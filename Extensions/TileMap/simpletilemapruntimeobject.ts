@@ -33,6 +33,8 @@ namespace gdjs {
   export type SimpleTileMapNetworkSyncData = ObjectNetworkSyncData &
     SimpleTileMapNetworkSyncDataType;
 
+  const hitBoxTag: string = 'collision';
+
   /**
    * Displays a SimpleTileMap object.
    * @category Objects > Tile Map
@@ -49,13 +51,10 @@ namespace gdjs {
     readonly _rowCount: number;
     readonly _columnCount: number;
     readonly _tileSize: number;
-    _displayMode = 'all';
-    _layerIndex = 0;
     _initialTileMapAsJsObject: TileMapHelper.EditableTileMapAsJsObject;
     readonly _initialTilesWithHitBox: number[];
     _isTileMapDirty: boolean = false;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap | null = null;
-    _hitBoxTag: string = 'collision';
 
     // TODO: Add a debug mode like for TileMapCollisionMaskRuntimeObject to draw?
 
@@ -96,7 +95,7 @@ namespace gdjs {
 
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap,
-            this._hitBoxTag
+            hitBoxTag
           );
 
           this.updateTransformation();
@@ -207,7 +206,7 @@ namespace gdjs {
               this._collisionTileMap =
                 new gdjs.TileMap.TransformedCollisionTileMap(
                   tileMap,
-                  this._hitBoxTag
+                  hitBoxTag
                 );
             }
 
@@ -255,7 +254,7 @@ namespace gdjs {
             this._collisionTileMap =
               new gdjs.TileMap.TransformedCollisionTileMap(
                 tileMap,
-                this._hitBoxTag
+                hitBoxTag
               );
           }
 
@@ -293,7 +292,7 @@ namespace gdjs {
               return;
             }
             tileDefinition.addHitBox(
-              this._hitBoxTag,
+              hitBoxTag,
               [
                 [0, 0],
                 [0, tileMap.getTileHeight()],
@@ -490,12 +489,12 @@ namespace gdjs {
       return this._collisionTileMap;
     }
 
-    getLayerIndex(): integer {
-      return this._layerIndex;
+    getEditedLayerIndex(): integer {
+      return 0;
     }
 
     getCollisionMaskTag(): string {
-      return this._hitBoxTag;
+      return hitBoxTag;
     }
 
     invalidateTileMap(): void {

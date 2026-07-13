@@ -8,7 +8,7 @@ namespace gdjs {
       tilemapJsonFile: string;
       tilesetJsonFile: string;
       tilemapAtlasImage: string;
-      displayMode: string;
+      displayMode: 'visible' | 'all' | 'index';
       layerIndex: integer;
       levelIndex: integer;
       animationSpeedScale: number;
@@ -58,6 +58,7 @@ namespace gdjs {
     _tilemapAtlasImage: string;
     _displayMode: string;
     _layerIndex: integer;
+    editedLayerIndex: integer;
     _levelIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
@@ -93,6 +94,7 @@ namespace gdjs {
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
       this._displayMode = objectData.content.displayMode;
       this._layerIndex = objectData.content.layerIndex;
+      this.editedLayerIndex = objectData.content.layerIndex;
       this._levelIndex = objectData.content.levelIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
@@ -157,7 +159,7 @@ namespace gdjs {
       if (
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
-        this.setLayerIndex(newObjectData.content.layerIndex);
+        this.setDisplayedLayerIndex(newObjectData.content.layerIndex);
       }
       if (
         oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
@@ -224,7 +226,7 @@ namespace gdjs {
         this.setDisplayMode(networkSyncData.dm);
       }
       if (networkSyncData.lai !== undefined) {
-        this.setLayerIndex(networkSyncData.lai);
+        this.setDisplayedLayerIndex(networkSyncData.lai);
       }
       if (networkSyncData.lei !== undefined) {
         this.setLevelIndex(networkSyncData.lei);
@@ -381,13 +383,25 @@ namespace gdjs {
       return this._displayMode;
     }
 
-    setLayerIndex(layerIndex: integer): void {
+    setDisplayedLayerIndex(layerIndex: integer): void {
       this._layerIndex = layerIndex;
       this.reloadTileMap();
     }
 
-    getLayerIndex(): integer {
+    getDisplayedLayerIndex(): integer {
       return this._layerIndex;
+    }
+
+    /**
+     * Change which layer is used to edit and read tiles.
+     * @param layerIndex The index of the layer to edit
+     */
+    setEditedLayerIndex(layerIndex: integer): void {
+      this.editedLayerIndex = layerIndex;
+    }
+
+    getEditedLayerIndex(): integer {
+      return this.editedLayerIndex;
     }
 
     setLevelIndex(levelIndex: integer): void {

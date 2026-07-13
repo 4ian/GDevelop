@@ -73,54 +73,6 @@ namespace gdjs {
     getGridRowCount(): integer;
 
     getGridColumnCount(): integer;
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @returns The tile's id.
-     */
-    getTileId(x: integer, y: integer, layerIndex: integer): integer;
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnY(
-      x: integer,
-      y: integer,
-      layerIndex: integer,
-      flip: boolean
-    ): void;
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnX(
-      x: integer,
-      y: integer,
-      layerIndex: integer,
-      flip: boolean
-    ): void;
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean;
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean;
   }
 
   /**
@@ -272,64 +224,6 @@ namespace gdjs {
 
     getGridColumnCount(): integer {
       return this.object.getGridColumnCount();
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @returns The tile's id.
-     */
-    getTileId(x: integer, y: integer, layerIndex: integer): integer {
-      return this.object.getTileId(x, y, layerIndex);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnY(
-      x: integer,
-      y: integer,
-      layerIndex: integer,
-      flip: boolean
-    ): void {
-      this.object.flipTileOnY(x, y, layerIndex, flip);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     * @param flip true if the tile should be flipped.
-     */
-    flipTileOnX(
-      x: integer,
-      y: integer,
-      layerIndex: integer,
-      flip: boolean
-    ): void {
-      this.object.flipTileOnX(x, y, layerIndex, flip);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
-      return this.object.isTileFlippedOnX(x, y, layerIndex);
-    }
-
-    /**
-     * @param x The layer column.
-     * @param y The layer row.
-     * @param layerIndex The layer index.
-     */
-    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
-      return this.object.isTileFlippedOnY(x, y, layerIndex);
     }
   }
 

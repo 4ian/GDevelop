@@ -36,7 +36,10 @@ namespace gdjs {
 
     abstract getCollisionTileMap(): gdjs.TileMap.TransformedCollisionTileMap | null;
 
-    abstract getLayerIndex(): integer;
+    /**
+     * Return the layer that is used to edit and read tiles.
+     */
+    abstract getEditedLayerIndex(): integer;
 
     abstract getCollisionMaskTag(): string;
 
@@ -249,7 +252,7 @@ namespace gdjs {
      * @param layerIndex The layer index.
      * @returns The tile's id.
      */
-    getTileId(x: integer, y: integer, layerIndex: integer): integer {
+    private getTileId(x: integer, y: integer, layerIndex: integer): integer {
       const tileMap = this.getTileMap();
       if (!tileMap) return -1;
       return tileMap.getTileId(x, y, layerIndex);
@@ -260,7 +263,11 @@ namespace gdjs {
      * @param y The layer row.
      * @param layerIndex The layer index.
      */
-    isTileFlippedOnX(x: integer, y: integer, layerIndex: integer): boolean {
+    private isTileFlippedOnX(
+      x: integer,
+      y: integer,
+      layerIndex: integer
+    ): boolean {
       const tileMap = this.getTileMap();
       if (!tileMap) return false;
       return tileMap.isTileFlippedOnX(x, y, layerIndex);
@@ -271,7 +278,11 @@ namespace gdjs {
      * @param y The layer row.
      * @param layerIndex The layer index.
      */
-    isTileFlippedOnY(x: integer, y: integer, layerIndex: integer): boolean {
+    private isTileFlippedOnY(
+      x: integer,
+      y: integer,
+      layerIndex: integer
+    ): boolean {
       const tileMap = this.getTileMap();
       if (!tileMap) return false;
       return tileMap.isTileFlippedOnY(x, y, layerIndex);
@@ -332,7 +343,7 @@ namespace gdjs {
     }
 
     getTileAtGridCoordinates(columnIndex: integer, rowIndex: integer): integer {
-      return this.getTileId(columnIndex, rowIndex, 0);
+      return this.getTileId(columnIndex, rowIndex, this.getEditedLayerIndex());
     }
 
     setTileAtPosition(tileId: number, x: float, y: float) {
@@ -350,7 +361,7 @@ namespace gdjs {
       if (!tileMap) {
         return;
       }
-      const layer = tileMap.getTileLayer(this.getLayerIndex());
+      const layer = tileMap.getTileLayer(this.getEditedLayerIndex());
       if (!layer) {
         return;
       }
@@ -373,7 +384,7 @@ namespace gdjs {
           newTileDefinition.hasFullHitBox(this.getCollisionMaskTag());
         if (hadFullHitBox !== haveFullHitBox) {
           collisionTileMap.invalidateTile(
-            this.getLayerIndex(),
+            this.getEditedLayerIndex(),
             columnIndex,
             rowIndex
           );
@@ -399,7 +410,7 @@ namespace gdjs {
       rowIndex: integer,
       flip: boolean
     ) {
-      this.flipTileOnY(columnIndex, rowIndex, 0, flip);
+      this.flipTileOnY(columnIndex, rowIndex, this.getEditedLayerIndex(), flip);
       this.invalidateTileMap();
       // No need to invalidate hit boxes since at the moment, collision mask
       // cannot be configured on each tile.
@@ -410,7 +421,7 @@ namespace gdjs {
       rowIndex: integer,
       flip: boolean
     ) {
-      this.flipTileOnX(columnIndex, rowIndex, 0, flip);
+      this.flipTileOnX(columnIndex, rowIndex, this.getEditedLayerIndex(), flip);
       this.invalidateTileMap();
       // No need to invalidate hit boxes since at the moment, collision mask
       // cannot be configured on each tile.
@@ -422,7 +433,12 @@ namespace gdjs {
      * @param layerIndex The layer index.
      * @param flip true if the tile should be flipped.
      */
-    flipTileOnY(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+    private flipTileOnY(
+      x: integer,
+      y: integer,
+      layerIndex: integer,
+      flip: boolean
+    ) {
       const tileMap = this.getTileMapForEdition();
       if (!tileMap) return;
       tileMap.flipTileOnY(x, y, layerIndex, flip);
@@ -434,7 +450,12 @@ namespace gdjs {
      * @param layerIndex The layer index.
      * @param flip true if the tile should be flipped.
      */
-    flipTileOnX(x: integer, y: integer, layerIndex: integer, flip: boolean) {
+    private flipTileOnX(
+      x: integer,
+      y: integer,
+      layerIndex: integer,
+      flip: boolean
+    ) {
       const tileMap = this.getTileMapForEdition();
       if (!tileMap) return;
       tileMap.flipTileOnX(x, y, layerIndex, flip);
@@ -444,22 +465,38 @@ namespace gdjs {
       const [columnIndex, rowIndex] =
         this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnX(
+        columnIndex,
+        rowIndex,
+        this.getEditedLayerIndex()
+      );
     }
 
     isTileFlippedOnXAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnX(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnX(
+        columnIndex,
+        rowIndex,
+        this.getEditedLayerIndex()
+      );
     }
 
     isTileFlippedOnYAtPosition(x: float, y: float) {
       const [columnIndex, rowIndex] =
         this.getGridCoordinatesFromSceneCoordinates(x, y);
 
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnY(
+        columnIndex,
+        rowIndex,
+        this.getEditedLayerIndex()
+      );
     }
 
     isTileFlippedOnYAtGridCoordinates(columnIndex: integer, rowIndex: integer) {
-      return this.isTileFlippedOnY(columnIndex, rowIndex, 0);
+      return this.isTileFlippedOnY(
+        columnIndex,
+        rowIndex,
+        this.getEditedLayerIndex()
+      );
     }
 
     removeTileAtPosition(x: float, y: float) {
@@ -473,7 +510,7 @@ namespace gdjs {
       if (!tileMap) {
         return;
       }
-      const layer = tileMap.getTileLayer(this.getLayerIndex());
+      const layer = tileMap.getTileLayer(this.getEditedLayerIndex());
       if (!layer) {
         return;
       }
@@ -492,7 +529,7 @@ namespace gdjs {
           oldTileDefinition.hasFullHitBox(this.getCollisionMaskTag());
         if (hadFullHitBox) {
           collisionTileMap.invalidateTile(
-            this.getLayerIndex(),
+            this.getEditedLayerIndex(),
             columnIndex,
             rowIndex
           );

@@ -704,7 +704,7 @@ const defineExternalTileMap = function (extension, _, gd) {
       gd.ParameterOptions.makeNewOptions()
     )
     .getCodeExtraInformation()
-    .setFunctionName('getLayerIndex');
+    .setFunctionName('getDisplayedLayerIndex');
 
   object
     .addAction(
@@ -722,8 +722,8 @@ const defineExternalTileMap = function (extension, _, gd) {
       gd.ParameterOptions.makeNewOptions()
     )
     .getCodeExtraInformation()
-    .setFunctionName('setLayerIndex')
-    .setGetter('getLayerIndex');
+    .setFunctionName('setDisplayedLayerIndex')
+    .setGetter('getDisplayedLayerIndex');
 
   object
     .addExpression(
@@ -735,7 +735,7 @@ const defineExternalTileMap = function (extension, _, gd) {
     )
     .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
-    .setFunctionName('getLayerIndex');
+    .setFunctionName('getDisplayedLayerIndex');
 
   object
     .addExpressionAndCondition(

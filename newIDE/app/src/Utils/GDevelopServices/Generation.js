@@ -199,7 +199,7 @@ export type AiGeneratedEventChange = {
 
 export type AiGeneratedEventBatch = {
   eventsDescription: string,
-  eventsScript: string | null,
+  eventScript: string | null,
   placementRelation: string,
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,

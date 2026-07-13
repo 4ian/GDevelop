@@ -200,7 +200,7 @@ export type EventsGenerationResult =
 
 export type EventBatch = {|
   eventsDescription: string,
-  eventsScript: string | null,
+  eventScript: string | null,
   placementRelation: string,
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,
@@ -4706,9 +4706,9 @@ const addSceneEvents: EditorFunction = {
               batch,
               'events_description'
             );
-            const eventsScript = SafeExtractor.extractStringProperty(
+            const eventScript = SafeExtractor.extractStringProperty(
               batch,
-              'events_script'
+              'event_script'
             );
             const placementRelation = SafeExtractor.extractStringProperty(
               batch,
@@ -4743,7 +4743,7 @@ const addSceneEvents: EditorFunction = {
                     : {eventsDescription}
                   </Text>
                 )}
-                {eventsScript && (
+                {eventScript && (
                   <Text
                     noMargin
                     allowSelection
@@ -4754,7 +4754,7 @@ const addSceneEvents: EditorFunction = {
                     <b>
                       <Trans>Events script</Trans>
                     </b>
-                    : {eventsScript}
+                    : {eventScript}
                   </Text>
                 )}
                 {placementRelation && (
@@ -4982,9 +4982,9 @@ const addSceneEvents: EditorFunction = {
                 batch,
                 'events_description'
               ) || '',
-            eventsScript: SafeExtractor.extractStringProperty(
+            eventScript: SafeExtractor.extractStringProperty(
               batch,
-              'events_script'
+              'event_script'
             ),
             placementRelation:
               SafeExtractor.extractStringProperty(
@@ -5017,7 +5017,7 @@ const addSceneEvents: EditorFunction = {
         parsedEventBatches.some(
           batch =>
             !batch.eventsDescription &&
-            !batch.eventsScript &&
+            !batch.eventScript &&
             batch.placementRelation !== 'delete'
         )
       ) {

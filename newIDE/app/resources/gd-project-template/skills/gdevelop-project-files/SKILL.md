@@ -90,6 +90,19 @@ generated compatibility/runtime output, not multi-file source.
   example `Controllers = [{ type = "array", children = [...] }]`. Use
   `variables = { }` when empty. Never write recursive `[[variables...]]` TOML
   tables.
+- Object groups: use only an `[objectGroups]` table in the owning project,
+  scene, prefab, prefab-variant, or function settings. Each key is the group
+  name and each value is an array of object names, for example
+  `Buttons = ["PauseButton", "Retry"]`. Use `objectGroups = { }` when there
+  are no groups. Preserve a group's `requiredBehaviors` with an optional
+  `[objectGroupRequiredBehaviors]` companion table whose matching group key
+  contains the behavior-type string array. Never write `objectsGroups`,
+  `objectGroups = []`, `[[objectsGroups]]`, or nested group/member descriptor
+  tables.
+- Sprite points: keep `originPoint` and `centerPoint` as inline TOML tables;
+  keep named `points` and `customCollisionMask` vertices as inline arrays of
+  point tables. Never expand point data into long dotted TOML headers. For
+  example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
 - `config.settings`: edit global configuration only under the short local
   `[settings]` table; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
@@ -379,7 +392,7 @@ Before finishing:
 - Confirm every changed `.settings` file is unindented TOML and independently
   parseable; confirm every `.layout` is canonical Layout DSL version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
-  `objects`, `objectsGroups`, or behavior definitions.
+  `objects`, `objectGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete

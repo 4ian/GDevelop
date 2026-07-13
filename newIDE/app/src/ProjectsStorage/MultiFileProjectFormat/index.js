@@ -47,6 +47,10 @@ const VARIABLE_DEFINITION_FIELDS = Object.freeze([
   'sceneVariables',
 ]);
 const VARIABLE_DEFINITION_FIELD_SET = new Set(VARIABLE_DEFINITION_FIELDS);
+const SOURCE_OBJECT_GROUPS_FIELD = 'objectGroups';
+const SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD =
+  'objectGroupRequiredBehaviors';
+const LEGACY_OWNER_OBJECT_GROUPS_FIELD = 'objectsGroups';
 
 export const SCENE_LAYOUT_FIELDS = Object.freeze([
   'r',
@@ -249,6 +253,147 @@ const compactVariableDefinitionFields = payload => {
   return compacted;
 };
 
+const validateObjectGroupStringArray = (values, label, fileUri) => {
+  const strings = asArray(values, label, fileUri);
+  strings.forEach((value, index) => {
+    if (typeof value !== 'string') {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label}[${index}] must be a string.`,
+        fileUri
+      );
+    }
+  });
+  return strings;
+};
+
+const compactObjectGroupDescriptors = (descriptors, descriptorField, label) =>
+  asArray(descriptors, label, undefined).map((descriptor, index) => {
+    if (
+      !descriptor ||
+      typeof descriptor !== 'object' ||
+      Array.isArray(descriptor) ||
+      Object.keys(descriptor).length !== 1 ||
+      typeof descriptor[descriptorField] !== 'string'
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label}[${index}] must contain exactly one string ${descriptorField} field.`
+      );
+    }
+    return descriptor[descriptorField];
+  });
+
+const compactObjectGroupFields = payload => {
+  const compacted = clone(payload);
+  const compactGroupsOn = (owner, legacyField, label) => {
+    if (owner[legacyField] === undefined) return;
+    if (
+      legacyField !== SOURCE_OBJECT_GROUPS_FIELD &&
+      owner[SOURCE_OBJECT_GROUPS_FIELD] !== undefined
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} cannot contain both objectsGroups and objectGroups.`
+      );
+    }
+    if (owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD] !== undefined) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} cannot contain the source-only ${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD} field before projection.`
+      );
+    }
+    const legacyGroups = asArray(owner[legacyField], label, undefined);
+    const groupsByName = {};
+    const requiredBehaviorsByGroupName = {};
+    legacyGroups.forEach((group, index) => {
+      if (!group || typeof group !== 'object' || Array.isArray(group)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}] must be an object-group descriptor.`
+        );
+      }
+      const fields = Object.keys(group);
+      if (
+        (fields.length !== 2 && fields.length !== 3) ||
+        !fields.includes('name') ||
+        !fields.includes('objects') ||
+        (fields.length === 3 && !fields.includes('requiredBehaviors'))
+      ) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}] must contain name, objects, and optionally requiredBehaviors.`
+        );
+      }
+      const name = group.name;
+      if (typeof name !== 'string') {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}].name must be a string.`
+        );
+      }
+      if (Object.prototype.hasOwnProperty.call(groupsByName, name)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label} contains duplicate group ${name}.`
+        );
+      }
+      Object.defineProperty(groupsByName, name, {
+        value: compactObjectGroupDescriptors(
+          group.objects,
+          'name',
+          `${label}.${name}.objects`
+        ),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+      if (Object.prototype.hasOwnProperty.call(group, 'requiredBehaviors')) {
+        Object.defineProperty(requiredBehaviorsByGroupName, name, {
+          value: compactObjectGroupDescriptors(
+            group.requiredBehaviors,
+            'type',
+            `${label}.${name}.requiredBehaviors`
+          ),
+          enumerable: true,
+          configurable: true,
+          writable: true,
+        });
+      }
+    });
+    delete owner[legacyField];
+    owner[SOURCE_OBJECT_GROUPS_FIELD] = groupsByName;
+    if (Object.keys(requiredBehaviorsByGroupName).length) {
+      owner[
+        SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD
+      ] = requiredBehaviorsByGroupName;
+    }
+  };
+
+  const rootLegacyField =
+    compacted[LEGACY_OWNER_OBJECT_GROUPS_FIELD] !== undefined
+      ? LEGACY_OWNER_OBJECT_GROUPS_FIELD
+      : compacted[SOURCE_OBJECT_GROUPS_FIELD] !== undefined
+      ? SOURCE_OBJECT_GROUPS_FIELD
+      : null;
+  if (rootLegacyField) {
+    compactGroupsOn(compacted, rootLegacyField, rootLegacyField);
+  }
+  if (Array.isArray(compacted.variants)) {
+    compacted.variants.forEach((variant, index) => {
+      if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+        return;
+      }
+      compactGroupsOn(
+        variant,
+        LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+        `variants[${index}].objectsGroups`
+      );
+    });
+  }
+  return compacted;
+};
+
 const restoreVariableDefinitionFields = (payload, fileUri) => {
   const restored = clone(payload);
   VARIABLE_DEFINITION_FIELDS.forEach(field => {
@@ -282,6 +427,111 @@ const restoreVariableDefinitionFields = (payload, fileUri) => {
       return { name, ...descriptorWrapper[0] };
     });
   });
+  return restored;
+};
+
+const restoreObjectGroupFields = (payload, fileUri) => {
+  const restored = clone(payload);
+  const restoreGroupsOn = (owner, legacyField, label) => {
+    if (owner[LEGACY_OWNER_OBJECT_GROUPS_FIELD] !== undefined) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} uses retired objectsGroups source syntax. Use an objectGroups table.`,
+        fileUri
+      );
+    }
+    if (owner[SOURCE_OBJECT_GROUPS_FIELD] === undefined) {
+      if (owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD] !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label} cannot define required behaviors without objectGroups.`,
+          fileUri
+        );
+      }
+      return;
+    }
+    const sourceGroups = owner[SOURCE_OBJECT_GROUPS_FIELD];
+    if (
+      !sourceGroups ||
+      typeof sourceGroups !== 'object' ||
+      Array.isArray(sourceGroups)
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} must be a TOML table keyed by group name.`,
+        fileUri
+      );
+    }
+    const groupsByName = sourceGroups;
+    const sourceRequiredBehaviors =
+      owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD];
+    if (
+      sourceRequiredBehaviors !== undefined &&
+      (!sourceRequiredBehaviors ||
+        typeof sourceRequiredBehaviors !== 'object' ||
+        Array.isArray(sourceRequiredBehaviors))
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD} must be a TOML table keyed by group name.`,
+        fileUri
+      );
+    }
+    const requiredBehaviorsByGroupName = sourceRequiredBehaviors || {};
+    Object.keys(requiredBehaviorsByGroupName).forEach(name => {
+      if (!Object.prototype.hasOwnProperty.call(groupsByName, name)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD}.${name} does not match an object group.`,
+          fileUri
+        );
+      }
+    });
+    const legacyGroups = Object.keys(groupsByName).map(name => {
+      const objects = validateObjectGroupStringArray(
+        groupsByName[name],
+        `${label}.${name}`,
+        fileUri
+      ).map(objectName => ({ name: objectName }));
+      if (
+        Object.prototype.hasOwnProperty.call(requiredBehaviorsByGroupName, name)
+      ) {
+        return {
+          name,
+          objects,
+          requiredBehaviors: validateObjectGroupStringArray(
+            requiredBehaviorsByGroupName[name],
+            `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD}.${name}`,
+            fileUri
+          ).map(behaviorType => ({ type: behaviorType })),
+        };
+      }
+      return { name, objects };
+    });
+    delete owner[SOURCE_OBJECT_GROUPS_FIELD];
+    delete owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD];
+    owner[legacyField] = legacyGroups;
+  };
+
+  restoreGroupsOn(
+    restored,
+    restored.kind === 'function'
+      ? SOURCE_OBJECT_GROUPS_FIELD
+      : LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+    SOURCE_OBJECT_GROUPS_FIELD
+  );
+  if (Array.isArray(restored.variants)) {
+    restored.variants.forEach((variant, index) => {
+      if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+        return;
+      }
+      restoreGroupsOn(
+        variant,
+        LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+        `variants[${index}].objectGroups`
+      );
+    });
+  }
   return restored;
 };
 
@@ -345,7 +595,7 @@ const projectTomlProjection = payload => {
 
 const projectTomlPayload = payload => {
   const { projected, rawJson } = projectTomlProjection(
-    compactVariableDefinitionFields(payload)
+    compactObjectGroupFields(compactVariableDefinitionFields(payload))
   );
   if (Object.prototype.hasOwnProperty.call(projected, 'rawJson')) {
     fail(
@@ -450,7 +700,10 @@ const restoreTomlPayload = (namespace, fileUri) => {
   delete payload.rawJson;
   const restoredPayload = restoreTomlProjection(payload, rawJson, fileUri);
   rejectLegacyFolderStructures(restoredPayload, fileUri);
-  return restoreVariableDefinitionFields(restoredPayload, fileUri);
+  return restoreObjectGroupFields(
+    restoreVariableDefinitionFields(restoredPayload, fileUri),
+    fileUri
+  );
 };
 
 const normalizeLf = source =>
@@ -495,6 +748,31 @@ const stringifyInlineTomlValue = value => {
   return stringifyToml.value(value);
 };
 
+const isPointRecord = value =>
+  !!value &&
+  typeof value === 'object' &&
+  !Array.isArray(value) &&
+  typeof value.x === 'number' &&
+  typeof value.y === 'number';
+
+const isInlinePointValue = (key, value) => {
+  if (key === 'originPoint' || key === 'centerPoint') {
+    return isPointRecord(value);
+  }
+  if (key === 'points') {
+    return Array.isArray(value) && value.every(isPointRecord);
+  }
+  if (key === 'customCollisionMask') {
+    return (
+      Array.isArray(value) &&
+      value.every(
+        polygon => Array.isArray(polygon) && polygon.every(isPointRecord)
+      )
+    );
+  }
+  return false;
+};
+
 const serializeToml = object => {
   // TOML table nesting is already explicit in dotted headers. Keeping every
   // generated line at column zero avoids presentation-only whitespace churn.
@@ -525,6 +803,21 @@ const serializeToml = object => {
       );
     });
   });
+  const reservePointValues = value => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      value.forEach(reservePointValues);
+      return;
+    }
+    Object.keys(value).forEach(key => {
+      if (isInlinePointValue(key, value[key])) {
+        value[key] = reserveInlineValue(value[key]);
+        return;
+      }
+      reservePointValues(value[key]);
+    });
+  };
+  reservePointValues(serializable);
   const output = stripTomlStructuralIndentation(
     normalizeLf(stringifyToml(serializable))
   ).trimEnd();

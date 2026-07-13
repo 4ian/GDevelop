@@ -127,7 +127,7 @@ helpUrl = ""
 deprecated = false
 deprecationMessage = ""
 parameters = []
-objectGroups = []
+objectGroups = { }
 ```
 
 `ResetCombat.events`:
@@ -160,8 +160,8 @@ isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
 layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 variables = { }
-objectsGroups = []
 propertyDescriptors = []
+objectGroups = { }
 ```
 
 `Enemy.layout`:
@@ -188,7 +188,7 @@ sentence = "Initialize _PARAM0_"
 private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "CombatKit::Enemy" }]
-objectGroups = []
+objectGroups = { }
 ```
 
 `Initialize/Initialize.events`:
@@ -254,7 +254,7 @@ sentence = "_PARAM0_ takes _PARAM2_ damage"
 private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object" }, { name = "Behavior", description = "Behavior", type = "behavior", supplementaryInformation = "CombatKit::Health" }, { name = "Amount", description = "Damage amount", type = "expression" }]
-objectGroups = []
+objectGroups = { }
 ```
 
 `TakeDamage/TakeDamage.events`:

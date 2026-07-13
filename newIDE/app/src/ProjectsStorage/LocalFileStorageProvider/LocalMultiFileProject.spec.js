@@ -31,7 +31,10 @@ import {
   writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
-import { unserializeFromJSObject } from '../../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 
 const projectFixture = {
   gdVersion: { major: 5, minor: 6, build: 0, revision: 0 },
@@ -439,6 +442,48 @@ describe('Local multi-file project storage', () => {
         path.join(temporaryDirectory, 'objects/GlobalPlayer.settings')
       )
     ).toBe(true);
+  });
+
+  test('writes the real libGD object-group shape with required behaviors', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    try {
+      project.setName('Object group project');
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalPlayer', 0);
+      const group = globalObjects
+        .getObjectGroups()
+        .insertNew('Global Actors', 0);
+      group.addObject('GlobalPlayer');
+      group.addRequiredBehavior('Tween::TweenBehavior');
+
+      const serializedProject = serializeToJSObject(project, 'serializeTo');
+      expect(serializedProject.objectsGroups).toEqual([
+        {
+          name: 'Global Actors',
+          objects: [{ name: 'GlobalPlayer' }],
+          requiredBehaviors: [{ type: 'Tween::TweenBehavior' }],
+        },
+      ]);
+
+      const entryPath = path.join(temporaryDirectory, 'project.settings');
+      await writeLegacyProjectAsMultiFile(serializedProject, entryPath);
+      const projectSettings = fs.readFileSync(entryPath, 'utf8');
+      expect(projectSettings).toContain('[objectGroups]');
+      expect(projectSettings).toContain('"Global Actors" = [ "GlobalPlayer" ]');
+      expect(projectSettings).toContain('[objectGroupRequiredBehaviors]');
+      expect(projectSettings).toContain(
+        '"Global Actors" = [ "Tween::TweenBehavior" ]'
+      );
+      expect(
+        areLegacyProjectsEquivalent(
+          serializedProject,
+          await openMultiFileProject(entryPath)
+        )
+      ).toBe(true);
+    } finally {
+      project.delete();
+    }
   });
 
   test('stores prefab and behavior function grouping in function settings', async () => {

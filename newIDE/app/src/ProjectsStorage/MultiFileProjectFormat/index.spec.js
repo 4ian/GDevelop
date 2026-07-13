@@ -22,6 +22,20 @@ const standardEvent = () => ({
   actions: [],
 });
 
+const serializedObjectGroup = (
+  name,
+  objectNames,
+  requiredBehaviorTypes = undefined
+) => ({
+  name,
+  objects: objectNames.map(objectName => ({ name: objectName })),
+  ...(requiredBehaviorTypes
+    ? {
+        requiredBehaviors: requiredBehaviorTypes.map(type => ({ type })),
+      }
+    : {}),
+});
+
 const functionObject = name => ({
   name,
   functionType: 'Action',
@@ -544,6 +558,66 @@ mode = "embedded"
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
+  test('writes Sprite point settings as inline TOML values', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [],
+        animations: [
+          {
+            name: 'Idle',
+            directions: [
+              {
+                looping: false,
+                timeBetweenFrames: 0.1,
+                sprites: [
+                  {
+                    image: 'Player.png',
+                    originPoint: { name: 'origine', x: 0, y: 0 },
+                    centerPoint: {
+                      name: 'centre',
+                      x: 16,
+                      y: 16,
+                      automatic: true,
+                    },
+                    points: [{ name: 'Muzzle', x: 28, y: 8 }],
+                    hasCustomCollisionMask: true,
+                    customCollisionMask: [
+                      [{ x: 0, y: 0 }, { x: 32, y: 0 }, { x: 16, y: 32 }],
+                    ],
+                  },
+                ],
+              },
+            ],
+            useMultipleDirections: false,
+          },
+        ],
+      },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const source = files['game://objects/Player.settings'];
+
+    expect(source).toContain(
+      'originPoint = { name = "origine", x = 0, y = 0 }'
+    );
+    expect(source).toContain(
+      'centerPoint = { name = "centre", x = 16, y = 16, automatic = true }'
+    );
+    expect(source).toContain('points = [ { name = "Muzzle", x = 28, y = 8 } ]');
+    expect(source).toContain(
+      'customCollisionMask = [ [ { x = 0, y = 0 }, { x = 32, y = 0 }, { x = 16, y = 32 } ] ]'
+    );
+    expect(source).not.toMatch(
+      /^\[+.*(?:originPoint|centerPoint|points|customCollisionMask)\]+$/m
+    );
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
   test('rejects namespaced serialized folder trees without compatibility', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://extensions/Combat/extension.settings'] += `
@@ -729,7 +803,7 @@ folderName = "__ROOT"
         },
       ],
     };
-    prefab.objectsGroups = [{ name: 'Parts', objects: ['Body'] }];
+    prefab.objectsGroups = [serializedObjectGroup('Parts', ['Body'])];
     const files = decomposeLegacyProjectToFiles(project);
     const layoutDocument = compileLayoutDsl(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout'],
@@ -744,7 +818,7 @@ folderName = "__ROOT"
     expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
     expect(layoutDocument).not.toHaveProperty('objectsGroups');
     expect(prefabSettings).not.toHaveProperty('objects');
-    expect(prefabSettings.objectsGroups).toEqual(prefab.objectsGroups);
+    expect(prefabSettings.objectGroups).toEqual({ Parts: ['Body'] });
     expect(
       parseTomlSource(
         files['game://extensions/Combat/prefabs/Enemy/objects/Body.settings']
@@ -761,6 +835,154 @@ folderName = "__ROOT"
       composeLegacyProjectFromFiles(files).eventsFunctionsExtensions[0]
         .eventsBasedObjects[0].objects
     ).toEqual(prefab.objects);
+  });
+
+  test('stores every settings-owned object group in a compact objectGroups table', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const extension = project.eventsFunctionsExtensions[0];
+    const prefab = extension.eventsBasedObjects[0];
+    const behavior = extension.eventsBasedBehaviors[0];
+    project.objectsGroups = [
+      serializedObjectGroup(
+        'Global Actors',
+        ['GlobalPlayer', 'GlobalEnemy'],
+        ['PlatformBehavior::PlatformerObjectBehavior']
+      ),
+    ];
+    project.layouts[0].objectsGroups = [
+      serializedObjectGroup('Buttons', ['PauseButton', 'Retry']),
+    ];
+    extension.eventsFunctions[0].objectGroups = [
+      serializedObjectGroup('Targets', ['Target', 'OtherTarget']),
+    ];
+    prefab.objectsGroups = [serializedObjectGroup('Parts', ['Body', 'Label'])];
+    prefab.variants[0].objectsGroups = [
+      serializedObjectGroup('Variant Parts', ['ArmoredBody']),
+    ];
+    prefab.eventsFunctions[0].objectGroups = [
+      serializedObjectGroup('Hit Targets', ['Target']),
+    ];
+    behavior.eventsFunctions[0].objectGroups = [
+      serializedObjectGroup('Healing Targets', ['Target']),
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const projectSettings = parseTomlSource(files[MULTI_FILE_ENTRY_URI]);
+    const sceneSettings = parseTomlSource(
+      files['game://scenes/Main/scene.settings']
+    );
+    const extensionFunctionSettings = parseTomlSource(
+      files[
+        'game://extensions/Combat/functions/CalculateDamage/function.settings'
+      ]
+    );
+    const prefabSettings = parseTomlSource(
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+    );
+    const prefabFunctionSettings = parseTomlSource(
+      files[
+        'game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/function.settings'
+      ]
+    );
+    const behaviorFunctionSettings = parseTomlSource(
+      files[
+        'game://extensions/Combat/behaviors/Health/functions/Heal/function.settings'
+      ]
+    );
+
+    expect(projectSettings.objectGroups).toEqual({
+      'Global Actors': ['GlobalPlayer', 'GlobalEnemy'],
+    });
+    expect(projectSettings.objectGroupRequiredBehaviors).toEqual({
+      'Global Actors': ['PlatformBehavior::PlatformerObjectBehavior'],
+    });
+    expect(sceneSettings.objectGroups).toEqual({
+      Buttons: ['PauseButton', 'Retry'],
+    });
+    expect(extensionFunctionSettings.objectGroups).toEqual({
+      Targets: ['Target', 'OtherTarget'],
+    });
+    expect(prefabSettings.objectGroups).toEqual({
+      Parts: ['Body', 'Label'],
+    });
+    expect(prefabSettings.variants[0].objectGroups).toEqual({
+      'Variant Parts': ['ArmoredBody'],
+    });
+    expect(prefabFunctionSettings.objectGroups).toEqual({
+      'Hit Targets': ['Target'],
+    });
+    expect(behaviorFunctionSettings.objectGroups).toEqual({
+      'Healing Targets': ['Target'],
+    });
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[objectGroups]');
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
+      '"Global Actors" = [ "GlobalPlayer", "GlobalEnemy" ]'
+    );
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain(
+      '[objectGroupRequiredBehaviors]'
+    );
+    expect(
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings']
+    ).toContain('[variants.objectGroups]');
+    expect(
+      Object.values(files)
+        .filter(source => typeof source === 'string')
+        .join('\n')
+    ).not.toMatch(/\[\[objectsGroups(?:\.|\]\])/);
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
+  test('rejects every retired or malformed object-group source form', () => {
+    const filesWithObjectsGroups = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    filesWithObjectsGroups[MULTI_FILE_ENTRY_URI] += `
+[[objectsGroups]]
+name = "Legacy"
+objects = [ "Player" ]
+`;
+    expect(() => composeLegacyProjectFromFiles(filesWithObjectsGroups)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_OBJECT_GROUPS' })
+    );
+
+    const functionUri =
+      'game://extensions/Combat/functions/CalculateDamage/function.settings';
+    const filesWithArrayGroups = decomposeLegacyProjectToFiles(projectFixture);
+    filesWithArrayGroups[functionUri] = filesWithArrayGroups[
+      functionUri
+    ].replace('objectGroups = { }\n', 'objectGroups = []\n');
+    expect(() => composeLegacyProjectFromFiles(filesWithArrayGroups)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_OBJECT_GROUPS' })
+    );
+
+    const filesWithOrphanRequirements = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    filesWithOrphanRequirements[
+      MULTI_FILE_ENTRY_URI
+    ] = filesWithOrphanRequirements[MULTI_FILE_ENTRY_URI].replace(
+      'objectGroups = { }\n',
+      '[objectGroups]\nButtons = [ "Player" ]\n\n[objectGroupRequiredBehaviors]\nMissing = [ "Tween::TweenBehavior" ]\n'
+    );
+    expect(() =>
+      composeLegacyProjectFromFiles(filesWithOrphanRequirements)
+    ).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_OBJECT_GROUPS' })
+    );
+
+    const filesWithNonStringMember = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    filesWithNonStringMember[MULTI_FILE_ENTRY_URI] = filesWithNonStringMember[
+      MULTI_FILE_ENTRY_URI
+    ].replace('objectGroups = { }\n', '[objectGroups]\nButtons = [ 1 ]\n');
+    expect(() =>
+      composeLegacyProjectFromFiles(filesWithNonStringMember)
+    ).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_OBJECT_GROUPS' })
+    );
   });
 
   test('keeps prefab properties as flat arrays without property folders', () => {

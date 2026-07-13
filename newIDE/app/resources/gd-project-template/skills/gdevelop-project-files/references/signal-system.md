@@ -237,8 +237,8 @@ getterName = ""
 private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "Cards::CardSlot" }, { name = "SignalName", description = "Signal name", type = "string" }, { name = "Payload", description = "Payload", type = "string" }]
-objectGroups = []
 events = "game://extensions/Cards/prefabs/CardSlot/functions/Lifecycle/onSignal/onSignal.events"
+objectGroups = { }
 ```
 
 In the body, branch on the fixed parameters `SignalName` and `Payload`. Do not

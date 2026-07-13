@@ -505,6 +505,88 @@ corresponding field name). Recursive forms such as `[[variables]]`,
 `[[sceneVariables.children]]`, and a descriptor that repeats `name` are
 invalid; there is no compatibility reader for them.
 
+### 5.1.5 Compact object groups
+
+Every settings-owned object-group container uses one TOML table keyed by group
+name. Each value is the complete ordered array of object names in that group:
+
+```toml
+[objectGroups]
+Buttons = [ "PauseButton", "Retry", "PlayButton" ]
+"UI Navigation" = [ "LeftArrow", "SpeedUp" ]
+```
+
+When a group declares required behavior types, the settings file preserves
+that metadata in an optional companion table keyed by the same group name:
+
+```toml
+[objectGroupRequiredBehaviors]
+Buttons = [ "ButtonStates::ButtonFSM" ]
+```
+
+Every key in `objectGroupRequiredBehaviors` must also exist in `objectGroups`.
+Omitting the companion key means the serialized group has no
+`requiredBehaviors` property. An explicitly empty companion array preserves an
+explicitly empty `requiredBehaviors` array.
+
+An owner with no groups writes the compact empty-table value:
+
+```toml
+objectGroups = { }
+```
+
+This representation applies to project, scene, prefab, prefab-variant, and
+function settings. A prefab variant nested in `prefab.settings` uses its
+corresponding nested table:
+
+```toml
+[[variants]]
+name = "Armored"
+layout = "game://extensions/Combat/prefabs/Enemy/variants/Armored.layout"
+
+[variants.objectGroups]
+Parts = [ "Armor", "Body" ]
+```
+
+The loader reconstructs the current serializer's `objectsGroups` arrays for
+project/scene/prefab owners and its `objectGroups` arrays for functions. Each
+source member string becomes the serializer descriptor `{ "name": "..." }`.
+Each required-behavior string becomes `{ "type": "..." }` inside the group's
+`requiredBehaviors` property. Group names must be unique because they are TOML
+keys. String values and array order are preserved exactly. Group declaration
+order is used for deterministic serializer reconstruction but has no runtime
+meaning in the source format.
+
+No other object-group membership source form exists, and required-behavior
+metadata uses only the companion table described above. In particular,
+`objectsGroups`, `objectGroups = []`, `[[objectsGroups]]`,
+`[[objectsGroups.objects]]`, and descriptor arrays containing repeated
+`name`/`objects` fields are invalid and are not migrated during multi-file
+loading.
+
+### 5.1.6 Inline Sprite points
+
+Sprite point data is always written as inline TOML values. A sprite frame uses
+this canonical shape:
+
+```toml
+originPoint = { name = "origine", x = 0, y = 0 }
+centerPoint = { name = "centre", x = 16, y = 16, automatic = true }
+points = [ { name = "Muzzle", x = 28, y = 8 } ]
+customCollisionMask = [ [ { x = 0, y = 0 }, { x = 32, y = 0 }, { x = 16, y = 32 } ] ]
+```
+
+`originPoint` and `centerPoint` are inline tables. `points` is an inline array
+of named-point tables. `customCollisionMask` is an inline array of polygons,
+where every polygon is an inline array of vertex tables. Empty point and mask
+arrays stay inline as `[ ]`.
+
+The writer must never expand these values into dotted headers such as
+`[animations.directions.sprites.originPoint]`,
+`[animations.directions.sprites.centerPoint]`, or nested point
+array-of-table headers. Parsing the inline representation reconstructs the
+same serializer objects and arrays without a separate conversion shape.
+
 ### 5.2 TOML profile
 
 Writers use TOML 1.0 with these restrictions:
@@ -518,13 +600,22 @@ Writers use TOML 1.0 with these restrictions:
 - Variable definition descriptors are the exception: their named entries and
   nested descriptor objects are emitted as one-line inline arrays/tables under
   `variables`, `globalVariables`, or `sceneVariables`.
+- Object groups are emitted only as `[objectGroups]` tables whose values are
+  arrays of object-name strings. Their optional serialized
+  `requiredBehaviors` metadata is emitted in the parallel
+  `[objectGroupRequiredBehaviors]` table as behavior-type string arrays.
+- Sprite `originPoint`, `centerPoint`, named `points`, and
+  `customCollisionMask` vertex data are emitted as inline TOML tables and
+  arrays rather than nested headers.
 - Keys that are not bare TOML keys are quoted.
 - Every file ends with exactly one newline.
 - NaN and infinity are forbidden because legacy JSON cannot represent them.
 
 Within component payload tables, ordinary field names intentionally match the
-current JSON serializer names (`objectsGroups`, `loopIndexVariable`, and so
-on). Legacy `*FolderStructure` fields are the exception: they are not part of
+current JSON serializer names (`loopIndexVariable` and so on). Object groups
+are the explicit exception: every source owner uses the single `objectGroups`
+table described above even though current legacy serializers use two different
+array field spellings. Legacy `*FolderStructure` fields are also excluded from
 the multi-file format. Physical project directories own component structure,
 and the legacy runtime/editor model rebuilds any transient root folders while
 composing.
@@ -707,8 +798,8 @@ packageName = "com.example.mygame"
 orientation = "default"
 ```
 
-Real entry files also contain projected `objectsGroups` and `variables`
-payloads when non-empty. Global object definitions and resources are never
+Real entry files also contain the `[objectGroups]` and `[variables]` tables.
+Global object definitions and resources are never
 written in `project.settings`. No settings file may contain a legacy
 `objectsFolderStructure` table.
 Global configuration is likewise never written there; it belongs to
@@ -1097,7 +1188,7 @@ expressionType = { type = "number" }
 parameters = [
   { name = "amount", type = "expression", description = "Base amount", optional = false, defaultValue = "", codeOnly = false }
 ]
-objectGroups = []
+objectGroups = { }
 ```
 
 Rules:
@@ -1180,7 +1271,10 @@ assetStoreOriginalName = ""
 
 It also owns:
 
-- `objectsGroups` for the prefab and for every variant.
+- The compact `[objectGroups]` table for the prefab and the corresponding
+  `[variants.objectGroups]` table for every variant, plus their optional
+  `[objectGroupRequiredBehaviors]` and
+  `[variants.objectGroupRequiredBehaviors]` companion tables.
 - Prefab variables.
 - Flat `propertyDescriptors` in source order. They are one direct TOML array;
   property groups and property folder trees do not exist in this format.
@@ -1269,7 +1363,7 @@ sentence = "Damage _PARAM0_"
 private = false
 async = false
 parameters = []
-objectGroups = []
+objectGroups = { }
 ```
 
 `function.settings` owns the complete function identity, signature, metadata,

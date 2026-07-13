@@ -160,6 +160,27 @@ describe('project source catalogs', () => {
     expect(catalog.authoring.rules.join('\n')).toContain(
       'Controllers = [{ type = "array"'
     );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      '[objectGroups] TOML table'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      '[objectGroupRequiredBehaviors]'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'originPoint and centerPoint as inline TOML tables'
+    );
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).toContain('objectGroups');
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).toContain('objectGroupRequiredBehaviors');
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).not.toContain('objectsGroups');
     expect(catalog.authoring.variableDefinition).toContain(
       'does not repeat name'
     );

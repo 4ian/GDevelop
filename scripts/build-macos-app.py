@@ -5,6 +5,12 @@ Dedicated packaging counterpart to ``start-macos-app.py`` (which only launches
 the app for development). This builds the React app, syncs it into the Electron
 ``app/www`` folder, and packages a distributable ``.dmg`` with electron-builder.
 
+Missing or out-of-date npm dependencies are installed automatically before the
+build: each package dir gets an ``npm install`` when its ``node_modules`` is
+absent or its ``package.json``/``package-lock.json`` is newer than the last
+install (so a newly-added dependency does not fail the build with a late
+"Can't resolve" error).
+
 macOS code signing and notarization are disabled (``GD_PORTABLE_BUILD=true``) so
 the build works without Apple Developer certificates. The resulting ``.dmg`` is
 therefore unsigned: on first launch other machines may need to right-click the
@@ -30,7 +36,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from libgd_build import LIBGD_VARIANTS, build_libgd
+from libgd_build import LIBGD_VARIANTS, build_libgd, npm_install_needed
 
 
 def parse_args() -> argparse.Namespace:
@@ -308,12 +314,15 @@ def ensure_electron_dependencies(
     dry_run: bool,
 ) -> None:
     step("Ensure Electron dependencies")
-    if electron_builder.exists():
+    needed, reason = npm_install_needed(electron_app_dir)
+    if electron_builder.exists() and not needed:
         print(f"electron-builder present: {electron_builder}", flush=True)
         return
 
+    if not electron_builder.exists():
+        reason = "electron-builder is missing"
     print(
-        "electron-builder is missing; installing electron-app dependencies.",
+        f"electron-app dependencies out of date ({reason}); installing.",
         flush=True,
     )
     run_command([resolve_tool("npm"), "install"], cwd=electron_app_dir, dry_run=dry_run)
@@ -327,11 +336,15 @@ def ensure_electron_dependencies(
 def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
     step("Ensure React app dependencies")
     node_modules = app_dir / "node_modules"
-    if node_modules.exists():
+    needed, reason = npm_install_needed(app_dir)
+    if not needed:
         print(f"React app dependencies present: {node_modules}", flush=True)
         return
 
-    print("React app node_modules missing; running npm install in newIDE/app.", flush=True)
+    print(
+        f"React app dependencies out of date ({reason}); running npm install in newIDE/app.",
+        flush=True,
+    )
     run_command([resolve_tool("npm"), "install"], cwd=app_dir, dry_run=dry_run)
 
     if not dry_run and not node_modules.exists():

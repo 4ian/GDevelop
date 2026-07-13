@@ -16,7 +16,7 @@ import sys
 import time
 from pathlib import Path
 
-from libgd_build import LIBGD_VARIANTS, build_libgd, is_libgd_stale
+from libgd_build import LIBGD_VARIANTS, build_libgd, is_libgd_stale, npm_install_needed
 
 
 DEV_PORTS = (3000, 5002)
@@ -194,11 +194,17 @@ def ensure_electron_dependencies(
     dry_run: bool,
 ) -> None:
     step("Ensure Electron dependencies")
-    if electron_exe.exists():
+    needed, reason = npm_install_needed(electron_app_dir)
+    if electron_exe.exists() and not needed:
         print(f"Electron executable exists: {electron_exe}", flush=True)
         return
 
-    print("Electron executable is missing; installing electron-app dependencies.", flush=True)
+    if not electron_exe.exists():
+        reason = "Electron executable is missing"
+    print(
+        f"electron-app dependencies out of date ({reason}); installing.",
+        flush=True,
+    )
     run_command([resolve_tool("npm"), "install"], cwd=electron_app_dir, dry_run=dry_run)
 
     if not dry_run and not electron_exe.exists():
@@ -208,11 +214,15 @@ def ensure_electron_dependencies(
 def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
     step("Ensure React app dependencies")
     node_modules = app_dir / "node_modules"
-    if node_modules.exists():
+    needed, reason = npm_install_needed(app_dir)
+    if not needed:
         print(f"React app dependencies present: {node_modules}", flush=True)
         return
 
-    print("React app node_modules missing; running npm install in newIDE/app.", flush=True)
+    print(
+        f"React app dependencies out of date ({reason}); running npm install in newIDE/app.",
+        flush=True,
+    )
     run_command([resolve_tool("npm"), "install"], cwd=app_dir, dry_run=dry_run)
 
     if not dry_run and not node_modules.exists():

@@ -103,6 +103,41 @@ def is_libgd_stale(repo_root: Path) -> tuple[bool, str]:
     return False, "built libGD.js is up to date with its C++ sources"
 
 
+def npm_install_needed(package_dir: Path) -> tuple[bool, str]:
+    """Whether ``npm install`` should run in ``package_dir``.
+
+    Returns ``(needed, reason)``. A bare ``node_modules`` existence check is not
+    enough: when a dependency is added to ``package.json`` after the last
+    install, ``node_modules`` still exists but is missing the new package, and
+    the build fails later with a "Can't resolve" error. npm writes a hidden
+    lockfile ``node_modules/.package-lock.json`` after every install, so a
+    ``package.json``/``package-lock.json`` newer than that marker means the
+    installed tree is out of date.
+    """
+    node_modules = package_dir / "node_modules"
+    if not node_modules.is_dir():
+        return True, "node_modules is missing"
+
+    marker = node_modules / ".package-lock.json"
+    try:
+        marker_mtime = marker.stat().st_mtime
+    except OSError:
+        # No install marker means npm never finished an install here (or it is
+        # an old npm); install to be safe.
+        return True, "node_modules/.package-lock.json marker is missing"
+
+    for manifest_name in ("package.json", "package-lock.json"):
+        manifest = package_dir / manifest_name
+        try:
+            manifest_mtime = manifest.stat().st_mtime
+        except OSError:
+            continue
+        if manifest_mtime > marker_mtime:
+            return True, f"{manifest_name} is newer than the last npm install"
+
+    return False, "dependencies are in sync with package.json"
+
+
 def step(title: str) -> None:
     print(f"\n==> {title}", flush=True)
 
@@ -424,9 +459,10 @@ def build_libgd(
 
     gdevelop_js_dir = repo_root / "GDevelop.js"
     node_modules = gdevelop_js_dir / "node_modules"
-    if not node_modules.exists():
+    needed, reason = npm_install_needed(gdevelop_js_dir)
+    if needed:
         print(
-            "GDevelop.js node_modules missing; running npm install in GDevelop.js.",
+            f"GDevelop.js dependencies out of date ({reason}); running npm install in GDevelop.js.",
             flush=True,
         )
         run_command([resolve_tool("npm"), "install"], cwd=gdevelop_js_dir, dry_run=dry_run)

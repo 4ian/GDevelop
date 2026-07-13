@@ -4,6 +4,12 @@
 This intentionally uses the production Electron path because the development
 server path can hang on this Windows checkout and can race with GDJS resource
 regeneration.
+
+Missing or out-of-date npm dependencies are installed automatically before the
+build: each package dir gets an ``npm install`` when its ``node_modules`` is
+absent or its ``package.json``/``package-lock.json`` is newer than the last
+install (so a newly-added dependency does not fail the build with a late
+"Can't resolve" error).
 """
 
 from __future__ import annotations
@@ -16,7 +22,7 @@ import sys
 import time
 from pathlib import Path
 
-from libgd_build import LIBGD_VARIANTS, build_libgd
+from libgd_build import LIBGD_VARIANTS, build_libgd, npm_install_needed
 
 
 DEV_PORTS = (3000, 5002)
@@ -246,15 +252,39 @@ def ensure_electron_dependencies(
     dry_run: bool,
 ) -> None:
     step("Ensure Electron dependencies")
-    if electron_exe.exists():
+    needed, reason = npm_install_needed(electron_app_dir)
+    if electron_exe.exists() and not needed:
         print(f"Electron executable exists: {electron_exe}", flush=True)
         return
 
-    print("Electron executable is missing; installing electron-app dependencies.", flush=True)
+    if not electron_exe.exists():
+        reason = "Electron executable is missing"
+    print(
+        f"electron-app dependencies out of date ({reason}); installing.",
+        flush=True,
+    )
     run_command([resolve_tool("npm"), "install"], cwd=electron_app_dir, dry_run=dry_run)
 
     if not dry_run and not electron_exe.exists():
         raise RuntimeError(f"Electron executable still missing after npm install: {electron_exe}")
+
+
+def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
+    step("Ensure React app dependencies")
+    node_modules = app_dir / "node_modules"
+    needed, reason = npm_install_needed(app_dir)
+    if not needed:
+        print(f"React app dependencies present: {node_modules}", flush=True)
+        return
+
+    print(
+        f"React app dependencies out of date ({reason}); running npm install in newIDE/app.",
+        flush=True,
+    )
+    run_command([resolve_tool("npm"), "install"], cwd=app_dir, dry_run=dry_run)
+
+    if not dry_run and not node_modules.exists():
+        raise RuntimeError(f"React app node_modules still missing after npm install: {node_modules}")
 
 
 def build_react_app(app_dir: Path, build: bool, dry_run: bool) -> None:
@@ -399,6 +429,7 @@ def main() -> int:
 
     try:
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
+        ensure_react_app_dependencies(app_dir, args.dry_run)
         build_libgd(
             repo_root,
             skip_build=not build,

@@ -13,17 +13,16 @@ import {
   isWriteTool,
 } from './McpToolCatalog';
 
-const expectedTools = [
+const expectedAlwaysAvailableTools = [
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
-  'validate_current_project_json',
+  'generate-catalogs',
+  'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
-  'gdevelop_capabilities',
-  'gdevelop_refresh_tool_catalog',
   'reload_project',
   'launch_preview',
   'wait_until_preview_ready',
@@ -36,8 +35,10 @@ const expectedTools = [
   'capture_preview_screenshot',
 ].sort();
 
+const expectedWriteTools = ['import_extension'];
+
 describe('McpToolCatalog', () => {
-  it('exposes only editor queries and preview debugging tools', () => {
+  it('always exposes only the bounded extension importer from write tools', () => {
     const withoutPermissions = getMcpTools({
       allowWriteTools: false,
       allowCommandTools: false,
@@ -48,16 +49,23 @@ describe('McpToolCatalog', () => {
     });
 
     expect(withoutPermissions.map(tool => tool.name).sort()).toEqual(
-      expectedTools
+      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
     );
     expect(withPermissions.map(tool => tool.name).sort()).toEqual(
-      expectedTools
+      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
     );
     expect(
       getAllMcpToolsForIntrospection()
         .map(tool => tool.name)
         .sort()
-    ).toEqual(expectedTools);
+    ).toEqual([...expectedAlwaysAvailableTools, ...expectedWriteTools].sort());
+    expect(isWriteTool('import_extension')).toBe(true);
+    expect(
+      canCallMcpTool('import_extension', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
   });
 
   it('does not expose project authoring, save, command, or escape-hatch tools', () => {
@@ -72,6 +80,9 @@ describe('McpToolCatalog', () => {
       'gdevelop_search_instruction_metadata',
       'gdevelop_get_instruction_metadata',
       'apply_validated_project_json_patch',
+      'validate_current_project_json',
+      'gdevelop_capabilities',
+      'gdevelop_refresh_tool_catalog',
     ].forEach(name => {
       expect(isKnownMcpTool(name)).toBe(false);
       expect(isWriteTool(name)).toBe(false);
@@ -93,10 +104,13 @@ describe('McpToolCatalog', () => {
     });
     expect(Object.keys(capabilities.categories).sort()).toEqual([
       'Editor queries',
+      'Extension import',
       'Preview debugging',
     ]);
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');
+    expect(capabilities.note).toContain('settings-catalog.json');
+    expect(capabilities.note).toContain('layout-catalog.json');
     expect(
       capabilities.categories['Preview debugging'].map(tool => tool.name)
     ).toContain('reload_project');
@@ -117,8 +131,68 @@ describe('McpToolCatalog', () => {
         }),
       })
     );
+    expect(tool.description).toContain('regenerate');
     expect(
       canCallMcpTool('reload_project', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+  });
+
+  it('exposes generate-catalogs as an awaited, non-destructive catalog write', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'generate-catalogs');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        inputSchema: expect.objectContaining({
+          type: 'object',
+          additionalProperties: false,
+        }),
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(tool.description).toContain('waits for all three files');
+    expect(
+      canCallMcpTool('generate-catalogs', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+  });
+
+  it('exposes validate_project_files as a no-input catalog-regenerating validation gate', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'validate_project_files');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          additionalProperties: false,
+        },
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(tool.description).toContain('game.json');
+    expect(tool.description).toContain('regenerate all');
+    expect(tool.description).toContain('before reload_project');
+    expect(
+      canCallMcpTool('validate_project_files', {
         allowWriteTools: false,
         allowCommandTools: false,
       })

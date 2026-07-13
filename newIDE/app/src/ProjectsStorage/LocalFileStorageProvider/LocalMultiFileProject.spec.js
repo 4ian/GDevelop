@@ -26,8 +26,12 @@ import {
   getProjectLocation,
   onSaveProject,
   writeProjectInstructionCatalog,
+  writeProjectLayoutCatalog,
+  writeProjectSettingsCatalog,
+  writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
+import { unserializeFromJSObject } from '../../Utils/Serializer';
 
 const projectFixture = {
   gdVersion: { major: 5, minor: 6, build: 0, revision: 0 },
@@ -115,6 +119,54 @@ describe('Local multi-file project storage', () => {
     );
   });
 
+  test('uses portable physical names for URI segments invalid on Windows', async () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.firstLayout = 'Extension: Health';
+    project.previewLayout = 'Extension: Health';
+    project.layouts[0].name = 'Extension: Health';
+    project.layouts[0].mangledName = 'ExtensionHealth';
+    const files = decomposeLegacyProjectToFiles(project);
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+
+    await writeMultiFileSourceTree({ entryPath, files });
+
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes',
+          'Extension%3A%20Health',
+          'scene.settings'
+        )
+      )
+    ).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
+  test('opens a source tree after Git converts settings files to CRLF', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    await writeMultiFileSourceTree({ entryPath, files });
+    Object.keys(files).forEach(uri => {
+      if (!uri.endsWith('.settings')) return;
+      const filePath = resolveGameUriToPath(temporaryDirectory, uri);
+      const source = fs.readFileSync(filePath, 'utf8');
+      fs.writeFileSync(filePath, source.replace(/\n/g, '\r\n'), 'utf8');
+    });
+
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
   test('loads named IfDo instructions through the generated catalog', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const files = decomposeLegacyProjectToFiles(projectFixture);
@@ -172,7 +224,56 @@ describe('Local multi-file project storage', () => {
       await writeLegacyProjectAsMultiFile(changedProject, entryPath)
     ).toEqual(['game://scenes/Main/scene.settings']);
 
-    const changedResourcesProject = JSON.parse(JSON.stringify(changedProject));
+    const changedObjectProject = JSON.parse(JSON.stringify(changedProject));
+    changedObjectProject.layouts[0].objects.push({
+      name: 'Player',
+      type: 'Sprite',
+      behaviors: [
+        {
+          name: 'PlatformerObject',
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+        },
+      ],
+    });
+    changedObjectProject.layouts[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'Player' }],
+        },
+      ],
+    };
+    expect(
+      await writeLegacyProjectAsMultiFile(changedObjectProject, entryPath)
+    ).toEqual(['game://scenes/Main/objects/Player.settings']);
+
+    const changedInstanceProject = JSON.parse(
+      JSON.stringify(changedObjectProject)
+    );
+    changedInstanceProject.layouts[0].layers = [{ name: '' }];
+    changedInstanceProject.layouts[0].instances.push({
+      name: 'Player',
+      persistentUuid: '00000000-0000-4000-8000-000000000001',
+      x: 100,
+      y: 200,
+      angle: 0,
+      layer: '',
+      zOrder: 1,
+      customSize: false,
+      width: 0,
+      height: 0,
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    });
+    expect(
+      await writeLegacyProjectAsMultiFile(changedInstanceProject, entryPath)
+    ).toEqual(['game://scenes/Main/Main.layout']);
+
+    const changedResourcesProject = JSON.parse(
+      JSON.stringify(changedInstanceProject)
+    );
     changedResourcesProject.resources.resources.push({
       file: 'assets/New.png',
       kind: 'image',
@@ -205,6 +306,262 @@ describe('Local multi-file project storage', () => {
     ).toBe(false);
   });
 
+  test('routes prefab definition and instance edits to their owning files', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions = [
+      {
+        name: 'Local',
+        eventsFunctions: [],
+        eventsBasedBehaviors: [],
+        eventsBasedObjects: [
+          {
+            name: 'Widget',
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 64,
+            objects: [],
+            objectsFolderStructure: {
+              folderName: '__ROOT',
+              children: [],
+            },
+            objectsGroups: [],
+            layers: [],
+            instances: [],
+            editionSettings: {},
+            eventsFunctions: [],
+            variants: [],
+          },
+        ],
+      },
+    ];
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    const changedDefinition = JSON.parse(JSON.stringify(project));
+    changedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objects.push(
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [{ name: 'Tween', type: 'Tween::TweenBehavior' }],
+      }
+    );
+    changedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Parts',
+          children: [{ objectName: 'Body' }],
+        },
+      ],
+    };
+    expect(
+      await writeLegacyProjectAsMultiFile(changedDefinition, entryPath)
+    ).toEqual(['game://extensions/Local/prefabs/Widget/objects/Body.settings']);
+
+    const changedInstance = JSON.parse(JSON.stringify(changedDefinition));
+    changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].layers = [
+      { name: '' },
+    ];
+    changedInstance.eventsFunctionsExtensions[0].eventsBasedObjects[0].instances.push(
+      {
+        name: 'Body',
+        persistentUuid: '00000000-0000-4000-8000-000000000002',
+        x: 0,
+        y: 0,
+        angle: 0,
+        layer: '',
+        zOrder: 0,
+        customSize: false,
+        width: 0,
+        height: 0,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+      }
+    );
+    expect(
+      await writeLegacyProjectAsMultiFile(changedInstance, entryPath)
+    ).toEqual(['game://extensions/Local/prefabs/Widget/Widget.layout']);
+
+    const movedDefinition = JSON.parse(JSON.stringify(changedInstance));
+    movedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objectsFolderStructure.children[0].folderName =
+      'Visuals';
+    expect(
+      await writeLegacyProjectAsMultiFile(movedDefinition, entryPath)
+    ).toEqual(['game://extensions/Local/prefabs/Widget/objects/Body.settings']);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'extensions/Local/prefabs/Widget/objects/Body.settings'
+        )
+      )
+    ).toBe(true);
+  });
+
+  test('stores global object grouping in its flat settings file', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.objects = [
+      {
+        name: 'GlobalPlayer',
+        type: 'Sprite',
+        behaviors: [],
+      },
+    ];
+    project.objectsFolderStructure = {
+      folderName: '__ROOT',
+      children: [
+        {
+          folderName: 'Actors',
+          children: [{ objectName: 'GlobalPlayer' }],
+        },
+      ],
+    };
+
+    expect(await writeLegacyProjectAsMultiFile(project, entryPath)).toEqual(
+      expect.arrayContaining(['game://objects/GlobalPlayer.settings'])
+    );
+    expect((await openMultiFileProject(entryPath)).objects).toEqual(
+      project.objects
+    );
+
+    const movedProject = JSON.parse(JSON.stringify(project));
+    movedProject.objectsFolderStructure.children[0].folderName = 'Shared';
+    expect(
+      await writeLegacyProjectAsMultiFile(movedProject, entryPath)
+    ).toEqual(['game://objects/GlobalPlayer.settings']);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, 'objects/GlobalPlayer.settings')
+      )
+    ).toBe(true);
+  });
+
+  test('stores prefab and behavior function grouping in function settings', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const makeFunction = name => ({
+      name,
+      functionType: 'Action',
+      fullName: name,
+      description: '',
+      sentence: '',
+      group: '',
+      private: false,
+      async: false,
+      parameters: [],
+      objectGroups: [],
+      events: [],
+    });
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions = [
+      {
+        name: 'Local',
+        eventsFunctions: [],
+        eventsBasedObjects: [
+          {
+            name: 'Widget',
+            objects: [],
+            objectsGroups: [],
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 64,
+            layers: [],
+            instances: [],
+            editionSettings: {},
+            eventsFunctions: [makeFunction('Initialize')],
+            eventsFunctionsFolderStructure: {
+              folderName: '__ROOT',
+              children: [
+                {
+                  folderName: 'Lifecycle',
+                  children: [{ functionName: 'Initialize' }],
+                },
+              ],
+            },
+            variants: [],
+          },
+        ],
+        eventsBasedBehaviors: [
+          {
+            name: 'Health',
+            eventsFunctions: [makeFunction('Heal')],
+            eventsFunctionsFolderStructure: {
+              folderName: '__ROOT',
+              children: [
+                {
+                  folderName: 'Recovery',
+                  children: [{ functionName: 'Heal' }],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ];
+
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'extensions/Local/prefabs/Widget/functions/Initialize/function.settings'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'extensions/Local/behaviors/Health/functions/Heal/Heal.events'
+        )
+      )
+    ).toBe(true);
+    const opened = await openMultiFileProject(entryPath);
+    expect(
+      opened.eventsFunctionsExtensions[0].eventsBasedObjects[0]
+        .eventsFunctionsFolderStructure
+    ).toEqual(
+      project.eventsFunctionsExtensions[0].eventsBasedObjects[0]
+        .eventsFunctionsFolderStructure
+    );
+    expect(
+      opened.eventsFunctionsExtensions[0].eventsBasedBehaviors[0]
+        .eventsFunctionsFolderStructure
+    ).toEqual(
+      project.eventsFunctionsExtensions[0].eventsBasedBehaviors[0]
+        .eventsFunctionsFolderStructure
+    );
+
+    const moved = JSON.parse(JSON.stringify(project));
+    moved.eventsFunctionsExtensions[0].eventsBasedObjects[0].eventsFunctionsFolderStructure.children[0].folderName =
+      'Setup';
+    moved.eventsFunctionsExtensions[0].eventsBasedBehaviors[0].eventsFunctionsFolderStructure.children[0].folderName =
+      'State';
+    const changed = await writeLegacyProjectAsMultiFile(moved, entryPath);
+    expect(changed).toEqual([
+      'game://extensions/Local/prefabs/Widget/functions/Initialize/function.settings',
+      'game://extensions/Local/behaviors/Health/functions/Heal/function.settings',
+    ]);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'extensions/Local/prefabs/Widget/functions/Initialize'
+        )
+      )
+    ).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(moved, await openMultiFileProject(entryPath))
+    ).toBe(true);
+  });
+
   test('removes only obsolete files owned by the previous manifest', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
@@ -234,7 +591,7 @@ describe('Local multi-file project storage', () => {
 
   test('renames all files owned by extension components and removes empty old folders', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
-    const makeFunction = name => ({
+    const makeFunction = (name: string) => ({
       name,
       functionType: 'Action',
       fullName: name,
@@ -267,8 +624,15 @@ describe('Local multi-file project storage', () => {
               children: [],
             },
             objectsGroups: [],
+            areaMinX: 0,
+            areaMinY: 0,
+            areaMinZ: 0,
+            areaMaxX: 64,
+            areaMaxY: 64,
+            areaMaxZ: 0,
             layers: [],
             instances: [],
+            editionSettings: {},
             eventsFunctions: [makeFunction('TakeDamage')],
             variants: [],
           },
@@ -282,7 +646,7 @@ describe('Local multi-file project storage', () => {
         ],
       },
     ];
-    const exists = relativePath =>
+    const exists = (relativePath: string) =>
       fs.existsSync(path.join(temporaryDirectory, ...relativePath.split('/')));
 
     await writeLegacyProjectAsMultiFile(project, entryPath);
@@ -309,9 +673,16 @@ describe('Local multi-file project storage', () => {
     expect(exists('extensions/Combat/prefabs/Enemy')).toBe(false);
     expect(exists('extensions/Combat/prefabs/Boss/prefab.settings')).toBe(true);
     expect(exists('extensions/Combat/prefabs/Boss/Boss.layout')).toBe(true);
-    expect(exists('extensions/Combat/prefabs/Boss/ReceiveDamage.events')).toBe(
-      true
-    );
+    expect(
+      exists(
+        'extensions/Combat/prefabs/Boss/functions/ReceiveDamage/function.settings'
+      )
+    ).toBe(true);
+    expect(
+      exists(
+        'extensions/Combat/prefabs/Boss/functions/ReceiveDamage/ReceiveDamage.events'
+      )
+    ).toBe(true);
     const prefabSettings = fs.readFileSync(
       path.join(
         temporaryDirectory,
@@ -322,9 +693,8 @@ describe('Local multi-file project storage', () => {
     expect(prefabSettings).toContain(
       'layout = "game://extensions/Combat/prefabs/Boss/Boss.layout"'
     );
-    expect(prefabSettings).toContain(
-      'events = "game://extensions/Combat/prefabs/Boss/ReceiveDamage.events"'
-    );
+    expect(prefabSettings).not.toContain('.functions.');
+    expect(prefabSettings).not.toContain('ReceiveDamage.events');
     project = renamed;
 
     renamed = JSON.parse(JSON.stringify(project));
@@ -337,9 +707,16 @@ describe('Local multi-file project storage', () => {
     expect(
       exists('extensions/Combat/behaviors/Vitality/behavior.settings')
     ).toBe(true);
-    expect(exists('extensions/Combat/behaviors/Vitality/Restore.events')).toBe(
-      true
-    );
+    expect(
+      exists(
+        'extensions/Combat/behaviors/Vitality/functions/Restore/function.settings'
+      )
+    ).toBe(true);
+    expect(
+      exists(
+        'extensions/Combat/behaviors/Vitality/functions/Restore/Restore.events'
+      )
+    ).toBe(true);
     project = renamed;
 
     renamed = JSON.parse(JSON.stringify(project));
@@ -351,9 +728,11 @@ describe('Local multi-file project storage', () => {
       exists('extensions/Battle/functions/ComputeDamage/ComputeDamage.events')
     ).toBe(true);
     expect(exists('extensions/Battle/prefabs/Boss/Boss.layout')).toBe(true);
-    expect(exists('extensions/Battle/behaviors/Vitality/Restore.events')).toBe(
-      true
-    );
+    expect(
+      exists(
+        'extensions/Battle/behaviors/Vitality/functions/Restore/Restore.events'
+      )
+    ).toBe(true);
     expect(
       areLegacyProjectsEquivalent(
         renamed,
@@ -405,7 +784,7 @@ describe('Local multi-file project storage', () => {
       path.join(temporaryDirectory, 'project.settings')
     );
     expect(
-      areLegacyProjectsEquivalent(projectFixture, secondResult.content)
+      areLegacyProjectsEquivalent(firstResult.content, secondResult.content)
     ).toBe(true);
 
     fs.writeFileSync(legacyPath, `${legacySource} `, 'utf8');
@@ -446,12 +825,113 @@ describe('Local multi-file project storage', () => {
     );
 
     expect(fs.existsSync(catalogPath)).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          '.gdevelop/deprecated-instructions-catalog.json'
+        )
+      )
+    ).toBe(false);
     expect(JSON.parse(fs.readFileSync(catalogPath, 'utf8')).counts).toEqual(
       catalog.counts
     );
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
+    project.delete();
+  });
+
+  test('writes project-aware AI settings and layout catalogs in .gdevelop', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Catalog project');
+    ensureProjectHasDefaultScene(project);
+    const layout = project.getLayoutAt(0);
+    layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+
+    const settingsCatalog = await writeProjectSettingsCatalog(
+      project,
+      temporaryDirectory
+    );
+    const layoutCatalog = await writeProjectLayoutCatalog(
+      project,
+      temporaryDirectory,
+      undefined,
+      settingsCatalog.effectTypes
+    );
+    const settingsPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/settings-catalog.json'
+    );
+    const layoutPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/layout-catalog.json'
+    );
+
+    expect(fs.existsSync(settingsPath)).toBe(true);
+    expect(fs.existsSync(layoutPath)).toBe(true);
+    const persistedSettingsCatalog = JSON.parse(
+      fs.readFileSync(settingsPath, 'utf8')
+    );
+    expect(persistedSettingsCatalog.counts).toEqual(settingsCatalog.counts);
+    expect(JSON.stringify(persistedSettingsCatalog.fileKinds)).not.toMatch(
+      /FolderStructure/
+    );
+    expect(settingsCatalog.counts.fileKinds).toBe(14);
+    expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
+    expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
+    expect(layoutCatalog.contexts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'scene',
+          owner: { scene: 'UntitledScene' },
+          objects: expect.arrayContaining([
+            expect.objectContaining({ name: 'Player', type: 'Sprite' }),
+          ]),
+        }),
+      ])
+    );
+    project.delete();
+  });
+
+  test('regenerates every project source catalog together', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Reloaded catalog project');
+    ensureProjectHasDefaultScene(project);
+
+    const counts = await writeProjectSourceCatalogs(
+      project,
+      temporaryDirectory
+    );
+
+    expect(counts.instructions.actions).toBeGreaterThan(100);
+    expect(counts.settings.objectTypes).toBeGreaterThan(5);
+    expect(counts.layouts.contexts).toBe(1);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/instructions-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          '.gdevelop/deprecated-instructions-catalog.json'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
+      )
+    ).toBe(true);
     project.delete();
   });
 
@@ -484,7 +964,82 @@ describe('Local multi-file project storage', () => {
     expect(
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
+    expect(fs.readFileSync(generatedPath, 'utf8')).not.toMatch(
+      /(?:eventsFunctions|objects|properties|sharedProperties)FolderStructure/
+    );
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
+      )
+    ).toBe(true);
     project.delete();
+  });
+
+  test('saves and reopens the Physics2 template instruction whose type contains whitespace', async () => {
+    const gd: libGDevelop = global.gd;
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const physics2ExtensionModule = require('../../../../../Extensions/Physics2Behavior/JsExtension');
+    const physics2Extension = physics2ExtensionModule.createExtension(
+      message => message,
+      gd
+    );
+    gd.JsPlatform.get().addNewExtension(physics2Extension);
+    physics2Extension.delete();
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const legacyProject = JSON.parse(JSON.stringify(projectFixture));
+    legacyProject.properties.name = 'Physics template regression';
+    legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
+    legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Physics2::Remove joint' },
+            parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+          },
+        ],
+      },
+    ];
+    try {
+      unserializeFromJSObject(project, legacyProject);
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const eventsSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/Main.events'),
+        'utf8'
+      );
+      expect(eventsSource).toContain('do "Physics2::Remove joint"');
+      expect(eventsSource).not.toContain('@exact');
+      const reopened = await openMultiFileProject(entryPath);
+      expect(reopened.layouts[0].events[0].actions[0]).toMatchObject({
+        type: { value: 'Physics2::Remove joint' },
+        parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+      });
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension('Physics2');
+    }
   });
 
   test('writes the default scene sources on the first project save', async () => {

@@ -159,7 +159,7 @@ The following table maps the items visible in the GDevelop event menus to IfDo.
 | Else                    | `else` or `else if condition`                               |
 | For each object         | `for each Object`                                           |
 | For each child variable | `for each child variablePath as alias`                      |
-| Event group             | `@group "Name" ... @end group`                             |
+| Event group             | `@group "Name" ... @end group`                              |
 | JavaScript code         | `@js` ... `@end js`                                         |
 | Link external events    | `link external "Sheet Name"`                                |
 | Repeat                  | `repeat count`                                              |
@@ -294,7 +294,7 @@ A source file has one of two kinds:
 1. **Event-sheet body** — compiled for the scene target supplied by project and
    scene settings, or the external target supplied by `external.settings`.
 2. **Function body** — compiled for the function signature supplied by
-   `function.settings`, `prefab.settings`, or `behavior.settings`.
+   its dedicated `function.settings`.
 
 Both have the same pure DSL file grammar. Their owning settings determine the
 semantic context.
@@ -306,18 +306,19 @@ scenes/<SceneName>/<SceneName>.events
 externals/<ExternalEventSheetName>.events
 extensions/<ExtensionName>/functions/<FunctionName>/function.settings
 extensions/<ExtensionName>/functions/<FunctionName>/<FunctionName>.events
-extensions/<ExtensionName>/prefabs/<PrefabName>/<FunctionName>.events
-extensions/<ExtensionName>/behaviors/<BehaviorName>/<FunctionName>.events
+extensions/<ExtensionName>/prefabs/<PrefabName>/functions/<FunctionName>/function.settings
+extensions/<ExtensionName>/prefabs/<PrefabName>/functions/<FunctionName>/<FunctionName>.events
+extensions/<ExtensionName>/behaviors/<BehaviorName>/functions/<FunctionName>/function.settings
+extensions/<ExtensionName>/behaviors/<BehaviorName>/functions/<FunctionName>/<FunctionName>.events
 ```
 
 In a project, the filename is cross-checked but settings are authoritative.
 External event-sheet paths and linked scenes are listed in
 `externals/external.settings`.
-Extension-level function paths
-are listed in `extension.settings` and resolved through
-`functions/<Function>/function.settings`; prefab and behavior methods are
-listed by their respective owner settings. The `ifdo-ai` profile requires the
-canonical path when the integration can control it.
+All function settings are discovered from fixed physical `functions/`
+directories. Prefab and behavior `function.settings` files store editor
+grouping in `folder = ["Parent", "Child"]`; no owner settings file lists them. The `ifdo-ai` profile
+requires the canonical path when the integration can control it.
 
 Every managed `.events` reference stored in settings is a canonical
 project-root URI, not a relative path. For example:
@@ -326,16 +327,19 @@ project-root URI, not a relative path. For example:
 events = "game://scenes/Main/Main.events"
 events = "game://externals/SharedCombat.events"
 events = "game://extensions/Combat/functions/Damage/Damage.events"
+events = "game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events"
+events = "game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events"
 ```
 
 `game://` is rooted at the directory containing `project.settings`. Resolution,
 normalization, containment, and percent-encoding rules are defined in the
 multi-file project format specification. All `.settings` TOML files are
-append-safe namespace fragments; concatenating them in locally owned order
-produces the authoritative in-memory `CombinedProjectSettings` compilation document
-without changing the pure DSL grammar described here. Settings fragments remain
-separate files on disk; none embeds or includes another fragment, and the
-combined document is never written as project source.
+local-root documents mounted at namespaces derived from their canonical paths.
+Strictly merging those mounted documents produces the authoritative in-memory
+`CombinedProjectSettings` compilation document without changing the pure DSL
+grammar described here. Settings documents remain separate on disk; none
+embeds or includes another, and the combined document is never written as
+project source.
 
 A `.events` file contains one event body. Multiple functions use multiple
 files/subfolders.
@@ -351,12 +355,12 @@ then binds its own `.events` target out of band:
 game://scenes/Main/scene.settings -> game://scenes/Main/Main.events
 game://externals/external.settings -> game://externals/SharedCombat.events
 game://extensions/Combat/functions/Damage/function.settings -> game://extensions/Combat/functions/Damage/Damage.events
-game://extensions/Combat/prefabs/Enemy/prefab.settings -> game://extensions/Combat/prefabs/Enemy/TakeDamage.events
-game://extensions/Combat/behaviors/Health/behavior.settings -> game://extensions/Combat/behaviors/Health/Heal.events
+game://extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/function.settings -> game://extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/TakeDamage.events
+game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings -> game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/Heal.events
 ```
 
 All identity, owner, function type, parameters, return type, ordering, and
-editor configuration live in `.settings` TOML. `.layout` TOML is limited to
+editor configuration live in `.settings` TOML. `.layout` Layout DSL is limited to
 visual/UI data. `.events` contains only DSL statements, DSL comments, typed
 metadata annotations, and typed exact catalog instructions defined in this
 document. Raw event or instruction JSON is forbidden.
@@ -1443,13 +1447,15 @@ owner manifest:
 ```text
 extensions/Combat/functions/Damage/function.settings
 extensions/Combat/functions/Damage/Damage.events
-extensions/Combat/prefabs/Enemy/TakeDamage.events
-extensions/Combat/behaviors/Health/Heal.events
+extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/function.settings
+extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/TakeDamage.events
+extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings
+extensions/Combat/behaviors/Health/functions/Recovery/Heal/Heal.events
 ```
 
-In the canonical project profile, `Damage.events` begins directly with event
-statements. `function.settings` supplies the extension-level function
-declaration. Prefab and behavior declarations come from their owner settings.
+In the canonical project profile, every `.events` body begins directly with
+event statements. Its sibling `function.settings` supplies the complete
+extension, prefab, or behavior function declaration.
 
 ### 17.1 Standalone function-header shorthand
 
@@ -1822,13 +1828,16 @@ Lifecycle functions are part of the full profile but should be generated by AI o
 - A project-owned function file contains only its event body; it has no front
   matter and no `function` header.
 - The compiler receives function identity, owner, signature, result type, and
-  flags from `function.settings`, `prefab.settings`, or `behavior.settings`.
+  flags from the sibling `function.settings`.
 - A standalone `function` header is accepted only when the compiler API has no
   settings target and explicitly enables the shorthand.
 - A function header is invalid in the canonical multi-file project profile and
   in scene/external-event targets.
 - The canonical extension-function path is
   `functions/<Function>/<Function>.events`, beside `function.settings`.
+- Canonical prefab/behavior function paths are
+  `functions/<Function>/<Function>.events`, beside their dedicated
+  `function.settings`; grouping is its `folder` property.
 - The function becomes an ordinary catalog action, condition, or expression after its signature is registered.
 - Cyclic calls are reported; recursive cycles are rejected by the AI profile unless explicitly enabled.
 
@@ -1925,6 +1934,12 @@ do AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera
 The JSON-string rule makes catalog forms lossless without guessing whether an
 operand is an object name, resource name, or nested GDevelop expression.
 
+Every generated `dslName` obeys the normal identifier grammar. After ordinary
+normalization, a parameter name beginning with a digit is prefixed with
+`parameter_`; for example, the displayed name `3D capability` becomes
+`parameter_3d_capability`. The formatter and parser use this same deterministic
+name so generated DSL always recompiles.
+
 The generated artifact is deliberately lean and line-oriented. Each action,
 condition, or expression occupies one compact JSON line and contains only
 authoring-relevant names, descriptions, valid scope names, parameter
@@ -1937,9 +1952,23 @@ events editor labels `[DEPRECATED]`), instructions carrying a deprecation
 message, and expressions hidden or marked deprecated are excluded so an AI
 cannot select APIs that the editor warns against.
 
+Lossless conversion is separate from AI authoring. The editor also generates
+`.gdevelop/deprecated-instructions-catalog.json` alongside the normal catalog.
+It contains only valid deprecated or hidden compatibility instructions needed
+to round-trip existing or imported projects. The compiler and formatter merge
+both catalogs in memory when saving and loading project sources. AI models may
+consult the deprecated catalog only to understand a legacy project or make a
+targeted edit to a deprecated instruction already present. They must never use
+it to construct new events or introduce another deprecated instruction; all
+new event logic must come from `.gdevelop/instructions-catalog.json`.
+
 Rules:
 
 - The exact instruction must exist in the catalog.
+- Write ordinary instruction types as bare tokens. If an exact catalog type
+  contains whitespace, write the type as a JSON string (for example,
+  `do "Physics2::Remove joint" ...`); the decoded string is the instruction
+  type and is not an alias.
 - Named arguments are required.
 - The model may not invent an instruction type.
 - Catalog instruction types never use an `@` prefix; `@` is reserved for
@@ -2372,8 +2401,8 @@ GDevelop event-sheet JSON or extension-function JSON
 | `if` / `or` / `do`                                     | Standard event                                   |
 | `else`                                                 | Else event                                       |
 | `>`                                                    | Child event in the parent event's event list     |
-| `@comment "text" ...`                                 | Comment event                                    |
-| `@group "name"` ... `@end group`                     | Event group                                      |
+| `@comment "text" ...`                                  | Comment event                                    |
+| `@group "name"` ... `@end group`                       | Event group                                      |
 | `for each Object`                                      | For Each Object event                            |
 | `for each child`                                       | For Each Child Variable event                    |
 | `repeat`                                               | Repeat event                                     |
@@ -2417,12 +2446,14 @@ source-only `while limit=` guard. The richer project-aware result below remains
 the editor integration API to build on top of this core.
 
 `options.formatInstruction` is the reverse boundary. The multi-file storage
-adapter builds both callbacks from the saved project instruction catalog, so a
+adapter builds both callbacks from the saved internal serialization instruction
+catalog, so a
 generic named catalog instruction compiles and decompiles without `@exact`.
-That catalog enumerates the non-deprecated authoring surface. Editor-hidden
-compatibility identifiers, instructions with deprecation messages, and hidden
-or deprecated expressions are omitted so AI authors cannot introduce entries
-that render with warning/deprecated styling into new event code.
+The separate AI catalog enumerates the non-deprecated authoring surface.
+Editor-hidden compatibility identifiers, instructions with deprecation
+messages, and hidden or deprecated expressions are omitted from the AI catalog
+so models cannot introduce entries that render with warning/deprecated styling
+into new event code.
 
 Suggested result:
 
@@ -3380,7 +3411,10 @@ three sibling events, because that changes action count and picking semantics.
 
 Nested `BuiltinCommonInstructions::And`, `Or`, or `Not` instructions that
 cannot be represented by the simple `if`/`or` grouping use the typed exact
-catalog instruction form with instruction-depth prefixes.
+catalog instruction form with instruction-depth prefixes. In particular, the
+decompiler must not expand an `Or` whose direct child is another `Or`, because
+the parser's `or` sugar intentionally flattens alternatives and would change
+the serialized instruction tree.
 
 ### 32.3 Comparisons and assignments
 
@@ -3502,6 +3536,8 @@ to `iterableVariableName`, `valueIteratorVariableName`,
 - Each immediately following `and while` compiles to another distinct,
   ordered `whileConditions` entry. This is the canonical exact form for
   current serialized events that contain multiple sibling entries.
+- Instruction-depth children of a `while` or `and while` header remain children
+  of that header instruction; they must never be moved ahead of the header.
 - Structural `or` alternatives after a non-empty header are lowered into the
   header condition's `BuiltinCommonInstructions::Or` instruction; they do not
   create sibling `whileConditions` entries.
@@ -3626,7 +3662,8 @@ The multi-file project format stores every `EventsFunction` field except
 
 For extension-level functions, the owner is
 `extensions/<Extension>/functions/<Function>/function.settings`. Prefab and
-behavior methods use their `prefab.settings` or `behavior.settings` entries.
+behavior methods use their own flat
+`functions/<Function>/function.settings` files with `folder` arrays.
 
 The owner settings entry is the complete metadata source and compiler target.
 Canonical project `.events` files contain neither front matter nor a
@@ -3672,15 +3709,16 @@ object/behavior parameters and generated call names come from the current
 metadata declaration helper; the compiler must not treat all three owners as
 identical extension-level functions.
 
-### 34.6 Folder and order metadata
+### 34.6 Physical ownership and order metadata
 
-Function folder structure is not derivable from filenames. `extension.settings`
-preserves the ordered manifest and `eventsFunctionsFolderStructure` for
-extension-level functions, with each entry pointing to
-`functions/<Function>/function.settings`. `prefab.settings` and
-`behavior.settings` preserve the same information for their own methods. A DSL
-decompiler must not sort function files alphabetically and thereby change
-editor presentation/group ownership.
+The multi-file format does not serialize `eventsFunctionsFolderStructure` or
+any other legacy `*FolderStructure` property. Extension-level functions are
+owned by physical `functions/<Function>/` directories. Prefab and behavior
+methods are owned by physical `functions/<Function>/` directories containing
+both `function.settings` and the sibling `.events` body. Contiguous `order`
+values preserve deterministic legacy array order. Each `function.settings`
+`folder` array is the source of truth for editor grouping; only a transient
+legacy folder tree is reconstructed in memory.
 
 ---
 

@@ -6,16 +6,18 @@ import {
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
-  areLegacyProjectsEquivalent,
   composeLegacyProjectFromFiles,
   decomposeLegacyProjectToFiles,
   encodeManagedName,
+  getLegacyProjectFirstDifferenceDescription,
   parseTomlSource,
   validateGameUri,
 } from '../MultiFileProjectFormat';
 import {
+  PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   createCatalogInstructionResolver,
+  mergeProjectInstructionCatalogs,
   validateProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 
@@ -26,9 +28,45 @@ const crypto = optionalRequire('crypto');
 const MAX_MANAGED_FILES = 10000;
 const MAX_SOURCE_FILE_SIZE = 16 * 1024 * 1024;
 const MAX_COMPOSED_SOURCE_SIZE = 256 * 1024 * 1024;
+const WINDOWS_INVALID_PATH_CHARACTER = /[<>:"/\\|?*]/;
+const WINDOWS_DEVICE_PATH_SEGMENT = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
 
 const requireFileSystem = () => {
   if (!fs || !path) throw new Error('Filesystem is not supported.');
+};
+
+const requiresPortablePathEncoding = (segment: string): boolean =>
+  WINDOWS_INVALID_PATH_CHARACTER.test(segment) ||
+  Array.from(segment).some(character => character.charCodeAt(0) < 32) ||
+  WINDOWS_DEVICE_PATH_SEGMENT.test(segment) ||
+  /[. ]$/.test(segment);
+
+const gameUriPhysicalSegments = (uri: string): Array<string> => {
+  validateGameUri(uri);
+  return uri
+    .slice('game://'.length)
+    .split('/')
+    .map(encodedSegment => {
+      const decodedSegment = decodeURIComponent(encodedSegment);
+      return requiresPortablePathEncoding(decodedSegment)
+        ? encodedSegment
+        : decodedSegment;
+    });
+};
+
+const physicalNameToGameUriSegment = (name: string): string => {
+  if (/%[0-9A-F]{2}/.test(name)) {
+    try {
+      const decodedName = decodeURIComponent(name);
+      if (requiresPortablePathEncoding(decodedName)) {
+        validateGameUri(`game://managed/${name}`);
+        return name;
+      }
+    } catch (error) {
+      // A user-owned percent sign is encoded normally below.
+    }
+  }
+  return encodeManagedName(name);
 };
 
 const isInside = (rootPath: string, targetPath: string): boolean => {
@@ -50,9 +88,8 @@ export const resolveGameUriToPath = (
   uri: string
 ): string => {
   requireFileSystem();
-  const relative = validateGameUri(uri);
   const root = path.resolve(projectRoot);
-  const resolved = path.resolve(root, ...relative.split('/'));
+  const resolved = path.resolve(root, ...gameUriPhysicalSegments(uri));
   assertInside(root, resolved);
 
   const realRoot = fs.realpathSync(root);
@@ -79,12 +116,13 @@ const removeEmptyManagedParentDirectories = async (
   uris.forEach(uri => {
     const relative = validateGameUri(uri);
     const segments = relative.split('/');
-    if (!['scenes', 'extensions', 'externals'].includes(segments[0])) return;
+    if (!['objects', 'scenes', 'extensions', 'externals'].includes(segments[0]))
+      return;
 
     let directory = path.dirname(resolveGameUriToPath(root, uri));
     while (directory !== root) {
       const directorySegments = path.relative(root, directory).split(path.sep);
-      // Keep the stable top-level containers (scenes, extensions, externals).
+      // Keep the stable top-level containers.
       if (directorySegments.length <= 1) break;
       assertInside(root, directory);
       directories.add(directory);
@@ -150,17 +188,17 @@ export const recoverMultiFileTransactions = async (
     }
     if (journal.state === 'staged') {
       for (const uri of [...journal.changedUris].reverse()) {
-        const relative = validateGameUri(uri);
+        validateGameUri(uri);
         const target = resolveGameUriToPath(root, uri);
         const staged = path.join(
           transactionRoot,
           'stage',
-          ...relative.split('/')
+          ...gameUriPhysicalSegments(uri)
         );
         const backup = path.join(
           transactionRoot,
           'backup',
-          ...relative.split('/')
+          ...gameUriPhysicalSegments(uri)
         );
         if (fs.existsSync(backup)) {
           await fs.ensureDir(path.dirname(target));
@@ -170,12 +208,12 @@ export const recoverMultiFileTransactions = async (
         }
       }
       for (const uri of journal.obsoleteUris || []) {
-        const relative = validateGameUri(uri);
+        validateGameUri(uri);
         const target = resolveGameUriToPath(root, uri);
         const backup = path.join(
           transactionRoot,
           'backup',
-          ...relative.split('/')
+          ...gameUriPhysicalSegments(uri)
         );
         if (fs.existsSync(backup) && !fs.existsSync(target)) {
           await fs.ensureDir(path.dirname(target));
@@ -224,6 +262,28 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
+const discoverSettingsFilesRecursively = async (
+  directoryPath: string,
+  uriSegments: Array<string>,
+  output: Array<string>
+): Promise<void> => {
+  if (!fs.existsSync(directoryPath)) return;
+  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const encodedName = physicalNameToGameUriSegment(entry.name);
+    const entryPath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      await discoverSettingsFilesRecursively(
+        entryPath,
+        [...uriSegments, encodedName],
+        output
+      );
+    } else if (entry.isFile() && entry.name.endsWith('.settings')) {
+      output.push(`game://${[...uriSegments, encodedName].join('/')}`);
+    }
+  }
+};
+
 const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
@@ -236,21 +296,30 @@ const discoverOwnedSettingsUris = async (
   if (fs.existsSync(resourcesSettingsPath)) {
     discovered.push(MULTI_FILE_RESOURCES_URI);
   }
+  await discoverSettingsFilesRecursively(
+    path.join(projectRoot, 'objects'),
+    ['objects'],
+    discovered
+  );
   const scenesRoot = path.join(projectRoot, 'scenes');
   if (fs.existsSync(scenesRoot)) {
     const sceneEntries = await fs.readdir(scenesRoot, {
       withFileTypes: true,
     });
-    sceneEntries
-      .filter(entry => entry.isDirectory())
-      .forEach(entry => {
-        const filePath = path.join(scenesRoot, entry.name, 'scene.settings');
-        if (fs.existsSync(filePath)) {
-          discovered.push(
-            `game://scenes/${encodeManagedName(entry.name)}/scene.settings`
-          );
-        }
-      });
+    for (const entry of sceneEntries) {
+      if (!entry.isDirectory()) continue;
+      const sceneSegment = physicalNameToGameUriSegment(entry.name);
+      const sceneRoot = path.join(scenesRoot, entry.name);
+      const filePath = path.join(sceneRoot, 'scene.settings');
+      if (fs.existsSync(filePath)) {
+        discovered.push(`game://scenes/${sceneSegment}/scene.settings`);
+      }
+      await discoverSettingsFilesRecursively(
+        path.join(sceneRoot, 'objects'),
+        ['scenes', sceneSegment, 'objects'],
+        discovered
+      );
+    }
   }
 
   const externalSettingsPath = path.join(
@@ -270,7 +339,9 @@ const discoverOwnedSettingsUris = async (
     for (const extensionEntry of extensionEntries) {
       if (!extensionEntry.isDirectory()) continue;
       const extensionRoot = path.join(extensionsRoot, extensionEntry.name);
-      const extensionUriSegment = encodeManagedName(extensionEntry.name);
+      const extensionUriSegment = physicalNameToGameUriSegment(
+        extensionEntry.name
+      );
       const extensionSettingsPath = path.join(
         extensionRoot,
         'extension.settings'
@@ -290,22 +361,68 @@ const discoverOwnedSettingsUris = async (
         const childEntries = await fs.readdir(childRoot, {
           withFileTypes: true,
         });
-        childEntries
-          .filter(entry => entry.isDirectory())
-          .forEach(entry => {
-            const settingsPath = path.join(
-              childRoot,
-              entry.name,
-              child.settings
+        for (const entry of childEntries) {
+          if (!entry.isDirectory()) continue;
+          const childSegment = physicalNameToGameUriSegment(entry.name);
+          const componentRoot = path.join(childRoot, entry.name);
+          const settingsPath = path.join(componentRoot, child.settings);
+          if (fs.existsSync(settingsPath)) {
+            discovered.push(
+              `game://extensions/${extensionUriSegment}/${
+                child.folder
+              }/${childSegment}/${child.settings}`
             );
-            if (fs.existsSync(settingsPath)) {
-              discovered.push(
-                `game://extensions/${extensionUriSegment}/${
-                  child.folder
-                }/${encodeManagedName(entry.name)}/${child.settings}`
-              );
-            }
+          }
+          if (child.folder === 'prefabs' || child.folder === 'behaviors') {
+            await discoverSettingsFilesRecursively(
+              path.join(componentRoot, 'functions'),
+              [
+                'extensions',
+                extensionUriSegment,
+                child.folder,
+                childSegment,
+                'functions',
+              ],
+              discovered
+            );
+          }
+          if (child.folder !== 'prefabs') continue;
+          await discoverSettingsFilesRecursively(
+            path.join(componentRoot, 'objects'),
+            [
+              'extensions',
+              extensionUriSegment,
+              'prefabs',
+              childSegment,
+              'objects',
+            ],
+            discovered
+          );
+          const variantsRoot = path.join(componentRoot, 'variants');
+          if (!fs.existsSync(variantsRoot)) continue;
+          const variantEntries = await fs.readdir(variantsRoot, {
+            withFileTypes: true,
           });
+          for (const variantEntry of variantEntries) {
+            if (!variantEntry.isDirectory()) continue;
+            const variantSegment = physicalNameToGameUriSegment(
+              variantEntry.name
+            );
+            await discoverSettingsFilesRecursively(
+              path.join(variantsRoot, variantEntry.name, 'objects'),
+              [
+                'extensions',
+                extensionUriSegment,
+                'prefabs',
+                childSegment,
+                'variants',
+                variantSegment,
+                'objects',
+              ],
+              discovered
+            );
+          }
+        }
       }
     }
   }
@@ -371,16 +488,29 @@ export const openMultiFileProject = async (
 ): Promise<Object> => {
   const { projectRoot, files } = await readMultiFileSourceTree(entryPath);
   const effectiveOptions = { ...(options || {}) };
-  const catalogPath = path.join(
+  const ignoreInstructionCatalog =
+    effectiveOptions.ignoreInstructionCatalog === true;
+  delete effectiveOptions.ignoreInstructionCatalog;
+  const authoringCatalogPath = path.join(
     projectRoot,
     ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   );
-  if (fs.existsSync(catalogPath)) {
+  const deprecatedCatalogPath = path.join(
+    projectRoot,
+    ...PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  );
+  if (!ignoreInstructionCatalog && fs.existsSync(authoringCatalogPath)) {
     let catalog;
     try {
       catalog = validateProjectInstructionCatalog(
-        JSON.parse(await readBoundedUtf8(catalogPath))
+        JSON.parse(await readBoundedUtf8(authoringCatalogPath))
       );
+      if (fs.existsSync(deprecatedCatalogPath)) {
+        const deprecatedCatalog = validateProjectInstructionCatalog(
+          JSON.parse(await readBoundedUtf8(deprecatedCatalogPath))
+        );
+        catalog = mergeProjectInstructionCatalogs(catalog, deprecatedCatalog);
+      }
     } catch (error) {
       throw new MultiFileProjectError(
         'MULTIFILE_INVALID_INSTRUCTION_CATALOG',
@@ -470,9 +600,9 @@ export const writeMultiFileSourceTree = async ({
 
   await fs.ensureDir(stageRoot);
   for (const uri of changedUris) {
-    const relative = validateGameUri(uri);
+    validateGameUri(uri);
     await writeAndFlush(
-      path.join(stageRoot, ...relative.split('/')),
+      path.join(stageRoot, ...gameUriPhysicalSegments(uri)),
       files[uri]
     );
   }
@@ -488,10 +618,11 @@ export const writeMultiFileSourceTree = async ({
   const committed = [];
   try {
     for (const uri of [...changedUris].sort(sortForCommit)) {
-      const relative = validateGameUri(uri);
+      validateGameUri(uri);
       const target = resolveGameUriToPath(projectRoot, uri);
-      const staged = path.join(stageRoot, ...relative.split('/'));
-      const backup = path.join(backupRoot, ...relative.split('/'));
+      const physicalSegments = gameUriPhysicalSegments(uri);
+      const staged = path.join(stageRoot, ...physicalSegments);
+      const backup = path.join(backupRoot, ...physicalSegments);
       if (fs.existsSync(target)) {
         await fs.ensureDir(path.dirname(backup));
         await fs.copy(target, backup, { overwrite: true });
@@ -501,9 +632,9 @@ export const writeMultiFileSourceTree = async ({
       committed.push({ uri, target, backup });
     }
     for (const uri of obsoleteUris) {
-      const relative = validateGameUri(uri);
+      validateGameUri(uri);
       const target = resolveGameUriToPath(projectRoot, uri);
-      const backup = path.join(backupRoot, ...relative.split('/'));
+      const backup = path.join(backupRoot, ...gameUriPhysicalSegments(uri));
       if (fs.existsSync(target)) {
         await fs.ensureDir(path.dirname(backup));
         await fs.copy(target, backup, { overwrite: true });
@@ -566,10 +697,14 @@ export const migrateLegacyProject = async ({
     },
   });
   const verificationProject = composeLegacyProjectFromFiles(files);
-  if (!areLegacyProjectsEquivalent(legacyProject, verificationProject)) {
+  const verificationDifference = getLegacyProjectFirstDifferenceDescription(
+    legacyProject,
+    verificationProject
+  );
+  if (verificationDifference) {
     throw new MultiFileProjectError(
       'MULTIFILE_MIGRATION_VERIFICATION_FAILED',
-      'The composed project differs from the legacy source.'
+      `The composed project differs from the legacy source. ${verificationDifference}`
     );
   }
   await writeMultiFileSourceTree({ entryPath, files });
@@ -582,9 +717,7 @@ export const getLegacyMigrationSourceHash = async (
   if (!fs.existsSync(entryPath)) return null;
   const source = await readBoundedUtf8(entryPath);
   const document = parseTomlSource(source, MULTI_FILE_ENTRY_URI);
-  return document.project && document.project.migration
-    ? document.project.migration.sourceSha256 || null
-    : null;
+  return document.migration ? document.migration.sourceSha256 || null : null;
 };
 
 export const hashLegacySource = (source: string): string => sha256(source);
@@ -602,7 +735,7 @@ export const writeLegacyProjectAsMultiFile = async (
       await readBoundedUtf8(entryPath),
       MULTI_FILE_ENTRY_URI
     );
-    migration = document.project ? document.project.migration : undefined;
+    migration = document.migration;
   }
   const files = decomposeLegacyProjectToFiles(legacyProject, {
     migration,
@@ -612,10 +745,14 @@ export const writeLegacyProjectAsMultiFile = async (
     files,
     (options && options.composeOptions) || {}
   );
-  if (!areLegacyProjectsEquivalent(legacyProject, verificationProject)) {
+  const verificationDifference = getLegacyProjectFirstDifferenceDescription(
+    legacyProject,
+    verificationProject
+  );
+  if (verificationDifference) {
     throw new MultiFileProjectError(
       'MULTIFILE_SAVE_VERIFICATION_FAILED',
-      'Generated multi-file sources do not reconstruct the project.'
+      `Generated multi-file sources do not reconstruct the project. ${verificationDifference}`
     );
   }
   const obsoleteUris: Array<string> = Object.keys(previousFiles).filter(

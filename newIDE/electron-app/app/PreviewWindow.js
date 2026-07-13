@@ -87,16 +87,16 @@ const focusWindowForInput = window => {
   }
 };
 
-const getPreviewDisplay = ({ parentWindow, x, y }) => {
+const getPreviewDisplayWorkArea = ({ parentWindow, x, y }) => {
   if (typeof x === 'number' && typeof y === 'number') {
-    return screen.getDisplayNearestPoint({ x, y });
+    return screen.getDisplayNearestPoint({ x, y }).workArea;
   }
 
   if (parentWindow && !parentWindow.isDestroyed()) {
-    return screen.getDisplayMatching(parentWindow.getBounds());
+    return screen.getDisplayMatching(parentWindow.getBounds()).workArea;
   }
 
-  return screen.getPrimaryDisplay();
+  return screen.getPrimaryDisplay().workArea;
 };
 
 const fitPreviewWindowToDisplayHeight = (previewWindow, displayWorkArea) => {
@@ -437,16 +437,14 @@ const openPreviewWindow = ({
     const parentWindowId = parentWindow ? parentWindow.id : null;
     const x = numberOfWindows > 1 ? positions[i + 1].x : undefined;
     const y = numberOfWindows > 1 ? positions[i + 1].y : undefined;
-    const previewDisplay = getPreviewDisplay({
+    const displayWorkArea = getPreviewDisplayWorkArea({
       parentWindow,
       x,
       y,
     });
-    const displayWorkArea = previewDisplay.workArea;
     const fittedPreviewBrowserWindowOptions = getPreviewBrowserWindowOptionsFittingDisplay(
       previewBrowserWindowOptions,
-      displayWorkArea,
-      previewDisplay.scaleFactor
+      displayWorkArea
     );
     const browserWindowOptions = {
       ...fittedPreviewBrowserWindowOptions,

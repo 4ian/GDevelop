@@ -17,6 +17,15 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import {
+  decomposeLegacyProjectToFiles,
+  parseTomlSource,
+} from '../ProjectsStorage/MultiFileProjectFormat';
+import {
+  openMultiFileProject,
+  readMultiFileSourceTree,
+} from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -135,6 +144,7 @@ import {
   applyValidatedProjectJsonPatch,
   syncEditorFromValidatedProjectJson,
   validateCurrentProjectJson,
+  validateSerializedProject,
 } from './McpProjectTools';
 import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
@@ -335,6 +345,147 @@ const errorResult = (message: string, details?: Object): McpToolResult => {
     ],
     structuredContent: payload,
   };
+};
+
+const getProjectFilesValidationPhase = (code: ?string): string => {
+  if (!code) return 'load-and-compose-project-files';
+  if (code === 'MULTIFILE_INVALID_TOML') return 'parse-settings';
+  if (code === 'PROJECT_CATALOG_REGENERATION_FAILED') {
+    return 'regenerate-project-catalogs';
+  }
+  if (code.startsWith('LAYOUT_')) return 'compile-layout';
+  if (code.startsWith('IFDO_')) return 'compile-events';
+  if (
+    code === 'MULTIFILE_MISSING_FILE' ||
+    code === 'MULTIFILE_INVALID_ENTRY' ||
+    code === 'MULTIFILE_PATH_ESCAPE'
+  ) {
+    return 'load-project-files';
+  }
+  return 'compose-game-json';
+};
+
+const getErrorLocation = (error: any): {| line: ?number, column: ?number |} => {
+  let line = typeof error.line === 'number' ? error.line : null;
+  let column = typeof error.column === 'number' ? error.column : null;
+  const message = error && error.message ? String(error.message) : '';
+  const tomlLocation = message.match(/\bat row (\d+), col (\d+)/i);
+  if (tomlLocation) {
+    if (line === null) line = Number(tomlLocation[1]);
+    if (column === null) column = Number(tomlLocation[2]);
+  }
+  return { line, column };
+};
+
+const getValidationSourceExcerpt = ({
+  projectFile,
+  fileUri,
+  line,
+}: {|
+  projectFile: string,
+  fileUri: ?string,
+  line: ?number,
+|}): ?Array<Object> => {
+  if (!fs || !path || !fileUri || !line || !fileUri.startsWith('game://')) {
+    return null;
+  }
+  try {
+    const sourcePath = path.resolve(
+      path.dirname(projectFile),
+      ...fileUri.slice('game://'.length).split('/')
+    );
+    const lines = fs.readFileSync(sourcePath, 'utf8').split(/\r?\n|\r/);
+    const firstLine = Math.max(1, line - 2);
+    const lastLine = Math.min(lines.length, line + 2);
+    const excerpt = [];
+    for (let lineNumber = firstLine; lineNumber <= lastLine; lineNumber++) {
+      excerpt.push({
+        line: lineNumber,
+        text: lines[lineNumber - 1],
+        isErrorLine: lineNumber === line,
+      });
+    }
+    return excerpt;
+  } catch (readError) {
+    return null;
+  }
+};
+
+const getProjectFilesValidationDiagnostic = (
+  error: any,
+  projectFile: string
+): Object => {
+  const code =
+    error && typeof error.code === 'string'
+      ? error.code
+      : 'PROJECT_FILES_VALIDATION_FAILED';
+  const fileUri =
+    error && typeof error.fileUri === 'string' ? error.fileUri : null;
+  const { line, column } = getErrorLocation(error);
+  let filePath = null;
+  if (path && fileUri && fileUri.startsWith('game://')) {
+    filePath = path.resolve(
+      path.dirname(projectFile),
+      ...fileUri.slice('game://'.length).split('/')
+    );
+  }
+  return {
+    severity: 'error',
+    phase: getProjectFilesValidationPhase(code),
+    code,
+    errorType: error && typeof error.name === 'string' ? error.name : 'Error',
+    message:
+      error && error.message
+        ? String(error.message)
+        : 'Unable to validate the project files.',
+    fileUri: fileUri || undefined,
+    filePath: filePath || undefined,
+    line: line || undefined,
+    column: column || undefined,
+    sourceExcerpt:
+      getValidationSourceExcerpt({ projectFile, fileUri, line }) || undefined,
+  };
+};
+
+const generateProjectSourceCatalogsFromDisk = async (
+  projectFile: string
+): Promise<{| projectRoot: string, catalogs: Object |}> => {
+  const projectRoot = path ? path.dirname(projectFile) : null;
+  if (!projectRoot) {
+    throw new Error(
+      'Filesystem path support is unavailable, so project catalogs cannot be regenerated.'
+    );
+  }
+
+  // Bootstrap from disk without trusting the potentially stale generated
+  // instruction catalog. Each catalog write is awaited and verified by the
+  // project writer before this helper resolves.
+  const catalogSource = await openMultiFileProject(projectFile, {
+    ignoreInstructionCatalog: true,
+    skipEventsCompilation: true,
+  });
+  const catalogProject = new gd.ProjectHelper.createNewGDJSProject();
+  try {
+    try {
+      unserializeFromJSObject(catalogProject, catalogSource);
+      const catalogs = await writeProjectSourceCatalogs(
+        catalogProject,
+        projectRoot
+      );
+      return { projectRoot, catalogs };
+    } catch (error) {
+      const catalogError: any = new Error(
+        `Unable to regenerate the project source catalogs: ${
+          error && error.message ? error.message : String(error)
+        }`
+      );
+      catalogError.name = 'ProjectCatalogRegenerationError';
+      catalogError.code = 'PROJECT_CATALOG_REGENERATION_FAILED';
+      throw catalogError;
+    }
+  } finally {
+    catalogProject.delete();
+  }
 };
 
 // Extract the JSON payload from a textResult/errorResult-shaped tool response,
@@ -4859,6 +5010,180 @@ const callMcpTool = async ({
     return textResult(getProjectSummary(project, args.sceneName));
   }
 
+  if (toolName === 'generate-catalogs') {
+    if (!project) return errorResult('No project opened.');
+    const projectFile = project.getProjectFile();
+    if (!projectFile) {
+      return errorResult(
+        'The current project has no disk location. Save it as a multi-file project before generating catalogs.',
+        {
+          catalogsRegenerated: false,
+          phase: 'locate-project-files',
+        }
+      );
+    }
+    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'generate-catalogs requires a local multi-file project whose entry file is project.settings.',
+        {
+          catalogsRegenerated: false,
+          phase: 'locate-project-files',
+          projectFile,
+        }
+      );
+    }
+
+    try {
+      const {
+        projectRoot,
+        catalogs,
+      } = await generateProjectSourceCatalogsFromDisk(projectFile);
+      return textResult({
+        success: true,
+        projectFile,
+        catalogsRegenerated: true,
+        writeMode: 'awaited-and-verified',
+        catalogs,
+        catalogFiles: {
+          instructions: path.join(
+            projectRoot,
+            '.gdevelop',
+            'instructions-catalog.json'
+          ),
+          settings: path.join(
+            projectRoot,
+            '.gdevelop',
+            'settings-catalog.json'
+          ),
+          layouts: path.join(projectRoot, '.gdevelop', 'layout-catalog.json'),
+        },
+        nextAction:
+          'Read the refreshed catalogs before making edits that depend on newly added or changed project structure. Run validate_project_files after the final source edit before reload_project.',
+        note:
+          'All three generated catalog files were written sequentially and verified before this response. Project source files and editor memory were not modified.',
+      });
+    } catch (error) {
+      const diagnostic = getProjectFilesValidationDiagnostic(
+        error,
+        projectFile
+      );
+      return errorResult('Unable to regenerate the project source catalogs.', {
+        catalogsRegenerated: false,
+        phase: diagnostic.phase,
+        projectFile,
+        errors: [diagnostic],
+      });
+    }
+  }
+
+  if (toolName === 'validate_project_files') {
+    if (!project) return errorResult('No project opened.');
+    const projectFile = project.getProjectFile();
+    if (!projectFile) {
+      return errorResult(
+        'The current project has no disk location. Save it as a multi-file project before validating project files.',
+        {
+          valid: false,
+          phase: 'locate-project-files',
+          errors: [
+            {
+              severity: 'error',
+              phase: 'locate-project-files',
+              code: 'PROJECT_FILES_UNSAVED_PROJECT',
+              message: 'The current project has no disk location.',
+            },
+          ],
+        }
+      );
+    }
+    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'validate_project_files requires a local multi-file project whose entry file is project.settings.',
+        {
+          valid: false,
+          phase: 'locate-project-files',
+          projectFile,
+          errors: [
+            {
+              severity: 'error',
+              phase: 'locate-project-files',
+              code: 'PROJECT_FILES_INVALID_ENTRY',
+              message:
+                'The open project is not using project.settings as its entry file.',
+              filePath: projectFile,
+            },
+          ],
+        }
+      );
+    }
+
+    try {
+      // Bootstrap without the potentially stale generated instruction catalog,
+      // then regenerate every catalog from the disk-source project. Re-open the
+      // sources afterward so final event compilation uses the fresh catalog.
+      const { catalogs } = await generateProjectSourceCatalogsFromDisk(
+        projectFile
+      );
+
+      const serializedProject = await openMultiFileProject(projectFile);
+      const generatedJson = JSON.stringify(serializedProject, null, 2);
+      const generatedGameJson = {
+        reconstructedInMemory: true,
+        writtenToDisk: false,
+        targetPath: path
+          ? path.join(path.dirname(projectFile), '.gdevelop', 'game.json')
+          : undefined,
+        byteLength: unescape(encodeURIComponent(generatedJson)).length,
+      };
+      const validation = validateSerializedProject(serializedProject, {
+        include_generated_code: true,
+      });
+      if (!validation.valid) {
+        return errorResult(
+          'The project files were composed into game.json, but the reconstructed project failed GDevelop validation.',
+          {
+            valid: false,
+            phase: 'validate-generated-game-json',
+            validationMode: 'multi-file-disk-sources',
+            projectFile,
+            catalogsRegenerated: true,
+            catalogs,
+            generatedGameJson,
+            errors: validation.errors || [],
+            validation,
+          }
+        );
+      }
+      return textResult({
+        ...validation,
+        validationMode: 'multi-file-disk-sources',
+        projectFile,
+        catalogsRegenerated: true,
+        catalogs,
+        generatedGameJson,
+        nextAction:
+          'Project disk sources are valid. You may now call reload_project to load them into the editor.',
+        note:
+          'Regenerated all project source catalogs, loaded every referenced multi-file source again using the fresh instruction catalog, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified.',
+      });
+    } catch (error) {
+      const diagnostic = getProjectFilesValidationDiagnostic(
+        error,
+        projectFile
+      );
+      return errorResult(
+        'Unable to reconstruct game.json from the multi-file project sources.',
+        {
+          valid: false,
+          phase: diagnostic.phase,
+          validationMode: 'multi-file-disk-sources',
+          projectFile,
+          errors: [diagnostic],
+        }
+      );
+    }
+  }
+
   if (toolName === 'reload_project') {
     if (!project) return errorResult('No project opened.');
     if (!context.reloadProjectAndWait) {
@@ -4866,12 +5191,13 @@ const callMcpTool = async ({
         'The GDevelop host did not provide reloadProjectAndWait, so MCP cannot reload project files from disk.'
       );
     }
+    const reloadProjectAndWait = context.reloadProjectAndWait;
 
     const persistenceState = context.getPersistenceState
       ? context.getPersistenceState()
       : null;
     try {
-      const reloadResult = await context.reloadProjectAndWait();
+      const reloadResult = await reloadProjectAndWait();
       if (reloadResult && reloadResult.reloaded === false) {
         return errorResult(
           reloadResult.reason || 'The project could not be reloaded from disk.',
@@ -4888,15 +5214,186 @@ const callMcpTool = async ({
         projectFile: reloadedProject
           ? reloadedProject.getProjectFile() || undefined
           : undefined,
+        catalogsRegenerated:
+          !!reloadResult && reloadResult.catalogsRegenerated === true,
+        catalogs:
+          reloadResult && reloadResult.catalogs
+            ? reloadResult.catalogs
+            : undefined,
         reload: reloadResult || undefined,
         nextAction:
-          'Project disk sources are loaded. You may now call launch_preview.',
+          reloadResult && reloadResult.catalogsRegenerated
+            ? 'Project disk sources are loaded and generated catalogs are refreshed. You may now call launch_preview.'
+            : 'Project disk sources are loaded. You may now call launch_preview.',
       });
     } catch (error) {
       return errorResult(
         error && error.message
           ? error.message
           : 'Unable to reload the project from disk.'
+      );
+    }
+  }
+
+  if (toolName === 'import_extension') {
+    if (!project) return errorResult('No project opened.');
+    if (!context.ensureExtensionInstalled) {
+      return errorResult(
+        'The GDevelop host did not provide the native extension importer.'
+      );
+    }
+    if (!context.saveProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide awaited project saving, so converted multi-file sources cannot be generated.'
+      );
+    }
+    const ensureExtensionInstalled = context.ensureExtensionInstalled;
+    const saveProjectAndWait = context.saveProjectAndWait;
+
+    const extensionName =
+      args && typeof args.extension_name === 'string'
+        ? args.extension_name.trim()
+        : '';
+    if (!extensionName) {
+      return errorResult('extension_name must be a non-empty string.');
+    }
+    if (extensionName.length > 128) {
+      return errorResult('extension_name must not exceed 128 characters.');
+    }
+    const projectFile = project.getProjectFile();
+    if (!/[\\/]project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'import_extension requires a saved multi-file project whose entry file is project.settings.'
+      );
+    }
+
+    const wasAlreadyInstalled = project.hasEventsFunctionsExtensionNamed(
+      extensionName
+    );
+    const installedExtensionNames: Array<string> = [];
+    try {
+      if (!wasAlreadyInstalled) {
+        await ensureExtensionInstalled({
+          extensionName,
+          onWillInstallExtension: (names: Array<string>) => {
+            if (context.onWillInstallExtension)
+              context.onWillInstallExtension(names);
+          },
+          onExtensionInstalled: (names: Array<string>) => {
+            names.forEach(name => {
+              if (installedExtensionNames.indexOf(name) === -1)
+                installedExtensionNames.push(name);
+            });
+            if (context.onExtensionInstalled)
+              context.onExtensionInstalled(names);
+          },
+        });
+      }
+
+      if (!project.hasEventsFunctionsExtensionNamed(extensionName)) {
+        return errorResult(
+          `The native importer did not add "${extensionName}" to the project. Verify the exact repository/registry name and that it is a project extension rather than a built-in extension.`
+        );
+      }
+
+      if (!wasAlreadyInstalled) context.triggerUnsavedChanges();
+      const saveResult = await saveProjectAndWait();
+      if (
+        !saveResult ||
+        (typeof saveResult === 'object' && saveResult.saved === false)
+      ) {
+        const saveFailureReason =
+          saveResult && typeof saveResult === 'object'
+            ? saveResult.reason
+            : 'no-save-receipt';
+        return errorResult(
+          `Extension "${extensionName}" was loaded in editor memory, but its immediate project save failed (${saveFailureReason ||
+            'unknown reason'}). Generated multi-file sources were not confirmed.`,
+          {
+            importerVersion: 3,
+            extensionName,
+            importedExtensions: installedExtensionNames,
+            saved: false,
+            save: saveResult || undefined,
+          }
+        );
+      }
+
+      const namesToReport = installedExtensionNames.length
+        ? installedExtensionNames
+        : [extensionName];
+      const decomposedFiles = decomposeLegacyProjectToFiles(
+        serializeToJSObject(project)
+      );
+      const generatedSources: { [string]: Array<string> } = {};
+      namesToReport.forEach(name => {
+        const extensionSettingsUri = Object.keys(decomposedFiles).find(uri => {
+          if (!uri.endsWith('/extension.settings')) return false;
+          const settings = parseTomlSource(decomposedFiles[uri], uri);
+          return settings.kind === 'extension' && settings.name === name;
+        });
+        if (!extensionSettingsUri) {
+          generatedSources[name] = [];
+          return;
+        }
+        const extensionRoot = extensionSettingsUri.slice(
+          0,
+          -'extension.settings'.length
+        );
+        generatedSources[name] = Object.keys(decomposedFiles)
+          .filter(uri => uri.indexOf(extensionRoot) === 0)
+          .sort((left, right) => left.localeCompare(right));
+      });
+
+      const savedSourceTree = await readMultiFileSourceTree(projectFile);
+      const savedSourceUris = new Set(Object.keys(savedSourceTree.files));
+      const missingGeneratedSources: Array<string> = [];
+      Object.keys(generatedSources).forEach(name => {
+        generatedSources[name].forEach(uri => {
+          if (!savedSourceUris.has(uri)) missingGeneratedSources.push(uri);
+        });
+      });
+      if (missingGeneratedSources.length) {
+        return errorResult(
+          `Extension "${extensionName}" was saved, but generated multi-file sources could not be read back from disk.`,
+          {
+            importerVersion: 3,
+            extensionName,
+            importedExtensions: installedExtensionNames,
+            missingGeneratedSources,
+            saved: false,
+          }
+        );
+      }
+
+      return textResult({
+        success: true,
+        importerVersion: 3,
+        extensionName,
+        alreadyInstalled: wasAlreadyInstalled,
+        importedExtensions: installedExtensionNames,
+        projectFile,
+        generatedSources,
+        persistedSourcesVerified: true,
+        save: saveResult,
+        nextAction:
+          'Edit the generated project files directly. Call reload_project after the final file edit and before launch_preview.',
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : `Unable to import extension "${extensionName}".`,
+        {
+          importerVersion: 3,
+          extensionName,
+          importedExtensions: installedExtensionNames,
+          writerError: {
+            name: error && error.name ? error.name : undefined,
+            code: error && error.code ? error.code : undefined,
+            fileUri: error && error.fileUri ? error.fileUri : undefined,
+          },
+        }
       );
     }
   }

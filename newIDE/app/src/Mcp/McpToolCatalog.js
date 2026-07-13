@@ -42,6 +42,12 @@ const emptyObjectSchema = {
   additionalProperties: true,
 };
 
+const noInputSchema = {
+  type: 'object',
+  properties: {},
+  additionalProperties: false,
+};
+
 const sceneNameSchema = {
   type: 'object',
   properties: {
@@ -3773,6 +3779,30 @@ const readTools: Array<McpTool> = [
     inputSchema: validateCurrentProjectJsonSchema,
   },
   {
+    name: 'generate-catalogs',
+    description:
+      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, and .gdevelop/layout-catalog.json from the current local multi-file project sources. The call waits for all three files to be written and verified before returning. Accepts no inputs, writes only generated catalogs, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs before making dependent edits.',
+    inputSchema: noInputSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
+    name: 'validate_project_files',
+    description:
+      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
+    inputSchema: noInputSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'inspect_custom_object_runtime_geometry',
     description:
       'Inspect events-based object geometry for prefab coordinate debugging: parent/custom object area, estimated visible child bounds, child local positions, Sprite points/collision masks, and cursor hit-test hints.',
@@ -4183,7 +4213,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files and wait for the editor to finish loading them. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview uses the new disk sources.',
+      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated catalogs use the new disk sources.',
     inputSchema: emptyObjectSchema,
     annotations: {
       readOnlyHint: false,
@@ -4340,6 +4370,29 @@ const readTools: Array<McpTool> = [
 ];
 
 const writeTools: Array<McpTool> = [
+  {
+    name: 'import_extension',
+    description:
+      'Import an official GDevelop extension by its registry name (persistence protocol v3). GDevelop downloads the legacy extension JSON with its required dependencies, loads it through the native extension model, waits for any active save, immediately saves the project again, reads the canonical multi-file extension sources back from disk before reporting success, and returns the original writer error when persistence fails. After this one conversion step, edit the returned .settings, .layout, and .events files directly.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        extension_name: {
+          type: 'string',
+          description:
+            'Exact extension name from the official GDevelop extensions repository/registry, for example "StarRatingBar".',
+        },
+      },
+      required: ['extension_name'],
+      additionalProperties: false,
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
   {
     name: 'initialize_project',
     description:
@@ -4879,6 +4932,20 @@ const commandTools: Array<McpTool> = [
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  'generate-catalogs': [
+    {
+      description:
+        'Regenerate and verify all three project-source catalogs after structural file changes.',
+      arguments: {},
+    },
+  ],
+  import_extension: [
+    {
+      description:
+        'Import StarRatingBar and generate its canonical multi-file project sources.',
+      arguments: { extension_name: 'StarRatingBar' },
+    },
+  ],
   gdevelop_refresh_tool_catalog: [
     {
       description:
@@ -5603,6 +5670,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       arguments: {
         include_generated_code: true,
       },
+    },
+  ],
+  validate_project_files: [
+    {
+      description:
+        'Validate all current multi-file disk sources before reloading them into the editor.',
+      arguments: {},
     },
   ],
   apply_validated_project_json_patch: [
@@ -6668,11 +6742,10 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_get_project_summary',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
-  'validate_current_project_json',
+  'generate-catalogs',
+  'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
-  'gdevelop_capabilities',
-  'gdevelop_refresh_tool_catalog',
   'reload_project',
   'launch_preview',
   'wait_until_preview_ready',
@@ -6683,6 +6756,7 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'control_preview',
   'set_runtime_state',
   'capture_preview_screenshot',
+  'import_extension',
 ]);
 
 const exposedReadTools = readTools.filter(tool =>
@@ -6698,6 +6772,9 @@ const exposedCommandTools = commandTools.filter(tool =>
 const writeToolNames: Set<string> = new Set(
   exposedWriteTools.map(tool => tool.name)
 );
+const alwaysAvailableWriteToolNames: Set<string> = new Set([
+  'import_extension',
+]);
 const commandToolNames: Set<string> = new Set(
   exposedCommandTools.map(tool => tool.name)
 );
@@ -6727,7 +6804,11 @@ export const canCallMcpTool = (
     };
   }
 
-  if (isWriteTool(toolName) && !permissions.allowWriteTools) {
+  if (
+    isWriteTool(toolName) &&
+    !alwaysAvailableWriteToolNames.has(toolName) &&
+    !permissions.allowWriteTools
+  ) {
     return {
       canCall: false,
       reason: 'Write MCP tools are disabled in GDevelop preferences.',
@@ -6763,7 +6844,11 @@ export const getMcpTools = (
 ): Array<McpTool> =>
   [
     ...exposedReadTools,
-    ...(permissions.allowWriteTools ? exposedWriteTools : []),
+    ...exposedWriteTools.filter(
+      tool =>
+        permissions.allowWriteTools ||
+        alwaysAvailableWriteToolNames.has(tool.name)
+    ),
     ...(permissions.allowCommandTools ? exposedCommandTools : []),
   ].map(withDefaultToolAnnotations);
 
@@ -6802,6 +6887,7 @@ export const getCapabilitiesSummary = (
     allByName[tool.name] = tool;
   });
   const categories: { [string]: Array<string> } = {
+    'Extension import': ['import_extension'],
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
@@ -6897,6 +6983,8 @@ export const getCapabilitiesSummary = (
       'set_first_layout',
     ],
     'Preview debugging': [
+      'generate-catalogs',
+      'validate_project_files',
       'reload_project',
       'launch_preview',
       'wait_until_preview_ready',
@@ -6930,7 +7018,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to editor queries and preview debugging. Author the game through project files and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

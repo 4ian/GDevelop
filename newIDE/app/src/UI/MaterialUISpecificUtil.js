@@ -83,6 +83,17 @@ export const isElementAMuiInput = (element: Element): boolean => {
 };
 
 /**
+ * Release focus before an operation that can open a Material-UI modal or move
+ * the current editor into another window. MUI hides modal siblings before its
+ * focus trap runs, and browsers reject aria-hidden when one of those siblings
+ * still contains the focused control.
+ */
+export const blurActiveElementBeforeUiTransition = (): void => {
+  const activeElement = document.activeElement;
+  if (activeElement instanceof HTMLElement) activeElement.blur();
+};
+
+/**
  * Heal the main window after a popped-out window (see WindowPortal) closes.
  *
  * A popped-out window (e.g. the debugger) shares the SAME JS context and the

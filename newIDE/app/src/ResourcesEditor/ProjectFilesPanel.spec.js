@@ -24,6 +24,7 @@ import {
   getResourceFileAfterProjectFileMove,
   getResourceFileAfterProjectPathMove,
   hasExternalFilesDragData,
+  isTextLikeFile,
   isProjectFileNode,
   normalizeLinkedFolders,
   shouldSelectProjectFileNode,
@@ -85,6 +86,19 @@ describe('ProjectFilesPanel', () => {
     linkedFolderId: 'linked-folder:d:/library',
     isLinkedFolderRoot: true,
   };
+
+  it.each(['.events', '.layout', '.settings'])(
+    'recognizes %s project sources as text files',
+    extension => {
+      expect(
+        isTextLikeFile({
+          ...fileNode,
+          name: `project${extension}`,
+          extension,
+        })
+      ).toBe(true);
+    }
+  );
 
   it('formats file deletion blockers without Lingui placeholders', () => {
     const message = buildFileDeletionBlockersMessage([

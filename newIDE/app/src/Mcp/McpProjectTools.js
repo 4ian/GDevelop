@@ -472,6 +472,12 @@ const collectExtensionFunctionLintResults = (
             function_name: eventsFunction.getName(),
             require_root_groups: false,
             include_generated_code: includeGeneratedCode,
+            // Store extensions are reviewed, versioned dependencies and can
+            // intentionally retain hidden legacy instructions for backwards
+            // compatibility. Still compile and parse their generated code,
+            // while reserving semantic authoring lint for local extensions.
+            generated_code_only:
+              extension.getOriginName() === 'gdevelop-extension-store',
           });
           if (!result.valid) results.push(result);
         } catch (error) {
@@ -515,7 +521,7 @@ const collectExtensionFunctionLintResults = (
   return results;
 };
 
-const validateSerializedProject = (
+export const validateSerializedProject = (
   serializedProject: Object,
   args: Object = {}
 ): Object => {

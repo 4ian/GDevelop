@@ -9,6 +9,7 @@ import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { blurActiveElementBeforeUiTransition } from '../../UI/MaterialUISpecificUtil';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (
@@ -208,6 +209,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
 
     const onPreviewButtonClick = React.useCallback(
       async () => {
+        blurActiveElementBeforeUiTransition();
+
         if (hasPreviewsRunning) {
           await onHotReloadPreview();
           return;

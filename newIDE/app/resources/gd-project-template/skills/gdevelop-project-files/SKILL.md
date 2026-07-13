@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, variable, resource, layout, or event-sheet work. Read the generated instruction catalog for event authoring; synchronize direct edits with the GDevelop MCP `reload_project` tool before preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -8,45 +8,134 @@ description: Create, inspect, modify, refactor, and verify GDevelop games throug
 ## Source of truth
 
 Treat project files as authoritative. Modify them directly; do not use MCP to
-author the game.
+author the game. The sole authoring-related exception is `import_extension`:
+use it once to import and convert an official legacy extension into canonical
+multi-file sources, then continue by editing those generated files directly.
 
 Read, in order:
 
 1. `project.settings` for project metadata and non-global-config project data.
 2. `resources.settings` for the complete project resource registry.
 3. `config.settings` for the complete arbitrary global-config subtree.
-4. Relevant child `.settings` files for semantic configuration.
-5. Relevant `.layout` files for visual/UI configuration.
+4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
+   for semantic configuration and object definitions, including each object's
+   variables, effects, and behaviors.
+5. `.gdevelop/layout-catalog.json`, then relevant `.layout` files for Layout
+   DSL instances, layers, spatial bounds, background, and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
 
-The catalog is regenerated from the loaded project every time GDevelop saves.
-Never edit it. Search it narrowly with `rg` by instruction type, displayed
-name, group, description, parameter `dslName`, or expression name instead of
-loading the whole file into context. The generated JSON keeps one catalog entry
-per line so a matching search returns only the relevant instruction.
+The three catalogs are regenerated from the loaded project every time GDevelop
+saves. Never edit them. Search them narrowly with `rg`: use file kind, object,
+behavior, effect, owner, or layout context in the source catalogs, and use
+instruction type, displayed name, group, description, parameter `dslName`, or
+expression name in the instruction catalog. Generated JSON keeps one catalog
+entry per line so a matching search returns only relevant metadata.
+
+After a large structural source change, call the no-input GDevelop MCP
+`generate-catalogs` tool and wait for `catalogsRegenerated: true` before making
+edits that depend on the changed structure. Large structural changes include
+installing or importing an extension and creating, deleting, renaming, or
+substantially changing a prefab, behavior, function, extension, object type, or
+other catalog-owned component. Re-read the relevant freshly generated
+settings, layout, and instruction catalogs before continuing; do not rely on
+catalog content read before the structural change. A later structural change
+invalidates that catalog view and requires another `generate-catalogs` call.
+This refresh is not validation and does not replace the final
+`validate_project_files` gate.
+
+Use the catalogs as authoring contracts:
+
+- In `settings-catalog.json`, read `fileKinds` for the target document's path,
+  mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary. Search
+  `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
+  names, defaults, requirements, and property metadata. Use `settingsOwners`
+  to resolve existing project components and their object definitions.
+- In `layout-catalog.json`, read `elements` for exact context-specific tags,
+  attributes, literals, child order, defaults, and constraints. Select the one
+  `contexts` entry whose `owner` matches the scene, prefab, variant, or external
+  layout, then use only its listed layers, objects, and attached behaviors.
+  Search `effectTypes` for exact effect parameters and types.
+- If the relevant registered type, file kind, element, or effect is absent,
+  stop instead of guessing. If a direct edit introduces a new object or
+  attached behavior name, validate its registered type in the settings catalog,
+  define it first in the owning `.settings` file, and then reference that exact
+  new name in the same coherent `.layout` patch; the saved layout context will
+  list it after GDevelop regenerates the catalogs.
+
+Search narrowly, for example:
+
+```sh
+rg '"type":"Sprite"' .gdevelop/settings-catalog.json
+rg '"type":"Tween::TweenBehavior"' .gdevelop/settings-catalog.json
+rg '"element":"instance"' .gdevelop/layout-catalog.json
+rg '"owner":{"scene":"Main"}' .gdevelop/layout-catalog.json
+```
 
 Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
 generated compatibility/runtime output, not multi-file source.
 
 ## File contract
 
-- `.settings`: TOML semantic/configuration data. Keep every file independent,
-  append-safe, and unindented. Never embed another settings fragment.
-- `config.settings`: edit global configuration only under
-  `[project.globalConfig]`; preserve arbitrary keys and the format-owned
+- `.settings`: TOML semantic/configuration data, including object definitions
+  and their complete behavior/variable/effect configuration. Keep every file
+  independent, local-root, and unindented. The physical path supplies the
+  mounted namespace, so never repeat owner names in long TOML table headers.
+  Never embed another settings document. Follow the matching settings-catalog
+  `fileKinds` entry and use only registered type metadata from that catalog.
+- Variable definitions: in `variables`, `globalVariables`, and
+  `sceneVariables`, use a table keyed by variable name. Assign each name one
+  inline array containing its complete descriptor without another `name`, for
+  example `Controllers = [{ type = "array", children = [...] }]`. Use
+  `variables = { }` when empty. Never write recursive `[[variables...]]` TOML
+  tables.
+- `config.settings`: edit global configuration only under the short local
+  `[settings]` table; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
-- `.layout`: unindented TOML containing visual/UI data only: objects, layers,
-  instances, editor view state, and prefab visual composition.
+- `.layout`: Layout DSL component-tree markup containing placement/layout data
+  only: instances, layers, spatial bounds, background, and editor view state.
+  Never put TOML, object definitions, or attached behavior definitions in a
+  `.layout` file. Instance behavior overrides are allowed only for behaviors
+  already attached by the owning `.settings` object definition. Follow the
+  matching layout-catalog `contexts` entry and `elements` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
-  there.
+  there. Use `instructions-catalog.json` as the only source for constructing
+  new event instructions. `deprecated-instructions-catalog.json` exists only
+  so you can understand legacy projects and make targeted edits to deprecated
+  instructions already present in their `.events` files. Never select an
+  instruction from the deprecated catalog when constructing new events, and
+  never introduce a new use of a deprecated instruction. Preserve or minimally
+  edit an existing deprecated instruction only when the user's legacy project
+  requires it; use a current replacement from `instructions-catalog.json`
+  whenever the edit can migrate it safely.
 
-Preserve manifest order, stable names, existing unknown fields, and ownership
-boundaries. Make the smallest coherent patch. When adding a component, add its
-manifest entry and every referenced source file in the same change.
+Preserve component order, stable names, existing unknown fields, and ownership
+boundaries. Make the smallest coherent patch. When adding a component, create
+its physical component directory and every referenced source file in the same
+change. Never write optional grouping directories or `eventsFunctionsFolderStructure`,
+`objectsFolderStructure`, `propertiesFolderStructure`, or
+`sharedPropertiesFolderStructure`. Object and owner-function settings store
+editor grouping as `folder = ["Parent", "Child"]`; use `folder = []` for the
+root. There is no property tree: prefab
+`propertyDescriptors` and behavior
+`propertyDescriptors`/`sharedPropertyDescriptors` are flat arrays in source
+order.
+
+Give every global, scene, default-prefab, and variant-prefab object its own
+`<Object>.settings` file directly under the owner's flat `objects/` directory. Put
+the complete object definition there, including behaviors, variables, effects,
+and type-specific configuration. `project.settings`, `scene.settings`, and
+`prefab.settings` must not embed object definitions. Keep object groups and
+other owner-wide configuration in the owner settings. Put only instances,
+layers, background/bounds, and editor layout state in `.layout`.
+
+Give every prefab and behavior function its own `functions/<Function>/`
+directory containing `function.settings` and `<Function>.events`. Store editor
+grouping in the function settings `folder` array. `prefab.settings` and
+`behavior.settings` must not embed function metadata.
 
 ## Project layout
 
@@ -54,9 +143,11 @@ manifest entry and every referenced source file in the same change.
 project.settings
 resources.settings
 config.settings
+objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
+scenes/<Scene>/objects/<Object>.settings
 externals/external.settings
 externals/<External>.layout
 externals/<External>.events
@@ -65,13 +156,66 @@ extensions/<Extension>/functions/<Function>/function.settings
 extensions/<Extension>/functions/<Function>/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/prefab.settings
 extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
-extensions/<Extension>/prefabs/<Prefab>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/function.settings
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/objects/<Object>.settings
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
-extensions/<Extension>/behaviors/<Behavior>/<Function>.events
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.events
 .gdevelop/instructions-catalog.json
+.gdevelop/deprecated-instructions-catalog.json # legacy read/edit only; never for new events
+.gdevelop/settings-catalog.json
+.gdevelop/layout-catalog.json
 ```
 
-Only create optional folders when the owning manifest references them.
+Do not create optional grouping folders. Canonical component directories are
+fixed; object/function grouping belongs in each settings file's `folder`
+array. Settings files never reference other settings files.
+
+## Task references
+
+Load only the references required by the task:
+
+- Read [references/create-extensions.md](references/create-extensions.md) in
+  full before creating an extension or adding/removing extension-level
+  functions, prefabs, behaviors, or their functions.
+- Read [references/layout-dsl.md](references/layout-dsl.md) in full before
+  creating or changing any `.layout` file. Preserve existing UUIDs and use its
+  exact scene, prefab/variant, or external-layout context rules.
+- Read [references/events-dls.md](references/events-dls.md) in full before
+  creating or changing any `.events` file. Use only its canonical IfDo
+  structures and the exact types and `dslName` parameters found in the
+  generated project instruction catalog.
+- Read [references/global-config.md](references/global-config.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Global Config,
+  or to add/change a `{{...}}` placeholder. Also read the events guide for an
+  event consumer and the extension guide when injecting config into a prefab,
+  behavior, or reusable extension.
+- Read [references/signal-system.md](references/signal-system.md) in full
+  whenever the user asks for signals, messaging, notification, scene/prefab
+  communication, `SignalReceived`, signal sender/payload handling, or an
+  `onSignal` lifecycle. Also read the events guide, and read the extension guide
+  before adding or changing a prefab/custom-object `onSignal` function. Read
+  the Global Config guide too when signal names use placeholders.
+- Read
+  [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
+  in full before implementing a substantial reusable system or installing a
+  third-party extension. Search the official GDevelop extensions repository
+  first and prefer adapting a reviewed existing extension over rebuilding a
+  heavy feature from scratch.
+- Read
+  [references/refactor-with-reusable-components.md](references/refactor-with-reusable-components.md)
+  in full whenever the user asks to refactor, extract, deduplicate, modularize,
+  or reorganize project logic with prefabs, behaviors, or functions. Also load
+  the creation guide and, for any substantial subsystem, the reuse guide.
+  Complete the migration and verification; do not stop after suggesting an
+  architecture or creating empty component shells.
+
+Build from scratch only when repository search finds no suitable extension,
+the available extension is incompatible or unsafe, or a small project-specific
+implementation is materially simpler. Record that decision in the task result.
 
 ## Event authoring
 
@@ -139,22 +283,43 @@ loop, comment, and JavaScript metadata when editing existing sources.
 
 ## Direct-edit workflow
 
-1. Inspect manifests and only the owned files relevant to the request.
+1. Inspect manifests and only the owned files relevant to the request. Search
+   `.gdevelop/settings-catalog.json` before adding or changing settings-owned
+   object, behavior, effect, or component definitions. Search
+   `.gdevelop/layout-catalog.json` for the exact layout grammar and matching
+   project context before adding or changing layout content.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
    expressions. The generated catalog excludes editor-hidden and deprecated
    APIs; never invent or reuse an instruction identifier that is absent from it
    when authoring new events.
 3. Patch source files directly. Use `apply_patch` for precise edits.
-4. Re-read every changed manifest reference and verify that each `game://` URI
+   Creating or changing an object type or one of its behaviors is a settings
+   edit; creating or moving an instance is a layout edit.
+4. After any large structural change (including extension installation or
+   creating/changing a prefab, behavior, function, extension, or object type),
+   call the no-input MCP `generate-catalogs` tool. Require
+   `catalogsRegenerated: true`, then re-read every refreshed catalog relevant
+   to subsequent edits. Do not continue from catalog metadata read before the
+   structural change. Repeat this step after each later structural phase.
+5. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
-5. Check TOML syntax, duplicate namespaces, event depth, instruction names,
-   named parameters, and asset paths.
-6. Call the GDevelop MCP `reload_project` tool and require a successful reload
+6. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
+   namespaces, event depth, instruction names, named parameters, and asset
+   paths.
+7. Call the no-input GDevelop MCP `validate_project_files` tool after the most
+   recent source edit. Require `valid: true`; use its file URI, error code,
+   line, column, and source excerpt to fix every reported settings, layout,
+   events, reference, or generated-project validation failure. This call first
+   regenerates all three `.gdevelop` catalogs, then validates the sources using
+   the fresh instruction catalog. Call it at least once before calling
+   `reload_project`; a failed validation does not satisfy this gate.
+8. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
-7. For gameplay or visual changes, call `launch_preview` only after step 6.
+9. For gameplay or visual changes, call `launch_preview` only after step 8.
    If any project source changes after the reload, call `reload_project` again
-   before the next preview.
+   before the next preview, preceded by a new successful
+   `validate_project_files` call for those edits.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -163,37 +328,89 @@ asset is appropriate.
 
 ## MCP boundary
 
-MCP is synchronization/read/debug-only. Use it only for:
+MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
+- Importing and converting an official legacy extension with
+  `import_extension`. This is the only MCP tool allowed to create project
+  source. It must return the generated source paths; all later adaptation is a
+  direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
+- Regenerating and synchronously waiting for all three generated source
+  catalogs with `generate-catalogs` after large structural source changes, so
+  subsequent authoring can read current catalog contracts.
+- Regenerating all source catalogs and validating direct disk edits without
+  changing editor memory by calling the no-input `validate_project_files` tool
+  before `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
 - Inspecting live runtime state, logs, errors, audio, and instance positions.
 - Capturing preview screenshots.
 
-Never use MCP to create scenes, objects, resources, variables, instances,
-extensions, behaviors, prefabs, or events. Never use generic editor-call,
-command, patch, sync, or save tools for authoring.
+Except for the single `import_extension` conversion transaction, never use MCP
+to create scenes, objects, resources, variables, instances, extensions,
+behaviors, prefabs, or events. Never use generic editor-call, command, patch,
+sync, or save tools for authoring.
 
-`reload_project` is a mandatory preview gate. In every direct-edit task, call
-it successfully at least once after the most recent source-file edit and before
-the first `launch_preview`. Never launch or relaunch a preview from stale editor
-memory. A later source edit invalidates the earlier reload receipt.
+`generate-catalogs` is a mandatory mid-task refresh after every large
+structural source change. Require `catalogsRegenerated: true`, then read the
+latest relevant `.gdevelop/settings-catalog.json`,
+`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json`
+before making dependent edits. The tool writes and verifies only those three
+generated files and does not validate sources or reload editor memory.
+
+`validate_project_files` is a mandatory reload gate. In every direct-edit task,
+call it successfully with no inputs at least once after the most recent
+source-file edit and before `reload_project`. It regenerates the instruction,
+settings, and layout catalogs first, then reconstructs the generated `game.json`
+representation from the multi-file settings, layouts, and events using the
+fresh instruction catalog without replacing editor memory. A later source edit
+invalidates the earlier validation receipt.
+
+`reload_project` remains a mandatory preview gate. Call it successfully only
+after the validation gate and before the first `launch_preview`. Never launch
+or relaunch a preview from stale editor memory. A later source edit invalidates
+both the validation and reload receipts.
 
 ## Verification
 
 Before finishing:
 
-- Confirm every changed TOML file is unindented and independently parseable.
-- Confirm `.layout` changes are visual/UI-only.
+- Confirm every changed `.settings` file is unindented TOML and independently
+  parseable; confirm every `.layout` is canonical Layout DSL version 1.
+- Confirm `.layout` files contain only placement/layout concepts and contain no
+  `objects`, `objectsGroups`, or behavior definitions.
+- Confirm no `.settings` file contains a legacy `*FolderStructure` property;
+  object/function grouping uses only a valid local `folder` array.
+- Confirm every global, scene, and prefab object definition and its complete
+  behaviors are at the local root of its individual `<Object>.settings` file.
+- Confirm prefab and behavior property descriptor arrays are flat and contain
+  no grouping/folder metadata.
+- Confirm every prefab/behavior function has a dedicated flat function
+  directory with `function.settings` and its matching sibling `.events`, and
+  owner settings contain no embedded function entries.
 - Confirm settings references use `game://` and resolve to existing files.
+- Confirm settings file kinds and every object/behavior/effect type against
+  `settings-catalog.json`.
+- Confirm layout elements, attributes, layers, objects, attached behaviors,
+  and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
+- For Global Config changes, confirm `config.settings` ownership, canonical
+  raw-JSON pointers, placeholder paths/types, and regeneration-time behavior
+  against the Global Config reference.
+- For signal changes, confirm target kind, receiver kind, fixed `onSignal`
+  signature, guarded emission, next-dispatch timing, and preview signal-monitor
+  evidence against the signal-system reference.
 - Confirm every action has an effective condition in its event or ancestor
   chain and no unconditional action can execute every frame.
 - Confirm every object-targeting action operates on a provably single picked
   instance; use `for each` when processing multiple instances.
 - Confirm no legacy JSON was changed.
+- Confirm `generate-catalogs` returned `catalogsRegenerated: true` after the
+  final large structural change and that subsequent dependent edits used the
+  refreshed relevant catalogs.
+- Confirm `validate_project_files` returned `valid: true` after the final source
+  edit and before `reload_project`.
 - Confirm `reload_project` succeeded after the final source edit and before any
   `launch_preview` call.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,

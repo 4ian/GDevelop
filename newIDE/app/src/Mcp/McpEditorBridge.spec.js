@@ -5,6 +5,8 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { decomposeLegacyProjectToFiles } from '../ProjectsStorage/MultiFileProjectFormat';
+import { writeMultiFileSourceTree } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 
 // Mock the behavior store registry fetch (search_behavior_store) so the test
@@ -171,8 +173,180 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).toContain(
       'gdevelop_get_editor_state'
     );
+    expect(response.tools.map(tool => tool.name)).toContain(
+      'validate_project_files'
+    );
+    expect(response.tools.map(tool => tool.name)).toContain(
+      'generate-catalogs'
+    );
     expect(response.tools.map(tool => tool.name)).toContain('reload_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('generates and verifies all three catalogs before returning', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-generate-catalogs-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Catalog generation test');
+    project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    await writeMultiFileSourceTree({
+      entryPath: projectFile,
+      files,
+    });
+    const catalogDirectory = path.join(temporaryDirectory, '.gdevelop');
+    fs.mkdirSync(catalogDirectory, { recursive: true });
+    const catalogFiles = {
+      instructions: path.join(catalogDirectory, 'instructions-catalog.json'),
+      settings: path.join(catalogDirectory, 'settings-catalog.json'),
+      layouts: path.join(catalogDirectory, 'layout-catalog.json'),
+    };
+    Object.keys(catalogFiles).forEach(key => {
+      fs.writeFileSync(catalogFiles[key], '{ stale catalog', 'utf8');
+    });
+    const reloadProjectAndWait = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      reloadProjectAndWait,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'generate-catalogs', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        projectFile,
+        catalogsRegenerated: true,
+        writeMode: 'awaited-and-verified',
+        catalogs: expect.objectContaining({
+          instructions: expect.any(Object),
+          settings: expect.any(Object),
+          layouts: expect.any(Object),
+        }),
+        catalogFiles,
+      })
+    );
+    Object.keys(catalogFiles).forEach(key => {
+      expect(() =>
+        JSON.parse(fs.readFileSync(catalogFiles[key], 'utf8'))
+      ).not.toThrow();
+    });
+    expect(result.generatedGameJson).toBeUndefined();
+    expect(result.nextAction).toContain('Read the refreshed catalogs');
+  });
+
+  it('validates multi-file disk sources without reloading the editor', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-validate-project-files-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Disk validation test');
+    project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    await writeMultiFileSourceTree({
+      entryPath: projectFile,
+      files,
+    });
+    const catalogDirectory = path.join(temporaryDirectory, '.gdevelop');
+    fs.mkdirSync(catalogDirectory, { recursive: true });
+    fs.writeFileSync(
+      path.join(catalogDirectory, 'instructions-catalog.json'),
+      '{ stale and invalid catalog',
+      'utf8'
+    );
+    const reloadProjectAndWait = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      reloadProjectAndWait,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        valid: true,
+        validationMode: 'multi-file-disk-sources',
+        projectFile,
+        catalogsRegenerated: true,
+        catalogs: expect.objectContaining({
+          instructions: expect.any(Object),
+          settings: expect.any(Object),
+          layouts: expect.any(Object),
+        }),
+        generatedGameJson: expect.objectContaining({
+          reconstructedInMemory: true,
+          writtenToDisk: false,
+          byteLength: expect.any(Number),
+        }),
+      })
+    );
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'instructions-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json')
+      )
+    ).toBe(true);
+    expect(result.nextAction).toContain('reload_project');
+  });
+
+  it('reports the source file and location for invalid project files', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-invalid-project-files-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setProjectFile(projectFile);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://project.settings'] += '\ninvalid = [\n';
+    await writeMultiFileSourceTree({ entryPath: projectFile, files });
+    const bridge = makeBridge({ getProject: () => project });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual([
+      expect.objectContaining({
+        severity: 'error',
+        phase: 'parse-settings',
+        code: 'MULTIFILE_INVALID_TOML',
+        fileUri: 'game://project.settings',
+        filePath: projectFile,
+      }),
+    ]);
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {
@@ -188,6 +362,12 @@ describe('McpEditorBridge', () => {
       return {
         reloaded: true,
         fileIdentifier: 'C:\\game\\project.settings',
+        catalogsRegenerated: true,
+        catalogs: {
+          instructions: { actions: 123 },
+          settings: { objectTypes: 45 },
+          layouts: { contexts: 2 },
+        },
       };
     }): any);
     const bridge = makeBridge({
@@ -215,9 +395,128 @@ describe('McpEditorBridge', () => {
         discardedUnsavedInMemoryChanges: true,
         projectName: 'After reload',
         projectFile: 'C:\\game\\project.settings',
+        catalogsRegenerated: true,
+        catalogs: {
+          instructions: { actions: 123 },
+          settings: { objectTypes: 45 },
+          layouts: { contexts: 2 },
+        },
       })
     );
+    expect(result.nextAction).toContain('catalogs are refreshed');
     expect(result.nextAction).toContain('launch_preview');
+  });
+
+  it('imports an extension through the native host and returns generated multi-file sources', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-extension-import-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = new gd.Project();
+    project.setProjectFile(projectFile);
+    const ensureExtensionInstalled = jest.fn(async options => {
+      const extension = project.insertNewEventsFunctionsExtension(
+        options.extensionName,
+        0
+      );
+      extension.getEventsFunctions().insertNewEventsFunction('FormatRating', 0);
+      options.onExtensionInstalled([options.extensionName]);
+    });
+    const saveProjectAndWait = jest.fn(async () => {
+      await writeMultiFileSourceTree({
+        entryPath: projectFile,
+        files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
+      });
+      return { saved: true };
+    });
+    const triggerUnsavedChanges = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      getPermissions: () => ({
+        allowWriteTools: false,
+        allowCommandTools: false,
+      }),
+      ensureExtensionInstalled,
+      saveProjectAndWait,
+      triggerUnsavedChanges,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'import_extension',
+        arguments: { extension_name: 'StarRatingBar' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(ensureExtensionInstalled).toHaveBeenCalledWith(
+      expect.objectContaining({ extensionName: 'StarRatingBar' })
+    );
+    expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
+    expect(saveProjectAndWait).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        importerVersion: 3,
+        extensionName: 'StarRatingBar',
+        alreadyInstalled: false,
+        importedExtensions: ['StarRatingBar'],
+        persistedSourcesVerified: true,
+      })
+    );
+    expect(result.generatedSources.StarRatingBar).toContain(
+      'game://extensions/StarRatingBar/extension.settings'
+    );
+    expect(result.generatedSources.StarRatingBar).toEqual(
+      expect.arrayContaining([
+        'game://extensions/StarRatingBar/functions/FormatRating/function.settings',
+        'game://extensions/StarRatingBar/functions/FormatRating/FormatRating.events',
+      ])
+    );
+    project.delete();
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  });
+
+  it('does not report an extension import as successful without disk persistence', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-extension-unsaved-')
+    );
+    const project = new gd.Project();
+    project.setProjectFile(path.join(temporaryDirectory, 'project.settings'));
+    const bridge = makeBridge({
+      getProject: () => project,
+      ensureExtensionInstalled: async options => {
+        project.insertNewEventsFunctionsExtension(options.extensionName, 0);
+        options.onExtensionInstalled([options.extensionName]);
+      },
+      // Simulate a host that claims to have saved without writing the source
+      // tree. The import tool must detect this during its disk read-back.
+      saveProjectAndWait: async () => ({ saved: true }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'import_extension',
+        arguments: { extension_name: 'UnsavedExtension' },
+      },
+    });
+
+    expect(response.isError).toBe(true);
+    const result = JSON.parse(response.content[0].text);
+    expect(result).toEqual(
+      expect.objectContaining({
+        importerVersion: 3,
+        writerError: expect.objectContaining({ code: 'ENOENT' }),
+      })
+    );
+    expect(response.content[0].text).not.toContain(
+      '"persistedSourcesVerified": true'
+    );
+    project.delete();
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
   });
 
   it('returns unexpected tool failures as structured JSON', async () => {
@@ -244,24 +543,23 @@ describe('McpEditorBridge', () => {
     );
   });
 
-  it('refreshes the MCP tool catalog in one read-only call', async () => {
+  it('rejects MCP tools removed from the public catalog', async () => {
     const bridge = makeBridge();
 
-    const response = await bridge.handleRendererMcpRequest({
-      method: 'tools/call',
-      params: {
-        name: 'gdevelop_refresh_tool_catalog',
-        arguments: {},
-      },
-    });
-    const result = JSON.parse(response.content[0].text);
+    for (const name of [
+      'validate_current_project_json',
+      'gdevelop_refresh_tool_catalog',
+      'gdevelop_capabilities',
+    ]) {
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: { name, arguments: {} },
+      });
+      const result = JSON.parse(response.content[0].text);
 
-    expect(response.isError).not.toBe(true);
-    expect(result.success).toBe(true);
-    expect(result.tools.map(tool => tool.name)).toContain(
-      'gdevelop_capabilities'
-    );
-    expect(result.categories).toBeDefined();
+      expect(response.isError).toBe(true);
+      expect(result.error).toBe(`Unknown MCP tool: ${name}.`);
+    }
   });
 
   it('reports preview health and recovery actions without a running preview', async () => {
@@ -1536,35 +1834,6 @@ describe('McpEditorBridge', () => {
       expect(project.getMaximumFPS()).toBe(120);
       expect(propertiesResult.project.name).toBe('Sky Battle Deluxe');
       expect(triggerUnsavedChanges).toHaveBeenCalledTimes(2);
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('validates the current serialized project without write permissions', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.setName('Serializable Project');
-    project.insertNewLayout('Level1', 0);
-
-    try {
-      const bridge = makeBridge({
-        getProject: () => project,
-      });
-
-      const response = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'validate_current_project_json',
-          arguments: {},
-        },
-      });
-      const result = JSON.parse(response.content[0].text);
-
-      expect(response.isError).not.toBe(true);
-      expect(result.valid).toBe(true);
-      expect(result.validationMode).toBe('current-editor-project');
-      expect(project.getName()).toBe('Serializable Project');
     } finally {
       project.delete();
     }

@@ -2305,36 +2305,38 @@ const lintExtensionFunctionTarget = (
   args: Object = {}
 ): Object => {
   const issues: Array<Object> = [];
-  scanProjectForValidationErrors(project)
-    .filter(error => isProjectValidationErrorForTarget(error, target))
-    .forEach(error => {
-      issues.push({
-        severity: 'error',
-        ...error,
+  if (!args.generated_code_only) {
+    scanProjectForValidationErrors(project)
+      .filter(error => isProjectValidationErrorForTarget(error, target))
+      .forEach(error => {
+        issues.push({
+          severity: 'error',
+          ...error,
+        });
       });
-    });
 
-  issues.push(
-    ...collectInstructionScopeIssues({
-      project,
-      parentKind: target.parentKind,
-      eventsFunction: target.eventsFunction,
-    })
-  );
-  issues.push(
-    ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
-  );
-  issues.push(
-    ...collectGlobalConfigExpressionMisuseIssues(target.eventsFunction)
-  );
-  issues.push(
-    ...collectObjectFunctionCreateExternalObjectIssues(
-      target.parentKind,
-      target.eventsFunction
-    )
-  );
-  if (!args || args.require_root_groups !== false) {
-    issues.push(...collectRootGroupIssues(target.eventsFunction));
+    issues.push(
+      ...collectInstructionScopeIssues({
+        project,
+        parentKind: target.parentKind,
+        eventsFunction: target.eventsFunction,
+      })
+    );
+    issues.push(
+      ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
+    );
+    issues.push(
+      ...collectGlobalConfigExpressionMisuseIssues(target.eventsFunction)
+    );
+    issues.push(
+      ...collectObjectFunctionCreateExternalObjectIssues(
+        target.parentKind,
+        target.eventsFunction
+      )
+    );
+    if (!args || args.require_root_groups !== false) {
+      issues.push(...collectRootGroupIssues(target.eventsFunction));
+    }
   }
 
   const generatedCodeResult: {|

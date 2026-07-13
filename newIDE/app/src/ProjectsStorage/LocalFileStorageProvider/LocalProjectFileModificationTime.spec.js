@@ -48,8 +48,16 @@ describe('getLocalProjectLastModifiedDate', () => {
       path.join(temporaryDirectory, 'scenes', 'Main', 'Main.events'),
       300000
     );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, '.gdevelop', 'settings-catalog.json'),
+      350000
+    );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json'),
+      400000
+    );
 
-    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(300000);
+    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(400000);
   });
 
   it('ignores resources and generated autosaves', async () => {

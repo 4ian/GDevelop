@@ -7,6 +7,8 @@ export type ShowAlertDialogOptions = {|
   title: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
+  /** Non-translatable technical details, typically an underlying error. */
+  details?: string,
 |};
 export type ShowAlertDialogOptionsWithCallback = {|
   ...ShowAlertDialogOptions,

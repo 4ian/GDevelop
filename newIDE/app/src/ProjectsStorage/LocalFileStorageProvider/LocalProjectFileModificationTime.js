@@ -1,6 +1,10 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
 import { PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
+import {
+  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+  PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+} from '../ProjectSourceCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -93,6 +97,11 @@ export const getLocalProjectLastModifiedDate = async (
       projectRoot,
       ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
     ),
+    path.join(
+      projectRoot,
+      ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
+    ),
+    path.join(projectRoot, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')),
   ];
   const modificationTimes = await Promise.all([
     ...pathsToInspect.map(getFileModificationTime),

@@ -27,14 +27,26 @@ import {
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
 import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
+import { removeLegacyFolderStructuresFromProject } from '../MultiFileProjectFormat';
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  buildProjectDeprecatedInstructionCatalog,
   buildProjectInstructionCatalog,
   createCatalogInstructionFormatter,
   createCatalogInstructionResolver,
+  mergeProjectInstructionCatalogs,
   serializeProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
+import {
+  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+  PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+  buildProjectLayoutCatalog,
+  buildProjectSettingsCatalog,
+  serializeProjectLayoutCatalog,
+  serializeProjectSettingsCatalog,
+} from '../ProjectSourceCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -155,6 +167,89 @@ export const writeProjectInstructionCatalog = async (
   return catalog;
 };
 
+const writeProjectDeprecatedInstructionCatalog = async (
+  project: gdProject,
+  projectPath: string
+): Promise<Object> => {
+  const catalog = buildProjectDeprecatedInstructionCatalog(project);
+  const catalogPath = path.join(
+    projectPath,
+    ...PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  );
+  await writeAndCheckFile(
+    serializeProjectInstructionCatalog(catalog),
+    catalogPath
+  );
+  return catalog;
+};
+
+export const writeProjectSettingsCatalog = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const catalog = buildProjectSettingsCatalog({
+    project,
+    serializedProject,
+  });
+  await writeAndCheckFile(
+    serializeProjectSettingsCatalog(catalog),
+    path.join(projectPath, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/'))
+  );
+  return catalog;
+};
+
+export const writeProjectLayoutCatalog = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object,
+  effectTypes?: Array<Object>
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const catalog = buildProjectLayoutCatalog({
+    project,
+    serializedProject,
+    effectTypes,
+  });
+  await writeAndCheckFile(
+    serializeProjectLayoutCatalog(catalog),
+    path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+  );
+  return catalog;
+};
+
+export const writeProjectSourceCatalogs = async (
+  project: gdProject,
+  projectPath: string
+): Promise<Object> => {
+  const serializedProject = serializeToJSObject(project, 'serializeTo');
+  const instructionCatalog = await writeProjectInstructionCatalog(
+    project,
+    projectPath
+  );
+  await writeProjectDeprecatedInstructionCatalog(project, projectPath);
+  const settingsCatalog = await writeProjectSettingsCatalog(
+    project,
+    projectPath,
+    serializedProject
+  );
+  const layoutCatalog = await writeProjectLayoutCatalog(
+    project,
+    projectPath,
+    serializedProject,
+    settingsCatalog.effectTypes
+  );
+
+  return {
+    instructions: instructionCatalog.counts,
+    settings: settingsCatalog.counts,
+    layouts: layoutCatalog.counts,
+  };
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,
@@ -185,28 +280,64 @@ const writeProjectFiles = async ({
   const serializeEndTime = Date.now();
 
   if (path.basename(filePath).toLowerCase() === 'project.settings') {
-    const catalog = buildProjectInstructionCatalog(project);
+    const authoringCatalog = buildProjectInstructionCatalog(project);
+    const deprecatedCatalog = buildProjectDeprecatedInstructionCatalog(project);
+    const serializationCatalog = mergeProjectInstructionCatalogs(
+      authoringCatalog,
+      deprecatedCatalog
+    );
+    const settingsCatalog = buildProjectSettingsCatalog({
+      project,
+      serializedProject: serializedProjectObject,
+    });
+    const layoutCatalog = buildProjectLayoutCatalog({
+      project,
+      serializedProject: serializedProjectObject,
+      effectTypes: settingsCatalog.effectTypes,
+    });
     await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
       decomposeOptions: {
         eventsDslOptions: {
-          formatInstruction: createCatalogInstructionFormatter(catalog),
+          formatInstruction: createCatalogInstructionFormatter(
+            serializationCatalog
+          ),
         },
       },
       composeOptions: {
         compileOptions: {
-          resolveInstruction: createCatalogInstructionResolver(catalog),
+          resolveInstruction: createCatalogInstructionResolver(
+            serializationCatalog
+          ),
         },
       },
     });
     await writeAndCheckFile(
-      serializeProjectInstructionCatalog(catalog),
+      serializeProjectInstructionCatalog(authoringCatalog),
       path.join(
         projectPath,
         ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
       )
     );
+    await writeAndCheckFile(
+      serializeProjectInstructionCatalog(deprecatedCatalog),
+      path.join(
+        projectPath,
+        ...PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+      )
+    );
+    await writeAndCheckFile(
+      serializeProjectSettingsCatalog(settingsCatalog),
+      path.join(
+        projectPath,
+        ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
+      )
+    );
+    await writeAndCheckFile(
+      serializeProjectLayoutCatalog(layoutCatalog),
+      path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+    );
     await writeAndCheckFormattedJSONFile(
-      serializedProjectObject,
+      removeLegacyFolderStructuresFromProject(serializedProjectObject),
       path.join(
         projectPath,
         ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')

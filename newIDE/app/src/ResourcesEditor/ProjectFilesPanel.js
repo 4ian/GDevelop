@@ -619,6 +619,9 @@ export const isTextLikeFile = (node: ProjectFileNode): boolean =>
     '.csv',
     '.md',
     '.markdown',
+    '.events',
+    '.layout',
+    '.settings',
   ].includes(node.extension);
 
 const getIconForNode = (node: ProjectFileNode): React.Node => {

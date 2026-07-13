@@ -1,12 +1,13 @@
 # GDevelop Multi-file Project Format
 
-## TOML project/layout/settings files and IfDo event source files
+## TOML settings, Layout DSL, and IfDo event source files
 
 **Status:** Version 1.0 implemented format contract
 **Entry file:** `project.settings`
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
-**Related specification:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md)
+**Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
+[gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md)
 
 ---
 
@@ -43,8 +44,9 @@
 
 This specification replaces the single large GDevelop project JSON document with a source-oriented directory tree:
 
-- TOML for project, scene settings, visual scene layout, extension, prefab,
-  and behavior data.
+- TOML for project, scene, extension, prefab, behavior, resource, and global
+  configuration settings.
+- Layout DSL component-tree markup for visual/spatial `.layout` sources.
 - One `.events` source file for every scene event sheet and every events-based function.
 - Stable, explicit file references so a scene, function, behavior, or prefab can be reviewed and changed independently.
 - A compatibility adapter that reconstructs the current legacy serializer tree in memory. The existing `gd::Project`, preview, export, code generation, and runtime paths continue to consume the current model.
@@ -52,7 +54,7 @@ This specification replaces the single large GDevelop project JSON document with
 The format is intended to improve AI editing, human review, merge behavior, and Git history without requiring a runtime-format migration.
 
 This document is a design and implementation contract. The repository now
-contains the TOML multi-file adapter in
+contains the TOML-settings/Layout-DSL multi-file adapter in
 `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, the local transactional
 filesystem integration in
 `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`,
@@ -74,24 +76,29 @@ phase 5 before they can store this directory format natively.
    current serializers. Conversion stops before writing files when an input is
    outside that typed coverage contract.
 4. **A file owns a well-defined subtree.** No mutable field is duplicated across two files.
-5. **Names are data, paths select source bodies.** A component name is read
-   from its owning settings namespace and is never inferred only from a
-   filename. Settings fragments are discovered, not referenced by other
-   settings fragments.
-6. **Ordering is explicit.** Array order, scene order, function order, folder order, layer order, object order, and event order are semantically preserved.
+5. **Paths are namespaces; names remain validated data.** A canonical physical
+   path selects the mounted namespace. The local `name` field must agree with
+   that identity. Settings documents are discovered, not referenced by other
+   settings documents.
+6. **Ordering and grouping are explicit.** Array, scene, function, layer,
+   object, and event order are preserved. Editor object/function grouping is
+   stored as a `folder = ["Parent", "Child"]` value, never as optional physical
+   directories.
 7. **Writes are deterministic and transactional.** Formatting, key order, path spelling, and newline behavior are canonical.
 8. **Legacy import is one-way by default.** The original JSON is retained as an unchanged backup; it is not updated after successful conversion.
 9. **Preview and export never treat the source tree as runtime data.** They
    receive a composed legacy serializer tree or, when a path is required, the
    generated `.gdevelop/game.json` compatibility snapshot.
-10. **`.layout` files are visual/UI-focused.** Scene identity, variables,
-    runtime/loading/input settings, shared behavior data, and events belong in
-    `scene.settings` or `.events`; `.layout` retains only visual/editor data as
-    far as current polymorphic object serialization safely allows.
-11. **Settings are append-safe TOML fragments.** All `.settings` files can be
-    discovered from fixed folder conventions, ordered by their locally owned
-    `order` values, concatenated, and parsed as one conflict-free in-memory
-    TOML document.
+10. **`.layout` files contain placement and layout concepts only.** Object
+    definitions (including their variables, effects, and behavior
+    configurations) belong to individual object `.settings` files. A scene
+    `.layout` owns instances, layers, background/editor-view properties, and
+    other spatial layout data; it never owns the object definitions instantiated
+    there. Events remain in `.events`.
+11. **Settings use local-root TOML plus path-derived namespaces.** Every
+    `.settings` file is parsed independently. Its canonical physical path
+    determines where its local root is mounted in the combined settings tree;
+    mounted documents are then recursively merged with conflicts rejected.
 12. **Managed source references are project-root URIs.** Settings refer to
     `.layout` and `.events` sources with canonical `game://...` URIs rooted at
     the directory containing `project.settings`, never relative paths. A
@@ -118,7 +125,7 @@ The design follows these existing implementation boundaries:
 | Behaviors                      | `EventsBasedBehavior` and `AbstractEventsBasedEntity`                                 | `behavior.settings` owns behavior metadata and each method owns one `.events` file.                                                                      |
 | Existing folder projects       | `LocalProjectWriter`, `LocalProjectOpener`, and `ObjectSplitter`                      | Existing split JSON projects are legacy input. Their reference tree must be unsplit before migration.                                                    |
 | Editor open path               | `ProjectsStorage` to `MainFrame`, then `gd.Serializer.fromJSObject`                   | A new storage adapter should return a composed legacy-shaped object to minimize editor changes.                                                          |
-| Preview/export                 | `gdjs::Exporter`, `ExporterHelper`, and preview launchers                             | Existing exporters can use the composed/in-memory `gd::Project`; no runtime code needs to parse TOML or DSL.                                             |
+| Preview/export                 | `gdjs::Exporter`, `ExporterHelper`, and preview launchers                             | Existing exporters can use the composed/in-memory `gd::Project`; runtime code parses neither settings TOML nor source DSL.                               |
 
 The current optional folder-project mode is not this format. It still writes JSON partials, leaves events embedded, writes a legacy root object containing references, and deletes/recreates split directory contents during save.
 
@@ -132,11 +139,16 @@ MyGame/
   resources.settings
   config.settings
 
+  objects/
+    Player.settings                 # folder = ["Shared"]
+
   scenes/
     Main/
       scene.settings
       Main.layout
       Main.events
+      objects/
+        Player.settings             # folder = ["Actors"]
     GameOver/
       scene.settings
       GameOver.layout
@@ -163,19 +175,37 @@ MyGame/
         Enemy/
           prefab.settings
           Enemy.layout
-          OnCreated.events
-          TakeDamage.events
+          objects/
+            Body.settings           # folder = ["Visuals"]
+          functions/
+            OnCreated/
+              function.settings     # folder = ["Lifecycle"]
+              OnCreated.events
+            TakeDamage/
+              function.settings
+              TakeDamage.events
           variants/
             Armored.layout
+            Armored/
+              objects/
+                Shield.settings     # folder = ["Equipment"]
 
       behaviors/
         Health/
           behavior.settings
-          OnCreated.events
-          TakeDamage.events
+          functions/
+            OnCreated/
+              function.settings     # folder = ["Lifecycle"]
+              OnCreated.events
+            TakeDamage/
+              function.settings
+              TakeDamage.events
 
   .gdevelop/
     instructions-catalog.json
+    deprecated-instructions-catalog.json
+    settings-catalog.json
+    layout-catalog.json
     state.json
     transactions/
 ```
@@ -198,14 +228,20 @@ both; the two files remain independent unless both are listed in
   registry at the project root.
 - One root `config.settings` whenever the serialized project contains a
   `globalConfig` subtree, including an empty one.
+- One `objects/<Object>.settings` file for every global
+  object definition.
 - Exactly one scene subfolder containing `scene.settings`, one `.layout`, and
-  one `.events` file for every scene.
+  one `.events` file for every scene, plus one recursively discovered object
+  settings file per scene object definition.
 - Exactly one `extension.settings` per project extension.
 - Exactly one subfolder per extension-level function. Every function subfolder
   contains exactly one `function.settings` and one matching
   `<FunctionName>.events` file.
-- Exactly one `prefab.settings`, one default `<PrefabName>.layout`, and one `.events` file per prefab function.
-- Exactly one `behavior.settings` and one `.events` file per behavior function.
+- Exactly one `prefab.settings`, one default `<PrefabName>.layout`, one object
+  settings file per default or variant child object, and one dedicated
+  function subfolder per prefab function.
+- Exactly one `behavior.settings` and one dedicated function subfolder per
+  behavior function.
 
 ### 4.2 Optional files
 
@@ -221,6 +257,27 @@ both; the two files remain independent unless both are listed in
   Editor-hidden instructions (which the events editor treats as deprecated),
   instructions with deprecation messages, and hidden or deprecated expressions
   are excluded so AI-authored events cannot select APIs that produce warnings.
+- `.gdevelop/deprecated-instructions-catalog.json`, regenerated alongside the
+  authoring catalog on every manual project save. It contains only valid
+  deprecated or hidden compatibility instructions excluded from
+  `instructions-catalog.json`. The editor merges both catalogs in memory for
+  lossless `.events` conversion. An AI may consult the deprecated catalog only
+  to understand a legacy project or make a targeted edit to a deprecated
+  instruction already present there. It must never use this catalog to
+  construct new events or introduce another deprecated instruction.
+- `.gdevelop/settings-catalog.json`, regenerated on every manual project save.
+  It describes the managed settings file kinds and ownership rules, the
+  project components that currently own settings, and the non-hidden object,
+  behavior, and effect types registered for the loaded project. Behavior and
+  effect entries include their authoring property metadata. AI models must
+  consult it before creating settings-owned definitions and must never edit it.
+- `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
+  It describes every Layout DSL element and attribute plus the project-aware
+  scene, prefab, variant, and external-layout contexts. Each context lists the
+  object definitions, attached behaviors, and layers that can be referenced in
+  that layout. Registered effect types and typed parameters are included so an
+  AI model does not guess layout APIs. It is generated state and must never be
+  edited.
 - `.gdevelop/game.json`, regenerated from the composed legacy serializer tree
   on every manual project save. It is an ignored runtime/export compatibility
   snapshot, never editable project source.
@@ -230,114 +287,109 @@ both; the two files remain independent unless both are listed in
 
 ## 5. Common file rules
 
-### 5.1 Settings fragments and layout markers
+### 5.1 Settings fragments and layout grammar
 
-Every `.settings` file is a standalone TOML fragment rooted at a unique,
-fully qualified table. It must not emit shared root scalar keys such as
-`format = ...` or `formatVersion = ...`, because those keys would collide when
-settings files are appended.
+Every `.settings` file is a standalone, unindented TOML document whose owned
+component fields are written at the local document root. Long qualified TOML
+headers are forbidden. The loader derives the semantic namespace from the
+canonical physical path and mounts the parsed local document there before the
+in-memory merge.
 
-Examples of settings-owned namespaces:
+Examples of local settings documents:
 
 ```toml
-[project]
 kind = "project"
 settingsFormatVersion = 1
-
-[scenes."Main"]
-kind = "scene"
-settingsFormatVersion = 1
-order = 0
-
-[externals]
-kind = "externals"
-settingsFormatVersion = 1
-
-[extensions."Combat"]
-kind = "extension"
-settingsFormatVersion = 1
-order = 0
-
-[extensions."Combat".functions."CalculateDamage"]
-kind = "function"
-settingsFormatVersion = 1
-order = 0
 ```
 
-`.layout` files are not appended to the settings document. They retain root
-format markers:
+For example, the root above in
+`extensions/Combat/functions/CalculateDamage/function.settings` mounts at
+`extensions."Combat".functions."CalculateDamage"`. The path is the namespace;
+the file does not repeat it.
 
-```toml
-format = "gdevelop-scene-layout"
-formatVersion = 1
+`.layout` files are not TOML and are not appended to the settings document.
+They use the context supplied by the referencing scene, prefab/variant, or
+external-layout settings entry and must have exactly one Layout DSL root:
+
+```layout
+<layout version=1 background=#202030>
+  <layer name="">
+    <camera size=default viewport=default />
+  </layer>
+</layout>
 ```
 
-Allowed layout `format` values in version 1 are:
-
-```text
-gdevelop-scene-layout
-gdevelop-external-layout
-gdevelop-prefab-layout
-gdevelop-prefab-variant-layout
-```
+There is no compatibility reader for the retired TOML `.layout` draft and no
+format-marker table inside layout source. The complete normative grammar,
+compiler/decompiler mapping, defaults, semantic checks, and canonical writer
+are defined by [gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md).
 
 ### 5.1.1 Strict extension ownership
 
 The three source extensions have non-overlapping responsibilities:
 
-| Extension   | Allowed content                                                                                        | Forbidden content                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `.settings` | TOML identity, metadata, signatures, variables, local ordering, runtime/editor configuration            | IfDo statements, visual placement/layout payloads, and references to other settings files                    |
-| `.layout`   | TOML visual/UI definitions, layers, instances, positions, dimensions, effects, and editor-canvas state | Events, function signatures, runtime logic, and general non-visual settings                                  |
-| `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions        | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration |
+| Extension   | Allowed content                                                                                                                                     | Forbidden content                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `.settings` | TOML identity, metadata, signatures, per-object definitions and their behaviors/variables/effects, local ordering, and runtime/editor configuration | IfDo statements, instance placement, layer ordering, spatial layout payloads, and references to other settings files |
+| `.layout`   | Layout DSL instances, layers, positions, bounds/dimensions, background, and editor-canvas state                                                     | TOML, object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings       |
+| `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions                                                     | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration         |
 
 The loader rejects a file containing content owned by another extension. It
 does not merge duplicated configuration from `.events` or `.layout` files.
 
 `.events` files contain IfDo DSL only. They never contain TOML front matter,
 JSON configuration, or duplicated owner/function settings. Their target and
-identity come from the owning `.settings` namespace.
+identity come from the owning `.settings` document and canonical path.
 
-### 5.1.2 Conflict-free settings concatenation
+### 5.1.2 Path mounting and conflict-free settings merge
 
-All `.settings` files in a project must be directly composable into one valid
-TOML document in memory. The loader concatenates their UTF-8 text, separated
-only by a newline, in this deterministic dependency order:
+All `.settings` files are combined in this deterministic dependency order:
 
 1. `project.settings`.
 2. `resources.settings`.
 3. `config.settings`, when present.
-4. `externals/external.settings`, when that fixed path exists.
-5. Scene settings in project scene order.
-6. Extension settings in project extension order.
-7. Each extension's per-function, prefab, and behavior settings in their
+4. Root object settings in global object order.
+5. `externals/external.settings`, when that fixed path exists.
+6. Scene settings in project scene order, followed by that scene's flat
+   object settings in object order.
+7. Extension settings in project extension order.
+8. Each extension's per-function, prefab, and behavior settings in their
    locally owned contiguous `order` values.
+9. Each prefab's flat default and variant object settings in object order.
+10. Each prefab and behavior's flat function settings in function order.
 
 The loader discovers settings fragments only from the fixed paths
-`resources.settings`, `config.settings`, `scenes/*/scene.settings`,
+`resources.settings`, `config.settings`,
+`objects/*.settings`, `scenes/*/scene.settings`,
+`scenes/*/objects/*.settings`,
 `externals/external.settings`,
 `extensions/*/extension.settings`,
 `extensions/*/functions/*/function.settings`,
 `extensions/*/prefabs/*/prefab.settings`, and
-`extensions/*/behaviors/*/behavior.settings`. No parent settings file lists or
-references these children. The loader appends the discovered fragments without
-key rewriting, object merging, or conflict resolution. The combined text is
-parsed once as the authoritative settings document; bootstrap results are
-discarded.
+`extensions/*/prefabs/*/objects/*.settings`,
+`extensions/*/prefabs/*/variants/*/objects/*.settings`, and
+`extensions/*/prefabs/*/functions/*/function.settings`,
+`extensions/*/behaviors/*/behavior.settings`, and
+`extensions/*/behaviors/*/functions/*/function.settings`. No parent settings
+file lists or references these children.
+
+For every discovered file the loader:
+
+1. Parses the file independently as TOML.
+2. Validates its local-root marker and canonical path.
+3. Derives its mount namespace from that path.
+4. Mounts the local document at that namespace.
+5. Recursively merges mounted objects. Any duplicate scalar, array, or table
+   ownership is a hard error; there is no parent-wins or child-wins policy.
 
 The result is an ephemeral in-memory document called
 `CombinedProjectSettings` in this specification. Conceptually:
 
 ```text
-project.settings
-  + resources.settings
-  + config.settings
-  + externals/external.settings
-  + every scene.settings
-  + every extension.settings
-  + every function.settings
-  + every prefab.settings
-  + every behavior.settings
+parse each local settings document
+  -> derive namespace from canonical physical path
+  -> mount the local root at that namespace
+  -> strict recursive merge
       -> CombinedProjectSettings
       -> validate and compile project
 ```
@@ -350,16 +402,16 @@ to the project directory.
 
 Every `.settings` file remains an independent canonical TOML file when stored:
 
-- Canonical `.settings` and `.layout` writers use no indentation. Every
-  non-empty source line begins at column zero; dotted table headers already
-  express nesting without presentation-only leading whitespace.
-- A settings file must not contain the TOML text or namespace subtree owned by
+- Canonical `.settings` writers use no indentation: every non-empty settings
+  line begins at column zero. Layout DSL uses canonical two-space structural
+  indentation because hierarchy is part of its human-readable component tree.
+- A settings file must not contain the TOML text or local payload owned by
   another settings file.
 - The format has no TOML `include`, import, inheritance, or textual-expansion
   directive for settings.
 - A scene settings fragment owns its `.layout` and `.events` references. The
   project fragment never embeds or repeats those references.
-- Loading and compilation append the fragments in memory; saving performs the
+- Loading and compilation mount and merge the documents in memory; saving performs the
   inverse ownership projection and writes each changed subtree only to its
   owning file.
 - Editing `scene.settings`, `function.settings`, or another child fragment does
@@ -369,18 +421,17 @@ Every `.settings` file remains an independent canonical TOML file when stored:
   export, autosave, or caching. A recovery snapshot may store fragments, but it
   must preserve their ownership boundaries.
 
-Direct concatenation is the only combination operation. There is no recursive
-settings-inclusion semantics and no parent-wins/child-wins conflict policy; a
-collision is a schema or identity error.
+There is no textual concatenation, recursive settings inclusion, or
+parent-wins/child-wins conflict policy; a collision is a schema or identity
+error.
 
 Additional rules for stored fragments and their combined shape:
 
-- Every settings file owns exactly one unique component namespace subtree.
-  `project.settings` additionally owns the one reserved `[gdevelop]` format
-  table used to bootstrap the combined document. `resources.settings` owns
-  only the `[project.resources]` subtree. The fixed-path `config.settings`
-  fragment owns `[project.globalConfig]`; because global config is arbitrary
-  user data, it does not inject `kind` or version keys into that subtree.
+- Every settings file owns exactly one local component document. The physical
+  path supplies its unique mounted namespace. `project.settings` keeps format
+  bootstrap scalars at its root. `config.settings` uses the short local
+  `[gdevelopConfig]` and `[settings]` tables because global config is arbitrary
+  user data.
 - A file must not declare or reopen a table owned by another settings file.
 - There are no `sceneFiles`, `extensionFiles`, `functionFiles`, `prefabFiles`,
   `behaviorFiles`, or `externalSettings` settings-file indexes. Scenes,
@@ -388,15 +439,14 @@ Additional rules for stored fragments and their combined shape:
   contiguous zero-based `order` value in their own settings namespace.
 - `external.settings` may use `eventFiles` and `layoutFiles` because those
   entries describe `.events` and `.layout` sources, not other settings files.
-- Dynamic names are quoted TOML path segments, so names containing dots do not
-  create accidental sub-namespaces.
-- Two files resolving to the same namespace are a hard duplicate-identity
+- Dynamic names are path components and are encoded by the canonical `game://`
+  path rules; they are not repeated in TOML table headers.
+- Two files resolving to the same mounted namespace are a hard duplicate-identity
   error before compilation.
-- Each fragment must parse on its own and as part of the combined document.
-- Each fragment ends with one newline; the concatenator may insert one extra
-  blank line for diagnostics/readability.
+- Each local document must parse on its own and mount without a merge conflict.
+- Each local document ends with one newline.
 - Source diagnostics retain the byte range and originating filename for every
-  appended fragment.
+  mounted document.
 
 The combined in-memory document has a shape like:
 
@@ -420,6 +470,41 @@ kind = "extension"
 kind = "function"
 ```
 
+### 5.1.4 Named inline variable definitions
+
+Every settings-owned variable container uses a compact, lossless TOML table
+keyed by variable name. This applies to:
+
+- Project, scene, object, prefab, and events-based behavior `variables`.
+- Extension `globalVariables` and `sceneVariables`.
+
+Each variable value is exactly one inline array containing its complete legacy
+descriptor without the repeated `name` member. Nested `children` remain arrays
+of descriptors and are written with inline tables, so no recursive TOML table
+headers are generated. For example:
+
+```toml
+[sceneVariables]
+Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [  ] } ] } ] } ]
+```
+
+Primitive variables use the same rule:
+
+```toml
+[variables]
+Score = [ { type = "number", value = 0 } ]
+PlayerName = [ { type = "string", value = "Ada" } ]
+Enabled = [ { type = "boolean", value = true } ]
+```
+
+The descriptor preserves `type`, `value` or `children`, enum `values`,
+`folded`, `persistentUuid`, `hasMixedValues`, and unknown serializer fields.
+The loader restores `name` from the TOML key and reconstructs the current
+legacy variable array. An empty container is `variables = { }` (or the
+corresponding field name). Recursive forms such as `[[variables]]`,
+`[[sceneVariables.children]]`, and a descriptor that repeats `name` are
+invalid; there is no compatibility reader for them.
+
 ### 5.2 TOML profile
 
 Writers use TOML 1.0 with these restrictions:
@@ -430,11 +515,19 @@ Writers use TOML 1.0 with these restrictions:
 - Decimal integers and floats only.
 - RFC 3339 dates are not used for semantic project data; timestamps are strings.
 - Tables and array-of-tables are emitted in schema order.
+- Variable definition descriptors are the exception: their named entries and
+  nested descriptor objects are emitted as one-line inline arrays/tables under
+  `variables`, `globalVariables`, or `sceneVariables`.
 - Keys that are not bare TOML keys are quoted.
 - Every file ends with exactly one newline.
 - NaN and infinity are forbidden because legacy JSON cannot represent them.
 
-Within component payload tables, field names intentionally match the current JSON serializer names (`objectsGroups`, `eventsFunctionsFolderStructure`, `loopIndexVariable`, and so on). This reduces adapter code and gives a direct mapping to existing `SerializeTo`/`UnserializeFrom` methods.
+Within component payload tables, ordinary field names intentionally match the
+current JSON serializer names (`objectsGroups`, `loopIndexVariable`, and so
+on). Legacy `*FolderStructure` fields are the exception: they are not part of
+the multi-file format. Physical project directories own component structure,
+and the legacy runtime/editor model rebuilds any transient root folders while
+composing.
 
 ### 5.3 JSON-to-TOML projection
 
@@ -447,7 +540,8 @@ For payloads produced by the current serializer:
 | Array of one scalar type | TOML array                                                     |
 | String                   | TOML string                                                    |
 | Boolean                  | TOML boolean                                                   |
-| Number                   | TOML integer when integral and safe, otherwise float           |
+| Safe integer             | TOML integer                                                   |
+| Other finite number      | TOML float when lossless; otherwise canonical `rawJson` text   |
 | Empty object             | Inline table `{}` when a typed table would otherwise disappear |
 | Empty array              | `[]`                                                           |
 
@@ -464,13 +558,16 @@ JSON text and reapplied by JSON Pointer:
 
 Rules for `rawJson`:
 
-- The table is nested below the file's owned namespace, for example
-  `[project.rawJson]` or `[scenes."Main".rawJson]`, so it remains append-safe.
+- For ordinary component documents the table is the short local `[rawJson]`
+  table. `config.settings` uses `[gdevelopConfig.rawJson]` for format-owned
+  pointers and `[settings.rawJson]` for a user-owned `rawJson` member.
 - Keys are RFC 6901 JSON Pointers relative to the component's legacy payload.
 - Values are canonical JSON text.
 - Raw overrides are applied after the ordinary TOML projection is built.
 - A pointer must not overlap another pointer in the same file.
 - A writer should use this only when the ordinary projection is not lossless.
+- Integers outside JavaScript's safe-integer range use `rawJson`; this avoids
+  TOML parser overflow while preserving the exact legacy JSON number.
 - Unknown raw pointers are preserved, not discarded.
 
 ### 5.4 Canonical ordering
@@ -483,9 +580,9 @@ Order-sensitive data remains arrays/arrays-of-tables. Maps whose order is not se
 
 ### 5.5 File identity and path safety
 
-Each settings namespace is authoritative for its component identity. The
-loader verifies that the namespace owner, fixed folder kind, locally stored
-name, and referenced `.layout`/`.events` source agree.
+Each canonical settings path is authoritative for its mounted namespace. The
+loader verifies that the path owner, fixed component kind, locally stored name,
+and referenced `.layout`/`.events` source agree.
 
 Suggested filenames are generated as follows:
 
@@ -528,9 +625,11 @@ Canonical and safety rules:
   `..` segment.
 - A reference must not contain an absolute path, drive prefix, UNC prefix, or
   backslash.
-- The loader percent-decodes and normalizes the path, resolves it from the
-  project root, follows the platform's safe canonicalization rules, and rejects
-  traversal or symlink escape outside that root.
+- The loader percent-decodes and normalizes portable path segments. A segment
+  containing Windows-invalid characters, a Windows device name, or a trailing
+  dot/space stays in its uppercase percent-encoded physical form on every OS,
+  keeping a Git checkout portable. The resolved path is still confined to the
+  project root and checked against traversal and symlink escape.
 - Normalized case/Unicode collisions and duplicate resolved paths are errors.
 - Writers preserve an already-recorded canonical URI until an explicit move or
   rename operation changes it.
@@ -555,13 +654,15 @@ The entry file owns the current project root except these split containers:
 
 - `resources`
 - `globalConfig`
+- `objects`
 - `layouts`
 - `externalEvents`
 - `externalLayouts`
 - `eventsFunctionsExtensions`
 
-It therefore owns project properties, versions, platforms, global objects and
-object folders/groups, global variables, and first/preview scene selection.
+It therefore owns project properties, versions, platforms, global object
+groups, global variables, and first/preview scene selection. Individual global
+object definitions are discovered from the root `objects/` directory.
 The sibling `resources.settings` owns the complete
 legacy `resources` container, including resource entries, origins, metadata,
 and resource folders. The sibling `config.settings` owns the complete arbitrary
@@ -570,24 +671,21 @@ legacy `globalConfig` subtree.
 ### 6.2 Example
 
 ```toml
-[gdevelop]
 combinedSettingsFormatVersion = 1
 eventsDslVersion = "2.0"
-
-[project]
 kind = "project"
 settingsFormatVersion = 1
 firstLayout = "Main"
 previewLayout = "Main"
 initialGDVersion = ""
 
-[project.gdVersion]
+[gdVersion]
 major = 5
 minor = 6
 build = 0
 revision = 0
 
-[project.properties]
+[properties]
 name = "My Game"
 description = "Example multi-file project"
 version = "1.0.0"
@@ -609,21 +707,48 @@ packageName = "com.example.mygame"
 orientation = "default"
 ```
 
-Real entry files also contain the projected `objects`,
-`objectsFolderStructure`, `objectsGroups`, and `variables` payloads when
-non-empty. Resources are never written in `project.settings`.
+Real entry files also contain projected `objectsGroups` and `variables`
+payloads when non-empty. Global object definitions and resources are never
+written in `project.settings`. No settings file may contain a legacy
+`objectsFolderStructure` table.
 Global configuration is likewise never written there; it belongs to
 `config.settings`.
 
-### 6.3 `resources.settings` example
+### 6.3 Global object settings
+
+Every global object definition has one physical source file:
+
+```text
+objects/<Object>.settings
+```
 
 ```toml
-[project.resources]
+kind = "object"
+settingsFormatVersion = 1
+order = 0
+folder = []
+name = "Player"
+type = "Sprite"
+behaviors = []
+variables = { }
+effects = []
+```
+
+The file owns the complete global object definition. Directories between
+`objects/` and the filename are the object's editor folder path. The global
+`order` field preserves the legacy object-array order independently of the
+folder path. Composition discovers these files recursively and reconstructs
+the in-memory global object array plus the transient legacy folder tree needed
+by the current editor. Empty logical folders are not source data.
+
+### 6.4 `resources.settings` example
+
+```toml
 kind = "resources"
 settingsFormatVersion = 1
 resourceFolders = []
 
-[[project.resources.resources]]
+[[resources]]
 file = "assets/Player.png"
 kind = "image"
 metadata = ""
@@ -636,38 +761,40 @@ userAdded = true
 references the other. The `kind` and `settingsFormatVersion` fields are removed
 when composing the legacy `resources` object.
 
-### 6.4 `config.settings` example
+### 6.5 `config.settings` example
 
 ```toml
 [gdevelopConfig]
 settingsFormatVersion = 1
 
-[project.globalConfig.sheet.row]
+[settings.sheet.row]
 column = "value"
 column2 = "another value"
 
-[project.globalConfig.sheet.row2]
+[settings.sheet.row2]
 column = "second"
 column2 = "third"
 ```
 
 `config.settings` is discovered at its fixed root path and is never referenced
 by another settings file. No format markers are inserted beneath
-`[project.globalConfig]`, because every key there belongs to the user-defined
+local `[settings]`, because every key there belongs to the user-defined
 configuration. Unsupported TOML value shapes use the format-owned
 `[gdevelopConfig.rawJson]` table with JSON Pointers relative to the
 global-config root. This separate namespace ensures that a user-defined
 `project.globalConfig.rawJson` key remains ordinary user data.
 
-### 6.5 Root rules
+### 6.6 Root rules
 
 - `project.settings` contains no reference to any `.settings` file, including
   no self-reference. Its fixed root filename is the entry marker.
-- `project.settings` must not contain `[project.resources]` in canonical
-  output. `resources.settings` is the sole writer of that namespace.
-- `project.settings` must not contain `[project.globalConfig]` in canonical
-  output. `config.settings` is the sole writer of that namespace.
-- `[gdevelop].eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
+- `project.settings` must not contain resources in canonical output.
+  `resources.settings` is mounted as the sole writer of `project.resources`.
+- `project.settings` must not contain global config in canonical output.
+  `config.settings` local `[settings]` is mounted as `project.globalConfig`.
+- `project.settings` must not contain global objects in canonical output.
+  Each global object owns one flat root object settings file.
+- Root `eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
   intentionally rejected rather than rewritten during multi-file loading;
   legacy JSON import always emits the current grammar.
 - Scene and extension order are contiguous zero-based `order` values owned by
@@ -684,7 +811,7 @@ global-config root. This separate namespace ensures that a user-defined
 - `firstLayout` and `previewLayout`, when present, must name a scene.
 - The root entry does not store content hashes. Hashes belong in ignored editor state so editing one event file does not force a root-file Git conflict.
 
-### 6.6 Legacy composition
+### 6.7 Legacy composition
 
 The composer removes format-only fields and creates:
 
@@ -694,7 +821,6 @@ The composer removes format-only fields and creates:
   "properties": {},
   "resources": [],
   "objects": [],
-  "objectsFolderStructure": {},
   "objectsGroups": [],
   "variables": [],
   "globalConfig": {},
@@ -707,9 +833,10 @@ The composer removes format-only fields and creates:
 }
 ```
 
-The four split arrays are filled in locally owned order: scenes from
-`scene.settings`, extensions from `extension.settings`, and both external
-containers from `external.settings`.
+The global `objects` array is composed from root object settings in their
+locally owned order. The four split arrays are filled in locally owned order:
+scenes from `scene.settings`, extensions from `extension.settings`, and both
+external containers from `external.settings`.
 
 ---
 
@@ -722,17 +849,19 @@ scenes/<Scene>/
   scene.settings
   <Scene>.layout
   <Scene>.events
+  objects/
+    <Object>.settings
+    <Object>.settings
 ```
 
 This is a required boundary, not merely a filename convention.
 
 ### 7.1 `scene.settings`
 
-`scene.settings` owns scene identity and non-visual configuration extracted
-from the current `gd::Layout` serializer object:
+`scene.settings` owns scene identity and scene-wide non-layout configuration
+extracted from the current `gd::Layout` serializer object:
 
 ```toml
-[scenes."Main"]
 kind = "scene"
 settingsFormatVersion = 1
 order = 0
@@ -760,62 +889,77 @@ It also owns:
 
 These fields must not be duplicated in the `.layout` file.
 
-### 7.2 `<Scene>.layout`
+#### 7.1.1 Scene object settings
 
-The `.layout` file should contain only visual/UI and scene-editor layout data
-as far as the current object model permits. It owns what is drawn, arranged,
-layered, or displayed in the scene editor—not scene execution logic or general
-scene configuration.
+Every scene object definition has one physical source file:
 
-```toml
-format = "gdevelop-scene-layout"
-formatVersion = 1
-
-[layout]
-r = 32
-v = 32
-b = 48
-
-[layout.uiSettings]
-# Existing editor settings projection.
-
-[[layout.layers]]
-name = ""
-visibility = true
-isLocked = false
-
-[[layout.objects]]
-name = "Player"
-type = "Sprite"
-
-[[layout.instances]]
-name = "Player"
-x = 128.0
-y = 256.0
+```text
+scenes/<Scene>/objects/<Object>.settings
 ```
 
-The visual layout payload may contain:
+```toml
+kind = "object"
+settingsFormatVersion = 1
+order = 0
+folder = []
+name = "Player"
+type = "Sprite"
+behaviors = []
+variables = { }
+effects = []
+```
 
-- `objects`
-- `objectsFolderStructure`
+The file owns the complete polymorphic object definition, including attached
+behaviors, variables, effects, animations, and type-specific configuration.
+Its `folder = ["Parent", "Child"]` array is the object's editor grouping;
+`folder = []` means the root. No optional grouping directory, `objects` array,
+or `objectsFolderStructure` is written. During editor/runtime composition the
+loader rebuilds the temporary legacy tree from these arrays. Empty logical
+folders are not source data.
+
+### 7.2 `<Scene>.layout`
+
+The `.layout` file contains only scene placement and layout data. It owns where
+instances are placed, how layers are arranged, the scene background, and
+editor-canvas state. An instance refers to an object definition owned by
+a scene object `.settings` file; the definition itself never appears in this
+file.
+
+```layout
+<layout version=1 background=#202030>
+  <editor grid=true grid-size=32,32,32 snap=true />
+
+  <layer name="">
+    <camera size=default viewport=default />
+    <Player
+      id="ef3ef49d-f20f-4450-b373-0ce43291a002"
+      at=128,256
+    />
+  </layer>
+</layout>
+```
+
+The scene layout payload may contain only:
+
 - `instances`
 - `layers`
 - `uiSettings`
 - Background color and other visual editor properties.
 
-Scene object definitions currently combine visual configuration with embedded
-object behavior/variable configuration in one polymorphic serialized object.
-Version 1 keeps each object intact in `.layout` to avoid invasive changes or
-data loss. A later format may split visual object data from object logic after
-the core object serializers expose a safe boundary.
+Object definitions remain intact in their individual scene object settings,
+including polymorphic object data and embedded behavior, variable, and effect
+configuration. The composer merges those definitions with this placement
+payload before calling the existing scene unserializer.
 
 The `.layout` file must not contain:
 
 - `events` or event instructions.
+- `objects` or any object behavior configuration.
+- Any legacy `*FolderStructure` field.
 - Scene variables.
 - Scene loading/unloading, input, title, sound-startup, or sort settings.
 - Scene behavior shared data.
-- Any field owned by `scene.settings`.
+- Any field owned by `scene.settings` or a scene object settings file.
 
 If an owned field appears in both files, loading fails instead of choosing one
 copy.
@@ -874,7 +1018,6 @@ The settings file owns extension metadata and its project-wide extension
 files.
 
 ```toml
-[extensions."Combat"]
 kind = "extension"
 settingsFormatVersion = 1
 order = 0
@@ -893,9 +1036,6 @@ previewIconUrl = ""
 iconUrl = ""
 helpPath = ""
 gdevelopVersion = ""
-
-[extensions."Combat".eventsFunctionsFolderStructure]
-# Projection of the current ordered extension-function folder tree.
 ```
 
 The settings file also owns, when present:
@@ -906,12 +1046,13 @@ The settings file also owns, when present:
 - `sourceFiles`
 - `globalVariables`
 - `sceneVariables`
-- Extension-level function folder structure.
 
 It must not embed `eventsFunctions`, `eventsBasedObjects`, or
 `eventsBasedBehaviors` implementations, and must not contain `functionFiles`,
-`prefabFiles`, or `behaviorFiles` indexes. Each extension-level function,
-prefab, and behavior owns its position in its own `order` field.
+`prefabFiles`, `behaviorFiles`, or `eventsFunctionsFolderStructure`. The
+physical `functions/`, `prefabs/`, and `behaviors/` directories are the only
+component structure. Each extension-level function, prefab, and behavior owns
+its position in its own `order` field.
 
 ### 8.2 Per-function subfolders
 
@@ -935,7 +1076,6 @@ functions/CalculateDamage/
 except its `events` body:
 
 ```toml
-[extensions."Combat".functions."CalculateDamage"]
 kind = "function"
 settingsFormatVersion = 1
 order = 0
@@ -963,8 +1103,8 @@ objectGroups = []
 Rules:
 
 - The loader discovers every `functions/*/function.settings` file. Each
-  function owns its contiguous zero-based `order`; `extension.settings` owns
-  only the extension-function folder structure.
+  function owns its contiguous zero-based `order`; no settings file stores a
+  second logical function tree.
 - The `events` value is a project-root
   `game://extensions/<Extension>/functions/<Function>/<Function>.events` URI,
   never a path relative to `function.settings`.
@@ -1011,7 +1151,6 @@ In current code, a prefab corresponds to an `EventsBasedObject` (also called an 
 ### 9.1 `prefab.settings`
 
 ```toml
-[extensions."Combat".prefabs."Enemy"]
 kind = "prefab"
 settingsFormatVersion = 1
 order = 0
@@ -1032,14 +1171,6 @@ isUsingLegacyInstancesRenderer = false
 
 layout = "game://extensions/Combat/prefabs/Enemy/Enemy.layout"
 
-[[extensions."Combat".prefabs."Enemy".functions]]
-name = "onCreated"
-events = "game://extensions/Combat/prefabs/Enemy/OnCreated.events"
-
-[[extensions."Combat".prefabs."Enemy".functions]]
-name = "TakeDamage"
-events = "game://extensions/Combat/prefabs/Enemy/TakeDamage.events"
-
 [[extensions."Combat".prefabs."Enemy".variants]]
 name = "Armored"
 layout = "game://extensions/Combat/prefabs/Enemy/variants/Armored.layout"
@@ -1047,18 +1178,16 @@ assetStoreAssetId = ""
 assetStoreOriginalName = ""
 ```
 
-Each `[[functions]]` entry uses the same complete function-metadata schema as
-an extension-level per-function `function.settings`; the abbreviated example
-shows only identity and event path.
-
 It also owns:
 
+- `objectsGroups` for the prefab and for every variant.
 - Prefab variables.
-- Attached behavior configurations.
-- Property descriptors and property folder structure.
-- Complete metadata, source order, and function folder structure for every
-  listed prefab function; the matching `.events` file owns only its body.
+- Flat `propertyDescriptors` in source order. They are one direct TOML array;
+  property groups and property folder trees do not exist in this format.
 - Variant order.
+
+It never embeds prefab function metadata. Functions are discovered from the
+physical `functions/` directory described in section 9.4.
 
 ### 9.2 `<Prefab>.layout`
 
@@ -1066,44 +1195,85 @@ The default layout maps to the default `EventsBasedObjectVariant` fields:
 
 - `areaMinX`, `areaMinY`, `areaMinZ`
 - `areaMaxX`, `areaMaxY`, `areaMaxZ`
-- `objects`
-- `objectsFolderStructure`
-- `objectsGroups`
 - `layers`
 - `instances`
 - `editionSettings`
 
-The layout contains all visual/default-variant settings. `prefab.settings` does not duplicate them.
+The layout contains only spatial/default-variant layout settings.
+`prefab.settings` owns groups and other prefab-wide configuration; it does not
+duplicate layout fields, object definitions, or a logical folder tree.
 
-```toml
-format = "gdevelop-prefab-layout"
-formatVersion = 1
+Every default-prefab child object has one physical source file:
 
-[layout]
-areaMinX = 0
-areaMinY = 0
-areaMinZ = 0
-areaMaxX = 64
-areaMaxY = 64
-areaMaxZ = 64
+```text
+extensions/<Extension>/prefabs/<Prefab>/objects/<Object>.settings
 ```
 
-When composing legacy JSON, the default layout fields are merged into the prefab object at the same level, matching `EventsBasedObject::SerializeTo`.
+The file owns the complete child object definition and uses the namespace
+`[extensions."<Extension>".prefabs."<Prefab>".objects."<Object>"]`. Its
+physical folder path is the editor object folder path.
+
+```layout
+<layout version=1>
+  <bounds min=0,0,0 max=64,64,64 />
+</layout>
+```
+
+When composing legacy JSON, settings-owned object definitions and layout-owned
+spatial fields are merged into the prefab object at the same level, matching
+`EventsBasedObject::SerializeTo`.
 
 ### 9.3 Variant layouts
 
-Current prefabs may contain `variants`. Version 1 stores each non-default
-variant's visual data in `variants/<Variant>.layout` using
-`gdevelop-prefab-variant-layout`. Variant identity and asset-store identifiers
-are configuration in the `[[variants]]` entry of `prefab.settings`, not in the
-UI-only `.layout` file.
+Current prefabs may contain `variants`. Layout DSL stores each non-default
+variant's spatial data in `variants/<Variant>.layout` using prefab-variant
+context. Variant identity and asset-store identifiers
+as well as its groups and other variant metadata are configuration in the
+`[[variants]]` entry of `prefab.settings`, not in the `.layout` file. Variant
+child object definitions use:
+
+```text
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
+```
+
+The path mounts each local document at
+`extensions."<Extension>".prefabs."<Prefab>".variantObjects."<Variant>"."<Object>"`.
 
 ### 9.4 Prefab function files
 
-Each prefab function is stored directly in the prefab directory as
-`<Function>.events`, as requested. Its complete identity and signature are in
-the matching `[[functions]]` entry of `prefab.settings`; the `.events` file is
-pure IfDo DSL:
+Every prefab function has a dedicated physical directory:
+
+```text
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/
+  function.settings
+  <Function>.events
+```
+
+There are no optional grouping directories after `functions/`. The final
+directory name matches the function name. `function.settings` stores grouping
+as `folder = ["Parent", "Child"]`, or `folder = []` at the root. Composition
+derives the transient legacy folder tree exclusively from these values. For
+example:
+
+```toml
+kind = "function"
+settingsFormatVersion = 1
+order = 0
+folder = ["Combat"]
+name = "TakeDamage"
+events = "game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events"
+functionType = "Action"
+fullName = "Take damage"
+description = "Damages one enemy."
+sentence = "Damage _PARAM0_"
+private = false
+async = false
+parameters = []
+objectGroups = []
+```
+
+`function.settings` owns the complete function identity, signature, metadata,
+and owner-local function order. Its sibling `.events` file owns only pure IfDo DSL:
 
 ```events
 if Object.health > 0
@@ -1117,7 +1287,6 @@ do Object.health -= amount
 ### 10.1 `behavior.settings`
 
 ```toml
-[extensions."Combat".behaviors."Health"]
 kind = "behavior"
 settingsFormatVersion = 1
 order = 0
@@ -1130,34 +1299,31 @@ previewIconUrl = ""
 iconUrl = ""
 helpPath = ""
 quickCustomizationVisibility = "default"
-
-[[extensions."Combat".behaviors."Health".functions]]
-name = "onCreated"
-events = "game://extensions/Combat/behaviors/Health/OnCreated.events"
-
-[[extensions."Combat".behaviors."Health".functions]]
-name = "TakeDamage"
-events = "game://extensions/Combat/behaviors/Health/TakeDamage.events"
 ```
-
-Each `[[functions]]` entry uses the same complete function-metadata schema as
-an extension-level per-function `function.settings`; the abbreviated example
-shows only identity and event path.
 
 The file also owns:
 
 - Behavior variables.
-- Property descriptors and their folder structure.
-- Shared property descriptors and their folder structure.
-- Complete metadata, source order, and function folder structure for every
-  listed behavior function; the matching `.events` file owns only its body.
+- Flat `propertyDescriptors` and `sharedPropertyDescriptors` arrays in source
+  order. No property folder tree is serialized or reconstructed.
+- Behavior-wide metadata only. Function metadata is never embedded here.
 
 ### 10.2 Behavior function files
 
-Every behavior method is a sibling `.events` file containing pure IfDo DSL.
-Its identity and signature come from the matching `[[functions]]` entry of
-`behavior.settings`. The legacy composer places the compiled body under the
-behavior's `eventsFunctions` array.
+Every behavior method uses:
+
+```text
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/
+  function.settings
+  <Function>.events
+```
+
+Its physical path supplies the mounted namespace
+`extensions."<Extension>".behaviors."<Behavior>".functions."<Function>"`.
+Its `folder` array reconstructs editor grouping; `function.settings` owns
+identity/signature/order, and the sibling `.events` owns only the body. The
+legacy composer places the compiled result under the behavior's
+`eventsFunctions` array. Empty logical function folders are not source data.
 
 ---
 
@@ -1167,11 +1333,11 @@ Every extension, prefab, or behavior function `.events` file contains only
 IfDo DSL event code. Complete function identity and settings are stored by its
 owner:
 
-| Function owner | Complete metadata location                        |
-| -------------- | ------------------------------------------------- |
-| Extension      | The function subfolder's `function.settings`      |
-| Prefab         | The prefab's `prefab.settings` function entry     |
-| Behavior       | The behavior's `behavior.settings` function entry |
+| Function owner | Complete metadata location                                    |
+| -------------- | ------------------------------------------------------------- |
+| Extension      | `functions/<Function>/function.settings`                      |
+| Prefab         | `prefabs/<Prefab>/functions/<Function>/function.settings`     |
+| Behavior       | `behaviors/<Behavior>/functions/<Function>/function.settings` |
 
 Example extension function body:
 
@@ -1210,20 +1376,18 @@ payload.
 
 ### 12.1 `external.settings`
 
-`external.settings` is an append-safe TOML fragment with the unique
-`[externals]` namespace:
+`external.settings` is a local-root TOML document mounted at `externals`:
 
 ```toml
-[externals]
 kind = "externals"
 settingsFormatVersion = 1
 
-[[externals.eventFiles]]
+[[eventFiles]]
 name = "Shared Combat"
 linkedScene = "Main"
 events = "game://externals/Shared%20Combat.events"
 
-[[externals.layoutFiles]]
+[[layoutFiles]]
 name = "Shared Combat"
 linkedScene = "Main"
 layout = "game://externals/Shared%20Combat.layout"
@@ -1238,6 +1402,12 @@ container, and every referenced URI resolves directly inside `externals/`.
 from an older project is preserved exactly and reported as a project diagnostic
 rather than changed during migration. Newly authored non-empty values must name
 an existing scene.
+
+For a stale external layout link only, migration also writes
+`unresolvedScene = true` on that `layoutFiles` entry. This explicit marker lets
+the layout and its association round-trip without disabling linked-scene
+validation for new entries. It is rejected if `linkedScene` resolves and is
+not emitted into the reconstructed legacy JSON.
 
 ### 12.2 External events
 
@@ -1257,9 +1427,10 @@ and compiled `events`.
 
 ### 12.3 External layouts
 
-An external layout is one UI-only
-`externals/<ExternalName>.layout` TOML file with format
-`gdevelop-external-layout`. It owns only `instances` and `editionSettings`.
+An external layout is one layout-only
+`externals/<ExternalName>.layout` Layout DSL file compiled in external context.
+It owns only `instances` and `editionSettings`; its `<layer>` elements reference
+the linked scene's existing layers rather than defining layers.
 Its `name`, `linkedScene`, and order come from the corresponding
 `external.settings` `layoutFiles` entry. The composer maps `linkedScene` to
 `associatedLayout` to match `ExternalLayout::SerializeTo`.
@@ -1290,20 +1461,21 @@ project.settings
 
 ### 13.2 Exact container mapping
 
-| New source                                                              | Legacy destination                                                                                  |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `project.settings` ordinary payload                                     | Project root excluding resources, global config, and four split arrays                                |
-| `resources.settings` `[project.resources]`                              | Project root `resources` object after removing format-only markers                                   |
-| `config.settings` `[project.globalConfig]`                              | Project root `globalConfig` object without adding or removing user keys                              |
-| Each scene `scene.settings` + `.layout` + `.events`                     | One `layouts[]` item, merging non-visual settings, visual/editor layout data, and compiled `events` |
-| `external.settings` event entry + external `.events`                    | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                               |
-| `external.settings` layout entry + external `.layout`                   | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                              |
-| `extension.settings` + children                                         | One `eventsFunctionsExtensions[]` item                                                              |
-| Per-function settings `order` + extension folder tree                   | Extension function order and `eventsFunctionsFolderStructure`                                       |
-| `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events` | One extension `eventsFunctions[]` entry                                                             |
-| `prefabs/<P>/prefab.settings` + default/variant layouts + functions     | Extension `eventsBasedObjects[]`                                                                    |
-| `behaviors/<B>/behavior.settings` + functions                           | Extension `eventsBasedBehaviors[]`                                                                  |
-| Owner function-settings entry + compiled pure DSL body                  | One `EventsFunction` object; settings provide metadata and body becomes `events`                    |
+| New source                                                                 | Legacy destination                                                                                                          |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `project.settings` ordinary payload                                        | Project root excluding resources, global config, global object definitions, and four split arrays                           |
+| Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
+| `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
+| `config.settings` `[settings]`                                             | Project root `globalConfig` object without adding or removing user keys                                                     |
+| Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
+| `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
+| `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
+| `extension.settings` + children                                            | One `eventsFunctionsExtensions[]` item                                                                                      |
+| Physical extension component directories + per-component `order`           | Extension functions, prefabs, and behaviors in deterministic order                                                          |
+| `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events`    | One extension `eventsFunctions[]` entry                                                                                     |
+| `prefabs/<P>/prefab.settings` + flat object/function settings + layouts    | Extension `eventsBasedObjects[]`                                                                                            |
+| `behaviors/<B>/behavior.settings` + flat function settings                 | Extension `eventsBasedBehaviors[]`                                                                                          |
+| Prefab/behavior `functions/<F>/function.settings` + sibling `<F>.events`   | One owner `EventsFunction`; `folder` reconstructs transient editor grouping                                                 |
 
 ### 13.3 Two-pass catalog bootstrap
 
@@ -1311,8 +1483,9 @@ Catalog instruction types and named parameters cannot be compiled safely
 without the loaded project's instruction metadata. The loader therefore uses
 two logical passes:
 
-1. Discover and parse all TOML settings/layout files and resolve every pure
-   `.events` body through its owning settings namespace.
+1. Discover and parse all TOML settings fragments, compile every Layout DSL
+   source in its owner context, and resolve every pure `.events` body through
+   its owning settings document and path-derived namespace.
 2. Build a skeleton legacy tree with scenes, objects, variables, resources
    from `resources.settings`, global config from `config.settings`, extension
    declarations, behaviors, prefabs, and function signatures, but empty event
@@ -1323,9 +1496,9 @@ two logical passes:
 6. Insert compiled arrays into the final legacy tree.
 7. Unserialize the final tree into the editor project.
 
-Exact `@exact` instruction syntax can be parsed before the catalog, but its
-identifier, signature, kind, parameters, and sub-instructions are validated
-after bootstrap.
+Instruction statement structure can be parsed before the catalog, but every
+type identifier, signature, kind, parameter, and sub-instruction is resolved
+and validated after bootstrap. The DSL has no `@exact` fallback.
 
 ### 13.4 Unknown data
 
@@ -1344,21 +1517,22 @@ after bootstrap.
 ### 14.1 Opening `project.settings`
 
 1. Resolve and validate the entry path.
-2. Bootstrap-parse `project.settings` and validate `[gdevelop]` and `[project]`.
+2. Parse `project.settings` and validate its local-root format and project markers.
 3. Discover settings fragments at the fixed folder paths, enforce project-root
    containment, bootstrap-parse each fragment, and sort every ordered
    component kind by its locally owned `order` value.
-4. Append all `.settings` fragments in the deterministic order from section
-   5.1.2 and parse the transient `CombinedProjectSettings` TOML as the
-   authoritative compilation input.
+4. Mount all local `.settings` documents by path in the deterministic order
+   from section 5.1.2 and strictly merge the transient
+   `CombinedProjectSettings` as the authoritative compilation input.
 5. Validate fragment identities, duplicate namespaces/paths, ordering, owner
    relationships, required pairs, and `settingsFormatVersion` for marker-bearing
    component fragments. Validate `config.settings` by its fixed path,
    format-owned `[gdevelopConfig]` marker, and exclusive
-   `[project.globalConfig]` ownership.
+   local `[settings]` ownership mounted at `project.globalConfig`.
 6. Resolve all authoritative layout/events URIs, then read those sources with
    a bounded concurrency limit.
-7. Parse `.layout` files separately and validate their layout format markers.
+7. Parse and semantically compile `.layout` files separately using the owning
+   scene, prefab/variant, or linked-scene external context.
 8. Bootstrap the project catalog.
 9. Compile every `.events` file and collect source-mapped diagnostics.
 10. Compose the legacy serializer tree.
@@ -1397,25 +1571,30 @@ Only dirty owned files are serialized. Editing
 `scenes/Main/Main.events` should not rewrite `scene.settings`, `Main.layout`,
 unrelated extensions, or `project.settings`.
 
-| Editor mutation                                                                                          | Source file marked dirty                      |
-| -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Project properties and global objects/groups/variables                                                   | `project.settings`                            |
-| Resource entries, origins, metadata, and resource folders                                                | `resources.settings`                          |
-| Arbitrary global configuration                                                                          | `config.settings`                             |
-| Scene identity, variables, object groups, loading/input/sound/sort settings, shared behavior data        | The scene `scene.settings`                    |
-| Scene objects, instances, layers, effects, background, and scene-editor canvas/folder state              | The scene `.layout`                           |
-| Scene events                                                                                             | The scene `.events`                           |
-| Extension metadata, dependencies, variables, extension order, and extension-function folders             | `extension.settings`                          |
-| Extension-level function metadata/signature                                                              | That function subfolder's `function.settings` |
-| Extension function event body                                                                            | That function subfolder's `<Function>.events` |
-| Prefab declaration/properties/variables/behaviors and prefab-function metadata/order/folders             | `prefab.settings`                             |
-| Prefab default or variant visual content                                                                 | The corresponding prefab `.layout`            |
-| Prefab function event body                                                                               | That function `.events`                       |
-| Behavior declaration/properties/variables and behavior-function metadata/order/folders                   | `behavior.settings`                           |
-| Behavior function event body                                                                             | That function `.events`                       |
-| External event/layout identity, linked scene, source URI, and order                                      | `external.settings`                           |
-| External event body                                                                                      | Its `.events`                                 |
-| External layout instances/editor layout data                                                             | Its `.layout`                                 |
+| Editor mutation                                                                                       | Source file marked dirty                                         |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Project properties, global object groups, and global variables                                        | `project.settings`                                               |
+| A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
+| Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
+| Arbitrary global configuration                                                                        | `config.settings`                                                |
+| Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
+| A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
+| Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
+| Scene events                                                                                          | The scene `.events`                                              |
+| Extension metadata, dependencies, variables, and extension order                                      | `extension.settings`                                             |
+| Extension-level function metadata/signature                                                           | That function subfolder's `function.settings`                    |
+| Extension function event body                                                                         | That function subfolder's `<Function>.events`                    |
+| Prefab declaration, flat property descriptors, groups, variables, and variants                        | `prefab.settings`                                                |
+| A default/variant prefab child object definition, attached behaviors, or editor-folder grouping       | The corresponding flat prefab object `.settings` file (`folder`) |
+| Prefab default or variant instances, layers, spatial bounds, and editor layout state                  | The corresponding prefab `.layout`                               |
+| Prefab function metadata/signature or function-folder grouping                                        | Its flat `functions/<Function>/function.settings` (`folder`)     |
+| Prefab function event body                                                                            | The sibling `<Function>.events`                                  |
+| Behavior declaration, flat property descriptors, and variables                                        | `behavior.settings`                                              |
+| Behavior function metadata/signature or function-folder grouping                                      | Its flat `functions/<Function>/function.settings` (`folder`)     |
+| Behavior function event body                                                                          | The sibling `<Function>.events`                                  |
+| External event/layout identity, linked scene, source URI, and order                                   | `external.settings`                                              |
+| External event body                                                                                   | Its `.events`                                                    |
+| External layout instances/editor layout data                                                          | Its `.layout`                                                    |
 
 A function metadata/signature edit rewrites only its owning `.settings` file
 unless a rename also changes the subfolder or `.events` filename. The existing
@@ -1424,35 +1603,51 @@ merely to duplicate configuration.
 
 The writer:
 
-1. Projects each dirty settings namespace from the editor model back to its one
-   owning fragment and serializes that component canonically in memory.
+1. Projects each dirty mounted namespace from the editor model back to its one
+   local-root document and serializes that component canonically in memory.
 2. Parses/compiles the generated text again as a self-check.
 3. Writes a sibling temporary file.
 4. Flushes the file and, where supported, its directory entry.
 5. Atomically replaces the target.
-6. Regenerates `.gdevelop/instructions-catalog.json` from the loaded project,
-   installed extensions, object/behavior metadata, and function signatures.
-   Enumeration covers the non-deprecated authoring surface. It excludes
-   editor-hidden compatibility instructions, instructions with deprecation
+6. Regenerates the three AI authoring catalogs under `.gdevelop/` from the
+   loaded project and installed platform metadata:
+   `.gdevelop/instructions-catalog.json`,
+   `.gdevelop/settings-catalog.json`, and
+   `.gdevelop/layout-catalog.json`. The instruction catalog contains actions,
+   conditions, expressions, and function signatures. The settings catalog
+   contains file ownership schemas and registered object/behavior/effect
+   metadata. The layout catalog contains the Layout DSL grammar and each
+   layout's resolvable objects, attached behaviors, and layers.
+   Instruction enumeration covers the non-deprecated authoring surface. It
+   excludes editor-hidden compatibility instructions, instructions with deprecation
    messages, and expressions that are hidden, marked deprecated, or carry a
    deprecation message.
-   The lean JSON keeps only DSL-authoring metadata and writes one compact
-   instruction per line for targeted `rg` searches. UI icons, help paths,
+   The lean JSON catalogs keep only authoring metadata and write one compact
+   catalog entry per line for targeted `rg` searches. UI icons, help paths,
    derived parameter templates, repeated scope labels, per-entry `kind`, and
    parameter `index` fields already implied by their parent arrays are
-   excluded. The catalog is deterministically ordered and written only after source
-   verification succeeds.
-7. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
+   excluded. The catalogs are deterministically ordered and written only after
+   source verification succeeds.
+7. Regenerates `.gdevelop/deprecated-instructions-catalog.json` alongside the
+   normal instruction catalog. It stores only deprecated/hidden compatibility
+   entries. Serialization and loading merge both catalogs in memory for
+   lossless legacy conversion. AI authoring uses only the filtered
+   `.gdevelop/instructions-catalog.json`; the deprecated catalog may be read
+   only to understand or minimally edit deprecated instructions already found
+   in a legacy project, never to construct new events.
+8. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
    an ignored compatibility snapshot.
-8. Updates ignored state hashes.
+9. Updates ignored state hashes.
 
-The generated catalog and IfDo compiler share one named-instruction contract.
+The generated authoring and deprecated compatibility catalogs share one
+named-instruction contract.
 Every instruction uses its exact catalog type and each parameter's exact
 `dslName`; values are JSON strings containing the serialized operand. The DSL
 does not hardcode instruction aliases. This lets an AI edit `.events` directly without MCP
-instruction-discovery or event-writing tools. The loader reads the ignored
-catalog to resolve these named forms. Missing, invalid, or stale catalog entries
-produce diagnostics rather than guessed positional arrays.
+instruction-discovery or event-writing tools. The loader merges the two
+instruction catalogs to resolve all existing named forms. Missing,
+invalid, or stale catalog entries produce diagnostics rather than guessed
+positional arrays.
 
 AI integrations treat the project files as the authoring API. MCP exposure is
 limited to editor-state queries and preview/runtime debugging; it does not
@@ -1532,7 +1727,7 @@ No user edit is accepted into the newly loaded project until step 12 succeeds.
 The new entry records import provenance:
 
 ```toml
-[project.migration]
+[migration]
 source = "game://game.json"
 sourceSha256 = "..."
 importedAt = "2026-07-11T10:30:00Z"
@@ -1553,6 +1748,31 @@ Writing a user-selected legacy JSON outside `.gdevelop/` is an explicit
 compatibility export, not normal Save. It composes current sources, validates
 them, and writes the selected `.json`. The editor continues tracking
 `project.settings`; the ignored `.gdevelop/game.json` snapshot is separate.
+
+### 16.6 Official extension import boundary
+
+Extensions distributed by the official GDevelop extension registry/repository
+remain legacy JSON interchange artifacts. AI clients must not translate these
+files manually. The editor exposes the narrow MCP tool `import_extension` with
+an exact registry `extension_name`. The tool must:
+
+1. Resolve and download the official serialized extension with the native
+   extension-store service.
+2. Resolve and install required extension dependencies through the same native
+   installation path.
+3. Load the serialized extensions through the current
+   `Project::UnserializeAndInsertExtensionsFrom` model path so compatibility
+   logic and declaration ordering are preserved.
+4. Mark the project changed and immediately await a normal multi-file save.
+5. Read the saved multi-file source tree back from disk and fail the MCP call
+   if any expected generated extension source is absent.
+6. Return the verified `game://extensions/...` source paths for the requested
+   extension and every imported dependency.
+
+This is a conversion transaction, not a general MCP authoring surface. Once it
+succeeds, `.settings`, `.layout`, and `.events` are the editable source of truth;
+the AI edits those files directly and uses `reload_project` before preview. A
+failed import must not be replaced with a partial hand-authored conversion.
 
 ---
 
@@ -1576,7 +1796,8 @@ new source files
   -> existing runtime `data.js` / project data
 ```
 
-The GDJS runtime receives the same serialized runtime project data as before. It does not read TOML, `.layout`, `.settings`, or `.events` files.
+The GDJS runtime receives the same serialized runtime project data as before.
+It reads neither settings TOML nor `.layout`/`.events` source DSL.
 
 ### 17.3 Generated legacy JSON
 
@@ -1678,8 +1899,10 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 - Implement canonical JSON-subtree <-> TOML projection and `rawJson` overrides.
 - Implement fixed-path settings discovery, path validation, local ordering,
   and component ownership types.
-- Implement the `gd::Layout` field partition that writes non-visual scene
-  configuration to `scene.settings` and visual/editor data to `.layout`.
+- Implement the `gd::Layout` field partition that writes scene object
+  definitions and their behaviors plus non-layout configuration to
+  `scene.settings`, while `.layout` receives only instances, layers,
+  background, and editor/spatial layout data.
 - Add a legacy composer producing the current JS object/`SerializerElement` shape.
 
 ### Phase 2: events compiler/decompiler
@@ -1741,15 +1964,18 @@ legacy JSON
 - Exhaustive typed DSL coverage for every event/instruction serializer field,
   recursive variable value, and supported platform event adapter; `.events`
   parsing rejects raw event or instruction JSON fallback constructs.
-- Scene settings/layout ownership: non-visual fields are extracted to
-  `scene.settings`, `.layout` contains only allowed visual/editor fields, and
-  the merged legacy layout is structurally equivalent.
+- Scene settings/object/layout ownership: every object definition and its
+  complete behavior/variable/effect data is extracted to one recursive
+  `objects/<Object>.settings` with a `folder` array; `.layout` contains only allowed
+  instances/layers/editor-spatial fields; forbidden cross-file fields are
+  rejected; and the merged legacy layout is structurally equivalent.
 - Nested instruction `subInstructions`, OR/AND/NOT, inverted, awaited, and disabled instructions.
 - Local variable types, UUIDs, enums, arrays, structures, and editor folded state.
 - Async functions, lifecycle functions, `ExpressionAndCondition`, and `ActionWithOperator`.
-- Per-function `functions/<Function>/function.settings` metadata, matching
-  `.events` filename, missing/unlisted files, and owner-identity validation;
-  extension order/folder structure remains in `extension.settings`.
+- Extension and owner-function `function.settings` metadata, recursive physical
+  folder mapping, matching sibling `.events` filename, missing/unlisted files,
+  owner-identity validation, and the absence of every legacy
+  `*FolderStructure` field.
 - Extension dependencies and cross-extension prefab/behavior references.
 - Prefab default and additional variants.
 - Root-level `externals/external.settings`, external events, and external
@@ -1759,8 +1985,9 @@ legacy JSON
 - Legacy French/XML field fallbacks and version compatibility branches.
 - Existing folder-project split references.
 - Unicode, reserved filenames, case-fold collisions, and traversal attempts.
-- Raw concatenation of every `.settings` fragment produces one valid TOML
-  document with no duplicate keys or tables and the expected namespace tree.
+- Parsing each `.settings` document, mounting it from its canonical path, and
+  strictly merging the mounted trees produces the expected namespace tree
+  without duplicate ownership.
 - No settings fragment embeds another fragment or uses an include directive;
   compilation creates `CombinedProjectSettings` only in memory, and saving a
   child setting rewrites only its owning file.
@@ -1783,13 +2010,15 @@ Tests must fail if a converter drops a key, changes array order, replaces an unk
 - Changing GDJS runtime project data.
 - Replacing `gd::Project` or existing C++ serializers.
 - Making the runtime load TOML or DSL.
-- Splitting every object, resource, layer, or instance into an individual file.
+- Splitting every resource, layer, or instance into an individual file.
 - Embedding binary assets in TOML.
 - Automatically merging simultaneous semantic edits.
 - Removing current legacy compatibility branches.
 - Treating filenames as stable entity IDs.
 
-Future versions may split resources/global objects further, add stable entity IDs, or introduce a direct typed source model after the compatibility format has proven reliable.
+Future versions may split resources further, add stable entity IDs, or
+introduce a direct typed source model after the compatibility format has
+proven reliable.
 
 ---
 
@@ -1805,32 +2034,42 @@ A conforming implementation must satisfy all of the following:
    under `.gdevelop/`; it never recreates an editable root legacy JSON.
 4. `resources.settings` exclusively owns the project resource registry and is
    combined without a reference from `project.settings`.
-5. `config.settings` exclusively owns `[project.globalConfig]`, preserves its
-   arbitrary user keys, and is combined without a reference from
+5. `config.settings` local `[settings]` exclusively owns the mounted
+   `project.globalConfig`, preserves its arbitrary user keys, and is combined without a reference from
    `project.settings`.
-6. Every scene has its own subfolder with `scene.settings`, a visual/UI-focused
-   TOML layout, and a DSL events file.
+6. Every scene has its own subfolder with `scene.settings`, a placement-focused
+   Layout DSL file, an events DSL file, and flat object
+   settings. Object definitions and their behaviors belong to individual
+   object settings; instances and layers belong to the layout.
 7. The root `externals/` directory is a sibling of `scenes/`; it contains
    `external.settings` plus each `<ExternalName>.events` and
    `<ExternalName>.layout`, and `external.settings` owns linked-scene metadata
    and external-container ordering.
 8. Every extension-level function has a
    `functions/<Function>/function.settings` and matching
-   `<Function>.events`, and every extension, prefab, behavior, and function
-   follows the directory ownership defined here.
-9. Preview/export composes current legacy data only at the compatibility boundary.
-10. Every supported serializer event and instruction shape has a typed IfDo
-   representation; unknown or newer shapes stop migration before any source is
-   committed.
-11. Paths, ordering, formatting, and writes are deterministic.
-12. No managed save deletes unrecognized user files.
-13. A full new-source -> legacy -> current-project verification succeeds before migration is considered complete.
-14. All `.settings` fragments append conflict-free into one authoritative TOML
-    document, and every managed source reference uses a project-root `game://`
-    URI rather than a relative path.
-15. Settings remain separate files on disk with no include/embedding syntax;
+   `<Function>.events`. Every prefab and behavior function similarly has
+   `functions/<Function>/function.settings` with a `folder` array and a matching
+   sibling `<Function>.events`; the `folder` property replaces logical editor
+   function trees.
+9. Every global, scene, default-prefab, and variant-prefab object definition
+   has one `<Object>.settings` file under its owner's physical `objects/`
+   directory. Each file's `folder` property replaces logical object-folder
+   trees.
+10. Preview/export composes current legacy data only at the compatibility boundary.
+11. Every supported serializer event and instruction shape has a typed IfDo
+    representation; unknown or newer shapes stop migration before any source is
+    committed.
+12. Paths, ordering, formatting, and writes are deterministic.
+13. No managed save deletes unrecognized user files.
+14. A full new-source -> legacy -> current-project verification succeeds before migration is considered complete.
+15. All local-root `.settings` documents mount and merge conflict-free into one
+    authoritative in-memory settings tree, and every managed source reference
+    uses a project-root `game://` URI rather than a relative path.
+16. Settings remain separate files on disk with no include/embedding syntax;
     the editor creates the combined project-settings document only in memory
     for validation and compilation, then saves each changed namespace back to
     its owning fragment.
-16. Every normal multi-file Save/Save As regenerates `.gdevelop/game.json` from
+17. Every normal multi-file Save/Save As regenerates `.gdevelop/game.json` from
     the verified composed legacy serializer tree.
+18. Prefab and behavior property descriptors are flat ordered arrays. The
+    format neither serializes nor reconstructs property folder structures.

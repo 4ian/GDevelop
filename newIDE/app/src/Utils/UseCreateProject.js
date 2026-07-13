@@ -50,6 +50,38 @@ export type CreateProjectResult = {|
 
 const optionalLocalProjectSetupStepTimeoutMs = 10000;
 
+export const getProjectCreationErrorDetails = (rawError: any): string => {
+  const details: Array<string> = [];
+  const seen = new Set();
+  let error = rawError;
+  while (error !== undefined && error !== null && !seen.has(error)) {
+    if (typeof error === 'object') seen.add(error);
+    if (typeof error === 'string') {
+      details.push(error);
+      break;
+    }
+    const name =
+      typeof error.name === 'string' && error.name ? error.name : 'Error';
+    const code =
+      typeof error.code === 'string' && error.code ? ` [${error.code}]` : '';
+    let message =
+      typeof error.message === 'string' && error.message ? error.message : '';
+    if (!message) {
+      try {
+        message = JSON.stringify(error);
+      } catch (serializationError) {
+        message = String(error);
+      }
+    }
+    details.push(`${name}${code}${message ? `: ${message}` : ''}`);
+    if (!error || typeof error !== 'object' || !error.cause) break;
+    error = error.cause;
+  }
+  return details.length
+    ? details.join('\nCaused by: ')
+    : 'Unknown project creation error.';
+};
+
 const runOptionalLocalProjectSetupStep = async (
   description: string,
   setupStep: () => Promise<void>
@@ -115,7 +147,6 @@ type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
-  getStorageProvider: () => StorageProvider,
   loadFromProject: (
     project: gdProject,
     fileMetadata: ?FileMetadata
@@ -130,6 +161,7 @@ type Props = {|
     |}
   ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
+  ensureProjectExtensionsLoaded: () => Promise<void>,
   ensureResourcesAreMoved: (
     options: MoveAllProjectResourcesOptionsWithoutProgress
   ) => Promise<void>,
@@ -170,10 +202,10 @@ const useCreateProject = ({
   onSuccessOrError,
   onError,
   getStorageProviderOperations,
-  getStorageProvider,
   loadFromProject,
   openFromFileMetadata,
   onProjectSaved,
+  ensureProjectExtensionsLoaded,
   ensureResourcesAreMoved,
   onGameRegistered,
 }: Props): UseCreateProjectReturnType => {
@@ -308,11 +340,17 @@ const useCreateProject = ({
           }
         }
 
+        // Loading a project starts the two-pass generation of its local
+        // extensions. The initial save also generates source catalogs from
+        // registered behavior metadata, so it must not run while that metadata
+        // is still being replaced between the two passes.
+        await ensureProjectExtensionsLoaded();
+
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
         );
-        const newStorageProvider = getStorageProvider();
-        const storageProviderInternalName = newStorageProvider.internalName;
+        const storageProviderInternalName =
+          newProjectSetup.storageProvider.internalName;
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
@@ -353,6 +391,13 @@ const useCreateProject = ({
                 ) {
                   console.log('Project template files will be copied later.');
                 }
+
+                // Resource importing can take long enough for a newer local
+                // extension generation pass to be queued. This callback is the
+                // final asynchronous step before the storage provider serializes
+                // the project, so wait again at the actual serialization
+                // boundary.
+                await ensureProjectExtensionsLoaded();
               },
             }
           );
@@ -406,6 +451,7 @@ const useCreateProject = ({
 
         return { createdProject: currentProject };
       } catch (rawError) {
+        console.error('Unable to create the project:', rawError);
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
@@ -413,6 +459,7 @@ const useCreateProject = ({
         showAlert({
           title: t`Unable to create the project`,
           message: errorMessage,
+          details: getProjectCreationErrorDetails(rawError),
         });
 
         onError();
@@ -423,11 +470,11 @@ const useCreateProject = ({
     },
     [
       authenticatedUser,
-      getStorageProvider,
       getStorageProviderOperations,
       loadFromProject,
       onError,
       onProjectSaved,
+      ensureProjectExtensionsLoaded,
       openFromFileMetadata,
       preferences,
       showAlert,
@@ -462,6 +509,7 @@ const useCreateProject = ({
         showAlert({
           title: t`Unable to create the project`,
           message: t`An error occurred when creating the project. Try again later.`,
+          details: getProjectCreationErrorDetails(error),
         });
         onError();
         return { createdProject: null };

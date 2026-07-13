@@ -396,6 +396,44 @@ describe('IfDo events DSL', () => {
       ).toBe(true);
     });
 
+    test('preserves instruction trees in while conditions and nested logical Or', () => {
+      const andCondition = instruction('BuiltinCommonInstructions::And', [], {
+        subInstructions: [instruction('A'), instruction('B')],
+      });
+      const nestedOr = instruction('BuiltinCommonInstructions::Or', [], {
+        subInstructions: [
+          instruction('BuiltinCommonInstructions::Or', [], {
+            subInstructions: [instruction('C'), instruction('D')],
+          }),
+          instruction('E'),
+        ],
+      });
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::While',
+          infiniteLoopWarning: true,
+          whileConditions: [andCondition],
+          conditions: [],
+          actions: [],
+          events: [],
+          variables: [],
+        },
+        standard({ conditions: [nestedOr] }),
+      ];
+      const input = JSON.stringify(events);
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+
+      expect(dsl).toContain(
+        'while @exact id="BuiltinCommonInstructions::And" parameters=[]'
+      );
+      expect(dsl).toContain(
+        'if @exact id="BuiltinCommonInstructions::Or" parameters=[]'
+      );
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
+    });
+
     test('preserves JavaScript line endings and delimiter-looking body lines', () => {
       const inlineCode = 'const text = `\r\n@end js\r\n`;\r\nreturn text;';
       const input = JSON.stringify([
@@ -411,6 +449,27 @@ describe('IfDo events DSL', () => {
       expect(dsl).toContain('delimiter="IFDO_1"');
       expect(dsl).toContain('@end js IFDO_1');
       const output = compileIfDoToLegacyEventsJson(dsl);
+      expect(JSON.parse(output)[0].inlineCode).toBe(inlineCode);
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+    });
+
+    test('preserves three or more consecutive newlines inside JavaScript', () => {
+      const inlineCode =
+        'const values = [1, 2, 3];\n\n\n/** Keep this visual separator. */\nreturn values;';
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode,
+          parameterObjects: '',
+          useStrict: false,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const output = compileIfDoToLegacyEventsJson(dsl);
+
+      expect(dsl).toContain('\n\n\n/** Keep this visual separator. */');
       expect(JSON.parse(output)[0].inlineCode).toBe(inlineCode);
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });

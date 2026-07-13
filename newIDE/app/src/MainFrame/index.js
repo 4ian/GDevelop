@@ -113,6 +113,7 @@ import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
 import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
+import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
@@ -261,6 +262,7 @@ import useLocalProjectChangesWatcher, {
   showLocalProjectFilesChangedDialog,
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
+import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -397,10 +399,26 @@ const findStorageProviderFor = (
   storageProviders: Array<StorageProvider>,
   fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
 ): ?StorageProvider => {
-  const { storageProviderName } = fileMetadataAndStorageProviderName;
-  const storageProvider = storageProviders.filter(
+  const {
+    storageProviderName,
+    fileMetadata,
+  } = fileMetadataAndStorageProviderName;
+  let storageProvider = storageProviders.filter(
     storageProvider => storageProvider.internalName === storageProviderName
   )[0];
+
+  // Older or interrupted project-creation flows could persist a recent local
+  // file without its provider name. Recover only unambiguous absolute local
+  // paths; other missing/unknown providers must still surface an error.
+  const isAbsoluteLocalPath = /^(?:[a-zA-Z]:[\\/]|[\\/]{2}|\/)/.test(
+    fileMetadata.fileIdentifier
+  );
+  if (!storageProvider && !storageProviderName && isAbsoluteLocalPath) {
+    storageProvider = storageProviders.find(
+      provider =>
+        provider.internalName === localFileStorageProviderInternalName
+    );
+  }
 
   if (!storageProvider) {
     showErrorBox({
@@ -2073,7 +2091,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       setIsProjectOpening(true);
     },
     getStorageProviderOperations,
-    getStorageProvider,
     afterCreatingProject: async ({
       project,
       editorTabs,
@@ -2139,6 +2156,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         currentFileMetadata: fileMetadata,
       }));
     },
+    ensureProjectExtensionsLoaded:
+      eventsFunctionsExtensionsState.ensureLoadFinished,
     ensureResourcesAreMoved,
     onGameRegistered: gamesList.fetchGames,
   });
@@ -5693,6 +5712,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
+        // Project extensions are loaded in two passes and their registered
+        // metadata is replaced between these passes. Do not serialize the
+        // project (or generate its source catalogs) while this replacement is
+        // still in progress, as catalog generation could otherwise access
+        // invalid behavior metadata.
+        await eventsFunctionsExtensionsState.ensureLoadFinished();
+
         let newSaveAsLocation: ?SaveAsLocation =
           options && options.forcedSavedAsLocation;
         let newSaveAsOptions: ?SaveAsOptions = null;
@@ -5872,6 +5898,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       showConfirmation,
       markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
+      eventsFunctionsExtensionsState,
     ]
   );
 
@@ -5922,7 +5949,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   const saveWithBackgroundSerializer = false;
   const saveProject = React.useCallback(
     async (options?: {|
-      skipNewVersionWarning: boolean,
+      skipNewVersionWarning?: boolean,
+      rethrowSaveError?: boolean,
     |}): Promise<?FileMetadata> => {
       if (!currentProject) return;
       // Prevent saving if there are errors in the extension modules, as
@@ -5968,6 +5996,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       try {
         const saveStartTime = performance.now();
+
+        // Keep saving synchronized with the two-pass project extension loader.
+        // The settings catalog reads registered behavior metadata, which must
+        // not be replaced while the project is being serialized.
+        await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         // At the end of the promise below, currentProject and storageProvider
         // may have changed (if the user opened another project). So we read and
@@ -6053,6 +6086,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           return fileMetadata;
         }
       } catch (error) {
+        console.error('Unable to save the project:', error);
+        if (options && options.rethrowSaveError) throw error;
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
           error
         );
@@ -6096,6 +6131,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       checkedOutVersionStatus,
       markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
+      eventsFunctionsExtensionsState,
     ]
   );
 
@@ -7353,6 +7389,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     [editorTabsRef]
   );
 
+  const saveProjectForMcpAndWait = React.useCallback(
+    (): Promise<Object> =>
+      saveProjectAfterPendingSave({
+        isSaveProjectInProgress,
+        saveProject: () => saveProject({ rethrowSaveError: true }),
+        hasExtensionLoadErrors,
+      }),
+    [hasExtensionLoadErrors, isSaveProjectInProgress, saveProject]
+  );
+
   const mcpEditorBridge = React.useMemo(
     () =>
       createMcpEditorBridge({
@@ -7379,13 +7425,45 @@ const MainFrame = (props: Props): React.MixedElement => {
             };
           }
           const fileIdentifier = currentFileMetadata.fileIdentifier;
+          const storageProviderName = getStorageProvider().internalName;
           await reloadProject({
             skipUnsavedChangesConfirmation: true,
             rethrowOpenError: true,
           });
-          return { reloaded: true, fileIdentifier };
+          const reloadedProject = currentProjectRef.current;
+          const isLocalMultiFileProject =
+            storageProviderName === localFileStorageProviderInternalName &&
+            !!reloadedProject &&
+            /(?:^|[\\/])project\.settings$/i.test(
+              reloadedProject.getProjectFile()
+            );
+          if (!isLocalMultiFileProject || !reloadedProject) {
+            return {
+              reloaded: true,
+              fileIdentifier,
+              catalogsRegenerated: false,
+            };
+          }
+
+          const projectRootPath = getProjectRootPath(reloadedProject);
+          if (!projectRootPath) {
+            throw new Error(
+              'Unable to resolve the local project root for catalog regeneration.'
+            );
+          }
+          await eventsFunctionsExtensionsState.ensureLoadFinished();
+          const catalogs = await writeProjectSourceCatalogs(
+            reloadedProject,
+            projectRootPath
+          );
+          return {
+            reloaded: true,
+            fileIdentifier,
+            catalogsRegenerated: true,
+            catalogs,
+          };
         },
-        saveProjectAndWait: () => saveProject(),
+        saveProjectAndWait: saveProjectForMcpAndWait,
         getPersistenceState: () => ({
           hasUnsavedChanges: getChangesCount() > 0,
           changesCount: getChangesCount(),
@@ -7438,9 +7516,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       triggerUnsavedChanges,
       getChangesCount,
       getTimeOfFirstChangeSinceLastSave,
-      saveProject,
+      saveProjectForMcpAndWait,
       reloadProject,
       currentFileMetadata,
+      getStorageProvider,
+      eventsFunctionsExtensionsState,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,

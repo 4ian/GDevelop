@@ -5,6 +5,8 @@ import { buildCompleteProjectInstructionCatalog } from '../../Mcp/McpEventKnowle
 
 export const PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH =
   '.gdevelop/instructions-catalog.json';
+export const PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH =
+  '.gdevelop/deprecated-instructions-catalog.json';
 
 export class ProjectInstructionCatalogError extends Error {
   code: string;
@@ -62,6 +64,51 @@ type CatalogLookup = {
   action: Map<string, CatalogEntry>,
   condition: Map<string, CatalogEntry>,
 };
+const DSL_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const UNQUOTED_INSTRUCTION_TYPE = /^[^@\s][^\s]*$/;
+
+const parseCatalogInstructionSource = (
+  source: string,
+  line: number
+): {| type: string, argumentsSource: string |} => {
+  if (source.startsWith('"')) {
+    let escaped = false;
+    let closingQuoteIndex = -1;
+    for (let index = 1; index < source.length; index++) {
+      const character = source[index];
+      if (escaped) {
+        escaped = false;
+      } else if (character === '\\') {
+        escaped = true;
+      } else if (character === '"') {
+        closingQuoteIndex = index;
+        break;
+      }
+    }
+    if (closingQuoteIndex !== -1) {
+      const typeSource = source.slice(0, closingQuoteIndex + 1);
+      const remainder = source.slice(closingQuoteIndex + 1);
+      if (!remainder || /^\s/.test(remainder)) {
+        let type;
+        try {
+          type = JSON.parse(typeSource);
+        } catch (error) {
+          type = null;
+        }
+        if (typeof type === 'string' && type) {
+          return { type, argumentsSource: remainder.trim() };
+        }
+      }
+    }
+  } else {
+    const match = /^([^@\s][^\s]*)(?:\s+(.*))?$/.exec(source);
+    if (match) return { type: match[1], argumentsSource: match[2] || '' };
+  }
+  throw new ProjectInstructionCatalogError(
+    'IFDO_CATALOG_INSTRUCTION_REQUIRED',
+    `Line ${line}: expected InstructionType with named arguments.`
+  );
+};
 
 const entriesForKind = (
   catalog: Catalog,
@@ -90,7 +137,7 @@ const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
       typeof parameter !== 'object' ||
       (parameter.index !== undefined && parameter.index !== index) ||
       typeof parameter.dslName !== 'string' ||
-      !parameter.dslName
+      !DSL_IDENTIFIER.test(parameter.dslName)
     )
       fail(
         'IFDO_CATALOG_INVALID',
@@ -160,21 +207,17 @@ export const createCatalogInstructionResolver = (
     source: string,
     line: number,
   }): LegacyInstruction => {
-    const match = /^([^@\s][^\s]*)(?:\s+(.*))?$/.exec(source);
-    if (!match) {
-      throw new ProjectInstructionCatalogError(
-        'IFDO_CATALOG_INSTRUCTION_REQUIRED',
-        `Line ${line}: expected InstructionType with named arguments.`
-      );
-    }
-    const type = match[1];
+    const { type, argumentsSource } = parseCatalogInstructionSource(
+      source,
+      line
+    );
     const entry = lookup[kind].get(type);
     if (!entry)
       throw new ProjectInstructionCatalogError(
         'IFDO_CATALOG_UNKNOWN_INSTRUCTION',
         `Line ${line}: ${kind} ${type} is not in the project instruction catalog.`
       );
-    const argumentsByName = parseCatalogInstructionArguments(match[2] || '');
+    const argumentsByName = parseCatalogInstructionArguments(argumentsSource);
     const knownNames = new Set(
       entry.parameters.map(parameter => parameter.dslName)
     );
@@ -247,7 +290,10 @@ export const createCatalogInstructionFormatter = (
         ({ parameter, value }) =>
           `${parameter.dslName}=${JSON.stringify(value)}`
       );
-    return `${entry.type}${operands.length ? ` ${operands.join(' ')}` : ''}`;
+    const formattedType = UNQUOTED_INSTRUCTION_TYPE.test(entry.type)
+      ? entry.type
+      : JSON.stringify(entry.type);
+    return `${formattedType}${operands.length ? ` ${operands.join(' ')}` : ''}`;
   };
 };
 
@@ -258,6 +304,122 @@ export const buildProjectInstructionCatalog = (
   validateProjectInstructionCatalog(
     buildCompleteProjectInstructionCatalog({ project, i18n })
   );
+
+/**
+ * Deprecated and hidden compatibility metadata omitted from the normal
+ * authoring catalog. Existing projects can still contain these instructions,
+ * so the editor merges this delta with the authoring catalog for lossless
+ * source conversion.
+ */
+export const buildProjectDeprecatedInstructionCatalog = (
+  project: gdProject,
+  i18n?: any
+): Object => {
+  const authoringCatalog = buildProjectInstructionCatalog(project, i18n);
+  const completeCatalog = validateProjectInstructionCatalog(
+    buildCompleteProjectInstructionCatalog({
+      project,
+      i18n,
+      includeDeprecatedAndHidden: true,
+    })
+  );
+  const authoringActionTypes = new Set(
+    authoringCatalog.actions.map(entry => entry.type)
+  );
+  const authoringConditionTypes = new Set(
+    authoringCatalog.conditions.map(entry => entry.type)
+  );
+  const authoringExpressionKeys = new Set(
+    authoringCatalog.expressions.map(
+      entry => `${entry.type}\u0000${String(entry.returnType)}`
+    )
+  );
+  const actions = completeCatalog.actions.filter(
+    entry => !authoringActionTypes.has(entry.type)
+  );
+  const conditions = completeCatalog.conditions.filter(
+    entry => !authoringConditionTypes.has(entry.type)
+  );
+  const expressions = completeCatalog.expressions.filter(
+    entry =>
+      !authoringExpressionKeys.has(
+        `${entry.type}\u0000${String(entry.returnType)}`
+      )
+  );
+  return validateProjectInstructionCatalog({
+    ...completeCatalog,
+    authoring: {
+      ...completeCatalog.authoring,
+      preferredSyntax:
+        'Compatibility metadata for reading and minimally editing existing deprecated instructions only.',
+      rules: [
+        'Never use this catalog to construct new events.',
+        'Use .gdevelop/instructions-catalog.json for all newly authored instructions.',
+        'Entries here may only preserve or minimally edit deprecated instructions already present in legacy project event code.',
+      ],
+    },
+    counts: {
+      actions: actions.length,
+      conditions: conditions.length,
+      expressions: expressions.length,
+    },
+    actions,
+    conditions,
+    expressions,
+  });
+};
+
+export const mergeProjectInstructionCatalogs = (
+  authoringCatalogInput: any,
+  deprecatedCatalogInput: any
+): Object => {
+  const authoringCatalog = validateProjectInstructionCatalog(
+    authoringCatalogInput
+  );
+  const deprecatedCatalog = validateProjectInstructionCatalog(
+    deprecatedCatalogInput
+  );
+  const mergeEntries = (
+    primaryEntries: Array<Object>,
+    additionalEntries: Array<Object>,
+    getKey: Object => string
+  ): Array<Object> => {
+    const entriesByKey = new Map();
+    [...primaryEntries, ...additionalEntries].forEach(entry => {
+      const key = getKey(entry);
+      if (!entriesByKey.has(key)) entriesByKey.set(key, entry);
+    });
+    return Array.from(entriesByKey.values()).sort((left, right) =>
+      getKey(left).localeCompare(getKey(right))
+    );
+  };
+  const actions = mergeEntries(
+    authoringCatalog.actions,
+    deprecatedCatalog.actions,
+    entry => entry.type
+  );
+  const conditions = mergeEntries(
+    authoringCatalog.conditions,
+    deprecatedCatalog.conditions,
+    entry => entry.type
+  );
+  const expressions = mergeEntries(
+    authoringCatalog.expressions,
+    deprecatedCatalog.expressions,
+    entry => `${entry.type}\u0000${String(entry.returnType)}`
+  );
+  return validateProjectInstructionCatalog({
+    ...authoringCatalog,
+    counts: {
+      actions: actions.length,
+      conditions: conditions.length,
+      expressions: expressions.length,
+    },
+    actions,
+    conditions,
+    expressions,
+  });
+};
 
 export const serializeProjectInstructionCatalog = (catalog: Object): string =>
   (() => {

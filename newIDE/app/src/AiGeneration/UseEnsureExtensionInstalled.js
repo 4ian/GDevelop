@@ -5,6 +5,7 @@ import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionSto
 import {
   useInstallExtension,
   checkRequiredExtensionsUpdate,
+  ensureExtensionsRegistryLoaded,
   getRequiredExtensions,
   getExtensionHeader,
 } from '../AssetStore/ExtensionStore/InstallExtension';
@@ -42,8 +43,13 @@ export const useEnsureExtensionInstalled = ({
         if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
           return;
 
+        const availableExtensionShortHeadersByName = await ensureExtensionsRegistryLoaded(
+          extensionShortHeadersByName[extensionName]
+            ? extensionShortHeadersByName
+            : {}
+        );
         const extensionShortHeader = getExtensionHeader(
-          extensionShortHeadersByName,
+          availableExtensionShortHeadersByName,
           extensionName
         );
         const extensionShortHeaders: Array<ExtensionShortHeader> = [
@@ -58,7 +64,7 @@ export const useEnsureExtensionInstalled = ({
           {
             requiredExtensions,
             project,
-            extensionShortHeadersByName,
+            extensionShortHeadersByName: availableExtensionShortHeadersByName,
           }
         );
         await installExtension({

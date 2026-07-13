@@ -64,20 +64,27 @@ export const EventsFunctionsExtensionsProvider = ({
     [onWriteFile, makeEventsFunctionCodeWriter]
   );
 
-  const ensureLoadFinished = React.useCallback((): Promise<void> => {
-    const currentLastLoadPromise = lastLoadPromise.current;
-    if (currentLastLoadPromise) {
-      console.info(
-        'Waiting on the events functions extensions to finish loading...'
-      );
-    } else {
+  const ensureLoadFinished = React.useCallback(async (): Promise<void> => {
+    let loadPromise = lastLoadPromise.current;
+    if (!loadPromise) {
       console.info('Events functions extensions are ready.');
-      return Promise.resolve();
+      return;
     }
 
-    return currentLastLoadPromise.then(() => {
-      console.info('Events functions extensions finished loading.');
-    });
+    console.info(
+      'Waiting on the events functions extensions to finish loading...'
+    );
+
+    // A new generation pass can be queued while the previous promise is
+    // settling. Keep reading the ref until the queue is actually empty rather
+    // than returning after the promise that happened to be current when this
+    // function was called.
+    while (loadPromise) {
+      await loadPromise;
+      loadPromise = lastLoadPromise.current;
+    }
+
+    console.info('Events functions extensions finished loading.');
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(

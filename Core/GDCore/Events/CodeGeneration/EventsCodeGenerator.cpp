@@ -1102,6 +1102,14 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     if (event.IsDisabled() || !event.IsExecutable())
       continue;
 
+    // Synthetic AsyncEvent wrappers (inserted by PreprocessAsyncActions) are
+    // not user-visible, so they carry no persistent UUID and can't be a
+    // breakpoint/step target: skip them.
+    gd::String breakpointCode;
+    if (event.GetType() != "BuiltinAsync::Async") {
+      breakpointCode = GenerateBreakpointCode(event);
+    }
+
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Push(
           event.GetVariables());
@@ -1173,8 +1181,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::String scopeEnd = GenerateScopeEnd(context);
     gd::String declarationsCode = GenerateObjectsDeclarationCode(context);
 
-    output += "\n" + scopeBegin + "\n" + declarationsCode + "\n" +
-              eventCoreCode + "\n" + scopeEnd + "\n";
+    output += "\n" + breakpointCode + scopeBegin + "\n" + declarationsCode +
+              "\n" + eventCoreCode + "\n" + scopeEnd + "\n";
 
     if (event.HasVariables()) {
       GetProjectScopedContainers().GetVariablesContainersList().Pop();

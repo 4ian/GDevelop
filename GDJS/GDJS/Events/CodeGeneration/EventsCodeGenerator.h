@@ -377,6 +377,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateProfilerSectionEnd(
       const gd::String& section) override;
 
+  virtual gd::String GenerateBreakpointCode(gd::BaseEvent& event) override;
+
   virtual gd::String GenerateRelationalOperation(
       const gd::String& relationalOperator,
       const gd::String& lhs,

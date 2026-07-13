@@ -181,6 +181,7 @@ describe('GDevelop multi-file project format', () => {
     expect(files[MULTI_FILE_ENTRY_URI]).toContain(
       'combinedSettingsFormatVersion = 1'
     );
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = { }');
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
@@ -888,6 +889,117 @@ folderName = "__ROOT"
       );
     });
     expect(() => composeLegacyProjectFromFiles(files)).not.toThrow();
+  });
+
+  test('stores every settings-owned variable definition as a named inline descriptor', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const numberVariable = (name, value) => ({
+      name,
+      type: 'number',
+      value,
+    });
+    project.variables = [
+      {
+        ...numberVariable('GlobalScore', 12),
+        folded: true,
+        persistentUuid: 'global-score-variable',
+      },
+    ];
+    project.layouts[0].variables = [
+      { name: 'SceneState', type: 'string', value: 'Ready' },
+    ];
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [],
+        variables: [numberVariable('Health', 100)],
+      },
+    ];
+    const extension = project.eventsFunctionsExtensions[0];
+    extension.globalVariables = [
+      {
+        name: 'Difficulty',
+        type: 'enum',
+        value: 'Hard',
+        values: ['Easy', 'Hard'],
+      },
+    ];
+    extension.sceneVariables = [
+      {
+        name: 'Controllers',
+        type: 'array',
+        children: [
+          {
+            type: 'structure',
+            children: [
+              {
+                name: 'Buttons',
+                type: 'array',
+                children: [
+                  {
+                    type: 'structure',
+                    children: [
+                      { name: 'State', type: 'string', value: 'Idle' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    extension.eventsBasedObjects[0].variables = [
+      { name: 'Enabled', type: 'boolean', value: true },
+    ];
+    extension.eventsBasedBehaviors[0].variables = [
+      numberVariable('Cooldown', 0.25),
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const extensionSource =
+      files['game://extensions/Combat/extension.settings'];
+    const sceneSource = files['game://scenes/Main/scene.settings'];
+    const prefabSource =
+      files['game://extensions/Combat/prefabs/Enemy/prefab.settings'];
+    const behaviorSource =
+      files['game://extensions/Combat/behaviors/Health/behavior.settings'];
+
+    expect(extensionSource).toContain('[sceneVariables]');
+    expect(extensionSource).toContain(
+      'Controllers = [ { type = "array", children = [ { type = "structure"'
+    );
+    expect(extensionSource).toContain(
+      'Difficulty = [ { type = "enum", value = "Hard", values = [ "Easy", "Hard" ] } ]'
+    );
+    expect(sceneSource).toContain(
+      'SceneState = [ { type = "string", value = "Ready" } ]'
+    );
+    expect(prefabSource).toContain(
+      'Enabled = [ { type = "boolean", value = true } ]'
+    );
+    expect(behaviorSource).toContain(
+      'Cooldown = [ { type = "number", value = 0.25 } ]'
+    );
+    Object.keys(files)
+      .filter(uri => uri.endsWith('.settings'))
+      .forEach(uri => {
+        expect(files[uri]).not.toMatch(
+          /\[\[(?:variables|globalVariables|sceneVariables)(?:\.|\]\])/m
+        );
+      });
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+
+    const malformedFiles = { ...files };
+    malformedFiles[
+      'game://extensions/Combat/extension.settings'
+    ] = extensionSource.replace(/Controllers = \[[^\n]+/, 'Controllers = []');
+    expect(() => composeLegacyProjectFromFiles(malformedFiles)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
+    );
   });
 
   test('writes TOML without indentation', () => {

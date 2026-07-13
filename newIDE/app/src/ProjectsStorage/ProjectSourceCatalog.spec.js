@@ -147,6 +147,12 @@ describe('project source catalogs', () => {
     expect(catalog.authoring.rules.join('\n')).toContain(
       'folder = ["Parent", "Child"]'
     );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Controllers = [{ type = "array"'
+    );
+    expect(catalog.authoring.variableDefinition).toContain(
+      'does not repeat name'
+    );
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );

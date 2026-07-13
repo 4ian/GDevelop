@@ -40,6 +40,12 @@ export const LEGACY_FOLDER_STRUCTURE_FIELDS = Object.freeze([
 const LEGACY_FOLDER_STRUCTURE_FIELD_SET = new Set(
   LEGACY_FOLDER_STRUCTURE_FIELDS
 );
+const VARIABLE_DEFINITION_FIELDS = Object.freeze([
+  'variables',
+  'globalVariables',
+  'sceneVariables',
+]);
+const VARIABLE_DEFINITION_FIELD_SET = new Set(VARIABLE_DEFINITION_FIELDS);
 
 export const SCENE_LAYOUT_FIELDS = Object.freeze([
   'r',
@@ -180,6 +186,84 @@ const scalarKind = value =>
     ? 'object'
     : typeof value;
 
+const compactVariableDefinitionFields = payload => {
+  const compacted = clone(payload);
+  VARIABLE_DEFINITION_FIELDS.forEach(field => {
+    if (compacted[field] === undefined) return;
+    if (!Array.isArray(compacted[field])) {
+      fail(
+        'MULTIFILE_INVALID_VARIABLES',
+        `${field} must be a legacy variable-definition array before serialization.`
+      );
+    }
+    const variablesByName = {};
+    compacted[field].forEach((variable, index) => {
+      if (
+        !variable ||
+        typeof variable !== 'object' ||
+        Array.isArray(variable)
+      ) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field}[${index}] must be a variable descriptor.`
+        );
+      }
+      const name = variable.name;
+      if (typeof name !== 'string' || !name.length) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field}[${index}].name must be a non-empty string.`
+        );
+      }
+      if (Object.prototype.hasOwnProperty.call(variablesByName, name)) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} contains duplicate variable ${name}.`
+        );
+      }
+      variablesByName[name] = [omitFields(variable, new Set(['name']))];
+    });
+    compacted[field] = variablesByName;
+  });
+  return compacted;
+};
+
+const restoreVariableDefinitionFields = (payload, fileUri) => {
+  const restored = clone(payload);
+  VARIABLE_DEFINITION_FIELDS.forEach(field => {
+    if (restored[field] === undefined) return;
+    const variablesByName = asObject(restored[field], field, fileUri);
+    restored[field] = Object.keys(variablesByName).map(name => {
+      const descriptorWrapper = asArray(
+        variablesByName[name],
+        `${field}.${name}`,
+        fileUri
+      );
+      if (
+        descriptorWrapper.length !== 1 ||
+        !descriptorWrapper[0] ||
+        typeof descriptorWrapper[0] !== 'object' ||
+        Array.isArray(descriptorWrapper[0])
+      ) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field}.${name} must be a one-element inline descriptor array.`,
+          fileUri
+        );
+      }
+      if (descriptorWrapper[0].name !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field}.${name} must not repeat its name inside the descriptor.`,
+          fileUri
+        );
+      }
+      return { name, ...descriptorWrapper[0] };
+    });
+  });
+  return restored;
+};
+
 const projectTomlProjection = payload => {
   const rawJson = {};
 
@@ -235,7 +319,9 @@ const projectTomlProjection = payload => {
 };
 
 const projectTomlPayload = payload => {
-  const { projected, rawJson } = projectTomlProjection(payload);
+  const { projected, rawJson } = projectTomlProjection(
+    compactVariableDefinitionFields(payload)
+  );
   if (Object.prototype.hasOwnProperty.call(projected, 'rawJson')) {
     fail(
       'MULTIFILE_RESERVED_FIELD',
@@ -339,7 +425,7 @@ const restoreTomlPayload = (namespace, fileUri) => {
   delete payload.rawJson;
   const restoredPayload = restoreTomlProjection(payload, rawJson, fileUri);
   rejectLegacyFolderStructures(restoredPayload, fileUri);
-  return restoredPayload;
+  return restoreVariableDefinitionFields(restoredPayload, fileUri);
 };
 
 const normalizeLf = source =>
@@ -368,13 +454,63 @@ const stripTomlStructuralIndentation = source => {
     .join('\n');
 };
 
+const stringifyInlineTomlValue = value => {
+  if (Array.isArray(value)) {
+    return `[ ${value.map(stringifyInlineTomlValue).join(', ')} ]`;
+  }
+  if (value && typeof value === 'object') {
+    const assignments = Object.keys(value).map(
+      key =>
+        `${
+          /^[A-Za-z0-9_-]+$/.test(key) ? key : stringifyToml.value(String(key))
+        } = ${stringifyInlineTomlValue(value[key])}`
+    );
+    return `{ ${assignments.join(', ')}${assignments.length ? ' ' : ''}}`;
+  }
+  return stringifyToml.value(value);
+};
+
 const serializeToml = object => {
   // TOML table nesting is already explicit in dotted headers. Keeping every
   // generated line at column zero avoids presentation-only whitespace churn.
+  const serializable = clone(object);
+  const inlineValues = new Map();
+  let tokenIndex = 0;
+  const serializedInput = canonicalJson(serializable);
+  const reserveInlineValue = value => {
+    let token;
+    do {
+      token = `__GDEVELOP_INLINE_TOML_${tokenIndex++}__`;
+    } while (serializedInput.includes(token));
+    inlineValues.set(token, stringifyInlineTomlValue(value));
+    return token;
+  };
+  Object.keys(serializable).forEach(key => {
+    if (!VARIABLE_DEFINITION_FIELD_SET.has(key)) return;
+    const variablesByName = serializable[key];
+    if (
+      !variablesByName ||
+      typeof variablesByName !== 'object' ||
+      Array.isArray(variablesByName)
+    )
+      return;
+    Object.keys(variablesByName).forEach(variableName => {
+      variablesByName[variableName] = reserveInlineValue(
+        variablesByName[variableName]
+      );
+    });
+  });
   const output = stripTomlStructuralIndentation(
-    normalizeLf(stringifyToml(object))
+    normalizeLf(stringifyToml(serializable))
   ).trimEnd();
-  return `${output}\n`;
+  let expandedOutput = output;
+  inlineValues.forEach((inlineValue, token) => {
+    expandedOutput = expandedOutput.replace(
+      stringifyToml.value(token),
+      inlineValue
+    );
+  });
+  return `${expandedOutput}\n`;
 };
 
 export const parseTomlSource = (source, fileUri = '<memory>') => {

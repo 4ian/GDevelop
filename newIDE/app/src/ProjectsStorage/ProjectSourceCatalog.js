@@ -665,6 +665,7 @@ export const buildProjectSettingsCatalog = ({
         'At load time the editor parses each local document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted documents. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
+        'Write variables, globalVariables, and sceneVariables as TOML tables keyed by variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Never write recursive [[variables...]] tables.',
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
@@ -675,6 +676,8 @@ export const buildProjectSettingsCatalog = ({
         'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
       behaviorDefinition:
         'An attached behavior requires a unique object-local name and a registered type; initialize properties from that type metadata or an existing definition.',
+      variableDefinition:
+        'A variable name is the key in variables/globalVariables/sceneVariables. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
     },
     fileKinds: SETTINGS_FILE_KINDS,
     settingsOwners,

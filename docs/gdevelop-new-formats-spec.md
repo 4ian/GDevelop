@@ -461,6 +461,41 @@ kind = "extension"
 kind = "function"
 ```
 
+### 5.1.4 Named inline variable definitions
+
+Every settings-owned variable container uses a compact, lossless TOML table
+keyed by variable name. This applies to:
+
+- Project, scene, object, prefab, and events-based behavior `variables`.
+- Extension `globalVariables` and `sceneVariables`.
+
+Each variable value is exactly one inline array containing its complete legacy
+descriptor without the repeated `name` member. Nested `children` remain arrays
+of descriptors and are written with inline tables, so no recursive TOML table
+headers are generated. For example:
+
+```toml
+[sceneVariables]
+Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [  ] } ] } ] } ]
+```
+
+Primitive variables use the same rule:
+
+```toml
+[variables]
+Score = [ { type = "number", value = 0 } ]
+PlayerName = [ { type = "string", value = "Ada" } ]
+Enabled = [ { type = "boolean", value = true } ]
+```
+
+The descriptor preserves `type`, `value` or `children`, enum `values`,
+`folded`, `persistentUuid`, `hasMixedValues`, and unknown serializer fields.
+The loader restores `name` from the TOML key and reconstructs the current
+legacy variable array. An empty container is `variables = { }` (or the
+corresponding field name). Recursive forms such as `[[variables]]`,
+`[[sceneVariables.children]]`, and a descriptor that repeats `name` are
+invalid; there is no compatibility reader for them.
+
 ### 5.2 TOML profile
 
 Writers use TOML 1.0 with these restrictions:
@@ -471,6 +506,9 @@ Writers use TOML 1.0 with these restrictions:
 - Decimal integers and floats only.
 - RFC 3339 dates are not used for semantic project data; timestamps are strings.
 - Tables and array-of-tables are emitted in schema order.
+- Variable definition descriptors are the exception: their named entries and
+  nested descriptor objects are emitted as one-line inline arrays/tables under
+  `variables`, `globalVariables`, or `sceneVariables`.
 - Keys that are not bare TOML keys are quoted.
 - Every file ends with exactly one newline.
 - NaN and infinity are forbidden because legacy JSON cannot represent them.
@@ -678,7 +716,7 @@ folder = []
 name = "Player"
 type = "Sprite"
 behaviors = []
-variables = []
+variables = { }
 effects = []
 ```
 
@@ -853,7 +891,7 @@ folder = []
 name = "Player"
 type = "Sprite"
 behaviors = []
-variables = []
+variables = { }
 effects = []
 ```
 

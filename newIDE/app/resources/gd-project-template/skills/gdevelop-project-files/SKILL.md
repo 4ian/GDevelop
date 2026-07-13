@@ -72,6 +72,12 @@ generated compatibility/runtime output, not multi-file source.
   mounted namespace, so never repeat owner names in long TOML table headers.
   Never embed another settings document. Follow the matching settings-catalog
   `fileKinds` entry and use only registered type metadata from that catalog.
+- Variable definitions: in `variables`, `globalVariables`, and
+  `sceneVariables`, use a table keyed by variable name. Assign each name one
+  inline array containing its complete descriptor without another `name`, for
+  example `Controllers = [{ type = "array", children = [...] }]`. Use
+  `variables = { }` when empty. Never write recursive `[[variables...]]` TOML
+  tables.
 - `config.settings`: edit global configuration only under the short local
   `[settings]` table; preserve arbitrary keys and the format-owned
   `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.

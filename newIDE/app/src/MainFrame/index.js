@@ -5694,6 +5694,13 @@ const MainFrame = (props: Props): React.MixedElement => {
       const storageProviderInternalName = newStorageProvider.internalName;
 
       try {
+        // Project extensions are loaded in two passes and their registered
+        // metadata is replaced between these passes. Do not serialize the
+        // project (or generate its source catalogs) while this replacement is
+        // still in progress, as catalog generation could otherwise access
+        // invalid behavior metadata.
+        await eventsFunctionsExtensionsState.ensureLoadFinished();
+
         let newSaveAsLocation: ?SaveAsLocation =
           options && options.forcedSavedAsLocation;
         let newSaveAsOptions: ?SaveAsOptions = null;
@@ -5873,6 +5880,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       showConfirmation,
       markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
+      eventsFunctionsExtensionsState,
     ]
   );
 
@@ -5970,6 +5978,11 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       try {
         const saveStartTime = performance.now();
+
+        // Keep saving synchronized with the two-pass project extension loader.
+        // The settings catalog reads registered behavior metadata, which must
+        // not be replaced while the project is being serialized.
+        await eventsFunctionsExtensionsState.ensureLoadFinished();
 
         // At the end of the promise below, currentProject and storageProvider
         // may have changed (if the user opened another project). So we read and
@@ -6100,6 +6113,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       checkedOutVersionStatus,
       markGameAsSavedIfRelevant,
       hasExtensionLoadErrors,
+      eventsFunctionsExtensionsState,
     ]
   );
 

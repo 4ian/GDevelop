@@ -5022,7 +5022,7 @@ const addSceneEvents: EditorFunction = {
         )
       ) {
         return makeGenericFailure(
-          'No events description (or events script) provided for some event batches. Provide one for each event(s) to generate.'
+          'No events description/events script provided for some event batches. Provide one for each event(s) to generate.'
         );
       }
     } else if (!eventsDescription) {

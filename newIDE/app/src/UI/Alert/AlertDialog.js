@@ -52,19 +52,18 @@ function AlertDialog(props: Props): React.Node {
               />
             </Text>
             {props.details ? (
-              <>
-                <Text size="body-small" style={{ fontWeight: 'bold' }}>
-                  <Trans>Root cause</Trans>
-                </Text>
-                <Text
-                  size="body-small"
-                  allowSelection
-                  allowBrowserAutoTranslate={false}
-                  style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
-                >
-                  {props.details}
-                </Text>
-              </>
+              <Text
+                size="body-small"
+                allowSelection
+                allowBrowserAutoTranslate={false}
+                style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+              >
+                <strong>
+                  <Trans>Root cause:</Trans>
+                </strong>
+                <br />
+                <span>{props.details}</span>
+              </Text>
             ) : null}
           </>
         </Dialog>

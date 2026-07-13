@@ -3157,6 +3157,85 @@ const canonicalValue = value => {
   return value;
 };
 
+const findFirstValueDifference = (left, right, path = '$') => {
+  if (Object.is(left, right)) return null;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right)) {
+      return { path, left, right };
+    }
+    if (left.length !== right.length) {
+      return {
+        path: `${path}.length`,
+        left: left.length,
+        right: right.length,
+      };
+    }
+    for (let index = 0; index < left.length; index++) {
+      const difference = findFirstValueDifference(
+        left[index],
+        right[index],
+        `${path}[${index}]`
+      );
+      if (difference) return difference;
+    }
+    return null;
+  }
+  if (left && right && typeof left === 'object' && typeof right === 'object') {
+    const keys = Array.from(
+      new Set([...Object.keys(left), ...Object.keys(right)])
+    ).sort();
+    for (const key of keys) {
+      const pathSegment = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key)
+        ? `.${key}`
+        : `[${JSON.stringify(key)}]`;
+      const difference = findFirstValueDifference(
+        left[key],
+        right[key],
+        `${path}${pathSegment}`
+      );
+      if (difference) return difference;
+    }
+    return null;
+  }
+  return { path, left, right };
+};
+
+const summarizeDifferenceValue = value => {
+  if (value === undefined) return 'missing';
+  const serialized = JSON.stringify(value);
+  if (serialized === undefined) return String(value);
+  return serialized.length > 160
+    ? `${serialized.slice(0, 157)}...`
+    : serialized;
+};
+
+export const getLegacyProjectFirstDifferenceDescription = (left, right) => {
+  const difference = findFirstValueDifference(
+    canonicalValue(normalizeLegacyProjectForMultiFile(left)),
+    canonicalValue(normalizeLegacyProjectForMultiFile(right))
+  );
+  if (!difference) return null;
+  if (
+    typeof difference.left === 'string' &&
+    typeof difference.right === 'string'
+  ) {
+    let character = 0;
+    while (
+      character < difference.left.length &&
+      character < difference.right.length &&
+      difference.left[character] === difference.right[character]
+    )
+      character++;
+    return `${
+      difference.path
+    }: strings differ at character ${character} (original length ${
+      difference.left.length
+    }, reconstructed length ${difference.right.length}).`;
+  }
+  return `${difference.path}: original ${summarizeDifferenceValue(
+    difference.left
+  )}, reconstructed ${summarizeDifferenceValue(difference.right)}.`;
+};
+
 export const areLegacyProjectsEquivalent = (left, right) =>
-  JSON.stringify(canonicalValue(normalizeLegacyProjectForMultiFile(left))) ===
-  JSON.stringify(canonicalValue(normalizeLegacyProjectForMultiFile(right)));
+  !getLegacyProjectFirstDifferenceDescription(left, right);

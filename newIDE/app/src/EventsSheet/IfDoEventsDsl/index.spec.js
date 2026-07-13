@@ -415,6 +415,27 @@ describe('IfDo events DSL', () => {
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
+    test('preserves three or more consecutive newlines inside JavaScript', () => {
+      const inlineCode =
+        'const values = [1, 2, 3];\n\n\n/** Keep this visual separator. */\nreturn values;';
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          inlineCode,
+          parameterObjects: '',
+          useStrict: false,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const output = compileIfDoToLegacyEventsJson(dsl);
+
+      expect(dsl).toContain('\n\n\n/** Keep this visual separator. */');
+      expect(JSON.parse(output)[0].inlineCode).toBe(inlineCode);
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+    });
+
     test('preserves array-serialized multiline JavaScript without inserting commas', () => {
       const input = JSON.stringify([
         {

@@ -2392,9 +2392,10 @@ export const convertLegacyEventsJsonToIfDo = (
   options: ConvertOptions = {}
 ): string => {
   const events = parseLegacyEventsJson(json);
-  return `${formatEvents(events, 0, options)
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')}\n`;
+  // Do not normalize whitespace after joining. JavaScript event bodies are
+  // embedded verbatim in this output, so a global blank-line rewrite would
+  // silently modify executable source code.
+  return `${formatEvents(events, 0, options).join('\n')}\n`;
 };
 
 export const compileIfDoToLegacyEventsJson = (

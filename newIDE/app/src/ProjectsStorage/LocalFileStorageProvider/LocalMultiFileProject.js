@@ -6,10 +6,10 @@ import {
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
-  areLegacyProjectsEquivalent,
   composeLegacyProjectFromFiles,
   decomposeLegacyProjectToFiles,
   encodeManagedName,
+  getLegacyProjectFirstDifferenceDescription,
   parseTomlSource,
   validateGameUri,
 } from '../MultiFileProjectFormat';
@@ -657,10 +657,14 @@ export const migrateLegacyProject = async ({
     },
   });
   const verificationProject = composeLegacyProjectFromFiles(files);
-  if (!areLegacyProjectsEquivalent(legacyProject, verificationProject)) {
+  const verificationDifference = getLegacyProjectFirstDifferenceDescription(
+    legacyProject,
+    verificationProject
+  );
+  if (verificationDifference) {
     throw new MultiFileProjectError(
       'MULTIFILE_MIGRATION_VERIFICATION_FAILED',
-      'The composed project differs from the legacy source.'
+      `The composed project differs from the legacy source. ${verificationDifference}`
     );
   }
   await writeMultiFileSourceTree({ entryPath, files });
@@ -701,10 +705,14 @@ export const writeLegacyProjectAsMultiFile = async (
     files,
     (options && options.composeOptions) || {}
   );
-  if (!areLegacyProjectsEquivalent(legacyProject, verificationProject)) {
+  const verificationDifference = getLegacyProjectFirstDifferenceDescription(
+    legacyProject,
+    verificationProject
+  );
+  if (verificationDifference) {
     throw new MultiFileProjectError(
       'MULTIFILE_SAVE_VERIFICATION_FAILED',
-      'Generated multi-file sources do not reconstruct the project.'
+      `Generated multi-file sources do not reconstruct the project. ${verificationDifference}`
     );
   }
   const obsoleteUris: Array<string> = Object.keys(previousFiles).filter(

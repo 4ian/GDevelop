@@ -9,6 +9,7 @@ import {
   composeLegacyProjectFromFiles,
   decomposeLegacyProjectToFiles,
   encodeManagedName,
+  getLegacyProjectFirstDifferenceDescription,
   parseTomlSource,
   removeLegacyFolderStructuresFromProject,
   validateGameUri,
@@ -166,6 +167,32 @@ const projectFixture = {
 };
 
 describe('GDevelop multi-file project format', () => {
+  test('describes the first normalized verification difference without dumping large values', () => {
+    const left = {
+      ...projectFixture,
+      layouts: [
+        {
+          ...projectFixture.layouts[0],
+          title: 'A'.repeat(200),
+        },
+      ],
+    };
+    const right = {
+      ...projectFixture,
+      layouts: [
+        {
+          ...projectFixture.layouts[0],
+          title: `${'A'.repeat(100)}B${'A'.repeat(99)}`,
+        },
+      ],
+    };
+
+    expect(getLegacyProjectFirstDifferenceDescription(left, right)).toBe(
+      '$.layouts[0].title: strings differ at character 100 (original length 200, reconstructed length 200).'
+    );
+    expect(getLegacyProjectFirstDifferenceDescription(left, left)).toBeNull();
+  });
+
   test('round-trips every component kind through settings TOML, Layout DSL, and IfDo', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture, {
       migration: {

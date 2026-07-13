@@ -190,6 +190,12 @@ describe('McpEditorBridge', () => {
       return {
         reloaded: true,
         fileIdentifier: 'C:\\game\\project.settings',
+        catalogsRegenerated: true,
+        catalogs: {
+          instructions: { actions: 123 },
+          settings: { objectTypes: 45 },
+          layouts: { contexts: 2 },
+        },
       };
     }): any);
     const bridge = makeBridge({
@@ -217,8 +223,15 @@ describe('McpEditorBridge', () => {
         discardedUnsavedInMemoryChanges: true,
         projectName: 'After reload',
         projectFile: 'C:\\game\\project.settings',
+        catalogsRegenerated: true,
+        catalogs: {
+          instructions: { actions: 123 },
+          settings: { objectTypes: 45 },
+          layouts: { contexts: 2 },
+        },
       })
     );
+    expect(result.nextAction).toContain('catalogs are refreshed');
     expect(result.nextAction).toContain('launch_preview');
   });
 
@@ -234,9 +247,7 @@ describe('McpEditorBridge', () => {
         options.extensionName,
         0
       );
-      extension
-        .getEventsFunctions()
-        .insertNewEventsFunction('FormatRating', 0);
+      extension.getEventsFunctions().insertNewEventsFunction('FormatRating', 0);
       options.onExtensionInstalled([options.extensionName]);
     });
     const saveProjectAndWait = jest.fn(async () => {
@@ -301,9 +312,7 @@ describe('McpEditorBridge', () => {
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-unsaved-')
     );
     const project = new gd.Project();
-    project.setProjectFile(
-      path.join(temporaryDirectory, 'project.settings')
-    );
+    project.setProjectFile(path.join(temporaryDirectory, 'project.settings'));
     const bridge = makeBridge({
       getProject: () => project,
       ensureExtensionInstalled: async options => {

@@ -28,6 +28,7 @@ import {
   writeProjectInstructionCatalog,
   writeProjectLayoutCatalog,
   writeProjectSettingsCatalog,
+  writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
 
@@ -834,6 +835,38 @@ describe('Local multi-file project storage', () => {
         }),
       ])
     );
+    project.delete();
+  });
+
+  test('regenerates every project source catalog together', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Reloaded catalog project');
+    ensureProjectHasDefaultScene(project);
+
+    const counts = await writeProjectSourceCatalogs(
+      project,
+      temporaryDirectory
+    );
+
+    expect(counts.instructions.actions).toBeGreaterThan(100);
+    expect(counts.settings.objectTypes).toBeGreaterThan(5);
+    expect(counts.layouts.contexts).toBe(1);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/instructions-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
+      )
+    ).toBe(true);
     project.delete();
   });
 

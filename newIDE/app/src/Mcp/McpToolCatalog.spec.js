@@ -129,6 +129,7 @@ describe('McpToolCatalog', () => {
         }),
       })
     );
+    expect(tool.description).toContain('regenerate');
     expect(
       canCallMcpTool('reload_project', {
         allowWriteTools: false,

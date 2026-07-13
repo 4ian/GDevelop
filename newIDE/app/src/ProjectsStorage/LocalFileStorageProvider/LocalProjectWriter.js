@@ -202,6 +202,34 @@ export const writeProjectLayoutCatalog = async (
   return catalog;
 };
 
+export const writeProjectSourceCatalogs = async (
+  project: gdProject,
+  projectPath: string
+): Promise<Object> => {
+  const serializedProject = serializeToJSObject(project, 'serializeTo');
+  const instructionCatalog = await writeProjectInstructionCatalog(
+    project,
+    projectPath
+  );
+  const settingsCatalog = await writeProjectSettingsCatalog(
+    project,
+    projectPath,
+    serializedProject
+  );
+  const layoutCatalog = await writeProjectLayoutCatalog(
+    project,
+    projectPath,
+    serializedProject,
+    settingsCatalog.effectTypes
+  );
+
+  return {
+    instructions: instructionCatalog.counts,
+    settings: settingsCatalog.counts,
+    layouts: layoutCatalog.counts,
+  };
+};
+
 const writeProjectFiles = async ({
   project,
   filePath,

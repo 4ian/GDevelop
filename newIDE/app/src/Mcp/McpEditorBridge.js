@@ -4894,9 +4894,17 @@ const callMcpTool = async ({
         projectFile: reloadedProject
           ? reloadedProject.getProjectFile() || undefined
           : undefined,
+        catalogsRegenerated:
+          !!reloadResult && reloadResult.catalogsRegenerated === true,
+        catalogs:
+          reloadResult && reloadResult.catalogs
+            ? reloadResult.catalogs
+            : undefined,
         reload: reloadResult || undefined,
         nextAction:
-          'Project disk sources are loaded. You may now call launch_preview.',
+          reloadResult && reloadResult.catalogsRegenerated
+            ? 'Project disk sources are loaded and generated catalogs are refreshed. You may now call launch_preview.'
+            : 'Project disk sources are loaded. You may now call launch_preview.',
       });
     } catch (error) {
       return errorResult(

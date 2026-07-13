@@ -4183,7 +4183,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files and wait for the editor to finish loading them. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview uses the new disk sources.',
+      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated catalogs use the new disk sources.',
     inputSchema: emptyObjectSchema,
     annotations: {
       readOnlyHint: false,

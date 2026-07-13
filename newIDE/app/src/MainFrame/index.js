@@ -262,6 +262,7 @@ import useLocalProjectChangesWatcher, {
   showLocalProjectFilesChangedDialog,
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
+import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -7407,11 +7408,43 @@ const MainFrame = (props: Props): React.MixedElement => {
             };
           }
           const fileIdentifier = currentFileMetadata.fileIdentifier;
+          const storageProviderName = getStorageProvider().internalName;
           await reloadProject({
             skipUnsavedChangesConfirmation: true,
             rethrowOpenError: true,
           });
-          return { reloaded: true, fileIdentifier };
+          const reloadedProject = currentProjectRef.current;
+          const isLocalMultiFileProject =
+            storageProviderName === localFileStorageProviderInternalName &&
+            !!reloadedProject &&
+            /(?:^|[\\/])project\.settings$/i.test(
+              reloadedProject.getProjectFile()
+            );
+          if (!isLocalMultiFileProject || !reloadedProject) {
+            return {
+              reloaded: true,
+              fileIdentifier,
+              catalogsRegenerated: false,
+            };
+          }
+
+          const projectRootPath = getProjectRootPath(reloadedProject);
+          if (!projectRootPath) {
+            throw new Error(
+              'Unable to resolve the local project root for catalog regeneration.'
+            );
+          }
+          await eventsFunctionsExtensionsState.ensureLoadFinished();
+          const catalogs = await writeProjectSourceCatalogs(
+            reloadedProject,
+            projectRootPath
+          );
+          return {
+            reloaded: true,
+            fileIdentifier,
+            catalogsRegenerated: true,
+            catalogs,
+          };
         },
         saveProjectAndWait: saveProjectForMcpAndWait,
         getPersistenceState: () => ({
@@ -7469,6 +7502,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       saveProjectForMcpAndWait,
       reloadProject,
       currentFileMetadata,
+      getStorageProvider,
+      eventsFunctionsExtensionsState,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,

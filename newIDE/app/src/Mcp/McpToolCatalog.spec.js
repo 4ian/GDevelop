@@ -19,12 +19,9 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_get_project_summary',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
-  'validate_current_project_json',
   'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
-  'gdevelop_capabilities',
-  'gdevelop_refresh_tool_catalog',
   'reload_project',
   'launch_preview',
   'wait_until_preview_ready',
@@ -82,6 +79,9 @@ describe('McpToolCatalog', () => {
       'gdevelop_search_instruction_metadata',
       'gdevelop_get_instruction_metadata',
       'apply_validated_project_json_patch',
+      'validate_current_project_json',
+      'gdevelop_capabilities',
+      'gdevelop_refresh_tool_catalog',
     ].forEach(name => {
       expect(isKnownMcpTool(name)).toBe(false);
       expect(isWriteTool(name)).toBe(false);

@@ -84,7 +84,7 @@ describe('project source catalogs', () => {
     ).toThrow(ProjectSourceCatalogError);
   });
 
-  test('reads project behavior properties from serialized definitions instead of volatile metadata wrappers', () => {
+  test('reads project behavior details from serialized definitions instead of volatile metadata wrappers', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const extensionName = 'CatalogLocalBehaviorTest';
     const extension = project.insertNewEventsFunctionsExtension(
@@ -105,6 +105,12 @@ describe('project source catalogs', () => {
       .insertNew('Internal', 1)
       .setType('String')
       .setHidden(true);
+    behavior
+      .getPropertyDescriptors()
+      .insertNew('Platformer', 2)
+      .setType('Behavior')
+      .setLabel('Platformer behavior')
+      .addExtraInfo('PlatformBehavior::PlatformerObjectBehavior');
     reloadProjectEventsFunctionsExtensionMetadata(
       project,
       extension,
@@ -130,6 +136,10 @@ describe('project source catalogs', () => {
     expect(platformExtension).toBeDefined();
     const metadata = platformExtension.getBehaviorMetadata(behaviorType);
     const getPropertiesSpy = jest.spyOn(metadata, 'getProperties');
+    const getRequiredBehaviorTypesSpy = jest.spyOn(
+      metadata,
+      'getRequiredBehaviorTypes'
+    );
     const serializedProject = serializeToJSObject(project, 'serializeTo');
 
     const catalog = buildProjectSettingsCatalog({
@@ -165,8 +175,19 @@ describe('project source catalogs', () => {
         defaultValue: '42',
         label: 'Speed',
       },
+      {
+        name: 'Platformer',
+        type: 'Behavior',
+        defaultValue: '',
+        label: 'Platformer behavior',
+        extraInfo: ['PlatformBehavior::PlatformerObjectBehavior'],
+      },
+    ]);
+    expect(entry.requiredBehaviorTypes).toEqual([
+      'PlatformBehavior::PlatformerObjectBehavior',
     ]);
     expect(getPropertiesSpy).not.toHaveBeenCalled();
+    expect(getRequiredBehaviorTypesSpy).not.toHaveBeenCalled();
 
     const serializedWithoutBehaviorDefinition = JSON.parse(
       JSON.stringify(serializedProject)
@@ -175,22 +196,33 @@ describe('project source catalogs', () => {
     getPropertiesSpy.mockImplementation(() => {
       throw new WebAssembly.RuntimeError('memory access out of bounds');
     });
+    getRequiredBehaviorTypesSpy.mockImplementation(() => {
+      throw new WebAssembly.RuntimeError('memory access out of bounds');
+    });
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const fallbackCatalog = buildProjectSettingsCatalog({
       project,
       serializedProject: serializedWithoutBehaviorDefinition,
     });
-    expect(
-      fallbackCatalog.behaviorTypes.find(
-        behaviorEntry => behaviorEntry.type === behaviorType
-      ).properties
-    ).toEqual([]);
+    const fallbackEntry = fallbackCatalog.behaviorTypes.find(
+      behaviorEntry => behaviorEntry.type === behaviorType
+    );
+    expect(fallbackEntry.properties).toEqual([]);
+    expect(fallbackEntry.requiredBehaviorTypes).toBeUndefined();
     expect(getPropertiesSpy).toHaveBeenCalled();
+    expect(getRequiredBehaviorTypesSpy).toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining(`properties for behavior ${behaviorType}`),
       expect.any(WebAssembly.RuntimeError)
     );
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `required behavior types for behavior ${behaviorType}`
+      ),
+      expect.any(WebAssembly.RuntimeError)
+    );
     warnSpy.mockRestore();
+    getRequiredBehaviorTypesSpy.mockRestore();
     getPropertiesSpy.mockRestore();
     project.delete();
   });

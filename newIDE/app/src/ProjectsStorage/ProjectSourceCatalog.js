@@ -108,11 +108,29 @@ const summarizeSerializedProperties = (
           label: choice.label,
         }));
       }
-      if (Array.isArray(property.extraInfo) && property.extraInfo.length) {
-        summary.extraInfo = property.extraInfo;
+      const extraInfo = Array.isArray(property.extraInformation)
+        ? property.extraInformation
+        : property.extraInfo;
+      if (Array.isArray(extraInfo) && extraInfo.length) {
+        summary.extraInfo = extraInfo;
       }
       return summary;
     });
+
+const getSerializedRequiredBehaviorTypes = (
+  behaviorDefinition: Object
+): Array<string> =>
+  (behaviorDefinition.propertyDescriptors || [])
+    .filter(property => property.type === 'Behavior')
+    .map(property => {
+      const extraInfo = Array.isArray(property.extraInformation)
+        ? property.extraInformation
+        : property.extraInfo;
+      return Array.isArray(extraInfo) && extraInfo.length
+        ? String(extraInfo[0] || '')
+        : '';
+    })
+    .filter(Boolean);
 
 const safelySummarizeMetadataProperties = (
   readProperties: () => any,
@@ -123,6 +141,21 @@ const safelySummarizeMetadataProperties = (
   } catch (error) {
     console.warn(
       `[ProjectSourceCatalog] Unable to read ${context}; omitting its property metadata from the generated catalog.`,
+      error
+    );
+    return [];
+  }
+};
+
+const safelyReadRequiredBehaviorTypes = (
+  metadata: gdBehaviorMetadata,
+  behaviorType: string
+): Array<string> => {
+  try {
+    return toArray(metadata.getRequiredBehaviorTypes());
+  } catch (error) {
+    console.warn(
+      `[ProjectSourceCatalog] Unable to read required behavior types for behavior ${behaviorType}; omitting them from the generated catalog.`,
       error
     );
     return [];
@@ -240,9 +273,9 @@ const collectRegisteredTypes = (
       }
       const objectType = metadata.getObjectType();
       if (objectType) entry.objectType = objectType;
-      const requiredBehaviorTypes = toArray(
-        metadata.getRequiredBehaviorTypes()
-      );
+      const requiredBehaviorTypes = localBehaviorDefinition
+        ? getSerializedRequiredBehaviorTypes(localBehaviorDefinition)
+        : safelyReadRequiredBehaviorTypes(metadata, behaviorType);
       if (requiredBehaviorTypes.length) {
         entry.requiredBehaviorTypes = sortedUnique(requiredBehaviorTypes);
       }

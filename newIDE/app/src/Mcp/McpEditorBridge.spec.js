@@ -475,24 +475,23 @@ describe('McpEditorBridge', () => {
     );
   });
 
-  it('refreshes the MCP tool catalog in one read-only call', async () => {
+  it('rejects MCP tools removed from the public catalog', async () => {
     const bridge = makeBridge();
 
-    const response = await bridge.handleRendererMcpRequest({
-      method: 'tools/call',
-      params: {
-        name: 'gdevelop_refresh_tool_catalog',
-        arguments: {},
-      },
-    });
-    const result = JSON.parse(response.content[0].text);
+    for (const name of [
+      'validate_current_project_json',
+      'gdevelop_refresh_tool_catalog',
+      'gdevelop_capabilities',
+    ]) {
+      const response = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: { name, arguments: {} },
+      });
+      const result = JSON.parse(response.content[0].text);
 
-    expect(response.isError).not.toBe(true);
-    expect(result.success).toBe(true);
-    expect(result.tools.map(tool => tool.name)).toContain(
-      'gdevelop_capabilities'
-    );
-    expect(result.categories).toBeDefined();
+      expect(response.isError).toBe(true);
+      expect(result.error).toBe(`Unknown MCP tool: ${name}.`);
+    }
   });
 
   it('reports preview health and recovery actions without a running preview', async () => {
@@ -1767,35 +1766,6 @@ describe('McpEditorBridge', () => {
       expect(project.getMaximumFPS()).toBe(120);
       expect(propertiesResult.project.name).toBe('Sky Battle Deluxe');
       expect(triggerUnsavedChanges).toHaveBeenCalledTimes(2);
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('validates the current serialized project without write permissions', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.setName('Serializable Project');
-    project.insertNewLayout('Level1', 0);
-
-    try {
-      const bridge = makeBridge({
-        getProject: () => project,
-      });
-
-      const response = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'validate_current_project_json',
-          arguments: {},
-        },
-      });
-      const result = JSON.parse(response.content[0].text);
-
-      expect(response.isError).not.toBe(true);
-      expect(result.valid).toBe(true);
-      expect(result.validationMode).toBe('current-editor-project');
-      expect(project.getName()).toBe('Serializable Project');
     } finally {
       project.delete();
     }

@@ -119,6 +119,35 @@ describe('Local multi-file project storage', () => {
     );
   });
 
+  test('uses portable physical names for URI segments invalid on Windows', async () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.firstLayout = 'Extension: Health';
+    project.previewLayout = 'Extension: Health';
+    project.layouts[0].name = 'Extension: Health';
+    project.layouts[0].mangledName = 'ExtensionHealth';
+    const files = decomposeLegacyProjectToFiles(project);
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+
+    await writeMultiFileSourceTree({ entryPath, files });
+
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes',
+          'Extension%3A%20Health',
+          'scene.settings'
+        )
+      )
+    ).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
   test('opens a source tree after Git converts settings files to CRLF', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const files = decomposeLegacyProjectToFiles(projectFixture);

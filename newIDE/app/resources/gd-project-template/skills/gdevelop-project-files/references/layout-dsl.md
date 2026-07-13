@@ -55,7 +55,8 @@ references to layers of its `linkedScene`. External layer elements allow only
 - Strings use JSON double-quote escaping.
 - Numbers are finite base-10 JSON numbers.
 - Booleans are `true` or `false`.
-- Colors are uppercase `#RRGGBB`.
+- Colors are uppercase `#RRGGBB`. Preserve an imported `rgb(r,g,b)` only when
+  serialized finite components fall outside the normal byte range.
 - Positions are `x,y` or `x,y,z`; rotations are `z` or `x,y,z` degrees.
 - Sizes are `wxh`; vectors/rectangles use comma separators without spaces.
 - Typed maps use strict JSON literals with quoted keys and no trailing comma.
@@ -90,6 +91,9 @@ Editor attributes map to current editor state:
 Omit the editor when it has no authored fields. `grid-type` is `rectangular`
 or `isometric`; `mode` is `instances-editor` or `embedded-game`. Grid sizes
 are non-negative, alpha is in `[0,1]`, and zoom is at least `0.01`.
+Never add `selected-layer-unresolved` to new content. It is emitted only to
+preserve an imported stale `selected-layer`, and must be removed when the layer
+reference is fixed.
 
 ## Layers, cameras, and effects
 
@@ -164,12 +168,16 @@ UUIDv4 and position:
 />
 ```
 
-Attribute order is `of`, `id`, `order`, `at`, `rotation`, `z-order`, `size`,
-`depth`, `opacity`, `flip`, `locked`, `sealed`, `keep-ratio`. Preserve every
-existing UUID. Generate a fresh UUIDv4 only for a genuinely new instance in
-the same `.layout`. UUIDs must be unique within one layout, not across the
-whole project; separate scenes, externals, prefabs, and prefab variants may
-intentionally use matching UUIDs.
+An imported stale instance can appear as
+`<object of="RemovedObject" unresolved ... />`. Preserve that marker while the
+object definition is missing, but never add it to a new or resolving instance.
+
+Attribute order is `of`, `unresolved`, `id`, `order`, `at`, `rotation`,
+`z-order`, `size`, `depth`, `opacity`, `flip`, `locked`, `sealed`,
+`keep-ratio`. Preserve every existing UUID. Generate a fresh UUIDv4 only for a
+genuinely new instance in the same `.layout`. UUIDs must be unique within one
+layout, not across the whole project; separate scenes, externals, prefabs, and
+prefab variants may intentionally use matching UUIDs.
 
 Defaults are rotation/z-order zero, opacity 255, no flip, automatic size,
 unlocked, unsealed, and keep-ratio true. Use `size=auto(w x h)` without spaces
@@ -231,8 +239,9 @@ owning settings. Do not write its behavior type; the compiler derives it.
   or `auto(...)` forms.
 - Preserve unknown settings in `.settings`; never move them into layout.
 - Reject rather than invent an unknown object, layer, behavior, effect,
-  property, tag, attribute, or serializer fallback.
-- Keep object definitions and attached behaviors in individual recursive
+  property, tag, attribute, or serializer fallback. Preserve only explicit
+  import markers already present for stale object/layer references.
+- Keep object definitions and attached behaviors in individual flat
   object `.settings` files; keep events, resources, owner variables, and
   runtime settings outside `.layout`.
 - After an edit, reload the project before previewing so the editor compiler

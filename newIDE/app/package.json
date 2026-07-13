@@ -132,6 +132,7 @@
     "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
     "lint": "eslint src/ --max-warnings=0",
     "test": "react-app-rewired test --env=node",
+    "test:examples-compatibility": "node scripts/run-gdevelop-examples-compatibility-test.js",
     "flow": "flow",
     "check-script-types": "cd scripts && tsc",
     "storybook": "storybook dev -p 9009",

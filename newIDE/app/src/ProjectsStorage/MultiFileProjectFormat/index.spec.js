@@ -864,6 +864,27 @@ folderName = "__ROOT"
     ).toBe(true);
   });
 
+  test('migrates legacy editor RGB fields to the current packed grid color', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions[0].eventsBasedObjects[0].editionSettings = {
+      gridR: 158,
+      gridG: 180,
+      gridB: 255,
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const output = composeLegacyProjectFromFiles(files);
+
+    expect(
+      files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
+    ).toContain('grid-color=#9EB4FF');
+    expect(
+      output.eventsFunctionsExtensions[0].eventsBasedObjects[0].editionSettings
+        .gridColor
+    ).toBe(0x9eb4ff);
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
   test('saves custom-object variants with untouched empty editor settings', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const variant =
@@ -1060,6 +1081,54 @@ folderName = "__ROOT"
       'multiline = """\nfirst line\n second line"""'
     );
     expect(output.globalConfig.multiline).toBe('first line\n second line');
+  });
+
+  test('stores unsafe JSON integers losslessly outside TOML integer fields', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].behaviorsSharedData = [
+      { EasingFactor: 358874684797066000000 },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    const sceneSettings = files['game://scenes/Main/scene.settings'];
+
+    expect(sceneSettings).toContain('[rawJson]');
+    expect(sceneSettings).toContain('358874684797066000000');
+    expect(composeLegacyProjectFromFiles(files).layouts[0]).toMatchObject({
+      behaviorsSharedData: [{ EasingFactor: 358874684797066000000 }],
+    });
+  });
+
+  test('uses deterministic distinct files for case-colliding object names', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      { name: 'getmoney', type: 'Sprite', behaviors: [] },
+      { name: 'GetMoney', type: 'Sprite', behaviors: [] },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    const objectUris = Object.keys(files).filter(uri =>
+      uri.startsWith('game://scenes/Main/objects/')
+    );
+
+    expect(objectUris).toHaveLength(2);
+    expect(new Set(objectUris.map(uri => uri.toLowerCase())).size).toBe(2);
+    expect(
+      composeLegacyProjectFromFiles(files).layouts[0].objects.map(
+        object => object.name
+      )
+    ).toEqual(['getmoney', 'GetMoney']);
+  });
+
+  test('preserves an external layout whose linked scene was removed', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.externalLayouts[0].associatedLayout = 'Removed Scene';
+    const files = decomposeLegacyProjectToFiles(project);
+
+    expect(files['game://externals/external.settings']).toContain(
+      'unresolvedScene = true'
+    );
+    expect(
+      composeLegacyProjectFromFiles(files).externalLayouts[0].associatedLayout
+    ).toBe('Removed Scene');
   });
 
   test('uses canonical safe game URIs and encoded names', () => {

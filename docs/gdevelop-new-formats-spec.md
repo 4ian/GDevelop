@@ -540,7 +540,8 @@ For payloads produced by the current serializer:
 | Array of one scalar type | TOML array                                                     |
 | String                   | TOML string                                                    |
 | Boolean                  | TOML boolean                                                   |
-| Number                   | TOML integer when integral and safe, otherwise float           |
+| Safe integer             | TOML integer                                                   |
+| Other finite number      | TOML float when lossless; otherwise canonical `rawJson` text   |
 | Empty object             | Inline table `{}` when a typed table would otherwise disappear |
 | Empty array              | `[]`                                                           |
 
@@ -565,6 +566,8 @@ Rules for `rawJson`:
 - Raw overrides are applied after the ordinary TOML projection is built.
 - A pointer must not overlap another pointer in the same file.
 - A writer should use this only when the ordinary projection is not lossless.
+- Integers outside JavaScript's safe-integer range use `rawJson`; this avoids
+  TOML parser overflow while preserving the exact legacy JSON number.
 - Unknown raw pointers are preserved, not discarded.
 
 ### 5.4 Canonical ordering
@@ -622,9 +625,11 @@ Canonical and safety rules:
   `..` segment.
 - A reference must not contain an absolute path, drive prefix, UNC prefix, or
   backslash.
-- The loader percent-decodes and normalizes the path, resolves it from the
-  project root, follows the platform's safe canonicalization rules, and rejects
-  traversal or symlink escape outside that root.
+- The loader percent-decodes and normalizes portable path segments. A segment
+  containing Windows-invalid characters, a Windows device name, or a trailing
+  dot/space stays in its uppercase percent-encoded physical form on every OS,
+  keeping a Git checkout portable. The resolved path is still confined to the
+  project root and checked against traversal and symlink escape.
 - Normalized case/Unicode collisions and duplicate resolved paths are errors.
 - Writers preserve an already-recorded canonical URI until an explicit move or
   rename operation changes it.
@@ -1397,6 +1402,12 @@ container, and every referenced URI resolves directly inside `externals/`.
 from an older project is preserved exactly and reported as a project diagnostic
 rather than changed during migration. Newly authored non-empty values must name
 an existing scene.
+
+For a stale external layout link only, migration also writes
+`unresolvedScene = true` on that `layoutFiles` entry. This explicit marker lets
+the layout and its association round-trip without disabling linked-scene
+validation for new entries. It is rejected if `linkedScene` resolves and is
+not emitted into the reconstructed legacy JSON.
 
 ### 12.2 External events
 

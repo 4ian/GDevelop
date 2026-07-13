@@ -29,6 +29,16 @@ module.exports = {
       '<rootDir>/node_modules/(?!react-markdown|vfile|unist-.*|unified|bail|trough|character-entities|remark-parse|mdast-util-.*|micromark|decode-named-character-reference|remark-rehype|property-information|hast-util-.*|space-separated-tokens|comma-separated-tokens|ccount|escape-string-regexp|trim-lines|hast-util-whitespace|remark-gfm|mdast-util-gfm|mdast-util-find-and-replace|mdast-util-to-markdown|markdown-table|is-plain-obj)',
     ];
 
+    // This suite downloads and converts the complete GDevelop examples
+    // repository. Keep it out of normal unit-test discovery; the dedicated
+    // npm script opts in explicitly before this configuration is evaluated.
+    if (process.env.RUN_GDEVELOP_EXAMPLES_COMPATIBILITY !== '1') {
+      config.testPathIgnorePatterns = [
+        ...(config.testPathIgnorePatterns || []),
+        '/GDevelopExamplesCompatibility\\.spec\\.js$',
+      ];
+    }
+
     return config;
   },
 };

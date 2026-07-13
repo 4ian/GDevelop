@@ -442,10 +442,13 @@ Context-specific root attributes are:
 | Attribute    | Type        | Context    | Current serializer mapping                       |
 | ------------ | ----------- | ---------- | ------------------------------------------------ |
 | `version`    | Integer `1` | All        | Source grammar only; not emitted to runtime data |
-| `background` | `#RRGGBB`   | Scene only | `r`, `v`, `b`                                    |
+| `background` | `#RRGGBB` or `rgb(r,g,b)` | Scene only | `r`, `v`, `b`                        |
 
 `background` is required for a scene and forbidden for a prefab or external
 layout. The current scene serializer has no background alpha field.
+Canonical byte-range integer colors use `#RRGGBB`. `rgb(r,g,b)` is the
+lossless form for finite serialized components outside that range, which occur
+in some existing projects and must survive migration unchanged.
 
 The canonical root-child order is:
 
@@ -622,20 +625,29 @@ Version 1 supports those current fields and no untyped editor-data escape.
 | `zoom`           | Finite number at least `0.01`         | `zoomFactor`                                |
 | `window-mask`    | Boolean                               | `windowMask`                                |
 | `selected-layer` | String                                | `selectedLayer`                             |
+| `selected-layer-unresolved` | Bare Boolean marker | No JSON field; preserves a stale editor selection |
 | `mode`           | `instances-editor` or `embedded-game` | `gameEditorMode`                            |
 
 `grid-size` components must be non-negative. The current serialized model can
 contain zero for an inactive or not-yet-prepared grid axis, while the editor
 normalizes active grid sizes to at least `0.01`. `zoom` must be at least
-`0.01`, matching current editor preparation. A non-empty `selected-layer` must
-resolve in a scene/prefab or in the linked scene for an external layout; the
-empty default remains valid for an empty prefab layout.
+`0.01`, matching current editor preparation. A newly authored non-empty
+`selected-layer` must resolve in a scene/prefab or in the linked scene for an
+external layout; the empty default remains valid for an empty prefab layout.
+Migration preserves an existing stale editor selection by emitting the bare
+`selected-layer-unresolved` marker immediately after `selected-layer`. The
+compiler rejects this marker when the named layer now resolves or when no
+`selected-layer` is present, and the marker never becomes a legacy JSON field.
 
 When `<editor>` is omitted, the compiler emits an empty editor-settings
 object. The current editor then applies its contextual defaults. A decompiler
 emits every current field present in the serialized editor-settings object;
 once the current editor has saved those settings, the canonical line is fully
 explicit and stable.
+
+Legacy editor settings with separate `gridR`, `gridG`, and `gridB` keys are
+normalized during migration to the current packed `gridColor` field. Missing
+legacy components use the current editor defaults `158`, `180`, and `255`.
 
 The current arbitrary editor-settings container can also contain only part of
 a grouped tuple. When decompiling such data, missing `grid-size` axes are
@@ -644,8 +656,8 @@ axes with `0`. This is the same normalization performed by
 `prepareInstancesEditorSettings` and makes the grouped DSL representation safe
 for partially initialized prefab/variant editor settings.
 
-Old editor-only keys not read by `InstancesEditorSettings` are outside version
-1 by design.
+Other old editor-only keys not read by `InstancesEditorSettings` are outside
+version 1 by design.
 
 ---
 
@@ -684,11 +696,15 @@ order is layer-array order.
 | `locked`             | `isLocked`                        | Boolean editor lock                                |
 | `lighting`           | `isLightingLayer`                 | Boolean                                            |
 | `follow-base-camera` | `followBaseLayerCamera`           | Boolean                                            |
-| `ambient`            | `ambientLightColorR/G/B`          | `#RRGGBB`                                          |
+| `ambient`            | `ambientLightColorR/G/B`          | `#RRGGBB` or `rgb(r,g,b)`                          |
 | `near`               | `camera3DNearPlaneDistance`       | Finite number                                      |
 | `far`                | `camera3DFarPlaneDistance`        | Finite number greater than `near`                  |
 | `fov`                | `camera3DFieldOfView`             | Number greater than `0` and at most `180`          |
 | `max-2d-distance`    | `camera2DPlaneMaxDrawingDistance` | Positive finite number                             |
+
+Like scene backgrounds, `ambient` uses `#RRGGBB` for ordinary byte-range
+integer colors and `rgb(r,g,b)` when existing serialized numeric components
+must be preserved losslessly.
 
 For a perspective camera, `near` must be strictly positive. The current editor
 allows a non-positive near distance for an orthographic camera, but it must
@@ -804,6 +820,18 @@ Unsafe or reserved names use `<object of="...">`:
 
 `of` maps to current instance field `name`. The `of` attribute is allowed only
 on the fallback element.
+
+An imported project can contain an instance left behind after its object
+definition was removed. That existing stale record is preserved explicitly:
+
+```layout
+<object of="RemovedObject" unresolved id="47d81ec0-75af-4e2b-81f7-f69fb1f48a89" at=10,20 />
+```
+
+`unresolved` is an import-only bare marker allowed only on `<object>`. It has no
+legacy JSON field. The compiler requires it when the name does not resolve and
+rejects it when the name does resolve, so it cannot be used to weaken normal
+object-reference validation.
 
 Reserved tag names are:
 
@@ -1167,13 +1195,15 @@ Compilation stops before changing the project if any rule fails.
 - Scene/prefab layer names are unique. A scene or prefab may have no layers
   only when it also has no instances.
 - External layer groups reference unique existing layers of the linked scene.
-- A non-empty `selected-layer` resolves in the applicable layer container.
+- A non-empty `selected-layer` resolves in the applicable layer container,
+  except for an existing stale value carrying `selected-layer-unresolved`.
 - Camera, lighting, and effect validation follows sections 14 through 16.
 
 ### 24.3 Instance rules
 
 - Every UUID is valid and unique within its owning `.layout` file.
-- Every object tag resolves in the correct context.
+- Every object tag resolves in the correct context, except for an imported
+  fallback `<object ... unresolved>` record.
 - Every instance is a direct child of one layer.
 - `order` obeys the all-or-none contiguous contract.
 - `z-order` and `opacity` are integers; opacity is in `[0,255]`.

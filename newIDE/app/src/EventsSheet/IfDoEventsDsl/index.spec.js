@@ -396,6 +396,44 @@ describe('IfDo events DSL', () => {
       ).toBe(true);
     });
 
+    test('preserves instruction trees in while conditions and nested logical Or', () => {
+      const andCondition = instruction('BuiltinCommonInstructions::And', [], {
+        subInstructions: [instruction('A'), instruction('B')],
+      });
+      const nestedOr = instruction('BuiltinCommonInstructions::Or', [], {
+        subInstructions: [
+          instruction('BuiltinCommonInstructions::Or', [], {
+            subInstructions: [instruction('C'), instruction('D')],
+          }),
+          instruction('E'),
+        ],
+      });
+      const events = [
+        {
+          type: 'BuiltinCommonInstructions::While',
+          infiniteLoopWarning: true,
+          whileConditions: [andCondition],
+          conditions: [],
+          actions: [],
+          events: [],
+          variables: [],
+        },
+        standard({ conditions: [nestedOr] }),
+      ];
+      const input = JSON.stringify(events);
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+
+      expect(dsl).toContain(
+        'while @exact id="BuiltinCommonInstructions::And" parameters=[]'
+      );
+      expect(dsl).toContain(
+        'if @exact id="BuiltinCommonInstructions::Or" parameters=[]'
+      );
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
+    });
+
     test('preserves JavaScript line endings and delimiter-looking body lines', () => {
       const inlineCode = 'const text = `\r\n@end js\r\n`;\r\nreturn text;';
       const input = JSON.stringify([

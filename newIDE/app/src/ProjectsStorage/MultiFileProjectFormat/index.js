@@ -114,7 +114,20 @@ const rethrowIfDoError = (error, fileUri): empty => {
   throw wrapped;
 };
 
-const clone = value => JSON.parse(JSON.stringify(value));
+const clone = value =>
+  JSON.parse(
+    JSON.stringify(value, (key, nestedValue) => {
+      if (typeof nestedValue !== 'bigint') return nestedValue;
+      const numberValue = Number(nestedValue);
+      if (!Number.isSafeInteger(numberValue)) {
+        fail(
+          'MULTIFILE_UNREPRESENTABLE_VALUE',
+          'TOML integers outside the JSON safe-integer range are forbidden.'
+        );
+      }
+      return numberValue;
+    })
+  );
 
 const removeLegacyFolderStructures = value => {
   if (Array.isArray(value)) {
@@ -286,6 +299,10 @@ const projectTomlProjection = payload => {
           'MULTIFILE_UNREPRESENTABLE_VALUE',
           `Non-finite number at ${pointer || '/'} cannot be stored.`
         );
+      }
+      if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+        rawJson[pointer] = canonicalJson(value);
+        return undefined;
       }
       return value;
     }
@@ -965,12 +982,11 @@ const splitObjectDefinitions = ({
   files,
 }) => {
   const foldersByObjectName = ownedFolderValues(folderStructure, 'objectName');
+  const objectFileNames = new Set();
   (objects || []).forEach((object, order) => {
     const name = String(object.name || '');
-    const uri = encodeUriPath([
-      ...baseSegments,
-      `${encodeManagedName(name)}.settings`,
-    ]);
+    const fileName = uniqueManagedName(name, objectFileNames);
+    const uri = encodeUriPath([...baseSegments, `${fileName}.settings`]);
     putSettingsFile(
       files,
       uri,
@@ -1376,6 +1392,10 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       const name = String(external.name || '');
       const fileName = uniqueManagedName(name, layoutNames);
       const layoutUri = encodeUriPath(['externals', `${fileName}.layout`]);
+      const linkedScene = (project.layouts || []).find(
+        layout =>
+          String(layout.name || '') === String(external.associatedLayout || '')
+      );
       layoutFiles.push({
         ...omitFields(
           external,
@@ -1383,6 +1403,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         ),
         name,
         linkedScene: String(external.associatedLayout || ''),
+        ...(!linkedScene ? { unresolvedScene: true } : {}),
         layout: layoutUri,
       });
       putLayoutFile(
@@ -1390,30 +1411,17 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         layoutUri,
         'gdevelop-external-layout',
         takeFields(external, EXTERNAL_LAYOUT_FIELDS),
-        (() => {
-          const linkedScene = (project.layouts || []).find(
-            layout =>
-              String(layout.name || '') ===
-              String(external.associatedLayout || '')
-          );
-          if (!linkedScene)
-            fail(
-              'LAYOUT_UNKNOWN_SCENE',
-              `External layout ${name} references missing scene ${String(
-                external.associatedLayout || ''
-              )}.`,
-              layoutUri
-            );
-          return {
-            ...layoutObjectContext(
-              linkedScene.objects || [],
-              project.objects || []
-            ),
-            layerNames: (linkedScene.layers || []).map(layer =>
-              String(layer.name || '')
-            ),
-          };
-        })()
+        linkedScene
+          ? {
+              ...layoutObjectContext(
+                linkedScene.objects || [],
+                project.objects || []
+              ),
+              layerNames: (linkedScene.layers || []).map(layer =>
+                String(layer.name || '')
+              ),
+            }
+          : {}
       );
     });
     putSettingsFile(files, externalSettings, {
@@ -2085,11 +2093,15 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
             objectUri
           );
         }
-        const expectedFilename = `${encodeManagedName(name)}.settings`;
-        if (segments[segments.length - 1] !== expectedFilename) {
+        const encodedName = encodeManagedName(name);
+        const expectedFilenames = [
+          `${decodeURIComponent(encodedName)}.settings`,
+          `${decodeURIComponent(encodedName)}~${stableHash8(name)}.settings`,
+        ];
+        if (!expectedFilenames.includes(segments[segments.length - 1])) {
           fail(
             'MULTIFILE_IDENTITY_MISMATCH',
-            `Object ${name} must be stored as ${expectedFilename}.`,
+            `Object ${name} must use its canonical managed filename.`,
             objectUri
           );
         }
@@ -2859,7 +2871,8 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       const linkedScene = project.layouts.find(
         layout => layout.name === linkedSceneName
       );
-      if (!linkedScene) {
+      const unresolvedScene = entry.unresolvedScene === true;
+      if (!linkedScene && !unresolvedScene) {
         fail(
           'LAYOUT_UNKNOWN_SCENE',
           `External layout ${String(
@@ -2868,23 +2881,37 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           uri
         );
       }
+      if (linkedScene && unresolvedScene) {
+        fail(
+          'MULTIFILE_INVALID_MANIFEST',
+          `External layout ${String(
+            entry.name || ''
+          )} resolves to scene ${linkedSceneName} and must not be marked unresolved.`,
+          uri
+        );
+      }
       return {
-        ...omitFields(entry, new Set(['linkedScene', 'layout'])),
+        ...omitFields(
+          entry,
+          new Set(['linkedScene', 'unresolvedScene', 'layout'])
+        ),
         name: expectString(entry.name, 'external layout name', uri),
         associatedLayout: linkedSceneName,
         ...readLayout(
           files,
           registerUri(expectString(entry.layout, 'external layout URI', uri)),
           'gdevelop-external-layout',
-          {
-            ...layoutObjectContext(
-              linkedScene.objects || [],
-              project.objects || []
-            ),
-            layerNames: (linkedScene.layers || []).map(layer =>
-              String(layer.name || '')
-            ),
-          }
+          linkedScene
+            ? {
+                ...layoutObjectContext(
+                  linkedScene.objects || [],
+                  project.objects || []
+                ),
+                layerNames: (linkedScene.layers || []).map(layer =>
+                  String(layer.name || '')
+                ),
+              }
+            : {}
         ),
       };
     });
@@ -2992,6 +3019,21 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
     layout[editorField] = {};
   }
   const editor = layout[editorField];
+  if (
+    editor.gridR !== undefined ||
+    editor.gridG !== undefined ||
+    editor.gridB !== undefined
+  ) {
+    if (editor.gridColor === undefined) {
+      const gridR = editor.gridR === undefined ? 158 : editor.gridR;
+      const gridG = editor.gridG === undefined ? 180 : editor.gridG;
+      const gridB = editor.gridB === undefined ? 255 : editor.gridB;
+      editor.gridColor = gridR * 65536 + gridG * 256 + gridB;
+    }
+    delete editor.gridR;
+    delete editor.gridG;
+    delete editor.gridB;
+  }
   if (
     editor.gridWidth !== undefined ||
     editor.gridHeight !== undefined ||

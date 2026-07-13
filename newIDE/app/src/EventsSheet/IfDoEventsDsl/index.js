@@ -2025,7 +2025,8 @@ const formatInstructionLines = (
   depth: number,
   instructionDepth: number = 0,
   options: {
-    rootKeyword?: 'if' | 'or' | 'do',
+    rootKeyword?: 'if' | 'or' | 'do' | 'while' | 'and while',
+    rootSuffix?: string,
     expandLogicalOr?: boolean,
     formatInstruction?: FormatInstruction,
   } = {}
@@ -2039,7 +2040,10 @@ const formatInstructionLines = (
     !instruction.type.inverted &&
     !instruction.type.await &&
     (instruction.parameters || []).length === 0 &&
-    (instruction.subInstructions || []).length >= 2
+    (instruction.subInstructions || []).length >= 2 &&
+    !(instruction.subInstructions || []).some(
+      child => child.type.value === 'BuiltinCommonInstructions::Or'
+    )
   ) {
     return (instruction.subInstructions || []).flatMap((child, index) =>
       formatInstructionLines(child, kind, depth, 0, {
@@ -2070,7 +2074,9 @@ const formatInstructionLines = (
   lines.push(
     `${prefix}${
       instructionDepth === 0 ? `${rootKeyword} ` : ''
-    }${catalogInstructionText || instructionText}`
+    }${catalogInstructionText || instructionText}${
+      instructionDepth === 0 ? options.rootSuffix || '' : ''
+    }`
   );
   (instruction.subInstructions || []).forEach(child => {
     lines.push(
@@ -2267,26 +2273,16 @@ const formatEvents = (
         );
       } else {
         whileConditions.forEach((instruction, index) => {
-          const formatted = formatInstructionLines(
-            instruction,
-            'condition',
-            depth,
-            0,
-            {
+          lines.push(
+            ...formatInstructionLines(instruction, 'condition', depth, 0, {
+              rootKeyword: index === 0 ? 'while' : 'and while',
+              rootSuffix:
+                index === 0 && event.loopIndexVariable
+                  ? ` index=${quote(event.loopIndexVariable)}`
+                  : '',
               expandLogicalOr: false,
               formatInstruction: options.formatInstruction,
-            }
-          );
-          const instructionLine = formatted.pop();
-          lines.push(...formatted);
-          lines.push(
-            `${depthPrefix(depth)}${
-              index === 0 ? 'while' : 'and while'
-            } ${instructionLine.slice(`${depthPrefix(depth)}if `.length)}${
-              index === 0 && event.loopIndexVariable
-                ? ` index=${quote(event.loopIndexVariable)}`
-                : ''
-            }`
+            })
           );
         });
       }

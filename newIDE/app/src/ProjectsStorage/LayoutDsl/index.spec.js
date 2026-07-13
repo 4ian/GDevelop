@@ -9,7 +9,8 @@ import {
   parseLayoutDsl,
 } from './index';
 
-const uuid = index => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`;
+const uuid = index =>
+  `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`;
 
 describe('Layout DSL', () => {
   test('parses the component tree and strict JSON literals', () => {
@@ -21,7 +22,9 @@ describe('Layout DSL', () => {
   </layer>
 </layout>`);
     expect(root.name).toBe('layout');
-    expect(root.children[0].children[0].children[0].attributes[1].value).toEqual({
+    expect(
+      root.children[0].children[0].children[0].attributes[1].value
+    ).toEqual({
       text: 'a>b',
     });
   });
@@ -30,18 +33,48 @@ describe('Layout DSL', () => {
     ['', 'LAYOUT_EMPTY'],
     ['<scene />', 'LAYOUT_INVALID_ROOT'],
     ['<layout version=2></layout>', 'LAYOUT_UNSUPPORTED_VERSION'],
-    ['<layout version=1 background=#000000></layout><layout />', 'LAYOUT_MULTIPLE_ROOTS'],
+    [
+      '<layout version=1 background=#000000></layout><layout />',
+      'LAYOUT_MULTIPLE_ROOTS',
+    ],
     ['<layout version=1 background=#000000>text</layout>', 'LAYOUT_TEXT_NODE'],
-    ['<layout version=1 version=1 background=#000000></layout>', 'LAYOUT_DUPLICATE_ATTRIBUTE'],
-    ['<layout version=1 background=#000000><bad /></layout>', 'LAYOUT_INVALID_CHILD'],
-    ['<layout background=#000000 version=1></layout>', 'LAYOUT_ATTRIBUTE_ORDER'],
+    [
+      '<layout version=1 version=1 background=#000000></layout>',
+      'LAYOUT_DUPLICATE_ATTRIBUTE',
+    ],
+    [
+      '<layout version=1 background=#000000><bad /></layout>',
+      'LAYOUT_INVALID_CHILD',
+    ],
+    [
+      '<layout background=#000000 version=1></layout>',
+      'LAYOUT_ATTRIBUTE_ORDER',
+    ],
     ['<layout version=1 background=#000000 />', 'LAYOUT_INVALID_ROOT'],
-    ['<layout version=1 background=#000000><editor></editor></layout>', 'LAYOUT_EXPECTED_EMPTY_ELEMENT'],
-    ['<layout version=1 background=#000000><layer name="" /></layout>', 'LAYOUT_EXPECTED_CONTAINER'],
-    ['<layout version=1 background=#000000><editor grid /></layout>', 'LAYOUT_INVALID_BARE_ATTRIBUTE'],
-    ['<layout version=1 background=#000000><!-- no --></layout>', 'LAYOUT_SYNTAX'],
-    ['<layout version=1 background=#000000><layer name=""></layout>', 'LAYOUT_MISMATCHED_TAG'],
-    ['<layout version=1 background=#000000><editor grid=true future=false /></layout>', 'LAYOUT_UNKNOWN_ATTRIBUTE'],
+    [
+      '<layout version=1 background=#000000><editor></editor></layout>',
+      'LAYOUT_EXPECTED_EMPTY_ELEMENT',
+    ],
+    [
+      '<layout version=1 background=#000000><layer name="" /></layout>',
+      'LAYOUT_EXPECTED_CONTAINER',
+    ],
+    [
+      '<layout version=1 background=#000000><editor grid /></layout>',
+      'LAYOUT_INVALID_BARE_ATTRIBUTE',
+    ],
+    [
+      '<layout version=1 background=#000000><!-- no --></layout>',
+      'LAYOUT_SYNTAX',
+    ],
+    [
+      '<layout version=1 background=#000000><layer name=""></layout>',
+      'LAYOUT_MISMATCHED_TAG',
+    ],
+    [
+      '<layout version=1 background=#000000><editor grid=true future=false /></layout>',
+      'LAYOUT_UNKNOWN_ATTRIBUTE',
+    ],
   ])('rejects invalid document %#', (source, code) => {
     expect(() => compileLayoutDsl(source, { kind: 'scene' })).toThrow(
       expect.objectContaining({ code })
@@ -54,7 +87,9 @@ describe('Layout DSL', () => {
   <layer name="" rendering=2d+3d camera-type=perspective visible=false locked=true lighting=true follow-base-camera=true ambient=#010203 near=1 far=500 fov=60 max-2d-distance=200>
     <camera size=default(640,480) viewport=default(0,0,0.5,1) />
     <effect name="Glow" type="Test::Glow" folded=true enabled=false numbers={"strength":2} strings={"mode":"soft"} booleans={"fast":true} />
-    <Player id="${uuid(1)}" at=1,2,3 rotation=4,5,6 z-order=-2 size=auto(10x20) depth=30 opacity=42 flip=x,z locked sealed keep-ratio=false>
+    <Player id="${uuid(
+      1
+    )}" at=1,2,3 rotation=4,5,6 z-order=-2 size=auto(10x20) depth=30 opacity=42 flip=x,z locked sealed keep-ratio=false>
       <properties numbers={"animation":1} strings={"text":"Ready"} />
       <variables>
         <var name="Health" type=number value=100 />
@@ -107,7 +142,9 @@ describe('Layout DSL', () => {
           opacity: 42,
           flippedX: true,
           flippedZ: true,
-          behaviorOverridings: [{ name: 'Move', type: 'Movement::Move', speed: 12 }],
+          behaviorOverridings: [
+            { name: 'Move', type: 'Movement::Move', speed: 12 },
+          ],
         },
       ],
     });
@@ -134,10 +171,15 @@ describe('Layout DSL', () => {
 
     expect(
       compileLayoutDsl(
-        `<layout version=1><layer name="World"><Coin id="${uuid(2)}" at=1,2 /></layer></layout>`,
+        `<layout version=1><layer name="World"><Coin id="${uuid(
+          2
+        )}" at=1,2 /></layer></layout>`,
         { kind: 'external', objectNames: ['Coin'], layerNames: ['World'] }
       )
-    ).toEqual({ editionSettings: {}, instances: [expect.objectContaining({ layer: 'World' })] });
+    ).toEqual({
+      editionSettings: {},
+      instances: [expect.objectContaining({ layer: 'World' })],
+    });
   });
 
   test('normalizes partial current editor tuples with editor defaults', () => {
@@ -169,25 +211,202 @@ describe('Layout DSL', () => {
     });
   });
 
+  test('preserves serialized color components outside the RGB byte range', () => {
+    const layout = {
+      r: 1,
+      v: 2,
+      b: 3,
+      uiSettings: {},
+      layers: [
+        {
+          name: '',
+          ambientLightColorR: 1869181824,
+          ambientLightColorG: 150995056,
+          ambientLightColorB: 16,
+          cameras: [],
+          effects: [],
+        },
+      ],
+      instances: [],
+    };
+    const source = decompileLayoutDsl(layout, { kind: 'scene' });
+
+    expect(source).toContain('background=#010203');
+    expect(source).toContain('ambient=rgb(1869181824,150995056,16)');
+    expect(compileLayoutDsl(source, { kind: 'scene' }).layers[0]).toMatchObject(
+      {
+        ambientLightColorR: 1869181824,
+        ambientLightColorG: 150995056,
+        ambientLightColorB: 16,
+      }
+    );
+  });
+
+  test('preserves explicitly marked stale instances without weakening resolution', () => {
+    const source = `<layout version=1 background=#000000>
+  <layer name="">
+    <object of="RemovedObject" unresolved id="${uuid(9)}" at=1,2 />
+  </layer>
+</layout>`;
+    const context = { kind: 'scene', objectNames: [] };
+    const layout = compileLayoutDsl(source, context);
+
+    expect(layout.instances[0]).toMatchObject({
+      name: 'RemovedObject',
+      x: 1,
+      y: 2,
+    });
+    expect(decompileLayoutDsl(layout, context)).toContain(
+      '<object of="RemovedObject" unresolved'
+    );
+    expect(() =>
+      compileLayoutDsl(source.replace(' unresolved', ''), context)
+    ).toThrow(expect.objectContaining({ code: 'LAYOUT_UNKNOWN_OBJECT' }));
+    expect(() =>
+      compileLayoutDsl(source, {
+        kind: 'scene',
+        objectNames: ['RemovedObject'],
+      })
+    ).toThrow(expect.objectContaining({ code: 'LAYOUT_INVALID_INSTANCE' }));
+  });
+
+  test('preserves an explicitly marked stale editor layer selection', () => {
+    const layout = {
+      r: 0,
+      v: 0,
+      b: 0,
+      uiSettings: { selectedLayer: 'Removed Layer' },
+      layers: [{ name: '', cameras: [], effects: [] }],
+      instances: [],
+    };
+    const source = decompileLayoutDsl(layout, { kind: 'scene' });
+
+    expect(source).toContain('selected-layer="Removed Layer"');
+    expect(source).toContain('selected-layer-unresolved');
+    expect(compileLayoutDsl(source, { kind: 'scene' }).uiSettings).toEqual({
+      selectedLayer: 'Removed Layer',
+    });
+    expect(() =>
+      compileLayoutDsl(source.replace(' selected-layer-unresolved', ''), {
+        kind: 'scene',
+      })
+    ).toThrow(expect.objectContaining({ code: 'LAYOUT_UNKNOWN_LAYER' }));
+  });
+
   test.each([
-    [`<layout version=1 background=#000000><layer name=""><Missing id="${uuid(1)}" at=0,0 /></layer></layout>`, { kind: 'scene', objectNames: [] }, 'LAYOUT_UNKNOWN_OBJECT'],
-    [`<layout version=1><layer name="Missing"></layer></layout>`, { kind: 'external', layerNames: [''] }, 'LAYOUT_UNKNOWN_LAYER'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="bad" at=0,0 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_UUID'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0 order=1 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_ORDER'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0 opacity=256 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_INSTANCE'],
-    [`<layout version=1 background=#000000><layer name="" camera-type=perspective near=0></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_LAYER'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0 /><Player id="${uuid(1)}" at=1,1 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_DUPLICATE_UUID'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0 order=0 /><Player id="${uuid(2)}" at=1,1 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_ORDER'],
-    [`<layout version=1 background=#000000><layer name=""><camera size=default viewport=0,0,2,1 /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_CAMERA'],
-    [`<layout version=1 background=#000000><layer name=""><effect name="X" type="T" /><effect name="X" type="T" /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_DUPLICATE_EFFECT'],
-    [`<layout version=1 background=#000000><layer name=""><effect name="X" type="T" numbers={"x":"wrong"} /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_NUMBER'],
-    [`<layout version=1 background=#000000><layer name=""><effect name="X" type="T" /></layer></layout>`, { kind: 'scene', effectTypes: [] }, 'LAYOUT_UNKNOWN_EFFECT_TYPE'],
-    [`<layout version=1 background=#000000><layer name=""><effect name="X" type="T" strings={"strength":"wrong"} /></layer></layout>`, { kind: 'scene', effectTypes: ['T'], effectParameterTypesByType: { T: { strength: 'number' } } }, 'LAYOUT_INVALID_EFFECT_PARAMETER'],
-    [`<layout version=1 background=#000000><layer name=""><camera size=default viewport=default /><effect name="X" type="T" /><camera size=default viewport=default /></layer></layout>`, { kind: 'scene' }, 'LAYOUT_CHILD_ORDER'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0><variables><var name="X" type=enum value="C" values=["A","B"] /></variables></Player></layer></layout>`, { kind: 'scene' }, 'LAYOUT_INVALID_VARIABLE'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0><override behavior="Move" data={} /></Player></layer></layout>`, { kind: 'scene' }, 'LAYOUT_UNKNOWN_BEHAVIOR'],
-    [`<layout version=1 background=#000000><layer name=""><Player id="${uuid(1)}" at=0,0><properties strings={"animation":"wrong"} /></Player></layer></layout>`, { kind: 'scene', instancePropertyTypesByObject: { Player: { animation: 'number' } } }, 'LAYOUT_INVALID_INSTANCE_PROPERTY'],
-    [`<layout version=1><layer name=""><camera size=default viewport=default /></layer></layout>`, { kind: 'external', layerNames: [''] }, 'LAYOUT_INVALID_CHILD'],
+    [
+      `<layout version=1 background=#000000><layer name=""><Missing id="${uuid(
+        1
+      )}" at=0,0 /></layer></layout>`,
+      { kind: 'scene', objectNames: [] },
+      'LAYOUT_UNKNOWN_OBJECT',
+    ],
+    [
+      `<layout version=1><layer name="Missing"></layer></layout>`,
+      { kind: 'external', layerNames: [''] },
+      'LAYOUT_UNKNOWN_LAYER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="bad" at=0,0 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_UUID',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0 order=1 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_ORDER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0 opacity=256 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_INSTANCE',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name="" camera-type=perspective near=0></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_LAYER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0 /><Player id="${uuid(1)}" at=1,1 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_DUPLICATE_UUID',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0 order=0 /><Player id="${uuid(2)}" at=1,1 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_ORDER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><camera size=default viewport=0,0,2,1 /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_CAMERA',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><effect name="X" type="T" /><effect name="X" type="T" /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_DUPLICATE_EFFECT',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><effect name="X" type="T" numbers={"x":"wrong"} /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_NUMBER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><effect name="X" type="T" /></layer></layout>`,
+      { kind: 'scene', effectTypes: [] },
+      'LAYOUT_UNKNOWN_EFFECT_TYPE',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><effect name="X" type="T" strings={"strength":"wrong"} /></layer></layout>`,
+      {
+        kind: 'scene',
+        effectTypes: ['T'],
+        effectParameterTypesByType: { T: { strength: 'number' } },
+      },
+      'LAYOUT_INVALID_EFFECT_PARAMETER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><camera size=default viewport=default /><effect name="X" type="T" /><camera size=default viewport=default /></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_CHILD_ORDER',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0><variables><var name="X" type=enum value="C" values=["A","B"] /></variables></Player></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_INVALID_VARIABLE',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0><override behavior="Move" data={} /></Player></layer></layout>`,
+      { kind: 'scene' },
+      'LAYOUT_UNKNOWN_BEHAVIOR',
+    ],
+    [
+      `<layout version=1 background=#000000><layer name=""><Player id="${uuid(
+        1
+      )}" at=0,0><properties strings={"animation":"wrong"} /></Player></layer></layout>`,
+      {
+        kind: 'scene',
+        instancePropertyTypesByObject: { Player: { animation: 'number' } },
+      },
+      'LAYOUT_INVALID_INSTANCE_PROPERTY',
+    ],
+    [
+      `<layout version=1><layer name=""><camera size=default viewport=default /></layer></layout>`,
+      { kind: 'external', layerNames: [''] },
+      'LAYOUT_INVALID_CHILD',
+    ],
   ])('validates semantic rule %#', (source, context, code) => {
     expect(() => compileLayoutDsl(source, context)).toThrow(
       expect.objectContaining({ code })
@@ -236,24 +455,90 @@ describe('Layout DSL', () => {
       uiSettings: {},
       layers: [{ name: '' }, { name: 'HUD' }],
       instances: [
-        { name: 'A', x: 0, y: 0, angle: 0, zOrder: 0, layer: '', customSize: false, width: 0, height: 0, persistentUuid: uuid(1), numberProperties: [], stringProperties: [], initialVariables: [] },
-        { name: 'B', x: 0, y: 0, angle: 0, zOrder: 0, layer: 'HUD', customSize: false, width: 0, height: 0, persistentUuid: uuid(2), numberProperties: [], stringProperties: [], initialVariables: [] },
-        { name: 'C', x: 0, y: 0, angle: 0, zOrder: 0, layer: '', customSize: false, width: 0, height: 0, persistentUuid: uuid(3), numberProperties: [], stringProperties: [], initialVariables: [] },
+        {
+          name: 'A',
+          x: 0,
+          y: 0,
+          angle: 0,
+          zOrder: 0,
+          layer: '',
+          customSize: false,
+          width: 0,
+          height: 0,
+          persistentUuid: uuid(1),
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+        },
+        {
+          name: 'B',
+          x: 0,
+          y: 0,
+          angle: 0,
+          zOrder: 0,
+          layer: 'HUD',
+          customSize: false,
+          width: 0,
+          height: 0,
+          persistentUuid: uuid(2),
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+        },
+        {
+          name: 'C',
+          x: 0,
+          y: 0,
+          angle: 0,
+          zOrder: 0,
+          layer: '',
+          customSize: false,
+          width: 0,
+          height: 0,
+          persistentUuid: uuid(3),
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+        },
       ],
     };
     const source = decompileLayoutDsl(layout, { kind: 'scene' });
     expect(source.match(/ order=/g)).toHaveLength(3);
-    expect(compileLayoutDsl(source, { kind: 'scene' }).instances.map(item => item.name)).toEqual(['A', 'B', 'C']);
+    expect(
+      compileLayoutDsl(source, { kind: 'scene' }).instances.map(
+        item => item.name
+      )
+    ).toEqual(['A', 'B', 'C']);
   });
 
   test('uses fallback object tags and canonical stable formatting', () => {
     const layout = {
       editionSettings: {},
-      instances: [{ name: 'layer', x: 1, y: 2, angle: 0, zOrder: 0, layer: '', customSize: false, width: 0, height: 0, persistentUuid: uuid(4), numberProperties: [], stringProperties: [], initialVariables: [] }],
+      instances: [
+        {
+          name: 'layer',
+          x: 1,
+          y: 2,
+          angle: 0,
+          zOrder: 0,
+          layer: '',
+          customSize: false,
+          width: 0,
+          height: 0,
+          persistentUuid: uuid(4),
+          numberProperties: [],
+          stringProperties: [],
+          initialVariables: [],
+        },
+      ],
     };
     const source = decompileLayoutDsl(layout, { kind: 'external' });
     expect(source).toContain('<object of="layer"');
-    expect(decompileLayoutDsl(compileLayoutDsl(source, { kind: 'external' }), { kind: 'external' })).toBe(source);
+    expect(
+      decompileLayoutDsl(compileLayoutDsl(source, { kind: 'external' }), {
+        kind: 'external',
+      })
+    ).toBe(source);
     expect(source.endsWith('\n')).toBe(true);
     expect(
       formatLayoutDsl(source.replace(/^ {2}/gm, '      '), {
@@ -272,7 +557,15 @@ describe('Layout DSL', () => {
   test('fails rather than losing unknown serializer fields', () => {
     expect(() =>
       decompileLayoutDsl(
-        { r: 0, v: 0, b: 0, uiSettings: {}, layers: [], instances: [], futureField: true },
+        {
+          r: 0,
+          v: 0,
+          b: 0,
+          uiSettings: {},
+          layers: [],
+          instances: [],
+          futureField: true,
+        },
         { kind: 'scene' }
       )
     ).toThrow(expect.objectContaining({ code: 'LAYOUT_UNSUPPORTED_FIELD' }));
@@ -311,14 +604,21 @@ describe('Layout DSL', () => {
 
   test('reports file, line and column', () => {
     try {
-      compileLayoutDsl('<layout version=1 background=#000000>\n  <bad />\n</layout>', {
-        kind: 'scene',
-        fileUri: 'game://scenes/Main/Main.layout',
-      });
+      compileLayoutDsl(
+        '<layout version=1 background=#000000>\n  <bad />\n</layout>',
+        {
+          kind: 'scene',
+          fileUri: 'game://scenes/Main/Main.layout',
+        }
+      );
       throw new Error('Expected compilation failure.');
     } catch (error) {
       expect(error).toBeInstanceOf(LayoutDslError);
-      expect(error).toMatchObject({ line: 2, column: 3, fileUri: 'game://scenes/Main/Main.layout' });
+      expect(error).toMatchObject({
+        line: 2,
+        column: 3,
+        fileUri: 'game://scenes/Main/Main.layout',
+      });
     }
   });
 });

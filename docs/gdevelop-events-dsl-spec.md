@@ -3411,7 +3411,10 @@ three sibling events, because that changes action count and picking semantics.
 
 Nested `BuiltinCommonInstructions::And`, `Or`, or `Not` instructions that
 cannot be represented by the simple `if`/`or` grouping use the typed exact
-catalog instruction form with instruction-depth prefixes.
+catalog instruction form with instruction-depth prefixes. In particular, the
+decompiler must not expand an `Or` whose direct child is another `Or`, because
+the parser's `or` sugar intentionally flattens alternatives and would change
+the serialized instruction tree.
 
 ### 32.3 Comparisons and assignments
 
@@ -3533,6 +3536,8 @@ to `iterableVariableName`, `valueIteratorVariableName`,
 - Each immediately following `and while` compiles to another distinct,
   ordered `whileConditions` entry. This is the canonical exact form for
   current serialized events that contain multiple sibling entries.
+- Instruction-depth children of a `while` or `and while` header remain children
+  of that header instruction; they must never be moved ahead of the header.
 - Structural `or` alternatives after a non-empty header are lowered into the
   header condition's `BuiltinCommonInstructions::Or` instruction; they do not
   create sibling `whileConditions` entries.

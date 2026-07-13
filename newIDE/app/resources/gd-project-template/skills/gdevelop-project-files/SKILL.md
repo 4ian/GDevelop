@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; validate direct edits with the GDevelop MCP `validate_project_files` tool before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -32,6 +32,18 @@ behavior, effect, owner, or layout context in the source catalogs, and use
 instruction type, displayed name, group, description, parameter `dslName`, or
 expression name in the instruction catalog. Generated JSON keeps one catalog
 entry per line so a matching search returns only relevant metadata.
+
+After a large structural source change, call the no-input GDevelop MCP
+`generate-catalogs` tool and wait for `catalogsRegenerated: true` before making
+edits that depend on the changed structure. Large structural changes include
+installing or importing an extension and creating, deleting, renaming, or
+substantially changing a prefab, behavior, function, extension, object type, or
+other catalog-owned component. Re-read the relevant freshly generated
+settings, layout, and instruction catalogs before continuing; do not rely on
+catalog content read before the structural change. A later structural change
+invalidates that catalog view and requires another `generate-catalogs` call.
+This refresh is not validation and does not replace the final
+`validate_project_files` gate.
 
 Use the catalogs as authoring contracts:
 
@@ -274,22 +286,28 @@ loop, comment, and JavaScript metadata when editing existing sources.
 3. Patch source files directly. Use `apply_patch` for precise edits.
    Creating or changing an object type or one of its behaviors is a settings
    edit; creating or moving an instance is a layout edit.
-4. Re-read every changed manifest reference and verify that each `game://` URI
+4. After any large structural change (including extension installation or
+   creating/changing a prefab, behavior, function, extension, or object type),
+   call the no-input MCP `generate-catalogs` tool. Require
+   `catalogsRegenerated: true`, then re-read every refreshed catalog relevant
+   to subsequent edits. Do not continue from catalog metadata read before the
+   structural change. Repeat this step after each later structural phase.
+5. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
-5. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
+6. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
    namespaces, event depth, instruction names, named parameters, and asset
    paths.
-6. Call the no-input GDevelop MCP `validate_project_files` tool after the most
+7. Call the no-input GDevelop MCP `validate_project_files` tool after the most
    recent source edit. Require `valid: true`; use its file URI, error code,
    line, column, and source excerpt to fix every reported settings, layout,
    events, reference, or generated-project validation failure. This call first
    regenerates all three `.gdevelop` catalogs, then validates the sources using
    the fresh instruction catalog. Call it at least once before calling
    `reload_project`; a failed validation does not satisfy this gate.
-7. Call the GDevelop MCP `reload_project` tool and require a successful reload
+8. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
-8. For gameplay or visual changes, call `launch_preview` only after step 7.
+9. For gameplay or visual changes, call `launch_preview` only after step 8.
    If any project source changes after the reload, call `reload_project` again
    before the next preview, preceded by a new successful
    `validate_project_files` call for those edits.
@@ -308,6 +326,9 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
+- Regenerating and synchronously waiting for all three generated source
+  catalogs with `generate-catalogs` after large structural source changes, so
+  subsequent authoring can read current catalog contracts.
 - Regenerating all source catalogs and validating direct disk edits without
   changing editor memory by calling the no-input `validate_project_files` tool
   before `reload_project`.
@@ -321,6 +342,13 @@ Except for the single `import_extension` conversion transaction, never use MCP
 to create scenes, objects, resources, variables, instances, extensions,
 behaviors, prefabs, or events. Never use generic editor-call, command, patch,
 sync, or save tools for authoring.
+
+`generate-catalogs` is a mandatory mid-task refresh after every large
+structural source change. Require `catalogsRegenerated: true`, then read the
+latest relevant `.gdevelop/settings-catalog.json`,
+`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json`
+before making dependent edits. The tool writes and verifies only those three
+generated files and does not validate sources or reload editor memory.
 
 `validate_project_files` is a mandatory reload gate. In every direct-edit task,
 call it successfully with no inputs at least once after the most recent
@@ -369,6 +397,9 @@ Before finishing:
 - Confirm every object-targeting action operates on a provably single picked
   instance; use `for each` when processing multiple instances.
 - Confirm no legacy JSON was changed.
+- Confirm `generate-catalogs` returned `catalogsRegenerated: true` after the
+  final large structural change and that subsequent dependent edits used the
+  refreshed relevant catalogs.
 - Confirm `validate_project_files` returned `valid: true` after the final source
   edit and before `reload_project`.
 - Confirm `reload_project` succeeded after the final source edit and before any

@@ -1571,6 +1571,11 @@ const compileEvents = (files, uri, options) => {
       uri
     );
   }
+  // Catalog generation needs the project structure and extension metadata,
+  // but it cannot compile catalog-authored instructions until that catalog
+  // has been generated. Keep validating the file boundary above, then use an
+  // empty event list for this bootstrap pass only.
+  if (options.skipEventsCompilation) return [];
   try {
     return JSON.parse(
       compileIfDoToLegacyEventsJson(source, options.compileOptions || {})

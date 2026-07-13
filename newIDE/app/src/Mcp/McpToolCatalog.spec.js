@@ -19,6 +19,7 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_get_project_summary',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
+  'generate-catalogs',
   'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
@@ -133,6 +134,34 @@ describe('McpToolCatalog', () => {
     expect(tool.description).toContain('regenerate');
     expect(
       canCallMcpTool('reload_project', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+  });
+
+  it('exposes generate-catalogs as an awaited, non-destructive catalog write', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'generate-catalogs');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        inputSchema: expect.objectContaining({
+          type: 'object',
+          additionalProperties: false,
+        }),
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(tool.description).toContain('waits for all three files');
+    expect(
+      canCallMcpTool('generate-catalogs', {
         allowWriteTools: false,
         allowCommandTools: false,
       })

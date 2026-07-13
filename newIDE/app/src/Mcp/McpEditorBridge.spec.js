@@ -176,8 +176,73 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).toContain(
       'validate_project_files'
     );
+    expect(response.tools.map(tool => tool.name)).toContain(
+      'generate-catalogs'
+    );
     expect(response.tools.map(tool => tool.name)).toContain('reload_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('generates and verifies all three catalogs before returning', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-generate-catalogs-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Catalog generation test');
+    project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    await writeMultiFileSourceTree({
+      entryPath: projectFile,
+      files,
+    });
+    const catalogDirectory = path.join(temporaryDirectory, '.gdevelop');
+    fs.mkdirSync(catalogDirectory, { recursive: true });
+    const catalogFiles = {
+      instructions: path.join(catalogDirectory, 'instructions-catalog.json'),
+      settings: path.join(catalogDirectory, 'settings-catalog.json'),
+      layouts: path.join(catalogDirectory, 'layout-catalog.json'),
+    };
+    Object.keys(catalogFiles).forEach(key => {
+      fs.writeFileSync(catalogFiles[key], '{ stale catalog', 'utf8');
+    });
+    const reloadProjectAndWait = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => project,
+      reloadProjectAndWait,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'generate-catalogs', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        projectFile,
+        catalogsRegenerated: true,
+        writeMode: 'awaited-and-verified',
+        catalogs: expect.objectContaining({
+          instructions: expect.any(Object),
+          settings: expect.any(Object),
+          layouts: expect.any(Object),
+        }),
+        catalogFiles,
+      })
+    );
+    Object.keys(catalogFiles).forEach(key => {
+      expect(() =>
+        JSON.parse(fs.readFileSync(catalogFiles[key], 'utf8'))
+      ).not.toThrow();
+    });
+    expect(result.generatedGameJson).toBeUndefined();
+    expect(result.nextAction).toContain('Read the refreshed catalogs');
   });
 
   it('validates multi-file disk sources without reloading the editor', async () => {
@@ -188,9 +253,12 @@ describe('McpEditorBridge', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Disk validation test');
     project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
     await writeMultiFileSourceTree({
       entryPath: projectFile,
-      files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
+      files,
     });
     const catalogDirectory = path.join(temporaryDirectory, '.gdevelop');
     fs.mkdirSync(catalogDirectory, { recursive: true });

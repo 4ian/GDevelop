@@ -381,7 +381,11 @@ const getValidationSourceExcerpt = ({
   projectFile,
   fileUri,
   line,
-}: {| projectFile: string, fileUri: ?string, line: ?number |}): ?Array<Object> => {
+}: {|
+  projectFile: string,
+  fileUri: ?string,
+  line: ?number,
+|}): ?Array<Object> => {
   if (!fs || !path || !fileUri || !line || !fileUri.startsWith('game://')) {
     return null;
   }
@@ -441,6 +445,47 @@ const getProjectFilesValidationDiagnostic = (
     sourceExcerpt:
       getValidationSourceExcerpt({ projectFile, fileUri, line }) || undefined,
   };
+};
+
+const generateProjectSourceCatalogsFromDisk = async (
+  projectFile: string
+): Promise<{| projectRoot: string, catalogs: Object |}> => {
+  const projectRoot = path ? path.dirname(projectFile) : null;
+  if (!projectRoot) {
+    throw new Error(
+      'Filesystem path support is unavailable, so project catalogs cannot be regenerated.'
+    );
+  }
+
+  // Bootstrap from disk without trusting the potentially stale generated
+  // instruction catalog. Each catalog write is awaited and verified by the
+  // project writer before this helper resolves.
+  const catalogSource = await openMultiFileProject(projectFile, {
+    ignoreInstructionCatalog: true,
+    skipEventsCompilation: true,
+  });
+  const catalogProject = new gd.ProjectHelper.createNewGDJSProject();
+  try {
+    try {
+      unserializeFromJSObject(catalogProject, catalogSource);
+      const catalogs = await writeProjectSourceCatalogs(
+        catalogProject,
+        projectRoot
+      );
+      return { projectRoot, catalogs };
+    } catch (error) {
+      const catalogError: any = new Error(
+        `Unable to regenerate the project source catalogs: ${
+          error && error.message ? error.message : String(error)
+        }`
+      );
+      catalogError.name = 'ProjectCatalogRegenerationError';
+      catalogError.code = 'PROJECT_CATALOG_REGENERATION_FAILED';
+      throw catalogError;
+    }
+  } finally {
+    catalogProject.delete();
+  }
 };
 
 // Extract the JSON payload from a textResult/errorResult-shaped tool response,
@@ -4965,6 +5010,72 @@ const callMcpTool = async ({
     return textResult(getProjectSummary(project, args.sceneName));
   }
 
+  if (toolName === 'generate-catalogs') {
+    if (!project) return errorResult('No project opened.');
+    const projectFile = project.getProjectFile();
+    if (!projectFile) {
+      return errorResult(
+        'The current project has no disk location. Save it as a multi-file project before generating catalogs.',
+        {
+          catalogsRegenerated: false,
+          phase: 'locate-project-files',
+        }
+      );
+    }
+    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+      return errorResult(
+        'generate-catalogs requires a local multi-file project whose entry file is project.settings.',
+        {
+          catalogsRegenerated: false,
+          phase: 'locate-project-files',
+          projectFile,
+        }
+      );
+    }
+
+    try {
+      const {
+        projectRoot,
+        catalogs,
+      } = await generateProjectSourceCatalogsFromDisk(projectFile);
+      return textResult({
+        success: true,
+        projectFile,
+        catalogsRegenerated: true,
+        writeMode: 'awaited-and-verified',
+        catalogs,
+        catalogFiles: {
+          instructions: path.join(
+            projectRoot,
+            '.gdevelop',
+            'instructions-catalog.json'
+          ),
+          settings: path.join(
+            projectRoot,
+            '.gdevelop',
+            'settings-catalog.json'
+          ),
+          layouts: path.join(projectRoot, '.gdevelop', 'layout-catalog.json'),
+        },
+        nextAction:
+          'Read the refreshed catalogs before making edits that depend on newly added or changed project structure. Run validate_project_files after the final source edit before reload_project.',
+        note:
+          'All three generated catalog files were written sequentially and verified before this response. Project source files and editor memory were not modified.',
+      });
+    } catch (error) {
+      const diagnostic = getProjectFilesValidationDiagnostic(
+        error,
+        projectFile
+      );
+      return errorResult('Unable to regenerate the project source catalogs.', {
+        catalogsRegenerated: false,
+        phase: diagnostic.phase,
+        projectFile,
+        errors: [diagnostic],
+      });
+    }
+  }
+
   if (toolName === 'validate_project_files') {
     if (!project) return errorResult('No project opened.');
     const projectFile = project.getProjectFile();
@@ -5007,41 +5118,12 @@ const callMcpTool = async ({
     }
 
     try {
-      const projectRoot = path ? path.dirname(projectFile) : null;
-      if (!projectRoot) {
-        throw new Error(
-          'Filesystem path support is unavailable, so project catalogs cannot be regenerated.'
-        );
-      }
-
       // Bootstrap without the potentially stale generated instruction catalog,
       // then regenerate every catalog from the disk-source project. Re-open the
       // sources afterward so final event compilation uses the fresh catalog.
-      const catalogSource = await openMultiFileProject(projectFile, {
-        ignoreInstructionCatalog: true,
-      });
-      const catalogProject = new gd.ProjectHelper.createNewGDJSProject();
-      let catalogs;
-      try {
-        try {
-          unserializeFromJSObject(catalogProject, catalogSource);
-          catalogs = await writeProjectSourceCatalogs(
-            catalogProject,
-            projectRoot
-          );
-        } catch (error) {
-          const catalogError: any = new Error(
-            `Unable to regenerate the project source catalogs: ${
-              error && error.message ? error.message : String(error)
-            }`
-          );
-          catalogError.name = 'ProjectCatalogRegenerationError';
-          catalogError.code = 'PROJECT_CATALOG_REGENERATION_FAILED';
-          throw catalogError;
-        }
-      } finally {
-        catalogProject.delete();
-      }
+      const { catalogs } = await generateProjectSourceCatalogsFromDisk(
+        projectFile
+      );
 
       const serializedProject = await openMultiFileProject(projectFile);
       const generatedJson = JSON.stringify(serializedProject, null, 2);

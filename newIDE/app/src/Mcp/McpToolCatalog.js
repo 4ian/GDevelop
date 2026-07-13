@@ -3779,6 +3779,18 @@ const readTools: Array<McpTool> = [
     inputSchema: validateCurrentProjectJsonSchema,
   },
   {
+    name: 'generate-catalogs',
+    description:
+      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, and .gdevelop/layout-catalog.json from the current local multi-file project sources. The call waits for all three files to be written and verified before returning. Accepts no inputs, writes only generated catalogs, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs before making dependent edits.',
+    inputSchema: noInputSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'validate_project_files',
     description:
       'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
@@ -4920,6 +4932,13 @@ const commandTools: Array<McpTool> = [
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  'generate-catalogs': [
+    {
+      description:
+        'Regenerate and verify all three project-source catalogs after structural file changes.',
+      arguments: {},
+    },
+  ],
   import_extension: [
     {
       description:
@@ -6723,6 +6742,7 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_get_project_summary',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
+  'generate-catalogs',
   'validate_project_files',
   'inspect_tool_schema',
   'get_tool_usage_examples',
@@ -6963,6 +6983,7 @@ export const getCapabilitiesSummary = (
       'set_first_layout',
     ],
     'Preview debugging': [
+      'generate-catalogs',
       'validate_project_files',
       'reload_project',
       'launch_preview',

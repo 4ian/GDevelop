@@ -31,6 +31,7 @@ import {
   writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
+import { unserializeFromJSObject } from '../../Utils/Serializer';
 
 const projectFixture = {
   gdVersion: { major: 5, minor: 6, build: 0, revision: 0 },
@@ -795,6 +796,14 @@ describe('Local multi-file project storage', () => {
     );
 
     expect(fs.existsSync(catalogPath)).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          '.gdevelop/deprecated-instructions-catalog.json'
+        )
+      )
+    ).toBe(false);
     expect(JSON.parse(fs.readFileSync(catalogPath, 'utf8')).counts).toEqual(
       catalog.counts
     );
@@ -878,6 +887,14 @@ describe('Local multi-file project storage', () => {
     ).toBe(true);
     expect(
       fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          '.gdevelop/deprecated-instructions-catalog.json'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
       )
     ).toBe(true);
@@ -932,6 +949,68 @@ describe('Local multi-file project storage', () => {
       )
     ).toBe(true);
     project.delete();
+  });
+
+  test('saves and reopens the Physics2 template instruction whose type contains whitespace', async () => {
+    const gd: libGDevelop = global.gd;
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const physics2ExtensionModule = require('../../../../../Extensions/Physics2Behavior/JsExtension');
+    const physics2Extension = physics2ExtensionModule.createExtension(
+      message => message,
+      gd
+    );
+    gd.JsPlatform.get().addNewExtension(physics2Extension);
+    physics2Extension.delete();
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const legacyProject = JSON.parse(JSON.stringify(projectFixture));
+    legacyProject.properties.name = 'Physics template regression';
+    legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
+    legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Physics2::Remove joint' },
+            parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+          },
+        ],
+      },
+    ];
+    try {
+      unserializeFromJSObject(project, legacyProject);
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const eventsSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/Main.events'),
+        'utf8'
+      );
+      expect(eventsSource).toContain('do "Physics2::Remove joint"');
+      expect(eventsSource).not.toContain('@exact');
+      const reopened = await openMultiFileProject(entryPath);
+      expect(reopened.layouts[0].events[0].actions[0]).toMatchObject({
+        type: { value: 'Physics2::Remove joint' },
+        parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+      });
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension('Physics2');
+    }
   });
 
   test('writes the default scene sources on the first project save', async () => {

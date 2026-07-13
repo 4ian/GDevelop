@@ -6,9 +6,11 @@ import {
   convertLegacyEventsJsonToIfDo,
 } from './index';
 import {
+  buildProjectDeprecatedInstructionCatalog,
   buildProjectInstructionCatalog,
   createCatalogInstructionFormatter,
   createCatalogInstructionResolver,
+  mergeProjectInstructionCatalogs,
   serializeProjectInstructionCatalog,
   validateProjectInstructionCatalog,
 } from './ProjectInstructionCatalog';
@@ -74,10 +76,7 @@ describe('project IfDo instruction catalog', () => {
           type: 'FireBullet::RotateObject',
           parameters: [
             {
-              dslName: normalizeInstructionParameterDslName(
-                '3d_capability',
-                0
-              ),
+              dslName: normalizeInstructionParameterDslName('3d_capability', 0),
             },
           ],
         },
@@ -165,6 +164,96 @@ describe('project IfDo instruction catalog', () => {
     expect(areLegacyEventsEquivalent(input, output)).toBe(true);
   });
 
+  test('quotes and round-trips an exact instruction type containing whitespace', () => {
+    const spacedTypeCatalog = {
+      ...catalogFixture,
+      actions: [
+        {
+          type: 'Physics2::Remove joint',
+          parameters: [
+            { dslName: 'object' },
+            { dslName: 'behavior' },
+            { dslName: 'joint_id' },
+          ],
+        },
+      ],
+    };
+    const input = JSON.stringify([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Physics2::Remove joint' },
+            parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+          },
+        ],
+      },
+    ]);
+    const dsl = convertLegacyEventsJsonToIfDo(input, {
+      formatInstruction: createCatalogInstructionFormatter(spacedTypeCatalog),
+    });
+    const output = compileIfDoToLegacyEventsJson(dsl, {
+      resolveInstruction: createCatalogInstructionResolver(spacedTypeCatalog),
+    });
+
+    expect(dsl).toContain('do "Physics2::Remove joint"');
+    expect(dsl).not.toContain('@exact');
+    expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+  });
+
+  test('round-trips the real Physics2 spaced instruction type used by templates', () => {
+    const gd: libGDevelop = global.gd;
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const physics2ExtensionModule = require('../../../../../Extensions/Physics2Behavior/JsExtension');
+    const physics2Extension = physics2ExtensionModule.createExtension(
+      message => message,
+      gd
+    );
+    gd.JsPlatform.get().addNewExtension(physics2Extension);
+    physics2Extension.delete();
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    try {
+      const authoringCatalog = buildProjectInstructionCatalog(project);
+      const deprecatedCatalog = buildProjectDeprecatedInstructionCatalog(
+        project
+      );
+      const completeCatalog = mergeProjectInstructionCatalogs(
+        authoringCatalog,
+        deprecatedCatalog
+      );
+      const instruction = completeCatalog.actions.find(
+        ({ type }) => type === 'Physics2::Remove joint'
+      );
+      expect(instruction).toBeDefined();
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Physics2::Remove joint' },
+              parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+            },
+          ],
+        },
+      ]);
+      const dsl = convertLegacyEventsJsonToIfDo(input, {
+        formatInstruction: createCatalogInstructionFormatter(completeCatalog),
+      });
+      const output = compileIfDoToLegacyEventsJson(dsl, {
+        resolveInstruction: createCatalogInstructionResolver(completeCatalog),
+      });
+
+      expect(dsl).toContain('do "Physics2::Remove joint"');
+      expect(dsl).not.toContain('@exact');
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension('Physics2');
+    }
+  });
+
   test('rejects the removed @ catalog prefix', () => {
     expect(() =>
       compileIfDoToLegacyEventsJson('do @Network::Send url="x" body="y"\n', {
@@ -177,6 +266,11 @@ describe('project IfDo instruction catalog', () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
     const catalog = buildProjectInstructionCatalog(project);
+    const deprecatedCatalog = buildProjectDeprecatedInstructionCatalog(project);
+    const serializationCatalog = mergeProjectInstructionCatalogs(
+      catalog,
+      deprecatedCatalog
+    );
     const serialized = serializeProjectInstructionCatalog(catalog);
     const deprecatedActionTypes = new Set(
       enumerateAllInstructions(false, project, (null: any), {
@@ -227,6 +321,29 @@ describe('project IfDo instruction catalog', () => {
       )
     ).toBe(false);
     expect(
+      serializationCatalog.actions.some(({ type }) =>
+        deprecatedActionTypes.has(type)
+      ) ||
+        serializationCatalog.conditions.some(({ type }) =>
+          deprecatedConditionTypes.has(type)
+        )
+    ).toBe(true);
+    expect(
+      deprecatedCatalog.actions.some(({ type }) =>
+        catalog.actions.some(entry => entry.type === type)
+      )
+    ).toBe(false);
+    expect(
+      deprecatedCatalog.conditions.some(({ type }) =>
+        catalog.conditions.some(entry => entry.type === type)
+      )
+    ).toBe(false);
+    expect(
+      deprecatedCatalog.authoring.rules.some(rule =>
+        rule.startsWith('Never use this catalog to construct new events')
+      )
+    ).toBe(true);
+    expect(
       [...catalog.actions, ...catalog.conditions, ...catalog.expressions].some(
         entry => entry.deprecationMessage !== undefined
       )
@@ -241,10 +358,10 @@ describe('project IfDo instruction catalog', () => {
       catalog.expressions.some(({ type }) => type === 'TextObject::String')
     ).toBe(false);
     expect(catalog.authoring.catalogConditionSyntax).toBe(
-      'if InstructionType dslName="exact serialized operand"'
+      'if InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)'
     );
     expect(catalog.authoring.catalogActionSyntax).toBe(
-      'do InstructionType dslName="exact serialized operand"'
+      'do InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)'
     );
     expect(
       catalog.authoring.rules.some(rule =>
@@ -320,14 +437,18 @@ describe('project IfDo instruction catalog', () => {
       },
     ]);
     const compatibilityDsl = convertLegacyEventsJsonToIfDo(compatibilityInput, {
-      formatInstruction: createCatalogInstructionFormatter(catalog),
+      formatInstruction: createCatalogInstructionFormatter(
+        serializationCatalog
+      ),
     });
-    expect(compatibilityDsl).toContain('@exact');
+    expect(compatibilityDsl).not.toContain('@exact');
     expect(
       areLegacyEventsEquivalent(
         compatibilityInput,
         compileIfDoToLegacyEventsJson(compatibilityDsl, {
-          resolveInstruction: createCatalogInstructionResolver(catalog),
+          resolveInstruction: createCatalogInstructionResolver(
+            serializationCatalog
+          ),
         })
       )
     ).toBe(true);

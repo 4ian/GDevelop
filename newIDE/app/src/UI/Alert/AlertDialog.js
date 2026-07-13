@@ -13,6 +13,7 @@ type Props = {|
   open: boolean,
   title: MessageDescriptor,
   message: MessageDescriptor,
+  details?: string,
   onDismiss: () => void,
   dismissButtonLabel?: MessageDescriptor,
 |};
@@ -39,13 +40,33 @@ function AlertDialog(props: Props): React.Node {
               onClick={props.onDismiss}
             />,
           ]}
-          maxWidth="xs"
+          maxWidth={props.details ? 'sm' : 'xs'}
           onRequestClose={props.onDismiss}
           onApply={props.onDismiss}
         >
-          <Text>
-            <MarkdownText translatableSource={props.message} isStandaloneText />
-          </Text>
+          <>
+            <Text>
+              <MarkdownText
+                translatableSource={props.message}
+                isStandaloneText
+              />
+            </Text>
+            {props.details ? (
+              <>
+                <Text size="body-small" style={{ fontWeight: 'bold' }}>
+                  <Trans>Root cause</Trans>
+                </Text>
+                <Text
+                  size="body-small"
+                  allowSelection
+                  allowBrowserAutoTranslate={false}
+                  style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+                >
+                  {props.details}
+                </Text>
+              </>
+            ) : null}
+          </>
         </Dialog>
       )}
     </I18n>

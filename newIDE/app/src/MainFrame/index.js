@@ -399,10 +399,26 @@ const findStorageProviderFor = (
   storageProviders: Array<StorageProvider>,
   fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
 ): ?StorageProvider => {
-  const { storageProviderName } = fileMetadataAndStorageProviderName;
-  const storageProvider = storageProviders.filter(
+  const {
+    storageProviderName,
+    fileMetadata,
+  } = fileMetadataAndStorageProviderName;
+  let storageProvider = storageProviders.filter(
     storageProvider => storageProvider.internalName === storageProviderName
   )[0];
+
+  // Older or interrupted project-creation flows could persist a recent local
+  // file without its provider name. Recover only unambiguous absolute local
+  // paths; other missing/unknown providers must still surface an error.
+  const isAbsoluteLocalPath = /^(?:[a-zA-Z]:[\\/]|[\\/]{2}|\/)/.test(
+    fileMetadata.fileIdentifier
+  );
+  if (!storageProvider && !storageProviderName && isAbsoluteLocalPath) {
+    storageProvider = storageProviders.find(
+      provider =>
+        provider.internalName === localFileStorageProviderInternalName
+    );
+  }
 
   if (!storageProvider) {
     showErrorBox({
@@ -2075,7 +2091,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       setIsProjectOpening(true);
     },
     getStorageProviderOperations,
-    getStorageProvider,
     afterCreatingProject: async ({
       project,
       editorTabs,
@@ -2141,6 +2156,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         currentFileMetadata: fileMetadata,
       }));
     },
+    ensureProjectExtensionsLoaded:
+      eventsFunctionsExtensionsState.ensureLoadFinished,
     ensureResourcesAreMoved,
     onGameRegistered: gamesList.fetchGames,
   });

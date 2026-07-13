@@ -203,6 +203,7 @@ MyGame/
 
   .gdevelop/
     instructions-catalog.json
+    deprecated-instructions-catalog.json
     settings-catalog.json
     layout-catalog.json
     state.json
@@ -256,6 +257,14 @@ both; the two files remain independent unless both are listed in
   Editor-hidden instructions (which the events editor treats as deprecated),
   instructions with deprecation messages, and hidden or deprecated expressions
   are excluded so AI-authored events cannot select APIs that produce warnings.
+- `.gdevelop/deprecated-instructions-catalog.json`, regenerated alongside the
+  authoring catalog on every manual project save. It contains only valid
+  deprecated or hidden compatibility instructions excluded from
+  `instructions-catalog.json`. The editor merges both catalogs in memory for
+  lossless `.events` conversion. An AI may consult the deprecated catalog only
+  to understand a legacy project or make a targeted edit to a deprecated
+  instruction already present there. It must never use this catalog to
+  construct new events or introduce another deprecated instruction.
 - `.gdevelop/settings-catalog.json`, regenerated on every manual project save.
   It describes the managed settings file kinds and ownership rules, the
   project components that currently own settings, and the non-hidden object,
@@ -319,11 +328,11 @@ are defined by [gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md).
 
 The three source extensions have non-overlapping responsibilities:
 
-| Extension   | Allowed content                                                                                        | Forbidden content                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Extension   | Allowed content                                                                                                                                     | Forbidden content                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `.settings` | TOML identity, metadata, signatures, per-object definitions and their behaviors/variables/effects, local ordering, and runtime/editor configuration | IfDo statements, instance placement, layer ordering, spatial layout payloads, and references to other settings files |
-| `.layout`   | Layout DSL instances, layers, positions, bounds/dimensions, background, and editor-canvas state         | TOML, object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings       |
-| `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions        | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration |
+| `.layout`   | Layout DSL instances, layers, positions, bounds/dimensions, background, and editor-canvas state                                                     | TOML, object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings       |
+| `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions                                                     | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration         |
 
 The loader rejects a file containing content owned by another extension. It
 does not merge duplicated configuration from `.events` or `.layout` files.
@@ -1319,10 +1328,10 @@ Every extension, prefab, or behavior function `.events` file contains only
 IfDo DSL event code. Complete function identity and settings are stored by its
 owner:
 
-| Function owner | Complete metadata location                                         |
-| -------------- | ------------------------------------------------------------------ |
-| Extension      | `functions/<Function>/function.settings`                           |
-| Prefab         | `prefabs/<Prefab>/functions/<Function>/function.settings` |
+| Function owner | Complete metadata location                                    |
+| -------------- | ------------------------------------------------------------- |
+| Extension      | `functions/<Function>/function.settings`                      |
+| Prefab         | `prefabs/<Prefab>/functions/<Function>/function.settings`     |
 | Behavior       | `behaviors/<Behavior>/functions/<Function>/function.settings` |
 
 Example extension function body:
@@ -1441,21 +1450,21 @@ project.settings
 
 ### 13.2 Exact container mapping
 
-| New source                                                              | Legacy destination                                                                                  |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `project.settings` ordinary payload                                     | Project root excluding resources, global config, global object definitions, and four split arrays    |
-| Flat root `objects/*.settings`                                          | Project root `objects[]`; each `folder` array produces only the transient editor folder tree          |
-| `resources.settings` local root                                         | Project root `resources` object after removing format-only markers                                   |
-| `config.settings` `[settings]`                                          | Project root `globalConfig` object without adding or removing user keys                              |
+| New source                                                                 | Legacy destination                                                                                                          |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `project.settings` ordinary payload                                        | Project root excluding resources, global config, global object definitions, and four split arrays                           |
+| Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
+| `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
+| `config.settings` `[settings]`                                             | Project root `globalConfig` object without adding or removing user keys                                                     |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
-| `external.settings` event entry + external `.events`                    | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                               |
-| `external.settings` layout entry + external `.layout`                   | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                              |
-| `extension.settings` + children                                         | One `eventsFunctionsExtensions[]` item                                                              |
-| Physical extension component directories + per-component `order`       | Extension functions, prefabs, and behaviors in deterministic order                                  |
-| `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events` | One extension `eventsFunctions[]` entry                                                             |
-| `prefabs/<P>/prefab.settings` + flat object/function settings + layouts | Extension `eventsBasedObjects[]` |
-| `behaviors/<B>/behavior.settings` + flat function settings              | Extension `eventsBasedBehaviors[]`                                                                  |
-| Prefab/behavior `functions/<F>/function.settings` + sibling `<F>.events` | One owner `EventsFunction`; `folder` reconstructs transient editor grouping |
+| `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
+| `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
+| `extension.settings` + children                                            | One `eventsFunctionsExtensions[]` item                                                                                      |
+| Physical extension component directories + per-component `order`           | Extension functions, prefabs, and behaviors in deterministic order                                                          |
+| `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events`    | One extension `eventsFunctions[]` entry                                                                                     |
+| `prefabs/<P>/prefab.settings` + flat object/function settings + layouts    | Extension `eventsBasedObjects[]`                                                                                            |
+| `behaviors/<B>/behavior.settings` + flat function settings                 | Extension `eventsBasedBehaviors[]`                                                                                          |
+| Prefab/behavior `functions/<F>/function.settings` + sibling `<F>.events`   | One owner `EventsFunction`; `folder` reconstructs transient editor grouping                                                 |
 
 ### 13.3 Two-pass catalog bootstrap
 
@@ -1551,30 +1560,30 @@ Only dirty owned files are serialized. Editing
 `scenes/Main/Main.events` should not rewrite `scene.settings`, `Main.layout`,
 unrelated extensions, or `project.settings`.
 
-| Editor mutation                                                                                          | Source file marked dirty                      |
-| -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Project properties, global object groups, and global variables                                           | `project.settings`                            |
-| A global object definition or its editor-folder grouping                                                 | `objects/<Object>.settings` (`folder`) |
-| Resource entries, origins, metadata, and resource folders                                                | `resources.settings`                          |
-| Arbitrary global configuration                                                                          | `config.settings`                             |
-| Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data    | The scene `scene.settings`                    |
-| A scene object definition, attached behaviors, or editor-folder grouping                                | `scenes/<Scene>/objects/<Object>.settings` (`folder`) |
-| Scene instances, layers, background, and scene-editor canvas/layout state                                | The scene `.layout`                           |
-| Scene events                                                                                             | The scene `.events`                           |
-| Extension metadata, dependencies, variables, and extension order                                        | `extension.settings`                          |
-| Extension-level function metadata/signature                                                              | That function subfolder's `function.settings` |
-| Extension function event body                                                                            | That function subfolder's `<Function>.events` |
-| Prefab declaration, flat property descriptors, groups, variables, and variants                          | `prefab.settings`                             |
-| A default/variant prefab child object definition, attached behaviors, or editor-folder grouping | The corresponding flat prefab object `.settings` file (`folder`) |
-| Prefab default or variant instances, layers, spatial bounds, and editor layout state                     | The corresponding prefab `.layout`            |
-| Prefab function metadata/signature or function-folder grouping                                           | Its flat `functions/<Function>/function.settings` (`folder`) |
-| Prefab function event body                                                                               | The sibling `<Function>.events`               |
-| Behavior declaration, flat property descriptors, and variables                                          | `behavior.settings`                           |
-| Behavior function metadata/signature or function-folder grouping                                         | Its flat `functions/<Function>/function.settings` (`folder`) |
-| Behavior function event body                                                                             | The sibling `<Function>.events`               |
-| External event/layout identity, linked scene, source URI, and order                                      | `external.settings`                           |
-| External event body                                                                                      | Its `.events`                                 |
-| External layout instances/editor layout data                                                             | Its `.layout`                                 |
+| Editor mutation                                                                                       | Source file marked dirty                                         |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Project properties, global object groups, and global variables                                        | `project.settings`                                               |
+| A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
+| Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
+| Arbitrary global configuration                                                                        | `config.settings`                                                |
+| Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
+| A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
+| Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
+| Scene events                                                                                          | The scene `.events`                                              |
+| Extension metadata, dependencies, variables, and extension order                                      | `extension.settings`                                             |
+| Extension-level function metadata/signature                                                           | That function subfolder's `function.settings`                    |
+| Extension function event body                                                                         | That function subfolder's `<Function>.events`                    |
+| Prefab declaration, flat property descriptors, groups, variables, and variants                        | `prefab.settings`                                                |
+| A default/variant prefab child object definition, attached behaviors, or editor-folder grouping       | The corresponding flat prefab object `.settings` file (`folder`) |
+| Prefab default or variant instances, layers, spatial bounds, and editor layout state                  | The corresponding prefab `.layout`                               |
+| Prefab function metadata/signature or function-folder grouping                                        | Its flat `functions/<Function>/function.settings` (`folder`)     |
+| Prefab function event body                                                                            | The sibling `<Function>.events`                                  |
+| Behavior declaration, flat property descriptors, and variables                                        | `behavior.settings`                                              |
+| Behavior function metadata/signature or function-folder grouping                                      | Its flat `functions/<Function>/function.settings` (`folder`)     |
+| Behavior function event body                                                                          | The sibling `<Function>.events`                                  |
+| External event/layout identity, linked scene, source URI, and order                                   | `external.settings`                                              |
+| External event body                                                                                   | Its `.events`                                                    |
+| External layout instances/editor layout data                                                          | Its `.layout`                                                    |
 
 A function metadata/signature edit rewrites only its owning `.settings` file
 unless a rename also changes the subfolder or `.events` filename. The existing
@@ -1608,17 +1617,26 @@ The writer:
    parameter `index` fields already implied by their parent arrays are
    excluded. The catalogs are deterministically ordered and written only after
    source verification succeeds.
-7. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
+7. Regenerates `.gdevelop/deprecated-instructions-catalog.json` alongside the
+   normal instruction catalog. It stores only deprecated/hidden compatibility
+   entries. Serialization and loading merge both catalogs in memory for
+   lossless legacy conversion. AI authoring uses only the filtered
+   `.gdevelop/instructions-catalog.json`; the deprecated catalog may be read
+   only to understand or minimally edit deprecated instructions already found
+   in a legacy project, never to construct new events.
+8. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
    an ignored compatibility snapshot.
-8. Updates ignored state hashes.
+9. Updates ignored state hashes.
 
-The generated catalog and IfDo compiler share one named-instruction contract.
+The generated authoring and deprecated compatibility catalogs share one
+named-instruction contract.
 Every instruction uses its exact catalog type and each parameter's exact
 `dslName`; values are JSON strings containing the serialized operand. The DSL
 does not hardcode instruction aliases. This lets an AI edit `.events` directly without MCP
-instruction-discovery or event-writing tools. The loader reads the ignored
-catalog to resolve these named forms. Missing, invalid, or stale catalog entries
-produce diagnostics rather than guessed positional arrays.
+instruction-discovery or event-writing tools. The loader merges the two
+instruction catalogs to resolve all existing named forms. Missing,
+invalid, or stale catalog entries produce diagnostics rather than guessed
+positional arrays.
 
 AI integrations treat the project files as the authoring API. MCP exposure is
 limited to editor-state queries and preview/runtime debugging; it does not
@@ -2028,8 +2046,8 @@ A conforming implementation must satisfy all of the following:
    trees.
 10. Preview/export composes current legacy data only at the compatibility boundary.
 11. Every supported serializer event and instruction shape has a typed IfDo
-   representation; unknown or newer shapes stop migration before any source is
-   committed.
+    representation; unknown or newer shapes stop migration before any source is
+    committed.
 12. Paths, ordering, formatting, and writes are deterministic.
 13. No managed save deletes unrecognized user files.
 14. A full new-source -> legacy -> current-project verification succeeds before migration is considered complete.

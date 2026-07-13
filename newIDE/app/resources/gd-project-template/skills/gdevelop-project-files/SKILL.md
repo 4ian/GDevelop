@@ -102,7 +102,15 @@ generated compatibility/runtime output, not multi-file source.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
-  there.
+  there. Use `instructions-catalog.json` as the only source for constructing
+  new event instructions. `deprecated-instructions-catalog.json` exists only
+  so you can understand legacy projects and make targeted edits to deprecated
+  instructions already present in their `.events` files. Never select an
+  instruction from the deprecated catalog when constructing new events, and
+  never introduce a new use of a deprecated instruction. Preserve or minimally
+  edit an existing deprecated instruction only when the user's legacy project
+  requires it; use a current replacement from `instructions-catalog.json`
+  whenever the edit can migrate it safely.
 
 Preserve component order, stable names, existing unknown fields, and ownership
 boundaries. Make the smallest coherent patch. When adding a component, create
@@ -157,6 +165,7 @@ extensions/<Extension>/behaviors/<Behavior>/behavior.settings
 extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings
 extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.events
 .gdevelop/instructions-catalog.json
+.gdevelop/deprecated-instructions-catalog.json # legacy read/edit only; never for new events
 .gdevelop/settings-catalog.json
 .gdevelop/layout-catalog.json
 ```

@@ -118,6 +118,7 @@ function ConfirmProvider({ children }: Props): React.Node {
           dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
           title={alertDialogConfig.title}
           message={alertDialogConfig.message}
+          details={alertDialogConfig.details}
         />
       )}
       {confirmDialogConfig && (

@@ -40,6 +40,13 @@ rg '"type":"CollisionNP"' .gdevelop/instructions-catalog.json
 rg 'SetNumberObjectVariable' .gdevelop/instructions-catalog.json
 ```
 
+`.gdevelop/deprecated-instructions-catalog.json` is not an authoring source.
+Consult it only when a legacy project's existing `.events` code already uses a
+deprecated instruction and you must understand or minimally edit that exact
+instruction. Never use a deprecated-catalog entry to construct a new event or
+introduce another deprecated instruction. Prefer a current replacement from
+`instructions-catalog.json` whenever a safe migration is part of the edit.
+
 Use only symbols and instructions available to the owning context. When the
 catalog appears stale, save through the editor to regenerate it before
 authoring events.
@@ -47,12 +54,14 @@ authoring events.
 ## Catalog instructions
 
 Write the exact catalog `type` after `if`, `or`, or `do`. Never prefix an
-instruction type with `@` and never replace it with a prose alias:
+instruction type with `@` and never replace it with a prose alias. The rare
+exact type containing whitespace is written as a JSON string:
 
 ```events
 if SceneJustBegins
 if CollisionNP first_object="Player" second_object="Enemy"
 do Delete object="Enemy"
+do "Physics2::Remove joint" object="Object" behavior="PhysicsBehavior" joint_id="MouseJointID"
 ```
 
 Use every required parameter exactly once by its catalog `dslName`. Parameter

@@ -14,8 +14,10 @@ import {
   validateGameUri,
 } from '../MultiFileProjectFormat';
 import {
+  PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   createCatalogInstructionResolver,
+  mergeProjectInstructionCatalogs,
   validateProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 
@@ -450,16 +452,26 @@ export const openMultiFileProject = async (
   const ignoreInstructionCatalog =
     effectiveOptions.ignoreInstructionCatalog === true;
   delete effectiveOptions.ignoreInstructionCatalog;
-  const catalogPath = path.join(
+  const authoringCatalogPath = path.join(
     projectRoot,
     ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   );
-  if (!ignoreInstructionCatalog && fs.existsSync(catalogPath)) {
+  const deprecatedCatalogPath = path.join(
+    projectRoot,
+    ...PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  );
+  if (!ignoreInstructionCatalog && fs.existsSync(authoringCatalogPath)) {
     let catalog;
     try {
       catalog = validateProjectInstructionCatalog(
-        JSON.parse(await readBoundedUtf8(catalogPath))
+        JSON.parse(await readBoundedUtf8(authoringCatalogPath))
       );
+      if (fs.existsSync(deprecatedCatalogPath)) {
+        const deprecatedCatalog = validateProjectInstructionCatalog(
+          JSON.parse(await readBoundedUtf8(deprecatedCatalogPath))
+        );
+        catalog = mergeProjectInstructionCatalogs(catalog, deprecatedCatalog);
+      }
     } catch (error) {
       throw new MultiFileProjectError(
         'MULTIFILE_INVALID_INSTRUCTION_CATALOG',

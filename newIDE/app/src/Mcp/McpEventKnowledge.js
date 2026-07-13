@@ -1981,9 +1981,11 @@ const catalogExpression = (summary: Object, scope: Object): Object => {
 export const buildCompleteProjectInstructionCatalog = ({
   project,
   i18n,
+  includeDeprecatedAndHidden = false,
 }: {|
   project: gdProject,
   i18n?: any,
+  includeDeprecatedAndHidden?: boolean,
 |}): Object => {
   const collectInstructions = (isCondition: boolean) => {
     const entriesByType: Map<string, Object> = new Map();
@@ -1993,7 +1995,11 @@ export const buildCompleteProjectInstructionCatalog = ({
       // The events editor treats every hidden instruction as deprecated and
       // renders it with the [DEPRECATED] warning, including older APIs such as
       // TextObject::String that do not carry a deprecation message.
-      if (isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)) return;
+      if (
+        !includeDeprecatedAndHidden &&
+        isDeprecatedOrHiddenInstructionMetadata(instruction.metadata)
+      )
+        return;
       if (entriesByType.has(instruction.type)) return;
       const summary = summarizeInstructionMetadata({
         type: instruction.type,
@@ -2014,7 +2020,11 @@ export const buildCompleteProjectInstructionCatalog = ({
   const expressionsByKey: Map<string, Object> = new Map();
   enumerateAllExpressions('', project, (i18n || null: any)).forEach(
     expression => {
-      if (isDeprecatedExpressionMetadata(expression.metadata)) return;
+      if (
+        !includeDeprecatedAndHidden &&
+        isDeprecatedExpressionMetadata(expression.metadata)
+      )
+        return;
       const key = `${
         expression.type
       }\u0000${expression.metadata.getReturnType()}`;
@@ -2047,9 +2057,9 @@ export const buildCompleteProjectInstructionCatalog = ({
       preferredSyntax:
         'Use the exact instruction type and named parameters from this catalog. The DSL does not define hardcoded instruction aliases.',
       catalogConditionSyntax:
-        'if InstructionType dslName="exact serialized operand"',
+        'if InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)',
       catalogActionSyntax:
-        'do InstructionType dslName="exact serialized operand"',
+        'do InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)',
       eventScopes: {
         scene: 'Scene and external events',
         extensionFunction: 'Free extension function events',
@@ -2060,13 +2070,16 @@ export const buildCompleteProjectInstructionCatalog = ({
       },
       rules: [
         'Write catalog instruction types directly without an @ prefix.',
+        'Write an exact instruction type containing whitespace as a JSON string.',
         'Use each parameter dslName exactly as listed.',
         'Catalog-form argument values are JSON strings containing the exact GDevelop serialized operand.',
         'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',
         'Keep parameter expressions inside the JSON string, including embedded quotes where required.',
         'Use only entries compatible with the target event scope.',
         'Never write @exact. Use only instruction and expression types represented by this catalog.',
-        'Editor-hidden or deprecated instructions and expressions are intentionally excluded and must not be authored.',
+        includeDeprecatedAndHidden
+          ? 'This internal catalog is lossless serialization metadata and is not an AI authoring catalog.'
+          : 'Editor-hidden or deprecated instructions and expressions are intentionally excluded and must not be authored.',
       ],
     },
     counts: {

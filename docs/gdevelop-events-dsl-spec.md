@@ -159,7 +159,7 @@ The following table maps the items visible in the GDevelop event menus to IfDo.
 | Else                    | `else` or `else if condition`                               |
 | For each object         | `for each Object`                                           |
 | For each child variable | `for each child variablePath as alias`                      |
-| Event group             | `@group "Name" ... @end group`                             |
+| Event group             | `@group "Name" ... @end group`                              |
 | JavaScript code         | `@js` ... `@end js`                                         |
 | Link external events    | `link external "Sheet Name"`                                |
 | Repeat                  | `repeat count`                                              |
@@ -1952,9 +1952,23 @@ events editor labels `[DEPRECATED]`), instructions carrying a deprecation
 message, and expressions hidden or marked deprecated are excluded so an AI
 cannot select APIs that the editor warns against.
 
+Lossless conversion is separate from AI authoring. The editor also generates
+`.gdevelop/deprecated-instructions-catalog.json` alongside the normal catalog.
+It contains only valid deprecated or hidden compatibility instructions needed
+to round-trip existing or imported projects. The compiler and formatter merge
+both catalogs in memory when saving and loading project sources. AI models may
+consult the deprecated catalog only to understand a legacy project or make a
+targeted edit to a deprecated instruction already present. They must never use
+it to construct new events or introduce another deprecated instruction; all
+new event logic must come from `.gdevelop/instructions-catalog.json`.
+
 Rules:
 
 - The exact instruction must exist in the catalog.
+- Write ordinary instruction types as bare tokens. If an exact catalog type
+  contains whitespace, write the type as a JSON string (for example,
+  `do "Physics2::Remove joint" ...`); the decoded string is the instruction
+  type and is not an alias.
 - Named arguments are required.
 - The model may not invent an instruction type.
 - Catalog instruction types never use an `@` prefix; `@` is reserved for
@@ -2387,8 +2401,8 @@ GDevelop event-sheet JSON or extension-function JSON
 | `if` / `or` / `do`                                     | Standard event                                   |
 | `else`                                                 | Else event                                       |
 | `>`                                                    | Child event in the parent event's event list     |
-| `@comment "text" ...`                                 | Comment event                                    |
-| `@group "name"` ... `@end group`                     | Event group                                      |
+| `@comment "text" ...`                                  | Comment event                                    |
+| `@group "name"` ... `@end group`                       | Event group                                      |
 | `for each Object`                                      | For Each Object event                            |
 | `for each child`                                       | For Each Child Variable event                    |
 | `repeat`                                               | Repeat event                                     |
@@ -2432,12 +2446,14 @@ source-only `while limit=` guard. The richer project-aware result below remains
 the editor integration API to build on top of this core.
 
 `options.formatInstruction` is the reverse boundary. The multi-file storage
-adapter builds both callbacks from the saved project instruction catalog, so a
+adapter builds both callbacks from the saved internal serialization instruction
+catalog, so a
 generic named catalog instruction compiles and decompiles without `@exact`.
-That catalog enumerates the non-deprecated authoring surface. Editor-hidden
-compatibility identifiers, instructions with deprecation messages, and hidden
-or deprecated expressions are omitted so AI authors cannot introduce entries
-that render with warning/deprecated styling into new event code.
+The separate AI catalog enumerates the non-deprecated authoring surface.
+Editor-hidden compatibility identifiers, instructions with deprecation
+messages, and hidden or deprecated expressions are omitted from the AI catalog
+so models cannot introduce entries that render with warning/deprecated styling
+into new event code.
 
 Suggested result:
 

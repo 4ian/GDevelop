@@ -447,11 +447,14 @@ export const openMultiFileProject = async (
 ): Promise<Object> => {
   const { projectRoot, files } = await readMultiFileSourceTree(entryPath);
   const effectiveOptions = { ...(options || {}) };
+  const ignoreInstructionCatalog =
+    effectiveOptions.ignoreInstructionCatalog === true;
+  delete effectiveOptions.ignoreInstructionCatalog;
   const catalogPath = path.join(
     projectRoot,
     ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   );
-  if (fs.existsSync(catalogPath)) {
+  if (!ignoreInstructionCatalog && fs.existsSync(catalogPath)) {
     let catalog;
     try {
       catalog = validateProjectInstructionCatalog(

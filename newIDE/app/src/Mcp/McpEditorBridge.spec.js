@@ -185,13 +185,20 @@ describe('McpEditorBridge', () => {
       path.join(os.tmpdir(), 'gdevelop-mcp-validate-project-files-')
     );
     const projectFile = path.join(temporaryDirectory, 'project.settings');
-    const project = new gd.Project();
+    const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Disk validation test');
     project.setProjectFile(projectFile);
     await writeMultiFileSourceTree({
       entryPath: projectFile,
       files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
     });
+    const catalogDirectory = path.join(temporaryDirectory, '.gdevelop');
+    fs.mkdirSync(catalogDirectory, { recursive: true });
+    fs.writeFileSync(
+      path.join(catalogDirectory, 'instructions-catalog.json'),
+      '{ stale and invalid catalog',
+      'utf8'
+    );
     const reloadProjectAndWait = jest.fn();
     const bridge = makeBridge({
       getProject: () => project,
@@ -212,6 +219,12 @@ describe('McpEditorBridge', () => {
         valid: true,
         validationMode: 'multi-file-disk-sources',
         projectFile,
+        catalogsRegenerated: true,
+        catalogs: expect.objectContaining({
+          instructions: expect.any(Object),
+          settings: expect.any(Object),
+          layouts: expect.any(Object),
+        }),
         generatedGameJson: expect.objectContaining({
           reconstructedInMemory: true,
           writtenToDisk: false,
@@ -219,6 +232,21 @@ describe('McpEditorBridge', () => {
         }),
       })
     );
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'instructions-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json')
+      )
+    ).toBe(true);
     expect(result.nextAction).toContain('reload_project');
   });
 
@@ -227,7 +255,7 @@ describe('McpEditorBridge', () => {
       path.join(os.tmpdir(), 'gdevelop-mcp-invalid-project-files-')
     );
     const projectFile = path.join(temporaryDirectory, 'project.settings');
-    const project = new gd.Project();
+    const project = gd.ProjectHelper.createNewGDJSProject();
     project.setProjectFile(projectFile);
     const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
     files['game://project.settings'] += '\ninvalid = [\n';

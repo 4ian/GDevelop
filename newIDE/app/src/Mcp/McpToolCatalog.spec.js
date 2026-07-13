@@ -139,7 +139,7 @@ describe('McpToolCatalog', () => {
     ).toEqual({ canCall: true });
   });
 
-  it('exposes validate_project_files as a no-input read-only validation gate', () => {
+  it('exposes validate_project_files as a no-input catalog-regenerating validation gate', () => {
     const tool = getMcpTools({
       allowWriteTools: false,
       allowCommandTools: false,
@@ -153,13 +153,14 @@ describe('McpToolCatalog', () => {
           additionalProperties: false,
         },
         annotations: expect.objectContaining({
-          readOnlyHint: true,
+          readOnlyHint: false,
           destructiveHint: false,
           idempotentHint: true,
         }),
       })
     );
     expect(tool.description).toContain('game.json');
+    expect(tool.description).toContain('regenerate all');
     expect(tool.description).toContain('before reload_project');
     expect(
       canCallMcpTool('validate_project_files', {

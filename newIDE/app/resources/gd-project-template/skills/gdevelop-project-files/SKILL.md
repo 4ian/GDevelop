@@ -282,9 +282,10 @@ loop, comment, and JavaScript metadata when editing existing sources.
 6. Call the no-input GDevelop MCP `validate_project_files` tool after the most
    recent source edit. Require `valid: true`; use its file URI, error code,
    line, column, and source excerpt to fix every reported settings, layout,
-   events, reference, or generated-project validation failure. Call it at least
-   once before calling `reload_project`; a failed validation does not satisfy
-   this gate.
+   events, reference, or generated-project validation failure. This call first
+   regenerates all three `.gdevelop` catalogs, then validates the sources using
+   the fresh instruction catalog. Call it at least once before calling
+   `reload_project`; a failed validation does not satisfy this gate.
 7. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
@@ -307,8 +308,9 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
-- Validating direct disk edits without changing editor memory by calling the
-  no-input `validate_project_files` tool before `reload_project`.
+- Regenerating all source catalogs and validating direct disk edits without
+  changing editor memory by calling the no-input `validate_project_files` tool
+  before `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
@@ -322,10 +324,11 @@ sync, or save tools for authoring.
 
 `validate_project_files` is a mandatory reload gate. In every direct-edit task,
 call it successfully with no inputs at least once after the most recent
-source-file edit and before `reload_project`. It reconstructs the generated
-`game.json` representation from the multi-file settings, layouts, and events
-without replacing editor memory. A later source edit invalidates the earlier
-validation receipt.
+source-file edit and before `reload_project`. It regenerates the instruction,
+settings, and layout catalogs first, then reconstructs the generated `game.json`
+representation from the multi-file settings, layouts, and events using the
+fresh instruction catalog without replacing editor memory. A later source edit
+invalidates the earlier validation receipt.
 
 `reload_project` remains a mandatory preview gate. Call it successfully only
 after the validation gate and before the first `launch_preview`. Never launch

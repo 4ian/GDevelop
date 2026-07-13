@@ -25,6 +25,7 @@ import {
   openMultiFileProject,
   readMultiFileSourceTree,
 } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -349,6 +350,9 @@ const errorResult = (message: string, details?: Object): McpToolResult => {
 const getProjectFilesValidationPhase = (code: ?string): string => {
   if (!code) return 'load-and-compose-project-files';
   if (code === 'MULTIFILE_INVALID_TOML') return 'parse-settings';
+  if (code === 'PROJECT_CATALOG_REGENERATION_FAILED') {
+    return 'regenerate-project-catalogs';
+  }
   if (code.startsWith('LAYOUT_')) return 'compile-layout';
   if (code.startsWith('IFDO_')) return 'compile-events';
   if (
@@ -361,9 +365,7 @@ const getProjectFilesValidationPhase = (code: ?string): string => {
   return 'compose-game-json';
 };
 
-const getErrorLocation = (
-  error: any
-): {| line: ?number, column: ?number |} => {
+const getErrorLocation = (error: any): {| line: ?number, column: ?number |} => {
   let line = typeof error.line === 'number' ? error.line : null;
   let column = typeof error.column === 'number' ? error.column : null;
   const message = error && error.message ? String(error.message) : '';
@@ -427,8 +429,7 @@ const getProjectFilesValidationDiagnostic = (
     severity: 'error',
     phase: getProjectFilesValidationPhase(code),
     code,
-    errorType:
-      error && typeof error.name === 'string' ? error.name : 'Error',
+    errorType: error && typeof error.name === 'string' ? error.name : 'Error',
     message:
       error && error.message
         ? String(error.message)
@@ -5006,6 +5007,42 @@ const callMcpTool = async ({
     }
 
     try {
+      const projectRoot = path ? path.dirname(projectFile) : null;
+      if (!projectRoot) {
+        throw new Error(
+          'Filesystem path support is unavailable, so project catalogs cannot be regenerated.'
+        );
+      }
+
+      // Bootstrap without the potentially stale generated instruction catalog,
+      // then regenerate every catalog from the disk-source project. Re-open the
+      // sources afterward so final event compilation uses the fresh catalog.
+      const catalogSource = await openMultiFileProject(projectFile, {
+        ignoreInstructionCatalog: true,
+      });
+      const catalogProject = new gd.ProjectHelper.createNewGDJSProject();
+      let catalogs;
+      try {
+        try {
+          unserializeFromJSObject(catalogProject, catalogSource);
+          catalogs = await writeProjectSourceCatalogs(
+            catalogProject,
+            projectRoot
+          );
+        } catch (error) {
+          const catalogError: any = new Error(
+            `Unable to regenerate the project source catalogs: ${
+              error && error.message ? error.message : String(error)
+            }`
+          );
+          catalogError.name = 'ProjectCatalogRegenerationError';
+          catalogError.code = 'PROJECT_CATALOG_REGENERATION_FAILED';
+          throw catalogError;
+        }
+      } finally {
+        catalogProject.delete();
+      }
+
       const serializedProject = await openMultiFileProject(projectFile);
       const generatedJson = JSON.stringify(serializedProject, null, 2);
       const generatedGameJson = {
@@ -5027,6 +5064,8 @@ const callMcpTool = async ({
             phase: 'validate-generated-game-json',
             validationMode: 'multi-file-disk-sources',
             projectFile,
+            catalogsRegenerated: true,
+            catalogs,
             generatedGameJson,
             errors: validation.errors || [],
             validation,
@@ -5037,11 +5076,13 @@ const callMcpTool = async ({
         ...validation,
         validationMode: 'multi-file-disk-sources',
         projectFile,
+        catalogsRegenerated: true,
+        catalogs,
         generatedGameJson,
         nextAction:
           'Project disk sources are valid. You may now call reload_project to load them into the editor.',
         note:
-          'Loaded every referenced multi-file source and reconstructed the legacy game.json representation in memory. The editor project and disk files were not modified.',
+          'Regenerated all project source catalogs, loaded every referenced multi-file source again using the fresh instruction catalog, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(

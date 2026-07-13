@@ -3781,10 +3781,10 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_project_files',
     description:
-      'Load the current local multi-file project from project.settings, reconstruct its legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, does not reload the editor or write files, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
+      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
     inputSchema: noInputSchema,
     annotations: {
-      readOnlyHint: true,
+      readOnlyHint: false,
       destructiveHint: false,
       idempotentHint: true,
       openWorldHint: false,
@@ -6881,7 +6881,6 @@ export const getCapabilitiesSummary = (
       'gdevelop_capabilities',
       'gdevelop_refresh_tool_catalog',
       'validate_current_project_json',
-      'validate_project_files',
     ],
     'Read scene / objects / events': [
       'read_serialized_scene',
@@ -6967,6 +6966,7 @@ export const getCapabilitiesSummary = (
       'set_first_layout',
     ],
     'Preview debugging': [
+      'validate_project_files',
       'reload_project',
       'launch_preview',
       'wait_until_preview_ready',

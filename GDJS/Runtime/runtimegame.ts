@@ -919,10 +919,6 @@ namespace gdjs {
       }
     }
 
-    getDebuggerClient(): gdjs.AbstractDebuggerClient | null {
-      return this._debuggerClient;
-    }
-
     /** Returns the breakpoint manager, creating it on first use. */
     getBreakpointManager(): gdjs.DebuggerBreakpointManager {
       if (!this._breakpointManager) {

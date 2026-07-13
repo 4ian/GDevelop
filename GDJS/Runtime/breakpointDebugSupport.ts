@@ -34,14 +34,14 @@ namespace gdjs {
   /** A breakpoint hit frozen on a `debugger;` statement. */
   export type BreakpointHit = {
     functionId: string;
-    eventIndex: number;
+    eventId: string;
     sceneName: string;
   };
 
-  /** Breakpoints set on one events function. */
+  /** Breakpoints set on one events function, identified by event UUIDs. */
   export type BreakpointEntry = {
     functionId: string;
-    eventIndices: number[];
+    eventIds: string[];
   };
 
   /**
@@ -58,15 +58,19 @@ namespace gdjs {
      * Without it the generated `debugger;` is a no-op, so the FSM is skipped. */
     private _cdpAttached: boolean;
 
-    /** Event indices that should pause, keyed by events-function id. */
-    private _breakpointIndices: Map<string, Set<number>> | null = null;
+    /** Event UUIDs that should pause, keyed by events-function id. */
+    private _breakpointIds: Map<string, Set<string>> | null = null;
 
     // Stepping FSM, armed via programStepping / schedulePauseAtNextEvent.
     private _stepNextEvent = false;
     private _stepPassedCurrentEvent = false;
-    private _stepCurrentEventIndex = -1;
+    private _stepCurrentEventId = '';
     private _stepCurrentFunctionId = '';
     private _stepStartDepth = -1;
+    /** Scene the current step was armed in. If a different scene starts running
+     * (e.g. a "Change scene" action fired), the step can never complete, so it
+     * is abandoned instead of swallowing the new scene's breakpoints. */
+    private _stepSceneName = '';
 
     /** Stack of active events-function ids, used for stepping depth checks. */
     private _functionStack: string[] = [];
@@ -75,16 +79,19 @@ namespace gdjs {
 
     /** Container running when the breakpoint fired (the scene, or a
      * sub-container for custom-object methods) — tells the dump builder where
-     * to read object instances. Union because `RuntimeScene` widens
-     * `getProfiler()` and isn't assignable to the abstract base. */
-    private _lastBpCallingContainer:
-      | gdjs.RuntimeInstanceContainer
-      | gdjs.RuntimeScene
-      | null = null;
+     * to read object instances. */
+    private _lastBpCallingContainer: gdjs.RuntimeInstanceContainer | null = null;
 
     constructor(game: gdjs.RuntimeGame) {
       this._game = game;
       this._cdpAttached = !!game._options.cdpDebuggerEnabled;
+    }
+
+    /** Whether a function id denotes extension (free-function or custom-object
+     * method) generated code, as opposed to top-level scene code. Centralized
+     * so the stepping FSM has a single place that knows the namespace shape. */
+    private static _isExtensionScope(functionId: string): boolean {
+      return functionId.startsWith('gdjs.evtsExt__');
     }
 
     pushBreakpointFunction(functionId: string): void {
@@ -102,7 +109,7 @@ namespace gdjs {
      */
     checkBreakpoint(
       functionId: string,
-      eventIndex: number,
+      eventId: string,
       container: gdjs.RuntimeInstanceContainer
     ): boolean {
       if (!this._cdpAttached) return false;
@@ -114,7 +121,8 @@ namespace gdjs {
           if (!this._stepCurrentFunctionId) {
             // Step-over with no pinned event (game was running): stop only at
             // scene-level events, not deep inside extensions.
-            if (functionId.startsWith('gdjs.evtsExt__')) return false;
+            if (DebuggerBreakpointManager._isExtensionScope(functionId))
+              return false;
             this._stepStartDepth = depth;
           } else if (functionId === this._stepCurrentFunctionId) {
             this._stepStartDepth = depth;
@@ -132,14 +140,14 @@ namespace gdjs {
         }
 
         // Step-over from a fresh pause with no pinned event to step past.
-        if (this._stepCurrentEventIndex < 0) {
+        if (!this._stepCurrentEventId) {
           this._stepNextEvent = false;
-          return this._triggerBreakpoint(functionId, eventIndex, container);
+          return this._triggerBreakpoint(functionId, eventId, container);
         }
 
         if (
           functionId === this._stepCurrentFunctionId &&
-          eventIndex === this._stepCurrentEventIndex
+          eventId === this._stepCurrentEventId
         ) {
           this._stepPassedCurrentEvent = true;
           return false;
@@ -147,17 +155,17 @@ namespace gdjs {
         if (this._stepPassedCurrentEvent) {
           this._stepNextEvent = false;
           this._stepPassedCurrentEvent = false;
-          this._stepCurrentEventIndex = -1;
-          return this._triggerBreakpoint(functionId, eventIndex, container);
+          this._stepCurrentEventId = '';
+          return this._triggerBreakpoint(functionId, eventId, container);
         }
         return false;
       }
 
-      const bpMap = this._breakpointIndices;
+      const bpMap = this._breakpointIds;
       if (bpMap) {
         const fnSet = bpMap.get(functionId);
-        if (fnSet && fnSet.has(eventIndex)) {
-          return this._triggerBreakpoint(functionId, eventIndex, container);
+        if (fnSet && fnSet.has(eventId)) {
+          return this._triggerBreakpoint(functionId, eventId, container);
         }
       }
       return false;
@@ -165,14 +173,14 @@ namespace gdjs {
 
     private _triggerBreakpoint(
       functionId: string,
-      eventIndex: number,
+      eventId: string,
       container: gdjs.RuntimeInstanceContainer
     ): boolean {
       // Hit info only; the variable dump is built later by Electron main over
       // CDP, once V8 is paused.
       this._lastBreakpoint = {
         functionId,
-        eventIndex,
+        eventId,
         sceneName: container.getScene().getName(),
       };
       this._lastBpCallingContainer = container;
@@ -182,15 +190,29 @@ namespace gdjs {
     /**
      * Called after a scene's events run. If stepping was armed but the target
      * event wasn't reached this frame, reset so stepping wraps to the next one.
+     * @param sceneName Name of the scene whose events just ran.
      */
-    onFrameEnd(): void {
+    onFrameEnd(sceneName: string): void {
       if (!this._stepNextEvent) return;
-      if (this._stepCurrentFunctionId.startsWith('gdjs.evtsExt__')) {
+
+      // The scene the step was pinned to is no longer running (scene switch):
+      // abandon stepping so the new scene's own breakpoints keep working.
+      if (this._stepSceneName && sceneName !== this._stepSceneName) {
+        this._stepNextEvent = false;
+        this._stepPassedCurrentEvent = false;
+        this._stepCurrentEventId = '';
+        this._stepCurrentFunctionId = '';
+        this._stepStartDepth = -1;
+        this._stepSceneName = '';
+        return;
+      }
+
+      if (DebuggerBreakpointManager._isExtensionScope(this._stepCurrentFunctionId)) {
         // Extension scope: stop stepping and let the game resume.
         this._stepNextEvent = false;
       } else {
         // Scene scope: reset to "stop at first event" on the next frame.
-        this._stepCurrentEventIndex = -1;
+        this._stepCurrentEventId = '';
         this._stepStartDepth = -1;
       }
     }
@@ -198,14 +220,14 @@ namespace gdjs {
     // --- Commands issued by the IDE over CDP, through gdjs.BreakpointDebugger.* ---
 
     setBreakpoints(entries: gdjs.BreakpointEntry[]): void {
-      const map = new Map<string, Set<number>>();
+      const map = new Map<string, Set<string>>();
       for (let i = 0; i < entries.length; i++) {
         const e = entries[i];
-        if (e && e.functionId && e.eventIndices && e.eventIndices.length > 0) {
-          map.set(e.functionId, new Set(e.eventIndices));
+        if (e && e.functionId && e.eventIds && e.eventIds.length > 0) {
+          map.set(e.functionId, new Set(e.eventIds));
         }
       }
-      this._breakpointIndices = map.size > 0 ? map : null;
+      this._breakpointIds = map.size > 0 ? map : null;
     }
 
     /**
@@ -228,43 +250,52 @@ namespace gdjs {
 
     /**
      * Arms the stepping FSM so the next event (or the one after the given
-     * `eventIndex`) trips a breakpoint.
+     * `eventId`) trips a breakpoint.
      * @param preFlipPassed Treat the current event as already passed (V8 pauses
      * on the `debugger;` that sits after `checkBreakpoint`, so the event is
-     * "passed" but its body hasn't run yet). For a raw pause pass -1 / false.
+     * "passed" but its body hasn't run yet). For a raw pause pass '' / false.
      */
     programStepping(
-      eventIndex: number,
+      eventId: string,
       functionId: string,
       preFlipPassed: boolean
     ): void {
       this._stepNextEvent = true;
       this._stepPassedCurrentEvent = !!preFlipPassed;
-      this._stepCurrentEventIndex = eventIndex;
+      this._stepCurrentEventId = eventId;
       this._stepCurrentFunctionId = functionId;
       this._stepStartDepth = -1;
+      // Pin to the scene of the pause we are stepping from (if any).
+      this._stepSceneName = this._lastBreakpoint
+        ? this._lastBreakpoint.sceneName
+        : '';
     }
 
     /** Pauses the running game at the next event. */
     schedulePauseAtNextEvent(): void {
       this._stepNextEvent = true;
       this._stepPassedCurrentEvent = false;
-      this._stepCurrentEventIndex = -1;
+      this._stepCurrentEventId = '';
       this._stepCurrentFunctionId = '';
       this._stepStartDepth = -1;
+      // Raw pause: not pinned to any scene, stop at the next event anywhere.
+      this._stepSceneName = '';
       // A held Debugger-panel Pause keeps the render loop dormant, so
       // checkBreakpoint would never run — clear it.
       this._game.pause(false);
     }
 
-    getLastBreakpoint(): gdjs.BreakpointHit | null {
-      return this._lastBreakpoint;
+    /**
+     * Returns the last breakpoint hit and clears it, so it counts only for its
+     * own pause; a later foreign pause (e.g. a user's `debugger;`) reads `null`.
+     */
+    consumeLastBreakpoint(): gdjs.BreakpointHit | null {
+      const bp = this._lastBreakpoint;
+      this._lastBreakpoint = null;
+      return bp;
     }
 
-    getLastBpCallingContainer():
-      | gdjs.RuntimeInstanceContainer
-      | gdjs.RuntimeScene
-      | null {
+    getLastBpCallingContainer(): gdjs.RuntimeInstanceContainer | null {
       return this._lastBpCallingContainer;
     }
   }
@@ -296,13 +327,13 @@ namespace gdjs {
 
     /** Arms the stepping FSM. Returns false if the game isn't ready. */
     export const programStepping = (
-      eventIndex: number,
+      eventId: string,
       functionId: string,
       preFlipPassed: boolean
     ): boolean => {
       const manager = getManager();
       if (!manager) return false;
-      manager.programStepping(eventIndex, functionId, preFlipPassed);
+      manager.programStepping(eventId, functionId, preFlipPassed);
       return true;
     };
 
@@ -320,7 +351,10 @@ namespace gdjs {
      */
     export const readPauseState = (): string => {
       const manager = getManager();
-      const bp = manager ? manager.getLastBreakpoint() : null;
+      const bp = manager ? manager.consumeLastBreakpoint() : null;
+      // Foreign pause (a user's own `debugger;`, DevTools break, ...): no hit
+      // to report, so skip the dump and let the caller resume immediately.
+      if (!bp) return JSON.stringify({ bp: null, dump: '' });
       let dump = '';
       try {
         if (buildDumpJson) dump = buildDumpJson();
@@ -352,10 +386,8 @@ namespace gdjs {
       // Custom-object methods use the sub-container; scene events use the
       // top scene. The override is recorded by the breakpoint manager.
       const manager = game._breakpointManager;
-      const callingContainer:
-        | gdjs.RuntimeInstanceContainer
-        | gdjs.RuntimeScene
-        | null = (manager && manager.getLastBpCallingContainer()) || topScene;
+      const callingContainer: gdjs.RuntimeInstanceContainer | null =
+        (manager && manager.getLastBpCallingContainer()) || topScene;
       const objectVariablesByName: {
         [objectName: string]: gdjs.VariablesContainer;
       } = {};
@@ -398,11 +430,7 @@ namespace gdjs {
         message,
         function (_key: string, value: unknown): unknown {
           if (value instanceof Map) {
-            const obj: { [key: string]: unknown } = {};
-            value.forEach((v: unknown, k: unknown) => {
-              obj[String(k)] = v;
-            });
-            return obj;
+            return gdjs.convertMapToPlainObjectForJson(value);
           }
           return value;
         }

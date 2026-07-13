@@ -450,16 +450,12 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
-   * \brief Generate breakpoint check code for the event at the given flat
-   * index. Only emitted in preview mode; default returns empty string.
+   * \brief Generate breakpoint check code for the given event (keyed by its
+   * persistent UUID). Only emitted in preview mode; default returns "".
    */
-  virtual gd::String GenerateBreakpointCode(size_t eventIndex) { return ""; }
-
-  /**
-   * \brief Return the next sequential breakpoint event index and increment
-   * the counter. The counter follows DFS traversal order.
-   */
-  size_t GetNextBreakpointEventIndex() { return nextBreakpointEventIndex++; }
+  virtual gd::String GenerateBreakpointCode(gd::BaseEvent& event) {
+    return "";
+  }
 
   /**
    * \brief Get the namespace to be used to store code generated
@@ -889,8 +885,6 @@ class GD_CORE_API EventsCodeGenerator {
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
-  size_t nextBreakpointEventIndex = 0;  ///< DFS counter for breakpoint event
-                                        ///< indices in generated code.
 
   gd::DiagnosticReport* diagnosticReport;
 };

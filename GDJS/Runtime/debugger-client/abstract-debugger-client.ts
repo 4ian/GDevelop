@@ -1,6 +1,20 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
+  /**
+   * `Map` doesn't serialize to JSON natively; convert it to a string-keyed
+   * plain object so it survives `JSON.stringify`. Shared by both dump builders.
+   */
+  export const convertMapToPlainObjectForJson = (
+    value: Map<unknown, unknown>
+  ): { [key: string]: unknown } => {
+    const obj: { [key: string]: unknown } = {};
+    value.forEach((v, k) => {
+      obj[String(k)] = v;
+    });
+    return obj;
+  };
+
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -741,13 +755,8 @@ namespace gdjs {
           ) {
             return '[Removed from the debugger]';
           }
-          // Map instances don't serialize to JSON natively.
           if (value instanceof Map) {
-            const obj: Record<string, any> = {};
-            value.forEach((v, k) => {
-              obj[k] = v;
-            });
-            return obj;
+            return gdjs.convertMapToPlainObjectForJson(value);
           }
           return value;
         },

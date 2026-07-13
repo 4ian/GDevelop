@@ -106,7 +106,7 @@ namespace gdjs {
 
     // Stub so generated profiler code works on any instance container.
     // RuntimeScene overrides this with a real implementation.
-    getProfiler(): null {
+    getProfiler(): gdjs.Profiler | null {
       return null;
     }
 

@@ -16,7 +16,7 @@
  */
 declare type InitialBreakpointEntry = {
   functionId: string;
-  eventIndices: number[];
+  eventIds: string[];
 };
 
 interface Window {

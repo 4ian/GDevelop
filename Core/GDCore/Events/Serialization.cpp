@@ -223,6 +223,8 @@ void EventsListSerialization::UnserializeEventsFrom(
     event->SetFolded(eventElem.GetBoolAttribute("folded", false));
     event->SetAiGeneratedEventId(
         eventElem.GetStringAttribute("aiGeneratedEventId", ""));
+    event->SetPersistentUuid(
+        eventElem.GetStringAttribute("persistentUuid", ""));
 
     list.InsertEvent(event, list.GetEventsCount());
   }
@@ -242,6 +244,8 @@ void EventsListSerialization::SerializeEventsTo(const EventsList& list,
       eventElem.SetAttribute("folded", event.IsFolded());
     if (!event.GetAiGeneratedEventId().empty())
       eventElem.SetAttribute("aiGeneratedEventId", event.GetAiGeneratedEventId());
+    if (!event.GetPersistentUuid().empty())
+      eventElem.SetAttribute("persistentUuid", event.GetPersistentUuid());
     eventElem.AddChild("type").SetValue(event.GetType());
 
     event.SerializeTo(eventElem);

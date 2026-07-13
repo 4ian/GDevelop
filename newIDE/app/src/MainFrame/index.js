@@ -2575,7 +2575,17 @@ const MainFrame = (props: Props): React.MixedElement => {
       ]);
 
       try {
-        await eventsFunctionsExtensionsState.ensureLoadFinished();
+        // In-game edition uses the window-message debugger client, not CDP,
+        // so it never needs breakpoint instrumentation and can just wait for
+        // whatever flavor is already loaded (its hot reloads are frequent).
+        if (isForInGameEdition) {
+          await eventsFunctionsExtensionsState.ensureLoadFinished();
+        } else {
+          await eventsFunctionsExtensionsState.ensureProjectEventsFunctionsExtensionsForFlavor(
+            currentProject,
+            true
+          );
+        }
 
         const startTime = Date.now();
         let inAppTutorialMessageInPreview = { message: '', position: '' };

@@ -413,13 +413,17 @@ const Instruction = (props: Props): React.Node => {
                 highlightedSearchText: props.highlightedSearchText,
                 highlightedSearchMatchCase: props.highlightedSearchMatchCase,
                 runtimeVariables,
-                lastObjectName: getLastObjectParameterValue({
-                  instructionMetadata: metadata,
-                  instruction,
-                  expressionMetadata: null,
-                  expression: null,
-                  parameterIndex,
-                }),
+                // Only needed to resolve object-variable tooltips, which are
+                // only shown when a runtime dump is present.
+                lastObjectName: runtimeVariables
+                  ? getLastObjectParameterValue({
+                      instructionMetadata: metadata,
+                      instruction,
+                      expressionMetadata: null,
+                      expression: null,
+                      parameterIndex,
+                    })
+                  : null,
               })}
             </span>
           );

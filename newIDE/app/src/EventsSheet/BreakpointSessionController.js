@@ -11,10 +11,8 @@ import {
   getBreakpoints as getSessionBreakpoints,
   updateEntry as updateBreakpointsSessionEntry,
   buildAllBreakpointsPayload,
-  walkEventsInGeneratorOrder,
 } from './BreakpointsSessionStore';
 import { extractVariablesFromDump } from '../Debugger/RuntimeVariablesContext';
-import { findEventByPath } from '../Utils/EventsValidationScanner';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
@@ -26,6 +24,15 @@ const NON_BREAKPOINTABLE_TYPES = [
 
 export const isBreakpointableEvent = (event: gdBaseEvent): boolean =>
   event.isExecutable() && !NON_BREAKPOINTABLE_TYPES.includes(event.getType());
+
+// Whether a scope's events run as instrumented code the preview debugger can
+// pause on. External events (inlined into scenes) and behavior methods (built
+// for runtime, uninstrumented) can't; anything else needs a function id.
+export const canScopeHoldBreakpoints = (scope: EventsScope): boolean => {
+  if (scope.externalEvents) return false;
+  if (scope.eventsBasedBehavior) return false;
+  return getFunctionIdFromScope(scope) !== '';
+};
 
 // Resolves the runtime function/scene namespace for a scope, matching the id
 // the code generator stamps into `checkBreakpoint` calls.
@@ -63,19 +70,34 @@ const getFunctionIdFromScope = (scope: EventsScope): string => {
   return '';
 };
 
-// Maps flat DFS index (matching the C++ code generator's traversal) back to
-// its serialized EventPath (e.g. "0/2/1").
-const buildFlatIndexToPathMap = (events: gdEventsList): Map<number, string> => {
-  const map = new Map<number, string>();
-  walkEventsInGeneratorOrder(events, (_event, idx, path) => {
-    map.set(idx, path);
-  });
-  return map;
+// DFS lookup of the event carrying the given persistent UUID, returning the
+// event and its slash-separated EventPath (e.g. "0/2/1"). Uses the same tree
+// the IDE renders, so no code-generation traversal has to be replicated here.
+const findEventByUuid = (
+  events: gdEventsList,
+  eventId: string
+): {| event: gdBaseEvent, path: string |} | null => {
+  const walk = (
+    list: gdEventsList,
+    pathPrefix: string
+  ): {| event: gdBaseEvent, path: string |} | null => {
+    for (let i = 0; i < list.getEventsCount(); i++) {
+      const event = list.getEventAt(i);
+      const path = pathPrefix ? `${pathPrefix}/${i}` : `${i}`;
+      if (event.getPersistentUuid() === eventId) return { event, path };
+      if (event.canHaveSubEvents()) {
+        const found = walk(event.getSubEvents(), path);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return walk(events, '');
 };
 
 export type BreakpointHit = {|
   path: string | null,
-  eventIndex: number,
+  eventId: string,
 |};
 
 type Callbacks = {|
@@ -103,10 +125,13 @@ export default class BreakpointSessionController {
     this._callbacks = callbacks;
   }
 
-  // Breakpoints saved earlier this editor session (tab previously opened,
-  // debugger previously attached, etc.).
-  static getInitialBreakpoints(events: gdEventsList): Set<number> {
-    return getSessionBreakpoints(events.ptr);
+  // Breakpoints (event UUIDs) saved earlier this session for this scope. Scopes
+  // that can't hold breakpoints return none, even if their functionId aliases a
+  // scene's (e.g. an external events sheet resolves to its layout's namespace).
+  getInitialBreakpoints(): Set<string> {
+    const scope = this._callbacks.getScope();
+    if (!canScopeHoldBreakpoints(scope)) return new Set();
+    return getSessionBreakpoints(getFunctionIdFromScope(scope));
   }
 
   start() {
@@ -138,10 +163,10 @@ export default class BreakpointSessionController {
     const breakpoint = payload && payload.breakpoint;
     if (
       breakpoint &&
-      typeof breakpoint.eventIndex === 'number' &&
+      typeof breakpoint.eventId === 'string' &&
       typeof breakpoint.functionId === 'string'
     ) {
-      this._applyBreakpointHit(breakpoint.functionId, breakpoint.eventIndex);
+      this._applyBreakpointHit(breakpoint.functionId, breakpoint.eventId);
     }
     const dumpJson = payload && payload.dumpJson;
     if (dumpJson) {
@@ -161,50 +186,48 @@ export default class BreakpointSessionController {
     this._callbacks.onResumed();
   }
 
-  // On a breakpoint hit: resolve the flat-index → path. A resolved
+  // On a breakpoint hit: resolve the event UUID → path. A resolved
   // non-breakpointable event (comment/group) can't hold a pause, so step past
   // it; otherwise hand the hit to the events sheet.
-  _applyBreakpointHit(hitFunctionId: string, eventIndex: number) {
+  _applyBreakpointHit(hitFunctionId: string, eventId: string) {
     const scope = this._callbacks.getScope();
     if (hitFunctionId !== getFunctionIdFromScope(scope)) return;
 
     const events = this._callbacks.getEvents();
-    const path = buildFlatIndexToPathMap(events).get(eventIndex) || null;
+    const found = findEventByUuid(events, eventId);
 
-    if (path) {
-      const event = findEventByPath(events, path.split('/').map(Number));
-      if (event && !isBreakpointableEvent(event)) {
-        this.step(eventIndex);
-        return;
-      }
+    if (found && !isBreakpointableEvent(found.event)) {
+      // A comment/group can't hold a pause: step past it.
+      this.step(eventId);
+      return;
     }
 
     this._isPaused = true;
-    this._callbacks.onBreakpointHit({ path, eventIndex });
+    this._callbacks.onBreakpointHit({
+      path: found ? found.path : null,
+      eventId,
+    });
   }
 
   toggleBreakpointsForEvents(
-    previousBreakpoints: Set<number>,
+    previousBreakpoints: Set<string>,
     events: Array<gdBaseEvent>
-  ): Set<number> {
+  ): Set<string> {
     const newBreakpoints = new Set(previousBreakpoints);
     events.forEach(event => {
       if (!isBreakpointableEvent(event)) return;
-      const ptr = event.ptr;
-      if (newBreakpoints.has(ptr)) {
-        newBreakpoints.delete(ptr);
+      const eventId = event.getOrCreatePersistentUuid();
+      if (newBreakpoints.has(eventId)) {
+        newBreakpoints.delete(eventId);
       } else {
-        newBreakpoints.add(ptr);
+        newBreakpoints.add(eventId);
       }
     });
     return newBreakpoints;
   }
 
-  persistBreakpoints(breakpoints: Set<number>) {
-    const events = this._callbacks.getEvents();
+  persistBreakpoints(breakpoints: Set<string>) {
     updateBreakpointsSessionEntry(
-      events.ptr,
-      events,
       getFunctionIdFromScope(this._callbacks.getScope()),
       breakpoints
     );
@@ -221,9 +244,9 @@ export default class BreakpointSessionController {
     resumePausedPreview();
   }
 
-  step(eventIndex: number) {
+  step(eventId: string) {
     stepPausedPreview({
-      currentEventIndex: eventIndex,
+      currentEventId: eventId,
       currentFunctionId: getFunctionIdFromScope(this._callbacks.getScope()),
     });
   }

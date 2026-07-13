@@ -7,6 +7,7 @@ import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
 import BreakpointSessionController, {
   isBreakpointableEvent,
+  canScopeHoldBreakpoints,
   type BreakpointHit,
 } from './BreakpointSessionController';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
@@ -279,10 +280,10 @@ type State = {|
 
   fontSize: number,
 
-  breakpoints: Set<number>,
+  breakpoints: Set<string>,
 
   pausedOnEventPath: string | null,
-  pausedOnEventIndex: number,
+  pausedOnEventId: string,
   isPausedInDebugger: boolean,
   runtimeVariables: any,
 |};
@@ -412,10 +413,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     fontSize: 14,
 
-    breakpoints: (new Set(): Set<number>),
+    breakpoints: (new Set(): Set<string>),
 
     pausedOnEventPath: null,
-    pausedOnEventIndex: -1,
+    pausedOnEventId: '',
     isPausedInDebugger: false,
     runtimeVariables: null,
   };
@@ -429,9 +430,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
     this.state = {
       ...this.state,
-      breakpoints: BreakpointSessionController.getInitialBreakpoints(
-        this.props.events
-      ),
+      breakpoints: this._breakpointSession.getInitialBreakpoints(),
     };
   }
 
@@ -749,6 +748,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _selectionCanToggleBreakpoint = (): boolean => {
+    if (!canScopeHoldBreakpoints(this.props.scope)) return false;
     return getSelectedEvents(this.state.selection).some(isBreakpointableEvent);
   };
 
@@ -1708,6 +1708,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _toggleBreakpoint = () => {
+    if (!canScopeHoldBreakpoints(this.props.scope)) return;
     const selectedEvents = getSelectedEvents(this.state.selection);
     if (selectedEvents.length === 0) return;
 
@@ -1731,7 +1732,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _stepNextEvent = () => {
     if (!this.state.isPausedInDebugger) return;
-    this._breakpointSession.step(this.state.pausedOnEventIndex);
+    this._breakpointSession.step(this.state.pausedOnEventId);
   };
 
   _scrollToPausedEvent = (path: string) => {
@@ -1750,18 +1751,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _clearPausedState = () => {
     this.setState({
       pausedOnEventPath: null,
-      pausedOnEventIndex: -1,
+      pausedOnEventId: '',
       isPausedInDebugger: false,
       runtimeVariables: null,
     });
   };
 
   // Mark the paused event row and scroll it into view.
-  _onBreakpointHit = ({ path, eventIndex }: BreakpointHit) => {
+  _onBreakpointHit = ({ path, eventId }: BreakpointHit) => {
     this.setState(
       {
         pausedOnEventPath: path,
-        pausedOnEventIndex: eventIndex,
+        pausedOnEventId: eventId,
         isPausedInDebugger: true,
         // Toast position is preserved across pauses once the user has dragged it.
       },

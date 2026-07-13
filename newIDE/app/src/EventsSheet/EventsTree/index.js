@@ -509,7 +509,7 @@ type EventsTreeProps = {|
   tutorials: ?Array<Tutorial>,
 
   highlightedAiGeneratedEventIds: Set<string>,
-  breakpoints: Set<number>,
+  breakpoints: Set<string>,
   pausedOnEventPath: string | null,
 |};
 
@@ -994,7 +994,10 @@ const EventsTree: React.ComponentType<{
           highlightedSearchText={props.highlightedSearchText}
           highlightedSearchMatchCase={props.highlightedSearchMatchCase}
           highlightedAiGeneratedEventIds={props.highlightedAiGeneratedEventIds}
-          hasBreakpoint={props.breakpoints.has(event.ptr)}
+          hasBreakpoint={
+            props.breakpoints.size > 0 &&
+            props.breakpoints.has(event.getPersistentUuid())
+          }
           isPausedOn={
             props.pausedOnEventPath === node.relativeNodePath.join('/')
           }

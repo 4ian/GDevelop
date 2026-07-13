@@ -34,14 +34,14 @@ const {
  */
 
 /**
- * @typedef {{functionId: string, eventIndices: Array<number>}} BreakpointEntry
+ * @typedef {{functionId: string, eventIds: Array<string>}} BreakpointEntry
  */
 
 /**
- * `currentEventIndex`: zero-based index of the event the debugger is paused on;
- * omit for a raw pause. `currentFunctionId`: events-function identifier; omit
- * for top-level scene code / raw pause.
- * @typedef {{currentEventIndex?: number, currentFunctionId?: string}} StepPayload
+ * `currentEventId`: UUID of the event the debugger is paused on; omit for a raw
+ * pause. `currentFunctionId`: events-function identifier; omit for top-level
+ * scene code / raw pause.
+ * @typedef {{currentEventId?: string, currentFunctionId?: string}} StepPayload
  */
 
 /**
@@ -140,6 +140,17 @@ const attachCdpToPreview = (
                 breakpoint = parsed && parsed.bp ? parsed.bp : null;
                 dumpJson = (parsed && parsed.dump) || '';
               } catch (_) {}
+            }
+            // Foreign pause (a user's own `debugger;`, a DevTools break, ...):
+            // not one of our breakpoints, so resume at once instead of freezing
+            // the preview waiting for an IDE action that will never come.
+            if (!breakpoint) {
+              const entry = cdpSessions.get(windowId);
+              if (entry) entry.isPaused = false;
+              wc.debugger
+                .sendCommand('Debugger.resume')
+                .catch(() => {});
+              return;
             }
             sendToParent(parentWindowId, 'preview-debugger-paused', {
               windowId,
@@ -291,18 +302,18 @@ const setBreakpointsPreviewDebugger = async (windowId, breakpoints) => {
 const stepPreviewDebugger = async (windowId, stepPayload) => {
   const target = findTargetPreviewWindowId(windowId);
   if (target === null) return false;
-  const eventIndex =
-    stepPayload && typeof stepPayload.currentEventIndex === 'number'
-      ? stepPayload.currentEventIndex
-      : -1;
+  const eventId =
+    stepPayload && typeof stepPayload.currentEventId === 'string'
+      ? stepPayload.currentEventId
+      : '';
   const functionId =
     stepPayload && typeof stepPayload.currentFunctionId === 'string'
       ? stepPayload.currentFunctionId
       : '';
-  const preFlipPassed = eventIndex >= 0;
+  const preFlipPassed = eventId !== '';
   const expression = serializeFunctionForCdp(
     programSteppingInPreview,
-    eventIndex,
+    eventId,
     functionId,
     preFlipPassed
   );

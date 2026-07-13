@@ -8,7 +8,9 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 export const resumePausedPreview = async (): Promise<boolean> => {
   if (!ipcRenderer) return false;
   try {
-    return !!(await ipcRenderer.invoke('preview-debugger-resume', {}));
+    return !!(await ipcRenderer.invoke('preview-debugger-resume', {
+      windowId: pausedWindowId,
+    }));
   } catch (error) {
     console.warn('[cdp-bridge] resume failed:', error);
     return false;
@@ -20,12 +22,15 @@ export const resumePausedPreview = async (): Promise<boolean> => {
  * V8 so the next `checkBreakpoint` trips on the target event.
  */
 export const stepPausedPreview = async (payload: {|
-  currentEventIndex: number,
+  currentEventId: string,
   currentFunctionId?: string,
 |}): Promise<boolean> => {
   if (!ipcRenderer) return false;
   try {
-    return !!(await ipcRenderer.invoke('preview-debugger-step', { payload }));
+    return !!(await ipcRenderer.invoke('preview-debugger-step', {
+      windowId: pausedWindowId,
+      payload,
+    }));
   } catch (error) {
     console.warn('[cdp-bridge] step failed:', error);
     return false;
@@ -49,7 +54,7 @@ export const schedulePauseAtNextEvent = async (): Promise<boolean> => {
 };
 
 export type CDPBreakpointInfo = {|
-  eventIndex: number,
+  eventId: string,
   sceneName: string,
   functionId: string,
 |};
@@ -67,6 +72,9 @@ export type CDPPausePayload = {|
 // still receive the current pause state via the replay in onPreviewDebuggerPauseChange.
 let lastPaused: boolean = false;
 let lastPayload: ?CDPPausePayload = null;
+// The window that reported the current pause. Resume/step must target *this*
+// window rather than letting the main process guess when several previews run.
+let pausedWindowId: ?number = null;
 
 if (ipcRenderer) {
   ipcRenderer.on('preview-debugger-paused', (_event, payload) => {
@@ -75,10 +83,13 @@ if (ipcRenderer) {
       breakpoint: payload && payload.breakpoint ? payload.breakpoint : null,
       dumpJson: (payload && payload.dumpJson) || '',
     };
+    pausedWindowId =
+      payload && typeof payload.windowId === 'number' ? payload.windowId : null;
   });
   ipcRenderer.on('preview-debugger-resumed', () => {
     lastPaused = false;
     lastPayload = null;
+    pausedWindowId = null;
   });
 }
 
@@ -135,7 +146,7 @@ export const onPreviewDebuggerClosed = (callback: () => void): (() => void) => {
 export const setPreviewBreakpointsViaCdp = async (
   breakpoints: Array<{|
     functionId: string,
-    eventIndices: Array<number>,
+    eventIds: Array<string>,
   |}>
 ): Promise<boolean> => {
   if (!ipcRenderer) return false;

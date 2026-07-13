@@ -1597,16 +1597,15 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
-gd::String EventsCodeGenerator::GenerateBreakpointCode(size_t eventIndex) {
+gd::String EventsCodeGenerator::GenerateBreakpointCode(gd::BaseEvent& event) {
   if (GenerateCodeForRuntime()) return "";
 
-  // The `runtimeScene &&` guard matches the push/pop and profiler code: the
-  // local can be undefined during custom-object construction.
-  // checkBreakpoint returns false unless CDP is attached (Electron local
-  // preview only), so the `debugger;` is dead code in web/remote previews.
+  // `runtimeScene &&` guards the undefined local during custom-object build.
+  // checkBreakpoint is false unless CDP is attached (local Electron preview), so
+  // `debugger;` is dead code elsewhere. The event UUID is the id shared with the IDE.
   return "if (runtimeScene && runtimeScene.getBreakpointManager().checkBreakpoint(" +
          ConvertToStringExplicit(GetCodeNamespace()) + ", " +
-         gd::String::From(eventIndex) +
+         ConvertToStringExplicit(event.GetOrCreatePersistentUuid()) +
          ", runtimeScene)) debugger;\n";
 }
 

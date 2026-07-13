@@ -5,7 +5,7 @@
  * module. They are stringified individually via `Function.prototype.toString()`
  * (see `cdpEval.js`), so co-locating them here does not affect serialization.
  *
- * @typedef {{functionId: string, eventIndices: Array<number>}} BreakpointEntry
+ * @typedef {{functionId: string, eventIds: Array<string>}} BreakpointEntry
  */
 
 /**
@@ -61,15 +61,15 @@ function setBreakpointsInPreview(entries) {
  * the target event, then the caller issues `Debugger.resume`. Thin wrapper
  * over `gdjs.BreakpointDebugger.programStepping` (the logic lives in the runtime).
  *
- * @param {number} eventIndex Zero-based index of the paused event, or `-1` for a raw pause.
+ * @param {string} eventId UUID of the paused event, or `""` for a raw pause.
  * @param {string} functionId Events-function identifier, or `""` for scene code / raw pause.
  * @param {boolean} preFlipPassed Whether to mark the current event as already passed.
  * @returns {boolean} `true` if applied, `false` if the runtime debugger isn't ready yet.
  */
-function programSteppingInPreview(eventIndex, functionId, preFlipPassed) {
+function programSteppingInPreview(eventId, functionId, preFlipPassed) {
   if (typeof gdjs === 'undefined' || !gdjs.BreakpointDebugger) return false;
   return gdjs.BreakpointDebugger.programStepping(
-    eventIndex,
+    eventId,
     functionId,
     preFlipPassed
   );

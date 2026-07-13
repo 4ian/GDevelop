@@ -1953,6 +1953,8 @@ export class BaseEvent extends EmscriptenObject {
   unserializeFrom(project: Project, element: SerializerElement): void;
   getAiGeneratedEventId(): string;
   setAiGeneratedEventId(aiGeneratedEventId: string): void;
+  getOrCreatePersistentUuid(): string;
+  getPersistentUuid(): string;
 }
 
 export class StandardEvent extends BaseEvent {

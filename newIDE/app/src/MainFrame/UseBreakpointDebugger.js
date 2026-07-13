@@ -52,13 +52,13 @@ const useBreakpointDebugger = ({
   showAlert,
 }: Params): Result => {
   const previewPausedRef = React.useRef<boolean>(false);
-  const lastHitEventIndexRef = React.useRef<number>(-1);
+  const lastHitEventIdRef = React.useRef<string>('');
   const lastHitFunctionIdRef = React.useRef<string>('');
 
   // Stable ref to the hit handler so the CDP listener never needs to re-subscribe.
   type BreakpointHitHandler = (
     functionId: string,
-    eventIndex: number,
+    eventId: string,
     sceneName: string
   ) => void;
   const handleBreakpointHitRef = React.useRef<?BreakpointHitHandler>(null);
@@ -67,11 +67,11 @@ const useBreakpointDebugger = ({
     () => {
       const handleBreakpointHit = (
         functionId: string,
-        eventIndex: number,
+        eventId: string,
         sceneName: string
       ) => {
         previewPausedRef.current = true;
-        lastHitEventIndexRef.current = eventIndex;
+        lastHitEventIdRef.current = eventId;
         lastHitFunctionIdRef.current = functionId;
 
         // Behavior object methods are compiled with compilationForRuntime=true
@@ -153,7 +153,7 @@ const useBreakpointDebugger = ({
       // so reset refs when the preview connection closes.
       const resetPauseRefs = () => {
         previewPausedRef.current = false;
-        lastHitEventIndexRef.current = -1;
+        lastHitEventIdRef.current = '';
         lastHitFunctionIdRef.current = '';
       };
       const unregister = previewDebuggerServer.registerCallbacks({
@@ -182,18 +182,18 @@ const useBreakpointDebugger = ({
       if (
         isPaused &&
         breakpoint &&
-        typeof breakpoint.eventIndex === 'number' &&
+        typeof breakpoint.eventId === 'string' &&
         typeof breakpoint.functionId === 'string' &&
         handleBreakpointHitRef.current
       ) {
         handleBreakpointHitRef.current(
           breakpoint.functionId,
-          breakpoint.eventIndex,
+          breakpoint.eventId,
           breakpoint.sceneName || ''
         );
       } else if (!isPaused) {
         previewPausedRef.current = false;
-        lastHitEventIndexRef.current = -1;
+        lastHitEventIdRef.current = '';
         lastHitFunctionIdRef.current = '';
       }
     });
@@ -237,7 +237,7 @@ const useBreakpointDebugger = ({
       }
       if (!previewPausedRef.current) return;
       stepPausedPreview({
-        currentEventIndex: lastHitEventIndexRef.current,
+        currentEventId: lastHitEventIdRef.current,
         currentFunctionId: lastHitFunctionIdRef.current,
       });
     },

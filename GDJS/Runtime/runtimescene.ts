@@ -424,7 +424,7 @@ namespace gdjs {
 
       // Let the breakpoint manager wrap up stepping for this frame (preview only).
       const breakpointManager = this._runtimeGame._breakpointManager;
-      if (breakpointManager) breakpointManager.onFrameEnd();
+      if (breakpointManager) breakpointManager.onFrameEnd(this.getName());
       if (this._profiler) {
         this._profiler.end('events');
       }

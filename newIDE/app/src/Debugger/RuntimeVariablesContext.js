@@ -4,7 +4,8 @@ import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
 
-// Mirrors the internals of gdjs.Variable (same shape as in VariablesContainerInspector).
+// Single source of truth for the gdjs.Variable mirror shape (also reused by
+// the Debugger's VariablesContainerInspector).
 export type RuntimeVariable = {
   _type: 'string' | 'number' | 'boolean' | 'structure' | 'array',
   _str: string,
@@ -234,8 +235,7 @@ export const buildRuntimeVariableTooltip = ({
 |}): string => {
   if (!runtimeVariables || !value) return tooltip;
 
-  // Use `sourceType` (resolved container kind) for scope selection;
-  // fall back to the tooltip string for callers that don't set sourceType.
+  // Use `sourceType` (resolved container kind) for scope selection.
   let varScope: 'global' | 'scene' | 'local' | 'object' | 'any';
   if (
     sourceType === gd.VariablesContainer.Global ||
@@ -250,12 +250,6 @@ export const buildRuntimeVariableTooltip = ({
   } else if (sourceType === gd.VariablesContainer.Local) {
     varScope = 'local';
   } else if (sourceType === gd.VariablesContainer.Object) {
-    varScope = 'object';
-  } else if (tooltip === 'global variable') {
-    varScope = 'global';
-  } else if (tooltip === 'scene variable') {
-    varScope = 'scene';
-  } else if (tooltip === 'object variable') {
     varScope = 'object';
   } else {
     varScope = 'any';

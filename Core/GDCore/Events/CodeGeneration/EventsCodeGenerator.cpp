@@ -1103,11 +1103,11 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
       continue;
 
     // Synthetic AsyncEvent wrappers (inserted by PreprocessAsyncActions) are
-    // not user-visible; skip so flat indices stay aligned with the IDE's DFS walk.
+    // not user-visible, so they carry no persistent UUID and can't be a
+    // breakpoint/step target: skip them.
     gd::String breakpointCode;
     if (event.GetType() != "BuiltinAsync::Async") {
-      size_t breakpointIndex = GetNextBreakpointEventIndex();
-      breakpointCode = GenerateBreakpointCode(breakpointIndex);
+      breakpointCode = GenerateBreakpointCode(event);
     }
 
     if (event.HasVariables()) {

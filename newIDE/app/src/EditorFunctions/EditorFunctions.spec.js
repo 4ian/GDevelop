@@ -11,6 +11,28 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+const fake9PatchAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Yellow Button',
+  objectType: '9patch',
+  animationsCount: 1,
+};
+
+const fake3DModelAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Knight Character',
+  objectType: 'Scene3D::Model3DObject',
+  animationsCount: 8,
+};
+
+// Particle emitter assets have no animations count in the assets database.
+const fakeParticleEmitterAssetShortHeader = {
+  ...fakeAssetShortHeader1,
+  name: 'Fire Sparkles',
+  objectType: 'ParticleSystem::ParticleEmitter',
+  animationsCount: undefined,
+};
+
 // $FlowFixMe[incompatible-type]
 // $FlowFixMe[missing-local-annot]
 // $FlowFixMe[cannot-resolve-name]
@@ -81,6 +103,8 @@ describe('editorFunctions', () => {
       });
     },
     onObjectsModifiedOutsideEditor: jest.fn(),
+    onWillDeleteScene: jest.fn(),
+    onWillDeleteObject: jest.fn(),
     onWillInstallExtension: jest.fn(),
     onExtensionInstalled: jest.fn(),
     getAssetStoreTagForNewObject: () => null,
@@ -161,7 +185,7 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
+        `"Created object \\"MyNewTextObject\\" (type \\"TextObject::Text\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). Properties: bold: false, characterSize: 20 (px), color: 0;0;0 (color), isOutlineEnabled: false, isShadowEnabled: false, italic: false, lineHeight: 0 (px), outlineColor: 255;255;255 (color), outlineThickness: 2 (px), shadowAngle: 90 (deg), shadowBlurRadius: 2 (px), shadowColor: 0;0;0 (color), shadowDistance: 4 (px), shadowOpacity: 127 (px), text: Text (multilinestring), textAlignment: left (choice, one of: [\\"left\\", \\"center\\", \\"right\\"]), verticalTextAlignment: top (choice, one of: [\\"top\\", \\"center\\", \\"bottom\\"]). Empty: font (resource)."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -187,13 +211,99 @@ describe('editorFunctions', () => {
       );
 
       expect(result.message).toMatchInlineSnapshot(
-        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Properties: ."`
+        `"Created object \\"SomeNewObject\\" (type \\"Sprite\\", scene \\"TestScene\\") from asset store. Used asset \\"Dino Doux\\" (6 animation(s)). This object type has no editable object properties."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
         isNewObjectTypeUsed: false,
       });
+    });
+
+    it('creates a new object from a 9patch asset, without showing its constant animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'TextObject::Text',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake9PatchAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_type: 'TextObject::Text',
+            object_name: 'MenuButton',
+            search_terms: 'yellow button',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Yellow Button".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+    });
+
+    it('creates a new object from an animated 3D model asset, showing its animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              assetShortHeader: fake3DModelAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Knight',
+            search_terms: 'knight character',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining(
+          'Used asset "Knight Character" (8 animation(s)).'
+        )
+      );
     });
 
     it('creates a new object (from scratch, fallback if not found in the asset store)', async () => {
@@ -253,7 +363,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Object \\"Player\\" already exists."`
+        `"Object \\"Player\\" already exists - nothing was changed. Set replace_existing_object to true to replace its assets from the asset store."`
       );
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
         scene: testScene,
@@ -442,7 +552,7 @@ describe('editorFunctions', () => {
       );
       expect(testScene.getObjects().hasObjectNamed('Player')).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
       expect(result.success).toBe(true);
       expect(onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
@@ -569,7 +679,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(
-        `"Scene not found: \\"NonExistentScene\\"."`
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
       );
     });
 
@@ -649,8 +759,53 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toMatchInlineSnapshot(
-        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\")."`
+        `"Replaced scene \\"TestScene\\" object \\"Player\\" with asset store object (same type \\"Sprite\\"). Used asset \\"Dino Doux\\" (6 animation(s))."`
       );
+    });
+
+    it('replaces an existing object with a particle emitter asset, which has no animations count', async () => {
+      // $FlowFixMe[underconstrained-implicit-instantiation]
+      const onObjectsModifiedOutsideEditor = jest.fn();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.create_or_replace_object.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          searchAndInstallAsset: async ({
+            objectsContainer,
+            objectName,
+            objectType,
+          }) => {
+            const object = objectsContainer.insertNewObject(
+              project,
+              objectType || 'Sprite',
+              objectName,
+              objectsContainer.getObjectsCount()
+            );
+            return Promise.resolve({
+              status: 'asset-installed',
+              message: 'Object installed',
+              createdObjects: [object],
+              // $FlowFixMe[incompatible-type] - the AssetShortHeader type declares animationsCount as required, but particle emitter assets have none in the assets database.
+              assetShortHeader: fakeParticleEmitterAssetShortHeader,
+              isTheFirstOfItsTypeInProject: false,
+            });
+          },
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            replace_existing_object: true,
+            search_terms: 'fire sparkles',
+          },
+          onObjectsModifiedOutsideEditor,
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toEqual(
+        expect.stringContaining('Used asset "Fire Sparkles".')
+      );
+      expect(result.message).not.toEqual(expect.stringContaining('animation'));
+      expect(result.message).not.toEqual(expect.stringContaining('undefined'));
     });
 
     it('fails when object_type conflicts with an existing object type', async () => {
@@ -966,7 +1121,7 @@ describe('editorFunctions', () => {
         Set \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\".
         Warnings:
         Could not set \\"textAlignment\\" on \\"MyTextObject\\": invalid value or type.
-        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\".
+        Property \\"nonExistingProperty\\" not found on object \\"MyTextObject\\". Available properties: bold, characterSize, color, font, isOutlineEnabled, isShadowEnabled, italic, lineHeight, outlineColor, outlineThickness, shadowAngle, shadowBlurRadius, shadowColor, shadowDistance, shadowOpacity, text, textAlignment, verticalTextAlignment.
         \\"shadowAngle\\" on \\"MyTextObject\\" = \\"20\\", but requested \\"20,40 , 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowDistance\\" on \\"MyTextObject\\" = \\"0\\", but requested \\"20X   40 X 50\\" looks multi-dimensional; only a single number is allowed.
         \\"shadowBlurRadius\\" on \\"MyTextObject\\" = \\"20.41\\", but requested \\"20.41 × 50\\" looks multi-dimensional; only a single number is allowed."
@@ -980,6 +1135,28 @@ describe('editorFunctions', () => {
       expect(properties.get('bold').getValue()).toBe('true');
       expect(properties.get('italic').getValue()).toBe('false');
       expect(properties.get('shadowAngle').getValue()).toBe('20');
+    });
+
+    it('lists the available properties only once when several properties are not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyTextObject',
+            changed_properties: [
+              { property_name: 'fontSize', new_value: '56' },
+              { property_name: 'scaleX', new_value: '2' },
+              { property_name: 'wrongProperty', new_value: '3' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(
+        (result.message || '').split('Available properties:').length - 1
+      ).toBe(1);
     });
 
     it('reports the FINAL renamed name when a collision forces a suffix', async () => {
@@ -1020,6 +1197,369 @@ describe('editorFunctions', () => {
       expect(testScene.getObjects().hasObjectNamed('Foo')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('Foo2')).toBe(true);
       expect(testScene.getObjects().hasObjectNamed('MyTextObject')).toBe(false);
+    });
+  });
+
+  describe('change_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "change_object_property" name to the same implementation', () => {
+      expect(editorFunctions.change_object_property).toBe(
+        editorFunctions.change_object_properties_effects
+      );
+    });
+
+    it('creates a new effect on the object (not on any layer) and reports it with a single message', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              {
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+                changed_properties: [
+                  { property_name: 'opacity', new_value: '0.5' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.message).not.toContain('Modified "opacity"');
+
+      const object = testScene.getObjects().getObject('MySprite');
+      const effectsContainer = object.getEffects();
+      expect(effectsContainer.getEffectsCount()).toBe(1);
+      expect(
+        effectsContainer.getEffect('MySepia').getDoubleParameter('opacity')
+      ).toBe(0.5);
+
+      // The base layer must not have received the effect.
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+
+    it('updates and deletes existing object effects', async () => {
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            { effect_name: 'ToRemove', effect_type: 'FakeSepia' },
+            { effect_name: 'ToKeep', effect_type: 'FakeNight' },
+          ],
+        },
+      });
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_effects: [
+              { effect_name: 'ToRemove', delete_this_effect: true },
+              {
+                effect_name: 'ToKeep',
+                changed_properties: [
+                  { property_name: 'intensity', new_value: '0.3' },
+                ],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Removed "ToRemove" effect on object "MySprite".'
+      );
+      expect(result.message).toContain(
+        'Modified "intensity" property of the "ToKeep" effect to "0.3".'
+      );
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
+      expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('changes properties and effects together in a single call', async () => {
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            changed_properties: [
+              { property_name: 'name', new_value: 'MySprite' },
+            ],
+            changed_effects: [
+              { effect_name: 'MyNight', effect_type: 'FakeNight' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('already named "MySprite"');
+      expect(result.message).toContain('Created new "MyNight" effect');
+
+      const effectsContainer = testScene
+        .getObjects()
+        .getObject('MySprite')
+        .getEffects();
+      expect(effectsContainer.hasEffectNamed('MyNight')).toBe(true);
+    });
+
+    it('warns and does not add an effect on an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+            changed_effects: [
+              { effect_name: 'MySepia', effect_type: 'FakeSepia' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain(
+        'Object "MyCube" does not support effects'
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MyCube')
+          .getEffects()
+          .getEffectsCount()
+      ).toBe(0);
+    });
+  });
+
+  describe('change_object_properties_effects (delete_this_object)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene object and its instances when delete_this_object is true', async () => {
+      const sceneObjects = testScene.getObjects();
+      sceneObjects.insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const instance = testScene
+        .getInitialInstances()
+        .insertNewInitialInstance();
+      instance.setObjectName('MySprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted object "MySprite"');
+      expect(sceneObjects.hasObjectNamed('MySprite')).toBe(false);
+      expect(
+        testScene.getInitialInstances().hasInstancesOfObject('MySprite')
+      ).toBe(false);
+    });
+
+    it('deletes a global object and removes it from groups', async () => {
+      const globalObjects = project.getObjects();
+      globalObjects.insertNewObject(project, 'Sprite', 'GlobalSprite', 0);
+      const group = globalObjects.getObjectGroups().insertNew('AllSprites', 0);
+      group.addObject('GlobalSprite');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'GlobalSprite',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(globalObjects.hasObjectNamed('GlobalSprite')).toBe(false);
+      expect(group.find('GlobalSprite')).toBe(false);
+    });
+
+    it('fails when the object is not found', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Ghost',
+            delete_this_object: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Object not found');
+    });
+
+    it('notifies the editor of the deleted object name, so it can close any related dialog/panel', async () => {
+      testScene.getObjects().insertNewObject(project, 'Sprite', 'MySprite', 0);
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_object_properties_effects.launchFunction({
+        ...fakeOptions,
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          delete_this_object: true,
+        },
+      });
+
+      expect(fakeOptions.onWillDeleteObject).toHaveBeenCalledWith({
+        scene: testScene,
+        objectName: 'MySprite',
+      });
+      expect(fakeOptions.onInstancesModifiedOutsideEditor).toHaveBeenCalledWith(
+        { scene: testScene }
+      );
+      expect(fakeOptions.onObjectsModifiedOutsideEditor).toHaveBeenCalledWith({
+        scene: testScene,
+        isNewObjectTypeUsed: false,
+      });
+    });
+  });
+
+  describe('inspect_object_properties_effects (object effects)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const testSceneObjects = testScene.getObjects();
+      const object = testSceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        'MySprite',
+        testSceneObjects.getObjectsCount()
+      );
+      const effect = object.getEffects().insertNewEffect('MySepia', 0);
+      effect.setEffectType('FakeSepia');
+      effect.setDoubleParameter('opacity', 0.7);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('redirects the old "inspect_object_properties" name to the same implementation', () => {
+      expect(editorFunctions.inspect_object_properties).toBe(
+        editorFunctions.inspect_object_properties_effects
+      );
+    });
+
+    it('returns the object properties as well as its own effects', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toBeTruthy();
+      expect(result.effects).toEqual([
+        expect.objectContaining({
+          effectName: 'MySepia',
+          effectType: 'FakeSepia',
+        }),
+      ]);
+    });
+
+    it('does not include an effects field for an object type with no effect capability', async () => {
+      const testSceneObjects = testScene.getObjects();
+      testSceneObjects.insertNewObject(
+        project,
+        'FakeScene3D::Cube3DObject',
+        'MyCube',
+        testSceneObjects.getObjectsCount()
+      );
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_object_properties_effects.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MyCube',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.effects).toBeUndefined();
     });
   });
 
@@ -1106,7 +1646,7 @@ describe('editorFunctions', () => {
         Set \\"IgnoreDefaultControls\\" on behavior \\"PlatformerObject\\" = \\"false\\".
         Warnings:
         \\"MaxSpeed\\" on behavior \\"PlatformerObject\\" = \\"300\\", but requested \\"300 x 20\\" looks multi-dimensional; only a single number is allowed.
-        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\"."
+        Property \\"nonExistingProperty\\" not on behavior \\"PlatformerObject\\" of \\"MySprite\\". Available properties: Acceleration, CanGoDownFromJumpthru, CanGrabPlatforms, CanGrabWithoutMoving, Deceleration, Gravity, IgnoreDefaultControls, JumpSpeed, JumpSustainTime, LadderClimbingSpeed, MaxFallingSpeed, MaxSpeed, SlopeMaxAngle, XGrabTolerance, YGrabOffset."
       `);
 
       // Verify the behavior properties were actually changed
@@ -1443,7 +1983,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with a child field.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
 
       const result = await editorFunctions.add_or_edit_variable.launchFunction({
@@ -1510,7 +2050,7 @@ describe('editorFunctions', () => {
       // Pre-populate a structure with multiple children to ensure none are lost.
       const variables = project.getVariables();
       const struct = variables.insertNew('player', 0);
-      struct.castTo('Structure');
+      struct.castTo('structure');
       struct.getChild('hp').setValue(10);
       struct.getChild('name').setString('Hero');
       struct.getChild('alive').setBool(true);
@@ -1541,7 +2081,7 @@ describe('editorFunctions', () => {
       // Pre-populate an array with multiple items to ensure none are lost.
       const variables = project.getVariables();
       const array = variables.insertNew('inventory', 0);
-      array.castTo('Array');
+      array.castTo('array');
       array.pushNew().setString('Sword');
       array.pushNew().setString('Shield');
       array.pushNew().setString('Potion');
@@ -1684,7 +2224,7 @@ describe('editorFunctions', () => {
         .getObject('Player')
         .getVariables();
       const arrayVariable = playerVariables.insertNew('Variable', 0);
-      arrayVariable.castTo('Array');
+      arrayVariable.castTo('array');
       arrayVariable.pushNew().setValue(10);
       arrayVariable.pushNew().setValue(11);
       arrayVariable.pushNew().setValue(12);
@@ -1755,7 +2295,7 @@ describe('editorFunctions', () => {
         .getObject('Player')
         .getVariables();
       const arrayVariable = objectVariables.insertNew('Variable', 0);
-      arrayVariable.castTo('Array');
+      arrayVariable.castTo('array');
       arrayVariable.pushNew().setValue(10);
       arrayVariable.pushNew().setValue(11);
       arrayVariable.pushNew().setValue(12);
@@ -1914,8 +2454,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 100, 200 on layer "base".'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 100, 200 on the base layer \(""\)\./
         )
       );
     });
@@ -1939,8 +2479,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 2 new instances of object "Player" using point brush at 50, 60 on layer "base" (size 64x64, rotation 45°, opacity 128/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124).'
+        expect.stringMatching(
+          /Created 2 new instances of object "Player" \(ids: [0-9a-f-]{10}, [0-9a-f-]{10}\) using point brush at 50, 60 on the base layer \(""\) \(size 64x64, rotation 45°, opacity 128\/255, z-order 5, origin at this position, each occupies X 50 to 114, Y 60 to 124\)\./
         )
       );
     });
@@ -2115,18 +2655,65 @@ describe('editorFunctions', () => {
       expect(uniqueKeys.size).toBe(positions.length);
     });
 
-    it('falls back to the scene center when no brush_position is given', async () => {
-      await putInstances({
-        brush_kind: 'point',
-        new_instances_count: 1,
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center — a major source of instances duplicated
+    // or dropped at a meaningless position by the AI. It must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        {
-          x: project.getGameResolutionWidth() / 2,
-          y: project.getGameResolutionHeight() / 2,
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The most frequent malformed call seen in production: a "modification"
+    // call that forgot `existing_instance_ids` (and gave no position). It used
+    // to create a duplicate instance at the scene center; it must fail.
+    it('fails instead of creating a default instance when neither existing_instance_ids nor brush_position are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          instances_opacity: 0,
         },
-      ]);
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('existing_instance_ids')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The base layer's real name is "": accept the frequent "base" mistake
+    // (when no layer literally named "base" exists) instead of failing.
+    it('accepts "base" as the base layer name when no such layer exists', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+        layer_name: 'base',
+      });
+
+      const [created] = getInstances(testScene);
+      expect(created.layer).toBe('');
+      expect(result.message).toEqual(
+        expect.stringContaining('the base layer ("")')
+      );
     });
 
     it('scatters instances within the radius for the random_in_circle brush', async () => {
@@ -2147,19 +2734,94 @@ describe('editorFunctions', () => {
       });
     });
 
-    // Regression test: creating instances with the "none" brush used to leave
-    // every new instance at the origin (0,0) instead of at brush_position.
-    it('creates new instances at brush_position with the none brush', async () => {
-      await putInstances({
-        brush_kind: 'none',
-        brush_position: '200,300',
-        new_instances_count: 2,
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '200,300',
+          new_instances_count: 2,
+        },
       });
 
-      expect(getInstancePositions(testScene)).toEqual([
-        { x: 200, y: 300 },
-        { x: 200, y: 300 },
-      ]);
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      for (const brush_kind of ['point', 'none']) {
+        const result = await editorFunctions.put_2d_instances.launchFunction({
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'Player',
+            layer_name: '',
+            brush_kind,
+            new_instances_count: 0,
+          },
+        });
+
+        expect(result.success).toBe(false);
+        expect(result.message).toEqual(
+          expect.stringContaining('Nothing to do')
+        );
+        expect(getInstancePositions(testScene)).toEqual([]);
+      }
+    });
+
+    // The none brush with neither ids nor an explicit count used to create one
+    // instance at the default scene-center position.
+    it('fails with the none brush when no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '300,400',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([{ x: 300, y: 400 }]);
     });
 
     // The none brush must still leave existing instances where they are.
@@ -2331,6 +2993,35 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
+    // An erase that removed nothing used to report "Erased 0 instances." as a
+    // success, which the AI took as a confirmation the instances were gone.
+    it('fails when the erase brush matches nothing', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 1,
+      });
+
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'erase',
+          brush_position: '900,900',
+          brush_size: 10,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('No instance was erased.')
+      );
+      // The existing instance is untouched.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+    });
+
     it('fails when erasing an unknown instance id (none found, nothing changed)', async () => {
       // Bypass the `putInstances` helper, which asserts success — here we
       // expect a failure so the agent gets a real error signal instead of a
@@ -2434,8 +3125,8 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toEqual(
-        expect.stringContaining(
-          'Created 1 new instance of object "Player" using point brush at 10, 20, 30 on layer "base" (size 8x16x24, rotation (15°, 30°, 45°), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54).'
+        expect.stringMatching(
+          /Created 1 new instance of object "Player" \(id: [0-9a-f-]{10}\) using point brush at 10, 20, 30 on the base layer \(""\) \(size 8x16x24, rotation \(15°, 30°, 45°\), origin at this position, each occupies X 10 to 18, Y 20 to 36, Z 30 to 54\)\./
         )
       );
     });
@@ -2573,6 +3264,47 @@ describe('editorFunctions', () => {
       });
     });
 
+    it('fails without creating instances when the line brush lacks brush_end_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'line',
+          brush_position: '10,20,30',
+          new_instances_count: 3,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('requires brush_end_position')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // Creating instances without an explicit brush_position used to silently
+    // fall back to the scene center: it must fail instead.
+    it('fails when creating instances without a brush_position', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'point',
+          new_instances_count: 1,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('`brush_position` is required')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
     it('fails when no requested instance id is found and nothing is created', async () => {
       // Bypass the `putInstances` helper, which asserts success — here we
       // expect a failure so the agent gets a real error signal instead of a
@@ -2594,6 +3326,74 @@ describe('editorFunctions', () => {
           'None of the specified instance ids were found: does-not-exist'
         )
       );
+    });
+
+    // A call asking to create nothing and modify nothing used to silently
+    // create one instance at the default scene-center position.
+    it('fails when new_instances_count is 0 and no existing_instance_ids are given', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          new_instances_count: 0,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(expect.stringContaining('Nothing to do'));
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The "none" brush is for modifying existing instances only: creating with
+    // it used to silently pile up instances at a default position, leaving
+    // unwanted duplicates.
+    it('fails instead of creating instances with the none brush', async () => {
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '10,20,30',
+          new_instances_count: 6,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('cannot create new ones')
+      );
+      expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // The created id in the message closes the loop "create then adjust":
+    // it must be directly usable as `existing_instance_ids`.
+    it('reports the created instance id, usable to modify it in a follow-up call', async () => {
+      const result = await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+
+      const idMatch = (result.message || '').match(/\(id: ([^)]+)\)/);
+      if (!idMatch) throw new Error('Expected the created id in the message.');
+
+      const moveResult = await putInstances({
+        brush_kind: 'point',
+        brush_position: '40,50,60',
+        existing_instance_ids: idMatch[1],
+      });
+
+      expect(moveResult.message).toEqual(
+        expect.stringContaining('Repositioned 1 instance')
+      );
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 40, y: 50, z: 60 },
+      ]);
     });
 
     it('erases an existing instance by id', async () => {
@@ -2816,6 +3616,67 @@ describe('editorFunctions', () => {
       });
     });
 
+    it('keeps spaces and special characters when renaming a scene', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Templo das Estações' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Renamed scene "TestScene" to "Templo das Estações"'
+      );
+      expect(project.hasLayoutNamed('Templo das Estações')).toBe(true);
+      expect(project.hasLayoutNamed('Templo_das_Estações')).toBe(false);
+    });
+
+    it('uses the new scene name when renaming and setting as first scene in the same call', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'New Scene Name' },
+              { property_name: 'isFirstScene', new_value: 'true' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain(
+        'Set "New Scene Name" as the first (startup) scene.'
+      );
+      expect(project.getFirstLayout()).toBe('New Scene Name');
+    });
+
+    it('lists the project scenes when the scene is not found', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'NonExistentScene',
+            changed_properties: [
+              { property_name: 'name', new_value: 'Whatever' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toMatchInlineSnapshot(
+        `"Scene not found: \\"NonExistentScene\\". Scenes in this project: \\"TestScene\\"."`
+      );
+    });
+
     it('does nothing when renaming a scene to its current name', async () => {
       const onProjectItemRenamedOutsideEditor: JestMockFn<any, any> = jest.fn();
 
@@ -2836,6 +3697,80 @@ describe('editorFunctions', () => {
       expect(result.message).toContain('Scene already named "TestScene".');
       expect(project.hasLayoutNamed('TestScene')).toBe(true);
       expect(onProjectItemRenamedOutsideEditor).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (layers)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      makeTestExtensions(gd);
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('creates a layer and clearly reports it did not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'UI' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"UI\\" did not exist in scene \\"TestScene\\": created it at position 1. Layers are now: \\"\\", \\"UI\\". If you meant to modify an existing layer, check its exact name."
+      `);
+      expect(testScene.hasLayerNamed('UI')).toBe(true);
+    });
+
+    it('does not create a layer when renaming a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              { layer_name: 'Ground', new_layer_name: 'Background' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": no layer was renamed. Existing layers are: \\"\\". To create a new layer, pass its name as \\"layer_name\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
+      expect(testScene.hasLayerNamed('Background')).toBe(false);
+    });
+
+    it('does not create a layer when deleting a layer that does not exist', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'Ground', delete_this_layer: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": nothing was deleted. Existing layers are: \\"\\"."`
+      );
+      expect(testScene.hasLayerNamed('Ground')).toBe(false);
     });
   });
 
@@ -2947,6 +3882,93 @@ describe('editorFunctions', () => {
         .getEffects();
       expect(effectsContainer.hasEffectNamed('ToRemove')).toBe(false);
       expect(effectsContainer.hasEffectNamed('ToKeep')).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 3D-only effect to a 2D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('2d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MyLight" effect');
+      expect(result.warnings).toContain(
+        '"MyLight" only works in 3D, but layer "" is restricted to 2D'
+      );
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('')
+          .getEffects()
+          .hasEffectNamed('MyLight')
+      ).toBe(true);
+    });
+
+    it('warns (but still adds it) when adding a 2D-only effect to a 3D-restricted layer', async () => {
+      testScene
+        .getLayers()
+        .getLayer('')
+        .setRenderingType('3d');
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MySepia',
+                effect_type: 'FakeSepia',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Created new "MySepia" effect');
+      expect(result.warnings).toContain(
+        '"MySepia" only works in 2D, but layer "" is restricted to 3D'
+      );
+    });
+
+    it('does not warn when the layer allows both 2D and 3D (default)', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layer_effects: [
+              {
+                layer_name: '',
+                effect_name: 'MyLight',
+                effect_type: 'FakeDirectionalLight',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Done.');
+      expect(result.warnings).toBeUndefined();
     });
   });
 
@@ -3505,6 +4527,69 @@ describe('editorFunctions', () => {
     });
   });
 
+  describe('change_behavior_property (delete_this_behavior)', () => {
+    let project: gdProject;
+    let testScene: gdLayout;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      testScene = project.insertNewLayout('TestScene', 0);
+      const object = testScene
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'MySprite', 0);
+      object.addNewBehavior(
+        project,
+        'PlatformBehavior::PlatformerObjectBehavior',
+        'PlatformerObject'
+      );
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a behavior from an object when delete_this_behavior is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'PlatformerObject',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Removed behavior');
+      expect(
+        testScene
+          .getObjects()
+          .getObject('MySprite')
+          .hasBehaviorNamed('PlatformerObject')
+      ).toBe(false);
+    });
+
+    it('fails when the behavior is not on the object', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'NotThere',
+            delete_this_behavior: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Not removed');
+    });
+  });
+
   describe('inspect_behavior_properties (single object)', () => {
     let project: gdProject;
     let testScene: gdLayout;
@@ -3558,6 +4643,69 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('not on');
+    });
+  });
+
+  describe('change_scene_properties_layers_effects_groups (delete_this_scene)', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('deletes a scene when delete_this_scene is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('Deleted scene "TestScene"');
+      expect(project.hasLayoutNamed('TestScene')).toBe(false);
+    });
+
+    it('clears the first layout if the deleted scene was the first layout', async () => {
+      project.setFirstLayout('TestScene');
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('notifies the editor before the scene is deleted, so it can close any open tab', async () => {
+      const scene = project.getLayout('TestScene');
+      const fakeOptions = makeFakeLaunchFunctionOptionsWithProject(project);
+
+      await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...fakeOptions,
+          args: {
+            scene_name: 'TestScene',
+            delete_this_scene: true,
+          },
+        }
+      );
+
+      expect(fakeOptions.onWillDeleteScene).toHaveBeenCalledWith({ scene });
     });
   });
 
@@ -3775,6 +4923,365 @@ describe('editorFunctions', () => {
           .get('Enemies')
           .find('Ghost')
       ).toBe(false);
+    });
+  });
+
+  describe('inspect_project_properties_resources', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+      project.insertNewLayout('MenuScene', 1);
+
+      const imageResource = new gd.ImageResource();
+      imageResource.setName('hero.png');
+      imageResource.setFile('assets/hero.png');
+      const audioResource = new gd.AudioResource();
+      audioResource.setName('jump.aac');
+      audioResource.setFile('assets/jump.aac');
+      project.getResourcesManager().addResource(imageResource);
+      project.getResourcesManager().addResource(audioResource);
+      imageResource.delete();
+      audioResource.delete();
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('returns the project properties, scene names and a resources summary', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {},
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const properties = result.properties || {};
+      expect(properties.name).toBe(project.getName());
+      expect(properties.windowWidth).toBe(project.getGameResolutionWidth());
+      expect(properties.windowHeight).toBe(project.getGameResolutionHeight());
+      expect(properties.scaleMode).toBe(project.getScaleMode());
+      expect(properties.firstLayout).toBe(project.getFirstLayout());
+      expect(result.sceneNames).toEqual(['TestScene', 'MenuScene']);
+      expect(result.resources).toBe(undefined);
+      const resourcesSummary = result.resourcesSummary || {};
+      expect(resourcesSummary.total).toBe(2);
+      expect(resourcesSummary.byKind).toEqual({ image: 1, audio: 1 });
+      expect(resourcesSummary.hint).toContain('filter_by_resource_name');
+      expect(resourcesSummary.hint).toContain('list_all_resources');
+    });
+
+    it('lists all the resources when list_all_resources is true', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { list_all_resources: true },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.resourcesSummary).toBe(undefined);
+      expect(result.resources).toEqual([
+        {
+          name: 'hero.png',
+          kind: 'image',
+          file: 'assets/hero.png',
+          metadata: undefined,
+          originName: undefined,
+          originIdentifier: undefined,
+        },
+        {
+          name: 'jump.aac',
+          kind: 'audio',
+          file: 'assets/jump.aac',
+          metadata: undefined,
+          originName: undefined,
+          originIdentifier: undefined,
+        },
+      ]);
+    });
+
+    it('searches resources by name (case-insensitive)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { filter_by_resource_name: 'JUMP' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const resources = result.resources || [];
+      expect(resources.map(resource => resource.name)).toEqual(['jump.aac']);
+    });
+
+    it('warns when no resource name matches the search', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: { filter_by_resource_name: 'ghost' },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.resources).toEqual([]);
+      expect(result.warnings).toContain('No resource name contains "ghost"');
+      expect(result.warnings).toContain('2 resources in total');
+    });
+  });
+
+  describe('change_project_properties_resources', () => {
+    let project: gdProject;
+
+    beforeEach(() => {
+      // $FlowFixMe[invalid-constructor]
+      project = new gd.ProjectHelper.createNewGDJSProject();
+      project.insertNewLayout('TestScene', 0);
+      project.insertNewLayout('MenuScene', 1);
+    });
+
+    afterEach(() => {
+      project.delete();
+    });
+
+    it('changes the game name, resolution and first scene', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'name', new_value: 'My Great Game' },
+              { property_name: 'windowWidth', new_value: '1920' },
+              { property_name: 'windowHeight', new_value: '1080' },
+              { property_name: 'firstLayout', new_value: 'MenuScene' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getName()).toBe('My Great Game');
+      expect(project.getGameResolutionWidth()).toBe(1920);
+      expect(project.getGameResolutionHeight()).toBe(1080);
+      expect(project.getFirstLayout()).toBe('MenuScene');
+    });
+
+    it('accepts the game property names used by the scene tool', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'gameName', new_value: 'Aliased Name' },
+              { property_name: 'gameResolutionWidth', new_value: '640' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getName()).toBe('Aliased Name');
+      expect(project.getGameResolutionWidth()).toBe(640);
+    });
+
+    it('validates properties with a fixed set of values', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'scaleMode', new_value: 'nearest' },
+              { property_name: 'orientation', new_value: 'sideways' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getScaleMode()).toBe('nearest');
+      expect(result.message).toContain('Invalid orientation: "sideways"');
+      expect(result.message).toContain('"landscape"');
+    });
+
+    it('refuses a first scene that does not exist and lists the scenes', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'firstLayout', new_value: 'DoesNotExist' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Scene not found: "DoesNotExist"');
+      expect(result.message).toContain('"TestScene"');
+      expect(result.message).toContain('"MenuScene"');
+      expect(project.getFirstLayout()).toBe('');
+    });
+
+    it('warns on an unknown property and lists the supported ones', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_properties: [
+              { property_name: 'gravity', new_value: '9.8' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Unknown project property: "gravity"');
+      expect(result.message).toContain('firstLayout');
+    });
+
+    it('fails when no change is provided', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {},
+        }
+      );
+
+      expect(result.success).toBe(false);
+    });
+
+    const addProjectResources = () => {
+      const imageResource = new gd.ImageResource();
+      imageResource.setName('hero.png');
+      imageResource.setFile('assets/hero.png');
+      const audioResource = new gd.AudioResource();
+      audioResource.setName('jump.aac');
+      audioResource.setFile('assets/jump.aac');
+      project.getResourcesManager().addResource(imageResource);
+      project.getResourcesManager().addResource(audioResource);
+      imageResource.delete();
+      audioResource.delete();
+    };
+
+    const addObjectUsingImageResource = (imageName: string) => {
+      const object = project
+        .getLayout('TestScene')
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Hero', 0);
+      const spriteConfiguration = gd.asSpriteConfiguration(
+        object.getConfiguration()
+      );
+      const animation = new gd.Animation();
+      animation.setDirectionsCount(1);
+      const sprite = new gd.Sprite();
+      sprite.setImageName(imageName);
+      animation.getDirection(0).addSprite(sprite);
+      spriteConfiguration.getAnimations().addAnimation(animation);
+      sprite.delete();
+      animation.delete();
+      return object;
+    };
+
+    it('renames a resource and updates the objects using it', async () => {
+      addProjectResources();
+      const object = addObjectUsingImageResource('hero.png');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              {
+                resource_name: 'hero.png',
+                new_resource_name: 'hero-sprite.png',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getResourcesManager().hasResource('hero.png')).toBe(false);
+      expect(project.getResourcesManager().hasResource('hero-sprite.png')).toBe(
+        true
+      );
+      // The file is unchanged, only the resource name is.
+      expect(
+        project
+          .getResourcesManager()
+          .getResource('hero-sprite.png')
+          .getFile()
+      ).toBe('assets/hero.png');
+      expect(
+        gd
+          .asSpriteConfiguration(object.getConfiguration())
+          .getAnimations()
+          .getAnimation(0)
+          .getDirection(0)
+          .getSprite(0)
+          .getImageName()
+      ).toBe('hero-sprite.png');
+    });
+
+    it('deletes a resource not used by any object', async () => {
+      addProjectResources();
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'jump.aac', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(project.getResourcesManager().hasResource('jump.aac')).toBe(false);
+    });
+
+    it('refuses to delete a resource still used by an object', async () => {
+      addProjectResources();
+      addObjectUsingImageResource('hero.png');
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'hero.png', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('NOT deleted');
+      expect(result.message).toContain('Hero');
+      // Must steer away from modifying the objects to force the deletion.
+      expect(result.message).toContain('Do NOT modify');
+      expect(result.message).toContain('report the problem');
+      expect(project.getResourcesManager().hasResource('hero.png')).toBe(true);
+    });
+
+    it('warns when the resource does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            changed_resources: [
+              { resource_name: 'ghost.png', delete_this_resource: true },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Resource not found: "ghost.png"');
     });
   });
 });

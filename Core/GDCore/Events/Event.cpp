@@ -29,6 +29,30 @@ BaseEvent::BaseEvent()
       disabled(false),
       folded(false) {}
 
+// Copy operations are user-defined because _memoryTracked must not be copied:
+// it registers the owning instance in MemoryTrackedRegistry.
+BaseEvent::BaseEvent(const BaseEvent& other)
+    : originalEvent(other.originalEvent),
+      totalTimeDuringLastSession(other.totalTimeDuringLastSession),
+      percentDuringLastSession(other.percentDuringLastSession),
+      folded(other.folded),
+      disabled(other.disabled),
+      type(other.type),
+      aiGeneratedEventId(other.aiGeneratedEventId) {}
+
+BaseEvent& BaseEvent::operator=(const BaseEvent& other) {
+  if (this != &other) {
+    originalEvent = other.originalEvent;
+    totalTimeDuringLastSession = other.totalTimeDuringLastSession;
+    percentDuringLastSession = other.percentDuringLastSession;
+    folded = other.folded;
+    disabled = other.disabled;
+    type = other.type;
+    aiGeneratedEventId = other.aiGeneratedEventId;
+  }
+  return *this;
+}
+
 bool BaseEvent::HasSubEvents() const { return !GetSubEvents().IsEmpty(); }
 
 const gd::String& BaseEvent::GetOrCreatePersistentUuid() {

@@ -124,7 +124,7 @@ describe('applyVariableChange', () => {
     it('should add property to existing structure', () => {
       // Setup existing structure
       const existingStruct = variablesContainer.insertNew('existingStruct', 0);
-      existingStruct.castTo('Structure');
+      existingStruct.castTo('structure');
       existingStruct.getChild('existingProp').setString('existing');
 
       const result = applyVariableChange({
@@ -186,7 +186,7 @@ describe('applyVariableChange', () => {
     it('should expand array when accessing higher index', () => {
       // Setup existing array with 2 items
       const existingArray = variablesContainer.insertNew('existingArray', 0);
-      existingArray.castTo('Array');
+      existingArray.castTo('array');
       existingArray.pushNew().setString('item0');
       existingArray.pushNew().setString('item1');
 
@@ -220,7 +220,7 @@ describe('applyVariableChange', () => {
     it('should modify existing array item', () => {
       // Setup existing array
       const existingArray = variablesContainer.insertNew('existingArray', 0);
-      existingArray.castTo('Array');
+      existingArray.castTo('array');
       existingArray.pushNew().setString('original');
 
       applyVariableChange({
@@ -542,11 +542,11 @@ describe('applyVariableChange', () => {
     it('replaces a whole structure (root and nested) with new JSON, dropping old fields', () => {
       // Pre-populate a structure with multiple children, including a nested one.
       const root = variablesContainer.insertNew('player', 0);
-      root.castTo('Structure');
+      root.castTo('structure');
       root.getChild('hp').setValue(10);
       root.getChild('name').setString('Hero');
       const stats = root.getChild('stats');
-      stats.castTo('Structure');
+      stats.castTo('structure');
       stats.getChild('strength').setValue(5);
       stats.getChild('agility').setValue(7);
 
@@ -571,7 +571,7 @@ describe('applyVariableChange', () => {
       // should be replaced, siblings at the parent level must be preserved.
       replacedRoot.getChild('hp').setValue(10);
       const newStats = replacedRoot.getChild('stats');
-      newStats.castTo('Structure');
+      newStats.castTo('structure');
       newStats.getChild('strength').setValue(5);
       newStats.getChild('agility').setValue(7);
 
@@ -599,14 +599,14 @@ describe('applyVariableChange', () => {
     it('replaces a whole array (root and nested) with new JSON, dropping old elements', () => {
       // Pre-populate an array with multiple items, plus a nested array.
       const root = variablesContainer.insertNew('inventory', 0);
-      root.castTo('Array');
+      root.castTo('array');
       root.pushNew().setString('Sword');
       root.pushNew().setString('Shield');
       root.pushNew().setString('Potion');
       const nested = variablesContainer.insertNew('matrix', 0);
-      nested.castTo('Structure');
+      nested.castTo('structure');
       const row = nested.getChild('row');
-      row.castTo('Array');
+      row.castTo('array');
       row.pushNew().setValue(1);
       row.pushNew().setValue(2);
       row.pushNew().setValue(3);
@@ -641,6 +641,68 @@ describe('applyVariableChange', () => {
       expect(replacedRow.getType()).toBe(gd.Variable.Array);
       expect(replacedRow.getChildrenCount()).toBe(1);
       expect(replacedRow.getAtIndex(0).getValue()).toBe(42);
+    });
+  });
+
+  describe('Empty arrays and structures', () => {
+    it('creates an empty array from "[]"', () => {
+      const result = applyVariableChange({
+        variablePath: 'emptyArray',
+        forcedVariableType: 'Array',
+        variablesContainer,
+        value: '[]',
+      });
+
+      expect(result.variableType).toBe('Array');
+      const variable = variablesContainer.get('emptyArray');
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      expect(variable.getChildrenCount()).toBe(0);
+    });
+
+    it('creates an empty structure from "{}"', () => {
+      const result = applyVariableChange({
+        variablePath: 'emptyStructure',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{}',
+      });
+
+      expect(result.variableType).toBe('Structure');
+      const variable = variablesContainer.get('emptyStructure');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChildrenCount()).toBe(0);
+    });
+
+    it('creates empty array and structure children inside a structure', () => {
+      applyVariableChange({
+        variablePath: 'inventory',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '{"weapons": [], "stats": {}}',
+      });
+
+      const variable = variablesContainer.get('inventory');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('weapons').getType()).toBe(gd.Variable.Array);
+      expect(variable.getChild('weapons').getChildrenCount()).toBe(0);
+      expect(variable.getChild('stats').getType()).toBe(gd.Variable.Structure);
+      expect(variable.getChild('stats').getChildrenCount()).toBe(0);
+    });
+
+    it('replaces an existing number child with an empty array via a path', () => {
+      const root = variablesContainer.insertNew('storage', 0);
+      root.getChild('herbs').setValue(0);
+
+      applyVariableChange({
+        variablePath: 'storage.herbs',
+        forcedVariableType: 'Array',
+        variablesContainer,
+        value: '[]',
+      });
+
+      const herbs = variablesContainer.get('storage').getChild('herbs');
+      expect(herbs.getType()).toBe(gd.Variable.Array);
+      expect(herbs.getChildrenCount()).toBe(0);
     });
   });
 });

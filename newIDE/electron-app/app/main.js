@@ -49,6 +49,7 @@ const {
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
+const { installCliInPath } = require('./InstallCliInPath');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -73,7 +74,7 @@ let windowCounter = 0; // Counter for creating unique session partitions
 // so have to ignore one more).
 const argsParserOptions = {
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command'],
+  string: ['_', 'run-command', 'cmd-args'],
 };
 const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
 
@@ -428,6 +429,12 @@ app.on('ready', function() {
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
+
+  ipcMain.handle('install-cli-in-path', async () => {
+    // Inside an AppImage, process.execPath points into a transient mount that
+    // vanishes on quit; APPIMAGE is the stable file path (still breaks if moved).
+    return installCliInPath(process.env.APPIMAGE || process.execPath);
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {
@@ -864,7 +871,7 @@ app.on('ready', function() {
           const escapedPath = projectPath.replace(/'/g, "'\\''");
           const shellCommand = keepOpen
             ? `cd '${escapedPath}' && ${npmCommand}`
-            : `cd '${escapedPath}' && ${npmCommand} && exit || echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"`;
+            : `cd '${escapedPath}' && ${npmCommand} && exit || echo '${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}'`;
           const script = `tell application "Terminal" to do script "${shellCommand.replace(
             /"/g,
             '\\"'

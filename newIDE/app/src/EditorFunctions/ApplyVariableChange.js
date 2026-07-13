@@ -125,13 +125,13 @@ const convertJsObjectToVariable = (value: any, variable: gdVariable) => {
   } else if (typeof value === 'boolean') {
     variable.setBool(value);
   } else if (Array.isArray(value)) {
-    variable.castTo('Array');
+    variable.castTo('array');
     variable.clearChildren();
     for (const item of value) {
       convertJsObjectToVariable(item, variable.pushNew());
     }
   } else if (typeof value === 'object') {
-    variable.castTo('Structure');
+    variable.castTo('structure');
     variable.clearChildren();
     for (const [key, item] of Object.entries(value)) {
       convertJsObjectToVariable(item, variable.getChild(key));
@@ -185,7 +185,7 @@ export const applyVariableChange = ({
       // $FlowFixMe[incompatible-use]
       if (variable.getType() !== gd.Variable.Structure) {
         // $FlowFixMe[incompatible-use]
-        variable.castTo('Structure');
+        variable.castTo('structure');
       }
       // $FlowFixMe[incompatible-use]
       if (!variable.hasChild(segment.value)) {
@@ -200,7 +200,7 @@ export const applyVariableChange = ({
       // $FlowFixMe[incompatible-use]
       if (variable.getType() !== gd.Variable.Array) {
         // $FlowFixMe[incompatible-use]
-        variable.castTo('Array');
+        variable.castTo('array');
       }
 
       // Ensure array has enough elements

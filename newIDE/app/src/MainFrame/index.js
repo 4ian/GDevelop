@@ -88,6 +88,8 @@ import {
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
@@ -150,9 +152,18 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
+import {
+  installCliInPath,
+  isCliInPathInstallSupported,
+} from '../Utils/InstallCliInPath';
+import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import {
+  type ImportExtension,
+  type SaveProject,
+} from './LocalCliCommandRunner';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -405,6 +416,10 @@ export type Props = {|
     project: ?gdProject,
     i18n: I18n,
     commandPaletteRef: {| current: ?CommandPaletteInterface |},
+    importExtension: ImportExtension,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+    saveProject: SaveProject,
   |}) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
@@ -1644,10 +1659,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     );
     if (!answer) return;
 
-    setState(state => ({
-      ...state,
-      editorTabs: closeLayoutTabs(state.editorTabs, layout),
-    })).then(state => {
+    onWillDeleteScene({ scene: layout }).then(() => {
       if (currentProject.getFirstLayout() === layout.getName())
         currentProject.setFirstLayout('');
       currentProject.removeLayout(layout.getName());
@@ -1786,76 +1798,33 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
-  const onWillInstallExtension = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) return;
+  const onWillInstallExtension = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
 
-    for (const extensionName of extensionNames) {
-      // Close the extension tab before updating/reinstalling the extension.
-      // This is especially important when the extension tab in selected.
-      const eventsFunctionsExtensionName = extensionName;
+      for (const extensionName of extensionNames) {
+        // Close the extension tab before updating/reinstalling the extension.
+        // This is especially important when the extension tab in selected.
+        const eventsFunctionsExtensionName = extensionName;
 
-      if (
-        currentProject.hasEventsFunctionsExtensionNamed(
-          eventsFunctionsExtensionName
-        )
-      ) {
-        setState(state => ({
-          ...state,
-          editorTabs: closeEventsFunctionsExtensionTabs(
-            state.editorTabs,
+        if (
+          currentProject.hasEventsFunctionsExtensionNamed(
             eventsFunctionsExtensionName
-          ),
-        }));
+          )
+        ) {
+          setState(state => ({
+            ...state,
+            editorTabs: closeEventsFunctionsExtensionTabs(
+              state.editorTabs,
+              eventsFunctionsExtensionName
+            ),
+          }));
+        }
       }
-    }
-  };
-
-  const onExtensionInstalled = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) {
-      return;
-    }
-    let hasEventsBasedObject = false;
-    for (const extensionName of extensionNames) {
-      const eventsBasedObjects = currentProject
-        .getEventsFunctionsExtension(extensionName)
-        .getEventsBasedObjects();
-      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
-        const eventsBasedObject = eventsBasedObjects.getAt(index);
-        gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
-          currentProject,
-          eventsBasedObject
-        );
-      }
-
-      // Close extension tab because `onInstallExtension` is not necessarily
-      // called when the extension tab is not selected.
-
-      // TODO Open the closed tabs back
-      // It would be safer to close the tabs before the extension is installed
-      // but it would make opening them back more complicated.
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
-          extensionName
-        ),
-      }));
-
-      hasEventsBasedObject =
-        hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
-    }
-    if (hasEventsBasedObject) {
-      notifyChangesToInGameEditor({
-        shouldReloadProjectData: true,
-        shouldReloadLibraries: true,
-        shouldReloadResources: false,
-        shouldHardReload: false,
-        reasons: ['installed-extension-with-custom-object'],
-      });
-    }
-  };
+    },
+    [state.currentProject, setState]
+  );
 
   const notifyChangesToInGameEditor = React.useCallback(
     (hotReloadSteps: HotReloadSteps) => {
@@ -1876,6 +1845,77 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [state.editorTabs]
+  );
+
+  const onExtensionInstalled = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) {
+        return;
+      }
+      let hasEventsBasedObject = false;
+      for (const extensionName of extensionNames) {
+        const eventsBasedObjects = currentProject
+          .getEventsFunctionsExtension(extensionName)
+          .getEventsBasedObjects();
+        for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+          const eventsBasedObject = eventsBasedObjects.getAt(index);
+          gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+            currentProject,
+            eventsBasedObject
+          );
+        }
+
+        // Close extension tab because `onInstallExtension` is not necessarily
+        // called when the extension tab is not selected.
+
+        // TODO Open the closed tabs back
+        // It would be safer to close the tabs before the extension is installed
+        // but it would make opening them back more complicated.
+        setState(state => ({
+          ...state,
+          editorTabs: closeEventsFunctionsExtensionTabs(
+            state.editorTabs,
+            extensionName
+          ),
+        }));
+
+        hasEventsBasedObject =
+          hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
+      }
+      if (hasEventsBasedObject) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['installed-extension-with-custom-object'],
+        });
+      }
+    },
+    [state.currentProject, notifyChangesToInGameEditor, setState]
+  );
+
+  const importExtension = useImportExtension();
+
+  const onImportExtension = React.useCallback(
+    async () => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
+      await importExtension({
+        i18n,
+        project: currentProject,
+        onWillInstallExtension,
+        onExtensionInstalled,
+      });
+    },
+    [
+      state.currentProject,
+      importExtension,
+      i18n,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    ]
   );
 
   const triggerHotReloadInGameEditorIfNeeded = React.useCallback(
@@ -3767,6 +3807,37 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
+  // Called before the scene is actually deleted from the project, so the
+  // gdLayout is still valid for the tab-matching in `closeLayoutTabs`
+  // (mirrors the manual delete flow, which closes tabs before removing).
+  // The caller MUST await this: `setState` (`useStateWithCallback`) resolves
+  // once the tab-closing update is applied, and closing tabs requires
+  // reading the layout via `getLayout()` — which only works while the scene
+  // still exists in the project.
+  const onWillDeleteScene = async (
+    changes: WillDeleteSceneChanges
+  ): Promise<void> => {
+    await setState(state => ({
+      ...state,
+      editorTabs: closeLayoutTabs(state.editorTabs, changes.scene),
+    }));
+  };
+
+  // Called before the object is actually deleted from the project, so any
+  // open editor can still safely read it (e.g. to close a dialog/panel
+  // referring to it) without risking a dangling reference.
+  const onWillDeleteObject = React.useCallback(
+    (changes: WillDeleteObjectChanges) => {
+      for (const editor of getAllEditorTabs(state.editorTabs)) {
+        const { editorRef } = editor;
+        if (editorRef) {
+          editorRef.onWillDeleteObject(changes);
+        }
+      }
+    },
+    [state.editorTabs]
+  );
+
   const selectAllInActiveEditors = React.useCallback(
     () => {
       if (isUserTyping()) {
@@ -5271,12 +5342,28 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
     onTogglePauseExecution: togglePauseExecution,
     onStepNextEvent: stepNextEvent,
+    onImportExtension,
+    canInstallCliInPath: isCliInPathInstallSupported(),
+    onInstallCliInPath: async () => {
+      const result = await installCliInPath();
+      // Main-process message isn't localized but carries OS-specific nuance
+      // (e.g. "open a new terminal" on Windows) that a generic string would drop.
+      _showSnackMessage(
+        result.status === 'success'
+          ? result.message
+          : i18n._(t`Couldn't set up the GDevelop CLI: ${result.message}`)
+      );
+    },
   });
 
   useCliCommandRunner({
     project: state.currentProject,
     i18n,
     commandPaletteRef,
+    importExtension,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    saveProject,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -5503,6 +5590,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onObjectsModifiedOutsideEditor: onObjectsModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
+    onWillDeleteScene: onWillDeleteScene,
+    onWillDeleteObject: onWillDeleteObject,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,

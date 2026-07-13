@@ -98,6 +98,7 @@ import {
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import { type WillDeleteObjectChanges } from '../EditorFunctions/OutsideEditorChanges';
 import {
   type EventsBasedObjectChildrenEditedOptions,
   getImageResourceNamesForEditedObject,
@@ -761,7 +762,37 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdateObjectsList();
   };
 
+  onWillDeleteObject = (changes: WillDeleteObjectChanges) => {
+    // Called before the object is actually deleted, so it's still safe to
+    // read `editedObjectWithContext.object` here.
+    const { editedObjectWithContext } = this.state;
+    if (
+      editedObjectWithContext &&
+      editedObjectWithContext.object.getName() === changes.objectName
+    ) {
+      this.editObject(null);
+    }
+
+    // Clear the objects-list selection now, before actually deleting the
+    // object, to prevent any stale reference in a re-render after deletion
+    // (exact same fix and rationale as the manual delete flow's
+    // `_onDeleteObjects`).
+    this.setState({ selectedObjectFolderOrObjectsWithContext: [] });
+
+    // Drop only the selected instances of this object (mirrors the manual
+    // delete flow, which does the same before removing the object), rather
+    // than waiting for the `onInstancesModifiedOutsideEditor` call that
+    // follows the actual removal and would clear the whole selection.
+    this.instancesSelection.unselectInstancesOfObject(changes.objectName);
+  };
+
   onObjectGroupsModifiedOutsideEditor = () => {
+    // /!\ Drop the group selection to avoid keeping any reference to a group
+    // that could have been deleted or re-created in memory.
+    if (this.state.selectedObjectGroup) {
+      this.setState({ selectedObjectGroup: null });
+    }
+
     // Force refresh of the object groups list.
     this.forceUpdateObjectGroupsList();
   };
@@ -1851,10 +1882,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectsWithContext.forEach(objectWithContext => {
       const { object, global } = objectWithContext;
 
-      // Unselect instances of the deleted object because these instances
-      // will be deleted by gd.WholeProjectRefactorer (and after that, they will
+      // Close the object's edit dialog if open, clear the objects-list
+      // selection and unselect instances of the deleted object - all before
+      // gd.WholeProjectRefactorer removes them below (after which they would
       // be invalid references, as pointing to deleted objects).
-      this.instancesSelection.unselectInstancesOfObject(object.getName());
+      this.onWillDeleteObject({ scene: layout, objectName: object.getName() });
 
       if (layout) {
         if (global) {
@@ -1876,12 +1908,6 @@ export default class SceneEditor extends React.Component<Props, State> {
           object.getName()
         );
       }
-    });
-
-    // /!\ Clear the selected objects before actually deleting them to prevent
-    // any stale reference in a re-render after deletion.
-    this.setState({
-      selectedObjectFolderOrObjectsWithContext: [],
     });
 
     this.props.onObjectListsModified({ isNewObjectTypeUsed: false });
@@ -2096,6 +2122,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     done: boolean => void
   ) => {
+    // Clear the group selection now, before actually deleting the group,
+    // to prevent any stale reference in a re-render after deletion (the
+    // group properties panel would call into a destroyed gd.ObjectGroup).
+    this.setState({ selectedObjectGroup: null });
+
     // done() actually does the deletion of the object group,
     // so ensure groupWithContext is not used after this call.
     done(true);

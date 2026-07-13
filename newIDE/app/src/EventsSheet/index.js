@@ -590,6 +590,24 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   updateToolbar() {
     if (!this.props.setToolbar) return;
 
+    try {
+      this._updateToolbar();
+    } catch (error) {
+      // The toolbar is rendered outside of the events sheet error boundary:
+      // an error while inspecting the selection (typically because it holds
+      // events destroyed by a change that did not clear the selection) would
+      // crash the whole app. Drop the selection and build the toolbar again.
+      console.error(
+        'Error while updating the events sheet toolbar - clearing the selection and retrying.',
+        error
+      );
+      this.setState({ selection: clearSelection() }, () =>
+        this._updateToolbar()
+      );
+    }
+  }
+
+  _updateToolbar() {
     const canAddSubEvent = this._selectionCanHaveSubEvents();
 
     this.props.setToolbar(

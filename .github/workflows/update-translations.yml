@@ -57,6 +57,14 @@ jobs:
         run: npm run compile-translations
         working-directory: newIDE/app
 
+      # Safety check: if the English catalog is missing (it's re-created by
+      # compile-translations after being removed by extract-all-translations),
+      # English strings with parameters would be displayed with raw
+      # placeholders (like "{name}") in production builds. Fail instead of
+      # opening a Pull Request that would delete it.
+      - name: Verify that the English catalog was compiled
+        run: test -f newIDE/app/src/locales/en/messages.js
+
       - name: Create a Pull Request with the changes
         uses: peter-evans/create-pull-request@v6
         with:

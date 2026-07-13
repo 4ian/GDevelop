@@ -15,6 +15,21 @@ const isWin = /^win/.test(process.platform);
 
 const newIdeAppPath = path.join(__dirname, '..');
 
+// These packages are dependencies of @lingui/cli. They are used to check
+// that translations are valid ICU messages before running "lingui compile"
+// (which crashes at the first invalid translation, leaving all the
+// remaining locales - notably "en" - without a compiled catalog).
+let PO = null;
+let parseIcuMessage = null;
+try {
+  PO = require('pofile');
+  parseIcuMessage = require('messageformat-parser').parse;
+} catch (error) {
+  shell.echo(
+    `⚠️ Can't load "pofile" or "messageformat-parser" (${error}) - invalid translations won't be detected before compilation.`
+  );
+}
+
 const readUtf8File = path =>
   new Promise((resolve, reject) => {
     fs.readFile(path, 'utf8', function(err, content) {
@@ -63,7 +78,9 @@ if (!msgcat) {
   shell.echo(
     `ℹ️ Install "gettext" with "brew install gettext" (macOS) or your Linux package manager.`
   );
-  shell.exit(0);
+  // On a CI, this is a fatal error: continuing would silently produce
+  // outdated (or missing, in the case of "en") compiled catalogs.
+  shell.exit(process.env.CI ? 1 : 0);
 }
 
 const computeTranslationRatio = compiledCatalog => {
@@ -129,6 +146,48 @@ const sanitizeMessagePo = path => {
         forbiddenStringsFound,
       };
     });
+  });
+};
+
+// Check that every translation is a valid ICU message, and empty the invalid
+// ones (so that they fall back to the English source string). A single invalid
+// translation (for example, corrupted on Crowdin) would otherwise make
+// "lingui compile" crash, leaving all the locales compiled after it - "en"
+// included - without an up-to-date "messages.js". A missing "en/messages.js"
+// makes English strings with parameters displayed with raw placeholders (like
+// "{numberOfAssetPacks}") in production builds.
+const validateMessagePo = path => {
+  if (!PO || !parseIcuMessage) {
+    return Promise.resolve({ invalidMessages: [] });
+  }
+
+  return readUtf8File(path).then(content => {
+    const catalog = PO.parse(content);
+    const invalidMessages = [];
+    catalog.items.forEach(item => {
+      const hasInvalidTranslation = item.msgstr.some(translation => {
+        if (!translation) return false;
+        try {
+          parseIcuMessage(translation);
+          return false;
+        } catch (error) {
+          return true;
+        }
+      });
+
+      if (hasInvalidTranslation) {
+        invalidMessages.push({ msgid: item.msgid });
+        item.msgstr = item.msgstr.map(() => '');
+      }
+    });
+
+    if (invalidMessages.length === 0) {
+      return { invalidMessages };
+    }
+
+    return writeUtf8File(path, catalog.toString()).then(() => ({
+      invalidMessages,
+    }));
   });
 };
 
@@ -294,11 +353,51 @@ getLocales()
     ).then(() => locales);
   })
   .then(locales => {
+    // Empty (and warn about) translations that are not valid ICU messages
+    // and would make "lingui compile" crash.
+    return Promise.all(
+      locales.map(locale =>
+        validateMessagePo(getLocaleCatalogPath(locale)).then(results => {
+          if (results.invalidMessages.length) {
+            shell.echo(
+              `🚩 Found invalid translations for locale ${locale} (emptied to fall back to the source string - fix them on Crowdin):`
+            );
+            results.invalidMessages.forEach(({ msgid }) => {
+              shell.echo(`  * ${msgid}`);
+            });
+          }
+        })
+      )
+    ).then(() => locales);
+  })
+  .then(locales => {
     // Launch "lingui compile" for transforming .PO files into
     // js files ready to be used with @lingui/react newIDE translations
-    shell.exec('node node_modules/.bin/lingui compile', {
+    const compileResult = shell.exec('node node_modules/.bin/lingui compile', {
       cwd: newIdeAppPath,
     });
+    if (compileResult.code !== 0) {
+      shell.echo(
+        `❌ "lingui compile" failed - some locales are missing an up-to-date "messages.js". Verify the translations reported in the error above (and fix them on Crowdin).`
+      );
+      shell.exit(1);
+      return;
+    }
+
+    // The English catalog is removed by extract-all-translations and must be
+    // re-created by "lingui compile". If it's missing, English strings with
+    // parameters would be displayed with raw placeholders (like "{name}")
+    // in production builds (but not in development, as LinguiJS compiles
+    // missing messages on the fly only in development).
+    if (!fs.existsSync(getLocaleCompiledCatalogPath('en'))) {
+      shell.echo(
+        `❌ "${getLocaleCompiledCatalogPath(
+          'en'
+        )}" was not created by "lingui compile".`
+      );
+      shell.exit(1);
+      return;
+    }
 
     return locales;
   })

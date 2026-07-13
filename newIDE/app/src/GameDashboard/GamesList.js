@@ -27,8 +27,12 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
-import SelectOption from '../UI/SelectOption';
-import SearchBarSelectField from '../UI/SearchBarSelectField';
+import GamesListFilterSelector, {
+  type GamesListFilter,
+} from './GamesListFilterSelector';
+import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
+import { hasValidSubscriptionPlan } from '../Utils/GDevelopServices/Usage';
+import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -128,6 +132,61 @@ const areDashboardItemsEqual = (
   return false;
 };
 
+const getProjectsRestorationMessage = (
+  restorationTimeWindowInSeconds: ?number
+): React.Node => {
+  if (
+    restorationTimeWindowInSeconds == null ||
+    restorationTimeWindowInSeconds <= 0
+  ) {
+    return <Trans>Restore projects with a subscription</Trans>;
+  }
+
+  const days = Math.floor(restorationTimeWindowInSeconds / (24 * 3600));
+  const hours = Math.floor(restorationTimeWindowInSeconds / 3600);
+  const minutes = Math.max(1, Math.floor(restorationTimeWindowInSeconds / 60));
+  const duration =
+    days > 1 ? (
+      <Trans>{days} days</Trans>
+    ) : days === 1 ? (
+      <Trans>1 day</Trans>
+    ) : hours > 1 ? (
+      <Trans>{hours} hours</Trans>
+    ) : hours === 1 ? (
+      <Trans>1 hour</Trans>
+    ) : minutes > 1 ? (
+      <Trans>{minutes} minutes</Trans>
+    ) : (
+      <Trans>1 minute</Trans>
+    );
+
+  return (
+    <Trans>
+      By default, a project can only be restored during the {duration} following
+      its deletion. Get a subscription to restore older projects.
+    </Trans>
+  );
+};
+
+const isProjectRestorable = (
+  deletedCloudProject: CloudProjectWithUserAccessInfo,
+  restorationTimeWindowInSeconds: ?number
+): boolean => {
+  if (
+    restorationTimeWindowInSeconds == null ||
+    restorationTimeWindowInSeconds === -1
+  ) {
+    // Unknown window (limits not loaded yet) or unlimited: let the user try,
+    // the backend enforces the permission anyway.
+    return true;
+  }
+  const deletedAt = deletedCloudProject.deletedAt;
+  if (!deletedAt) return false;
+  return (
+    Date.now() - Date.parse(deletedAt) <= restorationTimeWindowInSeconds * 1000
+  );
+};
+
 const getDashboardItemsToDisplay = ({
   project,
   currentFileMetadata,
@@ -136,6 +195,7 @@ const getDashboardItemsToDisplay = ({
   searchClient,
   currentPage,
   orderBy,
+  filter,
 }: {|
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -145,6 +205,7 @@ const getDashboardItemsToDisplay = ({
   searchClient: Fuse,
   currentPage: number,
   orderBy: GamesDashboardOrderBy,
+  filter: GamesListFilter,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
   let itemsToDisplay: DashboardItem[] = [...allDashboardItems];
@@ -155,9 +216,16 @@ const getDashboardItemsToDisplay = ({
       getFuseSearchQueryForMultipleKeys(searchText, [
         'game.gameName',
         'projectFiles.fileMetadata.name',
+        'deletedCloudProject.name',
       ])
     );
     itemsToDisplay = searchResults.map(result => result.item);
+  } else if (filter === 'deleted') {
+    // Deleted projects are already sorted by deletion date: just paginate them.
+    itemsToDisplay = itemsToDisplay.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
   } else {
     // If there is no search, sort the items by the selected order.
     if (orderBy) {
@@ -263,6 +331,10 @@ type Props = {|
     file: FileMetadataAndStorageProviderName,
     options?: { skipConfirmation: boolean }
   ) => Promise<void>,
+  onRestoreCloudProject: (
+    i18n: I18nType,
+    cloudProject: CloudProjectWithUserAccessInfo
+  ) => Promise<void>,
   // Controls
   currentPage: number,
   setCurrentPage: (currentPage: number) => void,
@@ -280,6 +352,7 @@ const GamesList = ({
   onUnregisterGame,
   onRegisterProject,
   onDeleteCloudProject,
+  onRestoreCloudProject,
   disabled,
   storageProviders,
   canOpen,
@@ -295,19 +368,37 @@ const GamesList = ({
   searchText,
   setSearchText,
 }: Props): React.Node => {
-  const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    cloudProjects,
+    profile,
+    onCloudProjectsChanged,
+    subscription,
+    limits,
+  } = React.useContext(AuthenticatedUserContext);
   const {
     values: { gamesDashboardOrderBy: orderBy },
     setGamesDashboardOrderBy,
   } = React.useContext(PreferencesContext);
 
+  const [filter, setFilter] = React.useState<GamesListFilter>('active');
+
+  React.useEffect(
+    () => {
+      // Deleted projects are only available for logged-in users: switch back
+      // to the active projects when logging out, to avoid being stuck on an
+      // empty list without the filter selector displayed.
+      if (!profile && filter === 'deleted') {
+        setFilter('active');
+      }
+    },
+    [profile, filter]
+  );
+
   const { isMobile } = useResponsiveWindowSize();
   const gameThumbnailWidth = getThumbnailWidth({ isMobile });
 
   const allRecentProjectFiles = useProjectsListFor(null);
-  const allDashboardItems: ?(DashboardItem[]) = React.useMemo(
+  const activeDashboardItems: ?(DashboardItem[]) = React.useMemo(
     () => {
       if (!games) return null;
       const projectFilesWithGame = games.map(game => {
@@ -339,6 +430,22 @@ const GamesList = ({
     [games, allRecentProjectFiles, project]
   );
 
+  const deletedDashboardItems: DashboardItem[] = React.useMemo(
+    () =>
+      (cloudProjects || [])
+        .filter(cloudProject => !!cloudProject.deletedAt)
+        .sort(
+          (cloudProjectA, cloudProjectB) =>
+            Date.parse(cloudProjectB.deletedAt || '') -
+            Date.parse(cloudProjectA.deletedAt || '')
+        )
+        .map(cloudProject => ({ deletedCloudProject: cloudProject })),
+    [cloudProjects]
+  );
+
+  const allDashboardItems: ?(DashboardItem[]) =
+    filter === 'deleted' ? deletedDashboardItems : activeDashboardItems;
+
   const totalNumberOfPages = allDashboardItems
     ? Math.ceil(allDashboardItems.length / pageSize)
     : 1;
@@ -364,6 +471,7 @@ const GamesList = ({
         keys: [
           { name: 'game.gameName', weight: 1 },
           { name: 'projectFiles.fileMetadata.name', weight: 1 },
+          { name: 'deletedCloudProject.name', weight: 1 },
         ],
       }),
     [allDashboardItems]
@@ -381,6 +489,7 @@ const GamesList = ({
       searchClient,
       currentPage,
       orderBy,
+      filter,
     })
   );
 
@@ -395,6 +504,7 @@ const GamesList = ({
           searchClient,
           currentPage,
           orderBy,
+          filter,
         })
       );
     },
@@ -413,6 +523,7 @@ const GamesList = ({
       games, // games change (when updating a game for instance)
       currentPage, // user changes page
       orderBy, // user changes order
+      filter, // user switches between active and deleted projects
       currentFileMetadata, // opened project changes (when opening or closing a project from here)
       allRecentProjectFiles.length, // list of recent projects changes (when a project is removed from list)
       project, // opened project changes (when closing a project from here)
@@ -465,11 +576,11 @@ const GamesList = ({
 
   React.useEffect(
     () => {
-      // Reset pagination when modifying the sorting order.
+      // Reset pagination when modifying the sorting order or the list shown.
       setCurrentPage(1);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [orderBy]
+    [orderBy, filter]
   );
 
   const shouldShowOpenProject =
@@ -533,13 +644,22 @@ const GamesList = ({
               )}
             </LineStackLayout>
           </Line>
-          {allDashboardItems && allDashboardItems.length > 0 && (
+          {((activeDashboardItems && activeDashboardItems.length > 0) ||
+            deletedDashboardItems.length > 0) && (
             <ResponsiveLineStackLayout
               expand
               noMargin
               alignItems="center"
               noResponsiveLandscape
             >
+              {!isMobile && (
+                <GamesListFilterSelector
+                  filter={filter}
+                  onFilterChange={setFilter}
+                  orderBy={orderBy}
+                  onOrderByChange={setGamesDashboardOrderBy}
+                />
+              )}
               <Column noMargin expand>
                 <SearchBar
                   value={searchText}
@@ -550,26 +670,14 @@ const GamesList = ({
                 />
               </Column>
               <Line noMargin justifyContent="space-between">
-                <SearchBarSelectField
-                  value={orderBy}
-                  onChange={(e, i, value: string) =>
-                    // $FlowFixMe[incompatible-type]
-                    setGamesDashboardOrderBy(value)
-                  }
-                >
-                  <SelectOption
-                    value="lastModifiedAt"
-                    label={t`Last modified`}
+                {isMobile && (
+                  <GamesListFilterSelector
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    orderBy={orderBy}
+                    onOrderByChange={setGamesDashboardOrderBy}
                   />
-                  <SelectOption
-                    value="totalSessions"
-                    label={t`Most sessions (all time)`}
-                  />
-                  <SelectOption
-                    value="weeklySessions"
-                    label={t`Most sessions (past 7 days)`}
-                  />
-                </SearchBarSelectField>
+                )}
                 <Line
                   noMargin
                   expand
@@ -607,6 +715,32 @@ const GamesList = ({
               </Line>
             </ResponsiveLineStackLayout>
           )}
+          {filter === 'deleted' &&
+            !!profile &&
+            !hasValidSubscriptionPlan(subscription) && (
+              <GetSubscriptionCard
+                subscriptionDialogOpeningReason="Restore deleted project"
+                label={<Trans>Get a subscription</Trans>}
+                recommendedPlanId="gdevelop_silver"
+                placementId="restore-deleted-project"
+              >
+                <Line>
+                  <Column noMargin expand>
+                    <Text size="block-title" noMargin>
+                      <Trans>Deleted a project by mistake?</Trans>
+                    </Text>
+                    <Text noMargin>
+                      {getProjectsRestorationMessage(
+                        limits
+                          ? limits.capabilities.cloudProjects
+                              .projectRestorationTimeWindowInSeconds
+                          : null
+                      )}
+                    </Text>
+                  </Column>
+                </Line>
+              </GetSubscriptionCard>
+            )}
           {!displayedDashboardItems &&
             Array.from({ length: pageSize }).map((_, i) => (
               <Line key={i} expand>
@@ -626,12 +760,15 @@ const GamesList = ({
             displayedDashboardItems
               .map((dashboardItem, index) => {
                 const game = dashboardItem.game;
+                const deletedCloudProject = dashboardItem.deletedCloudProject;
                 const projectFileMetadataAndStorageProviderName = dashboardItem.projectFiles
                   ? dashboardItem.projectFiles[0]
                   : null;
 
                 const key = game
                   ? game.id
+                  : deletedCloudProject
+                  ? deletedCloudProject.id
                   : projectFileMetadataAndStorageProviderName
                   ? `${projectFileMetadataAndStorageProviderName.fileMetadata
                       .name || 'project'}-${index}`
@@ -678,6 +815,18 @@ const GamesList = ({
                         skipConfirmation: true,
                       });
                     }}
+                    onRestoreProject={
+                      deletedCloudProject &&
+                      isProjectRestorable(
+                        deletedCloudProject,
+                        limits
+                          ? limits.capabilities.cloudProjects
+                              .projectRestorationTimeWindowInSeconds
+                          : null
+                      )
+                        ? () => onRestoreCloudProject(i18n, deletedCloudProject)
+                        : undefined
+                    }
                   />
                 );
               })
@@ -691,6 +840,18 @@ const GamesList = ({
               >
                 <BackgroundText>
                   <Trans>No game matching your search.</Trans>
+                </BackgroundText>
+              </Paper>
+            </Column>
+          ) : filter === 'deleted' ? (
+            <Column expand noMargin>
+              <Paper
+                variant="outlined"
+                background="dark"
+                style={styles.noGameMessageContainer}
+              >
+                <BackgroundText>
+                  <Trans>You don't have any deleted projects.</Trans>
                 </BackgroundText>
               </Paper>
             </Column>

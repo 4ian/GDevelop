@@ -448,7 +448,7 @@ function assertAlive(obj, label, gd, className) {
  * destruction.
  *
  * @param {object} gd - The Module/gd object (after adaptNamingConventions).
- * @param {{skipped: Set<string>, tracked: Set<string>, verbose: boolean}}
+ * @param {{skippedClassNames: Set<string>, trackedClassNames: Map<string, string>, verbose: boolean}}
  */
 function patchClassesForUseAfterFreeDetection(
   gd,
@@ -471,8 +471,10 @@ function patchClassesForUseAfterFreeDetection(
 
     const proto = gd[gdClass].prototype;
 
-    // Determine if this class is tracked in C++.
-    const className = trackedClassNames.has(gdClass) ? gdClass : null;
+    // Determine if this class is tracked in C++. The value is the class name
+    // registered in MemoryTrackedRegistry, which can differ from the JS class
+    // name (e.g. all event classes are tracked as "BaseEvent").
+    const className = trackedClassNames.get(gdClass) || null;
 
     // Store the class name on the prototype so that assertObjectAlive can
     // look it up at runtime without requiring callers to know it.
@@ -561,22 +563,35 @@ function patchClassesForUseAfterFreeDetection(
 
 patchClassesForUseAfterFreeDetection(Module, {
   skippedClassNames: new Set([]),
-  // If adding new classes, also add them to `MemoryTrackedRegistryDialog`
-  // and to the MemoryTracked member in the C++ class header.
-  trackedClassNames: new Set([
-    'Project',
-    'Layout',
-    'gdObject',
-    'Behavior',
-    'BehaviorsSharedData',
-    'EffectsContainer',
-    'InitialInstancesContainer',
-    'LayersContainer',
-    'ObjectFolderOrObject',
-    'ObjectGroupsContainer',
-    'ObjectsContainer',
-    'VariablesContainer',
-    'JsCodeEvent',
+  // Maps each JS class name to the class name registered in
+  // MemoryTrackedRegistry (via the MemoryTracked member in the C++ class
+  // header) - usually the same, but subclasses can be tracked by their base
+  // class (e.g. all event classes are tracked as "BaseEvent").
+  // If adding new classes, also add them to `MemoryTrackedRegistryDialog`.
+  trackedClassNames: new Map([
+    ['Project', 'Project'],
+    ['Layout', 'Layout'],
+    ['gdObject', 'gdObject'],
+    ['Behavior', 'Behavior'],
+    ['BehaviorsSharedData', 'BehaviorsSharedData'],
+    ['EffectsContainer', 'EffectsContainer'],
+    ['InitialInstancesContainer', 'InitialInstancesContainer'],
+    ['LayersContainer', 'LayersContainer'],
+    ['ObjectFolderOrObject', 'ObjectFolderOrObject'],
+    ['ObjectGroupsContainer', 'ObjectGroupsContainer'],
+    ['ObjectsContainer', 'ObjectsContainer'],
+    ['VariablesContainer', 'VariablesContainer'],
+    ['BaseEvent', 'BaseEvent'],
+    ['StandardEvent', 'BaseEvent'],
+    ['ElseEvent', 'BaseEvent'],
+    ['RepeatEvent', 'BaseEvent'],
+    ['WhileEvent', 'BaseEvent'],
+    ['ForEachEvent', 'BaseEvent'],
+    ['ForEachChildVariableEvent', 'BaseEvent'],
+    ['CommentEvent', 'BaseEvent'],
+    ['GroupEvent', 'BaseEvent'],
+    ['LinkEvent', 'BaseEvent'],
+    ['JsCodeEvent', 'BaseEvent'],
   ]),
   verbose: false,
 });

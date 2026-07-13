@@ -300,7 +300,7 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
+      await eventsFunctionsExtensionsState.ensureLoadFinished(project);
 
       const exportOutput = await exportPipeline.launchExport(
         exportPipelineContext,

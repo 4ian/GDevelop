@@ -54,9 +54,10 @@ const exitApp = (exitCode: number) => {
 };
 
 const ensureProjectExtensionsReadyForCli = async (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject
 ): Promise<boolean> => {
-  await eventsFunctionsExtensionsState.ensureLoadFinished();
+  await eventsFunctionsExtensionsState.ensureLoadFinished(project);
 
   if (eventsFunctionsExtensionsState.eventsFunctionsExtensionsError) {
     console.error(
@@ -117,7 +118,8 @@ export const useCliCommandRunner = ({
       const run = async () => {
         try {
           const extensionsReady = await ensureProjectExtensionsReadyForCli(
-            eventsFunctionsExtensionsState
+            eventsFunctionsExtensionsState,
+            project
           );
           if (!extensionsReady) {
             if (!keepOpen) exitApp(1);

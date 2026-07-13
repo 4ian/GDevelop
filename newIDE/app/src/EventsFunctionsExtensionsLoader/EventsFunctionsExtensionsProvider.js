@@ -48,7 +48,12 @@ export const EventsFunctionsExtensionsProvider = ({
     setEventsFunctionsExtensionsError,
   ] = React.useState<Error | null>(null);
   const includeFileHashs = React.useRef<{ [string]: number }>({});
-  const lastLoadPromise = React.useRef<?Promise<void>>(null);
+  // Extension generation is serialized per project. A single application-wide
+  // queue makes a newly opened project wait for stale work from the project
+  // that was just closed, which can block project creation indefinitely.
+  const lastLoadPromises = React.useRef<WeakMap<gdProject, Promise<void>>>(
+    new WeakMap()
+  );
 
   const onWriteFile = React.useCallback(
     ({ includeFile, content }: IncludeFileContent) => {
@@ -64,35 +69,42 @@ export const EventsFunctionsExtensionsProvider = ({
     [onWriteFile, makeEventsFunctionCodeWriter]
   );
 
-  const ensureLoadFinished = React.useCallback(async (): Promise<void> => {
-    let loadPromise = lastLoadPromise.current;
-    if (!loadPromise) {
-      console.info('Events functions extensions are ready.');
-      return;
-    }
+  const ensureLoadFinished = React.useCallback(
+    async (project: ?gdProject): Promise<void> => {
+      if (!project) {
+        console.info('Events functions extensions are ready.');
+        return;
+      }
 
-    console.info(
-      'Waiting on the events functions extensions to finish loading...'
-    );
+      let loadPromise = lastLoadPromises.current.get(project);
+      if (!loadPromise) {
+        console.info('Events functions extensions are ready.');
+        return;
+      }
 
-    // A new generation pass can be queued while the previous promise is
-    // settling. Keep reading the ref until the queue is actually empty rather
-    // than returning after the promise that happened to be current when this
-    // function was called.
-    while (loadPromise) {
-      await loadPromise;
-      loadPromise = lastLoadPromise.current;
-    }
+      console.info(
+        'Waiting on the events functions extensions to finish loading...'
+      );
 
-    console.info('Events functions extensions finished loading.');
-  }, []);
+      // A new generation pass for this project can be queued while the
+      // previous promise is settling. Keep reading this project's entry until
+      // its queue is actually empty.
+      while (loadPromise) {
+        await loadPromise;
+        loadPromise = lastLoadPromises.current.get(project);
+      }
+
+      console.info('Events functions extensions finished loading.');
+    },
+    []
+  );
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
     (project: ?gdProject): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
       const previousLastLoadPromise =
-        lastLoadPromise.current || Promise.resolve();
+        lastLoadPromises.current.get(project) || Promise.resolve();
 
       let startTime;
 
@@ -123,14 +135,14 @@ export const EventsFunctionsExtensionsProvider = ({
               Date.now() - startTime
             ).toFixed(2)}ms.`
           );
-          // Only clear the ref if no newer load has been queued since.
-          // In theory we don't do concurrent loads, but it's better to be safe.
-          if (lastLoadPromise.current === currentPromise) {
-            lastLoadPromise.current = null;
+          // Only clear this project's entry if no newer load has been queued
+          // for it since.
+          if (lastLoadPromises.current.get(project) === currentPromise) {
+            lastLoadPromises.current.delete(project);
           }
         });
 
-      lastLoadPromise.current = currentPromise;
+      lastLoadPromises.current.set(project, currentPromise);
       return currentPromise;
     },
     [eventsFunctionCodeWriter, i18n]

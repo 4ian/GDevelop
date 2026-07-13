@@ -618,8 +618,21 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const [
     isProjectClosedSoAvoidReloadingExtensions,
-    setIsProjectClosedSoAvoidReloadingExtensions,
+    setIsProjectClosedSoAvoidReloadingExtensionsState,
   ] = React.useState<boolean>(false);
+  // React state is not updated synchronously. Keep a ref in sync so extension
+  // editor unmount callbacks cannot enqueue work for a project after closing
+  // it has started but before the state update has rendered.
+  const isProjectClosedSoAvoidReloadingExtensionsRef = React.useRef<boolean>(
+    false
+  );
+  const setIsProjectClosedSoAvoidReloadingExtensions = React.useCallback(
+    (isProjectClosed: boolean) => {
+      isProjectClosedSoAvoidReloadingExtensionsRef.current = isProjectClosed;
+      setIsProjectClosedSoAvoidReloadingExtensionsState(isProjectClosed);
+    },
+    []
+  );
   const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
   const [
     shareDialogInitialTab,
@@ -1730,7 +1743,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       console.info('Deleting project from memory...');
       // Wait for any in-progress load to complete before unloading, otherwise the
       // pending load would re-add the old project's extensions after we remove them.
-      await eventsFunctionsExtensionsState.ensureLoadFinished();
+      await eventsFunctionsExtensionsState.ensureLoadFinished(currentProject);
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
@@ -1752,6 +1765,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
+      setIsProjectClosedSoAvoidReloadingExtensions,
       sealUnsavedChanges,
       openAskAi,
       state.editorTabs,
@@ -1801,7 +1815,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       // Start extension code generation before exposing the project via state.
       // This ensures that when the CLI useEffect fires (triggered by the
-      // setState below), ensureLoadFinished() will see the pending promise
+      // setState below), ensureLoadFinished(project) will see the pending promise
       // and wait for generation to complete.
       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
         project
@@ -1880,6 +1894,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
+      setIsProjectClosedSoAvoidReloadingExtensions,
     ]
   );
 
@@ -3518,7 +3533,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
 
         try {
-          await eventsFunctionsExtensionsState.ensureLoadFinished();
+          await eventsFunctionsExtensionsState.ensureLoadFinished(
+            currentProject
+          );
           if (isPreviewLaunchCancelled(previewLaunchId)) {
             return;
           }
@@ -4785,7 +4802,7 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const _onReloadEventsFunctionsExtensionsAsync = React.useCallback(
     async () => {
-      if (isProjectClosedSoAvoidReloadingExtensions) {
+      if (isProjectClosedSoAvoidReloadingExtensionsRef.current) {
         return;
       }
       await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
@@ -4800,7 +4817,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       });
     },
     [
-      isProjectClosedSoAvoidReloadingExtensions,
       currentProject,
       eventsFunctionsExtensionsState,
       notifyChangesToInGameEditor,
@@ -4821,7 +4837,7 @@ const MainFrame = (props: Props): React.MixedElement => {
    */
   const onLoadEventsFunctionsExtensions = React.useCallback(
     async ({ shouldHotReloadEditor }: {| shouldHotReloadEditor: boolean |}) => {
-      if (isProjectClosedSoAvoidReloadingExtensions) {
+      if (isProjectClosedSoAvoidReloadingExtensionsRef.current) {
         return;
       }
       await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
@@ -4838,7 +4854,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [
-      isProjectClosedSoAvoidReloadingExtensions,
       currentProject,
       eventsFunctionsExtensionsState,
       notifyChangesToInGameEditor,
@@ -5717,7 +5732,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         // project (or generate its source catalogs) while this replacement is
         // still in progress, as catalog generation could otherwise access
         // invalid behavior metadata.
-        await eventsFunctionsExtensionsState.ensureLoadFinished();
+        await eventsFunctionsExtensionsState.ensureLoadFinished(
+          upToDateProject
+        );
 
         let newSaveAsLocation: ?SaveAsLocation =
           options && options.forcedSavedAsLocation;
@@ -6000,7 +6017,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         // Keep saving synchronized with the two-pass project extension loader.
         // The settings catalog reads registered behavior metadata, which must
         // not be replaced while the project is being serialized.
-        await eventsFunctionsExtensionsState.ensureLoadFinished();
+        await eventsFunctionsExtensionsState.ensureLoadFinished(currentProject);
 
         // At the end of the promise below, currentProject and storageProvider
         // may have changed (if the user opened another project). So we read and
@@ -7451,7 +7468,9 @@ const MainFrame = (props: Props): React.MixedElement => {
               'Unable to resolve the local project root for catalog regeneration.'
             );
           }
-          await eventsFunctionsExtensionsState.ensureLoadFinished();
+          await eventsFunctionsExtensionsState.ensureLoadFinished(
+            reloadedProject
+          );
           const catalogs = await writeProjectSourceCatalogs(
             reloadedProject,
             projectRootPath

@@ -199,9 +199,6 @@ export type AiGeneratedEventChange = {
 
 export type AiGeneratedEventBatch = {
   eventsDescription: string,
-  // Events written in the "events script" syntax: compiled deterministically
-  // by the backend when valid (no LLM call), with a graceful fallback to the
-  // LLM generation otherwise.
   eventsScript: string | null,
   placementRelation: string,
   placementTargetEventId: string | null,

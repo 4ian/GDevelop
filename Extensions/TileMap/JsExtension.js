@@ -44,7 +44,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -58,7 +58,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -74,7 +74,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -90,7 +90,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -106,7 +106,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('Position X'), '', false)
@@ -115,7 +115,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setGetter('getTileAtPosition');
 
   capability
-    .addAction(
+    .addScopedAction(
       'FlipTileOnYAtPosition',
       _('Flip tile vertically (at position)'),
       _('Flip tile vertically at scene coordinates.'),
@@ -126,7 +126,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -135,7 +135,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setFunctionName('flipTileOnYAtPosition');
 
   capability
-    .addAction(
+    .addScopedAction(
       'FlipTileOnXAtPosition',
       _('Flip tile horizontally (at position)'),
       _('Flip tile horizontally at scene coordinates.'),
@@ -146,7 +146,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
@@ -155,7 +155,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setFunctionName('flipTileOnXAtPosition');
 
   capability
-    .addAction(
+    .addScopedAction(
       'RemoveTileAtPosition',
       _('Remove tile (at position)'),
       _('Remove the tile at the scene coordinates.'),
@@ -164,11 +164,10 @@ const defineTileMapCapability = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('removeTileAtPosition');
 
   capability
@@ -181,7 +180,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .addParameter('number', _('Grid X'), '', false)
@@ -190,7 +189,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setGetter('getTileAtGridCoordinates');
 
   capability
-    .addAction(
+    .addScopedAction(
       'FlipTileOnYAtGridCoordinates',
       _('Flip tile vertically (on the grid)'),
       _('Flip tile vertically at grid coordinates.'),
@@ -201,7 +200,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -210,7 +209,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setFunctionName('flipTileOnYAtGridCoordinates');
 
   capability
-    .addAction(
+    .addScopedAction(
       'FlipTileOnXAtGridCoordinates',
       _('Flip tile horizontally (on the grid)'),
       _('Flip tile horizontally at grid coordinates.'),
@@ -221,7 +220,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
@@ -230,7 +229,7 @@ const defineTileMapCapability = function (extension, _, gd) {
     .setFunctionName('flipTileOnXAtGridCoordinates');
 
   capability
-    .addAction(
+    .addScopedAction(
       'RemoveTileAtGridCoordinates',
       _('Remove tile (on the grid)'),
       _('Remove the tile at the grid coordinates.'),
@@ -239,15 +238,14 @@ const defineTileMapCapability = function (extension, _, gd) {
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('removeTileAtGridCoordinates');
 
   capability
-    .addCondition(
+    .addScopedCondition(
       'IsTileFlippedOnXAtPosition',
       _('Tile flipped horizontally (at position)'),
       _('Check if tile at scene coordinates is flipped horizontally.'),
@@ -258,15 +256,14 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('isTileFlippedOnXAtPosition');
 
   capability
-    .addCondition(
+    .addScopedCondition(
       'IsTileFlippedOnYAtPosition',
       _('Tile flipped vertically (at position)'),
       _('Check if tile at scene coordinates is flipped vertically.'),
@@ -277,15 +274,14 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('isTileFlippedOnYAtPosition');
 
   capability
-    .addCondition(
+    .addScopedCondition(
       'IsTileFlippedOnXAtGridCoordinates',
       _('Tile flipped horizontally (on the grid)'),
       _('Check if tile at grid coordinates is flipped horizontally.'),
@@ -296,15 +292,14 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipX24.png',
       'res/actions/flipX.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('isTileFlippedOnXAtGridCoordinates');
 
   capability
-    .addCondition(
+    .addScopedCondition(
       'IsTileFlippedOnYAtGridCoordinates',
       _('Tile flipped vertically (on the grid)'),
       _('Check if tile at grid coordinates is flipped vertically.'),
@@ -315,11 +310,10 @@ const defineTileMapCapability = function (extension, _, gd) {
       'res/actions/flipY24.png',
       'res/actions/flipY.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .addParameter('number', _('Grid X'), '', false)
     .addParameter('number', _('Grid Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('isTileFlippedOnYAtGridCoordinates');
 
   capability
@@ -332,7 +326,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       _('Size'),
       'res/actions/scaleHeight24_black.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('setGridRowCount')
@@ -348,7 +342,7 @@ const defineTileMapCapability = function (extension, _, gd) {
       _('Size'),
       'res/actions/scaleWidth24_black.png'
     )
-    .addParameter('object', _('3D object'), '', false)
+    .addParameter('object', _('Tile map'), '', false)
     .addParameter('behavior', _('Behavior'), 'TileMapBehavior')
     .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
     .setFunctionName('setGridColumnCount')
@@ -1278,7 +1272,6 @@ const defineSimpleTileMap = function (extension, _, gd) {
     .addParameter('object', _('Tile map'), 'SimpleTileMap', false)
     .addParameter('number', _('Position X'), '', false)
     .addParameter('number', _('Position Y'), '', false)
-    .getCodeExtraInformation()
     .setFunctionName('removeTileAtPosition');
 
   object

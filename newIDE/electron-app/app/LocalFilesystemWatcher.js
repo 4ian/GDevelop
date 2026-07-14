@@ -37,9 +37,6 @@ const setupWatcher = (folderPath, fileWiseCallback, serializedOptions) => {
           // Same for git repositories (and any file starting by ".git").
           normalizedCandidatePath.includes('/.git')
         ) {
-          console.info(
-            `Local file watcher has ignored path "${normalizedCandidatePath}".`
-          );
           return true;
         }
 

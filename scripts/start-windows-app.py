@@ -322,7 +322,9 @@ def sync_electron_www(electron_app_dir: Path, build: bool, dry_run: bool) -> Non
     )
 
 
-def launch_electron(electron_app_dir: Path, electron_exe: Path, dry_run: bool) -> int | None:
+def launch_electron(
+    electron_app_dir: Path, electron_exe: Path, dry_run: bool
+) -> subprocess.Popen[bytes] | None:
     step("Launch Electron")
     command = [str(electron_exe), "app"]
     print(
@@ -334,20 +336,22 @@ def launch_electron(electron_app_dir: Path, electron_exe: Path, dry_run: bool) -
 
     env = os.environ.copy()
     env["ELECTRON_IS_DEV"] = "0"
-    creationflags = 0
-    if os.name == "nt":
-        creationflags = subprocess.CREATE_NEW_PROCESS_GROUP
     process = subprocess.Popen(
         command,
         cwd=electron_app_dir,
         env=env,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        creationflags=creationflags,
     )
     print(f"Started Electron process PID: {process.pid}", flush=True)
-    return process.pid
+    print("Electron console logs will stream below.", flush=True)
+    return process
+
+
+def wait_for_electron(process: subprocess.Popen[bytes]) -> None:
+    step("Run Electron in foreground")
+    print("Waiting for Electron to exit. Press Ctrl+C to stop it.", flush=True)
+    return_code = process.wait()
+    if return_code != 0:
+        raise RuntimeError(f"Electron exited with code {return_code}.")
 
 
 def verify_inputs(
@@ -465,8 +469,12 @@ def main() -> int:
             )
             stop_existing_processes(repo_root, electron_exe, args.dry_run)
             verify_inputs(repo_root, electron_app_dir, electron_exe, args.dry_run)
-            launch_electron(electron_app_dir, electron_exe, args.dry_run)
+            electron_process = launch_electron(
+                electron_app_dir, electron_exe, args.dry_run
+            )
             verify_electron_started(repo_root, electron_exe, args.dry_run)
+            if electron_process is not None:
+                wait_for_electron(electron_process)
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         return 1

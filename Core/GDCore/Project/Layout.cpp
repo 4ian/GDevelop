@@ -175,11 +175,22 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
        i < allBehaviorsTypes.size() && i < allBehaviorsNames.size();
        ++i) {
     const gd::String& name = allBehaviorsNames[i];
+    const gd::String& type = allBehaviorsTypes[i];
+
+    // Events-based behaviors without shared properties don't need a scene
+    // shared-data entry. Remove a stale entry as well, for example after the
+    // last shared property has been removed from the behavior.
+    if (project.HasEventsBasedBehavior(type) &&
+        project.GetEventsBasedBehavior(type)
+            .GetSharedPropertyDescriptors()
+            .IsEmpty()) {
+      behaviorsSharedData.erase(name);
+      continue;
+    }
 
     if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
 
-    auto sharedData =
-        CreateBehaviorsSharedData(project, name, allBehaviorsTypes[i]);
+    auto sharedData = CreateBehaviorsSharedData(project, name, type);
     if (sharedData) {
       behaviorsSharedData[name] = std::move(sharedData);
     }
@@ -206,6 +217,11 @@ std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(
     const gd::String& name,
     const gd::String& behaviorsType) {
   if (project.HasEventsBasedBehavior(behaviorsType)) {
+    if (project.GetEventsBasedBehavior(behaviorsType)
+            .GetSharedPropertyDescriptors()
+            .IsEmpty()) {
+      return nullptr;
+    }
     auto sharedData = gd::make_unique<gd::CustomBehaviorsSharedData>(
         name, project, behaviorsType);
     sharedData->InitializeContent();

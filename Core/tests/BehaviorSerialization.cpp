@@ -141,6 +141,77 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
+  SECTION("A custom behavior without shared properties has no scene shared data") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProject(project, platform);
+    auto &layout = project.GetLayout("Scene");
+
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.GetAllBehaviorSharedDataNames().empty());
+
+    SerializerElement projectElement;
+    project.SerializeTo(projectElement);
+    auto &sharedDataElement = projectElement.GetChild("layouts")
+                                  .GetChild(0)
+                                  .GetChild("behaviorsSharedData");
+    sharedDataElement.ConsiderAsArrayOf("behaviorSharedData");
+    REQUIRE(sharedDataElement.GetChildrenCount() == 0);
+  }
+
+  SECTION("Scene shared data follows custom behavior shared properties") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProject(project, platform);
+    auto &layout = project.GetLayout("Scene");
+    auto &sharedProperties =
+        project
+            .GetEventsBasedBehavior(
+                "MyEventsExtension::MyEventsBasedBehavior")
+            .GetSharedPropertyDescriptors();
+    sharedProperties.InsertNew("MySharedProperty", 0)
+        .SetType("Number")
+        .SetValue("42");
+
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.HasBehaviorSharedData("MyEventsBasedBehavior"));
+    REQUIRE(layout.GetBehaviorSharedData("MyEventsBasedBehavior")
+                .GetProperties()
+                .size() == 1);
+
+    sharedProperties.Remove("MySharedProperty");
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.GetAllBehaviorSharedDataNames().empty());
+  }
+
+  SECTION("Loading drops a stale empty shared-data entry") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+    auto &sharedDataElement = projectElement.GetChild("layouts")
+                                  .GetChild(0)
+                                  .GetChild("behaviorsSharedData");
+    auto &staleSharedData =
+        sharedDataElement.AddChild("behaviorSharedData");
+    staleSharedData.SetAttribute("name", "MyEventsBasedBehavior");
+    staleSharedData.SetAttribute(
+        "type", "MyEventsExtension::MyEventsBasedBehavior");
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    REQUIRE(readProject.GetLayout("Scene")
+                .GetAllBehaviorSharedDataNames()
+                .empty());
+  }
+
   SECTION("Copy constructor of Behavior") {
     gd::Platform platform;
     gd::Project originalProject;

@@ -1594,12 +1594,45 @@ const splitBehavior = ({
   };
 };
 
+const getEventsBasedBehaviorTypesWithoutSharedProperties = project => {
+  const behaviorTypes = new Set();
+  (project.eventsFunctionsExtensions || []).forEach(extension => {
+    (extension.eventsBasedBehaviors || []).forEach(behavior => {
+      if (
+        !Array.isArray(behavior.sharedPropertyDescriptors) ||
+        behavior.sharedPropertyDescriptors.length === 0
+      ) {
+        behaviorTypes.add(`${extension.name}::${behavior.name}`);
+      }
+    });
+  });
+  return behaviorTypes;
+};
+
+const removeEmptyEventsBasedBehaviorSharedData = (
+  layout,
+  behaviorTypesWithoutSharedProperties
+) =>
+  !Array.isArray(layout.behaviorsSharedData)
+    ? layout
+    : {
+        ...layout,
+        behaviorsSharedData: layout.behaviorsSharedData.filter(
+          sharedData =>
+            !sharedData ||
+            !behaviorTypesWithoutSharedProperties.has(sharedData.type)
+        ),
+      };
+
 export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const project = clone(asObject(legacyProject, 'Project'));
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
+  const behaviorTypesWithoutSharedProperties = getEventsBasedBehaviorTypesWithoutSharedProperties(
+    project
+  );
 
   splitObjectDefinitions({
     objects: project.objects,
@@ -1645,6 +1678,10 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   }
 
   (project.layouts || []).forEach((layout, order) => {
+    const layoutWithoutEmptyBehaviorSharedData = removeEmptyEventsBasedBehaviorSharedData(
+      layout,
+      behaviorTypesWithoutSharedProperties
+    );
     const name = String(layout.name || '');
     const folderName = uniqueManagedName(name, sceneNames);
     const settingsUri = encodeUriPath(['scenes', folderName, 'scene.settings']);
@@ -1659,7 +1696,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       `${folderName}.events`,
     ]);
     const settingsPayload = omitFields(
-      layout,
+      layoutWithoutEmptyBehaviorSharedData,
       new Set([...SCENE_LAYOUT_FIELDS, 'events', 'objects'])
     );
     splitObjectDefinitions({

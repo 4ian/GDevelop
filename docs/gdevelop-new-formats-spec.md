@@ -992,6 +992,11 @@ It also owns:
 - Other scene-level runtime, loading, input, sorting, or identity settings
   added to the current serializer in the future.
 
+A `[[behaviorsSharedData]]` entry is emitted only when the referenced behavior
+declares at least one shared property. A behavior with no shared property must
+not receive an empty `name`/`type` placeholder; when no behavior needs shared
+data, the scene collection remains `behaviorsSharedData = []`.
+
 These fields must not be duplicated in the `.layout` file.
 
 #### 7.1.1 Scene object settings

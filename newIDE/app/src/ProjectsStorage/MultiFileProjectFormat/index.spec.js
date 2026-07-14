@@ -312,6 +312,45 @@ describe('GDevelop multi-file project format', () => {
       });
   });
 
+  test('omits scene shared-data entries for behaviors without shared properties', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].behaviorsSharedData = [
+      { name: 'Health', type: 'Combat::Health' },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const sceneSettings = files['game://scenes/Main/scene.settings'];
+    const parsedSceneSettings = parseTomlSource(sceneSettings);
+
+    expect(sceneSettings).not.toMatch(/\[\[[^\]]*behaviorsSharedData\]\]/);
+    expect(parsedSceneSettings.behaviorsSharedData).toEqual([]);
+    expect(
+      composeLegacyProjectFromFiles(files).layouts[0].behaviorsSharedData
+    ).toEqual([]);
+  });
+
+  test('keeps scene shared-data entries for behaviors with shared properties', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.eventsFunctionsExtensions[0].eventsBasedBehaviors[0].sharedPropertyDescriptors = [
+      { name: 'MaximumHealth', type: 'Number', value: '100' },
+    ];
+    project.layouts[0].behaviorsSharedData = [
+      {
+        name: 'Health',
+        type: 'Combat::Health',
+        MaximumHealth: 80,
+      },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const sceneSettings = files['game://scenes/Main/scene.settings'];
+
+    expect(sceneSettings).toMatch(/\[\[[^\]]*behaviorsSharedData\]\]/);
+    expect(
+      composeLegacyProjectFromFiles(files).layouts[0].behaviorsSharedData
+    ).toEqual(project.layouts[0].behaviorsSharedData);
+  });
+
   test('discovers settings by fixed folders and restores locally owned order', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.eventsFunctionsExtensions[0].eventsFunctions.push(

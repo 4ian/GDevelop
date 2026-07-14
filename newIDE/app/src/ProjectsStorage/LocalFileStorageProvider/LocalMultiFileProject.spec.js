@@ -122,6 +122,46 @@ describe('Local multi-file project storage', () => {
     );
   });
 
+  test('migrates inline variable containers and saves canonical settings during open', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.variables = [{ name: 'Score', type: 'number', value: 12 }];
+    project.layouts[0].variables = [
+      { name: 'State', type: 'string', value: 'Ready' },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    await writeMultiFileSourceTree({ entryPath, files });
+
+    const projectSource = fs
+      .readFileSync(entryPath, 'utf8')
+      .replace(/\[variables\]\n(Score = [^\n]+)/, 'variables = { $1 }');
+    const sceneSettingsPath = path.join(
+      temporaryDirectory,
+      'scenes/Main/scene.settings'
+    );
+    const sceneSource = fs
+      .readFileSync(sceneSettingsPath, 'utf8')
+      .replace(/\[variables\]\n(State = [^\n]+)/, 'variables = { $1 }');
+    fs.writeFileSync(entryPath, projectSource, 'utf8');
+    fs.writeFileSync(sceneSettingsPath, sceneSource, 'utf8');
+    const untouchedEventsPath = path.join(
+      temporaryDirectory,
+      'scenes/Main/Main.events'
+    );
+    const untouchedEvents = fs.readFileSync(untouchedEventsPath, 'utf8');
+
+    const openedProject = await openMultiFileProject(entryPath);
+
+    expect(areLegacyProjectsEquivalent(project, openedProject)).toBe(true);
+    const migratedProjectSource = fs.readFileSync(entryPath, 'utf8');
+    const migratedSceneSource = fs.readFileSync(sceneSettingsPath, 'utf8');
+    expect(migratedProjectSource).toContain('[variables]\nScore = [');
+    expect(migratedSceneSource).toContain('[variables]\nState = [');
+    expect(migratedProjectSource).not.toMatch(/^variables\s*=/m);
+    expect(migratedSceneSource).not.toMatch(/^variables\s*=/m);
+    expect(fs.readFileSync(untouchedEventsPath, 'utf8')).toBe(untouchedEvents);
+  });
+
   test('uses portable physical names for URI segments invalid on Windows', async () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.firstLayout = 'Extension: Health';

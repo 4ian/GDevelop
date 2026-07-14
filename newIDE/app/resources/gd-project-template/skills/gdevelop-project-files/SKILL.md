@@ -92,7 +92,10 @@ generated compatibility/runtime output, not multi-file source.
   `Controllers = [{ type = "array", children = [...] }]`. Represent an empty
   container with its empty table header. Never write a whole container as
   `variables = { ... }` or `variables = { }`, and never write recursive
-  `[[variables...]]` TOML tables.
+  `[[variables...]]` TOML tables. Existing inline-table containers are
+  load-time migration inputs only: the editor converts them to these dedicated
+  headers and saves the affected settings files immediately when opening the
+  project. Do not preserve or introduce the migration form in direct edits.
 - Object groups: use only an `[objectGroups]` table in the owning project,
   scene, prefab, prefab-variant, or function settings. Each key is the group
   name and each value is an array of object names, for example
@@ -329,13 +332,20 @@ loop, comment, and JavaScript metadata when editing existing sources.
    regenerates all three `.gdevelop` catalogs, then validates the sources using
    the fresh instruction catalog. Call it at least once before calling
    `reload_project`; a failed validation does not satisfy this gate.
-8. Call the GDevelop MCP `reload_project` tool and require a successful reload
+8. After the requested task is complete and validation succeeds, use Git from
+   the project repository root to commit every task-owned change before
+   `reload_project`. Inspect `git status` and the final diff, stage all changes
+   made for the user's task without including unrelated pre-existing work, and
+   create a commit with a concise, descriptive imperative message. Record the
+   commit hash and message for the final report. If any source edit is needed
+   afterward, validate again and create a follow-up commit before reloading.
+9. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
-9. For gameplay or visual changes, call `launch_preview` only after step 8.
+10. For gameplay or visual changes, call `launch_preview` only after step 9.
    If any project source changes after the reload, call `reload_project` again
    before the next preview, preceded by a new successful
-   `validate_project_files` call for those edits.
+   `validate_project_files` call and Git commit for those edits.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -383,10 +393,17 @@ representation from the multi-file settings, layouts, and events using the
 fresh instruction catalog without replacing editor memory. A later source edit
 invalidates the earlier validation receipt.
 
+The Git commit is also a mandatory reload gate. After the final successful
+validation, inspect the repository diff, stage every change made for the user's
+task, and commit it with a proper concise, descriptive message. Do not include
+unrelated pre-existing changes. `reload_project` must run only after this commit
+succeeds. A later source edit requires a new validation and follow-up commit
+before another reload.
+
 `reload_project` remains a mandatory preview gate. Call it successfully only
-after the validation gate and before the first `launch_preview`. Never launch
-or relaunch a preview from stale editor memory. A later source edit invalidates
-both the validation and reload receipts.
+after both the validation and Git-commit gates and before the first
+`launch_preview`. Never launch or relaunch a preview from stale editor memory. A
+later source edit invalidates the validation, commit, and reload receipts.
 
 ## Verification
 
@@ -427,8 +444,12 @@ Before finishing:
   refreshed relevant catalogs.
 - Confirm `validate_project_files` returned `valid: true` after the final source
   edit and before `reload_project`.
+- Confirm every task-owned change was committed after final validation and
+  before `reload_project`; record the commit hash and descriptive commit
+  message, and confirm no unrelated pre-existing change entered the commit.
 - Confirm `reload_project` succeeded after the final source edit and before any
   `launch_preview` call.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
   audio, timing, or object picking changed.
-- Report changed source files and concrete verification evidence.
+- Report changed source files, concrete verification evidence, and the final
+  Git commit hash and message.

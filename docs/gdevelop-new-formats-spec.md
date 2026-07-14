@@ -509,9 +509,14 @@ legacy variable array. An empty container is an empty table header:
 
 Whole-container inline assignments such as
 `variables = { Score = [{ type = "number", value = 0 }] }` and
-`variables = { }` are invalid. Recursive forms such as `[[variables]]`,
-`[[sceneVariables.children]]`, and a descriptor that repeats `name` are also
-invalid; there is no compatibility reader for any of these retired forms.
+`variables = { }` are noncanonical migration inputs. When a local project is
+opened, the loader accepts these inline-table assignments, reconstructs their
+root variable containers, and atomically rewrites only the affected settings
+files with dedicated table headers before returning the loaded project. This
+is an automatic one-time source migration, not an authoring form. Assignments
+to arrays or scalars, recursive forms such as `[[variables]]` and
+`[[sceneVariables.children]]`, and descriptors that repeat `name` remain
+invalid.
 
 ### 5.1.5 Compact object groups
 

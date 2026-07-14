@@ -10,6 +10,7 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
+  hasInlineVariableContainerSyntax,
   parseTomlSource,
   removeLegacyFolderStructuresFromProject,
   validateGameUri,
@@ -1148,6 +1149,22 @@ objects = [ "Player" ]
     );
   });
 
+  test('does not reinterpret an arbitrary Global Config variables key', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.globalConfig.variables = {};
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('variables = { }');
+    expect(
+      hasInlineVariableContainerSyntax(
+        files[MULTI_FILE_CONFIG_URI],
+        MULTI_FILE_CONFIG_URI
+      )
+    ).toBe(false);
+    expect(composeLegacyProjectFromFiles(files).globalConfig).toEqual(
+      project.globalConfig
+    );
+  });
+
   test('all settings fragments are local-root TOML documents', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     const settings = Object.keys(files)
@@ -1295,14 +1312,61 @@ objects = [ "Player" ]
       expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
     );
 
+    const toInlineContainer = (source, field, variableName) =>
+      source.replace(
+        new RegExp(`\\[${field}\\]\\n(${variableName} = [^\\n]+)`),
+        `${field} = { $1 }`
+      );
     const inlineContainerFiles = { ...files };
-    inlineContainerFiles[MULTI_FILE_ENTRY_URI] = projectSource.replace(
-      '[variables]',
-      'variables = { }'
+    inlineContainerFiles[MULTI_FILE_ENTRY_URI] = toInlineContainer(
+      projectSource,
+      'variables',
+      'GlobalScore'
     );
-    expect(() => composeLegacyProjectFromFiles(inlineContainerFiles)).toThrow(
-      expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
+    inlineContainerFiles[
+      'game://scenes/Main/scene.settings'
+    ] = toInlineContainer(sceneSource, 'variables', 'SceneState');
+    inlineContainerFiles[
+      'game://scenes/Main/objects/Player.settings'
+    ] = toInlineContainer(objectSource, 'variables', 'Health');
+    inlineContainerFiles[
+      'game://extensions/Combat/extension.settings'
+    ] = toInlineContainer(
+      toInlineContainer(extensionSource, 'globalVariables', 'Difficulty'),
+      'sceneVariables',
+      'Controllers'
     );
+    inlineContainerFiles[
+      'game://extensions/Combat/prefabs/Enemy/prefab.settings'
+    ] = toInlineContainer(prefabSource, 'variables', 'Enabled');
+    inlineContainerFiles[
+      'game://extensions/Combat/behaviors/Health/behavior.settings'
+    ] = toInlineContainer(behaviorSource, 'variables', 'Cooldown');
+    expect(
+      hasInlineVariableContainerSyntax(
+        inlineContainerFiles[MULTI_FILE_ENTRY_URI],
+        MULTI_FILE_ENTRY_URI
+      )
+    ).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        composeLegacyProjectFromFiles(inlineContainerFiles)
+      )
+    ).toBe(true);
+
+    const emptyInlineContainerFiles = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    emptyInlineContainerFiles[MULTI_FILE_ENTRY_URI] = emptyInlineContainerFiles[
+      MULTI_FILE_ENTRY_URI
+    ].replace('[variables]', 'variables = { }');
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        composeLegacyProjectFromFiles(emptyInlineContainerFiles)
+      )
+    ).toBe(true);
   });
 
   test('writes TOML without indentation', () => {

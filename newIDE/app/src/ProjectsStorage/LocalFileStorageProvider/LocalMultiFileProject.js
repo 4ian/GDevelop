@@ -10,6 +10,7 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
+  hasInlineVariableContainerSyntax,
   parseTomlSource,
   validateGameUri,
 } from '../MultiFileProjectFormat';
@@ -522,7 +523,36 @@ export const openMultiFileProject = async (
       ...((options && options.compileOptions) || {}),
     };
   }
-  return composeLegacyProjectFromFiles(files, effectiveOptions);
+  const inlineVariableContainerUris = Object.keys(files).filter(
+    uri =>
+      uri.endsWith('.settings') &&
+      hasInlineVariableContainerSyntax(files[uri], uri)
+  );
+  const project = composeLegacyProjectFromFiles(files, effectiveOptions);
+  if (inlineVariableContainerUris.length) {
+    const entryDocument = parseTomlSource(
+      files[MULTI_FILE_ENTRY_URI],
+      MULTI_FILE_ENTRY_URI
+    );
+    const canonicalFiles = decomposeLegacyProjectToFiles(project, {
+      migration: entryDocument.migration,
+    });
+    const rewrittenFiles = {};
+    inlineVariableContainerUris.forEach(uri => {
+      if (canonicalFiles[uri] === undefined) {
+        throw new MultiFileProjectError(
+          'MULTIFILE_VARIABLE_MIGRATION_FAILED',
+          `Unable to regenerate the settings source after migrating inline variables: ${uri}`,
+          uri
+        );
+      }
+      rewrittenFiles[uri] = canonicalFiles[uri];
+    });
+    // Opening a project is the migration boundary: persist only affected
+    // settings documents before returning the loaded in-memory project.
+    await writeMultiFileSourceTree({ entryPath, files: rewrittenFiles });
+  }
+  return project;
 };
 
 const sortForCommit = (left: string, right: string): number => {

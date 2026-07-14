@@ -45,7 +45,9 @@ files, and executable logic in `.events`.
    owns one inline descriptor array, for example
    `Controllers = [{ type = "array", children = [...] }]`. Use an empty table
    header for an empty container; never use `variables = { ... }` or
-   `variables = { }`.
+   `variables = { }`. Those inline-table containers are accepted only as
+   existing load-time migration input and are rewritten by the editor; never
+   author or preserve them.
 8. Use exact instruction types and `dslName` parameters from
    `.gdevelop/instructions-catalog.json` in every event body.
 9. Call `reload_project` after the declaration/files exist. If the extension

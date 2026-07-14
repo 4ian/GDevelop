@@ -709,6 +709,84 @@ const restoreTomlPayload = (namespace, fileUri) => {
 const normalizeLf = source =>
   source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 
+const extractInlineVariableContainers = (source, fileUri) => {
+  const inlineVariableContainers = {};
+  const invalidAssignments = [];
+  let inMultilineBasicString = false;
+  let inMultilineLiteralString = false;
+  const sourceWithoutInlineContainers = source
+    .split('\n')
+    .map(line => {
+      if (!inMultilineBasicString && !inMultilineLiteralString) {
+        const assignmentMatch = line.match(
+          /^\s*(variables|globalVariables|sceneVariables|"variables"|"globalVariables"|"sceneVariables")\s*=\s*(.*)$/
+        );
+        if (assignmentMatch) {
+          const field = assignmentMatch[1].replace(/^"|"$/g, '');
+          if (!assignmentMatch[2].trimStart().startsWith('{')) {
+            invalidAssignments.push(field);
+          } else {
+            if (inlineVariableContainers[field] !== undefined) {
+              fail(
+                'MULTIFILE_INVALID_VARIABLES',
+                `${field} is assigned more than once.`,
+                fileUri
+              );
+            }
+            const parsedAssignment = parseToml(line.trim());
+            const container = parsedAssignment[field];
+            if (
+              !container ||
+              typeof container !== 'object' ||
+              Array.isArray(container)
+            ) {
+              fail(
+                'MULTIFILE_INVALID_VARIABLES',
+                `${field} must be an inline table when using the migratable assignment form.`,
+                fileUri
+              );
+            }
+            inlineVariableContainers[field] = container;
+            // Preserve line numbers for diagnostics while removing this
+            // assignment from its accidental TOML table scope. It is mounted
+            // at the settings root after the rest of the document is parsed.
+            return '';
+          }
+        }
+      }
+
+      const basicDelimiterCount = (line.match(/"""/g) || []).length;
+      if (!inMultilineLiteralString && basicDelimiterCount % 2 === 1) {
+        inMultilineBasicString = !inMultilineBasicString;
+      }
+      const literalDelimiterCount = (line.match(/'''/g) || []).length;
+      if (!inMultilineBasicString && literalDelimiterCount % 2 === 1) {
+        inMultilineLiteralString = !inMultilineLiteralString;
+      }
+      return line;
+    })
+    .join('\n');
+
+  return {
+    sourceWithoutInlineContainers,
+    inlineVariableContainers,
+    invalidAssignments,
+  };
+};
+
+const ownsVariableDefinitionContainers = fileUri =>
+  fileUri !== MULTI_FILE_CONFIG_URI && fileUri !== MULTI_FILE_RESOURCES_URI;
+
+export const hasInlineVariableContainerSyntax = (
+  source,
+  fileUri = '<memory>'
+) =>
+  ownsVariableDefinitionContainers(fileUri) &&
+  Object.keys(
+    extractInlineVariableContainers(normalizeLf(source), fileUri)
+      .inlineVariableContainers
+  ).length > 0;
+
 const stripTomlStructuralIndentation = source => {
   let inMultilineBasicString = false;
   return source
@@ -876,7 +954,36 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
     );
   }
   try {
-    const parsed = parseToml(normalizedSource);
+    const {
+      sourceWithoutInlineContainers,
+      inlineVariableContainers,
+      invalidAssignments,
+    } = ownsVariableDefinitionContainers(fileUri)
+      ? extractInlineVariableContainers(normalizedSource, fileUri)
+      : {
+          sourceWithoutInlineContainers: normalizedSource,
+          inlineVariableContainers: {},
+          invalidAssignments: [],
+        };
+    if (invalidAssignments.length) {
+      const field = invalidAssignments[0];
+      fail(
+        'MULTIFILE_INVALID_VARIABLES',
+        `${field} must use a [${field}] TOML table. Only an inline-table assignment can be migrated automatically.`,
+        fileUri
+      );
+    }
+    const parsed = parseToml(sourceWithoutInlineContainers);
+    Object.keys(inlineVariableContainers).forEach(field => {
+      if (parsed[field] !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} cannot use both a [${field}] table and an inline-table assignment.`,
+          fileUri
+        );
+      }
+      parsed[field] = inlineVariableContainers[field];
+    });
     const rejectDates = value => {
       if (value instanceof Date) {
         fail('MULTIFILE_INVALID_SOURCE', 'TOML dates are forbidden.', fileUri);
@@ -886,19 +993,14 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
         Object.keys(value).forEach(key => rejectDates(value[key]));
     };
     rejectDates(parsed);
+    if (!ownsVariableDefinitionContainers(fileUri)) return parsed;
     VARIABLE_DEFINITION_FIELDS.forEach(field => {
-      if (
-        new RegExp(`^(?:${field}|"${field}")\\s*=`, 'm').test(normalizedSource)
-      ) {
-        fail(
-          'MULTIFILE_INVALID_VARIABLES',
-          `${field} must use a [${field}] TOML table, not an inline table or array.`,
-          fileUri
-        );
-      }
       if (parsed[field] === undefined) return;
+      if (inlineVariableContainers[field] !== undefined) return;
       if (
-        !new RegExp(`^\\[${field}\\](?:\\s*#.*)?$`, 'm').test(normalizedSource)
+        !new RegExp(`^\\[${field}\\](?:\\s*#.*)?$`, 'm').test(
+          sourceWithoutInlineContainers
+        )
       ) {
         fail(
           'MULTIFILE_INVALID_VARIABLES',

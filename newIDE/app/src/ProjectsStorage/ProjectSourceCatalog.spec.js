@@ -154,6 +154,14 @@ describe('project source catalogs', () => {
       tomlRoot: true,
       requiredFields: expect.arrayContaining(['folder']),
     });
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'static-data')
+    ).toMatchObject({
+      path: 'static-data.toml',
+      mountedNamespace: 'editor.staticData',
+      tomlRoot: true,
+      requiredFields: [],
+    });
     expect(catalog.authoring.rules.join('\n')).toContain(
       'folder = ["Parent", "Child"]'
     );

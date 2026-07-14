@@ -87,7 +87,7 @@ describe('ProjectFilesPanel', () => {
     isLinkedFolderRoot: true,
   };
 
-  it.each(['.events', '.layout', '.settings'])(
+  it.each(['.events', '.layout', '.settings', '.toml'])(
     'recognizes %s project sources as text files',
     extension => {
       expect(

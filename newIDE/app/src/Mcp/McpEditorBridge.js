@@ -134,11 +134,11 @@ import {
 import {
   setFirstLayout,
   setProjectProperties,
-  getGlobalConfig,
-  setGlobalConfig,
-  setGlobalConfigValue,
-  deleteGlobalConfigValue,
-  summarizeGlobalConfig,
+  getStaticData,
+  setStaticData,
+  setStaticDataValue,
+  deleteStaticDataValue,
+  summarizeStaticData,
   snapshotProject,
   restoreProjectSnapshot,
   applyValidatedProjectJsonPatch,
@@ -801,7 +801,7 @@ const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
       defaultCapabilityInferred:
         'Behavior is a default GDevelop object capability surfaced by the object API; read_serialized_scene may still show behaviors: [] because only explicit serialized behaviors are stored there.',
     },
-    globalConfigSummary: summarizeGlobalConfig(project),
+    staticDataSummary: summarizeStaticData(project),
     ...simplifiedProject,
   };
 };
@@ -4997,11 +4997,11 @@ const getResourceContent = async (
     };
   }
 
-  if (uri === 'gdevelop://project/global-config.json') {
+  if (uri === 'gdevelop://project/static-data.json') {
     return {
       uri,
       mimeType: 'application/json',
-      text: JSON.stringify(getGlobalConfig(project, {}).globalConfig, null, 2),
+      text: JSON.stringify(getStaticData(project, {}).staticData, null, 2),
     };
   }
 
@@ -5763,10 +5763,10 @@ const callMcpTool = async ({
     );
   }
 
-  if (toolName === 'gdevelop_get_global_config') {
+  if (toolName === 'gdevelop_get_static_data') {
     if (!project) return errorResult('No project opened.');
     try {
-      return textResult(getGlobalConfig(project, args || {}));
+      return textResult(getStaticData(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
     }
@@ -7072,19 +7072,19 @@ const callMcpTool = async ({
     }
   }
 
-  let globalConfigWriteToolHandler = null;
-  if (toolName === 'gdevelop_set_global_config') {
-    globalConfigWriteToolHandler = setGlobalConfig;
-  } else if (toolName === 'gdevelop_set_global_config_value') {
-    globalConfigWriteToolHandler = setGlobalConfigValue;
-  } else if (toolName === 'gdevelop_delete_global_config_value') {
-    globalConfigWriteToolHandler = deleteGlobalConfigValue;
+  let staticDataWriteToolHandler = null;
+  if (toolName === 'gdevelop_set_static_data') {
+    staticDataWriteToolHandler = setStaticData;
+  } else if (toolName === 'gdevelop_set_static_data_value') {
+    staticDataWriteToolHandler = setStaticDataValue;
+  } else if (toolName === 'gdevelop_delete_static_data_value') {
+    staticDataWriteToolHandler = deleteStaticDataValue;
   }
 
-  if (globalConfigWriteToolHandler) {
+  if (staticDataWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
-      const result = globalConfigWriteToolHandler(project, args || {});
+      const result = staticDataWriteToolHandler(project, args || {});
       if (result.didModifyProject !== false) {
         context.triggerUnsavedChanges();
       }

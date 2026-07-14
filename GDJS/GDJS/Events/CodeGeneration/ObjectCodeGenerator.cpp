@@ -13,17 +13,17 @@
 namespace gdjs {
 
 namespace {
-gd::String ResolveProjectGlobalConfigPlaceholders(
+gd::String ResolveProjectStaticDataPlaceholders(
     const gd::Project& project,
     const gd::String& value) {
   gd::String resolvedValue;
   gd::String missingPath;
-  if (project.ResolveGlobalConfigPlaceholders(
+  if (project.ResolveStaticDataPlaceholders(
           value, resolvedValue, missingPath)) {
     return resolvedValue;
   }
 
-  gd::LogError("Global config path \"{{" + missingPath +
+  gd::LogError("Static Data path \"{{" + missingPath +
                "}}\" does not exist while generating object property code.");
   return value;
 }
@@ -429,7 +429,7 @@ gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
           property.GetType()));
   const bool isJsonObjectProperty = property.GetType() == "JsonObject";
   const gd::String propertyValue =
-      ResolveProjectGlobalConfigPlaceholders(project, property.GetValue());
+      ResolveProjectStaticDataPlaceholders(project, property.GetValue());
 
   if (isJsonObjectProperty) {
     return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());

@@ -9,14 +9,42 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import { type WillDeleteObjectChanges } from '../../EditorFunctions/OutsideEditorChanges';
-import { GlobalConfigEditor } from '../../GlobalConfig/GlobalConfigDialog';
+import { StaticDataEditor } from '../../StaticData/StaticDataDialog';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-export class GlobalConfigEditorContainer extends React.Component<RenderEditorContainerProps> {
+export class StaticDataEditorContainer extends React.Component<RenderEditorContainerProps> {
+  autoSaveChain: Promise<void> = Promise.resolve();
+  staticDataRevision: number = 0;
+
+  enqueueStaticDataAutoSave = (revision: number, staticData: Object) => {
+    this.autoSaveChain = this.autoSaveChain
+      .catch(() => {
+        // Keep later edits saveable if an unexpected error escaped the callback.
+      })
+      .then(async () => {
+        if (revision !== this.staticDataRevision) return;
+        let wasSaved = false;
+        try {
+          wasSaved = await this.props.onAutoSaveStaticData(staticData);
+        } catch (error) {
+          console.error('Unable to auto-save Static Data:', error);
+        }
+        if (wasSaved || revision !== this.staticDataRevision) return;
+
+        const { unsavedChanges } = this.props;
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      });
+  };
+
+  onStaticDataChanged = (staticData: Object) => {
+    this.staticDataRevision++;
+    this.enqueueStaticDataAutoSave(this.staticDataRevision, staticData);
+  };
+
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     return this.props.isActive || nextProps.isActive;
   }
@@ -82,20 +110,15 @@ export class GlobalConfigEditorContainer extends React.Component<RenderEditorCon
   }
 
   render(): any {
-    const { project, unsavedChanges } = this.props;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
-      <GlobalConfigEditor
-        project={project}
-        onChange={() => {
-          if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-        }}
-      />
+      <StaticDataEditor project={project} onChange={this.onStaticDataChanged} />
     );
   }
 }
 
-export const renderGlobalConfigEditorContainer = (
+export const renderStaticDataEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-): React.Node => <GlobalConfigEditorContainer {...props} />;
+): React.Node => <StaticDataEditorContainer {...props} />;

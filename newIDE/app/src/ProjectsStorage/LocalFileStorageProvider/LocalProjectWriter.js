@@ -26,8 +26,15 @@ import {
   type ShowAlertFunction,
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
-import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
-import { removeLegacyFolderStructuresFromProject } from '../MultiFileProjectFormat';
+import {
+  writeLegacyProjectAsMultiFile,
+  writeMultiFileSourceTree,
+} from './LocalMultiFileProject';
+import {
+  MULTI_FILE_STATIC_DATA_URI,
+  removeLegacyFolderStructuresFromProject,
+  serializeStaticDataToToml,
+} from '../MultiFileProjectFormat';
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
@@ -62,7 +69,7 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
-export const splittedProjectSingleFileNames = ['globalConfig'];
+export const splittedProjectSingleFileNames = ['staticData'];
 
 const deleteExistingFilesFromDirs = (
   project: gdProject,
@@ -336,8 +343,12 @@ const writeProjectFiles = async ({
       serializeProjectLayoutCatalog(layoutCatalog),
       path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
     );
+    const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
+      serializedProjectObject
+    );
+    delete generatedLegacyProject.staticData;
     await writeAndCheckFormattedJSONFile(
-      removeLegacyFolderStructuresFromProject(serializedProjectObject),
+      generatedLegacyProject,
       path.join(
         projectPath,
         ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')
@@ -561,9 +572,7 @@ export const onSaveProjectAs = async (
   saveAsLocation: ?SaveAsLocation,
   options: {|
     onStartSaving: () => void,
-    onMoveResources: ({|
-      newFileMetadata: FileMetadata,
-    |}) => Promise<void>,
+    onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
   |}
 ): Promise<{|
   wasSaved: boolean,
@@ -657,6 +666,24 @@ export const onAutoSaveProject = (
       throw err;
     }
   );
+};
+
+export const onAutoSaveStaticData = async (
+  staticData: Object,
+  fileMetadata: FileMetadata
+): Promise<boolean> => {
+  const entryPath = fileMetadata.fileIdentifier;
+  if (path.basename(entryPath).toLowerCase() !== 'project.settings') {
+    return false;
+  }
+
+  await writeMultiFileSourceTree({
+    entryPath,
+    files: {
+      [MULTI_FILE_STATIC_DATA_URI]: serializeStaticDataToToml(staticData),
+    },
+  });
+  return true;
 };
 
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>

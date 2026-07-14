@@ -18,7 +18,7 @@
 3. [Codebase compatibility basis](#3-codebase-compatibility-basis)
 4. [Canonical directory layout](#4-canonical-directory-layout)
 5. [Common file rules](#5-common-file-rules)
-6. [`project.settings`, `resources.settings`, and `config.settings`](#6-projectsettings-resourcessettings-and-configsettings)
+6. [`project.settings`, `resources.settings`, and `static-data.toml`](#6-projectsettings-resourcessettings-and-static-datatoml)
 7. [Scene files](#7-scene-files)
 8. [Extension files](#8-extension-files)
 9. [Prefab files](#9-prefab-files)
@@ -137,7 +137,7 @@ The current optional folder-project mode is not this format. It still writes JSO
 MyGame/
   project.settings
   resources.settings
-  config.settings
+  static-data.toml
 
   objects/
     Player.settings                 # folder = ["Shared"]
@@ -226,8 +226,8 @@ both; the two files remain independent unless both are listed in
 
 - One `project.settings` entry file and one `resources.settings` resource
   registry at the project root.
-- One root `config.settings` whenever the serialized project contains a
-  `globalConfig` subtree, including an empty one.
+- One root `static-data.toml` whenever the serialized project contains a
+  `staticData` subtree, including an empty one.
 - One `objects/<Object>.settings` file for every global
   object definition.
 - Exactly one scene subfolder containing `scene.settings`, one `.layout`, and
@@ -350,19 +350,21 @@ All `.settings` files are combined in this deterministic dependency order:
 
 1. `project.settings`.
 2. `resources.settings`.
-3. `config.settings`, when present.
-4. Root object settings in global object order.
-5. `externals/external.settings`, when that fixed path exists.
-6. Scene settings in project scene order, followed by that scene's flat
+3. Root object settings in global object order.
+4. `externals/external.settings`, when that fixed path exists.
+5. Scene settings in project scene order, followed by that scene's flat
    object settings in object order.
-7. Extension settings in project extension order.
-8. Each extension's per-function, prefab, and behavior settings in their
+6. Extension settings in project extension order.
+7. Each extension's per-function, prefab, and behavior settings in their
    locally owned contiguous `order` values.
-9. Each prefab's flat default and variant object settings in object order.
-10. Each prefab and behavior's flat function settings in function order.
+8. Each prefab's flat default and variant object settings in object order.
+9. Each prefab and behavior's flat function settings in function order.
+
+`static-data.toml` is parsed separately as editor-only Static Data. It is not
+mounted into or merged with the combined project settings document.
 
 The loader discovers settings fragments only from the fixed paths
-`resources.settings`, `config.settings`,
+`resources.settings`, `static-data.toml`,
 `objects/*.settings`, `scenes/*/scene.settings`,
 `scenes/*/objects/*.settings`,
 `externals/external.settings`,
@@ -432,9 +434,8 @@ Additional rules for stored fragments and their combined shape:
 
 - Every settings file owns exactly one local component document. The physical
   path supplies its unique mounted namespace. `project.settings` keeps format
-  bootstrap scalars at its root. `config.settings` uses the short local
-  `[globalConfig]` and `[settings]` tables because global config is arbitrary
-  user data.
+  bootstrap scalars at its root. The separate `static-data.toml` document contains
+  only direct-root user data and has no format metadata or wrapper table.
 - A file must not declare or reopen a table owned by another settings file.
 - There are no `sceneFiles`, `extensionFiles`, `functionFiles`, `prefabFiles`,
   `behaviorFiles`, or `externalSettings` settings-file indexes. Scenes,
@@ -661,22 +662,20 @@ For payloads produced by the current serializer:
 | Empty object             | Inline table `{}` when a typed table would otherwise disappear |
 | Empty array              | `[]`                                                           |
 
-The current project serializers normally do not emit JSON `null` or
-heterogeneous scalar arrays. Arbitrary global-config JSON or a future/extension
-value that TOML cannot represent without changing type is stored as canonical
-JSON text and reapplied by JSON Pointer:
+The current component serializers normally do not emit JSON `null` or
+heterogeneous scalar arrays. A future or extension-owned component value that
+TOML cannot represent without changing type is stored as canonical JSON text
+and reapplied by JSON Pointer:
 
 ```toml
-[globalConfig.rawJson]
+[rawJson]
 "/arbitrary" = "null"
 "/mixed" = '''[1,"two"]'''
 ```
 
 Rules for `rawJson`:
 
-- For ordinary component documents the table is the short local `[rawJson]`
-  table. `config.settings` uses `[globalConfig.rawJson]` for format-owned
-  pointers and `[settings.rawJson]` for a user-owned `rawJson` member.
+- For component documents the table is the short local `[rawJson]` table.
 - Keys are RFC 6901 JSON Pointers relative to the component's legacy payload.
 - Values are canonical JSON text.
 - Raw overrides are applied after the ordinary TOML projection is built.
@@ -685,6 +684,11 @@ Rules for `rawJson`:
 - Integers outside JavaScript's safe-integer range use `rawJson`; this avoids
   TOML parser overflow while preserving the exact legacy JSON number.
 - Unknown raw pointers are preserved, not discarded.
+
+`static-data.toml` is deliberately simpler: it has no raw-JSON fallback or reserved
+metadata namespace. Every Static Data value must be directly representable
+in TOML. JSON `null`, heterogeneous arrays, dates, non-finite numbers, and
+unsafe integers are rejected rather than encoded behind user data.
 
 ### 5.4 Canonical ordering
 
@@ -762,14 +766,14 @@ settings.
 
 ---
 
-## 6. `project.settings`, `resources.settings`, and `config.settings`
+## 6. `project.settings`, `resources.settings`, and `static-data.toml`
 
 ### 6.1 Ownership
 
 The entry file owns the current project root except these split containers:
 
 - `resources`
-- `globalConfig`
+- `staticData`
 - `objects`
 - `layouts`
 - `externalEvents`
@@ -781,8 +785,8 @@ groups, global variables, and first/preview scene selection. Individual global
 object definitions are discovered from the root `objects/` directory.
 The sibling `resources.settings` owns the complete
 legacy `resources` container, including resource entries, origins, metadata,
-and resource folders. The sibling `config.settings` owns the complete arbitrary
-legacy `globalConfig` subtree.
+and resource folders. The sibling `static-data.toml` owns the complete editor-only,
+TOML-compatible Static Data object.
 
 ### 6.2 Example
 
@@ -827,8 +831,8 @@ Real entry files also contain the `[objectGroups]` and `[variables]` tables.
 Global object definitions and resources are never
 written in `project.settings`. No settings file may contain a legacy
 `objectsFolderStructure` table.
-Global configuration is likewise never written there; it belongs to
-`config.settings`.
+Static Data is likewise never written there; it belongs to
+`static-data.toml`.
 
 ### 6.3 Global object settings
 
@@ -878,28 +882,28 @@ userAdded = true
 references the other. The `kind` and `settingsFormatVersion` fields are removed
 when composing the legacy `resources` object.
 
-### 6.5 `config.settings` example
+### 6.5 `static-data.toml` example
 
 ```toml
-[globalConfig]
-settingsFormatVersion = 1
-
-[settings.sheet.row]
+[sheet.row]
 column = "value"
 column2 = "another value"
 
-[settings.sheet.row2]
+[sheet.row2]
 column = "second"
 column2 = "third"
 ```
 
-`config.settings` is discovered at its fixed root path and is never referenced
-by another settings file. No format markers are inserted beneath
-local `[settings]`, because every key there belongs to the user-defined
-configuration. Unsupported TOML value shapes use the format-owned
-`[globalConfig.rawJson]` table with JSON Pointers relative to the
-global-config root. This separate namespace ensures that a user-defined
-`project.globalConfig.rawJson` key remains ordinary user data.
+`static-data.toml` is discovered at its fixed root path and is never referenced by
+another source file. The entire document is user-defined configuration: it has
+no `[settings]` or `[staticData]` wrapper and no `settingsFormatVersion`
+marker. Unsupported TOML value shapes are rejected. A user-defined `rawJson`
+key is ordinary data with no serializer meaning.
+
+The editor auto-saves Static Data changes directly to `static-data.toml` after a
+short debounce. This isolated save does not rewrite `project.settings` or any
+other owned source. The normal project-save transaction also writes
+`static-data.toml` from the in-memory Static Data as a fallback.
 
 ### 6.6 Root rules
 
@@ -907,8 +911,9 @@ global-config root. This separate namespace ensures that a user-defined
   no self-reference. Its fixed root filename is the entry marker.
 - `project.settings` must not contain resources in canonical output.
   `resources.settings` is mounted as the sole writer of `project.resources`.
-- `project.settings` must not contain global config in canonical output.
-  `config.settings` local `[settings]` is mounted as `project.globalConfig`.
+- `project.settings` must not contain static data in canonical output.
+  `static-data.toml` is loaded separately into the editor's Static Data model and
+  is not part of the combined settings merge.
 - `project.settings` must not contain global objects in canonical output.
   Each global object owns one flat root object settings file.
 - Root `eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
@@ -940,7 +945,7 @@ The composer removes format-only fields and creates:
   "objects": [],
   "objectsGroups": [],
   "variables": [],
-  "globalConfig": {},
+  "staticData": {},
   "firstLayout": "Main",
   "previewLayout": "Main",
   "layouts": [],
@@ -954,6 +959,11 @@ The global `objects` array is composed from root object settings in their
 locally owned order. The four split arrays are filled in locally owned order:
 scenes from `scene.settings`, extensions from `extension.settings`, and both
 external containers from `external.settings`.
+
+The compatibility adapter temporarily attaches the `static-data.toml` value to the
+in-memory authoring project so existing editor placeholder tooling can use it.
+Generated `.gdevelop/game.json` and runtime exports omit `staticData`;
+supported placeholders are resolved before runtime data is written.
 
 ---
 
@@ -1573,7 +1583,7 @@ Composition produces an in-memory object equivalent to current project JSON. It 
 ```text
 project.settings
   + resources.settings
-  + config.settings
+  + static-data.toml (editor-only placeholder source)
   + scene settings
   + visual scene layouts
   + compiled scene events
@@ -1590,10 +1600,10 @@ project.settings
 
 | New source                                                                 | Legacy destination                                                                                                          |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `project.settings` ordinary payload                                        | Project root excluding resources, global config, global object definitions, and four split arrays                           |
+| `project.settings` ordinary payload                                        | Project root excluding resources, static data, global object definitions, and four split arrays                           |
 | Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
 | `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
-| `config.settings` `[settings]`                                             | Project root `globalConfig` object without adding or removing user keys                                                     |
+| `static-data.toml` direct root                                                  | Editor-only Static Data object without adding or removing user keys                                                       |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
 | `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
 | `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
@@ -1614,7 +1624,7 @@ two logical passes:
    source in its owner context, and resolve every pure `.events` body through
    its owning settings document and path-derived namespace.
 2. Build a skeleton legacy tree with scenes, objects, variables, resources
-   from `resources.settings`, global config from `config.settings`, extension
+   from `resources.settings`, editor-only static data from `static-data.toml`, extension
    declarations, behaviors, prefabs, and function signatures, but empty event
    bodies.
 3. Unserialize the skeleton into a temporary project/context and load required platform extensions.
@@ -1650,12 +1660,12 @@ and validated after bootstrap. The DSL has no `@exact` fallback.
    component kind by its locally owned `order` value.
 4. Mount all local `.settings` documents by path in the deterministic order
    from section 5.1.2 and strictly merge the transient
-   `CombinedProjectSettings` as the authoritative compilation input.
+   `CombinedProjectSettings` as the authoritative compilation input. Parse
+   `static-data.toml` separately into the editor-only Static Data model.
 5. Validate fragment identities, duplicate namespaces/paths, ordering, owner
    relationships, required pairs, and `settingsFormatVersion` for marker-bearing
-   component fragments. Validate `config.settings` by its fixed path,
-   format-owned `[globalConfig]` marker, and exclusive
-   local `[settings]` ownership mounted at `project.globalConfig`.
+   component fragments. Validate `static-data.toml` by its fixed path, direct-root
+   TOML-compatible data, and absence of serializer wrapper/metadata tables.
 6. Resolve all authoritative layout/events URIs, then read those sources with
    a bounded concurrency limit.
 7. Parse and semantically compile `.layout` files separately using the owning
@@ -1703,7 +1713,7 @@ unrelated extensions, or `project.settings`.
 | Project properties, global object groups, and global variables                                        | `project.settings`                                               |
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
-| Arbitrary global configuration                                                                        | `config.settings`                                                |
+| Editor-only Static Data                                                                             | `static-data.toml`                                                    |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
 | A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
 | Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
@@ -1980,7 +1990,7 @@ Moving a function or entity changes owner identity and may change generated inst
 
 - Canonical output avoids timestamps and random formatting changes in source files.
 - `project.settings` does not change when scenes, extensions, functions,
-  prefabs, behaviors, resources, or global-config values are added, removed,
+  prefabs, behaviors, resources, or static-data values are added, removed,
   reordered, renamed, or edited; each component owns that configuration
   locally.
 - Function bodies, scene events, and layouts produce isolated diffs.
@@ -2154,16 +2164,17 @@ proven reliable.
 A conforming implementation must satisfy all of the following:
 
 1. Opening `project.settings` discovers `resources.settings`,
-   `config.settings`, and the other fixed settings fragments, then reconstructs
+   `static-data.toml`, and the other fixed settings fragments, then reconstructs
    a complete current project without runtime changes.
 2. Opening legacy JSON converts once, commits atomically, preserves the original, and switches the editor to the new entry.
 3. Normal Save writes new-format source files plus ignored generated artifacts
    under `.gdevelop/`; it never recreates an editable root legacy JSON.
 4. `resources.settings` exclusively owns the project resource registry and is
    combined without a reference from `project.settings`.
-5. `config.settings` local `[settings]` exclusively owns the mounted
-   `project.globalConfig`, preserves its arbitrary user keys, and is combined without a reference from
-   `project.settings`.
+5. `static-data.toml` exclusively owns direct-root, editor-only Static Data,
+   has no format metadata or wrapper table, and is loaded separately without a
+   reference from or merge into `project.settings`. Generated compatibility
+   JSON and runtime exports omit the Static Data map.
 6. Every scene has its own subfolder with `scene.settings`, a placement-focused
    Layout DSL file, an events DSL file, and flat object
    settings. Object definitions and their behaviors belong to individual

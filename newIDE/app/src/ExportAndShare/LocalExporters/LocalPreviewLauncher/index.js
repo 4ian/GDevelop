@@ -21,7 +21,7 @@ import {
   addGlobalObjectGroupsToDataJs,
   addGlobalObjectGroupsToProjectData,
 } from '../../PreviewGlobalObjectGroupsPatch';
-import { hasGlobalConfigPlaceholderDiagnostic } from '../../../Utils/GlobalConfigPlaceholderDiagnostics';
+import { hasStaticDataPlaceholderDiagnostic } from '../../../Utils/StaticDataPlaceholderDiagnostics';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -416,11 +416,11 @@ export default class LocalPreviewLauncher extends React.Component<
       previewExportOptions
     );
     if (
-      hasGlobalConfigPlaceholderDiagnostic(
+      hasStaticDataPlaceholderDiagnostic(
         project.getWholeProjectDiagnosticReport()
       )
     ) {
-      this.props.onInvalidGlobalConfigPlaceholder();
+      this.props.onInvalidStaticDataPlaceholder();
       exporter.delete();
       previewExportOptions.delete();
       return;

@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -14,9 +14,9 @@ multi-file sources, then continue by editing those generated files directly.
 
 Read, in order:
 
-1. `project.settings` for project metadata and non-global-config project data.
+1. `project.settings` for project metadata and non-static-data project data.
 2. `resources.settings` for the complete project resource registry.
-3. `config.settings` for the complete arbitrary global-config subtree.
+3. `static-data.toml` for the complete editor-only Static Data object.
 4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
@@ -112,9 +112,9 @@ generated compatibility/runtime output, not multi-file source.
   keep named `points` and `customCollisionMask` vertices as inline arrays of
   point tables. Never expand point data into long dotted TOML headers. For
   example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
-- `config.settings`: edit global configuration only under the short local
-  `[settings]` table; preserve arbitrary keys and the format-owned
-  `[globalConfig]`/`[globalConfig.rawJson]` tables.
+- `static-data.toml`: the entire root document is editor-only Static Data.
+  Author data directly, with no `[settings]`, `[staticData]`, format-version,
+  or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: Layout DSL component-tree markup containing placement/layout data
   only: instances, layers, spatial bounds, background, and editor view state.
   Never put TOML, object definitions, or attached behavior definitions in a
@@ -168,7 +168,7 @@ grouping in the function settings `folder` array. `prefab.settings` and
 ```text
 project.settings
 resources.settings
-config.settings
+static-data.toml
 objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
@@ -214,8 +214,8 @@ Load only the references required by the task:
   creating or changing any `.events` file. Use only its canonical IfDo
   structures and the exact types and `dslName` parameters found in the
   generated project instruction catalog.
-- Read [references/global-config.md](references/global-config.md) in full
-  whenever the user asks to create, edit, reorganize, or consume Global Config,
+- Read [references/static-data.md](references/static-data.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Static Data,
   or to add/change a `{{...}}` placeholder. Also read the events guide for an
   event consumer and the extension guide when injecting config into a prefab,
   behavior, or reusable extension.
@@ -224,7 +224,7 @@ Load only the references required by the task:
   communication, `SignalReceived`, signal sender/payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
-  the Global Config guide too when signal names use placeholders.
+  the Static Data guide too when signal names use placeholders.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -338,8 +338,7 @@ loop, comment, and JavaScript metadata when editing existing sources.
    events, reference, or generated-project validation failure. This call first
    regenerates all three `.gdevelop` catalogs, then validates the sources using
    the fresh instruction catalog. Call it at least once before calling
-   `reload_project`; a failed validation does not satisfy this gate. `valid:
-   true` proves parsing, source reconstruction, project validation, and
+   `reload_project`; a failed validation does not satisfy this gate. `valid: true` proves parsing, source reconstruction, project validation, and
    extension generated-code preflight only. It does not prove runtime object
    picking or gameplay side effects.
 8. After the requested task is complete and validation succeeds, use Git from
@@ -357,9 +356,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
     `instance_indexes` to inspect bounded live position, angle, force, variable,
     and behavior state. Runtime verification is mandatory for extension actions
     that create, delete, pick, or mutate objects.
-   If any project source changes after the reload, call `reload_project` again
-   before the next preview, preceded by a new successful
-   `validate_project_files` call and Git commit for those edits.
+    If any project source changes after the reload, call `reload_project` again
+    before the next preview, preceded by a new successful
+    `validate_project_files` call and Git commit for those edits.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -447,9 +446,9 @@ Before finishing:
 - Confirm layout elements, attributes, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
-- For Global Config changes, confirm `config.settings` ownership, canonical
-  raw-JSON pointers, placeholder paths/types, and regeneration-time behavior
-  against the Global Config reference.
+- For Static Data changes, confirm `static-data.toml` ownership, direct-root
+  TOML data, placeholder paths/types, and regeneration-time behavior
+  against the Static Data reference.
 - For signal changes, confirm target kind, receiver kind, fixed `onSignal`
   signature, guarded emission, next-dispatch timing, and preview signal-monitor
   evidence against the signal-system reference.

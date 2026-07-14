@@ -57,7 +57,7 @@ type Props = {|
   project?: ?gdProject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
-  hideGlobalConfigPlaceholderHints?: boolean,
+  hideStaticDataPlaceholderHints?: boolean,
 |};
 
 const styles = {
@@ -80,34 +80,34 @@ const styles = {
   },
 };
 
-const globalConfigPlaceholderExample = '{{cards.sunflower.price}}';
+const staticDataPlaceholderExample = '{{cards.sunflower.price}}';
 
-const hasGlobalConfigPlaceholderSyntax = (value: any): boolean =>
+const hasStaticDataPlaceholderSyntax = (value: any): boolean =>
   typeof value === 'string' &&
   (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
 
-const isExactGlobalConfigPlaceholder = (value: string): boolean =>
+const isExactStaticDataPlaceholder = (value: string): boolean =>
   /^\s*\{\{\s*[^{}]+\s*\}\}\s*$/.test(value);
 
-const isValidNumberOrGlobalConfigPlaceholder = (value: string): boolean => {
-  if (isExactGlobalConfigPlaceholder(value)) return true;
-  if (hasGlobalConfigPlaceholderSyntax(value)) return false;
+const isValidNumberOrStaticDataPlaceholder = (value: string): boolean => {
+  if (isExactStaticDataPlaceholder(value)) return true;
+  if (hasStaticDataPlaceholderSyntax(value)) return false;
 
   const numberValue = parseFloat(value);
   return !isNaN(numberValue);
 };
 
-const getGlobalConfigPlaceholderErrorText = (
+const getStaticDataPlaceholderErrorText = (
   field: ValueField,
   value: any
 ): React.Node => {
   const valueAsString = value == null ? '' : '' + value;
-  if (!hasGlobalConfigPlaceholderSyntax(valueAsString)) return null;
+  if (!hasStaticDataPlaceholderSyntax(valueAsString)) return null;
 
-  if (field.forbidGlobalConfigPlaceholder) {
+  if (field.forbidStaticDataPlaceholder) {
     return (
       <Trans>
-        Global config placeholders can only be edited from the object editor
+        Static Data placeholders can only be edited from the object editor
         window.
       </Trans>
     );
@@ -115,12 +115,12 @@ const getGlobalConfigPlaceholderErrorText = (
 
   if (
     field.valueType === 'number' &&
-    !isExactGlobalConfigPlaceholder(valueAsString)
+    !isExactStaticDataPlaceholder(valueAsString)
   ) {
     return (
       <Trans>
         Use a whole placeholder for number properties, for example{' '}
-        {globalConfigPlaceholderExample}.
+        {staticDataPlaceholderExample}.
       </Trans>
     );
   }
@@ -234,7 +234,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
-  hideGlobalConfigPlaceholderHints,
+  hideStaticDataPlaceholderHints,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -307,9 +307,9 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'number') {
         const { setValue, getEndAdornment, getRawValue, setRawValue } = field;
         const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
-        const allowGlobalConfigPlaceholder = !!field.allowGlobalConfigPlaceholder;
+        const allowStaticDataPlaceholder = !!field.allowStaticDataPlaceholder;
         const value =
-          allowGlobalConfigPlaceholder && getRawValue
+          allowStaticDataPlaceholder && getRawValue
             ? getRawValue(instances[0])
             : getFieldValue({ instances, field });
         return (
@@ -321,21 +321,21 @@ const PropertiesEditor = ({
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             hintText={
-              allowGlobalConfigPlaceholder && !hideGlobalConfigPlaceholderHints
-                ? globalConfigPlaceholderExample
+              allowStaticDataPlaceholder && !hideStaticDataPlaceholderHints
+                ? staticDataPlaceholderExample
                 : undefined
             }
-            errorText={getGlobalConfigPlaceholderErrorText(field, value)}
+            errorText={getStaticDataPlaceholderErrorText(field, value)}
             onChange={newValue => {
-              if (allowGlobalConfigPlaceholder) {
+              if (allowStaticDataPlaceholder) {
                 if (!setRawValue) return;
-                if (!isValidNumberOrGlobalConfigPlaceholder(newValue)) return;
+                if (!isValidNumberOrStaticDataPlaceholder(newValue)) return;
 
                 instances.forEach(i => setRawValue(i, newValue));
                 _onInstancesModified(instances);
                 return;
               }
-              if (hasGlobalConfigPlaceholderSyntax(newValue)) return;
+              if (hasStaticDataPlaceholderSyntax(newValue)) return;
 
               const newNumberValue = parseFloat(newValue);
               // If the value is not a number, the user is probably still typing, adding a dot or a comma.
@@ -344,7 +344,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
-            type={allowGlobalConfigPlaceholder ? 'text' : 'number'}
+            type={allowStaticDataPlaceholder ? 'text' : 'number'}
             style={styles.field}
             disabled={getDisabled({ instances, field, mixedValues: false })}
             endAdornment={
@@ -421,12 +421,12 @@ const PropertiesEditor = ({
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
                 hintText={
-                  field.allowGlobalConfigPlaceholder &&
-                  !hideGlobalConfigPlaceholderHints
-                    ? globalConfigPlaceholderExample
+                  field.allowStaticDataPlaceholder &&
+                  !hideStaticDataPlaceholderHints
+                    ? staticDataPlaceholderExample
                     : undefined
                 }
-                errorText={getGlobalConfigPlaceholderErrorText(
+                errorText={getStaticDataPlaceholderErrorText(
                   field,
                   getFieldValue({
                     instances,
@@ -436,8 +436,8 @@ const PropertiesEditor = ({
                 )}
                 onChange={newValue => {
                   if (
-                    field.forbidGlobalConfigPlaceholder &&
-                    hasGlobalConfigPlaceholderSyntax(newValue)
+                    field.forbidStaticDataPlaceholder &&
+                    hasStaticDataPlaceholderSyntax(newValue)
                   ) {
                     return;
                   }
@@ -478,7 +478,7 @@ const PropertiesEditor = ({
       instances,
       getFieldDescription,
       _onInstancesModified,
-      hideGlobalConfigPlaceholderHints,
+      hideStaticDataPlaceholderHints,
     ]
   );
 
@@ -751,8 +751,8 @@ const PropertiesEditor = ({
                   mode="row"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
-                  hideGlobalConfigPlaceholderHints={
-                    hideGlobalConfigPlaceholderHints
+                  hideStaticDataPlaceholderHints={
+                    hideStaticDataPlaceholderHints
                   }
                 />
               )}
@@ -785,8 +785,8 @@ const PropertiesEditor = ({
                   mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
-                  hideGlobalConfigPlaceholderHints={
-                    hideGlobalConfigPlaceholderHints
+                  hideStaticDataPlaceholderHints={
+                    hideStaticDataPlaceholderHints
                   }
                 />
               )}

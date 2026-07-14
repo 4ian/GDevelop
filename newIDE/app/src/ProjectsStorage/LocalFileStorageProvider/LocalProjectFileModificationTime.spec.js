@@ -41,7 +41,7 @@ describe('getLocalProjectLastModifiedDate', () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     writeFileWithModificationTime(entryPath, 100000);
     writeFileWithModificationTime(
-      path.join(temporaryDirectory, 'config.settings'),
+      path.join(temporaryDirectory, 'static-data.toml'),
       200000
     );
     writeFileWithModificationTime(

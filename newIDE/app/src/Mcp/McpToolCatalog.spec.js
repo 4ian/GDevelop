@@ -17,6 +17,7 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
+  'gdevelop_get_static_data',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'generate-catalogs',
@@ -35,10 +36,15 @@ const expectedAlwaysAvailableTools = [
   'capture_preview_screenshot',
 ].sort();
 
-const expectedWriteTools = ['import_extension'];
+const expectedAlwaysAvailableWriteTools = ['import_extension'];
+const expectedPermissionedWriteTools = [
+  'gdevelop_set_static_data',
+  'gdevelop_set_static_data_value',
+  'gdevelop_delete_static_data_value',
+];
 
 describe('McpToolCatalog', () => {
-  it('always exposes only the bounded extension importer from write tools', () => {
+  it('requires write permission for Static Data editing tools', () => {
     const withoutPermissions = getMcpTools({
       allowWriteTools: false,
       allowCommandTools: false,
@@ -49,20 +55,49 @@ describe('McpToolCatalog', () => {
     });
 
     expect(withoutPermissions.map(tool => tool.name).sort()).toEqual(
-      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
+      [
+        ...expectedAlwaysAvailableTools,
+        ...expectedAlwaysAvailableWriteTools,
+      ].sort()
     );
     expect(withPermissions.map(tool => tool.name).sort()).toEqual(
-      [...expectedAlwaysAvailableTools, ...expectedWriteTools].sort()
+      [
+        ...expectedAlwaysAvailableTools,
+        ...expectedAlwaysAvailableWriteTools,
+        ...expectedPermissionedWriteTools,
+      ].sort()
     );
     expect(
       getAllMcpToolsForIntrospection()
         .map(tool => tool.name)
         .sort()
-    ).toEqual([...expectedAlwaysAvailableTools, ...expectedWriteTools].sort());
+    ).toEqual(
+      [
+        ...expectedAlwaysAvailableTools,
+        ...expectedAlwaysAvailableWriteTools,
+        ...expectedPermissionedWriteTools,
+      ].sort()
+    );
     expect(isWriteTool('import_extension')).toBe(true);
+    expect(isWriteTool('gdevelop_set_static_data')).toBe(true);
     expect(
       canCallMcpTool('import_extension', {
         allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+    expect(
+      canCallMcpTool('gdevelop_set_static_data', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({
+      canCall: false,
+      reason: 'Write MCP tools are disabled in GDevelop preferences.',
+    });
+    expect(
+      canCallMcpTool('gdevelop_set_static_data', {
+        allowWriteTools: true,
         allowCommandTools: false,
       })
     ).toEqual({ canCall: true });
@@ -106,6 +141,7 @@ describe('McpToolCatalog', () => {
       'Editor queries',
       'Extension import',
       'Preview debugging',
+      'Variables & scenes',
     ]);
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');

@@ -616,6 +616,7 @@ export const isTextLikeFile = (node: ProjectFileNode): boolean =>
     '.xml',
     '.yaml',
     '.yml',
+    '.toml',
     '.csv',
     '.md',
     '.markdown',

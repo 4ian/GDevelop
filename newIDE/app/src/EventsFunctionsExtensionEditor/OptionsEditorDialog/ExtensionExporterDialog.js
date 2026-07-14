@@ -14,7 +14,7 @@ import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
-import { findGlobalConfigPlaceholderInSerializedData } from '../../Utils/GlobalConfigPlaceholderDiagnostics';
+import { findStaticDataPlaceholderInSerializedData } from '../../Utils/StaticDataPlaceholderDiagnostics';
 
 const gd: libGDevelop = global.gd;
 
@@ -67,14 +67,14 @@ const exportExtension = async (
   if (requiredExtensions.length > 0) {
     serializedObject.requiredExtensions = requiredExtensions;
   }
-  const globalConfigPlaceholderPath = findGlobalConfigPlaceholderInSerializedData(
+  const staticDataPlaceholderPath = findStaticDataPlaceholderInSerializedData(
     serializedObject
   );
-  if (globalConfigPlaceholderPath !== null) {
+  if (staticDataPlaceholderPath !== null) {
     showErrorBox({
-      message: `The extension can't be exported because it contains global config placeholder "{{${globalConfigPlaceholderPath}}}". Extensions with global config placeholders can only be used in the current project.`,
+      message: `The extension can't be exported because it contains static data placeholder "{{${staticDataPlaceholderPath}}}". Extensions with static data placeholders can only be used in the current project.`,
       rawError: null,
-      errorId: 'extension-export-global-config-placeholder',
+      errorId: 'extension-export-static-data-placeholder',
       doNotReport: true,
     });
     return;

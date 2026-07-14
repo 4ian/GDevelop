@@ -87,16 +87,16 @@ rg 'SignalName|SignalPayload|SignalSenderObjectName|SignalSenderInstanceId' .gde
 
 The built-in signal surface normally exposed for new AI-authored events is:
 
-| Kind | Type/name | Purpose |
-| --- | --- | --- |
-| Condition | `SignalReceived` | Iterate scene-targeted signals with one name in a scene/external-scene event |
-| Action | `EmitSceneSignal` | Broadcast to scene receivers and eligible custom objects |
-| Action | `EmitSignalToObjectInstance` | Target one runtime instance ID |
-| Action | `EmitSignalToPickedObjects` | Target a snapshot of the current picked instances |
-| Text expression | `SignalName()` | Name of the current scene-received signal |
-| Text expression | `SignalPayload()` | Payload of the current scene-received signal |
-| Text expression | `SignalSenderObjectName()` | Sender object name, or empty text |
-| Number expression | `SignalSenderInstanceId()` | Sender instance ID, or `-1` |
+| Kind              | Type/name                    | Purpose                                                                      |
+| ----------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| Condition         | `SignalReceived`             | Iterate scene-targeted signals with one name in a scene/external-scene event |
+| Action            | `EmitSceneSignal`            | Broadcast to scene receivers and eligible custom objects                     |
+| Action            | `EmitSignalToObjectInstance` | Target one runtime instance ID                                               |
+| Action            | `EmitSignalToPickedObjects`  | Target a snapshot of the current picked instances                            |
+| Text expression   | `SignalName()`               | Name of the current scene-received signal                                    |
+| Text expression   | `SignalPayload()`            | Payload of the current scene-received signal                                 |
+| Text expression   | `SignalSenderObjectName()`   | Sender object name, or empty text                                            |
+| Number expression | `SignalSenderInstanceId()`   | Sender instance ID, or `-1`                                                  |
 
 `EmitSignalToObject` and `EmitSignalToObjectGroup` exist in the runtime/editor
 implementation but are hidden authoring instructions. The generated catalog
@@ -116,12 +116,12 @@ each against the project catalog before copying it.
 
 Choose the smallest target that expresses the contract:
 
-| Target | Receivers | Scene `SignalReceived` sees it? | Typical use |
-| --- | --- | --- | --- |
-| Scene | Custom-object instances with an actual `onSignal` override, then scene receiver events | Yes | Prefab announces an event; scene broadcasts a mode change |
-| One instance ID | That one eligible custom-object instance | No | Request/reply or command to one prefab |
-| Picked objects | The eligible custom objects picked at emission time | No | Send one command to a selected subset |
-| Object name/group | Matching eligible custom objects | No | Runtime supports this, but authoring actions are hidden by default |
+| Target            | Receivers                                                                              | Scene `SignalReceived` sees it? | Typical use                                                        |
+| ----------------- | -------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------ |
+| Scene             | Custom-object instances with an actual `onSignal` override, then scene receiver events | Yes                             | Prefab announces an event; scene broadcasts a mode change          |
+| One instance ID   | That one eligible custom-object instance                                               | No                              | Request/reply or command to one prefab                             |
+| Picked objects    | The eligible custom objects picked at emission time                                    | No                              | Send one command to a selected subset                              |
+| Object name/group | Matching eligible custom objects                                                       | No                              | Runtime supports this, but authoring actions are hidden by default |
 
 A scene-targeted signal is a broadcast. Every loaded custom-object instance
 whose generated runtime class overrides `onSignal` can receive it, even when
@@ -317,9 +317,9 @@ evolution. Do not send whole mutable state trees every frame. `onSignal` does
 not expose sender expressions, so include sender-related application data in
 the payload when the handler genuinely needs it.
 
-Signal names can be centralized in Global Config, for example
+Signal names can be centralized in Static Data, for example
 `{{signals.card.selected}}`, when a project needs one static registry shared by
-emitters. Read [global-config.md](global-config.md) before doing this; the
+emitters. Read [static-data.md](static-data.md) before doing this; the
 placeholder is resolved at code generation and is not a runtime lookup.
 
 ## Complete patterns
@@ -359,13 +359,10 @@ the next dispatch. The scene does not receive this object-targeted signal.
 
 ### Project-owned static signal registry
 
-`config.settings`:
+`static-data.toml`:
 
 ```toml
-[globalConfig]
-settingsFormatVersion = 1
-
-[settings.signals.card]
+[signals.card]
 selected = "Card.Selected"
 refresh = "Card.Refresh"
 ```

@@ -18,7 +18,7 @@
 using namespace gd;
 
 namespace {
-bool IsExactGlobalConfigPlaceholderValue(const gd::String &value) {
+bool IsExactStaticDataPlaceholderValue(const gd::String &value) {
   gd::String trimmedValue = value;
   trimmedValue = trimmedValue.Trim();
   if (trimmedValue.length() < 5) return false;
@@ -53,13 +53,13 @@ void CustomConfigurationHelper::InitializeContent(
     } else if (primitiveType == "string" || valueType == "behavior") {
       element.SetStringValue(property->GetValue());
     } else if (primitiveType == "number") {
-      if (IsExactGlobalConfigPlaceholderValue(property->GetValue())) {
+      if (IsExactStaticDataPlaceholderValue(property->GetValue())) {
         element.SetStringValue(property->GetValue());
       } else {
         element.SetDoubleValue(GetNumberPropertyValue(property->GetValue()));
       }
     } else if (primitiveType == "boolean") {
-      if (IsExactGlobalConfigPlaceholderValue(property->GetValue())) {
+      if (IsExactStaticDataPlaceholderValue(property->GetValue())) {
         element.SetStringValue(property->GetValue());
       } else {
         element.SetBoolValue(GetBooleanPropertyValue(property->GetValue()));
@@ -131,13 +131,13 @@ bool CustomConfigurationHelper::UpdateProperty(
   } else if (primitiveType == "string" || valueType == "behavior") {
     element.SetStringValue(newValue);
   } else if (primitiveType == "number") {
-    if (IsExactGlobalConfigPlaceholderValue(newValue)) {
+    if (IsExactStaticDataPlaceholderValue(newValue)) {
       element.SetStringValue(newValue);
     } else {
       element.SetDoubleValue(GetNumberPropertyValue(newValue));
     }
   } else if (primitiveType == "boolean") {
-    if (IsExactGlobalConfigPlaceholderValue(newValue)) {
+    if (IsExactStaticDataPlaceholderValue(newValue)) {
       element.SetStringValue(newValue);
     } else {
       element.SetBoolValue(GetBooleanPropertyValue(newValue));

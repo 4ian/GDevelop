@@ -1072,43 +1072,43 @@ class GD_CORE_API Project {
 
   ///@}
 
-  /** \name Global configuration
-   * Members functions related to project-wide JSON configuration data.
+  /** \name Static Data
+   * Members functions related to project-wide Static Data.
    */
   ///@{
 
   /**
-   * Get the project-wide JSON configuration data.
+   * Get the project-wide Static Data JSON.
    */
-  inline const gd::String& GetGlobalConfigJson() const {
-    return globalConfigJson;
+  inline const gd::String& GetStaticDataJson() const {
+    return staticDataJson;
   }
 
   /**
-   * Set the project-wide JSON configuration data.
+   * Set the project-wide Static Data JSON.
    */
-  inline void SetGlobalConfigJson(const gd::String& globalConfigJson_) {
-    globalConfigJson = globalConfigJson_.empty() ? "{}" : globalConfigJson_;
+  inline void SetStaticDataJson(const gd::String& staticDataJson_) {
+    staticDataJson = staticDataJson_.empty() ? "{}" : staticDataJson_;
   }
 
   /**
-   * Get a project-wide JSON configuration value as a string.
+   * Get a project-wide Static Data value as a string.
    *
    * Object and array values are returned as JSON strings.
    */
-  bool GetGlobalConfigValueAsString(const gd::String& path,
+  bool GetStaticDataValueAsString(const gd::String& path,
                                     gd::String& value) const;
 
   /**
    * Replace all `{{path.to.value}}` placeholders with values from the
-   * project-wide JSON configuration.
+   * project-wide Static Data.
    *
    * \param source The source string that can contain placeholders.
    * \param resolved The string with placeholders replaced when all paths exist.
    * \param missingPath The first placeholder path that could not be resolved.
    * \return true if all placeholders were resolved.
    */
-  bool ResolveGlobalConfigPlaceholders(const gd::String& source,
+  bool ResolveStaticDataPlaceholders(const gd::String& source,
                                        gd::String& resolved,
                                        gd::String& missingPath) const;
 
@@ -1202,7 +1202,7 @@ class GD_CORE_API Project {
               ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
-  gd::String globalConfigJson;       ///< Project-wide JSON configuration data
+  gd::String staticDataJson;  ///< Project-wide Static Data JSON
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts

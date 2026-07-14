@@ -1011,52 +1011,52 @@ const firstLayoutSchema = {
   additionalProperties: true,
 };
 
-const globalConfigReadSchema = {
+const staticDataReadSchema = {
   type: 'object',
   properties: {
     placeholder_path: {
       type: 'string',
       description:
-        'Optional exact global config placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the full config object.',
+        'Optional exact Static Data placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the complete Static Data object.',
     },
   },
   additionalProperties: false,
 };
 
-const globalConfigReplaceSchema = {
+const staticDataReplaceSchema = {
   type: 'object',
   properties: {
-    global_config: {
+    static_data: {
       type: 'object',
       description:
-        'Complete replacement global config object. The root must be a JSON object.',
+        'Complete replacement static data object. The root must be a JSON object.',
       additionalProperties: true,
     },
-    global_config_json: {
+    static_data_json: {
       type: 'string',
       description:
-        'Alternative complete replacement config as a JSON string. The root must be an object.',
+        'Alternative complete Static Data replacement as a JSON string. The root must be an object.',
     },
-    include_config: {
+    include_static_data: {
       type: 'boolean',
       description:
-        'When true, include the written config object in the response.',
+        'When true, include the written Static Data object in the response.',
     },
   },
   additionalProperties: true,
 };
 
-const globalConfigValueSchema = {
+const staticDataValueSchema = {
   type: 'object',
   properties: {
     placeholder_path: {
       type: 'string',
       description:
-        'Exact global config placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
+        'Exact static data placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
     },
     value: {
       description:
-        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed config values, or a string for text values.',
+        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed Static Data values, or a string for text values.',
     },
     value_json: {
       type: 'string',
@@ -1068,10 +1068,10 @@ const globalConfigValueSchema = {
   additionalProperties: true,
 };
 
-const globalConfigDeleteSchema = {
+const staticDataDeleteSchema = {
   type: 'object',
   properties: {
-    placeholder_path: globalConfigValueSchema.properties.placeholder_path,
+    placeholder_path: staticDataValueSchema.properties.placeholder_path,
   },
   required: ['placeholder_path'],
   additionalProperties: false,
@@ -3733,10 +3733,10 @@ const readTools: Array<McpTool> = [
     },
   },
   {
-    name: 'gdevelop_get_global_config',
+    name: 'gdevelop_get_static_data',
     description:
-      'Read the project Global Config map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
-    inputSchema: globalConfigReadSchema,
+      'Read the project Static Data map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
+    inputSchema: staticDataReadSchema,
   },
   {
     name: 'gdevelop_list_scenes',
@@ -4508,22 +4508,22 @@ const writeTools: Array<McpTool> = [
     inputSchema: firstLayoutSchema,
   },
   {
-    name: 'gdevelop_set_global_config',
+    name: 'gdevelop_set_static_data',
     description:
-      'Replace the project Global Config map with a complete JSON object in the open editor model. Prefer gdevelop_set_global_config_value for small focused edits.',
-    inputSchema: globalConfigReplaceSchema,
+      'Replace the project Static Data map with a complete JSON object in the open editor model. Prefer gdevelop_set_static_data_value for small focused edits.',
+    inputSchema: staticDataReplaceSchema,
   },
   {
-    name: 'gdevelop_set_global_config_value',
+    name: 'gdevelop_set_static_data_value',
     description:
-      'Set one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
-    inputSchema: globalConfigValueSchema,
+      'Set one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
+    inputSchema: staticDataValueSchema,
   },
   {
-    name: 'gdevelop_delete_global_config_value',
+    name: 'gdevelop_delete_static_data_value',
     description:
-      'Delete one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}.',
-    inputSchema: globalConfigDeleteSchema,
+      'Delete one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}.',
+    inputSchema: staticDataDeleteSchema,
   },
   {
     name: 'snapshot_project',
@@ -5095,23 +5095,23 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  gdevelop_get_global_config: [
+  gdevelop_get_static_data: [
     {
-      description: 'Read the full Global Config object.',
+      description: 'Read the full Static Data object.',
       arguments: {},
     },
     {
-      description: 'Read one Global Config value by placeholder path.',
+      description: 'Read one Static Data value by placeholder path.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.price}}',
       },
     },
   ],
-  gdevelop_set_global_config: [
+  gdevelop_set_static_data: [
     {
-      description: 'Replace the full Global Config object.',
+      description: 'Replace the full Static Data object.',
       arguments: {
-        global_config: {
+        static_data: {
           cards: {
             Sunflower: {
               name: 'Sunflower',
@@ -5123,9 +5123,9 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  gdevelop_set_global_config_value: [
+  gdevelop_set_static_data_value: [
     {
-      description: 'Set one numeric Global Config value.',
+      description: 'Set one numeric Static Data value.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.price}}',
         value: 50,
@@ -5133,16 +5133,16 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Set one object Global Config value from JSON text when the MCP client cannot pass a nested value directly.',
+        'Set one object Static Data value from JSON text when the MCP client cannot pass a nested value directly.',
       arguments: {
         placeholder_path: '{{cards.Sunflower}}',
         value_json: '{"name":"Sunflower","price":50,"canUse":true}',
       },
     },
   ],
-  gdevelop_delete_global_config_value: [
+  gdevelop_delete_static_data_value: [
     {
-      description: 'Delete one Global Config value.',
+      description: 'Delete one Static Data value.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.previewObjectName}}',
       },
@@ -6779,6 +6779,10 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
+  'gdevelop_get_static_data',
+  'gdevelop_set_static_data',
+  'gdevelop_set_static_data_value',
+  'gdevelop_delete_static_data_value',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'generate-catalogs',
@@ -6930,7 +6934,7 @@ export const getCapabilitiesSummary = (
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
-      'gdevelop_get_global_config',
+      'gdevelop_get_static_data',
       'gdevelop_list_scenes',
       'gdevelop_list_objects',
       'gdevelop_get_editor_selection',
@@ -7010,9 +7014,9 @@ export const getCapabilitiesSummary = (
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
-      'gdevelop_set_global_config',
-      'gdevelop_set_global_config_value',
-      'gdevelop_delete_global_config_value',
+      'gdevelop_set_static_data',
+      'gdevelop_set_static_data_value',
+      'gdevelop_delete_static_data_value',
       'delete_scene_variable',
       'batch_delete_scene_variables',
       'delete_object_variable',
@@ -7057,7 +7061,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, Static Data editing, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

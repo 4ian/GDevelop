@@ -12,7 +12,7 @@ const path = optionalRequire('path');
 const multiFileProjectDirectories = ['scenes', 'externals', 'extensions'];
 const multiFileProjectRootFiles = [
   'project.settings',
-  'config.settings',
+  'static-data.toml',
   'resources.settings',
 ];
 const multiFileProjectExtensions = new Set(['.settings', '.layout', '.events']);

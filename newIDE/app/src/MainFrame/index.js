@@ -9,7 +9,7 @@ import AddCircleIcon from '../UI/CustomSvgIcons/AddCircle';
 import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
-import GlobalConfigIcon from '../UI/CustomSvgIcons/GlobalConfig';
+import StaticDataIcon from '../UI/CustomSvgIcons/StaticData';
 import GlobalVariableIcon from '../UI/CustomSvgIcons/GlobalVariable';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
@@ -116,7 +116,7 @@ import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
 import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { renderGlobalConfigEditorContainer } from './EditorContainers/GlobalConfigEditorContainer';
+import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -270,7 +270,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
-import { hasInvalidGlobalConfigPlaceholderValidationError } from '../Utils/GlobalConfigPlaceholderDiagnostics';
+import { hasInvalidStaticDataPlaceholderValidationError } from '../Utils/StaticDataPlaceholderDiagnostics';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -350,7 +350,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'global-config': renderGlobalConfigEditorContainer,
+  'static-data': renderStaticDataEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
@@ -415,8 +415,7 @@ const findStorageProviderFor = (
   );
   if (!storageProvider && !storageProviderName && isAbsoluteLocalPath) {
     storageProvider = storageProviders.find(
-      provider =>
-        provider.internalName === localFileStorageProviderInternalName
+      provider => provider.internalName === localFileStorageProviderInternalName
     );
   }
 
@@ -693,7 +692,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
-        const mustBlockForInvalidGlobalConfigPlaceholder = hasInvalidGlobalConfigPlaceholderValidationError(
+        const mustBlockForInvalidStaticDataPlaceholder = hasInvalidStaticDataPlaceholderValidationError(
           validationErrors
         );
         const mustBlockForUnsafeExternalLayoutCreation =
@@ -703,12 +702,12 @@ const MainFrame = (props: Props): React.MixedElement => {
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
-          mustBlockForInvalidGlobalConfigPlaceholder ||
+          mustBlockForInvalidStaticDataPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
           mustBlockForAmbiguousObjectPicking ||
           mustBlockForUnconditionedActions;
 
-        if (mustBlockForInvalidGlobalConfigPlaceholder) {
+        if (mustBlockForInvalidStaticDataPlaceholder) {
           setDiagnosticReportDialogOpen(true);
           return true;
         }
@@ -1259,8 +1258,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
-          : kind === 'global-config'
-          ? i18n._(t`Global config`)
+          : kind === 'static-data'
+          ? i18n._(t`Static Data`)
           : kind === 'global-search'
           ? i18n._(t`Global search`)
           : kind === 'ask-ai'
@@ -1326,8 +1325,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
-        ) : kind === 'global-config' ? (
-          <GlobalConfigIcon />
+        ) : kind === 'static-data' ? (
+          <StaticDataIcon />
         ) : kind === 'global-search' ? (
           <SearchIcon />
         ) : kind === 'layout' ? (
@@ -4262,7 +4261,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     stickyNotes.createNote({ showManager: false });
   }, []);
 
-  const openGlobalConfig = React.useCallback(
+  const openStaticData = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -4271,12 +4270,12 @@ const MainFrame = (props: Props): React.MixedElement => {
             state.editorTabs,
             // $FlowFixMe[incompatible-type]
             getEditorOpeningOptions({
-              kind: 'global-config',
+              kind: 'static-data',
               name: '',
               dontFocusTab: true,
             })
           ),
-          'global-config'
+          'static-data'
         ),
       }));
     },
@@ -6159,6 +6158,39 @@ const MainFrame = (props: Props): React.MixedElement => {
     [saveProject]
   );
 
+  const autoSaveStaticData = React.useCallback(
+    async (staticData: Object): Promise<boolean> => {
+      if (!currentProject || !currentFileMetadata) return false;
+
+      const { onAutoSaveStaticData } = getStorageProviderOperations();
+      if (!onAutoSaveStaticData) return false;
+
+      try {
+        const projectFile = currentProject.getProjectFile();
+        const staticDataFileMetadata = projectFile
+          ? { ...currentFileMetadata, fileIdentifier: projectFile }
+          : currentFileMetadata;
+        return await onAutoSaveStaticData(staticData, staticDataFileMetadata);
+      } catch (error) {
+        console.error('Unable to auto-save Static Data:', error);
+        _showSnackMessage(
+          i18n._(
+            t`Static Data could not be written to static-data.toml. Use the project Save button to try again.`
+          ),
+          null
+        );
+        return false;
+      }
+    },
+    [
+      currentProject,
+      currentFileMetadata,
+      getStorageProviderOperations,
+      _showSnackMessage,
+      i18n,
+    ]
+  );
+
   /**
    * Returns true if the project has been closed and false if the user refused to close it.
    */
@@ -6865,11 +6897,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       openStickyNotesManager
     );
     addRecentEditorSwitcherSideMenuItem(
-      'global-config',
-      i18n._(t`Global config`),
+      'static-data',
+      i18n._(t`Static Data`),
       i18n._(t`Game settings`),
-      <GlobalConfigIcon />,
-      openGlobalConfig
+      <StaticDataIcon />,
+      openStaticData
     );
     addRecentEditorSwitcherSideMenuItem(
       globalVariablesItemId,
@@ -7727,6 +7759,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     setEditorTabs: setEditorTabs,
     onFocusedEditorTabChange: selectProjectManagerItemForEditorTab,
     saveProject: saveProject,
+    autoSaveStaticData: autoSaveStaticData,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,
     getOrLoadProjectVersion: getOrLoadProjectVersion,
@@ -7864,7 +7897,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
       onOpenStickyNotes={openStickyNotesManager}
-      onOpenGlobalConfig={openGlobalConfig}
+      onOpenStaticData={openStaticData}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -7915,7 +7948,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             onExport: () => {
               openShareDialog('publish');
             },
-            onInvalidGlobalConfigPlaceholder: () => {
+            onInvalidStaticDataPlaceholder: () => {
               setDiagnosticReportDialogOpen(true);
             },
             onCaptureFinished,

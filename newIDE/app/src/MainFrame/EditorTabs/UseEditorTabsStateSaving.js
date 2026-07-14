@@ -43,7 +43,7 @@ const projectHasItem = ({
       'debugger',
       'start page',
       'resources',
-      'global-config',
+      'static-data',
       'global-search',
     ].includes(kind)
   )
@@ -138,7 +138,7 @@ const useEditorTabsStateSaving = ({
             editor =>
               editor.key !== 'start page' &&
               editor.kind !== 'resources' &&
-              editor.kind !== 'global-config'
+              editor.kind !== 'static-data'
           )
           .map(editor => ({
             projectItemName: editor.projectItemName,
@@ -195,7 +195,7 @@ const useEditorTabsStateSaving = ({
 
       const editorsOpeningOptions = editorState.editorTabs.editors
         .filter(editorMetadata => editorMetadata.editorKind !== 'resources')
-        .filter(editorMetadata => editorMetadata.editorKind !== 'global-config')
+        .filter(editorMetadata => editorMetadata.editorKind !== 'static-data')
         .map(editorMetadata => {
           if (
             projectHasItem({

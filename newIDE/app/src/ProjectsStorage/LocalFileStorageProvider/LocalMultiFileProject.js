@@ -2,7 +2,7 @@
 
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
-  MULTI_FILE_CONFIG_URI,
+  MULTI_FILE_STATIC_DATA_URI,
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
@@ -289,9 +289,9 @@ const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
   const discovered = [];
-  const configSettingsPath = path.join(projectRoot, 'config.settings');
-  if (fs.existsSync(configSettingsPath)) {
-    discovered.push(MULTI_FILE_CONFIG_URI);
+  const staticDataTomlPath = path.join(projectRoot, 'static-data.toml');
+  if (fs.existsSync(staticDataTomlPath)) {
+    discovered.push(MULTI_FILE_STATIC_DATA_URI);
   }
   const resourcesSettingsPath = path.join(projectRoot, 'resources.settings');
   if (fs.existsSync(resourcesSettingsPath)) {
@@ -549,8 +549,12 @@ export const openMultiFileProject = async (
       rewrittenFiles[uri] = canonicalFiles[uri];
     });
     // Opening a project is the migration boundary: persist only affected
-    // settings documents before returning the loaded in-memory project.
-    await writeMultiFileSourceTree({ entryPath, files: rewrittenFiles });
+    // source documents before returning the loaded in-memory project.
+    await writeMultiFileSourceTree({
+      entryPath,
+      files: rewrittenFiles,
+      obsoleteUris: [],
+    });
   }
   return project;
 };
@@ -582,15 +586,19 @@ const writeAndFlush = async (filePath: string, content: string) => {
     throw new Error(`Written file verification failed: ${filePath}`);
 };
 
-export const writeMultiFileSourceTree = async ({
-  entryPath,
-  files,
-  obsoleteUris = [],
-}: {
+type WriteMultiFileSourceTreeOptions = {|
   entryPath: string,
   files: { [string]: string },
   obsoleteUris?: Array<string>,
-}): Promise<Array<string>> => {
+|};
+
+const projectSourceWriteQueues: Map<string, Promise<void>> = new Map();
+
+const writeMultiFileSourceTreeTransaction = async ({
+  entryPath,
+  files,
+  obsoleteUris = [],
+}: WriteMultiFileSourceTreeOptions): Promise<Array<string>> => {
   requireFileSystem();
   const projectRoot = path.resolve(path.dirname(entryPath));
   await fs.ensureDir(projectRoot);
@@ -694,6 +702,26 @@ export const writeMultiFileSourceTree = async ({
     await fs.remove(transactionRoot);
   }
   return [...changedUris, ...obsoleteUris];
+};
+
+export const writeMultiFileSourceTree = (
+  options: WriteMultiFileSourceTreeOptions
+): Promise<Array<string>> => {
+  requireFileSystem();
+  const projectRoot = path.resolve(path.dirname(options.entryPath));
+  const previousWrite =
+    projectSourceWriteQueues.get(projectRoot) || Promise.resolve();
+  const write = previousWrite.then(() =>
+    writeMultiFileSourceTreeTransaction(options)
+  );
+  const queueTail = write.then(() => undefined, () => undefined);
+  projectSourceWriteQueues.set(projectRoot, queueTail);
+  queueTail.then(() => {
+    if (projectSourceWriteQueues.get(projectRoot) === queueTail) {
+      projectSourceWriteQueues.delete(projectRoot);
+    }
+  });
+  return write;
 };
 
 const sha256 = (content: string): string => {

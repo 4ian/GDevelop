@@ -7,6 +7,7 @@ import os from 'os';
 // $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 import {
+  MULTI_FILE_STATIC_DATA_URI,
   decomposeLegacyProjectToFiles,
   areLegacyProjectsEquivalent,
 } from '../MultiFileProjectFormat';
@@ -24,6 +25,7 @@ import { onOpen } from './LocalProjectOpener';
 import {
   GENERATED_LEGACY_PROJECT_RELATIVE_PATH,
   getProjectLocation,
+  onAutoSaveStaticData,
   onSaveProject,
   writeProjectInstructionCatalog,
   writeProjectLayoutCatalog,
@@ -44,7 +46,7 @@ const projectFixture = {
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
   variables: [],
-  globalConfig: {},
+  staticData: {},
   layouts: [
     {
       name: 'Main',
@@ -99,13 +101,13 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(path.join(temporaryDirectory, 'resources.settings'))
     ).toBe(true);
     expect(
-      fs.existsSync(path.join(temporaryDirectory, 'config.settings'))
+      fs.existsSync(path.join(temporaryDirectory, 'static-data.toml'))
     ).toBe(true);
     expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
       '[project.resources'
     );
     expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
-      '[project.globalConfig'
+      '[project.staticData'
     );
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
@@ -329,24 +331,46 @@ describe('Local multi-file project storage', () => {
       await writeLegacyProjectAsMultiFile(changedResourcesProject, entryPath)
     ).toEqual(['game://resources.settings']);
 
-    const changedConfigProject = JSON.parse(
+    const changedStaticDataProject = JSON.parse(
       JSON.stringify(changedResourcesProject)
     );
-    changedConfigProject.globalConfig.newSetting = true;
+    changedStaticDataProject.staticData.newSetting = true;
     expect(
-      await writeLegacyProjectAsMultiFile(changedConfigProject, entryPath)
-    ).toEqual(['game://config.settings']);
+      await writeLegacyProjectAsMultiFile(changedStaticDataProject, entryPath)
+    ).toEqual(['game://static-data.toml']);
 
-    const withoutConfigProject = JSON.parse(
-      JSON.stringify(changedConfigProject)
+    const withoutStaticDataProject = JSON.parse(
+      JSON.stringify(changedStaticDataProject)
     );
-    delete withoutConfigProject.globalConfig;
+    delete withoutStaticDataProject.staticData;
     expect(
-      await writeLegacyProjectAsMultiFile(withoutConfigProject, entryPath)
-    ).toEqual(['game://config.settings']);
+      await writeLegacyProjectAsMultiFile(withoutStaticDataProject, entryPath)
+    ).toEqual(['game://static-data.toml']);
     expect(
-      fs.existsSync(path.join(temporaryDirectory, 'config.settings'))
+      fs.existsSync(path.join(temporaryDirectory, 'static-data.toml'))
     ).toBe(false);
+  });
+
+  test('serializes concurrent source writes for the same project', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const firstWrite = writeMultiFileSourceTree({
+      entryPath,
+      files: {
+        [MULTI_FILE_STATIC_DATA_URI]: '[sheet.row]\ncolumn = "first"\n',
+      },
+    });
+    const secondWrite = writeMultiFileSourceTree({
+      entryPath,
+      files: {
+        [MULTI_FILE_STATIC_DATA_URI]: '[sheet.row]\ncolumn = "second"\n',
+      },
+    });
+
+    await Promise.all([firstWrite, secondWrite]);
+
+    expect(
+      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+    ).toBe('[sheet.row]\ncolumn = "second"\n');
   });
 
   test('routes prefab definition and instance edits to their owning files', async () => {
@@ -1024,6 +1048,9 @@ describe('Local multi-file project storage', () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Generated compatibility project');
+    project.setStaticDataJson(
+      JSON.stringify({ sheet: { row: { column: 'editor only' } } })
+    );
     const entryPath = path.join(temporaryDirectory, 'project.settings');
 
     await onSaveProject(
@@ -1049,6 +1076,14 @@ describe('Local multi-file project storage', () => {
     expect(
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
+    expect(
+      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).staticData
+    ).toBeUndefined();
+    expect(
+      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+    ).toBe(`[sheet.row]
+column = "editor only"
+`);
     expect(fs.readFileSync(generatedPath, 'utf8')).not.toMatch(
       /(?:eventsFunctions|objects|properties|sharedProperties)FolderStructure/
     );
@@ -1062,6 +1097,42 @@ describe('Local multi-file project storage', () => {
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
     ).toBe(true);
+    project.delete();
+  });
+
+  test('auto-saves Static Data directly to static-data.toml', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const originalEntrySource = '[project]\nname = "Auto-save test"\n';
+    fs.writeFileSync(entryPath, originalEntrySource);
+    project.setStaticDataJson(
+      JSON.stringify({
+        sheet: {
+          row: { column: 'sd', column2: 'sdf' },
+          row2: { column: 'zz', column2: '333' },
+        },
+      })
+    );
+
+    await expect(
+      onAutoSaveStaticData(
+        JSON.parse(project.getStaticDataJson()),
+        ({ fileIdentifier: entryPath }: any)
+      )
+    ).resolves.toBe(true);
+
+    expect(
+      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+    ).toBe(`[sheet.row]
+column = "sd"
+column2 = "sdf"
+
+[sheet.row2]
+column = "zz"
+column2 = "333"
+`);
+    expect(fs.readFileSync(entryPath, 'utf8')).toBe(originalEntrySource);
     project.delete();
   });
 

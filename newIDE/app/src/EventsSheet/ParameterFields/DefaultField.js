@@ -15,7 +15,7 @@ import {
   getHighlightSearchTextParts,
   applySyntaxColoring,
 } from '../../Utils/HighlightSearchText';
-import { getMissingGlobalConfigPlaceholderPath } from '../../Utils/GlobalConfigPlaceholderDiagnostics';
+import { getMissingStaticDataPlaceholderPath } from '../../Utils/StaticDataPlaceholderDiagnostics';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -70,13 +70,13 @@ export const renderInlineDefaultField = ({
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
-    const missingGlobalConfigPath = getMissingGlobalConfigPlaceholderPath(
+    const missingStaticDataPath = getMissingStaticDataPlaceholderPath(
       expression.getPlainString(),
       scope.project
     );
     const errorMessage =
-      missingGlobalConfigPath !== null
-        ? `Global config path "{{${missingGlobalConfigPath}}}" does not exist.`
+      missingStaticDataPath !== null
+        ? `Static Data path "{{${missingStaticDataPath}}}" does not exist.`
         : undefined;
 
     return (

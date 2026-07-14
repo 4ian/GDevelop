@@ -823,12 +823,12 @@ const getNumberWithAliases = (
   return null;
 };
 
-const globalConfigPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
+const staticDataPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
 
 const isPlainObject = (value: any): boolean =>
   !!value && typeof value === 'object' && !Array.isArray(value);
 
-const parseGlobalConfigRoot = (value: any, label: string): Object => {
+const parseStaticDataRoot = (value: any, label: string): Object => {
   const parsedValue =
     typeof value === 'string' ? JSON.parse(value || '{}') : value;
   if (!isPlainObject(parsedValue)) {
@@ -837,45 +837,43 @@ const parseGlobalConfigRoot = (value: any, label: string): Object => {
   return parsedValue;
 };
 
-const readProjectGlobalConfig = (project: gdProject): Object => {
-  const projectWithGlobalConfig: any = project;
+const readProjectStaticData = (project: gdProject): Object => {
+  const projectWithStaticData: any = project;
   const json =
-    typeof projectWithGlobalConfig.getGlobalConfigJson === 'function'
-      ? projectWithGlobalConfig.getGlobalConfigJson()
+    typeof projectWithStaticData.getStaticDataJson === 'function'
+      ? projectWithStaticData.getStaticDataJson()
       : '{}';
-  return parseGlobalConfigRoot(json || '{}', 'Project global config');
+  return parseStaticDataRoot(json || '{}', 'Project static data');
 };
 
-const writeProjectGlobalConfig = (project: gdProject, config: Object) => {
-  const projectWithGlobalConfig: any = project;
-  if (typeof projectWithGlobalConfig.setGlobalConfigJson !== 'function') {
-    throw new Error(
-      'This GDevelop build does not expose global config writes.'
-    );
+const writeProjectStaticData = (project: gdProject, staticData: Object) => {
+  const projectWithStaticData: any = project;
+  if (typeof projectWithStaticData.setStaticDataJson !== 'function') {
+    throw new Error('This GDevelop build does not expose static data writes.');
   }
-  projectWithGlobalConfig.setGlobalConfigJson(JSON.stringify(config));
+  projectWithStaticData.setStaticDataJson(JSON.stringify(staticData));
 };
 
-const normalizeGlobalConfigPlaceholderPath = (
+const normalizeStaticDataPlaceholderPath = (
   placeholderPath: string
 ): string => {
-  const match = globalConfigPlaceholderRegex.exec(placeholderPath || '');
+  const match = staticDataPlaceholderRegex.exec(placeholderPath || '');
   if (!match) {
     throw new Error(
-      'Global config paths must use placeholder syntax such as {{cards.sunflower.price}}.'
+      'Static Data paths must use placeholder syntax such as {{cards.sunflower.price}}.'
     );
   }
   const normalizedPath = match[1].trim();
   if (!normalizedPath) {
-    throw new Error('Global config placeholder path cannot be empty.');
+    throw new Error('Static Data placeholder path cannot be empty.');
   }
   return normalizedPath;
 };
 
-const parseGlobalConfigPlaceholderPath = (
+const parseStaticDataPlaceholderPath = (
   placeholderPath: string
 ): Array<string | number> => {
-  const path = normalizeGlobalConfigPlaceholderPath(placeholderPath);
+  const path = normalizeStaticDataPlaceholderPath(placeholderPath);
   const segments: Array<string | number> = [];
   let current = '';
   let index = 0;
@@ -941,12 +939,12 @@ const parseGlobalConfigPlaceholderPath = (
   pushCurrent();
 
   if (!segments.length) {
-    throw new Error('Global config placeholder path cannot be empty.');
+    throw new Error('Static Data placeholder path cannot be empty.');
   }
   return segments;
 };
 
-const getGlobalConfigPathArg = (args: Object): string => {
+const getStaticDataPathArg = (args: Object): string => {
   const placeholderPath = getStringWithAliases(args || {}, [
     'placeholder_path',
     'placeholderPath',
@@ -958,11 +956,11 @@ const getGlobalConfigPathArg = (args: Object): string => {
   return placeholderPath;
 };
 
-const getGlobalConfigValueAtPath = (
-  config: Object,
+const getStaticDataValueAtPath = (
+  staticData: Object,
   segments: Array<string | number>
 ): {| exists: boolean, value?: any |} => {
-  let current: any = config;
+  let current: any = staticData;
   for (const segment of segments) {
     if (Array.isArray(current)) {
       if (
@@ -986,12 +984,12 @@ const getGlobalConfigValueAtPath = (
   return { exists: true, value: current };
 };
 
-const setGlobalConfigValueAtPath = (
-  config: Object,
+const setStaticDataValueAtPath = (
+  staticData: Object,
   segments: Array<string | number>,
   value: any
 ) => {
-  let current: any = config;
+  let current: any = staticData;
   for (let index = 0; index < segments.length - 1; index++) {
     const segment = segments[index];
     const nextSegment = segments[index + 1];
@@ -999,7 +997,7 @@ const setGlobalConfigValueAtPath = (
     if (Array.isArray(current)) {
       if (typeof segment !== 'number' || segment < 0) {
         throw new Error(
-          'Array global config paths must use non-negative indexes.'
+          'Array static data paths must use non-negative indexes.'
         );
       }
       if (!hasOwn(current, String(segment)) || current[segment] === null) {
@@ -1007,7 +1005,7 @@ const setGlobalConfigValueAtPath = (
       }
       if (typeof current[segment] !== 'object') {
         throw new Error(
-          `Global config path segment "${String(
+          `Static Data path segment "${String(
             segment
           )}" is not an object or array.`
         );
@@ -1016,7 +1014,7 @@ const setGlobalConfigValueAtPath = (
       continue;
     } else if (!current || typeof current !== 'object') {
       throw new Error(
-        `Global config path cannot create a child under non-object segment "${String(
+        `Static Data path cannot create a child under non-object segment "${String(
           segment
         )}".`
       );
@@ -1028,7 +1026,7 @@ const setGlobalConfigValueAtPath = (
     }
     if (typeof current[key] !== 'object') {
       throw new Error(
-        `Global config path segment "${String(
+        `Static Data path segment "${String(
           segment
         )}" is not an object or array.`
       );
@@ -1039,28 +1037,26 @@ const setGlobalConfigValueAtPath = (
   const lastSegment = segments[segments.length - 1];
   if (Array.isArray(current)) {
     if (typeof lastSegment !== 'number' || lastSegment < 0) {
-      throw new Error(
-        'Array global config paths must use non-negative indexes.'
-      );
+      throw new Error('Array static data paths must use non-negative indexes.');
     }
     current[lastSegment] = value;
     return;
   }
   if (!current || typeof current !== 'object') {
-    throw new Error('Global config path parent is not an object.');
+    throw new Error('Static Data path parent is not an object.');
   }
   current[String(lastSegment)] = value;
 };
 
-const deleteGlobalConfigValueAtPath = (
-  config: Object,
+const deleteStaticDataValueAtPath = (
+  staticData: Object,
   segments: Array<string | number>
 ): {| deleted: boolean, previousValue?: any |} => {
   const parentSegments = segments.slice(0, -1);
   const lastSegment = segments[segments.length - 1];
   const parentResult = parentSegments.length
-    ? getGlobalConfigValueAtPath(config, parentSegments)
-    : { exists: true, value: config };
+    ? getStaticDataValueAtPath(staticData, parentSegments)
+    : { exists: true, value: staticData };
   if (!parentResult.exists) return { deleted: false };
 
   const parent: any = parentResult.value;
@@ -1085,7 +1081,7 @@ const deleteGlobalConfigValueAtPath = (
   return { deleted: true, previousValue };
 };
 
-const getGlobalConfigInputValue = (args: Object): any => {
+const getStaticDataInputValue = (args: Object): any => {
   if (hasOwn(args || {}, 'value_json')) {
     return JSON.parse(String(args.value_json));
   }
@@ -1096,28 +1092,25 @@ const getGlobalConfigInputValue = (args: Object): any => {
   throw new Error('Missing value or value_json.');
 };
 
-const getGlobalConfigRootFromArgs = (args: Object): Object => {
-  if (hasOwn(args || {}, 'global_config')) {
-    return parseGlobalConfigRoot(args.global_config, 'global_config');
+const getStaticDataRootFromArgs = (args: Object): Object => {
+  if (hasOwn(args || {}, 'static_data')) {
+    return parseStaticDataRoot(args.static_data, 'static_data');
   }
-  if (hasOwn(args || {}, 'globalConfig')) {
-    return parseGlobalConfigRoot(args.globalConfig, 'globalConfig');
+  if (hasOwn(args || {}, 'staticData')) {
+    return parseStaticDataRoot(args.staticData, 'staticData');
   }
-  if (hasOwn(args || {}, 'config')) {
-    return parseGlobalConfigRoot(args.config, 'config');
+  if (hasOwn(args || {}, 'static_data_json')) {
+    return parseStaticDataRoot(args.static_data_json, 'static_data_json');
   }
-  if (hasOwn(args || {}, 'global_config_json')) {
-    return parseGlobalConfigRoot(args.global_config_json, 'global_config_json');
+  if (hasOwn(args || {}, 'staticDataJson')) {
+    return parseStaticDataRoot(args.staticDataJson, 'staticDataJson');
   }
-  if (hasOwn(args || {}, 'globalConfigJson')) {
-    return parseGlobalConfigRoot(args.globalConfigJson, 'globalConfigJson');
-  }
-  throw new Error('Missing global_config or global_config_json.');
+  throw new Error('Missing static_data or static_data_json.');
 };
 
-export const summarizeGlobalConfig = (project: gdProject): Object => {
-  const config = readProjectGlobalConfig(project);
-  const topLevelKeys = Object.keys(config);
+export const summarizeStaticData = (project: gdProject): Object => {
+  const staticData = readProjectStaticData(project);
+  const topLevelKeys = Object.keys(staticData);
   const placeholderExamples: Array<string> = [];
   const collectPlaceholders = (value: any, path: string) => {
     if (placeholderExamples.length >= 12) return;
@@ -1138,7 +1131,7 @@ export const summarizeGlobalConfig = (project: gdProject): Object => {
     }
     if (path) placeholderExamples.push(`{{${path}}}`);
   };
-  topLevelKeys.forEach(key => collectPlaceholders(config[key], key));
+  topLevelKeys.forEach(key => collectPlaceholders(staticData[key], key));
   return {
     topLevelKeyCount: topLevelKeys.length,
     topLevelKeys,
@@ -1146,22 +1139,20 @@ export const summarizeGlobalConfig = (project: gdProject): Object => {
   };
 };
 
-export const getGlobalConfig = (
+export const getStaticData = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const config = readProjectGlobalConfig(project);
+  const staticData = readProjectStaticData(project);
   const placeholderPath = getStringWithAliases(args || {}, [
     'placeholder_path',
     'placeholderPath',
     'path',
   ]);
   if (placeholderPath) {
-    const normalizedPath = normalizeGlobalConfigPlaceholderPath(
-      placeholderPath
-    );
-    const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
-    const result = getGlobalConfigValueAtPath(config, segments);
+    const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
+    const segments = parseStaticDataPlaceholderPath(placeholderPath);
+    const result = getStaticDataValueAtPath(staticData, segments);
     return {
       success: true,
       placeholderPath: `{{${normalizedPath}}}`,
@@ -1173,42 +1164,42 @@ export const getGlobalConfig = (
 
   return {
     success: true,
-    summary: summarizeGlobalConfig(project),
-    globalConfig: config,
-    globalConfigJson: JSON.stringify(config, null, 2),
+    summary: summarizeStaticData(project),
+    staticData,
+    staticDataJson: JSON.stringify(staticData, null, 2),
   };
 };
 
-export const setGlobalConfig = (
+export const setStaticData = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const config = getGlobalConfigRootFromArgs(args);
-  const previousSummary = summarizeGlobalConfig(project);
-  writeProjectGlobalConfig(project, config);
+  const staticData = getStaticDataRootFromArgs(args);
+  const previousSummary = summarizeStaticData(project);
+  writeProjectStaticData(project, staticData);
   return {
     success: true,
     didModifyProject: true,
     previousSummary,
-    summary: summarizeGlobalConfig(project),
-    globalConfig: args.include_config === true ? config : undefined,
+    summary: summarizeStaticData(project),
+    staticData: args.include_static_data === true ? staticData : undefined,
     note:
-      'Global config was replaced in the editor project model. Persist it with gdevelop_save_project_and_wait.',
+      'Static Data was replaced in the editor project model. Persist it with gdevelop_save_project_and_wait.',
   };
 };
 
-export const setGlobalConfigValue = (
+export const setStaticDataValue = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const placeholderPath = getGlobalConfigPathArg(args);
-  const normalizedPath = normalizeGlobalConfigPlaceholderPath(placeholderPath);
-  const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
-  const config = readProjectGlobalConfig(project);
-  const previous = getGlobalConfigValueAtPath(config, segments);
-  const value = getGlobalConfigInputValue(args);
-  setGlobalConfigValueAtPath(config, segments, value);
-  writeProjectGlobalConfig(project, config);
+  const placeholderPath = getStaticDataPathArg(args);
+  const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
+  const segments = parseStaticDataPlaceholderPath(placeholderPath);
+  const staticData = readProjectStaticData(project);
+  const previous = getStaticDataValueAtPath(staticData, segments);
+  const value = getStaticDataInputValue(args);
+  setStaticDataValueAtPath(staticData, segments, value);
+  writeProjectStaticData(project, staticData);
   return {
     success: true,
     didModifyProject: true,
@@ -1218,20 +1209,20 @@ export const setGlobalConfigValue = (
     previousValue: previous.value,
     value,
     note:
-      'Global config value was updated in the editor project model. Persist it with gdevelop_save_project_and_wait.',
+      'Static Data value was updated in the editor project model. Persist it with gdevelop_save_project_and_wait.',
   };
 };
 
-export const deleteGlobalConfigValue = (
+export const deleteStaticDataValue = (
   project: gdProject,
   args: Object = {}
 ): Object => {
-  const placeholderPath = getGlobalConfigPathArg(args);
-  const normalizedPath = normalizeGlobalConfigPlaceholderPath(placeholderPath);
-  const segments = parseGlobalConfigPlaceholderPath(placeholderPath);
-  const config = readProjectGlobalConfig(project);
-  const deletion = deleteGlobalConfigValueAtPath(config, segments);
-  if (deletion.deleted) writeProjectGlobalConfig(project, config);
+  const placeholderPath = getStaticDataPathArg(args);
+  const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
+  const segments = parseStaticDataPlaceholderPath(placeholderPath);
+  const staticData = readProjectStaticData(project);
+  const deletion = deleteStaticDataValueAtPath(staticData, segments);
+  if (deletion.deleted) writeProjectStaticData(project, staticData);
   return {
     success: true,
     didModifyProject: deletion.deleted,
@@ -1240,8 +1231,8 @@ export const deleteGlobalConfigValue = (
     deleted: deletion.deleted,
     previousValue: deletion.previousValue,
     note: deletion.deleted
-      ? 'Global config value was deleted in the editor project model. Persist it with gdevelop_save_project_and_wait.'
-      : 'Global config value did not exist; the project was not modified.',
+      ? 'Static Data value was deleted in the editor project model. Persist it with gdevelop_save_project_and_wait.'
+      : 'Static Data value did not exist; the project was not modified.',
   };
 };
 

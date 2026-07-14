@@ -142,7 +142,7 @@ const globalsRootFolderId = getProjectManagerItemId('globals');
 export const globalVariablesItemId: string = getProjectManagerItemId(
   'global-variables'
 );
-const globalConfigItemId = getProjectManagerItemId('global-config');
+const staticDataItemId = getProjectManagerItemId('static-data');
 export const globalObjectsItemId: string = getProjectManagerItemId(
   'global-objects'
 );
@@ -201,8 +201,8 @@ export const getProjectManagerTreeViewItemIdForEditorTab = (
   switch (editorKind) {
     case 'resources':
       return gameResourcesItemId;
-    case 'global-config':
-      return globalConfigItemId;
+    case 'static-data':
+      return staticDataItemId;
     case 'layout':
       return projectItemName && project.hasLayoutNamed(projectItemName)
         ? getSceneTreeViewItemId(project.getLayout(projectItemName))
@@ -786,7 +786,7 @@ type Props = {|
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
   onOpenStickyNotes: () => void,
-  onOpenGlobalConfig: () => void,
+  onOpenStaticData: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -867,7 +867,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onEventBasedObjectTypeChanged,
       onOpenResources,
       onOpenStickyNotes,
-      onOpenGlobalConfig,
+      onOpenStaticData,
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
@@ -1851,10 +1851,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   return [
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        globalConfigItemId,
-                        i18n._(t`Global config`),
-                        onOpenGlobalConfig,
-                        'res/icons_default/global_config24_black.svg'
+                        staticDataItemId,
+                        i18n._(t`Static Data`),
+                        onOpenStaticData,
+                        'res/icons_default/static_data24_black.svg'
                       )
                     ),
                     new LeafTreeViewItem(
@@ -2220,7 +2220,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
-        onOpenGlobalConfig,
+        onOpenStaticData,
         onOpenResources,
         onOpenStickyNotes,
         onShareProject,

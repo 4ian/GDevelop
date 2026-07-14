@@ -22,7 +22,7 @@ import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
 import { addGlobalObjectGroupsToDataJs } from '../../PreviewGlobalObjectGroupsPatch';
-import { hasGlobalConfigPlaceholderDiagnostic } from '../../../Utils/GlobalConfigPlaceholderDiagnostics';
+import { hasStaticDataPlaceholderDiagnostic } from '../../../Utils/StaticDataPlaceholderDiagnostics';
 const gd: libGDevelop = global.gd;
 
 type State = {|
@@ -241,7 +241,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         previewExportOptions
       );
       if (
-        hasGlobalConfigPlaceholderDiagnostic(
+        hasStaticDataPlaceholderDiagnostic(
           project.getWholeProjectDiagnosticReport()
         )
       ) {
@@ -252,7 +252,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
             } catch (error) {}
           });
         }
-        this.props.onInvalidGlobalConfigPlaceholder();
+        this.props.onInvalidStaticDataPlaceholder();
         previewExportOptions.delete();
         exporter.delete();
         return;

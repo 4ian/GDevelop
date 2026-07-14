@@ -13,7 +13,7 @@ It complements, and goes deeper than, the existing high-level docs:
 - `newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` — properties.
 - `newIDE/docs/Supported-JavaScript-features-and-coding-style.md` — coding style.
 - `docs/CustomObjectArchitecture.md` — deep dive on prefabs/events-based objects.
-- `docs/GlobalConfig.md` — the Global Config feature.
+- `docs/StaticData.md` — the Static Data feature.
 
 > Line numbers are accurate at time of writing and will drift. Treat file paths
 > as canonical and line numbers as hints. All paths are relative to the repo root.
@@ -712,7 +712,7 @@ single-file-vs-folder split is done entirely in the IDE (JS), driven by
 
 - `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`
   splits these top-level keys into separate files: `layouts`, `externalLayouts`,
-  `externalEvents`, `eventsFunctionsExtensions` (and `globalConfig`).
+  `externalEvents`, `eventsFunctionsExtensions` (and `staticData`).
 - The split replaces each value with a reference node
   (`{ __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: <path> }`) via
   `Utils/ObjectSplitter.js`; each array item becomes a file named after its
@@ -902,5 +902,5 @@ architecture.
 | Bindings | `GDevelop.js/Bindings/` (`Bindings.idl`, `Wrapper.cpp`, `glue.*`, `postjs.js`), `GDevelop.js/types/`, `types.d.ts` |
 | Serialization | `Core/GDCore/Serialization/`, `newIDE/app/src/ProjectsStorage/`, `newIDE/app/src/Utils/{Serializer,ObjectSplitter}.js`, `GDJS/GDJS/IDE/ExporterHelper.cpp` |
 | Editor | `newIDE/app/src/` (`MainFrame/`, `SceneEditor/`, `InstancesEditor/`, `EventsSheet/`, `ObjectEditor/`, `ObjectsRendering/`, `InstructionOrExpression/`, `UI/`) |
-| Related deep dives | `docs/CustomObjectArchitecture.md`, `docs/GlobalConfig.md`, `newIDE/docs/` |
+| Related deep dives | `docs/CustomObjectArchitecture.md`, `docs/StaticData.md`, `newIDE/docs/` |
 

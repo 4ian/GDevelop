@@ -680,8 +680,8 @@ export class Project extends EmscriptenObject {
   getEventsBasedObject(type: string): EventsBasedObject;
   ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): VariablesContainer;
-  setGlobalConfigJson(globalConfigJson: string): void;
-  getGlobalConfigJson(): string;
+  setStaticDataJson(staticDataJson: string): void;
+  getStaticDataJson(): string;
   getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;

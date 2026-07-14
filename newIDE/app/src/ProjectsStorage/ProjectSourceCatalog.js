@@ -342,7 +342,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     ],
     forbiddenFields: [
       'resources',
-      'globalConfig',
+      'staticData',
       'objects',
       'layouts',
       'eventsFunctionsExtensions',
@@ -380,14 +380,14 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     commonFields: ['resources', 'resourceFolders'],
   },
   {
-    kind: 'config',
-    path: 'config.settings',
-    mountedNamespace: 'project.globalConfig',
-    tomlRoot: '[settings]',
+    kind: 'static-data',
+    path: 'static-data.toml',
+    mountedNamespace: 'editor.staticData',
+    tomlRoot: true,
     requiredFields: [],
-    commonFields: ['arbitrary project global configuration'],
+    commonFields: ['arbitrary TOML-compatible static data'],
     note:
-      'Format metadata belongs in [globalConfig]; global configuration belongs in the short local [settings] table.',
+      'The entire document is editor-only Static Data. Do not add format metadata or a wrapper table.',
   },
   {
     kind: 'scene',
@@ -701,7 +701,7 @@ export const buildProjectSettingsCatalog = ({
       rules: [
         'Read the relevant existing settings file before editing or creating a sibling component.',
         'Write component fields at the TOML root. Never repeat project, scene, extension, prefab, behavior, function, or object names in TOML table headers; the canonical physical path supplies that namespace.',
-        'At load time the editor parses each local document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted documents. Duplicate ownership is an error.',
+        'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. static-data.toml is loaded separately as editor-only Static Data. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
         'Open variable containers only with [variables], [globalVariables], or [sceneVariables] TOML headers and write one assignment per variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Use an empty header for an empty container. Never write a whole variable container as variables = { ... } or variables = { }, and never write recursive [[variables...]] tables. Existing whole-container inline tables are load-time migration input only and are rewritten automatically; do not preserve or introduce them.',

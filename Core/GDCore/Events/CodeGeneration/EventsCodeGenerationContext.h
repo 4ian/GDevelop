@@ -289,19 +289,19 @@ class GD_CORE_API EventsCodeGenerationContext {
   }
 
   /**
-   * \brief Enable replacing global config placeholders in strings generated
+   * \brief Enable replacing static data placeholders in strings generated
    * for event instructions.
    */
-  void SetGlobalConfigPlaceholderReplacementEnabled(bool enabled) {
-    globalConfigPlaceholderReplacementEnabled = enabled;
+  void SetStaticDataPlaceholderReplacementEnabled(bool enabled) {
+    staticDataPlaceholderReplacementEnabled = enabled;
   }
 
   /**
    * \brief Return true if strings generated in the current context should have
-   * global config placeholders replaced.
+   * static data placeholders replaced.
    */
-  bool IsGlobalConfigPlaceholderReplacementEnabled() const {
-    return globalConfigPlaceholderReplacementEnabled;
+  bool IsStaticDataPlaceholderReplacementEnabled() const {
+    return staticDataPlaceholderReplacementEnabled;
   }
 
   /**
@@ -378,9 +378,9 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool objectListParameterPickingAllowed =
       false;  ///< True while condition object-list parameters are being
               ///< generated, so conditions can narrow multiple candidates.
-  bool globalConfigPlaceholderReplacementEnabled =
+  bool staticDataPlaceholderReplacementEnabled =
       false;  ///< True while strings generated for event instructions should
-              ///< have global config placeholders replaced at code generation
+              ///< have static data placeholders replaced at code generation
               ///< time.
 };
 

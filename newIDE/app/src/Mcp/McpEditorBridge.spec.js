@@ -876,14 +876,14 @@ describe('McpEditorBridge', () => {
     }
   });
 
-  it('reads and edits global config through focused MCP tools', async () => {
+  it('reads and edits static data through focused MCP tools', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const triggerUnsavedChanges = jest.fn();
 
     try {
-      const projectWithGlobalConfig: any = project;
-      projectWithGlobalConfig.setGlobalConfigJson(
+      const projectWithStaticData: any = project;
+      projectWithStaticData.setStaticDataJson(
         JSON.stringify({
           cards: {
             PeaShooter: { name: 'PeaShooter', price: 100 },
@@ -908,15 +908,15 @@ describe('McpEditorBridge', () => {
         },
       });
       const summary = JSON.parse(summaryResponse.content[0].text);
-      expect(summary.globalConfigSummary.topLevelKeys).toContain('cards');
-      expect(summary.globalConfigSummary.placeholderExamples).toContain(
+      expect(summary.staticDataSummary.topLevelKeys).toContain('cards');
+      expect(summary.staticDataSummary.placeholderExamples).toContain(
         '{{cards.PeaShooter.price}}'
       );
 
       const readValueResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_get_global_config',
+          name: 'gdevelop_get_static_data',
           arguments: {
             placeholder_path: '{{cards.PeaShooter.price}}',
           },
@@ -929,7 +929,7 @@ describe('McpEditorBridge', () => {
       const resourceResponse = await bridge.handleRendererMcpRequest({
         method: 'resources/read',
         params: {
-          uri: 'gdevelop://project/global-config.json',
+          uri: 'gdevelop://project/static-data.json',
         },
       });
       expect(
@@ -939,9 +939,9 @@ describe('McpEditorBridge', () => {
       const replaceResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config',
+          name: 'gdevelop_set_static_data',
           arguments: {
-            global_config: {
+            static_data: {
               cards: {
                 Sunflower: { name: 'Sunflower', price: 50 },
               },
@@ -955,7 +955,7 @@ describe('McpEditorBridge', () => {
       const setValueResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: '{{cards.Sunflower.canUse}}',
             value: true,
@@ -969,7 +969,7 @@ describe('McpEditorBridge', () => {
       const setObjectResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: '{{cards.WallNut}}',
             value_json: '{"name":"WallNut","price":50}',
@@ -982,7 +982,7 @@ describe('McpEditorBridge', () => {
       const deleteResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_delete_global_config_value',
+          name: 'gdevelop_delete_static_data_value',
           arguments: {
             placeholder_path: '{{cards.Sunflower.canUse}}',
           },
@@ -991,9 +991,7 @@ describe('McpEditorBridge', () => {
       const deleteResult = JSON.parse(deleteResponse.content[0].text);
       expect(deleteResult.deleted).toBe(true);
 
-      const finalConfig = JSON.parse(
-        projectWithGlobalConfig.getGlobalConfigJson()
-      );
+      const finalConfig = JSON.parse(projectWithStaticData.getStaticDataJson());
       expect(finalConfig.cards.Sunflower.price).toBe(50);
       expect(finalConfig.cards.Sunflower.canUse).toBeUndefined();
       expect(finalConfig.cards.WallNut.name).toBe('WallNut');
@@ -1002,7 +1000,7 @@ describe('McpEditorBridge', () => {
       const invalidPathResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: 'cards.Sunflower.price',
             value: 75,

@@ -120,7 +120,7 @@ void ExpressionCodeGenerator::OnVisitNumberNode(NumberNode& node) {
 
 void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
   output += codeGenerator.ConvertToStringExplicit(
-      codeGenerator.ResolveGlobalConfigPlaceholders(node.text, context));
+      codeGenerator.ResolveStaticDataPlaceholders(node.text, context));
 }
 
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {

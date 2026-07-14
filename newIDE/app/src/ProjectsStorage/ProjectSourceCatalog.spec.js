@@ -161,6 +161,9 @@ describe('project source catalogs', () => {
       'Controllers = [{ type = "array"'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
+      'Never write a whole variable container as variables = { ... }'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
       '[objectGroups] TOML table'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
@@ -184,6 +187,7 @@ describe('project source catalogs', () => {
     expect(catalog.authoring.variableDefinition).toContain(
       'does not repeat name'
     );
+    expect(catalog.authoring.variableDefinition).toContain('[variables]');
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );

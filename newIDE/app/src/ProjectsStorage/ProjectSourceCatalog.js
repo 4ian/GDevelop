@@ -704,7 +704,7 @@ export const buildProjectSettingsCatalog = ({
         'At load time the editor parses each local document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted documents. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Write variables, globalVariables, and sceneVariables as TOML tables keyed by variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Never write recursive [[variables...]] tables.',
+        'Open variable containers only with [variables], [globalVariables], or [sceneVariables] TOML headers and write one assignment per variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Use an empty header for an empty container. Never write a whole variable container as variables = { ... } or variables = { }, and never write recursive [[variables...]] tables.',
         'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
         'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
@@ -718,7 +718,7 @@ export const buildProjectSettingsCatalog = ({
       behaviorDefinition:
         'An attached behavior requires a unique object-local name and a registered type; initialize properties from that type metadata or an existing definition.',
       variableDefinition:
-        'A variable name is the key in variables/globalVariables/sceneVariables. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
+        'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
     },
     fileKinds: SETTINGS_FILE_KINDS,
     settingsOwners,

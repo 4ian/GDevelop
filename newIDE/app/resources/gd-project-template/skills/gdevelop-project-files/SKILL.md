@@ -85,11 +85,14 @@ generated compatibility/runtime output, not multi-file source.
   Never embed another settings document. Follow the matching settings-catalog
   `fileKinds` entry and use only registered type metadata from that catalog.
 - Variable definitions: in `variables`, `globalVariables`, and
-  `sceneVariables`, use a table keyed by variable name. Assign each name one
-  inline array containing its complete descriptor without another `name`, for
-  example `Controllers = [{ type = "array", children = [...] }]`. Use
-  `variables = { }` when empty. Never write recursive `[[variables...]]` TOML
-  tables.
+  `sceneVariables`, always open a dedicated `[variables]`,
+  `[globalVariables]`, or `[sceneVariables]` table and write one assignment per
+  variable name. Assign each name one inline array containing its complete
+  descriptor without another `name`, for example
+  `Controllers = [{ type = "array", children = [...] }]`. Represent an empty
+  container with its empty table header. Never write a whole container as
+  `variables = { ... }` or `variables = { }`, and never write recursive
+  `[[variables...]]` TOML tables.
 - Object groups: use only an `[objectGroups]` table in the owning project,
   scene, prefab, prefab-variant, or function settings. Each key is the group
   name and each value is an array of object names, for example

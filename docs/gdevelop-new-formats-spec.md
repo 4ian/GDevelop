@@ -470,10 +470,11 @@ kind = "extension"
 kind = "function"
 ```
 
-### 5.1.4 Named inline variable definitions
+### 5.1.4 Named variable tables with inline descriptors
 
-Every settings-owned variable container uses a compact, lossless TOML table
-keyed by variable name. This applies to:
+Every settings-owned variable container uses a dedicated TOML table header
+keyed by variable name. The header is exactly `[variables]`,
+`[globalVariables]`, or `[sceneVariables]`. This applies to:
 
 - Project, scene, object, prefab, and events-based behavior `variables`.
 - Extension `globalVariables` and `sceneVariables`.
@@ -500,10 +501,17 @@ Enabled = [ { type = "boolean", value = true } ]
 The descriptor preserves `type`, `value` or `children`, enum `values`,
 `folded`, `persistentUuid`, `hasMixedValues`, and unknown serializer fields.
 The loader restores `name` from the TOML key and reconstructs the current
-legacy variable array. An empty container is `variables = { }` (or the
-corresponding field name). Recursive forms such as `[[variables]]`,
-`[[sceneVariables.children]]`, and a descriptor that repeats `name` are
-invalid; there is no compatibility reader for them.
+legacy variable array. An empty container is an empty table header:
+
+```toml
+[variables]
+```
+
+Whole-container inline assignments such as
+`variables = { Score = [{ type = "number", value = 0 }] }` and
+`variables = { }` are invalid. Recursive forms such as `[[variables]]`,
+`[[sceneVariables.children]]`, and a descriptor that repeats `name` are also
+invalid; there is no compatibility reader for any of these retired forms.
 
 ### 5.1.5 Compact object groups
 
@@ -597,9 +605,9 @@ Writers use TOML 1.0 with these restrictions:
 - Decimal integers and floats only.
 - RFC 3339 dates are not used for semantic project data; timestamps are strings.
 - Tables and array-of-tables are emitted in schema order.
-- Variable definition descriptors are the exception: their named entries and
-  nested descriptor objects are emitted as one-line inline arrays/tables under
-  `variables`, `globalVariables`, or `sceneVariables`.
+- Variable containers are emitted only as `[variables]`, `[globalVariables]`,
+  or `[sceneVariables]` tables. Each named descriptor value and its nested
+  descriptor objects are emitted as a one-line inline array/table.
 - Object groups are emitted only as `[objectGroups]` tables whose values are
   arrays of object-name strings. Their optional serialized
   `requiredBehaviors` metadata is emitted in the parallel
@@ -821,8 +829,9 @@ folder = []
 name = "Player"
 type = "Sprite"
 behaviors = []
-variables = { }
 effects = []
+
+[variables]
 ```
 
 The file owns the complete global object definition. Directories between
@@ -996,8 +1005,9 @@ folder = []
 name = "Player"
 type = "Sprite"
 behaviors = []
-variables = { }
 effects = []
+
+[variables]
 ```
 
 The file owns the complete polymorphic object definition, including attached

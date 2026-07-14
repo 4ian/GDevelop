@@ -732,6 +732,9 @@ const stripTomlStructuralIndentation = source => {
     .join('\n');
 };
 
+const stringifyInlineTomlKey = key =>
+  /^[A-Za-z0-9_-]+$/.test(key) ? key : stringifyToml.value(String(key));
+
 const stringifyInlineTomlValue = value => {
   if (Array.isArray(value)) {
     return `[ ${value.map(stringifyInlineTomlValue).join(', ')} ]`;
@@ -739,9 +742,9 @@ const stringifyInlineTomlValue = value => {
   if (value && typeof value === 'object') {
     const assignments = Object.keys(value).map(
       key =>
-        `${
-          /^[A-Za-z0-9_-]+$/.test(key) ? key : stringifyToml.value(String(key))
-        } = ${stringifyInlineTomlValue(value[key])}`
+        `${stringifyInlineTomlKey(key)} = ${stringifyInlineTomlValue(
+          value[key]
+        )}`
     );
     return `{ ${assignments.join(', ')}${assignments.length ? ' ' : ''}}`;
   }
@@ -778,13 +781,22 @@ const serializeToml = object => {
   // generated line at column zero avoids presentation-only whitespace churn.
   const serializable = clone(object);
   const inlineValues = new Map();
+  const variableTablePlaceholders = new Map();
   let tokenIndex = 0;
   const serializedInput = canonicalJson(serializable);
-  const reserveInlineValue = value => {
+  const reserveUniqueToken = category => {
     let token;
     do {
-      token = `__GDEVELOP_INLINE_TOML_${tokenIndex++}__`;
-    } while (serializedInput.includes(token));
+      token = `__GDEVELOP_${category}_${tokenIndex++}__`;
+    } while (
+      serializedInput.includes(token) ||
+      inlineValues.has(token) ||
+      variableTablePlaceholders.has(token)
+    );
+    return token;
+  };
+  const reserveInlineValue = value => {
+    const token = reserveUniqueToken('INLINE_TOML');
     inlineValues.set(token, stringifyInlineTomlValue(value));
     return token;
   };
@@ -797,11 +809,19 @@ const serializeToml = object => {
       Array.isArray(variablesByName)
     )
       return;
-    Object.keys(variablesByName).forEach(variableName => {
-      variablesByName[variableName] = reserveInlineValue(
-        variablesByName[variableName]
-      );
-    });
+    const placeholder = reserveUniqueToken('VARIABLE_TABLE');
+    variableTablePlaceholders.set(
+      placeholder,
+      Object.keys(variablesByName)
+        .map(
+          variableName =>
+            `${stringifyInlineTomlKey(
+              variableName
+            )} = ${stringifyInlineTomlValue(variablesByName[variableName])}`
+        )
+        .join('\n')
+    );
+    serializable[key] = { [placeholder]: placeholder };
   });
   const reservePointValues = value => {
     if (!value || typeof value !== 'object') return;
@@ -828,7 +848,13 @@ const serializeToml = object => {
       inlineValue
     );
   });
-  return `${expandedOutput}\n`;
+  variableTablePlaceholders.forEach((assignments, placeholder) => {
+    expandedOutput = expandedOutput.replace(
+      `${placeholder} = ${stringifyToml.value(placeholder)}`,
+      assignments
+    );
+  });
+  return `${expandedOutput.trimEnd()}\n`;
 };
 
 export const parseTomlSource = (source, fileUri = '<memory>') => {
@@ -860,6 +886,27 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
         Object.keys(value).forEach(key => rejectDates(value[key]));
     };
     rejectDates(parsed);
+    VARIABLE_DEFINITION_FIELDS.forEach(field => {
+      if (
+        new RegExp(`^(?:${field}|"${field}")\\s*=`, 'm').test(normalizedSource)
+      ) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} must use a [${field}] TOML table, not an inline table or array.`,
+          fileUri
+        );
+      }
+      if (parsed[field] === undefined) return;
+      if (
+        !new RegExp(`^\\[${field}\\](?:\\s*#.*)?$`, 'm').test(normalizedSource)
+      ) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} must use a [${field}] TOML table, not an inline table or array.`,
+          fileUri
+        );
+      }
+    });
     return parsed;
   } catch (error) {
     if (error instanceof MultiFileProjectError) throw error;

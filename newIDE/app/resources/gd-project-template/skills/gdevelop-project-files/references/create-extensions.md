@@ -40,9 +40,12 @@ files, and executable logic in `.events`.
    child-settings indexes to `project.settings` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
-7. Write every `variables`, `globalVariables`, or `sceneVariables` container as
-   a table keyed by variable name. Each key owns one inline descriptor array,
-   for example `Controllers = [{ type = "array", children = [...] }]`.
+7. Open every variable container with `[variables]`, `[globalVariables]`, or
+   `[sceneVariables]`, then write one assignment per variable name. Each key
+   owns one inline descriptor array, for example
+   `Controllers = [{ type = "array", children = [...] }]`. Use an empty table
+   header for an empty container; never use `variables = { ... }` or
+   `variables = { }`.
 8. Use exact instruction types and `dslName` parameters from
    `.gdevelop/instructions-catalog.json` in every event body.
 9. Call `reload_project` after the declaration/files exist. If the extension
@@ -159,9 +162,10 @@ isTextContainer = false
 isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
 layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
-variables = { }
 propertyDescriptors = []
 objectGroups = { }
+
+[variables]
 ```
 
 `Enemy.layout`:
@@ -209,8 +213,9 @@ folder = []
 name = "Body"
 type = "Sprite"
 behaviors = []
-variables = { }
 effects = []
+
+[variables]
 ```
 
 Add every child object definition, its variables/effects, and every attached

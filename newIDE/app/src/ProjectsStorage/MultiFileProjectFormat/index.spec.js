@@ -222,7 +222,8 @@ describe('GDevelop multi-file project format', () => {
     expect(files[MULTI_FILE_ENTRY_URI]).toContain(
       'combinedSettingsFormatVersion = 1'
     );
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = { }');
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[variables]');
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toMatch(/^variables\s*=/m);
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
@@ -1242,13 +1243,21 @@ objects = [ "Player" ]
     const files = decomposeLegacyProjectToFiles(project);
     const extensionSource =
       files['game://extensions/Combat/extension.settings'];
+    const projectSource = files[MULTI_FILE_ENTRY_URI];
     const sceneSource = files['game://scenes/Main/scene.settings'];
+    const objectSource = files['game://scenes/Main/objects/Player.settings'];
     const prefabSource =
       files['game://extensions/Combat/prefabs/Enemy/prefab.settings'];
     const behaviorSource =
       files['game://extensions/Combat/behaviors/Health/behavior.settings'];
 
+    expect(projectSource).toContain('[variables]');
+    expect(sceneSource).toContain('[variables]');
+    expect(objectSource).toContain('[variables]');
+    expect(extensionSource).toContain('[globalVariables]');
     expect(extensionSource).toContain('[sceneVariables]');
+    expect(prefabSource).toContain('[variables]');
+    expect(behaviorSource).toContain('[variables]');
     expect(extensionSource).toContain(
       'Controllers = [ { type = "array", children = [ { type = "structure"'
     );
@@ -1268,6 +1277,9 @@ objects = [ "Player" ]
       .filter(uri => uri.endsWith('.settings'))
       .forEach(uri => {
         expect(files[uri]).not.toMatch(
+          /^(?:variables|globalVariables|sceneVariables)\s*=/m
+        );
+        expect(files[uri]).not.toMatch(
           /\[\[(?:variables|globalVariables|sceneVariables)(?:\.|\]\])/m
         );
       });
@@ -1280,6 +1292,15 @@ objects = [ "Player" ]
       'game://extensions/Combat/extension.settings'
     ] = extensionSource.replace(/Controllers = \[[^\n]+/, 'Controllers = []');
     expect(() => composeLegacyProjectFromFiles(malformedFiles)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
+    );
+
+    const inlineContainerFiles = { ...files };
+    inlineContainerFiles[MULTI_FILE_ENTRY_URI] = projectSource.replace(
+      '[variables]',
+      'variables = { }'
+    );
+    expect(() => composeLegacyProjectFromFiles(inlineContainerFiles)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
     );
   });

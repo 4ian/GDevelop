@@ -165,6 +165,12 @@ declare type VariableData = Readonly<{
   children?: VariableData[];
   /** The type of the variable. Defaults to number. */
   type?: VariableType;
+  /**
+   * A unique identifier, stable across saves of the project, used by the
+   * editor to track the variable (for refactoring after renames...).
+   * Unused by the game engine.
+   */
+  persistentUuid?: string;
 }>;
 
 /** A variable child of a container. Those always have a name. */

@@ -77,7 +77,12 @@ const EditedObjectGroupEditorDialog = ({
   } = useSerializableObjectCancelableEditor({
     serializableObject: groupVariablesContainer,
     onCancel: () => {},
-    resetThenClearPersistentUuid: true,
+    // The merged container is a temporary object, but its variables keep the
+    // persistent UUIDs of the variables of the first object of the group -
+    // they must be preserved (only set for variables not having one yet), as
+    // they can be copied to the objects of the group when applying changes,
+    // are persisted in the project file and so must stay stable.
+    ensurePersistentUuids: true,
   });
 
   const apply = async () => {
@@ -114,7 +119,6 @@ const EditedObjectGroupEditorDialog = ({
         );
       }
     }
-    groupVariablesContainer.clearPersistentUuid();
   };
 
   const removeObject = React.useCallback(

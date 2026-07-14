@@ -152,10 +152,12 @@ const useVariablesContainerRefactoring = ({
       console.error('Error applying variable refactoring:', error);
     }
 
-    // Take a fresh snapshot for the next cycle.
+    // Take a fresh snapshot for the next cycle. Only ensure UUIDs are set
+    // (for newly added variables) - existing UUIDs are preserved, as they
+    // are persisted in the project file and must stay stable to avoid
+    // useless changes in it.
     snapshot.delete();
-    variablesContainer.clearPersistentUuid();
-    variablesContainer.resetPersistentUuid();
+    variablesContainer.ensurePersistentUuids();
     const newSnapshot = new gd.SerializerElement();
     variablesContainer.serializeTo(newSnapshot);
     snapshotRef.current = newSnapshot;
@@ -166,7 +168,10 @@ const useVariablesContainerRefactoring = ({
       if (!enabled) return;
 
       // Setup: snapshot the current state of the variables container.
-      variablesContainer.resetPersistentUuid();
+      // Only ensure UUIDs are set (for variables that don't have one yet) -
+      // existing UUIDs are preserved, as they are persisted in the project
+      // file and must stay stable to avoid useless changes in it.
+      variablesContainer.ensurePersistentUuids();
       const snapshot = new gd.SerializerElement();
       variablesContainer.serializeTo(snapshot);
       snapshotRef.current = snapshot;
@@ -178,14 +183,6 @@ const useVariablesContainerRefactoring = ({
         if (timerRef.current) {
           clearTimeout(timerRef.current);
           timerRef.current = null;
-        }
-
-        // Try to clear persistent UUIDs so they are not persisted in the
-        // project file. This may fail if the object was already deleted.
-        try {
-          variablesContainer.clearPersistentUuid();
-        } catch (error) {
-          // The container might already be deleted.
         }
 
         // Free the snapshot C++ memory.

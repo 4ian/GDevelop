@@ -1086,6 +1086,25 @@ describe('libGD.js', function () {
 
       container.delete();
     });
+    it('can ensure persistent UUIDs are set, while preserving existing ones', function () {
+      let container = new gd.VariablesContainer();
+      container.insertNew('Variable', 0).setValue(4);
+
+      container.ensurePersistentUuids();
+      const variableUuid = container.get('Variable').getPersistentUuid();
+      expect(variableUuid).toBeTruthy();
+
+      container.insertNew('SecondVariable', 1).setValue(5);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBe('');
+
+      container.ensurePersistentUuids();
+
+      // The existing UUID is preserved, the new variable got one.
+      expect(container.get('Variable').getPersistentUuid()).toBe(variableUuid);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBeTruthy();
+
+      container.delete();
+    });
   });
 
   describe('gd.Variable', function () {

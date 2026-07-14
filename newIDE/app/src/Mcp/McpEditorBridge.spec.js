@@ -298,6 +298,17 @@ describe('McpEditorBridge', () => {
           writtenToDisk: false,
           byteLength: expect.any(Number),
         }),
+        validationScope: expect.objectContaining({
+          projectUnserialization: 'checked',
+          projectSerializationRoundTrip: 'checked',
+          projectValidation: 'checked',
+          extensionGeneratedCode: 'checked',
+          runtimeGameplaySemantics: 'not-verified',
+        }),
+        runtimeSemanticsVerified: false,
+        runtimeVerificationRecommendation: expect.stringContaining(
+          'paused preview'
+        ),
       })
     );
     expect(
@@ -316,6 +327,8 @@ describe('McpEditorBridge', () => {
       )
     ).toBe(true);
     expect(result.nextAction).toContain('reload_project');
+    expect(result.nextAction).toContain('does not verify runtime');
+    expect(result.note).toContain('does not prove object picking');
   });
 
   it('reports the source file and location for invalid project files', async () => {
@@ -5899,7 +5912,45 @@ describe('McpEditorBridge', () => {
             // source of counts.
             _instances: {
               items: {
-                Player: [{}],
+                Player: [
+                  {
+                    id: 7,
+                    persistentUuid: 'player-instance-uuid',
+                    x: 10,
+                    y: 20,
+                    angle: 180,
+                    layer: 'Gameplay',
+                    zOrder: 3,
+                    pick: true,
+                    _permanentForceX: -720,
+                    _permanentForceY: 0,
+                    _instantForces: [{ _x: 5, _y: 0, _angle: 0, _length: 5 }],
+                    _totalForce: {
+                      _x: -715,
+                      _y: 0,
+                      _angle: 180,
+                      _length: 715,
+                    },
+                    _variables: {
+                      _variables: {
+                        Health: {
+                          _value: 3,
+                          _str: '',
+                          _stringDirty: true,
+                          _isStructure: false,
+                        },
+                      },
+                    },
+                    _behaviors: [
+                      {
+                        name: 'Fire',
+                        type: 'FireBullet::FireBullet',
+                        _activated: true,
+                        _cooldown: 0.25,
+                      },
+                    ],
+                  },
+                ],
                 Enemy: [{}, {}],
               },
             },
@@ -5969,7 +6020,12 @@ describe('McpEditorBridge', () => {
       method: 'tools/call',
       params: {
         name: 'gdevelop_inspect_running_preview',
-        arguments: { timeout_ms: 1000 },
+        arguments: {
+          timeout_ms: 1000,
+          objects: ['Player', 'Enemy', 'MissingObject'],
+          include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+          instance_indexes: [0, 2],
+        },
       },
     });
     const result = JSON.parse(response.content[0].text);
@@ -5987,6 +6043,46 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.scenes[0].totalInstances).toBe(3);
     expect(result.runtime.scenes[0].sceneVariables.Score).toBe(42);
     expect(result.runtime.globalVariables.Coins).toBe(7);
+    expect(result.runtime.scenes[0].instanceStates.Player[0]).toEqual(
+      expect.objectContaining({
+        index: 0,
+        id: 7,
+        persistentUuid: 'player-instance-uuid',
+        picked: true,
+        position: { x: 10, y: 20, layer: 'Gameplay', zOrder: 3 },
+        angle: 180,
+        variables: { Health: 3 },
+        behaviors: [
+          expect.objectContaining({
+            name: 'Fire',
+            type: 'FireBullet::FireBullet',
+            activated: true,
+            state: { _cooldown: 0.25 },
+          }),
+        ],
+      })
+    );
+    expect(result.runtime.scenes[0].instanceStates.Player[0].forces).toEqual(
+      expect.objectContaining({
+        permanent: expect.objectContaining({
+          x: -720,
+          y: 0,
+          angle: 180,
+          length: 720,
+        }),
+        instantaneous: [{ x: 5, y: 0, angle: 0, length: 5 }],
+        total: { x: -715, y: 0, angle: 180, length: 715 },
+      })
+    );
+    expect(result.runtime.scenes[0].missingObjects).toEqual(['MissingObject']);
+    expect(result.runtime.scenes[0].instanceStates.Enemy[0]).toEqual({
+      index: 0,
+      missingFields: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+    });
+    expect(result.runtime.scenes[0].missingInstances).toEqual({
+      Player: [2],
+      Enemy: [2],
+    });
     expect(result.recentLogs).toEqual([recentCustomLog]);
     expect(result.logs).toEqual(expect.arrayContaining([recentCustomLog]));
   });

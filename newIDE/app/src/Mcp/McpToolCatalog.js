@@ -1540,6 +1540,31 @@ const inspectRunningPreviewSchema = {
       description:
         'Default false. When true, include instance positions for ALL objects (can be large).',
     },
+    objects: {
+      type: 'array',
+      maxItems: 50,
+      items: { type: 'string' },
+      description:
+        'Optional object names for bounded per-instance runtime inspection. Returns at most 50 instances per object and reports missing objects explicitly.',
+    },
+    include: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+      },
+      description:
+        'Fields to return for objects. Defaults to position, angle, forces, variables, and behaviors when objects is provided.',
+    },
+    instance_indexes: {
+      type: 'array',
+      uniqueItems: true,
+      maxItems: 50,
+      items: { type: 'integer', minimum: 0 },
+      description:
+        'Optional zero-based instance indexes to return for every requested object. Missing indexes are reported explicitly.',
+    },
   },
   additionalProperties: false,
 };
@@ -1768,6 +1793,9 @@ const runFramesSchema = {
       description:
         'Object names whose live instance x/y/angle/layer/zOrder to include in the returned runtime snapshot.',
     },
+    objects: inspectRunningPreviewSchema.properties.objects,
+    include: inspectRunningPreviewSchema.properties.include,
+    instance_indexes: inspectRunningPreviewSchema.properties.instance_indexes,
     include_cursor_world_coordinates: {
       type: 'boolean',
       description:
@@ -3775,7 +3803,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_current_project_json',
     description:
-      'Validate the currently open in-memory project by serializing it, unserializing it through GDevelop, scanning events/resources, and preflighting generated extension JavaScript when enabled. Does not mutate or save.',
+      'Validate the currently open in-memory project by serializing it, unserializing it through GDevelop, scanning events/resources, and preflighting generated extension JavaScript when enabled. This does not verify runtime gameplay semantics, object picking, or action side effects. Does not mutate or save.',
     inputSchema: validateCurrentProjectJsonSchema,
   },
   {
@@ -3793,7 +3821,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_project_files',
     description:
-      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
+      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. valid:true proves structural/code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -4207,7 +4235,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, recent captured console/debugger logs for that preview, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, recent captured console/debugger logs, runtime errors, sounds, input state, and a compact runtime snapshot. Pass objects plus include to get bounded per-instance position, angle, force, variable, and behavior state without requesting the huge raw dump; missing objects, indexes, or fields are explicit. Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
@@ -4267,7 +4295,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'run_frames',
     description:
-      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
+      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. Pass objects plus include for bounded per-instance position, angle, force, variable, and behavior state in the same receipt. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
     inputSchema: runFramesSchema,
   },
   {
@@ -6259,6 +6287,15 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         include_raw_dump: true,
       },
     },
+    {
+      description:
+        'Inspect one Bullet instance with bounded force, variable, and behavior state instead of returning the raw dump.',
+      arguments: {
+        objects: ['Bullet'],
+        include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+        instance_indexes: [0],
+      },
+    },
   ],
   preview_health_check: [
     {
@@ -6392,11 +6429,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Tap Space once (register a "just pressed" shot), step a few frames, and check the bullet count.',
+        'Tap Space once (register a "just pressed" shot), step a few frames, and inspect the created bullet force and state.',
       arguments: {
         inputs: [{ type: 'keyPressed', key: 'Space' }],
         frames: 5,
-        instance_positions_for: ['Bullet'],
+        objects: ['Bullet'],
+        include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+        instance_indexes: [0],
       },
     },
     {

@@ -883,6 +883,83 @@ folderName = "__ROOT"
     ).toEqual(prefab.objects);
   });
 
+  test('omits hidden behavior properties from object settings and rejects authored copies', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    const behaviorDefinition =
+      project.eventsFunctionsExtensions[0].eventsBasedBehaviors[0];
+    behaviorDefinition.propertyDescriptors = [
+      { name: 'VisibleValue', type: 'Number', value: '5' },
+      {
+        name: 'RuntimeValue',
+        type: 'Number',
+        value: '0',
+        hidden: true,
+      },
+    ];
+    const makeObject = name => ({
+      name,
+      type: 'Sprite',
+      behaviors: [
+        {
+          name: 'Health',
+          type: 'Combat::Health',
+          VisibleValue: 7,
+          RuntimeValue: 99,
+        },
+      ],
+    });
+    project.objects = [makeObject('GlobalPlayer')];
+    project.layouts[0].objects = [makeObject('ScenePlayer')];
+    const prefab = project.eventsFunctionsExtensions[0].eventsBasedObjects[0];
+    prefab.objects = [makeObject('PrefabPlayer')];
+    prefab.variants[0].objects = [makeObject('VariantPlayer')];
+
+    const objectUris = [
+      'game://objects/GlobalPlayer.settings',
+      'game://scenes/Main/objects/ScenePlayer.settings',
+      'game://extensions/Combat/prefabs/Enemy/objects/PrefabPlayer.settings',
+      'game://extensions/Combat/prefabs/Enemy/variants/Armored/objects/VariantPlayer.settings',
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    objectUris.forEach(objectUri => {
+      const objectDocument = parseTomlSource(files[objectUri]);
+      const attachedBehavior = objectDocument.behaviors[0];
+      expect(attachedBehavior).toMatchObject({
+        name: 'Health',
+        type: 'Combat::Health',
+        VisibleValue: 7,
+      });
+      expect(attachedBehavior).not.toHaveProperty('RuntimeValue');
+      expect(files[objectUri]).not.toContain('RuntimeValue');
+    });
+    const composed = composeLegacyProjectFromFiles(files);
+    const composedObjects = [
+      composed.objects[0],
+      composed.layouts[0].objects[0],
+      composed.eventsFunctionsExtensions[0].eventsBasedObjects[0].objects[0],
+      composed.eventsFunctionsExtensions[0].eventsBasedObjects[0].variants[0]
+        .objects[0],
+    ];
+    composedObjects.forEach(object => {
+      expect(object.behaviors[0]).not.toHaveProperty('RuntimeValue');
+    });
+    expect(areLegacyProjectsEquivalent(project, composed)).toBe(true);
+
+    const objectUri = 'game://scenes/Main/objects/ScenePlayer.settings';
+    const filesWithHiddenProperty = { ...files };
+    filesWithHiddenProperty[objectUri] = files[objectUri].replace(
+      'VisibleValue = 7',
+      'VisibleValue = 7\nRuntimeValue = 99'
+    );
+    expect(() =>
+      composeLegacyProjectFromFiles(filesWithHiddenProperty)
+    ).toThrow(
+      expect.objectContaining({
+        code: 'MULTIFILE_FORBIDDEN_HIDDEN_BEHAVIOR_PROPERTY',
+      })
+    );
+  });
+
   test('stores every settings-owned object group in a compact objectGroups table', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const extension = project.eventsFunctionsExtensions[0];

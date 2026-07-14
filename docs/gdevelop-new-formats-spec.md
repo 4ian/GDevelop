@@ -269,8 +269,11 @@ both; the two files remain independent unless both are listed in
   It describes the managed settings file kinds and ownership rules, the
   project components that currently own settings, and the non-hidden object,
   behavior, and effect types registered for the loaded project. Behavior and
-  effect entries include their authoring property metadata. AI models must
-  consult it before creating settings-owned definitions and must never edit it.
+  effect entries include their authoring property metadata. Hidden behavior
+  descriptors are deliberately omitted: they are runtime-managed, use their
+  descriptor defaults, and are forbidden in attached object settings. AI
+  models must consult the catalog before creating settings-owned definitions
+  and must never edit it.
 - `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
   It describes every Layout DSL element and attribute plus the project-aware
   scene, prefab, variant, and external-layout contexts. Each context lists the
@@ -632,6 +635,15 @@ array field spellings. Legacy `*FolderStructure` fields are also excluded from
 the multi-file format. Physical project directories own component structure,
 and the legacy runtime/editor model rebuilds any transient root folders while
 composing.
+
+Attached behavior instances are a deliberate projection exception. An object
+settings file stores only the behavior identity fields and author-writable
+properties exposed by `.gdevelop/settings-catalog.json`. A property descriptor
+marked `hidden` in an events-based behavior definition remains in that
+behavior's own `behavior.settings`, but its value must not be copied into any
+global, scene, prefab, or prefab-variant object definition. The composer rejects
+such authored values. Runtime behavior code initializes omitted hidden values
+from descriptor defaults and owns their later state.
 
 ### 5.3 JSON-to-TOML projection
 

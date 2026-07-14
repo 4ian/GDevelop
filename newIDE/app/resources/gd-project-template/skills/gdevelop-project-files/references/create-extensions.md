@@ -225,8 +225,11 @@ behavior to its own flat object settings file. Its `folder` array is the editor
 object grouping. Add only instances, layers,
 spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
-rather than inventing serializer fields. Keep `propertyDescriptors` as one
-flat ordered array in `prefab.settings`; never add property folders.
+rather than inventing serializer fields. For attached behaviors, copy only
+author-writable properties listed for that type in `settings-catalog.json`.
+Never copy a hidden behavior property from legacy JSON into object settings;
+runtime code initializes and owns it. Keep `propertyDescriptors` as one flat
+ordered array in `prefab.settings`; never add property folders.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
@@ -276,6 +279,12 @@ The object and behavior parameters identify one caller instance. Do not remove
 the guarding condition or call this method with an unrestricted multi-instance
 selection.
 
+Object-list parameters keep their logical parameter name across a behavior
+function call. When a function creates an object and a child event mutates that
+same parameter, use the catalog instruction with the same object parameter in
+both instructions. The generated function context preserves the newly created
+selection through child events and nested private behavior-function calls.
+
 ## Add or change components
 
 - Add a free function in its own `functions/<Name>/` folder. Put its complete
@@ -303,7 +312,8 @@ selection.
 4. Verify prefab layouts contain no object definitions or behaviors and that
    every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata
-   exists.
+   exists. Verify attached object behaviors contain no editor-hidden properties
+   absent from `settings-catalog.json`.
 5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
 6. Reload the project and confirm the new instruction/object/behavior types

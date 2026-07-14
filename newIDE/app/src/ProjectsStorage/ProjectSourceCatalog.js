@@ -710,13 +710,14 @@ export const buildProjectSettingsCatalog = ({
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
+        'For an attached behavior, serialize only properties listed in behaviorTypes[].properties. Editor-hidden behavior descriptors are intentionally absent from this catalog, are runtime-managed, and are forbidden in object settings; the runtime initializes them from descriptor defaults.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],
       objectDefinition:
         'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
       behaviorDefinition:
-        'An attached behavior requires a unique object-local name and a registered type; initialize properties from that type metadata or an existing definition.',
+        'An attached behavior requires a unique object-local name and a registered type. Initialize only author-writable properties listed for that type in behaviorTypes[].properties. Never serialize editor-hidden properties in an object definition.',
       variableDefinition:
         'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
     },

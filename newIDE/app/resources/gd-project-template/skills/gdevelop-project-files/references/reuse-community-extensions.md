@@ -124,7 +124,9 @@ by hand.
 4. Read and adapt the generated `.settings`, `.layout`, and `.events` files
    directly. Never edit the downloaded JSON or `.gdevelop/game.json`.
 5. After the final adaptation, call `reload_project`, then debug with a fresh
-   preview.
+   paused preview. For any imported action that creates, deletes, picks, or
+   mutates objects, use deterministic `run_frames` with targeted `objects`,
+   `include`, and `instance_indexes` and verify the live side effects.
 
 The native conversion maps the legacy extension as follows:
 
@@ -142,6 +144,12 @@ The native conversion maps the legacy extension as follows:
 | Prefab non-default variant instances/layers/spatial bounds/editor state | `variants/<Variant>.layout` |
 | `eventsBasedBehaviors[]` owner metadata | One `behaviors/<B>/behavior.settings` each |
 | Behavior `eventsFunctions[]` metadata/bodies and function grouping | `behaviors/<B>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events` |
+
+The conversion keeps hidden property descriptors in the owning
+`behavior.settings` because generated runtime code needs their defaults, but it
+must not copy hidden runtime-managed values into attached object settings. Such
+properties are absent from `settings-catalog.json` and are forbidden authoring
+fields.
 
 Follow [create-extensions.md](create-extensions.md) for exact ownership and
 examples when adapting the generated sources. The converter, not the model,

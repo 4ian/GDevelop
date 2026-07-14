@@ -51,7 +51,10 @@ Use the catalogs as authoring contracts:
   mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary. Search
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
-  to resolve existing project components and their object definitions.
+  to resolve existing project components and their object definitions. For an
+  attached behavior, write only properties listed in its `behaviorTypes`
+  entry. Editor-hidden properties are deliberately absent, runtime-managed,
+  and forbidden in object settings; never copy them from legacy JSON.
 - In `layout-catalog.json`, read `elements` for exact context-specific tags,
   attributes, literals, child order, defaults, and constraints. Select the one
   `contexts` entry whose `owner` matches the scene, prefab, variant, or external
@@ -150,6 +153,10 @@ and type-specific configuration. `project.settings`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
+For each attached behavior, keep its identity fields and only the author-writable
+properties present in `settings-catalog.json`. Hidden behavior descriptor values
+must not appear in `<Object>.settings`; generated runtime code supplies their
+descriptor defaults and manages their state.
 
 Give every prefab and behavior function its own `functions/<Function>/`
 directory containing `function.settings` and `<Function>.events`. Store editor
@@ -331,7 +338,10 @@ loop, comment, and JavaScript metadata when editing existing sources.
    events, reference, or generated-project validation failure. This call first
    regenerates all three `.gdevelop` catalogs, then validates the sources using
    the fresh instruction catalog. Call it at least once before calling
-   `reload_project`; a failed validation does not satisfy this gate.
+   `reload_project`; a failed validation does not satisfy this gate. `valid:
+   true` proves parsing, source reconstruction, project validation, and
+   extension generated-code preflight only. It does not prove runtime object
+   picking or gameplay side effects.
 8. After the requested task is complete and validation succeeds, use Git from
    the project repository root to commit every task-owned change before
    `reload_project`. Inspect `git status` and the final diff, stage all changes
@@ -343,6 +353,10 @@ loop, comment, and JavaScript metadata when editing existing sources.
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
 10. For gameplay or visual changes, call `launch_preview` only after step 9.
+    Start paused and use `run_frames` with `objects`, `include`, and optional
+    `instance_indexes` to inspect bounded live position, angle, force, variable,
+    and behavior state. Runtime verification is mandatory for extension actions
+    that create, delete, pick, or mutate objects.
    If any project source changes after the reload, call `reload_project` again
    before the next preview, preceded by a new successful
    `validate_project_files` call and Git commit for those edits.
@@ -370,7 +384,8 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
-- Inspecting live runtime state, logs, errors, audio, and instance positions.
+- Inspecting live runtime state, logs, errors, audio, and bounded targeted
+  instance position, angle, force, variable, and behavior state.
 - Capturing preview screenshots.
 
 Except for the single `import_extension` conversion transaction, never use MCP
@@ -391,7 +406,9 @@ source-file edit and before `reload_project`. It regenerates the instruction,
 settings, and layout catalogs first, then reconstructs the generated `game.json`
 representation from the multi-file settings, layouts, and events using the
 fresh instruction catalog without replacing editor memory. A later source edit
-invalidates the earlier validation receipt.
+invalidates the earlier validation receipt. Its `valid: true` result is not a
+runtime semantic test; behavior-sensitive changes still require a paused preview
+and deterministic `run_frames` inspection.
 
 The Git commit is also a mandatory reload gate. After the final successful
 validation, inspect the repository diff, stage every change made for the user's
@@ -417,6 +434,8 @@ Before finishing:
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
   behaviors are at the local root of its individual `<Object>.settings` file.
+- Confirm attached behaviors serialize only catalog-listed author-writable
+  properties and no editor-hidden behavior descriptor appears in object settings.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
 - Confirm every prefab/behavior function has a dedicated flat function

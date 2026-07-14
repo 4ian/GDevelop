@@ -571,11 +571,30 @@ export const validateSerializedProject = (
       errors,
       generatedCodePreflight:
         args.include_generated_code === false ? 'skipped' : 'checked',
+      validationScope: {
+        projectUnserialization: 'checked',
+        projectSerializationRoundTrip: 'checked',
+        projectValidation: 'checked',
+        extensionGeneratedCode:
+          args.include_generated_code === false ? 'skipped' : 'checked',
+        runtimeGameplaySemantics: 'not-verified',
+      },
+      runtimeSemanticsVerified: false,
+      runtimeVerificationRecommendation:
+        'Runtime verification is required for extension actions that create, delete, pick, or mutate objects. Launch a paused preview and use run_frames with targeted object inspection.',
     };
   } catch (error) {
     return {
       success: true,
       valid: false,
+      validationScope: {
+        projectUnserialization: 'failed',
+        projectSerializationRoundTrip: 'not-checked',
+        projectValidation: 'not-checked',
+        extensionGeneratedCode: 'not-checked',
+        runtimeGameplaySemantics: 'not-verified',
+      },
+      runtimeSemanticsVerified: false,
       errors: [
         {
           severity: 'error',

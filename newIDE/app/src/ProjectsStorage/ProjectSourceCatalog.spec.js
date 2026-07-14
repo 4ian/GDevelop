@@ -172,6 +172,12 @@ describe('project source catalogs', () => {
     expect(catalog.authoring.rules.join('\n')).toContain(
       'originPoint and centerPoint as inline TOML tables'
     );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Editor-hidden behavior descriptors'
+    );
+    expect(catalog.authoring.behaviorDefinition).toContain(
+      'Never serialize editor-hidden properties'
+    );
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
         .commonFields
@@ -208,6 +214,9 @@ describe('project source catalogs', () => {
         extraInfo: ['PlatformBehavior::PlatformerObjectBehavior'],
       },
     ]);
+    expect(entry.properties.map(property => property.name)).not.toContain(
+      'Internal'
+    );
     expect(entry.requiredBehaviorTypes).toEqual([
       'PlatformBehavior::PlatformerObjectBehavior',
     ]);

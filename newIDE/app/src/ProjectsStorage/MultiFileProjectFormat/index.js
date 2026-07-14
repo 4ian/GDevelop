@@ -149,6 +149,113 @@ const removeLegacyFolderStructures = value => {
 export const removeLegacyFolderStructuresFromProject = legacyProject =>
   removeLegacyFolderStructures(clone(legacyProject));
 
+const ATTACHED_BEHAVIOR_IDENTITY_FIELDS = new Set([
+  'name',
+  'type',
+  'isFolded',
+  'isMuted',
+  'isInheritedFromObjectType',
+  'quickCustomizationVisibility',
+  'propertiesQuickCustomizationVisibilities',
+]);
+
+const collectHiddenBehaviorPropertiesByType = project => {
+  const hiddenPropertiesByType = new Map();
+  (project.eventsFunctionsExtensions || []).forEach(extension => {
+    const extensionName = String(extension.name || '');
+    (extension.eventsBasedBehaviors || []).forEach(behaviorDefinition => {
+      const behaviorName = String(behaviorDefinition.name || '');
+      const hiddenProperties = new Set(
+        (behaviorDefinition.propertyDescriptors || [])
+          .filter(property => property && property.hidden === true)
+          .map(property => String(property.name || ''))
+          .filter(
+            propertyName =>
+              propertyName &&
+              !ATTACHED_BEHAVIOR_IDENTITY_FIELDS.has(propertyName)
+          )
+      );
+      if (extensionName && behaviorName && hiddenProperties.size) {
+        hiddenPropertiesByType.set(
+          `${extensionName}::${behaviorName}`,
+          hiddenProperties
+        );
+      }
+    });
+  });
+  return hiddenPropertiesByType;
+};
+
+const forEachProjectObjectDefinition = (project, callback) => {
+  (project.objects || []).forEach((object, index) =>
+    callback(object, `project.objects[${index}]`)
+  );
+  (project.layouts || []).forEach((layout, layoutIndex) => {
+    (layout.objects || []).forEach((object, objectIndex) =>
+      callback(
+        object,
+        `project.layouts[${layoutIndex}].objects[${objectIndex}]`
+      )
+    );
+  });
+  (project.eventsFunctionsExtensions || []).forEach(
+    (extension, extensionIndex) => {
+      (extension.eventsBasedObjects || []).forEach((prefab, prefabIndex) => {
+        (prefab.objects || []).forEach((object, objectIndex) =>
+          callback(
+            object,
+            `project.eventsFunctionsExtensions[${extensionIndex}].eventsBasedObjects[${prefabIndex}].objects[${objectIndex}]`
+          )
+        );
+        (prefab.variants || []).forEach((variant, variantIndex) => {
+          (variant.objects || []).forEach((object, objectIndex) =>
+            callback(
+              object,
+              `project.eventsFunctionsExtensions[${extensionIndex}].eventsBasedObjects[${prefabIndex}].variants[${variantIndex}].objects[${objectIndex}]`
+            )
+          );
+        });
+      });
+    }
+  );
+};
+
+const processHiddenAttachedBehaviorProperties = (project, reject) => {
+  const hiddenPropertiesByType = collectHiddenBehaviorPropertiesByType(project);
+  if (!hiddenPropertiesByType.size) return project;
+  forEachProjectObjectDefinition(project, (object, objectPath) => {
+    (object && Array.isArray(object.behaviors) ? object.behaviors : []).forEach(
+      behavior => {
+        if (!behavior || typeof behavior !== 'object') return;
+        const behaviorType = String(behavior.type || '');
+        const hiddenProperties = hiddenPropertiesByType.get(behaviorType);
+        if (!hiddenProperties) return;
+        hiddenProperties.forEach(propertyName => {
+          if (!Object.prototype.hasOwnProperty.call(behavior, propertyName)) {
+            return;
+          }
+          if (reject) {
+            fail(
+              'MULTIFILE_FORBIDDEN_HIDDEN_BEHAVIOR_PROPERTY',
+              `${objectPath} behavior ${String(
+                behavior.name || behaviorType
+              )} must not serialize hidden property ${propertyName}. Hidden behavior properties are runtime-managed and use their descriptor defaults.`
+            );
+          }
+          delete behavior[propertyName];
+        });
+      }
+    );
+  });
+  return project;
+};
+
+const removeHiddenAttachedBehaviorProperties = project =>
+  processHiddenAttachedBehaviorProperties(project, false);
+
+const rejectHiddenAttachedBehaviorProperties = project =>
+  processHiddenAttachedBehaviorProperties(project, true);
+
 const rejectLegacyFolderStructures = (value, fileUri, pointer = '') => {
   if (Array.isArray(value)) {
     value.forEach((item, index) =>
@@ -1618,7 +1725,9 @@ const removeEmptyBehaviorSharedData = layout =>
       };
 
 export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
-  const project = clone(asObject(legacyProject, 'Project'));
+  const project = removeHiddenAttachedBehaviorProperties(
+    clone(asObject(legacyProject, 'Project'))
+  );
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
@@ -3465,6 +3574,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
     return extension;
   });
+  rejectHiddenAttachedBehaviorProperties(project);
   return project;
 };
 
@@ -3615,7 +3725,9 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
 };
 
 export const normalizeLegacyProjectForMultiFile = legacyProject => {
-  const project = removeLegacyFolderStructuresFromProject(legacyProject);
+  const project = removeHiddenAttachedBehaviorProperties(
+    removeLegacyFolderStructuresFromProject(legacyProject)
+  );
   project.layouts = project.layouts || [];
   project.externalEvents = project.externalEvents || [];
   project.externalLayouts = project.externalLayouts || [];

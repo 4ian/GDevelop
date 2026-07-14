@@ -76,9 +76,9 @@ namespace gdjs {
       if (!tileMap) return;
       for (const layer of tileMap.getLayers()) {
         const isLayerHidden =
-          (this._object._displayMode === 'index' &&
-            this._object._layerIndex !== layer.id) ||
-          (this._object._displayMode === 'visible' && !layer.isVisible());
+          (this._object.getDisplayMode() === 'index' &&
+            this._object.getDisplayedLayerIndex() !== layer.id) ||
+          (this._object.getDisplayMode() === 'visible' && !layer.isVisible());
 
         // Only set alpha on editable layers that are not hidden,
         // as others are not rendered.
@@ -201,8 +201,8 @@ namespace gdjs {
           tileMap,
           textureCache,
           // @ts-ignore
-          this._object._displayMode,
-          this._object._layerIndex,
+          this._object.getDisplayMode(),
+          this._object.getDisplayedLayerIndex(),
           leftBound,
           rightBound,
           topBound,

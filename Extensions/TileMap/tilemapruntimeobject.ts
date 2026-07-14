@@ -293,7 +293,6 @@ namespace gdjs {
               }
               this._renderer.refreshPixiTileMap(textureCache, true);
               this.invalidateHitboxes();
-              const hasEditedLayer = false;
               if (!this._tileMap.getTileLayer(this.editedLayerIndex)) {
                 for (const layer of this._tileMap.getLayers()) {
                   if (this._tileMap.getTileLayer(layer.id)) {

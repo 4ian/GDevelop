@@ -486,6 +486,14 @@ namespace gdjs {
       return this._collisionTileMap;
     }
 
+    getDisplayMode(): string {
+      return 'all';
+    }
+
+    getDisplayedLayerIndex(): integer {
+      return 0;
+    }
+
     getEditedLayerIndex(): integer {
       return 0;
     }

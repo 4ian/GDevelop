@@ -16,7 +16,7 @@
  */
 
 /**
- * @param {GDNamespace.PlatformExtension} extension
+ * @param {gd.PlatformExtension} extension
  * @param {(translationSource: string) => string} _
  * @param {GDNamespace} gd
  */
@@ -1011,7 +1011,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Columns'))
         .setDescription(_('Number of columns.'))
-        .setHidden()
+        .setHidden(true)
     );
     objectProperties.set(
       'rowCount',
@@ -1024,7 +1024,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Rows'))
         .setDescription(_('Number of rows.'))
-        .setHidden()
+        .setHidden(true)
     );
     objectProperties.set(
       'tileSize',
@@ -1037,7 +1037,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setType('number')
         .setLabel(_('Tile size'))
         .setDescription(_('Tile size in pixels.'))
-        .setHidden() // Hidden because a full editor is needed to recompute column/row counts
+        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
     );
     objectProperties.set(
       'tilesWithHitBox',
@@ -1047,7 +1047,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .setDescription(
           _('The list of tile ids with a hit box (separated by commas).')
         )
-        .setHidden()
+        .setHidden(true)
     );
 
     objectProperties.set(
@@ -1057,7 +1057,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
         .addExtraInfo('image')
         .setLabel(_('Atlas image'))
         .setDescription(_('The Atlas image containing the tileset.'))
-        .setHidden() // Hidden because a full editor is needed to recompute column/row counts
+        .setHidden(true) // Hidden because a full editor is needed to recompute column/row counts
     );
 
     return objectProperties;
@@ -1090,7 +1090,7 @@ const defineSimpleTileMap = function (extension, _, gd) {
       .setValue(instance.getRawStringProperty('tileMap'))
       .setType('string')
       .setLabel('Tilemap')
-      .setHidden();
+      .setHidden(true);
 
     return instanceProperties;
   };

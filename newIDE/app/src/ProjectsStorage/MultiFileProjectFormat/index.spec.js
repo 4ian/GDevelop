@@ -479,7 +479,7 @@ mode = "embedded"
     withEmptyConfig.globalConfig = {};
     const filesWithEmptyConfig = decomposeLegacyProjectToFiles(withEmptyConfig);
     expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain(
-      '[gdevelopConfig]'
+      '[globalConfig]'
     );
     expect(filesWithEmptyConfig[MULTI_FILE_CONFIG_URI]).toContain('[settings]');
     expect(
@@ -1260,7 +1260,7 @@ objects = [ "Player" ]
 
   test('stores unsupported TOML values as canonical raw JSON pointers', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
-    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[gdevelopConfig.rawJson]');
+    expect(files[MULTI_FILE_CONFIG_URI]).toContain('[globalConfig.rawJson]');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('[settings.rawJson]');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('userOwned = "kept"');
     expect(files[MULTI_FILE_CONFIG_URI]).toContain('"/nullable" = "null"');

@@ -362,7 +362,7 @@ the next dispatch. The scene does not receive this object-targeted signal.
 `config.settings`:
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.signals.card]

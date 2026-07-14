@@ -387,7 +387,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     requiredFields: [],
     commonFields: ['arbitrary project global configuration'],
     note:
-      'Format metadata belongs in [gdevelopConfig]; global configuration belongs in the short local [settings] table.',
+      'Format metadata belongs in [globalConfig]; global configuration belongs in the short local [settings] table.',
   },
   {
     kind: 'scene',

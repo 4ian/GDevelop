@@ -1763,7 +1763,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       asObject(project.globalConfig, 'Project globalConfig')
     );
     const metadataSource = serializeToml({
-      gdevelopConfig: {
+      globalConfig: {
         settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
         ...(Object.keys(rawJson).length ? { rawJson } : {}),
       },
@@ -2036,18 +2036,18 @@ const parseSettings = (files, uri) => {
   const localDocument = parseTomlSource(source, uri);
   if (uri === MULTI_FILE_CONFIG_URI) {
     if (
-      !localDocument.gdevelopConfig ||
+      !localDocument.globalConfig ||
       !localDocument.settings ||
       localDocument.project !== undefined
     ) {
       fail(
         'MULTIFILE_INVALID_LOCAL_SETTINGS',
-        'config.settings must contain only local gdevelopConfig and settings tables.',
+        'config.settings must contain only local globalConfig and settings tables.',
         uri
       );
     }
     return {
-      gdevelopConfig: localDocument.gdevelopConfig,
+      globalConfig: localDocument.globalConfig,
       project: { globalConfig: localDocument.settings },
     };
   }
@@ -2867,15 +2867,15 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     settingsUris.push(uri);
     const configDocument = parseSettings(files, uri);
     const configMetadata = asObject(
-      configDocument.gdevelopConfig,
-      'gdevelopConfig',
+      configDocument.globalConfig,
+      'globalConfig',
       uri
     );
     Object.keys(configMetadata).forEach(key => {
       if (!['settingsFormatVersion', 'rawJson'].includes(key)) {
         fail(
           'MULTIFILE_INVALID_SCHEMA',
-          `Unknown gdevelopConfig field ${key}.`,
+          `Unknown globalConfig field ${key}.`,
           uri
         );
       }

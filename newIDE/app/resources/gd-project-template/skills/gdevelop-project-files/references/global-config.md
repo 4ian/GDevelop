@@ -55,8 +55,8 @@ add a reference to it in `project.settings`.
 
 Ownership is strict:
 
-- `[gdevelopConfig]` is format metadata owned by the multi-file serializer.
-- `[gdevelopConfig.rawJson]` is format-owned fallback storage for JSON values
+- `[globalConfig]` is format metadata owned by the multi-file serializer.
+- `[globalConfig.rawJson]` is format-owned fallback storage for JSON values
   that cannot be represented directly by the TOML projection.
 - `[settings]` and its descendants are user configuration data.
 - `project.settings` must not contain a global-config table in newly authored
@@ -65,7 +65,7 @@ Ownership is strict:
 Minimal empty source:
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings]
@@ -86,7 +86,7 @@ fragment.
 Example project configuration:
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.gameplay]
@@ -167,16 +167,16 @@ title = "Play"
 
 The multi-file serializer projects JSON into TOML, but JSON `null` and certain
 arrays have no lossless direct representation under this contract. Store those
-values as canonical JSON text in `[gdevelopConfig.rawJson]`, keyed by RFC 6901
+values as canonical JSON text in `[globalConfig.rawJson]`, keyed by RFC 6901
 JSON Pointer.
 
 Example:
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
-[gdevelopConfig.rawJson]
+[globalConfig.rawJson]
 "/optionalValue" = "null"
 "/mixed" = '[1,"two",true]'
 "/cards/Sunflower/rewards" = '[null,{"kind":"coin","amount":2}]'
@@ -203,7 +203,7 @@ Rules for raw JSON entries:
 
 `[settings.rawJson]` is not serializer metadata. It is an ordinary,
 legal user key named `rawJson` and must be preserved independently from
-`[gdevelopConfig.rawJson]`.
+`[globalConfig.rawJson]`.
 
 Do not hand-convert ordinary strings/numbers/booleans to raw JSON. Use the
 fallback only where the value cannot be represented losslessly, and preserve
@@ -427,7 +427,7 @@ paths.
 ### Balance data plus feature defaults
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.features]
@@ -449,7 +449,7 @@ variables at initialization only if gameplay must later mutate them.
 ### Arrays and special keys
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.waves]
@@ -470,7 +470,7 @@ Placeholders:
 ### Static signal-name registry
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.signals.inventory]
@@ -502,10 +502,10 @@ Conceptual JSON:
 Canonical source:
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
-[gdevelopConfig.rawJson]
+[globalConfig.rawJson]
 "/release/label" = "null"
 "/spawnPattern" = '[1,"elite",true]'
 
@@ -517,7 +517,7 @@ channel = "preview"
 
 - Read the whole current `config.settings` before modifying one subtree.
 - Edit only `[settings]` data and intentionally owned raw JSON
-  pointers; preserve `[gdevelopConfig]` fields.
+  pointers; preserve `[globalConfig]` fields.
 - Keep `settingsFormatVersion = 1` and reject unknown metadata keys rather than
   moving them into user config.
 - Do not duplicate config in `project.settings`.
@@ -578,7 +578,7 @@ error with a fabricated value unless that default is part of the user's design.
 
 - Decide explicitly why the data is static config rather than runtime state.
 - Read the complete `config.settings` and relevant owner `.settings`/events.
-- Preserve `[gdevelopConfig]`; author user data only below
+- Preserve `[globalConfig]`; author user data only below
   `[settings]`.
 - Use TOML for directly representable values and canonical raw JSON pointers
   only for lossless fallback cases.

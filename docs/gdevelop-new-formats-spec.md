@@ -433,7 +433,7 @@ Additional rules for stored fragments and their combined shape:
 - Every settings file owns exactly one local component document. The physical
   path supplies its unique mounted namespace. `project.settings` keeps format
   bootstrap scalars at its root. `config.settings` uses the short local
-  `[gdevelopConfig]` and `[settings]` tables because global config is arbitrary
+  `[globalConfig]` and `[settings]` tables because global config is arbitrary
   user data.
 - A file must not declare or reopen a table owned by another settings file.
 - There are no `sceneFiles`, `extensionFiles`, `functionFiles`, `prefabFiles`,
@@ -667,7 +667,7 @@ value that TOML cannot represent without changing type is stored as canonical
 JSON text and reapplied by JSON Pointer:
 
 ```toml
-[gdevelopConfig.rawJson]
+[globalConfig.rawJson]
 "/arbitrary" = "null"
 "/mixed" = '''[1,"two"]'''
 ```
@@ -675,7 +675,7 @@ JSON text and reapplied by JSON Pointer:
 Rules for `rawJson`:
 
 - For ordinary component documents the table is the short local `[rawJson]`
-  table. `config.settings` uses `[gdevelopConfig.rawJson]` for format-owned
+  table. `config.settings` uses `[globalConfig.rawJson]` for format-owned
   pointers and `[settings.rawJson]` for a user-owned `rawJson` member.
 - Keys are RFC 6901 JSON Pointers relative to the component's legacy payload.
 - Values are canonical JSON text.
@@ -881,7 +881,7 @@ when composing the legacy `resources` object.
 ### 6.5 `config.settings` example
 
 ```toml
-[gdevelopConfig]
+[globalConfig]
 settingsFormatVersion = 1
 
 [settings.sheet.row]
@@ -897,7 +897,7 @@ column2 = "third"
 by another settings file. No format markers are inserted beneath
 local `[settings]`, because every key there belongs to the user-defined
 configuration. Unsupported TOML value shapes use the format-owned
-`[gdevelopConfig.rawJson]` table with JSON Pointers relative to the
+`[globalConfig.rawJson]` table with JSON Pointers relative to the
 global-config root. This separate namespace ensures that a user-defined
 `project.globalConfig.rawJson` key remains ordinary user data.
 
@@ -1654,7 +1654,7 @@ and validated after bootstrap. The DSL has no `@exact` fallback.
 5. Validate fragment identities, duplicate namespaces/paths, ordering, owner
    relationships, required pairs, and `settingsFormatVersion` for marker-bearing
    component fragments. Validate `config.settings` by its fixed path,
-   format-owned `[gdevelopConfig]` marker, and exclusive
+   format-owned `[globalConfig]` marker, and exclusive
    local `[settings]` ownership mounted at `project.globalConfig`.
 6. Resolve all authoritative layout/events URIs, then read those sources with
    a bounded concurrency limit.

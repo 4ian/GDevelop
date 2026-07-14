@@ -114,7 +114,7 @@ generated compatibility/runtime output, not multi-file source.
   example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
 - `config.settings`: edit global configuration only under the short local
   `[settings]` table; preserve arbitrary keys and the format-owned
-  `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
+  `[globalConfig]`/`[globalConfig.rawJson]` tables.
 - `.layout`: Layout DSL component-tree markup containing placement/layout data
   only: instances, layers, spatial bounds, background, and editor view state.
   Never put TOML, object definitions, or attached behavior definitions in a

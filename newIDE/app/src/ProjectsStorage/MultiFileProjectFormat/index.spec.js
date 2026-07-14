@@ -312,10 +312,15 @@ describe('GDevelop multi-file project format', () => {
       });
   });
 
-  test('omits scene shared-data entries for behaviors without shared properties', () => {
+  test('omits empty scene shared-data entries for custom and native behaviors', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.layouts[0].behaviorsSharedData = [
       { name: 'Health', type: 'Combat::Health' },
+      {
+        name: 'Platform',
+        type: 'PlatformBehavior::PlatformBehavior',
+        quickCustomizationVisibility: 'hidden',
+      },
     ];
 
     const files = decomposeLegacyProjectToFiles(project);

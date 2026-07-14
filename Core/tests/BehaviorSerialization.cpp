@@ -141,11 +141,16 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
-  SECTION("A custom behavior without shared properties has no scene shared data") {
+  SECTION("Behaviors without shared properties have no scene shared data") {
     gd::Platform platform;
     gd::Project project;
     SetupProject(project, platform);
     auto &layout = project.GetLayout("Scene");
+    auto &object = layout.GetObjects().GetObject("MyObject");
+    REQUIRE(object.AddNewBehavior(
+                project,
+                "ResizableCapability::ResizableBehavior",
+                "Resizable") != nullptr);
 
     layout.UpdateBehaviorsSharedData(project);
 
@@ -202,6 +207,11 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     staleSharedData.SetAttribute("name", "MyEventsBasedBehavior");
     staleSharedData.SetAttribute(
         "type", "MyEventsExtension::MyEventsBasedBehavior");
+    auto &staleNativeSharedData =
+        sharedDataElement.AddChild("behaviorSharedData");
+    staleNativeSharedData.SetAttribute("name", "Resizable");
+    staleNativeSharedData.SetAttribute(
+        "type", "ResizableCapability::ResizableBehavior");
 
     gd::Project readProject;
     readProject.AddPlatform(platform);

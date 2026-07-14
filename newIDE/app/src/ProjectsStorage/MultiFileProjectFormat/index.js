@@ -1594,25 +1594,14 @@ const splitBehavior = ({
   };
 };
 
-const getEventsBasedBehaviorTypesWithoutSharedProperties = project => {
-  const behaviorTypes = new Set();
-  (project.eventsFunctionsExtensions || []).forEach(extension => {
-    (extension.eventsBasedBehaviors || []).forEach(behavior => {
-      if (
-        !Array.isArray(behavior.sharedPropertyDescriptors) ||
-        behavior.sharedPropertyDescriptors.length === 0
-      ) {
-        behaviorTypes.add(`${extension.name}::${behavior.name}`);
-      }
-    });
-  });
-  return behaviorTypes;
-};
+const BEHAVIOR_SHARED_DATA_METADATA_FIELDS = new Set([
+  'name',
+  'type',
+  'propertiesQuickCustomizationVisibilities',
+  'quickCustomizationVisibility',
+]);
 
-const removeEmptyEventsBasedBehaviorSharedData = (
-  layout,
-  behaviorTypesWithoutSharedProperties
-) =>
+const removeEmptyBehaviorSharedData = layout =>
   !Array.isArray(layout.behaviorsSharedData)
     ? layout
     : {
@@ -1620,7 +1609,11 @@ const removeEmptyEventsBasedBehaviorSharedData = (
         behaviorsSharedData: layout.behaviorsSharedData.filter(
           sharedData =>
             !sharedData ||
-            !behaviorTypesWithoutSharedProperties.has(sharedData.type)
+            typeof sharedData !== 'object' ||
+            Array.isArray(sharedData) ||
+            Object.keys(sharedData).some(
+              field => !BEHAVIOR_SHARED_DATA_METADATA_FIELDS.has(field)
+            )
         ),
       };
 
@@ -1630,9 +1623,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
-  const behaviorTypesWithoutSharedProperties = getEventsBasedBehaviorTypesWithoutSharedProperties(
-    project
-  );
 
   splitObjectDefinitions({
     objects: project.objects,
@@ -1678,9 +1668,8 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   }
 
   (project.layouts || []).forEach((layout, order) => {
-    const layoutWithoutEmptyBehaviorSharedData = removeEmptyEventsBasedBehaviorSharedData(
-      layout,
-      behaviorTypesWithoutSharedProperties
+    const layoutWithoutEmptyBehaviorSharedData = removeEmptyBehaviorSharedData(
+      layout
     );
     const name = String(layout.name || '');
     const folderName = uniqueManagedName(name, sceneNames);

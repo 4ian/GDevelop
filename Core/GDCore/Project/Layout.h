@@ -262,8 +262,8 @@ class GD_CORE_API Layout {
   /**
    * This ensures that the scene has an instance of shared data for every
    * behavior with shared properties on every object that can be used on the
-   * scene (i.e. the objects of the scene and the global objects). Events-based
-   * behaviors without shared properties don't have a shared-data instance.
+   * scene (i.e. the objects of the scene and the global objects). Behaviors
+   * without shared properties don't have a shared-data instance.
    *
    * Must be called when a behavior have been added/deleted
    * or when a scene have been added to a project.

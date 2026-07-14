@@ -177,18 +177,30 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
     const gd::String& name = allBehaviorsNames[i];
     const gd::String& type = allBehaviorsTypes[i];
 
-    // Events-based behaviors without shared properties don't need a scene
-    // shared-data entry. Remove a stale entry as well, for example after the
-    // last shared property has been removed from the behavior.
-    if (project.HasEventsBasedBehavior(type) &&
-        project.GetEventsBasedBehavior(type)
-            .GetSharedPropertyDescriptors()
-            .IsEmpty()) {
-      behaviorsSharedData.erase(name);
+    bool isKnownBehaviorType = project.HasEventsBasedBehavior(type);
+    if (!isKnownBehaviorType) {
+      const gd::BehaviorMetadata& behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              project.GetCurrentPlatform(), type);
+      isKnownBehaviorType =
+          !gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata);
+    }
+
+    auto existingSharedData = behaviorsSharedData.find(name);
+    if (existingSharedData != behaviorsSharedData.end()) {
+      // Remove stale placeholders after the last shared property is removed.
+      // Keep unknown behavior data so a temporarily missing extension doesn't
+      // cause data loss.
+      if (isKnownBehaviorType &&
+          existingSharedData->second->GetProperties().empty()) {
+        behaviorsSharedData.erase(existingSharedData);
+      }
       continue;
     }
 
-    if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
+    // Don't synthesize an empty placeholder for an unknown behavior. Existing
+    // unknown shared data is preserved by the branch above.
+    if (!isKnownBehaviorType) continue;
 
     auto sharedData = CreateBehaviorsSharedData(project, name, type);
     if (sharedData) {
@@ -250,6 +262,7 @@ std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(
   sharedData->SetName(name);
   sharedData->SetTypeName(behaviorsType);
   sharedData->InitializeContent();
+  if (sharedData->GetProperties().empty()) return nullptr;
   return std::unique_ptr<gd::BehaviorsSharedData>(sharedData);
 }
 

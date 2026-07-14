@@ -566,6 +566,7 @@ namespace gdjs {
           this._collisionMaskTag,
           this._layerIndex
         );
+      this.invalidateTransformation();
       }
       return this._tileMap;
     }

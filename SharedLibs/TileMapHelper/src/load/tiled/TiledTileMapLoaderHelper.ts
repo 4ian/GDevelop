@@ -105,7 +105,7 @@ export const extractTileUidFlippedStates = (
  * @return the tile identifier.
  */
 export function getTileIdFromTiledGUI(
-  tiledGUI: number | undefined
+  tiledGUI: number
 ): number | undefined {
   return tiledGUI === 0 ? undefined : tiledGUI - 1;
 }

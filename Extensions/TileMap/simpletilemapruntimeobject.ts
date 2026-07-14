@@ -252,10 +252,7 @@ namespace gdjs {
             this._collisionTileMap.updateFromTileMap(tileMap);
           } else {
             this._collisionTileMap =
-              new gdjs.TileMap.TransformedCollisionTileMap(
-                tileMap,
-                hitBoxTag
-              );
+              new gdjs.TileMap.TransformedCollisionTileMap(tileMap, hitBoxTag);
           }
 
           this.invalidateTransformation();

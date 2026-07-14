@@ -85,6 +85,21 @@ describe('getLocalProjectLastModifiedDate', () => {
     expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(200000);
   });
 
+  it('ignores Static Data changes', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    writeFileWithModificationTime(entryPath, 100000);
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'scenes', 'Main', 'Main.events'),
+      200000
+    );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'static-data.toml'),
+      300000
+    );
+
+    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(200000);
+  });
+
   it('checks the entry file for a legacy single-file project', async () => {
     const entryPath = path.join(temporaryDirectory, 'game.json');
     writeFileWithModificationTime(entryPath, 600000);

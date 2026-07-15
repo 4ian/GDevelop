@@ -76,6 +76,17 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
       const auto &objectsContainersList =
           projectScopedContainers.GetObjectsContainersList();
       rootObjectName = instruction.GetParameter(0).GetPlainString();
+
+      // Extensions still rely on undeclared object variables.
+      auto objectSourceType =
+          projectScopedContainers.GetObjectsContainersList()
+              .GetObjectsContainerFromObjectName(rootObjectName)
+              ->GetSourceType();
+      // TODO Check child-object variables while keep ignoring object variables
+      // from parameters.
+      if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
+        rootObjectName = "";
+      }
     }
     auto &expressionNode =
         *instruction.GetParameter(parameterIndex).GetRootNode();

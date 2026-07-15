@@ -382,6 +382,7 @@ interface ObjectRefactorer {
         [Ref] gdObject obj,
         [ Const, Ref ] VariablesContainer groupVariablesContainer);
     void STATIC_FillMissingGroupBehaviorToObject(
+        [Const, Ref] Platform platform,
         [Ref] ObjectsContainer globalObjectsContainer,
         [Ref] ObjectsContainer objectsContainer,
         [Ref] gdObject obj,

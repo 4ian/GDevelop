@@ -14,6 +14,7 @@ class Object;
 class ObjectsContainersList;
 class ObjectsContainer;
 class ObjectGroup;
+class Platform;
 class VariablesContainer;
 struct VariablesChangeset;
 } // namespace gd
@@ -76,6 +77,7 @@ public:
    * group.
    */
   static void FillMissingGroupBehaviorToObject(
+      const gd::Platform& platform,
       gd::ObjectsContainer &globalObjectsContainer,
       gd::ObjectsContainer &objectsContainer, gd::Object &object,
       const gd::ObjectGroup &objectGroup, const gd::String &behaviorName);

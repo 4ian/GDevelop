@@ -559,6 +559,7 @@ export const validateSerializedProject = (
       sourceFiles: args.javascript_source_files,
       runtimeApiDeclaration: args.runtime_api_declaration,
       projectApiDeclaration: args.project_api_declaration,
+      typescript: args.typescript,
     });
     const errors = [
       ...projectValidationErrors.map(error => ({
@@ -577,6 +578,8 @@ export const validateSerializedProject = (
       projectValidationErrors,
       extensionLintFailures,
       javascriptAuthoring,
+      environmentDiagnostics: javascriptAuthoring.environmentDiagnostics || [],
+      sourceDiagnostics: javascriptAuthoring.sourceDiagnostics || [],
       errors,
       generatedCodePreflight:
         args.include_generated_code === false ? 'skipped' : 'checked',
@@ -586,7 +589,9 @@ export const validateSerializedProject = (
         projectValidation: 'checked',
         extensionGeneratedCode:
           args.include_generated_code === false ? 'skipped' : 'checked',
-        javascriptAuthoringApi: 'checked',
+        javascriptAuthoringApi: javascriptAuthoring.checked
+          ? 'checked'
+          : 'typescript-unavailable',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,

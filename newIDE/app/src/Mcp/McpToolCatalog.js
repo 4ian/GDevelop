@@ -1714,7 +1714,7 @@ const controlPreviewSchema = {
     action: {
       type: 'string',
       description:
-        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews directly), or focus (bring all preview windows to front - fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step. For stale-preview cleanup before verification, prefer save_and_relaunch_preview_paused so cleanup and relaunch happen as one supported workflow.',
+        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews directly), or focus (bring all preview windows to front - fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step. For stale-preview cleanup before verification, close all previews here, then call launch_preview with start_paused=true and force_new=true.',
     },
     frames: {
       type: 'number',
@@ -1728,7 +1728,7 @@ const controlPreviewSchema = {
     close_all: {
       type: 'boolean',
       description:
-        'For action=close: close ALL running previews instead of just the targeted one. For stale-preview cleanup before runtime verification, prefer save_and_relaunch_preview_paused.',
+        'For action=close: close ALL running previews instead of just the targeted one. Then call launch_preview with start_paused=true and force_new=true for a fresh paused preview.',
     },
     debugger_id: {
       type: 'string',
@@ -1841,20 +1841,6 @@ const launchPreviewSchema = {
     },
   },
   additionalProperties: false,
-};
-
-const saveAndRelaunchPreviewPausedSchema = {
-  type: 'object',
-  properties: {
-    scene_name: launchPreviewSchema.properties.scene_name,
-    timeout_ms: launchPreviewSchema.properties.timeout_ms,
-    relaunch_attempts: {
-      type: 'number',
-      description:
-        'Number of fresh launch attempts after awaited preview cleanup. Defaults to 2, maximum 4, with exponential backoff.',
-    },
-  },
-  additionalProperties: true,
 };
 
 const setRuntimeStateSchema = {
@@ -4932,7 +4918,7 @@ const commandTools: Array<McpTool> = [
   {
     name: 'gdevelop_run_command',
     description:
-      'Run a GDevelop command palette command by name. SAVE_PROJECT is special-cased to await completion and return verified persistence evidence. Other commands report launch only. CLOSE_PREVIEW is not a command; use save_and_relaunch_preview_paused for stale preview cleanup.',
+      'Run a GDevelop command palette command by name. SAVE_PROJECT is special-cased to await completion and return verified persistence evidence. Other commands report launch only. CLOSE_PREVIEW is not a command; use control_preview with action=close and close_all=true, then launch_preview with start_paused=true and force_new=true.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -4950,12 +4936,6 @@ const commandTools: Array<McpTool> = [
     description:
       'Save the current project, await completion, then compare canonical editor and disk hashes. Returns project path, timestamps, dirty counts, disk write evidence, hashesMatch, and a reason distinguishing saved, nothing changed, not marked dirty, save failure, and verification failure.',
     inputSchema: emptyObjectSchema,
-  },
-  {
-    name: 'save_and_relaunch_preview_paused',
-    description:
-      "Save with persistence evidence, await stale preview/window cleanup, then launch a fresh paused debug preview with retry and exponential backoff. Reports requested, attempted, and confirmed pause states plus every launch attempt and a fallback recovery workflow. By default previews the project's first scene; pass scene_name for a specific layout.",
-    inputSchema: saveAndRelaunchPreviewPausedSchema,
   },
 ];
 
@@ -6606,22 +6586,6 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  save_and_relaunch_preview_paused: [
-    {
-      description:
-        'Recover from stale extension edits by saving, closing previews, and relaunching one paused debug preview.',
-      arguments: {
-        timeout_ms: 10000,
-      },
-    },
-    {
-      description:
-        'Save and relaunch a paused preview on a specific scene after editing it.',
-      arguments: {
-        scene_name: 'main',
-      },
-    },
-  ],
   add_or_edit_variable: [
     {
       description: 'Create or update a scene variable before writing events.',
@@ -7034,7 +6998,6 @@ export const getCapabilitiesSummary = (
       'run_frames',
       'preview_health_check',
       'gdevelop_inspect_running_preview',
-      'save_and_relaunch_preview_paused',
       'capture_preview_screenshot',
       'render_scene_to_png',
       'control_preview',

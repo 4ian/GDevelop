@@ -1,10 +1,18 @@
 // @flow
 
 import { sha256 } from 'js-sha256';
-import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+import optionalRequire from '../Utils/OptionalRequire';
 import { extractIfDoJavaScriptBlocks } from '../EventsSheet/IfDoEventsDsl';
 
-const loadTypeScript = optionalLazyRequire('typescript');
+let cachedTypeScript = null;
+const loadTypeScriptChecker = (): any => {
+  if (cachedTypeScript) return cachedTypeScript;
+  const typescript = optionalRequire('typescript');
+  // Cache successful resolution only. Electron/npm setup can become available
+  // later in the same process, so an early miss must not poison validation.
+  if (typescript) cachedTypeScript = typescript;
+  return typescript;
+};
 
 export const JAVASCRIPT_AUTHORING_API_VERSION = 1;
 export const PROJECT_RUNTIME_API_RELATIVE_PATH = '.gdevelop/runtime-api.d.ts';
@@ -930,23 +938,12 @@ const FORBIDDEN_GLOBALS = new Set([
 
 const validateBlockWithTypeScript = ({
   block,
+  typescript,
   runtimeApiDeclaration,
   projectApiDeclaration,
   model,
   compilerState,
 }: Object): Array<Object> => {
-  const typescript = loadTypeScript();
-  if (!typescript) {
-    return [
-      makeDiagnostic({
-        code: 'JS_API_TYPESCRIPT_UNAVAILABLE',
-        message:
-          'The TypeScript checker is unavailable; JavaScript API validation was skipped.',
-        block,
-        severity: block.useStrict ? 'error' : 'warning',
-      }),
-    ];
-  }
   const ts = typescript;
   const root = 'C:/__gdevelop_javascript_api__';
   const runtimePath = `${root}/runtime-api.d.ts`;
@@ -1166,7 +1163,26 @@ export const validateJavaScriptAuthoringBlocks = ({
   serializedProject,
   runtimeApiDeclaration,
   projectApiDeclaration,
+  typescript: typescriptOverride,
 }: Object): Object => {
+  const typescript =
+    typescriptOverride === undefined
+      ? loadTypeScriptChecker()
+      : typescriptOverride;
+  const strictBlocks = blocks.filter(block => block.useStrict).length;
+  const environmentDiagnostics = typescript
+    ? []
+    : [
+        {
+          severity: strictBlocks ? 'error' : 'warning',
+          phase: 'javascript-authoring-environment',
+          code: 'JS_API_TYPESCRIPT_UNAVAILABLE',
+          message:
+            'The TypeScript checker is unavailable; JavaScript source validation was skipped. Install the validator runtime dependency before relying on validate_project_files.',
+          scope: 'validator',
+          affectedBlocks: blocks.length,
+        },
+      ];
   const runtimeDeclaration =
     runtimeApiDeclaration || buildRuntimeApiDeclaration();
   const projectDeclaration =
@@ -1187,29 +1203,39 @@ export const validateJavaScriptAuthoringBlocks = ({
       code: 'JS_API_RESOURCE_LIMIT',
       message: `JavaScript validation is limited to ${MAX_JAVASCRIPT_BLOCKS} blocks and ${MAX_JAVASCRIPT_SOURCE_SIZE} source characters.`,
     };
+    const diagnostics = [...environmentDiagnostics, diagnostic];
     return {
-      checked: true,
+      checked: !!typescript,
       valid: false,
       blocks: blocks.length,
-      strictBlocks: blocks.filter(block => block.useStrict).length,
-      errors: [diagnostic],
-      warnings: [],
-      diagnostics: [diagnostic],
+      strictBlocks,
+      checkedBlocks: 0,
+      typescriptAvailable: !!typescript,
+      typescriptVersion: typescript ? String(typescript.version || '') : null,
+      environmentDiagnostics,
+      sourceDiagnostics: [diagnostic],
+      errors: diagnostics.filter(item => item.severity === 'error'),
+      warnings: diagnostics.filter(item => item.severity === 'warning'),
+      diagnostics,
     };
   }
-  const diagnostics: Array<Object> = [];
+  const sourceDiagnostics: Array<Object> = [];
   const compilerState = { program: null };
-  blocks.forEach(block =>
-    diagnostics.push(
-      ...validateBlockWithTypeScript({
-        block,
-        runtimeApiDeclaration: runtimeDeclaration,
-        projectApiDeclaration: projectDeclaration,
-        model,
-        compilerState,
-      })
-    )
-  );
+  if (typescript) {
+    blocks.forEach(block =>
+      sourceDiagnostics.push(
+        ...validateBlockWithTypeScript({
+          block,
+          typescript,
+          runtimeApiDeclaration: runtimeDeclaration,
+          projectApiDeclaration: projectDeclaration,
+          model,
+          compilerState,
+        })
+      )
+    );
+  }
+  const diagnostics = [...environmentDiagnostics, ...sourceDiagnostics];
   const errors = diagnostics.filter(
     diagnostic => diagnostic.severity === 'error'
   );
@@ -1217,12 +1243,17 @@ export const validateJavaScriptAuthoringBlocks = ({
     diagnostic => diagnostic.severity === 'warning'
   );
   return {
-    checked: true,
+    checked: !!typescript,
     valid: errors.length === 0,
     blocks: blocks.length,
-    strictBlocks: blocks.filter(block => block.useStrict).length,
+    strictBlocks,
+    checkedBlocks: typescript ? blocks.length : 0,
+    typescriptAvailable: !!typescript,
+    typescriptVersion: typescript ? String(typescript.version || '') : null,
     runtimeApiHash: sha256(runtimeDeclaration),
     projectApiHash: sha256(projectDeclaration),
+    environmentDiagnostics,
+    sourceDiagnostics,
     errors,
     warnings,
     diagnostics,
@@ -1234,6 +1265,7 @@ export const validateProjectJavaScriptAuthoring = ({
   sourceFiles,
   runtimeApiDeclaration,
   projectApiDeclaration,
+  typescript,
 }: Object): Object =>
   validateJavaScriptAuthoringBlocks({
     blocks: sourceFiles
@@ -1242,6 +1274,7 @@ export const validateProjectJavaScriptAuthoring = ({
     serializedProject,
     runtimeApiDeclaration,
     projectApiDeclaration,
+    typescript,
   });
 
 export const buildJavaScriptAuthoringArtifacts = (

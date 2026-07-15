@@ -324,6 +324,14 @@ describe('McpEditorBridge', () => {
           runtimeGameplaySemantics: 'not-verified',
         }),
         runtimeSemanticsVerified: false,
+        javascriptAuthoring: expect.objectContaining({
+          checked: true,
+          checkedBlocks: 0,
+          typescriptAvailable: true,
+          typescriptVersion: expect.any(String),
+          environmentDiagnostics: [],
+          sourceDiagnostics: [],
+        }),
         runtimeVerificationRecommendation: expect.stringContaining(
           'paused preview'
         ),
@@ -725,11 +733,11 @@ runtimeScene._instances.length;
     expect(result.responsive).toBe(false);
     expect(result.previewHealth).toBe('connected-unresponsive');
     expect(result.recommendedActions).toContain(
-      'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
+      'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }'
     );
   });
 
-  it('rejects CLOSE_PREVIEW as a command and points to preview relaunch cleanup', async () => {
+  it('keeps the unexposed command escape hatch unavailable', async () => {
     const runCommand = jest.fn();
     const bridge = makeBridge({
       getPermissions: () => ({
@@ -749,11 +757,9 @@ runtimeScene._instances.length;
 
     expect(response.isError).toBe(true);
     expect(response.content[0].text).toContain(
-      'CLOSE_PREVIEW is not a GDevelop command'
+      'Unknown MCP tool: gdevelop_run_command'
     );
-    expect(response.content[0].text).toContain(
-      'save_and_relaunch_preview_paused'
-    );
+    expect(response.content[0].text).not.toContain('relaunch_preview_paused');
     expect(runCommand).not.toHaveBeenCalled();
   });
 
@@ -3726,7 +3732,7 @@ runtimeScene._instances.length;
         'preview-ws-0',
       ]);
       expect(result.staleStateAdvisory.recommendedActions).toContain(
-        'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
+        'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }'
       );
       expect(result.staleStateAdvisory.editorPanelsMayBeStale).toEqual(
         expect.arrayContaining([
@@ -7672,7 +7678,7 @@ runtimeScene._instances.length;
     project.delete();
   });
 
-  it('saves, closes stale previews, relaunches paused, and inspects runtime state', async () => {
+  it('does not expose the retired save-and-relaunch preview helper', async () => {
     const saveProjectAndWait: any = jest.fn(async () => ({
       saved: true,
       consistency: { projectName: 'Preview Test' },
@@ -7801,31 +7807,12 @@ runtimeScene._instances.length;
     });
     const result = JSON.parse(response.content[0].text);
 
-    expect(response.isError).not.toBe(true);
-    expect(result.success).toBe(true);
-    expect(result.saved).toBe(true);
-    expect(result.closedWindows).toBe(true);
-    expect(result.closedDebuggerConnections).toBe(true);
-    expect(result.requestedPause).toBe(true);
-    expect(result.pauseAttempted).toBe(true);
-    expect(result.launch.pauseConfirmed).toBe(true);
-    expect(result.launchAttempts).toHaveLength(2);
-    expect(result.launchAttempts[0].success).toBe(false);
-    expect(result.launchAttempts[1].success).toBe(true);
-    expect(result.debuggerId).toBe('preview-ws-new');
-    expect(result.sceneName).toBe('Level1');
-    expect(result.runtime.objectInstanceCounts.Player).toBe(1);
-    expect(saveProjectAndWait).toHaveBeenCalled();
-    expect(closeAllPreviews).toHaveBeenCalled();
-    expect(closeAllConnections).toHaveBeenCalled();
-    expect(runCommand).toHaveBeenCalledTimes(2);
-    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
-    expect(
-      sent.some(
-        entry =>
-          entry.id === 'preview-ws-new' && entry.message.command === 'pause'
-      )
-    ).toBe(true);
+    expect(response.isError).toBe(true);
+    expect(result.error).toContain('Unknown MCP tool');
+    expect(saveProjectAndWait).not.toHaveBeenCalled();
+    expect(closeAllPreviews).not.toHaveBeenCalled();
+    expect(closeAllConnections).not.toHaveBeenCalled();
+    expect(runCommand).not.toHaveBeenCalled();
   });
 
   it('launch_preview reports not ready when a new preview connects but never answers getStatus', async () => {

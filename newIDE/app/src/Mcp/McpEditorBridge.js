@@ -27,6 +27,10 @@ import {
   resolveGameUriToPath,
 } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import {
+  buildBehaviorPropertySchemasByType,
+  validateProjectSettingsCatalog,
+} from '../ProjectsStorage/ProjectSourceCatalog';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import { type EditorCallbacks } from '../EditorFunctions';
@@ -167,10 +171,10 @@ const hasOwn = (object: any, propertyName: string): boolean =>
 let nextTargetedRequestId = 1;
 
 const PREVIEW_CLEANUP_RELAUNCH_ACTION =
-  'save_and_relaunch_preview_paused { timeout_ms: 10000 }';
+  'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }';
 
 const closePreviewCommandError =
-  'CLOSE_PREVIEW is not a GDevelop command. For stale preview cleanup, call save_and_relaunch_preview_paused; it saves the project, closes stale previews through the preview launcher, launches one fresh paused debug preview, and waits for runtime readiness.';
+  'CLOSE_PREVIEW is not a GDevelop command. For stale preview cleanup, call control_preview with action="close" and close_all=true, then call launch_preview with start_paused=true and force_new=true.';
 
 // Score a behavior store header against space-separated query tokens. Returns 0
 // for no match; higher is a better match. Every token must match somewhere.
@@ -1821,7 +1825,7 @@ const captureRunningPreviewState = (
         }),
         note: dumpPayload
           ? undefined
-          : `No runtime dump was received before the timeout - the preview connected but did not respond. Remediation: use ${PREVIEW_CLEANUP_RELAUNCH_ACTION} to save, close stale previews, and launch one paused preview; then advance with run_frames. You can also increase timeout_ms. status/logs may still be useful.`,
+          : `No runtime dump was received before the timeout - the preview connected but did not respond. Remediation: use ${PREVIEW_CLEANUP_RELAUNCH_ACTION} to close stale previews and launch one paused preview; then advance with run_frames. You can also increase timeout_ms. status/logs may still be useful.`,
       });
     };
 
@@ -2715,7 +2719,7 @@ const runPreviewFrames = async (
       failurePhase: 'renderer-response',
       debuggerId: targetId,
       error:
-        'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or use save_and_relaunch_preview_paused to clean up stale previews and relaunch.',
+        'run_frames timed out: the targeted preview did not reply. The window may still be loading; retry, or close all previews with control_preview and relaunch with launch_preview using start_paused=true and force_new=true.',
       requestedFrames: frames,
       steppedFrames: 0,
       stoppedEarly: true,
@@ -3061,7 +3065,7 @@ const previewHealthCheck = async (
           ],
     note: responsive
       ? 'The selected preview replied to a debugger status ping.'
-      : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, run save_and_relaunch_preview_paused so cleanup happens through the preview relaunch path.',
+      : 'Use this before screenshots/runtime tests when the debugger channel looks stale. For a connected-but-unresponsive preview, close all previews with control_preview, then relaunch with launch_preview using start_paused=true and force_new=true.',
   };
 };
 
@@ -3571,7 +3575,7 @@ const buildStaleStateAdvisory = (
       : [],
     editorPanelsMayBeStale,
     message: previewMayBeStale
-      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; use save_and_relaunch_preview_paused before final runtime verification.'
+      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; close all previews with control_preview, then call launch_preview with start_paused=true and force_new=true before final runtime verification.'
       : 'The project changed through MCP. No running preview was detected, but already-open editor panels can still need a refresh if they show old state.',
   };
 };
@@ -4314,7 +4318,7 @@ const launchPreview = async (
           readiness,
           startPaused,
           note:
-            'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Use save_and_relaunch_preview_paused to clean up stale previews and relaunch one paused preview.',
+            'Attached to an already-connected preview window, but its runtime debugger did not answer getStatus. Close all previews with control_preview, then call launch_preview with start_paused=true and force_new=true.',
         });
       }
     }
@@ -4405,7 +4409,7 @@ const launchPreview = async (
       readiness,
       startPaused,
       note:
-        'Preview window/debugger id connected, but the runtime did not answer getStatus before the timeout. Treat this preview as not ready; use save_and_relaunch_preview_paused for cleanup and relaunch.',
+        'Preview window/debugger id connected, but the runtime did not answer getStatus before the timeout. Treat this preview as not ready; close all previews with control_preview, then call launch_preview with start_paused=true and force_new=true.',
     });
   }
 
@@ -5501,11 +5505,24 @@ const callMcpTool = async ({
       // Bootstrap without the potentially stale generated instruction catalog,
       // then regenerate every catalog from the disk-source project. Re-open the
       // sources afterward so final event compilation uses the fresh catalog.
-      const { catalogs } = await generateProjectSourceCatalogsFromDisk(
-        projectFile
+      const {
+        projectRoot,
+        catalogs,
+      } = await generateProjectSourceCatalogsFromDisk(projectFile);
+      const settingsCatalog = validateProjectSettingsCatalog(
+        JSON.parse(
+          fs.readFileSync(
+            path.join(projectRoot, '.gdevelop', 'settings-catalog.json'),
+            'utf8'
+          )
+        )
       );
-
-      const serializedProject = await openMultiFileProject(projectFile);
+      const behaviorPropertySchemasByType = buildBehaviorPropertySchemasByType(
+        settingsCatalog
+      );
+      const serializedProject = await openMultiFileProject(projectFile, {
+        behaviorPropertySchemasByType,
+      });
       const sourceTree = await readMultiFileSourceTree(projectFile);
       const generatedJson = JSON.stringify(serializedProject, null, 2);
       const generatedGameJson = {
@@ -5538,12 +5555,28 @@ const callMcpTool = async ({
               diagnostic =>
                 addProjectSourceLocationDetails(diagnostic, projectFile)
             ),
+            environmentDiagnostics: (
+              validation.javascriptAuthoring.environmentDiagnostics || []
+            ).map(diagnostic =>
+              addProjectSourceLocationDetails(diagnostic, projectFile)
+            ),
+            sourceDiagnostics: (
+              validation.javascriptAuthoring.sourceDiagnostics || []
+            ).map(diagnostic =>
+              addProjectSourceLocationDetails(diagnostic, projectFile)
+            ),
           }
         : validation.javascriptAuthoring;
       const sourceLocatedValidation = {
         ...validation,
         errors: sourceLocatedErrors,
         javascriptAuthoring,
+        environmentDiagnostics: (validation.environmentDiagnostics || []).map(
+          diagnostic => addProjectSourceLocationDetails(diagnostic, projectFile)
+        ),
+        sourceDiagnostics: (validation.sourceDiagnostics || []).map(
+          diagnostic => addProjectSourceLocationDetails(diagnostic, projectFile)
+        ),
       };
       if (!validation.valid) {
         return errorResult(
@@ -6588,149 +6621,6 @@ const callMcpTool = async ({
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(compareSceneEventsSemantics(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'save_and_relaunch_preview_paused') {
-    if (!context.saveProjectAndWait) {
-      return errorResult(
-        'The GDevelop host did not provide saveProjectAndWait, so MCP cannot save before relaunching the preview.'
-      );
-    }
-    const previewDebuggerServer = context.getPreviewDebuggerServer
-      ? context.getPreviewDebuggerServer()
-      : null;
-    try {
-      const save = await saveProjectWithEvidence(context);
-      let closedWindows = false;
-      let closedDebuggerConnections = false;
-      if (typeof context.closeAllPreviews === 'function') {
-        await Promise.resolve(context.closeAllPreviews());
-        closedWindows = true;
-      }
-      if (
-        previewDebuggerServer &&
-        typeof previewDebuggerServer.closeAllConnections === 'function'
-      ) {
-        previewDebuggerServer.closeAllConnections();
-        closedDebuggerConnections = true;
-      }
-      const closeWaitStartedAt = Date.now();
-      while (
-        previewDebuggerServer &&
-        getPreviewDebuggerIds(previewDebuggerServer).length > 0 &&
-        Date.now() - closeWaitStartedAt < 2000
-      ) {
-        await wait(50);
-      }
-
-      const maximumAttempts =
-        args && typeof args.relaunch_attempts === 'number'
-          ? Math.max(1, Math.min(4, Math.floor(args.relaunch_attempts)))
-          : 2;
-      const launchAttempts = [];
-      let launch = null;
-      for (let attempt = 1; attempt <= maximumAttempts; attempt++) {
-        launch = await launchPreview(
-          previewDebuggerServer,
-          context.runCommand,
-          {
-            ...(args || {}),
-            start_paused: true,
-            force_new: true,
-          },
-          {
-            getProject: context.getProject,
-            launchPreviewForScene: context.launchPreviewForScene,
-          }
-        );
-        launchAttempts.push({
-          attempt,
-          success: !!launch.success,
-          failurePhase: launch.failurePhase,
-          debuggerId: launch.debuggerId,
-          elapsedMs: launch.elapsedMs,
-          requestedPause: true,
-          pauseAttempted: !!launch.pauseAttempted,
-          pauseConfirmed: !!launch.pauseConfirmed,
-          error: launch.error,
-        });
-        if (launch.success) break;
-        if (attempt < maximumAttempts) {
-          // A connected-but-unresponsive launch can leave a stale websocket or
-          // window that the next attempt attaches to. Close it before backing
-          // off so every retry starts from a clean debugger lifecycle.
-          if (typeof context.closeAllPreviews === 'function') {
-            await Promise.resolve(context.closeAllPreviews());
-          }
-          if (
-            previewDebuggerServer &&
-            typeof previewDebuggerServer.closeAllConnections === 'function'
-          ) {
-            previewDebuggerServer.closeAllConnections();
-          }
-          await wait(250 * Math.pow(2, attempt - 1));
-        }
-      }
-      launch = launch || {
-        success: false,
-        failurePhase: 'window-launch',
-        error: 'No preview launch attempt was made.',
-      };
-      let inspect = null;
-      if (launch.success && launch.debuggerId) {
-        inspect = await captureRunningPreviewState(previewDebuggerServer, {
-          ...(args || {}),
-          debugger_id: launch.debuggerId,
-          timeout_ms: args && args.timeout_ms,
-        });
-      }
-      return textResult({
-        success: !!(save.success && launch && launch.success),
-        saved: !!save.saved,
-        save,
-        closedWindows,
-        closedDebuggerConnections,
-        closeWaitMs: Date.now() - closeWaitStartedAt,
-        requestedPause: true,
-        pauseAttempted: !!launch.pauseAttempted,
-        pauseConfirmed: !!launch.pauseConfirmed,
-        launchAttempts,
-        launch,
-        debuggerId: launch.debuggerId || null,
-        sceneName:
-          (inspect &&
-            inspect.runtime &&
-            Array.isArray(inspect.runtime.scenes) &&
-            inspect.runtime.scenes[0] &&
-            inspect.runtime.scenes[0].name) ||
-          (launch.status && launch.status.sceneName) ||
-          null,
-        runtime:
-          inspect && inspect.runtime
-            ? {
-                sceneName:
-                  inspect.runtime.scenes &&
-                  inspect.runtime.scenes[0] &&
-                  inspect.runtime.scenes[0].name,
-                objectInstanceCounts:
-                  inspect.runtime.scenes &&
-                  inspect.runtime.scenes[0] &&
-                  inspect.runtime.scenes[0].objectInstanceCounts,
-                sceneVariables:
-                  inspect.runtime.scenes &&
-                  inspect.runtime.scenes[0] &&
-                  inspect.runtime.scenes[0].sceneVariables,
-                globalVariables: inspect.runtime.globalVariables,
-              }
-            : undefined,
-        errors: inspect && inspect.errors ? inspect.errors : undefined,
-        note: launch.success
-          ? 'Saved, closed stale previews, launched a fresh debug preview, confirmed pause/readiness, and inspected the runtime snapshot.'
-          : 'The save/close steps ran, but the fresh paused preview did not become ready after retries. Recovery: call launch_preview { start_paused: true, force_new: true }, then wait_until_preview_ready.',
-      });
     } catch (error) {
       return errorResult(error.message);
     }

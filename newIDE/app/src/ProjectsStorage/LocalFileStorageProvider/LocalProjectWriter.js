@@ -229,7 +229,8 @@ export const writeProjectLayoutCatalog = async (
   project: gdProject,
   projectPath: string,
   serializedProjectObject?: Object,
-  effectTypes?: Array<Object>
+  effectTypes?: Array<Object>,
+  behaviorTypes?: Array<Object>
 ): Promise<Object> => {
   const serializedProject =
     serializedProjectObject || serializeToJSObject(project, 'serializeTo');
@@ -237,6 +238,7 @@ export const writeProjectLayoutCatalog = async (
     project,
     serializedProject,
     effectTypes,
+    behaviorTypes,
   });
   await writeAndCheckFile(
     serializeProjectLayoutCatalog(catalog),
@@ -286,7 +288,8 @@ export const writeProjectSourceCatalogs = async (
     project,
     projectPath,
     serializedProject,
-    settingsCatalog.effectTypes
+    settingsCatalog.effectTypes,
+    settingsCatalog.behaviorTypes
   );
   const javascriptApi = await writeProjectJavaScriptAuthoringApi(
     project,
@@ -346,6 +349,7 @@ const writeProjectFiles = async ({
       project,
       serializedProject: serializedProjectObject,
       effectTypes: settingsCatalog.effectTypes,
+      behaviorTypes: settingsCatalog.behaviorTypes,
     });
     const javascriptArtifacts = buildJavaScriptAuthoringArtifacts(
       serializedProjectObject

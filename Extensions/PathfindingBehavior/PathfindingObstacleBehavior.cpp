@@ -27,6 +27,7 @@ PathfindingObstacleBehavior::GetProperties(
       .SetType("Boolean");
   properties["Cost"]
       .SetLabel(_("Cost (if not impassable)"))
+      .SetType("Number")
       .SetValue(gd::String::From(behaviorContent.GetDoubleAttribute("cost")));
 
   return properties;

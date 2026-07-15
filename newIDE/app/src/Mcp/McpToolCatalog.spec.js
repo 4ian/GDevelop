@@ -130,6 +130,11 @@ describe('McpToolCatalog', () => {
       ).toEqual({ canCall: false, reason: `Unknown MCP tool: ${name}.` });
       expect(getMcpToolUsageExamples(name)[name]).toEqual([]);
     });
+    expect(
+      JSON.stringify(
+        getMcpTools({ allowWriteTools: true, allowCommandTools: true })
+      )
+    ).not.toContain('save_and_relaunch_preview_paused');
   });
 
   it('describes the file-first boundary in capabilities', () => {

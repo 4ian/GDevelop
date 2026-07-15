@@ -2123,7 +2123,84 @@ const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
   }
 };
 
-const layoutObjectContext = (localObjects, fallbackObjects = []) => {
+const isBehaviorPropertyValueValid = (value, type) => {
+  const normalizedType = String(type || '').toLowerCase();
+  if (['number', 'float'].includes(normalizedType)) {
+    return typeof value === 'number' && Number.isFinite(value);
+  }
+  if (normalizedType === 'integer') return Number.isInteger(value);
+  if (normalizedType === 'boolean') return typeof value === 'boolean';
+  return typeof value === 'string';
+};
+
+const validateAttachedBehaviorProperties = (
+  behaviors,
+  behaviorPropertySchemasByType,
+  uri,
+  objectName
+) => {
+  if (!behaviorPropertySchemasByType) return;
+  (behaviors || []).forEach(behavior => {
+    const behaviorType = String(behavior.type || '');
+    const schema = behaviorPropertySchemasByType[behaviorType];
+    if (!schema) return;
+    const properties = schema.properties || [];
+    const bySerializedKey = properties.reduce((result, property) => {
+      result[property.serializedKey] = property;
+      return result;
+    }, {});
+    const byAuthoringKey = properties.reduce((result, property) => {
+      result[property.authoringKey] = property;
+      return result;
+    }, {});
+    Object.keys(behavior).forEach(key => {
+      if (ATTACHED_BEHAVIOR_IDENTITY_FIELDS.has(key)) return;
+      const property = bySerializedKey[key];
+      if (property) {
+        if (!isBehaviorPropertyValueValid(behavior[key], property.type)) {
+          fail(
+            'MULTIFILE_INVALID_BEHAVIOR_PROPERTY',
+            `Behavior ${String(
+              behavior.name || behaviorType
+            )} on ${objectName} property ${key} must be ${property.type}.`,
+            uri
+          );
+        }
+        return;
+      }
+      const authoringProperty = byAuthoringKey[key];
+      if (
+        authoringProperty &&
+        authoringProperty.serializedKey !== authoringProperty.authoringKey
+      ) {
+        fail(
+          'BEHAVIOR_PROPERTY_KEY_MISMATCH',
+          `Behavior ${String(
+            behavior.name || behaviorType
+          )} on ${objectName} uses editor-facing key ${key}; use serialized key ${
+            authoringProperty.serializedKey
+          }.`,
+          uri
+        );
+      }
+      if (schema.unknownPropertyPolicy === 'error') {
+        fail(
+          'MULTIFILE_UNKNOWN_BEHAVIOR_PROPERTY',
+          `Behavior ${String(
+            behavior.name || behaviorType
+          )} on ${objectName} has unknown serialized property ${key}.`,
+          uri
+        );
+      }
+    });
+  });
+};
+
+const layoutObjectContext = (
+  localObjects,
+  fallbackObjects = [],
+  behaviorPropertySchemasByType
+) => {
   const objectsByName = new Map();
   (fallbackObjects || []).forEach(object =>
     objectsByName.set(String(object.name || ''), object)
@@ -2144,6 +2221,7 @@ const layoutObjectContext = (localObjects, fallbackObjects = []) => {
   return {
     objectNames: Array.from(objectsByName.keys()),
     behaviorTypesByObject,
+    behaviorPropertySchemasByType,
   };
 };
 
@@ -2469,7 +2547,11 @@ const composePrefab = (
   }
   const objects = objectDocuments.map(document => document.object);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
-  const objectContext = layoutObjectContext(objects);
+  const objectContext = layoutObjectContext(
+    objects,
+    [],
+    options.behaviorPropertySchemasByType
+  );
   const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout', {
     ...objectContext,
   });
@@ -2501,7 +2583,11 @@ const composePrefab = (
         expectString(entry.layout, 'variant.layout', uri),
         'gdevelop-prefab-variant-layout',
         {
-          ...layoutObjectContext(variantObjects),
+          ...layoutObjectContext(
+            variantObjects,
+            [],
+            options.behaviorPropertySchemasByType
+          ),
         }
       );
       Object.keys(variantLayout).forEach(field => {
@@ -2695,6 +2781,12 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           ),
         };
         validateManifestIdentity(entry, payload, objectUri);
+        validateAttachedBehaviorProperties(
+          payload.behaviors,
+          options.behaviorPropertySchemasByType,
+          objectUri,
+          name
+        );
         return {
           entry,
           uri: objectUri,
@@ -3349,7 +3441,11 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         expectString(entry.events, 'scene.events', uri)
       );
       const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
-        ...layoutObjectContext(objects, project.objects || []),
+        ...layoutObjectContext(
+          objects,
+          project.objects || [],
+          options.behaviorPropertySchemasByType
+        ),
       });
       Object.keys(layout).forEach(field => {
         if (settings[field] !== undefined) {
@@ -3459,7 +3555,8 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
             ? {
                 ...layoutObjectContext(
                   linkedScene.objects || [],
-                  project.objects || []
+                  project.objects || [],
+                  options.behaviorPropertySchemasByType
                 ),
                 layerNames: (linkedScene.layers || []).map(layer =>
                   String(layer.name || '')

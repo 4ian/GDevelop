@@ -642,6 +642,43 @@ column2 = "ssfssdfsf"
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
+  test('validates attached behaviors with catalog serialized property keys', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [{ name: 'Move', type: 'Test::Move', Speed: 12 }],
+      },
+    ];
+    const files = decomposeLegacyProjectToFiles(project);
+    const objectUri = 'game://scenes/Main/objects/Player.settings';
+    const options = {
+      behaviorPropertySchemasByType: {
+        'Test::Move': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'error',
+          properties: [
+            {
+              authoringKey: 'Speed',
+              serializedKey: 'speed',
+              type: 'Number',
+            },
+          ],
+        },
+      },
+    };
+
+    expect(() => composeLegacyProjectFromFiles(files, options)).toThrow(
+      expect.objectContaining({ code: 'BEHAVIOR_PROPERTY_KEY_MISMATCH' })
+    );
+    files[objectUri] = files[objectUri].replace('Speed = 12', 'speed = 12');
+    expect(
+      composeLegacyProjectFromFiles(files, options).layouts[0].objects[0]
+        .behaviors[0]
+    ).toMatchObject({ name: 'Move', type: 'Test::Move', speed: 12 });
+  });
+
   test('writes Sprite point settings as inline TOML values', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.objects = [

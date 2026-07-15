@@ -967,7 +967,8 @@ describe('Local multi-file project storage', () => {
       project,
       temporaryDirectory,
       undefined,
-      settingsCatalog.effectTypes
+      settingsCatalog.effectTypes,
+      settingsCatalog.behaviorTypes
     );
     const settingsPath = path.join(
       temporaryDirectory,
@@ -1001,6 +1002,7 @@ describe('Local multi-file project storage', () => {
         }),
       ])
     );
+    expect(layoutCatalog.behaviorOverrideSchemas.length).toBeGreaterThan(5);
     project.delete();
   });
 

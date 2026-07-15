@@ -5,6 +5,7 @@ import {
   buildProjectApiDeclaration,
   buildRuntimeApiDeclaration,
   collectSourceFileJavaScriptBlocks,
+  validateJavaScriptAuthoringBlocks,
   validateProjectJavaScriptAuthoring,
 } from './JavaScriptAuthoringApi';
 
@@ -68,6 +69,35 @@ const serializedProject = {
 };
 
 describe('JavaScript authoring API', () => {
+  test('reports one validator-environment diagnostic when TypeScript is unavailable', () => {
+    const validation = validateJavaScriptAuthoringBlocks({
+      serializedProject,
+      typescript: null,
+      blocks: [
+        { inlineCode: 'const first = 1;', useStrict: true },
+        { inlineCode: 'const second = 2;', useStrict: true },
+      ],
+    });
+
+    expect(validation).toMatchObject({
+      checked: false,
+      valid: false,
+      blocks: 2,
+      checkedBlocks: 0,
+      typescriptAvailable: false,
+      typescriptVersion: null,
+    });
+    expect(validation.environmentDiagnostics).toEqual([
+      expect.objectContaining({
+        code: 'JS_API_TYPESCRIPT_UNAVAILABLE',
+        scope: 'validator',
+        affectedBlocks: 2,
+      }),
+    ]);
+    expect(validation.sourceDiagnostics).toEqual([]);
+    expect(validation.errors).toHaveLength(1);
+  });
+
   test('generates a deterministic curated runtime declaration', () => {
     const declaration = buildRuntimeApiDeclaration();
     expect(buildRuntimeApiDeclaration()).toBe(declaration);

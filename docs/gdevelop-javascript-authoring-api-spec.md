@@ -2,9 +2,10 @@
 
 ## A Typed, AI-Friendly Public Runtime Contract
 
-**Status:** Proposal for review; no implementation is implied by this document
+**Status:** Implemented version 1 core contract; extension runtime fragments and
+automatic JavaScript rename refactoring are future additions
 
-**Specification version:** 0.1
+**Specification version:** 1.0
 
 **Generated artifacts:** `.gdevelop/runtime-api.d.ts` and
 `.gdevelop/project-api.d.ts`
@@ -47,7 +48,7 @@ Related specifications:
 21. [Testing requirements](#21-testing-requirements)
 22. [Implementation phases](#22-implementation-phases)
 23. [Rejected alternatives](#23-rejected-alternatives)
-24. [Open review questions](#24-open-review-questions)
+24. [Later review questions](#24-later-review-questions)
 25. [Final design principles](#25-final-design-principles)
 
 ---
@@ -269,8 +270,10 @@ The public API must be explicit. TypeScript's `public` keyword alone is not a
 sufficient boundary because many runtime implementation fields are currently
 public for historical or internal reasons.
 
-Core and extension runtime sources opt declarations into the authoring API with
-a dedicated JSDoc marker:
+Version 1 stores the reviewed core allowlist as declaration source in
+`JavaScriptAuthoringApi.js`. Each entry is checked against the real runtime
+implementation during review and carries a `@javascriptPublic` marker in the
+generated declaration:
 
 ```ts
 /**
@@ -281,9 +284,9 @@ a dedicated JSDoc marker:
 getObjects(objectName: string): gdjs.RuntimeObject[];
 ```
 
-The declaration generator includes:
+The version 1 declaration generator includes:
 
-1. Symbols explicitly marked `@javascriptPublic`.
+1. Symbols in the reviewed core declaration allowlist.
 2. Types required transitively by their public signatures.
 3. Project-specific overloads generated from project definitions.
 
@@ -309,9 +312,11 @@ An underscore name is forbidden even if it appears in a raw preview dump.
 
 ### 7.3 Public API source of truth
 
-The source of truth is the annotated runtime TypeScript and reviewed extension
-declaration fragments. The generator must use the TypeScript syntax tree. It
-must not derive the API from:
+The version 1 source of truth is the explicit reviewed declaration allowlist in
+`JavaScriptAuthoringApi.js`. Moving the markers into runtime TypeScript and
+extracting them with the TypeScript syntax tree is a future maintainability
+improvement; it must not change the emitted contract without review. The
+generator must not derive the API from:
 
 - A live runtime object using reflection.
 - A debugger dump.
@@ -330,8 +335,9 @@ method or type does not require changing existing project source.
 ## 8. `runtime-api.d.ts`
 
 `runtime-api.d.ts` describes the public runtime available to JavaScript events.
-It is generated from the current core runtime plus public declaration fragments
-for extensions loaded by the project.
+Version 1 generates it from the reviewed core allowlist. Loaded extension
+runtime fragments are deferred; extension instructions remain available through
+Events DSL.
 
 ### 8.1 Minimum core surface
 
@@ -608,9 +614,10 @@ event's picked instances to the JavaScript event.
 
 ## 12. Extension API exposure
 
-### 12.1 Reviewed declaration fragments
+### 12.1 Future reviewed declaration fragments
 
-An extension may contribute public JavaScript runtime declarations when it has
+After the version 1 extension-fragment format is specified, an extension may
+contribute public JavaScript runtime declarations when it has
 actual stable runtime classes or functions intended for JavaScript authors.
 Each fragment must:
 
@@ -638,7 +645,8 @@ declarations:
 - Its Events DSL instructions remain fully usable.
 - Its attached object/behavior base types fall back to the nearest known public
   type.
-- The generator emits a bounded warning in its validation receipt.
+- The version 1 generator falls back without exposing the runtime type; a
+  future fragment-aware generator will emit a bounded warning in its receipt.
 - The generator must not expose the extension's entire implementation as
   `any`.
 
@@ -790,13 +798,14 @@ These warnings are heuristic and do not replace runtime profiling.
 
 ## 16. Rename and refactoring safety
 
-### 16.1 Declaration diff
+### 16.1 Version 1 behavior
 
-Before overwriting `project-api.d.ts`, generation compares its previous symbol
-model with the new one. Stable project identities, where available, distinguish
-a rename from deletion plus creation.
+Version 1 regenerates `project-api.d.ts` from the authoritative project model
+after a rename and rechecks every strict JavaScript block. A stale statically
+known name becomes a source-located validation error. The generator never runs
+a global text or regular-expression replacement over JavaScript.
 
-The diff covers:
+The generated model covers:
 
 - Scenes.
 - Objects and object groups.
@@ -806,10 +815,10 @@ The diff covers:
 - Resources.
 - Extensions, prefabs, and functions.
 
-### 16.2 AST-aware updates
+### 16.2 Future AST-aware updates
 
-Rename operations update JavaScript only where the reference is statically
-unambiguous, for example:
+A future editor rename transaction may update JavaScript where the reference is
+statically unambiguous, for example:
 
 ```js
 runtimeScene.getObjects("Player");
@@ -817,8 +826,9 @@ player.getBehavior("Health");
 runtimeScene.getVariables().get("Score");
 ```
 
-The editor uses the JavaScript syntax tree and context type, never a global
-text replacement or regular expression.
+Such an implementation must use the JavaScript syntax tree and context type,
+never a global text replacement or regular expression. Version 1 requires the
+author of the rename to update these literals in the same source change.
 
 ### 16.3 Dynamic references
 
@@ -829,15 +839,17 @@ runtimeScene.getObjects(prefix + kind);
 runtimeScene.getObjects(nameFromVariable);
 ```
 
-When a renamed symbol might be referenced dynamically, the refactor receipt
-must report the source locations for manual review. It must not guess.
+When a renamed symbol might be referenced dynamically, an author or future
+refactor receipt must report the source locations for manual review. It must
+not guess.
 
 ### 16.4 Atomicity
 
-A project rename is one transaction:
+A project rename remains one coherent source transaction:
 
 1. Update authoritative `.settings`, `.layout`, and `.events` sources.
-2. Update statically proven JavaScript literals.
+2. Update affected JavaScript literals explicitly (or, in a future version,
+   through proven AST-aware edits).
 3. Regenerate all catalogs and declaration files.
 4. Type-check all affected JavaScript blocks.
 5. Abort and restore the previous source set if an unhandled blocking error
@@ -855,20 +867,19 @@ fully available:
 3. Compose and validate the in-memory project model.
 4. Register built-in and project extensions.
 5. Generate instruction, settings, and layout catalogs.
-6. Extract the curated core and loaded-extension JavaScript API.
+6. Load the curated core JavaScript API.
 7. Generate `runtime-api.d.ts`.
 8. Generate `project-api.d.ts` from the composed project and function contexts.
 9. Type-check all JavaScript events.
 10. Generate `.gdevelop/game.json` for preview/export compatibility.
-11. Write generated artifacts atomically.
+11. Write each generated artifact through a verified sibling temporary file
+    and replace its target.
 
-If declaration generation or strict JavaScript validation fails, the save must
-report the root cause and must not publish a partially updated declaration pair.
-The previous valid generated files may remain for diagnostics but cannot be
-reported as current.
-
-`state.json` records the source hashes used to generate both files so validation
-can reject a stale declaration pair.
+If declaration generation or strict JavaScript validation fails, the save
+reports the source-located root cause before publishing new project sources.
+Both declaration files carry deterministic hashes; generation receipts return
+the same hashes, and every written file is read back and verified before the
+operation reports success.
 
 ---
 
@@ -964,15 +975,12 @@ Initial codes:
 | `JS_API_SYNTAX_ERROR` | JavaScript cannot be parsed |
 | `JS_API_UNKNOWN_MEMBER` | Method or property is absent from the public API |
 | `JS_API_PRIVATE_MEMBER` | Underscore/private runtime state was accessed |
-| `JS_API_UNKNOWN_PROJECT_SYMBOL` | Object, variable, layer, behavior, or resource name is invalid in this context |
-| `JS_API_WRONG_CONTEXT` | A JavaScript context global is unavailable here |
 | `JS_API_NULLABILITY` | A nullable result is used without a guard |
-| `JS_API_TYPE_MISMATCH` | Arguments or assignments do not match the declaration |
+| `JS_API_TYPE_MISMATCH` | Arguments, project literals, context globals, or assignments do not match the declaration |
 | `JS_API_FORBIDDEN_GLOBAL` | A forbidden browser, Node, dynamic-code, or host API is used |
-| `JS_API_STALE_DECLARATIONS` | Generated declarations do not match current project/runtime hashes |
-| `JS_API_DYNAMIC_RENAME_REFERENCE` | A rename may affect an unresolvable dynamic string reference |
-| `JS_API_EXTENSION_TYPES_MISSING` | A loaded extension lacks reviewed public JavaScript declarations |
-| `JS_API_RUNTIME_NOT_VERIFIED` | Static validation passed but runtime semantics still require preview testing |
+| `JS_API_RESOURCE_LIMIT` | JavaScript block count or aggregate source exceeds the validation budget |
+| `JS_API_TYPESCRIPT_UNAVAILABLE` | The checker is unavailable; strict blocks fail and compatibility blocks warn |
+| `JS_API_PERFORMANCE_RISK` | A statically obvious unbounded loop needs review (warning) |
 
 Diagnostics should favor an exact corrective action, for example:
 
@@ -1061,44 +1069,43 @@ Implementation is incomplete without tests for all of the following.
 
 ---
 
-## 22. Implementation phases
+## 22. Implementation status and later phases
 
-### Phase 1: Curated core declarations
+### Implemented: curated core declarations
 
-- Define `@javascriptPublic`.
-- Extract a small core runtime surface.
+- Define and review a small `@javascriptPublic` core runtime surface.
 - Generate deterministic `runtime-api.d.ts`.
 - Replace JavaScript authoring autocomplete's unrestricted runtime-source view
   with the curated declaration file.
 
-### Phase 2: Project declarations
+### Implemented: project declarations
 
 - Generate scene, object, group, variable, behavior, layer, resource, and
   function context maps.
 - Add project-aware literal overloads.
 - Generate deterministic `project-api.d.ts`.
 
-### Phase 3: Validation
+### Implemented: validation
 
 - Extract and type-check `@js` blocks.
 - Map diagnostics back to `.events` source.
 - Add private API and forbidden-global policies.
 - Add declaration hashes to validation receipts.
 
-### Phase 4: Rename integration
+### Future: rename integration
 
 - Diff project symbol models before replacing declarations.
 - Update statically proven JavaScript literals through AST refactoring.
 - Report dynamic references.
 - Make rename and regeneration atomic.
 
-### Phase 5: Extension declarations
+### Future: extension declarations
 
 - Define reviewed extension declaration fragments.
 - Include only extensions loaded by the project.
 - Add missing/conflicting extension diagnostics.
 
-### Phase 6: AI workflow and runtime verification
+### Implemented: AI workflow and runtime verification
 
 - Update the project-file skill to read the declarations only when JavaScript
   is needed.
@@ -1149,25 +1156,23 @@ a separate design. `@js` blocks already provide an executable integration path.
 
 ---
 
-## 24. Open review questions
+## 24. Later review questions
 
-The following decisions should be confirmed before implementation:
+Version 1 is implemented. The following decisions remain for later versions:
 
-1. Should the first core API include selected `gdjs.evtTools`, or should AI
-   models use Events DSL instructions for all equivalent operations?
-2. Should existing private API usage be a warning forever, or become an error
-   after a declared migration version?
-3. Which concrete object and behavior runtime classes are required in the
-   initial allowlist?
-4. Should project resource declarations expose only names and kinds, or also
+1. What reviewed declaration-fragment contract should extensions use, and how
+   should conflicting fragments be diagnosed?
+2. Should existing private API usage remain a compatibility warning forever,
+   or become an error after a declared migration version?
+3. Should project resource declarations expose only names and kinds, or also
    normalized read-only file paths?
-5. Should external events require one explicit associated-scene type context
+4. Should external events require one explicit associated-scene type context
    rather than calculating an intersection across possible scenes?
-6. Should networking/browser capabilities be granted only by reviewed
+5. Should networking/browser capabilities be granted only by reviewed
    extensions, or can a project declare explicit capability grants later?
-7. What save-time and declaration-size budgets are acceptable for very large
-   projects?
-8. After version 1 is stable, is there enough need to design standalone
+6. What tighter save-time and declaration-size budgets are appropriate for
+   very large projects after measuring real projects?
+7. After version 1 is stable, is there enough need to design standalone
    `scripts/` modules, or are extension/function-owned `@js` blocks sufficient?
 
 ---

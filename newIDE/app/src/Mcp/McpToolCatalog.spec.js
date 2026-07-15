@@ -195,7 +195,9 @@ describe('McpToolCatalog', () => {
         }),
       })
     );
-    expect(tool.description).toContain('waits for all three files');
+    expect(tool.description).toContain('all five generated authoring files');
+    expect(tool.description).toContain('runtime-api.d.ts');
+    expect(tool.description).toContain('project-api.d.ts');
     expect(
       canCallMcpTool('generate-catalogs', {
         allowWriteTools: false,
@@ -226,6 +228,7 @@ describe('McpToolCatalog', () => {
     );
     expect(tool.description).toContain('game.json');
     expect(tool.description).toContain('regenerate all');
+    expect(tool.description).toContain('JavaScript authoring-API');
     expect(tool.description).toContain('before reload_project');
     expect(
       canCallMcpTool('validate_project_files', {

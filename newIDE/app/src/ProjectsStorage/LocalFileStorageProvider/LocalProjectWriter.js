@@ -54,6 +54,13 @@ import {
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
 } from '../ProjectSourceCatalog';
+import {
+  PROJECT_API_RELATIVE_PATH,
+  PROJECT_RUNTIME_API_RELATIVE_PATH,
+  JavaScriptAuthoringApiError,
+  buildJavaScriptAuthoringArtifacts,
+  validateProjectJavaScriptAuthoring,
+} from '../JavaScriptAuthoringApi';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -145,9 +152,19 @@ const writeAndCheckFile = async (
     throw new Error('The content to save on disk is empty. Aborting.');
 
   await fs.ensureDir(path.dirname(filePath));
-
-  await fs.writeFile(filePath, content);
-  await checkFileContent(filePath, content);
+  const temporaryPath = `${filePath}.tmp-${Date.now()}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
+  try {
+    await fs.writeFile(temporaryPath, content);
+    await checkFileContent(temporaryPath, content);
+    await fs.move(temporaryPath, filePath, { overwrite: true });
+    await checkFileContent(filePath, content);
+  } finally {
+    if (await fs.pathExists(temporaryPath)) {
+      await fs.remove(temporaryPath);
+    }
+  }
 };
 
 const writeAndCheckFormattedJSONFile = async (
@@ -228,6 +245,28 @@ export const writeProjectLayoutCatalog = async (
   return catalog;
 };
 
+export const writeProjectJavaScriptAuthoringApi = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const artifacts = buildJavaScriptAuthoringArtifacts(serializedProject);
+  await writeAndCheckFile(
+    artifacts.runtimeApi,
+    path.join(projectPath, ...PROJECT_RUNTIME_API_RELATIVE_PATH.split('/'))
+  );
+  await writeAndCheckFile(
+    artifacts.projectApi,
+    path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
+  );
+  return {
+    counts: artifacts.counts,
+    hashes: artifacts.hashes,
+  };
+};
+
 export const writeProjectSourceCatalogs = async (
   project: gdProject,
   projectPath: string
@@ -249,11 +288,17 @@ export const writeProjectSourceCatalogs = async (
     serializedProject,
     settingsCatalog.effectTypes
   );
+  const javascriptApi = await writeProjectJavaScriptAuthoringApi(
+    project,
+    projectPath,
+    serializedProject
+  );
 
   return {
     instructions: instructionCatalog.counts,
     settings: settingsCatalog.counts,
     layouts: layoutCatalog.counts,
+    javascript: javascriptApi,
   };
 };
 
@@ -302,6 +347,17 @@ const writeProjectFiles = async ({
       serializedProject: serializedProjectObject,
       effectTypes: settingsCatalog.effectTypes,
     });
+    const javascriptArtifacts = buildJavaScriptAuthoringArtifacts(
+      serializedProjectObject
+    );
+    const javascriptValidation = validateProjectJavaScriptAuthoring({
+      serializedProject: serializedProjectObject,
+      runtimeApiDeclaration: javascriptArtifacts.runtimeApi,
+      projectApiDeclaration: javascriptArtifacts.projectApi,
+    });
+    if (!javascriptValidation.valid) {
+      throw new JavaScriptAuthoringApiError(javascriptValidation.errors[0]);
+    }
     await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
       decomposeOptions: {
         eventsDslOptions: {
@@ -342,6 +398,14 @@ const writeProjectFiles = async ({
     await writeAndCheckFile(
       serializeProjectLayoutCatalog(layoutCatalog),
       path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+    );
+    await writeAndCheckFile(
+      javascriptArtifacts.runtimeApi,
+      path.join(projectPath, ...PROJECT_RUNTIME_API_RELATIVE_PATH.split('/'))
+    );
+    await writeAndCheckFile(
+      javascriptArtifacts.projectApi,
+      path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
     );
     const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
       serializedProjectObject

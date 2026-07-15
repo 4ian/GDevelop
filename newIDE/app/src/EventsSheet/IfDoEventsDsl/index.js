@@ -645,6 +645,36 @@ const scanSource = (source: string): Array<SourceLine> => {
   return lines;
 };
 
+export type IfDoJavaScriptBlock = {|
+  inlineCode: string,
+  parameterObjects: string,
+  useStrict: boolean,
+  headerLine: number,
+  bodyLine: number,
+|};
+
+/**
+ * Return raw JavaScript bodies with their source location and authoring
+ * context metadata. The same scanner is used by the parser, so validation
+ * cannot disagree with compilation about delimiters or block boundaries.
+ */
+export const extractIfDoJavaScriptBlocks = (
+  source: string
+): Array<IfDoJavaScriptBlock> =>
+  scanSource(source)
+    .filter(line => line.jsBody !== undefined)
+    .map(line => {
+      const args = parseNamedArguments(line.text.slice('@js'.length));
+      return {
+        inlineCode: line.jsBody || '',
+        parameterObjects:
+          args.objects === undefined ? '' : String(args.objects),
+        useStrict: args.strict === true,
+        headerLine: line.line,
+        bodyLine: line.line + 1,
+      };
+    });
+
 const commonEvent = (type: string, metadata: Metadata): Object => {
   const event = {
     type,

@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -25,9 +25,12 @@ Read, in order:
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
+8. `.gdevelop/runtime-api.d.ts` and `.gdevelop/project-api.d.ts` before adding
+   or changing any JavaScript event.
 
-The three catalogs are regenerated from the loaded project every time GDevelop
-saves. Never edit them. Search them narrowly with `rg`: use file kind, object,
+The three catalogs and two JavaScript declarations are regenerated from the
+loaded project every time GDevelop saves. Never edit them. Search them narrowly
+with `rg`: use file kind, object,
 behavior, effect, owner, or layout context in the source catalogs, and use
 instruction type, displayed name, group, description, parameter `dslName`, or
 expression name in the instruction catalog. Generated JSON keeps one catalog
@@ -39,9 +42,10 @@ edits that depend on the changed structure. Large structural changes include
 installing or importing an extension and creating, deleting, renaming, or
 substantially changing a prefab, behavior, function, extension, object type, or
 other catalog-owned component. Re-read the relevant freshly generated
-settings, layout, and instruction catalogs before continuing; do not rely on
-catalog content read before the structural change. A later structural change
-invalidates that catalog view and requires another `generate-catalogs` call.
+settings, layout, and instruction catalogs before continuing; if JavaScript is
+in scope, also re-read the two declarations. Do not rely on generated content
+read before the structural change. A later structural change invalidates that
+view and requires another `generate-catalogs` call.
 This refresh is not validation and does not replace the final
 `validate_project_files` gate.
 
@@ -133,6 +137,9 @@ generated compatibility/runtime output, not multi-file source.
   edit an existing deprecated instruction only when the user's legacy project
   requires it; use a current replacement from `instructions-catalog.json`
   whenever the edit can migrate it safely.
+  `runtime-api.d.ts` and `project-api.d.ts` are the only approved JavaScript
+  authoring surface. Read them before changing `@js`; never hand-edit either
+  declaration or recover private APIs from runtime source/generated code.
 
 Preserve component order, stable names, existing unknown fields, and ownership
 boundaries. Make the smallest coherent patch. When adding a component, create
@@ -194,6 +201,8 @@ extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.even
 .gdevelop/deprecated-instructions-catalog.json # legacy read/edit only; never for new events
 .gdevelop/settings-catalog.json
 .gdevelop/layout-catalog.json
+.gdevelop/runtime-api.d.ts
+.gdevelop/project-api.d.ts
 ```
 
 Do not create optional grouping folders. Canonical component directories are
@@ -214,6 +223,10 @@ Load only the references required by the task:
   creating or changing any `.events` file. Use only its canonical IfDo
   structures and the exact types and `dslName` parameters found in the
   generated project instruction catalog.
+- Also read [references/javascript-api.md](references/javascript-api.md) in
+  full before creating or changing any `@js` event. Use only the generated
+  public declarations, author new blocks with `strict=true`, and preserve
+  compatibility mode only for existing legacy JavaScript.
 - Read [references/static-data.md](references/static-data.md) in full
   whenever the user asks to create, edit, reorganize, or consume Static Data,
   or to add/change a `{{...}}` placeholder. Also read the events guide for an
@@ -280,7 +293,12 @@ Rules:
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
-- Keep JavaScript events opt-in; use native instructions first.
+- Keep JavaScript events opt-in; use native instructions first. New or changed
+  AI-authored JavaScript must use `strict=true`, must use only context globals
+  and members declared in `.gdevelop/runtime-api.d.ts` and
+  `.gdevelop/project-api.d.ts`, and must obey the JavaScript reference. Never
+  use underscore/private members, generated `.func` symbols, browser/Node
+  globals, filesystem, shell, DOM, storage, or direct networking APIs.
 
 Common structure:
 
@@ -318,6 +336,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
    expressions. The generated catalog excludes editor-hidden and deprecated
    APIs; never invent or reuse an instruction identifier that is absent from it
    when authoring new events.
+   If JavaScript is required, read both generated `.d.ts` files and the
+   JavaScript reference before editing the block; do not infer an API from raw
+   engine source or preview code.
 3. Patch source files directly. Use `apply_patch` for precise edits.
    Creating or changing an object type or one of its behaviors is a settings
    edit; creating or moving an instance is a layout edit.
@@ -336,11 +357,14 @@ loop, comment, and JavaScript metadata when editing existing sources.
    recent source edit. Require `valid: true`; use its file URI, error code,
    line, column, and source excerpt to fix every reported settings, layout,
    events, reference, or generated-project validation failure. This call first
-   regenerates all three `.gdevelop` catalogs, then validates the sources using
-   the fresh instruction catalog. Call it at least once before calling
-   `reload_project`; a failed validation does not satisfy this gate. `valid: true` proves parsing, source reconstruction, project validation, and
-   extension generated-code preflight only. It does not prove runtime object
-   picking or gameplay side effects.
+   regenerates all three `.gdevelop` catalogs and both JavaScript declaration
+   files, then validates the sources using those fresh contracts. Call it at
+   least once before calling
+   `reload_project`; a failed validation does not satisfy this gate. For
+   JavaScript, fix every reported source URI/line diagnostic. `valid: true`
+   proves parsing, source reconstruction, project validation, JavaScript
+   authoring-API checking, and extension generated-code preflight only. It does
+   not prove runtime object picking or gameplay side effects.
 8. After the requested task is complete and validation succeeds, use Git from
    the project repository root to commit every task-owned change before
    `reload_project`. Inspect `git status` and the final diff, stage all changes
@@ -374,9 +398,10 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
-- Regenerating and synchronously waiting for all three generated source
-  catalogs with `generate-catalogs` after large structural source changes, so
-  subsequent authoring can read current catalog contracts.
+- Regenerating and synchronously waiting for the three generated source
+  catalogs and two JavaScript declaration files with `generate-catalogs` after
+  large structural source changes, so subsequent authoring can read current
+  contracts.
 - Regenerating all source catalogs and validating direct disk edits without
   changing editor memory by calling the no-input `validate_project_files` tool
   before `reload_project`.
@@ -395,16 +420,18 @@ sync, or save tools for authoring.
 `generate-catalogs` is a mandatory mid-task refresh after every large
 structural source change. Require `catalogsRegenerated: true`, then read the
 latest relevant `.gdevelop/settings-catalog.json`,
-`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json`
-before making dependent edits. The tool writes and verifies only those three
-generated files and does not validate sources or reload editor memory.
+`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json` and,
+for JavaScript work, both generated `.d.ts` files before making dependent edits.
+The tool writes and verifies those five generated authoring files and does not
+validate sources or reload editor memory.
 
 `validate_project_files` is a mandatory reload gate. In every direct-edit task,
 call it successfully with no inputs at least once after the most recent
 source-file edit and before `reload_project`. It regenerates the instruction,
-settings, and layout catalogs first, then reconstructs the generated `game.json`
-representation from the multi-file settings, layouts, and events using the
-fresh instruction catalog without replacing editor memory. A later source edit
+settings, and layout catalogs and both JavaScript declarations first, then
+reconstructs the generated `game.json` representation from the multi-file
+settings, layouts, and events and type-checks JavaScript blocks against the
+fresh public API without replacing editor memory. A later source edit
 invalidates the earlier validation receipt. Its `valid: true` result is not a
 runtime semantic test; behavior-sensitive changes still require a paused preview
 and deterministic `run_frames` inspection.
@@ -446,6 +473,9 @@ Before finishing:
 - Confirm layout elements, attributes, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
+- For every changed JavaScript event, confirm `strict=true`, validate all
+  context globals/project literals/public members against both generated
+  `.d.ts` files, and confirm no forbidden private or ambient API is used.
 - For Static Data changes, confirm `static-data.toml` ownership, direct-root
   TOML data, placeholder paths/types, and regeneration-time behavior
   against the Static Data reference.

@@ -3809,7 +3809,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'generate-catalogs',
     description:
-      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, and .gdevelop/layout-catalog.json from the current local multi-file project sources. The call waits for all three files to be written and verified before returning. Accepts no inputs, writes only generated catalogs, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs before making dependent edits.',
+      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, .gdevelop/runtime-api.d.ts, and .gdevelop/project-api.d.ts from the current local multi-file project sources. The call waits for all five generated authoring files to be written and verified before returning. Accepts no inputs, writes only generated authoring files, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs and declarations before making dependent edits.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -3821,7 +3821,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_project_files',
     description:
-      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. valid:true proves structural/code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
+      'Load the current local multi-file project from project.settings, regenerate all catalogs and public JavaScript declaration files, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory, validate JavaScript event blocks against the generated context-aware API, then validate through GDevelop and preflight generated extension JavaScript. strict=true JavaScript API violations block validation; compatibility blocks report semantic warnings while syntax errors still block. valid:true proves structural, JavaScript authoring-API, and code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop authoring files, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -4241,7 +4241,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated catalogs use the new disk sources.',
+      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
     inputSchema: emptyObjectSchema,
     annotations: {
       readOnlyHint: false,
@@ -4963,7 +4963,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   'generate-catalogs': [
     {
       description:
-        'Regenerate and verify all three project-source catalogs after structural file changes.',
+        'Regenerate and verify the three project-source catalogs and two JavaScript declaration files after structural file changes.',
       arguments: {},
     },
   ],
@@ -7061,7 +7061,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, Static Data editing, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, Static Data editing, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

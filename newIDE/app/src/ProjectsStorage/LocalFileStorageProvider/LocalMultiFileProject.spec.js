@@ -1018,6 +1018,8 @@ describe('Local multi-file project storage', () => {
     expect(counts.instructions.actions).toBeGreaterThan(100);
     expect(counts.settings.objectTypes).toBeGreaterThan(5);
     expect(counts.layouts.contexts).toBe(1);
+    expect(counts.javascript.counts.scenes).toBe(1);
+    expect(counts.javascript.hashes.runtimeApi).toMatch(/^[0-9a-f]{64}$/);
     expect(
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/instructions-catalog.json')
@@ -1041,6 +1043,18 @@ describe('Local multi-file project storage', () => {
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
     ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/project-api.d.ts'))
+    ).toBe(true);
+    expect(
+      fs.readFileSync(
+        path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'),
+        'utf8'
+      )
+    ).not.toContain('_instances');
     project.delete();
   });
 
@@ -1096,6 +1110,12 @@ column = "editor only"
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/project-api.d.ts'))
     ).toBe(true);
     project.delete();
   });

@@ -6,6 +6,7 @@ import {
 import optionalRequire from '../Utils/OptionalRequire';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import { lintExtensionFunctionEvents } from './McpExtensionTools';
+import { validateProjectJavaScriptAuthoring } from '../ProjectsStorage/JavaScriptAuthoringApi';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -553,12 +554,19 @@ export const validateSerializedProject = (
         );
       }
     });
+    const javascriptAuthoring = validateProjectJavaScriptAuthoring({
+      serializedProject,
+      sourceFiles: args.javascript_source_files,
+      runtimeApiDeclaration: args.runtime_api_declaration,
+      projectApiDeclaration: args.project_api_declaration,
+    });
     const errors = [
       ...projectValidationErrors.map(error => ({
         severity: 'error',
         ...error,
       })),
       ...extensionErrors,
+      ...javascriptAuthoring.errors,
     ].filter(error => error.severity === 'error' || !error.severity);
     return {
       success: true,
@@ -568,6 +576,7 @@ export const validateSerializedProject = (
       sceneNames: getProjectSceneNames(serializedProject),
       projectValidationErrors,
       extensionLintFailures,
+      javascriptAuthoring,
       errors,
       generatedCodePreflight:
         args.include_generated_code === false ? 'skipped' : 'checked',
@@ -577,6 +586,7 @@ export const validateSerializedProject = (
         projectValidation: 'checked',
         extensionGeneratedCode:
           args.include_generated_code === false ? 'skipped' : 'checked',
+        javascriptAuthoringApi: 'checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,
@@ -592,6 +602,7 @@ export const validateSerializedProject = (
         projectSerializationRoundTrip: 'not-checked',
         projectValidation: 'not-checked',
         extensionGeneratedCode: 'not-checked',
+        javascriptAuthoringApi: 'not-checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,

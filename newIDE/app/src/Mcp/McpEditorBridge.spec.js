@@ -183,7 +183,7 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
   });
 
-  it('generates and verifies all three catalogs before returning', async () => {
+  it('generates and verifies all catalogs and JavaScript declarations before returning', async () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-generate-catalogs-')
     );
@@ -204,9 +204,15 @@ describe('McpEditorBridge', () => {
       instructions: path.join(catalogDirectory, 'instructions-catalog.json'),
       settings: path.join(catalogDirectory, 'settings-catalog.json'),
       layouts: path.join(catalogDirectory, 'layout-catalog.json'),
+      runtimeApi: path.join(catalogDirectory, 'runtime-api.d.ts'),
+      projectApi: path.join(catalogDirectory, 'project-api.d.ts'),
     };
-    Object.keys(catalogFiles).forEach(key => {
-      fs.writeFileSync(catalogFiles[key], '{ stale catalog', 'utf8');
+    [
+      catalogFiles.instructions,
+      catalogFiles.settings,
+      catalogFiles.layouts,
+    ].forEach(catalogFile => {
+      fs.writeFileSync(catalogFile, '{ stale catalog', 'utf8');
     });
     const reloadProjectAndWait = jest.fn();
     const bridge = makeBridge({
@@ -236,11 +242,21 @@ describe('McpEditorBridge', () => {
         catalogFiles,
       })
     );
-    Object.keys(catalogFiles).forEach(key => {
+    [
+      catalogFiles.instructions,
+      catalogFiles.settings,
+      catalogFiles.layouts,
+    ].forEach(catalogFile => {
       expect(() =>
-        JSON.parse(fs.readFileSync(catalogFiles[key], 'utf8'))
+        JSON.parse(fs.readFileSync(catalogFile, 'utf8'))
       ).not.toThrow();
     });
+    expect(fs.readFileSync(catalogFiles.runtimeApi, 'utf8')).toContain(
+      'declare namespace gdjs'
+    );
+    expect(fs.readFileSync(catalogFiles.projectApi, 'utf8')).toContain(
+      'declare namespace GDevelopProject'
+    );
     expect(result.generatedGameJson).toBeUndefined();
     expect(result.nextAction).toContain('Read the refreshed catalogs');
   });
@@ -288,6 +304,7 @@ describe('McpEditorBridge', () => {
         validationMode: 'multi-file-disk-sources',
         projectFile,
         catalogsRegenerated: true,
+        javascriptApiRegenerated: true,
         catalogs: expect.objectContaining({
           instructions: expect.any(Object),
           settings: expect.any(Object),
@@ -303,6 +320,7 @@ describe('McpEditorBridge', () => {
           projectSerializationRoundTrip: 'checked',
           projectValidation: 'checked',
           extensionGeneratedCode: 'checked',
+          javascriptAuthoringApi: 'checked',
           runtimeGameplaySemantics: 'not-verified',
         }),
         runtimeSemanticsVerified: false,
@@ -326,9 +344,67 @@ describe('McpEditorBridge', () => {
         path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json')
       )
     ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'runtime-api.d.ts')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'project-api.d.ts')
+      )
+    ).toBe(true);
     expect(result.nextAction).toContain('reload_project');
     expect(result.nextAction).toContain('does not verify runtime');
     expect(result.note).toContain('does not prove object picking');
+  });
+
+  it('reports strict JavaScript API errors against the original events source', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-invalid-javascript-api-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = `@js strict=true
+runtimeScene._instances.length;
+@end js
+`;
+    await writeMultiFileSourceTree({ entryPath: projectFile, files });
+    const bridge = makeBridge({ getProject: () => project });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'error',
+          code: 'JS_API_PRIVATE_MEMBER',
+          fileUri: 'game://scenes/Scene/Scene.events',
+          filePath: path.join(
+            temporaryDirectory,
+            'scenes',
+            'Scene',
+            'Scene.events'
+          ),
+          line: 2,
+          sourceExcerpt: expect.arrayContaining([
+            expect.objectContaining({
+              isErrorLine: true,
+              text: expect.stringContaining('_instances'),
+            }),
+          ]),
+        }),
+      ])
+    );
   });
 
   it('reports the source file and location for invalid project files', async () => {

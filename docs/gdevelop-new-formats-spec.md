@@ -206,6 +206,8 @@ MyGame/
     deprecated-instructions-catalog.json
     settings-catalog.json
     layout-catalog.json
+    runtime-api.d.ts
+    project-api.d.ts
     state.json
     transactions/
 ```
@@ -281,6 +283,15 @@ both; the two files remain independent unless both are listed in
   that layout. Registered effect types and typed parameters are included so an
   AI model does not guess layout APIs. It is generated state and must never be
   edited.
+- `.gdevelop/runtime-api.d.ts`, regenerated on every manual project save. It
+  contains the compact reviewed public runtime surface available to JavaScript
+  events. Runtime-private, underscore, renderer, generated-code, browser,
+  Node.js, and privileged APIs are excluded. It is generated state and must
+  never be edited.
+- `.gdevelop/project-api.d.ts`, regenerated alongside the runtime declaration.
+  It describes the current scene/object/group/variable/layer/resource and
+  extension-function names and gives JavaScript events context-aware types. It
+  is generated state and must never be edited.
 - `.gdevelop/game.json`, regenerated from the composed legacy serializer tree
   on every manual project save. It is an ignored runtime/export compatibility
   snapshot, never editable project source.
@@ -1765,16 +1776,23 @@ The writer:
    parameter `index` fields already implied by their parent arrays are
    excluded. The catalogs are deterministically ordered and written only after
    source verification succeeds.
-7. Regenerates `.gdevelop/deprecated-instructions-catalog.json` alongside the
+7. Regenerates `.gdevelop/runtime-api.d.ts` and
+   `.gdevelop/project-api.d.ts`, then type-checks JavaScript event blocks
+   against their exact scene/function contexts. Syntax errors always block;
+   `strict=true` blocks also reject unknown/private APIs, stale project
+   literals, nullability errors, bad argument types, and forbidden globals.
+   Existing non-strict compatibility blocks preserve semantic issues as
+   warnings. No JavaScript executes during validation.
+8. Regenerates `.gdevelop/deprecated-instructions-catalog.json` alongside the
    normal instruction catalog. It stores only deprecated/hidden compatibility
    entries. Serialization and loading merge both catalogs in memory for
    lossless legacy conversion. AI authoring uses only the filtered
    `.gdevelop/instructions-catalog.json`; the deprecated catalog may be read
    only to understand or minimally edit deprecated instructions already found
    in a legacy project, never to construct new events.
-8. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
+9. Writes the equivalent composed legacy project to `.gdevelop/game.json` as
    an ignored compatibility snapshot.
-9. Updates ignored state hashes.
+10. Updates ignored state hashes.
 
 The generated authoring and deprecated compatibility catalogs share one
 named-instruction contract.

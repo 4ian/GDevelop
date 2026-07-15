@@ -24,6 +24,7 @@ import {
 import {
   openMultiFileProject,
   readMultiFileSourceTree,
+  resolveGameUriToPath,
 } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
@@ -424,10 +425,7 @@ const getProjectFilesValidationDiagnostic = (
   const { line, column } = getErrorLocation(error);
   let filePath = null;
   if (path && fileUri && fileUri.startsWith('game://')) {
-    filePath = path.resolve(
-      path.dirname(projectFile),
-      ...fileUri.slice('game://'.length).split('/')
-    );
+    filePath = resolveGameUriToPath(path.dirname(projectFile), fileUri);
   }
   return {
     severity: 'error',
@@ -442,6 +440,28 @@ const getProjectFilesValidationDiagnostic = (
     filePath: filePath || undefined,
     line: line || undefined,
     column: column || undefined,
+    sourceExcerpt:
+      getValidationSourceExcerpt({ projectFile, fileUri, line }) || undefined,
+  };
+};
+
+const addProjectSourceLocationDetails = (
+  diagnostic: Object,
+  projectFile: string
+): Object => {
+  const fileUri =
+    diagnostic && typeof diagnostic.fileUri === 'string'
+      ? diagnostic.fileUri
+      : null;
+  const line = diagnostic && Number(diagnostic.line || 0);
+  if (!fileUri) return diagnostic;
+  const filePath =
+    path && fileUri.startsWith('game://')
+      ? resolveGameUriToPath(path.dirname(projectFile), fileUri)
+      : undefined;
+  return {
+    ...diagnostic,
+    filePath,
     sourceExcerpt:
       getValidationSourceExcerpt({ projectFile, fileUri, line }) || undefined,
   };
@@ -5414,11 +5434,13 @@ const callMcpTool = async ({
             'settings-catalog.json'
           ),
           layouts: path.join(projectRoot, '.gdevelop', 'layout-catalog.json'),
+          runtimeApi: path.join(projectRoot, '.gdevelop', 'runtime-api.d.ts'),
+          projectApi: path.join(projectRoot, '.gdevelop', 'project-api.d.ts'),
         },
         nextAction:
           'Read the refreshed catalogs before making edits that depend on newly added or changed project structure. Run validate_project_files after the final source edit before reload_project.',
         note:
-          'All three generated catalog files were written sequentially and verified before this response. Project source files and editor memory were not modified.',
+          'All three generated catalog files and both JavaScript declaration files were written sequentially and verified before this response. Project source files and editor memory were not modified.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(
@@ -5484,6 +5506,7 @@ const callMcpTool = async ({
       );
 
       const serializedProject = await openMultiFileProject(projectFile);
+      const sourceTree = await readMultiFileSourceTree(projectFile);
       const generatedJson = JSON.stringify(serializedProject, null, 2);
       const generatedGameJson = {
         reconstructedInMemory: true,
@@ -5495,7 +5518,33 @@ const callMcpTool = async ({
       };
       const validation = validateSerializedProject(serializedProject, {
         include_generated_code: true,
+        javascript_source_files: sourceTree.files,
       });
+      const sourceLocatedErrors = (validation.errors || []).map(diagnostic =>
+        addProjectSourceLocationDetails(diagnostic, projectFile)
+      );
+      const javascriptAuthoring = validation.javascriptAuthoring
+        ? {
+            ...validation.javascriptAuthoring,
+            errors: (validation.javascriptAuthoring.errors || []).map(
+              diagnostic =>
+                addProjectSourceLocationDetails(diagnostic, projectFile)
+            ),
+            warnings: (validation.javascriptAuthoring.warnings || []).map(
+              diagnostic =>
+                addProjectSourceLocationDetails(diagnostic, projectFile)
+            ),
+            diagnostics: (validation.javascriptAuthoring.diagnostics || []).map(
+              diagnostic =>
+                addProjectSourceLocationDetails(diagnostic, projectFile)
+            ),
+          }
+        : validation.javascriptAuthoring;
+      const sourceLocatedValidation = {
+        ...validation,
+        errors: sourceLocatedErrors,
+        javascriptAuthoring,
+      };
       if (!validation.valid) {
         return errorResult(
           'The project files were composed into game.json, but the reconstructed project failed GDevelop validation.',
@@ -5505,24 +5554,26 @@ const callMcpTool = async ({
             validationMode: 'multi-file-disk-sources',
             projectFile,
             catalogsRegenerated: true,
+            javascriptApiRegenerated: true,
             catalogs,
             generatedGameJson,
-            errors: validation.errors || [],
-            validation,
+            errors: sourceLocatedErrors,
+            validation: sourceLocatedValidation,
           }
         );
       }
       return textResult({
-        ...validation,
+        ...sourceLocatedValidation,
         validationMode: 'multi-file-disk-sources',
         projectFile,
         catalogsRegenerated: true,
+        javascriptApiRegenerated: true,
         catalogs,
         generatedGameJson,
         nextAction:
           'Project disk sources are structurally valid and passed code-generation preflight. This does not verify runtime gameplay semantics. You may now call reload_project, then launch a paused preview and use run_frames for behavior-sensitive changes.',
         note:
-          'Regenerated all project source catalogs, loaded every referenced multi-file source again using the fresh instruction catalog, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime.',
+          'Regenerated all project source catalogs and JavaScript declaration files, loaded every referenced multi-file source again using the fresh instruction catalog, type-checked JavaScript event blocks against the generated public API, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, JavaScript authoring-API validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(

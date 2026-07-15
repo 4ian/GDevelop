@@ -4989,18 +4989,10 @@ describe('editorFunctions', () => {
         {
           name: 'hero.png',
           kind: 'image',
-          file: 'assets/hero.png',
-          metadata: undefined,
-          originName: undefined,
-          originIdentifier: undefined,
         },
         {
           name: 'jump.aac',
           kind: 'audio',
-          file: 'assets/jump.aac',
-          metadata: undefined,
-          originName: undefined,
-          originIdentifier: undefined,
         },
       ]);
     });

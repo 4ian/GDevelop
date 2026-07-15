@@ -3497,6 +3497,13 @@ const put2dInstances: EditorFunction = {
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
         );
       }
+      // The "none" brush never applies a position: fail instead of silently
+      // ignoring it, so the caller switches to a placement brush to move.
+      if (brush_kind === 'none' && parsedBrushPosition) {
+        return makeGenericFailure(
+          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact position of every matched instance — one call per target position).'
+        );
+      }
       // After the guard, a missing position can only happen when nothing is
       // created nor moved ("none" brush only): the fallback is never used.
       const brushPosition: [number, number] = parsedBrushPosition || [0, 0];
@@ -3879,14 +3886,18 @@ const put2dInstances: EditorFunction = {
           return makeGenericFailure(
             `Matched ${matchedCount} existing instance${
               matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
           );
         }
 
         return makeGenericFailure(
           `Matched ${matchedCount} existing instance${
             matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.`
+          } but the requested values are identical to their current ones, so nothing changed.${
+            hasPositionBrush
+              ? ''
+              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+          }`
         );
       }
 
@@ -4241,6 +4252,13 @@ const put3dInstances: EditorFunction = {
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
         );
       }
+      // The "none" brush never applies a position: fail instead of silently
+      // ignoring it, so the caller switches to a placement brush to move.
+      if (brush_kind === 'none' && parsedBrushPosition) {
+        return makeGenericFailure(
+          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact X, Y and Z of every matched instance — one call per target position).'
+        );
+      }
       // After the guard, a missing position can only happen when nothing is
       // created nor moved ("none" brush only): the fallback is never used.
       const brushPosition: [number, number, number] = parsedBrushPosition || [
@@ -4565,14 +4583,18 @@ const put3dInstances: EditorFunction = {
           return makeGenericFailure(
             `Matched ${matchedCount} existing instance${
               matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify (see the tool parameters for what can be edited).`
+            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
           );
         }
 
         return makeGenericFailure(
           `Matched ${matchedCount} existing instance${
             matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.`
+          } but the requested values are identical to their current ones, so nothing changed.${
+            hasPositionBrush
+              ? ''
+              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+          }`
         );
       }
 

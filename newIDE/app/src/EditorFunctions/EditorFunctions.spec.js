@@ -2824,8 +2824,9 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([{ x: 300, y: 400 }]);
     });
 
-    // The none brush must still leave existing instances where they are.
-    it('does not move an existing instance edited with the none brush', async () => {
+    // A position passed with the none brush would be silently ignored, which
+    // agents misread as a move failure: the call must fail explicitly.
+    it('fails when a brush_position is passed with the none brush', async () => {
       await putInstances({
         brush_kind: 'point',
         brush_position: '100,200',
@@ -2833,13 +2834,23 @@ describe('editorFunctions', () => {
       });
       const [created] = getInstances(testScene);
 
-      await putInstances({
-        brush_kind: 'none',
-        brush_position: '640,360',
-        existing_instance_ids: created.uuid,
-        instances_size: '48,48',
+      const result = await editorFunctions.put_2d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '640,360',
+          existing_instance_ids: created.uuid,
+          instances_size: '48,48',
+        },
       });
 
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('never moves instances')
+      );
       expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
     });
 
@@ -3368,6 +3379,37 @@ describe('editorFunctions', () => {
         expect.stringContaining('cannot create new ones')
       );
       expect(getInstancePositions(testScene)).toEqual([]);
+    });
+
+    // A position passed with the none brush would be silently ignored, which
+    // agents misread as a move failure: the call must fail explicitly.
+    it('fails when a brush_position is passed with the none brush', async () => {
+      await putInstances({
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      });
+      const [created] = getInstances(testScene);
+
+      const result = await editorFunctions.put_3d_instances.launchFunction({
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          layer_name: '',
+          brush_kind: 'none',
+          brush_position: '10,20,150',
+          existing_instance_ids: created.uuid,
+        },
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toEqual(
+        expect.stringContaining('never moves instances')
+      );
+      expect(getInstancePositions(testScene)).toEqual([
+        { x: 10, y: 20, z: 30 },
+      ]);
     });
 
     // The created id in the message closes the loop "create then adjust":

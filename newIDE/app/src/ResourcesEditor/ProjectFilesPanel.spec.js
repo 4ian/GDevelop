@@ -549,7 +549,7 @@ describe('ProjectFilesPanel', () => {
     expect(source).toContain('updateProjectSkillsFolderFromTemplate(node);');
   });
 
-  it('shows folder link management actions', () => {
+  it('shows the add folder link action only on the linked folders root', () => {
     const source = getSource();
 
     expect(source).toContain("'.gdevelop-folder-links.json'");
@@ -561,7 +561,10 @@ describe('ProjectFilesPanel', () => {
     );
     expect(source).toContain('if (rootNode) nodes.push(rootNode);');
     expect(source).toContain('topLevelNodes.map(node => renderNode(node, 0))');
-    expect(source).toContain('label: i18n._(t`Add folder link`)');
+    expect(source.split('label: i18n._(t`Add folder link`)').length - 1).toBe(
+      1
+    );
+    expect(source).not.toContain('tooltip={t`Add folder link`}');
     expect(source).toContain('canRenameLinkedFolderNode(node)');
     expect(source).toContain('name: newName');
     expect(source).toContain('label: i18n._(t`Remove folder link`)');

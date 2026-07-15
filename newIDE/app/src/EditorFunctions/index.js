@@ -6249,6 +6249,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 );
                 for (const behaviorName of groupVisibleBehaviorNames) {
                   gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+                    project.getCurrentPlatform(),
                     globalObjects,
                     sceneObjects,
                     object,

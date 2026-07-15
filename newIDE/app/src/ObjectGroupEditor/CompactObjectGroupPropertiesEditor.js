@@ -221,6 +221,7 @@ export const CompactObjectGroupPropertiesEditor = ({
       );
       for (const behaviorName of allVisibleBehaviorNames) {
         gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+          project.getCurrentPlatform(),
           globalObjectsContainer || objectsContainer,
           objectsContainer,
           object,
@@ -237,6 +238,7 @@ export const CompactObjectGroupPropertiesEditor = ({
       groupVariablesContainer,
       objectGroup,
       objectsContainer,
+      project,
     ]
   );
 

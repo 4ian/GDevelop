@@ -99,7 +99,7 @@ export const useRefreshLimits = (
 
 // All requests are made in orchestrator mode, and sub-agents (explorer, edit)
 // are created server-side with the same tools version as the orchestrator.
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v7';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v8';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying

@@ -4036,6 +4036,27 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "This variable does not exist on this object or group.");
     }
 
+    SECTION("Undeclared object variable in extensions") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "objectvar", "");
+      node->Visit(validator);
+      RequireNoError(validator);
+    }
+
+    SECTION("Undeclared object variable in extensions with children") {
+      auto node =
+          parser.ParseExpression("MyUndeclaredVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers,
+                                        "objectvar", "");
+      node->Visit(validator);
+      RequireNoError(validator);
+    }
+
     SECTION("Undeclared object variable in expression") {
       auto node = parser.ParseExpression("MyObject.MyUndeclaredVariable");
       REQUIRE(node != nullptr);

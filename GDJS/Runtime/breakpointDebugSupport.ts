@@ -80,7 +80,8 @@ namespace gdjs {
     /** Container running when the breakpoint fired (the scene, or a
      * sub-container for custom-object methods) — tells the dump builder where
      * to read object instances. */
-    private _lastBpCallingContainer: gdjs.RuntimeInstanceContainer | null = null;
+    private _lastBpCallingContainer: gdjs.RuntimeInstanceContainer | null =
+      null;
 
     constructor(game: gdjs.RuntimeGame) {
       this._game = game;
@@ -207,7 +208,9 @@ namespace gdjs {
         return;
       }
 
-      if (DebuggerBreakpointManager._isExtensionScope(this._stepCurrentFunctionId)) {
+      if (
+        DebuggerBreakpointManager._isExtensionScope(this._stepCurrentFunctionId)
+      ) {
         // Extension scope: stop stepping and let the game resume.
         this._stepNextEvent = false;
       } else {

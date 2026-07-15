@@ -1,5 +1,6 @@
 const electron = require('electron');
 const path = require('path');
+const fs = require('fs');
 const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
@@ -66,13 +67,77 @@ let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
 
+// open-projects.json in userData: separate CLI processes read this to find live editors.
+const windowProjectPaths = new Map();
+const openProjectsRegistryPath = path.join(
+  app.getPath('userData'),
+  'open-projects.json'
+);
+
+const normalizeProjectPath = filePath => {
+  if (!filePath) return null;
+  try {
+    const resolved = path.resolve(filePath);
+    return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+  } catch (e) {
+    return null;
+  }
+};
+
+const writeOpenProjectsRegistry = () => {
+  try {
+    const projectPaths = Array.from(new Set(windowProjectPaths.values()));
+    fs.writeFileSync(openProjectsRegistryPath, JSON.stringify(projectPaths));
+  } catch (e) {}
+};
+
+const readOpenProjectsRegistry = () => {
+  try {
+    const projectPaths = JSON.parse(
+      fs.readFileSync(openProjectsRegistryPath, 'utf8')
+    );
+    return Array.isArray(projectPaths) ? projectPaths : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const setWindowProjectPath = (windowId, filePath) => {
+  const normalized = normalizeProjectPath(filePath);
+  if (normalized) windowProjectPaths.set(windowId, normalized);
+  else windowProjectPaths.delete(windowId);
+  writeOpenProjectsRegistry();
+};
+
+const clearWindowProjectPath = windowId => {
+  if (windowProjectPaths.delete(windowId)) writeOpenProjectsRegistry();
+};
+
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
 const argsParserOptions = {
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
   string: ['_', 'run-command', 'cmd-args'],
 };
-const args = parseArgs(process.argv.slice(isDev ? 2 : 1), argsParserOptions);
+
+// Chromium may inject its own flags into second-instance argv, landing right
+// between --run-command and its value. Drop unknown -- flags before parsing.
+const knownCliFlagNames = new Set(
+  [...argsParserOptions.boolean, ...argsParserOptions.string].filter(
+    name => name !== '_'
+  )
+);
+const parseGDevelopArgs = argv =>
+  parseArgs(
+    argv.filter(
+      arg =>
+        !arg.startsWith('--') ||
+        knownCliFlagNames.has(arg.slice(2).split('=')[0])
+    ),
+    argsParserOptions
+  );
+
+const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
 
 const devTools = !!args['dev-tools'];
 
@@ -87,25 +152,47 @@ if (process.platform === 'win32') {
 
 // Single instance lock - prevents multiple Electron processes
 // This solves Firebase IndexedDB locking issues while still allowing multiple windows.
-//
-// When invoked via `--run-command` (CLI / CI scenarios), we deliberately
-// SKIP the single-instance lock so each CLI invocation runs in its own
-// process. This lets the launching shell wait for completion and observe
-// the exit code, instead of being immediately backgrounded by the existing
-// instance taking over via the second-instance handler.
+// CLI: skip the lock unless the target project is a known open window (registry hit);
+// a stale registry entry falls back to running headless in this process.
 const isCliRunCommand = !!args['run-command'];
-const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
+const cliProjectPath = isCliRunCommand
+  ? normalizeProjectPath(args._[0])
+  : null;
+const isCliProjectAlreadyOpenElsewhere =
+  !!cliProjectPath && readOpenProjectsRegistry().includes(cliProjectPath);
+const gotTheLock =
+  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere
+    ? true
+    : app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
-} else if (!isCliRunCommand) {
-  // First instance - handle second-instance events by creating new windows
+} else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
-    const secondInstanceArgs = parseArgs(
-      commandLine.slice(isDev ? 2 : 1),
-      argsParserOptions
+    const secondInstanceArgs = parseGDevelopArgs(
+      commandLine.slice(isDev ? 2 : 1)
     );
+
+    const secondInstanceCommandName = secondInstanceArgs['run-command'];
+    if (secondInstanceCommandName) {
+      const secondInstanceProjectPath = normalizeProjectPath(
+        secondInstanceArgs._[0]
+      );
+      const targetWindow = Array.from(mainWindows).find(
+        window => windowProjectPaths.get(window.id) === secondInstanceProjectPath
+      );
+
+      if (targetWindow) {
+        targetWindow.webContents.send('run-cli-command', {
+          commandName: secondInstanceCommandName,
+          commandArgs: secondInstanceArgs['cmd-args'],
+          projectPath: secondInstanceProjectPath,
+        });
+        targetWindow.focus();
+        return;
+      }
+    }
 
     // Update the global args so the new window's renderer (which reads them
     // via remote.getGlobal('args')) picks up the second-instance CLI flags
@@ -145,6 +232,8 @@ const windowTargetIdToBrowserWindowIds = new Map();
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
+  // windowArgs: a GUI primary process can still open a CLI window (second-instance fallback).
+  const isCliWindow = !!windowArgs['run-command'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();
@@ -202,13 +291,13 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
-  if (isCliRunCommand && !windowArgs['keep-open']) {
+  if (isCliWindow && !windowArgs['keep-open']) {
     options.show = false;
     options.skipTaskbar = true;
   }
 
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated && !isCliRunCommand) newWindow.maximize();
+  if (!isIntegrated && !isCliWindow) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
@@ -230,7 +319,7 @@ function createNewWindow(windowArgs = args) {
 
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
-  if (isCliRunCommand) {
+  if (isCliWindow) {
     newWindow.webContents.on('console-message', (_event, level, message) => {
       if (level < 1) return;
       if (message.startsWith('%c')) return;
@@ -271,6 +360,7 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
+    clearWindowProjectPath(windowId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -381,6 +471,11 @@ function createNewWindow(windowArgs = args) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  // Handoff calls app.quit() but 'ready' still runs; without the lock, do not create a window.
+  if (!gotTheLock) {
+    return;
+  }
+
   registerGdideProtocol({ isDev });
 
   // Create the first window
@@ -420,6 +515,11 @@ app.on('ready', function() {
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
+
+  ipcMain.on('set-window-project-path', (event, filePath) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (window) setWindowProjectPath(window.id, filePath);
   });
 
   ipcMain.handle('install-cli-in-path', async () => {

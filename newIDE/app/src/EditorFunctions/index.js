@@ -1171,10 +1171,14 @@ const createOrReplaceObject: EditorFunction = {
             assetSearchMissed = true;
           }
         } catch (error) {
+          const serverErrorData =
+            error.response && error.response.data
+              ? ` - ${JSON.stringify(error.response.data)}`
+              : '';
           return makeGenericFailure(
             `Unexpected error while searching/installing object (${
               error.message
-            }).`
+            }${serverErrorData}).`
           );
         }
       }
@@ -1343,10 +1347,14 @@ const createOrReplaceObject: EditorFunction = {
           // No asset found.
         }
       } catch (error) {
+        const serverErrorData =
+          error.response && error.response.data
+            ? ` - ${JSON.stringify(error.response.data)}`
+            : '';
         return makeGenericFailure(
           `Unexpected error while searching/installing object (${
             error.message
-          }).`
+          }${serverErrorData}).`
         );
       }
 
@@ -6392,13 +6400,12 @@ const inspectProjectPropertiesResources: EditorFunction = {
     const resources = shouldListResources
       ? listedResourceNames.map(resourceName => {
           const resource = resourcesManager.getResource(resourceName);
+          // Only expose what the AI can act on: `file`/`originIdentifier` are
+          // internal URLs easily mistaken for asset store IDs, `metadata` is
+          // editor-internal (and can be huge), `originName` is provenance only.
           return {
             name: resourceName,
             kind: resource.getKind(),
-            file: resource.getFile(),
-            metadata: resource.getMetadata() || undefined,
-            originName: resource.getOriginName() || undefined,
-            originIdentifier: resource.getOriginIdentifier() || undefined,
           };
         })
       : undefined;

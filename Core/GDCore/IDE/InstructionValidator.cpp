@@ -70,22 +70,22 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     // declared while legacy ones don't.
     // For legacy variable instruction, we pass an empty object name.
     gd::String rootObjectName = "";
-    if (parameterType == "objectvar" &&
-        gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
-            instruction.GetType())) {
+    if (parameterType == "objectvar") {
       const auto &objectsContainersList =
           projectScopedContainers.GetObjectsContainersList();
       rootObjectName = instruction.GetParameter(0).GetPlainString();
 
-      // Extensions still rely on undeclared object variables.
-      auto objectSourceType =
-          projectScopedContainers.GetObjectsContainersList()
-              .GetObjectsContainerFromObjectName(rootObjectName)
-              ->GetSourceType();
-      // TODO Check child-object variables while keep ignoring object variables
-      // from parameters.
-      if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
-        rootObjectName = "";
+      if (!gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+              instruction.GetType())) {
+        // Extensions still rely on legacy object variables instructions.
+        auto objectSourceType =
+            projectScopedContainers.GetObjectsContainersList()
+                .GetObjectsContainerFromObjectName(rootObjectName)
+                ->GetSourceType();
+        // Only child-object variable declarations are checked.
+        if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
+          rootObjectName = "";
+        }
       }
     }
     auto &expressionNode =

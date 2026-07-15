@@ -305,7 +305,7 @@ module.exports = [
     "languageCode": "ta_IN",
     "languageName": "Tamil",
     "languageNativeName": "தமிழ்",
-    "translationRatio": 0.38135848299387975
+    "translationRatio": 0.38115782080866856
   },
   {
     "languageCode": "th_TH",

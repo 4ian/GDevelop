@@ -324,6 +324,12 @@ describe('McpEditorBridge', () => {
           runtimeGameplaySemantics: 'not-verified',
         }),
         runtimeSemanticsVerified: false,
+        validationResultKind: 'structural-validation',
+        completionStatus: 'runtime-verification-required',
+        runtimeVerificationRequired: true,
+        completionWarning: expect.stringContaining(
+          'valid:true does not prove that the game works'
+        ),
         javascriptAuthoring: expect.objectContaining({
           checked: true,
           checkedBlocks: 0,
@@ -364,7 +370,9 @@ describe('McpEditorBridge', () => {
     ).toBe(true);
     expect(result.nextAction).toContain('reload_project');
     expect(result.nextAction).toContain('does not verify runtime');
+    expect(result.nextAction).toContain('RUNTIME VERIFICATION REQUIRED');
     expect(result.note).toContain('does not prove object picking');
+    expect(result.note).toContain('RUNTIME NOT VERIFIED');
   });
 
   it('reports strict JavaScript API errors against the original events source', async () => {

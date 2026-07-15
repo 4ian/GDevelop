@@ -52,7 +52,10 @@ const run = async () => {
       throw new Error('Renderer should not be called for initialize');
     },
   });
-  assert.strictEqual(initializeResponse.result.serverInfo.name, 'gdevelop-editor');
+  assert.strictEqual(
+    initializeResponse.result.serverInfo.name,
+    'gdevelop-editor'
+  );
 
   const authFailureResponse = await handleMcpJsonRpcRequest({
     request: {
@@ -96,6 +99,30 @@ const run = async () => {
     sendRendererRequest: async () => ({ ok: true }),
   });
   assert.strictEqual(unknownMethodResponse.error.code, -32601);
+
+  const rendererError = new Error('Renderer timed out.');
+  rendererError.data = {
+    code: 'MCP_RENDERER_TIMEOUT',
+    operationId: 'reload-project-1',
+  };
+  const rendererFailureResponse = await handleMcpJsonRpcRequest({
+    request: {
+      jsonrpc: '2.0',
+      id: 5,
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    },
+    authorizationHeader: 'Bearer test-token',
+    token: 'test-token',
+    sendRendererRequest: async () => {
+      throw rendererError;
+    },
+  });
+  assert.strictEqual(rendererFailureResponse.error.code, -32603);
+  assert.deepStrictEqual(
+    rendererFailureResponse.error.data,
+    rendererError.data
+  );
 
   const server = await startMcpServer({
     port: 0,

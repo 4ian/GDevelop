@@ -33,6 +33,9 @@ const {
   stopMcpServer,
   getMcpServerState,
 } = require('./Mcp/McpServer');
+const {
+  createMcpRendererRequestBroker,
+} = require('./Mcp/McpRendererRequestBroker');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
@@ -108,9 +111,6 @@ let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
 let mcpRendererWebContents = null;
-let mcpRendererRequestId = 0;
-const pendingMcpRendererRequests = new Map();
-const MCP_RENDERER_REQUEST_TIMEOUT_MS = 30000;
 
 const serializeMcpServerState = (state, error) => ({
   isRunning: !!state,
@@ -119,42 +119,15 @@ const serializeMcpServerState = (state, error) => ({
   error: error || null,
 });
 
-const sendMcpRendererRequest = ({ method, params }) =>
-  new Promise((resolve, reject) => {
-    const webContents = mcpRendererWebContents;
-    if (!webContents || webContents.isDestroyed()) {
-      reject(new Error('No active GDevelop editor window is available.'));
-      return;
-    }
+const mcpRendererRequestBroker = createMcpRendererRequestBroker({
+  getWebContents: () => mcpRendererWebContents,
+});
 
-    const id = ++mcpRendererRequestId;
-    const timeoutId = setTimeout(() => {
-      pendingMcpRendererRequests.delete(id);
-      reject(new Error('Timed out waiting for the GDevelop editor.'));
-    }, MCP_RENDERER_REQUEST_TIMEOUT_MS);
+const sendMcpRendererRequest = request =>
+  mcpRendererRequestBroker.send(request);
 
-    pendingMcpRendererRequests.set(id, {
-      resolve,
-      reject,
-      timeoutId,
-      webContents,
-    });
-
-    webContents.send('mcp-renderer-request', {
-      id,
-      method,
-      params,
-    });
-  });
-
-const clearPendingMcpRendererRequestsFor = webContents => {
-  for (const [id, pendingRequest] of pendingMcpRendererRequests) {
-    if (pendingRequest.webContents !== webContents) continue;
-    clearTimeout(pendingRequest.timeoutId);
-    pendingRequest.reject(new Error('The GDevelop editor window was closed.'));
-    pendingMcpRendererRequests.delete(id);
-  }
-};
+const clearPendingMcpRendererRequestsFor = webContents =>
+  mcpRendererRequestBroker.clearFor(webContents);
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
@@ -626,27 +599,7 @@ app.on('ready', function() {
   });
 
   ipcMain.on('mcp-renderer-response', (event, response) => {
-    const pendingRequest =
-      response && typeof response.id === 'number'
-        ? pendingMcpRendererRequests.get(response.id)
-        : null;
-    if (!pendingRequest || pendingRequest.webContents !== event.sender) return;
-
-    pendingMcpRendererRequests.delete(response.id);
-    clearTimeout(pendingRequest.timeoutId);
-
-    if (response.error) {
-      pendingRequest.reject(
-        new Error(
-          response.error && response.error.message
-            ? response.error.message
-            : String(response.error)
-        )
-      );
-      return;
-    }
-
-    pendingRequest.resolve(response.result);
+    mcpRendererRequestBroker.handleResponse(event.sender, response);
   });
 
   ipcMain.handle('mcp-server-get-state', async () =>

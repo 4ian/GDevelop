@@ -48,6 +48,25 @@ const noInputSchema = {
   additionalProperties: false,
 };
 
+const reloadProjectSchema = {
+  type: 'object',
+  properties: {
+    timeout_ms: {
+      type: 'number',
+      minimum: 1000,
+      maximum: 600000,
+      description:
+        'Optional wait timeout in milliseconds. Defaults to 120000. If the wait expires, the reload continues and the timeout error returns an operation_id.',
+    },
+    operation_id: {
+      type: 'string',
+      description:
+        'Optional reload operation ID returned by a previous timeout. Reattaches to the running operation or returns its retained completed receipt without starting another reload.',
+    },
+  },
+  additionalProperties: false,
+};
+
 const sceneNameSchema = {
   type: 'object',
   properties: {
@@ -4227,8 +4246,8 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
-    inputSchema: emptyObjectSchema,
+      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. Reload waits default to 120 seconds and can be configured with timeout_ms. A timed-out reload keeps running and returns an operation_id in the JSON-RPC error data; call reload_project with that operation_id to attach or poll without starting a duplicate reload. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
+    inputSchema: reloadProjectSchema,
     annotations: {
       readOnlyHint: false,
       destructiveHint: true,

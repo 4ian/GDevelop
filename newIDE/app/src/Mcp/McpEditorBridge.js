@@ -5604,9 +5604,9 @@ const callMcpTool = async ({
         catalogs,
         generatedGameJson,
         nextAction:
-          'Project disk sources are structurally valid and passed code-generation preflight. This does not verify runtime gameplay semantics. You may now call reload_project, then launch a paused preview and use run_frames for behavior-sensitive changes.',
+          'RUNTIME VERIFICATION REQUIRED BEFORE COMPLETION: valid:true establishes structural and code-generation validity only; it does not verify runtime gameplay semantics. Call reload_project, then launch a paused preview and use run_frames for every behavior-sensitive change.',
         note:
-          'Regenerated all project source catalogs and JavaScript declaration files, loaded every referenced multi-file source again using the fresh instruction catalog, type-checked JavaScript event blocks against the generated public API, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, JavaScript authoring-API validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime.',
+          'STRUCTURAL VALIDATION ONLY — RUNTIME NOT VERIFIED. Regenerated all project source catalogs and JavaScript declaration files, loaded every referenced multi-file source again using the fresh instruction catalog, type-checked JavaScript event blocks against the generated public API, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, JavaScript authoring-API validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime and must not be reported as proof that the game works.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(

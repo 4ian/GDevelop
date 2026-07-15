@@ -277,7 +277,9 @@ generated declaration:
 
 ```ts
 /**
- * Return all living instances of an object.
+ * Return the live, engine-owned array of living instances. Creating or
+ * deleting an instance mutates this array immediately. Iterate a slice()
+ * snapshot or iterate backward when calling deleteFromScene().
  * @javascriptPublic
  * @since 1
  */
@@ -610,6 +612,23 @@ GDevelop event picking. JavaScript-local arrays and Events DSL picked-object
 lists are different concepts. Only the `objects=` header supplies the parent
 event's picked instances to the JavaScript event.
 
+### 11.5 Live object arrays and deletion
+
+`runtimeScene.getObjects(name)` returns the engine-owned live instance array,
+not a stable snapshot. `deleteFromScene()` removes the instance from that array
+immediately, so forward iteration while deleting can skip the item shifted into
+the deleted index. Iterate a copy when order is unimportant:
+
+```js
+const instances = runtimeScene.getObjects("Enemy").slice();
+for (const instance of instances) {
+  instance.deleteFromScene();
+}
+```
+
+Alternatively, iterate the live array backward. Never delete from it with a
+forward `for`, `for...of`, or `forEach` loop.
+
 ---
 
 ## 12. Extension API exposure
@@ -735,7 +754,11 @@ A successful check proves only:
 
 It does not prove object-picking side effects, timing, collision behavior,
 visual correctness, performance, network behavior, or the absence of runtime
-exceptions from dynamic data. Validation receipts must state this boundary.
+exceptions from dynamic data. Validation receipts must mark themselves as
+`structural-validation`, return `runtimeVerificationRequired: true` after a
+successful structural check, and include an explicit completion warning. An
+agent must never summarize `valid: true` as "the game works" or task completion
+without separate preview evidence.
 
 ### 14.4 Severity for existing code
 

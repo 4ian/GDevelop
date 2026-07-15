@@ -364,7 +364,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
    JavaScript, fix every reported source URI/line diagnostic. `valid: true`
    proves parsing, source reconstruction, project validation, JavaScript
    authoring-API checking, and extension generated-code preflight only. It does
-   not prove runtime object picking or gameplay side effects.
+   not prove runtime object picking or gameplay side effects. Never summarize
+   `valid: true` as "the game works" or as task completion without the required
+   preview evidence.
 8. After the requested task is complete and validation succeeds, use Git from
    the project repository root to commit every task-owned change before
    `reload_project`. Inspect `git status` and the final diff, stage all changes
@@ -374,7 +376,10 @@ loop, comment, and JavaScript metadata when editing existing sources.
    afterward, validate again and create a follow-up commit before reloading.
 9. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
-   stale editor memory.
+   stale editor memory. Reload waits default to 120 seconds. If a timeout returns
+   an `operation_id`, call `reload_project` again with that exact ID to attach to
+   or poll the existing operation; do not start recovery processes or assume the
+   reload failed while its receipt says it is still running.
 10. For gameplay or visual changes, call `launch_preview` only after step 9.
     Start paused and use `run_frames` with `objects`, `include`, and optional
     `instance_indexes` to inspect bounded live position, angle, force, variable,
@@ -434,7 +439,8 @@ settings, layouts, and events and type-checks JavaScript blocks against the
 fresh public API without replacing editor memory. A later source edit
 invalidates the earlier validation receipt. Its `valid: true` result is not a
 runtime semantic test; behavior-sensitive changes still require a paused preview
-and deterministic `run_frames` inspection.
+and deterministic `run_frames` inspection. Never report the game as working or
+the task as complete from this receipt alone.
 
 The Git commit is also a mandatory reload gate. After the final successful
 validation, inspect the repository diff, stage every change made for the user's
@@ -446,7 +452,9 @@ before another reload.
 `reload_project` remains a mandatory preview gate. Call it successfully only
 after both the validation and Git-commit gates and before the first
 `launch_preview`. Never launch or relaunch a preview from stale editor memory. A
-later source edit invalidates the validation, commit, and reload receipts.
+later source edit invalidates the validation, commit, and reload receipts. If the
+call times out with an `operation_id`, retry with that ID so the request attaches
+to the retained reload instead of starting a duplicate operation.
 
 ## Verification
 

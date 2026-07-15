@@ -660,6 +660,10 @@ namespace gdjs {
 
     /**
      * Get all the instances of the object called name.
+     *
+     * The returned array is the live, engine-owned instance list. Adding or
+     * deleting an instance mutates it immediately. Iterate a snapshot made with
+     * `slice()` or iterate backward when deleting instances from this list.
      * @param name Name of the object for which the instances must be returned.
      * @return The list of objects with the given name
      */

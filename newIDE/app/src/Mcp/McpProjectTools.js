@@ -569,9 +569,18 @@ export const validateSerializedProject = (
       ...extensionErrors,
       ...javascriptAuthoring.errors,
     ].filter(error => error.severity === 'error' || !error.severity);
+    const structurallyValid = errors.length === 0;
     return {
       success: true,
-      valid: errors.length === 0,
+      valid: structurallyValid,
+      validationResultKind: 'structural-validation',
+      completionStatus: structurallyValid
+        ? 'runtime-verification-required'
+        : 'structural-validation-failed',
+      runtimeVerificationRequired: structurallyValid,
+      completionWarning: structurallyValid
+        ? 'RUNTIME VERIFICATION REQUIRED: valid:true does not prove that the game works. Do not report runtime correctness or task completion until a paused preview verifies behavior-sensitive changes.'
+        : 'Structural validation failed. Fix every blocking diagnostic before reload or runtime verification.',
       projectName: validationProject.getName(),
       projectUuid: validationProject.getProjectUuid(),
       sceneNames: getProjectSceneNames(serializedProject),
@@ -602,6 +611,11 @@ export const validateSerializedProject = (
     return {
       success: true,
       valid: false,
+      validationResultKind: 'structural-validation',
+      completionStatus: 'structural-validation-failed',
+      runtimeVerificationRequired: false,
+      completionWarning:
+        'Structural validation failed before runtime verification could begin.',
       validationScope: {
         projectUnserialization: 'failed',
         projectSerializationRoundTrip: 'not-checked',

@@ -120,8 +120,8 @@ const argsParserOptions = {
   string: ['_', 'run-command', 'cmd-args'],
 };
 
-// Chromium may inject its own flags into second-instance argv, landing right
-// between --run-command and its value. Drop unknown -- flags before parsing.
+// Drop switches Chromium may inject into argv (e.g. --allow-file-access-from-files)
+// so they can't steal the value of our own -- flags during parsing.
 const knownCliFlagNames = new Set(
   [...argsParserOptions.boolean, ...argsParserOptions.string].filter(
     name => name !== '_'
@@ -163,16 +163,19 @@ const isCliProjectAlreadyOpenElsewhere =
 const gotTheLock =
   isCliRunCommand && !isCliProjectAlreadyOpenElsewhere
     ? true
-    : app.requestSingleInstanceLock();
+    : app.requestSingleInstanceLock({ args });
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    const secondInstanceArgs = parseGDevelopArgs(
-      commandLine.slice(isDev ? 2 : 1)
-    );
+  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+    // Prefer the args parsed by the second instance: Chromium reorders commandLine
+    // (switches first, values last), breaking flag-to-value pairing on reparse.
+    const secondInstanceArgs =
+      additionalData && additionalData.args
+        ? additionalData.args
+        : parseGDevelopArgs(commandLine.slice(isDev ? 2 : 1));
 
     const secondInstanceCommandName = secondInstanceArgs['run-command'];
     if (secondInstanceCommandName) {

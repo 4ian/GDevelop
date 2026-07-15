@@ -68,24 +68,20 @@ export const MaxProjectCountAlertMessage = ({
             {maximumCount === 1 ? (
               <Trans>One project at a time — Upgrade for more</Trans>
             ) : (
-              <Trans>
-                You've reached your maximum storage of {maximumCount}
-                cloud projects
-              </Trans>
+              <Trans>Maximum of {maximumCount} cloud projects reached</Trans>
             )}
           </Text>
           <Text noMargin={margin === 'dense'}>
             {canMaximumCountBeIncreased ? (
               !hasValidSubscription ? (
                 <Trans>
-                  Thanks for trying GDevelop! Unlock more projects, AI usage,
-                  publishing, multiplayer, courses and much more by upgrading.
+                  Unlock more projects, AI usage, publishing, multiplayer,
+                  courses and much more by upgrading.
                 </Trans>
               ) : (
                 <Trans>
                   Upgrade to get more cloud projects, AI usage, publishing,
-                  multiplayer, courses and credits every month with GDevelop
-                  Premium.
+                  multiplayer, courses and monthly credits.
                 </Trans>
               )
             ) : (

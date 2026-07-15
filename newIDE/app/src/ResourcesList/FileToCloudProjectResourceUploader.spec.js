@@ -9,7 +9,7 @@ describe('FileToCloudProjectResourceUploader', () => {
     );
     expect(
       getInputAcceptedMimesAndExtensions('bitmapFont')
-    ).toMatchInlineSnapshot(`"file,.fnt,.xml"`);
+    ).toMatchInlineSnapshot(`"file"`);
     expect(getInputAcceptedMimesAndExtensions('font')).toMatchInlineSnapshot(
       `"font/ttf,font/otf,.ttf,.otf"`
     );
@@ -29,10 +29,10 @@ describe('FileToCloudProjectResourceUploader', () => {
       `"video/mp4,video/webm,.mp4,.webm"`
     );
     expect(getInputAcceptedMimesAndExtensions('model3D')).toMatchInlineSnapshot(
-      `"file,.glb"`
+      `"file"`
     );
     expect(getInputAcceptedMimesAndExtensions('atlas')).toMatchInlineSnapshot(
-      `"file,.atlas"`
+      `"file"`
     );
     expect(getInputAcceptedMimesAndExtensions('spine')).toMatchInlineSnapshot(
       `"application/json,.json"`

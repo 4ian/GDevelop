@@ -370,7 +370,9 @@ export class Variable extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): Variable;
+  ensurePersistentUuid(): Variable;
   clearPersistentUuid(): Variable;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainer extends EmscriptenObject {
@@ -393,7 +395,9 @@ export class VariablesContainer extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): VariablesContainer;
+  ensurePersistentUuids(): VariablesContainer;
   clearPersistentUuid(): VariablesContainer;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainersList extends EmscriptenObject {

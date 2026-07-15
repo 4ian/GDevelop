@@ -40,9 +40,14 @@ files, and executable logic in `.events`.
    child-settings indexes to `project.settings` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
-7. Write every `variables`, `globalVariables`, or `sceneVariables` container as
-   a table keyed by variable name. Each key owns one inline descriptor array,
-   for example `Controllers = [{ type = "array", children = [...] }]`.
+7. Open every variable container with `[variables]`, `[globalVariables]`, or
+   `[sceneVariables]`, then write one assignment per variable name. Each key
+   owns one inline descriptor array, for example
+   `Controllers = [{ type = "array", children = [...] }]`. Use an empty table
+   header for an empty container; never use `variables = { ... }` or
+   `variables = { }`. Those inline-table containers are accepted only as
+   existing load-time migration input and are rewritten by the editor; never
+   author or preserve them.
 8. Use exact instruction types and `dslName` parameters from
    `.gdevelop/instructions-catalog.json` in every event body.
 9. Call `reload_project` after the declaration/files exist. If the extension
@@ -127,7 +132,7 @@ helpUrl = ""
 deprecated = false
 deprecationMessage = ""
 parameters = []
-objectGroups = []
+objectGroups = { }
 ```
 
 `ResetCombat.events`:
@@ -159,9 +164,10 @@ isTextContainer = false
 isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
 layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
-variables = { }
-objectsGroups = []
 propertyDescriptors = []
+objectGroups = { }
+
+[variables]
 ```
 
 `Enemy.layout`:
@@ -188,7 +194,7 @@ sentence = "Initialize _PARAM0_"
 private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object", supplementaryInformation = "CombatKit::Enemy" }]
-objectGroups = []
+objectGroups = { }
 ```
 
 `Initialize/Initialize.events`:
@@ -209,8 +215,9 @@ folder = []
 name = "Body"
 type = "Sprite"
 behaviors = []
-variables = { }
 effects = []
+
+[variables]
 ```
 
 Add every child object definition, its variables/effects, and every attached
@@ -218,8 +225,11 @@ behavior to its own flat object settings file. Its `folder` array is the editor
 object grouping. Add only instances, layers,
 spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
-rather than inventing serializer fields. Keep `propertyDescriptors` as one
-flat ordered array in `prefab.settings`; never add property folders.
+rather than inventing serializer fields. For attached behaviors, copy only
+author-writable properties listed for that type in `settings-catalog.json`.
+Never copy a hidden behavior property from legacy JSON into object settings;
+runtime code initializes and owns it. Keep `propertyDescriptors` as one flat
+ordered array in `prefab.settings`; never add property folders.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
@@ -254,7 +264,7 @@ sentence = "_PARAM0_ takes _PARAM2_ damage"
 private = false
 async = false
 parameters = [{ name = "Object", description = "Object", type = "object" }, { name = "Behavior", description = "Behavior", type = "behavior", supplementaryInformation = "CombatKit::Health" }, { name = "Amount", description = "Damage amount", type = "expression" }]
-objectGroups = []
+objectGroups = { }
 ```
 
 `TakeDamage/TakeDamage.events`:
@@ -268,6 +278,12 @@ do SetNumberObjectVariable object="Object" variable="HP" modification_sign="-" v
 The object and behavior parameters identify one caller instance. Do not remove
 the guarding condition or call this method with an unrestricted multi-instance
 selection.
+
+Object-list parameters keep their logical parameter name across a behavior
+function call. When a function creates an object and a child event mutates that
+same parameter, use the catalog instruction with the same object parameter in
+both instructions. The generated function context preserves the newly created
+selection through child events and nested private behavior-function calls.
 
 ## Add or change components
 
@@ -296,7 +312,8 @@ selection.
 4. Verify prefab layouts contain no object definitions or behaviors and that
    every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata
-   exists.
+   exists. Verify attached object behaviors contain no editor-hidden properties
+   absent from `settings-catalog.json`.
 5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
 6. Reload the project and confirm the new instruction/object/behavior types

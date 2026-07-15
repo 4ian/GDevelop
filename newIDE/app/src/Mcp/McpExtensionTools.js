@@ -1960,7 +1960,7 @@ const DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES = new Set([
 const FUNCTION_VARIABLE_PARAMETER_SUGGESTION =
   'Inside extension functions, variable parameters are function arguments, not scene/local variables. Use CopyArgumentToVariable2 to copy the argument into an event-local variable, read/write that local variable with NumberVariable/SetNumberVariable, then use CopyVariableToArgument2 to write the local value back when needed.';
 
-const GLOBAL_CONFIG_EXPRESSION_CALL_REGEX = /\b(?:ConfigNumber|ConfigString|ConfigBool|ConfigChildCount|ConfigToJSON)\s*\(/;
+const STATIC_DATA_EXPRESSION_CALL_REGEX = /\b(?:ConfigNumber|ConfigString|ConfigBool|ConfigChildCount|ConfigToJSON)\s*\(/;
 
 const getEventLevelExpressionReferences = (eventReference: {|
   event: gdBaseEvent,
@@ -1999,22 +1999,22 @@ const getEventLevelExpressionReferences = (eventReference: {|
   return [];
 };
 
-const collectGlobalConfigExpressionMisuseIssues = (
+const collectStaticDataExpressionMisuseIssues = (
   eventsFunction: gdEventsFunction
 ): Array<Object> => {
   const issues: Array<Object> = [];
   collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
     getEventLevelExpressionReferences(eventReference).forEach(reference => {
-      if (!GLOBAL_CONFIG_EXPRESSION_CALL_REGEX.test(reference.value)) return;
+      if (!STATIC_DATA_EXPRESSION_CALL_REGEX.test(reference.value)) return;
 
       issues.push({
         severity: 'error',
-        type: 'global-config-expression-in-extension-function',
+        type: 'static-data-expression-in-extension-function',
         eventPath: reference.eventPath,
         eventExpression: reference.label,
         expressionValue: reference.value,
         suggestion:
-          'Do not use direct Global Config expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
+          'Do not use direct Static Data expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
       });
     });
 
@@ -2029,11 +2029,11 @@ const collectGlobalConfigExpressionMisuseIssues = (
           const value = instruction
             .getParameter(parameterIndex)
             .getPlainString();
-          if (!GLOBAL_CONFIG_EXPRESSION_CALL_REGEX.test(value)) continue;
+          if (!STATIC_DATA_EXPRESSION_CALL_REGEX.test(value)) continue;
 
           issues.push({
             severity: 'error',
-            type: 'global-config-expression-in-extension-function',
+            type: 'static-data-expression-in-extension-function',
             instructionType: instruction.getType(),
             instructionKind: instructionReference.instructionKind,
             eventPath: eventReference.path,
@@ -2041,7 +2041,7 @@ const collectGlobalConfigExpressionMisuseIssues = (
             parameterIndex,
             parameterValue: value,
             suggestion:
-              'Do not use direct Global Config expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
+              'Do not use direct Static Data expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
           });
         }
       }
@@ -2326,7 +2326,7 @@ const lintExtensionFunctionTarget = (
       ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
     );
     issues.push(
-      ...collectGlobalConfigExpressionMisuseIssues(target.eventsFunction)
+      ...collectStaticDataExpressionMisuseIssues(target.eventsFunction)
     );
     issues.push(
       ...collectObjectFunctionCreateExternalObjectIssues(

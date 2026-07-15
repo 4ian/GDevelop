@@ -25,17 +25,17 @@ using namespace std;
 
 namespace gd {
 namespace {
-class GlobalConfigPlaceholderReplacementScope {
+class StaticDataPlaceholderReplacementScope {
  public:
-  GlobalConfigPlaceholderReplacementScope(
+  StaticDataPlaceholderReplacementScope(
       gd::EventsCodeGenerationContext& context_, bool enabled)
       : context(context_),
-        wasEnabled(context_.IsGlobalConfigPlaceholderReplacementEnabled()) {
-    context.SetGlobalConfigPlaceholderReplacementEnabled(enabled);
+        wasEnabled(context_.IsStaticDataPlaceholderReplacementEnabled()) {
+    context.SetStaticDataPlaceholderReplacementEnabled(enabled);
   }
 
-  ~GlobalConfigPlaceholderReplacementScope() {
-    context.SetGlobalConfigPlaceholderReplacementEnabled(wasEnabled);
+  ~StaticDataPlaceholderReplacementScope() {
+    context.SetStaticDataPlaceholderReplacementEnabled(wasEnabled);
   }
 
  private:
@@ -341,8 +341,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
-  GlobalConfigPlaceholderReplacementScope
-      globalConfigPlaceholderReplacementScope(context, HasProject());
+  StaticDataPlaceholderReplacementScope
+      staticDataPlaceholderReplacementScope(context, HasProject());
 
   if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
@@ -662,8 +662,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   AddIncludeFiles(instrInfos.GetIncludeFiles());
 
-  GlobalConfigPlaceholderReplacementScope
-      globalConfigPlaceholderReplacementScope(context, HasProject());
+  StaticDataPlaceholderReplacementScope
+      staticDataPlaceholderReplacementScope(context, HasProject());
 
   if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
@@ -935,31 +935,31 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
   return outputCode;
 }
 
-gd::String EventsCodeGenerator::ResolveGlobalConfigPlaceholders(
+gd::String EventsCodeGenerator::ResolveStaticDataPlaceholders(
     const gd::String& plainString,
     gd::EventsCodeGenerationContext& context) {
   if (!HasProject() ||
-      !context.IsGlobalConfigPlaceholderReplacementEnabled()) {
+      !context.IsStaticDataPlaceholderReplacementEnabled()) {
     return plainString;
   }
 
   gd::String resolvedString;
   gd::String missingPath;
-  if (GetProject().ResolveGlobalConfigPlaceholders(
+  if (GetProject().ResolveStaticDataPlaceholders(
           plainString, resolvedString, missingPath)) {
     return resolvedString;
   }
 
-  gd::LogError("Global config path \"{{" + missingPath +
+  gd::LogError("Static Data path \"{{" + missingPath +
                "}}\" does not exist.");
 
   gd::DiagnosticReport* diagnosticReport = GetDiagnosticReport();
   if (diagnosticReport) {
     gd::ProjectDiagnostic projectDiagnostic(
         gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
-        "Global config path \"{{" + missingPath + "}}\" does not exist.",
+        "Static Data path \"{{" + missingPath + "}}\" does not exist.",
         "{{" + missingPath + "}}",
-        "A value in the project global config");
+        "A value in the project static data");
     diagnosticReport->Add(projectDiagnostic);
   }
 
@@ -1027,10 +1027,10 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.GetType() == "key") {
     argOutput = ConvertToStringExplicit(
-        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
+        ResolveStaticDataPlaceholders(parameter.GetPlainString(), context));
   } else if (ParameterMetadata::IsExpression("resource", metadata.GetType())) {
     const auto resourceName =
-        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context);
+        ResolveStaticDataPlaceholders(parameter.GetPlainString(), context);
     const auto &resourcesContainersList =
         GetProjectScopedContainers().GetResourcesContainersList();
     const auto sourceType =
@@ -1054,7 +1054,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
   } else if (metadata.GetType() == "mouse") {
     argOutput = ConvertToStringExplicit(
-        ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
+        ResolveStaticDataPlaceholders(parameter.GetPlainString(), context));
   } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
     // This is duplicated in `InstructionSentenceFormatter::GetFormattedParameterValue`.
@@ -1087,7 +1087,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         cout << "Warning: Unknown type of parameter \"" << metadata.GetType()
              << "\"." << std::endl;
       argOutput += ConvertToStringExplicit(
-          ResolveGlobalConfigPlaceholders(parameter.GetPlainString(), context));
+          ResolveStaticDataPlaceholders(parameter.GetPlainString(), context));
     }
   }
 

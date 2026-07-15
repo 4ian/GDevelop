@@ -1445,9 +1445,14 @@ gd::String EventsCodeGenerator::GenerateObject(
     for (auto& objectName : realObjects)
       context.ObjectsListNeededOrEmptyIfJustDeclared(objectName);
 
-    gd::String objectsMapName = useObjectParameterMapWhenAvailable(
-        objectName, declareMapOfObjects(realObjects, context));
-    output = objectsMapName;
+    // Keep the logical parameter name as the map key. Creation instructions
+    // pass this key back to EventsFunctionContext::createObject, which uses it
+    // to resolve the concrete object map supplied by the caller. Passing the
+    // caller map directly here would expose its concrete key (for example
+    // "Bullet") and bypass the logical parameter key (for example
+    // "ObjectToCreate"), so the function context could not create or pick the
+    // requested instance.
+    output = declareMapOfObjects(realObjects, context);
   } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects =
         GetObjectsContainersList().ExpandObjectName(objectName,

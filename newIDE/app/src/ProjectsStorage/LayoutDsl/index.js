@@ -23,6 +23,17 @@ export type LayoutDslContext = {
   objectNames?: Array<string>,
   layerNames?: Array<string>,
   behaviorTypesByObject?: { [string]: { [string]: string } },
+  behaviorPropertySchemasByType?: {
+    [string]: {
+      keySpace: 'serialized',
+      unknownPropertyPolicy: 'error' | 'preserve',
+      properties: Array<{
+        authoringKey: string,
+        serializedKey: string,
+        type: string,
+      }>,
+    },
+  },
   instancePropertyTypesByObject?: {
     [string]: { [string]: 'number' | 'string' },
   },
@@ -1091,6 +1102,71 @@ const compileOverride = (element, objectName, context, fileUri) => {
       fileUri
     );
   const data = jsonObject(a.data, 'override data', element, fileUri);
+  const propertySchema =
+    context.behaviorPropertySchemasByType &&
+    context.behaviorPropertySchemasByType[type];
+  if (propertySchema) {
+    const bySerializedKey = (propertySchema.properties || []).reduce(
+      (result, property) => {
+        result[property.serializedKey] = property;
+        return result;
+      },
+      {}
+    );
+    const byAuthoringKey = (propertySchema.properties || []).reduce(
+      (result, property) => {
+        result[property.authoringKey] = property;
+        return result;
+      },
+      {}
+    );
+    Object.keys(data).forEach(key => {
+      const property = bySerializedKey[key];
+      if (property) {
+        const normalizedType = String(property.type || '').toLowerCase();
+        const valid = ['number', 'float'].includes(normalizedType)
+          ? typeof data[key] === 'number' && Number.isFinite(data[key])
+          : normalizedType === 'integer'
+          ? Number.isInteger(data[key])
+          : normalizedType === 'boolean'
+          ? typeof data[key] === 'boolean'
+          : typeof data[key] === 'string';
+        if (!valid) {
+          fail(
+            'LAYOUT_INVALID_BEHAVIOR_PROPERTY',
+            `Override ${behaviorName} property ${key} must be ${
+              property.type
+            }.`,
+            element,
+            fileUri
+          );
+        }
+        return;
+      }
+      const authoringProperty = byAuthoringKey[key];
+      if (
+        authoringProperty &&
+        authoringProperty.serializedKey !== authoringProperty.authoringKey
+      ) {
+        fail(
+          'BEHAVIOR_PROPERTY_KEY_MISMATCH',
+          `Override ${behaviorName} uses editor-facing key ${key}; use serialized key ${
+            authoringProperty.serializedKey
+          }.`,
+          element,
+          fileUri
+        );
+      }
+      if (propertySchema.unknownPropertyPolicy === 'error') {
+        fail(
+          'LAYOUT_UNKNOWN_BEHAVIOR_PROPERTY',
+          `Override ${behaviorName} has unknown serialized property ${key}.`,
+          element,
+          fileUri
+        );
+      }
+    });
+  }
   const visibility =
     a['property-visibility'] === undefined
       ? {}

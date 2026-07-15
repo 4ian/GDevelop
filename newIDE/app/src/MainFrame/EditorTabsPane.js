@@ -120,6 +120,7 @@ export type EditorTabsPaneCommonProps = {|
   toggleProjectManager: () => void,
   isProjectManagerPinned: boolean,
   saveProject: () => Promise<?FileMetadata>,
+  autoSaveStaticData: (staticData: Object) => Promise<boolean>,
   saveProjectAsWithStorageProvider: (
     options: ?{|
       requestedStorageProvider?: StorageProvider,
@@ -357,6 +358,7 @@ const EditorTabsPane: React.ComponentType<{
     toggleProjectManager,
     isProjectManagerPinned,
     saveProject,
+    autoSaveStaticData,
     saveProjectAsWithStorageProvider,
     onCheckoutVersion,
     getOrLoadProjectVersion,
@@ -838,6 +840,7 @@ const EditorTabsPane: React.ComponentType<{
                     showRestartInGameEditorAfterErrorButton,
                     resourceManagementProps,
                     onSave: saveProject,
+                    onAutoSaveStaticData: autoSaveStaticData,
                     onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
                     canSave,
                     onCheckoutVersion,

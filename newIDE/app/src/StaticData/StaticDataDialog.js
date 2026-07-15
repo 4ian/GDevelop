@@ -8,14 +8,20 @@ import Text from '../UI/Text';
 import AddIcon from '../UI/CustomSvgIcons/Add';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import DownloadIcon from '../UI/CustomSvgIcons/Download';
+import FileWithLinesIcon from '../UI/CustomSvgIcons/FileWithLines';
 import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
 import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import UploadIcon from '../UI/CustomSvgIcons/Upload';
 import { copyTextToClipboard } from '../Utils/Clipboard';
+import {
+  parseStaticDataFromToml,
+  serializeStaticDataToToml,
+} from '../ProjectsStorage/MultiFileProjectFormat';
 
-type ConfigRoot = { [string]: any };
+type StaticDataRoot = { [string]: any };
+type RawEditorMode = 'json' | 'toml';
 type SelectedCell = {|
   sheetName: string,
   rowKey: string,
@@ -28,7 +34,7 @@ type Props = {|
   onApply?: () => void,
   onCancel?: () => void,
   embedded?: boolean,
-  onChange?: () => void,
+  onChange?: (staticData: StaticDataRoot) => void,
 |};
 
 const gridMinColumnWidth = 80;
@@ -428,11 +434,11 @@ const styles: { [string]: Object } = {
 const isPlainObject = (value: any): boolean =>
   !!value && typeof value === 'object' && !Array.isArray(value);
 
-const readProjectGlobalConfig = (project: gdProject): ConfigRoot => {
-  const projectWithGlobalConfig: any = project;
+const readProjectStaticData = (project: gdProject): StaticDataRoot => {
+  const projectWithStaticData: any = project;
   const json =
-    typeof projectWithGlobalConfig.getGlobalConfigJson === 'function'
-      ? projectWithGlobalConfig.getGlobalConfigJson()
+    typeof projectWithStaticData.getStaticDataJson === 'function'
+      ? projectWithStaticData.getStaticDataJson()
       : '{}';
 
   try {
@@ -525,9 +531,12 @@ const formatPathSegment = (
   return '["' + segment.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]';
 };
 
-const getSelectedPath = (selectedCell: ?SelectedCell, config: ConfigRoot) => {
+const getSelectedPath = (
+  selectedCell: ?SelectedCell,
+  staticData: StaticDataRoot
+) => {
   if (!selectedCell) return '';
-  const sheet = config[selectedCell.sheetName];
+  const sheet = staticData[selectedCell.sheetName];
   const rowValue = Array.isArray(sheet)
     ? sheet[Number(selectedCell.rowKey)]
     : isPlainObject(sheet)
@@ -551,11 +560,11 @@ const getSelectedPath = (selectedCell: ?SelectedCell, config: ConfigRoot) => {
 
 const getSelectedRowJson = (
   selectedCell: ?SelectedCell,
-  config: ConfigRoot
+  staticData: StaticDataRoot
 ): string => {
   if (!selectedCell || selectedCell.columnKey) return '';
 
-  const sheet = config[selectedCell.sheetName];
+  const sheet = staticData[selectedCell.sheetName];
   const rowValue = Array.isArray(sheet)
     ? sheet[Number(selectedCell.rowKey)]
     : isPlainObject(sheet)
@@ -570,7 +579,7 @@ const getSelectedRowJson = (
   }
 };
 
-const GlobalConfigDialog = ({
+const StaticDataDialog = ({
   project,
   open = true,
   onApply = () => {},
@@ -578,37 +587,47 @@ const GlobalConfigDialog = ({
   embedded = false,
   onChange,
 }: Props): React.Node => {
-  const [config, setConfig] = React.useState<ConfigRoot>(() =>
-    readProjectGlobalConfig(project)
+  const [staticData, setStaticData] = React.useState<StaticDataRoot>(() =>
+    readProjectStaticData(project)
   );
   const [selectedSheet, setSelectedSheet] = React.useState<string>(() => {
-    const config = readProjectGlobalConfig(project);
-    return Object.keys(config)[0] || '';
+    const staticData = readProjectStaticData(project);
+    return Object.keys(staticData)[0] || '';
   });
   const [selectedCell, setSelectedCell] = React.useState<?SelectedCell>(null);
   const [searchText, setSearchText] = React.useState('');
   const [rawJson, setRawJson] = React.useState(() =>
-    JSON.stringify(readProjectGlobalConfig(project), null, 2)
+    JSON.stringify(readProjectStaticData(project), null, 2)
   );
   const [rawJsonError, setRawJsonError] = React.useState('');
-  const [rawJsonExpanded, setRawJsonExpanded] = React.useState(false);
+  const [rawToml, setRawToml] = React.useState(() => {
+    try {
+      return serializeStaticDataToToml(readProjectStaticData(project));
+    } catch (error) {
+      return '';
+    }
+  });
+  const [rawTomlError, setRawTomlError] = React.useState('');
+  const [rawEditorMode, setRawEditorMode] = React.useState<?RawEditorMode>(
+    null
+  );
   const [isMinimized, setIsMinimized] = React.useState(false);
   const importInputRef = React.useRef<?HTMLInputElement>(null);
 
-  const commitConfig = React.useCallback(
-    (nextConfig: ConfigRoot) => {
-      setConfig(nextConfig);
+  const commitStaticData = React.useCallback(
+    (nextStaticData: StaticDataRoot) => {
+      setStaticData(nextStaticData);
       if (!embedded) return;
 
-      const projectWithGlobalConfig: any = project;
-      projectWithGlobalConfig.setGlobalConfigJson(JSON.stringify(nextConfig));
-      if (onChange) onChange();
+      const projectWithStaticData: any = project;
+      projectWithStaticData.setStaticDataJson(JSON.stringify(nextStaticData));
+      if (onChange) onChange(nextStaticData);
     },
     [embedded, onChange, project]
   );
 
-  const sheetNames = React.useMemo(() => Object.keys(config), [config]);
-  const sheet: any = selectedSheet ? config[selectedSheet] : null;
+  const sheetNames = React.useMemo(() => Object.keys(staticData), [staticData]);
+  const sheet: any = selectedSheet ? staticData[selectedSheet] : null;
   const rowKeys: Array<string> = React.useMemo(() => getRowKeys(sheet), [
     sheet,
   ]);
@@ -701,53 +720,60 @@ const GlobalConfigDialog = ({
 
   React.useEffect(
     () => {
-      if (!selectedSheet || !config[selectedSheet]) {
+      if (!selectedSheet || !staticData[selectedSheet]) {
         setSelectedSheet(sheetNames[0] || '');
       }
     },
-    [config, selectedSheet, sheetNames]
+    [staticData, selectedSheet, sheetNames]
   );
 
   React.useEffect(
     () => {
-      setRawJson(JSON.stringify(config, null, 2));
+      setRawJson(JSON.stringify(staticData, null, 2));
+      try {
+        setRawToml(serializeStaticDataToToml(staticData));
+        setRawTomlError('');
+      } catch (error) {
+        setRawToml('');
+        setRawTomlError(error.message);
+      }
     },
-    [config]
+    [staticData]
   );
 
   const addSheet = React.useCallback(
     () => {
       const sheetName = getUniqueName('sheet', sheetNames);
 
-      commitConfig({
-        ...config,
+      commitStaticData({
+        ...staticData,
         [sheetName]: {},
       });
       setSelectedSheet(sheetName);
     },
-    [commitConfig, config, sheetNames]
+    [commitStaticData, staticData, sheetNames]
   );
 
   const addRow = React.useCallback(
     () => {
       if (!selectedSheet) return;
 
-      const nextConfig = { ...config };
+      const nextStaticData = { ...staticData };
       if (Array.isArray(sheet)) {
-        nextConfig[selectedSheet] = [...sheet, {}];
+        nextStaticData[selectedSheet] = [...sheet, {}];
       } else {
         const rowName = getUniqueName(
           'row',
           isPlainObject(sheet) ? Object.keys(sheet) : []
         );
-        nextConfig[selectedSheet] = {
+        nextStaticData[selectedSheet] = {
           ...(isPlainObject(sheet) ? sheet : {}),
           [rowName]: {},
         };
       }
-      commitConfig(nextConfig);
+      commitStaticData(nextStaticData);
     },
-    [commitConfig, config, selectedSheet, sheet]
+    [commitStaticData, staticData, selectedSheet, sheet]
   );
 
   const addColumn = React.useCallback(
@@ -755,7 +781,7 @@ const GlobalConfigDialog = ({
       if (!selectedSheet) return;
       const columnName = getUniqueName('column', columnKeys);
 
-      const nextConfig = { ...config };
+      const nextStaticData = { ...staticData };
       const nextSheet: any = Array.isArray(sheet)
         ? [...sheet]
         : { ...(isPlainObject(sheet) ? sheet : {}) };
@@ -765,7 +791,7 @@ const GlobalConfigDialog = ({
         const rowValue = Array.isArray(nextSheet)
           ? nextSheet[rowIndex]
           : nextSheet[rowKey];
-        const nextRowValue: ConfigRoot = isPlainObject(rowValue)
+        const nextRowValue: StaticDataRoot = isPlainObject(rowValue)
           ? { ...rowValue }
           : {};
         if (nextRowValue[columnName] === undefined)
@@ -774,10 +800,10 @@ const GlobalConfigDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       });
 
-      nextConfig[selectedSheet] = nextSheet;
-      commitConfig(nextConfig);
+      nextStaticData[selectedSheet] = nextSheet;
+      commitStaticData(nextStaticData);
     },
-    [columnKeys, commitConfig, config, rowKeys, selectedSheet, sheet]
+    [columnKeys, commitStaticData, staticData, rowKeys, selectedSheet, sheet]
   );
 
   const renameSheet = React.useCallback(
@@ -789,14 +815,14 @@ const GlobalConfigDialog = ({
         nextSheetName,
         sheetNames.filter(name => name !== sheetName)
       );
-      const nextConfig: ConfigRoot = {};
-      Object.keys(config).forEach(currentSheetName => {
-        nextConfig[
+      const nextStaticData: StaticDataRoot = {};
+      Object.keys(staticData).forEach(currentSheetName => {
+        nextStaticData[
           currentSheetName === sheetName ? targetSheetName : currentSheetName
-        ] = config[currentSheetName];
+        ] = staticData[currentSheetName];
       });
 
-      commitConfig(nextConfig);
+      commitStaticData(nextStaticData);
       setSelectedSheet(currentSelectedSheet =>
         currentSelectedSheet === sheetName
           ? targetSheetName
@@ -808,7 +834,7 @@ const GlobalConfigDialog = ({
           : currentSelectedCell
       );
     },
-    [commitConfig, config, sheetNames]
+    [commitStaticData, staticData, sheetNames]
   );
 
   const renameRow = React.useCallback(
@@ -816,7 +842,7 @@ const GlobalConfigDialog = ({
       const nextRowKey = nextRowKeyText.trim();
       if (!nextRowKey || nextRowKey === rowKey) return;
 
-      const targetSheet = config[sheetName];
+      const targetSheet = staticData[sheetName];
       if (!isPlainObject(targetSheet)) return;
 
       const targetRowKey = getUniqueName(
@@ -825,14 +851,14 @@ const GlobalConfigDialog = ({
           currentRowKey => currentRowKey !== rowKey
         )
       );
-      const nextSheet: ConfigRoot = {};
+      const nextSheet: StaticDataRoot = {};
       Object.keys(targetSheet).forEach(currentRowKey => {
         nextSheet[currentRowKey === rowKey ? targetRowKey : currentRowKey] =
           targetSheet[currentRowKey];
       });
 
-      commitConfig({
-        ...config,
+      commitStaticData({
+        ...staticData,
         [sheetName]: nextSheet,
       });
       setSelectedCell(currentSelectedCell =>
@@ -843,7 +869,7 @@ const GlobalConfigDialog = ({
           : currentSelectedCell
       );
     },
-    [commitConfig, config]
+    [commitStaticData, staticData]
   );
 
   const renameColumn = React.useCallback(
@@ -851,7 +877,7 @@ const GlobalConfigDialog = ({
       const nextColumnKey = nextColumnKeyText.trim();
       if (!nextColumnKey || nextColumnKey === columnKey) return;
 
-      const targetSheet = config[sheetName];
+      const targetSheet = staticData[sheetName];
       const targetRowKeys = getRowKeys(targetSheet);
       const targetColumnKey = getUniqueName(
         nextColumnKey,
@@ -872,7 +898,7 @@ const GlobalConfigDialog = ({
           return;
         }
 
-        const nextRowValue: ConfigRoot = {};
+        const nextRowValue: StaticDataRoot = {};
         Object.keys(rowValue).forEach(currentColumnKey => {
           nextRowValue[
             currentColumnKey === columnKey ? targetColumnKey : currentColumnKey
@@ -882,8 +908,8 @@ const GlobalConfigDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       });
 
-      commitConfig({
-        ...config,
+      commitStaticData({
+        ...staticData,
         [sheetName]: nextSheet,
       });
       setSelectedCell(currentSelectedCell =>
@@ -894,7 +920,7 @@ const GlobalConfigDialog = ({
           : currentSelectedCell
       );
     },
-    [commitConfig, config]
+    [commitStaticData, staticData]
   );
 
   const handleNameInputKeyDown = React.useCallback(
@@ -913,7 +939,7 @@ const GlobalConfigDialog = ({
     (rowKey: string, columnKey: string, text: string) => {
       if (!selectedSheet) return;
 
-      const nextConfig = { ...config };
+      const nextStaticData = { ...staticData };
       const nextSheet: any = Array.isArray(sheet)
         ? [...sheet]
         : { ...(isPlainObject(sheet) ? sheet : {}) };
@@ -927,7 +953,7 @@ const GlobalConfigDialog = ({
           nextSheet[rowIndex] = parseCellValue(text);
         else nextSheet[rowKey] = parseCellValue(text);
       } else {
-        const nextRowValue: ConfigRoot = isPlainObject(rowValue)
+        const nextRowValue: StaticDataRoot = isPlainObject(rowValue)
           ? { ...rowValue }
           : {};
         nextRowValue[columnKey] = parseCellValue(text);
@@ -935,35 +961,35 @@ const GlobalConfigDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       }
 
-      nextConfig[selectedSheet] = nextSheet;
-      commitConfig(nextConfig);
+      nextStaticData[selectedSheet] = nextSheet;
+      commitStaticData(nextStaticData);
     },
-    [commitConfig, config, selectedSheet, sheet]
+    [commitStaticData, staticData, selectedSheet, sheet]
   );
 
   const deleteRow = React.useCallback(
     (sheetName: string, rowKey: string) => {
-      const nextConfig = { ...config };
-      const targetSheet = nextConfig[sheetName];
+      const nextStaticData = { ...staticData };
+      const targetSheet = nextStaticData[sheetName];
       if (Array.isArray(targetSheet)) {
-        nextConfig[sheetName] = targetSheet.filter(
+        nextStaticData[sheetName] = targetSheet.filter(
           (_, index) => String(index) !== rowKey
         );
       } else if (isPlainObject(targetSheet)) {
         const nextSheet = { ...targetSheet };
         delete nextSheet[rowKey];
-        nextConfig[sheetName] = nextSheet;
+        nextStaticData[sheetName] = nextSheet;
       }
-      commitConfig(nextConfig);
+      commitStaticData(nextStaticData);
       setSelectedCell(null);
     },
-    [commitConfig, config]
+    [commitStaticData, staticData]
   );
 
   const deleteColumn = React.useCallback(
     (sheetName: string, columnKey: string) => {
-      const nextConfig = { ...config };
-      const targetSheet = nextConfig[sheetName];
+      const nextStaticData = { ...staticData };
+      const targetSheet = nextStaticData[sheetName];
       const nextSheet: any = Array.isArray(targetSheet)
         ? [...targetSheet]
         : { ...targetSheet };
@@ -985,14 +1011,14 @@ const GlobalConfigDialog = ({
         if (Array.isArray(nextSheet)) nextSheet[rowIndex] = nextRowValue;
         else nextSheet[rowKey] = nextRowValue;
       });
-      nextConfig[sheetName] = nextSheet;
-      commitConfig(nextConfig);
+      nextStaticData[sheetName] = nextSheet;
+      commitStaticData(nextStaticData);
       setSelectedCell(null);
     },
-    [commitConfig, config]
+    [commitStaticData, staticData]
   );
 
-  const replaceConfigFromJson = React.useCallback(
+  const replaceStaticDataFromJson = React.useCallback(
     (jsonText: string) => {
       try {
         const parsed = JSON.parse(jsonText || '{}');
@@ -1000,20 +1026,32 @@ const GlobalConfigDialog = ({
           setRawJsonError('The root value must be a JSON object.');
           return;
         }
-        commitConfig(parsed);
+        commitStaticData(parsed);
         setRawJsonError('');
       } catch (error) {
         setRawJsonError(error.message);
       }
     },
-    [commitConfig]
+    [commitStaticData]
   );
 
   const applyRawJson = React.useCallback(
     () => {
-      replaceConfigFromJson(rawJson);
+      replaceStaticDataFromJson(rawJson);
     },
-    [rawJson, replaceConfigFromJson]
+    [rawJson, replaceStaticDataFromJson]
+  );
+
+  const applyRawToml = React.useCallback(
+    () => {
+      try {
+        commitStaticData(parseStaticDataFromToml(rawToml));
+        setRawTomlError('');
+      } catch (error) {
+        setRawTomlError(error.message);
+      }
+    },
+    [commitStaticData, rawToml]
   );
 
   const importJson = React.useCallback(
@@ -1027,32 +1065,33 @@ const GlobalConfigDialog = ({
         const result = reader.result;
         const jsonText = typeof result === 'string' ? result : '';
         setRawJson(jsonText);
-        replaceConfigFromJson(jsonText);
+        replaceStaticDataFromJson(jsonText);
       };
       reader.readAsText(file);
       event.currentTarget.value = '';
     },
-    [replaceConfigFromJson]
+    [replaceStaticDataFromJson]
   );
 
   const exportJson = React.useCallback(
     () => {
-      const blob = new Blob([JSON.stringify(config, null, 2)], {
+      const blob = new Blob([JSON.stringify(staticData, null, 2)], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = 'globalConfig.json';
+      anchor.download = 'static-data.json';
       anchor.click();
       URL.revokeObjectURL(url);
     },
-    [config]
+    [staticData]
   );
 
-  const selectedPath = getSelectedPath(selectedCell, config);
+  const selectedPath = getSelectedPath(selectedCell, staticData);
   const selectedPlaceholder = selectedPath ? '{{' + selectedPath + '}}' : '';
-  const selectedRowJson = getSelectedRowJson(selectedCell, config);
+  const selectedRowJson = getSelectedRowJson(selectedCell, staticData);
+  const rawEditorError = rawEditorMode === 'toml' ? rawTomlError : rawJsonError;
 
   const copyText = React.useCallback((text: string) => {
     if (!text) return;
@@ -1065,11 +1104,11 @@ const GlobalConfigDialog = ({
 
   const applyChanges = React.useCallback(
     () => {
-      const projectWithGlobalConfig: any = project;
-      projectWithGlobalConfig.setGlobalConfigJson(JSON.stringify(config));
+      const projectWithStaticData: any = project;
+      projectWithStaticData.setStaticDataJson(JSON.stringify(staticData));
       onApply();
     },
-    [config, onApply, project]
+    [staticData, onApply, project]
   );
 
   const content = (
@@ -1152,9 +1191,7 @@ const GlobalConfigDialog = ({
               {!selectedSheet ? (
                 <div style={styles.emptyState}>
                   <Text>
-                    <Trans>
-                      Create a sheet to start editing global config.
-                    </Trans>
+                    <Trans>Create a sheet to start editing static data.</Trans>
                   </Text>
                 </div>
               ) : (
@@ -1390,31 +1427,58 @@ const GlobalConfigDialog = ({
               ) : null}
               <span style={styles.rawToggleSpacer} />
               <FlatButton
+                label={<Trans>Raw TOML</Trans>}
+                leftIcon={<FileWithLinesIcon />}
+                primary={rawEditorMode === 'toml'}
+                onClick={() =>
+                  setRawEditorMode(rawEditorMode === 'toml' ? null : 'toml')
+                }
+              />
+              <FlatButton
                 label={<Trans>Raw JSON</Trans>}
                 leftIcon={<SettingsIcon />}
-                onClick={() => setRawJsonExpanded(!rawJsonExpanded)}
+                primary={rawEditorMode === 'json'}
+                onClick={() =>
+                  setRawEditorMode(rawEditorMode === 'json' ? null : 'json')
+                }
               />
             </div>
-            {rawJsonExpanded && (
+            {rawEditorMode && (
               <div style={styles.rawPanel}>
                 <div style={styles.rawHeader}>
                   <Text noMargin color="secondary">
-                    <Trans>Raw JSON</Trans>
+                    {rawEditorMode === 'toml' ? (
+                      <Trans>Raw TOML</Trans>
+                    ) : (
+                      <Trans>Raw JSON</Trans>
+                    )}
                   </Text>
                   <FlatButton
-                    label={<Trans>Apply JSON</Trans>}
-                    onClick={applyRawJson}
+                    label={
+                      rawEditorMode === 'toml' ? (
+                        <Trans>Apply TOML</Trans>
+                      ) : (
+                        <Trans>Apply JSON</Trans>
+                      )
+                    }
+                    onClick={
+                      rawEditorMode === 'toml' ? applyRawToml : applyRawJson
+                    }
                   />
                 </div>
                 <textarea
                   style={styles.rawTextArea}
-                  value={rawJson}
-                  onChange={event => setRawJson(event.currentTarget.value)}
+                  value={rawEditorMode === 'toml' ? rawToml : rawJson}
+                  onChange={event =>
+                    rawEditorMode === 'toml'
+                      ? setRawToml(event.currentTarget.value)
+                      : setRawJson(event.currentTarget.value)
+                  }
                 />
                 <div style={styles.rawFooter}>
-                  {rawJsonError ? (
+                  {rawEditorError ? (
                     <Text noMargin style={styles.error}>
-                      {rawJsonError}
+                      {rawEditorError}
                     </Text>
                   ) : null}
                 </div>
@@ -1430,7 +1494,7 @@ const GlobalConfigDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Global config</Trans>}
+      title={<Trans>Static Data</Trans>}
       open={open}
       onRequestClose={onCancel}
       onApply={applyChanges}
@@ -1463,7 +1527,7 @@ const GlobalConfigDialog = ({
       flexColumnBody
       fullHeight={!isMinimized}
       maxWidth="xl"
-      id="global-config-dialog"
+      id="static-data-dialog"
       noPadding
     >
       {content}
@@ -1471,14 +1535,14 @@ const GlobalConfigDialog = ({
   );
 };
 
-export const GlobalConfigEditor = ({
+export const StaticDataEditor = ({
   project,
   onChange,
 }: {|
   project: gdProject,
-  onChange: () => void,
+  onChange: (staticData: StaticDataRoot) => void,
 |}): React.Node => (
-  <GlobalConfigDialog project={project} embedded onChange={onChange} />
+  <StaticDataDialog project={project} embedded onChange={onChange} />
 );
 
-export default GlobalConfigDialog;
+export default StaticDataDialog;

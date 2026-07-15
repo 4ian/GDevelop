@@ -240,15 +240,14 @@ const InnerDialog = (props: InnerDialogProps) => {
     'intro-variables'
   );
 
-  const renderGlobalConfigPlaceholderHint = () => (
+  const renderStaticDataPlaceholderHint = () => (
     <Line>
       <Column noMargin expand>
         <AlertMessage kind="info">
           <Trans>
-            Global config placeholders can be used here in text or number
-            property values, and in scene events with Global configuration
-            conditions, actions, and expressions. Use{' '}
-            {'{{cards.sunflower.price}}'} as a placeholder path.
+            Static Data placeholders can be used here in text or number property
+            values, and in supported scene-event condition and action
+            parameters. Use {'{{cards.sunflower.price}}'} as a placeholder path.
           </Trans>
         </AlertMessage>
       </Column>
@@ -358,7 +357,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           }
         >
           {hasEventBasedObjectProperties
-            ? renderGlobalConfigPlaceholderHint()
+            ? renderStaticDataPlaceholderHint()
             : null}
           <EditorComponent
             objectConfiguration={object.getConfiguration()}
@@ -403,7 +402,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'behaviors' && (
         <Column noMargin expand useFullHeight noOverflowParent>
           {hasEventBasedBehaviorProperties
-            ? renderGlobalConfigPlaceholderHint()
+            ? renderStaticDataPlaceholderHint()
             : null}
           <BehaviorsEditor
             object={object}

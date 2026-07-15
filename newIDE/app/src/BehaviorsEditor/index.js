@@ -148,7 +148,7 @@ type BehaviorConfigurationEditorProps = {|
   isListLocked: boolean,
   canToggleBehaviorMute: boolean,
   layersContainer: gdLayersContainer,
-  hideGlobalConfigPlaceholderHints?: boolean,
+  hideStaticDataPlaceholderHints?: boolean,
 |};
 
 const BehaviorConfigurationEditor = React.forwardRef<
@@ -175,7 +175,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       isListLocked,
       canToggleBehaviorMute,
       layersContainer,
-      hideGlobalConfigPlaceholderHints,
+      hideStaticDataPlaceholderHints,
     },
     ref
   ) => {
@@ -437,9 +437,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                   projectScopedContainersAccessor
                 }
                 onBehaviorUpdated={onBehaviorsUpdated}
-                hideGlobalConfigPlaceholderHints={
-                  hideGlobalConfigPlaceholderHints
-                }
+                hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
               />
             </Line>
           </Column>
@@ -833,7 +831,7 @@ type Props = {|
   isListLocked: boolean,
   canToggleBehaviorMute?: boolean,
   canUseWholeProjectRefactorer?: boolean,
-  hideGlobalConfigPlaceholderHints?: boolean,
+  hideStaticDataPlaceholderHints?: boolean,
 |};
 
 const BehaviorsEditor = (props: Props): React.Node => {
@@ -860,7 +858,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     isListLocked,
     canToggleBehaviorMute,
     canUseWholeProjectRefactorer,
-    hideGlobalConfigPlaceholderHints,
+    hideStaticDataPlaceholderHints,
   } = props;
   const forceUpdate = useForceUpdate();
 
@@ -1026,8 +1024,8 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   }
                   isListLocked={isListLocked}
                   canToggleBehaviorMute={!!canToggleBehaviorMute}
-                  hideGlobalConfigPlaceholderHints={
-                    hideGlobalConfigPlaceholderHints
+                  hideStaticDataPlaceholderHints={
+                    hideStaticDataPlaceholderHints
                   }
                 />
               );

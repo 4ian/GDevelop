@@ -9,7 +9,7 @@ import { ExtensionItemDetailEditorContainer } from '../EditorContainers/Extensio
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
-import { GlobalConfigEditorContainer } from '../EditorContainers/GlobalConfigEditorContainer';
+import { StaticDataEditorContainer } from '../EditorContainers/StaticDataEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
@@ -30,7 +30,7 @@ type EditorRef =
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
-  | GlobalConfigEditorContainer
+  | StaticDataEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
@@ -49,7 +49,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
-  | 'global-config'
+  | 'static-data'
   | 'global-search'
   | 'ask-ai'
   | 'start page';
@@ -129,7 +129,7 @@ const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
   editorTab.closable &&
   editorTab.kind !== 'debugger' &&
   editorTab.kind !== 'resources' &&
-  editorTab.kind !== 'global-config';
+  editorTab.kind !== 'static-data';
 
 const limitOpenEditorTabsForPane = ({
   editors,

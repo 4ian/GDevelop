@@ -48,6 +48,7 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(
   properties["YGrabOffset"]
       .SetLabel(_("Grab offset on Y axis"))
       .SetGroup(_("Ledge"))
+      .SetType("Number")
       .SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
 

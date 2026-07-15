@@ -48,10 +48,10 @@ using namespace std;
 
 namespace gd {
 namespace {
-struct GlobalConfigPathSegment {
-  explicit GlobalConfigPathSegment(const gd::String& key_)
+struct StaticDataPathSegment {
+  explicit StaticDataPathSegment(const gd::String& key_)
       : key(key_), index(0), isIndex(false) {}
-  explicit GlobalConfigPathSegment(std::size_t index_)
+  explicit StaticDataPathSegment(std::size_t index_)
       : key(""), index(index_), isIndex(true) {}
 
   gd::String key;
@@ -59,15 +59,15 @@ struct GlobalConfigPathSegment {
   bool isIndex;
 };
 
-std::vector<GlobalConfigPathSegment> ParseGlobalConfigPath(gd::String path) {
-  std::vector<GlobalConfigPathSegment> segments;
+std::vector<StaticDataPathSegment> ParseStaticDataPath(gd::String path) {
+  std::vector<StaticDataPathSegment> segments;
   path = path.Trim();
 
   gd::String current;
   std::size_t position = 0;
   const auto pushCurrent = [&]() {
     if (!current.empty()) {
-      segments.push_back(GlobalConfigPathSegment(current));
+      segments.push_back(StaticDataPathSegment(current));
       current.clear();
     }
   };
@@ -107,7 +107,7 @@ std::vector<GlobalConfigPathSegment> ParseGlobalConfigPath(gd::String path) {
           position++;
         }
         if (position < path.length() && path[position] == ']') position++;
-        segments.push_back(GlobalConfigPathSegment(quotedSegment));
+        segments.push_back(StaticDataPathSegment(quotedSegment));
         continue;
       }
 
@@ -129,10 +129,10 @@ std::vector<GlobalConfigPathSegment> ParseGlobalConfigPath(gd::String path) {
       }
       if (isIndex) {
         segments.push_back(
-            GlobalConfigPathSegment(
+            StaticDataPathSegment(
                 static_cast<std::size_t>(bracketSegment.To<unsigned int>())));
       } else {
-        segments.push_back(GlobalConfigPathSegment(bracketSegment));
+        segments.push_back(StaticDataPathSegment(bracketSegment));
       }
       continue;
     }
@@ -145,7 +145,7 @@ std::vector<GlobalConfigPathSegment> ParseGlobalConfigPath(gd::String path) {
   return segments;
 }
 
-gd::String GlobalConfigValueToString(const gd::SerializerElement& element) {
+gd::String StaticDataValueToString(const gd::SerializerElement& element) {
   if (!element.IsValueUndefined()) {
     const auto& value = element.GetValue();
     if (value.IsString()) return value.GetRawString();
@@ -179,7 +179,7 @@ Project::Project()
                        gd::String::From(gd::VersionWrapper::Minor()) + "." +
                        gd::String::From(gd::VersionWrapper::Build())),
       variables(gd::VariablesContainer::SourceType::Global),
-      globalConfigJson("{}"),
+      staticDataJson("{}"),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
@@ -187,13 +187,13 @@ Project::Project()
 
 Project::~Project() {}
 
-bool Project::GetGlobalConfigValueAsString(const gd::String& path,
+bool Project::GetStaticDataValueAsString(const gd::String& path,
                                            gd::String& value) const {
-  gd::SerializerElement globalConfigElement =
-      gd::Serializer::FromJSON(GetGlobalConfigJson().c_str());
-  const gd::SerializerElement* currentElement = &globalConfigElement;
+  gd::SerializerElement staticDataElement =
+      gd::Serializer::FromJSON(GetStaticDataJson().c_str());
+  const gd::SerializerElement* currentElement = &staticDataElement;
 
-  for (const auto& segment : ParseGlobalConfigPath(path)) {
+  for (const auto& segment : ParseStaticDataPath(path)) {
     if (segment.isIndex) {
       if (!currentElement->ConsideredAsArray() ||
           segment.index >= currentElement->GetChildrenCount()) {
@@ -208,11 +208,11 @@ bool Project::GetGlobalConfigValueAsString(const gd::String& path,
     }
   }
 
-  value = GlobalConfigValueToString(*currentElement);
+  value = StaticDataValueToString(*currentElement);
   return true;
 }
 
-bool Project::ResolveGlobalConfigPlaceholders(
+bool Project::ResolveStaticDataPlaceholders(
     const gd::String& source,
     gd::String& resolved,
     gd::String& missingPath) const {
@@ -240,7 +240,7 @@ bool Project::ResolveGlobalConfigPlaceholders(
                       placeholderEnd - placeholderStart - 2)
             .Trim();
     gd::String value;
-    if (path.empty() || !GetGlobalConfigValueAsString(path, value)) {
+    if (path.empty() || !GetStaticDataValueAsString(path, value)) {
       missingPath = path;
       resolved = source;
       return false;
@@ -1186,11 +1186,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   objectsContainer.AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
-  if (element.HasChild("globalConfig")) {
-    SetGlobalConfigJson(
-        gd::Serializer::ToJSON(element.GetChild("globalConfig")));
+  if (element.HasChild("staticData")) {
+    SetStaticDataJson(
+        gd::Serializer::ToJSON(element.GetChild("staticData")));
   } else {
-    SetGlobalConfigJson("{}");
+    SetStaticDataJson("{}");
   }
 
   scenes.clear();
@@ -1458,9 +1458,9 @@ void Project::SerializeTo(SerializerElement& element) const {
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
-  if (GetGlobalConfigJson() != "{}") {
-    element.AddChild("globalConfig") =
-        gd::Serializer::FromJSON(GetGlobalConfigJson());
+  if (GetStaticDataJson() != "{}") {
+    element.AddChild("staticData") =
+        gd::Serializer::FromJSON(GetStaticDataJson());
   }
 
   element.SetAttribute("firstLayout", firstLayout);
@@ -1605,7 +1605,7 @@ void Project::Init(const gd::Project& game) {
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   variables = game.GetVariables();
-  globalConfigJson = game.GetGlobalConfigJson();
+  staticDataJson = game.GetStaticDataJson();
 
   projectFile = game.GetProjectFile();
 

@@ -1,6 +1,10 @@
 // @flow
 
 import { shouldHideExtension } from '../Version';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -52,9 +56,17 @@ const summarizeProperty = (name: string, property: any): ?Object => {
   ) {
     return null;
   }
+  const type = String((property.getType && property.getType()) || '');
+  if (!type) {
+    console.warn(
+      `[ProjectSourceCatalog] Property ${name} has no registered type and was omitted from the authoring catalog.`
+    );
+    return null;
+  }
   const summary: Object = {
     name,
-    type: property.getType(),
+    authoringKey: name,
+    type,
   };
   const defaultValue = property.getValue && property.getValue();
   if (defaultValue !== undefined) {
@@ -79,11 +91,113 @@ const summarizeProperty = (name: string, property: any): ?Object => {
   return summary;
 };
 
-const summarizeProperties = (properties: any): Array<Object> => {
+const changedTopLevelKeys = (before: Object, after: Object): Array<string> =>
+  sortedUnique([
+    ...Object.keys(before || {}),
+    ...Object.keys(after || {}),
+  ]).filter(key => JSON.stringify(before[key]) !== JSON.stringify(after[key]));
+
+const propertyProbeValue = (property: any): string => {
+  const type = String((property.getType && property.getType()) || '');
+  const value = String((property.getValue && property.getValue()) || '');
+  if (['Number', 'Integer', 'Float'].includes(type)) {
+    const number = Number(value);
+    return String(Number.isFinite(number) ? number + 1 : 1);
+  }
+  if (type === 'Boolean') {
+    return ['1', 'true'].includes(value.toLowerCase()) ? '0' : '1';
+  }
+  const choices = property.getChoices && toArray(property.getChoices());
+  if (choices && choices.length) {
+    const alternative = choices.find(
+      choice => String(choice.getValue()) !== value
+    );
+    if (alternative) return String(alternative.getValue());
+  }
+  return `${value}__gdevelop_catalog_probe__`;
+};
+
+const inferSerializedPropertyKey = ({
+  instance,
+  authoringKey,
+  property,
+}: Object): Object => {
+  if (!instance || typeof instance.updateProperty !== 'function') {
+    return {
+      status: 'unsupported',
+      reason: 'No writable metadata instance is registered for this property.',
+    };
+  }
+  let baseline;
+  try {
+    baseline = serializeToJSObject(instance);
+    if (!instance.updateProperty(authoringKey, propertyProbeValue(property))) {
+      return {
+        status: 'unsupported',
+        reason: 'The registered instance rejected the metadata property key.',
+      };
+    }
+    const changedKeys = changedTopLevelKeys(
+      baseline,
+      serializeToJSObject(instance)
+    );
+    if (changedKeys.length !== 1) {
+      return {
+        status: 'unsupported',
+        reason:
+          changedKeys.length === 0
+            ? 'Updating the property did not change serialized data.'
+            : `Updating the property changed multiple serialized keys: ${changedKeys.join(
+                ', '
+              )}.`,
+      };
+    }
+    return { status: 'supported', serializedKey: changedKeys[0] };
+  } catch (error) {
+    return {
+      status: 'unsupported',
+      reason: error && error.message ? error.message : String(error),
+    };
+  } finally {
+    if (baseline) {
+      try {
+        unserializeFromJSObject(instance, baseline);
+      } catch (error) {
+        console.warn(
+          `[ProjectSourceCatalog] Unable to restore metadata instance after probing ${authoringKey}.`,
+          error
+        );
+      }
+    }
+  }
+};
+
+const summarizeProperties = (
+  properties: any,
+  instance?: any
+): Array<Object> => {
   if (!properties || !properties.keys) return [];
   return toArray(properties.keys())
     .sort((left, right) => String(left).localeCompare(String(right)))
-    .map(name => summarizeProperty(String(name), properties.get(name)))
+    .map(name => {
+      const authoringKey = String(name);
+      const property = properties.get(name);
+      const summary = summarizeProperty(authoringKey, property);
+      if (!summary) return null;
+      if (instance !== undefined) {
+        const serialization = inferSerializedPropertyKey({
+          instance,
+          authoringKey,
+          property,
+        });
+        if (serialization.status === 'supported') {
+          summary.serializedKey = serialization.serializedKey;
+        } else {
+          summary.serialization = serialization;
+        }
+      }
+      return summary;
+    })
     .filter(Boolean);
 };
 
@@ -95,6 +209,8 @@ const summarizeSerializedProperties = (
     .map(property => {
       const summary: Object = {
         name: String(property.name || ''),
+        authoringKey: String(property.name || ''),
+        serializedKey: String(property.name || ''),
         type: String(property.type || ''),
       };
       if (property.value !== undefined) summary.defaultValue = property.value;
@@ -134,10 +250,11 @@ const getSerializedRequiredBehaviorTypes = (
 
 const safelySummarizeMetadataProperties = (
   readProperties: () => any,
+  instance: any,
   context: string
 ): Array<Object> => {
   try {
-    return summarizeProperties(readProperties());
+    return summarizeProperties(readProperties(), instance);
   } catch (error) {
     console.warn(
       `[ProjectSourceCatalog] Unable to read ${context}; omitting its property metadata from the generated catalog.`,
@@ -172,7 +289,7 @@ const getProjectExtensionNames = (serializedProject: Object): Set<string> =>
 const getProjectBehaviorDefinitions = (
   serializedProject: Object
 ): Map<string, Object> => {
-  const definitions = new Map();
+  const definitions: Map<string, Object> = new Map();
   (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
     const extensionName = String(extension.name || '');
     (extension.eventsBasedBehaviors || []).forEach(behavior => {
@@ -264,13 +381,21 @@ const collectRegisteredTypes = (
       } else {
         entry.properties = safelySummarizeMetadataProperties(
           () => metadata.getProperties(),
+          metadata.get(),
           `properties for behavior ${behaviorType}`
         );
         entry.sharedProperties = safelySummarizeMetadataProperties(
           () => metadata.getSharedProperties(),
+          metadata.getSharedDataInstance(),
           `shared properties for behavior ${behaviorType}`
         );
       }
+      entry.keySpace = 'serialized';
+      entry.unknownPropertyPolicy = entry.properties.every(
+        property => !!property.serializedKey
+      )
+        ? 'error'
+        : 'preserve';
       const objectType = metadata.getObjectType();
       if (objectType) entry.objectType = objectType;
       const requiredBehaviorTypes = localBehaviorDefinition
@@ -301,13 +426,14 @@ const collectRegisteredTypes = (
         unique: metadata.isMarkedAsUnique(),
         parameters: safelySummarizeMetadataProperties(
           () => metadata.getProperties(),
+          undefined,
           `parameters for effect ${effectType}`
         ),
       });
     });
   });
 
-  const uniqueByType = entries =>
+  const uniqueByType = (entries: Array<Object>): Array<Object> =>
     Array.from(
       entries
         .reduce((byType, entry) => {
@@ -316,7 +442,8 @@ const collectRegisteredTypes = (
         }, new Map())
         .values()
     );
-  const byType = (left, right) => String(left.type).localeCompare(right.type);
+  const byType = (left: Object, right: Object) =>
+    String(left.type).localeCompare(right.type);
   return {
     objectTypes: uniqueByType(objectTypes).sort(byType),
     behaviorTypes: uniqueByType(behaviorTypes).sort(byType),
@@ -327,6 +454,7 @@ const collectRegisteredTypes = (
 const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'project',
+    requiredMarker: { field: 'kind', value: 'project' },
     path: 'project.settings',
     mountedNamespace: 'project',
     tomlRoot: true,
@@ -334,14 +462,15 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     commonFields: [
       'gdVersion',
       'properties',
-      'objectsGroups',
+      'objectGroups',
+      'objectGroupRequiredBehaviors',
       'variables',
       'firstLayout',
       'previewLayout',
     ],
     forbiddenFields: [
       'resources',
-      'globalConfig',
+      'staticData',
       'objects',
       'layouts',
       'eventsFunctionsExtensions',
@@ -351,6 +480,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'global-object',
+    requiredMarker: { field: 'kind', value: 'object' },
     path: 'objects/<Object>.settings',
     mountedNamespace: 'project.objects."<Object>"',
     tomlRoot: true,
@@ -372,6 +502,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'resources',
+    requiredMarker: { field: 'kind', value: 'resources' },
     path: 'resources.settings',
     mountedNamespace: 'project.resources',
     tomlRoot: true,
@@ -379,17 +510,18 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     commonFields: ['resources', 'resourceFolders'],
   },
   {
-    kind: 'config',
-    path: 'config.settings',
-    mountedNamespace: 'project.globalConfig',
-    tomlRoot: '[settings]',
+    kind: 'static-data',
+    path: 'static-data.toml',
+    mountedNamespace: 'editor.staticData',
+    tomlRoot: true,
     requiredFields: [],
-    commonFields: ['arbitrary project global configuration'],
+    commonFields: ['arbitrary TOML-compatible static data'],
     note:
-      'Format metadata belongs in [gdevelopConfig]; global configuration belongs in the short local [settings] table.',
+      'The entire document is editor-only Static Data. Do not add format metadata or a wrapper table.',
   },
   {
     kind: 'scene',
+    requiredMarker: { field: 'kind', value: 'scene' },
     path: 'scenes/<Scene>/scene.settings',
     mountedNamespace: 'scenes."<Scene>"',
     tomlRoot: true,
@@ -402,7 +534,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'name',
     ],
     commonFields: [
-      'objectsGroups',
+      'objectGroups',
+      'objectGroupRequiredBehaviors',
       'variables',
       'behaviorsSharedData',
       'runtime/loading/input/sound/sort settings',
@@ -419,6 +552,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'scene-object',
+    requiredMarker: { field: 'kind', value: 'object' },
     path: 'scenes/<Scene>/objects/<Object>.settings',
     mountedNamespace: 'scenes."<Scene>".objects."<Object>"',
     tomlRoot: true,
@@ -440,6 +574,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'externals',
+    requiredMarker: { field: 'kind', value: 'externals' },
     path: 'externals/external.settings',
     mountedNamespace: 'externals',
     tomlRoot: true,
@@ -448,6 +583,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'extension',
+    requiredMarker: { field: 'kind', value: 'extension' },
     path: 'extensions/<Extension>/extension.settings',
     mountedNamespace: 'extensions."<Extension>"',
     tomlRoot: true,
@@ -461,6 +597,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'function',
+    requiredMarker: { field: 'kind', value: 'function' },
     path: 'extensions/<Extension>/functions/<Function>/function.settings',
     mountedNamespace: 'extensions."<Extension>".functions."<Function>"',
     tomlRoot: true,
@@ -477,12 +614,14 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'signature',
       'parameters',
       'objectGroups',
+      'objectGroupRequiredBehaviors',
       'editor metadata',
     ],
     forbiddenFields: ['event body'],
   },
   {
     kind: 'prefab',
+    requiredMarker: { field: 'kind', value: 'prefab' },
     path: 'extensions/<Extension>/prefabs/<Prefab>/prefab.settings',
     mountedNamespace: 'extensions."<Extension>".prefabs."<Prefab>"',
     tomlRoot: true,
@@ -494,7 +633,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'layout',
     ],
     commonFields: [
-      'objectsGroups',
+      'objectGroups',
+      'objectGroupRequiredBehaviors',
       'variables',
       'propertyDescriptors',
       'variants',
@@ -512,6 +652,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'prefab-object',
+    requiredMarker: { field: 'kind', value: 'object' },
     path:
       'extensions/<Extension>/prefabs/<Prefab>/{objects|variants/<Variant>/objects}/<Object>.settings',
     mountedNamespace:
@@ -535,6 +676,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'prefab-function',
+    requiredMarker: { field: 'kind', value: 'function' },
     path:
       'extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/function.settings',
     mountedNamespace:
@@ -553,6 +695,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'signature',
       'parameters',
       'objectGroups',
+      'objectGroupRequiredBehaviors',
       'editor metadata',
     ],
     forbiddenFields: ['event body'],
@@ -561,6 +704,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'behavior',
+    requiredMarker: { field: 'kind', value: 'behavior' },
     path: 'extensions/<Extension>/behaviors/<Behavior>/behavior.settings',
     mountedNamespace: 'extensions."<Extension>".behaviors."<Behavior>"',
     tomlRoot: true,
@@ -576,6 +720,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   },
   {
     kind: 'behavior-function',
+    requiredMarker: { field: 'kind', value: 'function' },
     path:
       'extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings',
     mountedNamespace:
@@ -594,6 +739,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'signature',
       'parameters',
       'objectGroups',
+      'objectGroupRequiredBehaviors',
       'editor metadata',
     ],
     forbiddenFields: ['event body'],
@@ -612,7 +758,7 @@ const summarizeObjectDefinition = (object: Object): Object => ({
 });
 
 const buildSettingsOwners = (serializedProject: Object): Array<Object> => {
-  const owners = [
+  const owners: Array<Object> = [
     {
       kind: 'project',
       name: String(
@@ -695,22 +841,25 @@ export const buildProjectSettingsCatalog = ({
       rules: [
         'Read the relevant existing settings file before editing or creating a sibling component.',
         'Write component fields at the TOML root. Never repeat project, scene, extension, prefab, behavior, function, or object names in TOML table headers; the canonical physical path supplies that namespace.',
-        'At load time the editor parses each local document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted documents. Duplicate ownership is an error.',
+        'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. static-data.toml is loaded separately as editor-only Static Data. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Write variables, globalVariables, and sceneVariables as TOML tables keyed by variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Never write recursive [[variables...]] tables.',
+        'Open variable containers only with [variables], [globalVariables], or [sceneVariables] TOML headers and write one assignment per variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Use an empty header for an empty container. Never write a whole variable container as variables = { ... } or variables = { }, and never write recursive [[variables...]] tables. Existing whole-container inline tables are load-time migration input only and are rewritten automatically; do not preserve or introduce them.',
+        'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
+        'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
+        'For an attached behavior, serialize only properties listed in behaviorTypes[].properties. Editor-hidden behavior descriptors are intentionally absent from this catalog, are runtime-managed, and are forbidden in object settings; the runtime initializes them from descriptor defaults.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],
       objectDefinition:
         'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
       behaviorDefinition:
-        'An attached behavior requires a unique object-local name and a registered type; initialize properties from that type metadata or an existing definition.',
+        'An attached behavior requires a unique object-local name and a registered type. Initialize only author-writable properties listed for that type in behaviorTypes[].properties. Never serialize editor-hidden properties in an object definition.',
       variableDefinition:
-        'A variable name is the key in variables/globalVariables/sceneVariables. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
+        'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
     },
     fileKinds: SETTINGS_FILE_KINDS,
     settingsOwners,
@@ -923,7 +1072,12 @@ const LAYOUT_ELEMENTS = Object.freeze([
     contexts: ['instance'],
     attributes: [
       { name: 'behavior', type: 'attached behavior name', required: true },
-      { name: 'data', type: 'strict JSON object', required: true },
+      {
+        name: 'data',
+        type:
+          'strict JSON object keyed by behaviorOverrideSchemas[].properties[].serializedKey',
+        required: true,
+      },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'muted', type: 'boolean', default: false },
       { name: 'inherited', type: 'boolean', default: false },
@@ -1086,14 +1240,33 @@ export const buildProjectLayoutCatalog = ({
   project,
   serializedProject,
   effectTypes,
+  behaviorTypes,
 }: {|
   project: gdProject,
   serializedProject: Object,
   effectTypes?: Array<Object>,
+  behaviorTypes?: Array<Object>,
 |}): Object => {
+  const registeredTypes =
+    effectTypes && behaviorTypes
+      ? null
+      : collectRegisteredTypes(project, serializedProject);
   const registeredEffectTypes =
-    effectTypes ||
-    collectRegisteredTypes(project, serializedProject).effectTypes;
+    effectTypes || (registeredTypes && registeredTypes.effectTypes) || [];
+  const registeredBehaviorTypes =
+    behaviorTypes || (registeredTypes && registeredTypes.behaviorTypes) || [];
+  const behaviorOverrideSchemas = registeredBehaviorTypes.map(behavior => ({
+    behaviorType: behavior.type,
+    keySpace: 'serialized',
+    unknownPropertyPolicy: behavior.unknownPropertyPolicy || 'preserve',
+    properties: (behavior.properties || [])
+      .filter(property => property.serializedKey)
+      .map(property => ({
+        authoringKey: property.authoringKey || property.name,
+        serializedKey: property.serializedKey,
+        type: property.type,
+      })),
+  }));
   const contexts = buildLayoutContexts(serializedProject);
   return validateProjectLayoutCatalog({
     format: 'gdevelop-layout-catalog',
@@ -1109,7 +1282,7 @@ export const buildProjectLayoutCatalog = ({
         'Strings use JSON escaping; typed maps use strict JSON; colors are uppercase #RRGGBB.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
         'Use an existing object name from the matching context. Use <object of="..."> for unsafe or reserved object names.',
-        'An override may reference only a behavior already attached to that object in the matching context.',
+        'An override may reference only a behavior already attached to that object in the matching context. Its data keys must use the exact serializedKey entries in behaviorOverrideSchemas, never the editor-facing authoringKey.',
         'Cameras precede effects, effects precede instances, and properties/variables precede overrides.',
         'Object definitions and attached behaviors belong in .settings, while event logic belongs in .events.',
       ],
@@ -1117,12 +1290,37 @@ export const buildProjectLayoutCatalog = ({
     elements: LAYOUT_ELEMENTS,
     contexts,
     effectTypes: registeredEffectTypes,
+    behaviorOverrideSchemas,
     counts: {
       elements: LAYOUT_ELEMENTS.length,
       contexts: contexts.length,
       effectTypes: registeredEffectTypes.length,
+      behaviorOverrideSchemas: behaviorOverrideSchemas.length,
     },
   });
+};
+
+export const buildBehaviorPropertySchemasByType = (
+  catalogOrBehaviorTypes: Object | Array<Object>
+): Object => {
+  const behaviorTypes = Array.isArray(catalogOrBehaviorTypes)
+    ? catalogOrBehaviorTypes
+    : (catalogOrBehaviorTypes && catalogOrBehaviorTypes.behaviorTypes) || [];
+  const schemas: { [string]: Object } = {};
+  behaviorTypes.forEach(behavior => {
+    schemas[String(behavior.type || '')] = {
+      keySpace: 'serialized',
+      unknownPropertyPolicy: behavior.unknownPropertyPolicy || 'preserve',
+      properties: (behavior.properties || [])
+        .filter(property => property.serializedKey)
+        .map(property => ({
+          authoringKey: String(property.authoringKey || property.name || ''),
+          serializedKey: String(property.serializedKey || ''),
+          type: String(property.type || ''),
+        })),
+    };
+  });
+  return schemas;
 };
 
 const validateBaseCatalog = (
@@ -1151,7 +1349,7 @@ const validateUniqueEntries = (
   getKey: Object => string,
   label: string
 ) => {
-  const keys = new Set();
+  const keys: Set<string> = new Set();
   entries.forEach(entry => {
     if (!entry || typeof entry !== 'object') fail(`Invalid ${label} entry.`);
     const key = getKey(entry);
@@ -1170,6 +1368,25 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
     'effectTypes',
   ]);
   validateUniqueEntries(validated.fileKinds, entry => entry.kind, 'file kind');
+  validated.fileKinds.forEach(fileKind => {
+    const expectedFileKind = SETTINGS_FILE_KINDS.find(
+      entry => entry.kind === fileKind.kind
+    );
+    if (!expectedFileKind) fail(`Unknown file kind ${fileKind.kind}.`);
+    const expectedMarker = expectedFileKind.requiredMarker;
+    if (
+      expectedMarker &&
+      (!fileKind.requiredMarker ||
+        fileKind.requiredMarker.field !== expectedMarker.field ||
+        fileKind.requiredMarker.value !== expectedMarker.value)
+    ) {
+      fail(
+        `File kind ${fileKind.kind} must declare persisted marker ${
+          expectedMarker.field
+        }=${expectedMarker.value}.`
+      );
+    }
+  });
   validateUniqueEntries(
     validated.objectTypes,
     entry => entry.type,
@@ -1180,6 +1397,54 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
     entry => entry.type,
     'behavior type'
   );
+  validated.behaviorTypes.forEach(behavior => {
+    if (
+      behavior.keySpace !== 'serialized' ||
+      !['error', 'preserve'].includes(behavior.unknownPropertyPolicy) ||
+      !Array.isArray(behavior.properties) ||
+      !Array.isArray(behavior.sharedProperties)
+    ) {
+      fail(`Behavior type ${behavior.type} has an invalid property contract.`);
+    }
+    ['properties', 'sharedProperties'].forEach(propertyListName => {
+      const serializedKeys: Set<string> = new Set();
+      behavior[propertyListName].forEach(property => {
+        if (
+          !property ||
+          !String(property.authoringKey || '') ||
+          !String(property.type || '')
+        ) {
+          fail(
+            `Behavior type ${
+              behavior.type
+            } has a ${propertyListName} entry without an authoring key or type.`
+          );
+        }
+        if (!property.serializedKey) {
+          if (
+            !property.serialization ||
+            property.serialization.status !== 'unsupported' ||
+            !String(property.serialization.reason || '')
+          ) {
+            fail(
+              `Behavior property ${behavior.type}.${
+                property.authoringKey
+              } has no serialized key or explicit unsupported mapping.`
+            );
+          }
+          return;
+        }
+        if (serializedKeys.has(property.serializedKey)) {
+          fail(
+            `Behavior type ${
+              behavior.type
+            } has duplicate serialized property key ${property.serializedKey}.`
+          );
+        }
+        serializedKeys.add(property.serializedKey);
+      });
+    });
+  });
   validateUniqueEntries(
     validated.effectTypes,
     entry => entry.type,
@@ -1193,6 +1458,7 @@ export const validateProjectLayoutCatalog = (catalog: any): Object => {
     'elements',
     'contexts',
     'effectTypes',
+    'behaviorOverrideSchemas',
   ]);
   validateUniqueEntries(
     validated.elements,
@@ -1217,6 +1483,38 @@ export const validateProjectLayoutCatalog = (catalog: any): Object => {
     entry => entry.type,
     'effect type'
   );
+  validateUniqueEntries(
+    validated.behaviorOverrideSchemas,
+    entry => entry.behaviorType,
+    'behavior override schema'
+  );
+  validated.behaviorOverrideSchemas.forEach(schema => {
+    if (
+      schema.keySpace !== 'serialized' ||
+      !['error', 'preserve'].includes(schema.unknownPropertyPolicy) ||
+      !Array.isArray(schema.properties)
+    ) {
+      fail(
+        `Behavior override schema ${
+          schema.behaviorType
+        } has an invalid key-space contract.`
+      );
+    }
+    validateUniqueEntries(
+      schema.properties,
+      property => property.serializedKey,
+      `serialized property for ${schema.behaviorType}`
+    );
+    schema.properties.forEach(property => {
+      if (!property.authoringKey || !property.type) {
+        fail(
+          `Behavior override property ${schema.behaviorType}.${
+            property.serializedKey
+          } has no authoring key or type.`
+        );
+      }
+    });
+  });
   return validated;
 };
 
@@ -1224,7 +1522,7 @@ const serializeCatalog = (
   catalog: Object,
   orderedArrayNames: Array<string>
 ): string => {
-  const arrays = {};
+  const arrays: { [string]: Array<Object> } = {};
   orderedArrayNames.forEach(name => {
     arrays[name] = catalog[name];
   });
@@ -1263,4 +1561,5 @@ export const serializeProjectLayoutCatalog = (catalog: Object): string =>
     'elements',
     'contexts',
     'effectTypes',
+    'behaviorOverrideSchemas',
   ]);

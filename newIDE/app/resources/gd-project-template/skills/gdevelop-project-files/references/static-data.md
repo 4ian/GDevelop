@@ -1,34 +1,34 @@
-# Use GDevelop Global Config and placeholders
+# Use GDevelop Static Data and placeholders
 
-Global Config is project-wide, JSON-compatible, static authoring data. Use it
+Static Data is project-wide, TOML-compatible, static authoring data. Use it
 for balance values, content definitions, feature defaults, stable identifiers,
 and other configuration that should be substituted into generated game data.
 It is not a runtime variable store and it is never a place for secrets.
 
 ## Contents
 
-1. [Choose Global Config or variables](#choose-global-config-or-variables)
+1. [Choose Static Data or variables](#choose-static-data-or-variables)
 2. [Multi-file source ownership](#multi-file-source-ownership)
-3. [Author config.settings correctly](#author-configsettings-correctly)
-4. [Represent null and mixed JSON safely](#represent-null-and-mixed-json-safely)
+3. [Author static-data.toml correctly](#author-static-datatoml-correctly)
+4. [Keep data TOML-compatible](#keep-data-toml-compatible)
 5. [Placeholder path syntax](#placeholder-path-syntax)
 6. [Resolution behavior](#resolution-behavior)
 7. [Use placeholders in events](#use-placeholders-in-events)
 8. [Use placeholders in custom-object and behavior properties](#use-placeholders-in-custom-object-and-behavior-properties)
 9. [Design reusable components](#design-reusable-components)
 10. [Complete examples](#complete-examples)
-11. [Edit and migration rules](#edit-and-migration-rules)
+11. [Edit rules](#edit-rules)
 12. [Validate and debug](#validate-and-debug)
 13. [Failure patterns](#failure-patterns)
 14. [Authoring checklist](#authoring-checklist)
 
-## Choose Global Config or variables
+## Choose Static Data or variables
 
-Use Global Config for values that are:
+Use Static Data for values that are:
 
 - Shared across the project.
 - Authored before the game runs.
-- JSON-compatible data such as balance tables, card definitions, localization
+- TOML-compatible data such as balance tables, card definitions, localization
   fragments, static signal names, or environment defaults.
 - Safe to compile into preview/export output as literals.
 
@@ -39,9 +39,9 @@ Use global, scene, object, or local variables for values that:
 - Need save-game persistence, networking, or live synchronization.
 - Depend on the current scene/session/player.
 
-Changing Global Config does not mutate a running preview. Its placeholders are
+Changing Static Data does not mutate a running preview. Its placeholders are
 resolved while code and runtime object data are generated, so regenerate or
-relaunch the preview/export after every relevant config change.
+relaunch the preview/export after every relevant static data change.
 
 Never store passwords, service credentials, private API keys, signing material,
 or other secrets. Resolved values are compiled into exported game code/data and
@@ -49,63 +49,54 @@ can be inspected by players.
 
 ## Multi-file source ownership
 
-In a canonical multi-file project, `config.settings` is the sole source for the
-complete Global Config object. It is discovered by its fixed root path; do not
+In a canonical multi-file project, `static-data.toml` is the sole source for the
+complete Static Data object. It is discovered by its fixed root path; do not
 add a reference to it in `project.settings`.
 
 Ownership is strict:
 
-- `[gdevelopConfig]` is format metadata owned by the multi-file serializer.
-- `[gdevelopConfig.rawJson]` is format-owned fallback storage for JSON values
-  that cannot be represented directly by the TOML projection.
-- `[settings]` and its descendants are user configuration data.
-- `project.settings` must not contain a global-config table in newly authored
+- The whole TOML document is user configuration data.
+- There is no `[settings]` or `[staticData]` wrapper and no format metadata.
+- `project.settings` must not contain a static-data table in newly authored
   sources.
 
-Minimal empty source:
+An explicit empty Static Data is an empty `static-data.toml` file.
 
-```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
+The GDevelop editor auto-saves grid, Raw TOML, Raw JSON, and import changes to
+this file for local multi-file projects. A normal project save also writes the
+same source; neither path adds Static Data to `project.settings`.
 
-[settings]
-```
+Do not edit `.gdevelop/game.json`; it is generated output and does not contain
+Static Data. Runtime exports also omit the map after resolving supported
+placeholders.
 
-Do not edit `.gdevelop/game.json`; it is generated compatibility/runtime
-output. Older design documents or project formats may mention a separate
-`globalConfig.json` or a top-level `globalConfig` inside legacy JSON. Those are
-compatibility formats, not the current multi-file authoring contract.
+## Author static-data.toml correctly
 
-## Author config.settings correctly
-
-The Global Config root must be a JSON object. TOML strings, finite numbers,
-booleans, nested tables, arrays, and arrays of tables map naturally to JSON.
-Keep settings source unindented and local-root like every other `.settings`
-fragment.
+The Static Data root is the TOML document itself. Strings, finite numbers,
+booleans, nested tables, homogeneous arrays, and arrays of tables map naturally
+to the editor's static configuration object. Keep the source unindented and
+write data directly at the root.
 
 Example project configuration:
 
 ```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
-
-[settings.gameplay]
+[gameplay]
 startingLives = 3
 friendlyFire = false
 difficultyNames = ["Story", "Normal", "Expert"]
 
-[settings.signals.card]
+[signals.card]
 selected = "Card.Selected"
 refresh = "Card.Refresh"
 
-[settings.cards.Sunflower]
+[cards.Sunflower]
 displayName = "Sunflower"
 price = 50
 cooldown = 7.5
 enabled = true
 tags = ["plant", "producer"]
 
-[settings.cards.Sunflower.stats]
+[cards.Sunflower.stats]
 health = 100
 production = 25
 ```
@@ -156,58 +147,28 @@ TOML has special key syntax. Quote keys that contain dots, spaces, or punctuatio
 when they should remain one JSON key:
 
 ```toml
-[settings.cards."sun.flower"]
+[cards."sun.flower"]
 displayName = "Sun Flower"
 
-[settings.localization."main menu"]
+[localization."main menu"]
 title = "Play"
 ```
 
-## Represent null and mixed JSON safely
+## Keep data TOML-compatible
 
-The multi-file serializer projects JSON into TOML, but JSON `null` and certain
-arrays have no lossless direct representation under this contract. Store those
-values as canonical JSON text in `[gdevelopConfig.rawJson]`, keyed by RFC 6901
-JSON Pointer.
+`static-data.toml` has no hidden fallback or reserved metadata namespace. Values
+must therefore be representable directly and losslessly in TOML. JSON `null`,
+mixed-type arrays such as `[1, "two"]`, non-finite numbers, dates, and integers
+outside JavaScript's safe range are rejected.
 
-Example:
+Use a meaningful TOML-compatible alternative when the data model allows it:
+omit an optional key instead of storing `null`, use a string status such as
+`"none"`, or replace a mixed tuple with a table containing named fields. Do not
+encode JSON inside a string merely to bypass validation; placeholders would see
+the string rather than the intended structured value.
 
-```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
-
-[gdevelopConfig.rawJson]
-"/optionalValue" = "null"
-"/mixed" = '[1,"two",true]'
-"/cards/Sunflower/rewards" = '[null,{"kind":"coin","amount":2}]'
-
-[settings]
-enabled = true
-```
-
-Rules for raw JSON entries:
-
-- Each pointer starts with `/` and is relative to the Global Config root.
-- Escape `~` in a key as `~0` and `/` as `~1`. A JSON key `a/b~c` uses pointer
-  token `a~1b~0c`.
-- The value must be a TOML string containing canonical `JSON.stringify` text:
-  no optional whitespace and no alternate numeric/string spelling.
-- Direct array elements of mixed JSON kinds, or a direct `null` element, cause
-  that array to use raw JSON. Homogeneous arrays can remain normal TOML.
-- A nested `null` inside an otherwise projectable object/array may be stored at
-  its own deeper pointer.
-- A raw pointer must not overlap ordinary projected data or be a parent/child
-  of another raw pointer.
-- Non-finite numbers (`NaN`, positive/negative infinity) are invalid and cannot
-  be stored.
-
-`[settings.rawJson]` is not serializer metadata. It is an ordinary,
-legal user key named `rawJson` and must be preserved independently from
-`[gdevelopConfig.rawJson]`.
-
-Do not hand-convert ordinary strings/numbers/booleans to raw JSON. Use the
-fallback only where the value cannot be represented losslessly, and preserve
-existing fallback entries unless deliberately changing their owned paths.
+A user key literally named `rawJson` is ordinary configuration data. It has no
+serializer meaning.
 
 ## Placeholder path syntax
 
@@ -232,7 +193,7 @@ Path rules:
   complex keys simple instead of depending on JSON-style escape semantics.
 - Empty paths such as `{{}}` are invalid.
 - Missing object keys or out-of-range indexes are errors; reads do not create
-  config entries.
+  static data entries.
 
 Prefer dot paths for stable identifier-like keys and quoted bracket paths only
 when the source data genuinely requires punctuation:
@@ -254,17 +215,16 @@ Cost: {{cards.Sunflower.price}} / Cooldown: {{cards.Sunflower.cooldown}}s
 
 Values convert as follows:
 
-| Config value | Substitution text |
-| --- | --- |
-| String | Raw string contents |
-| Number | Number text |
-| Boolean | `true` or `false` |
-| Object/array | Compact JSON text |
-| JSON `null` | Empty text |
+| Static Data value                      | Substitution text                                         |
+| -------------------------------------- | --------------------------------------------------------- |
+| String                                 | Raw string contents                                       |
+| Number                                 | Number text                                               |
+| Boolean                                | `true` or `false`                                         |
+| Object/array                           | Compact JSON text                                         |
 | Missing path or empty placeholder path | Resolution error; source text is retained for diagnostics |
 
-The runtime game does not load the Global Config map and there is no runtime
-Global Config event-tool API. Once generation succeeds, the game contains the
+The runtime game does not load the Static Data map and there is no runtime
+Static Data event-tool API. Once generation succeeds, the game contains the
 resolved literals/object data, not live `{{...}}` lookups.
 
 This also means a placeholder is not a general GDevelop expression. Do not use:
@@ -276,13 +236,13 @@ Variable({{variableName}})
 ```
 
 The first is invalid in a numeric expression, the second assumes structural
-code substitution that is not supported, and the third is not a config path.
+code substitution that is not supported, and the third is not a static data path.
 
 ## Use placeholders in events
 
 Read the events DSL guide and `.gdevelop/instructions-catalog.json` before
 editing. With a project context, current instruction code generation enables
-Global Config replacement for both actions and conditions. String-expression
+Static Data replacement for both actions and conditions. String-expression
 text nodes are the primary supported surface. Some raw string-like parameter
 types (such as keys, mouse buttons, resources, and otherwise unknown string
 parameters) also pass through the resolver, but use them only when the current
@@ -331,12 +291,12 @@ Event-based object and behavior properties are another supported boundary.
 Their configured values are resolved before static runtime object/behavior data
 is emitted.
 
-| Property type | Placeholder rule |
-| --- | --- |
-| String/text | Interpolation or an exact placeholder |
-| Number | Exact whole placeholder only |
-| Boolean | Exact whole placeholder only |
-| `JsonObject` | Exact subtree placeholder or valid JSON text |
+| Property type         | Placeholder rule                                                |
+| --------------------- | --------------------------------------------------------------- |
+| String/text           | Interpolation or an exact placeholder                           |
+| Number                | Exact whole placeholder only                                    |
+| Boolean               | Exact whole placeholder only                                    |
+| `JsonObject`          | Exact subtree placeholder or valid JSON text                    |
 | Choice/resource/color | Do not use unless current editor/catalog explicitly supports it |
 
 Valid number and boolean property values:
@@ -400,7 +360,7 @@ shape rather than inventing serializer fields.
 Direct project-owned extension events can resolve project placeholders when
 generated with their project context, but direct placeholders make an extension
 project-specific. Extension export rejects serialized extensions containing a
-Global Config placeholder.
+Static Data placeholder.
 
 For a reusable/exportable component:
 
@@ -413,13 +373,13 @@ For a reusable/exportable component:
 Preferred architecture:
 
 ```text
-project config: cards.Sunflower
+project static data: cards.Sunflower
   -> scene object configuration: CardConfig = {{cards.Sunflower}}
   -> prefab events: CardConfig.price, CardConfig.stats.health
 ```
 
 This keeps the component contract explicit, supports autocomplete through its
-JSON example, and avoids coupling extension source to one project's config
+JSON example, and avoids coupling extension source to one project's static data
 paths.
 
 ## Complete examples
@@ -427,18 +387,15 @@ paths.
 ### Balance data plus feature defaults
 
 ```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
-
-[settings.features]
+[features]
 tutorialEnabled = true
 analyticsEnabled = false
 
-[settings.balance.player]
+[balance.player]
 startingHealth = 100
 moveSpeed = 240
 
-[settings.balance.enemies.Slime]
+[balance.enemies.Slime]
 health = 30
 damage = 8
 ```
@@ -449,13 +406,10 @@ variables at initialization only if gameplay must later mutate them.
 ### Arrays and special keys
 
 ```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
-
-[settings.waves]
+[waves]
 names = ["opening", "pressure", "boss"]
 
-[settings.localization."main menu"]
+[localization."main menu"]
 title = "Start game"
 subtitle = "Choose a save slot"
 ```
@@ -470,10 +424,7 @@ Placeholders:
 ### Static signal-name registry
 
 ```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
-
-[settings.signals.inventory]
+[signals.inventory]
 request = "Inventory.Request"
 result = "Inventory.Result"
 ```
@@ -488,7 +439,7 @@ do EmitSceneSignal signal_name="\"{{signals.inventory.request}}\"" payload="\"in
 Read [signal-system.md](signal-system.md) for target semantics, receiver rules,
 and `onSignal` lifecycle constraints.
 
-### Null and heterogeneous content
+### Unsupported null and heterogeneous content
 
 Conceptual JSON:
 
@@ -499,95 +450,74 @@ Conceptual JSON:
 }
 ```
 
-Canonical source:
+This value cannot be stored in `static-data.toml`. Omit `release.label` or replace it
+with an explicit TOML-compatible status, and model `spawnPattern` as a table or
+an array whose elements share one TOML type.
 
-```toml
-[gdevelopConfig]
-settingsFormatVersion = 1
+## Edit rules
 
-[gdevelopConfig.rawJson]
-"/release/label" = "null"
-"/spawnPattern" = '[1,"elite",true]'
-
-[settings.release]
-channel = "preview"
-```
-
-## Edit and migration rules
-
-- Read the whole current `config.settings` before modifying one subtree.
-- Edit only `[settings]` data and intentionally owned raw JSON
-  pointers; preserve `[gdevelopConfig]` fields.
-- Keep `settingsFormatVersion = 1` and reject unknown metadata keys rather than
-  moving them into user config.
-- Do not duplicate config in `project.settings`.
-- Do not add a manifest/index entry for `config.settings`.
-- Preserve an absent config file when the project truly has no Global Config;
-  use the minimal empty form only when an explicit empty config object is part
+- Read the whole current `static-data.toml` before modifying one subtree.
+- Edit direct-root data only; do not add metadata or wrapper tables.
+- Do not duplicate static data in `project.settings`.
+- Do not add a manifest/index entry for `static-data.toml`.
+- Preserve an absent static data file when the project truly has no Static Data;
+  use an empty file only when an explicit empty static data object is part
   of the requested source.
-- When migrating old project data, move the complete root object into the new
-  config source and preserve types exactly, using raw pointers where necessary.
 - Search every `{{...}}` reference before renaming or deleting a key. Update
-  config and all consumers atomically.
-- Preserve the difference between a missing key and an explicit JSON `null`.
+  static data and all consumers atomically.
 
 ## Validate and debug
 
 After editing:
 
-1. Parse `config.settings` as standalone TOML, mount `[settings]` at
-   `project.globalConfig`, and verify the strict combined merge.
-2. Confirm the root under `[settings]` is an object and every number
-   is finite.
-3. Validate every raw pointer, RFC 6901 escape, canonical JSON string, and
-   non-overlap rule.
+1. Parse `static-data.toml` as a standalone root TOML document.
+2. Confirm every value is directly TOML-compatible and every number is finite
+   and within the safe integer range.
+3. Confirm there are no `[settings]`, `[staticData]`, format-version, or
+   serializer wrappers.
 4. Search changed placeholder paths and confirm their exact type/value.
 5. Confirm each use is on a supported action/property surface.
-6. Reload the project. A reload error is a source-format failure, not something
-   to work around with a legacy JSON edit.
+6. Reload the project. Treat a reload error as a source-format failure and fix
+   `static-data.toml`.
 7. Launch a fresh preview/export generation. Missing placeholders appear in
-   diagnostics under the message family “A value in the project global config”
+   diagnostics under the message family “A value in the project static data”
    and can block a valid preview/export.
 8. Exercise every configured component and verify the generated value/type,
    including `JsonObject` child paths.
 
 When a path is missing, resolution retains the original source text so the
-diagnostic remains visible. Fix the config path or consumer; do not hide the
+diagnostic remains visible. Fix the static data path or consumer; do not hide the
 error with a fabricated value unless that default is part of the user's design.
 
 ## Failure patterns
 
-- Treating Global Config as runtime mutable state.
-- Editing `.gdevelop/game.json`, legacy project JSON, or an obsolete
-  `globalConfig.json` instead of `config.settings`.
-- Putting global config in `project.settings`.
-- Editing format metadata as user data or confusing the two `rawJson` tables.
-- Writing JSON `null` directly as TOML or storing non-canonical raw JSON.
-- Overlapping raw pointers or forgetting `~0`/`~1` pointer escaping.
+- Treating Static Data as runtime mutable state.
+- Editing generated `.gdevelop/game.json` instead of `static-data.toml`.
+- Putting static data in `project.settings`.
+- Adding `[settings]`, `[staticData]`, or serializer metadata wrappers.
+- Trying to store JSON `null`, mixed-type arrays, dates, or unsafe integers.
 - Using inconsistent types for the same field across content records.
 - Using a placeholder in a numeric event expression or receiving condition.
 - Omitting the nested GDevelop-expression quotes in an IfDo string operand.
 - Using number/boolean interpolation instead of an exact whole placeholder.
 - Replacing a `JsonObject` descriptor's concrete JSON example with a placeholder.
 - Referencing a `JsonObject` child absent from its example schema.
-- Embedding direct project config paths in an extension intended for export.
+- Embedding direct project static data paths in an extension intended for export.
 - Expecting a running preview to update without regeneration.
 - Storing secrets in data that will be compiled into the exported game.
 
 ## Authoring checklist
 
-- Decide explicitly why the data is static config rather than runtime state.
-- Read the complete `config.settings` and relevant owner `.settings`/events.
-- Preserve `[gdevelopConfig]`; author user data only below
-  `[settings]`.
-- Use TOML for directly representable values and canonical raw JSON pointers
-  only for lossless fallback cases.
+- Decide explicitly why the value belongs in Static Data rather than runtime state.
+- Read the complete `static-data.toml` and relevant owner `.settings`/events.
+- Author user data directly at the TOML root with no wrapper or metadata.
+- Use only values TOML represents losslessly.
 - Choose stable, case-consistent, typed paths.
 - Verify every placeholder path, bracket segment, and array index.
 - Use placeholders only on supported action/property surfaces.
 - Keep scalar property placeholders exact where required and give every
   `JsonObject` property a concrete, complete JSON example.
-- Inject config through properties/parameters for reusable extensions.
+- Inject static data through properties/parameters for reusable extensions.
 - Update all consumers atomically when paths change.
-- Reload and regenerate a fresh preview/export, then resolve all missing-config
+- Reload and regenerate a fresh preview/export, then resolve all missing-static data
   diagnostics.

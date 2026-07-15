@@ -26,10 +26,24 @@ describe('project source catalogs', () => {
   test('validates and compactly serializes a settings catalog', () => {
     const catalog = {
       ...base('gdevelop-settings-catalog'),
-      fileKinds: [{ kind: 'project', path: 'project.settings' }],
+      fileKinds: [
+        {
+          kind: 'project',
+          path: 'project.settings',
+          requiredMarker: { field: 'kind', value: 'project' },
+        },
+      ],
       settingsOwners: [{ kind: 'project', name: 'Test' }],
       objectTypes: [{ type: 'Sprite' }],
-      behaviorTypes: [{ type: 'Tween::TweenBehavior' }],
+      behaviorTypes: [
+        {
+          type: 'Tween::TweenBehavior',
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'error',
+          properties: [],
+          sharedProperties: [],
+        },
+      ],
       effectTypes: [{ type: 'Effects::Outline' }],
     };
 
@@ -55,6 +69,7 @@ describe('project source catalogs', () => {
         },
       ],
       effectTypes: [],
+      behaviorOverrideSchemas: [],
     };
 
     const source = serializeProjectLayoutCatalog(catalog);
@@ -80,6 +95,7 @@ describe('project source catalogs', () => {
         elements: [{ element: 'layout' }],
         contexts: [{ kind: 'scene' }],
         effectTypes: [],
+        behaviorOverrideSchemas: [],
       })
     ).toThrow(ProjectSourceCatalogError);
   });
@@ -146,6 +162,20 @@ describe('project source catalogs', () => {
       project,
       serializedProject,
     });
+    const platformerEntry = catalog.behaviorTypes.find(
+      behaviorEntry =>
+        behaviorEntry.type === 'PlatformBehavior::PlatformerObjectBehavior'
+    );
+    expect(platformerEntry.properties).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Acceleration',
+          authoringKey: 'Acceleration',
+          serializedKey: 'acceleration',
+          type: 'Number',
+        }),
+      ])
+    );
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
     ).toMatchObject({
@@ -153,6 +183,15 @@ describe('project source catalogs', () => {
       mountedNamespace: 'scenes."<Scene>".objects."<Object>"',
       tomlRoot: true,
       requiredFields: expect.arrayContaining(['folder']),
+      requiredMarker: { field: 'kind', value: 'object' },
+    });
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'static-data')
+    ).toMatchObject({
+      path: 'static-data.toml',
+      mountedNamespace: 'editor.staticData',
+      tomlRoot: true,
+      requiredFields: [],
     });
     expect(catalog.authoring.rules.join('\n')).toContain(
       'folder = ["Parent", "Child"]'
@@ -160,9 +199,40 @@ describe('project source catalogs', () => {
     expect(catalog.authoring.rules.join('\n')).toContain(
       'Controllers = [{ type = "array"'
     );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Never write a whole variable container as variables = { ... }'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      '[objectGroups] TOML table'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      '[objectGroupRequiredBehaviors]'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'originPoint and centerPoint as inline TOML tables'
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Editor-hidden behavior descriptors'
+    );
+    expect(catalog.authoring.behaviorDefinition).toContain(
+      'Never serialize editor-hidden properties'
+    );
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).toContain('objectGroups');
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).toContain('objectGroupRequiredBehaviors');
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .commonFields
+    ).not.toContain('objectsGroups');
     expect(catalog.authoring.variableDefinition).toContain(
       'does not repeat name'
     );
+    expect(catalog.authoring.variableDefinition).toContain('[variables]');
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );
@@ -171,18 +241,25 @@ describe('project source catalogs', () => {
     expect(entry.properties).toEqual([
       {
         name: 'Speed',
+        authoringKey: 'Speed',
+        serializedKey: 'Speed',
         type: 'Number',
         defaultValue: '42',
         label: 'Speed',
       },
       {
         name: 'Platformer',
+        authoringKey: 'Platformer',
+        serializedKey: 'Platformer',
         type: 'Behavior',
         defaultValue: '',
         label: 'Platformer behavior',
         extraInfo: ['PlatformBehavior::PlatformerObjectBehavior'],
       },
     ]);
+    expect(entry.properties.map(property => property.name)).not.toContain(
+      'Internal'
+    );
     expect(entry.requiredBehaviorTypes).toEqual([
       'PlatformBehavior::PlatformerObjectBehavior',
     ]);

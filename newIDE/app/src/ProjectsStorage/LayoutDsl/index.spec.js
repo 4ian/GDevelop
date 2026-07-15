@@ -602,6 +602,47 @@ describe('Layout DSL', () => {
     );
   });
 
+  test('validates behavior overrides in the serialized property key space', () => {
+    const makeSource = data => `<layout version=1 background=#000000>
+  <layer name="">
+    <Player id="${uuid(20)}" at=0,0>
+      <override behavior="Move" data=${data} />
+    </Player>
+  </layer>
+</layout>`;
+    const context = {
+      kind: 'scene',
+      objectNames: ['Player'],
+      behaviorTypesByObject: { Player: { Move: 'Movement::Move' } },
+      behaviorPropertySchemasByType: {
+        'Movement::Move': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'error',
+          properties: [
+            {
+              authoringKey: 'Speed',
+              serializedKey: 'speed',
+              type: 'Number',
+            },
+          ],
+        },
+      },
+    };
+
+    expect(() => compileLayoutDsl(makeSource('{"Speed":12}'), context)).toThrow(
+      expect.objectContaining({ code: 'BEHAVIOR_PROPERTY_KEY_MISMATCH' })
+    );
+    expect(
+      compileLayoutDsl(makeSource('{"speed":12}'), context).instances[0]
+        .behaviorOverridings[0]
+    ).toMatchObject({ name: 'Move', speed: 12 });
+    expect(() =>
+      compileLayoutDsl(makeSource('{"speed":"fast"}'), context)
+    ).toThrow(
+      expect.objectContaining({ code: 'LAYOUT_INVALID_BEHAVIOR_PROPERTY' })
+    );
+  });
+
   test('reports file, line and column', () => {
     try {
       compileLayoutDsl(

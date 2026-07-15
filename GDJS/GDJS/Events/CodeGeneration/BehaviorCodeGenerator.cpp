@@ -15,17 +15,17 @@
 namespace gdjs {
 
 namespace {
-gd::String ResolveProjectGlobalConfigPlaceholders(
+gd::String ResolveProjectStaticDataPlaceholders(
     const gd::Project& project,
     const gd::String& value) {
   gd::String resolvedValue;
   gd::String missingPath;
-  if (project.ResolveGlobalConfigPlaceholders(
+  if (project.ResolveStaticDataPlaceholders(
           value, resolvedValue, missingPath)) {
     return resolvedValue;
   }
 
-  gd::LogError("Global config path \"{{" + missingPath +
+  gd::LogError("Static Data path \"{{" + missingPath +
                "}}\" does not exist while generating behavior property code.");
   return value;
 }
@@ -332,9 +332,7 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData = class RUNTIME_BEHAVIOR_CL
 
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData = function(instanceContainer, behaviorName) {
   if (!instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
-    const initialData = instanceContainer.getInitialSharedDataForBehavior(
-      behaviorName
-    );
+    const initialData = INITIAL_SHARED_DATA_CODE;
     instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
       instanceContainer,
       initialData
@@ -360,6 +358,13 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
                       generateInitializeSharedPropertiesCode())
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
                       generateInitializePropertiesCode())
+      .FindAndReplace(
+          "INITIAL_SHARED_DATA_CODE",
+          eventsBasedBehavior.GetSharedPropertyDescriptors().IsEmpty()
+              ? "{}"
+              : gd::String(
+                    "instanceContainer.getInitialSharedDataForBehavior("
+                    "behaviorName)"))
       .FindAndReplace("UPDATE_FROM_BEHAVIOR_DATA_CODE",
                       generateUpdateFromBehaviorDataCode())
       .FindAndReplace("GET_NETWORK_SYNC_DATA_CODE",
@@ -565,7 +570,7 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
   const bool isJsonObjectProperty = property.GetType() == "JsonObject";
   const gd::String propertyValue =
-      ResolveProjectGlobalConfigPlaceholders(project, property.GetValue());
+      ResolveProjectStaticDataPlaceholders(project, property.GetValue());
 
   if (isJsonObjectProperty) {
     return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());

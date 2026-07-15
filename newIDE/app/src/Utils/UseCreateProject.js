@@ -161,7 +161,7 @@ type Props = {|
     |}
   ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
-  ensureProjectExtensionsLoaded: () => Promise<void>,
+  ensureProjectExtensionsLoaded: (project: gdProject) => Promise<void>,
   ensureResourcesAreMoved: (
     options: MoveAllProjectResourcesOptionsWithoutProgress
   ) => Promise<void>,
@@ -344,7 +344,7 @@ const useCreateProject = ({
         // extensions. The initial save also generates source catalogs from
         // registered behavior metadata, so it must not run while that metadata
         // is still being replaced between the two passes.
-        await ensureProjectExtensionsLoaded();
+        await ensureProjectExtensionsLoaded(currentProject);
 
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
@@ -397,7 +397,7 @@ const useCreateProject = ({
                 // final asynchronous step before the storage provider serializes
                 // the project, so wait again at the actual serialization
                 // boundary.
-                await ensureProjectExtensionsLoaded();
+                await ensureProjectExtensionsLoaded(currentProject);
               },
             }
           );

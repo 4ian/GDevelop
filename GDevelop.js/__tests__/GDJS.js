@@ -327,9 +327,9 @@ describe('libGD.js - GDJS related tests', function () {
       layoutCodeGenerator.delete();
       project.delete();
     });
-    it('reports missing global config placeholders in action strings', function () {
+    it('reports missing static data placeholders in action strings', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setGlobalConfigJson(JSON.stringify({ labels: {} }));
+      project.setStaticDataJson(JSON.stringify({ labels: {} }));
       const layout = project.insertNewLayout('Scene', 0);
       layout.getVariables().insertNew('Result', 0).setString('');
       const evt = layout
@@ -337,7 +337,7 @@ describe('libGD.js - GDJS related tests', function () {
         .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
       const action = new gd.Instruction();
-      action.setType('BuiltinCommonInstructions::SetStringVariable');
+      action.setType('SetStringVariable');
       action.setParametersCount(3);
       action.setParameter(0, 'Result');
       action.setParameter(1, '=');
@@ -366,9 +366,9 @@ describe('libGD.js - GDJS related tests', function () {
       layoutCodeGenerator.delete();
       project.delete();
     });
-    it('reports missing global config placeholders in condition strings', function () {
+    it('reports missing static data placeholders in condition strings', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setGlobalConfigJson(JSON.stringify({ labels: {} }));
+      project.setStaticDataJson(JSON.stringify({ labels: {} }));
       const layout = project.insertNewLayout('Scene', 0);
       layout.getVariables().insertNew('Result', 0).setString('');
       const evt = layout

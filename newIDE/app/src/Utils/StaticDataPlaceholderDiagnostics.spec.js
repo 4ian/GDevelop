@@ -1,19 +1,19 @@
 // @flow
 import {
-  findGlobalConfigPlaceholderInSerializedData,
-  getMissingGlobalConfigPlaceholderPath,
-} from './GlobalConfigPlaceholderDiagnostics';
+  findStaticDataPlaceholderInSerializedData,
+  getMissingStaticDataPlaceholderPath,
+} from './StaticDataPlaceholderDiagnostics';
 
-const makeProjectWithGlobalConfig = (globalConfig: Object): gdProject =>
-  // $FlowFixMe[incompatible-cast] - The resolver only needs getGlobalConfigJson.
+const makeProjectWithStaticData = (staticData: Object): gdProject =>
+  // $FlowFixMe[incompatible-cast] - The resolver only needs getStaticDataJson.
   (({
-    getGlobalConfigJson: () => JSON.stringify(globalConfig),
+    getStaticDataJson: () => JSON.stringify(staticData),
   }: any): gdProject);
 
-describe('GlobalConfigPlaceholderDiagnostics', () => {
-  describe('getMissingGlobalConfigPlaceholderPath', () => {
+describe('StaticDataPlaceholderDiagnostics', () => {
+  describe('getMissingStaticDataPlaceholderPath', () => {
     it('returns null when all placeholders exist', () => {
-      const project = makeProjectWithGlobalConfig({
+      const project = makeProjectWithStaticData({
         signals: {
           triangle: {
             s1: 'TriangleSignal',
@@ -23,7 +23,7 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
       });
 
       expect(
-        getMissingGlobalConfigPlaceholderPath(
+        getMissingStaticDataPlaceholderPath(
           '"{{signals.triangle.s1}} {{labels[0]}}"',
           project
         )
@@ -31,7 +31,7 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
     });
 
     it('returns the first missing placeholder path', () => {
-      const project = makeProjectWithGlobalConfig({
+      const project = makeProjectWithStaticData({
         signals: {
           triangle: {
             s1: 'TriangleSignal',
@@ -40,7 +40,7 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
       });
 
       expect(
-        getMissingGlobalConfigPlaceholderPath(
+        getMissingStaticDataPlaceholderPath(
           '"{{signals.triangle.s3}}"',
           project
         )
@@ -48,13 +48,13 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
     });
 
     it('returns an empty path for empty placeholders', () => {
-      const project = makeProjectWithGlobalConfig({});
+      const project = makeProjectWithStaticData({});
 
-      expect(getMissingGlobalConfigPlaceholderPath('"{{}}"', project)).toBe('');
+      expect(getMissingStaticDataPlaceholderPath('"{{}}"', project)).toBe('');
     });
   });
 
-  describe('findGlobalConfigPlaceholderInSerializedData', () => {
+  describe('findStaticDataPlaceholderInSerializedData', () => {
     it('returns the first placeholder path in serialized data', () => {
       const serializedData = {
         events: [
@@ -77,7 +77,7 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
         ],
       };
 
-      expect(findGlobalConfigPlaceholderInSerializedData(serializedData)).toBe(
+      expect(findStaticDataPlaceholderInSerializedData(serializedData)).toBe(
         'signals.triangle.s1'
       );
       expect(serializedData.events[0].conditions[0].parameters[2]).toBe(
@@ -98,7 +98,7 @@ describe('GlobalConfigPlaceholderDiagnostics', () => {
         ],
       };
 
-      expect(findGlobalConfigPlaceholderInSerializedData(serializedData)).toBe(
+      expect(findStaticDataPlaceholderInSerializedData(serializedData)).toBe(
         null
       );
     });

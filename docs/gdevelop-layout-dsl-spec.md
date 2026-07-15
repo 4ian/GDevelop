@@ -500,7 +500,7 @@ own them:
 ```text
 name, mangledName, title, standardSortMethod, stopSoundsOnStartup,
 resourcesPreloading, resourcesUnloading, disableInputWhenNotFocused,
-objects, objectsGroups, variables,
+objects, objectGroups, objectGroupRequiredBehaviors, variables,
 behaviorsSharedData, events
 ```
 

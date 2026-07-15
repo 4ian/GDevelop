@@ -144,9 +144,7 @@ export type StorageProviderOperations = {|
     saveAsLocation: ?SaveAsLocation, // This is the new location to save to.
     options: {|
       onStartSaving: () => void,
-      onMoveResources: ({|
-        newFileMetadata: FileMetadata,
-      |}) => Promise<void>,
+      onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
     |}
   ) => Promise<{|
     wasSaved: boolean,
@@ -173,6 +171,11 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata
   ) => Promise<void>,
+  /** Persist the editor-only Static Data source without saving the project. */
+  onAutoSaveStaticData?: (
+    staticData: Object,
+    fileMetadata: FileMetadata
+  ) => Promise<boolean>,
   getAutoSaveCreationDate?: (
     fileMetadata: FileMetadata,
     compareLastModified: boolean

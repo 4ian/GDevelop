@@ -240,7 +240,9 @@ body. Do not create direct or indirect link cycles.
 ## JavaScript
 
 Prefer catalog instructions. Use JavaScript only when the user explicitly
-allows it and no suitable native instruction exists:
+allows it and no suitable native instruction exists. Before editing any block,
+read [javascript-api.md](javascript-api.md) and the generated
+`.gdevelop/runtime-api.d.ts` and `.gdevelop/project-api.d.ts` files:
 
 ```events
 @js objects=Enemy strict=true expanded=false

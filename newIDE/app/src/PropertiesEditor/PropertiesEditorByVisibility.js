@@ -46,7 +46,7 @@ type Props = {|
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
-  hideGlobalConfigPlaceholderHints?: boolean,
+  hideStaticDataPlaceholderHints?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -61,7 +61,7 @@ const PropertiesEditorByVisibility = ({
   resourceManagementProps,
   placeholder,
   isAdvancedSectionInitiallyUncollapsed,
-  hideGlobalConfigPlaceholderHints,
+  hideStaticDataPlaceholderHints,
 }: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
@@ -114,7 +114,7 @@ const PropertiesEditorByVisibility = ({
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         renderExtraDescriptionText={renderExtraDescriptionText}
         unsavedChanges={unsavedChanges}
-        hideGlobalConfigPlaceholderHints={hideGlobalConfigPlaceholderHints}
+        hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -140,9 +140,7 @@ const PropertiesEditorByVisibility = ({
                 }
                 renderExtraDescriptionText={renderExtraDescriptionText}
                 unsavedChanges={unsavedChanges}
-                hideGlobalConfigPlaceholderHints={
-                  hideGlobalConfigPlaceholderHints
-                }
+                hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -157,8 +155,8 @@ const PropertiesEditorByVisibility = ({
                     }
                     renderExtraDescriptionText={renderExtraDescriptionText}
                     unsavedChanges={unsavedChanges}
-                    hideGlobalConfigPlaceholderHints={
-                      hideGlobalConfigPlaceholderHints
+                    hideStaticDataPlaceholderHints={
+                      hideStaticDataPlaceholderHints
                     }
                   />
                 ) : (

@@ -20,11 +20,11 @@ export const MULTI_FILE_FORMAT_VERSION = 1;
 export const MULTI_FILE_ENTRY_NAME = 'project.settings';
 export const MULTI_FILE_ENTRY_URI = 'game://project.settings';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
-export const MULTI_FILE_CONFIG_URI = 'game://config.settings';
+export const MULTI_FILE_STATIC_DATA_URI = 'game://static-data.toml';
 
 const PROJECT_SPLIT_FIELDS = new Set([
   'resources',
-  'globalConfig',
+  'staticData',
   'objects',
   'layouts',
   'externalEvents',
@@ -47,6 +47,10 @@ const VARIABLE_DEFINITION_FIELDS = Object.freeze([
   'sceneVariables',
 ]);
 const VARIABLE_DEFINITION_FIELD_SET = new Set(VARIABLE_DEFINITION_FIELDS);
+const SOURCE_OBJECT_GROUPS_FIELD = 'objectGroups';
+const SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD =
+  'objectGroupRequiredBehaviors';
+const LEGACY_OWNER_OBJECT_GROUPS_FIELD = 'objectsGroups';
 
 export const SCENE_LAYOUT_FIELDS = Object.freeze([
   'r',
@@ -144,6 +148,113 @@ const removeLegacyFolderStructures = value => {
 
 export const removeLegacyFolderStructuresFromProject = legacyProject =>
   removeLegacyFolderStructures(clone(legacyProject));
+
+const ATTACHED_BEHAVIOR_IDENTITY_FIELDS = new Set([
+  'name',
+  'type',
+  'isFolded',
+  'isMuted',
+  'isInheritedFromObjectType',
+  'quickCustomizationVisibility',
+  'propertiesQuickCustomizationVisibilities',
+]);
+
+const collectHiddenBehaviorPropertiesByType = project => {
+  const hiddenPropertiesByType = new Map();
+  (project.eventsFunctionsExtensions || []).forEach(extension => {
+    const extensionName = String(extension.name || '');
+    (extension.eventsBasedBehaviors || []).forEach(behaviorDefinition => {
+      const behaviorName = String(behaviorDefinition.name || '');
+      const hiddenProperties = new Set(
+        (behaviorDefinition.propertyDescriptors || [])
+          .filter(property => property && property.hidden === true)
+          .map(property => String(property.name || ''))
+          .filter(
+            propertyName =>
+              propertyName &&
+              !ATTACHED_BEHAVIOR_IDENTITY_FIELDS.has(propertyName)
+          )
+      );
+      if (extensionName && behaviorName && hiddenProperties.size) {
+        hiddenPropertiesByType.set(
+          `${extensionName}::${behaviorName}`,
+          hiddenProperties
+        );
+      }
+    });
+  });
+  return hiddenPropertiesByType;
+};
+
+const forEachProjectObjectDefinition = (project, callback) => {
+  (project.objects || []).forEach((object, index) =>
+    callback(object, `project.objects[${index}]`)
+  );
+  (project.layouts || []).forEach((layout, layoutIndex) => {
+    (layout.objects || []).forEach((object, objectIndex) =>
+      callback(
+        object,
+        `project.layouts[${layoutIndex}].objects[${objectIndex}]`
+      )
+    );
+  });
+  (project.eventsFunctionsExtensions || []).forEach(
+    (extension, extensionIndex) => {
+      (extension.eventsBasedObjects || []).forEach((prefab, prefabIndex) => {
+        (prefab.objects || []).forEach((object, objectIndex) =>
+          callback(
+            object,
+            `project.eventsFunctionsExtensions[${extensionIndex}].eventsBasedObjects[${prefabIndex}].objects[${objectIndex}]`
+          )
+        );
+        (prefab.variants || []).forEach((variant, variantIndex) => {
+          (variant.objects || []).forEach((object, objectIndex) =>
+            callback(
+              object,
+              `project.eventsFunctionsExtensions[${extensionIndex}].eventsBasedObjects[${prefabIndex}].variants[${variantIndex}].objects[${objectIndex}]`
+            )
+          );
+        });
+      });
+    }
+  );
+};
+
+const processHiddenAttachedBehaviorProperties = (project, reject) => {
+  const hiddenPropertiesByType = collectHiddenBehaviorPropertiesByType(project);
+  if (!hiddenPropertiesByType.size) return project;
+  forEachProjectObjectDefinition(project, (object, objectPath) => {
+    (object && Array.isArray(object.behaviors) ? object.behaviors : []).forEach(
+      behavior => {
+        if (!behavior || typeof behavior !== 'object') return;
+        const behaviorType = String(behavior.type || '');
+        const hiddenProperties = hiddenPropertiesByType.get(behaviorType);
+        if (!hiddenProperties) return;
+        hiddenProperties.forEach(propertyName => {
+          if (!Object.prototype.hasOwnProperty.call(behavior, propertyName)) {
+            return;
+          }
+          if (reject) {
+            fail(
+              'MULTIFILE_FORBIDDEN_HIDDEN_BEHAVIOR_PROPERTY',
+              `${objectPath} behavior ${String(
+                behavior.name || behaviorType
+              )} must not serialize hidden property ${propertyName}. Hidden behavior properties are runtime-managed and use their descriptor defaults.`
+            );
+          }
+          delete behavior[propertyName];
+        });
+      }
+    );
+  });
+  return project;
+};
+
+const removeHiddenAttachedBehaviorProperties = project =>
+  processHiddenAttachedBehaviorProperties(project, false);
+
+const rejectHiddenAttachedBehaviorProperties = project =>
+  processHiddenAttachedBehaviorProperties(project, true);
 
 const rejectLegacyFolderStructures = (value, fileUri, pointer = '') => {
   if (Array.isArray(value)) {
@@ -249,6 +360,147 @@ const compactVariableDefinitionFields = payload => {
   return compacted;
 };
 
+const validateObjectGroupStringArray = (values, label, fileUri) => {
+  const strings = asArray(values, label, fileUri);
+  strings.forEach((value, index) => {
+    if (typeof value !== 'string') {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label}[${index}] must be a string.`,
+        fileUri
+      );
+    }
+  });
+  return strings;
+};
+
+const compactObjectGroupDescriptors = (descriptors, descriptorField, label) =>
+  asArray(descriptors, label, undefined).map((descriptor, index) => {
+    if (
+      !descriptor ||
+      typeof descriptor !== 'object' ||
+      Array.isArray(descriptor) ||
+      Object.keys(descriptor).length !== 1 ||
+      typeof descriptor[descriptorField] !== 'string'
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label}[${index}] must contain exactly one string ${descriptorField} field.`
+      );
+    }
+    return descriptor[descriptorField];
+  });
+
+const compactObjectGroupFields = payload => {
+  const compacted = clone(payload);
+  const compactGroupsOn = (owner, legacyField, label) => {
+    if (owner[legacyField] === undefined) return;
+    if (
+      legacyField !== SOURCE_OBJECT_GROUPS_FIELD &&
+      owner[SOURCE_OBJECT_GROUPS_FIELD] !== undefined
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} cannot contain both objectsGroups and objectGroups.`
+      );
+    }
+    if (owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD] !== undefined) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} cannot contain the source-only ${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD} field before projection.`
+      );
+    }
+    const legacyGroups = asArray(owner[legacyField], label, undefined);
+    const groupsByName = {};
+    const requiredBehaviorsByGroupName = {};
+    legacyGroups.forEach((group, index) => {
+      if (!group || typeof group !== 'object' || Array.isArray(group)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}] must be an object-group descriptor.`
+        );
+      }
+      const fields = Object.keys(group);
+      if (
+        (fields.length !== 2 && fields.length !== 3) ||
+        !fields.includes('name') ||
+        !fields.includes('objects') ||
+        (fields.length === 3 && !fields.includes('requiredBehaviors'))
+      ) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}] must contain name, objects, and optionally requiredBehaviors.`
+        );
+      }
+      const name = group.name;
+      if (typeof name !== 'string') {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label}[${index}].name must be a string.`
+        );
+      }
+      if (Object.prototype.hasOwnProperty.call(groupsByName, name)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label} contains duplicate group ${name}.`
+        );
+      }
+      Object.defineProperty(groupsByName, name, {
+        value: compactObjectGroupDescriptors(
+          group.objects,
+          'name',
+          `${label}.${name}.objects`
+        ),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+      if (Object.prototype.hasOwnProperty.call(group, 'requiredBehaviors')) {
+        Object.defineProperty(requiredBehaviorsByGroupName, name, {
+          value: compactObjectGroupDescriptors(
+            group.requiredBehaviors,
+            'type',
+            `${label}.${name}.requiredBehaviors`
+          ),
+          enumerable: true,
+          configurable: true,
+          writable: true,
+        });
+      }
+    });
+    delete owner[legacyField];
+    owner[SOURCE_OBJECT_GROUPS_FIELD] = groupsByName;
+    if (Object.keys(requiredBehaviorsByGroupName).length) {
+      owner[
+        SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD
+      ] = requiredBehaviorsByGroupName;
+    }
+  };
+
+  const rootLegacyField =
+    compacted[LEGACY_OWNER_OBJECT_GROUPS_FIELD] !== undefined
+      ? LEGACY_OWNER_OBJECT_GROUPS_FIELD
+      : compacted[SOURCE_OBJECT_GROUPS_FIELD] !== undefined
+      ? SOURCE_OBJECT_GROUPS_FIELD
+      : null;
+  if (rootLegacyField) {
+    compactGroupsOn(compacted, rootLegacyField, rootLegacyField);
+  }
+  if (Array.isArray(compacted.variants)) {
+    compacted.variants.forEach((variant, index) => {
+      if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+        return;
+      }
+      compactGroupsOn(
+        variant,
+        LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+        `variants[${index}].objectsGroups`
+      );
+    });
+  }
+  return compacted;
+};
+
 const restoreVariableDefinitionFields = (payload, fileUri) => {
   const restored = clone(payload);
   VARIABLE_DEFINITION_FIELDS.forEach(field => {
@@ -282,6 +534,111 @@ const restoreVariableDefinitionFields = (payload, fileUri) => {
       return { name, ...descriptorWrapper[0] };
     });
   });
+  return restored;
+};
+
+const restoreObjectGroupFields = (payload, fileUri) => {
+  const restored = clone(payload);
+  const restoreGroupsOn = (owner, legacyField, label) => {
+    if (owner[LEGACY_OWNER_OBJECT_GROUPS_FIELD] !== undefined) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} uses retired objectsGroups source syntax. Use an objectGroups table.`,
+        fileUri
+      );
+    }
+    if (owner[SOURCE_OBJECT_GROUPS_FIELD] === undefined) {
+      if (owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD] !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${label} cannot define required behaviors without objectGroups.`,
+          fileUri
+        );
+      }
+      return;
+    }
+    const sourceGroups = owner[SOURCE_OBJECT_GROUPS_FIELD];
+    if (
+      !sourceGroups ||
+      typeof sourceGroups !== 'object' ||
+      Array.isArray(sourceGroups)
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${label} must be a TOML table keyed by group name.`,
+        fileUri
+      );
+    }
+    const groupsByName = sourceGroups;
+    const sourceRequiredBehaviors =
+      owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD];
+    if (
+      sourceRequiredBehaviors !== undefined &&
+      (!sourceRequiredBehaviors ||
+        typeof sourceRequiredBehaviors !== 'object' ||
+        Array.isArray(sourceRequiredBehaviors))
+    ) {
+      fail(
+        'MULTIFILE_INVALID_OBJECT_GROUPS',
+        `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD} must be a TOML table keyed by group name.`,
+        fileUri
+      );
+    }
+    const requiredBehaviorsByGroupName = sourceRequiredBehaviors || {};
+    Object.keys(requiredBehaviorsByGroupName).forEach(name => {
+      if (!Object.prototype.hasOwnProperty.call(groupsByName, name)) {
+        fail(
+          'MULTIFILE_INVALID_OBJECT_GROUPS',
+          `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD}.${name} does not match an object group.`,
+          fileUri
+        );
+      }
+    });
+    const legacyGroups = Object.keys(groupsByName).map(name => {
+      const objects = validateObjectGroupStringArray(
+        groupsByName[name],
+        `${label}.${name}`,
+        fileUri
+      ).map(objectName => ({ name: objectName }));
+      if (
+        Object.prototype.hasOwnProperty.call(requiredBehaviorsByGroupName, name)
+      ) {
+        return {
+          name,
+          objects,
+          requiredBehaviors: validateObjectGroupStringArray(
+            requiredBehaviorsByGroupName[name],
+            `${SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD}.${name}`,
+            fileUri
+          ).map(behaviorType => ({ type: behaviorType })),
+        };
+      }
+      return { name, objects };
+    });
+    delete owner[SOURCE_OBJECT_GROUPS_FIELD];
+    delete owner[SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD];
+    owner[legacyField] = legacyGroups;
+  };
+
+  restoreGroupsOn(
+    restored,
+    restored.kind === 'function'
+      ? SOURCE_OBJECT_GROUPS_FIELD
+      : LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+    SOURCE_OBJECT_GROUPS_FIELD
+  );
+  if (Array.isArray(restored.variants)) {
+    restored.variants.forEach((variant, index) => {
+      if (!variant || typeof variant !== 'object' || Array.isArray(variant)) {
+        return;
+      }
+      restoreGroupsOn(
+        variant,
+        LEGACY_OWNER_OBJECT_GROUPS_FIELD,
+        `variants[${index}].objectGroups`
+      );
+    });
+  }
   return restored;
 };
 
@@ -343,9 +700,23 @@ const projectTomlProjection = payload => {
   return { projected, rawJson };
 };
 
+const projectStaticDataTomlPayload = (payload, fileUri) => {
+  const { projected, rawJson } = projectTomlProjection(payload);
+  const unsupportedPointers = Object.keys(rawJson);
+  if (unsupportedPointers.length) {
+    const pointer = unsupportedPointers[0] || '/';
+    fail(
+      'MULTIFILE_UNREPRESENTABLE_VALUE',
+      `Static Data value at ${pointer} cannot be represented directly in TOML. static-data.toml only stores TOML-compatible data.`,
+      fileUri
+    );
+  }
+  return projected;
+};
+
 const projectTomlPayload = payload => {
   const { projected, rawJson } = projectTomlProjection(
-    compactVariableDefinitionFields(payload)
+    compactObjectGroupFields(compactVariableDefinitionFields(payload))
   );
   if (Object.prototype.hasOwnProperty.call(projected, 'rawJson')) {
     fail(
@@ -450,11 +821,93 @@ const restoreTomlPayload = (namespace, fileUri) => {
   delete payload.rawJson;
   const restoredPayload = restoreTomlProjection(payload, rawJson, fileUri);
   rejectLegacyFolderStructures(restoredPayload, fileUri);
-  return restoreVariableDefinitionFields(restoredPayload, fileUri);
+  return restoreObjectGroupFields(
+    restoreVariableDefinitionFields(restoredPayload, fileUri),
+    fileUri
+  );
 };
 
 const normalizeLf = source =>
   source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+
+const extractInlineVariableContainers = (source, fileUri) => {
+  const inlineVariableContainers = {};
+  const invalidAssignments = [];
+  let inMultilineBasicString = false;
+  let inMultilineLiteralString = false;
+  const sourceWithoutInlineContainers = source
+    .split('\n')
+    .map(line => {
+      if (!inMultilineBasicString && !inMultilineLiteralString) {
+        const assignmentMatch = line.match(
+          /^\s*(variables|globalVariables|sceneVariables|"variables"|"globalVariables"|"sceneVariables")\s*=\s*(.*)$/
+        );
+        if (assignmentMatch) {
+          const field = assignmentMatch[1].replace(/^"|"$/g, '');
+          if (!assignmentMatch[2].trimStart().startsWith('{')) {
+            invalidAssignments.push(field);
+          } else {
+            if (inlineVariableContainers[field] !== undefined) {
+              fail(
+                'MULTIFILE_INVALID_VARIABLES',
+                `${field} is assigned more than once.`,
+                fileUri
+              );
+            }
+            const parsedAssignment = parseToml(line.trim());
+            const container = parsedAssignment[field];
+            if (
+              !container ||
+              typeof container !== 'object' ||
+              Array.isArray(container)
+            ) {
+              fail(
+                'MULTIFILE_INVALID_VARIABLES',
+                `${field} must be an inline table when using the migratable assignment form.`,
+                fileUri
+              );
+            }
+            inlineVariableContainers[field] = container;
+            // Preserve line numbers for diagnostics while removing this
+            // assignment from its accidental TOML table scope. It is mounted
+            // at the settings root after the rest of the document is parsed.
+            return '';
+          }
+        }
+      }
+
+      const basicDelimiterCount = (line.match(/"""/g) || []).length;
+      if (!inMultilineLiteralString && basicDelimiterCount % 2 === 1) {
+        inMultilineBasicString = !inMultilineBasicString;
+      }
+      const literalDelimiterCount = (line.match(/'''/g) || []).length;
+      if (!inMultilineBasicString && literalDelimiterCount % 2 === 1) {
+        inMultilineLiteralString = !inMultilineLiteralString;
+      }
+      return line;
+    })
+    .join('\n');
+
+  return {
+    sourceWithoutInlineContainers,
+    inlineVariableContainers,
+    invalidAssignments,
+  };
+};
+
+const ownsVariableDefinitionContainers = fileUri =>
+  fileUri !== MULTI_FILE_STATIC_DATA_URI &&
+  fileUri !== MULTI_FILE_RESOURCES_URI;
+
+export const hasInlineVariableContainerSyntax = (
+  source,
+  fileUri = '<memory>'
+) =>
+  ownsVariableDefinitionContainers(fileUri) &&
+  Object.keys(
+    extractInlineVariableContainers(normalizeLf(source), fileUri)
+      .inlineVariableContainers
+  ).length > 0;
 
 const stripTomlStructuralIndentation = source => {
   let inMultilineBasicString = false;
@@ -479,6 +932,9 @@ const stripTomlStructuralIndentation = source => {
     .join('\n');
 };
 
+const stringifyInlineTomlKey = key =>
+  /^[A-Za-z0-9_-]+$/.test(key) ? key : stringifyToml.value(String(key));
+
 const stringifyInlineTomlValue = value => {
   if (Array.isArray(value)) {
     return `[ ${value.map(stringifyInlineTomlValue).join(', ')} ]`;
@@ -486,13 +942,38 @@ const stringifyInlineTomlValue = value => {
   if (value && typeof value === 'object') {
     const assignments = Object.keys(value).map(
       key =>
-        `${
-          /^[A-Za-z0-9_-]+$/.test(key) ? key : stringifyToml.value(String(key))
-        } = ${stringifyInlineTomlValue(value[key])}`
+        `${stringifyInlineTomlKey(key)} = ${stringifyInlineTomlValue(
+          value[key]
+        )}`
     );
     return `{ ${assignments.join(', ')}${assignments.length ? ' ' : ''}}`;
   }
   return stringifyToml.value(value);
+};
+
+const isPointRecord = value =>
+  !!value &&
+  typeof value === 'object' &&
+  !Array.isArray(value) &&
+  typeof value.x === 'number' &&
+  typeof value.y === 'number';
+
+const isInlinePointValue = (key, value) => {
+  if (key === 'originPoint' || key === 'centerPoint') {
+    return isPointRecord(value);
+  }
+  if (key === 'points') {
+    return Array.isArray(value) && value.every(isPointRecord);
+  }
+  if (key === 'customCollisionMask') {
+    return (
+      Array.isArray(value) &&
+      value.every(
+        polygon => Array.isArray(polygon) && polygon.every(isPointRecord)
+      )
+    );
+  }
+  return false;
 };
 
 const serializeToml = object => {
@@ -500,13 +981,22 @@ const serializeToml = object => {
   // generated line at column zero avoids presentation-only whitespace churn.
   const serializable = clone(object);
   const inlineValues = new Map();
+  const variableTablePlaceholders = new Map();
   let tokenIndex = 0;
   const serializedInput = canonicalJson(serializable);
-  const reserveInlineValue = value => {
+  const reserveUniqueToken = category => {
     let token;
     do {
-      token = `__GDEVELOP_INLINE_TOML_${tokenIndex++}__`;
-    } while (serializedInput.includes(token));
+      token = `__GDEVELOP_${category}_${tokenIndex++}__`;
+    } while (
+      serializedInput.includes(token) ||
+      inlineValues.has(token) ||
+      variableTablePlaceholders.has(token)
+    );
+    return token;
+  };
+  const reserveInlineValue = value => {
+    const token = reserveUniqueToken('INLINE_TOML');
     inlineValues.set(token, stringifyInlineTomlValue(value));
     return token;
   };
@@ -519,12 +1009,35 @@ const serializeToml = object => {
       Array.isArray(variablesByName)
     )
       return;
-    Object.keys(variablesByName).forEach(variableName => {
-      variablesByName[variableName] = reserveInlineValue(
-        variablesByName[variableName]
-      );
-    });
+    const placeholder = reserveUniqueToken('VARIABLE_TABLE');
+    variableTablePlaceholders.set(
+      placeholder,
+      Object.keys(variablesByName)
+        .map(
+          variableName =>
+            `${stringifyInlineTomlKey(
+              variableName
+            )} = ${stringifyInlineTomlValue(variablesByName[variableName])}`
+        )
+        .join('\n')
+    );
+    serializable[key] = { [placeholder]: placeholder };
   });
+  const reservePointValues = value => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      value.forEach(reservePointValues);
+      return;
+    }
+    Object.keys(value).forEach(key => {
+      if (isInlinePointValue(key, value[key])) {
+        value[key] = reserveInlineValue(value[key]);
+        return;
+      }
+      reservePointValues(value[key]);
+    });
+  };
+  reservePointValues(serializable);
   const output = stripTomlStructuralIndentation(
     normalizeLf(stringifyToml(serializable))
   ).trimEnd();
@@ -535,7 +1048,13 @@ const serializeToml = object => {
       inlineValue
     );
   });
-  return `${expandedOutput}\n`;
+  variableTablePlaceholders.forEach((assignments, placeholder) => {
+    expandedOutput = expandedOutput.replace(
+      `${placeholder} = ${stringifyToml.value(placeholder)}`,
+      assignments
+    );
+  });
+  return `${expandedOutput.trimEnd()}\n`;
 };
 
 export const parseTomlSource = (source, fileUri = '<memory>') => {
@@ -557,7 +1076,36 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
     );
   }
   try {
-    const parsed = parseToml(normalizedSource);
+    const {
+      sourceWithoutInlineContainers,
+      inlineVariableContainers,
+      invalidAssignments,
+    } = ownsVariableDefinitionContainers(fileUri)
+      ? extractInlineVariableContainers(normalizedSource, fileUri)
+      : {
+          sourceWithoutInlineContainers: normalizedSource,
+          inlineVariableContainers: {},
+          invalidAssignments: [],
+        };
+    if (invalidAssignments.length) {
+      const field = invalidAssignments[0];
+      fail(
+        'MULTIFILE_INVALID_VARIABLES',
+        `${field} must use a [${field}] TOML table. Only an inline-table assignment can be migrated automatically.`,
+        fileUri
+      );
+    }
+    const parsed = parseToml(sourceWithoutInlineContainers);
+    Object.keys(inlineVariableContainers).forEach(field => {
+      if (parsed[field] !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} cannot use both a [${field}] table and an inline-table assignment.`,
+          fileUri
+        );
+      }
+      parsed[field] = inlineVariableContainers[field];
+    });
     const rejectDates = value => {
       if (value instanceof Date) {
         fail('MULTIFILE_INVALID_SOURCE', 'TOML dates are forbidden.', fileUri);
@@ -567,12 +1115,46 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
         Object.keys(value).forEach(key => rejectDates(value[key]));
     };
     rejectDates(parsed);
+    if (!ownsVariableDefinitionContainers(fileUri)) return parsed;
+    VARIABLE_DEFINITION_FIELDS.forEach(field => {
+      if (parsed[field] === undefined) return;
+      if (inlineVariableContainers[field] !== undefined) return;
+      if (
+        !new RegExp(`^\\[${field}\\](?:\\s*#.*)?$`, 'm').test(
+          sourceWithoutInlineContainers
+        )
+      ) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} must use a [${field}] TOML table, not an inline table or array.`,
+          fileUri
+        );
+      }
+    });
     return parsed;
   } catch (error) {
     if (error instanceof MultiFileProjectError) throw error;
     fail('MULTIFILE_INVALID_TOML', error.message, fileUri);
   }
 };
+
+export const serializeStaticDataToToml = staticData =>
+  serializeToml(
+    projectStaticDataTomlPayload(
+      asObject(staticData, 'Static Data'),
+      MULTI_FILE_STATIC_DATA_URI
+    )
+  );
+
+export const parseStaticDataFromToml = source =>
+  projectStaticDataTomlPayload(
+    asObject(
+      parseTomlSource(source, MULTI_FILE_STATIC_DATA_URI),
+      'Static Data',
+      MULTI_FILE_STATIC_DATA_URI
+    ),
+    MULTI_FILE_STATIC_DATA_URI
+  );
 
 const encodeUtf8Byte = byte =>
   `%${byte
@@ -1152,8 +1734,33 @@ const splitBehavior = ({
   };
 };
 
+const BEHAVIOR_SHARED_DATA_METADATA_FIELDS = new Set([
+  'name',
+  'type',
+  'propertiesQuickCustomizationVisibilities',
+  'quickCustomizationVisibility',
+]);
+
+const removeEmptyBehaviorSharedData = layout =>
+  !Array.isArray(layout.behaviorsSharedData)
+    ? layout
+    : {
+        ...layout,
+        behaviorsSharedData: layout.behaviorsSharedData.filter(
+          sharedData =>
+            !sharedData ||
+            typeof sharedData !== 'object' ||
+            Array.isArray(sharedData) ||
+            Object.keys(sharedData).some(
+              field => !BEHAVIOR_SHARED_DATA_METADATA_FIELDS.has(field)
+            )
+        ),
+      };
+
 export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
-  const project = clone(asObject(legacyProject, 'Project'));
+  const project = removeHiddenAttachedBehaviorProperties(
+    clone(asObject(legacyProject, 'Project'))
+  );
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
@@ -1183,26 +1790,17 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     });
   }
 
-  if (project.globalConfig !== undefined) {
-    validateGameUri(MULTI_FILE_CONFIG_URI);
-    const { projected, rawJson } = projectTomlProjection(
-      asObject(project.globalConfig, 'Project globalConfig')
+  if (project.staticData !== undefined) {
+    validateGameUri(MULTI_FILE_STATIC_DATA_URI);
+    files[MULTI_FILE_STATIC_DATA_URI] = serializeStaticDataToToml(
+      asObject(project.staticData, 'Project staticData')
     );
-    const metadataSource = serializeToml({
-      gdevelopConfig: {
-        settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
-        ...(Object.keys(rawJson).length ? { rawJson } : {}),
-      },
-    });
-    const configSource = Object.keys(projected).length
-      ? serializeToml({ settings: projected })
-      : '[settings]\n';
-    files[
-      MULTI_FILE_CONFIG_URI
-    ] = `${metadataSource.trimEnd()}\n\n${configSource}`;
   }
 
   (project.layouts || []).forEach((layout, order) => {
+    const layoutWithoutEmptyBehaviorSharedData = removeEmptyBehaviorSharedData(
+      layout
+    );
     const name = String(layout.name || '');
     const folderName = uniqueManagedName(name, sceneNames);
     const settingsUri = encodeUriPath(['scenes', folderName, 'scene.settings']);
@@ -1217,7 +1815,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       `${folderName}.events`,
     ]);
     const settingsPayload = omitFields(
-      layout,
+      layoutWithoutEmptyBehaviorSharedData,
       new Set([...SCENE_LAYOUT_FIELDS, 'events', 'objects'])
     );
     splitObjectDefinitions({
@@ -1457,23 +2055,6 @@ const parseSettings = (files, uri) => {
     fail('MULTIFILE_MISSING_FILE', 'Referenced settings file is missing.', uri);
   }
   const localDocument = parseTomlSource(source, uri);
-  if (uri === MULTI_FILE_CONFIG_URI) {
-    if (
-      !localDocument.gdevelopConfig ||
-      !localDocument.settings ||
-      localDocument.project !== undefined
-    ) {
-      fail(
-        'MULTIFILE_INVALID_LOCAL_SETTINGS',
-        'config.settings must contain only local gdevelopConfig and settings tables.',
-        uri
-      );
-    }
-    return {
-      gdevelopConfig: localDocument.gdevelopConfig,
-      project: { globalConfig: localDocument.settings },
-    };
-  }
   if (uri === MULTI_FILE_ENTRY_URI) {
     if (
       typeof localDocument.kind !== 'string' ||
@@ -1542,7 +2123,84 @@ const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
   }
 };
 
-const layoutObjectContext = (localObjects, fallbackObjects = []) => {
+const isBehaviorPropertyValueValid = (value, type) => {
+  const normalizedType = String(type || '').toLowerCase();
+  if (['number', 'float'].includes(normalizedType)) {
+    return typeof value === 'number' && Number.isFinite(value);
+  }
+  if (normalizedType === 'integer') return Number.isInteger(value);
+  if (normalizedType === 'boolean') return typeof value === 'boolean';
+  return typeof value === 'string';
+};
+
+const validateAttachedBehaviorProperties = (
+  behaviors,
+  behaviorPropertySchemasByType,
+  uri,
+  objectName
+) => {
+  if (!behaviorPropertySchemasByType) return;
+  (behaviors || []).forEach(behavior => {
+    const behaviorType = String(behavior.type || '');
+    const schema = behaviorPropertySchemasByType[behaviorType];
+    if (!schema) return;
+    const properties = schema.properties || [];
+    const bySerializedKey = properties.reduce((result, property) => {
+      result[property.serializedKey] = property;
+      return result;
+    }, {});
+    const byAuthoringKey = properties.reduce((result, property) => {
+      result[property.authoringKey] = property;
+      return result;
+    }, {});
+    Object.keys(behavior).forEach(key => {
+      if (ATTACHED_BEHAVIOR_IDENTITY_FIELDS.has(key)) return;
+      const property = bySerializedKey[key];
+      if (property) {
+        if (!isBehaviorPropertyValueValid(behavior[key], property.type)) {
+          fail(
+            'MULTIFILE_INVALID_BEHAVIOR_PROPERTY',
+            `Behavior ${String(
+              behavior.name || behaviorType
+            )} on ${objectName} property ${key} must be ${property.type}.`,
+            uri
+          );
+        }
+        return;
+      }
+      const authoringProperty = byAuthoringKey[key];
+      if (
+        authoringProperty &&
+        authoringProperty.serializedKey !== authoringProperty.authoringKey
+      ) {
+        fail(
+          'BEHAVIOR_PROPERTY_KEY_MISMATCH',
+          `Behavior ${String(
+            behavior.name || behaviorType
+          )} on ${objectName} uses editor-facing key ${key}; use serialized key ${
+            authoringProperty.serializedKey
+          }.`,
+          uri
+        );
+      }
+      if (schema.unknownPropertyPolicy === 'error') {
+        fail(
+          'MULTIFILE_UNKNOWN_BEHAVIOR_PROPERTY',
+          `Behavior ${String(
+            behavior.name || behaviorType
+          )} on ${objectName} has unknown serialized property ${key}.`,
+          uri
+        );
+      }
+    });
+  });
+};
+
+const layoutObjectContext = (
+  localObjects,
+  fallbackObjects = [],
+  behaviorPropertySchemasByType
+) => {
   const objectsByName = new Map();
   (fallbackObjects || []).forEach(object =>
     objectsByName.set(String(object.name || ''), object)
@@ -1563,6 +2221,7 @@ const layoutObjectContext = (localObjects, fallbackObjects = []) => {
   return {
     objectNames: Array.from(objectsByName.keys()),
     behaviorTypesByObject,
+    behaviorPropertySchemasByType,
   };
 };
 
@@ -1888,7 +2547,11 @@ const composePrefab = (
   }
   const objects = objectDocuments.map(document => document.object);
   const layoutUri = expectString(payload.layout, 'prefab.layout', uri);
-  const objectContext = layoutObjectContext(objects);
+  const objectContext = layoutObjectContext(
+    objects,
+    [],
+    options.behaviorPropertySchemasByType
+  );
   const layout = readLayout(files, layoutUri, 'gdevelop-prefab-layout', {
     ...objectContext,
   });
@@ -1920,7 +2583,11 @@ const composePrefab = (
         expectString(entry.layout, 'variant.layout', uri),
         'gdevelop-prefab-variant-layout',
         {
-          ...layoutObjectContext(variantObjects),
+          ...layoutObjectContext(
+            variantObjects,
+            [],
+            options.behaviorPropertySchemasByType
+          ),
         }
       );
       Object.keys(variantLayout).forEach(field => {
@@ -2045,7 +2712,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     'extensionFiles',
     'externalSettings',
     'resources',
-    'globalConfig',
+    'staticData',
   ].forEach(retiredField => {
     if (projectNamespace[retiredField] !== undefined) {
       fail(
@@ -2114,6 +2781,12 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           ),
         };
         validateManifestIdentity(entry, payload, objectUri);
+        validateAttachedBehaviorProperties(
+          payload.behaviors,
+          options.behaviorPropertySchemasByType,
+          objectUri,
+          name
+        );
         return {
           entry,
           uri: objectUri,
@@ -2277,44 +2950,10 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       );
     }
   }
-  let globalConfigPayload = null;
-  if (files[MULTI_FILE_CONFIG_URI] !== undefined) {
-    if (projectNamespace.globalConfig !== undefined) {
-      fail(
-        'MULTIFILE_OWNERSHIP_CONFLICT',
-        'Global config cannot be stored in both project.settings and config.settings.',
-        MULTI_FILE_CONFIG_URI
-      );
-    }
-    const uri = registerUri(MULTI_FILE_CONFIG_URI);
-    settingsUris.push(uri);
-    const configDocument = parseSettings(files, uri);
-    const configMetadata = asObject(
-      configDocument.gdevelopConfig,
-      'gdevelopConfig',
-      uri
-    );
-    Object.keys(configMetadata).forEach(key => {
-      if (!['settingsFormatVersion', 'rawJson'].includes(key)) {
-        fail(
-          'MULTIFILE_INVALID_SCHEMA',
-          `Unknown gdevelopConfig field ${key}.`,
-          uri
-        );
-      }
-    });
-    if (configMetadata.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION) {
-      fail(
-        'MULTIFILE_UNSUPPORTED_VERSION',
-        'Invalid global config namespace marker.',
-        uri
-      );
-    }
-    globalConfigPayload = restoreTomlProjection(
-      requireNamespace(configDocument, ['project', 'globalConfig'], uri),
-      configMetadata.rawJson,
-      uri
-    );
+  let staticDataPayload = null;
+  if (files[MULTI_FILE_STATIC_DATA_URI] !== undefined) {
+    const uri = registerUri(MULTI_FILE_STATIC_DATA_URI);
+    staticDataPayload = parseStaticDataFromToml(files[uri]);
   }
   let externalDocument = null;
   const externalSettingsUri = 'game://externals/external.settings';
@@ -2425,47 +3064,54 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         manifestName: 'functionFiles',
         namespaceName: 'functions',
         folderName: 'functions',
-        settingsName: 'function.settings',
+        settingsFilename: 'function.settings',
         kind: 'function',
       },
       {
         manifestName: 'prefabFiles',
         namespaceName: 'prefabs',
         folderName: 'prefabs',
-        settingsName: 'prefab.settings',
+        settingsFilename: 'prefab.settings',
         kind: 'prefab',
       },
       {
         manifestName: 'behaviorFiles',
         namespaceName: 'behaviors',
         folderName: 'behaviors',
-        settingsName: 'behavior.settings',
+        settingsFilename: 'behavior.settings',
         kind: 'behavior',
       },
-    ].forEach(config => {
+    ].forEach(childKind => {
       const legacyChildEntries = asArray(
-        namespace[config.manifestName],
-        config.manifestName,
+        namespace[childKind.manifestName],
+        childKind.manifestName,
         uri
       );
       if (legacyChildEntries.length) {
         fail(
           'MULTIFILE_INVALID_LOCAL_SETTINGS',
-          `${config.manifestName} settings indexes are not supported.`,
+          `${childKind.manifestName} settings indexes are not supported.`,
           uri
         );
       }
       let ownedDocuments;
       if (legacyChildEntries.length) {
-        assertUniqueManifestNames(legacyChildEntries, config.manifestName, uri);
+        assertUniqueManifestNames(
+          legacyChildEntries,
+          childKind.manifestName,
+          uri
+        );
         ownedDocuments = legacyChildEntries.map((childEntry, order) => {
           const childUri = registerUri(
-            expectString(childEntry.settings, `${config.manifestName}.settings`)
+            expectString(
+              childEntry.settings,
+              `${childKind.manifestName}.settings`
+            )
           );
-          validateChildSettingsPath(uri, childUri, config.manifestName);
+          validateChildSettingsPath(uri, childUri, childKind.manifestName);
           settingsUris.push(childUri);
           return {
-            manifestName: config.manifestName,
+            manifestName: childKind.manifestName,
             entry: { ...childEntry, order },
             uri: childUri,
             document: parseSettings(files, childUri),
@@ -2480,13 +3126,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
               segments.length === 5 &&
               segments[0] === 'extensions' &&
               segments[1] === ownerSegments[1] &&
-              segments[2] === config.folderName &&
-              segments[4] === config.settingsName
+              segments[2] === childKind.folderName &&
+              segments[4] === childKind.settingsFilename
             );
           })
           .map(childUri => {
             registerUri(childUri);
-            validateChildSettingsPath(uri, childUri, config.manifestName);
+            validateChildSettingsPath(uri, childUri, childKind.manifestName);
             settingsUris.push(childUri);
             const document = parseSettings(files, childUri);
             const ownerNamespace = requireNamespace(
@@ -2495,13 +3141,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
               childUri
             );
             const componentNamespace = asObject(
-              ownerNamespace[config.namespaceName],
-              `extensions.${entry.name}.${config.namespaceName}`,
+              ownerNamespace[childKind.namespaceName],
+              `extensions.${entry.name}.${childKind.namespaceName}`,
               childUri
             );
             const name = onlyNamespaceName(
               componentNamespace,
-              `extensions.${entry.name}.${config.namespaceName}`,
+              `extensions.${entry.name}.${childKind.namespaceName}`,
               childUri
             );
             const payload = restoreTomlPayload(
@@ -2509,22 +3155,22 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
               childUri
             );
             if (
-              payload.kind !== config.kind ||
+              payload.kind !== childKind.kind ||
               payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
             ) {
               fail(
                 'MULTIFILE_UNSUPPORTED_VERSION',
-                `Invalid ${config.kind} namespace marker.`,
+                `Invalid ${childKind.kind} namespace marker.`,
                 childUri
               );
             }
             return {
-              manifestName: config.manifestName,
+              manifestName: childKind.manifestName,
               entry: {
                 name,
                 order: readSettingsOrder(
                   payload,
-                  `extensions.${entry.name}.${config.namespaceName}.${name}`,
+                  `extensions.${entry.name}.${childKind.namespaceName}.${name}`,
                   childUri
                 ),
               },
@@ -2535,12 +3181,12 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           .sort((left, right) => left.entry.order - right.entry.order);
         assertUniqueManifestNames(
           ownedDocuments.map(({ entry: childEntry }) => childEntry),
-          `${entry.name} ${config.namespaceName} settings`,
+          `${entry.name} ${childKind.namespaceName} settings`,
           uri
         );
         assertContiguousSettingsOrder(
           ownedDocuments,
-          `${entry.name} ${config.namespaceName}`
+          `${entry.name} ${childKind.namespaceName}`
         );
       }
       childDocuments.push(...ownedDocuments);
@@ -2726,7 +3372,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
   });
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|config)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -2764,8 +3410,8 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   if (resourcesPayload) {
     project.resources = removeFormatFields(resourcesPayload);
   }
-  if (globalConfigPayload) {
-    project.globalConfig = globalConfigPayload;
+  if (staticDataPayload) {
+    project.staticData = staticDataPayload;
   }
   project.layouts = sceneDocuments.map(
     ({ entry, uri, document, objectDocuments }) => {
@@ -2795,7 +3441,11 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         expectString(entry.events, 'scene.events', uri)
       );
       const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
-        ...layoutObjectContext(objects, project.objects || []),
+        ...layoutObjectContext(
+          objects,
+          project.objects || [],
+          options.behaviorPropertySchemasByType
+        ),
       });
       Object.keys(layout).forEach(field => {
         if (settings[field] !== undefined) {
@@ -2905,7 +3555,8 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
             ? {
                 ...layoutObjectContext(
                   linkedScene.objects || [],
-                  project.objects || []
+                  project.objects || [],
+                  options.behaviorPropertySchemasByType
                 ),
                 layerNames: (linkedScene.layers || []).map(layer =>
                   String(layer.name || '')
@@ -2997,6 +3648,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
     return extension;
   });
+  rejectHiddenAttachedBehaviorProperties(project);
   return project;
 };
 
@@ -3147,7 +3799,9 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
 };
 
 export const normalizeLegacyProjectForMultiFile = legacyProject => {
-  const project = removeLegacyFolderStructuresFromProject(legacyProject);
+  const project = removeHiddenAttachedBehaviorProperties(
+    removeLegacyFolderStructuresFromProject(legacyProject)
+  );
   project.layouts = project.layouts || [];
   project.externalEvents = project.externalEvents || [];
   project.externalLayouts = project.externalLayouts || [];

@@ -13,6 +13,7 @@ import {
   generateOnChooseSaveProjectAsLocation,
   onSaveProjectAs,
   onAutoSaveProject,
+  onAutoSaveStaticData,
   getWriteErrorMessage,
   renderNewProjectSaveAsLocationChooser,
   getProjectLocation,
@@ -66,6 +67,7 @@ export default ({
     }),
     onSaveProjectAs,
     onAutoSaveProject,
+    onAutoSaveStaticData,
     onGetAutoSave,
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;

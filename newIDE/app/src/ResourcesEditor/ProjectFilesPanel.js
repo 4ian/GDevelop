@@ -23,7 +23,6 @@ import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import FileIcon from '../UI/CustomSvgIcons/File';
 import FileWithLines from '../UI/CustomSvgIcons/FileWithLines';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
-import AddFolderIcon from '../UI/CustomSvgIcons/AddFolder';
 import LinkIcon from '../UI/CustomSvgIcons/Link';
 import MusicIcon from '../UI/CustomSvgIcons/Music';
 import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
@@ -616,6 +615,7 @@ export const isTextLikeFile = (node: ProjectFileNode): boolean =>
     '.xml',
     '.yaml',
     '.yml',
+    '.toml',
     '.csv',
     '.md',
     '.markdown',
@@ -3044,10 +3044,6 @@ const ProjectFilesPanelContent: React.ComponentType<{
             label: i18n._(t`New Markdown`),
             click: () => openMarkdownDialogForNode(node),
           },
-          {
-            label: i18n._(t`Add folder link`),
-            click: openAddLinkedFolderDialog,
-          },
         ];
 
         if (canUpdateProjectFolderFromTemplate(node)) {
@@ -3481,13 +3477,6 @@ const ProjectFilesPanelContent: React.ComponentType<{
               tooltip={t`Copy project absolute path`}
             >
               <CopyIcon />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={openAddLinkedFolderDialog}
-              tooltip={t`Add folder link`}
-            >
-              <AddFolderIcon />
             </IconButton>
             <IconButton
               size="small"

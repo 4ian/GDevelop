@@ -175,11 +175,34 @@ void Layout::UpdateBehaviorsSharedData(gd::Project& project) {
        i < allBehaviorsTypes.size() && i < allBehaviorsNames.size();
        ++i) {
     const gd::String& name = allBehaviorsNames[i];
+    const gd::String& type = allBehaviorsTypes[i];
 
-    if (behaviorsSharedData.find(name) != behaviorsSharedData.end()) continue;
+    bool isKnownBehaviorType = project.HasEventsBasedBehavior(type);
+    if (!isKnownBehaviorType) {
+      const gd::BehaviorMetadata& behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              project.GetCurrentPlatform(), type);
+      isKnownBehaviorType =
+          !gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata);
+    }
 
-    auto sharedData =
-        CreateBehaviorsSharedData(project, name, allBehaviorsTypes[i]);
+    auto existingSharedData = behaviorsSharedData.find(name);
+    if (existingSharedData != behaviorsSharedData.end()) {
+      // Remove stale placeholders after the last shared property is removed.
+      // Keep unknown behavior data so a temporarily missing extension doesn't
+      // cause data loss.
+      if (isKnownBehaviorType &&
+          existingSharedData->second->GetProperties().empty()) {
+        behaviorsSharedData.erase(existingSharedData);
+      }
+      continue;
+    }
+
+    // Don't synthesize an empty placeholder for an unknown behavior. Existing
+    // unknown shared data is preserved by the branch above.
+    if (!isKnownBehaviorType) continue;
+
+    auto sharedData = CreateBehaviorsSharedData(project, name, type);
     if (sharedData) {
       behaviorsSharedData[name] = std::move(sharedData);
     }
@@ -206,6 +229,11 @@ std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(
     const gd::String& name,
     const gd::String& behaviorsType) {
   if (project.HasEventsBasedBehavior(behaviorsType)) {
+    if (project.GetEventsBasedBehavior(behaviorsType)
+            .GetSharedPropertyDescriptors()
+            .IsEmpty()) {
+      return nullptr;
+    }
     auto sharedData = gd::make_unique<gd::CustomBehaviorsSharedData>(
         name, project, behaviorsType);
     sharedData->InitializeContent();
@@ -234,6 +262,7 @@ std::unique_ptr<gd::BehaviorsSharedData> Layout::CreateBehaviorsSharedData(
   sharedData->SetName(name);
   sharedData->SetTypeName(behaviorsType);
   sharedData->InitializeContent();
+  if (sharedData->GetProperties().empty()) return nullptr;
   return std::unique_ptr<gd::BehaviorsSharedData>(sharedData);
 }
 

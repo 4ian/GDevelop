@@ -1,17 +1,14 @@
 // @flow
 import type { ValidationError } from './EventsValidationScanner';
 
-const globalConfigPlaceholderRegex = /\{\{[^{}]*\}\}/;
-const globalConfigPlaceholderCaptureRegex = /\{\{([^{}]*)\}\}/g;
-const globalConfigDiagnosticExpectedValue =
-  'A value in the project global config';
+const staticDataPlaceholderRegex = /\{\{[^{}]*\}\}/;
+const staticDataPlaceholderCaptureRegex = /\{\{([^{}]*)\}\}/g;
+const staticDataDiagnosticExpectedValue = 'A value in the project static data';
 
-type GlobalConfigPathSegment = string | number;
+type StaticDataPathSegment = string | number;
 
-const parseGlobalConfigPath = (
-  path: string
-): Array<GlobalConfigPathSegment> => {
-  const segments: Array<GlobalConfigPathSegment> = [];
+const parseStaticDataPath = (path: string): Array<StaticDataPathSegment> => {
+  const segments: Array<StaticDataPathSegment> = [];
   let current = '';
   let position = 0;
   const pushCurrent = () => {
@@ -78,14 +75,14 @@ const parseGlobalConfigPath = (
   return segments;
 };
 
-const getGlobalConfigValueAtPath = (
-  globalConfig: any,
+const getStaticDataValueAtPath = (
+  staticData: any,
   path: string
 ): {| found: boolean, value: any |} => {
   if (!path) return { found: false, value: undefined };
 
-  let value = globalConfig;
-  for (const segment of parseGlobalConfigPath(path)) {
+  let value = staticData;
+  for (const segment of parseStaticDataPath(path)) {
     if (value === null || value === undefined) {
       return { found: false, value: undefined };
     }
@@ -109,19 +106,18 @@ const getGlobalConfigValueAtPath = (
   return { found: true, value };
 };
 
-const hasGlobalConfigPath = (globalConfig: any, path: string): boolean => {
+const hasStaticDataPath = (staticData: any, path: string): boolean => {
   if (!path) return false;
-  return getGlobalConfigValueAtPath(globalConfig, path).found;
+  return getStaticDataValueAtPath(staticData, path).found;
 };
 
-export const isGlobalConfigPlaceholderDiagnostic = (
+export const isStaticDataPlaceholderDiagnostic = (
   projectDiagnostic: gdProjectDiagnostic
 ): boolean =>
-  projectDiagnostic.getExpectedValue() ===
-    globalConfigDiagnosticExpectedValue ||
-  projectDiagnostic.getMessage().indexOf('Global config path "{{') === 0;
+  projectDiagnostic.getExpectedValue() === staticDataDiagnosticExpectedValue ||
+  projectDiagnostic.getMessage().indexOf('Static Data path "{{') === 0;
 
-export const hasGlobalConfigPlaceholderDiagnostic = (
+export const hasStaticDataPlaceholderDiagnostic = (
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport
 ): boolean => {
   for (
@@ -136,9 +132,7 @@ export const hasGlobalConfigPlaceholderDiagnostic = (
       diagnosticIndex++
     ) {
       if (
-        isGlobalConfigPlaceholderDiagnostic(
-          diagnosticReport.get(diagnosticIndex)
-        )
+        isStaticDataPlaceholderDiagnostic(diagnosticReport.get(diagnosticIndex))
       ) {
         return true;
       }
@@ -148,34 +142,34 @@ export const hasGlobalConfigPlaceholderDiagnostic = (
   return false;
 };
 
-export const isInvalidGlobalConfigPlaceholderValidationError = (
+export const isInvalidStaticDataPlaceholderValidationError = (
   error: ValidationError
 ): boolean =>
   error.type === 'invalid-parameter' &&
   !!error.parameterValue &&
-  globalConfigPlaceholderRegex.test(error.parameterValue);
+  staticDataPlaceholderRegex.test(error.parameterValue);
 
-export const hasInvalidGlobalConfigPlaceholderValidationError = (
+export const hasInvalidStaticDataPlaceholderValidationError = (
   validationErrors: Array<ValidationError>
 ): boolean =>
-  validationErrors.some(isInvalidGlobalConfigPlaceholderValidationError);
+  validationErrors.some(isInvalidStaticDataPlaceholderValidationError);
 
-export const getMissingGlobalConfigPlaceholderPath = (
+export const getMissingStaticDataPlaceholderPath = (
   source: string,
   project: gdProject
 ): ?string => {
-  let globalConfig;
+  let staticData;
   try {
-    globalConfig = JSON.parse(project.getGlobalConfigJson());
+    staticData = JSON.parse(project.getStaticDataJson());
   } catch (error) {
     return null;
   }
 
-  globalConfigPlaceholderCaptureRegex.lastIndex = 0;
+  staticDataPlaceholderCaptureRegex.lastIndex = 0;
   let match;
-  while ((match = globalConfigPlaceholderCaptureRegex.exec(source)) !== null) {
+  while ((match = staticDataPlaceholderCaptureRegex.exec(source)) !== null) {
     const path = match[1].trim();
-    if (!hasGlobalConfigPath(globalConfig, path)) {
+    if (!hasStaticDataPath(staticData, path)) {
       return path;
     }
   }
@@ -183,13 +177,13 @@ export const getMissingGlobalConfigPlaceholderPath = (
   return null;
 };
 
-export const findGlobalConfigPlaceholderInSerializedData = (
+export const findStaticDataPlaceholderInSerializedData = (
   serializedData: any
 ): ?string => {
   const findInValue = value => {
     if (typeof value === 'string') {
-      globalConfigPlaceholderCaptureRegex.lastIndex = 0;
-      const match = globalConfigPlaceholderCaptureRegex.exec(value);
+      staticDataPlaceholderCaptureRegex.lastIndex = 0;
+      const match = staticDataPlaceholderCaptureRegex.exec(value);
       return match ? match[1].trim() : null;
     }
 

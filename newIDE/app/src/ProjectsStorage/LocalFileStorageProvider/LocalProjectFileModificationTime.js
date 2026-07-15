@@ -10,11 +10,7 @@ const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 
 const multiFileProjectDirectories = ['scenes', 'externals', 'extensions'];
-const multiFileProjectRootFiles = [
-  'project.settings',
-  'config.settings',
-  'resources.settings',
-];
+const multiFileProjectRootFiles = ['project.settings', 'resources.settings'];
 const multiFileProjectExtensions = new Set(['.settings', '.layout', '.events']);
 
 const getFileModificationTime = async (filePath: string): Promise<?number> => {
@@ -77,7 +73,9 @@ const getLatestProjectFileModificationTimeInDirectory = async (
 /**
  * Returns the newest modification time among files that make up a local
  * project. Resource files are deliberately excluded: they have their own
- * watcher and should not force a full project reload.
+ * watcher and should not force a full project reload. Static Data is also
+ * excluded because its editor writes static-data.toml independently from the
+ * project save lifecycle.
  */
 export const getLocalProjectLastModifiedDate = async (
   fileIdentifier: string

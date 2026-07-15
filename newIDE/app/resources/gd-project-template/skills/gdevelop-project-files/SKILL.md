@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Global Config/placeholder, signal-system, layout, or event-sheet work. Read the generated settings, layout, and instruction catalogs for authoring; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -14,9 +14,9 @@ multi-file sources, then continue by editing those generated files directly.
 
 Read, in order:
 
-1. `project.settings` for project metadata and non-global-config project data.
+1. `project.settings` for project metadata and non-static-data project data.
 2. `resources.settings` for the complete project resource registry.
-3. `config.settings` for the complete arbitrary global-config subtree.
+3. `static-data.toml` for the complete editor-only Static Data object.
 4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
@@ -25,9 +25,12 @@ Read, in order:
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
+8. `.gdevelop/runtime-api.d.ts` and `.gdevelop/project-api.d.ts` before adding
+   or changing any JavaScript event.
 
-The three catalogs are regenerated from the loaded project every time GDevelop
-saves. Never edit them. Search them narrowly with `rg`: use file kind, object,
+The three catalogs and two JavaScript declarations are regenerated from the
+loaded project every time GDevelop saves. Never edit them. Search them narrowly
+with `rg`: use file kind, object,
 behavior, effect, owner, or layout context in the source catalogs, and use
 instruction type, displayed name, group, description, parameter `dslName`, or
 expression name in the instruction catalog. Generated JSON keeps one catalog
@@ -39,9 +42,10 @@ edits that depend on the changed structure. Large structural changes include
 installing or importing an extension and creating, deleting, renaming, or
 substantially changing a prefab, behavior, function, extension, object type, or
 other catalog-owned component. Re-read the relevant freshly generated
-settings, layout, and instruction catalogs before continuing; do not rely on
-catalog content read before the structural change. A later structural change
-invalidates that catalog view and requires another `generate-catalogs` call.
+settings, layout, and instruction catalogs before continuing; if JavaScript is
+in scope, also re-read the two declarations. Do not rely on generated content
+read before the structural change. A later structural change invalidates that
+view and requires another `generate-catalogs` call.
 This refresh is not validation and does not replace the final
 `validate_project_files` gate.
 
@@ -51,7 +55,10 @@ Use the catalogs as authoring contracts:
   mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary. Search
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
-  to resolve existing project components and their object definitions.
+  to resolve existing project components and their object definitions. For an
+  attached behavior, write only properties listed in its `behaviorTypes`
+  entry. Editor-hidden properties are deliberately absent, runtime-managed,
+  and forbidden in object settings; never copy them from legacy JSON.
 - In `layout-catalog.json`, read `elements` for exact context-specific tags,
   attributes, literals, child order, defaults, and constraints. Select the one
   `contexts` entry whose `owner` matches the scene, prefab, variant, or external
@@ -85,14 +92,33 @@ generated compatibility/runtime output, not multi-file source.
   Never embed another settings document. Follow the matching settings-catalog
   `fileKinds` entry and use only registered type metadata from that catalog.
 - Variable definitions: in `variables`, `globalVariables`, and
-  `sceneVariables`, use a table keyed by variable name. Assign each name one
-  inline array containing its complete descriptor without another `name`, for
-  example `Controllers = [{ type = "array", children = [...] }]`. Use
-  `variables = { }` when empty. Never write recursive `[[variables...]]` TOML
+  `sceneVariables`, always open a dedicated `[variables]`,
+  `[globalVariables]`, or `[sceneVariables]` table and write one assignment per
+  variable name. Assign each name one inline array containing its complete
+  descriptor without another `name`, for example
+  `Controllers = [{ type = "array", children = [...] }]`. Represent an empty
+  container with its empty table header. Never write a whole container as
+  `variables = { ... }` or `variables = { }`, and never write recursive
+  `[[variables...]]` TOML tables. Existing inline-table containers are
+  load-time migration inputs only: the editor converts them to these dedicated
+  headers and saves the affected settings files immediately when opening the
+  project. Do not preserve or introduce the migration form in direct edits.
+- Object groups: use only an `[objectGroups]` table in the owning project,
+  scene, prefab, prefab-variant, or function settings. Each key is the group
+  name and each value is an array of object names, for example
+  `Buttons = ["PauseButton", "Retry"]`. Use `objectGroups = { }` when there
+  are no groups. Preserve a group's `requiredBehaviors` with an optional
+  `[objectGroupRequiredBehaviors]` companion table whose matching group key
+  contains the behavior-type string array. Never write `objectsGroups`,
+  `objectGroups = []`, `[[objectsGroups]]`, or nested group/member descriptor
   tables.
-- `config.settings`: edit global configuration only under the short local
-  `[settings]` table; preserve arbitrary keys and the format-owned
-  `[gdevelopConfig]`/`[gdevelopConfig.rawJson]` tables.
+- Sprite points: keep `originPoint` and `centerPoint` as inline TOML tables;
+  keep named `points` and `customCollisionMask` vertices as inline arrays of
+  point tables. Never expand point data into long dotted TOML headers. For
+  example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
+- `static-data.toml`: the entire root document is editor-only Static Data.
+  Author data directly, with no `[settings]`, `[staticData]`, format-version,
+  or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: Layout DSL component-tree markup containing placement/layout data
   only: instances, layers, spatial bounds, background, and editor view state.
   Never put TOML, object definitions, or attached behavior definitions in a
@@ -111,6 +137,9 @@ generated compatibility/runtime output, not multi-file source.
   edit an existing deprecated instruction only when the user's legacy project
   requires it; use a current replacement from `instructions-catalog.json`
   whenever the edit can migrate it safely.
+  `runtime-api.d.ts` and `project-api.d.ts` are the only approved JavaScript
+  authoring surface. Read them before changing `@js`; never hand-edit either
+  declaration or recover private APIs from runtime source/generated code.
 
 Preserve component order, stable names, existing unknown fields, and ownership
 boundaries. Make the smallest coherent patch. When adding a component, create
@@ -131,6 +160,10 @@ and type-specific configuration. `project.settings`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
+For each attached behavior, keep its identity fields and only the author-writable
+properties present in `settings-catalog.json`. Hidden behavior descriptor values
+must not appear in `<Object>.settings`; generated runtime code supplies their
+descriptor defaults and manages their state.
 
 Give every prefab and behavior function its own `functions/<Function>/`
 directory containing `function.settings` and `<Function>.events`. Store editor
@@ -142,7 +175,7 @@ grouping in the function settings `folder` array. `prefab.settings` and
 ```text
 project.settings
 resources.settings
-config.settings
+static-data.toml
 objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
@@ -168,6 +201,8 @@ extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.even
 .gdevelop/deprecated-instructions-catalog.json # legacy read/edit only; never for new events
 .gdevelop/settings-catalog.json
 .gdevelop/layout-catalog.json
+.gdevelop/runtime-api.d.ts
+.gdevelop/project-api.d.ts
 ```
 
 Do not create optional grouping folders. Canonical component directories are
@@ -188,8 +223,12 @@ Load only the references required by the task:
   creating or changing any `.events` file. Use only its canonical IfDo
   structures and the exact types and `dslName` parameters found in the
   generated project instruction catalog.
-- Read [references/global-config.md](references/global-config.md) in full
-  whenever the user asks to create, edit, reorganize, or consume Global Config,
+- Also read [references/javascript-api.md](references/javascript-api.md) in
+  full before creating or changing any `@js` event. Use only the generated
+  public declarations, author new blocks with `strict=true`, and preserve
+  compatibility mode only for existing legacy JavaScript.
+- Read [references/static-data.md](references/static-data.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Static Data,
   or to add/change a `{{...}}` placeholder. Also read the events guide for an
   event consumer and the extension guide when injecting config into a prefab,
   behavior, or reusable extension.
@@ -198,7 +237,7 @@ Load only the references required by the task:
   communication, `SignalReceived`, signal sender/payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
-  the Global Config guide too when signal names use placeholders.
+  the Static Data guide too when signal names use placeholders.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -254,7 +293,12 @@ Rules:
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
-- Keep JavaScript events opt-in; use native instructions first.
+- Keep JavaScript events opt-in; use native instructions first. New or changed
+  AI-authored JavaScript must use `strict=true`, must use only context globals
+  and members declared in `.gdevelop/runtime-api.d.ts` and
+  `.gdevelop/project-api.d.ts`, and must obey the JavaScript reference. Never
+  use underscore/private members, generated `.func` symbols, browser/Node
+  globals, filesystem, shell, DOM, storage, or direct networking APIs.
 
 Common structure:
 
@@ -292,6 +336,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
    expressions. The generated catalog excludes editor-hidden and deprecated
    APIs; never invent or reuse an instruction identifier that is absent from it
    when authoring new events.
+   If JavaScript is required, read both generated `.d.ts` files and the
+   JavaScript reference before editing the block; do not infer an API from raw
+   engine source or preview code.
 3. Patch source files directly. Use `apply_patch` for precise edits.
    Creating or changing an object type or one of its behaviors is a settings
    edit; creating or moving an instance is a layout edit.
@@ -310,16 +357,32 @@ loop, comment, and JavaScript metadata when editing existing sources.
    recent source edit. Require `valid: true`; use its file URI, error code,
    line, column, and source excerpt to fix every reported settings, layout,
    events, reference, or generated-project validation failure. This call first
-   regenerates all three `.gdevelop` catalogs, then validates the sources using
-   the fresh instruction catalog. Call it at least once before calling
-   `reload_project`; a failed validation does not satisfy this gate.
-8. Call the GDevelop MCP `reload_project` tool and require a successful reload
+   regenerates all three `.gdevelop` catalogs and both JavaScript declaration
+   files, then validates the sources using those fresh contracts. Call it at
+   least once before calling
+   `reload_project`; a failed validation does not satisfy this gate. For
+   JavaScript, fix every reported source URI/line diagnostic. `valid: true`
+   proves parsing, source reconstruction, project validation, JavaScript
+   authoring-API checking, and extension generated-code preflight only. It does
+   not prove runtime object picking or gameplay side effects.
+8. After the requested task is complete and validation succeeds, use Git from
+   the project repository root to commit every task-owned change before
+   `reload_project`. Inspect `git status` and the final diff, stage all changes
+   made for the user's task without including unrelated pre-existing work, and
+   create a commit with a concise, descriptive imperative message. Record the
+   commit hash and message for the final report. If any source edit is needed
+   afterward, validate again and create a follow-up commit before reloading.
+9. Call the GDevelop MCP `reload_project` tool and require a successful reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
    stale editor memory.
-9. For gameplay or visual changes, call `launch_preview` only after step 8.
-   If any project source changes after the reload, call `reload_project` again
-   before the next preview, preceded by a new successful
-   `validate_project_files` call for those edits.
+10. For gameplay or visual changes, call `launch_preview` only after step 9.
+    Start paused and use `run_frames` with `objects`, `include`, and optional
+    `instance_indexes` to inspect bounded live position, angle, force, variable,
+    and behavior state. Runtime verification is mandatory for extension actions
+    that create, delete, pick, or mutate objects.
+    If any project source changes after the reload, call `reload_project` again
+    before the next preview, preceded by a new successful
+    `validate_project_files` call and Git commit for those edits.
 
 For assets, write the asset file inside the project, add/update its resource
 entry in `resources.settings`, then reference its project-relative path from UI
@@ -335,16 +398,18 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
 - Reloading direct disk edits into the editor with `reload_project`.
-- Regenerating and synchronously waiting for all three generated source
-  catalogs with `generate-catalogs` after large structural source changes, so
-  subsequent authoring can read current catalog contracts.
+- Regenerating and synchronously waiting for the three generated source
+  catalogs and two JavaScript declaration files with `generate-catalogs` after
+  large structural source changes, so subsequent authoring can read current
+  contracts.
 - Regenerating all source catalogs and validating direct disk edits without
   changing editor memory by calling the no-input `validate_project_files` tool
   before `reload_project`.
 - Current editor/project/selection queries.
 - Launching or controlling a debug preview.
 - Deterministic frame stepping and input simulation.
-- Inspecting live runtime state, logs, errors, audio, and instance positions.
+- Inspecting live runtime state, logs, errors, audio, and bounded targeted
+  instance position, angle, force, variable, and behavior state.
 - Capturing preview screenshots.
 
 Except for the single `import_extension` conversion transaction, never use MCP
@@ -355,22 +420,33 @@ sync, or save tools for authoring.
 `generate-catalogs` is a mandatory mid-task refresh after every large
 structural source change. Require `catalogsRegenerated: true`, then read the
 latest relevant `.gdevelop/settings-catalog.json`,
-`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json`
-before making dependent edits. The tool writes and verifies only those three
-generated files and does not validate sources or reload editor memory.
+`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json` and,
+for JavaScript work, both generated `.d.ts` files before making dependent edits.
+The tool writes and verifies those five generated authoring files and does not
+validate sources or reload editor memory.
 
 `validate_project_files` is a mandatory reload gate. In every direct-edit task,
 call it successfully with no inputs at least once after the most recent
 source-file edit and before `reload_project`. It regenerates the instruction,
-settings, and layout catalogs first, then reconstructs the generated `game.json`
-representation from the multi-file settings, layouts, and events using the
-fresh instruction catalog without replacing editor memory. A later source edit
-invalidates the earlier validation receipt.
+settings, and layout catalogs and both JavaScript declarations first, then
+reconstructs the generated `game.json` representation from the multi-file
+settings, layouts, and events and type-checks JavaScript blocks against the
+fresh public API without replacing editor memory. A later source edit
+invalidates the earlier validation receipt. Its `valid: true` result is not a
+runtime semantic test; behavior-sensitive changes still require a paused preview
+and deterministic `run_frames` inspection.
+
+The Git commit is also a mandatory reload gate. After the final successful
+validation, inspect the repository diff, stage every change made for the user's
+task, and commit it with a proper concise, descriptive message. Do not include
+unrelated pre-existing changes. `reload_project` must run only after this commit
+succeeds. A later source edit requires a new validation and follow-up commit
+before another reload.
 
 `reload_project` remains a mandatory preview gate. Call it successfully only
-after the validation gate and before the first `launch_preview`. Never launch
-or relaunch a preview from stale editor memory. A later source edit invalidates
-both the validation and reload receipts.
+after both the validation and Git-commit gates and before the first
+`launch_preview`. Never launch or relaunch a preview from stale editor memory. A
+later source edit invalidates the validation, commit, and reload receipts.
 
 ## Verification
 
@@ -379,11 +455,13 @@ Before finishing:
 - Confirm every changed `.settings` file is unindented TOML and independently
   parseable; confirm every `.layout` is canonical Layout DSL version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
-  `objects`, `objectsGroups`, or behavior definitions.
+  `objects`, `objectGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
   behaviors are at the local root of its individual `<Object>.settings` file.
+- Confirm attached behaviors serialize only catalog-listed author-writable
+  properties and no editor-hidden behavior descriptor appears in object settings.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
 - Confirm every prefab/behavior function has a dedicated flat function
@@ -395,9 +473,12 @@ Before finishing:
 - Confirm layout elements, attributes, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
-- For Global Config changes, confirm `config.settings` ownership, canonical
-  raw-JSON pointers, placeholder paths/types, and regeneration-time behavior
-  against the Global Config reference.
+- For every changed JavaScript event, confirm `strict=true`, validate all
+  context globals/project literals/public members against both generated
+  `.d.ts` files, and confirm no forbidden private or ambient API is used.
+- For Static Data changes, confirm `static-data.toml` ownership, direct-root
+  TOML data, placeholder paths/types, and regeneration-time behavior
+  against the Static Data reference.
 - For signal changes, confirm target kind, receiver kind, fixed `onSignal`
   signature, guarded emission, next-dispatch timing, and preview signal-monitor
   evidence against the signal-system reference.
@@ -411,8 +492,12 @@ Before finishing:
   refreshed relevant catalogs.
 - Confirm `validate_project_files` returned `valid: true` after the final source
   edit and before `reload_project`.
+- Confirm every task-owned change was committed after final validation and
+  before `reload_project`; record the commit hash and descriptive commit
+  message, and confirm no unrelated pre-existing change entered the commit.
 - Confirm `reload_project` succeeded after the final source edit and before any
   `launch_preview` call.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
   audio, timing, or object picking changed.
-- Report changed source files and concrete verification evidence.
+- Report changed source files, concrete verification evidence, and the final
+  Git commit hash and message.

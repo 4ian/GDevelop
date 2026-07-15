@@ -26,8 +26,15 @@ import {
   type ShowAlertFunction,
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
-import { writeLegacyProjectAsMultiFile } from './LocalMultiFileProject';
-import { removeLegacyFolderStructuresFromProject } from '../MultiFileProjectFormat';
+import {
+  writeLegacyProjectAsMultiFile,
+  writeMultiFileSourceTree,
+} from './LocalMultiFileProject';
+import {
+  MULTI_FILE_STATIC_DATA_URI,
+  removeLegacyFolderStructuresFromProject,
+  serializeStaticDataToToml,
+} from '../MultiFileProjectFormat';
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
@@ -47,6 +54,13 @@ import {
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
 } from '../ProjectSourceCatalog';
+import {
+  PROJECT_API_RELATIVE_PATH,
+  PROJECT_RUNTIME_API_RELATIVE_PATH,
+  JavaScriptAuthoringApiError,
+  buildJavaScriptAuthoringArtifacts,
+  validateProjectJavaScriptAuthoring,
+} from '../JavaScriptAuthoringApi';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -62,7 +76,7 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
-export const splittedProjectSingleFileNames = ['globalConfig'];
+export const splittedProjectSingleFileNames = ['staticData'];
 
 const deleteExistingFilesFromDirs = (
   project: gdProject,
@@ -138,9 +152,19 @@ const writeAndCheckFile = async (
     throw new Error('The content to save on disk is empty. Aborting.');
 
   await fs.ensureDir(path.dirname(filePath));
-
-  await fs.writeFile(filePath, content);
-  await checkFileContent(filePath, content);
+  const temporaryPath = `${filePath}.tmp-${Date.now()}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
+  try {
+    await fs.writeFile(temporaryPath, content);
+    await checkFileContent(temporaryPath, content);
+    await fs.move(temporaryPath, filePath, { overwrite: true });
+    await checkFileContent(filePath, content);
+  } finally {
+    if (await fs.pathExists(temporaryPath)) {
+      await fs.remove(temporaryPath);
+    }
+  }
 };
 
 const writeAndCheckFormattedJSONFile = async (
@@ -205,7 +229,8 @@ export const writeProjectLayoutCatalog = async (
   project: gdProject,
   projectPath: string,
   serializedProjectObject?: Object,
-  effectTypes?: Array<Object>
+  effectTypes?: Array<Object>,
+  behaviorTypes?: Array<Object>
 ): Promise<Object> => {
   const serializedProject =
     serializedProjectObject || serializeToJSObject(project, 'serializeTo');
@@ -213,12 +238,35 @@ export const writeProjectLayoutCatalog = async (
     project,
     serializedProject,
     effectTypes,
+    behaviorTypes,
   });
   await writeAndCheckFile(
     serializeProjectLayoutCatalog(catalog),
     path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
   );
   return catalog;
+};
+
+export const writeProjectJavaScriptAuthoringApi = async (
+  project: gdProject,
+  projectPath: string,
+  serializedProjectObject?: Object
+): Promise<Object> => {
+  const serializedProject =
+    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
+  const artifacts = buildJavaScriptAuthoringArtifacts(serializedProject);
+  await writeAndCheckFile(
+    artifacts.runtimeApi,
+    path.join(projectPath, ...PROJECT_RUNTIME_API_RELATIVE_PATH.split('/'))
+  );
+  await writeAndCheckFile(
+    artifacts.projectApi,
+    path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
+  );
+  return {
+    counts: artifacts.counts,
+    hashes: artifacts.hashes,
+  };
 };
 
 export const writeProjectSourceCatalogs = async (
@@ -240,13 +288,20 @@ export const writeProjectSourceCatalogs = async (
     project,
     projectPath,
     serializedProject,
-    settingsCatalog.effectTypes
+    settingsCatalog.effectTypes,
+    settingsCatalog.behaviorTypes
+  );
+  const javascriptApi = await writeProjectJavaScriptAuthoringApi(
+    project,
+    projectPath,
+    serializedProject
   );
 
   return {
     instructions: instructionCatalog.counts,
     settings: settingsCatalog.counts,
     layouts: layoutCatalog.counts,
+    javascript: javascriptApi,
   };
 };
 
@@ -294,7 +349,19 @@ const writeProjectFiles = async ({
       project,
       serializedProject: serializedProjectObject,
       effectTypes: settingsCatalog.effectTypes,
+      behaviorTypes: settingsCatalog.behaviorTypes,
     });
+    const javascriptArtifacts = buildJavaScriptAuthoringArtifacts(
+      serializedProjectObject
+    );
+    const javascriptValidation = validateProjectJavaScriptAuthoring({
+      serializedProject: serializedProjectObject,
+      runtimeApiDeclaration: javascriptArtifacts.runtimeApi,
+      projectApiDeclaration: javascriptArtifacts.projectApi,
+    });
+    if (!javascriptValidation.valid) {
+      throw new JavaScriptAuthoringApiError(javascriptValidation.errors[0]);
+    }
     await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
       decomposeOptions: {
         eventsDslOptions: {
@@ -336,8 +403,20 @@ const writeProjectFiles = async ({
       serializeProjectLayoutCatalog(layoutCatalog),
       path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
     );
+    await writeAndCheckFile(
+      javascriptArtifacts.runtimeApi,
+      path.join(projectPath, ...PROJECT_RUNTIME_API_RELATIVE_PATH.split('/'))
+    );
+    await writeAndCheckFile(
+      javascriptArtifacts.projectApi,
+      path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
+    );
+    const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
+      serializedProjectObject
+    );
+    delete generatedLegacyProject.staticData;
     await writeAndCheckFormattedJSONFile(
-      removeLegacyFolderStructuresFromProject(serializedProjectObject),
+      generatedLegacyProject,
       path.join(
         projectPath,
         ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')
@@ -561,9 +640,7 @@ export const onSaveProjectAs = async (
   saveAsLocation: ?SaveAsLocation,
   options: {|
     onStartSaving: () => void,
-    onMoveResources: ({|
-      newFileMetadata: FileMetadata,
-    |}) => Promise<void>,
+    onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
   |}
 ): Promise<{|
   wasSaved: boolean,
@@ -657,6 +734,24 @@ export const onAutoSaveProject = (
       throw err;
     }
   );
+};
+
+export const onAutoSaveStaticData = async (
+  staticData: Object,
+  fileMetadata: FileMetadata
+): Promise<boolean> => {
+  const entryPath = fileMetadata.fileIdentifier;
+  if (path.basename(entryPath).toLowerCase() !== 'project.settings') {
+    return false;
+  }
+
+  await writeMultiFileSourceTree({
+    entryPath,
+    files: {
+      [MULTI_FILE_STATIC_DATA_URI]: serializeStaticDataToToml(staticData),
+    },
+  });
+  return true;
 };
 
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>

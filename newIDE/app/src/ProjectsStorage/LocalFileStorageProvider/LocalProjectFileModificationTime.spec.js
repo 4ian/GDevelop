@@ -41,7 +41,7 @@ describe('getLocalProjectLastModifiedDate', () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     writeFileWithModificationTime(entryPath, 100000);
     writeFileWithModificationTime(
-      path.join(temporaryDirectory, 'config.settings'),
+      path.join(temporaryDirectory, 'static-data.toml'),
       200000
     );
     writeFileWithModificationTime(
@@ -80,6 +80,21 @@ describe('getLocalProjectLastModifiedDate', () => {
         'project.settings'
       ),
       500000
+    );
+
+    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(200000);
+  });
+
+  it('ignores Static Data changes', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    writeFileWithModificationTime(entryPath, 100000);
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'scenes', 'Main', 'Main.events'),
+      200000
+    );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'static-data.toml'),
+      300000
     );
 
     expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(200000);

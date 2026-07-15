@@ -113,7 +113,7 @@ const getKindDisplayName = (editorTab: EditorTab): string => {
       return 'Debugger';
     case 'resources':
       return 'Resources';
-    case 'global-config':
+    case 'static-data':
       return 'Game settings';
     case 'global-search':
       return 'Search';

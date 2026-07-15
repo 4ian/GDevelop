@@ -1011,52 +1011,52 @@ const firstLayoutSchema = {
   additionalProperties: true,
 };
 
-const globalConfigReadSchema = {
+const staticDataReadSchema = {
   type: 'object',
   properties: {
     placeholder_path: {
       type: 'string',
       description:
-        'Optional exact global config placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the full config object.',
+        'Optional exact Static Data placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the complete Static Data object.',
     },
   },
   additionalProperties: false,
 };
 
-const globalConfigReplaceSchema = {
+const staticDataReplaceSchema = {
   type: 'object',
   properties: {
-    global_config: {
+    static_data: {
       type: 'object',
       description:
-        'Complete replacement global config object. The root must be a JSON object.',
+        'Complete replacement static data object. The root must be a JSON object.',
       additionalProperties: true,
     },
-    global_config_json: {
+    static_data_json: {
       type: 'string',
       description:
-        'Alternative complete replacement config as a JSON string. The root must be an object.',
+        'Alternative complete Static Data replacement as a JSON string. The root must be an object.',
     },
-    include_config: {
+    include_static_data: {
       type: 'boolean',
       description:
-        'When true, include the written config object in the response.',
+        'When true, include the written Static Data object in the response.',
     },
   },
   additionalProperties: true,
 };
 
-const globalConfigValueSchema = {
+const staticDataValueSchema = {
   type: 'object',
   properties: {
     placeholder_path: {
       type: 'string',
       description:
-        'Exact global config placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
+        'Exact static data placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
     },
     value: {
       description:
-        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed config values, or a string for text values.',
+        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed Static Data values, or a string for text values.',
     },
     value_json: {
       type: 'string',
@@ -1068,10 +1068,10 @@ const globalConfigValueSchema = {
   additionalProperties: true,
 };
 
-const globalConfigDeleteSchema = {
+const staticDataDeleteSchema = {
   type: 'object',
   properties: {
-    placeholder_path: globalConfigValueSchema.properties.placeholder_path,
+    placeholder_path: staticDataValueSchema.properties.placeholder_path,
   },
   required: ['placeholder_path'],
   additionalProperties: false,
@@ -1540,6 +1540,31 @@ const inspectRunningPreviewSchema = {
       description:
         'Default false. When true, include instance positions for ALL objects (can be large).',
     },
+    objects: {
+      type: 'array',
+      maxItems: 50,
+      items: { type: 'string' },
+      description:
+        'Optional object names for bounded per-instance runtime inspection. Returns at most 50 instances per object and reports missing objects explicitly.',
+    },
+    include: {
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string',
+        enum: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+      },
+      description:
+        'Fields to return for objects. Defaults to position, angle, forces, variables, and behaviors when objects is provided.',
+    },
+    instance_indexes: {
+      type: 'array',
+      uniqueItems: true,
+      maxItems: 50,
+      items: { type: 'integer', minimum: 0 },
+      description:
+        'Optional zero-based instance indexes to return for every requested object. Missing indexes are reported explicitly.',
+    },
   },
   additionalProperties: false,
 };
@@ -1689,7 +1714,7 @@ const controlPreviewSchema = {
     action: {
       type: 'string',
       description:
-        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews directly), or focus (bring all preview windows to front - fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step. For stale-preview cleanup before verification, prefer save_and_relaunch_preview_paused so cleanup and relaunch happen as one supported workflow.',
+        'pause (freeze the game loop), play (resume), step (advance exactly N frames while paused for deterministic testing), close (stop previews directly), or focus (bring all preview windows to front - fixes timed-out inspect/screenshot when a backgrounded preview is throttled). Defaults to step. For stale-preview cleanup before verification, close all previews here, then call launch_preview with start_paused=true and force_new=true.',
     },
     frames: {
       type: 'number',
@@ -1703,7 +1728,7 @@ const controlPreviewSchema = {
     close_all: {
       type: 'boolean',
       description:
-        'For action=close: close ALL running previews instead of just the targeted one. For stale-preview cleanup before runtime verification, prefer save_and_relaunch_preview_paused.',
+        'For action=close: close ALL running previews instead of just the targeted one. Then call launch_preview with start_paused=true and force_new=true for a fresh paused preview.',
     },
     debugger_id: {
       type: 'string',
@@ -1768,6 +1793,9 @@ const runFramesSchema = {
       description:
         'Object names whose live instance x/y/angle/layer/zOrder to include in the returned runtime snapshot.',
     },
+    objects: inspectRunningPreviewSchema.properties.objects,
+    include: inspectRunningPreviewSchema.properties.include,
+    instance_indexes: inspectRunningPreviewSchema.properties.instance_indexes,
     include_cursor_world_coordinates: {
       type: 'boolean',
       description:
@@ -1813,20 +1841,6 @@ const launchPreviewSchema = {
     },
   },
   additionalProperties: false,
-};
-
-const saveAndRelaunchPreviewPausedSchema = {
-  type: 'object',
-  properties: {
-    scene_name: launchPreviewSchema.properties.scene_name,
-    timeout_ms: launchPreviewSchema.properties.timeout_ms,
-    relaunch_attempts: {
-      type: 'number',
-      description:
-        'Number of fresh launch attempts after awaited preview cleanup. Defaults to 2, maximum 4, with exponential backoff.',
-    },
-  },
-  additionalProperties: true,
 };
 
 const setRuntimeStateSchema = {
@@ -3705,10 +3719,10 @@ const readTools: Array<McpTool> = [
     },
   },
   {
-    name: 'gdevelop_get_global_config',
+    name: 'gdevelop_get_static_data',
     description:
-      'Read the project Global Config map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
-    inputSchema: globalConfigReadSchema,
+      'Read the project Static Data map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
+    inputSchema: staticDataReadSchema,
   },
   {
     name: 'gdevelop_list_scenes',
@@ -3775,13 +3789,13 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_current_project_json',
     description:
-      'Validate the currently open in-memory project by serializing it, unserializing it through GDevelop, scanning events/resources, and preflighting generated extension JavaScript when enabled. Does not mutate or save.',
+      'Validate the currently open in-memory project by serializing it, unserializing it through GDevelop, scanning events/resources, and preflighting generated extension JavaScript when enabled. This does not verify runtime gameplay semantics, object picking, or action side effects. Does not mutate or save.',
     inputSchema: validateCurrentProjectJsonSchema,
   },
   {
     name: 'generate-catalogs',
     description:
-      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, and .gdevelop/layout-catalog.json from the current local multi-file project sources. The call waits for all three files to be written and verified before returning. Accepts no inputs, writes only generated catalogs, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs before making dependent edits.',
+      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, .gdevelop/runtime-api.d.ts, and .gdevelop/project-api.d.ts from the current local multi-file project sources. The call waits for all five generated authoring files to be written and verified before returning. Accepts no inputs, writes only generated authoring files, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs and declarations before making dependent edits.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -3793,7 +3807,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_project_files',
     description:
-      'Load the current local multi-file project from project.settings, regenerate all instruction, settings, and layout catalogs, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory from all referenced .settings, .layout, and .events files, then validate it through GDevelop and preflight generated extension JavaScript. Accepts no inputs, writes only generated .gdevelop catalogs, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project.',
+      'Load the current local multi-file project from project.settings, regenerate all catalogs and public JavaScript declaration files, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory, validate JavaScript event blocks against the generated context-aware API, then validate through GDevelop and preflight generated extension JavaScript. strict=true JavaScript API violations block validation; compatibility blocks report semantic warnings while syntax errors still block. valid:true proves structural, JavaScript authoring-API, and code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop authoring files, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -4207,13 +4221,13 @@ const readTools: Array<McpTool> = [
   {
     name: 'gdevelop_inspect_running_preview',
     description:
-      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, recent captured console/debugger logs for that preview, a separate errors list (uncaught exceptions, crashes, error-level logs), recentSounds (history since last inspect), activeSounds (sounds/musics currently playing incl. looping BGM), inputState (live pressed keys/mouse), and a compact runtime snapshot (running scene name, sceneElapsedTimeSeconds, per-object live instance counts, scene/global variable values). Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
+      'Inspect a currently running preview to verify runtime behavior: returns whether a preview is running (defaulting to the latest launched one), its status, recent captured console/debugger logs, runtime errors, sounds, input state, and a compact runtime snapshot. Pass objects plus include to get bounded per-instance position, angle, force, variable, and behavior state without requesting the huge raw dump; missing objects, indexes, or fields are explicit. Launch first with launch_preview { start_paused: true }, then advance with run_frames for deterministic tests. Use this to confirm a game actually runs and behaves, not just that a preview was launched.',
     inputSchema: inspectRunningPreviewSchema,
   },
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated catalogs use the new disk sources.',
+      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
     inputSchema: emptyObjectSchema,
     annotations: {
       readOnlyHint: false,
@@ -4267,7 +4281,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'run_frames',
     description:
-      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
+      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. Pass objects plus include for bounded per-instance position, angle, force, variable, and behavior state in the same receipt. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
     inputSchema: runFramesSchema,
   },
   {
@@ -4480,22 +4494,22 @@ const writeTools: Array<McpTool> = [
     inputSchema: firstLayoutSchema,
   },
   {
-    name: 'gdevelop_set_global_config',
+    name: 'gdevelop_set_static_data',
     description:
-      'Replace the project Global Config map with a complete JSON object in the open editor model. Prefer gdevelop_set_global_config_value for small focused edits.',
-    inputSchema: globalConfigReplaceSchema,
+      'Replace the project Static Data map with a complete JSON object in the open editor model. Prefer gdevelop_set_static_data_value for small focused edits.',
+    inputSchema: staticDataReplaceSchema,
   },
   {
-    name: 'gdevelop_set_global_config_value',
+    name: 'gdevelop_set_static_data_value',
     description:
-      'Set one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
-    inputSchema: globalConfigValueSchema,
+      'Set one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
+    inputSchema: staticDataValueSchema,
   },
   {
-    name: 'gdevelop_delete_global_config_value',
+    name: 'gdevelop_delete_static_data_value',
     description:
-      'Delete one Global Config value by exact placeholder path such as {{cards.Sunflower.price}}.',
-    inputSchema: globalConfigDeleteSchema,
+      'Delete one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}.',
+    inputSchema: staticDataDeleteSchema,
   },
   {
     name: 'snapshot_project',
@@ -4904,7 +4918,7 @@ const commandTools: Array<McpTool> = [
   {
     name: 'gdevelop_run_command',
     description:
-      'Run a GDevelop command palette command by name. SAVE_PROJECT is special-cased to await completion and return verified persistence evidence. Other commands report launch only. CLOSE_PREVIEW is not a command; use save_and_relaunch_preview_paused for stale preview cleanup.',
+      'Run a GDevelop command palette command by name. SAVE_PROJECT is special-cased to await completion and return verified persistence evidence. Other commands report launch only. CLOSE_PREVIEW is not a command; use control_preview with action=close and close_all=true, then launch_preview with start_paused=true and force_new=true.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -4923,19 +4937,13 @@ const commandTools: Array<McpTool> = [
       'Save the current project, await completion, then compare canonical editor and disk hashes. Returns project path, timestamps, dirty counts, disk write evidence, hashesMatch, and a reason distinguishing saved, nothing changed, not marked dirty, save failure, and verification failure.',
     inputSchema: emptyObjectSchema,
   },
-  {
-    name: 'save_and_relaunch_preview_paused',
-    description:
-      "Save with persistence evidence, await stale preview/window cleanup, then launch a fresh paused debug preview with retry and exponential backoff. Reports requested, attempted, and confirmed pause states plus every launch attempt and a fallback recovery workflow. By default previews the project's first scene; pass scene_name for a specific layout.",
-    inputSchema: saveAndRelaunchPreviewPausedSchema,
-  },
 ];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
   'generate-catalogs': [
     {
       description:
-        'Regenerate and verify all three project-source catalogs after structural file changes.',
+        'Regenerate and verify the three project-source catalogs and two JavaScript declaration files after structural file changes.',
       arguments: {},
     },
   ],
@@ -5067,23 +5075,23 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  gdevelop_get_global_config: [
+  gdevelop_get_static_data: [
     {
-      description: 'Read the full Global Config object.',
+      description: 'Read the full Static Data object.',
       arguments: {},
     },
     {
-      description: 'Read one Global Config value by placeholder path.',
+      description: 'Read one Static Data value by placeholder path.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.price}}',
       },
     },
   ],
-  gdevelop_set_global_config: [
+  gdevelop_set_static_data: [
     {
-      description: 'Replace the full Global Config object.',
+      description: 'Replace the full Static Data object.',
       arguments: {
-        global_config: {
+        static_data: {
           cards: {
             Sunflower: {
               name: 'Sunflower',
@@ -5095,9 +5103,9 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  gdevelop_set_global_config_value: [
+  gdevelop_set_static_data_value: [
     {
-      description: 'Set one numeric Global Config value.',
+      description: 'Set one numeric Static Data value.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.price}}',
         value: 50,
@@ -5105,16 +5113,16 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Set one object Global Config value from JSON text when the MCP client cannot pass a nested value directly.',
+        'Set one object Static Data value from JSON text when the MCP client cannot pass a nested value directly.',
       arguments: {
         placeholder_path: '{{cards.Sunflower}}',
         value_json: '{"name":"Sunflower","price":50,"canUse":true}',
       },
     },
   ],
-  gdevelop_delete_global_config_value: [
+  gdevelop_delete_static_data_value: [
     {
-      description: 'Delete one Global Config value.',
+      description: 'Delete one Static Data value.',
       arguments: {
         placeholder_path: '{{cards.Sunflower.previewObjectName}}',
       },
@@ -6259,6 +6267,15 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         include_raw_dump: true,
       },
     },
+    {
+      description:
+        'Inspect one Bullet instance with bounded force, variable, and behavior state instead of returning the raw dump.',
+      arguments: {
+        objects: ['Bullet'],
+        include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+        instance_indexes: [0],
+      },
+    },
   ],
   preview_health_check: [
     {
@@ -6392,11 +6409,13 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Tap Space once (register a "just pressed" shot), step a few frames, and check the bullet count.',
+        'Tap Space once (register a "just pressed" shot), step a few frames, and inspect the created bullet force and state.',
       arguments: {
         inputs: [{ type: 'keyPressed', key: 'Space' }],
         frames: 5,
-        instance_positions_for: ['Bullet'],
+        objects: ['Bullet'],
+        include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+        instance_indexes: [0],
       },
     },
     {
@@ -6567,22 +6586,6 @@ const toolUsageExamples: { [string]: Array<Object> } = {
       },
     },
   ],
-  save_and_relaunch_preview_paused: [
-    {
-      description:
-        'Recover from stale extension edits by saving, closing previews, and relaunching one paused debug preview.',
-      arguments: {
-        timeout_ms: 10000,
-      },
-    },
-    {
-      description:
-        'Save and relaunch a paused preview on a specific scene after editing it.',
-      arguments: {
-        scene_name: 'main',
-      },
-    },
-  ],
   add_or_edit_variable: [
     {
       description: 'Create or update a scene variable before writing events.',
@@ -6740,6 +6743,10 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
+  'gdevelop_get_static_data',
+  'gdevelop_set_static_data',
+  'gdevelop_set_static_data_value',
+  'gdevelop_delete_static_data_value',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'generate-catalogs',
@@ -6891,7 +6898,7 @@ export const getCapabilitiesSummary = (
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
-      'gdevelop_get_global_config',
+      'gdevelop_get_static_data',
       'gdevelop_list_scenes',
       'gdevelop_list_objects',
       'gdevelop_get_editor_selection',
@@ -6971,9 +6978,9 @@ export const getCapabilitiesSummary = (
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
-      'gdevelop_set_global_config',
-      'gdevelop_set_global_config_value',
-      'gdevelop_delete_global_config_value',
+      'gdevelop_set_static_data',
+      'gdevelop_set_static_data_value',
+      'gdevelop_delete_static_data_value',
       'delete_scene_variable',
       'batch_delete_scene_variables',
       'delete_object_variable',
@@ -6991,7 +6998,6 @@ export const getCapabilitiesSummary = (
       'run_frames',
       'preview_health_check',
       'gdevelop_inspect_running_preview',
-      'save_and_relaunch_preview_paused',
       'capture_preview_screenshot',
       'render_scene_to_png',
       'control_preview',
@@ -7018,7 +7024,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one legacy-extension import/conversion tool, editor queries, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json.',
+      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, Static Data editing, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

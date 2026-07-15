@@ -22,7 +22,7 @@ import {
   groupValidationErrors,
   type ValidationError,
 } from '../Utils/EventsValidationScanner';
-import { isGlobalConfigPlaceholderDiagnostic } from '../Utils/GlobalConfigPlaceholderDiagnostics';
+import { isStaticDataPlaceholderDiagnostic } from '../Utils/StaticDataPlaceholderDiagnostics';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
@@ -320,7 +320,7 @@ export default function DiagnosticReportDialog({
     (diagnosticReport: gdDiagnosticReport) => {
       // TODO Generalize error aggregation when enough errors are handled to have a clearer view.
       const missingSceneVariables = new Set<string>();
-      const missingGlobalConfigPlaceholders = new Set<string>();
+      const missingStaticDataPlaceholders = new Set<string>();
       const unknownObjects = new Set<string>();
       const mismatchedTypeObjects = new Set<string>();
       const unsafeExternalLayouts = new Set<string>();
@@ -329,10 +329,8 @@ export default function DiagnosticReportDialog({
       mapFor(0, diagnosticReport.count(), index => {
         const projectDiagnostic = diagnosticReport.get(index);
 
-        if (isGlobalConfigPlaceholderDiagnostic(projectDiagnostic)) {
-          missingGlobalConfigPlaceholders.add(
-            projectDiagnostic.getActualValue()
-          );
+        if (isStaticDataPlaceholderDiagnostic(projectDiagnostic)) {
+          missingStaticDataPlaceholders.add(projectDiagnostic.getActualValue());
           return;
         }
 
@@ -452,7 +450,7 @@ export default function DiagnosticReportDialog({
                   </TableRowColumn>
                 </TableRow>
               )}
-              {missingGlobalConfigPlaceholders.size > 0 && (
+              {missingStaticDataPlaceholders.size > 0 && (
                 <TableRow
                   style={{
                     backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
@@ -460,12 +458,12 @@ export default function DiagnosticReportDialog({
                 >
                   <TableRowColumn>
                     <Text size="body">
-                      <Trans>Missing global config values</Trans>
+                      <Trans>Missing static data values</Trans>
                     </Text>
                   </TableRowColumn>
                   <TableRowColumn>
                     <Text size="body" allowSelection>
-                      {[...missingGlobalConfigPlaceholders].join(', ')}
+                      {[...missingStaticDataPlaceholders].join(', ')}
                     </Text>
                   </TableRowColumn>
                 </TableRow>

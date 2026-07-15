@@ -183,7 +183,7 @@ describe('McpEditorBridge', () => {
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
   });
 
-  it('generates and verifies all three catalogs before returning', async () => {
+  it('generates and verifies all catalogs and JavaScript declarations before returning', async () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-generate-catalogs-')
     );
@@ -204,9 +204,15 @@ describe('McpEditorBridge', () => {
       instructions: path.join(catalogDirectory, 'instructions-catalog.json'),
       settings: path.join(catalogDirectory, 'settings-catalog.json'),
       layouts: path.join(catalogDirectory, 'layout-catalog.json'),
+      runtimeApi: path.join(catalogDirectory, 'runtime-api.d.ts'),
+      projectApi: path.join(catalogDirectory, 'project-api.d.ts'),
     };
-    Object.keys(catalogFiles).forEach(key => {
-      fs.writeFileSync(catalogFiles[key], '{ stale catalog', 'utf8');
+    [
+      catalogFiles.instructions,
+      catalogFiles.settings,
+      catalogFiles.layouts,
+    ].forEach(catalogFile => {
+      fs.writeFileSync(catalogFile, '{ stale catalog', 'utf8');
     });
     const reloadProjectAndWait = jest.fn();
     const bridge = makeBridge({
@@ -236,11 +242,21 @@ describe('McpEditorBridge', () => {
         catalogFiles,
       })
     );
-    Object.keys(catalogFiles).forEach(key => {
+    [
+      catalogFiles.instructions,
+      catalogFiles.settings,
+      catalogFiles.layouts,
+    ].forEach(catalogFile => {
       expect(() =>
-        JSON.parse(fs.readFileSync(catalogFiles[key], 'utf8'))
+        JSON.parse(fs.readFileSync(catalogFile, 'utf8'))
       ).not.toThrow();
     });
+    expect(fs.readFileSync(catalogFiles.runtimeApi, 'utf8')).toContain(
+      'declare namespace gdjs'
+    );
+    expect(fs.readFileSync(catalogFiles.projectApi, 'utf8')).toContain(
+      'declare namespace GDevelopProject'
+    );
     expect(result.generatedGameJson).toBeUndefined();
     expect(result.nextAction).toContain('Read the refreshed catalogs');
   });
@@ -288,6 +304,7 @@ describe('McpEditorBridge', () => {
         validationMode: 'multi-file-disk-sources',
         projectFile,
         catalogsRegenerated: true,
+        javascriptApiRegenerated: true,
         catalogs: expect.objectContaining({
           instructions: expect.any(Object),
           settings: expect.any(Object),
@@ -298,6 +315,26 @@ describe('McpEditorBridge', () => {
           writtenToDisk: false,
           byteLength: expect.any(Number),
         }),
+        validationScope: expect.objectContaining({
+          projectUnserialization: 'checked',
+          projectSerializationRoundTrip: 'checked',
+          projectValidation: 'checked',
+          extensionGeneratedCode: 'checked',
+          javascriptAuthoringApi: 'checked',
+          runtimeGameplaySemantics: 'not-verified',
+        }),
+        runtimeSemanticsVerified: false,
+        javascriptAuthoring: expect.objectContaining({
+          checked: true,
+          checkedBlocks: 0,
+          typescriptAvailable: true,
+          typescriptVersion: expect.any(String),
+          environmentDiagnostics: [],
+          sourceDiagnostics: [],
+        }),
+        runtimeVerificationRecommendation: expect.stringContaining(
+          'paused preview'
+        ),
       })
     );
     expect(
@@ -315,7 +352,67 @@ describe('McpEditorBridge', () => {
         path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json')
       )
     ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'runtime-api.d.ts')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop', 'project-api.d.ts')
+      )
+    ).toBe(true);
     expect(result.nextAction).toContain('reload_project');
+    expect(result.nextAction).toContain('does not verify runtime');
+    expect(result.note).toContain('does not prove object picking');
+  });
+
+  it('reports strict JavaScript API errors against the original events source', async () => {
+    const temporaryDirectory = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'gdevelop-mcp-invalid-javascript-api-')
+    );
+    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setProjectFile(projectFile);
+    project.insertNewLayout('Scene', 0);
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files['game://scenes/Scene/Scene.events'] = `@js strict=true
+runtimeScene._instances.length;
+@end js
+`;
+    await writeMultiFileSourceTree({ entryPath: projectFile, files });
+    const bridge = makeBridge({ getProject: () => project });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'validate_project_files', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'error',
+          code: 'JS_API_PRIVATE_MEMBER',
+          fileUri: 'game://scenes/Scene/Scene.events',
+          filePath: path.join(
+            temporaryDirectory,
+            'scenes',
+            'Scene',
+            'Scene.events'
+          ),
+          line: 2,
+          sourceExcerpt: expect.arrayContaining([
+            expect.objectContaining({
+              isErrorLine: true,
+              text: expect.stringContaining('_instances'),
+            }),
+          ]),
+        }),
+      ])
+    );
   });
 
   it('reports the source file and location for invalid project files', async () => {
@@ -636,11 +733,11 @@ describe('McpEditorBridge', () => {
     expect(result.responsive).toBe(false);
     expect(result.previewHealth).toBe('connected-unresponsive');
     expect(result.recommendedActions).toContain(
-      'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
+      'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }'
     );
   });
 
-  it('rejects CLOSE_PREVIEW as a command and points to preview relaunch cleanup', async () => {
+  it('keeps the unexposed command escape hatch unavailable', async () => {
     const runCommand = jest.fn();
     const bridge = makeBridge({
       getPermissions: () => ({
@@ -660,11 +757,9 @@ describe('McpEditorBridge', () => {
 
     expect(response.isError).toBe(true);
     expect(response.content[0].text).toContain(
-      'CLOSE_PREVIEW is not a GDevelop command'
+      'Unknown MCP tool: gdevelop_run_command'
     );
-    expect(response.content[0].text).toContain(
-      'save_and_relaunch_preview_paused'
-    );
+    expect(response.content[0].text).not.toContain('relaunch_preview_paused');
     expect(runCommand).not.toHaveBeenCalled();
   });
 
@@ -863,14 +958,14 @@ describe('McpEditorBridge', () => {
     }
   });
 
-  it('reads and edits global config through focused MCP tools', async () => {
+  it('reads and edits static data through focused MCP tools', async () => {
     // $FlowFixMe[invalid-constructor]
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const triggerUnsavedChanges = jest.fn();
 
     try {
-      const projectWithGlobalConfig: any = project;
-      projectWithGlobalConfig.setGlobalConfigJson(
+      const projectWithStaticData: any = project;
+      projectWithStaticData.setStaticDataJson(
         JSON.stringify({
           cards: {
             PeaShooter: { name: 'PeaShooter', price: 100 },
@@ -895,15 +990,15 @@ describe('McpEditorBridge', () => {
         },
       });
       const summary = JSON.parse(summaryResponse.content[0].text);
-      expect(summary.globalConfigSummary.topLevelKeys).toContain('cards');
-      expect(summary.globalConfigSummary.placeholderExamples).toContain(
+      expect(summary.staticDataSummary.topLevelKeys).toContain('cards');
+      expect(summary.staticDataSummary.placeholderExamples).toContain(
         '{{cards.PeaShooter.price}}'
       );
 
       const readValueResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_get_global_config',
+          name: 'gdevelop_get_static_data',
           arguments: {
             placeholder_path: '{{cards.PeaShooter.price}}',
           },
@@ -916,7 +1011,7 @@ describe('McpEditorBridge', () => {
       const resourceResponse = await bridge.handleRendererMcpRequest({
         method: 'resources/read',
         params: {
-          uri: 'gdevelop://project/global-config.json',
+          uri: 'gdevelop://project/static-data.json',
         },
       });
       expect(
@@ -926,9 +1021,9 @@ describe('McpEditorBridge', () => {
       const replaceResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config',
+          name: 'gdevelop_set_static_data',
           arguments: {
-            global_config: {
+            static_data: {
               cards: {
                 Sunflower: { name: 'Sunflower', price: 50 },
               },
@@ -942,7 +1037,7 @@ describe('McpEditorBridge', () => {
       const setValueResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: '{{cards.Sunflower.canUse}}',
             value: true,
@@ -956,7 +1051,7 @@ describe('McpEditorBridge', () => {
       const setObjectResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: '{{cards.WallNut}}',
             value_json: '{"name":"WallNut","price":50}',
@@ -969,7 +1064,7 @@ describe('McpEditorBridge', () => {
       const deleteResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_delete_global_config_value',
+          name: 'gdevelop_delete_static_data_value',
           arguments: {
             placeholder_path: '{{cards.Sunflower.canUse}}',
           },
@@ -978,9 +1073,7 @@ describe('McpEditorBridge', () => {
       const deleteResult = JSON.parse(deleteResponse.content[0].text);
       expect(deleteResult.deleted).toBe(true);
 
-      const finalConfig = JSON.parse(
-        projectWithGlobalConfig.getGlobalConfigJson()
-      );
+      const finalConfig = JSON.parse(projectWithStaticData.getStaticDataJson());
       expect(finalConfig.cards.Sunflower.price).toBe(50);
       expect(finalConfig.cards.Sunflower.canUse).toBeUndefined();
       expect(finalConfig.cards.WallNut.name).toBe('WallNut');
@@ -989,7 +1082,7 @@ describe('McpEditorBridge', () => {
       const invalidPathResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
-          name: 'gdevelop_set_global_config_value',
+          name: 'gdevelop_set_static_data_value',
           arguments: {
             placeholder_path: 'cards.Sunflower.price',
             value: 75,
@@ -3639,7 +3732,7 @@ describe('McpEditorBridge', () => {
         'preview-ws-0',
       ]);
       expect(result.staleStateAdvisory.recommendedActions).toContain(
-        'save_and_relaunch_preview_paused { timeout_ms: 10000 }'
+        'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }'
       );
       expect(result.staleStateAdvisory.editorPanelsMayBeStale).toEqual(
         expect.arrayContaining([
@@ -5899,7 +5992,45 @@ describe('McpEditorBridge', () => {
             // source of counts.
             _instances: {
               items: {
-                Player: [{}],
+                Player: [
+                  {
+                    id: 7,
+                    persistentUuid: 'player-instance-uuid',
+                    x: 10,
+                    y: 20,
+                    angle: 180,
+                    layer: 'Gameplay',
+                    zOrder: 3,
+                    pick: true,
+                    _permanentForceX: -720,
+                    _permanentForceY: 0,
+                    _instantForces: [{ _x: 5, _y: 0, _angle: 0, _length: 5 }],
+                    _totalForce: {
+                      _x: -715,
+                      _y: 0,
+                      _angle: 180,
+                      _length: 715,
+                    },
+                    _variables: {
+                      _variables: {
+                        Health: {
+                          _value: 3,
+                          _str: '',
+                          _stringDirty: true,
+                          _isStructure: false,
+                        },
+                      },
+                    },
+                    _behaviors: [
+                      {
+                        name: 'Fire',
+                        type: 'FireBullet::FireBullet',
+                        _activated: true,
+                        _cooldown: 0.25,
+                      },
+                    ],
+                  },
+                ],
                 Enemy: [{}, {}],
               },
             },
@@ -5969,7 +6100,12 @@ describe('McpEditorBridge', () => {
       method: 'tools/call',
       params: {
         name: 'gdevelop_inspect_running_preview',
-        arguments: { timeout_ms: 1000 },
+        arguments: {
+          timeout_ms: 1000,
+          objects: ['Player', 'Enemy', 'MissingObject'],
+          include: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+          instance_indexes: [0, 2],
+        },
       },
     });
     const result = JSON.parse(response.content[0].text);
@@ -5987,6 +6123,46 @@ describe('McpEditorBridge', () => {
     expect(result.runtime.scenes[0].totalInstances).toBe(3);
     expect(result.runtime.scenes[0].sceneVariables.Score).toBe(42);
     expect(result.runtime.globalVariables.Coins).toBe(7);
+    expect(result.runtime.scenes[0].instanceStates.Player[0]).toEqual(
+      expect.objectContaining({
+        index: 0,
+        id: 7,
+        persistentUuid: 'player-instance-uuid',
+        picked: true,
+        position: { x: 10, y: 20, layer: 'Gameplay', zOrder: 3 },
+        angle: 180,
+        variables: { Health: 3 },
+        behaviors: [
+          expect.objectContaining({
+            name: 'Fire',
+            type: 'FireBullet::FireBullet',
+            activated: true,
+            state: { _cooldown: 0.25 },
+          }),
+        ],
+      })
+    );
+    expect(result.runtime.scenes[0].instanceStates.Player[0].forces).toEqual(
+      expect.objectContaining({
+        permanent: expect.objectContaining({
+          x: -720,
+          y: 0,
+          angle: 180,
+          length: 720,
+        }),
+        instantaneous: [{ x: 5, y: 0, angle: 0, length: 5 }],
+        total: { x: -715, y: 0, angle: 180, length: 715 },
+      })
+    );
+    expect(result.runtime.scenes[0].missingObjects).toEqual(['MissingObject']);
+    expect(result.runtime.scenes[0].instanceStates.Enemy[0]).toEqual({
+      index: 0,
+      missingFields: ['position', 'angle', 'forces', 'variables', 'behaviors'],
+    });
+    expect(result.runtime.scenes[0].missingInstances).toEqual({
+      Player: [2],
+      Enemy: [2],
+    });
     expect(result.recentLogs).toEqual([recentCustomLog]);
     expect(result.logs).toEqual(expect.arrayContaining([recentCustomLog]));
   });
@@ -7502,7 +7678,7 @@ describe('McpEditorBridge', () => {
     project.delete();
   });
 
-  it('saves, closes stale previews, relaunches paused, and inspects runtime state', async () => {
+  it('does not expose the retired save-and-relaunch preview helper', async () => {
     const saveProjectAndWait: any = jest.fn(async () => ({
       saved: true,
       consistency: { projectName: 'Preview Test' },
@@ -7631,31 +7807,12 @@ describe('McpEditorBridge', () => {
     });
     const result = JSON.parse(response.content[0].text);
 
-    expect(response.isError).not.toBe(true);
-    expect(result.success).toBe(true);
-    expect(result.saved).toBe(true);
-    expect(result.closedWindows).toBe(true);
-    expect(result.closedDebuggerConnections).toBe(true);
-    expect(result.requestedPause).toBe(true);
-    expect(result.pauseAttempted).toBe(true);
-    expect(result.launch.pauseConfirmed).toBe(true);
-    expect(result.launchAttempts).toHaveLength(2);
-    expect(result.launchAttempts[0].success).toBe(false);
-    expect(result.launchAttempts[1].success).toBe(true);
-    expect(result.debuggerId).toBe('preview-ws-new');
-    expect(result.sceneName).toBe('Level1');
-    expect(result.runtime.objectInstanceCounts.Player).toBe(1);
-    expect(saveProjectAndWait).toHaveBeenCalled();
-    expect(closeAllPreviews).toHaveBeenCalled();
-    expect(closeAllConnections).toHaveBeenCalled();
-    expect(runCommand).toHaveBeenCalledTimes(2);
-    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
-    expect(
-      sent.some(
-        entry =>
-          entry.id === 'preview-ws-new' && entry.message.command === 'pause'
-      )
-    ).toBe(true);
+    expect(response.isError).toBe(true);
+    expect(result.error).toContain('Unknown MCP tool');
+    expect(saveProjectAndWait).not.toHaveBeenCalled();
+    expect(closeAllPreviews).not.toHaveBeenCalled();
+    expect(closeAllConnections).not.toHaveBeenCalled();
+    expect(runCommand).not.toHaveBeenCalled();
   });
 
   it('launch_preview reports not ready when a new preview connects but never answers getStatus', async () => {

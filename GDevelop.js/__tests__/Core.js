@@ -2705,8 +2705,8 @@ describe('libGD.js', function () {
       expect(validateVolumeParameter('"Not a number"')).toBe(false);
     });
 
-    it('validates global config placeholders in string parameters', function () {
-      project.setGlobalConfigJson(
+    it('validates static data placeholders in string parameters', function () {
+      project.setStaticDataJson(
         JSON.stringify({
           labels: {
             title: 'Window title',
@@ -3908,7 +3908,7 @@ describe('libGD.js', function () {
       fs.delete();
     });
 
-    it('should replace global config placeholders in runtime project data', function () {
+    it('should replace static data placeholders in runtime project data', function () {
       const fs = new gd.AbstractFileSystemJS();
       const project = gd.ProjectHelper.createNewGDJSProject();
       const projectDataElement = new gd.SerializerElement();
@@ -3928,7 +3928,7 @@ describe('libGD.js', function () {
         .insertNew('SceneTextVariable', 0)
         .setString('Scene: {{labels.sceneVariableText}}');
       project.setName('{{labels.projectName}}');
-      project.setGlobalConfigJson(
+      project.setStaticDataJson(
         JSON.stringify({
           labels: {
             globalVariableText: 'Runtime global variable',
@@ -3970,7 +3970,7 @@ describe('libGD.js', function () {
       expect(projectData.layouts[0].variables[0].value).toBe(
         'Scene: Runtime scene variable'
       );
-      expect(projectData.globalConfig).toBeUndefined();
+      expect(projectData.staticData).toBeUndefined();
 
       previewExportOptions.delete();
       exporter.delete();

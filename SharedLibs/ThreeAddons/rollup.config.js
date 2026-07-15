@@ -13,13 +13,13 @@ export default [
     output: [
       {
         name: 'THREE',
-        format: 'iife',
+        format: 'umd',
         file: './dist/three.js',
         sourcemap: true,
       },
       {
         name: 'THREE',
-        format: 'iife',
+        format: 'umd',
         file: '../../GDJS/Runtime/pixi-renderers/three.js',
         sourcemap: false,
       },

@@ -5711,6 +5711,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const {
     renderVersionHistoryPanel,
     openVersionHistoryPanel,
+    closeVersionHistoryPanel,
     checkedOutVersionStatus,
     onQuitVersionHistory,
     onCheckoutVersion,
@@ -5723,6 +5724,14 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenCloudProjectOnSpecificVersion,
     onReloadProject: reloadProjectAfterGitAction,
   });
+
+  const closeTemporarySideMenusOnEditorClick = React.useCallback(
+    () => {
+      closeProjectManagerOverlay();
+      closeVersionHistoryPanel();
+    },
+    [closeProjectManagerOverlay, closeVersionHistoryPanel]
+  );
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -8160,6 +8169,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         )}
         <div
           className="main-frame-editors-content"
+          onClickCapture={closeTemporarySideMenusOnEditorClick}
           style={
             gameEditorMode === 'embedded-game' &&
             activeEmbeddedGameFrameHoleCount > 0

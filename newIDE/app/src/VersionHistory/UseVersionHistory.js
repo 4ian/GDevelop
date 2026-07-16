@@ -93,6 +93,7 @@ const useVersionHistory = ({
 }: Props): {|
   checkedOutVersionStatus: ?OpenedVersionStatus,
   openVersionHistoryPanel: () => void,
+  closeVersionHistoryPanel: () => void,
   renderVersionHistoryPanel: () => React.Node,
   onQuitVersionHistory: () => Promise<void>,
   onCheckoutVersion: (
@@ -300,6 +301,10 @@ const useVersionHistory = ({
     setVersionHistoryPanelOpen(true);
   }, []);
 
+  const closeVersionHistoryPanel = React.useCallback(() => {
+    setVersionHistoryPanelOpen(false);
+  }, []);
+
   const onQuitVersionHistory = React.useCallback(
     async () => {
       if (!fileMetadata || !checkedOutVersionStatus || !latestVersionId) return;
@@ -462,12 +467,12 @@ const useVersionHistory = ({
             ModalProps={{
               keepMounted: true,
             }}
-            onClose={() => setVersionHistoryPanelOpen(false)}
+            onClose={closeVersionHistoryPanel}
           >
             <DrawerTopBar
               icon={<HistoryIcon />}
               title={i18n._(t`Git tool`)}
-              onClose={() => setVersionHistoryPanelOpen(false)}
+              onClose={closeVersionHistoryPanel}
               id="version-history-drawer"
             />
             <GitTool
@@ -488,6 +493,7 @@ const useVersionHistory = ({
   return {
     checkedOutVersionStatus,
     openVersionHistoryPanel,
+    closeVersionHistoryPanel,
     renderVersionHistoryPanel,
     onQuitVersionHistory,
     onCheckoutVersion,

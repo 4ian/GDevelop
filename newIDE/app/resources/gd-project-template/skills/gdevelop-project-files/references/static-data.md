@@ -301,8 +301,9 @@ For example, row-oriented localization data can keep stable UI keys as rows and
 locales as columns:
 
 ```toml
-[localization]
+[i18n]
 defaultLocale = "en"
+supportedLocales = ["en", "zh"]
 
 [localization."ui.title"]
 en = "Card Garden"
@@ -313,16 +314,21 @@ en = "Play"
 zh = "开始"
 ```
 
+Keep localization metadata such as `defaultLocale` and `supportedLocales` in a
+sibling table such as `i18n`, not inside `localization`. This keeps the
+`localization` grid homogeneous: every row key is a translation key and every
+column is a locale, without an extra generic `value` column.
+
 Reference the complete localization object once:
 
 ```toml
 [variables]
-Locale = [{ type = "string", value = "{{localization.defaultLocale}}" }]
+Locale = [{ type = "string", value = "{{i18n.defaultLocale}}" }]
 Translations = [{ type = "string", value = "{{localization}}" }]
 ```
 
 At startup, `Translations` contains compact JSON text such as
-`{"defaultLocale":"en","ui.title":{"en":"Card Garden",...}}`. When
+`{"ui.title":{"en":"Card Garden","zh":"卡牌花园"},...}`. When
 events need variable-style child access, convert that same variable once before
 its first consumer:
 

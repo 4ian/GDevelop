@@ -14,13 +14,14 @@ It is not a runtime variable store and it is never a place for secrets.
 5. [Placeholder path syntax](#placeholder-path-syntax)
 6. [Resolution behavior](#resolution-behavior)
 7. [Use placeholders in events](#use-placeholders-in-events)
-8. [Use placeholders in custom-object and behavior properties](#use-placeholders-in-custom-object-and-behavior-properties)
-9. [Design reusable components](#design-reusable-components)
-10. [Complete examples](#complete-examples)
-11. [Edit rules](#edit-rules)
-12. [Validate and debug](#validate-and-debug)
-13. [Failure patterns](#failure-patterns)
-14. [Authoring checklist](#authoring-checklist)
+8. [Use placeholders in string variables](#use-placeholders-in-string-variables)
+9. [Use placeholders in custom-object and behavior properties](#use-placeholders-in-custom-object-and-behavior-properties)
+10. [Design reusable components](#design-reusable-components)
+11. [Complete examples](#complete-examples)
+12. [Edit rules](#edit-rules)
+13. [Validate and debug](#validate-and-debug)
+14. [Failure patterns](#failure-patterns)
+15. [Authoring checklist](#authoring-checklist)
 
 ## Choose Static Data or variables
 
@@ -285,6 +286,60 @@ Safe event-use principles:
 - A missing path must fail validation; never silently replace it with an empty
   string or a guessed default.
 
+## Use placeholders in string variables
+
+The initial `value` of a string-type global, scene, object, prefab, or variant
+variable is an eligible placeholder surface. This also applies to string
+children nested inside structure and array variables. The placeholder is
+resolved while runtime variable data is generated, before the variable is
+created.
+
+For example, row-oriented localization data can keep stable UI keys as rows and
+locales as columns:
+
+```toml
+[localization]
+defaultLocale = "en"
+
+[localization."ui.title"]
+en = "Card Garden"
+zh = "卡牌花园"
+
+[localization."ui.play"]
+en = "Play"
+zh = "开始"
+```
+
+String variable descriptors can consume these values directly:
+
+```toml
+[variables]
+Locale = [{ type = "string", value = "{{localization.defaultLocale}}" }]
+Translations = [{ type = "structure", children = [{ name = "ui", type = "structure", children = [{ name = "title", type = "structure", children = [{ name = "en", type = "string", value = "{{localization['ui.title'].en}}" }, { name = "zh", type = "string", value = "{{localization['ui.title'].zh}}" }] }, { name = "play", type = "structure", children = [{ name = "en", type = "string", value = "{{localization['ui.play'].en}}" }, { name = "zh", type = "string", value = "{{localization['ui.play'].zh}}" }] }] }] }]
+```
+
+Variable rules:
+
+- Put the placeholder in a descriptor whose `type` is `string` and keep its
+  normal `value` field. Interpolation and exact placeholders are both allowed.
+- A structure or array descriptor still owns `children`; do not replace the
+  container with `value = "{{...}}"`. Put placeholders in its string leaves.
+- The resolved result remains a string. Number, boolean, object, and array
+  Static Data values are converted to their textual substitution form.
+- This rule does not make numeric or boolean variable initializers general
+  placeholder surfaces. Keep those values literal unless another documented
+  configuration surface performs the typed conversion.
+- The runtime variable is an ordinary mutable variable after initialization.
+  Changing it does not change Static Data, and changing Static Data does not
+  update an already running preview.
+- Missing paths are generation errors just as they are on event and property
+  surfaces.
+
+Prefer direct string-variable initialization over scene-start copy actions when
+the value is static configuration. Use initialization events only when the
+runtime value must be derived, converted, selected dynamically, or refreshed
+during play.
+
 ## Use placeholders in custom-object and behavior properties
 
 Event-based object and behavior properties are another supported boundary.
@@ -400,8 +455,9 @@ health = 30
 damage = 8
 ```
 
-Use these as static property defaults/configured values. Copy them into runtime
-variables at initialization only if gameplay must later mutate them.
+Use these as static property defaults/configured values. A string variable may
+reference Static Data directly in its initial `value`; use an initialization
+event when a runtime value needs typed conversion, derivation, or later refresh.
 
 ### Arrays and special keys
 
@@ -476,7 +532,8 @@ After editing:
 3. Confirm there are no `[settings]`, `[staticData]`, format-version, or
    serializer wrappers.
 4. Search changed placeholder paths and confirm their exact type/value.
-5. Confirm each use is on a supported action/property surface.
+5. Confirm each use is on a supported action, string-variable, or property
+   surface.
 6. Reload the project. Treat a reload error as a source-format failure and fix
    `static-data.toml`.
 7. Launch a fresh preview/export generation. Missing placeholders appear in
@@ -498,6 +555,9 @@ error with a fabricated value unless that default is part of the user's design.
 - Trying to store JSON `null`, mixed-type arrays, dates, or unsafe integers.
 - Using inconsistent types for the same field across content records.
 - Using a placeholder in a numeric event expression or receiving condition.
+- Putting a placeholder on a structure/array variable container instead of a
+  string leaf `value`.
+- Assuming a resolved string variable remains linked to Static Data at runtime.
 - Omitting the nested GDevelop-expression quotes in an IfDo string operand.
 - Using number/boolean interpolation instead of an exact whole placeholder.
 - Replacing a `JsonObject` descriptor's concrete JSON example with a placeholder.
@@ -514,7 +574,10 @@ error with a fabricated value unless that default is part of the user's design.
 - Use only values TOML represents losslessly.
 - Choose stable, case-consistent, typed paths.
 - Verify every placeholder path, bracket segment, and array index.
-- Use placeholders only on supported action/property surfaces.
+- Use placeholders only on supported action, string-variable, or property
+  surfaces.
+- Keep variable placeholders in string descriptor `value` fields, including
+  string leaves nested inside structures and arrays.
 - Keep scalar property placeholders exact where required and give every
   `JsonObject` property a concrete, complete JSON example.
 - Inject static data through properties/parameters for reusable extensions.

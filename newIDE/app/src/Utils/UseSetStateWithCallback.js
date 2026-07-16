@@ -7,12 +7,15 @@ import React from 'react';
  */
 export default function useStateWithCallback(initialValue) {
   const [state, setState] = React.useState(initialValue);
-  const callback = React.useRef(null);
+  // MainFrame can enqueue multiple state updates before React commits a render.
+  // Keep every resolver: a single ref would orphan the promise returned by an
+  // earlier update when a later update replaced it before the effect ran.
+  const callbacks = React.useRef([]);
 
   const useStateWithCB = React.useCallback(
     newValue => {
       return new Promise(resolve => {
-        callback.current = resolve;
+        callbacks.current.push(resolve);
         setState(newValue);
       });
     },
@@ -21,10 +24,11 @@ export default function useStateWithCallback(initialValue) {
 
   React.useEffect(
     () => {
-      if (callback.current !== null) {
-        callback.current(state);
-        callback.current = null;
-      }
+      if (callbacks.current.length === 0) return;
+
+      const committedCallbacks = callbacks.current;
+      callbacks.current = [];
+      committedCallbacks.forEach(callback => callback(state));
     },
     [state]
   );

@@ -1114,16 +1114,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   // Heal the main window across the same teardown window as the tree refresh.
   const healMainWindowAfterPopOutClose = React.useCallback(() => {
     const heal = () => {
+      if (typeof window.focus === 'function') window.focus();
       cleanupLeakedOverlaysAfterPopOutClose();
       // Diagnostic: if anything is still covering the editor after cleanup,
       // log exactly what it is so the remaining cause can be pinned down.
       reportPotentialInputBlockers();
     };
     heal();
-    setTimeout(heal, 0);
-    setTimeout(heal, 60);
-    setTimeout(heal, 200);
-    setTimeout(heal, 550);
+    [0, 60, 200, 550, 1000, 2000].forEach(delay => {
+      setTimeout(heal, delay);
+    });
   }, []);
 
   // Expose the input-blocker diagnostic so it can be run from the devtools
@@ -1191,6 +1191,17 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [previewLoadingRef, setPreviewLoading]
+  );
+
+  const getPreviewLaunchStateForMcp = React.useCallback(
+    () => ({
+      previewLoading: previewLoadingRef.current,
+      launchInProgress: previewLaunchInProgressRef.current,
+      launchPhase: previewLaunchPhaseRef.current,
+      activePreviewLaunchId: activePreviewLaunchIdRef.current,
+      cancelledPreviewLaunchCount: cancelledPreviewLaunchIdsRef.current.size,
+    }),
+    [previewLoadingRef]
   );
 
   React.useEffect(
@@ -3355,15 +3366,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       forceAlwaysOnTopInPreview,
       launchCaptureOptions,
       isForInGameEdition,
-    }: LaunchPreviewOptions) => {
-      if (!currentProject) return;
-      if (currentProject.getLayoutsCount() === 0) return;
+    }: LaunchPreviewOptions): Promise<boolean> => {
+      if (!currentProject) return false;
+      if (currentProject.getLayoutsCount() === 0) return false;
 
       if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
-        return;
+        return false;
       }
 
       let previewProjectLoadedFromFile: ?gdProject = null;
@@ -3380,10 +3391,10 @@ const MainFrame = (props: Props): React.MixedElement => {
             'preview'
           );
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
           if (shouldBlockPreview) {
-            return;
+            return false;
           }
         }
 
@@ -3414,7 +3425,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const previewLauncher = _previewLauncher.current;
         if (!previewLauncher) {
           console.error('Preview launcher not found.');
-          return;
+          return false;
         }
 
         if (previewLoadingRef.current) {
@@ -3426,7 +3437,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           // The main issue currently is files being erased/copied by the second preview,
           // which can break the game of the first preview,
           // when the game is loading its resources or reading files.
-          return;
+          return false;
         }
 
         // Open the preview windows immediately, if required by the preview launcher.
@@ -3455,7 +3466,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           }
         }
         if (isPreviewLaunchCancelled(previewLaunchId)) {
-          return;
+          return false;
         }
 
         // Mark the preview as loading after the optional save. The
@@ -3476,7 +3487,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             if (loadedProject) {
               loadedProject.delete();
             }
-            return;
+            return false;
           }
           if (loadedProject) {
             if (loadedProject.getLayoutsCount() === 0) {
@@ -3528,7 +3539,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             : createCaptureOptionsForPreview(launchCaptureOptions),
         ]);
         if (isPreviewLaunchCancelled(previewLaunchId)) {
-          return;
+          return false;
         }
 
         try {
@@ -3536,14 +3547,14 @@ const MainFrame = (props: Props): React.MixedElement => {
             currentProject
           );
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
           if (projectForPreview !== currentProject) {
             await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
               projectForPreview
             );
             if (isPreviewLaunchCancelled(previewLaunchId)) {
-              return;
+              return false;
             }
           }
 
@@ -3615,7 +3626,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             previewWindows,
           });
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
 
           clearPreviewLoadingForLaunch(previewLaunchId);
@@ -3650,12 +3661,14 @@ const MainFrame = (props: Props): React.MixedElement => {
               setDiagnosticReportDialogOpen(true);
             }
           }
+          return true;
         } catch (error) {
           clearPreviewLoadingForLaunch(previewLaunchId);
           console.error(
             'Error caught while launching preview, this should never happen.',
             error
           );
+          return false;
         }
       } finally {
         if (previewProjectLoadedFromFile) {
@@ -3706,10 +3719,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
-  const launchPreview = addCreateBadgePreHookIfNotClaimed(
+  const launchPreviewAndReport = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_PREVIEW,
     _launchPreview
+  );
+  const launchPreview = React.useCallback(
+    async (options: LaunchPreviewOptions): Promise<void> => {
+      await launchPreviewAndReport(options);
+    },
+    [launchPreviewAndReport]
   );
 
   const launchNewPreview = React.useCallback(
@@ -4422,6 +4441,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   // the editor's normal scene selection.
   const launchPreviewForScene = React.useCallback(
     async (sceneName: ?string) => {
+      const launchState = getPreviewLaunchStateForMcp();
+      if (launchState.launchInProgress || launchState.previewLoading) {
+        return {
+          accepted: false,
+          reason: 'preview-launch-already-in-progress',
+          launchState,
+        };
+      }
+
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
           ? getHotReloadPreviewLaunchCaptureOptions(
@@ -4430,10 +4458,14 @@ const MainFrame = (props: Props): React.MixedElement => {
           : undefined;
       const didOpenDebugger = await openDebugger();
       if (!didOpenDebugger) {
-        return;
+        return {
+          accepted: false,
+          reason: 'debugger-window-could-not-open',
+          launchState: getPreviewLaunchStateForMcp(),
+        };
       }
 
-      launchPreview({
+      const didLaunch = await launchPreviewAndReport({
         networkPreview: false,
         forcedPreviewLayoutName: sceneName || null,
         numberOfWindows: 1,
@@ -4441,13 +4473,19 @@ const MainFrame = (props: Props): React.MixedElement => {
         skipDiagnosticErrorBlocking: true,
         launchCaptureOptions,
       });
+      return {
+        accepted: !!didLaunch,
+        reason: didLaunch ? undefined : 'preview-launch-was-not-accepted',
+        launchState: getPreviewLaunchStateForMcp(),
+      };
     },
     [
       currentProject,
       openDebugger,
-      launchPreview,
+      launchPreviewAndReport,
       getHotReloadPreviewLaunchCaptureOptions,
       hasNonEditionPreviewsRunning,
+      getPreviewLaunchStateForMcp,
     ]
   );
 
@@ -6285,14 +6323,26 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   const onLocalProjectFilesChanged = React.useCallback(
     async (): Promise<void> => {
-      await showLocalProjectFilesChangedDialog({
-        showConfirmation,
-        onReloadProject: () =>
-          reloadProject({ skipUnsavedChangesConfirmation: true }),
-        onBackupProject: backupCurrentProjectToLocalFolder,
-      });
+      // If the file watcher fires just after a debugger/preview pop-out closed,
+      // make sure a stale full-window blocker is gone before opening the dialog.
+      healMainWindowAfterPopOutClose();
+      try {
+        await showLocalProjectFilesChangedDialog({
+          showConfirmation,
+          onReloadProject: () =>
+            reloadProject({ skipUnsavedChangesConfirmation: true }),
+          onBackupProject: backupCurrentProjectToLocalFolder,
+        });
+      } finally {
+        healMainWindowAfterPopOutClose();
+      }
     },
-    [backupCurrentProjectToLocalFolder, reloadProject, showConfirmation]
+    [
+      backupCurrentProjectToLocalFolder,
+      healMainWindowAfterPopOutClose,
+      reloadProject,
+      showConfirmation,
+    ]
   );
 
   useLocalProjectChangesWatcher({
@@ -7478,6 +7528,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           commandPaletteRef.current.launchCommand((commandName: any));
           return true;
         },
+        getPreviewLaunchState: getPreviewLaunchStateForMcp,
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
         reloadProjectAndWait: async reportProgress => {
@@ -7594,6 +7645,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       currentFileMetadata,
       getStorageProvider,
       eventsFunctionsExtensionsState,
+      getPreviewLaunchStateForMcp,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,

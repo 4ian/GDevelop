@@ -249,6 +249,7 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
+  getPreviewLaunchState?: () => Object,
   reloadProjectAndWait?: (
     reportProgress?: McpRequestProgressReporter
   ) => Promise<any>,
@@ -787,12 +788,14 @@ const saveProjectWithEvidence = async (
 
 const getEditorState = (
   project: ?gdProject,
-  permissions: McpPermissionOptions
+  permissions: McpPermissionOptions,
+  previewLaunchState?: ?Object
 ) => {
   if (!project) {
     return {
       hasProject: false,
       permissions,
+      previewLaunchState: previewLaunchState || undefined,
     };
   }
 
@@ -809,6 +812,7 @@ const getEditorState = (
     projectFolder,
     sceneNames: getSceneNames(project),
     permissions,
+    previewLaunchState: previewLaunchState || undefined,
   };
 };
 
@@ -4230,14 +4234,44 @@ const launchPreview = async (
       firstLayout,
       sceneSelectionSupported,
     });
+  let launchFailureDetails: ?Object = null;
+  const makeWindowLaunchFailure = () => ({
+    success: false,
+    launched: false,
+    ready: false,
+    failurePhase: 'window-launch',
+    error:
+      launchFailureDetails && launchFailureDetails.reason
+        ? `Could not launch a preview: ${launchFailureDetails.reason}.`
+        : launchFailureDetails && launchFailureDetails.error
+        ? `Could not launch a preview: ${launchFailureDetails.error}.`
+        : 'Could not launch a preview.',
+    launchFailureDetails: launchFailureDetails || undefined,
+  });
   // Launch the preview using the scene-aware launcher when available, falling
   // back to the legacy command which previews the editor's active tab.
-  const runLaunchCommand = (): boolean => {
+  const runLaunchCommand = async (): Promise<boolean> => {
+    launchFailureDetails = null;
     if (launchPreviewForScene) {
       try {
-        launchPreviewForScene(expectedScene || null);
+        const launchResult = await launchPreviewForScene(expectedScene || null);
+        if (launchResult === false) {
+          launchFailureDetails = { reason: 'scene-aware launch was rejected' };
+          return false;
+        }
+        if (
+          launchResult &&
+          typeof launchResult === 'object' &&
+          launchResult.accepted === false
+        ) {
+          launchFailureDetails = launchResult;
+          return false;
+        }
         return true;
       } catch (error) {
+        launchFailureDetails = {
+          error: error && error.message ? error.message : String(error),
+        };
         return false;
       }
     }
@@ -4338,15 +4372,9 @@ const launchPreview = async (
   );
 
   if (!previewDebuggerServer) {
-    const didRun = runLaunchCommand();
+    const didRun = await runLaunchCommand();
     if (!didRun) {
-      return {
-        success: false,
-        launched: false,
-        ready: false,
-        failurePhase: 'window-launch',
-        error: 'Could not launch a preview.',
-      };
+      return makeWindowLaunchFailure();
     }
 
     return annotate({
@@ -4371,15 +4399,9 @@ const launchPreview = async (
     existingIds,
     timeoutMs
   );
-  const didRun = runLaunchCommand();
+  const didRun = await runLaunchCommand();
   if (!didRun) {
-    return {
-      success: false,
-      launched: false,
-      ready: false,
-      failurePhase: 'window-launch',
-      error: 'Could not launch a preview.',
-    };
+    return makeWindowLaunchFailure();
   }
 
   const connection = await connectionPromise;
@@ -5381,7 +5403,13 @@ const callMcpTool = async ({
   const project = context.getProject();
 
   if (toolName === 'gdevelop_get_editor_state') {
-    return textResult(getEditorState(project, permissions));
+    return textResult(
+      getEditorState(
+        project,
+        permissions,
+        context.getPreviewLaunchState ? context.getPreviewLaunchState() : null
+      )
+    );
   }
 
   if (toolName === 'gdevelop_get_editor_selection') {
@@ -6503,7 +6531,7 @@ const callMcpTool = async ({
       let closedWindows = false;
       let closedDebuggerConnections = false;
       if (typeof context.closeAllPreviews === 'function') {
-        context.closeAllPreviews();
+        await context.closeAllPreviews();
         closedWindows = true;
       }
       if (

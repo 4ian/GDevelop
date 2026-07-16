@@ -844,6 +844,31 @@ runtimeScene._instances.length;
     expect(response.content[0].text).toContain('"hasProject": false');
   });
 
+  it('includes preview launch state in editor state when provided', async () => {
+    const bridge = makeBridge({
+      getPreviewLaunchState: () => ({
+        previewLoading: 'preview',
+        launchInProgress: true,
+        launchPhase: 'launching',
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'gdevelop_get_editor_state',
+        arguments: {},
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(result.previewLaunchState).toEqual({
+      previewLoading: 'preview',
+      launchInProgress: true,
+      launchPhase: 'launching',
+    });
+  });
+
   it('returns the current editor selection UI state', async () => {
     const bridge = makeBridge({
       getEditorSelection: () => ({
@@ -7513,6 +7538,55 @@ runtimeScene._instances.length;
     // The first scene was launched, not the editor's active tab.
     expect(launchedScenes).toEqual(['main']);
 
+    project.delete();
+  });
+
+  it('launch_preview reports scene-aware launch rejection without waiting for a debugger connection', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('main', 0);
+    project.setFirstLayout('main');
+
+    const launchPreviewForScene = jest.fn(async () => ({
+      accepted: false,
+      reason: 'preview-launch-already-in-progress',
+      launchState: {
+        previewLoading: 'preview',
+        launchInProgress: true,
+        launchPhase: 'launching',
+      },
+    }));
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: jest.fn(() => () => {}),
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 1000 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.launched).toBe(false);
+    expect(result.failurePhase).toBe('window-launch');
+    expect(result.error).toContain('preview-launch-already-in-progress');
+    expect(result.launchFailureDetails.launchState).toEqual({
+      previewLoading: 'preview',
+      launchInProgress: true,
+      launchPhase: 'launching',
+    });
     project.delete();
   });
 

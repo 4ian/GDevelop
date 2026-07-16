@@ -32,6 +32,38 @@ const DEBUGGER_POP_OUT_FORCE_CLOSE_DELAY_MS = 17000;
 // working even when the preview is not foreground. Ref-counted to the number of
 // open previews. (backgroundThrottling:false alone does NOT cover occlusion.)
 let powerSaveBlockerId = null;
+const PREVIEW_CLOSE_WAIT_TIMEOUT_MS = 8000;
+
+const waitForWindowClosed = (
+  window,
+  timeoutMs = PREVIEW_CLOSE_WAIT_TIMEOUT_MS
+) =>
+  new Promise(resolve => {
+    if (!window || window.isDestroyed()) {
+      resolve({ closed: true, timedOut: false });
+      return;
+    }
+
+    let timeoutId = null;
+    const cleanup = () => {
+      if (timeoutId !== null) clearTimeout(timeoutId);
+      window.removeListener('closed', onClosed);
+    };
+    const onClosed = () => {
+      cleanup();
+      resolve({ closed: true, timedOut: false });
+    };
+
+    window.once('closed', onClosed);
+    timeoutId = setTimeout(() => {
+      cleanup();
+      resolve({
+        closed: !!window.isDestroyed(),
+        timedOut: !window.isDestroyed(),
+      });
+    }, timeoutMs);
+  });
+
 const updatePowerSaveBlocker = () => {
   const shouldBlock = previewWindows.length > 0;
   if (shouldBlock && powerSaveBlockerId === null) {
@@ -238,6 +270,8 @@ const keepParentWindowVisibleAfterChildClose = (
   setTimeout(restoreParentWindow, 100);
   setTimeout(restoreParentWindow, 300);
   setTimeout(restoreParentWindow, 700);
+  setTimeout(restoreParentWindow, 1200);
+  setTimeout(restoreParentWindow, 2000);
 };
 
 const arrangeDebuggerPopOutWithLatestPreview = parentWindowId => {
@@ -534,40 +568,73 @@ const openPreviewWindow = ({
   }
 };
 
-const closePreviewWindow = windowId => {
+const closePreviewWindow = async windowId => {
   const entry = previewWindows.find(
     entry => entry.previewWindow.id === windowId
   );
   if (entry && entry.previewWindow) {
+    const closePromise = waitForWindowClosed(entry.previewWindow);
     entry.previewWindow.close();
+    return closePromise;
   }
 };
 
-const closePreviewWindowsForParent = parentWindowId => {
+const closePreviewWindowsForParent = async parentWindowId => {
   const entriesToClose = previewWindows.filter(
     entry => entry.parentWindowId === parentWindowId
   );
-  entriesToClose.forEach(entry => {
+  const closePromises = entriesToClose.map(entry => {
     try {
       if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
+        const closePromise = waitForWindowClosed(entry.previewWindow);
         entry.previewWindow.close();
+        return closePromise;
       }
     } catch (error) {
       console.warn('Ignoring exception when closing preview window:', error);
     }
+    return Promise.resolve({ closed: true, timedOut: false });
   });
+  return Promise.all(closePromises);
 };
 
-const closeAllPreviewWindows = () => {
-  previewWindows.forEach(entry => {
+const waitForDebuggerPopOutClosedForParents = async parentWindowIds => {
+  const closePromises = parentWindowIds.map(parentWindowId => {
+    const debuggerWindow = debuggerPopOutWindows.get(parentWindowId);
+    return waitForWindowClosed(debuggerWindow);
+  });
+  return Promise.all(closePromises);
+};
+
+const closeAllPreviewWindows = async () => {
+  const entriesToClose = previewWindows.slice();
+  const parentWindowIds = Array.from(
+    new Set(entriesToClose.map(entry => entry.parentWindowId))
+  );
+
+  const closePromises = entriesToClose.map(entry => {
     try {
       if (entry.previewWindow && !entry.previewWindow.isDestroyed()) {
+        const closePromise = waitForWindowClosed(entry.previewWindow);
         entry.previewWindow.close();
+        return closePromise;
       }
     } catch (error) {
       console.warn('Ignoring exception when closing preview window:', error);
     }
+    return Promise.resolve({ closed: true, timedOut: false });
   });
+
+  const previewCloseResults = await Promise.all(closePromises);
+  const debuggerCloseResults = await waitForDebuggerPopOutClosedForParents(
+    parentWindowIds
+  );
+
+  return {
+    closedPreviewWindows: entriesToClose.length,
+    previewCloseTimedOut: previewCloseResults.some(result => result.timedOut),
+    debuggerCloseTimedOut: debuggerCloseResults.some(result => result.timedOut),
+  };
 };
 
 const focusAllPreviewWindows = () => {

@@ -6006,10 +6006,14 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
 
-        const new_layer_name = SafeExtractor.extractStringProperty(
+        let new_layer_name = SafeExtractor.extractStringProperty(
           changed_layer,
           'new_layer_name'
         );
+        if (new_layer_name === layerName) {
+          // Same name means no rename: ignore it, as models often redundantly fill it when adding a layer.
+          new_layer_name = null;
+        }
         const new_layer_position = SafeExtractor.extractNumberProperty(
           changed_layer,
           'new_layer_position'
@@ -6106,7 +6110,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           }
           if (new_layer_name) {
             warnings.push(
-              `Layer "${layerName}" not found in scene "${scene.getName()}": no layer was renamed. Existing layers are: ${existingLayerNames}. To create a new layer, pass its name as "layer_name".`
+              `Layer "${layerName}" not found in scene "${scene.getName()}": no layer was renamed. Existing layers are: ${existingLayerNames}. To create a new layer, pass its name as "layer_name" and do not set "new_layer_name".`
             );
             return;
           }

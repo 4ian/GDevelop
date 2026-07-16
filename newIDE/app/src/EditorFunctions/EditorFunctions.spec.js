@@ -3844,10 +3844,37 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.warnings).toMatchInlineSnapshot(
-        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": no layer was renamed. Existing layers are: \\"\\". To create a new layer, pass its name as \\"layer_name\\"."`
+        `"Layer \\"Ground\\" not found in scene \\"TestScene\\": no layer was renamed. Existing layers are: \\"\\". To create a new layer, pass its name as \\"layer_name\\" and do not set \\"new_layer_name\\"."`
       );
       expect(testScene.hasLayerNamed('Ground')).toBe(false);
       expect(testScene.hasLayerNamed('Background')).toBe(false);
+    });
+
+    it('creates a layer when new_layer_name is redundantly set to the same name', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              {
+                layer_name: 'HUD',
+                new_layer_name: 'HUD',
+                new_layer_position: 1,
+                delete_this_layer: false,
+                move_instances_to_layer: '',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"HUD\\" did not exist in scene \\"TestScene\\": created it at position 1. Layers are now: \\"\\", \\"HUD\\". If you meant to modify an existing layer, check its exact name."
+      `);
+      expect(testScene.hasLayerNamed('HUD')).toBe(true);
     });
 
     it('does not create a layer when deleting a layer that does not exist', async () => {

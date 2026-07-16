@@ -55,6 +55,30 @@ function ConfirmProvider({ children }: Props): React.Node {
     },
     [isCli]
   );
+  React.useEffect(
+    () => {
+      if (!confirmDialogOpen || !confirmDialogConfig) return;
+
+      const dismissOnAbortSignal = confirmDialogConfig.dismissOnAbortSignal;
+      if (!dismissOnAbortSignal) return;
+
+      const dismissConfirmDialog = () => {
+        setConfirmDialogOpen(false);
+        confirmDialogConfig.callback(false);
+      };
+      if (dismissOnAbortSignal.aborted) {
+        dismissConfirmDialog();
+        return;
+      }
+
+      dismissOnAbortSignal.addEventListener('abort', dismissConfirmDialog, {
+        once: true,
+      });
+      return () =>
+        dismissOnAbortSignal.removeEventListener('abort', dismissConfirmDialog);
+    },
+    [confirmDialogConfig, confirmDialogOpen]
+  );
 
   // Confirm Delete
   const [

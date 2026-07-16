@@ -6360,7 +6360,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onLocalProjectFilesChanged = React.useCallback(
-    async (): Promise<void> => {
+    async (dismissSignal: AbortSignal): Promise<void> => {
       // If the file watcher fires just after a debugger/preview pop-out closed,
       // make sure a stale full-window blocker is gone before opening the dialog.
       healMainWindowAfterPopOutClose();
@@ -6370,6 +6370,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           onReloadProject: () =>
             reloadProject({ skipUnsavedChangesConfirmation: true }),
           onBackupProject: backupCurrentProjectToLocalFolder,
+          dismissSignal,
         });
       } finally {
         healMainWindowAfterPopOutClose();

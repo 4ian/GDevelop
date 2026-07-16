@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[missing-export] The react-test-renderer libdef is outdated.
 import TestRenderer, { act } from 'react-test-renderer';
 import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import useLocalProjectChangesWatcher, {
@@ -26,7 +27,7 @@ const Watcher = ({
   onProjectFilesChanged,
 }: {|
   enabled: boolean,
-  onProjectFilesChanged: () => Promise<void> | void,
+  onProjectFilesChanged: (dismissSignal: AbortSignal) => Promise<void> | void,
 |}) => {
   useLocalProjectChangesWatcher({
     enabled,
@@ -92,6 +93,60 @@ describe('useLocalProjectChangesWatcher', () => {
     expect(onProjectFilesChanged).not.toHaveBeenCalled();
     act(() => renderer.unmount());
   });
+
+  it('keeps polling while the dialog is open and closes it when the disk is no longer newer', async () => {
+    let dialogDismissSignal: ?AbortSignal = null;
+    const onProjectFilesChanged: any = (jest.fn(
+      (dismissSignal: AbortSignal) => {
+        dialogDismissSignal = dismissSignal;
+        return new Promise(resolve => {
+          dismissSignal.addEventListener('abort', () => resolve(), {
+            once: true,
+          });
+        });
+      }
+    ): any);
+    const modificationTimeMock: any = mockFn(getLocalProjectLastModifiedDate);
+    modificationTimeMock
+      .mockResolvedValueOnce(2000)
+      .mockResolvedValueOnce(3000)
+      .mockResolvedValue(1000);
+    let renderer;
+    act(() => {
+      renderer = TestRenderer.create(
+        <Watcher enabled onProjectFilesChanged={onProjectFilesChanged} />
+      );
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
+      await flushPromises();
+    });
+    expect(onProjectFilesChanged).toHaveBeenCalledTimes(1);
+    const activeDialogDismissSignal = dialogDismissSignal;
+    if (!activeDialogDismissSignal) {
+      throw new Error('Expected a dialog signal.');
+    }
+    expect(activeDialogDismissSignal.aborted).toBe(false);
+
+    await act(async () => {
+      jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
+      await flushPromises();
+    });
+    expect(getLocalProjectLastModifiedDate).toHaveBeenCalledTimes(2);
+    expect(onProjectFilesChanged).toHaveBeenCalledTimes(1);
+    expect(activeDialogDismissSignal.aborted).toBe(false);
+
+    await act(async () => {
+      jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
+      await flushPromises();
+    });
+    expect(getLocalProjectLastModifiedDate).toHaveBeenCalledTimes(3);
+    expect(onProjectFilesChanged).toHaveBeenCalledTimes(1);
+    expect(activeDialogDismissSignal.aborted).toBe(true);
+
+    act(() => renderer.unmount());
+  });
 });
 
 describe('showLocalProjectFilesChangedDialog', () => {
@@ -125,5 +180,23 @@ describe('showLocalProjectFilesChangedDialog', () => {
 
     expect(onReloadProject).not.toHaveBeenCalled();
     expect(onBackupProject).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows the watcher to dismiss the dialog', async () => {
+    const dismissController = new AbortController();
+    const showConfirmation: any = (jest.fn(() => Promise.resolve(false)): any);
+
+    await showLocalProjectFilesChangedDialog({
+      showConfirmation,
+      onReloadProject: (jest.fn(): any),
+      onBackupProject: (jest.fn(): any),
+      dismissSignal: dismissController.signal,
+    });
+
+    expect(showConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dismissOnAbortSignal: dismissController.signal,
+      })
+    );
   });
 });

@@ -10,17 +10,19 @@ type Props = {|
   enabled: boolean,
   fileIdentifier: ?string,
   lastKnownModificationTime: ?number,
-  onProjectFilesChanged: () => Promise<void> | void,
+  onProjectFilesChanged: (dismissSignal: AbortSignal) => Promise<void> | void,
 |};
 
 export const showLocalProjectFilesChangedDialog = async ({
   showConfirmation,
   onReloadProject,
   onBackupProject,
+  dismissSignal,
 }: {|
   showConfirmation: ShowConfirmFunction,
   onReloadProject: () => Promise<void>,
   onBackupProject: () => Promise<void>,
+  dismissSignal?: AbortSignal,
 |}): Promise<void> => {
   let shouldBackUpProject = false;
   const shouldReloadProject = await showConfirmation({
@@ -34,6 +36,7 @@ export const showLocalProjectFilesChangedDialog = async ({
     },
     level: 'warning',
     maxWidth: 'sm',
+    dismissOnAbortSignal: dismissSignal,
   });
 
   if (shouldReloadProject) {
@@ -55,10 +58,13 @@ const useLocalProjectChangesWatcher = ({
 
       let isDisposed = false;
       let baselineModificationTime = lastKnownModificationTime;
-      let isChecking = baselineModificationTime === null;
+      let isChecking = typeof baselineModificationTime !== 'number';
+      let pendingDialogAbortController: ?AbortController = null;
+      let latestPendingModificationTime: ?number = null;
+      let shouldAcknowledgePendingChanges = true;
 
       const initializeBaselineIfNeeded = async () => {
-        if (baselineModificationTime !== null) return;
+        if (typeof baselineModificationTime === 'number') return;
         try {
           baselineModificationTime = await getLocalProjectLastModifiedDate(
             fileIdentifier
@@ -79,18 +85,66 @@ const useLocalProjectChangesWatcher = ({
           const latestModificationTime = await getLocalProjectLastModifiedDate(
             fileIdentifier
           );
-          if (isDisposed || latestModificationTime === null) return;
+          if (isDisposed || typeof latestModificationTime !== 'number') return;
 
-          if (baselineModificationTime === null) {
+          const currentBaselineModificationTime = baselineModificationTime;
+          if (typeof currentBaselineModificationTime !== 'number') {
             baselineModificationTime = latestModificationTime;
             return;
           }
-          if (latestModificationTime <= baselineModificationTime) return;
 
-          // Acknowledge this disk version before showing the dialog, so
-          // dismissing it does not show the same warning every five seconds.
-          baselineModificationTime = latestModificationTime;
-          await onProjectFilesChanged();
+          if (latestModificationTime <= currentBaselineModificationTime) {
+            if (pendingDialogAbortController) {
+              // The disk is no longer ahead of the editor. Close the warning
+              // without acknowledging a modification that was reverted.
+              shouldAcknowledgePendingChanges = false;
+              pendingDialogAbortController.abort();
+            }
+            return;
+          }
+
+          const previousPendingModificationTime = latestPendingModificationTime;
+          latestPendingModificationTime =
+            typeof previousPendingModificationTime === 'number'
+              ? Math.max(
+                  previousPendingModificationTime,
+                  latestModificationTime
+                )
+              : latestModificationTime;
+          if (pendingDialogAbortController) {
+            // Keep the current dialog open while polling continues. Any newer
+            // disk version will be acknowledged if the user dismisses it.
+            return;
+          }
+
+          const dialogAbortController = new AbortController();
+          pendingDialogAbortController = dialogAbortController;
+          shouldAcknowledgePendingChanges = true;
+          (async () => {
+            try {
+              await onProjectFilesChanged(dialogAbortController.signal);
+            } catch (error) {
+              console.warn(
+                'Unable to handle local project files changes:',
+                error
+              );
+            } finally {
+              if (pendingDialogAbortController === dialogAbortController) {
+                const modificationTimeToAcknowledge = latestPendingModificationTime;
+                if (
+                  !isDisposed &&
+                  shouldAcknowledgePendingChanges &&
+                  typeof modificationTimeToAcknowledge === 'number'
+                ) {
+                  // A user dismissal acknowledges every disk version observed
+                  // while the dialog was open, avoiding duplicate warnings.
+                  baselineModificationTime = modificationTimeToAcknowledge;
+                }
+                pendingDialogAbortController = null;
+                latestPendingModificationTime = null;
+              }
+            }
+          })();
         } catch (error) {
           console.warn(
             'Unable to check local project files for changes:',
@@ -103,6 +157,9 @@ const useLocalProjectChangesWatcher = ({
 
       return () => {
         isDisposed = true;
+        if (pendingDialogAbortController) {
+          pendingDialogAbortController.abort();
+        }
         clearInterval(intervalId);
       };
     },

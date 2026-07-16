@@ -981,20 +981,7 @@ export const onAutoSaveStaticData = async (
 export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
   t`An error occurred when saving the project. Please try again by choosing another location.`;
 
-// See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
-const forbiddenCharacterRegex = /\\ | \/ | : | \* | \? | " | < | > | \|/g;
-const consecutiveSpacesRegex = /\s+/g;
-const cleanUpProjectFileName = (projectFileName: string) =>
-  (projectFileName.length > 200
-    ? projectFileName.substring(0, 200)
-    : projectFileName
-  )
-    .replace(forbiddenCharacterRegex, ' ')
-    .replace(consecutiveSpacesRegex, ' ')
-    .trim();
-
 export const getProjectLocation = ({
-  projectName,
   saveAsLocation,
   newProjectsDefaultFolder,
 }: {
@@ -1014,12 +1001,10 @@ export const getProjectLocation = ({
     : newProjectsDefaultFolder
     ? newProjectsDefaultFolder
     : '';
-  const projectFileName = 'project.settings';
-  const projectFolder = projectName
-    ? cleanUpProjectFileName(projectName)
-    : 'My project';
+  // The generated "My project XX" folder (or the folder chosen by the user)
+  // is already the project root.
   return {
-    fileIdentifier: path.join(outputPath, projectFolder, projectFileName),
+    fileIdentifier: path.join(outputPath, 'project.settings'),
   };
 };
 
@@ -1044,15 +1029,8 @@ export const renderNewProjectSaveAsLocationChooser = ({
       fullWidth
       value={path.dirname(projectLocation.fileIdentifier)}
       onChange={newOutputPath => {
-        const projectFolder = projectName
-          ? cleanUpProjectFileName(projectName)
-          : 'My project';
         setSaveAsLocation({
-          fileIdentifier: path.join(
-            newOutputPath,
-            projectFolder,
-            'project.settings'
-          ),
+          fileIdentifier: path.join(newOutputPath, 'project.settings'),
         });
       }}
       type="create-game"

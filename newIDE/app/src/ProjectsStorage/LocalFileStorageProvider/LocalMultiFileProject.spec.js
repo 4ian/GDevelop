@@ -911,14 +911,14 @@ describe('Local multi-file project storage', () => {
     ).toThrow();
   });
 
-  test('uses project.settings as the default local project entry', () => {
+  test('uses the generated folder as the local project root', () => {
     expect(
       getProjectLocation({
         projectName: 'My Game',
         saveAsLocation: null,
         newProjectsDefaultFolder: temporaryDirectory,
       }).fileIdentifier
-    ).toBe(path.join(temporaryDirectory, 'My Game', 'project.settings'));
+    ).toBe(path.join(temporaryDirectory, 'project.settings'));
   });
 
   test('writes the complete AI instruction catalog in .gdevelop', async () => {

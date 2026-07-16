@@ -3839,6 +3839,43 @@ describe('editorFunctions', () => {
       );
       expect(testScene.hasLayerNamed('Ground')).toBe(false);
     });
+
+    it('refuses to delete the base layer', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: '', delete_this_layer: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"The base layer (named \\"\\") cannot be deleted: every scene must keep it. Move or delete its instances instead."`
+      );
+      expect(testScene.hasLayerNamed('')).toBe(true);
+    });
+
+    it('refuses to rename the base layer', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: '', new_layer_name: 'Background' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"The base layer (named \\"\\") cannot be renamed. Create a new layer and move instances to it instead."`
+      );
+      expect(testScene.hasLayerNamed('')).toBe(true);
+      expect(testScene.hasLayerNamed('Background')).toBe(false);
+    });
   });
 
   describe('change_scene_properties_layers_effects_groups (layer effects)', () => {

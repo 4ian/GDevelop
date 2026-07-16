@@ -5997,6 +5997,16 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           'move_instances_to_layer'
         );
 
+        // The base layer must always exist: a scene without it is unable to run.
+        if (layerName === '' && (delete_this_layer || new_layer_name)) {
+          warnings.push(
+            delete_this_layer
+              ? `The base layer (named "") cannot be deleted: every scene must keep it. Move or delete its instances instead.`
+              : `The base layer (named "") cannot be renamed. Create a new layer and move instances to it instead.`
+          );
+          return;
+        }
+
         if (scene.hasLayerNamed(layerName)) {
           if (delete_this_layer) {
             if (move_instances_to_layer) {

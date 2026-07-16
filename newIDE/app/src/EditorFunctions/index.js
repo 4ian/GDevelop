@@ -549,12 +549,20 @@ const serializeNamedProperty = (
   name: string,
   property: gdPropertyDescriptor
 ): null | {} => {
+  const isEmptyFontResource =
+    property.getType().toLowerCase() === 'resource' &&
+    (property.getExtraInfo().toJSArray()[0] || '').toLowerCase() === 'font' &&
+    property.getValue() === '';
+
   return {
     name,
     ...serializeToJSObject(property),
     group: undefined,
     quickCustomizationVisibility: undefined,
     advanced: undefined,
+    ...(isEmptyFontResource
+      ? { hint: 'An empty font is valid: the default font is used.' }
+      : undefined),
   };
 };
 
@@ -810,7 +818,14 @@ const formatPropertiesList = (
       const choicesText = choices
         ? `one of: [${choices.map(c => `"${c}"`).join(', ')}]`
         : null;
-      const tag = [type, choicesText, unit].filter(Boolean).join(', ');
+      const resourceKind =
+        type === 'resource'
+          ? (property.getExtraInfo().toJSArray()[0] || '').toLowerCase()
+          : '';
+      const emptyFontNote =
+        resourceKind === 'font' ? ' — the default font is used' : '';
+      const tag =
+        [type, choicesText, unit].filter(Boolean).join(', ') + emptyFontNote;
       const list = emptyByType.get(tag) || [];
       list.push(name);
       emptyByType.set(tag, list);
@@ -1681,6 +1696,10 @@ const applyObjectPropertyChange = ({
   let sanitizedNewValue = sanitizePropertyNewValue(foundProperty, newValue);
 
   if (foundProperty.getType() === 'resource') {
+    const expectedResourceKind = (
+      foundProperty.getExtraInfo().toJSArray()[0] || ''
+    ).toLowerCase();
+
     if (!project.getResourcesManager().hasResource(sanitizedNewValue)) {
       // Resource names can contain backslashes (e.g. "assets\\Player.glb"):
       // tolerate a name given with the wrong slashes or casing, and suggest
@@ -1707,6 +1726,15 @@ const applyObjectPropertyChange = ({
               )
               .slice(0, 5)
           : [];
+        // Point to an import path that actually works for this resource kind:
+        // fonts and audio files never ship with asset store objects, so
+        // `create_or_replace_object` is a dead end for them.
+        const importGuidanceText =
+          expectedResourceKind === 'font'
+            ? `Fonts cannot be imported with the available tools. An empty "font" is valid (the default font is used); for a custom font, create a "BitmapText" object from the asset store instead.`
+            : expectedResourceKind === 'audio'
+            ? `Audio files cannot be imported with the available tools; an audio resource is automatically installed when generated events play a new sound/music file name.`
+            : `New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`;
         warnings.push(
           `"${foundPropertyName}" on "${object_name}" -> "${newValue}": resource "${sanitizedNewValue}" does not exist.${
             closeResourceNames.length > 0
@@ -1714,7 +1742,7 @@ const applyObjectPropertyChange = ({
                   .map(resourceName => `"${resourceName}"`)
                   .join(', ')}?`
               : ''
-          } New resources cannot be added just by name; use \`create_or_replace_object\` to import assets from the asset store (preserving properties/behaviors/events).`
+          } ${importGuidanceText}`
         );
         return;
       }
@@ -1724,8 +1752,6 @@ const applyObjectPropertyChange = ({
       .getResource(sanitizedNewValue);
 
     // Check the new resource is of the expected kind.
-    const extraInfos = foundProperty.getExtraInfo().toJSArray();
-    const expectedResourceKind = (extraInfos[0] || '').toLowerCase();
     if (
       expectedResourceKind &&
       resource.getKind().toLowerCase() !== expectedResourceKind

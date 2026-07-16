@@ -29,7 +29,10 @@ const Watcher = ({
   lastKnownModificationTime = 1000,
 }: {|
   enabled: boolean,
-  onProjectFilesChanged: (dismissSignal: AbortSignal) => Promise<void> | void,
+  onProjectFilesChanged: (
+    dismissSignal: AbortSignal,
+    dismissDialog: () => void
+  ) => Promise<void> | void,
   areProjectFilesSameAsMemory?: () => Promise<boolean>,
   lastKnownModificationTime?: number,
 |}) => {
@@ -271,5 +274,26 @@ describe('showLocalProjectFilesChangedDialog', () => {
         dismissOnAbortSignal: dismissController.signal,
       })
     );
+  });
+
+  it('dismisses the dialog before reloading the project', async () => {
+    const callOrder = [];
+    const dismissDialog: any = (jest.fn(() => {
+      callOrder.push('dismiss');
+    }): any);
+    const onReloadProject: any = (jest.fn(async () => {
+      callOrder.push('reload');
+    }): any);
+
+    await showLocalProjectFilesChangedDialog({
+      showConfirmation: (jest.fn(): any).mockResolvedValue(true),
+      onReloadProject,
+      onBackupProject: (jest.fn(): any),
+      dismissDialog,
+    });
+
+    expect(dismissDialog).toHaveBeenCalledTimes(1);
+    expect(onReloadProject).toHaveBeenCalledTimes(1);
+    expect(callOrder).toEqual(['dismiss', 'reload']);
   });
 });

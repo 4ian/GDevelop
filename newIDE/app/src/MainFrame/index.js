@@ -6298,6 +6298,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const dismissLocalProjectFilesChangedDialogRef = React.useRef<?() => void>(
+    null
+  );
   const reloadProjectInProgressRef = React.useRef<?Promise<void>>(null);
   const reloadProject = React.useCallback(
     async (options?: {
@@ -6307,6 +6310,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
       if (reloadProjectInProgressRef.current) {
+        if (dismissLocalProjectFilesChangedDialogRef.current) {
+          dismissLocalProjectFilesChangedDialogRef.current();
+        }
         return reloadProjectInProgressRef.current;
       }
 
@@ -6320,6 +6326,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           )
         );
         if (!answer) return;
+      }
+
+      // Every reload path comes through this function, including the
+      // reload_project MCP tool. Close an active disk-changes warning before
+      // replacing the in-memory project.
+      if (dismissLocalProjectFilesChangedDialogRef.current) {
+        dismissLocalProjectFilesChangedDialogRef.current();
       }
 
       const storageProviderName = getStorageProvider().internalName;
@@ -6372,7 +6385,20 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onLocalProjectFilesChanged = React.useCallback(
-    async (dismissSignal: AbortSignal): Promise<void> => {
+    async (
+      dismissSignal: AbortSignal,
+      dismissDialog: () => void
+    ): Promise<void> => {
+      const dismissTrackedDialog = () => {
+        dismissDialog();
+        if (
+          dismissLocalProjectFilesChangedDialogRef.current ===
+          dismissTrackedDialog
+        ) {
+          dismissLocalProjectFilesChangedDialogRef.current = null;
+        }
+      };
+      dismissLocalProjectFilesChangedDialogRef.current = dismissTrackedDialog;
       // If the file watcher fires just after a debugger/preview pop-out closed,
       // make sure a stale full-window blocker is gone before opening the dialog.
       healMainWindowAfterPopOutClose();
@@ -6383,8 +6409,15 @@ const MainFrame = (props: Props): React.MixedElement => {
             reloadProject({ skipUnsavedChangesConfirmation: true }),
           onBackupProject: backupCurrentProjectToLocalFolder,
           dismissSignal,
+          dismissDialog: dismissTrackedDialog,
         });
       } finally {
+        if (
+          dismissLocalProjectFilesChangedDialogRef.current ===
+          dismissTrackedDialog
+        ) {
+          dismissLocalProjectFilesChangedDialogRef.current = null;
+        }
         healMainWindowAfterPopOutClose();
       }
     },

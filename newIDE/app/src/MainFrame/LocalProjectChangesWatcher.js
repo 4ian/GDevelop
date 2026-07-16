@@ -11,7 +11,10 @@ type Props = {|
   fileIdentifier: ?string,
   lastKnownModificationTime: ?number,
   areProjectFilesSameAsMemory: () => Promise<boolean>,
-  onProjectFilesChanged: (dismissSignal: AbortSignal) => Promise<void> | void,
+  onProjectFilesChanged: (
+    dismissSignal: AbortSignal,
+    dismissDialog: () => void
+  ) => Promise<void> | void,
 |};
 
 export const showLocalProjectFilesChangedDialog = async ({
@@ -19,11 +22,13 @@ export const showLocalProjectFilesChangedDialog = async ({
   onReloadProject,
   onBackupProject,
   dismissSignal,
+  dismissDialog,
 }: {|
   showConfirmation: ShowConfirmFunction,
   onReloadProject: () => Promise<void>,
   onBackupProject: () => Promise<void>,
   dismissSignal?: AbortSignal,
+  dismissDialog?: () => void,
 |}): Promise<void> => {
   let shouldBackUpProject = false;
   const shouldReloadProject = await showConfirmation({
@@ -41,6 +46,9 @@ export const showLocalProjectFilesChangedDialog = async ({
   });
 
   if (shouldReloadProject) {
+    // Reloading makes this warning obsolete. Explicitly terminate its
+    // lifecycle now instead of waiting for another polling tick.
+    if (dismissDialog) dismissDialog();
     await onReloadProject();
   } else if (shouldBackUpProject) {
     await onBackupProject();
@@ -163,7 +171,8 @@ const useLocalProjectChangesWatcher = ({
           (async () => {
             try {
               await onProjectFilesChangedRef.current(
-                dialogAbortController.signal
+                dialogAbortController.signal,
+                () => dialogAbortController.abort()
               );
             } catch (error) {
               console.warn(

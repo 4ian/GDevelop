@@ -2246,18 +2246,15 @@ namespace gdjs {
             patchNegativeAxisHandlesOnTransformControlsGizmos(
               threeTransformControls
             );
-
-            threeTransformControls.rotation.order = 'ZYX';
+            threeTransformControls.getHelper().rotation.order = 'ZYX';
             const worldScale = this._currentScene
               ? this._currentScene.getRenderer3DWorldScale()
               : 1;
-            threeTransformControls.scale.set(
-              worldScale,
-              -worldScale,
-              worldScale
-            );
+            threeTransformControls
+              .getHelper()
+              .scale.set(worldScale, -worldScale, worldScale);
             threeTransformControls.mode = this._transformControlsMode;
-            threeTransformControls.traverse((obj) => {
+            threeTransformControls.getHelper().traverse((obj) => {
               // To be detected correctly by OutlinePass.
               // @ts-ignore
               obj.isTransformControls = true;
@@ -2274,7 +2271,7 @@ namespace gdjs {
             threeScene.add(dummyThreeObject);
 
             threeTransformControls.attach(dummyThreeObject);
-            threeScene.add(threeTransformControls);
+            threeScene.add(threeTransformControls.getHelper());
 
             // Keep track of the movement so the editor can apply it to the selection.
             let initialObjectX = 0;
@@ -2530,7 +2527,9 @@ namespace gdjs {
         return;
       }
       this._selectionControls.threeTransformControls.detach();
-      this._selectionControls.threeTransformControls.removeFromParent();
+      this._selectionControls.threeTransformControls
+        .getHelper()
+        .removeFromParent();
       this._selectionControls.dummyThreeObject.removeFromParent();
       this._editorGrid.setVisible(false);
       this._selectionControls = null;

@@ -25,14 +25,19 @@ const flushPromises = async () => {
 const Watcher = ({
   enabled,
   onProjectFilesChanged,
+  areProjectFilesSameAsMemory = async () => false,
+  lastKnownModificationTime = 1000,
 }: {|
   enabled: boolean,
   onProjectFilesChanged: (dismissSignal: AbortSignal) => Promise<void> | void,
+  areProjectFilesSameAsMemory?: () => Promise<boolean>,
+  lastKnownModificationTime?: number,
 |}) => {
   useLocalProjectChangesWatcher({
     enabled,
     fileIdentifier: 'C:\\game\\project.settings',
-    lastKnownModificationTime: 1000,
+    lastKnownModificationTime,
+    areProjectFilesSameAsMemory,
     onProjectFilesChanged,
   });
   return null;
@@ -94,7 +99,7 @@ describe('useLocalProjectChangesWatcher', () => {
     act(() => renderer.unmount());
   });
 
-  it('keeps polling while the dialog is open and closes it when the disk is no longer newer', async () => {
+  it('keeps polling and leaves the dialog open while the disk version is unacknowledged', async () => {
     let dialogDismissSignal: ?AbortSignal = null;
     const onProjectFilesChanged: any = (jest.fn(
       (dismissSignal: AbortSignal) => {
@@ -107,6 +112,9 @@ describe('useLocalProjectChangesWatcher', () => {
       }
     ): any);
     const modificationTimeMock: any = mockFn(getLocalProjectLastModifiedDate);
+    const areProjectFilesSameAsMemory: any = (jest.fn(): any).mockResolvedValue(
+      false
+    );
     modificationTimeMock
       .mockResolvedValueOnce(2000)
       .mockResolvedValueOnce(3000)
@@ -114,7 +122,11 @@ describe('useLocalProjectChangesWatcher', () => {
     let renderer;
     act(() => {
       renderer = TestRenderer.create(
-        <Watcher enabled onProjectFilesChanged={onProjectFilesChanged} />
+        <Watcher
+          enabled
+          areProjectFilesSameAsMemory={areProjectFilesSameAsMemory}
+          onProjectFilesChanged={onProjectFilesChanged}
+        />
       );
     });
 
@@ -129,12 +141,27 @@ describe('useLocalProjectChangesWatcher', () => {
     }
     expect(activeDialogDismissSignal.aborted).toBe(false);
 
+    const replacementOnProjectFilesChanged: any = (jest.fn(): any);
+    act(() => {
+      renderer.update(
+        <Watcher
+          enabled
+          areProjectFilesSameAsMemory={areProjectFilesSameAsMemory}
+          lastKnownModificationTime={3000}
+          onProjectFilesChanged={replacementOnProjectFilesChanged}
+        />
+      );
+    });
+    expect(activeDialogDismissSignal.aborted).toBe(false);
+
     await act(async () => {
       jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
       await flushPromises();
     });
     expect(getLocalProjectLastModifiedDate).toHaveBeenCalledTimes(2);
     expect(onProjectFilesChanged).toHaveBeenCalledTimes(1);
+    expect(replacementOnProjectFilesChanged).not.toHaveBeenCalled();
+    expect(areProjectFilesSameAsMemory).toHaveBeenCalledTimes(1);
     expect(activeDialogDismissSignal.aborted).toBe(false);
 
     await act(async () => {
@@ -143,8 +170,54 @@ describe('useLocalProjectChangesWatcher', () => {
     });
     expect(getLocalProjectLastModifiedDate).toHaveBeenCalledTimes(3);
     expect(onProjectFilesChanged).toHaveBeenCalledTimes(1);
-    expect(activeDialogDismissSignal.aborted).toBe(true);
+    expect(areProjectFilesSameAsMemory).toHaveBeenCalledTimes(2);
+    expect(activeDialogDismissSignal.aborted).toBe(false);
 
+    act(() => renderer.unmount());
+  });
+
+  it('closes the dialog when the disk files match the in-memory project', async () => {
+    let activeDialogDismissSignal: ?AbortSignal = null;
+    const onProjectFilesChanged: any = (jest.fn(
+      (dismissSignal: AbortSignal) => {
+        activeDialogDismissSignal = dismissSignal;
+        return new Promise(resolve => {
+          dismissSignal.addEventListener('abort', () => resolve(), {
+            once: true,
+          });
+        });
+      }
+    ): any);
+    mockFn(getLocalProjectLastModifiedDate).mockResolvedValue(2000);
+    const areProjectFilesSameAsMemory: any = (jest.fn(): any).mockResolvedValue(
+      true
+    );
+    let renderer;
+    act(() => {
+      renderer = TestRenderer.create(
+        <Watcher
+          enabled
+          areProjectFilesSameAsMemory={areProjectFilesSameAsMemory}
+          onProjectFilesChanged={onProjectFilesChanged}
+        />
+      );
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
+      await flushPromises();
+    });
+    const dismissSignal = activeDialogDismissSignal;
+    if (!dismissSignal) throw new Error('Expected a dialog signal.');
+    expect(dismissSignal.aborted).toBe(false);
+
+    await act(async () => {
+      jest.advanceTimersByTime(LOCAL_PROJECT_CHANGES_POLL_INTERVAL);
+      await flushPromises();
+    });
+
+    expect(areProjectFilesSameAsMemory).toHaveBeenCalledTimes(1);
+    expect(dismissSignal.aborted).toBe(true);
     act(() => renderer.unmount());
   });
 });

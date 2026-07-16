@@ -264,6 +264,9 @@ import useLocalProjectChangesWatcher, {
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
+import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import { areLegacyProjectsEquivalent } from '../ProjectsStorage/MultiFileProjectFormat';
+import { serializeToJSObject } from '../Utils/Serializer';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -6393,6 +6396,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  const areLocalProjectFilesSameAsMemory = React.useCallback(
+    async (): Promise<boolean> => {
+      if (!currentFileMetadata) return false;
+      const fileIdentifier = currentFileMetadata.fileIdentifier;
+      const project = currentProjectRef.current;
+      if (!project) return false;
+      const diskProject = await openMultiFileProject(fileIdentifier);
+      if (!isCurrentProjectFresh(currentProjectRef, project)) return false;
+
+      return areLegacyProjectsEquivalent(
+        serializeToJSObject(project, 'serializeTo'),
+        diskProject
+      );
+    },
+    [currentFileMetadata, currentProjectRef]
+  );
+
   useLocalProjectChangesWatcher({
     enabled:
       !!currentProject &&
@@ -6406,6 +6426,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     lastKnownModificationTime: currentFileMetadata
       ? currentFileMetadata.lastModifiedDate || null
       : null,
+    areProjectFilesSameAsMemory: areLocalProjectFilesSameAsMemory,
     onProjectFilesChanged: onLocalProjectFilesChanged,
   });
 

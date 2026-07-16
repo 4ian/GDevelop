@@ -1,0 +1,10 @@
+diff --git a/node_modules/@types/three/index.d.ts b/node_modules/@types/three/index.d.ts
+index 54ed635..ccba074 100644
+--- a/node_modules/@types/three/index.d.ts
++++ b/node_modules/@types/three/index.d.ts
+@@ -4,3 +4,4 @@
+ // and released in the @types/three npm package.
+ 
+ export * from "./src/Three";
++export as namespace THREE;
+\ No newline at end of file

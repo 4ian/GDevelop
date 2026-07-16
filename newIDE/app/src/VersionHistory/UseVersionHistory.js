@@ -461,6 +461,7 @@ const useVersionHistory = ({
           <Drawer
             open={versionHistoryPanelOpen}
             PaperProps={{
+              id: 'version-history-drawer-paper',
               style: styles.drawerContent,
               className: 'safe-area-aware-left-container',
             }}

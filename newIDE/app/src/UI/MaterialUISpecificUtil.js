@@ -95,6 +95,7 @@ export const blurActiveElementBeforeUiTransition = (): void => {
 
 const materialUiOverlayRootSelectors = [
   '.MuiModal-root',
+  '.MuiDrawer-modal',
   '.MuiPopover-root',
   '.MuiMenu-root',
   '.MuiDialog-root',
@@ -111,7 +112,10 @@ const materialUiOverlaySurfaceSelector = [
   '[role="menu"]',
   '[role="listbox"]',
 ].join(', ');
-const materialUiBackdropSelector = '.MuiBackdrop-root';
+const keepMountedTemporarySideMenuPaperSelector = [
+  '#project-manager-drawer-paper',
+  '#version-history-drawer-paper',
+].join(', ');
 
 const getElementClassName = (element: Element): string => {
   const className = (element: any).className;
@@ -160,6 +164,9 @@ const hasVisibleInteractiveOverlayContent = (element: Element): boolean => {
   }
   return false;
 };
+
+const isKeepMountedTemporarySideMenuOverlay = (element: Element): boolean =>
+  !!element.querySelector(keepMountedTemporarySideMenuPaperSelector);
 
 const removeElement = (element: Element): boolean => {
   if (!element.parentNode) return false;
@@ -244,7 +251,7 @@ const isMaterialUiOverlayLike = (element: Element): boolean => {
   }
 
   const className = getElementClassName(element);
-  return /\bMui(Modal|Popover|Menu|Dialog)-root\b|\bMuiBackdrop-root\b/.test(
+  return /\bMui(Modal|Popover|Menu|Dialog)-root\b|\bMuiDrawer-modal\b|\bMuiBackdrop-root\b/.test(
     className
   );
 };
@@ -282,11 +289,13 @@ const getMaterialUiOverlayRootAncestor = (element: Element): ?Element => {
  *  - `overflow: hidden` / `padding-right` left on `document.body` from the MUI
  *    scroll-lock.
  *
- * This function removes those leftovers. It only keeps overlay roots that have
- * real interactive content (Paper/dialog/menu/listbox). A backdrop by itself is
- * not a real open dialog; it is exactly the stale blocker that swallows input.
- * Body styles are cleared only when there is no real open modal left. Safe to
- * call on every popped-out-window close.
+ * This function removes those leftovers. It keeps real open overlays and the
+ * two hidden `keepMounted` temporary side-menu drawers that React must retain
+ * so they can be reopened. Other hidden Paper overlays can belong to a
+ * destroyed pop-out and are removed. A backdrop by itself is not a real open
+ * dialog; it is exactly the stale blocker that swallows input. Body styles are
+ * cleared only when there is no real open modal left. Safe to call on every
+ * popped-out-window close.
  */
 export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
   try {
@@ -303,16 +312,18 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       // (Paper/dialog/menu/listbox). A stale root left behind by a destroyed
       // popped-out window is often empty or backdrop-only. The backdrop is the
       // full-window element that swallows all mouse input.
-      const hasInteractiveContent = hasVisibleInteractiveOverlayContent(
+      const hasVisibleInteractiveContent = hasVisibleInteractiveOverlayContent(
         overlay
       );
-      const hasBackdrop = !!overlay.querySelector(materialUiBackdropSelector);
+      const isKeepMountedTemporarySideMenu = isKeepMountedTemporarySideMenuOverlay(
+        overlay
+      );
       const shouldRemove =
         !elementContainsActiveElement(overlay) &&
-        (isElementHiddenOrClosed(overlay) ||
-          !overlay.firstElementChild ||
-          !hasInteractiveContent ||
-          (hasBackdrop && !hasInteractiveContent));
+        (!overlay.firstElementChild ||
+          (!isKeepMountedTemporarySideMenu &&
+            (isElementHiddenOrClosed(overlay) ||
+              !hasVisibleInteractiveContent)));
 
       if (shouldRemove && removeElement(overlay)) {
         removedCount++;
@@ -327,6 +338,12 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       if (!isMaterialUiOverlayLike(element)) return;
       if (elementContainsActiveElement(element)) return;
       const overlayRoot = getMaterialUiOverlayRootAncestor(element);
+      // Keep-mounted side drawers must retain their backdrop even while
+      // closed. Removing it manually leaves React believing it is still
+      // mounted, so it will not be recreated on the next open.
+      if (overlayRoot && isKeepMountedTemporarySideMenuOverlay(overlayRoot)) {
+        return;
+      }
       if (
         overlayRoot &&
         overlayRoot !== element &&

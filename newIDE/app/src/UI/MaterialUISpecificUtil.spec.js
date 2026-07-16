@@ -108,6 +108,9 @@ class FakeElement {
       if (trimmedSelector.startsWith('.')) {
         return this.className.split(/\s+/).includes(trimmedSelector.slice(1));
       }
+      if (trimmedSelector.startsWith('#')) {
+        return this.getAttribute('id') === trimmedSelector.slice(1);
+      }
       if (trimmedSelector === '[aria-hidden="true"]') {
         return this.getAttribute('aria-hidden') === 'true';
       }
@@ -291,6 +294,129 @@ describe('MaterialUISpecificUtil', () => {
       expect(overlay.children).toContain(backdrop);
       expect(appRoot.getAttribute('aria-hidden')).toBe('true');
       expect(body.style.overflow).toBe('hidden');
+    } finally {
+      restoreDom();
+    }
+  });
+
+  test('keeps a hidden keep-mounted drawer attached so it can be reopened', () => {
+    const body = new FakeElement('body');
+    const appRoot = new FakeElement();
+    body.appendChild(appRoot);
+
+    const overlay = new FakeElement('MuiModal-root', {
+      rect: fullWindowRect,
+      style: {
+        ...fullWindowStyle,
+        visibility: 'hidden',
+      },
+    });
+    overlay.setAttribute('aria-hidden', 'true');
+    const backdrop = new FakeElement('MuiBackdrop-root', {
+      rect: fullWindowRect,
+      style: {
+        ...fullWindowStyle,
+        visibility: 'hidden',
+      },
+    });
+    const drawerPaper = new FakeElement('MuiPaper-root MuiDrawer-paper', {
+      rect: { left: 0, top: 0, width: 320, height: 800 },
+      style: {
+        display: 'block',
+        position: 'fixed',
+        visibility: 'hidden',
+      },
+    });
+    drawerPaper.setAttribute('id', 'project-manager-drawer-paper');
+    overlay.appendChild(backdrop);
+    overlay.appendChild(drawerPaper);
+    body.appendChild(overlay);
+
+    const restoreDom = installFakeDom(body);
+    try {
+      cleanupLeakedOverlaysAfterPopOutClose();
+
+      expect(body.children).toContain(overlay);
+      expect(overlay.children).toContain(drawerPaper);
+    } finally {
+      restoreDom();
+    }
+  });
+
+  test('keeps the backdrop of a keep-mounted MUI Drawer modal', () => {
+    const body = new FakeElement('body');
+    const appRoot = new FakeElement();
+    body.appendChild(appRoot);
+
+    const drawerRoot = new FakeElement('MuiDrawer-root MuiDrawer-modal', {
+      rect: fullWindowRect,
+      style: {
+        ...fullWindowStyle,
+        visibility: 'hidden',
+      },
+    });
+    drawerRoot.setAttribute('aria-hidden', 'true');
+    const backdrop = new FakeElement('MuiBackdrop-root', {
+      rect: fullWindowRect,
+      style: {
+        ...fullWindowStyle,
+        visibility: 'hidden',
+      },
+    });
+    const drawerPaper = new FakeElement('MuiPaper-root MuiDrawer-paper', {
+      rect: { left: 0, top: 0, width: 320, height: 800 },
+      style: {
+        display: 'block',
+        position: 'fixed',
+        visibility: 'hidden',
+      },
+    });
+    drawerPaper.setAttribute('id', 'version-history-drawer-paper');
+    drawerRoot.appendChild(backdrop);
+    drawerRoot.appendChild(drawerPaper);
+    body.appendChild(drawerRoot);
+
+    const restoreDom = installFakeDom(body);
+    try {
+      cleanupLeakedOverlaysAfterPopOutClose();
+
+      expect(body.children).toContain(drawerRoot);
+      expect(drawerRoot.children).toContain(backdrop);
+      expect(drawerRoot.children).toContain(drawerPaper);
+    } finally {
+      restoreDom();
+    }
+  });
+
+  test('removes a hidden Paper overlay that is not a live temporary side menu', () => {
+    const body = new FakeElement('body');
+    const appRoot = new FakeElement();
+    body.appendChild(appRoot);
+
+    const overlay = new FakeElement('MuiModal-root', {
+      rect: fullWindowRect,
+      style: {
+        ...fullWindowStyle,
+        visibility: 'hidden',
+      },
+    });
+    overlay.setAttribute('aria-hidden', 'true');
+    const stalePaper = new FakeElement('MuiPaper-root', {
+      rect: { left: 0, top: 0, width: 320, height: 800 },
+      style: {
+        display: 'block',
+        position: 'fixed',
+        visibility: 'hidden',
+      },
+    });
+    overlay.appendChild(stalePaper);
+    body.appendChild(overlay);
+
+    const restoreDom = installFakeDom(body);
+    try {
+      cleanupLeakedOverlaysAfterPopOutClose();
+
+      expect(body.children).not.toContain(overlay);
     } finally {
       restoreDom();
     }

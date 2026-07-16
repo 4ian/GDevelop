@@ -310,6 +310,7 @@ declare interface LayoutData extends InstanceContainerData {
   usedResources: ResourceReference[];
   resourcesPreloading?: 'at-startup' | 'never' | 'inherit';
   resourcesUnloading?: 'at-scene-exit' | 'never' | 'inherit';
+  renderer3DWorldScale: float;
   uiSettings: InstancesEditorSettings;
 }
 

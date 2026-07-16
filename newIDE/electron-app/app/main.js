@@ -602,6 +602,10 @@ app.on('ready', function() {
     mcpRendererRequestBroker.handleResponse(event.sender, response);
   });
 
+  ipcMain.on('mcp-renderer-progress', (event, response) => {
+    mcpRendererRequestBroker.handleProgress(event.sender, response);
+  });
+
   ipcMain.handle('mcp-server-get-state', async () =>
     serializeMcpServerState(getMcpServerState())
   );

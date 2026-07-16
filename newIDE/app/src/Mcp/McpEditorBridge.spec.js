@@ -455,11 +455,14 @@ runtimeScene._instances.length;
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {
+    const reportProgress = jest.fn();
     let currentProject: any = {
       getName: () => 'Before reload',
       getProjectFile: () => 'C:\\game\\project.settings',
     };
-    const reloadProjectAndWait: any = (jest.fn(async () => {
+    const reloadProjectAndWait: any = (jest.fn(async receivedReporter => {
+      expect(receivedReporter).toBe(reportProgress);
+      receivedReporter({ phase: 'editor-loading' });
       currentProject = {
         getName: () => 'After reload',
         getProjectFile: () => 'C:\\game\\project.settings',
@@ -488,11 +491,13 @@ runtimeScene._instances.length;
     const response = await bridge.handleRendererMcpRequest({
       method: 'tools/call',
       params: { name: 'reload_project', arguments: {} },
+      reportProgress,
     });
     const result = JSON.parse(response.content[0].text);
 
     expect(response.isError).not.toBe(true);
     expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
+    expect(reportProgress).toHaveBeenCalledWith({ phase: 'editor-loading' });
     expect(result).toEqual(
       expect.objectContaining({
         success: true,

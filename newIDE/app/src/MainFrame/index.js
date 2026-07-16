@@ -6212,12 +6212,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const reloadProjectInProgressRef = React.useRef<?Promise<void>>(null);
   const reloadProject = React.useCallback(
     async (options?: {
       skipUnsavedChangesConfirmation?: boolean,
       rethrowOpenError?: boolean,
     }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
+      if (reloadProjectInProgressRef.current) {
+        return reloadProjectInProgressRef.current;
+      }
 
       if (
         hasUnsavedChanges &&
@@ -6232,17 +6236,27 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
 
       const storageProviderName = getStorageProvider().internalName;
-      await openFromFileMetadataWithStorageProvider(
-        {
-          fileMetadata: currentFileMetadata,
-          storageProviderName,
-        },
-        {
-          ignoreUnsavedChanges: true,
-          ignoreAutoSave: true,
-          rethrowOpenError: !!(options && options.rethrowOpenError),
+      const reloadPromise = (async () => {
+        await openFromFileMetadataWithStorageProvider(
+          {
+            fileMetadata: currentFileMetadata,
+            storageProviderName,
+          },
+          {
+            ignoreUnsavedChanges: true,
+            ignoreAutoSave: true,
+            rethrowOpenError: !!(options && options.rethrowOpenError),
+          }
+        );
+      })();
+      reloadProjectInProgressRef.current = reloadPromise;
+      try {
+        await reloadPromise;
+      } finally {
+        if (reloadProjectInProgressRef.current === reloadPromise) {
+          reloadProjectInProgressRef.current = null;
         }
-      );
+      }
     },
     [
       currentProject,
@@ -7466,19 +7480,24 @@ const MainFrame = (props: Props): React.MixedElement => {
         },
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
-        reloadProjectAndWait: async () => {
+        reloadProjectAndWait: async reportProgress => {
           if (!currentFileMetadata) {
             return {
               reloaded: false,
               reason: 'The current project has no disk location.',
             };
           }
+          const reportReloadProgress = (phase: string) => {
+            if (reportProgress) reportProgress({ phase });
+          };
           const fileIdentifier = currentFileMetadata.fileIdentifier;
           const storageProviderName = getStorageProvider().internalName;
+          reportReloadProgress('editor-loading');
           await reloadProject({
             skipUnsavedChangesConfirmation: true,
             rethrowOpenError: true,
           });
+          reportReloadProgress('editor-loaded');
           const reloadedProject = currentProjectRef.current;
           const isLocalMultiFileProject =
             storageProviderName === localFileStorageProviderInternalName &&
@@ -7500,13 +7519,16 @@ const MainFrame = (props: Props): React.MixedElement => {
               'Unable to resolve the local project root for catalog regeneration.'
             );
           }
+          reportReloadProgress('extensions-loading');
           await eventsFunctionsExtensionsState.ensureLoadFinished(
             reloadedProject
           );
+          reportReloadProgress('catalogs-generating');
           const catalogs = await writeProjectSourceCatalogs(
             reloadedProject,
             projectRootPath
           );
+          reportReloadProgress('catalogs-complete');
           return {
             reloaded: true,
             fileIdentifier,
@@ -7597,12 +7619,27 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       const handleMcpRendererRequest = (event: any, request: any) => {
         const requestId = request && request.id;
+        const operationId = request && request.operationId;
+        const reportProgress = (progress: {| phase: string |}) => {
+          if (!operationId) return;
+          ipcRenderer.send('mcp-renderer-progress', {
+            id: requestId,
+            operationId,
+            progress: {
+              ...progress,
+              correlationId: operationId,
+            },
+          });
+        };
+        reportProgress({ phase: 'renderer-acknowledged' });
         mcpEditorBridgeRef.current
           .handleRendererMcpRequest({
             method: request && request.method,
             params: request && request.params,
+            reportProgress,
           })
           .then(result => {
+            reportProgress({ phase: 'receipt-persisting' });
             ipcRenderer.send('mcp-renderer-response', {
               id: requestId,
               result,

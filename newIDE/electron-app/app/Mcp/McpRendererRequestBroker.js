@@ -3,6 +3,7 @@ const DEFAULT_RELOAD_TIMEOUT_MS = 120000;
 const MINIMUM_REQUEST_TIMEOUT_MS = 1000;
 const MAXIMUM_REQUEST_TIMEOUT_MS = 600000;
 const RELOAD_OPERATION_RETENTION_MS = 5 * 60 * 1000;
+const RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
 
 const isReloadProjectRequest = request =>
   !!request &&
@@ -45,20 +46,51 @@ const makeRequestError = (message, data) => {
   return error;
 };
 
+const getRendererProcessId = webContents => {
+  if (!webContents || typeof webContents.getOSProcessId !== 'function') {
+    return null;
+  }
+  try {
+    return webContents.getOSProcessId();
+  } catch (error) {
+    return null;
+  }
+};
+
+const getReloadOperationMetadata = (
+  operation,
+  { attachedToExistingOperation, polledCompletedOperation } = {}
+) => ({
+  id: operation.operationId,
+  correlationId: operation.operationId,
+  status: operation.status,
+  phase: operation.phase,
+  phaseStartedAtMs: operation.phaseStartedAtMs,
+  lastProgressAtMs: operation.lastProgressAtMs,
+  startedAtMs: operation.startedAtMs,
+  completedAtMs: operation.completedAtMs,
+  retentionExpiresAtMs: operation.retentionExpiresAtMs,
+  rendererProcessId: operation.rendererProcessId,
+  rendererConnectionState: operation.rendererConnectionState,
+  rendererAcknowledged: operation.rendererAcknowledged,
+  projectLoadCompleted: operation.projectLoadCompleted,
+  catalogsGenerationStarted: operation.catalogsGenerationStarted,
+  catalogsGenerationCompleted: operation.catalogsGenerationCompleted,
+  receiptPersisting: operation.receiptPersisting,
+  attachedToExistingOperation: !!attachedToExistingOperation,
+  polledCompletedOperation: !!polledCompletedOperation,
+});
+
 const addReloadOperationMetadata = (
   result,
   operation,
   { attachedToExistingOperation, polledCompletedOperation }
 ) => {
   if (!result || typeof result !== 'object') return result;
-  const reloadOperation = {
-    id: operation.operationId,
-    status: operation.status,
-    startedAtMs: operation.startedAtMs,
-    completedAtMs: operation.completedAtMs,
+  const reloadOperation = getReloadOperationMetadata(operation, {
     attachedToExistingOperation,
     polledCompletedOperation,
-  };
+  });
   const structuredContent =
     result.structuredContent && typeof result.structuredContent === 'object'
       ? { ...result.structuredContent, reloadOperation }
@@ -90,6 +122,7 @@ const createMcpRendererRequestBroker = ({
   minimumRequestTimeoutMs = MINIMUM_REQUEST_TIMEOUT_MS,
   maximumRequestTimeoutMs = MAXIMUM_REQUEST_TIMEOUT_MS,
   reloadOperationRetentionMs = RELOAD_OPERATION_RETENTION_MS,
+  reloadOperationInactivityTimeoutMs = RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,
   now = () => Date.now(),
   setTimeoutFn = setTimeout,
   clearTimeoutFn = clearTimeout,
@@ -98,14 +131,35 @@ const createMcpRendererRequestBroker = ({
   let activeReloadOperation = null;
   const pendingRequests = new Map();
   const reloadOperations = new Map();
+  const expiredReloadOperations = new Map();
 
   const removeRetainedReloadOperation = operation => {
     if (reloadOperations.get(operation.operationId) === operation) {
       reloadOperations.delete(operation.operationId);
+      const expiredAtMs = now();
+      const tombstone = {
+        ...getReloadOperationMetadata(operation),
+        expiredAtMs,
+        expiryReason: 'retention-window-elapsed',
+      };
+      expiredReloadOperations.set(operation.operationId, tombstone);
+      const tombstoneTimeoutId = setTimeoutFn(() => {
+        if (expiredReloadOperations.get(operation.operationId) === tombstone) {
+          expiredReloadOperations.delete(operation.operationId);
+        }
+      }, reloadOperationRetentionMs);
+      if (
+        tombstoneTimeoutId &&
+        typeof tombstoneTimeoutId.unref === 'function'
+      ) {
+        tombstoneTimeoutId.unref();
+      }
     }
   };
 
   const retainCompletedReloadOperation = operation => {
+    operation.retentionExpiresAtMs =
+      operation.completedAtMs + reloadOperationRetentionMs;
     operation.retentionTimeoutId = setTimeoutFn(
       () => removeRetainedReloadOperation(operation),
       reloadOperationRetentionMs
@@ -118,22 +172,98 @@ const createMcpRendererRequestBroker = ({
     }
   };
 
+  const updateReloadOperationPhase = (operation, progress) => {
+    if (!operation.operationId || operation.status !== 'running') return;
+    const progressAtMs = now();
+    const nextPhase =
+      progress && typeof progress.phase === 'string' && progress.phase
+        ? progress.phase
+        : operation.phase;
+    if (nextPhase !== operation.phase) {
+      operation.phase = nextPhase;
+      operation.phaseStartedAtMs = progressAtMs;
+    }
+    operation.lastProgressAtMs = progressAtMs;
+    operation.rendererAcknowledged =
+      operation.rendererAcknowledged || nextPhase !== 'request-sent';
+    operation.projectLoadCompleted =
+      operation.projectLoadCompleted ||
+      nextPhase === 'editor-loaded' ||
+      nextPhase === 'extensions-loading' ||
+      nextPhase === 'catalogs-generating' ||
+      nextPhase === 'catalogs-complete' ||
+      nextPhase === 'receipt-persisting';
+    operation.catalogsGenerationStarted =
+      operation.catalogsGenerationStarted ||
+      nextPhase === 'catalogs-generating' ||
+      nextPhase === 'catalogs-complete' ||
+      nextPhase === 'receipt-persisting';
+    operation.catalogsGenerationCompleted =
+      operation.catalogsGenerationCompleted ||
+      nextPhase === 'catalogs-complete' ||
+      nextPhase === 'receipt-persisting';
+    operation.receiptPersisting =
+      operation.receiptPersisting || nextPhase === 'receipt-persisting';
+
+    if (operation.inactivityTimeoutId) {
+      clearTimeoutFn(operation.inactivityTimeoutId);
+    }
+    operation.inactivityTimeoutId = setTimeoutFn(() => {
+      if (operation.status !== 'running') return;
+      const error = makeRequestError(
+        `Reload operation ${
+          operation.operationId
+        } made no progress for ${reloadOperationInactivityTimeoutMs} ms while in phase ${
+          operation.phase
+        }.`,
+        {
+          code: 'MCP_RELOAD_OPERATION_STALLED',
+          timeoutMs: reloadOperationInactivityTimeoutMs,
+          operationId: operation.operationId,
+          operation_id: operation.operationId,
+        }
+      );
+      settleOperation(operation, null, error);
+    }, reloadOperationInactivityTimeoutMs);
+    if (
+      operation.inactivityTimeoutId &&
+      typeof operation.inactivityTimeoutId.unref === 'function'
+    ) {
+      operation.inactivityTimeoutId.unref();
+    }
+  };
+
   const settleOperation = (operation, result, error) => {
     pendingRequests.delete(operation.requestId);
     operation.completedAtMs = now();
+    if (operation.inactivityTimeoutId) {
+      clearTimeoutFn(operation.inactivityTimeoutId);
+      operation.inactivityTimeoutId = null;
+    }
     if (error) {
       operation.status = 'failed';
       operation.error = error;
-      operation.reject(error);
     } else {
       operation.status = 'completed';
+      operation.phase = 'completed';
+      operation.phaseStartedAtMs = operation.completedAtMs;
       operation.result = result;
-      operation.resolve(result);
     }
 
     if (operation.operationId) {
       if (activeReloadOperation === operation) activeReloadOperation = null;
       retainCompletedReloadOperation(operation);
+      if (error) {
+        error.data = {
+          ...(error.data && typeof error.data === 'object' ? error.data : {}),
+          reloadOperation: getReloadOperationMetadata(operation),
+        };
+      }
+    }
+    if (error) {
+      operation.reject(error);
+    } else {
+      operation.resolve(result);
     }
   };
 
@@ -146,6 +276,7 @@ const createMcpRendererRequestBroker = ({
     }
 
     const requestId = ++nextRequestId;
+    const startedAtMs = now();
     let resolve;
     let reject;
     const promise = new Promise((resolvePromise, rejectPromise) => {
@@ -160,11 +291,23 @@ const createMcpRendererRequestBroker = ({
         : null,
       webContents,
       status: 'running',
-      startedAtMs: now(),
+      startedAtMs,
+      phase: isReloadProjectRequest(request) ? 'request-sent' : null,
+      phaseStartedAtMs: startedAtMs,
+      lastProgressAtMs: startedAtMs,
       completedAtMs: null,
+      retentionExpiresAtMs: null,
+      rendererProcessId: getRendererProcessId(webContents),
+      rendererConnectionState: 'connected',
+      rendererAcknowledged: false,
+      projectLoadCompleted: false,
+      catalogsGenerationStarted: false,
+      catalogsGenerationCompleted: false,
+      receiptPersisting: false,
       result: null,
       error: null,
       retentionTimeoutId: null,
+      inactivityTimeoutId: null,
       promise,
       resolve,
       reject,
@@ -173,15 +316,22 @@ const createMcpRendererRequestBroker = ({
     if (operation.operationId) {
       reloadOperations.set(operation.operationId, operation);
       activeReloadOperation = operation;
+      updateReloadOperationPhase(operation, { phase: 'request-sent' });
     }
     try {
       webContents.send('mcp-renderer-request', {
         id: requestId,
+        operationId: operation.operationId,
         method: request.method,
         params: request.params,
       });
     } catch (error) {
       pendingRequests.delete(requestId);
+      if (operation.inactivityTimeoutId) {
+        clearTimeoutFn(operation.inactivityTimeoutId);
+        operation.inactivityTimeoutId = null;
+      }
+      operation.status = 'failed';
       if (operation.operationId) {
         reloadOperations.delete(operation.operationId);
         if (activeReloadOperation === operation) activeReloadOperation = null;
@@ -233,6 +383,12 @@ const createMcpRendererRequestBroker = ({
             operationId: operation.operationId,
             operation_id: operation.operationId,
             operationStatus: isReload ? operation.status : 'abandoned',
+            reloadOperation: isReload
+              ? getReloadOperationMetadata(operation, {
+                  attachedToExistingOperation,
+                  polledCompletedOperation,
+                })
+              : null,
             retry: isReload
               ? {
                   toolName: 'reload_project',
@@ -283,13 +439,34 @@ const createMcpRendererRequestBroker = ({
       if (requestedOperationId) {
         const operation = reloadOperations.get(requestedOperationId);
         const currentWebContents = getWebContents();
-        if (!operation || operation.webContents !== currentWebContents) {
+        if (!operation) {
+          const expiredOperation = expiredReloadOperations.get(
+            requestedOperationId
+          );
           throw makeRequestError(
             `Unknown or expired reload operation: ${requestedOperationId}.`,
             {
               code: 'MCP_RELOAD_OPERATION_NOT_FOUND',
               operationId: requestedOperationId,
               operation_id: requestedOperationId,
+              expiryReason: expiredOperation
+                ? expiredOperation.expiryReason
+                : 'operation-registry-unavailable-or-restarted',
+              lastKnownReloadOperation: expiredOperation || undefined,
+            }
+          );
+        }
+        if (
+          operation.status === 'running' &&
+          operation.webContents !== currentWebContents
+        ) {
+          throw makeRequestError(
+            `Reload operation ${requestedOperationId} belongs to a disconnected renderer.`,
+            {
+              code: 'MCP_RELOAD_RENDERER_DISCONNECTED',
+              operationId: requestedOperationId,
+              operation_id: requestedOperationId,
+              reloadOperation: getReloadOperationMetadata(operation),
             }
           );
         }
@@ -342,25 +519,37 @@ const createMcpRendererRequestBroker = ({
     return true;
   };
 
+  const handleProgress = (webContents, response) => {
+    const operation =
+      response && typeof response.id === 'number'
+        ? pendingRequests.get(response.id)
+        : null;
+    if (
+      !operation ||
+      !operation.operationId ||
+      operation.webContents !== webContents ||
+      (response.operationId && response.operationId !== operation.operationId)
+    ) {
+      return false;
+    }
+    updateReloadOperationPhase(operation, response.progress || {});
+    return true;
+  };
+
   const clearFor = webContents => {
-    const error = makeRequestError('The GDevelop editor window was closed.', {
-      code: 'MCP_EDITOR_WINDOW_CLOSED',
-    });
     for (const operation of pendingRequests.values()) {
       if (operation.webContents !== webContents) continue;
+      operation.rendererConnectionState = 'disconnected';
+      const error = makeRequestError('The GDevelop editor window was closed.', {
+        code: 'MCP_EDITOR_WINDOW_CLOSED',
+      });
       settleOperation(operation, null, error);
-    }
-    for (const operation of reloadOperations.values()) {
-      if (operation.webContents !== webContents) continue;
-      if (operation.retentionTimeoutId) {
-        clearTimeoutFn(operation.retentionTimeoutId);
-      }
-      removeRetainedReloadOperation(operation);
     }
   };
 
   return {
     send,
+    handleProgress,
     handleResponse,
     clearFor,
   };
@@ -371,5 +560,6 @@ module.exports = {
   DEFAULT_RELOAD_TIMEOUT_MS,
   MINIMUM_REQUEST_TIMEOUT_MS,
   MAXIMUM_REQUEST_TIMEOUT_MS,
+  RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,
   createMcpRendererRequestBroker,
 };

@@ -215,9 +215,15 @@ const getDefaultProcessEditorFunctionCalls = (): Function => {
     .processEditorFunctionCalls;
 };
 
+type McpRequestProgress = {|
+  phase: string,
+|};
+type McpRequestProgressReporter = McpRequestProgress => void;
+
 type RendererMcpRequest = {|
   method: string,
   params: any,
+  reportProgress?: McpRequestProgressReporter,
 |};
 
 type McpTextContent = {|
@@ -243,7 +249,10 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
-  reloadProjectAndWait?: () => Promise<any>,
+  reloadProjectAndWait?: (
+    reportProgress?: McpRequestProgressReporter
+  ) => Promise<any>,
+  reportProgress?: McpRequestProgressReporter,
   saveProjectAndWait?: () => Promise<any>,
   getPersistenceState?: () => {|
     hasUnsavedChanges: boolean,
@@ -5639,7 +5648,7 @@ const callMcpTool = async ({
       ? context.getPersistenceState()
       : null;
     try {
-      const reloadResult = await reloadProjectAndWait();
+      const reloadResult = await reloadProjectAndWait(context.reportProgress);
       if (reloadResult && reloadResult.reloaded === false) {
         return errorResult(
           reloadResult.reason || 'The project could not be reloaded from disk.',
@@ -7283,6 +7292,7 @@ export const createMcpEditorBridge = (
     handleRendererMcpRequest: async ({
       method,
       params,
+      reportProgress,
     }: RendererMcpRequest): Promise<any> => {
       const permissions = deferredContext.getPermissions();
 
@@ -7330,7 +7340,9 @@ export const createMcpEditorBridge = (
               params.arguments && typeof params.arguments === 'object'
                 ? params.arguments
                 : {},
-            context: deferredContext,
+            context: reportProgress
+              ? { ...deferredContext, reportProgress }
+              : deferredContext,
           });
         } catch (error) {
           return errorResult(

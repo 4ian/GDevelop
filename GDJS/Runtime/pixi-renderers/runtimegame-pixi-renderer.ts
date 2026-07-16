@@ -116,7 +116,6 @@ namespace gdjs {
         this._threeRenderer.shadowMap.enabled = true;
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this._threeRenderer.autoClear = false;
-        this._threeRenderer.pixelRatio = window.devicePixelRatio;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()

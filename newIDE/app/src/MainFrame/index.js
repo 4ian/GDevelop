@@ -413,6 +413,7 @@ export type Props = {|
   useCliCommandRunner: ({|
     project: ?gdProject,
     i18n: I18n,
+    fileIdentifier: ?string,
     commandPaletteRef: {| current: ?CommandPaletteInterface |},
     importExtension: ImportExtension,
     onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -5278,6 +5279,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   useCliCommandRunner({
     project: state.currentProject,
     i18n,
+    fileIdentifier,
     commandPaletteRef,
     importExtension,
     onWillInstallExtension,

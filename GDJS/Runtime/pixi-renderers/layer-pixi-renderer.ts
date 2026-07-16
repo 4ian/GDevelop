@@ -1356,7 +1356,7 @@ namespace gdjs {
         // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
         // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
         // This works because PixiJS and Three.js are using the same WebGL context.
-        const texture = threeRenderer.properties.get(this._threePlaneTexture);
+        const texture: any = threeRenderer.properties.get(this._threePlaneTexture);
         texture.__webglTexture = glTexture.texture;
       }
     }

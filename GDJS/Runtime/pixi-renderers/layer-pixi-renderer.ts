@@ -438,12 +438,7 @@ namespace gdjs {
               new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
             );
             if (game.getAntialiasingMode() !== 'none') {
-              this._threeEffectComposer.addPass(
-                new THREE_ADDONS.SMAAPass(
-                  game.getGameResolutionWidth(),
-                  game.getGameResolutionHeight()
-                )
-              );
+              this._threeEffectComposer.addPass(new THREE_ADDONS.SMAAPass());
             }
             this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
           }

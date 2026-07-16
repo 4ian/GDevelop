@@ -44,6 +44,16 @@ export default [
           'three': 'THREE',
         },
       },
+      {
+        name: 'THREE_ADDONS',
+        format: 'umd',
+        file: '../../GDJS/Runtime/pixi-renderers/ThreeAddons.js',
+        sourcemap: false,
+        plugins: [],
+        globals: {
+          'three': 'THREE',
+        },
+      },
     ],
   	external: ['three'],
     plugins: [

@@ -1664,6 +1664,31 @@ describe('editorFunctions', () => {
         'false'
       );
     });
+
+    it('redirects when the behavior has no properties at all (capability behaviors)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'Scale',
+            changed_properties: [
+              { property_name: 'X', new_value: '4' },
+              { property_name: 'Y', new_value: '4' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('No editable properties exist here');
+      // The explanation is given only once, even with several unknown properties.
+      expect(
+        (result.message || '').split('No editable properties exist here')
+          .length - 1
+      ).toBe(1);
+    });
   });
 
   describe('read_scene_events', () => {
@@ -4685,6 +4710,23 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('not on');
+    });
+
+    it('explains when a behavior has no properties at all (capability behaviors)', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.inspect_behavior_properties.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            object_name: 'MySprite',
+            behavior_name: 'Scale',
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.properties).toEqual([]);
+      expect(result.message).toContain('No editable properties exist here');
     });
   });
 

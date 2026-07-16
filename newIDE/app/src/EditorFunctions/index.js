@@ -558,16 +558,27 @@ const serializeNamedProperty = (
   };
 };
 
+// Having no property at all is expected for capability behaviors: explain and
+// redirect instead of listing nothing, so callers stop re-inspecting or
+// guessing property names from actions/expressions.
+const noEditablePropertiesText =
+  "No editable properties exist here. This is expected for capability behaviors (Scale, Opacity, Flippable, Resizable, Effect...): they are only used through their actions, conditions and expressions in events — never guess property names from those. An object's default size, scale or opacity is set on each placed instance, or with actions in events.";
+
 // List the (visible) property names so a "property not found" warning lets
-// the caller immediately pick the right name instead of guessing again.
-// Emitted at most once per call: if a previous warning already lists the
-// properties (e.g. several unknown properties in the same call), returns "".
+// the caller immediately pick the right name instead of guessing again. If no
+// property exists at all, explain that instead.
+// Emitted at most once per call: if a previous warning already includes this
+// text (e.g. several unknown properties in the same call), returns "".
 const getAvailablePropertyNamesText = (
   properties: gdMapStringPropertyDescriptor | null,
   existingWarnings: Array<string>
 ): string => {
   if (
-    existingWarnings.some(warning => warning.includes('Available properties:'))
+    existingWarnings.some(
+      warning =>
+        warning.includes('Available properties:') ||
+        warning.includes(noEditablePropertiesText)
+    )
   )
     return '';
   if (!properties) return '';
@@ -575,7 +586,7 @@ const getAvailablePropertyNamesText = (
     .keys()
     .toJSArray()
     .filter(name => !shouldHideProperty(properties.get(name)));
-  if (names.length === 0) return '';
+  if (names.length === 0) return ` ${noEditablePropertiesText}`;
   const maxCount = 25;
   return ` Available properties: ${names.slice(0, maxCount).join(', ')}${
     names.length > maxCount ? `, … (${names.length - maxCount} more)` : ''
@@ -2598,7 +2609,7 @@ const inspectBehaviorProperties: EditorFunction = {
       .getAllBehaviorSharedDataNames()
       .toJSArray();
 
-    let sharedProperties = undefined;
+    let sharedProperties: Array<{}> | void = undefined;
     if (allBehaviorSharedDataNames.includes(behavior_name)) {
       const behaviorSharedData = layout.getBehaviorSharedData(behavior_name);
       const behaviorSharedDataProperties = behaviorSharedData.getProperties();
@@ -2616,11 +2627,16 @@ const inspectBehaviorProperties: EditorFunction = {
         .filter(Boolean);
     }
 
+    const hasNoPropertyAtAll =
+      properties.length === 0 &&
+      (!sharedProperties || sharedProperties.length === 0);
+
     return {
       success: true,
       behaviorName: behavior_name,
       properties: properties,
       sharedProperties,
+      message: hasNoPropertyAtAll ? noEditablePropertiesText : undefined,
     };
   },
   modifiesProject: false,

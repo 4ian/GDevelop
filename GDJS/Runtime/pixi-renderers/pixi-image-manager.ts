@@ -55,7 +55,7 @@ namespace gdjs {
     /**
      * Map associating a resource name to the loaded Three.js texture.
      */
-    private _loadedThreeTextures: Hashtable<THREE.Texture>;
+    private _loadedThreeTextures: Hashtable<THREE.Texture<HTMLImageElement>>;
     private _loadedThreeMaterials = new ThreeMaterialCache();
     private _loadedThreeCubeTextures = new Map<string, THREE.CubeTexture>();
     private _loadedThreeCubeTextureKeysByResourceName = new ArrayMap<
@@ -186,7 +186,7 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture {
+    getThreeTexture(resourceName: string): THREE.Texture<HTMLImageElement> {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
@@ -567,7 +567,7 @@ namespace gdjs {
     dispose(): void {
       this._loadedTextures.clear();
 
-      const threeTextures: THREE.Texture[] = [];
+      const threeTextures: Array<THREE.Texture<HTMLImageElement>> = [];
       this._loadedThreeTextures.values(threeTextures);
       this._loadedThreeTextures.clear();
       for (const threeTexture of threeTextures) {

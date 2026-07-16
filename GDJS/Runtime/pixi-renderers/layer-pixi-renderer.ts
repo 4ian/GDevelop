@@ -401,11 +401,6 @@ namespace gdjs {
           }
 
           this._threeScene = new THREE.Scene();
-
-          // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-          // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-          this._threeScene.scale.y = -1;
-
           this._threeGroup = new THREE.Group();
           this._threeScene.add(this._threeGroup);
 
@@ -419,19 +414,17 @@ namespace gdjs {
               -width / 2,
               width / 2,
               height / 2,
-              -height / 2,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              -height / 2
             );
           } else {
             this._threeCamera = new THREE.PerspectiveCamera(
               this._layer.getInitialCamera3DFieldOfView(),
-              1,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              1
             );
           }
           this._threeCamera.rotation.order = 'ZYX';
+
+          this.updateWorldScale();
 
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
@@ -828,25 +821,52 @@ namespace gdjs {
       return [cx, cy];
     }
 
+    updateWorldScale(): void {
+      if (!this._threeScene || !this._threeCamera) {
+        return;
+      }
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+      this._threeScene.scale.set(
+        inverseWorldScale,
+        -inverseWorldScale,
+        inverseWorldScale
+      );
+
+      this._threeCamera.near =
+        this._layer.getInitialCamera3DNearPlaneDistance() * inverseWorldScale;
+      this._threeCamera.far =
+        this._layer.getInitialCamera3DFarPlaneDistance() * inverseWorldScale;
+    }
+
     updatePosition(): void {
       const instanceContainer = this._layer.getInstanceContainer();
       const runtimeGame = instanceContainer.getGame();
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
 
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
         const angle = -gdjs.toRad(this._layer.getCameraRotation());
-        this._threeCamera.position.x = this._layer.getCameraX();
-        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
+        this._threeCamera.position.x =
+          this._layer.getCameraX() * inverseWorldScale;
+        // The scene is mirrored on Y
+        this._threeCamera.position.y =
+          -this._layer.getCameraY() * inverseWorldScale;
         this._threeCamera.rotation.z = angle;
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
           this._threeCamera.zoom = this._layer.getCameraZoom();
           this._threeCamera.updateProjectionMatrix();
-          this._threeCamera.position.z = this._layer.getCameraZ(null);
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(null) * inverseWorldScale;
         } else {
-          this._threeCamera.position.z = this._layer.getCameraZ(
-            this._threeCamera.fov
-          );
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(this._threeCamera.fov) * inverseWorldScale;
         }
       }
 

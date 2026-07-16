@@ -54,6 +54,7 @@ describe('SaveState', () => {
     name: name,
     stopSoundsOnStartup: false,
     title: '',
+    renderer3DWorldScale: 100,
     behaviorsSharedData: [],
     objects: objects || [
       // @ts-ignore - This is a gdjs.SpriteObjectData.

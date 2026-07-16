@@ -2248,7 +2248,14 @@ namespace gdjs {
             );
 
             threeTransformControls.rotation.order = 'ZYX';
-            threeTransformControls.scale.y = -1;
+            const worldScale = this._currentScene
+              ? this._currentScene.getRenderer3DWorldScale()
+              : 1;
+            threeTransformControls.scale.set(
+              worldScale,
+              -worldScale,
+              worldScale
+            );
             threeTransformControls.mode = this._transformControlsMode;
             threeTransformControls.traverse((obj) => {
               // To be detected correctly by OutlinePass.
@@ -5036,7 +5043,6 @@ namespace gdjs {
       // of the BoxHelper is always (0, 0, 0) and the geometry is hard to manipulate.
       this.container = new THREE.Group();
       this.container.rotation.order = 'ZYX';
-      this.container.scale.y = -1;
       this.boxHelper = new THREE.BoxHelper(threeObject, '#f2a63c');
       this.boxHelper.rotation.order = 'ZYX';
       this.boxHelper.material.depthTest = false;
@@ -5045,6 +5051,10 @@ namespace gdjs {
     }
 
     update() {
+      const worldScale = this.object
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      this.container.scale.set(worldScale, -worldScale, worldScale);
       if (this.dummyObject3DForObject2D) {
         this.dummyObject3DForObject2D.position.set(
           this.object.getCenterXInScene(),

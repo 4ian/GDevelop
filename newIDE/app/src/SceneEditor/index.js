@@ -1822,6 +1822,27 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _sendSetRenderer3DWorldScale = () => {
+    this.forceUpdatePropertiesEditor();
+    this.forceUpdateLayersList();
+    const { previewDebuggerServer, layout } = this.props;
+    if (!layout) {
+      return;
+    }
+    if (previewDebuggerServer) {
+      previewDebuggerServer
+        .getExistingEmbeddedGameFrameDebuggerIds()
+        .forEach(debuggerId => {
+          previewDebuggerServer.sendMessage(debuggerId, {
+            command: 'setRenderer3DWorldScale',
+            payload: {
+              renderer3DWorldScale: [layout.getRenderer3DWorldScale()],
+            },
+          });
+        });
+    }
+  };
+
   _onLayersModified = (hasAnyEffectBeenAdded: boolean) => {
     const { onEffectAdded } = this.props;
     if (hasAnyEffectBeenAdded) {
@@ -3095,6 +3116,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onLayerRenamed={this._onLayerRenamed}
                     onLayersModified={() => this._onLayersModified(false)}
                     onBackgroundColorChanged={this._sendSetBackgroundColor}
+                    onRenderer3DWorldScaleFieldChanged={
+                      this._sendSetRenderer3DWorldScale
+                    }
                     onLayersVisibilityInEditorChanged={
                       this._onLayersVisibilityInEditorChanged
                     }

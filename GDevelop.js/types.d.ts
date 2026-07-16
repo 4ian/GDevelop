@@ -900,6 +900,8 @@ export class Layout extends EmscriptenObject {
   getResourcesPreloading(): string;
   setResourcesUnloading(resourcesUnloading: string): void;
   getResourcesUnloading(): string;
+  setRenderer3DWorldScale(value: number): void;
+  getRenderer3DWorldScale(): number;
 }
 
 export class ExternalEvents extends EmscriptenObject {

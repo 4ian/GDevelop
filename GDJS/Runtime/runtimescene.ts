@@ -61,6 +61,9 @@ namespace gdjs {
      */
     networkId: string | null = null;
 
+    private _renderer3DWorldScale: float = 100;
+    private _renderer3DInverseWorldScale: float = 0.01;
+
     /**
      * @param runtimeGame The game associated to this scene.
      */
@@ -156,6 +159,7 @@ namespace gdjs {
       }
       this._name = sceneData.name;
       this._resourcesUnloading = sceneData.resourcesUnloading || 'inherit';
+      this.setRenderer3DWorldScale(sceneData.renderer3DWorldScale);
       this.setBackgroundColor(sceneData.r, sceneData.v, sceneData.b);
 
       //Load layers
@@ -953,6 +957,26 @@ namespace gdjs {
         this.networkId = newNetworkId;
       }
       return this.networkId;
+    }
+
+    setRenderer3DWorldScale(worldScale: float): void {
+      const value = Math.abs(worldScale) || 100;
+      this._renderer3DWorldScale = value;
+      this._renderer3DInverseWorldScale = 1 / value;
+
+      for (const layer of this._orderedLayers) {
+        const layerRenderer = layer.getRenderer();
+        layerRenderer.updateWorldScale();
+        layerRenderer.updatePosition();
+      }
+    }
+
+    getRenderer3DWorldScale(): float {
+      return this._renderer3DWorldScale;
+    }
+
+    getRenderer3DInverseWorldScale(): float {
+      return this._renderer3DInverseWorldScale;
     }
   }
 

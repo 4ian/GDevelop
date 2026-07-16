@@ -830,6 +830,7 @@ namespace gdjs {
         newLayoutData.v,
         newLayoutData.b
       );
+      runtimeScene.setRenderer3DWorldScale(newLayoutData.renderer3DWorldScale);
       if (oldLayoutData.title !== newLayoutData.title) {
         runtimeScene
           .getGame()

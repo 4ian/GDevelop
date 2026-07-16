@@ -352,6 +352,27 @@ namespace gdjs {
               }
             }
           }
+        } else if (data.command === 'setRenderer3DWorldScale') {
+          if (inGameEditor) {
+            const editedInstanceContainer =
+              inGameEditor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              const renderer3DWorldScale = data.payload.renderer3DWorldScale;
+              if (
+                renderer3DWorldScale &&
+                editedInstanceContainer instanceof gdjs.RuntimeScene
+              ) {
+                const sceneData = runtimeGame.getSceneData(
+                  editedInstanceContainer.getScene().getName()
+                );
+                if (sceneData) {
+                  editedInstanceContainer.setRenderer3DWorldScale(
+                    renderer3DWorldScale
+                  );
+                }
+              }
+            }
+          }
         } else if (data.command === 'hotReloadAllInstances') {
           if (inGameEditor) {
             const editedInstanceContainer =

@@ -501,7 +501,7 @@ headers are generated. For example:
 
 ```toml
 [sceneVariables]
-Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [  ] } ] } ] } ]
+Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [ ] } ] } ] } ]
 ```
 
 Primitive variables use the same rule:
@@ -627,7 +627,8 @@ Writers use TOML 1.0 with these restrictions:
 - Tables and array-of-tables are emitted in schema order.
 - Variable containers are emitted only as `[variables]`, `[globalVariables]`,
   or `[sceneVariables]` tables. Each named descriptor value and its nested
-  descriptor objects are emitted as a one-line inline array/table.
+  descriptor objects are emitted as a one-line inline array/table. These
+  variable-definition tables are emitted after all other component content.
 - Object groups are emitted only as `[objectGroups]` tables whose values are
   arrays of object-name strings. Their optional serialized
   `requiredBehaviors` metadata is emitted in the parallel

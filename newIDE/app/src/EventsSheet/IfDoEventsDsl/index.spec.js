@@ -503,6 +503,56 @@ describe('IfDo events DSL', () => {
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
+    test('writes JavaScript event metadata directly on @js', () => {
+      const input = JSON.stringify([
+        {
+          type: 'BuiltinCommonInstructions::JsCode',
+          disabled: true,
+          folded: true,
+          aiGeneratedEventId: 'generated-javascript',
+          inlineCode: 'runtimeScene.resetTimer("MoveTick");',
+          parameterObjects: '',
+          useStrict: true,
+          eventsSheetExpanded: false,
+        },
+      ]);
+
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+
+      expect(dsl).toMatch(
+        /^@js disabled=true folded=true aiGeneratedEventId="generated-javascript" strict=true expanded=false$/m
+      );
+      expect(dsl).not.toMatch(/^@event(?:\s|$)/m);
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
+    });
+
+    test('does not add @event before a nested JavaScript event', () => {
+      const input = JSON.stringify([
+        standard({
+          conditions: [instruction('CompareTimer')],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              inlineCode: 'runtimeScene.resetTimer("MoveTick");',
+              parameterObjects: '',
+              useStrict: true,
+              eventsSheetExpanded: false,
+            },
+          ],
+        }),
+      ]);
+
+      const dsl = convertLegacyEventsJsonToIfDo(input);
+
+      expect(dsl).toContain('> @js strict=true expanded=false');
+      expect(dsl).not.toContain('> @event\n> @js');
+      expect(
+        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
+      ).toBe(true);
+    });
+
     test('preserves structural expressions, names, and comment whitespace', () => {
       const input = JSON.stringify([
         {
@@ -640,14 +690,29 @@ event
     });
 
     test('uses @js and @end js directives', () => {
-      const events = parseIfDoEvents(`@js objects="Enemy" strict=true expanded=false
+      const events = parseIfDoEvents(`@js disabled=true folded=true aiGeneratedEventId="generated-javascript" objects="Enemy" strict=true expanded=false
 const value = 1;
 @end js
 `);
       expect(events[0]).toMatchObject({
         type: 'BuiltinCommonInstructions::JsCode',
+        disabled: true,
+        folded: true,
+        aiGeneratedEventId: 'generated-javascript',
         inlineCode: 'const value = 1;',
         parameterObjects: 'Enemy',
+        useStrict: true,
+      });
+      const legacyAnnotatedEvents = parseIfDoEvents(`@event disabled=true aiGeneratedEventId="legacy-javascript"
+@js strict=true
+code();
+@end js
+`);
+      expect(legacyAnnotatedEvents[0]).toMatchObject({
+        type: 'BuiltinCommonInstructions::JsCode',
+        disabled: true,
+        aiGeneratedEventId: 'legacy-javascript',
+        inlineCode: 'code();',
         useStrict: true,
       });
       expect(() => parseIfDoEvents('js\ncode();\n@end js\n')).toThrow(

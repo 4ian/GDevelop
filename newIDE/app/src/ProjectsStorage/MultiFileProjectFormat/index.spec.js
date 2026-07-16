@@ -739,6 +739,56 @@ column2 = "ssfssdfsf"
     ).toBe(true);
   });
 
+  test('writes empty Sprite point arrays compactly and variables last', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Board',
+        type: 'Sprite',
+        variables: [],
+        behaviors: [],
+        animations: [
+          {
+            name: '',
+            directions: [
+              {
+                looping: false,
+                timeBetweenFrames: 0.1,
+                sprites: [
+                  {
+                    image: 'board.svg',
+                    originPoint: { name: 'origine', x: 0, y: 0 },
+                    centerPoint: {
+                      name: 'centre',
+                      x: 0,
+                      y: 0,
+                      automatic: true,
+                    },
+                    points: [],
+                    hasCustomCollisionMask: false,
+                    customCollisionMask: [],
+                  },
+                ],
+              },
+            ],
+            useMultipleDirections: false,
+          },
+        ],
+      },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const source = files['game://scenes/Main/objects/Board.settings'];
+
+    expect(source).toContain('points = [ ]');
+    expect(source).toContain('customCollisionMask = [ ]');
+    expect(source).not.toContain('[  ]');
+    expect(source.trimEnd().endsWith('[variables]')).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
   test('rejects namespaced serialized folder trees without compatibility', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://extensions/Combat/extension.settings'] += `

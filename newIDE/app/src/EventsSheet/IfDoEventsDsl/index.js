@@ -200,7 +200,15 @@ export const IFDO_EVENTS_DSL_COVERAGE = Object.freeze({
       'parameters',
     ],
     while: ['infiniteLoopWarning'],
-    js: ['objects', 'strict', 'expanded', 'delimiter'],
+    js: [
+      'disabled',
+      'folded',
+      'aiGeneratedEventId',
+      'objects',
+      'strict',
+      'expanded',
+      'delimiter',
+    ],
   },
 });
 
@@ -577,7 +585,17 @@ const splitPhysicalLines = (source: string): Array<PhysicalLine> => {
 const readJavaScriptDelimiter = (header: string, line: number): string => {
   const args = parseNamedArguments(header.slice('@js'.length));
   Object.keys(args).forEach(key => {
-    if (!['objects', 'strict', 'expanded', 'delimiter'].includes(key)) {
+    if (
+      ![
+        'disabled',
+        'folded',
+        'aiGeneratedEventId',
+        'objects',
+        'strict',
+        'expanded',
+        'delimiter',
+      ].includes(key)
+    ) {
       fail('IFDO_SYNTAX', `Unknown js argument ${key}.`, line);
     }
   });
@@ -1148,6 +1166,9 @@ class IfDoParser {
         assertMetadata(
           args,
           {
+            disabled: 'boolean',
+            folded: 'boolean',
+            aiGeneratedEventId: 'string',
             objects: 'string',
             strict: 'boolean',
             expanded: 'boolean',
@@ -1157,10 +1178,10 @@ class IfDoParser {
           line.line
         );
         current = {
-          ...commonEvent(
-            this.options.jsCodeEventType || EVENT_TYPES.js,
-            pendingEventMetadata
-          ),
+          ...commonEvent(this.options.jsCodeEventType || EVENT_TYPES.js, {
+            ...pendingEventMetadata,
+            ...args,
+          }),
           inlineCode: line.jsBody,
           parameterObjects: args.objects == null ? '' : String(args.objects),
           useStrict: !!args.strict,
@@ -2162,7 +2183,8 @@ const formatEvents = (
     if (eventIndex) lines.push('');
     if (
       event.type !== EVENT_TYPES.group &&
-      event.type !== EVENT_TYPES.comment
+      event.type !== EVENT_TYPES.comment &&
+      event.type !== EVENT_TYPES.js
     ) {
       lines.push(
         `${depthPrefix(depth)}${formatMetadata('@event', eventMetadata(event))}`
@@ -2375,6 +2397,7 @@ const formatEvents = (
       const delimiter = chooseJavaScriptDelimiter(event.inlineCode, depth);
       lines.push(
         `${depthPrefix(depth)}${formatMetadata('@js', {
+          ...eventMetadata(event),
           ...(event.parameterObjects
             ? { objects: event.parameterObjects }
             : {}),

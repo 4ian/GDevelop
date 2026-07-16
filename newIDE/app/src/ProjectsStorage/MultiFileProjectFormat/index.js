@@ -937,6 +937,7 @@ const stringifyInlineTomlKey = key =>
 
 const stringifyInlineTomlValue = value => {
   if (Array.isArray(value)) {
+    if (value.length === 0) return '[ ]';
     return `[ ${value.map(stringifyInlineTomlValue).join(', ')} ]`;
   }
   if (value && typeof value === 'object') {
@@ -981,18 +982,14 @@ const serializeToml = object => {
   // generated line at column zero avoids presentation-only whitespace churn.
   const serializable = clone(object);
   const inlineValues = new Map();
-  const variableTablePlaceholders = new Map();
+  const variableTables = [];
   let tokenIndex = 0;
   const serializedInput = canonicalJson(serializable);
   const reserveUniqueToken = category => {
     let token;
     do {
       token = `__GDEVELOP_${category}_${tokenIndex++}__`;
-    } while (
-      serializedInput.includes(token) ||
-      inlineValues.has(token) ||
-      variableTablePlaceholders.has(token)
-    );
+    } while (serializedInput.includes(token) || inlineValues.has(token));
     return token;
   };
   const reserveInlineValue = value => {
@@ -1009,19 +1006,18 @@ const serializeToml = object => {
       Array.isArray(variablesByName)
     )
       return;
-    const placeholder = reserveUniqueToken('VARIABLE_TABLE');
-    variableTablePlaceholders.set(
-      placeholder,
-      Object.keys(variablesByName)
+    variableTables.push({
+      key,
+      assignments: Object.keys(variablesByName)
         .map(
           variableName =>
             `${stringifyInlineTomlKey(
               variableName
             )} = ${stringifyInlineTomlValue(variablesByName[variableName])}`
         )
-        .join('\n')
-    );
-    serializable[key] = { [placeholder]: placeholder };
+        .join('\n'),
+    });
+    delete serializable[key];
   });
   const reservePointValues = value => {
     if (!value || typeof value !== 'object') return;
@@ -1048,12 +1044,19 @@ const serializeToml = object => {
       inlineValue
     );
   });
-  variableTablePlaceholders.forEach((assignments, placeholder) => {
-    expandedOutput = expandedOutput.replace(
-      `${placeholder} = ${stringifyToml.value(placeholder)}`,
-      assignments
-    );
-  });
+  // Keep variable containers last so array-of-table fields such as Sprite
+  // animations do not move an otherwise unchanged [variables] section.
+  expandedOutput = [
+    expandedOutput.trimEnd(),
+    ...variableTables.map(
+      ({ key, assignments }) =>
+        `[${stringifyInlineTomlKey(key)}]${
+          assignments ? `\n${assignments}` : ''
+        }`
+    ),
+  ]
+    .filter(Boolean)
+    .join('\n\n');
   return `${expandedOutput.trimEnd()}\n`;
 };
 

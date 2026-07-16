@@ -2141,9 +2141,11 @@ At a given depth:
 - `function` is valid only as an explicitly enabled standalone shorthand and
   never in a canonical project file or nested statement.
 - `@event`, `@instruction`, and `@while` attach typed round-trip metadata to
-  the next compatible construct. `@comment` and `@group` are complete event
-  statements rather than pending annotations; their `disabled`, `folded`, and
-  `aiGeneratedEventId` fields belong directly on the same statement.
+  the next compatible construct. `@comment`, `@group`, and `@js` are complete
+  event statements rather than pending annotations; their `disabled`,
+  `folded`, and `aiGeneratedEventId` fields belong directly on the same
+  statement. The parser still accepts a legacy `@event` annotation before
+  `@js`, but canonical serialization consolidates it onto `@js`.
 
 ### Stage 4: Bind metadata and validate owners
 
@@ -3608,15 +3610,16 @@ uses the current external-first behavior with the generic form.
 ### 33.6 JavaScript
 
 ```events
-@js objects=Enemy strict=true expanded=false
+@js disabled=true aiGeneratedEventId="generated-javascript" objects=Enemy strict=true expanded=false
 // source preserved verbatim
 @end js
 ```
 
 maps to `inlineCode`, `parameterObjects`, `useStrict`, and
-`eventsSheetExpanded`. The body preserves all bytes after newline
-normalization. `objects=` accepts the one object/object-group expression
-supported by the current event. Omitting flags uses current defaults.
+`eventsSheetExpanded`, with common event metadata stored on the `@js` header.
+The body preserves all bytes after newline normalization. `objects=` accepts
+the one object/object-group expression supported by the current event.
+Omitting flags uses current defaults.
 
 ---
 

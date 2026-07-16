@@ -263,6 +263,7 @@ import useLocalProjectChangesWatcher, {
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -1713,7 +1714,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const closeProject = React.useCallback(
-    async (): Promise<void> => {
+    async (options?: {|
+      reportProgress?: (phase: string) => void,
+    |}): Promise<void> => {
+      const reportProgress = (phase: string) => {
+        if (options && options.reportProgress) {
+          options.reportProgress(phase);
+        }
+      };
+      reportProgress('old-project-closing-previews');
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
 
@@ -1740,6 +1749,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!currentProject) return;
 
       // Close the editors related to this project.
+      reportProgress('old-project-state-clearing');
       await setState(state => ({
         ...state,
         currentProject: null,
@@ -1747,17 +1757,21 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      reportProgress('old-project-state-cleared');
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
       console.info('Deleting project from memory...');
       // Wait for any in-progress load to complete before unloading, otherwise the
       // pending load would re-add the old project's extensions after we remove them.
+      reportProgress('old-extensions-waiting');
       await eventsFunctionsExtensionsState.ensureLoadFinished(currentProject);
+      reportProgress('old-extensions-unloading');
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
       currentProject.delete();
+      reportProgress('old-project-deleted');
       sealUnsavedChanges();
       console.info('Project closed.');
 
@@ -1783,7 +1797,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const loadFromProject = React.useCallback(
-    async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
+    async (
+      project: gdProject,
+      fileMetadata: ?FileMetadata,
+      reportProgress?: (phase: string) => void
+    ): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
         ? // $FlowFixMe[incompatible-type]
           updateFileMetadataWithOpenedProject(fileMetadata, project)
@@ -1808,7 +1826,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
 
-      await closeProject();
+      await closeProject({ reportProgress });
 
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
@@ -1830,12 +1848,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
         project
       );
+      if (reportProgress) reportProgress('new-extensions-started');
 
+      if (reportProgress) reportProgress('new-project-state-publishing');
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: updatedFileMetadata,
       }));
+      if (reportProgress) reportProgress('new-project-state-published');
 
       if (updatedFileMetadata) {
         const storageProvider = getStorageProvider();
@@ -1851,6 +1872,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         //   to this base URL and which will be converted to full URLs.
         // ...
         // See `ResourceFetcher` for all the cases.
+        if (reportProgress) reportProgress('resources-loading');
         await ensureResourcesAreFetched(() => ({
           project,
           fileMetadata: updatedFileMetadata,
@@ -1858,6 +1880,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           storageProviderOperations,
           authenticatedUser,
         }));
+        if (reportProgress) reportProgress('resources-loaded');
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
@@ -1911,15 +1934,18 @@ const MainFrame = (props: Props): React.MixedElement => {
   const loadFromSerializedProject = React.useCallback(
     (
       serializedProject: gdSerializerElement,
-      fileMetadata: ?FileMetadata
+      fileMetadata: ?FileMetadata,
+      reportProgress?: (phase: string) => void
     ): Promise<State> => {
+      if (reportProgress) reportProgress('project-unserializing');
       const startTime = Date.now();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
       newProject.unserializeFrom(serializedProject);
+      if (reportProgress) reportProgress('project-unserialized');
       const duration = Date.now() - startTime;
       console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 
-      return loadFromProject(newProject, fileMetadata);
+      return loadFromProject(newProject, fileMetadata, reportProgress);
     },
     [loadFromProject]
   );
@@ -1940,6 +1966,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         ignoreAutoSave?: boolean,
         suppressOpenErrorAlert?: boolean,
         doNotTrackAsProjectOpened?: boolean,
+        reportProgress?: (phase: string) => void,
       |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -2029,11 +2056,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         let openingError: Error | null = null;
         try {
           const autoSaveFileMetadata = await checkForAutosave();
+          if (options && options.reportProgress) {
+            options.reportProgress('disk-reading');
+          }
           const result = await onOpen(
             autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
+          if (options && options.reportProgress) {
+            options.reportProgress('disk-read');
+          }
           if (result.fileMetadata) {
             effectiveFileMetadata = result.fileMetadata;
           }
@@ -2068,7 +2101,8 @@ const MainFrame = (props: Props): React.MixedElement => {
             serializedProject,
             // Autosaves keep the originally requested metadata. A storage adapter may
             // explicitly redirect a migrated legacy project to project.settings.
-            effectiveFileMetadata
+            effectiveFileMetadata,
+            options && options.reportProgress
           );
           return state;
         } finally {
@@ -5523,6 +5557,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         openingMessage?: ?MessageDescriptor,
         suppressOpenErrorAlert?: boolean,
         rethrowOpenError?: boolean,
+        reportProgress?: (phase: string) => void,
       |}
     ): Promise<void> => {
       if (hasUnsavedChanges && !(options && options.ignoreUnsavedChanges)) {
@@ -5549,6 +5584,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         ignoreAutoSave: (options && options.ignoreAutoSave) || false,
         suppressOpenErrorAlert:
           (options && options.suppressOpenErrorAlert) || false,
+        reportProgress: options && options.reportProgress,
       })
         .then(state => {
           if (state) {
@@ -6255,6 +6291,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     async (options?: {
       skipUnsavedChangesConfirmation?: boolean,
       rethrowOpenError?: boolean,
+      reportProgress?: (phase: string) => void,
     }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
       if (reloadProjectInProgressRef.current) {
@@ -6284,6 +6321,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             ignoreUnsavedChanges: true,
             ignoreAutoSave: true,
             rethrowOpenError: !!(options && options.rethrowOpenError),
+            reportProgress: options && options.reportProgress,
           }
         );
       })();
@@ -7543,10 +7581,11 @@ const MainFrame = (props: Props): React.MixedElement => {
           };
           const fileIdentifier = currentFileMetadata.fileIdentifier;
           const storageProviderName = getStorageProvider().internalName;
-          reportReloadProgress('editor-loading');
+          reportReloadProgress('reload-requested');
           await reloadProject({
             skipUnsavedChangesConfirmation: true,
             rethrowOpenError: true,
+            reportProgress: reportReloadProgress,
           });
           reportReloadProgress('editor-loaded');
           const reloadedProject = currentProjectRef.current;
@@ -7577,8 +7616,31 @@ const MainFrame = (props: Props): React.MixedElement => {
           reportReloadProgress('catalogs-generating');
           const catalogs = await writeProjectSourceCatalogs(
             reloadedProject,
-            projectRootPath
+            projectRootPath,
+            { reportProgress: reportReloadProgress }
           );
+          reportReloadProgress('catalogs-modification-time-reading');
+          const lastModifiedDate = await getLocalProjectLastModifiedDate(
+            reloadedProject.getProjectFile()
+          );
+          if (lastModifiedDate !== null) {
+            await setState(state => {
+              if (
+                state.currentProject !== reloadedProject ||
+                !state.currentFileMetadata
+              ) {
+                return state;
+              }
+              return {
+                ...state,
+                currentFileMetadata: {
+                  ...state.currentFileMetadata,
+                  lastModifiedDate,
+                },
+              };
+            });
+          }
+          reportReloadProgress('catalogs-modification-time-acknowledged');
           reportReloadProgress('catalogs-complete');
           return {
             reloaded: true,
@@ -7644,6 +7706,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       reloadProject,
       currentFileMetadata,
       getStorageProvider,
+      setState,
       eventsFunctionsExtensionsState,
       getPreviewLaunchStateForMcp,
       launchPreviewForScene,

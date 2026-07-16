@@ -64,6 +64,8 @@ import {
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
+const crypto = optionalRequire('crypto');
+const gd: libGDevelop = global.gd;
 
 export const GENERATED_LEGACY_PROJECT_RELATIVE_PATH = '.gdevelop/game.json';
 const remote = optionalRequire('@electron/remote');
@@ -175,53 +177,207 @@ const writeAndCheckFormattedJSONFile = async (
   await writeAndCheckFile(content, filePath);
 };
 
+// Source catalogs are small generated artifacts that are written from the
+// renderer immediately after a project reload. Keep these writes synchronous:
+// an async fs.ensureDir/fs.writeFile callback that is starved or never delivered
+// leaves the whole reload promise pending even though the renderer remains
+// otherwise responsive. Synchronous, atomic temp-file replacement either
+// completes or throws at the exact artifact subphase, so reload_project can
+// never be left waiting on an unobservable libuv filesystem callback.
+const checkFileContentSync = (filePath: string, expectedContent: string) => {
+  const time = performance.now();
+  const content = fs.readFileSync(filePath, { encoding: 'utf8' });
+  if (content === '') {
+    throw new Error(`Written file is empty, did the write fail?`);
+  }
+  if (content !== expectedContent) {
+    throw new Error(
+      `Written file is not containing the expected content, did the write fail?`
+    );
+  }
+  const verificationTime = performance.now() - time;
+  console.info(
+    `Verified ${filePath} content synchronously in ${verificationTime.toFixed()}ms.`
+  );
+};
+
+const writeAndCheckGeneratedFileSync = (
+  content: string,
+  filePath: string
+): void => {
+  if (!fs) throw new Error('Filesystem is not supported.');
+  if (content === '')
+    throw new Error('The content to save on disk is empty. Aborting.');
+
+  fs.ensureDirSync(path.dirname(filePath));
+  const temporaryPath = `${filePath}.tmp-${Date.now()}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
+  try {
+    fs.writeFileSync(temporaryPath, content);
+    checkFileContentSync(temporaryPath, content);
+    fs.moveSync(temporaryPath, filePath, { overwrite: true });
+    checkFileContentSync(filePath, content);
+  } finally {
+    if (fs.pathExistsSync(temporaryPath)) {
+      fs.removeSync(temporaryPath);
+    }
+  }
+};
+
+type ProjectSourceCatalogWriteOptions = {|
+  reportProgress?: (phase: string) => void,
+  instructionCatalog?: Object,
+  deprecatedInstructionCatalog?: Object,
+|};
+
+export class ProjectSourceCatalogGenerationError extends Error {
+  code: string;
+  catalogPhase: string;
+  catalogArtifact: ?string;
+
+  constructor(catalogPhase: string, error: Error) {
+    const artifactMatch = /^catalog-(.+)-(?:building|built|writing|written)$/.exec(
+      catalogPhase
+    );
+    super(
+      `Project source catalog generation failed in subphase "${catalogPhase}": ${
+        error && error.message ? error.message : String(error)
+      }`
+    );
+    this.name = 'ProjectSourceCatalogGenerationError';
+    this.code = 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED';
+    this.catalogPhase = catalogPhase;
+    this.catalogArtifact = catalogPhase.startsWith('catalog-project-serializ')
+      ? 'project-serialization'
+      : artifactMatch
+      ? artifactMatch[1]
+      : null;
+  }
+}
+
+const reportCatalogProgress = (
+  options: ?ProjectSourceCatalogWriteOptions,
+  phase: string
+) => {
+  if (options && options.reportProgress) options.reportProgress(phase);
+};
+
+let cachedInstructionCatalogs: ?{|
+  key: string,
+  instructionCatalog: Object,
+  deprecatedInstructionCatalog: Object,
+|} = null;
+
+const getInstructionCatalogCacheKey = (
+  project: gdProject,
+  serializedProject: Object
+): string => {
+  const platformExtensionNames = [];
+  const platformExtensions = gd
+    .asPlatform(gd.JsPlatform.get())
+    .getAllPlatformExtensions();
+  for (let index = 0; index < platformExtensions.size(); index++) {
+    platformExtensionNames.push(platformExtensions.at(index).getName());
+  }
+  platformExtensionNames.sort();
+  const properties = serializedProject.properties || {};
+  const signatureSource = JSON.stringify({
+    coreVersion: gd.VersionWrapper.fullString(),
+    initialGDVersion: serializedProject.initialGDVersion || '',
+    currentPlatform: properties.currentPlatform || '',
+    projectName: project.getName(),
+    projectUuid: project.getProjectUuid(),
+    platformExtensionNames,
+    eventsFunctionsExtensions:
+      serializedProject.eventsFunctionsExtensions || [],
+  });
+  return crypto
+    ? crypto
+        .createHash('sha256')
+        .update(signatureSource)
+        .digest('hex')
+    : signatureSource;
+};
+
 export const writeProjectInstructionCatalog = async (
   project: gdProject,
-  projectPath: string
+  projectPath: string,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
-  const catalog = buildProjectInstructionCatalog(project);
+  let catalog;
+  if (options && options.instructionCatalog) {
+    reportCatalogProgress(options, 'catalog-instructions-cache-hit');
+    catalog = options.instructionCatalog;
+  } else {
+    reportCatalogProgress(options, 'catalog-instructions-building');
+    catalog = buildProjectInstructionCatalog(project);
+    reportCatalogProgress(options, 'catalog-instructions-built');
+  }
   const catalogPath = path.join(
     projectPath,
     ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   );
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-instructions-writing');
+  writeAndCheckGeneratedFileSync(
     serializeProjectInstructionCatalog(catalog),
     catalogPath
   );
+  reportCatalogProgress(options, 'catalog-instructions-written');
   return catalog;
 };
 
 const writeProjectDeprecatedInstructionCatalog = async (
   project: gdProject,
-  projectPath: string
+  projectPath: string,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
-  const catalog = buildProjectDeprecatedInstructionCatalog(project);
+  let catalog;
+  if (options && options.deprecatedInstructionCatalog) {
+    reportCatalogProgress(options, 'catalog-deprecated-instructions-cache-hit');
+    catalog = options.deprecatedInstructionCatalog;
+  } else {
+    reportCatalogProgress(options, 'catalog-deprecated-instructions-building');
+    catalog = buildProjectDeprecatedInstructionCatalog(
+      project,
+      undefined,
+      options && options.instructionCatalog
+    );
+    reportCatalogProgress(options, 'catalog-deprecated-instructions-built');
+  }
   const catalogPath = path.join(
     projectPath,
     ...PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   );
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-deprecated-instructions-writing');
+  writeAndCheckGeneratedFileSync(
     serializeProjectInstructionCatalog(catalog),
     catalogPath
   );
+  reportCatalogProgress(options, 'catalog-deprecated-instructions-written');
   return catalog;
 };
 
 export const writeProjectSettingsCatalog = async (
   project: gdProject,
   projectPath: string,
-  serializedProjectObject?: Object
+  serializedProjectObject?: Object,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
+  reportCatalogProgress(options, 'catalog-settings-building');
   const serializedProject =
     serializedProjectObject || serializeToJSObject(project, 'serializeTo');
   const catalog = buildProjectSettingsCatalog({
     project,
     serializedProject,
   });
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-settings-built');
+  reportCatalogProgress(options, 'catalog-settings-writing');
+  writeAndCheckGeneratedFileSync(
     serializeProjectSettingsCatalog(catalog),
     path.join(projectPath, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/'))
   );
+  reportCatalogProgress(options, 'catalog-settings-written');
   return catalog;
 };
 
@@ -230,8 +386,10 @@ export const writeProjectLayoutCatalog = async (
   projectPath: string,
   serializedProjectObject?: Object,
   effectTypes?: Array<Object>,
-  behaviorTypes?: Array<Object>
+  behaviorTypes?: Array<Object>,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
+  reportCatalogProgress(options, 'catalog-layout-building');
   const serializedProject =
     serializedProjectObject || serializeToJSObject(project, 'serializeTo');
   const catalog = buildProjectLayoutCatalog({
@@ -240,29 +398,39 @@ export const writeProjectLayoutCatalog = async (
     effectTypes,
     behaviorTypes,
   });
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-layout-built');
+  reportCatalogProgress(options, 'catalog-layout-writing');
+  writeAndCheckGeneratedFileSync(
     serializeProjectLayoutCatalog(catalog),
     path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
   );
+  reportCatalogProgress(options, 'catalog-layout-written');
   return catalog;
 };
 
 export const writeProjectJavaScriptAuthoringApi = async (
   project: gdProject,
   projectPath: string,
-  serializedProjectObject?: Object
+  serializedProjectObject?: Object,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
+  reportCatalogProgress(options, 'catalog-javascript-api-building');
   const serializedProject =
     serializedProjectObject || serializeToJSObject(project, 'serializeTo');
   const artifacts = buildJavaScriptAuthoringArtifacts(serializedProject);
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-javascript-api-built');
+  reportCatalogProgress(options, 'catalog-runtime-api-writing');
+  writeAndCheckGeneratedFileSync(
     artifacts.runtimeApi,
     path.join(projectPath, ...PROJECT_RUNTIME_API_RELATIVE_PATH.split('/'))
   );
-  await writeAndCheckFile(
+  reportCatalogProgress(options, 'catalog-runtime-api-written');
+  reportCatalogProgress(options, 'catalog-project-api-writing');
+  writeAndCheckGeneratedFileSync(
     artifacts.projectApi,
     path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
   );
+  reportCatalogProgress(options, 'catalog-project-api-written');
   return {
     counts: artifacts.counts,
     hashes: artifacts.hashes,
@@ -271,38 +439,94 @@ export const writeProjectJavaScriptAuthoringApi = async (
 
 export const writeProjectSourceCatalogs = async (
   project: gdProject,
-  projectPath: string
+  projectPath: string,
+  options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
-  const serializedProject = serializeToJSObject(project, 'serializeTo');
-  const instructionCatalog = await writeProjectInstructionCatalog(
-    project,
-    projectPath
-  );
-  await writeProjectDeprecatedInstructionCatalog(project, projectPath);
-  const settingsCatalog = await writeProjectSettingsCatalog(
-    project,
-    projectPath,
-    serializedProject
-  );
-  const layoutCatalog = await writeProjectLayoutCatalog(
-    project,
-    projectPath,
-    serializedProject,
-    settingsCatalog.effectTypes,
-    settingsCatalog.behaviorTypes
-  );
-  const javascriptApi = await writeProjectJavaScriptAuthoringApi(
-    project,
-    projectPath,
-    serializedProject
-  );
-
-  return {
-    instructions: instructionCatalog.counts,
-    settings: settingsCatalog.counts,
-    layouts: layoutCatalog.counts,
-    javascript: javascriptApi,
+  let lastPhase = 'catalog-project-serializing';
+  const trackedOptions = {
+    reportProgress: phase => {
+      lastPhase = phase;
+      reportCatalogProgress(options, phase);
+    },
   };
+  try {
+    reportCatalogProgress(trackedOptions, 'catalog-project-serializing');
+    const serializedProject = serializeToJSObject(project, 'serializeTo');
+    reportCatalogProgress(trackedOptions, 'catalog-project-serialized');
+    reportCatalogProgress(
+      trackedOptions,
+      'catalog-instruction-signature-building'
+    );
+    const instructionCatalogCacheKey = getInstructionCatalogCacheKey(
+      project,
+      serializedProject
+    );
+    reportCatalogProgress(
+      trackedOptions,
+      'catalog-instruction-signature-built'
+    );
+    const cachedCatalogs =
+      cachedInstructionCatalogs &&
+      cachedInstructionCatalogs.key === instructionCatalogCacheKey
+        ? cachedInstructionCatalogs
+        : null;
+    const instructionCatalog = await writeProjectInstructionCatalog(
+      project,
+      projectPath,
+      {
+        ...trackedOptions,
+        instructionCatalog: cachedCatalogs
+          ? cachedCatalogs.instructionCatalog
+          : undefined,
+      }
+    );
+    const deprecatedInstructionCatalog = await writeProjectDeprecatedInstructionCatalog(
+      project,
+      projectPath,
+      {
+        ...trackedOptions,
+        instructionCatalog,
+        deprecatedInstructionCatalog: cachedCatalogs
+          ? cachedCatalogs.deprecatedInstructionCatalog
+          : undefined,
+      }
+    );
+    cachedInstructionCatalogs = {
+      key: instructionCatalogCacheKey,
+      instructionCatalog,
+      deprecatedInstructionCatalog,
+    };
+    const settingsCatalog = await writeProjectSettingsCatalog(
+      project,
+      projectPath,
+      serializedProject,
+      trackedOptions
+    );
+    const layoutCatalog = await writeProjectLayoutCatalog(
+      project,
+      projectPath,
+      serializedProject,
+      settingsCatalog.effectTypes,
+      settingsCatalog.behaviorTypes,
+      trackedOptions
+    );
+    const javascriptApi = await writeProjectJavaScriptAuthoringApi(
+      project,
+      projectPath,
+      serializedProject,
+      trackedOptions
+    );
+
+    return {
+      instructions: instructionCatalog.counts,
+      settings: settingsCatalog.counts,
+      layouts: layoutCatalog.counts,
+      javascript: javascriptApi,
+    };
+  } catch (error) {
+    if (error instanceof ProjectSourceCatalogGenerationError) throw error;
+    throw new ProjectSourceCatalogGenerationError(lastPhase, error);
+  }
 };
 
 const writeProjectFiles = async ({

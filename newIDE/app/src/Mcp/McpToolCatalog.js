@@ -51,6 +51,12 @@ const noInputSchema = {
 const reloadProjectSchema = {
   type: 'object',
   properties: {
+    mode: {
+      type: 'string',
+      enum: ['wait', 'start', 'status'],
+      description:
+        'wait (default) starts or attaches and waits for completion. start starts or attaches but returns the operation_id and current phase immediately. status never starts a reload and returns an immediate snapshot; omit operation_id to discover the active or latest retained operation after a caller interruption.',
+    },
     timeout_ms: {
       type: 'number',
       minimum: 1000,
@@ -61,7 +67,7 @@ const reloadProjectSchema = {
     operation_id: {
       type: 'string',
       description:
-        'Optional reload operation ID returned by a previous timeout. Reattaches to the running operation or returns its retained completed receipt without starting another reload.',
+        'Optional reload operation ID returned by start mode, a previous timeout, or status discovery. Reattaches to the running operation or returns its retained terminal receipt without starting another reload.',
     },
   },
   additionalProperties: false,
@@ -4246,7 +4252,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. Reload waits default to 120 seconds and can be configured with timeout_ms. A timed-out reload keeps running and returns an operation_id in the JSON-RPC error data; call reload_project with that operation_id to attach or poll without starting a duplicate reload. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
+      'Reload the current project from its disk files and regenerate all catalogs plus public JavaScript declarations. This discards stale or unsaved in-memory editor changes. Use mode:"start" to receive the operation_id and current phase immediately, then mode:"status" for non-blocking progress; status without an operation_id discovers the active/latest operation after caller interruption. The default mode:"wait" waits up to timeout_ms (120 seconds by default). Retrying an operation_id never starts a duplicate reload. After editing project files directly, require a completed reload before launch_preview.',
     inputSchema: reloadProjectSchema,
     annotations: {
       readOnlyHint: false,
@@ -4990,8 +4996,21 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   reload_project: [
     {
       description:
-        'Load direct project-file edits into the editor before launching a preview.',
-      arguments: {},
+        'Start loading direct project-file edits and receive a correlation ID immediately.',
+      arguments: { mode: 'start' },
+    },
+    {
+      description:
+        'Discover the active or latest retained reload after a caller interruption.',
+      arguments: { mode: 'status' },
+    },
+    {
+      description: 'Wait for a known reload operation to complete.',
+      arguments: {
+        mode: 'wait',
+        operation_id: 'reload-project-1',
+        timeout_ms: 120000,
+      },
     },
   ],
   create_signal_emit_action: [

@@ -374,12 +374,20 @@ loop, comment, and JavaScript metadata when editing existing sources.
    create a commit with a concise, descriptive imperative message. Record the
    commit hash and message for the final report. If any source edit is needed
    afterward, validate again and create a follow-up commit before reloading.
-9. Call the GDevelop MCP `reload_project` tool and require a successful reload
+9. Call the GDevelop MCP `reload_project` tool with `mode: "start"`. Require its
+   immediate accepted receipt and record the returned `operation_id`. Poll that
+   exact ID with `mode: "status"` until it is terminal; use `mode: "wait"` with
+   the same ID only when a blocking wait is useful. If a caller is interrupted
+   before recording the ID, call `mode: "status"` without an ID to discover the
+   active or latest retained operation. Require a successful completed reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
-   stale editor memory. Reload waits default to 120 seconds. If a timeout returns
-   an `operation_id`, call `reload_project` again with that exact ID to attach to
-   or poll the existing operation; do not start recovery processes or assume the
-   reload failed while its receipt says it is still running.
+   stale editor memory. Never start a duplicate while status says an operation
+   is running, and never assume a running reload failed merely because a waiter
+   timed out or was interrupted. The status receipt exposes
+   `catalogGeneration.artifacts`, the current catalog subphase, its timestamps,
+   and the last renderer catalog progress record. If it reports a catalog
+   failure, use that exact artifact/subphase; do not dismiss it as a generic
+   renderer timeout.
 10. For gameplay or visual changes, call `launch_preview` only after step 9.
     Start paused and use `run_frames` with `objects`, `include`, and optional
     `instance_indexes` to inspect bounded live position, angle, force, variable,
@@ -449,12 +457,17 @@ unrelated pre-existing changes. `reload_project` must run only after this commit
 succeeds. A later source edit requires a new validation and follow-up commit
 before another reload.
 
-`reload_project` remains a mandatory preview gate. Call it successfully only
-after both the validation and Git-commit gates and before the first
-`launch_preview`. Never launch or relaunch a preview from stale editor memory. A
-later source edit invalidates the validation, commit, and reload receipts. If the
-call times out with an `operation_id`, retry with that ID so the request attaches
-to the retained reload instead of starting a duplicate operation.
+`reload_project` remains a mandatory preview gate. After both the validation
+and Git-commit gates, start it with `mode: "start"`, record the immediate
+`operation_id`, and poll that exact operation with `mode: "status"` until its
+receipt is completed successfully. A status call without an ID discovers the
+active/latest retained operation after caller interruption. Never launch or
+relaunch a preview from stale editor memory. A later source edit invalidates the
+validation, commit, and reload receipts. Never start another reload while the
+current operation is running.
+The reload writes generated catalogs itself and acknowledges their modification
+times; do not respond to a "Project files changed on disk" dialog by starting a
+second reload while the recorded operation is still running.
 
 ## Verification
 

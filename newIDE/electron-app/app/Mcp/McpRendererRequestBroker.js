@@ -3,7 +3,61 @@ const DEFAULT_RELOAD_TIMEOUT_MS = 120000;
 const MINIMUM_REQUEST_TIMEOUT_MS = 1000;
 const MAXIMUM_REQUEST_TIMEOUT_MS = 600000;
 const RELOAD_OPERATION_RETENTION_MS = 5 * 60 * 1000;
-const RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000;
+const RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS = 60 * 1000;
+const RELOAD_CATALOG_SUBPHASE_INACTIVITY_TIMEOUT_MS = 15 * 1000;
+
+const CATALOG_ARTIFACT_NAMES = [
+  'project-serialization',
+  'instruction-signature',
+  'instructions',
+  'deprecated-instructions',
+  'settings',
+  'layout',
+  'javascript-api',
+  'runtime-api',
+  'project-api',
+  'modification-time-acknowledgement',
+];
+
+const getCatalogPhaseDetails = phase => {
+  if (typeof phase !== 'string') return null;
+  const exactPhases = {
+    'catalog-project-serializing': ['project-serialization', 'serializing'],
+    'catalog-project-serialized': ['project-serialization', 'completed'],
+    'catalogs-modification-time-reading': [
+      'modification-time-acknowledgement',
+      'reading',
+    ],
+    'catalogs-modification-time-acknowledged': [
+      'modification-time-acknowledgement',
+      'completed',
+    ],
+  };
+  if (exactPhases[phase]) {
+    return {
+      artifact: exactPhases[phase][0],
+      subphase: exactPhases[phase][1],
+      completed: exactPhases[phase][1] === 'completed',
+    };
+  }
+  const match = /^catalog-(instruction-signature|instructions|deprecated-instructions|settings|layout|javascript-api|runtime-api|project-api)-(cache-hit|building|built|writing|written)$/.exec(
+    phase
+  );
+  if (!match) return null;
+  return {
+    artifact: match[1],
+    subphase: match[2],
+    completed:
+      match[2] === 'written' ||
+      (match[1] === 'instruction-signature' && match[2] === 'built') ||
+      (match[1] === 'javascript-api' && match[2] === 'built'),
+  };
+};
+
+const isCatalogPhase = phase =>
+  phase === 'catalogs-generating' ||
+  (typeof phase === 'string' &&
+    (phase.startsWith('catalog-') || phase.startsWith('catalogs-')));
 
 const isReloadProjectRequest = request =>
   !!request &&
@@ -15,6 +69,11 @@ const getReloadArguments = request => {
   if (!isReloadProjectRequest(request)) return {};
   const args = request.params.arguments;
   return args && typeof args === 'object' ? args : {};
+};
+
+const getReloadMode = request => {
+  const mode = getReloadArguments(request).mode;
+  return mode === 'start' || mode === 'status' ? mode : 'wait';
 };
 
 const getRequestTimeout = ({
@@ -57,6 +116,55 @@ const getRendererProcessId = webContents => {
   }
 };
 
+const getCatalogGenerationMetadata = operation => {
+  const artifacts = {};
+  CATALOG_ARTIFACT_NAMES.forEach(artifactName => {
+    const recordedArtifact = operation.catalogArtifacts[artifactName];
+    const isFailedArtifact =
+      operation.status === 'failed' &&
+      operation.currentCatalogArtifact === artifactName;
+    artifacts[artifactName] = recordedArtifact
+      ? {
+          ...recordedArtifact,
+          status: isFailedArtifact ? 'failed' : recordedArtifact.status,
+          failedAtMs: isFailedArtifact
+            ? operation.completedAtMs
+            : recordedArtifact.failedAtMs,
+        }
+      : { status: 'not-started' };
+  });
+
+  const generatorState = operation.catalogsGenerationCompleted
+    ? 'resolved'
+    : operation.status === 'failed' && operation.catalogsGenerationStarted
+    ? 'failed'
+    : operation.catalogsGenerationStarted
+    ? 'pending'
+    : 'not-started';
+  const lastCatalogProgress = operation.catalogProgressHistory.length
+    ? operation.catalogProgressHistory[
+        operation.catalogProgressHistory.length - 1
+      ]
+    : null;
+  return {
+    state: generatorState,
+    currentArtifact:
+      generatorState === 'pending' || generatorState === 'failed'
+        ? operation.currentCatalogArtifact
+        : null,
+    artifacts,
+    progressHistory: operation.catalogProgressHistory.slice(),
+    lastRendererCatalogLog: lastCatalogProgress,
+    completionProgressReceived: operation.catalogsGenerationCompleted,
+    queue: {
+      strategy: 'single-active-reload-coalescing',
+      ownerOperationId:
+        operation.status === 'running' ? operation.operationId : null,
+      lockReleased: operation.status !== 'running',
+    },
+  };
+};
+
 const getReloadOperationMetadata = (
   operation,
   { attachedToExistingOperation, polledCompletedOperation } = {}
@@ -67,6 +175,8 @@ const getReloadOperationMetadata = (
   phase: operation.phase,
   phaseStartedAtMs: operation.phaseStartedAtMs,
   lastProgressAtMs: operation.lastProgressAtMs,
+  inactivityTimeoutMs: operation.inactivityTimeoutMs,
+  inactivityDeadlineAtMs: operation.inactivityDeadlineAtMs,
   startedAtMs: operation.startedAtMs,
   completedAtMs: operation.completedAtMs,
   retentionExpiresAtMs: operation.retentionExpiresAtMs,
@@ -76,6 +186,7 @@ const getReloadOperationMetadata = (
   projectLoadCompleted: operation.projectLoadCompleted,
   catalogsGenerationStarted: operation.catalogsGenerationStarted,
   catalogsGenerationCompleted: operation.catalogsGenerationCompleted,
+  catalogGeneration: getCatalogGenerationMetadata(operation),
   receiptPersisting: operation.receiptPersisting,
   attachedToExistingOperation: !!attachedToExistingOperation,
   polledCompletedOperation: !!polledCompletedOperation,
@@ -115,6 +226,65 @@ const addReloadOperationMetadata = (
   };
 };
 
+const makeReloadOperationSnapshot = (
+  operation,
+  { attachedToExistingOperation, polledCompletedOperation, mode }
+) => {
+  if (operation.status === 'completed' && operation.result) {
+    return addReloadOperationMetadata(operation.result, operation, {
+      attachedToExistingOperation,
+      polledCompletedOperation,
+    });
+  }
+
+  const reloadOperation = getReloadOperationMetadata(operation, {
+    attachedToExistingOperation,
+    polledCompletedOperation,
+  });
+  const payload = {
+    success: operation.status !== 'failed',
+    reloaded: false,
+    operationAccepted: operation.status === 'running',
+    mode,
+    reloadOperation,
+    error:
+      operation.status === 'failed' && operation.error
+        ? {
+            message: operation.error.message,
+            data: operation.error.data,
+          }
+        : undefined,
+    nextAction:
+      operation.status === 'running'
+        ? `Call reload_project with {"mode":"status","operation_id":"${
+            operation.operationId
+          }"} for a non-blocking progress snapshot, or omit mode to wait for completion.`
+        : operation.status === 'failed'
+        ? 'The reload operation failed. Inspect error and reloadOperation before starting a fresh reload.'
+        : 'The reload operation completed.',
+  };
+  return {
+    content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
+    structuredContent: payload,
+  };
+};
+
+const makeIdleReloadStatus = () => {
+  const payload = {
+    success: true,
+    reloaded: false,
+    operationAccepted: false,
+    mode: 'status',
+    reloadOperation: null,
+    nextAction:
+      'No active or retained reload operation is available. Call reload_project with {"mode":"start"} to start one and receive its operation_id immediately.',
+  };
+  return {
+    content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
+    structuredContent: payload,
+  };
+};
+
 const createMcpRendererRequestBroker = ({
   getWebContents,
   defaultRequestTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
@@ -123,12 +293,14 @@ const createMcpRendererRequestBroker = ({
   maximumRequestTimeoutMs = MAXIMUM_REQUEST_TIMEOUT_MS,
   reloadOperationRetentionMs = RELOAD_OPERATION_RETENTION_MS,
   reloadOperationInactivityTimeoutMs = RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,
+  reloadCatalogSubphaseInactivityTimeoutMs = RELOAD_CATALOG_SUBPHASE_INACTIVITY_TIMEOUT_MS,
   now = () => Date.now(),
   setTimeoutFn = setTimeout,
   clearTimeoutFn = clearTimeout,
 }) => {
   let nextRequestId = 0;
   let activeReloadOperation = null;
+  let latestReloadOperation = null;
   const pendingRequests = new Map();
   const reloadOperations = new Map();
   const expiredReloadOperations = new Map();
@@ -184,19 +356,45 @@ const createMcpRendererRequestBroker = ({
       operation.phaseStartedAtMs = progressAtMs;
     }
     operation.lastProgressAtMs = progressAtMs;
+    const catalogPhaseDetails = getCatalogPhaseDetails(nextPhase);
+    if (catalogPhaseDetails) {
+      const {
+        artifact: artifactName,
+        subphase,
+        completed,
+      } = catalogPhaseDetails;
+      const existingArtifact = operation.catalogArtifacts[artifactName];
+      operation.catalogArtifacts[artifactName] = {
+        status: completed ? 'completed' : 'running',
+        subphase,
+        startedAtMs: existingArtifact
+          ? existingArtifact.startedAtMs
+          : progressAtMs,
+        lastProgressAtMs: progressAtMs,
+        completedAtMs: completed ? progressAtMs : null,
+      };
+      operation.currentCatalogArtifact = completed ? null : artifactName;
+      operation.catalogProgressHistory.push({
+        phase: nextPhase,
+        artifact: artifactName,
+        subphase,
+        atMs: progressAtMs,
+      });
+      if (operation.catalogProgressHistory.length > 64) {
+        operation.catalogProgressHistory.shift();
+      }
+    }
     operation.rendererAcknowledged =
       operation.rendererAcknowledged || nextPhase !== 'request-sent';
     operation.projectLoadCompleted =
       operation.projectLoadCompleted ||
       nextPhase === 'editor-loaded' ||
       nextPhase === 'extensions-loading' ||
-      nextPhase === 'catalogs-generating' ||
-      nextPhase === 'catalogs-complete' ||
+      isCatalogPhase(nextPhase) ||
       nextPhase === 'receipt-persisting';
     operation.catalogsGenerationStarted =
       operation.catalogsGenerationStarted ||
-      nextPhase === 'catalogs-generating' ||
-      nextPhase === 'catalogs-complete' ||
+      isCatalogPhase(nextPhase) ||
       nextPhase === 'receipt-persisting';
     operation.catalogsGenerationCompleted =
       operation.catalogsGenerationCompleted ||
@@ -208,23 +406,38 @@ const createMcpRendererRequestBroker = ({
     if (operation.inactivityTimeoutId) {
       clearTimeoutFn(operation.inactivityTimeoutId);
     }
+    const isCatalogSubphase = isCatalogPhase(nextPhase);
+    operation.inactivityTimeoutMs = isCatalogSubphase
+      ? reloadCatalogSubphaseInactivityTimeoutMs
+      : reloadOperationInactivityTimeoutMs;
+    operation.inactivityDeadlineAtMs =
+      progressAtMs + operation.inactivityTimeoutMs;
     operation.inactivityTimeoutId = setTimeoutFn(() => {
       if (operation.status !== 'running') return;
+      const catalogArtifact = operation.currentCatalogArtifact;
       const error = makeRequestError(
-        `Reload operation ${
-          operation.operationId
-        } made no progress for ${reloadOperationInactivityTimeoutMs} ms while in phase ${
-          operation.phase
-        }.`,
+        isCatalogSubphase
+          ? `Reload operation ${operation.operationId} made no progress for ${
+              operation.inactivityTimeoutMs
+            } ms in catalog subphase ${operation.phase}${
+              catalogArtifact ? ` (artifact ${catalogArtifact})` : ''
+            }.`
+          : `Reload operation ${operation.operationId} made no progress for ${
+              operation.inactivityTimeoutMs
+            } ms while in phase ${operation.phase}.`,
         {
-          code: 'MCP_RELOAD_OPERATION_STALLED',
-          timeoutMs: reloadOperationInactivityTimeoutMs,
+          code: isCatalogSubphase
+            ? 'MCP_RELOAD_CATALOG_SUBPHASE_STALLED'
+            : 'MCP_RELOAD_OPERATION_STALLED',
+          timeoutMs: operation.inactivityTimeoutMs,
           operationId: operation.operationId,
           operation_id: operation.operationId,
+          phase: operation.phase,
+          catalogArtifact,
         }
       );
       settleOperation(operation, null, error);
-    }, reloadOperationInactivityTimeoutMs);
+    }, operation.inactivityTimeoutMs);
     if (
       operation.inactivityTimeoutId &&
       typeof operation.inactivityTimeoutId.unref === 'function'
@@ -233,16 +446,30 @@ const createMcpRendererRequestBroker = ({
     }
   };
 
-  const settleOperation = (operation, result, error) => {
+  const settleOperation = (
+    operation,
+    result,
+    error,
+    rendererReportedToolError = false
+  ) => {
     pendingRequests.delete(operation.requestId);
     operation.completedAtMs = now();
     if (operation.inactivityTimeoutId) {
       clearTimeoutFn(operation.inactivityTimeoutId);
       operation.inactivityTimeoutId = null;
     }
-    if (error) {
+    if (error || rendererReportedToolError) {
       operation.status = 'failed';
-      operation.error = error;
+      operation.error =
+        error ||
+        makeRequestError(
+          result && result.structuredContent && result.structuredContent.error
+            ? result.structuredContent.error
+            : 'The renderer reported a reload_project tool error.',
+          result && result.structuredContent
+            ? result.structuredContent
+            : undefined
+        );
     } else {
       operation.status = 'completed';
       operation.phase = 'completed';
@@ -253,9 +480,11 @@ const createMcpRendererRequestBroker = ({
     if (operation.operationId) {
       if (activeReloadOperation === operation) activeReloadOperation = null;
       retainCompletedReloadOperation(operation);
-      if (error) {
-        error.data = {
-          ...(error.data && typeof error.data === 'object' ? error.data : {}),
+      if (operation.error) {
+        operation.error.data = {
+          ...(operation.error.data && typeof operation.error.data === 'object'
+            ? operation.error.data
+            : {}),
           reloadOperation: getReloadOperationMetadata(operation),
         };
       }
@@ -303,11 +532,16 @@ const createMcpRendererRequestBroker = ({
       projectLoadCompleted: false,
       catalogsGenerationStarted: false,
       catalogsGenerationCompleted: false,
+      catalogArtifacts: {},
+      catalogProgressHistory: [],
+      currentCatalogArtifact: null,
       receiptPersisting: false,
       result: null,
       error: null,
       retentionTimeoutId: null,
       inactivityTimeoutId: null,
+      inactivityTimeoutMs: reloadOperationInactivityTimeoutMs,
+      inactivityDeadlineAtMs: null,
       promise,
       resolve,
       reject,
@@ -316,6 +550,7 @@ const createMcpRendererRequestBroker = ({
     if (operation.operationId) {
       reloadOperations.set(operation.operationId, operation);
       activeReloadOperation = operation;
+      latestReloadOperation = operation;
       updateReloadOperationPhase(operation, { phase: 'request-sent' });
     }
     try {
@@ -383,6 +618,8 @@ const createMcpRendererRequestBroker = ({
             operationId: operation.operationId,
             operation_id: operation.operationId,
             operationStatus: isReload ? operation.status : 'abandoned',
+            waiterDetached: isReload,
+            underlyingOperationContinues: isReload,
             reloadOperation: isReload
               ? getReloadOperationMetadata(operation, {
                   attachedToExistingOperation,
@@ -395,6 +632,15 @@ const createMcpRendererRequestBroker = ({
                   arguments: {
                     operation_id: operation.operationId,
                     timeout_ms: timeoutMs,
+                  },
+                }
+              : null,
+            status: isReload
+              ? {
+                  toolName: 'reload_project',
+                  arguments: {
+                    mode: 'status',
+                    operation_id: operation.operationId,
                   },
                 }
               : null,
@@ -435,7 +681,27 @@ const createMcpRendererRequestBroker = ({
         });
       }
 
-      const requestedOperationId = getReloadArguments(request).operation_id;
+      const reloadArguments = getReloadArguments(request);
+      const requestedOperationId = reloadArguments.operation_id;
+      const mode = getReloadMode(request);
+      if (mode === 'status' && !requestedOperationId) {
+        const operation =
+          activeReloadOperation ||
+          (latestReloadOperation &&
+          reloadOperations.get(latestReloadOperation.operationId) ===
+            latestReloadOperation
+            ? latestReloadOperation
+            : null);
+        return Promise.resolve(
+          operation
+            ? makeReloadOperationSnapshot(operation, {
+                attachedToExistingOperation: operation.status === 'running',
+                polledCompletedOperation: operation.status !== 'running',
+                mode,
+              })
+            : makeIdleReloadStatus()
+        );
+      }
       if (requestedOperationId) {
         const operation = reloadOperations.get(requestedOperationId);
         const currentWebContents = getWebContents();
@@ -470,26 +736,54 @@ const createMcpRendererRequestBroker = ({
             }
           );
         }
-        return waitForOperation(operation, request, {
+        const waitOptions = {
           attachedToExistingOperation: operation.status === 'running',
           polledCompletedOperation: operation.status !== 'running',
-        });
+        };
+        if (mode === 'start' || mode === 'status') {
+          return Promise.resolve(
+            makeReloadOperationSnapshot(operation, {
+              ...waitOptions,
+              mode,
+            })
+          );
+        }
+        return waitForOperation(operation, request, waitOptions);
       }
 
       if (
         activeReloadOperation &&
         activeReloadOperation.webContents === getWebContents()
       ) {
-        return waitForOperation(activeReloadOperation, request, {
+        const waitOptions = {
           attachedToExistingOperation: true,
           polledCompletedOperation: false,
-        });
+        };
+        if (mode === 'start') {
+          return Promise.resolve(
+            makeReloadOperationSnapshot(activeReloadOperation, {
+              ...waitOptions,
+              mode,
+            })
+          );
+        }
+        return waitForOperation(activeReloadOperation, request, waitOptions);
       }
 
-      return waitForOperation(createOperation(request), request, {
+      const operation = createOperation(request);
+      const waitOptions = {
         attachedToExistingOperation: false,
         polledCompletedOperation: false,
-      });
+      };
+      if (mode === 'start') {
+        return Promise.resolve(
+          makeReloadOperationSnapshot(operation, {
+            ...waitOptions,
+            mode,
+          })
+        );
+      }
+      return waitForOperation(operation, request, waitOptions);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -514,7 +808,16 @@ const createMcpRendererRequestBroker = ({
         )
       );
     } else {
-      settleOperation(operation, response.result, null);
+      settleOperation(
+        operation,
+        response.result,
+        null,
+        !!(
+          operation.operationId &&
+          response.result &&
+          response.result.isError === true
+        )
+      );
     }
     return true;
   };
@@ -561,5 +864,6 @@ module.exports = {
   MINIMUM_REQUEST_TIMEOUT_MS,
   MAXIMUM_REQUEST_TIMEOUT_MS,
   RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,
+  RELOAD_CATALOG_SUBPHASE_INACTIVITY_TIMEOUT_MS,
   createMcpRendererRequestBroker,
 };

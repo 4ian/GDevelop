@@ -313,9 +313,12 @@ export const buildProjectInstructionCatalog = (
  */
 export const buildProjectDeprecatedInstructionCatalog = (
   project: gdProject,
-  i18n?: any
+  i18n?: any,
+  authoringCatalogInput?: Object
 ): Object => {
-  const authoringCatalog = buildProjectInstructionCatalog(project, i18n);
+  const authoringCatalog = authoringCatalogInput
+    ? validateProjectInstructionCatalog(authoringCatalogInput)
+    : buildProjectInstructionCatalog(project, i18n);
   const completeCatalog = validateProjectInstructionCatalog(
     buildCompleteProjectInstructionCatalog({
       project,

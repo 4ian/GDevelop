@@ -175,12 +175,17 @@ describe('McpToolCatalog', () => {
     if (!tool) throw new Error('reload_project tool is missing.');
     expect(tool.description).toContain('regenerate');
     expect(tool.description).toContain('operation_id');
+    expect(tool.description).toContain('mode:"start"');
+    expect(tool.description).toContain('mode:"status"');
     expect(tool.inputSchema).toEqual(
       expect.objectContaining({
         additionalProperties: false,
         properties: expect.objectContaining({
           timeout_ms: expect.objectContaining({ maximum: 600000 }),
           operation_id: expect.objectContaining({ type: 'string' }),
+          mode: expect.objectContaining({
+            enum: ['wait', 'start', 'status'],
+          }),
         }),
       })
     );

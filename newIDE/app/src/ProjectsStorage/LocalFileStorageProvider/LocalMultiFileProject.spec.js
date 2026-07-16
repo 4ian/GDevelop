@@ -1012,15 +1012,38 @@ describe('Local multi-file project storage', () => {
     project.setName('Reloaded catalog project');
     ensureProjectHasDefaultScene(project);
 
-    const counts = await writeProjectSourceCatalogs(
-      project,
-      temporaryDirectory
-    );
+    // A never-resolving asynchronous ensureDir reproduces the callback stall
+    // that used to strand reload_project. Generated catalogs must use the
+    // synchronous verified writer and never touch this async API.
+    const ensureDirSpy = jest
+      .spyOn(fs, 'ensureDir')
+      .mockImplementation(() => new Promise(() => {}));
+    const progressPhases = [];
+    const cachedProgressPhases = [];
 
+    let counts: Object;
+    let cachedCounts: Object;
+    try {
+      counts = await writeProjectSourceCatalogs(project, temporaryDirectory, {
+        reportProgress: phase => progressPhases.push(phase),
+      });
+      cachedCounts = await writeProjectSourceCatalogs(
+        project,
+        temporaryDirectory,
+        {
+          reportProgress: phase => cachedProgressPhases.push(phase),
+        }
+      );
+    } finally {
+      ensureDirSpy.mockRestore();
+    }
+
+    expect(ensureDirSpy).not.toHaveBeenCalled();
     expect(counts.instructions.actions).toBeGreaterThan(100);
     expect(counts.settings.objectTypes).toBeGreaterThan(5);
     expect(counts.layouts.contexts).toBe(1);
     expect(counts.javascript.counts.scenes).toBe(1);
+    expect(cachedCounts).toEqual(counts);
     expect(counts.javascript.hashes.runtimeApi).toMatch(/^[0-9a-f]{64}$/);
     expect(
       fs.existsSync(
@@ -1057,6 +1080,42 @@ describe('Local multi-file project storage', () => {
         'utf8'
       )
     ).not.toContain('_instances');
+    expect(progressPhases).toEqual([
+      'catalog-project-serializing',
+      'catalog-project-serialized',
+      'catalog-instruction-signature-building',
+      'catalog-instruction-signature-built',
+      'catalog-instructions-building',
+      'catalog-instructions-built',
+      'catalog-instructions-writing',
+      'catalog-instructions-written',
+      'catalog-deprecated-instructions-building',
+      'catalog-deprecated-instructions-built',
+      'catalog-deprecated-instructions-writing',
+      'catalog-deprecated-instructions-written',
+      'catalog-settings-building',
+      'catalog-settings-built',
+      'catalog-settings-writing',
+      'catalog-settings-written',
+      'catalog-layout-building',
+      'catalog-layout-built',
+      'catalog-layout-writing',
+      'catalog-layout-written',
+      'catalog-javascript-api-building',
+      'catalog-javascript-api-built',
+      'catalog-runtime-api-writing',
+      'catalog-runtime-api-written',
+      'catalog-project-api-writing',
+      'catalog-project-api-written',
+    ]);
+    expect(cachedProgressPhases).toContain('catalog-instructions-cache-hit');
+    expect(cachedProgressPhases).toContain(
+      'catalog-deprecated-instructions-cache-hit'
+    );
+    expect(cachedProgressPhases).not.toContain('catalog-instructions-building');
+    expect(cachedProgressPhases).not.toContain(
+      'catalog-deprecated-instructions-building'
+    );
     project.delete();
   });
 

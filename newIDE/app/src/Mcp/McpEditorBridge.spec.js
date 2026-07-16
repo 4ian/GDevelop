@@ -517,6 +517,39 @@ runtimeScene._instances.length;
     expect(result.nextAction).toContain('launch_preview');
   });
 
+  it('preserves catalog subphase diagnostics when reload fails', async () => {
+    const catalogError: any = new Error('Unable to replace settings catalog.');
+    catalogError.code = 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED';
+    catalogError.catalogPhase = 'catalog-settings-writing';
+    catalogError.catalogArtifact = 'settings';
+    const bridge = makeBridge({
+      getProject: () => ({
+        getName: () => 'Catalog failure project',
+        getProjectFile: () => 'C:\\game\\project.settings',
+      }),
+      reloadProjectAndWait: jest.fn(async () => {
+        throw catalogError;
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: false,
+        error: 'Unable to replace settings catalog.',
+        code: 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED',
+        catalogPhase: 'catalog-settings-writing',
+        catalogArtifact: 'settings',
+      })
+    );
+  });
+
   it('imports an extension through the native host and returns generated multi-file sources', async () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-import-')

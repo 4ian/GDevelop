@@ -5709,7 +5709,14 @@ const callMcpTool = async ({
       return errorResult(
         error && error.message
           ? error.message
-          : 'Unable to reload the project from disk.'
+          : 'Unable to reload the project from disk.',
+        {
+          code: error && error.code ? error.code : 'MCP_RELOAD_PROJECT_FAILED',
+          catalogPhase:
+            error && error.catalogPhase ? error.catalogPhase : undefined,
+          catalogArtifact:
+            error && error.catalogArtifact ? error.catalogArtifact : undefined,
+        }
       );
     }
   }

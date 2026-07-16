@@ -64,6 +64,12 @@ const run = async () => {
   assert.strictEqual(timeoutError.data.operationStatus, 'running');
   assert.strictEqual(timeoutError.data.operationId, operationId);
   assert.strictEqual(timeoutError.data.operation_id, operationId);
+  assert.strictEqual(timeoutError.data.waiterDetached, true);
+  assert.strictEqual(timeoutError.data.underlyingOperationContinues, true);
+  assert.deepStrictEqual(timeoutError.data.status.arguments, {
+    mode: 'status',
+    operation_id: operationId,
+  });
   assert.strictEqual(
     timeoutError.data.reloadOperation.correlationId,
     operationId
@@ -75,6 +81,11 @@ const run = async () => {
   assert.strictEqual(timeoutError.data.reloadOperation.rendererProcessId, 4321);
   assert.strictEqual(
     timeoutError.data.reloadOperation.rendererAcknowledged,
+    true
+  );
+  assert.strictEqual(
+    timeoutError.data.reloadOperation.inactivityDeadlineAtMs >
+      timeoutError.data.reloadOperation.lastProgressAtMs,
     true
   );
 
@@ -91,6 +102,34 @@ const run = async () => {
     'editor-loaded',
     'extensions-loading',
     'catalogs-generating',
+    'catalog-project-serializing',
+    'catalog-project-serialized',
+    'catalog-instruction-signature-building',
+    'catalog-instruction-signature-built',
+    'catalog-instructions-building',
+    'catalog-instructions-built',
+    'catalog-instructions-writing',
+    'catalog-instructions-written',
+    'catalog-deprecated-instructions-building',
+    'catalog-deprecated-instructions-built',
+    'catalog-deprecated-instructions-writing',
+    'catalog-deprecated-instructions-written',
+    'catalog-settings-building',
+    'catalog-settings-built',
+    'catalog-settings-writing',
+    'catalog-settings-written',
+    'catalog-layout-building',
+    'catalog-layout-built',
+    'catalog-layout-writing',
+    'catalog-layout-written',
+    'catalog-javascript-api-building',
+    'catalog-javascript-api-built',
+    'catalog-runtime-api-writing',
+    'catalog-runtime-api-written',
+    'catalog-project-api-writing',
+    'catalog-project-api-written',
+    'catalogs-modification-time-reading',
+    'catalogs-modification-time-acknowledged',
     'catalogs-complete',
     'receipt-persisting',
   ]) {
@@ -125,6 +164,15 @@ const run = async () => {
   assert.strictEqual(retryMetadata.projectLoadCompleted, true);
   assert.strictEqual(retryMetadata.catalogsGenerationStarted, true);
   assert.strictEqual(retryMetadata.catalogsGenerationCompleted, true);
+  assert.strictEqual(retryMetadata.catalogGeneration.state, 'resolved');
+  Object.values(retryMetadata.catalogGeneration.artifacts).forEach(artifact =>
+    assert.strictEqual(artifact.status, 'completed')
+  );
+  assert.strictEqual(
+    retryMetadata.catalogGeneration.completionProgressReceived,
+    true
+  );
+  assert.strictEqual(retryMetadata.catalogGeneration.queue.lockReleased, true);
   assert.strictEqual(retryMetadata.receiptPersisting, true);
   assert(retryMetadata.retentionExpiresAtMs > retryMetadata.completedAtMs);
 
@@ -172,6 +220,151 @@ const run = async () => {
     true
   );
 
+  const rendererErrorPromise = broker.send(reloadRequest(100));
+  const rendererErrorRequest = sentRequests[3].request;
+  broker.handleProgress(webContents, {
+    id: rendererErrorRequest.id,
+    operationId: rendererErrorRequest.operationId,
+    progress: { phase: 'catalog-settings-writing' },
+  });
+  broker.handleResponse(webContents, {
+    id: rendererErrorRequest.id,
+    result: {
+      isError: true,
+      content: [{ type: 'text', text: 'settings write failed' }],
+      structuredContent: {
+        success: false,
+        error: 'settings write failed',
+        code: 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED',
+        catalogArtifact: 'settings',
+      },
+    },
+  });
+  const rendererErrorResult = await rendererErrorPromise;
+  assert.strictEqual(rendererErrorResult.isError, true);
+  assert.strictEqual(
+    rendererErrorResult.structuredContent.reloadOperation.status,
+    'failed'
+  );
+  assert.strictEqual(
+    rendererErrorResult.structuredContent.reloadOperation.catalogGeneration
+      .artifacts.settings.status,
+    'failed'
+  );
+
+  const observableRequests = [];
+  const observableWebContents = {
+    isDestroyed: () => false,
+    getOSProcessId: () => 9876,
+    send: (channel, request) => observableRequests.push({ channel, request }),
+  };
+  const observableBroker = createMcpRendererRequestBroker({
+    getWebContents: () => observableWebContents,
+    defaultReloadTimeoutMs: 100,
+    minimumRequestTimeoutMs: 1,
+    reloadOperationRetentionMs: 1000,
+    reloadOperationInactivityTimeoutMs: 1000,
+  });
+  const startResult = await observableBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: { mode: 'start' },
+    },
+  });
+  assert.strictEqual(observableRequests.length, 1);
+  const observableOperationId =
+    startResult.structuredContent.reloadOperation.id;
+  assert(observableOperationId);
+  assert.strictEqual(startResult.structuredContent.operationAccepted, true);
+  assert.strictEqual(
+    startResult.structuredContent.reloadOperation.status,
+    'running'
+  );
+  assert.strictEqual(
+    startResult.structuredContent.reloadOperation.rendererProcessId,
+    9876
+  );
+
+  const discoveredStatus = await observableBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: { mode: 'status' },
+    },
+  });
+  assert.strictEqual(
+    discoveredStatus.structuredContent.reloadOperation.id,
+    observableOperationId
+  );
+  assert.strictEqual(observableRequests.length, 1);
+
+  observableBroker.handleProgress(observableWebContents, {
+    id: observableRequests[0].request.id,
+    operationId: observableOperationId,
+    progress: { phase: 'old-extensions-waiting' },
+  });
+  const explicitStatus = await observableBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: {
+        mode: 'status',
+        operation_id: observableOperationId,
+      },
+    },
+  });
+  assert.strictEqual(
+    explicitStatus.structuredContent.reloadOperation.phase,
+    'old-extensions-waiting'
+  );
+
+  const observableWaiter = observableBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: {
+        mode: 'wait',
+        operation_id: observableOperationId,
+        timeout_ms: 100,
+      },
+    },
+  });
+  observableBroker.handleResponse(observableWebContents, {
+    id: observableRequests[0].request.id,
+    result: toolResult({ success: true, reloaded: true }),
+  });
+  const observableWaitResult = await observableWaiter;
+  assert.strictEqual(observableWaitResult.structuredContent.reloaded, true);
+  const retainedStatus = await observableBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: { mode: 'status' },
+    },
+  });
+  assert.strictEqual(
+    retainedStatus.structuredContent.reloadOperation.status,
+    'completed'
+  );
+  assert.strictEqual(
+    retainedStatus.structuredContent.reloadOperation.polledCompletedOperation,
+    true
+  );
+
+  const idleBroker = createMcpRendererRequestBroker({
+    getWebContents: () => observableWebContents,
+  });
+  const idleStatus = await idleBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: { mode: 'status' },
+    },
+  });
+  assert.strictEqual(idleStatus.structuredContent.reloadOperation, null);
+  assert.strictEqual(idleStatus.structuredContent.operationAccepted, false);
+
   const stalledRequests = [];
   const stalledWebContents = {
     isDestroyed: () => false,
@@ -207,6 +400,67 @@ const run = async () => {
   );
   assert.strictEqual(stalledPollError, stalledError);
   assert.strictEqual(stalledRequests.length, 1);
+
+  const catalogStalledRequests = [];
+  const catalogStalledWebContents = {
+    isDestroyed: () => false,
+    getOSProcessId: () => 2468,
+    send: (channel, request) =>
+      catalogStalledRequests.push({ channel, request }),
+  };
+  const catalogStalledBroker = createMcpRendererRequestBroker({
+    getWebContents: () => catalogStalledWebContents,
+    defaultReloadTimeoutMs: 100,
+    minimumRequestTimeoutMs: 1,
+    reloadOperationRetentionMs: 1000,
+    reloadOperationInactivityTimeoutMs: 1000,
+    reloadCatalogSubphaseInactivityTimeoutMs: 10,
+  });
+  const catalogStalledPromise = catalogStalledBroker.send(reloadRequest(100));
+  const catalogStalledRequest = catalogStalledRequests[0].request;
+  catalogStalledBroker.handleProgress(catalogStalledWebContents, {
+    id: catalogStalledRequest.id,
+    operationId: catalogStalledRequest.operationId,
+    progress: { phase: 'catalog-instructions-building' },
+  });
+  catalogStalledBroker.handleProgress(catalogStalledWebContents, {
+    id: catalogStalledRequest.id,
+    operationId: catalogStalledRequest.operationId,
+    progress: { phase: 'catalog-instructions-writing' },
+  });
+  const catalogStalledError = await getRejectedError(catalogStalledPromise);
+  const catalogStalledMetadata = catalogStalledError.data.reloadOperation;
+  assert.strictEqual(
+    catalogStalledError.data.code,
+    'MCP_RELOAD_CATALOG_SUBPHASE_STALLED'
+  );
+  assert.strictEqual(catalogStalledError.data.catalogArtifact, 'instructions');
+  assert.strictEqual(
+    catalogStalledMetadata.phase,
+    'catalog-instructions-writing'
+  );
+  assert.strictEqual(catalogStalledMetadata.inactivityTimeoutMs, 10);
+  assert.strictEqual(
+    catalogStalledMetadata.inactivityDeadlineAtMs,
+    catalogStalledMetadata.lastProgressAtMs + 10
+  );
+  assert.strictEqual(catalogStalledMetadata.catalogGeneration.state, 'failed');
+  assert.strictEqual(
+    catalogStalledMetadata.catalogGeneration.currentArtifact,
+    'instructions'
+  );
+  assert.strictEqual(
+    catalogStalledMetadata.catalogGeneration.artifacts.instructions.status,
+    'failed'
+  );
+  assert.strictEqual(
+    catalogStalledMetadata.catalogGeneration.lastRendererCatalogLog.subphase,
+    'writing'
+  );
+  assert.strictEqual(
+    catalogStalledMetadata.catalogGeneration.queue.lockReleased,
+    true
+  );
 
   const disconnectedRequests = [];
   let activeWebContents = {

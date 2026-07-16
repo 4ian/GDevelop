@@ -18,6 +18,7 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
+const process = optionalRequire('process');
 
 export type ImportExtension = (options: {|
   i18n: I18nType,
@@ -125,8 +126,16 @@ const exitApp = (exitCode: number) => {
 const normalizeProjectPath = (filePath: ?string): ?string => {
   if (!filePath || !path) return null;
   const resolved = path.resolve(filePath);
-  return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+  return process && process.platform === 'win32'
+    ? resolved.toLowerCase()
+    : resolved;
 };
+
+type RunCliCommandIpcPayload = {|
+  commandName: string,
+  commandArgs: string | Array<string> | void,
+  projectPath: ?string,
+|};
 
 const ensureProjectExtensionsReadyForCli = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
@@ -314,8 +323,8 @@ export const useCliCommandRunner = ({
       if (!ipcRenderer || !project) return;
 
       const onRunCliCommand = (
-        event,
-        { commandName, commandArgs, projectPath }
+        event: any,
+        { commandName, commandArgs, projectPath }: RunCliCommandIpcPayload
       ) => {
         if (
           normalizeProjectPath(projectPath) !==

@@ -1,14 +1,28 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
+import FlatButton from '../../UI/FlatButton';
+import Play from '../../UI/CustomSvgIcons/Play';
+import Pause from '../../UI/CustomSvgIcons/Pause';
 import CheckeredBackground from '../CheckeredBackground';
+import { getModelAnimationClipLabel } from './Model3DAnimationUtils';
 
 const styles = {
   container: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+    overflow: 'hidden',
+  },
+  previewStage: {
     position: 'relative',
     display: 'flex',
     flex: 1,
@@ -41,19 +55,51 @@ const styles = {
     borderRadius: 4,
     backgroundColor: 'rgba(0, 0, 0, 0.74)',
   },
+  animationPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
+    maxHeight: 142,
+    minWidth: 0,
+    borderTop: '1px solid rgba(128, 128, 128, 0.28)',
+    backgroundColor: 'rgba(0, 0, 0, 0.18)',
+    zIndex: 3,
+  },
+  animationPanelHeader: {
+    flexShrink: 0,
+    padding: '6px 10px 2px',
+  },
+  animationList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    minWidth: 0,
+    overflow: 'auto',
+    padding: '0 6px 6px',
+  },
 };
 
 type Props = {|
   modelUrl: string,
 |};
 
-const removeMetalness = material => {
+type ModelAnimationClipInfo = {|
+  name: string,
+  duration: number,
+|};
+
+type AnimationPlaybackController = {|
+  // Three.js does not expose Flow types in this version of the IDE.
+  mixer: any,
+  actions: Array<any>,
+|};
+
+const removeMetalness = (material: any) => {
   if (material && material.metalness) {
     material.metalness = 0;
   }
 };
 
-const removeMetalnessFromMesh = node => {
+const removeMetalnessFromMesh = (node: any) => {
   if (!node.material) return;
 
   if (Array.isArray(node.material)) {
@@ -64,11 +110,11 @@ const removeMetalnessFromMesh = node => {
   removeMetalness(node.material);
 };
 
-const disposeObject = object => {
+const disposeObject = (object: any) => {
   object.traverse(child => {
     if (child.geometry) child.geometry.dispose();
 
-    const disposeMaterial = material => {
+    const disposeMaterial = (material: any) => {
       if (!material) return;
       Object.keys(material).forEach(key => {
         const value = material[key];
@@ -90,8 +136,8 @@ const frameModel = ({
   camera,
   controls,
 }: {|
-  model: THREE.Object3D,
-  camera: THREE.PerspectiveCamera,
+  model: any,
+  camera: any,
   controls: any,
 |}) => {
   model.updateMatrixWorld(true);
@@ -121,8 +167,50 @@ const frameModel = ({
 
 const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
   const canvasHostRef = React.useRef<?HTMLDivElement>(null);
+  const animationPlaybackControllerRef = React.useRef<?AnimationPlaybackController>(
+    null
+  );
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<?string>(null);
+  const [animationClips, setAnimationClips] = React.useState<
+    Array<ModelAnimationClipInfo>
+  >([]);
+  const [
+    selectedAnimationIndex,
+    setSelectedAnimationIndex,
+  ] = React.useState<?number>(null);
+  const [isAnimationPlaying, setIsAnimationPlaying] = React.useState(false);
+
+  const toggleAnimation = React.useCallback(
+    (animationIndex: number) => {
+      const controller = animationPlaybackControllerRef.current;
+      if (!controller) return;
+
+      const action = controller.actions[animationIndex];
+      if (!action) return;
+
+      if (selectedAnimationIndex === animationIndex) {
+        if (isAnimationPlaying) {
+          action.paused = true;
+          setIsAnimationPlaying(false);
+        } else {
+          action.paused = false;
+          action.play();
+          setIsAnimationPlaying(true);
+        }
+        return;
+      }
+
+      controller.mixer.stopAllAction();
+      action.reset();
+      action.paused = false;
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.play();
+      setSelectedAnimationIndex(animationIndex);
+      setIsAnimationPlaying(true);
+    },
+    [isAnimationPlaying, selectedAnimationIndex]
+  );
 
   React.useEffect(
     () => {
@@ -133,9 +221,14 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       let animationFrameId = null;
       let resizeObserver = null;
       let model = null;
+      let animationMixer: any = null;
 
       setIsLoading(true);
       setError(null);
+      setAnimationClips([]);
+      setSelectedAnimationIndex(null);
+      setIsAnimationPlaying(false);
+      animationPlaybackControllerRef.current = null;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
@@ -166,6 +259,8 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       directionalLight.position.set(3, 4, 5);
       scene.add(directionalLight);
 
+      const clock = new THREE.Clock();
+
       const resize = () => {
         if (isDisposed) return;
         const width = Math.max(canvasHost.clientWidth, 1);
@@ -177,6 +272,8 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
 
       const render = () => {
         if (isDisposed) return;
+        const deltaTime = clock.getDelta();
+        if (animationMixer) animationMixer.update(deltaTime);
         controls.update();
         renderer.render(scene, camera);
         animationFrameId = window.requestAnimationFrame(render);
@@ -200,6 +297,20 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
           model.traverse(removeMetalnessFromMesh);
           scene.add(model);
           frameModel({ model, camera, controls });
+          animationMixer = new THREE.AnimationMixer(model);
+          const actions = gltf.animations.map(animationClip =>
+            animationMixer.clipAction(animationClip)
+          );
+          animationPlaybackControllerRef.current = {
+            mixer: animationMixer,
+            actions,
+          };
+          setAnimationClips(
+            gltf.animations.map(animationClip => ({
+              name: animationClip.name,
+              duration: animationClip.duration,
+            }))
+          );
           setIsLoading(false);
         },
         undefined,
@@ -221,6 +332,11 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
           window.removeEventListener('resize', resize);
         }
         controls.dispose();
+        animationPlaybackControllerRef.current = null;
+        if (animationMixer) {
+          animationMixer.stopAllAction();
+          if (model) animationMixer.uncacheRoot(model);
+        }
         if (model) {
           scene.remove(model);
           disposeObject(model);
@@ -236,17 +352,49 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
 
   return (
     <div style={styles.container}>
-      <CheckeredBackground />
-      <div ref={canvasHostRef} style={styles.canvasHost} />
-      {isLoading && (
-        <div style={styles.overlay}>
-          <PlaceholderLoader />
-        </div>
-      )}
-      {!!error && (
-        <div style={styles.overlay}>
-          <div style={styles.errorBox}>
-            <Text noMargin>{error}</Text>
+      <div style={styles.previewStage}>
+        <CheckeredBackground />
+        <div ref={canvasHostRef} style={styles.canvasHost} />
+        {isLoading && (
+          <div style={styles.overlay}>
+            <PlaceholderLoader />
+          </div>
+        )}
+        {!!error && (
+          <div style={styles.overlay}>
+            <div style={styles.errorBox}>
+              <Text noMargin>{error}</Text>
+            </div>
+          </div>
+        )}
+      </div>
+      {animationClips.length > 0 && (
+        <div style={styles.animationPanel}>
+          <div style={styles.animationPanelHeader}>
+            <Text size="body-small" noMargin>
+              <Trans>Animations</Trans> ({animationClips.length})
+            </Text>
+          </div>
+          <div style={styles.animationList}>
+            {animationClips.map((animationClip, animationIndex) => {
+              const isSelected = selectedAnimationIndex === animationIndex;
+              const isPlaying = isSelected && isAnimationPlaying;
+              const animationLabel = getModelAnimationClipLabel(
+                animationClip.name,
+                animationIndex
+              );
+              return (
+                <FlatButton
+                  key={`${animationClip.name}:${animationIndex}`}
+                  id={`model-animation-${animationIndex}`}
+                  label={<span translate="no">{animationLabel}</span>}
+                  leftIcon={isPlaying ? <Pause /> : <Play />}
+                  primary={isSelected}
+                  onClick={() => toggleAnimation(animationIndex)}
+                  style={{ margin: 2 }}
+                />
+              );
+            })}
           </div>
         </div>
       )}

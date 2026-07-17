@@ -20,6 +20,13 @@ export type InstructionSummary = {|
   parameters: Array<ParameterSummary>,
   hidden?: boolean,
   relevantForSceneEvents?: boolean,
+  /**
+   * Asynchronous capability of the instruction (actions only): 'optional'
+   * means it can be awaited or not, 'always' means the engine always runs
+   * the following actions and sub-events after it finishes. Absent for
+   * synchronous instructions.
+   */
+  async?: 'optional' | 'always',
 |};
 
 /**
@@ -253,6 +260,11 @@ export const buildExtensionSummary = ({
         }
         if (!instructionMetadata.isRelevantForLayoutEvents()) {
           instructionSummary.relevantForSceneEvents = false;
+        }
+        if (instructionMetadata.isAsync()) {
+          instructionSummary.async = instructionMetadata.isOptionallyAsync()
+            ? 'optional'
+            : 'always';
         }
 
         return instructionSummary;

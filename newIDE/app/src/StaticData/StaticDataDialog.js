@@ -527,7 +527,7 @@ const formatPathSegment = (
     return isFirstSegment ? segment : '.' + segment;
   }
 
-  return '["' + segment.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]';
+  return "['" + segment.replace(/['\\]/g, '\\$&') + "']";
 };
 
 const getSelectedPath = (

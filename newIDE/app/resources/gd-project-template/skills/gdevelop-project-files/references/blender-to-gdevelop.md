@@ -201,10 +201,11 @@ bpy.ops.export_scene.gltf(
     use_selection=True,
     export_cameras=False,
     export_lights=False,
+    export_apply=True,
 )
 ```
 
-Change `use_selection` to `False` only when the complete Blender scene is deliberately export-ready.
+Change `use_selection` to `False` only when the complete Blender scene is deliberately export-ready. `export_apply=True` is essential when the runtime shape depends on modifiers such as Bevel, Solidify, Mirror, or Subdivision; otherwise the GLB can contain only the unmodified base mesh.
 
 ## 10. Import the GLB into GDevelop
 

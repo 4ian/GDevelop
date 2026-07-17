@@ -67,6 +67,7 @@ import { Tabs } from '../UI/Tabs';
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import VariablesList from '../VariablesList/VariablesList';
 
 const gd: libGDevelop = global.gd;
 
@@ -132,7 +133,7 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
 |};
 
-type DetailSettingsTab = 'properties' | 'configuration';
+type DetailSettingsTab = 'properties' | 'private-variables' | 'configuration';
 type DetailPropertySelection = {|
   propertyName: string,
   isSharedProperties: boolean,
@@ -192,6 +193,14 @@ const styles = {
   detailSettingsConfigurationContent: {
     maxWidth: 1200,
     margin: '0 auto',
+  },
+  detailSettingsPrivateVariables: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+    overflow: 'hidden',
+    padding: '8px 16px 16px 16px',
   },
   detailSettingsProperties: {
     display: 'flex',
@@ -346,6 +355,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _propertyResourcesContainer: gdResourcesContainer = new gd.ResourcesContainer(
     gd.ResourcesContainer.Properties
   );
+  _behaviorVariablesContainerBeingEdited: ?gdVariablesContainer = null;
+  _behaviorVariablesSnapshot: ?gdSerializerElement = null;
   _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   _normalizeOnSignalEventsFunctionParameters = (): boolean => {
@@ -413,6 +424,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   }
 
   componentWillUnmount() {
+    this._applyBehaviorVariablesRefactoring();
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
     if (this._parameterVariablesContainer)
@@ -1826,6 +1838,51 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     this._openDetailSettingsDialog();
   };
 
+  _startEditingBehaviorVariables = () => {
+    this._applyBehaviorVariablesRefactoring();
+
+    const focusedEventsBasedBehavior = this.props.focusedEventsBasedBehavior;
+    if (!focusedEventsBasedBehavior) return;
+
+    const variablesContainer = focusedEventsBasedBehavior.getVariables();
+    variablesContainer.resetPersistentUuid();
+    const snapshot = new gd.SerializerElement();
+    variablesContainer.serializeTo(snapshot);
+    this._behaviorVariablesContainerBeingEdited = variablesContainer;
+    this._behaviorVariablesSnapshot = snapshot;
+  };
+
+  _applyBehaviorVariablesRefactoring = () => {
+    const snapshot = this._behaviorVariablesSnapshot;
+    if (!snapshot) return;
+
+    const variablesContainer = this._behaviorVariablesContainerBeingEdited;
+    if (!variablesContainer) {
+      snapshot.delete();
+      this._behaviorVariablesContainerBeingEdited = null;
+      this._behaviorVariablesSnapshot = null;
+      return;
+    }
+
+    try {
+      const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+        snapshot,
+        variablesContainer
+      );
+      gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+        this.props.project,
+        variablesContainer,
+        changeset,
+        snapshot
+      );
+    } finally {
+      variablesContainer.clearPersistentUuid();
+      snapshot.delete();
+      this._behaviorVariablesContainerBeingEdited = null;
+      this._behaviorVariablesSnapshot = null;
+    }
+  };
+
   _openDetailSettingsDialog = () => {
     const focusedEventsBasedBehavior = this.props.focusedEventsBasedBehavior;
     if (!focusedEventsBasedBehavior) {
@@ -1833,6 +1890,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
 
     this._editBehavior(focusedEventsBasedBehavior);
+    this._startEditingBehaviorVariables();
     this.setState(
       {
         detailSettingsDialogOpen: true,
@@ -1846,6 +1904,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _closeDetailSettingsDialog = () => {
+    this._applyBehaviorVariablesRefactoring();
     this.setState({ detailSettingsDialogOpen: false }, () => {
       this._editBehavior(null, this.props.onBehaviorSettingsDialogClose);
     });
@@ -2673,7 +2732,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   options={[
                     {
                       value: ('properties': DetailSettingsTab),
-                      label: <Trans>Properties</Trans>,
+                      label: <Trans>Editor Properties</Trans>,
+                    },
+                    {
+                      value: ('private-variables': DetailSettingsTab),
+                      label: <Trans>Private Variables</Trans>,
                     },
                     {
                       value: ('configuration': DetailSettingsTab),
@@ -2698,6 +2761,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         }}
                       />
                     </div>
+                  </div>
+                )}
+                {detailSettingsTab === 'private-variables' && (
+                  <div style={styles.detailSettingsPrivateVariables}>
+                    <VariablesList
+                      projectScopedContainersAccessor={
+                        detailSettingsProjectScopedContainersAccessor
+                      }
+                      directlyStoreValueChangesWhileEditing
+                      variablesContainer={focusedEventsBasedBehavior.getVariables()}
+                      emptyPlaceholderTitle={
+                        <Trans>Add your first private variable</Trans>
+                      }
+                      emptyPlaceholderDescription={
+                        <Trans>
+                          These variables hold internal state for the behavior.
+                        </Trans>
+                      }
+                      onComputeAllVariableNames={() => []}
+                      onVariablesUpdated={this._notifyBehaviorPropertiesUpdated}
+                      isListLocked={false}
+                    />
                   </div>
                 )}
                 {detailSettingsTab === 'properties' && (

@@ -991,20 +991,20 @@ const GitTool = ({
                           <Chip
                             key={remote}
                             size="small"
-                            label={i18n._(t`Remote ${remote}`)}
+                            label={`${i18n._(t`Remote`)} ${remote}`}
                             variant="outlined"
                           />
                         ))}
                       {!!status.ahead && (
                         <Chip
                           size="small"
-                          label={i18n._(t`Ahead ${status.ahead}`)}
+                          label={`${i18n._(t`Ahead`)} ${status.ahead}`}
                         />
                       )}
                       {!!status.behind && (
                         <Chip
                           size="small"
-                          label={i18n._(t`Behind ${status.behind}`)}
+                          label={`${i18n._(t`Behind`)} ${status.behind}`}
                         />
                       )}
                     </div>

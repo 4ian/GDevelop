@@ -3850,6 +3850,100 @@ describe('editorFunctions', () => {
       expect(testScene.hasLayerNamed('Background')).toBe(false);
     });
 
+    it('renames a layer, including in the layers container', async () => {
+      testScene.getLayers().insertNewLayer('UI', 1);
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'UI', new_layer_name: 'Interface' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Renamed layer \\"UI\\" to \\"Interface\\" for scene \\"TestScene\\" (events and instances updated)."
+      `);
+      expect(testScene.hasLayerNamed('UI')).toBe(false);
+      expect(testScene.hasLayerNamed('Interface')).toBe(true);
+    });
+
+    it('renames and moves a layer in the same call', async () => {
+      testScene.getLayers().insertNewLayer('UI', 1);
+      testScene.getLayers().insertNewLayer('Foreground', 2);
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              {
+                layer_name: 'UI',
+                new_layer_name: 'Interface',
+                new_layer_position: 2,
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Renamed layer \\"UI\\" to \\"Interface\\" for scene \\"TestScene\\" (events and instances updated).
+        Moved layer \\"Interface\\" to position 2 for scene \\"TestScene\\"."
+      `);
+      expect(testScene.getLayers().getLayerPosition('Interface')).toBe(2);
+    });
+
+    it('reports when a layer is already at the requested position', async () => {
+      testScene.getLayers().insertNewLayer('UI', 1);
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'UI', new_layer_position: 1 }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"UI\\" is already at position 1 for scene \\"TestScene\\"."
+      `);
+      expect(testScene.getLayers().getLayerPosition('UI')).toBe(1);
+    });
+
+    it('warns when renaming a layer to a name that already exists', async () => {
+      testScene.getLayers().insertNewLayer('UI', 1);
+      testScene.getLayers().insertNewLayer('HUD', 2);
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [{ layer_name: 'HUD', new_layer_name: 'UI' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"A layer named \\"UI\\" already exists in scene \\"TestScene\\": layer \\"HUD\\" was not renamed. To merge two layers, delete one with \\"delete_this_layer\\" and \\"move_instances_to_layer\\"."`
+      );
+      expect(testScene.hasLayerNamed('HUD')).toBe(true);
+      expect(testScene.hasLayerNamed('UI')).toBe(true);
+    });
+
     it('creates a layer when new_layer_name is redundantly set to the same name', async () => {
       const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
@@ -3893,6 +3987,60 @@ describe('editorFunctions', () => {
         `"Layer \\"Ground\\" not found in scene \\"TestScene\\": nothing was deleted. Existing layers are: \\"\\"."`
       );
       expect(testScene.hasLayerNamed('Ground')).toBe(false);
+    });
+
+    it('changes the initial visibility of an existing layer', async () => {
+      testScene.getLayers().insertNewLayer('MobileControls', 1);
+
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              { layer_name: 'MobileControls', new_visibility: false },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Set layer \\"MobileControls\\" initial visibility to hidden for scene \\"TestScene\\"."
+      `);
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('MobileControls')
+          .getVisibility()
+      ).toBe(false);
+    });
+
+    it('creates a new layer with the requested initial visibility', async () => {
+      const result = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_layers: [
+              { layer_name: 'ShopLayer', new_visibility: false },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Layer \\"ShopLayer\\" did not exist in scene \\"TestScene\\": created it at position 1 (initial visibility: hidden). Layers are now: \\"\\", \\"ShopLayer\\". If you meant to modify an existing layer, check its exact name."
+      `);
+      expect(
+        testScene
+          .getLayers()
+          .getLayer('ShopLayer')
+          .getVisibility()
+      ).toBe(false);
     });
 
     it('refuses to delete the base layer', async () => {
@@ -4920,6 +5068,123 @@ describe('editorFunctions', () => {
       const groups = testScene.getObjects().getObjectGroups();
       expect(groups.has('Foes')).toBe(true);
       expect(groups.has('Enemies')).toBe(false);
+    });
+
+    it('does not create a group when the changed_groups item specifies no changes', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'MobileControls',
+                new_group_name: '',
+                delete_this_group: false,
+                objects_to_add: [],
+                objects_to_remove: [],
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Group \\"MobileControls\\" not found in scene \\"TestScene\\" and no changes were specified: no group was created. To create it, list the objects to put in it in \\"objects_to_add\\"."`
+      );
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('MobileControls')).toBe(false);
+      expect(groups.count()).toBe(1);
+    });
+
+    it('does not create a group when deleting a group that does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [{ group_name: 'Ghosts', delete_this_group: true }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Group \\"Ghosts\\" not found in scene \\"TestScene\\": nothing was deleted. Existing groups are: \\"Enemies\\"."`
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObjectGroups()
+          .has('Ghosts')
+      ).toBe(false);
+    });
+
+    it('does not create a group when renaming a group that does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              { group_name: 'Ghosts', new_group_name: 'Spirits' },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Group \\"Ghosts\\" not found in scene \\"TestScene\\": no group was renamed. Existing groups are: \\"Enemies\\"."`
+      );
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Ghosts')).toBe(false);
+      expect(groups.has('Spirits')).toBe(false);
+    });
+
+    it('does not create a group when removing objects from a group that does not exist', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              { group_name: 'Ghosts', objects_to_remove: ['Enemy1'] },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.warnings).toMatchInlineSnapshot(
+        `"Group \\"Ghosts\\" not found in scene \\"TestScene\\": no objects were removed from it. Existing groups are: \\"Enemies\\"."`
+      );
+      expect(
+        testScene
+          .getObjects()
+          .getObjectGroups()
+          .has('Ghosts')
+      ).toBe(false);
+    });
+
+    it('creates a group when objects are added to it', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              { group_name: 'Players', objects_to_add: ['Enemy1'] },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Players')).toBe(true);
+      expect(groups.get('Players').find('Enemy1')).toBe(true);
     });
 
     it('echoes the resulting content of the group in the message', async () => {

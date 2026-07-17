@@ -5694,6 +5694,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
         return {
           name: layer.getName(),
           position: i,
+          visible: layer.getVisibility(),
           effects: mapFor(0, effectsContainer.getEffectsCount(), j => {
             const effect = effectsContainer.getEffectAt(j);
             const effectMetadata = gd.MetadataProvider.getEffectMetadata(
@@ -6026,6 +6027,10 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_layer,
           'move_instances_to_layer'
         );
+        const new_visibility = SafeExtractor.extractBooleanProperty(
+          changed_layer,
+          'new_visibility'
+        );
 
         // The base layer must always exist: a scene without it is unable to run.
         if (layerName === '' && (delete_this_layer || new_layer_name)) {
@@ -6038,6 +6043,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         }
 
         if (scene.hasLayerNamed(layerName)) {
+          let currentLayerName = layerName;
           if (delete_this_layer) {
             if (move_instances_to_layer) {
               gd.WholeProjectRefactorer.mergeLayersInScene(
@@ -6059,28 +6065,51 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               `Removed layer "${layerName}" for scene "${scene.getName()}".`
             );
           } else {
+            const layer = scene.getLayers().getLayer(layerName);
             if (new_layer_name) {
-              gd.WholeProjectRefactorer.renameLayerInScene(
-                project,
-                scene,
-                layerName,
-                new_layer_name
-              );
+              if (scene.hasLayerNamed(new_layer_name)) {
+                warnings.push(
+                  `A layer named "${new_layer_name}" already exists in scene "${scene.getName()}": layer "${layerName}" was not renamed. To merge two layers, delete one with "delete_this_layer" and "move_instances_to_layer".`
+                );
+              } else {
+                layer.setName(new_layer_name);
+                gd.WholeProjectRefactorer.renameLayerInScene(
+                  project,
+                  scene,
+                  layerName,
+                  new_layer_name
+                );
+                currentLayerName = new_layer_name;
+                changes.push(
+                  `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}" (events and instances updated).`
+                );
+              }
+            }
+            if (new_visibility !== null) {
+              layer.setVisibility(new_visibility);
               changes.push(
-                `Renamed layer "${layerName}" to "${new_layer_name}" for scene "${scene.getName()}".`
+                `Set layer "${currentLayerName}" initial visibility to ${
+                  new_visibility ? 'visible' : 'hidden'
+                } for scene "${scene.getName()}".`
               );
             }
           }
           if (new_layer_position !== null) {
-            scene
+            const currentLayerPosition = scene
               .getLayers()
-              .moveLayer(
-                scene.getLayers().getLayerPosition(layerName),
-                new_layer_position
+              .getLayerPosition(currentLayerName);
+            if (new_layer_position === currentLayerPosition) {
+              changes.push(
+                `Layer "${currentLayerName}" is already at position ${currentLayerPosition} for scene "${scene.getName()}".`
               );
-            changes.push(
-              `Moved layer "${layerName}" to position ${new_layer_position} for scene "${scene.getName()}".`
-            );
+            } else {
+              scene
+                .getLayers()
+                .moveLayer(currentLayerPosition, new_layer_position);
+              changes.push(
+                `Moved layer "${currentLayerName}" to position ${new_layer_position} for scene "${scene.getName()}".`
+              );
+            }
           }
 
           // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -6128,6 +6157,12 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               ? scene.getLayers().getLayersCount()
               : new_layer_position;
           scene.getLayers().insertNewLayer(layerName, insertionPosition);
+          if (new_visibility !== null) {
+            scene
+              .getLayers()
+              .getLayer(layerName)
+              .setVisibility(new_visibility);
+          }
           const newLayerNames = mapFor(
             0,
             scene.getLayers().getLayersCount(),
@@ -6138,7 +6173,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                 .getName()}"`
           ).join(', ');
           changes.push(
-            `Layer "${layerName}" did not exist in scene "${scene.getName()}": created it at position ${insertionPosition}. Layers are now: ${newLayerNames}. If you meant to modify an existing layer, check its exact name.`
+            `Layer "${layerName}" did not exist in scene "${scene.getName()}": created it at position ${insertionPosition}${
+              new_visibility === null
+                ? ''
+                : ` (initial visibility: ${
+                    new_visibility ? 'visible' : 'hidden'
+                  })`
+            }. Layers are now: ${newLayerNames}. If you meant to modify an existing layer, check its exact name.`
           );
         }
       });
@@ -6181,10 +6222,6 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'group_name'
         );
-        const newGroupName = SafeExtractor.extractStringProperty(
-          changed_group,
-          'new_group_name'
-        );
         const deleteThisGroup = SafeExtractor.extractBooleanProperty(
           changed_group,
           'delete_this_group'
@@ -6204,9 +6241,53 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           return;
         }
 
+        let newGroupName = SafeExtractor.extractStringProperty(
+          changed_group,
+          'new_group_name'
+        );
+        if (newGroupName === groupName) {
+          // Same name means no rename: ignore it, as models often redundantly fill it.
+          newGroupName = null;
+        }
+
+        const hasObjectsToAdd = !!objectsToAdd && objectsToAdd.length > 0;
+        const hasObjectsToRemove =
+          !!objectsToRemove && objectsToRemove.length > 0;
+
         let foundGroup: gdObjectGroup;
         if (!groups.has(groupName)) {
-          // Create the group if it does not exist yet.
+          const existingGroupNames = mapFor(
+            0,
+            groups.count(),
+            i => `"${groups.getAt(i).getName()}"`
+          ).join(', ');
+
+          // A deletion, rename or removal targeting a group that does not exist
+          // is always a wrong group name: don't create a group out of it.
+          if (deleteThisGroup) {
+            warnings.push(
+              `Group "${groupName}" not found in scene "${scene.getName()}": nothing was deleted. Existing groups are: ${existingGroupNames ||
+                '(none)'}.`
+            );
+            return;
+          }
+          if (newGroupName) {
+            warnings.push(
+              `Group "${groupName}" not found in scene "${scene.getName()}": no group was renamed. Existing groups are: ${existingGroupNames ||
+                '(none)'}.`
+            );
+            return;
+          }
+          if (!hasObjectsToAdd) {
+            warnings.push(
+              hasObjectsToRemove
+                ? `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
+                    '(none)'}.`
+                : `Group "${groupName}" not found in scene "${scene.getName()}" and no changes were specified: no group was created. To create it, list the objects to put in it in "objects_to_add".`
+            );
+            return;
+          }
+          // Create the group, as objects are being added to it.
           foundGroup = groups.insertNew(groupName, groups.count());
         } else {
           foundGroup = groups.get(groupName);

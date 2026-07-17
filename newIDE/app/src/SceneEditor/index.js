@@ -25,7 +25,6 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
 import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
-import ToolbarUndoRedoButtons from '../UI/ToolbarUndoRedoButtons';
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -1199,14 +1198,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <SplitEditorToolbar
-          leadingToolbar={
-            <ToolbarUndoRedoButtons
-              undo={this.undo}
-              canUndo={canUndo(this.state.history)}
-              redo={this.redo}
-              canRedo={canRedo(this.state.history)}
-            />
-          }
+          leadingToolbar={null}
           trailingToolbar={
             <MosaicEditorsDisplayToolbar
               gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}

@@ -1,862 +1,358 @@
 // @ts-check
 
 describe('gdjs.evtTools.signal', () => {
-  const signalCalls = [];
-  const signalParameterCalls = [];
-  const signalReceiverIds = [];
+  const objectCalls = [];
+  const behaviorCalls = [];
 
   before(() => {
-    const SignalTestRuntimeObject = class SignalTestRuntimeObject extends gdjs.TestRuntimeObject {
-      onSignal(signalName, payload, emitterObjectName, emitterInstanceId) {
-        const runtimeScene = this.getRuntimeScene();
-        const signalNameFromContext =
-          gdjs.evtTools.signal.getSignalName(runtimeScene);
-        const payloadFromContext =
-          gdjs.evtTools.signal.getSignalPayload(runtimeScene);
-        signalParameterCalls.push({
-          receiver: this.getName(),
-          signalName,
-          payload,
-          emitterObjectName,
-          emitterInstanceId,
-        });
-        signalReceiverIds.push({
+    class SignalTestRuntimeObject extends gdjs.TestRuntimeObject {
+      onSignal(signalName, payload) {
+        objectCalls.push({
           receiver: this.getName(),
           receiverId: this.getUniqueId(),
           signalName,
+          payload,
         });
-        signalCalls.push({
-          receiver: this.getName(),
-          signalName: signalNameFromContext,
-          payload: payloadFromContext,
-        });
-        if (signalNameFromContext === 'First') {
-          gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Second', '2');
+        if (signalName === 'First') {
+          gdjs.evtTools.signal.emitSceneSignal(
+            this.getRuntimeScene(),
+            'Second',
+            'later'
+          );
         }
       }
-    };
+    }
     gdjs.registerObject('SignalTest::Object', SignalTestRuntimeObject);
+
+    class SignalTestRuntimeBehavior extends gdjs.RuntimeBehavior {
+      onSignal(signalName, payload) {
+        behaviorCalls.push({
+          receiver: this.getName(),
+          ownerId: this.owner.getUniqueId(),
+          signalName,
+          payload,
+        });
+      }
+    }
+    gdjs.registerBehavior('SignalTest::Behavior', SignalTestRuntimeBehavior);
   });
 
   beforeEach(() => {
-    signalCalls.length = 0;
-    signalParameterCalls.length = 0;
-    signalReceiverIds.length = 0;
+    objectCalls.length = 0;
+    behaviorCalls.length = 0;
   });
 
-  const createSignalRuntimeScene = (
-    runtimeGame = gdjs.getPixiRuntimeGame()
-  ) => {
-    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.registerObject({
-      name: 'Receiver',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    runtimeScene.createObject('Receiver');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-    return runtimeScene;
+  const objectData = (name, withBehavior = false) => ({
+    name,
+    type: 'SignalTest::Object',
+    variables: [],
+    behaviors: withBehavior
+      ? [{ name: 'SignalBehavior', type: 'SignalTest::Behavior' }]
+      : [],
+    effects: [],
+  });
+
+  const createSignalRuntimeScene = () => {
+    const runtimeScene = new gdjs.TestRuntimeScene(gdjs.getPixiRuntimeGame());
+    runtimeScene.registerObject(objectData('Receiver', true));
+    const receiver = runtimeScene.createObject('Receiver');
+    if (!receiver) throw new Error('Unable to create signal test receiver.');
+    return { runtimeScene, receiver };
   };
 
-  /**
-   * @param {{objects?: ObjectData[], objectsGroups?: ObjectGroupData[]}} props
-   * @returns {LayoutData}
-   */
-  const createSignalTestSceneData = ({ objects = [], objectsGroups = [] }) => ({
-    layers: [
-      {
-        name: '',
-        visibility: true,
-        cameras: [],
-        effects: [],
-        ambientLightColorR: 127,
-        ambientLightColorB: 127,
-        ambientLightColorG: 127,
-        isLightingLayer: false,
-        followBaseLayerCamera: false,
-      },
-    ],
-    variables: [],
-    r: 0,
-    v: 0,
-    b: 0,
-    mangledName: 'Scene1',
-    name: 'Scene1',
-    stopSoundsOnStartup: false,
-    title: '',
-    behaviorsSharedData: [],
-    objects,
-    objectsGroups,
-    instances: [],
-    usedResources: [],
-    uiSettings: {
-      grid: false,
-      gridType: 'rectangular',
-      gridWidth: 10,
-      gridHeight: 10,
-      gridDepth: 10,
-      gridOffsetX: 0,
-      gridOffsetY: 0,
-      gridOffsetZ: 0,
-      gridColor: 0,
-      gridAlpha: 1,
-      snap: false,
-    },
-  });
-
-  it('queues signals until the next pre-events step and exposes their payload', () => {
-    const runtimeScene = createSignalRuntimeScene();
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', '7');
-
-      expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
-        false
-      );
-      expect(signalCalls.length).to.be(0);
-    });
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      expect(gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Ping')).to.be(
-        true
-      );
-      expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be('7');
-      signalCalls.push({
-        receiver: 'scene',
-        signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
-      });
-    });
-
-    expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'Ping', payload: '7' },
-      { receiver: 'scene', signalName: 'Ping', payload: '7' },
-    ]);
-    expect(signalParameterCalls).to.eql([
-      {
-        receiver: 'Receiver',
-        signalName: 'Ping',
-        payload: '7',
-        emitterObjectName: '',
-        emitterInstanceId: -1,
-      },
-    ]);
-  });
-
-  it('captures picked objects without reusing the caller picking list', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'OtherReceiver',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    runtimeScene.createObject('OtherReceiver');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-
-    const objectsLists = new Hashtable();
-    objectsLists.put('Receiver', runtimeScene.getObjects('Receiver').slice());
-
-    gdjs.evtTools.signal.emitSignalToPickedObjects(
-      runtimeScene,
-      objectsLists,
-      'Picked'
-    );
-    objectsLists.put(
-      'OtherReceiver',
-      runtimeScene.getObjects('OtherReceiver').slice()
-    );
-    objectsLists.get('Receiver').length = 0;
-
+  const dispatchFrame = (runtimeScene) => {
     runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+  };
 
-    expect(signalCalls.map(({ receiver }) => receiver)).to.eql(['Receiver']);
-  });
+  it('delivers scene signals on the next frame and exposes them to scene events without a subscription', () => {
+    const { runtimeScene } = createSignalRuntimeScene();
 
-  it('treats an omitted payload placeholder as no payload', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    const objectsLists = new Hashtable();
-    objectsLists.put('Receiver', runtimeScene.getObjects('Receiver').slice());
-
-    gdjs.evtTools.signal.emitSignalToPickedObjects(
-      runtimeScene,
-      objectsLists,
-      'NoPayload',
-      gdjs.VariablesContainer.badVariable
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'NoPayload', payload: '' },
-    ]);
-    expect(signalParameterCalls).to.eql([
-      {
-        receiver: 'Receiver',
-        signalName: 'NoPayload',
-        payload: '',
-        emitterObjectName: '',
-        emitterInstanceId: -1,
-      },
-    ]);
-  });
-
-  it('does not inherit the current signal sender without an explicit sender', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'Emitter',
-      type: 'TestObject::TestObject',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const emitter = runtimeScene.createObject('Emitter');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal('First', { kind: 'scene' }, '1', emitter);
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'LocaleChanged', 'fr');
     expect(
-      signalParameterCalls
-        .filter(({ signalName }) => signalName === 'Second')
-        .map(({ receiver, signalName, payload, emitterObjectName }) => ({
-          receiver,
-          signalName,
-          payload,
-          emitterObjectName,
-        }))
-    ).to.eql([
-      {
-        receiver: 'Receiver',
-        signalName: 'Second',
-        payload: '2',
-        emitterObjectName: '',
-      },
-    ]);
-    signalParameterCalls
-      .filter(({ signalName }) => signalName === 'Second')
-      .forEach(({ emitterInstanceId }) => {
-        expect(emitterInstanceId).to.be(-1);
-      });
+      gdjs.evtTools.signal.getDeliveredSceneSignals(
+        runtimeScene,
+        'LocaleChanged'
+      )
+    ).to.have.length(0);
+
+    dispatchFrame(runtimeScene);
+    const signals = gdjs.evtTools.signal.getDeliveredSceneSignals(
+      runtimeScene,
+      'LocaleChanged'
+    );
+    expect(signals).to.have.length(1);
+    expect(objectCalls).to.have.length(0);
+    expect(behaviorCalls).to.have.length(0);
+
+    gdjs.evtTools.signal.setCurrentSignalForSceneCondition(
+      runtimeScene,
+      signals[0]
+    );
+    expect(
+      gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'LocaleChanged')
+    ).to.be(true);
+    expect(gdjs.evtTools.signal.getSignalName(runtimeScene)).to.be(
+      'LocaleChanged'
+    );
+    expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be('fr');
+    gdjs.evtTools.signal.clearCurrentSignalForSceneCondition(runtimeScene);
+
+    expect(gdjs.evtTools.signal.getSignalName(runtimeScene)).to.be('');
+    expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be('');
   });
 
-  it('uses the object function context owner as the sender', () => {
-    const runtimeScene = createSignalRuntimeScene();
+  it('notifies prefab and behavior instances only after their own exact subscriptions', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    const behavior = receiver.getBehavior('SignalBehavior');
+
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      receiver,
+      'LocaleChanged'
+    );
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      behavior,
+      'LocaleChanged'
+    );
+    // Repeating a subscription is idempotent.
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      receiver,
+      'LocaleChanged'
+    );
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      behavior,
+      'OtherSignal'
+    );
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'LocaleChanged', 'ja');
+    dispatchFrame(runtimeScene);
+
+    expect(objectCalls).to.eql([
+      {
+        receiver: 'Receiver',
+        receiverId: receiver.getUniqueId(),
+        signalName: 'LocaleChanged',
+        payload: 'ja',
+      },
+    ]);
+    expect(behaviorCalls).to.eql([
+      {
+        receiver: 'SignalBehavior',
+        ownerId: receiver.getUniqueId(),
+        signalName: 'LocaleChanged',
+        payload: 'ja',
+      },
+    ]);
+  });
+
+  it('keeps an inactive behavior subscribed without replaying missed signals', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    const behavior = receiver.getBehavior('SignalBehavior');
+    if (!behavior) throw new Error('Unable to get signal test behavior.');
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, behavior, 'Ping');
+
+    behavior.activate(false);
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', 'missed');
+    dispatchFrame(runtimeScene);
+    expect(behaviorCalls).to.have.length(0);
+
+    behavior.activate(true);
+    expect(behaviorCalls).to.have.length(0);
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', 'new');
+    dispatchFrame(runtimeScene);
+    expect(behaviorCalls.map((call) => call.payload)).to.eql(['new']);
+  });
+
+  it('delivers a direct signal only to the targeted prefab onSignal', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    const behavior = receiver.getBehavior('SignalBehavior');
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, behavior, 'Direct');
+
+    gdjs.evtTools.signal.emitSignalToInstance(
+      runtimeScene,
+      receiver.getUniqueId(),
+      'Direct',
+      'one'
+    );
+    dispatchFrame(runtimeScene);
+
+    expect(objectCalls.map((call) => call.signalName)).to.eql(['Direct']);
+    expect(behaviorCalls).to.have.length(0);
+    expect(
+      gdjs.evtTools.signal.getDeliveredSceneSignals(runtimeScene, 'Direct')
+    ).to.have.length(0);
+  });
+
+  it('dismisses direct signals for missing instances and instances without onSignal', () => {
+    const { runtimeScene } = createSignalRuntimeScene();
     runtimeScene.registerObject({
-      name: 'PeaShooter',
+      name: 'PlainObject',
       type: 'TestObject::TestObject',
       variables: [],
       behaviors: [],
       effects: [],
     });
-    const peaShooter = runtimeScene.createObject('PeaShooter');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
+    const plainObject = runtimeScene.createObject('PlainObject');
+    if (!plainObject) throw new Error('Unable to create plain object.');
 
-    const eventsFunctionContext = {
-      getObjects: (objectName) => (objectName === 'Object' ? [peaShooter] : []),
+    gdjs.evtTools.signal.emitSignalToInstance(
+      runtimeScene,
+      999999,
+      'Missing',
+      ''
+    );
+    gdjs.evtTools.signal.emitSignalToInstance(
+      runtimeScene,
+      plainObject.getUniqueId(),
+      'NoHandler',
+      ''
+    );
+    dispatchFrame(runtimeScene);
+
+    expect(objectCalls).to.have.length(0);
+    expect(
+      runtimeScene.getSignalBus().getDebugInfo().signalsThisFrame
+    ).to.have.length(2);
+    expect(
+      runtimeScene
+        .getSignalBus()
+        .getDebugInfo()
+        .signalsThisFrame.map((signal) => signal.status)
+    ).to.eql(['unhandled', 'unhandled']);
+  });
+
+  it('cleans subscriptions when an object or behavior is destroyed', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    const behavior = receiver.getBehavior('SignalBehavior');
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'Ping');
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, behavior, 'Ping');
+
+    receiver.removeBehavior('SignalBehavior');
+    runtimeScene.markObjectForDeletion(receiver);
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', 'after-delete');
+    dispatchFrame(runtimeScene);
+
+    expect(objectCalls).to.have.length(0);
+    expect(behaviorCalls).to.have.length(0);
+  });
+
+  it('uses a stable subscriber snapshot for each scene signal', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    runtimeScene.registerObject(objectData('LateReceiver'));
+    const lateReceiver = runtimeScene.createObject('LateReceiver');
+    if (!lateReceiver) throw new Error('Unable to create late receiver.');
+
+    const signalReceiver = /** @type {any} */ (receiver);
+    const originalOnSignal = signalReceiver.onSignal.bind(receiver);
+    signalReceiver.onSignal = (signalName, payload) => {
+      originalOnSignal(signalName, payload);
+      gdjs.evtTools.signal.subscribeSceneSignal(
+        runtimeScene,
+        lateReceiver,
+        signalName
+      );
     };
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'Ping');
 
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', 'first');
+    dispatchFrame(runtimeScene);
+    expect(objectCalls.map((call) => call.receiver)).to.eql(['Receiver']);
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', 'second');
+    dispatchFrame(runtimeScene);
+    expect(objectCalls.map((call) => call.receiver)).to.eql([
+      'Receiver',
+      'Receiver',
+      'LateReceiver',
+    ]);
+  });
+
+  it('keeps signals emitted by onSignal handlers for the following frame', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'First');
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'Second');
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'First', 'now');
+    dispatchFrame(runtimeScene);
+    expect(objectCalls.map((call) => call.signalName)).to.eql(['First']);
+    expect(runtimeScene.getSignalBus().getQueuedSignalsCount()).to.be(1);
+
+    dispatchFrame(runtimeScene);
+    expect(objectCalls.map((call) => call.signalName)).to.eql([
+      'First',
+      'Second',
+    ]);
+  });
+
+  it('preserves FIFO delivery for repeated scene signal names', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'Ping');
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', '1');
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', '2');
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Ping', '3');
+
+    dispatchFrame(runtimeScene);
+    expect(objectCalls.map((call) => call.payload)).to.eql(['1', '2', '3']);
+    expect(
+      gdjs.evtTools.signal
+        .getDeliveredSceneSignals(runtimeScene, 'Ping')
+        .map((signal) => signal.payload)
+    ).to.eql(['1', '2', '3']);
+  });
+
+  it('retains overflow ahead of newly emitted signals', () => {
+    const { runtimeScene } = createSignalRuntimeScene();
+    for (let index = 0; index < 10001; ++index) {
       gdjs.evtTools.signal.emitSceneSignal(
         runtimeScene,
-        'Spawn',
-        'payload',
-        gdjs.evtTools.signal.getSenderFromContext(
-          /** @type {any} */ (eventsFunctionContext)
-        )
+        'Overflow',
+        '' + index
       );
-    });
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      expect(
-        gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Spawn')
-      ).to.be(true);
-      expect(
-        gdjs.evtTools.signal.getSignalSenderObjectName(runtimeScene)
-      ).to.be('PeaShooter');
-      expect(
-        gdjs.evtTools.signal.getSignalSenderInstanceId(runtimeScene)
-      ).to.be(peaShooter.getUniqueId());
-    });
-  });
-
-  it('uses the scene as debug source when a scene receiver forwards a signal', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'Emitter',
-      type: 'TestObject::TestObject',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const emitter = runtimeScene.createObject('Emitter');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal('SceneDispatcherIn', { kind: 'scene' }, '1', emitter);
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      if (
-        gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'SceneDispatcherIn')
-      ) {
-        gdjs.evtTools.signal.emitSignalToObject(
-          runtimeScene,
-          'Receiver',
-          'SceneDispatcherOut',
-          '2'
-        );
-      }
-    });
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    const secondSignalCalls = signalParameterCalls.filter(
-      ({ signalName }) => signalName === 'SceneDispatcherOut'
-    );
-    expect(secondSignalCalls.length).to.be(1);
-    expect(secondSignalCalls[0].emitterObjectName).to.be('');
-    expect(secondSignalCalls[0].emitterInstanceId).to.be(-1);
-
-    const records = runtimeScene
-      .getSignalBus()
-      .getSignalAnimationDebugRecords();
-    expect(records.length).to.be(1);
-    expect(records[0].name).to.be('SceneDispatcherOut');
-    expect(records[0].source.objectName).to.be('scene');
-  });
-
-  it('dispatches signals emitted by receivers in the same FIFO cycle', () => {
-    const runtimeScene = createSignalRuntimeScene();
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'First', '1');
-    });
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      expect(
-        gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'First')
-      ).to.be(true);
-      signalCalls.push({
-        receiver: 'scene',
-        signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
-      });
-
-      expect(
-        gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'Second')
-      ).to.be(true);
-      signalCalls.push({
-        receiver: 'scene',
-        signalName: gdjs.evtTools.signal.getSignalName(runtimeScene),
-        payload: gdjs.evtTools.signal.getSignalPayload(runtimeScene),
-      });
-    });
-
-    expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'First', payload: '1' },
-      { receiver: 'Receiver', signalName: 'Second', payload: '2' },
-      { receiver: 'scene', signalName: 'First', payload: '1' },
-      { receiver: 'scene', signalName: 'Second', payload: '2' },
-    ]);
-    expect(
-      signalParameterCalls
-        .filter(({ signalName }) => signalName === 'Second')
-        .map(({ receiver, signalName, payload, emitterObjectName }) => ({
-          receiver,
-          signalName,
-          payload,
-          emitterObjectName,
-        }))
-    ).to.eql([
-      {
-        receiver: 'Receiver',
-        signalName: 'Second',
-        payload: '2',
-        emitterObjectName: '',
-      },
-    ]);
-    signalParameterCalls
-      .filter(({ signalName }) => signalName === 'Second')
-      .forEach(({ emitterInstanceId }) => {
-        expect(emitterInstanceId).to.be(-1);
-      });
-  });
-
-  it('targets objects and object groups without broadcasting', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'OtherReceiver',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    runtimeScene.createObject('OtherReceiver');
-    // @ts-ignore - Build a group directly without loading full scene data.
-    runtimeScene._objectGroups.set('Receivers', ['Receiver', 'OtherReceiver']);
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-
-    gdjs.evtTools.signal.emitSignalToObject(
-      runtimeScene,
-      'OtherReceiver',
-      'ObjectOnly',
-      '3'
-    );
-
-    gdjs.evtTools.signal.emitSignalToObjectGroup(
-      runtimeScene,
-      'Receivers',
-      'Group',
-      '4'
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls).to.eql([
-      { receiver: 'OtherReceiver', signalName: 'ObjectOnly', payload: '3' },
-      { receiver: 'Receiver', signalName: 'Group', payload: '4' },
-      { receiver: 'OtherReceiver', signalName: 'Group', payload: '4' },
-    ]);
-  });
-
-  it('does not expose object-targeted signals to scene signal conditions', () => {
-    const runtimeScene = createSignalRuntimeScene();
-
-    gdjs.evtTools.signal.emitSignalToObject(
-      runtimeScene,
-      'Receiver',
-      'ObjectOnly',
-      'payload'
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(
-      gdjs.evtTools.signal.getDeliveredSignals(runtimeScene, 'ObjectOnly')
-        .length
-    ).to.be(1);
-    expect(
-      gdjs.evtTools.signal.getDeliveredSceneSignals(runtimeScene, 'ObjectOnly')
-        .length
-    ).to.be(0);
-    expect(
-      gdjs.evtTools.signal.isSignalReceived(runtimeScene, 'ObjectOnly')
-    ).to.be(false);
-  });
-
-  it('targets global object groups loaded by the scene', () => {
-    const receiverObjectData = {
-      name: 'Receiver',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    };
-    const runtimeGame = gdjs.getPixiRuntimeGame({
-      objects: [receiverObjectData],
-      objectsGroups: [
-        {
-          name: 'GlobalReceivers',
-          objects: [{ name: 'Receiver' }],
-        },
-      ],
-      layouts: [createSignalTestSceneData({})],
-    });
-    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene(runtimeGame.getSceneAndExtensionsData('Scene1'));
-    runtimeScene.createObject('Receiver');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-
-    gdjs.evtTools.signal.emitSignalToObjectGroup(
-      runtimeScene,
-      'GlobalReceivers',
-      'GlobalGroup',
-      'payload'
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'GlobalGroup', payload: 'payload' },
-    ]);
-  });
-
-  it('ignores non-existing object signal targets without registering empty instance lists', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    const missingObjectName = 'MissingReceiver';
-
-    // @ts-ignore - Inspect the runtime instance table directly for this regression.
-    expect(runtimeScene._instances.containsKey(missingObjectName)).to.be(false);
-
-    gdjs.evtTools.signal.emitSignalToObject(
-      runtimeScene,
-      missingObjectName,
-      'MissingTarget',
-      'payload'
-    );
-    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
-      1
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls.length).to.be(0);
-    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
-      0
-    );
-    expect(
-      gdjs.evtTools.signal.getDeliveredSignals(runtimeScene, 'MissingTarget')
-        .length
-    ).to.be(1);
-    // @ts-ignore - Inspect the runtime instance table directly for this regression.
-    expect(runtimeScene._instances.containsKey(missingObjectName)).to.be(false);
-  });
-
-  it('targets one object instance by unique id', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    const firstReceiver = runtimeScene.getObjects('Receiver')[0];
-    const secondReceiver = runtimeScene.createObject('Receiver');
-
-    gdjs.evtTools.signal.emitSignalToObjectInstance(
-      runtimeScene,
-      secondReceiver.getUniqueId(),
-      'InstanceOnly'
-    );
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls).to.eql([
-      { receiver: 'Receiver', signalName: 'InstanceOnly', payload: '' },
-    ]);
-    expect(signalReceiverIds).to.eql([
-      {
-        receiver: 'Receiver',
-        receiverId: secondReceiver.getUniqueId(),
-        signalName: 'InstanceOnly',
-      },
-    ]);
-    expect(
-      signalReceiverIds.some(
-        ({ receiverId }) => receiverId === firstReceiver.getUniqueId()
-      )
-    ).to.be(false);
-  });
-
-  it('ignores empty signal names without queueing debug noise', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, '', 'payload');
-
-    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
-      0
-    );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls.length).to.be(0);
-    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
-      []
-    );
-  });
-
-  it('ignores invalid object instance ids without queueing debug noise', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    gdjs.evtTools.signal.emitSignalToObjectInstance(
-      runtimeScene,
-      0,
-      'InstanceOnly'
-    );
-
-    expect(runtimeScene.getSignalBus().getDebugInfo().queuedSignalsCount).to.be(
-      0
-    );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls.length).to.be(0);
-    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
-      []
-    );
-  });
-
-  it('drops deleted picked objects before dispatch', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    const receiver = runtimeScene.getObjects('Receiver')[0];
-    const objectsLists = new Hashtable();
-    objectsLists.put('Receiver', [receiver]);
-
-    gdjs.evtTools.signal.emitSignalToPickedObjects(
-      runtimeScene,
-      objectsLists,
-      'Picked'
-    );
-    receiver.deleteFromScene();
-
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls.length).to.be(0);
-  });
-
-  it('records preview signal monitor diagnostics when animations are disabled', () => {
-    const runtimeGame = new gdjs.RuntimeGame(gdjs.createProjectData(), {
-      isPreview: true,
-    });
-    const runtimeScene = createSignalRuntimeScene(runtimeGame);
-    runtimeScene.registerObject({
-      name: 'Sender',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const sender = runtimeScene.createObject('Sender');
-
-    gdjs.evtTools.signal.emitSignalToObject(
-      runtimeScene,
-      'Receiver',
-      'PreviewMonitor',
-      'payload',
-      sender
-    );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    const diagnostics = runtimeScene.getSignalBus().getDebugInfo();
-    expect(diagnostics.signalsThisFrame.length).to.be(1);
-    const signalDebugRecord = diagnostics.signalsThisFrame[0];
-    const signalDebugSource = signalDebugRecord.source;
-    if (!signalDebugSource) {
-      throw new Error('Expected a signal debug source.');
     }
-    expect(signalDebugRecord.name).to.be('PreviewMonitor');
-    expect(signalDebugSource.objectName).to.be('Sender');
-    expect(signalDebugSource.objectId).to.be(sender.getUniqueId());
-    expect(signalDebugRecord.receiverPositions.length).to.be(1);
-    expect(signalDebugRecord.receiverPositions[0].objectName).to.be('Receiver');
-    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
-      []
-    );
+
+    dispatchFrame(runtimeScene);
+    expect(runtimeScene.getSignalBus().getQueuedSignalsCount()).to.be(1);
+    expect(
+      runtimeScene.getSignalBus().getDebugInfo().throttledSignalsCount
+    ).to.be(1);
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'New', 'after');
+    dispatchFrame(runtimeScene);
+    expect(
+      gdjs.evtTools.signal
+        .getDeliveredSceneSignals(runtimeScene, '')
+        .map((signal) => signal.name)
+    ).to.eql(['Overflow', 'New']);
   });
 
-  it('records preview scene signal diagnostics as scene target when animations are disabled', () => {
-    const runtimeGame = new gdjs.RuntimeGame(gdjs.createProjectData(), {
-      isPreview: true,
-    });
-    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-
-    gdjs.evtTools.signal.emitSceneSignal(
+  it('does not expose emitter metadata to handlers or public expressions', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    gdjs.evtTools.signal.subscribeSceneSignal(runtimeScene, receiver, 'Ping');
+    gdjs.evtTools.signal.emitSceneSignalFromEvents(
       runtimeScene,
-      'PreviewSceneMonitor',
-      'payload'
+      'Ping',
+      'source=' + receiver.getUniqueId(),
+      receiver
     );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
+    dispatchFrame(runtimeScene);
 
-    const diagnostics = runtimeScene.getSignalBus().getDebugInfo();
-    expect(diagnostics.signalsThisFrame.length).to.be(1);
-    const signalDebugRecord = diagnostics.signalsThisFrame[0];
-    const signalDebugSource = signalDebugRecord.source;
-    if (!signalDebugSource) {
-      throw new Error('Expected a signal debug source.');
-    }
-    expect(signalDebugRecord.name).to.be('PreviewSceneMonitor');
-    expect(signalDebugRecord.target).to.be('scene');
-    expect(signalDebugRecord.status).to.be('unhandled');
-    expect(signalDebugSource.objectName).to.be('scene');
-    expect(signalDebugRecord.targetPositions.length).to.be(1);
-    expect(signalDebugRecord.targetPositions[0].objectName).to.be('scene');
-    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
-      []
-    );
-  });
-
-  it('records signal animation debug points only when enabled', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'Sender',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
+    expect(objectCalls[0]).to.eql({
+      receiver: 'Receiver',
+      receiverId: receiver.getUniqueId(),
+      signalName: 'Ping',
+      payload: 'source=' + receiver.getUniqueId(),
     });
-    const sender = runtimeScene.createObject('Sender');
-    const receiver = runtimeScene.getObjects('Receiver')[0];
-    sender.setPosition(10, 20);
-    receiver.setPosition(90, 40);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal(
-        'Pulse',
-        { kind: 'object', objectName: 'Receiver' },
-        'payload',
-        sender
-      );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(runtimeScene.getSignalBus().getSignalAnimationDebugRecords()).to.eql(
-      []
-    );
-
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-    runtimeScene
-      .getSignalBus()
-      .emitSignal(
-        'Pulse',
-        { kind: 'object', objectName: 'Receiver' },
-        'payload',
-        sender
-      );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    const records = runtimeScene
-      .getSignalBus()
-      .getSignalAnimationDebugRecords();
-    expect(records.length).to.be(1);
-    expect(records[0].name).to.be('Pulse');
-    expect(records[0].payload).to.be('payload');
-    expect(records[0].target).to.be('object:Receiver');
-    expect(records[0].status).to.be('delivered');
-    expect(records[0].source.objectName).to.be('Sender');
-    expect(records[0].source.objectId).to.be(sender.getUniqueId());
-    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
-      ['Receiver']
-    );
-    records[0].receivers.forEach((receiverRecord) => {
-      expect(receiverRecord.objectName).to.be('Receiver');
-      expect(receiverRecord.objectId).to.be(receiver.getUniqueId());
-      expect(receiverRecord.x).to.be(receiver.getCenterXInScene());
-      expect(receiverRecord.y).to.be(receiver.getCenterYInScene());
-    });
-  });
-
-  it('records unhandled object signal animation targets', () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame();
-    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.registerObject({
-      name: 'Sender',
-      type: 'TestObject::TestObject',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    runtimeScene.registerObject({
-      name: 'PlainTarget',
-      type: 'TestObject::TestObject',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const sender = runtimeScene.createObject('Sender');
-    const plainTarget = runtimeScene.createObject('PlainTarget');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal(
-        'MissingHandler',
-        { kind: 'object', objectName: 'PlainTarget' },
-        'payload',
-        sender
-      );
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    expect(signalCalls.length).to.be(0);
-    const records = runtimeScene
-      .getSignalBus()
-      .getSignalAnimationDebugRecords();
-    expect(records.length).to.be(1);
-    expect(records[0].status).to.be('unhandled');
-    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
-      ['PlainTarget']
-    );
-    expect(records[0].receivers[0].isUnhandled).to.be(true);
-    expect(records[0].receivers[0].objectName).to.be('PlainTarget');
-    expect(records[0].receivers[0].objectId).to.be(plainTarget.getUniqueId());
-  });
-
-  it('records unhandled scene signal animations as scene targets', () => {
-    const runtimeGame = gdjs.getPixiRuntimeGame();
-    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
-    runtimeScene.registerObject({
-      name: 'Sender',
-      type: 'TestObject::TestObject',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const sender = runtimeScene.createObject('Sender');
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal('SceneWithoutReceiver', { kind: 'scene' }, 'payload', sender);
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {});
-
-    const records = runtimeScene
-      .getSignalBus()
-      .getSignalAnimationDebugRecords();
-    expect(records.length).to.be(1);
-    expect(records[0].target).to.be('scene');
-    expect(records[0].status).to.be('unhandled');
-    expect(records[0].source.objectName).to.be('Sender');
-    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
-      ['scene']
-    );
-    expect(records[0].receivers[0].isUnhandled).to.be(true);
-  });
-
-  it('records scene signal animations as scene receivers', () => {
-    const runtimeScene = createSignalRuntimeScene();
-    runtimeScene.registerObject({
-      name: 'Sender',
-      type: 'SignalTest::Object',
-      variables: [],
-      behaviors: [],
-      effects: [],
-    });
-    const sender = runtimeScene.createObject('Sender');
-    sender.setPosition(10, 20);
-    runtimeScene.getSignalBus().refreshReceiverIndex(runtimeScene);
-    runtimeScene.enableSignalAnimationDebugDraw(true);
-
-    runtimeScene
-      .getSignalBus()
-      .emitSignal('ScenePulse', { kind: 'scene' }, 'payload', sender);
-    runtimeScene.renderAndStepWithEventsFunction(16, () => {
-      const signal = gdjs.evtTools.signal.getDeliveredSignals(
-        runtimeScene,
-        'ScenePulse'
-      )[0];
-      gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, signal);
-    });
-
-    const records = runtimeScene
-      .getSignalBus()
-      .getSignalAnimationDebugRecords();
-    expect(records.length).to.be(1);
-    expect(records[0].name).to.be('ScenePulse');
-    expect(records[0].payload).to.be('payload');
-    expect(records[0].target).to.be('scene');
-    expect(records[0].status).to.be('delivered');
-    expect(records[0].source.objectName).to.be('Sender');
-    expect(records[0].receivers.map(({ receiverName }) => receiverName)).to.eql(
-      ['scene']
-    );
-    expect(records[0].receivers[0].x).to.be(
-      runtimeScene.getLayer('').getCameraX()
-    );
-    expect(records[0].receivers[0].y).to.be(
-      runtimeScene.getLayer('').getCameraY()
-    );
+    const deliveredSignal = gdjs.evtTools.signal.getDeliveredSceneSignals(
+      runtimeScene,
+      'Ping'
+    )[0];
+    expect(deliveredSignal).not.to.have.property('debugEmitter');
+    const signalTools = /** @type {any} */ (gdjs.evtTools.signal);
+    expect(signalTools.getSignalSenderObjectName).to.be(undefined);
+    expect(signalTools.getSignalSenderInstanceId).to.be(undefined);
+    expect(signalTools.getSignalDiagnostics).to.be(undefined);
   });
 });

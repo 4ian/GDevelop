@@ -400,6 +400,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
 bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
     const gd::String &functionName) {
   return functionName == "onCreated" || functionName == "onPlacedInScene" ||
+         functionName == "onSignal" ||
          functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
          functionName == "doStepPostEvents" || functionName == "onDestroy" ||

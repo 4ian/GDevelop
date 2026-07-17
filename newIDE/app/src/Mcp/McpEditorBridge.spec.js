@@ -6524,7 +6524,7 @@ runtimeScene._instances.length;
           name: 'create_signal_emit_action',
           arguments: {
             target_kind: 'object_instance',
-            instance_id: 'SignalSenderInstanceId()',
+            instance_id: 'Variable(RequesterInstanceId)',
             signal_name: 'Attack.Reply',
             payload: 'Blocked',
           },
@@ -6535,28 +6535,24 @@ runtimeScene._instances.length;
       expect(emitInstance.actionType).toBe('EmitSignalToObjectInstance');
       expect(emitInstance.instruction.parameters).toEqual([
         '',
-        'SignalSenderInstanceId()',
+        'Variable(RequesterInstanceId)',
         '"Attack.Reply"',
         '"Blocked"',
       ]);
 
-      const invalidExtensionTargetResponse = await bridge.handleRendererMcpRequest(
-        {
-          method: 'tools/call',
-          params: {
-            name: 'create_signal_emit_action',
-            arguments: {
-              target_kind: 'picked_objects',
-              target_scope: 'object_function',
-              objects: 'Enemies',
-              signal_name: 'Attack',
-            },
+      const invalidTargetResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'create_signal_emit_action',
+          arguments: {
+            target_kind: 'picked_objects',
+            signal_name: 'Attack',
           },
-        }
-      );
-      expect(invalidExtensionTargetResponse.isError).toBe(true);
-      expect(invalidExtensionTargetResponse.content[0].text).toContain(
-        'extension event sheets'
+        },
+      });
+      expect(invalidTargetResponse.isError).toBe(true);
+      expect(invalidTargetResponse.content[0].text).toContain(
+        'scene or object_instance'
       );
 
       const receiveResponse = await bridge.handleRendererMcpRequest({
@@ -6596,6 +6592,10 @@ runtimeScene._instances.length;
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const extension = project.insertNewEventsFunctionsExtension('SignalExt', 0);
     extension.getEventsBasedObjects().insertNew('SignalReceiver', 0);
+    extension
+      .getEventsBasedBehaviors()
+      .insertNew('SignalBehavior', 0)
+      .setObjectType('Sprite');
 
     try {
       const bridge = makeBridge({
@@ -6630,6 +6630,27 @@ runtimeScene._instances.length;
         result.function.parameters.map(parameter => parameter.name)
       ).toEqual(['Object', 'SignalName', 'Payload']);
 
+      const behaviorResponse = await bridge.handleRendererMcpRequest({
+        method: 'tools/call',
+        params: {
+          name: 'gdevelop_create_or_update_on_signal',
+          arguments: {
+            extension_name: 'SignalExt',
+            parent_kind: 'behavior',
+            parent_name: 'SignalBehavior',
+            summary_only: true,
+          },
+        },
+      });
+      const behaviorResult = JSON.parse(behaviorResponse.content[0].text);
+      expect(behaviorResponse.isError).not.toBe(true);
+      expect(behaviorResult.signalSignature).toEqual([
+        'Object',
+        'Behavior',
+        'SignalName',
+        'Payload',
+      ]);
+
       const inspectResponse = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
         params: {
@@ -6641,7 +6662,7 @@ runtimeScene._instances.length;
       });
       const usage = JSON.parse(inspectResponse.content[0].text);
       expect(inspectResponse.isError).not.toBe(true);
-      expect(usage.onSignalHandlers.totalMatches).toBe(1);
+      expect(usage.onSignalHandlers.totalMatches).toBe(2);
       expect(usage.onSignalHandlers.handlers[0].parentName).toBe(
         'SignalReceiver'
       );

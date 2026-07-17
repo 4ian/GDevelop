@@ -118,6 +118,18 @@ export default function BehaviorMethodSelectorDialog({
         />
         <FunctionListItem
           functionType={gd.EventsFunction.Action}
+          functionName="onSignal"
+          disabled={eventsFunctions.hasEventsFunctionNamed('onSignal')}
+          onChoose={onChoose}
+          description={
+            <Trans>
+              Events that will be run when this behavior instance receives a
+              scene signal it explicitly subscribed to.
+            </Trans>
+          }
+        />
+        <FunctionListItem
+          functionType={gd.EventsFunction.Action}
           functionName="doStepPreEvents"
           disabled={eventsFunctions.hasEventsFunctionNamed('doStepPreEvents')}
           onChoose={onChoose}

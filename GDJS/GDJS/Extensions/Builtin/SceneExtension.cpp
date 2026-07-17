@@ -31,23 +31,15 @@ SceneExtension::SceneExtension() {
   GetAllConditions()["SignalReceived"].SetFunctionName(
       "gdjs.evtTools.signal.isSignalReceived");
   GetAllActions()["EmitSceneSignal"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSceneSignal");
-  GetAllActions()["EmitSignalToObject"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSignalToObject");
+      "gdjs.evtTools.signal.emitSceneSignalFromEvents");
   GetAllActions()["EmitSignalToObjectInstance"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSignalToObjectInstance");
-  GetAllActions()["EmitSignalToPickedObjects"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSignalToPickedObjects");
-  GetAllActions()["EmitSignalToObjectGroup"].SetFunctionName(
-      "gdjs.evtTools.signal.emitSignalToObjectGroup");
+      "gdjs.evtTools.signal.emitSignalToInstanceFromEvents");
+  GetAllActions()["SubscribeSceneSignal"].SetFunctionName(
+      "gdjs.evtTools.signal.subscribeSceneSignal");
   GetAllStrExpressions()["SignalName"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalName");
   GetAllStrExpressions()["SignalPayload"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalPayload");
-  GetAllStrExpressions()["SignalSenderObjectName"].SetFunctionName(
-      "gdjs.evtTools.signal.getSignalSenderObjectName");
-  GetAllExpressions()["SignalSenderInstanceId"].SetFunctionName(
-      "gdjs.evtTools.signal.getSignalSenderInstanceId");
   GetAllActions()["SceneBackground"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.setBackgroundColor");
   GetAllActions()["Scene"].SetFunctionName(

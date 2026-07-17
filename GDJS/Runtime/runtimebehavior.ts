@@ -224,6 +224,12 @@ namespace gdjs {
     onPlacedInScene(): void {}
 
     /**
+     * Reimplement this in an events-based behavior to receive scene signals
+     * that this behavior instance explicitly subscribed to.
+     */
+    onSignal(signalName: string, payload: string): void {}
+
+    /**
      * Return true if the behavior is activated
      */
     activated(): boolean {

@@ -24,10 +24,7 @@ const addParameter = (
   extraInfo?: string
 ) => {
   const parameter = parameters.addNewParameter(name);
-  parameter
-    .setType(type)
-    .setName(name)
-    .setDescription(description);
+  parameter.setType(type).setName(name).setDescription(description);
   if (extraInfo) {
     parameter.setExtraInfo(extraInfo);
   }
@@ -93,9 +90,8 @@ export const ensureOnSignalObjectEventsFunctionProperParameters = (
     return false;
   }
 
-  const eventsFunction = eventsFunctions.getEventsFunction(
-    onSignalFunctionName
-  );
+  const eventsFunction =
+    eventsFunctions.getEventsFunction(onSignalFunctionName);
   const parameters = eventsFunction.getParameters();
   const objectType = gd.PlatformExtension.getObjectFullType(
     eventsFunctionsExtension.getName(),
@@ -111,6 +107,50 @@ export const ensureOnSignalObjectEventsFunctionProperParameters = (
 
   parameters.clearParameters();
   addParameter(parameters, 'Object', 'object', 'Object', objectType);
+  addSignalParameters(parameters);
+  return true;
+};
+
+export const ensureOnSignalBehaviorEventsFunctionProperParameters = (
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedBehavior: gdEventsBasedBehavior
+): boolean => {
+  const eventsFunctions = eventsBasedBehavior.getEventsFunctions();
+  if (!eventsFunctions.hasEventsFunctionNamed(onSignalFunctionName)) {
+    return false;
+  }
+
+  const eventsFunction =
+    eventsFunctions.getEventsFunction(onSignalFunctionName);
+  const parameters = eventsFunction.getParameters();
+  const behaviorType = gd.PlatformExtension.getBehaviorFullType(
+    eventsFunctionsExtension.getName(),
+    eventsBasedBehavior.getName()
+  );
+  if (
+    parameters.getParametersCount() === 4 &&
+    isParameterMatching(
+      parameters,
+      0,
+      'Object',
+      'object',
+      eventsBasedBehavior.getObjectType()
+    ) &&
+    isParameterMatching(parameters, 1, 'Behavior', 'behavior', behaviorType) &&
+    hasExpectedSignalParameters(parameters, 2)
+  ) {
+    return false;
+  }
+
+  parameters.clearParameters();
+  addParameter(
+    parameters,
+    'Object',
+    'object',
+    'Object',
+    eventsBasedBehavior.getObjectType()
+  );
+  addParameter(parameters, 'Behavior', 'behavior', 'Behavior', behaviorType);
   addSignalParameters(parameters);
   return true;
 };

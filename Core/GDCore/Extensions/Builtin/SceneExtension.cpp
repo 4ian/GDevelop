@@ -52,10 +52,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
 
   extension
       .AddCondition("SignalReceived",
-                    _("Signal received"),
-                    _("Check if a signal was delivered to the scene during "
-                      "this frame."),
-                    _("Signal _PARAM1_ was received"),
+                    _("Scene signal received"),
+                    _("Run once for each matching scene signal delivered "
+                      "during this frame."),
+                    _("Scene signal _PARAM1_ was received"),
                     _("Signals"),
                     "res/conditions/depart24.png",
                     "res/conditions/depart.png")
@@ -76,25 +76,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
+      .AddCodeOnlyParameter("signalDebugEmitterContext", "")
       .MarkAsSimple();
-
-  extension
-      .AddAction("EmitSignalToObject",
-                 _("Emit a signal to an object"),
-                 _("Queue a signal for all instances of an object."),
-                 _("Emit signal _PARAM2_ to object _PARAM1_ with payload : "
-                   "_PARAM3_"),
-                 _("Signals"),
-                 "res/actions/texte.png",
-                 "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Object name"))
-      .AddParameter("string", _("Signal name"))
-      .AddParameter("string", _("Payload"), "", true)
-      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
-      .SetHidden()
-      .MarkAsAdvanced();
 
   extension
       .AddAction("EmitSignalToObjectInstance",
@@ -110,43 +93,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("expression", _("Instance id"))
       .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
-      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
+      .AddCodeOnlyParameter("signalDebugEmitterContext", "")
       .MarkAsAdvanced();
 
   extension
-      .AddAction("EmitSignalToPickedObjects",
-                 _("Emit a signal to picked objects"),
-                 _("Queue a signal for the currently picked object "
-                   "instances."),
-                 _("Emit signal _PARAM2_ to picked _PARAM1_ with payload : "
-                   "_PARAM3_"),
+      .AddAction("SubscribeSceneSignal",
+                 _("Subscribe to a scene signal"),
+                 _("Subscribe the current prefab or behavior instance to a "
+                   "scene signal for the rest of its lifetime."),
+                 _("Subscribe to scene signal _PARAM2_"),
                  _("Signals"),
                  "res/actions/texte.png",
                  "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("objectList", _("Objects"))
+      .AddCodeOnlyParameter("signalReceiverContext", "")
       .AddParameter("string", _("Signal name"))
-      .AddParameter("string", _("Payload"), "", true)
-      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
       .MarkAsSimple();
-
-  extension
-      .AddAction("EmitSignalToObjectGroup",
-                 _("Emit a signal to an object group"),
-                 _("Queue a signal for all instances of objects in an object "
-                   "group."),
-                 _("Emit signal _PARAM2_ to object group _PARAM1_ with "
-                   "payload : _PARAM3_"),
-                 _("Signals"),
-                 "res/actions/texte.png",
-                 "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Object group name"))
-      .AddParameter("string", _("Signal name"))
-      .AddParameter("string", _("Payload"), "", true)
-      .AddCodeOnlyParameter("signalSenderObjectsContext", "")
-      .SetHidden()
-      .MarkAsAdvanced();
 
   extension
       .AddStrExpression("SignalName",
@@ -163,24 +125,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                         _("Read text from the current signal payload."),
                         _("Signals"),
                         "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .SetRelevantForLayoutEventsOnly();
-
-  extension
-      .AddStrExpression("SignalSenderObjectName",
-                        _("Signal sender object name"),
-                        _("Object name of the signal sender, if any."),
-                        _("Signals"),
-                        "res/actions/texte.png")
-      .AddCodeOnlyParameter("currentScene", "")
-      .SetRelevantForLayoutEventsOnly();
-
-  extension
-      .AddExpression("SignalSenderInstanceId",
-                     _("Signal sender instance id"),
-                     _("Instance id of the signal sender, if any."),
-                     _("Signals"),
-                     "res/actions/texte.png")
       .AddCodeOnlyParameter("currentScene", "")
       .SetRelevantForLayoutEventsOnly();
 

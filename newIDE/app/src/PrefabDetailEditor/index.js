@@ -471,7 +471,8 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   _selectEventsFunction = (
     selectedEventsFunction: ?gdEventsFunction,
     _selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    _selectedEventsBasedObject: ?gdEventsBasedObject
+    _selectedEventsBasedObject: ?gdEventsBasedObject,
+    onSelected?: () => void
   ) => {
     if (!selectedEventsFunction) {
       this._selectPrefabConfiguration();
@@ -491,7 +492,21 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       if (editorNavigator) {
         editorNavigator.openEditor('events-sheet');
       }
+      if (onSelected) onSelected();
     });
+  };
+
+  _openEventsFunctionSettings = (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => {
+    this._selectEventsFunction(
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+      this._openParametersDialog
+    );
   };
 
   _makeRenameEventsFunction = (i18n: I18nType): any => (
@@ -1403,6 +1418,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 forceUpdateEditor={() => this.forceUpdate()}
                 selectedEventsFunction={selectedEventsFunction}
                 onSelectEventsFunction={this._selectEventsFunction}
+                onOpenEventsFunctionSettings={this._openEventsFunctionSettings}
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
                 onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}

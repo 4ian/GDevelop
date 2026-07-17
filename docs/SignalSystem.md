@@ -1,7 +1,7 @@
 # Signal System
 
-> Status: design revision for review. No runtime or editor implementation is
-> implied by this document, and backward compatibility with earlier signal
+> Status: implemented runtime, code-generation, editor, debugger, tooling, and
+> documentation contract. Backward compatibility with earlier signal
 > prototypes is intentionally out of scope.
 
 The signal system is a scene-local, queued notification system for GDevelop.
@@ -835,8 +835,8 @@ behavior instances.
 
 ## 10. Code generation
 
-This section describes the proposed generated contracts, not an implementation
-performed as part of this document revision.
+This section describes the generated contracts implemented by the signal
+system.
 
 ### 10.1 Reserved lifecycle names
 
@@ -1035,8 +1035,7 @@ Projects using an experimental earlier design are outside this revision's scope.
 
 ## 14. Implementation impact
 
-No code is changed by this design revision. A future implementation would need
-to cover these areas together:
+The implementation covers these areas together:
 
 ### 14.1 Runtime
 

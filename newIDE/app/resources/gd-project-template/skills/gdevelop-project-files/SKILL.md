@@ -234,7 +234,7 @@ Load only the references required by the task:
   behavior, or reusable extension.
 - Read [references/signal-system.md](references/signal-system.md) in full
   whenever the user asks for signals, messaging, notification, scene/prefab
-  communication, `SignalReceived`, signal sender/payload handling, or an
+  communication, `SignalReceived`, signal payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
   the Static Data guide too when signal names use placeholders.

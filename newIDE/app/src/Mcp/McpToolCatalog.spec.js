@@ -18,8 +18,13 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
   'gdevelop_get_static_data',
+  'gdevelop_inspect_signal_usage',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
+  'create_action',
+  'create_signal_emit_action',
+  'create_signal_subscription_action',
+  'create_signal_received_condition',
   'generate-catalogs',
   'validate_project_files',
   'inspect_tool_schema',
@@ -41,6 +46,7 @@ const expectedPermissionedWriteTools = [
   'gdevelop_set_static_data',
   'gdevelop_set_static_data_value',
   'gdevelop_delete_static_data_value',
+  'gdevelop_create_or_update_on_signal',
 ];
 
 describe('McpToolCatalog', () => {
@@ -143,9 +149,11 @@ describe('McpToolCatalog', () => {
       allowCommandTools: true,
     });
     expect(Object.keys(capabilities.categories).sort()).toEqual([
+      'Author events',
       'Editor queries',
       'Extension import',
       'Preview debugging',
+      'Read scene / objects / events',
       'Variables & scenes',
     ]);
     expect(capabilities.note).toContain('project files');

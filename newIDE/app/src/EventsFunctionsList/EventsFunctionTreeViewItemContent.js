@@ -160,6 +160,11 @@ export type EventsFunctionCallbacks = {|
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
     selectedEventsBasedObject: ?gdEventsBasedObject
   ) => void,
+  onOpenEventsFunctionSettings: (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
@@ -365,6 +370,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     } = this.props;
 
     return [
+      {
+        label: i18n._(t`Function settings`),
+        click: () =>
+          this.props.onOpenEventsFunctionSettings(
+            eventsFunction,
+            eventsBasedBehavior,
+            eventsBasedObject
+          ),
+      },
       {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)

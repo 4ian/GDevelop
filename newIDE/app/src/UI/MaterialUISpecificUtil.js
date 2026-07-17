@@ -116,6 +116,7 @@ const keepMountedTemporarySideMenuPaperSelector = [
   '#project-manager-drawer-paper',
   '#version-history-drawer-paper',
 ].join(', ');
+const staleOverlayAttribute = 'data-gdevelop-stale-overlay';
 
 const getElementClassName = (element: Element): string => {
   const className = (element: any).className;
@@ -168,9 +169,26 @@ const hasVisibleInteractiveOverlayContent = (element: Element): boolean => {
 const isKeepMountedTemporarySideMenuOverlay = (element: Element): boolean =>
   !!element.querySelector(keepMountedTemporarySideMenuPaperSelector);
 
-const removeElement = (element: Element): boolean => {
+const neutralizeElement = (element: Element): boolean => {
   if (!element.parentNode) return false;
-  element.parentNode.removeChild(element);
+
+  // Never detach a Material-UI portal node manually. The node is owned by
+  // React, even while a transition is closing or a pop-out teardown has left
+  // it in an inconsistent state. Removing it here leaves React's fiber tree
+  // pointing at a node that is no longer under document.body; the next menu
+  // render then crashes in ReactDOM with a removeChild NotFoundError.
+  //
+  // Making a stale overlay inert fixes the input blocker while keeping the DOM
+  // relationship intact so React can safely finish its own unmount. A truly
+  // orphaned node can remain until the editor window is reloaded, but it is
+  // hidden and cannot intercept input.
+  const elementWithStyle: any = element;
+  if (elementWithStyle.style) {
+    elementWithStyle.style.pointerEvents = 'none';
+    elementWithStyle.style.visibility = 'hidden';
+  }
+  element.setAttribute('aria-hidden', 'true');
+  element.setAttribute(staleOverlayAttribute, 'true');
   return true;
 };
 
@@ -306,7 +324,7 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       topLevelMaterialUiOverlayRootSelector
     );
 
-    let removedCount = 0;
+    let neutralizedCount = 0;
     overlays.forEach(overlay => {
       // A genuinely-open GDevelop/MUI overlay contains an interactive surface
       // (Paper/dialog/menu/listbox). A stale root left behind by a destroyed
@@ -325,8 +343,8 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
             (isElementHiddenOrClosed(overlay) ||
               !hasVisibleInteractiveContent)));
 
-      if (shouldRemove && removeElement(overlay)) {
-        removedCount++;
+      if (shouldRemove && neutralizeElement(overlay)) {
+        neutralizedCount++;
       }
     });
 
@@ -338,6 +356,12 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       if (!isMaterialUiOverlayLike(element)) return;
       if (elementContainsActiveElement(element)) return;
       const overlayRoot = getMaterialUiOverlayRootAncestor(element);
+      if (
+        overlayRoot &&
+        overlayRoot.getAttribute(staleOverlayAttribute) === 'true'
+      ) {
+        return;
+      }
       // Keep-mounted side drawers must retain their backdrop even while
       // closed. Removing it manually leaves React believing it is still
       // mounted, so it will not be recreated on the next open.
@@ -353,7 +377,7 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
         return;
       }
       if (hasVisibleInteractiveOverlayContent(element)) return;
-      if (removeElement(element)) removedCount++;
+      if (neutralizeElement(element)) neutralizedCount++;
     });
 
     // If, after removing orphans, there is no real open modal/popover left,
@@ -365,6 +389,7 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
         ':scope > [aria-hidden="true"], :scope > [inert]'
       );
       hiddenNodes.forEach(node => {
+        if (node.getAttribute(staleOverlayAttribute) === 'true') return;
         // Don't touch nodes that intentionally use aria-hidden for icons etc.
         // Top-level body children that are app roots/portals are what MUI hides.
         node.removeAttribute('aria-hidden');
@@ -384,9 +409,9 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       }
     }
 
-    if (removedCount) {
+    if (neutralizedCount) {
       console.info(
-        `Cleaned up ${removedCount} leaked Material-UI overlay(s) from the main window after a popped-out window closed.`
+        `Neutralized ${neutralizedCount} leaked Material-UI overlay(s) in the main window after a popped-out window closed.`
       );
     }
   } catch (error) {

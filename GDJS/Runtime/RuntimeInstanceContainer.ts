@@ -655,6 +655,7 @@ namespace gdjs {
         this._instances.put(obj.name, []);
       }
       this._instances.get(obj.name).push(obj);
+      this.getScene()._registerRuntimeObject(obj);
       this._allInstancesListIsUpToDate = false;
     }
 
@@ -734,6 +735,8 @@ namespace gdjs {
       if (this._instancesRemoved.indexOf(obj) === -1) {
         this._instancesRemoved.push(obj);
       }
+
+      this.getScene()._unregisterRuntimeObject(obj);
 
       // Delete from the living instances.
       if (this._instances.containsKey(obj.getName())) {

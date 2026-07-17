@@ -686,6 +686,7 @@ const EventsFunctionsList = React.forwardRef<
       focusedEventsFunction,
       unsavedChanges,
       onSelectEventsFunction,
+      onOpenEventsFunctionSettings,
       onDeleteEventsFunction,
       onRenameEventsFunction,
       onAddEventsFunction,
@@ -1234,6 +1235,7 @@ const EventsFunctionsList = React.forwardRef<
       () => ({
         ...treeItemProps,
         onSelectEventsFunction,
+        onOpenEventsFunctionSettings,
         onDeleteEventsFunction,
         onRenameEventsFunction,
         onAddEventsFunction,
@@ -1245,6 +1247,7 @@ const EventsFunctionsList = React.forwardRef<
       [
         treeItemProps,
         onSelectEventsFunction,
+        onOpenEventsFunctionSettings,
         onDeleteEventsFunction,
         onRenameEventsFunction,
         onAddEventsFunction,

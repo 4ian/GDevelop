@@ -48,6 +48,7 @@ export const Default = (): React.Node => (
         )}
         // Free functions
         onSelectEventsFunction={action('function selected')}
+        onOpenEventsFunctionSettings={action('function settings opened')}
         onDeleteEventsFunction={action('function deleted')}
         onAddEventsFunction={(eventsBasedBehavior, eventsBasedObject, cb) =>
           cb({ functionType: 0, name: null })

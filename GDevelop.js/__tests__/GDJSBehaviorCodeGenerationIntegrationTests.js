@@ -33,6 +33,71 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
     expect(behavior.doStepPreEvents).not.toBeUndefined();
   });
 
+  it('passes the behavior signal receiver and debug emitter contexts to signal actions', function () {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedBehavior = eventsFunctionsExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SubscribeSceneSignal' },
+            parameters: ['', '', '"TestSignal"'],
+          },
+          {
+            type: { value: 'EmitSceneSignal' },
+            parameters: ['', '"TestSignal"', '"payload"', ''],
+          },
+        ],
+      },
+    ]);
+    eventsBasedBehavior
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedBehavior
+    );
+
+    const { gdjs, runtimeScene, behavior } = generatedBehavior(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      { logCode: false }
+    );
+    const subscribeSceneSignal = jest.fn();
+    const emitSceneSignalFromEvents = jest.fn();
+    gdjs.evtTools.signal = {
+      subscribeSceneSignal,
+      emitSceneSignalFromEvents,
+    };
+
+    behavior.MyFunction();
+
+    expect(subscribeSceneSignal).toHaveBeenCalledWith(
+      runtimeScene,
+      behavior,
+      'TestSignal'
+    );
+    expect(emitSceneSignalFromEvents).toHaveBeenCalledWith(
+      runtimeScene,
+      'TestSignal',
+      'payload',
+      behavior.owner
+    );
+  });
+
   it('logs an error when a behavior JsonObject property value is invalid', function () {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(

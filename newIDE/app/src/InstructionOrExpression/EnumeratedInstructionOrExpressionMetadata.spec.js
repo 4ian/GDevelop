@@ -69,7 +69,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     project.delete();
   });
 
-  it('only shows decoupled signal emit actions in extension events', () => {
+  it('shows only the two signal emit actions in free extension events', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsFunction = new gd.EventsFunction();
@@ -92,11 +92,62 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
         'EmitSignalToObject',
         'EmitSignalToPickedObjects',
         'EmitSignalToObjectGroup',
+        'SubscribeSceneSignal',
       ])
     );
 
     eventsFunctionsExtension.delete();
     eventsFunction.delete();
+    project.delete();
+  });
+
+  it('shows scene signal subscription only in object and behavior events', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+    const eventsFunction = new gd.EventsFunction();
+    const eventsBasedObject = new gd.EventsBasedObject();
+    const eventsBasedBehavior = new gd.EventsBasedBehavior();
+    const emitSceneSignal = enumerateAllInstructions(
+      false,
+      project,
+      makeFakeI18n()
+    ).find(instruction => instruction.type === 'EmitSceneSignal');
+    if (!emitSceneSignal) throw new Error('EmitSceneSignal metadata missing.');
+    const subscribeSceneSignal = {
+      ...emitSceneSignal,
+      type: 'SubscribeSceneSignal',
+    };
+
+    const objectInstructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      [subscribeSceneSignal],
+      {
+        project,
+        eventsFunctionsExtension,
+        eventsFunction,
+        eventsBasedObject,
+      }
+    );
+    const behaviorInstructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      [subscribeSceneSignal],
+      {
+        project,
+        eventsFunctionsExtension,
+        eventsFunction,
+        eventsBasedBehavior,
+      }
+    );
+
+    expect(objectInstructions.map(instruction => instruction.type)).toContain(
+      'SubscribeSceneSignal'
+    );
+    expect(behaviorInstructions.map(instruction => instruction.type)).toContain(
+      'SubscribeSceneSignal'
+    );
+
+    eventsBasedBehavior.delete();
+    eventsBasedObject.delete();
+    eventsFunction.delete();
+    eventsFunctionsExtension.delete();
     project.delete();
   });
 });

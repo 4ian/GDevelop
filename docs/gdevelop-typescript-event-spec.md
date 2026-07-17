@@ -754,11 +754,23 @@ cardinality. The deterministic object-picking rules continue to apply.
 
 ### 8.4 Signals and Static Data
 
-Signal helpers exposed by the reviewed runtime declaration are usable from
-TypeScript exactly where they are usable from JavaScript. Signal context is
-still determined by event nesting at runtime; static typing cannot prove that a
-code event is under a matching signal condition unless a future control-flow
-model is added.
+The signal runtime exposes only the two destinations defined by
+[SignalSystem.md](SignalSystem.md): a scene broadcast and one runtime instance
+ID. TypeScript declarations must not expose object-name, group, or picked-list
+emission helpers.
+
+Scene code under a matching **Scene signal received** condition can read
+`SignalName()` and `SignalPayload()` through the corresponding runtime helpers.
+That context is still determined by event nesting at runtime; static typing
+cannot prove the nesting unless a future control-flow model is added. Prefab
+and behavior `onSignal` code reads its fixed `signalName` and `payload`
+arguments instead.
+
+Prefab and behavior code may subscribe the current receiver to an exact scene
+signal name. A direct instance signal needs no subscription and invokes only
+the target prefab's `onSignal`; behavior `onSignal` is reserved for subscribed
+scene broadcasts. Runtime declarations expose no emitter getters. Application
+source data must be part of the user-defined payload when it is needed.
 
 Static Data remains code-generation-time data for supported event/property
 fields. `{{path}}` text inside JavaScript or TypeScript source is ordinary code

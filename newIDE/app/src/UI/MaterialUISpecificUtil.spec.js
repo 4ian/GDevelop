@@ -67,6 +67,9 @@ class FakeElement {
   }
 
   removeChild(child: FakeElement): FakeElement {
+    if (!this.children.includes(child)) {
+      throw new Error('The node to be removed is not a child of this node.');
+    }
     this.children = this.children.filter(element => element !== child);
     child.parentNode = null;
     child.parentElement = null;
@@ -227,7 +230,7 @@ describe('MaterialUISpecificUtil', () => {
     }
   });
 
-  test('removes a stale backdrop-only MUI overlay after a popped-out window closes', () => {
+  test('neutralizes a stale backdrop-only MUI overlay without detaching React-owned DOM', () => {
     const body = new FakeElement('body');
     const appRoot = new FakeElement();
     appRoot.setAttribute('aria-hidden', 'true');
@@ -250,10 +253,18 @@ describe('MaterialUISpecificUtil', () => {
     try {
       cleanupLeakedOverlaysAfterPopOutClose();
 
-      expect(body.children).not.toContain(overlay);
+      expect(body.children).toContain(overlay);
+      expect(overlay.style.pointerEvents).toBe('none');
+      expect(overlay.style.visibility).toBe('hidden');
+      expect(overlay.getAttribute('aria-hidden')).toBe('true');
+      expect(overlay.getAttribute('data-gdevelop-stale-overlay')).toBe('true');
       expect(appRoot.getAttribute('aria-hidden')).toBe(null);
       expect(body.style.overflow).toBe(undefined);
       expect(body.style.paddingRight).toBe(undefined);
+
+      // React still owns the portal root and must be able to complete the
+      // unmount itself without hitting a removeChild NotFoundError.
+      expect(() => body.removeChild(overlay)).not.toThrow();
     } finally {
       restoreDom();
     }
@@ -388,7 +399,7 @@ describe('MaterialUISpecificUtil', () => {
     }
   });
 
-  test('removes a hidden Paper overlay that is not a live temporary side menu', () => {
+  test('neutralizes a hidden Paper overlay without detaching it', () => {
     const body = new FakeElement('body');
     const appRoot = new FakeElement();
     body.appendChild(appRoot);
@@ -416,7 +427,11 @@ describe('MaterialUISpecificUtil', () => {
     try {
       cleanupLeakedOverlaysAfterPopOutClose();
 
-      expect(body.children).not.toContain(overlay);
+      expect(body.children).toContain(overlay);
+      expect(overlay.style.pointerEvents).toBe('none');
+      expect(overlay.style.visibility).toBe('hidden');
+      expect(overlay.getAttribute('data-gdevelop-stale-overlay')).toBe('true');
+      expect(() => body.removeChild(overlay)).not.toThrow();
     } finally {
       restoreDom();
     }

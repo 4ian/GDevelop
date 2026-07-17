@@ -2186,6 +2186,9 @@ namespace gdjs {
       if (!behavior) {
         return false;
       }
+      this._runtimeScene
+        .getScene()
+        ._signalBus?.removeSubscriptionsForBehavior(behavior);
       behavior.onDestroy();
       const behaviorIndex = this._behaviors.indexOf(behavior);
       if (behaviorIndex !== -1) {

@@ -64,10 +64,7 @@ export type EnumeratedInstructionOrExpressionMetadata =
 
 const signalEmitActionTypes = new Set([
   'EmitSceneSignal',
-  'EmitSignalToObject',
   'EmitSignalToObjectInstance',
-  'EmitSignalToPickedObjects',
-  'EmitSignalToObjectGroup',
 ]);
 
 const signalEmitActionTypesAllowedInExtensionEvents = new Set([
@@ -81,12 +78,12 @@ const signalEmitActionTypesAllowedInExtensionEvents = new Set([
  */
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   // $FlowFixMe[unsupported-variance-annotation]
-  +T: EnumeratedInstructionOrExpressionMetadata
+  +T: EnumeratedInstructionOrExpressionMetadata,
 >(
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  return list.filter(enumeratedInstructionOrExpressionMetadata =>
+  return list.filter((enumeratedInstructionOrExpressionMetadata) =>
     isFunctionVisibleInGivenScope(
       enumeratedInstructionOrExpressionMetadata,
       scope
@@ -98,16 +95,10 @@ const isFunctionVisibleInGivenScope = (
   enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   scope: EventsScope
 ): boolean => {
-  const {
-    behaviorMetadata,
-    objectMetadata,
-    extension,
-  } = enumeratedInstructionOrExpressionMetadata.scope;
-  const {
-    eventsBasedBehavior,
-    eventsBasedObject,
-    eventsFunctionsExtension,
-  } = scope;
+  const { behaviorMetadata, objectMetadata, extension } =
+    enumeratedInstructionOrExpressionMetadata.scope;
+  const { eventsBasedBehavior, eventsBasedObject, eventsFunctionsExtension } =
+    scope;
 
   if (
     eventsFunctionsExtension &&
@@ -117,6 +108,14 @@ const isFunctionVisibleInGivenScope = (
     !signalEmitActionTypesAllowedInExtensionEvents.has(
       enumeratedInstructionOrExpressionMetadata.type
     )
+  ) {
+    return false;
+  }
+
+  if (
+    extension.name === 'BuiltinScene' &&
+    enumeratedInstructionOrExpressionMetadata.type === 'SubscribeSceneSignal' &&
+    (!scope.eventsFunction || (!eventsBasedObject && !eventsBasedBehavior))
   ) {
     return false;
   }

@@ -18,7 +18,7 @@ namespace gdjs {
   const signalDebugPanelMinWidth = 260;
   const signalDebugPanelMaxWidth = 360;
   const signalDebugUnhandledColor = 0xffc857;
-  const signalDebugDroppedColor = 0xff5c8a;
+  const signalDebugThrottledColor = 0xff5c8a;
   const signalDebugColors = [
     0x00d1ff, 0xffc857, 0xff5c8a, 0x7cff6b, 0xb388ff, 0xff9f1c, 0x40f99b,
     0xff4d4d,
@@ -102,8 +102,8 @@ namespace gdjs {
     status: gdjs.SignalDebugStatus,
     signalName: string
   ): integer => {
-    if (status === 'dropped') {
-      return signalDebugDroppedColor;
+    if (status === 'throttled') {
+      return signalDebugThrottledColor;
     }
     if (status === 'unhandled') {
       return signalDebugUnhandledColor;
@@ -114,8 +114,8 @@ namespace gdjs {
   const getSignalDebugStatusLabel = (
     status: gdjs.SignalDebugStatus
   ): string => {
-    if (status === 'dropped') {
-      return 'DROPPED';
+    if (status === 'throttled') {
+      return 'THROTTLED';
     }
     if (status === 'unhandled') {
       return 'NO RECEIVER';

@@ -151,7 +151,10 @@ import {
   validateCurrentProjectJson,
   validateSerializedProject,
 } from './McpProjectTools';
-import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
+import {
+  ensureOnSignalBehaviorEventsFunctionProperParameters,
+  ensureOnSignalObjectEventsFunctionProperParameters,
+} from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 import optionalRequire from '../Utils/OptionalRequire';
 
@@ -3191,35 +3194,12 @@ const normalizeSignalTargetKind = (targetKind: any): string => {
     .trim()
     .toLowerCase()
     .replace(/[-\s]+/g, '_');
-  if (normalized === 'picked' || normalized === 'picked_object') {
-    return 'picked_objects';
-  }
-  if (normalized === 'group') return 'object_group';
   if (normalized === 'instance') return 'object_instance';
-  if (
-    normalized === 'scene' ||
-    normalized === 'object_instance' ||
-    normalized === 'picked_objects'
-  ) {
+  if (normalized === 'scene' || normalized === 'object_instance') {
     return normalized;
   }
-  throw new Error(
-    'target_kind must be scene, object_instance, or picked_objects.'
-  );
+  throw new Error('target_kind must be scene or object_instance.');
 };
-
-const signalTargetKindsAllowedInExtensionEvents = new Set([
-  'scene',
-  'object_instance',
-]);
-
-const signalExtensionEventTargetScopes = new Set([
-  'extension_function',
-  'object_function',
-  'prefab_function',
-  'behavior_function',
-  'async_function',
-]);
 
 const buildSignalEmitAction = ({
   project,
@@ -3231,17 +3211,6 @@ const buildSignalEmitAction = ({
   args: Object,
 |}): Object => {
   const targetKind = normalizeSignalTargetKind(args && args.target_kind);
-  const targetScope = String((args && args.target_scope) || '')
-    .trim()
-    .toLowerCase();
-  if (
-    signalExtensionEventTargetScopes.has(targetScope) &&
-    !signalTargetKindsAllowedInExtensionEvents.has(targetKind)
-  ) {
-    throw new Error(
-      'In extension event sheets, signal emit actions can only target scene or object_instance.'
-    );
-  }
   const signalName = signalStringExpression(
     getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
     'signal_name'
@@ -3255,7 +3224,6 @@ const buildSignalEmitAction = ({
   const parameters: Object = {};
   let outputLastParameterIndex =
     payload !== null && payload !== undefined ? 2 : 1;
-  let obsoleteEmitterParameterIndex = 3;
   const setPayload = (payloadIndex: number) => {
     if (payload !== null && payload !== undefined) {
       parameters[String(payloadIndex)] = payload;
@@ -3269,7 +3237,6 @@ const buildSignalEmitAction = ({
   } else if (targetKind === 'object_instance') {
     type = 'EmitSignalToObjectInstance';
     outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -3279,24 +3246,7 @@ const buildSignalEmitAction = ({
     );
     parameters['2'] = signalName;
     setPayload(3);
-  } else if (targetKind === 'picked_objects') {
-    type = 'EmitSignalToPickedObjects';
-    outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['objects', 'object_name', 'target_object_name'],
-        'objects'
-      )
-    );
-    parameters['2'] = signalName;
-    setPayload(3);
   }
-
-  // Old libGD builds still expose a required emitter object slot. Fill it to
-  // avoid a stale warning, then trim it from the JSON returned by this helper.
-  parameters[String(obsoleteEmitterParameterIndex)] = '';
 
   const built = buildInstruction({
     project,
@@ -3324,7 +3274,35 @@ const buildSignalEmitAction = ({
     actionType: type,
     targetKind,
     signalNote:
-      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Signal actions automatically use the owner object as sender in object/prefab functions. Scene and external scene events emit from the scene.',
+      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Emitter information is debugger-only; put application source identity in the payload when needed.',
+  };
+};
+
+const buildSignalSubscriptionAction = ({
+  project,
+  i18n,
+  args,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  args: Object,
+|}): Object => {
+  const signalName = signalStringExpression(
+    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
+    'signal_name'
+  );
+  const built = buildInstruction({
+    project,
+    i18n,
+    type: 'SubscribeSceneSignal',
+    kind: 'action',
+    parameters: { '2': signalName },
+  });
+  return {
+    ...built,
+    actionType: 'SubscribeSceneSignal',
+    signalNote:
+      'Use only in a prefab/object or behavior event sheet. The current prefab or behavior instance is the implicit receiver.',
   };
 };
 
@@ -3352,7 +3330,7 @@ const buildSignalReceivedCondition = ({
     ...built,
     conditionType: 'SignalReceived',
     signalNote:
-      'Drop instruction into a scene or external scene event conditions array only. Use SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
+      'Drop instruction into a scene or external scene event conditions array only. Use SignalName() and SignalPayload() in this event or its descendants.',
   };
 };
 
@@ -3363,8 +3341,8 @@ const createOrUpdateOnSignalFunction = (
   const parentKind = String((args && args.parent_kind) || '')
     .trim()
     .toLowerCase();
-  if (parentKind !== 'object') {
-    throw new Error('parent_kind must be object for onSignal.');
+  if (parentKind !== 'object' && parentKind !== 'behavior') {
+    throw new Error('parent_kind must be object or behavior for onSignal.');
   }
   const signalArgs = {
     ...(args || {}),
@@ -3378,13 +3356,22 @@ const createOrUpdateOnSignalFunction = (
   delete signalArgs.parameters_mode;
   delete signalArgs.serialized_function;
   const result = createOrUpdateExtensionFunction(project, signalArgs);
-  const signalSignature = ['Object', 'SignalName', 'Payload'];
+  const signalSignature =
+    parentKind === 'behavior'
+      ? ['Object', 'Behavior', 'SignalName', 'Payload']
+      : ['Object', 'SignalName', 'Payload'];
   let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
     index,
     name,
-    type: index === 0 ? 'object' : 'string',
+    type: index === 0 ? 'object' : name === 'Behavior' ? 'behavior' : 'string',
     description:
-      index === 0 ? 'Object' : index === 1 ? 'Signal name' : 'Payload',
+      name === 'Object'
+        ? 'Object'
+        : name === 'Behavior'
+        ? 'Behavior'
+        : name === 'SignalName'
+        ? 'Signal name'
+        : 'Payload',
   }));
   let repairedEventsFunction = null;
   const extensionName = args && args.extension_name;
@@ -3396,29 +3383,47 @@ const createOrUpdateOnSignalFunction = (
     project.hasEventsFunctionsExtensionNamed(extensionName)
   ) {
     const extension = project.getEventsFunctionsExtension(extensionName);
-    const objects = extension.getEventsBasedObjects();
-    if (objects.has(parentName)) {
-      const eventsBasedObject = objects.get(parentName);
-      ensureOnSignalObjectEventsFunctionProperParameters(
-        extension,
-        eventsBasedObject
-      );
-      const eventsFunctions = eventsBasedObject.getEventsFunctions();
-      if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
-        repairedEventsFunction = eventsFunctions.getEventsFunction('onSignal');
-        const parameters = repairedEventsFunction.getParameters();
-        fixedParameters = fixedParameters.map((parameter, index) => {
-          const repairedParameter = parameters.getParameterAt(index);
-          return {
-            ...parameter,
-            name: repairedParameter.getName(),
-            type: repairedParameter.getType(),
-            description: repairedParameter.getDescription(),
-            longDescription: repairedParameter.getLongDescription(),
-            extraInfo: repairedParameter.getExtraInfo() || undefined,
-          };
-        });
+    if (parentKind === 'behavior') {
+      const behaviors = extension.getEventsBasedBehaviors();
+      if (behaviors.has(parentName)) {
+        const behavior = behaviors.get(parentName);
+        ensureOnSignalBehaviorEventsFunctionProperParameters(
+          extension,
+          behavior
+        );
+        const eventsFunctions = behavior.getEventsFunctions();
+        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
+          repairedEventsFunction = eventsFunctions.getEventsFunction(
+            'onSignal'
+          );
+        }
       }
+    } else {
+      const objects = extension.getEventsBasedObjects();
+      if (objects.has(parentName)) {
+        const object = objects.get(parentName);
+        ensureOnSignalObjectEventsFunctionProperParameters(extension, object);
+        const eventsFunctions = object.getEventsFunctions();
+        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
+          repairedEventsFunction = eventsFunctions.getEventsFunction(
+            'onSignal'
+          );
+        }
+      }
+    }
+    if (repairedEventsFunction) {
+      const parameters = repairedEventsFunction.getParameters();
+      fixedParameters = fixedParameters.map((parameter, index) => {
+        const repairedParameter = parameters.getParameterAt(index);
+        return {
+          ...parameter,
+          name: repairedParameter.getName(),
+          type: repairedParameter.getType(),
+          description: repairedParameter.getDescription(),
+          longDescription: repairedParameter.getLongDescription(),
+          extraInfo: repairedParameter.getExtraInfo() || undefined,
+        };
+      });
     }
   }
   const fixedFunction = result.function
@@ -6207,6 +6212,21 @@ const callMcpTool = async ({
     try {
       return textResult(
         buildSignalEmitAction({
+          project,
+          i18n: context.i18n,
+          args: args || {},
+        })
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
+  if (toolName === 'create_signal_subscription_action') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(
+        buildSignalSubscriptionAction({
           project,
           i18n: context.i18n,
           args: args || {},

@@ -402,11 +402,11 @@ namespace gdjs {
     {
       effectType: 'Scene3D::HemisphereLight',
       name: 'Default Light for in-game editor',
-      doubleParameters: { elevation: 45, intensity: 1, rotation: 0 },
+      doubleParameters: { elevation: 45, intensity: 1, rotation: 90 },
       stringParameters: {
         groundColor: '64;64;64',
         skyColor: '255;255;255',
-        top: 'Y-',
+        top: 'Z+',
       },
       booleanParameters: {},
     },
@@ -1376,12 +1376,12 @@ namespace gdjs {
                   doubleParameters: {
                     elevation: 45,
                     intensity: 1,
-                    rotation: 0,
+                    rotation: 90,
                   },
                   stringParameters: {
                     groundColor: '64;64;64',
                     skyColor: '255;255;255',
-                    top: 'Y-',
+                    top: 'Z+',
                   },
                   booleanParameters: {},
                 },

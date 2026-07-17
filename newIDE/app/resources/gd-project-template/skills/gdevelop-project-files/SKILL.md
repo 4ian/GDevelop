@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop GLB import workflow, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -238,6 +238,11 @@ Load only the references required by the task:
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
   the Static Data guide too when signal names use placeholders.
+- Read
+  [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
+  before importing a `.glb` exported from Blender into GDevelop. Follow that
+  workflow for Blender scene preparation, GLB export, GDevelop resource and
+  object setup, collision, preview verification, and re-export updates.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a

@@ -104,6 +104,10 @@ const materialUiOverlayRootSelector = materialUiOverlayRootSelectors.join(', ');
 const topLevelMaterialUiOverlayRootSelector = materialUiOverlayRootSelectors
   .map(selector => `:scope > ${selector}`)
   .join(', ');
+const topLevelMaterialUiCleanupCandidateSelector = [
+  topLevelMaterialUiOverlayRootSelector,
+  ':scope > .MuiBackdrop-root',
+].join(', ');
 const materialUiOverlaySurfaceSelector = [
   '.MuiPaper-root',
   '.MuiPopover-paper',
@@ -288,6 +292,21 @@ const getMaterialUiOverlayRootAncestor = (element: Element): ?Element => {
 };
 
 /**
+ * Capture the Material-UI nodes that belong to the pop-out teardown that is
+ * starting now. Delayed cleanup passes must only inspect these nodes: a menu
+ * or dialog opened by the user after the pop-out closed is live UI, even when
+ * it is briefly empty while Material-UI mounts its transition content.
+ */
+export const captureMaterialUiOverlayCleanupCandidates = (): Array<Element> => {
+  const body = document.body;
+  if (!body) return [];
+
+  return Array.from(
+    body.querySelectorAll(topLevelMaterialUiCleanupCandidateSelector)
+  );
+};
+
+/**
  * Heal the main window after a popped-out window (see WindowPortal) closes.
  *
  * A popped-out window (e.g. the debugger) shares the SAME JS context and the
@@ -307,22 +326,33 @@ const getMaterialUiOverlayRootAncestor = (element: Element): ?Element => {
  *  - `overflow: hidden` / `padding-right` left on `document.body` from the MUI
  *    scroll-lock.
  *
- * This function removes those leftovers. It keeps real open overlays and the
+ * This function neutralizes those leftovers. It keeps real open overlays and the
  * two hidden `keepMounted` temporary side-menu drawers that React must retain
  * so they can be reopened. Other hidden Paper overlays can belong to a
- * destroyed pop-out and are removed. A backdrop by itself is not a real open
+ * destroyed pop-out and are neutralized. A backdrop by itself is not a real open
  * dialog; it is exactly the stale blocker that swallows input. Body styles are
  * cleared only when there is no real open modal left. Safe to call on every
  * popped-out-window close.
  */
-export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
+export const cleanupLeakedOverlaysAfterPopOutClose = (
+  cleanupCandidates?: ?Array<Element>
+): void => {
   try {
     const body = document.body;
     if (!body) return;
 
-    const overlays = body.querySelectorAll(
-      topLevelMaterialUiOverlayRootSelector
-    );
+    const cleanupCandidateSet = cleanupCandidates
+      ? new Set(cleanupCandidates)
+      : null;
+    const overlays: Array<Element> = cleanupCandidates
+      ? cleanupCandidates.filter(
+          candidate =>
+            !!candidate.parentNode &&
+            elementMatchesSelector(candidate, materialUiOverlayRootSelector)
+        )
+      : Array.from(
+          body.querySelectorAll(topLevelMaterialUiOverlayRootSelector)
+        );
 
     let neutralizedCount = 0;
     overlays.forEach(overlay => {
@@ -349,13 +379,20 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
     });
 
     // Defensive second pass: if a body-level MUI/backdrop element is still a
-    // full-window input blocker but is not part of a real open overlay, remove
+    // full-window input blocker but is not part of a real open overlay, neutralize
     // it. This catches partial MUI teardown states that don't keep the expected
     // root class.
     collectPotentialInputBlockers().forEach(({ element }) => {
       if (!isMaterialUiOverlayLike(element)) return;
       if (elementContainsActiveElement(element)) return;
       const overlayRoot = getMaterialUiOverlayRootAncestor(element);
+      if (
+        cleanupCandidateSet &&
+        !cleanupCandidateSet.has(element) &&
+        (!overlayRoot || !cleanupCandidateSet.has(overlayRoot))
+      ) {
+        return;
+      }
       if (
         overlayRoot &&
         overlayRoot.getAttribute(staleOverlayAttribute) === 'true'
@@ -380,9 +417,15 @@ export const cleanupLeakedOverlaysAfterPopOutClose = (): void => {
       if (neutralizeElement(element)) neutralizedCount++;
     });
 
-    // If, after removing orphans, there is no real open modal/popover left,
+    // If, after neutralizing orphans, there is no real open modal/popover left,
     // make sure the editor is not left inert or scroll-locked.
-    const stillHasOpenOverlay = hasOpenMaterialUiOverlay(body);
+    const hasOverlayOutsideCleanupScope = cleanupCandidateSet
+      ? Array.from(
+          body.querySelectorAll(topLevelMaterialUiOverlayRootSelector)
+        ).some(overlay => !cleanupCandidateSet.has(overlay))
+      : false;
+    const stillHasOpenOverlay =
+      hasOverlayOutsideCleanupScope || hasOpenMaterialUiOverlay(body);
     if (!stillHasOpenOverlay) {
       // Un-hide any nodes MUI's ariaHiddenSiblings left hidden.
       const hiddenNodes = body.querySelectorAll(

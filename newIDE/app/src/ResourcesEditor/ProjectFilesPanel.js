@@ -64,9 +64,9 @@ const ignoredDirectoryNames = new Set([
   'node_modules',
   '.cache',
 ]);
-const folderLinksFileName = '.gdevelop-folder-links.json';
+const gdevelopDirectoryName = '.gdevelop';
+const folderLinksFileName = 'folder-links.json';
 const linkedFoldersRootName = 'Linked folders';
-const ignoredFileNames = new Set([folderLinksFileName]);
 
 type ProjectFileNodeSource =
   | 'project'
@@ -461,7 +461,7 @@ export const getLinkedFoldersFilePath = (project: gdProject): ?string => {
   if (!path) return null;
   const projectRoot = getProjectRootPath(project);
   if (!projectRoot) return null;
-  return path.join(projectRoot, folderLinksFileName);
+  return path.join(projectRoot, gdevelopDirectoryName, folderLinksFileName);
 };
 
 const getLinkedFolderName = (absolutePath: string): string => {
@@ -695,8 +695,6 @@ const readDirectory = async ({
     }
     const name = dirent.name;
     if (dirent.isDirectory() && ignoredDirectoryNames.has(name)) continue;
-    if (dirent.isFile() && ignoredFileNames.has(name)) continue;
-
     const childAbsolutePath = path.join(absolutePath, name);
     const childRelativePath = relativePath
       ? normalizeSlashes(path.join(relativePath, name))
@@ -741,70 +739,6 @@ const readDirectory = async ({
   return sortNodes(nodes);
 };
 
-const ensureFolderLinksFileIsGitExcluded = async (
-  projectRoot: string
-): Promise<void> => {
-  if (!fs || !path) return;
-
-  let gitRootPath = path.resolve(projectRoot);
-  let gitDirectoryPath = null;
-  while (true) {
-    const candidateGitDirectoryPath = path.join(gitRootPath, '.git');
-    try {
-      const gitDirectoryStat = await fs.promises.stat(
-        candidateGitDirectoryPath
-      );
-      if (gitDirectoryStat.isDirectory()) {
-        gitDirectoryPath = candidateGitDirectoryPath;
-        break;
-      }
-    } catch (error) {
-      // Keep walking up to find an ancestor Git repository.
-    }
-
-    const parentPath = path.dirname(gitRootPath);
-    if (parentPath === gitRootPath) return;
-    gitRootPath = parentPath;
-  }
-
-  if (!gitDirectoryPath) return;
-
-  const gitInfoDirectoryPath = path.join(gitDirectoryPath, 'info');
-  const excludeFilePath = path.join(gitInfoDirectoryPath, 'exclude');
-  const excludeEntry = `/${normalizeSlashes(
-    path.relative(gitRootPath, path.join(projectRoot, folderLinksFileName))
-  )}`;
-
-  try {
-    await fs.promises.mkdir(gitInfoDirectoryPath, { recursive: true });
-    let existingExclude = '';
-    try {
-      existingExclude = await fs.promises.readFile(excludeFilePath, 'utf8');
-    } catch (error) {
-      existingExclude = '';
-    }
-
-    if (
-      existingExclude
-        .split(/\r?\n/)
-        .map(line => line.trim())
-        .includes(excludeEntry)
-    ) {
-      return;
-    }
-
-    const prefix =
-      existingExclude && !existingExclude.endsWith('\n') ? '\n' : '';
-    await fs.promises.appendFile(
-      excludeFilePath,
-      `${prefix}# GDevelop local folder links\n${excludeEntry}\n`,
-      'utf8'
-    );
-  } catch (error) {
-    // Do not block the feature if Git exclusion can't be updated.
-  }
-};
-
 const readLinkedFoldersFile = async (
   project: gdProject
 ): Promise<Array<LinkedFolder>> => {
@@ -837,7 +771,9 @@ const writeLinkedFoldersFile = async ({
   const linkedFoldersFilePath = getLinkedFoldersFilePath(project);
   if (!projectRoot || !linkedFoldersFilePath) return;
 
-  await ensureFolderLinksFileIsGitExcluded(projectRoot);
+  await fs.promises.mkdir(path.dirname(linkedFoldersFilePath), {
+    recursive: true,
+  });
   await fs.promises.writeFile(
     linkedFoldersFilePath,
     JSON.stringify(

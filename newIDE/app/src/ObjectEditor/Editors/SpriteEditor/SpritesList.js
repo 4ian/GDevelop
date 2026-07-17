@@ -39,6 +39,12 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+import {
+  getDroppedResourceFilePathsFromDataTransfer,
+  hasDroppedResourceFileData,
+  importDroppedResourceFileAsProjectResource,
+} from '../../../ResourcesList/ResourceSelectorWithThumbnail';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 
 const gd: libGDevelop = global.gd;
 
@@ -52,6 +58,11 @@ const styles = {
   },
   thumbnailExtraStyle: {
     marginLeft: 5,
+  },
+  spriteDropTarget: {
+    display: 'flex',
+    flex: 1,
+    minWidth: 0,
   },
 };
 
@@ -299,6 +310,7 @@ const SpritesList = ({
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
+  const [isDraggedOver, setDraggedOver] = React.useState<boolean>(false);
 
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
@@ -479,6 +491,105 @@ const SpritesList = ({
     ]
   );
 
+  const canDropImageFiles =
+    storageProvider.internalName === 'LocalFile' && !!project.getProjectFile();
+
+  const hasSupportedDropData = React.useCallback(
+    (event: any): boolean =>
+      canDropImageFiles &&
+      hasDroppedResourceFileData(event.dataTransfer, 'image'),
+    [canDropImageFiles]
+  );
+
+  const keepDropActive = React.useCallback(
+    (event: any) => {
+      if (!hasSupportedDropData(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+      setDraggedOver(true);
+    },
+    [hasSupportedDropData]
+  );
+
+  const onDropImageFiles = React.useCallback(
+    async (event: any) => {
+      if (!hasSupportedDropData(event)) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      setDraggedOver(false);
+
+      const imageFilePaths = getDroppedResourceFilePathsFromDataTransfer(
+        event.dataTransfer,
+        'image'
+      );
+      if (!imageFilePaths.length) return;
+
+      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+      let hasCreatedAnyResource = false;
+      let hasAddedAnySprite = false;
+      let importError: any = null;
+
+      for (const imageFilePath of imageFilePaths) {
+        try {
+          const {
+            resourceName,
+            hasCreatedResource,
+          } = await importDroppedResourceFileAsProjectResource({
+            project,
+            resourceKind: 'image',
+            filePath: imageFilePath,
+          });
+          hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
+
+          const resource = project
+            .getResourcesManager()
+            .getResource(resourceName);
+          addAnimationFrame(animations, direction, resource, onSpriteAdded);
+          hasAddedAnySprite = true;
+        } catch (error) {
+          importError = error;
+          console.error('Unable to import dropped sprite image:', error);
+        }
+      }
+
+      if (hasAddedAnySprite) {
+        forceUpdate();
+
+        if (hasCreatedAnyResource) {
+          await resourceManagementProps.onFetchNewlyAddedResources();
+          resourceManagementProps.onNewResourcesAdded();
+        }
+        if (onSpriteUpdated) onSpriteUpdated();
+        if (directionSpritesCountBeforeAdding === 0 && onFirstSpriteUpdated) {
+          onFirstSpriteUpdated();
+        }
+      }
+
+      if (importError) {
+        showErrorBox({
+          message:
+            'One or more images could not be imported. Check that the files can be read.',
+          rawError: importError,
+          errorId: 'sprite-image-drop-import-error',
+        });
+      }
+    },
+    [
+      animations,
+      direction,
+      forceUpdate,
+      hasSupportedDropData,
+      onFirstSpriteUpdated,
+      onSpriteAdded,
+      onSpriteUpdated,
+      project,
+      resourceManagementProps,
+    ]
+  );
+
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
@@ -607,19 +718,31 @@ const SpritesList = ({
         onDirectionUpdated={onSpriteUpdated}
       />
       <ResponsiveLineStackLayout noMargin expand alignItems="center">
-        <SortableList
-          resourcesLoader={resourcesLoader}
-          direction={direction}
-          project={project}
-          resourceManagementProps={resourceManagementProps}
-          selectedSprites={selectedSprites.current}
-          onSelectSprite={addSpriteToSelection}
-          onOpenSpriteContextMenu={openSpriteContextMenu}
-          onSortEnd={onSortEnd}
-          helperClass="sortable-helper"
-          lockAxis="x"
-          axis="x"
-        />
+        <div
+          style={{
+            ...styles.spriteDropTarget,
+            outline: isDraggedOver ? '1px dashed #8f72ff' : undefined,
+            outlineOffset: 2,
+          }}
+          onDragEnter={keepDropActive}
+          onDragOver={keepDropActive}
+          onDragLeave={() => setDraggedOver(false)}
+          onDrop={onDropImageFiles}
+        >
+          <SortableList
+            resourcesLoader={resourcesLoader}
+            direction={direction}
+            project={project}
+            resourceManagementProps={resourceManagementProps}
+            selectedSprites={selectedSprites.current}
+            onSelectSprite={addSpriteToSelection}
+            onOpenSpriteContextMenu={openSpriteContextMenu}
+            onSortEnd={onSortEnd}
+            helperClass="sortable-helper"
+            lockAxis="x"
+            axis="x"
+          />
+        </div>
         <ContextMenu
           ref={spriteContextMenu}
           buildMenuTemplate={(i18n: I18nType) => [

@@ -23,7 +23,7 @@ const createGitRepository = () => {
   return repoRoot;
 };
 
-const testResetRemovesUntrackedFilesExceptLinkedFoldersFile = async () => {
+const testResetRemovesUntrackedFiles = async () => {
   const repoRoot = createGitRepository();
   try {
     const projectFilePath = path.join(repoRoot, 'game.json');
@@ -44,12 +44,6 @@ const testResetRemovesUntrackedFilesExceptLinkedFoldersFile = async () => {
       path.join(repoRoot, 'untracked-folder', 'file.txt'),
       'remove\n'
     );
-
-    const linkedFoldersFilePath = path.join(
-      repoRoot,
-      '.gdevelop-folder-links.json'
-    );
-    fs.writeFileSync(linkedFoldersFilePath, '{"linkedFolders":[]}\n');
 
     const status = await handleGitToolRequest({
       projectFilePath,
@@ -74,10 +68,7 @@ const testResetRemovesUntrackedFilesExceptLinkedFoldersFile = async () => {
       fs.existsSync(path.join(repoRoot, 'untracked-folder')),
       false
     );
-    assert.strictEqual(fs.existsSync(linkedFoldersFilePath), true);
-    assert.deepStrictEqual(status.changedFiles.map(file => file.path), [
-      '.gdevelop-folder-links.json',
-    ]);
+    assert.deepStrictEqual(status.changedFiles, []);
   } finally {
     fs.rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -128,7 +119,7 @@ const testDiffSupportsJsonFileWithSpaces = async () => {
 };
 
 const run = async () => {
-  await testResetRemovesUntrackedFilesExceptLinkedFoldersFile();
+  await testResetRemovesUntrackedFiles();
   await testDiffSupportsJsonFileWithSpaces();
 };
 

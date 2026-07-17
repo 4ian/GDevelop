@@ -3,6 +3,7 @@
 
 import {
   blurActiveElementBeforeUiTransition,
+  captureMaterialUiOverlayCleanupCandidates,
   cleanupLeakedOverlaysAfterPopOutClose,
 } from './MaterialUISpecificUtil';
 
@@ -432,6 +433,58 @@ describe('MaterialUISpecificUtil', () => {
       expect(overlay.style.visibility).toBe('hidden');
       expect(overlay.getAttribute('data-gdevelop-stale-overlay')).toBe('true');
       expect(() => body.removeChild(overlay)).not.toThrow();
+    } finally {
+      restoreDom();
+    }
+  });
+
+  test('a delayed cleanup pass does not neutralize a dropdown opened after teardown began', () => {
+    const body = new FakeElement('body');
+    const appRoot = new FakeElement();
+    appRoot.setAttribute('aria-hidden', 'true');
+    body.appendChild(appRoot);
+    body.style.overflow = 'hidden';
+
+    const staleOverlay = new FakeElement('MuiModal-root', {
+      rect: fullWindowRect,
+      style: fullWindowStyle,
+    });
+    staleOverlay.appendChild(
+      new FakeElement('MuiBackdrop-root', {
+        rect: fullWindowRect,
+        style: fullWindowStyle,
+      })
+    );
+    body.appendChild(staleOverlay);
+
+    const restoreDom = installFakeDom(body);
+    try {
+      const cleanupCandidates = captureMaterialUiOverlayCleanupCandidates();
+
+      // A Material-UI menu portal can initially contain only its modal root
+      // while Fade mounts the Paper. It did not exist when teardown started,
+      // so a delayed cleanup pass must leave it alone.
+      const newlyOpenedMenu = new FakeElement('MuiPopover-root MuiMenu-root', {
+        rect: fullWindowRect,
+        style: fullWindowStyle,
+      });
+      body.appendChild(newlyOpenedMenu);
+
+      cleanupLeakedOverlaysAfterPopOutClose(cleanupCandidates);
+
+      expect(staleOverlay.style.pointerEvents).toBe('none');
+      expect(staleOverlay.getAttribute('data-gdevelop-stale-overlay')).toBe(
+        'true'
+      );
+      expect(newlyOpenedMenu.style.pointerEvents).toBe('auto');
+      expect(newlyOpenedMenu.style.visibility).toBe('visible');
+      expect(newlyOpenedMenu.getAttribute('data-gdevelop-stale-overlay')).toBe(
+        null
+      );
+      // The new menu is still mounting, so its ModalManager state must also be
+      // preserved even before its Paper is present.
+      expect(appRoot.getAttribute('aria-hidden')).toBe('true');
+      expect(body.style.overflow).toBe('hidden');
     } finally {
       restoreDom();
     }

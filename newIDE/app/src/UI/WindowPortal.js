@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import ReactDOM from 'react-dom';
+import ReactDOM, { flushSync } from 'react-dom';
 import PortalContainerContext from './PortalContainerContext';
 import Window from '../Utils/Window';
 import {
@@ -196,15 +196,34 @@ const WindowPortal = ({
     const styleObserver = copyDocumentStyles(document, externalWindowDocument);
 
     let hasStoppedRenderingIntoExternalWindow = false;
-    const stopRenderingIntoExternalWindow = () => {
+    const stopRenderingIntoExternalWindow = ({
+      synchronouslyUnmountPortal = false,
+    }: {| synchronouslyUnmountPortal?: boolean |} = {}) => {
       if (hasStoppedRenderingIntoExternalWindow) return;
       hasStoppedRenderingIntoExternalWindow = true;
 
       if (styleObserver) styleObserver.disconnect();
       if (observer) observer.disconnect();
-      onWindowReadyRef.current(null);
-      setWindowSize(null);
-      setContainer(null);
+
+      const unmountPortalContent = () => {
+        onWindowReadyRef.current(null);
+        setWindowSize(null);
+        setContainer(null);
+      };
+
+      if (synchronouslyUnmountPortal) {
+        // `beforeunload` returns control to Electron/Chrome immediately. A
+        // normal React state update can remain batched until after the child
+        // document has already been destroyed, preventing Material-UI modal
+        // effects from restoring aria-hidden, scroll locks and portal nodes.
+        // Commit the portal removal while its document is still alive.
+        flushSync(unmountPortalContent);
+      } else {
+        // During the component's own effect cleanup React is already
+        // unmounting synchronously, and calling flushSync from a lifecycle
+        // cleanup would be invalid.
+        unmountPortalContent();
+      }
     };
 
     // Suppress the benign "ResizeObserver loop" error in the external window
@@ -270,7 +289,7 @@ const WindowPortal = ({
 
       // Disconnect as soon as possible to avoid React, observers or callbacks
       // interacting with a BrowserWindow-backed document during teardown.
-      stopRenderingIntoExternalWindow();
+      stopRenderingIntoExternalWindow({ synchronouslyUnmountPortal: true });
 
       // Let the window closing be done normally (nothing prevents it).
       console.info(`Window "${targetId}" is unloaded.`);

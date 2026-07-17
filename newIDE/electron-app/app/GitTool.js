@@ -3,7 +3,6 @@ const path = require('path');
 
 const gitCommandTimeoutMs = 120000;
 const gitCommandMaxBuffer = 10 * 1024 * 1024;
-const linkedFoldersFileName = '.gdevelop-folder-links.json';
 
 const runGit = (workingDirectory, args, options = {}) =>
   new Promise((resolve, reject) => {
@@ -444,11 +443,7 @@ const resetToCommit = async ({ projectFilePath, commitHash }) => {
 
   const status = await ensureGitRepository(projectFilePath);
   await runGit(status.repoRoot, ['reset', '--hard', commitHash]);
-  await runGit(status.repoRoot, [
-    'clean',
-    '-fd',
-    `--exclude=${linkedFoldersFileName}`,
-  ]);
+  await runGit(status.repoRoot, ['clean', '-fd']);
 
   return getStatus(projectFilePath);
 };

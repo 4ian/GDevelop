@@ -566,7 +566,7 @@ describe('ProjectFilesPanel', () => {
       getLinkedFoldersFilePath({
         getProjectFile: () => 'D:\\Project\\game.json',
       })
-    ).toBe('D:\\Project\\.gdevelop-folder-links.json');
+    ).toBe('D:\\Project\\.gdevelop\\folder-links.json');
     expect(isProjectFileNode(fileNode)).toBe(true);
     expect(isProjectFileNode(linkedFileNode)).toBe(false);
   });
@@ -626,7 +626,7 @@ describe('ProjectFilesPanel', () => {
   it('shows the add folder link action only on the linked folders root', () => {
     const source = getSource();
 
-    expect(source).toContain("'.gdevelop-folder-links.json'");
+    expect(source).toContain("'folder-links.json'");
     expect(source).not.toContain(
       'children: [...children, linkedFoldersRootNode]'
     );

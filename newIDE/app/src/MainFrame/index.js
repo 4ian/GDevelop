@@ -40,6 +40,7 @@ import ProjectManager, {
 import LoaderModal from '../UI/LoaderModal';
 import {
   cleanupLeakedOverlaysAfterPopOutClose,
+  captureMaterialUiOverlayCleanupCandidates,
   reportPotentialInputBlockers,
 } from '../UI/MaterialUISpecificUtil';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
@@ -1110,22 +1111,21 @@ const MainFrame = (props: Props): React.MixedElement => {
     setTimeout(refresh, 500);
   }, []);
 
-  // When a popped-out window (e.g. the debugger) is destroyed, Material-UI's
-  // GLOBAL ModalManager — shared with that window — can fail to clean up,
-  // leaving an orphaned full-screen overlay root in the MAIN window's
-  // `document.body` that swallows every click (the "UI not responding after
-  // closing the debug window" bug), and/or `aria-hidden`/scroll-lock leftovers.
-  // Heal the main window across the same teardown window as the tree refresh.
+  // WindowPortal synchronously unmounts its React/MUI portals before the child
+  // document is destroyed. Keep this scoped cleanup as a fallback for older
+  // Electron teardown edge cases, inspecting only the overlays that existed
+  // when the actual editor/debugger pop-out started closing.
   const healMainWindowAfterPopOutClose = React.useCallback(() => {
+    if (typeof window.focus === 'function') window.focus();
+    const cleanupCandidates = captureMaterialUiOverlayCleanupCandidates();
     const heal = () => {
-      if (typeof window.focus === 'function') window.focus();
-      cleanupLeakedOverlaysAfterPopOutClose();
+      cleanupLeakedOverlaysAfterPopOutClose(cleanupCandidates);
       // Diagnostic: if anything is still covering the editor after cleanup,
       // log exactly what it is so the remaining cause can be pinned down.
       reportPotentialInputBlockers();
     };
     heal();
-    [0, 60, 200, 550, 1000, 2000].forEach(delay => {
+    [0, 60, 200, 550].forEach(delay => {
       setTimeout(heal, delay);
     });
   }, []);
@@ -1231,9 +1231,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             'a preview window was closed'
           );
         }
-        // A preview window close can leave the main window with leaked MUI
-        // overlay state, just like debugger/editor pop-outs do.
-        healMainWindowAfterPopOutClose();
       };
 
       ipcRenderer.on('preview-window-closed', onPreviewWindowClosed);
@@ -1247,7 +1244,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       cancelPendingPreviewLaunchAfterWindowClosed,
       clearPreviewDebuggerStatuses,
       hasNonEditionPreviewsRunning,
-      healMainWindowAfterPopOutClose,
       previewDebuggerServer,
     ]
   );
@@ -6399,9 +6395,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       };
       dismissLocalProjectFilesChangedDialogRef.current = dismissTrackedDialog;
-      // If the file watcher fires just after a debugger/preview pop-out closed,
-      // make sure a stale full-window blocker is gone before opening the dialog.
-      healMainWindowAfterPopOutClose();
       try {
         await showLocalProjectFilesChangedDialog({
           showConfirmation,
@@ -6418,15 +6411,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) {
           dismissLocalProjectFilesChangedDialogRef.current = null;
         }
-        healMainWindowAfterPopOutClose();
       }
     },
-    [
-      backupCurrentProjectToLocalFolder,
-      healMainWindowAfterPopOutClose,
-      reloadProject,
-      showConfirmation,
-    ]
+    [backupCurrentProjectToLocalFolder, reloadProject, showConfirmation]
   );
 
   const areLocalProjectFilesSameAsMemory = React.useCallback(

@@ -50,6 +50,7 @@ const getPortalContainerThemeProps = (portalContainer: ?HTMLElement) => {
   return {
     MuiModal: { container: portalContainer },
     MuiPopover: { container: portalContainer },
+    MuiPopper: { container: portalContainer },
     MuiMenu: { container: portalContainer },
     MuiDrawer: { container: portalContainer },
     MuiTooltip: {

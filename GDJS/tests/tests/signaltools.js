@@ -148,6 +148,49 @@ describe('gdjs.evtTools.signal', () => {
     ]);
   });
 
+  it('reports each concrete scene signal subscriber to the signal monitor', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    const behavior = receiver.getBehavior('SignalBehavior');
+    runtimeScene.isSignalMonitorDebugEnabled = () => true;
+
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      receiver,
+      'LocaleChanged'
+    );
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      behavior,
+      'LocaleChanged'
+    );
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'LocaleChanged', 'ja');
+    dispatchFrame(runtimeScene);
+
+    const signalRecord = runtimeScene.getSignalBus().getDebugInfo()
+      .signalsThisFrame[0];
+    expect(
+      signalRecord.receiverPositions.map((receiverPosition) => ({
+        objectName: receiverPosition.objectName,
+        objectId: receiverPosition.objectId,
+        receiverName: receiverPosition.receiverName,
+        receiverKind: receiverPosition.receiverKind,
+      }))
+    ).to.eql([
+      {
+        objectName: 'Receiver',
+        objectId: receiver.getUniqueId(),
+        receiverName: 'Receiver',
+        receiverKind: 'prefab',
+      },
+      {
+        objectName: 'Receiver',
+        objectId: receiver.getUniqueId(),
+        receiverName: 'SignalBehavior',
+        receiverKind: 'behavior',
+      },
+    ]);
+  });
+
   it('keeps an inactive behavior subscribed without replaying missed signals', () => {
     const { runtimeScene, receiver } = createSignalRuntimeScene();
     const behavior = receiver.getBehavior('SignalBehavior');

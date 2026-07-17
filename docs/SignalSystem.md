@@ -902,6 +902,12 @@ Signals delivered this frame
       InventoryPanel#42 (prefab)
 ```
 
+For a delivered scene broadcast, the signal monitor renders one delivery row
+per concrete receiver instead of showing the scene as the target. Prefab rows
+use `ObjectName#InstanceId (prefab)`; behavior rows use
+`ObjectName#InstanceId.BehaviorName`. A matching scene-event condition is shown
+as `scene events`.
+
 Diagnostics include:
 
 - pending and delivered counts;

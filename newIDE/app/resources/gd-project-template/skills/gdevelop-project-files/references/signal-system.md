@@ -208,6 +208,8 @@ Data is resolved during code generation, not at runtime. Read
 Reload direct project-file edits, start a fresh debug preview, and inspect the
 signal monitor. It reports signal ID, name, payload, debugger source, target,
 receivers, queue state, throttling, and unhandled delivery.
+Delivered scene broadcasts expand into one row per concrete prefab or behavior
+receiver instead of presenting the scene itself as their target.
 
 Verify:
 

@@ -10,6 +10,7 @@ namespace gdjs {
   const maxSignalDebugReceiverNamesPerSignal = 4;
   const maxSignalAnimationDebugRecordsPerFrame = 8;
   const maxSignalAnimationDebugPointsPerSignal = 4;
+  const maxSignalMonitorDebugReceiversPerSignal = 40;
 
   export type SignalDebugStatus = 'delivered' | 'unhandled' | 'throttled';
 
@@ -45,6 +46,10 @@ namespace gdjs {
     isThrottled?: boolean;
   };
 
+  export type SignalDebugReceiver = SignalAnimationDebugReceiver & {
+    receiverKind: 'scene' | 'prefab' | 'behavior';
+  };
+
   export type SignalAnimationDebugRecord = {
     id: integer;
     name: string;
@@ -65,12 +70,12 @@ namespace gdjs {
     status: SignalDebugStatus;
     receivers: string[];
     source: SignalDebugPoint | null;
-    receiverPositions: SignalAnimationDebugReceiver[];
+    receiverPositions: SignalDebugReceiver[];
     targetPositions: SignalAnimationDebugReceiver[];
   };
 
   type InternalSignalDebugRecord = SignalDebugRecord & {
-    enableAnimationDebugPoints: boolean;
+    enableDebugPoints: boolean;
   };
 
   export type SignalDebugInfo = {
@@ -423,7 +428,7 @@ namespace gdjs {
         ++index
       ) {
         const record = this._signalsThisFrameDebugRecords[index];
-        if (!record.enableAnimationDebugPoints || !record.source) continue;
+        if (!record.enableDebugPoints || !record.source) continue;
         const status = this._getDebugStatus(record);
         const positions =
           record.receiverPositions.length > 0
@@ -437,11 +442,13 @@ namespace gdjs {
           target: record.target,
           status,
           source: record.source,
-          receivers: positions.map((position) => ({
-            ...position,
-            isUnhandled: status === 'unhandled',
-            isThrottled: status === 'throttled',
-          })),
+          receivers: positions
+            .slice(0, maxSignalAnimationDebugPointsPerSignal)
+            .map((position) => ({
+              ...position,
+              isUnhandled: status === 'unhandled',
+              isThrottled: status === 'throttled',
+            })),
         });
       }
       return records;
@@ -457,6 +464,7 @@ namespace gdjs {
         this._recordReceiverPosition(
           record,
           getSceneSignalDebugPoint(runtimeScene),
+          'scene',
           'scene'
         );
       }
@@ -507,7 +515,8 @@ namespace gdjs {
           this._recordRuntimeReceiver(
             record,
             receiver.owner,
-            receiver.getName()
+            receiver.getName(),
+            'behavior'
           );
         } else {
           if (!isRuntimeObjectLiving(receiver)) {
@@ -516,7 +525,12 @@ namespace gdjs {
           }
           if (!runtimeObjectHasOnSignal(receiver)) continue;
           (receiver as any).onSignal(signal.name, signal.payload);
-          this._recordRuntimeReceiver(record, receiver, receiver.getName());
+          this._recordRuntimeReceiver(
+            record,
+            receiver,
+            receiver.getName(),
+            'prefab'
+          );
         }
       }
     }
@@ -572,20 +586,23 @@ namespace gdjs {
       this._recordRuntimeReceiver(
         record,
         runtimeObject,
-        runtimeObject.getName()
+        runtimeObject.getName(),
+        'prefab'
       );
     }
 
     private _recordRuntimeReceiver(
       record: InternalSignalDebugRecord,
       runtimeObject: gdjs.RuntimeObject,
-      receiverName: string
+      receiverName: string,
+      receiverKind: 'prefab' | 'behavior'
     ): void {
       this._recordReceiverName(record, receiverName);
       this._recordReceiverPosition(
         record,
         getRuntimeObjectSignalDebugPoint(runtimeObject),
-        receiverName
+        receiverName,
+        receiverKind
       );
       this._receiversThisFrameCount++;
     }
@@ -605,17 +622,18 @@ namespace gdjs {
     private _recordReceiverPosition(
       record: InternalSignalDebugRecord,
       point: SignalDebugPoint,
-      receiverName: string
+      receiverName: string,
+      receiverKind: 'scene' | 'prefab' | 'behavior'
     ): void {
       if (
-        !record.enableAnimationDebugPoints ||
+        !record.enableDebugPoints ||
         !record.source ||
         record.receiverPositions.length >=
-          maxSignalAnimationDebugPointsPerSignal
+          maxSignalMonitorDebugReceiversPerSignal
       ) {
         return;
       }
-      record.receiverPositions.push({ ...point, receiverName });
+      record.receiverPositions.push({ ...point, receiverName, receiverKind });
     }
 
     private _recordTargetPosition(
@@ -624,7 +642,7 @@ namespace gdjs {
       receiverName: string
     ): void {
       if (
-        !record.enableAnimationDebugPoints ||
+        !record.enableDebugPoints ||
         !record.source ||
         record.targetPositions.length >= maxSignalAnimationDebugPointsPerSignal
       ) {
@@ -650,8 +668,9 @@ namespace gdjs {
         source: null,
         receiverPositions: [],
         targetPositions: [],
-        enableAnimationDebugPoints:
-          isSignalAnimationDebugDrawEnabled(runtimeScene),
+        enableDebugPoints:
+          isSignalAnimationDebugDrawEnabled(runtimeScene) ||
+          runtimeScene.isSignalMonitorDebugEnabled(),
       };
       if (
         this._signalsThisFrameDebugRecords.length <
@@ -879,7 +898,6 @@ namespace gdjs {
             .getCurrentSceneSignal()?.payload || ''
         );
       };
-
     }
   }
 

@@ -1,5 +1,9 @@
 // @flow
 
+jest.mock('three/src/math/MathUtils', () => ({
+  generateUUID: () => 'test-uuid',
+}));
+
 import { insertNewEventsBasedObject } from './CreateEventsBasedObject';
 import { insertNewEventsBasedBehavior } from './CreateEventsBasedBehavior';
 import { initializeEventsFunctionDisplayName } from './InitializeEventsFunction';

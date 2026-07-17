@@ -12,7 +12,8 @@ type SignalDebugPoint = {
 type SignalDebugReceiver = {
   objectName: string,
   objectId: number,
-  receiverName?: string,
+  receiverName: string,
+  receiverKind: 'scene' | 'prefab' | 'behavior',
   ...
 };
 
@@ -27,7 +28,7 @@ type SignalDebugRecord = {
   source: ?SignalDebugPoint,
   receivers: Array<string>,
   receiverPositions: Array<SignalDebugReceiver>,
-  targetPositions: Array<SignalDebugReceiver>,
+  targetPositions: Array<SignalDebugPoint>,
   ...
 };
 
@@ -151,18 +152,32 @@ const formatSignalDebugTarget = (target: string): string => {
   return targetValue ? targetKind + ' ' + targetValue : targetKind;
 };
 
+const formatSignalDebugReceiver = (
+  receiver: SignalDebugReceiver
+): string => {
+  if (receiver.receiverKind === 'scene') {
+    return 'scene events';
+  }
+
+  const owner = formatSignalDebugPoint(receiver);
+  if (receiver.receiverKind === 'behavior') {
+    return owner + '.' + receiver.receiverName;
+  }
+  return owner + ' (prefab)';
+};
+
 const formatSignalDebugRecordDestination = (
   signalDebugRecord: SignalDebugRecord
 ): string => {
   if (signalDebugRecord.target === 'scene') {
-    return 'scene';
+    return 'scene broadcast';
   }
 
   if (
     signalDebugRecord.status === 'delivered' &&
     signalDebugRecord.receiverPositions.length > 0
   ) {
-    return formatSignalDebugPoint(signalDebugRecord.receiverPositions[0]);
+    return formatSignalDebugReceiver(signalDebugRecord.receiverPositions[0]);
   }
 
   if (signalDebugRecord.targetPositions.length > 0) {
@@ -256,7 +271,7 @@ const getSignalDiagnosticsSignature = (
   return signature;
 };
 
-const getSignalMonitorLogs = (
+export const getSignalMonitorLogs = (
   signalDiagnostics: SignalDiagnostics
 ): Array<SignalMonitorLog> => {
   const logs: Array<SignalMonitorLog> = [];
@@ -270,18 +285,30 @@ const getSignalMonitorLogs = (
       signalDebugRecord.status,
       signalDebugRecord.name
     );
-    logs.push({
-      id: signalDebugRecord.id,
-      signalName: signalDebugRecord.name,
-      payload: signalDebugRecord.payload,
-      target: signalDebugRecord.target,
-      source: signalDebugRecord.source || sceneSignalDebugPoint,
-      destination: formatSignalDebugRecordDestination(signalDebugRecord),
-      emittedFrameId: signalDebugRecord.emittedFrameId,
-      deliveredFrameId: signalDebugRecord.deliveredFrameId,
-      status: signalDebugRecord.status,
-      color,
-    });
+    const destinations =
+      signalDebugRecord.target === 'scene' &&
+      signalDebugRecord.status === 'delivered' &&
+      signalDebugRecord.receiverPositions.length > 0
+        ? signalDebugRecord.receiverPositions.map(formatSignalDebugReceiver)
+        : [formatSignalDebugRecordDestination(signalDebugRecord)];
+    for (
+      let destinationIndex = 0;
+      destinationIndex < destinations.length;
+      ++destinationIndex
+    ) {
+      logs.push({
+        id: signalDebugRecord.id,
+        signalName: signalDebugRecord.name,
+        payload: signalDebugRecord.payload,
+        target: signalDebugRecord.target,
+        source: signalDebugRecord.source || sceneSignalDebugPoint,
+        destination: destinations[destinationIndex],
+        emittedFrameId: signalDebugRecord.emittedFrameId,
+        deliveredFrameId: signalDebugRecord.deliveredFrameId,
+        status: signalDebugRecord.status,
+        color,
+      });
+    }
   }
   return logs;
 };
@@ -303,7 +330,9 @@ const getSignalMonitorLogKey = (log: SignalMonitorLog): string =>
   ':' +
   log.source.objectName +
   ':' +
-  log.source.objectId;
+  log.source.objectId +
+  ':' +
+  log.destination;
 
 const getSignalMonitorLogContentKey = (log: SignalMonitorLog): string =>
   log.status +

@@ -210,6 +210,8 @@ signal monitor. It reports signal ID, name, payload, debugger source, target,
 receivers, queue state, throttling, and unhandled delivery.
 Delivered scene broadcasts expand into one row per concrete prefab or behavior
 receiver instead of presenting the scene itself as their target.
+The monitor can rebuild its cards from the runtime's 40 most recent signal
+records, so deliveries survive panel rerenders and missed frame updates.
 
 Verify:
 

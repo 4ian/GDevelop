@@ -191,6 +191,39 @@ describe('gdjs.evtTools.signal', () => {
     ]);
   });
 
+  it('keeps recent signal monitor records across delivery frames', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+    runtimeScene.isSignalMonitorDebugEnabled = () => true;
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      receiver,
+      'TestSignal'
+    );
+    gdjs.evtTools.signal.subscribeSceneSignal(
+      runtimeScene,
+      receiver,
+      'TestSignal222'
+    );
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'TestSignal', 'tst1');
+    dispatchFrame(runtimeScene);
+    gdjs.evtTools.signal.emitSceneSignal(
+      runtimeScene,
+      'TestSignal222',
+      'test2'
+    );
+    dispatchFrame(runtimeScene);
+
+    const debugInfo = runtimeScene.getSignalBus().getDebugInfo();
+    expect(debugInfo.signalsThisFrame.map((signal) => signal.name)).to.eql([
+      'TestSignal222',
+    ]);
+    expect(debugInfo.recentSignals.map((signal) => signal.name)).to.eql([
+      'TestSignal',
+      'TestSignal222',
+    ]);
+  });
+
   it('keeps an inactive behavior subscribed without replaying missed signals', () => {
     const { runtimeScene, receiver } = createSignalRuntimeScene();
     const behavior = receiver.getBehavior('SignalBehavior');

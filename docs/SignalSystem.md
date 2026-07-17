@@ -908,6 +908,9 @@ use `ObjectName#InstanceId (prefab)`; behavior rows use
 `ObjectName#InstanceId.BehaviorName`. A matching scene-event condition is shown
 as `scene events`.
 
+The runtime diagnostic keeps the 40 most recent signal records so the monitor
+can reconstruct its cards after a panel rerender or a missed frame update.
+
 Diagnostics include:
 
 - pending and delivered counts;

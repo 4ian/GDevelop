@@ -10,6 +10,7 @@ namespace gdjs {
   const maxSignalDebugReceiverNamesPerSignal = 4;
   const maxSignalAnimationDebugRecordsPerFrame = 8;
   const maxSignalAnimationDebugPointsPerSignal = 4;
+  const maxSignalMonitorDebugRecords = 40;
   const maxSignalMonitorDebugReceiversPerSignal = 40;
 
   export type SignalDebugStatus = 'delivered' | 'unhandled' | 'throttled';
@@ -86,7 +87,24 @@ namespace gdjs {
     deliveredSignalsThisFrameCount: integer;
     receiversThisFrameCount: integer;
     signalsThisFrame: SignalDebugRecord[];
+    recentSignals: SignalDebugRecord[];
   };
+
+  const makePublicSignalDebugRecord = (
+    record: InternalSignalDebugRecord
+  ): SignalDebugRecord => ({
+    id: record.id,
+    name: record.name,
+    payload: record.payload,
+    target: record.target,
+    emittedFrameId: record.emittedFrameId,
+    deliveredFrameId: record.deliveredFrameId,
+    status: record.status,
+    receivers: record.receivers,
+    source: record.source,
+    receiverPositions: record.receiverPositions,
+    targetPositions: record.targetPositions,
+  });
 
   export interface RuntimeScene {
     _signalBus?: gdjs.SignalBus;
@@ -204,6 +222,7 @@ namespace gdjs {
     private _deliveredSignalsThisFrame: RuntimeSignal[] = [];
     private _sceneSubscriptions = new Map<string, RuntimeSignalReceiver[]>();
     private _signalsThisFrameDebugRecords: InternalSignalDebugRecord[] = [];
+    private _recentSignalMonitorDebugRecords: InternalSignalDebugRecord[] = [];
     private _signalDebugRecordsById = new Map<
       integer,
       InternalSignalDebugRecord
@@ -381,6 +400,7 @@ namespace gdjs {
       this._deliveredSignalsThisFrame.length = 0;
       this._sceneSubscriptions.clear();
       this._signalsThisFrameDebugRecords.length = 0;
+      this._recentSignalMonitorDebugRecords.length = 0;
       this._signalDebugRecordsById.clear();
       this._signalDebugEmittersById.clear();
       this._currentSceneSignal = null;
@@ -400,17 +420,12 @@ namespace gdjs {
         deliveredSignalsThisFrameCount: this._deliveredSignalsThisFrame.length,
         receiversThisFrameCount: this._receiversThisFrameCount,
         signalsThisFrame: this._signalsThisFrameDebugRecords.map((record) => ({
-          id: record.id,
-          name: record.name,
-          payload: record.payload,
-          target: record.target,
-          emittedFrameId: record.emittedFrameId,
-          deliveredFrameId: record.deliveredFrameId,
+          ...makePublicSignalDebugRecord(record),
           status: this._getDebugStatus(record),
-          receivers: record.receivers,
-          source: record.source,
-          receiverPositions: record.receiverPositions,
-          targetPositions: record.targetPositions,
+        })),
+        recentSignals: this._recentSignalMonitorDebugRecords.map((record) => ({
+          ...makePublicSignalDebugRecord(record),
+          status: this._getDebugStatus(record),
         })),
       };
     }
@@ -679,6 +694,15 @@ namespace gdjs {
         record.source = this._getDebugSource(runtimeScene, signal);
         this._signalsThisFrameDebugRecords.push(record);
         this._signalDebugRecordsById.set(signal.id, record);
+        if (runtimeScene.isSignalMonitorDebugEnabled()) {
+          this._recentSignalMonitorDebugRecords.push(record);
+          if (
+            this._recentSignalMonitorDebugRecords.length >
+            maxSignalMonitorDebugRecords
+          ) {
+            this._recentSignalMonitorDebugRecords.shift();
+          }
+        }
       }
       return record;
     }

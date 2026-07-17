@@ -40,6 +40,7 @@ export type SignalDiagnostics = {
   deliveredSignalsThisFrameCount: number,
   receiversThisFrameCount: number,
   signalsThisFrame: Array<SignalDebugRecord>,
+  recentSignals: Array<SignalDebugRecord>,
   ...
 };
 
@@ -241,7 +242,9 @@ const getSignalDiagnosticsSignature = (
     ':' +
     signalDiagnostics.receiversThisFrameCount +
     ':' +
-    signalDiagnostics.signalsThisFrame.length;
+    signalDiagnostics.signalsThisFrame.length +
+    ':' +
+    signalDiagnostics.recentSignals.length;
 
   for (
     let i = 0, len = signalDiagnostics.signalsThisFrame.length;
@@ -275,12 +278,9 @@ export const getSignalMonitorLogs = (
   signalDiagnostics: SignalDiagnostics
 ): Array<SignalMonitorLog> => {
   const logs: Array<SignalMonitorLog> = [];
-  for (
-    let i = 0, len = signalDiagnostics.signalsThisFrame.length;
-    i < len;
-    ++i
-  ) {
-    const signalDebugRecord = signalDiagnostics.signalsThisFrame[i];
+  const signalDebugRecords = signalDiagnostics.recentSignals;
+  for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
+    const signalDebugRecord = signalDebugRecords[i];
     const color = getSignalDebugStatusColor(
       signalDebugRecord.status,
       signalDebugRecord.name
@@ -455,6 +455,11 @@ const SignalMonitorRow = ({
   const color = toHexColor(log.color);
   const statusLabel = getSignalDebugStatusLabel(log.status);
   const payload = log.payload || '';
+  const route =
+    'from ' +
+    formatSignalDebugPoint(log.source) +
+    ' -> ' +
+    log.destination;
 
   return (
     <div
@@ -478,17 +483,11 @@ const SignalMonitorRow = ({
         ) : null}
         <div style={styles.idText}>#{log.id}</div>
       </div>
-      <div style={styles.fromTo}>
-        {shortenSignalDebugText(
-          'from ' +
-            formatSignalDebugPoint(log.source) +
-            ' -> ' +
-            log.destination,
-          62
-        )}
+      <div title={route} style={styles.fromTo}>
+        {shortenSignalDebugText(route, 62)}
       </div>
       <div
-        title={payload ? 'data: ' + payload : undefined}
+        title={payload ? 'payload: ' + payload : undefined}
         style={{
           ...styles.payload,
           color: payload ? '#ffdd78' : '#9aa7b8',
@@ -500,7 +499,7 @@ const SignalMonitorRow = ({
             : 'rgba(21, 29, 41, 0.7)',
         }}
       >
-        {'data: "' + payload + '"'}
+        {'payload: "' + payload + '"'}
       </div>
     </div>
   );

@@ -588,7 +588,9 @@ namespace gdjs {
         ':' +
         signalDiagnostics.receiversThisFrameCount +
         ':' +
-        signalDiagnostics.signalsThisFrame.length;
+        signalDiagnostics.signalsThisFrame.length +
+        ':' +
+        signalDiagnostics.recentSignals.length;
 
       for (
         let i = 0, len = signalDiagnostics.signalsThisFrame.length;

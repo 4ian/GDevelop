@@ -648,7 +648,7 @@ export default class LayerRenderer {
     light.position.set(0, 0, 1);
     const lightGroup = new THREE.Group();
     lightGroup.rotation.order = 'ZYX';
-    lightGroup.rotation.x = Math.PI / 4;
+    lightGroup.rotation.x = -Math.PI / 4;
     lightGroup.add(light);
     threeScene.add(lightGroup);
 

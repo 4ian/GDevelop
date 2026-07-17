@@ -524,6 +524,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onOpenPrefabDetailEditor={
                           props.onOpenPrefabDetailEditor
                         }
+                        onOpenPrefabSettings={props.onOpenPrefabSettings}
                         onDeleteEventsBasedObjectVariant={
                           props.onDeleteEventsBasedObjectVariant
                         }

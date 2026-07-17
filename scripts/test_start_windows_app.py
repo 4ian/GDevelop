@@ -191,7 +191,7 @@ class StartWindowsAppScriptTest(unittest.TestCase):
         self.assertIn("Write-Warning", port_stop_script)
         self.assertIn("exit 0", port_stop_script)
 
-    def test_electron_runs_in_foreground_with_inherited_console(self):
+    def test_electron_runs_detached_without_inherited_console(self):
         module = load_script_module()
         electron_app_dir = ROOT_DIR / "newIDE" / "electron-app"
         electron_exe = (
@@ -208,24 +208,17 @@ class StartWindowsAppScriptTest(unittest.TestCase):
                 electron_app_dir, electron_exe, dry_run=False
             )
 
-        self.assertIs(launched_process, process)
+        self.assertEqual(launched_process, process.pid)
         self.assertEqual(popen.call_args.args[0], [str(electron_exe), "app"])
         self.assertEqual(popen.call_args.kwargs["cwd"], electron_app_dir)
         self.assertEqual(popen.call_args.kwargs["env"]["ELECTRON_IS_DEV"], "0")
-        self.assertNotIn("stdin", popen.call_args.kwargs)
-        self.assertNotIn("stdout", popen.call_args.kwargs)
-        self.assertNotIn("stderr", popen.call_args.kwargs)
-        self.assertNotIn("creationflags", popen.call_args.kwargs)
-
-    def test_wait_for_electron_waits_and_rejects_failure(self):
-        module = load_script_module()
-        process = mock.Mock()
-        process.wait.return_value = 7
-
-        with self.assertRaisesRegex(RuntimeError, "Electron exited with code 7"):
-            module.wait_for_electron(process)
-
-        process.wait.assert_called_once_with()
+        self.assertIs(popen.call_args.kwargs["stdin"], subprocess.DEVNULL)
+        self.assertIs(popen.call_args.kwargs["stdout"], subprocess.DEVNULL)
+        self.assertIs(popen.call_args.kwargs["stderr"], subprocess.DEVNULL)
+        self.assertEqual(
+            popen.call_args.kwargs["creationflags"],
+            subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+        )
 
 
 if __name__ == "__main__":

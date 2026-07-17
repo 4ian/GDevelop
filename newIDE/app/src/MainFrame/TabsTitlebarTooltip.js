@@ -21,7 +21,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'events functions extension': <Trans>Extension</Trans>,
   'behavior detail': <Trans>Behavior</Trans>,
   'function detail': <Trans>Function</Trans>,
-  'prefab detail': <Trans>Prefab detail</Trans>,
+  'prefab detail': <Trans>Prefab events</Trans>,
   'custom object': <Trans>UI</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,

@@ -7200,7 +7200,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         addRecentEditorSwitcherSideMenuItem(
           `prefab detail ${extensionName}::${objectName}`,
           `${objectName} ${i18n._(t`(Prefab)`)}`,
-          `${extensionName} - ${i18n._(t`Prefab detail`)}`,
+          `${extensionName} - ${i18n._(t`Prefab events`)}`,
           <ObjectIcon />,
           () =>
             openPrefabDetailEditor(eventsFunctionsExtension, eventsBasedObject)
@@ -8012,6 +8012,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
     onOpenPrefabDetailEditor: openPrefabDetailEditor,
+    onOpenPrefabSettings: openPrefabSettings,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,

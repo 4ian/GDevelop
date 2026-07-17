@@ -34,6 +34,7 @@ type Props = {|
   getContentAABB: () => Rectangle | null,
   onEventsBasedObjectChildrenEdited: () => void,
   onOpenPrefabDetailEditor: ?() => void,
+  onOpenPrefabSettings: ?() => void,
 |};
 
 export const CompactEventsBasedObjectVariantPropertiesEditor = ({
@@ -44,6 +45,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = ({
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
   onOpenPrefabDetailEditor,
+  onOpenPrefabSettings,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -59,6 +61,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = ({
         getContentAABB,
         onEventsBasedObjectChildrenEdited,
         onOpenPrefabDetailEditor,
+        onOpenPrefabSettings,
       }),
     [
       i18n,
@@ -68,6 +71,7 @@ export const CompactEventsBasedObjectVariantPropertiesEditor = ({
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
       onOpenPrefabDetailEditor,
+      onOpenPrefabSettings,
     ]
   );
 

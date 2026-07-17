@@ -361,7 +361,8 @@ def sync_electron_www(electron_app_dir: Path, build: bool, dry_run: bool) -> Non
 
 def launch_electron(
     electron_app_dir: Path, electron_exe: Path, dry_run: bool
-) -> subprocess.Popen[bytes] | None:
+) -> int | None:
+    """Start Electron detached from this launcher and return its process ID."""
     step("Launch Electron")
     command = [str(electron_exe), "app"]
     print(
@@ -377,18 +378,15 @@ def launch_electron(
         command,
         cwd=electron_app_dir,
         env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        creationflags=(
+            subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+        ),
     )
-    print(f"Started Electron process PID: {process.pid}", flush=True)
-    print("Electron console logs will stream below.", flush=True)
-    return process
-
-
-def wait_for_electron(process: subprocess.Popen[bytes]) -> None:
-    step("Run Electron in foreground")
-    print("Waiting for Electron to exit. Press Ctrl+C to stop it.", flush=True)
-    return_code = process.wait()
-    if return_code != 0:
-        raise RuntimeError(f"Electron exited with code {return_code}.")
+    print(f"Started detached Electron process PID: {process.pid}", flush=True)
+    return process.pid
 
 
 def verify_inputs(
@@ -510,12 +508,8 @@ def main() -> int:
             )
             stop_existing_processes(repo_root, electron_exe, args.dry_run)
             verify_inputs(repo_root, electron_app_dir, electron_exe, args.dry_run)
-            electron_process = launch_electron(
-                electron_app_dir, electron_exe, args.dry_run
-            )
+            launch_electron(electron_app_dir, electron_exe, args.dry_run)
             verify_electron_started(repo_root, electron_exe, args.dry_run)
-            if electron_process is not None:
-                wait_for_electron(electron_process)
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         return 1

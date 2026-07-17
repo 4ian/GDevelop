@@ -394,6 +394,10 @@ type Props = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
@@ -4436,6 +4440,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onOpenPrefabDetailEditor={
                       this.props.onOpenPrefabDetailEditor
                     }
+                    onOpenPrefabSettings={this.props.onOpenPrefabSettings}
                     onDeleteEventsBasedObjectVariant={
                       this.props.onDeleteEventsBasedObjectVariant
                     }

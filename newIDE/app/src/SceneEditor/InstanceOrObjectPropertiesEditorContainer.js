@@ -99,6 +99,10 @@ type Props = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
 
   // For scenes
   onBackgroundColorChanged: () => void,
@@ -187,6 +191,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
       onOpenPrefabDetailEditor,
+      onOpenPrefabSettings,
 
       // For objects or instances:
       historyHandler,
@@ -355,6 +360,15 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
               eventsFunctionsExtension
                 ? () =>
                     onOpenPrefabDetailEditor(
+                      eventsFunctionsExtension,
+                      eventsBasedObject
+                    )
+                : null
+            }
+            onOpenPrefabSettings={
+              eventsFunctionsExtension && onOpenPrefabSettings
+                ? () =>
+                    onOpenPrefabSettings(
                       eventsFunctionsExtension,
                       eventsBasedObject
                     )

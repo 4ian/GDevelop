@@ -360,6 +360,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.onOpenEventBasedObjectVariantEditor
                 }
                 onOpenPrefabDetailEditor={props.onOpenPrefabDetailEditor}
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onDeleteEventsBasedObjectVariant={
                   props.onDeleteEventsBasedObjectVariant
                 }

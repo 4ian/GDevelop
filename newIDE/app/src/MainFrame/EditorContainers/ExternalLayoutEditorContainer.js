@@ -422,6 +422,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
               this.props.onOpenEventBasedObjectVariantEditor
             }
             onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
+            onOpenPrefabSettings={this.props.onOpenPrefabSettings}
             onObjectEdited={objectWithContext =>
               this.props.onSceneObjectEdited(layout, objectWithContext)
             }

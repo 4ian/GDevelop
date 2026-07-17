@@ -64,6 +64,10 @@ export type SceneEditorsDisplayProps = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,

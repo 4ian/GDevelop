@@ -12,6 +12,7 @@ import {
   canRenameProjectFileNode,
   canUpdateProjectFolderFromTemplate,
   findNodeById,
+  getProjectFileNodeIdsAfterSelection,
   getLinkedFoldersFilePath,
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
@@ -374,6 +375,79 @@ describe('ProjectFilesPanel', () => {
     expect(shouldSelectProjectFileNode(emptyFolderNode)).toBe(true);
     expect(shouldSelectProjectFileNode(sourceFolderNode)).toBe(true);
     expect(shouldSelectProjectFileNode(fileNode)).toBe(true);
+  });
+
+  it('replaces the selection on a regular click', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png', '01.png'],
+        nodeId: '03.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png', '03.png'],
+        anchorNodeId: '01.png',
+        isToggleSelection: false,
+        isRangeSelection: false,
+      })
+    ).toEqual(['03.png']);
+  });
+
+  it('toggles individual files with Ctrl or Cmd selection', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png'],
+        nodeId: '02.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png'],
+        anchorNodeId: '00.png',
+        isToggleSelection: true,
+        isRangeSelection: false,
+      })
+    ).toEqual(['00.png', '02.png']);
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png', '02.png'],
+        nodeId: '00.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png'],
+        anchorNodeId: '02.png',
+        isToggleSelection: true,
+        isRangeSelection: false,
+      })
+    ).toEqual(['02.png']);
+  });
+
+  it('selects a contiguous range in either direction with Shift', () => {
+    const orderedNodeIds = ['00.png', '01.png', '02.png', '03.png', '04.png'];
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['01.png'],
+        nodeId: '04.png',
+        orderedNodeIds,
+        anchorNodeId: '01.png',
+        isToggleSelection: false,
+        isRangeSelection: true,
+      })
+    ).toEqual(['01.png', '02.png', '03.png', '04.png']);
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['04.png'],
+        nodeId: '01.png',
+        orderedNodeIds,
+        anchorNodeId: '04.png',
+        isToggleSelection: false,
+        isRangeSelection: true,
+      })
+    ).toEqual(['01.png', '02.png', '03.png', '04.png']);
+  });
+
+  it('adds a range to the selection with Ctrl or Cmd plus Shift', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png'],
+        nodeId: '04.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png', '03.png', '04.png'],
+        anchorNodeId: '02.png',
+        isToggleSelection: true,
+        isRangeSelection: true,
+      })
+    ).toEqual(['00.png', '02.png', '03.png', '04.png']);
   });
 
   it('computes moved file and resource paths', () => {

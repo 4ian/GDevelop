@@ -995,7 +995,7 @@ describe('Local multi-file project storage', () => {
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'scene',
-          owner: { scene: 'UntitledScene' },
+          owner: { scene: 'Game' },
           objects: expect.arrayContaining([
             expect.objectContaining({ name: 'Player', type: 'Sprite' }),
           ]),
@@ -1300,20 +1300,12 @@ column2 = "333"
       }
     );
 
-    const sceneDirectory = path.join(
-      temporaryDirectory,
-      'scenes',
-      'UntitledScene'
-    );
+    const sceneDirectory = path.join(temporaryDirectory, 'scenes', 'Game');
     expect(fs.existsSync(path.join(sceneDirectory, 'scene.settings'))).toBe(
       true
     );
-    expect(
-      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.layout'))
-    ).toBe(true);
-    expect(
-      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.events'))
-    ).toBe(true);
+    expect(fs.existsSync(path.join(sceneDirectory, 'Game.layout'))).toBe(true);
+    expect(fs.existsSync(path.join(sceneDirectory, 'Game.events'))).toBe(true);
     project.delete();
   });
 

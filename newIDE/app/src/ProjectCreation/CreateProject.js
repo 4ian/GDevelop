@@ -463,7 +463,7 @@ export const addDefaultLightToAllLayers = (layout: gdLayout): void => {
 export const ensureProjectHasDefaultScene = (project: gdProject): void => {
   if (project.getLayoutsCount() > 0) return;
 
-  const layoutName = 'UntitledScene';
+  const layoutName = 'Game';
   project.insertNewLayout(layoutName, 0);
   addDefaultLightToAllLayers(project.getLayout(layoutName));
 };

@@ -7,6 +7,7 @@ import ScrollView from '../UI/ScrollView';
 import EmptyMessage from '../UI/EmptyMessage';
 import Text from '../UI/Text';
 import TextField from '../UI/TextField';
+import CircularProgress from '../UI/CircularProgress';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
@@ -918,6 +919,7 @@ const GitTool = ({
   }
 
   const isBusy = isLoading || !!runningAction;
+  const isPushing = runningAction === 'push';
   const changedFiles = status && status.isAvailable ? status.changedFiles : [];
   const commits = status && status.isAvailable ? status.commits : [];
   const canCommit = !!status && status.isAvailable && !!changedFiles.length;
@@ -936,7 +938,7 @@ const GitTool = ({
       label={<Trans>Push</Trans>}
       onClick={pushWithRemote}
       disabled={isBusy || !remoteRepositoryUrl.trim()}
-      icon={<Upload />}
+      icon={isPushing ? <CircularProgress size={24} /> : <Upload />}
       primary
     />,
   ];
@@ -1090,7 +1092,13 @@ const GitTool = ({
                           label={<Trans>Push</Trans>}
                           onClick={push}
                           disabled={isBusy || !canPush}
-                          icon={<Upload />}
+                          icon={
+                            isPushing ? (
+                              <CircularProgress size={24} />
+                            ) : (
+                              <Upload />
+                            )
+                          }
                           fullWidth
                         />
                       </div>

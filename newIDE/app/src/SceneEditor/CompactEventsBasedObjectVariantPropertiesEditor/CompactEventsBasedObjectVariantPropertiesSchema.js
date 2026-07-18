@@ -22,31 +22,32 @@ const getFitToContentButton = ({
 }: {|
   i18n: I18nType,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: () => void,
   forceUpdate: () => void,
 |}) => ({
   label: i18n._(t`Fit to content`),
   nonFieldType: 'button',
   onClick: (instance: gdInitialInstance) => {
-    const contentAABB = getContentAABB();
-    if (!contentAABB) {
-      return;
-    }
-    if (contentAABB.width() > 0) {
-      eventsBasedObjectVariant.setAreaMinX(contentAABB.left);
-      eventsBasedObjectVariant.setAreaMinY(contentAABB.top);
-    }
-    if (contentAABB.height() > 0) {
-      eventsBasedObjectVariant.setAreaMaxX(contentAABB.right);
-      eventsBasedObjectVariant.setAreaMaxY(contentAABB.bottom);
-    }
-    if (contentAABB.depth() > 0) {
-      eventsBasedObjectVariant.setAreaMinZ(contentAABB.zMin);
-      eventsBasedObjectVariant.setAreaMaxZ(contentAABB.zMax);
-    }
-    onEventsBasedObjectChildrenEdited();
-    forceUpdate();
+    getContentAABB().then(contentAABB => {
+      if (!contentAABB) {
+        return;
+      }
+      if (contentAABB.width() > 0) {
+        eventsBasedObjectVariant.setAreaMinX(contentAABB.left);
+        eventsBasedObjectVariant.setAreaMaxX(contentAABB.right);
+      }
+      if (contentAABB.height() > 0) {
+        eventsBasedObjectVariant.setAreaMinY(contentAABB.top);
+        eventsBasedObjectVariant.setAreaMaxY(contentAABB.bottom);
+      }
+      if (contentAABB.depth() > 0) {
+        eventsBasedObjectVariant.setAreaMinZ(contentAABB.zMin);
+        eventsBasedObjectVariant.setAreaMaxZ(contentAABB.zMax);
+      }
+      onEventsBasedObjectChildrenEdited();
+      forceUpdate();
+    });
   },
   disabled: 'onValuesDifferent',
   getValue: () => '',
@@ -294,7 +295,7 @@ export const makeSchema = ({
   forceUpdate: () => void,
   eventsBasedObject: gdEventsBasedObject,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: () => void,
   onOpenPrefabDetailEditor: ?() => void,
   onOpenPrefabSettings: ?() => void,

@@ -91,7 +91,7 @@ type Props = {|
   // For event-based object variants:
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,

@@ -372,11 +372,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onLayersModified={props.onLayersModified}
                 eventsBasedObject={props.eventsBasedObject}
                 eventsBasedObjectVariant={props.eventsBasedObjectVariant}
-                getContentAABB={
-                  editorRef.current
-                    ? editorRef.current.getContentAABB
-                    : () => null
-                }
+                getContentAABB={props.getContentAABB}
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }

@@ -538,11 +538,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         eventsBasedObjectVariant={
                           props.eventsBasedObjectVariant
                         }
-                        getContentAABB={
-                          editorRef.current
-                            ? editorRef.current.getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={props.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           props.onEventsBasedObjectChildrenEdited
                         }

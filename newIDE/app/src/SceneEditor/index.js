@@ -116,6 +116,7 @@ import {
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
+import { getContentAABB as getEditorContentAABB } from './GetContentAABB';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { type WillDeleteObjectChanges } from '../EditorFunctions/OutsideEditorChanges';
 import {
@@ -3571,6 +3572,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  getContentAABB = async (): Promise<Rectangle | null> => {
+    try {
+      return await getEditorContentAABB({
+        gameEditorMode: this.props.gameEditorMode,
+        previewDebuggerServer: this.props.previewDebuggerServer,
+        getInstancesEditorContentAABB: () =>
+          this.editorDisplay
+            ? this.editorDisplay.instancesHandlers.getContentAABB()
+            : null,
+      });
+    } catch (error) {
+      console.error("Can't get the content AABB.", error);
+      return null;
+    }
+  };
+
   zoomToFitSelection = () => {
     const { editorDisplay } = this;
     if (!editorDisplay) {
@@ -4472,6 +4489,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     eventsBasedObject={eventsBasedObject}
                     eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    getContentAABB={this.getContentAABB}
                     layersContainer={this.props.layersContainer}
                     globalObjectsContainer={this.props.globalObjectsContainer}
                     objectsContainer={this.props.objectsContainer}
@@ -4963,12 +4981,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                               });
                           }
                         }}
-                        getContentAABB={
-                          this.editorDisplay
-                            ? this.editorDisplay.instancesHandlers
-                                .getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={this.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           this.props.onEventsBasedObjectChildrenEdited
                         }

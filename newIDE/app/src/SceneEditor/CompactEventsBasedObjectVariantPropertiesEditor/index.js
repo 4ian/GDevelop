@@ -31,7 +31,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   eventsBasedObject: gdEventsBasedObject,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: () => void,
   onOpenPrefabDetailEditor: ?() => void,
   onOpenPrefabSettings: ?() => void,

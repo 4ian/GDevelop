@@ -15,7 +15,7 @@ type Props = {|
   project: gdProject,
   onApply: () => void,
   onClose: () => void,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
@@ -88,22 +88,23 @@ const EventsBasedObjectScenePropertiesDialog = ({
 
   const fitAreaToContent = React.useCallback(
     () => {
-      const contentAABB = getContentAABB();
-      if (!contentAABB) {
-        return;
-      }
-      if (contentAABB.width() > 0) {
-        setAreaMinX(contentAABB.left);
-        setAreaMinY(contentAABB.top);
-      }
-      if (contentAABB.height() > 0) {
-        setAreaMaxX(contentAABB.right);
-        setAreaMaxY(contentAABB.bottom);
-      }
-      if (contentAABB.depth() > 0) {
-        setAreaMinZ(contentAABB.zMin);
-        setAreaMaxZ(contentAABB.zMax);
-      }
+      getContentAABB().then(contentAABB => {
+        if (!contentAABB) {
+          return;
+        }
+        if (contentAABB.width() > 0) {
+          setAreaMinX(contentAABB.left);
+          setAreaMaxX(contentAABB.right);
+        }
+        if (contentAABB.height() > 0) {
+          setAreaMinY(contentAABB.top);
+          setAreaMaxY(contentAABB.bottom);
+        }
+        if (contentAABB.depth() > 0) {
+          setAreaMinZ(contentAABB.zMin);
+          setAreaMaxZ(contentAABB.zMax);
+        }
+      });
     },
     [getContentAABB]
   );

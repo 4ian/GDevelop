@@ -637,6 +637,10 @@ namespace gdjs {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
           }
+        } else if (data.command === 'getContentAABB') {
+          if (inGameEditor) {
+            this.sendContentAABB(data.messageId);
+          }
         } else if (data.command === 'captureScreenshot') {
           this.sendScreenshot(data.messageId);
         } else if (data.command === 'simulateInput') {
@@ -1167,6 +1171,31 @@ namespace gdjs {
                 maxY: 0,
                 maxZ: 0,
               },
+        })
+      );
+    }
+
+    sendContentAABB(messageId: number): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      const contentAABB = inGameEditor.getContentAABB();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'contentAABB',
+          editorId: inGameEditor.getEditorId(),
+          messageId,
+          payload: contentAABB
+            ? {
+                minX: contentAABB.min[0],
+                minY: contentAABB.min[1],
+                minZ: contentAABB.min[2],
+                maxX: contentAABB.max[0],
+                maxY: contentAABB.max[1],
+                maxZ: contentAABB.max[2],
+              }
+            : null,
         })
       );
     }

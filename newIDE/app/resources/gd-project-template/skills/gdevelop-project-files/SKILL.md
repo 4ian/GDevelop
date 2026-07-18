@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop GLB import workflow, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -240,9 +240,10 @@ Load only the references required by the task:
   the Static Data guide too when signal names use placeholders.
 - Read
   [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
-  before importing a `.glb` exported from Blender into GDevelop. Follow that
-  workflow for Blender scene preparation, GLB export, GDevelop resource and
-  object setup, collision, preview verification, and re-export updates.
+  before converting or merging glTF/GLB assets or importing a `.glb` exported
+  from Blender into GDevelop. Follow that workflow for Blender scene
+  preparation, GLB export, GDevelop resource and object setup, collision,
+  preview verification, and re-export updates.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -260,6 +261,31 @@ Load only the references required by the task:
 Build from scratch only when repository search finds no suitable extension,
 the available extension is incompatible or unsafe, or a small project-specific
 implementation is materially simpler. Record that decision in the task result.
+
+## Bundled Blender conversion scripts
+
+Use the bundled scripts directly for supported conversion jobs; do not rewrite
+their logic in an ad hoc script. Run them with Blender using
+`--background --factory-startup --python <script> -- <arguments>`, and call
+the selected script with `--help` when its exact options are needed.
+
+- For any `.gltf` to `.glb` request, run
+  [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py). Use
+  `--input` with `--output` for one file, or `--output-dir` for a directory;
+  add `--recursive` for nested inputs and `--overwrite` only when replacement
+  is intended. Require its final summary to report zero failures.
+- For any request to embed animations from a GLB into a character that uses
+  the same skeleton, run
+  [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py).
+  Supply `--character`, `--animations`, and `--output`; repeat `--action` to
+  select clips. Keep strict compatibility checking unless the user explicitly
+  accepts a weaker check. This script performs direct action reuse, not
+  retargeting; stop and use a real retargeting workflow when rigs differ.
+
+Generate a temporary output and inspect or round-trip it before replacing an
+existing project asset. When the final GLB is a project resource, keep it
+inside the project, preserve its registered path when updating it, validate
+the project, commit, reload, and verify it in a fresh preview.
 
 ## Event authoring
 

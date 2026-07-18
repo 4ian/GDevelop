@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import * as THREE from 'three';
@@ -8,10 +8,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import FlatButton from '../../UI/FlatButton';
+import SearchBar from '../../UI/SearchBar';
 import Play from '../../UI/CustomSvgIcons/Play';
 import Pause from '../../UI/CustomSvgIcons/Pause';
 import CheckeredBackground from '../CheckeredBackground';
-import { getModelAnimationClipLabel } from './Model3DAnimationUtils';
+import {
+  doesModelAnimationClipMatchSearch,
+  getModelAnimationClipLabel,
+} from './Model3DAnimationUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
@@ -69,8 +73,18 @@ const styles = {
     zIndex: 3,
   },
   animationPanelHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
     flexShrink: 0,
     padding: '6px 10px 2px',
+  },
+  animationPanelTitle: {
+    flexShrink: 0,
+  },
+  animationPanelSearch: {
+    flex: '0 1 344px',
+    minWidth: 0,
   },
   animationList: {
     display: 'flex',
@@ -183,6 +197,20 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
     setSelectedAnimationIndex,
   ] = React.useState<?number>(null);
   const [isAnimationPlaying, setIsAnimationPlaying] = React.useState(false);
+  const [animationNameFilter, setAnimationNameFilter] = React.useState('');
+
+  const filteredAnimationClips = animationClips
+    .map((animationClip, animationIndex) => ({
+      animationClip,
+      animationIndex,
+    }))
+    .filter(({ animationClip, animationIndex }) =>
+      doesModelAnimationClipMatchSearch(
+        animationClip.name,
+        animationIndex,
+        animationNameFilter
+      )
+    );
 
   const toggleAnimation = React.useCallback(
     (animationIndex: number) => {
@@ -231,6 +259,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       setAnimationClips([]);
       setSelectedAnimationIndex(null);
       setIsAnimationPlaying(false);
+      setAnimationNameFilter('');
       animationPlaybackControllerRef.current = null;
 
       const scene = new THREE.Scene();
@@ -381,12 +410,24 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       {animationClips.length > 0 && (
         <div style={styles.animationPanel}>
           <div style={styles.animationPanelHeader}>
-            <Text size="body-small" noMargin>
-              <Trans>Animations</Trans> ({animationClips.length})
-            </Text>
+            <div style={styles.animationPanelTitle}>
+              <Text size="body-small" noMargin>
+                <Trans>Animations</Trans> ({animationClips.length})
+              </Text>
+            </div>
+            <div style={styles.animationPanelSearch}>
+              <SearchBar
+                id="model-animation-name-filter"
+                value={animationNameFilter}
+                onChange={setAnimationNameFilter}
+                onChangeImmediately
+                onRequestSearch={() => {}}
+                placeholder={t`Filter animations by name`}
+              />
+            </div>
           </div>
           <div style={styles.animationList}>
-            {animationClips.map((animationClip, animationIndex) => {
+            {filteredAnimationClips.map(({ animationClip, animationIndex }) => {
               const isSelected = selectedAnimationIndex === animationIndex;
               const isPlaying = isSelected && isAnimationPlaying;
               const animationLabel = getModelAnimationClipLabel(

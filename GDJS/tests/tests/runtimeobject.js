@@ -14,6 +14,62 @@ describe('gdjs.RuntimeObject', () => {
     runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
   });
 
+  it('collects 3D collision masks from activated behaviors', () => {
+    const collisionMask = {
+      vertices: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
+      positionX: 1,
+      positionY: 2,
+      positionZ: 3,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      rotationW: 1,
+    };
+    class DebugCollisionMaskRuntimeBehavior extends gdjs.RuntimeBehavior {
+      usesLifecycleFunction() {
+        return false;
+      }
+
+      get3DDebugCollisionMask() {
+        return collisionMask;
+      }
+
+      clear3DDebugCollisionMaskCache() {}
+    }
+    gdjs.registerBehavior(
+      'TestBehavior::DebugCollisionMask',
+      DebugCollisionMaskRuntimeBehavior
+    );
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [
+        {
+          name: 'DebugCollisionMask',
+          type: 'TestBehavior::DebugCollisionMask',
+        },
+      ],
+      effects: [],
+    });
+
+    expect(object.get3DDebugCollisionMasks()).to.eql([collisionMask]);
+
+    object.activateBehavior('DebugCollisionMask', false);
+    expect(object.get3DDebugCollisionMasks()).to.eql([]);
+
+    const debugBehavior = object.getBehavior('DebugCollisionMask');
+    if (!debugBehavior) {
+      throw new Error('The debug collision-mask behavior should exist.');
+    }
+    const clearMaskCache = sinon.spy(
+      debugBehavior,
+      'clear3DDebugCollisionMaskCache'
+    );
+    object.clear3DDebugCollisionMaskCache();
+    expect(clearMaskCache.calledOnce).to.be(true);
+  });
+
   it('should compute distances properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',

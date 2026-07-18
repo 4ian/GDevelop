@@ -1,7 +1,106 @@
 namespace gdjs {
   type FloatPoint3D = [float, float, float];
 
+  type RigBoneDescription = {
+    name: string;
+    parentName: string;
+    bindMatrix: number[];
+  };
+
   const epsilon = 1 / (1 << 16);
+  const rigTransformEpsilon = 1 / (1 << 12);
+
+  const getNearestParentBone = (bone: THREE.Bone): THREE.Bone | null => {
+    let parent = bone.parent;
+    while (parent) {
+      const parentBone = parent as THREE.Bone;
+      if (parentBone.isBone) {
+        return parentBone;
+      }
+      parent = parent.parent;
+    }
+    return null;
+  };
+
+  const getRigDescription = (
+    root: THREE.Object3D
+  ): RigBoneDescription[] | null => {
+    root.updateMatrixWorld(true);
+    const bones: THREE.Bone[] = [];
+    root.traverse((node) => {
+      const bone = node as THREE.Bone;
+      if (bone.isBone) {
+        bones.push(bone);
+      }
+    });
+    if (bones.length === 0) {
+      return null;
+    }
+
+    const boneNames = new Set<string>();
+    const rootInverseMatrix = new THREE.Matrix4()
+      .copy(root.matrixWorld)
+      .invert();
+    const descriptions: RigBoneDescription[] = [];
+    for (const bone of bones) {
+      if (!bone.name || boneNames.has(bone.name)) {
+        return null;
+      }
+      boneNames.add(bone.name);
+
+      const parentBone = getNearestParentBone(bone);
+      const parentInverseMatrix = parentBone
+        ? new THREE.Matrix4().copy(parentBone.matrixWorld).invert()
+        : rootInverseMatrix;
+      const bindMatrix = new THREE.Matrix4()
+        .multiplyMatrices(parentInverseMatrix, bone.matrixWorld)
+        .elements.slice();
+      descriptions.push({
+        name: bone.name,
+        parentName: parentBone ? parentBone.name : '',
+        bindMatrix,
+      });
+    }
+    descriptions.sort((left, right) => left.name.localeCompare(right.name));
+    return descriptions;
+  };
+
+  const doModelsHaveExactMatchingRigs = (
+    targetModel: THREE_ADDONS.GLTF,
+    sourceModel: THREE_ADDONS.GLTF
+  ): boolean => {
+    const targetRig = getRigDescription(targetModel.scene);
+    const sourceRig = getRigDescription(sourceModel.scene);
+    if (!targetRig || !sourceRig || targetRig.length !== sourceRig.length) {
+      return false;
+    }
+
+    for (let boneIndex = 0; boneIndex < targetRig.length; boneIndex++) {
+      const targetBone = targetRig[boneIndex];
+      const sourceBone = sourceRig[boneIndex];
+      if (
+        targetBone.name !== sourceBone.name ||
+        targetBone.parentName !== sourceBone.parentName
+      ) {
+        return false;
+      }
+      for (
+        let matrixIndex = 0;
+        matrixIndex < targetBone.bindMatrix.length;
+        matrixIndex++
+      ) {
+        if (
+          Math.abs(
+            targetBone.bindMatrix[matrixIndex] -
+              sourceBone.bindMatrix[matrixIndex]
+          ) > rigTransformEpsilon
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
 
   const removeMetalness = (material: THREE.Material): void => {
     //@ts-ignore
@@ -73,6 +172,8 @@ namespace gdjs {
     private _originalModel: THREE_ADDONS.GLTF;
     private _animationMixer: THREE.AnimationMixer;
     private _action: THREE.AnimationAction | null;
+    private _model3DManager: gdjs.Model3DManager;
+    private _sharedAnimationModelCompatibility = new Map<string, boolean>();
 
     /**
      * The model origin evaluated according to the object configuration.
@@ -86,10 +187,10 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       // GLB files with skeleton must not have any transformation to work properly.
-      const originalModel = instanceContainer
-        .getGame()
-        .getModel3DManager()
-        .getModel(runtimeObject._modelResourceName);
+      const model3DManager = instanceContainer.getGame().getModel3DManager();
+      const originalModel = model3DManager.getModel(
+        runtimeObject._modelResourceName
+      );
       // _updateModel will actually add a clone of the model.
       const model = new THREE.Group();
 
@@ -103,6 +204,7 @@ namespace gdjs {
       this._model3DRuntimeObject = runtimeObject;
       this._threeObject = model;
       this._originalModel = originalModel;
+      this._model3DManager = model3DManager;
       this._modelOriginPoint = [0, 0, 0];
 
       this.updateSize();
@@ -328,6 +430,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(runtimeObject._modelResourceName);
+      this._sharedAnimationModelCompatibility.clear();
     }
 
     _updateModel(
@@ -450,16 +553,14 @@ namespace gdjs {
     playAnimation(
       animationName: string,
       shouldLoop: boolean,
-      ignoreCrossFade: boolean = false
+      ignoreCrossFade: boolean = false,
+      sourceModelResourceName: string = ''
     ) {
-      const clip = THREE.AnimationClip.findByName(
-        this._originalModel.animations,
-        animationName
+      const clip = this._getAnimationClip(
+        animationName,
+        sourceModelResourceName
       );
       if (!clip) {
-        console.error(
-          `The GLB file: ${this._model3DRuntimeObject._modelResourceName} doesn't have any animation named: ${animationName}`
-        );
         return;
       }
       const previousAction = this._action;
@@ -508,10 +609,57 @@ namespace gdjs {
       }
     }
 
-    getAnimationDuration(animationName: string): float {
+    private _getAnimationClip(
+      animationName: string,
+      sourceModelResourceName: string
+    ): THREE.AnimationClip | null {
+      const modelResourceName =
+        sourceModelResourceName ||
+        this._model3DRuntimeObject._modelResourceName;
+      let animationModel = this._originalModel;
+      if (modelResourceName !== this._model3DRuntimeObject._modelResourceName) {
+        animationModel = this._model3DManager.getModel(modelResourceName);
+        let isCompatible =
+          this._sharedAnimationModelCompatibility.get(modelResourceName);
+        if (isCompatible === undefined) {
+          isCompatible = doModelsHaveExactMatchingRigs(
+            this._originalModel,
+            animationModel
+          );
+          this._sharedAnimationModelCompatibility.set(
+            modelResourceName,
+            isCompatible
+          );
+          if (!isCompatible) {
+            console.error(
+              `The GLB file: ${modelResourceName} can't share animations with ${this._model3DRuntimeObject._modelResourceName} because their rigs don't exactly match.`
+            );
+          }
+        }
+        if (!isCompatible) {
+          return null;
+        }
+      }
+
       const clip = THREE.AnimationClip.findByName(
-        this._originalModel.animations,
+        animationModel.animations,
         animationName
+      );
+      if (!clip) {
+        console.error(
+          `The GLB file: ${modelResourceName} doesn't have any animation named: ${animationName}`
+        );
+      }
+      return clip;
+    }
+
+    getAnimationDuration(
+      animationName: string,
+      sourceModelResourceName: string = ''
+    ): float {
+      const clip = this._getAnimationClip(
+        animationName,
+        sourceModelResourceName
       );
       return clip ? clip.duration : 0;
     }

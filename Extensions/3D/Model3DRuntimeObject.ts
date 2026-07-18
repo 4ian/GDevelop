@@ -1,5 +1,10 @@
 namespace gdjs {
-  type Model3DAnimation = { name: string; source: string; loop: boolean };
+  type Model3DAnimation = {
+    name: string;
+    source: string;
+    sourceModelResourceName?: string;
+    loop: boolean;
+  };
 
   type Model3DObjectNetworkSyncDataType = {
     mt: number;
@@ -24,6 +29,7 @@ namespace gdjs {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
       modelResourceName: string;
+      sharedAnimationModelResources?: Array<{ resourceName: string }>;
       rotationX: number;
       rotationY: number;
       rotationZ: number;
@@ -158,7 +164,8 @@ namespace gdjs {
         this._renderer.playAnimation(
           this._animations[0].source,
           this._animations[0].loop,
-          true
+          true,
+          this._animations[0].sourceModelResourceName || ''
         );
       }
     }
@@ -232,19 +239,23 @@ namespace gdjs {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       if (this.getInstanceContainer().getGame().isInGameEdition()) {
-        const oldDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        const oldDefaultAnimation =
+          this._animations.length > 0 ? this._animations[0] : null;
         this._animations = newObjectData.content.animations;
-        const newDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        const newDefaultAnimation =
+          this._animations.length > 0 ? this._animations[0] : null;
         if (
-          newDefaultAnimationSource &&
-          oldDefaultAnimationSource !== newDefaultAnimationSource
+          newDefaultAnimation &&
+          (!oldDefaultAnimation ||
+            oldDefaultAnimation.source !== newDefaultAnimation.source ||
+            oldDefaultAnimation.sourceModelResourceName !==
+              newDefaultAnimation.sourceModelResourceName)
         ) {
           this._renderer.playAnimation(
-            newDefaultAnimationSource,
+            newDefaultAnimation.source,
             this._animations[0].loop,
-            true
+            true,
+            newDefaultAnimation.sourceModelResourceName || ''
           );
         }
       }
@@ -372,7 +383,12 @@ namespace gdjs {
       ) {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
-        this._renderer.playAnimation(animation.source, animation.loop);
+        this._renderer.playAnimation(
+          animation.source,
+          animation.loop,
+          false,
+          animation.sourceModelResourceName || ''
+        );
         if (this._animationPaused) {
           this._renderer.pauseAnimation();
         }
@@ -472,7 +488,9 @@ namespace gdjs {
 
     getAnimationDuration(): float {
       return this._renderer.getAnimationDuration(
-        this._animations[this._currentAnimationIndex].source
+        this._animations[this._currentAnimationIndex].source,
+        this._animations[this._currentAnimationIndex].sourceModelResourceName ||
+          ''
       );
     }
 

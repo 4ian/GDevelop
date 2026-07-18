@@ -32,4 +32,20 @@ describe('Model3DEditor', () => {
       "onChangeProperty('modelResourceName', newValue)"
     );
   });
+
+  test('supports multiple validated animation source models', () => {
+    const source = getSource();
+
+    expect(source).toContain('Share animations from models (optional)');
+    expect(source).toContain(
+      "multiSelection: true,\n          resourceKind: 'model3D'"
+    );
+    expect(source).toContain('validateModel3DRig(gltf, loadState.gltf)');
+    expect(source).toContain(
+      'newAnimation.setSourceModelResourceName(sourceModel.resourceName)'
+    );
+    expect(source).toContain(
+      'animation.getSourceModelResourceName(),\n                                    animation.getSource()'
+    );
+  });
 });

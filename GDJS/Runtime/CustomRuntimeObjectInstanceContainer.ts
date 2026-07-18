@@ -62,6 +62,7 @@ namespace gdjs {
     }
 
     _unloadContent() {
+      this._debuggerRenderer.clearDebugDraw();
       this.onDeletedFromScene(this._parent);
       // At this point, layer renderers are already removed by
       // `CustomRuntimeObject._reinitializeRenderer`.

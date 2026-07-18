@@ -742,6 +742,45 @@ namespace gdjs {
       return undefined;
     }
 
+    /**
+     * Return the 3D collision masks provided by activated behaviors.
+     *
+     * This is used by the preview debugger so it does not need to know which
+     * behaviors own collision shapes.
+     */
+    get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const collisionMasks: gdjs.DebugCollisionMask3D[] = gdjs.staticArray(
+        RuntimeObject.prototype.get3DDebugCollisionMasks
+      );
+      collisionMasks.length = 0;
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        const behavior = behaviors[behaviorName];
+        if (!behavior.activated()) {
+          continue;
+        }
+        const collisionMask = behavior.get3DDebugCollisionMask();
+        if (collisionMask) {
+          collisionMasks.push(collisionMask);
+        }
+      }
+      return collisionMasks;
+    }
+
+    /** Release behavior data cached for 3D collision-mask debug rendering. */
+    clear3DDebugCollisionMaskCache(): void {
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        behaviors[behaviorName].clear3DDebugCollisionMaskCache();
+      }
+    }
+
     //Common properties:
     /**
      * Get the name of the object.

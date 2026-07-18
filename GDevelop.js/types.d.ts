@@ -3013,6 +3013,8 @@ export class Model3DAnimation extends EmscriptenObject {
   getName(): string;
   setSource(name: string): void;
   getSource(): string;
+  setSourceModelResourceName(resourceName: string): void;
+  getSourceModelResourceName(): string;
   setShouldLoop(shouldLoop: boolean): void;
   shouldLoop(): boolean;
 }
@@ -3028,6 +3030,12 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getSharedAnimationModelResourcesCount(): number;
+  getSharedAnimationModelResourceName(index: number): string;
+  hasSharedAnimationModelResourceNamed(resourceName: string): boolean;
+  addSharedAnimationModelResource(resourceName: string): void;
+  removeSharedAnimationModelResource(index: number): void;
+  removeAllSharedAnimationModelResources(): void;
   getWidth(): number;
   getHeight(): number;
   getDepth(): number;

@@ -33,6 +33,28 @@ namespace gdjs {
   }
 
   /**
+   * The geometry and transform of a 3D collision mask to display while
+   * debugging a preview.
+   *
+   * The vertices describe triangles in the local space of the collision
+   * mask. They are kept as plain runtime data so behaviors don't have to
+   * create or own Three.js renderer objects. Providers must return a new
+   * vertices array whenever the mask geometry changes.
+   *
+   * @category Debugging > Debugger Renderer
+   */
+  export type DebugCollisionMask3D = {
+    vertices: Float32Array;
+    positionX: float;
+    positionY: float;
+    positionZ: float;
+    rotationX: float;
+    rotationY: float;
+    rotationZ: float;
+    rotationW: float;
+  };
+
+  /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
    * @category Core Engine > Behavior
    */
@@ -235,6 +257,19 @@ namespace gdjs {
     activated(): boolean {
       return this._activated;
     }
+
+    /**
+     * Return a 3D collision mask to display while debugging a preview.
+     *
+     * Behaviors that own a 3D collision shape can override this. Returning
+     * `null` keeps the behavior out of the collision-mask debug rendering.
+     */
+    get3DDebugCollisionMask(): gdjs.DebugCollisionMask3D | null {
+      return null;
+    }
+
+    /** Release data cached for 3D collision-mask debug rendering. */
+    clear3DDebugCollisionMaskCache(): void {}
 
     /**
      * Reimplement this method to do extra work when the behavior is activated (after

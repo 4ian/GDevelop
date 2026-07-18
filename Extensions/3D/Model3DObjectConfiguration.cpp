@@ -17,6 +17,8 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 
+#include <algorithm>
+
 using namespace std;
 
 Model3DObjectConfiguration::Model3DObjectConfiguration()
@@ -271,6 +273,19 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
   isCastingShadow = content.GetBoolAttribute("isCastingShadow");
   isReceivingShadow = content.GetBoolAttribute("isReceivingShadow");
 
+  RemoveAllSharedAnimationModelResources();
+  if (content.HasChild("sharedAnimationModelResources")) {
+    auto &sharedAnimationModelResourcesElement =
+        content.GetChild("sharedAnimationModelResources");
+    sharedAnimationModelResourcesElement.ConsiderAsArrayOf("resource");
+    for (std::size_t i = 0;
+         i < sharedAnimationModelResourcesElement.GetChildrenCount(); ++i) {
+      auto &resourceElement = sharedAnimationModelResourcesElement.GetChild(i);
+      AddSharedAnimationModelResource(
+          resourceElement.GetStringAttribute("resourceName", ""));
+    }
+  }
+
   RemoveAllAnimations();
   auto &animationsElement = content.GetChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");
@@ -279,6 +294,8 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
     Model3DAnimation animation;
     animation.SetName(animationElement.GetStringAttribute("name", ""));
     animation.SetSource(animationElement.GetStringAttribute("source", ""));
+    animation.SetSourceModelResourceName(
+        animationElement.GetStringAttribute("sourceModelResourceName", ""));
     animation.SetShouldLoop(animationElement.GetBoolAttribute("loop", false));
     AddAnimation(animation);
   }
@@ -302,12 +319,23 @@ void Model3DObjectConfiguration::DoSerializeTo(
   content.SetAttribute("isCastingShadow", isCastingShadow);
   content.SetAttribute("isReceivingShadow", isReceivingShadow);
 
+  auto &sharedAnimationModelResourcesElement =
+      content.AddChild("sharedAnimationModelResources");
+  sharedAnimationModelResourcesElement.ConsiderAsArrayOf("resource");
+  for (const auto &resourceName : sharedAnimationModelResourceNames) {
+    auto &resourceElement =
+        sharedAnimationModelResourcesElement.AddChild("resource");
+    resourceElement.SetAttribute("resourceName", resourceName);
+  }
+
   auto &animationsElement = content.AddChild("animations");
   animationsElement.ConsiderAsArrayOf("animation");
   for (auto &animation : animations) {
     auto &animationElement = animationsElement.AddChild("animation");
     animationElement.SetAttribute("name", animation.GetName());
     animationElement.SetAttribute("source", animation.GetSource());
+    animationElement.SetAttribute("sourceModelResourceName",
+                                  animation.GetSourceModelResourceName());
     animationElement.SetAttribute("loop", animation.ShouldLoop());
   }
 }
@@ -315,6 +343,12 @@ void Model3DObjectConfiguration::DoSerializeTo(
 void Model3DObjectConfiguration::ExposeResources(
     gd::ArbitraryResourceWorker &worker) {
   worker.ExposeModel3D(modelResourceName);
+  for (auto &resourceName : sharedAnimationModelResourceNames) {
+    worker.ExposeModel3D(resourceName);
+  }
+  for (auto &animation : animations) {
+    worker.ExposeModel3D(animation.GetSourceModelResourceName());
+  }
 }
 
 const gd::String &
@@ -375,4 +409,42 @@ void Model3DObjectConfiguration::MoveAnimation(std::size_t oldIndex,
   auto animation = animations[oldIndex];
   animations.erase(animations.begin() + oldIndex);
   animations.insert(animations.begin() + newIndex, animation);
+}
+
+gd::String Model3DObjectConfiguration::badSharedAnimationModelResourceName;
+
+const gd::String &
+Model3DObjectConfiguration::GetSharedAnimationModelResourceName(
+    std::size_t index) const {
+  if (index >= sharedAnimationModelResourceNames.size())
+    return badSharedAnimationModelResourceName;
+
+  return sharedAnimationModelResourceNames[index];
+}
+
+bool Model3DObjectConfiguration::HasSharedAnimationModelResourceNamed(
+    const gd::String &resourceName) const {
+  return !resourceName.empty() &&
+         std::find(sharedAnimationModelResourceNames.begin(),
+                   sharedAnimationModelResourceNames.end(),
+                   resourceName) != sharedAnimationModelResourceNames.end();
+}
+
+void Model3DObjectConfiguration::AddSharedAnimationModelResource(
+    const gd::String &resourceName) {
+  if (resourceName.empty() ||
+      HasSharedAnimationModelResourceNamed(resourceName))
+    return;
+
+  sharedAnimationModelResourceNames.push_back(resourceName);
+}
+
+bool Model3DObjectConfiguration::RemoveSharedAnimationModelResource(
+    std::size_t index) {
+  if (index >= sharedAnimationModelResourceNames.size())
+    return false;
+
+  sharedAnimationModelResourceNames.erase(
+      sharedAnimationModelResourceNames.begin() + index);
+  return true;
 }

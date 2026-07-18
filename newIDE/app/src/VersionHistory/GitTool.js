@@ -13,7 +13,6 @@ import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Chip from '../UI/Chip';
 import { Line } from '../UI/Grid';
-import { LineStackLayout } from '../UI/Layout';
 import Check from '../UI/CustomSvgIcons/Check';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
 import Upload from '../UI/CustomSvgIcons/Upload';
@@ -23,6 +22,7 @@ import UnsavedChangesContext from '../MainFrame/UnsavedChangesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import {
+  invokeGitToolCommitDiff,
   invokeGitToolDiff,
   invokeGitTool,
   isGitToolSupported,
@@ -68,6 +68,23 @@ const styles = {
   fileRowButton: {
     display: 'block',
     width: '100%',
+    margin: 0,
+    padding: 0,
+    border: 0,
+    background: 'transparent',
+    color: 'inherit',
+    textAlign: 'left',
+    cursor: 'pointer',
+    font: 'inherit',
+    WebkitAppearance: 'none',
+  },
+  commitTitleButton: {
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: 8,
+    width: '100%',
+    minWidth: 0,
     margin: 0,
     padding: 0,
     border: 0,
@@ -138,6 +155,16 @@ const styles = {
     minWidth: 720,
     padding: '2px 8px',
     fontStyle: 'italic',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    userSelect: 'text',
+  },
+  diffFileHeaderRow: {
+    minWidth: 720,
+    padding: '6px 8px',
+    fontWeight: 600,
+    borderTop: '1px solid rgba(127, 127, 127, 0.35)',
+    borderBottom: '1px solid rgba(127, 127, 127, 0.25)',
     whiteSpace: 'pre-wrap',
     overflowWrap: 'anywhere',
     userSelect: 'text',
@@ -220,42 +247,65 @@ const ChangedFileRow = ({
   </button>
 );
 
-const CommitRow = ({
+export const CommitRow = ({
   commit,
   i18n,
   disabled,
+  onOpenDiff,
   onRevert,
   onReset,
 }: {|
   commit: GitCommit,
   i18n: I18nType,
   disabled: boolean,
+  onOpenDiff: GitCommit => mixed,
   onRevert: GitCommit => void | Promise<void>,
   onReset: GitCommit => void | Promise<void>,
-|}) => (
+|}): React.Node => (
   <div style={styles.commitRow}>
-    <LineStackLayout
-      noMargin
-      alignItems="baseline"
-      justifyContent="space-between"
+    <button
+      type="button"
+      style={{
+        ...styles.commitTitleButton,
+        cursor: disabled ? 'default' : 'pointer',
+      }}
+      onClick={() => onOpenDiff(commit)}
+      disabled={disabled}
+      aria-label={i18n._(
+        t`Show changes for commit ${commit.subject || commit.shortHash}`
+      )}
     >
-      <Text
-        noMargin
-        size="body2"
+      <span
         style={{
-          fontWeight: 'bold',
+          flex: 1,
+          minWidth: 0,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
         }}
-        tooltip={commit.subject}
       >
-        {commit.subject || <Trans>No commit message</Trans>}
-      </Text>
-      <Text noMargin size="body-small" color="secondary" noShrink>
+        <Text
+          noMargin
+          displayInlineAsSpan
+          size="body2"
+          style={{
+            fontWeight: 'bold',
+          }}
+          tooltip={commit.subject}
+        >
+          {commit.subject || <Trans>No commit message</Trans>}
+        </Text>
+      </span>
+      <Text
+        noMargin
+        displayInlineAsSpan
+        size="body-small"
+        color="secondary"
+        noShrink
+      >
         {commit.shortHash}
       </Text>
-    </LineStackLayout>
+    </button>
     <Text noMargin size="body-small" color="secondary">
       {commit.author} - {formatCommitDate(i18n, commit.date)}
     </Text>
@@ -276,7 +326,7 @@ const CommitRow = ({
   </div>
 );
 
-type DiffRowKind = 'context' | 'delete' | 'add' | 'changed' | 'note';
+type DiffRowKind = 'context' | 'delete' | 'add' | 'changed' | 'note' | 'file';
 
 type SideBySideDiffRow = {|
   kind: DiffRowKind,
@@ -299,7 +349,32 @@ const parseHunkHeader = (
   };
 };
 
-const parseUnifiedDiff = (diffText: string): Array<SideBySideDiffRow> => {
+const formatDiffFileLabel = (line: string): string => {
+  const paths = line.match(/^diff --git a\/(.*) b\/(.*)$/);
+  if (!paths) return line.slice('diff --git '.length);
+
+  return paths[1] === paths[2] ? paths[2] : `${paths[1]} -> ${paths[2]}`;
+};
+
+const isVisibleDiffMetadata = (line: string): boolean =>
+  [
+    'old mode ',
+    'new mode ',
+    'new file mode ',
+    'deleted file mode ',
+    'similarity index ',
+    'dissimilarity index ',
+    'rename from ',
+    'rename to ',
+    'copy from ',
+    'copy to ',
+    'Binary files ',
+    'GIT binary patch',
+  ].some(prefix => line.startsWith(prefix));
+
+export const parseUnifiedDiff = (
+  diffText: string
+): Array<SideBySideDiffRow> => {
   const rows: Array<SideBySideDiffRow> = [];
   const lines = diffText.split(/\r?\n/);
   let oldLineNumber: number | null = null;
@@ -328,6 +403,36 @@ const parseUnifiedDiff = (diffText: string): Array<SideBySideDiffRow> => {
 
   while (index < lines.length) {
     const line = lines[index];
+
+    if (line.startsWith('diff --git ')) {
+      oldLineNumber = null;
+      newLineNumber = null;
+      rows.push({
+        kind: 'file',
+        oldLineNumber: null,
+        newLineNumber: null,
+        oldText: '',
+        newText: '',
+        label: formatDiffFileLabel(line),
+      });
+      index++;
+      continue;
+    }
+
+    if (isVisibleDiffMetadata(line)) {
+      oldLineNumber = null;
+      newLineNumber = null;
+      rows.push({
+        kind: 'note',
+        oldLineNumber: null,
+        newLineNumber: null,
+        oldText: '',
+        newText: '',
+        label: line,
+      });
+      index++;
+      continue;
+    }
 
     if (
       line === 'Staged changes' ||
@@ -497,10 +602,7 @@ const SideBySideDiffViewer = ({
   if (!diffText.trim() || !rows.length) {
     return (
       <Text noMargin color="secondary">
-        <Trans>
-          No textual diff is available for this file. It may be binary or
-          unchanged in the selected Git area.
-        </Trans>
+        <Trans>No changes are available for this selection.</Trans>
       </Text>
     );
   }
@@ -532,6 +634,20 @@ const SideBySideDiffViewer = ({
       </div>
       <div style={styles.diffRows}>
         {rows.map((row, index) => {
+          if (row.kind === 'file') {
+            return (
+              <div
+                key={index}
+                style={{
+                  ...styles.diffFileHeaderRow,
+                  backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+                }}
+              >
+                {row.label}
+              </div>
+            );
+          }
+
           if (row.kind === 'note') {
             return (
               <div
@@ -593,9 +709,11 @@ const GitTool = ({
   const [runningAction, setRunningAction] = React.useState<?string>(null);
   const [errorMessage, setErrorMessage] = React.useState<?string>(null);
   const [diffFile, setDiffFile] = React.useState<?GitChangedFile>(null);
+  const [diffCommit, setDiffCommit] = React.useState<?GitCommit>(null);
   const [diffText, setDiffText] = React.useState<string>('');
   const [isDiffLoading, setIsDiffLoading] = React.useState<boolean>(false);
   const [diffErrorMessage, setDiffErrorMessage] = React.useState<?string>(null);
+  const diffRequestId = React.useRef<number>(0);
 
   const projectFilePath = fileMetadata ? fileMetadata.fileIdentifier : null;
   const canUseGitTool =
@@ -631,8 +749,11 @@ const GitTool = ({
       setHasPushSuccessHint(false);
       setErrorMessage(null);
       setDiffFile(null);
+      setDiffCommit(null);
       setDiffText('');
+      setIsDiffLoading(false);
       setDiffErrorMessage(null);
+      diffRequestId.current++;
     },
     [refreshStatus]
   );
@@ -870,25 +991,67 @@ const GitTool = ({
     async (file: GitChangedFile) => {
       if (!projectFilePath) return;
 
+      const requestId = ++diffRequestId.current;
       setDiffFile(file);
+      setDiffCommit(null);
       setDiffText('');
       setDiffErrorMessage(null);
       setIsDiffLoading(true);
       try {
         const result = await invokeGitToolDiff(projectFilePath, file);
-        setDiffText(result.diff || '');
+        if (requestId === diffRequestId.current) {
+          setDiffText(result.diff || '');
+        }
       } catch (error) {
-        setDiffErrorMessage(getErrorMessage(error));
+        if (requestId === diffRequestId.current) {
+          setDiffErrorMessage(getErrorMessage(error));
+        }
       } finally {
-        setIsDiffLoading(false);
+        if (requestId === diffRequestId.current) {
+          setIsDiffLoading(false);
+        }
+      }
+    },
+    [projectFilePath]
+  );
+
+  const openCommitDiff = React.useCallback(
+    async (commit: GitCommit) => {
+      if (!projectFilePath) return;
+
+      const requestId = ++diffRequestId.current;
+      setDiffFile(null);
+      setDiffCommit(commit);
+      setDiffText('');
+      setDiffErrorMessage(null);
+      setIsDiffLoading(true);
+      try {
+        const result = await invokeGitToolCommitDiff(
+          projectFilePath,
+          commit.hash
+        );
+        if (requestId === diffRequestId.current) {
+          setDiffText(result.diff || '');
+        }
+      } catch (error) {
+        if (requestId === diffRequestId.current) {
+          setDiffErrorMessage(getErrorMessage(error));
+        }
+      } finally {
+        if (requestId === diffRequestId.current) {
+          setIsDiffLoading(false);
+        }
       }
     },
     [projectFilePath]
   );
 
   const closeDiffDialog = React.useCallback(() => {
+    diffRequestId.current++;
     setDiffFile(null);
+    setDiffCommit(null);
     setDiffText('');
+    setIsDiffLoading(false);
     setDiffErrorMessage(null);
   }, []);
 
@@ -1126,6 +1289,7 @@ const GitTool = ({
                           commit={commit}
                           i18n={i18n}
                           disabled={isBusy}
+                          onOpenDiff={openCommitDiff}
                           onRevert={revertCommit}
                           onReset={resetToCommit}
                         />
@@ -1166,11 +1330,17 @@ const GitTool = ({
             />
           </Dialog>
           <Dialog
-            open={!!diffFile}
+            open={!!diffFile || !!diffCommit}
             title={
               diffFile ? (
                 <React.Fragment>
                   <Trans>Diff</Trans>: {diffFile.path}
+                </React.Fragment>
+              ) : diffCommit ? (
+                <React.Fragment>
+                  <Trans>Diff</Trans>:{' '}
+                  {diffCommit.subject || <Trans>No commit message</Trans>} (
+                  {diffCommit.shortHash})
                 </React.Fragment>
               ) : (
                 <Trans>Diff</Trans>

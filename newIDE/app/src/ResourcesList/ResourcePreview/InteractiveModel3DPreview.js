@@ -13,6 +13,9 @@ import Pause from '../../UI/CustomSvgIcons/Pause';
 import CheckeredBackground from '../CheckeredBackground';
 import { getModelAnimationClipLabel } from './Model3DAnimationUtils';
 
+const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
+const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
+
 const styles = {
   container: {
     display: 'flex',
@@ -251,11 +254,18 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       controls.dampingFactor = 0.08;
       controls.screenSpacePanning = true;
 
-      const light = new THREE.HemisphereLight(0xffffff, 0x404040, 2.2);
+      const light = new THREE.HemisphereLight(
+        0xffffff,
+        0x404040,
+        PREVIEW_HEMISPHERE_LIGHT_INTENSITY
+      );
       light.position.set(0, 1, 0);
       scene.add(light);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+      const directionalLight = new THREE.DirectionalLight(
+        0xffffff,
+        PREVIEW_DIRECTIONAL_LIGHT_INTENSITY
+      );
       directionalLight.position.set(3, 4, 5);
       scene.add(directionalLight);
 

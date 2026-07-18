@@ -650,6 +650,29 @@ describe('ProjectFilesPanel', () => {
     expect(source).toContain('removeLinkedFolder(node)');
   });
 
+  it("can open a linked file's folder", () => {
+    const source = getSource();
+
+    expect(source).toContain('shell.showItemInFolder(node.absolutePath);');
+    expect(source).toContain("...(node.type === 'file'");
+    expect(source).toContain('label: i18n._(t`Open folder`)');
+    expect(source).toContain('click: () => openFolderForNode(node)');
+  });
+
+  it('can open folders and copy absolute paths from project nodes', () => {
+    const source = getSource();
+    const menuStart = source.indexOf('const menu: Array<MenuItemTemplate> = [');
+    const menuEnd = source.indexOf('];', menuStart);
+    const menu = source.slice(menuStart, menuEnd);
+
+    expect(source).toContain("if (node.type === 'folder') {");
+    expect(source).toContain('shell.openPath(node.absolutePath);');
+    expect(menu).toContain('label: i18n._(t`Open folder`)');
+    expect(menu).toContain('click: () => openFolderForNode(node)');
+    expect(menu).toContain('label: i18n._(t`Copy absolute path`)');
+    expect(menu).toContain('click: () => copyNodeAbsolutePath(node)');
+  });
+
   it('does not auto-select a newly created folder', () => {
     const folderNode: ProjectFileNode = {
       id: 'project/New folder',

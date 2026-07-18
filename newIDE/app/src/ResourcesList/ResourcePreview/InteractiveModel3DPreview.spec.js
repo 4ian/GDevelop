@@ -4,6 +4,18 @@ import path from 'path';
 import { getModelAnimationClipLabel } from './Model3DAnimationUtils';
 
 describe('InteractiveModel3DPreview', () => {
+  it('uses balanced lighting that preserves model colors and highlights', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'InteractiveModel3DPreview.js'),
+      'utf8'
+    );
+
+    expect(source).toContain('const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;');
+    expect(source).toContain(
+      'const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;'
+    );
+  });
+
   it('keeps GLB animation names and labels unnamed clips', () => {
     expect(getModelAnimationClipLabel('Walk', 0)).toBe('Walk');
     expect(getModelAnimationClipLabel('', 0)).toBe('Animation 1');

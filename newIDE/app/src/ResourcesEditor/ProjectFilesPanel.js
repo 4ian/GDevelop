@@ -2705,6 +2705,17 @@ const ProjectFilesPanelContent: React.ComponentType<{
       if (shell) shell.openPath(node.absolutePath);
     }, []);
 
+    const openFolderForNode = React.useCallback((node: ProjectFileNode) => {
+      if (!shell) return;
+
+      if (node.type === 'folder') {
+        shell.openPath(node.absolutePath);
+        return;
+      }
+
+      shell.showItemInFolder(node.absolutePath);
+    }, []);
+
     const openProjectFolder = React.useCallback(
       () => {
         const projectRoot = getProjectRootPath(project);
@@ -3033,6 +3044,14 @@ const ProjectFilesPanelContent: React.ComponentType<{
                   : i18n._(t`Open file`),
               click: () => openNodePath(node),
             },
+            ...(node.type === 'file'
+              ? [
+                  {
+                    label: i18n._(t`Open folder`),
+                    click: () => openFolderForNode(node),
+                  },
+                ]
+              : []),
             {
               label: i18n._(t`Copy absolute path`),
               click: () => copyNodeAbsolutePath(node),
@@ -3049,6 +3068,14 @@ const ProjectFilesPanelContent: React.ComponentType<{
             label: i18n._(t`Rename`),
             enabled: canRenameProjectFileNode(node),
             click: () => openRenameDialogForNode(node),
+          },
+          {
+            label: i18n._(t`Open folder`),
+            click: () => openFolderForNode(node),
+          },
+          {
+            label: i18n._(t`Copy absolute path`),
+            click: () => copyNodeAbsolutePath(node),
           },
           { type: 'separator' },
           {
@@ -3102,6 +3129,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
         copyNodeAbsolutePath,
         openAddLinkedFolderDialog,
         openFolderDialogForNode,
+        openFolderForNode,
         openMarkdownDialogForNode,
         openRenameDialogForNode,
         openNodePath,

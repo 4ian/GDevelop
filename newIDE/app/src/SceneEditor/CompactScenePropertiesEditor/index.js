@@ -239,7 +239,7 @@ export const CompactScenePropertiesEditor = ({
                           renderContent={() => (
                             <CompactBehaviorSharedDataPropertiesEditor
                               project={project}
-                              behaviorMetadata={behaviorMetadata}
+                              behaviorTypeName={behaviorTypeName}
                               behaviorSharedData={behaviorSharedData}
                               resourceManagementProps={resourceManagementProps}
                             />

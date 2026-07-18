@@ -675,7 +675,7 @@ export const CompactObjectPropertiesEditorContent = ({
                     renderContent={() => (
                       <CompactBehaviorComponent
                         project={project}
-                        behaviorMetadata={behaviorMetadata}
+                        behaviorTypeName={behaviorTypeName}
                         behaviors={[behavior]}
                         object={object}
                         layersContainer={layersContainer}

@@ -19,7 +19,6 @@ const CompactInstanceAnchorBehaviorEditor = ({
   project,
   object,
   layersContainer,
-  behaviorMetadata,
   instancesAndBehaviors,
   onBehaviorUpdated,
   resourceManagementProps,
@@ -72,7 +71,6 @@ const CompactInstanceAnchorBehaviorEditor = ({
         project={project}
         object={object}
         layersContainer={layersContainer}
-        behaviorMetadata={behaviorMetadata}
         instancesAndBehaviors={instancesAndBehaviors}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

@@ -16,6 +16,8 @@ import {
   customizeAdvancedTweenBehaviorPropertiesSchema,
 } from '../../BehaviorsEditor/Editors/AdvancedTweenBehaviorEditorOptions';
 
+const gd: libGDevelop = global.gd;
+
 export const styles = {
   icon: {
     fontSize: 18,
@@ -60,7 +62,7 @@ export const getSchemaWithOpenFullEditorButton = ({
 
 export const CompactBehaviorPropertiesEditor = ({
   project,
-  behaviorMetadata,
+  behaviorTypeName,
   behaviors,
   object,
   layersContainer,
@@ -69,6 +71,14 @@ export const CompactBehaviorPropertiesEditor = ({
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const behavior = behaviors[0];
+  // Behavior metadata is owned by the platform extension and is replaced when
+  // extensions are refreshed. Do not keep its WebIDL wrapper in React props:
+  // a deferred render could otherwise call into a freed WASM object.
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorTypeName
+  );
+  const openFullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
@@ -123,7 +133,7 @@ export const CompactBehaviorPropertiesEditor = ({
             ? schema =>
                 getSchemaWithOpenFullEditorButton({
                   schema,
-                  fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
+                  fullEditorLabel: openFullEditorLabel,
                   behavior: behaviors[0],
                   onOpenFullEditor,
                 })

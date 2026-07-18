@@ -6,7 +6,6 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
  */
 export type CompactInstanceBehaviorPropertiesEditorProps = {|
   project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
   instancesAndBehaviors: Array<{

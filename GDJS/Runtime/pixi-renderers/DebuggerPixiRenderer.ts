@@ -3,7 +3,7 @@ namespace gdjs {
   const signalDebugDrawRefreshInterval = 1000 / 30;
   const maxSignalDebugSegments = 16;
   const maxSignalDebugLabels = 6;
-  const debugDrawRefreshInterval = 1000 / 4;
+  const debugDrawRefreshInterval = 1000 / 30;
   const maxDebugDrawObjectsPerRefresh = 60;
   const maxDebugDrawHitBoxesPerRefresh = 120;
   const maxDebugDrawPointObjectsPerRefresh = 20;

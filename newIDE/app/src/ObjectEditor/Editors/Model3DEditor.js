@@ -19,6 +19,7 @@ import FlatButton from '../../UI/FlatButton';
 import { mapFor } from '../../Utils/MapFor';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
+import EmptyMessage from '../../UI/EmptyMessage';
 import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -74,6 +75,10 @@ const styles = {
   sharedAnimationModelStatusIcon: {
     width: 20,
     height: 20,
+  },
+  animationNameFilter: {
+    width: 320,
+    maxWidth: '50%',
   },
 };
 
@@ -161,6 +166,8 @@ const SharedAnimationModelRow = ({
   const isLoading = !loadState || loadState.isLoading;
   const isValid = !!validation && validation.isMatching;
   const hasError = !!loadState && loadState.hasError;
+  const animationCount =
+    loadState && loadState.gltf ? loadState.gltf.animations.length : 0;
 
   return (
     <Paper
@@ -175,7 +182,9 @@ const SharedAnimationModelRow = ({
           </Text>
           <Text noMargin size="body-small" color="secondary">
             {loadState && loadState.gltf ? (
-              <Trans>{loadState.gltf.animations.length} animations</Trans>
+              <React.Fragment>
+                {animationCount} <Trans>animations</Trans>
+              </React.Fragment>
             ) : isLoading ? (
               <Trans>Loading animations…</Trans>
             ) : (
@@ -284,6 +293,9 @@ const Model3DEditor = ({
     justAddedAnimationName,
     setJustAddedAnimationName,
   ] = React.useState<?string>(null);
+  const [animationNameFilter, setAnimationNameFilter] = React.useState<string>(
+    ''
+  );
   const justAddedAnimationElement = React.useRef<?any>(null);
 
   React.useEffect(
@@ -933,6 +945,9 @@ const Model3DEditor = ({
   );
 
   const sourceSelectOptions = [];
+  const primaryModelResourceName = properties
+    .get('modelResourceName')
+    .getValue();
   for (const sourceModel of animationSourceModels) {
     sourceModel.gltf.animations.forEach((animation, animationIndex) => {
       const animationLabel =
@@ -952,6 +967,22 @@ const Model3DEditor = ({
     });
   }
 
+  const normalizedAnimationNameFilter = animationNameFilter
+    .trim()
+    .toLowerCase();
+  const animationsCount = model3DConfiguration.getAnimationsCount();
+  const filteredAnimationIndexes = mapFor(
+    0,
+    animationsCount,
+    animationIndex => animationIndex
+  ).filter(animationIndex =>
+    model3DConfiguration
+      .getAnimation(animationIndex)
+      .getName()
+      .toLowerCase()
+      .includes(normalizedAnimationNameFilter)
+  );
+
   return (
     <>
       <ScrollView ref={scrollView}>
@@ -963,7 +994,7 @@ const Model3DEditor = ({
             floatingLabelText={properties.get('modelResourceName').getLabel()}
             resourceManagementProps={resourceManagementProps}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
-            resourceName={properties.get('modelResourceName').getValue()}
+            resourceName={primaryModelResourceName}
             onChange={newValue => {
               pendingScaleForReplacedModel.current =
                 scale !== null && Number.isFinite(scale) ? scale : 1;
@@ -1050,8 +1081,9 @@ const Model3DEditor = ({
                 >
                   <Trans>
                     Rig validation checks bone names, hierarchy, and bind pose
-                    against {properties.get('modelResourceName').getValue()}.
-                  </Trans>
+                    against
+                  </Trans>{' '}
+                  {primaryModelResourceName}.
                 </AlertMessage>
               </React.Fragment>
             )}
@@ -1165,7 +1197,21 @@ const Model3DEditor = ({
             objectConfiguration={objectConfiguration}
             propertyName="isReceivingShadow"
           />
-          <Text size="block-title">Animations</Text>
+          <Line noMargin alignItems="center">
+            <Text size="block-title">
+              <Trans>Animations</Trans> ({animationsCount})
+            </Text>
+            <Spacer />
+            <SemiControlledTextField
+              id="model3d-animation-name-filter"
+              margin="none"
+              value={animationNameFilter}
+              onChange={setAnimationNameFilter}
+              translatableHintText={t`Filter animations by name`}
+              style={styles.animationNameFilter}
+              disabled={animationsCount === 0}
+            />
+          </Line>
           <Column noMargin expand>
             <PropertyField
               objectConfiguration={objectConfiguration}
@@ -1173,7 +1219,7 @@ const Model3DEditor = ({
             />
           </Column>
           <Column noMargin expand useFullHeight>
-            {model3DConfiguration.getAnimationsCount() === 0 ? (
+            {animationsCount === 0 ? (
               <Column noMargin expand justifyContent="center">
                 <EmptyPlaceholder
                   title={<Trans>Add your first animation</Trans>}
@@ -1188,10 +1234,12 @@ const Model3DEditor = ({
               </Column>
             ) : (
               <React.Fragment>
-                {mapFor(
-                  0,
-                  model3DConfiguration.getAnimationsCount(),
-                  animationIndex => {
+                {filteredAnimationIndexes.length === 0 ? (
+                  <EmptyMessage>
+                    <Trans>No animations match this filter.</Trans>
+                  </EmptyMessage>
+                ) : (
+                  filteredAnimationIndexes.map(animationIndex => {
                     const animation = model3DConfiguration.getAnimation(
                       animationIndex
                     );
@@ -1309,7 +1357,7 @@ const Model3DEditor = ({
                         }
                       </DragSourceAndDropTarget>
                     );
-                  }
+                  })
                 )}
               </React.Fragment>
             )}

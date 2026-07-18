@@ -47,5 +47,12 @@ describe('Model3DEditor', () => {
     expect(source).toContain(
       'animation.getSourceModelResourceName(),\n                                    animation.getSource()'
     );
+    expect(source).toContain('{animationCount} <Trans>animations</Trans>');
+    expect(source).toContain("</Trans>{' '}\n                  {primaryModelResourceName}.");
+    expect(source).toContain('id="model3d-animation-name-filter"');
+    expect(source).toContain('<Trans>Animations</Trans> ({animationsCount})');
+    expect(source).toContain('translatableHintText={t`Filter animations by name`}');
+    expect(source).toContain('.includes(normalizedAnimationNameFilter)');
+    expect(source).toContain('filteredAnimationIndexes.map(animationIndex =>');
   });
 });

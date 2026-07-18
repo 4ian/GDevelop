@@ -30,6 +30,32 @@ describe('gdjs.DebuggerPixiRenderer', function () {
     return { runtimeScene, object, layer: runtimeScene.getLayer('') };
   };
 
+  it('refreshes collision masks at 30 frames per second', function () {
+    const { runtimeScene } = make3DSceneAndObject();
+    const debuggerRenderer = runtimeScene.getDebuggerRenderer();
+    const now = sinon.stub(Date, 'now');
+    now.returns(1000);
+    debuggerRenderer._debugDrawLastRenderSignature = '0:0:0';
+    debuggerRenderer._debugDrawLastRenderTime = 1000;
+
+    try {
+      expect(
+        debuggerRenderer.isDebugDrawRefreshNeeded(false, false, false)
+      ).to.be(false);
+      now.returns(1033);
+      expect(
+        debuggerRenderer.isDebugDrawRefreshNeeded(false, false, false)
+      ).to.be(false);
+      now.returns(1034);
+      expect(
+        debuggerRenderer.isDebugDrawRefreshNeeded(false, false, false)
+      ).to.be(true);
+    } finally {
+      now.restore();
+      runtimeScene._destroy();
+    }
+  });
+
   it('renders and updates a 3D collision mask in its layer', function () {
     const { runtimeScene, object, layer } = make3DSceneAndObject();
     let collisionMask = {

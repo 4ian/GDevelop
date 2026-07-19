@@ -2,7 +2,10 @@
 import { makeTestProject } from '../../../fixtures/TestProject';
 import { unserializeFromJSObject } from '../../../Utils/Serializer';
 import { renderEventsAsEventsScript } from './EventsScriptRenderer';
-import { buildEventsScriptSourceView } from './EventsScriptSourceView';
+import {
+  buildEventsScriptSourceView,
+  renderEventOwnSourceById,
+} from './EventsScriptSourceView';
 
 const gd: libGDevelop = global.gd;
 
@@ -349,6 +352,34 @@ describe('EventsScriptSourceView', () => {
       expect(view.renderingErrors).toEqual([]);
       // event-1 also references the object but is outside the scope.
       expect(view.selectedEventIds).toEqual(['event-0.0']);
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('renders the own source of one event (without sub-events) by id', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, manyEventsSerialized);
+
+      expect(
+        renderEventOwnSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-0',
+        })
+      ).toBe(
+        [
+          'if DepartScene():  # event-0',
+          '  CentreCamera(MySpriteObject)',
+          '  ChangeAnimation(MySpriteObject, =, 1)',
+        ].join('\n')
+      );
+      expect(
+        renderEventOwnSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-99',
+        })
+      ).toBe(null);
     } finally {
       project.delete();
     }

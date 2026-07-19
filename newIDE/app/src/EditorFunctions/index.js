@@ -18,7 +18,10 @@ import {
   eventsTextRenderingErrorText,
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
-import { buildEventsScriptSourceView } from '../EventsSheet/EventsTree/TextRenderer/EventsScriptSourceView';
+import {
+  buildEventsScriptSourceView,
+  renderEventOwnSourceById,
+} from '../EventsSheet/EventsTree/TextRenderer/EventsScriptSourceView';
 import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
@@ -211,6 +214,11 @@ export type EventBatch = {|
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,
   placementRationale: string | null,
+  // Anchor echo for replace placements (proof the replaced event was read):
+  expectedEventSource: string | null,
+  // The actual current source of the target event, that the backend
+  // compares the anchor against:
+  placementTargetEventSource: string | null,
 |};
 
 export type EventsGenerationOptions = {|
@@ -5153,6 +5161,30 @@ const addSceneEvents: EditorFunction = {
 
     const parsedEventBatches = eventBatches
       ? eventBatches.map(batch => {
+          const placementRelation =
+            SafeExtractor.extractStringProperty(batch, 'placement_relation') ||
+            '(unspecified)';
+          const placementTargetEventId = SafeExtractor.extractStringProperty(
+            batch,
+            'placement_target_event_id'
+          );
+
+          // For replace placements, also send the CURRENT source of the
+          // event being replaced: the backend compares the
+          // `expected_event_source` anchor against it (proof the event was
+          // read and hasn't changed).
+          const isReplacePlacement =
+            placementRelation ===
+              'replace_event_but_keep_existing_sub_events' ||
+            placementRelation === 'replace_entire_event_and_sub_events';
+          const placementTargetEventSource =
+            isReplacePlacement && placementTargetEventId
+              ? renderEventOwnSourceById({
+                  eventsList: currentSceneEvents,
+                  eventIdOrGroupName: placementTargetEventId,
+                })
+              : null;
+
           return {
             eventsDescription:
               SafeExtractor.extractStringProperty(
@@ -5163,15 +5195,8 @@ const addSceneEvents: EditorFunction = {
               batch,
               'event_script'
             ),
-            placementRelation:
-              SafeExtractor.extractStringProperty(
-                batch,
-                'placement_relation'
-              ) || '(unspecified)',
-            placementTargetEventId: SafeExtractor.extractStringProperty(
-              batch,
-              'placement_target_event_id'
-            ),
+            placementRelation,
+            placementTargetEventId,
             placementExpectedParentEventId: SafeExtractor.extractStringProperty(
               batch,
               'placement_expected_parent_event_id'
@@ -5180,6 +5205,11 @@ const addSceneEvents: EditorFunction = {
               batch,
               'placement_rationale'
             ),
+            expectedEventSource: SafeExtractor.extractStringProperty(
+              batch,
+              'expected_event_source'
+            ),
+            placementTargetEventSource,
           };
         })
       : null;

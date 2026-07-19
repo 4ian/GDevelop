@@ -85,6 +85,29 @@ const renderEventOwnTextForMatching = (
     .join('\n');
 };
 
+/**
+ * The current EventScript source of one event (its own lines: header, local
+ * variables, actions - without its sub-events), resolved by id or group
+ * name. Used as the reference the `expected_event_source` anchor of replace
+ * placements is compared against. Returns null when the event is not found.
+ */
+export const renderEventOwnSourceById = ({
+  eventsList,
+  eventIdOrGroupName,
+}: {|
+  eventsList: gdEventsList,
+  eventIdOrGroupName: string,
+|}): string | null => {
+  const nodesByPath: Map<string, EventNode> = new Map();
+  indexEvents(eventsList, '', nodesByPath);
+  const paths = resolveEventIdOrGroupName(eventIdOrGroupName, nodesByPath);
+  const firstPath = paths[0];
+  if (firstPath === undefined) return null;
+  const node = nodesByPath.get(firstPath);
+  if (!node) return null;
+  return renderEventOwnTextForMatching(node.event, firstPath);
+};
+
 const makeWordBoundaryRegex = (name: string): RegExp => {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^A-Za-z0-9_])${escaped}($|[^A-Za-z0-9_])`);

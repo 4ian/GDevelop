@@ -66,7 +66,12 @@ describe('InteractiveModel3DPreview', () => {
     expect(source).toContain('context.arc(32, 32, 24, 0, Math.PI * 2)');
     expect(source).toContain('boneJointPositions.setXYZ(');
     expect(source).toContain('new CSS2DObject(');
-    expect(source).toContain('getModelBoneDisplayName(bone, boneIndex)');
+    expect(source).toContain(
+      'displayName: getModelBoneDisplayName(bone, boneIndex)'
+    );
+    expect(source).toContain('canonicalName: getModelBoneCanonicalName(bone)');
+    expect(source).toContain('copyTextToClipboard(boneName)');
+    expect(source).toContain('<Trans>Bone name copied to clipboard!</Trans>');
     expect(source).toContain('MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18');
     expect(source).toContain('material.transparent = isVisible');
     expect(source).toContain('material.depthWrite = isVisible');

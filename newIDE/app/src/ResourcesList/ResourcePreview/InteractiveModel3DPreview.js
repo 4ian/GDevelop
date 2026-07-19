@@ -13,14 +13,20 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import FlatButton from '../../UI/FlatButton';
 import SearchBar from '../../UI/SearchBar';
+import InfoBar from '../../UI/Messages/InfoBar';
 import Play from '../../UI/CustomSvgIcons/Play';
 import Pause from '../../UI/CustomSvgIcons/Pause';
+import { copyTextToClipboard } from '../../Utils/Clipboard';
 import CheckeredBackground from '../CheckeredBackground';
 import {
   doesModelAnimationClipMatchSearch,
   getModelAnimationClipLabel,
 } from './Model3DAnimationUtils';
-import { getModelBoneDisplayName } from './Model3DBoneUtils';
+import {
+  getModelBoneCanonicalName,
+  getModelBoneDisplayName,
+} from './Model3DBoneUtils';
+import { createBoneLabelElement } from './Model3DBoneLabelUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
@@ -176,24 +182,6 @@ const getMaterials = (node: any): Array<any> => {
   return Array.isArray(node.material) ? node.material : [node.material];
 };
 
-const createBoneLabelElement = (boneName: string): HTMLDivElement => {
-  const element = document.createElement('div');
-  element.textContent = boneName;
-  element.setAttribute('translate', 'no');
-  element.style.marginLeft = '6px';
-  element.style.padding = '2px 5px';
-  element.style.border = '1px solid rgba(87, 218, 255, 0.9)';
-  element.style.borderRadius = '3px';
-  element.style.backgroundColor = 'rgba(15, 20, 28, 0.88)';
-  element.style.color = '#ffffff';
-  element.style.fontFamily = 'sans-serif';
-  element.style.fontSize = '11px';
-  element.style.lineHeight = '14px';
-  element.style.whiteSpace = 'nowrap';
-  element.style.pointerEvents = 'none';
-  return element;
-};
-
 const createBoneJointMarkerTexture = (): any => {
   const markerCanvas = document.createElement('canvas');
   markerCanvas.width = 64;
@@ -220,11 +208,13 @@ const createBonesVisualization = ({
   scene,
   camera,
   canvasHost,
+  onCopyBoneName,
 }: {|
   model: any,
   scene: any,
   camera: any,
   canvasHost: HTMLDivElement,
+  onCopyBoneName: (boneName: string) => void,
 |}): BonesVisualizationController | null => {
   const bones: Array<any> = [];
   model.traverse(child => {
@@ -309,7 +299,11 @@ const createBonesVisualization = ({
 
   const boneLabels = bones.map((bone, boneIndex) => {
     const label = new CSS2DObject(
-      createBoneLabelElement(getModelBoneDisplayName(bone, boneIndex))
+      createBoneLabelElement({
+        displayName: getModelBoneDisplayName(bone, boneIndex),
+        canonicalName: getModelBoneCanonicalName(bone),
+        onCopy: onCopyBoneName,
+      })
     );
     label.visible = false;
     label.center.set(0, 1);
@@ -429,6 +423,16 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
   const [hasBones, setHasBones] = React.useState(false);
   const [isShowingBones, setIsShowingBones] = React.useState(false);
   const [isShowingBoneNames, setIsShowingBoneNames] = React.useState(false);
+  const [boneNameCopyStatus, setBoneNameCopyStatus] = React.useState<
+    'success' | 'error' | null
+  >(null);
+
+  const onCopyBoneName = React.useCallback((boneName: string) => {
+    copyTextToClipboard(boneName).then(
+      () => setBoneNameCopyStatus('success'),
+      () => setBoneNameCopyStatus('error')
+    );
+  }, []);
 
   const filteredAnimationClips = animationClips
     .map((animationClip, animationIndex) => ({
@@ -624,6 +628,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
             scene,
             camera,
             canvasHost,
+            onCopyBoneName,
           });
           bonesVisualizationControllerRef.current = bonesVisualizationController;
           setHasBones(!!bonesVisualizationController);
@@ -682,7 +687,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
         }
       };
     },
-    [modelUrl]
+    [modelUrl, onCopyBoneName]
   );
 
   return (
@@ -784,6 +789,17 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
           )}
         </div>
       )}
+      <InfoBar
+        message={
+          boneNameCopyStatus === 'error' ? (
+            <Trans>Unable to copy the bone name.</Trans>
+          ) : (
+            <Trans>Bone name copied to clipboard!</Trans>
+          )
+        }
+        visible={boneNameCopyStatus !== null}
+        hide={() => setBoneNameCopyStatus(null)}
+      />
     </div>
   );
 };

@@ -134,7 +134,9 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
           buildMenuTemplate={() =>
             allEventsMetadata.map(metadata => ({
               label: metadata.fullName,
-              click: () => onAddEvent(metadata.type),
+              click: () => {
+                onAddEvent(metadata.type);
+              },
             }))
           }
         />

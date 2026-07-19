@@ -17,7 +17,6 @@ import IconButton from '../../UI/IconButton';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
-import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -60,6 +59,7 @@ import {
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
 import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
+import SingleBehaviorHost from '../../BehaviorsEditor/SingleBehaviorHost';
 
 const gd: libGDevelop = global.gd;
 
@@ -666,17 +666,13 @@ export const CompactObjectPropertiesEditorContent = ({
                   behaviorTypeName
                 );
                 const iconUrl = behaviorMetadata.getIconFilename();
-                const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
-                  behaviorTypeName
-                );
                 return (
                   <CollapsibleSubPanel
                     key={behavior.ptr}
                     renderContent={() => (
-                      <CompactBehaviorComponent
+                      <SingleBehaviorHost
                         project={project}
-                        behaviorTypeName={behaviorTypeName}
-                        behaviors={[behavior]}
+                        behavior={behavior}
                         object={object}
                         layersContainer={layersContainer}
                         onBehaviorUpdated={() => {}}

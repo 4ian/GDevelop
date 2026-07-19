@@ -7,13 +7,9 @@ import { useSerializableObjectsCancelableEditor } from '../Utils/SerializableObj
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
-import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
-import { Column, Line } from '../UI/Grid';
-import VariablesList from './VariablesList';
+import UnifiedVariablesList from './UnifiedVariablesList';
 import HelpButton from '../UI/HelpButton';
 import { getVariablePathFromNodeId } from './VariableToTreeNodeHandling';
-import { Tabs } from '../UI/Tabs';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { getRootVariableName } from '../EventsSheet/ParameterFields/VariableField';
@@ -31,9 +27,11 @@ type TabProps = {
   id: string,
   label: React.Node,
   variablesContainer: gdVariablesContainer,
+  scopeLabel?: string,
+  groupLabel?: React.Node,
   objectName?: ?string,
   initialInstances?: ?gdInitialInstancesContainer,
-  inheritedVariablesContainer?: gdVariablesContainer,
+  skipRefactoring?: boolean,
   loopIndexVariableName?: string,
   onRenameLoopIndexVariable?: (newName: string) => void,
   onRemoveLoopIndexVariable?: () => void,
@@ -102,11 +100,16 @@ const VariablesEditorDialog = ({
     resetThenClearPersistentUuid: true,
   });
 
-  const lastSelectedVariableNodeId = React.useRef<string | null>(null);
-  const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {
-    lastSelectedVariableNodeId.current =
-      nodes.length > 0 ? nodes[nodes.length - 1] : null;
-  }, []);
+  const lastSelectedVariable = React.useRef<?{
+    scopeId: string,
+    nodeId: string,
+  }>(null);
+  const onSelectedVariableChange = React.useCallback(
+    (scopeId: string, nodeId: string) => {
+      lastSelectedVariable.current = { scopeId, nodeId };
+    },
+    []
+  );
 
   const shouldCreateVariable = React.useRef<boolean>(
     initiallySelectedVariable ? initiallySelectedVariable.shouldCreate : false
@@ -121,7 +124,7 @@ const VariablesEditorDialog = ({
       // $FlowFixMe[missing-local-annot]
       tabs.findIndex(({ id }) => id === initiallyOpenTabId)
     );
-    const { variablesContainer, inheritedVariablesContainer } = tabs[tabIndex];
+    const { variablesContainer } = tabs[tabIndex];
     const { name: actualVariableName } = insertInVariablesContainer(
       variablesContainer,
       initiallySelectedVariable
@@ -129,33 +132,26 @@ const VariablesEditorDialog = ({
         : 'Variable',
       null,
       variablesContainer.count(),
-      inheritedVariablesContainer,
+      null,
       initiallySelectedVariable ? initiallySelectedVariable.variableType : null
     );
     actualInitiallySelectedVariableName.current = actualVariableName;
-    lastSelectedVariableNodeId.current = getNodeIdFromVariableName(
-      actualVariableName
-    );
+    lastSelectedVariable.current = {
+      scopeId: tabs[tabIndex].id,
+      nodeId: getNodeIdFromVariableName(actualVariableName),
+    };
   }
-
-  const { isMobile } = useResponsiveWindowSize();
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-variables'
-  );
-  const [currentTab, setCurrentTab] = React.useState(
-    initiallyOpenTabId || tabs[0].id
-  );
 
   const onRefactorAndApply = React.useCallback(
     async () => {
       const originalContentSerializedElements = getOriginalContentSerializedElements();
       for (const tab of tabs) {
-        const { id, variablesContainer, inheritedVariablesContainer } = tab;
+        const { id, variablesContainer, skipRefactoring } = tab;
         const originalContentSerializedElement = originalContentSerializedElements.get(
           id
         );
         if (
-          inheritedVariablesContainer ||
+          skipRefactoring ||
           // It can't actually happen.
           !originalContentSerializedElement
         ) {
@@ -189,15 +185,20 @@ const VariablesEditorDialog = ({
         }
         variablesContainer.clearPersistentUuid();
       }
-      const tab = tabs.find(({ id }) => id === currentTab);
+      const selectedVariable = lastSelectedVariable.current;
+      const tab = selectedVariable
+        ? tabs.find(({ id }) => id === selectedVariable.scopeId)
+        : null;
       if (tab) {
         onApply(
-          lastSelectedVariableNodeId.current &&
+          selectedVariable &&
             getVariablePathFromNodeId(
-              lastSelectedVariableNodeId.current,
+              selectedVariable.nodeId,
               tab.variablesContainer
             )
         );
+      } else {
+        onApply(null);
       }
     },
     [
@@ -206,7 +207,6 @@ const VariablesEditorDialog = ({
       objectName,
       initialInstances,
       project,
-      currentTab,
       onApply,
     ]
   );
@@ -256,71 +256,21 @@ const VariablesEditorDialog = ({
       flexBody
       fullHeight
       id={id}
-      fixedContent={
-        tabs.length > 1 ? (
-          <Tabs
-            value={currentTab}
-            onChange={setCurrentTab}
-            options={tabs.map(({ label, id }) => ({
-              label,
-              value: id,
-              id,
-            }))}
-            // Enforce scroll on mobile, because the tabs have long names.
-            variant={isMobile ? 'scrollable' : undefined}
-          />
-        ) : null
-      }
     >
-      {tabs.map(
-        ({
-          id,
-          variablesContainer,
-          inheritedVariablesContainer,
-          loopIndexVariableName,
-          onRenameLoopIndexVariable,
-          onRemoveLoopIndexVariable,
-          emptyPlaceholderTitle,
-          emptyPlaceholderDescription,
-          onComputeAllVariableNames,
-          objectName: tabObjectName,
-        }) => {
-          return (
-            currentTab === id && (
-              <Column expand noMargin noOverflowParent id={id} key={id}>
-                {variablesContainer.count() > 0 && DismissableTutorialMessage && (
-                  <Line>
-                    <Column expand>{DismissableTutorialMessage}</Column>
-                  </Line>
-                )}
-                <VariablesList
-                  projectScopedContainersAccessor={
-                    projectScopedContainersAccessor
-                  }
-                  variablesContainer={variablesContainer}
-                  areObjectVariables={!!tabObjectName}
-                  initiallySelectedVariableName={
-                    actualInitiallySelectedVariableName.current
-                  }
-                  inheritedVariablesContainer={inheritedVariablesContainer}
-                  emptyPlaceholderTitle={emptyPlaceholderTitle || null}
-                  emptyPlaceholderDescription={
-                    emptyPlaceholderDescription || null
-                  }
-                  onComputeAllVariableNames={onComputeAllVariableNames}
-                  helpPagePath={helpPagePath}
-                  onVariablesUpdated={notifyOfChange}
-                  onSelectedVariableChange={onSelectedVariableChange}
-                  isListLocked={isListLocked}
-                  loopIndexVariableName={loopIndexVariableName}
-                  onRenameLoopIndexVariable={onRenameLoopIndexVariable}
-                  onRemoveLoopIndexVariable={onRemoveLoopIndexVariable}
-                />
-              </Column>
-            )
-          );
+      <UnifiedVariablesList
+        // $FlowFixMe[incompatible-type] - TabProps and UnifiedVariablesScope
+        // deliberately share the same public shape.
+        scopes={tabs}
+        primaryScopeId={tabs.length ? tabs[0].id : undefined}
+        initiallyOpenScopeId={initiallyOpenTabId}
+        initiallySelectedVariableName={
+          actualInitiallySelectedVariableName.current
         }
-      )}
+        helpPagePath={helpPagePath}
+        onVariablesUpdated={notifyOfChange}
+        onSelectedVariableChange={onSelectedVariableChange}
+        isListLocked={isListLocked}
+      />
     </Dialog>
   );
 };

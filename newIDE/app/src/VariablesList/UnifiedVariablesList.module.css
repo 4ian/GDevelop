@@ -1,0 +1,489 @@
+.root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  outline: none;
+}
+
+.toolbar {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--variables-separator);
+}
+
+.header,
+.row {
+  display: grid;
+  grid-template-columns:
+    minmax(82px, 0.6fr)
+    minmax(180px, 2.15fr)
+    minmax(54px, 0.45fr)
+    minmax(190px, 1.65fr);
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 520px;
+}
+
+.header {
+  flex: 0 0 34px;
+  height: 34px;
+  padding: 0 10px;
+  color: var(--variables-secondary-text);
+  background: var(--variables-header-background);
+  border-bottom: 1px solid var(--variables-separator);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.headerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.headerButton:focus-visible,
+.typeChip:focus-visible,
+.iconButton:focus-visible,
+.rowMenuButton:focus-visible,
+.nameInput:focus-visible,
+.valueInput:focus-visible,
+.enumValueButton:focus-visible {
+  outline: 2px solid var(--variables-focus);
+  outline-offset: 1px;
+}
+
+.listViewport {
+  position: relative;
+  flex: 1;
+  min-height: 120px;
+  overflow: hidden;
+  background: var(--variables-list-background);
+}
+
+.row {
+  position: relative;
+  height: 40px;
+  padding: 0 10px;
+  color: var(--variables-primary-text);
+  background: var(--variables-list-background);
+  border-bottom: 1px solid color-mix(in srgb, var(--variables-separator) 55%, transparent);
+}
+
+.row:hover,
+.row:focus-within {
+  background: var(--variables-hover-background);
+}
+
+.rowSelected {
+  background: var(--variables-selected-background);
+}
+
+.rowSelected::before {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 3px;
+  content: '';
+  background: var(--variables-focus);
+  border-radius: 0 3px 3px 0;
+}
+
+.groupRow {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 8px 12px;
+  color: var(--variables-secondary-text);
+  background: var(--variables-group-background);
+  border-bottom: 1px solid var(--variables-separator);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.groupCount {
+  margin-left: 8px;
+  opacity: 0.65;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.emptyGroupRow {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 18px;
+  color: var(--variables-secondary-text);
+  background: var(--variables-list-background);
+  border-bottom: 1px solid var(--variables-separator);
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.scopeCell,
+.nameCell,
+.typeCell,
+.valueCell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+}
+
+.scopeBadge {
+  display: inline-block;
+  max-width: calc(100% - 10px);
+  padding: 3px 8px;
+  overflow: hidden;
+  color: var(--variables-scope-text);
+  background: var(--variables-scope-background);
+  border: 1px solid var(--variables-scope-border);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scopeInherited {
+  padding-left: 4px;
+  color: var(--variables-secondary-text);
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+.nameContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.depthGuide {
+  align-self: stretch;
+  width: 1px;
+  margin-right: 7px;
+  background: var(--variables-separator);
+}
+
+.dragHandle {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  min-height: 30px;
+  color: var(--variables-secondary-text);
+  cursor: grab;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.chevron,
+.chevronPlaceholder {
+  display: inline-flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 5px;
+}
+
+.chevron {
+  cursor: pointer;
+}
+
+.chevron:hover {
+  background: var(--variables-hover-background);
+}
+
+.arrayIndex {
+  flex: 1;
+  min-width: 0;
+  padding: 0 7px;
+  overflow: hidden;
+  color: var(--variables-secondary-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nameInput,
+.valueInput {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.nameInput:hover,
+.nameInput:focus,
+.valueInput:hover,
+.valueInput:focus {
+  background: var(--variables-field-background);
+  border-color: var(--variables-separator);
+}
+
+.nameInputInvalid {
+  border-color: var(--variables-error) !important;
+}
+
+.match {
+  padding: 0 1px;
+  color: inherit;
+  background: var(--variables-match-background);
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+.typeCell {
+  justify-content: flex-start;
+}
+
+.typeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 24px;
+  padding: 0 7px;
+  color: var(--variables-type-text);
+  background: var(--variables-type-background);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.typeChip:hover {
+  border-color: var(--variables-focus);
+}
+
+.valueCell {
+  gap: 4px;
+}
+
+.valuePreview {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--variables-secondary-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.enumValueButton {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 4px 8px;
+  overflow: hidden;
+  color: inherit;
+  background: var(--variables-field-background);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rowActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+
+.row:hover .rowActions,
+.row:focus-within .rowActions,
+.rowSelected .rowActions {
+  opacity: 1;
+}
+
+.iconButton,
+.rowMenuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: var(--variables-secondary-text);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.iconButton:hover,
+.rowMenuButton:hover {
+  color: var(--variables-primary-text);
+  background: var(--variables-hover-background);
+}
+
+.addChildButton {
+  color: var(--variables-focus);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.dropBefore::after,
+.dropAfter::after {
+  position: absolute;
+  right: 8px;
+  left: 8px;
+  height: 2px;
+  content: '';
+  background: var(--variables-focus);
+  border-radius: 1px;
+}
+
+.dropBefore::after {
+  top: 0;
+}
+
+.dropAfter::after {
+  bottom: 0;
+}
+
+.popover {
+  width: min(420px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 14px;
+}
+
+.popoverTitle {
+  margin: 0 0 10px;
+  color: var(--variables-primary-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.multilineInput {
+  width: 100%;
+  min-height: 140px;
+  box-sizing: border-box;
+  padding: 9px;
+  resize: vertical;
+  color: var(--variables-primary-text);
+  background: var(--variables-field-background);
+  border: 1px solid var(--variables-separator);
+  border-radius: 7px;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.popoverActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.enumOption {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px 30px 30px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(560px, calc(100% - 32px));
+  box-sizing: border-box;
+  margin: 22px auto;
+  padding: 18px;
+  color: var(--variables-secondary-text);
+  background: var(--variables-group-background);
+  border: 1px solid var(--variables-separator);
+  border-radius: 10px;
+}
+
+.exampleRow {
+  display: grid;
+  grid-template-columns: 1fr 42px 1fr;
+  align-items: center;
+  width: 100%;
+  height: 34px;
+  box-sizing: border-box;
+  margin: 12px 0;
+  padding: 0 10px;
+  color: var(--variables-secondary-text);
+  background: var(--variables-list-background);
+  border: 1px solid var(--variables-separator);
+  border-radius: 7px;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+@media (max-width: 720px) {
+  .header,
+  .row {
+    grid-template-columns: 78px minmax(150px, 1.5fr) 50px minmax(145px, 1fr);
+    min-width: 450px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .scopeBadge {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .dragHandle {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowActions {
+    transition: none;
+  }
+}

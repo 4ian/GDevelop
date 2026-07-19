@@ -35,6 +35,8 @@ type Props = {|
   searchText: string,
   onChangeSearchText: string => void,
   iconStyle?: any,
+  searchBarRef?: any,
+  searchResultCount?: number,
 |};
 
 const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
@@ -92,10 +94,30 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
       <LineStackLayout justifyContent="space-between" alignItems="center">
         <Column noMargin>
           <Line noMargin>
+            {props.isCompact || !props.canAdd ? null : props.isNarrow ? (
+              <IconButton
+                key="add-variable"
+                tooltip={t`Add variable`}
+                onClick={props.onAdd}
+                size="small"
+              >
+                <Add style={props.iconStyle} />
+              </IconButton>
+            ) : (
+              <FlatButton
+                primary
+                key="add-variable"
+                onClick={props.onAdd}
+                label={<Trans>Add</Trans>}
+                leftIcon={<Add />}
+              />
+            )}
             {buttonsToDisplay.map(
               ({ key, Icon, label, tooltip, onClick, disabled }, index) => (
                 <React.Fragment key={key}>
-                  {index > 0 ? <Spacer /> : null}
+                  {index > 0 || (!props.isCompact && props.canAdd) ? (
+                    <Spacer />
+                  ) : null}
                   {props.isNarrow ? (
                     <IconButton
                       key={key}
@@ -123,41 +145,32 @@ const VariablesListToolbar: React.ComponentType<Props> = React.memo<Props>(
         <Column expand noOverflowParent noMargin>
           {props.isCompact ? (
             <CompactSearchBar
+              ref={props.searchBarRef}
               value={props.searchText}
               onChange={props.onChangeSearchText}
-              placeholder={t`Search variables`}
+              placeholder={t`Search name, path, or value`}
             />
           ) : (
             <SearchBar
+              ref={props.searchBarRef}
               value={props.searchText}
               onRequestSearch={props.onChangeSearchText}
               onChange={props.onChangeSearchText}
-              placeholder={t`Search variables`}
+              onChangeImmediately
+              placeholder={t`Search name, path, or value`}
             />
           )}
+          {!!props.searchText && props.searchResultCount !== undefined ? (
+            <span
+              aria-live="polite"
+              style={{ fontSize: 11, opacity: 0.7, padding: '2px 8px 0' }}
+            >
+              {props.searchResultCount === 1
+                ? t`1 match`
+                : t`${props.searchResultCount} matches`}
+            </span>
+          ) : null}
         </Column>
-        {props.isCompact || !props.canAdd ? null : (
-          <Column noMargin>
-            {props.isNarrow ? (
-              <IconButton
-                key="add-variable"
-                tooltip={t`Add variable`}
-                onClick={props.onAdd}
-                size="small"
-              >
-                <Add style={props.iconStyle} />
-              </IconButton>
-            ) : (
-              <FlatButton
-                primary
-                key="add-variable"
-                onClick={props.onAdd}
-                label={<Trans>Add variable</Trans>}
-                leftIcon={<Add />}
-              />
-            )}
-          </Column>
-        )}
       </LineStackLayout>
     );
   }

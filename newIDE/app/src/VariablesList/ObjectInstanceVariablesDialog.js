@@ -54,7 +54,10 @@ const ObjectInstanceVariablesDialog = ({
               id: 'instance-variables',
               label: <Trans>Instance variables</Trans>,
               variablesContainer: objectInstance.getVariables(),
-              inheritedVariablesContainer: variablesEditedAssociatedObject.getVariables(),
+              // Instance values are private overrides. Do not refactor project
+              // references when they are edited, and do not display the
+              // object's variables as an inherited section in the editor.
+              skipRefactoring: true,
               emptyPlaceholderTitle: (
                 <Trans>Add your first instance variable</Trans>
               ),

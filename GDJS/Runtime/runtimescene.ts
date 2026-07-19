@@ -660,6 +660,14 @@ namespace gdjs {
         super._updateObjectsPreRender();
         return;
       } else {
+        for (
+          let i = 0;
+          i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+          ++i
+        ) {
+          gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+        }
+
         // After first frame, optimise rendering by setting only objects
         // near camera as visible.
         // TODO: For compatibility, pass a scale of `2`,

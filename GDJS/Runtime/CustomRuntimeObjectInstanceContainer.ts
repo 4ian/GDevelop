@@ -263,6 +263,14 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+      }
+
       const allInstancesList = this.getAdhocListOfAllInstances();
       const shouldRenderDebugDraw =
         this._debugDrawEnabled &&
@@ -337,6 +345,14 @@ namespace gdjs {
 
       // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
+
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate[i](this);
+      }
     }
 
     /**

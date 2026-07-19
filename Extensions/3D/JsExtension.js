@@ -52,7 +52,8 @@ module.exports = {
           new gd.BehaviorsSharedData()
         )
         .setHidden()
-        .setIncludeFile('Extensions/3D/Base3DBehavior.js');
+        .setIncludeFile('Extensions/3D/Base3DBehavior.js')
+        .addIncludeFile('Extensions/3D/Model3DBoneAttachmentManager.js');
 
       base3D
         .addExpressionAndConditionAndAction(
@@ -357,6 +358,172 @@ module.exports = {
         .addParameter('object', _('3D object'), '', false)
         .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
         .setFunctionName('getRightZ');
+
+      base3D
+        .addScopedAction(
+          'AttachToModelBone',
+          _('Attach to a 3D model bone'),
+          _(
+            'Attach the 3D object to a named bone of a 3D model. The objects must be in the same instance container and on the same 3D layer. Position and rotation follow the bone, while the attached object keeps its own size, scale, flips and visibility. Do not use this on an object whose transform is also controlled by an active physics behavior. For full-rate multiplayer following, run the same equipment events on every peer after both objects exist.'
+          ),
+          _('Attach _PARAM0_ to bone _PARAM3_ of _PARAM2_'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('objectPtr', _('Target 3D model'), 'Model3DObject', false)
+        .addParameter('model3DBoneName', _('Bone name'))
+        .setFunctionName('attachToModelBone');
+
+      base3D
+        .addScopedAction(
+          'DetachFromModelBone',
+          _('Detach from the 3D model bone'),
+          _(
+            'Detach the object from its 3D model bone while preserving its last synchronized position and rotation.'
+          ),
+          _('Detach _PARAM0_ from its 3D model bone'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('detachFromModelBone');
+
+      base3D
+        .addScopedAction(
+          'SetBoneAttachmentPositionOffset',
+          _('Set bone attachment position offset'),
+          _(
+            "Set the attachment position offset in the bone's local axes. The offset uses GDevelop distance units and is not multiplied by target scale."
+          ),
+          _(
+            'Set bone attachment position offset of _PARAM0_ to _PARAM2_; _PARAM3_; _PARAM4_'
+          ),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X offset'))
+        .addParameter('number', _('Y offset'))
+        .addParameter('number', _('Z offset'))
+        .setFunctionName('setBoneAttachmentPositionOffset');
+
+      base3D
+        .addScopedAction(
+          'SetBoneAttachmentRotationOffset',
+          _('Set bone attachment rotation offset'),
+          _(
+            "Set the attachment rotation offset in degrees using GDevelop's ZYX Euler order. The offset is composed after the bone rotation."
+          ),
+          _(
+            'Set bone attachment rotation offset of _PARAM0_ to _PARAM2_; _PARAM3_; _PARAM4_ degrees'
+          ),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .addParameter('number', _('X rotation offset'))
+        .addParameter('number', _('Y rotation offset'))
+        .addParameter('number', _('Z rotation offset'))
+        .setFunctionName('setBoneAttachmentRotationOffset');
+
+      base3D
+        .addScopedCondition(
+          'IsAttachedToModelBone',
+          _('Is attached to a 3D model bone'),
+          _(
+            'Check whether a bone attachment relationship is registered, including while it is temporarily unresolved.'
+          ),
+          _('_PARAM0_ is attached to a 3D model bone'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('isAttachedToModelBone');
+
+      base3D
+        .addScopedCondition(
+          'IsBoneAttachmentResolved',
+          _('Bone attachment is resolved'),
+          _(
+            'Check whether the attachment produced a valid transform during the most recent synchronization pass.'
+          ),
+          _('The bone attachment of _PARAM0_ is resolved'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('isBoneAttachmentResolved');
+
+      base3D
+        .addStrExpression(
+          'AttachedBoneName',
+          _('Attached bone name'),
+          _('Return the registered bone name, or an empty string.'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+        .setFunctionName('getAttachedBoneName');
+
+      const attachmentNumberExpressions = [
+        [
+          'BoneAttachmentOffsetX',
+          _('Bone attachment offset X'),
+          'getBoneAttachmentOffsetX',
+        ],
+        [
+          'BoneAttachmentOffsetY',
+          _('Bone attachment offset Y'),
+          'getBoneAttachmentOffsetY',
+        ],
+        [
+          'BoneAttachmentOffsetZ',
+          _('Bone attachment offset Z'),
+          'getBoneAttachmentOffsetZ',
+        ],
+        [
+          'BoneAttachmentRotationOffsetX',
+          _('Bone attachment rotation offset X'),
+          'getBoneAttachmentRotationOffsetX',
+        ],
+        [
+          'BoneAttachmentRotationOffsetY',
+          _('Bone attachment rotation offset Y'),
+          'getBoneAttachmentRotationOffsetY',
+        ],
+        [
+          'BoneAttachmentRotationOffsetZ',
+          _('Bone attachment rotation offset Z'),
+          'getBoneAttachmentRotationOffsetZ',
+        ],
+      ];
+      attachmentNumberExpressions.forEach(([name, fullName, functionName]) => {
+        base3D
+          .addExpression(
+            name,
+            fullName,
+            _('Return a component of the registered bone attachment offset.'),
+            _('Bone attachments'),
+            'res/conditions/3d_box.svg'
+          )
+          .addParameter('object', _('3D object'), '', false)
+          .addParameter('behavior', _('Behavior'), 'Base3DBehavior')
+          .setFunctionName(functionName);
+      });
     }
 
     {
@@ -381,6 +548,44 @@ module.exports = {
         .addIncludeFile('Extensions/3D/A_RuntimeObject3DRenderer.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject.js')
         .addIncludeFile('Extensions/3D/Model3DRuntimeObject3DRenderer.js');
+
+      object
+        .addScopedCondition(
+          'HasBone',
+          _('3D model has bone'),
+          _('Check whether the runtime model contains exactly one named bone.'),
+          _('_PARAM0_ has bone _PARAM1_'),
+          _('Bone attachments'),
+          'res/conditions/3d_box.svg',
+          'res/conditions/3d_box.svg'
+        )
+        .addParameter('object', _('3D model'), 'Model3DObject', false)
+        .addParameter('model3DBoneName', _('Bone name'))
+        .setFunctionName('hasBone');
+
+      const bonePositionExpressions = [
+        ['BoneX', _('Bone X position'), 'getBoneX'],
+        ['BoneY', _('Bone Y position'), 'getBoneY'],
+        ['BoneZ', _('Bone Z position'), 'getBoneZ'],
+        ['BoneRotationX', _('Bone rotation on X'), 'getBoneRotationX'],
+        ['BoneRotationY', _('Bone rotation on Y'), 'getBoneRotationY'],
+        ['BoneRotationZ', _('Bone rotation on Z'), 'getBoneRotationZ'],
+      ];
+      bonePositionExpressions.forEach(([name, fullName, functionName]) => {
+        object
+          .addExpression(
+            name,
+            fullName,
+            _(
+              'Return the scale-free posed bone transform in the model instance container coordinates. Missing or ambiguous bones return 0.'
+            ),
+            _('Bone attachments'),
+            'res/conditions/3d_box.svg'
+          )
+          .addParameter('object', _('3D model'), 'Model3DObject', false)
+          .addParameter('model3DBoneName', _('Bone name'))
+          .setFunctionName(functionName);
+      });
 
       // Properties expressions/conditions/actions:
 

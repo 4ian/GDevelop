@@ -1,4 +1,6 @@
 namespace gdjs {
+  const model3DBoneLogger = new gdjs.Logger('3D bone attachments');
+
   type Model3DAnimation = {
     name: string;
     source: string;
@@ -120,6 +122,18 @@ namespace gdjs {
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
     _data: Model3DObjectData;
+    private _boneExpressionPose: gdjs.Model3DBonePose = {
+      positionX: 0,
+      positionY: 0,
+      positionZ: 0,
+      quaternionX: 0,
+      quaternionY: 0,
+      quaternionZ: 0,
+      quaternionW: 1,
+    };
+    private _boneExpressionQuaternion = new THREE.Quaternion();
+    private _boneExpressionEuler = new THREE.Euler(0, 0, 0, 'ZYX');
+    private _lastBoneExpressionFailure: string | null = null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -341,8 +355,106 @@ namespace gdjs {
       );
     }
 
-    getRenderer(): RuntimeObject3DRenderer {
+    getRenderer(): gdjs.Model3DRuntimeObjectRenderer {
       return this._renderer;
+    }
+
+    /** @internal */
+    hasBone(boneName: string): boolean {
+      return this._renderer.hasBone(boneName);
+    }
+
+    /** @internal */
+    isBoneNameAmbiguous(boneName: string): boolean {
+      return this._renderer.isBoneNameAmbiguous(boneName);
+    }
+
+    /** @internal */
+    getBonePose(
+      boneName: string,
+      relativeTo: THREE.Object3D,
+      result: gdjs.Model3DBonePose
+    ): boolean {
+      return this._renderer.getBonePose(boneName, relativeTo, result);
+    }
+
+    private _getBonePoseForExpression(boneName: string): boolean {
+      const layerGroup = this.getInstanceContainer()
+        .getLayer(this.getLayer())
+        .getRenderer()
+        .getThreeGroup();
+      const isResolved =
+        !!layerGroup &&
+        this.getBonePose(boneName, layerGroup, this._boneExpressionPose);
+      if (isResolved) {
+        this._lastBoneExpressionFailure = null;
+        return true;
+      }
+
+      const failure = this.isBoneNameAmbiguous(boneName)
+        ? `ambiguous:${boneName}`
+        : `missing:${boneName}`;
+      if (failure !== this._lastBoneExpressionFailure) {
+        this._lastBoneExpressionFailure = failure;
+        model3DBoneLogger.warn(
+          this.isBoneNameAmbiguous(boneName)
+            ? `Bone name "${boneName}" is ambiguous on 3D model "${this.getName()}".`
+            : `Bone "${boneName}" was not found on 3D model "${this.getName()}".`
+        );
+      }
+      return false;
+    }
+
+    private _updateBoneExpressionRotation(boneName: string): boolean {
+      if (!this._getBonePoseForExpression(boneName)) return false;
+      const pose = this._boneExpressionPose;
+      this._boneExpressionQuaternion.set(
+        pose.quaternionX,
+        pose.quaternionY,
+        pose.quaternionZ,
+        pose.quaternionW
+      );
+      this._boneExpressionEuler.setFromQuaternion(
+        this._boneExpressionQuaternion,
+        'ZYX'
+      );
+      return true;
+    }
+
+    getBoneX(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionX
+        : 0;
+    }
+
+    getBoneY(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionY
+        : 0;
+    }
+
+    getBoneZ(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionZ
+        : 0;
+    }
+
+    getBoneRotationX(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.x)
+        : 0;
+    }
+
+    getBoneRotationY(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.y)
+        : 0;
+    }
+
+    getBoneRotationZ(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.z)
+        : 0;
     }
 
     _convertMaterialType(

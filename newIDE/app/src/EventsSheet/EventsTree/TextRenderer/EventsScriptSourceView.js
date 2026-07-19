@@ -411,6 +411,15 @@ export const buildEventsScriptSourceView = ({
     truncated = true;
   }
 
+  // Some events (like JavaScript code events) have no EventScript form and
+  // are shown as `#` comments: replacing a subtree containing one from this
+  // source would silently lose it - warn the reader.
+  if (text.includes('cannot be shown as EventScript')) {
+    notes.push(
+      'This selection contains event(s) that cannot be expressed as EventScript (shown as `#` comments). Do not use `replace_entire_event_and_sub_events` on a subtree containing them (they would be lost): use `replace_event_but_keep_existing_sub_events`, or edit around them.'
+    );
+  }
+
   return {
     text,
     selectedEventIds,

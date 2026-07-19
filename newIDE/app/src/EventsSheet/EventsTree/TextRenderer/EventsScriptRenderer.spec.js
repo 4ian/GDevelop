@@ -372,6 +372,42 @@ describe('EventsScriptSourceView', () => {
     }
   });
 
+  it('marks events without an EventScript form and warns about replacing them', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            { type: { value: 'Delete' }, parameters: ['MySpriteObject', ''] },
+          ],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              inlineCode: 'runtimeScene.setBackgroundColor(255, 0, 0);',
+            },
+          ],
+        },
+      ]);
+
+      const view = buildEventsScriptSourceView({
+        eventsList,
+        eventIds: ['event-0'],
+        maxChars: 10000,
+      });
+
+      expect(view.text).toContain(
+        '# (event of type "BuiltinCommonInstructions::JsCode" cannot be shown as EventScript)  # event-0.0'
+      );
+      expect(view.notes.join(' ')).toContain(
+        'cannot be expressed as EventScript'
+      );
+    } finally {
+      project.delete();
+    }
+  });
+
   it('degrades to a smaller depth, then drops events, to fit the budget', () => {
     const { project } = makeTestProject(gd);
     try {

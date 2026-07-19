@@ -1,890 +1,1020 @@
-# GDevelop Architecture — Low-Level Details, Principles & Conventions
+# GDevelop Architecture — Engineering Reference
 
-Status: descriptive engineering reference. This document explains *how GDevelop is
-built*: the layers, the data model, the events→code→runtime pipeline, the
-extension/metadata system, the C++↔JS bridge, the serialization format and the
-editor. It is written for contributors who need to reason about the internals,
-not for game authors.
+Status: descriptive reference for contributors. This document explains the
+architecture implemented by this checkout: the editor-time model, event
+compiler, GDJS runtime, extension system, WebAssembly bridge, project formats,
+editor, preview/export pipeline, and the branch-specific contracts layered on
+top of upstream GDevelop.
 
-It complements, and goes deeper than, the existing high-level docs:
+Last code audit: 2026-07-19 at commit `c705809fd9` on branch `new-format`.
+Paths are relative to the repository root. Symbols are named instead of tied to
+line numbers because this codebase changes quickly.
 
-- `Core/GDevelop-Architecture-Overview.md` — the canonical short overview (read first).
-- `newIDE/docs/How-are-exporters-and-platforms-working.md` — platforms & export.
-- `newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` — properties.
-- `newIDE/docs/Supported-JavaScript-features-and-coding-style.md` — coding style.
-- `docs/CustomObjectArchitecture.md` — deep dive on prefabs/events-based objects.
-- `docs/StaticData.md` — the Static Data feature.
+Read `Core/GDevelop-Architecture-Overview.md` first for the short upstream
+overview. Related focused references include:
 
-> Line numbers are accurate at time of writing and will drift. Treat file paths
-> as canonical and line numbers as hints. All paths are relative to the repo root.
+- `docs/StaticData.md` — project Static Data and placeholder replacement.
+- `docs/SignalSystem.md` — queued scene and direct-instance signals.
+- `docs/DeterministicObjectPicking.md` — rationale for stricter picking rules.
+- `newIDE/docs/How-are-exporters-and-platforms-working.md` — exporters.
+- `newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` — property schemas.
+- `newIDE/docs/Supported-JavaScript-features-and-coding-style.md` — editor/runtime JavaScript constraints.
+
+> This branch differs materially from stock GDevelop. In particular, local
+> projects default to a Git-oriented `project.settings` source tree, Static Data
+> is compiled out of exports, preview/export applies additional validation, and
+> the runtime contains a queued signal bus. Those behaviors are called out
+> explicitly below.
 
 ## Table of contents
 
-1. [The four layers and the golden rule](#1-the-four-layers-and-the-golden-rule)
-2. [Core data model (`gd::Project`)](#2-core-data-model-gdproject)
-3. [Events, instructions & expressions](#3-events-instructions--expressions)
-4. [Code generation & object picking](#4-code-generation--object-picking)
-5. [The GDJS runtime (game engine)](#5-the-gdjs-runtime-game-engine)
-6. [Extensions, metadata & platforms](#6-extensions-metadata--platforms)
-7. [GDevelop.js — the C++↔JS bridge](#7-gdevelopjs--the-cjs-bridge)
-8. [Serialization & the project file format](#8-serialization--the-project-file-format)
-9. [The editor (newIDE)](#9-the-editor-newide)
-10. [Cross-cutting conventions](#10-cross-cutting-conventions)
-11. [End-to-end: a frame, from authoring to pixels](#11-end-to-end-a-frame-from-authoring-to-pixels)
+1. [System map and dependency boundaries](#1-system-map-and-dependency-boundaries)
+2. [Core project model and scopes](#2-core-project-model-and-scopes)
+3. [Events, instructions, and expressions](#3-events-instructions-and-expressions)
+4. [Code generation and object picking](#4-code-generation-and-object-picking)
+5. [GDJS runtime](#5-gdjs-runtime)
+6. [Extensions, metadata, and platforms](#6-extensions-metadata-and-platforms)
+7. [GDevelop.js: the C++/JavaScript bridge](#7-gdevelopjs-the-cjavascript-bridge)
+8. [Serialization and project storage](#8-serialization-and-project-storage)
+9. [Editor, preview, export, and hot reload](#9-editor-preview-export-and-hot-reload)
+10. [Cross-cutting invariants](#10-cross-cutting-invariants)
+11. [Build and test seams](#11-build-and-test-seams)
+12. [End-to-end data flow](#12-end-to-end-data-flow)
 
 ---
 
-## 1. The four layers and the golden rule
+## 1. System map and dependency boundaries
 
-GDevelop is four codebases layered on top of one another. Each higher layer
-depends on the ones below; nothing below knows anything about the layers above.
+GDevelop is not one application with one object model. It is an authoring
+system that compiles a C++ editor model into JavaScript data and code consumed
+by a separate TypeScript runtime.
 
-| Layer | Directory | Language | Role |
+| Area | Primary directories | Language | Responsibility |
 | --- | --- | --- | --- |
-| **Core** | `Core/GDCore` | C++ | Describes and manipulates the *structure* of a game (`gd::Project`). Platform-agnostic model + IDE tools (refactoring, analysis, code-gen base). |
-| **Platform / Engine** | `GDJS/GDJS` (C++) + `GDJS/Runtime` (TS) | C++ + TypeScript | `GDJS/GDJS` = the editor-side platform (export, code generation, builtin extension wiring). `GDJS/Runtime` = the actual game engine that runs in the browser. |
-| **Extensions** | `Extensions/`, `Core/GDCore/Extensions/Builtin`, `GDJS/GDJS/Extensions/Builtin` | C++ + JS/TS | Objects, behaviors, actions, conditions, expressions. Builtins are the "standard library"; `Extensions/` are optional "plugins". |
-| **Bindings + Editor** | `GDevelop.js` + `newIDE` | C++→WASM + JS/React | `GDevelop.js` compiles Core/GDJS/Extensions to WebAssembly so the editor (React, Electron/web) can drive the model. |
+| Core model and IDE algorithms | `Core/GDCore` | C++ | Project tree, events AST, serialization, validation, refactoring, platform-neutral code-generation framework. |
+| GDJS platform | `GDJS/GDJS` | C++ | JavaScript-specific code generation, preview/export, and runtime function wiring. |
+| Game runtime | `GDJS/Runtime` | TypeScript | Game loop, scenes, objects, behaviors, rendering, input, audio, resources, debugger, and runtime utilities. |
+| Feature extensions | `Extensions`, `Core/GDCore/Extensions/Builtin`, `GDJS/GDJS/Extensions/Builtin` | C++, JS, TS | Object/behavior types and the actions, conditions, expressions, effects, dependencies, editor renderers, and runtime implementations they expose. |
+| C++ bindings | `GDevelop.js` | C++, WebIDL, JS | Compiles Core, the GDJS platform, and C++ extensions to `libGD.js` plus `libGD.wasm`. |
+| Editor | `newIDE` | Flow-typed JS, React, Electron | Owns authoring workflows, UI state, storage providers, preview/export orchestration, and renderers for the scene editor. |
+| Dependencies and build inputs | `ExtLibs`, `SharedLibs`, `ThirdParties` | Mixed | Vendored C++ libraries, browser/runtime libraries, and separately packaged maintenance sources. |
+| Generated outputs and tooling | `Binaries`, `scripts` | Mixed | Native/WASM build products and repository development/release scripts. |
 
-### The golden rule: IDE vs Runtime
+```mermaid
+flowchart TD
+  CORE["Core/GDCore<br/>gd::Project + events + IDE algorithms"]
+  PLATFORM["GDJS/GDJS<br/>JS code generation + exporter"]
+  EXT["Extensions<br/>metadata + runtime implementations"]
+  BIND["GDevelop.js<br/>libGD.js + libGD.wasm"]
+  IDE["newIDE<br/>React authoring application"]
+  DATA["Saved project sources"]
+  EXPORT["Generated event code + stripped projectData"]
+  RUNTIME["GDJS/Runtime<br/>exported/preview game"]
 
-The single most important distinction in the whole codebase
-(`Core/GDevelop-Architecture-Overview.md:15-39`):
+  CORE --> PLATFORM
+  CORE --> EXT
+  PLATFORM --> BIND
+  EXT --> BIND
+  BIND --> IDE
+  IDE <--> DATA
+  IDE --> PLATFORM
+  PLATFORM --> EXPORT
+  EXT --> EXPORT
+  EXPORT --> RUNTIME
+```
 
-- **IDE / editor-time** code describes the *structure* of a game. It lives in
-  `Core`, in any folder literally named `IDE`, and in `GDJS/GDJS`. It is
-  compiled to WebAssembly and runs *inside the editor*.
-- **Runtime / in-game** code is the game engine. It lives in `GDJS/Runtime`
-  (TypeScript) and runs *inside the exported game*. There is no `gd::Project`,
-  no metadata and no events at runtime — events have been *transpiled away* into
-  plain JavaScript.
+### The primary boundary: editor time versus runtime
 
-The canonical illustration is the `Variable` class, which exists twice and the
-two halves barely know about each other:
+Editor-time code describes a game. Runtime code executes a game.
 
-- `gd::Variable` (`Core/GDCore/Project/Variable.h`) — editor model: serialized,
-  undoable, shown in the UI.
-- `gdjs.Variable` (`GDJS/Runtime/variable.ts`) — runtime twin: a lightweight,
-  allocation-frugal object built from serialized JSON, optimized for per-frame
-  access.
+- `gd::Project`, metadata, events, editor properties, refactoring, and exporters
+  exist in C++ and are used through the WASM bridge by the editor.
+- `gdjs.RuntimeGame`, `gdjs.RuntimeScene`, `gdjs.RuntimeObject`, and
+  `gdjs.RuntimeBehavior` exist in the exported game.
+- Events and metadata do not survive as executable runtime objects. Code
+  generation turns them into plain JavaScript functions.
+- The two sides meet at serialized data contracts and generated function names.
 
-They communicate only through the JSON shape. This pattern — *a `gd::X` editor
-model and a `gdjs.X` runtime model bridged only by serialized data* — repeats
-for objects, behaviors, scenes, instances and the project itself. Keep it in
-mind for every subsystem below.
+The duplicated variable model is the simplest example:
 
-### Why two languages
+- `gd::Variable` in `Core/GDCore/Project/Variable.*` is authorable,
+  serializable, refactorable, and undoable.
+- `gdjs.Variable` in `GDJS/Runtime/variable.ts` is allocation-conscious runtime
+  state initialized from exported data.
 
-C++ for Core/engine-definition because it is portable and fast and was the
-original language; TypeScript/JS for the runtime and editor because the web is
-the primary target and React makes the UI tractable
-(`Core/GDevelop-Architecture-Overview.md:107-122`). `GDevelop.js` (Emscripten)
-is the bridge that lets the JS editor call the C++ model.
+The same editor/runtime pairing exists for projects/games, layouts/scenes,
+object definitions/runtime objects, behaviors, variables, and initial/runtime
+instances.
+
+### Two other boundaries to keep explicit
+
+1. **Declaration versus implementation.** Metadata declares that a feature
+   exists and how the editor presents it. A runtime function implements it.
+   `SetFunctionName`/`setFunctionName` and include files join the two.
+2. **Authoritative versus derived data.** `gd::Project` is authoritative while
+   the editor is open. Saved project sources are authoritative on disk.
+   generated `.gdevelop` catalogs, `data.js`, event code, and runtime bundles
+   are projections and should be regenerated rather than hand-edited.
 
 ---
 
-## 2. Core data model (`gd::Project`)
+## 2. Core project model and scopes
 
-Everything an author creates is a tree rooted at `gd::Project`
-(`Core/GDCore/Project/Project.h`). The model classes are plain C++ value types
-in `Core/GDCore/Project/`. The recurring shape is **"a container owns a list of
-named, serializable things"**.
+The authoring model is a tree rooted at `gd::Project` in
+`Core/GDCore/Project/Project.*`. Most model classes are ordinary C++ value types
+or containers with `SerializeTo`/`UnserializeFrom` methods.
 
-### The project tree
+### Project ownership tree
 
-```
-gd::Project                                   Project.h
-├── properties (name, version, window, FPS, projectUuid, platforms, loadingScreen…)
-├── resourcesContainer        gd::ResourcesContainer   (images, audio, fonts, json…)
-├── objectsContainer          gd::ObjectsContainer     (GLOBAL objects)
-├── variables                 gd::VariablesContainer   (GLOBAL variables, SourceType::Global)
-├── layouts[]                 gd::Layout               (scenes)
-│   ├── objectsContainer      gd::ObjectsContainer     (scene objects)
-│   ├── variables             gd::VariablesContainer   (SourceType::Scene)
-│   ├── initialInstances      gd::InitialInstancesContainer
-│   ├── layers                gd::LayersContainer
-│   ├── events                gd::EventsList
-│   └── behaviorsSharedData   (per behavior, per scene)
-├── externalLayouts[]         gd::ExternalLayout
-├── externalEvents[]          gd::ExternalEvents
-└── eventsFunctionsExtensions[] gd::EventsFunctionsExtension  (events-based extensions)
-    ├── eventsFunctions        (free functions)
-    ├── eventsBasedBehaviors   gd::EventsBasedBehavior[]
-    ├── eventsBasedObjects     gd::EventsBasedObject[]   (prefabs)
-    ├── globalVariables        (SourceType::ExtensionGlobal)
-    └── sceneVariables         (SourceType::ExtensionScene)
-```
-
-`gd::Project` exposes the children through ordinary accessors:
-`GetLayout(name)` (`Project.h:592`), `GetResourcesManager()` (`Project.h:1019`),
-`GetVariables()` (`Project.h:1063`), `GetEventsFunctionsExtension(name)`
-(`Project.h:887`), `SetFirstLayout()`/`GetFirstLayout()` (`Project.h:855-860`).
-
-### Objects, configurations and behaviors
-
-A `gd::Object` (`Core/GDCore/Project/Object.h`) is a *name* + a *configuration*
-+ containers for variables/behaviors/effects:
-
-- `objectVariables` — `gd::VariablesContainer` (`Object.h:280-281`), `SourceType::Object`.
-- `behaviors` — `gd::BehaviorsContainer`.
-- `effectsContainer` — `gd::EffectsContainer`.
-- `configuration` — a `gd::ObjectConfiguration` (the type-specific data; e.g. a
-  Sprite's animations). For custom objects this is a `gd::CustomObjectConfiguration`.
-
-The object/configuration split is what lets the same `gd::Object` machinery host
-sprites, text, and prefabs without the model knowing the specifics — the
-configuration is polymorphic and created by the platform's factory (see §6).
-
-### Variables and scopes
-
-`gd::VariablesContainer` (`Core/GDCore/Project/VariablesContainer.h`) is a list
-of `gd::Variable` plus a `SourceType` recording *what kind of scope it is*
-(`VariablesContainer.h:31-41`):
-
-```cpp
-enum SourceType {
-    Unknown, Global, Scene, Object, Local,
-    ExtensionGlobal, ExtensionScene, Parameters, Properties,
-};
+```text
+gd::Project
+├── properties
+│   ├── name, version, package, authors, categories
+│   ├── resolution, FPS, scaling, orientation, loading screen
+│   ├── projectUuid, platform selection, extension properties
+│   └── folder-project and editor/export settings
+├── resourcesContainer                       global resource definitions
+├── objectsContainer                         global objects and object groups
+├── variables                                global variables
+├── staticDataJson                           authoring-time structured constants
+├── layouts[] : gd::Layout                   scenes
+│   ├── objectsContainer                     scene objects and groups
+│   ├── variables                            scene variables
+│   ├── initialInstances                     placed instances
+│   ├── layers, editor settings, effects
+│   ├── events : gd::EventsList
+│   └── behaviorsSharedData
+├── externalLayouts[]
+├── externalEvents[]
+└── eventsFunctionsExtensions[]
+    ├── eventsFunctions                      free functions
+    ├── eventsBasedBehaviors                 custom behaviors
+    ├── eventsBasedObjects                   custom objects/prefabs + variants
+    ├── globalVariables / sceneVariables     extension-owned scopes
+    └── folder and property metadata
 ```
 
-`gd::Variable` (`Core/GDCore/Project/Variable.h`) is recursive: a variable is a
-number/string/boolean, or a **structure** (named children), or an **array**
-(ordered children). `Parameters` and `Properties` are *synthetic* scopes:
-function parameters and properties are converted into variable containers so
-events can reference them by name (see §4 and `docs/CustomObjectArchitecture.md`).
+Containers carry ownership and often a `SourceType`. `gd::ObjectsContainer`,
+`gd::VariablesContainer`, `gd::ResourcesContainer`, and the various
+`*Container`/`*List` helpers are central architectural primitives, not merely
+convenience wrappers.
 
-Which containers are visible where is assembled by `gd::ProjectScopedContainers`
-(`Core/GDCore/Project/ProjectScopedContainers.cpp`). For a scene it pushes
-project + scene variables; for a prefab it deliberately pushes the *extension's*
-variables instead of the project's, which is what makes prefabs reusable across
-projects (detailed in `docs/CustomObjectArchitecture.md`).
+### Objects, configurations, and instances
 
-### Properties
+`gd::Object` is a named definition with:
 
-`gd::PropertyDescriptor` (`Core/GDCore/Project/PropertyDescriptor.h`) is the
-typed, editor-facing field abstraction used by objects, behaviors and instances.
-Unlike variables, properties carry UI metadata (`label`, `type`,
-`measurementUnit`, `choices`, `hidden`, `quickCustomizationVisibility`) and, for
-events-based entities, auto-generate public actions/conditions/expressions. See
-`newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` for the
-declaration API and `docs/CustomObjectArchitecture.md` for properties-vs-variables.
+- a polymorphic `gd::ObjectConfiguration` for type-specific data;
+- a `gd::BehaviorsContainer`;
+- object variables;
+- effects;
+- identity and editor metadata.
 
-### Naming & identity conventions
+Sprite animations, text settings, 3D model data, and custom-object
+configuration therefore live behind the same object-definition API. Platform
+metadata/factories create the correct configuration subtype during load.
 
-- **Names** are validated by `Project::IsNameSafe` (`Project.cpp:1372+`):
-  non-empty, not starting with a digit, identifier characters only. Names are
-  the primary key for objects/layouts/variables and the join key in events.
-- **`persistentUuid`** — a random UUIDv4 (`Core/GDCore/Tools/UUID/UUID.h:19`)
-  carried by `gd::Object`, `gd::Variable`, `gd::VariablesContainer` and
-  `gd::InitialInstance`. It identifies "the same entity" across re-serializations
-  for diffing, refactoring changesets and network sync. Generated lazily and
-  written only when non-empty (`Object.cpp:133-160`, `Variable.cpp:334-335`),
-  except `InitialInstance` which always writes it (`InitialInstance.cpp:152-153`).
-- **`projectUuid`** — project/game identity, lives in `properties`, auto-generated
-  on load if absent (`Project.cpp:924-926`), surfaced as the `gameId`.
+An object definition is not an instance. A `gd::InitialInstance` references an
+object definition by name and adds placement, layer, z-order, per-instance
+properties, and a persistent UUID. At runtime it becomes a concrete
+`gdjs.RuntimeObject` owned by a `RuntimeInstanceContainer`.
+
+Custom objects use `gd::CustomObjectConfiguration` on the editor side and a
+`gdjs.CustomRuntimeObject` with a nested
+`CustomRuntimeObjectInstanceContainer` at runtime. The outer prefab is one
+runtime object; its children live in an internal instance container.
+
+### Variables, parameters, properties, and resources are scoped
+
+`gd::VariablesContainer::SourceType` distinguishes global, scene, object,
+local, extension-global, extension-scene, parameter, and property scopes.
+`gd::Variable` is recursive: primitive, structure, or array.
+
+Function parameters and events-based properties are projected into synthetic
+variable/resource/object containers. This allows the same expression parser,
+validator, autocompleter, and code generator to resolve an identifier without
+hard-coding every authoring context.
+
+`gd::ProjectScopedContainers` is the scope authority. Its factory methods build
+the visible lists for:
+
+- a project or scene;
+- free extension functions;
+- behavior functions;
+- object/prefab functions;
+- a custom-object definition;
+- nested event-local variables.
+
+It aggregates `ObjectsContainersList`, `VariablesContainersList`,
+`PropertiesContainersList`, `ResourcesContainersList`, and parameter metadata.
+For reusable events-based extensions it exposes extension-owned variables
+rather than silently binding the function to a host project's globals.
+
+### Properties are editor schemas, not general variables
+
+`gd::PropertyDescriptor` and `gd::NamedPropertyDescriptor` carry values plus UI
+and validation metadata such as label, description, type, unit, choices,
+visibility, and quick-customization behavior. Object, behavior, shared,
+instance, and events-based entity properties all use this abstraction.
+
+Properties can generate actions, conditions, and expressions for events-based
+entities. Their serialized keys are also used by this branch's multi-file
+property catalogs to decide which attached behavior fields are authorable and
+which hidden/internal fields must be excluded from source files.
+
+### Names and identities
+
+- Names are the authored join keys used by events, object groups, layout links,
+  resources, behaviors, and function parameters. Project-wide renames must go
+  through refactoring tools.
+- `persistentUuid` identifies the same model element or initial instance across
+  serialization, hot reload, source decomposition, and editor reconciliation.
+  Some model types create it lazily; initial instances require stable UUIDs.
+- `projectUuid` identifies the game/project and is surfaced as the storage
+  `gameId`. Old projects missing it receive one while loading.
+- Runtime objects have a numeric runtime unique ID. It is scene-lifetime state,
+  distinct from an authoring `persistentUuid`, and is used by direct signals
+  and debugger APIs.
 
 ---
 
-## 3. Events, instructions & expressions
+## 3. Events, instructions, and expressions
 
-Events are GDevelop's visual programming language. The model lives in
-`Core/GDCore/Events/`. There are **no events at runtime** — they are transpiled
-to JavaScript by code generation (§4).
+Events are the source language compiled by GDevelop. Their model lives in
+`Core/GDCore/Events`.
 
-### The event model
+### Event and instruction model
 
-- **`gd::BaseEvent`** (`Core/GDCore/Events/Event.h`) — abstract base for all
-  event types. An event is "mostly empty"; think of it as a scope/block. It
-  carries a string `type` (e.g. `"BuiltinCommonInstructions::Standard"`),
-  `disabled`/`folded` flags (`Event.h:336-341`), optional sub-events
-  (`CanHaveSubEvents`/`GetSubEvents`, `Event.h:76-86`), and optional event-local
-  variables (`CanHaveVariables`/`GetVariables`, `Event.h:98-112`,
-  `SourceType::Local`).
-- Concrete events live in `Core/GDCore/Events/Builtin/`: `StandardEvent`,
-  `WhileEvent`, `RepeatEvent`, `ForEachEvent`, `LinkEvent`, `CommentEvent`,
-  `GroupEvent`, etc.
-- **`gd::EventsList`** (`Core/GDCore/Events/EventsList.h`) — an ordered
-  `std::vector<std::shared_ptr<BaseEvent>>` (`EventsList.h:210`). A scene's logic
-  is one of these; events nest via sub-events.
+`gd::BaseEvent` is the abstract block/scope. Concrete event types under
+`Core/GDCore/Events/Builtin` include standard, while, repeat, for-each, link,
+group, comment, and variable-child iteration events. Depending on type, an
+event can own subevents, local variables, conditions, and actions.
 
-### Instructions: conditions and actions are the same class
+`gd::EventsList` is an ordered list of shared event pointers. Layouts, external
+events, and events-based functions all ultimately contain event lists.
 
-- **`gd::Instruction`** (`Core/GDCore/Events/Instruction.h`) — *"a member of an
-  event: it can be a condition or an action"* (`Instruction.h:18-19`). It holds a
-  `type` (the action/condition id, e.g. `"PositionX"`), an `inverted` flag (only
-  meaningful for conditions, `Instruction.h:186`), `disabled`/`awaitAsync` flags,
-  a `std::vector<gd::Expression> parameters`, and a `subInstructions` list (for
-  Or/And/Not). Think of it as a function call: a name + arguments.
-- **Conditions vs actions is purely contextual.** They are the *same* C++ class
-  stored in different lists on the event (the conditions list vs the actions
-  list) and resolved against a different metadata table (`GetConditionMetadata`
-  vs `GetActionMetadata`). A condition is a function returning true/false that
-  *also filters the picked objects* (see §4). `IsInverted()` applies only to
-  conditions.
-- **`gd::InstructionsList`** (`Core/GDCore/Events/InstructionsList.h`) — a
-  shared-pointer list of instructions.
+Conditions and actions use the same `gd::Instruction` class. An instruction is
+essentially:
 
-### Expressions
+```text
+type string
++ ordered gd::Expression parameters
++ flags (inverted, disabled, awaited)
++ optional subinstructions (And/Or/Not structures)
+```
 
-Every instruction parameter is a **`gd::Expression`**
-(`Core/GDCore/Events/Expression.h`): a wrapper around a `plainString` plus a
-lazily-parsed, cached AST (`node`). Parsing happens on first access via
-`GetRootNode()` (`Expression.cpp:33-39`), which runs the recursive-descent
-parser **`gd::ExpressionParser2`**
-(`Core/GDCore/Events/Parsers/ExpressionParser2.h`).
+The containing list and metadata lookup determine whether it is a condition or
+an action. Its `type` string is resolved against condition/action metadata
+registered by extensions.
 
-The AST node types are in
-`Core/GDCore/Events/Parsers/ExpressionParser2Node.h` and use the visitor pattern
-(`Visit(ExpressionParser2NodeWorker&)`):
+### Expressions are parsed source, not opaque strings
 
-- literals: `NumberNode`, `TextNode`
-- operators: `OperatorNode` (binary), `UnaryOperatorNode`, `SubExpressionNode`
-- identifiers/variables: `IdentifierNode`, `VariableNode`,
-  `VariableAccessorNode`, `VariableBracketAccessorNode`
-- calls: `ObjectFunctionNameNode`, `FunctionCallNode` (carries `objectName`,
-  `behaviorName`, `functionName`, parameters)
-- `EmptyNode` — a placeholder for syntax errors, with attached diagnostics.
+`gd::Expression` retains the original text and lazily caches an AST created by
+`gd::ExpressionParser2`. Nodes in `ExpressionParser2Node.h` cover literals,
+operators, identifiers, variable accessors, function calls, object and behavior
+calls, subexpressions, and error placeholders.
 
-Each node stores rich source-position info, which is what powers in-editor error
-underlining and autocompletion. The same AST is consumed by the validator, the
-autocompletion engine and the code generator (`ExpressionCodeGenerator`, §4).
+AST visitors are reused by:
+
+- syntax/semantic validation;
+- syntax coloring and diagnostics;
+- autocompletion and identifier discovery;
+- refactoring;
+- `gd::ExpressionCodeGenerator`.
+
+Source positions remain attached to nodes so editor diagnostics can identify a
+precise parameter region instead of treating the whole instruction as invalid.
+
+### Validation and refactoring are model operations
+
+Core validators use `ProjectScopedContainers` plus extension metadata to check
+instruction existence, parameter types, expressions, object/behavior
+compatibility, and resource references. The editor adds a serialized event
+scanner in `newIDE/app/src/Utils/EventsValidationScanner.js` for branch-specific
+launch gates.
+
+Renaming or deleting a referenced entity is not a string replacement in React.
+`gd::WholeProjectRefactorer`, `ObjectRefactorer`, expression visitors, and
+events workers update references across scenes, external events, extensions,
+object groups, and properties.
 
 ---
 
-## 4. Code generation & object picking
+## 4. Code generation and object picking
 
-Events are compiled to JavaScript. The compiler has two layers:
+The compiler has a platform-neutral traversal in
+`Core/GDCore/Events/CodeGeneration` and a JavaScript specialization in
+`GDJS/GDJS/Events/CodeGeneration`.
 
-- **Platform-agnostic base** — `gd::EventsCodeGenerator`
-  (`Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.cpp`). Drives the
-  *walk* over events → conditions/actions → parameters → expressions, and the
-  control-flow scaffolding. It is generic and emits via virtual methods.
-- **JS specialization** — `gdjs::EventsCodeGenerator`
-  (`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`) overrides those
-  virtuals to emit actual JavaScript.
+### Compiler inputs and outputs
 
-### From an instruction to a function call
+The compiler consumes:
 
-The link between an `gd::Instruction` and the JS it produces is **metadata**.
-`gd::MetadataProvider::GetConditionMetadata` / `GetActionMetadata`
-(`Core/GDCore/Extensions/Metadata/MetadataProvider.cpp`) look up the
-`gd::InstructionMetadata` for the instruction's `type` string. That metadata
-holds, in its nested `codeExtraInformation`
-(`Core/GDCore/Extensions/Metadata/InstructionMetadata.h:438-459`):
+- an events list;
+- `ProjectScopedContainers`;
+- extension metadata;
+- an `EventsCodeGenerationContext` tracking scope, picked lists, local
+  variables, async state, includes, and diagnostics.
 
-- `functionCallName` — the JS function emitted (e.g.
-  `gdjs.evtTools.camera.getCameraX`), set by `SetFunctionName(...)`.
-- `asyncFunctionCallName` — used when the action is awaited.
-- operator/getter/mutator info for "set/change value" instructions.
-- `customCodeGenerator` — an escape hatch: a full `std::function` that emits the
-  code itself, bypassing the standard path
-  (`EventsCodeGenerator.cpp:324-327`, `:617-619`).
-- `includeFiles` — runtime `.js` files this instruction needs, merged into the
-  build's include set.
+It emits JavaScript plus a set of required runtime include files. Scene events
+become a namespace with a `.func(runtimeScene)` entry. Events-based free
+functions, behaviors, and objects become generated functions/classes whose
+object, behavior, property, resource, and variable parameters are mapped
+through an `eventsFunctionContext`.
 
-So a registered instruction `PositionX` with `SetFunctionName("setX")` becomes,
-for each picked instance, `objectList[i].setX(args)`.
+### Metadata connects an instruction to code
 
-### Object picking — the defining concept
+`gd::MetadataProvider` resolves an instruction's type to
+`gd::InstructionMetadata`. Its code information can supply:
 
-This is what makes GDevelop's events different from ordinary scripting. **An
-object name in an event refers to a *dynamic list of currently-picked
-instances*, not a single object.** Conditions *filter* that list; actions *apply
-to every instance still in it*.
+- a synchronous and/or asynchronous function name;
+- include files;
+- getter/mutator/operator behavior;
+- custom code-generation callbacks;
+- static-versus-instance call information.
 
-The generated code maintains, per object name and per scope depth, a JS array of
-picked instances. The bookkeeping is tracked by
-**`gd::EventsCodeGenerationContext`**
-(`Core/GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h`):
+The ordinary path converts parameter types to JavaScript arguments, then emits
+a free function call, object method call, or behavior method call. Custom code
+generators are escape hatches and must maintain picking, async, diagnostics,
+and include-file invariants themselves.
 
-- `ObjectsListNeeded(name)` (`EventsCodeGenerationContext.cpp:71-82`) — records
-  that the current scope needs object `name`'s list and stamps the depth.
-- Each event gets its **own child context** via `InheritsFrom(parent)`
-  (`.cpp:18-47`): *"Objects picked in an event are totally different from those
-  picked in another"* (`EventsCodeGenerator.cpp:1122-1123`).
-- Loop events call `ForbidReuse()` so each iteration re-picks cleanly.
+### Object picking is scoped list state
 
-Object list names are depth-suffixed globals — `GetObjectListName`
-(`GDJS .../EventsCodeGenerator.cpp:1098-1102`) yields e.g.
-`gdjs.sceneCode.GDPlayerObjects2` for `Player` at depth 2. All such arrays are
-pre-declared and reset to `length = 0` once per frame
-(`GenerateAllObjectsDeclarationsAndResets`).
+An object name in an event denotes a list of currently picked runtime
+instances. Object groups expand to one list per concrete object name.
 
-**Filling a list** (`GenerateObjectsDeclarationCode`): from the scene
-(`gdjs.copyArray(runtimeScene.getObjects("Player"), list)`) or by copying the
-parent scope's list down to this depth (with a reuse optimization when the depth
-is the same).
+The normal sequence is:
 
-**Filtering in a condition** (`GenerateObjectCondition`,
-`GDJS .../EventsCodeGenerator.cpp:852-895`) — the canonical in-place compaction:
+1. `ObjectsListNeeded` records the list at the current scope depth.
+2. A root list is filled from `runtimeScene.getObjects(name)` (or from an
+   events-function context). A child scope copies or safely reuses its parent's
+   list.
+3. Object/behavior conditions compact the list in place and truncate it to the
+   matching instances.
+4. Subevents inherit the filtered selection. Independent sibling events have
+   separate contexts. Loop events forbid unsafe list reuse.
+5. Object and behavior actions iterate the picked list.
+
+The characteristic condition loop is an allocation-free compaction:
 
 ```js
-for (var i = 0, k = 0, l = list.length; i < l; ++i) {
-    if ( list[i].functionCallName(args) ) {   // instance passes?
-        isConditionTrue = true;
-        list[k] = list[i];                    // keep it
-        ++k;
-    }
+for (var i = 0, k = 0, l = objects.length; i < l; ++i) {
+  if (objects[i].condition(args)) {
+    objects[k++] = objects[i];
+  }
 }
-list.length = k;                              // shrink to only picked instances
+objects.length = k;
 ```
 
-**Iterating in an action** (`GenerateObjectAction`) — no filtering, just apply:
+An object action still uses list semantics:
 
 ```js
-for (var i = 0, len = list.length; i < len; ++i) {
-    list[i].functionCallName(args);
+for (var i = 0, len = objects.length; i < len; ++i) {
+  objects[i].action(args);
 }
 ```
 
-Expressions participate identically: referencing `Player.X()` marks `Player`'s
-list as needed at the current depth, exactly like a condition does
-(`gd::ExpressionCodeGenerator`, which is itself an AST visitor accumulating a
-string — `Core/GDCore/Events/CodeGeneration/ExpressionCodeGenerator.cpp`).
+### Deterministic single-instance consumption in this branch
 
-### Parameters → arguments
+This branch adds stricter behavior, but its exact scope matters:
 
-`GenerateParameterCodes` (`EventsCodeGenerator.cpp:883`) is the central switch
-turning each parameter's *type string* into generated argument text:
-expression/number/string/variable → run through the expression generator;
-`object` → an object-list reference; `relationalOperator`/`operator` → quoted
-strings; `yesorno`/`trueorfalse` → `true`/`false`; `inlineCode` → pasted
-verbatim. The full type system is in §6.
+- Scalar object/behavior expressions, object-variable access, and object
+  pointers use the first picked instance only after generated helpers in
+  `GDJS/Runtime/gd.ts` assert that the relevant concrete lists contain at most
+  one instance in total.
+- The editor scanner detects object parameters that require one deterministic
+  target but can receive multiple initial/dynamically created candidates.
+  Preview/export is blocked until a picking condition or `For each` structure
+  makes the target unambiguous.
+- Conditions may consume multi-instance candidate lists because filtering them
+  is their job.
+- Normal object/behavior actions still intentionally iterate all picked
+  instances. They are not globally converted into single-target operations.
 
-### Output shape & the GC-avoidance split
+This is narrower than saying “every object-consuming action requires one
+instance.” `docs/DeterministicObjectPicking.md` captures the design rationale,
+while `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`,
+`GDJS/Runtime/gd.ts`, and
+`newIDE/app/src/Utils/EventsValidationScanner.js` are the implementation
+authority for the current checkout.
 
-- A **scene** compiles to a JS module assigned to `gdjs.<mangledName>Code` with a
-  `.func = function(runtimeScene) {…}` entry (`GenerateLayoutCode`). The runtime
-  fetches it via `setEventsGeneratedCodeFunction` and calls it every frame.
-- To avoid one giant function (which stresses the JS engine's GC and caused lag
-  on low-end Android), GDJS wraps **each events list in its own named
-  sub-function** and the per-list state (object lists, condition booleans) lives
-  in **module-global statics**, not locals
-  (`GDJS .../EventsCodeGenerator.cpp:1193-1224`). This is a deliberate
-  performance design, not an accident.
-- **Functions/extensions** (events-based functions, behaviors, objects) compile
-  with an `eventsFunctionContext` local that maps the function's
-  object/behavior/parameter names to the *caller's* actual lists. The same
-  picking machinery then works unchanged inside functions. `HasProjectAndLayout()`
-  is the switch throughout code-gen choosing between scene-mode
-  (`runtimeScene.*`) and function-mode (`eventsFunctionContext.*`).
+The editor also blocks preview/export for enabled actions in a standard event
+with no enabled condition, invalid Static Data placeholders, and unsafe
+conditionless external-layout creation. These are authoring policy gates in
+`newIDE/app/src/MainFrame` and the event scanner; they are not fundamental
+upstream event AST rules.
 
----
+### Parameters and expressions
 
-## 5. The GDJS runtime (game engine)
+`GenerateParametersCodes` maps metadata types to generated values:
 
-The engine is TypeScript in `GDJS/Runtime/`. It consumes the exported
-`gdjs.projectData` and the generated events code, and runs the game loop. The
-class hierarchy mirrors the editor model but is optimized for per-frame speed.
+- numeric/string expressions are parsed and generated from their AST;
+- object/object-list parameters become maps of picked arrays;
+- object pointers become one object or a bad-object fallback;
+- variable/property/resource parameters resolve through scoped containers;
+- operators and booleans become literals;
+- code-only parameters inject runtime scene/context values;
+- inline code is emitted verbatim only for the dedicated metadata type.
 
-### Boot & the game loop
+Text literals and supported instruction parameter strings can contain Static
+Data placeholders. Replacement is enabled only when generation has a project
+context; reusable metadata-only passes leave the source intact.
 
-- **`gdjs.RuntimeGame`** (`runtimegame.ts:191`) owns the global state: global
-  `_variables`, the `ProjectData`, the renderer, the `_sceneStack`, the
-  `_inputManager`, resource loaders.
-- `startGameLoop()` (`runtimegame.ts:1255`) picks the first scene
-  (`_data.firstLayout` unless overridden), loads it via the scene stack, and
-  installs a frame callback through the renderer.
-- The actual `requestAnimationFrame` loop lives in the renderer
-  (`pixi-renderers/runtimegame-pixi-renderer.ts:1020`): it schedules the next
-  frame *first*, computes `dt`, and calls the callback; if the callback returns
-  false it cancels the loop.
-- The per-frame callback (`runtimegame.ts:1324`) applies FPS capping with a
-  7-frame margin, then (when not paused) calls `_sceneStack.step(elapsedTime)`.
+### Async actions
 
-### Scenes & instance containers
+An awaited action selects `asyncFunctionCallName` when available. Generated
+code uses `gdjs.TaskGroup` and `RuntimeScene`'s `AsyncTasksManager` to resume
+subevents/callbacks later. Picked lists required after the async boundary are
+copied into long-lived storage because the module-level scratch arrays are
+reset and reused every frame.
 
-- **`gdjs.RuntimeScene`** (`runtimescene.ts:14`) extends
-  **`gdjs.RuntimeInstanceContainer`** (`RuntimeInstanceContainer.ts:26`). The base
-  holds instance storage and the generic stepping; the scene adds time,
-  variables, events code and rendering.
-- The per-frame step, `renderAndStep(elapsedTime)` (`runtimescene.ts:388`), in
-  order:
-  1. `_timeManager.update()` (clamps elapsed time to avoid tunneling)
-  2. `_asyncTasksManager.processTasks()` (resolves "wait" actions)
-  3. `_updateObjectsPreEvents()` — forces, object `update()`, timers, **behavior
-     pre-events**
-  4. pre-events callbacks
-  5. **`this._eventsFunction(this)`** — the generated game logic
-  6. `_stepBehaviorsPostEvents()` — **behavior post-events**
-  7. post-events callbacks
-  8. `render()`
-  9. returns whether a scene change was requested.
+### Generated code shape is performance-sensitive
 
-This ordering is the contract behind GDevelop's lifecycle hooks:
-`doStepPreEvents` runs before the events sheet, `doStepPostEvents` after it.
-
-### Objects & behaviors
-
-- **`gdjs.RuntimeObject`** (`runtimeobject.ts:163`) — base for all runtime
-  objects. Core fields: `x`, `y`, `angle`, `zOrder`, `_nameId` (interned name id
-  for fast comparison, `:2950`), `_variables`, hitboxes + `aabb` (lazy, guarded by
-  `hitBoxesDirty`), forces, and **two** behavior collections: `_behaviors` (only
-  behaviors with lifecycle functions, iterated each frame) and `_behaviorsTable`
-  (all behaviors, keyed by name, for lookup).
-- Lifecycle: `onCreated()` (`:301`), `onPlacedInScene()` (`:321`),
-  `update()` (`:454`), `deleteFromScene()` (`:668`, defers actual removal),
-  `onDeletedFromScene()` (`:691`), `onDestroyed()` (`:712`). Subclasses override
-  the `on*` hooks, never `deleteFromScene` itself.
-- **`gdjs.RuntimeBehavior`** (`runtimebehavior.ts:39`) — `stepPreEvents`/
-  `stepPostEvents` wrappers gate on `_activated` and call the overridable
-  `doStepPreEvents`/`doStepPostEvents`. `usesLifecycleFunction()` (`:268`)
-  returns false for "capability" behaviors so they cost zero per-frame iteration.
-
-### Capabilities
-
-Cross-object features (opacity, scale, size, flip, animation, effects, text) are
-implemented as **hidden default behaviors** in
-`GDJS/Runtime/object-capabilities/` (e.g. `OpacityBehavior.ts`). Each implements
-an interface (`OpacityHandler` in `gd.ts`) and forwards to the owner object, and
-returns `usesLifecycleFunction(): false`. This lets events call a capability
-generically via `getBehavior(name)` regardless of the concrete object type,
-while native objects satisfy the interface directly — with no per-frame cost.
-
-### Instance management & the deferred-deletion rule
-
-`RuntimeInstanceContainer` stores instances in `_instances`
-(`Hashtable<RuntimeObject[]>`, keyed by object name), with a cached flat list
-`_allInstancesList` and a recycle pool `_instancesCache`
-(`RuntimeInstanceContainer.ts:30-43`).
-
-- **Create** (`createObject`, `:682`): pop from the pool and `reinitialize()`, or
-  `new` if empty — recycling avoids allocation.
-- **Delete is deferred** (`markObjectForDeletion`, `:725`): the instance is
-  removed from `_instances` and queued in `_instancesRemoved`, then truly
-  destroyed/recycled at safe drain points (`_cacheOrClearRemovedInstances`,
-  `:532`). Reason: events in the same frame may still reference a just-deleted
-  object. **This is a core invariant — never free an instance mid-frame.**
-
-### Scene stack
-
-**`gdjs.SceneStack`** (`scenestack.ts:25`) implements push/pop/replace/clear.
-`step()` (`:54`) calls the top scene's `renderAndStep` and, if it requested a
-change, dispatches it. `loadFromScene` (`runtimescene.ts:134`) is the scene boot:
-add layers, build variables, cache behavior shared data, register global objects
-then scene objects, create initial instances, wire the generated events function,
-fire loaded callbacks.
-
-### Runtime variables
-
-`gdjs.Variable` (`variable.ts:19`) and `gdjs.VariablesContainer`
-(`variablescontainer.ts:12`) are the runtime twins of the editor model. They are
-built for speed: separate typed storage slots (no re-parsing), index-based lookup
-via `_variablesArray`/`getFromIndex` (`:181`, used by generated code), tombstoning
-(`_undefinedInContainer`) instead of deletion to avoid GC, and `badVariable`/
-`badVariablesContainer` no-op singletons (`:320`, `:372`) so generated code never
-needs null checks.
-
-### Performance conventions (visible throughout the runtime)
-
-These are not optional style — the runtime is hand-tuned for 60fps on weak
-hardware (`newIDE/docs/Supported-JavaScript-features-and-coding-style.md`):
-
-- **Pool and recycle** objects, forces (`forcesGarbage`), and variable objects.
-- **Defer deletion**; drain at safe points.
-- **Cache and lazily rebuild** flat lists and geometry (`hitBoxesDirty`,
-  `_allInstancesListIsUpToDate`); `setX`/`setY` early-return on no-op.
-- **Split hot collections** (`_behaviors` vs `_behaviorsTable`).
-- **Allocate once, reuse**; avoid object/array literals in hot paths; declare all
-  fields at construction (hidden-class friendliness).
-- **Intern names** to integer ids for comparison.
-- **Render culling** by camera AABB after the first frame.
+Scene code is split into named subfunctions rather than one enormous closure.
+Picked arrays, condition flags, and other scratch state are declared on the
+generated namespace and reset for reuse. Function-mode generation keeps the
+same algorithms but maps names through `eventsFunctionContext` instead of
+directly querying the scene.
 
 ---
 
-## 6. Extensions, metadata & platforms
+## 5. GDJS runtime
 
-Almost everything an author uses — every object type, behavior, action,
-condition and expression — is *declared* by an extension. The engine core knows
-almost nothing; features are added as extensions
-(`Core/GDevelop-Architecture-Overview.md:76-84`).
+`GDJS/Runtime` is the game engine shipped to previews and exports. It consumes
+`gdjs.projectData`, `gdjs.runtimeGameOptions`, generated event functions, and
+extension/runtime include files.
 
-### Platform & extension
+### Boot and scene lifecycle
 
-- **`gd::Platform`** (`Core/GDCore/Extensions/Platform.h`) is the registry of
-  loaded extensions plus a factory table mapping object type → creation function.
-  There is one concrete platform, **`gdjs::JsPlatform`** (singleton,
-  `GDJS/GDJS/Extensions/JsPlatform.cpp`), whose constructor loads all builtin
-  extensions.
-- **`gd::PlatformExtension`** (`Core/GDCore/Extensions/PlatformExtension.h`) is
-  the **fluent builder**. Declaration uses chained calls that each return a
-  metadata reference:
+`gdjs.RuntimeGame` owns project data, global/extension variables, resource
+loaders, input, renderer, scene stack, debugger clients, and game-loop policy.
+`startGameLoop` chooses the initial scene, loads it through `SceneStack`, and
+registers a frame callback with the Pixi renderer. The renderer schedules the
+next `requestAnimationFrame`, calculates elapsed time, and invokes the runtime
+callback; `RuntimeGame` handles FPS capping, pause/resume, crashes, and scene
+stack stepping.
 
-```cpp
-extension
-    .AddAction("ShowLayer", _("Show a layer"), /*…*/)
-    .AddParameter("layer", _("Layer"))
-    .AddParameter("object", _("Object"))
-    .SetFunctionName("gdjs.evtTools.camera.showLayer");
-```
+`gdjs.RuntimeScene` extends `gdjs.RuntimeInstanceContainer`. Its
+`renderAndStep` order is a contract:
 
-`AddAction`/`AddCondition` return `gd::InstructionMetadata&`; `AddExpression`
-returns `gd::ExpressionMetadata&`; `AddObject`/`AddBehavior` return
-`ObjectMetadata&`/`BehaviorMetadata&`. The extension name is a namespace
-(`Name::`), so the full action type is `Name::ShowLayer`.
+1. update time and process async tasks;
+2. update objects, forces, timers, and behavior pre-events;
+3. run registered pre-events callbacks (the signal bus dispatches here);
+4. run generated scene events;
+5. run behavior post-events;
+6. run registered post-events callbacks;
+7. render and emit debugger diagnostics;
+8. let `SceneStack` apply a requested push, pop, replace, clear, or stop.
 
-### The metadata classes
+`RuntimeScene.loadFromScene` builds layers and variables, registers global then
+scene object definitions, restores behavior shared data, creates initial
+instances, assigns generated scene code, and fires scene-loaded callbacks.
 
-All in `Core/GDCore/Extensions/Metadata/`:
+### Instance containers, objects, and behaviors
 
-| Class | Describes | Key contents |
-| --- | --- | --- |
-| `InstructionMetadata` | one action or condition | parameters, sentence, group, icons, `codeExtraInformation` (function name, async name, operators, custom generator, include files) |
-| `ExpressionMetadata` | one expression | `returnType` ("number"/"string"), parameters, function name |
-| `ObjectMetadata` | an object type | instruction/expression maps, `createFunPtr`, default behaviors ("capabilities"), 3D flag |
-| `BehaviorMetadata` | a behavior type | `objectType` it applies to, instruction/expression maps, backing `gd::Behavior` instance, properties + shared properties |
-| `ParameterMetadata` | one parameter | wraps a `ValueTypeMetadata` + description/hint/`codeOnly` |
-| `ValueTypeMetadata` | the parameter *type* | the type string, extra info, optional/default — the **single source of truth** for type classification |
-| `MultipleInstructionMetadata` | composite | fans one fluent call out to an expression+condition+action at once |
+`RuntimeInstanceContainer` owns:
 
-`gd::MetadataProvider` (`MetadataProvider.cpp`) looks metadata up by type string
-by linearly scanning the platform's extensions, returning a static "bad"
-sentinel on miss (callers test by pointer identity, e.g.
-`IsBadInstructionMetadata`).
+- object definitions and cached constructors;
+- live instances grouped by object name;
+- a lazily rebuilt flat instance list;
+- layers and behavior shared data;
+- object recycle pools;
+- a queue of removed instances awaiting safe destruction/reuse.
 
-### The two-file pattern: declaration vs implementation
+`createObject` reinitializes a cached instance when its constructor supports
+recycling; otherwise it allocates a new runtime object. `deleteFromScene`
+removes an object from live lookup immediately but defers destruction/recycling.
+Generated code from the same frame may still hold the old object reference, so
+freeing it synchronously would be unsafe.
 
-Every feature has an **IDE declaration** (metadata: what it is, parameters, UI)
-and a **runtime implementation** (the JS the game runs). They are wired by name
-via `SetFunctionName`.
+`gdjs.RuntimeObject` owns transform, layer/z-order, variables, forces, hitboxes,
+effects, lifecycle state, and attached behaviors. It keeps a lifecycle list for
+behaviors that need per-frame calls and a table for all behavior lookups.
 
-- **Builtin extensions** split across C++ files: `Core/GDCore/Extensions/Builtin/`
-  declares the metadata (no function names); `GDJS/GDJS/Extensions/Builtin/`
-  subclasses each and calls `SetFunctionName("gdjs.evtTools…")`, then
-  `StripUnimplementedInstructionsAndExpressions()`. Core = "what exists"; GDJS =
-  "which runtime function backs it".
-- **JS extensions** (`Extensions/<Name>/`) do *both halves in JS*:
-  - `JsExtension.js` runs inside the IDE (against the WASM `gd`), builds a
-    `gd.PlatformExtension` with the camelCased builder API, and points each
-    instruction at a runtime function via `setFunctionName` + `setIncludeFile`.
-  - plain `.ts`/`.js` files (e.g. `examplejsextensiontools.ts`) define those
-    `gdjs.evtTools.<name>.<fn>` functions, shipped with GDJS and run in the game.
-  No libGD recompilation is needed for a JS extension. `Extensions/ExampleJsExtension/`
-  is the reference.
+`gdjs.RuntimeBehavior` gates pre/post steps on activation and exposes lifecycle
+hooks including `onCreated`, `onDestroy`, and this branch's `onSignal`.
 
-Declared parameters become the positional arguments of the runtime function, in
-order; `code-only` parameters (e.g. `currentScene`) are injected by code
-generation but hidden in the editor.
+### Capabilities and custom objects
 
-### The parameter type system
+Cross-object capabilities such as opacity, scaling, size, flipping, animation,
+effects, and text are represented by interfaces plus default capability
+behaviors under `GDJS/Runtime/object-capabilities`. Capability behaviors report
+that they do not use lifecycle functions, avoiding a per-frame cost when they
+only forward API calls to the owner.
 
-The first argument to `AddParameter(type, …)` is a type string classified by
-`gd::ValueTypeMetadata` (`ValueTypeMetadata.cpp`). It drives three things at once:
-(a) the editor field, (b) the generated runtime argument, (c) expression
-type-checking. Representative types:
+`gdjs.CustomRuntimeObject` is both a runtime object and an owner of an internal
+`CustomRuntimeObjectInstanceContainer`. Generated prefab lifecycle code steps
+the nested children and generated object events. Variants choose different
+serialized child layouts while preserving the public object type.
 
-- number-like: `number`, `expression`, `camera`, `forceMultiplier`
-- string-like: `string`, `layer`, `color`, `sceneName`, `keyboardKey`,
-  `objectAnimationName`, … (a long list in `ValueTypeMetadata.cpp:221-239`)
-- boolean: `yesorno`, `trueorfalse`
-- variable: `variable`, `variableOrProperty`, and legacy `objectvar`/`scenevar`/`globalvar`
-- object: `object`, `objectPtr`, `objectList`
-- behavior: `behavior`
-- resource: `imageResource`, `audioResource`, `jsonResource`, `model3DResource`, …
-- operators: `relationalOperator`, `operator`
+### Queued signal bus (branch-specific)
 
-Adding a new type means touching three places: `ValueTypeMetadata` (classify it),
-`EventsCodeGenerator::GenerateParameterCodes` (emit it), and
-`newIDE/app/src/EventsSheet/ParameterRenderingService.js` (render the field).
+`GDJS/Runtime/events-tools/signaltools.ts` installs one lazy `SignalBus` per
+runtime scene. It has exactly two destinations:
 
-### Events-based extensions → real extensions
+- a scene broadcast;
+- one runtime object instance ID.
 
-An events-based extension (authored in the IDE, stored in
-`gd::EventsFunctionsExtension`) is turned into a *real* platform extension at
-load time by `newIDE/app/src/EventsFunctionsExtensionsLoader/index.js`. In two
-passes (metadata first so functions can cross-reference, then full code-gen) it
-uses `gd::MetadataDeclarationHelper` to synthesize metadata and the
-`Behavior`/`Object`/`EventsFunctionsExtension` code generators to emit runtime
-JS, then `JsPlatform.get().addNewExtension(extension)`. This is how prefabs,
-custom behaviors and custom functions become first-class actions/conditions.
+Signal actions enqueue only. At the next frame's pre-events callback the bus
+swaps the pending queue into a fixed delivery batch, preserving FIFO order.
+Signals emitted by a handler go into the new pending queue and therefore wait
+for another frame; delivery is never recursively re-entrant.
 
----
+Scene signals are visible to generated scene-event conditions and to explicitly
+subscribed prefab/behavior receivers. Direct signals invoke only the targeted
+custom object's `onSignal`; they do not broadcast and do not notify its
+behaviors. Subscriptions are receiver-instance-specific, checked at delivery
+time, and removed when the receiver is destroyed.
 
-## 7. GDevelop.js — the C++↔JS bridge
+The bus throttles oversized delivery batches, retains the tail in FIFO order,
+and produces debugger/animation records. Runtime signal IDs and target object
+IDs are transient scene state, not saved project identity.
 
-`GDevelop.js` compiles Core + GDJS (the C++ parts) + Extensions to WebAssembly
-with Emscripten, exposing the C++ API to the JS editor via the **WebIDL binder**.
+### Runtime performance conventions
 
-### The pipeline
+Hot paths deliberately favor predictable allocation and hidden-class behavior:
 
-1. `GDevelop.js/Bindings/Bindings.idl` declares, in WebIDL, every C++ class and
-   method to expose — one `interface` per class, `X implements Y;` for
-   inheritance.
-2. `update-bindings.js` runs Emscripten's `webidl_binder.py` to generate
-   `Bindings/glue.cpp` (C thunks) and `Bindings/glue.js` (JS wrappers).
-3. `Bindings/Wrapper.cpp` `#include`s the real C++ headers and `glue.cpp` at the
-   end, plus `#define` macros that rewrite magic-prefixed IDL method names
-   (`WRAPPED_`, `STATIC_`, `MAP_`, `FREE_`, `CLONE_`) into real C++ expressions
-   (e.g. wrapping a raw pointer into a `std::shared_ptr`).
-4. `postjs.js` post-processes the JS at load: lowercases method names, applies
-   the prefix rules, and installs `.delete()` and a use-after-free detector.
+- reuse picked arrays, forces, variables, and eligible runtime objects;
+- defer deletion to safe drain points;
+- cache flattened lists, constructors, hitboxes, AABBs, and renderer data;
+- invalidate caches only when a mutation requires it;
+- intern frequently compared names;
+- separate lifecycle-bearing behaviors from lookup-only behaviors;
+- use bad-object/bad-variable no-op sentinels to avoid repeated null branches;
+- cull rendering against camera bounds.
 
-### The memory model — manual, no GC
-
-This is the part most likely to bite contributors. Every JS wrapper is a thin
-object whose only real state is `ptr`, an offset into the WASM heap:
-
-- `wrapPointer(ptr, Class)` returns a cached wrapper per `(class, ptr)`.
-- **There is no garbage collection of C++ objects.** Ownership is manual.
-- **Rule of thumb:** if your JS code created it (`new gd.X()`) or a factory
-  returned a fresh copy to you, you must call `.delete()` on it. If it's owned by
-  a parent (a child in a C++ container, or something copied into the platform),
-  you must **not** delete it.
-- The canonical dance (seen in the extension loaders): build a `gd.X` in JS, hand
-  it to a C++ method that *copies* it (`addNewExtension`), then immediately
-  `.delete()` the now-redundant JS-side temporary.
-- `postjs.js` adds a `UseAfterFreeError` guard: calling any method after
-  `.delete()` (or after the C++ object was freed, cross-checked against the
-  `MemoryTrackedRegistry` for tracked classes like `Project`, `Layout`,
-  `gdObject`) throws instead of corrupting memory.
-
-### Types for the editor
-
-- `GDevelop.js/types/*.js` — generated **Flow** declarations, one per class
-  (e.g. `gdInstructionMetadata`), used by the IDE.
-- `GDevelop.js/types.d.ts` — the generated **TypeScript** equivalent, with a base
-  `EmscriptenObject { ptr; delete(); }` and IDL-mirrored enums; used by GDJS and
-  extension authors (`Extensions/JsExtensionTypes.d.ts`).
-
-90% of the time, exposing new C++ to the editor is just adding lines to
-`Bindings.idl`; only occasionally do you touch `Wrapper.cpp`
-(`Core/GDevelop-Architecture-Overview.md:86-105`).
+These constraints apply to `GDJS/Runtime` and extension runtime code. They do
+not imply that React editor code must use the same low-allocation style.
 
 ---
 
-## 8. Serialization & the project file format
+## 6. Extensions, metadata, and platforms
 
-### One tree type: `gd::SerializerElement`
+Most user-facing features are registered by extensions. Core supplies the
+model and compiler framework; extensions supply vocabulary and implementations.
 
-All (de)serialization goes through **`gd::SerializerElement`**
-(`Core/GDCore/Serialization/SerializerElement.h:37`), a recursive node that is
-simultaneously a value, a dictionary (named children + attributes), or an array.
-`gd::Serializer` (`Serializer.cpp`) converts it to/from JSON via bundled
-RapidJSON.
+### Platform registry and factories
 
-A key backward-compatibility mechanism is the **three-way attribute fallback**:
-`GetStringAttribute(name, default, deprecatedName)` checks the current name, then
-a deprecated name, then a child of that name (`SerializerElement.cpp:95-112`).
-This is how legacy keys (often the old XML/French names) keep loading.
+`gd::Platform` owns loaded `gd::PlatformExtension` objects and factories for
+object configurations, behaviors, events, and related polymorphic model types.
+The concrete `gdjs::JsPlatform` singleton loads builtins and receives JavaScript
+and events-based extensions from the editor.
 
-> This repo also has a local **canonical mode** (`Serializer.h:55-85`): when on,
-> keys are emitted in stable alphabetical order and defaults are written, for
-> minimal, shift-free git diffs. Toggled from JS via
-> `gd.Serializer.setCanonicalMode`. Not present upstream.
+`gd::PlatformExtension` is a fluent metadata builder. It declares:
 
-### The `SerializeTo` / `UnserializeFrom` convention
+- actions and conditions (`InstructionMetadata`);
+- number/string expressions (`ExpressionMetadata`);
+- object types (`ObjectMetadata`);
+- behavior types (`BehaviorMetadata`);
+- effects, dependencies, extension properties, groups, and icons.
 
-There is **no `Serializable` base class** — it is a duck-typed convention. A
-class is serializable if it implements:
+Instruction/expression type strings are namespaced by extension and are the
+serialized API. Renaming one is a project-format migration, not a UI-only
+change.
+
+### Metadata is used by several subsystems
+
+Metadata drives more than the instruction picker:
+
+- editor sentences and parameter fields;
+- type checking and expression return types;
+- scope/resource discovery;
+- code generation and include collection;
+- object/behavior factories;
+- refactoring and diagnostics;
+- this branch's generated instruction/settings catalogs.
+
+`ValueTypeMetadata` and `ParameterMetadata` classify number, string, boolean,
+operator, object, behavior, variable/property, resource, layer/camera, and
+specialized editor fields. Adding a type often requires coordinated changes in
+Core classification, code generation, and
+`newIDE/app/src/EventsSheet/ParameterRenderingService.js`.
+
+### Three extension implementation paths
+
+1. **Builtin C++ declarations.** Core builtin extensions declare portable
+   vocabulary. GDJS builtin subclasses attach JavaScript function names and
+   strip unsupported entries.
+2. **Repository JavaScript extensions.** `Extensions/<Name>/JsExtension.js`
+   constructs a `gd.PlatformExtension` in the editor and references TS/JS
+   runtime files with include paths. It may also register an editor properties
+   configuration and scene-editor instance renderer.
+3. **Events-based extensions.** The project stores functions, behaviors, and
+   objects as `gd::EventsFunctionsExtension` data. The editor's
+   `EventsFunctionsExtensionsLoader` first registers metadata for every
+   extension, then performs full code generation so cross-extension references
+   can resolve. Generated extensions are copied into `JsPlatform` and temporary
+   WASM wrappers are deleted.
+
+Runtime include collection is demand-driven: using an instruction, object,
+behavior, or effect adds its declared files. Exporters then copy/build only the
+required engine/extension surface plus mandatory runtime libraries.
+
+---
+
+## 7. GDevelop.js: the C++/JavaScript bridge
+
+The React editor does not reimplement the C++ project model. `GDevelop.js`
+builds it into `libGD.js` and `libGD.wasm` with Emscripten.
+
+### Binding pipeline
+
+1. `GDevelop.js/Bindings/Bindings.idl` declares exposed interfaces, methods,
+   enums, and inheritance.
+2. `GDevelop.js/update-bindings.js` runs Emscripten's WebIDL binder and patches
+   generated `GDevelop.js/Bindings/glue.cpp` and
+   `GDevelop.js/Bindings/glue.js`.
+3. `GDevelop.js/Bindings/Wrapper.cpp` includes C++ headers and generated glue.
+   Prefix
+   conventions such as `WRAPPED_`, `STATIC_`, `MAP_`, `FREE_`, and `CLONE_`
+   adapt C++ ownership and signatures to WebIDL limitations.
+4. `GDevelop.js/Bindings/postjs.js` normalizes method names, installs helper
+   wrappers, tracks selected object lifetimes, and detects use after free.
+5. The build copies `libGD.*` to the editor and regenerates Flow declarations
+   under `GDevelop.js/types` plus `GDevelop.js/types.d.ts`.
+
+The root CMake graph builds `GDCore`, the C++ `GDJS` platform, selected C++
+extensions, and finally the Emscripten executable target. `GDevelop.js/Gruntfile.js`
+orchestrates CMake, Ninja/Make, binding generation, copying, and type generation.
+
+### Ownership is manual across the bridge
+
+A JS wrapper contains a pointer into the WASM heap. JavaScript garbage
+collection does not destroy the C++ object.
+
+- Delete an object created with `new gd.X()` or returned as an owned clone.
+- Do not delete a borrowed child owned by a project/container.
+- If an API copies a temporary (for example `JsPlatform.addNewExtension`),
+  delete the temporary wrapper after the call.
+- Never retain a borrowed wrapper beyond the lifetime of its parent.
+
+`GDevelop.js/Bindings/postjs.js` caches wrappers and raises
+`UseAfterFreeError` for tracked invalid accesses. This improves diagnostics but
+does not replace correct ownership.
+
+### Changing an exposed C++ API
+
+A typical binding change touches the C++ declaration/implementation,
+`Bindings.idl`, regenerated glue, generated Flow/TypeScript declarations, and
+bridge tests under `GDevelop.js/__tests__`. Hand edits to generated glue or type
+files will be overwritten.
+
+---
+
+## 8. Serialization and project storage
+
+There are two separate concerns:
+
+1. Core serializes the in-memory project to one logical tree.
+2. Storage providers decide how that tree is represented on disk or in cloud
+   storage.
+
+### Logical serialization tree
+
+`gd::SerializerElement` is a recursive value/dictionary/array representation.
+`gd::Serializer` converts it to/from JSON using RapidJSON. Model types follow a
+duck-typed convention:
 
 ```cpp
 void SerializeTo(gd::SerializerElement& element) const;
-void UnserializeFrom([gd::Project& project,] const gd::SerializerElement& element);
+void UnserializeFrom([gd::Project& project,]
+                     const gd::SerializerElement& element);
 ```
 
-The optional leading `gd::Project&` is passed when unserialization needs
-platform/extension lookups (objects, layouts, behaviors) and omitted when it
-doesn't (variables, resources, instances). The recurring pattern: write scalar
-attributes on the element, then `AddChild("x")` and delegate to each member's own
-`SerializeTo`. `gd::Object::SerializeTo` (`Object.cpp:132-146`) is a clean
-example. `SerializableWithNameList<T>` (`Core/GDCore/Tools/SerializableWithNameList.h`)
-handles named-element lists.
+A project argument is supplied when load requires extension metadata or model
+factories. There is no universal `Serializable` base class.
 
-### Migration = inline compatibility branches
+Backward compatibility is decentralized. `Get*Attribute` can fall back from a
+current key to a deprecated attribute/child name, and individual
+`UnserializeFrom` implementations normalize older shapes. `gdVersion` warns
+about newer producers but is not a central schema migration engine.
 
-GDevelop has **no separate migration pass and no schema-version-driven upgrade**.
-Instead:
+This branch adds `gd::Serializer` canonical mode. It stabilizes key order and
+emits selected default event fields for source-friendly diffs. The editor
+temporarily enables it through `newIDE/app/src/Utils/Serializer.js` when
+requested.
 
-- `gdVersion` / `initialGDVersion` are stamped into the file
-  (`Project.cpp:1219-1226`). On load, a newer-than-running version only *warns*
-  (`Project.cpp:783-815`) — it never blocks or transforms.
-- Each `UnserializeFrom` contains `// Compatibility with GD <= X` branches that
-  read old shapes and normalize them (e.g. `Object.cpp:109-127` upgrades the
-  pre-3.3 `Automatism` → `Behavior`; `Variable.cpp:376-393` handles pre-beta102
-  string typing). The deprecated-name attribute fallbacks are the other half.
+### Local project representations
 
-### Single-file vs folder projects
-
-The C++ side always serializes the **entire project into one tree**. The
-single-file-vs-folder split is done entirely in the IDE (JS), driven by
-`project.isFolderProject()`:
-
-- `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`
-  splits these top-level keys into separate files: `layouts`, `externalLayouts`,
-  `externalEvents`, `eventsFunctionsExtensions` (and `staticData`).
-- The split replaces each value with a reference node
-  (`{ __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: <path> }`) via
-  `Utils/ObjectSplitter.js`; each array item becomes a file named after its
-  slugified `name`. Loading reverses this with `unsplit` (depth-capped at 3 for
-  performance).
-
-### Resources
-
-`gd::ResourcesContainer` (`Core/GDCore/Project/ResourcesContainer.h`) holds
-polymorphic `gd::Resource` subclasses (`ImageResource`, `AudioResource`,
-`FontResource`, `JsonResource`, `Model3DResource`, …), created by a kind-string
-factory (`CreateResource`). Files are stored as **project-relative paths**;
-objects/scenes reference resources **by name** (a string), never by embedding.
-
-### What the runtime consumes
-
-Export does not ship the editor JSON verbatim. `ExporterHelper`
-(`GDJS/GDJS/IDE/ExporterHelper.cpp`) strips the project for export, computes
-per-scene `usedResources`, serializes, and writes a `data.js` that assigns the
-globals `gdjs.projectData` and `gdjs.runtimeGameOptions`. The runtime types are
-in `GDJS/Runtime/types/project-data.d.ts` (`ProjectData`, `LayoutData`,
-`InstanceData`, `ObjectData`, `VariableData`, …) — a stripped-plus-augmented
-mirror of the editor format.
-
----
-
-## 9. The editor (newIDE)
-
-The editor is a React app in `newIDE/app/src`, typed with **Flow**, that drives
-the C++ model through the WASM `gd` global. It runs in two shells: Electron
-(`LocalApp.js`) and web (`BrowserApp.js`).
-
-### App shell
-
-- `MainFrame/index.js` is the application shell: it holds the open `gdProject` in
-  state, manages the **editor tabs** (`MainFrame/EditorTabs/`), and orchestrates
-  open/save/export, preview and refactoring.
-- Each open tab is an **editor container** in `MainFrame/EditorContainers/`
-  (`SceneEditorContainer`, `EventsEditorContainer`, `CustomObjectEditorContainer`,
-  `ExternalEventsEditorContainer`, `ResourcesEditorContainer`, …). They share a
-  `BaseEditor` pattern and wrap a domain editor with the project/tab plumbing.
-
-### The `gd` global and memory discipline
-
-Every file that touches the model does `const gd: libGDevelop = global.gd;`. The
-WASM memory discipline from §7 applies throughout the editor:
-
-- Call `.delete()` on any `gd.X` you create. Long-lived editor wrappers that hold
-  a gd object across an edit session use
-  `Utils/SerializableObjectCancelableEditor.js` (`useSerializableObjectCancelableEditor`)
-  to manage the lifetime and support cancel.
-- The bridge to JSON for React state and undo is
-  `Utils/Serializer.js` — `serializeToJSObject(serializable, 'serializeTo')`
-  produces a plain JS object; `unserializeFromJSObject` reads one back.
-
-### Domain editors
-
-| Editor | Edits | Notable internals |
+| Representation | Entry | Status in this checkout |
 | --- | --- | --- |
-| `SceneEditor/` | a scene: instances, layers, objects | hosts the `InstancesEditor` canvas |
-| `InstancesEditor/` | placement of instances | a **PixiJS** canvas — the editor's own renderer |
-| `EventsSheet/` | the events of a scene/function | renders instructions via `InstructionEditor` + `ParameterFields/` |
-| `ObjectEditor/`, `ObjectsList/` | object configuration & variables | per-type editors in `ObjectEditor/Editors/` |
-| `BehaviorsEditor/` | behaviors on an object | per-type editors in `BehaviorsEditor/Editors/` |
-| `VariablesList/` | variable containers (scene/global/object) | one shared dialog, scope-specific wrappers |
+| Single JSON | arbitrary `*.json` | Legacy input/output path supported by the serializer/storage layer. |
+| Split JSON folder project | a JSON entry plus referenced `*.json` fragments | Legacy format using `ObjectSplitter` and `__REFERENCE_TO_SPLIT_OBJECT`. Still readable; not the new source format. |
+| Multi-file source project | `project.settings` | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files. |
 
-### Object rendering in the editor
+Opening a legacy JSON project normalizes it through the current libGD
+serializer, decomposes it next to the source, verifies a compose round trip,
+and redirects the open file metadata to `project.settings`. Migration metadata
+records the legacy source URI and SHA-256. If the old JSON later diverges from
+an existing migrated tree, the opener refuses to guess which side is newer.
 
-The editor renders objects on the PixiJS canvas through a *parallel* renderer
-hierarchy to the runtime's: `ObjectsRendering/ObjectsRenderingService.js`
-dispatches to `RenderedInstance` subclasses (one per object type). A JS extension
-registers its editor-side renderer via `registerInstanceRenderers` in
-`JsExtension.js`. So an object type has *two* renderers — `RenderedInstance` for
-the editor, `gdjs.RuntimeObject`'s renderer for the game — mirroring the IDE/Runtime split.
+### Multi-file source tree
 
-### Scope & autocompletion
+`newIDE/app/src/ProjectsStorage/MultiFileProjectFormat/index.js` owns the pure
+logical projection between the legacy-shaped JS object and source documents.
+`newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`
+owns filesystem discovery, URI/path safety, transactions, and migration.
 
-`InstructionOrExpression/EventsScope.js` is the IDE-side assembler of
-`gd::ProjectScopedContainers` (§2): it builds which objects/variables/properties
-are visible for the events sheet currently being edited (scene vs function vs
-prefab), powering validation and autocompletion. The instruction/expression
-pickers live under `InstructionOrExpression/` and `ExpressionAutocompletion/`.
+A representative source tree is:
 
-### Refactoring & undo
+```text
+project.settings
+resources.settings
+static-data.toml
+objects/<encoded-name>.settings
+scenes/<encoded-name>/scene.settings
+scenes/<encoded-name>/<encoded-name>.layout
+scenes/<encoded-name>/<encoded-name>.events
+scenes/<encoded-name>/objects/*.settings
+externals/external.settings
+externals/*.layout
+externals/*.events
+extensions/<encoded-name>/extension.settings
+extensions/<encoded-name>/functions/.../*.settings|*.events
+extensions/<encoded-name>/behaviors/.../*.settings|*.events
+extensions/<encoded-name>/prefabs/.../*.settings|*.layout|*.events
+```
 
-- Project-wide edits (rename/delete an object, update events after a change) call
-  the C++ **`gd.WholeProjectRefactorer`** static methods directly from JS — there
-  is no JS facade. This keeps a rename consistent across every event and
-  reference.
-- **Undo/redo** is snapshot-based: the project is serialized to JS objects and
-  diffed/restored through the history utilities, rather than via per-action
-  inverse commands.
+- `*.settings` and `static-data.toml` use TOML.
+- `*.layout` uses the layout DSL in
+  `newIDE/app/src/ProjectsStorage/LayoutDsl`.
+- `*.events` uses the IfDo DSL in
+  `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
+- Canonical `game://` URIs connect owned documents.
+- Display names are encoded into portable, case-safe physical segments.
+- Logical folder-structure fields from the legacy JSON model are omitted;
+  physical ownership and paths are the source organization.
 
-### Editor conventions
+The converter rejects unknown ownership, duplicate references, path escapes,
+non-canonical URIs, malformed namespaces, unsupported versions, and values that
+cannot round-trip. Every save decomposes the current project, recomposes it in
+memory, and compares normalized projects before touching authoring sources.
 
-- **Flow** typing everywhere (`// @flow`), not TypeScript (historical).
-- Shared UI component library in `newIDE/app/src/UI`; never hand-roll primitives.
-- **i18n** via `@lingui/macro` — wrap user-facing strings in `<Trans>` / `t`.
-- `PreferencesContext` for user prefs; theming via the UI theme system.
-- Testing: Jest with `*.spec.js`; component states are documented as Storybook
-  `stories/`. Prettier formats everything (`npm run format`).
+### Transactional local writes
+
+`writeMultiFileSourceTree` serializes concurrent writes per project root and
+only writes changed managed URIs. A transaction is staged under
+`.gdevelop/transactions/<id>` with flushed files, backups, and a journal.
+Managed files are committed in dependency order, with `project.settings` last.
+Failures restore backups; opening a project recovers any interrupted staged or
+committed transaction. Obsolete managed files and now-empty owned directories
+are removed without deleting user-owned files.
+
+Reader safety limits bound per-file size, total composed size, and managed file
+count. URI resolution checks lexical containment and existing real paths so
+symlinks cannot escape the project root.
+
+### Generated `.gdevelop` artifacts
+
+A multi-file save also regenerates editor/tooling projections:
+
+- `.gdevelop/instructions-catalog.json` and the deprecated instruction catalog;
+- `.gdevelop/settings-catalog.json` and `layout-catalog.json`;
+- `.gdevelop/runtime-api.d.ts` and `project-api.d.ts`;
+- `.gdevelop/game.json`, a legacy-shaped compatibility projection without
+  Static Data;
+- autosave and transaction state in dedicated subdirectories.
+
+These files support IfDo name resolution, AI/MCP authoring, validation,
+JavaScript blocks, compatibility consumers, and recovery. They are derived from
+the project plus loaded metadata. Do not make them the only home of authored
+state.
+
+### Static Data is compile-time project data
+
+Core stores arbitrary Static Data as a JSON string on `gd::Project` and
+serializes it as the `staticData` child. The multi-file source owns it in the
+unwrapped TOML root of `static-data.toml`.
+
+`{{path.to.value}}`, numeric array segments, and quoted bracket segments are
+resolved by `Project::ResolveStaticDataPlaceholders`. Validation, event code
+generation, generated object/behavior property code, and export-time serialized
+project traversal all use the same resolver. Missing paths produce diagnostics
+and block preview/export.
+
+After replacement, `ExporterHelper` removes `staticData` from exported project
+data. Static Data is therefore authoring/compile-time configuration, not a
+runtime database or mutable `gdjs.RuntimeGame` subsystem.
+
+### Runtime project data is a stripped projection
+
+`GDJS/GDJS/IDE/ExporterHelper.cpp` clones/strips editor-only content, determines
+project/scene resources, resolves Static Data, and serializes the runtime shape.
+`data.js` assigns `gdjs.projectData` and `gdjs.runtimeGameOptions`. Runtime
+interfaces in `GDJS/Runtime/types/project-data.d.ts` describe this projection;
+they are not a promise that every editor JSON field is shipped.
+
+Resource definitions store paths relative to the project and are referenced by
+name from objects/scenes. Export copies or transforms the actual files and adds
+used-resource lists rather than embedding resource binaries in the authoring
+tree.
 
 ---
 
-## 10. Cross-cutting conventions
+## 9. Editor, preview, export, and hot reload
 
-These principles recur across every layer; internalizing them is the fastest way
-to read the codebase.
+The editor is a React 18 application under `newIDE/app/src`, typed primarily
+with Flow. It runs in browser and Electron shells.
 
-1. **IDE model vs Runtime model.** Almost every concept exists as a `gd::X`
-   (editor, C++, serialized) and a `gdjs.X` (runtime, TS, built from JSON). They
-   are bridged only by the serialized data shape. Don't make one depend on the
-   other.
-2. **Declaration vs implementation.** Features are *declared* with metadata
-   (what it is, parameters, UI) and *implemented* by a runtime function, wired by
-   name via `SetFunctionName`. Code generation is the seam between them.
-3. **Names are the public API; UUIDs are identity.** Events join on names;
-   refactoring rewrites names project-wide via `WholeProjectRefactorer`;
-   `persistentUuid` tracks "the same entity" across serializations.
-4. **Containers own named, serializable children.** The model is built from a few
-   reusable container templates (`SerializableWithNameList`, the various
-   `*Container` classes), each implementing `SerializeTo`/`UnserializeFrom`.
-5. **Object picking is list semantics.** An object name means "currently picked
-   instances of that name". Conditions filter; actions iterate. This shapes
-   events, code generation, and the runtime.
-6. **Manual WASM memory.** In editor code, `.delete()` what you create, never
-   delete what a parent owns. A use-after-free guard backstops mistakes.
-7. **Backward compatibility is inline.** No migration framework — old project
-   shapes are normalized inside each `UnserializeFrom`, plus deprecated-name
-   attribute fallbacks. Add to these branches; don't break old files.
-8. **Performance is hand-managed at runtime.** Pool/recycle, defer deletion,
-   cache and lazily invalidate, avoid allocations in hot paths, declare all
-   fields up front. The editor, transpiled by Babel, may use modern JS freely;
-   the runtime is conservative and allocation-frugal.
-9. **Two type checkers.** Runtime/extensions use TypeScript; the editor uses
-   Flow. Both prefer explicit typing over `any`.
+### Startup and application shell
+
+`newIDE/app/src/index.js` loads `libGD.js`, initializes the WASM module, assigns
+`global.gd`, then renders the selected local/browser application. `LocalApp.js`
+and `BrowserApp.js` inject environment-specific storage, preview, authentication,
+resource, and export services into `MainFrame`.
+
+`newIDE/app/src/MainFrame/index.js` is a large functional
+component/orchestrator. It owns the current `gdProject`, editor tabs/panes,
+open/save/autosave, project manager, preview/export state, diagnostics,
+extension reloads, hot reload, preferences, and version-history integration.
+
+Tabs are represented by editor-container classes in
+`newIDE/app/src/MainFrame/EditorContainers`. Containers adapt a domain editor
+to common tab lifecycle, selection, undo, navigation, and project services.
+Major domain areas include:
+
+| Area | Primary directories |
+| --- | --- |
+| Scene and instance placement | `SceneEditor`, `InstancesEditor`, `LayersList`, `ObjectsList` |
+| Events and expressions | `EventsSheet`, `InstructionOrExpression`, `ExpressionAutocompletion` |
+| Objects and behaviors | `ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor` |
+| Events-based extensions/prefabs | `EventsFunctionsExtensionEditor`, `PrefabDetailEditor`, `EventsFunctionsExtensionsLoader` |
+| Resources and project files | `ResourcesEditor`, `ResourcesList`, `ProjectsStorage` |
+| Static Data | `StaticData`, `StaticDataEditorContainer` |
+| Preview/debug/in-game editing | `ExportAndShare`, `EmbeddedGame`, `Debugger`, `HotReload` |
+
+### The editor works on C++ objects through wrappers
+
+Files commonly bind `const gd: libGDevelop = global.gd`. React components may
+read or mutate model children through borrowed wrappers, but ownership rules
+from section 7 apply. Long-lived/cancelable dialogs use
+`newIDE/app/src/Utils/SerializableObjectCancelableEditor.js` to clone, restore,
+and dispose temporary model objects safely.
+
+`newIDE/app/src/Utils/Serializer.js` is the primary bridge between a WASM model
+object and a plain JS snapshot. Undo/redo in
+`newIDE/app/src/Utils/History.js` stores serialized before/after snapshots and
+restores through unserialization rather than maintaining an inverse command
+for every mutation.
+
+### Editor rendering is separate from game rendering
+
+The scene editor uses PixiJS/Three.js renderers registered through
+`ObjectsRenderingService`. A `RenderedInstance` visualizes an initial instance
+and exposes editor handles. The exported game uses a runtime object renderer.
+An object type can therefore require:
+
+- an editor model configuration;
+- an editor instance renderer/properties editor;
+- a runtime object and runtime renderer.
+
+Keeping these separate prevents editor selection handles, previews, and
+property affordances from leaking into exported runtime code.
+
+### Preview and export pipeline
+
+Before preview/export, `MainFrame` runs the serialized event scanner and native
+diagnostic generation. Branch-specific hard errors include invalid Static Data,
+ambiguous single-target object parameters, conditionless actions, and unsafe
+external-layout creation.
+
+The local/browser preview launchers then call the WASM `gd.Exporter`/
+`ExporterHelper` surface to:
+
+1. generate extension and scene event code;
+2. collect required includes and resources;
+3. strip and serialize runtime project/options data;
+4. write/patch `data.js`, scripts, assets, and `index.html`;
+5. launch the game with debugger/preview options.
+
+Local and service-worker/S3 preview paths use different filesystem transports
+but the C++ generation contracts are shared. Preview launchers may patch
+preview-only data (for example global object-group data) that the normal
+project stripper excludes.
+
+The debugger client and hot reloader update a running preview when compatible
+project or generated-code changes occur. Persistent instance UUIDs support
+reconciliation; structural changes can still require a scene/game reload.
 
 ---
 
-## 11. End-to-end: a frame, from authoring to pixels
+## 10. Cross-cutting invariants
 
-Tying the layers together with one concrete path — an author writes
-*"if Player is on the floor, set Player Y to 100"*:
+1. **Editor and runtime models are different systems.** Connect them through
+   serialized contracts and generated code, never by making runtime code depend
+   on `gd::Project`.
+2. **Metadata type strings and serialized names are APIs.** Changing them needs
+   migration/refactoring and compatibility tests.
+3. **Names select; UUIDs reconcile.** Events usually refer to names. Persistent
+   UUIDs preserve identity across saves, source projections, and hot reload.
+4. **Scopes come from `ProjectScopedContainers`.** Do not reconstruct partial
+   scope rules ad hoc in a UI component or code generator.
+5. **Picking is inherited list state.** Conditions narrow, subevents inherit,
+   actions iterate, and scalar/single-target consumers may assert cardinality.
+6. **WASM wrappers have manual ownership.** Delete owned temporaries, never
+   borrowed children, and do not outlive parents.
+7. **Project compatibility is read-time normalization.** Keep old-key fallbacks
+   and localized compatibility branches when changing the logical schema.
+8. **The multi-file tree must round-trip before commit.** Preserve ownership,
+   canonical URIs, deterministic names, transaction recovery, and generated
+   catalog regeneration.
+9. **Static Data disappears at runtime.** Resolve placeholders everywhere an
+   authored string/property enters generated or exported data, then remove the
+   source tree.
+10. **Signals cross a frame boundary.** Emission is queued; delivery is FIFO in
+    pre-events; handler emissions wait another frame; destroyed receivers are
+    not called.
+11. **Deletion is deferred in runtime containers.** A removed object can remain
+    referenced by generated code until a safe drain point.
+12. **Runtime performance is deliberate.** Reuse arrays and instances, cache
+    derived data, and avoid allocations in per-frame extension code.
+13. **Flow and TypeScript coexist.** The editor is primarily Flow; runtime and
+    extension implementations are TypeScript. Binding declarations are
+    generated for both ecosystems.
 
-1. **Authoring (editor).** In `EventsSheet`, the condition and action become two
-   `gd::Instruction`s on a `StandardEvent` in the scene's `gd::EventsList`. Each
-   parameter is a `gd::Expression`. Autocompletion/validation used the
-   `ProjectScopedContainers` assembled by `EventsScope.js`. Editing the scene
-   placed `Player` as a `gd::InitialInstance`. (Model: §2–3.)
-2. **Save.** The whole `gd::Project` serializes through `SerializerElement` to
-   JSON, split into per-scene files if it's a folder project. (§8.)
-3. **Preview/export.** The platform (`JsPlatform`) resolves each instruction's
-   metadata, and `gdjs::EventsCodeGenerator` transpiles the events to a JS module
-   `gdjs.<scene>Code.func`. The "on floor" condition compiles to a filtering loop
-   over the `Player` object list; the "set Y" action compiles to an iterating
-   loop calling `setY(100)` on each still-picked instance. `ExporterHelper`
-   writes `data.js` (`gdjs.projectData`) and the engine files. (§4, §6, §8.)
-4. **Boot (runtime).** `gdjs.RuntimeGame` starts, the `SceneStack` loads the
-   scene via `loadFromScene`, which creates a `gdjs.RuntimeObject` per initial
-   instance and wires `gdjs.<scene>Code.func` as the scene's events function.
-   (§5.)
-5. **Each frame.** The rAF loop calls `RuntimeScene.renderAndStep`: behaviors'
-   pre-events run, then the generated events function — `Player`'s instance list
-   is copied from the scene, filtered by the floor condition, and the survivors
-   get `setY(100)` — then behaviors' post-events, then `render()` draws via
-   PixiJS. (§4–5.)
+---
 
-The same instruction the author dropped in a list is, four layers later, a
-`list[i].setY(100)` call inside a generated function running 60 times a second —
-and nothing of the editor model exists at that point. That collapse, from
-declarative model to hand-tuned imperative loop, is the essence of GDevelop's
-architecture.
+## 11. Build and test seams
+
+The repository has several build systems because it produces native C++
+libraries, a WASM authoring library, a TypeScript runtime, a React web app, and
+Electron packages.
+
+| Change area | Main build/check | Tests that exercise the seam |
+| --- | --- | --- |
+| Core model, parser, refactorer | Root CMake; `GDCore_tests` target | `Core/tests` (Catch2) |
+| JS code generation or bindings | `cd GDevelop.js && npm run build` | `GDevelop.js/__tests__` via Jest |
+| Runtime or TS extension | `cd GDJS && npm run check-types` and `npm run build` | `cd GDJS/tests && npm test` (Karma/Mocha, headless browser) plus extension specs |
+| Editor/UI/storage | `cd newIDE/app && npm run flow`, `npm run lint`, `npm run check-format` | `npm test` / targeted `*.spec.js`; Storybook for visual states |
+| Electron integration | `newIDE/electron-app` package scripts | `newIDE/electron-app/test` |
+| Multi-file format | Editor Jest suite | `MultiFileProjectFormat`, `LayoutDsl`, `IfDoEventsDsl`, `LocalMultiFileProject`, and catalog specs |
+
+`newIDE/app`'s install/import scripts copy or build the GDJS runtime, extensions,
+themes, editor resources, and `libGD` into the app's public resources. A runtime
+or JS extension edit can often be rebuilt by the development watcher; a C++ or
+IDL edit requires rebuilding GDevelop.js.
+
+### Change-impact checklist
+
+When a logical project field changes, audit all of these rather than stopping
+at the declaring class:
+
+1. C++ copy/assignment, `SerializeTo`, and `UnserializeFrom`.
+2. Compatibility behavior for old projects.
+3. `Bindings.idl` and generated Flow/TypeScript bindings if exposed.
+4. Editor property/schema UI, refactoring, undo, and storage behavior.
+5. Multi-file decompose/compose ownership and round-trip tests.
+6. Export stripping/placeholder/resource behavior.
+7. `project-data.d.ts` and runtime loader if the field survives export.
+8. Preview/hot-reload/debugger handling.
+
+When an instruction parameter type changes, audit metadata classification,
+parameter rendering, validation/autocompletion, code generation, source
+catalogs/IfDo formatting, runtime signature, and extension tests.
+
+---
+
+## 12. End-to-end data flow
+
+Consider a scene event: “when `Player` is on the floor, set its Y position to
+100.”
+
+1. **Authoring.** `EventsSheet` creates a standard event containing condition
+   and action `gd::Instruction` values. Parameters are `gd::Expression` source.
+   `ProjectScopedContainers` supplies visible objects, variables, properties,
+   and resources. The placed `Player` is a `gd::InitialInstance`.
+2. **In-memory model.** The event belongs to the layout's `gd::EventsList`
+   inside the current WASM `gd::Project`. React holds UI state and borrowed
+wrappers; the C++ model is authoritative.
+3. **Save.** Core serializes one logical project tree. For a
+   `project.settings` project, the editor decomposes it into TOML/layout/IfDo
+   sources, recomposes and compares it, transactionally commits changed files,
+   and regenerates `.gdevelop` catalogs and declarations.
+4. **Preflight.** Preview/export scans serialized events and runs native code
+   generation diagnostics. Invalid branch-specific contracts stop the launch
+   and open a navigable diagnostic report.
+5. **Compilation.** `JsPlatform` resolves instruction metadata.
+   `gdjs::EventsCodeGenerator` creates a picked `Player` array, emits a
+   filtering loop for the floor condition, then emits an action loop calling
+   `setY(100)` for every remaining picked player. If the event instead evaluated
+   scalar `Player.X()` outside a current-object loop, generated code would first
+   require at most one picked instance.
+6. **Runtime projection.** `ExporterHelper` resolves Static Data, strips editor
+   content, computes used resources, writes generated scene/extension code, and
+   produces `data.js` with `gdjs.projectData` and runtime options.
+7. **Boot.** `RuntimeGame` loads the first scene through `SceneStack`.
+   `RuntimeScene.loadFromScene` registers definitions, creates runtime objects
+   from initial instances, and attaches the generated events function.
+8. **Frame.** The renderer drives `RuntimeScene.renderAndStep`: async tasks and
+   object pre-events run, queued signals dispatch, generated events filter and
+   act on the picked list, behavior post-events run, then PixiJS/Three.js render.
+9. **Mutation and cleanup.** Runtime state changes do not mutate the authoring
+   `gd::Project`. Deleted runtime objects leave live lookup immediately but are
+   destroyed or recycled only at a safe cleanup point.
+
+The architectural essence is the collapse from a rich, serializable,
+metadata-driven authoring tree into stripped data plus specialized imperative
+JavaScript loops. The exported game contains the result of authoring—not the
+authoring system itself.
 
 ---
 
@@ -892,15 +1022,19 @@ architecture.
 
 | Concern | Primary locations |
 | --- | --- |
-| Overview / vocabulary | `Core/GDevelop-Architecture-Overview.md` |
-| Core data model | `Core/GDCore/Project/` (`Project`, `Layout`, `Object`, `VariablesContainer`, `PropertyDescriptor`, `ProjectScopedContainers`) |
-| Events & expressions | `Core/GDCore/Events/` (`Event`, `Instruction`, `EventsList`, `Builtin/`, `Parsers/`) |
-| Code generation | `Core/GDCore/Events/CodeGeneration/` (base), `GDJS/GDJS/Events/CodeGeneration/` (JS), `EventsCodeGenerationContext` |
-| Runtime engine | `GDJS/Runtime/` (`runtimegame`, `runtimescene`, `RuntimeInstanceContainer`, `runtimeobject`, `runtimebehavior`, `scenestack`, `variable`, `object-capabilities/`) |
-| Extensions & metadata | `Core/GDCore/Extensions/` (`Platform`, `PlatformExtension`, `Metadata/`, `Builtin/`), `GDJS/GDJS/Extensions/`, `Extensions/` |
-| Events-based → real extensions | `newIDE/app/src/EventsFunctionsExtensionsLoader/`, `GDJS/GDJS/Events/CodeGeneration/MetadataDeclarationHelper.*` |
-| Bindings | `GDevelop.js/Bindings/` (`Bindings.idl`, `Wrapper.cpp`, `glue.*`, `postjs.js`), `GDevelop.js/types/`, `types.d.ts` |
-| Serialization | `Core/GDCore/Serialization/`, `newIDE/app/src/ProjectsStorage/`, `newIDE/app/src/Utils/{Serializer,ObjectSplitter}.js`, `GDJS/GDJS/IDE/ExporterHelper.cpp` |
-| Editor | `newIDE/app/src/` (`MainFrame/`, `SceneEditor/`, `InstancesEditor/`, `EventsSheet/`, `ObjectEditor/`, `ObjectsRendering/`, `InstructionOrExpression/`, `UI/`) |
-| Related deep dives | `docs/CustomObjectArchitecture.md`, `docs/StaticData.md`, `newIDE/docs/` |
-
+| High-level vocabulary | `Core/GDevelop-Architecture-Overview.md` |
+| Project model and scopes | `Core/GDCore/Project`, especially `Project`, `Layout`, `Object`, `InitialInstance`, `ProjectScopedContainers` |
+| Events and expressions | `Core/GDCore/Events`, `Core/GDCore/IDE` |
+| Base and JS code generation | `Core/GDCore/Events/CodeGeneration`, `GDJS/GDJS/Events/CodeGeneration` |
+| Picking assertions | `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.*`, `GDJS/Runtime/gd.ts`, `newIDE/app/src/Utils/EventsValidationScanner.js` |
+| Runtime lifecycle | `GDJS/Runtime/runtimegame.ts`, `GDJS/Runtime/runtimescene.ts`, `GDJS/Runtime/scenestack.ts`, `GDJS/Runtime/RuntimeInstanceContainer.ts`, `GDJS/Runtime/runtimeobject.ts`, `GDJS/Runtime/runtimebehavior.ts` |
+| Custom objects and capabilities | `GDJS/Runtime/CustomRuntimeObject*`, `GDJS/Runtime/object-capabilities` |
+| Signal system | `GDJS/Runtime/events-tools/signaltools.ts`, `docs/SignalSystem.md` |
+| Extensions and metadata | `Core/GDCore/Extensions`, `GDJS/GDJS/Extensions`, `Extensions`, `newIDE/app/src/EventsFunctionsExtensionsLoader` |
+| WASM bindings | `GDevelop.js/Bindings`, `GDevelop.js/Gruntfile.js`, `GDevelop.js/types`, `GDevelop.js/types.d.ts` |
+| Logical serialization | `Core/GDCore/Serialization`, model `SerializeTo`/`UnserializeFrom` methods |
+| Multi-file source format | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, `newIDE/app/src/ProjectsStorage/LayoutDsl`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js` |
+| Source catalogs/APIs | `newIDE/app/src/ProjectsStorage/ProjectSourceCatalog.js`, `newIDE/app/src/ProjectsStorage/JavaScriptAuthoringApi.js`, `newIDE/app/src/EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog.js` |
+| Static Data | `Core/GDCore/Project/Project.*`, `newIDE/app/src/StaticData`, `docs/StaticData.md` |
+| Preview and export | `GDJS/GDJS/IDE/Exporter*`, `newIDE/app/src/ExportAndShare`, `newIDE/app/src/HotReload`, `newIDE/app/src/EmbeddedGame` |
+| Editor shell | `newIDE/app/src/index.js`, `newIDE/app/src/LocalApp.js`, `newIDE/app/src/BrowserApp.js`, `newIDE/app/src/MainFrame`, domain editor directories |

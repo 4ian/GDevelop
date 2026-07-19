@@ -18,6 +18,7 @@ import {
   eventsTextRenderingErrorText,
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
+import { buildEventsScriptSourceView } from '../EventsSheet/EventsTree/TextRenderer/EventsScriptSourceView';
 import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
@@ -153,6 +154,11 @@ export type EditorFunctionGenericOutput = {|
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
+  // EventScript source view (see `read_scene_events_source`):
+  eventsScript?: string,
+  selectedEventIds?: Array<string>,
+  truncated?: boolean,
+  notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
   warnings?: string,
@@ -4729,6 +4735,105 @@ const readSceneEvents: EditorFunction = {
   modifiesProject: false,
 };
 
+const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
+const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
+const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+
+/**
+ * Reads the events of a scene as EventScript source (the exact syntax
+ * accepted by the `event_script` field of events generation), with filters
+ * to keep the output small.
+ */
+const readSceneEventsSource: EditorFunction = {
+  renderForEditor: ({ args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Read events source in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'events',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeSceneNotFoundFailure(project, scene_name);
+    }
+
+    const scene = project.getLayout(scene_name);
+    const eventIds = SafeExtractor.extractStringArrayProperty(
+      args,
+      'event_ids'
+    );
+    const searchText = SafeExtractor.extractStringProperty(args, 'search');
+    const objectNames = SafeExtractor.extractStringArrayProperty(
+      args,
+      'object_names'
+    );
+    const subEventsDepth = SafeExtractor.extractNumberProperty(
+      args,
+      'sub_events_depth'
+    );
+    const maxCharsArgument = SafeExtractor.extractNumberProperty(
+      args,
+      'max_chars'
+    );
+    const maxChars = Math.max(
+      EVENTS_SOURCE_MAX_CHARS_MINIMUM,
+      Math.min(
+        EVENTS_SOURCE_MAX_CHARS_LIMIT,
+        maxCharsArgument || EVENTS_SOURCE_MAX_CHARS_DEFAULT
+      )
+    );
+
+    const {
+      text,
+      selectedEventIds,
+      truncated,
+      notes,
+      renderingErrors,
+    } = buildEventsScriptSourceView({
+      eventsList: scene.getEvents(),
+      eventIds,
+      searchText,
+      objectNames,
+      subEventsDepth,
+      maxChars,
+    });
+
+    const output: EditorFunctionGenericOutput = {
+      success: true,
+      eventsForSceneNamed: scene_name,
+      eventsScript: text || noEventsInSceneText,
+      selectedEventIds,
+    };
+    if (truncated) output.truncated = true;
+    if (notes.length > 0) output.notes = notes;
+    if (renderingErrors.length > 0) {
+      // Surface partial failures so the cause is reported, not dropped.
+      output.eventsRenderingErrors = renderingErrors;
+    }
+    return output;
+  },
+  modifiesProject: false,
+};
+
 /**
  * Adds a new event to a scene's event sheet
  */
@@ -7740,6 +7845,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,
+  read_scene_events_source: readSceneEventsSource,
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,

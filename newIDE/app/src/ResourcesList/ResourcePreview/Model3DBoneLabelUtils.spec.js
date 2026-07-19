@@ -10,6 +10,8 @@ describe('Model3DBoneLabelUtils', () => {
     const element = createBoneLabelElement({
       displayName: 'Hand.Socket',
       canonicalName: 'Hand.Socket',
+      copyAriaLabel: 'Copy bone name Hand.Socket',
+      copyTooltip: 'Click to copy bone name',
       onCopy,
     });
 
@@ -17,6 +19,11 @@ describe('Model3DBoneLabelUtils', () => {
     expect(element.style.cursor).toBe('copy');
     expect(element.tabIndex).toBe(0);
     expect(element.getAttribute('role')).toBe('button');
+    expect(element.getAttribute('aria-label')).toBe(
+      'Copy bone name Hand.Socket'
+    );
+    expect(element.title).toBe('Click to copy bone name');
+    expect(element.title).not.toBe('[object Object]');
 
     element.click();
     element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
@@ -33,6 +40,8 @@ describe('Model3DBoneLabelUtils', () => {
     const element = createBoneLabelElement({
       displayName: 'Bone 3',
       canonicalName: '',
+      copyAriaLabel: '',
+      copyTooltip: '',
       onCopy,
     });
 
@@ -53,6 +62,8 @@ describe('Model3DBoneLabelUtils', () => {
     const element = createBoneLabelElement({
       displayName: 'Hand',
       canonicalName: 'Hand',
+      copyAriaLabel: 'Copy bone name Hand',
+      copyTooltip: 'Click to copy bone name',
       onCopy,
     });
     parent.appendChild(element);

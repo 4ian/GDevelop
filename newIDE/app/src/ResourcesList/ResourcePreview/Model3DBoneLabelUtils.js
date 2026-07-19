@@ -1,9 +1,10 @@
 // @flow
-import { t } from '@lingui/macro';
 
 type CreateBoneLabelElementOptions = {|
   displayName: string,
   canonicalName: string,
+  copyAriaLabel: string,
+  copyTooltip: string,
   onCopy: (boneName: string) => void,
 |};
 
@@ -16,6 +17,8 @@ type CreateBoneLabelElementOptions = {|
 export const createBoneLabelElement = ({
   displayName,
   canonicalName,
+  copyAriaLabel,
+  copyTooltip,
   onCopy,
 }: CreateBoneLabelElementOptions): HTMLDivElement => {
   const element = document.createElement('div');
@@ -42,8 +45,8 @@ export const createBoneLabelElement = ({
   element.style.userSelect = 'none';
   element.tabIndex = 0;
   element.setAttribute('role', 'button');
-  element.setAttribute('aria-label', t`Copy bone name ${canonicalName}`);
-  element.title = t`Click to copy bone name`;
+  element.setAttribute('aria-label', copyAriaLabel);
+  element.title = copyTooltip;
 
   const stopPointerPropagation = (event: Event) => {
     // Keep label interactions from manipulating the orbit controls behind it.

@@ -1,5 +1,7 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import * as THREE from 'three';
@@ -112,6 +114,11 @@ type Props = {|
   modelUrl: string,
 |};
 
+type ContentProps = {|
+  modelUrl: string,
+  i18n: I18nType,
+|};
+
 type ModelAnimationClipInfo = {|
   name: string,
   duration: number,
@@ -209,12 +216,14 @@ const createBonesVisualization = ({
   camera,
   canvasHost,
   onCopyBoneName,
+  i18n,
 }: {|
   model: any,
   scene: any,
   camera: any,
   canvasHost: HTMLDivElement,
   onCopyBoneName: (boneName: string) => void,
+  i18n: I18nType,
 |}): BonesVisualizationController | null => {
   const bones: Array<any> = [];
   model.traverse(child => {
@@ -298,10 +307,13 @@ const createBonesVisualization = ({
   canvasHost.appendChild(labelRenderer.domElement);
 
   const boneLabels = bones.map((bone, boneIndex) => {
+    const canonicalName = getModelBoneCanonicalName(bone);
     const label = new CSS2DObject(
       createBoneLabelElement({
         displayName: getModelBoneDisplayName(bone, boneIndex),
-        canonicalName: getModelBoneCanonicalName(bone),
+        canonicalName,
+        copyAriaLabel: i18n._(t`Copy bone name ${canonicalName}`),
+        copyTooltip: i18n._(t`Click to copy bone name`),
         onCopy: onCopyBoneName,
       })
     );
@@ -401,7 +413,10 @@ const frameModel = ({
   controls.update();
 };
 
-const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
+const InteractiveModel3DPreviewContent = ({
+  modelUrl,
+  i18n,
+}: ContentProps): React.Node => {
   const canvasHostRef = React.useRef<?HTMLDivElement>(null);
   const animationPlaybackControllerRef = React.useRef<?AnimationPlaybackController>(
     null
@@ -629,6 +644,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
             camera,
             canvasHost,
             onCopyBoneName,
+            i18n,
           });
           bonesVisualizationControllerRef.current = bonesVisualizationController;
           setHasBones(!!bonesVisualizationController);
@@ -687,7 +703,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
         }
       };
     },
-    [modelUrl, onCopyBoneName]
+    [i18n, modelUrl, onCopyBoneName]
   );
 
   return (
@@ -803,5 +819,11 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
     </div>
   );
 };
+
+const InteractiveModel3DPreview = (props: Props): React.Node => (
+  <I18n>
+    {({ i18n }) => <InteractiveModel3DPreviewContent {...props} i18n={i18n} />}
+  </I18n>
+);
 
 export default InteractiveModel3DPreview;

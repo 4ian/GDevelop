@@ -69,7 +69,10 @@ describe('InteractiveModel3DPreview', () => {
     expect(source).toContain(
       'displayName: getModelBoneDisplayName(bone, boneIndex)'
     );
-    expect(source).toContain('canonicalName: getModelBoneCanonicalName(bone)');
+    expect(source).toContain(
+      'const canonicalName = getModelBoneCanonicalName(bone)'
+    );
+    expect(source).toContain('copyTooltip: i18n._(t`Click to copy bone name`)');
     expect(source).toContain('copyTextToClipboard(boneName)');
     expect(source).toContain('<Trans>Bone name copied to clipboard!</Trans>');
     expect(source).toContain('MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18');

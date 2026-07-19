@@ -38,6 +38,10 @@ const {
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  resumePreviewDebugger,
+  stepPreviewDebugger,
+  setBreakpointsPreviewDebugger,
+  schedulePauseAtNextEventInPreviewDebugger,
 } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
@@ -301,9 +305,7 @@ function createNewWindow(windowArgs = args) {
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
-      const match = details.features.match(
-        /themeBackgroundColor=([^,]*)/
-      );
+      const match = details.features.match(/themeBackgroundColor=([^,]*)/);
       if (match) {
         try {
           backgroundColor = decodeURIComponent(match[1]);
@@ -344,8 +346,15 @@ function createNewWindow(windowArgs = args) {
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
     require('@electron/remote/main').enable(childWindow.webContents);
 
-    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
-      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    if (
+      !details.frameName ||
+      !details.frameName.startsWith('GDevelopWindowPortal')
+    ) {
+      console.warn(
+        `Unexpected frameName for child window: ${
+          details.frameName
+        } - verify handling on Electron side.`
+      );
     }
 
     // Track child window by frameName so the renderer can look up its
@@ -449,6 +458,7 @@ app.on('ready', function() {
       numberOfWindows: options.numberOfWindows,
       captureOptions: options.captureOptions,
       openEvent: event,
+      initialBreakpoints: options.initialBreakpoints,
     });
   });
   ipcMain.handle('preview-close', async (event, options) => {
@@ -458,6 +468,31 @@ app.on('ready', function() {
   ipcMain.handle('preview-close-all', async () => {
     return closeAllPreviewWindows();
   });
+
+  ipcMain.handle('preview-debugger-resume', async (event, { windowId }) => {
+    return resumePreviewDebugger(windowId);
+  });
+
+  ipcMain.handle(
+    'preview-debugger-step',
+    async (event, { windowId, payload }) => {
+      return stepPreviewDebugger(windowId, payload);
+    }
+  );
+
+  ipcMain.handle(
+    'preview-debugger-set-breakpoints',
+    async (event, { windowId, breakpoints }) => {
+      return setBreakpointsPreviewDebugger(windowId, breakpoints);
+    }
+  );
+
+  ipcMain.handle(
+    'preview-debugger-schedule-pause',
+    async (event, { windowId }) => {
+      return schedulePauseAtNextEventInPreviewDebugger(windowId);
+    }
+  );
 
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {

@@ -5,6 +5,10 @@ import * as React from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import {
+  CSS2DObject,
+  CSS2DRenderer,
+} from 'three/examples/jsm/renderers/CSS2DRenderer';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import FlatButton from '../../UI/FlatButton';
@@ -16,9 +20,12 @@ import {
   doesModelAnimationClipMatchSearch,
   getModelAnimationClipLabel,
 } from './Model3DAnimationUtils';
+import { getModelBoneDisplayName } from './Model3DBoneUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
+const MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18;
+const BONE_JOINT_MARKER_SIZE = 11;
 
 const styles = {
   container: {
@@ -110,6 +117,22 @@ type AnimationPlaybackController = {|
   actions: Array<any>,
 |};
 
+type MaterialAppearance = {|
+  material: any,
+  transparent: boolean,
+  opacity: number,
+  depthWrite: boolean,
+|};
+
+type BonesVisualizationController = {|
+  update: () => void,
+  render: () => void,
+  setSize: (width: number, height: number) => void,
+  setBonesVisible: (isVisible: boolean) => void,
+  setBoneNamesVisible: (isVisible: boolean) => void,
+  dispose: () => void,
+|};
+
 const removeMetalness = (material: any) => {
   if (material && material.metalness) {
     material.metalness = 0;
@@ -146,6 +169,208 @@ const disposeObject = (object: any) => {
       disposeMaterial(child.material);
     }
   });
+};
+
+const getMaterials = (node: any): Array<any> => {
+  if (!node.material) return [];
+  return Array.isArray(node.material) ? node.material : [node.material];
+};
+
+const createBoneLabelElement = (boneName: string): HTMLDivElement => {
+  const element = document.createElement('div');
+  element.textContent = boneName;
+  element.setAttribute('translate', 'no');
+  element.style.marginLeft = '6px';
+  element.style.padding = '2px 5px';
+  element.style.border = '1px solid rgba(87, 218, 255, 0.9)';
+  element.style.borderRadius = '3px';
+  element.style.backgroundColor = 'rgba(15, 20, 28, 0.88)';
+  element.style.color = '#ffffff';
+  element.style.fontFamily = 'sans-serif';
+  element.style.fontSize = '11px';
+  element.style.lineHeight = '14px';
+  element.style.whiteSpace = 'nowrap';
+  element.style.pointerEvents = 'none';
+  return element;
+};
+
+const createBoneJointMarkerTexture = (): any => {
+  const markerCanvas = document.createElement('canvas');
+  markerCanvas.width = 64;
+  markerCanvas.height = 64;
+  const context = markerCanvas.getContext('2d');
+  if (context) {
+    context.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
+    context.beginPath();
+    context.arc(32, 32, 24, 0, Math.PI * 2);
+    context.fillStyle = 'rgba(15, 20, 28, 0.95)';
+    context.fill();
+    context.lineWidth = 10;
+    context.strokeStyle = '#57daff';
+    context.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(markerCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+};
+
+const createBonesVisualization = ({
+  model,
+  scene,
+  camera,
+  canvasHost,
+}: {|
+  model: any,
+  scene: any,
+  camera: any,
+  canvasHost: HTMLDivElement,
+|}): BonesVisualizationController | null => {
+  const bones: Array<any> = [];
+  model.traverse(child => {
+    if (child.isBone) bones.push(child);
+  });
+  if (!bones.length) return null;
+
+  const materialAppearances: Array<MaterialAppearance> = [];
+  const recordedMaterials = new Set<any>();
+  model.traverse(child => {
+    getMaterials(child).forEach(material => {
+      if (!material || recordedMaterials.has(material)) return;
+      recordedMaterials.add(material);
+      materialAppearances.push({
+        material,
+        transparent: material.transparent,
+        opacity: material.opacity,
+        depthWrite: material.depthWrite,
+      });
+    });
+  });
+
+  const skeletonHelper = new THREE.SkeletonHelper(model);
+  skeletonHelper.visible = false;
+  skeletonHelper.renderOrder = 1000;
+  skeletonHelper.material.vertexColors = false;
+  skeletonHelper.material.color.set(0x57daff);
+  skeletonHelper.material.needsUpdate = true;
+  scene.add(skeletonHelper);
+
+  const boneJointMarkerTexture = createBoneJointMarkerTexture();
+  const boneJointPositions = new THREE.BufferAttribute(
+    new Float32Array(bones.length * 3),
+    3
+  );
+  const boneJointGeometry = new THREE.BufferGeometry();
+  boneJointGeometry.setAttribute('position', boneJointPositions);
+  const boneJointMaterial = new THREE.PointsMaterial({
+    map: boneJointMarkerTexture,
+    size: BONE_JOINT_MARKER_SIZE,
+    sizeAttenuation: false,
+    transparent: true,
+    alphaTest: 0.1,
+    depthTest: false,
+    depthWrite: false,
+    toneMapped: false,
+  });
+  const boneJoints = new THREE.Points(boneJointGeometry, boneJointMaterial);
+  boneJoints.visible = false;
+  boneJoints.renderOrder = 1001;
+  boneJoints.matrix = model.matrixWorld;
+  boneJoints.matrixAutoUpdate = false;
+  scene.add(boneJoints);
+
+  const inverseModelWorldMatrix = new THREE.Matrix4();
+  const bonePosition = new THREE.Vector3();
+  const updateBoneJointPositions = () => {
+    model.updateMatrixWorld(true);
+    inverseModelWorldMatrix.copy(model.matrixWorld).invert();
+    bones.forEach((bone, boneIndex) => {
+      bonePosition
+        .setFromMatrixPosition(bone.matrixWorld)
+        .applyMatrix4(inverseModelWorldMatrix);
+      boneJointPositions.setXYZ(
+        boneIndex,
+        bonePosition.x,
+        bonePosition.y,
+        bonePosition.z
+      );
+    });
+    boneJointPositions.needsUpdate = true;
+  };
+  updateBoneJointPositions();
+
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0';
+  labelRenderer.domElement.style.left = '0';
+  labelRenderer.domElement.style.zIndex = '2';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  canvasHost.appendChild(labelRenderer.domElement);
+
+  const boneLabels = bones.map((bone, boneIndex) => {
+    const label = new CSS2DObject(
+      createBoneLabelElement(getModelBoneDisplayName(bone, boneIndex))
+    );
+    label.visible = false;
+    label.center.set(0, 1);
+    bone.add(label);
+    return label;
+  });
+
+  let areBonesVisible = false;
+  let areBoneNamesVisible = false;
+  const updateBoneNamesVisibility = () => {
+    boneLabels.forEach(label => {
+      label.visible = areBonesVisible && areBoneNamesVisible;
+    });
+  };
+
+  const setBonesVisible = (isVisible: boolean) => {
+    areBonesVisible = isVisible;
+    skeletonHelper.visible = isVisible;
+    boneJoints.visible = isVisible;
+    updateBoneNamesVisibility();
+    materialAppearances.forEach(appearance => {
+      const { material } = appearance;
+      material.transparent = isVisible ? true : appearance.transparent;
+      material.opacity = isVisible
+        ? Math.min(appearance.opacity, MODEL_OPACITY_WHEN_SHOWING_BONES)
+        : appearance.opacity;
+      material.depthWrite = isVisible ? false : appearance.depthWrite;
+      material.needsUpdate = true;
+    });
+  };
+
+  const setBoneNamesVisible = (isVisible: boolean) => {
+    areBoneNamesVisible = isVisible;
+    updateBoneNamesVisibility();
+  };
+
+  return {
+    update: () => {
+      if (areBonesVisible) updateBoneJointPositions();
+    },
+    render: () => labelRenderer.render(scene, camera),
+    setSize: (width, height) => labelRenderer.setSize(width, height),
+    setBonesVisible,
+    setBoneNamesVisible,
+    dispose: () => {
+      setBoneNamesVisible(false);
+      setBonesVisible(false);
+      boneLabels.forEach((label, boneIndex) => {
+        bones[boneIndex].remove(label);
+      });
+      scene.remove(skeletonHelper);
+      skeletonHelper.dispose();
+      scene.remove(boneJoints);
+      boneJointGeometry.dispose();
+      boneJointMaterial.dispose();
+      boneJointMarkerTexture.dispose();
+      if (labelRenderer.domElement.parentNode === canvasHost) {
+        canvasHost.removeChild(labelRenderer.domElement);
+      }
+    },
+  };
 };
 
 const frameModel = ({
@@ -187,6 +412,9 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
   const animationPlaybackControllerRef = React.useRef<?AnimationPlaybackController>(
     null
   );
+  const bonesVisualizationControllerRef = React.useRef<?BonesVisualizationController>(
+    null
+  );
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<?string>(null);
   const [animationClips, setAnimationClips] = React.useState<
@@ -198,6 +426,9 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
   ] = React.useState<?number>(null);
   const [isAnimationPlaying, setIsAnimationPlaying] = React.useState(false);
   const [animationNameFilter, setAnimationNameFilter] = React.useState('');
+  const [hasBones, setHasBones] = React.useState(false);
+  const [isShowingBones, setIsShowingBones] = React.useState(false);
+  const [isShowingBoneNames, setIsShowingBoneNames] = React.useState(false);
 
   const filteredAnimationClips = animationClips
     .map((animationClip, animationIndex) => ({
@@ -243,6 +474,43 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
     [isAnimationPlaying, selectedAnimationIndex]
   );
 
+  const toggleBones = React.useCallback(
+    () => {
+      if (!bonesVisualizationControllerRef.current) return;
+      if (isShowingBones) setIsShowingBoneNames(false);
+      setIsShowingBones(!isShowingBones);
+    },
+    [isShowingBones]
+  );
+
+  const toggleBoneNames = React.useCallback(
+    () => {
+      if (!bonesVisualizationControllerRef.current || !isShowingBones) return;
+      setIsShowingBoneNames(!isShowingBoneNames);
+    },
+    [isShowingBoneNames, isShowingBones]
+  );
+
+  React.useEffect(
+    () => {
+      if (bonesVisualizationControllerRef.current) {
+        bonesVisualizationControllerRef.current.setBonesVisible(isShowingBones);
+      }
+    },
+    [isShowingBones]
+  );
+
+  React.useEffect(
+    () => {
+      if (bonesVisualizationControllerRef.current) {
+        bonesVisualizationControllerRef.current.setBoneNamesVisible(
+          isShowingBoneNames
+        );
+      }
+    },
+    [isShowingBoneNames]
+  );
+
   React.useEffect(
     () => {
       const canvasHost = canvasHostRef.current;
@@ -253,6 +521,7 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       let resizeObserver = null;
       let model = null;
       let animationMixer: any = null;
+      let bonesVisualizationController: ?BonesVisualizationController = null;
 
       setIsLoading(true);
       setError(null);
@@ -260,7 +529,11 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
       setSelectedAnimationIndex(null);
       setIsAnimationPlaying(false);
       setAnimationNameFilter('');
+      setHasBones(false);
+      setIsShowingBones(false);
+      setIsShowingBoneNames(false);
       animationPlaybackControllerRef.current = null;
+      bonesVisualizationControllerRef.current = null;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
@@ -305,6 +578,10 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
         const width = Math.max(canvasHost.clientWidth, 1);
         const height = Math.max(canvasHost.clientHeight, 1);
         renderer.setSize(width, height, false);
+        if (bonesVisualizationController) {
+          // The CSS labels share the same viewport as the WebGL canvas.
+          bonesVisualizationController.setSize(width, height);
+        }
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
       };
@@ -314,7 +591,13 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
         const deltaTime = clock.getDelta();
         if (animationMixer) animationMixer.update(deltaTime);
         controls.update();
+        if (bonesVisualizationController) {
+          bonesVisualizationController.update();
+        }
         renderer.render(scene, camera);
+        if (bonesVisualizationController) {
+          bonesVisualizationController.render();
+        }
         animationFrameId = window.requestAnimationFrame(render);
       };
 
@@ -336,6 +619,15 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
           model.traverse(removeMetalnessFromMesh);
           scene.add(model);
           frameModel({ model, camera, controls });
+          bonesVisualizationController = createBonesVisualization({
+            model,
+            scene,
+            camera,
+            canvasHost,
+          });
+          bonesVisualizationControllerRef.current = bonesVisualizationController;
+          setHasBones(!!bonesVisualizationController);
+          resize();
           animationMixer = new THREE.AnimationMixer(model);
           const actions = gltf.animations.map(animationClip =>
             animationMixer.clipAction(animationClip)
@@ -372,6 +664,10 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
         }
         controls.dispose();
         animationPlaybackControllerRef.current = null;
+        bonesVisualizationControllerRef.current = null;
+        if (bonesVisualizationController) {
+          bonesVisualizationController.dispose();
+        }
         if (animationMixer) {
           animationMixer.stopAllAction();
           if (model) animationMixer.uncacheRoot(model);
@@ -407,46 +703,85 @@ const InteractiveModel3DPreview = ({ modelUrl }: Props): React.Node => {
           </div>
         )}
       </div>
-      {animationClips.length > 0 && (
+      {(animationClips.length > 0 || hasBones) && (
         <div style={styles.animationPanel}>
           <div style={styles.animationPanelHeader}>
-            <div style={styles.animationPanelTitle}>
-              <Text size="body-small" noMargin>
-                <Trans>Animations</Trans> ({animationClips.length})
-              </Text>
-            </div>
-            <div style={styles.animationPanelSearch}>
-              <SearchBar
-                id="model-animation-name-filter"
-                value={animationNameFilter}
-                onChange={setAnimationNameFilter}
-                onChangeImmediately
-                onRequestSearch={() => {}}
-                placeholder={t`Filter animations by name`}
-              />
-            </div>
-          </div>
-          <div style={styles.animationList}>
-            {filteredAnimationClips.map(({ animationClip, animationIndex }) => {
-              const isSelected = selectedAnimationIndex === animationIndex;
-              const isPlaying = isSelected && isAnimationPlaying;
-              const animationLabel = getModelAnimationClipLabel(
-                animationClip.name,
-                animationIndex
-              );
-              return (
+            {animationClips.length > 0 && (
+              <React.Fragment>
+                <div style={styles.animationPanelTitle}>
+                  <Text size="body-small" noMargin>
+                    <Trans>Animations</Trans> ({animationClips.length})
+                  </Text>
+                </div>
+                <div style={styles.animationPanelSearch}>
+                  <SearchBar
+                    id="model-animation-name-filter"
+                    value={animationNameFilter}
+                    onChange={setAnimationNameFilter}
+                    onChangeImmediately
+                    onRequestSearch={() => {}}
+                    placeholder={t`Filter animations by name`}
+                  />
+                </div>
+              </React.Fragment>
+            )}
+            {hasBones && (
+              <React.Fragment>
                 <FlatButton
-                  key={`${animationClip.name}:${animationIndex}`}
-                  id={`model-animation-${animationIndex}`}
-                  label={<span translate="no">{animationLabel}</span>}
-                  leftIcon={isPlaying ? <Pause /> : <Play />}
-                  primary={isSelected}
-                  onClick={() => toggleAnimation(animationIndex)}
-                  style={{ margin: 2 }}
+                  id="model-show-bones"
+                  label={
+                    isShowingBones ? (
+                      <Trans>Hide bones</Trans>
+                    ) : (
+                      <Trans>Show bones</Trans>
+                    )
+                  }
+                  primary={isShowingBones}
+                  onClick={toggleBones}
+                  style={{ flexShrink: 0 }}
                 />
-              );
-            })}
+                <FlatButton
+                  id="model-show-bone-names"
+                  label={
+                    isShowingBoneNames ? (
+                      <Trans>Hide bone names</Trans>
+                    ) : (
+                      <Trans>Show bone names</Trans>
+                    )
+                  }
+                  primary={isShowingBoneNames}
+                  disabled={!isShowingBones}
+                  onClick={toggleBoneNames}
+                  style={{ flexShrink: 0 }}
+                />
+              </React.Fragment>
+            )}
           </div>
+          {animationClips.length > 0 && (
+            <div style={styles.animationList}>
+              {filteredAnimationClips.map(
+                ({ animationClip, animationIndex }) => {
+                  const isSelected = selectedAnimationIndex === animationIndex;
+                  const isPlaying = isSelected && isAnimationPlaying;
+                  const animationLabel = getModelAnimationClipLabel(
+                    animationClip.name,
+                    animationIndex
+                  );
+                  return (
+                    <FlatButton
+                      key={`${animationClip.name}:${animationIndex}`}
+                      id={`model-animation-${animationIndex}`}
+                      label={<span translate="no">{animationLabel}</span>}
+                      leftIcon={isPlaying ? <Pause /> : <Play />}
+                      primary={isSelected}
+                      onClick={() => toggleAnimation(animationIndex)}
+                      style={{ margin: 2 }}
+                    />
+                  );
+                }
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

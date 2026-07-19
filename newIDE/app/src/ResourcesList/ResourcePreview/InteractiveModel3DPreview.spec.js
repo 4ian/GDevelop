@@ -5,6 +5,7 @@ import {
   doesModelAnimationClipMatchSearch,
   getModelAnimationClipLabel,
 } from './Model3DAnimationUtils';
+import { getModelBoneDisplayName } from './Model3DBoneUtils';
 
 describe('InteractiveModel3DPreview', () => {
   it('uses balanced lighting that preserves model colors and highlights', () => {
@@ -52,5 +53,47 @@ describe('InteractiveModel3DPreview', () => {
     expect(source).toContain('placeholder={t`Filter animations by name`}');
     expect(source).toContain('filteredAnimationClips.map');
     expect(source).toContain('isPlaying ? <Pause /> : <Play />');
+  });
+
+  it('can reveal the model skeleton and bone names', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'InteractiveModel3DPreview.js'),
+      'utf8'
+    );
+
+    expect(source).toContain('new THREE.SkeletonHelper(model)');
+    expect(source).toContain('new THREE.Points(');
+    expect(source).toContain('context.arc(32, 32, 24, 0, Math.PI * 2)');
+    expect(source).toContain('boneJointPositions.setXYZ(');
+    expect(source).toContain('new CSS2DObject(');
+    expect(source).toContain('getModelBoneDisplayName(bone, boneIndex)');
+    expect(source).toContain('MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18');
+    expect(source).toContain('material.transparent = isVisible');
+    expect(source).toContain('material.depthWrite = isVisible');
+    expect(source).toContain('id="model-show-bones"');
+    expect(source).toContain('id="model-show-bone-names"');
+    expect(source).toContain('<Trans>Show bones</Trans>');
+    expect(source).toContain('<Trans>Hide bones</Trans>');
+    expect(source).toContain('<Trans>Show bone names</Trans>');
+    expect(source).toContain('<Trans>Hide bone names</Trans>');
+    expect(source).toContain('bonesVisualizationController.dispose()');
+  });
+
+  it('keeps periods from the original GLB bone name', () => {
+    expect(
+      getModelBoneDisplayName(
+        {
+          name: 'handslotl',
+          userData: { name: 'handslot.l' },
+        },
+        0
+      )
+    ).toBe('handslot.l');
+    expect(getModelBoneDisplayName({ name: 'spine', userData: {} }, 1)).toBe(
+      'spine'
+    );
+    expect(getModelBoneDisplayName({ name: '', userData: {} }, 2)).toBe(
+      'Bone 3'
+    );
   });
 });

@@ -360,16 +360,22 @@ common layer group. Let that matrix be `Mbone`.
 1. Translation is taken directly from `Mbone`. It therefore includes target
    position, model normalization, configured model rotation, model dimensions,
    animation, and bone translation.
-2. The upper 3x3 matrix is orthonormalized to the closest proper rotation.
-   Scale magnitude, non-uniform scale, reflection, and shear are discarded.
-3. Position offset is rotated by that scale-free bone rotation and added to the
+2. Before extracting rotation, the bone basis is converted from the rendered
+   GLTF coordinate system to GDevelop's logical object coordinate system. The
+   rendered model basis is `FlipY * configuredModelRotation`, so its inverse is
+   post-multiplied onto `Mbone`. This removes the renderer's coordinate-system
+   reflection without guessing which animated axis to flip.
+3. The converted upper 3x3 matrix is orthonormalized to the closest proper
+   rotation. Scale magnitude, non-uniform scale, any object flip, and shear are
+   discarded.
+4. Position offset is rotated by that scale-free bone rotation and added to the
    bone position.
-4. Rotation offset is converted from `ZYX` Euler degrees and post-multiplied
+5. Rotation offset is converted from `ZYX` Euler degrees and post-multiplied
    onto the bone rotation.
-5. The final quaternion is converted to the attached object's `ZYX` Euler
+6. The final quaternion is converted to the attached object's `ZYX` Euler
    rotation. The manager calls the normal `setX`, `setY`, `setZ`,
    `setRotationX`, `setRotationY`, and `setAngle` methods.
-6. The manager never calls size, scale, flip, visibility, layer, or renderer
+7. The manager never calls size, scale, flip, visibility, layer, or renderer
    parenting methods.
 
 In formula form:
@@ -638,8 +644,13 @@ allocate per frame.
 - Position and rotation offsets use bone-local axes and `ZYX` order.
 - Non-uniform target dimensions and model normalization do not change the
   child's width, height, depth, scale, or renderer-root parent.
-- Negative scale/reflection produces deterministic right-handed rotation and
-  does not mutate child flips.
+- The model's built-in Y reflection and configured model rotation are removed
+  as a coordinate-system basis before extracting the logical bone rotation.
+- Negative object flips produce deterministic right-handed rotation and do not
+  mutate child flips.
+- At multiple animated poses, three non-collinear points on a standalone model
+  with zero offsets match the same model authored directly below the bone when
+  target and attachment use the same configured model rotation and scale.
 - Attachment works for siblings in a scene container and siblings in a custom
   3D object container.
 - Cross-container and cross-layer attachment is rejected transactionally.

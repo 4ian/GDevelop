@@ -112,6 +112,12 @@ describe('3D model bone attachments', function () {
     expect(Math.abs(actual - expected)).to.be.lessThan(epsilon);
   };
 
+  const expectVectorClose = (actual, expected, epsilon = 1e-6) => {
+    expectClose(actual.x, expected.x, epsilon);
+    expectClose(actual.y, expected.y, epsilon);
+    expectClose(actual.z, expected.z, epsilon);
+  };
+
   it('extracts the closest proper rotation from scale, reflection and shear', function () {
     const extractor = new gdjs.Model3DScaleFreeRotationExtractor();
     const expectedQuaternion = new THREE.Quaternion().setFromEuler(
@@ -294,6 +300,59 @@ describe('3D model bone attachments', function () {
     expectClose(attachment.getRotationX(), target.getBoneRotationX('Hand'));
     expectClose(attachment.getRotationY(), target.getBoneRotationY('Hand'));
     expectClose(attachment.getAngle(), target.getBoneRotationZ('Hand'));
+  });
+
+  it('matches a direct bone child with reflected model coordinates', function () {
+    const bone = makeBone('Hand');
+    const runtimeScene = makeScene(makeGltf([bone]));
+    const targetData = makeModelData('Target', 20, 60, 40);
+    targetData.content.rotationX = 90;
+    const attachmentData = makeModelData('Attachment', 20, 60, 40);
+    attachmentData.content.rotationX = 90;
+    const target = addModel(runtimeScene, targetData);
+    const attachment = addModel(runtimeScene, attachmentData);
+    target.setPosition(120, 230);
+    target.setZ(340);
+    target.setRotationX(15);
+    target.setRotationY(-25);
+    target.setAngle(35);
+
+    const clonedBone = /** @type {any} */ (
+      target.getRenderer()
+    )._bonesByCanonicalName.get('Hand');
+    clonedBone.position.set(0.5, 0.75, -0.25);
+    clonedBone.rotation.set(0.2, -0.4, 0.6, 'ZYX');
+
+    const behavior = getBase3D(attachment);
+    behavior.attachToModelBone(target, 'Hand');
+    const layerGroup = /** @type {THREE.Object3D} */ (
+      runtimeScene.getLayer('').getRenderer().getThreeGroup()
+    );
+    const attachmentModelRoot = /** @type {any} */ (attachment.getRenderer())
+      ._clonedModelRoot;
+    const localPoints = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(1, 0, 0),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(0, 0, 1),
+    ];
+    const expectAttachmentToMatchDirectBoneChild = () => {
+      layerGroup.updateMatrixWorld(true);
+      localPoints.forEach((point) => {
+        expectVectorClose(
+          point.clone().applyMatrix4(attachmentModelRoot.matrixWorld),
+          point.clone().applyMatrix4(clonedBone.matrixWorld)
+        );
+      });
+    };
+
+    expect(behavior.isBoneAttachmentResolved()).to.be(true);
+    expectAttachmentToMatchDirectBoneChild();
+
+    clonedBone.position.set(-0.25, 1.5, 0.35);
+    clonedBone.rotation.set(-0.7, 0.35, -1.1, 'ZYX');
+    gdjs.Model3DBoneAttachmentManager.synchronizeContainer(runtimeScene);
+    expectAttachmentToMatchDirectBoneChild();
   });
 
   it('suspends on layer mismatch, resumes, detaches transactionally and cleans up target deletion', function () {

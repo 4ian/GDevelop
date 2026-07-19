@@ -451,6 +451,13 @@ namespace gdjs {
     private _relativeInverseMatrix = new THREE.Matrix4();
     private _boneRelativeMatrix = new THREE.Matrix4();
     private _boneQuaternion = new THREE.Quaternion();
+    private _modelCoordinateSystemInverseMatrix = new THREE.Matrix4();
+    private _modelRotationEuler = new THREE.Euler(0, 0, 0, 'ZYX');
+    private _modelYAxisReflectionMatrix = new THREE.Matrix4().makeScale(
+      1,
+      -1,
+      1
+    );
     private _scaleFreeRotationExtractor =
       new gdjs.Model3DScaleFreeRotationExtractor();
     private _originalModel: THREE_ADDONS.GLTF;
@@ -555,6 +562,18 @@ namespace gdjs {
       this._boneRelativeMatrix.multiplyMatrices(
         this._relativeInverseMatrix,
         bone.matrixWorld
+      );
+
+      // The model normalization converts GLTF coordinates to GDevelop with a
+      // reflected Y axis followed by the model's configured default rotation.
+      // A bone matrix therefore has a negative determinant and cannot be
+      // represented directly by the attachment's (proper) logical rotation.
+      // Express the bone in the model's GDevelop coordinate system before
+      // removing scale and shear. This also makes a zero rotation offset match
+      // a mesh authored directly below the bone when both models use the same
+      // configured default rotation.
+      this._boneRelativeMatrix.multiply(
+        this._modelCoordinateSystemInverseMatrix
       );
       if (
         !this._scaleFreeRotationExtractor.setQuaternionFromMatrix(
@@ -803,6 +822,19 @@ namespace gdjs {
       originalDepth: float,
       keepAspectRatio: boolean
     ) {
+      // stretchModelIntoUnitaryCube applies this same reflected coordinate
+      // system to the rendered model (positive normalization scales omitted).
+      this._modelRotationEuler.set(
+        gdjs.toRad(rotationX),
+        gdjs.toRad(rotationY),
+        gdjs.toRad(rotationZ),
+        'ZYX'
+      );
+      this._modelCoordinateSystemInverseMatrix
+        .makeRotationFromEuler(this._modelRotationEuler)
+        .premultiply(this._modelYAxisReflectionMatrix)
+        .invert();
+
       // Start from the original model because:
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space

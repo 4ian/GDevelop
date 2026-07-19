@@ -679,6 +679,125 @@ column2 = "ssfssdfsf"
     ).toMatchObject({ name: 'Move', type: 'Test::Move', speed: 12 });
   });
 
+  test('never writes behavior properties excluded by a strict authoring schema', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics',
+            type: 'Test::Strict',
+            speed: 12,
+            hiddenRuntimeValue: 99,
+            privateRuntimeValue: 'secret',
+          },
+          {
+            name: 'Compatibility',
+            type: 'Test::Preserve',
+            pluginOwnedValue: 'kept',
+          },
+        ],
+      },
+    ];
+    project.layouts[0].instances = [
+      {
+        name: 'Player',
+        x: 0,
+        y: 0,
+        angle: 0,
+        zOrder: 0,
+        layer: '',
+        customSize: false,
+        width: 0,
+        height: 0,
+        persistentUuid: '00000000-0000-4000-8000-000000000001',
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        behaviorOverridings: [
+          {
+            name: 'Physics',
+            type: 'Test::Strict',
+            speed: 24,
+            hiddenRuntimeValue: 199,
+            privateRuntimeValue: 'instance-secret',
+          },
+          {
+            name: 'Compatibility',
+            type: 'Test::Preserve',
+            pluginOwnedValue: 'instance-kept',
+          },
+        ],
+      },
+    ];
+    const options = {
+      behaviorPropertySchemasByType: {
+        'Test::Strict': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'error',
+          excludedSerializedKeys: ['hiddenRuntimeValue', 'privateRuntimeValue'],
+          properties: [
+            {
+              authoringKey: 'Speed',
+              serializedKey: 'speed',
+              type: 'Number',
+            },
+          ],
+        },
+        'Test::Preserve': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'preserve',
+          properties: [],
+        },
+      },
+    };
+
+    const files = decomposeLegacyProjectToFiles(project, options);
+    const objectSource = files['game://scenes/Main/objects/Player.settings'];
+    const layoutSource = files['game://scenes/Main/Main.layout'];
+    expect(objectSource).toContain('speed = 12');
+    expect(layoutSource).toContain('"speed":24');
+    expect(objectSource).not.toContain('hiddenRuntimeValue');
+    expect(objectSource).not.toContain('privateRuntimeValue');
+    expect(layoutSource).not.toContain('hiddenRuntimeValue');
+    expect(layoutSource).not.toContain('privateRuntimeValue');
+    expect(objectSource).toContain('pluginOwnedValue = "kept"');
+    expect(layoutSource).toContain('"pluginOwnedValue":"instance-kept"');
+
+    const composed = composeLegacyProjectFromFiles(files, options);
+    expect(composed.layouts[0].objects[0].behaviors[0]).toEqual({
+      name: 'Physics',
+      type: 'Test::Strict',
+      speed: 12,
+    });
+    expect(
+      composed.layouts[0].instances[0].behaviorOverridings[0]
+    ).toMatchObject({
+      name: 'Physics',
+      type: 'Test::Strict',
+      speed: 24,
+    });
+    expect(areLegacyProjectsEquivalent(project, composed, options)).toBe(true);
+    expect(project.layouts[0].objects[0].behaviors[0]).toHaveProperty(
+      'hiddenRuntimeValue',
+      99
+    );
+
+    const projectWithUnknownProperty = JSON.parse(JSON.stringify(project));
+    projectWithUnknownProperty.layouts[0].objects[0].behaviors[0].typo = true;
+    const filesWithUnknownProperty = decomposeLegacyProjectToFiles(
+      projectWithUnknownProperty,
+      options
+    );
+    expect(() =>
+      composeLegacyProjectFromFiles(filesWithUnknownProperty, options)
+    ).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_UNKNOWN_BEHAVIOR_PROPERTY' })
+    );
+  });
+
   test('writes Sprite point settings as inline TOML values', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.objects = [

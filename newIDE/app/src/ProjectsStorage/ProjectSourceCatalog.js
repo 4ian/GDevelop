@@ -91,6 +91,11 @@ const summarizeProperty = (name: string, property: any): ?Object => {
   return summary;
 };
 
+const excludedSerializedPropertyKeysBySummaries: WeakMap<
+  Array<Object>,
+  Array<string>
+> = new WeakMap();
+
 const changedTopLevelKeys = (before: Object, after: Object): Array<string> =>
   sortedUnique([
     ...Object.keys(before || {}),
@@ -177,11 +182,28 @@ const summarizeProperties = (
   instance?: any
 ): Array<Object> => {
   if (!properties || !properties.keys) return [];
-  return toArray(properties.keys())
+  const excludedSerializedPropertyKeys = [];
+  const summaries = toArray(properties.keys())
     .sort((left, right) => String(left).localeCompare(String(right)))
     .map(name => {
       const authoringKey = String(name);
       const property = properties.get(name);
+      if (
+        (property.isHidden && property.isHidden()) ||
+        (property.isDeprecated && property.isDeprecated())
+      ) {
+        if (instance !== undefined) {
+          const serialization = inferSerializedPropertyKey({
+            instance,
+            authoringKey,
+            property,
+          });
+          if (serialization.status === 'supported') {
+            excludedSerializedPropertyKeys.push(serialization.serializedKey);
+          }
+        }
+        return null;
+      }
       const summary = summarizeProperty(authoringKey, property);
       if (!summary) return null;
       if (instance !== undefined) {
@@ -199,12 +221,18 @@ const summarizeProperties = (
       return summary;
     })
     .filter(Boolean);
+  excludedSerializedPropertyKeysBySummaries.set(
+    summaries,
+    sortedUnique(excludedSerializedPropertyKeys)
+  );
+  return summaries;
 };
 
 const summarizeSerializedProperties = (
   propertyDescriptors: ?Array<Object>
-): Array<Object> =>
-  (propertyDescriptors || [])
+): Array<Object> => {
+  const descriptors = propertyDescriptors || [];
+  const summaries = descriptors
     .filter(property => !property.hidden && !property.deprecated)
     .map(property => {
       const summary: Object = {
@@ -232,6 +260,17 @@ const summarizeSerializedProperties = (
       }
       return summary;
     });
+  excludedSerializedPropertyKeysBySummaries.set(
+    summaries,
+    sortedUnique(
+      descriptors
+        .filter(property => property.hidden || property.deprecated)
+        .map(property => String(property.name || ''))
+        .filter(Boolean)
+    )
+  );
+  return summaries;
+};
 
 const getSerializedRequiredBehaviorTypes = (
   behaviorDefinition: Object
@@ -1311,6 +1350,9 @@ export const buildBehaviorPropertySchemasByType = (
     schemas[String(behavior.type || '')] = {
       keySpace: 'serialized',
       unknownPropertyPolicy: behavior.unknownPropertyPolicy || 'preserve',
+      excludedSerializedKeys:
+        excludedSerializedPropertyKeysBySummaries.get(behavior.properties) ||
+        [],
       properties: (behavior.properties || [])
         .filter(property => property.serializedKey)
         .map(property => ({

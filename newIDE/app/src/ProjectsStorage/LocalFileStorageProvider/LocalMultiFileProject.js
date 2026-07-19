@@ -787,6 +787,7 @@ export const writeLegacyProjectAsMultiFile = async (
 ): Promise<Array<string>> => {
   let migration;
   let previousFiles: { [string]: string } = {};
+  const decomposeOptions = (options && options.decomposeOptions) || {};
   if (fs.existsSync(entryPath)) {
     previousFiles = (await readMultiFileSourceTree(entryPath)).files;
     const document = parseTomlSource(
@@ -797,7 +798,7 @@ export const writeLegacyProjectAsMultiFile = async (
   }
   const files = decomposeLegacyProjectToFiles(legacyProject, {
     migration,
-    ...((options && options.decomposeOptions) || {}),
+    ...decomposeOptions,
   });
   const verificationProject = composeLegacyProjectFromFiles(
     files,
@@ -805,7 +806,11 @@ export const writeLegacyProjectAsMultiFile = async (
   );
   const verificationDifference = getLegacyProjectFirstDifferenceDescription(
     legacyProject,
-    verificationProject
+    verificationProject,
+    {
+      behaviorPropertySchemasByType:
+        decomposeOptions.behaviorPropertySchemasByType,
+    }
   );
   if (verificationDifference) {
     throw new MultiFileProjectError(

@@ -1279,6 +1279,116 @@ column2 = "333"
     }
   });
 
+  test('does not expose or write hidden Physics3D behavior properties', async () => {
+    const gd: libGDevelop = global.gd;
+    const hiddenPhysics3DProperties = [
+      ['meshShapeResourceName', 'PrivateCollider.glb'],
+      ['shapeOffsetX', '12'],
+      ['shapeOffsetY', '13'],
+      ['shapeOffsetZ', '14'],
+      ['massCenterOffsetX', '34'],
+      ['massCenterOffsetY', '35'],
+      ['massCenterOffsetZ', '36'],
+    ];
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const physics3DExtensionModule = require('../../../../../Extensions/Physics3DBehavior/JsExtension');
+    const physics3DExtension = physics3DExtensionModule.createExtension(
+      message => message,
+      gd
+    );
+    gd.JsPlatform.get().addNewExtension(physics3DExtension);
+    physics3DExtension.delete();
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const legacyProject = JSON.parse(JSON.stringify(projectFixture));
+    legacyProject.properties.name = 'Physics3D hidden property regression';
+    legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
+    legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].objects = [
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics3D',
+            type: 'Physics3D::Physics3DBehavior',
+            angularDamping: 0.1,
+            bodyType: 'Static',
+            bullet: false,
+            density: 1,
+            fixedRotation: false,
+            friction: 0.3,
+            gravityScale: 1,
+            linearDamping: 0.1,
+            massOverride: 0,
+            object3D: '',
+            restitution: 0.1,
+            shape: 'Box',
+            shapeOrientation: 'Z',
+          },
+        ],
+      },
+    ];
+    try {
+      unserializeFromJSObject(project, legacyProject);
+      const behavior = project
+        .getLayout('Main')
+        .getObjects()
+        .getObject('Body')
+        .getBehavior('Physics3D');
+      const beforePropertyRead = serializeToJSObject(project, 'serializeTo')
+        .layouts[0].objects[0].behaviors[0];
+      behavior.getProperties();
+      const afterPropertyRead = serializeToJSObject(project, 'serializeTo')
+        .layouts[0].objects[0].behaviors[0];
+      expect(afterPropertyRead).toEqual(beforePropertyRead);
+      hiddenPhysics3DProperties.forEach(([propertyName, propertyValue]) => {
+        expect(afterPropertyRead).not.toHaveProperty(propertyName);
+        expect(behavior.updateProperty(propertyName, propertyValue)).toBe(true);
+      });
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/objects/Body.settings'),
+        'utf8'
+      );
+      const settingsCatalogSource = fs.readFileSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json'),
+        'utf8'
+      );
+      const generatedGameJson = JSON.parse(
+        fs.readFileSync(
+          path.join(temporaryDirectory, GENERATED_LEGACY_PROJECT_RELATIVE_PATH),
+          'utf8'
+        )
+      );
+      const generatedBehavior =
+        generatedGameJson.layouts[0].objects[0].behaviors[0];
+      expect(objectSource).toContain('bodyType = "Static"');
+      hiddenPhysics3DProperties.forEach(([propertyName]) => {
+        expect(settingsCatalogSource).not.toContain(propertyName);
+        expect(objectSource).not.toContain(propertyName);
+        expect(generatedBehavior).not.toHaveProperty(propertyName);
+      });
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension('Physics3D');
+    }
+  });
+
   test('writes the default scene sources on the first project save', async () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();

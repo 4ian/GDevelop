@@ -220,6 +220,64 @@ const forEachProjectObjectDefinition = (project, callback) => {
   );
 };
 
+const forEachProjectInitialInstance = (project, callback) => {
+  (project.layouts || []).forEach(layout =>
+    (layout.instances || []).forEach(callback)
+  );
+  (project.externalLayouts || []).forEach(layout =>
+    (layout.instances || []).forEach(callback)
+  );
+  (project.eventsFunctionsExtensions || []).forEach(extension => {
+    (extension.eventsBasedObjects || []).forEach(prefab => {
+      (prefab.instances || []).forEach(callback);
+      (prefab.variants || []).forEach(variant =>
+        (variant.instances || []).forEach(callback)
+      );
+    });
+  });
+};
+
+const processExcludedAttachedBehaviorProperties = (
+  project,
+  behaviorPropertySchemasByType
+) => {
+  if (!behaviorPropertySchemasByType) return project;
+  const processBehavior = behavior => {
+    if (!behavior || typeof behavior !== 'object') return;
+    const behaviorType = String(behavior.type || '');
+    const schema = behaviorPropertySchemasByType[behaviorType];
+    if (!schema) return;
+    const excludedSerializedKeys = new Set(
+      (schema.excludedSerializedKeys || []).map(key => String(key || ''))
+    );
+    if (!excludedSerializedKeys.size) return;
+    Object.keys(behavior).forEach(key => {
+      if (excludedSerializedKeys.has(key)) delete behavior[key];
+    });
+  };
+  forEachProjectObjectDefinition(project, object =>
+    (object && Array.isArray(object.behaviors) ? object.behaviors : []).forEach(
+      processBehavior
+    )
+  );
+  forEachProjectInitialInstance(project, instance =>
+    (instance && Array.isArray(instance.behaviorOverridings)
+      ? instance.behaviorOverridings
+      : []
+    ).forEach(processBehavior)
+  );
+  return project;
+};
+
+export const removeExcludedAttachedBehaviorPropertiesFromProject = (
+  legacyProject,
+  behaviorPropertySchemasByType
+) =>
+  processExcludedAttachedBehaviorProperties(
+    clone(legacyProject),
+    behaviorPropertySchemasByType
+  );
+
 const processHiddenAttachedBehaviorProperties = (project, reject) => {
   const hiddenPropertiesByType = collectHiddenBehaviorPropertiesByType(project);
   if (!hiddenPropertiesByType.size) return project;
@@ -1761,8 +1819,11 @@ const removeEmptyBehaviorSharedData = layout =>
       };
 
 export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
-  const project = removeHiddenAttachedBehaviorProperties(
-    clone(asObject(legacyProject, 'Project'))
+  const project = processExcludedAttachedBehaviorProperties(
+    removeHiddenAttachedBehaviorProperties(
+      clone(asObject(legacyProject, 'Project'))
+    ),
+    options.behaviorPropertySchemasByType
   );
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
@@ -3801,9 +3862,15 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
   }
 };
 
-export const normalizeLegacyProjectForMultiFile = legacyProject => {
-  const project = removeHiddenAttachedBehaviorProperties(
-    removeLegacyFolderStructuresFromProject(legacyProject)
+export const normalizeLegacyProjectForMultiFile = (
+  legacyProject,
+  options = {}
+) => {
+  const project = processExcludedAttachedBehaviorProperties(
+    removeHiddenAttachedBehaviorProperties(
+      removeLegacyFolderStructuresFromProject(legacyProject)
+    ),
+    options.behaviorPropertySchemasByType
   );
   project.layouts = project.layouts || [];
   project.externalEvents = project.externalEvents || [];
@@ -3908,10 +3975,14 @@ const summarizeDifferenceValue = value => {
     : serialized;
 };
 
-export const getLegacyProjectFirstDifferenceDescription = (left, right) => {
+export const getLegacyProjectFirstDifferenceDescription = (
+  left,
+  right,
+  options = {}
+) => {
   const difference = findFirstValueDifference(
-    canonicalValue(normalizeLegacyProjectForMultiFile(left)),
-    canonicalValue(normalizeLegacyProjectForMultiFile(right))
+    canonicalValue(normalizeLegacyProjectForMultiFile(left, options)),
+    canonicalValue(normalizeLegacyProjectForMultiFile(right, options))
   );
   if (!difference) return null;
   if (
@@ -3936,5 +4007,5 @@ export const getLegacyProjectFirstDifferenceDescription = (left, right) => {
   )}, reconstructed ${summarizeDifferenceValue(difference.right)}.`;
 };
 
-export const areLegacyProjectsEquivalent = (left, right) =>
-  !getLegacyProjectFirstDifferenceDescription(left, right);
+export const areLegacyProjectsEquivalent = (left, right, options = {}) =>
+  !getLegacyProjectFirstDifferenceDescription(left, right, options);

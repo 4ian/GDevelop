@@ -2,6 +2,7 @@
 
 import {
   ProjectSourceCatalogError,
+  buildBehaviorPropertySchemasByType,
   buildProjectSettingsCatalog,
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
@@ -260,6 +261,11 @@ describe('project source catalogs', () => {
     expect(entry.properties.map(property => property.name)).not.toContain(
       'Internal'
     );
+    expect(
+      buildBehaviorPropertySchemasByType(catalog)[behaviorType]
+        .excludedSerializedKeys
+    ).toEqual(['Internal']);
+    expect(serializeProjectSettingsCatalog(catalog)).not.toContain('Internal');
     expect(entry.requiredBehaviorTypes).toEqual([
       'PlatformBehavior::PlatformerObjectBehavior',
     ]);

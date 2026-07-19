@@ -33,6 +33,7 @@ import {
 import {
   MULTI_FILE_STATIC_DATA_URI,
   removeLegacyFolderStructuresFromProject,
+  removeExcludedAttachedBehaviorPropertiesFromProject,
   serializeStaticDataToToml,
 } from '../MultiFileProjectFormat';
 import {
@@ -49,6 +50,7 @@ import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationT
 import {
   PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
   PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+  buildBehaviorPropertySchemasByType,
   buildProjectLayoutCatalog,
   buildProjectSettingsCatalog,
   serializeProjectLayoutCatalog,
@@ -569,39 +571,52 @@ const writeProjectFiles = async ({
       project,
       serializedProject: serializedProjectObject,
     });
+    const behaviorPropertySchemasByType = buildBehaviorPropertySchemasByType(
+      settingsCatalog
+    );
+    const authoringSerializedProjectObject = removeExcludedAttachedBehaviorPropertiesFromProject(
+      serializedProjectObject,
+      behaviorPropertySchemasByType
+    );
     const layoutCatalog = buildProjectLayoutCatalog({
       project,
-      serializedProject: serializedProjectObject,
+      serializedProject: authoringSerializedProjectObject,
       effectTypes: settingsCatalog.effectTypes,
       behaviorTypes: settingsCatalog.behaviorTypes,
     });
     const javascriptArtifacts = buildJavaScriptAuthoringArtifacts(
-      serializedProjectObject
+      authoringSerializedProjectObject
     );
     const javascriptValidation = validateProjectJavaScriptAuthoring({
-      serializedProject: serializedProjectObject,
+      serializedProject: authoringSerializedProjectObject,
       runtimeApiDeclaration: javascriptArtifacts.runtimeApi,
       projectApiDeclaration: javascriptArtifacts.projectApi,
     });
     if (!javascriptValidation.valid) {
       throw new JavaScriptAuthoringApiError(javascriptValidation.errors[0]);
     }
-    await writeLegacyProjectAsMultiFile(serializedProjectObject, filePath, {
-      decomposeOptions: {
-        eventsDslOptions: {
-          formatInstruction: createCatalogInstructionFormatter(
-            serializationCatalog
-          ),
+    await writeLegacyProjectAsMultiFile(
+      authoringSerializedProjectObject,
+      filePath,
+      {
+        decomposeOptions: {
+          behaviorPropertySchemasByType,
+          eventsDslOptions: {
+            formatInstruction: createCatalogInstructionFormatter(
+              serializationCatalog
+            ),
+          },
         },
-      },
-      composeOptions: {
-        compileOptions: {
-          resolveInstruction: createCatalogInstructionResolver(
-            serializationCatalog
-          ),
+        composeOptions: {
+          behaviorPropertySchemasByType,
+          compileOptions: {
+            resolveInstruction: createCatalogInstructionResolver(
+              serializationCatalog
+            ),
+          },
         },
-      },
-    });
+      }
+    );
     await writeAndCheckFile(
       serializeProjectInstructionCatalog(authoringCatalog),
       path.join(
@@ -636,7 +651,7 @@ const writeProjectFiles = async ({
       path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
     );
     const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
-      serializedProjectObject
+      authoringSerializedProjectObject
     );
     delete generatedLegacyProject.staticData;
     await writeAndCheckFormattedJSONFile(

@@ -56,9 +56,11 @@ Use the catalogs as authoring contracts:
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
   to resolve existing project components and their object definitions. For an
-  attached behavior, write only properties listed in its `behaviorTypes`
-  entry. Editor-hidden properties are deliberately absent, runtime-managed,
-  and forbidden in object settings; never copy them from legacy JSON.
+  attached behavior, initialize or edit only properties listed in its
+  `behaviorTypes` entry. Editor-hidden, deprecated, extension-owned, and legacy
+  serializer properties are deliberately absent from the authoring surface;
+  never invent them, but preserve every unlisted field already present in an
+  object settings file or legacy JSON source.
 - In `layout-catalog.json`, read `tables` for exact context-specific headers,
   fields, value types, defaults, and constraints. Select the one
   `contexts` entry whose `owner` matches the scene, prefab, variant, or external
@@ -161,10 +163,11 @@ and type-specific configuration. `project.settings`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
-For each attached behavior, keep its identity fields and only the author-writable
-properties present in `settings-catalog.json`. Hidden behavior descriptor values
-must not appear in `<Object>.settings`; generated runtime code supplies their
-descriptor defaults and manages their state.
+For each attached behavior, keep its identity fields and complete existing
+serializer data in `<Object>.settings`. Initialize or edit only the
+author-writable properties present in `settings-catalog.json`; preserve
+unlisted fields verbatim because specialized editors may own runtime-required
+configuration that the generic catalog intentionally hides.
 
 Give every prefab and behavior function its own `functions/<Function>/`
 directory containing `function.settings` and `<Function>.events`. Store editor
@@ -514,8 +517,9 @@ Before finishing:
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
   behaviors are at the local root of its individual `<Object>.settings` file.
-- Confirm attached behaviors serialize only catalog-listed author-writable
-  properties and no editor-hidden behavior descriptor appears in object settings.
+- Confirm attached behaviors use catalog-listed properties for new edits and
+  preserve every existing unlisted serialized field verbatim. Do not treat a
+  field's absence from the catalog as permission to delete it.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
 - Confirm every prefab/behavior function has a dedicated flat function

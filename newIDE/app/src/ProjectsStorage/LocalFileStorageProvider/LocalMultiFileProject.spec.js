@@ -1235,6 +1235,31 @@ column2 = "333"
     legacyProject.properties.name = 'Physics template regression';
     legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
     legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].objects = [
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics2',
+            type: 'Physics2::Physics2Behavior',
+            angularDamping: 0.1,
+            bodyType: 'Dynamic',
+            bullet: false,
+            canSleep: true,
+            density: 1,
+            fixedRotation: false,
+            friction: 0.3,
+            gravityScale: 1,
+            layers: 3,
+            linearDamping: 0.1,
+            masks: 5,
+            restitution: 0.1,
+            shape: 'Box',
+          },
+        ],
+      },
+    ];
     legacyProject.layouts[0].events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -1270,10 +1295,21 @@ column2 = "333"
       );
       expect(eventsSource).toContain('do "Physics2::Remove joint"');
       expect(eventsSource).not.toContain('@exact');
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/objects/Body.settings'),
+        'utf8'
+      );
+      expect(objectSource).toContain('layers = 3');
+      expect(objectSource).toContain('masks = 5');
       const reopened = await openMultiFileProject(entryPath);
       expect(reopened.layouts[0].events[0].actions[0]).toMatchObject({
         type: { value: 'Physics2::Remove joint' },
         parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
+      });
+      expect(reopened.layouts[0].objects[0].behaviors[0]).toMatchObject({
+        type: 'Physics2::Physics2Behavior',
+        layers: 3,
+        masks: 5,
       });
     } finally {
       project.delete();
@@ -1281,16 +1317,16 @@ column2 = "333"
     }
   });
 
-  test('does not expose or write hidden Physics3D behavior properties', async () => {
+  test('preserves hidden Physics3D behavior properties without exposing them in the catalog', async () => {
     const gd: libGDevelop = global.gd;
     const hiddenPhysics3DProperties = [
-      ['meshShapeResourceName', 'PrivateCollider.glb'],
-      ['shapeOffsetX', '12'],
-      ['shapeOffsetY', '13'],
-      ['shapeOffsetZ', '14'],
-      ['massCenterOffsetX', '34'],
-      ['massCenterOffsetY', '35'],
-      ['massCenterOffsetZ', '36'],
+      ['meshShapeResourceName', 'PrivateCollider.glb', 'PrivateCollider.glb'],
+      ['shapeOffsetX', '12', 12],
+      ['shapeOffsetY', '13', 13],
+      ['shapeOffsetZ', '14', 14],
+      ['massCenterOffsetX', '34', 34],
+      ['massCenterOffsetY', '35', 35],
+      ['massCenterOffsetZ', '36', 36],
     ];
     // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
     const physics3DExtensionModule = require('../../../../../Extensions/Physics3DBehavior/JsExtension');
@@ -1321,8 +1357,10 @@ column2 = "333"
             fixedRotation: false,
             friction: 0.3,
             gravityScale: 1,
+            layers: 5,
             linearDamping: 0.1,
             massOverride: 0,
+            masks: 9,
             object3D: '',
             restitution: 0.1,
             shape: 'Box',
@@ -1367,9 +1405,11 @@ column2 = "333"
         path.join(temporaryDirectory, 'scenes/Main/objects/Body.settings'),
         'utf8'
       );
-      const settingsCatalogSource = fs.readFileSync(
-        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json'),
-        'utf8'
+      const settingsCatalog = JSON.parse(
+        fs.readFileSync(
+          path.join(temporaryDirectory, '.gdevelop/settings-catalog.json'),
+          'utf8'
+        )
       );
       const generatedGameJson = JSON.parse(
         fs.readFileSync(
@@ -1379,11 +1419,21 @@ column2 = "333"
       );
       const generatedBehavior =
         generatedGameJson.layouts[0].objects[0].behaviors[0];
+      const physics3DPropertyNames = settingsCatalog.behaviorTypes
+        .find(
+          behaviorType => behaviorType.type === 'Physics3D::Physics3DBehavior'
+        )
+        .properties.map(property => property.name);
       expect(objectSource).toContain('bodyType = "Static"');
-      hiddenPhysics3DProperties.forEach(([propertyName]) => {
-        expect(settingsCatalogSource).not.toContain(propertyName);
-        expect(objectSource).not.toContain(propertyName);
-        expect(generatedBehavior).not.toHaveProperty(propertyName);
+      expect(physics3DPropertyNames).not.toContain('layers');
+      expect(physics3DPropertyNames).not.toContain('masks');
+      expect(objectSource).toContain('layers = 5');
+      expect(objectSource).toContain('masks = 9');
+      expect(generatedBehavior).toMatchObject({ layers: 5, masks: 9 });
+      hiddenPhysics3DProperties.forEach(([propertyName, , serializedValue]) => {
+        expect(physics3DPropertyNames).not.toContain(propertyName);
+        expect(objectSource).toContain(propertyName);
+        expect(generatedBehavior).toHaveProperty(propertyName, serializedValue);
       });
     } finally {
       project.delete();

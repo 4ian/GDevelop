@@ -91,11 +91,6 @@ const summarizeProperty = (name: string, property: any): ?Object => {
   return summary;
 };
 
-const excludedSerializedPropertyKeysBySummaries: WeakMap<
-  Array<Object>,
-  Array<string>
-> = new WeakMap();
-
 const changedTopLevelKeys = (before: Object, after: Object): Array<string> =>
   sortedUnique([
     ...Object.keys(before || {}),
@@ -182,8 +177,7 @@ const summarizeProperties = (
   instance?: any
 ): Array<Object> => {
   if (!properties || !properties.keys) return [];
-  const excludedSerializedPropertyKeys = [];
-  const summaries = toArray(properties.keys())
+  return toArray(properties.keys())
     .sort((left, right) => String(left).localeCompare(String(right)))
     .map(name => {
       const authoringKey = String(name);
@@ -192,16 +186,6 @@ const summarizeProperties = (
         (property.isHidden && property.isHidden()) ||
         (property.isDeprecated && property.isDeprecated())
       ) {
-        if (instance !== undefined) {
-          const serialization = inferSerializedPropertyKey({
-            instance,
-            authoringKey,
-            property,
-          });
-          if (serialization.status === 'supported') {
-            excludedSerializedPropertyKeys.push(serialization.serializedKey);
-          }
-        }
         return null;
       }
       const summary = summarizeProperty(authoringKey, property);
@@ -221,18 +205,13 @@ const summarizeProperties = (
       return summary;
     })
     .filter(Boolean);
-  excludedSerializedPropertyKeysBySummaries.set(
-    summaries,
-    sortedUnique(excludedSerializedPropertyKeys)
-  );
-  return summaries;
 };
 
 const summarizeSerializedProperties = (
   propertyDescriptors: ?Array<Object>
 ): Array<Object> => {
   const descriptors = propertyDescriptors || [];
-  const summaries = descriptors
+  return descriptors
     .filter(property => !property.hidden && !property.deprecated)
     .map(property => {
       const summary: Object = {
@@ -260,16 +239,6 @@ const summarizeSerializedProperties = (
       }
       return summary;
     });
-  excludedSerializedPropertyKeysBySummaries.set(
-    summaries,
-    sortedUnique(
-      descriptors
-        .filter(property => property.hidden || property.deprecated)
-        .map(property => String(property.name || ''))
-        .filter(Boolean)
-    )
-  );
-  return summaries;
 };
 
 const getSerializedRequiredBehaviorTypes = (
@@ -889,14 +858,14 @@ export const buildProjectSettingsCatalog = ({
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
-        'For an attached behavior, serialize only properties listed in behaviorTypes[].properties. Editor-hidden behavior descriptors are intentionally absent from this catalog, are runtime-managed, and are forbidden in object settings; the runtime initializes them from descriptor defaults.',
+        'For an attached behavior, use behaviorTypes[].properties for author-writable fields. Editor-hidden and deprecated descriptors are intentionally absent from this catalog, but existing serialized fields not listed there are preserved verbatim because they may be configured by a specialized editor and required at runtime.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],
       objectDefinition:
         'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
       behaviorDefinition:
-        'An attached behavior requires a unique object-local name and a registered type. Initialize only author-writable properties listed for that type in behaviorTypes[].properties. Never serialize editor-hidden properties in an object definition.',
+        'An attached behavior requires a unique object-local name and a registered type. Initialize or edit only author-writable properties listed for that type in behaviorTypes[].properties. Preserve unlisted serialized properties already present in an object definition.',
       variableDefinition:
         'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
     },
@@ -1348,9 +1317,6 @@ export const buildBehaviorPropertySchemasByType = (
     schemas[String(behavior.type || '')] = {
       keySpace: 'serialized',
       unknownPropertyPolicy: behavior.unknownPropertyPolicy || 'preserve',
-      excludedSerializedKeys:
-        excludedSerializedPropertyKeysBySummaries.get(behavior.properties) ||
-        [],
       properties: (behavior.properties || [])
         .filter(property => property.serializedKey)
         .map(property => ({

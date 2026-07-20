@@ -33,7 +33,6 @@ import {
 import {
   MULTI_FILE_STATIC_DATA_URI,
   removeLegacyFolderStructuresFromProject,
-  removeExcludedAttachedBehaviorPropertiesFromProject,
   serializeStaticDataToToml,
 } from '../MultiFileProjectFormat';
 import {
@@ -574,10 +573,10 @@ const writeProjectFiles = async ({
     const behaviorPropertySchemasByType = buildBehaviorPropertySchemasByType(
       settingsCatalog
     );
-    const authoringSerializedProjectObject = removeExcludedAttachedBehaviorPropertiesFromProject(
-      serializedProjectObject,
-      behaviorPropertySchemasByType
-    );
+    // Hidden behavior properties are omitted from the authoring catalog, but
+    // they can still contain data configured by a specialized editor that the
+    // runtime needs. Keep the serializer output lossless.
+    const authoringSerializedProjectObject = serializedProjectObject;
     const layoutCatalog = buildProjectLayoutCatalog({
       project,
       serializedProject: authoringSerializedProjectObject,

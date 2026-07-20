@@ -226,10 +226,12 @@ object grouping. Add only instances, layers,
 spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
 rather than inventing serializer fields. For attached behaviors, copy only
-author-writable properties listed for that type in `settings-catalog.json`.
-Never copy a hidden behavior property from legacy JSON into object settings;
-runtime code initializes and owns it. Keep `propertyDescriptors` as one flat
-ordered array in `prefab.settings`; never add property folders.
+author-writable properties listed for that type in `settings-catalog.json` when
+creating a new attachment. When migrating an existing attachment, preserve its
+unlisted serialized fields verbatim: specialized editors can store required
+runtime configuration there even though the generic catalog hides it. Keep
+`propertyDescriptors` as one flat ordered array in `prefab.settings`; never add
+property folders.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
@@ -312,8 +314,8 @@ selection through child events and nested private behavior-function calls.
 4. Verify prefab layouts contain no object definitions or behaviors and that
    every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata
-   exists. Verify attached object behaviors contain no editor-hidden properties
-   absent from `settings-catalog.json`.
+   exists. Verify new attached behavior fields are catalog-listed and all
+   pre-existing unlisted serialized fields still round-trip unchanged.
 5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
 6. Reload the project and confirm the new instruction/object/behavior types

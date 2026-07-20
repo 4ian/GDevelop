@@ -679,7 +679,7 @@ column2 = "ssfssdfsf"
     ).toMatchObject({ name: 'Move', type: 'Test::Move', speed: 12 });
   });
 
-  test('never writes behavior properties excluded by a strict authoring schema', () => {
+  test('preserves behavior properties omitted from an authoring schema', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.layouts[0].objects = [
       {
@@ -736,8 +736,7 @@ column2 = "ssfssdfsf"
       behaviorPropertySchemasByType: {
         'Test::Strict': {
           keySpace: 'serialized',
-          unknownPropertyPolicy: 'error',
-          excludedSerializedKeys: ['hiddenRuntimeValue', 'privateRuntimeValue'],
+          unknownPropertyPolicy: 'preserve',
           properties: [
             {
               authoringKey: 'Speed',
@@ -759,10 +758,10 @@ column2 = "ssfssdfsf"
     const layoutSource = files['game://scenes/Main/Main.layout'];
     expect(objectSource).toContain('speed = 12');
     expect(layoutSource).toContain('speed = 24');
-    expect(objectSource).not.toContain('hiddenRuntimeValue');
-    expect(objectSource).not.toContain('privateRuntimeValue');
-    expect(layoutSource).not.toContain('hiddenRuntimeValue');
-    expect(layoutSource).not.toContain('privateRuntimeValue');
+    expect(objectSource).toContain('hiddenRuntimeValue = 99');
+    expect(objectSource).toContain('privateRuntimeValue = "secret"');
+    expect(layoutSource).toContain('hiddenRuntimeValue = 199');
+    expect(layoutSource).toContain('privateRuntimeValue = "instance-secret"');
     expect(objectSource).toContain('pluginOwnedValue = "kept"');
     expect(layoutSource).toContain('pluginOwnedValue = "instance-kept"');
 
@@ -771,6 +770,8 @@ column2 = "ssfssdfsf"
       name: 'Physics',
       type: 'Test::Strict',
       speed: 12,
+      hiddenRuntimeValue: 99,
+      privateRuntimeValue: 'secret',
     });
     expect(
       composed.layouts[0].instances[0].behaviorOverridings[0]
@@ -778,23 +779,13 @@ column2 = "ssfssdfsf"
       name: 'Physics',
       type: 'Test::Strict',
       speed: 24,
+      hiddenRuntimeValue: 199,
+      privateRuntimeValue: 'instance-secret',
     });
     expect(areLegacyProjectsEquivalent(project, composed, options)).toBe(true);
     expect(project.layouts[0].objects[0].behaviors[0]).toHaveProperty(
       'hiddenRuntimeValue',
       99
-    );
-
-    const projectWithUnknownProperty = JSON.parse(JSON.stringify(project));
-    projectWithUnknownProperty.layouts[0].objects[0].behaviors[0].typo = true;
-    const filesWithUnknownProperty = decomposeLegacyProjectToFiles(
-      projectWithUnknownProperty,
-      options
-    );
-    expect(() =>
-      composeLegacyProjectFromFiles(filesWithUnknownProperty, options)
-    ).toThrow(
-      expect.objectContaining({ code: 'MULTIFILE_UNKNOWN_BEHAVIOR_PROPERTY' })
     );
   });
 
@@ -1127,7 +1118,7 @@ folderName = "__ROOT"
     ).toEqual(prefab.objects);
   });
 
-  test('omits hidden behavior properties from object settings and rejects authored copies', () => {
+  test('round-trips hidden behavior properties without advertising them', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const behaviorDefinition =
       project.eventsFunctionsExtensions[0].eventsBasedBehaviors[0];
@@ -1140,7 +1131,7 @@ folderName = "__ROOT"
         hidden: true,
       },
     ];
-    const makeObject = name => ({
+    const makeObject = (name: string) => ({
       name,
       type: 'Sprite',
       behaviors: [
@@ -1172,9 +1163,9 @@ folderName = "__ROOT"
         name: 'Health',
         type: 'Combat::Health',
         VisibleValue: 7,
+        RuntimeValue: 99,
       });
-      expect(attachedBehavior).not.toHaveProperty('RuntimeValue');
-      expect(files[objectUri]).not.toContain('RuntimeValue');
+      expect(files[objectUri]).toContain('RuntimeValue = 99');
     });
     const composed = composeLegacyProjectFromFiles(files);
     const composedObjects = [
@@ -1185,23 +1176,20 @@ folderName = "__ROOT"
         .objects[0],
     ];
     composedObjects.forEach(object => {
-      expect(object.behaviors[0]).not.toHaveProperty('RuntimeValue');
+      expect(object.behaviors[0]).toHaveProperty('RuntimeValue', 99);
     });
     expect(areLegacyProjectsEquivalent(project, composed)).toBe(true);
 
     const objectUri = 'game://scenes/Main/objects/ScenePlayer.settings';
     const filesWithHiddenProperty = { ...files };
     filesWithHiddenProperty[objectUri] = files[objectUri].replace(
-      'VisibleValue = 7',
-      'VisibleValue = 7\nRuntimeValue = 99'
+      'RuntimeValue = 99',
+      'RuntimeValue = 123'
     );
-    expect(() =>
-      composeLegacyProjectFromFiles(filesWithHiddenProperty)
-    ).toThrow(
-      expect.objectContaining({
-        code: 'MULTIFILE_FORBIDDEN_HIDDEN_BEHAVIOR_PROPERTY',
-      })
-    );
+    expect(
+      composeLegacyProjectFromFiles(filesWithHiddenProperty).layouts[0]
+        .objects[0].behaviors[0]
+    ).toHaveProperty('RuntimeValue', 123);
   });
 
   test('stores every settings-owned object group in a compact objectGroups table', () => {

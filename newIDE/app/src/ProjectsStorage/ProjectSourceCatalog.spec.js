@@ -257,10 +257,10 @@ describe('project source catalogs', () => {
       'originPoint and centerPoint as inline TOML tables'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Editor-hidden behavior descriptors'
+      'Editor-hidden and deprecated descriptors'
     );
     expect(catalog.authoring.behaviorDefinition).toContain(
-      'Never serialize editor-hidden properties'
+      'Preserve unlisted serialized properties'
     );
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
@@ -306,10 +306,14 @@ describe('project source catalogs', () => {
     expect(entry.properties.map(property => property.name)).not.toContain(
       'Internal'
     );
-    expect(
-      buildBehaviorPropertySchemasByType(catalog)[behaviorType]
-        .excludedSerializedKeys
-    ).toEqual(['Internal']);
+    expect(buildBehaviorPropertySchemasByType(catalog)[behaviorType]).toEqual(
+      expect.objectContaining({
+        unknownPropertyPolicy: 'preserve',
+        properties: expect.not.arrayContaining([
+          expect.objectContaining({ serializedKey: 'Internal' }),
+        ]),
+      })
+    );
     expect(serializeProjectSettingsCatalog(catalog)).not.toContain('Internal');
     expect(entry.requiredBehaviorTypes).toEqual([
       'PlatformBehavior::PlatformerObjectBehavior',

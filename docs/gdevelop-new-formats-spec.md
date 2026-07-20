@@ -272,10 +272,12 @@ both; the two files remain independent unless both are listed in
   project components that currently own settings, and the non-hidden object,
   behavior, and effect types registered for the loaded project. Behavior and
   effect entries include their authoring property metadata. Hidden behavior
-  descriptors are deliberately omitted: they are runtime-managed, use their
-  descriptor defaults, and are forbidden in attached object settings. AI
-  models must consult the catalog before creating settings-owned definitions
-  and must never edit it.
+  descriptors are deliberately omitted from the authoring surface because they
+  require a specialized editor. Their existing serialized values remain in
+  attached object settings and must round-trip verbatim: hidden does not mean
+  runtime-managed or disposable. AI models must consult the catalog before
+  creating settings-owned definitions, must preserve unlisted existing
+  behavior fields, and must never edit the generated catalog.
 - `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
   It describes every layout TOML table and field plus the project-aware
   scene, prefab, variant, and external-layout contexts. Each context lists the
@@ -652,14 +654,15 @@ the multi-file format. Physical project directories own component structure,
 and the legacy runtime/editor model rebuilds any transient root folders while
 composing.
 
-Attached behavior instances are a deliberate projection exception. An object
-settings file stores only the behavior identity fields and author-writable
-properties exposed by `.gdevelop/settings-catalog.json`. A property descriptor
-marked `hidden` in an events-based behavior definition remains in that
-behavior's own `behavior.settings`, but its value must not be copied into any
-global, scene, prefab, or prefab-variant object definition. The composer rejects
-such authored values. Runtime behavior code initializes omitted hidden values
-from descriptor defaults and owns their later state.
+Attached behavior instances use the serializer key space. The catalog lists
+the author-writable properties that an AI may initialize or edit, while hidden,
+deprecated, extension-owned, and legacy serialized fields are intentionally
+not advertised. Any such fields already present in a global, scene, prefab, or
+prefab-variant object definition still belong to that attached behavior and
+must round-trip unchanged. This distinction lets specialized behavior editors
+persist runtime configuration such as collision layers, masks, collider
+dimensions, and offsets without exposing those fields in the generic authoring
+surface.
 
 ### 5.3 JSON-to-TOML projection
 

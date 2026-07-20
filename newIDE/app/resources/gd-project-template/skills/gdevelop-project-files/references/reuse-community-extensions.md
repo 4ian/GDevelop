@@ -149,9 +149,10 @@ The native conversion maps the legacy extension as follows:
 
 The conversion keeps hidden property descriptors in the owning
 `behavior.settings` because generated runtime code needs their defaults, but it
-must not copy hidden runtime-managed values into attached object settings. Such
-properties are absent from `settings-catalog.json` and are forbidden authoring
-fields.
+also keeps any existing hidden or extension-owned values on attached behaviors.
+Such properties are absent from `settings-catalog.json`, so models must not
+invent or generically edit them; absence from the catalog is not permission to
+delete serializer data that a specialized editor or the runtime requires.
 
 Follow [create-extensions.md](create-extensions.md) for exact ownership and
 examples when adapting the generated sources. The converter, not the model,

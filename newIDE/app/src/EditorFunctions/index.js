@@ -5186,13 +5186,22 @@ const addSceneEvents: EditorFunction = {
             placementRelation ===
               'replace_event_but_keep_existing_sub_events' ||
             isReplaceEntirePlacement;
-          const placementTargetEventSource =
+          const renderedTargetEventSource =
             isReplacePlacement && placementTargetEventId
               ? renderEventSourceById({
                   eventsList: currentSceneEvents,
                   eventIdOrGroupName: placementTargetEventId,
                   includeSubEvents: isReplaceEntirePlacement,
                 })
+              : null;
+          // A subtree too big to be read in one call cannot serve as the
+          // proof-of-read reference either (the backend bounds the field):
+          // skip the check for it (like an editor without the capability)
+          // rather than failing the whole request.
+          const placementTargetEventSource =
+            renderedTargetEventSource &&
+            renderedTargetEventSource.length <= EVENTS_SOURCE_MAX_CHARS_LIMIT
+              ? renderedTargetEventSource
               : null;
 
           return {

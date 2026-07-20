@@ -58,13 +58,23 @@ namespace gdjs {
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            const inverseWorldScale = scene ? scene.scale.x : 1;
             if (parameterName === 'density') {
-              this.fog.density = value;
+              this.fog.density = value / inverseWorldScale;
             }
           }
           getDoubleParameter(parameterName: string): number {
+            const scene = target.get3DRendererObject() as
+              | THREE.Scene
+              | null
+              | undefined;
+            const inverseWorldScale = scene ? scene.scale.x : 1;
             if (parameterName === 'density') {
-              return this.fog.density;
+              return this.fog.density * inverseWorldScale;
             }
             return 0;
           }

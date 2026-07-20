@@ -159,7 +159,10 @@ describe('EventsScriptRenderer', () => {
 
       expect(renderingErrors).toEqual([]);
       expect(text).toBe(
-        'if not PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject) and Or(DepartScene(), PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject)) and once:  # event-0'
+        [
+          'if not PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject) and Or(DepartScene(), PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject)) and once:  # event-0',
+          '  pass',
+        ].join('\n')
       );
     } finally {
       project.delete();
@@ -232,9 +235,11 @@ describe('EventsScriptRenderer', () => {
           '  local number Count = 3',
           '  local string Title = "Hello \\"world\\""',
           'else if DepartScene():  # event-2',
+          '  pass',
           'for each MySpriteObject:  # event-3',
           '  Delete(MySpriteObject)',
           'repeat 4 + 3 times:  # event-4',
+          '  pass',
           'group "My group":  # event-5',
           '  always:  # event-5.0',
           '    Delete(MySpriteObject)',

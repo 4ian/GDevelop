@@ -84,7 +84,8 @@
         }
       ],
       "expectedEventsScript": [
-        "if not PlatformBehavior::IsFalling(MySpriteObject, PlatformerObject) and Or(DepartScene(), not Timer(2, \"T\")):"
+        "if not PlatformBehavior::IsFalling(MySpriteObject, PlatformerObject) and Or(DepartScene(), not Timer(2, \"T\")):",
+        "  pass"
       ]
     },
     {
@@ -173,18 +174,33 @@
         "  local number Count = 3",
         "  local string Title = \"Hello \\\"world\\\"\"",
         "else if DepartScene():",
+        "  pass",
         "for each MySpriteObject:",
         "  Delete(MySpriteObject)",
         "repeat 4 + 3 times:",
+        "  pass",
         "while DepartScene():",
         "  Wait(1)",
         "for each child in Inventory value Item:",
+        "  pass",
         "group \"My group\":",
         "  always:",
         "    Delete(MySpriteObject)",
         "disabled always:",
         "  Wait(1)"
       ]
+    },
+    {
+      "name": "empty group renders an explicit pass",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Group",
+          "name": "Empty group",
+          "events": []
+        }
+      ],
+      "expectedEventsScript": ["group \"Empty group\":", "  pass"]
     },
     {
       "name": "unknown instruction and non-representable event",

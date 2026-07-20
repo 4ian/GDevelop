@@ -549,6 +549,12 @@ export const renderEventAsEventsScriptLines = ({
     }
   }
 
+  // An empty body is always made explicit with `pass`, so the header never
+  // looks like it owns the next (non-indented) line. The parser ignores it.
+  if (parts && !parts.standaloneLine && lines.length === 1) {
+    lines.push(`${bodyIndent}pass`);
+  }
+
   return lines;
 };
 

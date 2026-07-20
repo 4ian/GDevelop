@@ -99,9 +99,10 @@ export const useRefreshLimits = (
 
 // All requests are made in orchestrator mode, and sub-agents (explorer, edit)
 // are created server-side with the same tools version as the orchestrator.
-// v9: `read_events_source` (this editor implements it) and the explicit
+// v11: `read_events_source` (this editor implements it) and the explicit
 // replace relations of `generate_events` (keep or replace sub-events).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v9';
+// v10 is skipped.
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v11';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying

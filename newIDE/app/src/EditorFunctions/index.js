@@ -157,7 +157,7 @@ export type EditorFunctionGenericOutput = {|
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
-  // EventScript source view (see `read_scene_events_source`):
+  // EventScript source view (see `read_events_source`):
   eventsScript?: string,
   selectedEventIds?: Array<string>,
   truncated?: boolean,
@@ -4752,7 +4752,7 @@ const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
  * accepted by the `event_script` field of events generation), with filters
  * to keep the output small.
  */
-const readSceneEventsSource: EditorFunction = {
+const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
@@ -7875,7 +7875,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,
-  read_scene_events_source: readSceneEventsSource,
+  read_events_source: readEventsSource,
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,

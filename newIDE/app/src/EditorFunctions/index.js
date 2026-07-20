@@ -19,9 +19,9 @@ import {
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
 import {
-  buildEventsScriptSourceView,
-  renderEventOwnSourceById,
-} from '../EventsSheet/EventsTree/TextRenderer/EventsScriptSourceView';
+  buildEventScriptSourceView,
+  renderEventSourceById,
+} from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
 import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
@@ -158,7 +158,7 @@ export type EditorFunctionGenericOutput = {|
   reminder?: string,
   animationNames?: string,
   // EventScript source view (see `read_events_source`):
-  eventsScript?: string,
+  eventScript?: string,
   selectedEventIds?: Array<string>,
   truncated?: boolean,
   notes?: Array<string>,
@@ -4816,7 +4816,7 @@ const readEventsSource: EditorFunction = {
       truncated,
       notes,
       renderingErrors,
-    } = buildEventsScriptSourceView({
+    } = buildEventScriptSourceView({
       eventsList: scene.getEvents(),
       eventIds,
       searchText,
@@ -4828,7 +4828,12 @@ const readEventsSource: EditorFunction = {
     const output: EditorFunctionGenericOutput = {
       success: true,
       eventsForSceneNamed: scene_name,
-      eventsScript: text || noEventsInSceneText,
+      // An empty `text` does NOT mean the scene has no events: a filter can
+      // match nothing on a populated sheet (the notes say which case it
+      // is). Only a truly empty sheet gets the "no events" text.
+      eventScript:
+        text ||
+        (scene.getEvents().getEventsCount() === 0 ? noEventsInSceneText : ''),
       selectedEventIds,
     };
     if (truncated) output.truncated = true;
@@ -5169,19 +5174,24 @@ const addSceneEvents: EditorFunction = {
             'placement_target_event_id'
           );
 
-          // For replace placements, also send the CURRENT source of the
-          // event being replaced: the backend compares the
-          // `expected_event_source` anchor against it (proof the event was
-          // read and hasn't changed).
+          // For replace placements, also send the CURRENT source of what is
+          // being replaced: the backend compares the
+          // `expected_event_source` anchor against it (proof it was read
+          // and hasn't changed). The source covers exactly what the
+          // placement destroys: the event alone when its sub-events are
+          // kept, the whole subtree when they are replaced too.
+          const isReplaceEntirePlacement =
+            placementRelation === 'replace_entire_event_and_sub_events';
           const isReplacePlacement =
             placementRelation ===
               'replace_event_but_keep_existing_sub_events' ||
-            placementRelation === 'replace_entire_event_and_sub_events';
+            isReplaceEntirePlacement;
           const placementTargetEventSource =
             isReplacePlacement && placementTargetEventId
-              ? renderEventOwnSourceById({
+              ? renderEventSourceById({
                   eventsList: currentSceneEvents,
                   eventIdOrGroupName: placementTargetEventId,
+                  includeSubEvents: isReplaceEntirePlacement,
                 })
               : null;
 

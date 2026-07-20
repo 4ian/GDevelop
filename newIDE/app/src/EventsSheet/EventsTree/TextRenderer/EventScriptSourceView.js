@@ -1,10 +1,10 @@
 // @flow
 import { mapFor } from '../../../Utils/MapFor';
 import {
-  renderEventAsEventsScriptLines,
-  renderEventsScriptHeaderLine,
-  type EventsScriptRenderingError,
-} from './EventsScriptRenderer';
+  renderEventAsEventScriptLines,
+  renderEventScriptHeaderLine,
+  type EventScriptRenderingError,
+} from './EventScriptRenderer';
 
 const gd: libGDevelop = global.gd;
 
@@ -21,12 +21,12 @@ type EventNode = {|
  * ancestors of selected events shown as header lines and skipped siblings
  * shown as `# ...` markers).
  */
-export type EventsScriptSourceView = {|
+export type EventScriptSourceView = {|
   text: string,
   selectedEventIds: Array<string>,
   truncated: boolean,
   notes: Array<string>,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  renderingErrors: Array<EventScriptRenderingError>,
 |};
 
 const indexEvents = (
@@ -67,36 +67,44 @@ const compareDocumentOrder = (pathA: string, pathB: string): number => {
 
 /**
  * The event's own EventScript lines (header, local variables, actions -
- * without its sub-events), used to match the search/object filters.
+ * without its sub-events, no collapse marker), used to match the
+ * search/object filters and as the "own source" of an event. An event whose
+ * body is empty (even one with sub-events) gets an explicit `pass` line,
+ * like every other rendering.
  */
 const renderEventOwnTextForMatching = (
   event: gdBaseEvent,
   path: string
 ): string => {
-  const renderingErrors: Array<EventsScriptRenderingError> = [];
-  return renderEventAsEventsScriptLines({
+  const renderingErrors: Array<EventScriptRenderingError> = [];
+  return renderEventAsEventScriptLines({
     event,
     eventPath: path,
     indent: '',
     subEventsDepth: 0,
+    showCollapsedSubEventsMarker: false,
     renderingErrors,
-  })
-    .filter(line => !line.trim().startsWith('# ...'))
-    .join('\n');
+  }).join('\n');
 };
 
 /**
- * The current EventScript source of one event (its own lines: header, local
- * variables, actions - without its sub-events), resolved by id or group
- * name. Used as the reference the `expected_event_source` anchor of replace
- * placements is compared against. Returns null when the event is not found.
+ * The current EventScript source of one event, resolved by id or group
+ * name: its own lines only (header, local variables, actions), or the whole
+ * subtree with `includeSubEvents`. Used as the reference the
+ * `expected_event_source` anchor of replace placements is compared against
+ * (own source for `replace_event_but_keep_existing_sub_events`, full
+ * subtree for `replace_entire_event_and_sub_events` - the anchor covers
+ * exactly what the placement destroys). Returns null when the event is not
+ * found.
  */
-export const renderEventOwnSourceById = ({
+export const renderEventSourceById = ({
   eventsList,
   eventIdOrGroupName,
+  includeSubEvents,
 }: {|
   eventsList: gdEventsList,
   eventIdOrGroupName: string,
+  includeSubEvents: boolean,
 |}): string | null => {
   const nodesByPath: Map<string, EventNode> = new Map();
   indexEvents(eventsList, '', nodesByPath);
@@ -105,7 +113,17 @@ export const renderEventOwnSourceById = ({
   if (firstPath === undefined) return null;
   const node = nodesByPath.get(firstPath);
   if (!node) return null;
-  return renderEventOwnTextForMatching(node.event, firstPath);
+  if (!includeSubEvents) {
+    return renderEventOwnTextForMatching(node.event, firstPath);
+  }
+  const renderingErrors: Array<EventScriptRenderingError> = [];
+  return renderEventAsEventScriptLines({
+    event: node.event,
+    eventPath: firstPath,
+    indent: '',
+    subEventsDepth: Number.MAX_SAFE_INTEGER,
+    renderingErrors,
+  }).join('\n');
 };
 
 const makeWordBoundaryRegex = (name: string): RegExp => {
@@ -162,7 +180,7 @@ const renderFilteredTree = ({
   selectedPathsSet: Set<string>,
   ancestorPathsSet: Set<string>,
   subEventsDepth: number,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  renderingErrors: Array<EventScriptRenderingError>,
 |}): Array<string> => {
   const lines: Array<string> = [];
   let skippedPaths: Array<string> = [];
@@ -187,7 +205,7 @@ const renderFilteredTree = ({
     if (selectedPathsSet.has(path)) {
       flushSkipped();
       lines.push(
-        ...renderEventAsEventsScriptLines({
+        ...renderEventAsEventScriptLines({
           event,
           eventPath: path,
           indent,
@@ -198,13 +216,27 @@ const renderFilteredTree = ({
     } else if (ancestorPathsSet.has(path)) {
       flushSkipped();
       lines.push(
-        renderEventsScriptHeaderLine({
+        renderEventScriptHeaderLine({
           event,
           eventPath: path,
           indent,
           renderingErrors,
         })
       );
+      // The ancestor is only shown for context: make explicit that its own
+      // body (actions, local variables) is not displayed, so this view is
+      // never mistaken for the full source of the ancestor.
+      const ancestorOwnBodyLines = renderEventOwnTextForMatching(event, path)
+        .split('\n')
+        .slice(1)
+        .filter(line => line.trim() !== 'pass');
+      if (ancestorOwnBodyLines.length > 0) {
+        lines.push(
+          `${indent + INDENT}# ... ${
+            ancestorOwnBodyLines.length
+          } line(s) of this parent event (shown only as context) not displayed: read event_ids: ["event-${path}"] to see them.`
+        );
+      }
       if (event.canHaveSubEvents()) {
         lines.push(
           ...renderFilteredTree({
@@ -241,7 +273,7 @@ const renderFilteredTree = ({
  * depth, then dropping trailing selected events (with a note giving their
  * ids so they can be fetched with another call).
  */
-export const buildEventsScriptSourceView = ({
+export const buildEventScriptSourceView = ({
   eventsList,
   eventIds,
   searchText,
@@ -255,9 +287,9 @@ export const buildEventsScriptSourceView = ({
   objectNames?: Array<string> | null,
   subEventsDepth?: number | null,
   maxChars: number,
-|}): EventsScriptSourceView => {
+|}): EventScriptSourceView => {
   const notes: Array<string> = [];
-  const renderingErrors: Array<EventsScriptRenderingError> = [];
+  const renderingErrors: Array<EventScriptRenderingError> = [];
 
   const nodesByPath: Map<string, EventNode> = new Map();
   indexEvents(eventsList, '', nodesByPath);
@@ -337,20 +369,35 @@ export const buildEventsScriptSourceView = ({
       )
   );
 
-  const selectedEventIds = selectedPaths.map(path => `event-${path}`);
   if (selectedPaths.length === 0) {
+    // Say exactly why nothing is returned: an empty sheet, ids that resolved
+    // to nothing (the sheet may well have events) or filters matching
+    // nothing are all different situations for the caller.
+    const emptyResultNote =
+      nodesByPath.size === 0
+        ? 'The events sheet is empty.'
+        : hasSearch
+        ? 'No event matches the given filters (the events sheet is NOT empty).'
+        : 'None of the given `event_ids` matches an event (the events sheet is NOT empty).';
     return {
       text: '',
-      selectedEventIds,
+      selectedEventIds: [],
       truncated: false,
-      notes: [
-        ...notes,
-        hasSearch
-          ? 'No event matches the given filters.'
-          : 'The events sheet is empty.',
-      ],
+      notes: [...notes, emptyResultNote],
       renderingErrors,
     };
+  }
+
+  // An `else` event only makes sense right after its `if` (or another
+  // `else`): point it out when one is selected, so a filtered read is not
+  // mistaken for a standalone, resendable event.
+  for (const path of selectedPaths) {
+    const node = nodesByPath.get(path);
+    if (node && node.event.getType() === 'BuiltinCommonInstructions::Else') {
+      notes.push(
+        `event-${path} is an \`else\` event: it runs when the conditions of the event just before it (at the same level) were not met. Resending it alone is not valid EventScript - rework it together with its \`if\`, or keep it in place.`
+      );
+    }
   }
 
   // 3) Render, degrading gracefully to stay under `maxChars`: reduce the
@@ -391,6 +438,9 @@ export const buildEventsScriptSourceView = ({
     }).join('\n');
   };
 
+  // `selectedEventIds` always describes what the returned text actually
+  // shows: it is recomputed when trailing events are dropped below.
+  let shownPaths = selectedPaths;
   let text = '';
   let truncated = false;
   let fitted = false;
@@ -431,6 +481,7 @@ export const buildEventsScriptSourceView = ({
         }). Call again with \`event_ids\` (or a narrower filter) to read them.`
       );
     }
+    shownPaths = keptPaths;
     truncated = true;
   }
 
@@ -445,7 +496,7 @@ export const buildEventsScriptSourceView = ({
 
   return {
     text,
-    selectedEventIds,
+    selectedEventIds: shownPaths.map(path => `event-${path}`),
     truncated,
     notes,
     renderingErrors,

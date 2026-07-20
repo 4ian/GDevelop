@@ -1,11 +1,11 @@
 // @flow
 import { makeTestProject } from '../../../fixtures/TestProject';
 import { unserializeFromJSObject } from '../../../Utils/Serializer';
-import { renderEventsAsEventsScript } from './EventsScriptRenderer';
+import { renderEventsAsEventScript } from './EventScriptRenderer';
 import {
-  buildEventsScriptSourceView,
-  renderEventOwnSourceById,
-} from './EventsScriptSourceView';
+  buildEventScriptSourceView,
+  renderEventSourceById,
+} from './EventScriptSourceView';
 
 const gd: libGDevelop = global.gd;
 
@@ -13,7 +13,7 @@ const gd: libGDevelop = global.gd;
 // (events-script-serializer.js in the GDevelop-services repository): both
 // sides must render the same events to the same EventScript. Keep the
 // fixtures file byte-identical in both repositories.
-const serializerFixtures = require('./EventsScriptRenderer.fixtures.json');
+const serializerFixtures = require('./EventScriptRenderer.fixtures.json');
 
 const makeEventsList = (project: gdProject, serializedEvents: Array<any>) => {
   const eventsList = new gd.EventsList();
@@ -26,9 +26,9 @@ const makeEventsList = (project: gdProject, serializedEvents: Array<any>) => {
   return eventsList;
 };
 
-// A scene start event mirroring the shape that caused a "near miss" in
-// production: several unrelated actions and a sub-event, of which an AI
-// agent only knows a part.
+// A scene start event with several unrelated actions and a sub-event: the
+// shape whose faithful rendering matters most when an AI agent reads an
+// event before editing it.
 const sceneStartSerializedEvents = [
   {
     type: 'BuiltinCommonInstructions::Standard',
@@ -63,13 +63,13 @@ const sceneStartSerializedEvents = [
   },
 ];
 
-describe('EventsScriptRenderer conformance fixtures', () => {
+describe('EventScriptRenderer conformance fixtures', () => {
   serializerFixtures.fixtures.forEach(fixture => {
     it(`renders like the backend serializer: ${fixture.name}`, () => {
       const { project } = makeTestProject(gd);
       try {
         const eventsList = makeEventsList(project, fixture.serializedEvents);
-        const { text } = renderEventsAsEventsScript({ eventsList });
+        const { text } = renderEventsAsEventScript({ eventsList });
         // The fixtures are id-agnostic (the backend serializer does not
         // annotate): strip the `# event-N` annotations before comparing.
         const withoutIdAnnotations = text
@@ -77,7 +77,7 @@ describe('EventsScriptRenderer conformance fixtures', () => {
           .map(line => line.replace(/\s*# event-[\d.]+$/, ''))
           .join('\n');
         expect(withoutIdAnnotations).toBe(
-          fixture.expectedEventsScript.join('\n')
+          fixture.expectedEventScript.join('\n')
         );
       } finally {
         project.delete();
@@ -86,13 +86,13 @@ describe('EventsScriptRenderer conformance fixtures', () => {
   });
 });
 
-describe('EventsScriptRenderer', () => {
+describe('EventScriptRenderer', () => {
   it('renders events as EventScript with event id annotations', () => {
     const { project } = makeTestProject(gd);
     try {
       const eventsList = makeEventsList(project, sceneStartSerializedEvents);
 
-      const { text, renderingErrors } = renderEventsAsEventsScript({
+      const { text, renderingErrors } = renderEventsAsEventScript({
         eventsList,
       });
 
@@ -153,7 +153,7 @@ describe('EventsScriptRenderer', () => {
         },
       ]);
 
-      const { text, renderingErrors } = renderEventsAsEventsScript({
+      const { text, renderingErrors } = renderEventsAsEventScript({
         eventsList,
       });
 
@@ -223,7 +223,7 @@ describe('EventsScriptRenderer', () => {
         },
       ]);
 
-      const { text, renderingErrors } = renderEventsAsEventsScript({
+      const { text, renderingErrors } = renderEventsAsEventScript({
         eventsList,
       });
 
@@ -255,7 +255,7 @@ describe('EventsScriptRenderer', () => {
     try {
       const eventsList = makeEventsList(project, sceneStartSerializedEvents);
 
-      const { text, renderingErrors } = renderEventsAsEventsScript({
+      const { text, renderingErrors } = renderEventsAsEventScript({
         eventsList,
         subEventsDepth: 0,
       });
@@ -275,7 +275,7 @@ describe('EventsScriptRenderer', () => {
   });
 });
 
-describe('EventsScriptSourceView', () => {
+describe('EventScriptSourceView', () => {
   const manyEventsSerialized = [
     ...sceneStartSerializedEvents,
     {
@@ -307,7 +307,7 @@ describe('EventsScriptSourceView', () => {
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         maxChars: 10000,
       });
@@ -315,7 +315,8 @@ describe('EventsScriptSourceView', () => {
       expect(view.renderingErrors).toEqual([]);
       expect(view.selectedEventIds).toEqual(['event-0', 'event-1', 'event-2']);
       expect(view.truncated).toBe(false);
-      // Default whole-sheet depth is 1: event-0.0 is included.
+      // A whole-sheet read includes one level of sub-events by default
+      // (`subEventsDepth` unset): the direct sub-event event-0.0 is shown.
       expect(view.text).toContain('# event-0.0');
       expect(view.text).toContain('# event-2');
     } finally {
@@ -328,7 +329,7 @@ describe('EventsScriptSourceView', () => {
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         eventIds: ['event-0.0'],
         maxChars: 10000,
@@ -338,8 +339,10 @@ describe('EventsScriptSourceView', () => {
       expect(view.selectedEventIds).toEqual(['event-0.0']);
       expect(view.text).toBe(
         [
-          // The ancestor is shown as a header line for context.
+          // The ancestor is shown as a header line for context, with a
+          // marker making explicit that its own actions are not displayed.
           'if DepartScene():  # event-0',
+          '  # ... 2 line(s) of this parent event (shown only as context) not displayed: read event_ids: ["event-0"] to see them.',
           '  if PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject):  # event-0.0',
           '    Delete(MySpriteObject)',
           '# ... 2 other event(s) here (event-1, event-2)',
@@ -355,7 +358,7 @@ describe('EventsScriptSourceView', () => {
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         searchText: 'changeanimation',
         maxChars: 10000,
@@ -376,7 +379,7 @@ describe('EventsScriptSourceView', () => {
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         eventIds: ['event-0'],
         objectNames: ['GroupOfSpriteObjectsWithBehaviors'],
@@ -391,15 +394,16 @@ describe('EventsScriptSourceView', () => {
     }
   });
 
-  it('renders the own source of one event (without sub-events) by id', () => {
+  it('renders the source of one event by id (own lines, or the full subtree)', () => {
     const { project } = makeTestProject(gd);
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
       expect(
-        renderEventOwnSourceById({
+        renderEventSourceById({
           eventsList,
           eventIdOrGroupName: 'event-0',
+          includeSubEvents: false,
         })
       ).toBe(
         [
@@ -409,9 +413,25 @@ describe('EventsScriptSourceView', () => {
         ].join('\n')
       );
       expect(
-        renderEventOwnSourceById({
+        renderEventSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-0',
+          includeSubEvents: true,
+        })
+      ).toBe(
+        [
+          'if DepartScene():  # event-0',
+          '  CentreCamera(MySpriteObject)',
+          '  ChangeAnimation(MySpriteObject, =, 1)',
+          '  if PlatformBehavior::IsFalling(GroupOfSpriteObjectsWithBehaviors, PlatformerObject):  # event-0.0',
+          '    Delete(MySpriteObject)',
+        ].join('\n')
+      );
+      expect(
+        renderEventSourceById({
           eventsList,
           eventIdOrGroupName: 'event-99',
+          includeSubEvents: false,
         })
       ).toBe(null);
     } finally {
@@ -419,19 +439,131 @@ describe('EventsScriptSourceView', () => {
     }
   });
 
-  it('reports unknown event ids', () => {
+  it('renders `pass` in the own source of an action-less event with sub-events', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [{ type: { value: 'DepartScene' }, parameters: [''] }],
+          actions: [],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [{ type: { value: 'Wait' }, parameters: ['1'] }],
+            },
+          ],
+        },
+      ]);
+
+      // The own source has an empty body: it gets the explicit `pass`,
+      // exactly like a read of the same event without its sub-events.
+      expect(
+        renderEventSourceById({
+          eventsList,
+          eventIdOrGroupName: 'event-0',
+          includeSubEvents: false,
+        })
+      ).toBe(['if DepartScene():  # event-0', '  pass'].join('\n'));
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('reports unknown event ids without pretending the sheet is empty', () => {
     const { project } = makeTestProject(gd);
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         eventIds: ['event-99'],
         maxChars: 10000,
       });
 
       expect(view.selectedEventIds).toEqual([]);
+      expect(view.text).toBe('');
       expect(view.notes.join(' ')).toContain('event-99');
+      expect(view.notes.join(' ')).toContain('NOT empty');
+      expect(view.notes.join(' ')).not.toContain('sheet is empty.');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('distinguishes an empty sheet from filters matching nothing', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const emptyEventsList = makeEventsList(project, []);
+      const emptyView = buildEventScriptSourceView({
+        eventsList: emptyEventsList,
+        maxChars: 10000,
+      });
+      expect(emptyView.notes).toEqual(['The events sheet is empty.']);
+
+      const eventsList = makeEventsList(project, manyEventsSerialized);
+      const noMatchView = buildEventScriptSourceView({
+        eventsList,
+        searchText: 'nothing matches this',
+        maxChars: 10000,
+      });
+      expect(noMatchView.text).toBe('');
+      expect(noMatchView.notes.join(' ')).toContain(
+        'No event matches the given filters'
+      );
+      expect(noMatchView.notes.join(' ')).toContain('NOT empty');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('reports only the shown events in selectedEventIds when trailing events are dropped', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, manyEventsSerialized);
+
+      const view = buildEventScriptSourceView({
+        eventsList,
+        // Small enough to force dropping trailing events, big enough to
+        // keep at least the first one.
+        maxChars: 130,
+      });
+
+      expect(view.truncated).toBe(true);
+      expect(view.selectedEventIds.length).toBeLessThan(3);
+      expect(view.selectedEventIds[0]).toBe('event-0');
+      // The dropped events are listed in the notes instead.
+      expect(view.notes.join(' ')).toContain('not shown');
+    } finally {
+      project.delete();
+    }
+  });
+
+  it('notes that a selected `else` event binds to the `if` above it', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [{ type: { value: 'DepartScene' }, parameters: [''] }],
+          actions: [{ type: { value: 'Wait' }, parameters: ['1'] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Else',
+          conditions: [],
+          actions: [{ type: { value: 'Wait' }, parameters: ['2'] }],
+        },
+      ]);
+
+      const view = buildEventScriptSourceView({
+        eventsList,
+        eventIds: ['event-1'],
+        maxChars: 10000,
+      });
+
+      expect(view.selectedEventIds).toEqual(['event-1']);
+      expect(view.notes.join(' ')).toContain('`else` event');
     } finally {
       project.delete();
     }
@@ -456,7 +588,7 @@ describe('EventsScriptSourceView', () => {
         },
       ]);
 
-      const view = buildEventsScriptSourceView({
+      const view = buildEventScriptSourceView({
         eventsList,
         eventIds: ['event-0'],
         maxChars: 10000,
@@ -478,7 +610,7 @@ describe('EventsScriptSourceView', () => {
     try {
       const eventsList = makeEventsList(project, manyEventsSerialized);
 
-      const smallView = buildEventsScriptSourceView({
+      const smallView = buildEventScriptSourceView({
         eventsList,
         maxChars: 260,
       });
@@ -486,7 +618,7 @@ describe('EventsScriptSourceView', () => {
       expect(smallView.text).toContain('not shown: read event_ids:');
       expect(smallView.text.length).toBeLessThanOrEqual(260);
 
-      const tinyView = buildEventsScriptSourceView({
+      const tinyView = buildEventScriptSourceView({
         eventsList,
         maxChars: 150,
       });

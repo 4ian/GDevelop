@@ -7,7 +7,7 @@
 // in GDevelop-services): same function names, same rendering rules - only
 // the inputs differ (gd objects + platform metadata here, events JSON +
 // features summary there). Both are held together by the SHARED conformance
-// fixtures (`EventsScriptRenderer.fixtures.json`, byte-identical in both
+// fixtures (`EventScriptRenderer.fixtures.json`, byte-identical in both
 // repositories): any rendering change must update the fixtures on both
 // sides. See the README next to the backend parser for the full map of the
 // EventScript ecosystem.
@@ -17,7 +17,7 @@ const gd: libGDevelop = global.gd;
 
 // A failure to render an event/instruction as EventScript, with `path`
 // locating the node (same paths as the events text renderer: `event-1.2`).
-export type EventsScriptRenderingError = {|
+export type EventScriptRenderingError = {|
   path: string,
   message: string,
 |};
@@ -118,7 +118,7 @@ const NOT_TYPE = 'BuiltinCommonInstructions::Not';
 const renderConditionExpression = (
   instruction: gdInstruction,
   eventPath: string,
-  renderingErrors: Array<EventsScriptRenderingError>
+  renderingErrors: Array<EventScriptRenderingError>
 ): string => {
   const type = instruction.getType();
 
@@ -166,7 +166,7 @@ const renderConditionExpression = (
 const renderConditionsListExpression = (
   conditionsList: gdInstructionsList,
   eventPath: string,
-  renderingErrors: Array<EventsScriptRenderingError>
+  renderingErrors: Array<EventScriptRenderingError>
 ): string => {
   return mapFor(0, conditionsList.size(), i =>
     renderConditionExpression(conditionsList.get(i), eventPath, renderingErrors)
@@ -176,7 +176,7 @@ const renderConditionsListExpression = (
 const renderActionLine = (
   instruction: gdInstruction,
   eventPath: string,
-  renderingErrors: Array<EventsScriptRenderingError>
+  renderingErrors: Array<EventScriptRenderingError>
 ): string => {
   const type = instruction.getType();
   const metadata = gd.MetadataProvider.getActionMetadata(
@@ -242,7 +242,7 @@ type EventScriptParts = {|
 const buildEventScriptParts = (
   event: gdBaseEvent,
   eventPath: string,
-  renderingErrors: Array<EventsScriptRenderingError>
+  renderingErrors: Array<EventScriptRenderingError>
 ): EventScriptParts | null => {
   const type = event.getType();
 
@@ -302,10 +302,11 @@ const buildEventScriptParts = (
       ? ` index ${repeatEvent.getLoopIndexVariableName()}`
       : '';
     const ifClause = conditions ? ` if ${conditions}` : '';
+    // An empty repeat expression (a repeat event just created in the
+    // editor) renders as `repeat 0 times` so the output stays parseable.
     return {
-      header: `repeat ${repeatEvent
-        .getRepeatExpression()
-        .getPlainString()} times${indexClause}${ifClause}`,
+      header: `repeat ${repeatEvent.getRepeatExpression().getPlainString() ||
+        '0'} times${indexClause}${ifClause}`,
       actionsList: repeatEvent.getActions(),
     };
   }
@@ -409,7 +410,7 @@ const renderHeaderLineFromParts = ({
  * `comment "..."`), without its body, annotated with its id. Used both by
  * the full rendering and to show ancestors of filtered events.
  */
-export const renderEventsScriptHeaderLine = ({
+export const renderEventScriptHeaderLine = ({
   event,
   eventPath,
   indent,
@@ -418,7 +419,7 @@ export const renderEventsScriptHeaderLine = ({
   event: gdBaseEvent,
   eventPath: string,
   indent: string,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  renderingErrors: Array<EventScriptRenderingError>,
 |}): string => {
   let parts = null;
   try {
@@ -445,7 +446,7 @@ const countEventsAndInstructions = (
     const event = eventsList.getEventAt(i);
     eventsCount++;
     try {
-      const renderingErrors: Array<EventsScriptRenderingError> = [];
+      const renderingErrors: Array<EventScriptRenderingError> = [];
       const parts = buildEventScriptParts(event, '', renderingErrors);
       if (parts && parts.actionsList) {
         instructionsCount += parts.actionsList.size();
@@ -465,20 +466,24 @@ const countEventsAndInstructions = (
 /**
  * Render an event (and its sub-events, up to `subEventsDepth` levels) as
  * EventScript lines. Collapsed sub-events are replaced by a `# ...` marker
- * telling how to fetch them.
+ * telling how to fetch them (pass `showCollapsedSubEventsMarker: false` to
+ * omit the marker, for "own source only" renderings: the body then gets an
+ * explicit `pass` when the event has nothing else).
  */
-export const renderEventAsEventsScriptLines = ({
+export const renderEventAsEventScriptLines = ({
   event,
   eventPath,
   indent,
   subEventsDepth,
+  showCollapsedSubEventsMarker,
   renderingErrors,
 }: {|
   event: gdBaseEvent,
   eventPath: string,
   indent: string,
   subEventsDepth: number,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  showCollapsedSubEventsMarker?: boolean,
+  renderingErrors: Array<EventScriptRenderingError>,
 |}): Array<string> => {
   const lines = [];
   const bodyIndent = indent + INDENT;
@@ -531,7 +536,7 @@ export const renderEventAsEventsScriptLines = ({
   if (event.canHaveSubEvents() && event.getSubEvents().getEventsCount() > 0) {
     if (subEventsDepth > 0) {
       lines.push(
-        ...renderEventsListAsEventsScriptLines({
+        ...renderEventsListAsEventScriptLines({
           eventsList: event.getSubEvents(),
           parentPath: eventPath,
           indent: bodyIndent,
@@ -539,7 +544,7 @@ export const renderEventAsEventsScriptLines = ({
           renderingErrors,
         })
       );
-    } else {
+    } else if (showCollapsedSubEventsMarker !== false) {
       const { eventsCount, instructionsCount } = countEventsAndInstructions(
         event.getSubEvents()
       );
@@ -558,7 +563,7 @@ export const renderEventAsEventsScriptLines = ({
   return lines;
 };
 
-export const renderEventsListAsEventsScriptLines = ({
+export const renderEventsListAsEventScriptLines = ({
   eventsList,
   parentPath,
   indent,
@@ -569,14 +574,14 @@ export const renderEventsListAsEventsScriptLines = ({
   parentPath: string,
   indent: string,
   subEventsDepth: number,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  renderingErrors: Array<EventScriptRenderingError>,
 |}): Array<string> => {
   const lines = [];
   mapFor(0, eventsList.getEventsCount(), i => {
     const eventPath = (parentPath ? parentPath + '.' : '') + i;
     try {
       lines.push(
-        ...renderEventAsEventsScriptLines({
+        ...renderEventAsEventScriptLines({
           event: eventsList.getEventAt(i),
           eventPath,
           indent,
@@ -605,7 +610,7 @@ export const renderEventsListAsEventsScriptLines = ({
  * its id (`# event-1.2`) as a comment. Sub-events deeper than
  * `subEventsDepth` levels are collapsed into a `# ...` marker.
  */
-export const renderEventsAsEventsScript = ({
+export const renderEventsAsEventScript = ({
   eventsList,
   subEventsDepth,
 }: {|
@@ -613,10 +618,10 @@ export const renderEventsAsEventsScript = ({
   subEventsDepth?: number,
 |}): {|
   text: string,
-  renderingErrors: Array<EventsScriptRenderingError>,
+  renderingErrors: Array<EventScriptRenderingError>,
 |} => {
-  const renderingErrors: Array<EventsScriptRenderingError> = [];
-  const lines = renderEventsListAsEventsScriptLines({
+  const renderingErrors: Array<EventScriptRenderingError> = [];
+  const lines = renderEventsListAsEventScriptLines({
     eventsList,
     parentPath: '',
     indent: '',

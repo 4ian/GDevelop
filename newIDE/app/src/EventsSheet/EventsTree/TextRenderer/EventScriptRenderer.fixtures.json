@@ -1,5 +1,5 @@
 {
-  "note": "Conformance fixtures shared between the backend EventScript serializer (events-script-serializer.js in GDevelop-services) and the editor-side renderer (EventsScriptRenderer.js in the GDevelop repository). The SAME serialized events must render to the SAME EventScript on both sides. Keep this file byte-identical with its copy: newIDE/app/src/EventsSheet/EventsTree/TextRenderer/EventsScriptRenderer.fixtures.json (GDevelop repository).",
+  "note": "Conformance fixtures shared between the backend EventScript serializer (events-script-serializer.js in GDevelop-services) and the editor-side renderer (EventScriptRenderer.js in the GDevelop repository). The SAME serialized events must render to the SAME EventScript on both sides. Keep this file byte-identical with its copy: newIDE/app/src/EventsSheet/EventsTree/TextRenderer/EventScriptRenderer.fixtures.json (GDevelop repository).",
   "fixtures": [
     {
       "name": "hidden parameters, trigger once and a sub-event",
@@ -46,7 +46,7 @@
           ]
         }
       ],
-      "expectedEventsScript": [
+      "expectedEventScript": [
         "if Timer(2, \"SpawnTimer\") and once:",
         "  ResetTimer(\"SpawnTimer\")",
         "  CentreCamera(MySpriteObject)",
@@ -83,7 +83,7 @@
           "actions": []
         }
       ],
-      "expectedEventsScript": [
+      "expectedEventScript": [
         "if not PlatformBehavior::IsFalling(MySpriteObject, PlatformerObject) and Or(DepartScene(), not Timer(2, \"T\")):",
         "  pass"
       ]
@@ -168,7 +168,7 @@
           "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
         }
       ],
-      "expectedEventsScript": [
+      "expectedEventScript": [
         "comment \"Setup\\nwith a second line\"",
         "always:",
         "  local number Count = 3",
@@ -191,6 +191,46 @@
       ]
     },
     {
+      "name": "degenerate loops (freshly created in the editor, fields still empty) stay parseable",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::While",
+          "whileConditions": [],
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Repeat",
+          "repeatExpression": "",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "expectedEventScript": [
+        "while :",
+        "  pass",
+        "repeat 0 times:",
+        "  pass",
+        "for each :",
+        "  pass",
+        "for each child in :",
+        "  pass"
+      ]
+    },
+    {
       "name": "empty group renders an explicit pass",
       "parsesBack": true,
       "serializedEvents": [
@@ -200,7 +240,7 @@
           "events": []
         }
       ],
-      "expectedEventsScript": ["group \"Empty group\":", "  pass"]
+      "expectedEventScript": ["group \"Empty group\":", "  pass"]
     },
     {
       "name": "unknown instruction and non-representable event",
@@ -221,7 +261,7 @@
           "inlineCode": "runtimeScene.setBackgroundColor(255, 0, 0);"
         }
       ],
-      "expectedEventsScript": [
+      "expectedEventScript": [
         "always:",
         "  SomeUnknownExtension::Unknown(A, , B)",
         "# (event of type \"BuiltinCommonInstructions::JsCode\" cannot be shown as EventScript)"

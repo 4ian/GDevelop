@@ -13,6 +13,7 @@ import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 import { type FileMetadata } from '../ProjectsStorage';
+import { readProjectSettings } from '../Utils/ProjectSettingsReader';
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -55,9 +56,54 @@ const getCommandArgs = (): Array<string> => {
   return values.map(value => value.trim()).filter(Boolean);
 };
 
+/**
+ * Whether diagnostic-error export blocking should be enforced for this CLI run.
+ *
+ * Priority (highest first):
+ *  1. `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` CLI flags,
+ *     for CI/release scripts that want to force the behavior explicitly.
+ *  2. The project's own `gdevelop-settings.yaml`, read directly from disk here
+ *     (rather than relying on `preferences.getBlockPreviewAndExportOnDiagnosticErrors()`,
+ *     which is a persisted, cross-project value only updated asynchronously - after
+ *     resources are fetched - by `MainFrame`'s `loadFromProject`. Depending on
+ *     timing, the CLI command can otherwise run before that update happens and see
+ *     a stale/unrelated value from a previous session or another project).
+ *  3. The current (persisted) `blockPreviewAndExportOnDiagnosticErrors` preference,
+ *     as a fallback when the project has no `gdevelop-settings.yaml` (or it doesn't
+ *     define this preference).
+ */
+export const shouldBlockOnDiagnosticErrorsForCli = async (
+  project: gdProject,
+  preferences: Preferences
+): Promise<boolean> => {
+  const appArguments = Window.getArguments();
+  const cliOverride = appArguments['block-on-diagnostic-errors'];
+  if (typeof cliOverride === 'boolean') return cliOverride;
+
+  try {
+    const projectFilePath = project.getProjectFile();
+    if (projectFilePath) {
+      const parsedProjectSettings = await readProjectSettings(projectFilePath);
+      const yamlValue =
+        parsedProjectSettings &&
+        parsedProjectSettings.preferences &&
+        parsedProjectSettings.preferences
+          .blockPreviewAndExportOnDiagnosticErrors;
+      if (typeof yamlValue === 'boolean') return yamlValue;
+    }
+  } catch (error) {
+    console.warn(
+      '[CLI] Failed to read gdevelop-settings.yaml for diagnostic-error blocking, falling back to preferences:',
+      error.message
+    );
+  }
+
+  return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
+};
+
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
-    if (preferences.getBlockPreviewAndExportOnDiagnosticErrors()) {
+    if (await shouldBlockOnDiagnosticErrorsForCli(project, preferences)) {
       const errors = scanProjectForValidationErrors(project);
       if (errors.length > 0) {
         console.error(

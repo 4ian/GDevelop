@@ -41,8 +41,10 @@ type Props = {|
   anchorEl: ?any,
 
   resourceManagementProps: ResourceManagementProps,
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
-  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const InlineParameterEditor = ({

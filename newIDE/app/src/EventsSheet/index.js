@@ -194,8 +194,10 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
-  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 type ComponentProps = {|

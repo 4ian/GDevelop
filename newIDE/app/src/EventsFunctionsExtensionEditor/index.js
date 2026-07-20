@@ -1384,6 +1384,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const selectedEventsBasedEntity =
       selectedEventsBasedBehavior || selectedEventsBasedObject;
 
+    const isLifecycleEventsFunction =
+      !!selectedEventsFunction &&
+      (selectedEventsBasedBehavior
+        ? gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+            selectedEventsFunction.getName()
+          )
+        : selectedEventsBasedObject
+        ? gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+            selectedEventsFunction.getName()
+          )
+        : gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
+            selectedEventsFunction.getName()
+          ));
+
     const editors: {
       [string]: Editor,
     } = {
@@ -1578,9 +1592,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
-                editEventsFunctionParameter={this._editEventsFunctionParameter}
+                editEventsFunctionParameter={
+                  isLifecycleEventsFunction
+                    ? null
+                    : this._editEventsFunctionParameter
+                }
                 openEventsBasedEntityPropertyEditorDialog={
-                  this._openEventsBasedEntityPropertyEditorDialog
+                  selectedEventsBasedEntity
+                    ? this._openEventsBasedEntityPropertyEditorDialog
+                    : null
                 }
               />
             </Background>

@@ -91,7 +91,9 @@ type Props = {|
   ) => void,
   noHelpButton?: boolean,
   id?: string,
-  openEventsBasedEntityPropertyEditorDialog: VariableDialogOpeningProps => void,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const isParameterVisible = (

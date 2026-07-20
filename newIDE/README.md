@@ -142,6 +142,30 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
 
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
 
+For `EXPORT_HTML5_EXTERNAL`, use `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors`
+to explicitly force whether the export should fail when the project has diagnostic errors
+(instead of relying on the persisted, cross-project `blockPreviewAndExportOnDiagnosticErrors`
+preference, or on the project's `gdevelop-settings.yaml`, which is applied asynchronously and
+may not have been applied yet when the command starts). This is handy to enable strict
+checking for release builds while keeping it disabled for local/dev builds:
+
+```bash
+# Release build: fail the export if the project has diagnostic errors.
+./gdevelop --no-sandbox --disable-update-check --block-on-diagnostic-errors \
+  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
+
+# Dev build: never block the export, regardless of preferences/settings.
+./gdevelop --no-sandbox --disable-update-check --no-block-on-diagnostic-errors \
+  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
+```
+
+If neither flag is passed, the existing preference-based behavior is used unchanged.
+
+If both `--block-on-diagnostic-errors` and `--no-block-on-diagnostic-errors` are passed at the
+same time, only the one appearing **last** on the command line wins (a warning is logged to
+help spot this if it happens by accident, e.g. because of conflicting flags coming from a
+template/CI matrix) - avoid passing both.
+
 ### Making the CLI available on PATH
 
 When GDevelop is installed with the Windows NSIS installer, the install

@@ -129,12 +129,6 @@ const UnifiedVariablesDialog = ({
         behaviorVariables && {
           id: 'behavior-variables',
           label: <Trans>Behavior variables</Trans>,
-          scopeLabel: 'Behavior',
-          groupLabel: eventsBasedBehavior ? (
-            <Trans>{eventsBasedBehavior.getName()} — Behavior</Trans>
-          ) : (
-            <Trans>Behavior</Trans>
-          ),
           variablesContainer: behaviorVariables,
           emptyPlaceholderTitle: (
             <Trans>Add your first behavior variable</Trans>
@@ -147,12 +141,6 @@ const UnifiedVariablesDialog = ({
         prefabVariables && {
           id: 'prefab-variables',
           label: <Trans>Prefab variables</Trans>,
-          scopeLabel: 'Prefab',
-          groupLabel: eventsBasedObject ? (
-            <Trans>{eventsBasedObject.getName()} — Prefab</Trans>
-          ) : (
-            <Trans>Prefab</Trans>
-          ),
           variablesContainer: prefabVariables,
           emptyPlaceholderTitle: <Trans>Add your first prefab variable</Trans>,
           emptyPlaceholderDescription: (
@@ -166,14 +154,6 @@ const UnifiedVariablesDialog = ({
             `[${extensionVariableLabelPrefix}] Scene variables`
           ) : (
             <Trans>Scene variables</Trans>
-          ),
-          scopeLabel: 'Scene',
-          groupLabel: layout ? (
-            <Trans>{layout.getName()} — Scene</Trans>
-          ) : extensionVariableLabelPrefix ? (
-            <Trans>{extensionVariableLabelPrefix} — Scene</Trans>
-          ) : (
-            <Trans>Scene</Trans>
           ),
           variablesContainer: sceneVariables,
           emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
@@ -191,12 +171,6 @@ const UnifiedVariablesDialog = ({
           ) : (
             <Trans>Global variables</Trans>
           ),
-          scopeLabel: 'Global',
-          groupLabel: extensionVariableLabelPrefix ? (
-            <Trans>{extensionVariableLabelPrefix} — Global</Trans>
-          ) : (
-            <Trans>Project — Global</Trans>
-          ),
           variablesContainer: globalVariables,
           emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
           emptyPlaceholderDescription: (
@@ -210,8 +184,6 @@ const UnifiedVariablesDialog = ({
           ({ id, objectName, variablesContainer, initialInstances }) => ({
             id,
             label: objectName,
-            scopeLabel: objectName,
-            groupLabel: objectName,
             objectName,
             initialInstances,
             variablesContainer,
@@ -237,10 +209,8 @@ const UnifiedVariablesDialog = ({
       ].filter(Boolean),
     [
       behaviorVariables,
-      eventsBasedBehavior,
       onComputeAllBehaviorVariableNames,
       prefabVariables,
-      eventsBasedObject,
       onComputeAllPrefabVariableNames,
       sceneVariables,
       extensionVariableLabelPrefix,
@@ -312,23 +282,7 @@ const UnifiedVariablesDialog = ({
       open={open}
       onCancel={onCancel}
       onApply={onApply}
-      title={
-        eventsBasedBehavior ? (
-          <Trans>
-            Variables in behavior: {eventsBasedBehavior.getName()}
-          </Trans>
-        ) : eventsBasedObject ? (
-          <Trans>Variables in prefab: {eventsBasedObject.getName()}</Trans>
-        ) : layout ? (
-          <Trans>Variables in Scene: {layout.getName()}</Trans>
-        ) : eventsFunctionsExtension ? (
-          <Trans>
-            Variables in extension: {eventsFunctionsExtension.getName()}
-          </Trans>
-        ) : (
-          <Trans>Variables</Trans>
-        )
-      }
+      title={<Trans>Variables</Trans>}
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
       initiallyOpenTabId={initiallyOpenTabId}

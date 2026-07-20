@@ -16,9 +16,9 @@ import {
   getObjectOriginLabel,
   getObjectOriginShortLabel,
   getObjectOriginTooltip,
-  getWorkbenchObjectIconUrl,
+  getWorkbenchObjectIconUrlFromType,
   getWorkbenchObjectKey,
-  getWorkbenchObjectTypeLabel,
+  getWorkbenchObjectTypeLabelFromType,
   type WorkbenchObject,
 } from './EnumerateWorkbenchObjects';
 import classes from './ObjectSettingsWorkbench.module.css';
@@ -98,17 +98,20 @@ const ObjectSwitcher = ({
     setFocusedIndex(0);
   }, []);
 
-  const openSwitcher = React.useCallback(() => {
-    const selectedIndex = selectedObject
-      ? objects.findIndex(
-          item =>
-            getWorkbenchObjectKey(item) ===
-            getWorkbenchObjectKey(selectedObject)
-        )
-      : 0;
-    setFocusedIndex(Math.max(0, selectedIndex));
-    setOpen(true);
-  }, [objects, selectedObject]);
+  const openSwitcher = React.useCallback(
+    () => {
+      const selectedIndex = selectedObject
+        ? objects.findIndex(
+            item =>
+              getWorkbenchObjectKey(item) ===
+              getWorkbenchObjectKey(selectedObject)
+          )
+        : 0;
+      setFocusedIndex(Math.max(0, selectedIndex));
+      setOpen(true);
+    },
+    [objects, selectedObject]
+  );
 
   React.useEffect(
     () => {
@@ -122,17 +125,23 @@ const ObjectSwitcher = ({
         }
       }, 0);
       return () => clearTimeout(timeoutId);
-    }, [open, filteredObjects, focusedIndex]);
+    },
+    [open, filteredObjects, focusedIndex]
+  );
 
   React.useEffect(
     () => {
       if (openRequestId) openSwitcher();
-    }, [openRequestId, openSwitcher]);
+    },
+    [openRequestId, openSwitcher]
+  );
 
   React.useEffect(
     () => {
       setFocusedIndex(0);
-    }, [query]);
+    },
+    [query]
+  );
 
   const selectFocused = React.useCallback(
     () => {
@@ -141,19 +150,22 @@ const ObjectSwitcher = ({
       onSelectObject(item);
       close();
       if (triggerRef.current) triggerRef.current.focus();
-    }, [close, filteredObjects, focusedIndex, onSelectObject]
+    },
+    [close, filteredObjects, focusedIndex, onSelectObject]
   );
 
   const onKeyDown = React.useCallback(
     (event: SyntheticKeyboardEvent<HTMLElement>) => {
       if (!open && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault();
+        event.stopPropagation();
         openSwitcher();
         return;
       }
       if (!open) return;
       if (event.key === 'ArrowDown') {
         event.preventDefault();
+        event.stopPropagation();
         setFocusedIndex(index =>
           filteredObjects.length
             ? Math.min(index + 1, filteredObjects.length - 1)
@@ -161,23 +173,27 @@ const ObjectSwitcher = ({
         );
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
+        event.stopPropagation();
         setFocusedIndex(index => Math.max(index - 1, 0));
       } else if (event.key === 'Enter') {
         event.preventDefault();
+        event.stopPropagation();
         selectFocused();
       } else if (event.key === 'Escape') {
         event.preventDefault();
+        event.stopPropagation();
         close();
         if (triggerRef.current) triggerRef.current.focus();
       }
-    }, [close, filteredObjects.length, open, openSwitcher, selectFocused]
+    },
+    [close, filteredObjects.length, open, openSwitcher, selectFocused]
   );
 
   const selectedType = selectedObject
-    ? getWorkbenchObjectTypeLabel(project, selectedObject.object)
+    ? getWorkbenchObjectTypeLabelFromType(project, selectedObject.objectType)
     : '';
   const selectedIcon = selectedObject
-    ? getWorkbenchObjectIconUrl(project, selectedObject.object)
+    ? getWorkbenchObjectIconUrlFromType(project, selectedObject.objectType)
     : '';
 
   return (
@@ -200,15 +216,11 @@ const ObjectSwitcher = ({
             <React.Fragment>
               <span className={classes.objectIconBox}>
                 {selectedIcon ? (
-                  <IconContainer
-                    src={selectedIcon}
-                    alt=""
-                    size={20}
-                  />
+                  <IconContainer src={selectedIcon} alt="" size={20} />
                 ) : null}
               </span>
               <span className={classes.triggerName}>
-                {selectedObject.object.getName()}
+                {selectedObject.objectName}
               </span>
               <span className={classes.triggerMeta}>
                 {selectedType} · {getObjectOriginShortLabel(selectedObject)}
@@ -224,6 +236,11 @@ const ObjectSwitcher = ({
         <Popper
           open={open}
           anchorEl={triggerRef.current}
+          container={
+            triggerRef.current
+              ? triggerRef.current.ownerDocument.body
+              : undefined
+          }
           placement="bottom-start"
           className={classes.switcherPopper}
         >
@@ -239,7 +256,9 @@ const ObjectSwitcher = ({
             </div>
             {!!query && (
               <div className={classes.switcherMatchSummary} aria-live="polite">
-                {filteredObjects.length} of {objects.length} objects match
+                <Trans>
+                  {filteredObjects.length} of {objects.length} objects match
+                </Trans>
               </div>
             )}
             <div
@@ -254,13 +273,13 @@ const ObjectSwitcher = ({
                   !!selectedObject &&
                   key === getWorkbenchObjectKey(selectedObject);
                 const isFocused = index === focusedIndex;
-                const typeLabel = getWorkbenchObjectTypeLabel(
+                const typeLabel = getWorkbenchObjectTypeLabelFromType(
                   project,
-                  item.object
+                  item.objectType
                 );
-                const iconUrl = getWorkbenchObjectIconUrl(
+                const iconUrl = getWorkbenchObjectIconUrlFromType(
                   project,
-                  item.object
+                  item.objectType
                 );
                 return (
                   <button
@@ -270,7 +289,7 @@ const ObjectSwitcher = ({
                     type="button"
                     role="option"
                     aria-selected={isSelected}
-                    aria-label={`${item.object.getName()}, ${
+                    aria-label={`${item.objectName}, ${
                       item.scope === 'global'
                         ? 'Global object'
                         : getObjectOriginLabel(item)
@@ -294,7 +313,7 @@ const ObjectSwitcher = ({
                     <span className={classes.switcherRowText}>
                       <span className={classes.switcherRowName}>
                         <HighlightedName
-                          name={item.object.getName()}
+                          name={item.objectName}
                           query={query.trim()}
                         />
                       </span>
@@ -309,7 +328,9 @@ const ObjectSwitcher = ({
               })}
               {!filteredObjects.length && (
                 <div className={classes.switcherEmpty}>
-                  <span>No objects match “{query}”</span>
+                  <span>
+                    <Trans>No objects match “{query}”</Trans>
+                  </span>
                   <button type="button" onClick={() => setQuery('')}>
                     <Trans>Clear</Trans>
                   </button>
@@ -317,11 +338,17 @@ const ObjectSwitcher = ({
               )}
             </div>
             <div className={classes.switcherFooter}>
-              <span>↑↓ navigate · Enter select · Esc close</span>
               <span>
-                {query
-                  ? `${filteredObjects.length} of ${objects.length} objects`
-                  : `${objects.length} objects`}
+                <Trans>↑↓ navigate · Enter select · Esc close</Trans>
+              </span>
+              <span>
+                {query ? (
+                  <Trans>
+                    {filteredObjects.length} of {objects.length} objects
+                  </Trans>
+                ) : (
+                  <Trans>{objects.length} objects</Trans>
+                )}
               </span>
             </div>
           </div>

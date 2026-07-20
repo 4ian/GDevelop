@@ -118,6 +118,7 @@ import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
+import ObjectSettingsWorkbenchWindow from '../ObjectSettingsWorkbench/ObjectSettingsWorkbenchWindow';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -810,6 +811,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     editorKey: null,
     requestId: 0,
   });
+  const [
+    objectSettingsWindowState,
+    setObjectSettingsWindowState,
+  ] = React.useState<{|
+    projectPtr: ?number,
+    focusRequestId: number,
+  |}>({ projectPtr: null, focusRequestId: 0 });
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -4332,6 +4340,17 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [getEditorOpeningOptions, setState]
+  );
+
+  const openObjectSettings = React.useCallback(
+    () => {
+      if (!currentProject) return;
+      setObjectSettingsWindowState(previousState => ({
+        projectPtr: currentProject.ptr,
+        focusRequestId: previousState.focusRequestId + 1,
+      }));
+    },
+    [currentProject]
   );
 
   const openGlobalSearch = React.useCallback(
@@ -8102,6 +8121,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onOpenResources={openResources}
       onOpenStickyNotes={openStickyNotesManager}
       onOpenStaticData={openStaticData}
+      onOpenObjectSettings={openObjectSettings}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -8271,6 +8291,38 @@ const MainFrame = (props: Props): React.MixedElement => {
         onPopIn={onPopInTab}
         focusRequest={poppedOutEditorFocusRequest}
       />
+      {currentProject &&
+        objectSettingsWindowState.projectPtr === currentProject.ptr && (
+          <ObjectSettingsWorkbenchWindow
+            key={`object-settings-window-${currentProject.ptr}`}
+            project={currentProject}
+            unsavedChanges={unsavedChanges}
+            resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
+            onDeleteEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
+            onGlobalObjectEdited={onGlobalObjectEdited}
+            onSceneObjectEdited={onSceneObjectEdited}
+            onEventsBasedObjectChildrenEdited={
+              onEventsBasedObjectChildrenEdited
+            }
+            onObjectListsModified={onObjectListsModified}
+            triggerHotReloadInGameEditorIfNeeded={
+              triggerHotReloadInGameEditorIfNeeded
+            }
+            focusRequestId={objectSettingsWindowState.focusRequestId}
+            onClose={() =>
+              setObjectSettingsWindowState(previousState => ({
+                projectPtr: null,
+                focusRequestId: previousState.focusRequestId,
+              }))
+            }
+          />
+        )}
       {currentProject && standalonePrefabSettingsDialog && (
         <PrefabDetailEditor
           key={`prefab-settings-dialog-${

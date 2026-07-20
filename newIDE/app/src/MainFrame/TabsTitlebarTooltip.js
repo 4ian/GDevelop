@@ -25,6 +25,7 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'custom object': <Trans>UI</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
+  'static-data': <Trans>Static Data</Trans>,
   'global-search': <Trans>Global search</Trans>,
   'start page': <Trans>Homepage</Trans>,
   'ask-ai': <Trans>Ask AI</Trans>,

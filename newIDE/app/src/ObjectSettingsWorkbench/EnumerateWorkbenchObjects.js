@@ -8,6 +8,9 @@ export type ObjectOriginScope = 'scene' | 'global' | 'prefab';
 /** Editor-only ownership metadata. It is deliberately separate from the
  * serialized object model and from ObjectsList's legacy `global` boolean. */
 export type WorkbenchObject = {|
+  key: string,
+  objectName: string,
+  objectType: string,
   object: gdObject,
   scope: ObjectOriginScope,
   ownerName: string,
@@ -17,13 +20,11 @@ export type WorkbenchObject = {|
 |};
 
 export const getWorkbenchObjectKey = (item: WorkbenchObject): string =>
-  `${item.scope}:${item.ownerName}:${item.object.ptr}`;
+  item.key;
 
 export const getObjectOriginLabel = (item: WorkbenchObject): string => {
   if (item.scope === 'global') return 'Global';
-  return `${item.scope === 'scene' ? 'Scene' : 'Prefab'} · ${
-    item.ownerName
-  }`;
+  return `${item.scope === 'scene' ? 'Scene' : 'Prefab'} · ${item.ownerName}`;
 };
 
 export const getObjectOriginShortLabel = (item: WorkbenchObject): string =>
@@ -43,24 +44,34 @@ export const getObjectOriginTooltip = (item: WorkbenchObject): string =>
 export const getWorkbenchObjectTypeLabel = (
   project: gdProject,
   object: gdObject
+): string => getWorkbenchObjectTypeLabelFromType(project, object.getType());
+
+export const getWorkbenchObjectTypeLabelFromType = (
+  project: gdProject,
+  objectType: string
 ): string => {
   const metadata = gd.MetadataProvider.getObjectMetadata(
     project.getCurrentPlatform(),
-    object.getType()
+    objectType
   );
   if (!metadata || gd.MetadataProvider.isBadObjectMetadata(metadata)) {
-    return object.getType();
+    return objectType;
   }
-  return metadata.getFullName() || metadata.getName() || object.getType();
+  return metadata.getFullName() || metadata.getName() || objectType;
 };
 
 export const getWorkbenchObjectIconUrl = (
   project: gdProject,
   object: gdObject
+): string => getWorkbenchObjectIconUrlFromType(project, object.getType());
+
+export const getWorkbenchObjectIconUrlFromType = (
+  project: gdProject,
+  objectType: string
 ): string => {
   const metadata = gd.MetadataProvider.getObjectMetadata(
     project.getCurrentPlatform(),
-    object.getType()
+    objectType
   );
   return metadata && !gd.MetadataProvider.isBadObjectMetadata(metadata)
     ? metadata.getIconFilename()
@@ -92,8 +103,12 @@ export const enumerateWorkbenchObjects = (
       objectIndex++
     ) {
       const object = objects.getObjectAt(objectIndex);
-      sceneObjectNames.add(object.getName());
+      const objectName = object.getName();
+      sceneObjectNames.add(objectName);
       result.push({
+        key: `scene:${layout.getName()}:${objectName}`,
+        objectName,
+        objectType: object.getType(),
         object,
         scope: 'scene',
         ownerName: layout.getName(),
@@ -108,8 +123,12 @@ export const enumerateWorkbenchObjects = (
   mapFor(0, globalObjects.getObjectsCount(), objectIndex =>
     globalObjects.getObjectAt(objectIndex)
   ).forEach(object => {
-    if (sceneObjectNames.has(object.getName())) return;
+    const objectName = object.getName();
+    if (sceneObjectNames.has(objectName)) return;
     result.push({
+      key: `global:${objectName}`,
+      objectName,
+      objectType: object.getType(),
       object,
       scope: 'global',
       ownerName: '',
@@ -127,6 +146,7 @@ export const enumerateWorkbenchObjects = (
     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
       extensionIndex
     );
+    const extensionName = eventsFunctionsExtension.getName();
     const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
     for (
       let prefabIndex = 0;
@@ -134,16 +154,22 @@ export const enumerateWorkbenchObjects = (
       prefabIndex++
     ) {
       const eventsBasedObject = eventsBasedObjects.at(prefabIndex);
+      const eventsBasedObjectName = eventsBasedObject.getName();
       const ownerName =
-        eventsBasedObject.getFullName() || eventsBasedObject.getName();
+        eventsBasedObject.getFullName() || eventsBasedObjectName;
       const objects = eventsBasedObject.getObjects();
       for (
         let objectIndex = 0;
         objectIndex < objects.getObjectsCount();
         objectIndex++
       ) {
+        const object = objects.getObjectAt(objectIndex);
+        const objectName = object.getName();
         result.push({
-          object: objects.getObjectAt(objectIndex),
+          key: `prefab:${extensionName}:${eventsBasedObjectName}:${objectName}`,
+          objectName,
+          objectType: object.getType(),
+          object,
           scope: 'prefab',
           ownerName,
           layout: null,
@@ -171,8 +197,8 @@ export const filterWorkbenchObjects = ({
 
   return objects.filter(item =>
     [
-      item.object.getName(),
-      getWorkbenchObjectTypeLabel(project, item.object),
+      item.objectName,
+      getWorkbenchObjectTypeLabelFromType(project, item.objectType),
       getObjectOriginLabel(item),
       item.ownerName,
       item.scope,

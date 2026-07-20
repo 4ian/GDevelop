@@ -82,6 +82,25 @@ export const saveToHistory = (
   changeContext?: any
 ): HistoryState => {
   const newCurrentValue = serializeToJSObject(newCurrentSerializableValue);
+  return saveSerializedValueToHistory(
+    history,
+    newCurrentValue,
+    actionType,
+    changeContext
+  );
+};
+
+/**
+ * Save a value that was already serialized while its libGD.js wrapper was
+ * known to be alive. This is useful for delayed/coalesced editor history: the
+ * native object can legitimately be replaced before the delayed commit runs.
+ */
+export const saveSerializedValueToHistory = (
+  history: HistoryState,
+  newCurrentValue: Object,
+  actionType?: RevertableActionType,
+  changeContext?: any
+): HistoryState => {
   // Add the current state to the previous actions.
   const newPreviousActions = [
     ...history.previousActions,

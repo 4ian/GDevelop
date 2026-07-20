@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 
 import {
   type Field,
@@ -10,6 +11,13 @@ import {
 export type SourceFilterResult = {|
   matchCount: number,
   filteredSchema: Schema,
+|};
+
+export type SourceFilterIndex = {|
+  schema: Schema,
+  instances: Instances,
+  normalizedSourceSearchText: string,
+  fieldSearchText: Map<Field, string>,
 |};
 
 const normalize = (value: any): string =>
@@ -28,7 +36,12 @@ const safelyRead = (reader: ?(any) => any, instance: any): string => {
 
 const getFieldSearchText = (field: Field, instances: Instances): string => {
   const instance = instances[0];
-  const parts = [field.name || '', field.title || '', field.label || ''];
+  const fieldWithOptionalText: any = field;
+  const parts = [
+    field.name || '',
+    fieldWithOptionalText.title || '',
+    fieldWithOptionalText.label || '',
+  ];
 
   if (field.getLabel) parts.push(safelyRead(field.getLabel, instance));
   if (field.getDescription)
@@ -50,6 +63,32 @@ const getFieldSearchText = (field: Field, instances: Instances): string => {
 
 const isValueProperty = (field: Field): boolean =>
   !!field.getValue && !!field.setValue;
+
+export const createSourceFilterIndex = ({
+  schema,
+  instances,
+  sourceSearchText,
+}: {|
+  schema: Schema,
+  instances: Instances,
+  sourceSearchText: string,
+|}): SourceFilterIndex => {
+  const fieldSearchText = new Map<Field, string>();
+  const indexFields = (fields: Schema): void => {
+    fields.forEach(field => {
+      fieldSearchText.set(field, getFieldSearchText(field, instances));
+      if (field.children) indexFields(field.children);
+    });
+  };
+  indexFields(schema);
+
+  return {
+    schema,
+    instances,
+    normalizedSourceSearchText: normalize(sourceSearchText),
+    fieldSearchText,
+  };
+};
 
 export const countSchemaProperties = (
   schema: Schema,
@@ -110,7 +149,7 @@ const renderHighlightedLabel = (
             backgroundColor: 'var(--theme-list-item-hover-background-color)',
           }}
         >
-          Advanced
+          <Trans>Advanced</Trans>
         </span>
       )}
     </span>
@@ -122,17 +161,19 @@ const filterFields = ({
   instances,
   query,
   ancestorMatches,
+  fieldSearchText,
 }: {|
   schema: Schema,
   instances: Instances,
   query: string,
   ancestorMatches: boolean,
+  fieldSearchText: Map<Field, string>,
 |}): {| schema: Schema, count: number |} => {
   const filteredSchema: Schema = [];
   let count = 0;
 
   schema.forEach(field => {
-    const ownText = getFieldSearchText(field, instances);
+    const ownText = fieldSearchText.get(field) || '';
     const ownMatches = ownText.includes(query);
 
     if (field.children) {
@@ -142,6 +183,7 @@ const filterFields = ({
         instances,
         query,
         ancestorMatches: ancestorMatches || ownMatches,
+        fieldSearchText,
       });
       if (childResult.schema.length) {
         filteredSchema.push({ ...field, children: childResult.schema });
@@ -154,13 +196,13 @@ const filterFields = ({
     if (!matches) return;
 
     const isAdvanced = field.visibility === 'advanced';
-    let nextField = field;
+    let nextField: any = field;
     if (isValueProperty(field)) {
       count++;
       const originalGetLabel = field.getLabel;
       // Filtered advanced fields are promoted so they are revealed immediately;
       // the label retains an explicit Advanced indicator.
-      nextField = {
+      nextField = ({
         ...field,
         visibility: isAdvanced ? 'basic' : field.visibility,
         isHighlighted: () => true,
@@ -169,9 +211,13 @@ const filterFields = ({
           const label = originalGetLabel
             ? originalGetLabel(instance)
             : field.name;
-          return renderHighlightedLabel(String(label || field.name), query, isAdvanced);
+          return renderHighlightedLabel(
+            String(label || field.name),
+            query,
+            isAdvanced
+          );
         },
-      };
+      }: any);
     }
     filteredSchema.push(nextField);
   });
@@ -190,25 +236,42 @@ export const filterSourceSchema = ({
   query: string,
   sourceSearchText: string,
 |}): SourceFilterResult => {
+  const index = createSourceFilterIndex({
+    schema,
+    instances,
+    sourceSearchText,
+  });
+  return filterSourceFilterIndex({ index, query });
+};
+
+export const filterSourceFilterIndex = ({
+  index,
+  query,
+}: {|
+  index: SourceFilterIndex,
+  query: string,
+|}): SourceFilterResult => {
   const normalizedQuery = query.trim().toLocaleLowerCase();
   if (!normalizedQuery) {
     return {
       matchCount: 0,
-      filteredSchema: schema,
+      filteredSchema: index.schema,
     };
   }
 
-  const sourceMatches = normalize(sourceSearchText).includes(normalizedQuery);
+  const sourceMatches = index.normalizedSourceSearchText.includes(
+    normalizedQuery
+  );
   const result = filterFields({
-    schema,
-    instances,
+    schema: index.schema,
+    instances: index.instances,
     query: normalizedQuery,
     ancestorMatches: sourceMatches,
+    fieldSearchText: index.fieldSearchText,
   });
 
   return {
-    matchCount:
-      result.count || (sourceMatches ? 1 : 0),
+    matchCount: result.count || (sourceMatches ? 1 : 0),
     filteredSchema: result.schema,
   };
 };

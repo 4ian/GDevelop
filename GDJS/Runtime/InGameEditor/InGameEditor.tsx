@@ -3276,6 +3276,11 @@ namespace gdjs {
         const firstIntersect = intersects[0];
         if (!firstIntersect) return;
 
+        const worldScale = currentScene.getRenderer3DWorldScale();
+        firstIntersect.distance *= worldScale;
+        firstIntersect.point.x *= worldScale;
+        firstIntersect.point.y *= worldScale;
+        firstIntersect.point.z *= worldScale;
         firstIntersectsByLayer[layerName] = {
           intersect: firstIntersect,
         };

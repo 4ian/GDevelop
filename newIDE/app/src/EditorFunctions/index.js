@@ -284,7 +284,7 @@ export type RelatedAiRequestLastMessages = {|
   lastAssistantMessages: string[],
 |};
 
-type LaunchFunctionOptionsWithoutProject = {|
+export type LaunchFunctionOptionsWithoutProject = {|
   PixiResourcesLoader: any,
   args: any,
   editorCallbacks: EditorCallbacks,
@@ -3124,7 +3124,7 @@ const changeBehaviorProperty: EditorFunction = {
 
         const { propertyWarnings, propertyChanges } = verifyPropertyChange({
           propertyNameWithLocation: `"${foundPropertyName}" on shared behavior "${behavior_name}"`,
-          newProperties: behavior.getProperties(),
+          newProperties: behaviorSharedData.getProperties(),
           propertyName: foundPropertyName,
           requestedNewValue: sanitizedNewValue,
         });
@@ -5916,6 +5916,16 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
     const scene = project.getLayout(scene_name);
     const layersContainer = scene.getLayers();
 
+    // Mirror the runtime behavior: when `firstLayout` is not set (or names a
+    // missing scene), the first scene of the project is the startup scene.
+    const firstLayoutName = project.getFirstLayout();
+    const effectiveFirstSceneName =
+      firstLayoutName && project.hasLayoutNamed(firstLayoutName)
+        ? firstLayoutName
+        : project.getLayoutsCount() > 0
+        ? project.getLayoutAt(0).getName()
+        : '';
+
     return {
       success: true,
       propertiesLayersEffectsForSceneNamed: scene.getName(),
@@ -5927,7 +5937,7 @@ const inspectScenePropertiesLayersEffects: EditorFunction = {
           scene.getBackgroundColorBlue()
         ),
         stopSoundsOnStartup: scene.stopSoundsOnStartup(),
-        isFirstScene: project.getFirstLayout() === scene.getName(),
+        isFirstScene: effectiveFirstSceneName === scene.getName(),
 
         // Also include some project related properties:
         gameResolutionWidth: project.getGameResolutionWidth(),
@@ -6293,7 +6303,21 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         if (scene.hasLayerNamed(layerName)) {
           let currentLayerName = layerName;
           if (delete_this_layer) {
-            if (move_instances_to_layer) {
+            // The base layer is named "", so only a null (not set) value means
+            // "delete the instances of the layer".
+            if (move_instances_to_layer !== null) {
+              if (!scene.hasLayerNamed(move_instances_to_layer)) {
+                warnings.push(
+                  `Layer "${move_instances_to_layer}" does not exist in scene "${scene.getName()}": layer "${layerName}" was NOT deleted (its instances would have nowhere to go). The base layer is named "".`
+                );
+                return;
+              }
+              if (move_instances_to_layer === layerName) {
+                warnings.push(
+                  `"move_instances_to_layer" is the same as the layer to delete ("${layerName}"): layer NOT deleted. Use another layer name, or omit it to also delete the instances.`
+                );
+                return;
+              }
               gd.WholeProjectRefactorer.mergeLayersInScene(
                 project,
                 scene,
@@ -6310,7 +6334,13 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             }
             scene.getLayers().removeLayer(layerName);
             changes.push(
-              `Removed layer "${layerName}" for scene "${scene.getName()}".`
+              move_instances_to_layer !== null
+                ? `Removed layer "${layerName}" for scene "${scene.getName()}" (instances moved to ${
+                    move_instances_to_layer === ''
+                      ? 'the base layer'
+                      : `layer "${move_instances_to_layer}"`
+                  }).`
+                : `Removed layer "${layerName}" for scene "${scene.getName()}" (its instances were removed too).`
             );
           } else {
             const layer = scene.getLayers().getLayer(layerName);

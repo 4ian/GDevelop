@@ -1,0 +1,218 @@
+version = 1
+background = "#4BADB0"
+
+[editor]
+zoom = 0.29509054643709776
+windowMask = false
+selectedLayer = "3D Terrain"
+mode = "embedded-game"
+
+[editor.grid]
+enabled = true
+type = "rectangular"
+size = [64, 64, 32]
+offset = [0, 0, 0]
+color = "#D7FFFF"
+alpha = 0.35
+snap = true
+
+[[layer]]
+name = ""
+locked = true
+cameras = [{ size = "default", viewport = "default" }]
+
+[[layer]]
+name = "3D Terrain"
+rendering = "3d"
+cameraType = "perspective"
+cameraBehavior = "do-nothing"
+ambient = "#FFFFFF"
+near = 1
+max2DDistance = 10000
+cameras = [{ size = "default", viewport = "default" }]
+
+[[layer.effect]]
+name = "Terrain Ambient Light"
+type = "Scene3D::AmbientLight"
+intensity = 0.9
+color = "255;255;255"
+
+[[layer.effect]]
+name = "Terrain Sun"
+type = "Scene3D::DirectionalLight"
+distanceFromCamera = 1500
+elevation = 55
+frustumSize = 4000
+intensity = 0.65
+minimumShadowBias = 0.001
+rotation = 315
+color = "255;244;220"
+shadowQuality = "medium"
+top = "Z+"
+isCastingShadow = true
+
+[[layer.place]]
+object = "Terrain"
+items = [
+  { id = "PFal-Iy2S16S52XJ8HmuKg", at = [640, 360, -487.958801213], locked = true },
+]
+
+[[layer.place]]
+object = "TerrainSupportCollider"
+depth = 24
+opacity = 0
+locked = true
+items = [
+  { id = "peFM0j6uSm-hT_pOTxttzA", at = [-998, -878.823529412, 99.194139963], size = [853.411764706, 454.235294118] },
+  { id = "6U13oSoNTFOs-v7tON8CmA", at = [-103.294117647, 1832.823529412, -404.594095331], size = [344.117647059, 178.941176471] },
+  { id = "J4I3s8EuR4CybKLSpdUkDw", at = [-144.588235297, 222.352941176, -56.347044371], size = [977.29411765, 261.529411766] },
+  { id = "LxzHuL5TQDy3sB55Uin2YA", at = [-144.588235297, 139.764705882, -56.347044371], size = [1472.823529417, 82.588235294] },
+  { id = "VTek1h-pSnChnPAFpHVxDA", at = [-598.823529416, 15.88235294, -56.347044371], size = [1927.058823536, 123.882352942] },
+  { id = "ZNW8elKrTgqBMGfXU2mWkA", at = [-1080.5882353, -342.000000002, -56.347044371], size = [2408.82352942, 357.882352942] },
+  { id = "LY9IMRRoSKGNQl37lxF0pA", at = [-1080.5882353, -741.176470592, -56.347044371], size = [1968.352941183, 399.17647059] },
+  { id = "-tlGYbiIRXuAgMQsfGdOpQ", at = [-1080.5882353, -947.647058828, -56.347044371], size = [1018.588235298, 206.470588236] },
+  { id = "nbTp4vS4RvmWZU7M4MrdZw", at = [1741.176470588, -424.588235294, -299.982330625], size = [564.352941176, 192.705882353] },
+  { id = "9IUqpJBETnGO4dVAO37gNg", at = [1245.647058824, -933.882352941, -299.982330625], size = [1059.882352941, 509.294117647] },
+  { id = "MKgscNIDSF245IvkvhrGEg", at = [-1287.058823529, 1777.764705882, -421.111742389], size = [344.117647059, 165.176470588] },
+  { id = "ee-ohvPpTyOANNM34p5-9g", at = [818.941176471, 1543.764705882, -189.864683566], size = [660.705882353, 247.764705882] },
+  { id = "khX0HTxuTDGSb4IIXCGj-w", at = [818.941176471, 1185.882352941, -189.864683566], size = [1266.352941176, 357.882352941] },
+  { id = "GcMz_528RgGvYj9fGEad2Q", at = [640, 1020.705882353, -189.864683566], size = [1445.294117647, 165.176470588] },
+  { id = "jfpXMcVtQcuxAchYO_Nfhw", at = [640, 552.705882353, -189.864683566], size = [1693.058823529, 468] },
+  { id = "HoUJV0ULTMubWduTesZ_6g", at = [1094.235294118, 29.647058824, -189.864683566], size = [1238.823529412, 523.058823529] },
+  { id = "XFkbmeTzTkivV2pzdHE5FQ", at = [1479.647058824, 483.882352941, -49.464683566], size = [770.823529412, 481.764705882] },
+  { id = "gLALaGPATCKCrcl4U8ujzA", at = [419.764705882, 1598.823529412, -338.523507095], size = [440.470588235, 385.411764706] },
+  { id = "FBloYZa_TcWCo8kGdUSW2g", at = [-1080.588235294, 1103.294117647, -244.923507095], size = [702, 468] },
+  { id = "8Gfx3SOkTjaZVssSaLy5gg", at = [-1080.588235294, 704.117647059, -244.923507095], size = [908.470588235, 399.176470588] },
+  { id = "oY65NGjcTG-4cUd4ER-ELw", at = [-1080.588235294, 277.411764706, -244.923507095], size = [605.647058824, 426.705882353] },
+]
+
+[[layer.place]]
+object = "LadderStep"
+locked = true
+items = [
+  { id = "NbsKNjn0QfSy_dSJ3HTIzA", at = [729.470580082, 712.795281131, -167.241131856] },
+  { id = "65GfzJBRT9WxS2nTN186aA", at = [729.470580082, 674.254075781, -145.217623448] },
+  { id = "DhGuDR-BTIiLKPDIp8uEVQ", at = [729.470584185, 635.712878635, -123.194082222] },
+  { id = "bljEsll7Qh28qIxL1tuuhw", at = [729.470584185, 597.171714307, -101.170540995] },
+  { id = "WOK52JQzQ4WHHPnjbXaAeQ", at = [729.470596491, 558.630508956, -79.147032587] },
+  { id = "54HLTaXAT2C2rBAnzmh1qA", at = [729.470596491, 517.820666924, -57.123491361] },
+]
+
+[[layer.place]]
+object = "BuildingCottage"
+locked = true
+items = [
+  { id = "KBSMUPLwTAaSBLWBsGv21Q", at = [1328.235294118, 759.176483715, -165.864695381] },
+  { id = "ll_Lc8GpQs-DBueZAhxIYw", at = [1754.941228979, 635.294117647, -25.464698006], size = [274.605869882, 247.213625956], depth = 282.172263335 },
+  { id = "UsdyTkEoRKm8vbu4igPBdA", at = [2071.529359257, 772.941176471, -25.464698006], rotation = 8.000002499 },
+  { id = "_NjE2fEsQTS3BaXtrUftMA", at = [1520.941189598, 1158.352967431, -165.864695381], rotation = -8.000002499, size = [260.152929362, 233.793028378], depth = 267.168738388 },
+  { id = "uqLqLPmgRGWhEcslB2QiYA", at = [1947.647058824, 1158.352967431, -165.864695381], rotation = 4.999999855, size = [271.715290919, 244.529505946], depth = 279.1715846 },
+]
+
+[[layer.place]]
+object = "BuildingCastle"
+items = [
+  { id = "zRiYG1fnQkq_Z7J4PenRyw", at = [-557.529385511, -644.823555666, 258.088268112], locked = true },
+]
+
+[[layer.place]]
+object = "BuildingWatchtower"
+locked = true
+items = [
+  { id = "_9Upx7ZCRCKVZrAClGUZhg", at = [-819.058876038, 538.941169907, -113.04260899] },
+  { id = "__56YyxCTCe_UDKk0e4nmA", at = [640, 1777.764732136, -210.049382098], size = [227.769549278, 227.769532891], depth = 405.232942 },
+]
+
+[[layer.place]]
+object = "TreePine"
+locked = true
+items = [
+  { id = "_8ovTVtFTbSxlI-HO8u3BA", at = [1328.235294118, -754.941228979, -188.920580359], size = [286.836268523, 282.478589563], depth = 470.133533941 },
+  { id = "_vbY-mbUR12eicmmrO0_dg", at = [1507.176496842, -810, -200.276460087] },
+  { id = "NqHVkeJaQDOz8RvZdrVqmA", at = [1686.117633932, -727.411777833, -181.349982935], size = [311.778552742, 307.041945177], depth = 511.014710805 },
+  { id = "IdLPAKVZQuu0-6Sr0ZfBUQ", at = [1878.823529412, -810, -200.276460087] },
+  { id = "xX7M30G1Ryif5BXXh78XZg", at = [2085.294117647, -713.647085078, -185.135265238], size = [299.307410633, 294.76026737], depth = 490.574122373 },
+  { id = "m9MEya2lRDC9zaLiPg4HAg", at = [2195.41179096, -493.411738452, -204.06174239], size = [236.951700084, 233.351878335], depth = 388.371180212 },
+  { id = "i3nDjFYeS6qiMNYvQNwaTA", at = [1314.470601362, -548.470575108, -207.847024693], size = [224.480557975, 221.070200528], depth = 367.93059178 },
+]
+
+[[layer.place]]
+object = "TreeBroad"
+locked = true
+items = [
+  { id = "DSiUTKa5Q4mBQS2BAcGVew", at = [-956.705934861, -245.647071951, 43.496501306], size = [243.313967649, 160.176526266], depth = 281.144130118 },
+  { id = "getS0zmoSD2GopbFZxBIXQ", at = [48.117620805, -603.529411765, 47.48827205] },
+  { id = "zxGmpqLoRgimA4k_K47CPQ", at = [-942.941176471, 497.647058824, -145.079986348], size = [243.313967649, 160.176526266], depth = 281.144130118 },
+  { id = "s40pGNEaQ76TDNczku-nPA", at = [-874.117647059, 1392.352941176, -137.096444859], size = [268.925964243, 177.037213242], depth = 310.738249078 },
+  { id = "9o04_5_7SFGx3KQ_IL9bkw", at = [1892.588287802, 1392.352941176, -86.029378947] },
+  { id = "Twa_ImePSiunkd6Ks0cQMQ", at = [2085.294117647, 1351.058797275, -90.021149691], size = [243.313967649, 160.176526266], depth = 281.144130118 },
+  { id = "ksyc4RTeQjSBRvUDp5QzSQ", at = [1658.588248421, 1667.647058824, -98.00469118], size = [217.701971054, 143.315839291], depth = 251.550011158 },
+  { id = "7ABjaUZNRbGbmVp4OYEJkg", at = [2209.17641808, 153.529411765, -94.012920436], size = [230.507969351, 151.746182779], depth = 266.347070638 },
+]
+
+[[layer.place]]
+object = "Sheep"
+locked = true
+items = [
+  { id = "XUgjnzY0T9ySc9ckeEOcUA", at = [1190.588235294, 1020.705908607, -165.864695381], rotation = -11.459154366 },
+  { id = "4i52mu57S-qzXQoIN1LRcQ", at = [1713.647085078, 1323.529411765, -165.864695381], rotation = -137.509876296 },
+  { id = "5k5lu5GyTVKmBKWN1kVfpQ", at = [2154.117647059, 291.176470588, -165.864695381], rotation = 40.107048391 },
+  { id = "3gykSi9vQ3SvpKDx5NVswg", at = [984.117647059, 1571.294143901, -165.864695381], rotation = -63.02535883 },
+]
+
+[[layer.place]]
+object = "Knight"
+items = [
+  { id = "yuukfj10RWKPStbMrz8YTQ", at = [832, 896, 100], zOrder = 1 },
+]
+
+[[layer.place]]
+object = "Skeleton_Minion"
+items = [
+  { id = "boaCYexfRX67xuKwUEMOlQ", at = [1024, 896, -165.864695381], zOrder = 2 },
+]
+
+[[layer.place]]
+object = "SkeletonHurtbox"
+items = [
+  { id = "OTvRHAjkRVWad7-GjYZjkQ", at = [994, 871, -210.864695381], size = [60, 50], depth = 90, opacity = 0 },
+]
+
+[[layer.place]]
+object = "KnightSwordHitbox"
+items = [
+  { id = "vranmAsaRUm5c9AQ4nV76w", at = [0, 0, -100000], size = [23.755743, 6.164129], depth = 83.768203, opacity = 0 },
+]
+
+[[layer.place]]
+object = "KnightAxeHitbox"
+items = [
+  { id = "7NajD_UPQHGooe_yPWAilA", at = [0, 0, -100000], size = [58.489842, 12.353435], depth = 81.37901, opacity = 0 },
+]
+
+[[layer]]
+name = "Game"
+
+[[layer.effect]]
+name = "3D Ambient Hemisphere Light"
+type = "Scene3D::HemisphereLight"
+elevation = 40
+intensity = 0.33
+rotation = 300
+groundColor = "127;127;127"
+skyColor = "255;255;255"
+top = "Z+"
+
+[[layer.effect]]
+name = "3D Sun Light"
+type = "Scene3D::DirectionalLight"
+distanceFromCamera = 1500
+elevation = 40
+frustumSize = 4000
+intensity = 0.75
+minimumShadowBias = 0
+rotation = 300
+color = "255;255;255"
+shadowQuality = "medium"
+top = "Z+"
+isCastingShadow = true

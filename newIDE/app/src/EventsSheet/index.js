@@ -137,6 +137,7 @@ import {
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
 import UnifiedVariablesDialog from '../VariablesList/UnifiedVariablesDialog';
+import VariablesEditorRedesignWindowPortal from '../VariablesEditorRedesign/VariablesEditorRedesignWindowPortal';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
@@ -289,6 +290,8 @@ type State = {|
   catalogBlinkNonce: number,
 
   layoutVariablesDialogOpen: boolean,
+  variablesRedesignWindowOpen: boolean,
+  variablesRedesignWindowFocusRequestId: number,
 
   generatedCode: ?{|
     name: string,
@@ -464,6 +467,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     catalogBlinkNonce: 0,
 
     layoutVariablesDialogOpen: false,
+    variablesRedesignWindowOpen: false,
+    variablesRedesignWindowFocusRequestId: 0,
 
     // When set, the "generated JavaScript code" dialog is shown.
     generatedCode: (null: ?{|
@@ -722,6 +727,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             )}
             moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
             onOpenSceneVariables={this.openSceneVariables}
+            onOpenVariablesRedesignWindow={this.openVariablesRedesignWindow}
+            isVariablesRedesignWindowOpen={
+              this.state.variablesRedesignWindowOpen
+            }
             onShowGeneratedCode={
               // Available for scenes AND extension events-functions (free, behavior
               // and object functions); not for external events.
@@ -1152,6 +1161,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   openSceneVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
+  };
+
+  openVariablesRedesignWindow = () => {
+    this.setState(
+      state => ({
+        variablesRedesignWindowOpen: true,
+        variablesRedesignWindowFocusRequestId:
+          state.variablesRedesignWindowFocusRequestId + 1,
+      }),
+      () => this.updateToolbar()
+    );
+  };
+
+  closeVariablesRedesignWindow = () => {
+    this.setState({ variablesRedesignWindowOpen: false }, () =>
+      this.updateToolbar()
+    );
   };
 
   openVariablesEditor = (
@@ -3404,6 +3430,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             isListLocked={false}
             initiallySelectedVariable={null}
+          />
+        )}
+        {this.state.variablesRedesignWindowOpen && (
+          <VariablesEditorRedesignWindowPortal
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            focusRequestId={this.state.variablesRedesignWindowFocusRequestId}
+            onClose={this.closeVariablesRedesignWindow}
           />
         )}
         {this.state.textEditedEvent && (

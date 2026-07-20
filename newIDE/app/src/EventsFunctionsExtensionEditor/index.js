@@ -2480,6 +2480,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       onClick={this._openDetailSettingsDialog}
                       id="behavior-settings-button"
                     />
+                  ) : isFunctionDetailMode ? (
+                    <FlatButton
+                      fullWidth
+                      label={<Trans>Function settings</Trans>}
+                      leftIcon={<Tune />}
+                      onClick={this._openParametersDialog}
+                      id="function-settings-button"
+                    />
                   ) : null
                 }
               />

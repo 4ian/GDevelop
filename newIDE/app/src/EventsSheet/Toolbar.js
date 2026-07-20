@@ -16,7 +16,6 @@ import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
 import SceneVariableIcon from '../UI/CustomSvgIcons/SceneVariable';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import VariablesEditorRedesignWindowPortal from '../VariablesEditorRedesign/VariablesEditorRedesignWindowPortal';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -47,6 +46,8 @@ type Props = {|
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
+  onOpenVariablesRedesignWindow: () => void,
+  isVariablesRedesignWindowOpen: boolean,
   onShowGeneratedCode?: ?() => void,
 |};
 
@@ -79,21 +80,11 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
+  onOpenVariablesRedesignWindow,
+  isVariablesRedesignWindowOpen,
   onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
-  const [
-    isVariablesRedesignWindowOpen,
-    setIsVariablesRedesignWindowOpen,
-  ] = React.useState(false);
-  const [
-    variablesRedesignFocusRequestId,
-    setVariablesRedesignFocusRequestId,
-  ] = React.useState(0);
-  const openVariablesRedesignWindow = React.useCallback(() => {
-    setIsVariablesRedesignWindowOpen(true);
-    setVariablesRedesignFocusRequestId(requestId => requestId + 1);
-  }, []);
   const settingsButton = onOpenSettings ? (
     <IconButton
       size="small"
@@ -137,7 +128,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
           size="small"
           color="default"
           selected={isVariablesRedesignWindowOpen}
-          onClick={openVariablesRedesignWindow}
+          onClick={onOpenVariablesRedesignWindow}
           id="toolbar-open-redesigned-variables-window-button"
           tooltip={t`Open redesigned variables window`}
         >
@@ -212,12 +203,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         )}
         {settingsButtonPosition === 'end' && settingsButton}
       </ToolbarGroup>
-      {isVariablesRedesignWindowOpen && (
-        <VariablesEditorRedesignWindowPortal
-          focusRequestId={variablesRedesignFocusRequestId}
-          onClose={() => setIsVariablesRedesignWindowOpen(false)}
-        />
-      )}
     </>
   );
 });

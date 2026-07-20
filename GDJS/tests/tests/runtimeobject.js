@@ -167,55 +167,6 @@ describe('gdjs.RuntimeObject', () => {
     );
   });
 
-  it('calls onPlacedInScene after creating an object from initial instance data', () => {
-    runtimeScene.registerObject({
-      name: 'obj1',
-      type: '',
-      variables: [],
-      behaviors: [
-        {
-          name: 'TestBehavior',
-          type: 'TestBehavior::TestBehavior',
-        },
-      ],
-      effects: [],
-    });
-
-    runtimeScene.createObjectsFrom(
-      [
-        {
-          angle: 0,
-          customSize: false,
-          height: 0,
-          layer: '',
-          name: 'obj1',
-          persistentUuid: 'initial-instance-id',
-          width: 0,
-          x: 12,
-          y: 34,
-          zOrder: 7,
-          numberProperties: [],
-          stringProperties: [],
-          initialVariables: [],
-          behaviorOverridings: [],
-        },
-      ],
-      0,
-      0,
-      0,
-      false
-    );
-
-    const object = runtimeScene.getObjects('obj1')[0];
-    expect(object.getVariables().get('lastState').getAsString()).to.be(
-      'placed'
-    );
-    expect(object.getVariables().get('placedCount').getAsNumber()).to.be(1);
-    expect(object.getVariables().get('placedX').getAsNumber()).to.be(12);
-    expect(object.getVariables().get('placedY').getAsNumber()).to.be(34);
-    expect(object.getVariables().get('placedZOrder').getAsNumber()).to.be(7);
-  });
-
   it('should compute AABB properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',

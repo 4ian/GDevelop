@@ -522,6 +522,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onExportAssets={props.onExportAssets}
                 onImportAssets={props.onImportAssets}
                 onDeleteObjects={(objectWithContext, cb) =>

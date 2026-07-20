@@ -312,19 +312,6 @@ namespace gdjs {
     }
 
     /**
-     * Called after the object has been placed in its scene or parent container.
-     * Position, layer and z order are applied before this method runs.
-     *
-     * If you redefine this function, **make sure to call the original method**
-     * (`RuntimeObject.prototype.onPlacedInScene.call(this);`).
-     */
-    onPlacedInScene(): void {
-      for (let i = 0; i < this._behaviors.length; ++i) {
-        this._behaviors[i].onPlacedInScene();
-      }
-    }
-
-    /**
      * Called to reset the object to its default state. This is used for objects that are
      * "recycled": they are dismissed (at which point `onDeletedFromScene` is called) but still
      * stored in a cache to be reused next time an object must be created. At this point,
@@ -2258,7 +2245,6 @@ namespace gdjs {
       }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       newRuntimeBehavior.onCreated();
-      newRuntimeBehavior.onPlacedInScene();
       return true;
     }
 

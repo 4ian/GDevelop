@@ -322,6 +322,10 @@
   scrollbar-width: thin;
 }
 
+.variableRowsLive {
+  height: 400px;
+}
+
 .variableRow {
   position: relative;
   display: grid;
@@ -382,6 +386,10 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .scopeScene {
@@ -438,11 +446,16 @@
   font-size: 13.5px;
 }
 
-.nameCell input:hover,
-.nameCell input:focus {
+.nameCell input:not([readonly]):hover,
+.nameCell input:not([readonly]):focus {
   padding: 0 7px;
   background: #26263a;
   border-color: #3a3a4c;
+}
+
+.nameCell input[readonly] {
+  color: #9a9aab;
+  cursor: default;
 }
 
 .variableRowSelected .nameCell input {
@@ -616,6 +629,10 @@
   right: 24px;
   color: #6e6e80;
   font-size: 11px;
+}
+
+.matchCountLive {
+  top: 562px;
 }
 
 .designCallout {

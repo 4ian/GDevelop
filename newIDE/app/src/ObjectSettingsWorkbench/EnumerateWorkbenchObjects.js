@@ -81,8 +81,9 @@ export const getWorkbenchObjectIconUrlFromType = (
 /**
  * Build the effective, ungrouped object collection shown by Object Settings.
  * Scene definitions keep project/layout order. Globals shadowed by any scene
- * definition are omitted. Prefab children follow in extension/prefab order and
- * retain their definition owner rather than the scene instance using them.
+ * definition are omitted. Objects owned by prefabs are intentionally excluded:
+ * this workbench only switches between objects that belong to a scene or to
+ * the project globally.
  */
 export const enumerateWorkbenchObjects = (
   project: gdProject
@@ -138,48 +139,6 @@ export const enumerateWorkbenchObjects = (
     });
   });
 
-  for (
-    let extensionIndex = 0;
-    extensionIndex < project.getEventsFunctionsExtensionsCount();
-    extensionIndex++
-  ) {
-    const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(
-      extensionIndex
-    );
-    const extensionName = eventsFunctionsExtension.getName();
-    const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    for (
-      let prefabIndex = 0;
-      prefabIndex < eventsBasedObjects.size();
-      prefabIndex++
-    ) {
-      const eventsBasedObject = eventsBasedObjects.at(prefabIndex);
-      const eventsBasedObjectName = eventsBasedObject.getName();
-      const ownerName =
-        eventsBasedObject.getFullName() || eventsBasedObjectName;
-      const objects = eventsBasedObject.getObjects();
-      for (
-        let objectIndex = 0;
-        objectIndex < objects.getObjectsCount();
-        objectIndex++
-      ) {
-        const object = objects.getObjectAt(objectIndex);
-        const objectName = object.getName();
-        result.push({
-          key: `prefab:${extensionName}:${eventsBasedObjectName}:${objectName}`,
-          objectName,
-          objectType: object.getType(),
-          object,
-          scope: 'prefab',
-          ownerName,
-          layout: null,
-          eventsFunctionsExtension,
-          eventsBasedObject,
-        });
-      }
-    }
-  }
-
   return result;
 };
 
@@ -192,10 +151,14 @@ export const filterWorkbenchObjects = ({
   objects: Array<WorkbenchObject>,
   query: string,
 |}): Array<WorkbenchObject> => {
+  // Keep this boundary defensive even though the standard enumeration already
+  // excludes prefab children. Callers supplying a cached/custom collection
+  // must not make prefab-owned objects searchable or keyboard-selectable.
+  const selectableObjects = objects.filter(item => item.scope !== 'prefab');
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  if (!normalizedQuery) return objects;
+  if (!normalizedQuery) return selectableObjects;
 
-  return objects.filter(item =>
+  return selectableObjects.filter(item =>
     [
       item.objectName,
       getWorkbenchObjectTypeLabelFromType(project, item.objectType),

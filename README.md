@@ -369,10 +369,8 @@ first picked instance and fall back to a bad object/default result when the list
 is empty. The explicit picking instructions are the widening or replacement
 operations: "Pick all" copies all instances back into the current lists, "Pick
 random" and "Pick nearest" reduce the lists to one instance, and creation
-instructions append the newly created instance to the active list. In GDJS,
-creation also calls `onPlacedInScene()` after position, layer, and z-order are
-set, so following actions/conditions in the same scope see the new object as
-picked.
+instructions append the newly created instance to the active list, so following
+actions/conditions in the same scope see the new object as picked.
 
 Subevents inherit the parent event's current picked lists, so they operate on
 the subset left by the parent conditions. `AND` is just sequential condition

@@ -29,7 +29,7 @@ import { useManageObjectBehaviors } from '../BehaviorsEditor';
 import { createCompactBehaviorPropertiesSchema } from '../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorPropertiesEditor';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { getAllVisibleBehaviorNames } from '../Utils/Behavior';
-import useForceUpdate, { useForceRecompute } from '../Utils/UseForceUpdate';
+import { useForceRecompute } from '../Utils/UseForceUpdate';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import {
   serializeToJSObject,
@@ -110,16 +110,10 @@ type SourceId = 'object' | string;
 const getBehaviorSourceId = (behaviorName: string): SourceId =>
   `behavior:${behaviorName}`;
 
-const getBehaviorFromSourceId = (
-  object: gdObject,
-  sourceId: SourceId
-): gdBehavior | null => {
-  if (!sourceId.startsWith('behavior:')) return null;
-  const behaviorName = sourceId.slice('behavior:'.length);
-  return object.hasBehaviorNamed(behaviorName)
-    ? object.getBehavior(behaviorName)
+const getBehaviorNameFromSourceId = (sourceId: SourceId): string | null =>
+  sourceId.startsWith('behavior:')
+    ? sourceId.slice('behavior:'.length)
     : null;
-};
 
 const isBehaviorInherited = (behavior: gdBehavior): boolean => {
   try {
@@ -296,7 +290,6 @@ const SelectedObjectWorkspace = ({
   onSelectObject,
   onObjectsMayHaveChanged,
 }: SelectedWorkspaceProps): React.Node => {
-  const forceUpdate = useForceUpdate();
   const [renderVersion, setRenderVersion] = React.useState(0);
   const [structureVersion, setStructureVersion] = React.useState(0);
   const [filterQuery, setFilterQuery] = React.useState('');
@@ -306,7 +299,9 @@ const SelectedObjectWorkspace = ({
   const [switcherOpenRequestId, setSwitcherOpenRequestId] = React.useState(0);
   const [sourcesDrawerOpen, setSourcesDrawerOpen] = React.useState(false);
   const [richEditorOpen, setRichEditorOpen] = React.useState(false);
-  const [renamedBehavior, setRenamedBehavior] = React.useState<?gdBehavior>(
+  // Keep only behavior names in React state. Native behavior wrappers are
+  // owned by their object and can be destroyed when the object is refreshed.
+  const [renamedBehaviorName, setRenamedBehaviorName] = React.useState<?string>(
     null
   );
   const [renameValue, setRenameValue] = React.useState('');
@@ -319,6 +314,9 @@ const SelectedObjectWorkspace = ({
   const historiesRef = React.useRef<Map<string, HistoryState>>(new Map());
   const pendingHistoryCommitRef = React.useRef<?PendingHistoryCommit>(null);
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const refreshBehaviorWrappers = React.useCallback(() => {
+    setRenderVersion(version => version + 1);
+  }, []);
 
   const object = selectedObject.object;
   const selectedObjectKey = getWorkbenchObjectKey(selectedObject);
@@ -500,7 +498,7 @@ const SelectedObjectWorkspace = ({
     object,
     isChildObject: selectedObject.scope === 'prefab',
     eventsFunctionsExtension: selectedObject.eventsFunctionsExtension,
-    onUpdate: forceUpdate,
+    onUpdate: refreshBehaviorWrappers,
     onBehaviorsUpdated: () => notifyObjectChanged(selectedObject, true),
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
@@ -528,39 +526,44 @@ const SelectedObjectWorkspace = ({
     [justAddedBehaviorName, resetJustAddedBehaviorName]
   );
 
-  const visibleBehaviors = React.useMemo(
+  const visibleBehaviorNames = React.useMemo(
     () => {
-      if (structureVersion) {
-        // Invalidate after a behavior is added, renamed, duplicated or removed.
+      if (renderVersion || structureVersion) {
+        // Re-read names after edits and after a behavior is added, renamed,
+        // duplicated or removed. Strings remain valid if native wrappers are
+        // replaced by an object refresh.
       }
       return getAllVisibleBehaviorNames([object])
-        .filter(name => object.hasBehaviorNamed(name))
-        .map(name => object.getBehavior(name));
+        .filter(name => object.hasBehaviorNamed(name));
     },
-    [object, structureVersion]
+    [object, renderVersion, structureVersion]
   );
 
   React.useEffect(
     () => {
+      const selectedBehaviorName = getBehaviorNameFromSourceId(
+        selectedSourceId
+      );
       if (
         selectedSourceId !== 'object' &&
-        !getBehaviorFromSourceId(object, selectedSourceId)
+        (!selectedBehaviorName ||
+          !object.hasBehaviorNamed(selectedBehaviorName))
       ) {
         setSelectedSourceId(
-          visibleBehaviors.length
+          visibleBehaviorNames.length
             ? getBehaviorSourceId(
-                visibleBehaviors[
+                visibleBehaviorNames[
                   Math.min(
                     deletedBehaviorIndexRef.current,
-                    visibleBehaviors.length - 1
+                    visibleBehaviorNames.length - 1
                   )
-                ].getName()
+                ]
               )
             : 'object'
         );
       }
     },
-    [object, selectedSourceId, visibleBehaviors]
+    [object, selectedSourceId, visibleBehaviorNames]
   );
 
   const objectMetadata = gd.MetadataProvider.getObjectMetadata(
@@ -611,13 +614,16 @@ const SelectedObjectWorkspace = ({
         // Invalidate descriptors after extension or behavior structure changes.
       }
       const schemas = new Map<string, Schema>();
-      visibleBehaviors.forEach(behavior => {
+      visibleBehaviorNames.forEach(behaviorName => {
+        // Never retain this native wrapper outside the schema generation for
+        // the current render generation.
+        const behavior = object.getBehavior(behaviorName);
         const metadata = gd.MetadataProvider.getBehaviorMetadata(
           project.getCurrentPlatform(),
           behavior.getTypeName()
         );
         if (gd.MetadataProvider.isBadBehaviorMetadata(metadata)) {
-          schemas.set(behavior.getName(), []);
+          schemas.set(behaviorName, []);
           return;
         }
         const schema = createCompactBehaviorPropertiesSchema({
@@ -627,7 +633,7 @@ const SelectedObjectWorkspace = ({
           layersContainer,
         });
         schemas.set(
-          behavior.getName(),
+          behaviorName,
           isBehaviorInherited(behavior) ? makeSchemaReadOnly(schema) : schema
         );
       });
@@ -639,7 +645,7 @@ const SelectedObjectWorkspace = ({
       project,
       schemaRecomputeTrigger,
       structureVersion,
-      visibleBehaviors,
+      visibleBehaviorNames,
     ]
   );
 
@@ -675,7 +681,8 @@ const SelectedObjectWorkspace = ({
   const behaviorFilterIndices = React.useMemo(
     () => {
       const indices = new Map<string, SourceFilterIndex>();
-      visibleBehaviors.forEach(behavior => {
+      visibleBehaviorNames.forEach(behaviorName => {
+        const behavior = object.getBehavior(behaviorName);
         const metadata = gd.MetadataProvider.getBehaviorMetadata(
           project.getCurrentPlatform(),
           behavior.getTypeName()
@@ -684,17 +691,17 @@ const SelectedObjectWorkspace = ({
           ? behavior.getTypeName()
           : metadata.getFullName();
         indices.set(
-          behavior.getName(),
+          behaviorName,
           createSourceFilterIndex({
-            schema: behaviorSchemas.get(behavior.getName()) || [],
+            schema: behaviorSchemas.get(behaviorName) || [],
             instances: [behavior],
-            sourceSearchText: `${behavior.getName()} ${typeLabel}`,
+            sourceSearchText: `${behaviorName} ${typeLabel}`,
           })
         );
       });
       return indices;
     },
-    [behaviorSchemas, project, visibleBehaviors]
+    [behaviorSchemas, object, project, visibleBehaviorNames]
   );
 
   const behaviorFilterResults = React.useMemo(
@@ -723,9 +730,13 @@ const SelectedObjectWorkspace = ({
         // which makes the details panel appear to flicker.
         if (wasFiltering && selectionBeforeFilterRef.current) {
           const sourceToRestore = selectionBeforeFilterRef.current;
+          const behaviorNameToRestore = getBehaviorNameFromSourceId(
+            sourceToRestore
+          );
           if (
             sourceToRestore === 'object' ||
-            getBehaviorFromSourceId(object, sourceToRestore)
+            (behaviorNameToRestore &&
+              object.hasBehaviorNamed(behaviorNameToRestore))
           ) {
             setSelectedSourceId(sourceToRestore);
           }
@@ -737,13 +748,12 @@ const SelectedObjectWorkspace = ({
         selectedSourceId === 'object'
           ? objectFilterResult.matchCount
           : (() => {
-              const behavior = getBehaviorFromSourceId(
-                object,
+              const behaviorName = getBehaviorNameFromSourceId(
                 selectedSourceId
               );
-              return behavior
+              return behaviorName && object.hasBehaviorNamed(behaviorName)
                 ? (
-                    behaviorFilterResults.get(behavior.getName()) || {
+                    behaviorFilterResults.get(behaviorName) || {
                       matchCount: 0,
                     }
                   ).matchCount
@@ -755,13 +765,15 @@ const SelectedObjectWorkspace = ({
         setSelectedSourceId('object');
         return;
       }
-      const firstMatchingBehavior = visibleBehaviors.find(behavior => {
-        const result = behaviorFilterResults.get(behavior.getName());
-        return result && result.matchCount;
-      });
-      if (firstMatchingBehavior) {
+      const firstMatchingBehaviorName = visibleBehaviorNames.find(
+        behaviorName => {
+          const result = behaviorFilterResults.get(behaviorName);
+          return result && result.matchCount;
+        }
+      );
+      if (firstMatchingBehaviorName) {
         setSelectedSourceId(
-          getBehaviorSourceId(firstMatchingBehavior.getName())
+          getBehaviorSourceId(firstMatchingBehaviorName)
         );
       }
     },
@@ -771,7 +783,7 @@ const SelectedObjectWorkspace = ({
       object,
       objectFilterResult.matchCount,
       selectedSourceId,
-      visibleBehaviors,
+      visibleBehaviorNames,
     ]
   );
 
@@ -890,10 +902,12 @@ const SelectedObjectWorkspace = ({
   );
 
   const duplicateBehavior = React.useCallback(
-    (behavior: gdBehavior) => {
+    (behaviorName: string) => {
+      if (!object.hasBehaviorNamed(behaviorName)) return;
+      const behavior = object.getBehavior(behaviorName);
       ensureHistory(selectedObject);
       const newName = newNameGenerator(
-        behavior.getName(),
+        behaviorName,
         name => object.hasBehaviorNamed(name),
         'Copy'
       );
@@ -926,8 +940,8 @@ const SelectedObjectWorkspace = ({
 
   const applyBehaviorRename = React.useCallback(
     () => {
-      if (!renamedBehavior) return;
-      const oldName = renamedBehavior.getName();
+      if (!renamedBehaviorName) return;
+      const oldName = renamedBehaviorName;
       const nextName = newNameGenerator(
         gd.Project.getSafeName(renameValue),
         name => object.hasBehaviorNamed(name) && name !== oldName
@@ -938,7 +952,7 @@ const SelectedObjectWorkspace = ({
         setSelectedSourceId(getBehaviorSourceId(nextName));
         notifyObjectChanged(selectedObject, true);
       }
-      setRenamedBehavior(null);
+      setRenamedBehaviorName(null);
       setRenameValue('');
     },
     [
@@ -946,7 +960,7 @@ const SelectedObjectWorkspace = ({
       notifyObjectChanged,
       object,
       renameValue,
-      renamedBehavior,
+      renamedBehaviorName,
       selectedObject,
     ]
   );
@@ -1022,14 +1036,18 @@ const SelectedObjectWorkspace = ({
     [filterQuery, redo, undo, updateFilterQuery]
   );
 
-  const selectedBehavior = getBehaviorFromSourceId(object, selectedSourceId);
-  const selectedBehaviorFilterResult = selectedBehavior
-    ? behaviorFilterResults.get(selectedBehavior.getName())
+  const selectedBehaviorName = getBehaviorNameFromSourceId(selectedSourceId);
+  const selectedBehavior =
+    selectedBehaviorName && object.hasBehaviorNamed(selectedBehaviorName)
+      ? object.getBehavior(selectedBehaviorName)
+      : null;
+  const selectedBehaviorFilterResult = selectedBehaviorName
+    ? behaviorFilterResults.get(selectedBehaviorName)
     : null;
   const hasAnyFilterMatch =
     objectFilterResult.matchCount > 0 ||
-    visibleBehaviors.some(behavior => {
-      const result = behaviorFilterResults.get(behavior.getName());
+    visibleBehaviorNames.some(behaviorName => {
+      const result = behaviorFilterResults.get(behaviorName);
       return result && result.matchCount > 0;
     });
 
@@ -1146,14 +1164,15 @@ const SelectedObjectWorkspace = ({
                     <Add />
                   </button>
                 </div>
-                {!visibleBehaviors.length && (
+                {!visibleBehaviorNames.length && (
                   <div className={classes.noBehaviors}>
                     <Trans>No behaviors yet</Trans>
                   </div>
                 )}
-                {visibleBehaviors.map(behavior => {
-                  const sourceId = getBehaviorSourceId(behavior.getName());
-                  const result = behaviorFilterResults.get(behavior.getName());
+                {visibleBehaviorNames.map((behaviorName, behaviorIndex) => {
+                  const behavior = object.getBehavior(behaviorName);
+                  const sourceId = getBehaviorSourceId(behaviorName);
+                  const result = behaviorFilterResults.get(behaviorName);
                   const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
                     project.getCurrentPlatform(),
                     behavior.getTypeName()
@@ -1164,9 +1183,10 @@ const SelectedObjectWorkspace = ({
                   const iconUrl = isUnknown
                     ? ''
                     : behaviorMetadata.getIconFilename();
+                  const inherited = isBehaviorInherited(behavior);
                   return (
                     <div
-                      key={behavior.ptr}
+                      key={`${selectedObjectKey}:${behaviorName}`}
                       role="option"
                       tabIndex={0}
                       aria-selected={selectedSourceId === sourceId}
@@ -1194,7 +1214,7 @@ const SelectedObjectWorkspace = ({
                           <BehaviorIcon className={classes.sourceIcon} />
                         )}
                         <span className={classes.sourceName}>
-                          {behavior.getName()}
+                          {behaviorName}
                         </span>
                         {!!filterQuery && result && result.matchCount > 0 && (
                           <span
@@ -1222,8 +1242,8 @@ const SelectedObjectWorkspace = ({
                           {
                             label: menuI18n._(t`Rename`),
                             click: () => {
-                              setRenamedBehavior(behavior);
-                              setRenameValue(behavior.getName());
+                              setRenamedBehaviorName(behaviorName);
+                              setRenameValue(behaviorName);
                             },
                             // No project refactoring path exists yet for
                             // renaming an attached behavior.
@@ -1231,8 +1251,8 @@ const SelectedObjectWorkspace = ({
                           },
                           {
                             label: menuI18n._(t`Duplicate`),
-                            click: () => duplicateBehavior(behavior),
-                            enabled: !isBehaviorInherited(behavior),
+                            click: () => duplicateBehavior(behaviorName),
+                            enabled: !inherited,
                           },
                           { type: 'separator' },
                           {
@@ -1249,12 +1269,10 @@ const SelectedObjectWorkspace = ({
                           {
                             label: menuI18n._(t`Delete`),
                             click: () => {
-                              deletedBehaviorIndexRef.current = visibleBehaviors.indexOf(
-                                behavior
-                              );
-                              removeBehavior(behavior.getName());
+                              deletedBehaviorIndexRef.current = behaviorIndex;
+                              removeBehavior(behaviorName);
                             },
-                            enabled: !isBehaviorInherited(behavior),
+                            enabled: !inherited,
                           },
                         ]}
                       />
@@ -1277,7 +1295,7 @@ const SelectedObjectWorkspace = ({
                   <div>
                     <h2 className={classes.detailsTitle}>
                       {selectedBehavior ? (
-                        selectedBehavior.getName()
+                        selectedBehaviorName
                       ) : (
                         <Trans>Object properties</Trans>
                       )}
@@ -1378,7 +1396,7 @@ const SelectedObjectWorkspace = ({
                               filterQuery
                                 ? selectedBehaviorFilterResult.filteredSchema
                                 : behaviorSchemas.get(
-                                    selectedBehavior.getName()
+                                    selectedBehaviorName || ''
                                   )
                             }
                             isAdvancedSectionInitiallyUncollapsed={
@@ -1442,7 +1460,7 @@ const SelectedObjectWorkspace = ({
             </main>
           </div>
           {newBehaviorDialog}
-          {!!renamedBehavior && (
+          {!!renamedBehaviorName && (
             <Dialog
               open
               title={<Trans>Rename behavior</Trans>}
@@ -1450,7 +1468,7 @@ const SelectedObjectWorkspace = ({
                 <FlatButton
                   key="cancel"
                   label={<Trans>Cancel</Trans>}
-                  onClick={() => setRenamedBehavior(null)}
+                  onClick={() => setRenamedBehaviorName(null)}
                 />,
                 <DialogPrimaryButton
                   key="rename"
@@ -1459,7 +1477,7 @@ const SelectedObjectWorkspace = ({
                   onClick={applyBehaviorRename}
                 />,
               ]}
-              onRequestClose={() => setRenamedBehavior(null)}
+              onRequestClose={() => setRenamedBehaviorName(null)}
               onApply={applyBehaviorRename}
             >
               <SemiControlledTextField

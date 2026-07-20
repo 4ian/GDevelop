@@ -95,6 +95,55 @@ describe('VariablesEditorRedesignWindow', () => {
     });
   });
 
+  it('adds to the scope of the selected row in the merged list', () => {
+    const onApply = (jest.fn(): any);
+    const renderer = TestRenderer.create(
+      <VariablesEditorRedesignWindow
+        scopes={[
+          { id: 'scene', label: 'Scene', tone: 'scene' },
+          { id: 'global', label: 'Global', tone: 'global' },
+        ]}
+        initialVariables={[
+          ...searchVariables,
+          {
+            id: 'difficulty',
+            scopeId: 'global',
+            name: 'difficulty',
+            type: 'number',
+            value: 2,
+          },
+        ]}
+        primaryScopeId="scene"
+        onApply={onApply}
+      />
+    );
+
+    const globalNameInput = renderer.root
+      .findAllByProps({
+        'aria-label': 'Variable name',
+      })
+      .find(input => input.props.value === 'difficulty');
+    if (!globalNameInput) throw new Error('Global variable row not found.');
+    const globalVariableRow =
+      globalNameInput.parent && globalNameInput.parent.parent;
+    if (!globalVariableRow) throw new Error('Global variable row not found.');
+    act(() => {
+      globalVariableRow.props.onClick();
+    });
+    act(() => {
+      renderer.root
+        .findByProps({ 'aria-label': 'Add variable' })
+        .props.onClick();
+    });
+    act(() => {
+      renderer.root.findByProps({ children: 'Apply' }).props.onClick();
+    });
+
+    expect(onApply.mock.calls[0][0]).toContainEqual(
+      expect.objectContaining({ name: 'Variable', scopeId: 'global' })
+    );
+  });
+
   it('edits a matching value inline in the search reference window', () => {
     const renderer = TestRenderer.create(
       <VariablesEditorRedesignWindow

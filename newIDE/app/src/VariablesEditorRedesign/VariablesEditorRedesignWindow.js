@@ -51,8 +51,9 @@ type Props = {|
   primaryScopeId?: string,
   onApply?: (Array<RedesignVariable>) => void,
   onCancel?: () => void,
-  onRunPreview?: () => void,
+  onRunPreview?: (Array<RedesignVariable>) => void,
   onHelp?: () => void,
+  showDesignCallout?: boolean,
 |};
 
 export const REFERENCE_GEOMETRY = Object.freeze({
@@ -186,6 +187,19 @@ const cloneVariables = (
   variables: Array<RedesignVariable>
 ): Array<RedesignVariable> => JSON.parse(JSON.stringify(variables));
 
+const cloneVariableWithNewIds = (
+  variable: RedesignVariable,
+  idPrefix: string
+): RedesignVariable => ({
+  ...cloneVariables([variable])[0],
+  id: idPrefix,
+  children: variable.children
+    ? variable.children.map((child, index) =>
+        cloneVariableWithNewIds(child, `${idPrefix}-${index}`)
+      )
+    : undefined,
+});
+
 const getScalarValue = (variable: RedesignVariable): string => {
   if (variable.type === 'structure' || variable.type === 'array') return '';
   return variable.value === undefined ? '' : String(variable.value);
@@ -224,6 +238,19 @@ const getNextType = (type: RedesignVariableType): RedesignVariableType => {
 
 const isCollection = (variable: RedesignVariable): boolean =>
   variable.type === 'structure' || variable.type === 'array';
+
+const getArrayChildIds = (variables: Array<RedesignVariable>): Set<string> => {
+  const arrayChildIds: Set<string> = new Set();
+  const visit = (variable: RedesignVariable): void => {
+    const children = variable.children || [];
+    if (variable.type === 'array') {
+      children.forEach(child => arrayChildIds.add(child.id));
+    }
+    children.forEach(visit);
+  };
+  variables.forEach(visit);
+  return arrayChildIds;
+};
 
 export const getFilteredVariableRows = ({
   variables,
@@ -566,6 +593,7 @@ const VariablesEditorRedesignWindow = ({
   onCancel,
   onRunPreview,
   onHelp,
+  showDesignCallout = true,
 }: Props): React.Node => {
   const initialValues = React.useMemo(
     () =>
@@ -623,7 +651,19 @@ const VariablesEditorRedesignWindow = ({
     [variables]
   );
 
-  const selectedScopeId = primaryScopeId || (scopes[0] && scopes[0].id) || '';
+  const selectedScopeId = React.useMemo(
+    () => {
+      for (const selectedId of selectedIds) {
+        const selectedVariable = findVariableById(variables, selectedId);
+        if (selectedVariable) return selectedVariable.scopeId;
+      }
+      if (visibleScopeIds.size === 1) {
+        return [...visibleScopeIds][0];
+      }
+      return primaryScopeId || (scopes[0] && scopes[0].id) || '';
+    },
+    [primaryScopeId, scopes, selectedIds, variables, visibleScopeIds]
+  );
 
   const addVariable = React.useCallback(
     () => {
@@ -667,10 +707,16 @@ const VariablesEditorRedesignWindow = ({
     () => new Map(scopes.map(scope => [scope.id, scope])),
     [scopes]
   );
+  const arrayChildIds = React.useMemo(() => getArrayChildIds(variables), [
+    variables,
+  ]);
   const matchCount = rows.filter(row => row.directMatch).length;
-  const overviewRows = rows.filter(
-    row => row.variable.id !== 'stats-hp' && row.variable.id !== 'stats-tags'
-  );
+  const overviewRows = initialVariables
+    ? rows
+    : rows.filter(
+        row =>
+          row.variable.id !== 'stats-hp' && row.variable.id !== 'stats-tags'
+      );
 
   const copySelection = React.useCallback(
     () => {
@@ -690,9 +736,12 @@ const VariablesEditorRedesignWindow = ({
   const pasteSelection = React.useCallback(
     () => {
       if (!clipboard.length) return;
+      const now = Date.now();
       const pasted = clipboard.map((variable, index) => ({
-        ...cloneVariables([variable])[0],
-        id: `${variable.id}-copy-${Date.now()}-${index}`,
+        ...cloneVariableWithNewIds(
+          variable,
+          `${variable.id}-copy-${now}-${index}`
+        ),
         name: getUniqueName(
           [...variables, ...clipboard.slice(0, index)],
           variable.name
@@ -913,7 +962,9 @@ const VariablesEditorRedesignWindow = ({
         </div>
 
         <div
-          className={styles.variableRows}
+          className={`${styles.variableRows} ${
+            showDesignCallout ? '' : styles.variableRowsLive
+          }`}
           role="treegrid"
           aria-label="Variables"
         >
@@ -1001,6 +1052,7 @@ const VariablesEditorRedesignWindow = ({
                   ) : null}
                   <input
                     value={variable.name}
+                    readOnly={arrayChildIds.has(variable.id)}
                     aria-label="Variable name"
                     onClick={event => event.stopPropagation()}
                     onChange={event => {
@@ -1162,35 +1214,45 @@ const VariablesEditorRedesignWindow = ({
         </div>
 
         {query ? (
-          <div className={styles.matchCount}>{matchCount} matches</div>
+          <div
+            className={`${styles.matchCount} ${
+              showDesignCallout ? '' : styles.matchCountLive
+            }`}
+          >
+            {matchCount} matches
+          </div>
         ) : null}
 
-        <aside className={styles.designCallout}>
-          <strong>
-            Every scope in one list · Scope column · no dropdown, no tabs, no
-            side panel
-          </strong>
-          <span>
-            The leftmost Scope column shows each row's container. All scopes are
-            visible together — Scene, Global, and each object.
-          </span>
-          <span>
-            Optional filter lives on the “SCOPE ▾” column header. Group order:
-            Scene · Global · objects (or Prefab/Behavior · Ext Scene/Global ·
-            objects).
-          </span>
-          <small>
-            Title names the context: “Variables in Scene: Game”. Child rows
-            inherit their parent’s scope (shown dimmed). Prefab vars are
-            private.
-          </small>
-        </aside>
+        {showDesignCallout ? (
+          <aside className={styles.designCallout}>
+            <strong>
+              Every scope in one list · Scope column · no dropdown, no tabs, no
+              side panel
+            </strong>
+            <span>
+              The leftmost Scope column shows each row's container. All scopes
+              are visible together — Scene, Global, and each object.
+            </span>
+            <span>
+              Optional filter lives on the “SCOPE ▾” column header. Group order:
+              Scene · Global · objects (or Prefab/Behavior · Ext Scene/Global ·
+              objects).
+            </span>
+            <small>
+              Title names the context: “Variables in Scene: Game”. Child rows
+              inherit their parent’s scope (shown dimmed). Prefab vars are
+              private.
+            </small>
+          </aside>
+        ) : null}
 
         <footer className={styles.dialogFooter}>
           <button
             type="button"
             className={styles.previewButton}
-            onClick={onRunPreview}
+            onClick={() =>
+              onRunPreview && onRunPreview(cloneVariables(variables))
+            }
           >
             ▷ Run a preview
           </button>

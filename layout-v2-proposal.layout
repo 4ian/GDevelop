@@ -1,0 +1,144 @@
+layout 2 background=#4BADB0 {
+  guides {
+    grid rectangular size=(64, 64, 32) offset=(0, 0, 0) color=#D7FFFF alpha=0.35 snap
+  }
+
+  layer "" locked {
+    camera default
+  }
+
+  layer "3D Terrain" render=3d projection=perspective camera-policy=independent ambient=#FFFFFF near=1 max-2d-distance=10000 {
+    camera default
+
+    effect "Terrain Ambient Light" Scene3D::AmbientLight {
+      intensity 0.9
+      color #FFFFFF
+    }
+
+    effect "Terrain Sun" Scene3D::DirectionalLight {
+      distance-from-camera 1500
+      elevation 55
+      frustum-size 4000
+      intensity 0.65
+      minimum-shadow-bias 0.001
+      rotation 315
+      color #FFF4DC
+      shadow-quality medium
+      top Z+
+      casting-shadow true
+    }
+
+    instance Terrain @PFal-Iy2S16S52XJ8HmuKg at=(640, 360, -487.958801213) locked
+
+    instances TerrainSupportCollider depth=24 opacity=0 locked {
+      @peFM0j6uSm-hT_pOTxttzA at=(-998, -878.823529412, 99.194139963) size=(853.411764706, 454.235294118)
+      @6U13oSoNTFOs-v7tON8CmA at=(-103.294117647, 1832.823529412, -404.594095331) size=(344.117647059, 178.941176471)
+      @J4I3s8EuR4CybKLSpdUkDw at=(-144.588235297, 222.352941176, -56.347044371) size=(977.29411765, 261.529411766)
+      @LxzHuL5TQDy3sB55Uin2YA at=(-144.588235297, 139.764705882, -56.347044371) size=(1472.823529417, 82.588235294)
+      @VTek1h-pSnChnPAFpHVxDA at=(-598.823529416, 15.88235294, -56.347044371) size=(1927.058823536, 123.882352942)
+      @ZNW8elKrTgqBMGfXU2mWkA at=(-1080.5882353, -342.000000002, -56.347044371) size=(2408.82352942, 357.882352942)
+      @LY9IMRRoSKGNQl37lxF0pA at=(-1080.5882353, -741.176470592, -56.347044371) size=(1968.352941183, 399.17647059)
+      @-tlGYbiIRXuAgMQsfGdOpQ at=(-1080.5882353, -947.647058828, -56.347044371) size=(1018.588235298, 206.470588236)
+      @nbTp4vS4RvmWZU7M4MrdZw at=(1741.176470588, -424.588235294, -299.982330625) size=(564.352941176, 192.705882353)
+      @9IUqpJBETnGO4dVAO37gNg at=(1245.647058824, -933.882352941, -299.982330625) size=(1059.882352941, 509.294117647)
+      @MKgscNIDSF245IvkvhrGEg at=(-1287.058823529, 1777.764705882, -421.111742389) size=(344.117647059, 165.176470588)
+      @ee-ohvPpTyOANNM34p5-9g at=(818.941176471, 1543.764705882, -189.864683566) size=(660.705882353, 247.764705882)
+      @khX0HTxuTDGSb4IIXCGj-w at=(818.941176471, 1185.882352941, -189.864683566) size=(1266.352941176, 357.882352941)
+      @GcMz_528RgGvYj9fGEad2Q at=(640, 1020.705882353, -189.864683566) size=(1445.294117647, 165.176470588)
+      @jfpXMcVtQcuxAchYO_Nfhw at=(640, 552.705882353, -189.864683566) size=(1693.058823529, 468)
+      @HoUJV0ULTMubWduTesZ_6g at=(1094.235294118, 29.647058824, -189.864683566) size=(1238.823529412, 523.058823529)
+      @XFkbmeTzTkivV2pzdHE5FQ at=(1479.647058824, 483.882352941, -49.464683566) size=(770.823529412, 481.764705882)
+      @gLALaGPATCKCrcl4U8ujzA at=(419.764705882, 1598.823529412, -338.523507095) size=(440.470588235, 385.411764706)
+      @FBloYZa_TcWCo8kGdUSW2g at=(-1080.588235294, 1103.294117647, -244.923507095) size=(702, 468)
+      @8Gfx3SOkTjaZVssSaLy5gg at=(-1080.588235294, 704.117647059, -244.923507095) size=(908.470588235, 399.176470588)
+      @oY65NGjcTG-4cUd4ER-ELw at=(-1080.588235294, 277.411764706, -244.923507095) size=(605.647058824, 426.705882353)
+    }
+
+    instances LadderStep locked {
+      @NbsKNjn0QfSy_dSJ3HTIzA at=(729.470580082, 712.795281131, -167.241131856)
+      @65GfzJBRT9WxS2nTN186aA at=(729.470580082, 674.254075781, -145.217623448)
+      @DhGuDR-BTIiLKPDIp8uEVQ at=(729.470584185, 635.712878635, -123.194082222)
+      @bljEsll7Qh28qIxL1tuuhw at=(729.470584185, 597.171714307, -101.170540995)
+      @WOK52JQzQ4WHHPnjbXaAeQ at=(729.470596491, 558.630508956, -79.147032587)
+      @54HLTaXAT2C2rBAnzmh1qA at=(729.470596491, 517.820666924, -57.123491361)
+    }
+
+    instances BuildingCottage locked {
+      @KBSMUPLwTAaSBLWBsGv21Q at=(1328.235294118, 759.176483715, -165.864695381)
+      @ll_Lc8GpQs-DBueZAhxIYw at=(1754.941228979, 635.294117647, -25.464698006) size=(274.605869882, 247.213625956) depth=282.172263335
+      @UsdyTkEoRKm8vbu4igPBdA at=(2071.529359257, 772.941176471, -25.464698006) rotation=8.000002499
+      @_NjE2fEsQTS3BaXtrUftMA at=(1520.941189598, 1158.352967431, -165.864695381) rotation=-8.000002499 size=(260.152929362, 233.793028378) depth=267.168738388
+      @uqLqLPmgRGWhEcslB2QiYA at=(1947.647058824, 1158.352967431, -165.864695381) rotation=4.999999855 size=(271.715290919, 244.529505946) depth=279.1715846
+    }
+
+    instance BuildingCastle @zRiYG1fnQkq_Z7J4PenRyw at=(-557.529385511, -644.823555666, 258.088268112) locked
+
+    instances BuildingWatchtower locked {
+      @_9Upx7ZCRCKVZrAClGUZhg at=(-819.058876038, 538.941169907, -113.04260899)
+      @__56YyxCTCe_UDKk0e4nmA at=(640, 1777.764732136, -210.049382098) size=(227.769549278, 227.769532891) depth=405.232942
+    }
+
+    instances TreePine locked {
+      @_8ovTVtFTbSxlI-HO8u3BA at=(1328.235294118, -754.941228979, -188.920580359) size=(286.836268523, 282.478589563) depth=470.133533941
+      @_vbY-mbUR12eicmmrO0_dg at=(1507.176496842, -810, -200.276460087)
+      @NqHVkeJaQDOz8RvZdrVqmA at=(1686.117633932, -727.411777833, -181.349982935) size=(311.778552742, 307.041945177) depth=511.014710805
+      @IdLPAKVZQuu0-6Sr0ZfBUQ at=(1878.823529412, -810, -200.276460087)
+      @xX7M30G1Ryif5BXXh78XZg at=(2085.294117647, -713.647085078, -185.135265238) size=(299.307410633, 294.76026737) depth=490.574122373
+      @m9MEya2lRDC9zaLiPg4HAg at=(2195.41179096, -493.411738452, -204.06174239) size=(236.951700084, 233.351878335) depth=388.371180212
+      @i3nDjFYeS6qiMNYvQNwaTA at=(1314.470601362, -548.470575108, -207.847024693) size=(224.480557975, 221.070200528) depth=367.93059178
+    }
+
+    instances TreeBroad locked {
+      @DSiUTKa5Q4mBQS2BAcGVew at=(-956.705934861, -245.647071951, 43.496501306) size=(243.313967649, 160.176526266) depth=281.144130118
+      @getS0zmoSD2GopbFZxBIXQ at=(48.117620805, -603.529411765, 47.48827205)
+      @zxGmpqLoRgimA4k_K47CPQ at=(-942.941176471, 497.647058824, -145.079986348) size=(243.313967649, 160.176526266) depth=281.144130118
+      @s40pGNEaQ76TDNczku-nPA at=(-874.117647059, 1392.352941176, -137.096444859) size=(268.925964243, 177.037213242) depth=310.738249078
+      @9o04_5_7SFGx3KQ_IL9bkw at=(1892.588287802, 1392.352941176, -86.029378947)
+      @Twa_ImePSiunkd6Ks0cQMQ at=(2085.294117647, 1351.058797275, -90.021149691) size=(243.313967649, 160.176526266) depth=281.144130118
+      @ksyc4RTeQjSBRvUDp5QzSQ at=(1658.588248421, 1667.647058824, -98.00469118) size=(217.701971054, 143.315839291) depth=251.550011158
+      @7ABjaUZNRbGbmVp4OYEJkg at=(2209.17641808, 153.529411765, -94.012920436) size=(230.507969351, 151.746182779) depth=266.347070638
+    }
+
+    instances Sheep locked {
+      @XUgjnzY0T9ySc9ckeEOcUA at=(1190.588235294, 1020.705908607, -165.864695381) rotation=-11.459154366
+      @4i52mu57S-qzXQoIN1LRcQ at=(1713.647085078, 1323.529411765, -165.864695381) rotation=-137.509876296
+      @5k5lu5GyTVKmBKWN1kVfpQ at=(2154.117647059, 291.176470588, -165.864695381) rotation=40.107048391
+      @3gykSi9vQ3SvpKDx5NVswg at=(984.117647059, 1571.294143901, -165.864695381) rotation=-63.02535883
+    }
+
+    instance Knight @yuukfj10RWKPStbMrz8YTQ at=(832, 896, 100) z-order=1
+
+    instance Skeleton_Minion @boaCYexfRX67xuKwUEMOlQ at=(1024, 896, -165.864695381) z-order=2
+
+    instance SkeletonHurtbox @OTvRHAjkRVWad7-GjYZjkQ at=(994, 871, -210.864695381) size=(60, 50) depth=90 opacity=0
+
+    instance KnightSwordHitbox @vranmAsaRUm5c9AQ4nV76w at=(0, 0, -100000) size=(23.755743, 6.164129) depth=83.768203 opacity=0
+
+    instance KnightAxeHitbox @7NajD_UPQHGooe_yPWAilA at=(0, 0, -100000) size=(58.489842, 12.353435) depth=81.37901 opacity=0
+  }
+
+  layer Game {
+
+    effect "3D Ambient Hemisphere Light" Scene3D::HemisphereLight {
+      elevation 40
+      intensity 0.33
+      rotation 300
+      ground-color #7F7F7F
+      sky-color #FFFFFF
+      top Z+
+    }
+
+    effect "3D Sun Light" Scene3D::DirectionalLight {
+      distance-from-camera 1500
+      elevation 40
+      frustum-size 4000
+      intensity 0.75
+      minimum-shadow-bias 0
+      rotation 300
+      color #FFFFFF
+      shadow-quality medium
+      top Z+
+      casting-shadow true
+    }
+  }
+}

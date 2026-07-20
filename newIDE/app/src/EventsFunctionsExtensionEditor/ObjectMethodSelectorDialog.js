@@ -104,18 +104,6 @@ export default function ObjectMethodSelectorDialog({
         />
         <FunctionListItem
           functionType={gd.EventsFunction.Action}
-          functionName="onPlacedInScene"
-          disabled={eventsFunctions.hasEventsFunctionNamed('onPlacedInScene')}
-          onChoose={onChoose}
-          description={
-            <Trans>
-              Events that will be run once, after an object is created and its
-              position, layer and z order are applied.
-            </Trans>
-          }
-        />
-        <FunctionListItem
-          functionType={gd.EventsFunction.Action}
           functionName="onSignal"
           disabled={eventsFunctions.hasEventsFunctionNamed('onSignal')}
           onChoose={onChoose}

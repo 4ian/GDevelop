@@ -8,6 +8,7 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import CompactSearchBar from '../UI/CompactSearchBar';
+import FlatButton from '../UI/FlatButton';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -58,6 +59,7 @@ import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import objectTypeToDefaultName from './ObjectTypeToDefaultName';
+import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 
 const gd: libGDevelop = global.gd;
 
@@ -474,6 +476,10 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onOpenPrefabSettings?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onExportAssets: () => void,
   onImportAssets: () => void,
   onObjectCreated: (
@@ -530,6 +536,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onEditObject,
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
+      onOpenPrefabSettings,
       onExportAssets,
       onImportAssets,
       onObjectCreated,
@@ -1571,6 +1578,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             />
           </Column>
         </LineStackLayout>
+        {eventsFunctionsExtension && eventsBasedObject && onOpenPrefabSettings && (
+          <LineStackLayout noMargin>
+            <Column expand>
+              <FlatButton
+                fullWidth
+                label={<Trans>Prefab settings</Trans>}
+                leftIcon={<SettingsIcon />}
+                onClick={() =>
+                  onOpenPrefabSettings(
+                    eventsFunctionsExtension,
+                    eventsBasedObject
+                  )
+                }
+                id="objects-list-prefab-settings-button"
+              />
+            </Column>
+          </LineStackLayout>
+        )}
         <div
           style={styles.listContainer}
           onKeyDown={keyboardShortcutsRef.current.onKeyDown}
@@ -1694,6 +1719,9 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
+  prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension &&
+  prevProps.eventsBasedObject === nextProps.eventsBasedObject &&
+  prevProps.onOpenPrefabSettings === nextProps.onOpenPrefabSettings &&
   prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 

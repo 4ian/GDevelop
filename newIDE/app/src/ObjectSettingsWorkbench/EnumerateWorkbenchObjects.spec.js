@@ -1,16 +1,18 @@
 // @flow
 import { makeTestProject } from '../fixtures/TestProject';
-import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   enumerateWorkbenchObjects,
   filterWorkbenchObjects,
-  getObjectOriginLabel,
 } from './EnumerateWorkbenchObjects';
 
 const gd: libGDevelop = global.gd;
 
 describe('Object Settings workbench object enumeration', () => {
-  it('keeps definition ownership and source order', () => {
+  it('keeps scene/global ownership and excludes prefab children', () => {
     const { project, testLayout } = makeTestProject(gd);
     const objects = enumerateWorkbenchObjects(project);
 
@@ -20,17 +22,7 @@ describe('Object Settings workbench object enumeration', () => {
       ])
     );
     expect(objects.filter(item => item.scope === 'global')).toHaveLength(2);
-    expect(objects.filter(item => item.scope === 'prefab')).toHaveLength(4);
-    expect(
-      objects
-        .filter(item => item.scope === 'prefab')
-        .map(item => getObjectOriginLabel(item))
-    ).toEqual([
-      'Prefab · PanelSpriteButton',
-      'Prefab · PanelSpriteButton',
-      'Prefab · PanelSpriteButton',
-      'Prefab · PanelSpriteButton',
-    ]);
+    expect(objects.some(item => item.scope === 'prefab')).toBe(false);
   });
 
   it('omits a global definition shadowed in any scene', () => {
@@ -58,9 +50,17 @@ describe('Object Settings workbench object enumeration', () => {
       )
     ).toBe(true);
     expect(
+      filterWorkbenchObjects({ project, objects, query: 'testlayout' }).every(
+        item => item.scope === 'scene'
+      )
+    ).toBe(true);
+    expect(
       filterWorkbenchObjects({ project, objects, query: 'panelspritebutton' })
         .length
     ).toBeGreaterThan(0);
+    expect(
+      filterWorkbenchObjects({ project, objects, query: 'prefab' })
+    ).toHaveLength(0);
   });
 
   it('uses a stable key to resolve a fresh wrapper after an object is replaced', () => {
@@ -83,5 +83,36 @@ describe('Object Settings workbench object enumeration', () => {
     expect(replacementItem).toBeDefined();
     if (!replacementItem) throw new Error('Expected a replacement object.');
     expect(() => serializeToJSObject(replacementItem.object)).not.toThrow();
+  });
+
+  it('resolves a behavior again by name after an object refresh destroys its wrapper', () => {
+    const { project, testLayout } = makeTestProject(gd);
+    const objects = testLayout.getObjects();
+    const object = objects.insertNewObject(
+      project,
+      'Sprite',
+      'BehaviorOwner',
+      objects.getObjectsCount()
+    );
+    const behavior = object.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'PlatformerObject'
+    );
+    if (!behavior) throw new Error('Expected the behavior to be created.');
+
+    const behaviorName = behavior.getName();
+    const serializedObject = serializeToJSObject(object);
+    unserializeFromJSObject(
+      object,
+      serializedObject,
+      'unserializeFrom',
+      project
+    );
+
+    expect(() => behavior.getName()).toThrow();
+    const refreshedBehavior = object.getBehavior(behaviorName);
+    expect(refreshedBehavior.getName()).toBe(behaviorName);
+    expect(() => refreshedBehavior.getProperties()).not.toThrow();
   });
 });

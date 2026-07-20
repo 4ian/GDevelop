@@ -33,6 +33,8 @@ import {
   writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
+import { insertNewEventsBasedBehavior } from '../../EventsFunctionsList/CreateEventsBasedBehavior';
+import { reloadProjectEventsFunctionsExtensionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -1417,6 +1419,88 @@ column2 = "333"
     expect(fs.existsSync(path.join(sceneDirectory, 'Game.layout'))).toBe(true);
     expect(fs.existsSync(path.join(sceneDirectory, 'Game.events'))).toBe(true);
     project.delete();
+  });
+
+  test('preserves a legacy serialized behavior property removed from its extension', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const extensionName = 'LegacyJoystickPropertyTest';
+    project.setName('Legacy joystick property');
+    ensureProjectHasDefaultScene(project);
+
+    const extension = project.insertNewEventsFunctionsExtension(
+      extensionName,
+      0
+    );
+    const behaviorDefinition = insertNewEventsBasedBehavior(extension);
+    behaviorDefinition.setName('MultitouchJoystick');
+    behaviorDefinition.setFullName('Multitouch joystick');
+    behaviorDefinition
+      .getPropertyDescriptors()
+      .insertNew('ControllerIdentifier', 0)
+      .setType('Number')
+      .setValue('1');
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      ({
+        getIncludeFileFor: () => 'generated.js',
+        writeFunctionCode: async () => {},
+        writeBehaviorCode: async () => {},
+        writeObjectCode: async () => {},
+      }: any),
+      ({ _: value => (typeof value === 'string' ? value : value.id) }: any)
+    );
+
+    const object = project
+      .getLayoutAt(0)
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Border', 0);
+    const behavior = object.addNewBehavior(
+      project,
+      `${extensionName}::MultitouchJoystick`,
+      'MultitouchJoystick'
+    );
+    if (!behavior) throw new Error('Expected the behavior to be created.');
+    const legacyProject = serializeToJSObject(project, 'serializeTo');
+    legacyProject.layouts[0].objects[0].behaviors[0].FloatingEnabled = false;
+    unserializeFromJSObject(project, legacyProject);
+    expect(
+      serializeToJSObject(project, 'serializeTo').layouts[0].objects[0]
+        .behaviors[0]
+    ).toHaveProperty('FloatingEnabled', false);
+
+    try {
+      const entryPath = path.join(temporaryDirectory, 'project.settings');
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Game/objects/Border.settings'),
+        'utf8'
+      );
+      expect(objectSource).toContain('FloatingEnabled = false');
+      const reopened = await openMultiFileProject(entryPath);
+      expect(reopened.layouts[0].objects[0].behaviors[0]).toHaveProperty(
+        'FloatingEnabled',
+        false
+      );
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension(extensionName);
+    }
   });
 
   test('rolls back an interrupted staged transaction', async () => {

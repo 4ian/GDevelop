@@ -430,11 +430,11 @@ const collectRegisteredTypes = (
         );
       }
       entry.keySpace = 'serialized';
-      entry.unknownPropertyPolicy = entry.properties.every(
-        property => !!property.serializedKey
-      )
-        ? 'error'
-        : 'preserve';
+      // Behavior serializers can retain fields from an older version of an
+      // extension after a property descriptor is removed. These fields must
+      // survive project conversion: rejecting them makes otherwise valid
+      // templates and legacy projects impossible to save.
+      entry.unknownPropertyPolicy = 'preserve';
       const objectType = metadata.getObjectType();
       if (objectType) entry.objectType = objectType;
       const requiredBehaviorTypes = localBehaviorDefinition

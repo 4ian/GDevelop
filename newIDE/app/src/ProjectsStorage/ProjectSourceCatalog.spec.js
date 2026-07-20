@@ -220,6 +220,7 @@ describe('project source catalogs', () => {
         }),
       ])
     );
+    expect(platformerEntry.unknownPropertyPolicy).toBe('preserve');
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
     ).toMatchObject({
@@ -282,6 +283,7 @@ describe('project source catalogs', () => {
     );
 
     expect(entry).toBeDefined();
+    expect(entry.unknownPropertyPolicy).toBe('preserve');
     expect(entry.properties).toEqual([
       {
         name: 'Speed',

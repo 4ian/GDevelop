@@ -9,6 +9,12 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+// Conformance fixtures shared with the backend serializer
+// (events-script-serializer.js in the GDevelop-services repository): both
+// sides must render the same events to the same EventScript. Keep the
+// fixtures file byte-identical in both repositories.
+const serializerFixtures = require('./EventsScriptRenderer.fixtures.json');
+
 const makeEventsList = (project: gdProject, serializedEvents: Array<any>) => {
   const eventsList = new gd.EventsList();
   unserializeFromJSObject(
@@ -56,6 +62,29 @@ const sceneStartSerializedEvents = [
     ],
   },
 ];
+
+describe('EventsScriptRenderer conformance fixtures', () => {
+  serializerFixtures.fixtures.forEach(fixture => {
+    it(`renders like the backend serializer: ${fixture.name}`, () => {
+      const { project } = makeTestProject(gd);
+      try {
+        const eventsList = makeEventsList(project, fixture.serializedEvents);
+        const { text } = renderEventsAsEventsScript({ eventsList });
+        // The fixtures are id-agnostic (the backend serializer does not
+        // annotate): strip the `# event-N` annotations before comparing.
+        const withoutIdAnnotations = text
+          .split('\n')
+          .map(line => line.replace(/\s*# event-[\d.]+$/, ''))
+          .join('\n');
+        expect(withoutIdAnnotations).toBe(
+          fixture.expectedEventsScript.join('\n')
+        );
+      } finally {
+        project.delete();
+      }
+    });
+  });
+});
 
 describe('EventsScriptRenderer', () => {
   it('renders events as EventScript with event id annotations', () => {

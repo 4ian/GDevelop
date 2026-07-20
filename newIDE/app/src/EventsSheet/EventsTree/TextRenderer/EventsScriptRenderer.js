@@ -1,4 +1,16 @@
 // @flow
+// Renders events as EventScript source (the syntax accepted by the
+// `event_script` field of events generation - see `events-script.js` in the
+// GDevelop-services repository, which documents the grammar).
+//
+// This module mirrors the backend serializer (`events-script-serializer.js`
+// in GDevelop-services): same function names, same rendering rules - only
+// the inputs differ (gd objects + platform metadata here, events JSON +
+// features summary there). Both are held together by the SHARED conformance
+// fixtures (`EventsScriptRenderer.fixtures.json`, byte-identical in both
+// repositories): any rendering change must update the fixtures on both
+// sides. See the README next to the backend parser for the full map of the
+// EventScript ecosystem.
 import { mapFor, mapVector } from '../../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;

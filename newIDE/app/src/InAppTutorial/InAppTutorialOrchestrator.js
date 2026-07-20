@@ -47,6 +47,20 @@ const selectorInterpolationProjectDataAccessors = {
   editorTab: 'editorTab:',
 };
 
+// When enabled (`?in-app-tutorial-test-mode` in the URL), the orchestrator
+// exposes its current state on the window so that automated tests (see the
+// GDevelopApp/Tutorials repository) can follow a tutorial flow like a user
+// would and detect steps that can no longer be completed.
+const isInAppTutorialTestModeEnabled = (): boolean => {
+  try {
+    return new URLSearchParams(window.location.search).has(
+      'in-app-tutorial-test-mode'
+    );
+  } catch (error) {
+    return false;
+  }
+};
+
 const getPhasesStartIndices = (endIndices: Array<number>): Array<number> =>
   endIndices.map((_, i) => {
     return i === 0 ? 0 : endIndices[i - 1] + 1;
@@ -1234,6 +1248,34 @@ const InAppTutorialOrchestrator: React.ComponentType<{
       },
       [checkIfWrongEditor, currentEditor, currentSceneName]
     );
+
+    // In test mode, expose the tutorial state on the window at each render,
+    // so that automated tests can perform the action expected by the current
+    // step and check that the tutorial advances.
+    React.useEffect(() => {
+      if (!isInAppTutorialTestModeEnabled()) return;
+      window.inAppTutorialTestModeState = {
+        tutorialId,
+        stepIndex: currentStepIndex,
+        stepCount,
+        elementToHighlightId:
+          currentStep && currentStep.elementToHighlightId
+            ? interpolateElementId({
+                elementId: currentStep.elementToHighlightId,
+                data,
+                isMobile,
+              })
+            : null,
+        nextStepTrigger: currentStep ? currentStep.nextStepTrigger : null,
+        isOnClosableDialog: currentStep
+          ? !!currentStep.isOnClosableDialog
+          : false,
+        projectData: data,
+        expectedEditor: interpolateExpectedEditor(expectedEditor, data),
+        wrongEditorInfoOpen,
+        displayEndDialog,
+      };
+    });
 
     useGiveTrivialBadgeWhenTutorialIsFinished({
       authenticatedUser,

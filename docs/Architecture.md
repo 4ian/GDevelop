@@ -49,16 +49,16 @@ GDevelop is not one application with one object model. It is an authoring
 system that compiles a C++ editor model into JavaScript data and code consumed
 by a separate TypeScript runtime.
 
-| Area | Primary directories | Language | Responsibility |
-| --- | --- | --- | --- |
-| Core model and IDE algorithms | `Core/GDCore` | C++ | Project tree, events AST, serialization, validation, refactoring, platform-neutral code-generation framework. |
-| GDJS platform | `GDJS/GDJS` | C++ | JavaScript-specific code generation, preview/export, and runtime function wiring. |
-| Game runtime | `GDJS/Runtime` | TypeScript | Game loop, scenes, objects, behaviors, rendering, input, audio, resources, debugger, and runtime utilities. |
-| Feature extensions | `Extensions`, `Core/GDCore/Extensions/Builtin`, `GDJS/GDJS/Extensions/Builtin` | C++, JS, TS | Object/behavior types and the actions, conditions, expressions, effects, dependencies, editor renderers, and runtime implementations they expose. |
-| C++ bindings | `GDevelop.js` | C++, WebIDL, JS | Compiles Core, the GDJS platform, and C++ extensions to `libGD.js` plus `libGD.wasm`. |
-| Editor | `newIDE` | Flow-typed JS, React, Electron | Owns authoring workflows, UI state, storage providers, preview/export orchestration, and renderers for the scene editor. |
-| Dependencies and build inputs | `ExtLibs`, `SharedLibs`, `ThirdParties` | Mixed | Vendored C++ libraries, browser/runtime libraries, and separately packaged maintenance sources. |
-| Generated outputs and tooling | `Binaries`, `scripts` | Mixed | Native/WASM build products and repository development/release scripts. |
+| Area                          | Primary directories                                                            | Language                       | Responsibility                                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core model and IDE algorithms | `Core/GDCore`                                                                  | C++                            | Project tree, events AST, serialization, validation, refactoring, platform-neutral code-generation framework.                                     |
+| GDJS platform                 | `GDJS/GDJS`                                                                    | C++                            | JavaScript-specific code generation, preview/export, and runtime function wiring.                                                                 |
+| Game runtime                  | `GDJS/Runtime`                                                                 | TypeScript                     | Game loop, scenes, objects, behaviors, rendering, input, audio, resources, debugger, and runtime utilities.                                       |
+| Feature extensions            | `Extensions`, `Core/GDCore/Extensions/Builtin`, `GDJS/GDJS/Extensions/Builtin` | C++, JS, TS                    | Object/behavior types and the actions, conditions, expressions, effects, dependencies, editor renderers, and runtime implementations they expose. |
+| C++ bindings                  | `GDevelop.js`                                                                  | C++, WebIDL, JS                | Compiles Core, the GDJS platform, and C++ extensions to `libGD.js` plus `libGD.wasm`.                                                             |
+| Editor                        | `newIDE`                                                                       | Flow-typed JS, React, Electron | Owns authoring workflows, UI state, storage providers, preview/export orchestration, and renderers for the scene editor.                          |
+| Dependencies and build inputs | `ExtLibs`, `SharedLibs`, `ThirdParties`                                        | Mixed                          | Vendored C++ libraries, browser/runtime libraries, and separately packaged maintenance sources.                                                   |
+| Generated outputs and tooling | `Binaries`, `scripts`                                                          | Mixed                          | Native/WASM build products and repository development/release scripts.                                                                            |
 
 ```mermaid
 flowchart TD
@@ -695,11 +695,11 @@ requested.
 
 ### Local project representations
 
-| Representation | Entry | Status in this checkout |
-| --- | --- | --- |
-| Single JSON | arbitrary `*.json` | Legacy input/output path supported by the serializer/storage layer. |
+| Representation            | Entry                                           | Status in this checkout                                                                                            |
+| ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Single JSON               | arbitrary `*.json`                              | Legacy input/output path supported by the serializer/storage layer.                                                |
 | Split JSON folder project | a JSON entry plus referenced `*.json` fragments | Legacy format using `ObjectSplitter` and `__REFERENCE_TO_SPLIT_OBJECT`. Still readable; not the new source format. |
-| Multi-file source project | `project.settings` | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files. |
+| Multi-file source project | `project.settings`                              | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files.                        |
 
 Opening a legacy JSON project normalizes it through the current libGD
 serializer, decomposes it next to the source, verifies a compose round trip,
@@ -735,8 +735,8 @@ extensions/<encoded-name>/prefabs/.../*.settings|*.layout|*.events
 ```
 
 - `*.settings` and `static-data.toml` use TOML.
-- `*.layout` uses the layout DSL in
-  `newIDE/app/src/ProjectsStorage/LayoutDsl`.
+- `*.layout` uses strict flat TOML in
+  `newIDE/app/src/ProjectsStorage/LayoutToml`.
 - `*.events` uses the IfDo DSL in
   `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
 - Canonical `game://` URIs connect owned documents.
@@ -832,15 +832,15 @@ Tabs are represented by editor-container classes in
 to common tab lifecycle, selection, undo, navigation, and project services.
 Major domain areas include:
 
-| Area | Primary directories |
-| --- | --- |
-| Scene and instance placement | `SceneEditor`, `InstancesEditor`, `LayersList`, `ObjectsList` |
-| Events and expressions | `EventsSheet`, `InstructionOrExpression`, `ExpressionAutocompletion` |
-| Objects and behaviors | `ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor` |
+| Area                            | Primary directories                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| Scene and instance placement    | `SceneEditor`, `InstancesEditor`, `LayersList`, `ObjectsList`                             |
+| Events and expressions          | `EventsSheet`, `InstructionOrExpression`, `ExpressionAutocompletion`                      |
+| Objects and behaviors           | `ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor`                              |
 | Events-based extensions/prefabs | `EventsFunctionsExtensionEditor`, `PrefabDetailEditor`, `EventsFunctionsExtensionsLoader` |
-| Resources and project files | `ResourcesEditor`, `ResourcesList`, `ProjectsStorage` |
-| Static Data | `StaticData`, `StaticDataEditorContainer` |
-| Preview/debug/in-game editing | `ExportAndShare`, `EmbeddedGame`, `Debugger`, `HotReload` |
+| Resources and project files     | `ResourcesEditor`, `ResourcesList`, `ProjectsStorage`                                     |
+| Static Data                     | `StaticData`, `StaticDataEditorContainer`                                                 |
+| Preview/debug/in-game editing   | `ExportAndShare`, `EmbeddedGame`, `Debugger`, `HotReload`                                 |
 
 ### The editor works on C++ objects through wrappers
 
@@ -939,14 +939,14 @@ The repository has several build systems because it produces native C++
 libraries, a WASM authoring library, a TypeScript runtime, a React web app, and
 Electron packages.
 
-| Change area | Main build/check | Tests that exercise the seam |
-| --- | --- | --- |
-| Core model, parser, refactorer | Root CMake; `GDCore_tests` target | `Core/tests` (Catch2) |
-| JS code generation or bindings | `cd GDevelop.js && npm run build` | `GDevelop.js/__tests__` via Jest |
-| Runtime or TS extension | `cd GDJS && npm run check-types` and `npm run build` | `cd GDJS/tests && npm test` (Karma/Mocha, headless browser) plus extension specs |
-| Editor/UI/storage | `cd newIDE/app && npm run flow`, `npm run lint`, `npm run check-format` | `npm test` / targeted `*.spec.js`; Storybook for visual states |
-| Electron integration | `newIDE/electron-app` package scripts | `newIDE/electron-app/test` |
-| Multi-file format | Editor Jest suite | `MultiFileProjectFormat`, `LayoutDsl`, `IfDoEventsDsl`, `LocalMultiFileProject`, and catalog specs |
+| Change area                    | Main build/check                                                        | Tests that exercise the seam                                                                        |
+| ------------------------------ | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Core model, parser, refactorer | Root CMake; `GDCore_tests` target                                       | `Core/tests` (Catch2)                                                                               |
+| JS code generation or bindings | `cd GDevelop.js && npm run build`                                       | `GDevelop.js/__tests__` via Jest                                                                    |
+| Runtime or TS extension        | `cd GDJS && npm run check-types` and `npm run build`                    | `cd GDJS/tests && npm test` (Karma/Mocha, headless browser) plus extension specs                    |
+| Editor/UI/storage              | `cd newIDE/app && npm run flow`, `npm run lint`, `npm run check-format` | `npm test` / targeted `*.spec.js`; Storybook for visual states                                      |
+| Electron integration           | `newIDE/electron-app` package scripts                                   | `newIDE/electron-app/test`                                                                          |
+| Multi-file format              | Editor Jest suite                                                       | `MultiFileProjectFormat`, `LayoutToml`, `IfDoEventsDsl`, `LocalMultiFileProject`, and catalog specs |
 
 `newIDE/app`'s install/import scripts copy or build the GDJS runtime, extensions,
 themes, editor resources, and `libGD` into the app's public resources. A runtime
@@ -984,7 +984,7 @@ Consider a scene event: “when `Player` is on the floor, set its Y position to
    and resources. The placed `Player` is a `gd::InitialInstance`.
 2. **In-memory model.** The event belongs to the layout's `gd::EventsList`
    inside the current WASM `gd::Project`. React holds UI state and borrowed
-wrappers; the C++ model is authoritative.
+   wrappers; the C++ model is authoritative.
 3. **Save.** Core serializes one logical project tree. For a
    `project.settings` project, the editor decomposes it into TOML/layout/IfDo
    sources, recomposes and compares it, transactionally commits changed files,
@@ -1020,21 +1020,21 @@ authoring system itself.
 
 ## Source map
 
-| Concern | Primary locations |
-| --- | --- |
-| High-level vocabulary | `Core/GDevelop-Architecture-Overview.md` |
-| Project model and scopes | `Core/GDCore/Project`, especially `Project`, `Layout`, `Object`, `InitialInstance`, `ProjectScopedContainers` |
-| Events and expressions | `Core/GDCore/Events`, `Core/GDCore/IDE` |
-| Base and JS code generation | `Core/GDCore/Events/CodeGeneration`, `GDJS/GDJS/Events/CodeGeneration` |
-| Picking assertions | `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.*`, `GDJS/Runtime/gd.ts`, `newIDE/app/src/Utils/EventsValidationScanner.js` |
-| Runtime lifecycle | `GDJS/Runtime/runtimegame.ts`, `GDJS/Runtime/runtimescene.ts`, `GDJS/Runtime/scenestack.ts`, `GDJS/Runtime/RuntimeInstanceContainer.ts`, `GDJS/Runtime/runtimeobject.ts`, `GDJS/Runtime/runtimebehavior.ts` |
-| Custom objects and capabilities | `GDJS/Runtime/CustomRuntimeObject*`, `GDJS/Runtime/object-capabilities` |
-| Signal system | `GDJS/Runtime/events-tools/signaltools.ts`, `docs/SignalSystem.md` |
-| Extensions and metadata | `Core/GDCore/Extensions`, `GDJS/GDJS/Extensions`, `Extensions`, `newIDE/app/src/EventsFunctionsExtensionsLoader` |
-| WASM bindings | `GDevelop.js/Bindings`, `GDevelop.js/Gruntfile.js`, `GDevelop.js/types`, `GDevelop.js/types.d.ts` |
-| Logical serialization | `Core/GDCore/Serialization`, model `SerializeTo`/`UnserializeFrom` methods |
-| Multi-file source format | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, `newIDE/app/src/ProjectsStorage/LayoutDsl`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js` |
-| Source catalogs/APIs | `newIDE/app/src/ProjectsStorage/ProjectSourceCatalog.js`, `newIDE/app/src/ProjectsStorage/JavaScriptAuthoringApi.js`, `newIDE/app/src/EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog.js` |
-| Static Data | `Core/GDCore/Project/Project.*`, `newIDE/app/src/StaticData`, `docs/StaticData.md` |
-| Preview and export | `GDJS/GDJS/IDE/Exporter*`, `newIDE/app/src/ExportAndShare`, `newIDE/app/src/HotReload`, `newIDE/app/src/EmbeddedGame` |
-| Editor shell | `newIDE/app/src/index.js`, `newIDE/app/src/LocalApp.js`, `newIDE/app/src/BrowserApp.js`, `newIDE/app/src/MainFrame`, domain editor directories |
+| Concern                         | Primary locations                                                                                                                                                                                                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| High-level vocabulary           | `Core/GDevelop-Architecture-Overview.md`                                                                                                                                                                                                                                  |
+| Project model and scopes        | `Core/GDCore/Project`, especially `Project`, `Layout`, `Object`, `InitialInstance`, `ProjectScopedContainers`                                                                                                                                                             |
+| Events and expressions          | `Core/GDCore/Events`, `Core/GDCore/IDE`                                                                                                                                                                                                                                   |
+| Base and JS code generation     | `Core/GDCore/Events/CodeGeneration`, `GDJS/GDJS/Events/CodeGeneration`                                                                                                                                                                                                    |
+| Picking assertions              | `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.*`, `GDJS/Runtime/gd.ts`, `newIDE/app/src/Utils/EventsValidationScanner.js`                                                                                                                                          |
+| Runtime lifecycle               | `GDJS/Runtime/runtimegame.ts`, `GDJS/Runtime/runtimescene.ts`, `GDJS/Runtime/scenestack.ts`, `GDJS/Runtime/RuntimeInstanceContainer.ts`, `GDJS/Runtime/runtimeobject.ts`, `GDJS/Runtime/runtimebehavior.ts`                                                               |
+| Custom objects and capabilities | `GDJS/Runtime/CustomRuntimeObject*`, `GDJS/Runtime/object-capabilities`                                                                                                                                                                                                   |
+| Signal system                   | `GDJS/Runtime/events-tools/signaltools.ts`, `docs/SignalSystem.md`                                                                                                                                                                                                        |
+| Extensions and metadata         | `Core/GDCore/Extensions`, `GDJS/GDJS/Extensions`, `Extensions`, `newIDE/app/src/EventsFunctionsExtensionsLoader`                                                                                                                                                          |
+| WASM bindings                   | `GDevelop.js/Bindings`, `GDevelop.js/Gruntfile.js`, `GDevelop.js/types`, `GDevelop.js/types.d.ts`                                                                                                                                                                         |
+| Logical serialization           | `Core/GDCore/Serialization`, model `SerializeTo`/`UnserializeFrom` methods                                                                                                                                                                                                |
+| Multi-file source format        | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, `newIDE/app/src/ProjectsStorage/LayoutToml`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js` |
+| Source catalogs/APIs            | `newIDE/app/src/ProjectsStorage/ProjectSourceCatalog.js`, `newIDE/app/src/ProjectsStorage/JavaScriptAuthoringApi.js`, `newIDE/app/src/EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog.js`                                                                             |
+| Static Data                     | `Core/GDCore/Project/Project.*`, `newIDE/app/src/StaticData`, `docs/StaticData.md`                                                                                                                                                                                        |
+| Preview and export              | `GDJS/GDJS/IDE/Exporter*`, `newIDE/app/src/ExportAndShare`, `newIDE/app/src/HotReload`, `newIDE/app/src/EmbeddedGame`                                                                                                                                                     |
+| Editor shell                    | `newIDE/app/src/index.js`, `newIDE/app/src/LocalApp.js`, `newIDE/app/src/BrowserApp.js`, `newIDE/app/src/MainFrame`, domain editor directories                                                                                                                            |

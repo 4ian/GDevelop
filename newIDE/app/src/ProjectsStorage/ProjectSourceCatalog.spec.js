@@ -3,6 +3,7 @@
 import {
   ProjectSourceCatalogError,
   buildBehaviorPropertySchemasByType,
+  buildProjectLayoutCatalog,
   buildProjectSettingsCatalog,
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
@@ -57,9 +58,13 @@ describe('project source catalogs', () => {
   test('validates and compactly serializes a layout catalog', () => {
     const catalog = {
       ...base('gdevelop-layout-catalog'),
-      elements: [
-        { element: 'layout' },
-        { element: 'layer', variant: 'external reference' },
+      tables: [
+        { table: 'layout', header: '[layout]' },
+        {
+          table: 'layer',
+          header: '[[layer]]',
+          variant: 'external reference',
+        },
       ],
       contexts: [
         {
@@ -93,12 +98,50 @@ describe('project source catalogs', () => {
     expect(() =>
       validateProjectLayoutCatalog({
         ...base('gdevelop-layout-catalog'),
-        elements: [{ element: 'layout' }],
+        tables: [{ table: 'layout', header: '[layout]' }],
         contexts: [{ kind: 'scene' }],
         effectTypes: [],
         behaviorOverrideSchemas: [],
       })
     ).toThrow(ProjectSourceCatalogError);
+  });
+
+  test('generates the flat layout TOML authoring schema', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const catalog = buildProjectLayoutCatalog({
+      project,
+      serializedProject: {
+        objects: [],
+        layouts: [],
+        externalLayouts: [],
+        eventsFunctionsExtensions: [],
+      },
+      effectTypes: [],
+      behaviorTypes: [],
+    });
+
+    expect(catalog.authoring.syntax).toContain('Standard flat TOML');
+    expect(catalog.tables.map(table => table.header)).toEqual([
+      '[layout]',
+      '[editor]',
+      '[[layer]]',
+      '[[layer]]',
+      '[[effect]]',
+      '[[instance]]',
+      '[[variable]]',
+      '[[behavior]]',
+    ]);
+    expect(
+      catalog.tables.find(table => table.table === 'editor').fields
+    ).toContainEqual(
+      expect.objectContaining({ name: 'selected_layer_unresolved' })
+    );
+    expect(
+      catalog.tables.find(table => table.table === 'instance').fields
+    ).toContainEqual(expect.objectContaining({ name: 'properties' }));
+    expect(catalog.counts.tables).toBe(catalog.tables.length);
+    expect(catalog).not.toHaveProperty('elements');
+    project.delete();
   });
 
   test('reads project behavior details from serialized definitions instead of volatile metadata wrappers', () => {

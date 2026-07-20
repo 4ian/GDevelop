@@ -21,7 +21,7 @@ Read, in order:
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
 5. `.gdevelop/layout-catalog.json`, then relevant `.layout` files for Layout
-   DSL instances, layers, spatial bounds, background, and editor-canvas layout.
+   TOML instances, layers, spatial bounds, background, and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
@@ -59,12 +59,12 @@ Use the catalogs as authoring contracts:
   attached behavior, write only properties listed in its `behaviorTypes`
   entry. Editor-hidden properties are deliberately absent, runtime-managed,
   and forbidden in object settings; never copy them from legacy JSON.
-- In `layout-catalog.json`, read `elements` for exact context-specific tags,
-  attributes, literals, child order, defaults, and constraints. Select the one
+- In `layout-catalog.json`, read `tables` for exact context-specific headers,
+  fields, value types, defaults, and constraints. Select the one
   `contexts` entry whose `owner` matches the scene, prefab, variant, or external
   layout, then use only its listed layers, objects, and attached behaviors.
   Search `effectTypes` for exact effect parameters and types.
-- If the relevant registered type, file kind, element, or effect is absent,
+- If the relevant registered type, file kind, layout table, or effect is absent,
   stop instead of guessing. If a direct edit introduces a new object or
   attached behavior name, validate its registered type in the settings catalog,
   define it first in the owning `.settings` file, and then reference that exact
@@ -76,7 +76,7 @@ Search narrowly, for example:
 ```sh
 rg '"type":"Sprite"' .gdevelop/settings-catalog.json
 rg '"type":"Tween::TweenBehavior"' .gdevelop/settings-catalog.json
-rg '"element":"instance"' .gdevelop/layout-catalog.json
+rg '"table":"instance"' .gdevelop/layout-catalog.json
 rg '"owner":{"scene":"Main"}' .gdevelop/layout-catalog.json
 ```
 
@@ -119,12 +119,13 @@ generated compatibility/runtime output, not multi-file source.
 - `static-data.toml`: the entire root document is editor-only Static Data.
   Author data directly, with no `[settings]`, `[staticData]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
-- `.layout`: Layout DSL component-tree markup containing placement/layout data
-  only: instances, layers, spatial bounds, background, and editor view state.
-  Never put TOML, object definitions, or attached behavior definitions in a
-  `.layout` file. Instance behavior overrides are allowed only for behaviors
-  already attached by the owning `.settings` object definition. Follow the
-  matching layout-catalog `contexts` entry and `elements` definitions.
+- `.layout`: standard flat TOML containing placement/layout data only:
+  `[layout]`, optional `[editor]`, and short `[[layer]]`, `[[effect]]`,
+  `[[instance]]`, `[[variable]]`, and `[[behavior]]` records. Never put object
+  definitions or attached behavior definitions in a `.layout` file. Instance
+  behavior overrides are allowed only for behaviors already attached by the
+  owning `.settings` object definition. Follow the matching layout-catalog
+  `contexts` entry and `tables` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -216,7 +217,7 @@ Load only the references required by the task:
 - Read [references/create-extensions.md](references/create-extensions.md) in
   full before creating an extension or adding/removing extension-level
   functions, prefabs, behaviors, or their functions.
-- Read [references/layout-dsl.md](references/layout-dsl.md) in full before
+- Read [references/layout-toml.md](references/layout-toml.md) in full before
   creating or changing any `.layout` file. Preserve existing UUIDs and use its
   exact scene, prefab/variant, or external-layout context rules.
 - Read [references/events-dls.md](references/events-dls.md) in full before
@@ -361,7 +362,7 @@ loop, comment, and JavaScript metadata when editing existing sources.
 1. Inspect manifests and only the owned files relevant to the request. Search
    `.gdevelop/settings-catalog.json` before adding or changing settings-owned
    object, behavior, effect, or component definitions. Search
-   `.gdevelop/layout-catalog.json` for the exact layout grammar and matching
+   `.gdevelop/layout-catalog.json` for the exact layout schema and matching
    project context before adding or changing layout content.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
    expressions. The generated catalog excludes editor-hidden and deprecated
@@ -381,7 +382,7 @@ loop, comment, and JavaScript metadata when editing existing sources.
    structural change. Repeat this step after each later structural phase.
 5. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
-6. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
+6. Check settings and layout TOML syntax/semantics, duplicate
    namespaces, event depth, instruction names, named parameters, and asset
    paths.
 7. Call the no-input GDevelop MCP `validate_project_files` tool after the most
@@ -504,8 +505,9 @@ second reload while the recorded operation is still running.
 
 Before finishing:
 
-- Confirm every changed `.settings` file is unindented TOML and independently
-  parseable; confirm every `.layout` is canonical Layout DSL version 1.
+- Confirm every changed `.settings` and `.layout` file is unindented,
+  independently parseable TOML; confirm every `.layout` is canonical flat
+  layout TOML version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
   `objects`, `objectGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
@@ -522,7 +524,7 @@ Before finishing:
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm settings file kinds and every object/behavior/effect type against
   `settings-catalog.json`.
-- Confirm layout elements, attributes, layers, objects, attached behaviors,
+- Confirm layout tables, fields, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
 - For every changed JavaScript event, confirm `strict=true`, validate all

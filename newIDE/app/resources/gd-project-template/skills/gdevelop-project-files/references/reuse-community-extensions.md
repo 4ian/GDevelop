@@ -98,15 +98,17 @@ by hand.
 1. Before making direct project-file edits, call the GDevelop MCP tool:
 
    ```json
-   {"name":"import_extension","arguments":{"extension_name":"StarRatingBar"}}
+   {
+     "name": "import_extension",
+     "arguments": { "extension_name": "StarRatingBar" }
+   }
    ```
 
    This bounded importer is available even when general MCP write tools are
    disabled. If it is unavailable, report the missing editor capability; do
    not fall back to manual JSON conversion.
 
-   Before the call, inspect the tool description and require `persistence
-   protocol v3`. Refreshing the MCP catalog does not hot-reload changed editor
+   Before the call, inspect the tool description and require `persistence protocol v3`. Refreshing the MCP catalog does not hot-reload changed editor
    JavaScript. If the description lacks v3, or a failure reports
    `importerVersion` below 3, the running GDevelop build is stale and must be
    rebuilt/restarted before retrying. Protocol v3 exposes the original writer
@@ -130,20 +132,20 @@ by hand.
 
 The native conversion maps the legacy extension as follows:
 
-| Downloaded extension field | Multi-file destination |
-| --- | --- |
-| Top-level metadata except implementation arrays | `extensions/<E>/extension.settings` |
-| `eventsFunctions[]` metadata | One `functions/<F>/function.settings` each |
-| `eventsFunctions[].events` | Matching `functions/<F>/<F>.events` |
-| `eventsBasedObjects[]` metadata, flat property descriptors, groups, and variables | One `prefabs/<P>/prefab.settings` each |
-| Default child object definitions and attached behaviors | One flat `prefabs/<P>/objects/<Object>.settings` each; grouping is `folder` |
-| Prefab default-variant instances/layers/spatial bounds/editor layout state | `<P>.layout` |
-| Prefab `eventsFunctions[]` metadata/bodies and function grouping | `prefabs/<P>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events` |
-| Prefab non-default variant metadata/groups | Its entry in `prefab.settings` |
-| Prefab non-default variant child definitions/behaviors | One flat `prefabs/<P>/variants/<Variant>/objects/<Object>.settings` each; grouping is `folder` |
-| Prefab non-default variant instances/layers/spatial bounds/editor state | `variants/<Variant>.layout` |
-| `eventsBasedBehaviors[]` owner metadata | One `behaviors/<B>/behavior.settings` each |
-| Behavior `eventsFunctions[]` metadata/bodies and function grouping | `behaviors/<B>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events` |
+| Downloaded extension field                                                        | Multi-file destination                                                                         |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Top-level metadata except implementation arrays                                   | `extensions/<E>/extension.settings`                                                            |
+| `eventsFunctions[]` metadata                                                      | One `functions/<F>/function.settings` each                                                     |
+| `eventsFunctions[].events`                                                        | Matching `functions/<F>/<F>.events`                                                            |
+| `eventsBasedObjects[]` metadata, flat property descriptors, groups, and variables | One `prefabs/<P>/prefab.settings` each                                                         |
+| Default child object definitions and attached behaviors                           | One flat `prefabs/<P>/objects/<Object>.settings` each; grouping is `folder`                    |
+| Prefab default-variant instances/layers/spatial bounds/editor layout state        | `<P>.layout`                                                                                   |
+| Prefab `eventsFunctions[]` metadata/bodies and function grouping                  | `prefabs/<P>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events`             |
+| Prefab non-default variant metadata/groups                                        | Its entry in `prefab.settings`                                                                 |
+| Prefab non-default variant child definitions/behaviors                            | One flat `prefabs/<P>/variants/<Variant>/objects/<Object>.settings` each; grouping is `folder` |
+| Prefab non-default variant instances/layers/spatial bounds/editor state           | `variants/<Variant>.layout`                                                                    |
+| `eventsBasedBehaviors[]` owner metadata                                           | One `behaviors/<B>/behavior.settings` each                                                     |
+| Behavior `eventsFunctions[]` metadata/bodies and function grouping                | `behaviors/<B>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events`           |
 
 The conversion keeps hidden property descriptors in the owning
 `behavior.settings` because generated runtime code needs their defaults, but it
@@ -164,7 +166,8 @@ dependency/compatibility issue before retrying.
 ## Verify and report
 
 1. Parse every new settings TOML fragment independently and as combined
-   settings; compile every generated `.layout` as Layout DSL version 1.
+   settings; parse and semantically compile every generated `.layout` as flat
+   layout TOML version 1.
 2. Confirm no downloaded `.json` file was added to project source.
 3. Confirm the import receipt lists the requested extension, its generated
    `extension.settings`, and source files for all imported dependencies.

@@ -915,174 +915,170 @@ export const buildProjectSettingsCatalog = ({
   });
 };
 
-const LAYOUT_ELEMENTS = Object.freeze([
+const LAYOUT_TABLES = Object.freeze([
   {
-    element: 'layout',
+    table: 'layout',
+    header: '[layout]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
+    fields: [
       { name: 'version', type: 'integer', required: true, value: 1 },
       {
         name: 'background',
-        type: '#RRGGBB',
+        type: '"#RRGGBB"',
         requiredIn: ['scene'],
         forbiddenIn: ['prefab', 'prefab-variant', 'external'],
       },
+      {
+        name: 'bounds',
+        type: '{ min = [x, y, z], max = [x, y, z] }',
+        requiredIn: ['prefab', 'prefab-variant'],
+        forbiddenIn: ['scene', 'external'],
+      },
     ],
-    children: ['bounds?', 'editor?', 'layer*'],
   },
   {
-    element: 'bounds',
-    contexts: ['prefab', 'prefab-variant'],
-    attributes: [
-      { name: 'min', type: 'number,number,number', required: true },
-      { name: 'max', type: 'number,number,number', required: true },
-    ],
-    empty: true,
-  },
-  {
-    element: 'editor',
+    table: 'editor',
+    header: '[editor]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
+    optional: true,
+    fields: [
       { name: 'grid', type: 'boolean' },
       {
-        name: 'grid-type',
+        name: 'grid_type',
         type: 'enum',
         values: ['rectangular', 'isometric'],
       },
-      { name: 'grid-size', type: 'non-negative number,number,number' },
-      { name: 'grid-offset', type: 'number,number,number' },
-      { name: 'grid-color', type: '#RRGGBB' },
-      { name: 'grid-alpha', type: 'number', range: '[0,1]' },
+      { name: 'grid_size', type: '[x, y, z] non-negative numbers' },
+      { name: 'grid_offset', type: '[x, y, z] numbers' },
+      { name: 'grid_color', type: '"#RRGGBB"' },
+      { name: 'grid_alpha', type: 'number', range: '[0,1]' },
       { name: 'snap', type: 'boolean' },
       { name: 'zoom', type: 'number', range: '[0.01,infinity)' },
-      { name: 'window-mask', type: 'boolean' },
-      { name: 'selected-layer', type: 'string' },
+      { name: 'window_mask', type: 'boolean' },
+      { name: 'selected_layer', type: 'existing layer name' },
+      {
+        name: 'selected_layer_unresolved',
+        type: 'boolean import marker',
+        default: false,
+      },
       {
         name: 'mode',
         type: 'enum',
         values: ['instances-editor', 'embedded-game'],
       },
     ],
-    empty: true,
   },
   {
-    element: 'layer',
+    table: 'layer',
+    header: '[[layer]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
+    repeated: true,
+    fields: [
+      {
+        name: 'id',
+        type: 'file-local lowercase letters/digits/hyphens reference',
+        required: true,
+      },
       { name: 'name', type: 'string', required: true },
       { name: 'rendering', type: 'enum', values: ['', '2d', '3d', '2d+3d'] },
       {
-        name: 'camera-type',
+        name: 'camera_type',
         type: 'enum',
         values: ['', 'perspective', 'orthographic'],
       },
       {
-        name: 'camera-behavior',
+        name: 'camera_behavior',
         type: 'enum',
         values: ['do-nothing', 'top-left-anchored-if-never-moved'],
       },
       { name: 'visible', type: 'boolean', default: true },
       { name: 'locked', type: 'boolean', default: false },
       { name: 'lighting', type: 'boolean', default: false },
-      { name: 'follow-base-camera', type: 'boolean', default: false },
-      { name: 'ambient', type: '#RRGGBB', default: '#C8C8C8' },
+      { name: 'follow_base_camera', type: 'boolean', default: false },
+      { name: 'ambient', type: '"#RRGGBB"', default: '#C8C8C8' },
       { name: 'near', type: 'number', default: 3 },
       { name: 'far', type: 'number', default: 10000 },
       { name: 'fov', type: 'number', range: '(0,180]', default: 45 },
       {
-        name: 'max-2d-distance',
+        name: 'max_2d_distance',
         type: 'positive number',
         default: 5000,
       },
+      {
+        name: 'cameras',
+        type:
+          'inline table array; each item has size and viewport as "default", numeric arrays, or { default = [...] }',
+      },
     ],
-    children: ['camera*', 'effect*', 'instance*'],
-    rules: [
-      'far must be greater than near',
-      'camera/effect/instance order is strict',
-    ],
+    rules: ['far must be greater than near', 'at most 50 cameras'],
   },
   {
-    element: 'layer',
+    table: 'layer',
+    header: '[[layer]]',
     variant: 'external reference',
     contexts: ['external'],
-    attributes: [
+    repeated: true,
+    fields: [
+      {
+        name: 'id',
+        type: 'file-local lowercase letters/digits/hyphens reference',
+        required: true,
+      },
       { name: 'name', type: 'existing linked-scene layer', required: true },
     ],
-    children: ['instance*'],
   },
   {
-    element: 'camera',
+    table: 'effect',
+    header: '[[effect]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
-      {
-        name: 'size',
-        type: 'default | default(width,height) | widthxheight',
-        required: true,
-      },
-      {
-        name: 'viewport',
-        type:
-          'default | default(left,top,right,bottom) | left,top,right,bottom',
-        required: true,
-      },
-    ],
-    empty: true,
-  },
-  {
-    element: 'effect',
-    contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
+    repeated: true,
+    fields: [
+      { name: 'layer', type: 'existing layer id', required: true },
       { name: 'name', type: 'string', required: true },
       { name: 'type', type: 'registered effect type', required: true },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'enabled', type: 'boolean', default: true },
-      { name: 'numbers', type: 'strict JSON object of finite numbers' },
-      { name: 'strings', type: 'strict JSON object of strings' },
-      { name: 'booleans', type: 'strict JSON object of booleans' },
+      {
+        name: 'params',
+        type: 'inline TOML table using catalog-declared parameter types',
+      },
     ],
-    empty: true,
   },
   {
-    element: 'instance',
-    sourceForm: '<ObjectName> or <object of="Exact object name">',
+    table: 'instance',
+    header: '[[instance]]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
-      { name: 'of', type: 'existing object name', requiredFor: '<object>' },
+    repeated: true,
+    fields: [
       { name: 'id', type: 'lowercase UUIDv4', required: true },
-      { name: 'order', type: 'non-negative integer' },
-      { name: 'at', type: 'x,y | x,y,z', required: true },
-      { name: 'rotation', type: 'z | x,y,z', default: 0 },
-      { name: 'z-order', type: 'integer', default: 0 },
-      { name: 'size', type: 'auto | auto(widthxheight) | widthxheight' },
+      { name: 'object', type: 'existing object name', required: true },
+      { name: 'layer', type: 'existing layer id', required: true },
+      { name: 'unresolved', type: 'boolean import marker', default: false },
+      { name: 'at', type: '[x, y] or [x, y, z]', required: true },
+      { name: 'rotation', type: 'z number or [x, y, z]', default: 0 },
+      { name: 'z_order', type: 'integer', default: 0 },
+      { name: 'size', type: '[width, height] custom size' },
+      { name: 'auto_size', type: '[width, height] inactive stored size' },
       { name: 'depth', type: 'number' },
       { name: 'opacity', type: 'integer', range: '[0,255]', default: 255 },
-      { name: 'flip', type: 'unique comma-list', values: ['x', 'y', 'z'] },
-      { name: 'locked', type: 'bare boolean', default: false },
-      { name: 'sealed', type: 'bare boolean', default: false },
-      { name: 'keep-ratio', type: 'boolean', default: true },
+      { name: 'flip', type: 'unique string array', values: ['x', 'y', 'z'] },
+      { name: 'locked', type: 'boolean', default: false },
+      { name: 'sealed', type: 'boolean', default: false },
+      { name: 'keep_ratio', type: 'boolean', default: true },
+      {
+        name: 'properties',
+        type: 'inline TOML table of catalog-declared number/string values',
+      },
     ],
-    children: ['properties?', 'variables?', 'override*'],
   },
   {
-    element: 'properties',
-    contexts: ['instance'],
-    attributes: [
-      { name: 'numbers', type: 'strict JSON object of finite numbers' },
-      { name: 'strings', type: 'strict JSON object of strings' },
-    ],
-    empty: true,
-  },
-  {
-    element: 'variables',
-    contexts: ['instance'],
-    attributes: [],
-    children: ['var*'],
-  },
-  {
-    element: 'var',
-    contexts: ['variables', 'var'],
-    attributes: [
-      { name: 'name', type: 'string', requiredExceptIn: ['array'] },
+    table: 'variable',
+    header: '[[variable]]',
+    contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
+    repeated: true,
+    fields: [
+      { name: 'instance', type: 'existing instance UUID', required: true },
+      { name: 'name', type: 'string', required: true },
       {
         name: 'type',
         type: 'enum',
@@ -1096,26 +1092,29 @@ const LAYOUT_ELEMENTS = Object.freeze([
       },
       {
         name: 'values',
-        type: 'unique JSON string array',
+        type: 'unique TOML string array',
         allowedFor: ['enum'],
       },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'id', type: 'lowercase UUIDv4' },
-    ],
-    children: [
-      'var* for structure or array; primitive variables must be empty',
+      {
+        name: 'children',
+        type: 'recursive inline variable table array for structure/array',
+      },
     ],
   },
   {
-    element: 'override',
-    contexts: ['instance'],
-    attributes: [
-      { name: 'behavior', type: 'attached behavior name', required: true },
+    table: 'behavior',
+    header: '[[behavior]]',
+    contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
+    repeated: true,
+    fields: [
+      { name: 'instance', type: 'existing instance UUID', required: true },
+      { name: 'name', type: 'attached behavior name', required: true },
       {
-        name: 'data',
+        name: 'properties',
         type:
-          'strict JSON object keyed by behaviorOverrideSchemas[].properties[].serializedKey',
-        required: true,
+          'inline TOML table keyed by behaviorOverrideSchemas[].properties[].serializedKey',
       },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'muted', type: 'boolean', default: false },
@@ -1126,11 +1125,10 @@ const LAYOUT_ELEMENTS = Object.freeze([
         values: ['default', 'visible', 'hidden'],
       },
       {
-        name: 'property-visibility',
-        type: 'strict JSON object with default|visible|hidden values',
+        name: 'property_visibility',
+        type: 'inline TOML table with default|visible|hidden string values',
       },
     ],
-    empty: true,
   },
 ]);
 
@@ -1313,25 +1311,25 @@ export const buildProjectLayoutCatalog = ({
     project: projectIdentity(project),
     authoring: {
       sourceExtension: '.layout',
-      syntax:
-        'GDevelop Layout DSL version 1 component-tree markup (not XML, HTML, TOML, or JSON).',
+      syntax: 'Standard flat TOML using short layout record headers.',
       rules: [
         'Read the owning settings namespace and the matching context entry before editing a layout.',
-        'Use only listed elements and attributes. Text nodes, comments, entities, declarations, CDATA, and unknown markup are forbidden.',
-        'Strings use JSON escaping; typed maps use strict JSON; colors are uppercase #RRGGBB.',
+        'Use only the listed [layout], [editor], [[layer]], [[effect]], [[instance]], [[variable]], and [[behavior]] tables and fields.',
+        'Use standard TOML strings, booleans, numeric arrays, and inline tables. Colors are quoted uppercase #RRGGBB strings.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
-        'Use an existing object name from the matching context. Use <object of="..."> for unsafe or reserved object names.',
-        'An override may reference only a behavior already attached to that object in the matching context. Its data keys must use the exact serializedKey entries in behaviorOverrideSchemas, never the editor-facing authoringKey.',
-        'Cameras precede effects, effects precede instances, and properties/variables precede overrides.',
+        'Layer ids are short file-local references. Every effect and instance uses an existing layer id; every variable and behavior uses an existing instance UUID.',
+        'Use an existing object name from the matching context in instance.object.',
+        'A [[behavior]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
+        'The [[instance]] record order is the global serialized instance order. Never add a synthetic order field.',
         'Object definitions and attached behaviors belong in .settings, while event logic belongs in .events.',
       ],
     },
-    elements: LAYOUT_ELEMENTS,
+    tables: LAYOUT_TABLES,
     contexts,
     effectTypes: registeredEffectTypes,
     behaviorOverrideSchemas,
     counts: {
-      elements: LAYOUT_ELEMENTS.length,
+      tables: LAYOUT_TABLES.length,
       contexts: contexts.length,
       effectTypes: registeredEffectTypes.length,
       behaviorOverrideSchemas: behaviorOverrideSchemas.length,
@@ -1497,15 +1495,15 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
 
 export const validateProjectLayoutCatalog = (catalog: any): Object => {
   const validated = validateBaseCatalog(catalog, 'gdevelop-layout-catalog', [
-    'elements',
+    'tables',
     'contexts',
     'effectTypes',
     'behaviorOverrideSchemas',
   ]);
   validateUniqueEntries(
-    validated.elements,
-    entry => `${entry.element}\u0000${entry.variant || ''}`,
-    'layout element'
+    validated.tables,
+    entry => `${entry.table}\u0000${entry.variant || ''}`,
+    'layout table'
   );
   validated.contexts.forEach(context => {
     if (
@@ -1600,7 +1598,7 @@ export const serializeProjectSettingsCatalog = (catalog: Object): string =>
 
 export const serializeProjectLayoutCatalog = (catalog: Object): string =>
   serializeCatalog(validateProjectLayoutCatalog(catalog), [
-    'elements',
+    'tables',
     'contexts',
     'effectTypes',
     'behaviorOverrideSchemas',

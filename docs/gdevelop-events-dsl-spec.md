@@ -360,7 +360,7 @@ game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.setti
 ```
 
 All identity, owner, function type, parameters, return type, ordering, and
-editor configuration live in `.settings` TOML. `.layout` Layout DSL is limited to
+editor configuration live in `.settings` TOML. `.layout` TOML is limited to
 visual/UI data. `.events` contains only DSL statements, DSL comments, typed
 metadata annotations, and typed exact catalog instructions defined in this
 document. Raw event or instruction JSON is forbidden.

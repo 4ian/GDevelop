@@ -11,10 +11,10 @@ import {
   parseLegacyEventsJson,
 } from '../../EventsSheet/IfDoEventsDsl';
 import {
-  LayoutDslError,
-  compileLayoutDsl,
-  decompileLayoutDsl,
-} from '../LayoutDsl';
+  LayoutTomlError,
+  compileLayoutToml,
+  decompileLayoutToml,
+} from '../LayoutToml';
 
 export const MULTI_FILE_FORMAT_VERSION = 1;
 export const MULTI_FILE_ENTRY_NAME = 'project.settings';
@@ -74,7 +74,7 @@ const PREFAB_LAYOUT_FIELDS = Object.freeze([
 ]);
 
 const EXTERNAL_LAYOUT_FIELDS = Object.freeze(['instances', 'editionSettings']);
-const LAYOUT_DSL_KIND_BY_FORMAT = Object.freeze({
+const LAYOUT_TOML_KIND_BY_FORMAT = Object.freeze({
   'gdevelop-scene-layout': 'scene',
   'gdevelop-prefab-layout': 'prefab',
   'gdevelop-prefab-variant-layout': 'prefab-variant',
@@ -103,7 +103,7 @@ const fail = (code: string, message: string, fileUri?: string): empty => {
   throw new MultiFileProjectError(code, message, fileUri);
 };
 
-const rethrowLayoutDslError = (error, fileUri): empty => {
+const rethrowLayoutTomlError = (error, fileUri): empty => {
   const wrapped = new MultiFileProjectError(error.code, error.message);
   wrapped.fileUri = fileUri;
   wrapped.line = error.line;
@@ -1508,19 +1508,19 @@ const putSettingsFile = (files, uri, namespace) => {
 
 const putLayoutFile = (files, uri, format, layout, semanticContext = {}) => {
   validateGameUri(uri);
-  const kind = LAYOUT_DSL_KIND_BY_FORMAT[format];
+  const kind = LAYOUT_TOML_KIND_BY_FORMAT[format];
   if (!kind)
     fail('MULTIFILE_INVALID_LAYOUT', `Unknown layout format ${format}.`, uri);
   try {
-    files[uri] = decompileLayoutDsl(layout, {
+    files[uri] = decompileLayoutToml(layout, {
       kind,
       fileUri: uri,
       ...semanticContext,
       usedInstanceUuids: new Set(),
     });
   } catch (error) {
-    if (error instanceof LayoutDslError) {
-      rethrowLayoutDslError(error, uri);
+    if (error instanceof LayoutTomlError) {
+      rethrowLayoutTomlError(error, uri);
     }
     throw error;
   }
@@ -2165,7 +2165,7 @@ const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
   const source = files[uri];
   if (source === undefined)
     fail('MULTIFILE_MISSING_FILE', 'Referenced layout file is missing.', uri);
-  const kind = LAYOUT_DSL_KIND_BY_FORMAT[expectedFormat];
+  const kind = LAYOUT_TOML_KIND_BY_FORMAT[expectedFormat];
   if (!kind)
     fail(
       'MULTIFILE_INVALID_LAYOUT',
@@ -2173,15 +2173,15 @@ const readLayout = (files, uri, expectedFormat, semanticContext = {}) => {
       uri
     );
   try {
-    return compileLayoutDsl(source, {
+    return compileLayoutToml(source, {
       kind,
       fileUri: uri,
       ...semanticContext,
       usedInstanceUuids: new Set(),
     });
   } catch (error) {
-    if (error instanceof LayoutDslError) {
-      rethrowLayoutDslError(error, uri);
+    if (error instanceof LayoutTomlError) {
+      rethrowLayoutTomlError(error, uri);
     }
     throw error;
   }
@@ -3725,8 +3725,8 @@ const normalizeFunctionEvents = functions =>
 
 const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
   // libGD can serialize an untouched custom-object variant editor settings
-  // value as an empty array. The Layout DSL has a structured editor settings
-  // block and therefore reconstructs the same empty value as an object. Both
+  // value as an empty array. Layout TOML has a structured editor settings
+  // table and therefore reconstructs the same empty value as an object. Both
   // representations mean that no editor settings are configured.
   if (
     !layout[editorField] ||

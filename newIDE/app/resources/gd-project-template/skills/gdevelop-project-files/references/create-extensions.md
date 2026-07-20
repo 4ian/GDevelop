@@ -12,12 +12,12 @@
 
 Use the narrowest reusable abstraction:
 
-| Need | Component |
-| --- | --- |
-| Shared project logic without per-object state | Extension-level function |
-| State and reusable logic attached to one object | Behavior |
-| Reusable composition with child object definitions and placed instances | Prefab |
-| A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
+| Need                                                                    | Component                         |
+| ----------------------------------------------------------------------- | --------------------------------- |
+| Shared project logic without per-object state                           | Extension-level function          |
+| State and reusable logic attached to one object                         | Behavior                          |
+| Reusable composition with child object definitions and placed instances | Prefab                            |
+| A reusable visual object that also owns stateful logic                  | Prefab plus one or more behaviors |
 
 Keep each child object definition and all of its behaviors in an individual
 `objects/<Object>.settings` file. Store its editor grouping in
@@ -54,7 +54,7 @@ files, and executable logic in `.events`.
    adds instruction types, re-read the regenerated catalog before writing or
    changing callers.
 10. Reload again after the final edit, then preview every public function,
-   prefab, and behavior path.
+    prefab, and behavior path.
 
 ## Complete source example
 
@@ -172,10 +172,10 @@ objectGroups = { }
 
 `Enemy.layout`:
 
-```layout
-<layout version=1>
-  <bounds min=0,0,0 max=64,64,64 />
-</layout>
+```toml
+[layout]
+version = 1
+bounds = { min = [0, 0, 0], max = [64, 64, 64] }
 ```
 
 `extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/function.settings`:
@@ -305,8 +305,8 @@ selection through child events and nested private behavior-function calls.
 ## Validate the extension
 
 1. Parse every changed settings TOML independently, mount it from its canonical
-   path, and verify the strict combined merge; compile every changed `.layout`
-   as Layout DSL version 1.
+   path, and verify the strict combined merge; parse and semantically compile
+   every changed `.layout` as flat layout TOML version 1.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
 4. Verify prefab layouts contain no object definitions or behaviors and that

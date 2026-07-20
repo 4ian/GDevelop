@@ -17,7 +17,7 @@ import {
   serializeStaticDataToToml,
   validateGameUri,
 } from './index';
-import { compileLayoutDsl } from '../LayoutDsl';
+import { compileLayoutToml } from '../LayoutToml';
 
 const standardEvent = () => ({
   type: 'BuiltinCommonInstructions::Standard',
@@ -212,7 +212,7 @@ describe('GDevelop multi-file project format', () => {
     expect(getLegacyProjectFirstDifferenceDescription(left, left)).toBeNull();
   });
 
-  test('round-trips every component kind through settings TOML, Layout DSL, and IfDo', () => {
+  test('round-trips every component kind through settings/layout TOML and IfDo', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture, {
       migration: {
         source: 'game://game.json',
@@ -559,14 +559,14 @@ column2 = "ssfssdfsf"
     };
     const files = decomposeLegacyProjectToFiles(project);
     const layoutSource = files['game://scenes/Main/Main.layout'];
-    const layoutDocument = compileLayoutDsl(layoutSource, {
+    const layoutDocument = compileLayoutToml(layoutSource, {
       kind: 'scene',
       objectNames: ['Player'],
     });
     const settingsDocument = parseTomlSource(
       files['game://scenes/Main/scene.settings']
     );
-    expect(layoutSource).toMatch(/^<layout version=1 background=/);
+    expect(layoutSource).toMatch(/^\[layout\]\nversion = 1\nbackground = /);
     expect(layoutDocument).not.toHaveProperty('objects');
     expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
     expect(layoutDocument).not.toHaveProperty('variables');
@@ -758,13 +758,13 @@ column2 = "ssfssdfsf"
     const objectSource = files['game://scenes/Main/objects/Player.settings'];
     const layoutSource = files['game://scenes/Main/Main.layout'];
     expect(objectSource).toContain('speed = 12');
-    expect(layoutSource).toContain('"speed":24');
+    expect(layoutSource).toContain('speed = 24');
     expect(objectSource).not.toContain('hiddenRuntimeValue');
     expect(objectSource).not.toContain('privateRuntimeValue');
     expect(layoutSource).not.toContain('hiddenRuntimeValue');
     expect(layoutSource).not.toContain('privateRuntimeValue');
     expect(objectSource).toContain('pluginOwnedValue = "kept"');
-    expect(layoutSource).toContain('"pluginOwnedValue":"instance-kept"');
+    expect(layoutSource).toContain('pluginOwnedValue = "instance-kept"');
 
     const composed = composeLegacyProjectFromFiles(files, options);
     expect(composed.layouts[0].objects[0].behaviors[0]).toEqual({
@@ -1095,7 +1095,7 @@ folderName = "__ROOT"
     };
     prefab.objectsGroups = [serializedObjectGroup('Parts', ['Body'])];
     const files = decomposeLegacyProjectToFiles(project);
-    const layoutDocument = compileLayoutDsl(
+    const layoutDocument = compileLayoutToml(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout'],
       { kind: 'prefab', objectNames: ['Body'] }
     );
@@ -1447,7 +1447,7 @@ objects = [ "Player" ]
     const files = decomposeLegacyProjectToFiles(project);
     expect(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
-    ).toContain('grid-size=16,24,32');
+    ).toContain('grid_size = [16, 24, 32]');
     expect(
       areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
     ).toBe(true);
@@ -1466,7 +1466,7 @@ objects = [ "Player" ]
 
     expect(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
-    ).toContain('grid-color=#9EB4FF');
+    ).toContain('grid_color = "#9EB4FF"');
     expect(
       output.eventsFunctionsExtensions[0].eventsBasedObjects[0].editionSettings
         .gridColor
@@ -1493,12 +1493,12 @@ objects = [ "Player" ]
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
-  test('rejects retired TOML layout sources without a compatibility path', () => {
+  test('rejects retired markup layout sources without a compatibility path', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     const layoutUri = 'game://scenes/Main/Main.layout';
-    files[layoutUri] = 'format = "gdevelop-scene-layout"\nformatVersion = 2\n';
+    files[layoutUri] = '<layout version=1 background=#000000></layout>\n';
     expect(() => composeLegacyProjectFromFiles(files)).toThrow(
-      expect.objectContaining({ code: 'LAYOUT_SYNTAX' })
+      expect.objectContaining({ code: 'LAYOUT_INVALID_TOML' })
     );
   });
 
@@ -1558,7 +1558,12 @@ objects = [ "Player" ]
   test('accepts Git-style CRLF line endings in every settings source', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     Object.keys(files).forEach(uri => {
-      if (!uri.endsWith('.settings') && !uri.endsWith('.toml')) return;
+      if (
+        !uri.endsWith('.settings') &&
+        !uri.endsWith('.toml') &&
+        !uri.endsWith('.layout')
+      )
+        return;
       files[uri] = files[uri].replace(/\n/g, '\r\n');
     });
 
@@ -1851,9 +1856,9 @@ objects = [ "Player" ]
     const objectInLayout = decomposeLegacyProjectToFiles(projectFixture);
     objectInLayout['game://scenes/Main/Main.layout'] = objectInLayout[
       'game://scenes/Main/Main.layout'
-    ].replace('</layout>', '  <objects />\n</layout>');
+    ].replace('background = ', 'objects = []\nbackground = ');
     expect(() => composeLegacyProjectFromFiles(objectInLayout)).toThrow(
-      expect.objectContaining({ code: 'LAYOUT_INVALID_CHILD' })
+      expect.objectContaining({ code: 'LAYOUT_UNKNOWN_FIELD' })
     );
 
     const duplicated = decomposeLegacyProjectToFiles(projectFixture);
@@ -1876,10 +1881,10 @@ objects = [ "Player" ]
     ).toThrow(MultiFileProjectError);
   });
 
-  test('round-trips canonical layout DSL through the multi-file project', () => {
+  test('round-trips canonical flat layout TOML through the multi-file project', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     expect(files['game://scenes/Main/Main.layout']).toMatch(
-      /^<layout version=1 background=/
+      /^\[layout\]\nversion = 1\nbackground = /
     );
     expect(
       areLegacyProjectsEquivalent(

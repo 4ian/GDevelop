@@ -243,6 +243,45 @@
       "expectedEventScript": ["group \"Empty group\":", "  pass"]
     },
     {
+      "name": "unicode identifiers (objects, variables, iterators) are preserved",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "Héros",
+          "conditions": [],
+          "actions": [
+            { "type": { "value": "Delete" }, "parameters": ["Héros", ""] }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "variables": [
+            { "name": "Vitesse_éclair", "type": "number", "value": "3" }
+          ],
+          "conditions": [],
+          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "Inventaire",
+          "valueIteratorVariableName": "Objet",
+          "keyIteratorVariableName": "",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "expectedEventScript": [
+        "for each Héros:",
+        "  Delete(Héros)",
+        "always:",
+        "  local number Vitesse_éclair = 3",
+        "  Wait(1)",
+        "for each child in Inventaire value Objet:",
+        "  pass"
+      ]
+    },
+    {
       "name": "unknown instruction and non-representable event",
       "parsesBack": true,
       "serializedEvents": [

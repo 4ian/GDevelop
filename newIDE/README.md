@@ -46,7 +46,7 @@ npm run start # or yarn start
 
 There is a script file that automates cloning this repository, building the IDE and running it:
 
--   For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned, then simply run it.
+- For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GDevelop to be cloned, then simply run it.
 
 ### Development of UI components
 
@@ -94,8 +94,8 @@ Any text editor is fine, but it's a good idea to have one with _Prettier_ (code 
 
 Cloud storage providers are set up with development keys when you're running GDevelop in development mode. For these, to work, you must execute the web-app not from the traditional `http://localhost:3000` origin, but from `http://gdevelop-app-local.com:3000`:
 
--   Set up a [redirection in your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), that should look like: `127.0.0.1 gdevelop-app-local.com`.
--   Launch the web app from `http://gdevelop-app-local.com:3000`.
+- Set up a [redirection in your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), that should look like: `127.0.0.1 gdevelop-app-local.com`.
+- Launch the web app from `http://gdevelop-app-local.com:3000`.
 
 > This is only necessary if you want to have cloud storage providers working in development. If not done, GDevelop will simply display an error while trying to use them.
 
@@ -140,31 +140,8 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 
-Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
-
-For `EXPORT_HTML5_EXTERNAL`, use `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors`
-to explicitly force whether the export should fail when the project has diagnostic errors
-(instead of relying on the persisted, cross-project `blockPreviewAndExportOnDiagnosticErrors`
-preference, or on the project's `gdevelop-settings.yaml`, which is applied asynchronously and
-may not have been applied yet when the command starts). This is handy to enable strict
-checking for release builds while keeping it disabled for local/dev builds:
-
-```bash
-# Release build: fail the export if the project has diagnostic errors.
-./gdevelop --no-sandbox --disable-update-check --block-on-diagnostic-errors \
-  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
-
-# Dev build: never block the export, regardless of preferences/settings.
-./gdevelop --no-sandbox --disable-update-check --no-block-on-diagnostic-errors \
-  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
-```
-
-If neither flag is passed, the existing preference-based behavior is used unchanged.
-
-If both `--block-on-diagnostic-errors` and `--no-block-on-diagnostic-errors` are passed at the
-same time, only the one appearing **last** on the command line wins (a warning is logged to
-help spot this if it happens by accident, e.g. because of conflicting flags coming from a
-template/CI matrix) - avoid passing both.
+Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
+             `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
 
 ### Making the CLI available on PATH
 
@@ -221,12 +198,12 @@ yarn compile-translations # or npm run compile-translations
 
 The editor, the game engine and extensions are always in development. Your contribution is welcome!
 
--   Check [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+- Check [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
 
-    You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
+  You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
--   Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
+- Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
 
--   To submit your changes, you have to first create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+- To submit your changes, you have to first create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
--   Finally, make sure that the tests pass (refer to this README and the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS) for learning how to run tests).
+- Finally, make sure that the tests pass (refer to this README and the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS) for learning how to run tests).

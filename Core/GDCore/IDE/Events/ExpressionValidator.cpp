@@ -190,7 +190,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
                               isUndeclaredVariableFatal);
         if (variable.HasChild(childIdentifierName)) {
           ValidateLastChildVariable(variable.GetChild(childIdentifierName),
-                                    identifierNameLocation);
+                                    childIdentifierNameLocation);
         }
         return true; // We found a variable.
       }

@@ -230,11 +230,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           const auto &variable =
               projectScopedContainers.GetVariablesContainersList().Get(
                   node.name);
-          if (node.child) {
-            parentVariable = &variable;
-          } else {
-            ValidateLastChildVariable(variable, node.location);
-          }
+          parentVariable = &variable;
         }
         node.child->Visit(*this);
       }

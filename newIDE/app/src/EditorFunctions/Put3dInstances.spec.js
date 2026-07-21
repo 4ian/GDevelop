@@ -105,7 +105,7 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Resized 1 instance to 50x60x70.')
+      expect.stringContaining('Resized 1 instance of "Cube" to 50x60x70.')
     );
     const [resized] = getInstances(testScene);
     expect(resized.hasCustomSize).toBe(true);
@@ -134,7 +134,9 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Rotated 1 instance to (15°, 30°, 45°).')
+      expect.stringContaining(
+        'Rotated 1 instance of "Cube" to (15°, 30°, 45°).'
+      )
     );
     const [rotated] = getInstances(testScene);
     expect(rotated.rotationX).toBe(15);
@@ -157,7 +159,9 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Repositioned 1 instance using point brush.')
+      expect.stringContaining(
+        'Repositioned 1 instance of "Cube" using point brush.'
+      )
     );
     // No new instance is created; the existing one is repositioned.
     const instances = getInstances(testScene);
@@ -184,7 +188,9 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Moved 1 instance to layer "Foreground".')
+      expect.stringContaining(
+        'Moved 1 instance of "Cube" to layer "Foreground".'
+      )
     );
     const [moved] = getInstances(testScene);
     expect(moved.layer).toBe('Foreground');
@@ -192,6 +198,100 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     expect(moved.x).toBe(10);
     expect(moved.y).toBe(20);
     expect(moved.z).toBe(30);
+  });
+
+  // A trailing comma used to leave an empty id in the list, and
+  // `uuid.startsWith('')` matches every instance: erasing "abc," would wipe
+  // the whole scene instead of the single targeted instance.
+  it('ignores empty entries in existing_instance_ids instead of matching every instance', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '10,20,30',
+      new_instances_count: 2,
+    });
+    const [first, second] = getInstances(testScene);
+
+    const result = await putInstances({
+      brush_kind: 'erase',
+      existing_instance_ids: `${first.id},`,
+    });
+
+    expect(result.message).toEqual(
+      expect.stringContaining('Erased 1 instance')
+    );
+    // Only the targeted instance was erased, not the whole scene.
+    const remaining = getInstances(testScene);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe(second.id);
+  });
+
+  // An instance created without an object name would be a corrupted, invisible
+  // orphan: the call must fail instead of creating it and reporting a success.
+  it('fails to create instances when object_name is missing', async () => {
+    const result = await editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        layer_name: '',
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: 1,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Cannot create 1 new instance(s) without `object_name`.'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  // Without a radius, the random brush would silently stack every instance
+  // at the exact brush position.
+  it('fails when using the random_in_sphere brush without a brush_size', async () => {
+    const result = await editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Cube',
+        layer_name: '',
+        brush_kind: 'random_in_sphere',
+        brush_position: '10,20,30',
+        new_instances_count: 3,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'The "random_in_sphere" brush requires a positive `brush_size`'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  it('fails on a negative new_instances_count', async () => {
+    const result = await editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Cube',
+        layer_name: '',
+        brush_kind: 'point',
+        brush_position: '10,20,30',
+        new_instances_count: -1,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        '`new_instances_count` must be 0 or a positive integer (got -1).'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
   });
 
   // Matching instances with the none brush but not asking for any change is a

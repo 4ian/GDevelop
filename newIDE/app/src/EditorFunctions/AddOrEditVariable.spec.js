@@ -58,6 +58,77 @@ describe('add_or_edit_variable', () => {
     expect(variable.getBool()).toBe(true);
   });
 
+  // A malformed path used to throw out of the whole call, losing the report
+  // of the variables already applied earlier in the batch.
+  it('applies the valid items of a batch and warns about the malformed ones', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.add_or_edit_variable.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_scope: 'global',
+          variables: [
+            { variable_name_or_path: 'score', value: '100' },
+            // Malformed array index: this item alone must fail.
+            { variable_name_or_path: 'items[x]', value: '1' },
+            { variable_name_or_path: 'playerName', value: 'Alex' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(
+      expect.stringContaining('Added global variable "score" (Number) = 100')
+    );
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Added global variable "playerName" (String) = Alex'
+      )
+    );
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Could not change global variable "items[x]": Content of the index is invalid ("x") - it should be a number.'
+      )
+    );
+    // Both valid items were really applied, the malformed one was not.
+    expect(
+      project
+        .getVariables()
+        .get('score')
+        .getValue()
+    ).toBe(100);
+    expect(
+      project
+        .getVariables()
+        .get('playerName')
+        .getString()
+    ).toBe('Alex');
+    expect(project.getVariables().has('items')).toBe(false);
+  });
+
+  it('warns (and stores nothing) when a forced number has a non-numeric value', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.add_or_edit_variable.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          variable_name_or_path: 'score',
+          variable_scope: 'global',
+          value: 'lots',
+          variable_type: 'number',
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Could not change global variable "score": Value "lots" is not a valid number'
+      )
+    );
+    // No NaN variable was created.
+    expect(project.getVariables().has('score')).toBe(false);
+  });
+
   it('fails on an invalid variable_scope', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.add_or_edit_variable.launchFunction(
       {

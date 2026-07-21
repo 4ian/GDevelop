@@ -56,6 +56,106 @@ describe('change_project_properties_resources', () => {
     expect(project.getPackageName()).toBe('com.janedoe.game');
   });
 
+  // The backend tool description documents an empty `firstLayout` as valid:
+  // it means "the first scene of the project".
+  it('resets firstLayout with an empty value', async () => {
+    project.setFirstLayout('TestScene');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          changed_properties: [{ property_name: 'firstLayout', new_value: '' }],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain(
+      'Reset firstLayout: the first scene of the project will be loaded when the game starts.'
+    );
+    expect(project.getFirstLayout()).toBe('');
+  });
+
+  it('rejects a non-boolean value for pixelsRounding instead of silently storing false', async () => {
+    project.setPixelsRounding(true);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          changed_properties: [
+            { property_name: 'pixelsRounding', new_value: 'yes' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain(
+      'Invalid pixelsRounding: "yes". Must be "true" or "false". Skipped.'
+    );
+    expect(project.getPixelsRounding()).toBe(true);
+  });
+
+  it('rejects a non-boolean value for adaptGameResolutionAtRuntime', async () => {
+    project.setAdaptGameResolutionAtRuntime(true);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          changed_properties: [
+            { property_name: 'adaptGameResolutionAtRuntime', new_value: '1' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain(
+      'Invalid adaptGameResolutionAtRuntime: "1". Must be "true" or "false". Skipped.'
+    );
+    expect(project.getAdaptGameResolutionAtRuntime()).toBe(true);
+  });
+
+  // The objects scan alone would miss this usage: a sound only referenced by
+  // a "Play sound" action must still block the deletion.
+  it('refuses to delete a resource used only in events', async () => {
+    addProjectResources();
+    const scene = project.getLayout('TestScene');
+    const event = new gd.StandardEvent();
+    const action = new gd.Instruction();
+    action.setType('PlaySound');
+    action.setParametersCount(5);
+    action.setParameter(0, ''); // The runtime scene passed as parameter.
+    action.setParameter(1, 'jump.aac');
+    action.setParameter(2, 'no');
+    action.setParameter(3, '100');
+    action.setParameter(4, '1');
+    event.getActions().insert(action, 0);
+    scene.getEvents().insertEvent(event, 0);
+    action.delete();
+    event.delete();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          changed_resources: [
+            { resource_name: 'jump.aac', delete_this_resource: true },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain(
+      'Resource "jump.aac" was NOT deleted because it is still used by the project'
+    );
+    expect(project.getResourcesManager().hasResource('jump.aac')).toBe(true);
+  });
+
   it('fails when an invalid orientation is the only requested change', async () => {
     const initialOrientation = project.getOrientation();
 

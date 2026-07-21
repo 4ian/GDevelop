@@ -1,6 +1,10 @@
 // @flow
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { editorFunctions, type EditorFunctionGenericOutput } from './index';
+import {
+  editorFunctions,
+  type EditorFunctionGenericOutput,
+  type RenderForEditorOptions,
+} from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
 
 const gd: libGDevelop = global.gd;
@@ -19,6 +23,35 @@ describe('add_behavior', () => {
 
   afterEach(() => {
     project.delete();
+  });
+
+  // The early returns of renderForEditor (no project, unknown behavior type)
+  // used to crash on a variable read before its declaration.
+  it('renders a description even without a project or with an unknown behavior type', () => {
+    const { editorCallbacks } = makeFakeLaunchFunctionOptionsWithProject(
+      project
+    );
+    const args = {
+      scene_name: 'TestScene',
+      object_name: 'MySprite',
+      behavior_type: 'Bogus::NopeBehavior',
+    };
+
+    const { renderForEditor } = editorFunctions.add_behavior;
+    if (!renderForEditor) throw new Error('renderForEditor is not defined.');
+    const makeOptions = (
+      projectOrNull: ?gdProject
+    ): RenderForEditorOptions => ({
+      project: projectOrNull,
+      args,
+      editorCallbacks,
+      shouldShowDetails: false,
+      editorFunctionCallResultOutput: null,
+      exampleShortHeaders: null,
+    });
+
+    expect(renderForEditor(makeOptions(null)).text).toBeTruthy();
+    expect(renderForEditor(makeOptions(project)).text).toBeTruthy();
   });
 
   it('fails when the behavior type does not exist', async () => {

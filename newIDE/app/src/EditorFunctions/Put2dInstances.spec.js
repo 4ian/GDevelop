@@ -87,7 +87,7 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Moved 1 instance to layer "UI".')
+      expect.stringContaining('Moved 1 instance of "Player" to layer "UI".')
     );
     const [moved] = getInstances(testScene);
     expect(moved.layer).toBe('UI');
@@ -112,7 +112,9 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Changed Z-order of 1 instance to 42.')
+      expect.stringContaining(
+        'Changed Z-order of 1 instance of "Player" to 42.'
+      )
     );
     const [modified] = getInstances(testScene);
     expect(modified.zOrder).toBe(42);
@@ -188,6 +190,134 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     expect(getInstances(testScene)).toHaveLength(1);
   });
 
+  // A trailing comma used to leave an empty id in the list, and
+  // `uuid.startsWith('')` matches every instance: erasing "abc," would wipe
+  // the whole scene instead of the single targeted instance.
+  it('ignores empty entries in existing_instance_ids instead of matching every instance', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 2,
+    });
+    const [first, second] = getInstances(testScene);
+
+    const result = await putInstances({
+      brush_kind: 'erase',
+      existing_instance_ids: `${first.id},`,
+    });
+
+    expect(result.message).toEqual(
+      expect.stringContaining('Erased 1 instance')
+    );
+    // Only the targeted instance was erased, not the whole scene.
+    const remaining = getInstances(testScene);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe(second.id);
+  });
+
+  it('accepts spaces after the commas in existing_instance_ids', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 2,
+    });
+    const [first, second] = getInstances(testScene);
+
+    const result = await putInstances({
+      brush_kind: 'erase',
+      existing_instance_ids: `${first.id}, ${second.id}`,
+    });
+
+    expect(result.message).toEqual(
+      expect.stringContaining('Erased 2 instances')
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  // An instance created without an object name would be a corrupted, invisible
+  // orphan: the call must fail instead of creating it and reporting a success.
+  it('fails to create instances when object_name is missing', async () => {
+    const result = await editorFunctions.put_2d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        layer_name: '',
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: 2,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'Cannot create 2 new instance(s) without `object_name`.'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  // Without a radius, the random brush would silently stack every instance
+  // at the exact brush position.
+  it('fails when using the random_in_circle brush without a brush_size', async () => {
+    const result = await editorFunctions.put_2d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Player',
+        layer_name: '',
+        brush_kind: 'random_in_circle',
+        brush_position: '100,200',
+        new_instances_count: 3,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        'The "random_in_circle" brush requires a positive `brush_size`'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  it('fails on a negative new_instances_count', async () => {
+    const result = await editorFunctions.put_2d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Player',
+        layer_name: '',
+        brush_kind: 'point',
+        brush_position: '100,200',
+        new_instances_count: -3,
+      },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.message).toEqual(
+      expect.stringContaining(
+        '`new_instances_count` must be 0 or a positive integer (got -3).'
+      )
+    );
+    expect(getInstances(testScene)).toHaveLength(0);
+  });
+
+  // The creation loop runs a whole number of times: a fractional count must
+  // be normalized so the reported count matches what was created.
+  it('rounds a fractional new_instances_count', async () => {
+    const result = await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 2.4,
+    });
+
+    expect(result.message).toEqual(
+      expect.stringContaining('Created 2 new instances')
+    );
+    expect(getInstances(testScene)).toHaveLength(2);
+  });
+
   it('moves existing instances along a line with the line brush', async () => {
     await putInstances({
       brush_kind: 'point',
@@ -205,7 +335,9 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     });
 
     expect(result.message).toEqual(
-      expect.stringContaining('Repositioned 2 instances using line brush.')
+      expect.stringContaining(
+        'Repositioned 2 instances of "Player" using line brush.'
+      )
     );
     // No new instance is created; the 2 existing ones are spread on the line.
     const positions = getInstances(testScene)

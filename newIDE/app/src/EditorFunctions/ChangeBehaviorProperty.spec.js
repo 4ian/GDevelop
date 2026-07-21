@@ -32,6 +32,45 @@ describe('change_behavior_property (property warnings and shared properties)', (
     project.delete();
   });
 
+  // The live deletion path (delete_this_behavior) on a group — the legacy
+  // remove_behavior tool is no longer offered to the AI since toolsVersion v6.
+  it('deletes a behavior from every object of a group with delete_this_behavior', async () => {
+    const testSceneObjects = testScene.getObjects();
+    const enemy1 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Enemy1',
+      testSceneObjects.getObjectsCount()
+    );
+    const enemy2 = testSceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Enemy2',
+      testSceneObjects.getObjectsCount()
+    );
+    enemy1.addNewBehavior(project, 'FakeBehavior::FakeBehavior', 'MyBehavior');
+    enemy2.addNewBehavior(project, 'FakeBehavior::FakeBehavior', 'MyBehavior');
+    const group = testSceneObjects.getObjectGroups().insertNew('Enemies', 0);
+    group.addObject('Enemy1');
+    group.addObject('Enemy2');
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Enemies',
+          behavior_name: 'MyBehavior',
+          delete_this_behavior: true,
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(enemy1.hasBehaviorNamed('MyBehavior')).toBe(false);
+    expect(enemy2.hasBehaviorNamed('MyBehavior')).toBe(false);
+  });
+
   it('fails listing the available property names when the property does not exist', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.change_behavior_property.launchFunction(
       {

@@ -5,6 +5,8 @@ import {
   editorFunctions,
   noEventsInSceneText,
   type EditorFunctionGenericOutput,
+  type ResourceSearchAndInstallOptions,
+  type ResourceSearchAndInstallResult,
 } from './index';
 import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
 

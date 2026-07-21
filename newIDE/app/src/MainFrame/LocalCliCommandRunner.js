@@ -55,9 +55,19 @@ const getCommandArgs = (): Array<string> => {
   return values.map(value => value.trim()).filter(Boolean);
 };
 
+export const shouldBlockOnDiagnosticErrorsForCli = (
+  preferences: Preferences
+): boolean => {
+  const appArguments = Window.getArguments();
+  const cliOverride = appArguments['block-on-diagnostic-errors'];
+  if (typeof cliOverride === 'boolean') return cliOverride;
+
+  return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
+};
+
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
-    if (preferences.getBlockPreviewAndExportOnDiagnosticErrors()) {
+    if (shouldBlockOnDiagnosticErrorsForCli(preferences)) {
       const errors = scanProjectForValidationErrors(project);
       if (errors.length > 0) {
         console.error(
@@ -154,6 +164,7 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   saveProject: SaveProject,
+  ensureProjectSettingsApplied: () => Promise<void>,
 |};
 
 export const useCliCommandRunner = ({
@@ -164,6 +175,7 @@ export const useCliCommandRunner = ({
   onWillInstallExtension,
   onExtensionInstalled,
   saveProject,
+  ensureProjectSettingsApplied,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -195,6 +207,8 @@ export const useCliCommandRunner = ({
             if (!keepOpen) exitApp(1);
             return;
           }
+
+          await ensureProjectSettingsApplied();
 
           const awaitableRunner = getAwaitableCliRunner(commandName);
           if (awaitableRunner) {
@@ -248,6 +262,7 @@ export const useCliCommandRunner = ({
       onWillInstallExtension,
       onExtensionInstalled,
       saveProject,
+      ensureProjectSettingsApplied,
     ]
   );
 

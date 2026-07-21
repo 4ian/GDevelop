@@ -46,18 +46,21 @@ namespace gdjs {
             this._light.shadow.camera.updateProjectionMatrix();
           }
 
-          private _updateShadowCamera(): void {
+          private _updateShadowCamera(scene: gdjs.RuntimeScene): void {
             if (!this._shadowCameraDirty) {
               return;
             }
             this._shadowCameraDirty = false;
 
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+            const frustumSize = this._frustumSize * inverseWorldScale;
+
             this._light.shadow.camera.near = 1;
             this._light.shadow.camera.far = this._distanceFromCamera + 10000;
-            this._light.shadow.camera.right = this._frustumSize / 2;
-            this._light.shadow.camera.left = -this._frustumSize / 2;
-            this._light.shadow.camera.top = this._frustumSize / 2;
-            this._light.shadow.camera.bottom = -this._frustumSize / 2;
+            this._light.shadow.camera.right = frustumSize / 2;
+            this._light.shadow.camera.left = -frustumSize / 2;
+            this._light.shadow.camera.top = frustumSize / 2;
+            this._light.shadow.camera.bottom = -frustumSize / 2;
           }
 
           private _updateShadowMapSize(): void {
@@ -124,8 +127,11 @@ namespace gdjs {
             return true;
           }
           updatePreRender(target: gdjs.EffectsTarget): any {
+            const scene = target.getRuntimeScene().getScene();
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
+
             // Apply any update to the camera or shadow map size.
-            this._updateShadowCamera();
+            this._updateShadowCamera(scene);
             this._updateShadowMapSize();
 
             // Avoid shadow acne due to depth buffer precision.
@@ -135,7 +141,8 @@ namespace gdjs {
                 : this._shadowMapSize < 2048
                   ? 1.25
                   : 1;
-            this._light.shadow.bias = -this._minimumShadowBias * biasMultiplier;
+            this._light.shadow.bias =
+              -this._minimumShadowBias * biasMultiplier * inverseWorldScale;
 
             // Apply update to the light position and its target.
             // By doing this, the shadows are "following" the GDevelop camera.
@@ -183,8 +190,16 @@ namespace gdjs {
                 this._distanceFromCamera *
                   Math.sin(gdjs.toRad(this._elevation));
 
-              this._light.position.set(posLightX, posLightY, posLightZ);
-              this._light.target.position.set(roundedX, roundedY, roundedZ);
+              this._light.position.set(
+                posLightX * inverseWorldScale,
+                posLightY * inverseWorldScale,
+                posLightZ * inverseWorldScale
+              );
+              this._light.target.position.set(
+                roundedX * inverseWorldScale,
+                roundedY * inverseWorldScale,
+                roundedZ * inverseWorldScale
+              );
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {

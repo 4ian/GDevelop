@@ -59,11 +59,8 @@ namespace gdjs {
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
-            const scene = target.get3DRendererObject() as
-              | THREE.Scene
-              | null
-              | undefined;
-            const inverseWorldScale = scene ? scene.scale.x : 1;
+            const scene = target.getRuntimeScene().getScene();
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
             if (parameterName === 'near') {
               this.fog.near = value * inverseWorldScale;
             } else if (parameterName === 'far') {
@@ -71,15 +68,12 @@ namespace gdjs {
             }
           }
           getDoubleParameter(parameterName: string): number {
-            const scene = target.get3DRendererObject() as
-              | THREE.Scene
-              | null
-              | undefined;
-            const inverseWorldScale = scene ? scene.scale.x : 1;
+            const scene = target.getRuntimeScene().getScene();
+            const worldScale = scene.getRenderer3DWorldScale();
             if (parameterName === 'near') {
-              return this.fog.near / inverseWorldScale;
+              return this.fog.near * worldScale;
             } else if (parameterName === 'far') {
-              return this.fog.far / inverseWorldScale;
+              return this.fog.far * worldScale;
             }
             return 0;
           }

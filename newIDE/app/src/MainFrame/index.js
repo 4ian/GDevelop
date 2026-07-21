@@ -1220,7 +1220,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         // is able to save. Otherwise, it means nothing to consider this as
         // a recent file: we must wait for the user to save in a "real" storage
         // (like locally or on Google Drive).
-        if (onSaveProject) {
+        // Also skip this when running a headless CLI command (`--run-command`):
+        // such projects are opened programmatically (e.g. for automated exports)
+        // and shouldn't pollute the "recent projects" list shown in the regular UI.
+        if (onSaveProject && !Window.isRunningCommandFromCli()) {
           preferences.insertRecentProjectFile({
             fileMetadata: updatedFileMetadata,
             storageProviderName: storageProvider.internalName,

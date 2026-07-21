@@ -122,10 +122,10 @@ const exitApp = (exitCode: number) => {
   if (ipcRenderer) ipcRenderer.send('app-exit', exitCode);
 };
 
-// Must match electron-app/app/main.js normalizeProjectPath (IPC routing).
-const normalizeProjectPath = (filePath: ?string): ?string => {
-  if (!filePath || !path) return null;
-  const resolved = path.resolve(filePath);
+// Must match electron-app/app/OpenProjectsRegistry.js normalizeFileIdentifier (IPC routing).
+const normalizeFileIdentifier = (fileIdentifier: ?string): ?string => {
+  if (!fileIdentifier || !path) return null;
+  const resolved = path.resolve(fileIdentifier);
   return process && process.platform === 'win32'
     ? resolved.toLowerCase()
     : resolved;
@@ -134,7 +134,7 @@ const normalizeProjectPath = (filePath: ?string): ?string => {
 type RunCliCommandIpcPayload = {|
   commandName: string,
   commandArgs: string | Array<string> | void,
-  projectPath: ?string,
+  fileIdentifier: ?string,
 |};
 
 const ensureProjectExtensionsReadyForCli = async (
@@ -324,14 +324,18 @@ export const useCliCommandRunner = ({
 
       const onRunCliCommand = (
         event: any,
-        { commandName, commandArgs, projectPath }: RunCliCommandIpcPayload
+        {
+          commandName,
+          commandArgs,
+          fileIdentifier: routedFileIdentifier,
+        }: RunCliCommandIpcPayload
       ) => {
         if (
-          normalizeProjectPath(projectPath) !==
-          normalizeProjectPath(fileIdentifier)
+          normalizeFileIdentifier(routedFileIdentifier) !==
+          normalizeFileIdentifier(fileIdentifier)
         ) {
           console.error(
-            `[CLI] Command "${commandName}" was routed to this window for "${projectPath ||
+            `[CLI] Command "${commandName}" was routed to this window for "${routedFileIdentifier ||
               ''}", but it now has "${fileIdentifier || ''}" open. Ignoring.`
           );
           return;

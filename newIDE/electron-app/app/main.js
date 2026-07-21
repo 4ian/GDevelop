@@ -7,7 +7,6 @@ const BrowserWindow = electron.BrowserWindow; // Module to create native browser
 const Menu = electron.Menu;
 const Notification = electron.Notification;
 const protocol = electron.protocol;
-const parseArgs = require('minimist');
 const isDev = require('electron-is-dev');
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
@@ -47,6 +46,16 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { installCliInPath } = require('./InstallCliInPath');
+const {
+  setWindowFileIdentifier,
+  clearWindowFileIdentifier,
+} = require('./OpenProjectsRegistry');
+const {
+  parseGDevelopArgs,
+  parseSecondInstanceArgs,
+  isCliProjectAlreadyOpenElsewhere,
+  routeCliCommandToLiveEditor,
+} = require('./CliCommandHandoff');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -67,76 +76,6 @@ let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
 
-// open-projects.json in userData: separate CLI processes read this to find live editors.
-const windowProjectPaths = new Map();
-const openProjectsRegistryPath = path.join(
-  app.getPath('userData'),
-  'open-projects.json'
-);
-
-const normalizeProjectPath = filePath => {
-  if (!filePath) return null;
-  try {
-    const resolved = path.resolve(filePath);
-    return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
-  } catch (e) {
-    return null;
-  }
-};
-
-const writeOpenProjectsRegistry = () => {
-  try {
-    const projectPaths = Array.from(new Set(windowProjectPaths.values()));
-    fs.writeFileSync(openProjectsRegistryPath, JSON.stringify(projectPaths));
-  } catch (e) {}
-};
-
-const readOpenProjectsRegistry = () => {
-  try {
-    const projectPaths = JSON.parse(
-      fs.readFileSync(openProjectsRegistryPath, 'utf8')
-    );
-    return Array.isArray(projectPaths) ? projectPaths : [];
-  } catch (e) {
-    return [];
-  }
-};
-
-const setWindowProjectPath = (windowId, filePath) => {
-  const normalized = normalizeProjectPath(filePath);
-  if (normalized) windowProjectPaths.set(windowId, normalized);
-  else windowProjectPaths.delete(windowId);
-  writeOpenProjectsRegistry();
-};
-
-const clearWindowProjectPath = windowId => {
-  if (windowProjectPaths.delete(windowId)) writeOpenProjectsRegistry();
-};
-
-// Parse arguments (knowing that in dev, we run electron with an argument,
-// so have to ignore one more).
-const argsParserOptions = {
-  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command', 'cmd-args'],
-};
-
-// Drop switches Chromium may inject into argv (e.g. --allow-file-access-from-files)
-// so they can't steal the value of our own -- flags during parsing.
-const knownCliFlagNames = new Set(
-  [...argsParserOptions.boolean, ...argsParserOptions.string].filter(
-    name => name !== '_'
-  )
-);
-const parseGDevelopArgs = argv =>
-  parseArgs(
-    argv.filter(
-      arg =>
-        !arg.startsWith('--') ||
-        knownCliFlagNames.has(arg.slice(2).split('=')[0])
-    ),
-    argsParserOptions
-  );
-
 const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
 
 const devTools = !!args['dev-tools'];
@@ -155,13 +94,8 @@ if (process.platform === 'win32') {
 // CLI: skip the lock unless the target project is a known open window (registry hit);
 // a stale registry entry falls back to running headless in this process.
 const isCliRunCommand = !!args['run-command'];
-const cliProjectPath = isCliRunCommand
-  ? normalizeProjectPath(args._[0])
-  : null;
-const isCliProjectAlreadyOpenElsewhere =
-  !!cliProjectPath && readOpenProjectsRegistry().includes(cliProjectPath);
 const gotTheLock =
-  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere
+  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere(args)
     ? true
     : app.requestSingleInstanceLock({ args });
 
@@ -170,31 +104,14 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
-    // Prefer the args parsed by the second instance: Chromium reorders commandLine
-    // (switches first, values last), breaking flag-to-value pairing on reparse.
-    const secondInstanceArgs =
-      additionalData && additionalData.args
-        ? additionalData.args
-        : parseGDevelopArgs(commandLine.slice(isDev ? 2 : 1));
+    const secondInstanceArgs = parseSecondInstanceArgs({
+      commandLine,
+      additionalData,
+      isDev,
+    });
 
-    const secondInstanceCommandName = secondInstanceArgs['run-command'];
-    if (secondInstanceCommandName) {
-      const secondInstanceProjectPath = normalizeProjectPath(
-        secondInstanceArgs._[0]
-      );
-      const targetWindow = Array.from(mainWindows).find(
-        window => windowProjectPaths.get(window.id) === secondInstanceProjectPath
-      );
-
-      if (targetWindow) {
-        targetWindow.webContents.send('run-cli-command', {
-          commandName: secondInstanceCommandName,
-          commandArgs: secondInstanceArgs['cmd-args'],
-          projectPath: secondInstanceProjectPath,
-        });
-        targetWindow.focus();
-        return;
-      }
+    if (routeCliCommandToLiveEditor({ parsedArgs: secondInstanceArgs, mainWindows })) {
+      return;
     }
 
     // Update the global args so the new window's renderer (which reads them
@@ -363,7 +280,7 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
-    clearWindowProjectPath(windowId);
+    clearWindowFileIdentifier(windowId);
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -520,9 +437,9 @@ app.on('ready', function() {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
   });
 
-  ipcMain.on('set-window-project-path', (event, filePath) => {
+  ipcMain.on('set-window-project-path', (event, fileIdentifier) => {
     const window = BrowserWindow.fromWebContents(event.sender);
-    if (window) setWindowProjectPath(window.id, filePath);
+    if (window) setWindowFileIdentifier(window.id, fileIdentifier);
   });
 
   ipcMain.handle('install-cli-in-path', async () => {

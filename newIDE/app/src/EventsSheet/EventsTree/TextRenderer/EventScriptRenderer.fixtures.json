@@ -1,0 +1,271 @@
+{
+  "note": "Conformance fixtures shared between the backend EventScript serializer (events-script-serializer.js in GDevelop-services) and the editor-side renderer (EventScriptRenderer.js in the GDevelop repository). The SAME serialized events must render to the SAME EventScript on both sides. Keep this file byte-identical with its copy: newIDE/app/src/EventsSheet/EventsTree/TextRenderer/EventScriptRenderer.fixtures.json (GDevelop repository).",
+  "fixtures": [
+    {
+      "name": "hidden parameters, trigger once and a sub-event",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": { "value": "Timer" },
+              "parameters": ["", "2", "\"SpawnTimer\""]
+            },
+            {
+              "type": { "value": "BuiltinCommonInstructions::Once" },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": { "value": "ResetTimer" },
+              "parameters": ["", "\"SpawnTimer\""]
+            },
+            {
+              "type": { "value": "CentreCamera" },
+              "parameters": ["", "MySpriteObject", "", "", ""]
+            }
+          ],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": { "value": "PlatformBehavior::IsFalling" },
+                  "parameters": ["MySpriteObject", "PlatformerObject"]
+                }
+              ],
+              "actions": [
+                {
+                  "type": { "value": "Delete" },
+                  "parameters": ["MySpriteObject", ""]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expectedEventScript": [
+        "if Timer(2, \"SpawnTimer\") and once:",
+        "  ResetTimer(\"SpawnTimer\")",
+        "  CentreCamera(MySpriteObject)",
+        "  if PlatformBehavior::IsFalling(MySpriteObject, PlatformerObject):",
+        "    Delete(MySpriteObject)"
+      ]
+    },
+    {
+      "name": "inverted conditions and or",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "PlatformBehavior::IsFalling",
+                "inverted": true
+              },
+              "parameters": ["MySpriteObject", "PlatformerObject"]
+            },
+            {
+              "type": { "value": "BuiltinCommonInstructions::Or" },
+              "parameters": [],
+              "subInstructions": [
+                { "type": { "value": "DepartScene" }, "parameters": [""] },
+                {
+                  "type": { "value": "Timer", "inverted": true },
+                  "parameters": ["", "2", "\"T\""]
+                }
+              ]
+            }
+          ],
+          "actions": []
+        }
+      ],
+      "expectedEventScript": [
+        "if not PlatformBehavior::IsFalling(MySpriteObject, PlatformerObject) and Or(DepartScene(), not Timer(2, \"T\")):",
+        "  pass"
+      ]
+    },
+    {
+      "name": "comments, local variables, else, loops, group and disabled events",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Comment",
+          "comment": "Setup\nwith a second line"
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "variables": [
+            { "name": "Count", "type": "number", "value": "3" },
+            { "name": "Title", "type": "string", "value": "Hello \"world\"" }
+          ],
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Else",
+          "conditions": [
+            { "type": { "value": "DepartScene" }, "parameters": [""] }
+          ],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "MySpriteObject",
+          "conditions": [],
+          "actions": [
+            {
+              "type": { "value": "Delete" },
+              "parameters": ["MySpriteObject", ""]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Repeat",
+          "repeatExpression": "4 + 3",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::While",
+          "whileConditions": [
+            { "type": { "value": "DepartScene" }, "parameters": [""] }
+          ],
+          "conditions": [],
+          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "Inventory",
+          "valueIteratorVariableName": "Item",
+          "keyIteratorVariableName": "",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Group",
+          "name": "My group",
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": { "value": "Delete" },
+                  "parameters": ["MySpriteObject", ""]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "disabled": true,
+          "conditions": [],
+          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+        }
+      ],
+      "expectedEventScript": [
+        "comment \"Setup\\nwith a second line\"",
+        "always:",
+        "  local number Count = 3",
+        "  local string Title = \"Hello \\\"world\\\"\"",
+        "else if DepartScene():",
+        "  pass",
+        "for each MySpriteObject:",
+        "  Delete(MySpriteObject)",
+        "repeat 4 + 3 times:",
+        "  pass",
+        "while DepartScene():",
+        "  Wait(1)",
+        "for each child in Inventory value Item:",
+        "  pass",
+        "group \"My group\":",
+        "  always:",
+        "    Delete(MySpriteObject)",
+        "disabled always:",
+        "  Wait(1)"
+      ]
+    },
+    {
+      "name": "degenerate loops (freshly created in the editor, fields still empty) stay parseable",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::While",
+          "whileConditions": [],
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::Repeat",
+          "repeatExpression": "",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "",
+          "conditions": [],
+          "actions": []
+        },
+        {
+          "type": "BuiltinCommonInstructions::ForEachChildVariable",
+          "iterableVariableName": "",
+          "conditions": [],
+          "actions": []
+        }
+      ],
+      "expectedEventScript": [
+        "while :",
+        "  pass",
+        "repeat 0 times:",
+        "  pass",
+        "for each :",
+        "  pass",
+        "for each child in :",
+        "  pass"
+      ]
+    },
+    {
+      "name": "empty group renders an explicit pass",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Group",
+          "name": "Empty group",
+          "events": []
+        }
+      ],
+      "expectedEventScript": ["group \"Empty group\":", "  pass"]
+    },
+    {
+      "name": "unknown instruction and non-representable event",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": { "value": "SomeUnknownExtension::Unknown" },
+              "parameters": ["A", "", "B"]
+            }
+          ]
+        },
+        {
+          "type": "BuiltinCommonInstructions::JsCode",
+          "inlineCode": "runtimeScene.setBackgroundColor(255, 0, 0);"
+        }
+      ],
+      "expectedEventScript": [
+        "always:",
+        "  SomeUnknownExtension::Unknown(A, , B)",
+        "# (event of type \"BuiltinCommonInstructions::JsCode\" cannot be shown as EventScript)"
+      ]
+    }
+  ]
+}

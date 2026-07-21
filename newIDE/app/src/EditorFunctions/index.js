@@ -19,6 +19,10 @@ import {
   type EventsTextRenderingError,
 } from '../EventsSheet/EventsTree/TextRenderer';
 import {
+  buildEventScriptSourceView,
+  renderEventSourceById,
+} from '../EventsSheet/EventsTree/TextRenderer/EventScriptSourceView';
+import {
   addMissingObjectBehaviors,
   addObjectUndeclaredVariables,
   addUndeclaredVariables,
@@ -153,6 +157,11 @@ export type EditorFunctionGenericOutput = {|
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
+  // EventScript source view (see `read_events_source`):
+  eventScript?: string,
+  selectedEventIds?: Array<string>,
+  truncated?: boolean,
+  notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
   warnings?: string,
@@ -205,6 +214,11 @@ export type EventBatch = {|
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,
   placementRationale: string | null,
+  // Anchor echo for replace placements (proof the replaced event was read):
+  expectedEventSource: string | null,
+  // The actual current source of the target event, that the backend
+  // compares the anchor against:
+  placementTargetEventSource: string | null,
 |};
 
 export type EventsGenerationOptions = {|
@@ -5020,6 +5034,110 @@ const readSceneEvents: EditorFunction = {
   modifiesProject: false,
 };
 
+const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
+const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
+const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+
+/**
+ * Reads the events of a scene as EventScript source (the exact syntax
+ * accepted by the `event_script` field of events generation), with filters
+ * to keep the output small.
+ */
+const readEventsSource: EditorFunction = {
+  renderForEditor: ({ args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Read events source in scene{' '}
+          <Link
+            href="#"
+            onClick={() =>
+              editorCallbacks.onOpenLayout(scene_name, {
+                openEventsEditor: true,
+                openSceneEditor: true,
+                focusWhenOpened: 'events',
+              })
+            }
+          >
+            {scene_name}
+          </Link>
+          .
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeSceneNotFoundFailure(project, scene_name);
+    }
+
+    const scene = project.getLayout(scene_name);
+    const eventIds = SafeExtractor.extractStringArrayProperty(
+      args,
+      'event_ids'
+    );
+    const searchText = SafeExtractor.extractStringProperty(args, 'search');
+    const objectNames = SafeExtractor.extractStringArrayProperty(
+      args,
+      'object_names'
+    );
+    const subEventsDepth = SafeExtractor.extractNumberProperty(
+      args,
+      'sub_events_depth'
+    );
+    const maxCharsArgument = SafeExtractor.extractNumberProperty(
+      args,
+      'max_chars'
+    );
+    const maxChars = Math.max(
+      EVENTS_SOURCE_MAX_CHARS_MINIMUM,
+      Math.min(
+        EVENTS_SOURCE_MAX_CHARS_LIMIT,
+        maxCharsArgument || EVENTS_SOURCE_MAX_CHARS_DEFAULT
+      )
+    );
+
+    const {
+      text,
+      selectedEventIds,
+      truncated,
+      notes,
+      renderingErrors,
+    } = buildEventScriptSourceView({
+      eventsList: scene.getEvents(),
+      eventIds,
+      searchText,
+      objectNames,
+      subEventsDepth,
+      maxChars,
+    });
+
+    const output: EditorFunctionGenericOutput = {
+      success: true,
+      eventsForSceneNamed: scene_name,
+      // An empty `text` does NOT mean the scene has no events: a filter can
+      // match nothing on a populated sheet (the notes say which case it
+      // is). Only a truly empty sheet gets the "no events" text.
+      eventScript:
+        text ||
+        (scene.getEvents().getEventsCount() === 0 ? noEventsInSceneText : ''),
+      selectedEventIds,
+    };
+    if (truncated) output.truncated = true;
+    if (notes.length > 0) output.notes = notes;
+    if (renderingErrors.length > 0) {
+      // Surface partial failures so the cause is reported, not dropped.
+      output.eventsRenderingErrors = renderingErrors;
+    }
+    return output;
+  },
+  modifiesProject: false,
+};
+
 /**
  * Adds a new event to a scene's event sheet
  */
@@ -5339,6 +5457,44 @@ const addSceneEvents: EditorFunction = {
 
     const parsedEventBatches = eventBatches
       ? eventBatches.map(batch => {
+          const placementRelation =
+            SafeExtractor.extractStringProperty(batch, 'placement_relation') ||
+            '(unspecified)';
+          const placementTargetEventId = SafeExtractor.extractStringProperty(
+            batch,
+            'placement_target_event_id'
+          );
+
+          // For replace placements, also send the CURRENT source of what is
+          // being replaced: the backend compares the
+          // `expected_event_source` anchor against it (proof it was read
+          // and hasn't changed). The source covers exactly what the
+          // placement destroys: the event alone when its sub-events are
+          // kept, the whole subtree when they are replaced too.
+          const isReplaceEntirePlacement =
+            placementRelation === 'replace_entire_event_and_sub_events';
+          const isReplacePlacement =
+            placementRelation ===
+              'replace_event_but_keep_existing_sub_events' ||
+            isReplaceEntirePlacement;
+          const renderedTargetEventSource =
+            isReplacePlacement && placementTargetEventId
+              ? renderEventSourceById({
+                  eventsList: currentSceneEvents,
+                  eventIdOrGroupName: placementTargetEventId,
+                  includeSubEvents: isReplaceEntirePlacement,
+                })
+              : null;
+          // A subtree too big to be read in one call cannot serve as the
+          // proof-of-read reference either (the backend bounds the field):
+          // skip the check for it (like an editor without the capability)
+          // rather than failing the whole request.
+          const placementTargetEventSource =
+            renderedTargetEventSource &&
+            renderedTargetEventSource.length <= EVENTS_SOURCE_MAX_CHARS_LIMIT
+              ? renderedTargetEventSource
+              : null;
+
           return {
             eventsDescription:
               SafeExtractor.extractStringProperty(
@@ -5349,15 +5505,8 @@ const addSceneEvents: EditorFunction = {
               batch,
               'event_script'
             ),
-            placementRelation:
-              SafeExtractor.extractStringProperty(
-                batch,
-                'placement_relation'
-              ) || '(unspecified)',
-            placementTargetEventId: SafeExtractor.extractStringProperty(
-              batch,
-              'placement_target_event_id'
-            ),
+            placementRelation,
+            placementTargetEventId,
             placementExpectedParentEventId: SafeExtractor.extractStringProperty(
               batch,
               'placement_expected_parent_event_id'
@@ -5366,6 +5515,11 @@ const addSceneEvents: EditorFunction = {
               batch,
               'placement_rationale'
             ),
+            expectedEventSource: SafeExtractor.extractStringProperty(
+              batch,
+              'expected_event_source'
+            ),
+            placementTargetEventSource,
           };
         })
       : null;
@@ -8253,6 +8407,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   put_2d_instances: put2dInstances,
   put_3d_instances: put3dInstances,
   read_scene_events: readSceneEvents,
+  read_events_source: readEventsSource,
   add_scene_events: addSceneEvents,
   create_scene: createScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,

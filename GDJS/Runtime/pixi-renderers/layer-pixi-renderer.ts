@@ -557,10 +557,13 @@ namespace gdjs {
     setCamera3DNearPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
 
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
       this._threeCamera.near = Math.min(
         // 0 is not a valid value for three js perspective camera:
         // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
-        Math.max(distance, 0.0001),
+        Math.max(distance * inverseWorldScale, 0.000001),
         // Near value cannot exceed far value.
         this._threeCamera.far
       );
@@ -569,18 +572,30 @@ namespace gdjs {
 
     getCamera3DNearPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.near;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.near * worldScale;
     }
 
     setCamera3DFarPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
-      this._threeCamera.far = Math.max(distance, this._threeCamera.near);
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      this._threeCamera.far = Math.max(
+        distance * inverseWorldScale,
+        this._threeCamera.near
+      );
       this._threeCameraDirty = true;
     }
 
     getCamera3DFarPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.far;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.far * worldScale;
     }
 
     setCamera3DFieldOfView(angle: number) {

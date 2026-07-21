@@ -21,9 +21,13 @@ const readOrInferVariableType = (
     return 'Boolean';
   }
 
-  const numberValue = Number(value);
-  if (!Number.isNaN(numberValue)) {
-    return 'Number';
+  // An empty value must stay a string: `Number('')` is 0, which would
+  // silently turn it into a number.
+  if (value.trim() !== '') {
+    const numberValue = Number(value);
+    if (!Number.isNaN(numberValue)) {
+      return 'Number';
+    }
   }
 
   return 'String';
@@ -160,6 +164,36 @@ export const applyVariableChange = ({
     throw new Error('Invalid variable path');
   }
 
+  // Analyze the value upfront, so that an invalid one is rejected before any
+  // variable (or intermediate parent) is created.
+  // An explicitly requested primitive type wins over JSON parsing: without
+  // this, a JSON-looking value could never be stored as a literal string.
+  const lowercaseForcedType = forcedVariableType
+    ? forcedVariableType.toLowerCase()
+    : null;
+  const isForcedPrimitiveType =
+    lowercaseForcedType === 'string' ||
+    lowercaseForcedType === 'number' ||
+    lowercaseForcedType === 'boolean';
+  const arrayOrObjectValue = isForcedPrimitiveType
+    ? null
+    : parseValueAsObjectOrArray(value);
+  let primitiveVariableType = null;
+  let numberValue = 0;
+  if (!arrayOrObjectValue) {
+    primitiveVariableType = readOrInferVariableType(forcedVariableType, value);
+    if (primitiveVariableType === 'Number') {
+      // `Number` (not `parseFloat`) so the stored value always matches the
+      // type inference, and garbage is caught instead of storing NaN.
+      numberValue = value.trim() === '' ? NaN : Number(value);
+      if (Number.isNaN(numberValue)) {
+        throw new Error(
+          `Value "${value}" is not a valid number for variable path "${variablePath}". Use a numeric value, or set \`variable_type\` to "string".`
+        );
+      }
+    }
+  }
+
   let addedNewVariable = false;
   const firstSegment = pathSegments[0];
 
@@ -216,8 +250,6 @@ export const applyVariableChange = ({
     }
   }
 
-  const arrayOrObjectValue = parseValueAsObjectOrArray(value);
-
   if (arrayOrObjectValue) {
     // Value is an object or array.
     // $FlowFixMe[incompatible-type]
@@ -233,14 +265,16 @@ export const applyVariableChange = ({
   } else {
     // Value is a primitive, or not a valid Object/Array in JSON:
 
-    const variableType = readOrInferVariableType(forcedVariableType, value);
+    const variableType =
+      primitiveVariableType ||
+      readOrInferVariableType(forcedVariableType, value);
 
     if (variableType === 'String') {
       // $FlowFixMe[incompatible-use]
       variable.setString(value);
     } else if (variableType === 'Number') {
       // $FlowFixMe[incompatible-use]
-      variable.setValue(parseFloat(value));
+      variable.setValue(numberValue);
     } else if (variableType === 'Boolean') {
       // $FlowFixMe[incompatible-use]
       variable.setBool(value.toLowerCase() === 'true');

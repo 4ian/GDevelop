@@ -1,15 +1,14 @@
 // @flow
 import { fakeAssetShortHeader1 } from '../fixtures/GDevelopServicesTestData';
-import { PixiResourcesLoaderMock } from '../fixtures/TestPixiResourcesLoader';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import {
   editorFunctions,
   noEventsInSceneText,
   type EditorFunctionGenericOutput,
-  type LaunchFunctionOptionsWithProject,
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
 } from './index';
+import { makeFakeLaunchFunctionOptionsWithProject } from './TestHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,84 +34,7 @@ const fakeParticleEmitterAssetShortHeader = {
   animationsCount: undefined,
 };
 
-// $FlowFixMe[incompatible-type]
-// $FlowFixMe[missing-local-annot]
-// $FlowFixMe[cannot-resolve-name]
-const makeFakeI18n = (fakeI18n): I18nType => ({
-  ...fakeI18n,
-  _: message => message.id,
-});
-
 describe('editorFunctions', () => {
-  const makeFakeLaunchFunctionOptionsWithProject = (
-    project: gdProject
-  ): LaunchFunctionOptionsWithProject => ({
-    project,
-    args: {},
-    i18n: makeFakeI18n(),
-    editorCallbacks: {
-      onOpenLayout: jest.fn(),
-      onCreateProject: jest.fn(),
-    },
-    relatedAiRequestId: 'fake-ai-request-id',
-    getRelatedAiRequestLastMessages: () => ({
-      lastUserMessage: null,
-      lastAssistantMessages: [],
-    }),
-    generateEvents: jest.fn(),
-    onInstancesModifiedOutsideEditor: jest.fn(),
-    onObjectGroupsModifiedOutsideEditor: jest.fn(),
-    onSceneEventsModifiedOutsideEditor: jest.fn(),
-    onProjectItemRenamedOutsideEditor: jest.fn(),
-    toolOptions: {
-      includeEventsJson: true,
-    },
-    ensureExtensionInstalled: jest.fn(),
-    searchAndInstallAsset: async ({
-      objectsContainer,
-      objectName,
-      objectType,
-    }) => {
-      const fakeFoundObjectType = objectType || 'Sprite';
-      const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
-        project,
-        fakeFoundObjectType
-      );
-      const object = objectsContainer.insertNewObject(
-        project,
-        fakeFoundObjectType,
-        objectName,
-        objectsContainer.getObjectsCount()
-      );
-
-      return Promise.resolve({
-        status: 'asset-installed',
-        message: 'Object installed',
-        createdObjects: [object],
-        assetShortHeader: fakeAssetShortHeader1,
-        isTheFirstOfItsTypeInProject,
-      });
-    },
-    searchAndInstallResources: async () => {
-      return Promise.resolve({
-        results: [
-          {
-            resourceName: 'fake-resource-name',
-            resourceKind: 'fake-resource-kind',
-            status: 'resource-installed',
-          },
-        ],
-      });
-    },
-    onObjectsModifiedOutsideEditor: jest.fn(),
-    onWillDeleteScene: jest.fn(),
-    onWillDeleteObject: jest.fn(),
-    onWillInstallExtension: jest.fn(),
-    onExtensionInstalled: jest.fn(),
-    getAssetStoreTagForNewObject: () => null,
-    PixiResourcesLoader: PixiResourcesLoaderMock,
-  });
-
   describe('create_or_replace_object', () => {
     let project: gdProject;
     let testScene: gdLayout;

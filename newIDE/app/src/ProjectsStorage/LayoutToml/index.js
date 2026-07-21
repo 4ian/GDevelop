@@ -56,6 +56,14 @@ const RECORD_HEADERS = new Set([
   'variable',
   'behavior',
 ]);
+const EFFECT_STRUCTURAL_FIELDS = Object.freeze([
+  'layer',
+  'name',
+  'type',
+  'folded',
+  'enabled',
+]);
+const RETIRED_EFFECT_FIELDS = new Set(['params']);
 
 export class LayoutTomlError extends Error {
   code: string;
@@ -596,7 +604,7 @@ const compileCamera = (record, state) => {
 const compileEffect = (record, context, state) => {
   const effect = validateRecord(
     record,
-    ['layer', 'name', 'type', 'folded', 'enabled', 'params'],
+    Object.keys(record || {}),
     ['layer', 'name', 'type'],
     'effect',
     state
@@ -609,17 +617,40 @@ const compileEffect = (record, context, state) => {
       `Effect type ${effectType} is not registered.`,
       record
     );
-  const params = expectTable(
-    effect.params === undefined ? {} : effect.params,
-    'effect params',
-    record,
-    state
+  const knownParameters =
+    context.effectParameterTypesByType &&
+    context.effectParameterTypesByType[effectType];
+  if (knownParameters) {
+    Object.keys(knownParameters).forEach(name => {
+      if (
+        EFFECT_STRUCTURAL_FIELDS.includes(name) ||
+        RETIRED_EFFECT_FIELDS.has(name)
+      )
+        fail(
+          state,
+          'LAYOUT_EFFECT_PARAMETER_COLLISION',
+          `Effect parameter ${name} on ${effectType} collides with a reserved effect field.`,
+          record
+        );
+    });
+  }
+  const parameterNames = Object.keys(effect).filter(
+    name => !EFFECT_STRUCTURAL_FIELDS.includes(name)
   );
+  parameterNames.forEach(name => {
+    if (RETIRED_EFFECT_FIELDS.has(name))
+      fail(
+        state,
+        'LAYOUT_UNKNOWN_FIELD',
+        `Unknown effect field ${name}. Effect parameters must be direct fields on [[effect]].`,
+        record
+      );
+  });
   const numbers = {};
   const strings = {};
   const booleans = {};
-  Object.keys(params).forEach(name => {
-    const value = params[name];
+  parameterNames.forEach(name => {
+    const value = effect[name];
     if (typeof value === 'number')
       numbers[name] = expectNumber(
         value,
@@ -643,12 +674,9 @@ const compileEffect = (record, context, state) => {
         record
       );
   });
-  const knownParameters =
-    context.effectParameterTypesByType &&
-    context.effectParameterTypesByType[effectType];
   if (knownParameters) {
-    Object.keys(params).forEach(name => {
-      const actualType = typeof params[name];
+    parameterNames.forEach(name => {
+      const actualType = typeof effect[name];
       if (knownParameters[name] !== actualType)
         fail(
           state,
@@ -2110,7 +2138,7 @@ const decompileEffect = (effect, layerId) => {
   };
   if (effect.folded) output.folded = true;
   if (effect.disabled) output.enabled = false;
-  const params = {};
+  const parameters = {};
   [
     ['number', effect.doubleParameters || {}],
     ['string', effect.stringParameters || {}],
@@ -2124,15 +2152,25 @@ const decompileEffect = (effect, layerId) => {
         )} ${type} parameters must be an object.`
       );
     Object.keys(values).forEach(name => {
-      if (Object.prototype.hasOwnProperty.call(params, name))
+      if (
+        EFFECT_STRUCTURAL_FIELDS.includes(name) ||
+        RETIRED_EFFECT_FIELDS.has(name)
+      )
+        throw new LayoutTomlError(
+          'LAYOUT_EFFECT_PARAMETER_COLLISION',
+          `Effect parameter ${name} collides with a reserved effect field.`
+        );
+      if (Object.prototype.hasOwnProperty.call(parameters, name))
         throw new LayoutTomlError(
           'LAYOUT_DUPLICATE_EFFECT_PARAMETER',
           `Effect parameter ${name} occurs in more than one typed parameter map.`
         );
-      params[name] = values[name];
+      parameters[name] = values[name];
     });
   });
-  if (Object.keys(params).length) output.params = sortedObject(params);
+  Object.keys(sortedObject(parameters)).forEach(name => {
+    output[name] = parameters[name];
+  });
   return output;
 };
 

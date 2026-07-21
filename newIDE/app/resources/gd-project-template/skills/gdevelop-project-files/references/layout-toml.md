@@ -169,12 +169,15 @@ layer = "world"
 name = "Glow"
 type = "Effects::Glow"
 enabled = true
-params = { strength = 2, quality = "high", fast = true }
+strength = 2
+quality = "high"
+fast = true
 ```
 
-Effect names are unique per layer. Use only effect types and parameter names
-listed in the layout catalog. TOML value types must match catalog parameter
-types. Optional `folded` defaults to false and `enabled` defaults to true.
+Effect names are unique per layer. Effect parameters are direct fields on the
+`[[effect]]` record. Use only effect types and parameter names listed in the
+layout catalog, and match their TOML value types. `params` is not a valid
+field. Optional `folded` defaults to false and `enabled` defaults to true.
 
 ## Instances
 

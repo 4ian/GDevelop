@@ -113,7 +113,9 @@ name = "Glow"
 type = "Test::Glow"
 folded = true
 enabled = false
-params = { strength = 2, mode = "soft", fast = true }
+strength = 2
+mode = "soft"
+fast = true
 
 [[instance]]
 id = "${uuid(1)}"
@@ -168,6 +170,14 @@ property_visibility = { speed = "hidden" }
       kind: 'scene',
       objectNames: ['Player'],
       behaviorTypesByObject: { Player: { Move: 'Movement::Move' } },
+      effectTypes: ['Test::Glow'],
+      effectParameterTypesByType: {
+        'Test::Glow': {
+          strength: 'number',
+          mode: 'string',
+          fast: 'boolean',
+        },
+      },
     };
     const output = compileLayoutToml(source, context);
 
@@ -186,7 +196,15 @@ property_visibility = { speed = "hidden" }
           renderingType: '2d+3d',
           cameraType: 'perspective',
           cameras: [{ defaultSize: true, width: 640, height: 480 }],
-          effects: [{ name: 'Glow', disabled: true }],
+          effects: [
+            {
+              name: 'Glow',
+              disabled: true,
+              doubleParameters: { strength: 2 },
+              stringParameters: { mode: 'soft' },
+              booleanParameters: { fast: true },
+            },
+          ],
         },
         { name: 'HUD' },
       ],
@@ -212,9 +230,12 @@ property_visibility = { speed = "hidden" }
         },
       ],
     });
-    expect(
-      compileLayoutToml(decompileLayoutToml(output, context), context)
-    ).toEqual(output);
+    const canonicalSource = decompileLayoutToml(output, context);
+    expect(canonicalSource).toContain(
+      'fast = true\nmode = "soft"\nstrength = 2'
+    );
+    expect(canonicalSource).not.toContain('params =');
+    expect(compileLayoutToml(canonicalSource, context)).toEqual(output);
   });
 
   test('compiles prefab bounds and external layer references', () => {
@@ -405,7 +426,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\nparams = { x = "wrong" }\n`
+        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\nx = "wrong"\n`
       ),
       {
         kind: 'scene',
@@ -413,6 +434,24 @@ at = [1, 2]
         effectParameterTypesByType: { T: { x: 'number' } },
       },
       'LAYOUT_INVALID_EFFECT_PARAMETER',
+    ],
+    [
+      sceneSource(
+        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\nparams = { x = 1 }\n`
+      ),
+      { kind: 'scene' },
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      sceneSource(
+        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
+      ),
+      {
+        kind: 'scene',
+        effectTypes: ['T'],
+        effectParameterTypesByType: { T: { enabled: 'boolean' } },
+      },
+      'LAYOUT_EFFECT_PARAMETER_COLLISION',
     ],
     [
       sceneSource(
@@ -625,6 +664,37 @@ at = [1, 2]
       )
     ).toThrow(
       expect.objectContaining({ code: 'LAYOUT_DUPLICATE_EFFECT_PARAMETER' })
+    );
+  });
+
+  test('rejects serialized effect parameters that collide with record fields', () => {
+    expect(() =>
+      decompileLayoutToml(
+        {
+          r: 0,
+          v: 0,
+          b: 0,
+          uiSettings: {},
+          layers: [
+            {
+              name: '',
+              effects: [
+                {
+                  name: 'Light',
+                  effectType: 'Light',
+                  doubleParameters: { enabled: 1 },
+                  stringParameters: {},
+                  booleanParameters: {},
+                },
+              ],
+            },
+          ],
+          instances: [],
+        },
+        { kind: 'scene' }
+      )
+    ).toThrow(
+      expect.objectContaining({ code: 'LAYOUT_EFFECT_PARAMETER_COLLISION' })
     );
   });
 

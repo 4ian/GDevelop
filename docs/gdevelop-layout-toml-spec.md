@@ -221,13 +221,17 @@ name = "Glow"
 type = "Effects::Glow"
 folded = true
 enabled = false
-params = { strength = 2, quality = "high", fast = true }
+strength = 2
+quality = "high"
+fast = true
 ```
 
 `layer`, `name`, and `type` are required. The layer ID must resolve. Effect
 names are unique per layer. The effect type and every parameter name/type must
-match the generated layout catalog. Parameters are flat finite numbers,
-strings, or booleans. `folded` defaults false and `enabled` defaults true.
+match the generated layout catalog. Parameters are direct fields on the
+`[[effect]]` record and must be flat finite numbers, strings, or booleans.
+`params` is not a valid field. `folded` defaults false and `enabled` defaults
+true.
 
 ## 10. `[[instance]]`
 
@@ -355,7 +359,7 @@ name = "HUD"
 layer = "base"
 name = "World Glow"
 type = "Effects::Glow"
-params = { strength = 2 }
+strength = 2
 
 [[instance]]
 id = "ef3ef49d-f20f-4450-b373-0ce43291a002"

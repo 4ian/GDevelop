@@ -139,6 +139,18 @@ describe('project source catalogs', () => {
     expect(
       catalog.tables.find(table => table.table === 'instance').fields
     ).toContainEqual(expect.objectContaining({ name: 'properties' }));
+    const effectTable = catalog.tables.find(table => table.table === 'effect');
+    expect(effectTable.fields).not.toContainEqual(
+      expect.objectContaining({ name: 'params' })
+    );
+    expect(effectTable.parameterFields).toEqual({
+      placement: 'direct fields on [[effect]]',
+      schema: 'effectTypes[type].parameters',
+      scalarTypes: ['number', 'string', 'boolean'],
+    });
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Effect parameters are direct fields on [[effect]]'
+    );
     expect(catalog.counts.tables).toBe(catalog.tables.length);
     expect(catalog).not.toHaveProperty('elements');
     project.delete();

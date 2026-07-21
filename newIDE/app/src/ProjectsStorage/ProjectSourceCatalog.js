@@ -1007,11 +1007,12 @@ const LAYOUT_TABLES = Object.freeze([
       { name: 'type', type: 'registered effect type', required: true },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'enabled', type: 'boolean', default: true },
-      {
-        name: 'params',
-        type: 'inline TOML table using catalog-declared parameter types',
-      },
     ],
+    parameterFields: {
+      placement: 'direct fields on [[effect]]',
+      schema: 'effectTypes[type].parameters',
+      scalarTypes: ['number', 'string', 'boolean'],
+    },
   },
   {
     table: 'instance',
@@ -1287,6 +1288,7 @@ export const buildProjectLayoutCatalog = ({
         'Use standard TOML strings, booleans, numeric arrays, and inline tables. Colors are quoted uppercase #RRGGBB strings.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
         'Layer ids are short file-local references. Every effect and instance uses an existing layer id; every variable and behavior uses an existing instance UUID.',
+        'Effect parameters are direct fields on [[effect]] after type. Use the exact names and TOML scalar types in effectTypes[type].parameters; params is not a valid field.',
         'Use an existing object name from the matching context in instance.object.',
         'A [[behavior]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
         'The [[instance]] record order is the global serialized instance order. Never add a synthetic order field.',

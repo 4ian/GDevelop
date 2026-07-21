@@ -8387,6 +8387,34 @@ const searchObjectAssetStore: EditorFunction = {
   modifiesProject: false,
 };
 
+const searchResourceStore: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const resourceKind = SafeExtractor.extractStringProperty(
+      args,
+      'resource_kind'
+    );
+    if (resourceKind === 'audio') {
+      return {
+        text: <Trans>Searching audio files in the resource store.</Trans>,
+      };
+    }
+    if (resourceKind === 'font') {
+      return {
+        text: <Trans>Searching fonts in the resource store.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Searching the resource store.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to search the resource store - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
@@ -8425,6 +8453,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   run_edit_agent: runEditAgent,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
+  search_resource_store: searchResourceStore,
 
   generate_events: addSceneEvents,
 

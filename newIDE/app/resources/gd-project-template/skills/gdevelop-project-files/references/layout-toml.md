@@ -16,9 +16,9 @@ Use this exact order and one final newline:
 
 1. `[layout]`
 2. Optional `[editor]`
-3. All `[[layer]]` records
-4. All `[[effect]]` records
-5. All `[[instance]]` records
+3. All `[[layers]]` records
+4. All `[[effects]]` records
+5. All `[[instances]]` records
 6. All `[[variables]]` records
 7. All `[[behaviors]]` records
 
@@ -39,12 +39,12 @@ grid = true
 grid_type = "rectangular"
 grid_size = [32, 32, 32]
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 cameras = [{ size = "default", viewport = "default" }]
 
-[[instance]]
+[[instances]]
 id = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 object = "Player"
 layer = "base"
@@ -60,11 +60,11 @@ A prefab or prefab variant forbids `background` and requires integer bounds:
 version = 1
 bounds = { min = [0, 0, 0], max = [128, 96, 0] }
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 
-[[instance]]
+[[instances]]
 id = "37662871-3864-42a8-ae4d-c9ec0ebd6371"
 object = "Body"
 layer = "base"
@@ -74,17 +74,17 @@ at = [0, 0]
 ## External layout
 
 An external layout forbids `background`, `bounds`, effects, and cameras. Its
-`[[layer]]` records reference layers of its `linkedScene`:
+`[[layers]]` records reference layers of its `linkedScene`:
 
 ```toml
 [layout]
 version = 1
 
-[[layer]]
+[[layers]]
 id = "world"
 name = "World"
 
-[[instance]]
+[[instances]]
 id = "492deedb-eab1-498c-8daf-5ebd0e313c98"
 object = "Coin"
 layer = "world"
@@ -125,7 +125,7 @@ uses lowercase letters, digits, and hyphens. Effects and instances refer to the
 ID, while `selected_layer` uses the runtime name.
 
 ```toml
-[[layer]]
+[[layers]]
 id = "world"
 name = "World"
 rendering = "2d+3d"
@@ -164,7 +164,7 @@ layer may have at most 50 cameras. `far` must exceed `near`; perspective
 Effects use a short top-level record and a layer ID:
 
 ```toml
-[[effect]]
+[[effects]]
 layer = "world"
 name = "Glow"
 type = "Effects::Glow"
@@ -175,7 +175,7 @@ fast = true
 ```
 
 Effect names are unique per layer. Effect parameters are direct fields on the
-`[[effect]]` record. Use only effect types and parameter names listed in the
+`[[effects]]` record. Use only effect types and parameter names listed in the
 layout catalog, and match their TOML value types. `params` is not a valid
 field. Optional `folded` defaults to false and `enabled` defaults to true.
 
@@ -185,7 +185,7 @@ Every instance requires an existing object name, existing layer ID, lowercase
 UUIDv4, and a two- or three-number position:
 
 ```toml
-[[instance]]
+[[instances]]
 id = "01fce651-91cd-4d11-bd56-ef1370807527"
 object = "Model"
 layer = "world"
@@ -206,7 +206,7 @@ Use a scalar `rotation` for Z-only rotation and `[x, y, z]` otherwise. `size`
 enables a custom size; `auto_size` preserves inactive stored dimensions.
 `size` and `auto_size` are mutually exclusive. Opacity is in `[0,255]`.
 
-The `[[instance]]` table order is the global serialized instance order. Never
+The `[[instances]]` table order is the global serialized instance order. Never
 add an `order` field and never regroup instance records by layer if doing so
 would change that order.
 
@@ -275,7 +275,7 @@ record may exist for each attached behavior on one instance.
 
 - Parse as standard TOML and keep one final newline.
 - Use only tables and fields listed in the generated layout catalog.
-- Preserve `[[layer]]`, `[[effect]]`, `[[instance]]`, `[[variables]]`, and
+- Preserve `[[layers]]`, `[[effects]]`, `[[instances]]`, `[[variables]]`, and
   `[[behaviors]]` array order.
 - Preserve every existing instance UUID.
 - Resolve every layer ID, instance UUID, object, behavior, effect, and property

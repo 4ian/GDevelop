@@ -18,7 +18,7 @@ background = "#000000"
 
 ${body}`;
 
-const baseLayer = `[[layer]]
+const baseLayer = `[[layers]]
 id = "base"
 name = ""
 `;
@@ -27,7 +27,7 @@ describe('layout TOML', () => {
   test('parses standard TOML tables and typed inline values', () => {
     const document = parseLayoutToml(
       sceneSource(`${baseLayer}
-[[instance]]
+[[instances]]
 id = "${uuid(1)}"
 object = "Player"
 layer = "base"
@@ -37,7 +37,7 @@ properties = { animation = 2, text = "a>b" }
     );
 
     expect(document.layout).toEqual({ version: 1, background: '#000000' });
-    expect(document.instance[0].properties).toEqual({
+    expect(document.instances[0].properties).toEqual({
       animation: 2,
       text: 'a>b',
     });
@@ -57,7 +57,19 @@ properties = { animation = 2, text = "a>b" }
     ],
     [
       '[layout]\nversion = 1\nbackground = "#000000"\n[layer]\nid = "base"\nname = ""',
-      'LAYOUT_INVALID_RECORD',
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      '[layout]\nversion = 1\nbackground = "#000000"\n[[layer]]\nid = "base"\nname = ""',
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      '[layout]\nversion = 1\nbackground = "#000000"\n[[effect]]\nname = "X"',
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      '[layout]\nversion = 1\nbackground = "#000000"\n[[instance]]\nid = "bad"',
+      'LAYOUT_UNKNOWN_FIELD',
     ],
     [
       '[layout]\nversion = 1\nbackground = "#000000"\n[editor]\nfuture = false',
@@ -87,7 +99,7 @@ window_mask = true
 selected_layer = "HUD"
 mode = "embedded-game"
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 rendering = "2d+3d"
@@ -103,11 +115,11 @@ fov = 60
 max_2d_distance = 200
 cameras = [{ size = { default = [640, 480] }, viewport = { default = [0, 0, 0.5, 1] } }]
 
-[[layer]]
+[[layers]]
 id = "hud"
 name = "HUD"
 
-[[effect]]
+[[effects]]
 layer = "base"
 name = "Glow"
 type = "Test::Glow"
@@ -117,7 +129,7 @@ strength = 2
 mode = "soft"
 fast = true
 
-[[instance]]
+[[instances]]
 id = "${uuid(1)}"
 object = "Player"
 layer = "base"
@@ -254,11 +266,11 @@ bounds = { min = [-1, 0, 2], max = [3, 4, 5] }
         `[layout]
 version = 1
 
-[[layer]]
+[[layers]]
 id = "world"
 name = "World"
 
-[[instance]]
+[[instances]]
 id = "${uuid(2)}"
 object = "Coin"
 layer = "world"
@@ -339,7 +351,7 @@ selected_layer = "Removed Layer"
 selected_layer_unresolved = true
 
 ${baseLayer}
-[[instance]]
+[[instances]]
 id = "${uuid(9)}"
 object = "RemovedObject"
 layer = "base"
@@ -364,7 +376,7 @@ at = [1, 2]
   test.each([
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Missing"\nlayer = "base"\nat = [0, 0]\n`
       ),
@@ -372,20 +384,20 @@ at = [1, 2]
       'LAYOUT_UNKNOWN_OBJECT',
     ],
     [
-      `[layout]\nversion = 1\n\n[[layer]]\nid = "missing"\nname = "Missing"\n`,
+      `[layout]\nversion = 1\n\n[[layers]]\nid = "missing"\nname = "Missing"\n`,
       { kind: 'external', layerNames: [''] },
       'LAYOUT_UNKNOWN_LAYER',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "bad"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n`
+        `${baseLayer}\n[[instances]]\nid = "bad"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n`
       ),
       { kind: 'scene' },
       'LAYOUT_INVALID_UUID',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\nopacity = 256\n`
       ),
@@ -394,16 +406,16 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `[[layer]]\nid = "base"\nname = ""\ncamera_type = "perspective"\nnear = 0\n`
+        `[[layers]]\nid = "base"\nname = ""\ncamera_type = "perspective"\nnear = 0\n`
       ),
       { kind: 'scene' },
       'LAYOUT_INVALID_LAYER',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
-        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[instance]]\nid = "${uuid(
+        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [1, 1]\n`
       ),
@@ -412,21 +424,21 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `[[layer]]\nid = "base"\nname = ""\ncameras = [{ size = "default", viewport = [0, 0, 2, 1] }]\n`
+        `[[layers]]\nid = "base"\nname = ""\ncameras = [{ size = "default", viewport = [0, 0, 2, 1] }]\n`
       ),
       { kind: 'scene' },
       'LAYOUT_INVALID_CAMERA',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\n\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
+        `${baseLayer}\n[[effects]]\nlayer = "base"\nname = "X"\ntype = "T"\n\n[[effects]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
       ),
       { kind: 'scene' },
       'LAYOUT_DUPLICATE_EFFECT',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\nx = "wrong"\n`
+        `${baseLayer}\n[[effects]]\nlayer = "base"\nname = "X"\ntype = "T"\nx = "wrong"\n`
       ),
       {
         kind: 'scene',
@@ -437,14 +449,14 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\nparams = { x = 1 }\n`
+        `${baseLayer}\n[[effects]]\nlayer = "base"\nname = "X"\ntype = "T"\nparams = { x = 1 }\n`
       ),
       { kind: 'scene' },
       'LAYOUT_UNKNOWN_FIELD',
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[variable]]\ninstance = "${uuid(
           1
@@ -455,7 +467,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[behavior]]\ninstance = "${uuid(
           1
@@ -466,7 +478,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
+        `${baseLayer}\n[[effects]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
       ),
       {
         kind: 'scene',
@@ -477,7 +489,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[variables]]\ninstance = "${uuid(
           1
@@ -488,7 +500,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[behaviors]]\ninstance = "${uuid(
           1
@@ -499,7 +511,7 @@ at = [1, 2]
     ],
     [
       sceneSource(
-        `${baseLayer}\n[[instance]]\nid = "${uuid(
+        `${baseLayer}\n[[instances]]\nid = "${uuid(
           1
         )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\nproperties = { animation = "wrong" }\n`
       ),
@@ -510,7 +522,7 @@ at = [1, 2]
       'LAYOUT_INVALID_INSTANCE_PROPERTY',
     ],
     [
-      `[layout]\nversion = 1\n\n[[layer]]\nid = "base"\nname = ""\ncameras = [{ size = "default", viewport = "default" }]\n`,
+      `[layout]\nversion = 1\n\n[[layers]]\nid = "base"\nname = ""\ncameras = [{ size = "default", viewport = "default" }]\n`,
       { kind: 'external', layerNames: [''] },
       'LAYOUT_UNKNOWN_FIELD',
     ],
@@ -528,7 +540,7 @@ at = [1, 2]
     expect(() =>
       compileLayoutToml(
         sceneSource(
-          `[[layer]]\nid = "base"\nname = ""\ncameras = [${cameras}]\n`
+          `[[layers]]\nid = "base"\nname = ""\ncameras = [${cameras}]\n`
         ),
         { kind: 'scene' }
       )
@@ -723,7 +735,7 @@ at = [1, 2]
   test('validates behavior properties in serialized key space', () => {
     const makeSource = properties =>
       sceneSource(`${baseLayer}
-[[instance]]
+[[instances]]
 id = "${uuid(20)}"
 object = "Player"
 layer = "base"

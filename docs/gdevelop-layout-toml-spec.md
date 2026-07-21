@@ -31,9 +31,9 @@ The format uses a small fixed vocabulary of short TOML headers:
 ```text
 [layout]
 [editor]
-[[layer]]
-[[effect]]
-[[instance]]
+[[layers]]
+[[effects]]
+[[instances]]
 [[variables]]
 [[behaviors]]
 ```
@@ -68,9 +68,9 @@ Canonical output uses this order:
 
 1. `[layout]`;
 2. optional `[editor]`;
-3. all `[[layer]]` records in layer order;
-4. all `[[effect]]` records in per-layer effect order;
-5. all `[[instance]]` records in global serialized instance order;
+3. all `[[layers]]` records in layer order;
+4. all `[[effects]]` records in per-layer effect order;
+5. all `[[instances]]` records in global serialized instance order;
 6. all `[[variables]]` records grouped by instance order;
 7. all `[[behaviors]]` records grouped by instance order.
 
@@ -152,12 +152,12 @@ Rules:
 preserve a stale selected layer. It is invalid without `selected_layer`, and it
 is invalid after the layer resolves.
 
-## 7. `[[layer]]`
+## 7. `[[layers]]`
 
 Scene/prefab layers use:
 
 ```toml
-[[layer]]
+[[layers]]
 id = "world"
 name = "World"
 rendering = "2d+3d"
@@ -212,10 +212,10 @@ cameras = [
 `viewport` uses the same representation with four normalized ordered values.
 The default rectangle is `[0, 0, 1, 1]`.
 
-## 9. `[[effect]]`
+## 9. `[[effects]]`
 
 ```toml
-[[effect]]
+[[effects]]
 layer = "world"
 name = "Glow"
 type = "Effects::Glow"
@@ -229,14 +229,14 @@ fast = true
 `layer`, `name`, and `type` are required. The layer ID must resolve. Effect
 names are unique per layer. The effect type and every parameter name/type must
 match the generated layout catalog. Parameters are direct fields on the
-`[[effect]]` record and must be flat finite numbers, strings, or booleans.
+`[[effects]]` record and must be flat finite numbers, strings, or booleans.
 `params` is not a valid field. `folded` defaults false and `enabled` defaults
 true.
 
-## 10. `[[instance]]`
+## 10. `[[instances]]`
 
 ```toml
-[[instance]]
+[[instances]]
 id = "01fce651-91cd-4d11-bd56-ef1370807527"
 object = "Player"
 layer = "world"
@@ -274,7 +274,7 @@ unlocked, unsealed, and `keep_ratio = true`.
 `unresolved = true` preserves an imported stale object reference. It is invalid
 for a resolvable object and must never be introduced for new content.
 
-The `[[instance]]` array-of-tables order is the global serialized instance
+The `[[instances]]` array-of-tables order is the global serialized instance
 order. The retired markup `order` workaround is forbidden.
 
 ## 11. `[[variables]]`
@@ -346,29 +346,29 @@ grid_size = [32, 32, 32]
 snap = true
 selected_layer = "HUD"
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 cameras = [{ size = "default", viewport = "default" }]
 
-[[layer]]
+[[layers]]
 id = "hud"
 name = "HUD"
 
-[[effect]]
+[[effects]]
 layer = "base"
 name = "World Glow"
 type = "Effects::Glow"
 strength = 2
 
-[[instance]]
+[[instances]]
 id = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 object = "Player"
 layer = "base"
 at = [92, 552]
 properties = { animation = 1 }
 
-[[instance]]
+[[instances]]
 id = "4a1e5377-cbe7-4078-9a51-96a1e9956411"
 object = "ScoreText"
 layer = "hud"

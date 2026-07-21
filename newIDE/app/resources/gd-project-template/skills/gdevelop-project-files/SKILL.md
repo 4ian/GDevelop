@@ -119,8 +119,8 @@ generated compatibility/runtime output, not multi-file source.
   Author data directly, with no `[settings]`, `[staticData]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: standard flat TOML containing placement/layout data only:
-  `[layout]`, optional `[editor]`, and short `[[layer]]`, `[[effect]]`,
-  `[[instance]]`, `[[variables]]`, and `[[behaviors]]` records. Never put object
+  `[layout]`, optional `[editor]`, and short `[[layers]]`, `[[effects]]`,
+  `[[instances]]`, `[[variables]]`, and `[[behaviors]]` records. Never put object
   definitions or attached behavior definitions in a `.layout` file. Instance
   behavior overrides are allowed only for behaviors already attached by the
   owning `.settings` object definition. Follow the matching layout-catalog

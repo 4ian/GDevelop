@@ -41,18 +41,18 @@ const LAYER_ID = /^[a-z0-9][a-z0-9-]*$/;
 const ROOT_FIELDS = [
   'layout',
   'editor',
-  'layer',
-  'effect',
-  'instance',
+  'layers',
+  'effects',
+  'instances',
   'variables',
   'behaviors',
 ];
 const RECORD_HEADERS = new Set([
   'layout',
   'editor',
-  'layer',
-  'effect',
-  'instance',
+  'layers',
+  'effects',
+  'instances',
   'variables',
   'behaviors',
 ]);
@@ -642,7 +642,7 @@ const compileEffect = (record, context, state) => {
       fail(
         state,
         'LAYOUT_UNKNOWN_FIELD',
-        `Unknown effect field ${name}. Effect parameters must be direct fields on [[effect]].`,
+        `Unknown effect field ${name}. Effect parameters must be direct fields on [[effects]].`,
         record
       );
   });
@@ -1505,7 +1505,7 @@ export const compileLayoutToml = (
     state
   );
 
-  const layerRecords = records(document, 'layer', state);
+  const layerRecords = records(document, 'layers', state);
   const layerIds = new Map();
   const layerNames = new Set();
   const layers = [];
@@ -1540,7 +1540,7 @@ export const compileLayoutToml = (
         );
     });
 
-  records(document, 'effect', state).forEach(record => {
+  records(document, 'effects', state).forEach(record => {
     if (context.kind === 'external')
       fail(
         state,
@@ -1568,7 +1568,7 @@ export const compileLayoutToml = (
     owner.layer.effects.push(effect);
   });
 
-  const instances = records(document, 'instance', state).map(record => {
+  const instances = records(document, 'instances', state).map(record => {
     const layerId = expectString(record.layer, 'instance layer', record, state);
     const owner = layerIds.get(layerId);
     if (!owner)
@@ -2291,14 +2291,14 @@ const serializeLayoutDocument = document => {
   const lines = [];
   emitTable(lines, '[layout]', document.layout);
   if (document.editor) emitTable(lines, '[editor]', document.editor);
-  (document.layer || []).forEach(record =>
-    emitTable(lines, '[[layer]]', record)
+  (document.layers || []).forEach(record =>
+    emitTable(lines, '[[layers]]', record)
   );
-  (document.effect || []).forEach(record =>
-    emitTable(lines, '[[effect]]', record)
+  (document.effects || []).forEach(record =>
+    emitTable(lines, '[[effects]]', record)
   );
-  (document.instance || []).forEach(record =>
-    emitTable(lines, '[[instance]]', record)
+  (document.instances || []).forEach(record =>
+    emitTable(lines, '[[instances]]', record)
   );
   (document.variables || []).forEach(record =>
     emitTable(lines, '[[variables]]', record)
@@ -2382,17 +2382,17 @@ export const decompileLayoutToml = (
         );
     });
   }
-  document.layer = layerRecords.map(layer =>
+  document.layers = layerRecords.map(layer =>
     decompileLayer(layer, layerIds.get(layer.name), kind === 'external')
   );
-  document.effect = [];
+  document.effects = [];
   if (kind !== 'external')
     layerRecords.forEach(layer =>
       (layer.effects || []).forEach(effect =>
-        document.effect.push(decompileEffect(effect, layerIds.get(layer.name)))
+        document.effects.push(decompileEffect(effect, layerIds.get(layer.name)))
       )
     );
-  document.instance = instances.map(instance =>
+  document.instances = instances.map(instance =>
     decompileInstance(instance, layerIds.get(instance.layer || ''), context)
   );
   document.variables = [];

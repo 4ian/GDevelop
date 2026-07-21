@@ -333,7 +333,7 @@ prefab/variant, or external-layout settings entry and must have exactly one
 version = 1
 background = "#202030"
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 cameras = [{ size = "default", viewport = "default" }]
@@ -1095,12 +1095,12 @@ grid = true
 grid_size = [32, 32, 32]
 snap = true
 
-[[layer]]
+[[layers]]
 id = "base"
 name = ""
 cameras = [{ size = "default", viewport = "default" }]
 
-[[instance]]
+[[instances]]
 layer = "base"
 object = "Player"
 id = "ef3ef49d-f20f-4450-b373-0ce43291a002"
@@ -1600,7 +1600,7 @@ and compiled `events`.
 
 An external layout is one layout-only
 `externals/<ExternalName>.layout` TOML file compiled in external context.
-It owns only `instances` and `editionSettings`; its `[[layer]]` records reference
+It owns only `instances` and `editionSettings`; its `[[layers]]` records reference
 the linked scene's existing layers rather than defining layers.
 Its `name`, `linkedScene`, and order come from the corresponding
 `external.settings` `layoutFiles` entry. The composer maps `linkedScene` to

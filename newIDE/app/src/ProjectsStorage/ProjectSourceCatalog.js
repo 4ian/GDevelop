@@ -938,8 +938,8 @@ const LAYOUT_TABLES = Object.freeze([
     ],
   },
   {
-    table: 'layer',
-    header: '[[layer]]',
+    table: 'layers',
+    header: '[[layers]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
     repeated: true,
     fields: [
@@ -982,8 +982,8 @@ const LAYOUT_TABLES = Object.freeze([
     rules: ['far must be greater than near', 'at most 50 cameras'],
   },
   {
-    table: 'layer',
-    header: '[[layer]]',
+    table: 'layers',
+    header: '[[layers]]',
     variant: 'external reference',
     contexts: ['external'],
     repeated: true,
@@ -997,8 +997,8 @@ const LAYOUT_TABLES = Object.freeze([
     ],
   },
   {
-    table: 'effect',
-    header: '[[effect]]',
+    table: 'effects',
+    header: '[[effects]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
     repeated: true,
     fields: [
@@ -1009,14 +1009,14 @@ const LAYOUT_TABLES = Object.freeze([
       { name: 'enabled', type: 'boolean', default: true },
     ],
     parameterFields: {
-      placement: 'direct fields on [[effect]]',
+      placement: 'direct fields on [[effects]]',
       schema: 'effectTypes[type].parameters',
       scalarTypes: ['number', 'string', 'boolean'],
     },
   },
   {
-    table: 'instance',
-    header: '[[instance]]',
+    table: 'instances',
+    header: '[[instances]]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
     repeated: true,
     fields: [
@@ -1284,14 +1284,14 @@ export const buildProjectLayoutCatalog = ({
       syntax: 'Standard flat TOML using short layout record headers.',
       rules: [
         'Read the owning settings namespace and the matching context entry before editing a layout.',
-        'Use only the listed [layout], [editor], [[layer]], [[effect]], [[instance]], [[variables]], and [[behaviors]] tables and fields.',
+        'Use only the listed [layout], [editor], [[layers]], [[effects]], [[instances]], [[variables]], and [[behaviors]] tables and fields.',
         'Use standard TOML strings, booleans, numeric arrays, and inline tables. Colors are quoted uppercase #RRGGBB strings.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
         'Layer ids are short file-local references. Every effect and instance uses an existing layer id; every variable and behavior uses an existing instance UUID.',
-        'Effect parameters are direct fields on [[effect]] after type. Use the exact names and TOML scalar types in effectTypes[type].parameters; params is not a valid field.',
+        'Effect parameters are direct fields on [[effects]] after type. Use the exact names and TOML scalar types in effectTypes[type].parameters; params is not a valid field.',
         'Use an existing object name from the matching context in instance.object.',
         'A [[behaviors]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
-        'The [[instance]] record order is the global serialized instance order. Never add a synthetic order field.',
+        'The [[instances]] record order is the global serialized instance order. Never add a synthetic order field.',
         'Object definitions and attached behaviors belong in .settings, while event logic belongs in .events.',
       ],
     },

@@ -61,8 +61,8 @@ describe('project source catalogs', () => {
       tables: [
         { table: 'layout', header: '[layout]' },
         {
-          table: 'layer',
-          header: '[[layer]]',
+          table: 'layers',
+          header: '[[layers]]',
           variant: 'external reference',
         },
       ],
@@ -124,10 +124,10 @@ describe('project source catalogs', () => {
     expect(catalog.tables.map(table => table.header)).toEqual([
       '[layout]',
       '[editor]',
-      '[[layer]]',
-      '[[layer]]',
-      '[[effect]]',
-      '[[instance]]',
+      '[[layers]]',
+      '[[layers]]',
+      '[[effects]]',
+      '[[instances]]',
       '[[variables]]',
       '[[behaviors]]',
     ]);
@@ -137,19 +137,19 @@ describe('project source catalogs', () => {
       expect.objectContaining({ name: 'selected_layer_unresolved' })
     );
     expect(
-      catalog.tables.find(table => table.table === 'instance').fields
+      catalog.tables.find(table => table.table === 'instances').fields
     ).toContainEqual(expect.objectContaining({ name: 'properties' }));
-    const effectTable = catalog.tables.find(table => table.table === 'effect');
+    const effectTable = catalog.tables.find(table => table.table === 'effects');
     expect(effectTable.fields).not.toContainEqual(
       expect.objectContaining({ name: 'params' })
     );
     expect(effectTable.parameterFields).toEqual({
-      placement: 'direct fields on [[effect]]',
+      placement: 'direct fields on [[effects]]',
       schema: 'effectTypes[type].parameters',
       scalarTypes: ['number', 'string', 'boolean'],
     });
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Effect parameters are direct fields on [[effect]]'
+      'Effect parameters are direct fields on [[effects]]'
     );
     expect(catalog.counts.tables).toBe(catalog.tables.length);
     expect(catalog).not.toHaveProperty('elements');

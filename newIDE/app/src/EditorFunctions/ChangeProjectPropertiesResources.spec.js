@@ -156,6 +156,29 @@ describe('change_project_properties_resources', () => {
     expect(project.getResourcesManager().hasResource('jump.aac')).toBe(true);
   });
 
+  // Guards the whole-project usage scan against false positives: a resource
+  // that is genuinely unused must still be deletable.
+  it('deletes an unused resource', async () => {
+    addProjectResources();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          changed_resources: [
+            { resource_name: 'jump.aac', delete_this_resource: true },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('Deleted resource "jump.aac".');
+    expect(project.getResourcesManager().hasResource('jump.aac')).toBe(false);
+    // The other resource is untouched.
+    expect(project.getResourcesManager().hasResource('hero.png')).toBe(true);
+  });
+
   it('fails when an invalid orientation is the only requested change', async () => {
     const initialOrientation = project.getOrientation();
 

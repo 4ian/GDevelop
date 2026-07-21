@@ -229,6 +229,37 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
     expect(getMySpriteEffects().hasEffectNamed('MyGlow')).toBe(false);
   });
 
+  // Same invariant as the rename guard: the container does not enforce name
+  // uniqueness, so a creation under a taken `new_effect_name` must be refused
+  // or two effects would share the same name.
+  it('refuses to add a new effect under an already existing new_effect_name', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_effects: [
+            {
+              effect_name: 'Glow',
+              effect_type: 'FakeNight',
+              new_effect_name: 'MySepia',
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain(
+      'An effect named "MySepia" already exists on object "MySprite": effect NOT added.'
+    );
+    // The pre-existing effect is untouched and still the only one.
+    const effects = getMySpriteEffects();
+    expect(effects.getEffectsCount()).toBe(1);
+    expect(effects.getEffect('MySepia').getEffectType()).toBe('FakeSepia');
+  });
+
   it('warns when changing properties of an effect that does not exist', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
       {

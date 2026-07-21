@@ -5869,6 +5869,15 @@ const applyEffectChange = ({
   } else {
     if (effect_type) {
       const newEffectName = new_effect_name || effectName;
+      // Same invariant as the rename guard above: the container does not
+      // enforce name uniqueness, so creating under an already-taken
+      // `new_effect_name` would leave two effects with the same name.
+      if (effectsContainer.hasEffectNamed(newEffectName)) {
+        warnings.push(
+          `An effect named "${newEffectName}" already exists on ${targetLabel}: effect NOT added. Use another name, or target "${newEffectName}" directly with \`effect_name\` to modify it.`
+        );
+        return;
+      }
       currentEffectName = newEffectName;
       const effectMetadata = gd.MetadataProvider.getEffectMetadata(
         project.getCurrentPlatform(),
@@ -6717,15 +6726,21 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           );
         } else {
           if (newGroupName && newGroupName !== groupName) {
-            // Groups share the object namespace and nothing enforces
-            // uniqueness on rename: renaming onto a taken name would leave
-            // two groups (or a group and an object) with the same name.
+            // Groups share the object namespace (across the scene AND the
+            // global scope) and nothing enforces uniqueness on rename:
+            // renaming onto a taken name would leave two groups (or a group
+            // and an object) with the same name.
             if (
               groups.has(newGroupName) ||
-              scene.getObjects().hasObjectNamed(newGroupName)
+              scene.getObjects().hasObjectNamed(newGroupName) ||
+              project.getObjects().hasObjectNamed(newGroupName) ||
+              project
+                .getObjects()
+                .getObjectGroups()
+                .has(newGroupName)
             ) {
               warnings.push(
-                `An object or group named "${newGroupName}" already exists in scene "${scene.getName()}": group "${groupName}" was NOT renamed.`
+                `An object or group named "${newGroupName}" already exists (in scene "${scene.getName()}" or globally): group "${groupName}" was NOT renamed.`
               );
             } else {
               gd.WholeProjectRefactorer.objectOrGroupRenamedInScene(

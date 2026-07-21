@@ -393,10 +393,47 @@ describe('change_scene_properties_layers_effects_groups', () => {
 
     expect(result.success).toBe(false);
     expect(result.warnings).toContain(
-      'An object or group named "Allies" already exists in scene "TestScene": group "Enemies" was NOT renamed.'
+      'An object or group named "Allies" already exists (in scene "TestScene" or globally): group "Enemies" was NOT renamed.'
     );
     expect(result.warnings).toContain(
-      'An object or group named "Ghost" already exists in scene "TestScene": group "Allies" was NOT renamed.'
+      'An object or group named "Ghost" already exists (in scene "TestScene" or globally): group "Allies" was NOT renamed.'
+    );
+    expect(groups.has('Enemies')).toBe(true);
+    expect(groups.has('Allies')).toBe(true);
+  });
+
+  // Groups share the object namespace with the GLOBAL scope too: renaming a
+  // scene group onto a global object (or global group) name would conflate
+  // their references in events.
+  it('refuses to rename a group to an existing global object or global group name', async () => {
+    project.getObjects().insertNewObject(project, 'Sprite', 'Hero', 0);
+    project
+      .getObjects()
+      .getObjectGroups()
+      .insertNew('Bosses', 0);
+    const groups = testScene.getObjects().getObjectGroups();
+    groups.insertNew('Enemies', 0);
+    groups.insertNew('Allies', 1);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [
+            { group_name: 'Enemies', new_group_name: 'Hero' },
+            { group_name: 'Allies', new_group_name: 'Bosses' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.warnings).toContain(
+      'An object or group named "Hero" already exists (in scene "TestScene" or globally): group "Enemies" was NOT renamed.'
+    );
+    expect(result.warnings).toContain(
+      'An object or group named "Bosses" already exists (in scene "TestScene" or globally): group "Allies" was NOT renamed.'
     );
     expect(groups.has('Enemies')).toBe(true);
     expect(groups.has('Allies')).toBe(true);

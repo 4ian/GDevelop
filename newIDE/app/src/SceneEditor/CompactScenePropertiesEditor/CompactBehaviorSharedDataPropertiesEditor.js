@@ -7,9 +7,11 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 
+const gd: libGDevelop = global.gd;
+
 type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
+  behaviorTypeName: string,
   behaviorSharedData: gdBehaviorsSharedData,
   resourceManagementProps: ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
@@ -17,11 +19,15 @@ type CompactBehaviorPropertiesEditorProps = {|
 
 export const CompactBehaviorSharedDataPropertiesEditor = ({
   project,
-  behaviorMetadata,
+  behaviorTypeName,
   behaviorSharedData,
   resourceManagementProps,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorTypeName
+  );
 
   const propertiesSchema = React.useMemo(
     () => {

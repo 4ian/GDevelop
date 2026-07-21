@@ -641,9 +641,31 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
                                ? "  task: new gdjs.ManuallyResolvableTask(),\n"
                                : "";
 
+  const bool hasSignalReceiver =
+      !thisObjectName.empty() || !thisBehaviorName.empty();
+  const gd::String signalReceiverContext =
+      hasSignalReceiver
+          ? "that"
+          : "parentEventsFunctionContext ? "
+            "parentEventsFunctionContext._signalReceiverContext : undefined";
+  const gd::String signalDebugEmitterContext =
+      !thisBehaviorName.empty()
+          ? "that.owner"
+          : (!thisObjectName.empty()
+                 ? "that"
+                 : "parentEventsFunctionContext ? "
+                   "parentEventsFunctionContext._signalDebugEmitterContext : "
+                   "undefined");
+
   return gd::String("var eventsFunctionContext = {\n") +
          // The async task, if there is one
          async +
+         // Signal routing context. Keep it in the events-function context as
+         // event lists can be extracted into helper functions where `that` is
+         // not in scope. Free functions inherit it from their caller.
+         "  _signalReceiverContext: " + signalReceiverContext + ",\n" +
+         "  _signalDebugEmitterContext: " + signalDebugEmitterContext +
+         ",\n" +
          // The object name to parameter map:
          "  _objectsMap: {\n" + objectsGettersMap +
          "},\n"
@@ -1344,11 +1366,14 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   else if (metadata.GetType() == "eventsFunctionContext") {
     argOutput = HasProjectAndLayout() ? "null" : "eventsFunctionContext";
-  } else if (metadata.GetType() == "signalSenderObjectsContext") {
+  } else if (metadata.GetType() == "signalDebugEmitterContext") {
     argOutput = HasProjectAndLayout()
                     ? "undefined"
-                    : "gdjs.evtTools.signal.getSenderFromContext("
-                      "eventsFunctionContext)";
+                    : "eventsFunctionContext._signalDebugEmitterContext";
+  } else if (metadata.GetType() == "signalReceiverContext") {
+    argOutput = HasProjectAndLayout()
+                    ? "undefined"
+                    : "eventsFunctionContext._signalReceiverContext";
   } else
     return gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,

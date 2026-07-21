@@ -390,6 +390,7 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
             this.props.onOpenEventBasedObjectVariantEditor
           }
           onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
+          onOpenPrefabSettings={this.props.onOpenPrefabSettings}
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
           onDeleteEventsBasedObjectVariant={

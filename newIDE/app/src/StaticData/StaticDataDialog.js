@@ -374,8 +374,7 @@ const styles: { [string]: Object } = {
     border: '1px solid #3f4b5d',
     borderRadius: 4,
     padding: '4px 7px',
-    fontFamily: 'monospace',
-    fontSize: 12,
+    font: 'inherit',
     overflowWrap: 'anywhere',
     maxWidth: '100%',
   },
@@ -528,7 +527,7 @@ const formatPathSegment = (
     return isFirstSegment ? segment : '.' + segment;
   }
 
-  return '["' + segment.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]';
+  return "['" + segment.replace(/['\\]/g, '\\$&') + "']";
 };
 
 const getSelectedPath = (

@@ -25,7 +25,6 @@ import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
 import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
-import ToolbarUndoRedoButtons from '../UI/ToolbarUndoRedoButtons';
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -112,10 +111,12 @@ import {
 } from './Create3DModelFromGLB';
 import {
   changeViewPosition,
+  registerCustomObjectDroppedInEmbeddedGameFrameCallback,
   register3DModelFilesDroppedInEmbeddedGameFrameCallback,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
+import { getContentAABB as getEditorContentAABB } from './GetContentAABB';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { type WillDeleteObjectChanges } from '../EditorFunctions/OutsideEditorChanges';
 import {
@@ -136,7 +137,7 @@ const url = optionalRequire('url');
 // it, so the union is kept in sync locally here.
 type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
-type EmbeddedGameFrame3DModelDropPosition = {|
+type EmbeddedGameFrameDropPosition = {|
   x: number,
   y: number,
   z: number,
@@ -394,6 +395,10 @@ type Props = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
@@ -548,6 +553,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   unregister3DModelFilesDroppedInEmbeddedGameFrameCallback:
     | (() => void)
     | null = null;
+  unregisterCustomObjectDroppedInEmbeddedGameFrameCallback:
+    | (() => void)
+    | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
   _reloadResourcesCounter: number = 0;
   _ignoredResourceChangeIdentifiers: { [string]: number } = {};
@@ -614,6 +622,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.props.unsavedChanges.triggerUnsavedChanges();
 
     this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
+    this._syncCustomObjectDroppedInEmbeddedGameFrameCallback();
   }
 
   componentDidMount() {
@@ -687,6 +696,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       );
     }
     this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
+    this._syncCustomObjectDroppedInEmbeddedGameFrameCallback();
   }
 
   componentWillUnmount() {
@@ -700,6 +710,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback) {
       this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
       this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
+    if (this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback();
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = null;
     }
   }
 
@@ -720,6 +734,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     ) {
       this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
       this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
+  };
+
+  _syncCustomObjectDroppedInEmbeddedGameFrameCallback = () => {
+    const shouldRegister =
+      this.props.isActive && this.props.gameEditorMode === 'embedded-game';
+
+    if (
+      shouldRegister &&
+      !this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = registerCustomObjectDroppedInEmbeddedGameFrameCallback(
+        this._onCustomObjectDroppedInEmbeddedGameFrame
+      );
+    } else if (
+      !shouldRegister &&
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback();
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = null;
     }
   };
 
@@ -1195,14 +1229,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
         <SplitEditorToolbar
-          leadingToolbar={
-            <ToolbarUndoRedoButtons
-              undo={this.undo}
-              canUndo={canUndo(this.state.history)}
-              redo={this.redo}
-              canRedo={canRedo(this.state.history)}
-            />
-          }
+          leadingToolbar={null}
           trailingToolbar={
             <MosaicEditorsDisplayToolbar
               gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
@@ -1903,7 +1930,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _getOrCreateObjectFromCustomObjectDragItem = (
-    customObjectDragItem: CustomObjectDragItem
+    customObjectDragItem: CustomObjectDragItem,
+    { notifyInGameEditor = true }: {| notifyInGameEditor?: boolean |} = {}
   ): gdObject | null => {
     if (!this._canAddObject()) return null;
 
@@ -1998,7 +2026,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       false
     );
 
-    this._onObjectsCreated([object], isTheFirstOfItsTypeInProject);
+    this._onObjectsCreated([object], isTheFirstOfItsTypeInProject, {
+      notifyInGameEditor,
+    });
     this.forceUpdateObjectsList();
     return object;
   };
@@ -2673,13 +2703,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  _get3DModelDropPositionInEmbeddedGameFrame = async ({
+  _getDropPositionInEmbeddedGameFrame = async ({
     x,
     y,
   }: {|
     x: number,
     y: number,
-  |}): Promise<?EmbeddedGameFrame3DModelDropPosition> => {
+  |}): Promise<?EmbeddedGameFrameDropPosition> => {
     const { previewDebuggerServer } = this.props;
     if (!previewDebuggerServer) return null;
 
@@ -2713,14 +2743,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             : this.state.chosenLayer,
       };
     } catch (error) {
-      console.error('Unable to get the 3D model drop position:', error);
+      console.error(
+        'Unable to get the embedded 3D editor drop position:',
+        error
+      );
       return null;
     }
   };
 
   _addInstancesForObjectsAt3DPosition = (
     objects: Array<gdObject>,
-    dropPosition: EmbeddedGameFrame3DModelDropPosition
+    dropPosition: EmbeddedGameFrameDropPosition
   ): Array<gdInitialInstance> => {
     if (!objects.length) return [];
 
@@ -2741,6 +2774,68 @@ export default class SceneEditor extends React.Component<Props, State> {
 
       return instance;
     });
+  };
+
+  _onCustomObjectDroppedInEmbeddedGameFrame = async ({
+    customObjectDragItem,
+    x,
+    y,
+  }: {|
+    customObjectDragItem: CustomObjectDragItem,
+    x: number,
+    y: number,
+  |}) => {
+    const dropPosition = await this._getDropPositionInEmbeddedGameFrame({
+      x,
+      y,
+    });
+    if (!dropPosition) return;
+
+    const objectType = gd.PlatformExtension.getObjectFullType(
+      customObjectDragItem.extensionName,
+      customObjectDragItem.eventsBasedObjectName
+    );
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      objectType
+    );
+    const objectCountBeforeDrop = this.props.objectsContainer.getObjectsCount();
+    const object = this._getOrCreateObjectFromCustomObjectDragItem(
+      customObjectDragItem,
+      { notifyInGameEditor: false }
+    );
+    if (!object) return;
+
+    const isNewObject =
+      this.props.objectsContainer.getObjectsCount() > objectCountBeforeDrop;
+    const instances = this._addInstancesForObjectsAt3DPosition(
+      [object],
+      dropPosition
+    );
+    this._onInstancesAdded(instances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances({
+      instances,
+      multiSelect: true,
+      layersLocks: null,
+    });
+    this._onInstancesSelected(instances);
+    this.forceUpdatePropertiesEditor();
+
+    if (isNewObject) {
+      if (isTheFirstOfItsTypeInProject) {
+        this.props.onObjectListsModified({
+          isNewObjectTypeUsed: true,
+        });
+      } else {
+        this._hotReloadObjectsAndAddInstancesInEditor3D({
+          objects: [object],
+          instances,
+        });
+      }
+    } else {
+      this._sendAddedInstances(instances);
+    }
   };
 
   _on3DModelFilesDroppedInEmbeddedGameFrame = async ({
@@ -2769,7 +2864,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     if (!supported3DModelFilePaths.length) return;
 
-    const dropPosition = await this._get3DModelDropPositionInEmbeddedGameFrame({
+    const dropPosition = await this._getDropPositionInEmbeddedGameFrame({
       x,
       y,
     });
@@ -3474,6 +3569,22 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (this.props.gameEditorMode === 'embedded-game') {
       changeViewPosition('zoomToFitContent');
+    }
+  };
+
+  getContentAABB = async (): Promise<Rectangle | null> => {
+    try {
+      return await getEditorContentAABB({
+        gameEditorMode: this.props.gameEditorMode,
+        previewDebuggerServer: this.props.previewDebuggerServer,
+        getInstancesEditorContentAABB: () =>
+          this.editorDisplay
+            ? this.editorDisplay.instancesHandlers.getContentAABB()
+            : null,
+      });
+    } catch (error) {
+      console.error("Can't get the content AABB.", error);
+      return null;
     }
   };
 
@@ -4378,6 +4489,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     eventsBasedObject={eventsBasedObject}
                     eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    getContentAABB={this.getContentAABB}
                     layersContainer={this.props.layersContainer}
                     globalObjectsContainer={this.props.globalObjectsContainer}
                     objectsContainer={this.props.objectsContainer}
@@ -4436,6 +4548,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onOpenPrefabDetailEditor={
                       this.props.onOpenPrefabDetailEditor
                     }
+                    onOpenPrefabSettings={this.props.onOpenPrefabSettings}
                     onDeleteEventsBasedObjectVariant={
                       this.props.onDeleteEventsBasedObjectVariant
                     }
@@ -4868,12 +4981,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                               });
                           }
                         }}
-                        getContentAABB={
-                          this.editorDisplay
-                            ? this.editorDisplay.instancesHandlers
-                                .getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={this.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           this.props.onEventsBasedObjectChildrenEdited
                         }

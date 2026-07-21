@@ -10,14 +10,13 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
-  hasInlineVariableContainerSyntax,
   parseStaticDataFromToml,
   parseTomlSource,
   removeLegacyFolderStructuresFromProject,
   serializeStaticDataToToml,
   validateGameUri,
 } from './index';
-import { compileLayoutDsl } from '../LayoutDsl';
+import { compileLayoutToml } from '../LayoutToml';
 
 const standardEvent = () => ({
   type: 'BuiltinCommonInstructions::Standard',
@@ -212,7 +211,7 @@ describe('GDevelop multi-file project format', () => {
     expect(getLegacyProjectFirstDifferenceDescription(left, left)).toBeNull();
   });
 
-  test('round-trips every component kind through settings TOML, Layout DSL, and IfDo', () => {
+  test('round-trips every component kind through settings/layout TOML and IfDo', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture, {
       migration: {
         source: 'game://game.json',
@@ -227,8 +226,7 @@ describe('GDevelop multi-file project format', () => {
     expect(files[MULTI_FILE_ENTRY_URI]).toContain(
       'combinedSettingsFormatVersion = 1'
     );
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[variables]');
-    expect(files[MULTI_FILE_ENTRY_URI]).not.toMatch(/^variables\s*=/m);
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = [ ]');
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
@@ -559,14 +557,14 @@ column2 = "ssfssdfsf"
     };
     const files = decomposeLegacyProjectToFiles(project);
     const layoutSource = files['game://scenes/Main/Main.layout'];
-    const layoutDocument = compileLayoutDsl(layoutSource, {
+    const layoutDocument = compileLayoutToml(layoutSource, {
       kind: 'scene',
       objectNames: ['Player'],
     });
     const settingsDocument = parseTomlSource(
       files['game://scenes/Main/scene.settings']
     );
-    expect(layoutSource).toMatch(/^<layout version=1 background=/);
+    expect(layoutSource).toMatch(/^\[layout\]\nversion = 1\nbackground = /);
     expect(layoutDocument).not.toHaveProperty('objects');
     expect(layoutDocument).not.toHaveProperty('objectsFolderStructure');
     expect(layoutDocument).not.toHaveProperty('variables');
@@ -679,6 +677,116 @@ column2 = "ssfssdfsf"
     ).toMatchObject({ name: 'Move', type: 'Test::Move', speed: 12 });
   });
 
+  test('preserves behavior properties omitted from an authoring schema', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Player',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics',
+            type: 'Test::Strict',
+            speed: 12,
+            hiddenRuntimeValue: 99,
+            privateRuntimeValue: 'secret',
+          },
+          {
+            name: 'Compatibility',
+            type: 'Test::Preserve',
+            pluginOwnedValue: 'kept',
+          },
+        ],
+      },
+    ];
+    project.layouts[0].instances = [
+      {
+        name: 'Player',
+        x: 0,
+        y: 0,
+        angle: 0,
+        zOrder: 0,
+        layer: '',
+        customSize: false,
+        width: 0,
+        height: 0,
+        persistentUuid: '00000000-0000-4000-8000-000000000001',
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+        behaviorOverridings: [
+          {
+            name: 'Physics',
+            type: 'Test::Strict',
+            speed: 24,
+            hiddenRuntimeValue: 199,
+            privateRuntimeValue: 'instance-secret',
+          },
+          {
+            name: 'Compatibility',
+            type: 'Test::Preserve',
+            pluginOwnedValue: 'instance-kept',
+          },
+        ],
+      },
+    ];
+    const options = {
+      behaviorPropertySchemasByType: {
+        'Test::Strict': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'preserve',
+          properties: [
+            {
+              authoringKey: 'Speed',
+              serializedKey: 'speed',
+              type: 'Number',
+            },
+          ],
+        },
+        'Test::Preserve': {
+          keySpace: 'serialized',
+          unknownPropertyPolicy: 'preserve',
+          properties: [],
+        },
+      },
+    };
+
+    const files = decomposeLegacyProjectToFiles(project, options);
+    const objectSource = files['game://scenes/Main/objects/Player.settings'];
+    const layoutSource = files['game://scenes/Main/Main.layout'];
+    expect(objectSource).toContain('speed = 12');
+    expect(layoutSource).toContain('speed = 24');
+    expect(objectSource).toContain('hiddenRuntimeValue = 99');
+    expect(objectSource).toContain('privateRuntimeValue = "secret"');
+    expect(layoutSource).toContain('hiddenRuntimeValue = 199');
+    expect(layoutSource).toContain('privateRuntimeValue = "instance-secret"');
+    expect(objectSource).toContain('pluginOwnedValue = "kept"');
+    expect(layoutSource).toContain('pluginOwnedValue = "instance-kept"');
+
+    const composed = composeLegacyProjectFromFiles(files, options);
+    expect(composed.layouts[0].objects[0].behaviors[0]).toEqual({
+      name: 'Physics',
+      type: 'Test::Strict',
+      speed: 12,
+      hiddenRuntimeValue: 99,
+      privateRuntimeValue: 'secret',
+    });
+    expect(
+      composed.layouts[0].instances[0].behaviorOverridings[0]
+    ).toMatchObject({
+      name: 'Physics',
+      type: 'Test::Strict',
+      speed: 24,
+      hiddenRuntimeValue: 199,
+      privateRuntimeValue: 'instance-secret',
+    });
+    expect(areLegacyProjectsEquivalent(project, composed, options)).toBe(true);
+    expect(project.layouts[0].objects[0].behaviors[0]).toHaveProperty(
+      'hiddenRuntimeValue',
+      99
+    );
+  });
+
   test('writes Sprite point settings as inline TOML values', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.objects = [
@@ -734,6 +842,56 @@ column2 = "ssfssdfsf"
     expect(source).not.toMatch(
       /^\[+.*(?:originPoint|centerPoint|points|customCollisionMask)\]+$/m
     );
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
+  test('writes empty Sprite point and variable arrays compactly', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].objects = [
+      {
+        name: 'Board',
+        type: 'Sprite',
+        variables: [],
+        behaviors: [],
+        animations: [
+          {
+            name: '',
+            directions: [
+              {
+                looping: false,
+                timeBetweenFrames: 0.1,
+                sprites: [
+                  {
+                    image: 'board.svg',
+                    originPoint: { name: 'origine', x: 0, y: 0 },
+                    centerPoint: {
+                      name: 'centre',
+                      x: 0,
+                      y: 0,
+                      automatic: true,
+                    },
+                    points: [],
+                    hasCustomCollisionMask: false,
+                    customCollisionMask: [],
+                  },
+                ],
+              },
+            ],
+            useMultipleDirections: false,
+          },
+        ],
+      },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    const source = files['game://scenes/Main/objects/Board.settings'];
+
+    expect(source).toContain('points = [ ]');
+    expect(source).toContain('customCollisionMask = [ ]');
+    expect(source).not.toContain('[  ]');
+    expect(source).toContain('variables = [ ]');
     expect(
       areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
     ).toBe(true);
@@ -926,7 +1084,7 @@ folderName = "__ROOT"
     };
     prefab.objectsGroups = [serializedObjectGroup('Parts', ['Body'])];
     const files = decomposeLegacyProjectToFiles(project);
-    const layoutDocument = compileLayoutDsl(
+    const layoutDocument = compileLayoutToml(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout'],
       { kind: 'prefab', objectNames: ['Body'] }
     );
@@ -958,7 +1116,7 @@ folderName = "__ROOT"
     ).toEqual(prefab.objects);
   });
 
-  test('omits hidden behavior properties from object settings and rejects authored copies', () => {
+  test('round-trips hidden behavior properties without advertising them', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const behaviorDefinition =
       project.eventsFunctionsExtensions[0].eventsBasedBehaviors[0];
@@ -971,7 +1129,7 @@ folderName = "__ROOT"
         hidden: true,
       },
     ];
-    const makeObject = name => ({
+    const makeObject = (name: string) => ({
       name,
       type: 'Sprite',
       behaviors: [
@@ -1003,9 +1161,9 @@ folderName = "__ROOT"
         name: 'Health',
         type: 'Combat::Health',
         VisibleValue: 7,
+        RuntimeValue: 99,
       });
-      expect(attachedBehavior).not.toHaveProperty('RuntimeValue');
-      expect(files[objectUri]).not.toContain('RuntimeValue');
+      expect(files[objectUri]).toContain('RuntimeValue = 99');
     });
     const composed = composeLegacyProjectFromFiles(files);
     const composedObjects = [
@@ -1016,23 +1174,20 @@ folderName = "__ROOT"
         .objects[0],
     ];
     composedObjects.forEach(object => {
-      expect(object.behaviors[0]).not.toHaveProperty('RuntimeValue');
+      expect(object.behaviors[0]).toHaveProperty('RuntimeValue', 99);
     });
     expect(areLegacyProjectsEquivalent(project, composed)).toBe(true);
 
     const objectUri = 'game://scenes/Main/objects/ScenePlayer.settings';
     const filesWithHiddenProperty = { ...files };
     filesWithHiddenProperty[objectUri] = files[objectUri].replace(
-      'VisibleValue = 7',
-      'VisibleValue = 7\nRuntimeValue = 99'
+      'RuntimeValue = 99',
+      'RuntimeValue = 123'
     );
-    expect(() =>
-      composeLegacyProjectFromFiles(filesWithHiddenProperty)
-    ).toThrow(
-      expect.objectContaining({
-        code: 'MULTIFILE_FORBIDDEN_HIDDEN_BEHAVIOR_PROPERTY',
-      })
-    );
+    expect(
+      composeLegacyProjectFromFiles(filesWithHiddenProperty).layouts[0]
+        .objects[0].behaviors[0]
+    ).toHaveProperty('RuntimeValue', 123);
   });
 
   test('stores every settings-owned object group in a compact objectGroups table', () => {
@@ -1278,7 +1433,7 @@ objects = [ "Player" ]
     const files = decomposeLegacyProjectToFiles(project);
     expect(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
-    ).toContain('grid-size=16,24,32');
+    ).toContain('grid_size = [16, 24, 32]');
     expect(
       areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
     ).toBe(true);
@@ -1297,7 +1452,7 @@ objects = [ "Player" ]
 
     expect(
       files['game://extensions/Combat/prefabs/Enemy/Enemy.layout']
-    ).toContain('grid-color=#9EB4FF');
+    ).toContain('grid_color = "#9EB4FF"');
     expect(
       output.eventsFunctionsExtensions[0].eventsBasedObjects[0].editionSettings
         .gridColor
@@ -1324,12 +1479,12 @@ objects = [ "Player" ]
     expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
-  test('rejects retired TOML layout sources without a compatibility path', () => {
+  test('rejects retired markup layout sources without a compatibility path', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     const layoutUri = 'game://scenes/Main/Main.layout';
-    files[layoutUri] = 'format = "gdevelop-scene-layout"\nformatVersion = 2\n';
+    files[layoutUri] = '<layout version=1 background=#000000></layout>\n';
     expect(() => composeLegacyProjectFromFiles(files)).toThrow(
-      expect.objectContaining({ code: 'LAYOUT_SYNTAX' })
+      expect.objectContaining({ code: 'LAYOUT_INVALID_TOML' })
     );
   });
 
@@ -1360,13 +1515,7 @@ objects = [ "Player" ]
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.staticData.variables = {};
     const files = decomposeLegacyProjectToFiles(project);
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('[variables]');
-    expect(
-      hasInlineVariableContainerSyntax(
-        files[MULTI_FILE_STATIC_DATA_URI],
-        MULTI_FILE_STATIC_DATA_URI
-      )
-    ).toBe(false);
+    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('variables = { }');
     expect(composeLegacyProjectFromFiles(files).staticData).toEqual(
       project.staticData
     );
@@ -1389,7 +1538,12 @@ objects = [ "Player" ]
   test('accepts Git-style CRLF line endings in every settings source', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     Object.keys(files).forEach(uri => {
-      if (!uri.endsWith('.settings') && !uri.endsWith('.toml')) return;
+      if (
+        !uri.endsWith('.settings') &&
+        !uri.endsWith('.toml') &&
+        !uri.endsWith('.layout')
+      )
+        return;
       files[uri] = files[uri].replace(/\n/g, '\r\n');
     });
 
@@ -1398,7 +1552,7 @@ objects = [ "Player" ]
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
   });
 
-  test('stores every settings-owned variable definition as a named inline descriptor', () => {
+  test('stores every settings-owned variable definition as a repeated named record', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const numberVariable = (name, value) => ({
       name,
@@ -1475,36 +1629,36 @@ objects = [ "Player" ]
     const behaviorSource =
       files['game://extensions/Combat/behaviors/Health/behavior.settings'];
 
-    expect(projectSource).toContain('[variables]');
-    expect(sceneSource).toContain('[variables]');
-    expect(objectSource).toContain('[variables]');
-    expect(extensionSource).toContain('[globalVariables]');
-    expect(extensionSource).toContain('[sceneVariables]');
-    expect(prefabSource).toContain('[variables]');
-    expect(behaviorSource).toContain('[variables]');
+    expect(projectSource).toContain('[[variables]]');
+    expect(sceneSource).toContain('[[variables]]');
+    expect(objectSource).toContain('[[variables]]');
+    expect(extensionSource).toContain('[[globalVariables]]');
+    expect(extensionSource).toContain('[[sceneVariables]]');
+    expect(prefabSource).toContain('[[variables]]');
+    expect(behaviorSource).toContain('[[variables]]');
     expect(extensionSource).toContain(
-      'Controllers = [ { type = "array", children = [ { type = "structure"'
+      'name = "Controllers"\ntype = "array"\nchildren = [ { type = "structure"'
     );
     expect(extensionSource).toContain(
-      'Difficulty = [ { type = "enum", value = "Hard", values = [ "Easy", "Hard" ] } ]'
+      'name = "Difficulty"\ntype = "enum"\nvalue = "Hard"\nvalues = [ "Easy", "Hard" ]'
     );
     expect(sceneSource).toContain(
-      'SceneState = [ { type = "string", value = "Ready" } ]'
+      'name = "SceneState"\ntype = "string"\nvalue = "Ready"'
     );
     expect(prefabSource).toContain(
-      'Enabled = [ { type = "boolean", value = true } ]'
+      'name = "Enabled"\ntype = "boolean"\nvalue = true'
     );
     expect(behaviorSource).toContain(
-      'Cooldown = [ { type = "number", value = 0.25 } ]'
+      'name = "Cooldown"\ntype = "number"\nvalue = 0.25'
     );
     Object.keys(files)
       .filter(uri => uri.endsWith('.settings'))
       .forEach(uri => {
         expect(files[uri]).not.toMatch(
-          /^(?:variables|globalVariables|sceneVariables)\s*=/m
+          /^\[(?:variables|globalVariables|sceneVariables)\]$/m
         );
         expect(files[uri]).not.toMatch(
-          /\[\[(?:variables|globalVariables|sceneVariables)(?:\.|\]\])/m
+          /^(?:variables|globalVariables|sceneVariables)\s*=\s*\[\s*\{/m
         );
       });
     expect(
@@ -1514,66 +1668,32 @@ objects = [ "Player" ]
     const malformedFiles = { ...files };
     malformedFiles[
       'game://extensions/Combat/extension.settings'
-    ] = extensionSource.replace(/Controllers = \[[^\n]+/, 'Controllers = []');
+    ] = extensionSource.replace('name = "Controllers"\n', '');
     expect(() => composeLegacyProjectFromFiles(malformedFiles)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
     );
 
-    const toInlineContainer = (source, field, variableName) =>
-      source.replace(
-        new RegExp(`\\[${field}\\]\\n(${variableName} = [^\\n]+)`),
-        `${field} = { $1 }`
-      );
-    const inlineContainerFiles = { ...files };
-    inlineContainerFiles[MULTI_FILE_ENTRY_URI] = toInlineContainer(
-      projectSource,
-      'variables',
-      'GlobalScore'
-    );
-    inlineContainerFiles[
-      'game://scenes/Main/scene.settings'
-    ] = toInlineContainer(sceneSource, 'variables', 'SceneState');
-    inlineContainerFiles[
-      'game://scenes/Main/objects/Player.settings'
-    ] = toInlineContainer(objectSource, 'variables', 'Health');
-    inlineContainerFiles[
-      'game://extensions/Combat/extension.settings'
-    ] = toInlineContainer(
-      toInlineContainer(extensionSource, 'globalVariables', 'Difficulty'),
-      'sceneVariables',
-      'Controllers'
-    );
-    inlineContainerFiles[
-      'game://extensions/Combat/prefabs/Enemy/prefab.settings'
-    ] = toInlineContainer(prefabSource, 'variables', 'Enabled');
-    inlineContainerFiles[
-      'game://extensions/Combat/behaviors/Health/behavior.settings'
-    ] = toInlineContainer(behaviorSource, 'variables', 'Cooldown');
-    expect(
-      hasInlineVariableContainerSyntax(
-        inlineContainerFiles[MULTI_FILE_ENTRY_URI],
+    expect(() =>
+      parseTomlSource(
+        '[variables]\nScore = [{ type = "number", value = 1 }]\n',
         MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
-    expect(
-      areLegacyProjectsEquivalent(
-        project,
-        composeLegacyProjectFromFiles(inlineContainerFiles)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource(
+        'variables = [{ name = "Score", type = "number", value = 1 }]\n',
+        MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
-
-    const emptyInlineContainerFiles = decomposeLegacyProjectToFiles(
-      projectFixture
-    );
-    emptyInlineContainerFiles[MULTI_FILE_ENTRY_URI] = emptyInlineContainerFiles[
-      MULTI_FILE_ENTRY_URI
-    ].replace('[variables]', 'variables = { }');
-    expect(
-      areLegacyProjectsEquivalent(
-        projectFixture,
-        composeLegacyProjectFromFiles(emptyInlineContainerFiles)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource('variables = { }\n', MULTI_FILE_ENTRY_URI)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource(
+        '[[variables]]\nname = "Data"\ntype = "structure"\n\n[[variables.children]]\nname = "Value"\ntype = "number"\nvalue = 1\n',
+        MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
   });
 
   test('writes TOML without indentation', () => {
@@ -1682,9 +1802,9 @@ objects = [ "Player" ]
     const objectInLayout = decomposeLegacyProjectToFiles(projectFixture);
     objectInLayout['game://scenes/Main/Main.layout'] = objectInLayout[
       'game://scenes/Main/Main.layout'
-    ].replace('</layout>', '  <objects />\n</layout>');
+    ].replace('background = ', 'objects = []\nbackground = ');
     expect(() => composeLegacyProjectFromFiles(objectInLayout)).toThrow(
-      expect.objectContaining({ code: 'LAYOUT_INVALID_CHILD' })
+      expect.objectContaining({ code: 'LAYOUT_UNKNOWN_FIELD' })
     );
 
     const duplicated = decomposeLegacyProjectToFiles(projectFixture);
@@ -1707,10 +1827,10 @@ objects = [ "Player" ]
     ).toThrow(MultiFileProjectError);
   });
 
-  test('round-trips canonical layout DSL through the multi-file project', () => {
+  test('round-trips canonical flat layout TOML through the multi-file project', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     expect(files['game://scenes/Main/Main.layout']).toMatch(
-      /^<layout version=1 background=/
+      /^\[layout\]\nversion = 1\nbackground = /
     );
     expect(
       areLegacyProjectsEquivalent(

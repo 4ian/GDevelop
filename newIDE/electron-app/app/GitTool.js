@@ -3,7 +3,6 @@ const path = require('path');
 
 const gitCommandTimeoutMs = 120000;
 const gitCommandMaxBuffer = 10 * 1024 * 1024;
-const linkedFoldersFileName = '.gdevelop-folder-links.json';
 
 const runGit = (workingDirectory, args, options = {}) =>
   new Promise((resolve, reject) => {
@@ -444,11 +443,7 @@ const resetToCommit = async ({ projectFilePath, commitHash }) => {
 
   const status = await ensureGitRepository(projectFilePath);
   await runGit(status.repoRoot, ['reset', '--hard', commitHash]);
-  await runGit(status.repoRoot, [
-    'clean',
-    '-fd',
-    `--exclude=${linkedFoldersFileName}`,
-  ]);
+  await runGit(status.repoRoot, ['clean', '-fd']);
 
   return getStatus(projectFilePath);
 };
@@ -515,6 +510,55 @@ const getChangedFileDiff = async ({ projectFilePath, file }) => {
   };
 };
 
+const getCommitDiff = async ({ projectFilePath, commitHash }) => {
+  const normalizedCommitHash =
+    typeof commitHash === 'string' ? commitHash.trim() : '';
+  if (!/^[0-9a-f]{7,64}$/i.test(normalizedCommitHash)) {
+    throw new Error('A valid commit hash is required.');
+  }
+
+  const status = await ensureGitRepository(projectFilePath);
+  const commitDetails = await runGit(status.repoRoot, [
+    'rev-list',
+    '--parents',
+    '-n',
+    '1',
+    normalizedCommitHash,
+  ]);
+  const [resolvedCommitHash, firstParentHash] = commitDetails.stdout.split(
+    /\s+/
+  );
+  if (!resolvedCommitHash) throw new Error('Unable to resolve the commit.');
+
+  // Comparing with the first parent gives merge commits the same ordinary
+  // unified patch shape as other commits. Root commits have no parent, so
+  // Git show is used to compare them with an empty tree.
+  const result = firstParentHash
+    ? await runGit(status.repoRoot, [
+        'diff',
+        '--no-ext-diff',
+        '--no-color',
+        '--find-renames',
+        firstParentHash,
+        resolvedCommitHash,
+        '--',
+      ])
+    : await runGit(status.repoRoot, [
+        'show',
+        '--format=',
+        '--no-ext-diff',
+        '--no-color',
+        '--find-renames',
+        resolvedCommitHash,
+        '--',
+      ]);
+
+  return {
+    commitHash: resolvedCommitHash,
+    diff: result.stdout,
+  };
+};
+
 const initializeRepository = async projectFilePath => {
   const projectDirectory = getProjectDirectory(projectFilePath);
   await runGit(projectDirectory, ['init']);
@@ -557,6 +601,11 @@ const handleGitToolRequest = async request => {
       return getChangedFileDiff({
         projectFilePath,
         file: payload.file,
+      });
+    case 'commit-diff':
+      return getCommitDiff({
+        projectFilePath,
+        commitHash: payload.commitHash,
       });
     default:
       throw new Error(`Unknown Git tool action: ${action || 'none'}.`);

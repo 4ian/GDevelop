@@ -14,13 +14,14 @@ It is not a runtime variable store and it is never a place for secrets.
 5. [Placeholder path syntax](#placeholder-path-syntax)
 6. [Resolution behavior](#resolution-behavior)
 7. [Use placeholders in events](#use-placeholders-in-events)
-8. [Use placeholders in custom-object and behavior properties](#use-placeholders-in-custom-object-and-behavior-properties)
-9. [Design reusable components](#design-reusable-components)
-10. [Complete examples](#complete-examples)
-11. [Edit rules](#edit-rules)
-12. [Validate and debug](#validate-and-debug)
-13. [Failure patterns](#failure-patterns)
-14. [Authoring checklist](#authoring-checklist)
+8. [Use placeholders in string variables](#use-placeholders-in-string-variables)
+9. [Use placeholders in custom-object and behavior properties](#use-placeholders-in-custom-object-and-behavior-properties)
+10. [Design reusable components](#design-reusable-components)
+11. [Complete examples](#complete-examples)
+12. [Edit rules](#edit-rules)
+13. [Validate and debug](#validate-and-debug)
+14. [Failure patterns](#failure-patterns)
+15. [Authoring checklist](#authoring-checklist)
 
 ## Choose Static Data or variables
 
@@ -285,6 +286,88 @@ Safe event-use principles:
 - A missing path must fail validation; never silently replace it with an empty
   string or a guessed default.
 
+## Use placeholders in string variables
+
+The initial `value` of a string-type global, scene, object, prefab, or variant
+variable is an eligible placeholder surface. The placeholder is resolved while
+runtime variable data is generated, before the variable is created.
+
+An exact placeholder may point to a primitive, object, or array. Objects and
+arrays resolve to compact JSON text, so one string variable can carry a complete
+Static Data subtree. Do not duplicate the subtree as leaf-by-leaf variable
+descriptors.
+
+For example, row-oriented localization data can keep stable UI keys as rows and
+locales as columns:
+
+```toml
+[i18n]
+defaultLocale = "en"
+supportedLocales = ["en", "zh"]
+
+[localization."ui.title"]
+en = "Card Garden"
+zh = "卡牌花园"
+
+[localization."ui.play"]
+en = "Play"
+zh = "开始"
+```
+
+Keep localization metadata such as `defaultLocale` and `supportedLocales` in a
+sibling table such as `i18n`, not inside `localization`. This keeps the
+`localization` grid homogeneous: every row key is a translation key and every
+column is a locale, without an extra generic `value` column.
+
+Reference the complete localization object once:
+
+```toml
+[variables]
+Locale = [{ type = "string", value = "{{i18n.defaultLocale}}" }]
+Translations = [{ type = "string", value = "{{localization}}" }]
+```
+
+At startup, `Translations` contains compact JSON text such as
+`{"ui.title":{"en":"Card Garden","zh":"卡牌花园"},...}`. When
+events need variable-style child access, convert that same variable once before
+its first consumer:
+
+```events
+@event aiGeneratedEventId="initialize-localization"
+if SceneJustBegins
+do JSONToVariableStructure2 json_string="GlobalVariableString(Translations)" variable_where_to_store_the_json_object="Translations"
+```
+
+After conversion, the variable is a normal mutable structure. A quoted Static
+Data row key such as `ui.title` remains one child name containing a dot; it is
+not automatically expanded into `ui` then `title`.
+
+Variable rules:
+
+- Put the placeholder in a descriptor whose `type` is `string` and keep its
+  normal `value` field. Interpolation and exact placeholders are both allowed.
+- Prefer one exact subtree placeholder such as `{{localization}}` when the
+  Static Data value is an object or array. The result is compact JSON text.
+- Use the catalog's JSON-to-variable conversion action once if runtime events
+  need structure/array child access. The destination may be the same variable.
+- Do not write `value = "{{...}}"` on a `structure` or `array` descriptor;
+  those descriptor types serialize `children`, not `value`. Use a string root
+  placeholder and convert it at runtime instead.
+- Interpolating an object or array into surrounding text also emits compact
+  JSON, but only an exact subtree placeholder is appropriate for later parsing.
+- This rule does not make numeric or boolean variable initializers general
+  placeholder surfaces. Keep those values literal unless another documented
+  configuration surface performs the typed conversion.
+- The runtime variable is ordinary mutable data after initialization or JSON
+  conversion. Changing it does not change Static Data, and changing Static Data
+  does not update an already running preview.
+- Missing paths are generation errors just as they are on event and property
+  surfaces.
+
+Prefer direct string-variable initialization over scene-start copy actions when
+the value is static configuration. Add only the one-time JSON conversion when a
+runtime variable tree is actually needed.
+
 ## Use placeholders in custom-object and behavior properties
 
 Event-based object and behavior properties are another supported boundary.
@@ -400,8 +483,9 @@ health = 30
 damage = 8
 ```
 
-Use these as static property defaults/configured values. Copy them into runtime
-variables at initialization only if gameplay must later mutate them.
+Use these as static property defaults/configured values. A string variable may
+reference Static Data directly in its initial `value`; use an initialization
+event when a runtime value needs typed conversion, derivation, or later refresh.
 
 ### Arrays and special keys
 
@@ -476,7 +560,8 @@ After editing:
 3. Confirm there are no `[settings]`, `[staticData]`, format-version, or
    serializer wrappers.
 4. Search changed placeholder paths and confirm their exact type/value.
-5. Confirm each use is on a supported action/property surface.
+5. Confirm each use is on a supported action, string-variable, or property
+   surface.
 6. Reload the project. Treat a reload error as a source-format failure and fix
    `static-data.toml`.
 7. Launch a fresh preview/export generation. Missing placeholders appear in
@@ -498,6 +583,11 @@ error with a fabricated value unless that default is part of the user's design.
 - Trying to store JSON `null`, mixed-type arrays, dates, or unsafe integers.
 - Using inconsistent types for the same field across content records.
 - Using a placeholder in a numeric event expression or receiving condition.
+- Repeating one object subtree as many leaf placeholders instead of using one
+  string root placeholder and a JSON-to-variable conversion.
+- Putting `value = "{{...}}"` on a structure/array descriptor even though those
+  descriptor types serialize `children`.
+- Assuming a resolved string variable remains linked to Static Data at runtime.
 - Omitting the nested GDevelop-expression quotes in an IfDo string operand.
 - Using number/boolean interpolation instead of an exact whole placeholder.
 - Replacing a `JsonObject` descriptor's concrete JSON example with a placeholder.
@@ -514,7 +604,11 @@ error with a fabricated value unless that default is part of the user's design.
 - Use only values TOML represents losslessly.
 - Choose stable, case-consistent, typed paths.
 - Verify every placeholder path, bracket segment, and array index.
-- Use placeholders only on supported action/property surfaces.
+- Use placeholders only on supported action, string-variable, or property
+  surfaces.
+- Keep variable placeholders in string descriptor `value` fields. For an
+  object/array subtree, prefer one exact root placeholder and convert its JSON
+  text once when runtime child access is needed.
 - Keep scalar property placeholders exact where required and give every
   `JsonObject` property a concrete, complete JSON example.
 - Inject static data through properties/parameters for reusable extensions.

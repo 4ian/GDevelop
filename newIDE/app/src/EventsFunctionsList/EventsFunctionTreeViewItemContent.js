@@ -131,7 +131,6 @@ export const getFunctionIconUrl = (
         case 'onSceneLoaded':
         case 'onFirstSceneLoaded':
         case 'onCreated':
-        case 'onPlacedInScene':
           return 'res/functions/create_black.svg';
 
         case 'onHotReloading':
@@ -159,6 +158,11 @@ export type EventsFunctionCallbacks = {|
     selectedEventsFunction: ?gdEventsFunction,
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
     selectedEventsBasedObject: ?gdEventsBasedObject
+  ) => void,
+  onOpenEventsFunctionSettings: (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
   ) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
@@ -365,6 +369,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     } = this.props;
 
     return [
+      {
+        label: i18n._(t`Function settings`),
+        click: () =>
+          this.props.onOpenEventsFunctionSettings(
+            eventsFunction,
+            eventsBasedBehavior,
+            eventsBasedObject
+          ),
+      },
       {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)

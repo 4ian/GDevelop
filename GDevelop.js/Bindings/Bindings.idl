@@ -4055,6 +4055,9 @@ interface Model3DAnimation {
     void SetSource([Const] DOMString name);
     [Const, Ref] DOMString GetSource();
 
+    void SetSourceModelResourceName([Const] DOMString resourceName);
+    [Const, Ref] DOMString GetSourceModelResourceName();
+
     void SetShouldLoop(boolean shouldLoop);
     boolean ShouldLoop();
 };
@@ -4071,6 +4074,13 @@ interface Model3DObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    unsigned long GetSharedAnimationModelResourcesCount();
+    [Const, Ref] DOMString GetSharedAnimationModelResourceName(unsigned long index);
+    boolean HasSharedAnimationModelResourceNamed([Const] DOMString resourceName);
+    void AddSharedAnimationModelResource([Const] DOMString resourceName);
+    void RemoveSharedAnimationModelResource(unsigned long index);
+    void RemoveAllSharedAnimationModelResources();
 
     double GetWidth();
     double GetHeight();

@@ -29,6 +29,7 @@ export type SceneEditorsDisplayProps = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -61,6 +62,10 @@ export type SceneEditorsDisplayProps = {|
     variantName: string
   ) => void,
   onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,

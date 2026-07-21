@@ -198,9 +198,9 @@ export const useParameterOverridingAlertDialog = (): ((
   return async (existingParameterNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
       title: t`Existing parameters`,
-      message: t`These parameters already exist:${'\n\n - ' +
-        existingParameterNames.join('\n\n - ') +
-        '\n\n'}Do you want to replace them?`,
+      message: t`These parameters already exist:${
+        '\n\n - ' + existingParameterNames.join('\n\n - ') + '\n\n'
+      }Do you want to replace them?`,
       confirmButtonLabel: t`Replace`,
       dismissButtonLabel: t`Omit`,
     });
@@ -212,11 +212,13 @@ const getValidatedParameterName = (
   projectScopedContainers: gdProjectScopedContainers,
   newName: string
 ): string => {
-  const variablesContainersList = projectScopedContainers.getVariablesContainersList();
-  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  const variablesContainersList =
+    projectScopedContainers.getVariablesContainersList();
+  const objectsContainersList =
+    projectScopedContainers.getObjectsContainersList();
   const safeAndUniqueNewName = newNameGenerator(
     gd.Project.getSafeName(newName),
-    tentativeNewName =>
+    (tentativeNewName) =>
       parameters.hasParameterNamed(tentativeNewName) ||
       variablesContainersList.has(tentativeNewName) ||
       objectsContainersList.hasObjectNamed(tentativeNewName)
@@ -248,7 +250,7 @@ export const fillBehaviorParameter = (
 };
 
 export type CompactEventsFunctionParametersEditorInterface = {
-  editEventsFunctionParameter: VariableDialogOpeningProps => void,
+  editEventsFunctionParameter: (VariableDialogOpeningProps) => void,
 };
 
 type Props = {|
@@ -328,18 +330,12 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     ref
   ) => {
     const scrollView = React.useRef<?ScrollViewInterface>(null);
-    const [
-      justAddedParameterName,
-      setJustAddedParameterName,
-    ] = React.useState<?string>(null);
-    const [
-      selectedParameterName,
-      setSelectedParameterName,
-    ] = React.useState<?string>(null);
-    const [
-      selectedParametersEditorTab,
-      setSelectedParametersEditorTab,
-    ] = React.useState<ParametersEditorTab>('parameters');
+    const [justAddedParameterName, setJustAddedParameterName] =
+      React.useState<?string>(null);
+    const [selectedParameterName, setSelectedParameterName] =
+      React.useState<?string>(null);
+    const [selectedParametersEditorTab, setSelectedParametersEditorTab] =
+      React.useState<ParametersEditorTab>('parameters');
     const [parameterSearchText, setParameterSearchText] = React.useState('');
     const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState<{
       objectParameter: gdParameterMetadata | null,
@@ -350,43 +346,42 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       new Map<string, CompactTextFieldInterface | null>()
     );
 
-    React.useEffect(
-      () => {
-        if (!justAddedParameterName) {
-          return;
-        }
-        if (scrollView.current && justAddedParameterElement.current) {
-          scrollView.current.scrollTo(justAddedParameterElement.current);
-          setJustAddedParameterName(null);
-          justAddedParameterElement.current = null;
-        }
-        const parameterNameField = parameterNameFieldRefs.current.get(
-          justAddedParameterName
-        );
-        if (parameterNameField) {
-          parameterNameField.focus();
-          parameterNameField.select();
-        }
-      },
-      [justAddedParameterName]
-    );
+    React.useEffect(() => {
+      if (!justAddedParameterName) {
+        return;
+      }
+      if (scrollView.current && justAddedParameterElement.current) {
+        scrollView.current.scrollTo(justAddedParameterElement.current);
+        setJustAddedParameterName(null);
+        justAddedParameterElement.current = null;
+      }
+      const parameterNameField = parameterNameFieldRefs.current.get(
+        justAddedParameterName
+      );
+      if (parameterNameField) {
+        parameterNameField.focus();
+        parameterNameField.select();
+      }
+    }, [justAddedParameterName]);
 
     const draggedParameter = React.useRef<?gdParameterMetadata>(null);
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-    const showParameterOverridingConfirmation = useParameterOverridingAlertDialog();
+    const showParameterOverridingConfirmation =
+      useParameterOverridingAlertDialog();
 
     const forceUpdate = useForceUpdate();
 
     const functionName = eventsFunction.getName();
     const isOnSignalLifecycleEventsFunction =
-      functionName === 'onSignal' && !!eventsBasedObject && !eventsBasedBehavior;
+      functionName === 'onSignal' &&
+      (!!eventsBasedObject || !!eventsBasedBehavior);
     const isABehaviorLifecycleEventsFunction =
       !!eventsBasedBehavior &&
-      (gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+      gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
         functionName
-      ));
+      );
     const isAnObjectLifecycleEventsFunction =
       !!eventsBasedObject &&
       !eventsBasedBehavior &&
@@ -400,19 +395,17 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       isAnObjectLifecycleEventsFunction;
     freezeParameters = freezeParameters || isLifecycleEventsFunction;
 
-    const [
-      longDescriptionShownIndexes,
-      setLongDescriptionShownIndexes,
-    ] = React.useState<{ [number]: boolean }>({});
+    const [longDescriptionShownIndexes, setLongDescriptionShownIndexes] =
+      React.useState<{ [number]: boolean }>({});
 
     const firstParameterIndex = eventsBasedBehavior
       ? 2
       : eventsBasedObject
-      ? 1
-      : 0;
+        ? 1
+        : 0;
     const isParameterDisabled = React.useCallback(
       // $FlowFixMe[missing-local-annot]
-      index => {
+      (index) => {
         return (
           eventsFunction.getFunctionType() ===
             gd.EventsFunction.ActionWithOperator ||
@@ -506,9 +499,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       (name: string) => {
         const parameters = eventsFunction.getParameters();
         const removedParameter = parameters.getParameter(name);
-        const removedParameterIndex = parameters.getParameterPosition(
-          removedParameter
-        );
+        const removedParameterIndex =
+          parameters.getParameterPosition(removedParameter);
         const nextSelectedParameterName =
           parameters.getParametersCount() > 1
             ? parameters
@@ -546,7 +538,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     const duplicateParameter = React.useCallback(
       (parameter: gdParameterMetadata, index: number) => {
         const parameters = eventsFunction.getParameters();
-        const newName = newNameGenerator(parameter.getName(), name =>
+        const newName = newNameGenerator(parameter.getName(), (name) =>
           parameters.hasParameterNamed(name)
         );
 
@@ -566,7 +558,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     const pasteParameters = React.useCallback(
       // $FlowFixMe[missing-local-annot]
-      async propertyInsertionIndex => {
+      async (propertyInsertionIndex) => {
         const clipboardContent = Clipboard.get(PARAMETERS_CLIPBOARD_KIND);
         const parameterContents = SafeExtractor.extractArray(clipboardContent);
         if (!parameterContents) return;
@@ -581,7 +573,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           name: string,
           serializedParameter: string,
         }> = [];
-        parameterContents.forEach(parameterContent => {
+        parameterContents.forEach((parameterContent) => {
           const name = SafeExtractor.extractStringProperty(
             parameterContent,
             'name'
@@ -621,7 +613,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
         let shouldOverrideParameters = false;
         if (existingNamedParameters.length > 0) {
           shouldOverrideParameters = await showParameterOverridingConfirmation(
-            existingNamedParameters.map(namedParameter => namedParameter.name)
+            existingNamedParameters.map((namedParameter) => namedParameter.name)
           );
 
           if (shouldOverrideParameters) {
@@ -657,14 +649,11 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       ]
     );
 
-    const pasteParametersAtTheEnd = React.useCallback(
-      async () => {
-        await pasteParameters(
-          eventsFunction.getParameters().getParametersCount()
-        );
-      },
-      [eventsFunction, pasteParameters]
-    );
+    const pasteParametersAtTheEnd = React.useCallback(async () => {
+      await pasteParameters(
+        eventsFunction.getParameters().getParametersCount()
+      );
+    }, [eventsFunction, pasteParameters]);
 
     const pasteParametersBefore = React.useCallback(
       async (parameter: gdParameterMetadata) => {
@@ -686,7 +675,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               eventsFunction,
               oldIndex,
               newIndex,
-              isDone => {
+              (isDone) => {
                 if (!isDone) return;
                 parameters.moveParameter(oldIndex, newIndex);
                 forceUpdate();
@@ -700,7 +689,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               eventsFunction,
               oldIndex,
               newIndex,
-              isDone => {
+              (isDone) => {
                 if (!isDone) return;
                 parameters.moveParameter(oldIndex, newIndex);
                 forceUpdate();
@@ -713,7 +702,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               eventsFunction,
               oldIndex,
               newIndex,
-              isDone => {
+              (isDone) => {
                 // $FlowFixMe[constant-condition]
                 if (!isDone) return;
                 parameters.moveParameter(oldIndex, newIndex);
@@ -789,7 +778,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     // Same thing for an object which has mandatory Object parameter.
     const typeShownFirstIndex = firstParameterIndex;
     // $FlowFixMe[missing-local-annot]
-    const isParameterTypeShown = index => {
+    const isParameterTypeShown = (index) => {
       return index >= typeShownFirstIndex;
     };
     // The first two parameters of a behavior method should not be changed at all,
@@ -803,7 +792,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
 
     const isParameterDescriptionShown = React.useCallback(
       // $FlowFixMe[missing-local-annot]
-      index => {
+      (index) => {
         return index >= labelShownFirstIndex;
       },
       [labelShownFirstIndex]
@@ -824,8 +813,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
     const parametersIndexOffset = eventsBasedBehavior
       ? ParametersIndexOffsets.BehaviorFunction
       : eventsBasedObject
-      ? ParametersIndexOffsets.ObjectFunction
-      : ParametersIndexOffsets.FreeFunction;
+        ? ParametersIndexOffsets.ObjectFunction
+        : ParametersIndexOffsets.FreeFunction;
     const getParameterReferenceLabel = (index: number): string =>
       `_PARAM${index + parametersIndexOffset}_`;
     const copyParameterReferenceLabel = React.useCallback(
@@ -866,36 +855,38 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       isLifecycleEventsFunction && !isOnSignalLifecycleEventsFunction
         ? []
         : isOnSignalLifecycleEventsFunction
-        ? mapFor(
-            firstParameterIndex,
-            parameters.getParametersCount(),
-            index => index
-          )
-        : mapFor(0, parameters.getParametersCount(), index => index);
+          ? mapFor(
+              firstParameterIndex,
+              parameters.getParametersCount(),
+              (index) => index
+            )
+          : mapFor(0, parameters.getParametersCount(), (index) => index);
     const parametersCount = visibleParameterIndexes.length;
     const firstParameterName =
       parametersCount > 0
         ? parameters.getParameterAt(visibleParameterIndexes[0]).getName()
         : null;
 
-    React.useEffect(
-      () => {
-        if (parametersCount === 0) {
-          if (selectedParameterName !== null) {
-            setSelectedParameterName(null);
-          }
-          return;
+    React.useEffect(() => {
+      if (parametersCount === 0) {
+        if (selectedParameterName !== null) {
+          setSelectedParameterName(null);
         }
+        return;
+      }
 
-        if (
-          !selectedParameterName ||
-          !parameters.hasParameterNamed(selectedParameterName)
-        ) {
-          setSelectedParameterName(firstParameterName);
-        }
-      },
-      [firstParameterName, parameters, parametersCount, selectedParameterName]
-    );
+      if (
+        !selectedParameterName ||
+        !parameters.hasParameterNamed(selectedParameterName)
+      ) {
+        setSelectedParameterName(firstParameterName);
+      }
+    }, [
+      firstParameterName,
+      parameters,
+      parametersCount,
+      selectedParameterName,
+    ]);
 
     const selectedParameterIndex =
       selectedParameterName &&
@@ -909,8 +900,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             parameters.getParameter(selectedParameterName)
           )
         : parametersCount > 0
-        ? visibleParameterIndexes[0]
-        : -1;
+          ? visibleParameterIndexes[0]
+          : -1;
 
     const isAnExtensionLifecycleEventsFunction =
       !eventsBasedBehavior &&
@@ -1060,7 +1051,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       i18n: I18nType,
       parameter: gdParameterMetadata,
       index: number,
-      connectDragSource: React.Node => React.Node,
+      connectDragSource: (React.Node) => React.Node,
       isSelected?: boolean,
       onSelect?: () => void,
       hideDragHandle?: boolean,
@@ -1080,8 +1071,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             backgroundColor: transparentBackground
               ? 'transparent'
               : isSelected
-              ? gdevelopTheme.listItem.selectedBackgroundColor
-              : gdevelopTheme.list.itemsBackgroundColor,
+                ? gdevelopTheme.listItem.selectedBackgroundColor
+                : gdevelopTheme.list.itemsBackgroundColor,
           }}
           onClick={onSelect}
         >
@@ -1098,13 +1089,13 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             <LineStackLayout noMargin expand alignItems="center">
               {renderParameterReferenceLabel(i18n, index, isSelected)}
               <CompactSemiControlledTextField
-                ref={ref => {
+                ref={(ref) => {
                   parameterNameFieldRefs.current.set(parameter.getName(), ref);
                 }}
                 commitOnBlur
                 placeholder={i18n._(t`Enter the parameter name (mandatory)`)}
                 value={parameter.getName()}
-                onChange={newName => renameParameter(parameter, newName)}
+                onChange={(newName) => renameParameter(parameter, newName)}
                 disabled={isParameterDisabled(index)}
               />
             </LineStackLayout>
@@ -1162,7 +1153,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               <CompactSemiControlledTextField
                 commitOnBlur
                 value={parameter.getDescription()}
-                onChange={text => {
+                onChange={(text) => {
                   parameter.setDescription(text);
                   forceUpdate();
                 }}
@@ -1178,7 +1169,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
           <CompactTextAreaField
             label={i18n._(t`Long description`)}
             value={parameter.getLongDescription()}
-            onChange={text => {
+            onChange={(text) => {
               parameter.setLongDescription(text);
               forceUpdate();
             }}
@@ -1397,7 +1388,9 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
             <Line>
               <Column noMargin expand noOverflowParent>
                 {visibleParameterIndexes.length > 0 ? (
-                  visibleParameterIndexes.map(i => renderParameterRow(i18n, i))
+                  visibleParameterIndexes.map((i) =>
+                    renderParameterRow(i18n, i)
+                  )
                 ) : isLifecycleEventsFunction ? (
                   <EmptyMessage>
                     <Trans>This function has no parameters.</Trans>
@@ -1417,7 +1410,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
         selectedParameterIndex >= 0
           ? parameters.getParameterAt(selectedParameterIndex)
           : null;
-      const matchingParameterIndexes = visibleParameterIndexes.filter(index =>
+      const matchingParameterIndexes = visibleParameterIndexes.filter((index) =>
         getIsParameterMatchingSearch(parameters.getParameterAt(index), index)
       );
 
@@ -1504,7 +1497,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                     >
                       <div style={styles.splitListScrollContent}>
                         {matchingParameterIndexes.length > 0 ? (
-                          matchingParameterIndexes.map(i =>
+                          matchingParameterIndexes.map((i) =>
                             renderParameterListItem(i18n, i)
                           )
                         ) : parametersCount > 0 ? (
@@ -1542,7 +1535,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                           i18n,
                           parameter: selectedParameter,
                           index: selectedParameterIndex,
-                          connectDragSource: element => element,
+                          connectDragSource: (element) => element,
                           isSelected: true,
                           hideDragHandle: true,
                           transparentBackground: true,
@@ -1625,7 +1618,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                 objectBehaviorsTypes={[]}
                 isChildObject={false}
                 onClose={() => setNewBehaviorDialogOpen(null)}
-                onChoose={type => {
+                onChoose={(type) => {
                   const parameter = newBehaviorDialogOpen.behaviorParameter;
                   const valueTypeMetadata = parameter.getValueTypeMetadata();
                   valueTypeMetadata.setExtraInfo(type);

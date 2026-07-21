@@ -146,6 +146,9 @@ const staticDataItemId = getProjectManagerItemId('static-data');
 export const globalObjectsItemId: string = getProjectManagerItemId(
   'global-objects'
 );
+export const objectSettingsItemId: string = getProjectManagerItemId(
+  'object-settings'
+);
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
   'custom-objects'
@@ -787,6 +790,7 @@ type Props = {|
   onOpenResources: () => void,
   onOpenStickyNotes: () => void,
   onOpenStaticData: () => void,
+  onOpenObjectSettings: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -868,6 +872,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onOpenResources,
       onOpenStickyNotes,
       onOpenStaticData,
+      onOpenObjectSettings,
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
@@ -1873,6 +1878,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         'res/icons_default/global_object24_black.svg'
                       )
                     ),
+                    new LeafTreeViewItem(
+                      new ActionTreeViewItemContent(
+                        objectSettingsItemId,
+                        i18n._(t`Object Settings`),
+                        onOpenObjectSettings,
+                        'res/functions/object_black.svg'
+                      )
+                    ),
                   ];
                 },
               },
@@ -2221,6 +2234,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
         onOpenStaticData,
+        onOpenObjectSettings,
         onOpenResources,
         onOpenStickyNotes,
         onShareProject,

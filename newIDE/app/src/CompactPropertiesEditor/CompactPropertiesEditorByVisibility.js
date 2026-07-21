@@ -205,6 +205,7 @@ export const CompactPropertiesEditorByVisibility = ({
   removeSpacers,
   customizeBasicSchema,
   onRefreshAllFields,
+  isAdvancedSectionInitiallyUncollapsed,
 }: {|
   onInstancesModified?: Instances => void,
   schema: Schema,
@@ -214,6 +215,7 @@ export const CompactPropertiesEditorByVisibility = ({
   customizeBasicSchema?: (Schema => Schema) | null,
   placeholder: React.Node,
   onRefreshAllFields: () => void,
+  isAdvancedSectionInitiallyUncollapsed?: boolean,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -274,7 +276,10 @@ export const CompactPropertiesEditorByVisibility = ({
       )}
       {hasAdvancedProperties && (
         <CompactCollapsibleAdvancedSection
-          uncollapsedByDefault={areAdvancedPropertiesExpandedByDefault}
+          uncollapsedByDefault={
+            !!isAdvancedSectionInitiallyUncollapsed ||
+            areAdvancedPropertiesExpandedByDefault
+          }
         >
           <CompactPropertiesEditor
             project={project}

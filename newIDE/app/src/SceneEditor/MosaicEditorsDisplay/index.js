@@ -360,6 +360,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   props.onOpenEventBasedObjectVariantEditor
                 }
                 onOpenPrefabDetailEditor={props.onOpenPrefabDetailEditor}
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onDeleteEventsBasedObjectVariant={
                   props.onDeleteEventsBasedObjectVariant
                 }
@@ -371,11 +372,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onLayersModified={props.onLayersModified}
                 eventsBasedObject={props.eventsBasedObject}
                 eventsBasedObjectVariant={props.eventsBasedObjectVariant}
-                getContentAABB={
-                  editorRef.current
-                    ? editorRef.current.getContentAABB
-                    : () => null
-                }
+                getContentAABB={props.getContentAABB}
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
@@ -525,6 +522,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onExportAssets={props.onExportAssets}
                 onImportAssets={props.onImportAssets}
                 onDeleteObjects={(objectWithContext, cb) =>

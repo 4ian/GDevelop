@@ -91,9 +91,6 @@ gd::String GenerateVariableFromJsonValueCode(const gd::String& value,
 gd::String ObjectCodeGenerator::onCreatedFunctionName =
     "onCreated";
 
-gd::String ObjectCodeGenerator::onPlacedInSceneFunctionName =
-    "onPlacedInScene";
-
 gd::String ObjectCodeGenerator::doStepPreEventsFunctionName =
     "doStepPreEvents";
 
@@ -165,8 +162,6 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
                       : "",
                   functionName == onCreatedFunctionName
                       ? "gdjs.CustomRuntimeObject.prototype.onCreated.call(this);\n"
-                  : functionName == onPlacedInSceneFunctionName
-                      ? "gdjs.CustomRuntimeObject.prototype.onPlacedInScene.call(this);\n"
                       : "",
                   includeFiles,
                   compilationForRuntime);

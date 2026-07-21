@@ -12,6 +12,7 @@ import {
   canRenameProjectFileNode,
   canUpdateProjectFolderFromTemplate,
   findNodeById,
+  getProjectFileNodeIdsAfterSelection,
   getLinkedFoldersFilePath,
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
@@ -376,6 +377,79 @@ describe('ProjectFilesPanel', () => {
     expect(shouldSelectProjectFileNode(fileNode)).toBe(true);
   });
 
+  it('replaces the selection on a regular click', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png', '01.png'],
+        nodeId: '03.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png', '03.png'],
+        anchorNodeId: '01.png',
+        isToggleSelection: false,
+        isRangeSelection: false,
+      })
+    ).toEqual(['03.png']);
+  });
+
+  it('toggles individual files with Ctrl or Cmd selection', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png'],
+        nodeId: '02.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png'],
+        anchorNodeId: '00.png',
+        isToggleSelection: true,
+        isRangeSelection: false,
+      })
+    ).toEqual(['00.png', '02.png']);
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png', '02.png'],
+        nodeId: '00.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png'],
+        anchorNodeId: '02.png',
+        isToggleSelection: true,
+        isRangeSelection: false,
+      })
+    ).toEqual(['02.png']);
+  });
+
+  it('selects a contiguous range in either direction with Shift', () => {
+    const orderedNodeIds = ['00.png', '01.png', '02.png', '03.png', '04.png'];
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['01.png'],
+        nodeId: '04.png',
+        orderedNodeIds,
+        anchorNodeId: '01.png',
+        isToggleSelection: false,
+        isRangeSelection: true,
+      })
+    ).toEqual(['01.png', '02.png', '03.png', '04.png']);
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['04.png'],
+        nodeId: '01.png',
+        orderedNodeIds,
+        anchorNodeId: '04.png',
+        isToggleSelection: false,
+        isRangeSelection: true,
+      })
+    ).toEqual(['01.png', '02.png', '03.png', '04.png']);
+  });
+
+  it('adds a range to the selection with Ctrl or Cmd plus Shift', () => {
+    expect(
+      getProjectFileNodeIdsAfterSelection({
+        selectedNodeIds: ['00.png'],
+        nodeId: '04.png',
+        orderedNodeIds: ['00.png', '01.png', '02.png', '03.png', '04.png'],
+        anchorNodeId: '02.png',
+        isToggleSelection: true,
+        isRangeSelection: true,
+      })
+    ).toEqual(['00.png', '02.png', '03.png', '04.png']);
+  });
+
   it('computes moved file and resource paths', () => {
     const movedFilePath = getMovedProjectFilePath({
       sourceNode: fileNode,
@@ -492,7 +566,7 @@ describe('ProjectFilesPanel', () => {
       getLinkedFoldersFilePath({
         getProjectFile: () => 'D:\\Project\\game.json',
       })
-    ).toBe('D:\\Project\\.gdevelop-folder-links.json');
+    ).toBe('D:\\Project\\.gdevelop\\folder-links.json');
     expect(isProjectFileNode(fileNode)).toBe(true);
     expect(isProjectFileNode(linkedFileNode)).toBe(false);
   });
@@ -552,7 +626,7 @@ describe('ProjectFilesPanel', () => {
   it('shows the add folder link action only on the linked folders root', () => {
     const source = getSource();
 
-    expect(source).toContain("'.gdevelop-folder-links.json'");
+    expect(source).toContain("'folder-links.json'");
     expect(source).not.toContain(
       'children: [...children, linkedFoldersRootNode]'
     );
@@ -574,6 +648,29 @@ describe('ProjectFilesPanel', () => {
     );
     expect(source).toContain('openAddLinkedFolderDialog');
     expect(source).toContain('removeLinkedFolder(node)');
+  });
+
+  it("can open a linked file's folder", () => {
+    const source = getSource();
+
+    expect(source).toContain('shell.showItemInFolder(node.absolutePath);');
+    expect(source).toContain("...(node.type === 'file'");
+    expect(source).toContain('label: i18n._(t`Open folder`)');
+    expect(source).toContain('click: () => openFolderForNode(node)');
+  });
+
+  it('can open folders and copy absolute paths from project nodes', () => {
+    const source = getSource();
+    const menuStart = source.indexOf('const menu: Array<MenuItemTemplate> = [');
+    const menuEnd = source.indexOf('];', menuStart);
+    const menu = source.slice(menuStart, menuEnd);
+
+    expect(source).toContain("if (node.type === 'folder') {");
+    expect(source).toContain('shell.openPath(node.absolutePath);');
+    expect(menu).toContain('label: i18n._(t`Open folder`)');
+    expect(menu).toContain('click: () => openFolderForNode(node)');
+    expect(menu).toContain('label: i18n._(t`Copy absolute path`)');
+    expect(menu).toContain('click: () => copyNodeAbsolutePath(node)');
   });
 
   it('does not auto-select a newly created folder', () => {

@@ -1,13 +1,13 @@
 # GDevelop Multi-file Project Format
 
-## TOML settings, Layout DSL, and IfDo event source files
+## TOML settings, flat layout TOML, and IfDo event source files
 
 **Status:** Version 1.0 implemented format contract
 **Entry file:** `project.settings`
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
 **Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
-[gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md)
+[gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md)
 
 ---
 
@@ -46,7 +46,7 @@ This specification replaces the single large GDevelop project JSON document with
 
 - TOML for project, scene, extension, prefab, behavior, resource, and global
   configuration settings.
-- Layout DSL component-tree markup for visual/spatial `.layout` sources.
+- Flat standard TOML for visual/spatial `.layout` sources.
 - One `.events` source file for every scene event sheet and every events-based function.
 - Stable, explicit file references so a scene, function, behavior, or prefab can be reviewed and changed independently.
 - A compatibility adapter that reconstructs the current legacy serializer tree in memory. The existing `gd::Project`, preview, export, code generation, and runtime paths continue to consume the current model.
@@ -54,7 +54,7 @@ This specification replaces the single large GDevelop project JSON document with
 The format is intended to improve AI editing, human review, merge behavior, and Git history without requiring a runtime-format migration.
 
 This document is a design and implementation contract. The repository now
-contains the TOML-settings/Layout-DSL multi-file adapter in
+contains the TOML-settings/layout-TOML multi-file adapter in
 `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, the local transactional
 filesystem integration in
 `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`,
@@ -272,12 +272,14 @@ both; the two files remain independent unless both are listed in
   project components that currently own settings, and the non-hidden object,
   behavior, and effect types registered for the loaded project. Behavior and
   effect entries include their authoring property metadata. Hidden behavior
-  descriptors are deliberately omitted: they are runtime-managed, use their
-  descriptor defaults, and are forbidden in attached object settings. AI
-  models must consult the catalog before creating settings-owned definitions
-  and must never edit it.
+  descriptors are deliberately omitted from the authoring surface because they
+  require a specialized editor. Their existing serialized values remain in
+  attached object settings and must round-trip verbatim: hidden does not mean
+  runtime-managed or disposable. AI models must consult the catalog before
+  creating settings-owned definitions, must preserve unlisted existing
+  behavior fields, and must never edit the generated catalog.
 - `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
-  It describes every Layout DSL element and attribute plus the project-aware
+  It describes every layout TOML table and field plus the project-aware
   scene, prefab, variant, and external-layout contexts. Each context lists the
   object definitions, attached behaviors, and layers that can be referenced in
   that layout. Registered effect types and typed parameters are included so an
@@ -301,7 +303,7 @@ both; the two files remain independent unless both are listed in
 
 ## 5. Common file rules
 
-### 5.1 Settings fragments and layout grammar
+### 5.1 Settings fragments and layout schema
 
 Every `.settings` file is a standalone, unindented TOML document whose owned
 component fields are written at the local document root. Long qualified TOML
@@ -321,22 +323,26 @@ For example, the root above in
 `extensions."Combat".functions."CalculateDamage"`. The path is the namespace;
 the file does not repeat it.
 
-`.layout` files are not TOML and are not appended to the settings document.
-They use the context supplied by the referencing scene, prefab/variant, or
-external-layout settings entry and must have exactly one Layout DSL root:
+`.layout` files are standalone standard TOML documents and are not appended to
+the settings document. They use the context supplied by the referencing scene,
+prefab/variant, or external-layout settings entry and must have exactly one
+`[layout]` table:
 
-```layout
-<layout version=1 background=#202030>
-  <layer name="">
-    <camera size=default viewport=default />
-  </layer>
-</layout>
+```toml
+[layout]
+version = 1
+background = "#202030"
+
+[[layers]]
+id = "base"
+name = ""
+cameras = [{ size = "default", viewport = "default" }]
 ```
 
-There is no compatibility reader for the retired TOML `.layout` draft and no
-format-marker table inside layout source. The complete normative grammar,
+There is no compatibility reader for the retired markup format or earlier
+wrapped TOML drafts. The complete normative schema,
 compiler/decompiler mapping, defaults, semantic checks, and canonical writer
-are defined by [gdevelop-layout-dsl-spec.md](gdevelop-layout-dsl-spec.md).
+are defined by [gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md).
 
 ### 5.1.1 Strict extension ownership
 
@@ -345,7 +351,7 @@ The three source extensions have non-overlapping responsibilities:
 | Extension   | Allowed content                                                                                                                                     | Forbidden content                                                                                                    |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `.settings` | TOML identity, metadata, signatures, per-object definitions and their behaviors/variables/effects, local ordering, and runtime/editor configuration | IfDo statements, instance placement, layer ordering, spatial layout payloads, and references to other settings files |
-| `.layout`   | Layout DSL instances, layers, positions, bounds/dimensions, background, and editor-canvas state                                                     | TOML, object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings       |
+| `.layout`   | Flat TOML instances, layers, positions, bounds/dimensions, background, and editor-canvas state                                                      | Object/attached-behavior definitions, events, signatures, runtime logic, and general non-layout settings             |
 | `.events`   | Typed IfDo event statements, DSL comments, metadata annotations, and exact catalog instructions                                                     | TOML front matter, settings tables, layout data, raw event/instruction JSON, or legacy project configuration         |
 
 The loader rejects a file containing content owned by another extension. It
@@ -418,9 +424,8 @@ to the project directory.
 
 Every `.settings` file remains an independent canonical TOML file when stored:
 
-- Canonical `.settings` writers use no indentation: every non-empty settings
-  line begins at column zero. Layout DSL uses canonical two-space structural
-  indentation because hierarchy is part of its human-readable component tree.
+- Canonical `.settings` and `.layout` writers use no indentation: every
+  non-empty assignment or table header begins at column zero.
 - A settings file must not contain the TOML text or local payload owned by
   another settings file.
 - The format has no TOML `include`, import, inheritance, or textual-expansion
@@ -485,53 +490,60 @@ kind = "extension"
 kind = "function"
 ```
 
-### 5.1.4 Named variable tables with inline descriptors
+### 5.1.4 Repeated named variable records
 
-Every settings-owned variable container uses a dedicated TOML table header
-keyed by variable name. The header is exactly `[variables]`,
-`[globalVariables]`, or `[sceneVariables]`. This applies to:
+Every non-empty settings-owned variable container uses repeated TOML
+array-of-table records. The header is exactly `[[variables]]`,
+`[[globalVariables]]`, or `[[sceneVariables]]`. This applies to:
 
 - Project, scene, object, prefab, and events-based behavior `variables`.
 - Extension `globalVariables` and `sceneVariables`.
 
-Each variable value is exactly one inline array containing its complete legacy
-descriptor without the repeated `name` member. Nested `children` remain arrays
-of descriptors and are written with inline tables, so no recursive TOML table
-headers are generated. For example:
+Each record contains an explicit non-empty `name` followed by its complete
+descriptor. Nested `children` remain arrays of inline descriptors, so no
+recursive TOML table headers are generated. For example:
 
 ```toml
-[sceneVariables]
-Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [  ] } ] } ] } ]
+[[sceneVariables]]
+name = "Controllers"
+type = "array"
+children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [ ] } ] } ]
 ```
 
 Primitive variables use the same rule:
 
 ```toml
-[variables]
-Score = [ { type = "number", value = 0 } ]
-PlayerName = [ { type = "string", value = "Ada" } ]
-Enabled = [ { type = "boolean", value = true } ]
+[[variables]]
+name = "Score"
+type = "number"
+value = 0
+
+[[variables]]
+name = "PlayerName"
+type = "string"
+value = "Ada"
+
+[[variables]]
+name = "Enabled"
+type = "boolean"
+value = true
 ```
 
 The descriptor preserves `type`, `value` or `children`, enum `values`,
 `folded`, `persistentUuid`, `hasMixedValues`, and unknown serializer fields.
-The loader restores `name` from the TOML key and reconstructs the current
-legacy variable array. An empty container is an empty table header:
+The loader preserves record order and reconstructs the current legacy variable
+array. An empty container uses an explicit empty root array:
 
 ```toml
-[variables]
+variables = [ ]
 ```
 
-Whole-container inline assignments such as
-`variables = { Score = [{ type = "number", value = 0 }] }` and
-`variables = { }` are noncanonical migration inputs. When a local project is
-opened, the loader accepts these inline-table assignments, reconstructs their
-root variable containers, and atomically rewrites only the affected settings
-files with dedicated table headers before returning the loaded project. This
-is an automatic one-time source migration, not an authoring form. Assignments
-to arrays or scalars, recursive forms such as `[[variables]]` and
-`[[sceneVariables.children]]`, and descriptors that repeat `name` remain
-invalid.
+Keyed tables such as `[variables]`, whole-container inline assignments such as
+`variables = { ... }`, and non-empty inline arrays such as
+`variables = [{ name = "Score", ... }]` are invalid. Empty `variables = [ ]`,
+`globalVariables = [ ]`, and `sceneVariables = [ ]` assignments are the only
+assignment form. Recursive forms such as `[[sceneVariables.children]]` are
+also invalid.
 
 ### 5.1.5 Compact object groups
 
@@ -625,9 +637,10 @@ Writers use TOML 1.0 with these restrictions:
 - Decimal integers and floats only.
 - RFC 3339 dates are not used for semantic project data; timestamps are strings.
 - Tables and array-of-tables are emitted in schema order.
-- Variable containers are emitted only as `[variables]`, `[globalVariables]`,
-  or `[sceneVariables]` tables. Each named descriptor value and its nested
-  descriptor objects are emitted as a one-line inline array/table.
+- Non-empty variable containers are emitted only as repeated `[[variables]]`,
+  `[[globalVariables]]`, or `[[sceneVariables]]` records with explicit `name`
+  fields. Nested descriptor objects remain inline. Empty containers are
+  emitted as root `field = [ ]` assignments.
 - Object groups are emitted only as `[objectGroups]` tables whose values are
   arrays of object-name strings. Their optional serialized
   `requiredBehaviors` metadata is emitted in the parallel
@@ -648,14 +661,15 @@ the multi-file format. Physical project directories own component structure,
 and the legacy runtime/editor model rebuilds any transient root folders while
 composing.
 
-Attached behavior instances are a deliberate projection exception. An object
-settings file stores only the behavior identity fields and author-writable
-properties exposed by `.gdevelop/settings-catalog.json`. A property descriptor
-marked `hidden` in an events-based behavior definition remains in that
-behavior's own `behavior.settings`, but its value must not be copied into any
-global, scene, prefab, or prefab-variant object definition. The composer rejects
-such authored values. Runtime behavior code initializes omitted hidden values
-from descriptor defaults and owns their later state.
+Attached behavior instances use the serializer key space. The catalog lists
+the author-writable properties that an AI may initialize or edit, while hidden,
+deprecated, extension-owned, and legacy serialized fields are intentionally
+not advertised. Any such fields already present in a global, scene, prefab, or
+prefab-variant object definition still belong to that attached behavior and
+must round-trip unchanged. This distinction lets specialized behavior editors
+persist runtime configuration such as collision layers, masks, collider
+dimensions, and offsets without exposing those fields in the generic authoring
+surface.
 
 ### 5.3 JSON-to-TOML projection
 
@@ -838,7 +852,8 @@ packageName = "com.example.mygame"
 orientation = "default"
 ```
 
-Real entry files also contain the `[objectGroups]` and `[variables]` tables.
+Real entry files also contain `[objectGroups]` and either repeated
+`[[variables]]` records or `variables = [ ]`.
 Global object definitions and resources are never
 written in `project.settings`. No settings file may contain a legacy
 `objectsFolderStructure` table.
@@ -863,7 +878,7 @@ type = "Sprite"
 behaviors = []
 effects = []
 
-[variables]
+variables = [ ]
 ```
 
 The file owns the complete global object definition. Directories between
@@ -1051,7 +1066,7 @@ type = "Sprite"
 behaviors = []
 effects = []
 
-[variables]
+variables = [ ]
 ```
 
 The file owns the complete polymorphic object definition, including attached
@@ -1070,18 +1085,26 @@ editor-canvas state. An instance refers to an object definition owned by
 a scene object `.settings` file; the definition itself never appears in this
 file.
 
-```layout
-<layout version=1 background=#202030>
-  <editor grid=true grid-size=32,32,32 snap=true />
+```toml
+[layout]
+version = 1
+background = "#202030"
 
-  <layer name="">
-    <camera size=default viewport=default />
-    <Player
-      id="ef3ef49d-f20f-4450-b373-0ce43291a002"
-      at=128,256
-    />
-  </layer>
-</layout>
+[editor]
+grid = true
+grid_size = [32, 32, 32]
+snap = true
+
+[[layers]]
+id = "base"
+name = ""
+cameras = [{ size = "default", viewport = "default" }]
+
+[[instances]]
+layer = "base"
+object = "Player"
+id = "ef3ef49d-f20f-4450-b373-0ce43291a002"
+at = [128, 256]
 ```
 
 The scene layout payload may contain only:
@@ -1361,10 +1384,10 @@ The file owns the complete child object definition and uses the namespace
 `[extensions."<Extension>".prefabs."<Prefab>".objects."<Object>"]`. Its
 physical folder path is the editor object folder path.
 
-```layout
-<layout version=1>
-  <bounds min=0,0,0 max=64,64,64 />
-</layout>
+```toml
+[layout]
+version = 1
+bounds = { min = [0, 0, 0], max = [64, 64, 64] }
 ```
 
 When composing legacy JSON, settings-owned object definitions and layout-owned
@@ -1373,7 +1396,7 @@ spatial fields are merged into the prefab object at the same level, matching
 
 ### 9.3 Variant layouts
 
-Current prefabs may contain `variants`. Layout DSL stores each non-default
+Current prefabs may contain `variants`. Layout TOML stores each non-default
 variant's spatial data in `variants/<Variant>.layout` using prefab-variant
 context. Variant identity and asset-store identifiers
 as well as its groups and other variant metadata are configuration in the
@@ -1576,8 +1599,8 @@ and compiled `events`.
 ### 12.3 External layouts
 
 An external layout is one layout-only
-`externals/<ExternalName>.layout` Layout DSL file compiled in external context.
-It owns only `instances` and `editionSettings`; its `<layer>` elements reference
+`externals/<ExternalName>.layout` TOML file compiled in external context.
+It owns only `instances` and `editionSettings`; its `[[layers]]` records reference
 the linked scene's existing layers rather than defining layers.
 Its `name`, `linkedScene`, and order come from the corresponding
 `external.settings` `layoutFiles` entry. The composer maps `linkedScene` to
@@ -1611,10 +1634,10 @@ project.settings
 
 | New source                                                                 | Legacy destination                                                                                                          |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `project.settings` ordinary payload                                        | Project root excluding resources, static data, global object definitions, and four split arrays                           |
+| `project.settings` ordinary payload                                        | Project root excluding resources, static data, global object definitions, and four split arrays                             |
 | Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
 | `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
-| `static-data.toml` direct root                                                  | Editor-only Static Data object without adding or removing user keys                                                       |
+| `static-data.toml` direct root                                             | Editor-only Static Data object without adding or removing user keys                                                         |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
 | `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
 | `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
@@ -1631,7 +1654,7 @@ Catalog instruction types and named parameters cannot be compiled safely
 without the loaded project's instruction metadata. The loader therefore uses
 two logical passes:
 
-1. Discover and parse all TOML settings fragments, compile every Layout DSL
+1. Discover and parse all TOML settings fragments, compile every layout TOML
    source in its owner context, and resolve every pure `.events` body through
    its owning settings document and path-derived namespace.
 2. Build a skeleton legacy tree with scenes, objects, variables, resources
@@ -1724,7 +1747,7 @@ unrelated extensions, or `project.settings`.
 | Project properties, global object groups, and global variables                                        | `project.settings`                                               |
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
-| Editor-only Static Data                                                                             | `static-data.toml`                                                    |
+| Editor-only Static Data                                                                               | `static-data.toml`                                               |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
 | A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
 | Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
@@ -1764,7 +1787,7 @@ The writer:
    `.gdevelop/layout-catalog.json`. The instruction catalog contains actions,
    conditions, expressions, and function signatures. The settings catalog
    contains file ownership schemas and registered object/behavior/effect
-   metadata. The layout catalog contains the Layout DSL grammar and each
+   metadata. The layout catalog contains the layout TOML tables and each
    layout's resolvable objects, attached behaviors, and layers.
    Instruction enumeration covers the non-deprecated authoring surface. It
    excludes editor-hidden compatibility instructions, instructions with deprecation
@@ -2194,7 +2217,7 @@ A conforming implementation must satisfy all of the following:
    reference from or merge into `project.settings`. Generated compatibility
    JSON and runtime exports omit the Static Data map.
 6. Every scene has its own subfolder with `scene.settings`, a placement-focused
-   Layout DSL file, an events DSL file, and flat object
+   layout TOML file, an events DSL file, and flat object
    settings. Object definitions and their behaviors belong to individual
    object settings; instances and layers belong to the layout.
 7. The root `externals/` directory is a sibling of `scenes/`; it contains

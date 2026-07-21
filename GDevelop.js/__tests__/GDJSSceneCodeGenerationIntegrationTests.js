@@ -289,7 +289,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     });
     const emittedSignals = [];
     gdjs.evtTools.signal = {
-      emitSceneSignal: (_runtimeScene, signalName, payload) => {
+      emitSceneSignalFromEvents: (_runtimeScene, signalName, payload) => {
         emittedSignals.push({ signalName, payload });
       },
     };

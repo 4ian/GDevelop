@@ -39,7 +39,11 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import {
   drawLocalImageOperationToCanvas,
+  drawLocalImageSplitTileToCanvas,
   getLocalImageOutputBaseName,
+  getLocalImageSplitFileName,
+  getLocalImageSplitOutputFolderName,
+  getLocalImageSplitTiles,
   shouldDisableLocalImageApplyButton,
   type LocalImageCrop,
   type LocalImageExpandDirection,
@@ -860,6 +864,8 @@ const ToolsPanel = ({
     setLocalExpandDirection,
   ] = React.useState<LocalImageExpandDirection>('right');
   const [localExpandAmount, setLocalExpandAmount] = React.useState('32');
+  const [localSplitRows, setLocalSplitRows] = React.useState('1');
+  const [localSplitColumns, setLocalSplitColumns] = React.useState('1');
   const [localExpandFillColor, setLocalExpandFillColor] = React.useState(
     '0;0;0'
   );
@@ -1682,6 +1688,8 @@ const ToolsPanel = ({
         height: parsePixelField(localCropHeight),
       };
       const expandAmount = parsePixelField(localExpandAmount);
+      const splitRows = parsePixelField(localSplitRows);
+      const splitColumns = parsePixelField(localSplitColumns);
 
       setIsProcessingLocalImage(true);
       setLocalImageError(null);
@@ -1695,6 +1703,71 @@ const ToolsPanel = ({
           width: sourceImage.naturalWidth || sourceImage.width,
           height: sourceImage.naturalHeight || sourceImage.height,
         };
+
+        if (localImageOperation === 'split-spritesheet') {
+          const tiles = getLocalImageSplitTiles({
+            sourceSize,
+            rows: splitRows,
+            columns: splitColumns,
+          });
+          const projectRootPath = getProjectRootPath(project);
+          if (!projectRootPath) {
+            throw new Error('Save the project before splitting an image.');
+          }
+          const assetsFolderPath = path.join(projectRootPath, 'assets');
+          const outputFolderPath = path.join(
+            assetsFolderPath,
+            getLocalImageSplitOutputFolderName(imageAttachment.name)
+          );
+          if (!isAbsolutePathInside(assetsFolderPath, outputFolderPath)) {
+            throw new Error('Unable to create the spritesheet output folder.');
+          }
+          await fs.promises.mkdir(outputFolderPath, { recursive: true });
+
+          let firstOutputPath: ?string = null;
+          for (let index = 0; index < tiles.length; index++) {
+            const canvas = document.createElement('canvas');
+            drawLocalImageSplitTileToCanvas({
+              canvas,
+              image: sourceImage,
+              tile: tiles[index],
+            });
+            const outputBlob = await canvasToPngBlob(canvas);
+            const outputPath = path.join(
+              outputFolderPath,
+              getLocalImageSplitFileName(index + 1)
+            );
+            await fs.promises.writeFile(
+              outputPath,
+              await blobToBuffer(outputBlob)
+            );
+            if (!firstOutputPath) firstOutputPath = outputPath;
+          }
+
+          if (!firstOutputPath) {
+            throw new Error('No spritesheet images were generated.');
+          }
+          const normalizedOutputFolderPath = normalizeSlashes(outputFolderPath);
+          const normalizedFirstOutputPath = normalizeSlashes(firstOutputPath);
+          const firstOutputUrl = getFileUrl(firstOutputPath);
+          setLocalImageStatus(
+            `Saved ${tiles.length} images to ${normalizedOutputFolderPath}`
+          );
+          setLocalImageResultPath(normalizedOutputFolderPath);
+          setLocalImageResultUrl(firstOutputUrl);
+          onOpenWorkingDeskTask({
+            id: `local-image:${outputFolderPath}`,
+            kind: 'local-image',
+            title: path.basename(outputFolderPath),
+            status: 'success',
+            statusText: `${tiles.length} images saved.`,
+            generatedImagePath: normalizedFirstOutputPath,
+            generatedImageUrl: firstOutputUrl,
+          });
+          await onProjectFilesChanged();
+          return;
+        }
+
         const canvas = document.createElement('canvas');
         drawLocalImageOperationToCanvas({
           canvas,
@@ -1759,6 +1832,8 @@ const ToolsPanel = ({
       localExpandFillAlpha,
       localExpandFillColor,
       localImageOperation,
+      localSplitColumns,
+      localSplitRows,
       onOpenWorkingDeskTask,
       onProjectFilesChanged,
       project,
@@ -2384,7 +2459,11 @@ const ToolsPanel = ({
           floatingLabelText={<Trans>Operation</Trans>}
           value={localImageOperation}
           onChange={(event, index, value: string) => {
-            if (value === 'crop' || value === 'expand-canvas') {
+            if (
+              value === 'crop' ||
+              value === 'expand-canvas' ||
+              value === 'split-spritesheet'
+            ) {
               setLocalImageOperation(value);
             }
           }}
@@ -2392,6 +2471,10 @@ const ToolsPanel = ({
         >
           <SelectOption value="crop" label={t`Crop`} />
           <SelectOption value="expand-canvas" label={t`Expand canvas`} />
+          <SelectOption
+            value="split-spritesheet"
+            label={t`Split spritesheet`}
+          />
         </SelectField>
       </div>
       {localImageOperation === 'crop' ? (
@@ -2429,7 +2512,7 @@ const ToolsPanel = ({
             fullWidth
           />
         </div>
-      ) : (
+      ) : localImageOperation === 'expand-canvas' ? (
         <>
           <div style={styles.toolSelector}>
             <SelectField
@@ -2475,6 +2558,34 @@ const ToolsPanel = ({
             fullWidth
           />
         </>
+      ) : (
+        <>
+          <div style={styles.fieldGrid}>
+            <TextField
+              type="number"
+              value={localSplitRows}
+              onChange={(event, value) => setLocalSplitRows(value)}
+              floatingLabelText={<Trans>Rows</Trans>}
+              min={1}
+              max={999}
+              fullWidth
+            />
+            <TextField
+              type="number"
+              value={localSplitColumns}
+              onChange={(event, value) => setLocalSplitColumns(value)}
+              floatingLabelText={<Trans>Columns</Trans>}
+              min={1}
+              max={999}
+              fullWidth
+            />
+          </div>
+          <Text noMargin size="body-small" color="secondary">
+            <Trans>
+              Creates up to 999 images, named 001.png through 999.png.
+            </Trans>
+          </Text>
+        </>
       )}
       <MiniToolbar noPadding>
         <RaisedButton
@@ -2488,6 +2599,8 @@ const ToolsPanel = ({
             operation: localImageOperation,
             crop: localCrop,
             expandAmount: parsePixelField(localExpandAmount),
+            splitRows: parsePixelField(localSplitRows),
+            splitColumns: parsePixelField(localSplitColumns),
           })}
         />
       </MiniToolbar>

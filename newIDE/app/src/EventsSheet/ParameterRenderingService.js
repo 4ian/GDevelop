@@ -72,6 +72,7 @@ import LayerEffectParameterNameField from './ParameterFields/LayerEffectParamete
 import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
 import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
+import Model3DBoneNameField from './ParameterFields/Model3DBoneNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import ObjectSkinNameField from './ParameterFields/ObjectSkinNameField';
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
@@ -145,6 +146,7 @@ const components: {
   objectEffectName: ObjectEffectNameField,
   objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
+  model3DBoneName: Model3DBoneNameField,
   objectAnimationName: ObjectAnimationNameField,
   objectSkinName: ObjectSkinNameField,
   functionParameterName: FunctionParameterNameField,
@@ -218,6 +220,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectEffectName: t`Object effect name`,
   objectEffectParameterName: t`Object effect property name`,
   objectPointName: t`Object point name`,
+  model3DBoneName: t`3D model bone name`,
   objectAnimationName: t`Object animation name`,
   objectSkinName: t`Object skin name`,
   functionParameterName: t`Parameter name`,

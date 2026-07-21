@@ -333,6 +333,43 @@ def ensure_electron_dependencies(
         )
 
 
+def ensure_packaged_electron_runtime_dependencies(
+    electron_runtime_dir: Path, dry_run: bool
+) -> None:
+    step("Ensure packaged Electron runtime dependencies")
+    node_modules = electron_runtime_dir / "node_modules"
+    needed, reason = npm_install_needed(
+        electron_runtime_dir, required_dependencies=("typescript",)
+    )
+    if not needed:
+        print(
+            f"Packaged runtime dependencies present: {node_modules}",
+            flush=True,
+        )
+        return
+
+    print(
+        "Packaged Electron runtime dependencies out of date "
+        f"({reason}); running npm install in newIDE/electron-app/app.",
+        flush=True,
+    )
+    run_command(
+        [resolve_tool("npm"), "install"],
+        cwd=electron_runtime_dir,
+        dry_run=dry_run,
+    )
+
+    if not dry_run:
+        still_needed, still_needed_reason = npm_install_needed(
+            electron_runtime_dir, required_dependencies=("typescript",)
+        )
+        if still_needed:
+            raise RuntimeError(
+                "Packaged Electron runtime dependencies are still invalid after "
+                f"npm install: {still_needed_reason}"
+            )
+
+
 def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
     step("Ensure React app dependencies")
     node_modules = app_dir / "node_modules"
@@ -510,6 +547,7 @@ def main() -> int:
     repo_root = args.repo_root.resolve()
     app_dir = repo_root / "newIDE" / "app"
     electron_app_dir = repo_root / "newIDE" / "electron-app"
+    electron_runtime_dir = electron_app_dir / "app"
     dist_dir = electron_app_dir / "dist"
     electron_builder = electron_app_dir / "node_modules" / ".bin" / "electron-builder"
 
@@ -537,6 +575,9 @@ def main() -> int:
             return 0
 
         ensure_electron_dependencies(electron_app_dir, electron_builder, args.dry_run)
+        ensure_packaged_electron_runtime_dependencies(
+            electron_runtime_dir, args.dry_run
+        )
         ensure_react_app_dependencies(app_dir, args.dry_run)
         build_libgd(
             repo_root,

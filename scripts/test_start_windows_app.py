@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import tempfile
 import unittest
 from importlib import util
 from pathlib import Path
@@ -20,7 +21,7 @@ def load_script_module():
 
 
 class StartWindowsAppScriptTest(unittest.TestCase):
-    def test_dry_run_lists_full_startup_flow(self):
+    def test_dry_run_lists_no_launch_build_flow(self):
         result = subprocess.run(
             [sys.executable, str(SCRIPT), "--dry-run", "--no-launch"],
             cwd=ROOT_DIR,
@@ -30,9 +31,10 @@ class StartWindowsAppScriptTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("DRY RUN", result.stdout)
-        self.assertIn("Stop existing GDevelop Electron processes", result.stdout)
-        self.assertIn("Stop stale dev servers on ports 3000 and 5002", result.stdout)
+        self.assertNotIn("Stop existing GDevelop Electron processes", result.stdout)
+        self.assertNotIn("Stop stale dev servers on ports 3000 and 5002", result.stdout)
         self.assertIn("Ensure Electron dependencies", result.stdout)
+        self.assertIn("Ensure packaged Electron runtime dependencies", result.stdout)
         self.assertIn("Build React app", result.stdout)
         self.assertIn("Sync Electron app/www", result.stdout)
         self.assertIn("run build", result.stdout)
@@ -70,6 +72,57 @@ class StartWindowsAppScriptTest(unittest.TestCase):
         self.assertEqual(output, "")
         self.assertEqual(run.call_args.kwargs["encoding"], "utf-8")
         self.assertEqual(run.call_args.kwargs["errors"], "replace")
+
+    def test_packaged_runtime_installs_when_typescript_is_missing(self):
+        module = load_script_module()
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            runtime_dir = Path(temporary_directory)
+            node_modules = runtime_dir / "node_modules"
+            node_modules.mkdir()
+            (runtime_dir / "package.json").write_text(
+                '{"dependencies":{"typescript":"4.9.5"}}', encoding="utf-8"
+            )
+            (runtime_dir / "package-lock.json").write_text("{}", encoding="utf-8")
+            (node_modules / ".package-lock.json").write_text("{}", encoding="utf-8")
+
+            with mock.patch.object(module, "resolve_tool", return_value="npm"):
+                with mock.patch.object(module, "run_command") as run_command:
+                    module.ensure_packaged_electron_runtime_dependencies(
+                        runtime_dir, dry_run=True
+                    )
+
+        run_command.assert_called_once_with(
+            ["npm", "install"], cwd=runtime_dir, dry_run=True
+        )
+
+    def test_packaged_runtime_installs_when_typescript_version_is_wrong(self):
+        module = load_script_module()
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            runtime_dir = Path(temporary_directory)
+            typescript_dir = runtime_dir / "node_modules" / "typescript"
+            typescript_dir.mkdir(parents=True)
+            (runtime_dir / "package.json").write_text(
+                '{"dependencies":{"typescript":"4.9.5"}}', encoding="utf-8"
+            )
+            (runtime_dir / "package-lock.json").write_text("{}", encoding="utf-8")
+            (typescript_dir / "package.json").write_text(
+                '{"version":"5.9.3"}', encoding="utf-8"
+            )
+            (runtime_dir / "node_modules" / ".package-lock.json").write_text(
+                "{}", encoding="utf-8"
+            )
+
+            with mock.patch.object(module, "resolve_tool", return_value="npm"):
+                with mock.patch.object(module, "run_command") as run_command:
+                    module.ensure_packaged_electron_runtime_dependencies(
+                        runtime_dir, dry_run=True
+                    )
+
+        run_command.assert_called_once_with(
+            ["npm", "install"], cwd=runtime_dir, dry_run=True
+        )
 
     def test_refuses_to_run_as_administrator(self):
         module = load_script_module()
@@ -138,7 +191,7 @@ class StartWindowsAppScriptTest(unittest.TestCase):
         self.assertIn("Write-Warning", port_stop_script)
         self.assertIn("exit 0", port_stop_script)
 
-    def test_electron_runs_in_foreground_with_inherited_console(self):
+    def test_electron_runs_detached_without_inherited_console(self):
         module = load_script_module()
         electron_app_dir = ROOT_DIR / "newIDE" / "electron-app"
         electron_exe = (
@@ -155,24 +208,17 @@ class StartWindowsAppScriptTest(unittest.TestCase):
                 electron_app_dir, electron_exe, dry_run=False
             )
 
-        self.assertIs(launched_process, process)
+        self.assertEqual(launched_process, process.pid)
         self.assertEqual(popen.call_args.args[0], [str(electron_exe), "app"])
         self.assertEqual(popen.call_args.kwargs["cwd"], electron_app_dir)
         self.assertEqual(popen.call_args.kwargs["env"]["ELECTRON_IS_DEV"], "0")
-        self.assertNotIn("stdin", popen.call_args.kwargs)
-        self.assertNotIn("stdout", popen.call_args.kwargs)
-        self.assertNotIn("stderr", popen.call_args.kwargs)
-        self.assertNotIn("creationflags", popen.call_args.kwargs)
-
-    def test_wait_for_electron_waits_and_rejects_failure(self):
-        module = load_script_module()
-        process = mock.Mock()
-        process.wait.return_value = 7
-
-        with self.assertRaisesRegex(RuntimeError, "Electron exited with code 7"):
-            module.wait_for_electron(process)
-
-        process.wait.assert_called_once_with()
+        self.assertIs(popen.call_args.kwargs["stdin"], subprocess.DEVNULL)
+        self.assertIs(popen.call_args.kwargs["stdout"], subprocess.DEVNULL)
+        self.assertIs(popen.call_args.kwargs["stderr"], subprocess.DEVNULL)
+        self.assertEqual(
+            popen.call_args.kwargs["creationflags"],
+            subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+        )
 
 
 if __name__ == "__main__":

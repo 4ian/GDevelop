@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 
-type SignalDebugStatus = 'delivered' | 'unhandled' | 'dropped';
+type SignalDebugStatus = 'delivered' | 'unhandled' | 'throttled';
 
 type SignalDebugPoint = {
   objectName: string,
@@ -12,7 +12,8 @@ type SignalDebugPoint = {
 type SignalDebugReceiver = {
   objectName: string,
   objectId: number,
-  receiverName?: string,
+  receiverName: string,
+  receiverKind: 'scene' | 'prefab' | 'behavior',
   ...
 };
 
@@ -27,7 +28,7 @@ type SignalDebugRecord = {
   source: ?SignalDebugPoint,
   receivers: Array<string>,
   receiverPositions: Array<SignalDebugReceiver>,
-  targetPositions: Array<SignalDebugReceiver>,
+  targetPositions: Array<SignalDebugPoint>,
   ...
 };
 
@@ -35,10 +36,11 @@ export type SignalDiagnostics = {
   frameId: number,
   queuedSignalsCount: number,
   emittedSignalsCount: number,
-  droppedSignalsCount: number,
+  throttledSignalsCount: number,
   deliveredSignalsThisFrameCount: number,
   receiversThisFrameCount: number,
   signalsThisFrame: Array<SignalDebugRecord>,
+  recentSignals: Array<SignalDebugRecord>,
   ...
 };
 
@@ -62,20 +64,14 @@ type Props = {|
 type SignalDiagnosticsCounters = {|
   frameId: number,
   emittedSignalsCount: number,
-  droppedSignalsCount: number,
+  throttledSignalsCount: number,
 |};
 
 const maxSignalDebugPanelLogs = 40;
 const signalDebugUnhandledColor = 0xffc857;
-const signalDebugDroppedColor = 0xff5c8a;
+const signalDebugThrottledColor = 0xff5c8a;
 const signalDebugColors = [
-  0x00d1ff,
-  0xffc857,
-  0xff5c8a,
-  0x7cff6b,
-  0xb388ff,
-  0xff9f1c,
-  0x40f99b,
+  0x00d1ff, 0xffc857, 0xff5c8a, 0x7cff6b, 0xb388ff, 0xff9f1c, 0x40f99b,
   0xff4d4d,
 ];
 
@@ -88,8 +84,9 @@ const toHexColor = (color: number): string =>
   '#' + ('000000' + color.toString(16)).slice(-6);
 
 const toRgbaColor = (color: number, alpha: number): string =>
-  `rgba(${(color >> 16) & 255}, ${(color >> 8) & 255}, ${color &
-    255}, ${alpha})`;
+  `rgba(${(color >> 16) & 255}, ${(color >> 8) & 255}, ${
+    color & 255
+  }, ${alpha})`;
 
 const getSignalDebugColor = (signalName: string): number => {
   let hash = 0;
@@ -103,8 +100,8 @@ const getSignalDebugStatusColor = (
   status: SignalDebugStatus,
   signalName: string
 ): number => {
-  if (status === 'dropped') {
-    return signalDebugDroppedColor;
+  if (status === 'throttled') {
+    return signalDebugThrottledColor;
   }
   if (status === 'unhandled') {
     return signalDebugUnhandledColor;
@@ -113,8 +110,8 @@ const getSignalDebugStatusColor = (
 };
 
 const getSignalDebugStatusLabel = (status: SignalDebugStatus): string => {
-  if (status === 'dropped') {
-    return 'DROPPED';
+  if (status === 'throttled') {
+    return 'THROTTLED';
   }
   if (status === 'unhandled') {
     return 'NO RECEIVER';
@@ -150,30 +147,38 @@ const formatSignalDebugTarget = (target: string): string => {
 
   const targetKind = target.substr(0, separatorIndex);
   const targetValue = target.substr(separatorIndex + 1);
-  if (targetKind === 'objectGroup') {
-    return 'object group ' + (targetValue || '<missing>');
-  }
-  if (targetKind === 'object') {
-    return targetValue || 'object <missing>';
-  }
   if (targetKind === 'objectInstance') {
     return targetValue ? 'instance ' + targetValue : 'instance <missing>';
   }
   return targetValue ? targetKind + ' ' + targetValue : targetKind;
 };
 
+const formatSignalDebugReceiver = (
+  receiver: SignalDebugReceiver
+): string => {
+  if (receiver.receiverKind === 'scene') {
+    return 'scene events';
+  }
+
+  const owner = formatSignalDebugPoint(receiver);
+  if (receiver.receiverKind === 'behavior') {
+    return owner + '.' + receiver.receiverName;
+  }
+  return owner + ' (prefab)';
+};
+
 const formatSignalDebugRecordDestination = (
   signalDebugRecord: SignalDebugRecord
 ): string => {
   if (signalDebugRecord.target === 'scene') {
-    return 'scene';
+    return 'scene broadcast';
   }
 
   if (
     signalDebugRecord.status === 'delivered' &&
     signalDebugRecord.receiverPositions.length > 0
   ) {
-    return formatSignalDebugPoint(signalDebugRecord.receiverPositions[0]);
+    return formatSignalDebugReceiver(signalDebugRecord.receiverPositions[0]);
   }
 
   if (signalDebugRecord.targetPositions.length > 0) {
@@ -195,7 +200,8 @@ const hasSignalDiagnosticsReset = (
     signalDiagnostics.frameId < previousCounters.frameId ||
     signalDiagnostics.emittedSignalsCount <
       previousCounters.emittedSignalsCount ||
-    signalDiagnostics.droppedSignalsCount < previousCounters.droppedSignalsCount
+    signalDiagnostics.throttledSignalsCount <
+      previousCounters.throttledSignalsCount
   );
 };
 
@@ -204,7 +210,7 @@ const getSignalDiagnosticsCounters = (
 ): SignalDiagnosticsCounters => ({
   frameId: signalDiagnostics.frameId,
   emittedSignalsCount: signalDiagnostics.emittedSignalsCount,
-  droppedSignalsCount: signalDiagnostics.droppedSignalsCount,
+  throttledSignalsCount: signalDiagnostics.throttledSignalsCount,
 });
 
 const getSignalDiagnosticsFrameKey = (
@@ -214,7 +220,7 @@ const getSignalDiagnosticsFrameKey = (
   ':' +
   signalDiagnostics.emittedSignalsCount +
   ':' +
-  signalDiagnostics.droppedSignalsCount;
+  signalDiagnostics.throttledSignalsCount;
 
 const getSignalDiagnosticsSignature = (
   signalDiagnostics: ?SignalDiagnostics
@@ -230,13 +236,15 @@ const getSignalDiagnosticsSignature = (
     ':' +
     signalDiagnostics.emittedSignalsCount +
     ':' +
-    signalDiagnostics.droppedSignalsCount +
+    signalDiagnostics.throttledSignalsCount +
     ':' +
     signalDiagnostics.deliveredSignalsThisFrameCount +
     ':' +
     signalDiagnostics.receiversThisFrameCount +
     ':' +
-    signalDiagnostics.signalsThisFrame.length;
+    signalDiagnostics.signalsThisFrame.length +
+    ':' +
+    signalDiagnostics.recentSignals.length;
 
   for (
     let i = 0, len = signalDiagnostics.signalsThisFrame.length;
@@ -266,32 +274,41 @@ const getSignalDiagnosticsSignature = (
   return signature;
 };
 
-const getSignalMonitorLogs = (
+export const getSignalMonitorLogs = (
   signalDiagnostics: SignalDiagnostics
 ): Array<SignalMonitorLog> => {
   const logs: Array<SignalMonitorLog> = [];
-  for (
-    let i = 0, len = signalDiagnostics.signalsThisFrame.length;
-    i < len;
-    ++i
-  ) {
-    const signalDebugRecord = signalDiagnostics.signalsThisFrame[i];
+  const signalDebugRecords = signalDiagnostics.recentSignals;
+  for (let i = 0, len = signalDebugRecords.length; i < len; ++i) {
+    const signalDebugRecord = signalDebugRecords[i];
     const color = getSignalDebugStatusColor(
       signalDebugRecord.status,
       signalDebugRecord.name
     );
-    logs.push({
-      id: signalDebugRecord.id,
-      signalName: signalDebugRecord.name,
-      payload: signalDebugRecord.payload,
-      target: signalDebugRecord.target,
-      source: signalDebugRecord.source || sceneSignalDebugPoint,
-      destination: formatSignalDebugRecordDestination(signalDebugRecord),
-      emittedFrameId: signalDebugRecord.emittedFrameId,
-      deliveredFrameId: signalDebugRecord.deliveredFrameId,
-      status: signalDebugRecord.status,
-      color,
-    });
+    const destinations =
+      signalDebugRecord.target === 'scene' &&
+      signalDebugRecord.status === 'delivered' &&
+      signalDebugRecord.receiverPositions.length > 0
+        ? signalDebugRecord.receiverPositions.map(formatSignalDebugReceiver)
+        : [formatSignalDebugRecordDestination(signalDebugRecord)];
+    for (
+      let destinationIndex = 0;
+      destinationIndex < destinations.length;
+      ++destinationIndex
+    ) {
+      logs.push({
+        id: signalDebugRecord.id,
+        signalName: signalDebugRecord.name,
+        payload: signalDebugRecord.payload,
+        target: signalDebugRecord.target,
+        source: signalDebugRecord.source || sceneSignalDebugPoint,
+        destination: destinations[destinationIndex],
+        emittedFrameId: signalDebugRecord.emittedFrameId,
+        deliveredFrameId: signalDebugRecord.deliveredFrameId,
+        status: signalDebugRecord.status,
+        color,
+      });
+    }
   }
   return logs;
 };
@@ -313,7 +330,9 @@ const getSignalMonitorLogKey = (log: SignalMonitorLog): string =>
   ':' +
   log.source.objectName +
   ':' +
-  log.source.objectId;
+  log.source.objectId +
+  ':' +
+  log.destination;
 
 const getSignalMonitorLogContentKey = (log: SignalMonitorLog): string =>
   log.status +
@@ -436,6 +455,11 @@ const SignalMonitorRow = ({
   const color = toHexColor(log.color);
   const statusLabel = getSignalDebugStatusLabel(log.status);
   const payload = log.payload || '';
+  const route =
+    'from ' +
+    formatSignalDebugPoint(log.source) +
+    ' -> ' +
+    log.destination;
 
   return (
     <div
@@ -459,17 +483,11 @@ const SignalMonitorRow = ({
         ) : null}
         <div style={styles.idText}>#{log.id}</div>
       </div>
-      <div style={styles.fromTo}>
-        {shortenSignalDebugText(
-          'from ' +
-            formatSignalDebugPoint(log.source) +
-            ' -> ' +
-            log.destination,
-          62
-        )}
+      <div title={route} style={styles.fromTo}>
+        {shortenSignalDebugText(route, 62)}
       </div>
       <div
-        title={payload ? 'data: ' + payload : undefined}
+        title={payload ? 'payload: ' + payload : undefined}
         style={{
           ...styles.payload,
           color: payload ? '#ffdd78' : '#9aa7b8',
@@ -481,7 +499,7 @@ const SignalMonitorRow = ({
             : 'rgba(21, 29, 41, 0.7)',
         }}
       >
-        {'data: "' + payload + '"'}
+        {'payload: "' + payload + '"'}
       </div>
     </div>
   );
@@ -490,85 +508,77 @@ const SignalMonitorRow = ({
 export const SignalMonitor = ({ signalDiagnostics }: Props): React.Node => {
   const [logs, setLogs] = React.useState<Array<SignalMonitorLog>>([]);
   const lastDiagnosticsSignature = React.useRef('');
-  const lastDiagnosticsCounters = React.useRef<?SignalDiagnosticsCounters>(
-    null
-  );
+  const lastDiagnosticsCounters =
+    React.useRef<?SignalDiagnosticsCounters>(null);
   const rowsElement = React.useRef<?HTMLDivElement>(null);
 
-  React.useEffect(
-    () => {
-      const signature = getSignalDiagnosticsSignature(signalDiagnostics);
-      if (signature === lastDiagnosticsSignature.current) {
-        return;
-      }
-      lastDiagnosticsSignature.current = signature;
+  React.useEffect(() => {
+    const signature = getSignalDiagnosticsSignature(signalDiagnostics);
+    if (signature === lastDiagnosticsSignature.current) {
+      return;
+    }
+    lastDiagnosticsSignature.current = signature;
 
-      if (!signalDiagnostics) {
-        lastDiagnosticsCounters.current = null;
-        setLogs([]);
-        return;
-      }
+    if (!signalDiagnostics) {
+      lastDiagnosticsCounters.current = null;
+      setLogs([]);
+      return;
+    }
 
-      const hasRuntimeReset = hasSignalDiagnosticsReset(
-        lastDiagnosticsCounters.current,
-        signalDiagnostics
-      );
-      lastDiagnosticsCounters.current = getSignalDiagnosticsCounters(
-        signalDiagnostics
-      );
+    const hasRuntimeReset = hasSignalDiagnosticsReset(
+      lastDiagnosticsCounters.current,
+      signalDiagnostics
+    );
+    lastDiagnosticsCounters.current =
+      getSignalDiagnosticsCounters(signalDiagnostics);
 
-      const incomingLogs = getSignalMonitorLogs(signalDiagnostics);
-      if (incomingLogs.length === 0 && !hasRuntimeReset) {
-        return;
-      }
+    const incomingLogs = getSignalMonitorLogs(signalDiagnostics);
+    if (incomingLogs.length === 0 && !hasRuntimeReset) {
+      return;
+    }
 
-      setLogs(previousLogs => {
-        const logsToKeep = hasRuntimeReset ? [] : previousLogs;
-        const knownLogKeys = new Set(logsToKeep.map(getSignalMonitorLogKey));
-        const nextLogs = logsToKeep.slice();
-        let hasChanged = false;
+    setLogs((previousLogs) => {
+      const logsToKeep = hasRuntimeReset ? [] : previousLogs;
+      const knownLogKeys = new Set(logsToKeep.map(getSignalMonitorLogKey));
+      const nextLogs = logsToKeep.slice();
+      let hasChanged = false;
 
-        for (let i = 0, len = incomingLogs.length; i < len; ++i) {
-          const log = incomingLogs[i];
-          const logKey = getSignalMonitorLogKey(log);
-          if (knownLogKeys.has(logKey)) {
-            continue;
-          }
-
-          const lastLog = nextLogs[nextLogs.length - 1];
-          if (
-            lastLog &&
-            getSignalMonitorLogContentKey(lastLog) ===
-              getSignalMonitorLogContentKey(log)
-          ) {
-            nextLogs[nextLogs.length - 1] = log;
-          } else {
-            nextLogs.push(log);
-          }
-          knownLogKeys.add(logKey);
-          hasChanged = true;
+      for (let i = 0, len = incomingLogs.length; i < len; ++i) {
+        const log = incomingLogs[i];
+        const logKey = getSignalMonitorLogKey(log);
+        if (knownLogKeys.has(logKey)) {
+          continue;
         }
 
-        if (!hasChanged && !hasRuntimeReset) {
-          return previousLogs;
+        const lastLog = nextLogs[nextLogs.length - 1];
+        if (
+          lastLog &&
+          getSignalMonitorLogContentKey(lastLog) ===
+            getSignalMonitorLogContentKey(log)
+        ) {
+          nextLogs[nextLogs.length - 1] = log;
+        } else {
+          nextLogs.push(log);
         }
-
-        return nextLogs.slice(-maxSignalDebugPanelLogs);
-      });
-    },
-    [signalDiagnostics]
-  );
-
-  React.useEffect(
-    () => {
-      const rows = rowsElement.current;
-      if (!rows) {
-        return;
+        knownLogKeys.add(logKey);
+        hasChanged = true;
       }
-      rows.scrollTop = rows.scrollHeight;
-    },
-    [logs]
-  );
+
+      if (!hasChanged && !hasRuntimeReset) {
+        return previousLogs;
+      }
+
+      return nextLogs.slice(-maxSignalDebugPanelLogs);
+    });
+  }, [signalDiagnostics]);
+
+  React.useEffect(() => {
+    const rows = rowsElement.current;
+    if (!rows) {
+      return;
+    }
+    rows.scrollTop = rows.scrollHeight;
+  }, [logs]);
 
   return (
     <div style={styles.frame}>

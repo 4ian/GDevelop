@@ -4,13 +4,33 @@ import {
   canRedo,
   canUndo,
   saveToHistory,
+  saveSerializedValueToHistory,
   undo,
   redo,
 } from './History';
 import { makeTestProject } from '../fixtures/TestProject';
+import { serializeToJSObject } from './Serializer';
 const gd: libGDevelop = global.gd;
 
 describe('History', () => {
+  it('can commit a captured snapshot after its native wrapper is destroyed', () => {
+    const gdVariable = new gd.Variable();
+    gdVariable.setString('Original value');
+    const history = getHistoryInitialState(gdVariable, { historyMaxSize: 50 });
+
+    gdVariable.setString('Captured value');
+    const capturedValue = serializeToJSObject(gdVariable);
+    gdVariable.delete();
+
+    const updatedHistory = saveSerializedValueToHistory(
+      history,
+      capturedValue,
+      'EDIT'
+    );
+    expect(updatedHistory.currentValue).toEqual(capturedValue);
+    expect(canUndo(updatedHistory)).toBe(true);
+  });
+
   it('can save changes for a simple serializable object from libGD.js', () => {
     const gdVariable = new gd.Variable();
 

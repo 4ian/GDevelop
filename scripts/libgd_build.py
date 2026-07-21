@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -103,7 +105,9 @@ def is_libgd_stale(repo_root: Path) -> tuple[bool, str]:
     return False, "built libGD.js is up to date with its C++ sources"
 
 
-def npm_install_needed(package_dir: Path) -> tuple[bool, str]:
+def npm_install_needed(
+    package_dir: Path, required_dependencies: tuple[str, ...] = ()
+) -> tuple[bool, str]:
     """Whether ``npm install`` should run in ``package_dir``.
 
     Returns ``(needed, reason)``. A bare ``node_modules`` existence check is not
@@ -112,7 +116,9 @@ def npm_install_needed(package_dir: Path) -> tuple[bool, str]:
     the build fails later with a "Can't resolve" error. npm writes a hidden
     lockfile ``node_modules/.package-lock.json`` after every install, so a
     ``package.json``/``package-lock.json`` newer than that marker means the
-    installed tree is out of date.
+    installed tree is out of date. Callers can also name runtime-critical
+    dependencies that must exist and, when pinned exactly, match their declared
+    version.
     """
     node_modules = package_dir / "node_modules"
     if not node_modules.is_dir():
@@ -134,6 +140,42 @@ def npm_install_needed(package_dir: Path) -> tuple[bool, str]:
             continue
         if manifest_mtime > marker_mtime:
             return True, f"{manifest_name} is newer than the last npm install"
+
+    if required_dependencies:
+        package_json_path = package_dir / "package.json"
+        try:
+            package_json = json.loads(package_json_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            return True, f"could not read package.json: {error}"
+
+        declared_dependencies = package_json.get("dependencies", {})
+        for dependency_name in required_dependencies:
+            dependency_package_json = (
+                node_modules / Path(*dependency_name.split("/")) / "package.json"
+            )
+            try:
+                installed_package = json.loads(
+                    dependency_package_json.read_text(encoding="utf-8")
+                )
+            except FileNotFoundError:
+                return True, f"required dependency {dependency_name} is missing"
+            except (OSError, ValueError) as error:
+                return True, f"could not read installed {dependency_name}: {error}"
+
+            declared_version = declared_dependencies.get(dependency_name)
+            installed_version = installed_package.get("version")
+            if (
+                isinstance(declared_version, str)
+                and re.fullmatch(
+                    r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", declared_version
+                )
+                and installed_version != declared_version
+            ):
+                return (
+                    True,
+                    f"required dependency {dependency_name} is {installed_version}, "
+                    f"expected {declared_version}",
+                )
 
     return False, "dependencies are in sync with package.json"
 

@@ -3,7 +3,7 @@ namespace gdjs {
   const signalDebugDrawRefreshInterval = 1000 / 30;
   const maxSignalDebugSegments = 16;
   const maxSignalDebugLabels = 6;
-  const debugDrawRefreshInterval = 1000 / 4;
+  const debugDrawRefreshInterval = 1000 / 30;
   const maxDebugDrawObjectsPerRefresh = 60;
   const maxDebugDrawHitBoxesPerRefresh = 120;
   const maxDebugDrawPointObjectsPerRefresh = 20;
@@ -18,7 +18,7 @@ namespace gdjs {
   const signalDebugPanelMinWidth = 260;
   const signalDebugPanelMaxWidth = 360;
   const signalDebugUnhandledColor = 0xffc857;
-  const signalDebugDroppedColor = 0xff5c8a;
+  const signalDebugThrottledColor = 0xff5c8a;
   const signalDebugColors = [
     0x00d1ff, 0xffc857, 0xff5c8a, 0x7cff6b, 0xb388ff, 0xff9f1c, 0x40f99b,
     0xff4d4d,
@@ -57,6 +57,15 @@ namespace gdjs {
     minY: float;
     maxX: float;
     maxY: float;
+  };
+
+  type DebugDraw3DCollisionMask = {
+    objectId: integer;
+    object: gdjs.RuntimeObject;
+    maskIndex: integer;
+    vertices: Float32Array;
+    lineSegments: THREE.LineSegments;
+    layer: gdjs.RuntimeLayer;
   };
 
   const isDebugDrawAABBVisible = (
@@ -102,8 +111,8 @@ namespace gdjs {
     status: gdjs.SignalDebugStatus,
     signalName: string
   ): integer => {
-    if (status === 'dropped') {
-      return signalDebugDroppedColor;
+    if (status === 'throttled') {
+      return signalDebugThrottledColor;
     }
     if (status === 'unhandled') {
       return signalDebugUnhandledColor;
@@ -114,8 +123,8 @@ namespace gdjs {
   const getSignalDebugStatusLabel = (
     status: gdjs.SignalDebugStatus
   ): string => {
-    if (status === 'dropped') {
-      return 'DROPPED';
+    if (status === 'throttled') {
+      return 'THROTTLED';
     }
     if (status === 'unhandled') {
       return 'NO RECEIVER';
@@ -243,6 +252,8 @@ namespace gdjs {
         points: Record<string, PIXI.Text>;
       }
     >;
+    _debugDraw3DCollisionMasks: Record<string, DebugDraw3DCollisionMask> = {};
+    _debugDraw3DMaterial: THREE.LineBasicMaterial | null = null;
     _signalDebugDraw: PIXI.Graphics | null = null;
     _signalDebugDrawContainer: PIXI.Container | null = null;
     _signalDebugLastRenderTime: integer = 0;
@@ -277,6 +288,196 @@ namespace gdjs {
 
     getRendererObject() {
       return this._debugDrawContainer;
+    }
+
+    _createDebugDraw3DCollisionMaskGeometry(
+      vertices: Float32Array
+    ): THREE.WireframeGeometry {
+      const triangleGeometry = new THREE.BufferGeometry();
+      triangleGeometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(vertices, 3)
+      );
+      const wireframeGeometry = new THREE.WireframeGeometry(triangleGeometry);
+      triangleGeometry.dispose();
+      return wireframeGeometry;
+    }
+
+    _removeDebugDraw3DCollisionMask(key: string): void {
+      const renderedMask = this._debugDraw3DCollisionMasks[key];
+      if (!renderedMask) {
+        return;
+      }
+      renderedMask.layer
+        .getRenderer()
+        .remove3DRendererObject(renderedMask.lineSegments);
+      renderedMask.lineSegments.geometry.dispose();
+      delete this._debugDraw3DCollisionMasks[key];
+      for (const remainingKey in this._debugDraw3DCollisionMasks) {
+        if (
+          this._debugDraw3DCollisionMasks[remainingKey].object ===
+          renderedMask.object
+        ) {
+          return;
+        }
+      }
+      renderedMask.object.clear3DDebugCollisionMaskCache();
+    }
+
+    _removeExtraDebugDraw3DCollisionMasks(
+      objectId: integer,
+      collisionMasksCount: integer
+    ): void {
+      for (const key in this._debugDraw3DCollisionMasks) {
+        const renderedMask = this._debugDraw3DCollisionMasks[key];
+        if (
+          renderedMask.objectId === objectId &&
+          renderedMask.maskIndex >= collisionMasksCount
+        ) {
+          this._removeDebugDraw3DCollisionMask(key);
+        }
+      }
+    }
+
+    _renderDebugDraw3DCollisionMask(
+      object: gdjs.RuntimeObject,
+      maskIndex: integer,
+      collisionMask: gdjs.DebugCollisionMask3D,
+      layer: gdjs.RuntimeLayer
+    ): void {
+      const key = object.id + ':' + maskIndex;
+      if (
+        typeof THREE === 'undefined' ||
+        !layer.getRenderer().getThreeGroup()
+      ) {
+        this._removeDebugDraw3DCollisionMask(key);
+        return;
+      }
+
+      if (!this._debugDraw3DMaterial) {
+        this._debugDraw3DMaterial = new THREE.LineBasicMaterial({
+          color: 0xff0000,
+          transparent: true,
+          opacity: 0.5,
+          depthTest: false,
+          depthWrite: false,
+          fog: false,
+          toneMapped: false,
+        });
+      }
+
+      let renderedMask = this._debugDraw3DCollisionMasks[key];
+      if (!renderedMask) {
+        const lineSegments = new THREE.LineSegments(
+          this._createDebugDraw3DCollisionMaskGeometry(collisionMask.vertices),
+          this._debugDraw3DMaterial
+        );
+        // Debug helpers must not intercept in-game editor picking.
+        lineSegments.raycast = () => {};
+        // Render after the 2D composition plane on hybrid layers.
+        lineSegments.renderOrder = Number.MAX_SAFE_INTEGER + 1;
+        layer.getRenderer().add3DRendererObject(lineSegments);
+        renderedMask = this._debugDraw3DCollisionMasks[key] = {
+          objectId: object.id,
+          object,
+          maskIndex,
+          vertices: collisionMask.vertices,
+          lineSegments,
+          layer,
+        };
+      } else {
+        renderedMask.object = object;
+        if (renderedMask.layer !== layer) {
+          renderedMask.layer
+            .getRenderer()
+            .remove3DRendererObject(renderedMask.lineSegments);
+          layer.getRenderer().add3DRendererObject(renderedMask.lineSegments);
+          renderedMask.layer = layer;
+        }
+        if (renderedMask.vertices !== collisionMask.vertices) {
+          renderedMask.lineSegments.geometry.dispose();
+          renderedMask.lineSegments.geometry =
+            this._createDebugDraw3DCollisionMaskGeometry(
+              collisionMask.vertices
+            );
+          renderedMask.vertices = collisionMask.vertices;
+        }
+      }
+
+      const lineSegments = renderedMask.lineSegments;
+      lineSegments.position.set(
+        collisionMask.positionX,
+        collisionMask.positionY,
+        collisionMask.positionZ
+      );
+      lineSegments.quaternion.set(
+        collisionMask.rotationX,
+        collisionMask.rotationY,
+        collisionMask.rotationZ,
+        collisionMask.rotationW
+      );
+      lineSegments.visible = true;
+    }
+
+    _prepareDebugDraw3DCollisionMasks(
+      instances: gdjs.RuntimeObject[]
+    ): Map<integer, gdjs.DebugCollisionMask3D[]> {
+      const activeObjects = new Map<integer, gdjs.RuntimeObject>();
+      const collisionMasksByObjectId = new Map<
+        integer,
+        gdjs.DebugCollisionMask3D[]
+      >();
+      for (let i = 0, len = instances.length; i < len; ++i) {
+        activeObjects.set(instances[i].id, instances[i]);
+      }
+      for (const key in this._debugDraw3DCollisionMasks) {
+        const renderedMask = this._debugDraw3DCollisionMasks[key];
+        const object = activeObjects.get(renderedMask.objectId);
+        if (!object) {
+          this._removeDebugDraw3DCollisionMask(key);
+          continue;
+        }
+
+        const layer = this._instanceContainer.getLayer(object.getLayer());
+        if (!layer.getRenderer().getThreeGroup()) {
+          this._removeDebugDraw3DCollisionMask(key);
+          continue;
+        }
+        let collisionMasks = collisionMasksByObjectId.get(object.id);
+        if (!collisionMasks) {
+          // get3DDebugCollisionMasks uses a recycled array, so clone it before
+          // collecting masks for another object.
+          collisionMasks =
+            typeof THREE === 'undefined'
+              ? []
+              : object.get3DDebugCollisionMasks().slice();
+          collisionMasksByObjectId.set(object.id, collisionMasks);
+        }
+        if (renderedMask.maskIndex >= collisionMasks.length) {
+          this._removeDebugDraw3DCollisionMask(key);
+          continue;
+        }
+        if (renderedMask.layer !== layer) {
+          renderedMask.layer
+            .getRenderer()
+            .remove3DRendererObject(renderedMask.lineSegments);
+          layer.getRenderer().add3DRendererObject(renderedMask.lineSegments);
+          renderedMask.layer = layer;
+        }
+        renderedMask.lineSegments.visible = false;
+      }
+      return collisionMasksByObjectId;
+    }
+
+    _clearDebugDraw3DCollisionMasks(): void {
+      for (const key in this._debugDraw3DCollisionMasks) {
+        this._removeDebugDraw3DCollisionMask(key);
+      }
+      this._debugDraw3DCollisionMasks = {};
+      if (this._debugDraw3DMaterial) {
+        this._debugDraw3DMaterial.dispose();
+        this._debugDraw3DMaterial = null;
+      }
     }
 
     _getDebugDrawRenderSignature(
@@ -349,6 +550,9 @@ namespace gdjs {
         }
       }
       const debugDraw = this._debugDraw;
+
+      const collisionMasks3DByObjectId =
+        this._prepareDebugDraw3DCollisionMasks(instances);
 
       // Reset the boolean "wasRendered" of all points of objects to false:
       for (let id in this._debugDrawRenderedObjectsPoints) {
@@ -455,8 +659,38 @@ namespace gdjs {
           continue;
         }
 
+        let collisionMasks3D = collisionMasks3DByObjectId.get(object.id);
+        if (!collisionMasks3D) {
+          collisionMasks3D =
+            typeof THREE === 'undefined' || !layer.getRenderer().getThreeGroup()
+              ? []
+              : object.get3DDebugCollisionMasks().slice();
+          collisionMasks3DByObjectId.set(object.id, collisionMasks3D);
+        }
+        this._removeExtraDebugDraw3DCollisionMasks(
+          object.id,
+          collisionMasks3D.length
+        );
         const rendererObject = object.getRendererObject();
-        if (!rendererObject) {
+        if (!rendererObject && collisionMasks3D.length === 0) {
+          continue;
+        }
+        if (collisionMasks3D.length > 0) {
+          renderedObjectsCount++;
+          for (
+            let maskIndex = 0;
+            maskIndex < collisionMasks3D.length &&
+            drawnHitBoxesCount < maxDebugDrawHitBoxesPerRefresh;
+            ++maskIndex
+          ) {
+            this._renderDebugDraw3DCollisionMask(
+              object,
+              maskIndex,
+              collisionMasks3D[maskIndex],
+              layer
+            );
+            drawnHitBoxesCount++;
+          }
           continue;
         }
         const aabb = object.getAABB();
@@ -1865,6 +2099,7 @@ namespace gdjs {
     }
 
     clearDebugDraw(): void {
+      this._clearDebugDraw3DCollisionMasks();
       if (this._debugDraw) {
         this._debugDraw.clear();
       }

@@ -33,6 +33,8 @@ export type ShowConfirmDialogOptions = {|
   level?: 'info' | 'warning',
   maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
+  /** Closes the dialog as a dismissal when the signal is aborted. */
+  dismissOnAbortSignal?: AbortSignal,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|
   ...ShowConfirmDialogOptions,

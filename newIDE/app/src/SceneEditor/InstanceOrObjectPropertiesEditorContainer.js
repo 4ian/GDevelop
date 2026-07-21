@@ -91,11 +91,15 @@ type Props = {|
   // For event-based object variants:
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
   onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
     gdEventsFunctionsExtension,
     gdEventsBasedObject
   ) => void,
@@ -187,6 +191,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
       onOpenPrefabDetailEditor,
+      onOpenPrefabSettings,
 
       // For objects or instances:
       historyHandler,
@@ -355,6 +360,15 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
               eventsFunctionsExtension
                 ? () =>
                     onOpenPrefabDetailEditor(
+                      eventsFunctionsExtension,
+                      eventsBasedObject
+                    )
+                : null
+            }
+            onOpenPrefabSettings={
+              eventsFunctionsExtension && onOpenPrefabSettings
+                ? () =>
+                    onOpenPrefabSettings(
                       eventsFunctionsExtension,
                       eventsBasedObject
                     )

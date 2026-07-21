@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated settings, layout, and instruction catalogs for authoring, and read the generated public JavaScript declarations before editing `@js`; regenerate and re-read them with the GDevelop MCP `generate-catalogs` tool after large structural changes, then validate direct edits with `validate_project_files` before synchronizing them with `reload_project` and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -21,7 +21,7 @@ Read, in order:
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
 5. `.gdevelop/layout-catalog.json`, then relevant `.layout` files for Layout
-   DSL instances, layers, spatial bounds, background, and editor-canvas layout.
+   TOML instances, layers, spatial bounds, background, and editor-canvas layout.
 6. Relevant `.events` files for IfDo event logic.
 7. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
@@ -56,15 +56,17 @@ Use the catalogs as authoring contracts:
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
   to resolve existing project components and their object definitions. For an
-  attached behavior, write only properties listed in its `behaviorTypes`
-  entry. Editor-hidden properties are deliberately absent, runtime-managed,
-  and forbidden in object settings; never copy them from legacy JSON.
-- In `layout-catalog.json`, read `elements` for exact context-specific tags,
-  attributes, literals, child order, defaults, and constraints. Select the one
+  attached behavior, initialize or edit only properties listed in its
+  `behaviorTypes` entry. Editor-hidden, deprecated, extension-owned, and legacy
+  serializer properties are deliberately absent from the authoring surface;
+  never invent them, but preserve every unlisted field already present in an
+  object settings file or legacy JSON source.
+- In `layout-catalog.json`, read `tables` for exact context-specific headers,
+  fields, value types, defaults, and constraints. Select the one
   `contexts` entry whose `owner` matches the scene, prefab, variant, or external
   layout, then use only its listed layers, objects, and attached behaviors.
   Search `effectTypes` for exact effect parameters and types.
-- If the relevant registered type, file kind, element, or effect is absent,
+- If the relevant registered type, file kind, layout table, or effect is absent,
   stop instead of guessing. If a direct edit introduces a new object or
   attached behavior name, validate its registered type in the settings catalog,
   define it first in the owning `.settings` file, and then reference that exact
@@ -76,7 +78,7 @@ Search narrowly, for example:
 ```sh
 rg '"type":"Sprite"' .gdevelop/settings-catalog.json
 rg '"type":"Tween::TweenBehavior"' .gdevelop/settings-catalog.json
-rg '"element":"instance"' .gdevelop/layout-catalog.json
+rg '"table":"instance"' .gdevelop/layout-catalog.json
 rg '"owner":{"scene":"Main"}' .gdevelop/layout-catalog.json
 ```
 
@@ -92,17 +94,14 @@ generated compatibility/runtime output, not multi-file source.
   Never embed another settings document. Follow the matching settings-catalog
   `fileKinds` entry and use only registered type metadata from that catalog.
 - Variable definitions: in `variables`, `globalVariables`, and
-  `sceneVariables`, always open a dedicated `[variables]`,
-  `[globalVariables]`, or `[sceneVariables]` table and write one assignment per
-  variable name. Assign each name one inline array containing its complete
-  descriptor without another `name`, for example
-  `Controllers = [{ type = "array", children = [...] }]`. Represent an empty
-  container with its empty table header. Never write a whole container as
-  `variables = { ... }` or `variables = { }`, and never write recursive
-  `[[variables...]]` TOML tables. Existing inline-table containers are
-  load-time migration inputs only: the editor converts them to these dedicated
-  headers and saves the affected settings files immediately when opening the
-  project. Do not preserve or introduce the migration form in direct edits.
+  `sceneVariables`, write one repeated `[[variables]]`,
+  `[[globalVariables]]`, or `[[sceneVariables]]` record per variable. Every
+  record contains an explicit `name` plus its complete descriptor, for example
+  `name = "Controllers"`, `type = "array"`, and `children = [...]`. Represent
+  an empty container only as `variables = [ ]`, `globalVariables = [ ]`, or
+  `sceneVariables = [ ]`. Never write keyed `[variables]` tables, whole
+  containers as inline tables, non-empty inline descriptor arrays, or recursive
+  `[[variables.children]]` tables.
 - Object groups: use only an `[objectGroups]` table in the owning project,
   scene, prefab, prefab-variant, or function settings. Each key is the group
   name and each value is an array of object names, for example
@@ -119,12 +118,13 @@ generated compatibility/runtime output, not multi-file source.
 - `static-data.toml`: the entire root document is editor-only Static Data.
   Author data directly, with no `[settings]`, `[staticData]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
-- `.layout`: Layout DSL component-tree markup containing placement/layout data
-  only: instances, layers, spatial bounds, background, and editor view state.
-  Never put TOML, object definitions, or attached behavior definitions in a
-  `.layout` file. Instance behavior overrides are allowed only for behaviors
-  already attached by the owning `.settings` object definition. Follow the
-  matching layout-catalog `contexts` entry and `elements` definitions.
+- `.layout`: standard flat TOML containing placement/layout data only:
+  `[layout]`, optional `[editor]`, and short `[[layers]]`, `[[effects]]`,
+  `[[instances]]`, `[[variables]]`, and `[[behaviors]]` records. Never put object
+  definitions or attached behavior definitions in a `.layout` file. Instance
+  behavior overrides are allowed only for behaviors already attached by the
+  owning `.settings` object definition. Follow the matching layout-catalog
+  `contexts` entry and `tables` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.settings`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -160,10 +160,11 @@ and type-specific configuration. `project.settings`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
-For each attached behavior, keep its identity fields and only the author-writable
-properties present in `settings-catalog.json`. Hidden behavior descriptor values
-must not appear in `<Object>.settings`; generated runtime code supplies their
-descriptor defaults and manages their state.
+For each attached behavior, keep its identity fields and complete existing
+serializer data in `<Object>.settings`. Initialize or edit only the
+author-writable properties present in `settings-catalog.json`; preserve
+unlisted fields verbatim because specialized editors may own runtime-required
+configuration that the generic catalog intentionally hides.
 
 Give every prefab and behavior function its own `functions/<Function>/`
 directory containing `function.settings` and `<Function>.events`. Store editor
@@ -216,7 +217,7 @@ Load only the references required by the task:
 - Read [references/create-extensions.md](references/create-extensions.md) in
   full before creating an extension or adding/removing extension-level
   functions, prefabs, behaviors, or their functions.
-- Read [references/layout-dsl.md](references/layout-dsl.md) in full before
+- Read [references/layout-toml.md](references/layout-toml.md) in full before
   creating or changing any `.layout` file. Preserve existing UUIDs and use its
   exact scene, prefab/variant, or external-layout context rules.
 - Read [references/events-dls.md](references/events-dls.md) in full before
@@ -234,10 +235,16 @@ Load only the references required by the task:
   behavior, or reusable extension.
 - Read [references/signal-system.md](references/signal-system.md) in full
   whenever the user asks for signals, messaging, notification, scene/prefab
-  communication, `SignalReceived`, signal sender/payload handling, or an
+  communication, `SignalReceived`, signal payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
   the Static Data guide too when signal names use placeholders.
+- Read
+  [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
+  before converting or merging glTF/GLB assets or importing a `.glb` exported
+  from Blender into GDevelop. Follow that workflow for Blender scene
+  preparation, GLB export, GDevelop resource and object setup, collision,
+  preview verification, and re-export updates.
 - Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
@@ -255,6 +262,31 @@ Load only the references required by the task:
 Build from scratch only when repository search finds no suitable extension,
 the available extension is incompatible or unsafe, or a small project-specific
 implementation is materially simpler. Record that decision in the task result.
+
+## Bundled Blender conversion scripts
+
+Use the bundled scripts directly for supported conversion jobs; do not rewrite
+their logic in an ad hoc script. Run them with Blender using
+`--background --factory-startup --python <script> -- <arguments>`, and call
+the selected script with `--help` when its exact options are needed.
+
+- For any `.gltf` to `.glb` request, run
+  [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py). Use
+  `--input` with `--output` for one file, or `--output-dir` for a directory;
+  add `--recursive` for nested inputs and `--overwrite` only when replacement
+  is intended. Require its final summary to report zero failures.
+- For any request to embed animations from a GLB into a character that uses
+  the same skeleton, run
+  [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py).
+  Supply `--character`, `--animations`, and `--output`; repeat `--action` to
+  select clips. Keep strict compatibility checking unless the user explicitly
+  accepts a weaker check. This script performs direct action reuse, not
+  retargeting; stop and use a real retargeting workflow when rigs differ.
+
+Generate a temporary output and inspect or round-trip it before replacing an
+existing project asset. When the final GLB is a project resource, keep it
+inside the project, preserve its registered path when updating it, validate
+the project, commit, reload, and verify it in a fresh preview.
 
 ## Event authoring
 
@@ -330,7 +362,7 @@ loop, comment, and JavaScript metadata when editing existing sources.
 1. Inspect manifests and only the owned files relevant to the request. Search
    `.gdevelop/settings-catalog.json` before adding or changing settings-owned
    object, behavior, effect, or component definitions. Search
-   `.gdevelop/layout-catalog.json` for the exact layout grammar and matching
+   `.gdevelop/layout-catalog.json` for the exact layout schema and matching
    project context before adding or changing layout content.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
    expressions. The generated catalog excludes editor-hidden and deprecated
@@ -350,7 +382,7 @@ loop, comment, and JavaScript metadata when editing existing sources.
    structural change. Repeat this step after each later structural phase.
 5. Re-read every changed manifest reference and verify that each `game://` URI
    exists and stays inside the project.
-6. Check settings TOML syntax, Layout DSL structure/semantics, duplicate
+6. Check settings and layout TOML syntax/semantics, duplicate
    namespaces, event depth, instruction names, named parameters, and asset
    paths.
 7. Call the no-input GDevelop MCP `validate_project_files` tool after the most
@@ -364,7 +396,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
    JavaScript, fix every reported source URI/line diagnostic. `valid: true`
    proves parsing, source reconstruction, project validation, JavaScript
    authoring-API checking, and extension generated-code preflight only. It does
-   not prove runtime object picking or gameplay side effects.
+   not prove runtime object picking or gameplay side effects. Never summarize
+   `valid: true` as "the game works" or as task completion without the required
+   preview evidence.
 8. After the requested task is complete and validation succeeds, use Git from
    the project repository root to commit every task-owned change before
    `reload_project`. Inspect `git status` and the final diff, stage all changes
@@ -372,9 +406,20 @@ loop, comment, and JavaScript metadata when editing existing sources.
    create a commit with a concise, descriptive imperative message. Record the
    commit hash and message for the final report. If any source edit is needed
    afterward, validate again and create a follow-up commit before reloading.
-9. Call the GDevelop MCP `reload_project` tool and require a successful reload
+9. Call the GDevelop MCP `reload_project` tool with `mode: "start"`. Require its
+   immediate accepted receipt and record the returned `operation_id`. Poll that
+   exact ID with `mode: "status"` until it is terminal; use `mode: "wait"` with
+   the same ID only when a blocking wait is useful. If a caller is interrupted
+   before recording the ID, call `mode: "status"` without an ID to discover the
+   active or latest retained operation. Require a successful completed reload
    receipt. Do not invoke an MCP save that could replace newer disk edits with
-   stale editor memory.
+   stale editor memory. Never start a duplicate while status says an operation
+   is running, and never assume a running reload failed merely because a waiter
+   timed out or was interrupted. The status receipt exposes
+   `catalogGeneration.artifacts`, the current catalog subphase, its timestamps,
+   and the last renderer catalog progress record. If it reports a catalog
+   failure, use that exact artifact/subphase; do not dismiss it as a generic
+   renderer timeout.
 10. For gameplay or visual changes, call `launch_preview` only after step 9.
     Start paused and use `run_frames` with `objects`, `include`, and optional
     `instance_indexes` to inspect bounded live position, angle, force, variable,
@@ -434,7 +479,8 @@ settings, layouts, and events and type-checks JavaScript blocks against the
 fresh public API without replacing editor memory. A later source edit
 invalidates the earlier validation receipt. Its `valid: true` result is not a
 runtime semantic test; behavior-sensitive changes still require a paused preview
-and deterministic `run_frames` inspection.
+and deterministic `run_frames` inspection. Never report the game as working or
+the task as complete from this receipt alone.
 
 The Git commit is also a mandatory reload gate. After the final successful
 validation, inspect the repository diff, stage every change made for the user's
@@ -443,25 +489,34 @@ unrelated pre-existing changes. `reload_project` must run only after this commit
 succeeds. A later source edit requires a new validation and follow-up commit
 before another reload.
 
-`reload_project` remains a mandatory preview gate. Call it successfully only
-after both the validation and Git-commit gates and before the first
-`launch_preview`. Never launch or relaunch a preview from stale editor memory. A
-later source edit invalidates the validation, commit, and reload receipts.
+`reload_project` remains a mandatory preview gate. After both the validation
+and Git-commit gates, start it with `mode: "start"`, record the immediate
+`operation_id`, and poll that exact operation with `mode: "status"` until its
+receipt is completed successfully. A status call without an ID discovers the
+active/latest retained operation after caller interruption. Never launch or
+relaunch a preview from stale editor memory. A later source edit invalidates the
+validation, commit, and reload receipts. Never start another reload while the
+current operation is running.
+The reload writes generated catalogs itself and acknowledges their modification
+times; do not respond to a "Project files changed on disk" dialog by starting a
+second reload while the recorded operation is still running.
 
 ## Verification
 
 Before finishing:
 
-- Confirm every changed `.settings` file is unindented TOML and independently
-  parseable; confirm every `.layout` is canonical Layout DSL version 1.
+- Confirm every changed `.settings` and `.layout` file is unindented,
+  independently parseable TOML; confirm every `.layout` is canonical flat
+  layout TOML version 1.
 - Confirm `.layout` files contain only placement/layout concepts and contain no
   `objects`, `objectGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
   behaviors are at the local root of its individual `<Object>.settings` file.
-- Confirm attached behaviors serialize only catalog-listed author-writable
-  properties and no editor-hidden behavior descriptor appears in object settings.
+- Confirm attached behaviors use catalog-listed properties for new edits and
+  preserve every existing unlisted serialized field verbatim. Do not treat a
+  field's absence from the catalog as permission to delete it.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
 - Confirm every prefab/behavior function has a dedicated flat function
@@ -470,7 +525,7 @@ Before finishing:
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm settings file kinds and every object/behavior/effect type against
   `settings-catalog.json`.
-- Confirm layout elements, attributes, layers, objects, attached behaviors,
+- Confirm layout tables, fields, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
 - For every changed JavaScript event, confirm `strict=true`, validate all

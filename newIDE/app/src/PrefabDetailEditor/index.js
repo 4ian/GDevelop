@@ -53,6 +53,7 @@ import { Tabs } from '../UI/Tabs';
 import type { EventPath } from '../Utils/EventPath';
 import type { SearchFilterParams } from '../Utils/Search';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import VariablesList from '../VariablesList/VariablesList';
 import { type ExtensionFunctionEventsOutsideEditorChanges } from '../MainFrame/EditorContainers/BaseEditor';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
@@ -101,7 +102,11 @@ type PrefabPropertySelection = {|
   propertyName: string,
   isSharedProperties: boolean,
 |};
-type PrefabSettingsTab = 'configuration' | 'properties' | 'behaviors';
+type PrefabSettingsTab =
+  | 'configuration'
+  | 'properties'
+  | 'private-variables'
+  | 'behaviors';
 type PrefabBehaviorPropertiesSnapshot = { [propertyName: string]: string };
 type PrefabBehaviorSnapshot = {
   [behaviorName: string]: {|
@@ -145,6 +150,14 @@ const styles = {
     display: 'flex',
     flex: 1,
     minHeight: 0,
+    overflow: 'hidden',
+    padding: '8px 16px 16px 16px',
+  },
+  prefabSettingsPrivateVariables: {
+    display: 'flex',
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
     overflow: 'hidden',
     padding: '8px 16px 16px 16px',
   },
@@ -227,6 +240,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   _prefabBehaviorSnapshotsByObjectType: {
     [objectType: string]: PrefabBehaviorSnapshot,
   } = {};
+  _prefabVariablesSnapshot: ?gdSerializerElement = null;
   _parameterVariablesContainer: gdVariablesContainer = new gd.VariablesContainer(
     gd.VariablesContainer.Parameters
   );
@@ -271,6 +285,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this._applyPrefabVariablesRefactoring();
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
     if (this._objectsContainer) this._objectsContainer.delete();
     if (this._parameterVariablesContainer)
@@ -456,7 +471,8 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   _selectEventsFunction = (
     selectedEventsFunction: ?gdEventsFunction,
     _selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-    _selectedEventsBasedObject: ?gdEventsBasedObject
+    _selectedEventsBasedObject: ?gdEventsBasedObject,
+    onSelected?: () => void
   ) => {
     if (!selectedEventsFunction) {
       this._selectPrefabConfiguration();
@@ -476,7 +492,21 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       if (editorNavigator) {
         editorNavigator.openEditor('events-sheet');
       }
+      if (onSelected) onSelected();
     });
+  };
+
+  _openEventsFunctionSettings = (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => {
+    this._selectEventsFunction(
+      eventsFunction,
+      eventsBasedBehavior,
+      eventsBasedObject,
+      this._openParametersDialog
+    );
   };
 
   _makeRenameEventsFunction = (i18n: I18nType): any => (
@@ -1057,6 +1087,39 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     this._openPrefabDetailsDialog();
   };
 
+  _startEditingPrefabVariables = () => {
+    this._applyPrefabVariablesRefactoring();
+
+    const variablesContainer = this.props.eventsBasedObject.getVariables();
+    variablesContainer.resetPersistentUuid();
+    const snapshot = new gd.SerializerElement();
+    variablesContainer.serializeTo(snapshot);
+    this._prefabVariablesSnapshot = snapshot;
+  };
+
+  _applyPrefabVariablesRefactoring = () => {
+    const snapshot = this._prefabVariablesSnapshot;
+    if (!snapshot) return;
+
+    const variablesContainer = this.props.eventsBasedObject.getVariables();
+    try {
+      const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+        snapshot,
+        variablesContainer
+      );
+      gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+        this.props.project,
+        variablesContainer,
+        changeset,
+        snapshot
+      );
+    } finally {
+      variablesContainer.clearPersistentUuid();
+      snapshot.delete();
+      this._prefabVariablesSnapshot = null;
+    }
+  };
+
   _openPrefabDetailsDialog = (_eventsBasedObject?: ?gdEventsBasedObject) => {
     const objectType = this._getPrefabObjectType();
     const prefabBehaviorSnapshot = this._makePrefabBehaviorSnapshot(
@@ -1079,6 +1142,8 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
       }
     }
 
+    this._startEditingPrefabVariables();
+
     this.setState(
       {
         prefabDetailsDialogOpen: true,
@@ -1092,6 +1157,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
   };
 
   _closePrefabDetailsDialog = () => {
+    this._applyPrefabVariablesRefactoring();
     this.setState({ prefabDetailsDialogOpen: false }, () => {
       if (this.props.onPrefabSettingsDialogClose) {
         this.props.onPrefabSettingsDialogClose();
@@ -1352,6 +1418,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 forceUpdateEditor={() => this.forceUpdate()}
                 selectedEventsFunction={selectedEventsFunction}
                 onSelectEventsFunction={this._selectEventsFunction}
+                onOpenEventsFunctionSettings={this._openEventsFunctionSettings}
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
                 onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}
@@ -1532,7 +1599,11 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                   options={[
                     {
                       value: ('properties': PrefabSettingsTab),
-                      label: <Trans>Properties</Trans>,
+                      label: <Trans>Editor Properties</Trans>,
+                    },
+                    {
+                      value: ('private-variables': PrefabSettingsTab),
+                      label: <Trans>Private Variables</Trans>,
                     },
                     {
                       value: ('behaviors': PrefabSettingsTab),
@@ -1596,6 +1667,28 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       isListLocked={false}
                       canUseWholeProjectRefactorer={false}
                       hideStaticDataPlaceholderHints
+                    />
+                  </div>
+                )}
+                {prefabSettingsTab === 'private-variables' && (
+                  <div style={styles.prefabSettingsPrivateVariables}>
+                    <VariablesList
+                      projectScopedContainersAccessor={
+                        prefabDetailsProjectScopedContainersAccessor
+                      }
+                      directlyStoreValueChangesWhileEditing
+                      variablesContainer={eventsBasedObject.getVariables()}
+                      emptyPlaceholderTitle={
+                        <Trans>Add your first private variable</Trans>
+                      }
+                      emptyPlaceholderDescription={
+                        <Trans>
+                          These variables hold internal state for the prefab.
+                        </Trans>
+                      }
+                      onComputeAllVariableNames={() => []}
+                      onVariablesUpdated={this._notifyObjectPropertiesUpdated}
+                      isListLocked={false}
                     />
                   </div>
                 )}

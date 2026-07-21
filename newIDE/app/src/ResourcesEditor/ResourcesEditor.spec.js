@@ -25,4 +25,16 @@ describe('ResourcesEditor', () => {
     expect(source).not.toContain('CustomSvgIcons/Edit');
     expect(source).not.toContain('<EditIcon />');
   });
+
+  it('keeps project files visible in short editor windows', () => {
+    const source = getSource('index.js');
+
+    expect(source).toMatch(
+      /workingDeskPane:\s*\{[\s\S]*?minHeight:\s*0,[\s\S]*?\}/
+    );
+    expect(source).toMatch(/flex: `0 1 \$\{workingDeskHeight\}px`/);
+    expect(source).toContain(
+      'bounds.height - minProjectFilesHeight - resizeHandleSize'
+    );
+  });
 });

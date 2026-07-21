@@ -19,6 +19,11 @@ export type GitDiff = {|
   diff: string,
 |};
 
+export type GitCommitDiff = {|
+  commitHash: string,
+  diff: string,
+|};
+
 export type GitCommit = {|
   hash: string,
   shortHash: string,
@@ -82,5 +87,21 @@ export const invokeGitToolDiff = async (
     projectFilePath,
     action: 'diff',
     payload: { file },
+  });
+};
+
+export const invokeGitToolCommitDiff = async (
+  projectFilePath: string,
+  commitHash: string
+): Promise<GitCommitDiff> => {
+  const renderer = ipcRenderer;
+  if (!renderer || typeof renderer.invoke !== 'function') {
+    throw new Error('The Git tool is only available in the desktop app.');
+  }
+
+  return renderer.invoke('git-tool-request', {
+    projectFilePath,
+    action: 'commit-diff',
+    payload: { commitHash },
   });
 };

@@ -10,7 +10,8 @@ import Rectangle from '../../Utils/Rectangle';
 
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
-import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import Events from '../../UI/CustomSvgIcons/Events';
+import Settings from '../../UI/CustomSvgIcons/Settings';
 
 const getFitToContentButton = ({
   i18n,
@@ -21,31 +22,32 @@ const getFitToContentButton = ({
 }: {|
   i18n: I18nType,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: () => void,
   forceUpdate: () => void,
 |}) => ({
   label: i18n._(t`Fit to content`),
   nonFieldType: 'button',
   onClick: (instance: gdInitialInstance) => {
-    const contentAABB = getContentAABB();
-    if (!contentAABB) {
-      return;
-    }
-    if (contentAABB.width() > 0) {
-      eventsBasedObjectVariant.setAreaMinX(contentAABB.left);
-      eventsBasedObjectVariant.setAreaMinY(contentAABB.top);
-    }
-    if (contentAABB.height() > 0) {
-      eventsBasedObjectVariant.setAreaMaxX(contentAABB.right);
-      eventsBasedObjectVariant.setAreaMaxY(contentAABB.bottom);
-    }
-    if (contentAABB.depth() > 0) {
-      eventsBasedObjectVariant.setAreaMinZ(contentAABB.zMin);
-      eventsBasedObjectVariant.setAreaMaxZ(contentAABB.zMax);
-    }
-    onEventsBasedObjectChildrenEdited();
-    forceUpdate();
+    getContentAABB().then(contentAABB => {
+      if (!contentAABB) {
+        return;
+      }
+      if (contentAABB.width() > 0) {
+        eventsBasedObjectVariant.setAreaMinX(contentAABB.left);
+        eventsBasedObjectVariant.setAreaMaxX(contentAABB.right);
+      }
+      if (contentAABB.height() > 0) {
+        eventsBasedObjectVariant.setAreaMinY(contentAABB.top);
+        eventsBasedObjectVariant.setAreaMaxY(contentAABB.bottom);
+      }
+      if (contentAABB.depth() > 0) {
+        eventsBasedObjectVariant.setAreaMinZ(contentAABB.zMin);
+        eventsBasedObjectVariant.setAreaMaxZ(contentAABB.zMax);
+      }
+      onEventsBasedObjectChildrenEdited();
+      forceUpdate();
+    });
   },
   disabled: 'onValuesDifferent',
   getValue: () => '',
@@ -61,11 +63,29 @@ const getOpenPrefabDetailButton = ({
   if (!onOpenPrefabDetailEditor) return null;
 
   return {
-    label: i18n._(t`Prefab detail`),
+    label: i18n._(t`Prefab events`),
     nonFieldType: 'button',
-    showRightIcon: true,
-    getIcon: (style: {| fontSize: string |}) => <ShareExternal style={style} />,
+    getIcon: (style: {| fontSize: string |}) => <Events style={style} />,
     onClick: (_instance: gdInitialInstance) => onOpenPrefabDetailEditor(),
+    disabled: 'onValuesDifferent',
+    getValue: () => '',
+  };
+};
+
+const getOpenPrefabSettingsButton = ({
+  i18n,
+  onOpenPrefabSettings,
+}: {|
+  i18n: I18nType,
+  onOpenPrefabSettings: ?() => void,
+|}) => {
+  if (!onOpenPrefabSettings) return null;
+
+  return {
+    label: i18n._(t`Prefab settings`),
+    nonFieldType: 'button',
+    getIcon: (style: {| fontSize: string |}) => <Settings style={style} />,
+    onClick: (_instance: gdInitialInstance) => onOpenPrefabSettings(),
     disabled: 'onValuesDifferent',
     getValue: () => '',
   };
@@ -269,14 +289,16 @@ export const makeSchema = ({
   getContentAABB,
   onEventsBasedObjectChildrenEdited,
   onOpenPrefabDetailEditor,
+  onOpenPrefabSettings,
 }: {|
   i18n: I18nType,
   forceUpdate: () => void,
   eventsBasedObject: gdEventsBasedObject,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: () => void,
   onOpenPrefabDetailEditor: ?() => void,
+  onOpenPrefabSettings: ?() => void,
 |}): Schema => {
   // $FlowFixMe[incompatible-type]
   return [
@@ -356,6 +378,10 @@ export const makeSchema = ({
     getOpenPrefabDetailButton({
       i18n,
       onOpenPrefabDetailEditor,
+    }),
+    getOpenPrefabSettingsButton({
+      i18n,
+      onOpenPrefabSettings,
     }),
   ].filter(Boolean);
 };

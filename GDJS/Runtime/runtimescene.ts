@@ -27,6 +27,7 @@ namespace gdjs {
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _runtimeGame: gdjs.RuntimeGame;
     _lastId: integer = 0;
+    private _runtimeObjectsByUniqueId = new Map<integer, gdjs.RuntimeObject>();
     _name: string = '';
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
@@ -364,6 +365,7 @@ namespace gdjs {
       this._initialBehaviorSharedData = new Hashtable();
       this._eventsFunction = null;
       this._lastId = 0;
+      this._runtimeObjectsByUniqueId.clear();
       this.networkId = null;
       this._objectGroups.clear();
     }
@@ -580,13 +582,15 @@ namespace gdjs {
         ':' +
         signalDiagnostics.emittedSignalsCount +
         ':' +
-        signalDiagnostics.droppedSignalsCount +
+        signalDiagnostics.throttledSignalsCount +
         ':' +
         signalDiagnostics.deliveredSignalsThisFrameCount +
         ':' +
         signalDiagnostics.receiversThisFrameCount +
         ':' +
-        signalDiagnostics.signalsThisFrame.length;
+        signalDiagnostics.signalsThisFrame.length +
+        ':' +
+        signalDiagnostics.recentSignals.length;
 
       for (
         let i = 0, len = signalDiagnostics.signalsThisFrame.length;
@@ -656,6 +660,14 @@ namespace gdjs {
         super._updateObjectsPreRender();
         return;
       } else {
+        for (
+          let i = 0;
+          i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+          ++i
+        ) {
+          gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+        }
+
         // After first frame, optimise rendering by setting only objects
         // near camera as visible.
         // TODO: For compatibility, pass a scale of `2`,
@@ -768,6 +780,26 @@ namespace gdjs {
     /**
      * Create an identifier for a new object of the scene.
      */
+    _registerRuntimeObject(runtimeObject: gdjs.RuntimeObject): void {
+      this._runtimeObjectsByUniqueId.set(
+        runtimeObject.getUniqueId(),
+        runtimeObject
+      );
+    }
+
+    _unregisterRuntimeObject(runtimeObject: gdjs.RuntimeObject): void {
+      if (
+        this._runtimeObjectsByUniqueId.get(runtimeObject.getUniqueId()) ===
+        runtimeObject
+      ) {
+        this._runtimeObjectsByUniqueId.delete(runtimeObject.getUniqueId());
+      }
+    }
+
+    getRuntimeObjectByUniqueId(objectId: integer): gdjs.RuntimeObject | null {
+      return this._runtimeObjectsByUniqueId.get(objectId) || null;
+    }
+
     createNewUniqueId(): integer {
       this._lastId++;
       return this._lastId;

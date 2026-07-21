@@ -312,19 +312,6 @@ namespace gdjs {
     }
 
     /**
-     * Called after the object has been placed in its scene or parent container.
-     * Position, layer and z order are applied before this method runs.
-     *
-     * If you redefine this function, **make sure to call the original method**
-     * (`RuntimeObject.prototype.onPlacedInScene.call(this);`).
-     */
-    onPlacedInScene(): void {
-      for (let i = 0; i < this._behaviors.length; ++i) {
-        this._behaviors[i].onPlacedInScene();
-      }
-    }
-
-    /**
      * Called to reset the object to its default state. This is used for objects that are
      * "recycled": they are dismissed (at which point `onDeletedFromScene` is called) but still
      * stored in a cache to be reused next time an object must be created. At this point,
@@ -740,6 +727,45 @@ namespace gdjs {
      */
     get3DRendererObject(): THREE.Object3D | null | undefined {
       return undefined;
+    }
+
+    /**
+     * Return the 3D collision masks provided by activated behaviors.
+     *
+     * This is used by the preview debugger so it does not need to know which
+     * behaviors own collision shapes.
+     */
+    get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const collisionMasks: gdjs.DebugCollisionMask3D[] = gdjs.staticArray(
+        RuntimeObject.prototype.get3DDebugCollisionMasks
+      );
+      collisionMasks.length = 0;
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        const behavior = behaviors[behaviorName];
+        if (!behavior.activated()) {
+          continue;
+        }
+        const collisionMask = behavior.get3DDebugCollisionMask();
+        if (collisionMask) {
+          collisionMasks.push(collisionMask);
+        }
+      }
+      return collisionMasks;
+    }
+
+    /** Release behavior data cached for 3D collision-mask debug rendering. */
+    clear3DDebugCollisionMaskCache(): void {
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        behaviors[behaviorName].clear3DDebugCollisionMaskCache();
+      }
     }
 
     //Common properties:
@@ -2186,6 +2212,9 @@ namespace gdjs {
       if (!behavior) {
         return false;
       }
+      this._runtimeScene
+        .getScene()
+        ._signalBus?.removeSubscriptionsForBehavior(behavior);
       behavior.onDestroy();
       const behaviorIndex = this._behaviors.indexOf(behavior);
       if (behaviorIndex !== -1) {
@@ -2216,7 +2245,6 @@ namespace gdjs {
       }
       this._behaviorsTable.put(behaviorData.name, newRuntimeBehavior);
       newRuntimeBehavior.onCreated();
-      newRuntimeBehavior.onPlacedInScene();
       return true;
     }
 

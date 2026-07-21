@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="740" viewBox="0 0 1200 740" font-family="Inter, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <style>
+      .t{fill:#F3F3F7}.m{fill:#9A9AAB}.mm{fill:#6E6E80}
+      .sub{font-size:11px;letter-spacing:.3px}
+    </style>
+  </defs>
+  <rect width="1200" height="740" fill="#12121A"/>
+
+  <!-- ================= HEADER : object switcher (spans full width) ================= -->
+  <rect x="0" y="0" width="1200" height="64" fill="#191922"/>
+  <line x1="0" y1="64" x2="1200" y2="64" stroke="#2E2E3C" stroke-width="1"/>
+  <text x="24" y="26" class="mm sub" font-weight="700" letter-spacing=".6">OBJECT SETTINGS</text>
+  <text x="1176" y="26" class="mm sub" text-anchor="end">new entry under Globals · alongside Global objects</text>
+
+  <!-- switcher trigger — width matches the Sources panel (does not exceed it) -->
+  <rect x="18" y="30" width="264" height="26" rx="7" fill="#20202B" stroke="#3A3A4C" stroke-width="1"/>
+  <rect x="24" y="33" width="20" height="20" rx="5" fill="#2C2C3D"/><text x="28" y="49" font-size="12">🛡</text>
+  <text x="52" y="48" class="t" font-size="13" font-weight="600">Knight3D</text>
+  <text x="132" y="48" class="m" font-size="10.5">3D Model · Scene</text>
+  <path d="M262,40 l6,6 l6,-6" fill="none" stroke="#9D8BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Filter properties — moved into the header, right of the switcher -->
+  <rect x="298" y="30" width="300" height="26" rx="7" fill="#26263A"/>
+  <circle cx="315" cy="43" r="5.5" fill="none" stroke="#7C7C90" stroke-width="1.6"/><line x1="319" y1="47" x2="323" y2="51" stroke="#7C7C90" stroke-width="1.6"/>
+  <text x="331" y="47" class="m" font-size="12">Filter properties</text>
+  <text x="610" y="47" class="mm sub">filters sources &amp; fields for the current object</text>
+
+  <!-- ===== OPEN DROPDOWN (overlay) ===== -->
+  <rect x="20" y="62" width="330" height="330" rx="10" fill="#1E1E28" stroke="#3A3A4C" stroke-width="1.2"/>
+  <!-- search -->
+  <rect x="34" y="76" width="302" height="30" rx="7" fill="#26263A"/>
+  <circle cx="52" cy="91" r="5.5" fill="none" stroke="#7C7C90" stroke-width="1.6"/><line x1="56" y1="95" x2="60" y2="99" stroke="#7C7C90" stroke-width="1.6"/>
+  <text x="68" y="95" class="m" font-size="12">Search objects</text>
+
+  <!-- selected row -->
+  <rect x="28" y="114" width="314" height="40" rx="8" fill="#7B61FF" fill-opacity="0.16"/>
+  <rect x="28" y="114" width="3" height="40" rx="1.5" fill="#7B61FF"/>
+  <rect x="40" y="122" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="46" y="139" font-size="13">🛡</text>
+  <text x="74" y="131" class="t" font-size="13" font-weight="600">Knight3D</text>
+  <text x="74" y="146" class="sub mm">3D Model</text>
+  <rect x="286" y="124" width="50" height="18" rx="5" fill="#33333F"/><text x="311" y="137" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="600">Scene</text>
+
+  <!-- other rows -->
+  <rect x="40" y="164" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="47" y="181" font-size="12">▦</text>
+  <text x="74" y="174" class="t" font-size="13">Ground</text><text x="74" y="188" class="sub mm">Tiled Sprite</text>
+  <rect x="286" y="166" width="50" height="18" rx="5" fill="#33333F"/><text x="311" y="179" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="600">Scene</text>
+
+  <rect x="40" y="204" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="47" y="221" font-size="12">💡</text>
+  <text x="74" y="214" class="t" font-size="13">Light</text><text x="74" y="228" class="sub mm">Light</text>
+  <rect x="284" y="206" width="52" height="18" rx="5" fill="#2B3B58"/><text x="310" y="219" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+
+  <rect x="40" y="244" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="47" y="261" font-size="12">🧩</text>
+  <text x="74" y="254" class="t" font-size="13">HUD</text><text x="74" y="268" class="sub mm">Custom object</text>
+  <rect x="284" y="246" width="52" height="18" rx="5" fill="#4A3C1E"/><text x="310" y="259" class="sub" fill="#E7C285" text-anchor="middle" font-weight="600">Prefab</text>
+
+  <rect x="40" y="284" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="47" y="301" font-size="12">⭐</text>
+  <text x="74" y="294" class="t" font-size="13">Pickup</text><text x="74" y="308" class="sub mm">Sprite</text>
+  <rect x="284" y="286" width="52" height="18" rx="5" fill="#2B3B58"/><text x="310" y="299" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+
+  <rect x="40" y="324" width="24" height="24" rx="6" fill="#2C2C3D"/><text x="47" y="341" font-size="12">⚙</text>
+  <text x="74" y="334" class="t" font-size="13">Manager</text><text x="74" y="348" class="sub mm">Empty object</text>
+  <rect x="284" y="326" width="52" height="18" rx="5" fill="#2B3B58"/><text x="310" y="339" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+
+  <text x="34" y="380" class="sub mm">Overlay dropdown · reserves no width when closed · one badged effective list</text>
+
+  <!-- ================= SOURCES AREA (left of two) ================= -->
+  <rect x="0" y="64" width="300" height="676" fill="#20202B"/>
+  <line x1="300" y1="64" x2="300" y2="740" stroke="#2E2E3C" stroke-width="1"/>
+
+  <!-- (Filter properties lives in the header now, not here) -->
+
+  <!-- Object (selected) — shows the object's type as muted trailing text -->
+  <rect x="10" y="88" width="280" height="38" rx="8" fill="#7B61FF" fill-opacity="0.16"/>
+  <rect x="10" y="88" width="3" height="38" rx="1.5" fill="#7B61FF"/>
+  <text x="30" y="112" font-size="14">📦</text><text x="54" y="112" class="t" font-size="13.5" font-weight="600">Object</text>
+  <text x="282" y="112" class="mm sub" text-anchor="end">3D Model</text>
+
+  <!-- Behaviors section header + inline add -->
+  <text x="30" y="152" class="mm sub" font-weight="700" letter-spacing=".6">BEHAVIORS</text>
+  <rect x="256" y="138" width="26" height="20" rx="6" fill="#2C2340"/><text x="269" y="153" fill="#9D8BFF" font-size="14" text-anchor="middle" font-weight="700">＋</text>
+
+  <text x="30" y="186" font-size="14">🧲</text><text x="54" y="186" class="t" font-size="13.5">Physics 3D</text>
+  <text x="30" y="222" font-size="14">🕹</text><text x="54" y="222" class="t" font-size="13.5">Top-down movement</text>
+  <text x="30" y="258" font-size="14">✨</text><text x="54" y="258" class="t" font-size="13.5">Tween</text>
+
+  <text x="18" y="712" class="sub mm">Sources = Object + Behaviors only · Variables &amp; Effects use their own editors</text>
+
+  <!-- ================= DETAILS AREA (right of two) ================= -->
+  <rect x="300" y="64" width="900" height="676" fill="#191922"/>
+  <text x="332" y="100" class="t" font-size="15" font-weight="600">Object properties</text>
+  <text x="332" y="120" class="m" font-size="12">3D Model · <tspan fill="#C7C7D2" font-weight="600">Scene · MainMenu</tspan>   ← type · origin (owner named)</text>
+
+  <!-- Model -->
+  <text x="332" y="160" class="m" font-size="12.5">Model</text>
+  <rect x="540" y="146" width="620" height="30" rx="7" fill="#26263A"/><text x="554" y="166" class="t" font-size="12.5">knight.glb</text>
+  <text x="1146" y="166" class="m" font-size="14" text-anchor="end">…</text>
+
+  <!-- Orientation -->
+  <text x="332" y="204" class="m" font-size="12.5">Orientation</text>
+  <rect x="540" y="190" width="200" height="30" rx="7" fill="#26263A"/><text x="554" y="210" class="t" font-size="12.5">0</text><text x="730" y="210" class="mm sub" text-anchor="end">X°</text>
+  <rect x="748" y="190" width="200" height="30" rx="7" fill="#26263A"/><text x="762" y="210" class="t" font-size="12.5">0</text><text x="938" y="210" class="mm sub" text-anchor="end">Y°</text>
+  <rect x="956" y="190" width="204" height="30" rx="7" fill="#26263A"/><text x="970" y="210" class="t" font-size="12.5">0</text><text x="1150" y="210" class="mm sub" text-anchor="end">Z°</text>
+
+  <!-- Size -->
+  <text x="332" y="248" class="m" font-size="12.5">Size</text>
+  <rect x="540" y="234" width="200" height="30" rx="7" fill="#26263A"/><text x="554" y="254" class="t" font-size="12.5">64</text><text x="730" y="254" class="mm sub" text-anchor="end">W</text>
+  <rect x="748" y="234" width="200" height="30" rx="7" fill="#26263A"/><text x="762" y="254" class="t" font-size="12.5">64</text><text x="938" y="254" class="mm sub" text-anchor="end">H</text>
+  <rect x="956" y="234" width="204" height="30" rx="7" fill="#26263A"/><text x="970" y="254" class="t" font-size="12.5">64</text><text x="1150" y="254" class="mm sub" text-anchor="end">D</text>
+
+  <!-- Points -->
+  <text x="332" y="292" class="m" font-size="12.5">Points</text>
+  <rect x="540" y="278" width="620" height="30" rx="7" fill="#232331" stroke="#3A3A4C" stroke-width="1"/>
+  <text x="554" y="298" class="t" font-size="12.5">3 points defined</text>
+  <text x="1146" y="298" fill="#9D8BFF" font-size="12" text-anchor="end" font-weight="600">Edit ›</text>
+
+  <!-- specialized-editor note -->
+  <rect x="332" y="336" width="828" height="60" rx="10" fill="#232331" stroke="#3A3A4C" stroke-width="1"/>
+  <rect x="332" y="336" width="4" height="60" rx="2" fill="#7B61FF"/>
+  <text x="352" y="362" class="t" font-size="12.5" font-weight="600">Rich editors open in a separate window  ⧉</text>
+  <text x="352" y="382" class="m" font-size="12">Sprite / 3D / Particle animations, points, collision masks · own resizable window · the workbench stays open behind it.</text>
+
+  <text x="332" y="712" class="sub mm">Details · more room now the objects column is gone · content max 1120 px · label col 190–230 px · header stays while detail scrolls</text>
+</svg>

@@ -269,6 +269,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.onOpenCustomObjectEditor,
                         onOpenPrefabDetailEditor:
                           props.onOpenPrefabDetailEditor,
+                        onOpenPrefabSettings: props.onOpenPrefabSettings,
                         onOpenEventsFunctionsExtension:
                           props.onOpenEventsFunctionsExtension,
                         onRenamedEventsBasedObject:

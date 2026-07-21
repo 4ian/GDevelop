@@ -399,7 +399,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
  */
 bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "onPlacedInScene" ||
+  return functionName == "onCreated" || functionName == "onSignal" ||
          functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
          functionName == "doStepPostEvents" || functionName == "onDestroy" ||
@@ -414,8 +414,8 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
  */
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "onPlacedInScene" ||
-         functionName == "doStepPostEvents" || functionName == "onSignal" ||
+  return functionName == "onCreated" || functionName == "doStepPostEvents" ||
+         functionName == "onSignal" ||
          functionName == "onDestroy" || functionName == "onHotReloading";
 }
 

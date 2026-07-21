@@ -64,9 +64,9 @@ const ignoredDirectoryNames = new Set([
   'node_modules',
   '.cache',
 ]);
-const folderLinksFileName = '.gdevelop-folder-links.json';
+const gdevelopDirectoryName = '.gdevelop';
+const folderLinksFileName = 'folder-links.json';
 const linkedFoldersRootName = 'Linked folders';
-const ignoredFileNames = new Set([folderLinksFileName]);
 
 type ProjectFileNodeSource =
   | 'project'
@@ -461,7 +461,7 @@ export const getLinkedFoldersFilePath = (project: gdProject): ?string => {
   if (!path) return null;
   const projectRoot = getProjectRootPath(project);
   if (!projectRoot) return null;
-  return path.join(projectRoot, folderLinksFileName);
+  return path.join(projectRoot, gdevelopDirectoryName, folderLinksFileName);
 };
 
 const getLinkedFolderName = (absolutePath: string): string => {
@@ -695,8 +695,6 @@ const readDirectory = async ({
     }
     const name = dirent.name;
     if (dirent.isDirectory() && ignoredDirectoryNames.has(name)) continue;
-    if (dirent.isFile() && ignoredFileNames.has(name)) continue;
-
     const childAbsolutePath = path.join(absolutePath, name);
     const childRelativePath = relativePath
       ? normalizeSlashes(path.join(relativePath, name))
@@ -741,70 +739,6 @@ const readDirectory = async ({
   return sortNodes(nodes);
 };
 
-const ensureFolderLinksFileIsGitExcluded = async (
-  projectRoot: string
-): Promise<void> => {
-  if (!fs || !path) return;
-
-  let gitRootPath = path.resolve(projectRoot);
-  let gitDirectoryPath = null;
-  while (true) {
-    const candidateGitDirectoryPath = path.join(gitRootPath, '.git');
-    try {
-      const gitDirectoryStat = await fs.promises.stat(
-        candidateGitDirectoryPath
-      );
-      if (gitDirectoryStat.isDirectory()) {
-        gitDirectoryPath = candidateGitDirectoryPath;
-        break;
-      }
-    } catch (error) {
-      // Keep walking up to find an ancestor Git repository.
-    }
-
-    const parentPath = path.dirname(gitRootPath);
-    if (parentPath === gitRootPath) return;
-    gitRootPath = parentPath;
-  }
-
-  if (!gitDirectoryPath) return;
-
-  const gitInfoDirectoryPath = path.join(gitDirectoryPath, 'info');
-  const excludeFilePath = path.join(gitInfoDirectoryPath, 'exclude');
-  const excludeEntry = `/${normalizeSlashes(
-    path.relative(gitRootPath, path.join(projectRoot, folderLinksFileName))
-  )}`;
-
-  try {
-    await fs.promises.mkdir(gitInfoDirectoryPath, { recursive: true });
-    let existingExclude = '';
-    try {
-      existingExclude = await fs.promises.readFile(excludeFilePath, 'utf8');
-    } catch (error) {
-      existingExclude = '';
-    }
-
-    if (
-      existingExclude
-        .split(/\r?\n/)
-        .map(line => line.trim())
-        .includes(excludeEntry)
-    ) {
-      return;
-    }
-
-    const prefix =
-      existingExclude && !existingExclude.endsWith('\n') ? '\n' : '';
-    await fs.promises.appendFile(
-      excludeFilePath,
-      `${prefix}# GDevelop local folder links\n${excludeEntry}\n`,
-      'utf8'
-    );
-  } catch (error) {
-    // Do not block the feature if Git exclusion can't be updated.
-  }
-};
-
 const readLinkedFoldersFile = async (
   project: gdProject
 ): Promise<Array<LinkedFolder>> => {
@@ -837,7 +771,9 @@ const writeLinkedFoldersFile = async ({
   const linkedFoldersFilePath = getLinkedFoldersFilePath(project);
   if (!projectRoot || !linkedFoldersFilePath) return;
 
-  await ensureFolderLinksFileIsGitExcluded(projectRoot);
+  await fs.promises.mkdir(path.dirname(linkedFoldersFilePath), {
+    recursive: true,
+  });
   await fs.promises.writeFile(
     linkedFoldersFilePath,
     JSON.stringify(
@@ -1322,6 +1258,43 @@ export const canUpdateProjectFolderFromTemplate = (
 export const shouldSelectProjectFileNode = (node: ProjectFileNode): boolean =>
   node.type === 'file' || node.type === 'folder';
 
+export const getProjectFileNodeIdsAfterSelection = ({
+  selectedNodeIds,
+  nodeId,
+  orderedNodeIds,
+  anchorNodeId,
+  isToggleSelection,
+  isRangeSelection,
+}: {|
+  selectedNodeIds: Array<string>,
+  nodeId: string,
+  orderedNodeIds: Array<string>,
+  anchorNodeId: ?string,
+  isToggleSelection: boolean,
+  isRangeSelection: boolean,
+|}): Array<string> => {
+  if (isRangeSelection && anchorNodeId) {
+    const anchorIndex = orderedNodeIds.indexOf(anchorNodeId);
+    const nodeIndex = orderedNodeIds.indexOf(nodeId);
+    if (anchorIndex !== -1 && nodeIndex !== -1) {
+      const firstIndex = Math.min(anchorIndex, nodeIndex);
+      const lastIndex = Math.max(anchorIndex, nodeIndex);
+      const rangeNodeIds = orderedNodeIds.slice(firstIndex, lastIndex + 1);
+      return isToggleSelection
+        ? Array.from(new Set([...selectedNodeIds, ...rangeNodeIds]))
+        : rangeNodeIds;
+    }
+  }
+
+  if (isToggleSelection) {
+    return selectedNodeIds.includes(nodeId)
+      ? selectedNodeIds.filter(selectedNodeId => selectedNodeId !== nodeId)
+      : [...selectedNodeIds, nodeId];
+  }
+
+  return [nodeId];
+};
+
 export const canMoveProjectFileToFolder = ({
   sourceNode,
   targetFolderNode,
@@ -1733,6 +1706,15 @@ const ProjectFilesPanelContent: React.ComponentType<{
       setLinkedFoldersRootNode,
     ] = React.useState<?ProjectFileNode>(null);
     const [openedNodeIds, setOpenedNodeIds] = React.useState<Array<string>>([]);
+    const [selectedNodes, setSelectedNodes] = React.useState<
+      Array<ProjectFileNode>
+    >(selectedItem ? [selectedItem.node] : []);
+    const selectedNodesRef = React.useRef<Array<ProjectFileNode>>(
+      selectedNodes
+    );
+    const selectionAnchorNodeIdRef = React.useRef<?string>(
+      selectedItem ? selectedItem.node.id : null
+    );
     const [treeWidth, setTreeWidth] = React.useState(getPersistedTreeWidth);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<?string>(null);
@@ -1771,6 +1753,46 @@ const ProjectFilesPanelContent: React.ComponentType<{
       dropTargetFolderNodeId,
       setDropTargetFolderNodeId,
     ] = React.useState<?string>(null);
+
+    const replaceSelectedNodes = React.useCallback(
+      (nextSelectedNodes: Array<ProjectFileNode>) => {
+        selectedNodesRef.current = nextSelectedNodes;
+        setSelectedNodes(nextSelectedNodes);
+      },
+      []
+    );
+
+    React.useEffect(
+      () => {
+        if (!selectedItem) {
+          if (selectedNodesRef.current.length) replaceSelectedNodes([]);
+          selectionAnchorNodeIdRef.current = null;
+          return;
+        }
+
+        const selectedNodeIndex = selectedNodesRef.current.findIndex(
+          node => node.id === selectedItem.node.id
+        );
+        if (selectedNodeIndex === -1) {
+          replaceSelectedNodes([selectedItem.node]);
+          selectionAnchorNodeIdRef.current = selectedItem.node.id;
+          return;
+        }
+        if (selectedNodesRef.current[selectedNodeIndex] === selectedItem.node) {
+          return;
+        }
+
+        const nextSelectedNodes = [...selectedNodesRef.current];
+        nextSelectedNodes[selectedNodeIndex] = selectedItem.node;
+        replaceSelectedNodes(nextSelectedNodes);
+      },
+      [selectedItem, replaceSelectedNodes]
+    );
+
+    const selectedNodeIds = React.useMemo(
+      () => new Set(selectedNodes.map(node => node.id)),
+      [selectedNodes]
+    );
 
     const canBrowseProjectFiles =
       !!fs &&
@@ -1820,6 +1842,19 @@ const ProjectFilesPanelContent: React.ComponentType<{
           });
           setRootNode(newRootNode);
           setLinkedFoldersRootNode(linkedFoldersRootNode);
+          if (selectedNodesRef.current.length) {
+            const refreshedSelectedNodes = [];
+            selectedNodesRef.current.forEach(selectedNode => {
+              const refreshedSelectedNode = findNodeById(
+                projectFilesRootNode,
+                selectedNode.id
+              );
+              if (refreshedSelectedNode) {
+                refreshedSelectedNodes.push(refreshedSelectedNode);
+              }
+            });
+            replaceSelectedNodes(refreshedSelectedNodes);
+          }
           setOpenedNodeIds(openedNodeIds => {
             if (openedNodeIds.includes(newRootNode.id)) return openedNodeIds;
             return [newRootNode.id, ...openedNodeIds];
@@ -1834,7 +1869,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
           setIsLoading(false);
         }
       },
-      [project, onProjectFilesRefreshed]
+      [project, onProjectFilesRefreshed, replaceSelectedNodes]
     );
 
     const refreshOnResourceChange = React.useCallback(
@@ -2655,14 +2690,6 @@ const ProjectFilesPanelContent: React.ComponentType<{
       );
     }, []);
 
-    const selectNode = React.useCallback(
-      (node: ProjectFileNode) => {
-        if (!shouldSelectProjectFileNode(node)) return;
-        onSelectProjectFile(makeSelectionForNode(node));
-      },
-      [makeSelectionForNode, onSelectProjectFile]
-    );
-
     const openNode = React.useCallback(
       (node: ProjectFileNode) => {
         if (node.type === 'folder') {
@@ -2676,6 +2703,17 @@ const ProjectFilesPanelContent: React.ComponentType<{
 
     const openNodePath = React.useCallback((node: ProjectFileNode) => {
       if (shell) shell.openPath(node.absolutePath);
+    }, []);
+
+    const openFolderForNode = React.useCallback((node: ProjectFileNode) => {
+      if (!shell) return;
+
+      if (node.type === 'folder') {
+        shell.openPath(node.absolutePath);
+        return;
+      }
+
+      shell.showItemInFolder(node.absolutePath);
     }, []);
 
     const openProjectFolder = React.useCallback(
@@ -2950,18 +2988,6 @@ const ProjectFilesPanelContent: React.ComponentType<{
       [updateTreeWidth]
     );
 
-    const openContextMenu = React.useCallback(
-      (event: SyntheticMouseEvent<HTMLDivElement>, node: ProjectFileNode) => {
-        event.preventDefault();
-        event.stopPropagation();
-        selectNode(node);
-        if (contextMenu.current) {
-          contextMenu.current.open(event.clientX, event.clientY, { node });
-        }
-      },
-      [selectNode]
-    );
-
     const buildContextMenu = React.useCallback(
       (
         i18n: I18nType,
@@ -3018,6 +3044,14 @@ const ProjectFilesPanelContent: React.ComponentType<{
                   : i18n._(t`Open file`),
               click: () => openNodePath(node),
             },
+            ...(node.type === 'file'
+              ? [
+                  {
+                    label: i18n._(t`Open folder`),
+                    click: () => openFolderForNode(node),
+                  },
+                ]
+              : []),
             {
               label: i18n._(t`Copy absolute path`),
               click: () => copyNodeAbsolutePath(node),
@@ -3034,6 +3068,14 @@ const ProjectFilesPanelContent: React.ComponentType<{
             label: i18n._(t`Rename`),
             enabled: canRenameProjectFileNode(node),
             click: () => openRenameDialogForNode(node),
+          },
+          {
+            label: i18n._(t`Open folder`),
+            click: () => openFolderForNode(node),
+          },
+          {
+            label: i18n._(t`Copy absolute path`),
+            click: () => copyNodeAbsolutePath(node),
           },
           { type: 'separator' },
           {
@@ -3087,6 +3129,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
         copyNodeAbsolutePath,
         openAddLinkedFolderDialog,
         openFolderDialogForNode,
+        openFolderForNode,
         openMarkdownDialogForNode,
         openRenameDialogForNode,
         openNodePath,
@@ -3143,6 +3186,113 @@ const ProjectFilesPanelContent: React.ComponentType<{
       [nodeMatchesSearch, searchTextLowerCase]
     );
 
+    const visibleTreeNodes = React.useMemo(
+      (): Array<ProjectFileNode> => {
+        const visibleNodes = [];
+        const appendVisibleNode = (node: ProjectFileNode) => {
+          if (!shouldDisplayNode(node)) return;
+          if (shouldSelectProjectFileNode(node)) visibleNodes.push(node);
+
+          const isOpened =
+            !!searchTextLowerCase || openedNodeIds.includes(node.id);
+          if (!isOpened || !node.children) return;
+          node.children.forEach(appendVisibleNode);
+        };
+
+        topLevelNodes.forEach(appendVisibleNode);
+        return visibleNodes;
+      },
+      [openedNodeIds, searchTextLowerCase, shouldDisplayNode, topLevelNodes]
+    );
+
+    const selectNode = React.useCallback(
+      (
+        node: ProjectFileNode,
+        event: ?SyntheticMouseEvent<HTMLDivElement>,
+        orderedNodes: Array<ProjectFileNode>
+      ) => {
+        if (!shouldSelectProjectFileNode(node)) return;
+
+        const selectableOrderedNodes = orderedNodes.filter(
+          shouldSelectProjectFileNode
+        );
+        const orderedNodeIds = selectableOrderedNodes.map(node => node.id);
+        const isToggleSelection = !!(event && (event.ctrlKey || event.metaKey));
+        const isRangeSelection = !!(event && event.shiftKey);
+        const anchorNodeId = selectionAnchorNodeIdRef.current;
+        const hasValidRange = !!(
+          isRangeSelection &&
+          anchorNodeId &&
+          orderedNodeIds.includes(anchorNodeId) &&
+          orderedNodeIds.includes(node.id)
+        );
+        const nextSelectedNodeIds = getProjectFileNodeIdsAfterSelection({
+          selectedNodeIds: selectedNodesRef.current.map(node => node.id),
+          nodeId: node.id,
+          orderedNodeIds,
+          anchorNodeId,
+          isToggleSelection,
+          isRangeSelection,
+        });
+
+        const nodesById: Map<string, ProjectFileNode> = new Map();
+        selectedNodesRef.current.forEach(node => nodesById.set(node.id, node));
+        selectableOrderedNodes.forEach(node => nodesById.set(node.id, node));
+        nodesById.set(node.id, node);
+        const nextSelectedNodes = [];
+        nextSelectedNodeIds.forEach(nodeId => {
+          const selectedNode = nodesById.get(nodeId);
+          if (selectedNode) nextSelectedNodes.push(selectedNode);
+        });
+
+        replaceSelectedNodes(nextSelectedNodes);
+        if (!hasValidRange) selectionAnchorNodeIdRef.current = node.id;
+
+        if (nextSelectedNodeIds.includes(node.id)) {
+          onSelectProjectFile(makeSelectionForNode(node));
+          return;
+        }
+
+        const currentActiveNodeId = selectedItem ? selectedItem.node.id : null;
+        if (
+          currentActiveNodeId &&
+          nextSelectedNodeIds.includes(currentActiveNodeId)
+        ) {
+          return;
+        }
+
+        const nextActiveNode =
+          nextSelectedNodes[nextSelectedNodes.length - 1] || null;
+        onSelectProjectFile(
+          nextActiveNode ? makeSelectionForNode(nextActiveNode) : null
+        );
+      },
+      [
+        makeSelectionForNode,
+        onSelectProjectFile,
+        replaceSelectedNodes,
+        selectedItem,
+      ]
+    );
+
+    const openContextMenu = React.useCallback(
+      (
+        event: SyntheticMouseEvent<HTMLDivElement>,
+        node: ProjectFileNode,
+        orderedNodes: Array<ProjectFileNode>
+      ) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!selectedNodesRef.current.some(item => item.id === node.id)) {
+          selectNode(node, null, orderedNodes);
+        }
+        if (contextMenu.current) {
+          contextMenu.current.open(event.clientX, event.clientY, { node });
+        }
+      },
+      [selectNode]
+    );
+
     const renderNode: (
       ProjectFileNode,
       number
@@ -3151,9 +3301,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
         if (!shouldDisplayNode(node)) return null;
 
         const isSelected =
-          !!selectedItem &&
-          selectedItem.node.id === node.id &&
-          shouldSelectProjectFileNode(node);
+          selectedNodeIds.has(node.id) && shouldSelectProjectFileNode(node);
         const isDropTarget =
           node.type === 'folder' && dropTargetFolderNodeId === node.id;
         const hasChildren = !!node.children && node.children.length > 0;
@@ -3208,9 +3356,14 @@ const ProjectFilesPanelContent: React.ComponentType<{
               onDrop={event => {
                 if (node.type === 'folder') handleFolderDrop(event, node);
               }}
-              onClick={() => selectNode(node)}
+              onClick={event => selectNode(node, event, visibleTreeNodes)}
               onDoubleClick={() => openNode(node)}
-              onContextMenu={event => openContextMenu(event, node)}
+              onContextMenu={event =>
+                openContextMenu(event, node, visibleTreeNodes)
+              }
+              role="treeitem"
+              tabIndex={-1}
+              aria-selected={isSelected}
               title={node.relativePath || node.absolutePath}
             >
               <div
@@ -3252,11 +3405,12 @@ const ProjectFilesPanelContent: React.ComponentType<{
         openNode,
         searchTextLowerCase,
         selectNode,
-        selectedItem,
+        selectedNodeIds,
         shouldDisplayNode,
         startDraggingProjectFile,
         theme,
         toggleNode,
+        visibleTreeNodes,
       ]
     );
 
@@ -3288,6 +3442,48 @@ const ProjectFilesPanelContent: React.ComponentType<{
     );
     const isActiveFolderDropTarget =
       !!activeFolderNode && dropTargetFolderNodeId === activeFolderNode.id;
+
+    const selectAllThumbnailNodes = React.useCallback(
+      () => {
+        const nextSelectedNodes = thumbnailNodes.filter(
+          shouldSelectProjectFileNode
+        );
+        if (!nextSelectedNodes.length) return;
+
+        replaceSelectedNodes(nextSelectedNodes);
+        selectionAnchorNodeIdRef.current = nextSelectedNodes[0].id;
+        const currentActiveNodeId = selectedItem ? selectedItem.node.id : null;
+        if (
+          currentActiveNodeId &&
+          nextSelectedNodes.some(node => node.id === currentActiveNodeId)
+        ) {
+          return;
+        }
+        onSelectProjectFile(
+          makeSelectionForNode(nextSelectedNodes[nextSelectedNodes.length - 1])
+        );
+      },
+      [
+        makeSelectionForNode,
+        onSelectProjectFile,
+        replaceSelectedNodes,
+        selectedItem,
+        thumbnailNodes,
+      ]
+    );
+
+    const handleThumbnailGridKeyDown = React.useCallback(
+      (event: SyntheticKeyboardEvent<HTMLDivElement>) => {
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key.toLowerCase() === 'a'
+        ) {
+          event.preventDefault();
+          selectAllThumbnailNodes();
+        }
+      },
+      [selectAllThumbnailNodes]
+    );
 
     const renderThumbnailPreview = React.useCallback(
       (node: ProjectFileNode): React.Node => {
@@ -3334,9 +3530,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
     const renderThumbnailNode = React.useCallback(
       (node: ProjectFileNode): React.Node => {
         const isSelected =
-          !!selectedItem &&
-          selectedItem.node.id === node.id &&
-          shouldSelectProjectFileNode(node);
+          selectedNodeIds.has(node.id) && shouldSelectProjectFileNode(node);
         const isDropTarget =
           node.type === 'folder' && dropTargetFolderNodeId === node.id;
         const rowColor = isSelected
@@ -3387,10 +3581,15 @@ const ProjectFilesPanelContent: React.ComponentType<{
             onDrop={event => {
               if (node.type === 'folder') handleFolderDrop(event, node);
             }}
-            onClick={() => selectNode(node)}
+            onClick={event => selectNode(node, event, thumbnailNodes)}
             onDoubleClick={() => openNode(node)}
-            onContextMenu={event => openContextMenu(event, node)}
+            onContextMenu={event =>
+              openContextMenu(event, node, thumbnailNodes)
+            }
             title={node.relativePath || node.absolutePath}
+            role="option"
+            tabIndex={-1}
+            aria-selected={isSelected}
           >
             <div
               style={{
@@ -3419,9 +3618,10 @@ const ProjectFilesPanelContent: React.ComponentType<{
         openNode,
         renderThumbnailPreview,
         selectNode,
-        selectedItem,
+        selectedNodeIds,
         startDraggingProjectFile,
         theme,
+        thumbnailNodes,
       ]
     );
 
@@ -3505,7 +3705,9 @@ const ProjectFilesPanelContent: React.ComponentType<{
             style={styles.content}
             ref={contentRef}
             onContextMenu={event =>
-              openContextMenu(event, activeFolderNode || rootNode)
+              openContextMenu(event, activeFolderNode || rootNode, [
+                activeFolderNode || rootNode,
+              ])
             }
           >
             <div
@@ -3514,7 +3716,11 @@ const ProjectFilesPanelContent: React.ComponentType<{
                 flex: `0 0 ${treeWidth}px`,
               }}
             >
-              <div style={styles.scrollContainer}>
+              <div
+                style={styles.scrollContainer}
+                role="tree"
+                aria-multiselectable="true"
+              >
                 {topLevelNodes.map(node => renderNode(node, 0))}
               </div>
             </div>
@@ -3538,6 +3744,11 @@ const ProjectFilesPanelContent: React.ComponentType<{
                       ? styles.thumbnailsDropTarget
                       : undefined),
                   }}
+                  tabIndex={0}
+                  role="listbox"
+                  aria-multiselectable="true"
+                  onMouseDown={event => event.currentTarget.focus()}
+                  onKeyDown={handleThumbnailGridKeyDown}
                   onDragOver={event => {
                     if (activeFolderNode) {
                       handleFolderDragOver(event, activeFolderNode);

@@ -440,6 +440,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }
+                        onOpenPrefabSettings={props.onOpenPrefabSettings}
                         onExportAssets={props.onExportAssets}
                         onImportAssets={props.onImportAssets}
                         onDeleteObjects={(objectWithContext, cb) =>
@@ -524,6 +525,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onOpenPrefabDetailEditor={
                           props.onOpenPrefabDetailEditor
                         }
+                        onOpenPrefabSettings={props.onOpenPrefabSettings}
                         onDeleteEventsBasedObjectVariant={
                           props.onDeleteEventsBasedObjectVariant
                         }
@@ -537,11 +539,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         eventsBasedObjectVariant={
                           props.eventsBasedObjectVariant
                         }
-                        getContentAABB={
-                          editorRef.current
-                            ? editorRef.current.getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={props.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           props.onEventsBasedObjectChildrenEdited
                         }

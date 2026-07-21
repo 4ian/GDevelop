@@ -16,6 +16,8 @@ import {
   customizeAdvancedTweenBehaviorPropertiesSchema,
 } from '../../BehaviorsEditor/Editors/AdvancedTweenBehaviorEditorOptions';
 
+const gd: libGDevelop = global.gd;
+
 export const styles = {
   icon: {
     fontSize: 18,
@@ -58,46 +60,74 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
+export const createCompactBehaviorPropertiesSchema = ({
+  behaviorMetadata,
+  behavior,
+  object,
+  layersContainer,
+}: {|
+  behaviorMetadata: gdBehaviorMetadata,
+  behavior: gdBehavior,
+  object: gdObject | null,
+  layersContainer: gdLayersContainer,
+|}): Schema => {
+  const behaviorMetadataProperties = behaviorMetadata.getProperties();
+  const schema = propertiesMapToSchema({
+    properties: behaviorMetadataProperties,
+    defaultValueProperties: behaviorMetadataProperties,
+    getPropertyValue: (instance, name) =>
+      instance
+        .getProperties()
+        .get(name)
+        .getValue(),
+    onUpdateProperty: (instance, name, value) => {
+      instance.updateProperty(name, value);
+    },
+    object,
+    layersContainer,
+    visibility: 'All',
+    shouldDisabledFieldsWithMixedValues: true,
+  });
+  return behavior.getTypeName() === advancedTweenBehaviorType
+    ? customizeAdvancedTweenBehaviorPropertiesSchema(schema)
+    : schema;
+};
+
 export const CompactBehaviorPropertiesEditor = ({
   project,
-  behaviorMetadata,
+  behaviorTypeName,
   behaviors,
   object,
   layersContainer,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
+  propertiesSchema: providedPropertiesSchema,
+  isAdvancedSectionInitiallyUncollapsed,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const behavior = behaviors[0];
+  // Behavior metadata is owned by the platform extension and is replaced when
+  // extensions are refreshed. Do not keep its WebIDL wrapper in React props:
+  // a deferred render could otherwise call into a freed WASM object.
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorTypeName
+  );
+  const openFullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
-  const propertiesSchema = React.useMemo(
+  const computedPropertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      const behaviorMetadataProperties = behaviorMetadata.getProperties();
-      const schema = propertiesMapToSchema({
-        properties: behaviorMetadataProperties,
-        defaultValueProperties: behaviorMetadataProperties,
-        getPropertyValue: (instance, name) =>
-          instance
-            .getProperties()
-            .get(name)
-            .getValue(),
-        onUpdateProperty: (instance, name, value) => {
-          instance.updateProperty(name, value);
-        },
+      return createCompactBehaviorPropertiesSchema({
+        behaviorMetadata,
+        behavior,
         object,
         layersContainer,
-        visibility: 'All',
-        shouldDisabledFieldsWithMixedValues: true,
       });
-      if (behavior.getTypeName() === advancedTweenBehaviorType) {
-        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
-      }
-      return schema;
     },
     [
       schemaRecomputeTrigger,
@@ -107,6 +137,7 @@ export const CompactBehaviorPropertiesEditor = ({
       behavior,
     ]
   );
+  const propertiesSchema = providedPropertiesSchema || computedPropertiesSchema;
 
   return (
     <ColumnStackLayout expand noMargin noOverflowParent>
@@ -118,12 +149,15 @@ export const CompactBehaviorPropertiesEditor = ({
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
+        isAdvancedSectionInitiallyUncollapsed={
+          isAdvancedSectionInitiallyUncollapsed
+        }
         customizeBasicSchema={
           onOpenFullEditor
             ? schema =>
                 getSchemaWithOpenFullEditorButton({
                   schema,
-                  fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
+                  fullEditorLabel: openFullEditorLabel,
                   behavior: behaviors[0],
                   onOpenFullEditor,
                 })

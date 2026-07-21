@@ -39,6 +39,71 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     ).toBe('2trueTest');
   });
 
+  it('passes the custom object signal receiver and debug emitter contexts to signal actions', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SubscribeSceneSignal' },
+            parameters: ['', '', '"TestSignal"'],
+          },
+          {
+            type: { value: 'EmitSceneSignal' },
+            parameters: ['', '"TestSignal"', '"payload"', ''],
+          },
+        ],
+      },
+    ]);
+    eventsBasedObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedObject
+    );
+
+    const { gdjs, runtimeScene, object } = generatedCustomObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      { logCode: false }
+    );
+    const subscribeSceneSignal = jest.fn();
+    const emitSceneSignalFromEvents = jest.fn();
+    gdjs.evtTools.signal = {
+      subscribeSceneSignal,
+      emitSceneSignalFromEvents,
+    };
+
+    object.MyFunction();
+
+    expect(subscribeSceneSignal).toHaveBeenCalledWith(
+      runtimeScene,
+      object,
+      'TestSignal'
+    );
+    expect(emitSceneSignalFromEvents).toHaveBeenCalledWith(
+      runtimeScene,
+      'TestSignal',
+      'payload',
+      object
+    );
+  });
+
   it('logs an error when a custom object JsonObject property value is invalid', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(

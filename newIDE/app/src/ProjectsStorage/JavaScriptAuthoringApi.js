@@ -239,6 +239,12 @@ declare namespace gdjs {
     getName(): string;
     getGame(): RuntimeGame;
     getVariables(): VariablesContainer;
+    /**
+     * Return the live, engine-owned array of living instances. Creating or
+     * deleting an instance mutates this array immediately. Iterate a slice()
+     * snapshot or iterate backward when calling deleteFromScene().
+     * @javascriptPublic
+     */
     getObjects(name: string): RuntimeObject[];
     createObject(name: string): RuntimeObject | null;
     getInstancesCountOnScene(name: string): number;

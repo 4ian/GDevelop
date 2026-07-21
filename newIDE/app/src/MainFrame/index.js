@@ -40,6 +40,7 @@ import ProjectManager, {
 import LoaderModal from '../UI/LoaderModal';
 import {
   cleanupLeakedOverlaysAfterPopOutClose,
+  captureMaterialUiOverlayCleanupCandidates,
   reportPotentialInputBlockers,
 } from '../UI/MaterialUISpecificUtil';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
@@ -117,6 +118,7 @@ import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
+import ObjectSettingsWorkbenchWindow from '../ObjectSettingsWorkbench/ObjectSettingsWorkbenchWindow';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -263,6 +265,10 @@ import useLocalProjectChangesWatcher, {
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
+import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import { areLegacyProjectsEquivalent } from '../ProjectsStorage/MultiFileProjectFormat';
+import { serializeToJSObject } from '../Utils/Serializer';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
@@ -805,6 +811,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     editorKey: null,
     requestId: 0,
   });
+  const [
+    objectSettingsWindowState,
+    setObjectSettingsWindowState,
+  ] = React.useState<{|
+    projectPtr: ?number,
+    focusRequestId: number,
+  |}>({ projectPtr: null, focusRequestId: 0 });
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -1106,24 +1119,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     setTimeout(refresh, 500);
   }, []);
 
-  // When a popped-out window (e.g. the debugger) is destroyed, Material-UI's
-  // GLOBAL ModalManager — shared with that window — can fail to clean up,
-  // leaving an orphaned full-screen overlay root in the MAIN window's
-  // `document.body` that swallows every click (the "UI not responding after
-  // closing the debug window" bug), and/or `aria-hidden`/scroll-lock leftovers.
-  // Heal the main window across the same teardown window as the tree refresh.
+  // WindowPortal synchronously unmounts its React/MUI portals before the child
+  // document is destroyed. Keep this scoped cleanup as a fallback for older
+  // Electron teardown edge cases, inspecting only the overlays that existed
+  // when the actual editor/debugger pop-out started closing.
   const healMainWindowAfterPopOutClose = React.useCallback(() => {
+    if (typeof window.focus === 'function') window.focus();
+    const cleanupCandidates = captureMaterialUiOverlayCleanupCandidates();
     const heal = () => {
-      cleanupLeakedOverlaysAfterPopOutClose();
+      cleanupLeakedOverlaysAfterPopOutClose(cleanupCandidates);
       // Diagnostic: if anything is still covering the editor after cleanup,
       // log exactly what it is so the remaining cause can be pinned down.
       reportPotentialInputBlockers();
     };
     heal();
-    setTimeout(heal, 0);
-    setTimeout(heal, 60);
-    setTimeout(heal, 200);
-    setTimeout(heal, 550);
+    [0, 60, 200, 550].forEach(delay => {
+      setTimeout(heal, delay);
+    });
   }, []);
 
   // Expose the input-blocker diagnostic so it can be run from the devtools
@@ -1193,6 +1205,17 @@ const MainFrame = (props: Props): React.MixedElement => {
     [previewLoadingRef, setPreviewLoading]
   );
 
+  const getPreviewLaunchStateForMcp = React.useCallback(
+    () => ({
+      previewLoading: previewLoadingRef.current,
+      launchInProgress: previewLaunchInProgressRef.current,
+      launchPhase: previewLaunchPhaseRef.current,
+      activePreviewLaunchId: activePreviewLaunchIdRef.current,
+      cancelledPreviewLaunchCount: cancelledPreviewLaunchIdsRef.current.size,
+    }),
+    [previewLoadingRef]
+  );
+
   React.useEffect(
     () => {
       if (!ipcRenderer) return;
@@ -1216,9 +1239,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             'a preview window was closed'
           );
         }
-        // A preview window close can leave the main window with leaked MUI
-        // overlay state, just like debugger/editor pop-outs do.
-        healMainWindowAfterPopOutClose();
       };
 
       ipcRenderer.on('preview-window-closed', onPreviewWindowClosed);
@@ -1232,7 +1252,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       cancelPendingPreviewLaunchAfterWindowClosed,
       clearPreviewDebuggerStatuses,
       hasNonEditionPreviewsRunning,
-      healMainWindowAfterPopOutClose,
       previewDebuggerServer,
     ]
   );
@@ -1702,7 +1721,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const closeProject = React.useCallback(
-    async (): Promise<void> => {
+    async (options?: {|
+      reportProgress?: (phase: string) => void,
+    |}): Promise<void> => {
+      const reportProgress = (phase: string) => {
+        if (options && options.reportProgress) {
+          options.reportProgress(phase);
+        }
+      };
+      reportProgress('old-project-closing-previews');
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
 
@@ -1729,6 +1756,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!currentProject) return;
 
       // Close the editors related to this project.
+      reportProgress('old-project-state-clearing');
       await setState(state => ({
         ...state,
         currentProject: null,
@@ -1736,17 +1764,21 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      reportProgress('old-project-state-cleared');
 
       // Delete the project from memory. All references to it have been dropped previously
       // by the setState.
       console.info('Deleting project from memory...');
       // Wait for any in-progress load to complete before unloading, otherwise the
       // pending load would re-add the old project's extensions after we remove them.
+      reportProgress('old-extensions-waiting');
       await eventsFunctionsExtensionsState.ensureLoadFinished(currentProject);
+      reportProgress('old-extensions-unloading');
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
         currentProject
       );
       currentProject.delete();
+      reportProgress('old-project-deleted');
       sealUnsavedChanges();
       console.info('Project closed.');
 
@@ -1772,7 +1804,11 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const loadFromProject = React.useCallback(
-    async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
+    async (
+      project: gdProject,
+      fileMetadata: ?FileMetadata,
+      reportProgress?: (phase: string) => void
+    ): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
         ? // $FlowFixMe[incompatible-type]
           updateFileMetadataWithOpenedProject(fileMetadata, project)
@@ -1797,7 +1833,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       }
 
-      await closeProject();
+      await closeProject({ reportProgress });
 
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
@@ -1819,12 +1855,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
         project
       );
+      if (reportProgress) reportProgress('new-extensions-started');
 
+      if (reportProgress) reportProgress('new-project-state-publishing');
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: updatedFileMetadata,
       }));
+      if (reportProgress) reportProgress('new-project-state-published');
 
       if (updatedFileMetadata) {
         const storageProvider = getStorageProvider();
@@ -1840,6 +1879,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         //   to this base URL and which will be converted to full URLs.
         // ...
         // See `ResourceFetcher` for all the cases.
+        if (reportProgress) reportProgress('resources-loading');
         await ensureResourcesAreFetched(() => ({
           project,
           fileMetadata: updatedFileMetadata,
@@ -1847,6 +1887,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           storageProviderOperations,
           authenticatedUser,
         }));
+        if (reportProgress) reportProgress('resources-loaded');
 
         // Read and apply project settings from gdevelop-settings.yaml if it exists
         try {
@@ -1900,15 +1941,18 @@ const MainFrame = (props: Props): React.MixedElement => {
   const loadFromSerializedProject = React.useCallback(
     (
       serializedProject: gdSerializerElement,
-      fileMetadata: ?FileMetadata
+      fileMetadata: ?FileMetadata,
+      reportProgress?: (phase: string) => void
     ): Promise<State> => {
+      if (reportProgress) reportProgress('project-unserializing');
       const startTime = Date.now();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
       newProject.unserializeFrom(serializedProject);
+      if (reportProgress) reportProgress('project-unserialized');
       const duration = Date.now() - startTime;
       console.info(`Unserialization took ${duration.toFixed(2)} ms`);
 
-      return loadFromProject(newProject, fileMetadata);
+      return loadFromProject(newProject, fileMetadata, reportProgress);
     },
     [loadFromProject]
   );
@@ -1929,6 +1973,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         ignoreAutoSave?: boolean,
         suppressOpenErrorAlert?: boolean,
         doNotTrackAsProjectOpened?: boolean,
+        reportProgress?: (phase: string) => void,
       |}
     ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -2018,11 +2063,17 @@ const MainFrame = (props: Props): React.MixedElement => {
         let openingError: Error | null = null;
         try {
           const autoSaveFileMetadata = await checkForAutosave();
+          if (options && options.reportProgress) {
+            options.reportProgress('disk-reading');
+          }
           const result = await onOpen(
             autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
+          if (options && options.reportProgress) {
+            options.reportProgress('disk-read');
+          }
           if (result.fileMetadata) {
             effectiveFileMetadata = result.fileMetadata;
           }
@@ -2057,7 +2108,8 @@ const MainFrame = (props: Props): React.MixedElement => {
             serializedProject,
             // Autosaves keep the originally requested metadata. A storage adapter may
             // explicitly redirect a migrated legacy project to project.settings.
-            effectiveFileMetadata
+            effectiveFileMetadata,
+            options && options.reportProgress
           );
           return state;
         } finally {
@@ -3355,15 +3407,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       forceAlwaysOnTopInPreview,
       launchCaptureOptions,
       isForInGameEdition,
-    }: LaunchPreviewOptions) => {
-      if (!currentProject) return;
-      if (currentProject.getLayoutsCount() === 0) return;
+    }: LaunchPreviewOptions): Promise<boolean> => {
+      if (!currentProject) return false;
+      if (currentProject.getLayoutsCount() === 0) return false;
 
       if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
         console.error(
           'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
         );
-        return;
+        return false;
       }
 
       let previewProjectLoadedFromFile: ?gdProject = null;
@@ -3380,10 +3432,10 @@ const MainFrame = (props: Props): React.MixedElement => {
             'preview'
           );
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
           if (shouldBlockPreview) {
-            return;
+            return false;
           }
         }
 
@@ -3414,7 +3466,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const previewLauncher = _previewLauncher.current;
         if (!previewLauncher) {
           console.error('Preview launcher not found.');
-          return;
+          return false;
         }
 
         if (previewLoadingRef.current) {
@@ -3426,7 +3478,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           // The main issue currently is files being erased/copied by the second preview,
           // which can break the game of the first preview,
           // when the game is loading its resources or reading files.
-          return;
+          return false;
         }
 
         // Open the preview windows immediately, if required by the preview launcher.
@@ -3455,7 +3507,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           }
         }
         if (isPreviewLaunchCancelled(previewLaunchId)) {
-          return;
+          return false;
         }
 
         // Mark the preview as loading after the optional save. The
@@ -3476,7 +3528,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             if (loadedProject) {
               loadedProject.delete();
             }
-            return;
+            return false;
           }
           if (loadedProject) {
             if (loadedProject.getLayoutsCount() === 0) {
@@ -3528,7 +3580,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             : createCaptureOptionsForPreview(launchCaptureOptions),
         ]);
         if (isPreviewLaunchCancelled(previewLaunchId)) {
-          return;
+          return false;
         }
 
         try {
@@ -3536,14 +3588,14 @@ const MainFrame = (props: Props): React.MixedElement => {
             currentProject
           );
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
           if (projectForPreview !== currentProject) {
             await eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
               projectForPreview
             );
             if (isPreviewLaunchCancelled(previewLaunchId)) {
-              return;
+              return false;
             }
           }
 
@@ -3615,7 +3667,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             previewWindows,
           });
           if (isPreviewLaunchCancelled(previewLaunchId)) {
-            return;
+            return false;
           }
 
           clearPreviewLoadingForLaunch(previewLaunchId);
@@ -3650,12 +3702,14 @@ const MainFrame = (props: Props): React.MixedElement => {
               setDiagnosticReportDialogOpen(true);
             }
           }
+          return true;
         } catch (error) {
           clearPreviewLoadingForLaunch(previewLaunchId);
           console.error(
             'Error caught while launching preview, this should never happen.',
             error
           );
+          return false;
         }
       } finally {
         if (previewProjectLoadedFromFile) {
@@ -3706,10 +3760,16 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
-  const launchPreview = addCreateBadgePreHookIfNotClaimed(
+  const launchPreviewAndReport = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
     TRIVIAL_FIRST_PREVIEW,
     _launchPreview
+  );
+  const launchPreview = React.useCallback(
+    async (options: LaunchPreviewOptions): Promise<void> => {
+      await launchPreviewAndReport(options);
+    },
+    [launchPreviewAndReport]
   );
 
   const launchNewPreview = React.useCallback(
@@ -4282,6 +4342,17 @@ const MainFrame = (props: Props): React.MixedElement => {
     [getEditorOpeningOptions, setState]
   );
 
+  const openObjectSettings = React.useCallback(
+    () => {
+      if (!currentProject) return;
+      setObjectSettingsWindowState(previousState => ({
+        projectPtr: currentProject.ptr,
+        focusRequestId: previousState.focusRequestId + 1,
+      }));
+    },
+    [currentProject]
+  );
+
   const openGlobalSearch = React.useCallback(
     () => {
       setState(state => ({
@@ -4422,6 +4493,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   // the editor's normal scene selection.
   const launchPreviewForScene = React.useCallback(
     async (sceneName: ?string) => {
+      const launchState = getPreviewLaunchStateForMcp();
+      if (launchState.launchInProgress || launchState.previewLoading) {
+        return {
+          accepted: false,
+          reason: 'preview-launch-already-in-progress',
+          launchState,
+        };
+      }
+
       const launchCaptureOptions =
         currentProject && !hasNonEditionPreviewsRunning
           ? getHotReloadPreviewLaunchCaptureOptions(
@@ -4430,10 +4510,14 @@ const MainFrame = (props: Props): React.MixedElement => {
           : undefined;
       const didOpenDebugger = await openDebugger();
       if (!didOpenDebugger) {
-        return;
+        return {
+          accepted: false,
+          reason: 'debugger-window-could-not-open',
+          launchState: getPreviewLaunchStateForMcp(),
+        };
       }
 
-      launchPreview({
+      const didLaunch = await launchPreviewAndReport({
         networkPreview: false,
         forcedPreviewLayoutName: sceneName || null,
         numberOfWindows: 1,
@@ -4441,13 +4525,19 @@ const MainFrame = (props: Props): React.MixedElement => {
         skipDiagnosticErrorBlocking: true,
         launchCaptureOptions,
       });
+      return {
+        accepted: !!didLaunch,
+        reason: didLaunch ? undefined : 'preview-launch-was-not-accepted',
+        launchState: getPreviewLaunchStateForMcp(),
+      };
     },
     [
       currentProject,
       openDebugger,
-      launchPreview,
+      launchPreviewAndReport,
       getHotReloadPreviewLaunchCaptureOptions,
       hasNonEditionPreviewsRunning,
+      getPreviewLaunchStateForMcp,
     ]
   );
 
@@ -5485,6 +5575,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         openingMessage?: ?MessageDescriptor,
         suppressOpenErrorAlert?: boolean,
         rethrowOpenError?: boolean,
+        reportProgress?: (phase: string) => void,
       |}
     ): Promise<void> => {
       if (hasUnsavedChanges && !(options && options.ignoreUnsavedChanges)) {
@@ -5511,6 +5602,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         ignoreAutoSave: (options && options.ignoreAutoSave) || false,
         suppressOpenErrorAlert:
           (options && options.suppressOpenErrorAlert) || false,
+        reportProgress: options && options.reportProgress,
       })
         .then(state => {
           if (state) {
@@ -5637,6 +5729,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const {
     renderVersionHistoryPanel,
     openVersionHistoryPanel,
+    closeVersionHistoryPanel,
     checkedOutVersionStatus,
     onQuitVersionHistory,
     onCheckoutVersion,
@@ -5649,6 +5742,14 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenCloudProjectOnSpecificVersion,
     onReloadProject: reloadProjectAfterGitAction,
   });
+
+  const closeTemporarySideMenusOnEditorClick = React.useCallback(
+    () => {
+      closeProjectManagerOverlay();
+      closeVersionHistoryPanel();
+    },
+    [closeProjectManagerOverlay, closeVersionHistoryPanel]
+  );
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -6212,12 +6313,23 @@ const MainFrame = (props: Props): React.MixedElement => {
     [currentProject, hasUnsavedChanges, i18n, closeProject]
   );
 
+  const dismissLocalProjectFilesChangedDialogRef = React.useRef<?() => void>(
+    null
+  );
+  const reloadProjectInProgressRef = React.useRef<?Promise<void>>(null);
   const reloadProject = React.useCallback(
     async (options?: {
       skipUnsavedChangesConfirmation?: boolean,
       rethrowOpenError?: boolean,
+      reportProgress?: (phase: string) => void,
     }): Promise<void> => {
       if (!currentProject || !currentFileMetadata) return;
+      if (reloadProjectInProgressRef.current) {
+        if (dismissLocalProjectFilesChangedDialogRef.current) {
+          dismissLocalProjectFilesChangedDialogRef.current();
+        }
+        return reloadProjectInProgressRef.current;
+      }
 
       if (
         hasUnsavedChanges &&
@@ -6231,18 +6343,36 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (!answer) return;
       }
 
+      // Every reload path comes through this function, including the
+      // reload_project MCP tool. Close an active disk-changes warning before
+      // replacing the in-memory project.
+      if (dismissLocalProjectFilesChangedDialogRef.current) {
+        dismissLocalProjectFilesChangedDialogRef.current();
+      }
+
       const storageProviderName = getStorageProvider().internalName;
-      await openFromFileMetadataWithStorageProvider(
-        {
-          fileMetadata: currentFileMetadata,
-          storageProviderName,
-        },
-        {
-          ignoreUnsavedChanges: true,
-          ignoreAutoSave: true,
-          rethrowOpenError: !!(options && options.rethrowOpenError),
+      const reloadPromise = (async () => {
+        await openFromFileMetadataWithStorageProvider(
+          {
+            fileMetadata: currentFileMetadata,
+            storageProviderName,
+          },
+          {
+            ignoreUnsavedChanges: true,
+            ignoreAutoSave: true,
+            rethrowOpenError: !!(options && options.rethrowOpenError),
+            reportProgress: options && options.reportProgress,
+          }
+        );
+      })();
+      reloadProjectInProgressRef.current = reloadPromise;
+      try {
+        await reloadPromise;
+      } finally {
+        if (reloadProjectInProgressRef.current === reloadPromise) {
+          reloadProjectInProgressRef.current = null;
         }
-      );
+      }
     },
     [
       currentProject,
@@ -6270,15 +6400,56 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onLocalProjectFilesChanged = React.useCallback(
-    async (): Promise<void> => {
-      await showLocalProjectFilesChangedDialog({
-        showConfirmation,
-        onReloadProject: () =>
-          reloadProject({ skipUnsavedChangesConfirmation: true }),
-        onBackupProject: backupCurrentProjectToLocalFolder,
-      });
+    async (
+      dismissSignal: AbortSignal,
+      dismissDialog: () => void
+    ): Promise<void> => {
+      const dismissTrackedDialog = () => {
+        dismissDialog();
+        if (
+          dismissLocalProjectFilesChangedDialogRef.current ===
+          dismissTrackedDialog
+        ) {
+          dismissLocalProjectFilesChangedDialogRef.current = null;
+        }
+      };
+      dismissLocalProjectFilesChangedDialogRef.current = dismissTrackedDialog;
+      try {
+        await showLocalProjectFilesChangedDialog({
+          showConfirmation,
+          onReloadProject: () =>
+            reloadProject({ skipUnsavedChangesConfirmation: true }),
+          onBackupProject: backupCurrentProjectToLocalFolder,
+          dismissSignal,
+          dismissDialog: dismissTrackedDialog,
+        });
+      } finally {
+        if (
+          dismissLocalProjectFilesChangedDialogRef.current ===
+          dismissTrackedDialog
+        ) {
+          dismissLocalProjectFilesChangedDialogRef.current = null;
+        }
+      }
     },
     [backupCurrentProjectToLocalFolder, reloadProject, showConfirmation]
+  );
+
+  const areLocalProjectFilesSameAsMemory = React.useCallback(
+    async (): Promise<boolean> => {
+      if (!currentFileMetadata) return false;
+      const fileIdentifier = currentFileMetadata.fileIdentifier;
+      const project = currentProjectRef.current;
+      if (!project) return false;
+      const diskProject = await openMultiFileProject(fileIdentifier);
+      if (!isCurrentProjectFresh(currentProjectRef, project)) return false;
+
+      return areLegacyProjectsEquivalent(
+        serializeToJSObject(project, 'serializeTo'),
+        diskProject
+      );
+    },
+    [currentFileMetadata, currentProjectRef]
   );
 
   useLocalProjectChangesWatcher({
@@ -6294,6 +6465,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     lastKnownModificationTime: currentFileMetadata
       ? currentFileMetadata.lastModifiedDate || null
       : null,
+    areProjectFilesSameAsMemory: areLocalProjectFilesSameAsMemory,
     onProjectFilesChanged: onLocalProjectFilesChanged,
   });
 
@@ -7034,7 +7206,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         addRecentEditorSwitcherSideMenuItem(
           `prefab detail ${extensionName}::${objectName}`,
           `${objectName} ${i18n._(t`(Prefab)`)}`,
-          `${extensionName} - ${i18n._(t`Prefab detail`)}`,
+          `${extensionName} - ${i18n._(t`Prefab events`)}`,
           <ObjectIcon />,
           () =>
             openPrefabDetailEditor(eventsFunctionsExtension, eventsBasedObject)
@@ -7464,21 +7636,28 @@ const MainFrame = (props: Props): React.MixedElement => {
           commandPaletteRef.current.launchCommand((commandName: any));
           return true;
         },
+        getPreviewLaunchState: getPreviewLaunchStateForMcp,
         launchPreviewForScene: (sceneName: ?string) =>
           launchPreviewForScene(sceneName),
-        reloadProjectAndWait: async () => {
+        reloadProjectAndWait: async reportProgress => {
           if (!currentFileMetadata) {
             return {
               reloaded: false,
               reason: 'The current project has no disk location.',
             };
           }
+          const reportReloadProgress = (phase: string) => {
+            if (reportProgress) reportProgress({ phase });
+          };
           const fileIdentifier = currentFileMetadata.fileIdentifier;
           const storageProviderName = getStorageProvider().internalName;
+          reportReloadProgress('reload-requested');
           await reloadProject({
             skipUnsavedChangesConfirmation: true,
             rethrowOpenError: true,
+            reportProgress: reportReloadProgress,
           });
+          reportReloadProgress('editor-loaded');
           const reloadedProject = currentProjectRef.current;
           const isLocalMultiFileProject =
             storageProviderName === localFileStorageProviderInternalName &&
@@ -7500,13 +7679,39 @@ const MainFrame = (props: Props): React.MixedElement => {
               'Unable to resolve the local project root for catalog regeneration.'
             );
           }
+          reportReloadProgress('extensions-loading');
           await eventsFunctionsExtensionsState.ensureLoadFinished(
             reloadedProject
           );
+          reportReloadProgress('catalogs-generating');
           const catalogs = await writeProjectSourceCatalogs(
             reloadedProject,
-            projectRootPath
+            projectRootPath,
+            { reportProgress: reportReloadProgress }
           );
+          reportReloadProgress('catalogs-modification-time-reading');
+          const lastModifiedDate = await getLocalProjectLastModifiedDate(
+            reloadedProject.getProjectFile()
+          );
+          if (lastModifiedDate !== null) {
+            await setState(state => {
+              if (
+                state.currentProject !== reloadedProject ||
+                !state.currentFileMetadata
+              ) {
+                return state;
+              }
+              return {
+                ...state,
+                currentFileMetadata: {
+                  ...state.currentFileMetadata,
+                  lastModifiedDate,
+                },
+              };
+            });
+          }
+          reportReloadProgress('catalogs-modification-time-acknowledged');
+          reportReloadProgress('catalogs-complete');
           return {
             reloaded: true,
             fileIdentifier,
@@ -7571,7 +7776,9 @@ const MainFrame = (props: Props): React.MixedElement => {
       reloadProject,
       currentFileMetadata,
       getStorageProvider,
+      setState,
       eventsFunctionsExtensionsState,
+      getPreviewLaunchStateForMcp,
       launchPreviewForScene,
       getMcpEditorSelection,
       generateEvents,
@@ -7597,12 +7804,27 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       const handleMcpRendererRequest = (event: any, request: any) => {
         const requestId = request && request.id;
+        const operationId = request && request.operationId;
+        const reportProgress = (progress: {| phase: string |}) => {
+          if (!operationId) return;
+          ipcRenderer.send('mcp-renderer-progress', {
+            id: requestId,
+            operationId,
+            progress: {
+              ...progress,
+              correlationId: operationId,
+            },
+          });
+        };
+        reportProgress({ phase: 'renderer-acknowledged' });
         mcpEditorBridgeRef.current
           .handleRendererMcpRequest({
             method: request && request.method,
             params: request && request.params,
+            reportProgress,
           })
           .then(result => {
+            reportProgress({ phase: 'receipt-persisting' });
             ipcRenderer.send('mcp-renderer-response', {
               id: requestId,
               result,
@@ -7796,6 +8018,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     openInstructionOrExpression: openInstructionOrExpression,
     onOpenCustomObjectEditor: openCustomObjectEditor,
     onOpenPrefabDetailEditor: openPrefabDetailEditor,
+    onOpenPrefabSettings: openPrefabSettings,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
@@ -7898,6 +8121,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onOpenResources={openResources}
       onOpenStickyNotes={openStickyNotesManager}
       onOpenStaticData={openStaticData}
+      onOpenObjectSettings={openObjectSettings}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -8007,6 +8231,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         )}
         <div
           className="main-frame-editors-content"
+          onClickCapture={closeTemporarySideMenusOnEditorClick}
           style={
             gameEditorMode === 'embedded-game' &&
             activeEmbeddedGameFrameHoleCount > 0
@@ -8066,6 +8291,38 @@ const MainFrame = (props: Props): React.MixedElement => {
         onPopIn={onPopInTab}
         focusRequest={poppedOutEditorFocusRequest}
       />
+      {currentProject &&
+        objectSettingsWindowState.projectPtr === currentProject.ptr && (
+          <ObjectSettingsWorkbenchWindow
+            key={`object-settings-window-${currentProject.ptr}`}
+            project={currentProject}
+            unsavedChanges={unsavedChanges}
+            resourceManagementProps={resourceManagementProps}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
+            onOpenEventBasedObjectVariantEditor={
+              onOpenEventBasedObjectVariantEditor
+            }
+            onDeleteEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
+            onGlobalObjectEdited={onGlobalObjectEdited}
+            onSceneObjectEdited={onSceneObjectEdited}
+            onEventsBasedObjectChildrenEdited={
+              onEventsBasedObjectChildrenEdited
+            }
+            onObjectListsModified={onObjectListsModified}
+            triggerHotReloadInGameEditorIfNeeded={
+              triggerHotReloadInGameEditorIfNeeded
+            }
+            focusRequestId={objectSettingsWindowState.focusRequestId}
+            onClose={() =>
+              setObjectSettingsWindowState(previousState => ({
+                projectPtr: null,
+                focusRequestId: previousState.focusRequestId,
+              }))
+            }
+          />
+        )}
       {currentProject && standalonePrefabSettingsDialog && (
         <PrefabDetailEditor
           key={`prefab-settings-dialog-${

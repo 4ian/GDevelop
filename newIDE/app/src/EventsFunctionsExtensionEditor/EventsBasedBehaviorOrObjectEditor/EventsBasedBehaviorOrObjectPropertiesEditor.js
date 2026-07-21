@@ -509,6 +509,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                       key="visibility-hidden"
                                       value="Hidden"
                                       label={t`Hidden`}
+                                      hidden
                                     />
                                   </CompactSelectField>
                                 </Line>

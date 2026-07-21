@@ -1,12 +1,13 @@
 // @flow
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 
 /**
  * The props given to any behavior editor
  */
 export type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
-  behaviorMetadata: gdBehaviorMetadata,
+  behaviorTypeName: string,
   behaviors: Array<gdBehavior>,
   object: gdObject | null,
   layersContainer: gdLayersContainer,
@@ -14,4 +15,5 @@ export type CompactBehaviorPropertiesEditorProps = {|
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
+  propertiesSchema?: ?Schema,
 |};

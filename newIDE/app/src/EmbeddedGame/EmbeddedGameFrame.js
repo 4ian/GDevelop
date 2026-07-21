@@ -3,6 +3,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import { objectWithContextReactDndType } from '../ObjectsList';
+import {
+  projectManagerItemReactDndType,
+  isCustomObjectDragItem,
+  type CustomObjectDragItem,
+} from '../ProjectManager/ProjectManagerItemDragAndDrop';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import Text from '../UI/Text';
 import classes from './EmbeddedGameFrame.module.css';
@@ -24,6 +29,12 @@ type AttachToPreviewOptions = {|
 
 type EmbeddedGameFrame3DModelFilesDrop = {|
   modelFilePaths: Array<string>,
+  x: number,
+  y: number,
+|};
+
+type EmbeddedGameFrameCustomObjectDrop = {|
+  customObjectDragItem: CustomObjectDragItem,
   x: number,
   y: number,
 |};
@@ -121,6 +132,9 @@ let onChangeViewPosition:
 let on3DModelFilesDroppedInEmbeddedGameFrame:
   | null
   | (EmbeddedGameFrame3DModelFilesDrop => void | Promise<void>) = null;
+let onCustomObjectDroppedInEmbeddedGameFrame:
+  | null
+  | (EmbeddedGameFrameCustomObjectDrop => void | Promise<void>) = null;
 
 export const setEmbeddedGameFramePreviewLocation = ({
   previewIndexHtmlLocation,
@@ -181,6 +195,18 @@ export const register3DModelFilesDroppedInEmbeddedGameFrameCallback = (
   };
 };
 
+export const registerCustomObjectDroppedInEmbeddedGameFrameCallback = (
+  callback: EmbeddedGameFrameCustomObjectDrop => void | Promise<void>
+): (() => void) => {
+  onCustomObjectDroppedInEmbeddedGameFrame = callback;
+
+  return () => {
+    if (onCustomObjectDroppedInEmbeddedGameFrame === callback) {
+      onCustomObjectDroppedInEmbeddedGameFrame = null;
+    }
+  };
+};
+
 const logSwitchingInfo = ({
   editorId,
   sceneName,
@@ -218,7 +244,10 @@ type Props = {|
   |}) => Promise<void>,
 |};
 
-const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+const DropTarget = makeDropTarget<any>([
+  objectWithContextReactDndType,
+  projectManagerItemReactDndType,
+]);
 
 const noHotReloadSteps = {
   shouldReloadProjectData: false,
@@ -816,13 +845,33 @@ export const EmbeddedGameFrame = ({
       const dropTarget = dropTargetRef.current;
       if (!previewDebuggerServer || !dropTarget) return;
 
-      const name = monitor.getItem().name;
+      const item = monitor.getItem();
+      const name = item.name;
       if (!name) return;
 
-      setDraggedItem3D(!!monitor.getItem().is3D);
+      setDraggedItem3D(!!item.is3D);
 
       const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return;
       const dropTargetRect = dropTarget.getBoundingClientRect();
+
+      if (isCustomObjectDragItem(item)) {
+        const onCustomObjectDropped = onCustomObjectDroppedInEmbeddedGameFrame;
+        if (!dropped || !item.is3D || !onCustomObjectDropped) {
+          return;
+        }
+
+        Promise.resolve(
+          onCustomObjectDropped({
+            customObjectDragItem: item,
+            x: clientOffset.x - dropTargetRect.left,
+            y: clientOffset.y - dropTargetRect.top,
+          })
+        ).catch(error => {
+          console.error('Unable to drop the prefab in the 3D editor:', error);
+        });
+        return;
+      }
 
       previewDebuggerServer
         .getExistingEmbeddedGameFrameDebuggerIds()
@@ -910,7 +959,20 @@ export const EmbeddedGameFrame = ({
           }}
         />
         <DropTarget
-          canDrop={() => true}
+          canDrop={(item, monitor) => {
+            if (
+              !monitor ||
+              monitor.getItemType() !== projectManagerItemReactDndType
+            ) {
+              return true;
+            }
+
+            return (
+              !!onCustomObjectDroppedInEmbeddedGameFrame &&
+              isCustomObjectDragItem(item) &&
+              !!item.is3D
+            );
+          }}
           // TODO: "isAltPressed" is hardcoded to false, but we should detect it instead.
           hover={monitor =>
             dragNewInstance({ monitor, dropped: false, isAltPressed: false })

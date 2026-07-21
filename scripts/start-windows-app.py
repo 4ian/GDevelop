@@ -269,6 +269,43 @@ def ensure_electron_dependencies(
         raise RuntimeError(f"Electron executable still missing after npm install: {electron_exe}")
 
 
+def ensure_packaged_electron_runtime_dependencies(
+    electron_runtime_dir: Path, dry_run: bool
+) -> None:
+    step("Ensure packaged Electron runtime dependencies")
+    node_modules = electron_runtime_dir / "node_modules"
+    needed, reason = npm_install_needed(
+        electron_runtime_dir, required_dependencies=("typescript",)
+    )
+    if not needed:
+        print(
+            f"Packaged runtime dependencies present: {node_modules}",
+            flush=True,
+        )
+        return
+
+    print(
+        "Packaged Electron runtime dependencies out of date "
+        f"({reason}); running npm install in newIDE/electron-app/app.",
+        flush=True,
+    )
+    run_command(
+        [resolve_tool("npm"), "install"],
+        cwd=electron_runtime_dir,
+        dry_run=dry_run,
+    )
+
+    if not dry_run:
+        still_needed, still_needed_reason = npm_install_needed(
+            electron_runtime_dir, required_dependencies=("typescript",)
+        )
+        if still_needed:
+            raise RuntimeError(
+                "Packaged Electron runtime dependencies are still invalid after "
+                f"npm install: {still_needed_reason}"
+            )
+
+
 def ensure_react_app_dependencies(app_dir: Path, dry_run: bool) -> None:
     step("Ensure React app dependencies")
     node_modules = app_dir / "node_modules"
@@ -324,7 +361,8 @@ def sync_electron_www(electron_app_dir: Path, build: bool, dry_run: bool) -> Non
 
 def launch_electron(
     electron_app_dir: Path, electron_exe: Path, dry_run: bool
-) -> subprocess.Popen[bytes] | None:
+) -> int | None:
+    """Start Electron detached from this launcher and return its process ID."""
     step("Launch Electron")
     command = [str(electron_exe), "app"]
     print(
@@ -340,18 +378,15 @@ def launch_electron(
         command,
         cwd=electron_app_dir,
         env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        creationflags=(
+            subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+        ),
     )
-    print(f"Started Electron process PID: {process.pid}", flush=True)
-    print("Electron console logs will stream below.", flush=True)
-    return process
-
-
-def wait_for_electron(process: subprocess.Popen[bytes]) -> None:
-    step("Run Electron in foreground")
-    print("Waiting for Electron to exit. Press Ctrl+C to stop it.", flush=True)
-    return_code = process.wait()
-    if return_code != 0:
-        raise RuntimeError(f"Electron exited with code {return_code}.")
+    print(f"Started detached Electron process PID: {process.pid}", flush=True)
+    return process.pid
 
 
 def verify_inputs(
@@ -424,6 +459,7 @@ def main() -> int:
     repo_root = args.repo_root.resolve()
     app_dir = repo_root / "newIDE" / "app"
     electron_app_dir = repo_root / "newIDE" / "electron-app"
+    electron_runtime_dir = electron_app_dir / "app"
     electron_exe = electron_app_dir / "node_modules" / "electron" / "dist" / "electron.exe"
 
     if args.dry_run:
@@ -433,6 +469,9 @@ def main() -> int:
 
     try:
         ensure_electron_dependencies(repo_root, electron_app_dir, electron_exe, args.dry_run)
+        ensure_packaged_electron_runtime_dependencies(
+            electron_runtime_dir, args.dry_run
+        )
         ensure_react_app_dependencies(app_dir, args.dry_run)
         build_libgd(
             repo_root,
@@ -469,12 +508,8 @@ def main() -> int:
             )
             stop_existing_processes(repo_root, electron_exe, args.dry_run)
             verify_inputs(repo_root, electron_app_dir, electron_exe, args.dry_run)
-            electron_process = launch_electron(
-                electron_app_dir, electron_exe, args.dry_run
-            )
+            launch_electron(electron_app_dir, electron_exe, args.dry_run)
             verify_electron_started(repo_root, electron_exe, args.dry_run)
-            if electron_process is not None:
-                wait_for_electron(electron_process)
     except (RuntimeError, subprocess.CalledProcessError) as error:
         print(f"ERROR: {error}", file=sys.stderr, flush=True)
         return 1

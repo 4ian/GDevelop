@@ -1,4 +1,4 @@
 interface:
-  display_name: 'GDevelop Project Files'
-  short_description: 'Build GDevelop games through source files'
-  default_prompt: 'Use $gdevelop-project-files to modify this GDevelop project directly, refresh generated catalogs after structural changes, reload validated disk edits through MCP, and then verify them in a debug preview.'
+  display_name: "GDevelop Project Files"
+  short_description: "Build GDevelop games and convert 3D assets"
+  default_prompt: "Use $gdevelop-project-files to edit and verify this GDevelop project or run the bundled Blender scripts for glTF/GLB conversion jobs."

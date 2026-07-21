@@ -92,7 +92,7 @@ generation.
 An AI model may implement substantial game logic with JavaScript when the user
 explicitly requests it, but GDevelop's normal authoring preference remains:
 
-1. Layout DSL for instances and visual layout.
+1. Layout TOML for instances and visual layout.
 2. Settings TOML for definitions and configuration.
 3. Events DSL and catalog instructions for gameplay behavior.
 4. JavaScript events only where they materially improve the solution.
@@ -180,11 +180,11 @@ Version 1 does not:
 
 The project continues to have three normal AI authoring catalogs:
 
-| Artifact | Authoritative responsibility |
-| --- | --- |
-| `.gdevelop/instructions-catalog.json` | Events DSL instructions and expressions |
-| `.gdevelop/settings-catalog.json` | Settings-owned definitions and writable properties |
-| `.gdevelop/layout-catalog.json` | Layout DSL grammar and layout contexts |
+| Artifact                              | Authoritative responsibility                       |
+| ------------------------------------- | -------------------------------------------------- |
+| `.gdevelop/instructions-catalog.json` | Events DSL instructions and expressions            |
+| `.gdevelop/settings-catalog.json`     | Settings-owned definitions and writable properties |
+| `.gdevelop/layout-catalog.json`       | Layout TOML schema and layout contexts             |
 
 `.gdevelop/deprecated-instructions-catalog.json` remains a compatibility-only
 event catalog and must not be used to construct new logic.
@@ -192,10 +192,10 @@ event catalog and must not be used to construct new logic.
 The JavaScript declaration files complement these catalogs; they do not copy
 their complete contents:
 
-| Artifact | Responsibility |
-| --- | --- |
+| Artifact                     | Responsibility                                       |
+| ---------------------------- | ---------------------------------------------------- |
 | `.gdevelop/runtime-api.d.ts` | Stable public JavaScript runtime types and functions |
-| `.gdevelop/project-api.d.ts` | Project-specific names and their runtime types |
+| `.gdevelop/project-api.d.ts` | Project-specific names and their runtime types       |
 
 Examples of deliberate non-duplication:
 
@@ -277,7 +277,9 @@ generated declaration:
 
 ```ts
 /**
- * Return all living instances of an object.
+ * Return the live, engine-owned array of living instances. Creating or
+ * deleting an instance mutates this array immediately. Iterate a slice()
+ * snapshot or iterate backward when calling deleteFromScene().
  * @javascriptPublic
  * @since 1
  */
@@ -397,31 +399,31 @@ is:
 ```ts
 declare namespace GDevelopProject {
   interface Scenes {
-    "Main": {
+    Main: {
       objects: {
-        "Player": ObjectDefinition<
+        Player: ObjectDefinition<
           gdjs.SpriteRuntimeObject,
-          { "Health": number },
-          { "Platformer": gdjs.PlatformerObjectRuntimeBehavior }
+          { Health: number },
+          { Platformer: gdjs.PlatformerObjectRuntimeBehavior }
         >;
-        "Enemy": ObjectDefinition<gdjs.SpriteRuntimeObject, {}, {}>;
+        Enemy: ObjectDefinition<gdjs.SpriteRuntimeObject, {}, {}>;
       };
       groups: {
-        "Enemies": "Enemy";
+        Enemies: "Enemy";
       };
       variables: {
-        "Score": number;
+        Score: number;
       };
       layers: "" | "UI";
     };
   }
 
   interface GlobalObjects {
-    "Transition": ObjectDefinition<gdjs.RuntimeObject, {}, {}>;
+    Transition: ObjectDefinition<gdjs.RuntimeObject, {}, {}>;
   }
 
   interface GlobalVariables {
-    "HighScore": number;
+    HighScore: number;
   }
 
   interface Resources {
@@ -459,14 +461,14 @@ coordinates, event bodies, or hidden behavior settings.
 
 Variable declaration types map as follows:
 
-| GDevelop variable type | TypeScript authoring type |
-| --- | --- |
-| number | `number` |
-| string | `string` |
-| boolean | `boolean` |
-| enum | Literal union when values exist; otherwise `string` |
-| structure | Object type with named children |
-| array | Array of the inferred child union, or `unknown[]` when empty |
+| GDevelop variable type | TypeScript authoring type                                    |
+| ---------------------- | ------------------------------------------------------------ |
+| number                 | `number`                                                     |
+| string                 | `string`                                                     |
+| boolean                | `boolean`                                                    |
+| enum                   | Literal union when values exist; otherwise `string`          |
+| structure              | Object type with named children                              |
+| array                  | Array of the inferred child union, or `unknown[]` when empty |
 
 Unknown or mixed structures use `unknown`, never `any`, unless the runtime API
 itself intentionally exposes `any`.
@@ -610,6 +612,23 @@ GDevelop event picking. JavaScript-local arrays and Events DSL picked-object
 lists are different concepts. Only the `objects=` header supplies the parent
 event's picked instances to the JavaScript event.
 
+### 11.5 Live object arrays and deletion
+
+`runtimeScene.getObjects(name)` returns the engine-owned live instance array,
+not a stable snapshot. `deleteFromScene()` removes the instance from that array
+immediately, so forward iteration while deleting can skip the item shifted into
+the deleted index. Iterate a copy when order is unimportant:
+
+```js
+const instances = runtimeScene.getObjects("Enemy").slice();
+for (const instance of instances) {
+  instance.deleteFromScene();
+}
+```
+
+Alternatively, iterate the live array backward. Never delete from it with a
+forward `for`, `for...of`, or `forEach` loop.
+
 ---
 
 ## 12. Extension API exposure
@@ -735,7 +754,11 @@ A successful check proves only:
 
 It does not prove object-picking side effects, timing, collision behavior,
 visual correctness, performance, network behavior, or the absence of runtime
-exceptions from dynamic data. Validation receipts must state this boundary.
+exceptions from dynamic data. Validation receipts must mark themselves as
+`structural-validation`, return `runtimeVerificationRequired: true` after a
+successful structural check, and include an explicit completion warning. An
+agent must never summarize `valid: true` as "the game works" or task completion
+without separate preview evidence.
 
 ### 14.4 Severity for existing code
 
@@ -970,17 +993,17 @@ line, column, source excerpt, and suggested public alternative when known.
 
 Initial codes:
 
-| Code | Meaning |
-| --- | --- |
-| `JS_API_SYNTAX_ERROR` | JavaScript cannot be parsed |
-| `JS_API_UNKNOWN_MEMBER` | Method or property is absent from the public API |
-| `JS_API_PRIVATE_MEMBER` | Underscore/private runtime state was accessed |
-| `JS_API_NULLABILITY` | A nullable result is used without a guard |
-| `JS_API_TYPE_MISMATCH` | Arguments, project literals, context globals, or assignments do not match the declaration |
-| `JS_API_FORBIDDEN_GLOBAL` | A forbidden browser, Node, dynamic-code, or host API is used |
-| `JS_API_RESOURCE_LIMIT` | JavaScript block count or aggregate source exceeds the validation budget |
-| `JS_API_TYPESCRIPT_UNAVAILABLE` | The checker is unavailable; strict blocks fail and compatibility blocks warn |
-| `JS_API_PERFORMANCE_RISK` | A statically obvious unbounded loop needs review (warning) |
+| Code                            | Meaning                                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `JS_API_SYNTAX_ERROR`           | JavaScript cannot be parsed                                                               |
+| `JS_API_UNKNOWN_MEMBER`         | Method or property is absent from the public API                                          |
+| `JS_API_PRIVATE_MEMBER`         | Underscore/private runtime state was accessed                                             |
+| `JS_API_NULLABILITY`            | A nullable result is used without a guard                                                 |
+| `JS_API_TYPE_MISMATCH`          | Arguments, project literals, context globals, or assignments do not match the declaration |
+| `JS_API_FORBIDDEN_GLOBAL`       | A forbidden browser, Node, dynamic-code, or host API is used                              |
+| `JS_API_RESOURCE_LIMIT`         | JavaScript block count or aggregate source exceeds the validation budget                  |
+| `JS_API_TYPESCRIPT_UNAVAILABLE` | The checker is unavailable; strict blocks fail and compatibility blocks warn              |
+| `JS_API_PERFORMANCE_RISK`       | A statically obvious unbounded loop needs review (warning)                                |
 
 Diagnostics should favor an exact corrective action, for example:
 

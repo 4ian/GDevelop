@@ -48,6 +48,31 @@ const noInputSchema = {
   additionalProperties: false,
 };
 
+const reloadProjectSchema = {
+  type: 'object',
+  properties: {
+    mode: {
+      type: 'string',
+      enum: ['wait', 'start', 'status'],
+      description:
+        'wait (default) starts or attaches and waits for completion. start starts or attaches but returns the operation_id and current phase immediately. status never starts a reload and returns an immediate snapshot; omit operation_id to discover the active or latest retained operation after a caller interruption.',
+    },
+    timeout_ms: {
+      type: 'number',
+      minimum: 1000,
+      maximum: 600000,
+      description:
+        'Optional wait timeout in milliseconds. Defaults to 120000. If the wait expires, the reload continues and the timeout error returns an operation_id.',
+    },
+    operation_id: {
+      type: 'string',
+      description:
+        'Optional reload operation ID returned by start mode, a previous timeout, or status discovery. Reattaches to the running operation or returns its retained terminal receipt without starting another reload.',
+    },
+  },
+  additionalProperties: false,
+};
+
 const sceneNameSchema = {
   type: 'object',
   properties: {
@@ -3563,7 +3588,7 @@ const signalEmitActionSchema = {
     target_kind: {
       type: 'string',
       description:
-        'Signal target: scene, object_instance, or picked_objects. Use scene for prefab-to-scene notifications, object_instance for scene-to-one-prefab commands, and picked_objects for scene-to-picked-prefabs commands. In extension event sheets, use only scene or object_instance.',
+        'Signal target: scene or object_instance. Use scene for broadcasts and object_instance for a command to exactly one prefab instance.',
     },
     signal_name: {
       type: 'string',
@@ -3575,28 +3600,14 @@ const signalEmitActionSchema = {
       description:
         'Optional string payload expression. Keep payloads small. Bare text is quoted automatically; use ToString(...) for numeric data. Inside onSignal, use GetArgumentAsString("Payload") or the fixed Payload parameter, not scene-only SignalPayload().',
     },
-    object_name: {
-      type: 'string',
-      description: 'Target object list name for picked_objects targets.',
-    },
-    objects: {
-      type: 'string',
-      description:
-        'Object list parameter for picked_objects targets; alias for object_name.',
-    },
     instance_id: {
       description:
-        'Object instance id expression for object_instance targets, for example Enemy.InstanceId() or SignalSenderInstanceId().',
-    },
-    object_group_name: {
-      type: 'string',
-      description:
-        'Legacy field; object_group signal emit actions are no longer generated.',
+        'Object instance id expression for object_instance targets, for example Enemy.InstanceId(). If the ID came from another receiver, encode it in that signal payload.',
     },
     target_scope: {
       type: 'string',
       description:
-        'Optional scope guard: scene, extension_function, behavior_function, object_function, or async_function. Extension scopes reject picked_objects targets.',
+        'Optional scope hint: scene, extension_function, behavior_function, object_function, or async_function.',
     },
   },
   required: ['target_kind', 'signal_name'],
@@ -3615,6 +3626,24 @@ const signalReceivedConditionSchema = {
       type: 'string',
       description:
         'Optional documentation-only scope hint. Signal received is valid only in scene and external scene event sheets. Prefabs receive signals with onSignal instead.',
+    },
+  },
+  required: ['signal_name'],
+  additionalProperties: true,
+};
+
+const signalSubscriptionActionSchema = {
+  type: 'object',
+  properties: {
+    signal_name: {
+      type: 'string',
+      description:
+        'Exact scene signal name. Bare names are quoted automatically. The current prefab or behavior instance is implicit.',
+    },
+    target_scope: {
+      type: 'string',
+      description:
+        'Optional documentation-only scope hint. This action is valid only in prefab/object and behavior event sheets.',
     },
   },
   required: ['signal_name'],
@@ -3659,13 +3688,13 @@ const onSignalFunctionSchema = {
     parent_kind: {
       type: 'string',
       description:
-        'Receiver kind: object. onSignal is not a free extension function.',
+        'Receiver kind: object or behavior. onSignal is not a free extension function.',
     },
     parent_name: extensionFunctionSchema.properties.parent_name,
     events_json: {
       ...extensionFunctionSchema.properties.events_json,
       description:
-        'Serialized events for the onSignal lifecycle handler. Branch on the fixed SignalName parameter, read Payload through GetArgumentAsString("Payload") or the fixed Payload parameter, and do not use scene-only SignalPayload()/SignalSender* expressions here.',
+        'Serialized events for the onSignal lifecycle handler. Branch on the fixed SignalName parameter and read the fixed Payload parameter; do not use scene-only SignalName() or SignalPayload() expressions here.',
     },
     dry_run: extensionFunctionSchema.properties.dry_run,
     summary_only: extensionFunctionSchema.properties.summary_only,
@@ -4036,13 +4065,19 @@ const readTools: Array<McpTool> = [
   {
     name: 'create_signal_emit_action',
     description:
-      'Build a correctly-formed signal emit ACTION instruction JSON for scene, object_instance, or picked_objects targets. Use it for scene-to-prefab commands and prefab-to-scene notifications. Handles hidden currentScene, signalName quoting, string payload, and required emitter object parameter ordering.',
+      'Build a correctly-formed signal emit ACTION instruction JSON for a scene broadcast or exactly one object instance. Handles hidden runtime parameters, signal-name quoting, and string payloads.',
     inputSchema: signalEmitActionSchema,
+  },
+  {
+    name: 'create_signal_subscription_action',
+    description:
+      'Build a Subscribe to scene signal ACTION for a prefab/object or behavior event sheet. The current receiver is implicit.',
+    inputSchema: signalSubscriptionActionSchema,
   },
   {
     name: 'create_signal_received_condition',
     description:
-      'Build a correctly-formed Signal received CONDITION instruction JSON for scene or external scene event sheets only. Use it for scene-level signal dispatchers; prefabs receive with onSignal. Handles hidden currentScene and signalName quoting.',
+      'Build a correctly-formed Scene signal received CONDITION instruction JSON for scene or external scene event sheets only. Prefabs and behaviors receive subscribed broadcasts with onSignal.',
     inputSchema: signalReceivedConditionSchema,
   },
   {
@@ -4227,8 +4262,8 @@ const readTools: Array<McpTool> = [
   {
     name: 'reload_project',
     description:
-      'Reload the current project from its disk files, wait for the editor to finish loading them, and regenerate the instruction, settings, and layout catalogs plus public JavaScript declaration files for local multi-file projects. This discards stale or unsaved in-memory editor changes. After editing project files directly, call this at least once before launch_preview so the preview and generated authoring files use the new disk sources.',
-    inputSchema: emptyObjectSchema,
+      'Reload the current project from its disk files and regenerate all catalogs plus public JavaScript declarations. This discards stale or unsaved in-memory editor changes. Use mode:"start" to receive the operation_id and current phase immediately, then mode:"status" for non-blocking progress; status without an operation_id discovers the active/latest operation after caller interruption. The default mode:"wait" waits up to timeout_ms (120 seconds by default). Retrying an operation_id never starts a duplicate reload. After editing project files directly, require a completed reload before launch_preview.',
+    inputSchema: reloadProjectSchema,
     annotations: {
       readOnlyHint: false,
       destructiveHint: true,
@@ -4851,7 +4886,7 @@ const writeTools: Array<McpTool> = [
   {
     name: 'gdevelop_create_or_update_on_signal',
     description:
-      'Create or update the reserved object onSignal lifecycle function in an extension. Use it for prefab signal receivers. GDevelop maintains the fixed Object, SignalName, and Payload parameters; inside onSignal, branch on SignalName and read Payload directly.',
+      'Create or update the reserved object or behavior onSignal lifecycle function. Object handlers use Object, SignalName, Payload; behavior handlers use Object, Behavior, SignalName, Payload.',
     inputSchema: onSignalFunctionSchema,
   },
   {
@@ -4971,8 +5006,21 @@ const toolUsageExamples: { [string]: Array<Object> } = {
   reload_project: [
     {
       description:
-        'Load direct project-file edits into the editor before launching a preview.',
-      arguments: {},
+        'Start loading direct project-file edits and receive a correlation ID immediately.',
+      arguments: { mode: 'start' },
+    },
+    {
+      description:
+        'Discover the active or latest retained reload after a caller interruption.',
+      arguments: { mode: 'status' },
+    },
+    {
+      description: 'Wait for a known reload operation to complete.',
+      arguments: {
+        mode: 'wait',
+        operation_id: 'reload-project-1',
+        timeout_ms: 120000,
+      },
     },
   ],
   create_signal_emit_action: [
@@ -5006,21 +5054,22 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Emit a reply to one object instance by id, using a signal expression as the target id.',
+        'Emit a reply to one object instance by an id carried explicitly in the payload contract.',
       arguments: {
         target_kind: 'object_instance',
-        instance_id: 'SignalSenderInstanceId()',
+        instance_id: 'Variable(RequesterInstanceId)',
         signal_name: 'Attack.Reply',
         payload: 'Blocked',
       },
     },
+  ],
+  create_signal_subscription_action: [
     {
-      description: 'Emit a signal to currently picked object instances.',
+      description:
+        'Subscribe the current prefab or behavior instance to a scene broadcast.',
       arguments: {
-        target_kind: 'picked_objects',
-        objects: 'Enemy',
-        signal_name: 'EnemyHit',
-        payload: 'SignalPayload()',
+        signal_name: 'Locale.Changed',
+        target_scope: 'behavior_function',
       },
     },
   ],
@@ -5033,7 +5082,7 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Scene receives a prefab reply. Put the returned condition in a scene/external-scene event, then use SignalPayload(), SignalSenderObjectName(), and SignalSenderInstanceId() in its sub-events/actions.',
+        'Scene receives a prefab reply. Put the returned condition in a scene/external-scene event, then use SignalName() and SignalPayload() in its sub-events/actions.',
       arguments: {
         signal_name: 'CardSlot.Selected',
         target_scope: 'scene',
@@ -6749,6 +6798,12 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_delete_static_data_value',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
+  'gdevelop_inspect_signal_usage',
+  'create_action',
+  'create_signal_emit_action',
+  'create_signal_subscription_action',
+  'create_signal_received_condition',
+  'gdevelop_create_or_update_on_signal',
   'generate-catalogs',
   'validate_project_files',
   'inspect_tool_schema',
@@ -6960,6 +7015,7 @@ export const getCapabilitiesSummary = (
       'create_action',
       'create_condition',
       'create_signal_emit_action',
+      'create_signal_subscription_action',
       'create_signal_received_condition',
       'add_scene_events',
       'patch_scene_event_instruction',

@@ -62,6 +62,7 @@ namespace gdjs {
     }
 
     _unloadContent() {
+      this._debuggerRenderer.clearDebugDraw();
       this.onDeletedFromScene(this._parent);
       // At this point, layer renderers are already removed by
       // `CustomRuntimeObject._reinitializeRenderer`.
@@ -158,10 +159,7 @@ namespace gdjs {
         0,
         0,
         // TODO EBO: handle hot-reloading for custom objects (including nested custom objects)
-        true,
-        {
-          skipOnPlacedInScene: true,
-        }
+        true
       );
 
       // Set up the default z order (for objects created from events)
@@ -262,6 +260,14 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+      }
+
       const allInstancesList = this.getAdhocListOfAllInstances();
       const shouldRenderDebugDraw =
         this._debugDrawEnabled &&
@@ -336,6 +342,14 @@ namespace gdjs {
 
       // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
+
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate[i](this);
+      }
     }
 
     /**

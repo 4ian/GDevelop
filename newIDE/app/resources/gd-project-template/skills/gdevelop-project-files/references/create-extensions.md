@@ -12,12 +12,12 @@
 
 Use the narrowest reusable abstraction:
 
-| Need | Component |
-| --- | --- |
-| Shared project logic without per-object state | Extension-level function |
-| State and reusable logic attached to one object | Behavior |
-| Reusable composition with child object definitions and placed instances | Prefab |
-| A reusable visual object that also owns stateful logic | Prefab plus one or more behaviors |
+| Need                                                                    | Component                         |
+| ----------------------------------------------------------------------- | --------------------------------- |
+| Shared project logic without per-object state                           | Extension-level function          |
+| State and reusable logic attached to one object                         | Behavior                          |
+| Reusable composition with child object definitions and placed instances | Prefab                            |
+| A reusable visual object that also owns stateful logic                  | Prefab plus one or more behaviors |
 
 Keep each child object definition and all of its behaviors in an individual
 `objects/<Object>.settings` file. Store its editor grouping in
@@ -40,21 +40,19 @@ files, and executable logic in `.events`.
    child-settings indexes to `project.settings` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
-7. Open every variable container with `[variables]`, `[globalVariables]`, or
-   `[sceneVariables]`, then write one assignment per variable name. Each key
-   owns one inline descriptor array, for example
-   `Controllers = [{ type = "array", children = [...] }]`. Use an empty table
-   header for an empty container; never use `variables = { ... }` or
-   `variables = { }`. Those inline-table containers are accepted only as
-   existing load-time migration input and are rewritten by the editor; never
-   author or preserve them.
+7. Write one repeated `[[variables]]`, `[[globalVariables]]`, or
+   `[[sceneVariables]]` record per variable, with an explicit `name` and the
+   complete descriptor fields. Use `variables = [ ]`,
+   `globalVariables = [ ]`, or `sceneVariables = [ ]` only for an empty
+   container. Never author keyed variable tables, whole-container inline
+   tables, non-empty inline descriptor arrays, or recursive child tables.
 8. Use exact instruction types and `dslName` parameters from
    `.gdevelop/instructions-catalog.json` in every event body.
 9. Call `reload_project` after the declaration/files exist. If the extension
    adds instruction types, re-read the regenerated catalog before writing or
    changing callers.
 10. Reload again after the final edit, then preview every public function,
-   prefab, and behavior path.
+    prefab, and behavior path.
 
 ## Complete source example
 
@@ -167,15 +165,15 @@ layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 propertyDescriptors = []
 objectGroups = { }
 
-[variables]
+variables = [ ]
 ```
 
 `Enemy.layout`:
 
-```layout
-<layout version=1>
-  <bounds min=0,0,0 max=64,64,64 />
-</layout>
+```toml
+[layout]
+version = 1
+bounds = { min = [0, 0, 0], max = [64, 64, 64] }
 ```
 
 `extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/function.settings`:
@@ -217,7 +215,7 @@ type = "Sprite"
 behaviors = []
 effects = []
 
-[variables]
+variables = [ ]
 ```
 
 Add every child object definition, its variables/effects, and every attached
@@ -226,10 +224,12 @@ object grouping. Add only instances, layers,
 spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
 rather than inventing serializer fields. For attached behaviors, copy only
-author-writable properties listed for that type in `settings-catalog.json`.
-Never copy a hidden behavior property from legacy JSON into object settings;
-runtime code initializes and owns it. Keep `propertyDescriptors` as one flat
-ordered array in `prefab.settings`; never add property folders.
+author-writable properties listed for that type in `settings-catalog.json` when
+creating a new attachment. When migrating an existing attachment, preserve its
+unlisted serialized fields verbatim: specialized editors can store required
+runtime configuration there even though the generic catalog hides it. Keep
+`propertyDescriptors` as one flat ordered array in `prefab.settings`; never add
+property folders.
 
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
@@ -305,15 +305,15 @@ selection through child events and nested private behavior-function calls.
 ## Validate the extension
 
 1. Parse every changed settings TOML independently, mount it from its canonical
-   path, and verify the strict combined merge; compile every changed `.layout`
-   as Layout DSL version 1.
+   path, and verify the strict combined merge; parse and semantically compile
+   every changed `.layout` as flat layout TOML version 1.
 2. Verify component orders are contiguous and names/folders/basenames match.
 3. Verify every referenced `.events` and `.layout` file exists.
 4. Verify prefab layouts contain no object definitions or behaviors and that
    every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata
-   exists. Verify attached object behaviors contain no editor-hidden properties
-   absent from `settings-catalog.json`.
+   exists. Verify new attached behavior fields are catalog-listed and all
+   pre-existing unlisted serialized fields still round-trip unchanged.
 5. Verify every action is condition-guarded and every object action targets at
    most one picked instance.
 6. Reload the project and confirm the new instruction/object/behavior types

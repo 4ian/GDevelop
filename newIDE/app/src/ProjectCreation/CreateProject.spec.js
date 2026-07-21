@@ -44,7 +44,7 @@ describe('CreateProject template files', () => {
     ensureProjectHasDefaultScene(project);
 
     expect(project.getLayoutsCount()).toBe(1);
-    expect(project.getLayoutAt(0).getName()).toBe('UntitledScene');
+    expect(project.getLayoutAt(0).getName()).toBe('Game');
     project.delete();
   });
 

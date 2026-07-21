@@ -151,7 +151,10 @@ import {
   validateCurrentProjectJson,
   validateSerializedProject,
 } from './McpProjectTools';
-import { ensureOnSignalObjectEventsFunctionProperParameters } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
+import {
+  ensureOnSignalBehaviorEventsFunctionProperParameters,
+  ensureOnSignalObjectEventsFunctionProperParameters,
+} from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
 import optionalRequire from '../Utils/OptionalRequire';
 
@@ -215,9 +218,15 @@ const getDefaultProcessEditorFunctionCalls = (): Function => {
     .processEditorFunctionCalls;
 };
 
+type McpRequestProgress = {|
+  phase: string,
+|};
+type McpRequestProgressReporter = McpRequestProgress => void;
+
 type RendererMcpRequest = {|
   method: string,
   params: any,
+  reportProgress?: McpRequestProgressReporter,
 |};
 
 type McpTextContent = {|
@@ -243,7 +252,11 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
-  reloadProjectAndWait?: () => Promise<any>,
+  getPreviewLaunchState?: () => Object,
+  reloadProjectAndWait?: (
+    reportProgress?: McpRequestProgressReporter
+  ) => Promise<any>,
+  reportProgress?: McpRequestProgressReporter,
   saveProjectAndWait?: () => Promise<any>,
   getPersistenceState?: () => {|
     hasUnsavedChanges: boolean,
@@ -778,12 +791,14 @@ const saveProjectWithEvidence = async (
 
 const getEditorState = (
   project: ?gdProject,
-  permissions: McpPermissionOptions
+  permissions: McpPermissionOptions,
+  previewLaunchState?: ?Object
 ) => {
   if (!project) {
     return {
       hasProject: false,
       permissions,
+      previewLaunchState: previewLaunchState || undefined,
     };
   }
 
@@ -800,6 +815,7 @@ const getEditorState = (
     projectFolder,
     sceneNames: getSceneNames(project),
     permissions,
+    previewLaunchState: previewLaunchState || undefined,
   };
 };
 
@@ -3178,35 +3194,12 @@ const normalizeSignalTargetKind = (targetKind: any): string => {
     .trim()
     .toLowerCase()
     .replace(/[-\s]+/g, '_');
-  if (normalized === 'picked' || normalized === 'picked_object') {
-    return 'picked_objects';
-  }
-  if (normalized === 'group') return 'object_group';
   if (normalized === 'instance') return 'object_instance';
-  if (
-    normalized === 'scene' ||
-    normalized === 'object_instance' ||
-    normalized === 'picked_objects'
-  ) {
+  if (normalized === 'scene' || normalized === 'object_instance') {
     return normalized;
   }
-  throw new Error(
-    'target_kind must be scene, object_instance, or picked_objects.'
-  );
+  throw new Error('target_kind must be scene or object_instance.');
 };
-
-const signalTargetKindsAllowedInExtensionEvents = new Set([
-  'scene',
-  'object_instance',
-]);
-
-const signalExtensionEventTargetScopes = new Set([
-  'extension_function',
-  'object_function',
-  'prefab_function',
-  'behavior_function',
-  'async_function',
-]);
 
 const buildSignalEmitAction = ({
   project,
@@ -3218,17 +3211,6 @@ const buildSignalEmitAction = ({
   args: Object,
 |}): Object => {
   const targetKind = normalizeSignalTargetKind(args && args.target_kind);
-  const targetScope = String((args && args.target_scope) || '')
-    .trim()
-    .toLowerCase();
-  if (
-    signalExtensionEventTargetScopes.has(targetScope) &&
-    !signalTargetKindsAllowedInExtensionEvents.has(targetKind)
-  ) {
-    throw new Error(
-      'In extension event sheets, signal emit actions can only target scene or object_instance.'
-    );
-  }
   const signalName = signalStringExpression(
     getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
     'signal_name'
@@ -3242,7 +3224,6 @@ const buildSignalEmitAction = ({
   const parameters: Object = {};
   let outputLastParameterIndex =
     payload !== null && payload !== undefined ? 2 : 1;
-  let obsoleteEmitterParameterIndex = 3;
   const setPayload = (payloadIndex: number) => {
     if (payload !== null && payload !== undefined) {
       parameters[String(payloadIndex)] = payload;
@@ -3256,7 +3237,6 @@ const buildSignalEmitAction = ({
   } else if (targetKind === 'object_instance') {
     type = 'EmitSignalToObjectInstance';
     outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
     parameters['1'] = String(
       getRequiredSignalArg(
         args,
@@ -3266,24 +3246,7 @@ const buildSignalEmitAction = ({
     );
     parameters['2'] = signalName;
     setPayload(3);
-  } else if (targetKind === 'picked_objects') {
-    type = 'EmitSignalToPickedObjects';
-    outputLastParameterIndex = 2;
-    obsoleteEmitterParameterIndex = 4;
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['objects', 'object_name', 'target_object_name'],
-        'objects'
-      )
-    );
-    parameters['2'] = signalName;
-    setPayload(3);
   }
-
-  // Old libGD builds still expose a required emitter object slot. Fill it to
-  // avoid a stale warning, then trim it from the JSON returned by this helper.
-  parameters[String(obsoleteEmitterParameterIndex)] = '';
 
   const built = buildInstruction({
     project,
@@ -3311,7 +3274,35 @@ const buildSignalEmitAction = ({
     actionType: type,
     targetKind,
     signalNote:
-      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Signal actions automatically use the owner object as sender in object/prefab functions. Scene and external scene events emit from the scene.',
+      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Emitter information is debugger-only; put application source identity in the payload when needed.',
+  };
+};
+
+const buildSignalSubscriptionAction = ({
+  project,
+  i18n,
+  args,
+}: {|
+  project: gdProject,
+  i18n?: any,
+  args: Object,
+|}): Object => {
+  const signalName = signalStringExpression(
+    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
+    'signal_name'
+  );
+  const built = buildInstruction({
+    project,
+    i18n,
+    type: 'SubscribeSceneSignal',
+    kind: 'action',
+    parameters: { '2': signalName },
+  });
+  return {
+    ...built,
+    actionType: 'SubscribeSceneSignal',
+    signalNote:
+      'Use only in a prefab/object or behavior event sheet. The current prefab or behavior instance is the implicit receiver.',
   };
 };
 
@@ -3339,7 +3330,7 @@ const buildSignalReceivedCondition = ({
     ...built,
     conditionType: 'SignalReceived',
     signalNote:
-      'Drop instruction into a scene or external scene event conditions array only. Use SignalPayload(), SignalSenderObjectName(), or SignalSenderInstanceId() in this event/sub-events to read signal data.',
+      'Drop instruction into a scene or external scene event conditions array only. Use SignalName() and SignalPayload() in this event or its descendants.',
   };
 };
 
@@ -3350,8 +3341,8 @@ const createOrUpdateOnSignalFunction = (
   const parentKind = String((args && args.parent_kind) || '')
     .trim()
     .toLowerCase();
-  if (parentKind !== 'object') {
-    throw new Error('parent_kind must be object for onSignal.');
+  if (parentKind !== 'object' && parentKind !== 'behavior') {
+    throw new Error('parent_kind must be object or behavior for onSignal.');
   }
   const signalArgs = {
     ...(args || {}),
@@ -3365,13 +3356,22 @@ const createOrUpdateOnSignalFunction = (
   delete signalArgs.parameters_mode;
   delete signalArgs.serialized_function;
   const result = createOrUpdateExtensionFunction(project, signalArgs);
-  const signalSignature = ['Object', 'SignalName', 'Payload'];
+  const signalSignature =
+    parentKind === 'behavior'
+      ? ['Object', 'Behavior', 'SignalName', 'Payload']
+      : ['Object', 'SignalName', 'Payload'];
   let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
     index,
     name,
-    type: index === 0 ? 'object' : 'string',
+    type: index === 0 ? 'object' : name === 'Behavior' ? 'behavior' : 'string',
     description:
-      index === 0 ? 'Object' : index === 1 ? 'Signal name' : 'Payload',
+      name === 'Object'
+        ? 'Object'
+        : name === 'Behavior'
+        ? 'Behavior'
+        : name === 'SignalName'
+        ? 'Signal name'
+        : 'Payload',
   }));
   let repairedEventsFunction = null;
   const extensionName = args && args.extension_name;
@@ -3383,29 +3383,47 @@ const createOrUpdateOnSignalFunction = (
     project.hasEventsFunctionsExtensionNamed(extensionName)
   ) {
     const extension = project.getEventsFunctionsExtension(extensionName);
-    const objects = extension.getEventsBasedObjects();
-    if (objects.has(parentName)) {
-      const eventsBasedObject = objects.get(parentName);
-      ensureOnSignalObjectEventsFunctionProperParameters(
-        extension,
-        eventsBasedObject
-      );
-      const eventsFunctions = eventsBasedObject.getEventsFunctions();
-      if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
-        repairedEventsFunction = eventsFunctions.getEventsFunction('onSignal');
-        const parameters = repairedEventsFunction.getParameters();
-        fixedParameters = fixedParameters.map((parameter, index) => {
-          const repairedParameter = parameters.getParameterAt(index);
-          return {
-            ...parameter,
-            name: repairedParameter.getName(),
-            type: repairedParameter.getType(),
-            description: repairedParameter.getDescription(),
-            longDescription: repairedParameter.getLongDescription(),
-            extraInfo: repairedParameter.getExtraInfo() || undefined,
-          };
-        });
+    if (parentKind === 'behavior') {
+      const behaviors = extension.getEventsBasedBehaviors();
+      if (behaviors.has(parentName)) {
+        const behavior = behaviors.get(parentName);
+        ensureOnSignalBehaviorEventsFunctionProperParameters(
+          extension,
+          behavior
+        );
+        const eventsFunctions = behavior.getEventsFunctions();
+        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
+          repairedEventsFunction = eventsFunctions.getEventsFunction(
+            'onSignal'
+          );
+        }
       }
+    } else {
+      const objects = extension.getEventsBasedObjects();
+      if (objects.has(parentName)) {
+        const object = objects.get(parentName);
+        ensureOnSignalObjectEventsFunctionProperParameters(extension, object);
+        const eventsFunctions = object.getEventsFunctions();
+        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
+          repairedEventsFunction = eventsFunctions.getEventsFunction(
+            'onSignal'
+          );
+        }
+      }
+    }
+    if (repairedEventsFunction) {
+      const parameters = repairedEventsFunction.getParameters();
+      fixedParameters = fixedParameters.map((parameter, index) => {
+        const repairedParameter = parameters.getParameterAt(index);
+        return {
+          ...parameter,
+          name: repairedParameter.getName(),
+          type: repairedParameter.getType(),
+          description: repairedParameter.getDescription(),
+          longDescription: repairedParameter.getLongDescription(),
+          extraInfo: repairedParameter.getExtraInfo() || undefined,
+        };
+      });
     }
   }
   const fixedFunction = result.function
@@ -4221,14 +4239,44 @@ const launchPreview = async (
       firstLayout,
       sceneSelectionSupported,
     });
+  let launchFailureDetails: ?Object = null;
+  const makeWindowLaunchFailure = () => ({
+    success: false,
+    launched: false,
+    ready: false,
+    failurePhase: 'window-launch',
+    error:
+      launchFailureDetails && launchFailureDetails.reason
+        ? `Could not launch a preview: ${launchFailureDetails.reason}.`
+        : launchFailureDetails && launchFailureDetails.error
+        ? `Could not launch a preview: ${launchFailureDetails.error}.`
+        : 'Could not launch a preview.',
+    launchFailureDetails: launchFailureDetails || undefined,
+  });
   // Launch the preview using the scene-aware launcher when available, falling
   // back to the legacy command which previews the editor's active tab.
-  const runLaunchCommand = (): boolean => {
+  const runLaunchCommand = async (): Promise<boolean> => {
+    launchFailureDetails = null;
     if (launchPreviewForScene) {
       try {
-        launchPreviewForScene(expectedScene || null);
+        const launchResult = await launchPreviewForScene(expectedScene || null);
+        if (launchResult === false) {
+          launchFailureDetails = { reason: 'scene-aware launch was rejected' };
+          return false;
+        }
+        if (
+          launchResult &&
+          typeof launchResult === 'object' &&
+          launchResult.accepted === false
+        ) {
+          launchFailureDetails = launchResult;
+          return false;
+        }
         return true;
       } catch (error) {
+        launchFailureDetails = {
+          error: error && error.message ? error.message : String(error),
+        };
         return false;
       }
     }
@@ -4329,15 +4377,9 @@ const launchPreview = async (
   );
 
   if (!previewDebuggerServer) {
-    const didRun = runLaunchCommand();
+    const didRun = await runLaunchCommand();
     if (!didRun) {
-      return {
-        success: false,
-        launched: false,
-        ready: false,
-        failurePhase: 'window-launch',
-        error: 'Could not launch a preview.',
-      };
+      return makeWindowLaunchFailure();
     }
 
     return annotate({
@@ -4362,15 +4404,9 @@ const launchPreview = async (
     existingIds,
     timeoutMs
   );
-  const didRun = runLaunchCommand();
+  const didRun = await runLaunchCommand();
   if (!didRun) {
-    return {
-      success: false,
-      launched: false,
-      ready: false,
-      failurePhase: 'window-launch',
-      error: 'Could not launch a preview.',
-    };
+    return makeWindowLaunchFailure();
   }
 
   const connection = await connectionPromise;
@@ -5372,7 +5408,13 @@ const callMcpTool = async ({
   const project = context.getProject();
 
   if (toolName === 'gdevelop_get_editor_state') {
-    return textResult(getEditorState(project, permissions));
+    return textResult(
+      getEditorState(
+        project,
+        permissions,
+        context.getPreviewLaunchState ? context.getPreviewLaunchState() : null
+      )
+    );
   }
 
   if (toolName === 'gdevelop_get_editor_selection') {
@@ -5604,9 +5646,9 @@ const callMcpTool = async ({
         catalogs,
         generatedGameJson,
         nextAction:
-          'Project disk sources are structurally valid and passed code-generation preflight. This does not verify runtime gameplay semantics. You may now call reload_project, then launch a paused preview and use run_frames for behavior-sensitive changes.',
+          'RUNTIME VERIFICATION REQUIRED BEFORE COMPLETION: valid:true establishes structural and code-generation validity only; it does not verify runtime gameplay semantics. Call reload_project, then launch a paused preview and use run_frames for every behavior-sensitive change.',
         note:
-          'Regenerated all project source catalogs and JavaScript declaration files, loaded every referenced multi-file source again using the fresh instruction catalog, type-checked JavaScript event blocks against the generated public API, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, JavaScript authoring-API validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime.',
+          'STRUCTURAL VALIDATION ONLY — RUNTIME NOT VERIFIED. Regenerated all project source catalogs and JavaScript declaration files, loaded every referenced multi-file source again using the fresh instruction catalog, type-checked JavaScript event blocks against the generated public API, and reconstructed the legacy game.json representation in memory. Project source files and editor memory were not modified. valid:true proves parsing, reconstruction, project validation, JavaScript authoring-API validation, and extension generated-code preflight only; it does not prove object picking or action side effects at runtime and must not be reported as proof that the game works.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(
@@ -5639,7 +5681,7 @@ const callMcpTool = async ({
       ? context.getPersistenceState()
       : null;
     try {
-      const reloadResult = await reloadProjectAndWait();
+      const reloadResult = await reloadProjectAndWait(context.reportProgress);
       if (reloadResult && reloadResult.reloaded === false) {
         return errorResult(
           reloadResult.reason || 'The project could not be reloaded from disk.',
@@ -5672,7 +5714,14 @@ const callMcpTool = async ({
       return errorResult(
         error && error.message
           ? error.message
-          : 'Unable to reload the project from disk.'
+          : 'Unable to reload the project from disk.',
+        {
+          code: error && error.code ? error.code : 'MCP_RELOAD_PROJECT_FAILED',
+          catalogPhase:
+            error && error.catalogPhase ? error.catalogPhase : undefined,
+          catalogArtifact:
+            error && error.catalogArtifact ? error.catalogArtifact : undefined,
+        }
       );
     }
   }
@@ -6173,6 +6222,21 @@ const callMcpTool = async ({
     }
   }
 
+  if (toolName === 'create_signal_subscription_action') {
+    if (!project) return errorResult('No project opened.');
+    try {
+      return textResult(
+        buildSignalSubscriptionAction({
+          project,
+          i18n: context.i18n,
+          args: args || {},
+        })
+      );
+    } catch (error) {
+      return errorResult(error.message);
+    }
+  }
+
   if (toolName === 'create_signal_received_condition') {
     if (!project) return errorResult('No project opened.');
     try {
@@ -6494,7 +6558,7 @@ const callMcpTool = async ({
       let closedWindows = false;
       let closedDebuggerConnections = false;
       if (typeof context.closeAllPreviews === 'function') {
-        context.closeAllPreviews();
+        await context.closeAllPreviews();
         closedWindows = true;
       }
       if (
@@ -7283,6 +7347,7 @@ export const createMcpEditorBridge = (
     handleRendererMcpRequest: async ({
       method,
       params,
+      reportProgress,
     }: RendererMcpRequest): Promise<any> => {
       const permissions = deferredContext.getPermissions();
 
@@ -7330,7 +7395,9 @@ export const createMcpEditorBridge = (
               params.arguments && typeof params.arguments === 'object'
                 ? params.arguments
                 : {},
-            context: deferredContext,
+            context: reportProgress
+              ? { ...deferredContext, reportProgress }
+              : deferredContext,
           });
         } catch (error) {
           return errorResult(

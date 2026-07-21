@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="740" viewBox="0 0 1200 740" font-family="Inter, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <style>
+      .t{fill:#F3F3F7}.m{fill:#9A9AAB}.mm{fill:#6E6E80}
+      .sub{font-size:11px;letter-spacing:.3px}
+      .dim{opacity:.34}
+    </style>
+  </defs>
+  <rect width="1200" height="740" fill="#12121A"/>
+
+  <!-- ===== HEADER : object switcher ===== -->
+  <rect x="0" y="0" width="1200" height="64" fill="#191922"/>
+  <line x1="0" y1="64" x2="1200" y2="64" stroke="#2E2E3C" stroke-width="1"/>
+  <text x="24" y="26" class="mm sub" font-weight="700" letter-spacing=".6">OBJECT SETTINGS</text>
+  <rect x="18" y="30" width="264" height="26" rx="7" fill="#20202B" stroke="#3A3A4C" stroke-width="1"/>
+  <rect x="24" y="33" width="20" height="20" rx="5" fill="#2C2C3D"/><text x="28" y="49" font-size="12">🛡</text>
+  <text x="52" y="48" class="t" font-size="13" font-weight="600">Knight3D</text>
+  <text x="132" y="48" class="m" font-size="10.5">3D Model · Scene</text>
+  <path d="M262,40 l6,6 l6,-6" fill="none" stroke="#9D8BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Filter properties (active) — in the header, right of the switcher -->
+  <rect x="298" y="30" width="300" height="26" rx="7" fill="#26263A" stroke="#7B61FF" stroke-width="1.4"/>
+  <circle cx="315" cy="43" r="5.5" fill="none" stroke="#9D8BFF" stroke-width="1.6"/><line x1="319" y1="47" x2="323" y2="51" stroke="#9D8BFF" stroke-width="1.6"/>
+  <text x="331" y="47" class="t" font-size="12.5" font-weight="600">speed</text>
+  <circle cx="584" cy="43" r="8" fill="#3A3A4C"/><text x="584" y="47" class="t" font-size="11" text-anchor="middle">✕</text>
+  <text x="610" y="47" class="mm sub">matches across sources &amp; fields</text>
+
+  <!-- ===== SOURCES AREA (filter active) ===== -->
+  <rect x="0" y="64" width="300" height="676" fill="#20202B"/>
+  <line x1="300" y1="64" x2="300" y2="740" stroke="#2E2E3C" stroke-width="1"/>
+
+  <!-- Object: 1 match -->
+  <text x="30" y="104" font-size="14">📦</text><text x="54" y="104" class="t" font-size="13.5">Object</text>
+  <rect x="248" y="92" width="34" height="18" rx="9" fill="#7B61FF"/><text x="265" y="105" class="sub" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+
+  <!-- Behaviors header + add -->
+  <text x="30" y="144" class="mm sub" font-weight="700" letter-spacing=".6">BEHAVIORS</text>
+  <rect x="256" y="130" width="26" height="20" rx="6" fill="#2C2340"/><text x="269" y="145" fill="#9D8BFF" font-size="14" text-anchor="middle" font-weight="700">＋</text>
+
+  <!-- Physics 3D: selected, 2 matches -->
+  <rect x="10" y="160" width="280" height="34" rx="8" fill="#7B61FF" fill-opacity="0.16"/>
+  <rect x="10" y="160" width="3" height="34" rx="1.5" fill="#7B61FF"/>
+  <text x="30" y="182" font-size="14">🧲</text><text x="54" y="182" class="t" font-size="13.5" font-weight="600">Physics 3D</text>
+  <rect x="248" y="168" width="34" height="18" rx="9" fill="#7B61FF"/><text x="265" y="181" class="sub" fill="#fff" text-anchor="middle" font-weight="700">2</text>
+
+  <!-- Top-down: 1 match -->
+  <text x="30" y="222" font-size="14">🕹</text><text x="54" y="222" class="t" font-size="13.5">Top-down movement</text>
+  <rect x="248" y="210" width="34" height="18" rx="9" fill="#7B61FF"/><text x="265" y="223" class="sub" fill="#fff" text-anchor="middle" font-weight="700">1</text>
+
+  <!-- Tween dimmed -->
+  <g class="dim"><text x="30" y="258" font-size="14">✨</text><text x="54" y="258" class="t" font-size="13.5">Tween</text></g>
+
+  <text x="18" y="712" class="sub mm">Zero-match sources dimmed · count badge only on matches · filter lives in the header</text>
+
+  <!-- ===== DETAILS AREA (filtered form) ===== -->
+  <rect x="300" y="64" width="900" height="676" fill="#191922"/>
+  <text x="332" y="100" class="t" font-size="15" font-weight="600">Physics 3D</text>
+  <text x="332" y="120" class="m" font-size="12">2 matching properties · Physics3D::Physics3DBehavior</text>
+
+  <!-- group heading kept -->
+  <text x="332" y="158" class="m sub" font-weight="700" letter-spacing=".6">MOVEMENT</text>
+  <line x1="424" y1="153" x2="1160" y2="153" stroke="#2A2A38" stroke-width="1"/>
+
+  <!-- matching field 1 -->
+  <rect x="332" y="172" width="70" height="18" rx="4" fill="#7B61FF" fill-opacity="0.28"/>
+  <text x="338" y="186" fill="#D9CCFF" font-size="12.5" font-weight="600">Speed</text>
+  <text x="404" y="186" class="m" font-size="12.5">max.</text>
+  <rect x="620" y="172" width="540" height="30" rx="7" fill="#26263A"/><text x="634" y="192" class="t" font-size="12.5">400</text><text x="1150" y="192" class="mm sub" text-anchor="end">px/s</text>
+
+  <!-- matching field 2: advanced revealed -->
+  <rect x="332" y="220" width="118" height="18" rx="4" fill="#7B61FF" fill-opacity="0.28"/>
+  <text x="338" y="234" fill="#D9CCFF" font-size="12.5" font-weight="600">Angular speed</text>
+  <rect x="456" y="221" width="66" height="17" rx="4" fill="#33333F"/><text x="489" y="234" class="sub" fill="#B9B9C7" text-anchor="middle">Advanced</text>
+  <rect x="620" y="220" width="540" height="30" rx="7" fill="#26263A"/><text x="634" y="240" class="t" font-size="12.5">180</text><text x="1150" y="240" class="mm sub" text-anchor="end">°/s</text>
+
+  <text x="332" y="286" class="mm" font-size="12">Non-matching fields hidden · form layout, group and field order preserved</text>
+
+  <!-- rules chip strip -->
+  <rect x="332" y="316" width="828" height="132" rx="10" fill="#20202B" stroke="#2E2E3C" stroke-width="1"/>
+  <text x="352" y="342" class="t" font-size="12.5" font-weight="600">Filter behavior</text>
+  <text x="352" y="366" class="m" font-size="12">• Every source row stays visible; zero-match sources are dimmed.</text>
+  <text x="352" y="386" class="m" font-size="12">• Count badge only on matching sources; badge exposes “4 matching properties”.</text>
+  <text x="352" y="406" class="m" font-size="12">• Matching label text highlighted — never the value.</text>
+  <text x="352" y="426" class="m" font-size="12">• Esc clears the query; ≤100 ms for 500 fields via a ptr-memoized index.</text>
+
+  <text x="332" y="712" class="sub mm">Still a property editor, not a search-results table · Ctrl/Cmd+F focuses this filter</text>
+</svg>

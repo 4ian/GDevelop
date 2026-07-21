@@ -10,17 +10,25 @@ type Props = {|
   enabled: boolean,
   fileIdentifier: ?string,
   lastKnownModificationTime: ?number,
-  onProjectFilesChanged: () => Promise<void> | void,
+  areProjectFilesSameAsMemory: () => Promise<boolean>,
+  onProjectFilesChanged: (
+    dismissSignal: AbortSignal,
+    dismissDialog: () => void
+  ) => Promise<void> | void,
 |};
 
 export const showLocalProjectFilesChangedDialog = async ({
   showConfirmation,
   onReloadProject,
   onBackupProject,
+  dismissSignal,
+  dismissDialog,
 }: {|
   showConfirmation: ShowConfirmFunction,
   onReloadProject: () => Promise<void>,
   onBackupProject: () => Promise<void>,
+  dismissSignal?: AbortSignal,
+  dismissDialog?: () => void,
 |}): Promise<void> => {
   let shouldBackUpProject = false;
   const shouldReloadProject = await showConfirmation({
@@ -34,9 +42,13 @@ export const showLocalProjectFilesChangedDialog = async ({
     },
     level: 'warning',
     maxWidth: 'sm',
+    dismissOnAbortSignal: dismissSignal,
   });
 
   if (shouldReloadProject) {
+    // Reloading makes this warning obsolete. Explicitly terminate its
+    // lifecycle now instead of waiting for another polling tick.
+    if (dismissDialog) dismissDialog();
     await onReloadProject();
   } else if (shouldBackUpProject) {
     await onBackupProject();
@@ -47,20 +59,42 @@ const useLocalProjectChangesWatcher = ({
   enabled,
   fileIdentifier,
   lastKnownModificationTime,
+  areProjectFilesSameAsMemory,
   onProjectFilesChanged,
 }: Props) => {
+  const onProjectFilesChangedRef = React.useRef(onProjectFilesChanged);
+  const areProjectFilesSameAsMemoryRef = React.useRef(
+    areProjectFilesSameAsMemory
+  );
+  const baselineModificationTimeRef = React.useRef<?number>(
+    lastKnownModificationTime
+  );
+
+  onProjectFilesChangedRef.current = onProjectFilesChanged;
+  areProjectFilesSameAsMemoryRef.current = areProjectFilesSameAsMemory;
+
+  React.useEffect(
+    () => {
+      if (!enabled || !fileIdentifier) return;
+
+      baselineModificationTimeRef.current = lastKnownModificationTime;
+    },
+    [enabled, fileIdentifier, lastKnownModificationTime]
+  );
+
   React.useEffect(
     () => {
       if (!enabled || !fileIdentifier) return;
 
       let isDisposed = false;
-      let baselineModificationTime = lastKnownModificationTime;
-      let isChecking = baselineModificationTime === null;
+      let pendingDialogAbortController: ?AbortController = null;
+      let latestPendingModificationTime: ?number = null;
+      let isChecking = typeof baselineModificationTimeRef.current !== 'number';
 
       const initializeBaselineIfNeeded = async () => {
-        if (baselineModificationTime !== null) return;
+        if (typeof baselineModificationTimeRef.current === 'number') return;
         try {
-          baselineModificationTime = await getLocalProjectLastModifiedDate(
+          baselineModificationTimeRef.current = await getLocalProjectLastModifiedDate(
             fileIdentifier
           );
         } finally {
@@ -79,18 +113,88 @@ const useLocalProjectChangesWatcher = ({
           const latestModificationTime = await getLocalProjectLastModifiedDate(
             fileIdentifier
           );
-          if (isDisposed || latestModificationTime === null) return;
+          if (isDisposed) return;
 
-          if (baselineModificationTime === null) {
-            baselineModificationTime = latestModificationTime;
+          const activeDialogAbortController = pendingDialogAbortController;
+          if (activeDialogAbortController) {
+            if (typeof latestModificationTime === 'number') {
+              latestPendingModificationTime = latestModificationTime;
+            }
+            let projectFilesSameAsMemory = false;
+            try {
+              projectFilesSameAsMemory = await areProjectFilesSameAsMemoryRef.current();
+            } catch (error) {
+              console.warn(
+                'Unable to compare local project files with the in-memory project:',
+                error
+              );
+            }
+            if (
+              isDisposed ||
+              pendingDialogAbortController !== activeDialogAbortController
+            ) {
+              return;
+            }
+
+            if (projectFilesSameAsMemory) {
+              // Only a full content comparison can prove that the warning is
+              // no longer needed. Modification times are used solely to
+              // detect that a comparison should begin.
+              const matchingModificationTime =
+                typeof latestModificationTime === 'number'
+                  ? latestModificationTime
+                  : latestPendingModificationTime;
+              if (typeof matchingModificationTime === 'number') {
+                baselineModificationTimeRef.current = matchingModificationTime;
+              }
+              latestPendingModificationTime = null;
+              activeDialogAbortController.abort();
+            }
             return;
           }
-          if (latestModificationTime <= baselineModificationTime) return;
 
-          // Acknowledge this disk version before showing the dialog, so
-          // dismissing it does not show the same warning every five seconds.
-          baselineModificationTime = latestModificationTime;
-          await onProjectFilesChanged();
+          if (typeof latestModificationTime !== 'number') return;
+
+          const currentBaselineModificationTime =
+            baselineModificationTimeRef.current;
+          if (typeof currentBaselineModificationTime !== 'number') {
+            baselineModificationTimeRef.current = latestModificationTime;
+            return;
+          }
+
+          if (latestModificationTime <= currentBaselineModificationTime) return;
+
+          latestPendingModificationTime = latestModificationTime;
+
+          const dialogAbortController = new AbortController();
+          pendingDialogAbortController = dialogAbortController;
+          (async () => {
+            try {
+              await onProjectFilesChangedRef.current(
+                dialogAbortController.signal,
+                () => dialogAbortController.abort()
+              );
+            } catch (error) {
+              console.warn(
+                'Unable to handle local project files changes:',
+                error
+              );
+            } finally {
+              if (pendingDialogAbortController === dialogAbortController) {
+                const modificationTimeToAcknowledge = latestPendingModificationTime;
+                if (
+                  !isDisposed &&
+                  typeof modificationTimeToAcknowledge === 'number'
+                ) {
+                  // A user dismissal acknowledges every disk version observed
+                  // while the dialog was open, avoiding duplicate warnings.
+                  baselineModificationTimeRef.current = modificationTimeToAcknowledge;
+                }
+                pendingDialogAbortController = null;
+                latestPendingModificationTime = null;
+              }
+            }
+          })();
         } catch (error) {
           console.warn(
             'Unable to check local project files for changes:',
@@ -103,10 +207,13 @@ const useLocalProjectChangesWatcher = ({
 
       return () => {
         isDisposed = true;
+        if (pendingDialogAbortController) {
+          pendingDialogAbortController.abort();
+        }
         clearInterval(intervalId);
       };
     },
-    [enabled, fileIdentifier, lastKnownModificationTime, onProjectFilesChanged]
+    [enabled, fileIdentifier]
   );
 };
 

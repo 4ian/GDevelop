@@ -30,7 +30,8 @@ const readRequestBody = request =>
     request.on('end', () => resolve(body));
   });
 
-const normalizeParams = params => (params && typeof params === 'object' ? params : {});
+const normalizeParams = params =>
+  params && typeof params === 'object' ? params : {};
 
 const handleMcpJsonRpcRequest = async ({
   request,
@@ -38,9 +39,16 @@ const handleMcpJsonRpcRequest = async ({
   token,
   sendRendererRequest,
 }) => {
-  const id = request && Object.prototype.hasOwnProperty.call(request, 'id') ? request.id : null;
+  const id =
+    request && Object.prototype.hasOwnProperty.call(request, 'id')
+      ? request.id
+      : null;
 
-  if (!request || request.jsonrpc !== '2.0' || typeof request.method !== 'string') {
+  if (
+    !request ||
+    request.jsonrpc !== '2.0' ||
+    typeof request.method !== 'string'
+  ) {
     return createJsonRpcError(
       id,
       JSON_RPC_ERROR_CODES.invalidRequest,
@@ -88,7 +96,8 @@ const handleMcpJsonRpcRequest = async ({
       JSON_RPC_ERROR_CODES.internalError,
       error && error.message
         ? error.message
-        : 'The GDevelop editor did not handle the MCP request.'
+        : 'The GDevelop editor did not handle the MCP request.',
+      error && error.data ? error.data : undefined
     );
   }
 };
@@ -170,7 +179,9 @@ const startMcpServer = ({ port, token, sendRendererRequest }) =>
 
 const stopMcpServer = serverState =>
   new Promise(resolve => {
-    const serverToStop = serverState ? serverState.server : activeServer && activeServer.server;
+    const serverToStop = serverState
+      ? serverState.server
+      : activeServer && activeServer.server;
     if (!serverToStop) {
       resolve();
       return;

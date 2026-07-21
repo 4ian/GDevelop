@@ -297,6 +297,6 @@ explicitly permitted.
   and owner scope.
 - Use `@group ... @end group`, `@js ... @end js`, and
   `@comment "..." background=[r,g,b] text=[r,g,b]` exactly.
-- Keep settings, layout markup, function declarations, and raw JSON outside
+- Keep settings, layout TOML, function declarations, and raw JSON outside
   `.events`.
 - After editing, call `reload_project`; preview only after the reload succeeds.

@@ -72,6 +72,7 @@ export const ProjectManagerDrawer = ({
     <Drawer
       open={projectManagerOpen}
       PaperProps={{
+        id: 'project-manager-drawer-paper',
         style: {
           ...styles.drawerContent,
           ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),

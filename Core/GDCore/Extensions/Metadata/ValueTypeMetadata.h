@@ -230,6 +230,7 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "objectEffectName" ||
              parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
+             parameterType == "model3DBoneName" ||
              parameterType == "objectAnimationName" ||
              parameterType == "objectSkinName" ||
              parameterType == "functionParameterName" ||

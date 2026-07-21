@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
   const testFiles = [
     './Extensions/**/tests/**.spec.js',
     './GDJS/tests/tests/**/*.js',
@@ -151,6 +151,10 @@ module.exports = function(config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextObject/textruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/A_RuntimeObject3D.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/A_RuntimeObject3DRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Base3DBehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Model3DRuntimeObject3DRenderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Model3DRuntimeObject.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Model3DBoneAttachmentManager.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/Cube3DRuntimeObjectPixiRenderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/3D/CustomRuntimeObject3D.js',

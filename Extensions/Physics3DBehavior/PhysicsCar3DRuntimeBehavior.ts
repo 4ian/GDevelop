@@ -1156,6 +1156,10 @@ namespace gdjs {
         this.carBehavior._destroyBody();
         this.physicsBodyUpdater.destroyBody();
       }
+
+      getDebugCollisionMaskSource(): gdjs.Physics3DRuntimeBehavior.DebugCollisionMaskSource | null {
+        return this.physicsBodyUpdater.getDebugCollisionMaskSource?.() || null;
+      }
     }
   }
 }

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Inter, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <style>
+      .t{fill:#F3F3F7}.m{fill:#9A9AAB}.mm{fill:#6E6E80}
+      .sub{font-size:11px;letter-spacing:.3px}
+      .pin{font-size:11px;font-weight:700;fill:#12121A}
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#12121A"/>
+  <text x="40" y="40" class="t" font-size="19" font-weight="700">Object switcher — open dropdown</text>
+  <text x="40" y="64" class="m" font-size="13">Overlay list: reuses ObjectsList rows · one badged effective collection · preserves list order · no scope grouping.</text>
+
+  <!-- ============================ LEFT: OPEN (default) ============================ -->
+  <text x="40" y="98" class="mm sub" font-weight="700" letter-spacing=".6">OPEN · nothing typed</text>
+
+  <!-- trigger (active, chevron up) -->
+  <rect x="40" y="106" width="440" height="44" rx="9" fill="#20202B" stroke="#7B61FF" stroke-width="1.4"/>
+  <rect x="50" y="115" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="57" y="134" font-size="14">🛡</text>
+  <text x="88" y="133" class="t" font-size="15" font-weight="700">Knight3D</text>
+  <text x="188" y="133" class="m" font-size="12">3D Model · Scene</text>
+  <path d="M452,133 l7,-7 l7,7" fill="none" stroke="#9D8BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- dropdown panel -->
+  <rect x="40" y="156" width="440" height="440" rx="10" fill="#1E1E28" stroke="#3A3A4C" stroke-width="1.2"/>
+
+  <!-- (1) search -->
+  <rect x="54" y="170" width="412" height="34" rx="8" fill="#26263A"/>
+  <circle cx="73" cy="187" r="6" fill="none" stroke="#7C7C90" stroke-width="1.6"/><line x1="77.5" y1="191.5" x2="82" y2="196" stroke="#7C7C90" stroke-width="1.6"/>
+  <text x="90" y="191" class="m" font-size="12.5">Search objects</text>
+  <circle cx="454" cy="187" r="9" fill="#7B61FF"/><text x="454" y="191" class="pin" text-anchor="middle">1</text>
+
+  <!-- Row 1 : Knight3D (selected) -->
+  <rect x="48" y="214" width="424" height="44" rx="8" fill="#7B61FF" fill-opacity="0.16"/>
+  <rect x="48" y="214" width="3" height="44" rx="1.5" fill="#7B61FF"/>
+  <rect x="62" y="223" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="242" font-size="13">🛡</text>
+  <text x="98" y="233" class="t" font-size="13.5" font-weight="700">Knight3D</text>
+  <text x="98" y="248" class="sub mm">3D Model</text>
+  <path d="M300,236 l4,4 l8,-9" fill="none" stroke="#9D8BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="320" y="226" width="140" height="20" rx="5" fill="#33333F"/><text x="330" y="240" class="sub" fill="#C7C7D2" font-weight="600">Scene · MainMenu</text>
+  <circle cx="490" cy="236" r="9" fill="#7B61FF"/><text x="490" y="240" class="pin" text-anchor="middle">2</text>
+  <circle cx="490" cy="270" r="9" fill="#7B61FF"/><text x="490" y="274" class="pin" text-anchor="middle">3</text>
+
+  <!-- Row 2 : Ground -->
+  <rect x="62" y="271" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="290" font-size="13">▦</text>
+  <text x="98" y="281" class="t" font-size="13.5">Ground</text><text x="98" y="296" class="sub mm">Tiled Sprite</text>
+  <rect x="320" y="274" width="140" height="20" rx="5" fill="#33333F"/><text x="330" y="288" class="sub" fill="#C7C7D2" font-weight="600">Scene · MainMenu</text>
+
+  <!-- Row 3 : Camera3D (keyboard focus) -->
+  <rect x="50" y="308" width="420" height="40" rx="8" fill="none" stroke="#9D8BFF" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <rect x="62" y="315" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="334" font-size="13">🎥</text>
+  <text x="98" y="325" class="t" font-size="13.5">Camera3D</text><text x="98" y="340" class="sub mm">3D Box</text>
+  <rect x="320" y="318" width="140" height="20" rx="5" fill="#33333F"/><text x="330" y="332" class="sub" fill="#C7C7D2" font-weight="600">Scene · MainMenu</text>
+  <circle cx="490" cy="328" r="9" fill="#7B61FF"/><text x="490" y="332" class="pin" text-anchor="middle">4</text>
+
+  <!-- Row 4 : Light (Global) -->
+  <rect x="62" y="359" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="378" font-size="13">💡</text>
+  <text x="98" y="369" class="t" font-size="13.5">Light</text><text x="98" y="384" class="sub mm">Light</text>
+  <rect x="404" y="362" width="56" height="20" rx="5" fill="#2B3B58"/><text x="432" y="376" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+
+  <!-- Row 5 : HUD (Prefab) -->
+  <rect x="62" y="403" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="422" font-size="13">🧩</text>
+  <text x="98" y="413" class="t" font-size="13.5">HUD</text><text x="98" y="428" class="sub mm">Custom object</text>
+  <rect x="316" y="406" width="144" height="20" rx="5" fill="#4A3C1E"/><text x="326" y="420" class="sub" fill="#E7C285" font-weight="600">Prefab · HealthBar</text>
+
+  <!-- Row 6 : Pickup (Global) -->
+  <rect x="62" y="447" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="69" y="466" font-size="13">⭐</text>
+  <text x="98" y="457" class="t" font-size="13.5">Pickup</text><text x="98" y="472" class="sub mm">Sprite</text>
+  <rect x="404" y="450" width="56" height="20" rx="5" fill="#2B3B58"/><text x="432" y="464" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+
+  <!-- (5) footer -->
+  <line x1="54" y1="500" x2="466" y2="500" stroke="#2E2E3C" stroke-width="1"/>
+  <text x="60" y="527" class="mm sub">↑↓ navigate · Enter select · Esc close</text>
+  <text x="460" y="527" class="mm sub" text-anchor="end">7 objects</text>
+  <circle cx="454" cy="551" r="9" fill="#7B61FF"/><text x="454" y="555" class="pin" text-anchor="middle">5</text>
+  <text x="60" y="555" class="mm sub">footer: keyboard hints + total count</text>
+
+  <!-- ============================ RIGHT: TYPING ============================ -->
+  <text x="620" y="98" class="mm sub" font-weight="700" letter-spacing=".6">TYPING “ca”</text>
+
+  <rect x="620" y="106" width="440" height="44" rx="9" fill="#20202B" stroke="#7B61FF" stroke-width="1.4"/>
+  <rect x="630" y="115" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="637" y="134" font-size="14">🛡</text>
+  <text x="668" y="133" class="t" font-size="15" font-weight="700">Knight3D</text>
+  <text x="768" y="133" class="m" font-size="12">3D Model · Scene</text>
+  <path d="M1032,133 l7,-7 l7,7" fill="none" stroke="#9D8BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="620" y="156" width="440" height="300" rx="10" fill="#1E1E28" stroke="#3A3A4C" stroke-width="1.2"/>
+
+  <!-- search with query + clear + cursor -->
+  <rect x="634" y="170" width="412" height="34" rx="8" fill="#26263A" stroke="#7B61FF" stroke-width="1.3"/>
+  <circle cx="653" cy="187" r="6" fill="none" stroke="#9D8BFF" stroke-width="1.6"/><line x1="657.5" y1="191.5" x2="662" y2="196" stroke="#9D8BFF" stroke-width="1.6"/>
+  <text x="670" y="191" class="t" font-size="12.5" font-weight="600">ca</text>
+  <rect x="686" y="179" width="1.5" height="16" fill="#9D8BFF"/>
+  <circle cx="1034" cy="187" r="8" fill="#3A3A4C"/><text x="1034" y="191" class="t" font-size="11" text-anchor="middle">✕</text>
+
+  <!-- match count -->
+  <text x="634" y="228" class="mm sub">1 of 7 objects match — name, type, and origin are searched</text>
+
+  <!-- matched row: Camera3D, "Ca" highlighted, keyboard-focused -->
+  <rect x="628" y="240" width="424" height="44" rx="8" fill="#7B61FF" fill-opacity="0.10" stroke="#9D8BFF" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <rect x="642" y="249" width="26" height="26" rx="6" fill="#2C2C3D"/><text x="649" y="268" font-size="13">🎥</text>
+  <rect x="678" y="248" width="26" height="18" rx="4" fill="#7B61FF" fill-opacity="0.4"/>
+  <text x="678" y="261" class="t" font-size="13.5" font-weight="700"><tspan fill="#EDE6FF">Ca</tspan><tspan fill="#F3F3F7">mera3D</tspan></text>
+  <text x="678" y="276" class="sub mm">3D Box</text>
+  <rect x="900" y="252" width="140" height="20" rx="5" fill="#33333F"/><text x="910" y="266" class="sub" fill="#C7C7D2" font-weight="600">Scene · MainMenu</text>
+
+  <!-- scope-search hint -->
+  <rect x="634" y="308" width="412" height="60" rx="8" fill="#232331" stroke="#3A3A4C" stroke-width="1"/>
+  <rect x="634" y="308" width="4" height="60" rx="2" fill="#7B61FF"/>
+  <text x="652" y="332" class="t sub" font-weight="700">Search matches origin too</text>
+  <text x="652" y="350" class="m sub">Type “scene”, “global”, or “prefab” to filter the list to that badge.</text>
+
+  <!-- empty state note -->
+  <text x="634" y="404" class="mm sub" font-weight="700">EMPTY (no match)</text>
+  <rect x="634" y="414" width="412" height="30" rx="8" fill="#20202B"/>
+  <text x="648" y="433" class="mm sub">No objects match “xyz” · Clear</text>
+
+  <!-- ============================ LEGEND ============================ -->
+  <rect x="40" y="620" width="1020" height="112" rx="12" fill="#191922" stroke="#2E2E3C" stroke-width="1"/>
+  <text x="64" y="648" class="t" font-size="13.5" font-weight="700">Anatomy</text>
+
+  <g>
+    <circle cx="72" cy="672" r="9" fill="#7B61FF"/><text x="72" y="676" class="pin" text-anchor="middle">1</text>
+    <text x="90" y="676" class="m" font-size="12">Search input, pinned at the top; auto-focused when the dropdown opens.</text>
+
+    <circle cx="72" cy="698" r="9" fill="#7B61FF"/><text x="72" y="702" class="pin" text-anchor="middle">2</text>
+    <text x="90" y="702" class="m" font-size="12">Selected object — purple band + left bar + ✓; row shows icon, name, muted type.</text>
+
+    <circle cx="600" cy="672" r="9" fill="#7B61FF"/><text x="600" y="676" class="pin" text-anchor="middle">3</text>
+    <text x="618" y="676" class="m" font-size="12">Origin badge, names its owner: “Scene · Name”, “Global”, “Prefab · Name” (§6).</text>
+
+    <circle cx="600" cy="698" r="9" fill="#7B61FF"/><text x="600" y="702" class="pin" text-anchor="middle">4</text>
+    <text x="618" y="702" class="m" font-size="12">Keyboard-focused row — dashed focus ring, moved with ↑↓, independent of selection.</text>
+  </g>
+  <circle cx="72" cy="724" r="9" fill="#7B61FF"/><text x="72" y="728" class="pin" text-anchor="middle">5</text>
+  <text x="90" y="728" class="m" font-size="12">Footer: keyboard hints + total count. Opens as an overlay — reserves no layout width when closed.</text>
+</svg>

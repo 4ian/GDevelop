@@ -19,6 +19,7 @@ import FlatButton from '../../UI/FlatButton';
 import { mapFor } from '../../Utils/MapFor';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
+import EmptyMessage from '../../UI/EmptyMessage';
 import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -33,6 +34,17 @@ import * as THREE from 'three';
 import { PropertyCheckbox, PropertyField } from './PropertyFields';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { ChoiceProperty } from '../../BehaviorsEditor/Editors/Physics2Editor';
+import Paper from '../../UI/Paper';
+import CircularProgress from '../../UI/CircularProgress';
+import SuccessFilled from '../../UI/CustomSvgIcons/SuccessFilled';
+import ErrorFilled from '../../UI/CustomSvgIcons/ErrorFilled';
+import ShieldChecked from '../../UI/CustomSvgIcons/ShieldChecked';
+import { applyResourceDefaults } from '../../ResourcesList/ResourceUtils';
+import { type ResourceSource } from '../../ResourcesList/ResourceSource';
+import {
+  validateModel3DRig,
+  type Model3DRigValidationResult,
+} from '../../ResourcesList/ResourcePreview/Model3DRigUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -52,6 +64,22 @@ const styles = {
     flex: 1,
     alignItems: 'center',
   },
+  sharedAnimationModelsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+  },
+  sharedAnimationModelRow: {
+    padding: '4px 8px',
+  },
+  sharedAnimationModelStatusIcon: {
+    width: 20,
+    height: 20,
+  },
+  animationNameFilter: {
+    width: 320,
+    maxWidth: '50%',
+  },
 };
 
 const epsilon = 1 / (1 << 16);
@@ -66,6 +94,155 @@ const removeTrailingZeroes = (value: string) => {
     }
   }
   return value;
+};
+
+type SharedAnimationModelLoadState = {|
+  gltf: GLTF | null,
+  isLoading: boolean,
+  hasError: boolean,
+|};
+
+const getAnimationSourceValue = (
+  resourceName: string,
+  animationName: string
+): string => JSON.stringify([resourceName, animationName]);
+
+const parseAnimationSourceValue = (
+  value: string
+): {| resourceName: string, animationName: string |} => {
+  try {
+    const parsedValue = JSON.parse(value);
+    if (
+      Array.isArray(parsedValue) &&
+      parsedValue.length === 2 &&
+      typeof parsedValue[0] === 'string' &&
+      typeof parsedValue[1] === 'string'
+    ) {
+      return {
+        resourceName: parsedValue[0],
+        animationName: parsedValue[1],
+      };
+    }
+  } catch (error) {
+    // Values created before shared animation sources only contain a clip name.
+  }
+  return { resourceName: '', animationName: value };
+};
+
+const getRigMismatchDescription = (
+  validation: Model3DRigValidationResult
+): React.Node => {
+  switch (validation.mismatchReason) {
+    case 'missing-skeleton':
+      return <Trans>No skeleton found</Trans>;
+    case 'unnamed-bone':
+      return <Trans>The rig has an unnamed bone</Trans>;
+    case 'duplicate-bone-name':
+      return <Trans>The rig has duplicate bone names</Trans>;
+    case 'bone-count':
+    case 'bone-names':
+      return <Trans>{validation.differentBoneCount} bones differ</Trans>;
+    case 'bone-hierarchy':
+      return <Trans>Bone hierarchy differs</Trans>;
+    case 'bind-pose':
+      return <Trans>Bind pose differs</Trans>;
+    default:
+      return <Trans>The rigs are not compatible</Trans>;
+  }
+};
+
+const SharedAnimationModelRow = ({
+  resourceName,
+  loadState,
+  validation,
+  onRemove,
+}: {|
+  resourceName: string,
+  loadState: ?SharedAnimationModelLoadState,
+  validation: ?Model3DRigValidationResult,
+  onRemove: () => void,
+|}): React.Node => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const isLoading = !loadState || loadState.isLoading;
+  const isValid = !!validation && validation.isMatching;
+  const hasError = !!loadState && loadState.hasError;
+  const animationCount =
+    loadState && loadState.gltf ? loadState.gltf.animations.length : 0;
+
+  return (
+    <Paper
+      variant="outlined"
+      background="dark"
+      style={styles.sharedAnimationModelRow}
+    >
+      <Line noMargin expand alignItems="center">
+        <Column noMargin expand>
+          <Text noMargin allowSelection allowBrowserAutoTranslate={false}>
+            {resourceName}
+          </Text>
+          <Text noMargin size="body-small" color="secondary">
+            {loadState && loadState.gltf ? (
+              <React.Fragment>
+                {animationCount} <Trans>animations</Trans>
+              </React.Fragment>
+            ) : isLoading ? (
+              <Trans>Loading animations…</Trans>
+            ) : (
+              <Trans>Animations unavailable</Trans>
+            )}
+          </Text>
+        </Column>
+        <Line noMargin alignItems="center">
+          {isLoading ? (
+            <CircularProgress size={20} />
+          ) : hasError ? (
+            <React.Fragment>
+              <ErrorFilled
+                style={{
+                  ...styles.sharedAnimationModelStatusIcon,
+                  color: gdevelopTheme.message.error,
+                }}
+              />
+              <Spacer />
+              <Text noMargin color="error">
+                <Trans>Unable to load model</Trans>
+              </Text>
+            </React.Fragment>
+          ) : isValid ? (
+            <React.Fragment>
+              <SuccessFilled style={styles.sharedAnimationModelStatusIcon} />
+              <Spacer />
+              <Text noMargin>
+                <Trans>Exact rig match</Trans>
+              </Text>
+            </React.Fragment>
+          ) : validation ? (
+            <React.Fragment>
+              <ErrorFilled
+                style={{
+                  ...styles.sharedAnimationModelStatusIcon,
+                  color: gdevelopTheme.message.error,
+                }}
+              />
+              <Spacer />
+              <Column noMargin>
+                <Text noMargin color="error">
+                  <Trans>Rig mismatch</Trans>
+                </Text>
+                <Text noMargin size="body-small" color="error">
+                  {getRigMismatchDescription(validation)}
+                </Text>
+              </Column>
+            </React.Fragment>
+          ) : null}
+          <Spacer />
+          <IconButton size="small" onClick={onRemove}>
+            <Trash />
+          </IconButton>
+        </Line>
+      </Line>
+    </Paper>
+  );
 };
 
 export const hasLight = (layout: ?gd.Layout): boolean => {
@@ -116,6 +293,9 @@ const Model3DEditor = ({
     justAddedAnimationName,
     setJustAddedAnimationName,
   ] = React.useState<?string>(null);
+  const [animationNameFilter, setAnimationNameFilter] = React.useState<string>(
+    ''
+  );
   const justAddedAnimationElement = React.useRef<?any>(null);
 
   React.useEffect(
@@ -141,6 +321,14 @@ const Model3DEditor = ({
 
   const model3DConfiguration = gd.asModel3DConfiguration(objectConfiguration);
   const properties = objectConfiguration.getProperties();
+  const sharedAnimationModelResourceNames = mapFor(
+    0,
+    model3DConfiguration.getSharedAnimationModelResourcesCount(),
+    index => model3DConfiguration.getSharedAnimationModelResourceName(index)
+  );
+  const sharedAnimationModelResourcesKey = JSON.stringify(
+    sharedAnimationModelResourceNames
+  );
 
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
@@ -169,6 +357,84 @@ const Model3DEditor = ({
   if (!gltf) {
     loadGltf(properties.get('modelResourceName').getValue());
   }
+
+  const [
+    sharedAnimationModelLoadStates,
+    setSharedAnimationModelLoadStates,
+  ] = React.useState<{
+    [resourceName: string]: SharedAnimationModelLoadState,
+  }>({});
+  React.useEffect(
+    () => {
+      let isCancelled = false;
+      const resourceNames: Array<string> = JSON.parse(
+        sharedAnimationModelResourcesKey
+      );
+      setSharedAnimationModelLoadStates(previousStates => {
+        const nextStates = {};
+        for (const resourceName of resourceNames) {
+          nextStates[resourceName] = previousStates[resourceName] || {
+            gltf: null,
+            isLoading: true,
+            hasError: false,
+          };
+        }
+        return nextStates;
+      });
+
+      resourceNames.forEach(resourceName => {
+        PixiResourcesLoader.get3DModel(project, resourceName).then(
+          loadedGltf => {
+            if (isCancelled) return;
+            setSharedAnimationModelLoadStates(previousStates => ({
+              ...previousStates,
+              [resourceName]: {
+                gltf: loadedGltf,
+                isLoading: false,
+                hasError: false,
+              },
+            }));
+          },
+          () => {
+            if (isCancelled) return;
+            setSharedAnimationModelLoadStates(previousStates => ({
+              ...previousStates,
+              [resourceName]: {
+                gltf: null,
+                isLoading: false,
+                hasError: true,
+              },
+            }));
+          }
+        );
+      });
+      return () => {
+        isCancelled = true;
+      };
+    },
+    [project, sharedAnimationModelResourcesKey]
+  );
+
+  const sharedAnimationModelRigValidations = React.useMemo<{
+    [resourceName: string]: Model3DRigValidationResult,
+  }>(
+    () => {
+      const validations = {};
+      if (!gltf) return validations;
+
+      const resourceNames: Array<string> = JSON.parse(
+        sharedAnimationModelResourcesKey
+      );
+      for (const resourceName of resourceNames) {
+        const loadState = sharedAnimationModelLoadStates[resourceName];
+        if (loadState && loadState.gltf) {
+          validations[resourceName] = validateModel3DRig(gltf, loadState.gltf);
+        }
+      }
+      return validations;
+    },
+    [gltf, sharedAnimationModelLoadStates, sharedAnimationModelResourcesKey]
+  );
 
   // $FlowFixMe[value-as-type]
   const model3D = React.useMemo<THREE.Object3D | null>(
@@ -319,9 +585,179 @@ const Model3DEditor = ({
     [modelSize, setDimensionsFromModelSizeAndScale]
   );
 
+  const modelResourceSources: Array<ResourceSource> = React.useMemo(
+    () => {
+      const storageProvider = resourceManagementProps.getStorageProvider();
+      return resourceManagementProps.resourceSources
+        .filter(source => source.kind === 'model3D')
+        .filter(
+          ({ onlyForStorageProvider }) =>
+            !onlyForStorageProvider ||
+            onlyForStorageProvider === storageProvider.internalName
+        );
+    },
+    [resourceManagementProps]
+  );
+
+  const addSharedAnimationModels = React.useCallback(
+    async () => {
+      const initialResourceSource = modelResourceSources[0];
+      if (!initialResourceSource) return;
+
+      try {
+        const {
+          selectedResources,
+          selectedSourceName,
+        } = await resourceManagementProps.onChooseResource({
+          initialSourceName: initialResourceSource.name,
+          multiSelection: true,
+          resourceKind: 'model3D',
+        });
+        if (!selectedResources.length) return;
+
+        const selectedResourceSource = modelResourceSources.find(
+          source => source.name === selectedSourceName
+        );
+        if (!selectedResourceSource) return;
+
+        const selectedResourceNames = selectedResources.map(resource =>
+          resource.getName()
+        );
+        let hasCreatedAnyResource = false;
+        if (selectedResourceSource.shouldCreateResource) {
+          selectedResources.forEach(resource => {
+            applyResourceDefaults(project, resource);
+            const hasCreatedResource = project
+              .getResourcesManager()
+              .addResource(resource);
+            hasCreatedAnyResource = hasCreatedAnyResource || hasCreatedResource;
+          });
+          selectedResources.forEach(resource => resource.delete());
+          if (hasCreatedAnyResource) {
+            await resourceManagementProps.onFetchNewlyAddedResources();
+            resourceManagementProps.onNewResourcesAdded();
+          }
+        }
+
+        const primaryModelResourceName = properties
+          .get('modelResourceName')
+          .getValue();
+        let hasAddedSharedModel = false;
+        for (const resourceName of selectedResourceNames) {
+          if (
+            !resourceName ||
+            resourceName === primaryModelResourceName ||
+            model3DConfiguration.hasSharedAnimationModelResourceNamed(
+              resourceName
+            )
+          ) {
+            continue;
+          }
+          model3DConfiguration.addSharedAnimationModelResource(resourceName);
+          hasAddedSharedModel = true;
+        }
+        if (!hasAddedSharedModel) return;
+
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+        resourceManagementProps.onResourceUsageChanged();
+      } catch (error) {
+        console.error('Unable to choose shared animation models', error);
+      }
+    },
+    [
+      forceUpdate,
+      model3DConfiguration,
+      modelResourceSources,
+      onObjectUpdated,
+      onSizeUpdated,
+      project,
+      properties,
+      resourceManagementProps,
+    ]
+  );
+
+  const removeSharedAnimationModel = React.useCallback(
+    (resourceIndex: number, resourceName: string) => {
+      model3DConfiguration.removeSharedAnimationModelResource(resourceIndex);
+      for (
+        let animationIndex = model3DConfiguration.getAnimationsCount() - 1;
+        animationIndex >= 0;
+        animationIndex--
+      ) {
+        if (
+          model3DConfiguration
+            .getAnimation(animationIndex)
+            .getSourceModelResourceName() === resourceName
+        ) {
+          model3DConfiguration.removeAnimation(animationIndex);
+        }
+      }
+      forceUpdate();
+      onSizeUpdated();
+      if (onObjectUpdated) onObjectUpdated();
+      resourceManagementProps.onResourceUsageChanged();
+    },
+    [
+      forceUpdate,
+      model3DConfiguration,
+      onObjectUpdated,
+      onSizeUpdated,
+      resourceManagementProps,
+    ]
+  );
+
+  const animationSourceModels: Array<{|
+    resourceName: string,
+    resourceLabel: string,
+    gltf: GLTF,
+  |}> = React.useMemo(
+    () => {
+      if (!gltf) return [];
+      const primaryModelResourceName = properties
+        .get('modelResourceName')
+        .getValue();
+      const sourceModels = [
+        {
+          resourceName: '',
+          resourceLabel: primaryModelResourceName,
+          gltf,
+        },
+      ];
+      const resourceNames: Array<string> = JSON.parse(
+        sharedAnimationModelResourcesKey
+      );
+      for (const resourceName of resourceNames) {
+        const loadState = sharedAnimationModelLoadStates[resourceName];
+        const validation = sharedAnimationModelRigValidations[resourceName];
+        if (
+          loadState &&
+          loadState.gltf &&
+          validation &&
+          validation.isMatching
+        ) {
+          sourceModels.push({
+            resourceName,
+            resourceLabel: resourceName,
+            gltf: loadState.gltf,
+          });
+        }
+      }
+      return sourceModels;
+    },
+    [
+      gltf,
+      properties,
+      sharedAnimationModelLoadStates,
+      sharedAnimationModelResourcesKey,
+      sharedAnimationModelRigValidations,
+    ]
+  );
+
   const scanNewAnimations = React.useCallback(
     () => {
-      if (!gltf) {
+      if (!animationSourceModels.length) {
         return;
       }
       setNameErrors({});
@@ -329,27 +765,40 @@ const Model3DEditor = ({
       const animationSources = mapFor(
         0,
         model3DConfiguration.getAnimationsCount(),
-        animationIndex =>
-          model3DConfiguration.getAnimation(animationIndex).getSource()
+        animationIndex => {
+          const animation = model3DConfiguration.getAnimation(animationIndex);
+          return getAnimationSourceValue(
+            animation.getSourceModelResourceName(),
+            animation.getSource()
+          );
+        }
       );
 
       let hasAddedAnimation = false;
-      for (const resourceAnimation of gltf.animations) {
-        if (animationSources.includes(resourceAnimation.name)) {
-          continue;
-        }
-        const newAnimationName = model3DConfiguration.hasAnimationNamed(
-          resourceAnimation.name
-        )
-          ? ''
-          : resourceAnimation.name;
+      for (const sourceModel of animationSourceModels) {
+        for (const resourceAnimation of sourceModel.gltf.animations) {
+          const animationSource = getAnimationSourceValue(
+            sourceModel.resourceName,
+            resourceAnimation.name
+          );
+          if (animationSources.includes(animationSource)) {
+            continue;
+          }
+          const newAnimationName = model3DConfiguration.hasAnimationNamed(
+            resourceAnimation.name
+          )
+            ? ''
+            : resourceAnimation.name;
 
-        const newAnimation = new gd.Model3DAnimation();
-        newAnimation.setName(newAnimationName);
-        newAnimation.setSource(resourceAnimation.name);
-        model3DConfiguration.addAnimation(newAnimation);
-        newAnimation.delete();
-        hasAddedAnimation = true;
+          const newAnimation = new gd.Model3DAnimation();
+          newAnimation.setName(newAnimationName);
+          newAnimation.setSource(resourceAnimation.name);
+          newAnimation.setSourceModelResourceName(sourceModel.resourceName);
+          model3DConfiguration.addAnimation(newAnimation);
+          newAnimation.delete();
+          animationSources.push(animationSource);
+          hasAddedAnimation = true;
+        }
       }
       if (hasAddedAnimation) {
         forceUpdate();
@@ -368,13 +817,13 @@ const Model3DEditor = ({
       } else {
         showAlert({
           title: t`No new animation`,
-          message: t`Every animation from the GLB file is already in the list.`,
+          message: t`Every animation from the compatible GLB files is already in the list.`,
         });
       }
     },
     [
       forceUpdate,
-      gltf,
+      animationSourceModels,
       model3DConfiguration,
       onObjectUpdated,
       onSizeUpdated,
@@ -495,18 +944,44 @@ const Model3DEditor = ({
     ]
   );
 
-  const sourceSelectOptions = gltf
-    ? gltf.animations.map(animation => {
-        return (
-          <SelectOption
-            key={animation.name}
-            value={animation.name}
-            label={animation.name}
-            shouldNotTranslate
-          />
-        );
-      })
-    : [];
+  const sourceSelectOptions = [];
+  const primaryModelResourceName = properties
+    .get('modelResourceName')
+    .getValue();
+  for (const sourceModel of animationSourceModels) {
+    sourceModel.gltf.animations.forEach((animation, animationIndex) => {
+      const animationLabel =
+        animation.name || `Animation ${animationIndex + 1}`;
+      const value = getAnimationSourceValue(
+        sourceModel.resourceName,
+        animation.name
+      );
+      sourceSelectOptions.push(
+        <SelectOption
+          key={`${value}-${animationIndex}`}
+          value={value}
+          label={`${sourceModel.resourceLabel} · ${animationLabel}`}
+          shouldNotTranslate
+        />
+      );
+    });
+  }
+
+  const normalizedAnimationNameFilter = animationNameFilter
+    .trim()
+    .toLowerCase();
+  const animationsCount = model3DConfiguration.getAnimationsCount();
+  const filteredAnimationIndexes = mapFor(
+    0,
+    animationsCount,
+    animationIndex => animationIndex
+  ).filter(animationIndex =>
+    model3DConfiguration
+      .getAnimation(animationIndex)
+      .getName()
+      .toLowerCase()
+      .includes(normalizedAnimationNameFilter)
+  );
 
   return (
     <>
@@ -519,16 +994,100 @@ const Model3DEditor = ({
             floatingLabelText={properties.get('modelResourceName').getLabel()}
             resourceManagementProps={resourceManagementProps}
             projectScopedContainersAccessor={projectScopedContainersAccessor}
-            resourceName={properties.get('modelResourceName').getValue()}
+            resourceName={primaryModelResourceName}
             onChange={newValue => {
               pendingScaleForReplacedModel.current =
                 scale !== null && Number.isFinite(scale) ? scale : 1;
               onChangeProperty('modelResourceName', newValue);
+              for (
+                let resourceIndex =
+                  model3DConfiguration.getSharedAnimationModelResourcesCount() -
+                  1;
+                resourceIndex >= 0;
+                resourceIndex--
+              ) {
+                if (
+                  model3DConfiguration.getSharedAnimationModelResourceName(
+                    resourceIndex
+                  ) === newValue
+                ) {
+                  model3DConfiguration.removeSharedAnimationModelResource(
+                    resourceIndex
+                  );
+                }
+              }
+              for (
+                let animationIndex = 0;
+                animationIndex < model3DConfiguration.getAnimationsCount();
+                animationIndex++
+              ) {
+                const animation = model3DConfiguration.getAnimation(
+                  animationIndex
+                );
+                if (animation.getSourceModelResourceName() === newValue) {
+                  animation.setSourceModelResourceName('');
+                }
+              }
               loadGltf(newValue);
               forceUpdate();
             }}
             id={`model3d-object-modelResourceName`}
           />
+          <Column noMargin expand>
+            <Line noMargin expand alignItems="center">
+              <Column noMargin expand>
+                <Text size="block-title" noMargin>
+                  <Trans>Share animations from models (optional)</Trans>
+                </Text>
+                <Text size="body-small" color="secondary" noMargin>
+                  <Trans>
+                    Reuse animations from GLB models with the same rig.
+                  </Trans>
+                </Text>
+              </Column>
+              <FlatButton
+                label={<Trans>Add models</Trans>}
+                leftIcon={<Add />}
+                primary
+                disabled={!modelResourceSources.length}
+                onClick={addSharedAnimationModels}
+              />
+            </Line>
+            {sharedAnimationModelResourceNames.length > 0 && (
+              <React.Fragment>
+                <div style={styles.sharedAnimationModelsList}>
+                  {sharedAnimationModelResourceNames.map(
+                    (resourceName, resourceIndex) => (
+                      <SharedAnimationModelRow
+                        key={resourceName}
+                        resourceName={resourceName}
+                        loadState={sharedAnimationModelLoadStates[resourceName]}
+                        validation={
+                          sharedAnimationModelRigValidations[resourceName]
+                        }
+                        onRemove={() =>
+                          removeSharedAnimationModel(
+                            resourceIndex,
+                            resourceName
+                          )
+                        }
+                      />
+                    )
+                  )}
+                </div>
+                <AlertMessage
+                  kind="info"
+                  renderLeftIcon={() => <ShieldChecked />}
+                >
+                  <Trans>
+                    Rig validation checks bone names, hierarchy, and bind pose
+                    against
+                  </Trans>{' '}
+                  {primaryModelResourceName}.
+                </AlertMessage>
+              </React.Fragment>
+            )}
+          </Column>
           <Text size="block-title" noMargin>
             <Trans>Default orientation</Trans>
           </Text>
@@ -638,7 +1197,21 @@ const Model3DEditor = ({
             objectConfiguration={objectConfiguration}
             propertyName="isReceivingShadow"
           />
-          <Text size="block-title">Animations</Text>
+          <Line noMargin alignItems="center">
+            <Text size="block-title">
+              <Trans>Animations</Trans> ({animationsCount})
+            </Text>
+            <Spacer />
+            <SemiControlledTextField
+              id="model3d-animation-name-filter"
+              margin="none"
+              value={animationNameFilter}
+              onChange={setAnimationNameFilter}
+              translatableHintText={t`Filter animations by name`}
+              style={styles.animationNameFilter}
+              disabled={animationsCount === 0}
+            />
+          </Line>
           <Column noMargin expand>
             <PropertyField
               objectConfiguration={objectConfiguration}
@@ -646,7 +1219,7 @@ const Model3DEditor = ({
             />
           </Column>
           <Column noMargin expand useFullHeight>
-            {model3DConfiguration.getAnimationsCount() === 0 ? (
+            {animationsCount === 0 ? (
               <Column noMargin expand justifyContent="center">
                 <EmptyPlaceholder
                   title={<Trans>Add your first animation</Trans>}
@@ -661,10 +1234,12 @@ const Model3DEditor = ({
               </Column>
             ) : (
               <React.Fragment>
-                {mapFor(
-                  0,
-                  model3DConfiguration.getAnimationsCount(),
-                  animationIndex => {
+                {filteredAnimationIndexes.length === 0 ? (
+                  <EmptyMessage>
+                    <Trans>No animations match this filter.</Trans>
+                  </EmptyMessage>
+                ) : (
+                  filteredAnimationIndexes.map(animationIndex => {
                     const animation = model3DConfiguration.getAnimation(
                       animationIndex
                     );
@@ -745,15 +1320,24 @@ const Model3DEditor = ({
                               <ColumnStackLayout expand>
                                 <SelectField
                                   id="animation-source-field"
-                                  value={animation.getSource()}
+                                  value={getAnimationSourceValue(
+                                    animation.getSourceModelResourceName(),
+                                    animation.getSource()
+                                  )}
                                   onChange={(event, value) => {
-                                    animation.setSource(event.target.value);
+                                    const source = parseAnimationSourceValue(
+                                      event.target.value
+                                    );
+                                    animation.setSource(source.animationName);
+                                    animation.setSourceModelResourceName(
+                                      source.resourceName
+                                    );
                                     forceUpdate();
                                   }}
                                   margin="dense"
                                   fullWidth
                                   floatingLabelText={
-                                    <Trans>GLB animation name</Trans>
+                                    <Trans>GLB animation source</Trans>
                                   }
                                   translatableHintText={t`Choose an animation`}
                                 >
@@ -773,7 +1357,7 @@ const Model3DEditor = ({
                         }
                       </DragSourceAndDropTarget>
                     );
-                  }
+                  })
                 )}
               </React.Fragment>
             )}

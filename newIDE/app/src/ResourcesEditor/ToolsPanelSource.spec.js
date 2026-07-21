@@ -125,6 +125,31 @@ describe('ToolsPanel source policies', () => {
     );
   });
 
+  it('saves split spritesheets in a named project assets folder', () => {
+    const source = getSource();
+    const runLocalImageToolStart = source.indexOf('const runLocalImageTool');
+    const renderLocalImageToolsStart = source.indexOf(
+      'const renderLocalImageTools ='
+    );
+    const runLocalImageToolSection = source.slice(
+      runLocalImageToolStart,
+      renderLocalImageToolsStart
+    );
+
+    expect(runLocalImageToolSection).toContain(
+      "localImageOperation === 'split-spritesheet'"
+    );
+    expect(runLocalImageToolSection).toContain(
+      "path.join(projectRootPath, 'assets')"
+    );
+    expect(runLocalImageToolSection).toContain(
+      'getLocalImageSplitOutputFolderName(imageAttachment.name)'
+    );
+    expect(runLocalImageToolSection).toContain(
+      'getLocalImageSplitFileName(index + 1)'
+    );
+  });
+
   it('selects the Local tools operation with a dropdown', () => {
     const source = getSource();
     const renderLocalImageToolsStart = source.indexOf(
@@ -157,6 +182,8 @@ describe('ToolsPanel source policies', () => {
     expect(operationSelectorSection).toContain('value={localImageOperation}');
     expect(operationSelectorSection).toContain('value="crop"');
     expect(operationSelectorSection).toContain('value="expand-canvas"');
+    expect(operationSelectorSection).toContain('value="split-spritesheet"');
+    expect(operationSelectorSection).toContain('Split spritesheet');
     expect(operationSelectorSection).not.toContain('<FlatButton');
   });
 });

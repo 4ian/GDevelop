@@ -1,8 +1,13 @@
 // @flow
 
+jest.mock('three/src/math/MathUtils', () => ({
+  generateUUID: () => 'test-uuid',
+}));
+
 import { insertNewEventsBasedObject } from './CreateEventsBasedObject';
 import { insertNewEventsBasedBehavior } from './CreateEventsBasedBehavior';
 import { initializeEventsFunctionDisplayName } from './InitializeEventsFunction';
+import { EventsFunctionTreeViewItemContent } from './EventsFunctionTreeViewItemContent';
 import { enumerateObjectTypes } from '../ObjectsList/EnumerateObjects';
 import { enumerateBehaviorsMetadata } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { reloadProjectEventsFunctionsExtensionMetadata } from '../EventsFunctionsExtensionsLoader';
@@ -104,6 +109,51 @@ describe('EventsFunctionsList extension entity creation', () => {
     ).toBe('Calculate');
 
     gd.JsPlatform.get().removeExtension(extensionName);
+    project.delete();
+  });
+});
+
+describe('EventsFunctionsList function menu', () => {
+  it('opens the settings for the selected function', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const extension = project.insertNewEventsFunctionsExtension(
+      'FunctionMenuTest',
+      0
+    );
+    const eventsFunctionsContainer = extension.getEventsFunctions();
+    const eventsFunction = eventsFunctionsContainer.insertNewEventsFunctionInFolder(
+      'TestFunction',
+      eventsFunctionsContainer.getRootFolder(),
+      0
+    );
+    const onOpenEventsFunctionSettings = jest.fn();
+    const itemContent = new EventsFunctionTreeViewItemContent(
+      eventsFunctionsContainer.getRootFolder().getChildAt(0),
+      ({
+        eventsFunctionsContainer,
+        eventsBasedBehavior: null,
+        eventsBasedObject: null,
+        onOpenEventsFunctionSettings,
+        addFolder: jest.fn(),
+        onMovedFunctionFolderOrFunctionToAnotherFolderInSameContainer: jest.fn(),
+      }: any)
+    );
+    const i18n = ({
+      _: message => (typeof message === 'string' ? message : message.id),
+    }: any);
+
+    const functionSettingsMenuItem: any = itemContent.buildMenuTemplate(
+      i18n,
+      0
+    )[0];
+    expect(functionSettingsMenuItem.label).toBe('Function settings');
+    functionSettingsMenuItem.click();
+    expect(onOpenEventsFunctionSettings).toHaveBeenCalledWith(
+      eventsFunction,
+      null,
+      null
+    );
+
     project.delete();
   });
 });

@@ -1862,6 +1862,25 @@ namespace gdjs {
       destroyBody() {
         this.characterBehavior._destroyBody();
       }
+
+      getDebugCollisionMaskSource(): gdjs.Physics3DRuntimeBehavior.DebugCollisionMaskSource | null {
+        const character = this.characterBehavior.character;
+        if (!character) {
+          return null;
+        }
+        const position = character.GetPosition();
+        const rotation = character.GetRotation();
+        return {
+          shape: character.GetShape(),
+          positionX: position.GetX(),
+          positionY: position.GetY(),
+          positionZ: position.GetZ(),
+          rotationX: rotation.GetX(),
+          rotationY: rotation.GetY(),
+          rotationZ: rotation.GetZ(),
+          rotationW: rotation.GetW(),
+        };
+      }
     }
 
     /**

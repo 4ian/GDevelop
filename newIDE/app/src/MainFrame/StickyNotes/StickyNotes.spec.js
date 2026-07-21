@@ -363,9 +363,6 @@ describe('StickyNotes', () => {
     expect(projectFilesPanelSource).toContain(
       'ignoredDirectoryNames.has(name)'
     );
-    expect(projectFilesPanelSource).toContain('ignoredFileNames.has(name)');
-    expect(localFileResourcesWatcherSource).toContain(
-      "path.sep + '.gdevelop'"
-    );
+    expect(localFileResourcesWatcherSource).toContain("path.sep + '.gdevelop'");
   });
 });

@@ -25,6 +25,7 @@ import {
   applyResourceDefaults,
   copyAllToProjectFolder,
   DEFAULT_IMPORTED_RESOURCES_FOLDER,
+  isURL,
 } from './ResourceUtils';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 
@@ -64,6 +65,21 @@ const hasNativeFileDragData = (dataTransferTypes: any): boolean => {
   }
 
   return false;
+};
+
+export const hasDroppedResourceFileData = (
+  dataTransfer: ?DataTransfer | any,
+  resourceKind: ResourceKind
+): boolean => {
+  if (!dataTransfer) return false;
+
+  const dataTransferTypes = dataTransfer.types || [];
+  return (
+    hasNativeFileDragData(dataTransferTypes) ||
+    hasProjectFileDragData(dataTransferTypes) ||
+    getDroppedResourceFilePathsFromDataTransfer(dataTransfer, resourceKind)
+      .length > 0
+  );
 };
 
 const getLocalPathFromNativeFile = (file: any, webUtils: any): ?string => {
@@ -150,12 +166,40 @@ export const importDroppedResourceFileAsProjectResource = async ({
     );
   }
 
+  const projectPath = path.dirname(projectFile);
+  const normalizedFilePath = path.resolve(filePath);
+  const resourcesManager = project.getResourcesManager();
+  const existingResourceName = resourcesManager
+    .getAllResourceNames()
+    .toJSArray()
+    .find(resourceName => {
+      const resource = resourcesManager.getResource(resourceName);
+      const resourceFile = resource.getFile();
+      if (
+        resource.getKind() !== resourceKind ||
+        !resourceFile ||
+        isURL(resourceFile)
+      ) {
+        return false;
+      }
+
+      const resourceFilePath = path.isAbsolute(resourceFile)
+        ? resourceFile
+        : path.join(projectPath, resourceFile);
+      return path.resolve(resourceFilePath) === normalizedFilePath;
+    });
+  if (existingResourceName) {
+    return {
+      resourceName: existingResourceName,
+      hasCreatedResource: false,
+    };
+  }
+
   const createNewResource = getResourceCreator(resourceKind);
   if (!createNewResource) {
     throw new Error(`Resource kind "${resourceKind}" is not supported.`);
   }
 
-  const projectPath = path.dirname(projectFile);
   const newToOldFilePaths = new Map<string, string>();
   const [resourceFilePath] = await copyAllToProjectFolder(
     project,
@@ -170,9 +214,7 @@ export const importDroppedResourceFileAsProjectResource = async ({
   resource.setFile(resourceName);
   resource.setName(resourceName);
   applyResourceDefaults(project, resource);
-  const hasCreatedResource = project
-    .getResourcesManager()
-    .addResource(resource);
+  const hasCreatedResource = resourcesManager.addResource(resource);
   resource.delete();
 
   return { resourceName, hasCreatedResource };
@@ -235,13 +277,7 @@ const ResourceSelectorWithThumbnail = ({
       const dataTransfer = event.dataTransfer;
       if (!dataTransfer) return false;
 
-      const dataTransferTypes = dataTransfer.types || [];
-      return (
-        hasNativeFileDragData(dataTransferTypes) ||
-        hasProjectFileDragData(dataTransferTypes) ||
-        getDroppedResourceFilePathsFromDataTransfer(dataTransfer, resourceKind)
-          .length > 0
-      );
+      return hasDroppedResourceFileData(dataTransfer, resourceKind);
     },
     [canDropResourceFiles, resourceKind]
   );

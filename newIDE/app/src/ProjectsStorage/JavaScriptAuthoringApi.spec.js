@@ -106,6 +106,12 @@ describe('JavaScript authoring API', () => {
     expect(declaration).toContain('addPolarForce');
     expect(declaration).toContain('resetTimer(name: string)');
     expect(declaration).toContain('setCameraX(value: number');
+    expect(declaration).toContain(
+      'Return the live, engine-owned array of living instances'
+    );
+    expect(declaration).toContain(
+      'iterate backward when calling deleteFromScene()'
+    );
     expect(declaration).not.toContain('_instances');
     expect(declaration).not.toContain('_behaviorData');
     expect(declaration).not.toContain('evtsExt__');

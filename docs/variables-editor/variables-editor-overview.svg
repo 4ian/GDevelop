@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="660" viewBox="0 0 1040 660" font-family="Inter, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <style>
+      .t{fill:#F3F3F7}.m{fill:#9A9AAB}.mm{fill:#6E6E80}
+      .sub{font-size:11px;letter-spacing:.3px}
+      .mono{font-family:'SF Mono',Menlo,monospace}
+    </style>
+  </defs>
+  <rect width="1040" height="660" fill="#0E0E15"/>
+
+  <!-- ===== DIALOG SHELL ===== -->
+  <rect x="24" y="20" width="992" height="620" rx="14" fill="#16161F" stroke="#2E2E3C" stroke-width="1"/>
+
+  <!-- dynamic title -->
+  <text x="48" y="58" class="t" font-size="21" font-weight="700">Variables in Scene: Game</text>
+  <text x="980" y="56" class="m" font-size="18" text-anchor="end">✕</text>
+  <line x1="24" y1="82" x2="1016" y2="82" stroke="#2E2E3C" stroke-width="1"/>
+
+  <!-- ===== TOOLBAR (full width; no scope selector) ===== -->
+  <rect x="48" y="98" width="88" height="30" rx="7" fill="#4A3AA0"/><text x="92" y="118" fill="#E7DEFF" font-size="12.5" text-anchor="middle" font-weight="600">＋ Add</text>
+  <rect x="144" y="98" width="30" height="30" rx="6" fill="#22222E"/><text x="159" y="118" class="t" font-size="13" text-anchor="middle">⧉</text>
+  <rect x="178" y="98" width="30" height="30" rx="6" fill="#22222E"/><text x="193" y="118" class="t" font-size="13" text-anchor="middle">🗑</text>
+  <rect x="212" y="98" width="30" height="30" rx="6" fill="#22222E"/><text x="227" y="118" class="t" font-size="13" text-anchor="middle">↶</text>
+  <rect x="246" y="98" width="30" height="30" rx="6" fill="#22222E"/><text x="261" y="118" class="t" font-size="13" text-anchor="middle">↷</text>
+  <rect x="792" y="98" width="200" height="30" rx="7" fill="#26263A"/>
+  <circle cx="810" cy="113" r="5.5" fill="none" stroke="#7C7C90" stroke-width="1.6"/><line x1="814" y1="117" x2="818" y2="121" stroke="#7C7C90" stroke-width="1.6"/>
+  <text x="826" y="117" class="m" font-size="12">Search name, path, or value</text>
+
+  <line x1="48" y1="146" x2="992" y2="146" stroke="#2E2E3C" stroke-width="1"/>
+
+  <!-- ===== COLUMN HEADERS ===== -->
+  <text x="60" y="170" class="mm sub" font-weight="700">SCOPE</text>
+  <path d="M112,163 l5,5 l5,-5" fill="none" stroke="#9D8BFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="220" y="170" class="mm sub" font-weight="700">NAME</text>
+  <text x="640" y="170" class="mm sub" font-weight="700">TYPE</text>
+  <text x="740" y="170" class="mm sub" font-weight="700">VALUE</text>
+
+  <!-- ===== ALL-SCOPES LIST ===== -->
+  <!-- score (Scene) -->
+  <rect x="56" y="188" width="60" height="20" rx="5" fill="#33333F"/><text x="86" y="202" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="600">Scene</text>
+  <text x="182" y="201" class="mm" font-size="12">⋮⋮</text>
+  <text x="220" y="201" class="t" font-size="13.5">score</text>
+  <rect x="632" y="189" width="30" height="20" rx="5" fill="#2B3B58"/><text x="647" y="203" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="700">#</text>
+  <rect x="736" y="188" width="256" height="22" rx="6" fill="#26263A"/><text x="748" y="203" class="t mono" font-size="12">0</text>
+
+  <!-- difficulty (Global) -->
+  <rect x="56" y="224" width="60" height="20" rx="5" fill="#2B3B58"/><text x="86" y="238" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="600">Global</text>
+  <text x="182" y="237" class="mm" font-size="12">⋮⋮</text>
+  <text x="220" y="237" class="t" font-size="13.5">difficulty</text>
+  <rect x="632" y="225" width="30" height="20" rx="5" fill="#2B3B58"/><text x="647" y="239" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="700">#</text>
+  <rect x="736" y="224" width="256" height="22" rx="6" fill="#26263A"/><text x="748" y="239" class="t mono" font-size="12">2</text>
+
+  <!-- playerName (Scene) -->
+  <rect x="56" y="260" width="60" height="20" rx="5" fill="#33333F"/><text x="86" y="274" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="600">Scene</text>
+  <text x="182" y="273" class="mm" font-size="12">⋮⋮</text>
+  <text x="220" y="273" class="t" font-size="13.5">playerName</text>
+  <rect x="632" y="261" width="30" height="20" rx="5" fill="#33333F"/><text x="647" y="275" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="700">T</text>
+  <rect x="736" y="260" width="232" height="22" rx="6" fill="#26263A"/><text x="748" y="275" class="t mono" font-size="12">Knight</text>
+  <rect x="968" y="260" width="24" height="22" rx="6" fill="#2C2340"/><text x="980" y="275" fill="#9D8BFF" font-size="12" text-anchor="middle">⤢</text>
+
+  <!-- stats (Scene, selected, expanded) -->
+  <rect x="48" y="288" width="944" height="30" rx="8" fill="#7B61FF" fill-opacity="0.16"/>
+  <rect x="48" y="288" width="3" height="30" rx="1.5" fill="#7B61FF"/>
+  <rect x="56" y="293" width="60" height="20" rx="5" fill="#33333F"/><text x="86" y="307" class="sub" fill="#C7C7D2" text-anchor="middle" font-weight="600">Scene</text>
+  <text x="182" y="308" class="mm" font-size="12">⋮⋮</text>
+  <text x="202" y="308" class="t" font-size="13">▾</text>
+  <text x="220" y="308" class="t" font-size="13.5" font-weight="700">stats</text>
+  <rect x="632" y="296" width="30" height="20" rx="5" fill="#4A3C1E"/><text x="647" y="310" class="sub" fill="#E7C285" text-anchor="middle" font-weight="700">{}</text>
+  <text x="736" y="308" class="mm mono" font-size="12">3 items</text>
+  <rect x="968" y="296" width="24" height="20" rx="6" fill="#2C2340"/><text x="980" y="310" fill="#9D8BFF" font-size="14" text-anchor="middle" font-weight="700">＋</text>
+
+  <!-- child speed (dimmed scope) -->
+  <line x1="230" y1="324" x2="230" y2="352" stroke="#33333F" stroke-width="1"/>
+  <text x="60" y="344" class="mm sub" opacity="0.5">Scene</text>
+  <text x="246" y="344" class="t" font-size="13">speed</text>
+  <rect x="632" y="332" width="30" height="20" rx="5" fill="#2B3B58"/><text x="647" y="346" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="700">#</text>
+  <rect x="736" y="331" width="256" height="22" rx="6" fill="#26263A"/><text x="748" y="346" class="t mono" font-size="12">400</text>
+
+  <!-- health (Player) -->
+  <rect x="56" y="368" width="60" height="20" rx="5" fill="#4A3C1E"/><text x="86" y="382" class="sub" fill="#E7C285" text-anchor="middle" font-weight="600">Player</text>
+  <text x="182" y="381" class="mm" font-size="12">⋮⋮</text>
+  <text x="220" y="381" class="t" font-size="13.5">health</text>
+  <rect x="632" y="369" width="30" height="20" rx="5" fill="#2B3B58"/><text x="647" y="383" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="700">#</text>
+  <rect x="736" y="368" width="256" height="22" rx="6" fill="#26263A"/><text x="748" y="383" class="t mono" font-size="12">100</text>
+
+  <!-- patrolRadius (Enemy) -->
+  <rect x="56" y="404" width="60" height="20" rx="5" fill="#3A2E4A"/><text x="86" y="418" class="sub" fill="#CBB6E6" text-anchor="middle" font-weight="600">Enemy</text>
+  <text x="182" y="417" class="mm" font-size="12">⋮⋮</text>
+  <text x="220" y="417" class="t" font-size="13.5">patrolRadius</text>
+  <rect x="632" y="405" width="30" height="20" rx="5" fill="#2B3B58"/><text x="647" y="419" class="sub" fill="#9DC0F0" text-anchor="middle" font-weight="700">#</text>
+  <rect x="736" y="404" width="256" height="22" rx="6" fill="#26263A"/><text x="748" y="419" class="t mono" font-size="12">250</text>
+
+  <!-- callout -->
+  <rect x="48" y="450" width="944" height="98" rx="10" fill="#20202B" stroke="#2E2E3C" stroke-width="1"/>
+  <rect x="48" y="450" width="4" height="98" rx="2" fill="#7B61FF"/>
+  <text x="68" y="476" class="t" font-size="12.5" font-weight="700">Every scope in one list · Scope column · no dropdown, no tabs, no side panel</text>
+  <text x="68" y="498" class="m" font-size="12">The leftmost Scope column shows each row's container. All scopes are visible together — Scene, Global, and each object.</text>
+  <text x="68" y="517" class="m" font-size="12">Optional filter lives on the “SCOPE ▾” column header. Group order: Scene · Global · objects (or Prefab/Behavior · Ext Scene/Global · objects).</text>
+  <text x="68" y="536" class="mm" font-size="11.5">Title names the context: “Variables in Scene: Game”. Child rows inherit their parent's scope (shown dimmed). Prefab vars are private.</text>
+
+  <!-- ===== FOOTER ===== -->
+  <line x1="24" y1="600" x2="1016" y2="600" stroke="#2E2E3C" stroke-width="1"/>
+  <rect x="48" y="610" width="150" height="30" rx="7" fill="#22222E" stroke="#3A3A4C" stroke-width="1"/><text x="123" y="630" class="t" font-size="12.5" text-anchor="middle">▷ Run a preview</text>
+  <text x="220" y="630" class="m" font-size="12.5">？ Help</text>
+  <rect x="790" y="610" width="90" height="30" rx="7" fill="#22222E" stroke="#3A3A4C" stroke-width="1"/><text x="835" y="630" class="t" font-size="12.5" text-anchor="middle">Cancel</text>
+  <rect x="890" y="610" width="90" height="30" rx="7" fill="#4A3AA0"/><text x="935" y="630" fill="#E7DEFF" font-size="12.5" text-anchor="middle" font-weight="600">Apply</text>
+</svg>

@@ -230,6 +230,15 @@ const BehaviorConfigurationEditor = React.forwardRef<
     }
 
     const expanded = !behavior.isFolded();
+    const inheritedBadge = isInheritedFromObjectType ? (
+      <Chip
+        size="small"
+        label={<Trans>inherited</Trans>}
+        color="secondary"
+        variant="outlined"
+        style={{ marginLeft: 8, height: 22 }}
+      />
+    ) : null;
 
     const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
       gd.JsPlatform.get(),
@@ -263,6 +272,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
             <Column noMargin expand>
               <TextField margin="none" value={behaviorName} disabled />
             </Column>
+            {inheritedBadge}
           </AccordionHeader>
           <AccordionBody>
             <EmptyMessage>
@@ -394,6 +404,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
               id={`behavior-${behaviorName}-name-text-field`}
             />
           </Column>
+          {inheritedBadge}
           {shouldShowMutedBadge ? (
             <Chip
               size="small"

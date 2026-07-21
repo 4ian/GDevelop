@@ -2,6 +2,8 @@
 
 import {
   ProjectSourceCatalogError,
+  buildBehaviorPropertySchemasByType,
+  buildProjectLayoutCatalog,
   buildProjectSettingsCatalog,
   serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
@@ -56,9 +58,13 @@ describe('project source catalogs', () => {
   test('validates and compactly serializes a layout catalog', () => {
     const catalog = {
       ...base('gdevelop-layout-catalog'),
-      elements: [
-        { element: 'layout' },
-        { element: 'layer', variant: 'external reference' },
+      tables: [
+        { table: 'layout', header: '[layout]' },
+        {
+          table: 'layers',
+          header: '[[layers]]',
+          variant: 'external reference',
+        },
       ],
       contexts: [
         {
@@ -92,12 +98,62 @@ describe('project source catalogs', () => {
     expect(() =>
       validateProjectLayoutCatalog({
         ...base('gdevelop-layout-catalog'),
-        elements: [{ element: 'layout' }],
+        tables: [{ table: 'layout', header: '[layout]' }],
         contexts: [{ kind: 'scene' }],
         effectTypes: [],
         behaviorOverrideSchemas: [],
       })
     ).toThrow(ProjectSourceCatalogError);
+  });
+
+  test('generates the flat layout TOML authoring schema', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const catalog = buildProjectLayoutCatalog({
+      project,
+      serializedProject: {
+        objects: [],
+        layouts: [],
+        externalLayouts: [],
+        eventsFunctionsExtensions: [],
+      },
+      effectTypes: [],
+      behaviorTypes: [],
+    });
+
+    expect(catalog.authoring.syntax).toContain('Standard flat TOML');
+    expect(catalog.tables.map(table => table.header)).toEqual([
+      '[layout]',
+      '[editor]',
+      '[[layers]]',
+      '[[layers]]',
+      '[[effects]]',
+      '[[instances]]',
+      '[[variables]]',
+      '[[behaviors]]',
+    ]);
+    expect(
+      catalog.tables.find(table => table.table === 'editor').fields
+    ).toContainEqual(
+      expect.objectContaining({ name: 'selected_layer_unresolved' })
+    );
+    expect(
+      catalog.tables.find(table => table.table === 'instances').fields
+    ).toContainEqual(expect.objectContaining({ name: 'properties' }));
+    const effectTable = catalog.tables.find(table => table.table === 'effects');
+    expect(effectTable.fields).not.toContainEqual(
+      expect.objectContaining({ name: 'params' })
+    );
+    expect(effectTable.parameterFields).toEqual({
+      placement: 'direct fields on [[effects]]',
+      schema: 'effectTypes[type].parameters',
+      scalarTypes: ['number', 'string', 'boolean'],
+    });
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'Effect parameters are direct fields on [[effects]]'
+    );
+    expect(catalog.counts.tables).toBe(catalog.tables.length);
+    expect(catalog).not.toHaveProperty('elements');
+    project.delete();
   });
 
   test('reads project behavior details from serialized definitions instead of volatile metadata wrappers', () => {
@@ -176,6 +232,7 @@ describe('project source catalogs', () => {
         }),
       ])
     );
+    expect(platformerEntry.unknownPropertyPolicy).toBe('preserve');
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
     ).toMatchObject({
@@ -197,10 +254,10 @@ describe('project source catalogs', () => {
       'folder = ["Parent", "Child"]'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Controllers = [{ type = "array"'
+      'name = "Controllers", type = "array"'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Never write a whole variable container as variables = { ... }'
+      'Keyed [variables] tables'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
       '[objectGroups] TOML table'
@@ -212,10 +269,10 @@ describe('project source catalogs', () => {
       'originPoint and centerPoint as inline TOML tables'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Editor-hidden behavior descriptors'
+      'Editor-hidden and deprecated descriptors'
     );
     expect(catalog.authoring.behaviorDefinition).toContain(
-      'Never serialize editor-hidden properties'
+      'Preserve unlisted serialized properties'
     );
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
@@ -230,14 +287,15 @@ describe('project source catalogs', () => {
         .commonFields
     ).not.toContain('objectsGroups');
     expect(catalog.authoring.variableDefinition).toContain(
-      'does not repeat name'
+      'Every record contains name'
     );
-    expect(catalog.authoring.variableDefinition).toContain('[variables]');
+    expect(catalog.authoring.variableDefinition).toContain('[[variables]]');
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );
 
     expect(entry).toBeDefined();
+    expect(entry.unknownPropertyPolicy).toBe('preserve');
     expect(entry.properties).toEqual([
       {
         name: 'Speed',
@@ -260,6 +318,15 @@ describe('project source catalogs', () => {
     expect(entry.properties.map(property => property.name)).not.toContain(
       'Internal'
     );
+    expect(buildBehaviorPropertySchemasByType(catalog)[behaviorType]).toEqual(
+      expect.objectContaining({
+        unknownPropertyPolicy: 'preserve',
+        properties: expect.not.arrayContaining([
+          expect.objectContaining({ serializedKey: 'Internal' }),
+        ]),
+      })
+    );
+    expect(serializeProjectSettingsCatalog(catalog)).not.toContain('Internal');
     expect(entry.requiredBehaviorTypes).toEqual([
       'PlatformBehavior::PlatformerObjectBehavior',
     ]);

@@ -33,6 +33,8 @@ import {
   writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
 import { ensureProjectHasDefaultScene } from '../../ProjectCreation/CreateProject';
+import { insertNewEventsBasedBehavior } from '../../EventsFunctionsList/CreateEventsBasedBehavior';
+import { reloadProjectEventsFunctionsExtensionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -124,7 +126,7 @@ describe('Local multi-file project storage', () => {
     );
   });
 
-  test('migrates inline variable containers and saves canonical settings during open', async () => {
+  test('rejects retired keyed variable tables without rewriting files during open', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.variables = [{ name: 'Score', type: 'number', value: 12 }];
@@ -136,14 +138,14 @@ describe('Local multi-file project storage', () => {
 
     const projectSource = fs
       .readFileSync(entryPath, 'utf8')
-      .replace(/\[variables\]\n(Score = [^\n]+)/, 'variables = { $1 }');
+      .replace('[[variables]]', '[variables]');
     const sceneSettingsPath = path.join(
       temporaryDirectory,
       'scenes/Main/scene.settings'
     );
     const sceneSource = fs
       .readFileSync(sceneSettingsPath, 'utf8')
-      .replace(/\[variables\]\n(State = [^\n]+)/, 'variables = { $1 }');
+      .replace('[[variables]]', '[variables]');
     fs.writeFileSync(entryPath, projectSource, 'utf8');
     fs.writeFileSync(sceneSettingsPath, sceneSource, 'utf8');
     const untouchedEventsPath = path.join(
@@ -152,15 +154,11 @@ describe('Local multi-file project storage', () => {
     );
     const untouchedEvents = fs.readFileSync(untouchedEventsPath, 'utf8');
 
-    const openedProject = await openMultiFileProject(entryPath);
-
-    expect(areLegacyProjectsEquivalent(project, openedProject)).toBe(true);
-    const migratedProjectSource = fs.readFileSync(entryPath, 'utf8');
-    const migratedSceneSource = fs.readFileSync(sceneSettingsPath, 'utf8');
-    expect(migratedProjectSource).toContain('[variables]\nScore = [');
-    expect(migratedSceneSource).toContain('[variables]\nState = [');
-    expect(migratedProjectSource).not.toMatch(/^variables\s*=/m);
-    expect(migratedSceneSource).not.toMatch(/^variables\s*=/m);
+    await expect(openMultiFileProject(entryPath)).rejects.toEqual(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
+    );
+    expect(fs.readFileSync(entryPath, 'utf8')).toBe(projectSource);
+    expect(fs.readFileSync(sceneSettingsPath, 'utf8')).toBe(sceneSource);
     expect(fs.readFileSync(untouchedEventsPath, 'utf8')).toBe(untouchedEvents);
   });
 
@@ -911,14 +909,14 @@ describe('Local multi-file project storage', () => {
     ).toThrow();
   });
 
-  test('uses project.settings as the default local project entry', () => {
+  test('uses the generated folder as the local project root', () => {
     expect(
       getProjectLocation({
         projectName: 'My Game',
         saveAsLocation: null,
         newProjectsDefaultFolder: temporaryDirectory,
       }).fileIdentifier
-    ).toBe(path.join(temporaryDirectory, 'My Game', 'project.settings'));
+    ).toBe(path.join(temporaryDirectory, 'project.settings'));
   });
 
   test('writes the complete AI instruction catalog in .gdevelop', async () => {
@@ -995,7 +993,7 @@ describe('Local multi-file project storage', () => {
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'scene',
-          owner: { scene: 'UntitledScene' },
+          owner: { scene: 'Game' },
           objects: expect.arrayContaining([
             expect.objectContaining({ name: 'Player', type: 'Sprite' }),
           ]),
@@ -1012,15 +1010,38 @@ describe('Local multi-file project storage', () => {
     project.setName('Reloaded catalog project');
     ensureProjectHasDefaultScene(project);
 
-    const counts = await writeProjectSourceCatalogs(
-      project,
-      temporaryDirectory
-    );
+    // A never-resolving asynchronous ensureDir reproduces the callback stall
+    // that used to strand reload_project. Generated catalogs must use the
+    // synchronous verified writer and never touch this async API.
+    const ensureDirSpy = jest
+      .spyOn(fs, 'ensureDir')
+      .mockImplementation(() => new Promise(() => {}));
+    const progressPhases = [];
+    const cachedProgressPhases = [];
 
+    let counts: Object;
+    let cachedCounts: Object;
+    try {
+      counts = await writeProjectSourceCatalogs(project, temporaryDirectory, {
+        reportProgress: phase => progressPhases.push(phase),
+      });
+      cachedCounts = await writeProjectSourceCatalogs(
+        project,
+        temporaryDirectory,
+        {
+          reportProgress: phase => cachedProgressPhases.push(phase),
+        }
+      );
+    } finally {
+      ensureDirSpy.mockRestore();
+    }
+
+    expect(ensureDirSpy).not.toHaveBeenCalled();
     expect(counts.instructions.actions).toBeGreaterThan(100);
     expect(counts.settings.objectTypes).toBeGreaterThan(5);
     expect(counts.layouts.contexts).toBe(1);
     expect(counts.javascript.counts.scenes).toBe(1);
+    expect(cachedCounts).toEqual(counts);
     expect(counts.javascript.hashes.runtimeApi).toMatch(/^[0-9a-f]{64}$/);
     expect(
       fs.existsSync(
@@ -1057,6 +1078,42 @@ describe('Local multi-file project storage', () => {
         'utf8'
       )
     ).not.toContain('_instances');
+    expect(progressPhases).toEqual([
+      'catalog-project-serializing',
+      'catalog-project-serialized',
+      'catalog-instruction-signature-building',
+      'catalog-instruction-signature-built',
+      'catalog-instructions-building',
+      'catalog-instructions-built',
+      'catalog-instructions-writing',
+      'catalog-instructions-written',
+      'catalog-deprecated-instructions-building',
+      'catalog-deprecated-instructions-built',
+      'catalog-deprecated-instructions-writing',
+      'catalog-deprecated-instructions-written',
+      'catalog-settings-building',
+      'catalog-settings-built',
+      'catalog-settings-writing',
+      'catalog-settings-written',
+      'catalog-layout-building',
+      'catalog-layout-built',
+      'catalog-layout-writing',
+      'catalog-layout-written',
+      'catalog-javascript-api-building',
+      'catalog-javascript-api-built',
+      'catalog-runtime-api-writing',
+      'catalog-runtime-api-written',
+      'catalog-project-api-writing',
+      'catalog-project-api-written',
+    ]);
+    expect(cachedProgressPhases).toContain('catalog-instructions-cache-hit');
+    expect(cachedProgressPhases).toContain(
+      'catalog-deprecated-instructions-cache-hit'
+    );
+    expect(cachedProgressPhases).not.toContain('catalog-instructions-building');
+    expect(cachedProgressPhases).not.toContain(
+      'catalog-deprecated-instructions-building'
+    );
     project.delete();
   });
 
@@ -1174,6 +1231,31 @@ column2 = "333"
     legacyProject.properties.name = 'Physics template regression';
     legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
     legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].objects = [
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics2',
+            type: 'Physics2::Physics2Behavior',
+            angularDamping: 0.1,
+            bodyType: 'Dynamic',
+            bullet: false,
+            canSleep: true,
+            density: 1,
+            fixedRotation: false,
+            friction: 0.3,
+            gravityScale: 1,
+            layers: 3,
+            linearDamping: 0.1,
+            masks: 5,
+            restitution: 0.1,
+            shape: 'Box',
+          },
+        ],
+      },
+    ];
     legacyProject.layouts[0].events = [
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -1209,14 +1291,149 @@ column2 = "333"
       );
       expect(eventsSource).toContain('do "Physics2::Remove joint"');
       expect(eventsSource).not.toContain('@exact');
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/objects/Body.settings'),
+        'utf8'
+      );
+      expect(objectSource).toContain('layers = 3');
+      expect(objectSource).toContain('masks = 5');
       const reopened = await openMultiFileProject(entryPath);
       expect(reopened.layouts[0].events[0].actions[0]).toMatchObject({
         type: { value: 'Physics2::Remove joint' },
         parameters: ['Object', 'PhysicsBehavior', 'MouseJointID'],
       });
+      expect(reopened.layouts[0].objects[0].behaviors[0]).toMatchObject({
+        type: 'Physics2::Physics2Behavior',
+        layers: 3,
+        masks: 5,
+      });
     } finally {
       project.delete();
       gd.JsPlatform.get().removeExtension('Physics2');
+    }
+  });
+
+  test('preserves hidden Physics3D behavior properties without exposing them in the catalog', async () => {
+    const gd: libGDevelop = global.gd;
+    const hiddenPhysics3DProperties = [
+      ['meshShapeResourceName', 'PrivateCollider.glb', 'PrivateCollider.glb'],
+      ['shapeOffsetX', '12', 12],
+      ['shapeOffsetY', '13', 13],
+      ['shapeOffsetZ', '14', 14],
+      ['massCenterOffsetX', '34', 34],
+      ['massCenterOffsetY', '35', 35],
+      ['massCenterOffsetZ', '36', 36],
+    ];
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const physics3DExtensionModule = require('../../../../../Extensions/Physics3DBehavior/JsExtension');
+    const physics3DExtension = physics3DExtensionModule.createExtension(
+      message => message,
+      gd
+    );
+    gd.JsPlatform.get().addNewExtension(physics3DExtension);
+    physics3DExtension.delete();
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const legacyProject = JSON.parse(JSON.stringify(projectFixture));
+    legacyProject.properties.name = 'Physics3D hidden property regression';
+    legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
+    legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].objects = [
+      {
+        name: 'Body',
+        type: 'Sprite',
+        behaviors: [
+          {
+            name: 'Physics3D',
+            type: 'Physics3D::Physics3DBehavior',
+            angularDamping: 0.1,
+            bodyType: 'Static',
+            bullet: false,
+            density: 1,
+            fixedRotation: false,
+            friction: 0.3,
+            gravityScale: 1,
+            layers: 5,
+            linearDamping: 0.1,
+            massOverride: 0,
+            masks: 9,
+            object3D: '',
+            restitution: 0.1,
+            shape: 'Box',
+            shapeOrientation: 'Z',
+          },
+        ],
+      },
+    ];
+    try {
+      unserializeFromJSObject(project, legacyProject);
+      const behavior = project
+        .getLayout('Main')
+        .getObjects()
+        .getObject('Body')
+        .getBehavior('Physics3D');
+      const beforePropertyRead = serializeToJSObject(project, 'serializeTo')
+        .layouts[0].objects[0].behaviors[0];
+      behavior.getProperties();
+      const afterPropertyRead = serializeToJSObject(project, 'serializeTo')
+        .layouts[0].objects[0].behaviors[0];
+      expect(afterPropertyRead).toEqual(beforePropertyRead);
+      hiddenPhysics3DProperties.forEach(([propertyName, propertyValue]) => {
+        expect(afterPropertyRead).not.toHaveProperty(propertyName);
+        expect(behavior.updateProperty(propertyName, propertyValue)).toBe(true);
+      });
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/objects/Body.settings'),
+        'utf8'
+      );
+      const settingsCatalog = JSON.parse(
+        fs.readFileSync(
+          path.join(temporaryDirectory, '.gdevelop/settings-catalog.json'),
+          'utf8'
+        )
+      );
+      const generatedGameJson = JSON.parse(
+        fs.readFileSync(
+          path.join(temporaryDirectory, GENERATED_LEGACY_PROJECT_RELATIVE_PATH),
+          'utf8'
+        )
+      );
+      const generatedBehavior =
+        generatedGameJson.layouts[0].objects[0].behaviors[0];
+      const physics3DPropertyNames = settingsCatalog.behaviorTypes
+        .find(
+          behaviorType => behaviorType.type === 'Physics3D::Physics3DBehavior'
+        )
+        .properties.map(property => property.name);
+      expect(objectSource).toContain('bodyType = "Static"');
+      expect(physics3DPropertyNames).not.toContain('layers');
+      expect(physics3DPropertyNames).not.toContain('masks');
+      expect(objectSource).toContain('layers = 5');
+      expect(objectSource).toContain('masks = 9');
+      expect(generatedBehavior).toMatchObject({ layers: 5, masks: 9 });
+      hiddenPhysics3DProperties.forEach(([propertyName, , serializedValue]) => {
+        expect(physics3DPropertyNames).not.toContain(propertyName);
+        expect(objectSource).toContain(propertyName);
+        expect(generatedBehavior).toHaveProperty(propertyName, serializedValue);
+      });
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension('Physics3D');
     }
   });
 
@@ -1241,21 +1458,95 @@ column2 = "333"
       }
     );
 
-    const sceneDirectory = path.join(
-      temporaryDirectory,
-      'scenes',
-      'UntitledScene'
-    );
+    const sceneDirectory = path.join(temporaryDirectory, 'scenes', 'Game');
     expect(fs.existsSync(path.join(sceneDirectory, 'scene.settings'))).toBe(
       true
     );
-    expect(
-      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.layout'))
-    ).toBe(true);
-    expect(
-      fs.existsSync(path.join(sceneDirectory, 'UntitledScene.events'))
-    ).toBe(true);
+    expect(fs.existsSync(path.join(sceneDirectory, 'Game.layout'))).toBe(true);
+    expect(fs.existsSync(path.join(sceneDirectory, 'Game.events'))).toBe(true);
     project.delete();
+  });
+
+  test('preserves a legacy serialized behavior property removed from its extension', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const extensionName = 'LegacyJoystickPropertyTest';
+    project.setName('Legacy joystick property');
+    ensureProjectHasDefaultScene(project);
+
+    const extension = project.insertNewEventsFunctionsExtension(
+      extensionName,
+      0
+    );
+    const behaviorDefinition = insertNewEventsBasedBehavior(extension);
+    behaviorDefinition.setName('MultitouchJoystick');
+    behaviorDefinition.setFullName('Multitouch joystick');
+    behaviorDefinition
+      .getPropertyDescriptors()
+      .insertNew('ControllerIdentifier', 0)
+      .setType('Number')
+      .setValue('1');
+    reloadProjectEventsFunctionsExtensionMetadata(
+      project,
+      extension,
+      ({
+        getIncludeFileFor: () => 'generated.js',
+        writeFunctionCode: async () => {},
+        writeBehaviorCode: async () => {},
+        writeObjectCode: async () => {},
+      }: any),
+      ({ _: value => (typeof value === 'string' ? value : value.id) }: any)
+    );
+
+    const object = project
+      .getLayoutAt(0)
+      .getObjects()
+      .insertNewObject(project, 'Sprite', 'Border', 0);
+    const behavior = object.addNewBehavior(
+      project,
+      `${extensionName}::MultitouchJoystick`,
+      'MultitouchJoystick'
+    );
+    if (!behavior) throw new Error('Expected the behavior to be created.');
+    const legacyProject = serializeToJSObject(project, 'serializeTo');
+    legacyProject.layouts[0].objects[0].behaviors[0].FloatingEnabled = false;
+    unserializeFromJSObject(project, legacyProject);
+    expect(
+      serializeToJSObject(project, 'serializeTo').layouts[0].objects[0]
+        .behaviors[0]
+    ).toHaveProperty('FloatingEnabled', false);
+
+    try {
+      const entryPath = path.join(temporaryDirectory, 'project.settings');
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const objectSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Game/objects/Border.settings'),
+        'utf8'
+      );
+      expect(objectSource).toContain('FloatingEnabled = false');
+      const reopened = await openMultiFileProject(entryPath);
+      expect(reopened.layouts[0].objects[0].behaviors[0]).toHaveProperty(
+        'FloatingEnabled',
+        false
+      );
+    } finally {
+      project.delete();
+      gd.JsPlatform.get().removeExtension(extensionName);
+    }
   });
 
   test('rolls back an interrupted staged transaction', async () => {

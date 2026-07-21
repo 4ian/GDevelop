@@ -333,7 +333,7 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
         click: () => this.onClick(),
       },
       {
-        label: i18n._(t`Open prefab detail`),
+        label: i18n._(t`Open prefab events`),
         click: () =>
           this.props.onOpenPrefabDetailEditor(
             this.eventsFunctionsExtension,
@@ -656,7 +656,7 @@ export class CustomObjectVariantTreeViewItemContent
         click: () => this.onClick(),
       },
       {
-        label: i18n._(t`Open prefab detail`),
+        label: i18n._(t`Open prefab events`),
         click: () =>
           this.props.onOpenPrefabDetailEditor(
             this.eventsFunctionsExtension,

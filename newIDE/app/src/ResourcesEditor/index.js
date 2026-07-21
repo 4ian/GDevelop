@@ -44,6 +44,7 @@ const layoutStorageKey = 'gdevelop.resourcesEditor.layout.v1';
 const minWorkingDeskHeight = 220;
 const minProjectFilesHeight = 150;
 const minToolsWidth = 300;
+const resizeHandleSize = 6;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -116,12 +117,15 @@ const styles = {
   },
   workingDeskPane: {
     display: 'flex',
-    minHeight: minWorkingDeskHeight,
+    // The preferred height is kept in the layout state, but this pane must be
+    // able to shrink when the editor is displayed in a shorter window.
+    minHeight: 0,
     minWidth: 0,
     overflow: 'hidden',
   },
   horizontalResizeHandle: {
-    flex: '0 0 6px',
+    flex: `0 0 ${resizeHandleSize}px`,
+    boxSizing: 'border-box',
     cursor: 'ns-resize',
     backgroundColor: 'rgba(128, 128, 128, 0.12)',
     borderTop: '1px solid rgba(128, 128, 128, 0.2)',
@@ -134,9 +138,11 @@ const styles = {
     flex: 1,
     minHeight: minProjectFilesHeight,
     minWidth: 0,
+    overflow: 'hidden',
   },
   verticalResizeHandle: {
-    flex: '0 0 6px',
+    flex: `0 0 ${resizeHandleSize}px`,
+    boxSizing: 'border-box',
     cursor: 'ew-resize',
     backgroundColor: 'rgba(128, 128, 128, 0.12)',
     borderLeft: '1px solid rgba(128, 128, 128, 0.2)',
@@ -517,13 +523,17 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
     const onMouseMove = (event: MouseEvent) => {
       const maxWorkingDeskHeight = Math.max(
+        0,
+        bounds.height - minProjectFilesHeight - resizeHandleSize
+      );
+      const minimumWorkingDeskHeight = Math.min(
         minWorkingDeskHeight,
-        bounds.height - minProjectFilesHeight
+        maxWorkingDeskHeight
       );
       this._updateLayout({
         workingDeskHeight: clamp(
           event.clientY - bounds.top,
-          minWorkingDeskHeight,
+          minimumWorkingDeskHeight,
           maxWorkingDeskHeight
         ),
       });
@@ -694,7 +704,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           <div
             style={{
               ...styles.workingDeskPane,
-              flex: `0 0 ${workingDeskHeight}px`,
+              // Treat the persisted height as a preferred size. Allowing this
+              // pane to shrink prevents it from hiding the panel below when a
+              // popped-out editor window is shorter than the main editor.
+              flex: `0 1 ${workingDeskHeight}px`,
             }}
           >
             <WorkingDesk

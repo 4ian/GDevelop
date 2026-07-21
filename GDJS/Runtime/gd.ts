@@ -36,6 +36,9 @@ namespace gdjs {
     instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
+  type RuntimeInstanceContainerCallback = (
+    instanceContainer: gdjs.RuntimeInstanceContainer
+  ) => void;
   type RuntimeSceneGetSyncDataCallback = (
     runtimeScene: gdjs.RuntimeScene,
     currentSyncData: LayoutNetworkSyncData,
@@ -78,6 +81,14 @@ namespace gdjs {
 
   /** @internal */
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
+
+  /** @internal */
+  export const callbacksRuntimeInstanceContainerPostObjectsUpdate: Array<RuntimeInstanceContainerCallback> =
+    [];
+
+  /** @internal */
+  export const callbacksRuntimeInstanceContainerPreObjectsRender: Array<RuntimeInstanceContainerCallback> =
     [];
 
   /** @internal */
@@ -528,6 +539,34 @@ namespace gdjs {
   };
 
   /**
+   * Register a function called after every object and pre-event behavior in an
+   * instance container has been updated, before the container events run.
+   *
+   * This callback is container-scoped, so it is also called for children of
+   * custom objects.
+   *
+   * @internal
+   */
+  export const registerRuntimeInstanceContainerPostObjectsUpdateCallback =
+    function (callback: RuntimeInstanceContainerCallback): void {
+      gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.push(callback);
+    };
+
+  /**
+   * Register a function called before objects in an instance container perform
+   * their pre-render update.
+   *
+   * This callback is container-scoped, so it is also called for children of
+   * custom objects.
+   *
+   * @internal
+   */
+  export const registerRuntimeInstanceContainerPreObjectsRenderCallback =
+    function (callback: RuntimeInstanceContainerCallback): void {
+      gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.push(callback);
+    };
+
+  /**
    * Register a function to be called each time a scene is getting its sync
    * data retrieved (via getNetworkSyncData).
    * @param callback The function to be called.
@@ -580,6 +619,8 @@ namespace gdjs {
     filterArrayInPlace(callbacksRuntimeSceneUnloading);
     filterArrayInPlace(callbacksRuntimeSceneUnloaded);
     filterArrayInPlace(callbacksObjectDeletedFromScene);
+    filterArrayInPlace(callbacksRuntimeInstanceContainerPostObjectsUpdate);
+    filterArrayInPlace(callbacksRuntimeInstanceContainerPreObjectsRender);
   };
 
   /**

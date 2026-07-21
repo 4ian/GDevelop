@@ -1,5 +1,12 @@
 namespace gdjs {
-  type Model3DAnimation = { name: string; source: string; loop: boolean };
+  const model3DBoneLogger = new gdjs.Logger('3D bone attachments');
+
+  type Model3DAnimation = {
+    name: string;
+    source: string;
+    sourceModelResourceName?: string;
+    loop: boolean;
+  };
 
   type Model3DObjectNetworkSyncDataType = {
     mt: number;
@@ -24,6 +31,7 @@ namespace gdjs {
     /** The base parameters of the Model3D object */
     content: Object3DDataContent & {
       modelResourceName: string;
+      sharedAnimationModelResources?: Array<{ resourceName: string }>;
       rotationX: number;
       rotationY: number;
       rotationZ: number;
@@ -114,6 +122,18 @@ namespace gdjs {
     _isCastingShadow: boolean = true;
     _isReceivingShadow: boolean = true;
     _data: Model3DObjectData;
+    private _boneExpressionPose: gdjs.Model3DBonePose = {
+      positionX: 0,
+      positionY: 0,
+      positionZ: 0,
+      quaternionX: 0,
+      quaternionY: 0,
+      quaternionZ: 0,
+      quaternionW: 1,
+    };
+    private _boneExpressionQuaternion = new THREE.Quaternion();
+    private _boneExpressionEuler = new THREE.Euler(0, 0, 0, 'ZYX');
+    private _lastBoneExpressionFailure: string | null = null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -158,7 +178,8 @@ namespace gdjs {
         this._renderer.playAnimation(
           this._animations[0].source,
           this._animations[0].loop,
-          true
+          true,
+          this._animations[0].sourceModelResourceName || ''
         );
       }
     }
@@ -232,19 +253,23 @@ namespace gdjs {
         this.setIsReceivingShadow(newObjectData.content.isReceivingShadow);
       }
       if (this.getInstanceContainer().getGame().isInGameEdition()) {
-        const oldDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        const oldDefaultAnimation =
+          this._animations.length > 0 ? this._animations[0] : null;
         this._animations = newObjectData.content.animations;
-        const newDefaultAnimationSource =
-          this._animations.length > 0 ? this._animations[0].source : null;
+        const newDefaultAnimation =
+          this._animations.length > 0 ? this._animations[0] : null;
         if (
-          newDefaultAnimationSource &&
-          oldDefaultAnimationSource !== newDefaultAnimationSource
+          newDefaultAnimation &&
+          (!oldDefaultAnimation ||
+            oldDefaultAnimation.source !== newDefaultAnimation.source ||
+            oldDefaultAnimation.sourceModelResourceName !==
+              newDefaultAnimation.sourceModelResourceName)
         ) {
           this._renderer.playAnimation(
-            newDefaultAnimationSource,
+            newDefaultAnimation.source,
             this._animations[0].loop,
-            true
+            true,
+            newDefaultAnimation.sourceModelResourceName || ''
           );
         }
       }
@@ -330,8 +355,106 @@ namespace gdjs {
       );
     }
 
-    getRenderer(): RuntimeObject3DRenderer {
+    getRenderer(): gdjs.Model3DRuntimeObjectRenderer {
       return this._renderer;
+    }
+
+    /** @internal */
+    hasBone(boneName: string): boolean {
+      return this._renderer.hasBone(boneName);
+    }
+
+    /** @internal */
+    isBoneNameAmbiguous(boneName: string): boolean {
+      return this._renderer.isBoneNameAmbiguous(boneName);
+    }
+
+    /** @internal */
+    getBonePose(
+      boneName: string,
+      relativeTo: THREE.Object3D,
+      result: gdjs.Model3DBonePose
+    ): boolean {
+      return this._renderer.getBonePose(boneName, relativeTo, result);
+    }
+
+    private _getBonePoseForExpression(boneName: string): boolean {
+      const layerGroup = this.getInstanceContainer()
+        .getLayer(this.getLayer())
+        .getRenderer()
+        .getThreeGroup();
+      const isResolved =
+        !!layerGroup &&
+        this.getBonePose(boneName, layerGroup, this._boneExpressionPose);
+      if (isResolved) {
+        this._lastBoneExpressionFailure = null;
+        return true;
+      }
+
+      const failure = this.isBoneNameAmbiguous(boneName)
+        ? `ambiguous:${boneName}`
+        : `missing:${boneName}`;
+      if (failure !== this._lastBoneExpressionFailure) {
+        this._lastBoneExpressionFailure = failure;
+        model3DBoneLogger.warn(
+          this.isBoneNameAmbiguous(boneName)
+            ? `Bone name "${boneName}" is ambiguous on 3D model "${this.getName()}".`
+            : `Bone "${boneName}" was not found on 3D model "${this.getName()}".`
+        );
+      }
+      return false;
+    }
+
+    private _updateBoneExpressionRotation(boneName: string): boolean {
+      if (!this._getBonePoseForExpression(boneName)) return false;
+      const pose = this._boneExpressionPose;
+      this._boneExpressionQuaternion.set(
+        pose.quaternionX,
+        pose.quaternionY,
+        pose.quaternionZ,
+        pose.quaternionW
+      );
+      this._boneExpressionEuler.setFromQuaternion(
+        this._boneExpressionQuaternion,
+        'ZYX'
+      );
+      return true;
+    }
+
+    getBoneX(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionX
+        : 0;
+    }
+
+    getBoneY(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionY
+        : 0;
+    }
+
+    getBoneZ(boneName: string): float {
+      return this._getBonePoseForExpression(boneName)
+        ? this._boneExpressionPose.positionZ
+        : 0;
+    }
+
+    getBoneRotationX(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.x)
+        : 0;
+    }
+
+    getBoneRotationY(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.y)
+        : 0;
+    }
+
+    getBoneRotationZ(boneName: string): float {
+      return this._updateBoneExpressionRotation(boneName)
+        ? gdjs.toDegrees(this._boneExpressionEuler.z)
+        : 0;
     }
 
     _convertMaterialType(
@@ -372,7 +495,12 @@ namespace gdjs {
       ) {
         const animation = this._animations[animationIndex];
         this._currentAnimationIndex = animationIndex;
-        this._renderer.playAnimation(animation.source, animation.loop);
+        this._renderer.playAnimation(
+          animation.source,
+          animation.loop,
+          false,
+          animation.sourceModelResourceName || ''
+        );
         if (this._animationPaused) {
           this._renderer.pauseAnimation();
         }
@@ -472,7 +600,9 @@ namespace gdjs {
 
     getAnimationDuration(): float {
       return this._renderer.getAnimationDuration(
-        this._animations[this._currentAnimationIndex].source
+        this._animations[this._currentAnimationIndex].source,
+        this._animations[this._currentAnimationIndex].sourceModelResourceName ||
+          ''
       );
     }
 

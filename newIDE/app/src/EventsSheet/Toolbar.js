@@ -12,6 +12,9 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
 import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
+import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
+import SceneVariableIcon from '../UI/CustomSvgIcons/SceneVariable';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
@@ -43,6 +46,8 @@ type Props = {|
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
+  onOpenVariablesRedesignWindow: () => void,
+  isVariablesRedesignWindowOpen: boolean,
   onShowGeneratedCode?: ?() => void,
 |};
 
@@ -75,6 +80,8 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
+  onOpenVariablesRedesignWindow,
+  isVariablesRedesignWindowOpen,
   onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
@@ -117,7 +124,37 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          selected={isVariablesRedesignWindowOpen}
+          onClick={onOpenVariablesRedesignWindow}
+          id="toolbar-open-redesigned-variables-window-button"
+          tooltip={t`Open redesigned variables window`}
+        >
+          <SceneVariableIcon />
+        </IconButton>
         {settingsButtonPosition === 'start' && settingsButton}
+        <ElementWithMenu
+          element={
+            <IconButton
+              size="small"
+              color="default"
+              id="toolbar-add-event-button"
+              tooltip={t`Add an event`}
+            >
+              <AddEventIcon />
+            </IconButton>
+          }
+          buildMenuTemplate={() =>
+            allEventsMetadata.map(metadata => ({
+              label: metadata.fullName,
+              click: () => {
+                onAddEvent(metadata.type);
+              },
+            }))
+          }
+        />
         <IconButton
           size="small"
           color="default"

@@ -182,6 +182,12 @@ const summarizeProperties = (
     .map(name => {
       const authoringKey = String(name);
       const property = properties.get(name);
+      if (
+        (property.isHidden && property.isHidden()) ||
+        (property.isDeprecated && property.isDeprecated())
+      ) {
+        return null;
+      }
       const summary = summarizeProperty(authoringKey, property);
       if (!summary) return null;
       if (instance !== undefined) {
@@ -203,8 +209,9 @@ const summarizeProperties = (
 
 const summarizeSerializedProperties = (
   propertyDescriptors: ?Array<Object>
-): Array<Object> =>
-  (propertyDescriptors || [])
+): Array<Object> => {
+  const descriptors = propertyDescriptors || [];
+  return descriptors
     .filter(property => !property.hidden && !property.deprecated)
     .map(property => {
       const summary: Object = {
@@ -232,6 +239,7 @@ const summarizeSerializedProperties = (
       }
       return summary;
     });
+};
 
 const getSerializedRequiredBehaviorTypes = (
   behaviorDefinition: Object
@@ -391,11 +399,11 @@ const collectRegisteredTypes = (
         );
       }
       entry.keySpace = 'serialized';
-      entry.unknownPropertyPolicy = entry.properties.every(
-        property => !!property.serializedKey
-      )
-        ? 'error'
-        : 'preserve';
+      // Behavior serializers can retain fields from an older version of an
+      // extension after a property descriptor is removed. These fields must
+      // survive project conversion: rejecting them makes otherwise valid
+      // templates and legacy projects impossible to save.
+      entry.unknownPropertyPolicy = 'preserve';
       const objectType = metadata.getObjectType();
       if (objectType) entry.objectType = objectType;
       const requiredBehaviorTypes = localBehaviorDefinition
@@ -844,22 +852,22 @@ export const buildProjectSettingsCatalog = ({
         'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. static-data.toml is loaded separately as editor-only Static Data. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Open variable containers only with [variables], [globalVariables], or [sceneVariables] TOML headers and write one assignment per variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Use an empty header for an empty container. Never write a whole variable container as variables = { ... } or variables = { }, and never write recursive [[variables...]] tables. Existing whole-container inline tables are load-time migration input only and are rewritten automatically; do not preserve or introduce them.',
+        'Write every non-empty variable container as repeated [[variables]], [[globalVariables]], or [[sceneVariables]] records. Each record contains an explicit non-empty name and the complete descriptor fields, for example name = "Controllers", type = "array", and children = [...]. Write variables = [ ], globalVariables = [ ], or sceneVariables = [ ] only for an empty container. Keyed [variables] tables, whole-container inline tables, and non-empty inline descriptor arrays are forbidden.',
         'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
         'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
-        'For an attached behavior, serialize only properties listed in behaviorTypes[].properties. Editor-hidden behavior descriptors are intentionally absent from this catalog, are runtime-managed, and are forbidden in object settings; the runtime initializes them from descriptor defaults.',
+        'For an attached behavior, use behaviorTypes[].properties for author-writable fields. Editor-hidden and deprecated descriptors are intentionally absent from this catalog, but existing serialized fields not listed there are preserved verbatim because they may be configured by a specialized editor and required at runtime.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],
       objectDefinition:
         'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
       behaviorDefinition:
-        'An attached behavior requires a unique object-local name and a registered type. Initialize only author-writable properties listed for that type in behaviorTypes[].properties. Never serialize editor-hidden properties in an object definition.',
+        'An attached behavior requires a unique object-local name and a registered type. Initialize or edit only author-writable properties listed for that type in behaviorTypes[].properties. Preserve unlisted serialized properties already present in an object definition.',
       variableDefinition:
-        'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
+        'Use one repeated [[variables]], [[globalVariables]], or [[sceneVariables]] record per variable. Every record contains name plus type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields. Use a root field = [ ] assignment only for an empty container.',
     },
     fileKinds: SETTINGS_FILE_KINDS,
     settingsOwners,
@@ -876,174 +884,171 @@ export const buildProjectSettingsCatalog = ({
   });
 };
 
-const LAYOUT_ELEMENTS = Object.freeze([
+const LAYOUT_TABLES = Object.freeze([
   {
-    element: 'layout',
+    table: 'layout',
+    header: '[layout]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
+    fields: [
       { name: 'version', type: 'integer', required: true, value: 1 },
       {
         name: 'background',
-        type: '#RRGGBB',
+        type: '"#RRGGBB"',
         requiredIn: ['scene'],
         forbiddenIn: ['prefab', 'prefab-variant', 'external'],
       },
+      {
+        name: 'bounds',
+        type: '{ min = [x, y, z], max = [x, y, z] }',
+        requiredIn: ['prefab', 'prefab-variant'],
+        forbiddenIn: ['scene', 'external'],
+      },
     ],
-    children: ['bounds?', 'editor?', 'layer*'],
   },
   {
-    element: 'bounds',
-    contexts: ['prefab', 'prefab-variant'],
-    attributes: [
-      { name: 'min', type: 'number,number,number', required: true },
-      { name: 'max', type: 'number,number,number', required: true },
-    ],
-    empty: true,
-  },
-  {
-    element: 'editor',
+    table: 'editor',
+    header: '[editor]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
+    optional: true,
+    fields: [
       { name: 'grid', type: 'boolean' },
       {
-        name: 'grid-type',
+        name: 'grid_type',
         type: 'enum',
         values: ['rectangular', 'isometric'],
       },
-      { name: 'grid-size', type: 'non-negative number,number,number' },
-      { name: 'grid-offset', type: 'number,number,number' },
-      { name: 'grid-color', type: '#RRGGBB' },
-      { name: 'grid-alpha', type: 'number', range: '[0,1]' },
+      { name: 'grid_size', type: '[x, y, z] non-negative numbers' },
+      { name: 'grid_offset', type: '[x, y, z] numbers' },
+      { name: 'grid_color', type: '"#RRGGBB"' },
+      { name: 'grid_alpha', type: 'number', range: '[0,1]' },
       { name: 'snap', type: 'boolean' },
       { name: 'zoom', type: 'number', range: '[0.01,infinity)' },
-      { name: 'window-mask', type: 'boolean' },
-      { name: 'selected-layer', type: 'string' },
+      { name: 'window_mask', type: 'boolean' },
+      { name: 'selected_layer', type: 'existing layer name' },
+      {
+        name: 'selected_layer_unresolved',
+        type: 'boolean import marker',
+        default: false,
+      },
       {
         name: 'mode',
         type: 'enum',
         values: ['instances-editor', 'embedded-game'],
       },
     ],
-    empty: true,
   },
   {
-    element: 'layer',
+    table: 'layers',
+    header: '[[layers]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
+    repeated: true,
+    fields: [
+      {
+        name: 'id',
+        type: 'file-local lowercase letters/digits/hyphens reference',
+        required: true,
+      },
       { name: 'name', type: 'string', required: true },
       { name: 'rendering', type: 'enum', values: ['', '2d', '3d', '2d+3d'] },
       {
-        name: 'camera-type',
+        name: 'camera_type',
         type: 'enum',
         values: ['', 'perspective', 'orthographic'],
       },
       {
-        name: 'camera-behavior',
+        name: 'camera_behavior',
         type: 'enum',
         values: ['do-nothing', 'top-left-anchored-if-never-moved'],
       },
       { name: 'visible', type: 'boolean', default: true },
       { name: 'locked', type: 'boolean', default: false },
       { name: 'lighting', type: 'boolean', default: false },
-      { name: 'follow-base-camera', type: 'boolean', default: false },
-      { name: 'ambient', type: '#RRGGBB', default: '#C8C8C8' },
+      { name: 'follow_base_camera', type: 'boolean', default: false },
+      { name: 'ambient', type: '"#RRGGBB"', default: '#C8C8C8' },
       { name: 'near', type: 'number', default: 3 },
       { name: 'far', type: 'number', default: 10000 },
       { name: 'fov', type: 'number', range: '(0,180]', default: 45 },
       {
-        name: 'max-2d-distance',
+        name: 'max_2d_distance',
         type: 'positive number',
         default: 5000,
       },
+      {
+        name: 'cameras',
+        type:
+          'inline table array; each item has size and viewport as "default", numeric arrays, or { default = [...] }',
+      },
     ],
-    children: ['camera*', 'effect*', 'instance*'],
-    rules: [
-      'far must be greater than near',
-      'camera/effect/instance order is strict',
-    ],
+    rules: ['far must be greater than near', 'at most 50 cameras'],
   },
   {
-    element: 'layer',
+    table: 'layers',
+    header: '[[layers]]',
     variant: 'external reference',
     contexts: ['external'],
-    attributes: [
+    repeated: true,
+    fields: [
+      {
+        name: 'id',
+        type: 'file-local lowercase letters/digits/hyphens reference',
+        required: true,
+      },
       { name: 'name', type: 'existing linked-scene layer', required: true },
     ],
-    children: ['instance*'],
   },
   {
-    element: 'camera',
+    table: 'effects',
+    header: '[[effects]]',
     contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
-      {
-        name: 'size',
-        type: 'default | default(width,height) | widthxheight',
-        required: true,
-      },
-      {
-        name: 'viewport',
-        type:
-          'default | default(left,top,right,bottom) | left,top,right,bottom',
-        required: true,
-      },
-    ],
-    empty: true,
-  },
-  {
-    element: 'effect',
-    contexts: ['scene', 'prefab', 'prefab-variant'],
-    attributes: [
+    repeated: true,
+    fields: [
+      { name: 'layer', type: 'existing layer id', required: true },
       { name: 'name', type: 'string', required: true },
       { name: 'type', type: 'registered effect type', required: true },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'enabled', type: 'boolean', default: true },
-      { name: 'numbers', type: 'strict JSON object of finite numbers' },
-      { name: 'strings', type: 'strict JSON object of strings' },
-      { name: 'booleans', type: 'strict JSON object of booleans' },
     ],
-    empty: true,
+    parameterFields: {
+      placement: 'direct fields on [[effects]]',
+      schema: 'effectTypes[type].parameters',
+      scalarTypes: ['number', 'string', 'boolean'],
+    },
   },
   {
-    element: 'instance',
-    sourceForm: '<ObjectName> or <object of="Exact object name">',
+    table: 'instances',
+    header: '[[instances]]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
-    attributes: [
-      { name: 'of', type: 'existing object name', requiredFor: '<object>' },
+    repeated: true,
+    fields: [
       { name: 'id', type: 'lowercase UUIDv4', required: true },
-      { name: 'order', type: 'non-negative integer' },
-      { name: 'at', type: 'x,y | x,y,z', required: true },
-      { name: 'rotation', type: 'z | x,y,z', default: 0 },
-      { name: 'z-order', type: 'integer', default: 0 },
-      { name: 'size', type: 'auto | auto(widthxheight) | widthxheight' },
+      { name: 'object', type: 'existing object name', required: true },
+      { name: 'layer', type: 'existing layer id', required: true },
+      { name: 'unresolved', type: 'boolean import marker', default: false },
+      { name: 'at', type: '[x, y] or [x, y, z]', required: true },
+      { name: 'rotation', type: 'z number or [x, y, z]', default: 0 },
+      { name: 'z_order', type: 'integer', default: 0 },
+      { name: 'size', type: '[width, height] custom size' },
+      { name: 'auto_size', type: '[width, height] inactive stored size' },
       { name: 'depth', type: 'number' },
       { name: 'opacity', type: 'integer', range: '[0,255]', default: 255 },
-      { name: 'flip', type: 'unique comma-list', values: ['x', 'y', 'z'] },
-      { name: 'locked', type: 'bare boolean', default: false },
-      { name: 'sealed', type: 'bare boolean', default: false },
-      { name: 'keep-ratio', type: 'boolean', default: true },
+      { name: 'flip', type: 'unique string array', values: ['x', 'y', 'z'] },
+      { name: 'locked', type: 'boolean', default: false },
+      { name: 'sealed', type: 'boolean', default: false },
+      { name: 'keep_ratio', type: 'boolean', default: true },
+      {
+        name: 'properties',
+        type: 'inline TOML table of catalog-declared number/string values',
+      },
     ],
-    children: ['properties?', 'variables?', 'override*'],
   },
   {
-    element: 'properties',
-    contexts: ['instance'],
-    attributes: [
-      { name: 'numbers', type: 'strict JSON object of finite numbers' },
-      { name: 'strings', type: 'strict JSON object of strings' },
-    ],
-    empty: true,
-  },
-  {
-    element: 'variables',
-    contexts: ['instance'],
-    attributes: [],
-    children: ['var*'],
-  },
-  {
-    element: 'var',
-    contexts: ['variables', 'var'],
-    attributes: [
-      { name: 'name', type: 'string', requiredExceptIn: ['array'] },
+    table: 'variables',
+    header: '[[variables]]',
+    contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
+    repeated: true,
+    fields: [
+      { name: 'instance', type: 'existing instance UUID', required: true },
+      { name: 'name', type: 'string', required: true },
       {
         name: 'type',
         type: 'enum',
@@ -1057,26 +1062,29 @@ const LAYOUT_ELEMENTS = Object.freeze([
       },
       {
         name: 'values',
-        type: 'unique JSON string array',
+        type: 'unique TOML string array',
         allowedFor: ['enum'],
       },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'id', type: 'lowercase UUIDv4' },
-    ],
-    children: [
-      'var* for structure or array; primitive variables must be empty',
+      {
+        name: 'children',
+        type: 'recursive inline variable table array for structure/array',
+      },
     ],
   },
   {
-    element: 'override',
-    contexts: ['instance'],
-    attributes: [
-      { name: 'behavior', type: 'attached behavior name', required: true },
+    table: 'behaviors',
+    header: '[[behaviors]]',
+    contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
+    repeated: true,
+    fields: [
+      { name: 'instance', type: 'existing instance UUID', required: true },
+      { name: 'name', type: 'attached behavior name', required: true },
       {
-        name: 'data',
+        name: 'properties',
         type:
-          'strict JSON object keyed by behaviorOverrideSchemas[].properties[].serializedKey',
-        required: true,
+          'inline TOML table keyed by behaviorOverrideSchemas[].properties[].serializedKey',
       },
       { name: 'folded', type: 'boolean', default: false },
       { name: 'muted', type: 'boolean', default: false },
@@ -1087,11 +1095,10 @@ const LAYOUT_ELEMENTS = Object.freeze([
         values: ['default', 'visible', 'hidden'],
       },
       {
-        name: 'property-visibility',
-        type: 'strict JSON object with default|visible|hidden values',
+        name: 'property_visibility',
+        type: 'inline TOML table with default|visible|hidden string values',
       },
     ],
-    empty: true,
   },
 ]);
 
@@ -1274,25 +1281,26 @@ export const buildProjectLayoutCatalog = ({
     project: projectIdentity(project),
     authoring: {
       sourceExtension: '.layout',
-      syntax:
-        'GDevelop Layout DSL version 1 component-tree markup (not XML, HTML, TOML, or JSON).',
+      syntax: 'Standard flat TOML using short layout record headers.',
       rules: [
         'Read the owning settings namespace and the matching context entry before editing a layout.',
-        'Use only listed elements and attributes. Text nodes, comments, entities, declarations, CDATA, and unknown markup are forbidden.',
-        'Strings use JSON escaping; typed maps use strict JSON; colors are uppercase #RRGGBB.',
+        'Use only the listed [layout], [editor], [[layers]], [[effects]], [[instances]], [[variables]], and [[behaviors]] tables and fields.',
+        'Use standard TOML strings, booleans, numeric arrays, and inline tables. Colors are quoted uppercase #RRGGBB strings.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
-        'Use an existing object name from the matching context. Use <object of="..."> for unsafe or reserved object names.',
-        'An override may reference only a behavior already attached to that object in the matching context. Its data keys must use the exact serializedKey entries in behaviorOverrideSchemas, never the editor-facing authoringKey.',
-        'Cameras precede effects, effects precede instances, and properties/variables precede overrides.',
+        'Layer ids are short file-local references. Every effect and instance uses an existing layer id; every variable and behavior uses an existing instance UUID.',
+        'Effect parameters are direct fields on [[effects]] after type. Use the exact names and TOML scalar types in effectTypes[type].parameters; params is not a valid field.',
+        'Use an existing object name from the matching context in instance.object.',
+        'A [[behaviors]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
+        'The [[instances]] record order is the global serialized instance order. Never add a synthetic order field.',
         'Object definitions and attached behaviors belong in .settings, while event logic belongs in .events.',
       ],
     },
-    elements: LAYOUT_ELEMENTS,
+    tables: LAYOUT_TABLES,
     contexts,
     effectTypes: registeredEffectTypes,
     behaviorOverrideSchemas,
     counts: {
-      elements: LAYOUT_ELEMENTS.length,
+      tables: LAYOUT_TABLES.length,
       contexts: contexts.length,
       effectTypes: registeredEffectTypes.length,
       behaviorOverrideSchemas: behaviorOverrideSchemas.length,
@@ -1455,15 +1463,15 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
 
 export const validateProjectLayoutCatalog = (catalog: any): Object => {
   const validated = validateBaseCatalog(catalog, 'gdevelop-layout-catalog', [
-    'elements',
+    'tables',
     'contexts',
     'effectTypes',
     'behaviorOverrideSchemas',
   ]);
   validateUniqueEntries(
-    validated.elements,
-    entry => `${entry.element}\u0000${entry.variant || ''}`,
-    'layout element'
+    validated.tables,
+    entry => `${entry.table}\u0000${entry.variant || ''}`,
+    'layout table'
   );
   validated.contexts.forEach(context => {
     if (
@@ -1558,7 +1566,7 @@ export const serializeProjectSettingsCatalog = (catalog: Object): string =>
 
 export const serializeProjectLayoutCatalog = (catalog: Object): string =>
   serializeCatalog(validateProjectLayoutCatalog(catalog), [
-    'elements',
+    'tables',
     'contexts',
     'effectTypes',
     'behaviorOverrideSchemas',

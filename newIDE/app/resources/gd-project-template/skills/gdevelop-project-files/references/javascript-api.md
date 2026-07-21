@@ -126,6 +126,20 @@ is absent, use a current Events DSL instruction or a reviewed extension. Do not
 recover a hidden method from engine source, generated preview code, or a debug
 dump.
 
+`runtimeScene.getObjects(name)` returns a live, engine-owned array. Calling
+`deleteFromScene()` removes an item from that same array immediately, so a
+forward `for`, `for...of`, or `forEach` deletion loop can skip instances. Delete
+from a snapshot instead:
+
+```js
+const instances = runtimeScene.getObjects("Enemy").slice();
+for (const instance of instances) {
+  instance.deleteFromScene();
+}
+```
+
+Reverse iteration over the live array is also safe.
+
 ## Forbidden surfaces
 
 AI-authored JavaScript must not use:
@@ -151,6 +165,9 @@ privileged capabilities.
   explicitly iterate the array when the intended operation applies to many.
 - Avoid unbounded loops, recursion, repeated whole-scene scans, large per-frame
   allocations, blocking work, and resource loading inside frame events.
+- Never add or delete instances while iterating forward over the live array
+  returned by `runtimeScene.getObjects`. Iterate a `slice()` snapshot or iterate
+  backward.
 - Keep each block small and owned by the relevant scene or reusable function.
   Do not place the whole game in one frame block unless the user explicitly
   chose that architecture.
@@ -212,7 +229,8 @@ examples use `>` only on the directives because the JavaScript event is a child.
    declarations before continuing.
 4. Run `validate_project_files` after the final source edit. Require
    `valid: true`. Fix diagnostics at their reported `.events` URI, line, and
-   column.
+   column. Treat this as structural validation only; never report that the game
+   works or that the task is complete from `valid: true` alone.
 5. Commit all task-owned source changes with Git before `reload_project`.
 6. Reload, launch a fresh paused preview, advance deterministic frames, and
    inspect every behavior-sensitive result.

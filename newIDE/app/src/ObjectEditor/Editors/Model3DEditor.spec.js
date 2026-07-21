@@ -32,4 +32,27 @@ describe('Model3DEditor', () => {
       "onChangeProperty('modelResourceName', newValue)"
     );
   });
+
+  test('supports multiple validated animation source models', () => {
+    const source = getSource();
+
+    expect(source).toContain('Share animations from models (optional)');
+    expect(source).toContain(
+      "multiSelection: true,\n          resourceKind: 'model3D'"
+    );
+    expect(source).toContain('validateModel3DRig(gltf, loadState.gltf)');
+    expect(source).toContain(
+      'newAnimation.setSourceModelResourceName(sourceModel.resourceName)'
+    );
+    expect(source).toContain(
+      'animation.getSourceModelResourceName(),\n                                    animation.getSource()'
+    );
+    expect(source).toContain('{animationCount} <Trans>animations</Trans>');
+    expect(source).toContain("</Trans>{' '}\n                  {primaryModelResourceName}.");
+    expect(source).toContain('id="model3d-animation-name-filter"');
+    expect(source).toContain('<Trans>Animations</Trans> ({animationsCount})');
+    expect(source).toContain('translatableHintText={t`Filter animations by name`}');
+    expect(source).toContain('.includes(normalizedAnimationNameFilter)');
+    expect(source).toContain('filteredAnimationIndexes.map(animationIndex =>');
+  });
 });

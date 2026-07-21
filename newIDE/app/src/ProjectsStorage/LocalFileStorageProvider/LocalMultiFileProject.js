@@ -10,7 +10,6 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
-  hasInlineVariableContainerSyntax,
   parseTomlSource,
   validateGameUri,
 } from '../MultiFileProjectFormat';
@@ -523,39 +522,7 @@ export const openMultiFileProject = async (
       ...((options && options.compileOptions) || {}),
     };
   }
-  const inlineVariableContainerUris = Object.keys(files).filter(
-    uri =>
-      uri.endsWith('.settings') &&
-      hasInlineVariableContainerSyntax(files[uri], uri)
-  );
   const project = composeLegacyProjectFromFiles(files, effectiveOptions);
-  if (inlineVariableContainerUris.length) {
-    const entryDocument = parseTomlSource(
-      files[MULTI_FILE_ENTRY_URI],
-      MULTI_FILE_ENTRY_URI
-    );
-    const canonicalFiles = decomposeLegacyProjectToFiles(project, {
-      migration: entryDocument.migration,
-    });
-    const rewrittenFiles = {};
-    inlineVariableContainerUris.forEach(uri => {
-      if (canonicalFiles[uri] === undefined) {
-        throw new MultiFileProjectError(
-          'MULTIFILE_VARIABLE_MIGRATION_FAILED',
-          `Unable to regenerate the settings source after migrating inline variables: ${uri}`,
-          uri
-        );
-      }
-      rewrittenFiles[uri] = canonicalFiles[uri];
-    });
-    // Opening a project is the migration boundary: persist only affected
-    // source documents before returning the loaded in-memory project.
-    await writeMultiFileSourceTree({
-      entryPath,
-      files: rewrittenFiles,
-      obsoleteUris: [],
-    });
-  }
   return project;
 };
 
@@ -787,6 +754,7 @@ export const writeLegacyProjectAsMultiFile = async (
 ): Promise<Array<string>> => {
   let migration;
   let previousFiles: { [string]: string } = {};
+  const decomposeOptions = (options && options.decomposeOptions) || {};
   if (fs.existsSync(entryPath)) {
     previousFiles = (await readMultiFileSourceTree(entryPath)).files;
     const document = parseTomlSource(
@@ -797,7 +765,7 @@ export const writeLegacyProjectAsMultiFile = async (
   }
   const files = decomposeLegacyProjectToFiles(legacyProject, {
     migration,
-    ...((options && options.decomposeOptions) || {}),
+    ...decomposeOptions,
   });
   const verificationProject = composeLegacyProjectFromFiles(
     files,
@@ -805,7 +773,11 @@ export const writeLegacyProjectAsMultiFile = async (
   );
   const verificationDifference = getLegacyProjectFirstDifferenceDescription(
     legacyProject,
-    verificationProject
+    verificationProject,
+    {
+      behaviorPropertySchemasByType:
+        decomposeOptions.behaviorPropertySchemasByType,
+    }
   );
   if (verificationDifference) {
     throw new MultiFileProjectError(

@@ -10,6 +10,7 @@ type Props = {|
   value: string | number | boolean,
   label: MessageDescriptor | React.Node,
   disabled?: boolean,
+  hidden?: boolean,
   shouldNotTranslate?: boolean,
 |};
 
@@ -25,6 +26,7 @@ const SelectOption = (props: Props): React.Node => {
         <option
           value={props.value}
           disabled={props.disabled}
+          hidden={props.hidden}
           style={{
             color: gdevelopTheme.text.color.primary,
             backgroundColor: gdevelopTheme.palette.canvasColor,

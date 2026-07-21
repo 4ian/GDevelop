@@ -14,6 +14,62 @@ describe('gdjs.RuntimeObject', () => {
     runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
   });
 
+  it('collects 3D collision masks from activated behaviors', () => {
+    const collisionMask = {
+      vertices: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
+      positionX: 1,
+      positionY: 2,
+      positionZ: 3,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      rotationW: 1,
+    };
+    class DebugCollisionMaskRuntimeBehavior extends gdjs.RuntimeBehavior {
+      usesLifecycleFunction() {
+        return false;
+      }
+
+      get3DDebugCollisionMask() {
+        return collisionMask;
+      }
+
+      clear3DDebugCollisionMaskCache() {}
+    }
+    gdjs.registerBehavior(
+      'TestBehavior::DebugCollisionMask',
+      DebugCollisionMaskRuntimeBehavior
+    );
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [
+        {
+          name: 'DebugCollisionMask',
+          type: 'TestBehavior::DebugCollisionMask',
+        },
+      ],
+      effects: [],
+    });
+
+    expect(object.get3DDebugCollisionMasks()).to.eql([collisionMask]);
+
+    object.activateBehavior('DebugCollisionMask', false);
+    expect(object.get3DDebugCollisionMasks()).to.eql([]);
+
+    const debugBehavior = object.getBehavior('DebugCollisionMask');
+    if (!debugBehavior) {
+      throw new Error('The debug collision-mask behavior should exist.');
+    }
+    const clearMaskCache = sinon.spy(
+      debugBehavior,
+      'clear3DDebugCollisionMaskCache'
+    );
+    object.clear3DDebugCollisionMaskCache();
+    expect(clearMaskCache.calledOnce).to.be(true);
+  });
+
   it('should compute distances properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
@@ -109,55 +165,6 @@ describe('gdjs.RuntimeObject', () => {
     expect(gdjs.RuntimeObject.getVariableEnum(unrestrictedEnumVariable)).to.be(
       'Other'
     );
-  });
-
-  it('calls onPlacedInScene after creating an object from initial instance data', () => {
-    runtimeScene.registerObject({
-      name: 'obj1',
-      type: '',
-      variables: [],
-      behaviors: [
-        {
-          name: 'TestBehavior',
-          type: 'TestBehavior::TestBehavior',
-        },
-      ],
-      effects: [],
-    });
-
-    runtimeScene.createObjectsFrom(
-      [
-        {
-          angle: 0,
-          customSize: false,
-          height: 0,
-          layer: '',
-          name: 'obj1',
-          persistentUuid: 'initial-instance-id',
-          width: 0,
-          x: 12,
-          y: 34,
-          zOrder: 7,
-          numberProperties: [],
-          stringProperties: [],
-          initialVariables: [],
-          behaviorOverridings: [],
-        },
-      ],
-      0,
-      0,
-      0,
-      false
-    );
-
-    const object = runtimeScene.getObjects('obj1')[0];
-    expect(object.getVariables().get('lastState').getAsString()).to.be(
-      'placed'
-    );
-    expect(object.getVariables().get('placedCount').getAsNumber()).to.be(1);
-    expect(object.getVariables().get('placedX').getAsNumber()).to.be(12);
-    expect(object.getVariables().get('placedY').getAsNumber()).to.be(34);
-    expect(object.getVariables().get('placedZOrder').getAsNumber()).to.be(7);
   });
 
   it('should compute AABB properly', () => {

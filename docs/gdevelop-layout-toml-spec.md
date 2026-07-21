@@ -34,8 +34,8 @@ The format uses a small fixed vocabulary of short TOML headers:
 [[layer]]
 [[effect]]
 [[instance]]
-[[variable]]
-[[behavior]]
+[[variables]]
+[[behaviors]]
 ```
 
 Relationships are explicit:
@@ -71,8 +71,8 @@ Canonical output uses this order:
 3. all `[[layer]]` records in layer order;
 4. all `[[effect]]` records in per-layer effect order;
 5. all `[[instance]]` records in global serialized instance order;
-6. all `[[variable]]` records grouped by instance order;
-7. all `[[behavior]]` records grouped by instance order.
+6. all `[[variables]]` records grouped by instance order;
+7. all `[[behaviors]]` records grouped by instance order.
 
 Assignments begin at column zero. One blank line separates tables. The file
 ends with one newline. Generated canonical output omits comments, default-valued
@@ -277,25 +277,25 @@ for a resolvable object and must never be introduced for new content.
 The `[[instance]]` array-of-tables order is the global serialized instance
 order. The retired markup `order` workaround is forbidden.
 
-## 11. `[[variable]]`
+## 11. `[[variables]]`
 
 Top-level initial variables reference an owning instance UUID:
 
 ```toml
-[[variable]]
+[[variables]]
 instance = "01fce651-91cd-4d11-bd56-ef1370807527"
 id = "4f0234fc-e34d-41b9-88b9-e4a73316f7be"
 name = "Health"
 type = "number"
 value = 100
 
-[[variable]]
+[[variables]]
 instance = "01fce651-91cd-4d11-bd56-ef1370807527"
 name = "Stats"
 type = "structure"
 children = [{ name = "Armor", type = "number", value = 20 }]
 
-[[variable]]
+[[variables]]
 instance = "01fce651-91cd-4d11-bd56-ef1370807527"
 name = "Path"
 type = "array"
@@ -310,10 +310,10 @@ optional; `id` is an optional UUIDv4.
 
 Top-level variable names are unique per instance.
 
-## 12. `[[behavior]]`
+## 12. `[[behaviors]]`
 
 ```toml
-[[behavior]]
+[[behaviors]]
 instance = "01fce651-91cd-4d11-bd56-ef1370807527"
 name = "PlatformerObject"
 properties = { maxSpeed = 500, acceleration = 1500 }
@@ -374,13 +374,13 @@ object = "ScoreText"
 layer = "hud"
 at = [24, 24]
 
-[[variable]]
+[[variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Health"
 type = "number"
 value = 100
 
-[[behavior]]
+[[behaviors]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "PlatformerObject"
 properties = { maxSpeed = 500 }

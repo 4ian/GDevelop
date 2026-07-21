@@ -126,7 +126,7 @@ describe('Local multi-file project storage', () => {
     );
   });
 
-  test('migrates inline variable containers and saves canonical settings during open', async () => {
+  test('rejects retired keyed variable tables without rewriting files during open', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.variables = [{ name: 'Score', type: 'number', value: 12 }];
@@ -138,14 +138,14 @@ describe('Local multi-file project storage', () => {
 
     const projectSource = fs
       .readFileSync(entryPath, 'utf8')
-      .replace(/\[variables\]\n(Score = [^\n]+)/, 'variables = { $1 }');
+      .replace('[[variables]]', '[variables]');
     const sceneSettingsPath = path.join(
       temporaryDirectory,
       'scenes/Main/scene.settings'
     );
     const sceneSource = fs
       .readFileSync(sceneSettingsPath, 'utf8')
-      .replace(/\[variables\]\n(State = [^\n]+)/, 'variables = { $1 }');
+      .replace('[[variables]]', '[variables]');
     fs.writeFileSync(entryPath, projectSource, 'utf8');
     fs.writeFileSync(sceneSettingsPath, sceneSource, 'utf8');
     const untouchedEventsPath = path.join(
@@ -154,15 +154,11 @@ describe('Local multi-file project storage', () => {
     );
     const untouchedEvents = fs.readFileSync(untouchedEventsPath, 'utf8');
 
-    const openedProject = await openMultiFileProject(entryPath);
-
-    expect(areLegacyProjectsEquivalent(project, openedProject)).toBe(true);
-    const migratedProjectSource = fs.readFileSync(entryPath, 'utf8');
-    const migratedSceneSource = fs.readFileSync(sceneSettingsPath, 'utf8');
-    expect(migratedProjectSource).toContain('[variables]\nScore = [');
-    expect(migratedSceneSource).toContain('[variables]\nState = [');
-    expect(migratedProjectSource).not.toMatch(/^variables\s*=/m);
-    expect(migratedSceneSource).not.toMatch(/^variables\s*=/m);
+    await expect(openMultiFileProject(entryPath)).rejects.toEqual(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
+    );
+    expect(fs.readFileSync(entryPath, 'utf8')).toBe(projectSource);
+    expect(fs.readFileSync(sceneSettingsPath, 'utf8')).toBe(sceneSource);
     expect(fs.readFileSync(untouchedEventsPath, 'utf8')).toBe(untouchedEvents);
   });
 

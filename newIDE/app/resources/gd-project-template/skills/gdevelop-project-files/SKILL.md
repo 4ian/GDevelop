@@ -94,17 +94,14 @@ generated compatibility/runtime output, not multi-file source.
   Never embed another settings document. Follow the matching settings-catalog
   `fileKinds` entry and use only registered type metadata from that catalog.
 - Variable definitions: in `variables`, `globalVariables`, and
-  `sceneVariables`, always open a dedicated `[variables]`,
-  `[globalVariables]`, or `[sceneVariables]` table and write one assignment per
-  variable name. Assign each name one inline array containing its complete
-  descriptor without another `name`, for example
-  `Controllers = [{ type = "array", children = [...] }]`. Represent an empty
-  container with its empty table header. Never write a whole container as
-  `variables = { ... }` or `variables = { }`, and never write recursive
-  `[[variables...]]` TOML tables. Existing inline-table containers are
-  load-time migration inputs only: the editor converts them to these dedicated
-  headers and saves the affected settings files immediately when opening the
-  project. Do not preserve or introduce the migration form in direct edits.
+  `sceneVariables`, write one repeated `[[variables]]`,
+  `[[globalVariables]]`, or `[[sceneVariables]]` record per variable. Every
+  record contains an explicit `name` plus its complete descriptor, for example
+  `name = "Controllers"`, `type = "array"`, and `children = [...]`. Represent
+  an empty container only as `variables = [ ]`, `globalVariables = [ ]`, or
+  `sceneVariables = [ ]`. Never write keyed `[variables]` tables, whole
+  containers as inline tables, non-empty inline descriptor arrays, or recursive
+  `[[variables.children]]` tables.
 - Object groups: use only an `[objectGroups]` table in the owning project,
   scene, prefab, prefab-variant, or function settings. Each key is the group
   name and each value is an array of object names, for example
@@ -123,7 +120,7 @@ generated compatibility/runtime output, not multi-file source.
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: standard flat TOML containing placement/layout data only:
   `[layout]`, optional `[editor]`, and short `[[layer]]`, `[[effect]]`,
-  `[[instance]]`, `[[variable]]`, and `[[behavior]]` records. Never put object
+  `[[instance]]`, `[[variables]]`, and `[[behaviors]]` records. Never put object
   definitions or attached behavior definitions in a `.layout` file. Instance
   behavior overrides are allowed only for behaviors already attached by the
   owning `.settings` object definition. Follow the matching layout-catalog

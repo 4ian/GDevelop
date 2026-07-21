@@ -19,8 +19,8 @@ Use this exact order and one final newline:
 3. All `[[layer]]` records
 4. All `[[effect]]` records
 5. All `[[instance]]` records
-6. All `[[variable]]` records
-7. All `[[behavior]]` records
+6. All `[[variables]]` records
+7. All `[[behaviors]]` records
 
 Do not indent TOML lines. Use snake_case field names exactly as cataloged.
 Comments are allowed, but generated canonical output omits them.
@@ -220,27 +220,27 @@ instance. UUIDs are unique within one `.layout`, not across the project.
 Top-level instance variables reference their owner by instance UUID:
 
 ```toml
-[[variable]]
+[[variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 id = "4f0234fc-e34d-41b9-88b9-e4a73316f7be"
 name = "Health"
 type = "number"
 value = 100
 
-[[variable]]
+[[variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Mode"
 type = "enum"
 value = "Idle"
 values = ["Idle", "Run"]
 
-[[variable]]
+[[variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Stats"
 type = "structure"
 children = [{ name = "Armor", type = "number", value = 20 }]
 
-[[variable]]
+[[variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Path"
 type = "array"
@@ -257,7 +257,7 @@ value when non-empty. Optional `id` is a UUIDv4.
 A behavior override also references its owning instance by UUID:
 
 ```toml
-[[behavior]]
+[[behaviors]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "PlatformerObject"
 properties = { maxSpeed = 500, acceleration = 1500 }
@@ -275,8 +275,8 @@ record may exist for each attached behavior on one instance.
 
 - Parse as standard TOML and keep one final newline.
 - Use only tables and fields listed in the generated layout catalog.
-- Preserve `[[layer]]`, `[[effect]]`, `[[instance]]`, `[[variable]]`, and
-  `[[behavior]]` array order.
+- Preserve `[[layer]]`, `[[effect]]`, `[[instance]]`, `[[variables]]`, and
+  `[[behaviors]]` array order.
 - Preserve every existing instance UUID.
 - Resolve every layer ID, instance UUID, object, behavior, effect, and property
   against the matching catalog context.

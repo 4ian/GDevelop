@@ -44,8 +44,8 @@ const ROOT_FIELDS = [
   'layer',
   'effect',
   'instance',
-  'variable',
-  'behavior',
+  'variables',
+  'behaviors',
 ];
 const RECORD_HEADERS = new Set([
   'layout',
@@ -53,8 +53,8 @@ const RECORD_HEADERS = new Set([
   'layer',
   'effect',
   'instance',
-  'variable',
-  'behavior',
+  'variables',
+  'behaviors',
 ]);
 const EFFECT_STRUCTURAL_FIELDS = Object.freeze([
   'layer',
@@ -1586,7 +1586,7 @@ export const compileLayoutToml = (
     instances.map(instance => [instance.persistentUuid, instance])
   );
   const variableNamesByInstance = new Map();
-  records(document, 'variable', state).forEach(record => {
+  records(document, 'variables', state).forEach(record => {
     const instanceId = expectString(
       record.instance,
       'variable instance',
@@ -1620,7 +1620,7 @@ export const compileLayoutToml = (
     });
   });
   const behaviorNamesByInstance = new Map();
-  records(document, 'behavior', state).forEach(record => {
+  records(document, 'behaviors', state).forEach(record => {
     const instanceId = expectString(
       record.instance,
       'behavior instance',
@@ -2300,11 +2300,11 @@ const serializeLayoutDocument = document => {
   (document.instance || []).forEach(record =>
     emitTable(lines, '[[instance]]', record)
   );
-  (document.variable || []).forEach(record =>
-    emitTable(lines, '[[variable]]', record)
+  (document.variables || []).forEach(record =>
+    emitTable(lines, '[[variables]]', record)
   );
-  (document.behavior || []).forEach(record =>
-    emitTable(lines, '[[behavior]]', record)
+  (document.behaviors || []).forEach(record =>
+    emitTable(lines, '[[behaviors]]', record)
   );
   return `${lines.join('\n').trimEnd()}\n`;
 };
@@ -2395,17 +2395,17 @@ export const decompileLayoutToml = (
   document.instance = instances.map(instance =>
     decompileInstance(instance, layerIds.get(instance.layer || ''), context)
   );
-  document.variable = [];
-  document.behavior = [];
+  document.variables = [];
+  document.behaviors = [];
   instances.forEach(instance => {
     (instance.initialVariables || []).forEach(variable =>
-      document.variable.push({
+      document.variables.push({
         instance: instance.persistentUuid,
         ...decompileVariable(variable, true),
       })
     );
     (instance.behaviorOverridings || []).forEach(override =>
-      document.behavior.push(decompileBehavior(override, instance, context))
+      document.behaviors.push(decompileBehavior(override, instance, context))
     );
   });
   const source = serializeLayoutDocument(document);

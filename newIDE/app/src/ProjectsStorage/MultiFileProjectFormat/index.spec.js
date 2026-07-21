@@ -10,7 +10,6 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
-  hasInlineVariableContainerSyntax,
   parseStaticDataFromToml,
   parseTomlSource,
   removeLegacyFolderStructuresFromProject,
@@ -227,8 +226,7 @@ describe('GDevelop multi-file project format', () => {
     expect(files[MULTI_FILE_ENTRY_URI]).toContain(
       'combinedSettingsFormatVersion = 1'
     );
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('[variables]');
-    expect(files[MULTI_FILE_ENTRY_URI]).not.toMatch(/^variables\s*=/m);
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = [ ]');
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
@@ -849,7 +847,7 @@ column2 = "ssfssdfsf"
     ).toBe(true);
   });
 
-  test('writes empty Sprite point arrays compactly and variables last', () => {
+  test('writes empty Sprite point and variable arrays compactly', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.layouts[0].objects = [
       {
@@ -893,7 +891,7 @@ column2 = "ssfssdfsf"
     expect(source).toContain('points = [ ]');
     expect(source).toContain('customCollisionMask = [ ]');
     expect(source).not.toContain('[  ]');
-    expect(source.trimEnd().endsWith('[variables]')).toBe(true);
+    expect(source).toContain('variables = [ ]');
     expect(
       areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
     ).toBe(true);
@@ -1517,13 +1515,7 @@ objects = [ "Player" ]
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.staticData.variables = {};
     const files = decomposeLegacyProjectToFiles(project);
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('[variables]');
-    expect(
-      hasInlineVariableContainerSyntax(
-        files[MULTI_FILE_STATIC_DATA_URI],
-        MULTI_FILE_STATIC_DATA_URI
-      )
-    ).toBe(false);
+    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('variables = { }');
     expect(composeLegacyProjectFromFiles(files).staticData).toEqual(
       project.staticData
     );
@@ -1560,7 +1552,7 @@ objects = [ "Player" ]
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
   });
 
-  test('stores every settings-owned variable definition as a named inline descriptor', () => {
+  test('stores every settings-owned variable definition as a repeated named record', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     const numberVariable = (name, value) => ({
       name,
@@ -1637,36 +1629,36 @@ objects = [ "Player" ]
     const behaviorSource =
       files['game://extensions/Combat/behaviors/Health/behavior.settings'];
 
-    expect(projectSource).toContain('[variables]');
-    expect(sceneSource).toContain('[variables]');
-    expect(objectSource).toContain('[variables]');
-    expect(extensionSource).toContain('[globalVariables]');
-    expect(extensionSource).toContain('[sceneVariables]');
-    expect(prefabSource).toContain('[variables]');
-    expect(behaviorSource).toContain('[variables]');
+    expect(projectSource).toContain('[[variables]]');
+    expect(sceneSource).toContain('[[variables]]');
+    expect(objectSource).toContain('[[variables]]');
+    expect(extensionSource).toContain('[[globalVariables]]');
+    expect(extensionSource).toContain('[[sceneVariables]]');
+    expect(prefabSource).toContain('[[variables]]');
+    expect(behaviorSource).toContain('[[variables]]');
     expect(extensionSource).toContain(
-      'Controllers = [ { type = "array", children = [ { type = "structure"'
+      'name = "Controllers"\ntype = "array"\nchildren = [ { type = "structure"'
     );
     expect(extensionSource).toContain(
-      'Difficulty = [ { type = "enum", value = "Hard", values = [ "Easy", "Hard" ] } ]'
+      'name = "Difficulty"\ntype = "enum"\nvalue = "Hard"\nvalues = [ "Easy", "Hard" ]'
     );
     expect(sceneSource).toContain(
-      'SceneState = [ { type = "string", value = "Ready" } ]'
+      'name = "SceneState"\ntype = "string"\nvalue = "Ready"'
     );
     expect(prefabSource).toContain(
-      'Enabled = [ { type = "boolean", value = true } ]'
+      'name = "Enabled"\ntype = "boolean"\nvalue = true'
     );
     expect(behaviorSource).toContain(
-      'Cooldown = [ { type = "number", value = 0.25 } ]'
+      'name = "Cooldown"\ntype = "number"\nvalue = 0.25'
     );
     Object.keys(files)
       .filter(uri => uri.endsWith('.settings'))
       .forEach(uri => {
         expect(files[uri]).not.toMatch(
-          /^(?:variables|globalVariables|sceneVariables)\s*=/m
+          /^\[(?:variables|globalVariables|sceneVariables)\]$/m
         );
         expect(files[uri]).not.toMatch(
-          /\[\[(?:variables|globalVariables|sceneVariables)(?:\.|\]\])/m
+          /^(?:variables|globalVariables|sceneVariables)\s*=\s*\[\s*\{/m
         );
       });
     expect(
@@ -1676,66 +1668,32 @@ objects = [ "Player" ]
     const malformedFiles = { ...files };
     malformedFiles[
       'game://extensions/Combat/extension.settings'
-    ] = extensionSource.replace(/Controllers = \[[^\n]+/, 'Controllers = []');
+    ] = extensionSource.replace('name = "Controllers"\n', '');
     expect(() => composeLegacyProjectFromFiles(malformedFiles)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' })
     );
 
-    const toInlineContainer = (source, field, variableName) =>
-      source.replace(
-        new RegExp(`\\[${field}\\]\\n(${variableName} = [^\\n]+)`),
-        `${field} = { $1 }`
-      );
-    const inlineContainerFiles = { ...files };
-    inlineContainerFiles[MULTI_FILE_ENTRY_URI] = toInlineContainer(
-      projectSource,
-      'variables',
-      'GlobalScore'
-    );
-    inlineContainerFiles[
-      'game://scenes/Main/scene.settings'
-    ] = toInlineContainer(sceneSource, 'variables', 'SceneState');
-    inlineContainerFiles[
-      'game://scenes/Main/objects/Player.settings'
-    ] = toInlineContainer(objectSource, 'variables', 'Health');
-    inlineContainerFiles[
-      'game://extensions/Combat/extension.settings'
-    ] = toInlineContainer(
-      toInlineContainer(extensionSource, 'globalVariables', 'Difficulty'),
-      'sceneVariables',
-      'Controllers'
-    );
-    inlineContainerFiles[
-      'game://extensions/Combat/prefabs/Enemy/prefab.settings'
-    ] = toInlineContainer(prefabSource, 'variables', 'Enabled');
-    inlineContainerFiles[
-      'game://extensions/Combat/behaviors/Health/behavior.settings'
-    ] = toInlineContainer(behaviorSource, 'variables', 'Cooldown');
-    expect(
-      hasInlineVariableContainerSyntax(
-        inlineContainerFiles[MULTI_FILE_ENTRY_URI],
+    expect(() =>
+      parseTomlSource(
+        '[variables]\nScore = [{ type = "number", value = 1 }]\n',
         MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
-    expect(
-      areLegacyProjectsEquivalent(
-        project,
-        composeLegacyProjectFromFiles(inlineContainerFiles)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource(
+        'variables = [{ name = "Score", type = "number", value = 1 }]\n',
+        MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
-
-    const emptyInlineContainerFiles = decomposeLegacyProjectToFiles(
-      projectFixture
-    );
-    emptyInlineContainerFiles[MULTI_FILE_ENTRY_URI] = emptyInlineContainerFiles[
-      MULTI_FILE_ENTRY_URI
-    ].replace('[variables]', 'variables = { }');
-    expect(
-      areLegacyProjectsEquivalent(
-        projectFixture,
-        composeLegacyProjectFromFiles(emptyInlineContainerFiles)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource('variables = { }\n', MULTI_FILE_ENTRY_URI)
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
+    expect(() =>
+      parseTomlSource(
+        '[[variables]]\nname = "Data"\ntype = "structure"\n\n[[variables.children]]\nname = "Value"\ntype = "number"\nvalue = 1\n',
+        MULTI_FILE_ENTRY_URI
       )
-    ).toBe(true);
+    ).toThrow(expect.objectContaining({ code: 'MULTIFILE_INVALID_VARIABLES' }));
   });
 
   test('writes TOML without indentation', () => {

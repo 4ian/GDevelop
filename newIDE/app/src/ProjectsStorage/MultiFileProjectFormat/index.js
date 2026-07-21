@@ -46,7 +46,6 @@ const VARIABLE_DEFINITION_FIELDS = Object.freeze([
   'globalVariables',
   'sceneVariables',
 ]);
-const VARIABLE_DEFINITION_FIELD_SET = new Set(VARIABLE_DEFINITION_FIELDS);
 const SOURCE_OBJECT_GROUPS_FIELD = 'objectGroups';
 const SOURCE_OBJECT_GROUP_REQUIRED_BEHAVIORS_FIELD =
   'objectGroupRequiredBehaviors';
@@ -228,10 +227,10 @@ const compactVariableDefinitionFields = payload => {
     if (!Array.isArray(compacted[field])) {
       fail(
         'MULTIFILE_INVALID_VARIABLES',
-        `${field} must be a legacy variable-definition array before serialization.`
+        `${field} must be a variable-definition array before serialization.`
       );
     }
-    const variablesByName = {};
+    const names = new Set();
     compacted[field].forEach((variable, index) => {
       if (
         !variable ||
@@ -250,15 +249,14 @@ const compactVariableDefinitionFields = payload => {
           `${field}[${index}].name must be a non-empty string.`
         );
       }
-      if (Object.prototype.hasOwnProperty.call(variablesByName, name)) {
+      if (names.has(name)) {
         fail(
           'MULTIFILE_INVALID_VARIABLES',
           `${field} contains duplicate variable ${name}.`
         );
       }
-      variablesByName[name] = [omitFields(variable, new Set(['name']))];
+      names.add(name);
     });
-    compacted[field] = variablesByName;
   });
   return compacted;
 };
@@ -408,33 +406,36 @@ const restoreVariableDefinitionFields = (payload, fileUri) => {
   const restored = clone(payload);
   VARIABLE_DEFINITION_FIELDS.forEach(field => {
     if (restored[field] === undefined) return;
-    const variablesByName = asObject(restored[field], field, fileUri);
-    restored[field] = Object.keys(variablesByName).map(name => {
-      const descriptorWrapper = asArray(
-        variablesByName[name],
-        `${field}.${name}`,
-        fileUri
-      );
+    const variables = asArray(restored[field], field, fileUri);
+    const names = new Set();
+    variables.forEach((variable, index) => {
       if (
-        descriptorWrapper.length !== 1 ||
-        !descriptorWrapper[0] ||
-        typeof descriptorWrapper[0] !== 'object' ||
-        Array.isArray(descriptorWrapper[0])
+        !variable ||
+        typeof variable !== 'object' ||
+        Array.isArray(variable)
       ) {
         fail(
           'MULTIFILE_INVALID_VARIABLES',
-          `${field}.${name} must be a one-element inline descriptor array.`,
+          `${field}[${index}] must be a variable descriptor.`,
           fileUri
         );
       }
-      if (descriptorWrapper[0].name !== undefined) {
+      const name = variable.name;
+      if (typeof name !== 'string' || !name.length) {
         fail(
           'MULTIFILE_INVALID_VARIABLES',
-          `${field}.${name} must not repeat its name inside the descriptor.`,
+          `${field}[${index}].name must be a non-empty string.`,
           fileUri
         );
       }
-      return { name, ...descriptorWrapper[0] };
+      if (names.has(name)) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} contains duplicate variable ${name}.`,
+          fileUri
+        );
+      }
+      names.add(name);
     });
   });
   return restored;
@@ -733,84 +734,9 @@ const restoreTomlPayload = (namespace, fileUri) => {
 const normalizeLf = source =>
   source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 
-const extractInlineVariableContainers = (source, fileUri) => {
-  const inlineVariableContainers = {};
-  const invalidAssignments = [];
-  let inMultilineBasicString = false;
-  let inMultilineLiteralString = false;
-  const sourceWithoutInlineContainers = source
-    .split('\n')
-    .map(line => {
-      if (!inMultilineBasicString && !inMultilineLiteralString) {
-        const assignmentMatch = line.match(
-          /^\s*(variables|globalVariables|sceneVariables|"variables"|"globalVariables"|"sceneVariables")\s*=\s*(.*)$/
-        );
-        if (assignmentMatch) {
-          const field = assignmentMatch[1].replace(/^"|"$/g, '');
-          if (!assignmentMatch[2].trimStart().startsWith('{')) {
-            invalidAssignments.push(field);
-          } else {
-            if (inlineVariableContainers[field] !== undefined) {
-              fail(
-                'MULTIFILE_INVALID_VARIABLES',
-                `${field} is assigned more than once.`,
-                fileUri
-              );
-            }
-            const parsedAssignment = parseToml(line.trim());
-            const container = parsedAssignment[field];
-            if (
-              !container ||
-              typeof container !== 'object' ||
-              Array.isArray(container)
-            ) {
-              fail(
-                'MULTIFILE_INVALID_VARIABLES',
-                `${field} must be an inline table when using the migratable assignment form.`,
-                fileUri
-              );
-            }
-            inlineVariableContainers[field] = container;
-            // Preserve line numbers for diagnostics while removing this
-            // assignment from its accidental TOML table scope. It is mounted
-            // at the settings root after the rest of the document is parsed.
-            return '';
-          }
-        }
-      }
-
-      const basicDelimiterCount = (line.match(/"""/g) || []).length;
-      if (!inMultilineLiteralString && basicDelimiterCount % 2 === 1) {
-        inMultilineBasicString = !inMultilineBasicString;
-      }
-      const literalDelimiterCount = (line.match(/'''/g) || []).length;
-      if (!inMultilineBasicString && literalDelimiterCount % 2 === 1) {
-        inMultilineLiteralString = !inMultilineLiteralString;
-      }
-      return line;
-    })
-    .join('\n');
-
-  return {
-    sourceWithoutInlineContainers,
-    inlineVariableContainers,
-    invalidAssignments,
-  };
-};
-
 const ownsVariableDefinitionContainers = fileUri =>
   fileUri !== MULTI_FILE_STATIC_DATA_URI &&
   fileUri !== MULTI_FILE_RESOURCES_URI;
-
-export const hasInlineVariableContainerSyntax = (
-  source,
-  fileUri = '<memory>'
-) =>
-  ownsVariableDefinitionContainers(fileUri) &&
-  Object.keys(
-    extractInlineVariableContainers(normalizeLf(source), fileUri)
-      .inlineVariableContainers
-  ).length > 0;
 
 const stripTomlStructuralIndentation = source => {
   let inMultilineBasicString = false;
@@ -885,7 +811,6 @@ const serializeToml = object => {
   // generated line at column zero avoids presentation-only whitespace churn.
   const serializable = clone(object);
   const inlineValues = new Map();
-  const variableTables = [];
   let tokenIndex = 0;
   const serializedInput = canonicalJson(serializable);
   const reserveUniqueToken = category => {
@@ -900,28 +825,6 @@ const serializeToml = object => {
     inlineValues.set(token, stringifyInlineTomlValue(value));
     return token;
   };
-  Object.keys(serializable).forEach(key => {
-    if (!VARIABLE_DEFINITION_FIELD_SET.has(key)) return;
-    const variablesByName = serializable[key];
-    if (
-      !variablesByName ||
-      typeof variablesByName !== 'object' ||
-      Array.isArray(variablesByName)
-    )
-      return;
-    variableTables.push({
-      key,
-      assignments: Object.keys(variablesByName)
-        .map(
-          variableName =>
-            `${stringifyInlineTomlKey(
-              variableName
-            )} = ${stringifyInlineTomlValue(variablesByName[variableName])}`
-        )
-        .join('\n'),
-    });
-    delete serializable[key];
-  });
   const reservePointValues = value => {
     if (!value || typeof value !== 'object') return;
     if (Array.isArray(value)) {
@@ -936,6 +839,18 @@ const serializeToml = object => {
       reservePointValues(value[key]);
     });
   };
+  VARIABLE_DEFINITION_FIELDS.forEach(field => {
+    if (!Array.isArray(serializable[field])) return;
+    serializable[field].forEach(variable => {
+      if (!variable || typeof variable !== 'object') return;
+      Object.keys(variable).forEach(key => {
+        const value = variable[key];
+        if (value && typeof value === 'object') {
+          variable[key] = reserveInlineValue(value);
+        }
+      });
+    });
+  });
   reservePointValues(serializable);
   const output = stripTomlStructuralIndentation(
     normalizeLf(stringifyToml(serializable))
@@ -947,19 +862,6 @@ const serializeToml = object => {
       inlineValue
     );
   });
-  // Keep variable containers last so array-of-table fields such as Sprite
-  // animations do not move an otherwise unchanged [variables] section.
-  expandedOutput = [
-    expandedOutput.trimEnd(),
-    ...variableTables.map(
-      ({ key, assignments }) =>
-        `[${stringifyInlineTomlKey(key)}]${
-          assignments ? `\n${assignments}` : ''
-        }`
-    ),
-  ]
-    .filter(Boolean)
-    .join('\n\n');
   return `${expandedOutput.trimEnd()}\n`;
 };
 
@@ -982,36 +884,7 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
     );
   }
   try {
-    const {
-      sourceWithoutInlineContainers,
-      inlineVariableContainers,
-      invalidAssignments,
-    } = ownsVariableDefinitionContainers(fileUri)
-      ? extractInlineVariableContainers(normalizedSource, fileUri)
-      : {
-          sourceWithoutInlineContainers: normalizedSource,
-          inlineVariableContainers: {},
-          invalidAssignments: [],
-        };
-    if (invalidAssignments.length) {
-      const field = invalidAssignments[0];
-      fail(
-        'MULTIFILE_INVALID_VARIABLES',
-        `${field} must use a [${field}] TOML table. Only an inline-table assignment can be migrated automatically.`,
-        fileUri
-      );
-    }
-    const parsed = parseToml(sourceWithoutInlineContainers);
-    Object.keys(inlineVariableContainers).forEach(field => {
-      if (parsed[field] !== undefined) {
-        fail(
-          'MULTIFILE_INVALID_VARIABLES',
-          `${field} cannot use both a [${field}] table and an inline-table assignment.`,
-          fileUri
-        );
-      }
-      parsed[field] = inlineVariableContainers[field];
-    });
+    const parsed = parseToml(normalizedSource);
     const rejectDates = value => {
       if (value instanceof Date) {
         fail('MULTIFILE_INVALID_SOURCE', 'TOML dates are forbidden.', fileUri);
@@ -1024,15 +897,32 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
     if (!ownsVariableDefinitionContainers(fileUri)) return parsed;
     VARIABLE_DEFINITION_FIELDS.forEach(field => {
       if (parsed[field] === undefined) return;
-      if (inlineVariableContainers[field] !== undefined) return;
+      if (!Array.isArray(parsed[field])) {
+        fail(
+          'MULTIFILE_INVALID_VARIABLES',
+          `${field} must use repeated [[${field}]] records.`,
+          fileUri
+        );
+      }
+      const repeatedTablePattern = new RegExp(
+        `^\\[\\[${field}\\]\\](?:\\s*#.*)?$`,
+        'm'
+      );
+      const emptyArrayPattern = new RegExp(
+        `^${field}\\s*=\\s*\\[\\s*\\](?:\\s*#.*)?$`,
+        'm'
+      );
+      const nestedTablePattern = new RegExp(`^\\[\\[?${field}\\.`, 'm');
       if (
-        !new RegExp(`^\\[${field}\\](?:\\s*#.*)?$`, 'm').test(
-          sourceWithoutInlineContainers
-        )
+        (parsed[field].length > 0 &&
+          !repeatedTablePattern.test(normalizedSource)) ||
+        (parsed[field].length === 0 &&
+          !emptyArrayPattern.test(normalizedSource)) ||
+        nestedTablePattern.test(normalizedSource)
       ) {
         fail(
           'MULTIFILE_INVALID_VARIABLES',
-          `${field} must use a [${field}] TOML table, not an inline table or array.`,
+          `${field} must use repeated [[${field}]] records; use ${field} = [ ] only when it is empty.`,
           fileUri
         );
       }

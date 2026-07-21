@@ -852,7 +852,7 @@ export const buildProjectSettingsCatalog = ({
         'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. static-data.toml is loaded separately as editor-only Static Data. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
-        'Open variable containers only with [variables], [globalVariables], or [sceneVariables] TOML headers and write one assignment per variable name. Each value is one inline array containing the complete descriptor without a repeated name, for example Controllers = [{ type = "array", children = [...] }]. Use an empty header for an empty container. Never write a whole variable container as variables = { ... } or variables = { }, and never write recursive [[variables...]] tables. Existing whole-container inline tables are load-time migration input only and are rewritten automatically; do not preserve or introduce them.',
+        'Write every non-empty variable container as repeated [[variables]], [[globalVariables]], or [[sceneVariables]] records. Each record contains an explicit non-empty name and the complete descriptor fields, for example name = "Controllers", type = "array", and children = [...]. Write variables = [ ], globalVariables = [ ], or sceneVariables = [ ] only for an empty container. Keyed [variables] tables, whole-container inline tables, and non-empty inline descriptor arrays are forbidden.',
         'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
         'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
@@ -867,7 +867,7 @@ export const buildProjectSettingsCatalog = ({
       behaviorDefinition:
         'An attached behavior requires a unique object-local name and a registered type. Initialize or edit only author-writable properties listed for that type in behaviorTypes[].properties. Preserve unlisted serialized properties already present in an object definition.',
       variableDefinition:
-        'Open the container with [variables], [globalVariables], or [sceneVariables]; never assign the whole container as an inline table. A variable name is one key in that table. Its value is exactly one inline descriptor table inside an array; the descriptor keeps type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields, but does not repeat name.',
+        'Use one repeated [[variables]], [[globalVariables]], or [[sceneVariables]] record per variable. Every record contains name plus type, value or children, enum values, folded state, persistentUuid, mixed-value state, and unknown fields. Use a root field = [ ] assignment only for an empty container.',
     },
     fileKinds: SETTINGS_FILE_KINDS,
     settingsOwners,
@@ -1042,8 +1042,8 @@ const LAYOUT_TABLES = Object.freeze([
     ],
   },
   {
-    table: 'variable',
-    header: '[[variable]]',
+    table: 'variables',
+    header: '[[variables]]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
     repeated: true,
     fields: [
@@ -1074,8 +1074,8 @@ const LAYOUT_TABLES = Object.freeze([
     ],
   },
   {
-    table: 'behavior',
-    header: '[[behavior]]',
+    table: 'behaviors',
+    header: '[[behaviors]]',
     contexts: ['scene', 'prefab', 'prefab-variant', 'external'],
     repeated: true,
     fields: [
@@ -1284,13 +1284,13 @@ export const buildProjectLayoutCatalog = ({
       syntax: 'Standard flat TOML using short layout record headers.',
       rules: [
         'Read the owning settings namespace and the matching context entry before editing a layout.',
-        'Use only the listed [layout], [editor], [[layer]], [[effect]], [[instance]], [[variable]], and [[behavior]] tables and fields.',
+        'Use only the listed [layout], [editor], [[layer]], [[effect]], [[instance]], [[variables]], and [[behaviors]] tables and fields.',
         'Use standard TOML strings, booleans, numeric arrays, and inline tables. Colors are quoted uppercase #RRGGBB strings.',
         'Preserve existing instance UUIDs. New UUIDv4 values must be lowercase and unique within the owning layout.',
         'Layer ids are short file-local references. Every effect and instance uses an existing layer id; every variable and behavior uses an existing instance UUID.',
         'Effect parameters are direct fields on [[effect]] after type. Use the exact names and TOML scalar types in effectTypes[type].parameters; params is not a valid field.',
         'Use an existing object name from the matching context in instance.object.',
-        'A [[behavior]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
+        'A [[behaviors]] record may reference only a behavior already attached to its instance object. Its properties keys must use the exact serializedKey entries in behaviorOverrideSchemas, never editor-facing authoringKey values.',
         'The [[instance]] record order is the global serialized instance order. Never add a synthetic order field.',
         'Object definitions and attached behaviors belong in .settings, while event logic belongs in .events.',
       ],

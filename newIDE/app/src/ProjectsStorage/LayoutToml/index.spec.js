@@ -133,32 +133,32 @@ sealed = true
 keep_ratio = false
 properties = { animation = 1, text = "Ready" }
 
-[[variable]]
+[[variables]]
 instance = "${uuid(1)}"
 name = "Health"
 type = "number"
 value = 100
 
-[[variable]]
+[[variables]]
 instance = "${uuid(1)}"
 name = "Mode"
 type = "enum"
 value = "Idle"
 values = ["Idle", "Run"]
 
-[[variable]]
+[[variables]]
 instance = "${uuid(1)}"
 name = "Data"
 type = "structure"
 children = [{ name = "Ready", type = "boolean", value = true }]
 
-[[variable]]
+[[variables]]
 instance = "${uuid(1)}"
 name = "Path"
 type = "array"
 children = [{ type = "string", value = "A" }, { type = "string", value = "B" }]
 
-[[behavior]]
+[[behaviors]]
 instance = "${uuid(1)}"
 name = "Move"
 properties = { speed = 12 }
@@ -444,6 +444,28 @@ at = [1, 2]
     ],
     [
       sceneSource(
+        `${baseLayer}\n[[instance]]\nid = "${uuid(
+          1
+        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[variable]]\ninstance = "${uuid(
+          1
+        )}"\nname = "X"\ntype = "number"\nvalue = 1\n`
+      ),
+      { kind: 'scene' },
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      sceneSource(
+        `${baseLayer}\n[[instance]]\nid = "${uuid(
+          1
+        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[behavior]]\ninstance = "${uuid(
+          1
+        )}"\nname = "Move"\n`
+      ),
+      { kind: 'scene' },
+      'LAYOUT_UNKNOWN_FIELD',
+    ],
+    [
+      sceneSource(
         `${baseLayer}\n[[effect]]\nlayer = "base"\nname = "X"\ntype = "T"\n`
       ),
       {
@@ -457,7 +479,7 @@ at = [1, 2]
       sceneSource(
         `${baseLayer}\n[[instance]]\nid = "${uuid(
           1
-        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[variable]]\ninstance = "${uuid(
+        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[variables]]\ninstance = "${uuid(
           1
         )}"\nname = "X"\ntype = "enum"\nvalue = "C"\nvalues = ["A", "B"]\n`
       ),
@@ -468,7 +490,7 @@ at = [1, 2]
       sceneSource(
         `${baseLayer}\n[[instance]]\nid = "${uuid(
           1
-        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[behavior]]\ninstance = "${uuid(
+        )}"\nobject = "Player"\nlayer = "base"\nat = [0, 0]\n\n[[behaviors]]\ninstance = "${uuid(
           1
         )}"\nname = "Move"\n`
       ),
@@ -707,7 +729,7 @@ object = "Player"
 layer = "base"
 at = [0, 0]
 
-[[behavior]]
+[[behaviors]]
 instance = "${uuid(20)}"
 name = "Move"
 properties = ${properties}

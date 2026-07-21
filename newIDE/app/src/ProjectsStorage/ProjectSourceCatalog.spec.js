@@ -128,8 +128,8 @@ describe('project source catalogs', () => {
       '[[layer]]',
       '[[effect]]',
       '[[instance]]',
-      '[[variable]]',
-      '[[behavior]]',
+      '[[variables]]',
+      '[[behaviors]]',
     ]);
     expect(
       catalog.tables.find(table => table.table === 'editor').fields
@@ -254,10 +254,10 @@ describe('project source catalogs', () => {
       'folder = ["Parent", "Child"]'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Controllers = [{ type = "array"'
+      'name = "Controllers", type = "array"'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
-      'Never write a whole variable container as variables = { ... }'
+      'Keyed [variables] tables'
     );
     expect(catalog.authoring.rules.join('\n')).toContain(
       '[objectGroups] TOML table'
@@ -287,9 +287,9 @@ describe('project source catalogs', () => {
         .commonFields
     ).not.toContain('objectsGroups');
     expect(catalog.authoring.variableDefinition).toContain(
-      'does not repeat name'
+      'Every record contains name'
     );
-    expect(catalog.authoring.variableDefinition).toContain('[variables]');
+    expect(catalog.authoring.variableDefinition).toContain('[[variables]]');
     const entry = catalog.behaviorTypes.find(
       behaviorEntry => behaviorEntry.type === behaviorType
     );

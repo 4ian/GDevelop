@@ -490,53 +490,60 @@ kind = "extension"
 kind = "function"
 ```
 
-### 5.1.4 Named variable tables with inline descriptors
+### 5.1.4 Repeated named variable records
 
-Every settings-owned variable container uses a dedicated TOML table header
-keyed by variable name. The header is exactly `[variables]`,
-`[globalVariables]`, or `[sceneVariables]`. This applies to:
+Every non-empty settings-owned variable container uses repeated TOML
+array-of-table records. The header is exactly `[[variables]]`,
+`[[globalVariables]]`, or `[[sceneVariables]]`. This applies to:
 
 - Project, scene, object, prefab, and events-based behavior `variables`.
 - Extension `globalVariables` and `sceneVariables`.
 
-Each variable value is exactly one inline array containing its complete legacy
-descriptor without the repeated `name` member. Nested `children` remain arrays
-of descriptors and are written with inline tables, so no recursive TOML table
-headers are generated. For example:
+Each record contains an explicit non-empty `name` followed by its complete
+descriptor. Nested `children` remain arrays of inline descriptors, so no
+recursive TOML table headers are generated. For example:
 
 ```toml
-[sceneVariables]
-Controllers = [ { type = "array", children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [ ] } ] } ] } ]
+[[sceneVariables]]
+name = "Controllers"
+type = "array"
+children = [ { type = "structure", children = [ { name = "Buttons", type = "array", children = [ { type = "structure", children = [ { name = "State", type = "string", value = "Idle" } ] } ] }, { name = "Joystick", type = "structure", children = [ ] } ] } ]
 ```
 
 Primitive variables use the same rule:
 
 ```toml
-[variables]
-Score = [ { type = "number", value = 0 } ]
-PlayerName = [ { type = "string", value = "Ada" } ]
-Enabled = [ { type = "boolean", value = true } ]
+[[variables]]
+name = "Score"
+type = "number"
+value = 0
+
+[[variables]]
+name = "PlayerName"
+type = "string"
+value = "Ada"
+
+[[variables]]
+name = "Enabled"
+type = "boolean"
+value = true
 ```
 
 The descriptor preserves `type`, `value` or `children`, enum `values`,
 `folded`, `persistentUuid`, `hasMixedValues`, and unknown serializer fields.
-The loader restores `name` from the TOML key and reconstructs the current
-legacy variable array. An empty container is an empty table header:
+The loader preserves record order and reconstructs the current legacy variable
+array. An empty container uses an explicit empty root array:
 
 ```toml
-[variables]
+variables = [ ]
 ```
 
-Whole-container inline assignments such as
-`variables = { Score = [{ type = "number", value = 0 }] }` and
-`variables = { }` are noncanonical migration inputs. When a local project is
-opened, the loader accepts these inline-table assignments, reconstructs their
-root variable containers, and atomically rewrites only the affected settings
-files with dedicated table headers before returning the loaded project. This
-is an automatic one-time source migration, not an authoring form. Assignments
-to arrays or scalars, recursive forms such as `[[variables]]` and
-`[[sceneVariables.children]]`, and descriptors that repeat `name` remain
-invalid.
+Keyed tables such as `[variables]`, whole-container inline assignments such as
+`variables = { ... }`, and non-empty inline arrays such as
+`variables = [{ name = "Score", ... }]` are invalid. Empty `variables = [ ]`,
+`globalVariables = [ ]`, and `sceneVariables = [ ]` assignments are the only
+assignment form. Recursive forms such as `[[sceneVariables.children]]` are
+also invalid.
 
 ### 5.1.5 Compact object groups
 
@@ -630,10 +637,10 @@ Writers use TOML 1.0 with these restrictions:
 - Decimal integers and floats only.
 - RFC 3339 dates are not used for semantic project data; timestamps are strings.
 - Tables and array-of-tables are emitted in schema order.
-- Variable containers are emitted only as `[variables]`, `[globalVariables]`,
-  or `[sceneVariables]` tables. Each named descriptor value and its nested
-  descriptor objects are emitted as a one-line inline array/table. These
-  variable-definition tables are emitted after all other component content.
+- Non-empty variable containers are emitted only as repeated `[[variables]]`,
+  `[[globalVariables]]`, or `[[sceneVariables]]` records with explicit `name`
+  fields. Nested descriptor objects remain inline. Empty containers are
+  emitted as root `field = [ ]` assignments.
 - Object groups are emitted only as `[objectGroups]` tables whose values are
   arrays of object-name strings. Their optional serialized
   `requiredBehaviors` metadata is emitted in the parallel
@@ -845,7 +852,8 @@ packageName = "com.example.mygame"
 orientation = "default"
 ```
 
-Real entry files also contain the `[objectGroups]` and `[variables]` tables.
+Real entry files also contain `[objectGroups]` and either repeated
+`[[variables]]` records or `variables = [ ]`.
 Global object definitions and resources are never
 written in `project.settings`. No settings file may contain a legacy
 `objectsFolderStructure` table.
@@ -870,7 +878,7 @@ type = "Sprite"
 behaviors = []
 effects = []
 
-[variables]
+variables = [ ]
 ```
 
 The file owns the complete global object definition. Directories between
@@ -1058,7 +1066,7 @@ type = "Sprite"
 behaviors = []
 effects = []
 
-[variables]
+variables = [ ]
 ```
 
 The file owns the complete polymorphic object definition, including attached

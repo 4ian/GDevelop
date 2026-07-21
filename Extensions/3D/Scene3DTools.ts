@@ -178,11 +178,12 @@ namespace gdjs {
         } else {
           threeCamera.up.set(0, 0, 1);
         }
+        const inverseWorldScale = runtimeScene.getRenderer3DInverseWorldScale();
         threeCamera.lookAt(
-          object.getCenterXInScene(),
-          -object.getCenterYInScene(),
+          object.getCenterXInScene() * inverseWorldScale,
+          -object.getCenterYInScene() * inverseWorldScale,
           //@ts-ignore
-          object.getZ ? object.getZ() : 0
+          object.getZ ? object.getZ() * inverseWorldScale : 0
         );
         // The layer angle takes over the 3D camera Z rotation.
         layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));
@@ -208,7 +209,12 @@ namespace gdjs {
         } else {
           threeCamera.up.set(0, 0, 1);
         }
-        threeCamera.lookAt(x, -y, z);
+        const inverseWorldScale = runtimeScene.getRenderer3DInverseWorldScale();
+        threeCamera.lookAt(
+          x * inverseWorldScale,
+          -y * inverseWorldScale,
+          z * inverseWorldScale
+        );
         // The layer angle takes over the 3D camera Z rotation.
         layer.setCameraRotation(gdjs.toDegrees(-threeCamera.rotation.z));
       };

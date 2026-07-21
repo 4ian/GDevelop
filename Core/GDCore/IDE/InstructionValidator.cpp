@@ -80,8 +80,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
         // Extensions still rely on legacy object variables instructions.
         auto objectSourceType =
             projectScopedContainers.GetObjectsContainersList()
-                .GetObjectsContainerFromObjectName(rootObjectName)
-                ->GetSourceType();
+                .GetObjectsContainerSourceType(rootObjectName);
         // Only child-object variable declarations are checked.
         if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
           rootObjectName = "";

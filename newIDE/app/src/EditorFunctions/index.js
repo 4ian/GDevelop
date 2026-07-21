@@ -6119,6 +6119,16 @@ const isFuzzyMatch = (string1: string, string2: string) => {
   return simplifiedString1 === simplifiedString2;
 };
 
+const parseBoolean = (
+  value: string
+): {| valid: true, value: boolean |} | {| valid: false |} => {
+  const lowercaseValue = value.toLowerCase();
+  if (lowercaseValue !== 'true' && lowercaseValue !== 'false') {
+    return { valid: false };
+  }
+  return { valid: true, value: lowercaseValue === 'true' };
+};
+
 const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   renderForEditor: ({ args, shouldShowDetails }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -6731,13 +6741,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             // renaming onto a taken name would leave two groups (or a group
             // and an object) with the same name.
             if (
-              groups.has(newGroupName) ||
-              scene.getObjects().hasObjectNamed(newGroupName) ||
-              project.getObjects().hasObjectNamed(newGroupName) ||
-              project
-                .getObjects()
-                .getObjectGroups()
-                .has(newGroupName)
+              resolveObjectsFromContextAndName({
+                project,
+                layout: scene,
+                objectOrGroupName: newGroupName,
+              })
             ) {
               warnings.push(
                 `An object or group named "${newGroupName}" already exists (in scene "${scene.getName()}" or globally): group "${groupName}" was NOT renamed.`
@@ -7249,14 +7257,14 @@ const changeProjectPropertiesResources: EditorFunction = {
           );
           changes.push(`Set game resolution height to ${newHeight}.`);
         } else if (isFuzzyMatch(propertyName, 'adaptGameResolutionAtRuntime')) {
-          const lowercaseNewValue = newValue.toLowerCase();
-          if (lowercaseNewValue !== 'true' && lowercaseNewValue !== 'false') {
+          const parsedBoolean = parseBoolean(newValue);
+          if (!parsedBoolean.valid) {
             warnings.push(
               `Invalid adaptGameResolutionAtRuntime: "${newValue}". Must be "true" or "false". Skipped.`
             );
             return;
           }
-          const adapt = lowercaseNewValue === 'true';
+          const adapt = parsedBoolean.value;
           project.setAdaptGameResolutionAtRuntime(adapt);
           changes.push(
             `Set adaptGameResolutionAtRuntime to ${adapt ? 'true' : 'false'}.`
@@ -7287,14 +7295,14 @@ const changeProjectPropertiesResources: EditorFunction = {
           project.setScaleMode(newValue);
           changes.push(`Set game scale mode to ${newValue}.`);
         } else if (isFuzzyMatch(propertyName, 'pixelsRounding')) {
-          const lowercaseNewValue = newValue.toLowerCase();
-          if (lowercaseNewValue !== 'true' && lowercaseNewValue !== 'false') {
+          const parsedBoolean = parseBoolean(newValue);
+          if (!parsedBoolean.valid) {
             warnings.push(
               `Invalid pixelsRounding: "${newValue}". Must be "true" or "false". Skipped.`
             );
             return;
           }
-          const pixelsRounding = lowercaseNewValue === 'true';
+          const pixelsRounding = parsedBoolean.value;
           project.setPixelsRounding(pixelsRounding);
           changes.push(
             `Set pixelsRounding to ${pixelsRounding ? 'true' : 'false'}.`

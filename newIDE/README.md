@@ -140,7 +140,8 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 
-Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
+Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
+             `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
 
 ### Making the CLI available on PATH
 

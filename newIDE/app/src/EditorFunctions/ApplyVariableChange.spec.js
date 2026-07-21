@@ -98,6 +98,62 @@ describe('applyVariableChange', () => {
       expect(variable.getType()).toBe(gd.Variable.String);
       expect(variable.getString()).toBe('123');
     });
+
+    // `Number('')` is 0, which used to make an empty value inferred as a
+    // number and stored as `parseFloat('')`, i.e. NaN.
+    it('should store an empty value as an empty string, not NaN', () => {
+      applyVariableChange({
+        variablePath: 'emptyValue',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '',
+      });
+
+      const variable = variablesContainer.get('emptyValue');
+      expect(variable.getType()).toBe(gd.Variable.String);
+      expect(variable.getString()).toBe('');
+    });
+
+    // Inference uses `Number` but storage used `parseFloat`: '0x10' was
+    // inferred as a number (16) but stored as 0.
+    it('should store the same number as inferred for hexadecimal values', () => {
+      applyVariableChange({
+        variablePath: 'hexValue',
+        forcedVariableType: null,
+        variablesContainer,
+        value: '0x10',
+      });
+
+      const variable = variablesContainer.get('hexValue');
+      expect(variable.getType()).toBe(gd.Variable.Number);
+      expect(variable.getValue()).toBe(16);
+    });
+
+    it('should throw (and not create the variable) when a forced number has a non-numeric value', () => {
+      expect(() =>
+        applyVariableChange({
+          variablePath: 'notANumber',
+          forcedVariableType: 'number',
+          variablesContainer,
+          value: 'abc',
+        })
+      ).toThrow('Value "abc" is not a valid number');
+      // Rejected before any variable was created.
+      expect(variablesContainer.has('notANumber')).toBe(false);
+    });
+
+    it('should store a JSON-looking value as a literal string when the type is forced to string', () => {
+      applyVariableChange({
+        variablePath: 'jsonAsString',
+        forcedVariableType: 'string',
+        variablesContainer,
+        value: '{"a": 1}',
+      });
+
+      const variable = variablesContainer.get('jsonAsString');
+      expect(variable.getType()).toBe(gd.Variable.String);
+      expect(variable.getString()).toBe('{"a": 1}');
+    });
   });
 
   describe('Structure child modification', () => {

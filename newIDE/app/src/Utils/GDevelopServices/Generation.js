@@ -204,6 +204,13 @@ export type AiGeneratedEventBatch = {
   placementTargetEventId: string | null,
   placementExpectedParentEventId: string | null,
   placementRationale: string | null,
+  // Anchor echo for replace placements: the caller's copy of the current
+  // source of the event being replaced (proof it was read).
+  expectedEventSource: string | null,
+  // The actual current source of the target event (its own lines, without
+  // sub-events), computed by the editor, that the backend compares the
+  // anchor against.
+  placementTargetEventSource: string | null,
 };
 
 export type AiGeneratedEvent = {

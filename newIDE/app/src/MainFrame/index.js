@@ -563,6 +563,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+  const lastProjectSettingsPromise = React.useRef<?Promise<void>>(null);
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -1202,6 +1203,48 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  const ensureProjectSettingsApplied = React.useCallback((): Promise<void> => {
+    return lastProjectSettingsPromise.current || Promise.resolve();
+  }, []);
+
+  const loadProjectSettings = React.useCallback(
+    (fileMetadata: ?FileMetadata): Promise<void> => {
+      if (!fileMetadata) return Promise.resolve();
+
+      const currentPromise = (async () => {
+        try {
+          const parsedProjectSettings = await readProjectSettings(
+            fileMetadata.fileIdentifier
+          );
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
+            await setState(currentState => ({
+              ...currentState,
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
+            }));
+            setResourceCustomPropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
+            );
+          }
+        } catch (error) {
+          console.warn(
+            '[MainFrame] Failed to read project settings:',
+            error.message
+          );
+        } finally {
+          // Only clear the ref if no newer load has been queued since.
+          if (lastProjectSettingsPromise.current === currentPromise) {
+            lastProjectSettingsPromise.current = null;
+          }
+        }
+      })();
+
+      lastProjectSettingsPromise.current = currentPromise;
+      return currentPromise;
+    },
+    [preferences, setState, setResourceCustomPropertyConfigs]
+  );
+
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       let updatedFileMetadata: ?FileMetadata = fileMetadata
@@ -1254,6 +1297,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         project
       );
 
+      // Likewise, start reading the project's `gdevelop-settings.yaml` before
+      // exposing the project via state, so `ensureProjectSettingsApplied()`
+      // sees the pending promise as soon as the CLI useEffect fires.
+      loadProjectSettings(updatedFileMetadata);
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
@@ -1282,28 +1330,6 @@ const MainFrame = (props: Props): React.MixedElement => {
           authenticatedUser,
         }));
 
-        // Read and apply project settings from gdevelop-settings.yaml if it exists
-        try {
-          const parsedProjectSettings = await readProjectSettings(
-            updatedFileMetadata.fileIdentifier
-          );
-          if (parsedProjectSettings) {
-            applyProjectPreferences(parsedProjectSettings, preferences);
-            setState(currentState => ({
-              ...currentState,
-              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
-            }));
-            setResourceCustomPropertyConfigs(
-              parsedProjectSettings.resourceCustomProperties || []
-            );
-          }
-        } catch (error) {
-          console.warn(
-            '[MainFrame] Failed to read project settings:',
-            error.message
-          );
-        }
-
         // Apply the preview layout override stored in the project file
         // (set via "Use this scene to start all previews").
         const previewLayoutName = project.getPreviewLayout();
@@ -1330,6 +1356,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       getStorageProviderOperations,
       ensureResourcesAreFetched,
       authenticatedUser,
+      loadProjectSettings,
     ]
   );
 
@@ -5286,6 +5313,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onWillInstallExtension,
     onExtensionInstalled,
     saveProject,
+    ensureProjectSettingsApplied,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

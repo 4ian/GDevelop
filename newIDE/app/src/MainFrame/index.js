@@ -418,6 +418,7 @@ export type Props = {|
     onWillInstallExtension: (extensionNames: Array<string>) => void,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
     saveProject: SaveProject,
+    ensureProjectSettingsApplied: () => Promise<void>,
   |}) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
@@ -563,6 +564,16 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
+
+  const projectSettingsAppliedRef = React.useRef<?{|
+    promise: Promise<void>,
+    resolve: () => void,
+  |}>(null);
+  const ensureProjectSettingsApplied = React.useCallback((): Promise<void> => {
+    const current = projectSettingsAppliedRef.current;
+    return current ? current.promise : Promise.resolve();
+  }, []);
+
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -1220,7 +1231,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         // is able to save. Otherwise, it means nothing to consider this as
         // a recent file: we must wait for the user to save in a "real" storage
         // (like locally or on Google Drive).
-        if (onSaveProject) {
+        // Also skip this when running a headless CLI command (`--run-command`):
+        // such projects are opened programmatically (e.g. for automated exports)
+        // and shouldn't pollute the "recent projects" list shown in the regular UI.
+        if (onSaveProject && !Window.isRunningCommandFromCli()) {
           preferences.insertRecentProjectFile({
             fileMetadata: updatedFileMetadata,
             storageProviderName: storageProvider.internalName,
@@ -1251,69 +1265,85 @@ const MainFrame = (props: Props): React.MixedElement => {
         project
       );
 
+      // Arm the "project settings applied" readiness signal before exposing the
+      // project via state. The CLI useEffect fires on the setState below, so the
+      // signal must already be pending by then; it is resolved once the project's
+      // `gdevelop-settings.yaml` has been read and applied (see below).
+      let resolveProjectSettingsApplied = () => {};
+      projectSettingsAppliedRef.current = {
+        promise: new Promise(resolve => {
+          resolveProjectSettingsApplied = resolve;
+        }),
+        resolve: () => resolveProjectSettingsApplied(),
+      };
+
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: updatedFileMetadata,
       }));
 
-      if (updatedFileMetadata) {
-        const storageProvider = getStorageProvider();
-        const storageProviderOperations = getStorageProviderOperations(
-          storageProvider
-        );
-
-        // Fetch the resources if needed, for example:
-        // - if opening a local file, with resources stored as URL
-        //   (which can happen after downloading it from the web-app),
-        //   in which case URLs will be downloaded.
-        // - if opening from a URL, with resources that are relative
-        //   to this base URL and which will be converted to full URLs.
-        // ...
-        // See `ResourceFetcher` for all the cases.
-        await ensureResourcesAreFetched(() => ({
-          project,
-          fileMetadata: updatedFileMetadata,
-          storageProvider,
-          storageProviderOperations,
-          authenticatedUser,
-        }));
-
-        // Read and apply project settings from gdevelop-settings.yaml if it exists
-        try {
-          const parsedProjectSettings = await readProjectSettings(
-            updatedFileMetadata.fileIdentifier
+      try {
+        if (updatedFileMetadata) {
+          const storageProvider = getStorageProvider();
+          const storageProviderOperations = getStorageProviderOperations(
+            storageProvider
           );
-          if (parsedProjectSettings) {
-            applyProjectPreferences(parsedProjectSettings, preferences);
-            setState(currentState => ({
-              ...currentState,
-              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
-            }));
-            setResourceCustomPropertyConfigs(
-              parsedProjectSettings.resourceCustomProperties || []
+
+          // Fetch the resources if needed, for example:
+          // - if opening a local file, with resources stored as URL
+          //   (which can happen after downloading it from the web-app),
+          //   in which case URLs will be downloaded.
+          // - if opening from a URL, with resources that are relative
+          //   to this base URL and which will be converted to full URLs.
+          // ...
+          // See `ResourceFetcher` for all the cases.
+          await ensureResourcesAreFetched(() => ({
+            project,
+            fileMetadata: updatedFileMetadata,
+            storageProvider,
+            storageProviderOperations,
+            authenticatedUser,
+          }));
+
+          // Read and apply project settings from gdevelop-settings.yaml if it exists
+          try {
+            const parsedProjectSettings = await readProjectSettings(
+              updatedFileMetadata.fileIdentifier
+            );
+            if (parsedProjectSettings) {
+              applyProjectPreferences(parsedProjectSettings, preferences);
+              setState(currentState => ({
+                ...currentState,
+                toolbarButtons: parsedProjectSettings.toolbarButtons || [],
+              }));
+              setResourceCustomPropertyConfigs(
+                parsedProjectSettings.resourceCustomProperties || []
+              );
+            }
+          } catch (error) {
+            console.warn(
+              '[MainFrame] Failed to read project settings:',
+              error.message
             );
           }
-        } catch (error) {
-          console.warn(
-            '[MainFrame] Failed to read project settings:',
-            error.message
-          );
-        }
 
-        // Apply the preview layout override stored in the project file
-        // (set via "Use this scene to start all previews").
-        const previewLayoutName = project.getPreviewLayout();
-        if (previewLayoutName && project.hasLayoutNamed(previewLayoutName)) {
-          setPreviewState(previewState => ({
-            ...previewState,
-            isPreviewOverriden: true,
-            overridenPreviewLayoutName: previewLayoutName,
-            overridenPreviewExternalLayoutName: null,
-          }));
-        }
+          // Apply the preview layout override stored in the project file
+          // (set via "Use this scene to start all previews").
+          const previewLayoutName = project.getPreviewLayout();
+          if (previewLayoutName && project.hasLayoutNamed(previewLayoutName)) {
+            setPreviewState(previewState => ({
+              ...previewState,
+              isPreviewOverriden: true,
+              overridenPreviewLayoutName: previewLayoutName,
+              overridenPreviewExternalLayoutName: null,
+            }));
+          }
 
-        setIsProjectClosedSoAvoidReloadingExtensions(false);
+          setIsProjectClosedSoAvoidReloadingExtensions(false);
+        }
+      } finally {
+        resolveProjectSettingsApplied();
       }
 
       return state;
@@ -5283,6 +5313,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onWillInstallExtension,
     onExtensionInstalled,
     saveProject,
+    ensureProjectSettingsApplied,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(

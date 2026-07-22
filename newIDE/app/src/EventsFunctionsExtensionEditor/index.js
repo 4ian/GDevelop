@@ -596,16 +596,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newIndex + ParametersIndexOffsets.FreeFunction
     );
 
-    const sentence = eventsFunction.getSentence();
-    if (sentence) {
-      const newSentence = remapSentenceParamIndices(
-        sentence,
-        oldIndex,
-        newIndex,
-        ParametersIndexOffsets.FreeFunction
-      );
-      eventsFunction.setSentence(newSentence);
-    }
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.FreeFunction
+    );
 
     done(true);
   };
@@ -628,16 +624,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newIndex
     );
 
-    const sentence = eventsFunction.getSentence();
-    if (sentence) {
-      const newSentence = remapSentenceParamIndices(
-        sentence,
-        oldIndex,
-        newIndex,
-        ParametersIndexOffsets.BehaviorFunction
-      );
-      eventsFunction.setSentence(newSentence);
-    }
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.BehaviorFunction
+    );
 
     done(true);
   };
@@ -661,20 +653,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newIndex
     );
 
+    this._remapEventsFunctionSentence(
+      eventsFunction,
+      oldIndex,
+      newIndex,
+      ParametersIndexOffsets.ObjectFunction
+    );
+
+    done(true);
+  };
+
+  _remapEventsFunctionSentence = (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    offset: number
+  ): void => {
     const sentence = eventsFunction.getSentence();
     if (sentence) {
       const newSentence = remapSentenceParamIndices(
         sentence,
         oldIndex,
         newIndex,
-        ParametersIndexOffsets.ObjectFunction
+        offset
       );
       eventsFunction.setSentence(newSentence);
     }
-
-    done(true);
   };
-
   _onDeleteEventsFunction = (
     eventsFunction: gdEventsFunction,
     cb: boolean => void

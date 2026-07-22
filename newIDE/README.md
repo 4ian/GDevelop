@@ -143,6 +143,10 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
              `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
 
+If the same project is already open in a running editor, the command runs in that
+window (fire-and-forget; the CLI exits without waiting or reporting the real result).
+Otherwise the command runs headless with a real exit code (including CI).
+
 ### Making the CLI available on PATH
 
 When GDevelop is installed with the Windows NSIS installer, the install

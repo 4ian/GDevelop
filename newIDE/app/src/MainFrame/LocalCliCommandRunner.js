@@ -17,6 +17,8 @@ import { type FileMetadata } from '../ProjectsStorage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs');
+const path = optionalRequire('path');
+const process = optionalRequire('process');
 
 export type ImportExtension = (options: {|
   i18n: I18nType,
@@ -47,14 +49,27 @@ export type CliCommandRunner = (
   |}
 ) => Promise<void>;
 
-const getCommandArgs = (): Array<string> => {
-  const appArguments = Window.getArguments();
-  const arg = appArguments['cmd-args'];
+const normalizeCommandArgs = (
+  arg: string | Array<string> | void
+): Array<string> => {
   if (!arg) return [];
   const values = Array.isArray(arg) ? arg : [arg];
   return values.map(value => value.trim()).filter(Boolean);
 };
 
+const getCommandArgs = (): Array<string> =>
+  normalizeCommandArgs(Window.getArguments()['cmd-args']);
+
+/**
+ * Whether diagnostic-error export blocking should be enforced for this CLI run.
+ *
+ * Priority (highest first):
+ *  1. `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` CLI flags,
+ *     for CI/release scripts that want to force the behavior explicitly.
+ *  2. The current `blockPreviewAndExportOnDiagnosticErrors` preference, which
+ *     reflects the project's own `gdevelop-settings.yaml` once
+ *     `ensureProjectSettingsApplied` has resolved (see `useCliCommandRunner`).
+ */
 export const shouldBlockOnDiagnosticErrorsForCli = (
   preferences: Preferences
 ): boolean => {
@@ -127,6 +142,21 @@ const exitApp = (exitCode: number) => {
   if (ipcRenderer) ipcRenderer.send('app-exit', exitCode);
 };
 
+// Must match electron-app/app/OpenProjectsRegistry.js normalizeFileIdentifier (IPC routing).
+const normalizeFileIdentifier = (fileIdentifier: ?string): ?string => {
+  if (!fileIdentifier || !path) return null;
+  const resolved = path.resolve(fileIdentifier);
+  return process && process.platform === 'win32'
+    ? resolved.toLowerCase()
+    : resolved;
+};
+
+type RunCliCommandIpcPayload = {|
+  commandName: string,
+  commandArgs: string | Array<string> | void,
+  fileIdentifier: ?string,
+|};
+
 const ensureProjectExtensionsReadyForCli = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
 ): Promise<boolean> => {
@@ -156,20 +186,107 @@ const ensureProjectExtensionsReadyForCli = async (
   return true;
 };
 
+type RunCliCommandOptions = {|
+  project: gdProject,
+  i18n: I18nType,
+  commandName: string,
+  commandArgs: Array<string>,
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  commandPaletteRef: {| current: ?CommandPaletteInterface |},
+  preferences: Preferences,
+  importExtension: ImportExtension,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  saveProject: SaveProject,
+  // Resolves once the project's `gdevelop-settings.yaml` has been read and
+  // applied to the preferences, so the command runner can rely on `preferences`
+  // as the single source of truth without racing the project load.
+  ensureProjectSettingsApplied: () => Promise<void>,
+  onFinished: (exitCode: number) => void,
+|};
+
+const runCliCommand = async ({
+  project,
+  i18n,
+  commandName,
+  commandArgs,
+  eventsFunctionsExtensionsState,
+  commandPaletteRef,
+  preferences,
+  importExtension,
+  onWillInstallExtension,
+  onExtensionInstalled,
+  saveProject,
+  ensureProjectSettingsApplied,
+  onFinished,
+}: RunCliCommandOptions): Promise<void> => {
+  try {
+    const extensionsReady = await ensureProjectExtensionsReadyForCli(
+      eventsFunctionsExtensionsState
+    );
+    if (!extensionsReady) {
+      onFinished(1);
+      return;
+    }
+
+    // Wait until the project's gdevelop-settings.yaml has been applied to
+    // the preferences, so commands (e.g. the diagnostic-error export block)
+    // read the project's own settings rather than a stale global value.
+    await ensureProjectSettingsApplied();
+
+    const awaitableRunner = getAwaitableCliRunner(commandName);
+    if (awaitableRunner) {
+      await awaitableRunner(project, i18n, {
+        preferences,
+        commandArgs,
+        importExtension,
+        onWillInstallExtension,
+        onExtensionInstalled,
+        saveProject,
+      });
+      console.info(`[CLI] Command "${commandName}" finished successfully.`);
+      onFinished(0);
+      return;
+    }
+
+    if (commandPaletteRef.current && commandPaletteRef.current.launchCommand) {
+      commandPaletteRef.current.launchCommand((commandName: any));
+      console.info(
+        `[CLI] Command "${commandName}" dispatched (fire-and-forget).`
+      );
+      setTimeout(() => onFinished(0), FIRE_AND_FORGET_GRACE_MS);
+      return;
+    }
+
+    console.error(
+      `[CLI] Command "${commandName}" could not be dispatched: command palette not ready.`
+    );
+    onFinished(1);
+  } catch (error) {
+    console.error(`[CLI] Command "${commandName}" failed:`, error);
+    onFinished(1);
+  }
+};
+
 type Props = {|
   project: ?gdProject,
   i18n: I18nType,
+  fileIdentifier: ?string,
   commandPaletteRef: {| current: ?CommandPaletteInterface |},
   importExtension: ImportExtension,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   saveProject: SaveProject,
+  // Resolves once the project's `gdevelop-settings.yaml` has been read and
+  // applied to the preferences, so the command runner can rely on `preferences`
+  // as the single source of truth without racing the project load.
   ensureProjectSettingsApplied: () => Promise<void>,
 |};
 
 export const useCliCommandRunner = ({
   project,
   i18n,
+  fileIdentifier,
   commandPaletteRef,
   importExtension,
   onWillInstallExtension,
@@ -181,6 +298,14 @@ export const useCliCommandRunner = ({
     EventsFunctionsExtensionsContext
   );
   const preferences = React.useContext(PreferencesContext);
+
+  React.useEffect(
+    () => {
+      if (ipcRenderer)
+        ipcRenderer.send('set-window-project-path', fileIdentifier);
+    },
+    [fileIdentifier]
+  );
 
   // Dispatch `--run-command` once the project is loaded. "Awaitable" commands
   // are awaited for a proper exit code; others fall back to fire-and-forget
@@ -198,63 +323,86 @@ export const useCliCommandRunner = ({
       cliCommandRanRef.current = true;
       const keepOpen = !!appArguments['keep-open'];
 
-      const run = async () => {
-        try {
-          const extensionsReady = await ensureProjectExtensionsReadyForCli(
-            eventsFunctionsExtensionsState
-          );
-          if (!extensionsReady) {
-            if (!keepOpen) exitApp(1);
-            return;
-          }
-
-          await ensureProjectSettingsApplied();
-
-          const awaitableRunner = getAwaitableCliRunner(commandName);
-          if (awaitableRunner) {
-            await awaitableRunner(project, i18n, {
-              preferences,
-              commandArgs: getCommandArgs(),
-              importExtension,
-              onWillInstallExtension,
-              onExtensionInstalled,
-              saveProject,
-            });
-            console.info(
-              `[CLI] Command "${commandName}" finished successfully.`
-            );
-            if (!keepOpen) exitApp(0);
-            return;
-          }
-
-          if (
-            commandPaletteRef.current &&
-            commandPaletteRef.current.launchCommand
-          ) {
-            commandPaletteRef.current.launchCommand((commandName: any));
-            console.info(
-              `[CLI] Command "${commandName}" dispatched (fire-and-forget).`
-            );
-            if (!keepOpen)
-              setTimeout(() => exitApp(0), FIRE_AND_FORGET_GRACE_MS);
-            return;
-          }
-
-          console.error(
-            `[CLI] Command "${commandName}" could not be dispatched: command palette not ready.`
-          );
-          if (!keepOpen) exitApp(1);
-        } catch (error) {
-          console.error(`[CLI] Command "${commandName}" failed:`, error);
-          if (!keepOpen) exitApp(1);
-        }
-      };
-
-      run();
+      runCliCommand({
+        project,
+        i18n,
+        commandName,
+        commandArgs: getCommandArgs(),
+        eventsFunctionsExtensionsState,
+        commandPaletteRef,
+        preferences,
+        importExtension,
+        onWillInstallExtension,
+        onExtensionInstalled,
+        saveProject,
+        ensureProjectSettingsApplied,
+        onFinished: exitCode => {
+          if (!keepOpen) exitApp(exitCode);
+        },
+      });
     },
     [
       project,
       i18n,
+      commandPaletteRef,
+      eventsFunctionsExtensionsState,
+      preferences,
+      importExtension,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      saveProject,
+      ensureProjectSettingsApplied,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      if (!ipcRenderer || !project) return;
+
+      const onRunCliCommand = (
+        event: any,
+        {
+          commandName,
+          commandArgs,
+          fileIdentifier: routedFileIdentifier,
+        }: RunCliCommandIpcPayload
+      ) => {
+        if (
+          normalizeFileIdentifier(routedFileIdentifier) !==
+          normalizeFileIdentifier(fileIdentifier)
+        ) {
+          console.error(
+            `[CLI] Command "${commandName}" was routed to this window for "${routedFileIdentifier ||
+              ''}", but it now has "${fileIdentifier || ''}" open. Ignoring.`
+          );
+          return;
+        }
+
+        runCliCommand({
+          project,
+          i18n,
+          commandName,
+          commandArgs: normalizeCommandArgs(commandArgs),
+          eventsFunctionsExtensionsState,
+          commandPaletteRef,
+          preferences,
+          importExtension,
+          onWillInstallExtension,
+          onExtensionInstalled,
+          saveProject,
+          ensureProjectSettingsApplied,
+          onFinished: () => {},
+        });
+      };
+
+      ipcRenderer.on('run-cli-command', onRunCliCommand);
+      return () =>
+        ipcRenderer.removeListener('run-cli-command', onRunCliCommand);
+    },
+    [
+      project,
+      i18n,
+      fileIdentifier,
       commandPaletteRef,
       eventsFunctionsExtensionsState,
       preferences,

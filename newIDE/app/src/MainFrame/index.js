@@ -413,11 +413,13 @@ export type Props = {|
   useCliCommandRunner: ({|
     project: ?gdProject,
     i18n: I18n,
+    fileIdentifier: ?string,
     commandPaletteRef: {| current: ?CommandPaletteInterface |},
     importExtension: ImportExtension,
     onWillInstallExtension: (extensionNames: Array<string>) => void,
     onExtensionInstalled: (extensionNames: Array<string>) => void,
     saveProject: SaveProject,
+    ensureProjectSettingsApplied: () => Promise<void>,
   |}) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
@@ -5308,6 +5310,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   useCliCommandRunner({
     project: state.currentProject,
     i18n,
+    fileIdentifier,
     commandPaletteRef,
     importExtension,
     onWillInstallExtension,

@@ -1213,7 +1213,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     (fileMetadata: ?FileMetadata): Promise<void> => {
       if (!fileMetadata) return Promise.resolve();
 
-      const currentPromise = (async () => {
+      const currentPromise: Promise<void> = (async () => {
         try {
           const parsedProjectSettings = await readProjectSettings(
             fileMetadata.fileIdentifier

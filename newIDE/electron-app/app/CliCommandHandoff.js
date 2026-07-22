@@ -5,7 +5,6 @@ const {
   getWindowFileIdentifier,
 } = require('./OpenProjectsRegistry');
 
-// In dev, electron is launched with an extra argument, so skip one more.
 const argsParserOptions = {
   boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
   string: ['_', 'run-command', 'cmd-args'],
@@ -34,6 +33,7 @@ const parseGDevelopArgs = argv =>
 const parseSecondInstanceArgs = ({ commandLine, additionalData, isDev }) =>
   additionalData && additionalData.args
     ? additionalData.args
+    // In dev, electron is launched with an extra argument, so skip one more.
     : parseGDevelopArgs(commandLine.slice(isDev ? 2 : 1));
 
 const isCliProjectAlreadyOpenElsewhere = parsedArgs => {

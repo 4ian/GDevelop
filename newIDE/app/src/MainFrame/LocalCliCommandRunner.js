@@ -60,9 +60,29 @@ const normalizeCommandArgs = (
 const getCommandArgs = (): Array<string> =>
   normalizeCommandArgs(Window.getArguments()['cmd-args']);
 
+/**
+ * Whether diagnostic-error export blocking should be enforced for this CLI run.
+ *
+ * Priority (highest first):
+ *  1. `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` CLI flags,
+ *     for CI/release scripts that want to force the behavior explicitly.
+ *  2. The current `blockPreviewAndExportOnDiagnosticErrors` preference, which
+ *     reflects the project's own `gdevelop-settings.yaml` once
+ *     `ensureProjectSettingsApplied` has resolved (see `useCliCommandRunner`).
+ */
+export const shouldBlockOnDiagnosticErrorsForCli = (
+  preferences: Preferences
+): boolean => {
+  const appArguments = Window.getArguments();
+  const cliOverride = appArguments['block-on-diagnostic-errors'];
+  if (typeof cliOverride === 'boolean') return cliOverride;
+
+  return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
+};
+
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
-    if (preferences.getBlockPreviewAndExportOnDiagnosticErrors()) {
+    if (shouldBlockOnDiagnosticErrorsForCli(preferences)) {
       const errors = scanProjectForValidationErrors(project);
       if (errors.length > 0) {
         console.error(
@@ -178,6 +198,10 @@ type RunCliCommandOptions = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   saveProject: SaveProject,
+  // Resolves once the project's `gdevelop-settings.yaml` has been read and
+  // applied to the preferences, so the command runner can rely on `preferences`
+  // as the single source of truth without racing the project load.
+  ensureProjectSettingsApplied: () => Promise<void>,
   onFinished: (exitCode: number) => void,
 |};
 
@@ -193,6 +217,7 @@ const runCliCommand = async ({
   onWillInstallExtension,
   onExtensionInstalled,
   saveProject,
+  ensureProjectSettingsApplied,
   onFinished,
 }: RunCliCommandOptions): Promise<void> => {
   try {
@@ -203,6 +228,11 @@ const runCliCommand = async ({
       onFinished(1);
       return;
     }
+
+    // Wait until the project's gdevelop-settings.yaml has been applied to
+    // the preferences, so commands (e.g. the diagnostic-error export block)
+    // read the project's own settings rather than a stale global value.
+    await ensureProjectSettingsApplied();
 
     const awaitableRunner = getAwaitableCliRunner(commandName);
     if (awaitableRunner) {
@@ -247,6 +277,10 @@ type Props = {|
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   saveProject: SaveProject,
+  // Resolves once the project's `gdevelop-settings.yaml` has been read and
+  // applied to the preferences, so the command runner can rely on `preferences`
+  // as the single source of truth without racing the project load.
+  ensureProjectSettingsApplied: () => Promise<void>,
 |};
 
 export const useCliCommandRunner = ({
@@ -258,6 +292,7 @@ export const useCliCommandRunner = ({
   onWillInstallExtension,
   onExtensionInstalled,
   saveProject,
+  ensureProjectSettingsApplied,
 }: Props) => {
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -300,6 +335,7 @@ export const useCliCommandRunner = ({
         onWillInstallExtension,
         onExtensionInstalled,
         saveProject,
+        ensureProjectSettingsApplied,
         onFinished: exitCode => {
           if (!keepOpen) exitApp(exitCode);
         },
@@ -315,6 +351,7 @@ export const useCliCommandRunner = ({
       onWillInstallExtension,
       onExtensionInstalled,
       saveProject,
+      ensureProjectSettingsApplied,
     ]
   );
 
@@ -353,6 +390,7 @@ export const useCliCommandRunner = ({
           onWillInstallExtension,
           onExtensionInstalled,
           saveProject,
+          ensureProjectSettingsApplied,
           onFinished: () => {},
         });
       };
@@ -372,6 +410,7 @@ export const useCliCommandRunner = ({
       onWillInstallExtension,
       onExtensionInstalled,
       saveProject,
+      ensureProjectSettingsApplied,
     ]
   );
 

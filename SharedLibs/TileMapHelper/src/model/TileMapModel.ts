@@ -455,20 +455,7 @@ export class EditableTileMap {
     if (!layer) return;
     const initialRowCount = this.dimY;
     const initialColumnCount = this.dimX;
-    if (layer.isEmpty() && this._layers.length === 1) {
-      // The tile map is empty. Instead of having an object with null width and height,
-      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
-      // in the editor. It might need to have a different behavior in the runtime.
-      layer.increaseDimensions(1, 0, 1, 0);
-      this.dimX = 1;
-      this.dimY = 1;
-      return {
-        shiftedRows: 0,
-        shiftedColumns: 0,
-        poppedRows: initialRowCount - 1,
-        poppedColumns: initialColumnCount - 1,
-      };
-    }
+
     const trimmingData = layer.getTrimmingData();
 
     for (const layer of this.getLayers()) {
@@ -488,6 +475,21 @@ export class EditableTileMap {
       trimmingData.columnsToShift;
     this.dimY =
       initialRowCount - trimmingData.rowsToPop - trimmingData.rowsToShift;
+
+    if (this.dimX === 0 && this.dimY === 0 && this._layers.length === 1) {
+      // The tile map is empty. Instead of having an object with null width and height,
+      // the tile map is resized to have a size of 1x1 with an empty tile. This is useful
+      // in the editor. It might need to have a different behavior in the runtime.
+      layer.increaseDimensions(1, 0, 1, 0);
+      this.dimX = 1;
+      this.dimY = 1;
+      return {
+        shiftedRows: 0,
+        shiftedColumns: 0,
+        poppedRows: initialRowCount - 1,
+        poppedColumns: initialColumnCount - 1,
+      };
+    }
 
     return {
       poppedRows: trimmingData.rowsToPop,

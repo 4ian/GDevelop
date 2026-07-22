@@ -858,54 +858,92 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     rowsToPop: number;
     columnsToPop: number;
   } {
-    let rowsToShift = 0,
-      rowsToPop = 0;
-    const initialDimensionX = this.getDimensionX();
-    const initialDimensionY = this.getDimensionY();
-    const columnsToShiftByRow = new Array(this._tiles.length).fill(
-      this._tiles[0].length,
-    );
-    const columnsToPopByRow = new Array(this._tiles.length).fill(
-      this._tiles[0].length,
-    );
-    let isFirstNonEmptyRowFound = false;
-    for (let y = 0; y < this._tiles.length; y++) {
+    let minX = this.getDimensionX();
+    let minY = this.getDimensionY();
+    let maxX = -1;
+    let maxY = -1;
+
+    // Scan from the bottom
+    for (let y = this._tiles.length - 1; y >= 0; y--) {
       const row = this._tiles[y];
-      let isFirstNonEmptyColumnFound = false;
-      for (let x = 0; x < row.length; x++) {
-        const cell = row[x];
+      let cell = 0;
+      // from right to left
+      for (let x = row.length - 1; x >= 0; x--) {
+        cell = row[x];
         if (cell !== 0) {
-          columnsToPopByRow[y] = row.length - 1 - x;
-          if (!isFirstNonEmptyColumnFound) {
-            columnsToShiftByRow[y] = x;
-            isFirstNonEmptyColumnFound = true;
-          }
+          maxX = x;
+          maxY = y;
+          break;
         }
       }
-      const isRowEmpty = !isFirstNonEmptyColumnFound;
-      if (!isRowEmpty) {
-        rowsToPop = this._tiles.length - 1 - y;
-        if (!isFirstNonEmptyRowFound) {
-          rowsToShift = y;
-          isFirstNonEmptyRowFound = true;
-        }
+      if (cell !== 0) {
+        break;
       }
     }
-    if (!isFirstNonEmptyRowFound) {
+    // The layer is empty.
+    if (maxY === -1) {
       return {
         columnsToShift: 0,
         rowsToShift: 0,
-        columnsToPop: initialDimensionX - 1,
-        rowsToPop: initialDimensionY - 1,
+        columnsToPop: this.getDimensionX() - 1,
+        rowsToPop: this.getDimensionY() - 1,
       };
     }
-    const columnsToShift = Math.min(...columnsToShiftByRow);
-    const columnsToPop = Math.min(...columnsToPopByRow);
+    // Scan from the top
+    for (let y = 0; y <= maxY; y++) {
+      const row = this._tiles[y];
+      let cell = 0;
+      // from left to right
+      for (let x = 0; x < row.length; x++) {
+        cell = row[x];
+        if (cell !== 0) {
+          minX = x;
+          minY = y;
+          break;
+        }
+      }
+      if (cell !== 0) {
+        break;
+      }
+    }
+    // When only 1 row remains, we already found the bounds.
+    if (minY !== maxY) {
+      let cell = 0;
+      // Scan from the right
+      for (let x = this.getDimensionX() - 1; x > maxX; x--) {
+        // maxY is already covered
+        for (let y = minY; y < maxY; y++) {
+          cell = this._tiles[y][x];
+          if (cell !== 0) {
+            maxX = x;
+            break;
+          }
+        }
+        if (cell !== 0) {
+          break;
+        }
+      }
+      // Scan from the left
+      for (let x = 0; x < minX; x++) {
+        let cell = 0;
+        // minY is already covered
+        for (let y = minY + 1; y <= maxY; y++) {
+          cell = this._tiles[y][x];
+          if (cell !== 0) {
+            minX = x;
+            break;
+          }
+        }
+        if (cell !== 0) {
+          break;
+        }
+      }
+    }
     return {
-      rowsToShift,
-      columnsToShift,
-      rowsToPop,
-      columnsToPop,
+      rowsToShift: minY,
+      columnsToShift: minX,
+      rowsToPop: this.getDimensionY() - 1 - maxY,
+      columnsToPop: this.getDimensionX() - 1 - maxX,
     };
   }
 

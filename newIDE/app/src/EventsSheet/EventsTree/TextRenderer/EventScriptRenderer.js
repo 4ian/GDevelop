@@ -216,15 +216,44 @@ const convertVariableToJsObject = (variable: gdVariable) => {
 };
 
 const renderLocalVariableLines = (
-  variables: gdVariablesContainer
+  variables: gdVariablesContainer,
+  excludedVariableName: string
 ): Array<string> => {
-  return mapFor(0, variables.count(), i => {
-    const variable = variables.getAt(i);
+  const lines = [];
+  mapFor(0, variables.count(), i => {
     const variableName = variables.getNameAt(i);
+    if (excludedVariableName && variableName === excludedVariableName) {
+      return;
+    }
+    const variable = variables.getAt(i);
     const type = gd.Variable.typeAsString(variable.getType());
     const value = JSON.stringify(convertVariableToJsObject(variable));
-    return `local ${type} ${variableName} = ${value}`;
+    lines.push(`local ${type} ${variableName} = ${value}`);
   });
+  return lines;
+};
+
+/**
+ * The loop index variable of a loop event (the `index X` clause), or an
+ * empty string. Its declaration as an event variable is implied by the
+ * clause: rendering it as a `local` declaration too would be redundant and
+ * misleading (it looks like a declaration shadowing the loop index).
+ */
+const getLoopIndexVariableName = (event: gdBaseEvent): string => {
+  const type = event.getType();
+  if (type === 'BuiltinCommonInstructions::Repeat') {
+    return gd.asRepeatEvent(event).getLoopIndexVariableName();
+  }
+  if (type === 'BuiltinCommonInstructions::ForEach') {
+    return gd.asForEachEvent(event).getLoopIndexVariableName();
+  }
+  if (type === 'BuiltinCommonInstructions::While') {
+    return gd.asWhileEvent(event).getLoopIndexVariableName();
+  }
+  if (type === 'BuiltinCommonInstructions::ForEachChildVariable') {
+    return gd.asForEachChildVariableEvent(event).getLoopIndexVariableName();
+  }
+  return '';
 };
 
 /**
@@ -501,9 +530,10 @@ export const renderEventAsEventScriptLines = ({
 
   try {
     if (event.canHaveVariables() && event.hasVariables()) {
-      renderLocalVariableLines(event.getVariables()).forEach(line =>
-        lines.push(`${bodyIndent}${line}`)
-      );
+      renderLocalVariableLines(
+        event.getVariables(),
+        getLoopIndexVariableName(event)
+      ).forEach(line => lines.push(`${bodyIndent}${line}`));
     }
   } catch (error) {
     renderingErrors.push({

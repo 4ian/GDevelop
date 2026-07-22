@@ -191,6 +191,28 @@
       ]
     },
     {
+      "name": "the auto-declared loop index variable is implied by the `index` clause (not rendered as a local)",
+      "parsesBack": true,
+      "serializedEvents": [
+        {
+          "type": "BuiltinCommonInstructions::Repeat",
+          "repeatExpression": "3",
+          "loopIndexVariable": "I",
+          "variables": [
+            { "name": "I", "type": "number", "value": "0" },
+            { "name": "Total", "type": "number", "value": "5" }
+          ],
+          "conditions": [],
+          "actions": [{ "type": { "value": "Wait" }, "parameters": ["1"] }]
+        }
+      ],
+      "expectedEventScript": [
+        "repeat 3 times index I:",
+        "  local number Total = 5",
+        "  Wait(1)"
+      ]
+    },
+    {
       "name": "degenerate loops (freshly created in the editor, fields still empty) stay parseable",
       "parsesBack": true,
       "serializedEvents": [

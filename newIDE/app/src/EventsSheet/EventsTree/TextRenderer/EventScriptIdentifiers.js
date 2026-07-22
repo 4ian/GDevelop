@@ -76,6 +76,30 @@ export const isAllowedInIdentifier = (character: string): boolean => {
 };
 
 /**
+ * Check if the name is safe to use as an identifier (object name, behavior
+ * name...) - the port of `gd::Project::IsNameSafe`. The editor can also
+ * call the real C++ implementation through `gd.Project.isNameSafe`: this
+ * port exists because the source view needs character-level checks (see
+ * `containsNameUsedAsIdentifier`, which the C++ does not expose), and it is
+ * verified against the C++ one by the conformance test of this module.
+ */
+export const isNameSafe = (name: string): boolean => {
+  if (!name) return false;
+  const firstLetter = name[0];
+  if (!firstLetter) return false;
+
+  if (!Number.isNaN(parseInt(firstLetter, 10))) return false;
+
+  for (const character of Array.from(name)) {
+    if (!isAllowedInIdentifier(character)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
  * Check if the text contains the name used as a whole identifier: an
  * occurrence with no identifier character just before or after (the
  * unicode-aware equivalent of a `\b` word boundary, which only understands

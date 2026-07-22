@@ -684,7 +684,14 @@ jobs:
               adm-zip@^0.5.10
 
       - run:
-          name: Run CLI HTML5 export
+          name: Import an extension then run CLI HTML5 export
+          # This first runs `--run-command IMPORT_EXTENSION_AND_SAVE` to import a
+          # real, dependency-free events-based extension into the example project
+          # and save it, then packages the game with
+          # `--run-command EXPORT_HTML5_EXTERNAL`. This exercises the generic CLI
+          # command runner (#8847) and the headless mutate + save round-trip
+          # before packaging, on top of the plain HTML5 export.
+          #
           # Wrap with xvfb-run as a safety net: even though the editor hides
           # its BrowserWindow in --run-command mode, Electron itself still
           # needs a usable display for some GPU/graphics initialization on
@@ -708,6 +715,7 @@ jobs:
               node newIDE/app/scripts/test-portable-cli-export.js \
               $EXTRA_ARGS \
               --example=3d-platformer \
+              --extension=./GDevelop.js/__tests__/extensions/EBAsyncAction.json \
               --workDir=./cli-html5-export-work \
               --artifactsDir=./cli-html5-export-artifacts
 

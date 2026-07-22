@@ -12,16 +12,30 @@
  *   3. Extracts it with adm-zip.
  *   4. Sparse-clones an example game from the GDevelop-examples repository
  *      (defaults to "3d-platformer").
- *   5. Runs the extracted GDevelop binary in CLI mode with
- *      `--run-command EXPORT_HTML5_EXTERNAL` to export the game to HTML5.
- *   6. Verifies the exported HTML5 game looks valid (e.g. `index.html`
+ *   5. Runs a CLI command *before packaging* to mutate the project:
+ *      `--run-command IMPORT_EXTENSION_AND_SAVE` imports one or more
+ *      events-based extensions into the project and saves it back to disk.
+ *      This exercises the headless project mutate + save round-trip added in
+ *      #8847 (the generic CLI command runner), and proves that a *separate*
+ *      later CLI invocation picks the persisted changes up.
+ *   6. Verifies the saved project now references the imported extension(s).
+ *   7. Runs the extracted GDevelop binary in CLI mode with
+ *      `--run-command EXPORT_HTML5_EXTERNAL` to package the game to HTML5.
+ *   8. Verifies the exported HTML5 game looks valid (e.g. `index.html`
  *      exists) and zips it into the artifacts folder.
  *
  * Usage:
  *   node test-portable-cli-export.js [--branch=master] [--example=3d-platformer]
  *                                    [--zipPath=/path/to/gdevelop-X.Y.Z.zip]
+ *                                    [--extension=/path/to/Extension.json]
+ *                                    [--no-extension-import]
  *                                    [--workDir=./.portable-cli-test]
  *                                    [--artifactsDir=./portable-cli-artifacts]
+ *
+ * `--extension` can be repeated to import several extensions. When omitted, a
+ * real, dependency-free events-based extension bundled in the repository is
+ * used. Pass `--no-extension-import` to skip the pre-packaging step and only
+ * test the plain HTML5 export.
  */
 
 const fs = require('fs');
@@ -45,6 +59,24 @@ const artifactsDir = path.resolve(
 // running the smoke test right after a build-linux job that already produced
 // the portable zip on disk).
 const localZipPath = args['zipPath'] ? path.resolve(args['zipPath']) : null;
+
+// Default extension imported before packaging. `EBAsyncAction.json` is a real,
+// dependency-free events-based extension (behavior + object + async functions)
+// kept valid by the GDevelop.js integration tests, so it is a safe, always
+// up-to-date sample to import headlessly. Override with one or more
+// `--extension` flags, or disable the step with `--no-extension-import`.
+const DEFAULT_EXTENSION_PATH = path.resolve(
+  __dirname,
+  '../../../GDevelop.js/__tests__/extensions/EBAsyncAction.json'
+);
+const extensionPaths = args['no-extension-import']
+  ? []
+  : (Array.isArray(args['extension'])
+      ? args['extension']
+      : args['extension']
+      ? [args['extension']]
+      : [DEFAULT_EXTENSION_PATH]
+    ).map(extensionPath => path.resolve(extensionPath));
 
 const version = electronAppPackageJson.version;
 const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/latest`;
@@ -134,11 +166,61 @@ const fail = msg => {
   }
   shell.echo(`✅ Example game project: ${gameJsonPath}`);
 
-  // 5. Run the GDevelop CLI export.
-  shell.echo('🚀 Running GDevelop CLI HTML5 export ...');
-  await runCliExport(gdevelopBinary, gameJsonPath);
+  // 5. Before packaging, run a CLI command that mutates the project: import
+  //    events-based extension(s) and save the project back to disk. This
+  //    exercises the generic CLI command runner (#8847) and the headless
+  //    mutate + save round-trip, so the export at step 7 runs against a
+  //    project that was modified by an earlier, separate CLI invocation.
+  if (extensionPaths.length > 0) {
+    for (const extensionPath of extensionPaths) {
+      if (!fs.existsSync(extensionPath)) {
+        fail(`Extension file to import does not exist: ${extensionPath}`);
+      }
+    }
+    const expectedExtensionNames = extensionPaths.map(readExtensionName);
+    const extensionNamesBefore = readProjectExtensionNames(gameJsonPath);
+    shell.echo(
+      `🧩 Importing ${extensionPaths.length} extension(s) before packaging: ` +
+        `${expectedExtensionNames.join(', ')}`
+    );
+    await runCliCommand(gdevelopBinary, {
+      command: 'IMPORT_EXTENSION_AND_SAVE',
+      gameJsonPath,
+      cmdArgs: extensionPaths,
+    });
 
-  // 6. Verify the export.
+    // The command saves the project in place — verify the imported extensions
+    // are now persisted in the game file (i.e. the save actually happened).
+    const extensionNamesAfter = readProjectExtensionNames(gameJsonPath);
+    const missing = expectedExtensionNames.filter(
+      name => !extensionNamesAfter.includes(name)
+    );
+    if (missing.length > 0) {
+      fail(
+        `IMPORT_EXTENSION_AND_SAVE did not persist extension(s) [${missing.join(
+          ', '
+        )}] into ${gameJsonPath}. ` +
+          `Extensions before: [${extensionNamesBefore.join(', ')}], ` +
+          `after: [${extensionNamesAfter.join(', ')}].`
+      );
+    }
+    shell.echo(
+      `✅ Extension(s) imported and saved into the project: ${expectedExtensionNames.join(
+        ', '
+      )}`
+    );
+  } else {
+    shell.echo('⏭️  Skipping extension import step (--no-extension-import).');
+  }
+
+  // 6. Run the GDevelop CLI export to package the (possibly mutated) project.
+  shell.echo('🚀 Running GDevelop CLI HTML5 export ...');
+  await runCliCommand(gdevelopBinary, {
+    command: 'EXPORT_HTML5_EXTERNAL',
+    gameJsonPath,
+  });
+
+  // 7. Verify the export.
   const exportedBuildDir = path.join(exampleDir, 'build');
   const exportedIndex = path.join(exportedBuildDir, 'index.html');
   if (!fs.existsSync(exportedIndex)) {
@@ -157,7 +239,7 @@ const fail = msg => {
   }
   shell.echo(`✅ index.html exported (${formatBytes(indexSize)})`);
 
-  // 7. Zip the exported HTML5 game into the artifacts folder so the CI job
+  // 8. Zip the exported HTML5 game into the artifacts folder so the CI job
   //    can surface a single downloadable archive via store_artifacts.
   const artifactZipPath = path.join(
     artifactsDir,
@@ -239,26 +321,32 @@ function cloneExampleSparse(repoUrl, repoBranch, slug, dest) {
 }
 
 /**
- * Run the GDevelop CLI export. Resolves on success, rejects on non-zero
- * exit. Times out (and SIGKILLs) after `CLI_TIMEOUT_MS`.
+ * Run a GDevelop `--run-command` CLI command headlessly. Resolves on success,
+ * rejects on non-zero exit. Times out (and SIGKILLs) after `CLI_TIMEOUT_MS`.
+ * Each `cmdArgs` entry is forwarded via its own repeated `--cmd-args` flag, as
+ * the command runner expects (e.g. one flag per extension path).
  * @param {string} gdevelopBinary
- * @param {string} gameJsonPath
+ * @param {{ command: string, gameJsonPath: string, cmdArgs?: string[] }} options
  * @returns {Promise<void>}
  */
-function runCliExport(gdevelopBinary, gameJsonPath) {
+function runCliCommand(gdevelopBinary, { command, gameJsonPath, cmdArgs = [] }) {
   return new Promise((resolve, reject) => {
     const cliArgs = [
       '--no-sandbox',
       '--disable-update-check',
       '--run-command',
-      'EXPORT_HTML5_EXTERNAL',
+      command,
       gameJsonPath,
+      ...cmdArgs.reduce(
+        (flags, value) => flags.concat(['--cmd-args', value]),
+        /** @type {string[]} */ ([])
+      ),
     ];
     shell.echo(`▶ ${gdevelopBinary} ${cliArgs.join(' ')}`);
     const child = spawn(gdevelopBinary, cliArgs, { stdio: 'inherit' });
 
     const timer = setTimeout(() => {
-      shell.echo('❌ CLI export timed out, killing process.');
+      shell.echo(`❌ CLI command "${command}" timed out, killing process.`);
       child.kill('SIGKILL');
     }, CLI_TIMEOUT_MS);
 
@@ -272,11 +360,37 @@ function runCliExport(gdevelopBinary, gameJsonPath) {
       else
         reject(
           new Error(
-            `GDevelop CLI exited with code=${code} signal=${signal || 'none'}`
+            `GDevelop CLI command "${command}" exited with code=${code} signal=${signal ||
+              'none'}`
           )
         );
     });
   });
+}
+
+/**
+ * Read the `name` of a serialized events-based extension file.
+ * @param {string} extensionPath
+ * @returns {string}
+ */
+function readExtensionName(extensionPath) {
+  const extension = JSON.parse(fs.readFileSync(extensionPath, 'utf8'));
+  if (!extension || typeof extension.name !== 'string' || !extension.name) {
+    fail(`Extension file has no "name" field: ${extensionPath}`);
+  }
+  return extension.name;
+}
+
+/**
+ * Read the names of the events-based extensions currently in a project file.
+ * @param {string} gameJsonPath
+ * @returns {string[]}
+ */
+function readProjectExtensionNames(gameJsonPath) {
+  const project = JSON.parse(fs.readFileSync(gameJsonPath, 'utf8'));
+  const extensions = project.eventsFunctionsExtensions;
+  if (!Array.isArray(extensions)) return [];
+  return extensions.map(extension => extension && extension.name).filter(Boolean);
 }
 
 function formatBytes(n) {

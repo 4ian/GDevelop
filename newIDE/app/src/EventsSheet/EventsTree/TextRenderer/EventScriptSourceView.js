@@ -5,6 +5,7 @@ import {
   renderEventScriptHeaderLine,
   type EventScriptRenderingError,
 } from './EventScriptRenderer';
+import { containsNameUsedAsIdentifier } from './EventScriptIdentifiers';
 
 const gd: libGDevelop = global.gd;
 
@@ -124,11 +125,6 @@ export const renderEventSourceById = ({
     subEventsDepth: Number.MAX_SAFE_INTEGER,
     renderingErrors,
   }).join('\n');
-};
-
-const makeWordBoundaryRegex = (name: string): RegExp => {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(^|[^A-Za-z0-9_])${escaped}($|[^A-Za-z0-9_])`);
 };
 
 /**
@@ -326,7 +322,7 @@ export const buildEventScriptSourceView = ({
   let selectedPaths: Array<string> = [];
   if (hasSearch) {
     const lowerCaseSearchText = searchText ? searchText.toLowerCase() : null;
-    const objectNameRegexes = (objectNames || []).map(makeWordBoundaryRegex);
+    const filterObjectNames = objectNames || [];
     const isInScope = (path: string) =>
       !hasEventIds ||
       scopeRootPaths.some(
@@ -343,8 +339,13 @@ export const buildEventScriptSourceView = ({
         continue;
       }
       if (
-        objectNameRegexes.length > 0 &&
-        !objectNameRegexes.some(regex => regex.test(ownText))
+        filterObjectNames.length > 0 &&
+        !filterObjectNames.some(objectName =>
+          // Object names can contain any unicode character allowed by
+          // GDevelop identifiers: a plain `\b`-style regex boundary would
+          // not work, use the identifier-aware matching.
+          containsNameUsedAsIdentifier(ownText, objectName)
+        )
       ) {
         continue;
       }

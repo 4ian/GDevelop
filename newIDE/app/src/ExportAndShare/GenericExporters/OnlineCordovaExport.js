@@ -65,7 +65,9 @@ export const SetupExportHeader = ({
             value={'androidAppBundle'}
             control={<Radio color="secondary" disabled={isExporting} />}
             label={
-              <Trans>Android App Bundle (for publishing on Google Play)</Trans>
+              <Trans>
+                Android App Bundle (.AAB file, for publishing on Google Play)
+              </Trans>
             }
           />
         </RadioGroup>

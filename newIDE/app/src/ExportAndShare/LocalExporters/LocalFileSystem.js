@@ -2,6 +2,7 @@
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getUID } from '../../Utils/LocalUserInfo';
 import { isURL } from '../../ResourcesList/ResourceUtils';
+import { decodePercentEncodedFileName } from '../../Utils/PercentEncodedFileName';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -102,6 +103,15 @@ class LocalFileSystem {
   fileNameFrom = (fullPath: string): any => {
     // If URLs are not downloaded, then filenames are not changed.
     if (!this._downloadUrlsToLocalFiles && isURL(fullPath)) return fullPath;
+
+    // For URLs that are downloaded (like resources of cloud projects), decode
+    // the percent-encoded file name, so that the file is stored on disk with
+    // its decoded name (required for the file to be found when the game runs -
+    // notably in a mobile app, where the WebView decodes the requested URL path
+    // before looking up the file).
+    if (isURL(fullPath)) {
+      return decodePercentEncodedFileName(path.basename(fullPath));
+    }
 
     return path.basename(fullPath);
   };

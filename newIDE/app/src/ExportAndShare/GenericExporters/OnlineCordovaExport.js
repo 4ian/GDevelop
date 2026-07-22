@@ -57,8 +57,7 @@ export const SetupExportHeader = ({
             control={<Radio color="secondary" disabled={isExporting} />}
             label={
               <Trans>
-                .apk - Android Package Kit (for testing on device or sharing
-                outside Google Play)
+                APK (for testing on device or sharing outside Google Play)
               </Trans>
             }
           />
@@ -67,7 +66,7 @@ export const SetupExportHeader = ({
             control={<Radio color="secondary" disabled={isExporting} />}
             label={
               <Trans>
-                .aab - Android App Bundle (for publishing on Google Play)
+                Android App Bundle (.AAB file, for publishing on Google Play)
               </Trans>
             }
           />

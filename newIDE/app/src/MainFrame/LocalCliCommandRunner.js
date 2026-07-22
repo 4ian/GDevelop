@@ -60,16 +60,6 @@ const normalizeCommandArgs = (
 const getCommandArgs = (): Array<string> =>
   normalizeCommandArgs(Window.getArguments()['cmd-args']);
 
-const parsePositiveInteger = (key: string, value: string): number => {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    throw new Error(
-      `[CLI] Invalid value "${value}" for "${key}" (expected a positive integer).`
-    );
-  }
-  return parsed;
-};
-
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
     if (preferences.getBlockPreviewAndExportOnDiagnosticErrors()) {
@@ -118,67 +108,6 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const fileMetadata = await saveProject({ skipNewVersionWarning: true });
     if (!fileMetadata) {
       throw new Error('[CLI] Extension imported but project save failed.');
-    }
-  },
-  SET_PROJECT_PROPERTIES: async (
-    project,
-    i18n,
-    { commandArgs, saveProject }
-  ) => {
-    // Each --cmd-args entry is a `key=value` pair applied to the project.
-    // Supported keys map to the game's public properties.
-    const propertySetters: {
-      [key: string]: (project: gdProject, value: string) => void,
-    } = {
-      name: (project, value) => project.setName(value),
-      author: (project, value) => project.setAuthor(value),
-      version: (project, value) => project.setVersion(value),
-      packageName: (project, value) => project.setPackageName(value),
-      description: (project, value) => project.setDescription(value),
-      // 'default' | 'landscape' | 'portrait'
-      orientation: (project, value) => project.setOrientation(value),
-      resolutionWidth: (project, value) =>
-        project.setGameResolutionSize(
-          parsePositiveInteger('resolutionWidth', value),
-          project.getGameResolutionHeight()
-        ),
-      resolutionHeight: (project, value) =>
-        project.setGameResolutionSize(
-          project.getGameResolutionWidth(),
-          parsePositiveInteger('resolutionHeight', value)
-        ),
-    };
-
-    if (commandArgs.length === 0) {
-      throw new Error(
-        '[CLI] SET_PROJECT_PROPERTIES requires at least one "key=value" pair via --cmd-args. ' +
-          `Supported keys: ${Object.keys(propertySetters).join(', ')}.`
-      );
-    }
-
-    for (const propertyAssignment of commandArgs) {
-      const separatorIndex = propertyAssignment.indexOf('=');
-      if (separatorIndex === -1) {
-        throw new Error(
-          `[CLI] Invalid project property "${propertyAssignment}" (expected "key=value").`
-        );
-      }
-      const key = propertyAssignment.slice(0, separatorIndex).trim();
-      const value = propertyAssignment.slice(separatorIndex + 1);
-      const setProperty = propertySetters[key];
-      if (!setProperty) {
-        throw new Error(
-          `[CLI] Unknown project property "${key}". ` +
-            `Supported keys: ${Object.keys(propertySetters).join(', ')}.`
-        );
-      }
-      setProperty(project, value);
-      console.info(`[CLI] Set project property "${key}" = "${value}".`);
-    }
-
-    const fileMetadata = await saveProject({ skipNewVersionWarning: true });
-    if (!fileMetadata) {
-      throw new Error('[CLI] Project properties updated but save failed.');
     }
   },
 };

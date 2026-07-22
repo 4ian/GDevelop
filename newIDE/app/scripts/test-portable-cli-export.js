@@ -18,9 +18,10 @@
  *      This exercises the headless project mutate + save round-trip added in
  *      #8847 (the generic CLI command runner), and proves that a *separate*
  *      later CLI invocation picks the persisted changes up.
- *   6. Runs `--run-command SET_PROJECT_PROPERTIES` to change several game
- *      properties (name, version, orientation, resolution) and save, then
- *      verifies the changes are persisted in the project file.
+ *   6. Launches an existing editor command-palette command through the same
+ *      generic `--run-command` path (fire-and-forget, no CLI-specific command
+ *      added). Defaults to `SAVE_PROJECT`, then verifies the project file was
+ *      actually rewritten and is still valid.
  *   7. Runs the extracted GDevelop binary in CLI mode with
  *      `--run-command EXPORT_HTML5_EXTERNAL` to package the game to HTML5.
  *   8. Verifies the exported HTML5 game looks valid (e.g. `index.html`
@@ -31,15 +32,16 @@
  *                                    [--zipPath=/path/to/gdevelop-X.Y.Z.zip]
  *                                    [--extension=/path/to/Extension.json]
  *                                    [--no-extension-import]
- *                                    [--no-set-properties]
+ *                                    [--launch-command=SAVE_PROJECT]
+ *                                    [--no-launch-command]
  *                                    [--workDir=./.portable-cli-test]
  *                                    [--artifactsDir=./portable-cli-artifacts]
  *
  * `--extension` can be repeated to import several extensions. When omitted, a
  * real, dependency-free events-based extension bundled in the repository is
  * used. Pass `--no-extension-import` to skip the extension import step and
- * `--no-set-properties` to skip the project properties step; either way the
- * plain HTML5 export still runs.
+ * `--no-launch-command` to skip the command-palette launch step; either way
+ * the plain HTML5 export still runs.
  */
 
 const fs = require('fs');
@@ -82,19 +84,15 @@ const extensionPaths = args['no-extension-import']
       : [DEFAULT_EXTENSION_PATH]
     ).map(extensionPath => path.resolve(extensionPath));
 
-// Deterministic project property changes applied (and saved) via the
-// SET_PROJECT_PROPERTIES CLI command before packaging. Each entry is the
-// `key=value` pair passed to the command and the corresponding key to check
-// afterwards in the saved project's `properties` object. Disable the whole
-// step with `--no-set-properties`.
-const shouldSetProjectProperties = !args['no-set-properties'];
-const projectPropertyChanges = [
-  { arg: 'name=CLI smoke test game', savedKey: 'name', expected: 'CLI smoke test game' },
-  { arg: 'version=9.9.9', savedKey: 'version', expected: '9.9.9' },
-  { arg: 'orientation=portrait', savedKey: 'orientation', expected: 'portrait' },
-  { arg: 'resolutionWidth=1280', savedKey: 'windowWidth', expected: 1280 },
-  { arg: 'resolutionHeight=720', savedKey: 'windowHeight', expected: 720 },
-];
+// Before packaging, launch an existing editor command-palette command through
+// the generic `--run-command` path (fire-and-forget via launchCommand — no
+// CLI-specific command is added for this). `SAVE_PROJECT` re-serializes the
+// project through the editor's own save code path, which is a real, useful,
+// headless-safe command to exercise. Disable with `--no-launch-command`, or
+// pick another command with `--launch-command=SOME_COMMAND`.
+const commandToLaunch = args['no-launch-command']
+  ? null
+  : args['launch-command'] || 'SAVE_PROJECT';
 
 const version = electronAppPackageJson.version;
 const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/latest`;
@@ -231,40 +229,44 @@ const fail = msg => {
     shell.echo('⏭️  Skipping extension import step (--no-extension-import).');
   }
 
-  // 6. Manipulate the project via CLI: change several game properties (name,
-  //    version, orientation, resolution) and save. Another headless mutate +
-  //    save round-trip, verified against the re-read project file below.
-  if (shouldSetProjectProperties) {
+  // 6. Launch an existing editor command-palette command through the generic
+  //    `--run-command` path (fire-and-forget). This exercises a real editor
+  //    code path without adding any CLI-specific command. `SAVE_PROJECT`
+  //    re-serializes the project, so we can verify it actually ran by checking
+  //    the project file was rewritten and is still valid JSON.
+  if (commandToLaunch) {
+    const mtimeBefore = fs.statSync(gameJsonPath).mtimeMs;
     shell.echo(
-      `🛠️  Setting project properties before packaging: ${projectPropertyChanges
-        .map(change => change.arg)
-        .join(', ')}`
+      `🎛️  Launching editor command "${commandToLaunch}" (fire-and-forget) before packaging ...`
     );
     await runCliCommand(gdevelopBinary, {
-      command: 'SET_PROJECT_PROPERTIES',
+      command: commandToLaunch,
       gameJsonPath,
-      cmdArgs: projectPropertyChanges.map(change => change.arg),
     });
 
-    const savedProperties = readProjectProperties(gameJsonPath);
-    const mismatches = projectPropertyChanges.filter(
-      change => savedProperties[change.savedKey] !== change.expected
-    );
-    if (mismatches.length > 0) {
-      fail(
-        `SET_PROJECT_PROPERTIES did not persist: ${mismatches
-          .map(
-            change =>
-              `${change.savedKey} expected ${JSON.stringify(
-                change.expected
-              )}, got ${JSON.stringify(savedProperties[change.savedKey])}`
-          )
-          .join('; ')}.`
+    if (commandToLaunch === 'SAVE_PROJECT') {
+      const mtimeAfter = fs.statSync(gameJsonPath).mtimeMs;
+      if (mtimeAfter <= mtimeBefore) {
+        fail(
+          `"${commandToLaunch}" did not rewrite ${gameJsonPath} ` +
+            `(mtime unchanged: ${mtimeBefore} -> ${mtimeAfter}). ` +
+            `The command may not have run.`
+        );
+      }
+      // Re-read to confirm the freshly saved project is still valid JSON with
+      // its extensions intact (i.e. the save produced a usable project file).
+      const extensionNames = readProjectExtensionNames(gameJsonPath);
+      shell.echo(
+        `✅ "${commandToLaunch}" re-saved the project (still valid JSON, ` +
+          `${extensionNames.length} extension(s)).`
+      );
+    } else {
+      shell.echo(
+        `✅ "${commandToLaunch}" dispatched (fire-and-forget, not verified).`
       );
     }
-    shell.echo('✅ Project properties updated and saved.');
   } else {
-    shell.echo('⏭️  Skipping project properties step (--no-set-properties).');
+    shell.echo('⏭️  Skipping editor command launch (--no-launch-command).');
   }
 
   // 7. Run the GDevelop CLI export to package the (possibly mutated) project.
@@ -445,17 +447,6 @@ function readProjectExtensionNames(gameJsonPath) {
   const extensions = project.eventsFunctionsExtensions;
   if (!Array.isArray(extensions)) return [];
   return extensions.map(extension => extension && extension.name).filter(Boolean);
-}
-
-/**
- * Read the public `properties` object of a project file (name, version,
- * windowWidth, ...).
- * @param {string} gameJsonPath
- * @returns {{ [key: string]: any }}
- */
-function readProjectProperties(gameJsonPath) {
-  const project = JSON.parse(fs.readFileSync(gameJsonPath, 'utf8'));
-  return project.properties || {};
 }
 
 function formatBytes(n) {

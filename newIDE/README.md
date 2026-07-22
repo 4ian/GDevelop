@@ -140,17 +140,17 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 
-`SET_PROJECT_PROPERTIES` updates the game's public properties and saves the project.
-Pass each change as a `key=value` pair with a repeated `--cmd-args` flag. Supported
-keys: `name`, `author`, `version`, `packageName`, `description`, `orientation`
-(`default`/`landscape`/`portrait`), `resolutionWidth`, `resolutionHeight`.
+`--run-command` also accepts any editor command palette command name (see
+`newIDE/app/src/CommandPalette/CommandsList.js`), for example `SAVE_PROJECT`.
+These launch the real editor command — the same code path as choosing it from
+the palette — as "fire-and-forget": the CLI dispatches it and exits without
+waiting for it to finish or reporting its result, so they suit headless
+automation rather than commands whose exit code you need to check.
 
 ```bash
-# Linux
+# Linux — re-save the project through the editor's own save code path.
 ./gdevelop --no-sandbox --disable-update-check \
-  --run-command SET_PROJECT_PROPERTIES /path/to/game.json \
-  --cmd-args "name=My renamed game" --cmd-args version=1.2.3 \
-  --cmd-args resolutionWidth=1920 --cmd-args resolutionHeight=1080
+  --run-command SAVE_PROJECT /path/to/game.json
 ```
 
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).

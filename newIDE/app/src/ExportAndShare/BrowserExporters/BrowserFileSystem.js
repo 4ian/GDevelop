@@ -1,5 +1,6 @@
 // @flow
 import path from 'path-browserify';
+import { decodePercentEncodedFileName } from '../../Utils/PercentEncodedFileName';
 const gd: libGDevelop = global.gd;
 
 export type BlobFileDescriptor = {|
@@ -113,6 +114,15 @@ export default class BrowserFileSystem {
     return '/browser-file-system-tmp-dir';
   };
   fileNameFrom = (fullpath: string): any => {
+    // For URLs (like resources of cloud projects), decode the percent-encoded
+    // file name, so that the file is stored on disk with its decoded name
+    // (required for the file to be found when the game runs - notably in
+    // a mobile app, where the WebView decodes the requested URL path before
+    // looking up the file).
+    if (isURL(fullpath)) {
+      return decodePercentEncodedFileName(pathPosix.basename(fullpath));
+    }
+
     return pathPosix.basename(fullpath);
   };
   dirNameFrom = (fullpath: string): any => {

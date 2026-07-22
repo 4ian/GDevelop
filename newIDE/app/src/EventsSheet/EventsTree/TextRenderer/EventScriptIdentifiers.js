@@ -1,9 +1,19 @@
 // @flow
 // A port of GDevelop `Core/GDCore/Events/Parsers/GrammarTerminals.h`
-// (`IsAllowedInIdentifier`), also ported backend-side in
-// `lib/gdevelop-identifiers.js` (GDevelop-services repository): identifiers
+// (`IsAllowedInIdentifier` and the character sets it relies on): identifiers
 // (object, variable, behavior names...) can contain any unicode character
 // except the ones reserved by the expressions grammar.
+//
+// KEEP IN SYNC - this definition exists in three places, which must all
+// change together:
+// - `Core/GDCore/Events/Parsers/GrammarTerminals.h` (the C++ source of
+//   truth, used by the expressions parser and `gd::Project::IsNameSafe`),
+// - this file (used by the EventScript source view),
+// - `generation-api/src/lib/gdevelop-identifiers.js` in the
+//   GDevelop-services repository (used by the EventScript parser and the
+//   events validation).
+// A character added or removed in one and not the others means the editor,
+// the backend and the engine would disagree on what a valid name is.
 
 const RESERVED_CHARACTERS = new Set([
   // Whitespaces:

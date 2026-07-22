@@ -130,6 +130,39 @@ describe('EventScriptSourceView', () => {
     }
   });
 
+  it('filters by object names with unicode identifiers (whole-name matches only)', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const eventsList = makeEventsList(project, [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [{ type: { value: 'Delete' }, parameters: ['Héros', ''] }],
+        },
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            { type: { value: 'Delete' }, parameters: ['SuperHéros', ''] },
+          ],
+        },
+      ]);
+
+      const view = buildEventScriptSourceView({
+        eventsList,
+        objectNames: ['Héros'],
+        maxChars: 10000,
+      });
+
+      // "SuperHéros" must NOT match the object name "Héros": identifier
+      // boundaries are unicode-aware, not ASCII `\b` ones.
+      expect(view.selectedEventIds).toEqual(['event-0']);
+      expect(view.text).toContain('Delete(Héros)');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('renders the source of one event by id (own lines, or the full subtree)', () => {
     const { project } = makeTestProject(gd);
     try {

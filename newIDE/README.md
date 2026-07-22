@@ -140,6 +140,19 @@ GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path
   --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
 ```
 
+`SET_PROJECT_PROPERTIES` updates the game's public properties and saves the project.
+Pass each change as a `key=value` pair with a repeated `--cmd-args` flag. Supported
+keys: `name`, `author`, `version`, `packageName`, `description`, `orientation`
+(`default`/`landscape`/`portrait`), `resolutionWidth`, `resolutionHeight`.
+
+```bash
+# Linux
+./gdevelop --no-sandbox --disable-update-check \
+  --run-command SET_PROJECT_PROPERTIES /path/to/game.json \
+  --cmd-args "name=My renamed game" --cmd-args version=1.2.3 \
+  --cmd-args resolutionWidth=1920 --cmd-args resolutionHeight=1080
+```
+
 Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools).
 
 If the same project is already open in a running editor, the command runs in that

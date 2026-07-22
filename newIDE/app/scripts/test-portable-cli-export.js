@@ -18,7 +18,9 @@
  *      This exercises the headless project mutate + save round-trip added in
  *      #8847 (the generic CLI command runner), and proves that a *separate*
  *      later CLI invocation picks the persisted changes up.
- *   6. Verifies the saved project now references the imported extension(s).
+ *   6. Runs `--run-command SET_PROJECT_PROPERTIES` to change several game
+ *      properties (name, version, orientation, resolution) and save, then
+ *      verifies the changes are persisted in the project file.
  *   7. Runs the extracted GDevelop binary in CLI mode with
  *      `--run-command EXPORT_HTML5_EXTERNAL` to package the game to HTML5.
  *   8. Verifies the exported HTML5 game looks valid (e.g. `index.html`
@@ -29,13 +31,15 @@
  *                                    [--zipPath=/path/to/gdevelop-X.Y.Z.zip]
  *                                    [--extension=/path/to/Extension.json]
  *                                    [--no-extension-import]
+ *                                    [--no-set-properties]
  *                                    [--workDir=./.portable-cli-test]
  *                                    [--artifactsDir=./portable-cli-artifacts]
  *
  * `--extension` can be repeated to import several extensions. When omitted, a
  * real, dependency-free events-based extension bundled in the repository is
- * used. Pass `--no-extension-import` to skip the pre-packaging step and only
- * test the plain HTML5 export.
+ * used. Pass `--no-extension-import` to skip the extension import step and
+ * `--no-set-properties` to skip the project properties step; either way the
+ * plain HTML5 export still runs.
  */
 
 const fs = require('fs');
@@ -77,6 +81,20 @@ const extensionPaths = args['no-extension-import']
       ? [args['extension']]
       : [DEFAULT_EXTENSION_PATH]
     ).map(extensionPath => path.resolve(extensionPath));
+
+// Deterministic project property changes applied (and saved) via the
+// SET_PROJECT_PROPERTIES CLI command before packaging. Each entry is the
+// `key=value` pair passed to the command and the corresponding key to check
+// afterwards in the saved project's `properties` object. Disable the whole
+// step with `--no-set-properties`.
+const shouldSetProjectProperties = !args['no-set-properties'];
+const projectPropertyChanges = [
+  { arg: 'name=CLI smoke test game', savedKey: 'name', expected: 'CLI smoke test game' },
+  { arg: 'version=9.9.9', savedKey: 'version', expected: '9.9.9' },
+  { arg: 'orientation=portrait', savedKey: 'orientation', expected: 'portrait' },
+  { arg: 'resolutionWidth=1280', savedKey: 'windowWidth', expected: 1280 },
+  { arg: 'resolutionHeight=720', savedKey: 'windowHeight', expected: 720 },
+];
 
 const version = electronAppPackageJson.version;
 const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/latest`;
@@ -213,14 +231,50 @@ const fail = msg => {
     shell.echo('⏭️  Skipping extension import step (--no-extension-import).');
   }
 
-  // 6. Run the GDevelop CLI export to package the (possibly mutated) project.
+  // 6. Manipulate the project via CLI: change several game properties (name,
+  //    version, orientation, resolution) and save. Another headless mutate +
+  //    save round-trip, verified against the re-read project file below.
+  if (shouldSetProjectProperties) {
+    shell.echo(
+      `🛠️  Setting project properties before packaging: ${projectPropertyChanges
+        .map(change => change.arg)
+        .join(', ')}`
+    );
+    await runCliCommand(gdevelopBinary, {
+      command: 'SET_PROJECT_PROPERTIES',
+      gameJsonPath,
+      cmdArgs: projectPropertyChanges.map(change => change.arg),
+    });
+
+    const savedProperties = readProjectProperties(gameJsonPath);
+    const mismatches = projectPropertyChanges.filter(
+      change => savedProperties[change.savedKey] !== change.expected
+    );
+    if (mismatches.length > 0) {
+      fail(
+        `SET_PROJECT_PROPERTIES did not persist: ${mismatches
+          .map(
+            change =>
+              `${change.savedKey} expected ${JSON.stringify(
+                change.expected
+              )}, got ${JSON.stringify(savedProperties[change.savedKey])}`
+          )
+          .join('; ')}.`
+      );
+    }
+    shell.echo('✅ Project properties updated and saved.');
+  } else {
+    shell.echo('⏭️  Skipping project properties step (--no-set-properties).');
+  }
+
+  // 7. Run the GDevelop CLI export to package the (possibly mutated) project.
   shell.echo('🚀 Running GDevelop CLI HTML5 export ...');
   await runCliCommand(gdevelopBinary, {
     command: 'EXPORT_HTML5_EXTERNAL',
     gameJsonPath,
   });
 
-  // 7. Verify the export.
+  // 8. Verify the export.
   const exportedBuildDir = path.join(exampleDir, 'build');
   const exportedIndex = path.join(exportedBuildDir, 'index.html');
   if (!fs.existsSync(exportedIndex)) {
@@ -239,7 +293,7 @@ const fail = msg => {
   }
   shell.echo(`✅ index.html exported (${formatBytes(indexSize)})`);
 
-  // 8. Zip the exported HTML5 game into the artifacts folder so the CI job
+  // 9. Zip the exported HTML5 game into the artifacts folder so the CI job
   //    can surface a single downloadable archive via store_artifacts.
   const artifactZipPath = path.join(
     artifactsDir,
@@ -391,6 +445,17 @@ function readProjectExtensionNames(gameJsonPath) {
   const extensions = project.eventsFunctionsExtensions;
   if (!Array.isArray(extensions)) return [];
   return extensions.map(extension => extension && extension.name).filter(Boolean);
+}
+
+/**
+ * Read the public `properties` object of a project file (name, version,
+ * windowWidth, ...).
+ * @param {string} gameJsonPath
+ * @returns {{ [key: string]: any }}
+ */
+function readProjectProperties(gameJsonPath) {
+  const project = JSON.parse(fs.readFileSync(gameJsonPath, 'utf8'));
+  return project.properties || {};
 }
 
 function formatBytes(n) {

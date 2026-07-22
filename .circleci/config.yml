@@ -684,13 +684,15 @@ jobs:
               adm-zip@^0.5.10
 
       - run:
-          name: Import an extension then run CLI HTML5 export
-          # This first runs `--run-command IMPORT_EXTENSION_AND_SAVE` to import a
-          # real, dependency-free events-based extension into the example project
-          # and save it, then packages the game with
-          # `--run-command EXPORT_HTML5_EXTERNAL`. This exercises the generic CLI
-          # command runner (#8847) and the headless mutate + save round-trip
-          # before packaging, on top of the plain HTML5 export.
+          name: Manipulate the project via CLI then run CLI HTML5 export
+          # Before packaging, this mutates the example project through the
+          # generic CLI command runner (#8847): `IMPORT_EXTENSION_AND_SAVE`
+          # imports a real, dependency-free events-based extension, then
+          # `SET_PROJECT_PROPERTIES` changes game properties (name, version,
+          # orientation, resolution). Each command saves the project, and the
+          # game is finally packaged with `EXPORT_HTML5_EXTERNAL`. This exercises
+          # the headless mutate + save round-trip before packaging, on top of
+          # the plain HTML5 export.
           #
           # Wrap with xvfb-run as a safety net: even though the editor hides
           # its BrowserWindow in --run-command mode, Electron itself still

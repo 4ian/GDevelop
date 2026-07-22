@@ -49,6 +49,10 @@ namespace gdjs {
 
     abstract invalidateTileMap(): void;
 
+    abstract getTileSetColumnCount(): integer;
+
+    abstract getTileSetRowCount(): integer;
+
     /**
      * This method is expensive and should not be called.
      * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.

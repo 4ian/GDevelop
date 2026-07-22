@@ -117,7 +117,7 @@ export namespace TiledTileMapLoader {
       }
     }
 
-    const collisionTileMap = new EditableTileMap(
+    const editableTileMap = new EditableTileMap(
       tiledTileMap.tilewidth,
       tiledTileMap.tileheight,
       tiledTileMap.width,
@@ -125,9 +125,17 @@ export namespace TiledTileMapLoader {
       definitions,
     );
 
+    const firstTileSet = tiledTileMap.tilesets[0];
+    if (firstTileSet) {
+      editableTileMap.setTileSetColumnCount(firstTileSet.columns);
+      editableTileMap.setTileSetRowCount(
+        Math.ceil(firstTileSet.tilecount / firstTileSet.columns),
+      );
+    }
+
     for (const tiledLayer of tiledTileMap.layers) {
       if (tiledLayer.type === "objectgroup") {
-        const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
+        const objectLayer = editableTileMap.addObjectLayer(tiledLayer.id);
         objectLayer.setVisible(tiledLayer.visible);
         if (tiledLayer.objects) {
           for (const tiledObject of tiledLayer.objects) {
@@ -163,7 +171,7 @@ export namespace TiledTileMapLoader {
           layerData = tiledLayer.data as integer[];
         }
         if (layerData) {
-          const collisionTileLayer = collisionTileMap.addNewTileLayer(
+          const collisionTileLayer = editableTileMap.addNewTileLayer(
             tiledLayer.id,
           );
           collisionTileLayer.setAlpha(tiledLayer.opacity);
@@ -202,6 +210,6 @@ export namespace TiledTileMapLoader {
       }
     }
 
-    return collisionTileMap;
+    return editableTileMap;
   }
 }

@@ -589,6 +589,20 @@ namespace gdjs {
     invalidateTileMap(): void {
       this._isTileMapDirty = true;
     }
+
+    getTileSetColumnCount(): integer {
+      if (!this._tileMap) {
+        return 0;
+      }
+      return this._tileMap.getTileSetColumnCount();
+    }
+
+    getTileSetRowCount(): integer {
+      if (!this._tileMap) {
+        return 0;
+      }
+      return this._tileMap.getTileSetRowCount();
+    }
   }
   gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);
 }

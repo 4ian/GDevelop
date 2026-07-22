@@ -34,9 +34,10 @@ export declare class EditableTileMap {
    */
   private dimY;
   /**
-   * True if is allowed to set a tile out of the tile map's bounds.
-   * Useful when editing the tile map easily.
+   * It can be useful for auto-tilling.
    */
+  private tileSetColumnCount;
+  private tileSetRowCount;
   /**
    * @param tileWidth The width of a tile.
    * @param tileHeight The height of a tile.
@@ -121,13 +122,17 @@ export declare class EditableTileMap {
   setDimensionY(dim: integer): void;
   /**
    * @param tileId The tile identifier
-   * @returns The tile definition form the tile set.
+   * @returns The tile definition from the tile set.
    */
   getTileDefinition(tileId: integer): TileDefinition | undefined;
   /**
-   * @returns All the tile definitions form the tile set.
+   * @returns All the tile definitions from the tile set.
    */
   getTileDefinitions(): Iterable<TileDefinition>;
+  getTileSetColumnCount(): integer;
+  getTileSetRowCount(): integer;
+  setTileSetColumnCount(tileSetColumnCount: integer): void;
+  setTileSetRowCount(tileSetRowCount: integer): void;
   /**
    * @param id The identifier of the new layer.
    * @returns The new layer.

@@ -466,11 +466,11 @@ namespace gdjs {
       return this._renderer.getScaleY();
     }
 
-    getTilesetColumnCount(): integer {
+    getTileSetColumnCount(): integer {
       return this._columnCount;
     }
 
-    getTilesetRowCount(): integer {
+    getTileSetRowCount(): integer {
       return this._rowCount;
     }
 

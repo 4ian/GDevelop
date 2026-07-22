@@ -73,6 +73,10 @@ namespace gdjs {
     getGridRowCount(): integer;
 
     getGridColumnCount(): integer;
+
+    getTileSetColumnCount(): integer;
+
+    getTileSetRowCount(): integer;
   }
 
   /**
@@ -224,6 +228,14 @@ namespace gdjs {
 
     getGridColumnCount(): integer {
       return this.object.getGridColumnCount();
+    }
+
+    getTileSetColumnCount(): integer {
+      return this.object.getTileSetColumnCount();
+    }
+
+    getTileSetRowCount(): integer {
+      return this.object.getTileSetRowCount();
     }
   }
 

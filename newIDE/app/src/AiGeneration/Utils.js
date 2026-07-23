@@ -529,6 +529,13 @@ export const useProcessFunctionCalls = ({
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
           toolOptions: aiRequest.toolOptions || null,
+          // Some functions adapt their behavior to the calling agent (e.g.
+          // `read_events_source` gives the explorer agent more room).
+          callerMode:
+            aiRequest.mode === 'agent-explorer' ||
+            aiRequest.mode === 'agent-edit'
+              ? aiRequest.mode
+              : null,
           i18n,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,

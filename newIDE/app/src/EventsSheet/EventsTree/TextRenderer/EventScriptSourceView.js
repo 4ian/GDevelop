@@ -258,7 +258,8 @@ const renderFilteredTree = ({
  * Build a filtered EventScript "source view" of a scene's events.
  *
  * - With no filter: every top-level event, sub-events collapsed beyond
- *   `subEventsDepth` (default 1).
+ *   `subEventsDepth` (default: `wholeSheetSubEventsDepth`, itself 1 when
+ *   not given).
  * - With `eventIds` (event ids or group names): those events, rendered in
  *   full by default, with their ancestors as header lines for context.
  * - With `searchText`/`objectNames`: events whose own lines (header,
@@ -275,6 +276,7 @@ export const buildEventScriptSourceView = ({
   searchText,
   objectNames,
   subEventsDepth,
+  wholeSheetSubEventsDepth,
   maxChars,
 }: {|
   eventsList: gdEventsList,
@@ -282,6 +284,10 @@ export const buildEventScriptSourceView = ({
   searchText?: string | null,
   objectNames?: Array<string> | null,
   subEventsDepth?: number | null,
+  // Depth used for a whole-sheet read when `subEventsDepth` is not given
+  // (defaults to 1). The explorer agent uses 2, to get a better picture in
+  // a single read.
+  wholeSheetSubEventsDepth?: number | null,
   maxChars: number,
 |}): EventScriptSourceView => {
   const notes: Array<string> = [];
@@ -408,7 +414,10 @@ export const buildEventScriptSourceView = ({
     subEventsDepth !== null && subEventsDepth !== undefined
       ? subEventsDepth
       : isWholeSheet
-      ? 1
+      ? wholeSheetSubEventsDepth !== null &&
+        wholeSheetSubEventsDepth !== undefined
+        ? wholeSheetSubEventsDepth
+        : 1
       : Number.MAX_SAFE_INTEGER;
 
   const depthsToTry = [

@@ -10,7 +10,7 @@ import classes from './FunctionCallsGroup.module.css';
 
 type Props = {|
   children: React.Node,
-  mode?: 'chat' | 'agent' | 'orchestrator',
+  mode?: 'chat' | 'agent' | 'orchestrator' | 'agent-explorer' | 'agent-edit',
 |};
 
 export const FunctionCallsGroup = ({

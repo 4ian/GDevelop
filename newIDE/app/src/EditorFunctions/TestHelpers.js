@@ -35,6 +35,7 @@ export const makeFakeLaunchFunctionOptionsWithoutProject = (): LaunchFunctionOpt
   toolOptions: {
     includeEventsJson: true,
   },
+  callerMode: null,
   ensureExtensionInstalled: jest.fn(),
   searchAndInstallAsset: jest.fn(),
   searchAndInstallResources: async () => {

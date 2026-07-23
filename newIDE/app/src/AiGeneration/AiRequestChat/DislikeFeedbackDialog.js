@@ -15,7 +15,7 @@ type DislikeFeedbackDialogProps = {|
   open: boolean,
   onClose: () => void,
   onSendFeedback: (reason: string, freeFormDetails: string) => void,
-  mode: 'chat' | 'agent' | 'orchestrator',
+  mode: 'chat' | 'agent' | 'orchestrator' | 'agent-explorer' | 'agent-edit',
 |};
 
 export const DislikeFeedbackDialog = ({

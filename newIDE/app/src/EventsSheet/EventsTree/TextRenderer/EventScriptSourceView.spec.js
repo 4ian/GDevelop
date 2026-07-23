@@ -60,6 +60,88 @@ describe('EventScriptSourceView', () => {
     }
   });
 
+  it('shows one more level on a whole-sheet read with `wholeSheetSubEventsDepth: 2` (explorer agent)', () => {
+    const { project } = makeTestProject(gd);
+    try {
+      const deeplyNestedSerializedEvents = [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [{ type: { value: 'DepartScene' }, parameters: [''] }],
+          actions: [],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: { value: 'ChangeAnimation' },
+                  parameters: ['MySpriteObject', '=', '1'],
+                },
+              ],
+              events: [
+                {
+                  type: 'BuiltinCommonInstructions::Standard',
+                  conditions: [],
+                  actions: [
+                    {
+                      type: { value: 'Delete' },
+                      parameters: ['MySpriteObject', ''],
+                    },
+                  ],
+                  events: [
+                    {
+                      type: 'BuiltinCommonInstructions::Standard',
+                      conditions: [],
+                      actions: [
+                        {
+                          type: { value: 'ChangeAnimation' },
+                          parameters: ['MySpriteObject', '=', '2'],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      const eventsList = makeEventsList(project, deeplyNestedSerializedEvents);
+
+      const defaultView = buildEventScriptSourceView({
+        eventsList,
+        maxChars: 10000,
+      });
+      // Default whole-sheet read: only one level of sub-events.
+      expect(defaultView.text).toContain('# event-0.0');
+      expect(defaultView.text).not.toContain('Delete(MySpriteObject)');
+
+      const explorerView = buildEventScriptSourceView({
+        eventsList,
+        wholeSheetSubEventsDepth: 2,
+        maxChars: 10000,
+      });
+      // Depth 2: the second level (event-0.0.0) is shown...
+      expect(explorerView.text).toContain('# event-0.0.0');
+      expect(explorerView.text).toContain('Delete(MySpriteObject)');
+      // ...but not the third one.
+      expect(explorerView.text).not.toContain(
+        'ChangeAnimation(MySpriteObject, =, 2)'
+      );
+
+      // An explicit `subEventsDepth` still wins over the whole-sheet default.
+      const explicitDepthView = buildEventScriptSourceView({
+        eventsList,
+        subEventsDepth: 1,
+        wholeSheetSubEventsDepth: 2,
+        maxChars: 10000,
+      });
+      expect(explicitDepthView.text).not.toContain('Delete(MySpriteObject)');
+    } finally {
+      project.delete();
+    }
+  });
+
   it('returns a single event subtree with ancestors as headers', () => {
     const { project } = makeTestProject(gd);
     try {

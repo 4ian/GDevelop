@@ -117,7 +117,9 @@ export type AiRequest = {
   gameId?: string | null,
   gameProjectJson?: string | null,
   status: GenerationStatus,
-  mode?: 'chat' | 'agent' | 'orchestrator',
+  // `agent-explorer` and `agent-edit` are only set on sub-agent requests
+  // (created server-side by the orchestrator's `run_*_agent` tools).
+  mode?: 'chat' | 'agent' | 'orchestrator' | 'agent-explorer' | 'agent-edit',
   aiConfiguration?: AiConfiguration,
   toolsVersion?: string,
   toolOptions?: AiRequestToolOptions | null,

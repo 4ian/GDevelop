@@ -282,6 +282,14 @@ export type ToolOptions = {
   ...
 };
 
+/**
+ * The sub-agent the processed function calls belong to, when they come from
+ * a sub-agent AI request (null for the main request: chat, agent or
+ * orchestrator). Some functions adapt their behavior to it (e.g.
+ * `read_events_source` gives the explorer agent more room).
+ */
+export type CallerMode = 'agent-explorer' | 'agent-edit' | null;
+
 export type RenderForEditorOptions = {|
   project: ?gdProject,
   args: any,
@@ -303,6 +311,7 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  callerMode: CallerMode,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -5034,9 +5043,20 @@ const readSceneEvents: EditorFunction = {
   modifiesProject: false,
 };
 
+// Keep these limits in sync with the `read_events_source` tool schemas in
+// `llm-gdevelop-tools.js` (GDevelop-services repository).
 const EVENTS_SOURCE_MAX_CHARS_DEFAULT = 12000;
 const EVENTS_SOURCE_MAX_CHARS_MINIMUM = 2000;
 const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
+// The explorer agent's whole job is reading: it gets more room and sees
+// one more level of sub-events on whole-scene reads.
+const EXPLORER_EVENTS_SOURCE_MAX_CHARS_DEFAULT = 16000;
+const EXPLORER_EVENTS_SOURCE_MAX_CHARS_LIMIT = 40000;
+const EXPLORER_EVENTS_SOURCE_WHOLE_SCENE_DEPTH = 2;
+// An `expected_event_source` anchor bigger than this cannot be sent as the
+// proof-of-read reference (the backend bounds the field at 40000): keep a
+// margin below it, independent from the read limits above.
+const EVENT_SOURCE_ANCHOR_MAX_CHARS = 30000;
 
 /**
  * Reads the events of a scene as EventScript source (the exact syntax
@@ -5068,7 +5088,7 @@ const readEventsSource: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, callerMode }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
 
     if (!project.hasLayoutNamed(scene_name)) {
@@ -5093,11 +5113,17 @@ const readEventsSource: EditorFunction = {
       args,
       'max_chars'
     );
+    const isExplorer = callerMode === 'agent-explorer';
     const maxChars = Math.max(
       EVENTS_SOURCE_MAX_CHARS_MINIMUM,
       Math.min(
-        EVENTS_SOURCE_MAX_CHARS_LIMIT,
-        maxCharsArgument || EVENTS_SOURCE_MAX_CHARS_DEFAULT
+        isExplorer
+          ? EXPLORER_EVENTS_SOURCE_MAX_CHARS_LIMIT
+          : EVENTS_SOURCE_MAX_CHARS_LIMIT,
+        maxCharsArgument ||
+          (isExplorer
+            ? EXPLORER_EVENTS_SOURCE_MAX_CHARS_DEFAULT
+            : EVENTS_SOURCE_MAX_CHARS_DEFAULT)
       )
     );
 
@@ -5113,6 +5139,9 @@ const readEventsSource: EditorFunction = {
       searchText,
       objectNames,
       subEventsDepth,
+      wholeSheetSubEventsDepth: isExplorer
+        ? EXPLORER_EVENTS_SOURCE_WHOLE_SCENE_DEPTH
+        : null,
       maxChars,
     });
 
@@ -5491,7 +5520,7 @@ const addSceneEvents: EditorFunction = {
           // rather than failing the whole request.
           const placementTargetEventSource =
             renderedTargetEventSource &&
-            renderedTargetEventSource.length <= EVENTS_SOURCE_MAX_CHARS_LIMIT
+            renderedTargetEventSource.length <= EVENT_SOURCE_ANCHOR_MAX_CHARS
               ? renderedTargetEventSource
               : null;
 

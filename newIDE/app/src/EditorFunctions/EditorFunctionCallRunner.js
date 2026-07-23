@@ -17,6 +17,7 @@ import {
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
   type ToolOptions,
+  type CallerMode,
 } from '.';
 import {
   type SceneEventsOutsideEditorChanges,
@@ -36,6 +37,7 @@ type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  callerMode: CallerMode,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -78,6 +80,7 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  callerMode,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -195,6 +198,7 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        callerMode,
         editorCallbacks,
         relatedAiRequestId,
         getRelatedAiRequestLastMessages,

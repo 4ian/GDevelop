@@ -86,22 +86,15 @@ export const CompactEffectsListEditor = ({
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
-  const { isSectionFolded, setSectionFolded } = usePersistedCollapsedSection({
+  const {
+    isSectionFolded,
+    toggleSectionFolded,
+    setSectionFolded,
+  } = usePersistedCollapsedSection({
     project,
     persistedPanelStateId: persistedPanelStateId,
     persistedPanelStateType: 'layer',
   });
-  const [isEffectsFolded, setEffectsFoldedState] = React.useState(
-    isSectionFolded(layerRenderingType + '-effects')
-  );
-
-  const setEffectsFolded = React.useCallback(
-    (isFolded: boolean) => {
-      setEffectsFoldedState(isFolded);
-      setSectionFolded(layerRenderingType + '-effects', isFolded);
-    },
-    [layerRenderingType, setSectionFolded]
-  );
 
   // Effects:
   const {
@@ -137,10 +130,13 @@ export const CompactEffectsListEditor = ({
           <Trans>2D effects</Trans>
         )
       }
-      isFolded={isEffectsFolded}
-      toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
+      isFolded={isSectionFolded(layerRenderingType + '-effects')}
+      toggleFolded={() => toggleSectionFolded(layerRenderingType + '-effects')}
       onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(layerRenderingType === '3d')}
+      onAdd={() => {
+        addEffect(layerRenderingType === '3d');
+        setSectionFolded(layerRenderingType + '-effects', false);
+      }}
       renderContent={() => (
         <ColumnStackLayout noMargin>
           {effectsContainer.getEffectsCount() === 0 && (

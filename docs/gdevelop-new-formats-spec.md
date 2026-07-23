@@ -1787,7 +1787,11 @@ The writer:
    `.gdevelop/layout-catalog.json`. The instruction catalog contains actions,
    conditions, expressions, and function signatures. The settings catalog
    contains file ownership schemas and registered object/behavior/effect
-   metadata. The layout catalog contains the layout TOML tables and each
+   metadata. Every settings `fileKinds` entry contains a complete `schema`
+   whose `rootFields` describe root scalars and whose recursive `childTables`
+   describe canonical TOML headers, record fields, dynamic-key rules, and
+   empty forms; `commonFields` remains only a compact search summary. The
+   layout catalog contains the layout TOML tables and each
    layout's resolvable objects, attached behaviors, and layers.
    Instruction enumeration covers the non-deprecated authoring surface. It
    excludes editor-hidden compatibility instructions, instructions with deprecation

@@ -1944,6 +1944,56 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
+                  externalsRootFolderId,
+                  i18n._(t`Externals`),
+                  {
+                    icon: <Add />,
+                    label: i18n._(t`Create`),
+                    click: openCreateExternalDialog,
+                    id: 'create-external-button',
+                  }
+                ),
+                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                  const externalItems: Array<TreeViewItem> = [
+                    ...mapFor(
+                      0,
+                      project.getExternalLayoutsCount(),
+                      i =>
+                        new LeafTreeViewItem(
+                          new ExternalLayoutTreeViewItemContent(
+                            project.getExternalLayoutAt(i),
+                            externalLayoutTreeViewItemProps
+                          )
+                        )
+                    ),
+                    ...mapFor(
+                      0,
+                      project.getExternalEventsCount(),
+                      i =>
+                        new LeafTreeViewItem(
+                          new ExternalEventsTreeViewItemContent(
+                            project.getExternalEventsAt(i),
+                            externalEventsTreeViewItemProps
+                          )
+                        )
+                    ),
+                  ];
+
+                  if (externalItems.length === 0) {
+                    return [
+                      new PlaceHolderTreeViewItem(
+                        externalsEmptyPlaceholderId,
+                        i18n._(t`Start by creating an external.`)
+                      ),
+                    ];
+                  }
+
+                  return externalItems;
+                },
+              },
+              {
+                isRoot: true,
+                content: new LabelTreeViewItemContent(
                   customObjectsRootFolderId,
                   i18n._(t`Prefabs`),
                   {
@@ -2174,56 +2224,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   return functionExtensionItems;
                 },
               },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  externalsRootFolderId,
-                  i18n._(t`Externals`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Create`),
-                    click: openCreateExternalDialog,
-                    id: 'create-external-button',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const externalItems: Array<TreeViewItem> = [
-                    ...mapFor(
-                      0,
-                      project.getExternalLayoutsCount(),
-                      i =>
-                        new LeafTreeViewItem(
-                          new ExternalLayoutTreeViewItemContent(
-                            project.getExternalLayoutAt(i),
-                            externalLayoutTreeViewItemProps
-                          )
-                        )
-                    ),
-                    ...mapFor(
-                      0,
-                      project.getExternalEventsCount(),
-                      i =>
-                        new LeafTreeViewItem(
-                          new ExternalEventsTreeViewItemContent(
-                            project.getExternalEventsAt(i),
-                            externalEventsTreeViewItemProps
-                          )
-                        )
-                    ),
-                  ];
-
-                  if (externalItems.length === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        externalsEmptyPlaceholderId,
-                        i18n._(t`Start by creating an external.`)
-                      ),
-                    ];
-                  }
-
-                  return externalItems;
-                },
-              },
             ];
       },
       [
@@ -2310,10 +2310,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           gameSettingsRootFolderId,
           globalsRootFolderId,
           scenesRootFolderId,
+          externalsRootFolderId,
           customObjectsRootFolderId,
           behaviorsRootFolderId,
           functionsRootFolderId,
-          externalsRootFolderId,
         ];
 
         if (!project) return nodeIds;

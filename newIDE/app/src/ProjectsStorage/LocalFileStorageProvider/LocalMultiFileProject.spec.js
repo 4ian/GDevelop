@@ -1060,6 +1060,24 @@ describe('Local multi-file project storage', () => {
     expect(JSON.stringify(persistedSettingsCatalog.fileKinds)).not.toMatch(
       /FolderStructure/
     );
+    expect(
+      persistedSettingsCatalog.fileKinds.every(
+        fileKind =>
+          fileKind.schema &&
+          Array.isArray(fileKind.schema.rootFields) &&
+          Array.isArray(fileKind.schema.childTables)
+      )
+    ).toBe(true);
+    expect(
+      persistedSettingsCatalog.fileKinds
+        .find(fileKind => fileKind.kind === 'externals')
+        .schema.childTables.find(table => table.table === 'eventFiles').fields
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'linkedScene', required: true }),
+        expect.objectContaining({ name: 'events', required: true }),
+      ])
+    );
     expect(settingsCatalog.counts.fileKinds).toBe(14);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);

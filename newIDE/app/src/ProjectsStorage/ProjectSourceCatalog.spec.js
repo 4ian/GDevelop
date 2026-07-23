@@ -33,6 +33,10 @@ describe('project source catalogs', () => {
           kind: 'project',
           path: 'project.settings',
           requiredMarker: { field: 'kind', value: 'project' },
+          schema: {
+            rootFields: [{ name: 'kind', type: 'string' }],
+            childTables: [],
+          },
         },
       ],
       settingsOwners: [{ kind: 'project', name: 'Test' }],
@@ -88,13 +92,28 @@ describe('project source catalogs', () => {
     expect(() =>
       validateProjectSettingsCatalog({
         ...base('gdevelop-settings-catalog'),
-        fileKinds: [{ kind: 'project' }],
+        fileKinds: [
+          {
+            kind: 'project',
+            schema: { rootFields: [], childTables: [] },
+          },
+        ],
         settingsOwners: [],
         objectTypes: [{ type: 'Sprite' }, { type: 'Sprite' }],
         behaviorTypes: [],
         effectTypes: [],
       })
     ).toThrow(ProjectSourceCatalogError);
+    expect(() =>
+      validateProjectSettingsCatalog({
+        ...base('gdevelop-settings-catalog'),
+        fileKinds: [{ kind: 'project' }],
+        settingsOwners: [],
+        objectTypes: [],
+        behaviorTypes: [],
+        effectTypes: [],
+      })
+    ).toThrow('File kind project must declare a schema');
     expect(() =>
       validateProjectLayoutCatalog({
         ...base('gdevelop-layout-catalog'),
@@ -286,6 +305,74 @@ describe('project source catalogs', () => {
       catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
         .commonFields
     ).not.toContain('objectsGroups');
+    expect(
+      catalog.fileKinds.every(
+        fileKind =>
+          fileKind.schema &&
+          Array.isArray(fileKind.schema.rootFields) &&
+          Array.isArray(fileKind.schema.childTables)
+      )
+    ).toBe(true);
+    const externalsSchema = catalog.fileKinds.find(
+      fileKind => fileKind.kind === 'externals'
+    ).schema;
+    expect(externalsSchema.childTables).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          table: 'eventFiles',
+          header: '[[eventFiles]]',
+          fields: expect.arrayContaining([
+            expect.objectContaining({
+              name: 'linkedScene',
+              type: expect.stringContaining('scene name'),
+              required: true,
+            }),
+            expect.objectContaining({
+              name: 'events',
+              type: expect.stringContaining('.events'),
+              required: true,
+            }),
+          ]),
+        }),
+        expect.objectContaining({
+          table: 'layoutFiles',
+          header: '[[layoutFiles]]',
+          fields: expect.arrayContaining([
+            expect.objectContaining({ name: 'linkedScene', required: true }),
+            expect.objectContaining({
+              name: 'layout',
+              type: expect.stringContaining('.layout'),
+              required: true,
+            }),
+          ]),
+        }),
+      ])
+    );
+    expect(
+      catalog.fileKinds
+        .find(fileKind => fileKind.kind === 'function')
+        .schema.childTables.map(table => table.header)
+    ).toEqual(
+      expect.arrayContaining([
+        '[expressionType]',
+        '[[parameters]]',
+        '[objectGroups]',
+      ])
+    );
+    expect(
+      catalog.fileKinds
+        .find(fileKind => fileKind.kind === 'prefab')
+        .schema.childTables.find(table => table.table === 'variants')
+        .childTables.map(table => table.header)
+    ).toEqual(
+      expect.arrayContaining([
+        '[variants.objectGroups]',
+        '[variants.objectGroupRequiredBehaviors]',
+      ])
+    );
+    expect(catalog.authoring.rules.join('\n')).toContain(
+      'commonFields is only a search summary'
+    );
     expect(catalog.authoring.variableDefinition).toContain(
       'Every record contains name'
     );

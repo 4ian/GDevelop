@@ -52,7 +52,11 @@ This refresh is not validation and does not replace the final
 Use the catalogs as authoring contracts:
 
 - In `settings-catalog.json`, read `fileKinds` for the target document's path,
-  mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary. Search
+  mounted namespace, local TOML root, required/common/forbidden fields, and ownership boundary.
+  Treat the matching `schema.rootFields` and recursively nested
+  `schema.childTables` as the complete structural contract, including exact
+  TOML headers, child-record fields, dynamic-key rules, and empty forms;
+  `commonFields` is only a search summary. Search
   `objectTypes`, `behaviorTypes`, and `effectTypes` for exact registered type
   names, defaults, requirements, and property metadata. Use `settingsOwners`
   to resolve existing project components and their object definitions. For an

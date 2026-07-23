@@ -230,6 +230,7 @@ type ProjectSourceCatalogWriteOptions = {|
   reportProgress?: (phase: string) => void,
   instructionCatalog?: Object,
   deprecatedInstructionCatalog?: Object,
+  additionalExtensions?: Array<gdPlatformExtension>,
 |};
 
 export class ProjectSourceCatalogGenerationError extends Error {
@@ -312,7 +313,11 @@ export const writeProjectInstructionCatalog = async (
     catalog = options.instructionCatalog;
   } else {
     reportCatalogProgress(options, 'catalog-instructions-building');
-    catalog = buildProjectInstructionCatalog(project);
+    catalog = buildProjectInstructionCatalog(
+      project,
+      undefined,
+      options && options.additionalExtensions
+    );
     reportCatalogProgress(options, 'catalog-instructions-built');
   }
   const catalogPath = path.join(
@@ -342,7 +347,8 @@ const writeProjectDeprecatedInstructionCatalog = async (
     catalog = buildProjectDeprecatedInstructionCatalog(
       project,
       undefined,
-      options && options.instructionCatalog
+      options && options.instructionCatalog,
+      options && options.additionalExtensions
     );
     reportCatalogProgress(options, 'catalog-deprecated-instructions-built');
   }
@@ -371,6 +377,7 @@ export const writeProjectSettingsCatalog = async (
   const catalog = buildProjectSettingsCatalog({
     project,
     serializedProject,
+    additionalExtensions: options && options.additionalExtensions,
   });
   reportCatalogProgress(options, 'catalog-settings-built');
   reportCatalogProgress(options, 'catalog-settings-writing');
@@ -444,8 +451,9 @@ export const writeProjectSourceCatalogs = async (
   options?: ProjectSourceCatalogWriteOptions
 ): Promise<Object> => {
   let lastPhase = 'catalog-project-serializing';
-  const trackedOptions = {
-    reportProgress: phase => {
+  const trackedOptions: ProjectSourceCatalogWriteOptions = {
+    ...(options || {}),
+    reportProgress: (phase: string) => {
       lastPhase = phase;
       reportCatalogProgress(options, phase);
     },
@@ -467,6 +475,7 @@ export const writeProjectSourceCatalogs = async (
       'catalog-instruction-signature-built'
     );
     const cachedCatalogs =
+      !(options && options.additionalExtensions) &&
       cachedInstructionCatalogs &&
       cachedInstructionCatalogs.key === instructionCatalogCacheKey
         ? cachedInstructionCatalogs

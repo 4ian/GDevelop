@@ -358,10 +358,11 @@ const enumerateExtensionInstructions = (
 };
 
 /**
- * List all the instructions available.
+ * List all the instructions provided by an extension.
  */
-export const enumerateAllInstructions = (
+export const enumerateAllInstructionsForExtension = (
   isCondition: boolean,
+  extension: gdPlatformExtension,
   project: gdProject,
   i18n: I18nType,
   options?: {| includeHiddenAndCompatibility?: boolean |}
@@ -371,92 +372,114 @@ export const enumerateAllInstructions = (
     options && options.includeHiddenAndCompatibility
   );
 
+  if (shouldHideExtension(project, extension)) {
+    return allInstructions;
+  }
+  const allObjectsTypes = extension.getExtensionObjectsTypes();
+  const allBehaviorsTypes = extension.getBehaviorsTypes();
+  const prefix = getExtensionPrefix(extension, i18n);
+
+  //Free instructions
+  const extensionFreeInstructions = enumerateExtensionInstructions(
+    prefix,
+    isCondition ? extension.getAllConditions() : extension.getAllActions(),
+    {
+      extension: { name: extension.getName() },
+      objectMetadata: undefined,
+      behaviorMetadata: undefined,
+    },
+    i18n,
+    undefined,
+    undefined,
+    includeHiddenAndCompatibility
+  );
+  allInstructions = [...allInstructions, ...extensionFreeInstructions];
+
+  //Objects instructions:
+  for (let j = 0; j < allObjectsTypes.size(); ++j) {
+    const objectType = allObjectsTypes.at(j);
+    const objectMetadata = extension.getObjectMetadata(objectType);
+    const scope: InstructionOrExpressionScope = {
+      extension: { name: extension.getName() },
+      objectMetadata: {
+        name: objectMetadata.getName(),
+        isPrivate: objectMetadata.isPrivate(),
+      },
+    };
+    allInstructions = [
+      ...allInstructions,
+      ...enumerateExtensionInstructions(
+        prefix,
+        isCondition
+          ? extension.getAllConditionsForObject(objectType)
+          : extension.getAllActionsForObject(objectType),
+        scope,
+        i18n,
+        undefined,
+        undefined,
+        includeHiddenAndCompatibility
+      ),
+    ];
+  }
+
+  //Behaviors instructions:
+  for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
+    const behaviorType = allBehaviorsTypes.at(j);
+    const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+    const scope = {
+      extension: { name: extension.getName() },
+      behaviorMetadata: {
+        name: behaviorMetadata.getName(),
+        isPrivate: behaviorMetadata.isPrivate(),
+      },
+    };
+
+    allInstructions = [
+      ...allInstructions,
+      ...enumerateExtensionInstructions(
+        prefix,
+        isCondition
+          ? extension.getAllConditionsForBehavior(behaviorType)
+          : extension.getAllActionsForBehavior(behaviorType),
+        // $FlowFixMe[incompatible-type]
+        scope,
+        i18n,
+        undefined,
+        undefined,
+        includeHiddenAndCompatibility
+      ),
+    ];
+  }
+
+  // $FlowFixMe[incompatible-type]
+  return allInstructions;
+};
+
+/**
+ * List all the instructions available.
+ */
+export const enumerateAllInstructions = (
+  isCondition: boolean,
+  project: gdProject,
+  i18n: I18nType,
+  options?: {| includeHiddenAndCompatibility?: boolean |}
+): Array<EnumeratedInstructionMetadata> => {
+  let allInstructions: Array<EnumeratedInstructionMetadata> = [];
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
-    const extension = allExtensions.at(i);
-    if (shouldHideExtension(project, extension)) {
-      continue;
-    }
-    const allObjectsTypes = extension.getExtensionObjectsTypes();
-    const allBehaviorsTypes = extension.getBehaviorsTypes();
-    const prefix = getExtensionPrefix(extension, i18n);
-
-    //Free instructions
-    const extensionFreeInstructions = enumerateExtensionInstructions(
-      prefix,
-      isCondition ? extension.getAllConditions() : extension.getAllActions(),
-      {
-        extension: { name: extension.getName() },
-        objectMetadata: undefined,
-        behaviorMetadata: undefined,
-      },
-      i18n,
-      undefined,
-      undefined,
-      includeHiddenAndCompatibility
-    );
-    allInstructions = [...allInstructions, ...extensionFreeInstructions];
-
-    //Objects instructions:
-    for (let j = 0; j < allObjectsTypes.size(); ++j) {
-      const objectType = allObjectsTypes.at(j);
-      const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope: InstructionOrExpressionScope = {
-        extension: { name: extension.getName() },
-        objectMetadata: {
-          name: objectMetadata.getName(),
-          isPrivate: objectMetadata.isPrivate(),
-        },
-      };
-      allInstructions = [
-        ...allInstructions,
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForObject(objectType)
-            : extension.getAllActionsForObject(objectType),
-          scope,
-          i18n,
-          undefined,
-          undefined,
-          includeHiddenAndCompatibility
-        ),
-      ];
-    }
-
-    //Behaviors instructions:
-    for (let j = 0; j < allBehaviorsTypes.size(); ++j) {
-      const behaviorType = allBehaviorsTypes.at(j);
-      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope = {
-        extension: { name: extension.getName() },
-        behaviorMetadata: {
-          name: behaviorMetadata.getName(),
-          isPrivate: behaviorMetadata.isPrivate(),
-        },
-      };
-
-      allInstructions = [
-        ...allInstructions,
-        ...enumerateExtensionInstructions(
-          prefix,
-          isCondition
-            ? extension.getAllConditionsForBehavior(behaviorType)
-            : extension.getAllActionsForBehavior(behaviorType),
-          // $FlowFixMe[incompatible-type]
-          scope,
-          i18n,
-          undefined,
-          undefined,
-          includeHiddenAndCompatibility
-        ),
-      ];
-    }
+    allInstructions = [
+      ...allInstructions,
+      ...enumerateAllInstructionsForExtension(
+        isCondition,
+        allExtensions.at(i),
+        project,
+        i18n,
+        options
+      ),
+    ];
   }
-
-  // $FlowFixMe[incompatible-type]
   return allInstructions;
 };
 

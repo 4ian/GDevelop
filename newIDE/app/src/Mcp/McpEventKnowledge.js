@@ -1,6 +1,16 @@
 // @flow
-import { enumerateAllExpressions } from '../InstructionOrExpression/EnumerateExpressions';
-import { enumerateAllInstructions } from '../InstructionOrExpression/EnumerateInstructions';
+import {
+  enumerateAllExpressions,
+  enumerateAllExpressionsForExtension,
+} from '../InstructionOrExpression/EnumerateExpressions';
+import {
+  enumerateAllInstructions,
+  enumerateAllInstructionsForExtension,
+} from '../InstructionOrExpression/EnumerateInstructions';
+import {
+  type EnumeratedExpressionMetadata,
+  type EnumeratedInstructionMetadata,
+} from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   renderInstructionSentenceAsPlainText,
   renderNonTranslatedEventsAsText,
@@ -1982,16 +1992,35 @@ export const buildCompleteProjectInstructionCatalog = ({
   project,
   i18n,
   includeDeprecatedAndHidden = false,
+  additionalExtensions = [],
 }: {|
   project: gdProject,
   i18n?: any,
   includeDeprecatedAndHidden?: boolean,
+  additionalExtensions?: Array<gdPlatformExtension>,
 |}): Object => {
   const collectInstructions = (isCondition: boolean) => {
     const entriesByType: Map<string, Object> = new Map();
-    enumerateAllInstructions(isCondition, project, (i18n || null: any), {
-      includeHiddenAndCompatibility: true,
-    }).forEach(instruction => {
+    const instructions: Array<EnumeratedInstructionMetadata> = [];
+    additionalExtensions.forEach(extension => {
+      instructions.push(
+        ...enumerateAllInstructionsForExtension(
+          isCondition,
+          extension,
+          project,
+          (i18n || null: any),
+          {
+            includeHiddenAndCompatibility: true,
+          }
+        )
+      );
+    });
+    instructions.push(
+      ...enumerateAllInstructions(isCondition, project, (i18n || null: any), {
+        includeHiddenAndCompatibility: true,
+      })
+    );
+    instructions.forEach(instruction => {
       // The events editor treats every hidden instruction as deprecated and
       // renders it with the [DEPRECATED] warning, including older APIs such as
       // TextObject::String that do not carry a deprecation message.
@@ -2018,25 +2047,37 @@ export const buildCompleteProjectInstructionCatalog = ({
   };
 
   const expressionsByKey: Map<string, Object> = new Map();
-  enumerateAllExpressions('', project, (i18n || null: any)).forEach(
-    expression => {
-      if (
-        !includeDeprecatedAndHidden &&
-        isDeprecatedExpressionMetadata(expression.metadata)
+  const allExpressions: Array<EnumeratedExpressionMetadata> = [];
+  additionalExtensions.forEach(extension => {
+    allExpressions.push(
+      ...enumerateAllExpressionsForExtension(
+        '',
+        extension,
+        project,
+        (i18n || null: any)
       )
-        return;
-      const key = `${
-        expression.type
-      }\u0000${expression.metadata.getReturnType()}`;
-      if (expressionsByKey.has(key)) return;
-      const summary = summarizeExpressionMetadata({
-        type: expression.type,
-        metadata: expression.metadata,
-        fullGroupName: expression.fullGroupName,
-      });
-      expressionsByKey.set(key, catalogExpression(summary, expression.scope));
-    }
+    );
+  });
+  allExpressions.push(
+    ...enumerateAllExpressions('', project, (i18n || null: any))
   );
+  allExpressions.forEach(expression => {
+    if (
+      !includeDeprecatedAndHidden &&
+      isDeprecatedExpressionMetadata(expression.metadata)
+    )
+      return;
+    const key = `${
+      expression.type
+    }\u0000${expression.metadata.getReturnType()}`;
+    if (expressionsByKey.has(key)) return;
+    const summary = summarizeExpressionMetadata({
+      type: expression.type,
+      metadata: expression.metadata,
+      fullGroupName: expression.fullGroupName,
+    });
+    expressionsByKey.set(key, catalogExpression(summary, expression.scope));
+  });
   const expressions = Array.from(expressionsByKey.values()).sort(
     (left, right) =>
       left.type.localeCompare(right.type) ||

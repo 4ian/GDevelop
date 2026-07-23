@@ -310,7 +310,8 @@ const getProjectBehaviorDefinitions = (
 
 const collectRegisteredTypes = (
   project: gdProject,
-  serializedProject: Object
+  serializedProject: Object,
+  additionalExtensions: Array<gdPlatformExtension> = []
 ): {|
   objectTypes: Array<Object>,
   behaviorTypes: Array<Object>,
@@ -324,7 +325,15 @@ const collectRegisteredTypes = (
     serializedProject
   );
   const platform = project.getCurrentPlatform();
-  const extensions = toArray(platform.getAllPlatformExtensions());
+  const additionalExtensionNames = new Set(
+    additionalExtensions.map(extension => extension.getName())
+  );
+  const extensions = [
+    ...additionalExtensions,
+    ...toArray(platform.getAllPlatformExtensions()).filter(
+      extension => !additionalExtensionNames.has(extension.getName())
+    ),
+  ];
 
   extensions.forEach(extension => {
     if (shouldHideExtension(project, extension)) return;
@@ -832,11 +841,17 @@ const projectIdentity = (project: gdProject): Object => ({
 export const buildProjectSettingsCatalog = ({
   project,
   serializedProject,
+  additionalExtensions = [],
 }: {|
   project: gdProject,
   serializedProject: Object,
+  additionalExtensions?: Array<gdPlatformExtension>,
 |}): Object => {
-  const registeredTypes = collectRegisteredTypes(project, serializedProject);
+  const registeredTypes = collectRegisteredTypes(
+    project,
+    serializedProject,
+    additionalExtensions
+  );
   const settingsOwners = buildSettingsOwners(serializedProject);
   return validateProjectSettingsCatalog({
     format: 'gdevelop-settings-catalog',

@@ -299,10 +299,15 @@ export const createCatalogInstructionFormatter = (
 
 export const buildProjectInstructionCatalog = (
   project: gdProject,
-  i18n?: any
+  i18n?: any,
+  additionalExtensions?: Array<gdPlatformExtension>
 ): Object =>
   validateProjectInstructionCatalog(
-    buildCompleteProjectInstructionCatalog({ project, i18n })
+    buildCompleteProjectInstructionCatalog({
+      project,
+      i18n,
+      additionalExtensions,
+    })
   );
 
 /**
@@ -314,16 +319,18 @@ export const buildProjectInstructionCatalog = (
 export const buildProjectDeprecatedInstructionCatalog = (
   project: gdProject,
   i18n?: any,
-  authoringCatalogInput?: Object
+  authoringCatalogInput?: Object,
+  additionalExtensions?: Array<gdPlatformExtension>
 ): Object => {
   const authoringCatalog = authoringCatalogInput
     ? validateProjectInstructionCatalog(authoringCatalogInput)
-    : buildProjectInstructionCatalog(project, i18n);
+    : buildProjectInstructionCatalog(project, i18n, additionalExtensions);
   const completeCatalog = validateProjectInstructionCatalog(
     buildCompleteProjectInstructionCatalog({
       project,
       i18n,
       includeDeprecatedAndHidden: true,
+      additionalExtensions,
     })
   );
   const authoringActionTypes = new Set(

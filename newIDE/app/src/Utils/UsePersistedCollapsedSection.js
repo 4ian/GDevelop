@@ -4,19 +4,19 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   project: gdProject,
-  persistedScrollType:
+  persistedPanelStateType:
     | 'instances-of-object'
     | 'object'
     | 'scene'
     | 'objectGroup'
     | 'layer',
-  persistedScrollId: string | null,
+  persistedPanelStateId: string | null,
 |};
 
 export const usePersistedCollapsedSection = ({
   project,
-  persistedScrollType,
-  persistedScrollId,
+  persistedPanelStateType,
+  persistedPanelStateId,
 }: Props): {
   isSectionFolded: (sectionId: string) => boolean,
   setSectionFolded: (sectionId: string, isCollapsed: boolean) => void,
@@ -42,38 +42,38 @@ export const usePersistedCollapsedSection = ({
   const isSectionFolded = React.useCallback(
     (sectionId: string): boolean => {
       const editorStateForProject = getEditorStateForProject(projectId);
-      if (!editorStateForProject || !persistedScrollId) return false;
+      if (!editorStateForProject || !persistedPanelStateId) return false;
 
-      return editorStateForProject.propertiesPanel[persistedScrollType]?.[
-        persistedScrollId
+      return editorStateForProject.propertiesPanel[persistedPanelStateType]?.[
+        persistedPanelStateId
       ]?.collapsedSections[sectionId];
     },
     [
       getEditorStateForProject,
-      persistedScrollId,
-      persistedScrollType,
+      persistedPanelStateId,
+      persistedPanelStateType,
       projectId,
     ]
   );
 
   const setSectionFolded = React.useCallback(
     (sectionId: string, isCollapsed: boolean): void => {
-      if (!persistedScrollId) return;
+      if (!persistedPanelStateId) return;
 
       const currentEditorState = getEditorStateForProject(projectId);
       setEditorStateForProject(projectId, {
         propertiesPanel: {
           ...currentEditorState?.propertiesPanel,
-          [persistedScrollType]: {
-            ...currentEditorState?.propertiesPanel[persistedScrollType],
-            [persistedScrollId]: {
-              ...currentEditorState?.propertiesPanel[persistedScrollType]?.[
-                persistedScrollId
+          [persistedPanelStateType]: {
+            ...currentEditorState?.propertiesPanel[persistedPanelStateType],
+            [persistedPanelStateId]: {
+              ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
+                persistedPanelStateId
               ],
               collapsedSections: {
-                ...currentEditorState?.propertiesPanel[persistedScrollType]?.[
-                  persistedScrollId
-                ]?.collapsedSections,
+                ...currentEditorState?.propertiesPanel[
+                  persistedPanelStateType
+                ]?.[persistedPanelStateId]?.collapsedSections,
                 [sectionId]: isCollapsed,
               },
             },
@@ -83,8 +83,8 @@ export const usePersistedCollapsedSection = ({
     },
     [
       getEditorStateForProject,
-      persistedScrollId,
-      persistedScrollType,
+      persistedPanelStateId,
+      persistedPanelStateType,
       projectId,
       setEditorStateForProject,
     ]

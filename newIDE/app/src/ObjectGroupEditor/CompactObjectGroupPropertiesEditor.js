@@ -143,14 +143,14 @@ export const CompactObjectGroupPropertiesEditor = ({
 
   // Object groups have no persistent UUID, so the name is used
   // (like for scenes).
-  const persistedScrollId = objectGroup.getName();
+  const persistedPanelStateId = objectGroup.getName();
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'objectGroup',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'objectGroup',
   });
   const {
     isSectionFolded,
@@ -158,8 +158,8 @@ export const CompactObjectGroupPropertiesEditor = ({
     toggleSectionFolded,
   } = usePersistedCollapsedSection({
     project,
-    persistedScrollId,
-    persistedScrollType: 'objectGroup',
+    persistedPanelStateId,
+    persistedPanelStateType: 'objectGroup',
   });
 
   const objects: Array<gdObject> = mapVector(

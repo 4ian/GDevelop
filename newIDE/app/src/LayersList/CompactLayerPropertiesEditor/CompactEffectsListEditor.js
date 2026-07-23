@@ -88,8 +88,8 @@ export const CompactEffectsListEditor = ({
 
   const { isSectionFolded, setSectionFolded } = usePersistedCollapsedSection({
     project,
-    persistedScrollId: persistedPanelStateId,
-    persistedScrollType: 'layer',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'layer',
   });
   const [isEffectsFolded, setEffectsFoldedState] = React.useState(
     isSectionFolded(layerRenderingType + '-effects')

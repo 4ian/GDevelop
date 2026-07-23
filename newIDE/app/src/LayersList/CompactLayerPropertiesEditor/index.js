@@ -101,8 +101,8 @@ export const CompactLayerPropertiesEditor = ({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId: persistedPanelStateId,
-    persistedScrollType: 'layer',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'layer',
   });
 
   const layerPropertiesSchema = React.useMemo<Schema>(

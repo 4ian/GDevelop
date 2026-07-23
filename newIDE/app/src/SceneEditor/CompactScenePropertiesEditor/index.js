@@ -109,14 +109,14 @@ export const CompactScenePropertiesEditor = ({
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const scrollKey = 'scene-' + scene.ptr;
 
-  const persistedScrollId = scene.getName();
+  const persistedPanelStateId = scene.getName();
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'scene',
+    persistedPanelStateId,
+    persistedPanelStateType: 'scene',
   });
   const {
     isSectionFolded,
@@ -124,8 +124,8 @@ export const CompactScenePropertiesEditor = ({
     toggleSectionFolded,
   } = usePersistedCollapsedSection({
     project,
-    persistedScrollId,
-    persistedScrollType: 'scene',
+    persistedPanelStateId,
+    persistedPanelStateType: 'scene',
   });
 
   // Variable refactoring: snapshot on mount, apply on unmount/scene change.

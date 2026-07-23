@@ -192,14 +192,14 @@ export const CompactInstancePropertiesEditor = ({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId: persistedPanelStateId,
-    persistedScrollType: 'instances-of-object',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'instances-of-object',
   });
   const { isSectionFolded, toggleSectionFolded } = usePersistedCollapsedSection(
     {
       project,
-      persistedScrollId: persistedPanelStateId,
-      persistedScrollType: 'instances-of-object',
+      persistedPanelStateId: persistedPanelStateId,
+      persistedPanelStateType: 'instances-of-object',
     }
   );
 

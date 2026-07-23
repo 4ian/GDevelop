@@ -480,8 +480,8 @@ export const CompactObjectPropertiesEditor = ({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId: persistedPanelStateId,
-    persistedScrollType: 'object',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'object',
   });
   const {
     isSectionFolded,
@@ -489,8 +489,8 @@ export const CompactObjectPropertiesEditor = ({
     toggleSectionFolded,
   } = usePersistedCollapsedSection({
     project,
-    persistedScrollId: persistedPanelStateId,
-    persistedScrollType: 'object',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'object',
   });
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.

@@ -24,11 +24,11 @@ export namespace TiledTileMapLoader {
    */
   export function load(
     tiledTileMap: TiledTileMap,
-    pako: any
+    pako: any,
   ): EditableTileMap | null {
     if (!tiledTileMap.tiledversion) {
       console.warn(
-        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
+        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?",
       );
 
       return null;
@@ -41,15 +41,12 @@ export namespace TiledTileMapLoader {
       if (tiledTileSet.tiles) {
         for (const tile of tiledTileSet.tiles) {
           const tileDefinition = new TileDefinition(
-            tile.animation ? tile.animation.length : 0
+            tile.animation ? tile.animation.length : 0,
           );
           const tileClass = tile.type || tile.class;
-          if (tile.objectgroup) {
+          if (tile.objectgroup && tile.objectgroup.objects) {
             for (const object of tile.objectgroup.objects) {
-              const tag = object.type || object.class || tileClass;
-              if (!tag || tag.length === 0) {
-                continue;
-              }
+              const tag = object.type || object.class || tileClass || "";
               let polygon: PolygonVertices | null = null;
               let hasFullHitBox = false;
               if (object.polygon) {
@@ -97,6 +94,7 @@ export namespace TiledTileMapLoader {
             }
           } else if (tileClass) {
             // When there is no shape, default to the whole tile.
+            // Unless no class is set and this is likely a non-solid tile.
             const polygon: PolygonVertices = [
               [0, 0],
               [0, tiledTileMap.tileheight],
@@ -107,48 +105,58 @@ export namespace TiledTileMapLoader {
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),
-            tileDefinition
+            tileDefinition,
           );
         }
       }
       for (let tileIndex = 0; tileIndex < tiledTileSet.tilecount; tileIndex++) {
         const tileId = getTileIdFromTiledGUI(firstGid + tileIndex);
-        if (!definitions.has(tileId)) {
+        if (tileId && !definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
         }
       }
     }
 
-    const collisionTileMap = new EditableTileMap(
+    const editableTileMap = new EditableTileMap(
       tiledTileMap.tilewidth,
       tiledTileMap.tileheight,
       tiledTileMap.width,
       tiledTileMap.height,
-      definitions
+      definitions,
     );
+
+    const firstTileSet = tiledTileMap.tilesets[0];
+    if (firstTileSet) {
+      editableTileMap.setTileSetColumnCount(firstTileSet.columns);
+      editableTileMap.setTileSetRowCount(
+        Math.ceil(firstTileSet.tilecount / firstTileSet.columns),
+      );
+    }
 
     for (const tiledLayer of tiledTileMap.layers) {
       if (tiledLayer.type === "objectgroup") {
-        const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
+        const objectLayer = editableTileMap.addObjectLayer(tiledLayer.id);
         objectLayer.setVisible(tiledLayer.visible);
-        for (const tiledObject of tiledLayer.objects) {
-          if (!tiledObject.visible || !tiledObject.gid) {
-            // Objects layer are nice to put decorations but dynamic objects
-            // must be done with GDevelop objects.
-            // So, there is no point to load it as there won't be any action to
-            // make objects visible individually.
-            continue;
+        if (tiledLayer.objects) {
+          for (const tiledObject of tiledLayer.objects) {
+            if (!tiledObject.visible || !tiledObject.gid) {
+              // Objects layer are nice to put decorations but dynamic objects
+              // must be done with GDevelop objects.
+              // So, there is no point to load it as there won't be any action to
+              // make objects visible individually.
+              continue;
+            }
+            const tileGid = extractTileUidFlippedStates(tiledObject.gid);
+            const object = new TileObject(
+              tiledObject.x,
+              tiledObject.y,
+              tileGid.id,
+            );
+            objectLayer.add(object);
+            object.setFlippedHorizontally(tileGid.flippedHorizontally);
+            object.setFlippedVertically(tileGid.flippedVertically);
+            object.setFlippedDiagonally(tileGid.flippedDiagonally);
           }
-          const tileGid = extractTileUidFlippedStates(tiledObject.gid);
-          const object = new TileObject(
-            tiledObject.x,
-            tiledObject.y,
-            tileGid.id
-          );
-          objectLayer.add(object);
-          object.setFlippedHorizontally(tileGid.flippedHorizontally);
-          object.setFlippedVertically(tileGid.flippedVertically);
-          object.setFlippedDiagonally(tileGid.flippedDiagonally);
         }
       } else if (tiledLayer.type === "tilelayer") {
         let tileSlotIndex = 0;
@@ -163,15 +171,15 @@ export namespace TiledTileMapLoader {
           layerData = tiledLayer.data as integer[];
         }
         if (layerData) {
-          const collisionTileLayer = collisionTileMap.addNewTileLayer(
-            tiledLayer.id
+          const collisionTileLayer = editableTileMap.addNewTileLayer(
+            tiledLayer.id,
           );
           collisionTileLayer.setAlpha(tiledLayer.opacity);
           collisionTileLayer.setVisible(tiledLayer.visible);
           // TODO handle layer offset
 
-          for (let y = 0; y < tiledLayer.height; y++) {
-            for (let x = 0; x < tiledLayer.width; x++) {
+          for (let y = 0; y < (tiledLayer.height || 0); y++) {
+            for (let x = 0; x < (tiledLayer.width || 0); x++) {
               // The "globalTileUid" is the tile UID with encoded
               // bits about the flipping/rotation of the tile.
               const globalTileUid = layerData[tileSlotIndex];
@@ -182,17 +190,17 @@ export namespace TiledTileMapLoader {
                 collisionTileLayer.setFlippedHorizontally(
                   x,
                   y,
-                  tileUid.flippedHorizontally
+                  tileUid.flippedHorizontally,
                 );
                 collisionTileLayer.setFlippedVertically(
                   x,
                   y,
-                  tileUid.flippedVertically
+                  tileUid.flippedVertically,
                 );
                 collisionTileLayer.setFlippedDiagonally(
                   x,
                   y,
-                  tileUid.flippedDiagonally
+                  tileUid.flippedDiagonally,
                 );
               }
               tileSlotIndex += 1;
@@ -202,6 +210,6 @@ export namespace TiledTileMapLoader {
       }
     }
 
-    return collisionTileMap;
+    return editableTileMap;
   }
 }

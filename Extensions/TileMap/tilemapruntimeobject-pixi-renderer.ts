@@ -55,8 +55,8 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._pixiObject.pivot.x = this._object.getTileMapWidth() / 2;
-      this._pixiObject.pivot.y = this._object.getTileMapHeight() / 2;
+      this._pixiObject.pivot.x = this._object.getOriginalWidth() / 2;
+      this._pixiObject.pivot.y = this._object.getOriginalHeight() / 2;
       this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
       this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
     }
@@ -76,9 +76,9 @@ namespace gdjs {
       if (!tileMap) return;
       for (const layer of tileMap.getLayers()) {
         const isLayerHidden =
-          (this._object._displayMode === 'index' &&
-            this._object._layerIndex !== layer.id) ||
-          (this._object._displayMode === 'visible' && !layer.isVisible());
+          (this._object.getDisplayMode() === 'index' &&
+            this._object.getDisplayedLayerIndex() !== layer.id) ||
+          (this._object.getDisplayMode() === 'visible' && !layer.isVisible());
 
         // Only set alpha on editable layers that are not hidden,
         // as others are not rendered.
@@ -93,33 +93,33 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      this._pixiObject.scale.x = width / this._object.getTileMapWidth();
+      this._pixiObject.scale.x = width / this._object.getOriginalWidth();
       this._pixiObject.position.x = this._object.x + width / 2;
     }
 
     setHeight(height: float): void {
-      this._pixiObject.scale.y = height / this._object.getTileMapHeight();
+      this._pixiObject.scale.y = height / this._object.getOriginalHeight();
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     setScaleX(scaleX: float): void {
       this._pixiObject.scale.x = scaleX;
-      const width = scaleX * this._object.getTileMapWidth();
+      const width = scaleX * this._object.getOriginalWidth();
       this._pixiObject.position.x = this._object.x + width / 2;
     }
 
     setScaleY(scaleY: float): void {
       this._pixiObject.scale.y = scaleY;
-      const height = scaleY * this._object.getTileMapHeight();
+      const height = scaleY * this._object.getOriginalHeight();
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     getWidth(): float {
-      return this._object.getTileMapWidth() * this._pixiObject.scale.x;
+      return this._object.getOriginalWidth() * this._pixiObject.scale.x;
     }
 
     getHeight(): float {
-      return this._object.getTileMapHeight() * this._pixiObject.scale.y;
+      return this._object.getOriginalHeight() * this._pixiObject.scale.y;
     }
 
     getScaleX(): float {
@@ -201,8 +201,8 @@ namespace gdjs {
           tileMap,
           textureCache,
           // @ts-ignore
-          this._object._displayMode,
-          this._object._layerIndex,
+          this._object.getDisplayMode(),
+          this._object.getDisplayedLayerIndex(),
           leftBound,
           rightBound,
           topBound,

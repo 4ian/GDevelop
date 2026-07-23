@@ -12,7 +12,6 @@ import {
   type TreeViewItemContent,
   type TreeItemProps,
   behaviorsRootFolderId,
-  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -72,6 +71,10 @@ export class BehaviorShortcutTreeViewItemContent
 
   getName(): string | React.Node {
     return this.eventsBasedBehavior.getName();
+  }
+
+  getSearchText(): string {
+    return `${this.eventsFunctionsExtension.getName()} ${this.eventsBasedBehavior.getName()}`;
   }
 
   getId(): string {
@@ -261,13 +264,6 @@ export class BehaviorShortcutTreeViewItemContent
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return (
-      itemContent.getId() === behaviorsRootFolderId ||
-      itemContent.getId() ===
-        getProjectManagerShortcutExtensionGroupId(
-          behaviorsRootFolderId,
-          this.eventsFunctionsExtension
-        )
-    );
+    return itemContent.getId() === behaviorsRootFolderId;
   }
 }

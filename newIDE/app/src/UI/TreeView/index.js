@@ -23,6 +23,7 @@ export const navigationKeys = [
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
+  +isLabel?: boolean,
 };
 
 export type MenuButton = {|
@@ -142,6 +143,7 @@ type Props<Item> = {|
   width?: number,
   items: Item[],
   getItemName: Item => string | React.Node,
+  getItemSearchText?: Item => string,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
@@ -188,6 +190,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     items,
     searchText,
     getItemName,
+    getItemSearchText,
     getItemId,
     getItemHtmlId,
     getItemChildren,
@@ -271,6 +274,11 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
+      const itemSearchText = getItemSearchText
+        ? getItemSearchText(item)
+        : typeof name === 'string'
+        ? name
+        : '';
       const rightComponent = renderRightComponent && renderRightComponent(item);
       const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
@@ -289,7 +297,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
         !searchText ||
         forceAllOpened ||
         forceOpen ||
-        (typeof name === 'string' && name.toLowerCase().includes(searchText)) ||
+        itemSearchText.toLowerCase().includes(searchText) ||
         flattenedChildren.length > 0
       ) {
         const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
@@ -337,6 +345,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [
       getItemId,
       getItemChildren,
+      getItemSearchText,
       forceAllOpened,
       openedNodeIds,
       openedDuringSearchNodeIds,

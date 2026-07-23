@@ -135,7 +135,6 @@ export default class ResourcesLoader {
         .resolve(projectPath, urlOrFilename)
         .replace(/\\/g, '/');
 
-      console.info('Caching resolved local filename:', resourceAbsolutePath);
       return this._cache.cacheLocalFileUrl(
         project,
         urlOrFilename,
@@ -177,7 +176,6 @@ export default class ResourcesLoader {
     );
     if (cachedUrl) return cachedUrl;
 
-    console.info('Caching resolved url:', urlWithParameters);
     return this._cache.cacheUrl(project, urlWithParameters);
   }
 

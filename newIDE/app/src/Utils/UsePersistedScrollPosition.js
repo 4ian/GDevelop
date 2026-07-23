@@ -52,9 +52,9 @@ export const usePersistedScrollPosition = ({
       if (!editorStateForProject) return;
 
       const scrollPosition =
-        editorStateForProject.propertiesPanelScroll[persistedScrollType]?.[
+        editorStateForProject.propertiesPanel[persistedScrollType]?.[
           persistedScrollId
-        ];
+        ]?.scrollPosition;
       if (!Number.isFinite(scrollPosition)) {
         return;
       }
@@ -71,7 +71,7 @@ export const usePersistedScrollPosition = ({
     ]
   );
 
-  return React.useCallback(
+  const onScroll = React.useCallback(
     () => {
       const scrollView = scrollViewRef.current;
       if (!scrollView || !persistedScrollId) return;
@@ -83,11 +83,16 @@ export const usePersistedScrollPosition = ({
         const currentEditorState = getEditorStateForProject(projectId);
 
         setEditorStateForProject(projectId, {
-          propertiesPanelScroll: {
-            ...currentEditorState?.propertiesPanelScroll,
+          propertiesPanel: {
+            ...currentEditorState?.propertiesPanel,
             [persistedScrollType]: {
-              ...currentEditorState?.propertiesPanelScroll[persistedScrollType],
-              [persistedScrollId]: scrollView.getScrollPosition(),
+              ...currentEditorState?.propertiesPanel[persistedScrollType],
+              [persistedScrollId]: {
+                ...currentEditorState?.propertiesPanel[persistedScrollType]?.[
+                  persistedScrollId
+                ],
+                scrollPosition: scrollView.getScrollPosition(),
+              },
             },
           },
         });
@@ -103,4 +108,6 @@ export const usePersistedScrollPosition = ({
       setEditorStateForProject,
     ]
   );
+
+  return onScroll;
 };

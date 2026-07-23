@@ -23,10 +23,9 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import Link from '../../UI/Link';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import {
-  TopLevelCollapsibleSection,
-  CollapsibleSubPanel,
-} from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { CollapsibleSubPanel } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 
 export const styles = {
   icon: {
@@ -68,6 +67,7 @@ type Props = {|
   onEffectAdded: () => void,
   layerRenderingType: '2d' | '3d',
   target: 'object' | 'layer',
+  persistedPanelStateId: string,
 |};
 
 export const CompactEffectsListEditor = ({
@@ -82,9 +82,26 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
+  persistedPanelStateId,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isEffectsFolded, setEffectsFolded] = React.useState(false);
+
+  const { isSectionFolded, setSectionFolded } = usePersistedCollapsedSection({
+    project,
+    persistedScrollId: persistedPanelStateId,
+    persistedScrollType: 'layer',
+  });
+  const [isEffectsFolded, setEffectsFoldedState] = React.useState(
+    isSectionFolded(layerRenderingType + '-effects')
+  );
+
+  const setEffectsFolded = React.useCallback(
+    (isFolded: boolean) => {
+      setEffectsFoldedState(isFolded);
+      setSectionFolded(layerRenderingType + '-effects', isFolded);
+    },
+    [layerRenderingType, setSectionFolded]
+  );
 
   // Effects:
   const {

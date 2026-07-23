@@ -15,16 +15,15 @@ import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { CompactBehaviorSharedDataPropertiesEditor } from './CompactBehaviorSharedDataPropertiesEditor';
-import {
-  TopLevelCollapsibleSection,
-  CollapsibleSubPanel,
-} from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { CollapsibleSubPanel } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 import Help from '../../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
@@ -90,9 +89,6 @@ export const CompactScenePropertiesEditor = ({
   historyHandler,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
-  const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const allVisibleBehaviors = scene
@@ -119,6 +115,15 @@ export const CompactScenePropertiesEditor = ({
     project,
     scrollViewRef,
     scrollKey,
+    persistedScrollId,
+    persistedScrollType: 'scene',
+  });
+  const {
+    isSectionFolded,
+    setSectionFolded,
+    toggleSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
     persistedScrollId,
     persistedScrollType: 'scene',
   });
@@ -188,8 +193,8 @@ export const CompactScenePropertiesEditor = ({
           </ColumnStackLayout>
           <TopLevelCollapsibleSection
             title={<Trans>Properties</Trans>}
-            isFolded={isPropertiesFolded}
-            toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
+            isFolded={isSectionFolded('properties')}
+            toggleFolded={() => toggleSectionFolded('properties')}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
                 <CompactPropertiesEditorByVisibility
@@ -209,8 +214,8 @@ export const CompactScenePropertiesEditor = ({
           {allVisibleBehaviors.length > 0 && (
             <TopLevelCollapsibleSection
               title={<Trans>Behaviors</Trans>}
-              isFolded={isBehaviorsFolded}
-              toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+              isFolded={isSectionFolded('behaviors')}
+              toggleFolded={() => toggleSectionFolded('behaviors')}
               renderContent={() => (
                 <ColumnStackLayout noMargin>
                   {allVisibleBehaviors.map(behaviorSharedData => {
@@ -271,14 +276,14 @@ export const CompactScenePropertiesEditor = ({
           )}
           <TopLevelCollapsibleSection
             title={<Trans>Scene Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+            isFolded={isSectionFolded('variables')}
+            toggleFolded={() => toggleSectionFolded('variables')}
             onOpenFullEditor={() => openSceneVariables()}
             onAdd={() => {
               if (variablesListRef.current) {
                 variablesListRef.current.addVariable();
               }
-              setIsVariablesFolded(false);
+              setSectionFolded('variables', false);
             }}
             renderContentAsHiddenWhenFolded={
               true /* Allows to keep a ref to the variables list for add button to work. */

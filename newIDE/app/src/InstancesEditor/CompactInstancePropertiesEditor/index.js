@@ -9,7 +9,6 @@ import CompactPropertiesEditor, {
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import getObjectByName from '../../Utils/GetObjectByName';
-import IconButton from '../../UI/IconButton';
 import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
@@ -18,7 +17,6 @@ import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import VariablesList, {
   type HistoryHandler,
 } from '../../VariablesList/VariablesList';
-import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import {
@@ -30,10 +28,10 @@ import TileSetVisualizer, {
   type TileMapTileSelection,
 } from '../TileSetVisualizer';
 import {
-  TopLevelCollapsibleSection,
   CollapsibleSubPanel,
   type TitleBarButton,
 } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 import { ColumnStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
 import { IconContainer } from '../../UI/IconContainer';
@@ -41,6 +39,7 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactInstanceBehaviorsEditorService from './CompactInstanceBehaviorsEditorService';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
@@ -172,7 +171,7 @@ export const CompactInstancePropertiesEditor = ({
     .map((instance: gdInitialInstance) => '' + instance.ptr)
     .join(';');
 
-  const persistedScrollId = React.useMemo(
+  const persistedPanelStateId = React.useMemo(
     () => {
       if (!instances.length || !scrollKey) return null;
 
@@ -193,9 +192,16 @@ export const CompactInstancePropertiesEditor = ({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
+    persistedScrollId: persistedPanelStateId,
     persistedScrollType: 'instances-of-object',
   });
+  const { isSectionFolded, toggleSectionFolded } = usePersistedCollapsedSection(
+    {
+      project,
+      persistedScrollId: persistedPanelStateId,
+      persistedScrollType: 'instances-of-object',
+    }
+  );
 
   const { object, instanceSchema, allVisibleBehaviors } = React.useMemo<{|
     object?: gdObject,
@@ -521,52 +527,41 @@ export const CompactInstancePropertiesEditor = ({
             />
           ) : null}
           {object && shouldDisplayVariablesList && variablesContainer ? (
-            <>
-              <Separator />
-              <Column>
-                <Line alignItems="center" justifyContent="space-between">
-                  <Text size="sub-title" noMargin>
-                    <Trans>Instance Variables</Trans>
-                  </Text>
-                  <Line alignItems="center" noMargin>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        editInstanceVariables(instance);
-                      }}
-                    >
-                      <ShareExternal style={styles.icon} />
-                    </IconButton>
-                  </Line>
-                </Line>
-              </Column>
-              <VariablesList
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                inheritedVariablesContainer={object.getVariables()}
-                variablesContainer={variablesContainer}
-                areObjectVariables
-                size="compact"
-                onComputeAllVariableNames={() =>
-                  object && layout
-                    ? EventsRootVariablesFinder.findAllObjectVariables(
-                        project.getCurrentPlatform(),
-                        project,
-                        layout,
-                        object.getName()
-                      )
-                    : []
-                }
-                historyHandler={historyHandler}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>There are no variables on this instance.</Trans>
-                }
-                isListLocked={true}
-              />
-            </>
+            <TopLevelCollapsibleSection
+              title={<Trans>Instance Variables</Trans>}
+              isFolded={isSectionFolded('variables')}
+              toggleFolded={() => toggleSectionFolded('variables')}
+              onOpenFullEditor={() => editInstanceVariables(instance)}
+              noContentMargin
+              renderContent={() => (
+                <VariablesList
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  directlyStoreValueChangesWhileEditing
+                  inheritedVariablesContainer={object.getVariables()}
+                  variablesContainer={variablesContainer}
+                  areObjectVariables
+                  size="compact"
+                  onComputeAllVariableNames={() =>
+                    object && layout
+                      ? EventsRootVariablesFinder.findAllObjectVariables(
+                          project.getCurrentPlatform(),
+                          project,
+                          layout,
+                          object.getName()
+                        )
+                      : []
+                  }
+                  historyHandler={historyHandler}
+                  toolbarIconStyle={styles.icon}
+                  compactEmptyPlaceholderText={
+                    <Trans>There are no variables on this instance.</Trans>
+                  }
+                  isListLocked={true}
+                />
+              )}
+            />
           ) : null}
         </Column>
       </ScrollView>

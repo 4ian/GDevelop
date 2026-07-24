@@ -287,7 +287,7 @@ export const PlayersRepartitionPerDurationChart = ({
         />
         <YAxis
           dataKey="playersCount"
-          stroke="#f5f5f5"
+          stroke={gdevelopTheme.chart.textColor}
           style={styles.tickLabel}
           domain={[0, 'dataMax']}
         />

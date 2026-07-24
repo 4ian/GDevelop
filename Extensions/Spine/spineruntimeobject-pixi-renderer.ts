@@ -254,14 +254,22 @@ namespace gdjs {
           this._rendererObject
         );
 
+      // Rotation of the point attachment within the skeleton, in degrees.
+      // `computeWorldRotation` accounts for both the attachment's own rotation
+      // (the angle set on the point in the Spine editor) and the full bone chain
+      // it is attached to.
+      // Note: the previous code returned only `slot.bone.rotation` for the local
+      // case, which ignored the attachment's own rotation entirely - so a point's
+      // configured angle had no effect on the "local rotation" expression.
+      const localRotation = attachment.computeWorldRotation(slot.bone);
+
       if (isWorld) {
-        return (
-          gdjs.toDegrees(this._rendererObject.rotation) +
-          attachment.computeWorldRotation(slot.bone)
-        );
+        // Add the object's own rotation to express the angle in scene space, so
+        // that: world rotation = local rotation + object angle.
+        return gdjs.toDegrees(this._rendererObject.rotation) + localRotation;
       }
 
-      return slot.bone.rotation;
+      return localRotation;
     }
 
     getPointAttachmentScale(

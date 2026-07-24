@@ -118,6 +118,50 @@ export const partialQuickSort = <Element: any>(
   }
 };
 
+const escapeRegExp = (text: string): string =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Compute how relevant an item's searchable text is for the given search words.
+ *
+ * A whole-word match ("car" in "a car") ranks higher than a prefix match
+ * ("car" in "cartoon"), which itself ranks higher than a match found somewhere
+ * else inside a word ("car" in "scar"). This lets us prioritize complete word
+ * matches over the partial matches that the substring-based search engine also
+ * returns.
+ *
+ * The result is always strictly positive so an item that the search engine
+ * matched is never excluded from the results.
+ */
+export const getTextSearchRelevance = (
+  itemText: string,
+  searchWords: Array<string>
+): number => {
+  if (searchWords.length === 0) return 1;
+
+  const lowerCasedItemText = itemText.toLowerCase();
+  let totalScore = 0;
+  for (const searchWord of searchWords) {
+    const escapedWord = escapeRegExp(searchWord);
+    if (new RegExp(`\\b${escapedWord}\\b`).test(lowerCasedItemText)) {
+      // Whole-word match ("car" in "a car"): the search term is a complete word.
+      totalScore += 1;
+    } else if (new RegExp(`\\b${escapedWord}`).test(lowerCasedItemText)) {
+      // Prefix match: the search term is only the start of a longer word
+      // ("car" in "card", "cartoon"). Heavily penalized so these incomplete
+      // word matches rank well below complete word matches.
+      totalScore += 0.2;
+    } else if (lowerCasedItemText.includes(searchWord)) {
+      // Match somewhere inside a word ("car" in "scar"). Penalized even more.
+      totalScore += 0.1;
+    }
+  }
+
+  // Keep the relevance strictly positive so a matched item is never filtered
+  // out, while still being lower than any real match.
+  return Math.max(totalScore / searchWords.length, 0.05);
+};
+
 /**
  * Filter a list of items according to the chosen category
  * and the chosen filters.
@@ -126,7 +170,8 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
-  searchFilters?: Array<SearchFilter<SearchItem>>
+  searchFilters?: Array<SearchFilter<SearchItem>>,
+  getSearchItemRelevance?: (searchItem: SearchItem) => number
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
 
@@ -178,16 +223,22 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
     });
 
   let sortedSearchItems = filteredSearchItems;
-  if (searchFilters) {
+  if (searchFilters || getSearchItemRelevance) {
     let pertinenceMin = 1;
     let pertinenceMax = 0;
     const weightedSearchItems = filteredSearchItems
       .map(searchItem => {
-        let pertinence = 1;
-        for (const searchFilter of searchFilters) {
-          pertinence *= searchFilter.getPertinence(searchItem);
-          if (pertinence === 0) {
-            return null;
+        // Seed the pertinence with the text search relevance so that whole-word
+        // matches are ranked above partial matches, then let the filters refine it.
+        let pertinence = getSearchItemRelevance
+          ? getSearchItemRelevance(searchItem)
+          : 1;
+        if (searchFilters) {
+          for (const searchFilter of searchFilters) {
+            pertinence *= searchFilter.getPertinence(searchItem);
+            if (pertinence === 0) {
+              return null;
+            }
           }
         }
         pertinenceMin = Math.min(pertinenceMin, pertinence);
@@ -335,12 +386,87 @@ export const useSearchItem = <SearchItem: SearchableItem>(
               } items in ${totalTime.toFixed(3)}ms.`
             );
 
+            // Prioritize whole-word matches (e.g. "car") over partial matches
+            // (e.g. "card", "cartoon") returned by the substring search engine.
+            const searchWords = searchText
+              .toLowerCase()
+              .split(/\s+/)
+              .filter(Boolean);
+            const getSearchItemRelevance = (searchItem: SearchItem) => {
+              let textRelevance = getTextSearchRelevance(
+                getItemDescription(searchItem),
+                searchWords
+              );
+
+              // When an item has many tags but only a few match the search, the
+              // match is diluted: it is likely less focused on what the user is
+              // looking for (e.g. an aerosol tagged "car" among 30 other tags).
+              // Reduce its score sharply, proportionally to the share of
+              // matching tags, so a heavily diluted match sinks below cleaner
+              // partial matches, while an item whose tags mostly match keeps a
+              // near-full score. A small floor keeps the item in the results.
+              // $FlowFixMe[prop-missing] - only AssetShortHeader/ResourceV2 have tags.
+              const tags: ?Array<string> = searchItem.tags;
+              if (tags && tags.length > 0) {
+                const matchingTagsCount = tags.filter(tag =>
+                  getTextSearchRelevance(tag, searchWords) >= 0.5
+                ).length;
+                const matchingTagsRatio = matchingTagsCount / tags.length;
+                textRelevance *= 0.15 + 0.85 * matchingTagsRatio;
+              }
+
+              // Boost items whose name itself contains the searched word: a
+              // match in the name is a much stronger signal of relevance than a
+              // match found only among the tags. The bonus is proportional to
+              // how well the name matches (whole-word matches count for more
+              // than partial ones, see getTextSearchRelevance).
+              // $FlowFixMe[prop-missing] - most searchable items have a name.
+              const name: ?string = searchItem.name;
+              if (name) {
+                const nameRelevanceBonus = 0.5;
+                textRelevance +=
+                  nameRelevanceBonus *
+                  getTextSearchRelevance(name, searchWords);
+              }
+
+              // Boost items that have a tag matching the search exactly (e.g.
+              // searching "car" on an asset tagged "car"). An exact tag match is
+              // a strong signal, so it is ranked just after a match found in the
+              // asset's name: the bonus is deliberately kept below the name bonus
+              // above so a name match still ranks first.
+              if (tags && tags.length > 0) {
+                const normalizedSearchText = searchText.trim().toLowerCase();
+                const hasExactTagMatch = tags.some(
+                  tag => tag.trim().toLowerCase() === normalizedSearchText
+                );
+                if (hasExactTagMatch) {
+                  const exactTagRelevanceBonus = 0.35;
+                  textRelevance += exactTagRelevanceBonus;
+                }
+              }
+
+              // For word searches, prefer 3D assets over 2D ones: they get a
+              // relevance bonus so that, at comparable text relevance, a 3D
+              // asset ranks above a 2D one. The bonus is deliberately moderate
+              // (not a strict "all 3D before all 2D" offset) so that a 2D asset
+              // with a clearly better score still ranks above a weakly matching
+              // 3D asset (e.g. one matching only through one of its many tags).
+              // Non-asset items (e.g. packs) have no objectType, so they are
+              // unaffected.
+              const threeDRelevanceBonus = 0.25;
+              const is3DAsset =
+                // $FlowFixMe[prop-missing] - only AssetShortHeader has objectType.
+                searchItem.objectType === 'Scene3D::Model3DObject';
+              return is3DAsset ? textRelevance + threeDRelevanceBonus : textRelevance;
+            };
+
             setSearchResults(
               filterSearchItems(
                 partialSearchResults,
                 chosenCategory,
                 chosenFilters,
-                searchFilters
+                searchFilters,
+                getSearchItemRelevance
               )
             );
           });

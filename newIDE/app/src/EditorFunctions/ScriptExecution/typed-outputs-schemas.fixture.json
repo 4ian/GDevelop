@@ -1,5 +1,5 @@
 {
-  "_comment": "VENDORED from GDevelop-services/generation-api/src/lib/script-api/output-types.js (scriptApiSharedOutputTypes + scriptApiToolOutputSchemas). Keep byte-in-sync with that file (update both in the same change). Used by typed-outputs-conformance.spec.js to check that the four typed reads keep returning the declared stable fields.",
+  "_comment": "VENDORED from GDevelop-services/generation-api/src/lib/script-api/output-types.js (scriptApiSharedOutputTypes + scriptApiToolOutputSchemas). This is the FIELD STRUCTURE only (names, types, required/openEnded) — human-readable descriptions are intentionally stripped, so it is NOT a byte-for-byte copy. Keep the field shapes in sync with that file (update both in the same change). Used by typed-outputs-conformance.spec.js to check that the four typed reads keep returning the declared stable fields.",
   "sharedOutputTypes": {
     "SimplifiedInstance": {
       "type": "object",

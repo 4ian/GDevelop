@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
@@ -36,6 +36,7 @@ export default function BehaviorMethodSelectorDialog({
         <HelpButton
           key="help"
           helpPagePath="/behaviors/events-based-behaviors"
+          scopeName={t`Behaviors`}
         />,
       ]}
       actions={[

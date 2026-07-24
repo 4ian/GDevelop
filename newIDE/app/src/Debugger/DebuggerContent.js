@@ -204,7 +204,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
             </ScrollView>
             <MiniToolbar>
               <Line justifyContent="space-between" alignItems="center" noMargin>
-                <HelpButton helpPagePath="/interface/debugger" />
+                <HelpButton
+                  helpPagePath="/interface/debugger"
+                  scopeName={t`Debugger`}
+                />
                 <div>
                   <Checkbox
                     checkedIcon={<Flash />}
@@ -254,8 +257,9 @@ export default class DebuggerContent extends React.Component<Props, State> {
             editors={editors}
             centralNodeId="selected-inspector"
             initialNodes={
+              getDefaultEditorMosaicNode('debugger') ||
               // $FlowFixMe[incompatible-type]
-              getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
+              initialMosaicEditorNodes
             }
             onPersistNodes={node =>
               setDefaultEditorMosaicNode('debugger', node)

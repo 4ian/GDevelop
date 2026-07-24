@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -151,7 +151,11 @@ const ProfileDialog = ({ onClose }: Props) => {
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/interface/profile" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/interface/profile"
+          scopeName={t`Profile`}
+        />,
         isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}

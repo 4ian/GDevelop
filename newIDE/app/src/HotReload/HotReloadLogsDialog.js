@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
@@ -60,7 +60,11 @@ export default function HotReloadLogsDialog({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/preview'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/preview'}
+          scopeName={t`Preview`}
+        />,
       ]}
       onRequestClose={onClose}
       open

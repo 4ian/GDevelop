@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
@@ -66,6 +66,7 @@ export default function EventsBasedObjectSelectorDialog({
         <HelpButton
           key="help"
           helpPagePath="/objects/custom-objects-prefab-template"
+          scopeName={t`Custom objects`}
         />,
       ]}
       open

@@ -111,6 +111,7 @@ const ExtensionInstallDialog = ({
           <HelpButton
             key="help-button"
             helpPagePath={extensionHeader.helpPath}
+            scopeName={t`Extension`}
           />
         ) : (
           undefined

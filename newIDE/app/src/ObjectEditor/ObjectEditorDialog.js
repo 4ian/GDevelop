@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
@@ -170,6 +171,38 @@ const InnerDialog = (props: InnerDialogProps) => {
     project.getCurrentPlatform(),
     object.getType()
   );
+  const objectDisplayName = objectMetadata
+    ? objectMetadata.getFullName()
+    : null;
+
+  const isSpriteObject = object.getType() === 'Sprite';
+  const spriteHasAnimations =
+    isSpriteObject &&
+    gd.asSpriteConfiguration(object.getConfiguration()).getAnimationsCount() >
+      0;
+
+  const contextualHelpPagePath = (() => {
+    if (currentTab === 'behaviors') return '/behaviors';
+    if (currentTab === 'variables')
+      return '/all-features/variables/object-variables';
+    if (currentTab === 'effects') return '/objects/effects';
+    if (isSpriteObject) return '/objects/sprite';
+    return helpPagePath || '/objects';
+  })();
+
+  const contextualHelpAnchor = (() => {
+    if (isSpriteObject && spriteHasAnimations) return 'adding-an-animation';
+    return undefined;
+  })();
+
+  const getContextualScopeName = (): MessageDescriptor => {
+    if (currentTab === 'behaviors') return t`Behaviors`;
+    if (currentTab === 'variables') return t`Object Variables`;
+    if (currentTab === 'effects') return t`Effects`;
+    if (isSpriteObject && spriteHasAnimations) return t`Animations`;
+    if (objectDisplayName) return objectDisplayName;
+    return t`Objects`;
+  };
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
@@ -265,7 +298,12 @@ const InnerDialog = (props: InnerDialogProps) => {
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help-button" helpPagePath={helpPagePath} />,
+        <HelpButton
+          key="help-button"
+          helpPagePath={contextualHelpPagePath}
+          anchor={contextualHelpAnchor}
+          scopeName={getContextualScopeName()}
+        />,
         <HotReloadPreviewButton
           key="hot-reload-preview-button"
           {...props.hotReloadPreviewButtonProps}

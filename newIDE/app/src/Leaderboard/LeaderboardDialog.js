@@ -5,7 +5,7 @@ import { LeaderboardAdmin } from '../GameDashboard/LeaderboardAdmin';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import HelpButton from '../UI/HelpButton';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 type Props = {|
   onClose: () => void,
@@ -38,6 +38,7 @@ const LeaderboardDialog = ({
         <HelpButton
           key="help"
           helpPagePath="/interface/games-dashboard/leaderboard-administration"
+          scopeName={t`Leaderboards`}
         />,
       ]}
       open={open}

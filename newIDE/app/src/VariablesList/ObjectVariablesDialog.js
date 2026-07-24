@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -68,6 +68,7 @@ const ObjectVariablesDialog = ({
       tabs={tabs}
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/object-variables'}
+      scopeName={t`Object variables`}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="object-variables-dialog"
       isListLocked={isListLocked}

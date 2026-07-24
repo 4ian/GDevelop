@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -461,7 +461,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
                   tutorialId="Intermediate-externals"
                   label={<Trans>Watch tutorial</Trans>}
                   renderIfNotFound={
-                    <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                    <HelpButton
+                      helpPagePath="/interface/events-editor/external-events"
+                      scopeName={t`External layouts`}
+                    />
                   }
                 />
               </Line>

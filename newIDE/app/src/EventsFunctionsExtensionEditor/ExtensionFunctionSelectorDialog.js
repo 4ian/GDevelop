@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
@@ -87,7 +87,11 @@ export default function ExtensionFunctionSelectorDialog({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/events/functions" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/events/functions"
+          scopeName={t`Functions`}
+        />,
       ]}
       open
       onRequestClose={onCancel}

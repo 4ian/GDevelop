@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import React from 'react';
 import Dialog from '../../UI/Dialog';
@@ -40,7 +40,11 @@ const BuildsDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/publishing'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/publishing'}
+          scopeName={t`Publishing`}
+        />,
       ]}
       onRequestClose={onClose}
       open={open}

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -76,6 +76,7 @@ const SceneVariablesDialog = ({
       tabs={tabs}
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/scene-variables'}
+      scopeName={t`Scene variables`}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="scene-variables-dialog"
       isListLocked={isListLocked}

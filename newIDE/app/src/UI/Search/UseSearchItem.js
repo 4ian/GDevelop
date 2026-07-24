@@ -392,72 +392,96 @@ export const useSearchItem = <SearchItem: SearchableItem>(
               .toLowerCase()
               .split(/\s+/)
               .filter(Boolean);
+            const normalizedSearchText = searchText.trim().toLowerCase();
+
+            // ---- Score weights ----
+            // Width of a priority band. The within-band score always stays well
+            // below this value, so an item in a higher band always outranks any
+            // item in a lower band (strict, non-overlapping ordering).
+            const BAND_WIDTH = 10;
+            // Weight of the name match added to the within-band score, so that
+            // (inside a band) an item with the searched word in its name ranks
+            // above one matching only through its tags.
+            const NAME_MATCH_WEIGHT = 0.5;
+            // Many-tags malus: the within-band score is multiplied by
+            // MANY_TAGS_MALUS_FLOOR + (1 - MANY_TAGS_MALUS_FLOOR) * ratio of
+            // matching tags. An item whose tags nearly all match keeps almost
+            // its full score; one matching through a tiny fraction of its tags
+            // is reduced down to the floor (never to zero, so it stays listed).
+            const MANY_TAGS_MALUS_FLOOR = 0.15;
+            // A tag counts as "matching" when its text relevance reaches at
+            // least this threshold (a prefix match scores 0.2, a whole-word
+            // match 1, so this keeps only strong tag matches).
+            const MATCHING_TAG_RELEVANCE_THRESHOLD = 0.5;
+
             const getSearchItemRelevance = (searchItem: SearchItem) => {
-              let textRelevance = getTextSearchRelevance(
+              // Base text relevance (whole word > prefix > substring). Only used
+              // to order items *within* a band, never to cross between bands.
+              let withinBandScore = getTextSearchRelevance(
                 getItemDescription(searchItem),
                 searchWords
               );
 
+              // How well the item's name matches. A whole-word match of the
+              // search term in the name yields a relevance >= 1.
+              // $FlowFixMe[prop-missing] - most searchable items have a name.
+              const name: ?string = searchItem.name;
+              const nameRelevance = name
+                ? getTextSearchRelevance(name, searchWords)
+                : 0;
+
               // When an item has many tags but only a few match the search, the
               // match is diluted: it is likely less focused on what the user is
               // looking for (e.g. an aerosol tagged "car" among 30 other tags).
-              // Reduce its score sharply, proportionally to the share of
-              // matching tags, so a heavily diluted match sinks below cleaner
-              // partial matches, while an item whose tags mostly match keeps a
-              // near-full score. A small floor keeps the item in the results.
+              // Reduce the within-band score sharply, proportionally to the
+              // share of matching tags, so a heavily diluted match sinks below
+              // cleaner partial matches. A small floor keeps it in the results.
               // $FlowFixMe[prop-missing] - only AssetShortHeader/ResourceV2 have tags.
               const tags: ?Array<string> = searchItem.tags;
               if (tags && tags.length > 0) {
-                const matchingTagsCount = tags.filter(tag =>
-                  getTextSearchRelevance(tag, searchWords) >= 0.5
+                const matchingTagsCount = tags.filter(
+                  tag =>
+                    getTextSearchRelevance(tag, searchWords) >=
+                    MATCHING_TAG_RELEVANCE_THRESHOLD
                 ).length;
                 const matchingTagsRatio = matchingTagsCount / tags.length;
-                textRelevance *= 0.15 + 0.85 * matchingTagsRatio;
+                withinBandScore *=
+                  MANY_TAGS_MALUS_FLOOR +
+                  (1 - MANY_TAGS_MALUS_FLOOR) * matchingTagsRatio;
               }
 
-              // Boost items whose name itself contains the searched word: a
-              // match in the name is a much stronger signal of relevance than a
-              // match found only among the tags. The bonus is proportional to
-              // how well the name matches (whole-word matches count for more
-              // than partial ones, see getTextSearchRelevance).
-              // $FlowFixMe[prop-missing] - most searchable items have a name.
-              const name: ?string = searchItem.name;
-              if (name) {
-                const nameRelevanceBonus = 0.5;
-                textRelevance +=
-                  nameRelevanceBonus *
-                  getTextSearchRelevance(name, searchWords);
-              }
+              // Within a band, an item whose name contains the searched word
+              // still ranks above one matching only through its tags.
+              withinBandScore += NAME_MATCH_WEIGHT * nameRelevance;
 
-              // Boost items that have a tag matching the search exactly (e.g.
-              // searching "car" on an asset tagged "car"). An exact tag match is
-              // a strong signal, so it is ranked just after a match found in the
-              // asset's name: the bonus is deliberately kept below the name bonus
-              // above so a name match still ranks first.
-              if (tags && tags.length > 0) {
-                const normalizedSearchText = searchText.trim().toLowerCase();
-                const hasExactTagMatch = tags.some(
+              // An "exact word" match: the whole search term appears as a
+              // complete word in the name, or the item has a tag exactly equal
+              // to the search term. This is the strongest relevance signal.
+              const hasWholeWordInName = nameRelevance >= 1;
+              const hasExactTag = !!(
+                tags &&
+                tags.some(
                   tag => tag.trim().toLowerCase() === normalizedSearchText
-                );
-                if (hasExactTagMatch) {
-                  const exactTagRelevanceBonus = 0.35;
-                  textRelevance += exactTagRelevanceBonus;
-                }
-              }
+                )
+              );
+              const hasExactWord = hasWholeWordInName || hasExactTag;
 
-              // For word searches, prefer 3D assets over 2D ones: they get a
-              // relevance bonus so that, at comparable text relevance, a 3D
-              // asset ranks above a 2D one. The bonus is deliberately moderate
-              // (not a strict "all 3D before all 2D" offset) so that a 2D asset
-              // with a clearly better score still ranks above a weakly matching
-              // 3D asset (e.g. one matching only through one of its many tags).
-              // Non-asset items (e.g. packs) have no objectType, so they are
-              // unaffected.
-              const threeDRelevanceBonus = 0.25;
+              // 3D assets are preferred over 2D ones.
               const is3DAsset =
                 // $FlowFixMe[prop-missing] - only AssetShortHeader has objectType.
                 searchItem.objectType === 'Scene3D::Model3DObject';
-              return is3DAsset ? textRelevance + threeDRelevanceBonus : textRelevance;
+
+              // Strict, non-overlapping bands enforce the priority order:
+              //   1. 3D assets with an exact word match      (+2 * BAND_WIDTH)
+              //   2. 2D assets with an exact word match       (+1 * BAND_WIDTH)
+              //   3. everything else (partial name match / single full tag),
+              //      ordered by the within-band score with the many-tags malus.
+              let score = withinBandScore;
+              if (hasExactWord) {
+                score += BAND_WIDTH; // Lift exact-word matches above the rest.
+                if (is3DAsset) score += BAND_WIDTH; // 3D-exact above 2D-exact.
+              }
+              return score;
             };
 
             setSearchResults(
@@ -489,6 +513,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
       chosenFilters,
       searchFilters,
       searchApi,
+      getItemDescription,
     ]
   );
 

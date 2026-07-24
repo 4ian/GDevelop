@@ -78,6 +78,8 @@ export type SceneEditorsDisplayProps = {|
   onLayerRenamed: () => void,
   onLayersModified: () => void,
   onLayersVisibilityInEditorChanged: () => void,
+  areCollisionsShownInEditor: boolean,
+  onToggleCollisionsShownInEditor: () => void,
   onBackgroundColorChanged: () => void,
   selectedObjectGroup: gdObjectGroup | null,
   onSelectObjectGroup: (objectGroup: gdObjectGroup | null) => void,

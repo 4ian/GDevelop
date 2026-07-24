@@ -234,6 +234,14 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     return project.getLayout(projectItemName);
   }
 
+  saveCurrentScene = () => {
+    if (this.editor) this.editor.saveCurrentScene();
+  };
+
+  loadSceneFromFile = () => {
+    if (this.editor) this.editor.loadSceneFromFile();
+  };
+
   saveUiSettings = () => {
     const layout = this.getLayout();
     const editor = this.editor;

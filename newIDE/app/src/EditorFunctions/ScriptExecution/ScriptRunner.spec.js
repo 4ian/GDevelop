@@ -7,6 +7,7 @@ import {
   type ScriptExecutionError,
 } from './ScriptRunner';
 import { type EditorFunctionGenericOutput } from '..';
+import { isNoOpConsideredSuccess } from '../isNoOpConsideredSuccess';
 
 // The runner is deliberately independent from `gd` and from the real editor
 // functions: it only needs functions following the `launchFunction` contract.
@@ -299,5 +300,79 @@ describe('runScript', () => {
     expect(result.functionCallRecords).toHaveLength(3);
     expect(result.functionCallRecords[1].args).toEqual({ id: 'instance-1' });
     expect(result.functionCallRecords[2].args).toEqual({ id: 'instance-2' });
+  });
+
+  // A no-op call (requested state == current state) is a success from v12, so a
+  // script must survive it; before v12 it is still a failure that stops the
+  // script. The editor function makes this decision via isNoOpConsideredSuccess
+  // (see EditorFunctions/index.js put_2d/put_3d_instances) — here we model that
+  // outcome and check the runner reacts correctly to each shape.
+  describe('idempotent no-op call', () => {
+    const noOpMessage =
+      'Matched 1 existing instance but the requested values are identical to their current ones, so nothing changed.';
+    const makeNoOpAwareFunction = (toolsVersion: ?string) =>
+      makeFakeFunction({
+        name: 'put_2d_instances',
+        modifiesProject: true,
+        launch: async () =>
+          isNoOpConsideredSuccess(toolsVersion)
+            ? { success: true, message: noOpMessage, nothingChanged: true }
+            : { success: false, message: noOpMessage },
+      });
+
+    it('lets the script continue past a no-op on v12 (nothingChanged in the record)', async () => {
+      const afterCalls: Array<number> = [];
+      const afterFunction = makeFakeFunction({
+        name: 'add_or_edit_variable',
+        modifiesProject: true,
+        launch: async () => {
+          afterCalls.push(1);
+          return { success: true, message: 'Variable declared.' };
+        },
+      });
+
+      const result = await runScript({
+        jsCode: [
+          `await put_2d_instances({});`,
+          `await add_or_edit_variable({});`,
+        ].join('\n'),
+        exposedFunctions: [makeNoOpAwareFunction('v12'), afterFunction],
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.error).toBeNull();
+      // The call AFTER the no-op ran: the no-op did not stop the script.
+      expect(afterCalls).toHaveLength(1);
+      expect(result.functionCallRecords).toHaveLength(2);
+      expect(result.functionCallRecords[0].success).toBe(true);
+      // The monitorable flag is preserved in the record's output.
+      expect(result.functionCallRecords[0].output.nothingChanged).toBe(true);
+    });
+
+    it('stops the script at a no-op before v12 (regression)', async () => {
+      const afterCalls: Array<number> = [];
+      const afterFunction = makeFakeFunction({
+        name: 'add_or_edit_variable',
+        modifiesProject: true,
+        launch: async () => {
+          afterCalls.push(1);
+          return { success: true, message: 'Variable declared.' };
+        },
+      });
+
+      const result = await runScript({
+        jsCode: [
+          `await put_2d_instances({});`,
+          `await add_or_edit_variable({});`,
+        ].join('\n'),
+        exposedFunctions: [makeNoOpAwareFunction('v11'), afterFunction],
+      });
+
+      expect(result.success).toBe(false);
+      // The script stopped at the failed no-op: the later call never ran.
+      expect(afterCalls).toHaveLength(0);
+      expect(result.functionCallRecords).toHaveLength(1);
+      expect(result.functionCallRecords[0].success).toBe(false);
+    });
   });
 });

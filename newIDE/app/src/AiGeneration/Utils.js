@@ -549,6 +549,9 @@ export const useProcessFunctionCalls = ({
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
           toolOptions: aiRequest.toolOptions || null,
+          // Threaded so functions can gate version-dependent behavior (e.g. a
+          // no-op counts as success from v12 — see isNoOpConsideredSuccess).
+          toolsVersion: aiRequest.toolsVersion || null,
           i18n,
           // Explorer sub-agent scripts are read-only: restrict their
           // `run_script` to non-mutating functions (defense in depth).

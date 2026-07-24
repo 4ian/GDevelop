@@ -36,6 +36,9 @@ type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'), threaded to the functions so
+  // they can gate version-dependent behavior (e.g. isNoOpConsideredSuccess).
+  toolsVersion?: ?string,
   // When true, a `run_script` call is exposed only non-mutating functions
   // (explorer sub-agent scripts, which must stay read-only).
   runScriptReadOnly?: boolean,
@@ -81,6 +84,7 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  toolsVersion,
   runScriptReadOnly,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
@@ -199,6 +203,7 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        toolsVersion,
         runScriptReadOnly,
         editorCallbacks,
         relatedAiRequestId,

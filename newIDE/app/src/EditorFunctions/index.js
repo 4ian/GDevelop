@@ -82,6 +82,7 @@ import {
 import { runScript as executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/capScriptOutput';
+import { isNoOpConsideredSuccess } from './isNoOpConsideredSuccess';
 
 export type HintEntry = {|
   code: string,
@@ -156,6 +157,10 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // Set to true (v12+) when a mutating call was a no-op because the requested
+  // state already matched the current state. Lets the no-op rate be counted
+  // from `functionCallRecords`/CloudWatch without any new telemetry.
+  nothingChanged?: boolean,
   eventsAsText?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
   eventsRenderingErrors?: Array<EventsTextRenderingError>,
@@ -319,6 +324,10 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'). Threaded so functions can gate
+  // version-dependent behavior (e.g. `isNoOpConsideredSuccess`). May be null
+  // when unknown (treated as pre-v12).
+  toolsVersion?: ?string,
   // When true, `run_script` exposes only non-mutating functions (explorer
   // sub-agent scripts, which must stay read-only). Ignored by other functions.
   runScriptReadOnly?: boolean,
@@ -3463,6 +3472,7 @@ const put2dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4175,15 +4185,25 @@ const put2dInstances: EditorFunction = {
           );
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4305,6 +4325,7 @@ const put3dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4953,15 +4974,25 @@ const put3dInstances: EditorFunction = {
           );
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).

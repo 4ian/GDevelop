@@ -366,13 +366,17 @@ namespace gdjs {
   };
 
   let hasWindowFocus = true;
+  // References for cleanup
+  const _onWindowFocus = () => {
+    hasWindowFocus = true;
+  };
+  const _onWindowBlur = () => {
+    hasWindowFocus = false;
+  };
+
   if (typeof window !== 'undefined') {
-    window.addEventListener('focus', () => {
-      hasWindowFocus = true;
-    });
-    window.addEventListener('blur', () => {
-      hasWindowFocus = false;
-    });
+    window.addEventListener('focus', _onWindowFocus);
+    window.addEventListener('blur', _onWindowBlur);
   }
 
   function isDefined<T>(value: T | null | undefined): value is NonNullable<T> {
@@ -967,6 +971,10 @@ namespace gdjs {
       if (this._unregisterContextLostListener) {
         this._unregisterContextLostListener();
         this._unregisterContextLostListener = null;
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', _onWindowFocus);
+        window.removeEventListener('blur', _onWindowBlur);
       }
     }
 

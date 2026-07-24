@@ -4,6 +4,7 @@ import * as React from 'react';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
+  type BuildSigningOptions,
   buildCordovaAndroid,
   getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
@@ -63,6 +64,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   getInitialExportState: () => ({
     targets: ['androidApk'],
     keystore: 'new',
+    buildSigningOptions: null,
     signingDialogOpen: false,
   }),
 
@@ -201,12 +203,17 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     if (!firebaseUser)
       return Promise.reject(new Error('User is not authenticated'));
 
+    const signing: BuildSigningOptions =
+      exportState.keystore === 'custom' && exportState.buildSigningOptions
+        ? exportState.buildSigningOptions
+        : { keystore: exportState.keystore };
+
     return buildCordovaAndroid(
       getAuthorizationHeader,
       firebaseUser.uid,
       uploadBucketKey,
       exportState.targets,
-      exportState.keystore,
+      signing,
       gameId,
       options,
       payWithCredits

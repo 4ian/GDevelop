@@ -113,6 +113,18 @@ export default class ResourcesLoader {
     ResourcesLoader._cache = new UrlsCache();
   }
 
+  static fixedEncodeURIComponent(str: string) {
+    return str.replace(/[#*]/g, function(c) {
+      return (
+        '%' +
+        c
+          .charCodeAt(0)
+          .toString(16)
+          .toUpperCase()
+      );
+    });
+  }
+
   /**
    * Get the fully qualified URL/filename for a URL/filename relative to the project.
    */
@@ -131,9 +143,9 @@ export default class ResourcesLoader {
       // Support local filesystem with Electron
       const file = project.getProjectFile();
       const projectPath = path.dirname(file);
-      const resourceAbsolutePath = path
-        .resolve(projectPath, urlOrFilename)
-        .replace(/\\/g, '/');
+      const resourceAbsolutePath = this.fixedEncodeURIComponent(
+        path.resolve(projectPath, urlOrFilename).replace(/\\/g, '/')
+      );
 
       console.info('Caching resolved local filename:', resourceAbsolutePath);
       return this._cache.cacheLocalFileUrl(

@@ -23,7 +23,7 @@ import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
 import { CompactEffectsListEditor } from './CompactEffectsListEditor';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
-import { TopLevelCollapsibleSection } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 
 export const styles = {
   icon: {
@@ -95,14 +95,14 @@ export const CompactLayerPropertiesEditor = ({
 
   // Layers have no persistent UUID, so the name is used (like for scenes).
   // The base layer has an empty name, so a placeholder is used instead.
-  const persistedScrollId = layer.getName() || 'base-layer';
+  const persistedPanelStateId = layer.getName() || 'base-layer';
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'layer',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'layer',
   });
 
   const layerPropertiesSchema = React.useMemo<Schema>(
@@ -197,6 +197,7 @@ export const CompactLayerPropertiesEditor = ({
               onEffectsUpdated={() => onLayersModified([layer])}
               onOpenFullEditor={() => onEditLayerEffects(layer)}
               onEffectAdded={onEffectAdded}
+              persistedPanelStateId={persistedPanelStateId}
             />
           )}
           {layer.getRenderingType() !== '2d' && !layer.isLightingLayer() && (
@@ -212,6 +213,7 @@ export const CompactLayerPropertiesEditor = ({
               onEffectsUpdated={() => onLayersModified([layer])}
               onOpenFullEditor={() => onEditLayerEffects(layer)}
               onEffectAdded={onEffectAdded}
+              persistedPanelStateId={persistedPanelStateId}
             />
           )}
         </Column>

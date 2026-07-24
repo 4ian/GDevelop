@@ -17,6 +17,7 @@ import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import ObjectGroup from '../UI/CustomSvgIcons/ObjectGroup';
 import { usePersistedScrollPosition } from '../Utils/UsePersistedScrollPosition';
+import { usePersistedCollapsedSection } from '../Utils/UsePersistedCollapsedSection';
 import Help from '../UI/CustomSvgIcons/Help';
 import { getHelpLink } from '../Utils/HelpLink';
 import Window from '../Utils/Window';
@@ -25,10 +26,8 @@ import Link from '../UI/Link';
 import useVariablesContainerRefactoring from '../VariablesList/useVariablesContainerRefactoring';
 import { type ObjectGroupEditorTab } from './EditedObjectGroupEditorDialog';
 import CompactObjectGroupEditor from './CompactObjectGroupEditor';
-import {
-  TopLevelCollapsibleSection,
-  CollapsibleSubPanel,
-} from '../ObjectEditor/CompactObjectPropertiesEditor';
+import { CollapsibleSubPanel } from '../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../CompactPropertiesEditor/TopLevelCollapsibleSection';
 import { useManageObjectBehaviors } from '../BehaviorsEditor';
 import CompactBehaviorsEditorService from '../ObjectEditor/CompactObjectPropertiesEditor/CompactBehaviorsEditorService';
 import { IconContainer } from '../UI/IconContainer';
@@ -121,9 +120,6 @@ export const CompactObjectGroupPropertiesEditor = ({
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const { isMobile } = useResponsiveWindowSize();
-  const [isObjectsFolded, setIsObjectsFolded] = React.useState(false);
-  const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
 
   const groupVariablesContainer = React.useMemo(
@@ -147,14 +143,23 @@ export const CompactObjectGroupPropertiesEditor = ({
 
   // Object groups have no persistent UUID, so the name is used
   // (like for scenes).
-  const persistedScrollId = objectGroup.getName();
+  const persistedPanelStateId = objectGroup.getName();
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'objectGroup',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'objectGroup',
+  });
+  const {
+    isSectionFolded,
+    setSectionFolded,
+    toggleSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
+    persistedPanelStateId,
+    persistedPanelStateType: 'objectGroup',
   });
 
   const objects: Array<gdObject> = mapVector(
@@ -310,8 +315,8 @@ export const CompactObjectGroupPropertiesEditor = ({
             <Column expand noMargin noOverflowParent>
               <TopLevelCollapsibleSection
                 title={<Trans>Objects</Trans>}
-                isFolded={isObjectsFolded}
-                toggleFolded={() => setIsObjectsFolded(!isObjectsFolded)}
+                isFolded={isSectionFolded('objects')}
+                toggleFolded={() => toggleSectionFolded('objects')}
                 onOpenFullEditor={openFullEditor}
                 renderContent={() => (
                   <ColumnStackLayout noMargin noOverflowParent>
@@ -334,8 +339,8 @@ export const CompactObjectGroupPropertiesEditor = ({
               />
               <TopLevelCollapsibleSection
                 title={<Trans>Behaviors</Trans>}
-                isFolded={isBehaviorsFolded}
-                toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+                isFolded={isSectionFolded('behaviors')}
+                toggleFolded={() => toggleSectionFolded('behaviors')}
                 onOpenFullEditor={undefined}
                 onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
                 renderContent={() => (
@@ -417,8 +422,8 @@ export const CompactObjectGroupPropertiesEditor = ({
               />
               <TopLevelCollapsibleSection
                 title={<Trans>Object Variables</Trans>}
-                isFolded={isVariablesFolded}
-                toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+                isFolded={isSectionFolded('variables')}
+                toggleFolded={() => toggleSectionFolded('variables')}
                 onOpenFullEditor={() =>
                   onEditObjectGroup(objectGroup, 'variables')
                 }
@@ -429,7 +434,7 @@ export const CompactObjectGroupPropertiesEditor = ({
                         if (variablesListRef.current) {
                           variablesListRef.current.addVariable();
                         }
-                        setIsVariablesFolded(false);
+                        setSectionFolded('variables', false);
                       }
                 }
                 renderContentAsHiddenWhenFolded={

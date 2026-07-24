@@ -7,13 +7,13 @@ type Props = {|
   project: gdProject,
   scrollViewRef: {| current: ?ScrollViewInterface |},
   scrollKey: string,
-  persistedScrollType:
+  persistedPanelStateType:
     | 'instances-of-object'
     | 'object'
     | 'scene'
     | 'objectGroup'
     | 'layer',
-  persistedScrollId: string | null,
+  persistedPanelStateId: string | null,
   saveDebounceTimeInMs?: number,
 |};
 
@@ -21,8 +21,8 @@ export const usePersistedScrollPosition = ({
   project,
   scrollViewRef,
   scrollKey,
-  persistedScrollType,
-  persistedScrollId,
+  persistedPanelStateType,
+  persistedPanelStateId,
   saveDebounceTimeInMs = 300,
 }: Props): (() => void) => {
   const {
@@ -45,16 +45,16 @@ export const usePersistedScrollPosition = ({
   React.useLayoutEffect(
     () => {
       const scrollView = scrollViewRef.current;
-      if (!persistedScrollId || !scrollView) {
+      if (!persistedPanelStateId || !scrollView) {
         return;
       }
       const editorStateForProject = getEditorStateForProject(projectId);
       if (!editorStateForProject) return;
 
       const scrollPosition =
-        editorStateForProject.propertiesPanelScroll[persistedScrollType]?.[
-          persistedScrollId
-        ];
+        editorStateForProject.propertiesPanel[persistedPanelStateType]?.[
+          persistedPanelStateId
+        ]?.scrollPosition;
       if (!Number.isFinite(scrollPosition)) {
         return;
       }
@@ -63,18 +63,18 @@ export const usePersistedScrollPosition = ({
     },
     [
       getEditorStateForProject,
-      persistedScrollId,
-      persistedScrollType,
+      persistedPanelStateId,
+      persistedPanelStateType,
       projectId,
       scrollKey,
       scrollViewRef,
     ]
   );
 
-  return React.useCallback(
+  const onScroll = React.useCallback(
     () => {
       const scrollView = scrollViewRef.current;
-      if (!scrollView || !persistedScrollId) return;
+      if (!scrollView || !persistedPanelStateId) return;
       if (saveScrollTimeoutId.current) {
         clearTimeout(saveScrollTimeoutId.current);
       }
@@ -83,11 +83,16 @@ export const usePersistedScrollPosition = ({
         const currentEditorState = getEditorStateForProject(projectId);
 
         setEditorStateForProject(projectId, {
-          propertiesPanelScroll: {
-            ...currentEditorState?.propertiesPanelScroll,
-            [persistedScrollType]: {
-              ...currentEditorState?.propertiesPanelScroll[persistedScrollType],
-              [persistedScrollId]: scrollView.getScrollPosition(),
+          propertiesPanel: {
+            ...currentEditorState?.propertiesPanel,
+            [persistedPanelStateType]: {
+              ...currentEditorState?.propertiesPanel[persistedPanelStateType],
+              [persistedPanelStateId]: {
+                ...currentEditorState?.propertiesPanel[
+                  persistedPanelStateType
+                ]?.[persistedPanelStateId],
+                scrollPosition: scrollView.getScrollPosition(),
+              },
             },
           },
         });
@@ -95,12 +100,14 @@ export const usePersistedScrollPosition = ({
     },
     [
       getEditorStateForProject,
-      persistedScrollId,
-      persistedScrollType,
+      persistedPanelStateId,
+      persistedPanelStateType,
       projectId,
       saveDebounceTimeInMs,
       scrollViewRef,
       setEditorStateForProject,
     ]
   );
+
+  return onScroll;
 };

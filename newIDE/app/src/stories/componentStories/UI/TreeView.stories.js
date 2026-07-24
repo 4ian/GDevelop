@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import { t } from '@lingui/macro';
+import Add from '../../../UI/CustomSvgIcons/Add';
 
 import { getPaperDecorator } from '../../PaperDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
@@ -514,6 +516,134 @@ export const Default = (): React.Node => {
                     canMoveSelectionToItem={() => Math.random() > 0.2}
                     reactDndType="demo"
                     shouldSelectUponContextMenuOpening
+                  />
+                </Column>
+              </Line>
+            )}
+          </AutoSizer>
+        </FixedHeightFlexContainer>
+      </Column>
+    </DragAndDropContextProvider>
+  );
+};
+
+const generateDeepNodes = (): Node[] => {
+  const sections: Array<Node> = [];
+  for (let sectionIndex = 1; sectionIndex <= 2; sectionIndex++) {
+    const folders: Array<Node> = [];
+    for (let folderIndex = 1; folderIndex <= 8; folderIndex++) {
+      const subFolders: Array<Node> = [];
+      for (let subFolderIndex = 1; subFolderIndex <= 3; subFolderIndex++) {
+        const items: Array<Node> = [];
+        for (let itemIndex = 1; itemIndex <= 6; itemIndex++) {
+          items.push({
+            id: `s${sectionIndex}-f${folderIndex}-sf${subFolderIndex}-object-${itemIndex}`,
+            name: `Object ${itemIndex}`,
+          });
+        }
+        subFolders.push({
+          id: `s${sectionIndex}-f${folderIndex}-subfolder-${subFolderIndex}`,
+          name: `Sub folder ${subFolderIndex} of folder ${folderIndex}`,
+          children: items,
+        });
+      }
+      folders.push({
+        id: `s${sectionIndex}-folder-${folderIndex}`,
+        name: `Folder ${folderIndex}`,
+        children: subFolders,
+      });
+    }
+    if (sectionIndex === 2) {
+      // A chain of folders nested 5 levels deep, to check the behavior when
+      // there are more levels than the maximum number of sticky rows.
+      let children: Array<Node> = [];
+      for (let level = 5; level >= 1; level--) {
+        const items: Array<Node> = [];
+        for (let itemIndex = 1; itemIndex <= 4; itemIndex++) {
+          items.push({
+            id: `deep-level-${level}-object-${itemIndex}`,
+            name: `Object ${itemIndex} at level ${level}`,
+          });
+        }
+        children = [
+          {
+            id: `deep-folder-level-${level}`,
+            name: `Deep folder (level ${level})`,
+            children: [...children, ...items],
+          },
+        ];
+      }
+      folders.push(...children);
+    }
+    sections.push({
+      id: `sticky-section-${sectionIndex}`,
+      name: sectionIndex === 1 ? 'Global Objects' : 'Scene Objects',
+      isRoot: true,
+      children: folders,
+    });
+  }
+  return sections;
+};
+
+const deepNodes = generateDeepNodes();
+
+const getAllNodeIdsWithChildren = (nodes: Node[]): string[] =>
+  nodes.flatMap(node =>
+    node.children ? [node.id, ...getAllNodeIdsWithChildren(node.children)] : []
+  );
+
+export const StickyAncestors = (): React.Node => {
+  const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);
+  const onSelectItems = (items: Node[]) => {
+    setSelectedItems(items.filter(item => !item.isRoot));
+  };
+  return (
+    <DragAndDropContextProvider>
+      <Column noMargin expand>
+        <FixedHeightFlexContainer height={500}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <Line expand>
+                <Column expand noMargin>
+                  {/* $FlowFixMe[incompatible-type] */}
+                  <TreeView
+                    multiSelect={false}
+                    height={height}
+                    width={width}
+                    items={deepNodes}
+                    getItemId={node => node.id}
+                    getItemName={node => node.name}
+                    onEditItem={action('Edit item')}
+                    selectedItems={selectedItems}
+                    onSelectItems={onSelectItems}
+                    onRenameItem={action('Rename item')}
+                    getItemThumbnail={node =>
+                      node.children ? null : 'res/unknown32.png'
+                    }
+                    // $FlowIgnore
+                    getItemChildren={node => node.children}
+                    getItemRightButton={node =>
+                      // Mirror the Objects list of a scene: only the
+                      // "Scene Objects" section has the add button.
+                      node.id === 'sticky-section-2'
+                        ? {
+                            id: 'add-new-object-button',
+                            icon: <Add />,
+                            label: t`Add object`,
+                            click: action('Add object'),
+                            primary: true,
+                          }
+                        : null
+                    }
+                    buildMenuTemplate={() => [{ label: 'salut' }]}
+                    onMoveSelectionToItem={action('Drop selection on item')}
+                    canMoveSelectionToItem={() => true}
+                    reactDndType="demo"
+                    initiallyOpenedNodeIds={getAllNodeIdsWithChildren(
+                      deepNodes
+                    )}
+                    shouldSelectUponContextMenuOpening
+                    enableStickyAncestors
                   />
                 </Column>
               </Line>

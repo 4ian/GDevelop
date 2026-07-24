@@ -72,6 +72,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   openSceneVariables: () => void,
   onBackgroundColorChanged: () => void,
+  onRenderer3DWorldScaleFieldChanged: () => void,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
@@ -84,6 +85,7 @@ export const CompactScenePropertiesEditor = ({
   scene,
   openSceneVariables,
   onBackgroundColorChanged,
+  onRenderer3DWorldScaleFieldChanged,
   projectScopedContainersAccessor,
   unsavedChanges,
   i18n,
@@ -144,9 +146,15 @@ export const CompactScenePropertiesEditor = ({
       return makeSchema({
         i18n,
         onBackgroundColorChanged,
+        onRenderer3DWorldScaleFieldChanged,
       });
     },
-    [schemaRecomputeTrigger, i18n, onBackgroundColorChanged]
+    [
+      schemaRecomputeTrigger,
+      i18n,
+      onBackgroundColorChanged,
+      onRenderer3DWorldScaleFieldChanged,
+    ]
   );
 
   return (

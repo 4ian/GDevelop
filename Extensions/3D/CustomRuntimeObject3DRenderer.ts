@@ -247,14 +247,14 @@ namespace gdjs {
     getAnimationFrameWidth(material: THREE.Material) {
       const map = (
         material as THREE.MeshBasicMaterial | THREE.MeshStandardMaterial
-      ).map;
+      ).map as THREE.Texture<HTMLImageElement>;
       return map ? map.image.width : 0;
     }
 
     getAnimationFrameHeight(material: THREE.Material) {
       const map = (
         material as THREE.MeshBasicMaterial | THREE.MeshStandardMaterial
-      ).map;
+      ).map as THREE.Texture<HTMLImageElement>;
       return map ? map.image.height : 0;
     }
   }

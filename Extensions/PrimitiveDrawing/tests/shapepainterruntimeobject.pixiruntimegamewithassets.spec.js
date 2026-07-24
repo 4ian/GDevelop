@@ -45,6 +45,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PixiJS RuntimeGame with assets
         name: 'Scene1',
         stopSoundsOnStartup: false,
         title: '',
+        renderer3DWorldScale: 100,
         behaviorsSharedData: [],
         objects: [],
         objectsGroups: [],

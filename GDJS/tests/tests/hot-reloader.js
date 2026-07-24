@@ -178,6 +178,7 @@ describe('gdjs.HotReloader._hotReloadRuntimeGame', () => {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      renderer3DWorldScale: 100,
       behaviorsSharedData: [],
       objects: objects || [
         createSpriteData({ name: 'MyObject', image: 'ResourceA' }),

@@ -1067,6 +1067,9 @@ interface Layout {
     [Const, Ref] DOMString GetResourcesPreloading();
     void SetResourcesUnloading([Const] DOMString resourcesUnloading);
     [Const, Ref] DOMString GetResourcesUnloading();
+
+    void SetRenderer3DWorldScale(double value);
+    double GetRenderer3DWorldScale();
 };
 
 interface ExternalEvents {

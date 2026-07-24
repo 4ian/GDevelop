@@ -401,11 +401,6 @@ namespace gdjs {
           }
 
           this._threeScene = new THREE.Scene();
-
-          // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
-          // We use a mirroring rather than a camera rotation so that the Z order is not changed.
-          this._threeScene.scale.y = -1;
-
           this._threeGroup = new THREE.Group();
           this._threeScene.add(this._threeGroup);
 
@@ -419,19 +414,17 @@ namespace gdjs {
               -width / 2,
               width / 2,
               height / 2,
-              -height / 2,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              -height / 2
             );
           } else {
             this._threeCamera = new THREE.PerspectiveCamera(
               this._layer.getInitialCamera3DFieldOfView(),
-              1,
-              this._layer.getInitialCamera3DNearPlaneDistance(),
-              this._layer.getInitialCamera3DFarPlaneDistance()
+              1
             );
           }
           this._threeCamera.rotation.order = 'ZYX';
+
+          this.updateWorldScale();
 
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
@@ -445,12 +438,7 @@ namespace gdjs {
               new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
             );
             if (game.getAntialiasingMode() !== 'none') {
-              this._threeEffectComposer.addPass(
-                new THREE_ADDONS.SMAAPass(
-                  game.getGameResolutionWidth(),
-                  game.getGameResolutionHeight()
-                )
-              );
+              this._threeEffectComposer.addPass(new THREE_ADDONS.SMAAPass());
             }
             this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
           }
@@ -569,10 +557,13 @@ namespace gdjs {
     setCamera3DNearPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
 
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
       this._threeCamera.near = Math.min(
         // 0 is not a valid value for three js perspective camera:
         // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.
-        Math.max(distance, 0.0001),
+        Math.max(distance * inverseWorldScale, 0.000001),
         // Near value cannot exceed far value.
         this._threeCamera.far
       );
@@ -581,18 +572,30 @@ namespace gdjs {
 
     getCamera3DNearPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.near;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.near * worldScale;
     }
 
     setCamera3DFarPlaneDistance(distance: number) {
       if (!this._threeCamera) return;
-      this._threeCamera.far = Math.max(distance, this._threeCamera.near);
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      this._threeCamera.far = Math.max(
+        distance * inverseWorldScale,
+        this._threeCamera.near
+      );
       this._threeCameraDirty = true;
     }
 
     getCamera3DFarPlaneDistance(): float {
       if (!this._threeCamera) return 0;
-      return this._threeCamera.far;
+      const worldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DWorldScale();
+      return this._threeCamera.far * worldScale;
     }
 
     setCamera3DFieldOfView(angle: number) {
@@ -828,25 +831,52 @@ namespace gdjs {
       return [cx, cy];
     }
 
+    updateWorldScale(): void {
+      if (!this._threeScene || !this._threeCamera) {
+        return;
+      }
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
+      // Use a mirroring on the Y axis to follow the same axis as in the 2D, PixiJS, rendering.
+      // We use a mirroring rather than a camera rotation so that the Z order is not changed.
+      this._threeScene.scale.set(
+        inverseWorldScale,
+        -inverseWorldScale,
+        inverseWorldScale
+      );
+
+      this._threeCamera.near =
+        this._layer.getInitialCamera3DNearPlaneDistance() * inverseWorldScale;
+      this._threeCamera.far =
+        this._layer.getInitialCamera3DFarPlaneDistance() * inverseWorldScale;
+    }
+
     updatePosition(): void {
       const instanceContainer = this._layer.getInstanceContainer();
       const runtimeGame = instanceContainer.getGame();
+      const inverseWorldScale = this._layer
+        .getRuntimeScene()
+        .getRenderer3DInverseWorldScale();
 
       // Update the 3D camera position and rotation.
       if (this._threeCamera) {
         const angle = -gdjs.toRad(this._layer.getCameraRotation());
-        this._threeCamera.position.x = this._layer.getCameraX();
-        this._threeCamera.position.y = -this._layer.getCameraY(); // scene is mirrored on Y
+        this._threeCamera.position.x =
+          this._layer.getCameraX() * inverseWorldScale;
+        // The scene is mirrored on Y
+        this._threeCamera.position.y =
+          -this._layer.getCameraY() * inverseWorldScale;
         this._threeCamera.rotation.z = angle;
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
           this._threeCamera.zoom = this._layer.getCameraZoom();
           this._threeCamera.updateProjectionMatrix();
-          this._threeCamera.position.z = this._layer.getCameraZ(null);
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(null) * inverseWorldScale;
         } else {
-          this._threeCamera.position.z = this._layer.getCameraZ(
-            this._threeCamera.fov
-          );
+          this._threeCamera.position.z =
+            this._layer.getCameraZ(this._threeCamera.fov) * inverseWorldScale;
         }
       }
 
@@ -1336,7 +1366,9 @@ namespace gdjs {
         // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
         // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.
         // This works because PixiJS and Three.js are using the same WebGL context.
-        const texture = threeRenderer.properties.get(this._threePlaneTexture);
+        const texture: any = threeRenderer.properties.get(
+          this._threePlaneTexture
+        );
         texture.__webglTexture = glTexture.texture;
       }
     }

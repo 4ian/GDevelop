@@ -516,6 +516,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onBackgroundColorChanged={
                           props.onBackgroundColorChanged
                         }
+                        onRenderer3DWorldScaleFieldChanged={
+                          props.onRenderer3DWorldScaleFieldChanged
+                        }
                         openSceneVariables={props.openSceneVariables}
                       />
                     )}

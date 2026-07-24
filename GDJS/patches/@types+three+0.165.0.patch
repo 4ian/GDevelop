@@ -1,0 +1,34 @@
+diff --git a/node_modules/@types/three/build/three.d.cts b/node_modules/@types/three/build/three.d.cts
+index 1e831f0..e3f7ddd 100644
+--- a/node_modules/@types/three/build/three.d.cts
++++ b/node_modules/@types/three/build/three.d.cts
+@@ -1 +1,2 @@
+ export * from "../src/Three.js";
++export as namespace THREE;
+\ No newline at end of file
+diff --git a/node_modules/@types/three/build/three.module.d.ts b/node_modules/@types/three/build/three.module.d.ts
+index 1e831f0..e3f7ddd 100644
+--- a/node_modules/@types/three/build/three.module.d.ts
++++ b/node_modules/@types/three/build/three.module.d.ts
+@@ -1 +1,2 @@
+ export * from "../src/Three.js";
++export as namespace THREE;
+\ No newline at end of file
+diff --git a/node_modules/@types/three/build/three.module.min.d.ts b/node_modules/@types/three/build/three.module.min.d.ts
+index 1e831f0..e3f7ddd 100644
+--- a/node_modules/@types/three/build/three.module.min.d.ts
++++ b/node_modules/@types/three/build/three.module.min.d.ts
+@@ -1 +1,2 @@
+ export * from "../src/Three.js";
++export as namespace THREE;
+\ No newline at end of file
+diff --git a/node_modules/@types/three/index.d.ts b/node_modules/@types/three/index.d.ts
+index 7e839d2..9253d1e 100644
+--- a/node_modules/@types/three/index.d.ts
++++ b/node_modules/@types/three/index.d.ts
+@@ -4,3 +4,4 @@
+ // and released in the @types/three npm package.
+ 
+ export * from "./src/Three.js";
++export as namespace THREE;
+\ No newline at end of file

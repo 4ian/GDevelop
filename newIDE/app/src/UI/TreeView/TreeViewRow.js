@@ -129,12 +129,14 @@ type Props<Item> = {|
   data: ItemData<Item>,
   /** Used by react-window. */
   isScrolling?: boolean,
+  /** True when the row is displayed as a sticky copy of an actual row. */
+  isSticky?: boolean,
 |};
 
 const TreeViewRow = <Item: ItemBaseAttributes>(
   props: Props<Item>
 ): React.Node => {
-  const { data, index, style } = props;
+  const { data, index, style, isSticky } = props;
   const {
     flattenedData,
     onOpen,
@@ -154,7 +156,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
     shouldSelectUponContextMenuOpening,
   } = data;
   const node = flattenedData[index];
-  const left = node.depth * 16;
+  // Slightly reduce the indentation on mobile, as horizontal space is scarce.
+  const left = node.depth * (isMobile ? 12 : 16);
   const forceUpdate = useForceUpdate();
   const isStayingOverRef = React.useRef<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
@@ -194,13 +197,15 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
-        onOpen(node);
+        // A sticky root row does not collapse on click: the click reveals the
+        // actual row instead (handled by the sticky rows container).
+        if (!isSticky) onOpen(node);
         return;
       }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
       onClick(node);
     },
-    [onClick, onSelect, node, onOpen]
+    [onClick, onSelect, node, onOpen, isSticky]
   );
 
   const onDoubleClickItem = React.useCallback(
@@ -311,7 +316,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           return {};
         }}
         canDrag={() =>
-          // Prevent dragging of root folder or placeholder.
+          // Prevent dragging of sticky copies, root folder or placeholder.
+          !isSticky &&
           !node.item.isRoot &&
           !node.item.isPlaceholder &&
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
@@ -420,7 +426,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                   <ListIcon iconSize={20} src={node.thumbnailSrc} />
                 </div>
               ) : null}
-              {renamedItemId === node.id && typeof node.name === 'string' ? (
+              {renamedItemId === node.id &&
+              !isSticky &&
+              typeof node.name === 'string' ? (
                 <SemiControlledRowInput
                   initialValue={node.name}
                   onEndRenaming={endRenaming}
@@ -577,7 +585,12 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
           const dropTarget = connectDropTarget(
             <div
-              id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
+              id={
+                // Do not duplicate the id on the sticky copy of a row.
+                getItemHtmlId && !isSticky
+                  ? getItemHtmlId(node.item, index)
+                  : undefined
+              }
               onClick={onClickItem}
               onDoubleClick={onDoubleClickItem}
               className={classNames(
@@ -599,7 +612,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
             <div
               style={{ paddingLeft: left }}
               className={classNames(classes.fullHeightFlexContainer, {
-                [classes.withDivider]: node.item.isRoot && index > 0,
+                [classes.withDivider]:
+                  node.item.isRoot && index > 0 && !isSticky,
               })}
             >
               {dropTarget}

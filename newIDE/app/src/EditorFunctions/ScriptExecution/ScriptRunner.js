@@ -58,6 +58,12 @@ export type ScriptExecutionResult = {|
   consoleLogs: Array<string>,
   returnValue: any,
   error: ScriptExecutionError | null,
+  /**
+   * Scene names created by calls made inside the script (accumulated from each
+   * call's `meta.newSceneNames`), so the caller can auto-open them like a
+   * standalone `create_scene` tool call does.
+   */
+  newSceneNames: Array<string>,
 |};
 
 /**
@@ -192,6 +198,7 @@ export const runScript = async ({
 |}): Promise<ScriptExecutionResult> => {
   const functionCallRecords: Array<ScriptFunctionCallRecord> = [];
   const consoleLogs: Array<string> = [];
+  const newSceneNames: Array<string> = [];
   const maxCallsCount = maxFunctionCallsCount || 100;
 
   let pendingCallFunctionName: string | null = null;
@@ -223,6 +230,12 @@ export const runScript = async ({
       try {
         const result = await launch(args);
         const { success, meta, ...output } = result;
+        // Accumulate scene names created by this call so the caller can
+        // auto-open them (a standalone create_scene tool call does this via
+        // meta.newSceneNames; a script must not lose it).
+        if (meta && Array.isArray(meta.newSceneNames)) {
+          newSceneNames.push(...meta.newSceneNames);
+        }
         functionCallRecords.push({
           functionName: name,
           args,
@@ -283,6 +296,7 @@ export const runScript = async ({
       consoleLogs,
       returnValue: returnValue === undefined ? null : returnValue,
       error: null,
+      newSceneNames,
     };
   } catch (error) {
     const isFunctionCallFailure = error instanceof FunctionCallFailedError;
@@ -300,6 +314,7 @@ export const runScript = async ({
           : extractScriptLineNumber(error),
         lastCalledFunctionName,
       },
+      newSceneNames,
     };
   }
 };

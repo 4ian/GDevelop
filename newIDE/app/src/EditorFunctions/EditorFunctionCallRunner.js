@@ -36,6 +36,9 @@ type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // When true, a `run_script` call is exposed only non-mutating functions
+  // (explorer sub-agent scripts, which must stay read-only).
+  runScriptReadOnly?: boolean,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -78,6 +81,7 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  runScriptReadOnly,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -195,6 +199,7 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        runScriptReadOnly,
         editorCallbacks,
         relatedAiRequestId,
         getRelatedAiRequestLastMessages,

@@ -746,7 +746,12 @@ const SubAgentFunctionCallRow = ({
           )}
           {subAgentItems.map(item =>
             item.type === 'function_call' ? (
-              <EditorFunctionCallRow
+              // Route through the dispatcher (not EditorFunctionCallRow
+              // directly) so a sub-agent's `run_script` child call gets the
+              // rich RunScriptFunctionCallRow (code/records/logs). In v12,
+              // run_script exists ONLY on sub-agents, so this is the path that
+              // matters.
+              <FunctionCallRow
                 project={project}
                 key={item.key}
                 functionCall={item.messageContent}

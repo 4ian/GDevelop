@@ -34,6 +34,7 @@ import {
   getPendingSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
+  getSubAgentKind,
 } from './AiRequestUtils';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -405,6 +406,15 @@ export const useProcessFunctionCalls = ({
         );
       });
 
+      // An explorer sub-agent's script is read-only (see below: it is exposed
+      // only non-mutating functions). Knowing this lets us both skip its edit
+      // approval and restrict the functions its `run_script` can call.
+      const subAgentKind = getSubAgentKind({
+        aiRequest,
+        aiRequests: aiRequestsRef.current,
+      });
+      const isReadOnlyScriptContext = subAgentKind === 'explorer';
+
       // Gate project-modifying calls behind a user confirmation when auto-edit
       // is off. Read-only calls (exploration, inspection) always run. The first
       // time an edit agent (or a direct modifying call) is about to change the
@@ -429,6 +439,10 @@ export const useProcessFunctionCalls = ({
         const modifyingFunctionCalls = functionCallsToProcess.filter(
           functionCall =>
             doesFunctionCallModifyProject(functionCall) &&
+            // An explorer sub-agent's `run_script` is read-only (exposed only
+            // non-mutating functions), so it never needs an edit approval even
+            // though `run_script` is declared as project-modifying.
+            !(isReadOnlyScriptContext && functionCall.name === 'run_script') &&
             !isCallApproved(functionCall)
         );
 
@@ -536,6 +550,9 @@ export const useProcessFunctionCalls = ({
           // $FlowFixMe[incompatible-type]
           toolOptions: aiRequest.toolOptions || null,
           i18n,
+          // Explorer sub-agent scripts are read-only: restrict their
+          // `run_script` to non-mutating functions (defense in depth).
+          runScriptReadOnly: isReadOnlyScriptContext,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
             arguments: functionCall.arguments,

@@ -24,9 +24,37 @@ const MAX_ARG_CHARS = 2000;
 const MAX_TOTAL_ARG_CHARS = 30000;
 const MAX_LOG_LINES = 100;
 const MAX_LOG_CHARS = 8000;
+const MAX_RETURN_VALUE_CHARS = 8000;
 
 const truncationMarker = (length: number) =>
   `…[truncated from ${length} chars]`;
+
+// Truncate a serialized string to `maxChars`, keeping a prefix + marker.
+const truncateSerialized = (serialized: string, maxChars: number): string =>
+  serialized.length <= maxChars
+    ? serialized
+    : `${serialized.slice(0, maxChars)}${truncationMarker(serialized.length)}`;
+
+/**
+ * Sanitize the script `return` value: it is sent as JSON, and an LLM-authored
+ * script can `return` something non-serializable (a cycle, a BigInt, a class
+ * instance). Round-trip it defensively and cap its size; on failure, fall back
+ * to a marker string so the whole request is never wedged by JSON.stringify.
+ */
+const sanitizeReturnValue = (returnValue: any): any => {
+  if (returnValue === null || returnValue === undefined) return null;
+  try {
+    const serialized = JSON.stringify(returnValue);
+    if (serialized === undefined) return '[unserializable value]';
+    if (serialized.length > MAX_RETURN_VALUE_CHARS) {
+      return truncateSerialized(serialized, MAX_RETURN_VALUE_CHARS);
+    }
+    // Return the parsed value (plain JSON) so it stays structured for the UI.
+    return JSON.parse(serialized);
+  } catch (error) {
+    return '[unserializable value]';
+  }
+};
 
 const isReadOnlyScriptFunction = (functionName: string): boolean =>
   /^(inspect_|describe_|read_)/.test(functionName);
@@ -45,6 +73,7 @@ export type CappedRunScriptOutput = {|
   returnValue: any,
   error: ScriptExecutionError | null,
   didModifyProject: boolean,
+  newSceneNames: Array<string>,
 |};
 
 /**
@@ -63,11 +92,13 @@ export const capScriptExecutionResult = (
       try {
         const serialized = JSON.stringify(record.args);
         if (serialized !== undefined) {
-          if (
-            serialized.length > MAX_ARG_CHARS ||
-            totalArgChars + serialized.length > MAX_TOTAL_ARG_CHARS
-          ) {
+          if (totalArgChars >= MAX_TOTAL_ARG_CHARS) {
+            // Whole-records budget already spent: keep only a marker.
             cappedArgs = truncationMarker(serialized.length);
+          } else if (serialized.length > MAX_ARG_CHARS) {
+            // Keep a prefix (still useful for the UI) + marker.
+            cappedArgs = truncateSerialized(serialized, MAX_ARG_CHARS);
+            totalArgChars += MAX_ARG_CHARS;
           } else {
             totalArgChars += serialized.length;
           }
@@ -99,6 +130,12 @@ export const capScriptExecutionResult = (
   let charsDropped = false;
   for (const line of consoleLogs) {
     if (totalLogChars + line.length > MAX_LOG_CHARS) {
+      const remaining = MAX_LOG_CHARS - totalLogChars;
+      // Keep a prefix of this line rather than dropping all content when a
+      // single (e.g. first) line already exceeds the budget.
+      if (remaining > 0) {
+        cappedByChars.push(truncateSerialized(line, remaining));
+      }
       charsDropped = true;
       break;
     }
@@ -123,8 +160,9 @@ export const capScriptExecutionResult = (
     success: result.success,
     functionCallRecords,
     consoleLogs,
-    returnValue: result.returnValue,
+    returnValue: sanitizeReturnValue(result.returnValue),
     error: result.error,
     didModifyProject,
+    newSceneNames: result.newSceneNames || [],
   };
 };

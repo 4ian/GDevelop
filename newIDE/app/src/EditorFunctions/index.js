@@ -319,6 +319,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // When true, `run_script` exposes only non-mutating functions (explorer
+  // sub-agent scripts, which must stay read-only). Ignored by other functions.
+  runScriptReadOnly?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -8433,11 +8436,27 @@ const runScript: EditorFunction = {
       };
     }
 
+    // Explorer sub-agent scripts are read-only: expose only non-mutating
+    // functions so a script can't modify the project (defense in depth; matches
+    // the backend's explorer script-function list). Signaled by the caller via
+    // `runScriptReadOnly` in the collaborators bag.
+    const allowedFunctionNames = launchOptions.runScriptReadOnly
+      ? [
+          ...Object.keys(editorFunctions).filter(
+            name => !editorFunctions[name].modifiesProject
+          ),
+          ...Object.keys(editorFunctionsWithoutProject).filter(
+            name => !editorFunctionsWithoutProject[name].modifiesProject
+          ),
+        ]
+      : null;
+
     const exposedFunctions = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject,
       launchOptions,
       project,
+      allowedFunctionNames,
     });
 
     const result = await executeScript({ jsCode, exposedFunctions });
@@ -8449,7 +8468,14 @@ const runScript: EditorFunction = {
       consoleLogs: capped.consoleLogs,
       returnValue: capped.returnValue,
       error: capped.error,
-      meta: { didModifyProject: capped.didModifyProject },
+      meta: {
+        didModifyProject: capped.didModifyProject,
+        // Forward scene names created inside the script so they auto-open, like
+        // a standalone create_scene call does.
+        ...(capped.newSceneNames.length > 0
+          ? { newSceneNames: capped.newSceneNames }
+          : {}),
+      },
     };
   },
   modifiesProject: true,

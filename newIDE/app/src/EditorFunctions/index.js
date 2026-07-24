@@ -6868,17 +6868,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             return;
           }
-          if (!hasObjectsToAdd) {
+          if (hasObjectsToRemove && !hasObjectsToAdd) {
             warnings.push(
-              hasObjectsToRemove
-                ? `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
-                    '(none)'}.`
-                : `Group "${groupName}" not found in scene "${scene.getName()}" and no changes were specified: no group was created. To create it, list the objects to put in it in "objects_to_add".`
+              `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
+                '(none)'}.`
             );
             return;
           }
-          // Create the group, as objects are being added to it.
+          // Create the group: either objects are being added to it, or only
+          // its name was given, which is a request for a new empty group
+          // (events can reference it before its objects exist).
           foundGroup = groups.insertNew(groupName, groups.count());
+          changes.push(
+            `Created group "${groupName}" in scene "${scene.getName()}".`
+          );
         } else {
           foundGroup = groups.get(groupName);
         }

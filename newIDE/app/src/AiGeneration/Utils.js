@@ -102,7 +102,13 @@ export const useRefreshLimits = (
 // v11: `read_events_source` (this editor implements it) and the explicit
 // replace relations of `generate_events` (keep or replace sub-events).
 // v10 is skipped.
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v11';
+// v12: script-based agents — the edit and explorer sub-agents drive a single
+// `run_script` tool (this editor implements it, see `EditorFunctions/
+// ScriptExecution/`), and the orchestrator can author an `initial_script` for
+// `run_edit_agent`. Requires the v12 prompts + generation-api to be deployed
+// first (see the v1 implementation handover §WP5). The flip-back is reverting
+// this constant to 'v11' (v11 prompts/tools stay served forever).
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v12';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying

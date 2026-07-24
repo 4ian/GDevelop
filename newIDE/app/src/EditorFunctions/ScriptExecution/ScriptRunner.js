@@ -1,5 +1,5 @@
 // @flow
-import { type EditorFunctionGenericOutput } from '.';
+import { type EditorFunctionGenericOutput } from '..';
 
 /**
  * PROTOTYPE — script-based agents ("run_script").
@@ -200,6 +200,10 @@ export const runScript = async ({
   const scopedValues: { [string]: any } = {};
   for (const exposedFunction of exposedFunctions) {
     const { name, launch, modifiesProject } = exposedFunction;
+    // The closures intentionally share the run-scoped `pendingCallFunctionName`
+    // / `lastCalledFunctionName` state to enforce sequential execution across
+    // all exposed functions (covered by ScriptRunner.spec.js).
+    // eslint-disable-next-line no-loop-func
     scopedValues[name] = async (args: any) => {
       if (pendingCallFunctionName) {
         throw new Error(

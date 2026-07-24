@@ -6,7 +6,7 @@ import {
   type ScriptExecutionResult,
   type ScriptExecutionError,
 } from './ScriptRunner';
-import { type EditorFunctionGenericOutput } from '.';
+import { type EditorFunctionGenericOutput } from '..';
 
 // The runner is deliberately independent from `gd` and from the real editor
 // functions: it only needs functions following the `launchFunction` contract.

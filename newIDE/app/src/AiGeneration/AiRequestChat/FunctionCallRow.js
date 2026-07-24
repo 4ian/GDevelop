@@ -57,6 +57,11 @@ export const FunctionCallRow: React.ComponentType<Props> = React.memo<Props>(
     if (props.functionCall.subAgentAiRequestId) {
       return <SubAgentFunctionCallRow {...props} />;
     }
+    // Script-based agents: a `run_script` call renders its title + a collapsed
+    // view of the script source, the calls it made, its logs and any error.
+    if (props.functionCall.name === 'run_script') {
+      return <RunScriptFunctionCallRow {...props} />;
+    }
     return <EditorFunctionCallRow {...props} />;
   }
 );
@@ -269,6 +274,230 @@ const EditorFunctionCallRow = ({
           <Text noMargin size="body-small" color="secondary">
             {details}
           </Text>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const runScriptStyles = {
+  code: {
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    fontFamily: 'monospace',
+    fontSize: 12,
+    margin: 0,
+    maxHeight: 320,
+    overflow: 'auto',
+  },
+  recordRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: 6,
+    overflowWrap: 'anywhere',
+  },
+};
+
+/**
+ * Renders a `run_script` call (script-based agents): the title + status icon are
+ * always visible; the script source, the calls it made (one sub-row each), its
+ * console logs and any error are collapsed inside a "details" section. Unknown
+ * recorded function names render as plain text rows (forward-compatible).
+ */
+const RunScriptFunctionCallRow = ({
+  functionCall,
+  editorFunctionCallResult,
+  existingFunctionCallOutput,
+  isRequestStopped,
+}: Props) => {
+  const [showDetails, setShowDetails] = React.useState(false);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { pendingEditApproval } = React.useContext(AiRequestContext);
+
+  const isAwaitingApproval =
+    !!pendingEditApproval &&
+    pendingEditApproval.callIds.includes(functionCall.call_id);
+
+  let title = 'Run a script';
+  let jsCode = '';
+  try {
+    const parsedArguments = JSON.parse(functionCall.arguments);
+    if (parsedArguments && typeof parsedArguments.title === 'string') {
+      title = parsedArguments.title;
+    }
+    if (parsedArguments && typeof parsedArguments.js_code === 'string') {
+      jsCode = parsedArguments.js_code;
+    }
+  } catch (error) {
+    // Keep defaults.
+  }
+
+  let parsedOutput = null;
+  try {
+    if (existingFunctionCallOutput) {
+      parsedOutput = JSON.parse(existingFunctionCallOutput.output);
+    }
+  } catch (error) {
+    parsedOutput = null;
+  }
+  if (
+    !parsedOutput &&
+    editorFunctionCallResult &&
+    editorFunctionCallResult.status === 'finished'
+  ) {
+    parsedOutput = editorFunctionCallResult.output;
+  }
+
+  const isFinished =
+    !!existingFunctionCallOutput ||
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'finished');
+  const isAborted =
+    (!!editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'aborted') ||
+    (parsedOutput && !!parsedOutput.stopped) ||
+    (!!isRequestStopped && !isFinished);
+  const hasErrored =
+    (editorFunctionCallResult &&
+      editorFunctionCallResult.status === 'finished' &&
+      editorFunctionCallResult.success === false) ||
+    (parsedOutput && parsedOutput.success === false);
+  const isWorking =
+    !isAwaitingApproval &&
+    !isFinished &&
+    !!editorFunctionCallResult &&
+    editorFunctionCallResult.status === 'working';
+
+  const records =
+    parsedOutput && Array.isArray(parsedOutput.functionCallRecords)
+      ? parsedOutput.functionCallRecords
+      : [];
+  const consoleLogs =
+    parsedOutput && Array.isArray(parsedOutput.consoleLogs)
+      ? parsedOutput.consoleLogs
+      : [];
+  const scriptError =
+    parsedOutput && parsedOutput.error ? parsedOutput.error : null;
+
+  const hasDetailsToShow =
+    !!jsCode || records.length > 0 || consoleLogs.length > 0 || !!scriptError;
+  const toggle = () => setShowDetails(v => !v);
+
+  return (
+    <div className={classes.functionCallContainer}>
+      <div className={classes.functionCallRow}>
+        <span className={classes.statusIconContainer}>
+          {hasErrored ? (
+            <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
+          ) : isAborted ? (
+            <Error
+              htmlColor={gdevelopTheme.text.color.disabled}
+              fontSize="small"
+            />
+          ) : isFinished ? (
+            <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
+          ) : (
+            <CircularProgress
+              size={16}
+              value={100}
+              variant={isWorking ? 'indeterminate' : 'determinate'}
+            />
+          )}
+        </span>
+        <div
+          className={
+            hasDetailsToShow
+              ? `${classes.functionCallTextArea} ${
+                  classes.functionCallTextAreaClickable
+                }`
+              : classes.functionCallTextArea
+          }
+          onClick={hasDetailsToShow ? toggle : undefined}
+          role={hasDetailsToShow ? 'button' : undefined}
+          tabIndex={hasDetailsToShow ? 0 : undefined}
+          onKeyDown={
+            hasDetailsToShow
+              ? e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggle();
+                  }
+                }
+              : undefined
+          }
+        >
+          <Text
+            size="body-small"
+            color="secondary"
+            // $FlowFixMe[incompatible-type]
+            style={styles.functionCallText}
+          >
+            {title}
+          </Text>
+          {hasDetailsToShow && (
+            <div className={classes.chevron}>
+              {showDetails ? (
+                <ChevronArrowBottom fontSize="small" />
+              ) : (
+                <ChevronArrowRight fontSize="small" />
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      {showDetails && (
+        <div className={classes.detailsContent}>
+          {!!jsCode && (
+            // $FlowFixMe[incompatible-type] - inline style object.
+            <pre style={runScriptStyles.code}>{jsCode}</pre>
+          )}
+          {records.map((record, index) => {
+            const functionName =
+              record && typeof record.functionName === 'string'
+                ? record.functionName
+                : '(unknown)';
+            const recordFailed = record && record.success === false;
+            const recordMessage =
+              record &&
+              record.output &&
+              typeof record.output === 'object' &&
+              typeof record.output.message === 'string'
+                ? record.output.message
+                : null;
+            return (
+              <div
+                key={`${functionName}-${index}`}
+                style={runScriptStyles.recordRow}
+              >
+                {recordFailed ? (
+                  <Error
+                    htmlColor={gdevelopTheme.message.error}
+                    fontSize="small"
+                  />
+                ) : (
+                  <Check
+                    htmlColor={gdevelopTheme.message.valid}
+                    fontSize="small"
+                  />
+                )}
+                <Text noMargin size="body-small" color="secondary">
+                  {functionName}
+                  {recordMessage ? ` — ${recordMessage}` : ''}
+                </Text>
+              </div>
+            );
+          })}
+          {consoleLogs.length > 0 && (
+            <pre style={runScriptStyles.code}>{consoleLogs.join('\n')}</pre>
+          )}
+          {!!scriptError && (
+            <Text noMargin size="body-small" color="error">
+              {scriptError.message}
+              {typeof scriptError.lineNumber === 'number'
+                ? ` (line ${scriptError.lineNumber})`
+                : ''}
+            </Text>
+          )}
         </div>
       )}
     </div>

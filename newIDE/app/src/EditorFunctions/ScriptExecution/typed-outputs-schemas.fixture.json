@@ -1,0 +1,132 @@
+{
+  "_comment": "VENDORED from GDevelop-services/generation-api/src/lib/script-api/output-types.js (scriptApiSharedOutputTypes + scriptApiToolOutputSchemas). Keep byte-in-sync with that file (update both in the same change). Used by typed-outputs-conformance.spec.js to check that the four typed reads keep returning the declared stable fields.",
+  "sharedOutputTypes": {
+    "SimplifiedInstance": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "name": { "type": "string" },
+        "id": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" },
+        "angle": { "type": "number" },
+        "layer": { "type": "string" },
+        "zOrder": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "depth": { "type": "number" }
+      },
+      "required": ["name", "id", "x", "y", "width", "height"]
+    },
+    "SimplifiedVariable": {
+      "type": "object",
+      "properties": {
+        "variableName": { "type": "string" },
+        "type": { "type": "string" },
+        "value": { "type": "string" },
+        "variableChildren": {
+          "type": "array",
+          "items": { "$namedType": "SimplifiedVariable" }
+        }
+      },
+      "required": ["variableName", "type"]
+    },
+    "NamedProperty": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "type": { "type": "string" },
+        "label": { "type": "string" }
+      },
+      "required": ["name", "value"]
+    },
+    "ObjectSizeInfo": {
+      "type": "object",
+      "properties": {
+        "width": { "$rawType": "number | null" },
+        "height": { "$rawType": "number | null" },
+        "depth": { "$rawType": "number | null" },
+        "originX": { "type": "number" },
+        "originY": { "type": "number" },
+        "originZ": { "$rawType": "number | null" },
+        "centerX": { "$rawType": "number | null" },
+        "centerY": { "$rawType": "number | null" },
+        "centerZ": { "$rawType": "number | null" }
+      },
+      "required": [
+        "width",
+        "height",
+        "depth",
+        "originX",
+        "originY",
+        "originZ",
+        "centerX",
+        "centerY",
+        "centerZ"
+      ]
+    }
+  },
+  "toolOutputSchemas": {
+    "describe_instances": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "instances": {
+          "type": "array",
+          "items": { "$namedType": "SimplifiedInstance" }
+        },
+        "objectSizeInfo": {
+          "$rawType": "{ [objectName: string]: ObjectSizeInfo | null }"
+        }
+      },
+      "required": ["instances"]
+    },
+    "inspect_variables": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "variables": {
+          "type": "array",
+          "items": { "$namedType": "SimplifiedVariable" }
+        }
+      },
+      "required": ["variables"]
+    },
+    "inspect_object_properties_effects": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "array",
+          "items": { "$namedType": "NamedProperty" }
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "behaviorName": { "type": "string" },
+              "behaviorType": { "type": "string" }
+            },
+            "required": ["behaviorName", "behaviorType"]
+          }
+        }
+      },
+      "required": ["properties", "behaviors"]
+    },
+    "inspect_behavior_properties": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "properties": {
+          "type": "array",
+          "items": { "$namedType": "NamedProperty" }
+        }
+      },
+      "required": ["properties"]
+    }
+  }
+}

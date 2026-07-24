@@ -79,6 +79,9 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
+import { runScript as executeScript } from './ScriptExecution/ScriptRunner';
+import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
+import { capScriptExecutionResult } from './ScriptExecution/capScriptOutput';
 
 export type HintEntry = {|
   code: string,
@@ -138,7 +141,20 @@ export type EditorFunctionGenericOutput = {|
   meta?: {
     newSceneNames?: Array<string>,
     createdProject?: gdProject,
+    // For `run_script`: true when ANY call the script made modified the
+    // project (so the editor refreshes even if the script ultimately failed).
+    didModifyProject?: boolean,
   },
+  // `run_script` (script-based agents) output payload — see the generation-api
+  // `script-api/README.md` §3.2. Present only for `run_script` calls.
+  functionCallRecords?: Array<Object>,
+  consoleLogs?: Array<string>,
+  returnValue?: any,
+  error?: {|
+    message: string,
+    lineNumber: number | null,
+    lastCalledFunctionName: string | null,
+  |} | null,
   message?: string,
   eventsAsText?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
@@ -8387,7 +8403,60 @@ const searchObjectAssetStore: EditorFunction = {
   modifiesProject: false,
 };
 
+/**
+ * Script-based agents (v12+): runs a JavaScript script written by the AI, in
+ * which the client-side editor functions are exposed as plain async functions
+ * (see `ScriptExecution/`). Replaces N discrete tool calls by one. The script's
+ * calls use the SAME implementations and collaborators bag as individual tool
+ * calls, so behavior (including the coalesced `on*ModifiedOutsideEditor`
+ * refresh) is identical. `modifiesProject: true` so the whole script is gated
+ * behind one edit approval when auto-edit is off.
+ */
+const runScript: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const title =
+      args && typeof args.title === 'string' && args.title
+        ? args.title
+        : 'Run a script';
+    // The rich per-record view is rendered by `RunScriptFunctionCallRow`; here
+    // we only provide the user-facing title (used e.g. for the approval label).
+    return { text: title, hasDetailsToShow: false };
+  },
+  launchFunction: async ({ args, project, ...launchOptions }) => {
+    const jsCode =
+      args && typeof args.js_code === 'string' ? args.js_code : null;
+    if (!jsCode) {
+      return {
+        success: false,
+        message:
+          'run_script requires a `js_code` string argument (the JavaScript to run).',
+      };
+    }
+
+    const exposedFunctions = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject,
+      launchOptions,
+      project,
+    });
+
+    const result = await executeScript({ jsCode, exposedFunctions });
+    const capped = capScriptExecutionResult(result);
+
+    return {
+      success: capped.success,
+      functionCallRecords: capped.functionCallRecords,
+      consoleLogs: capped.consoleLogs,
+      returnValue: capped.returnValue,
+      error: capped.error,
+      meta: { didModifyProject: capped.didModifyProject },
+    };
+  },
+  modifiesProject: true,
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
+  run_script: runScript,
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
   // Old tool names, kept for AI requests still using an older toolsVersion:

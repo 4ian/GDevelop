@@ -2342,7 +2342,7 @@ export class VectorExpressionParserError extends EmscriptenObject {
 export class ExpressionParser2NodeWorker extends EmscriptenObject {}
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
+  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, rootObjectName: string, extraInfo: string);
   getAllErrors(): VectorExpressionParserError;
   getFatalErrors(): VectorExpressionParserError;
   getDeprecationWarnings(): VectorExpressionParserError;

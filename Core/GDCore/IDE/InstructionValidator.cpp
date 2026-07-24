@@ -65,10 +65,33 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   if (gd::ParameterMetadata::IsExpression("number", parameterType) ||
       gd::ParameterMetadata::IsExpression("string", parameterType) ||
       gd::ParameterMetadata::IsExpression("variable", parameterType)) {
+
+    // New object variable instructions require the variable to be
+    // declared while legacy ones don't.
+    // For legacy variable instruction, we pass an empty object name.
+    gd::String rootObjectName = "";
+    if (parameterType == "objectvar") {
+      const auto &objectsContainersList =
+          projectScopedContainers.GetObjectsContainersList();
+      rootObjectName = instruction.GetParameter(0).GetPlainString();
+
+      if (!gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+              instruction.GetType())) {
+        // Extensions still rely on legacy object variables instructions.
+        auto objectSourceType =
+            projectScopedContainers.GetObjectsContainersList()
+                .GetObjectsContainerSourceType(rootObjectName);
+        // Only child-object variable declarations are checked.
+        if (objectSourceType == gd::ObjectsContainer::SourceType::Function) {
+          rootObjectName = "";
+        }
+      }
+    }
     auto &expressionNode =
         *instruction.GetParameter(parameterIndex).GetRootNode();
     ExpressionValidator expressionValidator(platform, projectScopedContainers,
                                             parameterType,
+                                            rootObjectName,
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
@@ -77,27 +100,6 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     }
     if (!expressionValidator.GetDeprecationWarnings().empty()) {
       result.hasDeprecationWarning = true;
-    }
-
-    // New object variable instructions require the variable to be
-    // declared while legacy ones don't.
-    // This is why it's done here instead of in the parser directly.
-    if (result.isValid && parameterType == "objectvar" &&
-        gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
-            instruction.GetType())) {
-      // Check at least the name of the root variable, it's the best we can
-      // do.
-      const auto &objectsContainersList =
-          projectScopedContainers.GetObjectsContainersList();
-      const auto &objectName = instruction.GetParameter(0).GetPlainString();
-      const auto &variableName =
-          instruction.GetParameter(parameterIndex).GetPlainString();
-      if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
-              objectName,
-              gd::InstructionValidator::GetRootVariableName(variableName)) ==
-          gd::ObjectsContainersList::DoesNotExist) {
-        result.isValid = false;
-      }
     }
   } else if (gd::ParameterMetadata::IsObject(parameterType)) {
     const auto &objectOrGroupName =

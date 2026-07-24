@@ -3915,6 +3915,7 @@ describe('libGD.js', function () {
           layout
         ),
         type,
+        '',
         ''
       );
       expressionNode.visit(expressionValidator);

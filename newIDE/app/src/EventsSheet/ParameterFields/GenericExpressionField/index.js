@@ -149,6 +149,7 @@ const extractErrors = (
     gd.JsPlatform.get(),
     projectScopedContainersAccessor.get(),
     expressionType,
+    '',
     parameterMetadata ? parameterMetadata.getExtraInfo() : ''
   );
   expressionNode.visit(expressionValidator);

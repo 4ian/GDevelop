@@ -79,6 +79,11 @@ const ImageThumbnail = (props: Props): React.MixedElement => {
       title={resourceName}
       style={containerStyle}
       onContextMenu={e => {
+        // Prevent the default browser context menu, which is otherwise not
+        // prevented because `stopPropagation` stops the event before it
+        // reaches the global `contextmenu` handler set up by
+        // `Window.setUpContextMenu`.
+        e.preventDefault();
         e.stopPropagation();
         if (onContextMenu) onContextMenu(e.clientX, e.clientY);
       }}

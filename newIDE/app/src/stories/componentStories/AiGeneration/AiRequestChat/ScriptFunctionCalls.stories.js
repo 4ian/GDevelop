@@ -32,7 +32,7 @@ import { testProject } from '../../../GDevelopJsInitializerDecorator';
 // place the user can read the code an agent is about to run (or has run), which
 // matters in particular when auto edit is off (see the awaiting-approval story).
 export default {
-  title: 'EventsFunctionsExtensionEditor/AiRequestChat/RunScript',
+  title: 'EventsFunctionsExtensionEditor/AiRequestChat/ScriptFunctionCalls',
   component: AiRequestChat,
   decorators: [paperDecorator],
 };

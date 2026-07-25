@@ -171,6 +171,7 @@
 
 .textBlock {
   padding: 6px 8px;
+  border: 1px solid var(--theme-list-item-separator-color);
   border-radius: 4px;
   background-color: var(--theme-surface-canvas-background-color);
   max-height: 180px;

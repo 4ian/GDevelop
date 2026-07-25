@@ -16,7 +16,7 @@ import {
   FunctionCallStatusIcon,
   type FunctionCallRowStatus,
 } from './FunctionCallRowLayout';
-import { ScriptCodeBlock } from './ScriptCodeBlock';
+import LightweightJavaScriptCodeBlock from '../../UI/LightweightJavaScriptCodeBlock';
 import {
   parseRunScriptArguments,
   parseRunScriptOutput,
@@ -472,7 +472,7 @@ export const RunScriptFunctionCallRow = ({
             label={<Trans>Script</Trans>}
             isOpenByDefault={isAwaitingApproval}
           >
-            <ScriptCodeBlock
+            <LightweightJavaScriptCodeBlock
               code={jsCode}
               highlightedLineNumber={error ? error.lineNumber : null}
             />

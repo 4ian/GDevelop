@@ -8,7 +8,7 @@ import { type EditorFunctionCallResult } from '../../EditorFunctions';
 import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
-import { Trans, Plural } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -569,17 +569,20 @@ const RunScriptFunctionCallRow = ({
   const metaParts = [];
   if (records.length > 0) {
     metaParts.push(
-      <Plural key="calls" value={records.length} one="# call" other="# calls" />
+      records.length === 1 ? (
+        <Trans key="calls">1 call</Trans>
+      ) : (
+        <Trans key="calls">{records.length} calls</Trans>
+      )
     );
   }
   if (consoleLogs.length > 0) {
     metaParts.push(
-      <Plural
-        key="logs"
-        value={consoleLogs.length}
-        one="# log"
-        other="# logs"
-      />
+      consoleLogs.length === 1 ? (
+        <Trans key="logs">1 log</Trans>
+      ) : (
+        <Trans key="logs">{consoleLogs.length} logs</Trans>
+      )
     );
   }
 
@@ -687,11 +690,11 @@ const RunScriptFunctionCallRow = ({
           {recordGroups.length > 0 && (
             <CollapsibleSection
               label={
-                <Plural
-                  value={records.length}
-                  one="# function call"
-                  other="# function calls"
-                />
+                records.length === 1 ? (
+                  <Trans>1 function call</Trans>
+                ) : (
+                  <Trans>{records.length} function calls</Trans>
+                )
               }
             >
               {recordGroups.map((group, index) => (
@@ -706,11 +709,11 @@ const RunScriptFunctionCallRow = ({
           {consoleLogs.length > 0 && (
             <CollapsibleSection
               label={
-                <Plural
-                  value={consoleLogs.length}
-                  one="# console log"
-                  other="# console logs"
-                />
+                consoleLogs.length === 1 ? (
+                  <Trans>1 console log</Trans>
+                ) : (
+                  <Trans>{consoleLogs.length} console logs</Trans>
+                )
               }
             >
               <pre className={classes.scriptCode}>{consoleLogs.join('\n')}</pre>

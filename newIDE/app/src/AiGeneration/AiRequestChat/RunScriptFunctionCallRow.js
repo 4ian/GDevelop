@@ -110,13 +110,19 @@ const ScriptSection = ({
   );
 };
 
-const RecordDot = ({ record }: {| record: ScriptRecord |}) => (
+const RecordDot = ({
+  isFailed,
+  hasChangedNothing,
+}: {|
+  isFailed: boolean,
+  hasChangedNothing: boolean,
+|}) => (
   <span
     className={classNames({
       [classes.dot]: true,
-      [classes.dotError]: record.isFailed,
-      [classes.dotUnchanged]: !record.isFailed && record.hasChangedNothing,
-      [classes.dotSuccess]: !record.isFailed && !record.hasChangedNothing,
+      [classes.dotError]: isFailed,
+      [classes.dotUnchanged]: !isFailed && hasChangedNothing,
+      [classes.dotSuccess]: !isFailed && !hasChangedNothing,
     })}
   />
 );
@@ -133,10 +139,10 @@ const CLAMPED_MESSAGE_LENGTH = 60;
  */
 const ScriptRecordRow = ({
   record,
-  showFunctionName,
+  isInsideGroup,
 }: {|
   record: ScriptRecord,
-  showFunctionName: boolean,
+  isInsideGroup?: boolean,
 |}) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const hasDetails =
@@ -147,9 +153,9 @@ const ScriptRecordRow = ({
   // message: their arguments are what tells them apart. A failure is always
   // explained by its message though.
   const summary =
-    showFunctionName || record.isFailed
-      ? record.message || record.argumentsSummary
-      : record.argumentsSummary || record.message;
+    isInsideGroup && !record.isFailed
+      ? record.argumentsSummary || record.message
+      : record.message || record.argumentsSummary;
 
   return (
     <div className={classes.recordRow}>
@@ -162,8 +168,11 @@ const ScriptRecordRow = ({
           if (hasDetails) setIsOpen(open => !open);
         }}
       >
-        <RecordDot record={record} />
-        {showFunctionName && (
+        <RecordDot
+          isFailed={record.isFailed}
+          hasChangedNothing={record.hasChangedNothing}
+        />
+        {!isInsideGroup && (
           <span className={`${classes.recordName} ${classes.oneLine}`}>
             {record.functionName}
           </span>
@@ -211,7 +220,12 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
         className={`${classes.recordHeader} ${classes.recordHeaderClickable}`}
         onClick={() => setIsOpen(open => !open)}
       >
-        <RecordDot record={group.records[group.records.length - 1]} />
+        <RecordDot
+          isFailed={failedCount > 0}
+          hasChangedNothing={group.records.every(
+            record => record.hasChangedNothing
+          )}
+        />
         <span className={`${classes.recordName} ${classes.oneLine}`}>
           {group.functionName}
         </span>
@@ -228,11 +242,7 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
       {isOpen && (
         <div className={classes.recordGroupContent}>
           {group.records.map((record, index) => (
-            <ScriptRecordRow
-              key={index}
-              record={record}
-              showFunctionName={false}
-            />
+            <ScriptRecordRow key={index} record={record} isInsideGroup />
           ))}
         </div>
       )}
@@ -395,11 +405,7 @@ export const RunScriptFunctionCallRow = ({
             <div className={classes.recordsList}>
               {recordGroups.map((group, index) =>
                 group.records.length === 1 ? (
-                  <ScriptRecordRow
-                    key={index}
-                    record={group.records[0]}
-                    showFunctionName
-                  />
+                  <ScriptRecordRow key={index} record={group.records[0]} />
                 ) : (
                   <ScriptRecordGroupRow key={index} group={group} />
                 )

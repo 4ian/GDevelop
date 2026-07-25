@@ -1,5 +1,6 @@
 // @flow
 import { type EditorFunctionGenericOutput } from '..';
+import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
 
 /**
  * PROTOTYPE — script-based agents ("run_script").
@@ -136,6 +137,47 @@ const extractScriptLineNumber = (error: Error): number | null => {
 
   const lineNumber = rawLineNumber - SCRIPT_SOURCE_LINE_OFFSET;
   return lineNumber >= 1 ? lineNumber : null;
+};
+
+/**
+ * Extracts the name of the missing identifier from a `ReferenceError`, or null
+ * for any other error. V8 (Chrome, Electron, Node) says "X is not defined",
+ * JavaScriptCore says "Can't find variable: X".
+ */
+const extractUndefinedName = (error: Error): string | null => {
+  if (error.name !== 'ReferenceError') return null;
+  const message = error.message || '';
+  const match =
+    /^(\w+) is not defined$/.exec(message) ||
+    /^Can't find variable: (\w+)$/.exec(message);
+  return match ? match[1] : null;
+};
+
+/**
+ * Explains a `ReferenceError` instead of forwarding it bare. The most common
+ * cause, by far, is an agent calling one of its own TOOLS (`search_docs`,
+ * `read_full_docs`...) from inside a script: those are resolved outside the
+ * editor and are deliberately not script functions. Saying so turns a wasted
+ * round trip into a self-correcting one.
+ */
+const buildUndefinedNameMessage = ({
+  undefinedName,
+  exposedFunctionNames,
+}: {|
+  undefinedName: string,
+  exposedFunctionNames: Array<string>,
+|}): string => {
+  const availableFunctions = `Functions available inside a script: ${exposedFunctionNames.join(
+    ', '
+  )}.`;
+  if (NON_SCRIPTABLE_FUNCTION_NAMES.has(undefinedName)) {
+    return (
+      `"${undefinedName}" is a tool, not a function available inside a script: ` +
+      'call it directly as a tool call, outside of any script. ' +
+      availableFunctions
+    );
+  }
+  return `"${undefinedName}" is not defined. ${availableFunctions}`;
 };
 
 /**
@@ -300,13 +342,21 @@ export const runScript = async ({
     };
   } catch (error) {
     const isFunctionCallFailure = error instanceof FunctionCallFailedError;
+    const undefinedName = isFunctionCallFailure
+      ? null
+      : extractUndefinedName(error);
     return {
       success: false,
       functionCallRecords,
       consoleLogs,
       returnValue: null,
       error: {
-        message: error.message || 'Unknown error',
+        message: undefinedName
+          ? buildUndefinedNameMessage({
+              undefinedName,
+              exposedFunctionNames: exposedFunctions.map(({ name }) => name),
+            })
+          : error.message || 'Unknown error',
         // For a failed function call, the interruption is expected: the
         // useful location is the call itself, already in the records.
         lineNumber: isFunctionCallFailure

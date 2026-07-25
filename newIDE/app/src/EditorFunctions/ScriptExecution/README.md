@@ -13,6 +13,7 @@ authoritative map of the three-repo contract, the §3.2 output payload and the
 | --- | --- |
 | Runner (sequential, stop-on-first-failure, records, logs, line numbers) | `ScriptRunner.js` (+ `.spec.js`) |
 | Exposed-functions bridge (registry → async functions bound to the collaborators bag) | `ExposedFunctions.js` (+ `.spec.js`) |
+| The functions never exposed inside a script (`run_script`, server-side tools...) | `NonScriptableFunctionNames.js` |
 | Output caps + read-only reduction + `didModifyProject` (§3.4) | `capScriptOutput.js` |
 | The `run_script` `EditorFunction` (parse, run, cap, return payload) | `../index.js` (`runScript`, registered in `editorFunctions`) |
 | Dispatch + approval gate (`modifiesProject: true` → one approval per script) | `../EditorFunctionCallRunner.js`, `../../AiGeneration/Utils.js` |
@@ -38,7 +39,12 @@ authoritative map of the three-repo contract, the §3.2 output payload and the
    `scriptApiSharedOutputTypes` / `scriptApiToolOutputSchemas` from the
    generation-api `script-api/output-types.js`; keep the two in sync (update
    both in the same change), EventScript-fixtures-style.**
-4. **Never edit a shipped version's behavior.** `run_script` ships as part of
+4. **A `ReferenceError` must name the mistake, not just the identifier.** The
+   observed failure mode is an agent calling one of its own TOOLS
+   (`search_docs`, `read_full_docs`...) inside a script; the runner answers
+   "`X` is a tool, not a function available inside a script" plus the list of
+   the functions that are, so the next turn self-corrects instead of guessing.
+5. **Never edit a shipped version's behavior.** `run_script` ships as part of
    tools `v12`; the flip-back is reverting `AI_ORCHESTRATOR_TOOLS_VERSION` to
    `'v11'`.
 

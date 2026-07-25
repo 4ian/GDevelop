@@ -180,6 +180,51 @@ describe('runScript', () => {
     expect(error.lastCalledFunctionName).toBe(null);
   });
 
+  it('explains that a tool called inside a script is not a script function', async () => {
+    const createScene = makeFakeFunction({
+      name: 'create_scene',
+      modifiesProject: true,
+    });
+
+    const result = await runScript({
+      // `search_docs` is a server-side tool: it stays a plain tool call.
+      jsCode: [
+        `await create_scene({ scene_name: 'Level' });`,
+        `const docs = await search_docs({ query: 'platformer' });`,
+      ].join('\n'),
+      exposedFunctions: [createScene],
+    });
+
+    expect(result.success).toBe(false);
+    const error = getErrorOrThrow(result);
+    expect(error.message).toContain(
+      '"search_docs" is a tool, not a function available inside a script'
+    );
+    expect(error.message).toContain('outside of any script');
+    expect(error.message).toContain(
+      'Functions available inside a script: create_scene.'
+    );
+    // The calls made before the error stay reported, and applied.
+    expect(result.functionCallRecords).toHaveLength(1);
+    expect(result.functionCallRecords[0].functionName).toBe('create_scene');
+  });
+
+  it('lists the available functions when the script calls an unknown name', async () => {
+    const createScene = makeFakeFunction({ name: 'create_scene' });
+
+    const result = await runScript({
+      jsCode: `await creaate_scene({ scene_name: 'Level' });`,
+      exposedFunctions: [createScene],
+    });
+
+    expect(result.success).toBe(false);
+    const error = getErrorOrThrow(result);
+    expect(error.message).toBe(
+      '"creaate_scene" is not defined. Functions available inside a script: create_scene.'
+    );
+    expect(error.lineNumber).toBe(1);
+  });
+
   it('reports syntax errors without crashing', async () => {
     const result = await runScript({
       jsCode: `const oops = {;`,

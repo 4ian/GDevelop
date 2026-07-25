@@ -177,7 +177,13 @@ const buildUndefinedNameMessage = ({
       availableFunctions
     );
   }
-  return `"${undefinedName}" is not defined. ${availableFunctions}`;
+  // The other observed cause: an object shorthand (`{ scene_name: scene,
+  // object_name }`) where no variable of that exact name exists.
+  return (
+    `"${undefinedName}" is not defined — check for a typo, or for an object ` +
+    'shorthand used without a variable of that name (write ' +
+    `\`{ ${undefinedName}: someValue }\`). ${availableFunctions}`
+  );
 };
 
 /**

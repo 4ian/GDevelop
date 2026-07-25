@@ -219,8 +219,10 @@ describe('runScript', () => {
 
     expect(result.success).toBe(false);
     const error = getErrorOrThrow(result);
-    expect(error.message).toBe(
-      '"creaate_scene" is not defined. Functions available inside a script: create_scene.'
+    expect(error.message).toContain('"creaate_scene" is not defined');
+    expect(error.message).toContain('object shorthand');
+    expect(error.message).toContain(
+      'Functions available inside a script: create_scene.'
     );
     expect(error.lineNumber).toBe(1);
   });

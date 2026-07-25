@@ -373,7 +373,7 @@ const CollapsibleSection = ({
           }
         }}
       >
-        <div className={classes.chevron}>
+        <div className={classes.sectionChevron}>
           {open ? (
             <ChevronArrowBottom fontSize="small" />
           ) : (
@@ -564,6 +564,8 @@ const RunScriptFunctionCallRow = ({
   const openScriptByDefault =
     (!!isAwaitingApproval && records.length === 0) ||
     (!!scriptError && records.length === 0);
+  const openCallsByDefault =
+    !!scriptError && records.some(record => record && record.success === false);
   const toggle = () => setShowDetails(v => !v);
 
   const metaParts = [];
@@ -696,6 +698,7 @@ const RunScriptFunctionCallRow = ({
                   <Trans>{records.length} function calls</Trans>
                 )
               }
+              defaultOpen={openCallsByDefault}
             >
               {recordGroups.map((group, index) => (
                 <ScriptRecordGroupRow
@@ -1013,7 +1016,7 @@ const SubAgentTextRow = ({
 |}) => {
   const [showDetails, setShowDetails] = React.useState(false);
   const firstLine = text.split('\n')[0];
-  const isMultiline = text.includes('\n') || firstLine.length > 90;
+  const hasMoreContent = text.includes('\n') || firstLine.length > 90;
   const toggle = () => setShowDetails(v => !v);
 
   return (
@@ -1028,17 +1031,17 @@ const SubAgentTextRow = ({
         </span>
         <div
           className={
-            isMultiline
+            hasMoreContent
               ? `${classes.functionCallTextArea} ${
                   classes.functionCallTextAreaClickable
                 }`
               : classes.functionCallTextArea
           }
-          onClick={isMultiline ? toggle : undefined}
-          role={isMultiline ? 'button' : undefined}
-          tabIndex={isMultiline ? 0 : undefined}
+          onClick={hasMoreContent ? toggle : undefined}
+          role={hasMoreContent ? 'button' : undefined}
+          tabIndex={hasMoreContent ? 0 : undefined}
           onKeyDown={
-            isMultiline
+            hasMoreContent
               ? e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -1049,21 +1052,27 @@ const SubAgentTextRow = ({
           }
         >
           <div
-            className={`${classes.functionCallTitle} ${
-              classes.functionCallTitleEllipsis
-            }`}
+            className={
+              showDetails
+                ? classes.functionCallTitle
+                : `${classes.functionCallTitle} ${
+                    classes.functionCallTitleEllipsis
+                  }`
+            }
           >
             <Text
               noMargin
               size="body-small"
               color="secondary"
               // $FlowFixMe[incompatible-type]
-              style={styles.singleLineText}
+              style={
+                showDetails ? styles.functionCallText : styles.singleLineText
+              }
             >
-              {firstLine}
+              {showDetails ? text : firstLine}
             </Text>
           </div>
-          {isMultiline && (
+          {hasMoreContent && (
             <div className={classes.chevron}>
               {showDetails ? (
                 <ChevronArrowBottom fontSize="small" />
@@ -1074,13 +1083,6 @@ const SubAgentTextRow = ({
           )}
         </div>
       </div>
-      {showDetails && isMultiline && (
-        <div className={classes.subAgentExpandedText}>
-          <Text noMargin size="body-small" color="secondary">
-            {text}
-          </Text>
-        </div>
-      )}
     </div>
   );
 };

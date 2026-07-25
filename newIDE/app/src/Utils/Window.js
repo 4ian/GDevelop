@@ -444,12 +444,13 @@ export default class Window {
 
   static isDev(): boolean {
     if (!electron || !remote) {
-      // $FlowFixMe[cannot-resolve-name]
-      const env = process.env;
       return (
-        !env.NODE_ENV ||
-        env.NODE_ENV === 'development' ||
-        env.REACT_APP_ENV === 'development' // Added manually in the .env as we cannot override NODE_ENV with react-scripts.
+        // $FlowFixMe[cannot-resolve-name]
+        !process.env.NODE_ENV ||
+        // $FlowFixMe[cannot-resolve-name]
+        process.env.NODE_ENV === 'development' ||
+        // $FlowFixMe[cannot-resolve-name]
+        process.env.REACT_APP_ENV === 'development' // Added manually in the .env as we cannot override NODE_ENV with react-scripts.
       );
     }
 

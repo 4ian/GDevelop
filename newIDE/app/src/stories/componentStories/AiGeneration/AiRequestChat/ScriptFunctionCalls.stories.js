@@ -23,14 +23,16 @@ import { testProject } from '../../../GDevelopJsInitializerDecorator';
 // Script-based agents (toolsVersion v12): the edit and explorer sub-agents drive
 // a single `run_script` tool instead of N discrete tool calls. These stories
 // exercise how a script is displayed in the chat by `RunScriptFunctionCallRow`
-// (title + status, then the script source, the calls it made, its console logs
-// and any error inside the collapsed details) — including the cases that only
-// happen in a real v12 flow: `run_script` lives on a SUB-AGENT, so it is
-// rendered as a child row of `SubAgentFunctionCallRow`.
+// (title + status + how many operations it made, then the script source, these
+// operations, its console output and its result as foldable sections, and the
+// error that stopped it) — including the cases that only happen in a real v12
+// flow: `run_script` lives on a SUB-AGENT, so it is rendered as a child row of
+// `SubAgentFunctionCallRow`.
 //
-// Click a script row to expand its details: that collapsed view is the only
-// place the user can read the code an agent is about to run (or has run), which
-// matters in particular when auto edit is off (see the awaiting-approval story).
+// Everything is folded by default: click a script row, then one of its sections,
+// to read the code an agent is about to run (or has run) and what it did. This
+// matters in particular when auto edit is off — the awaiting-approval story
+// checks the row is then opened on the script the user has to approve.
 export default {
   title: 'EventsFunctionsExtensionEditor/AiRequestChat/ScriptFunctionCalls',
   component: AiRequestChat,

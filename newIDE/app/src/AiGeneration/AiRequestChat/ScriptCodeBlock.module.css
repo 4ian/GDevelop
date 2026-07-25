@@ -37,11 +37,13 @@
 
 .errorLineNumber,
 .errorLine {
-  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+  /* A red tint that stays discreet on both light and dark themes. */
+  background-color: rgba(255, 82, 82, 0.15);
 }
 
 .errorLineNumber {
-  opacity: 1;
+  opacity: 0.8;
+  box-shadow: inset 2px 0 0 var(--theme-message-error-color);
 }
 
 .copyButtonContainer {

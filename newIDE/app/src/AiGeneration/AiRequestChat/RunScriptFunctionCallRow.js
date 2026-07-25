@@ -11,136 +11,27 @@ import {
 } from '../../Utils/GDevelopServices/Generation';
 import { type EditorFunctionCallResult } from '../../EditorFunctions';
 import { AiRequestContext } from '../AiRequestContext';
-import { SafeExtractor } from '../../Utils/SafeExtractor';
 import {
   FunctionCallRowLayout,
   FunctionCallStatusIcon,
   type FunctionCallRowStatus,
 } from './FunctionCallRowLayout';
 import { ScriptCodeBlock } from './ScriptCodeBlock';
+import {
+  parseRunScriptArguments,
+  parseRunScriptOutput,
+  groupScriptRecords,
+  type ScriptRecord,
+  type ScriptRecordGroup,
+  type ScriptError,
+} from './RunScriptOutput';
 import classes from './RunScriptFunctionCallRow.module.css';
 
-type ScriptRecord = {|
-  functionName: string,
-  message: string | null,
-  argumentsText: string | null,
-  isFailed: boolean,
-  hasChangedNothing: boolean,
-|};
-
-type ScriptError = {|
-  message: string,
-  lineNumber: number | null,
-  lastCalledFunctionName: string | null,
-|};
-
-type ScriptRun = {|
-  records: Array<ScriptRecord>,
-  consoleLogs: Array<string>,
-  resultText: string | null,
-  error: ScriptError | null,
-|};
-
-const stringifyValue = (value: any): string | null => {
-  if (value === null || value === undefined) return null;
-  if (typeof value === 'string') return value || null;
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch (error) {
-    return null;
-  }
-};
-
-const parseScriptRecord = (anything: any): ScriptRecord => {
-  const record = SafeExtractor.extractObject(anything);
-  const output = SafeExtractor.extractObjectProperty(anything, 'output');
-  return {
-    functionName:
-      SafeExtractor.extractStringProperty(anything, 'functionName') ||
-      '(unknown)',
-    message: output
-      ? SafeExtractor.extractStringProperty(output, 'message')
-      : null,
-    argumentsText: stringifyValue(record ? record.args : null),
-    isFailed:
-      SafeExtractor.extractBooleanProperty(anything, 'success') === false,
-    hasChangedNothing: output
-      ? SafeExtractor.extractBooleanProperty(output, 'nothingChanged') === true
-      : false,
-  };
-};
-
-/**
- * Reads what a `run_script` call produced: the calls it made, its console logs,
- * its return value and the error that stopped it (if any). Everything is
- * extracted defensively: the payload comes from an AI request and can be
- * incomplete or built by a newer version of the tools.
- */
-const parseScriptRun = (anything: any): ScriptRun => {
-  const scriptOutput = SafeExtractor.extractObject(anything);
-  const records = SafeExtractor.extractArrayProperty(
-    anything,
-    'functionCallRecords'
-  );
-  const rawError = SafeExtractor.extractObjectProperty(anything, 'error');
-  const errorMessage = rawError
-    ? SafeExtractor.extractStringProperty(rawError, 'message')
-    : null;
-
-  return {
-    records: (records || []).map(parseScriptRecord),
-    consoleLogs:
-      SafeExtractor.extractStringArrayProperty(anything, 'consoleLogs') || [],
-    resultText: stringifyValue(scriptOutput ? scriptOutput.returnValue : null),
-    error: errorMessage
-      ? {
-          message: errorMessage,
-          lineNumber: SafeExtractor.extractNumberProperty(
-            rawError,
-            'lineNumber'
-          ),
-          lastCalledFunctionName: SafeExtractor.extractStringProperty(
-            rawError,
-            'lastCalledFunctionName'
-          ),
-        }
-      : null,
-  };
-};
-
-const parseScriptArguments = (
-  functionCallArguments: string
-): {| title: string | null, jsCode: string |} => {
-  try {
-    const parsed = JSON.parse(functionCallArguments);
-    return {
-      title: SafeExtractor.extractStringProperty(parsed, 'title'),
-      jsCode: SafeExtractor.extractStringProperty(parsed, 'js_code') || '',
-    };
-  } catch (error) {
-    return { title: null, jsCode: '' };
-  }
-};
-
-/** Consecutive calls to the same function are shown as a single, foldable row. */
-type ScriptRecordGroup = {|
-  functionName: string,
-  records: Array<ScriptRecord>,
-|};
-
-const groupRecords = (
-  records: Array<ScriptRecord>
-): Array<ScriptRecordGroup> => {
-  const groups: Array<ScriptRecordGroup> = [];
-  records.forEach(record => {
-    const lastGroup = groups[groups.length - 1];
-    if (lastGroup && lastGroup.functionName === record.functionName) {
-      lastGroup.records.push(record);
-      return;
-    }
-    groups.push({ functionName: record.functionName, records: [record] });
-  });
-  return groups;
+const styles = {
+  wrappedText: {
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+  },
 };
 
 const ClickableArea = ({
@@ -231,7 +122,13 @@ const RecordDot = ({ record }: {| record: ScriptRecord |}) => (
 );
 
 /**
- * A single call made by the script: its name and message on one line, with its
+ * Beyond this length, a message can't be read on the single line of a record
+ * row: the row is then made expandable even if the call has no arguments.
+ */
+const CLAMPED_MESSAGE_LENGTH = 60;
+
+/**
+ * A single call made by the script: its name and a one line summary, with its
  * full message and arguments available on click.
  */
 const ScriptRecordRow = ({
@@ -242,7 +139,17 @@ const ScriptRecordRow = ({
   showFunctionName: boolean,
 |}) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const hasDetails = !!record.argumentsText || !!record.message;
+  const hasDetails =
+    !!record.argumentsText ||
+    (!!record.message && record.message.length > CLAMPED_MESSAGE_LENGTH);
+
+  // Inside a group, all the calls share the same name and often the same
+  // message: their arguments are what tells them apart. A failure is always
+  // explained by its message though.
+  const summary =
+    showFunctionName || record.isFailed
+      ? record.message || record.argumentsSummary
+      : record.argumentsSummary || record.message;
 
   return (
     <div className={classes.recordRow}>
@@ -257,10 +164,14 @@ const ScriptRecordRow = ({
       >
         <RecordDot record={record} />
         {showFunctionName && (
-          <span className={classes.recordName}>{record.functionName}</span>
+          <span className={`${classes.recordName} ${classes.oneLine}`}>
+            {record.functionName}
+          </span>
         )}
-        {record.message && (
-          <span className={classes.recordMessage}>{record.message}</span>
+        {summary && (
+          <span className={`${classes.recordMessage} ${classes.oneLine}`}>
+            {summary}
+          </span>
         )}
         {hasDetails && (
           <span className={classes.recordChevron}>
@@ -276,7 +187,7 @@ const ScriptRecordRow = ({
               size="body-small"
               color="secondary"
               // $FlowFixMe[incompatible-type]
-              style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+              style={styles.wrappedText}
             >
               {record.message}
             </Text>
@@ -301,10 +212,12 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
         onClick={() => setIsOpen(open => !open)}
       >
         <RecordDot record={group.records[group.records.length - 1]} />
-        <span className={classes.recordName}>{group.functionName}</span>
+        <span className={`${classes.recordName} ${classes.oneLine}`}>
+          {group.functionName}
+        </span>
         <span className={classes.recordCount}>×{group.records.length}</span>
         {failedCount > 0 && (
-          <span className={classes.recordMessage}>
+          <span className={`${classes.recordMessage} ${classes.oneLine}`}>
             <Trans>{failedCount} failed</Trans>
           </span>
         )}
@@ -329,7 +242,11 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
 
 const ScriptErrorBlock = ({ error }: {| error: ScriptError |}) => (
   <div className={classes.errorBlock}>
-    <span className={classes.errorMessage}>{error.message}</span>
+    <span className={classes.errorMessage}>
+      <Text noMargin size="body-small" color="error">
+        {error.message}
+      </Text>
+    </span>
     {(error.lineNumber !== null || error.lastCalledFunctionName) && (
       <span className={classes.errorMeta}>
         {error.lineNumber !== null ? `line ${error.lineNumber}` : null}
@@ -375,7 +292,7 @@ export const RunScriptFunctionCallRow = ({
   );
 
   const { title, jsCode } = React.useMemo(
-    () => parseScriptArguments(functionCall.arguments),
+    () => parseRunScriptArguments(functionCall.arguments),
     [functionCall.arguments]
   );
 
@@ -399,11 +316,16 @@ export const RunScriptFunctionCallRow = ({
     [existingFunctionCallOutput, editorFunctionCallResult]
   );
 
-  const { records, consoleLogs, resultText, error } = React.useMemo(
-    () => parseScriptRun(scriptOutput),
-    [scriptOutput]
-  );
-  const recordGroups = React.useMemo(() => groupRecords(records), [records]);
+  const {
+    records,
+    consoleLogs,
+    resultText,
+    isResultTextual,
+    error,
+  } = React.useMemo(() => parseRunScriptOutput(scriptOutput), [scriptOutput]);
+  const recordGroups = React.useMemo(() => groupScriptRecords(records), [
+    records,
+  ]);
 
   const isFinished =
     !!existingFunctionCallOutput ||
@@ -495,7 +417,19 @@ export const RunScriptFunctionCallRow = ({
         )}
         {resultText && (
           <ScriptSection label={<Trans>Result</Trans>}>
-            <pre className={classes.textBlock}>{resultText}</pre>
+            {isResultTextual ? (
+              <Text
+                noMargin
+                size="body-small"
+                color="secondary"
+                // $FlowFixMe[incompatible-type]
+                style={styles.wrappedText}
+              >
+                {resultText}
+              </Text>
+            ) : (
+              <pre className={classes.textBlock}>{resultText}</pre>
+            )}
           </ScriptSection>
         )}
       </div>

@@ -49,6 +49,16 @@
   min-width: 0;
 }
 
+/* Clamping with `-webkit-line-clamp` rather than `white-space: nowrap`: a
+   never-wrapping text would make the whole chat as wide as its longest line. */
+.labelContainerOnOneLine > * {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
 .secondaryLabel {
   display: flex;
   align-items: center;

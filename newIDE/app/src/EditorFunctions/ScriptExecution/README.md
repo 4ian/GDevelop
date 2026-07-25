@@ -16,7 +16,7 @@ authoritative map of the three-repo contract, the §3.2 output payload and the
 | Output caps + read-only reduction + `didModifyProject` (§3.4) | `capScriptOutput.js` |
 | The `run_script` `EditorFunction` (parse, run, cap, return payload) | `../index.js` (`runScript`, registered in `editorFunctions`) |
 | Dispatch + approval gate (`modifiesProject: true` → one approval per script) | `../EditorFunctionCallRunner.js`, `../../AiGeneration/Utils.js` |
-| Chat UI row (title + collapsed script/records/logs/error) | `../../AiGeneration/AiRequestChat/FunctionCallRow.js` (`RunScriptFunctionCallRow`) |
+| Chat UI row (title + folded script/records/logs/result/error) | `../../AiGeneration/AiRequestChat/RunScriptFunctionCallRow.js` (payload reading + tests in `RunScriptOutput.js`) |
 | Tools version constant (must match the backend capabilities) | `../../AiGeneration/Utils.js` (`AI_ORCHESTRATOR_TOOLS_VERSION`) |
 
 ## Invariants

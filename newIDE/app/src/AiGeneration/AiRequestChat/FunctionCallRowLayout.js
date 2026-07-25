@@ -16,11 +16,6 @@ const styles = {
     overflowWrap: 'anywhere',
     whiteSpace: 'pre-wrap',
   },
-  labelOnOneLine: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-  },
 };
 
 export type FunctionCallRowStatus =
@@ -117,13 +112,18 @@ export const FunctionCallRowLayout = ({
               : undefined
           }
         >
-          <div className={classes.labelContainer}>
+          <div
+            className={classNames({
+              [classes.labelContainer]: true,
+              [classes.labelContainerOnOneLine]: !!labelOnOneLine,
+            })}
+          >
             <Text
               noMargin
               size="body-small"
               color="secondary"
               // $FlowFixMe[incompatible-type]
-              style={labelOnOneLine ? styles.labelOnOneLine : styles.label}
+              style={styles.label}
             >
               {label}
             </Text>

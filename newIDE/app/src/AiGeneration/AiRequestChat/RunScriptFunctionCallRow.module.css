@@ -122,23 +122,27 @@
   opacity: 0.7;
 }
 
+/* Clamping with `-webkit-line-clamp` rather than `white-space: nowrap`: a
+   never-wrapping text would make the whole chat as wide as its longest line. */
+.oneLine {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
 .recordName {
   font-family: Menlo, Monaco, 'Courier New', monospace;
   font-size: 11px;
   color: var(--theme-text-default-color);
   flex-shrink: 0;
   max-width: 55%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .recordMessage {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--theme-text-secondary-color);
   font-size: 11px;
   opacity: 0.8;
@@ -193,18 +197,17 @@
 .errorBlock {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   padding: 4px 8px;
-  margin: 2px 0;
-  border-radius: 4px;
-  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+  margin: 2px 0 4px 0;
+  border-radius: 0 4px 4px 0;
+  border-left: 2px solid var(--theme-message-error-color);
+  /* A red tint that stays discreet on both light and dark themes. */
+  background-color: rgba(255, 82, 82, 0.1);
   min-width: 0;
 }
 
 .errorMessage {
-  color: var(--theme-message-error-color);
-  font-size: 11px;
-  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   user-select: text;

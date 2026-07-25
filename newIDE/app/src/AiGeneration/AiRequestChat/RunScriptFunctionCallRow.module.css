@@ -19,7 +19,7 @@
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   padding: 2px 0;
   cursor: pointer;
   user-select: none;
@@ -48,14 +48,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 15px;
-  padding: 0 4px;
-  border-radius: 8px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
   background-color: var(--theme-list-item-hover-background-color);
-  color: var(--theme-text-secondary-color);
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 
@@ -122,9 +118,10 @@
   opacity: 0.7;
 }
 
-/* Clamping with `-webkit-line-clamp` rather than `white-space: nowrap`: a
-   never-wrapping text would make the whole chat as wide as its longest line. */
-.oneLine {
+/* Clamping the text of a row with `-webkit-line-clamp` rather than
+   `white-space: nowrap`: a never-wrapping text would make the whole chat as
+   wide as its longest line. */
+.oneLine > * {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -133,26 +130,20 @@
 }
 
 .recordName {
-  font-family: Menlo, Monaco, 'Courier New', monospace;
-  font-size: 11px;
-  color: var(--theme-text-default-color);
   flex-shrink: 0;
   max-width: 55%;
+  min-width: 0;
 }
 
 .recordMessage {
   flex: 1;
   min-width: 0;
-  color: var(--theme-text-secondary-color);
-  font-size: 11px;
   opacity: 0.8;
 }
 
 .recordCount {
-  color: var(--theme-text-secondary-color);
-  font-size: 11px;
-  opacity: 0.7;
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .recordChevron {
@@ -179,19 +170,13 @@
 /* Text and code blocks */
 
 .textBlock {
-  margin: 0;
   padding: 6px 8px;
   border-radius: 4px;
   background-color: var(--theme-surface-canvas-background-color);
-  color: var(--theme-text-secondary-color);
-  font-family: Menlo, Monaco, 'Courier New', monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
   max-height: 180px;
   overflow: auto;
   user-select: text;
+  min-width: 0;
 }
 
 .errorBlock {
@@ -205,17 +190,5 @@
   /* A red tint that stays discreet on both light and dark themes. */
   background-color: rgba(255, 82, 82, 0.1);
   min-width: 0;
-}
-
-.errorMessage {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
   user-select: text;
-}
-
-.errorMeta {
-  color: var(--theme-message-error-color);
-  font-size: 10px;
-  opacity: 0.75;
-  font-family: Menlo, Monaco, 'Courier New', monospace;
 }

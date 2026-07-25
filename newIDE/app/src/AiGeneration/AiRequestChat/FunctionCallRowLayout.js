@@ -15,6 +15,9 @@ const styles = {
     // Anywhere because behavior/object names can be long and have no spaces.
     overflowWrap: 'anywhere',
     whiteSpace: 'pre-wrap',
+    // The height of the icon slot: the first line of the label is then centered
+    // on the icon, whether the label is clamped to one line or not.
+    lineHeight: '20px',
   },
 };
 

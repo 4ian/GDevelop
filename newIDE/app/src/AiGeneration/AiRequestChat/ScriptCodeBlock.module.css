@@ -12,8 +12,8 @@
   padding: 6px 0;
   max-height: 260px;
   overflow: auto;
-  font-family: Menlo, Monaco, 'Courier New', monospace;
-  font-size: 11px;
+  font-family: 'Lucida Console', Monaco, monospace;
+  font-size: 12px;
   line-height: 1.5;
   user-select: text;
   cursor: text;

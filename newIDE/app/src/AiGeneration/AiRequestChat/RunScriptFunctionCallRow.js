@@ -32,7 +32,37 @@ const styles = {
     whiteSpace: 'pre-wrap',
     overflowWrap: 'anywhere',
   },
+  code: {
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+    fontFamily: '"Lucida Console", Monaco, monospace',
+  },
+  functionName: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+  },
+  errorMeta: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    opacity: 0.75,
+  },
+  count: {
+    fontVariantNumeric: 'tabular-nums',
+  },
 };
+
+/** A block of monospaced text: a script's console output, a call's arguments... */
+const CodeTextBlock = ({ text }: {| text: string |}) => (
+  <div className={classes.textBlock}>
+    <Text
+      noMargin
+      size="body-small"
+      color="secondary"
+      // $FlowFixMe[incompatible-type]
+      style={styles.code}
+    >
+      {text}
+    </Text>
+  </div>
+);
 
 const ClickableArea = ({
   className,
@@ -102,7 +132,17 @@ const ScriptSection = ({
           {label}
         </Text>
         {count !== undefined && (
-          <span className={classes.countBadge}>{count}</span>
+          <span className={classes.countBadge}>
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              // $FlowFixMe[incompatible-type]
+              style={styles.count}
+            >
+              {count}
+            </Text>
+          </span>
         )}
       </ClickableArea>
       {isOpen && <div className={classes.sectionContent}>{children}</div>}
@@ -174,12 +214,21 @@ const ScriptRecordRow = ({
         />
         {!isInsideGroup && (
           <span className={`${classes.recordName} ${classes.oneLine}`}>
-            {record.functionName}
+            <Text
+              noMargin
+              size="body-small"
+              // $FlowFixMe[incompatible-type]
+              style={styles.functionName}
+            >
+              {record.functionName}
+            </Text>
           </span>
         )}
         {summary && (
           <span className={`${classes.recordMessage} ${classes.oneLine}`}>
-            {summary}
+            <Text noMargin size="body-small" color="secondary">
+              {summary}
+            </Text>
           </span>
         )}
         {hasDetails && (
@@ -202,7 +251,7 @@ const ScriptRecordRow = ({
             </Text>
           )}
           {record.argumentsText && (
-            <pre className={classes.textBlock}>{record.argumentsText}</pre>
+            <CodeTextBlock text={record.argumentsText} />
           )}
         </div>
       )}
@@ -227,12 +276,31 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
           )}
         />
         <span className={`${classes.recordName} ${classes.oneLine}`}>
-          {group.functionName}
+          <Text
+            noMargin
+            size="body-small"
+            // $FlowFixMe[incompatible-type]
+            style={styles.functionName}
+          >
+            {group.functionName}
+          </Text>
         </span>
-        <span className={classes.recordCount}>×{group.records.length}</span>
+        <span className={classes.recordCount}>
+          <Text
+            noMargin
+            size="body-small"
+            color="secondary"
+            // $FlowFixMe[incompatible-type]
+            style={styles.count}
+          >
+            ×{group.records.length}
+          </Text>
+        </span>
         {failedCount > 0 && (
           <span className={`${classes.recordMessage} ${classes.oneLine}`}>
-            <Trans>{failedCount} failed</Trans>
+            <Text noMargin size="body-small" color="secondary">
+              <Trans>{failedCount} failed</Trans>
+            </Text>
           </span>
         )}
         <span className={classes.recordChevron}>
@@ -252,17 +320,30 @@ const ScriptRecordGroupRow = ({ group }: {| group: ScriptRecordGroup |}) => {
 
 const ScriptErrorBlock = ({ error }: {| error: ScriptError |}) => (
   <div className={classes.errorBlock}>
-    <span className={classes.errorMessage}>
-      <Text noMargin size="body-small" color="error">
-        {error.message}
-      </Text>
-    </span>
+    <Text
+      noMargin
+      size="body-small"
+      color="error"
+      // $FlowFixMe[incompatible-type]
+      style={styles.wrappedText}
+    >
+      {error.message}
+    </Text>
     {(error.lineNumber !== null || error.lastCalledFunctionName) && (
-      <span className={classes.errorMeta}>
-        {error.lineNumber !== null ? `line ${error.lineNumber}` : null}
-        {error.lineNumber !== null && error.lastCalledFunctionName ? ' · ' : ''}
-        {error.lastCalledFunctionName}
-      </span>
+      <Text
+        noMargin
+        size="body-small"
+        color="error"
+        // $FlowFixMe[incompatible-type]
+        style={styles.errorMeta}
+      >
+        {[
+          error.lineNumber !== null ? `line ${error.lineNumber}` : null,
+          error.lastCalledFunctionName,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+      </Text>
     )}
   </div>
 );
@@ -418,7 +499,7 @@ export const RunScriptFunctionCallRow = ({
             label={<Trans>Console output</Trans>}
             count={consoleLogs.length}
           >
-            <pre className={classes.textBlock}>{consoleLogs.join('\n')}</pre>
+            <CodeTextBlock text={consoleLogs.join('\n')} />
           </ScriptSection>
         )}
         {resultText && (
@@ -434,7 +515,7 @@ export const RunScriptFunctionCallRow = ({
                 {resultText}
               </Text>
             ) : (
-              <pre className={classes.textBlock}>{resultText}</pre>
+              <CodeTextBlock text={resultText} />
             )}
           </ScriptSection>
         )}

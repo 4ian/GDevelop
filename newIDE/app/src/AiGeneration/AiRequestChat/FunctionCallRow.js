@@ -8,7 +8,7 @@ import { type EditorFunctionCallResult } from '../../EditorFunctions';
 import CircularProgress from '../../UI/CircularProgress';
 import { Tooltip } from '@material-ui/core';
 import Text from '../../UI/Text';
-import { Trans } from '@lingui/macro';
+import { Trans, Plural } from '@lingui/macro';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Error from '../../UI/CustomSvgIcons/Error';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
@@ -39,6 +39,11 @@ const styles = {
     // Anywhere because behavior names can be long and have no spaces.
     overflowWrap: 'anywhere',
     whiteSpace: 'pre-wrap',
+  },
+  singleLineText: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
 };
 
@@ -280,28 +285,199 @@ const EditorFunctionCallRow = ({
   );
 };
 
-const runScriptStyles = {
-  code: {
-    whiteSpace: 'pre-wrap',
-    overflowWrap: 'anywhere',
-    fontFamily: 'monospace',
-    fontSize: 12,
-    margin: 0,
-    maxHeight: 320,
-    overflow: 'auto',
-  },
-  recordRow: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: 6,
-    overflowWrap: 'anywhere',
-  },
+type ScriptRecord = {|
+  functionName?: mixed,
+  success?: mixed,
+  output?: mixed,
+|};
+
+type ScriptRecordGroup = {|
+  functionName: string,
+  failed: boolean,
+  count: number,
+  /** Distinct messages in this group (deduped, order preserved). */
+  messages: Array<string>,
+|};
+
+const getRecordMessage = (record: ScriptRecord): string | null => {
+  if (
+    record &&
+    record.output &&
+    typeof record.output === 'object' &&
+    // $FlowFixMe[incompatible-use]
+    typeof record.output.message === 'string'
+  ) {
+    // $FlowFixMe[incompatible-use]
+    return record.output.message;
+  }
+  return null;
+};
+
+/**
+ * Collapse consecutive successful calls with the same function name into a
+ * single row (e.g. 10× `put_2d_instances`). Failed calls stay ungrouped so the
+ * error is never hidden in a count.
+ */
+const groupConsecutiveScriptRecords = (
+  records: Array<ScriptRecord>
+): Array<ScriptRecordGroup> => {
+  const groups: Array<ScriptRecordGroup> = [];
+  for (const record of records) {
+    const functionName =
+      record && typeof record.functionName === 'string'
+        ? record.functionName
+        : '(unknown)';
+    const failed = !!(record && record.success === false);
+    const message = getRecordMessage(record);
+    const last = groups[groups.length - 1];
+    if (last && last.functionName === functionName && last.failed === failed) {
+      last.count += 1;
+      if (message && !last.messages.includes(message)) {
+        last.messages.push(message);
+      }
+    } else {
+      groups.push({
+        functionName,
+        failed,
+        count: 1,
+        messages: message ? [message] : [],
+      });
+    }
+  }
+  return groups;
+};
+
+const CollapsibleSection = ({
+  label,
+  children,
+  defaultOpen,
+}: {|
+  label: React.Node,
+  children: React.Node,
+  defaultOpen?: boolean,
+|}) => {
+  const [open, setOpen] = React.useState(!!defaultOpen);
+  const toggle = () => setOpen(v => !v);
+
+  return (
+    <div className={classes.scriptSection}>
+      <div
+        className={classes.scriptSectionHeader}
+        onClick={toggle}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        }}
+      >
+        <div className={classes.chevron}>
+          {open ? (
+            <ChevronArrowBottom fontSize="small" />
+          ) : (
+            <ChevronArrowRight fontSize="small" />
+          )}
+        </div>
+        <div className={classes.scriptSectionLabel}>
+          <Text noMargin size="body-small" color="secondary">
+            {label}
+          </Text>
+        </div>
+      </div>
+      {open && <div className={classes.scriptSectionBody}>{children}</div>}
+    </div>
+  );
+};
+
+const ScriptRecordGroupRow = ({
+  group,
+  gdevelopTheme,
+}: {|
+  group: ScriptRecordGroup,
+  gdevelopTheme: any,
+|}) => {
+  const [showMessage, setShowMessage] = React.useState(false);
+  const hasMessage = group.messages.length > 0;
+  const toggle = () => {
+    if (hasMessage) setShowMessage(v => !v);
+  };
+
+  return (
+    <div className={classes.scriptRecordRow}>
+      <div
+        className={
+          hasMessage
+            ? `${classes.scriptRecordHeader} ${
+                classes.scriptRecordHeaderClickable
+              }`
+            : classes.scriptRecordHeader
+        }
+        onClick={hasMessage ? toggle : undefined}
+        role={hasMessage ? 'button' : undefined}
+        tabIndex={hasMessage ? 0 : undefined}
+        onKeyDown={
+          hasMessage
+            ? e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggle();
+                }
+              }
+            : undefined
+        }
+      >
+        <span className={classes.statusIconContainer}>
+          {group.failed ? (
+            <Error htmlColor={gdevelopTheme.message.error} fontSize="small" />
+          ) : (
+            <Check htmlColor={gdevelopTheme.message.valid} fontSize="small" />
+          )}
+        </span>
+        <span className={classes.scriptRecordName}>
+          <Text
+            noMargin
+            size="body-small"
+            color="secondary"
+            // $FlowFixMe[incompatible-type]
+            style={styles.singleLineText}
+          >
+            {group.functionName}
+          </Text>
+        </span>
+        {group.count > 1 && (
+          <span className={classes.scriptRecordCount}>
+            <Text noMargin size="body-small" color="secondary">
+              ×{group.count}
+            </Text>
+          </span>
+        )}
+        {hasMessage && (
+          <div className={classes.chevron}>
+            {showMessage ? (
+              <ChevronArrowBottom fontSize="small" />
+            ) : (
+              <ChevronArrowRight fontSize="small" />
+            )}
+          </div>
+        )}
+      </div>
+      {showMessage && hasMessage && (
+        <div className={classes.scriptRecordMessage}>
+          <Text noMargin size="body-small" color="secondary">
+            {group.messages.join('\n')}
+          </Text>
+        </div>
+      )}
+    </div>
+  );
 };
 
 /**
  * Renders a `run_script` call (script-based agents): the title + status icon are
- * always visible; the script source, the calls it made (one sub-row each), its
- * console logs and any error are collapsed inside a "details" section. Unknown
+ * always visible; the script source, the calls it made, its console logs and any
+ * error live in nested sections that stay collapsed until opened. Unknown
  * recorded function names render as plain text rows (forward-compatible).
  */
 const RunScriptFunctionCallRow = ({
@@ -368,7 +544,7 @@ const RunScriptFunctionCallRow = ({
     !!editorFunctionCallResult &&
     editorFunctionCallResult.status === 'working';
 
-  const records =
+  const records: Array<ScriptRecord> =
     parsedOutput && Array.isArray(parsedOutput.functionCallRecords)
       ? parsedOutput.functionCallRecords
       : [];
@@ -379,9 +555,33 @@ const RunScriptFunctionCallRow = ({
   const scriptError =
     parsedOutput && parsedOutput.error ? parsedOutput.error : null;
 
+  const recordGroups = groupConsecutiveScriptRecords(records);
+
   const hasDetailsToShow =
     !!jsCode || records.length > 0 || consoleLogs.length > 0 || !!scriptError;
+  // When the user is about to approve a script, or a syntax error left no
+  // calls, open the Script section with the parent so the code is one click away.
+  const openScriptByDefault =
+    (!!isAwaitingApproval && records.length === 0) ||
+    (!!scriptError && records.length === 0);
   const toggle = () => setShowDetails(v => !v);
+
+  const metaParts = [];
+  if (records.length > 0) {
+    metaParts.push(
+      <Plural key="calls" value={records.length} one="# call" other="# calls" />
+    );
+  }
+  if (consoleLogs.length > 0) {
+    metaParts.push(
+      <Plural
+        key="logs"
+        value={consoleLogs.length}
+        one="# log"
+        other="# logs"
+      />
+    );
+  }
 
   return (
     <div className={classes.functionCallContainer}>
@@ -426,14 +626,31 @@ const RunScriptFunctionCallRow = ({
               : undefined
           }
         >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
+          <div
+            className={`${classes.functionCallTitle} ${
+              classes.functionCallTitleEllipsis
+            }`}
           >
-            {title}
-          </Text>
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              // $FlowFixMe[incompatible-type]
+              style={styles.singleLineText}
+            >
+              {title}
+            </Text>
+          </div>
+          {!showDetails && metaParts.length > 0 && (
+            <div className={classes.functionCallMeta}>
+              <Text noMargin size="body-small" color="secondary">
+                {metaParts.reduce((acc, part, index) => {
+                  if (index === 0) return [part];
+                  return [...acc, ' · ', part];
+                }, [])}
+              </Text>
+            </div>
+          )}
           {hasDetailsToShow && (
             <div className={classes.chevron}>
               {showDetails ? (
@@ -446,57 +663,58 @@ const RunScriptFunctionCallRow = ({
         </div>
       </div>
       {showDetails && (
-        <div className={classes.detailsContent}>
-          {!!jsCode && (
-            // $FlowFixMe[incompatible-type] - inline style object.
-            <pre style={runScriptStyles.code}>{jsCode}</pre>
-          )}
-          {records.map((record, index) => {
-            const functionName =
-              record && typeof record.functionName === 'string'
-                ? record.functionName
-                : '(unknown)';
-            const recordFailed = record && record.success === false;
-            const recordMessage =
-              record &&
-              record.output &&
-              typeof record.output === 'object' &&
-              typeof record.output.message === 'string'
-                ? record.output.message
-                : null;
-            return (
-              <div
-                key={`${functionName}-${index}`}
-                style={runScriptStyles.recordRow}
-              >
-                {recordFailed ? (
-                  <Error
-                    htmlColor={gdevelopTheme.message.error}
-                    fontSize="small"
-                  />
-                ) : (
-                  <Check
-                    htmlColor={gdevelopTheme.message.valid}
-                    fontSize="small"
-                  />
-                )}
-                <Text noMargin size="body-small" color="secondary">
-                  {functionName}
-                  {recordMessage ? ` — ${recordMessage}` : ''}
-                </Text>
-              </div>
-            );
-          })}
-          {consoleLogs.length > 0 && (
-            <pre style={runScriptStyles.code}>{consoleLogs.join('\n')}</pre>
-          )}
+        <div className={classes.nestedDetails}>
           {!!scriptError && (
-            <Text noMargin size="body-small" color="error">
-              {scriptError.message}
-              {typeof scriptError.lineNumber === 'number'
-                ? ` (line ${scriptError.lineNumber})`
-                : ''}
-            </Text>
+            <div className={classes.scriptError}>
+              <Text noMargin size="body-small" color="error">
+                {typeof scriptError.message === 'string'
+                  ? scriptError.message
+                  : 'Script error'}
+                {typeof scriptError.lineNumber === 'number'
+                  ? ` (line ${scriptError.lineNumber})`
+                  : ''}
+              </Text>
+            </div>
+          )}
+          {!!jsCode && (
+            <CollapsibleSection
+              label={<Trans>Script</Trans>}
+              defaultOpen={openScriptByDefault}
+            >
+              <pre className={classes.scriptCode}>{jsCode}</pre>
+            </CollapsibleSection>
+          )}
+          {recordGroups.length > 0 && (
+            <CollapsibleSection
+              label={
+                <Plural
+                  value={records.length}
+                  one="# function call"
+                  other="# function calls"
+                />
+              }
+            >
+              {recordGroups.map((group, index) => (
+                <ScriptRecordGroupRow
+                  key={`${group.functionName}-${index}`}
+                  group={group}
+                  gdevelopTheme={gdevelopTheme}
+                />
+              ))}
+            </CollapsibleSection>
+          )}
+          {consoleLogs.length > 0 && (
+            <CollapsibleSection
+              label={
+                <Plural
+                  value={consoleLogs.length}
+                  one="# console log"
+                  other="# console logs"
+                />
+              }
+            >
+              <pre className={classes.scriptCode}>{consoleLogs.join('\n')}</pre>
+            </CollapsibleSection>
           )}
         </div>
       )}
@@ -718,14 +936,21 @@ const SubAgentFunctionCallRow = ({
             }
           }}
         >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
+          <div
+            className={`${classes.functionCallTitle} ${
+              classes.functionCallTitleEllipsis
+            }`}
           >
-            {text || <Trans>Working...</Trans>}
-          </Text>
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              // $FlowFixMe[incompatible-type]
+              style={styles.singleLineText}
+            >
+              {text || <Trans>Working...</Trans>}
+            </Text>
+          </div>
           <div className={classes.chevron}>
             {showDetails ? (
               <ChevronArrowBottom fontSize="small" />
@@ -736,7 +961,7 @@ const SubAgentFunctionCallRow = ({
         </div>
       </div>
       {showDetails && (subAgentPrompt || subAgentItems.length > 0) && (
-        <div className={classes.detailsContent}>
+        <div className={classes.nestedDetails}>
           {subAgentPrompt && (
             <SubAgentTextRow
               key={`sub-${subAgentAiRequestId}-prompt`}
@@ -784,11 +1009,8 @@ const SubAgentTextRow = ({
   textType: 'output' | 'prompt',
 |}) => {
   const [showDetails, setShowDetails] = React.useState(false);
-
   const firstLine = text.split('\n')[0];
-  const truncatedLabel =
-    firstLine.length > 80 ? firstLine.substring(0, 80) + '...' : firstLine;
-
+  const isMultiline = text.includes('\n') || firstLine.length > 90;
   const toggle = () => setShowDetails(v => !v);
 
   return (
@@ -802,36 +1024,60 @@ const SubAgentTextRow = ({
           ) : null}
         </span>
         <div
-          className={`${classes.functionCallTextArea} ${
-            classes.functionCallTextAreaClickable
-          }`}
-          onClick={toggle}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggle();
-            }
-          }}
+          className={
+            isMultiline
+              ? `${classes.functionCallTextArea} ${
+                  classes.functionCallTextAreaClickable
+                }`
+              : classes.functionCallTextArea
+          }
+          onClick={isMultiline ? toggle : undefined}
+          role={isMultiline ? 'button' : undefined}
+          tabIndex={isMultiline ? 0 : undefined}
+          onKeyDown={
+            isMultiline
+              ? e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggle();
+                  }
+                }
+              : undefined
+          }
         >
-          <Text
-            size="body-small"
-            color="secondary"
-            // $FlowFixMe[incompatible-type]
-            style={styles.functionCallText}
+          <div
+            className={`${classes.functionCallTitle} ${
+              classes.functionCallTitleEllipsis
+            }`}
           >
-            {showDetails ? text : truncatedLabel}
-          </Text>
-          <div className={classes.chevron}>
-            {showDetails ? (
-              <ChevronArrowBottom fontSize="small" />
-            ) : (
-              <ChevronArrowRight fontSize="small" />
-            )}
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              // $FlowFixMe[incompatible-type]
+              style={styles.singleLineText}
+            >
+              {firstLine}
+            </Text>
           </div>
+          {isMultiline && (
+            <div className={classes.chevron}>
+              {showDetails ? (
+                <ChevronArrowBottom fontSize="small" />
+              ) : (
+                <ChevronArrowRight fontSize="small" />
+              )}
+            </div>
+          )}
         </div>
       </div>
+      {showDetails && isMultiline && (
+        <div className={classes.subAgentExpandedText}>
+          <Text noMargin size="body-small" color="secondary">
+            {text}
+          </Text>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,21 +5,26 @@
 
 .functionCallRow {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 4px;
+  min-height: 28px;
 }
 
 .statusIconContainer {
-  padding-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
 .functionCallTextArea {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   flex: 1;
   min-width: 0;
+  gap: 4px;
 }
 
 .functionCallTextAreaClickable {
@@ -36,12 +41,29 @@
   border-radius: 4px;
 }
 
+.functionCallTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.functionCallTitleEllipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.functionCallMeta {
+  flex-shrink: 0;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
 .chevron {
   display: flex;
   align-items: center;
   opacity: 0.6;
   padding: 0 2px;
-  padding-top: 6px;
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -59,4 +81,125 @@
 .detailsContent {
   padding-left: 20px;
   margin-top: 2px;
+}
+
+/* Nested details for scripts / sub-agents: compact, with a light left rail. */
+.nestedDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 4px 8px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(128, 128, 128, 0.28);
+}
+
+.scriptSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.scriptSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.9;
+}
+
+.scriptSectionHeader:hover {
+  opacity: 0.7;
+}
+
+.scriptSectionHeader:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.scriptSectionLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.scriptSectionBody {
+  padding: 2px 0 6px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scriptCode {
+  margin: 0;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--theme-surface-canvas-background-color);
+  font-family: var(--gdevelop-modern-font-family), monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+  user-select: text;
+}
+
+.scriptError {
+  padding: 4px 0 2px;
+  overflow-wrap: anywhere;
+}
+
+.scriptRecordRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.scriptRecordHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
+  min-width: 0;
+}
+
+.scriptRecordHeaderClickable {
+  cursor: pointer;
+}
+
+.scriptRecordHeaderClickable:hover {
+  opacity: 0.8;
+}
+
+.scriptRecordHeaderClickable:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.scriptRecordName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scriptRecordCount {
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.scriptRecordMessage {
+  padding: 0 0 4px 20px;
+  overflow-wrap: anywhere;
+  opacity: 0.85;
+  user-select: text;
+}
+
+.subAgentExpandedText {
+  padding: 2px 0 6px 20px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  user-select: text;
 }

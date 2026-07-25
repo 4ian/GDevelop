@@ -1,0 +1,56 @@
+.container {
+  position: relative;
+  background-color: var(--theme-surface-canvas-background-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.code {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: start;
+  padding: 6px 0;
+  max-height: 260px;
+  overflow: auto;
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  user-select: text;
+  cursor: text;
+  /* Room for the copy button, so the first lines are never hidden by it. */
+  padding-right: 24px;
+}
+
+.lineNumber {
+  padding: 0 8px 0 6px;
+  text-align: right;
+  user-select: none;
+  opacity: 0.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding-right: 4px;
+}
+
+.errorLineNumber,
+.errorLine {
+  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+}
+
+.errorLineNumber {
+  opacity: 1;
+}
+
+.copyButtonContainer {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  opacity: 0.5;
+}
+
+.copyButtonContainer:hover {
+  opacity: 1;
+}

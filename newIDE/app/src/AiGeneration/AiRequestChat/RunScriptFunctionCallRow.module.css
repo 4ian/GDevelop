@@ -1,0 +1,218 @@
+.scriptDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--theme-list-item-separator-color);
+  padding-left: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+}
+
+/* Sections (script, operations, console, result) */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 0;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  min-width: 0;
+}
+
+.sectionHeader:hover {
+  opacity: 0.8;
+}
+
+.sectionHeader:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sectionChevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: var(--theme-list-item-hover-background-color);
+  color: var(--theme-text-secondary-color);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.sectionContent {
+  padding: 2px 0 4px 16px;
+  min-width: 0;
+}
+
+/* Operations */
+
+.recordsList {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recordRow {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.recordHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 0;
+  min-width: 0;
+  outline: none;
+}
+
+.recordHeaderClickable {
+  cursor: pointer;
+}
+
+.recordHeaderClickable:hover {
+  opacity: 0.8;
+}
+
+.recordHeaderClickable:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.dotSuccess {
+  background-color: var(--theme-message-valid-color);
+}
+
+.dotError {
+  background-color: var(--theme-message-error-color);
+}
+
+.dotUnchanged {
+  border: 1.5px solid var(--theme-message-valid-color);
+  opacity: 0.7;
+}
+
+.recordName {
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--theme-text-default-color);
+  flex-shrink: 0;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recordMessage {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--theme-text-secondary-color);
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.recordCount {
+  color: var(--theme-text-secondary-color);
+  font-size: 11px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.recordChevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.recordDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 0 4px 12px;
+  min-width: 0;
+}
+
+.recordGroupContent {
+  padding-left: 12px;
+  min-width: 0;
+}
+
+/* Text and code blocks */
+
+.textBlock {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background-color: var(--theme-surface-canvas-background-color);
+  color: var(--theme-text-secondary-color);
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 180px;
+  overflow: auto;
+  user-select: text;
+}
+
+.errorBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  margin: 2px 0;
+  border-radius: 4px;
+  background-color: var(--event-sheet-instruction-parameter-error-background-color);
+  min-width: 0;
+}
+
+.errorMessage {
+  color: var(--theme-message-error-color);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.errorMeta {
+  color: var(--theme-message-error-color);
+  font-size: 10px;
+  opacity: 0.75;
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+}

@@ -8,8 +8,6 @@ import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
  * `EditorFunctionCallRunner` uses — so a call made inside a script behaves
  * exactly like the equivalent tool call (same implementation, same
  * `on*ModifiedOutsideEditor` callbacks, same `modifiesProject` flag).
- *
- * See the generation-api `script-api/README.md` for the tool/script split.
  */
 
 export { NON_SCRIPTABLE_FUNCTION_NAMES };

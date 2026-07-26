@@ -7,8 +7,7 @@ import {
 
 /**
  * Applies the caps and read-only reduction of the `run_script`
- * function_call_output payload (generation-api `script-api/README.md` §3.4)
- * before it is sent to the backend:
+ * function_call_output payload before it is sent to the backend:
  * - read-only records (`inspect_*`/`describe_*`/`read_*`) keep only
  *   `{ message }` (their data must not re-enter the LLM context),
  * - project-modifying records keep their full output,

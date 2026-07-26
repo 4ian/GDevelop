@@ -8,11 +8,23 @@ const gd: libGDevelop = global.gd;
 /**
  * Conformance test for the "typed reads" whose output shapes the generation-api
  * declares (so scripts can iterate/filter them without guessing field names).
- * It validates the REAL outputs of the four typed functions against the
- * vendored schema fixture (a copy of the backend `script-api/output-types.js`).
- * If a shape drifts, this fails — keep the fixture in sync with the backend
- * (see the READMEs in both repos).
+ * It validates the REAL outputs of the typed functions against the vendored
+ * schema fixture (a copy of the backend `script-api/output-types.js`). If a
+ * shape drifts, this fails — keep the fixture in sync with the backend.
  */
+
+// Every function declared in the fixture must have a test below: a newly typed
+// read whose real output is never checked would let the backend promise a shape
+// the editor does not return.
+const TESTED_TYPED_FUNCTION_NAMES = [
+  'describe_instances',
+  'inspect_variables',
+  'inspect_object_properties_effects',
+  'inspect_behavior_properties',
+  'inspect_scene_properties_layers_effects',
+  'inspect_project_properties_resources',
+  'read_events_source',
+];
 
 const sharedTypes = schemasFixture.sharedOutputTypes;
 const toolSchemas = schemasFixture.toolOutputSchemas;
@@ -97,6 +109,12 @@ describe('typed-outputs conformance (script API declared reads)', () => {
     project.delete();
   });
 
+  it('has a conformance test for every typed function declared by the backend', () => {
+    expect(Object.keys(toolSchemas).sort()).toEqual(
+      [...TESTED_TYPED_FUNCTION_NAMES].sort()
+    );
+  });
+
   it('describe_instances output conforms to DescribeInstancesResult', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.describe_instances.launchFunction(
       {
@@ -129,6 +147,58 @@ describe('typed-outputs conformance (script API declared reads)', () => {
     );
     expect(result.success).toBe(true);
     validateResultAgainstSchema(result, 'inspect_object_properties_effects');
+  });
+
+  it('inspect_scene_properties_layers_effects output conforms', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_scene_properties_layers_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(
+      result,
+      'inspect_scene_properties_layers_effects'
+    );
+    // The base layer is always there, so a script can always read a layer name.
+    expect((result.layers || []).length).toBeGreaterThan(0);
+  });
+
+  it('inspect_project_properties_resources output conforms', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {},
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_project_properties_resources');
+    expect(result.sceneNames || []).toContain('TestScene');
+  });
+
+  it('inspect_project_properties_resources output conforms when listing resources', async () => {
+    // `resources` is only returned when asked for: check that shape too.
+    const result: EditorFunctionGenericOutput = await editorFunctions.inspect_project_properties_resources.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { list_all_resources: true },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'inspect_project_properties_resources');
+  });
+
+  it('read_events_source output conforms', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.read_events_source.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: { scene_name: 'TestScene' },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'read_events_source');
+    expect(typeof result.eventScript).toBe('string');
   });
 
   it('inspect_behavior_properties output conforms', async () => {

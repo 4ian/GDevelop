@@ -146,8 +146,8 @@ export type EditorFunctionGenericOutput = {|
     // project (so the editor refreshes even if the script ultimately failed).
     didModifyProject?: boolean,
   },
-  // `run_script` (script-based agents) output payload — see the generation-api
-  // `script-api/README.md` §3.2. Present only for `run_script` calls.
+  // `run_script` (script-based agents) output payload. Present only for
+  // `run_script` calls.
   functionCallRecords?: Array<Object>,
   consoleLogs?: Array<string>,
   returnValue?: any,

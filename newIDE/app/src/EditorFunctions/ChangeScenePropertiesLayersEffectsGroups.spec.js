@@ -509,6 +509,141 @@ describe('change_scene_properties_layers_effects_groups', () => {
     expect(groups.has('Enemies')).toBe(false);
   });
 
+  it('does not give the behaviors of the single remaining object of a group to newly added objects', async () => {
+    // Regression test: a group containing "Player", "Obstacle" and
+    // "PushableBox" was reduced to only "Player" after the two others were
+    // deleted from the scene. Adding new objects to the group must not give
+    // them all the behaviors of "Player" (with its configuration) - which is
+    // what the "intersection" of a single-object group degenerates to.
+    const sceneObjects = testScene.getObjects();
+
+    const player = sceneObjects.insertNewObject(project, 'Sprite', 'Player', 0);
+    player.addNewBehavior(
+      project,
+      'FakeBehavior::FakeBehavior',
+      'MyFakeBehavior'
+    );
+    // A configured property, like the "Dynamic" body type of a physics
+    // behavior on a player character.
+    player.getBehavior('MyFakeBehavior').updateProperty('property1', 'Dynamic');
+    player.addNewBehavior(
+      project,
+      'PlatformBehavior::PlatformerObjectBehavior',
+      'PlatformerObject'
+    );
+
+    const group = sceneObjects.getObjectGroups().insertNew('Obstacles', 0);
+    group.addObject('Player');
+
+    sceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'HouseA',
+      sceneObjects.getObjectsCount()
+    );
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [
+            {
+              group_name: 'Obstacles',
+              objects_to_add: ['HouseA'],
+              // Objects already deleted from the scene (and so already removed
+              // from the group): removing them is a no-op.
+              objects_to_remove: ['Obstacle', 'PushableBox'],
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const house = sceneObjects.getObject('HouseA');
+    expect(house.hasBehaviorNamed('MyFakeBehavior')).toBe(false);
+    expect(house.hasBehaviorNamed('PlatformerObject')).toBe(false);
+    expect(result.message).toContain(
+      'Group "Obstacles" in scene "TestScene" now contains 2 object(s): Player, HouseA.'
+    );
+    // The message still explains what the rest of the group has in common,
+    // so the caller can decide to add the behaviors deliberately.
+    expect(result.message).toContain(
+      'Note: the other object(s) of group "Obstacles" have behavior(s) "MyFakeBehavior" (FakeBehavior::FakeBehavior), "PlatformerObject" (PlatformBehavior::PlatformerObjectBehavior) in common'
+    );
+    expect(result.message).toContain(
+      'Nothing was added to them automatically.'
+    );
+  });
+
+  it('copies the behavior configuration from an existing object of the group when opting in', async () => {
+    const sceneObjects = testScene.getObjects();
+
+    for (const objectName of ['Crate1', 'Crate2']) {
+      const object = sceneObjects.insertNewObject(
+        project,
+        'Sprite',
+        objectName,
+        sceneObjects.getObjectsCount()
+      );
+      object.addNewBehavior(
+        project,
+        'FakeBehavior::FakeBehavior',
+        'MyFakeBehavior'
+      );
+    }
+    // The configuration of the first object of the group is the one copied
+    // to newly added objects.
+    sceneObjects
+      .getObject('Crate1')
+      .getBehavior('MyFakeBehavior')
+      .updateProperty('property1', 'Custom shared value');
+
+    const group = sceneObjects.getObjectGroups().insertNew('Crates', 0);
+    group.addObject('Crate1');
+    group.addObject('Crate2');
+
+    sceneObjects.insertNewObject(
+      project,
+      'Sprite',
+      'Crate3',
+      sceneObjects.getObjectsCount()
+    );
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          changed_groups: [
+            {
+              group_name: 'Crates',
+              objects_to_add: ['Crate3'],
+              also_add_common_behaviors_variables: true,
+            },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    const crate3 = sceneObjects.getObject('Crate3');
+    expect(crate3.hasBehaviorNamed('MyFakeBehavior')).toBe(true);
+    expect(
+      crate3
+        .getBehavior('MyFakeBehavior')
+        .getProperties()
+        .get('property1')
+        .getValue()
+    ).toBe('Custom shared value');
+    // The message warns that the configuration was copied from an existing
+    // object of the group.
+    expect(result.message).toContain(
+      'The behavior properties and variable values were copied from an existing object of the group'
+    );
+  });
+
   it('reports no changes when only the scene name is provided', async () => {
     const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
       {

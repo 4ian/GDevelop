@@ -102,7 +102,10 @@ export const useRefreshLimits = (
 // v10: `search_resource_store` for the explorer and edit agents.
 // v11: `read_events_source` (this editor implements it) and the explicit
 // replace relations of `generate_events` (keep or replace sub-events).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v11';
+// v12: objects added to a group don't automatically get the behaviors and
+// variables the group has in common anymore (this editor implements the
+// `also_add_common_behaviors_variables` boolean opting into it).
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v12';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying

@@ -4818,7 +4818,59 @@ describe('editorFunctions', () => {
       }
     });
 
-    it('fills the variables and behaviors in common when an object is added to a group', async () => {
+    it('fills the variables and behaviors in common when an object is added to a group with also_add_common_behaviors_variables', async () => {
+      const sceneObjects = testScene.getObjects();
+
+      // Make Enemy1 and Enemy2 share a behavior and a variable in common, so
+      // the group exposes them. Then add a fresh Enemy3 with neither.
+      for (const objectName of ['Enemy1', 'Enemy2']) {
+        const object = sceneObjects.getObject(objectName);
+        object.addNewBehavior(
+          project,
+          'PlatformBehavior::PlatformerObjectBehavior',
+          'PlatformerObject'
+        );
+        object
+          .getVariables()
+          .insertNew('groupHealth', 0)
+          .setValue(100);
+      }
+      sceneObjects.insertNewObject(project, 'Sprite', 'Enemy3', 2);
+
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [
+              {
+                group_name: 'Enemies',
+                objects_to_add: ['Enemy3'],
+                also_add_common_behaviors_variables: true,
+              },
+            ],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+
+      // Enemy3 was added to the group, so it received the variable and behavior
+      // shared in common by the group.
+      const enemy3 = sceneObjects.getObject('Enemy3');
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+
+      // The change message explains which behaviors and variables the newly
+      // added object inherited from the group, with their names and types.
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Group \\"Enemies\\" in scene \\"TestScene\\" now contains 3 object(s): Enemy1, Enemy2, Enemy3.
+        Object(s) \\"Enemy3\\" newly added to group \\"Enemies\\" now have the behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) that the rest of the group has in common (a group is the \\"intersection\\" of its objects), added to them if they did not already have them. The behavior properties and variable values were copied from an existing object of the group: verify they fit the new objects (for example, a physics body type)."
+      `);
+    });
+
+    it('does not fill the variables and behaviors in common when an object is added to a group (default)', async () => {
       const sceneObjects = testScene.getObjects();
 
       // Make Enemy1 and Enemy2 share a behavior and a variable in common, so
@@ -4854,18 +4906,17 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(true);
 
-      // Enemy3 was added to the group, so it received the variable and behavior
-      // shared in common by the group.
+      // Enemy3 was added to the group but was not modified.
       const enemy3 = sceneObjects.getObject('Enemy3');
-      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(true);
-      expect(enemy3.getVariables().has('groupHealth')).toBe(true);
+      expect(enemy3.hasBehaviorNamed('PlatformerObject')).toBe(false);
+      expect(enemy3.getVariables().has('groupHealth')).toBe(false);
 
-      // The change message explains which behaviors and variables the newly
-      // added object inherited from the group, with their names and types.
+      // The change message explains which behaviors and variables the rest of
+      // the group has in common and that the new object was not given them.
       expect(result.message).toMatchInlineSnapshot(`
         "Done.
         Group \\"Enemies\\" in scene \\"TestScene\\" now contains 3 object(s): Enemy1, Enemy2, Enemy3.
-        Object(s) \\"Enemy3\\" newly added to group \\"Enemies\\" now have the behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) that the rest of the group has in common (a group is the \\"intersection\\" of its objects), added to them if they did not already have them."
+        Note: the other object(s) of group \\"Enemies\\" have behavior(s) \\"PlatformerObject\\" (PlatformBehavior::PlatformerObjectBehavior) and variable(s) \\"groupHealth\\" (Number) in common, which some newly added object(s) don't have. Nothing was added to them automatically. If events rely on these behaviors or variables for this group, add them yourself to the new objects, or set \`also_add_common_behaviors_variables\` to true to copy them (properties/values are then copied from an existing object of the group)."
       `);
     });
 
@@ -5702,11 +5753,11 @@ describe('editorFunctions', () => {
       ]);
     });
 
-    it('fills shared variables and behaviors when adding via objects_to_add', async () => {
+    it('fills shared variables and behaviors when adding via objects_to_add with also_add_common_behaviors_variables', async () => {
       const sceneObjects = testScene.getObjects();
 
       // Enemy1 and Enemy2 share a behavior and a variable, so the group exposes
-      // them. A freshly added Enemy3 should receive them too.
+      // them. A freshly added Enemy3 should receive them too when opting in.
       for (const objectName of ['Enemy1', 'Enemy2']) {
         const object = sceneObjects.getObject(objectName);
         object.addNewBehavior(
@@ -5730,6 +5781,7 @@ describe('editorFunctions', () => {
               {
                 group_name: 'Enemies',
                 objects_to_add: ['Enemy3'],
+                also_add_common_behaviors_variables: true,
               },
             ],
           },

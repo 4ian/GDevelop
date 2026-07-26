@@ -6824,6 +6824,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
           changed_group,
           'objects_to_remove'
         );
+        const alsoAddCommonBehaviorsAndVariables =
+          SafeExtractor.extractBooleanProperty(
+            changed_group,
+            'also_add_common_behaviors_variables'
+          ) === true;
         if (groupName === null) {
           warnings.push(
             `Missing "group_name" in changed_groups item. Skipped.`
@@ -6956,10 +6961,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
 
             // Capture the variables and behaviors shared in common by the group
             // (from its objects after removals, before additions), so that any
-            // newly added object can be filled with them - exactly like the
-            // object group editor does. This keeps an object added to a group
-            // consistent with the rest of the group (which is the "intersection"
-            // of its objects: it shows the variables and behaviors in common).
+            // newly added object can be filled with them if requested - exactly
+            // like the object group editor does. This keeps an object added to
+            // a group consistent with the rest of the group (which is the
+            // "intersection" of its objects: it shows the variables and
+            // behaviors in common).
             const objectsContainersList = gd.ProjectScopedContainers.makeNewProjectScopedContainersForProjectAndLayout(
               project,
               scene
@@ -6978,6 +6984,11 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
 
             const addedObjectNames = [];
+            // The shared behaviors and variables that at least one newly added
+            // object does not have (used to inform when they are not
+            // automatically added).
+            const missingSharedBehaviorNames: Set<string> = new Set();
+            const missingSharedVariableNames: Set<string> = new Set();
             namesToAdd.forEach(objectName => {
               const object = getObjectByName(
                 globalObjects,
@@ -6987,21 +6998,33 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               if (object) {
                 foundGroup.addObject(objectName);
                 addedObjectNames.push(objectName);
-                // Give the newly added object the variables and behaviors
-                // shared in common by the group, if it does not have them yet.
-                gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
-                  object,
-                  groupVariablesContainer
-                );
                 for (const behaviorName of groupVisibleBehaviorNames) {
-                  gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
-                    project.getCurrentPlatform(),
-                    globalObjects,
-                    sceneObjects,
+                  if (!object.hasBehaviorNamed(behaviorName))
+                    missingSharedBehaviorNames.add(behaviorName);
+                }
+                mapFor(0, groupVariablesContainer.count(), index => {
+                  const variableName = groupVariablesContainer.getNameAt(index);
+                  if (!object.getVariables().has(variableName))
+                    missingSharedVariableNames.add(variableName);
+                });
+
+                if (alsoAddCommonBehaviorsAndVariables) {
+                  // Give the newly added object the variables and behaviors
+                  // shared in common by the group, if it does not have them yet.
+                  gd.ObjectRefactorer.fillMissingGroupVariablesToObject(
                     object,
-                    foundGroup,
-                    behaviorName
+                    groupVariablesContainer
                   );
+                  for (const behaviorName of groupVisibleBehaviorNames) {
+                    gd.ObjectRefactorer.fillMissingGroupBehaviorToObject(
+                      project.getCurrentPlatform(),
+                      globalObjects,
+                      sceneObjects,
+                      object,
+                      foundGroup,
+                      behaviorName
+                    );
+                  }
                 }
               } else {
                 warnings.push(
@@ -7023,22 +7046,24 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
               }.`
             );
 
-            // Explain the variables and behaviors that were given to the newly
-            // added objects, so it is clear they now share the ones the group
-            // has in common (a group is the "intersection" of its objects).
+            // Explain the variables and behaviors the group has in common
+            // (a group is the "intersection" of its objects), and whether the
+            // newly added objects were given them or not.
             if (addedObjectNames.length > 0) {
-              const sharedVariableDescriptions = mapFor(
+              const sharedVariables = mapFor(
                 0,
                 groupVariablesContainer.count(),
-                index =>
-                  `"${groupVariablesContainer.getNameAt(
+                index => ({
+                  name: groupVariablesContainer.getNameAt(index),
+                  description: `"${groupVariablesContainer.getNameAt(
                     index
                   )}" (${getVariableTypeAsString(
                     gd,
                     groupVariablesContainer.getAt(index)
-                  )})`
+                  )})`,
+                })
               );
-              const sharedBehaviorDescriptions = groupVisibleBehaviorNames.map(
+              const sharedBehaviors = groupVisibleBehaviorNames.map(
                 behaviorName => {
                   const behaviorType =
                     existingGroupObjects.length > 0
@@ -7046,36 +7071,63 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
                           .getBehavior(behaviorName)
                           .getTypeName()
                       : null;
-                  return behaviorType
-                    ? `"${behaviorName}" (${behaviorType})`
-                    : `"${behaviorName}"`;
+                  return {
+                    name: behaviorName,
+                    description: behaviorType
+                      ? `"${behaviorName}" (${behaviorType})`
+                      : `"${behaviorName}"`,
+                  };
                 }
               );
 
-              if (
-                sharedVariableDescriptions.length > 0 ||
-                sharedBehaviorDescriptions.length > 0
-              ) {
-                const sharedParts = [];
-                if (sharedBehaviorDescriptions.length > 0) {
-                  sharedParts.push(
-                    `behavior(s) ${sharedBehaviorDescriptions.join(', ')}`
-                  );
+              const makeParts = (
+                behaviorDescriptions: Array<string>,
+                variableDescriptions: Array<string>
+              ) => {
+                const parts = [];
+                if (behaviorDescriptions.length > 0) {
+                  parts.push(`behavior(s) ${behaviorDescriptions.join(', ')}`);
                 }
-                if (sharedVariableDescriptions.length > 0) {
-                  sharedParts.push(
-                    `variable(s) ${sharedVariableDescriptions.join(', ')}`
-                  );
+                if (variableDescriptions.length > 0) {
+                  parts.push(`variable(s) ${variableDescriptions.join(', ')}`);
                 }
-                changes.push(
-                  `Object(s) ${addedObjectNames
-                    .map(name => `"${name}"`)
-                    .join(
-                      ', '
-                    )} newly added to group "${groupName}" now have the ${sharedParts.join(
-                    ' and '
-                  )} that the rest of the group has in common (a group is the "intersection" of its objects), added to them if they did not already have them.`
+                return parts;
+              };
+
+              if (alsoAddCommonBehaviorsAndVariables) {
+                const sharedParts = makeParts(
+                  sharedBehaviors.map(({ description }) => description),
+                  sharedVariables.map(({ description }) => description)
                 );
+                if (sharedParts.length > 0) {
+                  changes.push(
+                    `Object(s) ${addedObjectNames
+                      .map(name => `"${name}"`)
+                      .join(
+                        ', '
+                      )} newly added to group "${groupName}" now have the ${sharedParts.join(
+                      ' and '
+                    )} that the rest of the group has in common (a group is the "intersection" of its objects), added to them if they did not already have them. ` +
+                      `The behavior properties and variable values were copied from an existing object of the group: verify they fit the new objects (for example, a physics body type).`
+                  );
+                }
+              } else {
+                const missingParts = makeParts(
+                  sharedBehaviors
+                    .filter(({ name }) => missingSharedBehaviorNames.has(name))
+                    .map(({ description }) => description),
+                  sharedVariables
+                    .filter(({ name }) => missingSharedVariableNames.has(name))
+                    .map(({ description }) => description)
+                );
+                if (missingParts.length > 0) {
+                  changes.push(
+                    `Note: the other object(s) of group "${groupName}" have ${missingParts.join(
+                      ' and '
+                    )} in common, which some newly added object(s) don't have. Nothing was added to them automatically. ` +
+                      `If events rely on these behaviors or variables for this group, add them yourself to the new objects, or set \`also_add_common_behaviors_variables\` to true to copy them (properties/values are then copied from an existing object of the group).`
+                  );
+                }
               }
             }
           }

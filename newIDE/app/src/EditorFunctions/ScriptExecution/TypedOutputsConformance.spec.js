@@ -24,6 +24,7 @@ const TESTED_TYPED_FUNCTION_NAMES = [
   'inspect_scene_properties_layers_effects',
   'inspect_project_properties_resources',
   'read_events_source',
+  'add_behavior',
 ];
 
 const sharedTypes = schemasFixture.sharedOutputTypes;
@@ -187,6 +188,53 @@ describe('typed outputs conformance (script API declared reads)', () => {
     );
     expect(result.success).toBe(true);
     validateResultAgainstSchema(result, 'inspect_project_properties_resources');
+  });
+
+  // The only declared WRITE: `add_behavior` picks the behavior name, so a script
+  // can only chain on it if the call reports it.
+  it('add_behavior output conforms and reports the name it assigned', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'Player',
+          behavior_type: 'DestroyOutsideBehavior::DestroyOutside',
+        },
+      }
+    );
+    expect(result.success).toBe(true);
+    validateResultAgainstSchema(result, 'add_behavior');
+    // The reported name is the one the behavior really got on the object, so it
+    // can be passed straight to `change_behavior_property`.
+    const [added] = result.addedBehaviors || [];
+    expect(added.objectName).toBe('Player');
+    expect(added.behaviorType).toBe('DestroyOutsideBehavior::DestroyOutside');
+    expect(
+      testScene
+        .getObjects()
+        .getObject('Player')
+        .hasBehaviorNamed(added.behaviorName)
+    ).toBe(true);
+  });
+
+  it('add_behavior reports the name of a behavior that was already there', async () => {
+    const args = {
+      scene_name: 'TestScene',
+      object_name: 'Player',
+      behavior_type: 'DestroyOutsideBehavior::DestroyOutside',
+    };
+    const first: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+      { ...makeFakeLaunchFunctionOptionsWithProject(project), args }
+    );
+    const second: EditorFunctionGenericOutput = await editorFunctions.add_behavior.launchFunction(
+      { ...makeFakeLaunchFunctionOptionsWithProject(project), args }
+    );
+
+    expect(second.success).toBe(true);
+    validateResultAgainstSchema(second, 'add_behavior');
+    // Re-running a script must give the same usable name, not an empty list.
+    expect(second.addedBehaviors).toEqual(first.addedBehaviors);
   });
 
   it('read_events_source output conforms', async () => {

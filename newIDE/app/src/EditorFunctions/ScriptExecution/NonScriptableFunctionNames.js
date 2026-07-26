@@ -10,9 +10,8 @@
  * Everything else client-side (mutations, inspections, `read_events_source`) is
  * scriptable.
  *
- * Used both to build the exposed functions (`ExposedFunctions.js`) and to
- * explain the mistake when a script calls one of these by name
- * (`ScriptRunner.js`) — in its own module so neither has to import the other.
+ * In its own module so `ExposedFunctions.js` and `ScriptRunner.js` do not have
+ * to import each other.
  */
 export const NON_SCRIPTABLE_FUNCTION_NAMES: Set<string> = new Set([
   'run_script',

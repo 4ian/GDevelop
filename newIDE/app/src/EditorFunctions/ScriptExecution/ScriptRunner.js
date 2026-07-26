@@ -154,11 +154,9 @@ const extractUndefinedName = (error: Error): string | null => {
 };
 
 /**
- * Explains a `ReferenceError` instead of forwarding it bare. The most common
- * cause, by far, is an agent calling one of its own TOOLS (`search_docs`,
- * `read_full_docs`...) from inside a script: those are resolved outside the
- * editor and are deliberately not script functions. Saying so turns a wasted
- * round trip into a self-correcting one.
+ * The two causes seen in the failure reports, both of which the agent can
+ * correct on the next turn once named: calling one of its own tools from inside
+ * a script, and an object shorthand with no variable of that name.
  */
 const buildUndefinedNameMessage = ({
   undefinedName,
@@ -177,8 +175,6 @@ const buildUndefinedNameMessage = ({
       availableFunctions
     );
   }
-  // The other observed cause: an object shorthand (`{ scene_name: scene,
-  // object_name }`) where no variable of that exact name exists.
   return (
     `"${undefinedName}" is not defined — check for a typo, or for an object ` +
     'shorthand used without a variable of that name (write ' +

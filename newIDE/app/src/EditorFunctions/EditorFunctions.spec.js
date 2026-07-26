@@ -5439,7 +5439,7 @@ describe('editorFunctions', () => {
       expect(groups.has('Enemies')).toBe(false);
     });
 
-    it('does not create a group when the changed_groups item specifies no changes', async () => {
+    it('creates an empty group when the changed_groups item specifies no other changes', async () => {
       const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
@@ -5458,13 +5458,47 @@ describe('editorFunctions', () => {
         }
       );
 
-      expect(result.success).toBe(false);
-      expect(result.warnings).toMatchInlineSnapshot(
-        `"Group \\"MobileControls\\" not found in scene \\"TestScene\\" and no changes were specified: no group was created. To create it, list the objects to put in it in \\"objects_to_add\\"."`
-      );
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Created group \\"MobileControls\\" in scene \\"TestScene\\".
+        Group \\"MobileControls\\" in scene \\"TestScene\\" now contains 0 object(s): (none)."
+      `);
       const groups = testScene.getObjects().getObjectGroups();
-      expect(groups.has('MobileControls')).toBe(false);
-      expect(groups.count()).toBe(1);
+      expect(groups.has('MobileControls')).toBe(true);
+      expect(
+        groups
+          .get('MobileControls')
+          .getAllObjectsNames()
+          .size()
+      ).toBe(0);
+      expect(groups.count()).toBe(2);
+    });
+
+    it('creates an empty group when only the group name is specified', async () => {
+      const result: EditorFunctionGenericOutput = await editorFunctions.change_scene_properties_layers_effects_groups.launchFunction(
+        {
+          ...makeFakeLaunchFunctionOptionsWithProject(project),
+          args: {
+            scene_name: 'TestScene',
+            changed_groups: [{ group_name: 'Interactables' }],
+          },
+        }
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.message).toMatchInlineSnapshot(`
+        "Done.
+        Created group \\"Interactables\\" in scene \\"TestScene\\"."
+      `);
+      const groups = testScene.getObjects().getObjectGroups();
+      expect(groups.has('Interactables')).toBe(true);
+      expect(
+        groups
+          .get('Interactables')
+          .getAllObjectsNames()
+          .size()
+      ).toBe(0);
     });
 
     it('does not create a group when deleting a group that does not exist', async () => {

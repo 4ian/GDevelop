@@ -288,7 +288,7 @@ export const popOutTab = (
     editors: remainingEditors,
     currentTab:
       newCurrentTabIndex === -1
-        ? Math.max(0, sourceTabIndex - 1)
+        ? Math.max(0, Math.min(sourceTabIndex, remainingEditors.length - 1))
         : newCurrentTabIndex,
   };
 
@@ -392,9 +392,14 @@ export const closeTabsExceptIf = (
       editors: paneRemainingEditors,
 
       // Keep the focus on the current editor tab, or if it was closed
-      // go back to the first tab.
+      // focus the tab that took its place (or the last one).
       currentTab:
-        currentEditorTabNewIndex === -1 ? 0 : currentEditorTabNewIndex,
+        currentEditorTabNewIndex === -1
+          ? Math.max(
+              0,
+              Math.min(pane.currentTab, paneRemainingEditors.length - 1)
+            )
+          : currentEditorTabNewIndex,
     };
   }
 

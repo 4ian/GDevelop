@@ -6927,17 +6927,20 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
             );
             return;
           }
-          if (!hasObjectsToAdd) {
+          if (hasObjectsToRemove && !hasObjectsToAdd) {
             warnings.push(
-              hasObjectsToRemove
-                ? `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
-                    '(none)'}.`
-                : `Group "${groupName}" not found in scene "${scene.getName()}" and no changes were specified: no group was created. To create it, list the objects to put in it in "objects_to_add".`
+              `Group "${groupName}" not found in scene "${scene.getName()}": no objects were removed from it. Existing groups are: ${existingGroupNames ||
+                '(none)'}.`
             );
             return;
           }
-          // Create the group, as objects are being added to it.
+          // Create the group: either objects are being added to it, or only
+          // its name was given, which is a request for a new empty group
+          // (events can reference it before its objects exist).
           foundGroup = groups.insertNew(groupName, groups.count());
+          changes.push(
+            `Created group "${groupName}" in scene "${scene.getName()}".`
+          );
         } else {
           foundGroup = groups.get(groupName);
         }
@@ -8521,6 +8524,34 @@ const runScript: EditorFunction = {
   modifiesProject: true,
 };
 
+const searchResourceStore: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const resourceKind = SafeExtractor.extractStringProperty(
+      args,
+      'resource_kind'
+    );
+    if (resourceKind === 'audio') {
+      return {
+        text: <Trans>Searching audio files in the resource store.</Trans>,
+      };
+    }
+    if (resourceKind === 'font') {
+      return {
+        text: <Trans>Searching fonts in the resource store.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Searching the resource store.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to search the resource store - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 export const editorFunctions: { [string]: EditorFunction } = {
   run_script: runScript,
   create_object: createOrReplaceObject,
@@ -8560,6 +8591,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   run_edit_agent: runEditAgent,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
+  search_resource_store: searchResourceStore,
 
   generate_events: addSceneEvents,
 

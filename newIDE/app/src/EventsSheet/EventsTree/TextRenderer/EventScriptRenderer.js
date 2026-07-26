@@ -51,8 +51,10 @@ const escapeStringLiteral = (value: string): string =>
 /**
  * Render the arguments of an instruction call, keeping only the "visible"
  * parameters (code-only parameters are hidden slots filled by the engine:
- * the EventScript compilation re-inserts them). Trailing empty optional
- * parameters are dropped for brevity (the compilation refills them).
+ * the EventScript compilation re-inserts them). Trailing empty values are
+ * dropped for brevity (the compilation refills them), except an explicit
+ * empty-string literal `""` on a required parameter (a meaningful operand,
+ * kept so the round-trip stays stable).
  */
 const renderInstructionArguments = (
   instruction: gdInstruction,
@@ -60,6 +62,9 @@ const renderInstructionArguments = (
 ): Array<string> => {
   const instructionParametersCount = instruction.getParametersCount();
   const values: Array<string> = [];
+  // The parameter metadata aligned with each kept value (null for extra
+  // parameters and unknown instructions, where we have no metadata).
+  const valueParametersMetadata: Array<gdParameterMetadata | null> = [];
 
   if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
     // Unknown instruction: keep every parameter as-is (we cannot know which
@@ -68,6 +73,7 @@ const renderInstructionArguments = (
       values.push(
         escapeParameterValue(instruction.getParameter(index).getPlainString())
       );
+      valueParametersMetadata.push(null);
     }
   } else {
     const metadataParametersCount = metadata.getParametersCount();
@@ -80,6 +86,7 @@ const renderInstructionArguments = (
           ? instruction.getParameter(index).getPlainString()
           : '';
       values.push(escapeParameterValue(value));
+      valueParametersMetadata.push(parameterMetadata);
     }
     // Extra parameters not declared by the metadata (can happen with stale
     // projects): keep them rather than silently losing values.
@@ -91,16 +98,28 @@ const renderInstructionArguments = (
       values.push(
         escapeParameterValue(instruction.getParameter(index).getPlainString())
       );
+      valueParametersMetadata.push(null);
     }
   }
 
-  // Trailing empty values (bare `` or quoted `""`) are refilled by the
-  // compilation: drop them for brevity.
-  while (
-    values.length > 0 &&
-    (values[values.length - 1].trim() === '' ||
-      values[values.length - 1].trim() === '""')
-  ) {
+  // Drop trailing empty values for brevity (the compilation refills them),
+  // EXCEPT an explicit empty-string literal `""` on a REQUIRED parameter:
+  // there the empty string is a meaningful operand (e.g.
+  // `SetStringVariable(X, =, "")` sets the empty string), so keep it -
+  // otherwise the value looks lost on read-back and the round-trip is not
+  // stable. Optional / code-only trailing slots (like `Create`'s layer) are
+  // still trimmed.
+  while (values.length > 0) {
+    const lastValue = values[values.length - 1].trim();
+    if (lastValue !== '' && lastValue !== '""') break;
+    const parameterMetadata = valueParametersMetadata[values.length - 1];
+    if (
+      lastValue === '""' &&
+      parameterMetadata &&
+      !parameterMetadata.isOptional()
+    ) {
+      break;
+    }
     values.pop();
   }
   return values;

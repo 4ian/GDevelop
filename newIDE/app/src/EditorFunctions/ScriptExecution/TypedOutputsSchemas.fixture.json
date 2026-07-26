@@ -352,6 +352,38 @@
       "required": [
         "eventScript"
       ]
+    },
+    "add_behavior": {
+      "type": "object",
+      "openEnded": true,
+      "properties": {
+        "addedBehaviors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "openEnded": true,
+            "properties": {
+              "objectName": {
+                "type": "string"
+              },
+              "behaviorName": {
+                "type": "string"
+              },
+              "behaviorType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "objectName",
+              "behaviorName",
+              "behaviorType"
+            ]
+          }
+        }
+      },
+      "required": [
+        "addedBehaviors"
+      ]
     }
   }
 }

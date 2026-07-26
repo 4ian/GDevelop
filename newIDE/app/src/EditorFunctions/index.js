@@ -175,6 +175,13 @@ export type EditorFunctionGenericOutput = {|
   resources?: any,
   resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  // `add_behavior`: the behavior name the editor assigned, per object — a
+  // declared output type, because nothing else lets a script know it.
+  addedBehaviors?: Array<{|
+    objectName: string,
+    behaviorName: string,
+    behaviorType: string,
+  |}>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
@@ -2612,6 +2619,22 @@ const addBehavior: EditorFunction = {
 
     const changes = [];
     const warnings = [];
+    // The behavior NAME the editor assigned, per object: a script cannot guess
+    // it (there is no argument to impose one) and needs it to call the behavior
+    // functions afterwards. Reported as a declared output type, so a script does
+    // not have to read it back with `inspect_object_properties_effects`.
+    const addedBehaviors: Array<{|
+      objectName: string,
+      behaviorName: string,
+      behaviorType: string,
+    |}> = [];
+    const reportBehaviorOnObject = (objectName: string) => {
+      addedBehaviors.push({
+        objectName,
+        behaviorName,
+        behaviorType: behavior_type,
+      });
+    };
     for (const object of concerned.objects) {
       const objectName = object.getName();
 
@@ -2626,6 +2649,8 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" already on "${objectName}".`
           );
+          // Already there: a script chaining on the name must still get it.
+          reportBehaviorOnObject(objectName);
         }
         continue;
       }
@@ -2641,6 +2666,7 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${objectName}".`
           );
+          reportBehaviorOnObject(objectName);
         } else {
           warnings.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${objectName}".`
@@ -2679,10 +2705,14 @@ const addBehavior: EditorFunction = {
           behavior.getProperties()
         )}.`
       );
+      reportBehaviorOnObject(objectName);
     }
     layout.updateBehaviorsSharedData(project);
 
-    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
+    return {
+      ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
+      addedBehaviors,
+    };
   },
   modifiesProject: true,
 };

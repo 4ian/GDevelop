@@ -79,6 +79,10 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
+import { executeScript } from './ScriptExecution/ScriptRunner';
+import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
+import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
+import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 export type HintEntry = {|
   code: string,
@@ -138,8 +142,25 @@ export type EditorFunctionGenericOutput = {|
   meta?: {
     newSceneNames?: Array<string>,
     createdProject?: gdProject,
+    // For `run_script`: true when ANY call the script made modified the
+    // project (so the editor refreshes even if the script ultimately failed).
+    didModifyProject?: boolean,
   },
+  // `run_script` (script-based agents) output payload. Present only for
+  // `run_script` calls.
+  functionCallRecords?: Array<Object>,
+  consoleLogs?: Array<string>,
+  returnValue?: any,
+  error?: {|
+    message: string,
+    lineNumber: number | null,
+    lastCalledFunctionName: string | null,
+  |} | null,
   message?: string,
+  // Set to true (v12+) when a mutating call was a no-op because the requested
+  // state already matched the current state. Lets the no-op rate be counted
+  // from `functionCallRecords`/CloudWatch without any new telemetry.
+  nothingChanged?: boolean,
   eventsAsText?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
   eventsRenderingErrors?: Array<EventsTextRenderingError>,
@@ -303,6 +324,13 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'). Threaded so functions can gate
+  // version-dependent behavior (e.g. `isNoOpConsideredSuccess`). May be null
+  // when unknown (treated as pre-v12).
+  toolsVersion?: ?string,
+  // When true, `run_script` exposes only non-mutating functions (explorer
+  // sub-agent scripts, which must stay read-only). Ignored by other functions.
+  runScriptReadOnly?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -346,6 +374,15 @@ export type LaunchFunctionOptionsWithoutProject = {|
    */
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
+
+/**
+ * Everything a `launchFunction` receives except the call itself: what
+ * `run_script` forwards to every function a script calls.
+ */
+export type LaunchFunctionCollaborators = Omit<
+  LaunchFunctionOptionsWithoutProject,
+  'args'
+>;
 
 export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,
@@ -3444,6 +3481,7 @@ const put2dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4156,15 +4194,25 @@ const put2dInstances: EditorFunction = {
           );
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4286,6 +4334,7 @@ const put3dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4934,15 +4983,25 @@ const put3dInstances: EditorFunction = {
           );
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -8390,6 +8449,81 @@ const searchObjectAssetStore: EditorFunction = {
   modifiesProject: false,
 };
 
+/**
+ * Script-based agents (v12+): runs a JavaScript script written by the AI, in
+ * which the client-side editor functions are exposed as plain async functions
+ * (see `ScriptExecution/`). Replaces N discrete tool calls by one. The script's
+ * calls use the SAME implementations and collaborators bag as individual tool
+ * calls, so behavior (including the coalesced `on*ModifiedOutsideEditor`
+ * refresh) is identical. `modifiesProject: true` so the whole script is gated
+ * behind one edit approval when auto-edit is off.
+ */
+const runScript: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const title =
+      args && typeof args.title === 'string' && args.title
+        ? args.title
+        : 'Run a script';
+    // The rich per-record view is rendered by `RunScriptFunctionCallRow`; here
+    // we only provide the user-facing title (used e.g. for the approval label).
+    return { text: title, hasDetailsToShow: false };
+  },
+  launchFunction: async ({ args, project, ...launchOptions }) => {
+    const jsCode =
+      args && typeof args.js_code === 'string' ? args.js_code : null;
+    if (!jsCode) {
+      return {
+        success: false,
+        message:
+          'run_script requires a `js_code` string argument (the JavaScript to run).',
+      };
+    }
+
+    // Explorer sub-agent scripts are read-only: expose only non-mutating
+    // functions so a script can't modify the project (defense in depth; matches
+    // the backend's explorer script-function list). Signaled by the caller via
+    // `runScriptReadOnly` in the collaborators bag.
+    const allowedFunctionNames = launchOptions.runScriptReadOnly
+      ? [
+          ...Object.keys(editorFunctions).filter(
+            name => !editorFunctions[name].modifiesProject
+          ),
+          ...Object.keys(editorFunctionsWithoutProject).filter(
+            name => !editorFunctionsWithoutProject[name].modifiesProject
+          ),
+        ]
+      : null;
+
+    const exposedFunctions = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject,
+      launchOptions,
+      project,
+      allowedFunctionNames,
+    });
+
+    const result = await executeScript({ jsCode, exposedFunctions });
+    const capped = capScriptExecutionResult(result);
+
+    return {
+      success: capped.success,
+      functionCallRecords: capped.functionCallRecords,
+      consoleLogs: capped.consoleLogs,
+      returnValue: capped.returnValue,
+      error: capped.error,
+      meta: {
+        didModifyProject: capped.didModifyProject,
+        // Forward scene names created inside the script so they auto-open, like
+        // a standalone create_scene call does.
+        ...(capped.newSceneNames.length > 0
+          ? { newSceneNames: capped.newSceneNames }
+          : {}),
+      },
+    };
+  },
+  modifiesProject: true,
+};
+
 const searchResourceStore: EditorFunction = {
   renderForEditor: ({ args }) => {
     const resourceKind = SafeExtractor.extractStringProperty(
@@ -8419,6 +8553,7 @@ const searchResourceStore: EditorFunction = {
 };
 
 export const editorFunctions: { [string]: EditorFunction } = {
+  run_script: runScript,
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
   // Old tool names, kept for AI requests still using an older toolsVersion:

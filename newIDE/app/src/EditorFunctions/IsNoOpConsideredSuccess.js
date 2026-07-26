@@ -17,9 +17,6 @@
  * Parsing mirrors the backend's `isToolsVersionInRange` (numeric compare of the
  * `vN` suffix), but an unknown/missing version is treated as pre-v12 (keep the
  * failure) rather than passing.
- *
- * @param {?string} toolsVersion The AI request's tools version (e.g. 'v12').
- * @returns {boolean}
  */
 export const isNoOpConsideredSuccess = (toolsVersion: ?string): boolean => {
   if (!toolsVersion) return false;

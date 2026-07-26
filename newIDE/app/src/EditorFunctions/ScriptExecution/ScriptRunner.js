@@ -3,31 +3,16 @@ import { type EditorFunctionGenericOutput } from '..';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
 
 /**
- * PROTOTYPE — script-based agents ("run_script").
+ * Runs an AI-written JavaScript script whose editor functions are exposed as
+ * plain async functions, replacing N tool calls (N LLM round trips) by one.
+ * Mirrors `EditorFunctionCallRunner.processEditorFunctionCalls`: calls run
+ * strictly sequentially and the script stops at the first failure, with
+ * everything executed before it left applied and reported.
  *
- * Runs a JavaScript script written by an AI agent, in which the editor
- * functions (the client-side implementations of the AI tool calls) are
- * exposed as plain async functions. This replaces N discrete tool calls
- * (each requiring a whole round trip to the LLM) by a single `run_script`
- * tool call.
- *
- * Guarantees mirroring `EditorFunctionCallRunner.processEditorFunctionCalls`:
- * - Calls run strictly sequentially: a call made while another one is still
- *   pending (missing `await`, `Promise.all`...) throws immediately.
- * - Execution stops at the first function call returning `success: false` or
- *   at the first thrown error. Everything executed before stays applied
- *   (no rollback), and every call made so far is reported in
- *   `functionCallRecords` — so the caller (the agent or the orchestrator)
- *   can see exactly what happened, like with individual tool calls.
- *
- * About isolation: the script is evaluated with `new Function`, with the
- * common browser globals shadowed so that only the exposed editor functions,
- * `console` and standard JavaScript are reachable by honest code. This is
- * NOT a security boundary against adversarial code — the scripts come from
- * our own backend LLM and can do no more than the same LLM can already do
- * today through individual tool calls. If stronger isolation is needed later
- * (e.g. third-party prompts), swap `evaluateScript` for a real sandbox
- * (Worker, ShadowRealm or QuickJS-WASM) without changing the rest.
+ * `evaluateScript`'s shadowing of the browser globals is hygiene, NOT a
+ * security boundary: the script comes from our own backend LLM and can do no
+ * more than that LLM already can through individual tool calls. Swap it for a
+ * Worker / QuickJS-WASM sandbox if third-party prompts ever run here.
  */
 
 export type ExposedScriptFunction = {|
@@ -230,7 +215,7 @@ const evaluateScript = ({
   return Promise.resolve(scriptFunction(...scopedArguments));
 };
 
-export const runScript = async ({
+export const executeScript = async ({
   jsCode,
   exposedFunctions,
   maxFunctionCallsCount,

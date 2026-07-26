@@ -1,5 +1,5 @@
 // @flow
-import { runScript } from './ScriptRunner';
+import { executeScript } from './ScriptRunner';
 import {
   buildExposedScriptFunctions,
   NON_SCRIPTABLE_FUNCTION_NAMES,
@@ -9,6 +9,11 @@ import { capScriptExecutionResult } from './capScriptOutput';
 // Deliberately gd-free (like ScriptRunner.spec.js): fake registries following
 // the EditorFunction contract, so the exposed-functions bridge and the output
 // caps can be tested without a real project.
+
+// The bridge only FORWARDS the collaborators bag and the project, so the tests
+// pass deliberately partial fakes and assert what came out the other side.
+const asCollaborators = (fake: Object): any => fake;
+const asProject = (fake: mixed): any => fake;
 
 const makeFakeEditorFunction = ({
   modifiesProject,
@@ -39,8 +44,8 @@ describe('buildExposedScriptFunctions', () => {
     const exposed = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject,
-      launchOptions: {},
-      project: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
     });
 
     const names = exposed.map(f => f.name).sort();
@@ -59,8 +64,8 @@ describe('buildExposedScriptFunctions', () => {
     const exposed = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject: {},
-      launchOptions: {},
-      project: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
       allowedFunctionNames: ['describe_instances'],
     });
     expect(exposed.map(f => f.name)).toEqual(['describe_instances']);
@@ -80,11 +85,11 @@ describe('buildExposedScriptFunctions', () => {
     const exposed = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject: {},
-      launchOptions: { i18n: 'FAKE_I18N', toolOptions: null },
-      project: 'FAKE_PROJECT',
+      launchOptions: asCollaborators({ i18n: 'FAKE_I18N', toolOptions: null }),
+      project: asProject('FAKE_PROJECT'),
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: `await create_scene({ scene_name: 'Level1' });`,
       exposedFunctions: exposed,
     });
@@ -121,10 +126,10 @@ describe('capScriptExecutionResult', () => {
     const exposed = buildExposedScriptFunctions({
       editorFunctions,
       editorFunctionsWithoutProject: {},
-      launchOptions: {},
-      project: {},
+      launchOptions: asCollaborators({}),
+      project: asProject({}),
     });
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `await describe_instances({ scene_name: 'L' });`,
         `await create_scene({ scene_name: 'L2' });`,
@@ -152,7 +157,7 @@ describe('capScriptExecutionResult', () => {
       "  console.log('line ' + i);",
       '}',
     ].join('\n');
-    const result = await runScript({ jsCode, exposedFunctions: [] });
+    const result = await executeScript({ jsCode, exposedFunctions: [] });
     const capped = capScriptExecutionResult(result);
     // 100 kept + 1 note line.
     expect(capped.consoleLogs.length).toBe(101);

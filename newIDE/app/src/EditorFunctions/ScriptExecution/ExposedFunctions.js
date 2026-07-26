@@ -1,6 +1,7 @@
 // @flow
 import { type ExposedScriptFunction } from './ScriptRunner';
 import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
+import { type LaunchFunctionCollaborators } from '..';
 
 /**
  * Builds the list of editor functions exposed to a `run_script` script, from
@@ -20,10 +21,6 @@ type EditorFunctionLike = {
   ...
 };
 
-/**
- * @param {Object} options
- * @returns {Array<ExposedScriptFunction>}
- */
 export const buildExposedScriptFunctions = ({
   editorFunctions,
   editorFunctionsWithoutProject,
@@ -35,10 +32,8 @@ export const buildExposedScriptFunctions = ({
   // whose values carry extra fields like `renderForEditor`) are assignable.
   editorFunctions: { +[string]: EditorFunctionLike },
   editorFunctionsWithoutProject: { +[string]: EditorFunctionLike },
-  // The collaborators bag (i18n, toolOptions, editorCallbacks, the
-  // on*ModifiedOutsideEditor callbacks, ...) WITHOUT `args`/`project`.
-  launchOptions: Object,
-  project: ?any,
+  launchOptions: LaunchFunctionCollaborators,
+  project: ?gdProject,
   // When provided (the backend-declared function list for the agent/version),
   // only these functions are exposed. Otherwise all scriptable client-side
   // functions are exposed (see NON_SCRIPTABLE_FUNCTION_NAMES).

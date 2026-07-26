@@ -1,7 +1,7 @@
 // @flow
 import { editorFunctions, type EditorFunctionGenericOutput } from '..';
 import { makeFakeLaunchFunctionOptionsWithProject } from '../TestHelpers';
-import schemasFixture from './typed-outputs-schemas.fixture.json';
+import schemasFixture from './TypedOutputsSchemas.fixture.json';
 
 const gd: libGDevelop = global.gd;
 

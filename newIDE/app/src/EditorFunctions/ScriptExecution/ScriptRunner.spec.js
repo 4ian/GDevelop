@@ -1,13 +1,13 @@
 // @flow
 import {
-  runScript,
+  executeScript,
   type ExposedScriptFunction,
   type ScriptFunctionCallRecord,
   type ScriptExecutionResult,
   type ScriptExecutionError,
 } from './ScriptRunner';
 import { type EditorFunctionGenericOutput } from '..';
-import { isNoOpConsideredSuccess } from '../isNoOpConsideredSuccess';
+import { isNoOpConsideredSuccess } from '../IsNoOpConsideredSuccess';
 
 // The runner is deliberately independent from `gd` and from the real editor
 // functions: it only needs functions following the `launchFunction` contract.
@@ -46,7 +46,7 @@ const getErrorOrThrow = (
   return error;
 };
 
-describe('runScript', () => {
+describe('executeScript', () => {
   it('runs a script calling several functions sequentially and reports everything', async () => {
     const calls: Array<{ name: string, args: any }> = [];
     const createScene = makeFakeFunction({
@@ -68,7 +68,7 @@ describe('runScript', () => {
       },
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `const inspection = await inspect_variables({ scene_name: 'Level' });`,
         `console.log('Found variables:', inspection.variables.length);`,
@@ -116,7 +116,7 @@ describe('runScript', () => {
     });
     const working = makeFakeFunction({ name: 'working_function' });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `await working_function({});`,
         `await failing_function({ object_name: 'Ghost' });`,
@@ -150,7 +150,7 @@ describe('runScript', () => {
       },
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: `await throwing_function({});`,
       exposedFunctions: [throwing],
     });
@@ -164,7 +164,7 @@ describe('runScript', () => {
   });
 
   it('reports the line number of a script error (not tied to a function call)', async () => {
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `const value = 1;`,
         `console.log('before the error');`,
@@ -186,7 +186,7 @@ describe('runScript', () => {
       modifiesProject: true,
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       // `search_docs` is a server-side tool: it stays a plain tool call.
       jsCode: [
         `await create_scene({ scene_name: 'Level' });`,
@@ -212,7 +212,7 @@ describe('runScript', () => {
   it('lists the available functions when the script calls an unknown name', async () => {
     const createScene = makeFakeFunction({ name: 'create_scene' });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: `await creaate_scene({ scene_name: 'Level' });`,
       exposedFunctions: [createScene],
     });
@@ -228,7 +228,7 @@ describe('runScript', () => {
   });
 
   it('reports syntax errors without crashing', async () => {
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: `const oops = {;`,
       exposedFunctions: [],
     });
@@ -247,7 +247,7 @@ describe('runScript', () => {
       },
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `const first = slow_function({}); // no await`,
         `await slow_function({});`,
@@ -264,7 +264,7 @@ describe('runScript', () => {
   it('stops runaway loops after the maximum number of function calls', async () => {
     const counting = makeFakeFunction({ name: 'counting_function' });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [`while (true) {`, `  await counting_function({});`, `}`].join(
         '\n'
       ),
@@ -279,7 +279,7 @@ describe('runScript', () => {
   });
 
   it('shadows the browser globals inside the script', async () => {
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `return {`,
         `  windowType: typeof window,`,
@@ -301,7 +301,7 @@ describe('runScript', () => {
   });
 
   it('captures console logs of all levels, formatting objects', async () => {
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `console.log('a string', { key: 'value' }, 42);`,
         `console.warn('careful');`,
@@ -331,7 +331,7 @@ describe('runScript', () => {
       modifiesProject: true,
     });
 
-    const result = await runScript({
+    const result = await executeScript({
       jsCode: [
         `const inspection = await inspect_something({});`,
         `for (const instance of inspection.instances) {`,
@@ -378,7 +378,7 @@ describe('runScript', () => {
         },
       });
 
-      const result = await runScript({
+      const result = await executeScript({
         jsCode: [
           `await put_2d_instances({});`,
           `await add_or_edit_variable({});`,
@@ -407,7 +407,7 @@ describe('runScript', () => {
         },
       });
 
-      const result = await runScript({
+      const result = await executeScript({
         jsCode: [
           `await put_2d_instances({});`,
           `await add_or_edit_variable({});`,

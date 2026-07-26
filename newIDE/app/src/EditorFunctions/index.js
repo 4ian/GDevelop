@@ -79,10 +79,10 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
-import { runScript as executeScript } from './ScriptExecution/ScriptRunner';
+import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/capScriptOutput';
-import { isNoOpConsideredSuccess } from './isNoOpConsideredSuccess';
+import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 export type HintEntry = {|
   code: string,
@@ -374,6 +374,15 @@ export type LaunchFunctionOptionsWithoutProject = {|
    */
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
+
+/**
+ * Everything a `launchFunction` receives except the call itself: what
+ * `run_script` forwards to every function a script calls.
+ */
+export type LaunchFunctionCollaborators = Omit<
+  LaunchFunctionOptionsWithoutProject,
+  'args'
+>;
 
 export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,

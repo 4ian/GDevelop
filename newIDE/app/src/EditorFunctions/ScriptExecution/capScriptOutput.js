@@ -75,10 +75,6 @@ export type CappedRunScriptOutput = {|
   newSceneNames: Array<string>,
 |};
 
-/**
- * @param {ScriptExecutionResult} result
- * @returns {CappedRunScriptOutput}
- */
 export const capScriptExecutionResult = (
   result: ScriptExecutionResult
 ): CappedRunScriptOutput => {

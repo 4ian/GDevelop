@@ -1,5 +1,5 @@
 // @flow
-import { isNoOpConsideredSuccess } from './isNoOpConsideredSuccess';
+import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 describe('isNoOpConsideredSuccess', () => {
   it('treats a no-op as a success from tools v12 onwards', () => {

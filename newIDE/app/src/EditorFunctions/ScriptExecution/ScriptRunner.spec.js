@@ -180,6 +180,34 @@ describe('executeScript', () => {
     expect(error.lastCalledFunctionName).toBe(null);
   });
 
+  it('also exposes the functions under a `functions` namespace', async () => {
+    const calls: Array<string> = [];
+    const createScene = makeFakeFunction({
+      name: 'create_scene',
+      modifiesProject: true,
+      launch: async args => {
+        calls.push(args.scene_name);
+        return { success: true, message: 'Scene created.' };
+      },
+    });
+
+    const result = await executeScript({
+      jsCode: [
+        `await functions.create_scene({ scene_name: 'Namespaced' });`,
+        `await create_scene({ scene_name: 'Direct' });`,
+      ].join('\n'),
+      exposedFunctions: [createScene],
+    });
+
+    expect(result.error).toBe(null);
+    expect(result.success).toBe(true);
+    expect(calls).toEqual(['Namespaced', 'Direct']);
+    // Both call styles are recorded identically.
+    expect(
+      result.functionCallRecords.map(record => record.functionName)
+    ).toEqual(['create_scene', 'create_scene']);
+  });
+
   it('explains that a tool called inside a script is not a script function', async () => {
     const createScene = makeFakeFunction({
       name: 'create_scene',

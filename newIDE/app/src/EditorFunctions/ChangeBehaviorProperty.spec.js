@@ -86,7 +86,7 @@ describe('change_behavior_property (property warnings and shared properties)', (
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No changes. Issues:\n' +
+      'Nothing changed. Issues:\n' +
         'Property "nope" not on behavior "MyFakeBehavior" of "MyObject". ' +
         'Available properties: property1, property2.'
     );
@@ -110,7 +110,7 @@ describe('change_behavior_property (property warnings and shared properties)', (
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No changes. Issues:\n' +
+      'Nothing changed. Issues:\n' +
         'Missing "property_name" or "new_value" in changed_properties item: {"new_value":"hello"}. Skipped.\n' +
         'Missing "property_name" or "new_value" in changed_properties item: {"property_name":"property1"}. Skipped.'
     );

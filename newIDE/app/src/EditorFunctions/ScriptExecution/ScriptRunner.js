@@ -302,6 +302,11 @@ export const executeScript = async ({
     };
   }
 
+  // Agents regularly write `await functions.create_scene(...)`, assuming the
+  // exposed functions live in a namespace. Give them one, bound to the very
+  // same wrappers, instead of failing the script on a `ReferenceError`.
+  scopedValues.functions = { ...scopedValues };
+
   scopedValues.console = {
     log: (...values: Array<any>) => {
       consoleLogs.push(values.map(formatLoggedValue).join(' '));

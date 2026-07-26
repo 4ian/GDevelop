@@ -228,7 +228,7 @@ export const executeScript = async ({
   const functionCallRecords: Array<ScriptFunctionCallRecord> = [];
   const consoleLogs: Array<string> = [];
   const newSceneNames: Array<string> = [];
-  const maxCallsCount = maxFunctionCallsCount || 100;
+  const maxCallsCount = maxFunctionCallsCount || 600;
 
   let pendingCallFunctionName: string | null = null;
   let lastCalledFunctionName: string | null = null;

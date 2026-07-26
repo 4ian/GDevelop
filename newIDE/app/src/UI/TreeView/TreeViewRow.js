@@ -445,6 +445,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                     {
                       [classes.rootFolder]: node.item.isRoot,
                       [classes.placeholder]: node.item.isPlaceholder,
+                      [classes.categoryLabel]: node.item.isLabel,
                     },
                     node.extraClass
                   )}
@@ -600,6 +601,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                 dropIndicatorClassName,
                 {
                   [classes.selected]: node.selected,
+                  [classes.placeholderRow]: node.item.isPlaceholder,
                 }
               )}
               aria-selected={node.selected}

@@ -12,7 +12,6 @@ import {
   type TreeViewItemContent,
   type TreeItemProps,
   customObjectsRootFolderId,
-  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -273,6 +272,10 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
 
   getName(): string | React.Node {
     return this.eventsBasedObject.getName();
+  }
+
+  getSearchText(): string {
+    return `${this.eventsFunctionsExtension.getName()} ${this.eventsBasedObject.getName()}`;
   }
 
   getId(): string {
@@ -562,14 +565,7 @@ export class CustomObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return (
-      itemContent.getId() === customObjectsRootFolderId ||
-      itemContent.getId() ===
-        getProjectManagerShortcutExtensionGroupId(
-          customObjectsRootFolderId,
-          this.eventsFunctionsExtension
-        )
-    );
+    return itemContent.getId() === customObjectsRootFolderId;
   }
 }
 
@@ -594,6 +590,10 @@ export class CustomObjectVariantTreeViewItemContent
 
   getName(): string | React.Node {
     return this.variant.getName();
+  }
+
+  getSearchText(): string {
+    return `${this.eventsFunctionsExtension.getName()} ${this.eventsBasedObject.getName()} ${this.variant.getName()}`;
   }
 
   getId(): string {
@@ -868,11 +868,6 @@ export class CustomObjectVariantTreeViewItemContent
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
     return (
       itemContent.getId() === customObjectsRootFolderId ||
-      itemContent.getId() ===
-        getProjectManagerShortcutExtensionGroupId(
-          customObjectsRootFolderId,
-          this.eventsFunctionsExtension
-        ) ||
       itemContent.getId() ===
         getCustomObjectTreeViewItemId(
           this.eventsFunctionsExtension,

@@ -8,7 +8,6 @@ import {
   type TreeViewItemContent,
   type TreeItemProps,
   functionsRootFolderId,
-  getProjectManagerShortcutExtensionGroupId,
 } from './index';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type MenuButton } from '../UI/TreeView';
@@ -68,6 +67,10 @@ export class FunctionShortcutTreeViewItemContent
 
   getName(): string | React.Node {
     return this.eventsFunction.getName();
+  }
+
+  getSearchText(): string {
+    return `${this.eventsFunctionsExtension.getName()} ${this.eventsFunction.getName()}`;
   }
 
   getId(): string {
@@ -246,13 +249,6 @@ export class FunctionShortcutTreeViewItemContent
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return (
-      itemContent.getId() === functionsRootFolderId ||
-      itemContent.getId() ===
-        getProjectManagerShortcutExtensionGroupId(
-          functionsRootFolderId,
-          this.eventsFunctionsExtension
-        )
-    );
+    return itemContent.getId() === functionsRootFolderId;
   }
 }

@@ -13,10 +13,91 @@ import {
   migrateLegacyProject,
   openMultiFileProject,
 } from './LocalMultiFileProject';
+import { writeProjectSourceCatalogs } from './LocalProjectWriter';
+import {
+  PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+} from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
+import {
+  generateEventsFunctionExtensionMetadata,
+  type EventsFunctionCodeWriter,
+} from '../../EventsFunctionsExtensionsLoader';
+import {
+  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+  PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+} from '../ProjectSourceCatalog';
+import {
+  PROJECT_API_RELATIVE_PATH,
+  PROJECT_RUNTIME_API_RELATIVE_PATH,
+} from '../JavaScriptAuthoringApi';
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
+
+const bootstrapProjectSourceCatalogs = async (
+  projectFile: string
+): Promise<void> => {
+  const projectRoot = path.dirname(projectFile);
+  const generatedArtifactRelativePaths = [
+    PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+    PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
+    PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
+    PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+    PROJECT_RUNTIME_API_RELATIVE_PATH,
+    PROJECT_API_RELATIVE_PATH,
+  ];
+  if (
+    generatedArtifactRelativePaths.every(relativePath =>
+      fs.existsSync(path.join(projectRoot, ...relativePath.split('/')))
+    )
+  ) {
+    return;
+  }
+
+  // A first open has no generated instruction catalog yet, so reconstruct the
+  // project without compiling events, build isolated metadata for its local
+  // extensions, and write every generated authoring artifact before reopening.
+  const catalogSource = await openMultiFileProject(projectFile, {
+    ignoreInstructionCatalog: true,
+    skipEventsCompilation: true,
+  });
+  const catalogProject = gd.ProjectHelper.createNewGDJSProject();
+  const additionalExtensions: Array<gdPlatformExtension> = [];
+  const eventsFunctionCodeWriter: EventsFunctionCodeWriter = {
+    getIncludeFileFor: (functionName: string) => `${functionName}.js`,
+    writeFunctionCode: async () => {},
+    writeBehaviorCode: async () => {},
+    writeObjectCode: async () => {},
+  };
+  const i18n = ({
+    _: value =>
+      typeof value === 'string' ? value : value.id || value.message || '',
+  }: any);
+
+  try {
+    unserializeFromJSObject(catalogProject, catalogSource);
+    for (
+      let index = 0;
+      index < catalogProject.getEventsFunctionsExtensionsCount();
+      index++
+    ) {
+      additionalExtensions.push(
+        generateEventsFunctionExtensionMetadata(
+          catalogProject,
+          catalogProject.getEventsFunctionsExtensionAt(index),
+          { eventsFunctionCodeWriter, i18n }
+        )
+      );
+    }
+    await writeProjectSourceCatalogs(catalogProject, projectRoot, {
+      additionalExtensions,
+    });
+  } finally {
+    additionalExtensions.forEach(extension => extension.delete());
+    catalogProject.delete();
+  }
+};
 
 const normalizeLegacyProjectWithCurrentSerializer = (
   legacyProject: Object
@@ -50,13 +131,16 @@ export const onOpen = (
   const filePath = fileMetadata.fileIdentifier;
   if (path.basename(filePath).toLowerCase() === 'project.settings') {
     return getLocalProjectLastModifiedDate(filePath).then(
-      async lastModifiedDate => ({
-        content: await openMultiFileProject(filePath),
-        fileMetadata: {
-          ...fileMetadata,
-          ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
-        },
-      })
+      async lastModifiedDate => {
+        await bootstrapProjectSourceCatalogs(filePath);
+        return {
+          content: await openMultiFileProject(filePath),
+          fileMetadata: {
+            ...fileMetadata,
+            ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
+          },
+        };
+      }
     );
   }
   const projectPath = path.dirname(filePath);

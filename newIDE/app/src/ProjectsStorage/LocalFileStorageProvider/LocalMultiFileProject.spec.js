@@ -254,6 +254,80 @@ describe('Local multi-file project storage', () => {
     });
   });
 
+  test('bootstraps catalogs before compiling named events on first open', async () => {
+    const gd: libGDevelop = global.gd;
+    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const extensionName = 'FirstOpenCatalogTest';
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('First open catalog project');
+    ensureProjectHasDefaultScene(project);
+    const sceneName = project.getLayoutAt(0).getName();
+    const extension = project.insertNewEventsFunctionsExtension(
+      extensionName,
+      0
+    );
+    extension.setFullName('First open catalog test');
+    const action = extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('Ping', 0);
+    action.setFunctionType(gd.EventsFunction.Action);
+    action.setFullName('Ping');
+
+    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    files[`game://scenes/${sceneName}/${sceneName}.events`] =
+      '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
+    project.delete();
+    await writeMultiFileSourceTree({ entryPath, files });
+
+    const instructionCatalogPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/instructions-catalog.json'
+    );
+    expect(fs.existsSync(instructionCatalogPath)).toBe(false);
+
+    const result = await onOpen({ fileIdentifier: entryPath });
+
+    expect(result.content.layouts[0].events[0]).toMatchObject({
+      conditions: [
+        {
+          type: { value: 'SceneJustBegins' },
+        },
+      ],
+      actions: [
+        {
+          type: { value: 'FirstOpenCatalogTest::Ping' },
+          parameters: ['', ''],
+        },
+      ],
+    });
+    expect(fs.existsSync(instructionCatalogPath)).toBe(true);
+    expect(
+      JSON.parse(fs.readFileSync(instructionCatalogPath, 'utf8')).actions
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'FirstOpenCatalogTest::Ping',
+        }),
+      ])
+    );
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/settings-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(temporaryDirectory, '.gdevelop/project-api.d.ts'))
+    ).toBe(true);
+  });
+
   test('writes only changed owned components', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.settings');
     await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
@@ -985,6 +1059,24 @@ describe('Local multi-file project storage', () => {
     expect(persistedSettingsCatalog.counts).toEqual(settingsCatalog.counts);
     expect(JSON.stringify(persistedSettingsCatalog.fileKinds)).not.toMatch(
       /FolderStructure/
+    );
+    expect(
+      persistedSettingsCatalog.fileKinds.every(
+        fileKind =>
+          fileKind.schema &&
+          Array.isArray(fileKind.schema.rootFields) &&
+          Array.isArray(fileKind.schema.childTables)
+      )
+    ).toBe(true);
+    expect(
+      persistedSettingsCatalog.fileKinds
+        .find(fileKind => fileKind.kind === 'externals')
+        .schema.childTables.find(table => table.table === 'eventFiles').fields
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'linkedScene', required: true }),
+        expect.objectContaining({ name: 'events', required: true }),
+      ])
     );
     expect(settingsCatalog.counts.fileKinds).toBe(14);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);

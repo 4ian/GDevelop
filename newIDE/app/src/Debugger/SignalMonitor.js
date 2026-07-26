@@ -388,13 +388,14 @@ const styles = {
   rowHeader: {
     display: 'flex',
     alignItems: 'center',
+    width: '100%',
     minWidth: 0,
     gap: 8,
   },
   signalChip: {
+    flex: 1,
     height: 20,
-    maxWidth: '45%',
-    minWidth: 54,
+    minWidth: 0,
     padding: '2px 7px',
     boxSizing: 'border-box',
     borderRadius: 4,
@@ -406,6 +407,7 @@ const styles = {
     whiteSpace: 'nowrap',
   },
   statusChip: {
+    flexShrink: 0,
     height: 16,
     padding: '1px 6px',
     boxSizing: 'border-box',
@@ -417,6 +419,7 @@ const styles = {
     whiteSpace: 'nowrap',
   },
   idText: {
+    flexShrink: 0,
     marginLeft: 'auto',
     color: '#7e8da3',
     fontSize: 11,
@@ -473,8 +476,11 @@ const SignalMonitorRow = ({
     >
       <div style={{ ...styles.rowAccent, backgroundColor: color }} />
       <div style={styles.rowHeader}>
-        <div style={{ ...styles.signalChip, backgroundColor: color }}>
-          {shortenSignalDebugText(log.signalName, statusLabel ? 16 : 28)}
+        <div
+          title={log.signalName}
+          style={{ ...styles.signalChip, backgroundColor: color }}
+        >
+          {log.signalName}
         </div>
         {statusLabel ? (
           <div style={{ ...styles.statusChip, backgroundColor: color }}>

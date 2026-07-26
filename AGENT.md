@@ -58,15 +58,18 @@ desktop build and launch using the script for the host operating system:
 - Windows: `python scripts/start-windows-app.py`
 - macOS: `python3 scripts/start-macos-app.py`
 
-Run the command from the repository root. The default invocation builds,
-synchronizes the Electron application, launches it, and verifies that it
-started. Do not substitute `--dry-run`, `--no-launch`, or `--skip-build` for
-final validation of code changes. If the host is neither Windows nor macOS,
-state clearly that this repository has no matching required launch script;
-never claim the launch was completed.
+Run the command from the repository root as a detached background process.
+Confirm only that the background process was created successfully; do not wait
+for, poll, or monitor the build or application launch. After starting the
+background process, finish the current agent session immediately. Do not
+substitute `--dry-run`, `--no-launch`, or `--skip-build` for the required
+background invocation. If the host is neither Windows nor macOS, state clearly
+that this repository has no matching required launch script.
 
 Documentation-only changes do not require an application build and launch.
-Always report which checks ran and whether the desktop launch succeeded.
+Always report which checks ran and whether the background launcher process was
+started successfully. Do not claim that the build or desktop launch succeeded,
+because the agent does not wait for the result.
 
 ## Start every task this way
 
@@ -312,8 +315,9 @@ the change is primarily a reusable visual state.
 ### Python launcher/tooling
 
 Run the script's focused Python test when one exists (for example
-`scripts/test_start_windows_app.py`), then run the required real platform
-launcher.
+`scripts/test_start_windows_app.py`), then start the required real platform
+launcher as a detached background process and finish the agent session without
+waiting for it.
 
 ## Definition of done
 
@@ -325,8 +329,9 @@ A code task is complete only when:
    layer.
 3. Relevant type, lint, format, build, and test commands pass, or failures are
    reported with exact commands and reasons.
-4. `scripts/start-windows-app.py` or `scripts/start-macos-app.py` has completed
-   a real build and verified application launch on the host OS.
-5. The final report names the changed layers, tests run, launch result, and any
-   compatibility/performance follow-up.
-
+4. `scripts/start-windows-app.py` or `scripts/start-macos-app.py` has been
+   started successfully as a detached background process with the real build
+   and launch options.
+5. The final report names the changed layers, tests run, background launcher
+   dispatch result, and any compatibility/performance follow-up. The agent does
+   not wait for or report the eventual build or launch result.

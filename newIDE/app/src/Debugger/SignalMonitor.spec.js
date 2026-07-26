@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+// $FlowFixMe[missing-export] The react-test-renderer libdef is outdated.
 import TestRenderer, { act } from 'react-test-renderer';
 import { getSignalMonitorLogs, SignalMonitor } from './SignalMonitor';
 
@@ -105,18 +106,19 @@ describe('SignalMonitor', () => {
     ]);
   });
 
-  it('shows full route and payload information on hover', () => {
+  it('uses the full header width and shows full details on hover', () => {
     const receiver = {
       objectName: 'NewMyObject',
       objectId: 1,
       receiverName: 'MyBehavior',
       receiverKind: 'behavior',
     };
+    const signalName = 'A.Signal.Name.That.Needs.The.Available.Header.Width';
     const diagnostics = makeSignalDiagnostics(
       [receiver],
-      [makeSignalRecord(1, 'TestSignal', 'tst1', [receiver])]
+      [makeSignalRecord(1, signalName, 'tst1', [receiver])]
     );
-    let renderer;
+    let renderer: any = null;
     act(() => {
       renderer = TestRenderer.create(
         <SignalMonitor signalDiagnostics={diagnostics} />
@@ -126,8 +128,17 @@ describe('SignalMonitor', () => {
     const titles = renderer.root
       .findAll(node => !!node.props.title)
       .map(node => node.props.title);
+    expect(titles).toContain(signalName);
     expect(titles).toContain('from scene -> NewMyObject#1.MyBehavior');
     expect(titles).toContain('payload: tst1');
+
+    const signalNameNode = renderer.root.find(
+      node => node.props.title === signalName
+    );
+    expect(signalNameNode.props.children).toBe(signalName);
+    expect(signalNameNode.props.style.flex).toBe(1);
+    expect(signalNameNode.props.style.minWidth).toBe(0);
+    expect(signalNameNode.parent.props.style.width).toBe('100%');
 
     act(() => renderer.unmount());
   });

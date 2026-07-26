@@ -11,7 +11,7 @@ export type SimplifiedBehavior = {|
   behaviorType: string,
 |};
 
-type SimplifiedVariable = {|
+export type SimplifiedVariable = {|
   variableName: string,
   type: string,
   value?: string,
@@ -59,8 +59,11 @@ type SimplifiedResource = {|
 
 type SimplifiedProject = {|
   properties: {|
+    name: string,
     gameResolutionWidth: number,
     gameResolutionHeight: number,
+    orientation: string,
+    scaleMode: string,
     firstLayout: string,
   |},
   globalObjects: Array<SimplifiedObject>,
@@ -77,6 +80,101 @@ type ProjectSpecificExtensionsSummary = {|
 export type SimplifiedProjectOptions = {|
   scopeToScene?: string,
 |};
+
+export const getVariableTypeAsString = (
+  gd: libGDevelop,
+  variable: gdVariable
+): string => {
+  const type = variable.getType();
+  return type === gd.Variable.String
+    ? 'String'
+    : type === gd.Variable.Enum
+    ? 'Enum'
+    : type === gd.Variable.Number
+    ? 'Number'
+    : type === gd.Variable.Boolean
+    ? 'Boolean'
+    : type === gd.Variable.Structure
+    ? 'Structure'
+    : type === gd.Variable.Array
+    ? 'Array'
+    : 'unknown';
+};
+
+const getVariableValueAsString = (
+  gd: libGDevelop,
+  variable: gdVariable
+): string => {
+  const type = variable.getType();
+  return type === gd.Variable.Structure || type === gd.Variable.Array
+    ? variable.getChildrenCount() === 0
+      ? 'No children'
+      : variable.getChildrenCount() === 1
+      ? '1 child'
+      : `${variable.getChildrenCount()} children`
+    : type === gd.Variable.String || type === gd.Variable.Enum
+    ? variable.getString()
+    : type === gd.Variable.Number
+    ? variable.getValue().toString()
+    : type === gd.Variable.Boolean
+    ? variable.getBool()
+      ? 'True'
+      : 'False'
+    : 'unknown';
+};
+
+export const getSimplifiedVariable = (
+  gd: libGDevelop,
+  name: string,
+  variable: gdVariable
+): SimplifiedVariable => {
+  if (isCollectionVariable(variable)) {
+    if (variable.getType() === gd.Variable.Structure) {
+      return {
+        variableName: name,
+        type: getVariableTypeAsString(gd, variable),
+        variableChildren: variable
+          .getAllChildrenNames()
+          .toJSArray()
+          .map(childName =>
+            getSimplifiedVariable(gd, childName, variable.getChild(childName))
+          ),
+      };
+    }
+    if (variable.getType() === gd.Variable.Array) {
+      return {
+        variableName: name,
+        type: getVariableTypeAsString(gd, variable),
+        variableChildren: mapFor(0, variable.getChildrenCount(), index =>
+          getSimplifiedVariable(
+            gd,
+            index.toString(),
+            variable.getAtIndex(index)
+          )
+        ),
+      };
+    }
+  }
+
+  return {
+    variableName: name,
+    type: getVariableTypeAsString(gd, variable),
+    value: getVariableValueAsString(gd, variable),
+    enumValues:
+      variable.getType() === gd.Variable.Enum
+        ? variable.getEnumValues().toJSArray()
+        : undefined,
+  };
+};
+
+export const getSimplifiedVariablesContainer = (
+  gd: libGDevelop,
+  container: gdVariablesContainer
+): Array<SimplifiedVariable> =>
+  mapFor(0, container.count(), (index: number) => {
+    const name = container.getNameAt(index);
+    return getSimplifiedVariable(gd, name, container.getAt(index));
+  }).filter(Boolean);
 
 export const makeSimplifiedProjectBuilder = (
   gd: libGDevelop
@@ -408,8 +506,11 @@ export const makeSimplifiedProjectBuilder = (
 
     const simplifiedProject: SimplifiedProject = {
       properties: {
+        name: project.getName(),
         gameResolutionWidth: project.getGameResolutionWidth(),
         gameResolutionHeight: project.getGameResolutionHeight(),
+        orientation: project.getOrientation(),
+        scaleMode: project.getScaleMode(),
         firstLayout: project.getFirstLayout(),
       },
       resources: getSimplifiedResourcesJson(project.getResourcesManager()),

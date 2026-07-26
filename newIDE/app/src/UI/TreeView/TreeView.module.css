@@ -55,11 +55,33 @@
   animation-name: wiggle;
   animation-duration: 0.4s;
 }
+.treeView {
+  /* Needed to position the sticky rows container. */
+  position: relative;
+}
 .treeView:focus-visible {
   /**
    * Remove browser-specific style around focused element when hitting an arrow key.
    */
   outline: none;
+}
+
+.stickyRowsContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 2;
+  /* Offset, blur and negative spread so the shadow only shows below,
+   * delimiting the sticky rows from the content scrolling beneath. */
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.25);
+}
+.stickyRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Rows must be opaque as actual rows scroll beneath them. */
+  background-color: var(--theme-surface-canvas-background-color);
 }
 .rowContainer.withCanDropInsideIndicator {
   outline: 1px solid var(--theme-drop-indicator-can-drop-color);

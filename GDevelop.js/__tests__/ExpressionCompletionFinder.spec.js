@@ -21,10 +21,8 @@ describe('gd.ExpressionCompletionFinder', function () {
     const expression = expressionWithCaret.replace('|', '');
     const eventsFunction = new gd.EventsFunction();
     const parameters = eventsFunction.getParameters();
-    parameters.insertNewParameter('MyParameter1', 0)
-      .setType('string');
-    parameters.insertNewParameter('MyParameter2', 1)
-      .setType('number');
+    parameters.insertNewParameter('MyParameter1', 0).setType('string');
+    parameters.insertNewParameter('MyParameter2', 1).setType('number');
 
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
@@ -33,8 +31,10 @@ describe('gd.ExpressionCompletionFinder', function () {
       project,
       layout
     );
-    if (sharedPropertiesContainer) projectScopedContainers.addPropertiesContainer(sharedPropertiesContainer);
-    if (propertiesContainer) projectScopedContainers.addPropertiesContainer(propertiesContainer);
+    if (sharedPropertiesContainer)
+      projectScopedContainers.addPropertiesContainer(sharedPropertiesContainer);
+    if (propertiesContainer)
+      projectScopedContainers.addPropertiesContainer(propertiesContainer);
     projectScopedContainers.addParameters(parameters);
 
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
@@ -69,11 +69,11 @@ describe('gd.ExpressionCompletionFinder', function () {
 
       const makeChildrenTestVariables = (structure) => {
         // Make a structure...
-        structure.castTo('Structure');
+        structure.castTo('structure');
         // With a child structure,
         // useful to test the completion of grand children.
         const structureChild1 = structure.getChild('Child1Structure');
-        structureChild1.castTo('Structure');
+        structureChild1.castTo('structure');
         structureChild1.getChild('Child1StructureChild1');
         structureChild1.getChild('Child1StructureChild2');
         structureChild1.getChild('Child1StructureChild3');
@@ -84,7 +84,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         // With a child array, containing 2 structures and a number.
         // Useful to test completion of the array children.
         const structureChild2 = structure.getChild('Child2Array');
-        structureChild2.castTo('Array');
+        structureChild2.castTo('array');
         const structureChild2Item0 = structureChild2.pushNew();
         const structureChild2Item1 = structureChild2.pushNew();
         const structureChild2Item2 = structureChild2.pushNew();
@@ -96,21 +96,21 @@ describe('gd.ExpressionCompletionFinder', function () {
         structureChild2Item1.getChild('Child2ArrayItem0Child1');
         structureChild2Item1.getChild('Child2ArrayItem0Child2');
         structureChild2Item1.getChild('Child2ArrayItem0Child3');
-        structureChild2Item2.castTo('Number');
+        structureChild2Item2.castTo('number');
 
         // And a child boolean.
         const structureChild3 = structure.getChild('Child3Boolean');
-        structureChild3.castTo('Boolean');
+        structureChild3.castTo('boolean');
       };
 
       object
         .getVariables()
         .insertNew('MyObjectVariableNumber', 0)
-        .castTo('Number');
+        .castTo('number');
       object
         .getVariables()
         .insertNew('MyObjectVariableString', 1)
-        .castTo('String');
+        .castTo('string');
       makeChildrenTestVariables(
         object.getVariables().insertNew('MyObjectVariableStructure', 2)
       );
@@ -162,7 +162,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           .toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 1, no type, 3, no prefix, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 2, number, 3, no prefix, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -184,7 +184,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, MyObjectVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 1, no type, 3, MyObjectVariableStructure, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 2, number, 3, MyObjectVariableStructure, no completion, MySpriteObject, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
@@ -196,7 +196,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           .toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -213,7 +213,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, MyObjectVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyObjectVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -229,7 +229,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         // Completion of the variable, if we move the cursor back:
@@ -240,12 +240,12 @@ describe('gd.ExpressionCompletionFinder', function () {
             'MySpriteObject.MyObjectVariableStructure|.'
           )
         ).toMatchInlineSnapshot(`
-                  [
-                    "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                  ]
-              `);
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
         expect(
           testCompletions(
             'number',
@@ -272,7 +272,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -287,7 +287,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
 
@@ -318,7 +318,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -346,7 +346,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
 
@@ -356,12 +356,12 @@ describe('gd.ExpressionCompletionFinder', function () {
             'MySpriteObject.MyObjectVariableStructure|.Child1Structure.'
           )
         ).toMatchInlineSnapshot(`
-                  [
-                    "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                  ]
-              `);
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
         expect(
           testCompletions(
             'number',
@@ -397,7 +397,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -425,7 +425,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -464,7 +464,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -475,7 +475,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -528,7 +528,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
 
@@ -541,7 +541,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -568,7 +568,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
 
@@ -618,7 +618,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
 
@@ -628,12 +628,12 @@ describe('gd.ExpressionCompletionFinder', function () {
             'GroupOfSpriteObjects.MyObjectVariableStructure|.Child1Structure.'
           )
         ).toMatchInlineSnapshot(`
-                  [
-                    "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                    "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-                  ]
-              `);
+          [
+            "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+          ]
+        `);
         expect(
           testCompletions(
             'number',
@@ -669,7 +669,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -697,7 +697,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -736,7 +736,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -747,7 +747,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 3, no prefix, MyObjectVariableNumber, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 2, no prefix, MyObjectVariableString, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyObjectVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -773,7 +773,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 5, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, MyVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 2, number, 3, MyVariableStructure, no completion, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
@@ -797,7 +797,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 5, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 5, no prefix, MyVariableStructure.Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, MyVariableStructure.Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, MyVariableStructure.Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -808,7 +808,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         // Completion of the previous variables, if we move the cursor back:
@@ -831,7 +831,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -842,7 +842,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         // Completion of the previous variables, if we move the cursor back:
@@ -868,7 +868,7 @@ describe('gd.ExpressionCompletionFinder', function () {
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild2, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 3, no prefix, Child1Structure.Child1StructureChild3, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
       });
@@ -890,7 +890,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -952,7 +952,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(
@@ -985,7 +985,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           [
             "{ 3, no type, 5, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
             "{ 3, no type, 6, no prefix, Child2Array, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
-            "{ 3, no type, 3, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
+            "{ 3, no type, 4, no prefix, Child3Boolean, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
           ]
         `);
         expect(

@@ -106,7 +106,7 @@ export const processEditorFunctionCalls = async ({
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
     const name = functionCall.name;
-    if (!project && name !== 'initialize_project') {
+    if (!project && !editorFunctionsWithoutProject[name]) {
       results.push({
         status: 'finished',
         call_id,
@@ -143,6 +143,9 @@ export const processEditorFunctionCalls = async ({
             message: 'Invalid arguments (not a valid JSON string).',
           },
         });
+        // Without this, the function would still run with `args: undefined`
+        // and a second result would be pushed for the same call_id.
+        continue;
       }
 
       // $FlowFixMe[invalid-compare]

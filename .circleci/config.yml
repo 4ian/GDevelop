@@ -326,7 +326,13 @@ jobs:
 
       - run:
           name: Run tests
-          command: cd GDevelop.js && npm run test -- --maxWorkers=4
+          # Tests are slow under ASan and jest (in a non-TTY environment) only prints
+          # output when a whole test file finishes, so allow long silences instead of
+          # killing the step after the default 10 minutes without output.
+          no_output_timeout: 30m
+          # malloc_context_size: record fewer stack frames on each malloc/free (default
+          # is 30) - a small, free speedup that only shortens traces in ASan reports.
+          command: cd GDevelop.js && ASAN_OPTIONS=malloc_context_size=5 npm run test -- --maxWorkers=4
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

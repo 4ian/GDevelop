@@ -72,6 +72,9 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
+  onImportExtension: () => Promise<void>,
+  canInstallCliInPath: boolean,
+  onInstallCliInPath: () => void | Promise<void>,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -181,6 +184,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenGlobalSearch,
   });
 
+  useCommand('IMPORT_EXTENSION', !!handlers.project, {
+    handler: handlers.onImportExtension,
+  });
+
   const onRestartInGameEditor = handlers.onRestartInGameEditor;
   useCommand('RESTART_IN_GAME_EDITOR', true, {
     handler: React.useCallback(
@@ -191,6 +198,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
     handler: handlers.onOpenMemoryTrackerRegistry,
+  });
+
+  useCommand('INSTALL_CLI_IN_PATH', handlers.canInstallCliInPath, {
+    handler: handlers.onInstallCliInPath,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

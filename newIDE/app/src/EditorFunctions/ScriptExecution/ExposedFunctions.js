@@ -11,8 +11,6 @@ import { type LaunchFunctionCollaborators } from '..';
  * `on*ModifiedOutsideEditor` callbacks, same `modifiesProject` flag).
  */
 
-export { NON_SCRIPTABLE_FUNCTION_NAMES };
-
 // Inexact (trailing `...`) so the real `EditorFunction` / `EditorFunctionWithoutProject`
 // (which also carry `renderForEditor`) are assignable in this exact-by-default repo.
 type EditorFunctionLike = {

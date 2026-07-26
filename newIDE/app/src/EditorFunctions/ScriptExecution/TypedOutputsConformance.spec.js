@@ -84,7 +84,7 @@ const validateResultAgainstSchema = (result: any, toolName: string) => {
   validateValue(result, schema, toolName);
 };
 
-describe('typed-outputs conformance (script API declared reads)', () => {
+describe('typed outputs conformance (script API declared reads)', () => {
   let project: gdProject;
   let testScene: gdLayout;
 

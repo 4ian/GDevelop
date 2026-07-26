@@ -1,10 +1,8 @@
 // @flow
 import { executeScript } from './ScriptRunner';
-import {
-  buildExposedScriptFunctions,
-  NON_SCRIPTABLE_FUNCTION_NAMES,
-} from './ExposedFunctions';
-import { capScriptExecutionResult } from './capScriptOutput';
+import { buildExposedScriptFunctions } from './ExposedFunctions';
+import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
+import { capScriptExecutionResult } from './CapScriptOutput';
 
 // Deliberately gd-free (like ScriptRunner.spec.js): fake registries following
 // the EditorFunction contract, so the exposed-functions bridge and the output

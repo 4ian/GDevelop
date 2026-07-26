@@ -81,7 +81,7 @@ import {
 } from './Utils';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
-import { capScriptExecutionResult } from './ScriptExecution/capScriptOutput';
+import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 export type HintEntry = {|

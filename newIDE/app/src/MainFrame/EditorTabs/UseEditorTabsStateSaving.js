@@ -85,36 +85,29 @@ const useEditorTabsStateSaving = ({
   const saveEditorState = React.useCallback(
     () => {
       // TODO: adapt for saving multiple panes.
-      // Do not save the state if the user is on the start page
-      if (!currentProjectId || editorTabs.panes.center.currentTab === 0) return;
-      const editorState = {
-        currentTab: editorTabs.panes.center.currentTab,
-        editors: editorTabs.panes.center.editors
-          .filter(editor => editor.key !== 'start page')
-          .map(editor => ({
-            projectItemName: editor.projectItemName,
-            editorKind: editor.kind,
-          })),
-      };
+      if (!currentProjectId) return;
+      const editors = editorTabs.panes.center.editors
+        .filter(editor => editor.key !== 'start page')
+        .map(editor => ({
+          projectItemName: editor.projectItemName,
+          editorKind: editor.kind,
+        }));
+      // The start page tab can't be closed, so having no other tab also means
+      // that the project is being opened (its tabs are not restored yet) or
+      // closed. Saving then would overwrite the state about to be restored.
+      if (editors.length === 0) return;
 
-      setEditorStateForProject(
-        currentProjectId,
-        editorState.editors.length === 0
-          ? { editorTabs: null }
-          : { editorTabs: editorState }
-      );
+      setEditorStateForProject(currentProjectId, {
+        editorTabs: {
+          currentTab: editorTabs.panes.center.currentTab,
+          editors,
+        },
+      });
     },
     [currentProjectId, editorTabs, setEditorStateForProject]
   );
 
-  const saveEditorStateDebounced = useDebounce(
-    saveEditorState,
-    // Debounce should be deactivated when currentProjectId is null.
-    // Otherwise, if a project is open and the user switches
-    // to the Home tab and then selects another project, this might save the
-    // second project tabs state for the first project.
-    !!currentProjectId ? 1000 : 0
-  );
+  const saveEditorStateDebounced = useDebounce(saveEditorState, 1000);
 
   React.useEffect(
     () => {
@@ -126,6 +119,21 @@ const useEditorTabsStateSaving = ({
       editorTabs,
       setEditorStateForProject,
     ]
+  );
+
+  const saveEditorStateRef = React.useRef(saveEditorState);
+  React.useEffect(() => {
+    saveEditorStateRef.current = saveEditorState;
+  });
+
+  React.useEffect(
+    () => {
+      // Save the changes still pending in the debounce before the project
+      // changes: they belong to the project being left, and the debounced call
+      // would otherwise run (or be dropped) once it's too late to know that.
+      return () => saveEditorStateRef.current();
+    },
+    [currentProjectId]
   );
 
   const hasAPreviousSaveForEditorTabsState = React.useCallback(

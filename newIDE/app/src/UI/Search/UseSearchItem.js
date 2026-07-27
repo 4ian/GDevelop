@@ -14,6 +14,10 @@ import {
   type PrivateGameTemplateListingData,
   type BundleListingData,
 } from '../../Utils/GDevelopServices/Shop';
+import {
+  getDefaultSearchItemRelevance,
+  type GetSearchItemRelevance,
+} from './SearchItemRelevance';
 
 type SearchableItem =
   | AssetShortHeader
@@ -116,50 +120,6 @@ export const partialQuickSort = <Element: any>(
       searchItems[slidingIndexMax] = swap;
     }
   }
-};
-
-const escapeRegExp = (text: string): string =>
-  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-/**
- * Compute how relevant an item's searchable text is for the given search words.
- *
- * A whole-word match ("car" in "a car") ranks higher than a prefix match
- * ("car" in "cartoon"), which itself ranks higher than a match found somewhere
- * else inside a word ("car" in "scar"). This lets us prioritize complete word
- * matches over the partial matches that the substring-based search engine also
- * returns.
- *
- * The result is always strictly positive so an item that the search engine
- * matched is never excluded from the results.
- */
-export const getTextSearchRelevance = (
-  itemText: string,
-  searchWords: Array<string>
-): number => {
-  if (searchWords.length === 0) return 1;
-
-  const lowerCasedItemText = itemText.toLowerCase();
-  let totalScore = 0;
-  for (const searchWord of searchWords) {
-    const escapedWord = escapeRegExp(searchWord);
-    if (new RegExp(`\\b${escapedWord}\\b`).test(lowerCasedItemText)) {
-      // Whole-word match ("car" in "a car"): the search term is a complete word.
-      totalScore += 1;
-    } else if (new RegExp(`\\b${escapedWord}`).test(lowerCasedItemText)) {
-      // Prefix match: the search term is only the start of a longer word
-      // ("car" in "card", "cartoon"). Heavily penalized so these incomplete
-      // word matches rank well below complete word matches.
-      totalScore += 0.2;
-    } else if (lowerCasedItemText.includes(searchWord)) {
-      // Match somewhere inside a word ("car" in "scar"). Penalized even more.
-      totalScore += 0.1;
-    }
-  }
-
-  // Keep the relevance strictly positive so a matched item is never filtered
-  // out, while still being lower than any real match.
-  return Math.max(totalScore / searchWords.length, 0.05);
 };
 
 /**
@@ -280,7 +240,10 @@ export const useSearchItem = <SearchItem: SearchableItem>(
   searchText: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
-  searchFilters?: Array<SearchFilter<SearchItem>>
+  searchFilters?: Array<SearchFilter<SearchItem>>,
+  // Relevance of an item for the search: defined by the caller (which knows
+  // what is being searched), or this generic text-based default.
+  getSearchItemRelevance: GetSearchItemRelevance<SearchItem> = getDefaultSearchItemRelevance
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<SearchItem>>(
@@ -386,111 +349,18 @@ export const useSearchItem = <SearchItem: SearchableItem>(
               } items in ${totalTime.toFixed(3)}ms.`
             );
 
-            // Prioritize whole-word matches (e.g. "car") over partial matches
-            // (e.g. "card", "cartoon") returned by the substring search engine.
-            const searchWords = searchText
-              .toLowerCase()
-              .split(/\s+/)
-              .filter(Boolean);
-            const normalizedSearchText = searchText.trim().toLowerCase();
-
-            // ---- Score weights ----
-            // Width of a priority band. The within-band score always stays well
-            // below this value, so an item in a higher band always outranks any
-            // item in a lower band (strict, non-overlapping ordering).
-            const BAND_WIDTH = 10;
-            // Weight of the name match added to the within-band score, so that
-            // (inside a band) an item with the searched word in its name ranks
-            // above one matching only through its tags.
-            const NAME_MATCH_WEIGHT = 0.5;
-            // Many-tags malus: the within-band score is multiplied by
-            // MANY_TAGS_MALUS_FLOOR + (1 - MANY_TAGS_MALUS_FLOOR) * ratio of
-            // matching tags. An item whose tags nearly all match keeps almost
-            // its full score; one matching through a tiny fraction of its tags
-            // is reduced down to the floor (never to zero, so it stays listed).
-            const MANY_TAGS_MALUS_FLOOR = 0.15;
-            // A tag counts as "matching" when its text relevance reaches at
-            // least this threshold (a prefix match scores 0.2, a whole-word
-            // match 1, so this keeps only strong tag matches).
-            const MATCHING_TAG_RELEVANCE_THRESHOLD = 0.5;
-
-            const getSearchItemRelevance = (searchItem: SearchItem) => {
-              // Base text relevance (whole word > prefix > substring). Only used
-              // to order items *within* a band, never to cross between bands.
-              let withinBandScore = getTextSearchRelevance(
-                getItemDescription(searchItem),
-                searchWords
-              );
-
-              // How well the item's name matches. A whole-word match of the
-              // search term in the name yields a relevance >= 1.
-              // $FlowFixMe[prop-missing] - most searchable items have a name.
-              const name: ?string = searchItem.name;
-              const nameRelevance = name
-                ? getTextSearchRelevance(name, searchWords)
-                : 0;
-
-              // When an item has many tags but only a few match the search, the
-              // match is diluted: it is likely less focused on what the user is
-              // looking for (e.g. an aerosol tagged "car" among 30 other tags).
-              // Reduce the within-band score sharply, proportionally to the
-              // share of matching tags, so a heavily diluted match sinks below
-              // cleaner partial matches. A small floor keeps it in the results.
-              // $FlowFixMe[prop-missing] - only AssetShortHeader/ResourceV2 have tags.
-              const tags: ?Array<string> = searchItem.tags;
-              if (tags && tags.length > 0) {
-                const matchingTagsCount = tags.filter(
-                  tag =>
-                    getTextSearchRelevance(tag, searchWords) >=
-                    MATCHING_TAG_RELEVANCE_THRESHOLD
-                ).length;
-                const matchingTagsRatio = matchingTagsCount / tags.length;
-                withinBandScore *=
-                  MANY_TAGS_MALUS_FLOOR +
-                  (1 - MANY_TAGS_MALUS_FLOOR) * matchingTagsRatio;
-              }
-
-              // Within a band, an item whose name contains the searched word
-              // still ranks above one matching only through its tags.
-              withinBandScore += NAME_MATCH_WEIGHT * nameRelevance;
-
-              // An "exact word" match: the whole search term appears as a
-              // complete word in the name, or the item has a tag exactly equal
-              // to the search term. This is the strongest relevance signal.
-              const hasWholeWordInName = nameRelevance >= 1;
-              const hasExactTag = !!(
-                tags &&
-                tags.some(
-                  tag => tag.trim().toLowerCase() === normalizedSearchText
-                )
-              );
-              const hasExactWord = hasWholeWordInName || hasExactTag;
-
-              // 3D assets are preferred over 2D ones.
-              const is3DAsset =
-                // $FlowFixMe[prop-missing] - only AssetShortHeader has objectType.
-                searchItem.objectType === 'Scene3D::Model3DObject';
-
-              // Strict, non-overlapping bands enforce the priority order:
-              //   1. 3D assets with an exact word match      (+2 * BAND_WIDTH)
-              //   2. 2D assets with an exact word match       (+1 * BAND_WIDTH)
-              //   3. everything else (partial name match / single full tag),
-              //      ordered by the within-band score with the many-tags malus.
-              let score = withinBandScore;
-              if (hasExactWord) {
-                score += BAND_WIDTH; // Lift exact-word matches above the rest.
-                if (is3DAsset) score += BAND_WIDTH; // 3D-exact above 2D-exact.
-              }
-              return score;
-            };
-
             setSearchResults(
               filterSearchItems(
                 partialSearchResults,
                 chosenCategory,
                 chosenFilters,
                 searchFilters,
-                getSearchItemRelevance
+                searchItem =>
+                  getSearchItemRelevance(
+                    searchItem,
+                    getItemDescription(searchItem),
+                    searchText
+                  )
               )
             );
           });
@@ -514,6 +384,7 @@ export const useSearchItem = <SearchItem: SearchableItem>(
       searchFilters,
       searchApi,
       getItemDescription,
+      getSearchItemRelevance,
     ]
   );
 

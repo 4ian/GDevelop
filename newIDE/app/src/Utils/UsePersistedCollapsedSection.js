@@ -28,17 +28,6 @@ export const usePersistedCollapsedSection = ({
   } = React.useContext(PreferencesContext);
   const projectId = project.getProjectUuid();
 
-  const saveScrollTimeoutId = React.useRef<?TimeoutID>(null);
-  React.useEffect(
-    () => () => {
-      if (saveScrollTimeoutId.current) {
-        clearTimeout(saveScrollTimeoutId.current);
-        saveScrollTimeoutId.current = null;
-      }
-    },
-    []
-  );
-
   const isSectionFolded = React.useCallback(
     (sectionId: string): boolean => {
       const editorStateForProject = getEditorStateForProject(projectId);

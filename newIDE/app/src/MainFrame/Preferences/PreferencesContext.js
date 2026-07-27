@@ -177,7 +177,14 @@ export const allAlertMessages: Array<{
  */
 export type EditorStateForProject = {|
   editorTabs: EditorTabsPersistedState | null,
-  propertiesPanelScroll: { [string]: { [string]: number } },
+  propertiesPanel: {
+    [string]: {
+      [string]: {
+        scrollPosition: number,
+        collapsedSections: { [string]: boolean },
+      },
+    },
+  },
 |};
 
 // $FlowFixMe[deprecated-utility]

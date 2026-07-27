@@ -74,7 +74,13 @@ const styles = {
   },
 };
 
-type DraggedSpriteItem = {| directionPtr: number |};
+// `name` and `thumbnail` are displayed by the `CustomDragLayer` as a preview
+// under the cursor or finger during the drag.
+type DraggedSpriteItem = {|
+  directionPtr: number,
+  name: string,
+  thumbnail: string,
+|};
 
 // On touch screens, only start dragging a sprite if the finger stayed on it
 // for a while: quicker movements are scrolling the list. The delay is kept
@@ -564,12 +570,78 @@ const SpritesList = ({
     [forceUpdate]
   );
 
-  const spriteContextMenuIndex = React.useRef<number | null>(null);
+  const getSelectedSpriteIndexes = React.useCallback(
+    () => {
+      const selectedIndexes = [];
+      mapFor(0, direction.getSpritesCount(), i => {
+        if (selectedSprites.current[direction.getSprite(i).ptr]) {
+          selectedIndexes.push(i);
+        }
+      });
+      return selectedIndexes;
+    },
+    [direction]
+  );
+
+  const moveSelectedSpritesToPosition = React.useCallback(
+    (targetStartIndex: number) => {
+      const spritesCount = direction.getSpritesCount();
+      const selectedIndexes = getSelectedSpriteIndexes();
+      if (selectedIndexes.length === 0) return;
+      const startIndex = Math.min(
+        targetStartIndex,
+        spritesCount - selectedIndexes.length
+      );
+
+      // First gather the selected sprites at the end of the list, in order:
+      // moving a sprite to the last position never disturbs the sprites
+      // already gathered there. `currentPositions` keeps track of how each
+      // move shifts the other sprites.
+      const selectedCount = selectedIndexes.length;
+      const currentPositions = mapFor(0, spritesCount, i => i);
+      selectedIndexes.forEach(selectedIndex => {
+        const fromIndex = currentPositions.indexOf(selectedIndex);
+        if (fromIndex !== spritesCount - 1) {
+          direction.moveSprite(fromIndex, spritesCount - 1);
+        }
+        currentPositions.push(currentPositions.splice(fromIndex, 1)[0]);
+      });
+      // Then move this block of sprites to its final position, in order:
+      // each move leaves the rest of the block in place.
+      mapFor(0, selectedCount, j => {
+        const fromIndex = spritesCount - selectedCount + j;
+        const toIndex = startIndex + j;
+        if (fromIndex !== toIndex) direction.moveSprite(fromIndex, toIndex);
+      });
+
+      // As sprites were moved, the pointers of the selected sprites are now
+      // the ones at the final positions of the selection.
+      const newSelectedSprites: { [number]: boolean } = {};
+      mapFor(0, selectedCount, j => {
+        newSelectedSprites[direction.getSprite(startIndex + j).ptr] = true;
+      });
+      selectedSprites.current = newSelectedSprites;
+
+      forceUpdate();
+      if (onSpriteUpdated) onSpriteUpdated();
+      if (startIndex === 0 || selectedIndexes[0] === 0) {
+        // A sprite was moved from or to the first position,
+        // so the first sprite has changed.
+        if (onFirstSpriteUpdated) onFirstSpriteUpdated();
+      }
+    },
+    [
+      direction,
+      getSelectedSpriteIndexes,
+      forceUpdate,
+      onSpriteUpdated,
+      onFirstSpriteUpdated,
+    ]
+  );
 
   const openSpriteContextMenu = React.useCallback(
     // $FlowFixMe[missing-local-annot]
-    (x, y, sprite, index) => {
-      spriteContextMenuIndex.current = index;
+    (x, y, sprite) => {
       // When the context menu opens (long press on mobile), it intercepts
       // subsequent touch events, so the drag backend would never receive
       // touchend and a drag started by the press would stay active
@@ -630,7 +702,16 @@ const SpritesList = ({
                 beginDrag={() => {
                   draggedSpriteIndex.current = i;
                   startAutoScroll();
-                  return { directionPtr: direction.ptr };
+                  const imageName = sprite.getImageName();
+                  return {
+                    directionPtr: direction.ptr,
+                    name: imageName,
+                    thumbnail: resourcesLoader.getResourceFullUrl(
+                      project,
+                      imageName,
+                      {}
+                    ),
+                  };
                 }}
                 endDrag={stopAutoScroll}
                 // If there is only one sprite, don't make it draggable.
@@ -657,7 +738,7 @@ const SpritesList = ({
                               addSpriteToSelection(sprite, selected)
                             }
                             onContextMenu={(x, y) =>
-                              openSpriteContextMenu(x, y, sprite, i)
+                              openSpriteContextMenu(x, y, sprite)
                             }
                             resourceName={sprite.getImageName()}
                             resourcesLoader={resourcesLoader}
@@ -699,10 +780,16 @@ const SpritesList = ({
         <ContextMenu
           ref={spriteContextMenu}
           buildMenuTemplate={(i18n: I18nType) => {
-            const menuSpriteIndex = spriteContextMenuIndex.current;
-            // Read the count when the menu is opened, so that the menu
-            // is always up to date with the sprites in the direction.
+            // Read the sprites and the selection when the menu is opened,
+            // so that the menu is always up to date.
             const menuSpritesCount = direction.getSpritesCount();
+            const selectedIndexes = getSelectedSpriteIndexes();
+            // The position at which the selection starts when moved to the end.
+            const lastStartIndex = menuSpritesCount - selectedIndexes.length;
+            const isSelectionAtPosition = (startIndex: number) =>
+              selectedIndexes.every(
+                (selectedIndex, j) => selectedIndex === startIndex + j
+              );
             return [
               {
                 label: i18n._(t`Delete selection`),
@@ -712,25 +799,32 @@ const SpritesList = ({
                 label: i18n._(t`Duplicate selection`),
                 click: duplicateSprites,
               },
-              ...(menuSpriteIndex !== null && menuSpritesCount > 1
+              ...(menuSpritesCount > 1 && selectedIndexes.length > 0
                 ? [
                     { type: 'separator' },
-                    ...mapFor(0, menuSpritesCount, index => {
-                      let label;
-                      if (index === 0) {
-                        label = t`Move to beginning`;
-                      } else if (index === menuSpritesCount - 1) {
-                        label = t`Move to end`;
-                      } else {
-                        label = t`Move to position ${index}`;
-                      }
-
-                      return {
-                        label: i18n._(label),
-                        click: () => moveSpriteToIndex(menuSpriteIndex, index),
-                        enabled: index !== menuSpriteIndex,
-                      };
-                    }),
+                    {
+                      label: i18n._(t`Move to beginning`),
+                      click: () => moveSelectedSpritesToPosition(0),
+                      enabled: !isSelectionAtPosition(0),
+                    },
+                    ...(lastStartIndex >= 2
+                      ? [
+                          {
+                            label: i18n._(t`Move to position`),
+                            submenu: mapFor(1, lastStartIndex, index => ({
+                              label: i18n._(t`Position ${index}`),
+                              click: () => moveSelectedSpritesToPosition(index),
+                              enabled: !isSelectionAtPosition(index),
+                            })),
+                          },
+                        ]
+                      : []),
+                    {
+                      label: i18n._(t`Move to end`),
+                      click: () =>
+                        moveSelectedSpritesToPosition(lastStartIndex),
+                      enabled: !isSelectionAtPosition(lastStartIndex),
+                    },
                   ]
                 : []),
             ];

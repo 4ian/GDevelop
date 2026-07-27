@@ -8,6 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
+import CustomDragLayer from '../../../UI/DragAndDrop/CustomDragLayer';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -191,6 +192,7 @@ export const ManyShortAnimations = (): React.Node => {
           onObjectUpdated={notifyOfChange}
         />
       </FixedHeightFlexContainer>
+      <CustomDragLayer />
     </DragAndDropContextProvider>
   );
 };
@@ -229,6 +231,7 @@ export const ManyFramesInOneAnimation = (): React.Node => {
           onObjectUpdated={notifyOfChange}
         />
       </FixedHeightFlexContainer>
+      <CustomDragLayer />
     </DragAndDropContextProvider>
   );
 };

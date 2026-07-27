@@ -6,9 +6,16 @@
  */
 
 // What the default relevance reads on an item. Extra properties are ignored.
-type SearchableItemProperties = { +name?: string, +tags?: Array<string> };
+// An interface, so class instances (like the resources store items) are also
+// accepted.
+interface SearchableItemProperties {
+  +name?: string;
+  +tags?: Array<string>;
+}
 
-export type GetSearchItemRelevance<SearchItem> = (
+// Contravariant in SearchItem: a scorer reading only the generic searchable
+// properties can be used wherever a scorer for a more specific item is needed.
+export type GetSearchItemRelevance<-SearchItem> = (
   searchItem: SearchItem,
   itemText: string,
   searchText: string

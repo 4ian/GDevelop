@@ -1,7 +1,6 @@
 const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
-const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -75,6 +74,7 @@ const {
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { handleGitToolRequest } = require('./GitTool');
+const { launchNpmScriptInTerminal } = require('./NpmScriptRunner');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -1104,77 +1104,34 @@ app.on('ready', function() {
 
   setUpDiscordRichPresence(ipcMain);
 
-  const NPM_SCRIPT_COMMAND_FAILED_MESSAGE = 'Command failed!';
-
   // npm script execution in external terminal (cross-platform)
   ipcMain.on(
     'run-npm-script',
-    (event, { projectPath, npmScript, keepTerminalOpen }) => {
+    (
+      event,
+      {
+        projectPath,
+        npmScript,
+        keepTerminalOpen,
+        installDependencies,
+        openFolderAfterSuccess,
+      }
+    ) => {
       log.info(`Running npm script "${npmScript}" in ${projectPath}`);
 
-      const platform = process.platform;
-      const npmCommand = `npm run ${npmScript}`;
-      const keepOpen = !!keepTerminalOpen;
-
       try {
-        if (platform === 'win32') {
-          const innerCmd = keepOpen
-            ? `cd /d ${projectPath} && ${npmCommand}`
-            : `cd /d ${projectPath} && ${npmCommand} || (echo. & echo ${NPM_SCRIPT_COMMAND_FAILED_MESSAGE} & pause)`;
-          const cmdCloseFlag = keepOpen ? '/k' : '/c';
-          child_process
-            .spawn(
-              'cmd.exe',
-              ['/c', 'start', 'cmd.exe', cmdCloseFlag, innerCmd],
-              {
-                detached: true,
-                stdio: 'ignore',
-              }
-            )
-            .unref();
-        } else if (platform === 'darwin') {
-          const escapedPath = projectPath.replace(/'/g, "'\\''");
-          const shellCommand = keepOpen
-            ? `cd '${escapedPath}' && ${npmCommand}`
-            : `cd '${escapedPath}' && ${npmCommand} && exit || echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"`;
-          const script = `tell application "Terminal" to do script "${shellCommand.replace(
-            /"/g,
-            '\\"'
-          )}"`;
-          child_process.spawn('osascript', ['-e', script], {
-            detached: true,
-            stdio: 'ignore',
-          });
-        } else {
-          const bashCommand = keepOpen
-            ? `cd "${projectPath}" && ${npmCommand}; exec bash`
-            : `cd "${projectPath}" && ${npmCommand} || { echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"; exec bash; }`;
-          const terminals = [
-            {
-              cmd: 'x-terminal-emulator',
-              args: ['-e', 'bash', '-c', bashCommand],
-            },
-            { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
-            { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
-            { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
-          ];
-
-          const tryTerminal = index => {
-            if (index >= terminals.length) {
-              log.error('No terminal emulator found');
-              return;
-            }
-            const terminal = terminals[index];
-            const proc = child_process.spawn(terminal.cmd, terminal.args, {
-              detached: true,
-              stdio: 'ignore',
-            });
-            proc.on('error', () => tryTerminal(index + 1));
-            proc.unref();
-          };
-
-          tryTerminal(0);
-        }
+        launchNpmScriptInTerminal(
+          {
+            projectPath,
+            npmScript,
+            keepTerminalOpen,
+            installDependencies,
+            openFolderAfterSuccess,
+          },
+          {
+            onError: error => log.error('Failed to run npm script:', error),
+          }
+        );
       } catch (err) {
         log.error('Failed to run npm script:', err);
       }

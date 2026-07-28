@@ -54,8 +54,10 @@ export const ExportFlow = ({
 
 export const DoneFooter = ({
   renderGameButton,
+  renderBuildButton,
 }: {|
   renderGameButton: () => React.Node,
+  renderBuildButton?: () => React.Node,
 |}): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
@@ -72,14 +74,25 @@ export const DoneFooter = ({
         </Text>
       </LineStackLayout>
       <Text>
-        <Trans>
-          The game was properly exported. You can now use Electron Builder (you
-          need Node.js installed and to use the command-line on your computer to
-          run it) to create an executable.
-        </Trans>
+        {renderBuildButton ? (
+          <Trans>
+            The game was properly exported. You can now build a binary for your
+            current operating system. Node.js must be installed on your
+            computer.
+          </Trans>
+        ) : (
+          <Trans>
+            The game was properly exported. You can now use Electron Builder
+            (you need Node.js installed and to use the command-line on your
+            computer to run it) to create an executable.
+          </Trans>
+        )}
       </Text>
       <ColumnStackLayout justifyContent="center">
-        <Line justifyContent="center">{renderGameButton()}</Line>
+        <LineStackLayout justifyContent="center" alignItems="center">
+          {renderGameButton()}
+          {renderBuildButton ? renderBuildButton() : null}
+        </LineStackLayout>
         <FlatButton
           label={<Trans>Learn more about manual builds</Trans>}
           primary

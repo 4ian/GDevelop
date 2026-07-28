@@ -426,18 +426,21 @@ namespace gdjs {
           // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
           // it will fail.
           await new Promise<void>((resolve, reject) => {
-            const texture = PIXI.Texture.from(resourceUrl, {
-              resourceOptions: {
-                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                )
-                  ? 'use-credentials'
-                  : 'anonymous',
-                autoPlay: false,
-              },
-            }).on('error', (error) => {
-              reject(error);
+            // The resource is explicitly built as a video one: `PIXI.Texture.from`
+            // picks the kind of resource from the file extension of the URL,
+            // and there is none when the game resources were packed at export
+            // (the video is then read from a `blob:` URL).
+            const videoResource = new PIXI.VideoResource(resourceUrl, {
+              crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                resource.file
+              )
+                ? 'use-credentials'
+                : 'anonymous',
+              autoPlay: false,
             });
+            const texture = new PIXI.Texture(
+              new PIXI.BaseTexture(videoResource)
+            );
 
             const baseTexture = texture.baseTexture;
             baseTexture

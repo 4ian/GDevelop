@@ -20,12 +20,14 @@ import {
   ExportFlow,
 } from '../GenericExporters/CordovaExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
 const remote = optionalRequire('@electron/remote');
 const shell = remote ? remote.shell : null;
 
+const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
 type ExportState = {
@@ -161,11 +163,21 @@ export const localCordovaExportPipeline: ExportPipeline<
     return null;
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     exportOutput: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
-    return Promise.resolve(null);
+    // The export is a folder, so there is nothing to compress. This is where
+    // the resources are gathered into a few ".gdpak" archives instead, now
+    // that the ones stored as URLs have been downloaded.
+    if (context.packResources) {
+      await packResourcesInFolder({
+        exportDir: path.join(context.exportState.outputDir, 'www'),
+        onProgress: context.updateStepProgress,
+      });
+    }
+
+    return null;
   },
 
   renderDoneFooter: ({ exportState }) => {

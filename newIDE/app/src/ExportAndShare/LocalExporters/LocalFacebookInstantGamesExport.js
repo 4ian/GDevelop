@@ -21,6 +21,7 @@ import {
   ExportFlow,
 } from '../GenericExporters/FacebookInstantGamesExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 
 const path = optionalRequire('path');
 // It's important to use remote and not electron for folder actions,
@@ -184,10 +185,19 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
     return { temporaryOutputDir };
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { temporaryOutputDir }: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the archive holds a few files rather than one per resource.
+    if (context.packResources) {
+      await packResourcesInFolder({
+        exportDir: temporaryOutputDir,
+        onProgress: context.updateStepProgress,
+      });
+    }
+
     return archiveLocalFolder({
       path: temporaryOutputDir,
       outputFilename: context.exportState.archiveOutputFilename,

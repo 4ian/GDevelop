@@ -80,6 +80,7 @@ const PreferencesDialog = ({
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
+    setPackResourcesAtExport,
     setDisplaySaveReminder,
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
@@ -307,6 +308,20 @@ const PreferencesDialog = ({
               checked={values.autoDisplayChangelog}
               label={i18n._(
                 t`Display What's New when a new version is launched (recommended)`
+              )}
+            />
+          </ColumnStackLayout>
+          <Text size="block-title">
+            <Trans>Export</Trans>
+          </Text>
+          <ColumnStackLayout expand>
+            <CompactToggleField
+              labelColor="primary"
+              hideTooltip
+              onCheck={setPackResourcesAtExport}
+              checked={values.packResourcesAtExport}
+              label={i18n._(
+                t`Pack the game resources into a few files when exporting (recommended: avoids the file count limits of itch.io and other hosting services)`
               )}
             />
           </ColumnStackLayout>

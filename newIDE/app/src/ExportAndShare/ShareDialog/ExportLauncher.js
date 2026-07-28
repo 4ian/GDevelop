@@ -32,6 +32,9 @@ import inc from 'semver/functions/inc';
 import Toggle from '../../UI/Toggle';
 import AlertMessage from '../../UI/AlertMessage';
 import { type GameAndBuildsManager } from '../../Utils/UseGameAndBuildsManager';
+import PreferencesContext, {
+  type Preferences,
+} from '../../MainFrame/Preferences/PreferencesContext';
 
 type State = {|
   exportStep: BuildStep,
@@ -117,6 +120,9 @@ const getErrorMessage = (i18n: I18nType, exportStep: BuildStep) => {
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
+  static contextType: React.Context<Preferences> = PreferencesContext;
+  context: Preferences;
+
   state: State = {
     exportStep: '',
     build: null,
@@ -271,6 +277,7 @@ export default class ExportLauncher extends Component<Props, State> {
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
         i18n,
+        packResources: this.context.values.packResourcesAtExport,
       };
 
       if (

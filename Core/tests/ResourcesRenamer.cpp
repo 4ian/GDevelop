@@ -91,4 +91,37 @@ TEST_CASE("ResourcesRenamer", "[common]") {
         "{\"embeddedResourcesMapping\":{\"some-resource-name\":"
         "\"RenamedResource1\",\"some-other-resource-name\":\"Resource2\"}}");
   }
+
+  SECTION("It renames the texture files embedded in a 3D model") {
+    gd::Project project;
+    std::map<gd::String, gd::String> renamings = {
+        {"colormap.png", "RenamedColormap.png"}};
+    gd::ResourcesRenamer resourcesRenamer(project.GetResourcesManager(),
+                                          renamings);
+
+    // Add the image resource created for the texture file of a model.
+    gd::ImageResource textureResource;
+    textureResource.SetName("colormap.png");
+    project.GetResourcesManager().AddResource(textureResource);
+
+    // Add a 3D model referring to this texture file.
+    gd::Model3DResource model3DResource;
+    model3DResource.SetName("Model");
+    model3DResource.SetMetadata(
+        "{ \"embeddedResourcesMapping\": {\"../Textures/colormap.png\": "
+        "\"colormap.png\"} }");
+    project.GetResourcesManager().AddResource(model3DResource);
+
+    // Expose the model like an object using it would do.
+    gd::String model3DResourceName = "Model";
+    resourcesRenamer.ExposeResourceWithType("model3D", model3DResourceName);
+
+    // Check that the name of the texture was updated in the mapping, while the
+    // path written inside the model file was left untouched.
+    REQUIRE(project.GetResourcesManager().HasResource("Model") == true);
+    REQUIRE(
+        project.GetResourcesManager().GetResource("Model").GetMetadata() ==
+        "{\"embeddedResourcesMapping\":{\"../Textures/"
+        "colormap.png\":\"RenamedColormap.png\"}}");
+  }
 }

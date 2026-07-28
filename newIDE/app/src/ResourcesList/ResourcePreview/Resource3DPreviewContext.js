@@ -13,6 +13,7 @@ type WorkerRenderModelMessage = {|
   resourceUrl: string,
   resourceData: ArrayBuffer,
   basePath: string,
+  embeddedTextures: { [filePath: string]: ArrayBuffer } | null,
 |};
 
 type WorkerOutInitMessage = {|
@@ -38,11 +39,19 @@ type WorkerOutMessage =
   | WorkerOutRenderErrorMessage;
 
 export type Resource3DPreviewState = {|
-  getResourcePreview: (resourceUrl: string) => Promise<?string>,
+  getResourcePreview: (
+    resourceUrl: string,
+    // For models keeping their textures in separate files, the URL of each of
+    // these files, indexed by the path written inside the model.
+    embeddedTextureUrls?: ?{ [filePath: string]: string }
+  ) => Promise<?string>,
 |};
 
 const initialResource3DPreviewState = {
-  getResourcePreview: async (_resourceUrl: string) => null,
+  getResourcePreview: async (
+    _resourceUrl: string,
+    _embeddedTextureUrls?: ?{ [filePath: string]: string }
+  ) => null,
 };
 
 const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
@@ -141,7 +150,8 @@ class Resource3DPreviewWorkerManager {
   renderModel(
     resourceUrl: string,
     resourceData: ArrayBuffer,
-    basePath: string
+    basePath: string,
+    embeddedTextures: { [filePath: string]: ArrayBuffer } | null
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       if (!this.isInitialized) {
@@ -156,9 +166,13 @@ class Resource3DPreviewWorkerManager {
         resourceUrl,
         resourceData,
         basePath,
+        embeddedTextures,
       };
-      // Transfer the ArrayBuffer to avoid copying it across threads.
-      this.worker.postMessage(message, [resourceData]);
+      // Transfer the ArrayBuffers to avoid copying them across threads.
+      this.worker.postMessage(message, [
+        resourceData,
+        ...(embeddedTextures ? Object.values(embeddedTextures) : []),
+      ]);
     });
   }
 
@@ -178,7 +192,11 @@ export const Resource3DPreviewProvider = ({
 }: Props): React.MixedElement => {
   const [currentResource, setCurrentResource] = React.useState<?string>(null);
   const queueRef = React.useRef<
-    Array<{ url: string, resolve: (dataUrl: ?string) => void }>
+    Array<{
+      url: string,
+      embeddedTextureUrls: ?{ [filePath: string]: string },
+      resolve: (dataUrl: ?string) => void,
+    }>
   >([]);
   const previewCache = React.useRef<{ [url: string]: string }>({});
   const workerManagerRef = React.useRef<?Resource3DPreviewWorkerManager>(null);
@@ -200,62 +218,104 @@ export const Resource3DPreviewProvider = ({
     };
   }, []);
 
-  const enqueueResource = React.useCallback((url: string): Promise<?string> => {
-    return new Promise(resolve => {
-      // If it's already in the cache, resolve immediately.
-      if (previewCache.current[url]) {
-        resolve(previewCache.current[url]);
-        return;
-      }
+  const enqueueResource = React.useCallback(
+    (
+      url: string,
+      embeddedTextureUrls?: ?{ [filePath: string]: string }
+    ): Promise<?string> => {
+      return new Promise(resolve => {
+        // If it's already in the cache, resolve immediately.
+        if (previewCache.current[url]) {
+          resolve(previewCache.current[url]);
+          return;
+        }
 
-      // Add the item to the queue.
-      queueRef.current.push({ url, resolve });
-      // If the queue didn't have items before,
-      // then process it immediately.
-      // Otherwise, let the queue process handle it.
-      if (queueRef.current.length === 1) {
-        setCurrentResource(url);
-      }
-    });
-  }, []);
-
-  const renderModel = React.useCallback(async (url: string) => {
-    const workerManager = workerManagerRef.current;
-    if (!workerManager) {
-      return null;
-    }
-
-    // Fetch the resource data on the main thread. Workers in Electron cannot
-    // fetch file:// URLs because webSecurity:false only applies to the renderer
-    // process, not the network service process used by workers.
-    let resourceData: ArrayBuffer;
-    try {
-      const response = await fetch(url, {
-        credentials: checkIfCredentialsRequired(url)
-          ? 'include'
-          : 'same-origin',
+        // Add the item to the queue.
+        queueRef.current.push({ url, embeddedTextureUrls, resolve });
+        // If the queue didn't have items before,
+        // then process it immediately.
+        // Otherwise, let the queue process handle it.
+        if (queueRef.current.length === 1) {
+          setCurrentResource(url);
+        }
       });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      resourceData = await response.arrayBuffer();
-    } catch (error) {
-      console.error('Error fetching 3D model resource:', error);
-      return 'JsPlatform/Extensions/3d_model.svg';
-    }
+    },
+    []
+  );
 
-    const basePath = url.substring(0, url.lastIndexOf('/') + 1);
+  const renderModel = React.useCallback(
+    async (
+      url: string,
+      embeddedTextureUrls: ?{ [filePath: string]: string }
+    ) => {
+      const workerManager = workerManagerRef.current;
+      if (!workerManager) {
+        return null;
+      }
 
-    try {
-      const dataUrl = await workerManager.renderModel(
-        url,
-        resourceData,
-        basePath
-      );
-      return dataUrl;
-    } catch (error) {
-      console.error('Error rendering 3D model:', error);
-      return 'JsPlatform/Extensions/3d_model.svg';
-    }
-  }, []);
+      // Fetch the resource data on the main thread. Workers in Electron cannot
+      // fetch file:// URLs because webSecurity:false only applies to the renderer
+      // process, not the network service process used by workers.
+      const fetchArrayBuffer = async (
+        resourceUrl: string
+      ): Promise<ArrayBuffer> => {
+        const response = await fetch(resourceUrl, {
+          credentials: checkIfCredentialsRequired(resourceUrl)
+            ? 'include'
+            : 'same-origin',
+        });
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        return response.arrayBuffer();
+      };
+
+      let resourceData: ArrayBuffer;
+      try {
+        resourceData = await fetchArrayBuffer(url);
+      } catch (error) {
+        console.error('Error fetching 3D model resource:', error);
+        return 'JsPlatform/Extensions/3d_model.svg';
+      }
+
+      // Fetch the textures that the model keeps in separate files, if any. A
+      // texture that can't be fetched is skipped: the model is still worth being
+      // displayed without it.
+      let embeddedTextures = null;
+      if (embeddedTextureUrls) {
+        const fetchedTextures: { [filePath: string]: ArrayBuffer } = {};
+        embeddedTextures = fetchedTextures;
+        await Promise.all(
+          Object.entries(embeddedTextureUrls).map(
+            async ([filePath, textureUrl]) => {
+              try {
+                fetchedTextures[filePath] = await fetchArrayBuffer(textureUrl);
+              } catch (error) {
+                console.error(
+                  `Error fetching the texture ${textureUrl} of a 3D model:`,
+                  error
+                );
+              }
+            }
+          )
+        );
+      }
+
+      const basePath = url.substring(0, url.lastIndexOf('/') + 1);
+
+      try {
+        const dataUrl = await workerManager.renderModel(
+          url,
+          resourceData,
+          basePath,
+          embeddedTextures
+        );
+        return dataUrl;
+      } catch (error) {
+        console.error('Error rendering 3D model:', error);
+        return 'JsPlatform/Extensions/3d_model.svg';
+      }
+    },
+    []
+  );
 
   // Effect to process the current resource
   React.useEffect(
@@ -263,7 +323,13 @@ export const Resource3DPreviewProvider = ({
       if (!currentResource) return;
 
       const processResource = async () => {
-        const dataUrl = await renderModel(currentResource);
+        const queueItem = queueRef.current.find(
+          item => item.url === currentResource
+        );
+        const dataUrl = await renderModel(
+          currentResource,
+          queueItem ? queueItem.embeddedTextureUrls : null
+        );
 
         // Handle the result
         if (dataUrl) {

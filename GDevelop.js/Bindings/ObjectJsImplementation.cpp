@@ -206,6 +206,7 @@ void ObjectJsImplementation::ExposeResources(gd::ArbitraryResourceWorker& worker
         worker.ExposeBitmapFont(newPropertyValue);
       } else if (resourceType == "model3D") {
         worker.ExposeModel3D(newPropertyValue);
+        worker.ExposeEmbeddeds(newPropertyValue);
       } else if (resourceType == "atlas") {
         worker.ExposeAtlas(newPropertyValue);
       } else if (resourceType == "spine") {

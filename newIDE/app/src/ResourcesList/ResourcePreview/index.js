@@ -8,6 +8,7 @@ import File from '../../UI/CustomSvgIcons/File';
 import Video from '../../UI/CustomSvgIcons/Video';
 import Model3DPreview from './Model3DPreview';
 import AudioPreview from './AudioPreview';
+import { getEmbeddedResourceUrls } from '../ResourceUtils';
 
 type Props = {|
   project: gdProject,
@@ -60,6 +61,7 @@ const ResourcePreview = (props: Props): null | React.Node => {
             resourceName,
             {}
           )}
+          embeddedTextureUrls={getEmbeddedResourceUrls(project, resourceName)}
           expand
         />
       );

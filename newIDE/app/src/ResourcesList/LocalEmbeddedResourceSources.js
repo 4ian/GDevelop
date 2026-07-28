@@ -1,7 +1,7 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { isPathInProjectFolder } from './ResourceUtils';
+import { isPathInProjectFolder, isURL } from './ResourceUtils';
 import { createNewResource } from './ResourceSource';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
@@ -107,7 +107,9 @@ export function createAndMapEmbeddedResources(
       fullPath,
     } of embeddedResources.values()) {
       if (!resourceName) {
-        resourceName = path.relative(projectPath, fullPath);
+        // Always use forward slashes, so that the resource file can be found
+        // whatever the platform running the game is.
+        resourceName = path.relative(projectPath, fullPath).replace(/\\/g, '/');
       }
 
       const theEmbeddedResource = createNewResource(resourceKind);
@@ -228,6 +230,131 @@ export async function listTileMapEmbeddedResources(
   }
 }
 
+// A GLB file is a small binary header followed by "chunks". The first one is
+// always the glTF JSON description of the model.
+// See https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#glb-file-format-specification
+const glbMagic = 0x46546c67; // "glTF"
+const glbJsonChunkType = 0x4e4f534a; // "JSON"
+const glbHeaderByteLength = 12;
+const glbChunkHeaderByteLength = 8;
+
+/**
+ * Read the glTF JSON description contained in a GLB (binary glTF) file.
+ * @returns The parsed JSON, or null if this is not a readable GLB file.
+ */
+// $FlowFixMe[cannot-resolve-name]
+const readGlbJson = (fileContent: Buffer): ?Object => {
+  if (fileContent.byteLength < glbHeaderByteLength) return null;
+
+  const dataView = new DataView(
+    fileContent.buffer,
+    fileContent.byteOffset,
+    fileContent.byteLength
+  );
+  if (dataView.getUint32(0, true) !== glbMagic) return null;
+
+  let chunkStart = glbHeaderByteLength;
+  while (chunkStart + glbChunkHeaderByteLength <= fileContent.byteLength) {
+    const chunkByteLength = dataView.getUint32(chunkStart, true);
+    const chunkType = dataView.getUint32(chunkStart + 4, true);
+    const contentStart = chunkStart + glbChunkHeaderByteLength;
+    const contentEnd = contentStart + chunkByteLength;
+    if (contentEnd > fileContent.byteLength) return null;
+
+    if (chunkType === glbJsonChunkType) {
+      return JSON.parse(fileContent.toString('utf8', contentStart, contentEnd));
+    }
+
+    // Chunks are padded so that they always start on a 4 bytes boundary.
+    chunkStart = contentEnd + ((4 - (chunkByteLength % 4)) % 4);
+  }
+
+  return null;
+};
+
+/**
+ * URIs are percent-encoded inside glTF files, while the file on the disk is not.
+ */
+const decodeGlbUri = (uri: string): string => {
+  try {
+    return decodeURIComponent(uri);
+  } catch (error) {
+    // The URI is not properly encoded: use it as it is written in the file.
+    return uri;
+  }
+};
+
+/**
+ * List the texture files that a 3D model refers to, but that are stored outside
+ * of it - which happens when a model is exported without embedding its textures.
+ *
+ * Textures stored inside the GLB file itself are in a binary chunk and have no
+ * URI: they need no resource and are ignored here.
+ */
+export async function listModel3DEmbeddedResources(
+  project: gdProject,
+  filePath: string
+): Promise<?EmbeddedResources> {
+  if (!fs || !path) {
+    return null;
+  }
+
+  let gltf: ?Object = null;
+  try {
+    gltf = readGlbJson(await fs.promises.readFile(filePath));
+  } catch (error) {
+    console.error(
+      `Unable to read properly the data from file ${filePath} for use as a 3D model - ignoring any potentially separate texture files.`,
+      error
+    );
+    return null;
+  }
+  if (!gltf) return null;
+
+  const images = Array.isArray(gltf.images) ? gltf.images : [];
+  const dir = path.dirname(filePath);
+  const embeddedResources = new Map<string, EmbeddedResource>();
+  let hasAnyEmbeddedResourceOutsideProjectFolder = false;
+
+  for (const image of images) {
+    if (!image || typeof image.uri !== 'string' || !image.uri) continue;
+
+    // Images stored in the file itself (as a data URI or in a binary chunk)
+    // and images downloaded from the internet need no resource.
+    const relPath = image.uri;
+    if (isURL(relPath)) continue;
+    // The same file can be used by more than one texture of the model.
+    if (embeddedResources.has(relPath)) continue;
+
+    const fullPath = path.resolve(dir, decodeGlbUri(relPath));
+    if (!fs.existsSync(fullPath)) {
+      console.warn(
+        `The 3D model ${filePath} refers to a texture file that can't be found: ${fullPath} - ignoring it.`
+      );
+      continue;
+    }
+
+    const isOutsideProjectFolder = !isPathInProjectFolder(project, fullPath);
+    embeddedResources.set(relPath, {
+      resourceKind: 'image',
+      relPath,
+      fullPath,
+      isOutsideProjectFolder,
+    });
+
+    if (isOutsideProjectFolder)
+      hasAnyEmbeddedResourceOutsideProjectFolder = true;
+  }
+
+  // Most models embed their textures: don't store an empty mapping for them.
+  if (embeddedResources.size === 0) return null;
+
+  return {
+    embeddedResources,
+    hasAnyEmbeddedResourceOutsideProjectFolder,
+  };
+}
+
 export async function listSpineEmbeddedResources(
   project: gdProject,
   filePath: string
@@ -320,4 +447,5 @@ export const embeddedResourcesParsers: { [string]: ParseEmbeddedFiles } = {
   json: listTileMapEmbeddedResources,
   spine: listSpineEmbeddedResources,
   atlas: listSpineTextureAtlasEmbeddedResources,
+  model3D: listModel3DEmbeddedResources,
 };

@@ -26,12 +26,21 @@ const styles = {
 
 type Props = {|
   modelUrl: string,
+  // For models keeping their textures in separate files, the URL of each of
+  // these files, indexed by the path written inside the model.
+  embeddedTextureUrls?: ?{ [filePath: string]: string },
   expand?: boolean,
   fullWidth?: boolean,
   size?: number,
 |};
 
-const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
+const Model3DPreview = ({
+  modelUrl,
+  embeddedTextureUrls,
+  size,
+  expand,
+  fullWidth,
+}: Props) => {
   const { getResourcePreview } = React.useContext(Resource3DPreviewContext);
   const [imageDataUrl, setImageDataUrl] = React.useState(modelUrl ? null : '');
   const isMounted = useIsMounted();
@@ -43,7 +52,7 @@ const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
         if (!modelUrl) {
           return;
         }
-        const dataUrl = await getResourcePreview(modelUrl);
+        const dataUrl = await getResourcePreview(modelUrl, embeddedTextureUrls);
         if (!isMounted.current) {
           return;
         }
@@ -51,6 +60,9 @@ const Model3DPreview = ({ modelUrl, size, expand, fullWidth }: Props) => {
         setImageDataUrl(dataUrl);
       })();
     },
+    // The texture URLs are entirely determined by the model being displayed:
+    // rendering again when their (newly built) object changes would be useless.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [modelUrl, getResourcePreview, isMounted]
   );
 

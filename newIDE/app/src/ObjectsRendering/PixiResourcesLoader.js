@@ -10,6 +10,10 @@ import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 import { checkIfCredentialsRequired } from '../Utils/CrossOrigin';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import {
+  readEmbeddedResourcesMapping,
+  getEmbeddedResourceNames,
+} from '../ResourcesList/ResourceUtils';
 const gd: libGDevelop = global.gd;
 
 type SpineTextureAtlasOrLoadingError = {|
@@ -169,15 +173,132 @@ const createInvalidModel = (): GLTF => {
 // $FlowFixMe[value-as-type]
 const invalidModel: GLTF = createInvalidModel();
 
+let dracoLoader = null;
+const getOrCreateDracoLoader = () => {
+  if (!dracoLoader) {
+    dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('./external/draco/gltf/');
+  }
+  return dracoLoader;
+};
+
 let gltfLoader = null;
 const getOrCreateGltfLoader = () => {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('./external/draco/gltf/');
-    gltfLoader.setDRACOLoader(dracoLoader);
+    gltfLoader.setDRACOLoader(getOrCreateDracoLoader());
   }
   return gltfLoader;
+};
+
+/**
+ * Escape a string so that it can be used in a `RegExp` matching it exactly.
+ */
+const escapeRegExp = (text: string): string =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * A Three.js loader that gives back textures loaded from the image resources of
+ * the project, instead of downloading the image files that a 3D model refers to.
+ *
+ * See `getEmbeddedResourceNames` for more about models with textures kept in
+ * separate files.
+ */
+class EmbeddedTextureLoader extends THREE.Loader {
+  _project: gdProject;
+  _modelResourceName: string;
+  _textureResourceNames: { [key: string]: string };
+
+  constructor(
+    project: gdProject,
+    modelResourceName: string,
+    textureResourceNames: { [key: string]: string }
+  ) {
+    super();
+    this._project = project;
+    this._modelResourceName = modelResourceName;
+    this._textureResourceNames = textureResourceNames;
+  }
+
+  load(
+    url: string,
+    // $FlowFixMe[value-as-type]
+    onLoad: (texture: THREE.Texture) => void,
+    onProgress: ?(event: ProgressEvent) => void,
+    onError: ?(error: Error) => void
+  ) {
+    const textureResourceName = this._textureResourceNames[url];
+    if (!textureResourceName) {
+      if (onError)
+        onError(
+          new Error(
+            `No image resource is associated to the texture file "${url}" of the 3D model "${
+              this._modelResourceName
+            }".`
+          )
+        );
+      return;
+    }
+
+    PixiResourcesLoader.getThreeTexture(this._project, textureResourceName)
+      .then(threeTexture => {
+        // Give a copy of the texture: the glTF loader configures it according to
+        // the model (flipping, wrapping, color space...) and this must not alter
+        // the texture shared with the other objects using this image.
+        // Note that copies still share the same image on the GPU.
+        const modelThreeTexture = threeTexture.clone();
+        modelThreeTexture.userData.gdevelopImageResourceName = textureResourceName;
+        onLoad(modelThreeTexture);
+      })
+      .catch(error => {
+        console.error(
+          `Unable to load the texture "${textureResourceName}" used by the 3D model "${
+            this._modelResourceName
+          }":`,
+          error
+        );
+        if (onError) onError(error);
+      });
+  }
+}
+
+/**
+ * Apply the settings of an image resource to every texture that was loaded from
+ * it, as the glTF loader configures textures according to the model only.
+ */
+const applyImageResourceSettingsToTextures = (
+  project: gdProject,
+  // $FlowFixMe[value-as-type]
+  node: THREE.Object3D
+) => {
+  const resourcesManager = project.getResourcesManager();
+  // $FlowFixMe[value-as-type]
+  const applyToMaterial = (material: THREE.Material) => {
+    for (const value of Object.values(material)) {
+      if (!(value instanceof THREE.Texture)) continue;
+
+      const imageResourceName = value.userData.gdevelopImageResourceName;
+      if (typeof imageResourceName !== 'string') continue;
+      if (!resourcesManager.hasResource(imageResourceName)) continue;
+
+      applyThreeTextureSettings(
+        resourcesManager.getResource(imageResourceName),
+        value
+      );
+    }
+  };
+
+  node.traverse(child => {
+    // $FlowFixMe[value-as-type]
+    const mesh = (child: THREE.Mesh);
+    if (!mesh.material) return;
+
+    if (Array.isArray(mesh.material)) {
+      mesh.material.forEach(applyToMaterial);
+    } else {
+      applyToMaterial(mesh.material);
+    }
+  });
 };
 
 const load3DModel = (
@@ -198,13 +319,37 @@ const load3DModel = (
     isResourceForPixi: true,
   });
 
-  const gltfLoader = getOrCreateGltfLoader();
-  gltfLoader.withCredentials = checkIfCredentialsRequired(url);
+  // A 3D model can be exported with its textures kept in separate files. In this
+  // case, an image resource was created for each of these files when the model
+  // was imported: use a loader that knows how to find them, instead of letting
+  // it download the files the model refers to.
+  const textureResourceNames = getEmbeddedResourceNames(project, resourceName);
+  let loader;
+  if (textureResourceNames) {
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.addHandler(
+      new RegExp(
+        '^(' +
+          Object.keys(textureResourceNames)
+            .map(escapeRegExp)
+            .join('|') +
+          ')$'
+      ),
+      new EmbeddedTextureLoader(project, resourceName, textureResourceNames)
+    );
+    loader = new GLTFLoader(loadingManager);
+    loader.setDRACOLoader(getOrCreateDracoLoader());
+  } else {
+    loader = getOrCreateGltfLoader();
+  }
+
+  loader.withCredentials = checkIfCredentialsRequired(url);
   return new Promise((resolve, reject) => {
-    gltfLoader.load(
+    loader.load(
       url,
       gltf => {
         traverseToRemoveMetalnessFromMeshes(gltf.scene);
+        applyImageResourceSettingsToTextures(project, gltf.scene);
         resolve(gltf);
       },
       undefined,
@@ -277,25 +422,6 @@ const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
 // $FlowFixMe[value-as-type]
 const traverseToRemoveMetalnessFromMeshes = (node: THREE.Object3D) =>
   node.traverse(removeMetalnessFromMesh);
-
-export const readEmbeddedResourcesMapping = (
-  resource: gdResource
-): {} | null => {
-  const metadataString = resource.getMetadata();
-  try {
-    const metadata = JSON.parse(metadataString);
-    if (
-      !metadata.embeddedResourcesMapping ||
-      typeof metadata.embeddedResourcesMapping !== 'object'
-    ) {
-      return null;
-    }
-
-    return metadata.embeddedResourcesMapping;
-  } catch (err) {
-    return null;
-  }
-};
 
 const getEmbedderResources = (
   project: gdProject,

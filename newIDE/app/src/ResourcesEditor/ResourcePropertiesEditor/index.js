@@ -325,7 +325,10 @@ const ResourcePropertiesEditor: React.ComponentType<{
                   </Trans>
                 </AlertMessage>
               )}
-            <EmbeddedResourcesMappingTable resources={resources} />
+            <EmbeddedResourcesMappingTable
+              project={project}
+              resources={resources}
+            />
           </ColumnStackLayout>
         </ScrollView>
       </Background>

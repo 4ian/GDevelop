@@ -10,6 +10,7 @@ import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { isProjectImageResourceSmooth } from '../ResourcePreview/ImagePreview';
 import Model3DPreview from '../ResourcePreview/Model3DPreview';
 import CheckeredBackground from '../CheckeredBackground';
+import { getEmbeddedResourceUrls } from '../ResourceUtils';
 
 const paddingSize = 10;
 const styles = {
@@ -134,6 +135,7 @@ export const ProjectResourceCard = ({
               resourceName,
               {}
             )}
+            embeddedTextureUrls={getEmbeddedResourceUrls(project, resourceName)}
             fullWidth
           />
         );

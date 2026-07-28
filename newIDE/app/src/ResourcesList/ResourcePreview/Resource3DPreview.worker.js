@@ -58,11 +58,58 @@ const initRenderer = () => {
   return true;
 };
 
+/**
+ * Escape a string so that it can be used in a `RegExp` matching it exactly.
+ */
+// $FlowFixMe[missing-local-annot]
+const escapeRegExp = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * A Three.js loader building textures from image files that were fetched by the
+ * main thread, for 3D models keeping their textures in separate files.
+ *
+ * Like the model itself, these files can't be fetched from the worker (see
+ * `renderModel`), so their content is passed along with the model.
+ */
+class EmbeddedTextureLoader extends THREE.Loader {
+  // $FlowFixMe[missing-local-annot]
+  constructor(embeddedTextures) {
+    super();
+    this._embeddedTextures = embeddedTextures;
+  }
+
+  // $FlowFixMe[missing-local-annot]
+  load(url, onLoad, onProgress, onError) {
+    const textureData = this._embeddedTextures[url];
+    if (!textureData) {
+      if (onError) onError(new Error(`No data given for texture "${url}".`));
+      return;
+    }
+
+    // $FlowFixMe[cannot-resolve-name] - createImageBitmap is available in workers.
+    createImageBitmap(new Blob([textureData]))
+      .then(imageBitmap => {
+        const texture = new THREE.Texture(imageBitmap);
+        texture.needsUpdate = true;
+        onLoad(texture);
+      })
+      .catch(error => {
+        if (onError) onError(error);
+      });
+  }
+}
+
 // Render a 3D model to the offscreen canvas and return the data URL.
 // resourceData is an ArrayBuffer fetched by the main thread (workers cannot
 // fetch file:// URLs in Electron due to network service sandboxing).
-// $FlowFixMe[missing-local-annot]
-const renderModel = async (resourceUrl, resourceData, basePath) => {
+// embeddedTextures holds, for models with textures kept in separate files, the
+// content of these files indexed by the path written inside the model.
+const renderModel = async (
+  resourceUrl: string,
+  resourceData: ArrayBuffer,
+  basePath: string,
+  embeddedTextures: ?{ [filePath: string]: ArrayBuffer }
+) => {
   if (!renderer) {
     throw new Error('Renderer not initialized');
   }
@@ -82,7 +129,18 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
   // Parse the pre-fetched model data instead of fetching the URL,
   // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
-    const loader = new GLTFLoader();
+    const textureFilePaths = embeddedTextures
+      ? Object.keys(embeddedTextures)
+      : [];
+    let loadingManager;
+    if (textureFilePaths.length > 0) {
+      loadingManager = new THREE.LoadingManager();
+      loadingManager.addHandler(
+        new RegExp('^(' + textureFilePaths.map(escapeRegExp).join('|') + ')$'),
+        new EmbeddedTextureLoader(embeddedTextures)
+      );
+    }
+    const loader = new GLTFLoader(loadingManager);
 
     loader.parse(
       resourceData,
@@ -187,11 +245,12 @@ self.onmessage = async event => {
           throw new Error('Renderer not initialized');
         }
 
-        const { resourceData, basePath } = event.data;
+        const { resourceData, basePath, embeddedTextures } = event.data;
         const screenshot = await renderModel(
           resourceUrl,
           resourceData,
-          basePath
+          basePath,
+          embeddedTextures
         );
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({

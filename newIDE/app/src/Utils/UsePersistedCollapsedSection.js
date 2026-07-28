@@ -35,6 +35,8 @@ export const usePersistedCollapsedSection = ({
       const editorStateForProject = getEditorStateForProject(projectId);
       if (!editorStateForProject || !persistedPanelStateId) return false;
 
+      console.log(JSON.stringify(editorStateForProject));
+
       return editorStateForProject.propertiesPanel[persistedPanelStateType]?.[
         persistedPanelStateId
       ]?.collapsedSections[sectionId];

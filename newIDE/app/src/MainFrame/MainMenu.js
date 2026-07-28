@@ -46,6 +46,7 @@ export type MainMenuCallbacks = {|
   onOpenProjectManager: (open?: boolean) => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void | Promise<boolean>,
+  onOpenStickyNotes: () => void,
   onOpenGlobalSearch: () => void,
   onOpenAbout: (open?: boolean) => void,
   onOpenPreferences: (open?: boolean) => void,
@@ -76,6 +77,7 @@ export type MainMenuEvent =
   | 'main-menu-open-project-manager'
   | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
+  | 'main-menu-open-sticky-notes'
   | 'main-menu-open-global-search'
   | 'main-menu-open-about'
   | 'main-menu-open-preferences'
@@ -104,6 +106,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
     'main-menu-open-home-page': callbacks.onOpenHomePage,
     'main-menu-open-debugger': callbacks.onOpenDebugger,
+    'main-menu-open-sticky-notes': callbacks.onOpenStickyNotes,
     'main-menu-open-global-search': callbacks.onOpenGlobalSearch,
     'main-menu-open-about': callbacks.onOpenAbout,
     'main-menu-open-preferences': callbacks.onOpenPreferences,
@@ -252,6 +255,11 @@ export const buildMainMenuDeclarativeTemplate = ({
       {
         label: i18n._(t`Open Debugger`),
         onClickSendEvent: 'main-menu-open-debugger',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Sticky notes`),
+        onClickSendEvent: 'main-menu-open-sticky-notes',
         enabled: !!project,
       },
       {

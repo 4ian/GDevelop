@@ -132,22 +132,16 @@ const electron = optionalRequire('electron');
 export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
 
-const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
+const projectRootFolderId = getProjectManagerItemId('project');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
-const gameShareItemId = getProjectManagerItemId('game-share');
-const gameStickyNotesItemId = getProjectManagerItemId('game-sticky-notes');
-const globalsRootFolderId = getProjectManagerItemId('globals');
 export const globalVariablesItemId: string = getProjectManagerItemId(
   'global-variables'
 );
 const staticDataItemId = getProjectManagerItemId('static-data');
 export const globalObjectsItemId: string = getProjectManagerItemId(
   'global-objects'
-);
-export const objectSettingsItemId: string = getProjectManagerItemId(
-  'object-settings'
 );
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
@@ -811,6 +805,7 @@ export type ProjectManagerCreateItemKind =
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
+  openProjectVariables: () => void,
   selectAndScrollToItemFromId: (itemId: string) => void,
   activateItemFromId: (itemId: string) => void,
   createProjectItem: (itemKind: ProjectManagerCreateItemKind) => void,
@@ -828,9 +823,7 @@ type Props = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
-  onOpenStickyNotes: () => void,
   onOpenStaticData: () => void,
-  onOpenObjectSettings: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -851,7 +844,6 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onEffectAdded: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
-  onShareProject: () => void,
   onOpenHomePage: () => void,
   closeProjectManager: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -910,16 +902,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onEventsBasedObjectChildrenEdited,
       onEventBasedObjectTypeChanged,
       onOpenResources,
-      onOpenStickyNotes,
       onOpenStaticData,
-      onOpenObjectSettings,
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
       onEffectAdded,
       triggerHotReloadInGameEditorIfNeeded,
       onWillInstallExtension,
-      onShareProject,
       resourceManagementProps,
       projectScopedContainersAccessor,
       closeProjectManager,
@@ -1497,6 +1486,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         focusSearchBar: () => {
           if (searchBarRef.current) searchBarRef.current.focus();
         },
+        openProjectVariables,
         selectAndScrollToItemFromId: (itemId: string) => {
           selectAndScrollToTreeViewItemFromId(itemId);
         },
@@ -1506,7 +1496,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         },
         createProjectItem,
       }),
-      [createProjectItem, forceUpdate, selectAndScrollToTreeViewItemFromId]
+      [
+        createProjectItem,
+        forceUpdate,
+        openProjectVariables,
+        selectAndScrollToTreeViewItemFromId,
+      ]
     );
 
     const onTreeModified = React.useCallback(
@@ -1819,15 +1814,15 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  gameSettingsRootFolderId,
-                  i18n._(t`Settings`)
+                  projectRootFolderId,
+                  i18n._(t`Project`)
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return [
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         gamePropertiesItemId,
-                        i18n._(t`Properties & Icons`),
+                        i18n._(t`Properties`),
                         openProjectProperties,
                         'res/icons_default/properties_black.svg'
                       )
@@ -1850,33 +1845,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        gameShareItemId,
-                        i18n._(t`Export & Share`),
-                        onShareProject,
-                        'res/icons_default/publish_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        gameStickyNotesItemId,
-                        i18n._(t`Sticky notes`),
-                        onOpenStickyNotes,
-                        'res/icons_default/sticky_notes_black.svg'
-                      )
-                    ),
-                  ];
-                },
-              },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  globalsRootFolderId,
-                  i18n._(t`Globals`)
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  return [
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
                         staticDataItemId,
                         i18n._(t`Static Data`),
                         onOpenStaticData,
@@ -1885,26 +1853,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        globalVariablesItemId,
-                        i18n._(t`Global variables`),
-                        openProjectVariables,
-                        'res/icons_default/global_variable24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
                         globalObjectsItemId,
                         i18n._(t`Global objects`),
                         openProjectGlobalsDialog,
                         'res/icons_default/global_object24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        objectSettingsItemId,
-                        i18n._(t`Object Settings`),
-                        onOpenObjectSettings,
-                        'res/functions/object_black.svg'
                       )
                     ),
                   ];
@@ -2262,15 +2214,11 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
         onOpenStaticData,
-        onOpenObjectSettings,
         onOpenResources,
-        onOpenStickyNotes,
-        onShareProject,
         openCreateExternalDialog,
         openProjectExtensionsDialog,
         openProjectProperties,
         openCreateExtensionItemDialog,
-        openProjectVariables,
         openProjectGlobalsDialog,
         project,
         sceneTreeViewItemProps,
@@ -2335,8 +2283,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const initiallyOpenedNodeIds = React.useMemo(
       () => {
         const nodeIds = [
-          gameSettingsRootFolderId,
-          globalsRootFolderId,
+          projectRootFolderId,
           scenesRootFolderId,
           externalsRootFolderId,
           customObjectsRootFolderId,

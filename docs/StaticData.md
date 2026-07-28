@@ -366,7 +366,7 @@ Events:
 
 Editor:
 
-- Project Manager shows `Static Data` under `Globals`.
+- Project Manager shows `Static Data` under `Project`.
 - Clicking it opens a floated `static-data` editor tab.
 - The floated editor can be popped into the main editor tabs.
 - Grid add/edit/delete/import/export updates project static data and marks unsaved changes.

@@ -111,7 +111,7 @@ because the agent does not wait for the result.
 | Editor UI/workflow bug | The domain directory under `newIDE/app/src` | `MainFrame` orchestration, borrowed WASM object ownership, nearby `*.spec.js` |
 | Scene editor display/selection, not exported game rendering | `newIDE/app/src/SceneEditor`, `InstancesEditor`, `ObjectsRendering` | The extension's registered editor renderer; do not patch the runtime renderer for an editor-only issue |
 | Events editor, parameter fields, expressions, autocomplete | `newIDE/app/src/EventsSheet`, `InstructionOrExpression`, `ExpressionAutocompletion` | Core metadata/validation/scope and code generation |
-| Object/behavior/property editing | `newIDE/app/src/ObjectEditor`, `ObjectSettingsWorkbench`, `BehaviorsEditor`, `CompactPropertiesEditor`, `PropertiesEditor` | Core property descriptors, extension editor configuration |
+| Object/behavior/property editing | `newIDE/app/src/ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor`, `PropertiesEditor` | Core property descriptors, extension editor configuration |
 | Variables editor | `newIDE/app/src/VariablesEditorRedesign` and `VariablesList` | Core variable/source-scope APIs and history/serialization |
 | Events-based extensions or prefabs in the editor | `EventsFunctionsExtensionEditor`, `EventsFunctionsExtensionsLoader`, `EventsFunctionsList`, `PrefabDetailEditor` | Core `EventsFunctionsExtension` model and GDJS function/object/behavior generators |
 | Local project open/save, `project.settings`, TOML, layout or event source | `newIDE/app/src/ProjectsStorage` | `MultiFileProjectFormat`, `LayoutToml`, `LocalFileStorageProvider/LocalMultiFileProject.js`, IfDo DSL, format specs |

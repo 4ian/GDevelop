@@ -68,7 +68,6 @@ export const NoProjectOpen = (): React.Node => {
                   onOpenPrefabSettings={action('onOpenPrefabSettings')}
                   onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
                   onOpenStaticData={action('onOpenStaticData')}
-                  onOpenObjectSettings={action('onOpenObjectSettings')}
                   openBehaviorEvents={action('openBehaviorEvents')}
                   onOpenEventBasedObjectEditor={action(
                     'onOpenEventBasedObjectEditor'
@@ -115,7 +114,6 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
-                  onOpenStickyNotes={action('onOpenStickyNotes')}
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
@@ -125,7 +123,6 @@ export const NoProjectOpen = (): React.Node => {
                   triggerHotReloadInGameEditorIfNeeded={action(
                     'triggerHotReloadInGameEditorIfNeeded'
                   )}
-                  onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
@@ -186,7 +183,6 @@ export const ProjectOpen = (): React.Node => {
                   onOpenPrefabSettings={action('onOpenPrefabSettings')}
                   onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
                   onOpenStaticData={action('onOpenStaticData')}
-                  onOpenObjectSettings={action('onOpenObjectSettings')}
                   openBehaviorEvents={action('openBehaviorEvents')}
                   onOpenEventBasedObjectEditor={action(
                     'onOpenEventBasedObjectEditor'
@@ -233,7 +229,6 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onRenameExternalEvents={action('onRenameExternalEvents')}
                   onOpenResources={action('onOpenResources')}
-                  onOpenStickyNotes={action('onOpenStickyNotes')}
                   onReloadEventsFunctionsExtensions={action(
                     'onReloadEventsFunctionsExtensions'
                   )}
@@ -243,7 +238,6 @@ export const ProjectOpen = (): React.Node => {
                   triggerHotReloadInGameEditorIfNeeded={action(
                     'triggerHotReloadInGameEditorIfNeeded'
                   )}
-                  onShareProject={action('onShareProject')}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}

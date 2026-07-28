@@ -457,12 +457,6 @@ function createNewWindow(windowArgs = args) {
       const isBrowserPopup = details.frameName.startsWith(
         'GDevelopWindowPortal-browser-'
       );
-      const isObjectSettingsWindow = details.frameName.startsWith(
-        'GDevelopWindowPortal-object-settings-'
-      );
-      const isObjectEditorWindow = details.frameName.startsWith(
-        'GDevelopWindowPortal-object-editor-'
-      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
@@ -480,14 +474,8 @@ function createNewWindow(windowArgs = args) {
           // so that ToolbarTitlebar can provide safe margins for window controls.
           titleBarStyle: 'hidden',
           titleBarOverlay: {
-            color:
-              isObjectSettingsWindow || isObjectEditorWindow
-                ? '#191922'
-                : '#000000',
-            symbolColor:
-              isObjectSettingsWindow || isObjectEditorWindow
-                ? '#9A9AAB'
-                : '#ffffff',
+            color: '#000000',
+            symbolColor: '#ffffff',
           },
           trafficLightPosition: { x: 12, y: 12 },
           backgroundColor,

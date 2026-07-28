@@ -118,7 +118,6 @@ import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
-import ObjectSettingsWorkbenchWindow from '../ObjectSettingsWorkbench/ObjectSettingsWorkbenchWindow';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -821,13 +820,6 @@ const MainFrame = (props: Props): React.MixedElement => {
     editorKey: null,
     requestId: 0,
   });
-  const [
-    objectSettingsWindowState,
-    setObjectSettingsWindowState,
-  ] = React.useState<{|
-    projectPtr: ?number,
-    focusRequestId: number,
-  |}>({ projectPtr: null, focusRequestId: 0 });
   const lastProjectSettingsPromise = React.useRef<?Promise<void>>(null);
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
@@ -2348,6 +2340,19 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     []
   );
+
+  const openProjectVariablesFromSwitcher = React.useCallback(() => {
+    const projectManager = projectManagerRef.current;
+    if (projectManager) {
+      projectManager.openProjectVariables();
+      return;
+    }
+
+    setTimeout(() => {
+      const projectManager = projectManagerRef.current;
+      if (projectManager) projectManager.openProjectVariables();
+    }, 0);
+  }, []);
 
   const createProjectItemFromSwitcher = React.useCallback(
     (itemKind: ProjectManagerCreateItemKind) => {
@@ -4407,17 +4412,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       }));
     },
     [getEditorOpeningOptions, setState]
-  );
-
-  const openObjectSettings = React.useCallback(
-    () => {
-      if (!currentProject) return;
-      setObjectSettingsWindowState(previousState => ({
-        projectPtr: currentProject.ptr,
-        focusRequestId: previousState.focusRequestId + 1,
-      }));
-    },
-    [currentProject]
   );
 
   const openGlobalSearch = React.useCallback(
@@ -7147,7 +7141,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n._(t`Global variables`),
       i18n._(t`Globals`),
       <GlobalVariableIcon />,
-      () => activateProjectManagerItemFromSwitcher(globalVariablesItemId)
+      openProjectVariablesFromSwitcher
     );
     addRecentEditorSwitcherSideMenuItem(
       globalObjectsItemId,
@@ -8029,6 +8023,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProjectManager: showProjectManager,
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
+    onOpenStickyNotes: openStickyNotesManager,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
@@ -8206,9 +8201,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
-      onOpenStickyNotes={openStickyNotesManager}
       onOpenStaticData={openStaticData}
-      onOpenObjectSettings={openObjectSettings}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -8218,9 +8211,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       triggerHotReloadInGameEditorIfNeeded={
         triggerHotReloadInGameEditorIfNeeded
       }
-      onShareProject={() => {
-        openShareDialog();
-      }}
       isOpen={isProjectManagerVisible}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       resourceManagementProps={resourceManagementProps}
@@ -8378,38 +8368,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         onPopIn={onPopInTab}
         focusRequest={poppedOutEditorFocusRequest}
       />
-      {currentProject &&
-        objectSettingsWindowState.projectPtr === currentProject.ptr && (
-          <ObjectSettingsWorkbenchWindow
-            key={`object-settings-window-${currentProject.ptr}`}
-            project={currentProject}
-            unsavedChanges={unsavedChanges}
-            resourceManagementProps={resourceManagementProps}
-            onWillInstallExtension={onWillInstallExtension}
-            onExtensionInstalled={onExtensionInstalled}
-            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
-            onOpenEventBasedObjectVariantEditor={
-              onOpenEventBasedObjectVariantEditor
-            }
-            onDeleteEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
-            onGlobalObjectEdited={onGlobalObjectEdited}
-            onSceneObjectEdited={onSceneObjectEdited}
-            onEventsBasedObjectChildrenEdited={
-              onEventsBasedObjectChildrenEdited
-            }
-            onObjectListsModified={onObjectListsModified}
-            triggerHotReloadInGameEditorIfNeeded={
-              triggerHotReloadInGameEditorIfNeeded
-            }
-            focusRequestId={objectSettingsWindowState.focusRequestId}
-            onClose={() =>
-              setObjectSettingsWindowState(previousState => ({
-                projectPtr: null,
-                focusRequestId: previousState.focusRequestId,
-              }))
-            }
-          />
-        )}
       {currentProject && standalonePrefabSettingsDialog && (
         <PrefabDetailEditor
           key={`prefab-settings-dialog-${

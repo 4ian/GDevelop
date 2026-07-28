@@ -15,6 +15,7 @@ import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
+import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -63,7 +64,6 @@ import {
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
 import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
-import SingleBehaviorHost from '../../BehaviorsEditor/SingleBehaviorHost';
 import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 
 const gd: libGDevelop = global.gd;
@@ -767,13 +767,17 @@ export const CompactObjectPropertiesEditorContent = ({
                   behaviorTypeName
                 );
                 const iconUrl = behaviorMetadata.getIconFilename();
+                const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                  behaviorTypeName
+                );
                 return (
                   <CollapsibleSubPanel
                     key={behavior.ptr}
                     renderContent={() => (
-                      <SingleBehaviorHost
+                      <CompactBehaviorComponent
                         project={project}
-                        behavior={behavior}
+                        behaviorTypeName={behaviorTypeName}
+                        behaviors={[behavior]}
                         object={object}
                         layersContainer={layersContainer}
                         onBehaviorUpdated={() => {}}

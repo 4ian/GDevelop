@@ -88,6 +88,7 @@ export const usePersistedScrollPosition = ({
             [persistedPanelStateType]: {
               ...currentEditorState?.propertiesPanel[persistedPanelStateType],
               [persistedPanelStateId]: {
+                collapsedSections: {},
                 ...currentEditorState?.propertiesPanel[
                   persistedPanelStateType
                 ]?.[persistedPanelStateId],

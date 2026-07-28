@@ -56,6 +56,7 @@ export const usePersistedCollapsedSection = ({
           [persistedPanelStateType]: {
             ...currentEditorState?.propertiesPanel[persistedPanelStateType],
             [persistedPanelStateId]: {
+              scrollPosition: 0,
               ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
                 persistedPanelStateId
               ],

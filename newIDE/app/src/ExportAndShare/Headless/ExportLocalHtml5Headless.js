@@ -29,6 +29,12 @@ type Options = {|
   project: gdProject,
   i18n: I18nType,
   outputDir?: string,
+  /**
+   * Gather the game resources into a few ".gdpak" archives, so that the export
+   * stays below the file count limit of hosting services. On by default, as in
+   * the export dialog.
+   */
+  packResources?: boolean,
 |};
 
 type Result = {| outputDir: string |};
@@ -38,13 +44,14 @@ export const exportLocalHtml5Headless = async ({
   project,
   i18n,
   outputDir,
+  packResources = true,
 }: Options): Promise<Result> => {
   const resolvedOutputDir = outputDir || resolveHtml5OutputDir(project);
   project.setLastCompilationDirectory(resolvedOutputDir);
 
   const context = {
     project,
-    exportState: { outputDir: resolvedOutputDir },
+    exportState: { outputDir: resolvedOutputDir, packResources },
     updateStepProgress: (count: number, total: number) => {},
     i18n,
   };

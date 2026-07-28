@@ -35,6 +35,24 @@ export default class ElementWithMenu extends React.Component<Props, State> {
     const { _contextMenu } = this;
     if (!_contextMenu) return;
 
+    const eventWithPointerPosition: any = event;
+    if (
+      eventWithPointerPosition &&
+      typeof eventWithPointerPosition.clientX === 'number' &&
+      typeof eventWithPointerPosition.clientY === 'number' &&
+      (eventWithPointerPosition.clientX !== 0 ||
+        eventWithPointerPosition.clientY !== 0)
+    ) {
+      // A pointer event already gives viewport-relative coordinates. Avoid
+      // getBoundingClientRect here: reading layout synchronously can stall for
+      // seconds when a large events sheet has pending layout work.
+      _contextMenu.open(
+        Math.round(eventWithPointerPosition.clientX),
+        Math.round(eventWithPointerPosition.clientY)
+      );
+      return;
+    }
+
     const node = ReactDOM.findDOMNode(this._wrappedElement);
     // Use nodeType check instead of `instanceof HTMLElement` because
     // in a cross-window portal the node's constructor comes from the

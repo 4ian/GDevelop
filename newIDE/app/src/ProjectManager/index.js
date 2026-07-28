@@ -126,6 +126,7 @@ import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/Ev
 import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { createEventsFunctionExtensionItem } from './CreateEventsFunctionExtensionItem';
+import { getGameRootTreeViewItemDescription } from './GameRootTreeViewItem';
 
 const electron = optionalRequire('electron');
 
@@ -1802,6 +1803,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
+        const gameRootTreeViewItemDescription = getGameRootTreeViewItemDescription(
+          i18n,
+          mainMenuCallbacks.onCreateProject
+        );
         return !project ||
           !sceneTreeViewItemProps ||
           !customObjectTreeViewItemProps ||
@@ -1815,7 +1820,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
                   projectRootFolderId,
-                  i18n._(t`Project`)
+                  gameRootTreeViewItemDescription.label,
+                  gameRootTreeViewItemDescription.rightButton
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return [
@@ -2213,6 +2219,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
+        mainMenuCallbacks,
         onOpenStaticData,
         onOpenResources,
         openCreateExternalDialog,

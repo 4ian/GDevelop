@@ -77,6 +77,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetResourceName("InGameEditor-OrbitCameraIcon")
       .SetFilePath("InGameEditor/OrbitCameraIcon.svg")
       .SetKind("internal-in-game-editor-only-svg");
+  extension.AddInGameEditorResource()
+      .SetResourceName("InGameEditor-HiddenInstanceIcon")
+      .SetFilePath("InGameEditor/HiddenInstanceIcon.svg")
+      .SetKind("internal-in-game-editor-only-svg");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::ObjectConfiguration>(
       "", _("Base object"), _("Base object"), "res/functions/object_black.svg");

@@ -28,6 +28,8 @@ import Unlink from '../../UI/CustomSvgIcons/Unlink';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import Visibility from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
 import Restore from '../../UI/CustomSvgIcons/Restore';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
@@ -174,6 +176,33 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}): Field => ({
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
       nonFieldType: 'title',
       defaultValue: i18n._(t`Different objects`),
+    },
+    {
+      name: 'Hide instance',
+      getLabel: (instance: gdInitialInstance) =>
+        instance.isHidden()
+          ? i18n._(t`Hidden when the scene starts`)
+          : i18n._(t`Visible when the scene starts`),
+      valueType: 'enumIcon',
+      renderIcon: value =>
+        value === 'hidden' ? (
+          <VisibilityOff style={styles.icon} />
+        ) : (
+          <Visibility style={styles.icon} />
+        ),
+      isHighlighted: value => value === 'hidden',
+      getValue: (instance: gdInitialInstance) =>
+        instance.isHidden() ? 'hidden' : 'visible',
+      setValue: (
+        instance: gdInitialInstance,
+        newValue: 'hidden' | 'visible'
+      ) => {
+        instance.setHidden(newValue === 'hidden');
+      },
+      getNextValue: (
+        currentValue: 'hidden' | 'visible'
+      ): 'hidden' | 'visible' =>
+        currentValue === 'hidden' ? 'visible' : 'hidden',
     },
     {
       name: 'Lock instance',

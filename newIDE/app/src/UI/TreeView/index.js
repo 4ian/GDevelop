@@ -198,7 +198,7 @@ type Props<Item> = {|
   enableStickyAncestors?: boolean,
 |};
 
-const InnerTreeView = <Item: ItemBaseAttributes>(
+function InnerTreeView<Item: ItemBaseAttributes>(
   {
     height,
     width,
@@ -232,9 +232,9 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     shouldHideMenuIcon,
     enableStickyAncestors,
   }: Props<Item>,
-  ref: TreeViewInterface<Item>
   // $FlowFixMe[missing-local-annot]
-) => {
+  ref: TreeViewInterface<Item>
+) {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
     initiallyOpenedNodeIds || []
@@ -489,7 +489,6 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [enableStickyAncestors, hasStickyRows, gdevelopTheme]
   );
   const scrollOffsetRef = React.useRef<number>(0);
-  const listOuterRef = React.useRef<?HTMLDivElement>(null);
 
   const updateStickyRows = React.useCallback(
     () => {
@@ -913,7 +912,6 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
           // $FlowFixMe[incompatible-type]
           itemData={itemData}
           ref={listRef}
-          outerRef={listOuterRef}
           onScroll={enableStickyAncestors ? onScroll : undefined}
           // Keep overscanCount relatively high so that:
           // - during in-app tutorials we make sure the tooltip displayer finds
@@ -991,7 +989,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       />
     </>
   );
-};
+}
 
 // Define the polymorphic component type that will be exported:
 type TreeViewComponent = <Item: ItemBaseAttributes>(

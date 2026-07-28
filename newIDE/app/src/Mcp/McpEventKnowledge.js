@@ -1218,9 +1218,11 @@ const createWithInitEventExample = [
   },
 ];
 
-// For-each-object event: runs its conditions/actions once per instance of the
-// object. REQUIRED when an action like Create/PlaySound must affect EACH
-// instance (a plain Standard event's Create only fires for one picked instance).
+// For-each-object event: gives each instance an isolated picking context.
+// Normal object actions in a Standard event already affect all picked objects,
+// but standalone actions like Create/PlaySound run once per event and scalar
+// object expressions use one instance. Use ForEach when those operations must
+// run separately for every picked object.
 const forEachEventExample = [
   {
     type: 'BuiltinCommonInstructions::ForEach',
@@ -1388,7 +1390,7 @@ export const getEventsJsonExamples = ({
     {
       name: 'For-each-object event',
       purpose:
-        'Run conditions/actions once PER instance. REQUIRED when an action must affect each instance (e.g. each enemy fires its own bullet) — a plain Standard event acts on a single picked instance only.',
+        'Give every picked instance its own event context. Normal object actions already affect all picked instances; use ForEach when standalone actions or scalar object expressions must run separately per instance (for example, each enemy fires its own bullet).',
       events_json: JSON.stringify(forEachEventExample, null, 2),
     },
     {

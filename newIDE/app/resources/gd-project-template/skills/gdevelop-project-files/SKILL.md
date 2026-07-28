@@ -320,12 +320,14 @@ Rules:
   ancestor event. Never place an action on an unconditional path that executes
   every frame. Use an explicit trigger, state/input check, timer, comparison,
   or other condition that expresses when the action is allowed to run.
-- Before every object-targeting action, ensure the current picking set contains
-  at most one instance of that object. Use `for each Object` when multiple
-  instances must be processed one at a time, or narrow the selection with
-  conditions such as a unique ID/state match, nearest-object pick, collision,
-  or another deterministic selector. Never rely on an object action implicitly
-  applying to an unrestricted multi-instance selection.
+- Treat an object-targeting action as applying to every currently picked
+  instance of that object. When conditions leave multiple instances picked, or
+  do not narrow the object selection, the action executes on all of them. This
+  is normal and often intentional GDevelop behavior, so do not reject or
+  rewrite an event merely because an object action may affect multiple
+  instances. Narrow the selection only when the gameplay requires a specific
+  target; use `for each Object` when later conditions or actions need one
+  isolated instance at a time.
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
@@ -543,8 +545,10 @@ Before finishing:
   evidence against the signal-system reference.
 - Confirm every action has an effective condition in its event or ancestor
   chain and no unconditional action can execute every frame.
-- Confirm every object-targeting action operates on a provably single picked
-  instance; use `for each` when processing multiple instances.
+- Confirm object-targeting actions use the intended current picking set. Accept
+  actions that apply to multiple picked instances as normal GDevelop behavior;
+  narrow the selection or use `for each` only when the logic requires one
+  instance at a time.
 - Confirm no legacy JSON was changed.
 - Confirm `generate-catalogs` returned `catalogsRegenerated: true` after the
   final large structural change and that subsequent dependent edits used the

@@ -15,7 +15,6 @@ Related specifications:
 - [IfDo Events DSL](gdevelop-events-dsl-spec.md)
 - [JavaScript authoring API](gdevelop-javascript-authoring-api-spec.md)
 - [Multi-file project format](gdevelop-new-formats-spec.md)
-- [Deterministic object picking](DeterministicObjectPicking.md)
 - [Signal system](SignalSystem.md)
 - [Static Data](StaticData.md)
 

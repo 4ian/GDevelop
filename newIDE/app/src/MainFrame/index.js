@@ -714,9 +714,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unsafeExternalLayoutCreationErrors = validationErrors.filter(
           error => error.type === 'unsafe-external-layout-creation'
         );
-        const ambiguousObjectPickingErrors = validationErrors.filter(
-          error => error.type === 'ambiguous-object-picking'
-        );
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
@@ -725,14 +722,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         );
         const mustBlockForUnsafeExternalLayoutCreation =
           unsafeExternalLayoutCreationErrors.length > 0;
-        const mustBlockForAmbiguousObjectPicking =
-          ambiguousObjectPickingErrors.length > 0;
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
           mustBlockForInvalidStaticDataPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
-          mustBlockForAmbiguousObjectPicking ||
           mustBlockForUnconditionedActions;
 
         if (mustBlockForInvalidStaticDataPlaceholder) {
@@ -746,8 +740,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) {
           const title = mustBlockForUnsafeExternalLayoutCreation
             ? t`External layout action needs a condition`
-            : mustBlockForAmbiguousObjectPicking
-            ? t`Object action needs a single picked instance`
             : mustBlockForUnconditionedActions
             ? t`Action needs a condition`
             : t`Diagnostic errors found`;
@@ -755,10 +747,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             ? actionType === 'preview'
               ? t`This preview cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before launching a preview.`
               : t`This export cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before exporting.`
-            : mustBlockForAmbiguousObjectPicking
-            ? actionType === 'preview'
-              ? t`This preview cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before launching a preview.`
-              : t`This export cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before exporting.`
             : mustBlockForUnconditionedActions
             ? actionType === 'preview'
               ? t`This preview cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before launching a preview.`

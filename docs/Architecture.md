@@ -15,7 +15,6 @@ overview. Related focused references include:
 
 - `docs/StaticData.md` — project Static Data and placeholder replacement.
 - `docs/SignalSystem.md` — queued scene and direct-instance signals.
-- `docs/DeterministicObjectPicking.md` — rationale for stricter picking rules.
 - `newIDE/docs/How-are-exporters-and-platforms-working.md` — exporters.
 - `newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` — property schemas.
 - `newIDE/docs/Supported-JavaScript-features-and-coding-style.md` — editor/runtime JavaScript constraints.
@@ -373,7 +372,7 @@ for (var i = 0, len = objects.length; i < len; ++i) {
 }
 ```
 
-### Deterministic single-instance consumption in this branch
+### Object picking and single-instance consumption
 
 This branch adds stricter behavior, but its exact scope matters:
 
@@ -381,19 +380,21 @@ This branch adds stricter behavior, but its exact scope matters:
   pointers use the first picked instance only after generated helpers in
   `GDJS/Runtime/gd.ts` assert that the relevant concrete lists contain at most
   one instance in total.
-- The editor scanner detects object parameters that require one deterministic
-  target but can receive multiple initial/dynamically created candidates.
-  Preview/export is blocked until a picking condition or `For each` structure
-  makes the target unambiguous.
+- Editor and MCP validation do not inspect object-picking cardinality or require
+  a picking condition/`For each` structure. Object-picking behavior therefore
+  stays compatible with classic GDevelop authoring.
 - Conditions may consume multi-instance candidate lists because filtering them
   is their job.
 - Normal object/behavior actions still intentionally iterate all picked
   instances. They are not globally converted into single-target operations.
 
-This is narrower than saying “every object-consuming action requires one
-instance.” `docs/DeterministicObjectPicking.md` captures the design rationale,
-while `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`,
-`GDJS/Runtime/gd.ts`, and
+Event authors should narrow scalar targets with picking conditions such as
+`Pick random` or `Pick nearest`, or use `For each object` when every instance
+needs an isolated selection context. A singleton assertion violation throws at
+runtime rather than silently choosing the first candidate.
+
+`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`, `GDJS/Runtime/gd.ts`,
+and
 `newIDE/app/src/Utils/EventsValidationScanner.js` are the implementation
 authority for the current checkout.
 
@@ -401,7 +402,9 @@ The editor also blocks preview/export for enabled actions in a standard event
 with no enabled condition, invalid Static Data placeholders, and unsafe
 conditionless external-layout creation. These are authoring policy gates in
 `newIDE/app/src/MainFrame` and the event scanner; they are not fundamental
-upstream event AST rules.
+upstream event AST rules. Enabled conditions on parent events, including
+`For each object`, gate their nested standard events and do not need to be
+duplicated locally.
 
 ### Parameters and expressions
 

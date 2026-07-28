@@ -221,8 +221,8 @@ Preserve:
   logic ad hoc in React or a generator.
 - Object picking is list state: conditions filter, subevents inherit, and
   ordinary object/behavior actions iterate. Scalar/single-target consumers use
-  stricter cardinality checks. Read `docs/DeterministicObjectPicking.md` before
-  changing this.
+  stricter cardinality checks. Read the "Object picking and single-instance
+  consumption" section of `docs/Architecture.md` before changing this.
 - Runtime deletion/recycling is intentionally deferred because generated code
   may retain references until a safe drain point.
 - Runtime frame order is a contract. Signals are queued and delivered on a

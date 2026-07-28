@@ -14,6 +14,11 @@ namespace gdjs {
     _centerSprite: PIXI.Sprite | PIXI.TilingSprite;
     _borderSprites: Array<PIXI.Sprite | PIXI.TilingSprite>;
     _wasRendered: boolean = false;
+    /**
+     * Rebuilding the bitmap cache costs more than rendering the sprites
+     * directly, so objects that change at every frame are never cached.
+     */
+    _wasUpdatedSinceLastFrame: boolean = true;
     _textureWidth = 0;
     _textureHeight = 0;
 
@@ -56,6 +61,7 @@ namespace gdjs {
         new PIXI.Sprite(new PIXI.Texture(texture.baseTexture)),
       ];
 
+      this._keepCachedBitmapScaleMode();
       this.setTexture(textureName, instanceContainer);
       this._spritesContainer.removeChildren();
       this._spritesContainer.addChild(this._centerSprite);
@@ -73,30 +79,47 @@ namespace gdjs {
       return this._wrapperContainer;
     }
 
+    /**
+     * PixiJS always builds the `cacheAsBitmap` texture with the default scale
+     * mode (LINEAR) and gives no option to change it, which would blur panel
+     * sprites using a non smoothed image. The cached sprite is only created
+     * lazily, during a render, so the scale mode is applied by hooking into its
+     * creation: this keeps the cache pixel perfect even on the very first frame
+     * it's displayed.
+     */
+    private _keepCachedBitmapScaleMode(): void {
+      const spritesContainer = this._spritesContainer as any;
+      const initCachedDisplayObject = spritesContainer._initCachedDisplayObject;
+      spritesContainer._initCachedDisplayObject = (renderer: PIXI.Renderer) => {
+        initCachedDisplayObject.call(spritesContainer, renderer);
+        const cachedSprite = spritesContainer._cacheData
+          ? spritesContainer._cacheData.sprite
+          : null;
+        if (cachedSprite) {
+          cachedSprite.texture.baseTexture.scaleMode =
+            this._centerSprite.texture.baseTexture.scaleMode;
+        }
+      };
+    }
+
     ensureUpToDate() {
       if (this._spritesContainer.visible && this._wasRendered) {
-        // PIXI uses PIXI.SCALE_MODES.LINEAR for the cached image:
-        // this._spritesContainer._cacheData.sprite._texture.baseTexture.scaleMode
-        // There seems to be no way to configure this so the optimization is disabled.
-        if (
-          this._centerSprite.texture.baseTexture.scaleMode !==
-          PIXI.SCALE_MODES.NEAREST
-        ) {
-          // Cache the rendered sprites as a bitmap to speed up rendering when
-          // lots of panel sprites are on the scene, but only when the object is
-          // fully opaque.
-          // Because of a PixiJS v7 bug, `cacheAsBitmap` bakes the inherited
-          // `worldAlpha` into the cached texture, which is then multiplied again
-          // by the wrapper's alpha (see updateOpacity). A semi-transparent panel
-          // sprite would then render about twice as transparent as it should
-          // (and inconsistently with Sprite and Tiled Sprite). When there is any
-          // transparency, render the sprites directly so the opacity is applied
-          // exactly once, on the wrapper.
-          // See https://github.com/pixijs/pixijs/issues/10757
-          const isFullyOpaque = this._spritesContainer.worldAlpha >= 1;
-          this._spritesContainer.cacheAsBitmap = isFullyOpaque;
-        }
+        // Cache the rendered sprites as a bitmap to speed up rendering when
+        // lots of panel sprites are on the scene, but only when the object is
+        // fully opaque and didn't change since the last frame.
+        // Because of a PixiJS v7 bug, `cacheAsBitmap` bakes the inherited
+        // `worldAlpha` into the cached texture, which is then multiplied again
+        // by the wrapper's alpha (see updateOpacity). A semi-transparent panel
+        // sprite would then render about twice as transparent as it should
+        // (and inconsistently with Sprite and Tiled Sprite). When there is any
+        // transparency, render the sprites directly so the opacity is applied
+        // exactly once, on the wrapper.
+        // See https://github.com/pixijs/pixijs/issues/10757
+        const isFullyOpaque = this._spritesContainer.worldAlpha >= 1;
+        this._spritesContainer.cacheAsBitmap =
+          isFullyOpaque && !this._wasUpdatedSinceLastFrame;
       }
+      this._wasUpdatedSinceLastFrame = false;
       this._wasRendered = true;
     }
 
@@ -190,6 +213,7 @@ namespace gdjs {
       this._borderSprites[7].height = bottomMargin;
 
       this._wasRendered = true;
+      this._wasUpdatedSinceLastFrame = true;
       this._spritesContainer.cacheAsBitmap = false;
 
       const leftBorder = leftMargin;
@@ -403,6 +427,7 @@ namespace gdjs {
       ) {
         this._borderSprites[borderCounter].tint = tint;
       }
+      this._wasUpdatedSinceLastFrame = true;
       this._spritesContainer.cacheAsBitmap = false;
     }
 

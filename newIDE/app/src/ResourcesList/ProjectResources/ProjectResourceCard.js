@@ -134,6 +134,10 @@ export const ProjectResourceCard = ({
               resourceName,
               {}
             )}
+            embeddedTextureUrls={ResourcesLoader.getEmbeddedResourceUrls(
+              project,
+              resourceName
+            )}
             fullWidth
           />
         );

@@ -58,6 +58,10 @@ const ResourceThumbnail = ({
             resourceName,
             {}
           )}
+          embeddedTextureUrls={ResourcesLoader.getEmbeddedResourceUrls(
+            project,
+            resourceName
+          )}
           size={size || 100}
         />
       );

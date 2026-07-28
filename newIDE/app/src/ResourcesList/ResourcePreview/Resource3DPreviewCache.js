@@ -6,7 +6,14 @@
 // (see `ResourcesLoader`), so that a preview is still shown while it's rendered
 // again for a new URL.
 let previewCache: { [key: string]: {| url: string, preview: string |} } = {};
-let requestPreview: ?(url: string) => Promise<?string> = null;
+// For models keeping their textures in separate files, the URL of each of
+// these files, indexed by the path written inside the model.
+export type EmbeddedTextureUrls = { [filePath: string]: string };
+
+let requestPreview: ?(
+  url: string,
+  embeddedTextureUrls?: ?EmbeddedTextureUrls
+) => Promise<?string> = null;
 const requestedPreviewUrls: Set<string> = new Set();
 const previewRenderedListeners: Set<() => void> = new Set();
 let isListenersNotificationScheduled = false;
@@ -40,7 +47,10 @@ export const burstResource3DPreviewCache = () => {
 };
 
 export const setResource3DPreviewRequester = (
-  requester: ?(url: string) => Promise<?string>
+  requester: ?(
+    url: string,
+    embeddedTextureUrls?: ?EmbeddedTextureUrls
+  ) => Promise<?string>
 ) => {
   requestPreview = requester;
   if (!requester) burstResource3DPreviewCache();
@@ -64,7 +74,10 @@ export const subscribeToResource3DPreviewRendered = (
   };
 };
 
-export const getResource3DPreviewOrRequest = (url: string): ?string => {
+export const getResource3DPreviewOrRequest = (
+  url: string,
+  embeddedTextureUrls?: ?EmbeddedTextureUrls
+): ?string => {
   const cached = previewCache[getCacheKey(url)];
   if (cached && cached.url === url) return cached.preview;
   if (!requestedPreviewUrls.has(url)) {
@@ -75,7 +88,10 @@ export const getResource3DPreviewOrRequest = (url: string): ?string => {
         requestedPreviewUrls.delete(url);
         return;
       }
-      requestPreview(url).then(onPreviewRequestDone, onPreviewRequestDone);
+      requestPreview(url, embeddedTextureUrls).then(
+        onPreviewRequestDone,
+        onPreviewRequestDone
+      );
     });
   }
   return cached ? cached.preview : null;

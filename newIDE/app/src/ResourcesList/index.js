@@ -10,6 +10,7 @@ import SearchBar from '../UI/SearchBar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { filterResourcesList } from './EnumerateResources';
 import { getResourceFilePathStatus } from './ResourceUtils';
+import { getMissingEmbeddedResourceNames } from './EmbeddedResources';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -490,11 +491,15 @@ const ResourcesList: React.ComponentType<{
             .toJSArray();
           const newResourcesWithErrors = {};
           resourceNames.forEach(resourceName => {
+            // A resource can also be unusable because a resource it refers to
+            // (the textures of a 3D model, the tileset of a tilemap...) is
+            // missing from the project.
             // $FlowFixMe[prop-missing]
-            newResourcesWithErrors[resourceName] = getResourceFilePathStatus(
-              project,
-              resourceName
-            );
+            newResourcesWithErrors[resourceName] =
+              getResourceFilePathStatus(project, resourceName) ||
+              (getMissingEmbeddedResourceNames(project, resourceName).length > 0
+                ? 'error'
+                : '');
           });
           setResourcesWithErrors(newResourcesWithErrors);
           forceUpdateList();

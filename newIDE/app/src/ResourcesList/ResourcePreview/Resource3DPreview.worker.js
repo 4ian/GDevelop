@@ -159,8 +159,11 @@ const initRenderer = dracoDecoderFiles => {
 // Render a 3D model to the offscreen canvas and return the data URL.
 // resourceData is an ArrayBuffer fetched by the main thread (workers cannot
 // fetch file:// URLs in Electron due to network service sandboxing).
+// embeddedTextures holds, for models keeping their textures in separate files,
+// the content of these files (fetched by the main thread too), indexed by the
+// path written inside the model.
 // $FlowFixMe[missing-local-annot]
-const renderModel = async (resourceUrl, resourceData, basePath) => {
+const renderModel = async (resourceData, basePath, embeddedTextures) => {
   if (!renderer || !scene || !camera) {
     throw new Error('Renderer not initialized');
   }
@@ -168,7 +171,25 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
   // Parse the pre-fetched model data instead of fetching the URL,
   // so the worker never needs to make any network/file requests.
   return new Promise((resolve, reject) => {
-    const loader = new GLTFLoader();
+    // Textures kept in separate files are exposed as blob URLs, and the loader
+    // is redirected to them: they are then decoded exactly like the textures
+    // stored in the model (at the preview size).
+    const textureUrls = {};
+    if (embeddedTextures) {
+      Object.keys(embeddedTextures).forEach(filePath => {
+        textureUrls[
+          THREE.LoaderUtils.resolveURL(filePath, basePath)
+        ] = URL.createObjectURL(new Blob([embeddedTextures[filePath]]));
+      });
+    }
+    const revokeTextureUrls = () =>
+      Object.keys(textureUrls).forEach(url =>
+        URL.revokeObjectURL(textureUrls[url])
+      );
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.setURLModifier(url => textureUrls[url] || url);
+
+    const loader = new GLTFLoader(loadingManager);
     if (dracoLoader) {
       loader.setDRACOLoader(dracoLoader);
     }
@@ -190,6 +211,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
       resourceData,
       basePath,
       gltf => {
+        revokeTextureUrls();
         if (!renderer || !scene || !camera) {
           throw new Error('Renderer not initialized');
         }
@@ -297,6 +319,7 @@ const renderModel = async (resourceUrl, resourceData, basePath) => {
       },
       // Unlike `load`, `parse` has no progress callback.
       error => {
+        revokeTextureUrls();
         reject(error);
       }
     );
@@ -329,11 +352,11 @@ self.onmessage = async event => {
           throw new Error('Renderer not initialized');
         }
 
-        const { resourceData, basePath } = event.data;
+        const { resourceData, basePath, embeddedTextures } = event.data;
         const screenshot = await renderModel(
-          resourceUrl,
           resourceData,
-          basePath
+          basePath,
+          embeddedTextures
         );
         // eslint-disable-next-line no-restricted-globals
         self.postMessage({

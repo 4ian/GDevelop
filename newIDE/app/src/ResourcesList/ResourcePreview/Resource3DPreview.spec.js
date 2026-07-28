@@ -85,6 +85,95 @@ describe('Resource3DPreviewProvider', () => {
 
     act(() => testRenderer.unmount());
   });
+
+  it('sends the textures kept in separate files to the worker, with the model', async () => {
+    // A worker able to render, remembering what it was asked to render.
+    // $FlowFixMe[unclear-type] - Messages sent to the mock worker.
+    const renderMessages: Array<any> = [];
+    const transferredBuffers: Array<ArrayBuffer> = [];
+    // $FlowFixMe[prop-missing]
+    Resource3DPreviewWorker.mockImplementation(() => {
+      // $FlowFixMe[unclear-type] - Mock worker for tests
+      const worker: any = {
+        onmessage: null,
+        onerror: null,
+        terminate: () => {},
+        postMessage: (message: any, transfer: Array<ArrayBuffer>) => {
+          if (message.type === 'INIT') {
+            setTimeout(() =>
+              worker.onmessage({ data: { type: 'INIT', success: true } })
+            );
+            return;
+          }
+          renderMessages.push(message);
+          transferredBuffers.push(...transfer);
+          setTimeout(() =>
+            worker.onmessage({
+              data: {
+                type: 'RENDER_COMPLETE',
+                resourceUrl: message.resourceUrl,
+                screenshot: 'blob:rendered-model',
+              },
+            })
+          );
+        },
+      };
+      return worker;
+    });
+    // Each file is served with its URL as content.
+    global.fetch = jest.fn((url: string) =>
+      Promise.resolve({
+        ok: true,
+        arrayBuffer: () =>
+          Promise.resolve(new TextEncoder().encode(url).buffer),
+      })
+    );
+
+    let getResourcePreview = null;
+    const Consumer = () => {
+      getResourcePreview = React.useContext(Resource3DPreviewContext)
+        .getResourcePreview;
+      return null;
+    };
+    let testRenderer;
+    await act(async () => {
+      testRenderer = renderer.create(
+        <Resource3DPreviewProvider>
+          <Consumer />
+        </Resource3DPreviewProvider>
+      );
+    });
+    if (!getResourcePreview) throw new Error('No context value.');
+    const requestPreview = getResourcePreview;
+
+    let preview;
+    await act(async () => {
+      preview = await requestPreview('https://example.com/models/barrels.glb', {
+        'Textures/barrel.png': 'https://example.com/textures/barrel.png',
+        'Textures/planks.png': 'https://example.com/textures/planks.png',
+      });
+    });
+
+    expect(preview).toBe('blob:rendered-model');
+    expect(renderMessages).toHaveLength(1);
+    const { embeddedTextures, basePath } = renderMessages[0];
+    expect(basePath).toBe('https://example.com/models/');
+    // The textures are indexed by the paths written inside the model.
+    expect(Object.keys(embeddedTextures).sort()).toEqual([
+      'Textures/barrel.png',
+      'Textures/planks.png',
+    ]);
+    expect(
+      new TextDecoder().decode(embeddedTextures['Textures/planks.png'])
+    ).toBe('https://example.com/textures/planks.png');
+    // They are transferred to the worker, like the model.
+    expect(transferredBuffers).toHaveLength(3);
+    expect(transferredBuffers).toContain(
+      embeddedTextures['Textures/barrel.png']
+    );
+
+    act(() => testRenderer.unmount());
+  });
 });
 
 describe('Resource3DPreviewCache', () => {
@@ -100,12 +189,14 @@ describe('Resource3DPreviewCache', () => {
 
   it('keeps the preview of a local file while it is rendered again after a URL cache burst', async () => {
     let renderCount = 0;
-    const requester = jest.fn(async (url: string) => {
-      renderCount++;
-      const preview = `blob:preview-${renderCount}`;
-      setCachedResource3DPreview(url, preview);
-      return preview;
-    });
+    const requester = jest.fn(
+      async (url: string, _embeddedTextureUrls: ?{ [string]: string }) => {
+        renderCount++;
+        const preview = `blob:preview-${renderCount}`;
+        setCachedResource3DPreview(url, preview);
+        return preview;
+      }
+    );
     setResource3DPreviewRequester(requester);
 
     expect(getResource3DPreviewOrRequest('file:///a.glb?cache=1')).toBe(null);
@@ -125,5 +216,22 @@ describe('Resource3DPreviewCache', () => {
       'blob:preview-2'
     );
     expect(revokedUrls).toEqual(['blob:preview-1']);
+  });
+
+  it('gives the URLs of the textures kept in separate files to the requester', async () => {
+    const requester = jest.fn(
+      async (url: string, _embeddedTextureUrls: ?{ [string]: string }) =>
+        'blob:preview'
+    );
+    setResource3DPreviewRequester(requester);
+
+    getResource3DPreviewOrRequest('file:///models/barrels.glb', {
+      'Textures/barrel.png': 'file:///models/Textures/barrel.png',
+    });
+    await waitForMicrotasks();
+
+    expect(requester).toHaveBeenCalledWith('file:///models/barrels.glb', {
+      'Textures/barrel.png': 'file:///models/Textures/barrel.png',
+    });
   });
 });

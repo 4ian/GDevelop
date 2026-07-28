@@ -60,6 +60,10 @@ const ResourcePreview = (props: Props): null | React.Node => {
             resourceName,
             {}
           )}
+          embeddedTextureUrls={props.resourcesLoader.getEmbeddedResourceUrls(
+            project,
+            resourceName
+          )}
           expand
         />
       );

@@ -12,6 +12,7 @@ import {
   setCachedResource3DPreview,
   setResource3DPreviewRequester,
   subscribeToResource3DPreviewRendered,
+  type EmbeddedTextureUrls,
 } from './Resource3DPreviewCache';
 
 type WorkerInitMessage = {|
@@ -22,11 +23,17 @@ type WorkerInitMessage = {|
   dracoDecoderFiles: ?DracoDecoderFiles,
 |};
 
+type EmbeddedTexturesData = { [filePath: string]: ArrayBuffer };
+
 type WorkerRenderModelMessage = {|
   type: 'RENDER_MODEL',
   resourceUrl: string,
   resourceData: ArrayBuffer,
   basePath: string,
+  // For models keeping their textures in separate files, the content of these
+  // files (which the worker can't read by itself), indexed by the path written
+  // inside the model.
+  embeddedTextures: ?EmbeddedTexturesData,
 |};
 
 type WorkerOutInitMessage = {|
@@ -52,11 +59,17 @@ type WorkerOutMessage =
   | WorkerOutRenderErrorMessage;
 
 export type Resource3DPreviewState = {|
-  getResourcePreview: (resourceUrl: string) => Promise<?string>,
+  getResourcePreview: (
+    resourceUrl: string,
+    embeddedTextureUrls?: ?EmbeddedTextureUrls
+  ) => Promise<?string>,
 |};
 
 const initialResource3DPreviewState = {
-  getResourcePreview: async (_resourceUrl: string) => null,
+  getResourcePreview: async (
+    _resourceUrl: string,
+    _embeddedTextureUrls?: ?EmbeddedTextureUrls
+  ) => null,
 };
 
 const Resource3DPreviewContext: React.Context<Resource3DPreviewState> = React.createContext<Resource3DPreviewState>(
@@ -189,7 +202,8 @@ class Resource3DPreviewWorkerManager {
   async renderModel(
     resourceUrl: string,
     resourceData: ArrayBuffer,
-    basePath: string
+    basePath: string,
+    embeddedTextures: ?EmbeddedTexturesData
   ): Promise<string> {
     const isInitialized = await this.initializationPromise;
     if (!isInitialized) {
@@ -204,9 +218,13 @@ class Resource3DPreviewWorkerManager {
         resourceUrl,
         resourceData,
         basePath,
+        embeddedTextures,
       };
-      // Transfer the ArrayBuffer to avoid copying it across threads.
-      this.worker.postMessage(message, [resourceData]);
+      // Transfer the ArrayBuffers to avoid copying them across threads.
+      this.worker.postMessage(message, [
+        resourceData,
+        ...(embeddedTextures ? Object.values(embeddedTextures) : []),
+      ]);
     });
   }
 
@@ -230,7 +248,7 @@ export const useOnResource3DPreviewRendered = (listener: () => void) => {
 // The resource data is fetched on the main thread. Workers in Electron cannot
 // fetch file:// URLs because webSecurity:false only applies to the renderer
 // process, not the network service process used by workers.
-const fetchModelData = async (url: string): Promise<?ArrayBuffer> => {
+const fetchResourceData = async (url: string): Promise<?ArrayBuffer> => {
   try {
     const response = await fetch(url, {
       credentials: checkIfCredentialsRequired(url) ? 'include' : 'same-origin',
@@ -238,17 +256,42 @@ const fetchModelData = async (url: string): Promise<?ArrayBuffer> => {
     if (!response.ok) throw new Error(`HTTP error ${response.status}`);
     return await response.arrayBuffer();
   } catch (error) {
-    console.error('Error fetching 3D model resource:', error);
+    console.error('Error fetching resource of a 3D model:', error);
     return null;
   }
 };
 
+/**
+ * Fetch the textures that a model keeps in separate files. A texture that
+ * can't be fetched is skipped: the model is still worth showing without it.
+ */
+const fetchEmbeddedTextures = async (
+  embeddedTextureUrls: ?EmbeddedTextureUrls
+): Promise<?EmbeddedTexturesData> => {
+  if (!embeddedTextureUrls) return null;
+
+  const embeddedTextures: EmbeddedTexturesData = {};
+  await Promise.all(
+    Object.keys(embeddedTextureUrls).map(async filePath => {
+      const textureData = await fetchResourceData(
+        embeddedTextureUrls[filePath]
+      );
+      if (textureData) embeddedTextures[filePath] = textureData;
+    })
+  );
+  return embeddedTextures;
+};
+
+type QueueItem = {|
+  url: string,
+  embeddedTextureUrls: ?EmbeddedTextureUrls,
+  resolve: (dataUrl: ?string) => void,
+|};
+
 export const Resource3DPreviewProvider = ({
   children,
 }: Props): React.MixedElement => {
-  const queueRef = React.useRef<
-    Array<{ url: string, resolve: (dataUrl: ?string) => void }>
-  >([]);
+  const queueRef = React.useRef<Array<QueueItem>>([]);
   const workerManagerRef = React.useRef<?Resource3DPreviewWorkerManager>(null);
 
   // Initialize the worker manager on mount
@@ -273,7 +316,8 @@ export const Resource3DPreviewProvider = ({
     resourceDataPromise: Promise<?ArrayBuffer>,
   }>(null);
 
-  const renderModel = React.useCallback(async (url: string) => {
+  const renderModel = React.useCallback(async (item: QueueItem) => {
+    const { url, embeddedTextureUrls } = item;
     const workerManager = workerManagerRef.current;
     if (!workerManager) {
       return 'JsPlatform/Extensions/3d_model.svg';
@@ -284,17 +328,19 @@ export const Resource3DPreviewProvider = ({
     const resourceDataPromise =
       prefetchedModel && prefetchedModel.url === url
         ? prefetchedModel.resourceDataPromise
-        : fetchModelData(url);
+        : fetchResourceData(url);
 
     const nextItem = queueRef.current.find(item => item.url !== url);
     if (nextItem && !getCachedResource3DPreview(nextItem.url)) {
       prefetchedModelRef.current = {
         url: nextItem.url,
-        resourceDataPromise: fetchModelData(nextItem.url),
+        resourceDataPromise: fetchResourceData(nextItem.url),
       };
     }
 
+    const embeddedTexturesPromise = fetchEmbeddedTextures(embeddedTextureUrls);
     const resourceData = await resourceDataPromise;
+    const embeddedTextures = await embeddedTexturesPromise;
     if (!resourceData) {
       return 'JsPlatform/Extensions/3d_model.svg';
     }
@@ -305,7 +351,8 @@ export const Resource3DPreviewProvider = ({
       const dataUrl = await workerManager.renderModel(
         url,
         resourceData,
-        basePath
+        basePath,
+        embeddedTextures
       );
       return dataUrl;
     } catch (error) {
@@ -318,8 +365,9 @@ export const Resource3DPreviewProvider = ({
   const processQueue = React.useCallback(
     async () => {
       while (queueRef.current.length) {
-        const url = queueRef.current[0].url;
-        const dataUrl = await renderModel(url);
+        const queueItem = queueRef.current[0];
+        const url = queueItem.url;
+        const dataUrl = await renderModel(queueItem);
         setCachedResource3DPreview(url, dataUrl);
 
         // Resolve all the requests made for that URL and remove them from the queue.
@@ -333,7 +381,10 @@ export const Resource3DPreviewProvider = ({
   );
 
   const enqueueResource = React.useCallback(
-    (url: string): Promise<?string> => {
+    (
+      url: string,
+      embeddedTextureUrls?: ?EmbeddedTextureUrls
+    ): Promise<?string> => {
       return new Promise(resolve => {
         // If it's already in the cache, resolve immediately.
         const cachedPreview = getCachedResource3DPreview(url);
@@ -342,7 +393,7 @@ export const Resource3DPreviewProvider = ({
           return;
         }
 
-        queueRef.current.push({ url, resolve });
+        queueRef.current.push({ url, embeddedTextureUrls, resolve });
         // Unless the queue is already being processed.
         if (queueRef.current.length === 1) processQueue();
       });

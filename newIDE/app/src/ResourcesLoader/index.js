@@ -3,6 +3,7 @@ import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
 import { encodeLocalFileNameForUrl } from '../Utils/PercentEncodedFileName';
 import { getResource3DPreviewOrRequest } from '../ResourcesList/ResourcePreview/Resource3DPreviewCache';
+import { getEmbeddedResourceNames } from '../ResourcesList/EmbeddedResources';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -97,8 +98,40 @@ export default class ResourcesLoader {
   ): ?string {
     if (!resourceName) return null;
     return getResource3DPreviewOrRequest(
-      ResourcesLoader.getResourceFullUrl(project, resourceName, {})
+      ResourcesLoader.getResourceFullUrl(project, resourceName, {}),
+      // Models can keep their textures in separate files.
+      ResourcesLoader.getEmbeddedResourceUrls(project, resourceName)
     );
+  }
+
+  /**
+   * Return the URLs of the resources that the given resource refers to (like
+   * the textures of a 3D model kept in separate files), indexed by the file
+   * path written inside it - see `getEmbeddedResourceNames`.
+   *
+   * @returns null if this resource refers to no other resource of the project.
+   */
+  static getEmbeddedResourceUrls(
+    project: gdProject,
+    resourceName: string
+  ): { [filePath: string]: string } | null {
+    const embeddedResourceNames = getEmbeddedResourceNames(
+      project,
+      resourceName
+    );
+    if (!embeddedResourceNames) return null;
+
+    const embeddedResourceUrls: { [filePath: string]: string } = {};
+    for (const [filePath, embeddedResourceName] of Object.entries(
+      embeddedResourceNames
+    )) {
+      embeddedResourceUrls[filePath] = ResourcesLoader.getResourceFullUrl(
+        project,
+        embeddedResourceName,
+        {}
+      );
+    }
+    return embeddedResourceUrls;
   }
 
   /**

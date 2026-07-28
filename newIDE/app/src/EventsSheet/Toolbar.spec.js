@@ -24,7 +24,6 @@ jest.mock('../UI/Toolbar', () => {
 });
 jest.mock('../UI/ToolbarSeparator', () => () => null);
 jest.mock('./ToolbarCommands', () => () => null);
-jest.mock('../UI/Menu/ElementWithMenu', () => props => props.element);
 jest.mock('../KeyboardShortcuts', () => ({
   getShortcutDisplayName: () => '',
   useShortcutMap: () => ({ OPEN_SCENE_VARIABLES: '' }),
@@ -59,6 +58,17 @@ const makeProps = (onOpenLayoutEditor?: ?() => void) => ({
 });
 
 describe('EventsSheet Toolbar', () => {
+  it('does not show the removed add-event dropdown button', () => {
+    const component = TestRenderer.create(<Toolbar {...makeProps()} />);
+
+    expect(
+      component.root.findAll(
+        node =>
+          node.type === 'button' && node.props.id === 'toolbar-add-event-button'
+      )
+    ).toHaveLength(0);
+  });
+
   it('shows the associated scene button only when the editor provides one', () => {
     const onOpenLayoutEditor = jest.fn();
     const component = TestRenderer.create(

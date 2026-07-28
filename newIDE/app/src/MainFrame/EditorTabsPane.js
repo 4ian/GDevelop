@@ -527,34 +527,19 @@ const EditorTabsPane: React.ComponentType<{
       if (paneIdentifier === 'center') {
         onFocusedEditorTabChange(editorTab);
       }
-      updateToolbar();
-      // Ensure the editors shown on the screen are updated. This is for
-      // example useful if global objects have been updated in another editor.
-      if (editorTab.editorRef) {
-        editorTab.editorRef.forceUpdateEditor();
-      }
     },
-    [onFocusedEditorTabChange, paneIdentifier, updateToolbar]
+    [onFocusedEditorTabChange, paneIdentifier]
   );
 
   const onChangeEditorTab = React.useCallback(
     (value: number) => {
       const newEditorTabs = changeCurrentTab(editorTabs, paneIdentifier, value);
       setEditorTabs(newEditorTabs);
-
-      const newCurrentTab = getCurrentTabForPane(newEditorTabs, paneIdentifier);
-      if (newCurrentTab) {
-        onFocusedEditorTabChange(newCurrentTab, { force: true });
-        onEditorTabActivated(newCurrentTab);
-      }
+      // The new active prop renders the selected editor and ClosableTab reports
+      // its activation after that commit. Doing either operation imperatively
+      // here would render a large events sheet again while switching tabs.
     },
-    [
-      editorTabs,
-      setEditorTabs,
-      onEditorTabActivated,
-      onFocusedEditorTabChange,
-      paneIdentifier,
-    ]
+    [editorTabs, setEditorTabs, paneIdentifier]
   );
 
   const onCloseEditorTab = React.useCallback(

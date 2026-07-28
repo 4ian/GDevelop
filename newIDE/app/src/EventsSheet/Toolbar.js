@@ -12,9 +12,7 @@ import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
 import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
-import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
 import SceneIcon from '../UI/CustomSvgIcons/Scene';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
@@ -137,26 +135,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
           </>
         )}
         {settingsButtonPosition === 'start' && settingsButton}
-        <ElementWithMenu
-          element={
-            <IconButton
-              size="small"
-              color="default"
-              id="toolbar-add-event-button"
-              tooltip={t`Add an event`}
-            >
-              <AddEventIcon />
-            </IconButton>
-          }
-          buildMenuTemplate={() =>
-            allEventsMetadata.map(metadata => ({
-              label: metadata.fullName,
-              click: () => {
-                onAddEvent(metadata.type);
-              },
-            }))
-          }
-        />
         <IconButton
           size="small"
           color="default"

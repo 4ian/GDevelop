@@ -129,7 +129,6 @@ void ArbitraryResourceWorker::ExposeEmbeddeds(gd::String& resourceName) {
             child.second->GetValue().GetString();
 
         if (resourcesManager->HasResource(targetResourceName)) {
-          std::cout << targetResourceName << std::endl;
           gd::Resource& targetResource =
               resourcesManager->GetResource(targetResourceName);
 
@@ -160,6 +159,7 @@ void ArbitraryResourceWorker::ExposeResourceWithType(
   }
   if (resourceType == "model3D") {
     ExposeModel3D(resourceName);
+    ExposeEmbeddeds(resourceName);
     return;
   }
   if (resourceType == "audio") {

@@ -315,6 +315,9 @@ void Model3DObjectConfiguration::DoSerializeTo(
 void Model3DObjectConfiguration::ExposeResources(
     gd::ArbitraryResourceWorker &worker) {
   worker.ExposeModel3D(modelResourceName);
+  // A model can refer to texture files stored outside of it. They are exposed
+  // as image resources embedded in the model resource.
+  worker.ExposeEmbeddeds(modelResourceName);
 }
 
 const gd::String &

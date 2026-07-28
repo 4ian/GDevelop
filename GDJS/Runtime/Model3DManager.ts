@@ -236,6 +236,80 @@ namespace gdjs {
   }
 
   /**
+   * Escape a string so that it can be used in a `RegExp` matching it exactly.
+   */
+  const escapeRegExp = (text: string): string =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  /**
+   * A Three.js loader that gives back textures already loaded by the
+   * `ImageManager`, instead of downloading the image files that a 3D model file
+   * refers to.
+   *
+   * A 3D model can be exported with its textures kept in separate files. In this
+   * case, the editor creates an image resource for each of these files when the
+   * model is imported, and remembers which resource matches which file path
+   * written in the model ("embedded resources"). This loader does this lookup so
+   * that textures are shared with the rest of the game and no additional file is
+   * ever downloaded.
+   *
+   * Textures stored inside the model file are handled by
+   * `SharedTexturesGLTFPlugin` instead.
+   */
+  class EmbeddedTextureLoader extends THREE.Loader<THREE.Texture> {
+    private _runtimeGame: gdjs.RuntimeGame;
+    private _modelResourceName: string;
+
+    constructor(runtimeGame: gdjs.RuntimeGame, modelResourceName: string) {
+      super();
+      this._runtimeGame = runtimeGame;
+      this._modelResourceName = modelResourceName;
+    }
+
+    override load(
+      url: string,
+      onLoad: (texture: THREE.Texture) => void,
+      onProgress?: (event: ProgressEvent) => void,
+      onError?: (error: unknown) => void
+    ): void {
+      const imageResourceName = this._runtimeGame.resolveEmbeddedResource(
+        this._modelResourceName,
+        url
+      );
+      const imageManager = this._runtimeGame.getImageManager();
+
+      // The image resource is usually already loaded, as it's listed with the
+      // other resources used by the scene. Ensure it's loaded anyway, because
+      // resources can also be loaded one by one (for objects loaded on demand).
+      imageManager
+        .loadResource(imageResourceName)
+        .then(() => {
+          // Give a copy of the texture: the glTF loader configures it according
+          // to the model (flipping, wrapping, color space...) and this must not
+          // alter the texture shared with the other objects using this image.
+          // Copies share the same Source, so the image is uploaded only once on
+          // the GPU (and disposing a copy leaves the others intact).
+          const threeTexture = imageManager
+            .getThreeTexture(imageResourceName)
+            .clone();
+          threeTexture.userData.gdevelopImageResourceName = imageResourceName;
+          onLoad(threeTexture);
+        })
+        .catch((error) => {
+          logger.error(
+            'Unable to load the texture "' +
+              imageResourceName +
+              '" used by the 3D model "' +
+              this._modelResourceName +
+              '", error: ' +
+              error
+          );
+          if (onError) onError(error);
+        });
+    }
+  }
+
+  /**
    * Load, access, and unload the game's registered model3D resources.
    * Call loadResource to download a GLB, then processResource to make it
    * available through getModel.
@@ -262,8 +336,6 @@ namespace gdjs {
       this._resourceLoader = resourceLoader;
 
       if (typeof THREE !== 'undefined') {
-        this._loader = new THREE_ADDONS.GLTFLoader();
-
         this._dracoLoader = new THREE_ADDONS.DRACOLoader();
         // The Draco decoder files are shipped with the game engine files.
         const runtimeFilesBaseUrl =
@@ -272,10 +344,7 @@ namespace gdjs {
         this._dracoLoader.setDecoderPath(
           runtimeFilesBaseUrl + 'pixi-renderers/draco/gltf/'
         );
-        this._loader.setDRACOLoader(this._dracoLoader);
-        this._loader.register(
-          (parser) => new SharedTexturesGLTFPlugin(parser, this._sharedTextures)
-        );
+        this._loader = this._createLoader();
 
         /**
          * The invalid model is a box with magenta (#ff00ff) faces, to be
@@ -313,7 +382,7 @@ namespace gdjs {
         );
         return;
       }
-      const loader = this._loader;
+      const loader = this._getLoaderFor(resourceName);
       if (!loader) {
         return;
       }
@@ -325,15 +394,78 @@ namespace gdjs {
       try {
         const gltf: THREE_ADDONS.GLTF = await loader.parseAsync(data, '');
         forEachMaterial(gltf.scene, (material) =>
-          forEachTexture(material, (texture) =>
-            this._sharedTextures.retain(texture, resource.name)
-          )
+          forEachTexture(material, (texture) => {
+            this._applyImageResourceSettings(texture);
+            this._sharedTextures.retain(texture, resource.name);
+          })
         );
         this._loadedThreeModels.set(resource, gltf);
       } catch (error) {
         logger.error(
           "Can't fetch the 3D model file " + resource.file + ', error: ' + error
         );
+      }
+    }
+
+    /**
+     * Create a loader for 3D models, able to decode Draco compressed models and
+     * sharing the textures embedded in models.
+     */
+    private _createLoader(
+      loadingManager?: THREE.LoadingManager
+    ): THREE_ADDONS.GLTFLoader {
+      const loader = new THREE_ADDONS.GLTFLoader(loadingManager);
+      if (this._dracoLoader) {
+        loader.setDRACOLoader(this._dracoLoader);
+      }
+      loader.register(
+        (parser) => new SharedTexturesGLTFPlugin(parser, this._sharedTextures)
+      );
+      return loader;
+    }
+
+    /**
+     * Return the loader to use to parse the given model.
+     *
+     * Models with textures stored in separate files need a loader that knows how
+     * to find these textures in the image resources of the game.
+     */
+    private _getLoaderFor(
+      resourceName: string
+    ): THREE_ADDONS.GLTFLoader | null {
+      const sharedLoader = this._loader;
+      if (!sharedLoader) {
+        return null;
+      }
+
+      const runtimeGame = this._resourceLoader.getRuntimeGame();
+      const textureFilePaths =
+        runtimeGame.getEmbeddedResourcesNames(resourceName);
+      if (textureFilePaths.length === 0) {
+        // The model has no texture stored in a separate file.
+        return sharedLoader;
+      }
+
+      const loadingManager = new THREE.LoadingManager();
+      loadingManager.addHandler(
+        new RegExp('^(' + textureFilePaths.map(escapeRegExp).join('|') + ')$'),
+        new EmbeddedTextureLoader(runtimeGame, resourceName)
+      );
+      return this._createLoader(loadingManager);
+    }
+
+    /**
+     * Apply the settings of the image resource a texture was loaded from, if
+     * any, as the glTF loader configures textures according to the model only.
+     */
+    private _applyImageResourceSettings(texture: THREE.Texture): void {
+      const imageResourceName = texture.userData.gdevelopImageResourceName;
+      if (typeof imageResourceName !== 'string') return;
+
+      const resource = this._resourceLoader.getResource(imageResourceName);
+      if (resource && !resource.smoothed) {
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
       }
     }
 

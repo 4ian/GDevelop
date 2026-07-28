@@ -296,4 +296,141 @@ describe('gdjs.Model3DManager', () => {
       getBaseColorTexture(models[1]).source
     );
   });
+
+  describe('textures stored in separate files', () => {
+    const textureFilePath = '../Textures/colormap.png';
+
+    /**
+     * A model whose texture is stored in a separate file, associated to the
+     * "colormap" image resource (like the editor does when importing it).
+     * @returns {Promise<ResourceData>}
+     */
+    const makeModelWithSeparateTexture = async (name) => ({
+      ...(await makeEditedResource(name, (json) => {
+        json.images[0] = { uri: textureFilePath };
+      })),
+      metadata: JSON.stringify({
+        embeddedResourcesMapping: { [textureFilePath]: 'colormap' },
+      }),
+    });
+
+    /** @returns {ResourceData} */
+    const makeImageResource = ({ smoothed }) => ({
+      kind: 'image',
+      name: 'colormap',
+      file: 'base/GDJS/tests/tests-utils/assets/64x64.jpg',
+      metadata: '',
+      smoothed,
+      userAdded: false,
+    });
+
+    const createManagerWithImages = (resources) => {
+      const runtimeGame = new gdjs.RuntimeGame(
+        gdjs.createProjectData({ resources: { resources } })
+      );
+      // Textures of the ImageManager are made from the images loaded by PixiJS.
+      runtimeGame
+        .getRenderer()
+        .createStandardCanvas(document.createElement('div'));
+      const manager = runtimeGame.getResourceLoader().getModel3DManager();
+      managers.push(manager);
+      return {
+        manager,
+        imageManager: runtimeGame.getImageManager(),
+      };
+    };
+
+    it('uses the image resources, shared by all the models', async () => {
+      const { manager, imageManager } = createManagerWithImages([
+        await makeModelWithSeparateTexture('model-1.glb'),
+        await makeModelWithSeparateTexture('model-2.glb'),
+        makeImageResource({ smoothed: true }),
+      ]);
+
+      const texture1 = getBaseColorTexture(
+        await loadModel(manager, 'model-1.glb')
+      );
+      const texture2 = getBaseColorTexture(
+        await loadModel(manager, 'model-2.glb')
+      );
+      const imageTexture = imageManager.getThreeTexture('colormap');
+
+      expect(texture1).to.be.ok();
+      // Each model has its own texture, configured by the glTF loader...
+      expect(texture1).not.to.be(imageTexture);
+      expect(texture2).not.to.be(texture1);
+      expect(texture1.flipY).to.be(false);
+      expect(imageTexture.flipY).to.be(true);
+      // ...but the image itself is shared with the image resource.
+      expect(texture1.source).to.be(imageTexture.source);
+      expect(texture2.source).to.be(imageTexture.source);
+      expect(texture1.magFilter).to.be(THREE.LinearFilter);
+    });
+
+    it('applies the smoothing setting of the image resource', async () => {
+      const { manager } = createManagerWithImages([
+        await makeModelWithSeparateTexture('model-1.glb'),
+        makeImageResource({ smoothed: false }),
+      ]);
+
+      const texture = getBaseColorTexture(
+        await loadModel(manager, 'model-1.glb')
+      );
+
+      expect(texture.magFilter).to.be(THREE.NearestFilter);
+      expect(texture.minFilter).to.be(THREE.NearestFilter);
+    });
+
+    it('keeps the image resource texture usable when a model unloads', async () => {
+      const model1Resource = await makeModelWithSeparateTexture('model-1.glb');
+      const { manager, imageManager } = createManagerWithImages([
+        model1Resource,
+        await makeModelWithSeparateTexture('model-2.glb'),
+        makeImageResource({ smoothed: true }),
+      ]);
+
+      await loadModel(manager, 'model-1.glb');
+      const model2 = await loadModel(manager, 'model-2.glb');
+      const imageTexture = imageManager.getThreeTexture('colormap');
+      manager.unloadResource(model1Resource);
+
+      expect(imageManager.getThreeTexture('colormap')).to.be(imageTexture);
+      expect(getBaseColorTexture(model2).source).to.be(imageTexture.source);
+    });
+
+    it('still shares the textures embedded in the same models', async () => {
+      // One model mixing a texture in a separate file and an embedded one:
+      // both kinds of textures must be handled.
+      const makeMixedModel = (name) =>
+        makeEditedResource(name, (json) => {
+          json.images.push({ uri: textureFilePath });
+          json.textures.push({ source: json.images.length - 1 });
+          json.materials[0].emissiveTexture = {
+            index: json.textures.length - 1,
+          };
+        }).then((resource) => ({
+          ...resource,
+          metadata: JSON.stringify({
+            embeddedResourcesMapping: { [textureFilePath]: 'colormap' },
+          }),
+        }));
+      const { manager, imageManager } = createManagerWithImages([
+        await makeMixedModel('mixed-1.glb'),
+        await makeMixedModel('mixed-2.glb'),
+        makeImageResource({ smoothed: true }),
+      ]);
+
+      const model1 = await loadModel(manager, 'mixed-1.glb');
+      const model2 = await loadModel(manager, 'mixed-2.glb');
+
+      // The embedded texture is shared between the models...
+      expect(getMaterial(model1).map.source).to.be(
+        getMaterial(model2).map.source
+      );
+      // ...and the texture in a separate file comes from the image resource.
+      expect(getMaterial(model1).emissiveMap.source).to.be(
+        imageManager.getThreeTexture('colormap').source
+      );
+    });
+  });
 });

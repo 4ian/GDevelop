@@ -4,6 +4,7 @@ import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource';
 import ImageThumbnail from './ImageThumbnail';
 import Model3DPreview from '../ResourcePreview/Model3DPreview';
+import { getEmbeddedResourceUrls } from '../ResourceUtils';
 
 type Props = {|
   project: gdProject,
@@ -58,6 +59,7 @@ const ResourceThumbnail = ({
             resourceName,
             {}
           )}
+          embeddedTextureUrls={getEmbeddedResourceUrls(project, resourceName)}
           size={size || 100}
         />
       );

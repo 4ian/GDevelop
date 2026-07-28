@@ -543,7 +543,8 @@ export type SubscriptionDialogDisplayReason =
   | 'AI requests (subscribe)'
   | 'AI requests (upgrade)'
   | 'AI requests history'
-  | 'Coupon code entered';
+  | 'Coupon code entered'
+  | 'Restore deleted project';
 
 export type SubscriptionPlacementId =
   | 'builds'
@@ -564,7 +565,8 @@ export type SubscriptionPlacementId =
   | 'account-get-premium'
   | 'education'
   | 'ai-requests'
-  | 'redeem-code';
+  | 'redeem-code'
+  | 'restore-deleted-project';
 
 export const sendSubscriptionDialogShown = (
   metadata: SubscriptionAnalyticsMetadata

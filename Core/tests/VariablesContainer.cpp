@@ -78,4 +78,35 @@ TEST_CASE("VariablesContainer", "[common][variables]") {
     REQUIRE(mixedValuesVariable.HasMixedValues() == true);
     REQUIRE(mixedTypesVariable.GetType() == gd::Variable::Type::MixedTypes);
   }
+  SECTION("EnsurePersistentUuids sets missing UUIDs and preserves existing ones") {
+    gd::VariablesContainer container;
+    container.InsertNew("Variable1", 0).SetString("Hello World");
+
+    REQUIRE(container.GetPersistentUuid() == "");
+    REQUIRE(container.Get("Variable1").GetPersistentUuid() == "");
+
+    container.EnsurePersistentUuids();
+
+    const gd::String containerUuid = container.GetPersistentUuid();
+    const gd::String variable1Uuid =
+        container.Get("Variable1").GetPersistentUuid();
+    REQUIRE(containerUuid != "");
+    REQUIRE(variable1Uuid != "");
+
+    // A new variable, without a UUID, is added.
+    container.InsertNew("Variable2", 1).SetValue(42);
+    REQUIRE(container.Get("Variable2").GetPersistentUuid() == "");
+
+    container.EnsurePersistentUuids();
+
+    // Existing UUIDs are preserved, the new variable got one.
+    REQUIRE(container.GetPersistentUuid() == containerUuid);
+    REQUIRE(container.Get("Variable1").GetPersistentUuid() == variable1Uuid);
+    REQUIRE(container.Get("Variable2").GetPersistentUuid() != "");
+
+    // Contrary to ResetPersistentUuid, which regenerates everything.
+    container.ResetPersistentUuid();
+    REQUIRE(container.GetPersistentUuid() != containerUuid);
+    REQUIRE(container.Get("Variable1").GetPersistentUuid() != variable1Uuid);
+  }
 }

@@ -96,7 +96,10 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v3';
+// v10: `search_resource_store` for the explorer and edit agents.
+// v11: `read_events_source` and explicit keep/replace relations for
+// `generate_events`.
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v11';
 export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
 export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
 

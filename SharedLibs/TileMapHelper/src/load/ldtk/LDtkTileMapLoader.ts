@@ -77,6 +77,13 @@ export namespace LDtkTileMapLoader {
       dimY,
       tileSet
     );
+
+    const firstTileSet = ldtkTileMap.defs.tilesets[0];
+    if (firstTileSet) {
+      editableTileMap.setTileSetColumnCount(firstTileSet.__cWid);
+      editableTileMap.setTileSetRowCount(Math.ceil(firstTileSet.__cHei));
+    }
+
     const composedTileMap = new Map<string, TileDefinition>();
     let nextComposedTileId = 0xfffffff;
 

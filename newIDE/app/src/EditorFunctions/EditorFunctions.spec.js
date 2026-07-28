@@ -968,7 +968,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         No font matching \\"non-existing-font.ttf\\" found in the free library — the property was NOT changed. An empty \\"font\\" value is valid (the default font is used). Retry with a more descriptive name if needed."
       `);
 
@@ -1005,7 +1005,7 @@ describe('editorFunctions', () => {
       expect(searchAndInstallResources).not.toHaveBeenCalled();
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         \\"font\\" on \\"MyTextObject\\" -> \\"assets/font2.ttf\\": resource \\"assets/font2.ttf\\" does not exist. Did you mean: \\"font2.ttf\\"? To install a new font from the free library instead, retry with a more specific name."
       `);
     });
@@ -1029,7 +1029,7 @@ describe('editorFunctions', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatchInlineSnapshot(`
-        "No changes. Issues:
+        "Nothing changed. Issues:
         \\"font\\" on \\"MyTextObject\\" -> \\"audio1.aac\\": resource \\"audio1.aac\\" has kind \\"audio\\" but expected \\"font\\"."
       `);
 
@@ -3110,7 +3110,10 @@ describe('editorFunctions', () => {
 
     // A position passed with the none brush would be silently ignored, which
     // agents misread as a move failure: the call must fail explicitly.
-    it('fails when a brush_position is passed with the none brush', async () => {
+    // "none" + `brush_position` + `existing_instance_ids` is contradictory but
+    // unambiguous (move THOSE instances there), and it is what agents write:
+    // read it as the "point" brush instead of failing the whole script.
+    it('moves the instances when a brush_position is passed with the none brush', async () => {
       await putInstances({
         brush_kind: 'point',
         brush_position: '100,200',
@@ -3131,11 +3134,9 @@ describe('editorFunctions', () => {
         },
       });
 
-      expect(result.success).toBe(false);
-      expect(result.message).toEqual(
-        expect.stringContaining('never moves instances')
-      );
-      expect(getInstancePositions(testScene)).toEqual([{ x: 100, y: 200 }]);
+      expect(result.success).toBe(true);
+      // The instance moved, and no new one was created.
+      expect(getInstancePositions(testScene)).toEqual([{ x: 640, y: 360 }]);
     });
 
     // Editing an existing instance with the none brush and no brush_position
@@ -3775,9 +3776,8 @@ describe('editorFunctions', () => {
       expect(getInstancePositions(testScene)).toEqual([]);
     });
 
-    // A position passed with the none brush would be silently ignored, which
-    // agents misread as a move failure: the call must fail explicitly.
-    it('fails when a brush_position is passed with the none brush', async () => {
+    // Same reading as in 2D: "none" + position + ids means "move those there".
+    it('moves the instances when a brush_position is passed with the none brush', async () => {
       await putInstances({
         brush_kind: 'point',
         brush_position: '10,20,30',
@@ -3797,12 +3797,9 @@ describe('editorFunctions', () => {
         },
       });
 
-      expect(result.success).toBe(false);
-      expect(result.message).toEqual(
-        expect.stringContaining('never moves instances')
-      );
+      expect(result.success).toBe(true);
       expect(getInstancePositions(testScene)).toEqual([
-        { x: 10, y: 20, z: 30 },
+        { x: 10, y: 20, z: 150 },
       ]);
     });
 

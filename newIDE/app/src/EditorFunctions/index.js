@@ -88,6 +88,10 @@ import {
   type ObjectSizeInfo,
 } from './Utils';
 import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
+import { executeScript } from './ScriptExecution/ScriptRunner';
+import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
+import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
+import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
 
 export type HintEntry = {|
   code: string,
@@ -147,8 +151,25 @@ export type EditorFunctionGenericOutput = {|
   meta?: {
     newSceneNames?: Array<string>,
     createdProject?: gdProject,
+    // For `run_script`: true when ANY call the script made modified the
+    // project (so the editor refreshes even if the script ultimately failed).
+    didModifyProject?: boolean,
   },
+  // `run_script` (script-based agents) output payload. Present only for
+  // `run_script` calls.
+  functionCallRecords?: Array<Object>,
+  consoleLogs?: Array<string>,
+  returnValue?: any,
+  error?: {|
+    message: string,
+    lineNumber: number | null,
+    lastCalledFunctionName: string | null,
+  |} | null,
   message?: string,
+  // Set to true (v12+) when a mutating call was a no-op because the requested
+  // state already matched the current state. Lets the no-op rate be counted
+  // from `functionCallRecords`/CloudWatch without any new telemetry.
+  nothingChanged?: boolean,
   eventsAsText?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
   eventsRenderingErrors?: Array<EventsTextRenderingError>,
@@ -163,6 +184,13 @@ export type EditorFunctionGenericOutput = {|
   resources?: any,
   resourcesSummary?: any,
   behaviors?: Array<SimplifiedBehavior>,
+  // `add_behavior`: the behavior name the editor assigned, per object — a
+  // declared output type, because nothing else lets a script know it.
+  addedBehaviors?: Array<{|
+    objectName: string,
+    behaviorName: string,
+    behaviorType: string,
+  |}>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
@@ -309,6 +337,13 @@ export type LaunchFunctionOptionsWithoutProject = {|
   args: any,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'). Threaded so functions can gate
+  // version-dependent behavior (e.g. `isNoOpConsideredSuccess`). May be null
+  // when unknown (treated as pre-v12).
+  toolsVersion?: ?string,
+  // When true, `run_script` exposes only non-mutating functions (explorer
+  // sub-agent scripts, which must stay read-only). Ignored by other functions.
+  runScriptReadOnly?: boolean,
   i18n: I18nType,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
@@ -352,6 +387,15 @@ export type LaunchFunctionOptionsWithoutProject = {|
    */
   getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
+
+/**
+ * Everything a `launchFunction` receives except the call itself: what
+ * `run_script` forwards to every function a script calls.
+ */
+export type LaunchFunctionCollaborators = Omit<
+  LaunchFunctionOptionsWithoutProject,
+  'args'
+>;
 
 export type LaunchFunctionOptionsWithProject = {|
   ...LaunchFunctionOptionsWithoutProject,
@@ -521,20 +565,48 @@ const getUsedAssetText = (
 const getLayerNameForMessage = (layerName: string): string =>
   layerName === '' ? 'the base layer ("")' : `layer "${layerName}"`;
 
+/**
+ * A call that ended up changing nothing. From tools v12 this is a SUCCESS
+ * carrying the reasons: a script stops at its first failure, so a wrong
+ * property name in one call must not throw away every other edit of the batch
+ * (measured as the most frequent script failure in production). The agent still
+ * reads the reasons, and `nothingChanged` marks the outcome for the caller.
+ * Pre-v12 keeps the failure. See isNoOpConsideredSuccess.
+ */
+const makeNothingChangedOutput = ({
+  toolsVersion,
+  message,
+  warnings,
+}: {|
+  toolsVersion: ?string,
+  message: string,
+  warnings?: string,
+|}): EditorFunctionGenericOutput => {
+  const isSuccess = isNoOpConsideredSuccess(toolsVersion);
+  return {
+    success: isSuccess,
+    message,
+    warnings,
+    nothingChanged: isSuccess ? true : undefined,
+  };
+};
+
 const makeMultipleChangesOutput = (
   changes: Array<string>,
-  warnings: Array<string>
+  warnings: Array<string>,
+  toolsVersion: ?string
 ): EditorFunctionGenericOutput => {
   if (changes.length === 0 && warnings.length === 0) {
-    return {
-      success: false,
-      message: 'No changes.',
-    };
+    return makeNothingChangedOutput({
+      toolsVersion,
+      message:
+        'Nothing changed: the requested values are already the current ones, or nothing was requested.',
+    });
   } else if (changes.length === 0 && warnings.length > 0) {
-    return {
-      success: false,
-      message: ['No changes. Issues:', ...warnings].join('\n'),
-    };
+    return makeNothingChangedOutput({
+      toolsVersion,
+      message: ['Nothing changed. Issues:', ...warnings].join('\n'),
+    });
   } else if (changes.length > 0 && warnings.length === 0) {
     return {
       success: true,
@@ -2181,6 +2253,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onObjectsModifiedOutsideEditor,
     onInstancesModifiedOutsideEditor,
     onWillDeleteObject,
@@ -2352,7 +2425,7 @@ const changeObjectPropertiesEffects: EditorFunction = {
     }
 
     return {
-      ...makeMultipleChangesOutput(changes, warnings),
+      ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
       ...(newlyAddedResources && newlyAddedResources.length > 0
         ? { newlyAddedResources }
         : {}),
@@ -2477,6 +2550,7 @@ const addBehavior: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     ensureExtensionInstalled,
     onWillInstallExtension,
     onExtensionInstalled,
@@ -2551,6 +2625,22 @@ const addBehavior: EditorFunction = {
 
     const changes = [];
     const warnings = [];
+    // The behavior NAME the editor assigned, per object: a script cannot guess
+    // it (there is no argument to impose one) and needs it to call the behavior
+    // functions afterwards. Reported as a declared output type, so a script does
+    // not have to read it back with `inspect_object_properties_effects`.
+    const addedBehaviors: Array<{|
+      objectName: string,
+      behaviorName: string,
+      behaviorType: string,
+    |}> = [];
+    const reportBehaviorOnObject = (objectName: string) => {
+      addedBehaviors.push({
+        objectName,
+        behaviorName,
+        behaviorType: behavior_type,
+      });
+    };
     for (const object of concerned.objects) {
       const objectName = object.getName();
 
@@ -2565,6 +2655,8 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" already on "${objectName}".`
           );
+          // Already there: a script chaining on the name must still get it.
+          reportBehaviorOnObject(objectName);
         }
         continue;
       }
@@ -2580,6 +2672,7 @@ const addBehavior: EditorFunction = {
           changes.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability already on "${objectName}".`
           );
+          reportBehaviorOnObject(objectName);
         } else {
           warnings.push(
             `Behavior "${behaviorName}" (type "${behavior_type}") is a default capability; cannot be added to "${objectName}".`
@@ -2618,10 +2711,14 @@ const addBehavior: EditorFunction = {
           behavior.getProperties()
         )}.`
       );
+      reportBehaviorOnObject(objectName);
     }
     layout.updateBehaviorsSharedData(project);
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return {
+      ...makeMultipleChangesOutput(changes, warnings, toolsVersion),
+      addedBehaviors,
+    };
   },
   modifiesProject: true,
 };
@@ -2646,7 +2743,7 @@ const removeBehavior: EditorFunction = {
       ),
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
@@ -2702,7 +2799,7 @@ const removeBehavior: EditorFunction = {
       );
     }
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -2972,7 +3069,7 @@ const changeBehaviorProperty: EditorFunction = {
     // $FlowFixMe[incompatible-type]
     return renderChanges(changes);
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
     const object_name = extractRequiredString(args, 'object_name');
     const behavior_name = extractRequiredString(args, 'behavior_name');
@@ -3034,7 +3131,7 @@ const changeBehaviorProperty: EditorFunction = {
         );
       }
 
-      return makeMultipleChangesOutput(changes, warnings);
+      return makeMultipleChangesOutput(changes, warnings, toolsVersion);
     }
 
     const objectsWithBehavior = concerned.objects.filter(object =>
@@ -3180,7 +3277,7 @@ const changeBehaviorProperty: EditorFunction = {
     });
 
     // $FlowFixMe[incompatible-type]
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -3450,6 +3547,7 @@ const put2dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -3459,19 +3557,29 @@ const put2dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
-    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const requested_brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
       args,
       'brush_position'
     );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    // A "none" brush with both a `brush_position` and `existing_instance_ids`
+    // is contradictory ("none" never positions anything) but unambiguous: move
+    // THOSE instances there. Read it as the "point" brush, which is what the
+    // failure this replaces told the caller to do — every such call observed in
+    // production meant exactly that. Without `existing_instance_ids` the intent
+    // is genuinely unclear (create one? move all?), so that still fails.
+    const brush_kind =
+      requested_brush_kind === 'none' && brush_position && existing_instance_ids
+        ? 'point'
+        : requested_brush_kind;
     const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
     const brush_end_position = SafeExtractor.extractStringProperty(
       args,
       'brush_end_position'
-    );
-    const existing_instance_ids = SafeExtractor.extractStringProperty(
-      args,
-      'existing_instance_ids'
     );
     const new_instances_count = SafeExtractor.extractNumberProperty(
       args,
@@ -3734,13 +3842,6 @@ const put2dInstances: EditorFunction = {
           newInstancesCount > 0
             ? `A valid \`brush_position\` is required to create ${newInstancesCount} new instance(s) (or pass \`existing_instance_ids\` from \`describe_instances\` if you meant to modify existing instances).`
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
-        );
-      }
-      // The "none" brush never applies a position: fail instead of silently
-      // ignoring it, so the caller switches to a placement brush to move.
-      if (brush_kind === 'none' && parsedBrushPosition) {
-        return makeGenericFailure(
-          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact position of every matched instance — one call per target position).'
         );
       }
       // After the guard, a missing position can only happen when nothing is
@@ -4155,22 +4256,38 @@ const put2dInstances: EditorFunction = {
         }
 
         if (!hasMutationParams && !hasPositionBrush) {
-          return makeGenericFailure(
-            `Matched ${matchedCount} existing instance${
-              matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
-          );
+          const noRequestMessage = `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`;
+          if (isNoOpConsideredSuccess(toolsVersion)) {
+            return {
+              success: true,
+              message: noRequestMessage,
+              nothingChanged: true,
+            };
+          }
+          return makeGenericFailure(noRequestMessage);
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -4292,6 +4409,7 @@ const put3dInstances: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     PixiResourcesLoader,
   }) => {
@@ -4301,19 +4419,29 @@ const put3dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
-    const brush_kind = extractRequiredString(args, 'brush_kind');
+    const requested_brush_kind = extractRequiredString(args, 'brush_kind');
     const brush_position = SafeExtractor.extractStringProperty(
       args,
       'brush_position'
     );
+    const existing_instance_ids = SafeExtractor.extractStringProperty(
+      args,
+      'existing_instance_ids'
+    );
+    // A "none" brush with both a `brush_position` and `existing_instance_ids`
+    // is contradictory ("none" never positions anything) but unambiguous: move
+    // THOSE instances there. Read it as the "point" brush, which is what the
+    // failure this replaces told the caller to do — every such call observed in
+    // production meant exactly that. Without `existing_instance_ids` the intent
+    // is genuinely unclear (create one? move all?), so that still fails.
+    const brush_kind =
+      requested_brush_kind === 'none' && brush_position && existing_instance_ids
+        ? 'point'
+        : requested_brush_kind;
     const brush_size = SafeExtractor.extractNumberProperty(args, 'brush_size');
     const brush_end_position = SafeExtractor.extractStringProperty(
       args,
       'brush_end_position'
-    );
-    const existing_instance_ids = SafeExtractor.extractStringProperty(
-      args,
-      'existing_instance_ids'
     );
     const new_instances_count = SafeExtractor.extractNumberProperty(
       args,
@@ -4566,13 +4694,6 @@ const put3dInstances: EditorFunction = {
           newInstancesCount > 0
             ? `A valid \`brush_position\` is required to create ${newInstancesCount} new instance(s) (or pass \`existing_instance_ids\` from \`describe_instances\` if you meant to modify existing instances).`
             : `A valid \`brush_position\` is required for the "${brush_kind}" brush (or use the "none" brush to modify existing instances without moving them).`
-        );
-      }
-      // The "none" brush never applies a position: fail instead of silently
-      // ignoring it, so the caller switches to a placement brush to move.
-      if (brush_kind === 'none' && parsedBrushPosition) {
-        return makeGenericFailure(
-          'The "none" brush never moves instances: remove `brush_position`, or use the "point" brush to move (it sets the exact X, Y and Z of every matched instance — one call per target position).'
         );
       }
       // After the guard, a missing position can only happen when nothing is
@@ -4933,22 +5054,38 @@ const put3dInstances: EditorFunction = {
         }
 
         if (!hasMutationParams && !hasPositionBrush) {
-          return makeGenericFailure(
-            `Matched ${matchedCount} existing instance${
-              matchedCount > 1 ? 's' : ''
-            } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`
-          );
+          const noRequestMessage = `Matched ${matchedCount} existing instance${
+            matchedCount > 1 ? 's' : ''
+          } but no change was requested — provide a value to modify, or use the "point" brush with \`brush_position\` to move.`;
+          if (isNoOpConsideredSuccess(toolsVersion)) {
+            return {
+              success: true,
+              message: noRequestMessage,
+              nothingChanged: true,
+            };
+          }
+          return makeGenericFailure(noRequestMessage);
         }
 
-        return makeGenericFailure(
-          `Matched ${matchedCount} existing instance${
-            matchedCount > 1 ? 's' : ''
-          } but the requested values are identical to their current ones, so nothing changed.${
-            hasPositionBrush
-              ? ''
-              : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
-          }`
-        );
+        const noOpMessage = `Matched ${matchedCount} existing instance${
+          matchedCount > 1 ? 's' : ''
+        } but the requested values are identical to their current ones, so nothing changed.${
+          hasPositionBrush
+            ? ''
+            : ' To move instances, use the "point" brush with `brush_position` (the "none" brush never changes position).'
+        }`;
+        // A no-op (requested state == current state) is a SUCCESS from v12: a
+        // script stops at the first failure, so re-running an idempotent call
+        // must not kill it. Pre-v12 keeps the failure (useful tool-call
+        // feedback; shipped behavior unchanged). See isNoOpConsideredSuccess.
+        if (isNoOpConsideredSuccess(toolsVersion)) {
+          return {
+            success: true,
+            message: noOpMessage,
+            nothingChanged: true,
+          };
+        }
+        return makeGenericFailure(noOpMessage);
       }
 
       // /!\ Tell the editor that some instances have potentially been modified (and even removed).
@@ -6999,6 +7136,7 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
   launchFunction: async ({
     project,
     args,
+    toolsVersion,
     onInstancesModifiedOutsideEditor,
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
@@ -7201,6 +7339,22 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
         }
 
         if (scene.hasLayerNamed(layerName)) {
+          // `changed_layers: [{ layer_name: "HUD" }]` on an existing layer is
+          // how an agent asks to MAKE SURE the layer exists — which it does.
+          // Say so (like a rename to the current name does) instead of
+          // returning an unexplained "nothing changed" for the whole call.
+          if (
+            !delete_this_layer &&
+            !new_layer_name &&
+            new_layer_position === null &&
+            new_visibility === null &&
+            move_instances_to_layer === null
+          ) {
+            changes.push(
+              `Layer "${layerName}" already exists in scene "${scene.getName()}": nothing to change.`
+            );
+            return;
+          }
           let currentLayerName = layerName;
           if (delete_this_layer) {
             // The base layer is named "", so only a null (not set) value means
@@ -7693,16 +7847,17 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     }
 
     if (changes.length === 0 && warnings.length === 0) {
-      return {
-        success: false,
-        message: 'No changes.',
-      };
+      return makeNothingChangedOutput({
+        toolsVersion,
+        message:
+          'Nothing changed: the requested values are already the current ones, or nothing was requested.',
+      });
     } else if (changes.length === 0 && warnings.length > 0) {
-      return {
-        success: false,
-        message: 'No changes. See warnings.',
+      return makeNothingChangedOutput({
+        toolsVersion,
+        message: 'Nothing changed. See warnings.',
         warnings: warnings.join('\n'),
-      };
+      });
     } else if (changes.length > 0 && warnings.length === 0) {
       return {
         success: true,
@@ -7911,7 +8066,7 @@ const changeProjectPropertiesResources: EditorFunction = {
       text: <Trans>Change {changedPropertiesCount} project properties.</Trans>,
     };
   },
-  launchFunction: async ({ project, args }) => {
+  launchFunction: async ({ project, args, toolsVersion }) => {
     const changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
@@ -8235,7 +8390,7 @@ const changeProjectPropertiesResources: EditorFunction = {
         );
       });
 
-    return makeMultipleChangesOutput(changes, warnings);
+    return makeMultipleChangesOutput(changes, warnings, toolsVersion);
   },
   modifiesProject: true,
 };
@@ -8994,6 +9149,81 @@ const searchObjectAssetStore: EditorFunction = {
   modifiesProject: false,
 };
 
+/**
+ * Script-based agents (v12+): runs a JavaScript script written by the AI, in
+ * which the client-side editor functions are exposed as plain async functions
+ * (see `ScriptExecution/`). Replaces N discrete tool calls by one. The script's
+ * calls use the SAME implementations and collaborators bag as individual tool
+ * calls, so behavior (including the coalesced `on*ModifiedOutsideEditor`
+ * refresh) is identical. `modifiesProject: true` so the whole script is gated
+ * behind one edit approval when auto-edit is off.
+ */
+const runScript: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const title =
+      args && typeof args.title === 'string' && args.title
+        ? args.title
+        : 'Run a script';
+    // The rich per-record view is rendered by `RunScriptFunctionCallRow`; here
+    // we only provide the user-facing title (used e.g. for the approval label).
+    return { text: title, hasDetailsToShow: false };
+  },
+  launchFunction: async ({ args, project, ...launchOptions }) => {
+    const jsCode =
+      args && typeof args.js_code === 'string' ? args.js_code : null;
+    if (!jsCode) {
+      return {
+        success: false,
+        message:
+          'run_script requires a `js_code` string argument (the JavaScript to run).',
+      };
+    }
+
+    // Explorer sub-agent scripts are read-only: expose only non-mutating
+    // functions so a script can't modify the project (defense in depth; matches
+    // the backend's explorer script-function list). Signaled by the caller via
+    // `runScriptReadOnly` in the collaborators bag.
+    const allowedFunctionNames = launchOptions.runScriptReadOnly
+      ? [
+          ...Object.keys(editorFunctions).filter(
+            name => !editorFunctions[name].modifiesProject
+          ),
+          ...Object.keys(editorFunctionsWithoutProject).filter(
+            name => !editorFunctionsWithoutProject[name].modifiesProject
+          ),
+        ]
+      : null;
+
+    const exposedFunctions = buildExposedScriptFunctions({
+      editorFunctions,
+      editorFunctionsWithoutProject,
+      launchOptions,
+      project,
+      allowedFunctionNames,
+    });
+
+    const result = await executeScript({ jsCode, exposedFunctions });
+    const capped = capScriptExecutionResult(result);
+
+    return {
+      success: capped.success,
+      functionCallRecords: capped.functionCallRecords,
+      consoleLogs: capped.consoleLogs,
+      returnValue: capped.returnValue,
+      error: capped.error,
+      meta: {
+        didModifyProject: capped.didModifyProject,
+        // Forward scene names created inside the script so they auto-open, like
+        // a standalone create_scene call does.
+        ...(capped.newSceneNames.length > 0
+          ? { newSceneNames: capped.newSceneNames }
+          : {}),
+      },
+    };
+  },
+  modifiesProject: true,
+};
+
 const searchResourceStore: EditorFunction = {
   renderForEditor: ({ args }) => {
     const resourceKind = SafeExtractor.extractStringProperty(
@@ -9023,6 +9253,7 @@ const searchResourceStore: EditorFunction = {
 };
 
 export const editorFunctions: { [string]: EditorFunction } = {
+  run_script: runScript,
   create_object: createOrReplaceObject,
   create_or_replace_object: createOrReplaceObject,
   // Old tool names, kept for AI requests still using an older toolsVersion:

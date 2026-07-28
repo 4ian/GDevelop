@@ -224,7 +224,7 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No changes. Issues:\nEffect type "Bogus" is not a valid effect type. Effect "MyGlow" was NOT added.'
+      'Nothing changed. Issues:\nEffect type "Bogus" is not a valid effect type. Effect "MyGlow" was NOT added.'
     );
     expect(getMySpriteEffects().hasEffectNamed('MyGlow')).toBe(false);
   });
@@ -281,7 +281,7 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No changes. Issues:\nEffect "Nope" not found. Skipped.'
+      'Nothing changed. Issues:\nEffect "Nope" not found. Skipped.'
     );
   });
 
@@ -304,7 +304,7 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
 
     expect(result.success).toBe(false);
     expect(result.message).toBe(
-      'No changes. Issues:\nProperty "nope" not on effect "MySepia". Skipped.'
+      'Nothing changed. Issues:\nProperty "nope" not on effect "MySepia". Skipped.'
     );
     // The existing property was not touched.
     expect(
@@ -312,5 +312,56 @@ describe('change_object_properties_effects (effect rename, move and warnings)', 
         .getEffect('MySepia')
         .getDoubleParameter('opacity')
     ).toBe(0.7);
+  });
+
+  // Measured as the single most frequent script failure in production: agents
+  // set `width`/`height` (per-instance attributes) or an invented property name
+  // on an object, which changed nothing and killed the whole script. From v12
+  // the call reports the reason and the script keeps its other edits.
+  it('is a success carrying the reasons when no property matched, from v12', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        toolsVersion: 'v12',
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_properties: [
+            { property_name: 'width', new_value: '64' },
+            { property_name: 'notAProperty', new_value: 'whatever' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.nothingChanged).toBe(true);
+    // Every rejected property is reported, so the agent can fix them all in
+    // one follow-up instead of rediscovering them one script at a time.
+    expect(result.message).toEqual(
+      expect.stringContaining('"width" not found')
+    );
+    expect(result.message).toEqual(
+      expect.stringContaining('"notAProperty" not found')
+    );
+  });
+
+  it('still fails on the same call before v12 (regression)', async () => {
+    const result: EditorFunctionGenericOutput = await editorFunctions.change_object_properties_effects.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        toolsVersion: 'v11',
+        args: {
+          scene_name: 'TestScene',
+          object_name: 'MySprite',
+          changed_properties: [
+            { property_name: 'notAProperty', new_value: 'whatever' },
+          ],
+        },
+      }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.nothingChanged).toBeUndefined();
   });
 });

@@ -32,6 +32,7 @@ import {
   getPendingSubAgentFunctionCalls,
   getLastMessagesFromAiRequestOutput,
   getLatestActivePlan,
+  getSubAgentKind,
 } from './AiRequestUtils';
 import { useEnsureExtensionInstalled } from './UseEnsureExtensionInstalled';
 import { useGenerateEvents } from './UseGenerateEvents';
@@ -96,10 +97,10 @@ export const useRefreshLimits = (
 
 export const AI_AGENT_TOOLS_VERSION = 'v8';
 export const AI_CHAT_TOOLS_VERSION = 'v8';
-// v10: `search_resource_store` for the explorer and edit agents.
-// v11: `read_events_source` and explicit keep/replace relations for
-// `generate_events`.
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v11';
+// The tools of the orchestrator AND of the sub-agents it creates server-side.
+// Only bump it once the matching prompts and generation-api are deployed;
+// reverting it is the flip-back (every past version stays served).
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v12';
 export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
 export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
 
@@ -205,6 +206,9 @@ export const useProcessFunctionCalls = ({
   const { translatedObjectShortHeadersByType, fetchObjects } = React.useContext(
     ObjectStoreContext
   );
+  const { aiRequestStorage } = React.useContext(AiRequestContext);
+  const aiRequestsRef = React.useRef(aiRequestStorage.aiRequests);
+  aiRequestsRef.current = aiRequestStorage.aiRequests;
 
   React.useEffect(
     () => {
@@ -261,6 +265,15 @@ export const useProcessFunctionCalls = ({
         );
       });
 
+      // An explorer sub-agent's script is read-only (see below: it is exposed
+      // only non-mutating functions). Knowing this lets us both skip its edit
+      // approval and restrict the functions its `run_script` can call.
+      const subAgentKind = getSubAgentKind({
+        aiRequest,
+        aiRequests: aiRequestsRef.current,
+      });
+      const isReadOnlyScriptContext = subAgentKind === 'explorer';
+
       addEditorFunctionCallResults(
         aiRequest.id,
         functionCallsToProcess.map(functionCall => ({
@@ -279,7 +292,13 @@ export const useProcessFunctionCalls = ({
           editorCallbacks,
           // $FlowFixMe[incompatible-type]
           toolOptions: aiRequest.toolOptions || null,
+          // Threaded so functions can gate version-dependent behavior (e.g. a
+          // no-op counts as success from v12 — see isNoOpConsideredSuccess).
+          toolsVersion: aiRequest.toolsVersion || null,
           i18n,
+          // Explorer sub-agent scripts are read-only: restrict their
+          // `run_script` to non-mutating functions (defense in depth).
+          runScriptReadOnly: isReadOnlyScriptContext,
           functionCalls: functionCallsToProcess.map(functionCall => ({
             name: functionCall.name,
             arguments: functionCall.arguments,

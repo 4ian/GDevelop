@@ -8,6 +8,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
+import CustomDragLayer from '../../../UI/DragAndDrop/CustomDragLayer';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
@@ -85,9 +86,12 @@ const DISTINCT_IMAGE_FILE_NAMES = [
   'contraire.png',
 ];
 
-const getOrCreateStressTestSpriteObject = () => {
+const getOrCreateStressTestSpriteObject = (
+  objectName: string = 'MyStressTestSpriteObject',
+  animationsCount: number = ANIMATIONS_COUNT,
+  framesPerAnimation: number = FRAMES_PER_ANIMATION
+) => {
   const gd = global.gd;
-  const objectName = 'MyStressTestSpriteObject';
   const objectsContainer = testProject.testLayout.getObjects();
   if (!objectsContainer.hasObjectNamed(objectName)) {
     const resourcesManager = testProject.project.getResourcesManager();
@@ -110,15 +114,15 @@ const getOrCreateStressTestSpriteObject = () => {
       object.getConfiguration()
     );
     const animations = spriteConfiguration.getAnimations();
-    for (let i = 0; i < ANIMATIONS_COUNT; i++) {
+    for (let i = 0; i < animationsCount; i++) {
       const animation = new gd.Animation();
       animation.setName('Animation' + i);
       animation.setDirectionsCount(1);
       const direction = animation.getDirection(0);
-      for (let j = 0; j < FRAMES_PER_ANIMATION; j++) {
+      for (let j = 0; j < framesPerAnimation; j++) {
         const sprite = new gd.Sprite();
         const imageIndex =
-          (i * FRAMES_PER_ANIMATION + j) % DISTINCT_IMAGE_FILE_NAMES.length;
+          (i * framesPerAnimation + j) % DISTINCT_IMAGE_FILE_NAMES.length;
         sprite.setImageName('stress-' + DISTINCT_IMAGE_FILE_NAMES[imageIndex]);
         direction.addSprite(sprite);
         sprite.delete();
@@ -150,6 +154,85 @@ const onProfilerRender = (
   console.log(
     `[SpriteEditorStressTest] ${phase}: ${actualDuration.toFixed(1)}ms ` +
       `(images in DOM: ${document.querySelectorAll('img').length})`
+  );
+};
+
+// Enough animations to make the list scrollable, but light enough to load
+// fast: useful to test the navigation in the animations list, and drag and
+// drop of animations in it.
+export const ManyShortAnimations = (): React.Node => {
+  const { object } = getOrCreateStressTestSpriteObject(
+    'MyManyShortAnimationsSpriteObject',
+    12,
+    2
+  );
+  const [, setChangesCount] = React.useState(0);
+  const notifyOfChange = React.useCallback(
+    () => setChangesCount(count => count + 1),
+    []
+  );
+  const onSizeUpdated = React.useCallback(() => {}, []);
+  return (
+    <DragAndDropContextProvider>
+      <FixedHeightFlexContainer height={700}>
+        <SpriteEditor
+          renderObjectNameField={() => null}
+          objectConfiguration={object.getConfiguration()}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
+          project={testProject.project}
+          layout={testProject.testLayout}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
+          resourceManagementProps={fakeResourceManagementProps}
+          onSizeUpdated={onSizeUpdated}
+          object={object}
+          objectName="MyManyShortAnimationsSpriteObject"
+          onObjectUpdated={notifyOfChange}
+        />
+      </FixedHeightFlexContainer>
+      <CustomDragLayer />
+    </DragAndDropContextProvider>
+  );
+};
+
+// A single animation with a lot of frames: useful to test the navigation
+// in the (scrollable) list of sprites, and drag and drop of sprites in it.
+export const ManyFramesInOneAnimation = (): React.Node => {
+  const { object } = getOrCreateStressTestSpriteObject(
+    'MyManyFramesSpriteObject',
+    1,
+    30
+  );
+  const [, setChangesCount] = React.useState(0);
+  const notifyOfChange = React.useCallback(
+    () => setChangesCount(count => count + 1),
+    []
+  );
+  const onSizeUpdated = React.useCallback(() => {}, []);
+  return (
+    <DragAndDropContextProvider>
+      <FixedHeightFlexContainer height={700}>
+        <SpriteEditor
+          renderObjectNameField={() => null}
+          objectConfiguration={object.getConfiguration()}
+          projectScopedContainersAccessor={
+            testProject.testSceneProjectScopedContainersAccessor
+          }
+          project={testProject.project}
+          layout={testProject.testLayout}
+          eventsFunctionsExtension={null}
+          eventsBasedObject={null}
+          resourceManagementProps={fakeResourceManagementProps}
+          onSizeUpdated={onSizeUpdated}
+          object={object}
+          objectName="MyManyFramesSpriteObject"
+          onObjectUpdated={notifyOfChange}
+        />
+      </FixedHeightFlexContainer>
+      <CustomDragLayer />
+    </DragAndDropContextProvider>
   );
 };
 

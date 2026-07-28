@@ -19,6 +19,7 @@ import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
 import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { useAutoScrollDuringDrag } from '../../../UI/DragAndDrop/UseAutoScrollDuringDrag';
 import { DragHandleIcon } from '../../../UI/DragHandle';
 import DropIndicator from '../../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -95,6 +96,8 @@ type AnimationItemRowProps = {|
   objectName: string,
   resourceManagementProps: ResourceManagementProps,
   draggedAnimationIndex: { current: number | null },
+  startAutoScroll: () => void,
+  stopAutoScroll: () => void,
   moveAnimation: (targetIndex: number) => void,
   moveAnimationToIndex: (sourceIndex: number, targetIndex: number) => void,
   changeAnimationName: (animationIndex: number, newName: string) => void,
@@ -131,6 +134,8 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
     objectName,
     resourceManagementProps,
     draggedAnimationIndex,
+    startAutoScroll,
+    stopAutoScroll,
     moveAnimation,
     moveAnimationToIndex,
     changeAnimationName,
@@ -150,8 +155,10 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
           <DragSourceAndDropTarget
             beginDrag={() => {
               draggedAnimationIndex.current = animationIndex;
+              startAutoScroll();
               return {};
             }}
+            endDrag={stopAutoScroll}
             canDrag={() => true}
             canDrop={() => true}
             drop={() => {
@@ -403,6 +410,13 @@ const AnimationList: React.ComponentType<{
     const { showDeleteConfirmation } = useAlertDialog();
 
     const draggedAnimationIndex = React.useRef<number | null>(null);
+    const getScrollViewElement = React.useCallback(
+      () => (scrollView.current ? scrollView.current.getDomElement() : null),
+      [scrollView]
+    );
+    const { startAutoScroll, stopAutoScroll } = useAutoScrollDuringDrag(
+      getScrollViewElement
+    );
 
     const [nameErrors, setNameErrors] = React.useState<{
       [number]: React.Node,
@@ -975,6 +989,8 @@ const AnimationList: React.ComponentType<{
                       objectName={objectName}
                       resourceManagementProps={resourceManagementProps}
                       draggedAnimationIndex={draggedAnimationIndex}
+                      startAutoScroll={startAutoScroll}
+                      stopAutoScroll={stopAutoScroll}
                       moveAnimation={moveAnimation}
                       moveAnimationToIndex={moveAnimationToIndex}
                       changeAnimationName={changeAnimationName}

@@ -15,6 +15,7 @@ import {
   tiledNavMeshGeneratorConfigDefaults,
 } from 'recast-navigation/generators';
 import {
+  init,
   DebugDrawerUtils,
   RecastBuildContext,
   RecastChunkyTriMesh,

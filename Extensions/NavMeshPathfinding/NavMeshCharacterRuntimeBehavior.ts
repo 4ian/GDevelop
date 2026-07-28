@@ -12,6 +12,9 @@ namespace gdjs {
       }
 
       const Recast = await initializeRecast();
+
+      await RecastNav.init();
+      console.log("Initialized Recast");
       //@ts-ignore
       window.Recast = Recast;
     } catch (err) {
@@ -103,6 +106,56 @@ namespace gdjs {
       this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
       // this._manager =
       //   gdjs.PathfindingObstaclesManager.getManager(instanceContainer);
+
+      // const positions = [
+      //   0, 0, 0,
+      //   0, 1, 0,
+      //   1, 1, 0,
+      //   1, 0, 0,
+      // ];
+      
+      // const positions = [
+      //   0, 0, 0,
+      //   0, 0, 1,
+      //   1, 0, 1,
+      //   1, 0, 0,
+      // ];
+
+      // const indices = [
+      //   0, 1, 2,
+      //   1, 2, 3,
+      // ];
+
+      const groundMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 4));
+      //const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry( 1, 1 ));
+      const positions = groundMesh.geometry.attributes.position.array;
+      const indices = groundMesh.geometry.index.array;
+
+      console.log(positions,indices);
+
+      const navMeshConfig = {
+        borderSize: 0,
+        cs: 0.2,
+        ch: 0.2,
+        walkableSlopeAngle: 35,
+        walkableHeight: 1,
+        walkableClimb: 1,
+        walkableRadius: 1,
+        maxEdgeLen: 12,
+        maxSimplificationError: 1.3,
+        minRegionArea: 8,
+        mergeRegionArea: 20,
+        maxVertsPerPoly: 6,
+        detailSampleDist: 6,
+        detailSampleMaxError: 1,
+      };
+
+      const result = RecastNav.generateSoloNavMesh(
+        positions,
+        indices,
+        navMeshConfig
+      );
+      console.log(result);
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {

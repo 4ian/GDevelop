@@ -13,7 +13,7 @@ import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
 import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
 import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
 import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
-import SceneVariableIcon from '../UI/CustomSvgIcons/SceneVariable';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
@@ -36,6 +36,7 @@ type Props = {|
   canUndo: boolean,
   redo: () => void,
   canRedo: boolean,
+  onOpenLayoutEditor?: ?() => void,
   onToggleSearchPanel: () => void,
   onToggleGraphPreview: () => void,
   isGraphPreviewVisible: boolean,
@@ -46,8 +47,6 @@ type Props = {|
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
-  onOpenVariablesRedesignWindow: () => void,
-  isVariablesRedesignWindowOpen: boolean,
   onShowGeneratedCode?: ?() => void,
 |};
 
@@ -70,6 +69,7 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   canUndo,
   redo,
   canRedo,
+  onOpenLayoutEditor,
   onToggleSearchPanel,
   onToggleGraphPreview,
   isGraphPreviewVisible,
@@ -80,8 +80,6 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
-  onOpenVariablesRedesignWindow,
-  isVariablesRedesignWindowOpen,
   onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
@@ -124,16 +122,20 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
-        <IconButton
-          size="small"
-          color="default"
-          selected={isVariablesRedesignWindowOpen}
-          onClick={onOpenVariablesRedesignWindow}
-          id="toolbar-open-redesigned-variables-window-button"
-          tooltip={t`Open redesigned variables window`}
-        >
-          <SceneVariableIcon />
-        </IconButton>
+        {onOpenLayoutEditor && (
+          <>
+            <IconButton
+              size="small"
+              color="default"
+              onClick={onOpenLayoutEditor}
+              id="toolbar-open-layout-editor-button"
+              tooltip={t`Open the associated scene`}
+            >
+              <SceneIcon />
+            </IconButton>
+            <ToolbarSeparator />
+          </>
+        )}
         {settingsButtonPosition === 'start' && settingsButton}
         <ElementWithMenu
           element={

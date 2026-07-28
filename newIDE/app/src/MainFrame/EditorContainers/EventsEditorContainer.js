@@ -199,6 +199,17 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     );
   };
 
+  openLayoutEditor = () => {
+    const layout = this.getLayout();
+    if (!layout) return;
+
+    this.props.onOpenLayout(layout.getName(), {
+      openEventsEditor: false,
+      openSceneEditor: true,
+      focusWhenOpened: 'scene',
+    });
+  };
+
   render(): any {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
@@ -220,6 +231,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       <EventsSheet
         ref={editor => (this.editor = editor)}
         setToolbar={this.props.setToolbar}
+        onOpenLayoutEditor={this.openLayoutEditor}
         onOpenLayout={this.props.onOpenLayout}
         resourceManagementProps={this.props.resourceManagementProps}
         openInstructionOrExpression={this.props.openInstructionOrExpression}

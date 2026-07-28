@@ -182,8 +182,8 @@ export type EditorStateForProject = {|
   propertiesPanel: {
     [string]: {
       [string]: {
-        scrollPosition: number,
-        collapsedSections: { [string]: boolean },
+        scrollPosition?: number,
+        collapsedSections?: { [string]: boolean },
       },
     },
   },

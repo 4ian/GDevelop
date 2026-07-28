@@ -442,6 +442,97 @@ namespace gdjs {
     },
   ];
 
+  const customObjectEditorCapabilityBehaviors: BehaviorData[] = [
+    {
+      name: 'Animation',
+      type: 'AnimatableCapability::AnimatableBehavior',
+    },
+    { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
+    {
+      name: 'Flippable',
+      type: 'FlippableCapability::FlippableBehavior',
+    },
+    {
+      name: 'Object3D',
+      type: 'Scene3D::Base3DBehavior',
+    },
+    {
+      name: 'Opacity',
+      type: 'OpacityCapability::OpacityBehavior',
+    },
+    {
+      name: 'Resizable',
+      type: 'ResizableCapability::ResizableBehavior',
+    },
+    {
+      name: 'Scale',
+      type: 'ScalableCapability::ScalableBehavior',
+    },
+    {
+      name: 'Text',
+      type: 'TextContainerCapability::TextContainerBehavior',
+    },
+  ];
+
+  const getCustomObjectEditorBehaviors = (
+    eventsBasedObjectData: EventsBasedObjectData
+  ): Array<BehaviorData & any> => {
+    const behaviors = [...(eventsBasedObjectData.behaviors || [])];
+    const behaviorNames = new Set(
+      behaviors.map((behaviorData) => behaviorData.name)
+    );
+
+    // Keep all capabilities available for custom-object events, without
+    // replacing an actual behavior declared on the custom object.
+    for (const capabilityBehavior of customObjectEditorCapabilityBehaviors) {
+      if (!behaviorNames.has(capabilityBehavior.name)) {
+        behaviors.push(capabilityBehavior);
+      }
+    }
+    return behaviors;
+  };
+
+  const getCustomObjectEditorBehaviorsSharedData = (
+    runtimeGame: gdjs.RuntimeGame,
+    behaviors: Array<BehaviorData & any>
+  ): BehaviorSharedData[] => {
+    const behaviorTypesByName = new Map(
+      behaviors.map((behaviorData) => [behaviorData.name, behaviorData.type])
+    );
+    const sharedDataByBehaviorName = new Map<string, BehaviorSharedData>();
+
+    // Shared behavior settings live on layouts. Use the first matching
+    // settings so behavior constructors in the synthetic scene receive the
+    // same shape of data as they do in a normal scene.
+    for (const layoutData of runtimeGame.getGameData().layouts) {
+      for (const behaviorSharedData of layoutData.behaviorsSharedData) {
+        if (
+          behaviorTypesByName.get(behaviorSharedData.name) ===
+            behaviorSharedData.type &&
+          !sharedDataByBehaviorName.has(behaviorSharedData.name)
+        ) {
+          sharedDataByBehaviorName.set(
+            behaviorSharedData.name,
+            behaviorSharedData
+          );
+        }
+      }
+    }
+
+    // A behavior with shared properties may not be used by any layout yet.
+    // Supplying its identity avoids passing null to its constructor; generated
+    // behaviors then fall back to their declared property defaults.
+    for (const behaviorData of behaviors) {
+      if (!sharedDataByBehaviorName.has(behaviorData.name)) {
+        sharedDataByBehaviorName.set(behaviorData.name, {
+          name: behaviorData.name,
+          type: behaviorData.type,
+        });
+      }
+    }
+    return Array.from(sharedDataByBehaviorName.values());
+  };
+
   // TODO: factor this?
   const isMacLike =
     typeof navigator !== 'undefined' &&
@@ -1288,6 +1379,9 @@ namespace gdjs {
         return null;
       }
 
+      const customObjectEditorBehaviors = getCustomObjectEditorBehaviors(
+        eventsBasedObjectData
+      );
       const scene = new gdjs.RuntimeScene(this._runtimeGame);
       scene.loadFromScene({
         sceneData: {
@@ -1318,38 +1412,7 @@ namespace gdjs {
               variant: eventsBasedObjectVariantName,
               content: {},
               variables: [],
-              // Add all capabilities just in case events need them.
-              behaviors: [
-                {
-                  name: 'Animation',
-                  type: 'AnimatableCapability::AnimatableBehavior',
-                },
-                { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
-                {
-                  name: 'Flippable',
-                  type: 'FlippableCapability::FlippableBehavior',
-                },
-                {
-                  name: 'Object3D',
-                  type: 'Scene3D::Base3DBehavior',
-                },
-                {
-                  name: 'Opacity',
-                  type: 'OpacityCapability::OpacityBehavior',
-                },
-                {
-                  name: 'Resizable',
-                  type: 'ResizableCapability::ResizableBehavior',
-                },
-                {
-                  name: 'Scale',
-                  type: 'ScalableCapability::ScalableBehavior',
-                },
-                {
-                  name: 'Text',
-                  type: 'TextContainerCapability::TextContainerBehavior',
-                },
-              ],
+              behaviors: customObjectEditorBehaviors,
               effects: [],
             },
           ],
@@ -1404,12 +1467,10 @@ namespace gdjs {
           name: eventsBasedObjectData.name,
           stopSoundsOnStartup: true,
           title: '',
-          behaviorsSharedData: [
-            {
-              name: 'Text',
-              type: 'TextContainerCapability::TextContainerBehavior',
-            },
-          ],
+          behaviorsSharedData: getCustomObjectEditorBehaviorsSharedData(
+            this._runtimeGame,
+            customObjectEditorBehaviors
+          ),
           usedResources: [],
         },
         usedExtensionsWithVariablesData:

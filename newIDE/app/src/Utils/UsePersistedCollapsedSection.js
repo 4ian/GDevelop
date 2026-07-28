@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext, {
+  type EditorStateForPropertyPanel,
+} from '../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   project: gdProject,
@@ -48,25 +50,27 @@ export const usePersistedCollapsedSection = ({
   const setSectionFolded = React.useCallback(
     (sectionId: string, isCollapsed: boolean): void => {
       if (!persistedPanelStateId) return;
-
       const currentEditorState = getEditorStateForProject(projectId);
+
+      const panelState: EditorStateForPropertyPanel = {
+        scrollPosition: 0,
+        ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
+          persistedPanelStateId
+        ],
+        collapsedSections: {
+          ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
+            persistedPanelStateId
+          ]?.collapsedSections,
+          [sectionId]: isCollapsed,
+        },
+      };
+
       setEditorStateForProject(projectId, {
         propertiesPanel: {
           ...currentEditorState?.propertiesPanel,
           [persistedPanelStateType]: {
             ...currentEditorState?.propertiesPanel[persistedPanelStateType],
-            [persistedPanelStateId]: {
-              scrollPosition: 0,
-              ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
-                persistedPanelStateId
-              ],
-              collapsedSections: {
-                ...currentEditorState?.propertiesPanel[
-                  persistedPanelStateType
-                ]?.[persistedPanelStateId]?.collapsedSections,
-                [sectionId]: isCollapsed,
-              },
-            },
+            [persistedPanelStateId]: panelState,
           },
         },
       });

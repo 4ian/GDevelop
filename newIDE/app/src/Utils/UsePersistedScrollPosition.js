@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext, {
+  type EditorStateForPropertyPanel,
+} from '../MainFrame/Preferences/PreferencesContext';
 import { type ScrollViewInterface } from '../UI/ScrollView';
 
 type Props = {|
@@ -82,18 +84,20 @@ export const usePersistedScrollPosition = ({
       saveScrollTimeoutId.current = setTimeout(() => {
         const currentEditorState = getEditorStateForProject(projectId);
 
+        const panelState: EditorStateForPropertyPanel = {
+          collapsedSections: {},
+          ...currentEditorState?.propertiesPanel[persistedPanelStateType]?.[
+            persistedPanelStateId
+          ],
+          scrollPosition: scrollView.getScrollPosition(),
+        };
+
         setEditorStateForProject(projectId, {
           propertiesPanel: {
             ...currentEditorState?.propertiesPanel,
             [persistedPanelStateType]: {
               ...currentEditorState?.propertiesPanel[persistedPanelStateType],
-              [persistedPanelStateId]: {
-                collapsedSections: {},
-                ...currentEditorState?.propertiesPanel[
-                  persistedPanelStateType
-                ]?.[persistedPanelStateId],
-                scrollPosition: scrollView.getScrollPosition(),
-              },
+              [persistedPanelStateId]: panelState,
             },
           },
         });

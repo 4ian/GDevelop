@@ -7,6 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
   type EditorStateForProject,
   type EditorStateForProjectUpdate,
+  type EditorStateForPropertyPanel,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getIDEVersion } from '../../Version';
@@ -1389,6 +1390,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _getEditorStateForProject(projectId: string): any {
     const editorState = this.state.values.editorStateByProject[projectId];
     if (!editorState) return null;
+
+    const defaultState: EditorStateForPropertyPanel = {
+      scrollPosition: 0,
+      collapsedSections: {},
+    };
+    for (const panelType in editorState.propertiesPanel) {
+      const states = editorState.propertiesPanel[panelType];
+      for (const id in states) {
+        states[id] = {
+          ...defaultState,
+          ...states[id],
+        };
+      }
+    }
 
     return {
       editorTabs:

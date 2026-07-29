@@ -93,6 +93,20 @@ module.exports = {
         .addIncludeFile(
           'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
         );
+
+      aut.addAction("MoveTo",
+                    _("Move to a position"),
+                    _("Move the object to a position"),
+                    _("Move _PARAM0_ to _PARAM2_ ; _PARAM3_ ; _PARAM4_"),
+                    _("Movement on the path"),
+                    "CppPlatform/Extensions/AStaricon24.png",
+                    "CppPlatform/Extensions/AStaricon16.png")
+          .addParameter("object", _("Object"))
+          .addParameter("behavior", _("Behavior"), "NavMeshCharacterBehavior")
+          .addParameter("expression", _("Destination X position"))
+          .addParameter("expression", _("Destination Y position"))
+          .addParameter("expression", _("Destination Z position"))
+          .setFunctionName("moveTo");
     }
     {
       const behavior = new gd.BehaviorJsImplementation();

@@ -5,48 +5,122 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 
 namespace gdjs {
   export interface RuntimeInstanceContainer {
-    pathfindingObstaclesManager: gdjs.PathfindingObstaclesManager;
+    navMeshObstaclesManager: gdjs.NavMeshObstaclesManager;
   }
-  declare var rbush: any;
+
+  const cubePositions = [
+    0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5,
+    -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5,
+  ];
+  const cubeIndices = [
+    0, 1, 2, 1, 3, 2, 4, 5, 6, 5, 7, 6, 4, 6, 2, 6, 8, 2, 7, 5, 1, 5, 3, 1, 6,
+    7, 8, 7, 1, 8, 2, 3, 4, 3, 5, 4,
+  ];
 
   /**
-   * PathfindingObstaclesManager manages the common objects shared by objects
+   * NavMeshObstaclesManager manages the common objects shared by objects
    * having a pathfinding behavior: In particular, the obstacles behaviors are
    * required to declare themselves (see
-   * `PathfindingObstaclesManager.addObstacle`) to the manager of their
+   * `NavMeshObstaclesManager.addObstacle`) to the manager of their
    * associated container (see
    * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
    * @category Behaviors > 2D Pathfinding
    */
   export class NavMeshObstaclesManager {
+    obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
+    navMesh: RecastNav.NavMesh | null = null;
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
-    }
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     /**
      * Get the obstacles manager of an instance container.
      */
     static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      if (!instanceContainer.pathfindingObstaclesManager) {
+      if (!instanceContainer.navMeshObstaclesManager) {
         //Create the shared manager if necessary.
-        instanceContainer.pathfindingObstaclesManager =
-          new gdjs.PathfindingObstaclesManager(instanceContainer);
+        instanceContainer.navMeshObstaclesManager =
+          new gdjs.NavMeshObstaclesManager(instanceContainer);
       }
-      return instanceContainer.pathfindingObstaclesManager;
+      return instanceContainer.navMeshObstaclesManager;
+    }
+
+    rebuildNavMesh() {
+      const navMeshConfig = {
+        borderSize: 0,
+        cs: 2,
+        ch: 2,
+        walkableSlopeAngle: 60,
+        walkableHeight: 1,
+        walkableClimb: 1,
+        walkableRadius: 1,
+        maxEdgeLen: 12,
+        maxSimplificationError: 1.3,
+        minRegionArea: 8,
+        mergeRegionArea: 20,
+        maxVertsPerPoly: 6,
+        detailSampleDist: 6,
+        detailSampleMaxError: 1,
+      };
+
+      const positions: Array<float> = [];
+      const indices: Array<integer> = [];
+
+      const euler = new THREE.Euler();
+      euler.order = 'ZYX';
+      const point = new THREE.Vector3();
+
+      for (const obstacle of this.obstacles) {
+        //@ts-ignore
+        const object: gdjs.RuntimeObject3D = obstacle.owner;
+        const indicesOffset = Math.round(positions.length / 3);
+        for (
+          let index = 0;
+          index + 2 < cubePositions.length;
+          index = index + 3
+        ) {
+          let x = cubePositions[index];
+          let y = cubePositions[index + 2];
+          let z = cubePositions[index + 1];
+
+          x *= object.getWidth();
+          y *= object.getHeight();
+          z *= object.getDepth();
+
+          point.set(x, y, z);
+          euler.set(
+            object.getRotationX(),
+            object.getRotationY(),
+            object.getAngle()
+          );
+          point.applyEuler(euler);
+
+          x = object.getCenterXInScene() + point.x;
+          y = object.getCenterYInScene() + point.y;
+          z = object.getCenterZInScene() + point.z;
+
+          // Y is the top for Recast
+          positions.push(x, z, y);
+        }
+        for (const vertexIndex of cubeIndices) {
+          indices.push(vertexIndex + indicesOffset);
+        }
+      }
+
+      const result = RecastNav.generateSoloNavMesh(
+        positions,
+        indices,
+        navMeshConfig
+      );
+      if (result.success) {
+        this.navMesh = result.navMesh;
+      }
     }
 
     /**
      * Add a obstacle to the list of existing obstacles.
      */
-    addObstacle(
-      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
-    ) {
-      if (pathfindingObstacleBehavior.currentRBushAABB)
-        pathfindingObstacleBehavior.currentRBushAABB.updateAABBFromOwner();
-      else
-        pathfindingObstacleBehavior.currentRBushAABB =
-          new gdjs.BehaviorRBushAABB(pathfindingObstacleBehavior);
-
+    addObstacle(pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior) {
+      this.obstacles.add(pathfindingObstacleBehavior);
     }
 
     /**
@@ -54,13 +128,14 @@ namespace gdjs {
      * added before.
      */
     removeObstacle(
-      pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
+      pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior
     ) {
+      this.obstacles.delete(pathfindingObstacleBehavior);
     }
   }
 
   /**
-   * PathfindingObstacleRuntimeBehavior represents a behavior allowing objects to be
+   * NavMeshObstacleRuntimeBehavior represents a behavior allowing objects to be
    * considered as a obstacle by objects having Pathfinding Behavior.
    * @category Behaviors > 2D Pathfinding
    */
@@ -71,10 +146,8 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    _manager: PathfindingObstaclesManager;
+    _manager: NavMeshObstaclesManager;
     _registeredInManager: boolean = false;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<PathfindingObstacleRuntimeBehavior> | null =
-      null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -84,7 +157,7 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;
-      this._manager = PathfindingObstaclesManager.getManager(instanceContainer);
+      this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:
       //The owner is not yet fully constructed.
@@ -126,8 +199,7 @@ namespace gdjs {
         this._oldHeight !== this.owner.getHeight()
       ) {
         if (this._registeredInManager) {
-          this._manager.removeObstacle(this);
-          this._manager.addObstacle(this);
+          // TODO Notify that the mesh is out of date?
         }
         this._oldX = this.owner.getX();
         this._oldY = this.owner.getY();
@@ -137,10 +209,6 @@ namespace gdjs {
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
-
-    getAABB() {
-      return this.owner.getAABB();
-    }
 
     onActivate() {
       if (this._registeredInManager) {

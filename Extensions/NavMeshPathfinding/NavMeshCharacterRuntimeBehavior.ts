@@ -14,7 +14,7 @@ namespace gdjs {
       const Recast = await initializeRecast();
 
       await RecastNav.init();
-      console.log("Initialized Recast");
+      console.log('Initialized Recast');
       //@ts-ignore
       window.Recast = Recast;
     } catch (err) {
@@ -24,9 +24,9 @@ namespace gdjs {
   };
   gdjs.registerAsynchronouslyLoadingLibraryPromise(loadRecast());
 
-  interface PathfindingNetworkSyncDataType {
+  interface NavMeshCharacterNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.
-    path: FloatPoint[];
+    path: RecastNav.Vector3[];
     pf: boolean;
     sp: number;
     as: number;
@@ -38,8 +38,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface PathfindingNetworkSyncData extends BehaviorNetworkSyncData {
-    props: PathfindingNetworkSyncDataType;
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
+    props: NavMeshCharacterNetworkSyncDataType;
   }
 
   /**
@@ -48,7 +48,7 @@ namespace gdjs {
    * @category Behaviors > 2D Pathfinding
    */
   export class NavMeshCharacterRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _path: Array<FloatPoint> = [];
+    _path: Array<RecastNav.Vector3> = [];
     /** Used by the path simplification algorithm */
     static _smoothingResultVertices: Array<FloatPoint> = [];
     /** Used by the path simplification algorithm */
@@ -76,7 +76,7 @@ namespace gdjs {
     _totalSegmentDistance: float = 0;
     _currentSegment: integer = 0;
     _reachedEnd: boolean = false;
-    _manager: PathfindingObstaclesManager;
+    _manager: NavMeshObstaclesManager;
 
     _movementAngle: float = 0;
 
@@ -104,58 +104,15 @@ namespace gdjs {
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
       this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
-      // this._manager =
-      //   gdjs.PathfindingObstaclesManager.getManager(instanceContainer);
+      this._manager =
+        gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
 
-      // const positions = [
-      //   0, 0, 0,
-      //   0, 1, 0,
-      //   1, 1, 0,
-      //   1, 0, 0,
-      // ];
-      
-      // const positions = [
-      //   0, 0, 0,
-      //   0, 0, 1,
-      //   1, 0, 1,
-      //   1, 0, 0,
-      // ];
-
-      // const indices = [
-      //   0, 1, 2,
-      //   1, 2, 3,
-      // ];
-
-      const groundMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 4));
-      //const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry( 1, 1 ));
-      const positions = groundMesh.geometry.attributes.position.array;
-      const indices = groundMesh.geometry.index.array;
-
-      console.log(positions,indices);
-
-      const navMeshConfig = {
-        borderSize: 0,
-        cs: 0.2,
-        ch: 0.2,
-        walkableSlopeAngle: 35,
-        walkableHeight: 1,
-        walkableClimb: 1,
-        walkableRadius: 1,
-        maxEdgeLen: 12,
-        maxSimplificationError: 1.3,
-        minRegionArea: 8,
-        mergeRegionArea: 20,
-        maxVertsPerPoly: 6,
-        detailSampleDist: 6,
-        detailSampleMaxError: 1,
-      };
-
-      const result = RecastNav.generateSoloNavMesh(
-        positions,
-        indices,
-        navMeshConfig
-      );
-      console.log(result);
+      // TODO Remove
+      this._acceleration = 1000;
+      this._maxSpeed = 300;
+      this._angularMaxSpeed = 720;
+      this._rotateObject = true;
+      this._angleOffset = 0;
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
@@ -200,7 +157,7 @@ namespace gdjs {
 
     getNetworkSyncData(
       options: GetNetworkSyncDataOptions
-    ): PathfindingNetworkSyncData {
+    ): NavMeshCharacterNetworkSyncData {
       return {
         ...super.getNetworkSyncData(options),
         props: {
@@ -218,7 +175,7 @@ namespace gdjs {
     }
 
     updateFromNetworkSyncData(
-      networkSyncData: PathfindingNetworkSyncData,
+      networkSyncData: NavMeshCharacterNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
@@ -464,14 +421,10 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(
-      instanceContainer: gdjs.RuntimeInstanceContainer,
-      x: float,
-      y: float
-    ) {
+    moveTo(x: float, y: float, z: float) {
       const owner = this.owner;
 
-      //First be sure that there is a path to compute.
+      // First be sure that there is a path to compute.
       const targetCellX = Math.round((x - this._gridOffsetX) / this._cellWidth);
       const targetCellY = Math.round(
         (y - this._gridOffsetY) / this._cellHeight
@@ -484,20 +437,82 @@ namespace gdjs {
       );
       if (startCellX == targetCellX && startCellY == targetCellY) {
         this._path.length = 0;
-        this._path.push([owner.getX(), owner.getY()]);
-        this._path.push([x, y]);
+        this._path.push({ x: owner.getX(), y: owner.getY(), z: owner.getZ() });
+        this._path.push({ x, y, z });
         this._enterSegment(0);
         this._pathFound = true;
         return;
       }
 
-      //Start searching for a path
-      if (false) {
-        //Path found: memorize it
+      if (!this._manager.navMesh) {
+        this._manager.rebuildNavMesh();
+      }
+      if (!this._manager.navMesh) {
+        console.log("Can't build the nav mesh");
+        return;
       }
 
-      // No path found
-      this._pathFound = false;
+      // Start searching for a path
+      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
+
+      const { success: hasFindOrigin, point: origin } =
+        navMeshQuery.findClosestPoint(
+          {
+            x: owner.getX(),
+            y: owner.getZ(),
+            z: owner.getY(),
+          },
+          { halfExtents: { x: 100, y: 100, z: 100 } }
+        );
+      if (!hasFindOrigin) {
+        this._pathFound = false;
+        console.log(
+          "Can't find origin",
+          owner.getX(),
+          owner.getY(),
+          owner.getZ()
+        );
+        return;
+      }
+      const { success: hasFindDestination, point: destination } =
+        navMeshQuery.findClosestPoint(
+          { x, y: z, z: y },
+          { halfExtents: { x: 100, y: 100, z: 100 } }
+        );
+      if (!hasFindDestination) {
+        this._pathFound = false;
+        console.log("Can't find destination", x, y, z);
+        return;
+      }
+      const {
+        success: hasFindPath,
+        error,
+        path,
+      } = navMeshQuery.computePath(origin, destination);
+      if (!hasFindPath) {
+        this._pathFound = false;
+        console.log(
+          "Can't find a path from",
+          origin.x,
+          origin.z,
+          origin.y,
+          'to',
+          destination.x,
+          destination.z,
+          destination.y
+        );
+        return;
+      }
+
+      // Path found: memorize it
+      for (const point of path) {
+        const y = point.y;
+        point.y = point.z;
+        point.z = y;
+      }
+      console.log('path', path);
+      this._path = path;
+      this._enterSegment(0);
     }
 
     _enterSegment(segmentNumber: integer) {
@@ -507,12 +522,15 @@ namespace gdjs {
       this._currentSegment = segmentNumber;
       if (this._currentSegment < this._path.length - 1) {
         const pathX =
-          this._path[this._currentSegment + 1][0] -
-          this._path[this._currentSegment][0];
+          this._path[this._currentSegment + 1].x -
+          this._path[this._currentSegment].x;
         const pathY =
-          this._path[this._currentSegment + 1][1] -
-          this._path[this._currentSegment][1];
-        this._totalSegmentDistance = Math.sqrt(pathX * pathX + pathY * pathY);
+          this._path[this._currentSegment + 1].y -
+          this._path[this._currentSegment].y;
+        const pathZ =
+          this._path[this._currentSegment + 1].z -
+          this._path[this._currentSegment].z;
+        this._totalSegmentDistance = Math.hypot(pathX, pathY, pathZ);
         this._distanceOnSegment = 0;
         this._reachedEnd = false;
         this._movementAngle =
@@ -554,16 +572,23 @@ namespace gdjs {
       }
 
       // Position object on the segment and update its angle
-      let newPos = [0, 0];
+      let x = 0;
+      let y = 0;
+      let z = 0;
       if (this._currentSegment < this._path.length - 1) {
-        newPos[0] = gdjs.evtTools.common.lerp(
-          this._path[this._currentSegment][0],
-          this._path[this._currentSegment + 1][0],
+        x = gdjs.evtTools.common.lerp(
+          this._path[this._currentSegment].x,
+          this._path[this._currentSegment + 1].x,
           this._distanceOnSegment / this._totalSegmentDistance
         );
-        newPos[1] = gdjs.evtTools.common.lerp(
-          this._path[this._currentSegment][1],
-          this._path[this._currentSegment + 1][1],
+        y = gdjs.evtTools.common.lerp(
+          this._path[this._currentSegment].y,
+          this._path[this._currentSegment + 1].y,
+          this._distanceOnSegment / this._totalSegmentDistance
+        );
+        z = gdjs.evtTools.common.lerp(
+          this._path[this._currentSegment].z,
+          this._path[this._currentSegment + 1].z,
           this._distanceOnSegment / this._totalSegmentDistance
         );
         if (
@@ -576,14 +601,27 @@ namespace gdjs {
           );
         }
       } else {
-        newPos = this._path[this._path.length - 1];
+        const newPos = this._path[this._path.length - 1];
+        x = newPos.x;
+        y = newPos.y;
+        z = newPos.z;
       }
-      this.owner.setX(newPos[0]);
-      this.owner.setY(newPos[1]);
+      console.log(
+        'move',
+        this._distanceOnSegment,
+        '/',
+        this._totalSegmentDistance,
+        'at',
+        x,
+        y,
+        z
+      );
+      this.owner.setX(x);
+      this.owner.setY(y);
+      this.owner.setZ(z);
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
-
   }
   gdjs.registerBehavior(
     'NavMeshPathfinding::NavMeshCharacterBehavior',

@@ -179,6 +179,18 @@
       return new IntArray(raw);
     }
   }
+  class UnsignedIntArray extends BaseArray {
+    ArrayConstructor = Uint32Array;
+    constructor(raw) {
+      super(raw ?? new Raw.Module.UnsignedIntArray());
+    }
+    getHeap() {
+      return Raw.Module.HEAPU32;
+    }
+    static fromRaw(raw) {
+      return new UnsignedIntArray(raw);
+    }
+  }
   class UnsignedCharArray extends BaseArray {
     ArrayConstructor = Uint8Array;
     constructor(raw) {
@@ -737,6 +749,1174 @@
     }
     setBuildBvTree(value) {
       this.raw.buildBvTree = value;
+    }
+  }
+
+  class QueryFilter {
+    get includeFlags() {
+      return this.raw.getIncludeFlags();
+    }
+    set includeFlags(flags) {
+      this.raw.setIncludeFlags(flags);
+    }
+    get excludeFlags() {
+      return this.raw.getExcludeFlags();
+    }
+    set excludeFlags(flags) {
+      this.raw.setExcludeFlags(flags);
+    }
+    constructor(raw) {
+      this.raw = raw ?? new Raw.Module.dtQueryFilter();
+    }
+    getAreaCost(i) {
+      return this.raw.getAreaCost(i);
+    }
+    setAreaCost(i, cost) {
+      this.raw.setAreaCost(i, cost);
+    }
+  }
+  class NavMeshQuery {
+    /**
+     * Default query filter.
+     */
+
+    /**
+     * Default search distance along each axis.
+     */
+    defaultQueryHalfExtents = {
+      x: 1,
+      y: 1,
+      z: 1
+    };
+    constructor(value, params) {
+      if (value instanceof Raw.Module.NavMeshQuery) {
+        this.raw = value;
+      } else {
+        this.raw = new Raw.Module.NavMeshQuery();
+        this.raw.init(value.raw, params?.maxNodes ?? 2048);
+      }
+      if (params?.defaultQueryFilter) {
+        this.defaultFilter = params.defaultQueryFilter;
+      } else {
+        this.defaultFilter = new QueryFilter();
+        this.defaultFilter.includeFlags = 0xffff;
+        this.defaultFilter.excludeFlags = 0;
+      }
+    }
+    /**
+     * Finds the polygon nearest to the given position.
+     */
+    findNearestPoly(position, options) {
+      const nearestRefRaw = new Raw.UnsignedIntRef();
+      const nearestPointRaw = new Raw.Vec3();
+      const isOverPolyRaw = new Raw.BoolRef();
+      const status = this.raw.findNearestPoly(vec3.toArray(position), vec3.toArray(options?.halfExtents ?? this.defaultQueryHalfExtents), options?.filter?.raw ?? this.defaultFilter.raw, nearestRefRaw, nearestPointRaw, isOverPolyRaw);
+      const nearestPoint = vec3.fromRaw(nearestPointRaw);
+      Raw.destroy(nearestPointRaw);
+      const nearestRef = nearestRefRaw.value;
+      Raw.destroy(nearestRefRaw);
+      const isOverPoly = isOverPolyRaw.value;
+      Raw.destroy(isOverPolyRaw);
+      return {
+        success: statusSucceed(status),
+        status,
+        nearestRef,
+        nearestPoint,
+        isOverPoly
+      };
+    }
+    /**
+     * Finds the polygons along the navigation graph that touch the specified circle.
+     * @param startRef Reference of polygon to start search from
+     * @param centerPos Center of circle
+     * @param radius Radius of circle
+     * @param options
+     */
+    findPolysAroundCircle(startRef, centerPos, radius, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const maxPolys = options?.maxPolys ?? 256;
+      const resultRefArray = new UnsignedIntArray();
+      const resultParentArray = new UnsignedIntArray();
+      const resultCostArray = new FloatArray();
+      resultRefArray.resize(maxPolys);
+      resultParentArray.resize(maxPolys);
+      resultCostArray.resize(maxPolys);
+      const resultCountRef = new Raw.IntRef();
+      const status = this.raw.findPolysAroundCircle(startRef, vec3.toArray(centerPos), radius, filter.raw, resultRefArray.raw, resultParentArray.raw, resultCostArray.raw, resultCountRef, maxPolys);
+      const resultRefs = [...resultRefArray.getHeapView()];
+      resultRefArray.destroy();
+      const resultParents = [...resultParentArray.getHeapView()];
+      resultParentArray.destroy();
+      const resultCost = [...resultCostArray.getHeapView()];
+      resultCostArray.destroy();
+      const resultCount = resultCountRef.value;
+      Raw.destroy(resultCountRef);
+      // todo: freeing resultCostRef and resultCountRef intermittently throws
+      // memory related errors.
+      // const resultCost = resultCostRef.value;
+      // const resultCount = resultCountRef.value;
+      return {
+        success: statusSucceed(status),
+        status,
+        resultRefs,
+        resultParents,
+        resultCost,
+        resultCount
+      };
+    }
+    /**
+     * Finds polygons that overlap the search box.
+     * @param center The center of the search box
+     * @param halfExtents The search distance along each axis
+     * @param options
+     */
+    queryPolygons(center, halfExtents, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const maxPolys = options?.maxPolys ?? 256;
+      const polysRefsArray = new UnsignedIntArray();
+      polysRefsArray.resize(maxPolys);
+      const polyCountRef = new Raw.IntRef();
+      const status = this.raw.queryPolygons(vec3.toArray(center), vec3.toArray(halfExtents), filter.raw, polysRefsArray.raw, polyCountRef, maxPolys);
+      const polyCount = polyCountRef.value;
+      Raw.destroy(polyCountRef);
+      const polyRefs = [...polysRefsArray.getHeapView()].slice(0, polyCount);
+      polysRefsArray.destroy();
+      return {
+        success: statusSucceed(status),
+        status,
+        polyRefs
+      };
+    }
+    /**
+     * Returns the closest point on the given polygon to the given position.
+     *
+     * @param polyRef The reference of the polygon
+     * @param position The position to find the closest point to
+     */
+    closestPointOnPoly(polyRef, position) {
+      const closestPointRaw = new Raw.Vec3();
+      const positionOverPolyRaw = new Raw.BoolRef();
+      const status = this.raw.closestPointOnPoly(polyRef, vec3.toArray(position), closestPointRaw, positionOverPolyRaw);
+      const closestPoint = vec3.fromRaw(closestPointRaw);
+      Raw.destroy(closestPointRaw);
+      const isPointOverPoly = positionOverPolyRaw.value;
+      Raw.destroy(positionOverPolyRaw);
+      return {
+        success: statusSucceed(status),
+        status,
+        closestPoint,
+        isPointOverPoly
+      };
+    }
+    /**
+     * Finds the closest point on the NavMesh to the given position.
+     * @param position the position to find the closest point to
+     * @param options additional options
+     * @returns the result of the find closest point operation
+     */
+    findClosestPoint(position, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const halfExtents = options?.halfExtents ?? this.defaultQueryHalfExtents;
+      const resultPolyRef = new Raw.UnsignedIntRef();
+      const resultPoint = new Raw.Vec3();
+      const resultPointOverPoly = new Raw.BoolRef();
+      const status = this.raw.findClosestPoint(vec3.toArray(position), vec3.toArray(halfExtents), filter.raw, resultPolyRef, resultPoint, resultPointOverPoly);
+      const polyRef = resultPolyRef.value;
+      Raw.destroy(resultPolyRef);
+      const point = vec3.fromRaw(resultPoint);
+      Raw.destroy(resultPoint);
+      const isPointOverPoly = resultPointOverPoly.value;
+      Raw.destroy(resultPointOverPoly);
+      return {
+        success: statusSucceed(status),
+        status,
+        polyRef,
+        point,
+        isPointOverPoly
+      };
+    }
+    /**
+     * Returns a random point on the NavMesh within the given radius of the given position.
+     *
+     * @param position the center of the search circle
+     * @param radius the radius of the search circle
+     * @param options additional options
+     */
+    findRandomPointAroundCircle(position, radius, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const halfExtents = options?.halfExtents ?? this.defaultQueryHalfExtents;
+      let startRef;
+      if (options?.startRef) {
+        startRef = options.startRef;
+      } else {
+        const nearestPoly = this.findNearestPoly(position, {
+          filter,
+          halfExtents
+        });
+        if (!nearestPoly.success) {
+          return {
+            success: false,
+            status: nearestPoly.status,
+            randomPolyRef: 0,
+            randomPoint: {
+              x: 0,
+              y: 0,
+              z: 0
+            }
+          };
+        }
+        startRef = nearestPoly.nearestRef;
+      }
+      const randomPolyRefRaw = new Raw.UnsignedIntRef();
+      const randomPointRaw = new Raw.Vec3();
+      const status = this.raw.findRandomPointAroundCircle(startRef, vec3.toArray(position), radius, filter.raw, randomPolyRefRaw, randomPointRaw);
+      const randomPolyRef = randomPolyRefRaw.value;
+      Raw.destroy(randomPolyRefRaw);
+      const randomPoint = vec3.fromRaw(randomPointRaw);
+      Raw.destroy(randomPointRaw);
+      return {
+        success: statusSucceed(status),
+        status,
+        randomPolyRef,
+        randomPoint
+      };
+    }
+    /**
+     * Moves from the start to the end position constrained to the navigation mesh.
+     *
+     * @param startRef the reference id of the start polygon.
+     * @param startPosition a position of the mover within the start polygon.
+     * @param endPosition the desired end position of the mover.
+     *
+     * @returns The result of the move along surface operation.
+     */
+    moveAlongSurface(startRef, startPosition, endPosition, options) {
+      const maxVisitedSize = options?.maxVisitedSize ?? 256;
+      const resultPositionRaw = new Raw.Vec3();
+      const visitedArray = new UnsignedIntArray();
+      const filter = options?.filter?.raw ?? this.defaultFilter.raw;
+      const status = this.raw.moveAlongSurface(startRef, vec3.toArray(startPosition), vec3.toArray(endPosition), filter, resultPositionRaw, visitedArray.raw, maxVisitedSize);
+      const resultPosition = vec3.fromRaw(resultPositionRaw);
+      Raw.destroy(resultPositionRaw);
+      const visited = [...visitedArray.getHeapView()];
+      visitedArray.destroy();
+      return {
+        success: statusSucceed(status),
+        status,
+        resultPosition,
+        visited
+      };
+    }
+    /**
+     * Returns a random point on the navmesh.
+     * @param options additional options
+     * @returns a random point on the navmesh
+     */
+    findRandomPoint(options) {
+      const randomPolyRefRaw = new Raw.UnsignedIntRef();
+      const randomPointRaw = new Raw.Vec3();
+      const status = this.raw.findRandomPoint(options?.filter?.raw ?? this.defaultFilter.raw, randomPolyRefRaw, randomPointRaw);
+      const randomPolyRef = randomPolyRefRaw.value;
+      Raw.destroy(randomPolyRefRaw);
+      const randomPoint = vec3.fromRaw(randomPointRaw);
+      Raw.destroy(randomPointRaw);
+      return {
+        success: statusSucceed(status),
+        status,
+        randomPolyRef,
+        randomPoint
+      };
+    }
+    /**
+     * Gets the height of the polygon at the provided position using the height detail.
+     *
+     * @param polyRef the reference id of the polygon.
+     * @param position a position within the xz-bounds of the polygon.
+     */
+    getPolyHeight(polyRef, position) {
+      const floatRef = new Raw.FloatRef();
+      const status = this.raw.getPolyHeight(polyRef, vec3.toArray(position), floatRef);
+      const height = floatRef.value;
+      Raw.destroy(floatRef);
+      return {
+        success: statusSucceed(status),
+        status,
+        height
+      };
+    }
+    /**
+     * Finds a straight path from the start position to the end position.
+     *
+     * @param start the start position
+     * @param end the end position
+     * @param options additional options
+     *
+     * @returns an array of Vector3 positions that make up the path, or an empty array if no path was found.
+     */
+    computePath(start, end, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const halfExtents = options?.halfExtents ?? this.defaultQueryHalfExtents;
+      // find nearest polygons for start and end positions
+      const startNearestPolyResult = this.findNearestPoly(start, {
+        filter,
+        halfExtents
+      });
+      if (!startNearestPolyResult.success) {
+        return {
+          success: false,
+          error: {
+            name: 'findNearestPoly for start position failed',
+            status: startNearestPolyResult.status
+          },
+          path: []
+        };
+      }
+      const endNearestPolyResult = this.findNearestPoly(end, {
+        filter,
+        halfExtents
+      });
+      if (!endNearestPolyResult.success) {
+        return {
+          success: false,
+          error: {
+            name: 'findNearestPoly for end position failed',
+            status: endNearestPolyResult.status
+          },
+          path: []
+        };
+      }
+      const startRef = startNearestPolyResult.nearestRef;
+      const endRef = endNearestPolyResult.nearestRef;
+      // find polygon path
+      const maxPathPolys = options?.maxPathPolys ?? 256;
+      const findPathResult = this.findPath(startRef, endRef, start, end, {
+        filter,
+        maxPathPolys
+      });
+      if (!findPathResult.success) {
+        return {
+          success: false,
+          error: {
+            name: 'findPath unsuccessful',
+            status: findPathResult.status
+          },
+          path: []
+        };
+      }
+      if (findPathResult.polys.size <= 0) {
+        return {
+          success: false,
+          error: {
+            name: 'no polygon path found'
+          },
+          path: []
+        };
+      }
+      const lastPoly = findPathResult.polys.get(findPathResult.polys.size - 1);
+      let closestEnd = {
+        x: end.x,
+        y: end.y,
+        z: end.z
+      };
+      if (lastPoly !== endRef) {
+        const lastPolyClosestPointResult = this.closestPointOnPoly(lastPoly, end);
+        if (!lastPolyClosestPointResult.success) {
+          return {
+            success: false,
+            error: {
+              name: 'no closest point on last polygon found',
+              status: lastPolyClosestPointResult.status
+            },
+            path: []
+          };
+        }
+        closestEnd = lastPolyClosestPointResult.closestPoint;
+      }
+      // find straight path
+      const maxStraightPathPoints = options?.maxStraightPathPoints;
+      const findStraightPathResult = this.findStraightPath(start, closestEnd, findPathResult.polys, {
+        maxStraightPathPoints
+      });
+      if (!findStraightPathResult.success) {
+        return {
+          success: false,
+          error: {
+            name: 'findStraightPath unsuccessful',
+            status: findStraightPathResult.status
+          },
+          path: []
+        };
+      }
+      const {
+        straightPath,
+        straightPathCount
+      } = findStraightPathResult;
+      // format output
+      const points = [];
+      for (let i = 0; i < straightPathCount; i++) {
+        points.push({
+          x: straightPath.get(i * 3),
+          y: straightPath.get(i * 3 + 1),
+          z: straightPath.get(i * 3 + 2)
+        });
+      }
+      findPathResult.polys.destroy();
+      findStraightPathResult.straightPath.destroy();
+      findStraightPathResult.straightPathFlags.destroy();
+      findStraightPathResult.straightPathRefs.destroy();
+      return {
+        success: true,
+        path: points
+      };
+    }
+    /**
+     * Finds a path from the start polygon to the end polygon.
+     * @param startRef the reference id of the start polygon.
+     * @param endRef the reference id of the end polygon.
+     * @param startPosition position within the start polygon.
+     * @param endPosition position within the end polygon.
+     * @param options additional options
+     * @returns
+     *
+     * The `polys` array returned must be freed after use.
+     *
+     * ```ts
+     * findPathResult.polys.destroy();
+     * ```
+     */
+    findPath(startRef, endRef, startPosition, endPosition, options) {
+      const filter = options?.filter ?? this.defaultFilter;
+      const maxPathPolys = options?.maxPathPolys ?? 256;
+      const polysArray = new UnsignedIntArray();
+      polysArray.resize(maxPathPolys);
+      const status = this.raw.findPath(startRef, endRef, vec3.toArray(startPosition), vec3.toArray(endPosition), filter.raw, polysArray.raw, maxPathPolys);
+      return {
+        success: statusSucceed(status),
+        status,
+        polys: polysArray
+      };
+    }
+    /**
+     * Finds the straight path from the start to the end position within the polygon corridor.
+     *
+     * This method peforms what is often called 'string pulling'.
+     *
+     * The start position is clamped to the first polygon in the path, and the
+     * end position is clamped to the last. So the start and end positions should
+     * normally be within or very near the first and last polygons respectively.
+     *
+     * The returned polygon references represent the reference id of the polygon
+     * that is entered at the associated path position. The reference id associated
+     * with the end point will always be zero.  This allows, for example, matching
+     * off-mesh link points to their representative polygons.
+     *
+     * If the provided result arrays are too small for the entire result set,
+     * they will be filled as far as possible from the start toward the end
+     * position.
+     *
+     * @param start path start position
+     * @param end path end position
+     * @param path an array of polygon references that represent the path corridor
+     * @param options additional options
+     * @returns the straight path result
+     *
+     * The straightPath, straightPathFlags, and straightPathRefs arrays returned must be freed after use.
+     *
+     * ```ts
+     * findStraightPathResult.straightPath.destroy();
+     * findStraightPathResult.straightPathFlags.destroy();
+     * findStraightPathResult.straightPathRefs.destroy();
+     * ```
+     */
+    findStraightPath(start, end, path, options) {
+      const maxStraightPathPoints = options?.maxStraightPathPoints ?? 256;
+      const straightPathOptions = options?.straightPathOptions ?? 0;
+      let pathPolys;
+      if (Array.isArray(path)) {
+        pathPolys = new UnsignedIntArray();
+        pathPolys.copy(path);
+      } else {
+        pathPolys = path;
+      }
+      const straightPath = new FloatArray();
+      straightPath.resize(maxStraightPathPoints * 3);
+      const straightPathFlags = new UnsignedCharArray();
+      straightPathFlags.resize(maxStraightPathPoints);
+      const straightPathRefs = new UnsignedIntArray();
+      straightPathRefs.resize(maxStraightPathPoints);
+      const straightPathCountRaw = new Raw.IntRef();
+      const status = this.raw.findStraightPath(vec3.toArray(start), vec3.toArray(end), pathPolys.raw, straightPath.raw, straightPathFlags.raw, straightPathRefs.raw, straightPathCountRaw, maxStraightPathPoints, straightPathOptions);
+      const straightPathCount = straightPathCountRaw.value;
+      Raw.destroy(straightPathCountRaw);
+      if (Array.isArray(path)) {
+        pathPolys.destroy();
+      }
+      return {
+        success: statusSucceed(status),
+        status,
+        straightPath,
+        straightPathFlags,
+        straightPathRefs,
+        straightPathCount
+      };
+    }
+    /**
+     * Casts a 'walkability' ray along the surface of the navigation mesh from the start position toward the end position.
+     *
+     * This method is meant to be used for quick, short distance checks.
+     *
+     * If the path array is too small to hold the result, it will be filled as far as possible from the start postion toward the end position.
+     *
+     * The raycast ignores the y-value of the end position. (2D check.) This places significant limits on how it can be used.
+     *
+     * <b>Using the Hit Parameter (t)</b>
+     *
+     * If the hit parameter is a very high value, then the ray has hit
+     * the end position. In this case the path represents a valid corridor to the
+     * end position and the value of hitNormal is undefined.
+     *
+     * If the hit parameter is zero, then the start position is on the wall that
+     * was hit and the value of hitNormal is undefined.
+     *
+     * If 0 < t < 1.0 then the following applies:
+     *
+     * ```
+     * distanceToHitBorder = distanceToEndPosition * t
+     * hitPoint = startPos + (endPos - startPos) * t
+     * ```
+     *
+     * <b>Use Case Restriction</b>
+     *
+     * Consider a scene where there is a main floor with a second floor balcony that hangs over the main floor.
+     * So the first floor mesh extends below the balcony mesh.
+     * The start position is somewhere on the first floor.
+     * The end position is on the balcony.
+     *
+     * The raycast will search toward the end position along the first floor mesh.
+     * If it reaches the end position's xz-coordinates it will indicate FLT_MAX,(no wall hit), meaning it reached the end position.
+     * This is one example of why this method is meant for short distance checks.
+     *
+     * @param startRef the reference id of the start polygon.
+     * @param startPosition a position within the start polygon representing the start of the ray
+     * @param endPosition the position to cast the ray toward.
+     * @param options additional options
+     */
+    raycast(startRef, startPosition, endPosition, options) {
+      const raycastHit = new Raw.Module.dtRaycastHit();
+      const raycastOptions = options?.raycastOptions ?? 0;
+      const prevRef = options?.prevRef ?? 0;
+      const queryFilter = options?.filter?.raw ?? this.defaultFilter.raw;
+      const status = this.raw.raycast(startRef, vec3.toArray(startPosition), vec3.toArray(endPosition), queryFilter, raycastOptions, raycastHit, prevRef);
+      const result = {
+        success: statusSucceed(status),
+        status,
+        t: raycastHit.t,
+        hitNormal: vec3.fromArray(array(i => raycastHit.get_hitNormal(i), 3)),
+        hitEdgeIndex: raycastHit.hitEdgeIndex,
+        path: array(i => raycastHit.get_path(i), raycastHit.pathCount),
+        maxPath: raycastHit.maxPath,
+        pathCost: raycastHit.pathCost
+      };
+      Raw.destroy(raycastHit);
+      return result;
+    }
+    /**
+     * Destroys the NavMeshQuery instance
+     */
+    destroy() {
+      this.raw.destroy();
+    }
+  }
+
+  const crowdAgentParamsDefaults = {
+    radius: 0.5,
+    height: 1,
+    maxAcceleration: 20,
+    maxSpeed: 6,
+    collisionQueryRange: 2.5,
+    pathOptimizationRange: 0,
+    separationWeight: 0,
+    updateFlags: 7,
+    obstacleAvoidanceType: 0,
+    queryFilterType: 0,
+    userData: 0
+  };
+  class CrowdAgent {
+    get radius() {
+      return this.raw.params.radius;
+    }
+    set radius(value) {
+      this.raw.params.radius = value;
+    }
+    get height() {
+      return this.raw.params.height;
+    }
+    set height(value) {
+      this.raw.params.height = value;
+    }
+    get maxAcceleration() {
+      return this.raw.params.maxAcceleration;
+    }
+    set maxAcceleration(value) {
+      this.raw.params.maxAcceleration = value;
+    }
+    get maxSpeed() {
+      return this.raw.params.maxSpeed;
+    }
+    set maxSpeed(value) {
+      this.raw.params.maxSpeed = value;
+    }
+    get collisionQueryRange() {
+      return this.raw.params.collisionQueryRange;
+    }
+    set collisionQueryRange(value) {
+      this.raw.params.collisionQueryRange = value;
+    }
+    get pathOptimizationRange() {
+      return this.raw.params.pathOptimizationRange;
+    }
+    set pathOptimizationRange(value) {
+      this.raw.params.pathOptimizationRange = value;
+    }
+    get separationWeight() {
+      return this.raw.params.separationWeight;
+    }
+    set separationWeight(value) {
+      this.raw.params.separationWeight = value;
+    }
+    get updateFlags() {
+      return this.raw.params.updateFlags;
+    }
+    set updateFlags(value) {
+      this.raw.params.updateFlags = value;
+    }
+    get obstacleAvoidanceType() {
+      return this.raw.params.obstacleAvoidanceType;
+    }
+    set obstacleAvoidanceType(value) {
+      this.raw.params.obstacleAvoidanceType = value;
+    }
+    get queryFilterType() {
+      return this.raw.params.queryFilterType;
+    }
+    set queryFilterType(value) {
+      this.raw.params.queryFilterType = value;
+    }
+    get userData() {
+      return this.raw.params.userData;
+    }
+    set userData(value) {
+      this.raw.params.userData = value;
+    }
+    /**
+     * The interpolated position of the agent.
+     *
+     * Use this if stepping the crowd with interpolation.
+     * This will not be updated if stepping the crowd without interpolation.
+     */
+    interpolatedPosition = {
+      x: 0,
+      y: 0,
+      z: 0
+    };
+    constructor(crowd, agentIndex) {
+      this.crowd = crowd;
+      this.agentIndex = agentIndex;
+      this.raw = crowd.raw.getEditableAgent(agentIndex);
+      this.interpolatedPosition = this.position();
+    }
+    /**
+     * Updates the agent's target.
+     * @param position The new target position.
+     * @returns True if the request was successful.
+     */
+    requestMoveTarget(position) {
+      const {
+        nearestPoint,
+        nearestRef
+      } = this.crowd.navMeshQuery.findNearestPoly(position, {
+        halfExtents: this.crowd.navMeshQuery.defaultQueryHalfExtents,
+        filter: this.crowd.navMeshQuery.defaultFilter
+      });
+      return this.crowd.raw.requestMoveTarget(this.agentIndex, nearestRef, vec3.toArray(nearestPoint));
+    }
+    /**
+     * Submits a new move request for the specified agent.
+     * @param velocity The desired velocity of the agent.
+     * @returns True if the request was successful.
+     */
+    requestMoveVelocity(velocity) {
+      return this.crowd.raw.requestMoveVelocity(this.agentIndex, vec3.toArray(velocity));
+    }
+    /**
+     * Resets the current move request for the specified agent.
+     */
+    resetMoveTarget() {
+      this.crowd.raw.resetMoveTarget(this.agentIndex);
+    }
+    /**
+     * Teleports the agent to the specified position.
+     * @param position
+     */
+    teleport(position) {
+      Raw.CrowdUtils.agentTeleport(this.crowd.raw, this.agentIndex, vec3.toArray(position), vec3.toArray(this.crowd.navMeshQuery.defaultQueryHalfExtents), this.crowd.navMeshQuery.defaultFilter.raw);
+      vec3.copy(position, this.interpolatedPosition);
+    }
+    /**
+     * The position of the agent.
+     * @returns
+     */
+    position() {
+      return {
+        x: this.raw.get_npos(0),
+        y: this.raw.get_npos(1),
+        z: this.raw.get_npos(2)
+      };
+    }
+    /**
+     * The actual velocity of the agent. The change from velocityDesiredObstacleAdjusted -> velocity is constrained by max acceleration.
+     */
+    velocity() {
+      return {
+        x: this.raw.get_vel(0),
+        y: this.raw.get_vel(1),
+        z: this.raw.get_vel(2)
+      };
+    }
+    /**
+     * The desired velocity of the agent. Based on the current path, calculated from scratch each frame.
+     */
+    desiredVelocity() {
+      return {
+        x: this.raw.get_dvel(0),
+        y: this.raw.get_dvel(1),
+        z: this.raw.get_dvel(2)
+      };
+    }
+    /**
+     * The desired velocity adjusted by obstacle avoidance, calculated from scratch each frame.
+     */
+    desiredVelocityObstacleAdjusted() {
+      return {
+        x: this.raw.get_nvel(0),
+        y: this.raw.get_nvel(1),
+        z: this.raw.get_nvel(2)
+      };
+    }
+    /**
+     * Returns the state of the agent.
+     *
+     * 0 = DT_CROWDAGENT_STATE_INVALID
+     * 1 = DT_CROWDAGENT_STATE_WALKING
+     * 2 = DT_CROWDAGENT_STATE_OFFMESH
+     */
+    state() {
+      return this.raw.state;
+    }
+    /**
+     * Returns the next target position on the path to the target
+     * @returns
+     */
+    target() {
+      return {
+        x: this.raw.get_targetPos(0),
+        y: this.raw.get_targetPos(1),
+        z: this.raw.get_targetPos(2)
+      };
+    }
+    /**
+     * Returns the next target position on the path to the target
+     * @returns
+     */
+    nextTargetInPath() {
+      return {
+        x: this.raw.get_cornerVerts(0),
+        y: this.raw.get_cornerVerts(1),
+        z: this.raw.get_cornerVerts(2)
+      };
+    }
+    /**
+     * Returns the local path corridor corners for the agent
+     * @returns
+     */
+    corners() {
+      const points = [];
+      for (let i = 0; i < this.raw.ncorners; i++) {
+        points.push({
+          x: this.raw.get_cornerVerts(i * 3),
+          y: this.raw.get_cornerVerts(i * 3 + 1),
+          z: this.raw.get_cornerVerts(i * 3 + 2)
+        });
+      }
+      return points;
+    }
+    /**
+     * Returns the agents parameters.
+     * @returns
+     */
+    parameters() {
+      const {
+        params
+      } = this.raw;
+      return {
+        radius: params.radius,
+        height: params.height,
+        maxAcceleration: params.maxAcceleration,
+        maxSpeed: params.maxSpeed,
+        collisionQueryRange: params.collisionQueryRange,
+        pathOptimizationRange: params.pathOptimizationRange,
+        separationWeight: params.separationWeight,
+        updateFlags: params.updateFlags,
+        obstacleAvoidanceType: params.obstacleAvoidanceType,
+        queryFilterType: params.queryFilterType,
+        userData: params.userData
+      };
+    }
+    /**
+     * Updates the agent's parameters.
+     * Any parameters not specified in the crowdAgentParams object will be unchanged.
+     * @param crowdAgentParams agent parameters to update.
+     */
+    updateParameters(crowdAgentParams) {
+      const params = {
+        ...this.parameters(),
+        ...crowdAgentParams
+      };
+      this.setParameters(params);
+    }
+    /**
+     * Sets the agent's parameters.
+     * Any parameters not specified in the crowdAgentParams object will be set to their default values.
+     * @param crowdAgentParams agent parameters
+     */
+    setParameters(crowdAgentParams) {
+      const params = {
+        ...crowdAgentParamsDefaults,
+        ...crowdAgentParams
+      };
+      const dtCrowdAgentParams = new Raw.Module.dtCrowdAgentParams();
+      dtCrowdAgentParams.radius = params.radius;
+      dtCrowdAgentParams.height = params.height;
+      dtCrowdAgentParams.maxAcceleration = params.maxAcceleration;
+      dtCrowdAgentParams.maxSpeed = params.maxSpeed;
+      dtCrowdAgentParams.collisionQueryRange = params.collisionQueryRange;
+      dtCrowdAgentParams.pathOptimizationRange = params.pathOptimizationRange;
+      dtCrowdAgentParams.separationWeight = params.separationWeight;
+      dtCrowdAgentParams.updateFlags = params.updateFlags;
+      dtCrowdAgentParams.obstacleAvoidanceType = params.obstacleAvoidanceType;
+      dtCrowdAgentParams.queryFilterType = params.queryFilterType;
+      dtCrowdAgentParams.userData = params.userData;
+      this.crowd.raw.updateAgentParameters(this.agentIndex, dtCrowdAgentParams);
+    }
+    /**
+     * Returns whether the agent is over an off-mesh connection.
+     * @returns
+     */
+    overOffMeshConnection() {
+      return Raw.CrowdUtils.overOffMeshConnection(this.crowd.raw, this.agentIndex);
+    }
+  }
+  class Crowd {
+    /**
+     * The agents in the crowd.
+     */
+    agents = {};
+    /**
+     * The NavMesh the crowd is interacting with.
+     */
+
+    /**
+     * The NavMeshQuery used to find nearest polys for commands
+     */
+
+    /**
+     * Accumulator for fixed updates with interpolation
+     */
+    accumulator = 0;
+    /**
+     *
+     * @param navMesh the navmesh the crowd will use for planning
+     * @param param1 the crowd parameters
+     *
+     * @example
+     * ```ts
+     * const crowd = new Crowd(navMesh, {
+     *   maxAgents: 100,
+     *   maxAgentRadius: 1,
+     * });
+     * ```
+     */
+    constructor(navMesh, {
+      maxAgents,
+      maxAgentRadius
+    }) {
+      this.navMesh = navMesh;
+      this.raw = Raw.Detour.allocCrowd();
+      this.raw.init(maxAgents, maxAgentRadius, navMesh.raw.getNavMesh());
+      this.navMeshQuery = new NavMeshQuery(new Raw.Module.NavMeshQuery(this.raw.getNavMeshQuery()));
+    }
+    /**
+     * Steps the crowd forward in time with a fixed time step.
+     *
+     * There are two modes. The simple mode is fixed timestepping without interpolation. In this case you only use the first argument. The second case uses interpolation. In that you also provide the time since the function was last used, as well as the maximum fixed timesteps to take.
+     *
+     * @param dt The fixed time step size to use.
+     * @param timeSinceLastCalled The time elapsed since the function was last called.
+     * @param maxSubSteps Maximum number of fixed steps to take per function call.
+     *
+     * @example fixed time stepping
+     * ```ts
+     * const deltaTime = 1 / 60;
+     * crowd.update(deltaTime);
+     * ```
+     *
+     * @example variable time stepping
+     * ```ts
+     * crowd.update(timeSinceLastUpdate);
+     * ```
+     *
+     * @example fixed time stepping with interpolation
+     * ```ts
+     * const deltaTime = 1 / 60;
+     * const maxSubSteps = 10;
+     * crowd.update(deltaTime, timeSinceLastUpdate, maxSubSteps);
+     *
+     * console.log(agent.interpolatedPosition);
+     * ```
+     */
+    update(dt, timeSinceLastCalled, maxSubSteps = 10) {
+      if (timeSinceLastCalled === undefined) {
+        // fixed step
+        this.raw.update(dt, undefined);
+      } else {
+        this.accumulator += timeSinceLastCalled;
+        // Do fixed steps to catch up
+        let substeps = 0;
+        while (this.accumulator >= dt && substeps < maxSubSteps) {
+          this.raw.update(dt, undefined);
+          this.accumulator -= dt;
+          substeps++;
+        }
+        // Interpolate the agent positions
+        const t = this.accumulator % dt / dt;
+        const agents = this.getAgents();
+        for (const agent of agents) {
+          vec3.lerp(agent.interpolatedPosition, agent.position(), t, agent.interpolatedPosition);
+        }
+      }
+    }
+    /**
+     * Adds a new agent to the crowd.
+     */
+    addAgent(position, crowdAgentParams) {
+      const params = {
+        ...crowdAgentParamsDefaults,
+        ...crowdAgentParams
+      };
+      const dtCrowdAgentParams = new Raw.Module.dtCrowdAgentParams();
+      dtCrowdAgentParams.radius = params.radius;
+      dtCrowdAgentParams.height = params.height;
+      dtCrowdAgentParams.maxAcceleration = params.maxAcceleration;
+      dtCrowdAgentParams.maxSpeed = params.maxSpeed;
+      dtCrowdAgentParams.collisionQueryRange = params.collisionQueryRange;
+      dtCrowdAgentParams.pathOptimizationRange = params.pathOptimizationRange;
+      dtCrowdAgentParams.separationWeight = params.separationWeight;
+      dtCrowdAgentParams.updateFlags = params.updateFlags;
+      dtCrowdAgentParams.obstacleAvoidanceType = params.obstacleAvoidanceType;
+      dtCrowdAgentParams.queryFilterType = params.queryFilterType;
+      dtCrowdAgentParams.userData = params.userData;
+      const agentIndex = this.raw.addAgent(vec3.toArray(position), dtCrowdAgentParams);
+      const agent = new CrowdAgent(this, agentIndex);
+      this.agents[agentIndex] = agent;
+      return agent;
+    }
+    /**
+     * Gets the agent for the specified index, or null if no agent has the given index.
+     * @param agentIndex
+     * @returns
+     */
+    getAgent(agentIndex) {
+      const agent = this.agents[agentIndex];
+      if (!agent) {
+        return null;
+      }
+      return agent;
+    }
+    /**
+     * Removes the agent from the crowd.
+     */
+    removeAgent(agent) {
+      const agentIndex = typeof agent === 'number' ? agent : agent.agentIndex;
+      this.raw.removeAgent(agentIndex);
+      delete this.agents[agentIndex];
+    }
+    /**
+     * Returns the maximum number of agents that can be managed by the crowd.
+     */
+    getAgentCount() {
+      return this.raw.getAgentCount();
+    }
+    /**
+     * Returns the number of active agents in the crowd.
+     */
+    getActiveAgentCount() {
+      return Raw.CrowdUtils.getActiveAgentCount(this.raw);
+    }
+    /**
+     * Returns all the agents managed by the crowd.
+     */
+    getAgents() {
+      return Object.values(this.agents);
+    }
+    /**
+     * Gets the query filter for the specified index.
+     * @param filterIndex the index of the query filter to retrieve, (min 0, max 15)
+     * @returns the query filter
+     */
+    getFilter(filterIndex) {
+      return new QueryFilter(this.raw.getEditableFilter(filterIndex));
+    }
+    /**
+     * Destroys the crowd.
+     */
+    destroy() {
+      Raw.Detour.freeCrowd(this.raw);
+    }
+  }
+
+  /**
+   * Represents a helper class to visualize navigation cur and related data in PlayCanvas.
+   */
+  class DebugDrawerUtils {
+    currentPrimitiveType = 0;
+    currentVertices = [];
+    primitives = [];
+    constructor() {
+      this.debugDrawImpl = new Raw.Module.DebugDrawImpl();
+      // Bind the debug draw implementation handlers
+      this.debugDrawImpl.handleBegin = (primitive, _size) => {
+        this.currentPrimitiveType = primitive;
+        this.currentVertices = [];
+      };
+      this.debugDrawImpl.handleDepthMask = _state => {
+        // unused for now...
+      };
+      this.debugDrawImpl.handleTexture = _state => {
+        // unused for now...
+      };
+      this.debugDrawImpl.handleVertexWithColor = (x, y, z, color) => {
+        this.vertex(x, y, z, color);
+      };
+      this.debugDrawImpl.handleVertexWithColorAndUV = (x, y, z, color, _u, _v) => {
+        this.vertex(x, y, z, color);
+      };
+      const primitiveMap = {
+        [Raw.Module.DU_DRAW_LINES]: 'lines',
+        [Raw.Module.DU_DRAW_TRIS]: 'tris',
+        [Raw.Module.DU_DRAW_QUADS]: 'quads',
+        [Raw.Module.DU_DRAW_POINTS]: 'points'
+      };
+      this.debugDrawImpl.handleEnd = () => {
+        const type = primitiveMap[this.currentPrimitiveType];
+        this.primitives.push({
+          type,
+          vertices: this.currentVertices
+        });
+      };
+    }
+    flush() {
+      const cur = this.primitives;
+      this.primitives = [];
+      return cur;
+    }
+    drawHeightfieldSolid(hf) {
+      Raw.RecastDebugDraw.debugDrawHeightfieldSolid(this.debugDrawImpl, hf.raw);
+      return this.flush();
+    }
+    drawHeightfieldWalkable(hf) {
+      Raw.RecastDebugDraw.debugDrawHeightfieldWalkable(this.debugDrawImpl, hf.raw);
+      return this.flush();
+    }
+    drawCompactHeightfieldSolid(chf) {
+      Raw.RecastDebugDraw.debugDrawCompactHeightfieldSolid(this.debugDrawImpl, chf.raw);
+      return this.flush();
+    }
+    drawCompactHeightfieldRegions(chf) {
+      Raw.RecastDebugDraw.debugDrawCompactHeightfieldRegions(this.debugDrawImpl, chf.raw);
+      return this.flush();
+    }
+    drawCompactHeightfieldDistance(chf) {
+      Raw.RecastDebugDraw.debugDrawCompactHeightfieldDistance(this.debugDrawImpl, chf.raw);
+      return this.flush();
+    }
+    drawHeightfieldLayer(layer, idx) {
+      Raw.RecastDebugDraw.debugDrawHeightfieldLayer(this.debugDrawImpl, layer.raw, idx);
+      return this.flush();
+    }
+    drawHeightfieldLayers(lset) {
+      Raw.RecastDebugDraw.debugDrawHeightfieldLayers(this.debugDrawImpl, lset.raw);
+      return this.flush();
+    }
+    drawRegionConnections(cset, alpha = 1) {
+      Raw.RecastDebugDraw.debugDrawRegionConnections(this.debugDrawImpl, cset.raw, alpha);
+      return this.flush();
+    }
+    drawRawContours(cset, alpha = 1) {
+      Raw.RecastDebugDraw.debugDrawRawContours(this.debugDrawImpl, cset.raw, alpha);
+      return this.flush();
+    }
+    drawContours(cset, alpha = 1) {
+      Raw.RecastDebugDraw.debugDrawContours(this.debugDrawImpl, cset.raw, alpha);
+      return this.flush();
+    }
+    drawPolyMesh(mesh) {
+      Raw.RecastDebugDraw.debugDrawPolyMesh(this.debugDrawImpl, mesh.raw);
+      return this.flush();
+    }
+    drawPolyMeshDetail(dmesh) {
+      Raw.RecastDebugDraw.debugDrawPolyMeshDetail(this.debugDrawImpl, dmesh.raw);
+      return this.flush();
+    }
+    drawNavMesh(mesh, flags = 0) {
+      Raw.DetourDebugDraw.debugDrawNavMesh(this.debugDrawImpl, mesh.raw.getNavMesh(), flags);
+      return this.flush();
+    }
+    drawNavMeshWithClosedList(mesh, query, flags = 0) {
+      Raw.DetourDebugDraw.debugDrawNavMeshWithClosedList(this.debugDrawImpl, mesh.raw.m_navMesh, query.raw.m_navQuery, flags);
+      return this.flush();
+    }
+    drawNavMeshNodes(query) {
+      Raw.DetourDebugDraw.debugDrawNavMeshNodes(this.debugDrawImpl, query.raw.m_navQuery);
+      return this.flush();
+    }
+    drawNavMeshBVTree(mesh) {
+      Raw.DetourDebugDraw.debugDrawNavMeshBVTree(this.debugDrawImpl, mesh.raw.m_navMesh);
+      return this.flush();
+    }
+    drawNavMeshPortals(mesh) {
+      Raw.DetourDebugDraw.debugDrawNavMeshPortals(this.debugDrawImpl, mesh.raw.m_navMesh);
+      return this.flush();
+    }
+    drawNavMeshPolysWithFlags(mesh, flags, col) {
+      Raw.DetourDebugDraw.debugDrawNavMeshPolysWithFlags(this.debugDrawImpl, mesh.raw.m_navMesh, flags, col);
+      return this.flush();
+    }
+    drawNavMeshPoly(mesh, ref, col) {
+      Raw.DetourDebugDraw.debugDrawNavMeshPoly(this.debugDrawImpl, mesh.raw.m_navMesh, ref, col);
+      return this.flush();
+    }
+    /**
+     * Disposes of the debug drawer and releases resources.
+     */
+    dispose() {
+      Raw.Module.destroy(this.debugDrawImpl);
+    }
+    vertex(x, y, z, color) {
+      const r = (color & 0xff) / 255;
+      const g = (color >> 8 & 0xff) / 255;
+      const b = (color >> 16 & 0xff) / 255;
+      const a = (color >> 24 & 0xff) / 255;
+      this.currentVertices.push([x, y, z, r, g, b, a]);
     }
   }
 
@@ -2977,6 +4157,47 @@
     default: Recast
   });
 
+  exports.Crowd = Crowd;
+  exports.CrowdAgent = CrowdAgent;
+  exports.DebugDrawerUtils = DebugDrawerUtils;
+  exports.DetourBVNode = DetourBVNode;
+  exports.DetourLink = DetourLink;
+  exports.DetourMeshHeader = DetourMeshHeader;
+  exports.DetourMeshTile = DetourMeshTile;
+  exports.DetourOffMeshConnection = DetourOffMeshConnection;
+  exports.DetourPoly = DetourPoly;
+  exports.DetourPolyDetail = DetourPolyDetail;
+  exports.DetourTileCacheParams = DetourTileCacheParams;
+  exports.FloatArray = FloatArray;
+  exports.IntArray = IntArray;
+  exports.NavMesh = NavMesh;
+  exports.NavMeshCalcTileLocResult = NavMeshCalcTileLocResult;
+  exports.NavMeshCreateParams = NavMeshCreateParams;
+  exports.NavMeshGetTilesAtResult = NavMeshGetTilesAtResult;
+  exports.NavMeshParams = NavMeshParams;
+  exports.NavMeshQuery = NavMeshQuery;
+  exports.NavMeshRemoveTileResult = NavMeshRemoveTileResult;
+  exports.NavMeshStoreTileStateResult = NavMeshStoreTileStateResult;
+  exports.QueryFilter = QueryFilter;
+  exports.RecastBuildContext = RecastBuildContext;
+  exports.RecastChunkyTriMesh = RecastChunkyTriMesh;
+  exports.RecastCompactCell = RecastCompactCell;
+  exports.RecastCompactHeightfield = RecastCompactHeightfield;
+  exports.RecastCompactSpan = RecastCompactSpan;
+  exports.RecastContour = RecastContour;
+  exports.RecastContourSet = RecastContourSet;
+  exports.RecastHeightfield = RecastHeightfield;
+  exports.RecastHeightfieldLayer = RecastHeightfieldLayer;
+  exports.RecastHeightfieldLayerSet = RecastHeightfieldLayerSet;
+  exports.RecastPolyMesh = RecastPolyMesh;
+  exports.RecastPolyMeshDetail = RecastPolyMeshDetail;
+  exports.RecastSpan = RecastSpan;
+  exports.RecastSpanPool = RecastSpanPool;
+  exports.TileCache = TileCache;
+  exports.TileCacheMeshProcess = TileCacheMeshProcess;
+  exports.UnsignedCharArray = UnsignedCharArray;
+  exports.UnsignedIntArray = UnsignedIntArray;
+  exports.UnsignedShortArray = UnsignedShortArray;
   exports.buildTiledNavMeshRcConfig = buildTiledNavMeshRcConfig;
   exports.createDefaultTileCacheMeshProcess = createDefaultTileCacheMeshProcess;
   exports.dtIlog2 = dtIlog2;

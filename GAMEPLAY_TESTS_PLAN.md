@@ -24,9 +24,11 @@ This plan builds on two bodies of prior art that were fully analyzed:
 - A **gameplay test** is a named, described, pure-JS async script `async (harness) => {…}`
   running inside a real game preview, with easy access to the GDJS runtime: step frames,
   simulate input, inspect objects/variables, assert, take screenshots, profile.
-- Tests live **in the project** (`project.gameplayTests`) or **in an events-based
-  extension** (`extension.gameplayTests`). Serialized with the project. New C++ Core
-  classes + GDevelop.js bindings.
+- Tests live **in the project** (`project.tests`) or **in an events-based
+  extension** (`extension.tests`). Serialized with the project. New C++ Core
+  classes + GDevelop.js bindings. The model is deliberately generic (`gd::Test` with a
+  `type` attribute, `"gameplay"` in v1) to leave room for future test types; the UI
+  labels the v1 feature "Gameplay tests".
 - Tests are visible/authorable in the **Project Manager** (new "Tests" section), in the
   **extension editor** (new "Tests" section), open in a **new editor tab** (Monaco code
   editor + properties panel), runnable from the **toolbar**, the **command palette**, and
@@ -38,7 +40,7 @@ This plan builds on two bodies of prior art that were fully analyzed:
   optional performance report. A compact summary (`status`, `launchedAt`, `durationMs`)
   is persisted on the test; logs/screenshots are ephemeral (kept in editor memory,
   returned to the AI).
-- The **orchestrator gets exactly one new tool**: `run_game_tests`. It runs existing
+- The **orchestrator gets exactly one new tool**: `run_tests`. It runs existing
   tests by name, or persists + runs a new test from provided code. Under the hood it is a
   **tester sub-agent** with a zero-LLM fast path (same pattern as `run_edit_agent`'s
   `initial_script`): if the orchestrator's test code executes cleanly, no extra LLM call
@@ -60,7 +62,7 @@ flowchart LR
   subgraph Backend [GDevelop-services generation-api]
     ORCH[Orchestrator LLM<br/>toolsVersion v13]
     TESTER[Tester sub-agent<br/>mode: agent-tester]
-    ORCH -- run_game_tests --> TESTER
+    ORCH -- run_tests --> TESTER
   end
   subgraph Editor [newIDE]
     REG[editorFunctions registry<br/>run_gameplay_test]
@@ -81,7 +83,7 @@ flowchart LR
 
 Execution path of one AI-triggered test run:
 
-1. Orchestrator calls `run_game_tests({scope, tests | new_test})` (server-side tool).
+1. Orchestrator calls `run_tests({scope, tests | new_test})` (server-side tool).
 2. Backend creates a tester sub-agent AiRequest with a synthetic unresolved
    client-side `run_gameplay_test` call (the `initial_script` pattern —
    `llm-gdevelop-server-side-tools.js:1106`); the parent Lambda exits.
@@ -109,11 +111,14 @@ Follow the exact recipe below (all patterns verified in the codebase).
 
 ### 3.1 New classes
 
-- `Core/GDCore/Project/GameplayTest.h/.cpp` — model on `gd::ExternalEvents`
+- `Core/GDCore/Project/Test.h/.cpp` — model on `gd::ExternalEvents`
   (`Core/GDCore/Project/ExternalEvents.h:31-101`): `GetName/SetName`, `Clone()`,
   `SerializeTo`, `UnserializeFrom`, private `Init()`.
   Fields:
   - `gd::String name;`
+  - `gd::String type;` — `"gameplay"` in v1; serialized so future test types can share
+    the container/UI without a format change. Unserialize defaults missing/empty to
+    `"gameplay"`.
   - `gd::String description;`
   - `gd::String source;` — the JS body. Serialize with
     `element.AddChild("source").SetMultilineStringValue(source)` (same as
@@ -121,11 +126,10 @@ Follow the exact recipe below (all patterns verified in the codebase).
     readable.
   - Last-run summary (attributes, all optional): `lastRunStatus` (`""|"passed"|"failed"|"error"`),
     `lastRunAt` (unix ms as double), `lastRunDurationMs`, `lastRunFramesExecuted`.
-    NOTE: persisting last-run dirties the project on each run — acceptable (the user
-    asked for it), but the editor must mark unsaved changes accordingly. Console
-    logs/screenshots are NOT persisted.
-- `Core/GDCore/Project/GameplayTestsContainer.h` — thin wrapper over
-  `gd::SerializableWithNameList<gd::GameplayTest>` exactly like
+    DECIDED: persisted in the project JSON — dirties the project on each run; the editor
+    must mark unsaved changes accordingly. Console logs/screenshots are NOT persisted.
+- `Core/GDCore/Project/TestsContainer.h` — thin wrapper over
+  `gd::SerializableWithNameList<gd::Test>` exactly like
   `EventsBasedObjectVariantsContainer`
   (`Core/GDCore/Project/EventsBasedObjectVariantsContainer.h:26`): private inheritance +
   renamed accessors (`HasTestNamed`, `GetTest(name)`, `GetTest(index)`, `GetTestsCount`,
@@ -135,21 +139,21 @@ Follow the exact recipe below (all patterns verified in the codebase).
 
 ### 3.2 Attach to `gd::Project` and `gd::EventsFunctionsExtension`
 
-- `Project.h`: member `gd::GameplayTestsContainer gameplayTests;` near line 1195;
-  `GetGameplayTests()` const/non-const accessors near line 762.
+- `Project.h`: member `gd::TestsContainer tests;` near line 1195;
+  `GetTests()` const/non-const accessors near line 762.
 - `Project.cpp`:
-  - `SerializeTo` (~line 1172): `gameplayTests.SerializeElementsTo("gameplayTest", element.AddChild("gameplayTests"));`
-  - `UnserializeFrom` (~line 919): `gameplayTests.UnserializeElementsFrom("gameplayTest", element.GetChild("gameplayTests"));`
+  - `SerializeTo` (~line 1172): `tests.SerializeElementsTo("test", element.AddChild("tests"));`
+  - `UnserializeFrom` (~line 919): `tests.UnserializeElementsFrom("test", element.GetChild("tests"));`
     (`ConsiderAsArrayOf` on a missing child yields zero children → old projects load fine,
     no migration needed).
-  - **`Init` (~line 1295): `gameplayTests = game.gameplayTests;`** — forgetting this is
+  - **`Init` (~line 1295): `tests = game.tests;`** — forgetting this is
     the classic bug; add the copy-operator test (§3.5).
-- `EventsFunctionsExtension.h`: member near line 429, `GetGameplayTests()` near line 186.
+- `EventsFunctionsExtension.h`: member near line 429, `GetTests()` near line 186.
 - `EventsFunctionsExtension.cpp`:
   - `SerializeTo` (~line 124) — also covers the standalone extension `.json` format.
   - `UnserializeExtensionImplementationFrom` (~line 249) — tests are content, not a
     declaration other things reference.
-  - **`Init` (~line 56): `gameplayTests = other.gameplayTests;`**
+  - **`Init` (~line 56): `tests = other.tests;`**
 - `Core/GDCore/IDE/ProjectStripper.cpp` (`StripProjectForExport`, line 19): clear
   project-level and per-extension gameplay tests. Tests never ship in exports or preview
   `projectData` (source travels via debugger message).
@@ -161,19 +165,19 @@ Follow the exact recipe below (all patterns verified in the codebase).
 ### 3.3 GDevelop.js bindings
 
 - `GDevelop.js/Bindings/Bindings.idl`:
-  - `interface GameplayTest` (SetName/GetName, SetDescription/GetDescription,
+  - `interface Test` (SetName/GetName, SetType/GetType, SetDescription/GetDescription,
     SetSource/GetSource, last-run getters/setters, SerializeTo/UnserializeFrom) — model on
     `interface ExternalEvents` (Bindings.idl:1072).
-  - `interface GameplayTestsContainer` — model on `EventsBasedBehaviorsList`
+  - `interface TestsContainer` — model on `EventsBasedBehaviorsList`
     (Bindings.idl:3483): `InsertNew`, `Insert`, `Has`, `Get`, `GetAt`, `Remove`, `Move`,
     `GetCount`, `GetPosition`, `size`, `at`.
-  - `[Ref] GameplayTestsContainer GetGameplayTests();` in `interface Project` and
+  - `[Ref] TestsContainer GetTests();` in `interface Project` and
     `interface EventsFunctionsExtension`.
 - `GDevelop.js/Bindings/Wrapper.cpp`: `#include` the two new headers (block at lines
   70-95). `#define GetAt Get` already exists — no new define needed if the container
   exposes `GetAt`.
-- Rebuild bindings: regenerate and **commit** `types/gdgameplaytest.js`,
-  `types/gdgameplaytestscontainer.js`, updated `types/gdproject.js`,
+- Rebuild bindings: regenerate and **commit** `types/gdtest.js`,
+  `types/gdtestscontainer.js`, updated `types/gdproject.js`,
   `types/gdeventsfunctionsextension.js`, `types/libgdevelop.js`, `types.d.ts`.
 - Tests: `GDevelop.js/__tests__/Core.js` — mirror the ExternalEvents assertions
   (lines 90-99); `Core/tests/` — copy-operator + serialization round-trip test
@@ -182,9 +186,10 @@ Follow the exact recipe below (all patterns verified in the codebase).
 ### 3.4 JSON shape (for reference)
 
 ```json
-"gameplayTests": [
+"tests": [
   {
     "name": "PlayerCanCollectCoin",
+    "type": "gameplay",
     "description": "Player walks right and collects the first coin; Score increments.",
     "source": ["await harness.goToScene('Level1');", "…"],
     "lastRunStatus": "passed",
@@ -199,8 +204,8 @@ Follow the exact recipe below (all patterns verified in the codebase).
 
 - Round-trip: unserialize → serialize preserves tests at project and extension level.
 - Copy ctor / assignment of Project and EventsFunctionsExtension preserves tests.
-- Old projects (no `gameplayTests` key) load without warnings.
-- Exported/preview projectData contains no `gameplayTests`.
+- Old projects (no `tests` key) load without warnings.
+- Exported/preview projectData contains no `tests`.
 
 ---
 
@@ -391,7 +396,7 @@ example):
    extend `renameEditorTabs` (line 555).
 2. New `MainFrame/EditorContainers/GameplayTestEditorContainer.js` — class component per
    the pattern (inactive-tab `shouldComponentUpdate` early-out, `updateToolbar`,
-   `on*ModifiedOutsideEditor` no-ops, resolve `gd.GameplayTest` from
+   `on*ModifiedOutsideEditor` no-ops, resolve `gd.Test` from
    `project`/`extension` + `projectItemName`).
 3. `MainFrame/index.js:283` — register in `editorKindToRenderer`;
    `getEditorOpeningOptions` (line 752): label/icon, add `'gameplay-test'` to the
@@ -400,6 +405,9 @@ example):
    For extension-scoped tests, `projectItemName` = `extensionName::testName`.
 4. Editor content: `EditorMosaic` (`UI/EditorMosaic/index.js`) with
    `{ direction: 'row', first: 'test-code', second: 'test-properties', splitPercentage: 70 }`.
+   On small screens, fall back to `EditorMosaic/EditorNavigator.js` (tabs shown at the
+   bottom), exactly like the scene editor and the extension editor do — pattern at
+   `EventsFunctionsExtensionEditor/index.js:1801`.
    - `test-code`: `CodeEditor` (`newIDE/app/src/CodeEditor/index.js`, Monaco lazy-loaded;
      GDJS-aware autocompletion exists). ✚ Register a `harness.d.ts` in the Monaco setup
      so test authors get harness IntelliSense (add to
@@ -450,7 +458,7 @@ runGameplayTests({
    `BrowserPreviewDebuggerServer.js:156`).
 4. Send `gameplayTest.run` with the test source; await `gameplayTest.result` with an
    editor-side watchdog = `timeoutMs + margin`.
-5. Update `gd.GameplayTest` last-run fields; fire unsaved-changes; notify listeners
+5. Update `gd.Test` last-run fields; fire unsaved-changes; notify listeners
    (test editor tab, project manager badges).
 6. Tear down (or keep the frame alive between tests of the same batch — re-send
    `gameplayTest.run` sequentially; re-export only when the project changed since the
@@ -498,19 +506,24 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
   8 700-line `EditorFunctions/index.js`; only add registry entries there):
   - `run_gameplay_test` — client-side executor used by the tester sub-agent's synthetic
     call. Args `{ scope, test_name, source?, description?, persist?, timeout_ms?,
-    screenshots? }`. If `source` provided: create/update the `gd.GameplayTest`
+    screenshots? }`. If `source` provided: create/update the `gd.Test`
     (persist = default true), then run via the shared runner. Returns the
-    `GameplayTestResult` (capped — reuse `CapScriptOutput.js` patterns).
-    `modifiesProject: true` when it persists a new/changed test (edit-approval applies),
-    plus a `renderForEditor` row ("Running gameplay test …" with live status).
+    `GameplayTestResult` (capped — reuse `CapScriptOutput.js` patterns), plus a
+    `renderForEditor` row ("Running gameplay test …" with live status).
+    Approval semantics (decided): running an existing test needs NO approval (akin to
+    explorer reads); persisting a new/changed test IS a project modification and gets
+    the edit-approval row when auto-edit is off. The registry's `modifiesProject` flag
+    is a static boolean today — extend it to also accept `(args) => boolean` (evaluated
+    in `AiGeneration/Utils.js:421` before `requestEditApproval`) so approval only
+    triggers when `source` is provided.
   - Add it to `NON_SCRIPTABLE_FUNCTION_NAMES` for v1 (a preview launch inside a
     `run_script` blocks the whole script for seconds and complicates approval UX;
     revisit later).
 - `SimplifiedProject.js` (type at line 59, builder at line 412): add
-  `gameplayTests: [{ name, description, lastRunStatus?, lastRunAt? }]` at project level
+  `tests: [{ name, type, description, lastRunStatus?, lastRunAt? }]` at project level
   and inside each extension summary. Source is NOT in the simplified project.
 - The backend reader (`gdevelop-simplified-project.js` / `-reader.js`) mirrors this, and
-  `read_game_project_json` path examples gain `gameplayTests[*]` — including `source`
+  `read_game_project_json` path examples gain `tests[*]` — including `source`
   under the reader (full project JSON has it), so the orchestrator can inspect test code
   through the existing tool, per the product intent.
 - Bump `AI_ORCHESTRATOR_TOOLS_VERSION` to `'v13'` (`AiGeneration/Utils.js:104`) in the
@@ -535,17 +548,17 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
 ### 6.1 New tools version `v13`
 
 - `src/lib/llm-gdevelop-tools.js`: new orchestrator list entry for `v13` = the v12 list +
-  `runGameTestsV1`. (Resolve the stale `// TODO: Add testGameplayV1` comment at
+  `runTestsV1`. (Resolve the stale `// TODO: Add testGameplayV1` comment at
   line 5346.)
 - `handle.js` `choosePrompts` (line 1119): map v13 →
   `ai-request/orchestrator/compact-system-prompt-v13.md`. Nothing else — `>= v10`
   already resolves `/latest`.
 
-### 6.2 Orchestrator tool: `run_game_tests` (server-side)
+### 6.2 Orchestrator tool: `run_tests` (server-side)
 
 ```js
 {
-  name: 'run_game_tests',
+  name: 'run_tests',
   description: 'Run gameplay test(s) on the game and get pass/fail results with evidence.
     Either run existing tests by name, or provide a new test (name + code) which is saved
     into the project/extension and run. …(failure-triage protocol, see §6.5)',
@@ -589,7 +602,7 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
   in the prior attempt (`44bf6640`). Validate only `timeout_ms` and shape.
 - `findRepeatedToolCallLoop` (6 identical calls → kill): acceptable backstop; the tester's
   own run cap triggers first.
-- Message trimming (`utils/messages-trimming.js`): superseded `run_game_tests` outputs
+- Message trimming (`utils/messages-trimming.js`): superseded `run_tests` outputs
   for the SAME test name are redacted down to `status` + one line (opposite of the
   `read_events_source` exemption) — keeps repeated test-fix loops from bloating context.
 - `suspend.js`: adopt the branch's wording ("…update the plan if necessary and only
@@ -599,8 +612,7 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
 ### 6.3 Pricing
 
 `price-in-credits.js` `ORCHESTRATOR_V3_TOOL_CALL_CREDITS` (line 108): add
-`run_game_tests: 2` (proposal — between `run_edit_agent` 0.5 and `generate_events` 4;
-it launches a real preview and possibly a sub-agent loop) + count `new_test.code`
+`run_tests: 0.5` (decided — same as `run_edit_agent`) + count `new_test.code`
 characters into `SCRIPT_CREDITS_PER_CHARACTER`. Ensure `countToolCallUsage` rolls up the
 tester's `run_gameplay_test` calls into the parent bill (same as edit agent).
 
@@ -678,7 +690,7 @@ Carried from the prior branch (commit `60ca168a`), updated for the sub-agent spl
 - Deprecate/ignore `pr-33` (it targets the legacy v1 prompt; its 2 useful lines are
   subsumed by the v13 section).
 - e2e: add orchestrator benchmark cases where the mock editor returns canned
-  `run_game_tests` outputs (pass, assertion-fail, script-error) and assert the
+  `run_tests` outputs (pass, assertion-fail, script-error) and assert the
   orchestrator's next action matches the protocol.
 
 ### 7.3 Examples/starters (GDevelop-examples)
@@ -780,18 +792,21 @@ validated against a manually exported preview before any Core work lands).
 - Test fixtures as external layouts authored specifically for tests.
 - Community-extension test conventions in GDevelop-extensions CI.
 
-## 12. Open questions (need product decisions)
+## 12. Resolved product decisions
 
-1. **Last-run persistence**: in the project JSON (proposed — small, team-visible, but
-   dirties the project on each run) vs editor-local storage?
-2. **Naming**: "Tests" vs "Gameplay tests" in the UI; `gameplayTests` is the proposed
-   JSON key either way.
-3. **Credits**: proposed `run_game_tests: 2` + code characters — confirm.
-4. **Screenshots default**: proposed off for users / on-failure for benchmarks in v1 —
-   confirm appetite for vision-capable models in `llm-models.js`.
-5. **Edit approval UX**: persisting a new AI-written test counts as a project
-   modification (approval row). Should RUNNING an existing test require approval too?
-   Proposed: no.
-6. **Extension-scoped tests without scenes**: v1 runs them against a synthetic empty
-   scene + `spawn()` of the extension's objects. Good enough, or defer extension tests
-   entirely to v1.1?
+1. **Last-run persistence**: in the project JSON (dirties the project on each run; the
+   editor marks unsaved changes accordingly).
+2. **Naming**: UI label is "Gameplay tests". The model and serialization stay generic —
+   `gd::Test`, JSON key `tests`, `type: "gameplay"` — to leave room for future test
+   types sharing the same container/UI.
+3. **Tool name & credits**: the orchestrator tool is `run_tests`, priced **0.5 credits**
+   per call + per-character pricing on new test code.
+4. **Approval UX**: running an existing test requires NO approval (akin to the explorer
+   agent). Persisting a new/changed test is a project modification → edit-approval row
+   when auto-edit is off.
+5. **Extension-scoped tests**: v1 runs them against a synthetic empty scene + `spawn()`
+   of the extension's objects.
+
+Remaining open question: **screenshots default** — proposed off for users /
+`on-failure` for benchmarks in v1; confirm appetite for vision-capable models in
+`llm-models.js` when P4 lands.

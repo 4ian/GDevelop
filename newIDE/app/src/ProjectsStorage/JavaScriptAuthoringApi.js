@@ -886,6 +886,33 @@ export const collectSourceFileJavaScriptBlocks = (files: {
   return blocks;
 };
 
+const buildInstalledStoreExtensionCompatibilityProfile = (
+  serializedProject: Object
+): ?Object => {
+  const extensionNames = (serializedProject.eventsFunctionsExtensions || [])
+    .filter(extension => {
+      const extensionName = String((extension && extension.name) || '');
+      const origin = extension && extension.origin;
+      return (
+        !!extensionName &&
+        !!origin &&
+        origin.name === 'gdevelop-extension-store' &&
+        origin.identifier === extensionName
+      );
+    })
+    .map(extension => String(extension.name));
+  if (!extensionNames.length) return null;
+  return {
+    reviewedFileUriPrefixes: extensionNames.map(
+      extensionName => `game://extensions/${encodeURIComponent(extensionName)}/`
+    ),
+    provenance: {
+      source: 'installed-gdevelop-extension-store',
+      extensionNames,
+    },
+  };
+};
+
 const makeContextDeclaration = (block: Object, model: Object): string => {
   const context = getSourceContext(block.fileUri, model);
   const sceneName = context.sceneName;
@@ -1071,7 +1098,8 @@ const validateBlockWithTypeScript = ({
         message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
         block: validationBlock,
         ...location,
-        severity: isSyntaxError ? 'error' : severity,
+        severity:
+          isSyntaxError && !isReviewedCompatibilityBlock ? 'error' : severity,
       })
     );
   });
@@ -1207,7 +1235,7 @@ const validateBlockWithTypeScript = ({
       phase: 'javascript-authoring-api',
       code: 'EXTENSION_REVIEWED_COMPATIBILITY_PROFILE',
       message:
-        'A registry-fetched, reviewed extension uses legacy APIs outside the current public authoring declaration. Syntax and generated code remain blocking; migrate the extension to public facades.',
+        'A registry-fetched, reviewed extension uses JavaScript outside the current public authoring declaration. JavaScript authoring diagnostics are warnings so installation can continue; generated-code preflight remains blocking.',
       fileUri: block.fileUri,
       line: block.bodyLine || 1,
       column: 1,
@@ -1337,7 +1365,9 @@ export const validateProjectJavaScriptAuthoring = ({
     runtimeApiDeclaration,
     projectApiDeclaration,
     typescript,
-    compatibilityProfile,
+    compatibilityProfile:
+      compatibilityProfile ||
+      buildInstalledStoreExtensionCompatibilityProfile(serializedProject),
   });
 
 export const validateReviewedExtensionJavaScriptAuthoring = ({

@@ -327,7 +327,7 @@ objects[0]._behaviorData;
     expect(spoofed.code).toBe('EXTENSION_STRICT_API_INCOMPATIBLE');
   });
 
-  test('keeps syntax failures blocking for reviewed extensions', () => {
+  test('warns about syntax failures without blocking reviewed extensions', () => {
     const validation = validateReviewedExtensionJavaScriptAuthoring({
       serializedExtension: {
         name: 'Raycaster3D',
@@ -349,11 +349,143 @@ objects[0]._behaviorData;
       registryHeader: { name: 'Raycaster3D', version: '2.0.0' },
     });
 
-    expect(validation.valid).toBe(false);
-    expect(validation.code).toBe('EXTENSION_STRICT_API_INCOMPATIBLE');
-    expect(validation.errors).toEqual(
+    expect(validation.valid).toBe(true);
+    expect(validation.code).toBeUndefined();
+    expect(validation.errors).toEqual([]);
+    expect(validation.warnings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ code: 'JS_API_SYNTAX_ERROR' }),
+        expect.objectContaining({
+          code: 'EXTENSION_REVIEWED_COMPATIBILITY_PROFILE',
+        }),
+      ])
+    );
+  });
+
+  test('keeps installed store extension JavaScript warnings non-blocking during project validation', () => {
+    const validation = validateProjectJavaScriptAuthoring({
+      serializedProject: {
+        ...serializedProject,
+        eventsFunctionsExtensions: [
+          {
+            name: 'MousePointerLock',
+            origin: {
+              name: 'gdevelop-extension-store',
+              identifier: 'MousePointerLock',
+            },
+            eventsFunctions: [],
+            eventsBasedBehaviors: [],
+            eventsBasedObjects: [],
+          },
+        ],
+      },
+      sourceFiles: {
+        'game://extensions/MousePointerLock/functions/RequestPointerLock/RequestPointerLock.events': `@js strict=true
+document.body.requestPointerLock();
+gdjs._MousePointerLockExtension.handler.requestPointerLock();
+const broken = ;
+@end js
+`,
+      },
+    });
+
+    expect(validation.valid).toBe(true);
+    expect(validation.errors).toEqual([]);
+    expect(validation.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'JS_API_FORBIDDEN_GLOBAL' }),
+        expect.objectContaining({ code: 'JS_API_PRIVATE_MEMBER' }),
+        expect.objectContaining({ code: 'JS_API_SYNTAX_ERROR' }),
+        expect.objectContaining({
+          code: 'EXTENSION_REVIEWED_COMPATIBILITY_PROFILE',
+          provenance: expect.objectContaining({
+            source: 'installed-gdevelop-extension-store',
+            extensionNames: ['MousePointerLock'],
+          }),
+        }),
+      ])
+    );
+  });
+
+  test('does not trust a local extension or mismatched store origin during project validation', () => {
+    const extensionSource = `@js strict=true
+document.body.requestPointerLock();
+@end js
+`;
+    const validateExtension = (extension: Object) =>
+      validateProjectJavaScriptAuthoring({
+        serializedProject: {
+          ...serializedProject,
+          eventsFunctionsExtensions: [extension],
+        },
+        sourceFiles: {
+          'game://extensions/MousePointerLock/functions/RequestPointerLock/RequestPointerLock.events': extensionSource,
+        },
+      });
+
+    const localValidation = validateExtension({
+      name: 'MousePointerLock',
+      eventsFunctions: [],
+      eventsBasedBehaviors: [],
+      eventsBasedObjects: [],
+    });
+    const mismatchedOriginValidation = validateExtension({
+      name: 'MousePointerLock',
+      origin: {
+        name: 'gdevelop-extension-store',
+        identifier: 'DifferentExtension',
+      },
+      eventsFunctions: [],
+      eventsBasedBehaviors: [],
+      eventsBasedObjects: [],
+    });
+
+    expect(localValidation.valid).toBe(false);
+    expect(mismatchedOriginValidation.valid).toBe(false);
+    expect(localValidation.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'JS_API_FORBIDDEN_GLOBAL' }),
+      ])
+    );
+    expect(mismatchedOriginValidation.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'JS_API_FORBIDDEN_GLOBAL' }),
+      ])
+    );
+  });
+
+  test('keeps strict scene JavaScript blocking when store extensions are installed', () => {
+    const validation = validateProjectJavaScriptAuthoring({
+      serializedProject: {
+        ...serializedProject,
+        eventsFunctionsExtensions: [
+          {
+            name: 'MousePointerLock',
+            origin: {
+              name: 'gdevelop-extension-store',
+              identifier: 'MousePointerLock',
+            },
+            eventsFunctions: [],
+            eventsBasedBehaviors: [],
+            eventsBasedObjects: [],
+          },
+        ],
+      },
+      sourceFiles: {
+        'game://scenes/Main/Main.events': `@js strict=true
+document.body.requestPointerLock();
+@end js
+`,
+      },
+    });
+
+    expect(validation.valid).toBe(false);
+    expect(validation.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'JS_API_FORBIDDEN_GLOBAL',
+          fileUri: 'game://scenes/Main/Main.events',
+        }),
       ])
     );
   });

@@ -39,8 +39,8 @@ void EventsCodeGenerationContext::InheritsFrom(
   asyncDepth = parent_.asyncDepth;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
-  staticDataPlaceholderReplacementEnabled =
-      parent_.staticDataPlaceholderReplacementEnabled;
+  constantPlaceholderReplacementEnabled =
+      parent_.constantPlaceholderReplacementEnabled;
   contextDepth = parent_.GetContextDepth() + 1;
   if (parent_.maxDepthLevel) {
     maxDepthLevel = parent_.maxDepthLevel;

@@ -7,7 +7,7 @@ import os from 'os';
 // $FlowFixMe[cannot-resolve-module]
 import path from 'path';
 import {
-  MULTI_FILE_STATIC_DATA_URI,
+  MULTI_FILE_CONSTANTS_URI,
   decomposeLegacyProjectToFiles,
   areLegacyProjectsEquivalent,
 } from '../MultiFileProjectFormat';
@@ -25,7 +25,7 @@ import { onOpen } from './LocalProjectOpener';
 import {
   GENERATED_LEGACY_PROJECT_RELATIVE_PATH,
   getProjectLocation,
-  onAutoSaveStaticData,
+  onAutoSaveConstants,
   onSaveProject,
   writeProjectInstructionCatalog,
   writeProjectLayoutCatalog,
@@ -48,7 +48,7 @@ const projectFixture = {
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
   variables: [],
-  staticData: {},
+  constants: {},
   layouts: [
     {
       name: 'Main',
@@ -92,24 +92,35 @@ describe('Local multi-file project storage', () => {
     fs.removeSync(resolved);
   });
 
+  test('rejects a noncanonical .gdevelop entry name', async () => {
+    await expect(
+      readMultiFileSourceTree(
+        path.join(temporaryDirectory, 'OtherName.gdevelop')
+      )
+    ).rejects.toMatchObject({
+      code: 'MULTIFILE_INVALID_ENTRY',
+      message: 'The multi-file entry must be named project.gdevelop.',
+    });
+  });
+
   test('writes, verifies, and opens a source tree', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
     const changed = await writeMultiFileSourceTree({ entryPath, files });
 
-    expect(changed).toContain('game://project.settings');
+    expect(changed).toContain('game://project.gdevelop');
     expect(fs.existsSync(entryPath)).toBe(true);
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'resources.settings'))
     ).toBe(true);
-    expect(
-      fs.existsSync(path.join(temporaryDirectory, 'static-data.toml'))
-    ).toBe(true);
+    expect(fs.existsSync(path.join(temporaryDirectory, 'constants.toml'))).toBe(
+      true
+    );
     expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
       '[project.resources'
     );
     expect(fs.readFileSync(entryPath, 'utf8')).not.toContain(
-      '[project.staticData'
+      '[project.constants'
     );
     expect(
       fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
@@ -127,7 +138,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('rejects retired keyed variable tables without rewriting files during open', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.variables = [{ name: 'Score', type: 'number', value: 12 }];
     project.layouts[0].variables = [
@@ -169,7 +180,7 @@ describe('Local multi-file project storage', () => {
     project.layouts[0].name = 'Extension: Health';
     project.layouts[0].mangledName = 'ExtensionHealth';
     const files = decomposeLegacyProjectToFiles(project);
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
 
     await writeMultiFileSourceTree({ entryPath, files });
 
@@ -192,7 +203,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('opens a source tree after Git converts settings files to CRLF', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
     await writeMultiFileSourceTree({ entryPath, files });
     Object.keys(files).forEach(uri => {
@@ -211,7 +222,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('loads named IfDo instructions through the generated catalog', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://scenes/Main/Main.events'] =
       '@event\ndo Network::Send url="\\"https://example.com\\"" runtime=""\n';
@@ -256,7 +267,7 @@ describe('Local multi-file project storage', () => {
 
   test('bootstraps catalogs before compiling named events on first open', async () => {
     const gd: libGDevelop = global.gd;
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const extensionName = 'FirstOpenCatalogTest';
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('First open catalog project');
@@ -273,7 +284,10 @@ describe('Local multi-file project storage', () => {
     action.setFunctionType(gd.EventsFunction.Action);
     action.setFullName('Ping');
 
-    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    const files = decomposeLegacyProjectToFiles({
+      ...serializeToJSObject(project),
+      constants: {},
+    });
     files[`game://scenes/${sceneName}/${sceneName}.events`] =
       '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
     project.delete();
@@ -287,6 +301,8 @@ describe('Local multi-file project storage', () => {
 
     const result = await onOpen({ fileIdentifier: entryPath });
 
+    expect(result.content.constants).toBeUndefined();
+    expect(result.constants).toEqual({});
     expect(result.content.layouts[0].events[0]).toMatchObject({
       conditions: [
         {
@@ -329,7 +345,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('writes only changed owned components', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
     expect(
       await writeLegacyProjectAsMultiFile(projectFixture, entryPath)
@@ -403,50 +419,50 @@ describe('Local multi-file project storage', () => {
       await writeLegacyProjectAsMultiFile(changedResourcesProject, entryPath)
     ).toEqual(['game://resources.settings']);
 
-    const changedStaticDataProject = JSON.parse(
+    const changedConstantsProject = JSON.parse(
       JSON.stringify(changedResourcesProject)
     );
-    changedStaticDataProject.staticData.newSetting = true;
+    changedConstantsProject.constants.newSetting = true;
     expect(
-      await writeLegacyProjectAsMultiFile(changedStaticDataProject, entryPath)
-    ).toEqual(['game://static-data.toml']);
+      await writeLegacyProjectAsMultiFile(changedConstantsProject, entryPath)
+    ).toEqual(['game://constants.toml']);
 
-    const withoutStaticDataProject = JSON.parse(
-      JSON.stringify(changedStaticDataProject)
+    const withoutConstantsProject = JSON.parse(
+      JSON.stringify(changedConstantsProject)
     );
-    delete withoutStaticDataProject.staticData;
-    expect(
-      await writeLegacyProjectAsMultiFile(withoutStaticDataProject, entryPath)
-    ).toEqual(['game://static-data.toml']);
-    expect(
-      fs.existsSync(path.join(temporaryDirectory, 'static-data.toml'))
-    ).toBe(false);
+    delete withoutConstantsProject.constants;
+    await expect(
+      writeLegacyProjectAsMultiFile(withoutConstantsProject, entryPath)
+    ).rejects.toMatchObject({ code: 'MULTIFILE_MISSING_FILE' });
+    expect(fs.existsSync(path.join(temporaryDirectory, 'constants.toml'))).toBe(
+      true
+    );
   });
 
   test('serializes concurrent source writes for the same project', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const firstWrite = writeMultiFileSourceTree({
       entryPath,
       files: {
-        [MULTI_FILE_STATIC_DATA_URI]: '[sheet.row]\ncolumn = "first"\n',
+        [MULTI_FILE_CONSTANTS_URI]: '[sheet.row]\ncolumn = "first"\n',
       },
     });
     const secondWrite = writeMultiFileSourceTree({
       entryPath,
       files: {
-        [MULTI_FILE_STATIC_DATA_URI]: '[sheet.row]\ncolumn = "second"\n',
+        [MULTI_FILE_CONSTANTS_URI]: '[sheet.row]\ncolumn = "second"\n',
       },
     });
 
     await Promise.all([firstWrite, secondWrite]);
 
     expect(
-      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+      fs.readFileSync(path.join(temporaryDirectory, 'constants.toml'), 'utf8')
     ).toBe('[sheet.row]\ncolumn = "second"\n');
   });
 
   test('routes prefab definition and instance edits to their owning files', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.eventsFunctionsExtensions = [
       {
@@ -542,7 +558,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('stores global object grouping in its flat settings file', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.objects = [
       {
@@ -593,7 +609,10 @@ describe('Local multi-file project storage', () => {
       group.addObject('GlobalPlayer');
       group.addRequiredBehavior('Tween::TweenBehavior');
 
-      const serializedProject = serializeToJSObject(project, 'serializeTo');
+      const serializedProject = {
+        ...serializeToJSObject(project, 'serializeTo'),
+        constants: {},
+      };
       expect(serializedProject.objectsGroups).toEqual([
         {
           name: 'Global Actors',
@@ -602,7 +621,7 @@ describe('Local multi-file project storage', () => {
         },
       ]);
 
-      const entryPath = path.join(temporaryDirectory, 'project.settings');
+      const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
       await writeLegacyProjectAsMultiFile(serializedProject, entryPath);
       const projectSettings = fs.readFileSync(entryPath, 'utf8');
       expect(projectSettings).toContain('[objectGroups]');
@@ -623,7 +642,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('stores prefab and behavior function grouping in function settings', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const makeFunction = name => ({
       name,
       functionType: 'Action',
@@ -744,7 +763,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('removes only obsolete files owned by the previous manifest', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
     const userFile = path.join(temporaryDirectory, 'scenes/Main/notes.txt');
     fs.writeFileSync(userFile, 'keep me', 'utf8');
@@ -771,7 +790,7 @@ describe('Local multi-file project storage', () => {
   });
 
   test('renames all files owned by extension components and removes empty old folders', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const makeFunction = (name: string) => ({
       name,
       functionType: 'Action',
@@ -947,22 +966,29 @@ describe('Local multi-file project storage', () => {
 
   test('local project opening migrates once and redirects metadata', async () => {
     const legacyPath = path.join(temporaryDirectory, 'game.json');
-    const legacySource = `${JSON.stringify(projectFixture, null, 2)}\n`;
+    const { constants, ...projectContent } = projectFixture;
+    const legacySource = `${JSON.stringify(projectContent, null, 2)}\n`;
     fs.writeFileSync(legacyPath, legacySource, 'utf8');
+    fs.writeFileSync(
+      path.join(temporaryDirectory, 'constants.toml'),
+      '',
+      'utf8'
+    );
 
     const firstResult = await onOpen({ fileIdentifier: legacyPath });
     if (!firstResult.fileMetadata)
       throw new Error('Expected migration metadata.');
     expect(firstResult.fileMetadata.fileIdentifier).toBe(
-      path.join(temporaryDirectory, 'project.settings')
+      path.join(temporaryDirectory, 'project.gdevelop')
     );
     expect(fs.readFileSync(legacyPath, 'utf8')).toBe(legacySource);
+    expect(firstResult.constants).toEqual(constants);
 
     const secondResult = await onOpen({ fileIdentifier: legacyPath });
     if (!secondResult.fileMetadata)
       throw new Error('Expected redirected migration metadata.');
     expect(secondResult.fileMetadata.fileIdentifier).toBe(
-      path.join(temporaryDirectory, 'project.settings')
+      path.join(temporaryDirectory, 'project.gdevelop')
     );
     expect(
       areLegacyProjectsEquivalent(firstResult.content, secondResult.content)
@@ -990,7 +1016,7 @@ describe('Local multi-file project storage', () => {
         saveAsLocation: null,
         newProjectsDefaultFolder: temporaryDirectory,
       }).fileIdentifier
-    ).toBe(path.join(temporaryDirectory, 'project.settings'));
+    ).toBe(path.join(temporaryDirectory, 'project.gdevelop'));
   });
 
   test('writes the complete AI instruction catalog in .gdevelop', async () => {
@@ -1213,10 +1239,10 @@ describe('Local multi-file project storage', () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Generated compatibility project');
-    project.setStaticDataJson(
+    project.setConstantsJson(
       JSON.stringify({ sheet: { row: { column: 'editor only' } } })
     );
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
 
     await onSaveProject(
       project,
@@ -1242,10 +1268,10 @@ describe('Local multi-file project storage', () => {
       JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
     ).toBe('Generated compatibility project');
     expect(
-      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).staticData
+      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).constants
     ).toBeUndefined();
     expect(
-      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+      fs.readFileSync(path.join(temporaryDirectory, 'constants.toml'), 'utf8')
     ).toBe(`[sheet.row]
 column = "editor only"
 `);
@@ -1271,13 +1297,13 @@ column = "editor only"
     project.delete();
   });
 
-  test('auto-saves Static Data directly to static-data.toml', async () => {
+  test('auto-saves Constants directly to constants.toml', async () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const originalEntrySource = '[project]\nname = "Auto-save test"\n';
     fs.writeFileSync(entryPath, originalEntrySource);
-    project.setStaticDataJson(
+    project.setConstantsJson(
       JSON.stringify({
         sheet: {
           row: { column: 'sd', column2: 'sdf' },
@@ -1287,14 +1313,14 @@ column = "editor only"
     );
 
     await expect(
-      onAutoSaveStaticData(
-        JSON.parse(project.getStaticDataJson()),
+      onAutoSaveConstants(
+        JSON.parse(project.getConstantsJson()),
         ({ fileIdentifier: entryPath }: any)
       )
     ).resolves.toBe(true);
 
     expect(
-      fs.readFileSync(path.join(temporaryDirectory, 'static-data.toml'), 'utf8')
+      fs.readFileSync(path.join(temporaryDirectory, 'constants.toml'), 'utf8')
     ).toBe(`[sheet.row]
 column = "sd"
 column2 = "sdf"
@@ -1318,7 +1344,7 @@ column2 = "333"
     gd.JsPlatform.get().addNewExtension(physics2Extension);
     physics2Extension.delete();
     const project = gd.ProjectHelper.createNewGDJSProject();
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const legacyProject = JSON.parse(JSON.stringify(projectFixture));
     legacyProject.properties.name = 'Physics template regression';
     legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
@@ -1425,7 +1451,7 @@ column2 = "333"
     gd.JsPlatform.get().addNewExtension(physics3DExtension);
     physics3DExtension.delete();
     const project = gd.ProjectHelper.createNewGDJSProject();
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const legacyProject = JSON.parse(JSON.stringify(projectFixture));
     legacyProject.properties.name = 'Physics3D hidden property regression';
     legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
@@ -1538,7 +1564,7 @@ column2 = "333"
     await onSaveProject(
       project,
       ({
-        fileIdentifier: path.join(temporaryDirectory, 'project.settings'),
+        fileIdentifier: path.join(temporaryDirectory, 'project.gdevelop'),
         name: project.getName(),
         gameId: project.getProjectUuid(),
         lastModifiedDate: 0,
@@ -1609,7 +1635,7 @@ column2 = "333"
     ).toHaveProperty('FloatingEnabled', false);
 
     try {
-      const entryPath = path.join(temporaryDirectory, 'project.settings');
+      const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
       await onSaveProject(
         project,
         ({

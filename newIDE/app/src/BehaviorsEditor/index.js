@@ -148,7 +148,7 @@ type BehaviorConfigurationEditorProps = {|
   isListLocked: boolean,
   canToggleBehaviorMute: boolean,
   layersContainer: gdLayersContainer,
-  hideStaticDataPlaceholderHints?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const BehaviorConfigurationEditor = React.forwardRef<
@@ -175,7 +175,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
       isListLocked,
       canToggleBehaviorMute,
       layersContainer,
-      hideStaticDataPlaceholderHints,
+      hideConstantPlaceholderHints,
     },
     ref
   ) => {
@@ -448,7 +448,7 @@ const BehaviorConfigurationEditor = React.forwardRef<
                   projectScopedContainersAccessor
                 }
                 onBehaviorUpdated={onBehaviorsUpdated}
-                hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
+                hideConstantPlaceholderHints={hideConstantPlaceholderHints}
               />
             </Line>
           </Column>
@@ -842,7 +842,7 @@ type Props = {|
   isListLocked: boolean,
   canToggleBehaviorMute?: boolean,
   canUseWholeProjectRefactorer?: boolean,
-  hideStaticDataPlaceholderHints?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const BehaviorsEditor = (props: Props): React.Node => {
@@ -869,7 +869,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     isListLocked,
     canToggleBehaviorMute,
     canUseWholeProjectRefactorer,
-    hideStaticDataPlaceholderHints,
+    hideConstantPlaceholderHints,
   } = props;
   const forceUpdate = useForceUpdate();
 
@@ -1035,9 +1035,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
                   }
                   isListLocked={isListLocked}
                   canToggleBehaviorMute={!!canToggleBehaviorMute}
-                  hideStaticDataPlaceholderHints={
-                    hideStaticDataPlaceholderHints
-                  }
+                  hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                 />
               );
             })}

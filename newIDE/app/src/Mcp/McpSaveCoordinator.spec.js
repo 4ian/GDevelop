@@ -11,7 +11,7 @@ describe('McpSaveCoordinator', () => {
       saveInProgress = false;
     });
     const saveProject = jest.fn(async () => ({
-      fileIdentifier: 'C:\\game\\project.settings',
+      fileIdentifier: 'C:\\game\\project.gdevelop',
       version: '2',
     }));
 
@@ -27,7 +27,7 @@ describe('McpSaveCoordinator', () => {
     expect(saveProject).toHaveBeenCalledTimes(1);
     expect(result).toEqual({
       saved: true,
-      fileIdentifier: 'C:\\game\\project.settings',
+      fileIdentifier: 'C:\\game\\project.gdevelop',
       version: '2',
       waitedForPreviousSaveMs: 100,
     });
@@ -36,7 +36,7 @@ describe('McpSaveCoordinator', () => {
   it('does not start another save when the active save never finishes', async () => {
     let nowMs = 0;
     const saveProject = jest.fn(async () => ({
-      fileIdentifier: 'C:\\game\\project.settings',
+      fileIdentifier: 'C:\\game\\project.gdevelop',
     }));
 
     const result = await saveProjectAfterPendingSave({
@@ -83,8 +83,6 @@ describe('McpSaveCoordinator', () => {
         },
         hasExtensionLoadErrors: false,
       })
-    ).rejects.toThrow(
-      'MULTIFILE_DUPLICATE_NAMESPACE in extensions/FireBullet'
-    );
+    ).rejects.toThrow('MULTIFILE_DUPLICATE_NAMESPACE in extensions/FireBullet');
   });
 });

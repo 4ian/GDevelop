@@ -37,7 +37,7 @@ files, and executable logic in `.events`.
 4. Create the owner settings and every required child file in one patch.
 5. Keep each settings document independently valid and local-root. Its path
    supplies the mounted namespace. Never add
-   child-settings indexes to `project.settings` or `extension.settings`.
+   child-settings indexes to `project.gdevelop` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
 7. Write one repeated `[[variables]]`, `[[globalVariables]]`, or

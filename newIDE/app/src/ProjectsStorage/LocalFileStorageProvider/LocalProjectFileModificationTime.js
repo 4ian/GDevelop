@@ -1,6 +1,7 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire';
 import { PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
+import { MULTI_FILE_ENTRY_NAME } from '../MultiFileProjectFormat';
 import {
   PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
   PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
@@ -10,7 +11,7 @@ const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 
 const multiFileProjectDirectories = ['scenes', 'externals', 'extensions'];
-const multiFileProjectRootFiles = ['project.settings', 'resources.settings'];
+const multiFileProjectRootFiles = [MULTI_FILE_ENTRY_NAME, 'resources.settings'];
 const multiFileProjectExtensions = new Set(['.settings', '.layout', '.events']);
 
 const getFileModificationTime = async (filePath: string): Promise<?number> => {
@@ -73,8 +74,8 @@ const getLatestProjectFileModificationTimeInDirectory = async (
 /**
  * Returns the newest modification time among files that make up a local
  * project. Resource files are deliberately excluded: they have their own
- * watcher and should not force a full project reload. Static Data is also
- * excluded because its editor writes static-data.toml independently from the
+ * watcher and should not force a full project reload. Constants is also
+ * excluded because its editor writes constants.toml independently from the
  * project save lifecycle.
  */
 export const getLocalProjectLastModifiedDate = async (
@@ -82,7 +83,7 @@ export const getLocalProjectLastModifiedDate = async (
 ): Promise<?number> => {
   if (!fs || !path || !fileIdentifier) return null;
 
-  if (path.basename(fileIdentifier).toLowerCase() !== 'project.settings') {
+  if (path.basename(fileIdentifier).toLowerCase() !== MULTI_FILE_ENTRY_NAME) {
     return getFileModificationTime(fileIdentifier);
   }
 

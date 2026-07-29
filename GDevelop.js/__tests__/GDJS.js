@@ -327,9 +327,9 @@ describe('libGD.js - GDJS related tests', function () {
       layoutCodeGenerator.delete();
       project.delete();
     });
-    it('reports missing static data placeholders in action strings', function () {
+    it('reports missing constants placeholders in action strings', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setStaticDataJson(JSON.stringify({ labels: {} }));
+      project.setConstantsJson(JSON.stringify({ labels: {} }));
       const layout = project.insertNewLayout('Scene', 0);
       layout.getVariables().insertNew('Result', 0).setString('');
       const evt = layout
@@ -366,9 +366,9 @@ describe('libGD.js - GDJS related tests', function () {
       layoutCodeGenerator.delete();
       project.delete();
     });
-    it('reports missing static data placeholders in condition strings', function () {
+    it('reports missing constants placeholders in condition strings', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setStaticDataJson(JSON.stringify({ labels: {} }));
+      project.setConstantsJson(JSON.stringify({ labels: {} }));
       const layout = project.insertNewLayout('Scene', 0);
       layout.getVariables().insertNew('Result', 0).setString('');
       const evt = layout

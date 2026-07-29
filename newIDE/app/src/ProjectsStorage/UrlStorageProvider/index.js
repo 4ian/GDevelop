@@ -6,6 +6,7 @@ import {
   POSITIONAL_ARGUMENTS_KEY,
   type AppArguments,
 } from '../../Utils/Window';
+import { parseConstantsFromToml } from '../MultiFileProjectFormat';
 
 const isURL = (filename: string) => {
   return (
@@ -56,9 +57,23 @@ export default ({
       const response = await axios.get(url);
       if (!response.data)
         throw new Error("Can't parse data from the URL (is it valid JSON?)");
+      if (
+        !url.startsWith('http://') &&
+        !url.startsWith('https://') &&
+        !url.startsWith('ftp://')
+      ) {
+        throw new Error(
+          'URL projects require a sibling constants.toml file and must use an HTTP(S) or FTP URL.'
+        );
+      }
+      const constantsResponse = await axios.get<string>(
+        new URL('constants.toml', url).toString()
+      );
+      const constants = parseConstantsFromToml(constantsResponse.data || '');
 
       return {
         content: response.data,
+        constants,
       };
     },
   }),

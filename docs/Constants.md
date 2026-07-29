@@ -1,19 +1,21 @@
-# Static Data
+# Constants
 
-Status: first implementation is in place. Static Data now has project storage, folder-project save support, a dockable editor window, object-editor placeholder support, and code-generation-time placeholder replacement for action string parameters and event-based object/behavior properties.
+Status: first implementation is in place. Constants now has project storage, folder-project save support, a dockable editor window, object-editor placeholder support, and code-generation-time placeholder replacement for action string parameters and event-based object/behavior properties.
 
 This document describes the current implementation, not only the original design intent.
 
 ## Goal
 
-Static Data is project-wide JSON configuration data for game tuning and content data. It is separate from Global variables:
+Constants is project-wide TOML-compatible configuration data for game tuning
+and content data. It is separate from Global variables:
 
-- Static Data is saved as a JSON map.
+- Constants is persisted in the direct-root `constants.toml` source.
+- JSON is used only by the in-memory API and the editor import/export view.
 - Global variables remain runtime/game-state variables.
 - Action string parameters can use placeholder references. They are replaced
   with literal values during code generation, export, or extension export.
 - Object editor properties can use placeholder references such as `{{cards.sunflower.price}}` where this is explicitly enabled.
-- JSON-object properties can reference a static data subtree such as `{{cards.sunflower}}` and expose it in object/behavior events with variable-style child access such as `CardConfig.price`.
+- JSON-object properties can reference a constants subtree such as `{{cards.sunflower}}` and expose it in object/behavior events with variable-style child access such as `CardConfig.price`.
 - JSON-object properties define a required JSON example. Event autocompletion and validation use this example for `CardConfig.xxx` paths.
 
 Example:
@@ -47,102 +49,85 @@ An eligible object editor property can reference:
 
 | Area                     | Implementation                                                                                                                                                                                      | Relevant files                                                                                                                                                                                                                                                                     |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Project storage          | `gd::Project` stores a JSON string with `GetStaticDataJson` and `SetStaticDataJson`. Missing or empty values become `{}`.                                                                           | `Core/GDCore/Project/Project.h`, `Core/GDCore/Project/Project.cpp`                                                                                                                                                                                                                 |
-| Serialization            | Single-file projects serialize a top-level `staticData` object when it is not `{}`. Projects without Static Data use `{}`.                                                                          | `Core/GDCore/Project/Project.cpp`                                                                                                                                                                                                                                                  |
-| JS bindings              | The project exposes `getStaticDataJson` and `setStaticDataJson`.                                                                                                                                    | `GDevelop.js/Bindings/Bindings.idl`, `GDevelop.js/types.d.ts`, `GDevelop.js/types/gdproject.js`                                                                                                                                                                                    |
-| Folder projects          | Folder projects split `staticData` to `staticData.json`; the local resource watcher tracks this file.                                                                                               | `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalFileResourcesWatcher.js`                                                                                                            |
-| Multi-file projects      | `static-data.toml` stores direct-root, TOML-compatible editor data with no wrapper or format metadata. Local editor changes auto-save this source without rewriting `project.settings`.             | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat/index.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js`                                              |
-| Codegen replacement      | `gd::Project` resolves `{{path.to.value}}` placeholders from the saved static data. Action string parameters are replaced with literals while generating event code. Missing paths add diagnostics. | `Core/GDCore/Project/Project.cpp`, `Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.cpp`, `Core/GDCore/Events/CodeGeneration/ExpressionCodeGenerator.cpp`                                                                                                                    |
-| Editor UI                | `Static Data` is a `static-data` editor kind. It opens floated by default like Resources and can be popped back into the main editor tabs.                                                          | `newIDE/app/src/MainFrame/index.js`, `newIDE/app/src/MainFrame/EditorTabs/EditorTabsHandler.js`, `newIDE/app/src/MainFrame/EditorContainers/StaticDataEditorContainer.js`, `newIDE/app/src/ProjectManager/index.js`                                                                |
-| Grid editor              | The editor has sheet tabs, row/column editing, Raw TOML and Raw JSON panels, JSON import/export, and copy placeholder.                                                                              | `newIDE/app/src/StaticData/StaticDataDialog.js`                                                                                                                                                                                                                                    |
+| Project storage          | `gd::Project` stores a JSON string with `GetConstantsJson` and `SetConstantsJson`. Missing or empty values become `{}`.                                                                           | `Core/GDCore/Project/Project.h`, `Core/GDCore/Project/Project.cpp`                                                                                                                                                                                                                 |
+| Serialization            | Main project JSON never contains Constants. `Project::SerializeTo` omits the map; storage providers load parsed `constants.toml` alongside project content and initialize the project separately. | `Core/GDCore/Project/Project.cpp`, `newIDE/app/src/ProjectsStorage/*`                                                                                                                                                                                                              |
+| JS bindings              | The project exposes `getConstantsJson` and `setConstantsJson`.                                                                                                                                    | `GDevelop.js/Bindings/Bindings.idl`, `GDevelop.js/types.d.ts`, `GDevelop.js/types/gdproject.js`                                                                                                                                                                                    |
+| Persistent storage       | Every project type stores Constants in direct-root `constants.toml`, with no wrapper or format metadata. Local editor changes auto-save this source without rewriting `project.gdevelop`.          | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat/index.js`, local/cloud/URL/download storage providers                                                                                                                                                                     |
+| Codegen replacement      | `gd::Project` resolves `{{path.to.value}}` placeholders from the saved constants. Action string parameters are replaced with literals while generating event code. Missing paths add diagnostics. | `Core/GDCore/Project/Project.cpp`, `Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.cpp`, `Core/GDCore/Events/CodeGeneration/ExpressionCodeGenerator.cpp`                                                                                                                    |
+| Editor UI                | `Constants` is a `constants` editor kind. It opens floated by default like Resources and can be popped back into the main editor tabs.                                                          | `newIDE/app/src/MainFrame/index.js`, `newIDE/app/src/MainFrame/EditorTabs/EditorTabsHandler.js`, `newIDE/app/src/MainFrame/EditorContainers/ConstantsEditorContainer.js`, `newIDE/app/src/ProjectManager/index.js`                                                                |
+| Grid editor              | The editor has sheet tabs, row/column editing, Raw TOML and Raw JSON panels, JSON import/export, and copy placeholder.                                                                              | `newIDE/app/src/Constants/ConstantsDialog.js`                                                                                                                                                                                                                                    |
 | Placeholder editor scope | Placeholder editing is enabled in the full object editor window for event-based object/behavior properties. Other property editors show an error if `{{...}}` is entered.                           | `newIDE/app/src/ObjectEditor/ObjectEditorDialog.js`, `newIDE/app/src/ObjectEditor/Editors/ObjectPropertiesEditor.js`, `newIDE/app/src/BehaviorsEditor/Editors/BehaviorPropertiesEditor.js`, `newIDE/app/src/PropertiesEditor/*`, `newIDE/app/src/CompactPropertiesEditor/index.js` |
-| Object/behavior codegen  | Object and behavior properties resolve static data placeholders to static values during code generation.                                                                                            | `GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp`, `GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp`, `Core/GDCore/Project/CustomConfigurationHelper.cpp`, `Core/GDCore/Project/JsonObjectPropertyTools.h`                                                       |
+| Object/behavior codegen  | Object and behavior properties resolve constants placeholders to static values during code generation.                                                                                            | `GDJS/GDJS/Events/CodeGeneration/ObjectCodeGenerator.cpp`, `GDJS/GDJS/Events/CodeGeneration/BehaviorCodeGenerator.cpp`, `Core/GDCore/Project/CustomConfigurationHelper.cpp`, `Core/GDCore/Project/JsonObjectPropertyTools.h`                                                       |
 
 ## Storage Format
 
 The project model stores a JSON-compatible root object:
 
 ```ts
-type StaticDataValue =
-  | null
+type ConstantValue =
   | boolean
   | number
   | string
-  | { [key: string]: StaticDataValue }
-  | StaticDataValue[];
+  | { [key: string]: ConstantValue }
+  | ConstantValue[];
 
-type StaticData = { [key: string]: StaticDataValue };
+type Constants = { [key: string]: ConstantValue };
 ```
 
-Single-file project example:
-
-```json
-{
-  "properties": {
-    "name": "My game"
-  },
-  "variables": [],
-  "staticData": {
-    "cards": {
-      "sunflower": {
-        "price": 50
-      }
-    }
-  }
-}
-```
-
-Folder project example:
+Project source example:
 
 ```text
-project.json
-staticData.json
-layouts/
-externalLayouts/
-externalEvents/
-eventsFunctionsExtensions/
+project.gdevelop
+constants.toml
+resources.settings
+scenes/
+extensions/
 ```
 
-`staticData.json` contains the direct static data map, not a wrapper:
+The in-memory and JSON interchange representation is direct-root:
 
 ```json
 {
-  "cards": {
-    "sunflower": {
-      "price": 50
+  "sheet": {
+    "row": {
+      "column": "是",
+      "column2": "是"
+    },
+    "row2": {
+      "column": "s",
+      "column2": "是"
     }
   }
 }
 ```
 
-Current multi-file project example:
+The persisted TOML is also direct-root:
 
 ```toml
-# static-data.toml
+# constants.toml
 [cards.sunflower]
 price = 50
 enabled = true
 ```
 
-The whole TOML document is Static Data. It has no `[settings]`,
-`[staticData]`, or format-version wrapper. Values that TOML cannot represent
+The whole TOML document is Constants. It has no `[settings]`,
+`[constants]`, or format-version wrapper. Values that TOML cannot represent
 losslessly, including JSON `null` and mixed-type arrays, are rejected.
 
 Notes:
 
-- Empty static data is represented internally as `{}`.
-- Editing Static Data in a local `project.settings` project immediately queues
-  a write to `static-data.toml`. A normal project save also writes it.
-- `staticData` is omitted from single-file serialization when it is exactly `{}`.
-- Generated multi-file `.gdevelop/game.json` omits `staticData` because it is
-  editor-only source data.
-- Runtime project data does not embed `staticData`; placeholders are resolved
+- Empty constants is represented internally as `{}`.
+- Editing Constants in a local `project.gdevelop` project immediately queues
+  a write to `constants.toml`. A normal project save also writes it.
+- Main project JSON and generated `.gdevelop/game.json` never contain a
+  Constants root key.
+- Runtime project data does not embed the Constants map; placeholders are resolved
   before runtime code is written.
-- Runtime events cannot read or modify Static Data directly. Use scene/global/object variables for data that must change during gameplay.
+- Runtime events cannot read or modify Constants directly. Use scene/global/object variables for data that must change during gameplay.
 
 ## Placeholder Path Syntax
 
-Public static data references use exact placeholder paths:
+Public constants references use exact placeholder paths:
 
 ```text
 {{cards.sunflower.price}}
@@ -176,16 +161,16 @@ The Project Manager tree now contains:
 ```text
 Globals
   Global variables
-  Static Data
+  Constants
   Global objects
 ```
 
-Clicking `Static Data` opens a dockable editor:
+Clicking `Constants` opens a dockable editor:
 
-- It uses editor kind `static-data`.
+- It uses editor kind `constants`.
 - It opens in the external/floated pane by default, following the Resources window behavior.
 - The shared popped-out titlebar can return it to the main editor tabs.
-- The Project Manager selection mapping highlights `Static Data` when the tab is focused.
+- The Project Manager selection mapping highlights `Constants` when the tab is focused.
 - The editor is excluded from the normal saved editor-tabs restore list, like Resources.
 
 Current grid capabilities:
@@ -199,14 +184,14 @@ Current grid capabilities:
 - Delete row and delete column.
 - Copy selected `{{path}}` placeholder.
 - Import JSON from a file.
-- Export JSON to `static-data.json`.
+- Import and export the persisted TOML document as `constants.toml`.
 - Raw TOML and Raw JSON panels with `Apply TOML` and `Apply JSON`.
 
 Current edit semantics:
 
-- In docked/floated editor mode, edits are committed directly to `project.setStaticDataJson(...)`.
-- The editor container calls `unsavedChanges.triggerUnsavedChanges()` for committed static data changes.
-- The reusable component can render in a dialog wrapper, but the Project Manager opens Static Data as a dockable editor.
+- In docked/floated editor mode, edits are committed directly to `project.setConstantsJson(...)`.
+- The editor container calls `unsavedChanges.triggerUnsavedChanges()` for committed constants changes.
+- The reusable component can render in a dialog wrapper, but the Project Manager opens Constants as a dockable editor.
 
 Known editor limitations for this first implementation:
 
@@ -219,13 +204,13 @@ Known editor limitations for this first implementation:
 
 ## Codegen-Time Replacement
 
-Static Data has no runtime API. `RuntimeGame` does not load or expose the
-project static data, and the GDJS runtime does not include a static-data event-tool
+Constants has no runtime API. `RuntimeGame` does not load or expose the
+project constants, and the GDJS runtime does not include a constants event-tool
 namespace.
 
 Instead, placeholders are replaced while generating JavaScript code. A generated
 game or exported extension contains the resolved literal values, not runtime
-lookups into the project static data.
+lookups into the project constants.
 
 Supported targets:
 
@@ -234,7 +219,7 @@ Supported targets:
 - Extension events, event-based object events, and event-based behavior events
   when generated with a project context.
 - Event-based object and behavior properties that explicitly allow Global
-  Static Data placeholders.
+  constant placeholders.
 
 Example:
 
@@ -242,7 +227,7 @@ Example:
 Emit signal "{{signals.triangle.s1}}" to picked Triangle with payload: "s1 payload"
 ```
 
-If the project static data contains:
+If the project constants contains:
 
 ```json
 {
@@ -277,7 +262,7 @@ Current scope:
 - The object editor shows an info hint when editing event-based object or behavior properties that support placeholders.
 - Scene, external, and extension events can use placeholder paths in action
   string parameters.
-- Compact/property editors outside that scope reject placeholder syntax with: "Static Data placeholders can only be edited from the object editor window."
+- Compact/property editors outside that scope reject placeholder syntax with: "constant placeholders can only be edited from the object editor window."
 
 Current field behavior:
 
@@ -306,19 +291,19 @@ Code generation behavior:
 Resolution timing:
 
 - Placeholders are resolved while generating code and runtime data.
-- Existing generated code does not automatically update when editor-side static data
-  changes. Regenerate preview/export data to pick up static data edits.
+- Existing generated code does not automatically update when editor-side constants
+  changes. Regenerate preview/export data to pick up constants edits.
 - If a game needs live data changes, use variables for mutable state and use
-  Static Data only as the source data to read from.
+  Constants only as the source data to read from.
 
 ## Hot Reload And Preview
 
 Expected behavior:
 
-- Edited project static data is used when preview/export code is regenerated.
-- Runtime project data does not include `staticData`.
+- Edited project constants is used when preview/export code is regenerated.
+- Runtime project data does not include the Constants map.
 - Scene, external, and extension action parameters use the resolved literals
-  generated from the current project static data.
+  generated from the current project constants.
 - Object/behavior constructor values use the resolved values emitted during
   generation.
 
@@ -335,13 +320,13 @@ Implemented now:
 
 Not implemented yet:
 
-- Dedicated path picker/autocomplete from the Static Data editor.
+- Dedicated path picker/autocomplete from the Constants editor.
 - Placeholder replacement in non-string action parameter types.
 
 ## Recommended Next Work
 
 1. Add path picker/autocomplete for placeholders.
-2. Add row/column rename in the Static Data grid.
+2. Add row/column rename in the Constants grid.
 3. Add spreadsheet paste support for tab-separated data.
 4. Add grid keyboard navigation and multi-cell selection.
 5. Add focused tests for serialization, event diagnostics, editor opening, and placeholder codegen.
@@ -350,11 +335,11 @@ Not implemented yet:
 
 Core/storage:
 
-- Serialize and unserialize empty static data.
-- Serialize and unserialize nested objects, arrays, strings, numbers, booleans, and null.
+- Preserve empty Constants through `constants.toml`.
+- Round-trip nested objects, arrays, strings, numbers, and booleans.
 - Preserve keys requiring quoted bracket paths.
-- Open projects with missing `staticData` as `{}`.
-- Save folder projects with `staticData.json`.
+- Keep main project JSON free of a Constants root key.
+- Save every project type with direct-root `constants.toml`.
 
 Events:
 
@@ -366,13 +351,13 @@ Events:
 
 Editor:
 
-- Project Manager shows `Static Data` under `Project`.
-- Clicking it opens a floated `static-data` editor tab.
+- Project Manager shows `Constants` under `Project`.
+- Clicking it opens a floated `constants` editor tab.
 - The floated editor can be popped into the main editor tabs.
-- Grid add/edit/delete/import/export updates project static data and marks unsaved changes.
+- Grid add/edit/delete/import/export updates project constants and marks unsaved changes.
 - Copy placeholder uses the selected cell path.
 - Raw JSON rejects invalid JSON and non-object roots.
-- Raw TOML round-trips the direct-root `static-data.toml` representation and reports
+- Raw TOML round-trips the direct-root `constants.toml` representation and reports
   unsupported values or TOML syntax errors.
 
 Placeholders:

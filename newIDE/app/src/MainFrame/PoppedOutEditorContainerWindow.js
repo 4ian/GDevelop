@@ -256,7 +256,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.showRestartInGameEditorAfterErrorButton,
                         resourceManagementProps: poppedOutResourceManagementProps,
                         onSave: props.saveProject,
-                        onAutoSaveStaticData: props.autoSaveStaticData,
+                        onAutoSaveConstants: props.autoSaveConstants,
                         onSaveProjectAsWithStorageProvider:
                           props.saveProjectAsWithStorageProvider,
                         canSave: props.canSave,

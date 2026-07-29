@@ -12,6 +12,15 @@ const config = {
   // Bundled tool apps are ASAR files themselves. Keep them outside the main
   // app.asar so Electron can read their internal files after packaging.
   asarUnpack: ['external/**/*'],
+  fileAssociations: [
+    {
+      ext: 'gdevelop',
+      name: 'GDevelop project',
+      description: 'GDevelop project',
+      mimeType: 'application/x-gdevelop-project',
+      role: 'Editor',
+    },
+  ],
   extraResources: [
     {
       from: '../app/resources/GDJS',

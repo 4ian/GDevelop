@@ -1,14 +1,14 @@
 // @flow
 import type { ValidationError } from './EventsValidationScanner';
 
-const staticDataPlaceholderRegex = /\{\{[^{}]*\}\}/;
-const staticDataPlaceholderCaptureRegex = /\{\{([^{}]*)\}\}/g;
-const staticDataDiagnosticExpectedValue = 'A value in the project static data';
+const constantPlaceholderRegex = /\{\{[^{}]*\}\}/;
+const constantPlaceholderCaptureRegex = /\{\{([^{}]*)\}\}/g;
+const constantsDiagnosticExpectedValue = 'A project constant';
 
-type StaticDataPathSegment = string | number;
+type ConstantPathSegment = string | number;
 
-const parseStaticDataPath = (path: string): Array<StaticDataPathSegment> => {
-  const segments: Array<StaticDataPathSegment> = [];
+const parseConstantPath = (path: string): Array<ConstantPathSegment> => {
+  const segments: Array<ConstantPathSegment> = [];
   let current = '';
   let position = 0;
   const pushCurrent = () => {
@@ -36,8 +36,13 @@ const parseStaticDataPath = (path: string): Array<StaticDataPathSegment> => {
         const quote = path[position];
         position++;
         let quotedSegment = '';
-        while (position < path.length && path[position] !== quote) {
-          if (path[position] === '\\' && position + 1 < path.length) {
+        while (position < path.length) {
+          const quotedCharacter = path[position];
+          if (quotedCharacter === quote) break;
+          if (
+            quotedCharacter.charCodeAt(0) === 92 &&
+            position + 1 < path.length
+          ) {
             position++;
           }
           quotedSegment += path[position];
@@ -75,14 +80,14 @@ const parseStaticDataPath = (path: string): Array<StaticDataPathSegment> => {
   return segments;
 };
 
-const getStaticDataValueAtPath = (
-  staticData: any,
+const getConstantValueAtPath = (
+  constants: any,
   path: string
 ): {| found: boolean, value: any |} => {
   if (!path) return { found: false, value: undefined };
 
-  let value = staticData;
-  for (const segment of parseStaticDataPath(path)) {
+  let value = constants;
+  for (const segment of parseConstantPath(path)) {
     if (value === null || value === undefined) {
       return { found: false, value: undefined };
     }
@@ -93,31 +98,33 @@ const getStaticDataValueAtPath = (
       }
       value = value[segment];
     } else {
+      const objectValue: any = value;
       if (
-        typeof value !== 'object' ||
-        !Object.prototype.hasOwnProperty.call(value, segment)
+        typeof objectValue !== 'object' ||
+        // $FlowFixMe[method-unbinding]
+        !Object.prototype.hasOwnProperty.call(objectValue, segment)
       ) {
         return { found: false, value: undefined };
       }
-      value = value[segment];
+      value = objectValue[segment];
     }
   }
 
   return { found: true, value };
 };
 
-const hasStaticDataPath = (staticData: any, path: string): boolean => {
+const hasConstantPath = (constants: any, path: string): boolean => {
   if (!path) return false;
-  return getStaticDataValueAtPath(staticData, path).found;
+  return getConstantValueAtPath(constants, path).found;
 };
 
-export const isStaticDataPlaceholderDiagnostic = (
+export const isConstantPlaceholderDiagnostic = (
   projectDiagnostic: gdProjectDiagnostic
 ): boolean =>
-  projectDiagnostic.getExpectedValue() === staticDataDiagnosticExpectedValue ||
-  projectDiagnostic.getMessage().indexOf('Static Data path "{{') === 0;
+  projectDiagnostic.getExpectedValue() === constantsDiagnosticExpectedValue ||
+  projectDiagnostic.getMessage().indexOf('Constant path "{{') === 0;
 
-export const hasStaticDataPlaceholderDiagnostic = (
+export const hasConstantPlaceholderDiagnostic = (
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport
 ): boolean => {
   for (
@@ -132,7 +139,7 @@ export const hasStaticDataPlaceholderDiagnostic = (
       diagnosticIndex++
     ) {
       if (
-        isStaticDataPlaceholderDiagnostic(diagnosticReport.get(diagnosticIndex))
+        isConstantPlaceholderDiagnostic(diagnosticReport.get(diagnosticIndex))
       ) {
         return true;
       }
@@ -142,34 +149,35 @@ export const hasStaticDataPlaceholderDiagnostic = (
   return false;
 };
 
-export const isInvalidStaticDataPlaceholderValidationError = (
+export const isInvalidConstantPlaceholderValidationError = (
   error: ValidationError
 ): boolean =>
   error.type === 'invalid-parameter' &&
   !!error.parameterValue &&
-  staticDataPlaceholderRegex.test(error.parameterValue);
+  constantPlaceholderRegex.test(error.parameterValue);
 
-export const hasInvalidStaticDataPlaceholderValidationError = (
+export const hasInvalidConstantPlaceholderValidationError = (
   validationErrors: Array<ValidationError>
 ): boolean =>
-  validationErrors.some(isInvalidStaticDataPlaceholderValidationError);
+  validationErrors.some(isInvalidConstantPlaceholderValidationError);
 
-export const getMissingStaticDataPlaceholderPath = (
+export const getMissingConstantPlaceholderPath = (
   source: string,
   project: gdProject
 ): ?string => {
-  let staticData;
+  let constants;
   try {
-    staticData = JSON.parse(project.getStaticDataJson());
+    constants = JSON.parse(project.getConstantsJson());
   } catch (error) {
     return null;
   }
 
-  staticDataPlaceholderCaptureRegex.lastIndex = 0;
-  let match;
-  while ((match = staticDataPlaceholderCaptureRegex.exec(source)) !== null) {
+  constantPlaceholderCaptureRegex.lastIndex = 0;
+  while (true) {
+    const match = constantPlaceholderCaptureRegex.exec(source);
+    if (!match) break;
     const path = match[1].trim();
-    if (!hasStaticDataPath(staticData, path)) {
+    if (!hasConstantPath(constants, path)) {
       return path;
     }
   }
@@ -177,20 +185,20 @@ export const getMissingStaticDataPlaceholderPath = (
   return null;
 };
 
-export const findStaticDataPlaceholderInSerializedData = (
+export const findConstantPlaceholderInSerializedData = (
   serializedData: any
 ): ?string => {
-  const findInValue = value => {
+  const findInValue = (value: any): ?string => {
     if (typeof value === 'string') {
-      staticDataPlaceholderCaptureRegex.lastIndex = 0;
-      const match = staticDataPlaceholderCaptureRegex.exec(value);
+      constantPlaceholderCaptureRegex.lastIndex = 0;
+      const match = constantPlaceholderCaptureRegex.exec(value);
       return match ? match[1].trim() : null;
     }
 
     if (Array.isArray(value)) {
       for (const child of value) {
         const placeholderPath = findInValue(child);
-        if (placeholderPath !== null) return placeholderPath;
+        if (placeholderPath != null) return placeholderPath;
       }
       return null;
     }
@@ -198,7 +206,7 @@ export const findStaticDataPlaceholderInSerializedData = (
     if (value && typeof value === 'object') {
       for (const key of Object.keys(value)) {
         const placeholderPath = findInValue(value[key]);
-        if (placeholderPath !== null) return placeholderPath;
+        if (placeholderPath != null) return placeholderPath;
       }
     }
 

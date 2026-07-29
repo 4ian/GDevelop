@@ -9,7 +9,7 @@ import { ExtensionItemDetailEditorContainer } from '../EditorContainers/Extensio
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
-import { StaticDataEditorContainer } from '../EditorContainers/StaticDataEditorContainer';
+import { ConstantsEditorContainer } from '../EditorContainers/ConstantsEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
@@ -30,7 +30,7 @@ type EditorRef =
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
-  | StaticDataEditorContainer
+  | ConstantsEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
@@ -49,7 +49,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
-  | 'static-data'
+  | 'constants'
   | 'global-search'
   | 'ask-ai'
   | 'start page';
@@ -129,7 +129,7 @@ const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
   editorTab.closable &&
   editorTab.kind !== 'debugger' &&
   editorTab.kind !== 'resources' &&
-  editorTab.kind !== 'static-data';
+  editorTab.kind !== 'constants';
 
 const limitOpenEditorTabsForPane = ({
   editors,

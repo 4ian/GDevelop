@@ -41,7 +41,7 @@ const createField = (
   layers: gdLayersContainer | null,
   object: ?gdObject,
   showcaseNonDefaultValues: boolean,
-  allowStaticDataPlaceholders: boolean,
+  allowConstantPlaceholders: boolean,
   hideResourceProperties: boolean,
   shouldDisabledFieldsWithMixedValues: boolean
 ): ?Field => {
@@ -116,7 +116,7 @@ const createField = (
 
   const valueType = property.getType().toLowerCase();
   if (valueType === 'number') {
-    if (allowStaticDataPlaceholders) {
+    if (allowConstantPlaceholders) {
       const getRawValue = (instance: Instance): string =>
         getStringValue(instance, name);
       const setValue = (instance: Instance, newValue: number) => {
@@ -143,7 +143,7 @@ const createField = (
         getEndAdornment,
         visibility,
         isHighlighted: isHighlightedForString,
-        allowStaticDataPlaceholder: true,
+        allowConstantPlaceholder: true,
         disabled,
       };
     }
@@ -198,8 +198,8 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
-      allowStaticDataPlaceholder: allowStaticDataPlaceholders,
-      forbidStaticDataPlaceholder: !allowStaticDataPlaceholders,
+      allowConstantPlaceholder: allowConstantPlaceholders,
+      forbidConstantPlaceholder: !allowConstantPlaceholders,
       disabled,
     };
   } else if (valueType === 'jsonobject') {
@@ -216,8 +216,8 @@ const createField = (
       hasImpactOnAllOtherFields: property.hasImpactOnOtherProperties(),
       visibility,
       isHighlighted: isHighlightedForString,
-      allowStaticDataPlaceholder: allowStaticDataPlaceholders,
-      forbidStaticDataPlaceholder: !allowStaticDataPlaceholders,
+      allowConstantPlaceholder: allowConstantPlaceholders,
+      forbidConstantPlaceholder: !allowConstantPlaceholders,
       disabled,
     };
   } else if (valueType === 'boolean') {
@@ -601,7 +601,7 @@ type CommonProps = {|
   visibility?: 'All' | 'Basic' | 'Advanced' | 'Deprecated' | 'Basic-Quick',
   quickCustomizationVisibilities?: gdQuickCustomizationVisibilitiesContainer,
   showcaseNonDefaultValues?: boolean,
-  allowStaticDataPlaceholders?: boolean,
+  allowConstantPlaceholders?: boolean,
   hideResourceProperties?: boolean,
 |};
 
@@ -612,7 +612,7 @@ export const effectPropertiesMapToSchema = ({
   quickCustomizationVisibilities,
   hideResourceProperties,
   showcaseNonDefaultValues,
-  allowStaticDataPlaceholders,
+  allowConstantPlaceholders,
 }: {
   ...CommonProps,
   defaultValueProperties: gdMapStringPropertyDescriptor,
@@ -627,7 +627,7 @@ export const effectPropertiesMapToSchema = ({
     hideResourceProperties,
     showcaseNonDefaultValues,
     shouldDisabledFieldsWithMixedValues: false,
-    allowStaticDataPlaceholders,
+    allowConstantPlaceholders,
     getNumberValue: (instance: Instance, propertyName: string): number =>
       instance.hasDoubleParameter(propertyName)
         ? instance.getDoubleParameter(propertyName)
@@ -679,7 +679,7 @@ const propertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
-  allowStaticDataPlaceholders,
+  allowConstantPlaceholders,
   hideResourceProperties,
   shouldDisabledFieldsWithMixedValues,
 }: {
@@ -702,7 +702,7 @@ const propertiesMapToSchema = ({
     visibility,
     quickCustomizationVisibilities,
     showcaseNonDefaultValues,
-    allowStaticDataPlaceholders,
+    allowConstantPlaceholders,
     hideResourceProperties,
     shouldDisabledFieldsWithMixedValues,
     getNumberValue: (instance: Instance, propertyName: string): number => {
@@ -735,7 +735,7 @@ const adaptablePropertiesMapToSchema = ({
   visibility = 'All',
   quickCustomizationVisibilities,
   showcaseNonDefaultValues,
-  allowStaticDataPlaceholders = false,
+  allowConstantPlaceholders = false,
   hideResourceProperties,
   getNumberValue,
   getStringValue,
@@ -874,7 +874,7 @@ const adaptablePropertiesMapToSchema = ({
               layersContainer,
               object,
               !!showcaseNonDefaultValues,
-              allowStaticDataPlaceholders,
+              allowConstantPlaceholders,
               !!hideResourceProperties,
               shouldDisabledFieldsWithMixedValues
             );
@@ -916,7 +916,7 @@ const adaptablePropertiesMapToSchema = ({
         layersContainer,
         object,
         !!showcaseNonDefaultValues,
-        allowStaticDataPlaceholders,
+        allowConstantPlaceholders,
         !!hideResourceProperties,
         shouldDisabledFieldsWithMixedValues
       );

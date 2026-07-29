@@ -6,14 +6,14 @@ const i18n = ({
 }: any);
 
 describe('ProjectManager game root item', () => {
-  it('shows the game label and creates a new game from its add button', () => {
+  it('shows the project label and creates a new game from its add button', () => {
     const onCreateProject = jest.fn<[], void>();
     const description = getGameRootTreeViewItemDescription(
       i18n,
       onCreateProject
     );
 
-    expect(description.label).toBe('Game');
+    expect(description.label).toBe('Project');
 
     const createNewGameButton = description.rightButton;
     expect(createNewGameButton.id).toBe('create-new-game-button');

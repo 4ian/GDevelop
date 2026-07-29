@@ -1,19 +1,19 @@
 // @flow
 import {
-  findStaticDataPlaceholderInSerializedData,
-  getMissingStaticDataPlaceholderPath,
-} from './StaticDataPlaceholderDiagnostics';
+  findConstantPlaceholderInSerializedData,
+  getMissingConstantPlaceholderPath,
+} from './ConstantPlaceholderDiagnostics';
 
-const makeProjectWithStaticData = (staticData: Object): gdProject =>
-  // $FlowFixMe[incompatible-cast] - The resolver only needs getStaticDataJson.
+const makeProjectWithConstants = (constants: Object): gdProject =>
+  // $FlowFixMe[incompatible-cast] - The resolver only needs getConstantsJson.
   (({
-    getStaticDataJson: () => JSON.stringify(staticData),
+    getConstantsJson: () => JSON.stringify(constants),
   }: any): gdProject);
 
-describe('StaticDataPlaceholderDiagnostics', () => {
-  describe('getMissingStaticDataPlaceholderPath', () => {
+describe('ConstantPlaceholderDiagnostics', () => {
+  describe('getMissingConstantPlaceholderPath', () => {
     it('returns null when all placeholders exist', () => {
-      const project = makeProjectWithStaticData({
+      const project = makeProjectWithConstants({
         signals: {
           triangle: {
             s1: 'TriangleSignal',
@@ -23,7 +23,7 @@ describe('StaticDataPlaceholderDiagnostics', () => {
       });
 
       expect(
-        getMissingStaticDataPlaceholderPath(
+        getMissingConstantPlaceholderPath(
           '"{{signals.triangle.s1}} {{labels[0]}}"',
           project
         )
@@ -31,7 +31,7 @@ describe('StaticDataPlaceholderDiagnostics', () => {
     });
 
     it('returns the first missing placeholder path', () => {
-      const project = makeProjectWithStaticData({
+      const project = makeProjectWithConstants({
         signals: {
           triangle: {
             s1: 'TriangleSignal',
@@ -40,21 +40,18 @@ describe('StaticDataPlaceholderDiagnostics', () => {
       });
 
       expect(
-        getMissingStaticDataPlaceholderPath(
-          '"{{signals.triangle.s3}}"',
-          project
-        )
+        getMissingConstantPlaceholderPath('"{{signals.triangle.s3}}"', project)
       ).toBe('signals.triangle.s3');
     });
 
     it('returns an empty path for empty placeholders', () => {
-      const project = makeProjectWithStaticData({});
+      const project = makeProjectWithConstants({});
 
-      expect(getMissingStaticDataPlaceholderPath('"{{}}"', project)).toBe('');
+      expect(getMissingConstantPlaceholderPath('"{{}}"', project)).toBe('');
     });
   });
 
-  describe('findStaticDataPlaceholderInSerializedData', () => {
+  describe('findConstantPlaceholderInSerializedData', () => {
     it('returns the first placeholder path in serialized data', () => {
       const serializedData = {
         events: [
@@ -77,7 +74,7 @@ describe('StaticDataPlaceholderDiagnostics', () => {
         ],
       };
 
-      expect(findStaticDataPlaceholderInSerializedData(serializedData)).toBe(
+      expect(findConstantPlaceholderInSerializedData(serializedData)).toBe(
         'signals.triangle.s1'
       );
       expect(serializedData.events[0].conditions[0].parameters[2]).toBe(
@@ -98,7 +95,7 @@ describe('StaticDataPlaceholderDiagnostics', () => {
         ],
       };
 
-      expect(findStaticDataPlaceholderInSerializedData(serializedData)).toBe(
+      expect(findConstantPlaceholderInSerializedData(serializedData)).toBe(
         null
       );
     });

@@ -38,10 +38,10 @@ describe('getLocalProjectLastModifiedDate', () => {
   });
 
   it('returns the newest multi-file project definition modification time', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     writeFileWithModificationTime(entryPath, 100000);
     writeFileWithModificationTime(
-      path.join(temporaryDirectory, 'static-data.toml'),
+      path.join(temporaryDirectory, 'constants.toml'),
       200000
     );
     writeFileWithModificationTime(
@@ -61,7 +61,7 @@ describe('getLocalProjectLastModifiedDate', () => {
   });
 
   it('ignores resources and generated autosaves', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     writeFileWithModificationTime(entryPath, 100000);
     writeFileWithModificationTime(
       path.join(temporaryDirectory, 'scenes', 'Main', 'Main.layout'),
@@ -77,7 +77,7 @@ describe('getLocalProjectLastModifiedDate', () => {
         '.gdevelop',
         'autosave',
         'current',
-        'project.settings'
+        'project.gdevelop'
       ),
       500000
     );
@@ -85,15 +85,15 @@ describe('getLocalProjectLastModifiedDate', () => {
     expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(200000);
   });
 
-  it('ignores Static Data changes', async () => {
-    const entryPath = path.join(temporaryDirectory, 'project.settings');
+  it('ignores Constants changes', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     writeFileWithModificationTime(entryPath, 100000);
     writeFileWithModificationTime(
       path.join(temporaryDirectory, 'scenes', 'Main', 'Main.events'),
       200000
     );
     writeFileWithModificationTime(
-      path.join(temporaryDirectory, 'static-data.toml'),
+      path.join(temporaryDirectory, 'constants.toml'),
       300000
     );
 

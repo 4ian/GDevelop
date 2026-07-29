@@ -16,11 +16,11 @@ import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import UploadIcon from '../UI/CustomSvgIcons/Upload';
 import { copyTextToClipboard } from '../Utils/Clipboard';
 import {
-  parseStaticDataFromToml,
-  serializeStaticDataToToml,
+  parseConstantsFromToml,
+  serializeConstantsToToml,
 } from '../ProjectsStorage/MultiFileProjectFormat';
 
-type StaticDataRoot = { [string]: any };
+type ConstantsRoot = { [string]: any };
 type RawEditorMode = 'json' | 'toml';
 type SelectedCell = {|
   sheetName: string,
@@ -34,7 +34,7 @@ type Props = {|
   onApply?: () => void,
   onCancel?: () => void,
   embedded?: boolean,
-  onChange?: (staticData: StaticDataRoot) => void,
+  onChange?: (constants: ConstantsRoot) => void,
 |};
 
 const gridMinColumnWidth = 80;
@@ -433,11 +433,11 @@ const styles: { [string]: Object } = {
 const isPlainObject = (value: any): boolean =>
   !!value && typeof value === 'object' && !Array.isArray(value);
 
-const readProjectStaticData = (project: gdProject): StaticDataRoot => {
-  const projectWithStaticData: any = project;
+const readProjectConstants = (project: gdProject): ConstantsRoot => {
+  const projectWithConstants: any = project;
   const json =
-    typeof projectWithStaticData.getStaticDataJson === 'function'
-      ? projectWithStaticData.getStaticDataJson()
+    typeof projectWithConstants.getConstantsJson === 'function'
+      ? projectWithConstants.getConstantsJson()
       : '{}';
 
   try {
@@ -532,10 +532,10 @@ const formatPathSegment = (
 
 const getSelectedPath = (
   selectedCell: ?SelectedCell,
-  staticData: StaticDataRoot
+  constants: ConstantsRoot
 ) => {
   if (!selectedCell) return '';
-  const sheet = staticData[selectedCell.sheetName];
+  const sheet = constants[selectedCell.sheetName];
   const rowValue = Array.isArray(sheet)
     ? sheet[Number(selectedCell.rowKey)]
     : isPlainObject(sheet)
@@ -559,11 +559,11 @@ const getSelectedPath = (
 
 const getSelectedRowJson = (
   selectedCell: ?SelectedCell,
-  staticData: StaticDataRoot
+  constants: ConstantsRoot
 ): string => {
   if (!selectedCell || selectedCell.columnKey) return '';
 
-  const sheet = staticData[selectedCell.sheetName];
+  const sheet = constants[selectedCell.sheetName];
   const rowValue = Array.isArray(sheet)
     ? sheet[Number(selectedCell.rowKey)]
     : isPlainObject(sheet)
@@ -578,7 +578,7 @@ const getSelectedRowJson = (
   }
 };
 
-const StaticDataDialog = ({
+const ConstantsDialog = ({
   project,
   open = true,
   onApply = () => {},
@@ -586,22 +586,22 @@ const StaticDataDialog = ({
   embedded = false,
   onChange,
 }: Props): React.Node => {
-  const [staticData, setStaticData] = React.useState<StaticDataRoot>(() =>
-    readProjectStaticData(project)
+  const [constants, setConstants] = React.useState<ConstantsRoot>(() =>
+    readProjectConstants(project)
   );
   const [selectedSheet, setSelectedSheet] = React.useState<string>(() => {
-    const staticData = readProjectStaticData(project);
-    return Object.keys(staticData)[0] || '';
+    const constants = readProjectConstants(project);
+    return Object.keys(constants)[0] || '';
   });
   const [selectedCell, setSelectedCell] = React.useState<?SelectedCell>(null);
   const [searchText, setSearchText] = React.useState('');
   const [rawJson, setRawJson] = React.useState(() =>
-    JSON.stringify(readProjectStaticData(project), null, 2)
+    JSON.stringify(readProjectConstants(project), null, 2)
   );
   const [rawJsonError, setRawJsonError] = React.useState('');
   const [rawToml, setRawToml] = React.useState(() => {
     try {
-      return serializeStaticDataToToml(readProjectStaticData(project));
+      return serializeConstantsToToml(readProjectConstants(project));
     } catch (error) {
       return '';
     }
@@ -613,20 +613,20 @@ const StaticDataDialog = ({
   const [isMinimized, setIsMinimized] = React.useState(false);
   const importInputRef = React.useRef<?HTMLInputElement>(null);
 
-  const commitStaticData = React.useCallback(
-    (nextStaticData: StaticDataRoot) => {
-      setStaticData(nextStaticData);
+  const commitConstants = React.useCallback(
+    (nextConstants: ConstantsRoot) => {
+      setConstants(nextConstants);
       if (!embedded) return;
 
-      const projectWithStaticData: any = project;
-      projectWithStaticData.setStaticDataJson(JSON.stringify(nextStaticData));
-      if (onChange) onChange(nextStaticData);
+      const projectWithConstants: any = project;
+      projectWithConstants.setConstantsJson(JSON.stringify(nextConstants));
+      if (onChange) onChange(nextConstants);
     },
     [embedded, onChange, project]
   );
 
-  const sheetNames = React.useMemo(() => Object.keys(staticData), [staticData]);
-  const sheet: any = selectedSheet ? staticData[selectedSheet] : null;
+  const sheetNames = React.useMemo(() => Object.keys(constants), [constants]);
+  const sheet: any = selectedSheet ? constants[selectedSheet] : null;
   const rowKeys: Array<string> = React.useMemo(() => getRowKeys(sheet), [
     sheet,
   ]);
@@ -719,60 +719,60 @@ const StaticDataDialog = ({
 
   React.useEffect(
     () => {
-      if (!selectedSheet || !staticData[selectedSheet]) {
+      if (!selectedSheet || !constants[selectedSheet]) {
         setSelectedSheet(sheetNames[0] || '');
       }
     },
-    [staticData, selectedSheet, sheetNames]
+    [constants, selectedSheet, sheetNames]
   );
 
   React.useEffect(
     () => {
-      setRawJson(JSON.stringify(staticData, null, 2));
+      setRawJson(JSON.stringify(constants, null, 2));
       try {
-        setRawToml(serializeStaticDataToToml(staticData));
+        setRawToml(serializeConstantsToToml(constants));
         setRawTomlError('');
       } catch (error) {
         setRawToml('');
         setRawTomlError(error.message);
       }
     },
-    [staticData]
+    [constants]
   );
 
   const addSheet = React.useCallback(
     () => {
       const sheetName = getUniqueName('sheet', sheetNames);
 
-      commitStaticData({
-        ...staticData,
+      commitConstants({
+        ...constants,
         [sheetName]: {},
       });
       setSelectedSheet(sheetName);
     },
-    [commitStaticData, staticData, sheetNames]
+    [commitConstants, constants, sheetNames]
   );
 
   const addRow = React.useCallback(
     () => {
       if (!selectedSheet) return;
 
-      const nextStaticData = { ...staticData };
+      const nextConstants = { ...constants };
       if (Array.isArray(sheet)) {
-        nextStaticData[selectedSheet] = [...sheet, {}];
+        nextConstants[selectedSheet] = [...sheet, {}];
       } else {
         const rowName = getUniqueName(
           'row',
           isPlainObject(sheet) ? Object.keys(sheet) : []
         );
-        nextStaticData[selectedSheet] = {
+        nextConstants[selectedSheet] = {
           ...(isPlainObject(sheet) ? sheet : {}),
           [rowName]: {},
         };
       }
-      commitStaticData(nextStaticData);
+      commitConstants(nextConstants);
     },
-    [commitStaticData, staticData, selectedSheet, sheet]
+    [commitConstants, constants, selectedSheet, sheet]
   );
 
   const addColumn = React.useCallback(
@@ -780,7 +780,7 @@ const StaticDataDialog = ({
       if (!selectedSheet) return;
       const columnName = getUniqueName('column', columnKeys);
 
-      const nextStaticData = { ...staticData };
+      const nextConstants = { ...constants };
       const nextSheet: any = Array.isArray(sheet)
         ? [...sheet]
         : { ...(isPlainObject(sheet) ? sheet : {}) };
@@ -790,7 +790,7 @@ const StaticDataDialog = ({
         const rowValue = Array.isArray(nextSheet)
           ? nextSheet[rowIndex]
           : nextSheet[rowKey];
-        const nextRowValue: StaticDataRoot = isPlainObject(rowValue)
+        const nextRowValue: ConstantsRoot = isPlainObject(rowValue)
           ? { ...rowValue }
           : {};
         if (nextRowValue[columnName] === undefined)
@@ -799,10 +799,10 @@ const StaticDataDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       });
 
-      nextStaticData[selectedSheet] = nextSheet;
-      commitStaticData(nextStaticData);
+      nextConstants[selectedSheet] = nextSheet;
+      commitConstants(nextConstants);
     },
-    [columnKeys, commitStaticData, staticData, rowKeys, selectedSheet, sheet]
+    [columnKeys, commitConstants, constants, rowKeys, selectedSheet, sheet]
   );
 
   const renameSheet = React.useCallback(
@@ -814,14 +814,14 @@ const StaticDataDialog = ({
         nextSheetName,
         sheetNames.filter(name => name !== sheetName)
       );
-      const nextStaticData: StaticDataRoot = {};
-      Object.keys(staticData).forEach(currentSheetName => {
-        nextStaticData[
+      const nextConstants: ConstantsRoot = {};
+      Object.keys(constants).forEach(currentSheetName => {
+        nextConstants[
           currentSheetName === sheetName ? targetSheetName : currentSheetName
-        ] = staticData[currentSheetName];
+        ] = constants[currentSheetName];
       });
 
-      commitStaticData(nextStaticData);
+      commitConstants(nextConstants);
       setSelectedSheet(currentSelectedSheet =>
         currentSelectedSheet === sheetName
           ? targetSheetName
@@ -833,7 +833,7 @@ const StaticDataDialog = ({
           : currentSelectedCell
       );
     },
-    [commitStaticData, staticData, sheetNames]
+    [commitConstants, constants, sheetNames]
   );
 
   const renameRow = React.useCallback(
@@ -841,7 +841,7 @@ const StaticDataDialog = ({
       const nextRowKey = nextRowKeyText.trim();
       if (!nextRowKey || nextRowKey === rowKey) return;
 
-      const targetSheet = staticData[sheetName];
+      const targetSheet = constants[sheetName];
       if (!isPlainObject(targetSheet)) return;
 
       const targetRowKey = getUniqueName(
@@ -850,14 +850,14 @@ const StaticDataDialog = ({
           currentRowKey => currentRowKey !== rowKey
         )
       );
-      const nextSheet: StaticDataRoot = {};
+      const nextSheet: ConstantsRoot = {};
       Object.keys(targetSheet).forEach(currentRowKey => {
         nextSheet[currentRowKey === rowKey ? targetRowKey : currentRowKey] =
           targetSheet[currentRowKey];
       });
 
-      commitStaticData({
-        ...staticData,
+      commitConstants({
+        ...constants,
         [sheetName]: nextSheet,
       });
       setSelectedCell(currentSelectedCell =>
@@ -868,7 +868,7 @@ const StaticDataDialog = ({
           : currentSelectedCell
       );
     },
-    [commitStaticData, staticData]
+    [commitConstants, constants]
   );
 
   const renameColumn = React.useCallback(
@@ -876,7 +876,7 @@ const StaticDataDialog = ({
       const nextColumnKey = nextColumnKeyText.trim();
       if (!nextColumnKey || nextColumnKey === columnKey) return;
 
-      const targetSheet = staticData[sheetName];
+      const targetSheet = constants[sheetName];
       const targetRowKeys = getRowKeys(targetSheet);
       const targetColumnKey = getUniqueName(
         nextColumnKey,
@@ -897,7 +897,7 @@ const StaticDataDialog = ({
           return;
         }
 
-        const nextRowValue: StaticDataRoot = {};
+        const nextRowValue: ConstantsRoot = {};
         Object.keys(rowValue).forEach(currentColumnKey => {
           nextRowValue[
             currentColumnKey === columnKey ? targetColumnKey : currentColumnKey
@@ -907,8 +907,8 @@ const StaticDataDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       });
 
-      commitStaticData({
-        ...staticData,
+      commitConstants({
+        ...constants,
         [sheetName]: nextSheet,
       });
       setSelectedCell(currentSelectedCell =>
@@ -919,7 +919,7 @@ const StaticDataDialog = ({
           : currentSelectedCell
       );
     },
-    [commitStaticData, staticData]
+    [commitConstants, constants]
   );
 
   const handleNameInputKeyDown = React.useCallback(
@@ -938,7 +938,7 @@ const StaticDataDialog = ({
     (rowKey: string, columnKey: string, text: string) => {
       if (!selectedSheet) return;
 
-      const nextStaticData = { ...staticData };
+      const nextConstants = { ...constants };
       const nextSheet: any = Array.isArray(sheet)
         ? [...sheet]
         : { ...(isPlainObject(sheet) ? sheet : {}) };
@@ -952,7 +952,7 @@ const StaticDataDialog = ({
           nextSheet[rowIndex] = parseCellValue(text);
         else nextSheet[rowKey] = parseCellValue(text);
       } else {
-        const nextRowValue: StaticDataRoot = isPlainObject(rowValue)
+        const nextRowValue: ConstantsRoot = isPlainObject(rowValue)
           ? { ...rowValue }
           : {};
         nextRowValue[columnKey] = parseCellValue(text);
@@ -960,35 +960,35 @@ const StaticDataDialog = ({
         else nextSheet[rowKey] = nextRowValue;
       }
 
-      nextStaticData[selectedSheet] = nextSheet;
-      commitStaticData(nextStaticData);
+      nextConstants[selectedSheet] = nextSheet;
+      commitConstants(nextConstants);
     },
-    [commitStaticData, staticData, selectedSheet, sheet]
+    [commitConstants, constants, selectedSheet, sheet]
   );
 
   const deleteRow = React.useCallback(
     (sheetName: string, rowKey: string) => {
-      const nextStaticData = { ...staticData };
-      const targetSheet = nextStaticData[sheetName];
+      const nextConstants = { ...constants };
+      const targetSheet = nextConstants[sheetName];
       if (Array.isArray(targetSheet)) {
-        nextStaticData[sheetName] = targetSheet.filter(
+        nextConstants[sheetName] = targetSheet.filter(
           (_, index) => String(index) !== rowKey
         );
       } else if (isPlainObject(targetSheet)) {
         const nextSheet = { ...targetSheet };
         delete nextSheet[rowKey];
-        nextStaticData[sheetName] = nextSheet;
+        nextConstants[sheetName] = nextSheet;
       }
-      commitStaticData(nextStaticData);
+      commitConstants(nextConstants);
       setSelectedCell(null);
     },
-    [commitStaticData, staticData]
+    [commitConstants, constants]
   );
 
   const deleteColumn = React.useCallback(
     (sheetName: string, columnKey: string) => {
-      const nextStaticData = { ...staticData };
-      const targetSheet = nextStaticData[sheetName];
+      const nextConstants = { ...constants };
+      const targetSheet = nextConstants[sheetName];
       const nextSheet: any = Array.isArray(targetSheet)
         ? [...targetSheet]
         : { ...targetSheet };
@@ -1010,14 +1010,14 @@ const StaticDataDialog = ({
         if (Array.isArray(nextSheet)) nextSheet[rowIndex] = nextRowValue;
         else nextSheet[rowKey] = nextRowValue;
       });
-      nextStaticData[sheetName] = nextSheet;
-      commitStaticData(nextStaticData);
+      nextConstants[sheetName] = nextSheet;
+      commitConstants(nextConstants);
       setSelectedCell(null);
     },
-    [commitStaticData, staticData]
+    [commitConstants, constants]
   );
 
-  const replaceStaticDataFromJson = React.useCallback(
+  const replaceConstantsFromJson = React.useCallback(
     (jsonText: string) => {
       try {
         const parsed = JSON.parse(jsonText || '{}');
@@ -1025,35 +1025,35 @@ const StaticDataDialog = ({
           setRawJsonError('The root value must be a JSON object.');
           return;
         }
-        commitStaticData(parsed);
+        commitConstants(parsed);
         setRawJsonError('');
       } catch (error) {
         setRawJsonError(error.message);
       }
     },
-    [commitStaticData]
+    [commitConstants]
   );
 
   const applyRawJson = React.useCallback(
     () => {
-      replaceStaticDataFromJson(rawJson);
+      replaceConstantsFromJson(rawJson);
     },
-    [rawJson, replaceStaticDataFromJson]
+    [rawJson, replaceConstantsFromJson]
   );
 
   const applyRawToml = React.useCallback(
     () => {
       try {
-        commitStaticData(parseStaticDataFromToml(rawToml));
+        commitConstants(parseConstantsFromToml(rawToml));
         setRawTomlError('');
       } catch (error) {
         setRawTomlError(error.message);
       }
     },
-    [commitStaticData, rawToml]
+    [commitConstants, rawToml]
   );
 
-  const importJson = React.useCallback(
+  const importToml = React.useCallback(
     (event: SyntheticInputEvent<HTMLInputElement>) => {
       const files = event.currentTarget.files;
       const file = files && files[0];
@@ -1062,34 +1062,40 @@ const StaticDataDialog = ({
       const reader = new FileReader();
       reader.onload = () => {
         const result = reader.result;
-        const jsonText = typeof result === 'string' ? result : '';
-        setRawJson(jsonText);
-        replaceStaticDataFromJson(jsonText);
+        const tomlText = typeof result === 'string' ? result : '';
+        setRawToml(tomlText);
+        try {
+          commitConstants(parseConstantsFromToml(tomlText));
+          setRawTomlError('');
+        } catch (error) {
+          setRawTomlError(error.message);
+          setRawEditorMode('toml');
+        }
       };
       reader.readAsText(file);
       event.currentTarget.value = '';
     },
-    [replaceStaticDataFromJson]
+    [commitConstants]
   );
 
-  const exportJson = React.useCallback(
+  const exportToml = React.useCallback(
     () => {
-      const blob = new Blob([JSON.stringify(staticData, null, 2)], {
-        type: 'application/json',
+      const blob = new Blob([serializeConstantsToToml(constants)], {
+        type: 'application/toml',
       });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = 'static-data.json';
+      anchor.download = 'constants.toml';
       anchor.click();
       URL.revokeObjectURL(url);
     },
-    [staticData]
+    [constants]
   );
 
-  const selectedPath = getSelectedPath(selectedCell, staticData);
+  const selectedPath = getSelectedPath(selectedCell, constants);
   const selectedPlaceholder = selectedPath ? '{{' + selectedPath + '}}' : '';
-  const selectedRowJson = getSelectedRowJson(selectedCell, staticData);
+  const selectedRowJson = getSelectedRowJson(selectedCell, constants);
   const rawEditorError = rawEditorMode === 'toml' ? rawTomlError : rawJsonError;
 
   const copyText = React.useCallback((text: string) => {
@@ -1103,11 +1109,11 @@ const StaticDataDialog = ({
 
   const applyChanges = React.useCallback(
     () => {
-      const projectWithStaticData: any = project;
-      projectWithStaticData.setStaticDataJson(JSON.stringify(staticData));
+      const projectWithConstants: any = project;
+      projectWithConstants.setConstantsJson(JSON.stringify(constants));
       onApply();
     },
-    [staticData, onApply, project]
+    [constants, onApply, project]
   );
 
   const content = (
@@ -1128,9 +1134,9 @@ const StaticDataDialog = ({
               <input
                 ref={importInputRef}
                 type="file"
-                accept="application/json,.json"
+                accept="application/toml,text/plain,.toml"
                 style={styles.hiddenFileInput}
-                onChange={importJson}
+                onChange={importToml}
               />
               <FlatButton
                 label={<Trans>Import</Trans>}
@@ -1142,7 +1148,7 @@ const StaticDataDialog = ({
               <FlatButton
                 label={<Trans>Export</Trans>}
                 leftIcon={<DownloadIcon />}
-                onClick={exportJson}
+                onClick={exportToml}
               />
             </div>
           </div>
@@ -1190,7 +1196,7 @@ const StaticDataDialog = ({
               {!selectedSheet ? (
                 <div style={styles.emptyState}>
                   <Text>
-                    <Trans>Create a sheet to start editing static data.</Trans>
+                    <Trans>Create a sheet to start editing constants.</Trans>
                   </Text>
                 </div>
               ) : (
@@ -1493,7 +1499,7 @@ const StaticDataDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Static Data</Trans>}
+      title={<Trans>Constants</Trans>}
       open={open}
       onRequestClose={onCancel}
       onApply={applyChanges}
@@ -1526,7 +1532,7 @@ const StaticDataDialog = ({
       flexColumnBody
       fullHeight={!isMinimized}
       maxWidth="xl"
-      id="static-data-dialog"
+      id="constants-dialog"
       noPadding
     >
       {content}
@@ -1534,14 +1540,14 @@ const StaticDataDialog = ({
   );
 };
 
-export const StaticDataEditor = ({
+export const ConstantsEditor = ({
   project,
   onChange,
 }: {|
   project: gdProject,
-  onChange: (staticData: StaticDataRoot) => void,
+  onChange: (constants: ConstantsRoot) => void,
 |}): React.Node => (
-  <StaticDataDialog project={project} embedded onChange={onChange} />
+  <ConstantsDialog project={project} embedded onChange={onChange} />
 );
 
-export default StaticDataDialog;
+export default ConstantsDialog;

@@ -289,19 +289,19 @@ class GD_CORE_API EventsCodeGenerationContext {
   }
 
   /**
-   * \brief Enable replacing static data placeholders in strings generated
+   * \brief Enable replacing constants placeholders in strings generated
    * for event instructions.
    */
-  void SetStaticDataPlaceholderReplacementEnabled(bool enabled) {
-    staticDataPlaceholderReplacementEnabled = enabled;
+  void SetConstantPlaceholderReplacementEnabled(bool enabled) {
+    constantPlaceholderReplacementEnabled = enabled;
   }
 
   /**
    * \brief Return true if strings generated in the current context should have
-   * static data placeholders replaced.
+   * constants placeholders replaced.
    */
-  bool IsStaticDataPlaceholderReplacementEnabled() const {
-    return staticDataPlaceholderReplacementEnabled;
+  bool IsConstantPlaceholderReplacementEnabled() const {
+    return constantPlaceholderReplacementEnabled;
   }
 
   /**
@@ -378,9 +378,9 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool objectListParameterPickingAllowed =
       false;  ///< True while condition object-list parameters are being
               ///< generated, so conditions can narrow multiple candidates.
-  bool staticDataPlaceholderReplacementEnabled =
+  bool constantPlaceholderReplacementEnabled =
       false;  ///< True while strings generated for event instructions should
-              ///< have static data placeholders replaced at code generation
+              ///< have constants placeholders replaced at code generation
               ///< time.
 };
 

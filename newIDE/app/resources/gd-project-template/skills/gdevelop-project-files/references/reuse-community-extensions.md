@@ -91,7 +91,7 @@ version, and any later local adaptations in the final report.
 ## Install into multi-file sources
 
 Repository extensions are legacy JSON interchange artifacts, not project
-source. Do not reference or retain them in `project.settings`, `.settings`,
+source. Do not reference or retain them in `project.gdevelop`, `.settings`,
 `.layout`, or `.events` and do not ask the model to translate their event trees
 by hand.
 

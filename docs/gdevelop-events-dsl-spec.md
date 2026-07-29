@@ -331,7 +331,7 @@ events = "game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage
 events = "game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events"
 ```
 
-`game://` is rooted at the directory containing `project.settings`. Resolution,
+`game://` is rooted at the directory containing `project.gdevelop`. Resolution,
 normalization, containment, and percent-encoding rules are defined in the
 multi-file project format specification. All `.settings` TOML files are
 local-root documents mounted at namespaces derived from their canonical paths.

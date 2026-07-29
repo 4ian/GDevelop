@@ -9,7 +9,7 @@ import AddCircleIcon from '../UI/CustomSvgIcons/AddCircle';
 import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
-import StaticDataIcon from '../UI/CustomSvgIcons/StaticData';
+import ConstantsIcon from '../UI/CustomSvgIcons/Constants';
 import GlobalVariableIcon from '../UI/CustomSvgIcons/GlobalVariable';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
@@ -117,7 +117,7 @@ import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
 import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
+import { renderConstantsEditorContainer } from './EditorContainers/ConstantsEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -275,7 +275,10 @@ import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFi
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
-import { areLegacyProjectsEquivalent } from '../ProjectsStorage/MultiFileProjectFormat';
+import {
+  MULTI_FILE_ENTRY_NAME,
+  areLegacyProjectsEquivalent,
+} from '../ProjectsStorage/MultiFileProjectFormat';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
@@ -284,7 +287,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
-import { hasInvalidStaticDataPlaceholderValidationError } from '../Utils/StaticDataPlaceholderDiagnostics';
+import { hasInvalidConstantPlaceholderValidationError } from '../Utils/ConstantPlaceholderDiagnostics';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -367,7 +370,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'static-data': renderStaticDataEditorContainer,
+  constants: renderConstantsEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
@@ -716,7 +719,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
-        const mustBlockForInvalidStaticDataPlaceholder = hasInvalidStaticDataPlaceholderValidationError(
+        const mustBlockForInvalidConstantPlaceholder = hasInvalidConstantPlaceholderValidationError(
           validationErrors
         );
         const mustBlockForUnsafeExternalLayoutCreation =
@@ -724,11 +727,11 @@ const MainFrame = (props: Props): React.MixedElement => {
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
-          mustBlockForInvalidStaticDataPlaceholder ||
+          mustBlockForInvalidConstantPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
           mustBlockForUnconditionedActions;
 
-        if (mustBlockForInvalidStaticDataPlaceholder) {
+        if (mustBlockForInvalidConstantPlaceholder) {
           setDiagnosticReportDialogOpen(true);
           return true;
         }
@@ -1280,8 +1283,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
-          : kind === 'static-data'
-          ? i18n._(t`Static Data`)
+          : kind === 'constants'
+          ? i18n._(t`Constants`)
           : kind === 'global-search'
           ? i18n._(t`Global search`)
           : kind === 'ask-ai'
@@ -1347,8 +1350,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
-        ) : kind === 'static-data' ? (
-          <StaticDataIcon />
+        ) : kind === 'constants' ? (
+          <ConstantsIcon />
         ) : kind === 'global-search' ? (
           <SearchIcon />
         ) : kind === 'layout' ? (
@@ -1976,6 +1979,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   const loadFromSerializedProject = React.useCallback(
     (
       serializedProject: gdSerializerElement,
+      constants: Object,
       fileMetadata: ?FileMetadata,
       reportProgress?: (phase: string) => void
     ): Promise<State> => {
@@ -1983,6 +1987,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const startTime = Date.now();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
       newProject.unserializeFrom(serializedProject);
+      newProject.setConstantsJson(JSON.stringify(constants));
       if (reportProgress) reportProgress('project-unserialized');
       const duration = Date.now() - startTime;
       console.info(`Unserialization took ${duration.toFixed(2)} ms`);
@@ -2094,6 +2099,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       try {
         await delay(50);
         let content;
+        let constants = {};
         let effectiveFileMetadata = fileMetadata;
         let openingError: Error | null = null;
         try {
@@ -2106,6 +2112,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             setLoaderModalProgress
           );
           content = result.content;
+          constants = result.constants || {};
           if (options && options.reportProgress) {
             options.reportProgress('disk-read');
           }
@@ -2119,6 +2126,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           if (autoSaveAfterFailureFileMetadata) {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
+            constants = result.constants || {};
           }
         } finally {
           setIsLoadingProject(false);
@@ -2141,8 +2149,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         try {
           const state = loadFromSerializedProject(
             serializedProject,
+            constants,
             // Autosaves keep the originally requested metadata. A storage adapter may
-            // explicitly redirect a migrated legacy project to project.settings.
+            // explicitly redirect a migrated legacy project to project.gdevelop.
             effectiveFileMetadata,
             options && options.reportProgress
           );
@@ -3432,7 +3441,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       let serializedProject: ?gdSerializerElement = null;
       let previewProject: ?gdProject = null;
       try {
-        const { content } = await onOpen(fileMetadata);
+        const { content, constants = {} } = await onOpen(fileMetadata);
         if (!verifyProjectContent(i18n, content)) {
           return null;
         }
@@ -3440,6 +3449,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         serializedProject = gd.Serializer.fromJSObject(content);
         previewProject = gd.ProjectHelper.createNewGDJSProject();
         previewProject.unserializeFrom(serializedProject);
+        previewProject.setConstantsJson(JSON.stringify(constants));
         previewProject.setProjectFile(fileMetadata.fileIdentifier);
         return previewProject;
       } catch (error) {
@@ -4393,7 +4403,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     stickyNotes.createNote({ showManager: false });
   }, []);
 
-  const openStaticData = React.useCallback(
+  const openConstants = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -4402,12 +4412,12 @@ const MainFrame = (props: Props): React.MixedElement => {
             state.editorTabs,
             // $FlowFixMe[incompatible-type]
             getEditorOpeningOptions({
-              kind: 'static-data',
+              kind: 'constants',
               name: '',
               dontFocusTab: true,
             })
           ),
-          'static-data'
+          'constants'
         ),
       }));
     },
@@ -6320,24 +6330,24 @@ const MainFrame = (props: Props): React.MixedElement => {
     [saveProject]
   );
 
-  const autoSaveStaticData = React.useCallback(
-    async (staticData: Object): Promise<boolean> => {
+  const autoSaveConstants = React.useCallback(
+    async (constants: Object): Promise<boolean> => {
       if (!currentProject || !currentFileMetadata) return false;
 
-      const { onAutoSaveStaticData } = getStorageProviderOperations();
-      if (!onAutoSaveStaticData) return false;
+      const { onAutoSaveConstants } = getStorageProviderOperations();
+      if (!onAutoSaveConstants) return false;
 
       try {
         const projectFile = currentProject.getProjectFile();
-        const staticDataFileMetadata = projectFile
+        const constantsFileMetadata = projectFile
           ? { ...currentFileMetadata, fileIdentifier: projectFile }
           : currentFileMetadata;
-        return await onAutoSaveStaticData(staticData, staticDataFileMetadata);
+        return await onAutoSaveConstants(constants, constantsFileMetadata);
       } catch (error) {
-        console.error('Unable to auto-save Static Data:', error);
+        console.error('Unable to auto-save Constants:', error);
         _showSnackMessage(
           i18n._(
-            t`Static Data could not be written to static-data.toml. Use the project Save button to try again.`
+            t`Constants could not be written to constants.toml. Use the project Save button to try again.`
           ),
           null
         );
@@ -7130,11 +7140,11 @@ const MainFrame = (props: Props): React.MixedElement => {
       openStickyNotesManager
     );
     addRecentEditorSwitcherSideMenuItem(
-      'static-data',
-      i18n._(t`Static Data`),
+      'constants',
+      i18n._(t`Constants`),
       i18n._(t`Game settings`),
-      <StaticDataIcon />,
-      openStaticData
+      <ConstantsIcon />,
+      openConstants
     );
     addRecentEditorSwitcherSideMenuItem(
       globalVariablesItemId,
@@ -7740,12 +7750,19 @@ const MainFrame = (props: Props): React.MixedElement => {
           });
           reportReloadProgress('editor-loaded');
           const reloadedProject = currentProjectRef.current;
+          const reloadedProjectFile = reloadedProject
+            ? reloadedProject.getProjectFile()
+            : '';
           const isLocalMultiFileProject =
             storageProviderName === localFileStorageProviderInternalName &&
             !!reloadedProject &&
-            /(?:^|[\\/])project\.settings$/i.test(
-              reloadedProject.getProjectFile()
-            );
+            (reloadedProjectFile.toLowerCase() === MULTI_FILE_ENTRY_NAME ||
+              reloadedProjectFile
+                .toLowerCase()
+                .endsWith(`/${MULTI_FILE_ENTRY_NAME}`) ||
+              reloadedProjectFile
+                .toLowerCase()
+                .endsWith(`\\${MULTI_FILE_ENTRY_NAME}`));
           if (!isLocalMultiFileProject || !reloadedProject) {
             return {
               reloaded: true,
@@ -8063,7 +8080,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     setEditorTabs: setEditorTabs,
     onFocusedEditorTabChange: selectProjectManagerItemForEditorTab,
     saveProject: saveProject,
-    autoSaveStaticData: autoSaveStaticData,
+    autoSaveConstants: autoSaveConstants,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,
     getOrLoadProjectVersion: getOrLoadProjectVersion,
@@ -8201,7 +8218,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
-      onOpenStaticData={openStaticData}
+      onOpenConstants={openConstants}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -8249,7 +8266,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             onExport: () => {
               openShareDialog('publish');
             },
-            onInvalidStaticDataPlaceholder: () => {
+            onInvalidConstantPlaceholder: () => {
               setDiagnosticReportDialogOpen(true);
             },
             onCaptureFinished,

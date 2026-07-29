@@ -10,8 +10,9 @@ import {
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
-import { unzipFirstEntryOfBlob } from '../../Utils/Zip.js/Utils';
+import { unzipTextFilesFromBlob } from '../../Utils/Zip.js/Utils';
 import ProjectCache from '../../Utils/ProjectCache';
+import { parseConstantsFromToml } from '../MultiFileProjectFormat';
 
 const CLOUD_PROJECT_AUTOSAVE_PREFIX = 'cache-autosave:';
 let projectCache;
@@ -39,11 +40,12 @@ export const generateOnOpen = (
 ): ((
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
-) => Promise<{ content: any }>) => async (
+) => Promise<{ content: any, constants?: Object }>) => async (
   fileMetadata: FileMetadata,
   onProgress?: (progress: number, message: MessageDescriptor) => void
 ): Promise<{|
   content: Object,
+  constants: Object,
 |}> => {
   const cloudProjectId = fileMetadata.fileIdentifier;
 
@@ -62,17 +64,20 @@ export const generateOnOpen = (
       ''
     );
     const projectCache = getProjectCache();
-    const project = await projectCache.get({
+    const cachedProject = await projectCache.get({
       userId: profile.id,
       cloudProjectId,
     });
-    if (!project) {
+    if (!cachedProject) {
       throw new Error(
         `Could not find cache entry for project id ${cloudProjectId}.`
       );
     }
     await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
-    return { content: JSON.parse(project) };
+    return {
+      content: JSON.parse(cachedProject.project),
+      constants: parseConstantsFromToml(cachedProject.constantsToml),
+    };
   }
 
   onProgress && onProgress((1 / 4) * 100, t`Calibrating sensors`);
@@ -96,13 +101,16 @@ export const generateOnOpen = (
     fileMetadata.version
   );
   onProgress && onProgress((4 / 4) * 100, t`Opening portal`);
-  // Reading only the first entry since the zip should only contain the project json file
   try {
-    const serializedProject = await unzipFirstEntryOfBlob(
-      zippedSerializedProject
-    );
+    const files = await unzipTextFilesFromBlob(zippedSerializedProject);
+    if (!files['game.json'] || files['constants.toml'] === undefined) {
+      throw new Error(
+        'The cloud project archive must contain game.json and constants.toml.'
+      );
+    }
     return {
-      content: JSON.parse(serializedProject),
+      content: JSON.parse(files['game.json']),
+      constants: parseConstantsFromToml(files['constants.toml']),
     };
   } catch (error) {
     throw new CloudProjectReadingError();

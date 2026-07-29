@@ -31,7 +31,7 @@ describe('project source catalogs', () => {
       fileKinds: [
         {
           kind: 'project',
-          path: 'project.settings',
+          path: 'project.gdevelop',
           requiredMarker: { field: 'kind', value: 'project' },
           schema: {
             rootFields: [{ name: 'kind', type: 'string' }],
@@ -262,10 +262,10 @@ describe('project source catalogs', () => {
       requiredMarker: { field: 'kind', value: 'object' },
     });
     expect(
-      catalog.fileKinds.find(fileKind => fileKind.kind === 'static-data')
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'constants')
     ).toMatchObject({
-      path: 'static-data.toml',
-      mountedNamespace: 'editor.staticData',
+      path: 'constants.toml',
+      mountedNamespace: 'editor.constants',
       tomlRoot: true,
       requiredFields: [],
     });

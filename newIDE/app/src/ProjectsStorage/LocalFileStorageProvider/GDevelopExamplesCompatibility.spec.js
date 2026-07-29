@@ -5,7 +5,7 @@
 //
 // It sparse-downloads JSON sources from every example in GDevelop-examples,
 // imports each legacy project through the editor's real local opener, writes
-// the new multi-file representation, opens project.settings, and verifies that
+// the new multi-file representation, opens project.gdevelop, and verifies that
 // the reconstructed project is equivalent to the normalized imported project.
 
 // $FlowFixMe[cannot-resolve-module] Jest runs this compatibility test in Node.
@@ -283,14 +283,14 @@ if (!RUN_COMPATIBILITY_TEST) {
             path.relative(example.directoryPath, example.projectPath)
           );
           const imported = await onOpen({ fileIdentifier: legacyPath });
-          const entryPath = path.join(temporaryDirectory, 'project.settings');
+          const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
 
           expect(imported.fileMetadata).toBeDefined();
           expect(imported.fileMetadata.fileIdentifier).toBe(entryPath);
           expect(fs.existsSync(entryPath)).toBe(true);
 
           const sourceTree = await readMultiFileSourceTree(entryPath);
-          expect(sourceTree.files['game://project.settings']).toBeDefined();
+          expect(sourceTree.files['game://project.gdevelop']).toBeDefined();
           expect(Object.keys(sourceTree.files).length).toBeGreaterThan(1);
           Object.keys(sourceTree.files).forEach(uri => {
             expect(

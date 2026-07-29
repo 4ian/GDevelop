@@ -1,22 +1,22 @@
 // @flow
 
-import { StaticDataEditorContainer } from './StaticDataEditorContainer';
+import { ConstantsEditorContainer } from './ConstantsEditorContainer';
 
 jest.mock('../../EmbeddedGame/EmbeddedGameFrame', () => ({
   setEditorHotReloadNeeded: jest.fn(),
 }));
-jest.mock('../../StaticData/StaticDataDialog', () => ({
-  StaticDataEditor: () => null,
+jest.mock('../../Constants/ConstantsDialog', () => ({
+  ConstantsEditor: () => null,
 }));
 
-describe('StaticDataEditorContainer', () => {
-  test('immediately queues Static Data auto-saves from the editor', async () => {
-    const onAutoSaveStaticData: any = jest.fn(() => Promise.resolve(true));
+describe('ConstantsEditorContainer', () => {
+  test('immediately queues Constants auto-saves from the editor', async () => {
+    const onAutoSaveConstants: any = jest.fn(() => Promise.resolve(true));
     const triggerUnsavedChanges: any = jest.fn();
-    const container = new StaticDataEditorContainer(
+    const container = new ConstantsEditorContainer(
       ({
         project: {},
-        onAutoSaveStaticData,
+        onAutoSaveConstants,
         unsavedChanges: { triggerUnsavedChanges },
       }: any)
     );
@@ -26,35 +26,35 @@ describe('StaticDataEditorContainer', () => {
     editor.props.onChange({ value: 'second' });
     await container.autoSaveChain;
 
-    expect(onAutoSaveStaticData).toHaveBeenCalledTimes(1);
-    expect(onAutoSaveStaticData).toHaveBeenCalledWith({ value: 'second' });
+    expect(onAutoSaveConstants).toHaveBeenCalledTimes(1);
+    expect(onAutoSaveConstants).toHaveBeenCalledWith({ value: 'second' });
     expect(triggerUnsavedChanges).not.toHaveBeenCalled();
   });
 
   test('keeps the project dirty when isolated auto-save is unavailable', async () => {
-    const onAutoSaveStaticData: any = jest.fn(() => Promise.resolve(false));
+    const onAutoSaveConstants: any = jest.fn(() => Promise.resolve(false));
     const triggerUnsavedChanges: any = jest.fn();
-    const container = new StaticDataEditorContainer(
+    const container = new ConstantsEditorContainer(
       ({
-        onAutoSaveStaticData,
+        onAutoSaveConstants,
         unsavedChanges: { triggerUnsavedChanges },
       }: any)
     );
 
-    container.onStaticDataChanged({ value: 'test' });
+    container.onConstantsChanged({ value: 'test' });
     await container.autoSaveChain;
 
     expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);
   });
 
   test('keeps the project dirty when isolated auto-save rejects', async () => {
-    const onAutoSaveStaticData: any = jest.fn(() =>
+    const onAutoSaveConstants: any = jest.fn(() =>
       Promise.reject(new Error('Write failed'))
     );
     const triggerUnsavedChanges: any = jest.fn();
-    const container = new StaticDataEditorContainer(
+    const container = new ConstantsEditorContainer(
       ({
-        onAutoSaveStaticData,
+        onAutoSaveConstants,
         unsavedChanges: { triggerUnsavedChanges },
       }: any)
     );
@@ -62,7 +62,7 @@ describe('StaticDataEditorContainer', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    container.onStaticDataChanged({ value: 'test' });
+    container.onConstantsChanged({ value: 'test' });
     await container.autoSaveChain;
 
     expect(triggerUnsavedChanges).toHaveBeenCalledTimes(1);

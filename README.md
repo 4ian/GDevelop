@@ -275,7 +275,7 @@ Pre-generated documentation of the game engine is [available here](https://docs.
 
 ### Implementation notes
 
-- [Static Data](docs/StaticData.md): project-wide JSON configuration storage, editor support, and code-generation-time placeholder replacement.
+- [Constants](docs/Constants.md): project-wide `constants.toml` configuration, editor support, and code-generation-time placeholder replacement.
 - [Signal System](docs/SignalSystem.md): queued signal notification design for scene events, custom objects and prefabs.
 - [Object picking and single-instance consumption](docs/Architecture.md#object-picking-and-single-instance-consumption): runtime and editor rules for picked object lists, scalar consumers, and conditionless actions.
 

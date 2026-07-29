@@ -15,7 +15,7 @@ export const getGameRootTreeViewItemDescription = (
   i18n: I18nType,
   onCreateProject: () => void
 ): GameRootTreeViewItemDescription => ({
-  label: i18n._(t`Game`),
+  label: i18n._(t`Project`),
   rightButton: {
     icon: <Add />,
     label: i18n._(t`Create New Game`),

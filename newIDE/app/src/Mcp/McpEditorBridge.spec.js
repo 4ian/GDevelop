@@ -25,6 +25,11 @@ const path = require('path');
 const gd: libGDevelop = global.gd;
 
 describe('McpEditorBridge', () => {
+  const serializeProjectWithConstants = (project: gdProject): Object => ({
+    ...serializeToJSObject(project),
+    constants: JSON.parse(project.getConstantsJson()),
+  });
+
   const getInitialInstances = (
     initialInstances: gdInitialInstancesContainer
   ): Array<gdInitialInstance> => {
@@ -187,12 +192,14 @@ describe('McpEditorBridge', () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-generate-catalogs-')
     );
-    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Catalog generation test');
     project.setProjectFile(projectFile);
     project.insertNewLayout('Scene', 0);
-    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    const files = decomposeLegacyProjectToFiles(
+      serializeProjectWithConstants(project)
+    );
     files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
     await writeMultiFileSourceTree({
       entryPath: projectFile,
@@ -265,12 +272,14 @@ describe('McpEditorBridge', () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-validate-project-files-')
     );
-    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Disk validation test');
     project.setProjectFile(projectFile);
     project.insertNewLayout('Scene', 0);
-    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    const files = decomposeLegacyProjectToFiles(
+      serializeProjectWithConstants(project)
+    );
     files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
     await writeMultiFileSourceTree({
       entryPath: projectFile,
@@ -379,11 +388,13 @@ describe('McpEditorBridge', () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-invalid-javascript-api-')
     );
-    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setProjectFile(projectFile);
     project.insertNewLayout('Scene', 0);
-    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
+    const files = decomposeLegacyProjectToFiles(
+      serializeProjectWithConstants(project)
+    );
     files['game://scenes/Scene/Scene.events'] = `@js strict=true
 runtimeScene._instances.length;
 @end js
@@ -427,11 +438,13 @@ runtimeScene._instances.length;
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-invalid-project-files-')
     );
-    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setProjectFile(projectFile);
-    const files = decomposeLegacyProjectToFiles(serializeToJSObject(project));
-    files['game://project.settings'] += '\ninvalid = [\n';
+    const files = decomposeLegacyProjectToFiles(
+      serializeProjectWithConstants(project)
+    );
+    files['game://project.gdevelop'] += '\ninvalid = [\n';
     await writeMultiFileSourceTree({ entryPath: projectFile, files });
     const bridge = makeBridge({ getProject: () => project });
 
@@ -448,7 +461,7 @@ runtimeScene._instances.length;
         severity: 'error',
         phase: 'parse-settings',
         code: 'MULTIFILE_INVALID_TOML',
-        fileUri: 'game://project.settings',
+        fileUri: 'game://project.gdevelop',
         filePath: projectFile,
       }),
     ]);
@@ -458,18 +471,18 @@ runtimeScene._instances.length;
     const reportProgress = jest.fn();
     let currentProject: any = {
       getName: () => 'Before reload',
-      getProjectFile: () => 'C:\\game\\project.settings',
+      getProjectFile: () => 'C:\\game\\project.gdevelop',
     };
     const reloadProjectAndWait: any = (jest.fn(async receivedReporter => {
       expect(receivedReporter).toBe(reportProgress);
       receivedReporter({ phase: 'editor-loading' });
       currentProject = {
         getName: () => 'After reload',
-        getProjectFile: () => 'C:\\game\\project.settings',
+        getProjectFile: () => 'C:\\game\\project.gdevelop',
       };
       return {
         reloaded: true,
-        fileIdentifier: 'C:\\game\\project.settings',
+        fileIdentifier: 'C:\\game\\project.gdevelop',
         catalogsRegenerated: true,
         catalogs: {
           instructions: { actions: 123 },
@@ -504,7 +517,7 @@ runtimeScene._instances.length;
         reloaded: true,
         discardedUnsavedInMemoryChanges: true,
         projectName: 'After reload',
-        projectFile: 'C:\\game\\project.settings',
+        projectFile: 'C:\\game\\project.gdevelop',
         catalogsRegenerated: true,
         catalogs: {
           instructions: { actions: 123 },
@@ -525,7 +538,7 @@ runtimeScene._instances.length;
     const bridge = makeBridge({
       getProject: () => ({
         getName: () => 'Catalog failure project',
-        getProjectFile: () => 'C:\\game\\project.settings',
+        getProjectFile: () => 'C:\\game\\project.gdevelop',
       }),
       reloadProjectAndWait: jest.fn(async () => {
         throw catalogError;
@@ -554,7 +567,7 @@ runtimeScene._instances.length;
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-import-')
     );
-    const projectFile = path.join(temporaryDirectory, 'project.settings');
+    const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = new gd.Project();
     project.setProjectFile(projectFile);
     const ensureExtensionInstalled = jest.fn(async options => {
@@ -568,7 +581,9 @@ runtimeScene._instances.length;
     const saveProjectAndWait = jest.fn(async () => {
       await writeMultiFileSourceTree({
         entryPath: projectFile,
-        files: decomposeLegacyProjectToFiles(serializeToJSObject(project)),
+        files: decomposeLegacyProjectToFiles(
+          serializeProjectWithConstants(project)
+        ),
       });
       return { saved: true };
     });
@@ -627,7 +642,7 @@ runtimeScene._instances.length;
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-unsaved-')
     );
     const project = new gd.Project();
-    project.setProjectFile(path.join(temporaryDirectory, 'project.settings'));
+    project.setProjectFile(path.join(temporaryDirectory, 'project.gdevelop'));
     const bridge = makeBridge({
       getProject: () => project,
       ensureExtensionInstalled: async options => {
@@ -1024,146 +1039,6 @@ runtimeScene._instances.length;
           ],
         }),
       ]);
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('reads and edits static data through focused MCP tools', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    const triggerUnsavedChanges = jest.fn();
-
-    try {
-      const projectWithStaticData: any = project;
-      projectWithStaticData.setStaticDataJson(
-        JSON.stringify({
-          cards: {
-            PeaShooter: { name: 'PeaShooter', price: 100 },
-          },
-        })
-      );
-
-      const bridge = makeBridge({
-        getProject: () => project,
-        getPermissions: () => ({
-          allowWriteTools: true,
-          allowCommandTools: false,
-        }),
-        triggerUnsavedChanges,
-      });
-
-      const summaryResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_get_project_summary',
-          arguments: {},
-        },
-      });
-      const summary = JSON.parse(summaryResponse.content[0].text);
-      expect(summary.staticDataSummary.topLevelKeys).toContain('cards');
-      expect(summary.staticDataSummary.placeholderExamples).toContain(
-        '{{cards.PeaShooter.price}}'
-      );
-
-      const readValueResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_get_static_data',
-          arguments: {
-            placeholder_path: '{{cards.PeaShooter.price}}',
-          },
-        },
-      });
-      const readValue = JSON.parse(readValueResponse.content[0].text);
-      expect(readValue.exists).toBe(true);
-      expect(readValue.value).toBe(100);
-
-      const resourceResponse = await bridge.handleRendererMcpRequest({
-        method: 'resources/read',
-        params: {
-          uri: 'gdevelop://project/static-data.json',
-        },
-      });
-      expect(
-        JSON.parse(resourceResponse.contents[0].text).cards.PeaShooter.price
-      ).toBe(100);
-
-      const replaceResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_set_static_data',
-          arguments: {
-            static_data: {
-              cards: {
-                Sunflower: { name: 'Sunflower', price: 50 },
-              },
-            },
-          },
-        },
-      });
-      const replaceResult = JSON.parse(replaceResponse.content[0].text);
-      expect(replaceResult.success).toBe(true);
-
-      const setValueResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_set_static_data_value',
-          arguments: {
-            placeholder_path: '{{cards.Sunflower.canUse}}',
-            value: true,
-          },
-        },
-      });
-      const setValueResult = JSON.parse(setValueResponse.content[0].text);
-      expect(setValueResult.previousExists).toBe(false);
-      expect(setValueResult.value).toBe(true);
-
-      const setObjectResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_set_static_data_value',
-          arguments: {
-            placeholder_path: '{{cards.WallNut}}',
-            value_json: '{"name":"WallNut","price":50}',
-          },
-        },
-      });
-      const setObjectResult = JSON.parse(setObjectResponse.content[0].text);
-      expect(setObjectResult.value.name).toBe('WallNut');
-
-      const deleteResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_delete_static_data_value',
-          arguments: {
-            placeholder_path: '{{cards.Sunflower.canUse}}',
-          },
-        },
-      });
-      const deleteResult = JSON.parse(deleteResponse.content[0].text);
-      expect(deleteResult.deleted).toBe(true);
-
-      const finalConfig = JSON.parse(projectWithStaticData.getStaticDataJson());
-      expect(finalConfig.cards.Sunflower.price).toBe(50);
-      expect(finalConfig.cards.Sunflower.canUse).toBeUndefined();
-      expect(finalConfig.cards.WallNut.name).toBe('WallNut');
-      expect(triggerUnsavedChanges).toHaveBeenCalledTimes(4);
-
-      const invalidPathResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_set_static_data_value',
-          arguments: {
-            placeholder_path: 'cards.Sunflower.price',
-            value: 75,
-          },
-        },
-      });
-      expect(invalidPathResponse.isError).toBe(true);
-      expect(invalidPathResponse.content[0].text).toContain(
-        'placeholder syntax'
-      );
     } finally {
       project.delete();
     }

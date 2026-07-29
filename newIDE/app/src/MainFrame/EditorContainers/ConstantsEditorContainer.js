@@ -9,40 +9,40 @@ import {
   type ObjectGroupsOutsideEditorChanges,
 } from './BaseEditor';
 import { type WillDeleteObjectChanges } from '../../EditorFunctions/OutsideEditorChanges';
-import { StaticDataEditor } from '../../StaticData/StaticDataDialog';
+import { ConstantsEditor } from '../../Constants/ConstantsDialog';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
 
-export class StaticDataEditorContainer extends React.Component<RenderEditorContainerProps> {
+export class ConstantsEditorContainer extends React.Component<RenderEditorContainerProps> {
   autoSaveChain: Promise<void> = Promise.resolve();
-  staticDataRevision: number = 0;
+  constantsRevision: number = 0;
 
-  enqueueStaticDataAutoSave = (revision: number, staticData: Object) => {
+  enqueueConstantsAutoSave = (revision: number, constants: Object) => {
     this.autoSaveChain = this.autoSaveChain
       .catch(() => {
         // Keep later edits saveable if an unexpected error escaped the callback.
       })
       .then(async () => {
-        if (revision !== this.staticDataRevision) return;
+        if (revision !== this.constantsRevision) return;
         let wasSaved = false;
         try {
-          wasSaved = await this.props.onAutoSaveStaticData(staticData);
+          wasSaved = await this.props.onAutoSaveConstants(constants);
         } catch (error) {
-          console.error('Unable to auto-save Static Data:', error);
+          console.error('Unable to auto-save Constants:', error);
         }
-        if (wasSaved || revision !== this.staticDataRevision) return;
+        if (wasSaved || revision !== this.constantsRevision) return;
 
         const { unsavedChanges } = this.props;
         if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
       });
   };
 
-  onStaticDataChanged = (staticData: Object) => {
-    this.staticDataRevision++;
-    this.enqueueStaticDataAutoSave(this.staticDataRevision, staticData);
+  onConstantsChanged = (constants: Object) => {
+    this.constantsRevision++;
+    this.enqueueConstantsAutoSave(this.constantsRevision, constants);
   };
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
@@ -114,11 +114,11 @@ export class StaticDataEditorContainer extends React.Component<RenderEditorConta
     if (!project) return null;
 
     return (
-      <StaticDataEditor project={project} onChange={this.onStaticDataChanged} />
+      <ConstantsEditor project={project} onChange={this.onConstantsChanged} />
     );
   }
 }
 
-export const renderStaticDataEditorContainer = (
+export const renderConstantsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-): React.Node => <StaticDataEditorContainer {...props} />;
+): React.Node => <ConstantsEditorContainer {...props} />;

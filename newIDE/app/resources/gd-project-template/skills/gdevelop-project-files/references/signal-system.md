@@ -198,10 +198,10 @@ Use stable, case-sensitive semantic names such as `Game.Paused`,
 an ID, or a short enum-like token; use compact JSON only for a genuine
 multi-field contract.
 
-Signal names can be centralized in Static Data, for example
+Signal names can be centralized in Constants, for example
 `{{signals.card.selected}}`, when a project needs a shared registry. Static
 Data is resolved during code generation, not at runtime. Read
-[static-data.md](static-data.md) before authoring placeholders.
+[constants.md](constants.md) before authoring placeholders.
 
 ## Debug and verify
 

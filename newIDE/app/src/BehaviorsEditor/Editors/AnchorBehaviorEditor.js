@@ -299,7 +299,7 @@ const AnchorBehaviorEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
   projectScopedContainersAccessor,
-  hideStaticDataPlaceholderHints,
+  hideConstantPlaceholderHints,
 }: Props): React.Node => {
   const behavior = behaviors[0];
   const forceUpdate = useForceUpdate();
@@ -358,7 +358,7 @@ const AnchorBehaviorEditor = ({
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
-        hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
+        hideConstantPlaceholderHints={hideConstantPlaceholderHints}
         isAdvancedSectionInitiallyUncollapsed={
           horizontalBasicAnchor === 'Advanced' ||
           verticalBasicAnchor === 'Advanced' ||

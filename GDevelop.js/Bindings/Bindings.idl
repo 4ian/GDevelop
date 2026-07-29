@@ -706,8 +706,8 @@ interface Project {
     void EnsureObjectInheritedBehaviors([Ref] gdObject objectToUpdate);
 
     [Ref] VariablesContainer GetVariables();
-    void SetStaticDataJson([Const] DOMString staticDataJson);
-    [Const, Ref] DOMString GetStaticDataJson();
+    void SetConstantsJson([Const] DOMString constantsJson);
+    [Const, Ref] DOMString GetConstantsJson();
     [Ref] ObjectsContainer GetObjects();
     [Ref] ResourcesContainer GetResourcesManager();
 

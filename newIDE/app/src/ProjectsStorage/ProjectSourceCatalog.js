@@ -5,6 +5,10 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import {
+  MULTI_FILE_ENTRY_NAME,
+  MULTI_FILE_ENTRY_URI,
+} from './MultiFileProjectFormat';
 
 const gd: libGDevelop = global.gd;
 
@@ -831,7 +835,7 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
         required: true,
         value: '2.0',
       }),
-      settingsField('entry', 'game://project.settings', {
+      settingsField('entry', MULTI_FILE_ENTRY_URI, {
         optional: true,
       }),
       ...formatFields({ kind: 'project' }),
@@ -1051,7 +1055,7 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
       rawJsonTable,
     ],
   },
-  staticData: {
+  constants: {
     rootFields: [],
     childTables: [],
     dynamicFields: {
@@ -1348,7 +1352,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'project',
     requiredMarker: { field: 'kind', value: 'project' },
-    path: 'project.settings',
+    path: MULTI_FILE_ENTRY_NAME,
     mountedNamespace: 'project',
     tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion'],
@@ -1363,7 +1367,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     ],
     forbiddenFields: [
       'resources',
-      'staticData',
+      'constants',
       'objects',
       'layouts',
       'eventsFunctionsExtensions',
@@ -1406,15 +1410,15 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     schema: SETTINGS_FILE_SCHEMAS.resources,
   },
   {
-    kind: 'static-data',
-    path: 'static-data.toml',
-    mountedNamespace: 'editor.staticData',
+    kind: 'constants',
+    path: 'constants.toml',
+    mountedNamespace: 'editor.constants',
     tomlRoot: true,
     requiredFields: [],
-    commonFields: ['arbitrary TOML-compatible static data'],
+    commonFields: ['arbitrary TOML-compatible constants'],
     note:
-      'The entire document is editor-only Static Data. Do not add format metadata or a wrapper table.',
-    schema: SETTINGS_FILE_SCHEMAS.staticData,
+      'The entire document is editor-only Constants. Do not add format metadata or a wrapper table.',
+    schema: SETTINGS_FILE_SCHEMAS.constants,
   },
   {
     kind: 'scene',
@@ -1755,7 +1759,7 @@ export const buildProjectSettingsCatalog = ({
         'Read the relevant existing settings file before editing or creating a sibling component.',
         'Use the matching fileKinds[].schema as the complete structural contract: rootFields lists root scalars and childTables recursively lists every canonical TOML table header, record field, dynamic-key rule, empty form, and type-specific schema reference. commonFields is only a search summary and is not a schema.',
         'Write component fields at the TOML root. Never repeat project, scene, extension, prefab, behavior, function, or object names in TOML table headers; the canonical physical path supplies that namespace.',
-        'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. static-data.toml is loaded separately as editor-only Static Data. Duplicate ownership is an error.',
+        'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. constants.toml is loaded separately as editor-only Constants. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
         'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
         'Write every non-empty variable container as repeated [[variables]], [[globalVariables]], or [[sceneVariables]] records. Each record contains an explicit non-empty name and the complete descriptor fields, for example name = "Controllers", type = "array", and children = [...]. Write variables = [ ], globalVariables = [ ], or sceneVariables = [ ] only for an empty container. Keyed [variables] tables, whole-container inline tables, and non-empty inline descriptor arrays are forbidden.',

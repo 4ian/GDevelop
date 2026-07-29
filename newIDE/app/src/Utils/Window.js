@@ -260,7 +260,12 @@ export default class Window {
    */
   static getArguments(): AppArguments {
     if (remote) {
-      return remote.getGlobal('args');
+      const windowArgsById = remote.getGlobal('windowArgsById');
+      const currentWindow = remote.getCurrentWindow();
+      return (
+        (windowArgsById && windowArgsById[currentWindow.id]) ||
+        remote.getGlobal('args')
+      );
     }
 
     const argumentsObject = {};

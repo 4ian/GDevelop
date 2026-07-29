@@ -15,6 +15,11 @@ import {
 } from './LocalMultiFileProject';
 import { writeProjectSourceCatalogs } from './LocalProjectWriter';
 import {
+  MULTI_FILE_ENTRY_NAME,
+  MultiFileProjectError,
+  parseConstantsFromToml,
+} from '../MultiFileProjectFormat';
+import {
   PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
@@ -111,13 +116,33 @@ const normalizeLegacyProjectWithCurrentSerializer = (
   }
 };
 
+const readConstantsSource = async (projectRoot: string): Promise<Object> => {
+  const constantsPath = path.join(projectRoot, 'constants.toml');
+  if (!fs.existsSync(constantsPath)) {
+    throw new Error(`The project is missing ${constantsPath}.`);
+  }
+  return parseConstantsFromToml(
+    await fs.promises.readFile(constantsPath, 'utf8')
+  );
+};
+
+const separateConstantsFromProject = (
+  projectWithConstants: Object
+): {| content: Object, constants: Object |} => {
+  const { constants, ...content } = projectWithConstants;
+  if (!constants || typeof constants !== 'object' || Array.isArray(constants)) {
+    throw new Error('The project has invalid Constants.');
+  }
+  return { content, constants };
+};
+
 export const onOpenWithPicker = (): Promise<?FileMetadata> => {
   return openFilePicker({
     title: 'Open a project',
     properties: ['openFile'],
     message:
       'If you want to open your GDevelop 4 project, be sure to save it as a .json file',
-    filters: [{ name: 'GDevelop project', extensions: ['settings', 'json'] }],
+    filters: [{ name: 'GDevelop project', extensions: ['gdevelop', 'json'] }],
     // $FlowFixMe[incompatible-type]
   }).then(filePath => (filePath ? { fileIdentifier: filePath } : null));
 };
@@ -126,21 +151,34 @@ export const onOpen = (
   fileMetadata: FileMetadata
 ): Promise<{|
   content: Object,
+  constants: Object,
   fileMetadata?: FileMetadata,
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
-  if (path.basename(filePath).toLowerCase() === 'project.settings') {
+  const fileName = path.basename(filePath);
+  if (fileName.toLowerCase() === MULTI_FILE_ENTRY_NAME) {
     return getLocalProjectLastModifiedDate(filePath).then(
       async lastModifiedDate => {
         await bootstrapProjectSourceCatalogs(filePath);
+        const openedProject = separateConstantsFromProject(
+          await openMultiFileProject(filePath)
+        );
         return {
-          content: await openMultiFileProject(filePath),
+          ...openedProject,
           fileMetadata: {
             ...fileMetadata,
             ...(lastModifiedDate !== null ? { lastModifiedDate } : {}),
           },
         };
       }
+    );
+  }
+  if (path.extname(filePath).toLowerCase() === '.gdevelop') {
+    return Promise.reject(
+      new MultiFileProjectError(
+        'MULTIFILE_INVALID_ENTRY',
+        `The multi-file entry must be named ${MULTI_FILE_ENTRY_NAME}.`
+      )
     );
   }
   const projectPath = path.dirname(filePath);
@@ -155,7 +193,7 @@ export const onOpen = (
         // ownership projection. Keep a finite guard against malicious cycles.
         maxUnsplitDepth: 100,
       }).then(async () => {
-        const entryPath = path.join(projectPath, 'project.settings');
+        const entryPath = path.join(projectPath, MULTI_FILE_ENTRY_NAME);
         if (fs.existsSync(entryPath)) {
           const migrationHash = await getLegacyMigrationSourceHash(entryPath);
           if (
@@ -163,14 +201,17 @@ export const onOpen = (
             migrationHash !== hashLegacySource(legacySource)
           ) {
             throw new Error(
-              'The legacy JSON and migrated project.settings have diverged. Open project.settings or import the changed JSON into a different folder.'
+              'The legacy JSON and migrated project.gdevelop have diverged. Open project.gdevelop or import the changed JSON into a different folder.'
             );
           }
           const lastModifiedDate = await getLocalProjectLastModifiedDate(
             entryPath
           );
+          const openedProject = separateConstantsFromProject(
+            await openMultiFileProject(entryPath)
+          );
           return {
-            content: await openMultiFileProject(entryPath),
+            ...openedProject,
             fileMetadata: {
               ...fileMetadata,
               fileIdentifier: entryPath,
@@ -178,19 +219,22 @@ export const onOpen = (
             },
           };
         }
-        const normalizedLegacyProject = normalizeLegacyProjectWithCurrentSerializer(
-          object
-        );
+        const content = normalizeLegacyProjectWithCurrentSerializer(object);
+        const constants = await readConstantsSource(projectPath);
         const migration = await migrateLegacyProject({
           legacyPath: filePath,
           legacySource,
-          legacyProject: normalizedLegacyProject,
+          legacyProject: {
+            ...content,
+            constants,
+          },
         });
         const lastModifiedDate = await getLocalProjectLastModifiedDate(
           migration.entryPath
         );
         return {
-          content: normalizedLegacyProject,
+          content,
+          constants,
           fileMetadata: {
             ...fileMetadata,
             fileIdentifier: migration.entryPath,
@@ -208,7 +252,7 @@ export const getMultiFileAutoSavePath = (filePath: string): string =>
     '.gdevelop',
     'autosave',
     'current',
-    'project.settings'
+    MULTI_FILE_ENTRY_NAME
   );
 
 export const getAutoSaveCreationDate = async (
@@ -217,7 +261,7 @@ export const getAutoSaveCreationDate = async (
 ): Promise<?number> => {
   const filePath = fileMetadata.fileIdentifier;
   const autoSavePath =
-    path.basename(filePath).toLowerCase() === 'project.settings'
+    path.basename(filePath).toLowerCase() === MULTI_FILE_ENTRY_NAME
       ? getMultiFileAutoSavePath(filePath)
       : filePath + '.autosave';
   if (fs.existsSync(autoSavePath)) {
@@ -254,7 +298,7 @@ export const onGetAutoSave = (
     ...fileMetadata,
     fileIdentifier:
       path.basename(fileMetadata.fileIdentifier).toLowerCase() ===
-      'project.settings'
+      MULTI_FILE_ENTRY_NAME
         ? getMultiFileAutoSavePath(fileMetadata.fileIdentifier)
         : fileMetadata.fileIdentifier + '.autosave',
   });

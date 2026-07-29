@@ -96,7 +96,7 @@ const styles = {
   },
 };
 
-const hasStaticDataPlaceholderSyntax = (value: any): boolean =>
+const hasConstantPlaceholderSyntax = (value: any): boolean =>
   typeof value === 'string' &&
   (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
 
@@ -455,8 +455,8 @@ const CompactPropertiesEditor = ({
           placeholder: mixedValues ? '(Multiple values)' : undefined,
           onChange: (newValue: string) => {
             if (
-              field.forbidStaticDataPlaceholder &&
-              hasStaticDataPlaceholderSyntax(newValue)
+              field.forbidConstantPlaceholder &&
+              hasConstantPlaceholderSyntax(newValue)
             ) {
               return;
             }

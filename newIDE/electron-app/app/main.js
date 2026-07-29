@@ -85,6 +85,10 @@ const {
   isCliProjectAlreadyOpenElsewhere,
   routeCliCommandToLiveEditor,
 } = require('./CliCommandHandoff');
+const {
+  createProjectFileOpenHandler,
+  createProjectFileWindowArgs,
+} = require('./ProjectFileOpenHandler');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -147,6 +151,15 @@ const getCommandLineArguments = commandLine =>
     isDefaultApp: !!process.defaultApp,
   });
 const args = parseGDevelopArgs(getCommandLineArguments(process.argv));
+const windowArgsById = {};
+global['args'] = args;
+global['windowArgsById'] = windowArgsById;
+
+const projectFileOpenHandler = createProjectFileOpenHandler({
+  openProjectFile: filePath =>
+    createNewWindow(createProjectFileWindowArgs(args, filePath)),
+});
+app.on('open-file', projectFileOpenHandler.handleOpenFile);
 
 const devTools = !!args['dev-tools'];
 const windowsAppIconPath = path.join(__dirname, '..', 'build', 'icon.ico');
@@ -240,11 +253,6 @@ if (!gotTheLock) {
       ) {
         return;
       }
-
-      // Update the global args so the new window's renderer (which reads them
-      // via remote.getGlobal('args')) picks up the second-instance CLI flags
-      // (e.g. --run-command, positional project file).
-      global['args'] = secondInstanceArgs;
 
       createNewWindow(secondInstanceArgs);
     }
@@ -358,6 +366,7 @@ function createNewWindow(windowArgs = args) {
   const windowId = newWindow.id;
   const windowWebContents = newWindow.webContents;
   const isPrimaryWindow = windowNumber === 0;
+  windowArgsById[windowId] = windowArgs;
   log.info(
     `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
   );
@@ -424,6 +433,7 @@ function createNewWindow(windowArgs = args) {
       });
     }
     clearWindowFileIdentifier(windowId);
+    delete windowArgsById[windowId];
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -502,6 +512,10 @@ function createNewWindow(windowArgs = args) {
   // When a child window is created (e.g. a popped-out editor), set up security
   // policies and enable @electron/remote on it.
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
+    windowArgsById[childWindow.id] = windowArgs;
+    childWindow.on('closed', () => {
+      delete windowArgsById[childWindow.id];
+    });
     require('@electron/remote/main').enable(childWindow.webContents);
 
     if (
@@ -562,11 +576,12 @@ app.on('ready', function() {
 
   registerGdideProtocol({ isDev });
 
-  // Create the first window
-  createNewWindow(args);
-
-  // Expose program arguments (to be accessed by windows)
-  global['args'] = args;
+  // Finder can deliver document-open events before Electron is ready. Open
+  // every queued project and avoid creating an unrelated blank window.
+  const openedQueuedProjectCount = projectFileOpenHandler.markReady();
+  if (openedQueuedProjectCount === 0) {
+    createNewWindow(args);
+  }
 
   Menu.setApplicationMenu(buildPlaceholderMainMenu());
 

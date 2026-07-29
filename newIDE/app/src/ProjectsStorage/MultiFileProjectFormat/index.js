@@ -16,15 +16,15 @@ import {
   decompileLayoutToml,
 } from '../LayoutToml';
 
-export const MULTI_FILE_FORMAT_VERSION = 1;
-export const MULTI_FILE_ENTRY_NAME = 'project.settings';
-export const MULTI_FILE_ENTRY_URI = 'game://project.settings';
+export const MULTI_FILE_FORMAT_VERSION = 2;
+export const MULTI_FILE_ENTRY_NAME = 'project.gdevelop';
+export const MULTI_FILE_ENTRY_URI = 'game://project.gdevelop';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
-export const MULTI_FILE_STATIC_DATA_URI = 'game://static-data.toml';
+export const MULTI_FILE_CONSTANTS_URI = 'game://constants.toml';
 
 const PROJECT_SPLIT_FIELDS = new Set([
   'resources',
-  'staticData',
+  'constants',
   'objects',
   'layouts',
   'externalEvents',
@@ -604,14 +604,14 @@ const projectTomlProjection = payload => {
   return { projected, rawJson };
 };
 
-const projectStaticDataTomlPayload = (payload, fileUri) => {
+const projectConstantsTomlPayload = (payload, fileUri) => {
   const { projected, rawJson } = projectTomlProjection(payload);
   const unsupportedPointers = Object.keys(rawJson);
   if (unsupportedPointers.length) {
     const pointer = unsupportedPointers[0] || '/';
     fail(
       'MULTIFILE_UNREPRESENTABLE_VALUE',
-      `Static Data value at ${pointer} cannot be represented directly in TOML. static-data.toml only stores TOML-compatible data.`,
+      `Constant value at ${pointer} cannot be represented directly in TOML. constants.toml only stores TOML-compatible data.`,
       fileUri
     );
   }
@@ -735,8 +735,7 @@ const normalizeLf = source =>
   source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
 
 const ownsVariableDefinitionContainers = fileUri =>
-  fileUri !== MULTI_FILE_STATIC_DATA_URI &&
-  fileUri !== MULTI_FILE_RESOURCES_URI;
+  fileUri !== MULTI_FILE_CONSTANTS_URI && fileUri !== MULTI_FILE_RESOURCES_URI;
 
 const stripTomlStructuralIndentation = source => {
   let inMultilineBasicString = false;
@@ -934,22 +933,22 @@ export const parseTomlSource = (source, fileUri = '<memory>') => {
   }
 };
 
-export const serializeStaticDataToToml = staticData =>
+export const serializeConstantsToToml = constants =>
   serializeToml(
-    projectStaticDataTomlPayload(
-      asObject(staticData, 'Static Data'),
-      MULTI_FILE_STATIC_DATA_URI
+    projectConstantsTomlPayload(
+      asObject(constants, 'Constants'),
+      MULTI_FILE_CONSTANTS_URI
     )
   );
 
-export const parseStaticDataFromToml = source =>
-  projectStaticDataTomlPayload(
+export const parseConstantsFromToml = source =>
+  projectConstantsTomlPayload(
     asObject(
-      parseTomlSource(source, MULTI_FILE_STATIC_DATA_URI),
-      'Static Data',
-      MULTI_FILE_STATIC_DATA_URI
+      parseTomlSource(source, MULTI_FILE_CONSTANTS_URI),
+      'Constants',
+      MULTI_FILE_CONSTANTS_URI
     ),
-    MULTI_FILE_STATIC_DATA_URI
+    MULTI_FILE_CONSTANTS_URI
   );
 
 const encodeUtf8Byte = byte =>
@@ -1074,7 +1073,10 @@ const projectSettingsNamespace = document => {
   let found = false;
   const visit = value => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return;
-    if (typeof value.kind === 'string' && value.settingsFormatVersion === 1) {
+    if (
+      typeof value.kind === 'string' &&
+      value.settingsFormatVersion === MULTI_FILE_FORMAT_VERSION
+    ) {
       if (found) {
         fail(
           'MULTIFILE_INVALID_SCHEMA',
@@ -1103,7 +1105,10 @@ const findOwnedSettingsPayload = document => {
   let payload = null;
   const visit = value => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return;
-    if (typeof value.kind === 'string' && value.settingsFormatVersion === 1) {
+    if (
+      typeof value.kind === 'string' &&
+      value.settingsFormatVersion === MULTI_FILE_FORMAT_VERSION
+    ) {
       if (payload) {
         fail(
           'MULTIFILE_INVALID_SCHEMA',
@@ -1584,10 +1589,10 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     });
   }
 
-  if (project.staticData !== undefined) {
-    validateGameUri(MULTI_FILE_STATIC_DATA_URI);
-    files[MULTI_FILE_STATIC_DATA_URI] = serializeStaticDataToToml(
-      asObject(project.staticData, 'Project staticData')
+  if (project.constants !== undefined) {
+    validateGameUri(MULTI_FILE_CONSTANTS_URI);
+    files[MULTI_FILE_CONSTANTS_URI] = serializeConstantsToToml(
+      asObject(project.constants, 'Project constants')
     );
   }
 
@@ -1857,7 +1862,7 @@ const parseSettings = (files, uri) => {
     ) {
       fail(
         'MULTIFILE_INVALID_LOCAL_SETTINGS',
-        'project.settings must contain a project payload at the TOML root.',
+        'project.gdevelop must contain a project payload at the TOML root.',
         uri
       );
     }
@@ -2483,7 +2488,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   ) {
     fail(
       'MULTIFILE_UNSUPPORTED_VERSION',
-      'Unsupported project.settings format marker.',
+      'Unsupported project.gdevelop format marker.',
       MULTI_FILE_ENTRY_URI
     );
   }
@@ -2493,7 +2498,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   );
   if (
     projectNamespace.kind !== 'project' ||
-    projectNamespace.settingsFormatVersion !== 1
+    projectNamespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
   ) {
     fail(
       'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2506,12 +2511,12 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     'extensionFiles',
     'externalSettings',
     'resources',
-    'staticData',
+    'constants',
   ].forEach(retiredField => {
     if (projectNamespace[retiredField] !== undefined) {
       fail(
         'MULTIFILE_INVALID_LOCAL_SETTINGS',
-        `project.settings must not contain retired ${retiredField} ownership.`,
+        `project.gdevelop must not contain retired ${retiredField} ownership.`,
         MULTI_FILE_ENTRY_URI
       );
     }
@@ -2719,7 +2724,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     if (projectNamespace.resources !== undefined) {
       fail(
         'MULTIFILE_OWNERSHIP_CONFLICT',
-        'Resources cannot be stored in both project.settings and resources.settings.',
+        'Resources cannot be stored in both project.gdevelop and resources.settings.',
         MULTI_FILE_RESOURCES_URI
       );
     }
@@ -2744,11 +2749,15 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       );
     }
   }
-  let staticDataPayload = null;
-  if (files[MULTI_FILE_STATIC_DATA_URI] !== undefined) {
-    const uri = registerUri(MULTI_FILE_STATIC_DATA_URI);
-    staticDataPayload = parseStaticDataFromToml(files[uri]);
+  if (files[MULTI_FILE_CONSTANTS_URI] === undefined) {
+    fail(
+      'MULTIFILE_MISSING_FILE',
+      'The project must contain constants.toml.',
+      MULTI_FILE_CONSTANTS_URI
+    );
   }
+  const constantsUri = registerUri(MULTI_FILE_CONSTANTS_URI);
+  const constantsPayload = parseConstantsFromToml(files[constantsUri]);
   let externalDocument = null;
   const externalSettingsUri = 'game://externals/external.settings';
   if (
@@ -3204,9 +3213,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   if (resourcesPayload) {
     project.resources = removeFormatFields(resourcesPayload);
   }
-  if (staticDataPayload) {
-    project.staticData = staticDataPayload;
-  }
+  project.constants = constantsPayload;
   project.layouts = sceneDocuments.map(
     ({ entry, uri, document, objectDocuments }) => {
       const namespace = restoreTomlPayload(
@@ -3272,7 +3279,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     if (
       namespace.kind !== 'externals' ||
-      namespace.settingsFormatVersion !== 1
+      namespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
     ) {
       fail('MULTIFILE_UNSUPPORTED_VERSION', 'Invalid externals marker.', uri);
     }

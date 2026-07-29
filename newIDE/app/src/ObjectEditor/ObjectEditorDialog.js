@@ -230,12 +230,12 @@ const InnerDialog = (props: InnerDialogProps) => {
     'intro-variables'
   );
 
-  const renderStaticDataPlaceholderHint = () => (
+  const renderConstantPlaceholderHint = () => (
     <Line>
       <Column noMargin expand>
         <AlertMessage kind="info">
           <Trans>
-            Static Data placeholders can be used here in text or number property
+            constant placeholders can be used here in text or number property
             values, and in supported scene-event condition and action
             parameters. Use {'{{cards.sunflower.price}}'} as a placeholder path.
           </Trans>
@@ -347,7 +347,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           }
         >
           {hasEventBasedObjectProperties
-            ? renderStaticDataPlaceholderHint()
+            ? renderConstantPlaceholderHint()
             : null}
           <EditorComponent
             objectConfiguration={object.getConfiguration()}
@@ -392,7 +392,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'behaviors' && (
         <Column noMargin expand useFullHeight noOverflowParent>
           {hasEventBasedBehaviorProperties
-            ? renderStaticDataPlaceholderHint()
+            ? renderConstantPlaceholderHint()
             : null}
           <BehaviorsEditor
             object={object}

@@ -1036,72 +1036,6 @@ const firstLayoutSchema = {
   additionalProperties: true,
 };
 
-const staticDataReadSchema = {
-  type: 'object',
-  properties: {
-    placeholder_path: {
-      type: 'string',
-      description:
-        'Optional exact Static Data placeholder path to read, for example {{cards.Sunflower.price}}. Omit to read the complete Static Data object.',
-    },
-  },
-  additionalProperties: false,
-};
-
-const staticDataReplaceSchema = {
-  type: 'object',
-  properties: {
-    static_data: {
-      type: 'object',
-      description:
-        'Complete replacement static data object. The root must be a JSON object.',
-      additionalProperties: true,
-    },
-    static_data_json: {
-      type: 'string',
-      description:
-        'Alternative complete Static Data replacement as a JSON string. The root must be an object.',
-    },
-    include_static_data: {
-      type: 'boolean',
-      description:
-        'When true, include the written Static Data object in the response.',
-    },
-  },
-  additionalProperties: true,
-};
-
-const staticDataValueSchema = {
-  type: 'object',
-  properties: {
-    placeholder_path: {
-      type: 'string',
-      description:
-        'Exact static data placeholder path, for example {{cards.Sunflower.price}}. Placeholder syntax is required.',
-    },
-    value: {
-      description:
-        'JSON value to write at placeholder_path. Use a number/boolean/object/array for typed Static Data values, or a string for text values.',
-    },
-    value_json: {
-      type: 'string',
-      description:
-        'Alternative value as a JSON string, useful for explicitly writing objects, arrays, null, numbers, or booleans.',
-    },
-  },
-  required: ['placeholder_path'],
-  additionalProperties: true,
-};
-
-const staticDataDeleteSchema = {
-  type: 'object',
-  properties: {
-    placeholder_path: staticDataValueSchema.properties.placeholder_path,
-  },
-  required: ['placeholder_path'],
-  additionalProperties: false,
-};
-
 const put2dInstancesSchema = {
   type: 'object',
   properties: {
@@ -3748,12 +3682,6 @@ const readTools: Array<McpTool> = [
     },
   },
   {
-    name: 'gdevelop_get_static_data',
-    description:
-      'Read the project Static Data map. Omit placeholder_path for the full object, or pass an exact placeholder path such as {{cards.Sunflower.price}} to read one value.',
-    inputSchema: staticDataReadSchema,
-  },
-  {
     name: 'gdevelop_list_scenes',
     description: 'List all scenes/layouts in the current GDevelop project.',
     inputSchema: emptyObjectSchema,
@@ -3836,7 +3764,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'validate_project_files',
     description:
-      'Load the current local multi-file project from project.settings, regenerate all catalogs and public JavaScript declaration files, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory, validate JavaScript event blocks against the generated context-aware API, then validate through GDevelop and preflight generated extension JavaScript. strict=true JavaScript API violations block validation; compatibility blocks report semantic warnings while syntax errors still block. valid:true proves structural, JavaScript authoring-API, and code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop authoring files, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
+      'Load the current local multi-file project from project.gdevelop, regenerate all catalogs and public JavaScript declaration files, reload the sources using the fresh instruction catalog, reconstruct the legacy game.json representation in memory, validate JavaScript event blocks against the generated context-aware API, then validate through GDevelop and preflight generated extension JavaScript. strict=true JavaScript API violations block validation; compatibility blocks report semantic warnings while syntax errors still block. valid:true proves structural, JavaScript authoring-API, and code-generation validity only; it does NOT verify runtime gameplay semantics, object picking, or action side effects. Accepts no inputs, writes only generated .gdevelop authoring files, does not reload editor memory, and reports the blocking file, error code, line, column, and source excerpt when available. Call this after direct project-file edits and require valid:true before reload_project, then runtime-test behavior-sensitive changes with a paused preview and run_frames.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -4529,24 +4457,6 @@ const writeTools: Array<McpTool> = [
     inputSchema: firstLayoutSchema,
   },
   {
-    name: 'gdevelop_set_static_data',
-    description:
-      'Replace the project Static Data map with a complete JSON object in the open editor model. Prefer gdevelop_set_static_data_value for small focused edits.',
-    inputSchema: staticDataReplaceSchema,
-  },
-  {
-    name: 'gdevelop_set_static_data_value',
-    description:
-      'Set one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}. Creates missing parent objects/arrays as needed.',
-    inputSchema: staticDataValueSchema,
-  },
-  {
-    name: 'gdevelop_delete_static_data_value',
-    description:
-      'Delete one Static Data value by exact placeholder path such as {{cards.Sunflower.price}}.',
-    inputSchema: staticDataDeleteSchema,
-  },
-  {
     name: 'snapshot_project',
     description:
       'Take an in-memory snapshot of the WHOLE project (a coarse checkpoint for transaction-style safety). Call before a risky multi-step build; if a later step fails, restore_project_snapshot rolls back. Session-scoped (lost on reload) and NOT a disk save. Returns a snapshot_id.',
@@ -5121,59 +5031,6 @@ const toolUsageExamples: { [string]: Array<Object> } = {
         max_fps: 120,
         orientation: 'landscape',
         scale_mode: 'linear',
-      },
-    },
-  ],
-  gdevelop_get_static_data: [
-    {
-      description: 'Read the full Static Data object.',
-      arguments: {},
-    },
-    {
-      description: 'Read one Static Data value by placeholder path.',
-      arguments: {
-        placeholder_path: '{{cards.Sunflower.price}}',
-      },
-    },
-  ],
-  gdevelop_set_static_data: [
-    {
-      description: 'Replace the full Static Data object.',
-      arguments: {
-        static_data: {
-          cards: {
-            Sunflower: {
-              name: 'Sunflower',
-              price: 50,
-              canUse: true,
-            },
-          },
-        },
-      },
-    },
-  ],
-  gdevelop_set_static_data_value: [
-    {
-      description: 'Set one numeric Static Data value.',
-      arguments: {
-        placeholder_path: '{{cards.Sunflower.price}}',
-        value: 50,
-      },
-    },
-    {
-      description:
-        'Set one object Static Data value from JSON text when the MCP client cannot pass a nested value directly.',
-      arguments: {
-        placeholder_path: '{{cards.Sunflower}}',
-        value_json: '{"name":"Sunflower","price":50,"canUse":true}',
-      },
-    },
-  ],
-  gdevelop_delete_static_data_value: [
-    {
-      description: 'Delete one Static Data value.',
-      arguments: {
-        placeholder_path: '{{cards.Sunflower.previewObjectName}}',
       },
     },
   ],
@@ -6792,10 +6649,6 @@ const EXPOSED_MCP_TOOL_NAMES: Set<string> = new Set([
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
-  'gdevelop_get_static_data',
-  'gdevelop_set_static_data',
-  'gdevelop_set_static_data_value',
-  'gdevelop_delete_static_data_value',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
   'gdevelop_inspect_signal_usage',
@@ -6953,7 +6806,6 @@ export const getCapabilitiesSummary = (
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_project_summary',
-      'gdevelop_get_static_data',
       'gdevelop_list_scenes',
       'gdevelop_list_objects',
       'gdevelop_get_editor_selection',
@@ -7034,9 +6886,6 @@ export const getCapabilitiesSummary = (
     ],
     'Variables & scenes': [
       'add_or_edit_variable',
-      'gdevelop_set_static_data',
-      'gdevelop_set_static_data_value',
-      'gdevelop_delete_static_data_value',
       'delete_scene_variable',
       'batch_delete_scene_variables',
       'delete_object_variable',
@@ -7080,7 +6929,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, Static Data editing, and preview debugging. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
+      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, synchronization, validation, and preview debugging. There are no Constants MCP tools: the AI model must read and modify constants.toml directly on disk. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

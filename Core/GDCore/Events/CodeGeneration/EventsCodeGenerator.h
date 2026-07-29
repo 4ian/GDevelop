@@ -381,10 +381,10 @@ class GD_CORE_API EventsCodeGenerator {
   const gd::Layout& GetLayout() const { return *scene; }
 
   /**
-   * \brief Replace project static data placeholders in a string when the
+   * \brief Replace project constants placeholders in a string when the
    * current context allows it, and add a diagnostic for missing paths.
    */
-  gd::String ResolveStaticDataPlaceholders(
+  gd::String ResolveConstantPlaceholders(
       const gd::String& plainString,
       gd::EventsCodeGenerationContext& context);
 

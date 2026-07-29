@@ -101,11 +101,15 @@ export type StorageProviderOperations = {|
   onOpen?: (
     fileMetadata: FileMetadata,
     onProgress?: (progress: number, message: MessageDescriptor) => void
-  ) => Promise<{
-    content: Object,
-    /** A storage adapter can redirect an opened legacy source to its migrated entry. */
-    fileMetadata?: FileMetadata,
-  }>,
+  ) => Promise<
+    $ReadOnly<{
+      content: Object,
+      /** Constants parsed from the separately persisted constants.toml file. */
+      constants?: Object,
+      /** A storage adapter can redirect an opened legacy source to its migrated entry. */
+      fileMetadata?: FileMetadata,
+    }>
+  >,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
   getWriteErrorMessage?: (error: Error) => MessageDescriptor,
 
@@ -171,9 +175,9 @@ export type StorageProviderOperations = {|
     project: gdProject,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  /** Persist the editor-only Static Data source without saving the project. */
-  onAutoSaveStaticData?: (
-    staticData: Object,
+  /** Persist the editor-only Constants source without saving the project. */
+  onAutoSaveConstants?: (
+    constants: Object,
     fileMetadata: FileMetadata
   ) => Promise<boolean>,
   getAutoSaveCreationDate?: (
@@ -189,7 +193,7 @@ export type StorageProviderOperations = {|
 export type StorageProvider = {|
   internalName: string,
   name: MessageDescriptor,
-  /** Native multi-artifact support is required to store project.settings projects. */
+  /** Native multi-artifact support is required to store project.gdevelop projects. */
   multiFileProjectSupport?: 'native' | 'archive' | 'none',
   needUserAuthentication?: boolean,
   hiddenInOpenDialog?: boolean,

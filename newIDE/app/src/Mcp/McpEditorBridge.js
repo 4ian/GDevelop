@@ -18,6 +18,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
+  MULTI_FILE_ENTRY_NAME,
   decomposeLegacyProjectToFiles,
   parseTomlSource,
 } from '../ProjectsStorage/MultiFileProjectFormat';
@@ -139,11 +140,6 @@ import {
 import {
   setFirstLayout,
   setProjectProperties,
-  getStaticData,
-  setStaticData,
-  setStaticDataValue,
-  deleteStaticDataValue,
-  summarizeStaticData,
   snapshotProject,
   restoreProjectSnapshot,
   applyValidatedProjectJsonPatch,
@@ -841,7 +837,6 @@ const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
       defaultCapabilityInferred:
         'Behavior is a default GDevelop object capability surfaced by the object API; read_serialized_scene may still show behaviors: [] because only explicit serialized behaviors are stored there.',
     },
-    staticDataSummary: summarizeStaticData(project),
     ...simplifiedProject,
   };
 };
@@ -5057,14 +5052,6 @@ const getResourceContent = async (
     };
   }
 
-  if (uri === 'gdevelop://project/static-data.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(getStaticData(project, {}).staticData, null, 2),
-    };
-  }
-
   if (uri === 'gdevelop://project/extensions-summary') {
     return {
       uri,
@@ -5446,9 +5433,12 @@ const callMcpTool = async ({
         }
       );
     }
-    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'generate-catalogs requires a local multi-file project whose entry file is project.settings.',
+        'generate-catalogs requires a local multi-file project whose entry file is project.gdevelop.',
         {
           catalogsRegenerated: false,
           phase: 'locate-project-files',
@@ -5522,9 +5512,12 @@ const callMcpTool = async ({
         }
       );
     }
-    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'validate_project_files requires a local multi-file project whose entry file is project.settings.',
+        'validate_project_files requires a local multi-file project whose entry file is project.gdevelop.',
         {
           valid: false,
           phase: 'locate-project-files',
@@ -5535,7 +5528,7 @@ const callMcpTool = async ({
               phase: 'locate-project-files',
               code: 'PROJECT_FILES_INVALID_ENTRY',
               message:
-                'The open project is not using project.settings as its entry file.',
+                'The open project is not using project.gdevelop as its entry file.',
               filePath: projectFile,
             },
           ],
@@ -5752,9 +5745,12 @@ const callMcpTool = async ({
       return errorResult('extension_name must not exceed 128 characters.');
     }
     const projectFile = project.getProjectFile();
-    if (!/[\\/]project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'import_extension requires a saved multi-file project whose entry file is project.settings.'
+        'import_extension requires a saved multi-file project whose entry file is project.gdevelop.'
       );
     }
 
@@ -5894,15 +5890,6 @@ const callMcpTool = async ({
     return textResult(
       truncateText(serializeToJSON(project), args.maxLength || undefined)
     );
-  }
-
-  if (toolName === 'gdevelop_get_static_data') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(getStaticData(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
   }
 
   if (toolName === 'read_game_project_json') {
@@ -7065,36 +7052,6 @@ const callMcpTool = async ({
       }
       return textResult(
         result.success && !result.dryRun
-          ? withStaleStateAdvisory(
-              result,
-              context,
-              getStaleStateTargetForTool(toolName, args, result)
-            )
-          : result
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  let staticDataWriteToolHandler = null;
-  if (toolName === 'gdevelop_set_static_data') {
-    staticDataWriteToolHandler = setStaticData;
-  } else if (toolName === 'gdevelop_set_static_data_value') {
-    staticDataWriteToolHandler = setStaticDataValue;
-  } else if (toolName === 'gdevelop_delete_static_data_value') {
-    staticDataWriteToolHandler = deleteStaticDataValue;
-  }
-
-  if (staticDataWriteToolHandler) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const result = staticDataWriteToolHandler(project, args || {});
-      if (result.didModifyProject !== false) {
-        context.triggerUnsavedChanges();
-      }
-      return textResult(
-        result.didModifyProject !== false
           ? withStaleStateAdvisory(
               result,
               context,

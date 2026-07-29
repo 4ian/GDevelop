@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -11,12 +11,14 @@ Treat project files as authoritative. Modify them directly; do not use MCP to
 author the game. The sole authoring-related exception is `import_extension`:
 use it once to import and convert an official legacy extension into canonical
 multi-file sources, then continue by editing those generated files directly.
+There are no dedicated Constants MCP tools. Read and modify `constants.toml`
+directly.
 
 Read, in order:
 
-1. `project.settings` for project metadata and non-static-data project data.
+1. `project.gdevelop` for project metadata and non-constants project data.
 2. `resources.settings` for the complete project resource registry.
-3. `static-data.toml` for the complete editor-only Static Data object.
+3. `constants.toml` for the complete editor-only Constants object.
 4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
@@ -119,8 +121,8 @@ generated compatibility/runtime output, not multi-file source.
   keep named `points` and `customCollisionMask` vertices as inline arrays of
   point tables. Never expand point data into long dotted TOML headers. For
   example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
-- `static-data.toml`: the entire root document is editor-only Static Data.
-  Author data directly, with no `[settings]`, `[staticData]`, format-version,
+- `constants.toml`: the entire root document is editor-only Constants.
+  Author data directly, with no `[settings]`, `[constants]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: standard flat TOML containing placement/layout data only:
   `[layout]`, optional `[editor]`, and short `[[layers]]`, `[[effects]]`,
@@ -130,7 +132,7 @@ generated compatibility/runtime output, not multi-file source.
   owning `.settings` object definition. Follow the matching layout-catalog
   `contexts` entry and `tables` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
-- References: use canonical `game://...` URIs rooted at `project.settings`.
+- References: use canonical `game://...` URIs rooted at `project.gdevelop`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
   there. Use `instructions-catalog.json` as the only source for constructing
   new event instructions. `deprecated-instructions-catalog.json` exists only
@@ -160,7 +162,7 @@ order.
 Give every global, scene, default-prefab, and variant-prefab object its own
 `<Object>.settings` file directly under the owner's flat `objects/` directory. Put
 the complete object definition there, including behaviors, variables, effects,
-and type-specific configuration. `project.settings`, `scene.settings`, and
+and type-specific configuration. `project.gdevelop`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
@@ -178,9 +180,9 @@ grouping in the function settings `folder` array. `prefab.settings` and
 ## Project layout
 
 ```text
-project.settings
+project.gdevelop
 resources.settings
-static-data.toml
+constants.toml
 objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
@@ -232,8 +234,8 @@ Load only the references required by the task:
   full before creating or changing any `@js` event. Use only the generated
   public declarations, author new blocks with `strict=true`, and preserve
   compatibility mode only for existing legacy JavaScript.
-- Read [references/static-data.md](references/static-data.md) in full
-  whenever the user asks to create, edit, reorganize, or consume Static Data,
+- Read [references/constants.md](references/constants.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Constants,
   or to add/change a `{{...}}` placeholder. Also read the events guide for an
   event consumer and the extension guide when injecting config into a prefab,
   behavior, or reusable extension.
@@ -242,7 +244,7 @@ Load only the references required by the task:
   communication, `SignalReceived`, signal payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
-  the Static Data guide too when signal names use placeholders.
+  the Constants guide too when signal names use placeholders.
 - Read
   [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
   before converting or merging glTF/GLB assets or importing a `.glb` exported
@@ -444,6 +446,9 @@ asset is appropriate.
 
 MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
+Constants are outside this MCP surface. The AI model must author them by
+reading and editing `constants.toml` directly.
+
 - Importing and converting an official legacy extension with
   `import_extension`. This is the only MCP tool allowed to create project
   source. It must return the generated source paths; all later adaptation is a
@@ -537,9 +542,9 @@ Before finishing:
 - For every changed JavaScript event, confirm `strict=true`, validate all
   context globals/project literals/public members against both generated
   `.d.ts` files, and confirm no forbidden private or ambient API is used.
-- For Static Data changes, confirm `static-data.toml` ownership, direct-root
+- For Constants changes, confirm `constants.toml` ownership, direct-root
   TOML data, placeholder paths/types, and regeneration-time behavior
-  against the Static Data reference.
+  against the Constants reference.
 - For signal changes, confirm target kind, receiver kind, fixed `onSignal`
   signature, guarded emission, next-dispatch timing, and preview signal-monitor
   evidence against the signal-system reference.

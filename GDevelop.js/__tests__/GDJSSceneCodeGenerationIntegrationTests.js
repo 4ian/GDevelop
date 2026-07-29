@@ -187,9 +187,9 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     project.delete();
   });
 
-  it('replaces static data placeholders in string action and condition parameters for scene and external events', function () {
+  it('replaces constants placeholders in string action and condition parameters for scene and external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.setStaticDataJson(
+    project.setConstantsJson(
       JSON.stringify({
         labels: {
           scene: 'Scene label',
@@ -312,9 +312,9 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     project.delete();
   });
 
-  it('replaces static data placeholders in extension event actions and conditions', function () {
+  it('replaces constants placeholders in extension event actions and conditions', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.setStaticDataJson(
+    project.setConstantsJson(
       JSON.stringify({
         labels: {
           extension: 'Extension label',

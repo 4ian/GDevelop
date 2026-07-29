@@ -3,7 +3,7 @@
 ## TOML settings, flat layout TOML, and IfDo event source files
 
 **Status:** Version 1.0 implemented format contract
-**Entry file:** `project.settings`
+**Entry file:** `project.gdevelop`
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
 **Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
@@ -18,7 +18,7 @@
 3. [Codebase compatibility basis](#3-codebase-compatibility-basis)
 4. [Canonical directory layout](#4-canonical-directory-layout)
 5. [Common file rules](#5-common-file-rules)
-6. [`project.settings`, `resources.settings`, and `static-data.toml`](#6-projectsettings-resourcessettings-and-static-datatoml)
+6. [`project.gdevelop`, `resources.settings`, and `constants.toml`](#6-projectgdevelop-resourcessettings-and-constantstoml)
 7. [Scene files](#7-scene-files)
 8. [Extension files](#8-extension-files)
 9. [Prefab files](#9-prefab-files)
@@ -101,7 +101,7 @@ phase 5 before they can store this directory format natively.
     mounted documents are then recursively merged with conflicts rejected.
 12. **Managed source references are project-root URIs.** Settings refer to
     `.layout` and `.events` sources with canonical `game://...` URIs rooted at
-    the directory containing `project.settings`, never relative paths. A
+    the directory containing `project.gdevelop`, never relative paths. A
     `.settings` file never references another `.settings` file.
 13. **Settings stay separate on disk.** A settings file never includes or
     embeds another settings file. The editor creates the combined settings
@@ -135,9 +135,9 @@ The current optional folder-project mode is not this format. It still writes JSO
 
 ```text
 MyGame/
-  project.settings
+  project.gdevelop
   resources.settings
-  static-data.toml
+  constants.toml
 
   objects/
     Player.settings                 # folder = ["Shared"]
@@ -214,7 +214,7 @@ MyGame/
 
 All settings fragments at the fixed paths defined below, plus the `.layout`
 and `.events` sources they reference, are managed project source.
-`project.settings` and `extension.settings` do not enumerate or reference
+`project.gdevelop` and `extension.settings` do not enumerate or reference
 other settings files. `.gdevelop/` is editor state and should normally be
 ignored by Git.
 
@@ -226,10 +226,10 @@ both; the two files remain independent unless both are listed in
 
 ### 4.1 Required files
 
-- One `project.settings` entry file and one `resources.settings` resource
+- One `project.gdevelop` entry file and one `resources.settings` resource
   registry at the project root.
-- One root `static-data.toml` whenever the serialized project contains a
-  `staticData` subtree, including an empty one.
+- One root `constants.toml`, including an empty document when the project has
+  no Constants.
 - One `objects/<Object>.settings` file for every global
   object definition.
 - Exactly one scene subfolder containing `scene.settings`, one `.layout`, and
@@ -365,7 +365,7 @@ identity come from the owning `.settings` document and canonical path.
 
 All `.settings` files are combined in this deterministic dependency order:
 
-1. `project.settings`.
+1. `project.gdevelop`.
 2. `resources.settings`.
 3. Root object settings in global object order.
 4. `externals/external.settings`, when that fixed path exists.
@@ -377,11 +377,11 @@ All `.settings` files are combined in this deterministic dependency order:
 8. Each prefab's flat default and variant object settings in object order.
 9. Each prefab and behavior's flat function settings in function order.
 
-`static-data.toml` is parsed separately as editor-only Static Data. It is not
+`constants.toml` is parsed separately as editor-only Constants. It is not
 mounted into or merged with the combined project settings document.
 
 The loader discovers settings fragments only from the fixed paths
-`resources.settings`, `static-data.toml`,
+`resources.settings`, `constants.toml`,
 `objects/*.settings`, `scenes/*/scene.settings`,
 `scenes/*/objects/*.settings`,
 `externals/external.settings`,
@@ -436,7 +436,7 @@ Every `.settings` file remains an independent canonical TOML file when stored:
   inverse ownership projection and writes each changed subtree only to its
   owning file.
 - Editing `scene.settings`, `function.settings`, or another child fragment does
-  not rewrite `project.settings` or `extension.settings`. Component identity,
+  not rewrite `project.gdevelop` or `extension.settings`. Component identity,
   source references, and order are written in the component's own fragment.
 - The editor must not materialize a combined `.settings` file for preview,
   export, autosave, or caching. A recovery snapshot may store fragments, but it
@@ -449,8 +449,8 @@ error.
 Additional rules for stored fragments and their combined shape:
 
 - Every settings file owns exactly one local component document. The physical
-  path supplies its unique mounted namespace. `project.settings` keeps format
-  bootstrap scalars at its root. The separate `static-data.toml` document contains
+  path supplies its unique mounted namespace. `project.gdevelop` keeps format
+  bootstrap scalars at its root. The separate `constants.toml` document contains
   only direct-root user data and has no format metadata or wrapper table.
 - A file must not declare or reopen a table owned by another settings file.
 - There are no `sceneFiles`, `extensionFiles`, `functionFiles`, `prefabFiles`,
@@ -710,8 +710,8 @@ Rules for `rawJson`:
   TOML parser overflow while preserving the exact legacy JSON number.
 - Unknown raw pointers are preserved, not discarded.
 
-`static-data.toml` is deliberately simpler: it has no raw-JSON fallback or reserved
-metadata namespace. Every Static Data value must be directly representable
+`constants.toml` is deliberately simpler: it has no raw-JSON fallback or reserved
+metadata namespace. Every Constant value must be directly representable
 in TOML. JSON `null`, heterogeneous arrays, dates, non-finite numbers, and
 unsafe integers are rejected rather than encoded behind user data.
 
@@ -758,7 +758,7 @@ layout = "game://scenes/Main/Main.layout"
 events = "game://scenes/Main/Main.events"
 ```
 
-`game://` identifies the root directory containing `project.settings`. It is a
+`game://` identifies the root directory containing `project.gdevelop`. It is a
 project-source URI scheme, not a network URL and not an operating-system path.
 The text after `game://` is a root-relative project path.
 
@@ -781,7 +781,7 @@ Canonical and safety rules:
 
 Stored reference examples include `game://externals/Shared%20Combat.events` and
 `game://extensions/Combat/functions/CalculateDamage/CalculateDamage.events`.
-The loader may use `game://project.settings` and other settings URIs internally
+The loader may use `game://project.gdevelop` and other settings URIs internally
 for identity and diagnostics, but it never serializes one settings URI inside
 another settings fragment.
 
@@ -791,14 +791,15 @@ settings.
 
 ---
 
-## 6. `project.settings`, `resources.settings`, and `static-data.toml`
+## 6. `project.gdevelop`, `resources.settings`, and `constants.toml`
 
 ### 6.1 Ownership
 
-The entry file owns the current project root except these split containers:
+The entry file owns the current project root except these split containers and
+editor-only sources:
 
 - `resources`
-- `staticData`
+- `constants`
 - `objects`
 - `layouts`
 - `externalEvents`
@@ -810,8 +811,8 @@ groups, global variables, and first/preview scene selection. Individual global
 object definitions are discovered from the root `objects/` directory.
 The sibling `resources.settings` owns the complete
 legacy `resources` container, including resource entries, origins, metadata,
-and resource folders. The sibling `static-data.toml` owns the complete editor-only,
-TOML-compatible Static Data object.
+and resource folders. The sibling `constants.toml` owns the complete editor-only,
+TOML-compatible Constants object.
 
 ### 6.2 Example
 
@@ -819,7 +820,7 @@ TOML-compatible Static Data object.
 combinedSettingsFormatVersion = 1
 eventsDslVersion = "2.0"
 kind = "project"
-settingsFormatVersion = 1
+settingsFormatVersion = 2
 firstLayout = "Main"
 previewLayout = "Main"
 initialGDVersion = ""
@@ -855,10 +856,10 @@ orientation = "default"
 Real entry files also contain `[objectGroups]` and either repeated
 `[[variables]]` records or `variables = [ ]`.
 Global object definitions and resources are never
-written in `project.settings`. No settings file may contain a legacy
+written in `project.gdevelop`. No settings file may contain a legacy
 `objectsFolderStructure` table.
-Static Data is likewise never written there; it belongs to
-`static-data.toml`.
+Constants is likewise never written there; it belongs to
+`constants.toml`.
 
 ### 6.3 Global object settings
 
@@ -908,7 +909,7 @@ userAdded = true
 references the other. The `kind` and `settingsFormatVersion` fields are removed
 when composing the legacy `resources` object.
 
-### 6.5 `static-data.toml` example
+### 6.5 `constants.toml` example
 
 ```toml
 [sheet.row]
@@ -920,27 +921,27 @@ column = "second"
 column2 = "third"
 ```
 
-`static-data.toml` is discovered at its fixed root path and is never referenced by
+`constants.toml` is discovered at its fixed root path and is never referenced by
 another source file. The entire document is user-defined configuration: it has
-no `[settings]` or `[staticData]` wrapper and no `settingsFormatVersion`
+no `[settings]` or `[constants]` wrapper and no `settingsFormatVersion`
 marker. Unsupported TOML value shapes are rejected. A user-defined `rawJson`
 key is ordinary data with no serializer meaning.
 
-The editor auto-saves Static Data changes directly to `static-data.toml` after a
-short debounce. This isolated save does not rewrite `project.settings` or any
+The editor auto-saves Constants changes directly to `constants.toml` after a
+short debounce. This isolated save does not rewrite `project.gdevelop` or any
 other owned source. The normal project-save transaction also writes
-`static-data.toml` from the in-memory Static Data as a fallback.
+`constants.toml` from the in-memory Constants as a fallback.
 
 ### 6.6 Root rules
 
-- `project.settings` contains no reference to any `.settings` file, including
+- `project.gdevelop` contains no reference to any `.settings` file, including
   no self-reference. Its fixed root filename is the entry marker.
-- `project.settings` must not contain resources in canonical output.
+- `project.gdevelop` must not contain resources in canonical output.
   `resources.settings` is mounted as the sole writer of `project.resources`.
-- `project.settings` must not contain static data in canonical output.
-  `static-data.toml` is loaded separately into the editor's Static Data model and
+- `project.gdevelop` must not contain constants in canonical output.
+  `constants.toml` is loaded separately into the editor's Constants model and
   is not part of the combined settings merge.
-- `project.settings` must not contain global objects in canonical output.
+- `project.gdevelop` must not contain global objects in canonical output.
   Each global object owns one flat root object settings file.
 - Root `eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
   intentionally rejected rather than rewritten during multi-file loading;
@@ -959,9 +960,10 @@ other owned source. The normal project-save transaction also writes
 - `firstLayout` and `previewLayout`, when present, must name a scene.
 - The root entry does not store content hashes. Hashes belong in ignored editor state so editing one event file does not force a root-file Git conflict.
 
-### 6.7 Legacy composition
+### 6.7 In-memory composition
 
-The composer removes format-only fields and creates:
+The composer removes format-only fields and returns project content separately
+from the parsed Constants payload. The project content has this shape:
 
 ```json
 {
@@ -971,7 +973,6 @@ The composer removes format-only fields and creates:
   "objects": [],
   "objectsGroups": [],
   "variables": [],
-  "staticData": {},
   "firstLayout": "Main",
   "previewLayout": "Main",
   "layouts": [],
@@ -986,10 +987,11 @@ locally owned order. The four split arrays are filled in locally owned order:
 scenes from `scene.settings`, extensions from `extension.settings`, and both
 external containers from `external.settings`.
 
-The compatibility adapter temporarily attaches the `static-data.toml` value to the
-in-memory authoring project so existing editor placeholder tooling can use it.
-Generated `.gdevelop/game.json` and runtime exports omit `staticData`;
-supported placeholders are resolved before runtime data is written.
+The storage loader initializes `gd::Project::constantsJson` from the separate
+parsed `constants.toml` payload after the project content is unserialized.
+Generated `.gdevelop/game.json`, in-memory project JSON, and runtime exports
+contain no Constants map; supported placeholders are resolved before runtime
+data is written.
 
 ---
 
@@ -1170,7 +1172,7 @@ write the three source files independently.
   error.
 - All three files must resolve inside the discovered scene subfolder.
 - Scene rename changes the settings namespace, the three filenames, and project
-  event references in one transaction; `project.settings` has no scene-file
+  event references in one transaction; `project.gdevelop` has no scene-file
   index entry to update.
 
 ---
@@ -1615,9 +1617,9 @@ Its `name`, `linkedScene`, and order come from the corresponding
 Composition produces an in-memory object equivalent to current project JSON. It does not need to write that object into the project directory.
 
 ```text
-project.settings
+project.gdevelop
   + resources.settings
-  + static-data.toml (editor-only placeholder source)
+  + constants.toml (editor-only placeholder source)
   + scene settings
   + visual scene layouts
   + compiled scene events
@@ -1634,10 +1636,10 @@ project.settings
 
 | New source                                                                 | Legacy destination                                                                                                          |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `project.settings` ordinary payload                                        | Project root excluding resources, static data, global object definitions, and four split arrays                             |
+| `project.gdevelop` ordinary payload                                        | Project root excluding resources, constants, global object definitions, and four split arrays                             |
 | Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
 | `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
-| `static-data.toml` direct root                                             | Editor-only Static Data object without adding or removing user keys                                                         |
+| `constants.toml` direct root                                             | Editor-only Constants object without adding or removing user keys                                                         |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
 | `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
 | `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
@@ -1658,7 +1660,7 @@ two logical passes:
    source in its owner context, and resolve every pure `.events` body through
    its owning settings document and path-derived namespace.
 2. Build a skeleton legacy tree with scenes, objects, variables, resources
-   from `resources.settings`, editor-only static data from `static-data.toml`, extension
+   from `resources.settings`, editor-only constants from `constants.toml`, extension
    declarations, behaviors, prefabs, and function signatures, but empty event
    bodies.
 3. Unserialize the skeleton into a temporary project/context and load required platform extensions.
@@ -1685,20 +1687,20 @@ and validated after bootstrap. The DSL has no `@exact` fallback.
 
 ## 14. Editor open flow
 
-### 14.1 Opening `project.settings`
+### 14.1 Opening `project.gdevelop`
 
 1. Resolve and validate the entry path.
-2. Parse `project.settings` and validate its local-root format and project markers.
+2. Parse `project.gdevelop` and validate its local-root format and project markers.
 3. Discover settings fragments at the fixed folder paths, enforce project-root
    containment, bootstrap-parse each fragment, and sort every ordered
    component kind by its locally owned `order` value.
 4. Mount all local `.settings` documents by path in the deterministic order
    from section 5.1.2 and strictly merge the transient
    `CombinedProjectSettings` as the authoritative compilation input. Parse
-   `static-data.toml` separately into the editor-only Static Data model.
+   `constants.toml` separately into the editor-only Constants model.
 5. Validate fragment identities, duplicate namespaces/paths, ordering, owner
    relationships, required pairs, and `settingsFormatVersion` for marker-bearing
-   component fragments. Validate `static-data.toml` by its fixed path, direct-root
+   component fragments. Validate `constants.toml` by its fixed path, direct-root
    TOML-compatible data, and absence of serializer wrapper/metadata tables.
 6. Resolve all authoritative layout/events URIs, then read those sources with
    a bounded concurrency limit.
@@ -1708,10 +1710,29 @@ and validated after bootstrap. The DSL has no `@exact` fallback.
 9. Compile every `.events` file and collect source-mapped diagnostics.
 10. Compose the legacy serializer tree.
 11. Run the existing project-content validation and `gd::Project::UnserializeFrom` path.
-12. Set the project file to the absolute `project.settings` path.
+12. Set the project file to the absolute `project.gdevelop` path.
 13. Start file watching only after a successful load.
 
 The storage-provider result may continue returning a legacy-shaped `content` object to `MainFrame` initially. This keeps the existing `gd.Serializer.fromJSObject` and project load code unchanged.
+
+### 14.1.1 Desktop document opening
+
+Packaged desktop builds register `.gdevelop` as an editable GDevelop project
+document with MIME type `application/x-gdevelop-project`. Double-clicking
+`project.gdevelop` routes the selected path through the same local storage
+provider and validation flow as File > Open.
+
+Windows and Linux deliver the associated document as the first positional
+application argument. macOS delivers Finder document launches through
+Electron's `open-file` event. The main process queues macOS document paths
+received before application readiness and opens those projects instead of an
+unrelated blank window. Later document-open events create project windows
+immediately. Each main window retains its own launch arguments so concurrent
+document requests cannot overwrite another window's project path.
+
+The file association covers `*.gdevelop`, but the format still requires the
+exact canonical basename `project.gdevelop`; another basename is rejected as an
+invalid multi-file entry.
 
 ### 14.2 Errors
 
@@ -1740,14 +1761,14 @@ The editor tracks last-read hashes in `.gdevelop/state.json`.
 
 Only dirty owned files are serialized. Editing
 `scenes/Main/Main.events` should not rewrite `scene.settings`, `Main.layout`,
-unrelated extensions, or `project.settings`.
+unrelated extensions, or `project.gdevelop`.
 
 | Editor mutation                                                                                       | Source file marked dirty                                         |
 | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Project properties, global object groups, and global variables                                        | `project.settings`                                               |
+| Project properties, global object groups, and global variables                                        | `project.gdevelop`                                               |
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
-| Editor-only Static Data                                                                               | `static-data.toml`                                               |
+| Editor-only Constants                                                                               | `constants.toml`                                               |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
 | A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
 | Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
@@ -1845,7 +1866,7 @@ Rename, add/remove, migration, and refactors may touch many files. They use a jo
 3. Verify every staged file.
 4. Move content files into place.
 5. Replace owning settings fragments.
-6. Replace `project.settings` last when root project configuration changes.
+6. Replace `project.gdevelop` last when root project configuration changes.
 7. Mark the journal committed.
 8. Remove only obsolete files previously tracked as owned editor sources.
 
@@ -1878,7 +1899,7 @@ Existing split references are fully unsplit before conversion.
 
 ### 16.2 One-time migration algorithm
 
-When a legacy project is opened and no associated `project.settings` exists:
+When a legacy project is opened and no associated `project.gdevelop` exists:
 
 1. Read and retain the original JSON tree and source hash.
 2. Unsplit existing folder-project references.
@@ -1900,7 +1921,7 @@ When a legacy project is opened and no associated `project.settings` exists:
 11. Compare a canonical legacy serialization of the verified project against the normalized source project, allowing only documented normalization differences.
 12. Commit the new tree transactionally.
 13. Leave the original legacy JSON byte-for-byte unchanged.
-14. Switch editor metadata and recent-project history to `project.settings`.
+14. Switch editor metadata and recent-project history to `project.gdevelop`.
 
 No user edit is accepted into the newly loaded project until step 12 succeeds.
 
@@ -1920,7 +1941,7 @@ This metadata does not make the JSON an active source.
 
 ### 16.4 Reopening the legacy file
 
-- If its hash matches an existing migration marker, the editor redirects to `project.settings`.
+- If its hash matches an existing migration marker, the editor redirects to `project.gdevelop`.
 - If the legacy file changed after migration, the editor must not overwrite the new project. It reports two diverged sources and offers an explicit import-as-new or continue-with-new-project decision.
 - If conversion failed, no entry file is committed and the legacy file remains usable through the old reader.
 
@@ -1929,7 +1950,7 @@ This metadata does not make the JSON an active source.
 Writing a user-selected legacy JSON outside `.gdevelop/` is an explicit
 compatibility export, not normal Save. It composes current sources, validates
 them, and writes the selected `.json`. The editor continues tracking
-`project.settings`; the ignored `.gdevelop/game.json` snapshot is separate.
+`project.gdevelop`; the ignored `.gdevelop/game.json` snapshot is separate.
 
 ### 16.6 Official extension import boundary
 
@@ -1964,7 +1985,7 @@ failed import must not be replaced with a partial hand-authored conversion.
 
 The editor already holds a `gd::Project` built from the source tree. Existing preview launchers and `gdjs::Exporter::SerializeProjectData` use that object unchanged.
 
-If preview is configured to reload the saved project from disk, the storage provider first composes `project.settings` exactly as the normal open flow does, then creates the preview project through the existing unserializer.
+If preview is configured to reload the saved project from disk, the storage provider first composes `project.gdevelop` exactly as the normal open flow does, then creates the preview project through the existing unserializer.
 
 ### 17.2 Export
 
@@ -1993,7 +2014,7 @@ a project filename:
 3. Pass the generated path only to that compatibility boundary.
 
 Generated legacy JSON must stay under `.gdevelop/`. It must not be written
-beside `project.settings`, watched as source, added to recent projects, or
+beside `project.gdevelop`, watched as source, added to recent projects, or
 committed to Git.
 
 ---
@@ -2034,8 +2055,8 @@ Moving a function or entity changes owner identity and may change generated inst
 ## 19. Git and merge behavior
 
 - Canonical output avoids timestamps and random formatting changes in source files.
-- `project.settings` does not change when scenes, extensions, functions,
-  prefabs, behaviors, resources, or static-data values are added, removed,
+- `project.gdevelop` does not change when scenes, extensions, functions,
+  prefabs, behaviors, resources, or constants values are added, removed,
   reordered, renamed, or edited; each component owns that configuration
   locally.
 - Function bodies, scene events, and layouts produce isolated diffs.
@@ -2096,7 +2117,10 @@ Raw legacy blocks are data. They are never evaluated as code by the source loade
 
 ### Phase 3: local storage integration
 
-- Add `project.settings` to the local file picker and project-location logic.
+- Add `project.gdevelop` to the local file picker and project-location logic.
+- Register `.gdevelop` with packaged desktop builds and route Windows/Linux
+  positional document paths plus macOS `open-file` events into the local
+  opener.
 - Route open/save/autosave/file watching through the multi-file provider.
 - Keep `MainFrame` consuming a composed content object initially.
 - Add dirty-component tracking and transactional writes.
@@ -2208,18 +2232,18 @@ proven reliable.
 
 A conforming implementation must satisfy all of the following:
 
-1. Opening `project.settings` discovers `resources.settings`,
-   `static-data.toml`, and the other fixed settings fragments, then reconstructs
+1. Opening `project.gdevelop` discovers `resources.settings`,
+   `constants.toml`, and the other fixed settings fragments, then reconstructs
    a complete current project without runtime changes.
 2. Opening legacy JSON converts once, commits atomically, preserves the original, and switches the editor to the new entry.
 3. Normal Save writes new-format source files plus ignored generated artifacts
    under `.gdevelop/`; it never recreates an editable root legacy JSON.
 4. `resources.settings` exclusively owns the project resource registry and is
-   combined without a reference from `project.settings`.
-5. `static-data.toml` exclusively owns direct-root, editor-only Static Data,
+   combined without a reference from `project.gdevelop`.
+5. `constants.toml` exclusively owns direct-root, editor-only Constants,
    has no format metadata or wrapper table, and is loaded separately without a
-   reference from or merge into `project.settings`. Generated compatibility
-   JSON and runtime exports omit the Static Data map.
+   reference from or merge into `project.gdevelop`. Generated compatibility
+   JSON and runtime exports omit the Constants map.
 6. Every scene has its own subfolder with `scene.settings`, a placement-focused
    layout TOML file, an events DSL file, and flat object
    settings. Object definitions and their behaviors belong to individual

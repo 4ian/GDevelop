@@ -98,7 +98,7 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
-  onInvalidStaticDataPlaceholder: () => void,
+  onInvalidConstantPlaceholder: () => void,
   onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 

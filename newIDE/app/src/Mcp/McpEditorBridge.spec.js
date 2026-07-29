@@ -783,20 +783,48 @@ runtimeScene._instances.length;
     );
   });
 
-  it('imports an extension through the native host and returns generated multi-file sources', async () => {
+  it('imports a reviewed extension with JavaScript warnings and returns generated multi-file sources', async () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-import-')
     );
     const projectFile = path.join(temporaryDirectory, 'project.gdevelop');
     const project = new gd.Project();
     project.setProjectFile(projectFile);
-    const ensureExtensionInstalled = jest.fn(async options => {
+    const ensureExtensionInstalled: any = jest.fn(async (options: any) => {
+      const compatibility = await options.preflightExtension({
+        serializedExtension: {
+          name: 'StarRatingBar',
+          eventsFunctions: [
+            {
+              name: 'FormatRating',
+              events: [
+                {
+                  type: 'BuiltinCommonInstructions::JsCode',
+                  useStrict: true,
+                  inlineCode: 'const broken = ;',
+                },
+              ],
+            },
+          ],
+          eventsBasedBehaviors: [],
+          eventsBasedObjects: [],
+        },
+        registryHeader: { name: 'StarRatingBar', version: '1.0.0' },
+      });
+      expect(compatibility.valid).toBe(true);
+      expect(compatibility.errors).toEqual([]);
+      expect(compatibility.warnings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: 'JS_API_SYNTAX_ERROR' }),
+        ])
+      );
       const extension = project.insertNewEventsFunctionsExtension(
         options.extensionName,
         0
       );
       extension.getEventsFunctions().insertNewEventsFunction('FormatRating', 0);
       options.onExtensionInstalled([options.extensionName]);
+      return { installed: true, preflightReceipts: [compatibility] };
     });
     const saveProjectAndWait = jest.fn(async () => {
       await writeMultiFileSourceTree({
@@ -842,6 +870,18 @@ runtimeScene._instances.length;
         alreadyInstalled: false,
         importedExtensions: ['StarRatingBar'],
         persistedSourcesVerified: true,
+        compatibility: expect.objectContaining({
+          policy: 'reviewed-store-extension',
+          preflightedBeforeMutation: true,
+          receipts: [
+            expect.objectContaining({
+              valid: true,
+              warnings: expect.arrayContaining([
+                expect.objectContaining({ code: 'JS_API_SYNTAX_ERROR' }),
+              ]),
+            }),
+          ],
+        }),
       })
     );
     expect(result.generatedSources.StarRatingBar).toContain(
@@ -857,7 +897,7 @@ runtimeScene._instances.length;
     fs.rmSync(temporaryDirectory, { recursive: true, force: true });
   });
 
-  it('blocks an incompatible registry extension before project mutation or saving', async () => {
+  it('blocks a registry extension with mismatched downloaded identity before project mutation or saving', async () => {
     const temporaryDirectory = fs.mkdtempSync(
       path.join(os.tmpdir(), 'gdevelop-mcp-extension-preflight-')
     );
@@ -867,19 +907,8 @@ runtimeScene._instances.length;
     const ensureExtensionInstalled: any = jest.fn(async options => {
       const compatibility = await options.preflightExtension({
         serializedExtension: {
-          name: 'Raycaster3D',
-          eventsFunctions: [
-            {
-              name: 'Raycast',
-              events: [
-                {
-                  type: 'BuiltinCommonInstructions::JsCode',
-                  useStrict: true,
-                  inlineCode: 'const broken = ;',
-                },
-              ],
-            },
-          ],
+          name: 'DifferentExtension',
+          eventsFunctions: [],
           eventsBasedBehaviors: [],
           eventsBasedObjects: [],
         },

@@ -82,11 +82,6 @@ type DraggedSpriteItem = {|
   thumbnail: string,
 |};
 
-// On touch screens, only start dragging a sprite if the finger stayed on it
-// for a while: quicker movements are scrolling the list. The delay is kept
-// well under the long press opening the context menu (600ms).
-const TOUCH_DRAG_START_DELAY = 300; // ms
-
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget<DraggedSpriteItem>(
   'sprite-editor-sprites-list',
   { vibrate: 100 }
@@ -661,19 +656,6 @@ const SpritesList = ({
     [selectUniqueSprite, dragDropManager]
   );
 
-  const touchStartTimeRef = React.useRef<number>(0);
-  const canDragSprite = React.useCallback(() => {
-    const timeSinceTouchStart = Date.now() - touchStartTimeRef.current;
-    // If a touch recently started on a sprite, this drag attempt comes from
-    // that touch gesture (the drag is attempted at most a few hundred
-    // milliseconds after the touch starts). Otherwise, it's a mouse drag,
-    // which can start immediately.
-    if (timeSinceTouchStart < 2000) {
-      return timeSinceTouchStart >= TOUCH_DRAG_START_DELAY;
-    }
-    return true;
-  }, []);
-
   const spritesCount = direction.getSpritesCount();
   const hasMoreThanOneSprite = spritesCount > 1;
 
@@ -715,7 +697,7 @@ const SpritesList = ({
                 }}
                 endDrag={stopAutoScroll}
                 // If there is only one sprite, don't make it draggable.
-                canDrag={() => hasMoreThanOneSprite && canDragSprite()}
+                canDrag={() => hasMoreThanOneSprite}
                 // Only allow moving sprites within the same direction.
                 canDrop={item => item.directionPtr === direction.ptr}
                 drop={() => dropBeforeSprite(i)}
@@ -725,12 +707,7 @@ const SpritesList = ({
                     <div style={styles.spriteAndIndicator}>
                       {isOver && canDrop && <ColumnDropIndicator />}
                       {connectDragSource(
-                        <div
-                          style={styles.spriteDragSource}
-                          onTouchStart={() => {
-                            touchStartTimeRef.current = Date.now();
-                          }}
-                        >
+                        <div style={styles.spriteDragSource}>
                           <ImageThumbnail
                             selectable
                             selected={!!selectedSprites.current[sprite.ptr]}

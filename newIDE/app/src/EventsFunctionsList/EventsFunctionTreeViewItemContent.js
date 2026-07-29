@@ -290,15 +290,16 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  onSelect(): void {
+  // Must stay side-effect free: also triggered when a drag starts.
+  onSelect(): void {}
+
+  onClick(): void {
     this.props.onSelectEventsFunction(
       this.functionFolderOrFunction.getFunction(),
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
   }
-
-  onClick(): void {}
 
   rename(newName: string): void {
     const eventsFunction = this.functionFolderOrFunction.getFunction();

@@ -1,5 +1,60 @@
 describe('Physics3DRuntimeBehavior', () => {
   describe('data normalization', () => {
+    it('resolves the shared-data normalizer from the gdjs namespace', () => {
+      const originalJolt = window.Jolt;
+      const originalNormalizer = gdjs.normalizePhysics3DSharedData;
+      const sentinelError = new Error('shared normalizer called');
+      window.Jolt = {
+        Vec3: class {},
+        RVec3: class {},
+        Quat: class {},
+      };
+      gdjs.normalizePhysics3DSharedData = () => {
+        throw sentinelError;
+      };
+
+      try {
+        expect(
+          () => new gdjs.Physics3DSharedData({}, { name: 'Physics3D' })
+        ).to.throwException((error) => {
+          expect(error).to.be(sentinelError);
+        });
+      } finally {
+        gdjs.normalizePhysics3DSharedData = originalNormalizer;
+        window.Jolt = originalJolt;
+      }
+    });
+
+    it('resolves the behavior-data normalizer from the gdjs namespace', () => {
+      const originalNormalizer = gdjs.normalizePhysics3DBehaviorData;
+      const sentinelError = new Error('behavior normalizer called');
+      gdjs.normalizePhysics3DBehaviorData = () => {
+        throw sentinelError;
+      };
+
+      try {
+        expect(
+          () =>
+            new gdjs.Physics3DRuntimeBehavior(
+              {
+                getGame: () => ({
+                  isInGameEdition: () => false,
+                }),
+              },
+              {
+                name: 'Physics3D',
+                type: 'Physics3D::Physics3DBehavior',
+              },
+              {}
+            )
+        ).to.throwException((error) => {
+          expect(error).to.be(sentinelError);
+        });
+      } finally {
+        gdjs.normalizePhysics3DBehaviorData = originalNormalizer;
+      }
+    });
+
     it('applies finite Physics3D shared defaults', () => {
       const normalized = gdjs.normalizePhysics3DSharedData({
         name: 'Physics3D',

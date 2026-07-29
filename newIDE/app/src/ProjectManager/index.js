@@ -1860,7 +1860,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         globalObjectsItemId,
-                        i18n._(t`Global objects`),
+                        i18n._(t`Objects`),
                         openProjectGlobalsDialog,
                         'res/icons_default/global_object24_black.svg'
                       )

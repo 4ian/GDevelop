@@ -38,12 +38,19 @@ const getNpmScriptCommand = ({
   const npmCommand = installDependencies
     ? `npm install --no-audit --no-fund && ${runScriptCommand}`
     : runScriptCommand;
-  return openFolderAfterSuccess
-    ? `${npmCommand} && ${getOpenFolderCommand(
-        openFolderAfterSuccess,
-        platform
-      )}`
-    : npmCommand;
+  if (!openFolderAfterSuccess) {
+    return npmCommand;
+  }
+
+  const openFolderCommand = getOpenFolderCommand(
+    openFolderAfterSuccess,
+    platform
+  );
+  // Opening the output folder is best effort. In particular, Explorer can
+  // return a failure status after handing the request to an existing process.
+  const ignoreOpenFolderFailureCommand =
+    platform === 'win32' ? 'cmd /c exit 0' : 'true';
+  return `${npmCommand} && (${openFolderCommand} || ${ignoreOpenFolderFailureCommand})`;
 };
 
 const launchNpmScriptInTerminal = (

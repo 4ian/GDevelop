@@ -100,6 +100,23 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/events-tools/keyboard-key-definitions.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DDataNormalizer.js',
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.js',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/jolt-physics.wasm.wasm',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/networktools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/objecttools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/signaltools.js',

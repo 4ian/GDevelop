@@ -98,7 +98,8 @@ namespace gdjs {
       [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
-      const normalizedSharedData = normalizePhysics3DSharedData(sharedData);
+      const normalizedSharedData =
+        gdjs.normalizePhysics3DSharedData(sharedData);
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
       this.gravityX = normalizedSharedData.gravityX;
       this.gravityY = normalizedSharedData.gravityY;
@@ -426,7 +427,7 @@ namespace gdjs {
       owner: gdjs.RuntimeObject3D
     ) {
       super(instanceContainer, behaviorData, owner);
-      behaviorData = normalizePhysics3DBehaviorData(behaviorData);
+      behaviorData = gdjs.normalizePhysics3DBehaviorData(behaviorData);
       if (behaviorData.invalidFields.length > 0) {
         warnPhysics3DOnce(
           `behavior:${behaviorData.name || ''}`,

@@ -61,6 +61,13 @@ namespace gdjs {
     return object._modelResourceName;
   };
 
+  const physics3DWarnings = new Set<string>();
+  const warnPhysics3DOnce = (key: string, message: string): void => {
+    if (physics3DWarnings.has(key)) return;
+    physics3DWarnings.add(key);
+    console.warn(message);
+  };
+
   /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
     gravityX: float;
@@ -91,12 +98,21 @@ namespace gdjs {
       [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+      const normalizedSharedData = normalizePhysics3DSharedData(sharedData);
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
-      this.gravityX = sharedData.gravityX;
-      this.gravityY = sharedData.gravityY;
-      this.gravityZ = sharedData.gravityZ;
-      this.worldScale = sharedData.worldScale;
+      this.gravityX = normalizedSharedData.gravityX;
+      this.gravityY = normalizedSharedData.gravityY;
+      this.gravityZ = normalizedSharedData.gravityZ;
+      this.worldScale = normalizedSharedData.worldScale;
       this.worldInvScale = 1 / this.worldScale;
+      if (normalizedSharedData.invalidFields.length > 0) {
+        warnPhysics3DOnce(
+          `shared:${sharedData && sharedData.name ? sharedData.name : ''}`,
+          `[PHYSICS3D_MISSING_SHARED_DEFAULT] Physics3D shared data contained missing or invalid fields (${normalizedSharedData.invalidFields.join(
+            ', '
+          )}). Editor defaults were applied before creating the physics world.`
+        );
+      }
 
       // Initialize Jolt
       const settings = new Jolt.JoltSettings();
@@ -410,6 +426,17 @@ namespace gdjs {
       owner: gdjs.RuntimeObject3D
     ) {
       super(instanceContainer, behaviorData, owner);
+      behaviorData = normalizePhysics3DBehaviorData(behaviorData);
+      if (behaviorData.invalidFields.length > 0) {
+        warnPhysics3DOnce(
+          `behavior:${behaviorData.name || ''}`,
+          `[PHYSICS3D_INVALID_BEHAVIOR_NUMBER] Physics3D behavior "${
+            behaviorData.name || ''
+          }" contained missing or invalid fields (${behaviorData.invalidFields.join(
+            ', '
+          )}). Editor defaults were applied.`
+        );
+      }
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
         this
       );
@@ -426,18 +453,18 @@ namespace gdjs {
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
-      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
-      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
-      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
-      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
-      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
-      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
-      this.density = Math.max(0.0001, behaviorData.density);
-      this.massOverride = behaviorData.massOverride || 0;
+      this.shapeOffsetX = behaviorData.shapeOffsetX;
+      this.shapeOffsetY = behaviorData.shapeOffsetY;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ;
+      this.density = behaviorData.density;
+      this.massOverride = behaviorData.massOverride;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
-      this.linearDamping = Math.max(0, behaviorData.linearDamping);
-      this.angularDamping = Math.max(0, behaviorData.angularDamping);
+      this.linearDamping = behaviorData.linearDamping;
+      this.angularDamping = behaviorData.angularDamping;
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;

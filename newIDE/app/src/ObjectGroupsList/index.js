@@ -100,7 +100,7 @@ type Props = {|
   objectGroups: gdObjectGroupsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   selectedObjectGroup: gdObjectGroup | null,
-  onSelectObjectGroup: gdObjectGroup => void,
+  onSelectObjectGroup: (gdObjectGroup | null) => void,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
   onCreateGroup: () => void,
@@ -394,6 +394,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         if (treeViewRef.current)
           treeViewRef.current.openItems([globalGroupsRootFolderId]);
+        // Clear the group selection now, before actually removing the group
+        // from the scene (which destroys it), to avoid keeping a stale
+        // reference to it.
+        onSelectObjectGroup(null);
         globalObjectGroups.insert(
           group,
           typeof index === 'number' ? index : globalObjectGroups.count()
@@ -411,6 +415,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       [
         globalObjectGroups,
         objectGroups,
+        onSelectObjectGroup,
         onObjectGroupModified,
         beforeSetAsGlobalGroup,
         projectScopedContainersAccessor,
@@ -729,6 +734,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                     {({ height }) => (
                       // $FlowFixMe[incompatible-type]
                       <TreeView
+                        enableStickyAncestors
                         key={listKey}
                         ref={treeViewRef}
                         items={treeViewData}

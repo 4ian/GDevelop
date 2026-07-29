@@ -1,6 +1,7 @@
 // @flow
 
-import { serializeToJSON } from './Serializer';
+import { serializeToJSObject } from './Serializer';
+import { serializeConstantsToToml } from '../ProjectsStorage/MultiFileProjectFormat';
 
 const CLOUD_PROJECT_AUTOSAVE_CACHE_KEY = 'gdevelop-cloud-project-autosave';
 const objectStoreScope = 'cloud-project-autosaves';
@@ -177,11 +178,21 @@ class ProjectCache {
     });
   }
 
-  async get(cacheKey: ProjectCacheKey): Promise<string | null> {
+  async get(
+    cacheKey: ProjectCacheKey
+  ): Promise<{| project: string, constantsToml: string |} | null> {
     const entry = await this._getEntry(cacheKey);
-    if (!entry) return null;
-    const serializedProject = entry.project;
-    return serializedProject;
+    if (
+      !entry ||
+      typeof entry.project !== 'string' ||
+      typeof entry.constantsToml !== 'string'
+    ) {
+      return null;
+    }
+    return {
+      project: entry.project,
+      constantsToml: entry.constantsToml,
+    };
   }
 
   async getCreationDate(cacheKey: ProjectCacheKey): Promise<number | null> {
@@ -207,7 +218,10 @@ class ProjectCache {
         };
         transaction.objectStore(objectStoreScope).put({
           [keyName]: key,
-          project: serializeToJSON(project),
+          project: JSON.stringify(serializeToJSObject(project)),
+          constantsToml: serializeConstantsToToml(
+            JSON.parse(project.getConstantsJson())
+          ),
           createdAt: Date.now(),
         });
       } catch (error) {

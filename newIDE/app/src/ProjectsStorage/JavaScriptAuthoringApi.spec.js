@@ -7,6 +7,7 @@ import {
   collectSourceFileJavaScriptBlocks,
   validateJavaScriptAuthoringBlocks,
   validateProjectJavaScriptAuthoring,
+  validateReviewedExtensionJavaScriptAuthoring,
 } from './JavaScriptAuthoringApi';
 
 const serializedProject = {
@@ -187,6 +188,28 @@ if (bullet) bullet.addPolarForce(0, 720, 1);
     expect(validation.strictBlocks).toBe(1);
   });
 
+  test('exposes pointer-lock and bounded 3D raycast facades to strict code', () => {
+    const validation = validateProjectJavaScriptAuthoring({
+      serializedProject,
+      sourceFiles: {
+        'game://scenes/Main/Main.events': `@js objects="Player" strict=true
+gdjs.evtTools.input.requestPointerLock(runtimeScene, "first-person-camera");
+if (gdjs.evtTools.input.isPointerLocked(runtimeScene)) {
+  gdjs.evtTools.input.exitPointerLock(runtimeScene);
+}
+const hits = gdjs.evtTools.scene3d.raycastObjects(
+  0, 0, 0, 1, 0, 0, objects, 0, 1000, true
+);
+if (hits.length > 0) hits[0].object.setX(hits[0].pointX);
+@end js
+`,
+      },
+    });
+
+    expect(validation.valid).toBe(true);
+    expect(validation.errors).toEqual([]);
+  });
+
   test('rejects stale project literals in a known scene context', () => {
     const validation = validateProjectJavaScriptAuthoring({
       serializedProject,
@@ -254,6 +277,83 @@ objects[0]._behaviorData;
     expect(validation.warnings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ code: 'JS_API_PRIVATE_MEMBER' }),
+      ])
+    );
+  });
+
+  test('limits reviewed registry compatibility to pinned downloaded content', () => {
+    const serializedExtension = {
+      name: 'MousePointerLock',
+      eventsFunctions: [
+        {
+          name: 'Request',
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              useStrict: true,
+              inlineCode:
+                'document.body.requestPointerLock(); runtimeScene._instances;',
+            },
+          ],
+        },
+      ],
+      eventsBasedBehaviors: [],
+      eventsBasedObjects: [],
+    };
+    const validation = validateReviewedExtensionJavaScriptAuthoring({
+      serializedExtension,
+      registryHeader: { name: 'MousePointerLock', version: '1.2.3' },
+    });
+
+    expect(validation.valid).toBe(true);
+    expect(validation.provenanceVerified).toBe(true);
+    expect(validation.contentHash).toHaveLength(64);
+    expect(validation.errors).toEqual([]);
+    expect(validation.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'EXTENSION_REVIEWED_COMPATIBILITY_PROFILE',
+        }),
+        expect.objectContaining({ code: 'JS_API_FORBIDDEN_GLOBAL' }),
+        expect.objectContaining({ code: 'JS_API_PRIVATE_MEMBER' }),
+      ])
+    );
+
+    const spoofed = validateReviewedExtensionJavaScriptAuthoring({
+      serializedExtension,
+      registryHeader: { name: 'DifferentExtension', version: '1.2.3' },
+    });
+    expect(spoofed.valid).toBe(false);
+    expect(spoofed.code).toBe('EXTENSION_STRICT_API_INCOMPATIBLE');
+  });
+
+  test('keeps syntax failures blocking for reviewed extensions', () => {
+    const validation = validateReviewedExtensionJavaScriptAuthoring({
+      serializedExtension: {
+        name: 'Raycaster3D',
+        eventsFunctions: [
+          {
+            name: 'Raycast',
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::JsCode',
+                useStrict: true,
+                inlineCode: 'const broken = ;',
+              },
+            ],
+          },
+        ],
+        eventsBasedBehaviors: [],
+        eventsBasedObjects: [],
+      },
+      registryHeader: { name: 'Raycaster3D', version: '2.0.0' },
+    });
+
+    expect(validation.valid).toBe(false);
+    expect(validation.code).toBe('EXTENSION_STRICT_API_INCOMPATIBLE');
+    expect(validation.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'JS_API_SYNTAX_ERROR' }),
       ])
     );
   });

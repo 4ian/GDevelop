@@ -57,7 +57,7 @@ type Props = {|
   project?: ?gdProject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
-  hideStaticDataPlaceholderHints?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const styles = {
@@ -80,47 +80,46 @@ const styles = {
   },
 };
 
-const staticDataPlaceholderExample = '{{cards.sunflower.price}}';
+const constantPlaceholderExample = '{{cards.sunflower.price}}';
 
-const hasStaticDataPlaceholderSyntax = (value: any): boolean =>
+const hasConstantPlaceholderSyntax = (value: any): boolean =>
   typeof value === 'string' &&
   (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
 
-const isExactStaticDataPlaceholder = (value: string): boolean =>
+const isExactConstantPlaceholder = (value: string): boolean =>
   /^\s*\{\{\s*[^{}]+\s*\}\}\s*$/.test(value);
 
-const isValidNumberOrStaticDataPlaceholder = (value: string): boolean => {
-  if (isExactStaticDataPlaceholder(value)) return true;
-  if (hasStaticDataPlaceholderSyntax(value)) return false;
+const isValidNumberOrConstantPlaceholder = (value: string): boolean => {
+  if (isExactConstantPlaceholder(value)) return true;
+  if (hasConstantPlaceholderSyntax(value)) return false;
 
   const numberValue = parseFloat(value);
   return !isNaN(numberValue);
 };
 
-const getStaticDataPlaceholderErrorText = (
+const getConstantPlaceholderErrorText = (
   field: ValueField,
   value: any
 ): React.Node => {
   const valueAsString = value == null ? '' : '' + value;
-  if (!hasStaticDataPlaceholderSyntax(valueAsString)) return null;
+  if (!hasConstantPlaceholderSyntax(valueAsString)) return null;
 
-  if (field.forbidStaticDataPlaceholder) {
+  if (field.forbidConstantPlaceholder) {
     return (
       <Trans>
-        Static Data placeholders can only be edited from the object editor
-        window.
+        constant placeholders can only be edited from the object editor window.
       </Trans>
     );
   }
 
   if (
     field.valueType === 'number' &&
-    !isExactStaticDataPlaceholder(valueAsString)
+    !isExactConstantPlaceholder(valueAsString)
   ) {
     return (
       <Trans>
         Use a whole placeholder for number properties, for example{' '}
-        {staticDataPlaceholderExample}.
+        {constantPlaceholderExample}.
       </Trans>
     );
   }
@@ -234,7 +233,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
-  hideStaticDataPlaceholderHints,
+  hideConstantPlaceholderHints,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -307,9 +306,9 @@ const PropertiesEditor = ({
       } else if (field.valueType === 'number') {
         const { setValue, getEndAdornment, getRawValue, setRawValue } = field;
         const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
-        const allowStaticDataPlaceholder = !!field.allowStaticDataPlaceholder;
+        const allowConstantPlaceholder = !!field.allowConstantPlaceholder;
         const value =
-          allowStaticDataPlaceholder && getRawValue
+          allowConstantPlaceholder && getRawValue
             ? getRawValue(instances[0])
             : getFieldValue({ instances, field });
         return (
@@ -321,21 +320,21 @@ const PropertiesEditor = ({
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
             hintText={
-              allowStaticDataPlaceholder && !hideStaticDataPlaceholderHints
-                ? staticDataPlaceholderExample
+              allowConstantPlaceholder && !hideConstantPlaceholderHints
+                ? constantPlaceholderExample
                 : undefined
             }
-            errorText={getStaticDataPlaceholderErrorText(field, value)}
+            errorText={getConstantPlaceholderErrorText(field, value)}
             onChange={newValue => {
-              if (allowStaticDataPlaceholder) {
+              if (allowConstantPlaceholder) {
                 if (!setRawValue) return;
-                if (!isValidNumberOrStaticDataPlaceholder(newValue)) return;
+                if (!isValidNumberOrConstantPlaceholder(newValue)) return;
 
                 instances.forEach(i => setRawValue(i, newValue));
                 _onInstancesModified(instances);
                 return;
               }
-              if (hasStaticDataPlaceholderSyntax(newValue)) return;
+              if (hasConstantPlaceholderSyntax(newValue)) return;
 
               const newNumberValue = parseFloat(newValue);
               // If the value is not a number, the user is probably still typing, adding a dot or a comma.
@@ -344,7 +343,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
-            type={allowStaticDataPlaceholder ? 'text' : 'number'}
+            type={allowConstantPlaceholder ? 'text' : 'number'}
             style={styles.field}
             disabled={getDisabled({ instances, field, mixedValues: false })}
             endAdornment={
@@ -421,12 +420,12 @@ const PropertiesEditor = ({
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
                 hintText={
-                  field.allowStaticDataPlaceholder &&
-                  !hideStaticDataPlaceholderHints
-                    ? staticDataPlaceholderExample
+                  field.allowConstantPlaceholder &&
+                  !hideConstantPlaceholderHints
+                    ? constantPlaceholderExample
                     : undefined
                 }
-                errorText={getStaticDataPlaceholderErrorText(
+                errorText={getConstantPlaceholderErrorText(
                   field,
                   getFieldValue({
                     instances,
@@ -436,8 +435,8 @@ const PropertiesEditor = ({
                 )}
                 onChange={newValue => {
                   if (
-                    field.forbidStaticDataPlaceholder &&
-                    hasStaticDataPlaceholderSyntax(newValue)
+                    field.forbidConstantPlaceholder &&
+                    hasConstantPlaceholderSyntax(newValue)
                   ) {
                     return;
                   }
@@ -478,7 +477,7 @@ const PropertiesEditor = ({
       instances,
       getFieldDescription,
       _onInstancesModified,
-      hideStaticDataPlaceholderHints,
+      hideConstantPlaceholderHints,
     ]
   );
 
@@ -751,9 +750,7 @@ const PropertiesEditor = ({
                   mode="row"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
-                  hideStaticDataPlaceholderHints={
-                    hideStaticDataPlaceholderHints
-                  }
+                  hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                 />
               )}
             </UnsavedChangesContext.Consumer>
@@ -785,9 +782,7 @@ const PropertiesEditor = ({
                   mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
-                  hideStaticDataPlaceholderHints={
-                    hideStaticDataPlaceholderHints
-                  }
+                  hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                 />
               )}
             </UnsavedChangesContext.Consumer>

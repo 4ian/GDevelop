@@ -62,6 +62,9 @@ describe('SimplifiedProject', () => {
           "firstLayout": "",
           "gameResolutionHeight": 600,
           "gameResolutionWidth": 800,
+          "name": "Project",
+          "orientation": "landscape",
+          "scaleMode": "linear",
         },
         "resources": Array [
           Object {

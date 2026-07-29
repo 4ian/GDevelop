@@ -23,7 +23,7 @@ Core/GDCore authoring model and event AST
 Read `docs/Architecture.md` for the detailed engineering reference and
 `Core/GDevelop-Architecture-Overview.md` for the shorter upstream overview.
 This checkout has important branch-specific behavior: multi-file
-`project.settings` projects, strict layout TOML and IfDo event sources, Static
+`project.gdevelop` projects, strict layout TOML and IfDo event sources, Static
 Data placeholder compilation, extra preview/export validation, deterministic
 single-object checks, and a queued runtime signal bus.
 
@@ -111,13 +111,13 @@ because the agent does not wait for the result.
 | Editor UI/workflow bug | The domain directory under `newIDE/app/src` | `MainFrame` orchestration, borrowed WASM object ownership, nearby `*.spec.js` |
 | Scene editor display/selection, not exported game rendering | `newIDE/app/src/SceneEditor`, `InstancesEditor`, `ObjectsRendering` | The extension's registered editor renderer; do not patch the runtime renderer for an editor-only issue |
 | Events editor, parameter fields, expressions, autocomplete | `newIDE/app/src/EventsSheet`, `InstructionOrExpression`, `ExpressionAutocompletion` | Core metadata/validation/scope and code generation |
-| Object/behavior/property editing | `newIDE/app/src/ObjectEditor`, `ObjectSettingsWorkbench`, `BehaviorsEditor`, `CompactPropertiesEditor`, `PropertiesEditor` | Core property descriptors, extension editor configuration |
+| Object/behavior/property editing | `newIDE/app/src/ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor`, `PropertiesEditor` | Core property descriptors, extension editor configuration |
 | Variables editor | `newIDE/app/src/VariablesEditorRedesign` and `VariablesList` | Core variable/source-scope APIs and history/serialization |
 | Events-based extensions or prefabs in the editor | `EventsFunctionsExtensionEditor`, `EventsFunctionsExtensionsLoader`, `EventsFunctionsList`, `PrefabDetailEditor` | Core `EventsFunctionsExtension` model and GDJS function/object/behavior generators |
-| Local project open/save, `project.settings`, TOML, layout or event source | `newIDE/app/src/ProjectsStorage` | `MultiFileProjectFormat`, `LayoutToml`, `LocalFileStorageProvider/LocalMultiFileProject.js`, IfDo DSL, format specs |
+| Local project open/save, `project.gdevelop`, TOML, layout or event source | `newIDE/app/src/ProjectsStorage` | `MultiFileProjectFormat`, `LayoutToml`, `LocalFileStorageProvider/LocalMultiFileProject.js`, IfDo DSL, format specs |
 | IfDo event parsing/formatting/catalog resolution | `newIDE/app/src/EventsSheet/IfDoEventsDsl` | `ProjectInstructionCatalog.js`, multi-file composition, `docs/gdevelop-events-dsl-spec.md` |
 | Preview/export diagnostics or orchestration | `newIDE/app/src/MainFrame`, `ExportAndShare` | `newIDE/app/src/Utils/EventsValidationScanner.js`, `GDJS/GDJS/IDE/Exporter*` |
-| Exported project data, include/resource collection, Static Data stripping | `GDJS/GDJS/IDE/ExporterHelper.*` | Core project serialization, runtime `types/project-data.d.ts`, local/browser exporter |
+| Exported project data, include/resource collection, Constants placeholder resolution | `GDJS/GDJS/IDE/ExporterHelper.*` | Core project serialization, runtime `types/project-data.d.ts`, local/browser exporter |
 | Hot reload, debugger, in-game editor | `newIDE/app/src/HotReload`, `Debugger`, `EmbeddedGame` and `GDJS/Runtime/debugger-client`, `InGameEditor` | Persistent UUIDs, runtime object lifecycle, Electron preview server |
 | Electron main process, native filesystem/watchers/windows/menus | `newIDE/electron-app/app` | `newIDE/electron-app/scripts`, local app service injected in `newIDE/app/src/LocalApp.js` |
 | Web-only app/deployment | `newIDE/app/src/BrowserApp.js` and `newIDE/web-app` | Browser storage/preview exporters and service worker |
@@ -204,7 +204,7 @@ Preserve:
 - decompose/compose equivalence before writes;
 - canonical `game://` URIs and portable encoded names;
 - strict ownership and unknown-data rejection;
-- transaction recovery and `project.settings`-last commit ordering;
+- transaction recovery and `project.gdevelop`-last commit ordering;
 - generated catalog/API regeneration;
 - reader size/path/symlink safety limits;
 - round-trip, migration, recovery, and compatibility tests.
@@ -221,14 +221,14 @@ Preserve:
   logic ad hoc in React or a generator.
 - Object picking is list state: conditions filter, subevents inherit, and
   ordinary object/behavior actions iterate. Scalar/single-target consumers use
-  stricter cardinality checks. Read `docs/DeterministicObjectPicking.md` before
-  changing this.
+  stricter cardinality checks. Read the "Object picking and single-instance
+  consumption" section of `docs/Architecture.md` before changing this.
 - Runtime deletion/recycling is intentionally deferred because generated code
   may retain references until a safe drain point.
 - Runtime frame order is a contract. Signals are queued and delivered on a
   later pre-events phase; read `docs/SignalSystem.md`.
-- Static Data is authoring/compile-time data. Resolve placeholders consistently
-  and strip it from exported project data; read `docs/StaticData.md`.
+- Constants is authoring/compile-time data. Resolve placeholders consistently
+  and keep the map out of exported project data; read `docs/Constants.md`.
 - Runtime and extension hot paths are allocation-sensitive. Preserve array and
   object reuse, caches, recycling, and stable object shapes unless measurements
   justify a change.

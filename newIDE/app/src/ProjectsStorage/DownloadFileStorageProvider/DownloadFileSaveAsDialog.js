@@ -29,6 +29,7 @@ import {
 } from '../../Utils/BrowserArchiver';
 import path from 'path-browserify';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import { serializeConstantsToToml } from '../MultiFileProjectFormat';
 const gd: libGDevelop = global.gd;
 
 const PROJECT_JSON_FILENAME = 'game.json';
@@ -193,6 +194,7 @@ export default function DownloadFileSaveAsDialog({
           const serializedProject = new gd.SerializerElement();
           project.serializeTo(serializedProject);
           newProject.unserializeFrom(serializedProject);
+          newProject.setConstantsJson(project.getConstantsJson());
           serializedProject.delete();
 
           // Download resources to blobs, and update the project resources.
@@ -209,6 +211,12 @@ export default function DownloadFileSaveAsDialog({
           textFiles.push({
             text: JSON.stringify(serializeToJSObject(newProject)),
             filePath: PROJECT_JSON_FILENAME,
+          });
+          textFiles.push({
+            text: serializeConstantsToToml(
+              JSON.parse(newProject.getConstantsJson())
+            ),
+            filePath: 'constants.toml',
           });
 
           // Archive the whole project.

@@ -27,7 +27,7 @@
 
 namespace gd {
 namespace {
-bool ResolveStaticDataPlaceholdersForValidation(
+bool ResolveConstantPlaceholdersForValidation(
     const gd::ProjectScopedContainers &projectScopedContainers,
     const gd::String &value,
     gd::String &resolvedValue) {
@@ -38,12 +38,12 @@ bool ResolveStaticDataPlaceholdersForValidation(
   }
 
   gd::String missingPath;
-  if (projectScopedContainers.GetProject().ResolveStaticDataPlaceholders(
+  if (projectScopedContainers.GetProject().ResolveConstantPlaceholders(
           value, resolvedValue, missingPath)) {
     return true;
   }
 
-  gd::LogError("Static Data path \"{{" + missingPath +
+  gd::LogError("Constant path \"{{" + missingPath +
                "}}\" does not exist while validating an event parameter.");
   return false;
 }
@@ -87,7 +87,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
   }
 
   gd::String validationValue;
-  if (!ResolveStaticDataPlaceholdersForValidation(projectScopedContainers,
+  if (!ResolveConstantPlaceholdersForValidation(projectScopedContainers,
                                                     value, validationValue)) {
     result.isValid = false;
     return result;

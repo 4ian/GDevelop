@@ -31,9 +31,10 @@ import {
   writeMultiFileSourceTree,
 } from './LocalMultiFileProject';
 import {
-  MULTI_FILE_STATIC_DATA_URI,
+  MULTI_FILE_ENTRY_NAME,
+  MULTI_FILE_CONSTANTS_URI,
   removeLegacyFolderStructuresFromProject,
-  serializeStaticDataToToml,
+  serializeConstantsToToml,
 } from '../MultiFileProjectFormat';
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
@@ -79,7 +80,7 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
-export const splittedProjectSingleFileNames = ['staticData'];
+export const splittedProjectSingleFileNames: Array<string> = [];
 
 const deleteExistingFilesFromDirs = (
   project: gdProject,
@@ -567,17 +568,22 @@ const writeProjectFiles = async ({
     });
   }
   const serializeEndTime = Date.now();
+  const constants = JSON.parse(project.getConstantsJson());
 
-  if (path.basename(filePath).toLowerCase() === 'project.settings') {
+  if (path.basename(filePath).toLowerCase() === MULTI_FILE_ENTRY_NAME) {
     const authoringCatalog = buildProjectInstructionCatalog(project);
     const deprecatedCatalog = buildProjectDeprecatedInstructionCatalog(project);
     const serializationCatalog = mergeProjectInstructionCatalogs(
       authoringCatalog,
       deprecatedCatalog
     );
+    const authoringSerializedProjectObject = {
+      ...serializedProjectObject,
+      constants,
+    };
     const settingsCatalog = buildProjectSettingsCatalog({
       project,
-      serializedProject: serializedProjectObject,
+      serializedProject: authoringSerializedProjectObject,
     });
     const behaviorPropertySchemasByType = buildBehaviorPropertySchemasByType(
       settingsCatalog
@@ -585,7 +591,6 @@ const writeProjectFiles = async ({
     // Hidden behavior properties are omitted from the authoring catalog, but
     // they can still contain data configured by a specialized editor that the
     // runtime needs. Keep the serializer output lossless.
-    const authoringSerializedProjectObject = serializedProjectObject;
     const layoutCatalog = buildProjectLayoutCatalog({
       project,
       serializedProject: authoringSerializedProjectObject,
@@ -661,7 +666,7 @@ const writeProjectFiles = async ({
     const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
       authoringSerializedProjectObject
     );
-    delete generatedLegacyProject.staticData;
+    delete generatedLegacyProject.constants;
     await writeAndCheckFormattedJSONFile(
       generatedLegacyProject,
       path.join(
@@ -690,7 +695,7 @@ const writeProjectFiles = async ({
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });
 
-    return Promise.all(
+    await Promise.all(
       partialObjects.map(partialObject => {
         return writeAndCheckFormattedJSONFile(
           partialObject.object,
@@ -700,18 +705,21 @@ const writeProjectFiles = async ({
           throw err;
         });
       })
-    ).then(() => {
-      return writeAndCheckFormattedJSONFile(
-        serializedProjectObject,
-        filePath
-      ).catch(err => {
-        console.error('Unable to write the split project:', err);
-        throw err;
-      });
+    );
+    await writeAndCheckFormattedJSONFile(
+      serializedProjectObject,
+      filePath
+    ).catch(err => {
+      console.error('Unable to write the split project:', err);
+      throw err;
     });
   } else {
     await writeAndCheckFormattedJSONFile(serializedProjectObject, filePath);
   }
+  await writeAndCheckFile(
+    serializeConstantsToToml(constants),
+    path.join(projectPath, 'constants.toml')
+  );
 
   console.log(
     `[LocalProjectWriter] Project file(s) written in ${Date.now() -
@@ -755,7 +763,7 @@ export const onSaveProject = async (
 
   const projectPath = path.dirname(filePath);
 
-  if (path.basename(filePath).toLowerCase() !== 'project.settings') {
+  if (path.basename(filePath).toLowerCase() !== MULTI_FILE_ENTRY_NAME) {
     try {
       deleteExistingFilesFromDirs(project, projectPath);
     } catch (e) {
@@ -840,14 +848,14 @@ export const generateOnChooseSaveProjectAsLocation = ({
     defaultPath = path.join(
       path.dirname(defaultPath),
       safeFilename,
-      'project.settings'
+      MULTI_FILE_ENTRY_NAME
     );
   }
 
   const browserWindow = remote.getCurrentWindow();
   const saveDialogOptions = {
     defaultPath,
-    filters: [{ name: 'GDevelop project', extensions: ['settings'] }],
+    filters: [{ name: 'GDevelop project', extensions: ['gdevelop'] }],
   };
 
   if (!dialog) {
@@ -861,12 +869,12 @@ export const generateOnChooseSaveProjectAsLocation = ({
     return { saveAsLocation: null, saveAsOptions: null };
   }
   const filePath =
-    path.basename(selectedPath).toLowerCase() === 'project.settings'
+    path.basename(selectedPath).toLowerCase() === MULTI_FILE_ENTRY_NAME
       ? selectedPath
       : path.join(
           path.dirname(selectedPath),
           path.basename(selectedPath, path.extname(selectedPath)),
-          'project.settings'
+          MULTI_FILE_ENTRY_NAME
         );
 
   return {
@@ -959,16 +967,19 @@ export const onAutoSaveProject = (
 ): Promise<void> => {
   if (
     path.basename(fileMetadata.fileIdentifier).toLowerCase() ===
-    'project.settings'
+    MULTI_FILE_ENTRY_NAME
   ) {
     const autoSaveEntryPath = path.join(
       path.dirname(fileMetadata.fileIdentifier),
       '.gdevelop',
       'autosave',
       'current',
-      'project.settings'
+      MULTI_FILE_ENTRY_NAME
     );
-    const serializedProjectObject = serializeToJSObject(project, 'serializeTo');
+    const serializedProjectObject = {
+      ...serializeToJSObject(project, 'serializeTo'),
+      constants: JSON.parse(project.getConstantsJson()),
+    };
     return writeLegacyProjectAsMultiFile(
       serializedProjectObject,
       autoSaveEntryPath
@@ -983,19 +994,23 @@ export const onAutoSaveProject = (
   );
 };
 
-export const onAutoSaveStaticData = async (
-  staticData: Object,
+export const onAutoSaveConstants = async (
+  constants: Object,
   fileMetadata: FileMetadata
 ): Promise<boolean> => {
   const entryPath = fileMetadata.fileIdentifier;
-  if (path.basename(entryPath).toLowerCase() !== 'project.settings') {
-    return false;
+  if (path.basename(entryPath).toLowerCase() !== MULTI_FILE_ENTRY_NAME) {
+    await writeAndCheckFile(
+      serializeConstantsToToml(constants),
+      path.join(path.dirname(entryPath), 'constants.toml')
+    );
+    return true;
   }
 
   await writeMultiFileSourceTree({
     entryPath,
     files: {
-      [MULTI_FILE_STATIC_DATA_URI]: serializeStaticDataToToml(staticData),
+      [MULTI_FILE_CONSTANTS_URI]: serializeConstantsToToml(constants),
     },
   });
   return true;
@@ -1015,7 +1030,7 @@ export const getProjectLocation = ({
   if (
     saveAsLocation &&
     path.basename(saveAsLocation.fileIdentifier).toLowerCase() ===
-      'project.settings'
+      MULTI_FILE_ENTRY_NAME
   ) {
     return saveAsLocation;
   }
@@ -1027,7 +1042,7 @@ export const getProjectLocation = ({
   // The generated "My project XX" folder (or the folder chosen by the user)
   // is already the project root.
   return {
-    fileIdentifier: path.join(outputPath, 'project.settings'),
+    fileIdentifier: path.join(outputPath, MULTI_FILE_ENTRY_NAME),
   };
 };
 
@@ -1053,7 +1068,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
       value={path.dirname(projectLocation.fileIdentifier)}
       onChange={newOutputPath => {
         setSaveAsLocation({
-          fileIdentifier: path.join(newOutputPath, 'project.settings'),
+          fileIdentifier: path.join(newOutputPath, MULTI_FILE_ENTRY_NAME),
         });
       }}
       type="create-game"

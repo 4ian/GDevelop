@@ -37,7 +37,7 @@ files, and executable logic in `.events`.
 4. Create the owner settings and every required child file in one patch.
 5. Keep each settings document independently valid and local-root. Its path
    supplies the mounted namespace. Never add
-   child-settings indexes to `project.settings` or `extension.settings`.
+   child-settings indexes to `project.gdevelop` or `extension.settings`.
 6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
    `.settings` file.
 7. Write one repeated `[[variables]]`, `[[globalVariables]]`, or
@@ -48,11 +48,13 @@ files, and executable logic in `.events`.
    tables, non-empty inline descriptor arrays, or recursive child tables.
 8. Use exact instruction types and `dslName` parameters from
    `.gdevelop/instructions-catalog.json` in every event body.
-9. Call `reload_project` after the declaration/files exist. If the extension
+9. Call `generate-catalogs` after the declaration/files exist. If the extension
    adds instruction types, re-read the regenerated catalog before writing or
    changing callers.
-10. Reload again after the final edit, then preview every public function,
-    prefab, and behavior path.
+10. After the final edit, require `validate_project_files` to pass all
+    pre-runtime phases and commit the task-owned source changes. Then use
+    `verify_project_change`, or an equivalent reload plus fresh paused preview,
+    to exercise every public function, prefab, and behavior path.
 
 ## Complete source example
 
@@ -231,6 +233,13 @@ runtime configuration there even though the generic catalog hides it. Keep
 `propertyDescriptors` as one flat ordered array in `prefab.settings`; never add
 property folders.
 
+Ordinary behavior and shared-data deserialization overlays authored fields on
+extension-initialized defaults, including nested objects, while arrays remain
+authored replacements. Overriding behaviors intentionally remain sparse. This
+protects legacy/partial sources from missing runtime defaults, but new
+attachments must still author every writable property required by the generated
+catalog and preserve all existing unknown fields.
+
 `extensions/CombatKit/behaviors/Health/behavior.settings`:
 
 ```toml
@@ -314,10 +323,12 @@ selection through child events and nested private behavior-function calls.
    Verify property descriptor arrays are flat and no property folder metadata
    exists. Verify new attached behavior fields are catalog-listed and all
    pre-existing unlisted serialized fields still round-trip unchanged.
-5. Verify every action is condition-guarded and every object action targets at
-   most one picked instance.
-6. Reload the project and confirm the new instruction/object/behavior types
-   appear in the regenerated catalog.
+5. Verify every action is condition-guarded and every object action targets the
+   intended picked set. Multiple picked instances are valid when the operation
+   is intentionally collective; isolate with `for each` only when required.
+6. Regenerate catalogs, validate the final source, commit it, and confirm the
+   new instruction/object/behavior types appear after the verified reload.
 7. Instantiate the prefab, attach the behavior, and call each public function
    from a guarded test event.
-8. Launch a fresh preview and inspect runtime errors, picking, and state.
+8. Launch a fresh paused preview and inspect runtime errors, picking, and state,
+   preferably through typed `verify_project_change` assertions.

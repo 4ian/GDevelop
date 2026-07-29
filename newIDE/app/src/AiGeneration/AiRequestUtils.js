@@ -149,6 +149,35 @@ export const getAllSubAgentFunctionCalls = ({
 };
 
 /**
+ * Determine which kind of sub-agent an AI request is, by looking at the call
+ * that launched it in its parent request (`run_edit_agent` vs
+ * `run_explorer_agent`). Returns null for a top-level request (no parent) or
+ * when the parent/launching call cannot be resolved.
+ *
+ * Used to gate script behavior by mode: an explorer sub-agent's `run_script`
+ * is read-only, so it is neither exposed mutating functions nor gated behind
+ * the edit approval.
+ */
+export const getSubAgentKind = ({
+  aiRequest,
+  aiRequests,
+}: {|
+  aiRequest: AiRequest,
+  aiRequests: { [string]: AiRequest },
+|}): 'edit' | 'explorer' | null => {
+  if (!aiRequest.parentAiRequestId) return null;
+  const parentRequest = aiRequests[aiRequest.parentAiRequestId] || null;
+  if (!parentRequest) return null;
+  const launchingCall = getAllSubAgentFunctionCalls({
+    aiRequest: parentRequest,
+  }).find(functionCall => functionCall.subAgentAiRequestId === aiRequest.id);
+  if (!launchingCall) return null;
+  if (launchingCall.name === 'run_explorer_agent') return 'explorer';
+  if (launchingCall.name === 'run_edit_agent') return 'edit';
+  return null;
+};
+
+/**
  * Returns sub-agent function calls (those with a subAgentAiRequestId)
  * that don't yet have a corresponding function_call_output in the AI request output.
  */

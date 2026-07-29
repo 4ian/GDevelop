@@ -23,6 +23,20 @@ const buildFileMenu = (project: ?gdProject): any => {
   return (template[0]: any);
 };
 
+const buildViewMenu = (project: gdProject): any => {
+  const template = buildMainMenuDeclarativeTemplate({
+    i18n,
+    project,
+    canSaveProjectAs: true,
+    recentProjectFiles: [],
+    shortcutMap: defaultShortcuts,
+    isApplicationTopLevelMenu: false,
+    hideAskAi: false,
+  });
+
+  return (template.find(item => item.label === 'View'): any);
+};
+
 describe('MainMenu', () => {
   it('enables reloading when a project is open', () => {
     const fileMenu = buildFileMenu(({}: any));
@@ -66,5 +80,27 @@ describe('MainMenu', () => {
     reloadProjectItem.click();
 
     expect(onReloadProject).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens Sticky notes from the View menu', () => {
+    const onOpenStickyNotes: any = (jest.fn(): any);
+    const adaptedMenu = adaptFromDeclarativeTemplate(
+      [buildViewMenu(({}: any))],
+      ({ onOpenStickyNotes }: any)
+    );
+    const viewMenu: any = adaptedMenu[0];
+    const stickyNotesItem = viewMenu.submenu.find(
+      item => item.label === 'Sticky notes'
+    );
+
+    expect(stickyNotesItem).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        click: expect.any(Function),
+      })
+    );
+    stickyNotesItem.click();
+
+    expect(onOpenStickyNotes).toHaveBeenCalledTimes(1);
   });
 });

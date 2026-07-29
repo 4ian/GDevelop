@@ -290,6 +290,31 @@ declare namespace gdjs {
       function isMouseButtonPressed(runtimeScene: RuntimeScene, button: string): boolean;
       function getCursorX(runtimeScene: RuntimeScene, layer: string, camera: number): number;
       function getCursorY(runtimeScene: RuntimeScene, layer: string, camera: number): number;
+      function requestPointerLock(runtimeScene: RuntimeScene, reason?: string): boolean;
+      function exitPointerLock(runtimeScene: RuntimeScene, reason?: string): void;
+      function isPointerLocked(runtimeScene: RuntimeScene): boolean;
+    }
+    export namespace scene3d {
+      interface RaycastResult {
+        object: RuntimeObject;
+        objectIndex: number;
+        distance: number;
+        pointX: number;
+        pointY: number;
+        pointZ: number;
+      }
+      function raycastObjects(
+        originX: number,
+        originY: number,
+        originZ: number,
+        directionX: number,
+        directionY: number,
+        directionZ: number,
+        objects: RuntimeObject[],
+        near?: number,
+        far?: number,
+        recursive?: boolean
+      ): RaycastResult[];
     }
     export namespace common {
       function distanceBetweenPositions(x1: number, y1: number, x2: number, y2: number): number;
@@ -949,6 +974,7 @@ const validateBlockWithTypeScript = ({
   projectApiDeclaration,
   model,
   compilerState,
+  compatibilityProfile,
 }: Object): Array<Object> => {
   const ts = typescript;
   const root = 'C:/__gdevelop_javascript_api__';
@@ -1020,7 +1046,14 @@ const validateBlockWithTypeScript = ({
   );
   compilerState.program = program;
   const sourceFile = program.getSourceFile(sourcePath);
-  const severity = block.useStrict ? 'error' : 'warning';
+  const isReviewedCompatibilityBlock =
+    !!compatibilityProfile &&
+    Array.isArray(compatibilityProfile.reviewedFileUriPrefixes) &&
+    compatibilityProfile.reviewedFileUriPrefixes.some(prefix =>
+      String(block.fileUri || '').startsWith(prefix)
+    );
+  const severity =
+    block.useStrict && !isReviewedCompatibilityBlock ? 'error' : 'warning';
   const diagnostics = [];
   const syntacticDiagnostics = program.getSyntacticDiagnostics(sourceFile);
   const syntacticDiagnosticSet = new Set(syntacticDiagnostics);
@@ -1161,6 +1194,26 @@ const validateBlockWithTypeScript = ({
     };
     visit(sourceFile);
   }
+  if (
+    isReviewedCompatibilityBlock &&
+    diagnostics.some(
+      diagnostic =>
+        diagnostic.severity === 'warning' &&
+        diagnostic.code !== 'JS_API_PERFORMANCE_RISK'
+    )
+  ) {
+    diagnostics.push({
+      severity: 'warning',
+      phase: 'javascript-authoring-api',
+      code: 'EXTENSION_REVIEWED_COMPATIBILITY_PROFILE',
+      message:
+        'A registry-fetched, reviewed extension uses legacy APIs outside the current public authoring declaration. Syntax and generated code remain blocking; migrate the extension to public facades.',
+      fileUri: block.fileUri,
+      line: block.bodyLine || 1,
+      column: 1,
+      provenance: compatibilityProfile.provenance,
+    });
+  }
   return diagnostics;
 };
 
@@ -1170,6 +1223,7 @@ export const validateJavaScriptAuthoringBlocks = ({
   runtimeApiDeclaration,
   projectApiDeclaration,
   typescript: typescriptOverride,
+  compatibilityProfile,
 }: Object): Object => {
   const typescript =
     typescriptOverride === undefined
@@ -1237,6 +1291,7 @@ export const validateJavaScriptAuthoringBlocks = ({
           projectApiDeclaration: projectDeclaration,
           model,
           compilerState,
+          compatibilityProfile,
         })
       )
     );
@@ -1272,6 +1327,7 @@ export const validateProjectJavaScriptAuthoring = ({
   runtimeApiDeclaration,
   projectApiDeclaration,
   typescript,
+  compatibilityProfile,
 }: Object): Object =>
   validateJavaScriptAuthoringBlocks({
     blocks: sourceFiles
@@ -1281,7 +1337,95 @@ export const validateProjectJavaScriptAuthoring = ({
     runtimeApiDeclaration,
     projectApiDeclaration,
     typescript,
+    compatibilityProfile,
   });
+
+export const validateReviewedExtensionJavaScriptAuthoring = ({
+  serializedExtension,
+  registryHeader,
+  runtimeApiDeclaration,
+  projectApiDeclaration,
+  typescript,
+}: Object): Object => {
+  const extensionName = String(
+    (serializedExtension && serializedExtension.name) || ''
+  );
+  const registryName = String((registryHeader && registryHeader.name) || '');
+  const registryVersion = String(
+    (registryHeader && registryHeader.version) || ''
+  );
+  const contentHash = sha256(JSON.stringify(serializedExtension || {}));
+  if (!extensionName || extensionName !== registryName || !registryVersion) {
+    return {
+      success: true,
+      valid: false,
+      policy: 'reviewed-store-extension',
+      code: 'EXTENSION_STRICT_API_INCOMPATIBLE',
+      extensionName,
+      registryName,
+      registryVersion,
+      contentHash,
+      errors: [
+        {
+          severity: 'error',
+          code: 'EXTENSION_STRICT_API_INCOMPATIBLE',
+          message:
+            'The downloaded extension identity does not match the pinned registry header.',
+        },
+      ],
+      warnings: [],
+    };
+  }
+
+  const serializedProject = {
+    layouts: [],
+    externalEvents: [],
+    eventsFunctionsExtensions: [serializedExtension],
+    objects: [],
+    variables: [],
+    resources: { resources: [] },
+  };
+  const validation = validateProjectJavaScriptAuthoring({
+    serializedProject,
+    runtimeApiDeclaration,
+    projectApiDeclaration,
+    typescript,
+    compatibilityProfile: {
+      reviewedFileUriPrefixes: [
+        `game://extensions/${encodeURIComponent(extensionName)}/`,
+      ],
+      provenance: {
+        source: 'gdevelop-extension-registry',
+        extensionName,
+        registryVersion,
+        contentHash,
+      },
+    },
+  });
+  const errors = (validation.errors || []).map(error => ({
+    ...error,
+    policyCode: 'EXTENSION_STRICT_API_INCOMPATIBLE',
+    extensionName,
+  }));
+  return {
+    success: true,
+    valid: validation.valid,
+    policy: 'reviewed-store-extension',
+    code: validation.valid ? undefined : 'EXTENSION_STRICT_API_INCOMPATIBLE',
+    extensionName,
+    registryName,
+    registryVersion,
+    contentHash,
+    provenanceVerified: true,
+    generatedCodeRequired: true,
+    validation: {
+      ...validation,
+      errors,
+    },
+    errors,
+    warnings: validation.warnings || [],
+  };
+};
 
 export const buildJavaScriptAuthoringArtifacts = (
   serializedProject: Object

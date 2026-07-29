@@ -1270,18 +1270,36 @@ const compileLayer = (record, context, state) => {
     );
   const name = expectString(layerRecord.name, 'layer name', record, state);
   if (external) return { id, name };
+  const renderingType =
+    layerRecord.rendering === undefined
+      ? ''
+      : expectEnum(
+          layerRecord.rendering,
+          ['', '2d', '3d', '2d+3d'],
+          'layer rendering',
+          record,
+          state
+        );
+  const isLightingLayer =
+    layerRecord.lighting === undefined
+      ? false
+      : expectBoolean(layerRecord.lighting, 'layer lighting', record, state);
+  if (
+    isLightingLayer &&
+    (renderingType === '3d' || renderingType === '2d+3d')
+  ) {
+    fail(
+      state,
+      'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
+      `Layer "${name}" uses rendering="${renderingType}" and lighting=true. ` +
+        'The lighting flag creates a dedicated 2D Lighting Layer; it does not enable Scene3D lighting. ' +
+        'Set lighting=false and add Scene3D light effects instead.',
+      record
+    );
+  }
   const layer = {
     name,
-    renderingType:
-      layerRecord.rendering === undefined
-        ? ''
-        : expectEnum(
-            layerRecord.rendering,
-            ['', '2d', '3d', '2d+3d'],
-            'layer rendering',
-            record,
-            state
-          ),
+    renderingType,
     cameraType:
       layerRecord.camera_type === undefined
         ? ''
@@ -1300,10 +1318,7 @@ const compileLayer = (record, context, state) => {
       layerRecord.locked === undefined
         ? false
         : expectBoolean(layerRecord.locked, 'layer locked', record, state),
-    isLightingLayer:
-      layerRecord.lighting === undefined
-        ? false
-        : expectBoolean(layerRecord.lighting, 'layer lighting', record, state),
+    isLightingLayer,
     followBaseLayerCamera:
       layerRecord.follow_base_camera === undefined
         ? false

@@ -24,10 +24,34 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _wrappedElement: ?any;
 
   open = (event?: Event) => {
+    // Prevent the default behavior, notably the browser context menu
+    // on the web version, which is otherwise not prevented because
+    // `stopPropagation` stops the event before it reaches the global
+    // `contextmenu` handler set up by `Window.setUpContextMenu`.
+    // $FlowFixMe[method-unbinding]
+    if (event && event.preventDefault) event.preventDefault();
     // $FlowFixMe[method-unbinding]
     if (event && event.stopPropagation) event.stopPropagation();
     const { _contextMenu } = this;
     if (!_contextMenu) return;
+
+    const eventWithPointerPosition: any = event;
+    if (
+      eventWithPointerPosition &&
+      typeof eventWithPointerPosition.clientX === 'number' &&
+      typeof eventWithPointerPosition.clientY === 'number' &&
+      (eventWithPointerPosition.clientX !== 0 ||
+        eventWithPointerPosition.clientY !== 0)
+    ) {
+      // A pointer event already gives viewport-relative coordinates. Avoid
+      // getBoundingClientRect here: reading layout synchronously can stall for
+      // seconds when a large events sheet has pending layout work.
+      _contextMenu.open(
+        Math.round(eventWithPointerPosition.clientX),
+        Math.round(eventWithPointerPosition.clientY)
+      );
+      return;
+    }
 
     const node = ReactDOM.findDOMNode(this._wrappedElement);
     // Use nodeType check instead of `instanceof HTMLElement` because

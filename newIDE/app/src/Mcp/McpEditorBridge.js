@@ -1,23 +1,21 @@
 // @flow
-import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
+
 import {
   getMcpPrompts,
   getMcpResources,
   getMcpTools,
   getAllMcpToolsForIntrospection,
   getMcpToolUsageExamples,
-  getCapabilitiesSummary,
   canCallMcpTool,
-  isKnownMcpTool,
   type McpPermissionOptions,
 } from './McpToolCatalog';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import {
-  serializeToJSON,
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
+  MULTI_FILE_ENTRY_NAME,
   decomposeLegacyProjectToFiles,
   parseTomlSource,
 } from '../ProjectsStorage/MultiFileProjectFormat';
@@ -31,131 +29,25 @@ import {
   buildBehaviorPropertySchemasByType,
   validateProjectSettingsCatalog,
 } from '../ProjectsStorage/ProjectSourceCatalog';
-import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextRenderer';
+import { validateReviewedExtensionJavaScriptAuthoring } from '../ProjectsStorage/JavaScriptAuthoringApi';
 import { mapFor } from '../Utils/MapFor';
+import {
+  keyDefinitions,
+  getKeyboardKeyDefinition,
+} from '../Utils/KeyboardKeyNames';
 import { type EditorCallbacks } from '../EditorFunctions';
+import { buildInstruction } from './McpEventKnowledge';
+
 import {
-  getEventOperationReference,
-  getEventsJsonExamples,
-  getExactInstructionMetadata,
-  searchInstructionMetadata,
-  validateEventsJsonFile,
-  validateEventsJson,
-  autoQuoteEventParameters,
-  buildInstruction,
-  collectSerializedEventJsonIssues,
-} from './McpEventKnowledge';
-import {
-  addMissingObjectBehaviors,
-  addObjectUndeclaredVariables,
-  addUndeclaredVariables,
-  applyEventsChanges,
-} from '../EditorFunctions/ApplyEventsChanges';
-import {
-  createOrUpdateExtension,
-  createOrUpdateExtensionBehavior,
   createOrUpdateExtensionFunction,
-  createOrUpdateExtensionObject,
-  createOrUpdateExtensionProperty,
-  deleteExtension,
-  deleteExtensionBehavior,
-  deleteExtensionFunction,
-  deleteExtensionObject,
-  deleteExtensionProperty,
-  applyValidatedExtensionPatch,
-  bindChildSpriteResourceProperty,
-  extractPrefabFromObject,
-  findExtensionEvents,
-  findProjectEvents,
-  inspectCustomObjectRuntimeGeometry,
-  inspectExtensionBehavior,
-  inspectExtensionFunction,
-  inspectExtensionObject,
-  inspectExtensionProperty,
-  inspectPrefabPropertyBindings,
   inspectSignalUsage,
-  inspectProjectExtension,
-  listProjectExtensions,
-  lintExtensionFunctionEvents,
-  patchExtensionEventInstruction,
-  replaceExtensionFunctionEventsFromFile,
-  validateExtensionEventsJson,
 } from './McpExtensionTools';
-import {
-  addOrUpdateResource,
-  replaceProjectResource,
-  applyValidatedScenePatch,
-  bulkEditSceneAssets,
-  createSpriteObjectFromResource,
-  createTextObject,
-  batchDeleteSceneVariables,
-  deleteSceneObject,
-  deleteSceneVariable,
-  deleteObjectVariable,
-  deleteInstanceVariable,
-  generatePlaceholderAsset,
-  renderSceneToPng,
-  inspectProjectCleanup,
-  inspectProjectResources,
-  inspectResourceImages,
-  auditProjectAssetSources,
-  compareImageFiles,
-  cropSceneObjectImage,
-  inspectSceneDrawOrder,
-  listAvailableBehaviors,
-  putStructured2dInstances,
-  readSceneEventsSerialized,
-  readSerializedScene,
-  replaceObjectDefinition,
-  setObjectProperties,
-  setTextObjectProperties,
-  setSpriteAnimations,
-  sliceSpriteSheet,
-  bindSpriteAnimationsFromDirectory,
-  createTilemapObject,
-  setTilemapTiles,
-  getTilemapTiles,
-  inspectTilemapPalette,
-  setTilemapCollisionTiles,
-  inspectTilemapCollision,
-  checkTilemapWalkability,
-} from './McpSceneTools';
-import {
-  attachObjectToObjectTop,
-  compareSceneEventsSemantics,
-  createGroup,
-  ensureSceneEventIds,
-  findSceneEvents,
-  getSerializedEventsRevision,
-  inspectGameplayRules,
-  lintSceneEvents,
-  moveEventsToGroup,
-  patchSceneEventInstruction,
-  renameGroup,
-  replaceJavascriptEventCode,
-  replaceSceneEventsFromFile,
-  wrapEventsInGroup,
-} from './McpEventTools';
-import {
-  setFirstLayout,
-  setProjectProperties,
-  getStaticData,
-  setStaticData,
-  setStaticDataValue,
-  deleteStaticDataValue,
-  summarizeStaticData,
-  snapshotProject,
-  restoreProjectSnapshot,
-  applyValidatedProjectJsonPatch,
-  syncEditorFromValidatedProjectJson,
-  validateCurrentProjectJson,
-  validateSerializedProject,
-} from './McpProjectTools';
+import { validateSerializedProject } from './McpProjectTools';
 import {
   ensureOnSignalBehaviorEventsFunctionProperParameters,
   ensureOnSignalObjectEventsFunctionProperParameters,
 } from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
-import { getBehaviorsRegistry } from '../Utils/GDevelopServices/Extension';
+
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -165,58 +57,11 @@ const crypto = optionalRequire('crypto');
 const electron = optionalRequire('electron');
 const nativeImage = electron && electron.nativeImage;
 
-const hasOwn = (object: any, propertyName: string): boolean =>
-  !!object &&
-  typeof object === 'object' &&
-  Object.keys(object).includes(propertyName);
-
 // Monotonic id used to match targeted preview request/response messages.
 let nextTargetedRequestId = 1;
 
 const PREVIEW_CLEANUP_RELAUNCH_ACTION =
   'control_preview { action: "close", close_all: true }, then launch_preview { start_paused: true, force_new: true }';
-
-const closePreviewCommandError =
-  'CLOSE_PREVIEW is not a GDevelop command. For stale preview cleanup, call control_preview with action="close" and close_all=true, then call launch_preview with start_paused=true and force_new=true.';
-
-// Score a behavior store header against space-separated query tokens. Returns 0
-// for no match; higher is a better match. Every token must match somewhere.
-const scoreBehaviorHeaderMatch = (header: Object, query: string): number => {
-  const tokens = query
-    .toLowerCase()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (!tokens.length) return 1; // no query → everything matches (browse mode)
-  const haystackParts = [
-    header.type,
-    header.name,
-    header.fullName,
-    header.description,
-    header.category,
-    header.extensionName,
-    Array.isArray(header.tags) ? header.tags.join(' ') : '',
-  ]
-    .filter(Boolean)
-    .map(value => String(value).toLowerCase());
-  const haystack = haystackParts.join(' ');
-  let score = 0;
-  for (const token of tokens) {
-    if (!haystack.includes(token)) return 0; // AND semantics
-    // Bonus for matching the most identifying fields.
-    if ((header.fullName || '').toLowerCase().includes(token)) score += 3;
-    if ((header.name || '').toLowerCase().includes(token)) score += 2;
-    score += 1;
-  }
-  return score;
-};
-
-const getDefaultProcessEditorFunctionCalls = (): Function => {
-  // Lazily require the runner so focused MCP unit tests do not load the full
-  // rendering stack pulled by EditorFunctionCallRunner.
-  // $FlowFixMe[unsupported-syntax]
-  return require('../EditorFunctions/EditorFunctionCallRunner')
-    .processEditorFunctionCalls;
-};
 
 type McpRequestProgress = {|
   phase: string,
@@ -527,31 +372,6 @@ const generateProjectSourceCatalogsFromDisk = async (
 
 // Extract the JSON payload from a textResult/errorResult-shaped tool response,
 // so one tool can embed another tool's outcome in its own result.
-const extractToolResultPayload = (toolResult: any): any => {
-  if (!toolResult || !Array.isArray(toolResult.content)) return toolResult;
-  if (toolResult.structuredContent) return toolResult.structuredContent;
-  const text =
-    toolResult.content[0] && typeof toolResult.content[0].text === 'string'
-      ? toolResult.content[0].text
-      : '';
-  if (toolResult.isError) return { success: false, error: text };
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    return text;
-  }
-};
-
-const mcpDirectEventsRequiredMessage =
-  'MCP add_scene_events writes events directly and does not call the GDevelop event generation service. Pass events_json or event_changes.';
-
-const truncateText = (text: string, maxLength?: number): string => {
-  if (!maxLength || text.length <= maxLength) return text;
-  return `${text.slice(
-    0,
-    maxLength
-  )}\n\n[Truncated by GDevelop MCP server at ${maxLength} characters.]`;
-};
 
 const getSceneNames = (project: gdProject): Array<string> =>
   mapFor(0, project.getLayoutsCount(), index =>
@@ -603,192 +423,6 @@ const hashStructuredValue = (value: any): string => {
   return `fnv1a-${(hash >>> 0).toString(16).padStart(8, '0')}`;
 };
 
-const readDiskProjectEvidence = (projectFile: ?string): Object => {
-  if (!projectFile) return { exists: false, reason: 'no-project-file' };
-  if (!fs) return { exists: false, reason: 'filesystem-unavailable' };
-  try {
-    const stat = fs.statSync(projectFile);
-    const contents = fs.readFileSync(projectFile, 'utf8');
-    return {
-      exists: true,
-      size: stat.size,
-      modifiedAt: stat.mtime.toISOString(),
-      modifiedAtMs: stat.mtimeMs,
-      hash: hashStructuredValue(JSON.parse(contents)),
-    };
-  } catch (error) {
-    return {
-      exists: false,
-      reason: 'read-failed',
-      error: error.message,
-    };
-  }
-};
-
-const getPersistenceState = (context: McpEditorBridgeContext): Object => {
-  if (typeof context.getPersistenceState !== 'function') {
-    return {
-      available: false,
-      hasUnsavedChanges: undefined,
-      changesCount: undefined,
-      timeOfFirstChangeSinceLastSave: undefined,
-    };
-  }
-  try {
-    return { available: true, ...context.getPersistenceState() };
-  } catch (error) {
-    return { available: false, error: error.message };
-  }
-};
-
-const saveProjectWithEvidence = async (
-  context: McpEditorBridgeContext
-): Promise<Object> => {
-  const requestedAtMs = Date.now();
-  const requestedAt = new Date(requestedAtMs).toISOString();
-  const project = context.getProject();
-  const saveProjectAndWait = context.saveProjectAndWait;
-  if (!project) {
-    if (saveProjectAndWait) {
-      try {
-        const result = await saveProjectAndWait();
-        const saved = !!(
-          result &&
-          (typeof result !== 'object' ||
-            result.saved === undefined ||
-            result.saved === true)
-        );
-        return {
-          success: saved,
-          saved,
-          reason: saved ? 'host-confirmed-without-project-model' : 'no-project',
-          requestedAt,
-          completedAt: new Date().toISOString(),
-          hostReportedSaved: saved,
-          result: result || undefined,
-        };
-      } catch (error) {
-        return {
-          success: false,
-          saved: false,
-          reason: 'save-threw',
-          requestedAt,
-          completedAt: new Date().toISOString(),
-          error: error.message,
-        };
-      }
-    }
-    return {
-      success: false,
-      saved: false,
-      reason: 'no-project',
-      requestedAt,
-      completedAt: new Date().toISOString(),
-    };
-  }
-  if (!saveProjectAndWait) {
-    return {
-      success: false,
-      saved: false,
-      reason: 'save-handler-unavailable',
-      projectFile: project.getProjectFile() || undefined,
-      requestedAt,
-      completedAt: new Date().toISOString(),
-    };
-  }
-
-  const projectFile = project.getProjectFile() || null;
-  const beforeState = getPersistenceState(context);
-  const beforeDisk = readDiskProjectEvidence(projectFile);
-  const editorHashBefore = hashStructuredValue(serializeToJSObject(project));
-  let rawResult = null;
-  let saveError = null;
-  try {
-    rawResult = await saveProjectAndWait();
-  } catch (error) {
-    saveError = error;
-  }
-
-  const completedAtMs = Date.now();
-  const afterState = getPersistenceState(context);
-  const editorHash = hashStructuredValue(serializeToJSObject(project));
-  const afterDisk = readDiskProjectEvidence(projectFile);
-  const hashesMatch = afterDisk.exists
-    ? afterDisk.hash === editorHash
-    : undefined;
-  const diskWriteObserved = !!(
-    afterDisk.exists &&
-    (!beforeDisk.exists ||
-      afterDisk.modifiedAtMs !== beforeDisk.modifiedAtMs ||
-      afterDisk.hash !== beforeDisk.hash)
-  );
-  const dirtyBefore = beforeState.hasUnsavedChanges;
-  const dirtyAfter = afterState.hasUnsavedChanges;
-  const hostReportedSaved = !!(
-    rawResult &&
-    (typeof rawResult !== 'object' ||
-      rawResult.saved === undefined ||
-      rawResult.saved === true)
-  );
-  const nothingChangedBefore = !!(
-    dirtyBefore === false &&
-    beforeDisk.exists &&
-    beforeDisk.hash === editorHashBefore
-  );
-  const verifiedLocalSave = !!(
-    projectFile &&
-    afterDisk.exists &&
-    hashesMatch === true &&
-    (diskWriteObserved || (hostReportedSaved && !nothingChangedBefore))
-  );
-  const saved = projectFile ? verifiedLocalSave : hostReportedSaved;
-
-  let reason = 'save-failed';
-  if (saveError) reason = 'save-threw';
-  else if (saved && diskWriteObserved) reason = 'saved';
-  else if (saved) reason = 'saved-and-verified';
-  else if (!projectFile && !hostReportedSaved) reason = 'no-project-file';
-  else if (nothingChangedBefore && hashesMatch === true)
-    reason = 'nothing-changed';
-  else if (dirtyBefore === false && hashesMatch === false)
-    reason = 'project-not-marked-dirty';
-  else if (hostReportedSaved && hashesMatch === false)
-    reason = 'disk-verification-failed';
-
-  return {
-    success: saved || reason === 'nothing-changed',
-    saved,
-    reason,
-    projectFile: projectFile || undefined,
-    requestedAt,
-    completedAt: new Date(completedAtMs).toISOString(),
-    durationMs: completedAtMs - requestedAtMs,
-    dirtyBefore,
-    dirtyAfter,
-    changesCountBefore: beforeState.changesCount,
-    changesCountAfter: afterState.changesCount,
-    firstUnsavedChangeAt:
-      beforeState.timeOfFirstChangeSinceLastSave != null
-        ? new Date(beforeState.timeOfFirstChangeSinceLastSave).toISOString()
-        : undefined,
-    hostReportedSaved,
-    diskWriteObserved,
-    editorHashBefore,
-    diskHashBefore: beforeDisk.hash,
-    editorHash,
-    diskHash: afterDisk.hash,
-    hashesMatch,
-    file: {
-      exists: !!afterDisk.exists,
-      size: afterDisk.size,
-      modifiedAt: afterDisk.modifiedAt,
-      error: afterDisk.error,
-    },
-    error: saveError ? saveError.message : afterDisk.error,
-    result: rawResult || undefined,
-  };
-};
-
 const getEditorState = (
   project: ?gdProject,
   permissions: McpPermissionOptions,
@@ -807,10 +441,9 @@ const getEditorState = (
     hasProject: true,
     projectName: project.getName(),
     projectUuid: project.getProjectUuid(),
-    // Absolute project file + folder. Relative resource paths
-    // (add_or_update_resource, bulk_edit_scene_assets) and project-relative
-    // file args are resolved against projectFolder — this is the editor's open
-    // project folder, which may differ from the agent's cwd.
+    // Absolute project file + folder. Project-relative source and resource
+    // paths are resolved against projectFolder, which may differ from the
+    // caller's current working directory.
     projectFile,
     projectFolder,
     sceneNames: getSceneNames(project),
@@ -839,9 +472,8 @@ const getProjectSummary = (project: gdProject, sceneName?: ?string): Object => {
       explicitSerialized:
         'Behavior is explicitly stored on the object in serialized project data.',
       defaultCapabilityInferred:
-        'Behavior is a default GDevelop object capability surfaced by the object API; read_serialized_scene may still show behaviors: [] because only explicit serialized behaviors are stored there.',
+        'Behavior is a default GDevelop object capability surfaced by the object API; serialized scene data may still show behaviors: [] because only explicit serialized behaviors are stored there.',
     },
-    staticDataSummary: summarizeStaticData(project),
     ...simplifiedProject,
   };
 };
@@ -948,11 +580,6 @@ const annotateSummaryInstanceVariables = (
   });
 };
 
-const getProjectExtensionsSummary = (project: gdProject): Object => {
-  const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
-  return simplifiedProjectBuilder.getProjectSpecificExtensionsSummary(project);
-};
-
 const getObjectsSummary = (project: gdProject, sceneName?: ?string): Object => {
   const result: Object = {
     globalObjects: getObjectNames(project.getObjects()),
@@ -981,21 +608,6 @@ const getObjectsSummary = (project: gdProject, sceneName?: ?string): Object => {
   });
   return result;
 };
-
-const getCommandSummaries = () =>
-  Object.keys(commandsList).map(commandName => {
-    const commandMetadata = commandsList[((commandName: any): CommandName)];
-    const { displayText } = commandMetadata;
-    return {
-      commandName,
-      area: commandMetadata.area,
-      displayText:
-        typeof displayText === 'string'
-          ? displayText
-          : displayText && displayText.id,
-      handledByElectron: !!commandMetadata.handledByElectron,
-    };
-  });
 
 // ---------------------------------------------------------------------------
 // Runtime preview inspection
@@ -1274,6 +886,9 @@ const summarizeRuntimeInstance = (
     const position = {
       x: instance ? readRuntimeNumber(instance.x) : undefined,
       y: instance ? readRuntimeNumber(instance.y) : undefined,
+      z: instance
+        ? readRuntimeNumber(instance.z !== undefined ? instance.z : instance._z)
+        : undefined,
       layer:
         instance && typeof instance.layer === 'string'
           ? instance.layer
@@ -1369,7 +984,11 @@ const summarizeRuntimeInstance = (
 // the dump is the raw runtime object graph and its shape can vary.
 // options.positionObjectNames (Set<string>) → include per-instance x/y/angle for
 // those object names.
-const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
+const summarizeRuntimeGameDump = (
+  payload: any,
+  options?: Object,
+  rendererDiagnostics?: ?Object
+): Object => {
   if (!payload || typeof payload !== 'object') {
     return { available: false };
   }
@@ -1396,6 +1015,7 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
       paused: !!payload._paused,
       globalVariables: summarizeRuntimeVariables(payload._variables),
       scenes: [],
+      rendererDiagnostics: rendererDiagnostics || undefined,
     };
 
     const stack =
@@ -1441,6 +1061,12 @@ const summarizeRuntimeGameDump = (payload: any, options?: Object): Object => {
               y:
                 instance && typeof instance.y === 'number'
                   ? instance.y
+                  : undefined,
+              z:
+                instance && typeof instance.z === 'number'
+                  ? instance.z
+                  : instance && typeof instance._z === 'number'
+                  ? instance._z
                   : undefined,
               angle:
                 instance && typeof instance.angle === 'number'
@@ -1769,6 +1395,7 @@ const captureRunningPreviewState = (
 
     const logs = [];
     let dumpPayload = null;
+    let rendererDiagnostics = null;
     let status = null;
     let settled = false;
     let unregister = () => {};
@@ -1818,8 +1445,10 @@ const captureRunningPreviewState = (
             : undefined,
         runtime: summarizeRuntimeGameDump(
           dumpPayload,
-          makeRuntimeSummaryOptions(args)
+          makeRuntimeSummaryOptions(args),
+          rendererDiagnostics
         ),
+        rendererDiagnostics: rendererDiagnostics || undefined,
         includeRawDump: !!(args && args.include_raw_dump),
         rawDump:
           args && args.include_raw_dump ? dumpPayload || undefined : undefined,
@@ -1874,6 +1503,7 @@ const captureRunningPreviewState = (
           if (id !== targetId) return;
           if (parsedMessage.command === 'dump') {
             dumpPayload = parsedMessage.payload;
+            rendererDiagnostics = parsedMessage.rendererDiagnostics || null;
             // Got what we came for; resolve promptly.
             finish();
           } else if (parsedMessage.command === 'status') {
@@ -2198,7 +1828,7 @@ const capturePreviewScreenshotLegacy = async (
         ],
         recommendedActions: [
           'retry after the preview renders',
-          'use render_scene_to_png for static layout checks',
+          'use capture_preview_screenshot for visual checks',
         ],
       },
     };
@@ -2359,70 +1989,46 @@ const capturePreviewScreenshot = async (
   };
 };
 
-// Map GDevelop key names to raw DOM key codes (+ location for left/right
-// modifiers), so callers can pass "Space"/"Left"/"a" instead of numbers.
-// Mirrors GDJS keysNameToCode but stores RAW codes for modifiers (the runtime's
-// onKeyPressed re-applies the location offset).
-const KEY_NAME_TO_CODE: {
-  [string]: {| code: number, location?: number |},
-} = (() => {
-  const map: { [string]: {| code: number, location?: number |} } = {};
-  const add = (name: string, code: number, location?: number) => {
-    map[name.toLowerCase()] = location ? { code, location } : { code };
-  };
-  for (let c = 65; c <= 90; c++) add(String.fromCharCode(c), c); // a-z
-  for (let n = 0; n <= 9; n++) add('num' + n, 48 + n);
-  for (let n = 0; n <= 9; n++) add('numpad' + n, 96 + n);
-  add('space', 32);
-  add('return', 13);
-  add('enter', 13);
-  add('escape', 27);
-  add('tab', 9);
-  add('back', 8);
-  add('backspace', 8);
-  add('delete', 46);
-  add('insert', 45);
-  add('pageup', 33);
-  add('pagedown', 34);
-  add('end', 35);
-  add('home', 36);
-  add('pause', 19);
-  add('menu', 93);
-  add('left', 37);
-  add('up', 38);
-  add('right', 39);
-  add('down', 40);
-  add('add', 107);
-  add('subtract', 109);
-  add('multiply', 106);
-  add('divide', 111);
-  add('semicolon', 186);
-  add('comma', 188);
-  add('period', 190);
-  add('quote', 222);
-  add('slash', 191);
-  add('backslash', 220);
-  add('equal', 187);
-  add('dash', 189);
-  add('lbracket', 219);
-  add('rbracket', 221);
-  add('tilde', 192);
-  for (let f = 1; f <= 12; f++) add('f' + f, 111 + f);
-  // Modifiers: raw code + location (1 = left, 2 = right).
-  add('shift', 16);
-  add('lshift', 16, 1);
-  add('rshift', 16, 2);
-  add('control', 17);
-  add('ctrl', 17);
-  add('lcontrol', 17, 1);
-  add('rcontrol', 17, 2);
-  add('alt', 18);
-  add('lalt', 18, 1);
-  add('ralt', 18, 2);
-  add('lsystem', 91, 1);
-  add('rsystem', 91, 2);
-  return map;
-})();
+const getKeyboardKeyDefinitionForCode = (
+  keyCode: number,
+  location?: number
+): ?Object => {
+  const matchingLocation =
+    typeof location === 'number'
+      ? keyDefinitions.find(
+          definition =>
+            definition.keyCode === keyCode && definition.location === location
+        )
+      : null;
+  return (
+    matchingLocation ||
+    keyDefinitions.find(
+      definition => definition.keyCode === keyCode && definition.location === 0
+    ) ||
+    keyDefinitions.find(definition => definition.keyCode === keyCode) ||
+    null
+  );
+};
+
+const makeNormalizedKeyboardInput = (
+  type: string,
+  definition: ?Object,
+  keyCode: number,
+  location: ?number,
+  inputAlias?: string
+): Object => ({
+  type,
+  domCode: definition ? definition.domCode : null,
+  keyCode,
+  gdevelopKeyName: definition ? definition.gdevelopKeyName : null,
+  location:
+    typeof location === 'number'
+      ? location
+      : definition && typeof definition.location === 'number'
+      ? definition.location
+      : 0,
+  inputAlias,
+});
 
 const MOUSE_BUTTON_NAME_TO_CODE: { [string]: number } = {
   left: 0,
@@ -2442,24 +2048,42 @@ const resolveSimulatedInput = (raw: any): Object => {
   if (type === 'keyPressed' || type === 'keyReleased') {
     let code = typeof raw.key_code === 'number' ? raw.key_code : null;
     let location = typeof raw.location === 'number' ? raw.location : undefined;
+    let definition =
+      code !== null ? getKeyboardKeyDefinitionForCode(code, location) : null;
     if (code === null && typeof raw.key === 'string') {
-      const mapped = KEY_NAME_TO_CODE[raw.key.toLowerCase()];
-      if (!mapped) {
+      definition = getKeyboardKeyDefinition(raw.key);
+      if (!definition) {
         return { ok: false, error: `Unknown key name: "${raw.key}".` };
       }
-      code = mapped.code;
-      if (mapped.location !== undefined) location = mapped.location;
+      code = definition.keyCode;
+      if (typeof definition.location === 'number') {
+        location = definition.location;
+      }
     }
     if (code === null) {
       return { ok: false, error: `${type} needs "key" or "key_code".` };
     }
-    return { ok: true, input: { type, keyCode: code, location } };
+    return {
+      ok: true,
+      input: { type, keyCode: code, location },
+      normalization: makeNormalizedKeyboardInput(
+        type,
+        definition,
+        code,
+        location,
+        typeof raw.key === 'string' ? raw.key : undefined
+      ),
+    };
   }
   if (type === 'releaseAllKeys') {
-    return { ok: true, input: { type } };
+    return { ok: true, input: { type }, normalization: { type } };
   }
   if (type === 'mouseMove') {
-    return { ok: true, input: { type, x: raw.x, y: raw.y } };
+    return {
+      ok: true,
+      input: { type, x: raw.x, y: raw.y },
+      normalization: { type, x: raw.x, y: raw.y },
+    };
   }
   if (type === 'mouseButtonPressed' || type === 'mouseButtonReleased') {
     const button =
@@ -2468,16 +2092,24 @@ const resolveSimulatedInput = (raw: any): Object => {
         : typeof raw.button === 'string'
         ? MOUSE_BUTTON_NAME_TO_CODE[raw.button.toLowerCase()]
         : 0;
-    return { ok: true, input: { type, button: button || 0 } };
-  }
-  if (type === 'touchStart' || type === 'touchMove') {
     return {
       ok: true,
-      input: { type, identifier: raw.identifier || 0, x: raw.x, y: raw.y },
+      input: { type, button: button || 0 },
+      normalization: { type, button: button || 0 },
     };
   }
+  if (type === 'touchStart' || type === 'touchMove') {
+    const input = {
+      type,
+      identifier: raw.identifier || 0,
+      x: raw.x,
+      y: raw.y,
+    };
+    return { ok: true, input, normalization: input };
+  }
   if (type === 'touchEnd') {
-    return { ok: true, input: { type, identifier: raw.identifier || 0 } };
+    const input = { type, identifier: raw.identifier || 0 };
+    return { ok: true, input, normalization: input };
   }
   return { ok: false, error: `Unknown input type: "${type}".` };
 };
@@ -2517,7 +2149,12 @@ const expandRunFramesInput = (raw: any): Object => {
 
   const resolved = resolveSimulatedInput(raw);
   if (!resolved.ok) return resolved;
-  return { ok: true, preInputs: [resolved.input], postInputs: [] };
+  return {
+    ok: true,
+    preInputs: [resolved.input],
+    postInputs: [],
+    normalizations: [resolved.normalization],
+  };
 };
 
 const releaseHeldPreviewKeys = async (
@@ -2572,12 +2209,14 @@ const simulatePreviewInput = async (
     };
   }
   const resolved = [];
+  const normalizedInputs = [];
   for (const raw of rawInputs) {
     const result = resolveSimulatedInput(raw);
     if (!result.ok) {
       return { success: false, running: true, error: result.error };
     }
     resolved.push(result.input);
+    normalizedInputs.push(result.normalization);
   }
 
   const { matched, payload } = await sendTargetedRequest(
@@ -2591,6 +2230,7 @@ const simulatePreviewInput = async (
       running: true,
       debuggerId: targetId,
       appliedCount: resolved.length,
+      normalizedInputs,
       note:
         'Input sent but not confirmed (no reply from the targeted preview before timeout). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
     };
@@ -2614,6 +2254,7 @@ const simulatePreviewInput = async (
     running: true,
     debuggerId: targetId,
     applied: payload.applied,
+    normalizedInputs,
     error: payload.error || undefined,
     // InputManager state right after applying the input (pressedKeyCodes,
     // lastPressedKey, mouseX/Y, pressedMouseButtons). If a key you pressed is
@@ -2642,6 +2283,7 @@ const runPreviewFrames = async (
   const rawInputs = Array.isArray(args && args.inputs) ? args.inputs : [];
   const resolved: Array<Object> = [];
   const postResolved: Array<Object> = [];
+  const normalizedInputs: Array<Object> = [];
   let suggestedFrames: ?number;
   for (const raw of rawInputs) {
     const result = expandRunFramesInput(raw);
@@ -2650,6 +2292,7 @@ const runPreviewFrames = async (
     }
     resolved.push(...(result.preInputs || []));
     postResolved.push(...(result.postInputs || []));
+    normalizedInputs.push(...(result.normalizations || []));
     if (typeof result.frames === 'number' && suggestedFrames === undefined) {
       suggestedFrames = result.frames;
     }
@@ -2754,6 +2397,7 @@ const runPreviewFrames = async (
 
   const runMeta = (payload && payload.runFrames) || {};
   const dumpPayload = payload && payload.payload;
+  const rendererDiagnostics = payload && payload.rendererDiagnostics;
   let heldKeys = Array.isArray(runMeta.heldKeys) ? runMeta.heldKeys : [];
   let cleanup = runMeta.cleanup || {
     attempted: false,
@@ -2794,6 +2438,7 @@ const runPreviewFrames = async (
     running: true,
     debuggerId: targetId,
     applied: runMeta.applied,
+    normalizedInputs,
     requestedFrames: frames,
     steppedFrames,
     stoppedEarly,
@@ -2827,8 +2472,10 @@ const runPreviewFrames = async (
         : undefined),
     runtime: summarizeRuntimeGameDump(
       dumpPayload,
-      makeRuntimeSummaryOptions(args)
+      makeRuntimeSummaryOptions(args),
+      rendererDiagnostics
     ),
+    rendererDiagnostics: rendererDiagnostics || undefined,
     note:
       (heldKeys.length && !autoRelease
         ? `NOTE: ${heldKeys.length} key(s) still held (${heldKeys.join(
@@ -3446,93 +3093,6 @@ const createOrUpdateOnSignalFunction = (
   };
 };
 
-const getStaleStateTargetForTool = (
-  toolName: string,
-  args: ?Object,
-  result?: ?Object
-): Object => {
-  const sceneName =
-    getStringArg(args, ['scene_name', 'sceneName']) ||
-    (result && typeof result.sceneName === 'string' ? result.sceneName : null);
-
-  if (
-    toolName === 'add_scene_events' ||
-    toolName === 'generate_events' ||
-    toolName === 'replace_scene_events_from_file' ||
-    toolName === 'create_group' ||
-    toolName === 'wrap_events_in_group' ||
-    toolName === 'move_events_to_group' ||
-    toolName === 'rename_group' ||
-    toolName === 'ensure_scene_event_ids' ||
-    toolName === 'patch_scene_event_instruction' ||
-    toolName === 'attach_object_to_object_top'
-  ) {
-    return {
-      kind: 'scene-events',
-      sceneName,
-    };
-  }
-
-  if (
-    toolName === 'gdevelop_create_or_update_extension_function' ||
-    toolName === 'gdevelop_create_or_update_on_signal' ||
-    toolName === 'patch_extension_event_instruction' ||
-    toolName === 'replace_extension_function_events_from_file' ||
-    (toolName === 'apply_validated_extension_patch' &&
-      result &&
-      result.scope === 'extension_function')
-  ) {
-    const parentKind =
-      (result && typeof result.parentKind === 'string'
-        ? result.parentKind
-        : getStringArg(args, ['parent_kind', 'parentKind'])) || 'extension';
-    return {
-      kind: 'extension-function',
-      extensionName: getStringArg(args, ['extension_name', 'extensionName']),
-      parentKind,
-      parentName:
-        parentKind === 'extension'
-          ? null
-          : result && typeof result.parentName === 'string'
-          ? result.parentName
-          : getStringArg(args, ['parent_name', 'parentName']),
-      functionName:
-        result && typeof result.functionName === 'string'
-          ? result.functionName
-          : result &&
-            result.function &&
-            typeof result.function.name === 'string'
-          ? result.function.name
-          : getStringArg(args, [
-              'new_function_name',
-              'newFunctionName',
-              'function_name',
-              'functionName',
-            ]),
-    };
-  }
-
-  if (toolName === 'gdevelop_delete_extension_function') {
-    return {
-      kind: 'extension-function',
-      extensionName: getStringArg(args, ['extension_name', 'extensionName']),
-      parentKind:
-        getStringArg(args, ['parent_kind', 'parentKind']) || 'extension',
-      parentName: getStringArg(args, ['parent_name', 'parentName']),
-      functionName: getStringArg(args, ['function_name', 'functionName']),
-    };
-  }
-
-  if (sceneName) {
-    return {
-      kind: 'scene',
-      sceneName,
-    };
-  }
-
-  return { kind: 'project' };
-};
-
 const buildStaleStateAdvisory = (
   context: McpEditorBridgeContext,
   target: Object
@@ -3582,12 +3142,12 @@ const buildStaleStateAdvisory = (
       ? [
           ...(target.kind === 'extension-function'
             ? [
-                'gdevelop_save_project_and_wait',
+                'reload_project',
                 'reload/reopen the project if extension instruction metadata or generated preview code still looks stale',
               ]
             : []),
           PREVIEW_CLEANUP_RELAUNCH_ACTION,
-          'fallback: gdevelop_save_project_and_wait; control_preview { action: "close", close_all: true }; launch_preview { start_paused: true, force_new: true, timeout_ms: 15000 }; wait_until_preview_ready { require_paused: true }',
+          'fallback: control_preview { action: "close", close_all: true }; reload_project; launch_preview { start_paused: true, force_new: true, timeout_ms: 15000 }; wait_until_preview_ready { require_paused: true }',
           'run runtime checks/screenshots only after relaunching the preview',
         ]
       : [],
@@ -3796,33 +3356,6 @@ const makePreviewRuntimeNotReadyResult = ({
       operation,
     }),
   };
-};
-
-const notifyProjectModelChangedOutsideEditor = (
-  project: gdProject,
-  context: McpEditorBridgeContext
-) => {
-  for (let index = 0; index < project.getLayoutsCount(); index++) {
-    const scene = project.getLayoutAt(index);
-    if (context.onSceneEventsModifiedOutsideEditor) {
-      context.onSceneEventsModifiedOutsideEditor({
-        scene,
-        newOrChangedAiGeneratedEventIds: new Set(),
-      });
-    }
-    if (context.onObjectsModifiedOutsideEditor) {
-      context.onObjectsModifiedOutsideEditor({
-        scene,
-        isNewObjectTypeUsed: false,
-      });
-    }
-    if (context.onInstancesModifiedOutsideEditor) {
-      context.onInstancesModifiedOutsideEditor({ scene });
-    }
-    if (context.onObjectGroupsModifiedOutsideEditor) {
-      context.onObjectGroupsModifiedOutsideEditor({ scene });
-    }
-  }
 };
 
 const waitForPreviewRuntimeReady = async (
@@ -4629,88 +4162,6 @@ const setRuntimeState = async (
   };
 };
 
-// Auto-quote safe bare string literals (e.g. layer "HUD", a timer identifier) in
-// the events_json / event_changes[].generated_events of an add_scene_events
-// payload, so callers do not have to remember to escape them. Mutates a shallow
-// copy of args and returns it; never throws (best-effort normalization).
-const autoQuoteAddSceneEventsArgs = (
-  project: ?gdProject,
-  args: Object
-): Object => {
-  if (!project || !args) return args;
-  const normalizeEventsPayload = (eventsPayload: any): any => {
-    if (
-      typeof eventsPayload !== 'string' &&
-      !Array.isArray(eventsPayload) &&
-      !(eventsPayload && typeof eventsPayload === 'object')
-    ) {
-      return eventsPayload;
-    }
-
-    const originalWasString = typeof eventsPayload === 'string';
-    let parsed;
-    try {
-      parsed = originalWasString
-        ? JSON.parse(eventsPayload)
-        : JSON.parse(JSON.stringify(eventsPayload));
-      if (parsed && !Array.isArray(parsed) && typeof parsed.type === 'string') {
-        parsed = [parsed];
-      } else if (
-        parsed &&
-        !Array.isArray(parsed) &&
-        Array.isArray(parsed.events)
-      ) {
-        parsed = parsed.events;
-      }
-      if (!Array.isArray(parsed)) return eventsPayload;
-      const changed = autoQuoteEventParameters(project, parsed);
-      if (originalWasString) {
-        return changed > 0 ? JSON.stringify(parsed) : eventsPayload;
-      }
-      return changed > 0 ? parsed : eventsPayload;
-    } catch (error) {
-      // Leave invalid JSON untouched; validation will report it.
-      return eventsPayload;
-    }
-  };
-
-  const next = { ...args };
-  if (
-    typeof next.events_json === 'string' ||
-    Array.isArray(next.events_json) ||
-    (next.events_json && typeof next.events_json === 'object')
-  ) {
-    next.events_json = normalizeEventsPayload(next.events_json);
-  }
-  if (Array.isArray(next.event_changes)) {
-    next.event_changes = next.event_changes.map(change => {
-      if (!change || typeof change !== 'object') return change;
-      const updated = { ...change };
-      if (
-        typeof updated.generated_events === 'string' ||
-        Array.isArray(updated.generated_events) ||
-        (updated.generated_events &&
-          typeof updated.generated_events === 'object')
-      ) {
-        updated.generated_events = normalizeEventsPayload(
-          updated.generated_events
-        );
-      }
-      if (
-        typeof updated.generatedEvents === 'string' ||
-        Array.isArray(updated.generatedEvents) ||
-        (updated.generatedEvents && typeof updated.generatedEvents === 'object')
-      ) {
-        updated.generatedEvents = normalizeEventsPayload(
-          updated.generatedEvents
-        );
-      }
-      return updated;
-    });
-  }
-  return next;
-};
-
 const getEventsJsonArgument = (args: ?Object): string | null => {
   if (!args) return null;
   const eventsJson = args.events_json || args.eventsJson || args.events;
@@ -4719,290 +4170,6 @@ const getEventsJsonArgument = (args: ?Object): string | null => {
     return JSON.stringify(eventsJson);
   }
   return null;
-};
-
-const getSceneEventsRevision = (
-  project: gdProject,
-  sceneName: string
-): string => {
-  if (!project.hasLayoutNamed(sceneName)) {
-    throw new Error(`Scene "${sceneName}" does not exist.`);
-  }
-  return getSerializedEventsRevision(
-    serializeToJSObject(project.getLayout(sceneName).getEvents())
-  );
-};
-
-const makeSimulationEventChanges = (args: Object): Array<any> => {
-  const eventsJson = getEventsJsonArgument(args);
-  if (eventsJson) {
-    return [
-      {
-        operationName: args.operation_name || 'insert_at_end',
-        operationTargetEvent: args.operation_target_event || null,
-        generatedEvents: eventsJson,
-      },
-    ];
-  }
-  if (!Array.isArray(args.event_changes)) return [];
-  return args.event_changes.map(change => ({
-    operationName:
-      (change && (change.operation_name || change.operationName)) ||
-      'insert_at_end',
-    operationTargetEvent:
-      (change &&
-        (change.operation_target_event || change.operationTargetEvent)) ||
-      null,
-    generatedEvents:
-      change && change.generated_events !== undefined
-        ? typeof change.generated_events === 'string'
-          ? change.generated_events
-          : JSON.stringify(change.generated_events)
-        : change && change.generatedEvents !== undefined
-        ? typeof change.generatedEvents === 'string'
-          ? change.generatedEvents
-          : JSON.stringify(change.generatedEvents)
-        : null,
-  }));
-};
-
-const applyEventChangeDependenciesForSimulation = ({
-  project,
-  scene,
-  args,
-}: {
-  project: gdProject,
-  scene: gdLayout,
-  args: Object,
-}) => {
-  if (!Array.isArray(args.event_changes)) return;
-  args.event_changes.forEach(change => {
-    if (!change || typeof change !== 'object') return;
-    addUndeclaredVariables({
-      project,
-      scene,
-      undeclaredVariables:
-        change.undeclared_variables || change.undeclaredVariables || [],
-    });
-    const objectVariables =
-      change.undeclared_object_variables ||
-      change.undeclaredObjectVariables ||
-      {};
-    Object.keys(objectVariables).forEach(objectName =>
-      addObjectUndeclaredVariables({
-        project,
-        scene,
-        objectName,
-        undeclaredVariables: objectVariables[objectName] || [],
-      })
-    );
-    const missingBehaviors =
-      change.missing_object_behaviors || change.missingObjectBehaviors || {};
-    Object.keys(missingBehaviors).forEach(objectName =>
-      addMissingObjectBehaviors({
-        project,
-        scene,
-        objectName,
-        missingBehaviors: missingBehaviors[objectName] || [],
-      })
-    );
-  });
-};
-
-const dryRunSceneEventChanges = ({
-  project,
-  args,
-}: {
-  project: gdProject,
-  args: Object,
-}): Object => {
-  const sceneName =
-    args && typeof args.scene_name === 'string' ? args.scene_name : '';
-  if (!sceneName) throw new Error('Missing scene_name.');
-  if (!project.hasLayoutNamed(sceneName)) {
-    throw new Error(`Scene "${sceneName}" does not exist.`);
-  }
-  const eventChanges = makeSimulationEventChanges(args);
-  if (!eventChanges.length) {
-    throw new Error('Provide events_json or one or more event_changes.');
-  }
-
-  const currentSerializedEvents = serializeToJSObject(
-    project.getLayout(sceneName).getEvents()
-  );
-  const currentRevision = getSerializedEventsRevision(currentSerializedEvents);
-  const expectedRevision = args.expected_revision || args.expectedRevision;
-  if (expectedRevision && expectedRevision !== currentRevision) {
-    return {
-      success: false,
-      valid: false,
-      dryRun: true,
-      changed: false,
-      code: 'EVENT_SHEET_REVISION_CONFLICT',
-      sceneName,
-      expectedRevision,
-      eventSheetRevision: currentRevision,
-      error:
-        'The scene event sheet changed after it was read. Read it again and rebuild the patch against the current revision.',
-    };
-  }
-
-  const validationProject = gd.ProjectHelper.createNewGDJSProject();
-  try {
-    unserializeFromJSObject(validationProject, serializeToJSObject(project));
-    const validationScene = validationProject.getLayout(sceneName);
-    applyEventChangeDependenciesForSimulation({
-      project: validationProject,
-      scene: validationScene,
-      args,
-    });
-    const application = applyEventsChanges(
-      validationProject,
-      validationScene.getEvents(),
-      eventChanges,
-      args.generated_event_id || 'mcp-generated-event'
-    );
-    const proposedSerializedEvents = serializeToJSObject(
-      validationScene.getEvents()
-    );
-    const proposedRevision = getSerializedEventsRevision(
-      proposedSerializedEvents
-    );
-    if (application.errors.length) {
-      return {
-        success: false,
-        valid: false,
-        dryRun: true,
-        changed: false,
-        code: 'EVENT_PATCH_INVALID',
-        sceneName,
-        eventSheetRevision: currentRevision,
-        proposedEventSheetRevision: proposedRevision,
-        errors: application.errors,
-      };
-    }
-
-    const validation = validateEventsJson({
-      project: validationProject,
-      sceneName,
-      eventsJson: JSON.stringify(proposedSerializedEvents),
-      allowJavaScriptEvents: !!args.allow_javascript_events,
-      dedupeErrors: !!args.dedupe_errors,
-      summaryOnly: args.summary_only !== false,
-      errorsOnly: !!args.errors_only,
-      includeRenderedEvents: !!args.include_rendered_events,
-      includeNormalizedJson: !!args.include_normalized_json,
-    });
-    return {
-      ...validation,
-      success: validation.valid,
-      dryRun: true,
-      changed: false,
-      wouldModify: proposedRevision !== currentRevision,
-      sceneName,
-      eventSheetRevision: currentRevision,
-      proposedEventSheetRevision: proposedRevision,
-      requestedOperations: eventChanges.length,
-      lowLevelMutations: application.applied,
-    };
-  } finally {
-    validationProject.delete();
-  }
-};
-
-const normalizeSerializedEventsInputForValidation = (value: any): any => {
-  if (Array.isArray(value)) return value;
-  if (value && typeof value === 'object') {
-    if (typeof value.type === 'string') return [value];
-    if (Array.isArray(value.events)) return value.events;
-  }
-  return value;
-};
-
-const getGeneratedEventsPayload = (change: Object): any => {
-  if (!change || typeof change !== 'object') return undefined;
-  if (hasOwn(change, 'generated_events')) {
-    return change.generated_events;
-  }
-  if (hasOwn(change, 'generatedEvents')) {
-    return change.generatedEvents;
-  }
-  return undefined;
-};
-
-const collectAddSceneEventsRawIssues = (args: ?Object): Array<Object> => {
-  if (!args) return [];
-  const issues: Array<Object> = [];
-  const validatePayload = (source: string, payload: any) => {
-    if (payload === null || payload === undefined) return;
-    if (typeof payload === 'string' && payload.trim() === '') return;
-
-    let parsed;
-    try {
-      parsed =
-        typeof payload === 'string'
-          ? JSON.parse(payload)
-          : JSON.parse(JSON.stringify(payload));
-    } catch (error) {
-      issues.push({
-        severity: 'error',
-        type: 'invalid-events-json',
-        source,
-        suggestion: `Fix ${source}: it must be valid serialized events JSON.`,
-        error: error && error.message ? error.message : String(error),
-      });
-      return;
-    }
-
-    const normalized = normalizeSerializedEventsInputForValidation(parsed);
-    if (!Array.isArray(normalized)) {
-      issues.push({
-        severity: 'error',
-        type: 'invalid-events-json-shape',
-        source,
-        suggestion: `Fix ${source}: use a serialized events array, a single serialized event object, or { events: [...] } before calling add_scene_events.`,
-      });
-      return;
-    }
-
-    collectSerializedEventJsonIssues(normalized).forEach(issue => {
-      issues.push({
-        ...issue,
-        source,
-      });
-    });
-  };
-
-  validatePayload('events_json', args.events_json);
-  validatePayload('eventsJson', args.eventsJson);
-  validatePayload('events', args.events);
-
-  if (Array.isArray(args.event_changes)) {
-    args.event_changes.forEach((change, index) => {
-      const payload = getGeneratedEventsPayload(change);
-      if (payload === undefined || payload === null) return;
-      validatePayload(`event_changes[${index}].generated_events`, payload);
-    });
-  }
-
-  return issues;
-};
-
-const makeAddSceneEventsPreflightFailure = (args: ?Object): ?Object => {
-  const issues = collectAddSceneEventsRawIssues(args).filter(
-    issue => issue.severity === 'error'
-  );
-  if (!issues.length) return null;
-  return {
-    success: false,
-    valid: false,
-    error:
-      'add_scene_events validation failed before writing. No events were created.',
-    errors: issues,
-    issues,
-    note:
-      'Fix the serialized event JSON and retry. In scene/layout events, use current instruction types such as BooleanObjectVariable instead of legacy function-only forms such as ObjectVariableAsBoolean.',
-  };
 };
 
 const getPrompt = (name: string) => {
@@ -5037,6 +4204,10 @@ const getResourceContent = async (
     };
   }
 
+  if (uri !== 'gdevelop://project/summary') {
+    throw new Error(`Unknown GDevelop MCP resource: ${uri}`);
+  }
+
   if (!project) {
     throw new Error('No project opened.');
   }
@@ -5049,341 +4220,143 @@ const getResourceContent = async (
     };
   }
 
-  if (uri === 'gdevelop://project/json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: serializeToJSON(project),
-    };
-  }
-
-  if (uri === 'gdevelop://project/static-data.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(getStaticData(project, {}).staticData, null, 2),
-    };
-  }
-
-  if (uri === 'gdevelop://project/extensions-summary') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(getProjectExtensionsSummary(project), null, 2),
-    };
-  }
-
-  if (uri === 'gdevelop://project/resources.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(inspectProjectResources(project), null, 2),
-    };
-  }
-
-  const sceneResourceMatch = uri.match(
-    /^gdevelop:\/\/scene\/([^/]+)\/(events\.txt|events\.json|instances\.json|objects\.json|scene\.json)$/
-  );
-  if (!sceneResourceMatch) {
-    throw new Error(`Unknown GDevelop MCP resource: ${uri}`);
-  }
-
-  const sceneName = decodeURIComponent(sceneResourceMatch[1]);
-  const resourceKind = sceneResourceMatch[2];
-  if (!project.hasLayoutNamed(sceneName)) {
-    throw new Error(`Scene not found: "${sceneName}".`);
-  }
-
-  if (resourceKind === 'events.txt') {
-    return {
-      uri,
-      mimeType: 'text/plain',
-      text: renderNonTranslatedEventsAsText({
-        eventsList: project.getLayout(sceneName).getEvents(),
-      }),
-    };
-  }
-
-  if (resourceKind === 'events.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(
-        readSceneEventsSerialized(project, { scene_name: sceneName }),
-        null,
-        2
-      ),
-    };
-  }
-
-  if (resourceKind === 'scene.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(
-        readSerializedScene(project, { scene_name: sceneName }),
-        null,
-        2
-      ),
-    };
-  }
-
-  if (resourceKind === 'objects.json') {
-    return {
-      uri,
-      mimeType: 'application/json',
-      text: JSON.stringify(getObjectsSummary(project, sceneName), null, 2),
-    };
-  }
-
-  const instancesResult = await callMcpTool({
-    toolName: 'describe_instances',
-    args: { scene_name: sceneName },
-    context,
-  });
-  return {
-    uri,
-    mimeType: 'application/json',
-    text: instancesResult.content[0].text,
-  };
+  throw new Error(`Unknown GDevelop MCP resource: ${uri}`);
 };
 
-const callEditorFunction = async ({
-  toolName,
-  args,
-  context,
-}: {|
-  toolName: string,
-  args: Object,
-  context: McpEditorBridgeContext,
-|}): Promise<McpToolResult> => {
-  const project = context.getProject();
-  const isSceneEventWrite = !!(
-    project &&
-    (toolName === 'add_scene_events' || toolName === 'generate_events') &&
-    args &&
-    typeof args.scene_name === 'string' &&
-    project.hasLayoutNamed(args.scene_name)
-  );
-  const oldRevision = isSceneEventWrite
-    ? getSceneEventsRevision((project: any), args.scene_name)
-    : undefined;
-  const processEditorFunctionCalls =
-    context.processEditorFunctionCalls ||
-    getDefaultProcessEditorFunctionCalls();
-
-  let results: Array<any>;
+const parseMcpToolResult = (result: McpToolResult): Object => {
+  if (!result || !Array.isArray(result.content) || !result.content[0]) {
+    return {};
+  }
   try {
-    ({ results } = await processEditorFunctionCalls({
-      project,
-      i18n: context.i18n,
-      editorCallbacks: context.editorCallbacks,
-      toolOptions: { includeEventsJson: true },
-      functionCalls: [
-        {
-          name: toolName,
-          arguments: JSON.stringify(args || {}),
-          call_id: 'mcp-call',
-        },
-      ],
-      relatedAiRequestId: 'mcp',
-      getRelatedAiRequestLastMessages: () => ({
-        lastUserMessage: null,
-        lastAssistantMessages: [],
-      }),
-      generateEvents:
-        context.generateEvents ||
-        (async () => ({
-          generationCompleted: false,
-          errorMessage: 'Event generation is not available through MCP.',
-        })),
-      onSceneEventsModifiedOutsideEditor:
-        context.onSceneEventsModifiedOutsideEditor || (() => {}),
-      onInstancesModifiedOutsideEditor:
-        context.onInstancesModifiedOutsideEditor || (() => {}),
-      onObjectsModifiedOutsideEditor:
-        context.onObjectsModifiedOutsideEditor || (() => {}),
-      onObjectGroupsModifiedOutsideEditor:
-        context.onObjectGroupsModifiedOutsideEditor || (() => {}),
-      ensureExtensionInstalled:
-        context.ensureExtensionInstalled || (async () => {}),
-      onWillInstallExtension: context.onWillInstallExtension || (() => {}),
-      onExtensionInstalled: context.onExtensionInstalled || (() => {}),
-      searchAndInstallAsset:
-        context.searchAndInstallAsset ||
-        (async () => ({
-          status: 'error',
-          message: 'Asset search is not available through MCP.',
-          createdObjects: [],
-          assetShortHeader: null,
-          isTheFirstOfItsTypeInProject: false,
-        })),
-      searchAndInstallResources:
-        context.searchAndInstallResources ||
-        (async () => ({
-          results: [],
-        })),
-      getAssetStoreTagForNewObject:
-        context.getAssetStoreTagForNewObject || (() => null),
-    }));
+    return JSON.parse(result.content[0].text);
   } catch (error) {
-    const newRevision = isSceneEventWrite
-      ? getSceneEventsRevision((project: any), args.scene_name)
-      : undefined;
-    if (isSceneEventWrite && oldRevision !== newRevision) {
-      context.triggerUnsavedChanges();
-      const saveState =
-        args && args.save === true
-          ? {
-              requested: true,
-              ...(context.saveProjectAndWait
-                ? await saveProjectWithEvidence(context)
-                : {
-                    success: false,
-                    saved: false,
-                    reason: 'save-handler-unavailable',
-                  }),
-            }
-          : {
-              requested: false,
-              persistenceState: getPersistenceState(context),
-            };
-      return textResult({
-        success: true,
-        applied: true,
-        sceneName: args.scene_name,
-        oldRevision,
-        newRevision,
-        eventSheetRevision: newRevision,
-        editorReportedSuccess: false,
-        validationState: {
-          valid: true,
-          source: 'revision-readback-after-editor-exception',
-        },
-        saveState,
-        warning: error.message,
-      });
-    }
-    throw error;
+    return { message: result.content[0].text };
   }
+};
 
-  const firstResult = results && results[0];
-  if (!firstResult) {
-    return errorResult('The editor function did not return a result.');
-  }
+const compareVerificationValues = (
+  actual: any,
+  operator: string,
+  expected: any
+): boolean => {
+  if (operator === 'eq') return actual === expected;
+  if (operator === 'ne') return actual !== expected;
+  if (operator === 'gt') return actual > expected;
+  if (operator === 'gte') return actual >= expected;
+  if (operator === 'lt') return actual < expected;
+  if (operator === 'lte') return actual <= expected;
+  return false;
+};
 
-  if (firstResult.status === 'aborted') {
-    return errorResult('The editor function was aborted.');
+const findRendererLayerDiagnostic = (
+  inspection: Object,
+  layerName: string
+): ?Object => {
+  const diagnostics =
+    inspection && inspection.rendererDiagnostics
+      ? inspection.rendererDiagnostics
+      : inspection &&
+        inspection.runtime &&
+        inspection.runtime.rendererDiagnostics
+      ? inspection.runtime.rendererDiagnostics
+      : null;
+  const scenes =
+    diagnostics && Array.isArray(diagnostics.scenes) ? diagnostics.scenes : [];
+  for (let sceneIndex = scenes.length - 1; sceneIndex >= 0; sceneIndex--) {
+    const layers = Array.isArray(scenes[sceneIndex].layers)
+      ? scenes[sceneIndex].layers
+      : [];
+    const layer = layers.find(item => item && item.layerName === layerName);
+    if (layer) return layer;
   }
+  return null;
+};
 
-  if (firstResult.status === 'working') {
-    return textResult(firstResult);
-  }
+const evaluateProjectChangeAssertions = (
+  assertions: Array<Object>,
+  inspection: Object
+): Array<Object> => {
+  const runtimeScenes =
+    inspection && inspection.runtime && Array.isArray(inspection.runtime.scenes)
+      ? inspection.runtime.scenes
+      : [];
+  const runtimeScene = runtimeScenes[runtimeScenes.length - 1] || null;
+  return assertions.map((assertion, index) => {
+    let actual;
+    let expected = assertion.value;
+    let passed = false;
+    let details;
 
-  if (firstResult.didModifyProject) {
-    context.triggerUnsavedChanges();
-  }
-
-  let output = firstResult.output;
-  if (
-    firstResult.didModifyProject &&
-    output &&
-    typeof output === 'object' &&
-    !Array.isArray(output)
-  ) {
-    output = {
-      ...output,
-      persistenceState: getPersistenceState(context),
-    };
-  }
-  const newRevision = isSceneEventWrite
-    ? getSceneEventsRevision((project: any), args.scene_name)
-    : undefined;
-  const eventMutationObserved = !!(
-    isSceneEventWrite &&
-    (oldRevision !== newRevision ||
-      firstResult.didModifyProject ||
-      (output &&
-        typeof output === 'object' &&
-        (output.applied === true || output.lowLevelMutations > 0)))
-  );
-  const recoveredMutationAfterReportedFailure = !!(
-    !firstResult.success && eventMutationObserved
-  );
-  if (recoveredMutationAfterReportedFailure && !firstResult.didModifyProject) {
-    context.triggerUnsavedChanges();
-  }
-  if (isSceneEventWrite && output && typeof output === 'object') {
-    let saveState = {
-      requested: false,
-      persistenceState: getPersistenceState(context),
-    };
-    if (
-      args &&
-      args.save === true &&
-      (firstResult.success || recoveredMutationAfterReportedFailure)
-    ) {
-      saveState = {
-        requested: true,
-        ...(context.saveProjectAndWait
-          ? await saveProjectWithEvidence(context)
-          : {
-              success: false,
-              saved: false,
-              reason: 'save-handler-unavailable',
-            }),
+    if (assertion.type === 'object_count') {
+      actual =
+        runtimeScene &&
+        runtimeScene.objectInstanceCounts &&
+        typeof runtimeScene.objectInstanceCounts[assertion.object_name] ===
+          'number'
+          ? runtimeScene.objectInstanceCounts[assertion.object_name]
+          : 0;
+      passed = compareVerificationValues(actual, assertion.operator, expected);
+    } else if (assertion.type === 'instance_position_finite') {
+      const instanceIndex =
+        typeof assertion.instance_index === 'number'
+          ? assertion.instance_index
+          : 0;
+      const positions =
+        runtimeScene &&
+        runtimeScene.instancePositions &&
+        Array.isArray(runtimeScene.instancePositions[assertion.object_name])
+          ? runtimeScene.instancePositions[assertion.object_name]
+          : [];
+      actual = positions[instanceIndex] || null;
+      expected = 'finite x/y/z (when z is present)';
+      passed =
+        !!actual &&
+        Number.isFinite(actual.x) &&
+        Number.isFinite(actual.y) &&
+        (actual.z === undefined || Number.isFinite(actual.z));
+    } else if (assertion.type === 'runtime_error_count') {
+      actual =
+        inspection && Array.isArray(inspection.errors)
+          ? inspection.errors.length
+          : 0;
+      passed = compareVerificationValues(actual, assertion.operator, expected);
+    } else {
+      const layerName =
+        typeof assertion.layer_name === 'string' ? assertion.layer_name : '';
+      const layer = findRendererLayerDiagnostic(inspection, layerName);
+      const fieldByType = {
+        renderer_has_three_group: 'hasThreeGroup',
+        renderer_visible_mesh_count: 'visibleThreeMeshCount',
+        renderer_failed_texture_count: 'failedTextureCount',
+        renderer_rejected_object_count: 'rejected3DRendererObjectCount',
       };
+      const field = fieldByType[assertion.type];
+      if (!field) {
+        details = 'Unsupported assertion type.';
+      } else if (!layer) {
+        details = `Renderer diagnostics for layer "${layerName}" are unavailable.`;
+      } else {
+        actual = layer[field];
+        passed = compareVerificationValues(
+          actual,
+          assertion.operator,
+          expected
+        );
+      }
     }
-    output = {
-      ...output,
-      success: firstResult.success || recoveredMutationAfterReportedFailure,
-      sceneName: args.scene_name,
-      applied: eventMutationObserved,
-      oldRevision,
-      newRevision,
-      eventSheetRevision: newRevision,
-      validationState: output.validationState || {
-        valid: firstResult.success || recoveredMutationAfterReportedFailure,
-        source: 'direct-event-preflight',
-      },
-      saveState,
+
+    return {
+      index,
+      type: assertion.type,
+      passed,
+      actual,
+      expected,
+      operator: assertion.operator || undefined,
+      objectName: assertion.object_name || undefined,
+      layerName: assertion.layer_name || undefined,
+      details,
     };
-  }
-
-  // The event sheet revision is the source of truth. If an editor integration
-  // reports an unrelated failure after the model changed, returning an error
-  // would encourage a retry that duplicates the mutation.
-  if (recoveredMutationAfterReportedFailure) {
-    return textResult({
-      ...(output && typeof output === 'object' ? output : {}),
-      success: true,
-      applied: true,
-      editorReportedSuccess: false,
-      warning:
-        firstResult.output && firstResult.output.message
-          ? firstResult.output.message
-          : 'The editor reported a failure after the event sheet revision changed. The mutation was kept and verified by revision readback.',
-    });
-  }
-
-  return firstResult.success
-    ? textResult(
-        firstResult.didModifyProject
-          ? withStaleStateAdvisory(
-              output,
-              context,
-              getStaleStateTargetForTool(toolName, args, output)
-            )
-          : output
-      )
-    : errorResult(
-        firstResult.output && firstResult.output.message
-          ? firstResult.output.message
-          : JSON.stringify(firstResult.output || {}, null, 2),
-        output && typeof output === 'object' && !Array.isArray(output)
-          ? output
-          : undefined
-      );
+  });
 };
 
 const callMcpTool = async ({
@@ -5396,16 +4369,196 @@ const callMcpTool = async ({
   context: McpEditorBridgeContext,
 |}): Promise<McpToolResult> => {
   const permissions = context.getPermissions();
-  const targetToolName =
-    toolName === 'gdevelop_editor_call' && args && typeof args.name === 'string'
-      ? args.name
-      : toolName;
-  const permission = canCallMcpTool(targetToolName, permissions);
+  const permission = canCallMcpTool(toolName, permissions);
   if (!permission.canCall) {
     return errorResult(permission.reason || 'MCP tool is not allowed.');
   }
 
   const project = context.getProject();
+
+  if (toolName === 'verify_project_change') {
+    const receipts: Array<Object> = [];
+    const runStage = async (
+      stage: string,
+      name: string,
+      stageArgs: Object
+    ): Promise<
+      | {| failed: true, result: McpToolResult |}
+      | {| failed: false, receipt: Object |}
+    > => {
+      const response = await callMcpTool({
+        toolName: name,
+        args: stageArgs,
+        context,
+      });
+      const receipt = parseMcpToolResult(response);
+      receipts.push({ stage, toolName: name, receipt });
+      if (
+        response.isError ||
+        receipt.success === false ||
+        receipt.valid === false
+      ) {
+        return {
+          failed: true,
+          result: errorResult(
+            `verify_project_change stopped during ${stage}.`,
+            {
+              code: 'VERIFY_PROJECT_CHANGE_STAGE_FAILED',
+              success: false,
+              runtimeVerified: false,
+              completionReady: false,
+              failureStage: stage,
+              receipts,
+            }
+          ),
+        };
+      }
+      return { failed: false, receipt };
+    };
+
+    let stageResult = await runStage(
+      'validation',
+      'validate_project_files',
+      {}
+    );
+    if (stageResult.failed) return stageResult.result;
+
+    stageResult = await runStage('reload', 'reload_project', {});
+    if (stageResult.failed) return stageResult.result;
+
+    if (!args || args.close_existing_previews !== false) {
+      stageResult = await runStage('close-previews', 'control_preview', {
+        action: 'close',
+        close_all: true,
+      });
+      if (stageResult.failed) return stageResult.result;
+    }
+
+    stageResult = await runStage('launch', 'launch_preview', {
+      scene_name:
+        args && typeof args.scene_name === 'string'
+          ? args.scene_name
+          : undefined,
+      start_paused: true,
+      force_new: true,
+      timeout_ms:
+        args && typeof args.timeout_ms === 'number'
+          ? args.timeout_ms
+          : undefined,
+    });
+    if (stageResult.failed) return stageResult.result;
+    const debuggerId = stageResult.receipt.debuggerId;
+
+    const assertions =
+      args && Array.isArray(args.assertions) ? args.assertions : [];
+    const assertionObjectNames = assertions
+      .filter(
+        assertion =>
+          assertion &&
+          (assertion.type === 'object_count' ||
+            assertion.type === 'instance_position_finite') &&
+          typeof assertion.object_name === 'string'
+      )
+      .map(assertion => assertion.object_name);
+    const requestedObjects =
+      args && Array.isArray(args.objects) ? args.objects : [];
+    const objects = Array.from(
+      new Set([...requestedObjects, ...assertionObjectNames])
+    );
+
+    stageResult = await runStage('frames', 'run_frames', {
+      inputs: args && Array.isArray(args.inputs) ? args.inputs : undefined,
+      frames: args && typeof args.frames === 'number' ? args.frames : 1,
+      frame_delta_ms:
+        args && typeof args.frame_delta_ms === 'number'
+          ? args.frame_delta_ms
+          : undefined,
+      auto_release: true,
+      debugger_id: debuggerId || undefined,
+      objects: objects.length ? objects : undefined,
+      instance_positions_for: objects.length ? objects : undefined,
+      include:
+        args && Array.isArray(args.include)
+          ? args.include
+          : objects.length
+          ? ['position', 'angle', 'variables', 'behaviors']
+          : undefined,
+      instance_indexes:
+        args && Array.isArray(args.instance_indexes)
+          ? args.instance_indexes
+          : undefined,
+    });
+    if (stageResult.failed) return stageResult.result;
+
+    stageResult = await runStage(
+      'inspect',
+      'gdevelop_inspect_running_preview',
+      {
+        debugger_id: debuggerId || undefined,
+        timeout_ms:
+          args && typeof args.timeout_ms === 'number'
+            ? args.timeout_ms
+            : undefined,
+        objects: objects.length ? objects : undefined,
+        instance_positions_for: objects.length ? objects : undefined,
+        include:
+          args && Array.isArray(args.include)
+            ? args.include
+            : objects.length
+            ? ['position', 'angle', 'variables', 'behaviors']
+            : undefined,
+        instance_indexes:
+          args && Array.isArray(args.instance_indexes)
+            ? args.instance_indexes
+            : undefined,
+      }
+    );
+    if (stageResult.failed) return stageResult.result;
+    const inspection = stageResult.receipt;
+
+    const assertionResults = evaluateProjectChangeAssertions(
+      assertions,
+      inspection
+    );
+    receipts.push({
+      stage: 'assertions',
+      assertions: assertionResults,
+    });
+    const failedAssertion = assertionResults.find(result => !result.passed);
+    if (failedAssertion) {
+      return errorResult('A runtime verification assertion failed.', {
+        code: 'VERIFY_PROJECT_CHANGE_ASSERTION_FAILED',
+        success: false,
+        runtimeVerified: false,
+        completionReady: false,
+        failureStage: 'assertions',
+        failedAssertion,
+        assertions: assertionResults,
+        receipts,
+      });
+    }
+
+    if (args && args.screenshot) {
+      stageResult = await runStage('screenshot', 'capture_preview_screenshot', {
+        ...args.screenshot,
+        debugger_id: debuggerId || args.screenshot.debugger_id,
+      });
+      if (stageResult.failed) return stageResult.result;
+    }
+
+    return textResult({
+      success: true,
+      runtimeVerified: true,
+      completionReady: true,
+      sceneName:
+        args && typeof args.scene_name === 'string'
+          ? args.scene_name
+          : undefined,
+      debuggerId,
+      assertions: assertionResults,
+      receipts,
+    });
+  }
 
   if (toolName === 'gdevelop_get_editor_state') {
     return textResult(
@@ -5446,9 +4599,12 @@ const callMcpTool = async ({
         }
       );
     }
-    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'generate-catalogs requires a local multi-file project whose entry file is project.settings.',
+        'generate-catalogs requires a local multi-file project whose entry file is project.gdevelop.',
         {
           catalogsRegenerated: false,
           phase: 'locate-project-files',
@@ -5522,9 +4678,12 @@ const callMcpTool = async ({
         }
       );
     }
-    if (!/(?:^|[\\/])project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'validate_project_files requires a local multi-file project whose entry file is project.settings.',
+        'validate_project_files requires a local multi-file project whose entry file is project.gdevelop.',
         {
           valid: false,
           phase: 'locate-project-files',
@@ -5535,7 +4694,7 @@ const callMcpTool = async ({
               phase: 'locate-project-files',
               code: 'PROJECT_FILES_INVALID_ENTRY',
               message:
-                'The open project is not using project.settings as its entry file.',
+                'The open project is not using project.gdevelop as its entry file.',
               filePath: projectFile,
             },
           ],
@@ -5752,20 +4911,32 @@ const callMcpTool = async ({
       return errorResult('extension_name must not exceed 128 characters.');
     }
     const projectFile = project.getProjectFile();
-    if (!/[\\/]project\.settings$/i.test(projectFile)) {
+    if (
+      !path ||
+      path.basename(projectFile).toLowerCase() !== MULTI_FILE_ENTRY_NAME
+    ) {
       return errorResult(
-        'import_extension requires a saved multi-file project whose entry file is project.settings.'
+        'import_extension requires a saved multi-file project whose entry file is project.gdevelop.'
       );
     }
 
     const wasAlreadyInstalled = project.hasEventsFunctionsExtensionNamed(
       extensionName
     );
+    const projectHashBeforeImport = hashStructuredValue(
+      serializeToJSObject(project)
+    );
     const installedExtensionNames: Array<string> = [];
+    let extensionInstallReceipt = null;
     try {
       if (!wasAlreadyInstalled) {
-        await ensureExtensionInstalled({
+        extensionInstallReceipt = await ensureExtensionInstalled({
           extensionName,
+          preflightExtension: async ({ serializedExtension, registryHeader }) =>
+            validateReviewedExtensionJavaScriptAuthoring({
+              serializedExtension,
+              registryHeader,
+            }),
           onWillInstallExtension: (names: Array<string>) => {
             if (context.onWillInstallExtension)
               context.onWillInstallExtension(names);
@@ -5866,11 +5037,29 @@ const callMcpTool = async ({
         projectFile,
         generatedSources,
         persistedSourcesVerified: true,
+        compatibility:
+          extensionInstallReceipt &&
+          Array.isArray(extensionInstallReceipt.preflightReceipts)
+            ? {
+                policy: 'reviewed-store-extension',
+                preflightedBeforeMutation: true,
+                receipts: extensionInstallReceipt.preflightReceipts,
+              }
+            : {
+                policy: wasAlreadyInstalled
+                  ? 'already-installed-no-registry-preflight'
+                  : 'host-did-not-return-preflight-receipts',
+                preflightedBeforeMutation: false,
+                receipts: [],
+              },
         save: saveResult,
         nextAction:
           'Edit the generated project files directly. Call reload_project after the final file edit and before launch_preview.',
       });
     } catch (error) {
+      const projectHashAfterFailure = hashStructuredValue(
+        serializeToJSObject(project)
+      );
       return errorResult(
         error && error.message
           ? error.message
@@ -5878,7 +5067,17 @@ const callMcpTool = async ({
         {
           importerVersion: 3,
           extensionName,
+          code: error && error.code ? error.code : 'EXTENSION_IMPORT_FAILED',
           importedExtensions: installedExtensionNames,
+          installed: false,
+          saved: false,
+          projectUnchanged: projectHashBeforeImport === projectHashAfterFailure,
+          projectHashBefore: projectHashBeforeImport,
+          projectHashAfter: projectHashAfterFailure,
+          compatibility:
+            error && error.extensionCompatibility
+              ? error.extensionCompatibility
+              : undefined,
           writerError: {
             name: error && error.name ? error.name : undefined,
             code: error && error.code ? error.code : undefined,
@@ -5887,37 +5086,6 @@ const callMcpTool = async ({
         }
       );
     }
-  }
-
-  if (toolName === 'gdevelop_read_project_json') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(
-      truncateText(serializeToJSON(project), args.maxLength || undefined)
-    );
-  }
-
-  if (toolName === 'gdevelop_get_static_data') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(getStaticData(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'read_game_project_json') {
-    if (!project) return errorResult('No project opened.');
-    const serializedProject = JSON.parse(serializeToJSON(project));
-    return textResult({
-      success: true,
-      projectName: project.getName(),
-      projectUuid: project.getProjectUuid(),
-      serializedProject,
-      serializedProjectJson: truncateText(
-        JSON.stringify(serializedProject, null, 2),
-        args.maxLength || undefined
-      ),
-    });
   }
 
   if (toolName === 'gdevelop_list_scenes') {
@@ -5932,193 +5100,6 @@ const callMcpTool = async ({
   if (toolName === 'gdevelop_list_objects') {
     if (!project) return errorResult('No project opened.');
     return textResult(getObjectsSummary(project, args.sceneName));
-  }
-
-  if (toolName === 'gdevelop_list_extensions') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(listProjectExtensions(project));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_inspect_extension') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectProjectExtension(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_inspect_extension_function') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectExtensionFunction(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_inspect_extension_behavior') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectExtensionBehavior(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_inspect_extension_object') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectExtensionObject(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_inspect_extension_property') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectExtensionProperty(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'gdevelop_list_commands') {
-    return textResult(getCommandSummaries());
-  }
-
-  if (toolName === 'gdevelop_get_events_json_examples') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(
-      getEventsJsonExamples({
-        project,
-        sceneName:
-          args && typeof args.scene_name === 'string' ? args.scene_name : null,
-        includeExistingSceneEvents: !!(
-          args && args.include_existing_scene_events
-        ),
-      })
-    );
-  }
-
-  if (toolName === 'gdevelop_get_event_operation_reference') {
-    return textResult(getEventOperationReference());
-  }
-
-  if (toolName === 'gdevelop_validate_events_json') {
-    if (!project) return errorResult('No project opened.');
-    const validationArgs = args || {};
-    return textResult(
-      validateEventsJson({
-        project,
-        sceneName:
-          validationArgs && typeof validationArgs.scene_name === 'string'
-            ? validationArgs.scene_name
-            : null,
-        eventsJson: getEventsJsonArgument(validationArgs),
-        allowJavaScriptEvents: !!validationArgs.allow_javascript_events,
-        dedupeErrors: !!validationArgs.dedupe_errors,
-        summaryOnly: validationArgs.summary_only !== false,
-        errorsOnly: !!validationArgs.errors_only,
-        includeRenderedEvents: !!validationArgs.include_rendered_events,
-        includeNormalizedJson: !!validationArgs.include_normalized_json,
-      })
-    );
-  }
-
-  if (toolName === 'gdevelop_validate_extension_events_json') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(validateExtensionEventsJson(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'validate_current_project_json') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(validateCurrentProjectJson(project, args || {}));
-  }
-
-  if (toolName === 'inspect_custom_object_runtime_geometry') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(
-        inspectCustomObjectRuntimeGeometry(project, args || {})
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_prefab_property_bindings') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectPrefabPropertyBindings(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'validate_events_json_file') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(
-      validateEventsJsonFile({
-        project,
-        sceneName:
-          args && typeof args.scene_name === 'string' ? args.scene_name : null,
-        eventsJsonFile:
-          args && typeof args.events_json_file === 'string'
-            ? args.events_json_file
-            : null,
-        allowJavaScriptEvents: !!(args && args.allow_javascript_events),
-        summaryOnly: !(args && args.summary_only === false),
-        dedupeErrors: !!(args && args.dedupe_errors),
-        errorsOnly: !!(args && args.errors_only),
-        includeRenderedEvents: !!(args && args.include_rendered_events),
-        includeNormalizedJson: !!(args && args.include_normalized_json),
-      })
-    );
-  }
-
-  if (toolName === 'gdevelop_search_instruction_metadata') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(
-      searchInstructionMetadata({
-        project,
-        i18n: context.i18n,
-        query: args && typeof args.query === 'string' ? args.query : null,
-        kind: args && typeof args.kind === 'string' ? args.kind : null,
-        limit: args && typeof args.limit === 'number' ? args.limit : null,
-        compact: !(args && args.compact === false),
-        targetScope:
-          args && typeof args.target_scope === 'string'
-            ? args.target_scope
-            : null,
-      })
-    );
-  }
-
-  if (toolName === 'gdevelop_get_instruction_metadata') {
-    if (!project) return errorResult('No project opened.');
-    return textResult(
-      getExactInstructionMetadata({
-        project,
-        i18n: context.i18n,
-        type: args && typeof args.type === 'string' ? args.type : null,
-        kind: args && typeof args.kind === 'string' ? args.kind : null,
-        compact: !(args && args.compact === false),
-        targetScope:
-          args && typeof args.target_scope === 'string'
-            ? args.target_scope
-            : null,
-      })
-    );
   }
 
   if (toolName === 'inspect_tool_schema') {
@@ -6154,23 +5135,6 @@ const callMcpTool = async ({
     });
   }
 
-  if (toolName === 'gdevelop_capabilities') {
-    return textResult(getCapabilitiesSummary(context.getPermissions()));
-  }
-
-  if (toolName === 'gdevelop_refresh_tool_catalog') {
-    const permissions = context.getPermissions();
-    const capabilities = getCapabilitiesSummary(permissions);
-    return textResult({
-      success: true,
-      permissions: capabilities.permissions,
-      tools: getMcpTools(permissions),
-      categories: capabilities.categories,
-      note:
-        'Returned the current GDevelop MCP tool catalog from the editor. If your MCP host uses deferred tools, run tool_search for gdevelop after this so the host exposes newly listed tools.',
-    });
-  }
-
   if (toolName === 'preview_health_check') {
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
@@ -6189,7 +5153,7 @@ const callMcpTool = async ({
     );
   }
 
-  if (toolName === 'create_action' || toolName === 'create_condition') {
+  if (toolName === 'create_action') {
     if (!project) return errorResult('No project opened.');
     const type = args && typeof args.type === 'string' ? args.type : '';
     if (!type) return errorResult('Missing instruction "type".');
@@ -6198,7 +5162,7 @@ const callMcpTool = async ({
         project,
         i18n: context.i18n,
         type,
-        kind: toolName === 'create_condition' ? 'condition' : 'action',
+        kind: 'action',
         parameters: (args && args.parameters) || {},
       });
       return textResult(built);
@@ -6247,221 +5211,6 @@ const callMcpTool = async ({
           args: args || {},
         })
       );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'read_serialized_scene') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(readSerializedScene(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'get_tilemap_tiles') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(getTilemapTiles(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_tilemap_palette') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectTilemapPalette(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_tilemap_collision') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectTilemapCollision(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'check_tilemap_walkability') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(checkTilemapWalkability(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'read_scene_events_serialized') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(readSceneEventsSerialized(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_project_resources') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectProjectResources(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_resource_images') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectResourceImages(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'audit_project_asset_sources') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(auditProjectAssetSources(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'compare_image_files') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(compareImageFiles(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'crop_scene_object_image') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(cropSceneObjectImage(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_scene_draw_order') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectSceneDrawOrder(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'inspect_project_cleanup') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectProjectCleanup(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'list_available_behaviors') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(listAvailableBehaviors(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'search_behavior_store') {
-    // Search the COMMUNITY behavior registry (asset store) for behaviors that
-    // may not be installed yet. Returns each behavior's full `behavior_type` to
-    // pass to add_behavior, which installs the extension automatically.
-    try {
-      const query = args && typeof args.query === 'string' ? args.query : '';
-      const objectType = (args && (args.object_type || args.objectType)) || '';
-      const limit =
-        args && typeof args.limit === 'number'
-          ? Math.max(1, Math.min(50, Math.floor(args.limit)))
-          : 20;
-
-      const registry = await getBehaviorsRegistry();
-      const headers = Array.isArray(registry.headers) ? registry.headers : [];
-
-      // Which extensions are already installed in this project's platform.
-      const platform = project ? project.getCurrentPlatform() : null;
-      const isInstalled = (extensionName: string): boolean => {
-        if (!platform || !extensionName) return false;
-        try {
-          return platform.isExtensionLoaded(extensionName);
-        } catch (e) {
-          return false;
-        }
-      };
-
-      const scored = headers
-        .filter(
-          header =>
-            !header.isDeprecated &&
-            // If an object type is given, only behaviors that apply to it (or to
-            // any object — empty objectType means "any").
-            (!objectType ||
-              !header.objectType ||
-              header.objectType === objectType)
-        )
-        .map(header => ({
-          score: scoreBehaviorHeaderMatch(header, query),
-          header,
-        }))
-        .filter(entry => entry.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit)
-        .map(({ header }) => ({
-          // The exact value to pass to add_behavior as behavior_type.
-          behaviorType: header.type,
-          name: header.name,
-          fullName: header.fullName,
-          description: header.description,
-          category: header.category || undefined,
-          extensionName: header.extensionName,
-          // Empty objectType means it works on any object type.
-          requiredObjectType: header.objectType || '',
-          tier: header.tier || undefined,
-          requiredBehaviorTypes:
-            header.allRequiredBehaviorTypes &&
-            header.allRequiredBehaviorTypes.length
-              ? header.allRequiredBehaviorTypes
-              : undefined,
-          alreadyInstalled: isInstalled(header.extensionName),
-        }));
-
-      return textResult({
-        success: true,
-        query,
-        objectType: objectType || undefined,
-        totalMatches: scored.length,
-        behaviors: scored,
-        note:
-          'Community behaviors from the asset store. To use one, call add_behavior with its behaviorType (and scene_name + object_name) — the extension is installed automatically. For behaviors already in the project, prefer list_available_behaviors. Do NOT write events from scratch to replicate a behavior; install and configure it instead (inspect_behavior_properties / change_behavior_property).',
-      });
-    } catch (error) {
-      return errorResult(
-        `Could not fetch the behavior store registry: ${
-          error && error.message ? error.message : String(error)
-        }. (Requires network access.)`
-      );
-    }
-  }
-
-  if (toolName === 'inspect_gameplay_rules') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(inspectGameplayRules(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
     }
@@ -6627,64 +5376,10 @@ const callMcpTool = async ({
     }
   }
 
-  if (toolName === 'find_scene_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(findSceneEvents(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'find_extension_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(findExtensionEvents(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'find_project_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(findProjectEvents(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
   if (toolName === 'gdevelop_inspect_signal_usage') {
     if (!project) return errorResult('No project opened.');
     try {
       return textResult(inspectSignalUsage(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'lint_scene_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(lintSceneEvents(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'lint_extension_function_events') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(lintExtensionFunctionEvents(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'compare_scene_events_semantics') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(compareSceneEventsSemantics(project, args || {}));
     } catch (error) {
       return errorResult(error.message);
     }
@@ -6710,249 +5405,18 @@ const callMcpTool = async ({
     }
   }
 
-  if (toolName === 'gdevelop_run_command') {
-    const commandName =
-      args && typeof args.commandName === 'string' ? args.commandName : '';
-    if (!commandName) return errorResult('Missing commandName.');
-    if (commandName.trim().toUpperCase() === 'CLOSE_PREVIEW') {
-      return errorResult(closePreviewCommandError);
-    }
-    const commandMetadata = commandsList[((commandName: any): CommandName)];
-    if (!commandMetadata) {
-      return errorResult(`Unknown command: ${commandName}.`);
-    }
-    if (commandName.trim().toUpperCase() === 'SAVE_PROJECT') {
-      const persistence = await saveProjectWithEvidence(context);
-      return persistence.success
-        ? textResult({
-            success: true,
-            commandName,
-            completed: true,
-            persistence,
-          })
-        : errorResult('The project save did not complete successfully.', {
-            commandName,
-            completed: true,
-            persistence,
-          });
-    }
-    const didRun = context.runCommand(commandName);
-    return didRun
-      ? textResult({
-          commandName,
-          launched: true,
-          ...(commandName === 'LAUNCH_NEW_PREVIEW' ||
-          commandName === 'LAUNCH_DEBUG_PREVIEW'
-            ? {
-                note:
-                  'For MCP runtime tests, prefer launch_preview { start_paused: true }, then run_frames. It attaches to the debugger and avoids stale or already-running previews.',
-              }
-            : undefined),
-        })
-      : errorResult(`Unknown or unavailable command: ${commandName}.`);
-  }
-
-  if (toolName === 'gdevelop_save_project_and_wait') {
-    if (!context.saveProjectAndWait) {
-      return errorResult(
-        'The GDevelop host did not provide saveProjectAndWait, so MCP cannot confirm that the project was written to disk.'
-      );
-    }
-    try {
-      const persistence = await saveProjectWithEvidence(context);
-      // Post-save consistency snapshot (#11): report project-level facts so the
-      // caller can confirm the saved state matches intent without a separate read.
-      const project = context.getProject ? context.getProject() : null;
-      let consistency;
-      if (project) {
-        const sceneNames: Array<string> = [];
-        for (let i = 0; i < project.getLayoutsCount(); i++) {
-          sceneNames.push(project.getLayoutAt(i).getName());
-        }
-        consistency = {
-          projectName: project.getName(),
-          projectFile: project.getProjectFile() || undefined,
-          firstLayout: project.getFirstLayout() || undefined,
-          sceneCount: sceneNames.length,
-          sceneNames,
-        };
-      }
-      return textResult({
-        success: persistence.success,
-        saved: persistence.saved,
-        reason: persistence.reason,
-        persistence,
-        consistency,
-      });
-    } catch (error) {
-      return errorResult(
-        error && error.message
-          ? error.message
-          : 'Unable to save the project through MCP.'
-      );
-    }
-  }
-
-  if (toolName === 'gdevelop_editor_call') {
-    if (!args || typeof args.name !== 'string') {
-      return errorResult('Missing EditorFunction name.');
-    }
-    const editorFunctionArgs =
-      args.arguments && typeof args.arguments === 'object'
-        ? args.arguments
-        : {};
-    if (args.name !== 'gdevelop_editor_call' && isKnownMcpTool(args.name)) {
-      return callMcpTool({
-        toolName: args.name,
-        args: editorFunctionArgs,
-        context,
-      });
-    }
-    if (
-      (args.name === 'add_scene_events' || args.name === 'generate_events') &&
-      !getEventsJsonArgument(editorFunctionArgs) &&
-      !editorFunctionArgs.event_changes
-    ) {
-      return errorResult(mcpDirectEventsRequiredMessage);
-    }
-    return callEditorFunction({
-      toolName: args.name,
-      args:
-        args.name === 'add_scene_events' || args.name === 'generate_events'
-          ? autoQuoteAddSceneEventsArgs(
-              context.getProject(),
-              editorFunctionArgs
-            )
-          : editorFunctionArgs,
-      context,
-    });
-  }
-
-  let eventWriteArgs = args || {};
-  if (toolName === 'add_scene_events' || toolName === 'generate_events') {
-    if (
-      !getEventsJsonArgument(eventWriteArgs) &&
-      !eventWriteArgs.event_changes
-    ) {
-      return errorResult(mcpDirectEventsRequiredMessage);
-    }
-    const sceneName = eventWriteArgs.scene_name;
-    if (typeof sceneName !== 'string' || !sceneName) {
-      return errorResult('Missing scene_name.');
-    }
-    let currentRevision;
-    if (project) {
-      try {
-        currentRevision = getSceneEventsRevision(project, sceneName);
-      } catch (error) {
-        return errorResult(error.message);
-      }
-    }
-    const expectedRevision =
-      eventWriteArgs.expected_revision || eventWriteArgs.expectedRevision;
-    if (project && expectedRevision && expectedRevision !== currentRevision) {
-      return errorResult(
-        'The scene event sheet changed after it was read. Read it again and rebuild the patch against the current revision.',
-        {
-          code: 'EVENT_SHEET_REVISION_CONFLICT',
-          sceneName,
-          expectedRevision,
-          eventSheetRevision: currentRevision,
-        }
-      );
-    }
-    if (
-      project &&
-      (eventWriteArgs.dry_run === true || eventWriteArgs.dryRun === true)
-    ) {
-      try {
-        return textResult(
-          dryRunSceneEventChanges({
-            project,
-            args: eventWriteArgs,
-          })
-        );
-      } catch (error) {
-        return errorResult(error.message);
-      }
-    }
-    if (
-      !getEventsJsonArgument(eventWriteArgs) &&
-      !eventWriteArgs.event_changes
-    ) {
-      return errorResult(mcpDirectEventsRequiredMessage);
-    }
-  }
-
   let extensionWriteToolHandler = null;
-  if (toolName === 'gdevelop_create_or_update_extension') {
-    extensionWriteToolHandler = createOrUpdateExtension;
-  } else if (toolName === 'gdevelop_delete_extension') {
-    extensionWriteToolHandler = deleteExtension;
-  } else if (toolName === 'gdevelop_create_or_update_extension_function') {
-    extensionWriteToolHandler = createOrUpdateExtensionFunction;
-  } else if (toolName === 'gdevelop_create_or_update_on_signal') {
+  if (toolName === 'gdevelop_create_or_update_on_signal') {
     extensionWriteToolHandler = createOrUpdateOnSignalFunction;
-  } else if (toolName === 'replace_extension_function_events_from_file') {
-    extensionWriteToolHandler = replaceExtensionFunctionEventsFromFile;
-  } else if (toolName === 'patch_extension_event_instruction') {
-    extensionWriteToolHandler = patchExtensionEventInstruction;
-  } else if (toolName === 'apply_validated_extension_patch') {
-    extensionWriteToolHandler = applyValidatedExtensionPatch;
-  } else if (toolName === 'gdevelop_delete_extension_function') {
-    extensionWriteToolHandler = deleteExtensionFunction;
-  } else if (toolName === 'gdevelop_create_or_update_extension_behavior') {
-    extensionWriteToolHandler = createOrUpdateExtensionBehavior;
-  } else if (toolName === 'gdevelop_delete_extension_behavior') {
-    extensionWriteToolHandler = deleteExtensionBehavior;
-  } else if (toolName === 'gdevelop_create_or_update_extension_object') {
-    extensionWriteToolHandler = createOrUpdateExtensionObject;
-  } else if (toolName === 'gdevelop_delete_extension_object') {
-    extensionWriteToolHandler = deleteExtensionObject;
-  } else if (toolName === 'gdevelop_extract_prefab_from_object') {
-    extensionWriteToolHandler = extractPrefabFromObject;
-  } else if (toolName === 'gdevelop_create_or_update_extension_property') {
-    extensionWriteToolHandler = createOrUpdateExtensionProperty;
-  } else if (toolName === 'gdevelop_delete_extension_property') {
-    extensionWriteToolHandler = deleteExtensionProperty;
-  } else if (toolName === 'bind_child_sprite_resource_property') {
-    extensionWriteToolHandler = bindChildSpriteResourceProperty;
   }
 
   if (extensionWriteToolHandler) {
     if (!project) return errorResult('No project opened.');
     try {
       const extensionArgs = args || {};
-      const extensionPatchSnapshot =
-        toolName === 'apply_validated_extension_patch' &&
-        !(
-          extensionArgs &&
-          (extensionArgs.dry_run === true || extensionArgs.dryRun === true)
-        )
-          ? snapshotProject(project, {
-              label: `before-validated-extension-patch-${(extensionArgs &&
-                (extensionArgs.extension_name ||
-                  extensionArgs.extensionName)) ||
-                'extension'}`,
-            })
-          : null;
       const result = extensionWriteToolHandler(project, extensionArgs);
-      if (extensionPatchSnapshot && result.success && !result.dryRun) {
-        result.snapshot = extensionPatchSnapshot;
-      }
       const extensionFunctionEventsChanged =
-        toolName === 'patch_extension_event_instruction' ||
-        toolName === 'replace_extension_function_events_from_file' ||
-        (toolName === 'apply_validated_extension_patch' &&
-          result.scope === 'extension_function') ||
-        (toolName === 'gdevelop_create_or_update_extension_function' &&
-          extensionArgs &&
-          (getEventsJsonArgument(extensionArgs) ||
-            (extensionArgs.serialized_function &&
-              typeof extensionArgs.serialized_function === 'object'))) ||
-        (toolName === 'gdevelop_create_or_update_on_signal' &&
-          extensionArgs &&
-          getEventsJsonArgument(extensionArgs));
+        extensionArgs && getEventsJsonArgument(extensionArgs);
       if (
         extensionFunctionEventsChanged &&
         !result.dryRun &&
@@ -6975,19 +5439,6 @@ const callMcpTool = async ({
           newOrChangedAiGeneratedEventIds: new Set(),
         });
       }
-      // A wholesale extension reload (apply_validated_extension_patch with a
-      // cross-cutting change) frees and rebuilds the extension's C++ child
-      // containers. Tell the editor to drop stale wrappers for that extension's
-      // open tabs/panels, otherwise a later render can use-after-free.
-      if (
-        !result.dryRun &&
-        result.requiresEditorReload &&
-        context.onExtensionModifiedOutsideEditor
-      ) {
-        context.onExtensionModifiedOutsideEditor(
-          result.extensionName || extensionArgs.extension_name
-        );
-      }
       if (
         !result.dryRun &&
         result.success !== false &&
@@ -6996,336 +5447,32 @@ const callMcpTool = async ({
         context.triggerUnsavedChanges();
       }
       return textResult(
-        withStaleStateAdvisory(
-          result,
-          context,
-          getStaleStateTargetForTool(toolName, extensionArgs, result)
-        )
+        withStaleStateAdvisory(result, context, {
+          kind: 'extension-function',
+          extensionName:
+            result.extensionName || extensionArgs.extension_name || null,
+          parentKind:
+            result.parentKind || extensionArgs.parent_kind || 'extension',
+          parentName:
+            result.parentKind === 'extension' ||
+            extensionArgs.parent_kind === 'extension'
+              ? null
+              : result.parentName || extensionArgs.parent_name || null,
+          functionName:
+            result.functionName ||
+            (result.function && result.function.name
+              ? result.function.name
+              : 'onSignal'),
+        })
       );
     } catch (error) {
       return errorResult(error.message);
     }
   }
 
-  let projectWriteToolHandler = null;
-  if (toolName === 'set_project_properties') {
-    projectWriteToolHandler = setProjectProperties;
-  } else if (toolName === 'set_first_layout') {
-    projectWriteToolHandler = setFirstLayout;
-  }
-
-  if (toolName === 'snapshot_project') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(snapshotProject(project, args || {}));
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-  if (toolName === 'restore_project_snapshot') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const result = restoreProjectSnapshot(project, args || {});
-      context.triggerUnsavedChanges();
-      notifyProjectModelChangedOutsideEditor(project, context);
-      return textResult(
-        withStaleStateAdvisory(
-          result,
-          context,
-          getStaleStateTargetForTool(toolName, args, result)
-        )
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (
-    toolName === 'apply_validated_project_json_patch' ||
-    toolName === 'sync_editor_from_validated_project_json'
-  ) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const result =
-        toolName === 'apply_validated_project_json_patch'
-          ? applyValidatedProjectJsonPatch(project, args || {})
-          : syncEditorFromValidatedProjectJson(project, args || {});
-      if (result.success && !result.dryRun) {
-        context.triggerUnsavedChanges();
-        notifyProjectModelChangedOutsideEditor(project, context);
-        if (result.shouldSave && context.saveProjectAndWait) {
-          result.save = await saveProjectWithEvidence(context);
-        } else if (result.shouldSave) {
-          result.save = {
-            saved: false,
-            error:
-              'The GDevelop host did not provide saveProjectAndWait, so MCP could not save after applying the patch.',
-          };
-        }
-      }
-      return textResult(
-        result.success && !result.dryRun
-          ? withStaleStateAdvisory(
-              result,
-              context,
-              getStaleStateTargetForTool(toolName, args, result)
-            )
-          : result
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  let staticDataWriteToolHandler = null;
-  if (toolName === 'gdevelop_set_static_data') {
-    staticDataWriteToolHandler = setStaticData;
-  } else if (toolName === 'gdevelop_set_static_data_value') {
-    staticDataWriteToolHandler = setStaticDataValue;
-  } else if (toolName === 'gdevelop_delete_static_data_value') {
-    staticDataWriteToolHandler = deleteStaticDataValue;
-  }
-
-  if (staticDataWriteToolHandler) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const result = staticDataWriteToolHandler(project, args || {});
-      if (result.didModifyProject !== false) {
-        context.triggerUnsavedChanges();
-      }
-      return textResult(
-        result.didModifyProject !== false
-          ? withStaleStateAdvisory(
-              result,
-              context,
-              getStaleStateTargetForTool(toolName, args, result)
-            )
-          : result
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (projectWriteToolHandler) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const result = projectWriteToolHandler(project, args || {});
-      const didModifyProject =
-        result.success !== false && result.didModifyProject !== false;
-      if (didModifyProject) context.triggerUnsavedChanges();
-      return textResult(
-        didModifyProject
-          ? withStaleStateAdvisory(
-              result,
-              context,
-              getStaleStateTargetForTool(toolName, args, result)
-            )
-          : result
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  let sceneWriteToolHandler = null;
-  if (toolName === 'add_or_update_resource') {
-    sceneWriteToolHandler = addOrUpdateResource;
-  } else if (toolName === 'replace_project_resource') {
-    sceneWriteToolHandler = replaceProjectResource;
-  } else if (toolName === 'generate_placeholder_asset') {
-    sceneWriteToolHandler = generatePlaceholderAsset;
-  } else if (toolName === 'render_scene_to_png') {
-    sceneWriteToolHandler = renderSceneToPng;
-  } else if (toolName === 'create_sprite_object_from_resource') {
-    sceneWriteToolHandler = createSpriteObjectFromResource;
-  } else if (toolName === 'create_text_object') {
-    sceneWriteToolHandler = createTextObject;
-  } else if (toolName === 'bulk_edit_scene_assets') {
-    sceneWriteToolHandler = bulkEditSceneAssets;
-  } else if (toolName === 'set_sprite_animations') {
-    sceneWriteToolHandler = setSpriteAnimations;
-  } else if (toolName === 'slice_sprite_sheet') {
-    sceneWriteToolHandler = sliceSpriteSheet;
-  } else if (toolName === 'bind_sprite_animations_from_directory') {
-    sceneWriteToolHandler = bindSpriteAnimationsFromDirectory;
-  } else if (toolName === 'create_tilemap_object') {
-    sceneWriteToolHandler = createTilemapObject;
-  } else if (toolName === 'set_tilemap_tiles') {
-    sceneWriteToolHandler = setTilemapTiles;
-  } else if (toolName === 'set_tilemap_collision_tiles') {
-    sceneWriteToolHandler = setTilemapCollisionTiles;
-  } else if (toolName === 'replace_object_definition') {
-    sceneWriteToolHandler = replaceObjectDefinition;
-  } else if (toolName === 'delete_scene_object') {
-    sceneWriteToolHandler = deleteSceneObject;
-  } else if (toolName === 'delete_scene_variable') {
-    sceneWriteToolHandler = deleteSceneVariable;
-  } else if (toolName === 'batch_delete_scene_variables') {
-    sceneWriteToolHandler = batchDeleteSceneVariables;
-  } else if (toolName === 'delete_object_variable') {
-    sceneWriteToolHandler = deleteObjectVariable;
-  } else if (toolName === 'delete_instance_variable') {
-    sceneWriteToolHandler = deleteInstanceVariable;
-  } else if (toolName === 'set_object_properties') {
-    sceneWriteToolHandler = setObjectProperties;
-  } else if (toolName === 'set_text_object_properties') {
-    sceneWriteToolHandler = setTextObjectProperties;
-  } else if (
-    toolName === 'put_2d_instances' &&
-    args &&
-    Array.isArray(args.instances)
-  ) {
-    sceneWriteToolHandler = putStructured2dInstances;
-  } else if (toolName === 'apply_validated_scene_patch') {
-    sceneWriteToolHandler = applyValidatedScenePatch;
-  } else if (toolName === 'patch_scene_event_instruction') {
-    sceneWriteToolHandler = patchSceneEventInstruction;
-  } else if (toolName === 'replace_javascript_event_code') {
-    sceneWriteToolHandler = replaceJavascriptEventCode;
-  } else if (toolName === 'attach_object_to_object_top') {
-    sceneWriteToolHandler = attachObjectToObjectTop;
-  } else if (toolName === 'create_group') {
-    sceneWriteToolHandler = createGroup;
-  } else if (toolName === 'wrap_events_in_group') {
-    sceneWriteToolHandler = wrapEventsInGroup;
-  } else if (toolName === 'move_events_to_group') {
-    sceneWriteToolHandler = moveEventsToGroup;
-  } else if (toolName === 'rename_group') {
-    sceneWriteToolHandler = renameGroup;
-  } else if (toolName === 'ensure_scene_event_ids') {
-    sceneWriteToolHandler = ensureSceneEventIds;
-  } else if (toolName === 'replace_scene_events_from_file') {
-    sceneWriteToolHandler = replaceSceneEventsFromFile;
-  }
-
-  if (sceneWriteToolHandler) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const sceneArgs = args || {};
-      if (
-        toolName === 'bulk_edit_scene_assets' &&
-        (getEventsJsonArgument(sceneArgs) ||
-          Array.isArray(sceneArgs.event_changes))
-      ) {
-        const eventsJson = getEventsJsonArgument(sceneArgs);
-        const eventsArgs = {
-          scene_name: sceneArgs.scene_name,
-          events_json: eventsJson,
-          event_changes: Array.isArray(sceneArgs.event_changes)
-            ? sceneArgs.event_changes
-            : undefined,
-        };
-        const preflightFailure = makeAddSceneEventsPreflightFailure(
-          autoQuoteAddSceneEventsArgs(project, eventsArgs)
-        );
-        if (preflightFailure) {
-          return textResult({
-            ...preflightFailure,
-            error:
-              'bulk_edit_scene_assets event validation failed before writing. No scene asset or event changes were applied.',
-          });
-        }
-      }
-
-      const runSceneWriteTool: (
-        project: gdProject,
-        args: Object,
-        callbacks: Object
-      ) => Object = (sceneWriteToolHandler: any);
-      const result = runSceneWriteTool(project, sceneArgs, {
-        onSceneEventsModifiedOutsideEditor:
-          context.onSceneEventsModifiedOutsideEditor,
-        onInstancesModifiedOutsideEditor:
-          context.onInstancesModifiedOutsideEditor,
-        onObjectsModifiedOutsideEditor: context.onObjectsModifiedOutsideEditor,
-      });
-      // A dry_run handler returns without mutating - don't mark the project
-      // dirty and don't run any follow-up writes (e.g. the bulk events step).
-      const isDryRun = !!(
-        (sceneArgs.dry_run === true || sceneArgs.dryRun === true) &&
-        result &&
-        result.dryRun === true
-      );
-      const didModifyProject = !!(
-        result &&
-        result.success !== false &&
-        result.didModifyProject !== false
-      );
-      if (!isDryRun && didModifyProject) context.triggerUnsavedChanges();
-
-      // bulk_edit_scene_assets can also write events in the same call. Events are
-      // applied LAST (after resources/objects/animations/behaviors/variables/
-      // instances) and go through the SAME validated add_scene_events path - no
-      // structural validation (e.g. Or/And subInstructions checks) is bypassed.
-      // CRITICAL: when dry_run is set, the assets handler returned WITHOUT
-      // mutating; we must NOT write events either, or dry_run would still change
-      // the project (a dangerous bug). Skip the events follow-up entirely.
-      if (
-        !isDryRun &&
-        toolName === 'bulk_edit_scene_assets' &&
-        (getEventsJsonArgument(sceneArgs) ||
-          Array.isArray(sceneArgs.events) ||
-          Array.isArray(sceneArgs.event_changes))
-      ) {
-        const eventsJson = getEventsJsonArgument(sceneArgs);
-        const eventsArgs = {
-          scene_name: sceneArgs.scene_name,
-          events_json: eventsJson,
-          event_changes: Array.isArray(sceneArgs.event_changes)
-            ? sceneArgs.event_changes
-            : undefined,
-        };
-        const eventsResponse = await callEditorFunction({
-          toolName: 'add_scene_events',
-          args: autoQuoteAddSceneEventsArgs(project, eventsArgs),
-          context,
-        });
-        // Surface the events outcome alongside the assets result. callEditorFunction
-        // returns a textResult-shaped object; attach its parsed content if possible.
-        const combinedResult = {
-          ...result,
-          events: extractToolResultPayload(eventsResponse),
-        };
-        return textResult(
-          withStaleStateAdvisory(
-            combinedResult,
-            context,
-            getStaleStateTargetForTool('add_scene_events', eventsArgs, result)
-          )
-        );
-      }
-
-      if (isDryRun || !didModifyProject) {
-        return textResult(result);
-      }
-
-      return textResult(
-        withStaleStateAdvisory(
-          result,
-          context,
-          getStaleStateTargetForTool(toolName, sceneArgs, result)
-        )
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  const finalArgs =
-    (toolName === 'add_scene_events' || toolName === 'generate_events') &&
-    eventWriteArgs
-      ? autoQuoteAddSceneEventsArgs(project, eventWriteArgs)
-      : args || {};
-  if (toolName === 'add_scene_events' || toolName === 'generate_events') {
-    const preflightFailure = makeAddSceneEventsPreflightFailure(finalArgs);
-    if (preflightFailure) return textResult(preflightFailure);
-  }
-
-  return callEditorFunction({
+  return errorResult(`MCP tool "${toolName}" has no public implementation.`, {
+    code: 'MCP_TOOL_NOT_IMPLEMENTED',
     toolName,
-    args: finalArgs,
-    context,
   });
 };
 

@@ -28,7 +28,7 @@ import {
   addGlobalObjectGroupsToDataJs,
   addGlobalObjectGroupsToProjectData,
 } from '../../PreviewGlobalObjectGroupsPatch';
-import { hasStaticDataPlaceholderDiagnostic } from '../../../Utils/StaticDataPlaceholderDiagnostics';
+import { hasConstantPlaceholderDiagnostic } from '../../../Utils/ConstantPlaceholderDiagnostics';
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
@@ -297,7 +297,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         previewExportOptions
       );
       if (
-        hasStaticDataPlaceholderDiagnostic(
+        hasConstantPlaceholderDiagnostic(
           project.getWholeProjectDiagnosticReport()
         )
       ) {
@@ -308,7 +308,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
             } catch (error) {}
           });
         }
-        this.props.onInvalidStaticDataPlaceholder();
+        this.props.onInvalidConstantPlaceholder();
         previewExportOptions.delete();
         exporter.delete();
         return;

@@ -112,6 +112,37 @@ describe('EventsValidationScanner', () => {
       }
     });
 
+    it('diagnoses unknown literal keyboard names and accepts digit aliases', () => {
+      const { project, testLayout } = makeTestProject(gd);
+      const events = testLayout.getEvents();
+      const event = events.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      );
+      const conditions = gd.asStandardEvent(event).getConditions();
+      const addKeyCondition = (value: string, index: number) => {
+        const condition = new gd.Instruction();
+        condition.setType('KeyFromTextJustPressed');
+        condition.setParametersCount(2);
+        condition.setParameter(0, '');
+        condition.setParameter(1, value);
+        conditions.insert(condition, index);
+        condition.delete();
+      };
+      addKeyCondition('"NotARealKey"', 0);
+      addKeyCondition('"1"', 1);
+      addKeyCondition('"Digit2"', 2);
+
+      const errors = scanProjectForValidationErrors(project);
+      const keyboardErrors = errors.filter(
+        error => error.diagnosticCode === 'INPUT_UNKNOWN_KEY_NAME'
+      );
+
+      expect(keyboardErrors).toHaveLength(1);
+      expect(keyboardErrors[0].parameterValue).toBe('"NotARealKey"');
+    });
+
     describe('disabled events', () => {
       it('skips disabled events', () => {
         const { project, testLayout } = makeTestProject(gd);
@@ -724,6 +755,87 @@ describe('EventsValidationScanner', () => {
         }
       });
 
+      it('allows actions in a sub-event when the parent ForEach event has an enabled condition', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::ForEach',
+          0
+        );
+        const forEachEvent = gd.asForEachEvent(parentEvent);
+        forEachEvent.setObjectToPick('MySpriteObject');
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        forEachEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandardEvent = gd.asStandardEvent(childEvent);
+        const action = new gd.Instruction();
+        action.setType('Delete');
+        action.setParametersCount(1);
+        action.setParameter(0, 'MySpriteObject');
+        childStandardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        expect(
+          errors.find(
+            error =>
+              error.type === 'unconditioned-action' &&
+              error.instructionType === 'Delete'
+          )
+        ).toBeUndefined();
+      });
+
+      it('detects actions in a sub-event when all parent ForEach event conditions are disabled', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const events = testLayout.getEvents();
+
+        const parentEvent = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::ForEach',
+          0
+        );
+        const forEachEvent = gd.asForEachEvent(parentEvent);
+        forEachEvent.setObjectToPick('MySpriteObject');
+        const condition = new gd.Instruction();
+        condition.setType('SceneJustBegins');
+        condition.setParametersCount(1);
+        condition.setParameter(0, '');
+        condition.setDisabled(true);
+        forEachEvent.getConditions().insert(condition, 0);
+        condition.delete();
+
+        const childEvent = parentEvent
+          .getSubEvents()
+          .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+        const childStandardEvent = gd.asStandardEvent(childEvent);
+        const action = new gd.Instruction();
+        action.setType('Delete');
+        action.setParametersCount(1);
+        action.setParameter(0, 'MySpriteObject');
+        childStandardEvent.getActions().insert(action, 0);
+        action.delete();
+
+        const errors = scanProjectForValidationErrors(project);
+
+        expect(
+          errors.find(
+            error =>
+              error.type === 'unconditioned-action' &&
+              error.instructionType === 'Delete'
+          )
+        ).toBeDefined();
+      });
+
       it('detects external layout creation in a standard event without conditions', () => {
         const { project, testLayout } = makeTestProject(gd);
         const events = testLayout.getEvents();
@@ -1048,14 +1160,13 @@ describe('EventsValidationScanner', () => {
 
         const targetError = errors.find(
           e =>
-            e.type === 'ambiguous-object-picking' &&
             e.instructionType === 'Delete' &&
             e.parameterValue === 'MySpriteObject'
         );
         expect(targetError).toBeUndefined();
       });
 
-      it('detects single-instance parameters for objects created dynamically', () => {
+      it('does not validate object pointer cardinality for objects created dynamically', () => {
         const { project, testLayout } = makeTestProject(gd);
         const events = testLayout.getEvents();
 
@@ -1095,18 +1206,13 @@ describe('EventsValidationScanner', () => {
         const errors = scanProjectForValidationErrors(project);
         const targetError = errors.find(
           error =>
-            error.type === 'ambiguous-object-picking' &&
             error.instructionType === 'AddForceTowardObject' &&
             error.parameterIndex === 1
         );
-        expect(targetError).toBeDefined();
-        if (targetError) {
-          expect(targetError.cardinalitySource).toBe('dynamic-create');
-          expect(targetError.suggestedEventStructure).toBeDefined();
-        }
+        expect(targetError).toBeUndefined();
       });
 
-      it('expands CreateByName groups when modeling dynamic cardinality', () => {
+      it('does not model CreateByName groups for object picking cardinality', () => {
         const { project, testLayout } = makeTestProject(gd);
         const group = testLayout
           .getObjects()
@@ -1152,14 +1258,10 @@ describe('EventsValidationScanner', () => {
 
         const targetError = scanProjectForValidationErrors(project).find(
           error =>
-            error.type === 'ambiguous-object-picking' &&
             error.instructionType === 'AddForceTowardObject' &&
             error.parameterIndex === 1
         );
-        expect(targetError).toBeDefined();
-        if (targetError) {
-          expect(targetError.cardinalitySource).toBe('dynamic-create');
-        }
+        expect(targetError).toBeUndefined();
       });
 
       it('allows object action parameters when the scene has at most one initial instance', () => {
@@ -1183,7 +1285,6 @@ describe('EventsValidationScanner', () => {
 
         const targetError = errors.find(
           e =>
-            e.type === 'ambiguous-object-picking' &&
             e.instructionType === 'Delete' &&
             e.parameterValue === 'MySpriteObject'
         );
@@ -1218,9 +1319,8 @@ describe('EventsValidationScanner', () => {
 
         const targetError = errors.find(
           e =>
-            e.type === 'ambiguous-object-picking' &&
             e.instructionType === 'Delete' &&
-            e.parameterValue === 'MySpriteObject' &&
+            typeof e.parameterIndex === 'number' &&
             e.eventPath[0] === 0
         );
         expect(targetError).toBeUndefined();

@@ -14,7 +14,7 @@ import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
-import { findStaticDataPlaceholderInSerializedData } from '../../Utils/StaticDataPlaceholderDiagnostics';
+import { findConstantPlaceholderInSerializedData } from '../../Utils/ConstantPlaceholderDiagnostics';
 
 const gd: libGDevelop = global.gd;
 
@@ -67,14 +67,14 @@ const exportExtension = async (
   if (requiredExtensions.length > 0) {
     serializedObject.requiredExtensions = requiredExtensions;
   }
-  const staticDataPlaceholderPath = findStaticDataPlaceholderInSerializedData(
+  const constantPlaceholderPath = findConstantPlaceholderInSerializedData(
     serializedObject
   );
-  if (staticDataPlaceholderPath !== null) {
+  if (constantPlaceholderPath != null) {
     showErrorBox({
-      message: `The extension can't be exported because it contains static data placeholder "{{${staticDataPlaceholderPath}}}". Extensions with static data placeholders can only be used in the current project.`,
+      message: `The extension can't be exported because it contains constants placeholder "{{${constantPlaceholderPath}}}". Extensions with constants placeholders can only be used in the current project.`,
       rawError: null,
-      errorId: 'extension-export-static-data-placeholder',
+      errorId: 'extension-export-constants-placeholder',
       doNotReport: true,
     });
     return;

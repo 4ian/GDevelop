@@ -48,10 +48,10 @@ using namespace std;
 
 namespace gd {
 namespace {
-struct StaticDataPathSegment {
-  explicit StaticDataPathSegment(const gd::String& key_)
+struct ConstantPathSegment {
+  explicit ConstantPathSegment(const gd::String& key_)
       : key(key_), index(0), isIndex(false) {}
-  explicit StaticDataPathSegment(std::size_t index_)
+  explicit ConstantPathSegment(std::size_t index_)
       : key(""), index(index_), isIndex(true) {}
 
   gd::String key;
@@ -59,15 +59,15 @@ struct StaticDataPathSegment {
   bool isIndex;
 };
 
-std::vector<StaticDataPathSegment> ParseStaticDataPath(gd::String path) {
-  std::vector<StaticDataPathSegment> segments;
+std::vector<ConstantPathSegment> ParseConstantPath(gd::String path) {
+  std::vector<ConstantPathSegment> segments;
   path = path.Trim();
 
   gd::String current;
   std::size_t position = 0;
   const auto pushCurrent = [&]() {
     if (!current.empty()) {
-      segments.push_back(StaticDataPathSegment(current));
+      segments.push_back(ConstantPathSegment(current));
       current.clear();
     }
   };
@@ -107,7 +107,7 @@ std::vector<StaticDataPathSegment> ParseStaticDataPath(gd::String path) {
           position++;
         }
         if (position < path.length() && path[position] == ']') position++;
-        segments.push_back(StaticDataPathSegment(quotedSegment));
+        segments.push_back(ConstantPathSegment(quotedSegment));
         continue;
       }
 
@@ -129,10 +129,10 @@ std::vector<StaticDataPathSegment> ParseStaticDataPath(gd::String path) {
       }
       if (isIndex) {
         segments.push_back(
-            StaticDataPathSegment(
+            ConstantPathSegment(
                 static_cast<std::size_t>(bracketSegment.To<unsigned int>())));
       } else {
-        segments.push_back(StaticDataPathSegment(bracketSegment));
+        segments.push_back(ConstantPathSegment(bracketSegment));
       }
       continue;
     }
@@ -145,7 +145,7 @@ std::vector<StaticDataPathSegment> ParseStaticDataPath(gd::String path) {
   return segments;
 }
 
-gd::String StaticDataValueToString(const gd::SerializerElement& element) {
+gd::String ConstantValueToString(const gd::SerializerElement& element) {
   if (!element.IsValueUndefined()) {
     const auto& value = element.GetValue();
     if (value.IsString()) return value.GetRawString();
@@ -179,7 +179,7 @@ Project::Project()
                        gd::String::From(gd::VersionWrapper::Minor()) + "." +
                        gd::String::From(gd::VersionWrapper::Build())),
       variables(gd::VariablesContainer::SourceType::Global),
-      staticDataJson("{}"),
+      constantsJson("{}"),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
@@ -187,13 +187,13 @@ Project::Project()
 
 Project::~Project() {}
 
-bool Project::GetStaticDataValueAsString(const gd::String& path,
-                                           gd::String& value) const {
-  gd::SerializerElement staticDataElement =
-      gd::Serializer::FromJSON(GetStaticDataJson().c_str());
-  const gd::SerializerElement* currentElement = &staticDataElement;
+bool Project::GetConstantValueAsString(const gd::String& path,
+                                       gd::String& value) const {
+  gd::SerializerElement constantsElement =
+      gd::Serializer::FromJSON(GetConstantsJson().c_str());
+  const gd::SerializerElement* currentElement = &constantsElement;
 
-  for (const auto& segment : ParseStaticDataPath(path)) {
+  for (const auto& segment : ParseConstantPath(path)) {
     if (segment.isIndex) {
       if (!currentElement->ConsideredAsArray() ||
           segment.index >= currentElement->GetChildrenCount()) {
@@ -208,11 +208,11 @@ bool Project::GetStaticDataValueAsString(const gd::String& path,
     }
   }
 
-  value = StaticDataValueToString(*currentElement);
+  value = ConstantValueToString(*currentElement);
   return true;
 }
 
-bool Project::ResolveStaticDataPlaceholders(
+bool Project::ResolveConstantPlaceholders(
     const gd::String& source,
     gd::String& resolved,
     gd::String& missingPath) const {
@@ -240,7 +240,7 @@ bool Project::ResolveStaticDataPlaceholders(
                       placeholderEnd - placeholderStart - 2)
             .Trim();
     gd::String value;
-    if (path.empty() || !GetStaticDataValueAsString(path, value)) {
+    if (path.empty() || !GetConstantValueAsString(path, value)) {
       missingPath = path;
       resolved = source;
       return false;
@@ -1186,13 +1186,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   objectsContainer.AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
-  if (element.HasChild("staticData")) {
-    SetStaticDataJson(
-        gd::Serializer::ToJSON(element.GetChild("staticData")));
-  } else {
-    SetStaticDataJson("{}");
-  }
-
   scenes.clear();
   const SerializerElement& layoutsElement =
       element.GetChild("layouts", 0, "Scenes");
@@ -1458,10 +1451,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   objectsContainer.SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   objectsContainer.GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
-  if (GetStaticDataJson() != "{}") {
-    element.AddChild("staticData") =
-        gd::Serializer::FromJSON(GetStaticDataJson());
-  }
 
   element.SetAttribute("firstLayout", firstLayout);
   if (!previewLayout.empty()) {
@@ -1605,7 +1594,7 @@ void Project::Init(const gd::Project& game) {
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   variables = game.GetVariables();
-  staticDataJson = game.GetStaticDataJson();
+  constantsJson = game.GetConstantsJson();
 
   projectFile = game.GetProjectFile();
 

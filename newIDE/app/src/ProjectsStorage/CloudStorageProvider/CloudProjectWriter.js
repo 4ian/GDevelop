@@ -21,9 +21,10 @@ import { serializeToJSON, addFinalNewline } from '../../Utils/Serializer';
 import { serializeToJSONInBackground } from '../../Utils/BackgroundSerializer';
 import { t } from '@lingui/macro';
 import {
-  createZipWithSingleTextFile,
-  unzipFirstEntryOfBlob,
+  createZipWithTextFiles,
+  unzipTextFilesFromBlob,
 } from '../../Utils/Zip.js/Utils';
+import { serializeConstantsToToml } from '../MultiFileProjectFormat';
 import ProjectCache from '../../Utils/ProjectCache';
 import { getProjectCache } from './CloudProjectOpener';
 import { retryIfFailed } from '../../Utils/RetryIfFailed';
@@ -48,7 +49,11 @@ const zipProject = async ({
   project: gdProject,
   useBackgroundSerializer: boolean,
   canonicalEventSerialization: boolean,
-}): Promise<{ zippedProject: Blob, projectJson: string }> => {
+}): Promise<{
+  zippedProject: Blob,
+  projectJson: string,
+  constantsToml: string,
+}> => {
   const startTime = Date.now();
 
   let projectJson: string;
@@ -65,13 +70,16 @@ const zipProject = async ({
   }
 
   projectJson = addFinalNewline(projectJson);
+  const constantsToml = serializeConstantsToToml(
+    JSON.parse(project.getConstantsJson())
+  );
 
   const serializeToJSONEndTime = Date.now();
 
-  const zippedProject = await createZipWithSingleTextFile(
-    projectJson,
-    'game.json'
-  );
+  const zippedProject = await createZipWithTextFiles({
+    'game.json': projectJson,
+    'constants.toml': constantsToml,
+  });
 
   console.log(
     `[CloudProjectWriter] Zipping done in ${Date.now() -
@@ -79,17 +87,20 @@ const zipProject = async ({
       useBackgroundSerializer ? 'background' : 'main'
     } thread serialization).`
   );
-  return { zippedProject, projectJson };
+  return { zippedProject, projectJson, constantsToml };
 };
 
 const checkZipContent = async (
   zip: Blob,
-  projectJson: string
+  projectJson: string,
+  constantsToml: string
 ): Promise<boolean> => {
   try {
-    const unzippedProjectJson = await unzipFirstEntryOfBlob(zip);
+    const files = await unzipTextFilesFromBlob(zip);
     return (
-      unzippedProjectJson === projectJson && !!JSON.parse(unzippedProjectJson)
+      files['game.json'] === projectJson &&
+      files['constants.toml'] === constantsToml &&
+      !!JSON.parse(files['game.json'])
     );
   } catch (error) {
     console.error('An error occurred when checking zipped project.', error);
@@ -111,7 +122,10 @@ const zipAndPrepareProjectVersionForCommit = async ({
   presignedUrl: string,
   zippedProject: Blob,
 |}> => {
-  const [presignedUrl, { zippedProject, projectJson }] = await Promise.all([
+  const [
+    presignedUrl,
+    { zippedProject, projectJson, constantsToml },
+  ] = await Promise.all([
     getPresignedUrlForVersionUpload(authenticatedUser, cloudProjectId),
     zipProject({
       project,
@@ -121,7 +135,11 @@ const zipAndPrepareProjectVersionForCommit = async ({
     }),
   ]);
 
-  const archiveIsSane = await checkZipContent(zippedProject, projectJson);
+  const archiveIsSane = await checkZipContent(
+    zippedProject,
+    projectJson,
+    constantsToml
+  );
   if (!archiveIsSane) {
     throw new Error('Project compression failed before saving the project.');
   }

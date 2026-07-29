@@ -106,7 +106,7 @@ rendering = "2d+3d"
 camera_type = "perspective"
 visible = false
 locked = true
-lighting = true
+lighting = false
 follow_base_camera = true
 ambient = "#010203"
 near = 1
@@ -403,6 +403,20 @@ at = [1, 2]
       ),
       { kind: 'scene' },
       'LAYOUT_INVALID_INSTANCE',
+    ],
+    [
+      sceneSource(
+        `[[layers]]\nid = "base"\nname = ""\nrendering = "3d"\nlighting = true\n`
+      ),
+      { kind: 'scene' },
+      'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
+    ],
+    [
+      sceneSource(
+        `[[layers]]\nid = "base"\nname = ""\nrendering = "2d+3d"\nlighting = true\n`
+      ),
+      { kind: 'scene' },
+      'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
     ],
     [
       sceneSource(

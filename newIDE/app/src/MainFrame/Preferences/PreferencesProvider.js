@@ -1393,7 +1393,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return {
       editorTabs:
         editorState.editorTabs == null ? null : editorState.editorTabs,
-      propertiesPanelScroll: editorState.propertiesPanelScroll || {},
+      propertiesPanel: editorState.propertiesPanel || {},
     };
   }
 
@@ -1414,7 +1414,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
             projectId
           ] || {
             editorTabs: null,
-            propertiesPanelScroll: {},
+            propertiesPanel: {},
           };
           const mergedEditorState: EditorStateForProject = {
             ...previousEditorState,

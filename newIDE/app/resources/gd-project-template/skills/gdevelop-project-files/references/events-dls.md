@@ -80,6 +80,15 @@ Never author `@exact`. It is a compiler/import fallback, not AI-authored
 project syntax. If a type is absent after catalog regeneration, do not use it.
 The catalog intentionally excludes hidden and deprecated instructions.
 
+Keyboard parameters use the canonical definitions exposed by the generated
+instruction catalog. Main-row digits have canonical names `Num0` through
+`Num9`; user-facing aliases such as `"1"` and `Digit1` normalize to `Num1`.
+`Numpad1` remains a distinct keypad key and must not be substituted for the
+main-row digit. Prefer canonical names in authored `.events` files. A statically
+known unsupported literal is rejected as `INPUT_UNKNOWN_KEY_NAME`; dynamic
+string expressions are allowed because they cannot be proven invalid during
+authoring.
+
 ## Standard events
 
 Put one statement on each line. Multiple `if` groups mean AND; consecutive
@@ -277,9 +286,10 @@ explicitly permitted.
 
 - Guard every scene/external-sheet action with an effective condition in its
   event or an ancestor. Never create an unconditional every-frame action.
-- Before an object-targeting action, prove that at most one instance of that
-  object is picked. Use `for each Object` to process multiple instances or a
-  deterministic condition that narrows the pick to one instance.
+- Treat object-targeting actions as applying to the current picked set. Multiple
+  picked instances are valid when the gameplay intends to mutate them all; use
+  `for each Object` or a deterministic selector only when each instance must be
+  isolated or exactly one target is required.
 - Preserve OR groups because flattening them changes GDevelop object picking.
 - Preserve source order: actions run before child events, and picked instances
   flow into children.
@@ -299,4 +309,8 @@ explicitly permitted.
   `@comment "..." background=[r,g,b] text=[r,g,b]` exactly.
 - Keep settings, layout TOML, function declarations, and raw JSON outside
   `.events`.
-- After editing, call `reload_project`; preview only after the reload succeeds.
+- After editing, require `validate_project_files` to pass every structural,
+  generated-code, JavaScript-authoring, and semantic phase before
+  `reload_project`. Preview only after the reload succeeds, and use
+  `verify_project_change` or equivalent paused-preview checks for
+  behavior-sensitive changes.

@@ -22,7 +22,7 @@ const testBuildCommandInstallsDependencies = () => {
   );
 };
 
-const testBuildCommandOpensDistOnWindows = () => {
+const testBuildCommandIgnoresWindowsFolderOpenFailure = () => {
   assert.strictEqual(
     getNpmScriptCommand({
       npmScript: 'build',
@@ -30,7 +30,19 @@ const testBuildCommandOpensDistOnWindows = () => {
       openFolderAfterSuccess: 'dist',
       platform: 'win32',
     }),
-    'npm install --no-audit --no-fund && npm run build && explorer.exe .\\dist'
+    'npm install --no-audit --no-fund && npm run build && (explorer.exe .\\dist || cmd /c exit 0)'
+  );
+};
+
+const testBuildCommandIgnoresPosixFolderOpenFailure = () => {
+  assert.strictEqual(
+    getNpmScriptCommand({
+      npmScript: 'build',
+      installDependencies: true,
+      openFolderAfterSuccess: 'dist',
+      platform: 'linux',
+    }),
+    "npm install --no-audit --no-fund && npm run build && (xdg-open './dist' || true)"
   );
 };
 
@@ -95,7 +107,7 @@ const testWindowsLaunchUsesWorkingDirectory = () => {
         '',
         'cmd.exe',
         '/c',
-        'npm install --no-audit --no-fund && npm run build && explorer.exe .\\dist || (echo. & echo Command failed! & pause)',
+        'npm install --no-audit --no-fund && npm run build && (explorer.exe .\\dist || cmd /c exit 0) || (echo. & echo Command failed! & pause)',
       ],
       options: {
         cwd: 'C:\\Games & Tools\\My game',
@@ -108,7 +120,8 @@ const testWindowsLaunchUsesWorkingDirectory = () => {
 
 const run = () => {
   testBuildCommandInstallsDependencies();
-  testBuildCommandOpensDistOnWindows();
+  testBuildCommandIgnoresWindowsFolderOpenFailure();
+  testBuildCommandIgnoresPosixFolderOpenFailure();
   testOpenFolderCommandUsesHostFileManager();
   testInvalidScriptNameIsRejected();
   testUnsafeOpenFolderIsRejected();

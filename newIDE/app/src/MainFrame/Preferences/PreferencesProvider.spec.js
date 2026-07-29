@@ -1,9 +1,22 @@
 // @flow
 /* global globalThis */
 
-import { generateMcpServerAuthorizationToken } from './PreferencesProvider';
+import {
+  generateMcpServerAuthorizationToken,
+  getInitialPreferences,
+} from './PreferencesProvider';
 
 describe('PreferencesProvider', () => {
+  test('uses the diagnostic and advanced preferences defaults', () => {
+    expect(getInitialPreferences()).toMatchObject({
+      openDiagnosticReportAutomatically: true,
+      blockPreviewAndExportOnDiagnosticErrors: true,
+      showExperimentalExtensions: true,
+      showDeprecatedInstructionWarning: 'icon-and-deprecated-warning-text',
+      showJsTypeError: true,
+    });
+  });
+
   describe('generateMcpServerAuthorizationToken', () => {
     const globalScope: any = globalThis;
     const previousWindow = globalScope.window;

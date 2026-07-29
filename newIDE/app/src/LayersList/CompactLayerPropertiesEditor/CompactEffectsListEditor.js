@@ -23,10 +23,9 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import Link from '../../UI/Link';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
-import {
-  TopLevelCollapsibleSection,
-  CollapsibleSubPanel,
-} from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { CollapsibleSubPanel } from '../../ObjectEditor/CompactObjectPropertiesEditor';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 
 export const styles = {
   icon: {
@@ -68,6 +67,7 @@ type Props = {|
   onEffectAdded: () => void,
   layerRenderingType: '2d' | '3d',
   target: 'object' | 'layer',
+  persistedPanelStateId: string,
 |};
 
 export const CompactEffectsListEditor = ({
@@ -82,9 +82,19 @@ export const CompactEffectsListEditor = ({
   onEffectAdded,
   layerRenderingType,
   target,
+  persistedPanelStateId,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isEffectsFolded, setEffectsFolded] = React.useState(false);
+
+  const {
+    isSectionFolded,
+    toggleSectionFolded,
+    setSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'layer',
+  });
 
   // Effects:
   const {
@@ -109,6 +119,27 @@ export const CompactEffectsListEditor = ({
   const filteredEffectMetadata =
     layerRenderingType === '3d' ? all3DEffectMetadata : all2DEffectMetadata;
 
+  const effects = mapFor(
+    0,
+    effectsContainer.getEffectsCount(),
+    (index: number) => {
+      const effect: gdEffect = effectsContainer.getEffectAt(index);
+      const effectType = effect.getEffectType();
+      const effectMetadata = getEnumeratedEffectMetadata(
+        allEffectMetadata,
+        effectType
+      );
+      return { effect, effectMetadata };
+    }
+  ).filter(
+    ({ effectMetadata }) =>
+      !effectMetadata ||
+      (layerRenderingType !== '3d' &&
+        !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
+      (layerRenderingType !== '2d' &&
+        !effectMetadata.isMarkedAsOnlyWorkingFor2D)
+  );
+
   return (
     <TopLevelCollapsibleSection
       title={
@@ -120,13 +151,16 @@ export const CompactEffectsListEditor = ({
           <Trans>2D effects</Trans>
         )
       }
-      isFolded={isEffectsFolded}
-      toggleFolded={() => setEffectsFolded(!isEffectsFolded)}
+      isFolded={isSectionFolded(layerRenderingType + '-effects')}
+      toggleFolded={() => toggleSectionFolded(layerRenderingType + '-effects')}
       onOpenFullEditor={onOpenFullEditor}
-      onAdd={() => addEffect(layerRenderingType === '3d')}
+      onAdd={() => {
+        addEffect(layerRenderingType === '3d');
+        setSectionFolded(layerRenderingType + '-effects', false);
+      }}
       renderContent={() => (
         <ColumnStackLayout noMargin>
-          {effectsContainer.getEffectsCount() === 0 && (
+          {effects.length === 0 && (
             <Text size="body2" align="center" color="secondary">
               {target === 'object' ? (
                 <Trans>
@@ -166,86 +200,71 @@ export const CompactEffectsListEditor = ({
               )}
             </Text>
           )}
-          {mapFor(0, effectsContainer.getEffectsCount(), (index: number) => {
-            const effect: gdEffect = effectsContainer.getEffectAt(index);
-            const effectType = effect.getEffectType();
-            const effectMetadata = getEnumeratedEffectMetadata(
-              allEffectMetadata,
-              effectType
-            );
-
-            return !effectMetadata ||
-              (layerRenderingType !== '3d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor3D) ||
-              (layerRenderingType !== '2d' &&
-                !effectMetadata.isMarkedAsOnlyWorkingFor2D) ? (
-              <CollapsibleSubPanel
-                key={effect.ptr}
-                renderContent={() => (
-                  <ColumnStackLayout noMargin expand noOverflowParent>
-                    <CompactSelectField
-                      value={effectType}
-                      onChange={type => chooseEffectType(effect, type)}
-                    >
-                      {filteredEffectMetadata.map(effectMetadata => (
-                        <SelectOption
-                          key={effectMetadata.type}
-                          value={effectMetadata.type}
-                          label={effectMetadata.fullName}
-                          disabled={
-                            target === 'object' &&
-                            effectMetadata.isMarkedAsNotWorkingForObjects
-                          }
-                        />
-                      ))}
-                    </CompactSelectField>
-                    {effectMetadata && (
-                      <CompactPropertiesEditorByVisibility
-                        project={project}
-                        schema={effectMetadata.parametersSchema}
-                        instances={[effect]}
-                        onInstancesModified={onEffectsUpdated}
-                        resourceManagementProps={resourceManagementProps}
-                        placeholder={
-                          <Trans>Nothing to configure for this effect.</Trans>
+          {effects.map(({ effect, effectMetadata }) => (
+            <CollapsibleSubPanel
+              key={effect.ptr}
+              renderContent={() => (
+                <ColumnStackLayout noMargin expand noOverflowParent>
+                  <CompactSelectField
+                    value={effect.getEffectType()}
+                    onChange={type => chooseEffectType(effect, type)}
+                  >
+                    {filteredEffectMetadata.map(effectMetadata => (
+                      <SelectOption
+                        key={effectMetadata.type}
+                        value={effectMetadata.type}
+                        label={effectMetadata.fullName}
+                        disabled={
+                          target === 'object' &&
+                          effectMetadata.isMarkedAsNotWorkingForObjects
                         }
-                        onRefreshAllFields={forceUpdate}
                       />
-                    )}
-                  </ColumnStackLayout>
-                )}
-                isFolded={effect.isFolded()}
-                toggleFolded={() => {
-                  effect.setFolded(!effect.isFolded());
-                  forceUpdate();
-                }}
-                title={effect.getName()}
-                titleBarButtons={[
-                  {
-                    id: 'effect-visibility',
-                    icon: effect.isEnabled()
-                      ? VisibilityIcon
-                      : VisibilityOffIcon,
-                    label: effect.isEnabled() ? t`Hide effect` : t`Show effect`,
-                    onClick: () => {
-                      effect.setEnabled(!effect.isEnabled());
-                      onEffectsUpdated();
-                      forceUpdate();
-                    },
+                    ))}
+                  </CompactSelectField>
+                  {effectMetadata && (
+                    <CompactPropertiesEditorByVisibility
+                      project={project}
+                      schema={effectMetadata.parametersSchema}
+                      instances={[effect]}
+                      onInstancesModified={onEffectsUpdated}
+                      resourceManagementProps={resourceManagementProps}
+                      placeholder={
+                        <Trans>Nothing to configure for this effect.</Trans>
+                      }
+                      onRefreshAllFields={forceUpdate}
+                    />
+                  )}
+                </ColumnStackLayout>
+              )}
+              isFolded={effect.isFolded()}
+              toggleFolded={() => {
+                effect.setFolded(!effect.isFolded());
+                forceUpdate();
+              }}
+              title={effect.getName()}
+              titleBarButtons={[
+                {
+                  id: 'effect-visibility',
+                  icon: effect.isEnabled() ? VisibilityIcon : VisibilityOffIcon,
+                  label: effect.isEnabled() ? t`Hide effect` : t`Show effect`,
+                  onClick: () => {
+                    effect.setEnabled(!effect.isEnabled());
+                    onEffectsUpdated();
+                    forceUpdate();
                   },
-                  {
-                    id: 'remove-effect',
-                    icon: RemoveIcon,
-                    label: t`Remove effect`,
-                    onClick: () => {
-                      removeEffect(effect);
-                      onEffectsUpdated();
-                    },
+                },
+                {
+                  id: 'remove-effect',
+                  icon: RemoveIcon,
+                  label: t`Remove effect`,
+                  onClick: () => {
+                    removeEffect(effect);
+                    onEffectsUpdated();
                   },
-                ]}
-              />
-            ) : null;
-          })}
+                },
+              ]}
+            />
+          ))}
         </ColumnStackLayout>
       )}
     />

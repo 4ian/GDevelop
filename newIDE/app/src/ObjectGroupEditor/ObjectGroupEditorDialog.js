@@ -63,9 +63,6 @@ const ObjectGroupEditorDialog = ({
     editedObjectGroup,
     setEditedObjectGroup,
   ] = React.useState<gdObjectGroup | null>(group);
-  const [selectedTab, setSelectedTab] = React.useState<ObjectGroupEditorTab>(
-    initialTab || 'objects'
-  );
 
   const onApplyToEmptyGroup = React.useCallback(
     (
@@ -113,7 +110,6 @@ const ObjectGroupEditorDialog = ({
         );
       }
       setEditedObjectGroup(objectGroup);
-      setSelectedTab('commonFunctions');
     },
     [
       bypassedObjectGroupsContainer,
@@ -148,7 +144,7 @@ const ObjectGroupEditorDialog = ({
       onCancel={onCancel}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
-      initialTab={selectedTab}
+      initialTab={initialTab}
       isObjectListLocked={isObjectListLocked}
       isGroupGlobal={isGroupGlobal}
       objectNameFilter={objectNameFilter}

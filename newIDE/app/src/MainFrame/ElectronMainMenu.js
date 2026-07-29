@@ -239,6 +239,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-open-sticky-notes',
+    callback: callbacks.onOpenStickyNotes,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-open-global-search',
     callback: callbacks.onOpenGlobalSearch,
     shouldApply: isFocusedOnMainWindow,

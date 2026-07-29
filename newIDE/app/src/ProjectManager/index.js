@@ -126,28 +126,23 @@ import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/Ev
 import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { createEventsFunctionExtensionItem } from './CreateEventsFunctionExtensionItem';
+import { getGameRootTreeViewItemDescription } from './GameRootTreeViewItem';
 
 const electron = optionalRequire('electron');
 
 export const getProjectManagerItemId = (identifier: string): string =>
   `project-manager-tab-${identifier}`;
 
-const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
+const projectRootFolderId = getProjectManagerItemId('project');
 const gamePropertiesItemId = getProjectManagerItemId('game-properties');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 const gameExtensionsItemId = getProjectManagerItemId('game-extensions');
-const gameShareItemId = getProjectManagerItemId('game-share');
-const gameStickyNotesItemId = getProjectManagerItemId('game-sticky-notes');
-const globalsRootFolderId = getProjectManagerItemId('globals');
 export const globalVariablesItemId: string = getProjectManagerItemId(
   'global-variables'
 );
-const staticDataItemId = getProjectManagerItemId('static-data');
+const constantsItemId = getProjectManagerItemId('constants');
 export const globalObjectsItemId: string = getProjectManagerItemId(
   'global-objects'
-);
-export const objectSettingsItemId: string = getProjectManagerItemId(
-  'object-settings'
 );
 export const scenesRootFolderId: string = getProjectManagerItemId('scenes');
 export const customObjectsRootFolderId: string = getProjectManagerItemId(
@@ -204,8 +199,8 @@ export const getProjectManagerTreeViewItemIdForEditorTab = (
   switch (editorKind) {
     case 'resources':
       return gameResourcesItemId;
-    case 'static-data':
-      return staticDataItemId;
+    case 'constants':
+      return constantsItemId;
     case 'layout':
       return projectItemName && project.hasLayoutNamed(projectItemName)
         ? getSceneTreeViewItemId(project.getLayout(projectItemName))
@@ -811,6 +806,7 @@ export type ProjectManagerCreateItemKind =
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
   focusSearchBar: () => void,
+  openProjectVariables: () => void,
   selectAndScrollToItemFromId: (itemId: string) => void,
   activateItemFromId: (itemId: string) => void,
   createProjectItem: (itemKind: ProjectManagerCreateItemKind) => void,
@@ -828,9 +824,7 @@ type Props = {|
   ...BehaviorShortcutTreeViewItemCallbacks,
   ...FunctionShortcutTreeViewItemCallbacks,
   onOpenResources: () => void,
-  onOpenStickyNotes: () => void,
-  onOpenStaticData: () => void,
-  onOpenObjectSettings: () => void,
+  onOpenConstants: () => void,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
   onOpenEventBasedObjectEditor: (
     extensionName: string,
@@ -851,7 +845,6 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onEffectAdded: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
-  onShareProject: () => void,
   onOpenHomePage: () => void,
   closeProjectManager: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
@@ -910,16 +903,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onEventsBasedObjectChildrenEdited,
       onEventBasedObjectTypeChanged,
       onOpenResources,
-      onOpenStickyNotes,
-      onOpenStaticData,
-      onOpenObjectSettings,
+      onOpenConstants,
       onReloadEventsFunctionsExtensions,
       isOpen,
       hotReloadPreviewButtonProps,
       onEffectAdded,
       triggerHotReloadInGameEditorIfNeeded,
       onWillInstallExtension,
-      onShareProject,
       resourceManagementProps,
       projectScopedContainersAccessor,
       closeProjectManager,
@@ -1497,6 +1487,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         focusSearchBar: () => {
           if (searchBarRef.current) searchBarRef.current.focus();
         },
+        openProjectVariables,
         selectAndScrollToItemFromId: (itemId: string) => {
           selectAndScrollToTreeViewItemFromId(itemId);
         },
@@ -1506,7 +1497,12 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         },
         createProjectItem,
       }),
-      [createProjectItem, forceUpdate, selectAndScrollToTreeViewItemFromId]
+      [
+        createProjectItem,
+        forceUpdate,
+        openProjectVariables,
+        selectAndScrollToTreeViewItemFromId,
+      ]
     );
 
     const onTreeModified = React.useCallback(
@@ -1807,6 +1803,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
+        const gameRootTreeViewItemDescription = getGameRootTreeViewItemDescription(
+          i18n,
+          mainMenuCallbacks.onCreateProject
+        );
         return !project ||
           !sceneTreeViewItemProps ||
           !customObjectTreeViewItemProps ||
@@ -1819,15 +1819,16 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
-                  gameSettingsRootFolderId,
-                  i18n._(t`Settings`)
+                  projectRootFolderId,
+                  gameRootTreeViewItemDescription.label,
+                  gameRootTreeViewItemDescription.rightButton
                 ),
                 getChildren(i18n: I18nType): ?Array<TreeViewItem> {
                   return [
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         gamePropertiesItemId,
-                        i18n._(t`Properties & Icons`),
+                        i18n._(t`Properties`),
                         openProjectProperties,
                         'res/icons_default/properties_black.svg'
                       )
@@ -1850,61 +1851,18 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
-                        gameShareItemId,
-                        i18n._(t`Export & Share`),
-                        onShareProject,
-                        'res/icons_default/publish_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        gameStickyNotesItemId,
-                        i18n._(t`Sticky notes`),
-                        onOpenStickyNotes,
-                        'res/icons_default/sticky_notes_black.svg'
-                      )
-                    ),
-                  ];
-                },
-              },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  globalsRootFolderId,
-                  i18n._(t`Globals`)
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  return [
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        staticDataItemId,
-                        i18n._(t`Static Data`),
-                        onOpenStaticData,
-                        'res/icons_default/static_data24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        globalVariablesItemId,
-                        i18n._(t`Global variables`),
-                        openProjectVariables,
-                        'res/icons_default/global_variable24_black.svg'
+                        constantsItemId,
+                        i18n._(t`Constants`),
+                        onOpenConstants,
+                        'res/icons_default/constants24_black.svg'
                       )
                     ),
                     new LeafTreeViewItem(
                       new ActionTreeViewItemContent(
                         globalObjectsItemId,
-                        i18n._(t`Global objects`),
+                        i18n._(t`Objects`),
                         openProjectGlobalsDialog,
                         'res/icons_default/global_object24_black.svg'
-                      )
-                    ),
-                    new LeafTreeViewItem(
-                      new ActionTreeViewItemContent(
-                        objectSettingsItemId,
-                        i18n._(t`Object Settings`),
-                        onOpenObjectSettings,
-                        'res/functions/object_black.svg'
                       )
                     ),
                   ];
@@ -2261,16 +2219,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         externalEventsTreeViewItemProps,
         externalLayoutTreeViewItemProps,
         functionShortcutTreeViewItemProps,
-        onOpenStaticData,
-        onOpenObjectSettings,
+        mainMenuCallbacks,
+        onOpenConstants,
         onOpenResources,
-        onOpenStickyNotes,
-        onShareProject,
         openCreateExternalDialog,
         openProjectExtensionsDialog,
         openProjectProperties,
         openCreateExtensionItemDialog,
-        openProjectVariables,
         openProjectGlobalsDialog,
         project,
         sceneTreeViewItemProps,
@@ -2335,8 +2290,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const initiallyOpenedNodeIds = React.useMemo(
       () => {
         const nodeIds = [
-          gameSettingsRootFolderId,
-          globalsRootFolderId,
+          projectRootFolderId,
           scenesRootFolderId,
           externalsRootFolderId,
           customObjectsRootFolderId,
@@ -2455,6 +2409,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                             // $FlowFixMe[incompatible-type]
                             // $FlowFixMe[incompatible-exact]
                             <TreeView
+                              enableStickyAncestors
                               key={listKey}
                               ref={treeViewRef}
                               items={getTreeViewData(i18n)}

@@ -167,13 +167,18 @@ export function ClosableTab({
   onHover,
   maxWidth,
 }: ClosableTabProps): React.Node {
+  // Changing the callback identity must not reactivate an already active tab.
+  // In particular, activation may refresh an editor containing a large events
+  // sheet. Keep the latest callback without making it an effect dependency.
+  const onActivatedRef = React.useRef(onActivated);
+  onActivatedRef.current = onActivated;
   React.useEffect(
     () => {
       if (active) {
-        onActivated();
+        onActivatedRef.current();
       }
     },
-    [active, onActivated]
+    [active]
   );
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const spanLabelRef = React.useRef<?HTMLSpanElement>(null);

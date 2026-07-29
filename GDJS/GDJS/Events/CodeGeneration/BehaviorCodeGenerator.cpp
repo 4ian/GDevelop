@@ -15,17 +15,17 @@
 namespace gdjs {
 
 namespace {
-gd::String ResolveProjectStaticDataPlaceholders(
+gd::String ResolveProjectConstantPlaceholders(
     const gd::Project& project,
     const gd::String& value) {
   gd::String resolvedValue;
   gd::String missingPath;
-  if (project.ResolveStaticDataPlaceholders(
+  if (project.ResolveConstantPlaceholders(
           value, resolvedValue, missingPath)) {
     return resolvedValue;
   }
 
-  gd::LogError("Static Data path \"{{" + missingPath +
+  gd::LogError("Constant path \"{{" + missingPath +
                "}}\" does not exist while generating behavior property code.");
   return value;
 }
@@ -570,7 +570,7 @@ gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
       gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
   const bool isJsonObjectProperty = property.GetType() == "JsonObject";
   const gd::String propertyValue =
-      ResolveProjectStaticDataPlaceholders(project, property.GetValue());
+      ResolveProjectConstantPlaceholders(project, property.GetValue());
 
   if (isJsonObjectProperty) {
     return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());

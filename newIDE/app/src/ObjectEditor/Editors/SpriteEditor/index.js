@@ -64,6 +64,7 @@ export default function SpriteEditor({
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const animations = spriteConfiguration.getAnimations();
+  const anyFrame = hasAnyFrame(animations);
   const { isMobile } = useResponsiveWindowSize();
 
   const scrollView = React.useRef<?ScrollViewInterface>(null);
@@ -159,18 +160,18 @@ export default function SpriteEditor({
                   <FlatButton
                     label={<Trans>Edit collision masks</Trans>}
                     onClick={() => setCollisionMasksEditorOpen(true)}
-                    disabled={!hasAnyFrame(animations)}
+                    disabled={!anyFrame}
                   />
                   <FlatButton
                     label={<Trans>Edit points</Trans>}
                     onClick={() => setPointsEditorOpen(true)}
-                    disabled={!hasAnyFrame(animations)}
+                    disabled={!anyFrame}
                   />
                   {!isChildObject && (
                     <FlatButton
                       label={<Trans>Advanced options</Trans>}
                       onClick={() => setAdvancedOptionsOpen(true)}
-                      disabled={!hasAnyFrame(animations)}
+                      disabled={!anyFrame}
                     />
                   )}
                 </ResponsiveLineStackLayout>
@@ -178,19 +179,19 @@ export default function SpriteEditor({
                 <FlatButtonWithSplitMenu
                   label={<Trans>Edit collision masks</Trans>}
                   onClick={() => setCollisionMasksEditorOpen(true)}
-                  disabled={!hasAnyFrame(animations)}
+                  disabled={!anyFrame}
                   buildMenuTemplate={i18n =>
                     // $FlowFixMe[incompatible-type]
                     [
                       {
                         label: i18n._(t`Edit points`),
-                        disabled: !hasAnyFrame(animations),
+                        disabled: !anyFrame,
                         click: () => setPointsEditorOpen(true),
                       },
                       isChildObject
                         ? {
                             label: i18n._(t`Advanced options`),
-                            disabled: !hasAnyFrame(animations),
+                            disabled: !anyFrame,
                             click: () => setAdvancedOptionsOpen(true),
                           }
                         : null,

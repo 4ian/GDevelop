@@ -620,6 +620,7 @@ export const isTextLikeFile = (node: ProjectFileNode): boolean =>
     '.md',
     '.markdown',
     '.events',
+    '.gdevelop',
     '.layout',
     '.settings',
   ].includes(node.extension);

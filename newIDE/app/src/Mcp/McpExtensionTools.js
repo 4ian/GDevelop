@@ -93,7 +93,7 @@ const normalizeOptionalName = (name: any, label: string): ?string => {
 
 const getSafeUniqueName = (
   desiredName: string,
-  isNameTaken: (string) => boolean,
+  isNameTaken: string => boolean,
   currentName?: ?string
 ): string => {
   const baseName = gd.Project.getSafeName(desiredName);
@@ -161,7 +161,10 @@ const normalizeFunctionType = (
       'function_type must be a string or a numeric GDevelop function type.'
     );
   }
-  const normalized = functionType.trim().toLowerCase().replace(/\s+/g, '_');
+  const normalized = functionType
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_');
   const functionTypeByName = getFunctionTypeByName();
   if (!hasOwn(functionTypeByName, normalized)) {
     throw new Error(
@@ -173,7 +176,9 @@ const normalizeFunctionType = (
 
 const normalizeParentKind = (parentKind: any): string => {
   if (!parentKind) return 'extension';
-  const normalized = String(parentKind).trim().toLowerCase();
+  const normalized = String(parentKind)
+    .trim()
+    .toLowerCase();
   if (normalized === 'free' || normalized === 'global') return 'extension';
   if (
     normalized !== 'extension' &&
@@ -246,11 +251,11 @@ const parseJsonPointer = (pointer: string): Array<string> => {
   return pointer
     .slice(1)
     .split('/')
-    .map((part) => part.replace(/~1/g, '/').replace(/~0/g, '~'));
+    .map(part => part.replace(/~1/g, '/').replace(/~0/g, '~'));
 };
 
 const assertSafePathParts = (parts: Array<string>) => {
-  parts.forEach((part) => {
+  parts.forEach(part => {
     if (
       part === '__proto__' ||
       part === 'constructor' ||
@@ -402,7 +407,7 @@ const getNamedItemIndex = (
   label: string
 ): number => {
   if (!Array.isArray(items)) throw new Error(`Missing ${label} array.`);
-  const index = items.findIndex((item) => item && item.name === itemName);
+  const index = items.findIndex(item => item && item.name === itemName);
   if (index === -1) throw new Error(`${label} not found: "${itemName}".`);
   return index;
 };
@@ -412,16 +417,16 @@ const getVectorStringArray = (vectorString: any): Array<string> => {
   if (typeof vectorString.toJSArray === 'function') {
     return vectorString.toJSArray();
   }
-  return mapVector(vectorString, (value) => value);
+  return mapVector(vectorString, value => value);
 };
 
 const replaceVectorString = (vectorString: any, values: Array<string>) => {
   if (!vectorString || typeof vectorString.clear !== 'function') return;
   vectorString.clear();
   values
-    .filter((value) => typeof value === 'string' && value.trim())
-    .map((value) => value.trim())
-    .forEach((value) => vectorString.push_back(value));
+    .filter(value => typeof value === 'string' && value.trim())
+    .map(value => value.trim())
+    .forEach(value => vectorString.push_back(value));
 };
 
 const summarizeValueTypeMetadata = (valueTypeMetadata: any): ?Object => {
@@ -488,7 +493,7 @@ const summarizeParameter = (
 const summarizeParameters = (
   parameters: gdParameterMetadataContainer
 ): Array<Object> =>
-  mapFor(0, parameters.getParametersCount(), (index) =>
+  mapFor(0, parameters.getParametersCount(), index =>
     summarizeParameter(parameters.getParameterAt(index), index)
   );
 
@@ -510,7 +515,7 @@ const summarizeProperty = (
     isAdvanced: !!getOptionalBoolean(property, 'isAdvanced'),
     isDeprecated: !!getOptionalBoolean(property, 'isDeprecated'),
     extraInfo: getVectorStringArray(property.getExtraInfo()),
-    choices: mapVector(property.getChoices(), (choice) => ({
+    choices: mapVector(property.getChoices(), choice => ({
       value: choice.getValue(),
       label: choice.getLabel(),
     })),
@@ -525,7 +530,7 @@ const summarizeProperties = (
   properties: gdPropertiesContainer,
   includeSerialized: boolean = true
 ): Array<Object> =>
-  mapFor(0, properties.getCount(), (index) =>
+  mapFor(0, properties.getCount(), index =>
     summarizeProperty(properties.getAt(index), index, includeSerialized)
   );
 
@@ -597,10 +602,10 @@ const parseEventPath = (eventPath: string): Array<number> => {
   if (!pathString) {
     throw new Error(`Invalid event path: "${eventPath}".`);
   }
-  const parts = pathString.split('.').map((part) => Number(part));
+  const parts = pathString.split('.').map(part => Number(part));
   if (
     !parts.length ||
-    parts.some((part) => !Number.isInteger(part) || part < 0)
+    parts.some(part => !Number.isInteger(part) || part < 0)
   ) {
     throw new Error(`Invalid event path: "${eventPath}".`);
   }
@@ -720,8 +725,8 @@ const summarizeCompactEventReference = (
       typeof serializedEvent.inlineCode === 'string'
         ? serializedEvent.inlineCode
         : typeof serializedEvent.code === 'string'
-          ? serializedEvent.code
-          : '';
+        ? serializedEvent.code
+        : '';
     summary.javascript = {
       lines: code.split('\n').slice(0, 5),
       lineCount: code ? code.split('\n').length : 0,
@@ -745,7 +750,7 @@ const summarizeEventsFunctionCompact = (
   deprecationMessage: eventsFunction.getDeprecationMessage(),
   parameters: summarizeParameters(eventsFunction.getParameters()),
   eventsCount: eventsFunction.getEvents().getEventsCount(),
-  events: collectEventReferences(eventsFunction.getEvents()).map((reference) =>
+  events: collectEventReferences(eventsFunction.getEvents()).map(reference =>
     summarizeCompactEventReference(reference)
   ),
 });
@@ -857,9 +862,8 @@ const assertEventsFunctionSentenceIsValid = (
   );
   if (!validation.valid) {
     throw new Error(
-      `Invalid extension function sentence for "${eventsFunction.getName()}": ${
-        validation.errorMessage || 'Invalid parameter placeholders.'
-      }`
+      `Invalid extension function sentence for "${eventsFunction.getName()}": ${validation.errorMessage ||
+        'Invalid parameter placeholders.'}`
     );
   }
 };
@@ -870,14 +874,14 @@ const summarizeFunctions = (
   includeSerialized: boolean = true,
   onlyFunctionName?: ?string
 ): Array<Object> =>
-  mapFor(0, container.getEventsFunctionsCount(), (index) =>
+  mapFor(0, container.getEventsFunctionsCount(), index =>
     container.getEventsFunctionAt(index)
   )
     .filter(
-      (eventsFunction) =>
+      eventsFunction =>
         !onlyFunctionName || eventsFunction.getName() === onlyFunctionName
     )
-    .map((eventsFunction) =>
+    .map(eventsFunction =>
       summarizeEventsFunction(eventsFunction, includeEvents, includeSerialized)
     );
 
@@ -922,7 +926,7 @@ const summarizeBehaviors = (
   includeSerialized: boolean = true
 ): Array<Object> => {
   const behaviors = extension.getEventsBasedBehaviors();
-  return mapFor(0, behaviors.getCount(), (index) =>
+  return mapFor(0, behaviors.getCount(), index =>
     summarizeBehavior(behaviors.getAt(index), includeEvents, includeSerialized)
   );
 };
@@ -979,7 +983,7 @@ const summarizeObjects = (
   includeSerialized: boolean = true
 ): Array<Object> => {
   const objects = extension.getEventsBasedObjects();
-  return mapFor(0, objects.getCount(), (index) =>
+  return mapFor(0, objects.getCount(), index =>
     summarizeObject(objects.getAt(index), includeEvents, includeSerialized)
   );
 };
@@ -1003,7 +1007,7 @@ const summarizeExtension = (extension: gdEventsFunctionsExtension): Object => ({
 });
 
 export const listProjectExtensions = (project: gdProject): Object => ({
-  extensions: mapFor(0, project.getEventsFunctionsExtensionsCount(), (index) =>
+  extensions: mapFor(0, project.getEventsFunctionsExtensionsCount(), index =>
     summarizeExtension(project.getEventsFunctionsExtensionAt(index))
   ),
 });
@@ -1040,7 +1044,7 @@ const listExtensionFunctions = (
     extension.getEventsFunctions(),
     includeEvents,
     includeSerialized
-  ).map((eventsFunction) => ({
+  ).map(eventsFunction => ({
     scope: 'extension',
     parentKind: 'extension',
     parentName: null,
@@ -1054,7 +1058,7 @@ const listExtensionFunctions = (
       behavior.getEventsFunctions(),
       includeEvents,
       includeSerialized
-    ).forEach((eventsFunction) =>
+    ).forEach(eventsFunction =>
       functions.push({
         scope: 'behavior',
         parentKind: 'behavior',
@@ -1071,7 +1075,7 @@ const listExtensionFunctions = (
       object.getEventsFunctions(),
       includeEvents,
       includeSerialized
-    ).forEach((eventsFunction) =>
+    ).forEach(eventsFunction =>
       functions.push({
         scope: 'object',
         parentKind: 'object',
@@ -1106,13 +1110,16 @@ export const inspectProjectExtension = (
       freeFunctions: mapFor(
         0,
         extension.getEventsFunctions().getEventsFunctionsCount(),
-        (index) =>
-          extension.getEventsFunctions().getEventsFunctionAt(index).getName()
+        index =>
+          extension
+            .getEventsFunctions()
+            .getEventsFunctionAt(index)
+            .getName()
       ),
       behaviors: mapFor(
         0,
         extension.getEventsBasedBehaviors().getCount(),
-        (index) => {
+        index => {
           const behavior = extension.getEventsBasedBehaviors().getAt(index);
           return {
             name: behavior.getName(),
@@ -1129,7 +1136,7 @@ export const inspectProjectExtension = (
       objects: mapFor(
         0,
         extension.getEventsBasedObjects().getCount(),
-        (index) => {
+        index => {
           const object = extension.getEventsBasedObjects().getAt(index);
           return {
             name: object.getName(),
@@ -1480,13 +1487,13 @@ export const findExtensionEvents = (
   const extension = getExtension(project, extensionName);
   const limit = getSearchLimit(args);
   const matches = [];
-  collectExtensionEventSources(extension, args).forEach((source) => {
+  collectExtensionEventSources(extension, args).forEach(source => {
     findEventsInEventsList({
       eventsList: source.eventsList,
       args,
       owner: source.owner,
       defaultIncludeSerialized: false,
-    }).forEach((match) => matches.push(match));
+    }).forEach(match => matches.push(match));
   });
 
   return {
@@ -1512,7 +1519,7 @@ export const findProjectEvents = (project: gdProject, args: Object): Object => {
       args,
       owner: { scope: 'scene', sceneName: scene.getName() },
       defaultIncludeSerialized: false,
-    }).forEach((match) => matches.push(match));
+    }).forEach(match => matches.push(match));
   }
 
   const extensionName =
@@ -1526,13 +1533,13 @@ export const findProjectEvents = (project: gdProject, args: Object): Object => {
   ) {
     const extension = project.getEventsFunctionsExtensionAt(index);
     if (extensionName && extension.getName() !== extensionName) continue;
-    collectExtensionEventSources(extension, args).forEach((source) => {
+    collectExtensionEventSources(extension, args).forEach(source => {
       findEventsInEventsList({
         eventsList: source.eventsList,
         args,
         owner: source.owner,
         defaultIncludeSerialized: false,
-      }).forEach((match) => matches.push(match));
+      }).forEach(match => matches.push(match));
     });
   }
 
@@ -1573,7 +1580,7 @@ const buildSignalEventSearchArgs = (
     'function_name',
     'include_serialized',
     'summary_only',
-  ].forEach((name) => {
+  ].forEach(name => {
     if (args && args[name] !== undefined) searchArgs[name] = args[name];
   });
   if (signalName) searchArgs.parameter_contains = signalName;
@@ -1593,13 +1600,13 @@ export const inspectSignalUsage = (
   const limit = getSearchLimit(args);
   const emitMatches = [];
   let totalEmitMatches = 0;
-  signalEmitActionTypes.forEach((actionType) => {
+  signalEmitActionTypes.forEach(actionType => {
     const result = findProjectEvents(
       project,
       buildSignalEventSearchArgs(args, actionType, 'action', signalName, limit)
     );
     totalEmitMatches += result.totalMatches || 0;
-    (result.matches || []).forEach((match) =>
+    (result.matches || []).forEach(match =>
       emitMatches.push({ signalActionType: actionType, ...match })
     );
   });
@@ -1733,7 +1740,8 @@ export const inspectSignalUsage = (
       truncated: onSignalHandlers.length > limitedOnSignalHandlers.length,
       handlers: limitedOnSignalHandlers,
     },
-    note: 'Scene signal received conditions and SignalName()/SignalPayload() are scene/external-scene only. Prefab and behavior onSignal handlers are listed by receiver; branch on their fixed SignalName and Payload parameters.',
+    note:
+      'Scene signal received conditions and SignalName()/SignalPayload() are scene/external-scene only. Prefab and behavior onSignal handlers are listed by receiver; branch on their fixed SignalName and Payload parameters.',
   };
 };
 
@@ -1813,7 +1821,7 @@ const collectEventInstructionReferences = (
   if (eventType === 'BuiltinCommonInstructions::Standard') {
     const standardEvent = gd.asStandardEvent(event);
     collectInstructionReferences(standardEvent.getConditions()).forEach(
-      (reference) =>
+      reference =>
         references.push({
           instruction: reference.instruction,
           instructionKind: 'condition',
@@ -1821,7 +1829,7 @@ const collectEventInstructionReferences = (
         })
     );
     collectInstructionReferences(standardEvent.getActions()).forEach(
-      (reference) =>
+      reference =>
         references.push({
           instruction: reference.instruction,
           instructionKind: 'action',
@@ -1831,7 +1839,7 @@ const collectEventInstructionReferences = (
   } else if (eventType === 'BuiltinCommonInstructions::While') {
     const whileEvent = gd.asWhileEvent(event);
     collectInstructionReferences(whileEvent.getWhileConditions()).forEach(
-      (reference) =>
+      reference =>
         references.push({
           instruction: reference.instruction,
           instructionKind: 'condition',
@@ -1839,14 +1847,14 @@ const collectEventInstructionReferences = (
         })
     );
     collectInstructionReferences(whileEvent.getConditions()).forEach(
-      (reference) =>
+      reference =>
         references.push({
           instruction: reference.instruction,
           instructionKind: 'condition',
           instructionPath: reference.path,
         })
     );
-    collectInstructionReferences(whileEvent.getActions()).forEach((reference) =>
+    collectInstructionReferences(whileEvent.getActions()).forEach(reference =>
       references.push({
         instruction: reference.instruction,
         instructionKind: 'action',
@@ -1904,65 +1912,63 @@ const collectInstructionScopeIssues = ({
   eventsFunction: gdEventsFunction,
 |}): Array<Object> => {
   const issues: Array<Object> = [];
-  collectEventReferences(eventsFunction.getEvents()).forEach(
-    (eventReference) => {
-      collectEventInstructionReferences(eventReference.event).forEach(
-        (instructionReference) => {
-          const metadata = getMetadataForInstruction(
-            project,
-            instructionReference.instruction,
-            instructionReference.instructionKind
-          );
-          if (!metadata) return;
-          const instructionType = instructionReference.instruction.getType();
-          if (
-            !isInstructionVisibleForExtensionFunction({
-              metadata,
-              eventsFunction,
-              parentKind,
-            })
-          ) {
-            issues.push({
-              severity: 'error',
-              type: 'instruction-not-visible-in-extension-function',
-              instructionType,
-              instructionKind: instructionReference.instructionKind,
-              eventPath: eventReference.path,
-              instructionPath: instructionReference.instructionPath,
-              suggestion:
-                'Use an instruction that is relevant for extension function events. Instructions that are not relevant to the current function scope render with GDevelop warning/deprecated styling and can be ignored or compiled incorrectly.',
-            });
-          } else if (metadata.isHidden()) {
-            issues.push({
-              severity: 'error',
-              type: 'hidden-instruction-in-extension-function',
-              instructionType,
-              instructionKind: instructionReference.instructionKind,
-              eventPath: eventReference.path,
-              instructionPath: instructionReference.instructionPath,
-              deprecationMessage: metadata.getDeprecationMessage() || undefined,
-              suggestion:
-                metadata.getDeprecationMessage() ||
-                'Use a currently visible instruction instead of hidden/deprecated metadata.',
-            });
-          } else if (metadata.getDeprecationMessage()) {
-            issues.push({
-              severity: 'warning',
-              type: 'deprecated-instruction-in-extension-function',
-              instructionType,
-              instructionKind: instructionReference.instructionKind,
-              eventPath: eventReference.path,
-              instructionPath: instructionReference.instructionPath,
-              deprecationMessage: metadata.getDeprecationMessage(),
-              suggestion:
-                metadata.getDeprecationMessage() ||
-                'Use a non-deprecated instruction when possible.',
-            });
-          }
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const metadata = getMetadataForInstruction(
+          project,
+          instructionReference.instruction,
+          instructionReference.instructionKind
+        );
+        if (!metadata) return;
+        const instructionType = instructionReference.instruction.getType();
+        if (
+          !isInstructionVisibleForExtensionFunction({
+            metadata,
+            eventsFunction,
+            parentKind,
+          })
+        ) {
+          issues.push({
+            severity: 'error',
+            type: 'instruction-not-visible-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            suggestion:
+              'Use an instruction that is relevant for extension function events. Instructions that are not relevant to the current function scope render with GDevelop warning/deprecated styling and can be ignored or compiled incorrectly.',
+          });
+        } else if (metadata.isHidden()) {
+          issues.push({
+            severity: 'error',
+            type: 'hidden-instruction-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            deprecationMessage: metadata.getDeprecationMessage() || undefined,
+            suggestion:
+              metadata.getDeprecationMessage() ||
+              'Use a currently visible instruction instead of hidden/deprecated metadata.',
+          });
+        } else if (metadata.getDeprecationMessage()) {
+          issues.push({
+            severity: 'warning',
+            type: 'deprecated-instruction-in-extension-function',
+            instructionType,
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            deprecationMessage: metadata.getDeprecationMessage(),
+            suggestion:
+              metadata.getDeprecationMessage() ||
+              'Use a non-deprecated instruction when possible.',
+          });
         }
-      );
-    }
-  );
+      }
+    );
+  });
   return issues;
 };
 
@@ -1978,8 +1984,7 @@ const DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES = new Set([
 const FUNCTION_VARIABLE_PARAMETER_SUGGESTION =
   'Inside extension functions, variable parameters are function arguments, not scene/local variables. Use CopyArgumentToVariable2 to copy the argument into an event-local variable, read/write that local variable with NumberVariable/SetNumberVariable, then use CopyVariableToArgument2 to write the local value back when needed.';
 
-const STATIC_DATA_EXPRESSION_CALL_REGEX =
-  /\b(?:ConfigNumber|ConfigString|ConfigBool|ConfigChildCount|ConfigToJSON)\s*\(/;
+const CONSTANT_EXPRESSION_CALL_REGEX = /\b(?:ConfigNumber|ConfigString|ConfigBool|ConfigChildCount|ConfigToJSON)\s*\(/;
 
 const getEventLevelExpressionReferences = (eventReference: {|
   event: gdBaseEvent,
@@ -1991,7 +1996,10 @@ const getEventLevelExpressionReferences = (eventReference: {|
     return [
       {
         label: 'repeatExpression',
-        value: gd.asRepeatEvent(event).getRepeatExpression().getPlainString(),
+        value: gd
+          .asRepeatEvent(event)
+          .getRepeatExpression()
+          .getPlainString(),
         eventPath: eventReference.path,
       },
     ];
@@ -2015,56 +2023,54 @@ const getEventLevelExpressionReferences = (eventReference: {|
   return [];
 };
 
-const collectStaticDataExpressionMisuseIssues = (
+const collectConstantsExpressionMisuseIssues = (
   eventsFunction: gdEventsFunction
 ): Array<Object> => {
   const issues: Array<Object> = [];
-  collectEventReferences(eventsFunction.getEvents()).forEach(
-    (eventReference) => {
-      getEventLevelExpressionReferences(eventReference).forEach((reference) => {
-        if (!STATIC_DATA_EXPRESSION_CALL_REGEX.test(reference.value)) return;
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    getEventLevelExpressionReferences(eventReference).forEach(reference => {
+      if (!CONSTANT_EXPRESSION_CALL_REGEX.test(reference.value)) return;
 
-        issues.push({
-          severity: 'error',
-          type: 'static-data-expression-in-extension-function',
-          eventPath: reference.eventPath,
-          eventExpression: reference.label,
-          expressionValue: reference.value,
-          suggestion:
-            'Do not use direct Static Data expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
-        });
+      issues.push({
+        severity: 'error',
+        type: 'constants-expression-in-extension-function',
+        eventPath: reference.eventPath,
+        eventExpression: reference.label,
+        expressionValue: reference.value,
+        suggestion:
+          'Do not use direct Constants expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
       });
+    });
 
-      collectEventInstructionReferences(eventReference.event).forEach(
-        (instructionReference) => {
-          const instruction = instructionReference.instruction;
-          for (
-            let parameterIndex = 0;
-            parameterIndex < instruction.getParametersCount();
-            parameterIndex++
-          ) {
-            const value = instruction
-              .getParameter(parameterIndex)
-              .getPlainString();
-            if (!STATIC_DATA_EXPRESSION_CALL_REGEX.test(value)) continue;
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        for (
+          let parameterIndex = 0;
+          parameterIndex < instruction.getParametersCount();
+          parameterIndex++
+        ) {
+          const value = instruction
+            .getParameter(parameterIndex)
+            .getPlainString();
+          if (!CONSTANT_EXPRESSION_CALL_REGEX.test(value)) continue;
 
-            issues.push({
-              severity: 'error',
-              type: 'static-data-expression-in-extension-function',
-              instructionType: instruction.getType(),
-              instructionKind: instructionReference.instructionKind,
-              eventPath: eventReference.path,
-              instructionPath: instructionReference.instructionPath,
-              parameterIndex,
-              parameterValue: value,
-              suggestion:
-                'Do not use direct Static Data expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
-            });
-          }
+          issues.push({
+            severity: 'error',
+            type: 'constants-expression-in-extension-function',
+            instructionType: instruction.getType(),
+            instructionKind: instructionReference.instructionKind,
+            eventPath: eventReference.path,
+            instructionPath: instructionReference.instructionPath,
+            parameterIndex,
+            parameterValue: value,
+            suggestion:
+              'Do not use direct Constants expressions inside extension events. Inject config through parameters/properties instead, preferably a JSON-object property like CardConfig with an object-editor placeholder value such as {{cards.Sunflower}}, then read CardConfig.price in the extension events.',
+          });
         }
-      );
-    }
-  );
+      }
+    );
+  });
   return issues;
 };
 
@@ -2089,42 +2095,41 @@ const getFunctionVariableParameterNames = (
 const collectFunctionVariableParameterMisuseIssues = (
   eventsFunction: gdEventsFunction
 ): Array<Object> => {
-  const variableParameterNames =
-    getFunctionVariableParameterNames(eventsFunction);
+  const variableParameterNames = getFunctionVariableParameterNames(
+    eventsFunction
+  );
   if (!variableParameterNames.size) return [];
 
   const issues: Array<Object> = [];
-  collectEventReferences(eventsFunction.getEvents()).forEach(
-    (eventReference) => {
-      collectEventInstructionReferences(eventReference.event).forEach(
-        (instructionReference) => {
-          const instruction = instructionReference.instruction;
-          if (
-            !DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES.has(
-              instruction.getType()
-            ) ||
-            instruction.getParametersCount() < 1
-          ) {
-            return;
-          }
-          const firstParameter = instruction.getParameter(0).getPlainString();
-          if (!variableParameterNames.has(firstParameter)) return;
-
-          issues.push({
-            severity: 'error',
-            type: 'function-variable-parameter-used-as-direct-variable',
-            instructionType: instruction.getType(),
-            instructionKind: instructionReference.instructionKind,
-            eventPath: eventReference.path,
-            instructionPath: instructionReference.instructionPath,
-            parameterIndex: 0,
-            parameterName: firstParameter,
-            suggestion: FUNCTION_VARIABLE_PARAMETER_SUGGESTION,
-          });
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        if (
+          !DIRECT_VARIABLE_PARAMETER_INSTRUCTION_TYPES.has(
+            instruction.getType()
+          ) ||
+          instruction.getParametersCount() < 1
+        ) {
+          return;
         }
-      );
-    }
-  );
+        const firstParameter = instruction.getParameter(0).getPlainString();
+        if (!variableParameterNames.has(firstParameter)) return;
+
+        issues.push({
+          severity: 'error',
+          type: 'function-variable-parameter-used-as-direct-variable',
+          instructionType: instruction.getType(),
+          instructionKind: instructionReference.instructionKind,
+          eventPath: eventReference.path,
+          instructionPath: instructionReference.instructionPath,
+          parameterIndex: 0,
+          parameterName: firstParameter,
+          suggestion: FUNCTION_VARIABLE_PARAMETER_SUGGESTION,
+        });
+      }
+    );
+  });
   return issues;
 };
 
@@ -2157,50 +2162,47 @@ const collectObjectFunctionCreateExternalObjectIssues = (
   if (!externalObjectParameterNames.size) return [];
 
   const issues: Array<Object> = [];
-  collectEventReferences(eventsFunction.getEvents()).forEach(
-    (eventReference) => {
-      collectEventInstructionReferences(eventReference.event).forEach(
-        (instructionReference) => {
-          const instruction = instructionReference.instruction;
-          if (
-            instructionReference.instructionKind !== 'action' ||
-            instruction.getType() !== 'Create' ||
-            instruction.getParametersCount() < 1
-          ) {
-            return;
-          }
-
-          const objectParameterIndexes = [1, 0].filter(
-            (parameterIndex) =>
-              parameterIndex < instruction.getParametersCount()
-          );
-          const matchingParameterIndex = objectParameterIndexes.find(
-            (parameterIndex) =>
-              externalObjectParameterNames.has(
-                instruction.getParameter(parameterIndex).getPlainString()
-              )
-          );
-          if (matchingParameterIndex === undefined) return;
-          const objectName = instruction
-            .getParameter(matchingParameterIndex)
-            .getPlainString();
-
-          issues.push({
-            severity: 'warning',
-            type: 'object-function-create-external-object-parameter',
-            instructionType: instruction.getType(),
-            instructionKind: instructionReference.instructionKind,
-            eventPath: eventReference.path,
-            instructionPath: instructionReference.instructionPath,
-            parameterIndex: matchingParameterIndex,
-            parameterName: objectName,
-            suggestion:
-              'Events-based object functions cannot reliably create instances for an external object parameter. Move the Create action to a scene/free extension function, or create an internal child object/prefab instance owned by the events-based object.',
-          });
+  collectEventReferences(eventsFunction.getEvents()).forEach(eventReference => {
+    collectEventInstructionReferences(eventReference.event).forEach(
+      instructionReference => {
+        const instruction = instructionReference.instruction;
+        if (
+          instructionReference.instructionKind !== 'action' ||
+          instruction.getType() !== 'Create' ||
+          instruction.getParametersCount() < 1
+        ) {
+          return;
         }
-      );
-    }
-  );
+
+        const objectParameterIndexes = [1, 0].filter(
+          parameterIndex => parameterIndex < instruction.getParametersCount()
+        );
+        const matchingParameterIndex = objectParameterIndexes.find(
+          parameterIndex =>
+            externalObjectParameterNames.has(
+              instruction.getParameter(parameterIndex).getPlainString()
+            )
+        );
+        if (matchingParameterIndex === undefined) return;
+        const objectName = instruction
+          .getParameter(matchingParameterIndex)
+          .getPlainString();
+
+        issues.push({
+          severity: 'warning',
+          type: 'object-function-create-external-object-parameter',
+          instructionType: instruction.getType(),
+          instructionKind: instructionReference.instructionKind,
+          eventPath: eventReference.path,
+          instructionPath: instructionReference.instructionPath,
+          parameterIndex: matchingParameterIndex,
+          parameterName: objectName,
+          suggestion:
+            'Events-based object functions cannot reliably create instances for an external object parameter. Move the Create action to a scene/free extension function, or create an internal child object/prefab instance owned by the events-based object.',
+        });
+      }
+    );
+  });
   return issues;
 };
 
@@ -2309,15 +2311,14 @@ const collectGeneratedCodeIssues = (
 
 const summarizeExtensionLintIssues = (issues: Array<Object>): Object => {
   const byType = {};
-  issues.forEach((issue) => {
+  issues.forEach(issue => {
     const type = issue.type || 'unknown';
     byType[type] = (byType[type] || 0) + 1;
   });
   return {
     totalIssues: issues.length,
-    totalErrors: issues.filter((issue) => issue.severity === 'error').length,
-    totalWarnings: issues.filter((issue) => issue.severity === 'warning')
-      .length,
+    totalErrors: issues.filter(issue => issue.severity === 'error').length,
+    totalWarnings: issues.filter(issue => issue.severity === 'warning').length,
     byType,
   };
 };
@@ -2330,8 +2331,8 @@ const lintExtensionFunctionTarget = (
   const issues: Array<Object> = [];
   if (!args.generated_code_only) {
     scanProjectForValidationErrors(project)
-      .filter((error) => isProjectValidationErrorForTarget(error, target))
-      .forEach((error) => {
+      .filter(error => isProjectValidationErrorForTarget(error, target))
+      .forEach(error => {
         issues.push({
           severity: 'error',
           ...error,
@@ -2349,7 +2350,7 @@ const lintExtensionFunctionTarget = (
       ...collectFunctionVariableParameterMisuseIssues(target.eventsFunction)
     );
     issues.push(
-      ...collectStaticDataExpressionMisuseIssues(target.eventsFunction)
+      ...collectConstantsExpressionMisuseIssues(target.eventsFunction)
     );
     issues.push(
       ...collectObjectFunctionCreateExternalObjectIssues(
@@ -2372,7 +2373,7 @@ const lintExtensionFunctionTarget = (
   issues.push(...generatedCodeResult.issues);
 
   const issueSummary = summarizeExtensionLintIssues(issues);
-  const errors = issues.filter((issue) => issue.severity === 'error');
+  const errors = issues.filter(issue => issue.severity === 'error');
   return {
     success: true,
     valid: errors.length === 0,
@@ -2441,7 +2442,8 @@ export const validateExtensionEventsJson = (
     return {
       ...lintResult,
       validationMode: 'existing-function-events',
-      note: 'Validated the existing extension function events without modifying the project. Pass events_json to validate a replacement payload on a temporary extension copy.',
+      note:
+        'Validated the existing extension function events without modifying the project. Pass events_json to validate a replacement payload on a temporary extension copy.',
     };
   }
 
@@ -2449,7 +2451,7 @@ export const validateExtensionEventsJson = (
     project,
     extensionName,
     false,
-    (temporaryExtensionName) => {
+    temporaryExtensionName => {
       try {
         const result = createOrUpdateExtensionFunction(project, {
           ...(args || {}),
@@ -2471,7 +2473,8 @@ export const validateExtensionEventsJson = (
               ? result.function.name
               : args.function_name,
           function: result.function,
-          note: 'Validated events_json on a temporary extension copy; the live extension was not mutated.',
+          note:
+            'Validated events_json on a temporary extension copy; the live extension was not mutated.',
         };
       } catch (error) {
         return {
@@ -2486,7 +2489,8 @@ export const validateExtensionEventsJson = (
               ? error.message
               : 'Extension events validation failed.',
           ],
-          note: 'Validation failed on a temporary extension copy; the live extension was not mutated.',
+          note:
+            'Validation failed on a temporary extension copy; the live extension was not mutated.',
         };
       }
     }
@@ -2514,8 +2518,8 @@ const eventReferenceMatchesTarget = (
     typeof target.event_path === 'string'
       ? target.event_path
       : typeof target.eventPath === 'string'
-        ? target.eventPath
-        : null;
+      ? target.eventPath
+      : null;
   if (eventPath) {
     hasCriteria = true;
     if (!pathsEqual(reference.path, parseEventPath(eventPath))) return false;
@@ -2525,14 +2529,14 @@ const eventReferenceMatchesTarget = (
     typeof target.ai_generated_event_id === 'string'
       ? target.ai_generated_event_id
       : typeof target.aiGeneratedEventId === 'string'
-        ? target.aiGeneratedEventId
-        : typeof target.event_id === 'string'
-          ? target.event_id
-          : typeof target.eventId === 'string'
-            ? target.eventId
-            : typeof target.id === 'string'
-              ? target.id
-              : null;
+      ? target.aiGeneratedEventId
+      : typeof target.event_id === 'string'
+      ? target.event_id
+      : typeof target.eventId === 'string'
+      ? target.eventId
+      : typeof target.id === 'string'
+      ? target.id
+      : null;
   if (eventId) {
     hasCriteria = true;
     if (reference.event.getAiGeneratedEventId() !== eventId) return false;
@@ -2557,7 +2561,7 @@ const eventReferenceMatchesTarget = (
     hasCriteria = true;
     if (
       !instructions.actions.some(
-        (instruction) => instruction.type === target.action_type
+        instruction => instruction.type === target.action_type
       )
     ) {
       return false;
@@ -2567,7 +2571,7 @@ const eventReferenceMatchesTarget = (
     hasCriteria = true;
     if (
       !instructions.conditions.some(
-        (instruction) => instruction.type === target.condition_type
+        instruction => instruction.type === target.condition_type
       )
     ) {
       return false;
@@ -2578,8 +2582,8 @@ const eventReferenceMatchesTarget = (
     const needle = target.parameter_contains;
     const hasNeedle = instructions.actions
       .concat(instructions.conditions)
-      .some((instruction) =>
-        instruction.parameters.some((parameter) => parameter.includes(needle))
+      .some(instruction =>
+        instruction.parameters.some(parameter => parameter.includes(needle))
       );
     if (!hasNeedle) return false;
   }
@@ -2609,7 +2613,7 @@ const getSingleExtensionEventReference = (
   target: any
 ): ExtensionEventReference => {
   const references = collectEventReferences(eventsList);
-  const matches = references.filter((reference) =>
+  const matches = references.filter(reference =>
     eventReferenceMatchesTarget(reference, target)
   );
   if (!matches.length && target === undefined && references.length === 1) {
@@ -2651,8 +2655,8 @@ export const patchExtensionEventInstruction = (
       typeof args.instruction_kind === 'string'
         ? args.instruction_kind
         : typeof args.instructionKind === 'string'
-          ? args.instructionKind
-          : 'action';
+        ? args.instructionKind
+        : 'action';
     const normalizedInstructionKind =
       instructionKind === 'condition' || instructionKind === 'conditions'
         ? 'condition'
@@ -2661,13 +2665,13 @@ export const patchExtensionEventInstruction = (
       typeof args.instruction_type === 'string'
         ? args.instruction_type
         : typeof args.instructionType === 'string'
-          ? args.instructionType
-          : null;
+        ? args.instructionType
+        : null;
     if (!instructionType) {
       throw new Error('Missing instruction_type.');
     }
     const replacementParameters = Array.isArray(args.parameters)
-      ? args.parameters.map((parameter) => String(parameter))
+      ? args.parameters.map(parameter => String(parameter))
       : null;
     if (!replacementParameters) {
       throw new Error('Missing parameters array.');
@@ -2681,17 +2685,15 @@ export const patchExtensionEventInstruction = (
       typeof args.object_name === 'string'
         ? args.object_name
         : typeof args.objectName === 'string'
-          ? args.objectName
-          : null;
+        ? args.objectName
+        : null;
 
     const matches = collectEventInstructionReferences(eventReference.event)
       .filter(
-        (reference) => reference.instructionKind === normalizedInstructionKind
+        reference => reference.instructionKind === normalizedInstructionKind
       )
-      .filter(
-        (reference) => reference.instruction.getType() === instructionType
-      )
-      .filter((reference) =>
+      .filter(reference => reference.instruction.getType() === instructionType)
+      .filter(reference =>
         objectName
           ? instructionContainsParameter(reference.instruction, objectName)
           : true
@@ -2774,15 +2776,16 @@ const runOnTemporaryExtensionCopy = <T>(
   allowMissingExtension: boolean,
   callback: (string, boolean) => T
 ): T => {
-  const sourceExtensionExists =
-    project.hasEventsFunctionsExtensionNamed(extensionName);
+  const sourceExtensionExists = project.hasEventsFunctionsExtensionNamed(
+    extensionName
+  );
   if (!sourceExtensionExists && !allowMissingExtension) {
     throw new Error(`Extension not found: "${extensionName}".`);
   }
 
   const temporaryExtensionName = getSafeUniqueName(
     `${TEMP_EXTENSION_PREFIX}${extensionName}`,
-    (name) => project.hasEventsFunctionsExtensionNamed(name)
+    name => project.hasEventsFunctionsExtensionNamed(name)
   );
   const temporaryExtension = project.insertNewEventsFunctionsExtension(
     temporaryExtensionName,
@@ -3018,7 +3021,7 @@ const validateSerializedExtension = (
 ): Object => {
   const temporaryExtensionName = getSafeUniqueName(
     `${TEMP_EXTENSION_PREFIX}${extensionName}`,
-    (name) => project.hasEventsFunctionsExtensionNamed(name)
+    name => project.hasEventsFunctionsExtensionNamed(name)
   );
   const temporaryExtension = project.insertNewEventsFunctionsExtension(
     temporaryExtensionName,
@@ -3042,9 +3045,9 @@ const validateSerializedExtension = (
             true
           );
     const errors = [];
-    lintFailures.forEach((result) => {
+    lintFailures.forEach(result => {
       if (Array.isArray(result.errors)) {
-        result.errors.forEach((error) =>
+        result.errors.forEach(error =>
           errors.push({
             ...error,
             extensionName,
@@ -3211,8 +3214,8 @@ const findSingleSubTreeItem = (
   const operations = Array.isArray(args.patch)
     ? args.patch
     : Array.isArray(args.operations)
-      ? args.operations
-      : [];
+    ? args.operations
+    : [];
   let found: ?{| subTreeKey: string, itemIndex: number |} = null;
   for (const operation of operations) {
     if (!operation || typeof operation.path !== 'string') return null;
@@ -3321,10 +3324,10 @@ const isDeclarationOnlyExtensionPatch = (args: Object): boolean => {
   const operations = Array.isArray(args.patch)
     ? args.patch
     : Array.isArray(args.operations)
-      ? args.operations
-      : [];
+    ? args.operations
+    : [];
   if (!operations.length) return false;
-  return operations.every((operation) => {
+  return operations.every(operation => {
     if (!operation || typeof operation.path !== 'string') return false;
     const segments = operation.path.split('/').filter(Boolean);
     if (!segments.length) return false;
@@ -3366,19 +3369,19 @@ const applyExtensionDeclarationFields = (
     extension.setDescription(serializedExtension.description);
   } else if (Array.isArray(serializedExtension.description)) {
     extension.setDescription(
-      serializedExtension.description.map((line) => String(line)).join('\n')
+      serializedExtension.description.map(line => String(line)).join('\n')
     );
   }
   if (Array.isArray(serializedExtension.tags)) {
     replaceVectorString(
       extension.getTags(),
-      serializedExtension.tags.map((tag) => String(tag))
+      serializedExtension.tags.map(tag => String(tag))
     );
   }
   if (Array.isArray(serializedExtension.authorIds)) {
     replaceVectorString(
       extension.getAuthorIds(),
-      serializedExtension.authorIds.map((id) => String(id))
+      serializedExtension.authorIds.map(id => String(id))
     );
   }
 };
@@ -3401,7 +3404,7 @@ export const applyValidatedExtensionPatch = (
     patchedSerializedExtension,
     args || {}
   );
-  patch.forEach((operation) =>
+  patch.forEach(operation =>
     applySinglePatchOperation(scopedTarget.target, operation)
   );
 
@@ -3420,13 +3423,14 @@ export const applyValidatedExtensionPatch = (
       scope: scopedTarget.scope,
       scopeRootPath: scopedTarget.scopeRootPath,
       patchOperations: patch.length,
-      changedPaths: patch.map((operation) =>
+      changedPaths: patch.map(operation =>
         scopedTarget.scopeRootPath
           ? `${scopedTarget.scopeRootPath}${operation.path}`
           : operation.path
       ),
       validation,
-      note: 'Patch was applied only to a temporary serialized extension. Validation failed, so the live extension was not modified.',
+      note:
+        'Patch was applied only to a temporary serialized extension. Validation failed, so the live extension was not modified.',
     };
   }
 
@@ -3440,14 +3444,15 @@ export const applyValidatedExtensionPatch = (
       scope: scopedTarget.scope,
       scopeRootPath: scopedTarget.scopeRootPath,
       patchOperations: patch.length,
-      changedPaths: patch.map((operation) =>
+      changedPaths: patch.map(operation =>
         scopedTarget.scopeRootPath
           ? `${scopedTarget.scopeRootPath}${operation.path}`
           : operation.path
       ),
       validation,
       serializedExtension: summaryOnly ? undefined : patchedSerializedExtension,
-      note: 'Patch validated on a temporary extension copy only. The live extension was not modified.',
+      note:
+        'Patch validated on a temporary extension copy only. The live extension was not modified.',
     };
   }
 
@@ -3546,7 +3551,7 @@ export const applyValidatedExtensionPatch = (
     scope: scopedTarget.scope,
     scopeRootPath: scopedTarget.scopeRootPath,
     patchOperations: patch.length,
-    changedPaths: patch.map((operation) =>
+    changedPaths: patch.map(operation =>
       scopedTarget.scopeRootPath
         ? `${scopedTarget.scopeRootPath}${operation.path}`
         : operation.path
@@ -3650,9 +3655,9 @@ const getFirstSpriteFrameSummary = (serializedChildObject: Object): Object => {
           ? sprite.customCollisionMask
           : [];
         const points: Array<Object> = [];
-        collisionMask.forEach((polygon) => {
+        collisionMask.forEach(polygon => {
           if (Array.isArray(polygon)) {
-            polygon.forEach((point) => {
+            polygon.forEach(point => {
               if (
                 point &&
                 typeof point.x === 'number' &&
@@ -3665,10 +3670,10 @@ const getFirstSpriteFrameSummary = (serializedChildObject: Object): Object => {
         });
         const bounds = points.length
           ? {
-              minX: Math.min(...points.map((point) => point.x)),
-              minY: Math.min(...points.map((point) => point.y)),
-              maxX: Math.max(...points.map((point) => point.x)),
-              maxY: Math.max(...points.map((point) => point.y)),
+              minX: Math.min(...points.map(point => point.x)),
+              minY: Math.min(...points.map(point => point.y)),
+              maxX: Math.max(...points.map(point => point.x)),
+              maxY: Math.max(...points.map(point => point.y)),
             }
           : null;
         return {
@@ -3729,7 +3734,7 @@ const getChildPointCoordinates = (
   (Array.isArray(spriteFrame.customPoints)
     ? spriteFrame.customPoints
     : []
-  ).forEach((point) => addPoint(point.name || '', point, 'custom'));
+  ).forEach(point => addPoint(point.name || '', point, 'custom'));
   return points;
 };
 
@@ -3740,12 +3745,13 @@ const summarizeChildGeometry = (
   (Array.isArray(serializedObject.objects)
     ? serializedObject.objects
     : []
-  ).forEach((object) => {
+  ).forEach(object => {
     if (object && object.name) childObjects[object.name] = object;
   });
-  const children = (
-    Array.isArray(serializedObject.instances) ? serializedObject.instances : []
-  ).map((instance) => {
+  const children = (Array.isArray(serializedObject.instances)
+    ? serializedObject.instances
+    : []
+  ).map(instance => {
     const childName = getInstanceObjectName(instance);
     const childObject = childObjects[childName];
     const frameSummary = childObject
@@ -3791,23 +3797,15 @@ const summarizeChildGeometry = (
     };
   });
   const boundedChildBounds: Array<Object> = [];
-  children.forEach((child) => {
+  children.forEach(child => {
     if (child.bounds) boundedChildBounds.push(child.bounds);
   });
   const renderedBounds = boundedChildBounds.length
     ? (() => {
-        const minX = Math.min(
-          ...boundedChildBounds.map((bounds) => bounds.minX)
-        );
-        const minY = Math.min(
-          ...boundedChildBounds.map((bounds) => bounds.minY)
-        );
-        const maxX = Math.max(
-          ...boundedChildBounds.map((bounds) => bounds.maxX)
-        );
-        const maxY = Math.max(
-          ...boundedChildBounds.map((bounds) => bounds.maxY)
-        );
+        const minX = Math.min(...boundedChildBounds.map(bounds => bounds.minX));
+        const minY = Math.min(...boundedChildBounds.map(bounds => bounds.minY));
+        const maxX = Math.max(...boundedChildBounds.map(bounds => bounds.maxX));
+        const maxY = Math.max(...boundedChildBounds.map(bounds => bounds.maxY));
         return {
           minX,
           minY,
@@ -3889,14 +3887,14 @@ export const inspectCustomObjectRuntimeGeometry = (
     cursorLocalXArg != null
       ? cursorLocalXArg
       : cursorSceneX != null && parentScenePosition
-        ? cursorSceneX - parentScenePosition.x
-        : null;
+      ? cursorSceneX - parentScenePosition.x
+      : null;
   const cursorY =
     cursorLocalYArg != null
       ? cursorLocalYArg
       : cursorSceneY != null && parentScenePosition
-        ? cursorSceneY - parentScenePosition.y
-        : null;
+      ? cursorSceneY - parentScenePosition.y
+      : null;
   const layerName = getStringArg(args || {}, ['layer_name', 'layerName']) || '';
   let cursor: ?Object = undefined;
   if (cursorX != null && cursorY != null) {
@@ -3925,7 +3923,7 @@ export const inspectCustomObjectRuntimeGeometry = (
           : 'custom-object-local',
     };
   }
-  const children = geometry.children.map((child) => {
+  const children = geometry.children.map(child => {
     const scenePosition = parentScenePosition
       ? {
           x: parentScenePosition.x + child.localPosition.x,
@@ -3968,7 +3966,8 @@ export const inspectCustomObjectRuntimeGeometry = (
     renderedSceneBounds,
     hitTestBounds: {
       assumedForIsCursorOnObject: parentArea,
-      note: 'Events-based object cursor hit testing is driven by the parent/custom object area, not only by visible child pixels. A widened parent area can make IsCursorOnObject(Object) true outside visible children.',
+      note:
+        'Events-based object cursor hit testing is driven by the parent/custom object area, not only by visible child pixels. A widened parent area can make IsCursorOnObject(Object) true outside visible children.',
     },
     children,
     cursor,
@@ -3989,7 +3988,7 @@ const collectChildSpriteResourceUses = (
   (Array.isArray(serializedObject.objects)
     ? serializedObject.objects
     : []
-  ).forEach((childObject) => {
+  ).forEach(childObject => {
     (Array.isArray(childObject.animations)
       ? childObject.animations
       : []
@@ -4027,7 +4026,7 @@ const collectPropertyEventReferences = (
   (Array.isArray(serializedObject.eventsFunctions)
     ? serializedObject.eventsFunctions
     : []
-  ).forEach((eventsFunction) => {
+  ).forEach(eventsFunction => {
     const serializedEvents = JSON.stringify(eventsFunction.events || []);
     if (serializedEvents.includes(propertyName)) {
       references.push({
@@ -4047,13 +4046,13 @@ export const inspectPrefabPropertyBindings = (
   const serializedObject = serializeToJSObject(object);
   const properties = summarizeProperties(object.getPropertyDescriptors(), true);
   const childResourceUses = collectChildSpriteResourceUses(serializedObject);
-  const propertyBindings = properties.map((property) => {
+  const propertyBindings = properties.map(property => {
     const eventReferences = collectPropertyEventReferences(
       serializedObject,
       property.name
     );
     const matchingStaticChildResources = childResourceUses.filter(
-      (use) => use.resourceName === property.value
+      use => use.resourceName === property.value
     );
     return {
       propertyName: property.name,
@@ -4066,8 +4065,8 @@ export const inspectPrefabPropertyBindings = (
     };
   });
   const warnings = propertyBindings
-    .filter((binding) => binding.isResourceProperty && !binding.hasDynamicUse)
-    .map((binding) => ({
+    .filter(binding => binding.isResourceProperty && !binding.hasDynamicUse)
+    .map(binding => ({
       propertyName: binding.propertyName,
       type: 'resource-property-not-dynamically-used',
       severity: 'warning',
@@ -4082,7 +4081,8 @@ export const inspectPrefabPropertyBindings = (
     childResourceUses,
     propertyBindings,
     warnings,
-    note: 'A Resource property is considered dynamically used only when function events reference it. Static child Sprite frame images are reported separately because they do not prove per-instance property binding.',
+    note:
+      'A Resource property is considered dynamically used only when function events reference it. Static child Sprite frame images are reported separately because they do not prove per-instance property binding.',
   };
 };
 
@@ -4112,8 +4112,8 @@ const replaceChildSpriteFrameResource = (
     typeof args.frame_index === 'number'
       ? Math.max(0, Math.floor(args.frame_index))
       : typeof args.frameIndex === 'number'
-        ? Math.max(0, Math.floor(args.frameIndex))
-        : 0;
+      ? Math.max(0, Math.floor(args.frameIndex))
+      : 0;
   const replacements: Array<Object> = [];
   (Array.isArray(childObject.animations) ? childObject.animations : []).forEach(
     (animation, animationIndex) => {
@@ -4201,7 +4201,8 @@ export const bindChildSpriteResourceProperty = (
       replacements,
       dynamicBindingCreated: false,
       nativeBindingAvailable: false,
-      note: 'Dry run only. For Sprite children, this helper can update the default frame resource but cannot create a true dynamic Resource-property binding because Sprite has no general runtime set-image-from-resource action.',
+      note:
+        'Dry run only. For Sprite children, this helper can update the default frame resource but cannot create a true dynamic Resource-property binding because Sprite has no general runtime set-image-from-resource action.',
     };
   }
 
@@ -4274,11 +4275,11 @@ const getObjectFromContainers = (
 
 const iterateInitialInstances = (
   initialInstances: gdInitialInstancesContainer,
-  callback: (gdInitialInstance) => void
+  callback: gdInitialInstance => void
 ) => {
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe[cannot-write]
-  instanceGetter.invoke = (instancePtr) => {
+  instanceGetter.invoke = instancePtr => {
     const instance: gdInitialInstance = gd.wrapPointer(
       // $FlowFixMe[incompatible-type]
       instancePtr,
@@ -4355,7 +4356,7 @@ const computeInstancesAabb = (
   let maxX = -Infinity;
   let maxY = -Infinity;
   let maxZ = -Infinity;
-  instances.forEach((instance) => {
+  instances.forEach(instance => {
     const { width, height, depth } = getInitialInstanceSize(instance);
     minX = Math.min(minX, instance.getX());
     minY = Math.min(minY, instance.getY());
@@ -4439,7 +4440,7 @@ const removeInstances = (
   initialInstances: gdInitialInstancesContainer,
   instances: Array<gdInitialInstance>
 ) => {
-  instances.forEach((instance) => initialInstances.removeInstance(instance));
+  instances.forEach(instance => initialInstances.removeInstance(instance));
 };
 
 const removeUnusedObjects = (
@@ -4447,7 +4448,7 @@ const removeUnusedObjects = (
   initialInstances: gdInitialInstancesContainer,
   objectNames: Array<string>
 ) => {
-  objectNames.forEach((objectName) => {
+  objectNames.forEach(objectName => {
     if (
       objects.hasObjectNamed(objectName) &&
       !initialInstances.hasInstancesOfObject(objectName)
@@ -4486,8 +4487,8 @@ const getObjectNamesArg = (
   for (const name of names) {
     if (Array.isArray(args[name])) {
       const values = args[name]
-        .filter((value) => typeof value === 'string' && value.trim())
-        .map((value) => normalizeRequiredName(value, `${name} item`));
+        .filter(value => typeof value === 'string' && value.trim())
+        .map(value => normalizeRequiredName(value, `${name} item`));
       if (values.length) return Array.from(new Set(values));
     }
     if (typeof args[name] === 'string' && args[name].trim()) {
@@ -4515,7 +4516,7 @@ const extractPrefabFromSceneInstances = ({
   );
   const sourceObjectNameSet = new Set(sourceObjectNames);
   const selectedInstances = [];
-  iterateInitialInstances(scene.getInitialInstances(), (instance) => {
+  iterateInitialInstances(scene.getInitialInstances(), instance => {
     if (sourceObjectNameSet.has(instance.getObjectName())) {
       selectedInstances.push(instance);
     }
@@ -4532,7 +4533,7 @@ const extractPrefabFromSceneInstances = ({
   const normalizeOrigin = !(args && args.normalize_origin === false);
   setEventsBasedObjectArea(targetObject, area, normalizeOrigin);
   const childObjects = targetObject.getObjects();
-  sourceObjectNames.forEach((objectName) => {
+  sourceObjectNames.forEach(objectName => {
     const sourceObject = getObjectFromContainers(project, scene, objectName);
     if (!sourceObject) {
       throw new Error(
@@ -4541,7 +4542,7 @@ const extractPrefabFromSceneInstances = ({
     }
     copyObjectDefinition(project, sourceObject, childObjects);
   });
-  selectedInstances.forEach((instance) =>
+  selectedInstances.forEach(instance =>
     copyNormalizedInstance(
       project,
       instance,
@@ -4557,7 +4558,7 @@ const extractPrefabFromSceneInstances = ({
       args.prefab_scene_object_name ||
         targetObject.getDefaultName() ||
         targetObject.getName(),
-      (name) =>
+      name =>
         scene.getObjects().hasObjectNamed(name) ||
         project.getObjects().hasObjectNamed(name)
     );
@@ -4577,7 +4578,7 @@ const extractPrefabFromSceneInstances = ({
     prefabInstance.setZ(area.minZ);
     prefabInstance.setLayer(selectedInstances[0].getLayer());
     prefabInstance.setZOrder(
-      Math.max(...selectedInstances.map((instance) => instance.getZOrder()))
+      Math.max(...selectedInstances.map(instance => instance.getZOrder()))
     );
     removeInstances(scene.getInitialInstances(), selectedInstances);
     if (args.remove_scene_objects_when_unused) {
@@ -4637,7 +4638,11 @@ const extractPrefabFromExtensionObject = ({
     childObjectNames = mapFor(
       0,
       sourceObject.getObjects().getObjectsCount(),
-      (index) => sourceObject.getObjects().getObjectAt(index).getName()
+      index =>
+        sourceObject
+          .getObjects()
+          .getObjectAt(index)
+          .getName()
     );
   }
   if (!childObjectNames.length) {
@@ -4647,7 +4652,7 @@ const extractPrefabFromExtensionObject = ({
   }
   const childObjectNameSet = new Set(childObjectNames);
   const selectedInstances = [];
-  iterateInitialInstances(sourceObject.getInitialInstances(), (instance) => {
+  iterateInitialInstances(sourceObject.getInitialInstances(), instance => {
     if (childObjectNameSet.has(instance.getObjectName())) {
       selectedInstances.push(instance);
     }
@@ -4664,7 +4669,7 @@ const extractPrefabFromExtensionObject = ({
   const normalizeOrigin = !(args && args.normalize_origin === false);
   setEventsBasedObjectArea(targetObject, area, normalizeOrigin);
   const targetChildObjects = targetObject.getObjects();
-  childObjectNames.forEach((objectName) => {
+  childObjectNames.forEach(objectName => {
     const sourceChildObjects = sourceObject.getObjects();
     if (!sourceChildObjects.hasObjectNamed(objectName)) {
       throw new Error(
@@ -4677,7 +4682,7 @@ const extractPrefabFromExtensionObject = ({
       targetChildObjects
     );
   });
-  selectedInstances.forEach((instance) =>
+  selectedInstances.forEach(instance =>
     copyNormalizedInstance(
       project,
       instance,
@@ -4693,7 +4698,7 @@ const extractPrefabFromExtensionObject = ({
       args.prefab_child_object_name ||
         targetObject.getDefaultName() ||
         targetObject.getName(),
-      (name) => sourceObject.getObjects().hasObjectNamed(name)
+      name => sourceObject.getObjects().hasObjectNamed(name)
     );
     const prefabType = gd.PlatformExtension.getObjectFullType(
       normalizeRequiredName(args.extension_name, 'extension_name'),
@@ -4711,7 +4716,7 @@ const extractPrefabFromExtensionObject = ({
     prefabInstance.setZ(area.minZ);
     prefabInstance.setZOrder(
       selectedInstances.length
-        ? Math.max(...selectedInstances.map((instance) => instance.getZOrder()))
+        ? Math.max(...selectedInstances.map(instance => instance.getZOrder()))
         : 0
     );
     removeInstances(sourceObject.getInitialInstances(), selectedInstances);
@@ -4750,8 +4755,8 @@ export const extractPrefabFromObject = (
       args && typeof args.source_kind === 'string'
         ? args.source_kind
         : args && args.scene_name
-          ? 'scene_instances'
-          : 'extension_object';
+        ? 'scene_instances'
+        : 'extension_object';
     const validationArgs = {
       ...args,
       extension_name: temporaryExtensionName,
@@ -4814,7 +4819,7 @@ export const extractPrefabFromObject = (
       project,
       extensionName,
       true,
-      (temporaryExtensionName) =>
+      temporaryExtensionName =>
         extractPrefabFromObject(
           project,
           getValidationArgs(temporaryExtensionName)
@@ -4839,8 +4844,8 @@ export const extractPrefabFromObject = (
     args && typeof args.source_kind === 'string'
       ? args.source_kind
       : args && args.scene_name
-        ? 'scene_instances'
-        : 'extension_object';
+      ? 'scene_instances'
+      : 'extension_object';
   let sourceResult;
   if (sourceKind === 'scene_instances') {
     sourceResult = extractPrefabFromSceneInstances({
@@ -4874,14 +4879,12 @@ export const extractPrefabFromObject = (
         `Scene/global object "${sourceObjectName}" has type "${sourceObject.getType()}", which is not an events-based object type. Use source_kind:"scene_instances" with source_object_names to extract ordinary scene objects.`
       );
     }
-    const sourceExtensionName =
-      gd.PlatformExtension.getExtensionFromFullObjectType(
-        sourceObject.getType()
-      );
-    const eventsBasedObjectName =
-      gd.PlatformExtension.getObjectNameFromFullObjectType(
-        sourceObject.getType()
-      );
+    const sourceExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
+      sourceObject.getType()
+    );
+    const eventsBasedObjectName = gd.PlatformExtension.getObjectNameFromFullObjectType(
+      sourceObject.getType()
+    );
     sourceResult = extractPrefabFromExtensionObject({
       project,
       args: {
@@ -5015,7 +5018,7 @@ const applyExtensionFields = (
   if (Array.isArray(args.tags)) {
     replaceVectorString(
       extension.getTags(),
-      args.tags.filter((tag) => typeof tag === 'string')
+      args.tags.filter(tag => typeof tag === 'string')
     );
   }
 };
@@ -5056,7 +5059,7 @@ export const createOrUpdateExtension = (
   if (newExtensionName && newExtensionName !== extension.getName()) {
     const safeAndUniqueName = getSafeUniqueName(
       newExtensionName,
-      (name) => project.hasEventsFunctionsExtensionNamed(name),
+      name => project.hasEventsFunctionsExtensionNamed(name),
       extension.getName()
     );
     gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
@@ -5232,7 +5235,7 @@ const applyFunctionParameters = (
 ) => {
   const parameters = eventsFunction.getParameters();
   const normalizedParameterArgs = [];
-  parametersArgs.forEach((parameterArgs) => {
+  parametersArgs.forEach(parameterArgs => {
     if (!parameterArgs || typeof parameterArgs !== 'object') return;
     const parameterName = normalizeRequiredName(
       parameterArgs.name,
@@ -5257,7 +5260,7 @@ const applyFunctionParameters = (
         namesToRemove.push(parameterName);
       }
     }
-    namesToRemove.forEach((parameterName) => {
+    namesToRemove.forEach(parameterName => {
       if (parameters.hasParameterNamed(parameterName)) {
         parameters.removeParameter(parameterName);
       }
@@ -5346,10 +5349,10 @@ const getEventsJsonInput = (args: Object): any =>
   hasOwn(args, 'events_json')
     ? args.events_json
     : hasOwn(args, 'eventsJson')
-      ? args.eventsJson
-      : hasOwn(args, 'events')
-        ? args.events
-        : undefined;
+    ? args.eventsJson
+    : hasOwn(args, 'events')
+    ? args.events
+    : undefined;
 
 const applyEventsFunctionFields = (
   project: gdProject,
@@ -5418,7 +5421,7 @@ export const createOrUpdateExtensionFunction = (
       project,
       extensionNameForValidation,
       false,
-      (temporaryExtensionName) => {
+      temporaryExtensionName => {
         const result = createOrUpdateExtensionFunction(project, {
           ...args,
           extension_name: temporaryExtensionName,
@@ -5440,7 +5443,7 @@ export const createOrUpdateExtensionFunction = (
       project,
       extensionNameForValidation,
       false,
-      (temporaryExtensionName) =>
+      temporaryExtensionName =>
         createOrUpdateExtensionFunction(project, {
           ...args,
           extension_name: temporaryExtensionName,
@@ -5492,7 +5495,7 @@ export const createOrUpdateExtensionFunction = (
     if (newFunctionName && newFunctionName !== eventsFunction.getName()) {
       const safeAndUniqueName = getSafeUniqueName(
         newFunctionName,
-        (name) => container.hasEventsFunctionNamed(name),
+        name => container.hasEventsFunctionNamed(name),
         eventsFunction.getName()
       );
       renameEventsFunction({
@@ -5650,7 +5653,7 @@ export const createOrUpdateExtensionBehavior = (
   if (newBehaviorName && newBehaviorName !== behavior.getName()) {
     const safeAndUniqueName = getSafeUniqueName(
       newBehaviorName,
-      (name) => behaviors.has(name),
+      name => behaviors.has(name),
       behavior.getName()
     );
     gd.WholeProjectRefactorer.renameEventsBasedBehavior(
@@ -5745,7 +5748,7 @@ export const createOrUpdateExtensionObject = (
       project,
       extensionName,
       false,
-      (temporaryExtensionName) => {
+      temporaryExtensionName => {
         const result = createOrUpdateExtensionObject(project, {
           ...args,
           extension_name: temporaryExtensionName,
@@ -5767,7 +5770,7 @@ export const createOrUpdateExtensionObject = (
       project,
       extensionName,
       false,
-      (temporaryExtensionName) =>
+      temporaryExtensionName =>
         createOrUpdateExtensionObject(project, {
           ...args,
           extension_name: temporaryExtensionName,
@@ -5802,7 +5805,7 @@ export const createOrUpdateExtensionObject = (
   if (newObjectName && newObjectName !== object.getName()) {
     const safeAndUniqueName = getSafeUniqueName(
       newObjectName,
-      (name) => objects.has(name),
+      name => objects.has(name),
       object.getName()
     );
     gd.WholeProjectRefactorer.renameEventsBasedObject(
@@ -5914,14 +5917,14 @@ const applyPropertyFields = (
   if (Array.isArray(args.extra_info)) {
     const vectorString = new gd.VectorString();
     args.extra_info
-      .filter((item) => typeof item === 'string')
-      .forEach((item) => vectorString.push_back(item));
+      .filter(item => typeof item === 'string')
+      .forEach(item => vectorString.push_back(item));
     property.setExtraInfo(vectorString);
     vectorString.delete();
   }
   if (Array.isArray(args.choices)) {
     property.clearChoices();
-    args.choices.forEach((choice) => {
+    args.choices.forEach(choice => {
       if (!choice || typeof choice !== 'object') return;
       const value = typeof choice.value === 'string' ? choice.value : '';
       const label = typeof choice.label === 'string' ? choice.label : value;
@@ -5962,7 +5965,7 @@ export const createOrUpdateExtensionProperty = (
   if (newPropertyName && newPropertyName !== property.getName()) {
     const safeAndUniqueName = getSafeUniqueName(
       newPropertyName,
-      (name) => properties.has(name),
+      name => properties.has(name),
       property.getName()
     );
     renameProperty({

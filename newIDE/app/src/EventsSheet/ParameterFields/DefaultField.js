@@ -15,7 +15,7 @@ import {
   getHighlightSearchTextParts,
   applySyntaxColoring,
 } from '../../Utils/HighlightSearchText';
-import { getMissingStaticDataPlaceholderPath } from '../../Utils/StaticDataPlaceholderDiagnostics';
+import { getMissingConstantPlaceholderPath } from '../../Utils/ConstantPlaceholderDiagnostics';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -70,13 +70,13 @@ export const renderInlineDefaultField = ({
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
-    const missingStaticDataPath = getMissingStaticDataPlaceholderPath(
+    const missingConstantPath = getMissingConstantPlaceholderPath(
       expression.getPlainString(),
       scope.project
     );
     const errorMessage =
-      missingStaticDataPath !== null
-        ? `Static Data path "{{${missingStaticDataPath}}}" does not exist.`
+      missingConstantPath != null
+        ? `Constant path "{{${missingConstantPath}}}" does not exist.`
         : undefined;
 
     return (

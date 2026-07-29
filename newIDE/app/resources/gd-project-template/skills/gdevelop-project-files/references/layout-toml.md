@@ -159,6 +159,16 @@ Camera `viewport` follows the same pattern with four normalized values. A
 layer may have at most 50 cameras. `far` must exceed `near`; perspective
 `near` is positive; `fov` is in `(0,180]`; `max_2d_distance` is positive.
 
+`lighting = true` marks a dedicated **2D Lighting Layer**. It does not enable
+Scene3D lighting and must never be combined with `rendering = "3d"` or
+`rendering = "2d+3d"`. That invalid combination is rejected as
+`LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER`. For a 3D-capable layer, keep
+`lighting = false` and add catalog-listed Scene3D light effects such as a
+hemisphere or directional light. Old unvalidated projects are normalized to
+the explicit 3D rendering mode at runtime and emit
+`RUNTIME_3D_LIGHTING_LAYER_NORMALIZED`, but direct project-file authoring must
+fix the source instead of relying on that fallback.
+
 ## Effects
 
 Effects use a short top-level record and a layer ID:
@@ -280,6 +290,8 @@ record may exist for each attached behavior on one instance.
 - Preserve every existing instance UUID.
 - Resolve every layer ID, instance UUID, object, behavior, effect, and property
   against the matching catalog context.
+- Keep `lighting = true` exclusive to 2D layers; use Scene3D light effects on
+  `3d` and `2d+3d` layers.
 - Keep object definitions and attached behaviors in `.settings` and event logic
   in `.events`.
 - Reject unknown fields instead of inventing a fallback.

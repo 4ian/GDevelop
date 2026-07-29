@@ -583,7 +583,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
               // $FlowFixMe[incompatible-type]
               editorFunctionsWithoutProject[messageContent.name] ||
               null;
-            if (!editorFunction) continue;
+            if (!editorFunction || !editorFunction.renderForEditor) continue;
             try {
               const result = editorFunction.renderForEditor({
                 project,
@@ -993,6 +993,7 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                               existingFunctionCallOutput
                             }
                             editorCallbacks={editorCallbacks}
+                            isRequestStopped={aiRequest.status === 'suspended'}
                           />
                         )
                       )}
@@ -1086,6 +1087,9 @@ export const ChatMessages: React.ComponentType<Props> = React.memo<Props>(
                                     existingFunctionCallOutput
                                   }
                                   editorCallbacks={editorCallbacks}
+                                  isRequestStopped={
+                                    aiRequest.status === 'suspended'
+                                  }
                                 />
                               )
                             )}

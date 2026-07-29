@@ -229,7 +229,7 @@ export type RenderEditorContainerProps = {|
   onSave: (options?: {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>,
-  onAutoSaveStaticData: (staticData: Object) => Promise<boolean>,
+  onAutoSaveConstants: (constants: Object) => Promise<boolean>,
   onSaveProjectAsWithStorageProvider: (
     options: ?{|
       requestedStorageProvider?: StorageProvider,

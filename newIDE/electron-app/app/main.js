@@ -6,7 +6,6 @@ const BrowserWindow = electron.BrowserWindow; // Module to create native browser
 const Menu = electron.Menu;
 const Notification = electron.Notification;
 const protocol = electron.protocol;
-const parseArgs = require('minimist');
 const isDev = require('electron-is-dev');
 const ipcMain = electron.ipcMain;
 const autoUpdater = require('electron-updater').autoUpdater;
@@ -75,6 +74,21 @@ const {
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 const { handleGitToolRequest } = require('./GitTool');
 const { launchNpmScriptInTerminal } = require('./NpmScriptRunner');
+const { installCliInPath } = require('./InstallCliInPath');
+const {
+  setWindowFileIdentifier,
+  clearWindowFileIdentifier,
+} = require('./OpenProjectsRegistry');
+const {
+  parseGDevelopArgs,
+  parseSecondInstanceArgs,
+  isCliProjectAlreadyOpenElsewhere,
+  routeCliCommandToLiveEditor,
+} = require('./CliCommandHandoff');
+const {
+  createProjectFileOpenHandler,
+  createProjectFileWindowArgs,
+} = require('./ProjectFileOpenHandler');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -131,19 +145,21 @@ const clearPendingMcpRendererRequestsFor = webContents =>
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
-const argsParserOptions = {
-  boolean: ['dev-tools', 'disable-update-check', 'keep-open'],
-  string: ['_', 'run-command'],
-};
 const getCommandLineArguments = commandLine =>
   getElectronAppCommandLineArguments(commandLine, {
     isDev,
     isDefaultApp: !!process.defaultApp,
   });
-const args = parseArgs(
-  getCommandLineArguments(process.argv),
-  argsParserOptions
-);
+const args = parseGDevelopArgs(getCommandLineArguments(process.argv));
+const windowArgsById = {};
+global['args'] = args;
+global['windowArgsById'] = windowArgsById;
+
+const projectFileOpenHandler = createProjectFileOpenHandler({
+  openProjectFile: filePath =>
+    createNewWindow(createProjectFileWindowArgs(args, filePath)),
+});
+app.on('open-file', projectFileOpenHandler.handleOpenFile);
 
 const devTools = !!args['dev-tools'];
 const windowsAppIconPath = path.join(__dirname, '..', 'build', 'icon.ico');
@@ -208,33 +224,39 @@ if (process.platform === 'win32') {
 
 // Single instance lock - prevents multiple Electron processes
 // This solves Firebase IndexedDB locking issues while still allowing multiple windows.
-//
-// When invoked via `--run-command` (CLI / CI scenarios), we deliberately
-// SKIP the single-instance lock so each CLI invocation runs in its own
-// process. This lets the launching shell wait for completion and observe
-// the exit code, instead of being immediately backgrounded by the existing
-// instance taking over via the second-instance handler.
+// CLI: skip the lock unless the target project is a known open window (registry hit);
+// a stale registry entry falls back to running headless in this process.
 const isCliRunCommand = !!args['run-command'];
-const gotTheLock = isCliRunCommand ? true : app.requestSingleInstanceLock();
+const gotTheLock =
+  isCliRunCommand && !isCliProjectAlreadyOpenElsewhere(args)
+    ? true
+    : app.requestSingleInstanceLock({ args });
 
 if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
-} else if (!isCliRunCommand) {
-  // First instance - handle second-instance events by creating new windows
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    const secondInstanceArgs = parseArgs(
-      getCommandLineArguments(commandLine),
-      argsParserOptions
-    );
+} else {
+  app.on(
+    'second-instance',
+    (event, commandLine, workingDirectory, additionalData) => {
+      const secondInstanceArgs = parseSecondInstanceArgs({
+        commandLine,
+        additionalData,
+        isDev: isDev || !!process.defaultApp,
+      });
 
-    // Update the global args so the new window's renderer (which reads them
-    // via remote.getGlobal('args')) picks up the second-instance CLI flags
-    // (e.g. --run-command, positional project file).
-    global['args'] = secondInstanceArgs;
+      if (
+        routeCliCommandToLiveEditor({
+          parsedArgs: secondInstanceArgs,
+          mainWindows,
+        })
+      ) {
+        return;
+      }
 
-    createNewWindow(secondInstanceArgs);
-  });
+      createNewWindow(secondInstanceArgs);
+    }
+  );
 }
 
 // Quit when all windows are closed.
@@ -271,6 +293,8 @@ const windowTargetIdToBrowserWindowIds = new Map();
 // Function to create a new GDevelop window
 function createNewWindow(windowArgs = args) {
   const isIntegrated = windowArgs.mode === 'integrated';
+  // windowArgs: a GUI primary process can still open a CLI window (second-instance fallback).
+  const isCliWindow = !!windowArgs['run-command'];
 
   if (isIntegrated && app.dock) {
     app.dock.hide();
@@ -330,18 +354,19 @@ function createNewWindow(windowArgs = args) {
     options.show = false;
   }
 
-  if (isCliRunCommand && !windowArgs['keep-open']) {
+  if (isCliWindow && !windowArgs['keep-open']) {
     options.show = false;
     options.skipTaskbar = true;
   }
 
   const newWindow = new BrowserWindow(options);
-  if (!isIntegrated && !isCliRunCommand) newWindow.maximize();
+  if (!isIntegrated && !isCliWindow) newWindow.maximize();
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
   const windowWebContents = newWindow.webContents;
   const isPrimaryWindow = windowNumber === 0;
+  windowArgsById[windowId] = windowArgs;
   log.info(
     `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
   );
@@ -359,7 +384,7 @@ function createNewWindow(windowArgs = args) {
 
   // Uses process.stdout/stderr directly (not electron-log) to avoid
   // re-entering the renderer console and causing an infinite loop.
-  if (isCliRunCommand) {
+  if (isCliWindow) {
     newWindow.webContents.on('console-message', (_event, level, message) => {
       if (level < 1) return;
       if (message.startsWith('%c')) return;
@@ -407,6 +432,8 @@ function createNewWindow(windowArgs = args) {
         log.error('Failed to stop MCP server after window close:', error);
       });
     }
+    clearWindowFileIdentifier(windowId);
+    delete windowArgsById[windowId];
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -440,12 +467,6 @@ function createNewWindow(windowArgs = args) {
       const isBrowserPopup = details.frameName.startsWith(
         'GDevelopWindowPortal-browser-'
       );
-      const isObjectSettingsWindow = details.frameName.startsWith(
-        'GDevelopWindowPortal-object-settings-'
-      );
-      const isObjectEditorWindow = details.frameName.startsWith(
-        'GDevelopWindowPortal-object-editor-'
-      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
@@ -463,14 +484,8 @@ function createNewWindow(windowArgs = args) {
           // so that ToolbarTitlebar can provide safe margins for window controls.
           titleBarStyle: 'hidden',
           titleBarOverlay: {
-            color:
-              isObjectSettingsWindow || isObjectEditorWindow
-                ? '#191922'
-                : '#000000',
-            symbolColor:
-              isObjectSettingsWindow || isObjectEditorWindow
-                ? '#9A9AAB'
-                : '#ffffff',
+            color: '#000000',
+            symbolColor: '#ffffff',
           },
           trafficLightPosition: { x: 12, y: 12 },
           backgroundColor,
@@ -497,6 +512,10 @@ function createNewWindow(windowArgs = args) {
   // When a child window is created (e.g. a popped-out editor), set up security
   // policies and enable @electron/remote on it.
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
+    windowArgsById[childWindow.id] = windowArgs;
+    childWindow.on('closed', () => {
+      delete windowArgsById[childWindow.id];
+    });
     require('@electron/remote/main').enable(childWindow.webContents);
 
     if (
@@ -550,13 +569,19 @@ function createNewWindow(windowArgs = args) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  // Handoff calls app.quit() but 'ready' still runs; without the lock, do not create a window.
+  if (!gotTheLock) {
+    return;
+  }
+
   registerGdideProtocol({ isDev });
 
-  // Create the first window
-  createNewWindow(args);
-
-  // Expose program arguments (to be accessed by windows)
-  global['args'] = args;
+  // Finder can deliver document-open events before Electron is ready. Open
+  // every queued project and avoid creating an unrelated blank window.
+  const openedQueuedProjectCount = projectFileOpenHandler.markReady();
+  if (openedQueuedProjectCount === 0) {
+    createNewWindow(args);
+  }
 
   Menu.setApplicationMenu(buildPlaceholderMainMenu());
 
@@ -598,6 +623,17 @@ app.on('ready', function() {
 
   ipcMain.on('app-exit', (_event, exitCode) => {
     app.exit(typeof exitCode === 'number' ? exitCode : 0);
+  });
+
+  ipcMain.on('set-window-project-path', (event, fileIdentifier) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (window) setWindowFileIdentifier(window.id, fileIdentifier);
+  });
+
+  ipcMain.handle('install-cli-in-path', async () => {
+    // Inside an AppImage, process.execPath points into a transient mount that
+    // vanishes on quit; APPIMAGE is the stable file path (still breaks if moved).
+    return installCliInPath(process.env.APPIMAGE || process.execPath);
   });
 
   ipcMain.on('set-main-menu', (event, mainMenuTemplate) => {

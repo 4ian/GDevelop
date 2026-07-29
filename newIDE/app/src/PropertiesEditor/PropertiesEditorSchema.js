@@ -27,8 +27,8 @@ export type ValueFieldCommonProperties = {|
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
-  allowStaticDataPlaceholder?: boolean,
-  forbidStaticDataPlaceholder?: boolean,
+  allowConstantPlaceholder?: boolean,
+  forbidConstantPlaceholder?: boolean,
   visibility?: FieldVisibility | null,
   defaultValue?: string | number | boolean | null,
 |};

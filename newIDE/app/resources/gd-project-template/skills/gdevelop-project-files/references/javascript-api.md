@@ -119,6 +119,13 @@ operations, including:
 - public Sprite, Text, and Tiled Sprite operations;
 - variables and variable-container operations;
 - selected public `gdjs.evtTools` helpers;
+- pointer-lock facades
+  `gdjs.evtTools.input.requestPointerLock(runtimeScene)`,
+  `exitPointerLock(runtimeScene)`, and `isPointerLocked(runtimeScene)`;
+- bounded 3D raycasts through `gdjs.evtTools.scene3d.raycastObjects(...)`,
+  whose results contain runtime objects, indices, distances, and scalar hit
+  points but never expose Three.js intersections, cameras, renderers, or DOM
+  objects;
 - the limited events-function context surface.
 
 This is intentionally smaller than the engine implementation. If an operation
@@ -156,6 +163,15 @@ AI-authored JavaScript must not use:
 
 Use reviewed GDevelop extensions for network, storage, platform, or other
 privileged capabilities.
+
+The official extension importer may apply a narrow reviewed-extension
+compatibility profile during its mutation-free preflight. That profile is
+bound to the fetched registry identity, version, and content hash; it can
+downgrade legacy private/DOM API diagnostics to warnings for that reviewed
+package only. Syntax and generated-code failures remain blocking. It never
+applies to project-authored JavaScript, local extensions, a caller-supplied
+path, or a matching name alone, so do not remove `strict=true` or imitate the
+compatibility profile in project source.
 
 ## Safety and performance
 
@@ -228,12 +244,19 @@ examples use `>` only on the directives because the JavaScript event is a child.
 3. After structural changes, run `generate-catalogs` and re-read the generated
    declarations before continuing.
 4. Run `validate_project_files` after the final source edit. Require
-   `valid: true`. Fix diagnostics at their reported `.events` URI, line, and
-   column. Treat this as structural validation only; never report that the game
-   works or that the task is complete from `valid: true` alone.
+   `valid: true`, `structurallyValid: true`,
+   `eventCodeGenerationValid: true`, `semanticLintPassed: true`, and no false
+   generated-code or JavaScript-authoring phase. Fix diagnostics at their
+   reported `.events` URI, line, and column. A successful pre-runtime result
+   still has `runtimeVerified: false` and `completionReady: false`; never report
+   that the game works or that the task is complete from it alone.
 5. Commit all task-owned source changes with Git before `reload_project`.
-6. Reload, launch a fresh paused preview, advance deterministic frames, and
-   inspect every behavior-sensitive result.
+6. Prefer `verify_project_change` after the commit for a bounded
+   validate → reload → fresh paused preview → frames → inspect workflow with
+   typed assertions and optional screenshot. A successful receipt is the only
+   validation workflow result that sets both `runtimeVerified: true` and
+   `completionReady: true`. Otherwise perform the equivalent steps manually
+   and inspect every behavior-sensitive result.
 
 Important diagnostic codes include `JS_API_SYNTAX_ERROR`,
 `JS_API_UNKNOWN_MEMBER`, `JS_API_PRIVATE_MEMBER`, `JS_API_NULLABILITY`,

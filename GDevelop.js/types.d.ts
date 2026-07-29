@@ -380,7 +380,9 @@ export class Variable extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): Variable;
+  ensurePersistentUuid(): Variable;
   clearPersistentUuid(): Variable;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainer extends EmscriptenObject {
@@ -403,7 +405,9 @@ export class VariablesContainer extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): VariablesContainer;
+  ensurePersistentUuids(): VariablesContainer;
   clearPersistentUuid(): VariablesContainer;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainersList extends EmscriptenObject {
@@ -437,7 +441,7 @@ export class ObjectRefactorer extends EmscriptenObject {
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
   static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: VariablesContainer): void;
-  static fillMissingGroupBehaviorToObject(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
+  static fillMissingGroupBehaviorToObject(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
 }
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
@@ -680,8 +684,8 @@ export class Project extends EmscriptenObject {
   getEventsBasedObject(type: string): EventsBasedObject;
   ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): VariablesContainer;
-  setStaticDataJson(staticDataJson: string): void;
-  getStaticDataJson(): string;
+  setConstantsJson(constantsJson: string): void;
+  getConstantsJson(): string;
   getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;

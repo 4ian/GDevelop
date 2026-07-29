@@ -15,9 +15,8 @@ Related specifications:
 - [IfDo Events DSL](gdevelop-events-dsl-spec.md)
 - [JavaScript authoring API](gdevelop-javascript-authoring-api-spec.md)
 - [Multi-file project format](gdevelop-new-formats-spec.md)
-- [Deterministic object picking](DeterministicObjectPicking.md)
 - [Signal system](SignalSystem.md)
-- [Static Data](StaticData.md)
+- [Constants](Constants.md)
 
 ---
 
@@ -180,7 +179,7 @@ Version 1 does not:
 - Infer object picking from arbitrary TypeScript arrays.
 - Replace events, extensions, prefabs, or behaviors as the preferred reusable
   gameplay architecture.
-- Interpolate Static Data placeholders inside TypeScript source. This matches
+- Interpolate constant placeholders inside TypeScript source. This matches
   JavaScript source behavior; placeholders belong to supported event/property
   fields, not raw code text.
 - Guarantee that type-correct code has correct gameplay behavior.
@@ -752,7 +751,7 @@ At runtime the generator continues to:
 Typing an array as one object or group does not create a pick and does not prove
 cardinality. The deterministic object-picking rules continue to apply.
 
-### 8.4 Signals and Static Data
+### 8.4 Signals and Constants
 
 The signal runtime exposes only the two destinations defined by
 [SignalSystem.md](SignalSystem.md): a scene broadcast and one runtime instance
@@ -772,7 +771,7 @@ the target prefab's `onSignal`; behavior `onSignal` is reserved for subscribed
 scene broadcasts. Runtime declarations expose no emitter getters. Application
 source data must be part of the user-defined payload when it is needed.
 
-Static Data remains code-generation-time data for supported event/property
+Constants remains code-generation-time data for supported event/property
 fields. `{{path}}` text inside JavaScript or TypeScript source is ordinary code
 text and is never replaced.
 

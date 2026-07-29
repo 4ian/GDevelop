@@ -9,7 +9,7 @@ import { ExtensionItemDetailEditorContainer } from '../EditorContainers/Extensio
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
-import { StaticDataEditorContainer } from '../EditorContainers/StaticDataEditorContainer';
+import { ConstantsEditorContainer } from '../EditorContainers/ConstantsEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
@@ -30,7 +30,7 @@ type EditorRef =
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | ResourcesEditorContainer
-  | StaticDataEditorContainer
+  | ConstantsEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
@@ -49,7 +49,7 @@ export type EditorKind =
   | 'custom object'
   | 'debugger'
   | 'resources'
-  | 'static-data'
+  | 'constants'
   | 'global-search'
   | 'ask-ai'
   | 'start page';
@@ -129,7 +129,7 @@ const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
   editorTab.closable &&
   editorTab.kind !== 'debugger' &&
   editorTab.kind !== 'resources' &&
-  editorTab.kind !== 'static-data';
+  editorTab.kind !== 'constants';
 
 const limitOpenEditorTabsForPane = ({
   editors,
@@ -379,7 +379,7 @@ export const popOutTab = (
     editors: remainingEditors,
     currentTab:
       newCurrentTabIndex === -1
-        ? Math.max(0, sourceTabIndex - 1)
+        ? Math.max(0, Math.min(sourceTabIndex, remainingEditors.length - 1))
         : newCurrentTabIndex,
   };
 
@@ -483,9 +483,14 @@ export const closeTabsExceptIf = (
       editors: paneRemainingEditors,
 
       // Keep the focus on the current editor tab, or if it was closed
-      // go back to the first tab.
+      // focus the tab that took its place (or the last one).
       currentTab:
-        currentEditorTabNewIndex === -1 ? 0 : currentEditorTabNewIndex,
+        currentEditorTabNewIndex === -1
+          ? Math.max(
+              0,
+              Math.min(pane.currentTab, paneRemainingEditors.length - 1)
+            )
+          : currentEditorTabNewIndex,
     };
   }
 

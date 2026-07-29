@@ -13,15 +13,14 @@ line numbers because this codebase changes quickly.
 Read `Core/GDevelop-Architecture-Overview.md` first for the short upstream
 overview. Related focused references include:
 
-- `docs/StaticData.md` — project Static Data and placeholder replacement.
+- `docs/Constants.md` — project Constants and placeholder replacement.
 - `docs/SignalSystem.md` — queued scene and direct-instance signals.
-- `docs/DeterministicObjectPicking.md` — rationale for stricter picking rules.
 - `newIDE/docs/How-are-exporters-and-platforms-working.md` — exporters.
 - `newIDE/docs/Properties-schema-and-PropertiesEditor-explanations.md` — property schemas.
 - `newIDE/docs/Supported-JavaScript-features-and-coding-style.md` — editor/runtime JavaScript constraints.
 
 > This branch differs materially from stock GDevelop. In particular, local
-> projects default to a Git-oriented `project.settings` source tree, Static Data
+> projects default to a Git-oriented `project.gdevelop` source tree, Constants
 > is compiled out of exports, preview/export applies additional validation, and
 > the runtime contains a queued signal bus. Those behaviors are called out
 > explicitly below.
@@ -136,7 +135,7 @@ gd::Project
 ├── resourcesContainer                       global resource definitions
 ├── objectsContainer                         global objects and object groups
 ├── variables                                global variables
-├── staticDataJson                           authoring-time structured constants
+├── constantsJson                           authoring-time structured constants
 ├── layouts[] : gd::Layout                   scenes
 │   ├── objectsContainer                     scene objects and groups
 │   ├── variables                            scene variables
@@ -373,7 +372,7 @@ for (var i = 0, len = objects.length; i < len; ++i) {
 }
 ```
 
-### Deterministic single-instance consumption in this branch
+### Object picking and single-instance consumption
 
 This branch adds stricter behavior, but its exact scope matters:
 
@@ -381,27 +380,31 @@ This branch adds stricter behavior, but its exact scope matters:
   pointers use the first picked instance only after generated helpers in
   `GDJS/Runtime/gd.ts` assert that the relevant concrete lists contain at most
   one instance in total.
-- The editor scanner detects object parameters that require one deterministic
-  target but can receive multiple initial/dynamically created candidates.
-  Preview/export is blocked until a picking condition or `For each` structure
-  makes the target unambiguous.
+- Editor and MCP validation do not inspect object-picking cardinality or require
+  a picking condition/`For each` structure. Object-picking behavior therefore
+  stays compatible with classic GDevelop authoring.
 - Conditions may consume multi-instance candidate lists because filtering them
   is their job.
 - Normal object/behavior actions still intentionally iterate all picked
   instances. They are not globally converted into single-target operations.
 
-This is narrower than saying “every object-consuming action requires one
-instance.” `docs/DeterministicObjectPicking.md` captures the design rationale,
-while `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`,
-`GDJS/Runtime/gd.ts`, and
+Event authors should narrow scalar targets with picking conditions such as
+`Pick random` or `Pick nearest`, or use `For each object` when every instance
+needs an isolated selection context. A singleton assertion violation throws at
+runtime rather than silently choosing the first candidate.
+
+`GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`, `GDJS/Runtime/gd.ts`,
+and
 `newIDE/app/src/Utils/EventsValidationScanner.js` are the implementation
 authority for the current checkout.
 
 The editor also blocks preview/export for enabled actions in a standard event
-with no enabled condition, invalid Static Data placeholders, and unsafe
+with no enabled condition, invalid constant placeholders, and unsafe
 conditionless external-layout creation. These are authoring policy gates in
 `newIDE/app/src/MainFrame` and the event scanner; they are not fundamental
-upstream event AST rules.
+upstream event AST rules. Enabled conditions on parent events, including
+`For each object`, gate their nested standard events and do not need to be
+duplicated locally.
 
 ### Parameters and expressions
 
@@ -699,13 +702,21 @@ requested.
 | ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Single JSON               | arbitrary `*.json`                              | Legacy input/output path supported by the serializer/storage layer.                                                |
 | Split JSON folder project | a JSON entry plus referenced `*.json` fragments | Legacy format using `ObjectSplitter` and `__REFERENCE_TO_SPLIT_OBJECT`. Still readable; not the new source format. |
-| Multi-file source project | `project.settings`                              | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files.                        |
+| Multi-file source project | `project.gdevelop`                              | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files.                        |
 
 Opening a legacy JSON project normalizes it through the current libGD
 serializer, decomposes it next to the source, verifies a compose round trip,
-and redirects the open file metadata to `project.settings`. Migration metadata
+and redirects the open file metadata to `project.gdevelop`. Migration metadata
 records the legacy source URI and SHA-256. If the old JSON later diverges from
 an existing migrated tree, the opener refuses to guess which side is newer.
+
+Packaged desktop builds associate `.gdevelop` with GDevelop. Windows and Linux
+open the selected document through the positional project argument; macOS
+queues Finder `open-file` events received before application readiness and
+routes later events immediately. Launch arguments are retained per editor
+window so simultaneous document requests cannot select the wrong project.
+Only the exact canonical basename `project.gdevelop` is a valid multi-file
+entry.
 
 ### Multi-file source tree
 
@@ -717,9 +728,9 @@ owns filesystem discovery, URI/path safety, transactions, and migration.
 A representative source tree is:
 
 ```text
-project.settings
+project.gdevelop
 resources.settings
-static-data.toml
+constants.toml
 objects/<encoded-name>.settings
 scenes/<encoded-name>/scene.settings
 scenes/<encoded-name>/<encoded-name>.layout
@@ -734,7 +745,7 @@ extensions/<encoded-name>/behaviors/.../*.settings|*.events
 extensions/<encoded-name>/prefabs/.../*.settings|*.layout|*.events
 ```
 
-- `*.settings` and `static-data.toml` use TOML.
+- `*.settings` and `constants.toml` use TOML.
 - `*.layout` uses strict flat TOML in
   `newIDE/app/src/ProjectsStorage/LayoutToml`.
 - `*.events` uses the IfDo DSL in
@@ -754,7 +765,7 @@ memory, and compares normalized projects before touching authoring sources.
 `writeMultiFileSourceTree` serializes concurrent writes per project root and
 only writes changed managed URIs. A transaction is staged under
 `.gdevelop/transactions/<id>` with flushed files, backups, and a journal.
-Managed files are committed in dependency order, with `project.settings` last.
+Managed files are committed in dependency order, with `project.gdevelop` last.
 Failures restore backups; opening a project recovers any interrupted staged or
 committed transaction. Obsolete managed files and now-empty owned directories
 are removed without deleting user-owned files.
@@ -771,7 +782,7 @@ A multi-file save also regenerates editor/tooling projections:
 - `.gdevelop/settings-catalog.json` and `layout-catalog.json`;
 - `.gdevelop/runtime-api.d.ts` and `project-api.d.ts`;
 - `.gdevelop/game.json`, a legacy-shaped compatibility projection without
-  Static Data;
+  Constants;
 - autosave and transaction state in dedicated subdirectories.
 
 These files support IfDo name resolution, AI/MCP authoring, validation,
@@ -779,26 +790,26 @@ JavaScript blocks, compatibility consumers, and recovery. They are derived from
 the project plus loaded metadata. Do not make them the only home of authored
 state.
 
-### Static Data is compile-time project data
+### Constants is compile-time project data
 
-Core stores arbitrary Static Data as a JSON string on `gd::Project` and
-serializes it as the `staticData` child. The multi-file source owns it in the
-unwrapped TOML root of `static-data.toml`.
+Core stores arbitrary Constants as a JSON string on `gd::Project`, but project
+serialization omits it. Every storage provider persists the values in the
+unwrapped TOML root of `constants.toml`.
 
 `{{path.to.value}}`, numeric array segments, and quoted bracket segments are
-resolved by `Project::ResolveStaticDataPlaceholders`. Validation, event code
+resolved by `Project::ResolveConstantPlaceholders`. Validation, event code
 generation, generated object/behavior property code, and export-time serialized
 project traversal all use the same resolver. Missing paths produce diagnostics
 and block preview/export.
 
-After replacement, `ExporterHelper` removes `staticData` from exported project
-data. Static Data is therefore authoring/compile-time configuration, not a
-runtime database or mutable `gdjs.RuntimeGame` subsystem.
+The map never enters exported project data. Constants is therefore
+authoring/compile-time configuration, not a runtime database or mutable
+`gdjs.RuntimeGame` subsystem.
 
 ### Runtime project data is a stripped projection
 
 `GDJS/GDJS/IDE/ExporterHelper.cpp` clones/strips editor-only content, determines
-project/scene resources, resolves Static Data, and serializes the runtime shape.
+project/scene resources, resolves Constants, and serializes the runtime shape.
 `data.js` assigns `gdjs.projectData` and `gdjs.runtimeGameOptions`. Runtime
 interfaces in `GDJS/Runtime/types/project-data.d.ts` describe this projection;
 they are not a promise that every editor JSON field is shipped.
@@ -839,7 +850,7 @@ Major domain areas include:
 | Objects and behaviors           | `ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor`                              |
 | Events-based extensions/prefabs | `EventsFunctionsExtensionEditor`, `PrefabDetailEditor`, `EventsFunctionsExtensionsLoader` |
 | Resources and project files     | `ResourcesEditor`, `ResourcesList`, `ProjectsStorage`                                     |
-| Static Data                     | `StaticData`, `StaticDataEditorContainer`                                                 |
+| Constants                     | `Constants`, `ConstantsEditorContainer`                                                 |
 | Preview/debug/in-game editing   | `ExportAndShare`, `EmbeddedGame`, `Debugger`, `HotReload`                                 |
 
 ### The editor works on C++ objects through wrappers
@@ -873,7 +884,7 @@ property affordances from leaking into exported runtime code.
 ### Preview and export pipeline
 
 Before preview/export, `MainFrame` runs the serialized event scanner and native
-diagnostic generation. Branch-specific hard errors include invalid Static Data,
+diagnostic generation. Branch-specific hard errors include invalid Constants,
 ambiguous single-target object parameters, conditionless actions, and unsafe
 external-layout creation.
 
@@ -917,7 +928,7 @@ reconciliation; structural changes can still require a scene/game reload.
 8. **The multi-file tree must round-trip before commit.** Preserve ownership,
    canonical URIs, deterministic names, transaction recovery, and generated
    catalog regeneration.
-9. **Static Data disappears at runtime.** Resolve placeholders everywhere an
+9. **Constants disappears at runtime.** Resolve placeholders everywhere an
    authored string/property enters generated or exported data, then remove the
    source tree.
 10. **Signals cross a frame boundary.** Emission is queued; delivery is FIFO in
@@ -986,7 +997,7 @@ Consider a scene event: “when `Player` is on the floor, set its Y position to
    inside the current WASM `gd::Project`. React holds UI state and borrowed
    wrappers; the C++ model is authoritative.
 3. **Save.** Core serializes one logical project tree. For a
-   `project.settings` project, the editor decomposes it into TOML/layout/IfDo
+   `project.gdevelop` project, the editor decomposes it into TOML/layout/IfDo
    sources, recomposes and compares it, transactionally commits changed files,
    and regenerates `.gdevelop` catalogs and declarations.
 4. **Preflight.** Preview/export scans serialized events and runs native code
@@ -998,7 +1009,7 @@ Consider a scene event: “when `Player` is on the floor, set its Y position to
    `setY(100)` for every remaining picked player. If the event instead evaluated
    scalar `Player.X()` outside a current-object loop, generated code would first
    require at most one picked instance.
-6. **Runtime projection.** `ExporterHelper` resolves Static Data, strips editor
+6. **Runtime projection.** `ExporterHelper` resolves Constants, strips editor
    content, computes used resources, writes generated scene/extension code, and
    produces `data.js` with `gdjs.projectData` and runtime options.
 7. **Boot.** `RuntimeGame` loads the first scene through `SceneStack`.
@@ -1035,6 +1046,6 @@ authoring system itself.
 | Logical serialization           | `Core/GDCore/Serialization`, model `SerializeTo`/`UnserializeFrom` methods                                                                                                                                                                                                |
 | Multi-file source format        | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, `newIDE/app/src/ProjectsStorage/LayoutToml`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js` |
 | Source catalogs/APIs            | `newIDE/app/src/ProjectsStorage/ProjectSourceCatalog.js`, `newIDE/app/src/ProjectsStorage/JavaScriptAuthoringApi.js`, `newIDE/app/src/EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog.js`                                                                             |
-| Static Data                     | `Core/GDCore/Project/Project.*`, `newIDE/app/src/StaticData`, `docs/StaticData.md`                                                                                                                                                                                        |
+| Constants                     | `Core/GDCore/Project/Project.*`, `newIDE/app/src/Constants`, `docs/Constants.md`                                                                                                                                                                                        |
 | Preview and export              | `GDJS/GDJS/IDE/Exporter*`, `newIDE/app/src/ExportAndShare`, `newIDE/app/src/HotReload`, `newIDE/app/src/EmbeddedGame`                                                                                                                                                     |
 | Editor shell                    | `newIDE/app/src/index.js`, `newIDE/app/src/LocalApp.js`, `newIDE/app/src/BrowserApp.js`, `newIDE/app/src/MainFrame`, domain editor directories                                                                                                                            |

@@ -76,6 +76,16 @@ namespace gdjs {
       string,
       string
     >();
+    private _threeTextureFailures: Array<{
+      code: string;
+      resourceName: string;
+      sourceType: string;
+      objectName?: string;
+      faceIndex?: number;
+      message: string;
+    }> = [];
+    private _threeTextureFailureKeys = new Set<string>();
+    private _threeTextureFailureRegistryTruncated = false;
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -285,12 +295,58 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture {
+    getThreeTexture(
+      resourceName: string,
+      diagnosticContext?: {
+        objectName?: string;
+        faceIndex?: number;
+      }
+    ): THREE.Texture {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
       }
-      const image = this._getImageSource(resourceName);
+      let image: TexImageSource;
+      try {
+        image = this._getThreeTextureSource(resourceName);
+      } catch (error) {
+        const message =
+          error && (error as Error).message
+            ? (error as Error).message
+            : String(error);
+        const sourceTypeMatch = message.match(/source type "([^"]+)"/);
+        const failure = {
+          code: message.includes('THREE_TEXTURE_UNSUPPORTED_SOURCE')
+            ? 'THREE_TEXTURE_UNSUPPORTED_SOURCE'
+            : 'THREE_TEXTURE_LOAD_FAILED',
+          resourceName,
+          sourceType: sourceTypeMatch ? sourceTypeMatch[1] : 'unknown',
+          objectName:
+            diagnosticContext && diagnosticContext.objectName
+              ? diagnosticContext.objectName
+              : undefined,
+          faceIndex:
+            diagnosticContext && typeof diagnosticContext.faceIndex === 'number'
+              ? diagnosticContext.faceIndex
+              : undefined,
+          message,
+        };
+        const failureKey = [
+          failure.code,
+          failure.resourceName,
+          failure.objectName || '',
+          failure.faceIndex === undefined ? '' : failure.faceIndex,
+        ].join(':');
+        if (!this._threeTextureFailureKeys.has(failureKey)) {
+          this._threeTextureFailureKeys.add(failureKey);
+          if (this._threeTextureFailures.length < 64) {
+            this._threeTextureFailures.push(failure);
+          } else {
+            this._threeTextureFailureRegistryTruncated = true;
+          }
+        }
+        throw error;
+      }
 
       const threeTexture = new THREE.Texture(image);
       threeTexture.magFilter = THREE.LinearFilter;
@@ -308,7 +364,17 @@ namespace gdjs {
       return threeTexture;
     }
 
-    private _getImageSource(resourceName: string): HTMLImageElement {
+    getThreeTextureDebugInfo(): Object {
+      return {
+        failedTextureCount: this._threeTextureFailureKeys.size,
+        returnedFailureCount: this._threeTextureFailures.length,
+        failures: this._threeTextureFailures.slice(),
+        truncated: this._threeTextureFailureRegistryTruncated,
+        limit: 64,
+      };
+    }
+
+    private _getThreeTextureSource(resourceName: string): TexImageSource {
       // Texture is not loaded, load it now from the PixiJS texture.
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
@@ -320,12 +386,28 @@ namespace gdjs {
 
       // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
-      if (!(image instanceof HTMLImageElement)) {
+      const isSupportedThreeTextureSource =
+        (typeof HTMLImageElement !== 'undefined' &&
+          image instanceof HTMLImageElement) ||
+        (typeof HTMLCanvasElement !== 'undefined' &&
+          image instanceof HTMLCanvasElement) ||
+        (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) ||
+        (typeof ImageData !== 'undefined' && image instanceof ImageData) ||
+        (typeof HTMLVideoElement !== 'undefined' &&
+          image instanceof HTMLVideoElement) ||
+        (typeof OffscreenCanvas !== 'undefined' &&
+          image instanceof OffscreenCanvas);
+      if (!isSupportedThreeTextureSource) {
+        const sourceType =
+          image && image.constructor && image.constructor.name
+            ? image.constructor.name
+            : typeof image;
         throw new Error(
-          `Can't load texture for resource "${resourceName}" as it's not an image.`
+          `[THREE_TEXTURE_UNSUPPORTED_SOURCE] Can't load texture for resource "${resourceName}" ` +
+            `because the loaded source type "${sourceType}" cannot be uploaded to Three.js.`
         );
       }
-      return image;
+      return image as TexImageSource;
     }
 
     /**
@@ -361,14 +443,26 @@ namespace gdjs {
 
       const cubeTexture = new THREE.CubeTexture();
       // Faces on X axis need to be swapped.
-      cubeTexture.images[0] = this._getImageSource(xNegativeResourceName);
-      cubeTexture.images[1] = this._getImageSource(xPositiveResourceName);
+      cubeTexture.images[0] = this._getThreeTextureSource(
+        xNegativeResourceName
+      );
+      cubeTexture.images[1] = this._getThreeTextureSource(
+        xPositiveResourceName
+      );
       // Faces on Y keep the same order.
-      cubeTexture.images[2] = this._getImageSource(yPositiveResourceName);
-      cubeTexture.images[3] = this._getImageSource(yNegativeResourceName);
+      cubeTexture.images[2] = this._getThreeTextureSource(
+        yPositiveResourceName
+      );
+      cubeTexture.images[3] = this._getThreeTextureSource(
+        yNegativeResourceName
+      );
       // Faces on Z keep the same order.
-      cubeTexture.images[4] = this._getImageSource(zPositiveResourceName);
-      cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
+      cubeTexture.images[4] = this._getThreeTextureSource(
+        zPositiveResourceName
+      );
+      cubeTexture.images[5] = this._getThreeTextureSource(
+        zNegativeResourceName
+      );
       // The images also need to be mirrored horizontally by users.
 
       cubeTexture.magFilter = THREE.LinearFilter;
@@ -419,6 +513,10 @@ namespace gdjs {
         useTransparentTexture: boolean;
         forceBasicMaterial: boolean;
         vertexColors: boolean;
+        diagnosticContext?: {
+          objectName?: string;
+          faceIndex?: number;
+        };
       }
     ): THREE.Material {
       const loadedThreeMaterial = this._loadedThreeMaterials.get(
@@ -429,7 +527,7 @@ namespace gdjs {
 
       const material = options.forceBasicMaterial
         ? new THREE.MeshBasicMaterial({
-            map: this.getThreeTexture(resourceName),
+            map: this.getThreeTexture(resourceName, options.diagnosticContext),
             side: options.useTransparentTexture
               ? THREE.DoubleSide
               : THREE.FrontSide,
@@ -437,7 +535,7 @@ namespace gdjs {
             vertexColors: options.vertexColors,
           })
         : new THREE.MeshStandardMaterial({
-            map: this.getThreeTexture(resourceName),
+            map: this.getThreeTexture(resourceName, options.diagnosticContext),
             side: options.useTransparentTexture
               ? THREE.DoubleSide
               : THREE.FrontSide,

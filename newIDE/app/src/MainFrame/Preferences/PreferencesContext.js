@@ -179,7 +179,14 @@ export const allAlertMessages: Array<{
  */
 export type EditorStateForProject = {|
   editorTabs: EditorTabsPersistedState | null,
-  propertiesPanelScroll: { [string]: { [string]: number } },
+  propertiesPanel: {
+    [string]: {
+      [string]: {
+        scrollPosition?: number,
+        collapsedSections?: { [string]: boolean },
+      },
+    },
+  },
 |};
 
 // $FlowFixMe[deprecated-utility]
@@ -467,12 +474,12 @@ export const initialPreferences = {
     backdropClickBehavior: 'nothing',
     resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
-    showExperimentalExtensions: false,
+    showExperimentalExtensions: true,
     showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
-    blockPreviewAndExportOnDiagnosticErrors: false,
-    showDeprecatedInstructionWarning: 'no',
+    blockPreviewAndExportOnDiagnosticErrors: true,
+    showDeprecatedInstructionWarning: 'icon-and-deprecated-warning-text',
     use3DEditor: (isWebGLSupported(): boolean),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
@@ -496,7 +503,7 @@ export const initialPreferences = {
     mcpAllowCommandTools: false,
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
-    showJsTypeError: false,
+    showJsTypeError: true,
     canonicalEventSerialization: false,
     resourcesToolsSettings: defaultResourcesToolsSettings,
   },

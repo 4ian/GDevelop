@@ -895,7 +895,11 @@ namespace gdjs {
      */
     sendRuntimeGameDump(): void {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
+      const message = {
+        command: 'dump',
+        payload: this._runtimegame,
+        rendererDiagnostics: this._getRendererDiagnostics(),
+      };
       const serializationStartTime = Date.now();
 
       // Stringify the message, excluding some known data that are big and/or not
@@ -962,6 +966,81 @@ namespace gdjs {
         );
       }
       this._sendMessage(stringifiedMessage);
+    }
+
+    /**
+     * Build a bounded, JSON-safe renderer summary before normal debugger dump
+     * serialization redacts all renderer fields.
+     */
+    private _getRendererDiagnostics(): Object {
+      const maxScenes = 16;
+      const maxLayers = 64;
+      const scenes = this._runtimegame.getSceneStack().getAllScenes();
+      const sceneDiagnostics: Array<Object> = [];
+      let returnedLayerCount = 0;
+      let totalLayerCount = 0;
+
+      scenes.slice(0, maxScenes).forEach((scene) => {
+        const layerNames: Array<string> = [];
+        scene.getAllLayerNames(layerNames);
+        totalLayerCount += layerNames.length;
+        const layers: Array<Object> = [];
+        for (
+          let index = 0;
+          index < layerNames.length && returnedLayerCount < maxLayers;
+          index++
+        ) {
+          const layerName = layerNames[index];
+          returnedLayerCount++;
+          try {
+            const layer = scene.getLayer(layerName);
+            const renderer = layer.getRenderer();
+            layers.push(
+              renderer &&
+                typeof (renderer as any).getRendererDebugInfo === 'function'
+                ? (renderer as any).getRendererDebugInfo()
+                : {
+                    layerName,
+                    available: false,
+                    error:
+                      'The active layer renderer does not expose diagnostics.',
+                  }
+            );
+          } catch (error) {
+            layers.push({
+              layerName,
+              available: false,
+              error:
+                error && (error as Error).message
+                  ? (error as Error).message
+                  : String(error),
+            });
+          }
+        }
+        sceneDiagnostics.push({
+          sceneName: scene.getName(),
+          layers,
+          totalLayerCount: layerNames.length,
+          returnedLayerCount: layers.length,
+          truncated: layers.length < layerNames.length,
+        });
+      });
+
+      return {
+        available: true,
+        scenes: sceneDiagnostics,
+        totalSceneCount: scenes.length,
+        returnedSceneCount: sceneDiagnostics.length,
+        totalLayerCount,
+        returnedLayerCount,
+        truncated:
+          scenes.length > maxScenes || returnedLayerCount < totalLayerCount,
+        limits: {
+          scenes: maxScenes,
+          layers: maxLayers,
+          threeNodesPerLayer: 5000,
+        },
+      };
     }
 
     /**
@@ -1596,6 +1675,7 @@ namespace gdjs {
         ...extraTopLevel,
         command: (extraTopLevel as any).command || 'dump',
         payload: this._runtimegame,
+        rendererDiagnostics: this._getRendererDiagnostics(),
       };
       const excludedValues = [that._runtimegame.getGameData()];
       const excludedKeys = [

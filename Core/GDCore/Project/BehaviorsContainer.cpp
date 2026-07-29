@@ -141,11 +141,19 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
         contentElement.RemoveChild("type");
       }
 
-      behavior->UnserializeFrom(contentElement);
+      if (isOverriding) {
+        behavior->UnserializeFrom(contentElement);
+      } else {
+        behavior->UnserializeFromWithDefaultContent(contentElement);
+      }
     }
     // end of compatibility code
     else {
-      behavior->UnserializeFrom(behaviorElement);
+      if (isOverriding) {
+        behavior->UnserializeFrom(behaviorElement);
+      } else {
+        behavior->UnserializeFromWithDefaultContent(behaviorElement);
+      }
     }
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);

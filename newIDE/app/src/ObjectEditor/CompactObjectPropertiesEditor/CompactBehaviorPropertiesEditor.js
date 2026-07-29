@@ -60,39 +60,6 @@ export const getSchemaWithOpenFullEditorButton = ({
   return schema;
 };
 
-export const createCompactBehaviorPropertiesSchema = ({
-  behaviorMetadata,
-  behavior,
-  object,
-  layersContainer,
-}: {|
-  behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
-  object: gdObject | null,
-  layersContainer: gdLayersContainer,
-|}): Schema => {
-  const behaviorMetadataProperties = behaviorMetadata.getProperties();
-  const schema = propertiesMapToSchema({
-    properties: behaviorMetadataProperties,
-    defaultValueProperties: behaviorMetadataProperties,
-    getPropertyValue: (instance, name) =>
-      instance
-        .getProperties()
-        .get(name)
-        .getValue(),
-    onUpdateProperty: (instance, name, value) => {
-      instance.updateProperty(name, value);
-    },
-    object,
-    layersContainer,
-    visibility: 'All',
-    shouldDisabledFieldsWithMixedValues: true,
-  });
-  return behavior.getTypeName() === advancedTweenBehaviorType
-    ? customizeAdvancedTweenBehaviorPropertiesSchema(schema)
-    : schema;
-};
-
 export const CompactBehaviorPropertiesEditor = ({
   project,
   behaviorTypeName,
@@ -102,7 +69,6 @@ export const CompactBehaviorPropertiesEditor = ({
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
-  propertiesSchema: providedPropertiesSchema,
   isAdvancedSectionInitiallyUncollapsed,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
   const behavior = behaviors[0];
@@ -117,17 +83,32 @@ export const CompactBehaviorPropertiesEditor = ({
 
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
-  const computedPropertiesSchema = React.useMemo(
+  const propertiesSchema = React.useMemo(
     () => {
       if (schemaRecomputeTrigger) {
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
-      return createCompactBehaviorPropertiesSchema({
-        behaviorMetadata,
-        behavior,
+      const behaviorMetadataProperties = behaviorMetadata.getProperties();
+      const schema = propertiesMapToSchema({
+        properties: behaviorMetadataProperties,
+        defaultValueProperties: behaviorMetadataProperties,
+        getPropertyValue: (instance, name) =>
+          instance
+            .getProperties()
+            .get(name)
+            .getValue(),
+        onUpdateProperty: (instance, name, value) => {
+          instance.updateProperty(name, value);
+        },
         object,
         layersContainer,
+        visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: true,
       });
+      if (behavior.getTypeName() === advancedTweenBehaviorType) {
+        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+      }
+      return schema;
     },
     [
       schemaRecomputeTrigger,
@@ -137,7 +118,6 @@ export const CompactBehaviorPropertiesEditor = ({
       behavior,
     ]
   );
-  const propertiesSchema = providedPropertiesSchema || computedPropertiesSchema;
 
   return (
     <ColumnStackLayout expand noMargin noOverflowParent>

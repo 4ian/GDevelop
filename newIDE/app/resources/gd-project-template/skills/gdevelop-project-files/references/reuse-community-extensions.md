@@ -91,7 +91,7 @@ version, and any later local adaptations in the final report.
 ## Install into multi-file sources
 
 Repository extensions are legacy JSON interchange artifacts, not project
-source. Do not reference or retain them in `project.settings`, `.settings`,
+source. Do not reference or retain them in `project.gdevelop`, `.settings`,
 `.layout`, or `.events` and do not ask the model to translate their event trees
 by hand.
 
@@ -112,23 +112,34 @@ by hand.
    JavaScript. If the description lacks v3, or a failure reports
    `importerVersion` below 3, the running GDevelop build is stale and must be
    rebuilt/restarted before retrying. Protocol v3 exposes the original writer
-   exception instead of replacing it with a generic save error.
+   exception instead of replacing it with a generic save error. It also
+   downloads every candidate dependency and runs strict JavaScript
+   compatibility preflight before the first live project mutation or save.
 
 2. Require `success: true`, `importerVersion: 3`, and
    `persistedSourcesVerified: true`. The tool uses GDevelop's native extension
    installer, installs required dependencies, loads the legacy JSON through the
    engine model, immediately saves the in-memory project, reads the generated
    files back from disk, and returns `generatedSources` grouped by imported
-   extension.
+   extension. For a newly installed reviewed extension, also require
+   `compatibility.preflightedBeforeMutation: true` and inspect each receipt's
+   registry name, version, SHA-256 content hash, errors, and warnings. Reviewed
+   legacy private/DOM diagnostics may be warnings, but syntax and generated-code
+   failures remain blocking. A spoofed or mismatched extension identity must be
+   rejected.
 3. Verify that the requested extension has a non-empty generated source list
    containing `extension.settings`. Treat those returned files as the only
    editable source from this point onward.
 4. Read and adapt the generated `.settings`, `.layout`, and `.events` files
    directly. Never edit the downloaded JSON or `.gdevelop/game.json`.
-5. After the final adaptation, call `reload_project`, then debug with a fresh
-   paused preview. For any imported action that creates, deletes, picks, or
-   mutates objects, use deterministic `run_frames` with targeted `objects`,
-   `include`, and `instance_indexes` and verify the live side effects.
+5. After the final adaptation, run `validate_project_files`, fix every
+   structural/generated-code/JavaScript/semantic failure, and commit the
+   task-owned source changes. Then prefer `verify_project_change` for the
+   validate → reload → fresh paused preview → deterministic frames → inspect
+   sequence. For any imported action that creates, deletes, picks, or mutates
+   objects, use typed object-count/finite-position/runtime-error assertions and
+   targeted `objects`, `include`, and `instance_indexes`, or perform equivalent
+   `run_frames` inspection manually.
 
 The native conversion maps the legacy extension as follows:
 
@@ -160,8 +171,10 @@ owns initial preservation of unknown metadata, ordering, layouts, event
 structure, and DSL serialization. Resolve any later authored or replacement
 instructions through the generated catalog and never introduce `@exact`.
 
-If import fails, do not create a partial extension tree. Report the native
-import error and select another registry extension or fix the missing
+If import or preflight fails, require `installed: false`, `saved: false`, and
+`projectUnchanged: true` with identical before/after project hashes. Do not
+create a partial extension tree. Report the native import or compatibility
+error and select another registry extension or fix the missing
 dependency/compatibility issue before retrying.
 
 ## Verify and report
@@ -171,11 +184,14 @@ dependency/compatibility issue before retrying.
    layout TOML version 1.
 2. Confirm no downloaded `.json` file was added to project source.
 3. Confirm the import receipt lists the requested extension, its generated
-   `extension.settings`, and source files for all imported dependencies.
+   `extension.settings`, source files for all imported dependencies, and the
+   successful pre-mutation compatibility receipts.
 4. Confirm all dependency instruction types resolve after `reload_project`.
 5. Confirm imported event bodies obey condition and single-instance picking
    rules even when the upstream extension did not.
 6. Exercise each public behavior, prefab, and function in a guarded test path.
-7. Launch a fresh preview and inspect runtime/code-generation errors.
+7. Launch a fresh preview and inspect runtime/code-generation errors; require
+   `runtimeVerified: true` and `completionReady: true` only after the typed
+   runtime assertions pass.
 8. Report the selected extension, source commit/channel/version, adaptations,
    installed dependencies, and why reuse was preferable to a rewrite.

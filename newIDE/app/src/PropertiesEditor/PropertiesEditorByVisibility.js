@@ -46,7 +46,7 @@ type Props = {|
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
-  hideStaticDataPlaceholderHints?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -61,7 +61,7 @@ const PropertiesEditorByVisibility = ({
   resourceManagementProps,
   placeholder,
   isAdvancedSectionInitiallyUncollapsed,
-  hideStaticDataPlaceholderHints,
+  hideConstantPlaceholderHints,
 }: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
@@ -114,7 +114,7 @@ const PropertiesEditorByVisibility = ({
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         renderExtraDescriptionText={renderExtraDescriptionText}
         unsavedChanges={unsavedChanges}
-        hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
+        hideConstantPlaceholderHints={hideConstantPlaceholderHints}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -140,7 +140,7 @@ const PropertiesEditorByVisibility = ({
                 }
                 renderExtraDescriptionText={renderExtraDescriptionText}
                 unsavedChanges={unsavedChanges}
-                hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
+                hideConstantPlaceholderHints={hideConstantPlaceholderHints}
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -155,9 +155,7 @@ const PropertiesEditorByVisibility = ({
                     }
                     renderExtraDescriptionText={renderExtraDescriptionText}
                     unsavedChanges={unsavedChanges}
-                    hideStaticDataPlaceholderHints={
-                      hideStaticDataPlaceholderHints
-                    }
+                    hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                   />
                 ) : (
                   <Line justifyContent="center">

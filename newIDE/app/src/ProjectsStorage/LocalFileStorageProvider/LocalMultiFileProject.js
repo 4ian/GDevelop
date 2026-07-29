@@ -2,7 +2,8 @@
 
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
-  MULTI_FILE_STATIC_DATA_URI,
+  MULTI_FILE_ENTRY_NAME,
+  MULTI_FILE_CONSTANTS_URI,
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
@@ -288,9 +289,9 @@ const discoverOwnedSettingsUris = async (
   projectRoot: string
 ): Promise<Array<string>> => {
   const discovered = [];
-  const staticDataTomlPath = path.join(projectRoot, 'static-data.toml');
-  if (fs.existsSync(staticDataTomlPath)) {
-    discovered.push(MULTI_FILE_STATIC_DATA_URI);
+  const constantsTomlPath = path.join(projectRoot, 'constants.toml');
+  if (fs.existsSync(constantsTomlPath)) {
+    discovered.push(MULTI_FILE_CONSTANTS_URI);
   }
   const resourcesSettingsPath = path.join(projectRoot, 'resources.settings');
   if (fs.existsSync(resourcesSettingsPath)) {
@@ -434,10 +435,10 @@ export const readMultiFileSourceTree = async (
   entryPath: string
 ): Promise<{| projectRoot: string, files: { [string]: string } |}> => {
   requireFileSystem();
-  if (path.basename(entryPath) !== 'project.settings') {
+  if (path.basename(entryPath) !== MULTI_FILE_ENTRY_NAME) {
     throw new MultiFileProjectError(
       'MULTIFILE_INVALID_ENTRY',
-      'The multi-file entry must be named project.settings.'
+      `The multi-file entry must be named ${MULTI_FILE_ENTRY_NAME}.`
     );
   }
   const projectRoot = path.resolve(path.dirname(entryPath));
@@ -712,7 +713,7 @@ export const migrateLegacyProject = async ({
   legacyProject: Object,
 }): Promise<{| entryPath: string, files: { [string]: string } |}> => {
   requireFileSystem();
-  const entryPath = path.join(path.dirname(legacyPath), 'project.settings');
+  const entryPath = path.join(path.dirname(legacyPath), MULTI_FILE_ENTRY_NAME);
   const files = decomposeLegacyProjectToFiles(legacyProject, {
     migration: {
       source: sourceUriForLegacyPath(legacyPath),

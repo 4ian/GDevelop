@@ -1,8 +1,9 @@
 // @flow
 
 import {
-  MULTI_FILE_STATIC_DATA_URI,
+  MULTI_FILE_CONSTANTS_URI,
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_FORMAT_VERSION,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
   areLegacyProjectsEquivalent,
@@ -10,10 +11,10 @@ import {
   decomposeLegacyProjectToFiles,
   encodeManagedName,
   getLegacyProjectFirstDifferenceDescription,
-  parseStaticDataFromToml,
+  parseConstantsFromToml,
   parseTomlSource,
   removeLegacyFolderStructuresFromProject,
-  serializeStaticDataToToml,
+  serializeConstantsToToml,
   validateGameUri,
 } from './index';
 import { compileLayoutToml } from '../LayoutToml';
@@ -76,7 +77,7 @@ const projectFixture = {
   objectsFolderStructure: { folderName: '__ROOT', children: [] },
   objectsGroups: [],
   variables: [],
-  staticData: {
+  constants: {
     enabled: true,
     rawJson: { userOwned: 'kept' },
     sheet: {
@@ -224,7 +225,7 @@ describe('GDevelop multi-file project format', () => {
 
     expect(areLegacyProjectsEquivalent(projectFixture, output)).toBe(true);
     expect(files[MULTI_FILE_ENTRY_URI]).toContain(
-      'combinedSettingsFormatVersion = 1'
+      `combinedSettingsFormatVersion = ${MULTI_FILE_FORMAT_VERSION}`
     );
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = [ ]');
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
@@ -236,12 +237,12 @@ describe('GDevelop multi-file project format', () => {
     );
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('game://scenes/');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.resources');
-    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.staticData');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('[sheet.row]');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('column = "ssdfs"');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).not.toContain('[settings');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).not.toContain('[staticData');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).not.toContain(
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('[project.constants');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain('[sheet.row]');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain('column = "ssdfs"');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).not.toContain('[settings');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).not.toContain('[constants');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).not.toContain(
       'settingsFormatVersion'
     );
     expect(files[MULTI_FILE_RESOURCES_URI]).not.toContain(
@@ -440,7 +441,7 @@ settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
     );
   });
 
-  test('rejects resources embedded in project.settings', () => {
+  test('rejects resources embedded in project.gdevelop', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.resources = { resources: [], resourceFolders: [] };
     const files = decomposeLegacyProjectToFiles(project);
@@ -456,13 +457,13 @@ resourceFolders = []
     );
   });
 
-  test('rejects static data embedded in project.settings', () => {
+  test('rejects constants embedded in project.gdevelop', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
-    project.staticData = { mode: 'embedded' };
+    project.constants = { mode: 'embedded' };
     const files = decomposeLegacyProjectToFiles(project);
-    delete files[MULTI_FILE_STATIC_DATA_URI];
+    delete files[MULTI_FILE_CONSTANTS_URI];
     files[MULTI_FILE_ENTRY_URI] += `
-[project.staticData]
+[project.constants]
 mode = "embedded"
 `;
 
@@ -471,34 +472,31 @@ mode = "embedded"
     );
   });
 
-  test('preserves absent and empty static data without ownership ambiguity', () => {
-    const withoutStaticData = JSON.parse(JSON.stringify(projectFixture));
-    delete withoutStaticData.staticData;
-    const filesWithoutStaticData = decomposeLegacyProjectToFiles(
-      withoutStaticData
+  test('requires constants.toml and preserves an empty Constants document', () => {
+    const withoutConstants = JSON.parse(JSON.stringify(projectFixture));
+    delete withoutConstants.constants;
+    const filesWithoutConstants = decomposeLegacyProjectToFiles(
+      withoutConstants
     );
-    expect(filesWithoutStaticData[MULTI_FILE_STATIC_DATA_URI]).toBeUndefined();
-    expect(
-      Object.prototype.hasOwnProperty.call(
-        composeLegacyProjectFromFiles(filesWithoutStaticData),
-        'staticData'
-      )
-    ).toBe(false);
+    expect(filesWithoutConstants[MULTI_FILE_CONSTANTS_URI]).toBeUndefined();
+    expect(() => composeLegacyProjectFromFiles(filesWithoutConstants)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_MISSING_FILE' })
+    );
 
-    const withEmptyStaticData = JSON.parse(JSON.stringify(projectFixture));
-    withEmptyStaticData.staticData = {};
-    const filesWithEmptyStaticData = decomposeLegacyProjectToFiles(
-      withEmptyStaticData
+    const withEmptyConstants = JSON.parse(JSON.stringify(projectFixture));
+    withEmptyConstants.constants = {};
+    const filesWithEmptyConstants = decomposeLegacyProjectToFiles(
+      withEmptyConstants
     );
-    expect(filesWithEmptyStaticData[MULTI_FILE_STATIC_DATA_URI]).toBe('\n');
+    expect(filesWithEmptyConstants[MULTI_FILE_CONSTANTS_URI]).toBe('\n');
     expect(
-      composeLegacyProjectFromFiles(filesWithEmptyStaticData).staticData
+      composeLegacyProjectFromFiles(filesWithEmptyConstants).constants
     ).toEqual({});
   });
 
-  test('writes Static Data as unwrapped root TOML data', () => {
+  test('writes Constants as unwrapped root TOML data', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
-    project.staticData = {
+    project.constants = {
       sheet: {
         row: { column: 'ssdfs', column2: 'ss' },
         row2: { column: 'zzz', column2: 'ssfssdfsf' },
@@ -515,11 +513,11 @@ column2 = "ss"
 column = "zzz"
 column2 = "ssfssdfsf"
 `;
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toBe(expectedToml);
-    expect(serializeStaticDataToToml(project.staticData)).toBe(expectedToml);
-    expect(parseStaticDataFromToml(expectedToml)).toEqual(project.staticData);
-    expect(composeLegacyProjectFromFiles(files).staticData).toEqual(
-      project.staticData
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toBe(expectedToml);
+    expect(serializeConstantsToToml(project.constants)).toBe(expectedToml);
+    expect(parseConstantsFromToml(expectedToml)).toEqual(project.constants);
+    expect(composeLegacyProjectFromFiles(files).constants).toEqual(
+      project.constants
     );
   });
 
@@ -1488,36 +1486,36 @@ objects = [ "Player" ]
     );
   });
 
-  test('rejects Static Data values that TOML cannot represent directly', () => {
+  test('rejects Constant values that TOML cannot represent directly', () => {
     const withNull = JSON.parse(JSON.stringify(projectFixture));
-    withNull.staticData.nullable = null;
+    withNull.constants.nullable = null;
     expect(() => decomposeLegacyProjectToFiles(withNull)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_UNREPRESENTABLE_VALUE' })
     );
 
     const withMixedArray = JSON.parse(JSON.stringify(projectFixture));
-    withMixedArray.staticData.mixed = [1, 'two'];
+    withMixedArray.constants.mixed = [1, 'two'];
     expect(() => decomposeLegacyProjectToFiles(withMixedArray)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_UNREPRESENTABLE_VALUE' })
     );
   });
 
-  test('treats a Static Data rawJson key as ordinary user data', () => {
+  test('treats a Constants rawJson key as ordinary user data', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('[rawJson]');
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('userOwned = "kept"');
-    expect(composeLegacyProjectFromFiles(files).staticData).toEqual(
-      projectFixture.staticData
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain('[rawJson]');
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain('userOwned = "kept"');
+    expect(composeLegacyProjectFromFiles(files).constants).toEqual(
+      projectFixture.constants
     );
   });
 
-  test('does not reinterpret an arbitrary Static Data variables key', () => {
+  test('does not reinterpret an arbitrary Constants variables key', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
-    project.staticData.variables = {};
+    project.constants.variables = {};
     const files = decomposeLegacyProjectToFiles(project);
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain('variables = { }');
-    expect(composeLegacyProjectFromFiles(files).staticData).toEqual(
-      project.staticData
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain('variables = { }');
+    expect(composeLegacyProjectFromFiles(files).constants).toEqual(
+      project.constants
     );
   });
 
@@ -1707,14 +1705,14 @@ objects = [ "Player" ]
 
   test('preserves leading whitespace inside multiline TOML strings', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
-    project.staticData.multiline = 'first line\n second line';
+    project.constants.multiline = 'first line\n second line';
     const files = decomposeLegacyProjectToFiles(project);
     const output = composeLegacyProjectFromFiles(files);
 
-    expect(files[MULTI_FILE_STATIC_DATA_URI]).toContain(
+    expect(files[MULTI_FILE_CONSTANTS_URI]).toContain(
       'multiline = """\nfirst line\n second line"""'
     );
-    expect(output.staticData.multiline).toBe('first line\n second line');
+    expect(output.constants.multiline).toBe('first line\n second line');
   });
 
   test('stores unsafe JSON integers losslessly outside TOML integer fields', () => {
@@ -1781,7 +1779,7 @@ objects = [ "Player" ]
     '../outside.events',
     'game://../outside.events',
     'game://scenes\\Main.events',
-    'game://C:/game/project.settings',
+    'game://C:/game/project.gdevelop',
     'game://scenes/%2e%2e/file.events',
     'game://scenes/%ZZ/file.events',
   ])('rejects unsafe managed URI %s', uri => {

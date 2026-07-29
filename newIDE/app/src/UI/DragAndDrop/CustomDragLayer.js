@@ -15,7 +15,9 @@ import { getActiveEmbeddedGameFrameHoleRect } from '../../EmbeddedGame/EmbeddedG
 const layerStyles = {
   position: 'fixed',
   pointerEvents: 'none',
-  zIndex: 100,
+  // Make sure the dragged preview is visible even when dragging in a
+  // dialog or a drawer (Material UI modals are at z-index 1300).
+  zIndex: 1500,
   left: 0,
   top: 0,
   width: '100%',

@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.settings`, `static-data.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Static Data/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -11,12 +11,14 @@ Treat project files as authoritative. Modify them directly; do not use MCP to
 author the game. The sole authoring-related exception is `import_extension`:
 use it once to import and convert an official legacy extension into canonical
 multi-file sources, then continue by editing those generated files directly.
+There are no dedicated Constants MCP tools. Read and modify `constants.toml`
+directly.
 
 Read, in order:
 
-1. `project.settings` for project metadata and non-static-data project data.
+1. `project.gdevelop` for project metadata and non-constants project data.
 2. `resources.settings` for the complete project resource registry.
-3. `static-data.toml` for the complete editor-only Static Data object.
+3. `constants.toml` for the complete editor-only Constants object.
 4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
    for semantic configuration and object definitions, including each object's
    variables, effects, and behaviors.
@@ -77,6 +79,24 @@ Use the catalogs as authoring contracts:
   new name in the same coherent `.layout` patch; the saved layout context will
   list it after GDevelop regenerates the catalogs.
 
+Treat additive semantic and capability metadata as enforceable contracts:
+
+- `lighting = true` means a dedicated 2D Lighting Layer. It is invalid with
+  `rendering = "3d"` or `"2d+3d"`; use `lighting = false` plus catalog-listed
+  Scene3D light effects.
+- Resource `kind = "image"` has `image-2d` and `three-texture` capabilities.
+  SVG image resources are valid Three textures after Pixi rasterization.
+  Preserve and report any `THREE_TEXTURE_UNSUPPORTED_SOURCE` diagnostic instead
+  of assuming every loaded resource is texture-compatible.
+- For new or changed Physics3D data, author every writable catalog property and
+  require finite gravity values and `worldScale > 0`. Runtime/default hydration
+  protects partial legacy data but is not a reason to omit cataloged fields in
+  new source.
+- Keyboard parameters use the catalog's canonical names. Main-row digits are
+  `Num0` through `Num9`; aliases such as `"1"` and `Digit1` normalize to
+  `Num1`, while `Numpad1` remains distinct. Unknown static literals fail with
+  `INPUT_UNKNOWN_KEY_NAME`.
+
 Search narrowly, for example:
 
 ```sh
@@ -119,8 +139,8 @@ generated compatibility/runtime output, not multi-file source.
   keep named `points` and `customCollisionMask` vertices as inline arrays of
   point tables. Never expand point data into long dotted TOML headers. For
   example: `originPoint = { name = "Origin", x = 0, y = 0 }`.
-- `static-data.toml`: the entire root document is editor-only Static Data.
-  Author data directly, with no `[settings]`, `[staticData]`, format-version,
+- `constants.toml`: the entire root document is editor-only Constants.
+  Author data directly, with no `[settings]`, `[constants]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
 - `.layout`: standard flat TOML containing placement/layout data only:
   `[layout]`, optional `[editor]`, and short `[[layers]]`, `[[effects]]`,
@@ -130,7 +150,7 @@ generated compatibility/runtime output, not multi-file source.
   owning `.settings` object definition. Follow the matching layout-catalog
   `contexts` entry and `tables` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
-- References: use canonical `game://...` URIs rooted at `project.settings`.
+- References: use canonical `game://...` URIs rooted at `project.gdevelop`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
   there. Use `instructions-catalog.json` as the only source for constructing
   new event instructions. `deprecated-instructions-catalog.json` exists only
@@ -160,7 +180,7 @@ order.
 Give every global, scene, default-prefab, and variant-prefab object its own
 `<Object>.settings` file directly under the owner's flat `objects/` directory. Put
 the complete object definition there, including behaviors, variables, effects,
-and type-specific configuration. `project.settings`, `scene.settings`, and
+and type-specific configuration. `project.gdevelop`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
@@ -178,9 +198,9 @@ grouping in the function settings `folder` array. `prefab.settings` and
 ## Project layout
 
 ```text
-project.settings
+project.gdevelop
 resources.settings
-static-data.toml
+constants.toml
 objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
@@ -232,8 +252,8 @@ Load only the references required by the task:
   full before creating or changing any `@js` event. Use only the generated
   public declarations, author new blocks with `strict=true`, and preserve
   compatibility mode only for existing legacy JavaScript.
-- Read [references/static-data.md](references/static-data.md) in full
-  whenever the user asks to create, edit, reorganize, or consume Static Data,
+- Read [references/constants.md](references/constants.md) in full
+  whenever the user asks to create, edit, reorganize, or consume Constants,
   or to add/change a `{{...}}` placeholder. Also read the events guide for an
   event consumer and the extension guide when injecting config into a prefab,
   behavior, or reusable extension.
@@ -242,7 +262,7 @@ Load only the references required by the task:
   communication, `SignalReceived`, signal payload handling, or an
   `onSignal` lifecycle. Also read the events guide, and read the extension guide
   before adding or changing a prefab/custom-object `onSignal` function. Read
-  the Static Data guide too when signal names use placeholders.
+  the Constants guide too when signal names use placeholders.
 - Read
   [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
   before converting or merging glTF/GLB assets or importing a `.glb` exported
@@ -320,12 +340,14 @@ Rules:
   ancestor event. Never place an action on an unconditional path that executes
   every frame. Use an explicit trigger, state/input check, timer, comparison,
   or other condition that expresses when the action is allowed to run.
-- Before every object-targeting action, ensure the current picking set contains
-  at most one instance of that object. Use `for each Object` when multiple
-  instances must be processed one at a time, or narrow the selection with
-  conditions such as a unique ID/state match, nearest-object pick, collision,
-  or another deterministic selector. Never rely on an object action implicitly
-  applying to an unrestricted multi-instance selection.
+- Treat an object-targeting action as applying to every currently picked
+  instance of that object. When conditions leave multiple instances picked, or
+  do not narrow the object selection, the action executes on all of them. This
+  is normal and often intentional GDevelop behavior, so do not reject or
+  rewrite an event merely because an object action may affect multiple
+  instances. Narrow the selection only when the gameplay requires a specific
+  target; use `for each Object` when later conditions or actions need one
+  isolated instance at a time.
 - Keep OR alternatives as consecutive `if`/`or` lines.
 - Prefix every child-event line with `>` and every nested instruction with
   `?`.
@@ -390,19 +412,19 @@ loop, comment, and JavaScript metadata when editing existing sources.
    namespaces, event depth, instruction names, named parameters, and asset
    paths.
 7. Call the no-input GDevelop MCP `validate_project_files` tool after the most
-   recent source edit. Require `valid: true`; use its file URI, error code,
-   line, column, and source excerpt to fix every reported settings, layout,
-   events, reference, or generated-project validation failure. This call first
-   regenerates all three `.gdevelop` catalogs and both JavaScript declaration
-   files, then validates the sources using those fresh contracts. Call it at
-   least once before calling
-   `reload_project`; a failed validation does not satisfy this gate. For
-   JavaScript, fix every reported source URI/line diagnostic. `valid: true`
-   proves parsing, source reconstruction, project validation, JavaScript
-   authoring-API checking, and extension generated-code preflight only. It does
-   not prove runtime object picking or gameplay side effects. Never summarize
-   `valid: true` as "the game works" or as task completion without the required
-   preview evidence.
+   recent source edit. Require `valid: true`, `structurallyValid: true`,
+   `eventCodeGenerationValid: true`, `semanticLintPassed: true`,
+   `extensionGeneratedCodeValid !== false`, and
+   `javascriptAuthoringValid !== false`; use its file URI, error code, line,
+   column, and source excerpt to fix every reported settings, layout, events,
+   reference, generated-code, JavaScript-authoring, or semantic failure. This
+   call first regenerates all three `.gdevelop` catalogs and both JavaScript
+   declaration files, then validates the sources using those fresh contracts.
+   Call it at least once before any reload; a failed validation does not satisfy
+   this gate. `validMeaning = "pre-runtime-validation-passed"` still means
+   `runtimeVerified: false` and `completionReady: false`. Never summarize
+   `valid: true` as "the game works" or as task completion without preview
+   evidence.
 8. After the requested task is complete and validation succeeds, use Git from
    the project repository root to commit every task-owned change before
    `reload_project`. Inspect `git status` and the final diff, stage all changes
@@ -410,25 +432,27 @@ loop, comment, and JavaScript metadata when editing existing sources.
    create a commit with a concise, descriptive imperative message. Record the
    commit hash and message for the final report. If any source edit is needed
    afterward, validate again and create a follow-up commit before reloading.
-9. Call the GDevelop MCP `reload_project` tool with `mode: "start"`. Require its
-   immediate accepted receipt and record the returned `operation_id`. Poll that
-   exact ID with `mode: "status"` until it is terminal; use `mode: "wait"` with
-   the same ID only when a blocking wait is useful. If a caller is interrupted
-   before recording the ID, call `mode: "status"` without an ID to discover the
-   active or latest retained operation. Require a successful completed reload
-   receipt. Do not invoke an MCP save that could replace newer disk edits with
-   stale editor memory. Never start a duplicate while status says an operation
-   is running, and never assume a running reload failed merely because a waiter
-   timed out or was interrupted. The status receipt exposes
-   `catalogGeneration.artifacts`, the current catalog subphase, its timestamps,
-   and the last renderer catalog progress record. If it reports a catalog
-   failure, use that exact artifact/subphase; do not dismiss it as a generic
-   renderer timeout.
-10. For gameplay or visual changes, call `launch_preview` only after step 9.
-    Start paused and use `run_frames` with `objects`, `include`, and optional
-    `instance_indexes` to inspect bounded live position, angle, force, variable,
-    and behavior state. Runtime verification is mandatory for extension actions
-    that create, delete, pick, or mutate objects.
+9. For a manual verification sequence, call `reload_project` with
+   `mode: "start"`, record its `operation_id`, and poll that exact ID with
+   `mode: "status"` until it completes successfully. Use `mode: "wait"` with
+   the same ID only when a blocking wait is useful. If interrupted before
+   recording the ID, call status without an ID to discover the active/latest
+   operation. Never start a duplicate while one is running, invoke an MCP save,
+   or dismiss a catalog artifact/subphase failure as a generic timeout. Skip
+   this manual reload only when step 10 will call `verify_project_change`,
+   because that workflow performs its own validated reload.
+10. For gameplay or visual changes, prefer `verify_project_change` after the
+    Git commit. It performs validation → reload → optional stale-preview close
+    → fresh paused launch → deterministic frames → bounded inspection → typed
+    assertions → optional screenshot, stops at the first failed stage, and
+    retains each stage receipt. Use only its closed assertion schema (object
+    count, finite instance position, runtime-error count, and renderer
+    group/visible-mesh/texture-failure/rejection checks). Require
+    `runtimeVerified: true` and `completionReady: true`. For a manual sequence,
+    call `launch_preview` only after step 9, start paused, and use `run_frames`
+    with `objects`, `include`, and optional `instance_indexes`. Runtime
+    verification is mandatory for rendering/input changes and extension
+    actions that create, delete, pick, or mutate objects.
     If any project source changes after the reload, call `reload_project` again
     before the next preview, preceded by a new successful
     `validate_project_files` call and Git commit for those edits.
@@ -441,6 +465,35 @@ asset is appropriate.
 ## MCP boundary
 
 MCP is extension-import/synchronization/read/debug-only. Use it only for:
+
+The complete public protocol surface is the following 27-tool allowlist:
+
+- Editor/project inspection:
+  `gdevelop_get_editor_state`, `gdevelop_get_editor_selection`,
+  `gdevelop_get_project_summary`, `gdevelop_list_scenes`,
+  `gdevelop_list_objects`, and `gdevelop_inspect_signal_usage`.
+- Catalog, validation, and instruction construction:
+  `generate-catalogs`, `validate_project_files`, `inspect_tool_schema`,
+  `get_tool_usage_examples`, `create_action`,
+  `create_signal_emit_action`, `create_signal_subscription_action`, and
+  `create_signal_received_condition`.
+- Synchronization and runtime verification:
+  `reload_project`, `launch_preview`, `wait_until_preview_ready`,
+  `preview_health_check`, `gdevelop_inspect_running_preview`, `run_frames`,
+  `verify_project_change`, `simulate_preview_input`, `control_preview`,
+  `set_runtime_state`, and `capture_preview_screenshot`.
+- Public write operations: `import_extension` and the permissioned
+  `gdevelop_create_or_update_on_signal`.
+
+No other MCP tool name is supported, introspectable, or callable, even when
+write/command permissions are enabled. In particular, there is no generic
+editor-call, command, save, project patch/sync, scene/object/resource authoring,
+or hidden resource-read escape hatch. The allowlist describes protocol
+availability; this file-first skill still permits only the narrower workflows
+below and authors project source directly.
+
+Constants are outside this MCP surface. The AI model must author them by
+reading and editing `constants.toml` directly.
 
 - Importing and converting an official legacy extension with
   `import_extension`. This is the only MCP tool allowed to create project
@@ -460,6 +513,10 @@ MCP is extension-import/synchronization/read/debug-only. Use it only for:
 - Inspecting live runtime state, logs, errors, audio, and bounded targeted
   instance position, angle, force, variable, and behavior state.
 - Capturing preview screenshots.
+- Running the staged `verify_project_change` gate with typed assertions and
+  bounded renderer diagnostics. Renderer receipts expose scalar scene,
+  layer/group/camera/mesh/visibility/texture-failure/rejection information;
+  they never serialize raw Three.js, Pixi, renderer, canvas, or DOM objects.
 
 Except for the single `import_extension` conversion transaction, never use MCP
 to create scenes, objects, resources, variables, instances, extensions,
@@ -481,10 +538,13 @@ settings, and layout catalogs and both JavaScript declarations first, then
 reconstructs the generated `game.json` representation from the multi-file
 settings, layouts, and events and type-checks JavaScript blocks against the
 fresh public API without replacing editor memory. A later source edit
-invalidates the earlier validation receipt. Its `valid: true` result is not a
-runtime semantic test; behavior-sensitive changes still require a paused preview
-and deterministic `run_frames` inspection. Never report the game as working or
-the task as complete from this receipt alone.
+invalidates the earlier validation receipt. Require its structural,
+event-code-generation, extension-generated-code, JavaScript-authoring, and
+semantic statuses, not only the compatibility `valid` boolean. Its successful
+result deliberately keeps `runtimeVerified: false` and
+`completionReady: false`; behavior-sensitive changes still require a paused
+preview and deterministic runtime inspection. Never report the game as working
+or the task as complete from this receipt alone.
 
 The Git commit is also a mandatory reload gate. After the final successful
 validation, inspect the repository diff, stage every change made for the user's
@@ -493,14 +553,15 @@ unrelated pre-existing changes. `reload_project` must run only after this commit
 succeeds. A later source edit requires a new validation and follow-up commit
 before another reload.
 
-`reload_project` remains a mandatory preview gate. After both the validation
-and Git-commit gates, start it with `mode: "start"`, record the immediate
-`operation_id`, and poll that exact operation with `mode: "status"` until its
-receipt is completed successfully. A status call without an ID discovers the
-active/latest retained operation after caller interruption. Never launch or
-relaunch a preview from stale editor memory. A later source edit invalidates the
-validation, commit, and reload receipts. Never start another reload while the
-current operation is running.
+`reload_project` remains a mandatory preview gate, either as an explicit call
+or as the reload stage inside `verify_project_change`. After both the validation
+and Git-commit gates, a manual workflow starts it with `mode: "start"`, records
+the immediate `operation_id`, and polls that exact operation with
+`mode: "status"` until its receipt completes successfully. A status call
+without an ID discovers the active/latest retained operation after caller
+interruption. Never launch or relaunch a preview from stale editor memory. A
+later source edit invalidates the validation, commit, and reload receipts.
+Never start another reload while the current operation is running.
 The reload writes generated catalogs itself and acknowledges their modification
 times; do not respond to a "Project files changed on disk" dialog by starting a
 second reload while the recorded operation is still running.
@@ -531,32 +592,48 @@ Before finishing:
   `settings-catalog.json`.
 - Confirm layout tables, fields, layers, objects, attached behaviors,
   and effect parameters against the matching `layout-catalog.json` context.
+- Confirm no `3d` or `2d+3d` layer is marked `lighting = true`; inspect
+  renderer diagnostics for a Three scene/group/camera, visible meshes, zero
+  rejected objects, and zero failed textures when 3D rendering changed.
+- Confirm image resources used by 3D materials have the cataloged
+  `three-texture` capability. SVG image resources are supported through the
+  cached Pixi raster source.
+- Confirm Physics3D world scale is finite and positive and runtime instance
+  coordinates remain finite.
 - Confirm catalog instruction types, kinds, scopes, and `dslName` arguments.
 - For every changed JavaScript event, confirm `strict=true`, validate all
   context globals/project literals/public members against both generated
   `.d.ts` files, and confirm no forbidden private or ambient API is used.
-- For Static Data changes, confirm `static-data.toml` ownership, direct-root
+- For Constants changes, confirm `constants.toml` ownership, direct-root
   TOML data, placeholder paths/types, and regeneration-time behavior
-  against the Static Data reference.
+  against the Constants reference.
 - For signal changes, confirm target kind, receiver kind, fixed `onSignal`
   signature, guarded emission, next-dispatch timing, and preview signal-monitor
   evidence against the signal-system reference.
 - Confirm every action has an effective condition in its event or ancestor
   chain and no unconditional action can execute every frame.
-- Confirm every object-targeting action operates on a provably single picked
-  instance; use `for each` when processing multiple instances.
+- Confirm object-targeting actions use the intended current picking set. Accept
+  actions that apply to multiple picked instances as normal GDevelop behavior;
+  narrow the selection or use `for each` only when the logic requires one
+  instance at a time.
 - Confirm no legacy JSON was changed.
 - Confirm `generate-catalogs` returned `catalogsRegenerated: true` after the
   final large structural change and that subsequent dependent edits used the
   refreshed relevant catalogs.
-- Confirm `validate_project_files` returned `valid: true` after the final source
-  edit and before `reload_project`.
+- Confirm `validate_project_files` returned `valid: true` with all checked
+  pre-runtime phase fields successful after the final source edit and before
+  reload. Confirm that receipt still says `runtimeVerified: false` and
+  `completionReady: false`.
 - Confirm every task-owned change was committed after final validation and
   before `reload_project`; record the commit hash and descriptive commit
   message, and confirm no unrelated pre-existing change entered the commit.
-- Confirm `reload_project` succeeded after the final source edit and before any
-  `launch_preview` call.
+- Confirm explicit `reload_project` or the reload stage of
+  `verify_project_change` succeeded after the final source edit and before any
+  preview frames.
 - Debug runtime behavior with a fresh preview when behavior, rendering, input,
   audio, timing, or object picking changed.
+- Prefer one successful `verify_project_change` receipt for final runtime
+  acceptance; require every typed assertion to pass and both
+  `runtimeVerified: true` and `completionReady: true`.
 - Report changed source files, concrete verification evidence, and the final
   Git commit hash and message.

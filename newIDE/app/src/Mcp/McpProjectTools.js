@@ -522,6 +522,105 @@ const collectExtensionFunctionLintResults = (
   return results;
 };
 
+const collectProjectSemanticDiagnostics = (
+  serializedProject: Object
+): Array<Object> => {
+  const diagnostics: Array<Object> = [];
+  const layouts = Array.isArray(serializedProject.layouts)
+    ? serializedProject.layouts
+    : [];
+  layouts.forEach((layout, layoutIndex) => {
+    if (!layout || typeof layout !== 'object') return;
+    const layoutName =
+      typeof layout.name === 'string' ? layout.name : `#${layoutIndex}`;
+    const layers = Array.isArray(layout.layers) ? layout.layers : [];
+    layers.forEach((layer, layerIndex) => {
+      if (!layer || typeof layer !== 'object') return;
+      if (
+        layer.isLightingLayer === true &&
+        (layer.renderingType === '3d' || layer.renderingType === '2d+3d')
+      ) {
+        diagnostics.push({
+          code: 'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
+          severity: 'error',
+          stage: 'semantic',
+          message: `Layer "${layer.name ||
+            ''}" in scene "${layoutName}" uses rendering="${
+            layer.renderingType
+          }" and is marked as a dedicated 2D Lighting Layer.`,
+          remediation:
+            'Set isLightingLayer/lighting to false and add Scene3D light effects instead.',
+          source: {
+            projectPath: `layouts[${layoutIndex}].layers[${layerIndex}]`,
+          },
+          details: {
+            sceneName: layoutName,
+            layerName: layer.name || '',
+            renderingType: layer.renderingType,
+          },
+        });
+      }
+    });
+
+    const sharedDataList = Array.isArray(layout.behaviorsSharedData)
+      ? layout.behaviorsSharedData
+      : [];
+    sharedDataList.forEach((sharedData, sharedDataIndex) => {
+      if (
+        !sharedData ||
+        typeof sharedData !== 'object' ||
+        typeof sharedData.type !== 'string' ||
+        !sharedData.type.includes('Physics3D')
+      ) {
+        return;
+      }
+      const source = {
+        projectPath: `layouts[${layoutIndex}].behaviorsSharedData[${sharedDataIndex}]`,
+      };
+      const missingFields = [
+        'gravityX',
+        'gravityY',
+        'gravityZ',
+        'worldScale',
+      ].filter(field => sharedData[field] === undefined);
+      if (missingFields.length > 0) {
+        diagnostics.push({
+          code: 'PHYSICS3D_MISSING_SHARED_DEFAULT',
+          severity: 'warning',
+          stage: 'semantic',
+          message: `Physics3D shared data in scene "${layoutName}" omits editor-defined defaults: ${missingFields.join(
+            ', '
+          )}.`,
+          remediation:
+            'The loader will hydrate these defaults. Save the project in the editor to make them explicit.',
+          source,
+          details: { sceneName: layoutName, missingFields },
+        });
+      }
+      if (
+        sharedData.worldScale !== undefined &&
+        (typeof sharedData.worldScale !== 'number' ||
+          !Number.isFinite(sharedData.worldScale) ||
+          sharedData.worldScale <= 0)
+      ) {
+        diagnostics.push({
+          code: 'PHYSICS3D_INVALID_WORLD_SCALE',
+          severity: 'error',
+          stage: 'semantic',
+          message: `Physics3D worldScale in scene "${layoutName}" must be a finite number greater than zero.`,
+          remediation: 'Set worldScale to a positive value such as 100.',
+          source,
+          details: {
+            sceneName: layoutName,
+            worldScale: sharedData.worldScale,
+          },
+        });
+      }
+    });
+  });
+  return diagnostics;
+};
+
 export const validateSerializedProject = (
   serializedProject: Object,
   args: Object = {}
@@ -536,6 +635,26 @@ export const validateSerializedProject = (
     const projectValidationErrors = scanProjectForValidationErrors(
       validationProject
     );
+    const semanticEventErrors = projectValidationErrors.filter(
+      error => error.diagnosticCode
+    );
+    const structuralProjectValidationErrors = projectValidationErrors.filter(
+      error => !error.diagnosticCode
+    );
+    const semanticDiagnostics = [
+      ...collectProjectSemanticDiagnostics(serializedProject),
+      ...semanticEventErrors.map(error => ({
+        code: error.diagnosticCode,
+        severity: 'error',
+        stage: 'semantic',
+        message: `Invalid keyboard key literal ${String(
+          error.parameterValue || ''
+        )}.`,
+        remediation:
+          'Use a canonical GDevelop key name such as Num1, or a supported alias such as "1" or Digit1.',
+        details: error,
+      })),
+    ];
     const extensionLintFailures =
       args.include_generated_code === false
         ? []
@@ -561,34 +680,76 @@ export const validateSerializedProject = (
       projectApiDeclaration: args.project_api_declaration,
       typescript: args.typescript,
     });
+    const structuralErrors = structuralProjectValidationErrors.map(error => ({
+      severity: 'error',
+      ...error,
+    }));
     const errors = [
-      ...projectValidationErrors.map(error => ({
-        severity: 'error',
-        ...error,
-      })),
+      ...structuralErrors,
+      ...semanticDiagnostics.filter(
+        diagnostic => diagnostic.severity === 'error'
+      ),
       ...extensionErrors,
       ...javascriptAuthoring.errors,
     ].filter(error => error.severity === 'error' || !error.severity);
-    const structurallyValid = errors.length === 0;
+    const structurallyValid = structuralErrors.length === 0;
+    const extensionGeneratedCodeValid =
+      args.include_generated_code === false
+        ? null
+        : extensionErrors.filter(
+            error => error.severity === 'error' || !error.severity
+          ).length === 0;
+    const javascriptAuthoringValid = javascriptAuthoring.checked
+      ? javascriptAuthoring.errors.filter(
+          error => error.severity === 'error' || !error.severity
+        ).length === 0
+      : null;
+    const semanticLintPassed =
+      semanticDiagnostics.filter(diagnostic => diagnostic.severity === 'error')
+        .length === 0;
+    const validationPassed =
+      structurallyValid &&
+      extensionGeneratedCodeValid !== false &&
+      javascriptAuthoringValid !== false &&
+      semanticLintPassed;
     return {
       success: true,
-      valid: structurallyValid,
+      valid: validationPassed,
+      validMeaning: 'pre-runtime-validation-passed',
+      structurallyValid,
+      eventCodeGenerationValid: structurallyValid,
+      extensionGeneratedCodeValid,
+      javascriptAuthoringValid,
+      semanticLintStatus: 'checked',
+      semanticLintPassed,
+      runtimeVerified: false,
+      readyForRuntimeVerification: validationPassed,
+      completionReady: false,
       validationResultKind: 'structural-validation',
-      completionStatus: structurallyValid
+      completionStatus: validationPassed
         ? 'runtime-verification-required'
-        : 'structural-validation-failed',
-      runtimeVerificationRequired: structurallyValid,
-      completionWarning: structurallyValid
+        : !structurallyValid
+        ? 'structural-validation-failed'
+        : !semanticLintPassed
+        ? 'semantic-validation-failed'
+        : javascriptAuthoringValid === false
+        ? 'javascript-authoring-validation-failed'
+        : 'generated-code-validation-failed',
+      runtimeVerificationRequired: validationPassed,
+      completionWarning: validationPassed
         ? 'RUNTIME VERIFICATION REQUIRED: valid:true does not prove that the game works. Do not report runtime correctness or task completion until a paused preview verifies behavior-sensitive changes.'
-        : 'Structural validation failed. Fix every blocking diagnostic before reload or runtime verification.',
+        : 'Pre-runtime validation failed. Fix every blocking diagnostic before reload or runtime verification.',
       projectName: validationProject.getName(),
       projectUuid: validationProject.getProjectUuid(),
       sceneNames: getProjectSceneNames(serializedProject),
       projectValidationErrors,
+      structuralProjectValidationErrors,
+      semanticDiagnostics,
       extensionLintFailures,
       javascriptAuthoring,
       environmentDiagnostics: javascriptAuthoring.environmentDiagnostics || [],
       sourceDiagnostics: javascriptAuthoring.sourceDiagnostics || [],
+      diagnostics: semanticDiagnostics,
       errors,
       generatedCodePreflight:
         args.include_generated_code === false ? 'skipped' : 'checked',
@@ -596,11 +757,13 @@ export const validateSerializedProject = (
         projectUnserialization: 'checked',
         projectSerializationRoundTrip: 'checked',
         projectValidation: 'checked',
+        eventCodeGeneration: structurallyValid ? 'checked' : 'failed',
         extensionGeneratedCode:
           args.include_generated_code === false ? 'skipped' : 'checked',
         javascriptAuthoringApi: javascriptAuthoring.checked
           ? 'checked'
           : 'typescript-unavailable',
+        semanticLint: 'checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,
@@ -611,6 +774,16 @@ export const validateSerializedProject = (
     return {
       success: true,
       valid: false,
+      validMeaning: 'pre-runtime-validation-passed',
+      structurallyValid: false,
+      eventCodeGenerationValid: null,
+      extensionGeneratedCodeValid: null,
+      javascriptAuthoringValid: null,
+      semanticLintStatus: 'not-checked',
+      semanticLintPassed: null,
+      runtimeVerified: false,
+      readyForRuntimeVerification: false,
+      completionReady: false,
       validationResultKind: 'structural-validation',
       completionStatus: 'structural-validation-failed',
       runtimeVerificationRequired: false,
@@ -622,6 +795,7 @@ export const validateSerializedProject = (
         projectValidation: 'not-checked',
         extensionGeneratedCode: 'not-checked',
         javascriptAuthoringApi: 'not-checked',
+        semanticLint: 'not-checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,
@@ -851,419 +1025,6 @@ const getNumberWithAliases = (
     if (typeof value === 'number' && Number.isFinite(value)) return value;
   }
   return null;
-};
-
-const staticDataPlaceholderRegex = /^\s*\{\{\s*([^{}]+?)\s*\}\}\s*$/;
-
-const isPlainObject = (value: any): boolean =>
-  !!value && typeof value === 'object' && !Array.isArray(value);
-
-const parseStaticDataRoot = (value: any, label: string): Object => {
-  const parsedValue =
-    typeof value === 'string' ? JSON.parse(value || '{}') : value;
-  if (!isPlainObject(parsedValue)) {
-    throw new Error(`${label} must be a JSON object.`);
-  }
-  return parsedValue;
-};
-
-const readProjectStaticData = (project: gdProject): Object => {
-  const projectWithStaticData: any = project;
-  const json =
-    typeof projectWithStaticData.getStaticDataJson === 'function'
-      ? projectWithStaticData.getStaticDataJson()
-      : '{}';
-  return parseStaticDataRoot(json || '{}', 'Project static data');
-};
-
-const writeProjectStaticData = (project: gdProject, staticData: Object) => {
-  const projectWithStaticData: any = project;
-  if (typeof projectWithStaticData.setStaticDataJson !== 'function') {
-    throw new Error('This GDevelop build does not expose static data writes.');
-  }
-  projectWithStaticData.setStaticDataJson(JSON.stringify(staticData));
-};
-
-const normalizeStaticDataPlaceholderPath = (
-  placeholderPath: string
-): string => {
-  const match = staticDataPlaceholderRegex.exec(placeholderPath || '');
-  if (!match) {
-    throw new Error(
-      'Static Data paths must use placeholder syntax such as {{cards.sunflower.price}}.'
-    );
-  }
-  const normalizedPath = match[1].trim();
-  if (!normalizedPath) {
-    throw new Error('Static Data placeholder path cannot be empty.');
-  }
-  return normalizedPath;
-};
-
-const parseStaticDataPlaceholderPath = (
-  placeholderPath: string
-): Array<string | number> => {
-  const path = normalizeStaticDataPlaceholderPath(placeholderPath);
-  const segments: Array<string | number> = [];
-  let current = '';
-  let index = 0;
-
-  const pushCurrent = () => {
-    if (current !== '') {
-      segments.push(current);
-      current = '';
-    }
-  };
-
-  while (index < path.length) {
-    const character = path[index];
-
-    if (character === '.') {
-      pushCurrent();
-      index++;
-      continue;
-    }
-
-    if (character === '[') {
-      pushCurrent();
-      index++;
-      while (index < path.length && /\s/.test(path[index])) index++;
-
-      if (path[index] === '"' || path[index] === "'") {
-        const quote = path[index];
-        index++;
-        let quotedSegment = '';
-        while (index < path.length && path[index] !== quote) {
-          if (path[index] === '\\' && index + 1 < path.length) {
-            index++;
-          }
-          quotedSegment += path[index];
-          index++;
-        }
-        if (path[index] === quote) index++;
-        while (index < path.length && /\s/.test(path[index])) index++;
-        if (path[index] === ']') index++;
-        segments.push(quotedSegment);
-        continue;
-      }
-
-      let bracketSegment = '';
-      while (index < path.length && path[index] !== ']') {
-        bracketSegment += path[index];
-        index++;
-      }
-      if (path[index] === ']') index++;
-      bracketSegment = bracketSegment.trim();
-      if (/^\d+$/.test(bracketSegment)) {
-        segments.push(parseInt(bracketSegment, 10));
-      } else if (bracketSegment !== '') {
-        segments.push(bracketSegment);
-      }
-      continue;
-    }
-
-    current += character;
-    index++;
-  }
-
-  pushCurrent();
-
-  if (!segments.length) {
-    throw new Error('Static Data placeholder path cannot be empty.');
-  }
-  return segments;
-};
-
-const getStaticDataPathArg = (args: Object): string => {
-  const placeholderPath = getStringWithAliases(args || {}, [
-    'placeholder_path',
-    'placeholderPath',
-    'path',
-  ]);
-  if (!placeholderPath) {
-    throw new Error('Missing placeholder_path.');
-  }
-  return placeholderPath;
-};
-
-const getStaticDataValueAtPath = (
-  staticData: Object,
-  segments: Array<string | number>
-): {| exists: boolean, value?: any |} => {
-  let current: any = staticData;
-  for (const segment of segments) {
-    if (Array.isArray(current)) {
-      if (
-        typeof segment !== 'number' ||
-        segment < 0 ||
-        segment >= current.length
-      ) {
-        return { exists: false };
-      }
-      current = current[segment];
-      continue;
-    }
-    if (current && typeof current === 'object') {
-      const key = String(segment);
-      if (!hasOwn(current, key)) return { exists: false };
-      current = current[key];
-      continue;
-    }
-    return { exists: false };
-  }
-  return { exists: true, value: current };
-};
-
-const setStaticDataValueAtPath = (
-  staticData: Object,
-  segments: Array<string | number>,
-  value: any
-) => {
-  let current: any = staticData;
-  for (let index = 0; index < segments.length - 1; index++) {
-    const segment = segments[index];
-    const nextSegment = segments[index + 1];
-
-    if (Array.isArray(current)) {
-      if (typeof segment !== 'number' || segment < 0) {
-        throw new Error(
-          'Array static data paths must use non-negative indexes.'
-        );
-      }
-      if (!hasOwn(current, String(segment)) || current[segment] === null) {
-        current[segment] = typeof nextSegment === 'number' ? [] : {};
-      }
-      if (typeof current[segment] !== 'object') {
-        throw new Error(
-          `Static Data path segment "${String(
-            segment
-          )}" is not an object or array.`
-        );
-      }
-      current = current[segment];
-      continue;
-    } else if (!current || typeof current !== 'object') {
-      throw new Error(
-        `Static Data path cannot create a child under non-object segment "${String(
-          segment
-        )}".`
-      );
-    }
-
-    const key = String(segment);
-    if (!hasOwn(current, key) || current[key] === null) {
-      current[key] = typeof nextSegment === 'number' ? [] : {};
-    }
-    if (typeof current[key] !== 'object') {
-      throw new Error(
-        `Static Data path segment "${String(
-          segment
-        )}" is not an object or array.`
-      );
-    }
-    current = current[key];
-  }
-
-  const lastSegment = segments[segments.length - 1];
-  if (Array.isArray(current)) {
-    if (typeof lastSegment !== 'number' || lastSegment < 0) {
-      throw new Error('Array static data paths must use non-negative indexes.');
-    }
-    current[lastSegment] = value;
-    return;
-  }
-  if (!current || typeof current !== 'object') {
-    throw new Error('Static Data path parent is not an object.');
-  }
-  current[String(lastSegment)] = value;
-};
-
-const deleteStaticDataValueAtPath = (
-  staticData: Object,
-  segments: Array<string | number>
-): {| deleted: boolean, previousValue?: any |} => {
-  const parentSegments = segments.slice(0, -1);
-  const lastSegment = segments[segments.length - 1];
-  const parentResult = parentSegments.length
-    ? getStaticDataValueAtPath(staticData, parentSegments)
-    : { exists: true, value: staticData };
-  if (!parentResult.exists) return { deleted: false };
-
-  const parent: any = parentResult.value;
-  if (Array.isArray(parent)) {
-    if (
-      typeof lastSegment !== 'number' ||
-      lastSegment < 0 ||
-      lastSegment >= parent.length
-    ) {
-      return { deleted: false };
-    }
-    const previousValue = parent[lastSegment];
-    parent.splice(lastSegment, 1);
-    return { deleted: true, previousValue };
-  }
-
-  if (!parent || typeof parent !== 'object') return { deleted: false };
-  const key = String(lastSegment);
-  if (!hasOwn(parent, key)) return { deleted: false };
-  const previousValue = parent[key];
-  delete parent[key];
-  return { deleted: true, previousValue };
-};
-
-const getStaticDataInputValue = (args: Object): any => {
-  if (hasOwn(args || {}, 'value_json')) {
-    return JSON.parse(String(args.value_json));
-  }
-  if (hasOwn(args || {}, 'valueJson')) {
-    return JSON.parse(String(args.valueJson));
-  }
-  if (hasOwn(args || {}, 'value')) return args.value;
-  throw new Error('Missing value or value_json.');
-};
-
-const getStaticDataRootFromArgs = (args: Object): Object => {
-  if (hasOwn(args || {}, 'static_data')) {
-    return parseStaticDataRoot(args.static_data, 'static_data');
-  }
-  if (hasOwn(args || {}, 'staticData')) {
-    return parseStaticDataRoot(args.staticData, 'staticData');
-  }
-  if (hasOwn(args || {}, 'static_data_json')) {
-    return parseStaticDataRoot(args.static_data_json, 'static_data_json');
-  }
-  if (hasOwn(args || {}, 'staticDataJson')) {
-    return parseStaticDataRoot(args.staticDataJson, 'staticDataJson');
-  }
-  throw new Error('Missing static_data or static_data_json.');
-};
-
-export const summarizeStaticData = (project: gdProject): Object => {
-  const staticData = readProjectStaticData(project);
-  const topLevelKeys = Object.keys(staticData);
-  const placeholderExamples: Array<string> = [];
-  const collectPlaceholders = (value: any, path: string) => {
-    if (placeholderExamples.length >= 12) return;
-    if (isPlainObject(value)) {
-      const keys = Object.keys(value);
-      if (!keys.length && path) placeholderExamples.push(`{{${path}}}`);
-      keys.forEach(key =>
-        collectPlaceholders(value[key], path ? `${path}.${key}` : key)
-      );
-      return;
-    }
-    if (Array.isArray(value)) {
-      if (!value.length && path) placeholderExamples.push(`{{${path}}}`);
-      value.forEach((item, index) =>
-        collectPlaceholders(item, `${path}[${index}]`)
-      );
-      return;
-    }
-    if (path) placeholderExamples.push(`{{${path}}}`);
-  };
-  topLevelKeys.forEach(key => collectPlaceholders(staticData[key], key));
-  return {
-    topLevelKeyCount: topLevelKeys.length,
-    topLevelKeys,
-    placeholderExamples,
-  };
-};
-
-export const getStaticData = (
-  project: gdProject,
-  args: Object = {}
-): Object => {
-  const staticData = readProjectStaticData(project);
-  const placeholderPath = getStringWithAliases(args || {}, [
-    'placeholder_path',
-    'placeholderPath',
-    'path',
-  ]);
-  if (placeholderPath) {
-    const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
-    const segments = parseStaticDataPlaceholderPath(placeholderPath);
-    const result = getStaticDataValueAtPath(staticData, segments);
-    return {
-      success: true,
-      placeholderPath: `{{${normalizedPath}}}`,
-      path: normalizedPath,
-      exists: result.exists,
-      value: result.value,
-    };
-  }
-
-  return {
-    success: true,
-    summary: summarizeStaticData(project),
-    staticData,
-    staticDataJson: JSON.stringify(staticData, null, 2),
-  };
-};
-
-export const setStaticData = (
-  project: gdProject,
-  args: Object = {}
-): Object => {
-  const staticData = getStaticDataRootFromArgs(args);
-  const previousSummary = summarizeStaticData(project);
-  writeProjectStaticData(project, staticData);
-  return {
-    success: true,
-    didModifyProject: true,
-    previousSummary,
-    summary: summarizeStaticData(project),
-    staticData: args.include_static_data === true ? staticData : undefined,
-    note:
-      'Static Data was replaced in the editor project model. Persist it with gdevelop_save_project_and_wait.',
-  };
-};
-
-export const setStaticDataValue = (
-  project: gdProject,
-  args: Object = {}
-): Object => {
-  const placeholderPath = getStaticDataPathArg(args);
-  const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
-  const segments = parseStaticDataPlaceholderPath(placeholderPath);
-  const staticData = readProjectStaticData(project);
-  const previous = getStaticDataValueAtPath(staticData, segments);
-  const value = getStaticDataInputValue(args);
-  setStaticDataValueAtPath(staticData, segments, value);
-  writeProjectStaticData(project, staticData);
-  return {
-    success: true,
-    didModifyProject: true,
-    placeholderPath: `{{${normalizedPath}}}`,
-    path: normalizedPath,
-    previousExists: previous.exists,
-    previousValue: previous.value,
-    value,
-    note:
-      'Static Data value was updated in the editor project model. Persist it with gdevelop_save_project_and_wait.',
-  };
-};
-
-export const deleteStaticDataValue = (
-  project: gdProject,
-  args: Object = {}
-): Object => {
-  const placeholderPath = getStaticDataPathArg(args);
-  const normalizedPath = normalizeStaticDataPlaceholderPath(placeholderPath);
-  const segments = parseStaticDataPlaceholderPath(placeholderPath);
-  const staticData = readProjectStaticData(project);
-  const deletion = deleteStaticDataValueAtPath(staticData, segments);
-  if (deletion.deleted) writeProjectStaticData(project, staticData);
-  return {
-    success: true,
-    didModifyProject: deletion.deleted,
-    placeholderPath: `{{${normalizedPath}}}`,
-    path: normalizedPath,
-    deleted: deletion.deleted,
-    previousValue: deletion.previousValue,
-    note: deletion.deleted
-      ? 'Static Data value was deleted in the editor project model. Persist it with gdevelop_save_project_and_wait.'
-      : 'Static Data value did not exist; the project was not modified.',
-  };
 };
 
 const summarizeProjectProperties = (project: gdProject): Object => ({

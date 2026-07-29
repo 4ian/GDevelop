@@ -4,7 +4,6 @@ import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
 import ObjectGroupRequiredBehaviorsEditor from './ObjectGroupRequiredBehaviorsEditor';
-import ObjectGroupCommonFunctions from './ObjectGroupCommonFunctions';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -16,11 +15,12 @@ import Text from '../UI/Text';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
 import { type GroupWithContext } from '../ObjectsList/EnumerateObjects';
+import {
+  objectGroupEditorTabs,
+  type ObjectGroupEditorTab,
+} from './ObjectGroupEditorTabs';
 
-export type ObjectGroupEditorTab =
-  | 'objects'
-  | 'commonFunctions'
-  | 'requiredBehaviors';
+export type { ObjectGroupEditorTab };
 
 type Props = {|
   project: gdProject,
@@ -228,20 +228,15 @@ const EditedObjectGroupEditorDialog = ({
           <Tabs
             value={currentTab}
             onChange={setCurrentTab}
-            options={[
-              {
-                label: <Trans>Objects</Trans>,
-                value: 'objects',
-              },
-              {
-                label: <Trans>Common functions</Trans>,
-                value: 'commonFunctions',
-              },
-              {
-                label: <Trans>Required behaviors</Trans>,
-                value: 'requiredBehaviors',
-              },
-            ]}
+            options={objectGroupEditorTabs.map(tab => ({
+              label:
+                tab === 'objects' ? (
+                  <Trans>Objects</Trans>
+                ) : (
+                  <Trans>Required behaviors</Trans>
+                ),
+              value: tab,
+            }))}
           />
         </ColumnStackLayout>
       }
@@ -269,18 +264,8 @@ const EditedObjectGroupEditorDialog = ({
             isGlobalGroup={isGroupGlobal}
             objectNameFilter={objectNameFilter}
             requiredBehaviorTypes={requiredBehaviorTypes}
-            groupName={group.getName()}
           />
         ))}
-      {currentTab === 'commonFunctions' && (
-        <ObjectGroupCommonFunctions
-          project={project}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          globalObjectsContainer={globalObjectsContainer}
-          objectsContainer={objectsContainer}
-          groupName={group.getName()}
-        />
-      )}
       {currentTab === 'requiredBehaviors' && (
         <ObjectGroupRequiredBehaviorsEditor
           project={project}

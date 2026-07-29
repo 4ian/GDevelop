@@ -228,6 +228,12 @@ GDevelop's [3D Model object guide](https://wiki.gdevelop.io/gdevelop5/objects/3d
 
 Create or select a layer and enable 3D rendering. Keep 2D interface objects on a separate 2D layer when possible.
 
+In multi-file layout TOML, use `rendering = "3d"` or `"2d+3d"` with
+`lighting = false`. The `lighting` flag means a dedicated 2D Lighting Layer;
+it does not enable Scene3D lighting and the invalid 3D-plus-lighting
+combination fails with `LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER`. Add 3D light
+effects in the next section instead.
+
 Choose the camera projection according to the game:
 
 - **Perspective** for first-person, third-person, racing, platforming, and scenes where depth perspective matters.
@@ -260,7 +266,7 @@ If the model should cast and receive shadows:
 3. Add a directional light effect or suitable 3D lights.
 4. Tune shadow quality, range, and bias.
 
-Do not automatically export Blender lights and recreate the same lights in GDevelop. Pick one runtime lighting system. GDevelop layer lights are usually easier to control from events.
+Do not automatically export Blender lights and recreate the same lights in GDevelop. Pick one runtime lighting system. GDevelop Scene3D light effects are usually easier to control from events; do not turn the layer into a 2D Lighting Layer.
 
 ## 13. Add collision and physics separately
 
@@ -292,6 +298,9 @@ Verify:
 - Collision matches gameplay, not merely the visible silhouette.
 - Near/far clipping does not cut off the asset.
 - Performance is acceptable on the target device.
+- Renderer diagnostics report a Three scene, group, and camera; visible mesh
+  count is non-zero when expected; rejected-object and failed-texture counts
+  are zero.
 
 Always test from more than one camera angle when diagnosing scale or axis problems. A single top-down view can hide an incorrect vertical axis.
 
@@ -304,8 +313,10 @@ For later edits:
 3. Save the `.blend`.
 4. Export over the existing GLB resource.
 5. Confirm the file modification time and size changed.
-6. Reload the resource or project if GDevelop shows a cached version.
-7. Preview and repeat the verification checklist.
+6. Run `validate_project_files`, commit the task-owned resource/source change,
+   and reload the project if GDevelop shows a cached version.
+7. Use `verify_project_change` or an equivalent fresh paused preview and repeat
+   the verification checklist.
 
 Keep the same GLB path when the asset identity has not changed. This preserves object and animation references. Use a new filename only for a genuinely separate asset or intentional versioning strategy.
 
@@ -358,6 +369,8 @@ Keep the same GLB path when the asset identity has not changed. This preserves o
 
 - [ ] GLB is registered as a 3D Model resource.
 - [ ] Object is on a 3D layer.
+- [ ] The 3D layer has `lighting = false`; Scene3D light effects provide 3D
+      illumination.
 - [ ] Aspect ratio is preserved.
 - [ ] Material mode matches the lighting design.
 - [ ] Camera position, target, projection, and clipping are intentional.
@@ -365,6 +378,8 @@ Keep the same GLB path when the asset identity has not changed. This preserves o
 - [ ] Collision uses simplified gameplay shapes.
 - [ ] Animations are mapped and tested.
 - [ ] A fresh preview confirms rendering, collision, and performance.
+- [ ] Renderer diagnostics show the expected group/camera/visible meshes and
+      zero rejected objects or failed textures.
 
 ## Official references
 

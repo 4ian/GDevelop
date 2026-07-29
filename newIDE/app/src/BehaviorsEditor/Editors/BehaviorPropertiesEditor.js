@@ -22,7 +22,7 @@ const BehaviorPropertiesEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   isAdvancedSectionInitiallyUncollapsed,
-  hideStaticDataPlaceholderHints,
+  hideConstantPlaceholderHints,
 }: Props): React.Node => {
   const behavior = behaviors[0];
 
@@ -44,7 +44,7 @@ const BehaviorPropertiesEditor = ({
         layersContainer,
         visibility: 'All',
         shouldDisabledFieldsWithMixedValues: true,
-        allowStaticDataPlaceholders: project.hasEventsBasedBehavior(
+        allowConstantPlaceholders: project.hasEventsBasedBehavior(
           behavior.getTypeName()
         ),
       });
@@ -75,7 +75,7 @@ const BehaviorPropertiesEditor = ({
         isAdvancedSectionInitiallyUncollapsed={
           isAdvancedSectionInitiallyUncollapsed
         }
-        hideStaticDataPlaceholderHints={hideStaticDataPlaceholderHints}
+        hideConstantPlaceholderHints={hideConstantPlaceholderHints}
       />
     </Column>
   );

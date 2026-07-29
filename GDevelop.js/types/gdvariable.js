@@ -47,7 +47,9 @@ declare class gdVariable {
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   resetPersistentUuid(): gdVariable;
+  ensurePersistentUuid(): gdVariable;
   clearPersistentUuid(): gdVariable;
+  getPersistentUuid(): string;
   delete(): void;
   ptr: number;
 };

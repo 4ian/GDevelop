@@ -9,7 +9,7 @@ import AddCircleIcon from '../UI/CustomSvgIcons/AddCircle';
 import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import DebuggerIcon from '../UI/CustomSvgIcons/Debug';
 import ProjectResourcesIcon from '../UI/CustomSvgIcons/ProjectResources';
-import StaticDataIcon from '../UI/CustomSvgIcons/StaticData';
+import ConstantsIcon from '../UI/CustomSvgIcons/Constants';
 import GlobalVariableIcon from '../UI/CustomSvgIcons/GlobalVariable';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import ObjectIcon from '../UI/CustomSvgIcons/Object';
@@ -117,8 +117,7 @@ import { createMcpEditorBridge } from '../Mcp/McpEditorBridge';
 import { saveProjectAfterPendingSave } from '../Mcp/McpSaveCoordinator';
 import { type EditorCallbacks } from '../EditorFunctions';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { renderStaticDataEditorContainer } from './EditorContainers/StaticDataEditorContainer';
-import ObjectSettingsWorkbenchWindow from '../ObjectSettingsWorkbench/ObjectSettingsWorkbenchWindow';
+import { renderConstantsEditorContainer } from './EditorContainers/ConstantsEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
@@ -195,9 +194,18 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
+import {
+  installCliInPath,
+  isCliInPathInstallSupported,
+} from '../Utils/InstallCliInPath';
+import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import {
+  type ImportExtension,
+  type SaveProject,
+} from './LocalCliCommandRunner';
 import { isExtensionNameTaken } from '../ProjectManager/EventFunctionExtensionNameVerifier';
 import {
   type PreviewState,
@@ -267,7 +275,10 @@ import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFi
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
-import { areLegacyProjectsEquivalent } from '../ProjectsStorage/MultiFileProjectFormat';
+import {
+  MULTI_FILE_ENTRY_NAME,
+  areLegacyProjectsEquivalent,
+} from '../ProjectsStorage/MultiFileProjectFormat';
 import { serializeToJSObject } from '../Utils/Serializer';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { type CourseChapter } from '../Utils/GDevelopServices/Asset';
@@ -276,7 +287,7 @@ import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 import DiagnosticReportDialog from '../ExportAndShare/DiagnosticReportDialog';
 import MemoryTrackedRegistryDialog from './MemoryTrackedRegistryDialog';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
-import { hasInvalidStaticDataPlaceholderValidationError } from '../Utils/StaticDataPlaceholderDiagnostics';
+import { hasInvalidConstantPlaceholderValidationError } from '../Utils/ConstantPlaceholderDiagnostics';
 import { useMultiplayerLobbyConfigurator } from './UseMultiplayerLobbyConfigurator';
 import { useAuthenticatedPlayer } from './UseAuthenticatedPlayer';
 import ListIcon from '../UI/ListIcon';
@@ -284,7 +295,10 @@ import { QuickCustomizationDialog } from '../QuickCustomization/QuickCustomizati
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import useGamesList from '../GameDashboard/UseGamesList';
 import useCapturesManager from './UseCapturesManager';
-import { readProjectSettings } from '../Utils/ProjectSettingsReader';
+import {
+  readProjectSettings,
+  type ResourceCustomPropertyConfig,
+} from '../Utils/ProjectSettingsReader';
 import { renameLayoutInProject } from '../Utils/Layout';
 import useNpmScriptRunner from './NpmScriptRunner/useNpmScriptRunner';
 import { applyProjectPreferences } from '../Utils/ApplyProjectPreferences';
@@ -356,7 +370,7 @@ const editorKindToRenderer: {
   'custom object': renderCustomObjectEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
-  'static-data': renderStaticDataEditorContainer,
+  constants: renderConstantsEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
   'ask-ai': renderAskAiEditorContainer,
 };
@@ -532,7 +546,13 @@ export type Props = {|
   useCliCommandRunner: ({|
     project: ?gdProject,
     i18n: I18n,
+    fileIdentifier: ?string,
     commandPaletteRef: {| current: ?CommandPaletteInterface |},
+    importExtension: ImportExtension,
+    onWillInstallExtension: (extensionNames: Array<string>) => void,
+    onExtensionInstalled: (extensionNames: Array<string>) => void,
+    saveProject: SaveProject,
+    ensureProjectSettingsApplied: () => Promise<void>,
   |}) => void,
   onExportHtml5External?: (project: gdProject, i18n: I18n) => Promise<void>,
 |};
@@ -563,6 +583,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       toolbarButtons: [],
     }: State)
   );
+  const [
+    resourceCustomPropertyConfigs,
+    setResourceCustomPropertyConfigs,
+  ] = React.useState<Array<ResourceCustomPropertyConfig>>([]);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [
     cloudProjectFileMetadataToRecover,
@@ -692,28 +716,22 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unsafeExternalLayoutCreationErrors = validationErrors.filter(
           error => error.type === 'unsafe-external-layout-creation'
         );
-        const ambiguousObjectPickingErrors = validationErrors.filter(
-          error => error.type === 'ambiguous-object-picking'
-        );
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
-        const mustBlockForInvalidStaticDataPlaceholder = hasInvalidStaticDataPlaceholderValidationError(
+        const mustBlockForInvalidConstantPlaceholder = hasInvalidConstantPlaceholderValidationError(
           validationErrors
         );
         const mustBlockForUnsafeExternalLayoutCreation =
           unsafeExternalLayoutCreationErrors.length > 0;
-        const mustBlockForAmbiguousObjectPicking =
-          ambiguousObjectPickingErrors.length > 0;
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
-          mustBlockForInvalidStaticDataPlaceholder ||
+          mustBlockForInvalidConstantPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
-          mustBlockForAmbiguousObjectPicking ||
           mustBlockForUnconditionedActions;
 
-        if (mustBlockForInvalidStaticDataPlaceholder) {
+        if (mustBlockForInvalidConstantPlaceholder) {
           setDiagnosticReportDialogOpen(true);
           return true;
         }
@@ -724,8 +742,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) {
           const title = mustBlockForUnsafeExternalLayoutCreation
             ? t`External layout action needs a condition`
-            : mustBlockForAmbiguousObjectPicking
-            ? t`Object action needs a single picked instance`
             : mustBlockForUnconditionedActions
             ? t`Action needs a condition`
             : t`Diagnostic errors found`;
@@ -733,10 +749,6 @@ const MainFrame = (props: Props): React.MixedElement => {
             ? actionType === 'preview'
               ? t`This preview cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before launching a preview.`
               : t`This export cannot run because an event creates objects from an external layout without any condition. Add a condition, for example "At the beginning of the scene", before exporting.`
-            : mustBlockForAmbiguousObjectPicking
-            ? actionType === 'preview'
-              ? t`This preview cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before launching a preview.`
-              : t`This export cannot run because one or more events pass object parameters without first picking a single instance. Add conditions such as "Pick a random object" or "Pick nearest object", or use a "For each object" event before exporting.`
             : mustBlockForUnconditionedActions
             ? actionType === 'preview'
               ? t`This preview cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before launching a preview.`
@@ -811,13 +823,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     editorKey: null,
     requestId: 0,
   });
-  const [
-    objectSettingsWindowState,
-    setObjectSettingsWindowState,
-  ] = React.useState<{|
-    projectPtr: ?number,
-    focusRequestId: number,
-  |}>({ projectPtr: null, focusRequestId: 0 });
+  const lastProjectSettingsPromise = React.useRef<?Promise<void>>(null);
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
@@ -1277,8 +1283,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       const label =
         kind === 'resources'
           ? i18n._(t`Resources`)
-          : kind === 'static-data'
-          ? i18n._(t`Static Data`)
+          : kind === 'constants'
+          ? i18n._(t`Constants`)
           : kind === 'global-search'
           ? i18n._(t`Global search`)
           : kind === 'ask-ai'
@@ -1344,8 +1350,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           <DebuggerIcon />
         ) : kind === 'resources' ? (
           <ProjectResourcesIcon />
-        ) : kind === 'static-data' ? (
-          <StaticDataIcon />
+        ) : kind === 'constants' ? (
+          <ConstantsIcon />
         ) : kind === 'global-search' ? (
           <SearchIcon />
         ) : kind === 'layout' ? (
@@ -1764,6 +1770,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTabs: closeProjectTabs(state.editorTabs, currentProject),
         toolbarButtons: [],
       }));
+      setResourceCustomPropertyConfigs([]);
       reportProgress('old-project-state-cleared');
 
       // Delete the project from memory. All references to it have been dropped previously
@@ -1803,6 +1810,48 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  const ensureProjectSettingsApplied = React.useCallback((): Promise<void> => {
+    return lastProjectSettingsPromise.current || Promise.resolve();
+  }, []);
+
+  const loadProjectSettings = React.useCallback(
+    (fileMetadata: ?FileMetadata): Promise<void> => {
+      if (!fileMetadata) return Promise.resolve();
+
+      const currentPromise: Promise<void> = (async () => {
+        try {
+          const parsedProjectSettings = await readProjectSettings(
+            fileMetadata.fileIdentifier
+          );
+          if (parsedProjectSettings) {
+            applyProjectPreferences(parsedProjectSettings, preferences);
+            await setState(currentState => ({
+              ...currentState,
+              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
+            }));
+            setResourceCustomPropertyConfigs(
+              parsedProjectSettings.resourceCustomProperties || []
+            );
+          }
+        } catch (error) {
+          console.warn(
+            '[MainFrame] Failed to read project settings:',
+            error.message
+          );
+        } finally {
+          // Only clear the ref if no newer load has been queued since.
+          if (lastProjectSettingsPromise.current === currentPromise) {
+            lastProjectSettingsPromise.current = null;
+          }
+        }
+      })();
+
+      lastProjectSettingsPromise.current = currentPromise;
+      return currentPromise;
+    },
+    [preferences, setState]
+  );
+
   const loadFromProject = React.useCallback(
     async (
       project: gdProject,
@@ -1825,7 +1874,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         // is able to save. Otherwise, it means nothing to consider this as
         // a recent file: we must wait for the user to save in a "real" storage
         // (like locally or on Google Drive).
-        if (onSaveProject) {
+        // Also skip this when running a headless CLI command (`--run-command`):
+        // such projects are opened programmatically (e.g. for automated exports)
+        // and shouldn't pollute the "recent projects" list shown in the regular UI.
+        if (onSaveProject && !Window.isRunningCommandFromCli()) {
           preferences.insertRecentProjectFile({
             fileMetadata: updatedFileMetadata,
             storageProviderName: storageProvider.internalName,
@@ -1858,6 +1910,10 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (reportProgress) reportProgress('new-extensions-started');
 
       if (reportProgress) reportProgress('new-project-state-publishing');
+      // Likewise, start reading the project's `gdevelop-settings.yaml` before
+      // exposing the project via state, so `ensureProjectSettingsApplied()`
+      // sees the pending promise as soon as the CLI useEffect fires.
+      loadProjectSettings(updatedFileMetadata);
       const state = await setState(state => ({
         ...state,
         currentProject: project,
@@ -1889,25 +1945,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         }));
         if (reportProgress) reportProgress('resources-loaded');
 
-        // Read and apply project settings from gdevelop-settings.yaml if it exists
-        try {
-          const parsedProjectSettings = await readProjectSettings(
-            updatedFileMetadata.fileIdentifier
-          );
-          if (parsedProjectSettings) {
-            applyProjectPreferences(parsedProjectSettings, preferences);
-            setState(currentState => ({
-              ...currentState,
-              toolbarButtons: parsedProjectSettings.toolbarButtons || [],
-            }));
-          }
-        } catch (error) {
-          console.warn(
-            '[MainFrame] Failed to read project settings:',
-            error.message
-          );
-        }
-
         // Apply the preview layout override stored in the project file
         // (set via "Use this scene to start all previews").
         const previewLayoutName = project.getPreviewLayout();
@@ -1935,12 +1972,14 @@ const MainFrame = (props: Props): React.MixedElement => {
       ensureResourcesAreFetched,
       authenticatedUser,
       setIsProjectClosedSoAvoidReloadingExtensions,
+      loadProjectSettings,
     ]
   );
 
   const loadFromSerializedProject = React.useCallback(
     (
       serializedProject: gdSerializerElement,
+      constants: Object,
       fileMetadata: ?FileMetadata,
       reportProgress?: (phase: string) => void
     ): Promise<State> => {
@@ -1948,6 +1987,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const startTime = Date.now();
       const newProject = gd.ProjectHelper.createNewGDJSProject();
       newProject.unserializeFrom(serializedProject);
+      newProject.setConstantsJson(JSON.stringify(constants));
       if (reportProgress) reportProgress('project-unserialized');
       const duration = Date.now() - startTime;
       console.info(`Unserialization took ${duration.toFixed(2)} ms`);
@@ -2059,6 +2099,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       try {
         await delay(50);
         let content;
+        let constants = {};
         let effectiveFileMetadata = fileMetadata;
         let openingError: Error | null = null;
         try {
@@ -2071,6 +2112,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             setLoaderModalProgress
           );
           content = result.content;
+          constants = result.constants || {};
           if (options && options.reportProgress) {
             options.reportProgress('disk-read');
           }
@@ -2084,6 +2126,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           if (autoSaveAfterFailureFileMetadata) {
             const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
+            constants = result.constants || {};
           }
         } finally {
           setIsLoadingProject(false);
@@ -2106,8 +2149,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         try {
           const state = loadFromSerializedProject(
             serializedProject,
+            constants,
             // Autosaves keep the originally requested metadata. A storage adapter may
-            // explicitly redirect a migrated legacy project to project.settings.
+            // explicitly redirect a migrated legacy project to project.gdevelop.
             effectiveFileMetadata,
             options && options.reportProgress
           );
@@ -2305,6 +2349,19 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     []
   );
+
+  const openProjectVariablesFromSwitcher = React.useCallback(() => {
+    const projectManager = projectManagerRef.current;
+    if (projectManager) {
+      projectManager.openProjectVariables();
+      return;
+    }
+
+    setTimeout(() => {
+      const projectManager = projectManagerRef.current;
+      if (projectManager) projectManager.openProjectVariables();
+    }, 0);
+  }, []);
 
   const createProjectItemFromSwitcher = React.useCallback(
     (itemKind: ProjectManagerCreateItemKind) => {
@@ -2649,80 +2706,33 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
-  // Pre-existing: recreated each render by design; not part of this change.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onWillInstallExtension = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) return;
+  const onWillInstallExtension = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
 
-    for (const extensionName of extensionNames) {
-      // Close the extension tab before updating/reinstalling the extension.
-      // This is especially important when the extension tab in selected.
-      const eventsFunctionsExtensionName = extensionName;
+      for (const extensionName of extensionNames) {
+        // Close the extension tab before updating/reinstalling the extension.
+        // This is especially important when the extension tab in selected.
+        const eventsFunctionsExtensionName = extensionName;
 
-      if (
-        currentProject.hasEventsFunctionsExtensionNamed(
-          eventsFunctionsExtensionName
-        )
-      ) {
-        setState(state => ({
-          ...state,
-          editorTabs: closeEventsFunctionsExtensionTabs(
-            state.editorTabs,
+        if (
+          currentProject.hasEventsFunctionsExtensionNamed(
             eventsFunctionsExtensionName
-          ),
-        }));
+          )
+        ) {
+          setState(state => ({
+            ...state,
+            editorTabs: closeEventsFunctionsExtensionTabs(
+              state.editorTabs,
+              eventsFunctionsExtensionName
+            ),
+          }));
+        }
       }
-    }
-  };
-
-  // Pre-existing: recreated each render by design; not part of this change.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onExtensionInstalled = (extensionNames: Array<string>) => {
-    const { currentProject } = state;
-    if (!currentProject) {
-      return;
-    }
-    let hasEventsBasedObject = false;
-    for (const extensionName of extensionNames) {
-      const eventsBasedObjects = currentProject
-        .getEventsFunctionsExtension(extensionName)
-        .getEventsBasedObjects();
-      for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
-        const eventsBasedObject = eventsBasedObjects.getAt(index);
-        gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
-          currentProject,
-          eventsBasedObject
-        );
-      }
-
-      // Close extension tab because `onInstallExtension` is not necessarily
-      // called when the extension tab is not selected.
-
-      // TODO Open the closed tabs back
-      // It would be safer to close the tabs before the extension is installed
-      // but it would make opening them back more complicated.
-      setState(state => ({
-        ...state,
-        editorTabs: closeEventsFunctionsExtensionTabs(
-          state.editorTabs,
-          extensionName
-        ),
-      }));
-
-      hasEventsBasedObject =
-        hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
-    }
-    if (hasEventsBasedObject) {
-      notifyChangesToInGameEditor({
-        shouldReloadProjectData: true,
-        shouldReloadLibraries: true,
-        shouldReloadResources: false,
-        shouldHardReload: false,
-        reasons: ['installed-extension-with-custom-object'],
-      });
-    }
-  };
+    },
+    [state.currentProject, setState]
+  );
 
   const notifyChangesToInGameEditor = React.useCallback(
     (hotReloadSteps: HotReloadSteps) => {
@@ -2743,6 +2753,77 @@ const MainFrame = (props: Props): React.MixedElement => {
       }
     },
     [state.editorTabs]
+  );
+
+  const onExtensionInstalled = React.useCallback(
+    (extensionNames: Array<string>) => {
+      const currentProject = state.currentProject;
+      if (!currentProject) {
+        return;
+      }
+      let hasEventsBasedObject = false;
+      for (const extensionName of extensionNames) {
+        const eventsBasedObjects = currentProject
+          .getEventsFunctionsExtension(extensionName)
+          .getEventsBasedObjects();
+        for (let index = 0; index < eventsBasedObjects.getCount(); index++) {
+          const eventsBasedObject = eventsBasedObjects.getAt(index);
+          gd.EventsBasedObjectVariantHelper.complyVariantsToEventsBasedObject(
+            currentProject,
+            eventsBasedObject
+          );
+        }
+
+        // Close extension tab because `onInstallExtension` is not necessarily
+        // called when the extension tab is not selected.
+
+        // TODO Open the closed tabs back
+        // It would be safer to close the tabs before the extension is installed
+        // but it would make opening them back more complicated.
+        setState(state => ({
+          ...state,
+          editorTabs: closeEventsFunctionsExtensionTabs(
+            state.editorTabs,
+            extensionName
+          ),
+        }));
+
+        hasEventsBasedObject =
+          hasEventsBasedObject || eventsBasedObjects.getCount() > 0;
+      }
+      if (hasEventsBasedObject) {
+        notifyChangesToInGameEditor({
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          reasons: ['installed-extension-with-custom-object'],
+        });
+      }
+    },
+    [state.currentProject, notifyChangesToInGameEditor, setState]
+  );
+
+  const importExtension = useImportExtension();
+
+  const onImportExtension = React.useCallback(
+    async () => {
+      const currentProject = state.currentProject;
+      if (!currentProject) return;
+      await importExtension({
+        i18n,
+        project: currentProject,
+        onWillInstallExtension,
+        onExtensionInstalled,
+      });
+    },
+    [
+      state.currentProject,
+      importExtension,
+      i18n,
+      onWillInstallExtension,
+      onExtensionInstalled,
+    ]
   );
 
   const triggerHotReloadInGameEditorIfNeeded = React.useCallback(
@@ -3360,7 +3441,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       let serializedProject: ?gdSerializerElement = null;
       let previewProject: ?gdProject = null;
       try {
-        const { content } = await onOpen(fileMetadata);
+        const { content, constants = {} } = await onOpen(fileMetadata);
         if (!verifyProjectContent(i18n, content)) {
           return null;
         }
@@ -3368,6 +3449,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         serializedProject = gd.Serializer.fromJSObject(content);
         previewProject = gd.ProjectHelper.createNewGDJSProject();
         previewProject.unserializeFrom(serializedProject);
+        previewProject.setConstantsJson(JSON.stringify(constants));
         previewProject.setProjectFile(fileMetadata.fileIdentifier);
         return previewProject;
       } catch (error) {
@@ -4321,7 +4403,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     stickyNotes.createNote({ showManager: false });
   }, []);
 
-  const openStaticData = React.useCallback(
+  const openConstants = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -4330,27 +4412,16 @@ const MainFrame = (props: Props): React.MixedElement => {
             state.editorTabs,
             // $FlowFixMe[incompatible-type]
             getEditorOpeningOptions({
-              kind: 'static-data',
+              kind: 'constants',
               name: '',
               dontFocusTab: true,
             })
           ),
-          'static-data'
+          'constants'
         ),
       }));
     },
     [getEditorOpeningOptions, setState]
-  );
-
-  const openObjectSettings = React.useCallback(
-    () => {
-      if (!currentProject) return;
-      setObjectSettingsWindowState(previousState => ({
-        projectPtr: currentProject.ptr,
-        focusRequestId: previousState.focusRequestId + 1,
-      }));
-    },
-    [currentProject]
   );
 
   const openGlobalSearch = React.useCallback(
@@ -6259,24 +6330,24 @@ const MainFrame = (props: Props): React.MixedElement => {
     [saveProject]
   );
 
-  const autoSaveStaticData = React.useCallback(
-    async (staticData: Object): Promise<boolean> => {
+  const autoSaveConstants = React.useCallback(
+    async (constants: Object): Promise<boolean> => {
       if (!currentProject || !currentFileMetadata) return false;
 
-      const { onAutoSaveStaticData } = getStorageProviderOperations();
-      if (!onAutoSaveStaticData) return false;
+      const { onAutoSaveConstants } = getStorageProviderOperations();
+      if (!onAutoSaveConstants) return false;
 
       try {
         const projectFile = currentProject.getProjectFile();
-        const staticDataFileMetadata = projectFile
+        const constantsFileMetadata = projectFile
           ? { ...currentFileMetadata, fileIdentifier: projectFile }
           : currentFileMetadata;
-        return await onAutoSaveStaticData(staticData, staticDataFileMetadata);
+        return await onAutoSaveConstants(constants, constantsFileMetadata);
       } catch (error) {
-        console.error('Unable to auto-save Static Data:', error);
+        console.error('Unable to auto-save Constants:', error);
         _showSnackMessage(
           i18n._(
-            t`Static Data could not be written to static-data.toml. Use the project Save button to try again.`
+            t`Constants could not be written to constants.toml. Use the project Save button to try again.`
           ),
           null
         );
@@ -7069,18 +7140,18 @@ const MainFrame = (props: Props): React.MixedElement => {
       openStickyNotesManager
     );
     addRecentEditorSwitcherSideMenuItem(
-      'static-data',
-      i18n._(t`Static Data`),
+      'constants',
+      i18n._(t`Constants`),
       i18n._(t`Game settings`),
-      <StaticDataIcon />,
-      openStaticData
+      <ConstantsIcon />,
+      openConstants
     );
     addRecentEditorSwitcherSideMenuItem(
       globalVariablesItemId,
       i18n._(t`Global variables`),
       i18n._(t`Globals`),
       <GlobalVariableIcon />,
-      () => activateProjectManagerItemFromSwitcher(globalVariablesItemId)
+      openProjectVariablesFromSwitcher
     );
     addRecentEditorSwitcherSideMenuItem(
       globalObjectsItemId,
@@ -7413,12 +7484,30 @@ const MainFrame = (props: Props): React.MixedElement => {
     onRestartInGameEditor,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenMemoryTrackerRegistry: () => setMemoryTrackedRegistryDialogOpen(true),
+    onImportExtension,
+    canInstallCliInPath: isCliInPathInstallSupported(),
+    onInstallCliInPath: async () => {
+      const result = await installCliInPath();
+      // Main-process message isn't localized but carries OS-specific nuance
+      // (e.g. "open a new terminal" on Windows) that a generic string would drop.
+      _showSnackMessage(
+        result.status === 'success'
+          ? result.message
+          : i18n._(t`Couldn't set up the GDevelop CLI: ${result.message}`)
+      );
+    },
   });
 
   useCliCommandRunner({
     project: currentProject,
     i18n,
+    fileIdentifier,
     commandPaletteRef,
+    importExtension,
+    onWillInstallExtension,
+    onExtensionInstalled,
+    saveProject,
+    ensureProjectSettingsApplied,
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -7432,6 +7521,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     }),
     [
       resourceSources,
@@ -7443,6 +7533,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       canInstallPrivateAsset,
       onNewResourcesAdded,
       onResourceUsageChanged,
+      resourceCustomPropertyConfigs,
     ]
   );
 
@@ -7659,12 +7750,19 @@ const MainFrame = (props: Props): React.MixedElement => {
           });
           reportReloadProgress('editor-loaded');
           const reloadedProject = currentProjectRef.current;
+          const reloadedProjectFile = reloadedProject
+            ? reloadedProject.getProjectFile()
+            : '';
           const isLocalMultiFileProject =
             storageProviderName === localFileStorageProviderInternalName &&
             !!reloadedProject &&
-            /(?:^|[\\/])project\.settings$/i.test(
-              reloadedProject.getProjectFile()
-            );
+            (reloadedProjectFile.toLowerCase() === MULTI_FILE_ENTRY_NAME ||
+              reloadedProjectFile
+                .toLowerCase()
+                .endsWith(`/${MULTI_FILE_ENTRY_NAME}`) ||
+              reloadedProjectFile
+                .toLowerCase()
+                .endsWith(`\\${MULTI_FILE_ENTRY_NAME}`));
           if (!isLocalMultiFileProject || !reloadedProject) {
             return {
               reloaded: true,
@@ -7942,6 +8040,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenProjectManager: showProjectManager,
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
+    onOpenStickyNotes: openStickyNotesManager,
     onOpenGlobalSearch: openGlobalSearch,
     onOpenAbout: () => openAboutDialog(true),
     onOpenPreferences: () => openPreferencesDialog(true),
@@ -7981,7 +8080,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     setEditorTabs: setEditorTabs,
     onFocusedEditorTabChange: selectProjectManagerItemForEditorTab,
     saveProject: saveProject,
-    autoSaveStaticData: autoSaveStaticData,
+    autoSaveConstants: autoSaveConstants,
     saveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
     onCheckoutVersion: onCheckoutVersion,
     getOrLoadProjectVersion: getOrLoadProjectVersion,
@@ -8119,9 +8218,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
       onRenameExternalEvents={renameExternalEvents}
       onOpenResources={openResources}
-      onOpenStickyNotes={openStickyNotesManager}
-      onOpenStaticData={openStaticData}
-      onOpenObjectSettings={openObjectSettings}
+      onOpenConstants={openConstants}
       onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
@@ -8131,9 +8228,6 @@ const MainFrame = (props: Props): React.MixedElement => {
       triggerHotReloadInGameEditorIfNeeded={
         triggerHotReloadInGameEditorIfNeeded
       }
-      onShareProject={() => {
-        openShareDialog();
-      }}
       isOpen={isProjectManagerVisible}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       resourceManagementProps={resourceManagementProps}
@@ -8172,7 +8266,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             onExport: () => {
               openShareDialog('publish');
             },
-            onInvalidStaticDataPlaceholder: () => {
+            onInvalidConstantPlaceholder: () => {
               setDiagnosticReportDialogOpen(true);
             },
             onCaptureFinished,
@@ -8291,38 +8385,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         onPopIn={onPopInTab}
         focusRequest={poppedOutEditorFocusRequest}
       />
-      {currentProject &&
-        objectSettingsWindowState.projectPtr === currentProject.ptr && (
-          <ObjectSettingsWorkbenchWindow
-            key={`object-settings-window-${currentProject.ptr}`}
-            project={currentProject}
-            unsavedChanges={unsavedChanges}
-            resourceManagementProps={resourceManagementProps}
-            onWillInstallExtension={onWillInstallExtension}
-            onExtensionInstalled={onExtensionInstalled}
-            onOpenEventBasedObjectEditor={onOpenEventBasedObjectEditor}
-            onOpenEventBasedObjectVariantEditor={
-              onOpenEventBasedObjectVariantEditor
-            }
-            onDeleteEventsBasedObjectVariant={deleteEventsBasedObjectVariant}
-            onGlobalObjectEdited={onGlobalObjectEdited}
-            onSceneObjectEdited={onSceneObjectEdited}
-            onEventsBasedObjectChildrenEdited={
-              onEventsBasedObjectChildrenEdited
-            }
-            onObjectListsModified={onObjectListsModified}
-            triggerHotReloadInGameEditorIfNeeded={
-              triggerHotReloadInGameEditorIfNeeded
-            }
-            focusRequestId={objectSettingsWindowState.focusRequestId}
-            onClose={() =>
-              setObjectSettingsWindowState(previousState => ({
-                projectPtr: null,
-                focusRequestId: previousState.focusRequestId,
-              }))
-            }
-          />
-        )}
       {currentProject && standalonePrefabSettingsDialog && (
         <PrefabDetailEditor
           key={`prefab-settings-dialog-${

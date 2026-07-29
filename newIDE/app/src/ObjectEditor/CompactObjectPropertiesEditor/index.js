@@ -10,13 +10,12 @@ import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpress
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
-import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
 import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
-import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
+import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import Paper from '../../UI/Paper';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
@@ -25,15 +24,16 @@ import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
-import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
 import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
@@ -46,8 +46,13 @@ import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import Link from '../../UI/Link';
 import {
   getVariantName,
+  isVariantEditable,
+  duplicateVariant,
+  deleteVariant,
   ChildrenOverridingDepreciationAlert,
 } from '../Editors/CustomObjectPropertiesEditor';
+import NewVariantDialog from '../Editors/CustomObjectPropertiesEditor/NewVariantDialog';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertiesEditor/CompactEffectsListEditor';
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
@@ -59,7 +64,7 @@ import {
   type FieldChoices,
 } from '../../PropertiesEditor/PropertiesEditorSchema';
 import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
-import SingleBehaviorHost from '../../BehaviorsEditor/SingleBehaviorHost';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 
 const gd: libGDevelop = global.gd;
 
@@ -158,67 +163,6 @@ export const CollapsibleSubPanel = ({
   </Paper>
 );
 
-export const TopLevelCollapsibleSection = ({
-  title,
-  isFolded,
-  toggleFolded,
-  renderContent,
-  renderContentAsHiddenWhenFolded,
-  noContentMargin,
-  onOpenFullEditor,
-  onAdd,
-}: {|
-  title: React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  renderContent: () => React.Node,
-  renderContentAsHiddenWhenFolded?: boolean,
-  noContentMargin?: boolean,
-  onOpenFullEditor?: () => void,
-  onAdd?: (() => void) | null,
-|}): React.Node => (
-  <>
-    <Separator />
-    <Column noOverflowParent>
-      <LineStackLayout alignItems="center" justifyContent="space-between">
-        <LineStackLayout noMargin alignItems="center">
-          <IconButton size="small" onClick={toggleFolded}>
-            {isFolded ? (
-              <ChevronArrowRightWithRoundedBorder style={styles.icon} />
-            ) : (
-              <ChevronArrowDownWithRoundedBorder style={styles.icon} />
-            )}
-          </IconButton>
-          <Text size="sub-title" noMargin style={textEllipsisStyle}>
-            {title}
-          </Text>
-        </LineStackLayout>
-        <Line alignItems="center" noMargin>
-          {onOpenFullEditor && (
-            <IconButton size="small" onClick={onOpenFullEditor}>
-              <ShareExternal style={styles.icon} />
-            </IconButton>
-          )}
-          {onAdd && (
-            <IconButton size="small" onClick={onAdd}>
-              <Add style={styles.icon} />
-            </IconButton>
-          )}
-        </Line>
-      </LineStackLayout>
-    </Column>
-    <Column noMargin={noContentMargin}>
-      {isFolded ? (
-        renderContentAsHiddenWhenFolded ? (
-          <div style={styles.hiddenContent}>{renderContent()}</div>
-        ) : null
-      ) : (
-        renderContent()
-      )}
-    </Column>
-  </>
-);
-
 const resourcesPreloadingFieldChoices: Array<FieldChoices> = [
   {
     value: 'with-scene',
@@ -312,6 +256,8 @@ export const CompactObjectPropertiesEditorContent = ({
   onEditObject,
   onObjectsModified,
   onEffectAdded,
+  onOpenEventBasedObjectVariantEditor,
+  onDeleteEventsBasedObjectVariant,
   onWillInstallExtension,
   onExtensionInstalled,
   isVariableListLocked,
@@ -319,9 +265,12 @@ export const CompactObjectPropertiesEditorContent = ({
   expand = true,
 }: ContentProps): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
-  const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
+  const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
+  const [
+    duplicateAndEditVariantDialogOpen,
+    setDuplicateAndEditVariantDialogOpen,
+  ] = React.useState(false);
+  const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
   const variablesContainer = exceptionallyGuardAgainstDeadObject(
@@ -394,6 +343,16 @@ export const CompactObjectPropertiesEditorContent = ({
     ? customObjectEventsBasedObject.getFullName() ||
       customObjectEventsBasedObject.getName()
     : '';
+  const customObjectExtensionName = customObjectConfiguration
+    ? gd.PlatformExtension.getExtensionFromFullObjectType(
+        customObjectConfiguration.getType()
+      )
+    : null;
+  const customObjectExtension =
+    customObjectExtensionName &&
+    project.hasEventsFunctionsExtensionNamed(customObjectExtensionName)
+      ? project.getEventsFunctionsExtension(customObjectExtensionName)
+      : null;
 
   const shouldDisplayEventsBasedObjectChildren =
     customObjectConfiguration &&
@@ -410,6 +369,122 @@ export const CompactObjectPropertiesEditorContent = ({
     () => onEditObject(object, 'properties'),
     [object, onEditObject]
   );
+
+  const editVariant = React.useCallback(
+    () => {
+      if (
+        !isVariantEditable(
+          customObjectConfiguration,
+          customObjectEventsBasedObject,
+          customObjectExtension
+        )
+      ) {
+        setDuplicateAndEditVariantDialogOpen(true);
+        return;
+      }
+      customObjectExtension &&
+        customObjectEventsBasedObject &&
+        customObjectConfiguration &&
+        onOpenEventBasedObjectVariantEditor &&
+        onOpenEventBasedObjectVariantEditor(
+          customObjectExtension.getName(),
+          customObjectEventsBasedObject.getName(),
+          customObjectConfiguration.getVariantName()
+        );
+    },
+    [
+      customObjectConfiguration,
+      onOpenEventBasedObjectVariantEditor,
+      customObjectExtension,
+      customObjectEventsBasedObject,
+    ]
+  );
+
+  const doDuplicateVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setNewVariantDialogOpen(false);
+      forceUpdate();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+    ]
+  );
+
+  const duplicateAndEditVariant = React.useCallback(
+    (i18n: I18nType, newName: string) => {
+      duplicateVariant(
+        newName,
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        i18n
+      );
+      setDuplicateAndEditVariantDialogOpen(false);
+      forceUpdate();
+      editVariant();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      customObjectExtension,
+      forceUpdate,
+      project,
+      editVariant,
+    ]
+  );
+
+  const doDeleteVariant = React.useCallback(
+    async () => {
+      const hasConfirmedDeletion = await showDeleteConfirmation({
+        title: t`Remove variant`,
+        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
+      });
+      if (!hasConfirmedDeletion) {
+        return;
+      }
+      deleteVariant(
+        customObjectConfiguration,
+        customObjectEventsBasedObject,
+        customObjectExtension,
+        project,
+        onDeleteEventsBasedObjectVariant
+      );
+      forceUpdate();
+    },
+    [
+      customObjectConfiguration,
+      customObjectEventsBasedObject,
+      forceUpdate,
+      onDeleteEventsBasedObjectVariant,
+      project,
+      customObjectExtension,
+      showDeleteConfirmation,
+    ]
+  );
+
+  const persistedPanelStateId = object.getPersistentUuid();
+  const {
+    isSectionFolded,
+    setSectionFolded,
+    toggleSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'object',
+  });
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
   const { onVariablesUpdated } = useVariablesContainerRefactoring({
@@ -512,17 +587,43 @@ export const CompactObjectPropertiesEditorContent = ({
         </ColumnStackLayout>
         <TopLevelCollapsibleSection
           title={<Trans>Properties</Trans>}
-          isFolded={isPropertiesFolded}
-          toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
+          isFolded={isSectionFolded('properties')}
+          toggleFolded={() => toggleSectionFolded('properties')}
           onOpenFullEditor={openFullEditor}
           renderContent={() => (
             <ColumnStackLayout noMargin noOverflowParent>
               {shouldDisplayVariant && (
                 <ColumnStackLayout noMargin noOverflowParent>
-                  <Text size="body" noMargin>
-                    <Trans>Variant</Trans>
-                    {prefabName ? ` - ${prefabName}` : null}
-                  </Text>
+                  <LineStackLayout noMargin justifyContent="space-between">
+                    <Text size="body" noMargin>
+                      <Trans>Variant</Trans>
+                      {prefabName ? ` - ${prefabName}` : null}
+                    </Text>
+                    <LineStackLayout noMargin>
+                      <IconButton
+                        key={'delete-variant'}
+                        size="small"
+                        onClick={doDeleteVariant}
+                        disabled={!variantName}
+                      >
+                        <Trash style={styles.icon} />
+                      </IconButton>
+                      <IconButton
+                        key={'duplicate-variant'}
+                        size="small"
+                        onClick={() => setNewVariantDialogOpen(true)}
+                      >
+                        <Add style={styles.icon} />
+                      </IconButton>
+                      <IconButton
+                        key={'edit-variant'}
+                        size="small"
+                        onClick={editVariant}
+                      >
+                        <Edit style={styles.icon} />
+                      </IconButton>
+                    </LineStackLayout>
+                  </LineStackLayout>
                   <CompactSelectField
                     key={'variant-name'}
                     value={variantName}
@@ -639,8 +740,8 @@ export const CompactObjectPropertiesEditorContent = ({
         />
         <TopLevelCollapsibleSection
           title={<Trans>Behaviors</Trans>}
-          isFolded={isBehaviorsFolded}
-          toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+          isFolded={isSectionFolded('behaviors')}
+          toggleFolded={() => toggleSectionFolded('behaviors')}
           onOpenFullEditor={() => onEditObject(object, 'behaviors')}
           onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
           renderContent={() => (
@@ -666,13 +767,17 @@ export const CompactObjectPropertiesEditorContent = ({
                   behaviorTypeName
                 );
                 const iconUrl = behaviorMetadata.getIconFilename();
+                const CompactBehaviorComponent = CompactBehaviorsEditorService.getEditor(
+                  behaviorTypeName
+                );
                 return (
                   <CollapsibleSubPanel
                     key={behavior.ptr}
                     renderContent={() => (
-                      <SingleBehaviorHost
+                      <CompactBehaviorComponent
                         project={project}
-                        behavior={behavior}
+                        behaviorTypeName={behaviorTypeName}
+                        behaviors={[behavior]}
                         object={object}
                         layersContainer={layersContainer}
                         onBehaviorUpdated={() => {}}
@@ -716,8 +821,8 @@ export const CompactObjectPropertiesEditorContent = ({
         {variablesContainer && (
           <TopLevelCollapsibleSection
             title={<Trans>Object Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
+            isFolded={isSectionFolded('variables')}
+            toggleFolded={() => toggleSectionFolded('variables')}
             onOpenFullEditor={() => onEditObject(object, 'variables')}
             onAdd={
               isVariableListLocked
@@ -726,7 +831,7 @@ export const CompactObjectPropertiesEditorContent = ({
                     if (variablesListRef.current) {
                       variablesListRef.current.addVariable();
                     }
-                    setIsVariablesFolded(false);
+                    setSectionFolded('variables', false);
                   }
             }
             renderContentAsHiddenWhenFolded={
@@ -791,10 +896,30 @@ export const CompactObjectPropertiesEditorContent = ({
               onEffectsUpdated={() => onObjectsModified([object])}
               onOpenFullEditor={() => onEditObject(object, 'effects')}
               onEffectAdded={onEffectAdded}
+              persistedPanelStateId={persistedPanelStateId}
             />
           )}
       </Column>
       {newBehaviorDialog}
+      {newVariantDialogOpen && customObjectEventsBasedObject && (
+        <NewVariantDialog
+          initialName={variantName || i18n._(t`New variant`)}
+          onApply={name => doDuplicateVariant(i18n, name)}
+          onCancel={() => {
+            setNewVariantDialogOpen(false);
+          }}
+        />
+      )}
+      {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
+        <NewVariantDialog
+          isDuplicationBeforeEdition
+          initialName={variantName || i18n._(t`New variant`)}
+          onApply={name => duplicateAndEditVariant(i18n, name)}
+          onCancel={() => {
+            setDuplicateAndEditVariantDialogOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };
@@ -806,14 +931,14 @@ export const CompactObjectPropertiesEditor = (props: Props): React.Node => {
   const scrollKey = objects
     .map((instance: gdObject) => '' + instance.ptr)
     .join(';');
-  const persistedScrollId = object.getPersistentUuid();
+  const persistedPanelStateId = object.getPersistentUuid();
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'object',
+    persistedPanelStateId,
+    persistedPanelStateType: 'object',
   });
 
   return (

@@ -18,6 +18,7 @@ import {
 import { serializeToJSON, unserializeFromJSObject } from '../Utils/Serializer';
 import { mapFor } from '../Utils/MapFor';
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
+import { keyNames, keyAliases } from '../Utils/KeyboardKeyNames';
 import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
@@ -430,9 +431,9 @@ const describeBehaviorParameterHint = (behaviorType: ?string): string => {
     }". Fill the behavior NAME (not the type), no quotes.`;
   }
   if (behaviorType) {
-    return `behavior NAME on the object for type "${behaviorType}" (not the type itself), no quotes. Use list_available_behaviors with object_name to see the object's behavior names.`;
+    return `behavior NAME on the object for type "${behaviorType}" (not the type itself), no quotes. Read the object's project source and the generated settings catalog to find its behavior names.`;
   }
-  return `behavior NAME on the object (not the behavior type), no quotes. Use list_available_behaviors with object_name to see the names.`;
+  return `behavior NAME on the object (not the behavior type), no quotes. Read the object's project source and the generated settings catalog to find the names.`;
 };
 
 // Enumerated parameter types whose legal literal values are a FIXED small set
@@ -471,6 +472,9 @@ const acceptedValuesForParameter = (
   }
   if (parameterType === 'yesorno') return ['yes', 'no'];
   if (parameterType === 'trueorfalse') return ['True', 'False'];
+  if (parameterType === 'keyboardKey') {
+    return [...keyNames, ...keyAliases];
+  }
   return null;
 };
 
@@ -709,7 +713,7 @@ const getDeprecatedInstructionDiagnostic = ({
     : null;
   const suggestion =
     [deprecationMessage, replacementSuggestion].filter(Boolean).join(' ') ||
-    `Use gdevelop_search_instruction_metadata with kind "${kind}" and query "${metadata.getFullName() ||
+    `Search .gdevelop/instructions-catalog.json for kind "${kind}" and "${metadata.getFullName() ||
       type}" to find a current replacement.`;
 
   return {
@@ -992,7 +996,7 @@ export const getEventOperationReference = (): Object => ({
   targetPathFormat:
     'Use event-0 for the first root event, event-0.1 for the second sub-event of the first root event, or an aiGeneratedEventId previously assigned by GDevelop.',
   generatedEventsFormat:
-    'generated_events can be a JSON string, a serialized events array, a single serialized event object, or { events: [...] }. A Group event object with type and events is treated as one event; { events: [...] } is only a wrapper when there is no type. The same value can also be passed as events_json when using add_scene_events.',
+    'generated_events can be a JSON string, a serialized events array, a single serialized event object, or { events: [...] }. A Group event object with type and events is treated as one event; { events: [...] } is only a wrapper when there is no type.',
   operations: [
     {
       name: 'insert_at_end',
@@ -1396,7 +1400,7 @@ export const getEventsJsonExamples = ({
     {
       name: 'Capability-behavior actions (set text / opacity / animation)',
       purpose:
-        'How to write the hidden capability-behavior actions that are hard to discover by search. Parameters are [objectName, behaviorName, operator, value]: the behaviorName is "Text"/"Opacity"/"Animation", the operator is usually "=", and string values are quoted (e.g. "Game Over"), numbers are bare (e.g. 180). See also gdevelop_search_instruction_metadata commonTaskHints.',
+        'How to write the hidden capability-behavior actions that are hard to discover by search. Parameters are [objectName, behaviorName, operator, value]: the behaviorName is "Text"/"Opacity"/"Animation", the operator is usually "=", and string values are quoted (e.g. "Game Over"), numbers are bare (e.g. 180). See the generated instructions catalog for current parameter metadata.',
       events_json: JSON.stringify(capabilityActionsEventExample, null, 2),
     },
     {
@@ -1456,8 +1460,8 @@ export const getEventsJsonExamples = ({
   return {
     eventJsonShape:
       'Serialized scene events are a JSON array. A standard event uses type "BuiltinCommonInstructions::Standard", conditions: [{ type: { value: "<condition type>" }, parameters: [...] }], actions: [{ type: { value: "<action type>" }, parameters: [...] }], and optional nested events: [...].',
-    addSceneEventsShape:
-      'For add_scene_events, pass { scene_name, events_json } for append-at-end, or { scene_name, event_changes: [{ operation_name, operation_target_event, generated_events }] } for precise edits.',
+    projectFileEventsShape:
+      'Author scene events in the canonical project .events source files, following the generated instructions catalog and existing event serialization shape.',
     // Quoting and expression-syntax rules. These are the most common cause of
     // parameter validation failures.
     parameterSyntaxRules: {
@@ -1494,7 +1498,7 @@ export const getEventsJsonExamples = ({
     },
     commonInstructionTypes: {
       summary:
-        'Common current GDevelop internal instruction types (verify parameter order with gdevelop_get_instruction_metadata):',
+        'Common current GDevelop internal instruction types (verify parameter order with .gdevelop/instructions-catalog.json):',
       setObjectPositionX: 'SetX (action)',
       setObjectPositionY: 'SetY (action)',
       setObjectPosition: 'SetXY (action)',
@@ -1632,7 +1636,7 @@ export const getExactInstructionMetadata = ({
     const rawMetadata = getRawInstructionMetadata(project, type, kind);
     if (!rawMetadata) {
       return {
-        error: `No ${kind} metadata found for "${type}". Use gdevelop_search_instruction_metadata first to find exact types.`,
+        error: `No ${kind} metadata found for "${type}". Search .gdevelop/instructions-catalog.json for the exact type.`,
       };
     }
     if (isDeprecatedOrHiddenInstructionMetadata(rawMetadata)) {
@@ -1655,7 +1659,7 @@ export const getExactInstructionMetadata = ({
   );
   if (!metadata) {
     return {
-      error: `No ${kind} metadata found for "${type}". Use gdevelop_search_instruction_metadata first to find exact types.`,
+      error: `No ${kind} metadata found for "${type}". Search .gdevelop/instructions-catalog.json for the exact type.`,
     };
   }
   return {
@@ -2164,7 +2168,7 @@ export const buildInstruction = ({
   );
   if (!metadata) {
     throw new Error(
-      `Unknown ${kind} type "${type}". Use gdevelop_search_instruction_metadata to find the exact type.`
+      `Unknown ${kind} type "${type}". Search .gdevelop/instructions-catalog.json for the exact type.`
     );
   }
   if (isDeprecatedOrHiddenInstructionMetadata(metadata)) {
@@ -2773,7 +2777,7 @@ const withActionableSuggestion = (issue: Object): Object => {
         issue.relatedBehaviorParameterIndex
       } contains "${
         issue.relatedBehaviorParameterValue
-      }", which looks like a behavior TYPE. Behavior parameters take the behavior NAME on the object (e.g. "PlatformerObject"), not the type. Use inspect_object_properties to see the object's behavior names, or list_available_behaviors for the default name.`,
+      }", which looks like a behavior TYPE. Behavior parameters take the behavior NAME on the object (e.g. "PlatformerObject"), not the type. Read the object source and generated settings catalog for the configured behavior name.`,
     };
   }
 
@@ -2842,7 +2846,7 @@ const withActionableSuggestion = (issue: Object): Object => {
       ...issue,
       suggestion: `Parameter ${
         issue.parameterIndex
-      } expects a behavior NAME (the instance name on the object, e.g. "PlatformerObject"), not the behavior type, and without quotes. Use inspect_object_properties to see the names.`,
+      } expects a behavior NAME (the instance name on the object, e.g. "PlatformerObject"), not the behavior type, and without quotes. Read the object source and generated settings catalog to see the names.`,
     };
   }
 
@@ -2857,34 +2861,35 @@ const withActionableSuggestion = (issue: Object): Object => {
         ...issue,
         suggestion: `Variable "${value}" is ${
           issue.undeclaredVariable ? 'not declared' : 'likely not declared'
-        } in this scope. Declare it first with add_or_edit_variable (scene/global/object), or use the add_scene_events event_changes path with undeclared_variables to auto-declare it. The value format (bare name) is already correct.`,
+        } in this scope. Declare it in the appropriate project source (scene/global/object) before referencing it. The value format (bare name) is already correct.`,
       };
     }
     return {
       ...issue,
       suggestion: `Parameter ${
         issue.parameterIndex
-      } expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName. If the name is correct, declare the variable first with add_or_edit_variable.`,
+      } expects a bare variable reference (no quotes). Scene/global variables are referenced by name (e.g. Score); object variables as Object.VariableName. If the name is correct, declare the variable in the appropriate project source first.`,
     };
   }
 
   if (shape === 'resource') {
+    const resourceParameterType = parameterType || 'resource';
     if (startsQuoted && value) {
       const bare = value.trim().replace(/^"+|"+$/g, '');
       return {
         ...issue,
         suggestion: `Parameter ${
           issue.parameterIndex
-        } is a resource name (${parameterType}) and must be BARE with NO quotes — this is the OPPOSITE of string parameters. You wrote ${JSON.stringify(
+        } is a resource name (${resourceParameterType}) and must be BARE with NO quotes — this is the OPPOSITE of string parameters. You wrote ${JSON.stringify(
           value
-        )}; use ${bare} instead. The resource must already exist (add it with add_or_update_resource if needed).`,
+        )}; use ${bare} instead. The resource must already exist in resources.settings.`,
       };
     }
     return {
       ...issue,
       suggestion: `Parameter ${
         issue.parameterIndex
-      } is a resource name (${parameterType}): pass the BARE resource name with NO quotes (e.g. Shoot, not "Shoot"). The resource must already exist — add it with add_or_update_resource if needed.`,
+      } is a resource name (${resourceParameterType}): pass the BARE resource name with NO quotes (e.g. Shoot, not "Shoot"). The resource must already exist in resources.settings.`,
     };
   }
 
@@ -2904,13 +2909,13 @@ const withActionableSuggestion = (issue: Object): Object => {
       ...issue,
       suggestion: `If this parameter expects a text/string expression, wrap the literal in quotes (e.g. ${JSON.stringify(
         value
-      )}). If it expects an object/behavior/variable name or a number, leave it unquoted. Confirm with gdevelop_get_instruction_metadata.`,
+      )}). If it expects an object/behavior/variable name or a number, leave it unquoted. Confirm with .gdevelop/instructions-catalog.json.`,
     };
   }
   return {
     ...issue,
     suggestion:
-      'Check the exact parameter type/order with gdevelop_get_instruction_metadata, then rewrite this parameter for that type.',
+      'Check the exact parameter type/order in .gdevelop/instructions-catalog.json, then rewrite this parameter for that type.',
   };
 };
 

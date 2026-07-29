@@ -225,6 +225,8 @@ namespace gdjs {
     private _threePlaneMaterial: THREE.ShaderMaterial | null = null;
     private _threePlaneMesh: THREE.Mesh | null = null;
     private _threePlaneMeshDebugOutline: THREE.LineSegments | null = null;
+    private _rejected3DRendererObjectCount: integer = 0;
+    private _didWarnAboutRejected3DRendererObject: boolean = false;
 
     /**
      * Pixi doesn't sort children with zIndex == 0.
@@ -744,10 +746,10 @@ namespace gdjs {
 
       // Map tiltCos ∈ [hardCos, freeCos] to w ∈ [1, 0]
       let w = 0;
-      if (tiltCos <= hardCos)
-        w = 1; // fully clamped
-      else if (tiltCos >= freeCos)
-        w = 0; // no clamp
+      if (tiltCos <= hardCos) w = 1;
+      // fully clamped
+      else if (tiltCos >= freeCos) w = 0;
+      // no clamp
       else w = (freeCos - tiltCos) / (freeCos - hardCos);
 
       // Ease it
@@ -1231,7 +1233,17 @@ namespace gdjs {
     }
 
     add3DRendererObject(object: THREE.Object3D): void {
-      if (!this._threeGroup) return;
+      if (!this._threeGroup) {
+        this._rejected3DRendererObjectCount++;
+        if (!this._didWarnAboutRejected3DRendererObject) {
+          this._didWarnAboutRejected3DRendererObject = true;
+          console.warn(
+            `[RUNTIME_3D_RENDERER_OBJECT_REJECTED] A 3D renderer object could not be attached to layer "${this._layer.getName()}" ` +
+              `because its Three.js group is unavailable (rendering type: ${this._layer.getRenderingType()}).`
+          );
+        }
+        return;
+      }
 
       this._threeGroup.add(object);
     }
@@ -1240,6 +1252,142 @@ namespace gdjs {
       if (!this._threeGroup) return;
 
       this._threeGroup.remove(object);
+    }
+
+    /**
+     * Return a bounded, JSON-safe summary of the renderer state.
+     *
+     * Three.js and Pixi objects are intentionally never returned from this
+     * method. It is used by the runtime debugger before renderer fields are
+     * redacted from the normal object graph.
+     */
+    getRendererDebugInfo(): Object {
+      const renderingType = this._layer.getRenderingType();
+      const renderingTypeName =
+        renderingType === gdjs.RuntimeLayerRenderingType.THREE_D
+          ? '3d'
+          : renderingType === gdjs.RuntimeLayerRenderingType.TWO_D_PLUS_THREE_D
+            ? '2d+3d'
+            : '2d';
+      const maxTraversedNodes = 5000;
+      let traversedNodeCount = 0;
+      let threeMeshCount = 0;
+      let visibleThreeMeshCount = 0;
+      let truncated = false;
+      const nodesToVisit: Array<THREE.Object3D> = this._threeGroup
+        ? [this._threeGroup]
+        : [];
+      while (nodesToVisit.length > 0) {
+        if (traversedNodeCount >= maxTraversedNodes) {
+          truncated = true;
+          break;
+        }
+        const node = nodesToVisit.pop();
+        if (!node) continue;
+        traversedNodeCount++;
+        if ((node as any).isMesh) {
+          threeMeshCount++;
+          let visible = node.visible;
+          let parent = node.parent;
+          while (visible && parent && parent !== this._threeGroup) {
+            visible = parent.visible;
+            parent = parent.parent;
+          }
+          if (visible) visibleThreeMeshCount++;
+        }
+        for (let index = node.children.length - 1; index >= 0; index--) {
+          nodesToVisit.push(node.children[index]);
+        }
+      }
+
+      let camera;
+      if (this._threeCamera) {
+        const forward = this._threeCamera.getWorldDirection(
+          new THREE.Vector3()
+        );
+        const toFiniteNumberOrNull = (value: number): number | null =>
+          Number.isFinite(value) ? value : null;
+        const radiansToDegrees = (value: number): number =>
+          (value * 180) / Math.PI;
+        camera = {
+          type: this._threeCamera.type,
+          position: [
+            toFiniteNumberOrNull(this._threeCamera.position.x),
+            toFiniteNumberOrNull(this._threeCamera.position.y),
+            toFiniteNumberOrNull(this._threeCamera.position.z),
+          ],
+          rotationDegrees: [
+            toFiniteNumberOrNull(
+              radiansToDegrees(this._threeCamera.rotation.x)
+            ),
+            toFiniteNumberOrNull(
+              radiansToDegrees(this._threeCamera.rotation.y)
+            ),
+            toFiniteNumberOrNull(
+              radiansToDegrees(this._threeCamera.rotation.z)
+            ),
+          ],
+          forward: [
+            toFiniteNumberOrNull(forward.x),
+            toFiniteNumberOrNull(forward.y),
+            toFiniteNumberOrNull(forward.z),
+          ],
+          near: toFiniteNumberOrNull(this._threeCamera.near),
+          far: toFiniteNumberOrNull(this._threeCamera.far),
+          fov:
+            this._threeCamera instanceof THREE.PerspectiveCamera
+              ? toFiniteNumberOrNull(this._threeCamera.fov)
+              : undefined,
+        };
+      }
+      const imageManager = this._layer
+        .getInstanceContainer()
+        .getGame()
+        .getImageManager() as any;
+      const textureDiagnostics =
+        imageManager &&
+        typeof imageManager.getThreeTextureDebugInfo === 'function'
+          ? imageManager.getThreeTextureDebugInfo()
+          : {
+              failedTextureCount: 0,
+              returnedFailureCount: 0,
+              failures: [],
+              truncated: false,
+              limit: 0,
+            };
+
+      return {
+        layerName: this._layer.getName(),
+        renderingType: renderingTypeName,
+        configuredLightingLayer: this._layer.isConfiguredAsLightingLayer(),
+        effectiveLightingLayer: this._isLightingLayer,
+        hasThreeScene: !!this._threeScene,
+        hasThreeGroup: !!this._threeGroup,
+        hasThreeCamera: !!this._threeCamera,
+        threeSceneChildCount: this._threeScene
+          ? this._threeScene.children.length
+          : 0,
+        threeGroupChildCount: this._threeGroup
+          ? this._threeGroup.children.length
+          : 0,
+        threeMeshCount,
+        visibleThreeMeshCount,
+        rejected3DRendererObjectCount: this._rejected3DRendererObjectCount,
+        failedTextureCount: textureDiagnostics.failedTextureCount,
+        textureFailures: textureDiagnostics.failures,
+        textureFailureRegistryTruncated: textureDiagnostics.truncated,
+        effectCount: Object.keys(this._layer.getRendererEffects()).length,
+        effectComposerPassCount: this._threeEffectComposer
+          ? this._threeEffectComposer.passes.length
+          : 0,
+        fogType:
+          this._threeScene && this._threeScene.fog
+            ? (this._threeScene.fog as any).type
+            : null,
+        camera,
+        traversedNodeCount,
+        truncated,
+      };
     }
 
     updateClearColor(): void {

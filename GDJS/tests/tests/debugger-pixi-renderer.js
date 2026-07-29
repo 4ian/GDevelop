@@ -1,6 +1,46 @@
 // @ts-check
 
 describe('gdjs.DebuggerPixiRenderer', function () {
+  it('keeps explicit 3D rendering when an invalid lighting-layer flag is set', function () {
+    const warning = sinon.spy(console, 'warn');
+    const makeRuntimeScene = () => {
+      const runtimeScene = new gdjs.RuntimeScene(gdjs.getPixiRuntimeGame());
+      runtimeScene.addLayer({
+        name: 'InvalidLightingLayerForTest',
+        renderingType: '3d',
+        cameraType: 'perspective',
+        visibility: true,
+        cameras: [],
+        effects: [],
+        ambientLightColorR: 0,
+        ambientLightColorG: 0,
+        ambientLightColorB: 0,
+        isLightingLayer: true,
+        followBaseLayerCamera: false,
+      });
+      return runtimeScene;
+    };
+
+    const firstScene = makeRuntimeScene();
+    const secondScene = makeRuntimeScene();
+    try {
+      const layer = firstScene.getLayer('InvalidLightingLayerForTest');
+      expect(layer.getRenderingType()).to.be(
+        gdjs.RuntimeLayerRenderingType.THREE_D
+      );
+      expect(layer.isLightingLayer()).to.be(false);
+      expect(layer.getRenderer().getThreeGroup()).not.to.be(null);
+      expect(
+        warning.calledWithMatch('RUNTIME_3D_LIGHTING_LAYER_NORMALIZED')
+      ).to.be(true);
+      expect(warning.callCount).to.be(1);
+    } finally {
+      warning.restore();
+      firstScene._destroy();
+      secondScene._destroy();
+    }
+  });
+
   /**
    * @returns {{runtimeScene: gdjs.RuntimeScene, object: gdjs.TestRuntimeObject, layer: gdjs.RuntimeLayer}}
    */

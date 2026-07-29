@@ -5,13 +5,16 @@
 describe('gdjs.InputManager', () => {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({sceneData: {
-    layers: [{ name: '', visibility: true, effects: [] }],
-    variables: [],
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-  }, usedExtensionsWithVariablesData: []});
+  runtimeScene.loadFromScene({
+    sceneData: {
+      layers: [{ name: '', visibility: true, effects: [] }],
+      variables: [],
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    },
+    usedExtensionsWithVariablesData: [],
+  });
   const inputManager = runtimeScene.getGame().getInputManager();
   const inputTools = gdjs.evtTools.input;
 
@@ -89,6 +92,24 @@ describe('gdjs.InputManager', () => {
     expect(inputManager.wasKeyReleased(1016)).to.be(false);
 
     inputManager.onKeyReleased(17);
+  });
+
+  it('normalizes main keyboard digit aliases without changing numpad keys', () => {
+    inputManager.onKeyPressed(49);
+
+    expect(inputTools.isKeyPressed(runtimeScene, '1')).to.be(true);
+    expect(inputTools.isKeyPressed(runtimeScene, 'Digit1')).to.be(true);
+    expect(inputTools.isKeyPressed(runtimeScene, 'Num1')).to.be(true);
+    expect(inputTools.isKeyPressed(runtimeScene, 'Numpad1')).to.be(false);
+    expect(inputTools.wasKeyJustPressed(runtimeScene, '1')).to.be(true);
+    expect(inputTools.lastPressedKey(runtimeScene)).to.be('Num1');
+
+    inputManager.onKeyReleased(49);
+    inputManager.onKeyPressed(97, 3);
+    expect(inputTools.isKeyPressed(runtimeScene, 'Num1')).to.be(false);
+    expect(inputTools.isKeyPressed(runtimeScene, 'Numpad1')).to.be(true);
+    expect(inputTools.lastPressedKey(runtimeScene)).to.be('Numpad1');
+    inputManager.onKeyReleased(97, 3);
   });
 
   it('should handle mouse events', () => {
@@ -383,13 +404,16 @@ describe('gdjs.InputManager', () => {
 describe('gdjs.RuntimeObject.cursorOnObject', () => {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({sceneData: {
-    layers: [{ name: '', visibility: true, effects: [] }],
-    variables: [],
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-  }, usedExtensionsWithVariablesData: []});
+  runtimeScene.loadFromScene({
+    sceneData: {
+      layers: [{ name: '', visibility: true, effects: [] }],
+      variables: [],
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    },
+    usedExtensionsWithVariablesData: [],
+  });
 
   var object = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',

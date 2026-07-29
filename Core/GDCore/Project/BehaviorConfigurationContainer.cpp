@@ -5,13 +5,75 @@
  */
 #include "GDCore/Project/BehaviorConfigurationContainer.h"
 #include <iostream>
+#include <set>
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 
 namespace gd {
 
+namespace {
+
+void OverlaySerializerElement(gd::SerializerElement& target,
+                              const gd::SerializerElement& source) {
+  // Scalars and arrays are complete authored values. Objects can be overlaid,
+  // but a source/target type mismatch must replace the default value.
+  if (source.ConsideredAsArray() || !source.IsValueUndefined() ||
+      target.ConsideredAsArray() || !target.IsValueUndefined()) {
+    target = source;
+    return;
+  }
+
+  // Attributes and children serialize to the same JSON object. Store incoming
+  // attributes as children so their generic SerializerValue type is preserved.
+  for (const auto& attribute : source.GetAllAttributes()) {
+    target.RemoveAttribute(attribute.first);
+    target.RemoveChild(attribute.first);
+    target.AddChild(attribute.first).SetValue(attribute.second);
+  }
+
+  std::set<gd::String> processedChildNames;
+  for (const auto& childEntry : source.GetAllChildren()) {
+    const gd::String& childName = childEntry.first;
+    if (!childEntry.second ||
+        processedChildNames.find(childName) != processedChildNames.end()) {
+      continue;
+    }
+    processedChildNames.insert(childName);
+
+    const std::size_t sourceChildrenCount =
+        source.GetChildrenCount(childName);
+    const bool canRecursivelyOverlay =
+        !childName.empty() && sourceChildrenCount == 1 &&
+        !childEntry.second->ConsideredAsArray() &&
+        childEntry.second->IsValueUndefined() &&
+        target.GetChildrenCount(childName) == 1 &&
+        !target.GetChild(childName).ConsideredAsArray() &&
+        target.GetChild(childName).IsValueUndefined();
+    if (canRecursivelyOverlay) {
+      target.RemoveAttribute(childName);
+      OverlaySerializerElement(target.GetChild(childName),
+                               *childEntry.second);
+      continue;
+    }
+
+    target.RemoveAttribute(childName);
+    target.RemoveChild(childName);
+    for (const auto& replacementChild : source.GetAllChildren()) {
+      if (replacementChild.first == childName && replacementChild.second) {
+        target.AddChild(childName) = *replacementChild.second;
+      }
+    }
+  }
+}
+
+}  // namespace
+
 BehaviorConfigurationContainer::~BehaviorConfigurationContainer(){};
 
+void BehaviorConfigurationContainer::UnserializeFromWithDefaultContent(
+    const gd::SerializerElement& element) {
+  OverlaySerializerElement(content, element);
+}
 
 std::map<gd::String, gd::PropertyDescriptor> BehaviorConfigurationContainer::GetProperties() const {
   return GetProperties(content);

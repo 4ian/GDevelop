@@ -34,6 +34,7 @@ const expectedAlwaysAvailableTools = [
   'preview_health_check',
   'gdevelop_inspect_running_preview',
   'run_frames',
+  'verify_project_change',
   'simulate_preview_input',
   'control_preview',
   'set_runtime_state',
@@ -135,18 +136,19 @@ describe('McpToolCatalog', () => {
       allowCommandTools: true,
     });
     expect(Object.keys(capabilities.categories).sort()).toEqual([
-      'Author events',
       'Editor queries',
+      'Extension events',
       'Extension import',
-      'Preview debugging',
-      'Read scene / objects / events',
+      'Instruction discovery',
+      'Preview runtime',
+      'Project-file validation',
     ]);
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');
     expect(capabilities.note).toContain('settings-catalog.json');
     expect(capabilities.note).toContain('layout-catalog.json');
     expect(
-      capabilities.categories['Preview debugging'].map(tool => tool.name)
+      capabilities.categories['Project-file validation'].map(tool => tool.name)
     ).toContain('reload_project');
   });
 

@@ -269,6 +269,25 @@ describe('project source catalogs', () => {
       tomlRoot: true,
       requiredFields: [],
     });
+    const resourcesFileKind = catalog.fileKinds.find(
+      fileKind => fileKind.kind === 'resources'
+    );
+    if (!resourcesFileKind) throw new Error('Resources file kind is missing.');
+    const resourcesTable = resourcesFileKind.schema.childTables.find(
+      table => table.table === 'resources'
+    );
+    if (!resourcesTable) throw new Error('Resources table is missing.');
+    expect(
+      resourcesTable.fields.find(field => field.name === 'kind')
+    ).toMatchObject({
+      capabilitiesByValue: {
+        image: ['image-2d', 'three-texture'],
+        model3D: ['model-3d'],
+      },
+      capabilityNotes: {
+        'three-texture': expect.stringContaining('SVG'),
+      },
+    });
     expect(catalog.authoring.rules.join('\n')).toContain(
       'folder = ["Parent", "Child"]'
     );

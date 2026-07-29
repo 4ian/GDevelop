@@ -63,6 +63,10 @@ namespace gdjs {
           runtimeObject._materialType ===
           gdjs.Cube3DRuntimeObject.MaterialType.Basic,
         vertexColors: true,
+        diagnosticContext: {
+          objectName: runtimeObject.getName(),
+          faceIndex,
+        },
       });
   };
 

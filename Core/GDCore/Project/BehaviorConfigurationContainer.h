@@ -156,6 +156,17 @@ class GD_CORE_API BehaviorConfigurationContainer {
     content = element;
   };
 
+  /**
+   * \brief Overlay serialized behavior content on top of the content already
+   * initialized by the behavior extension.
+   *
+   * This is intended for ordinary behavior and shared-data deserialization.
+   * Overriding behaviors must keep using \ref UnserializeFrom because their
+   * sparse content represents inheritance.
+   */
+  void UnserializeFromWithDefaultContent(
+      const gd::SerializerElement& element);
+
   const gd::SerializerElement& GetContent() const { return content; };
   gd::SerializerElement& GetContent() { return content; };
 

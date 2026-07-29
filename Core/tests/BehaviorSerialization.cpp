@@ -13,6 +13,7 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/BehaviorConfigurationContainer.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
@@ -123,6 +124,61 @@ void CheckBehaviorProperty(ObjectsContainer &container) {
 
 // TODO EBO Add similar test cases for events-based objects.
 TEST_CASE("BehaviorSerialization", "[common]") {
+
+  SECTION("Overlay serialized behavior content on initialized defaults") {
+    gd::BehaviorConfigurationContainer container;
+    container.GetContent().AddChild("keptDefault").SetIntValue(42);
+    container.GetContent()
+        .AddChild("nested")
+        .AddChild("nestedDefault")
+        .SetStringValue("kept");
+    container.GetContent()
+        .GetChild("nested")
+        .AddChild("overridden")
+        .SetIntValue(1);
+    container.GetContent()
+        .AddChild("array")
+        .ConsiderAsArrayOf("item");
+    container.GetContent()
+        .GetChild("array")
+        .AddChild("item")
+        .SetStringValue("default");
+    container.GetContent()
+        .AddChild("replacedScalar")
+        .AddChild("staleDefault")
+        .SetBoolValue(true);
+
+    gd::SerializerElement serializedContent;
+    serializedContent.AddChild("nested")
+        .AddChild("overridden")
+        .SetIntValue(2);
+    serializedContent.AddChild("unknown").SetBoolValue(true);
+    auto& authoredArray = serializedContent.AddChild("array");
+    authoredArray.ConsiderAsArrayOf("item");
+    authoredArray.AddChild("item").SetStringValue("authored");
+    serializedContent.AddChild("replacedScalar").SetIntValue(7);
+
+    container.UnserializeFromWithDefaultContent(serializedContent);
+
+    REQUIRE(container.GetContent().GetChild("keptDefault").GetIntValue() ==
+            42);
+    REQUIRE(container.GetContent()
+                .GetChild("nested")
+                .GetChild("nestedDefault")
+                .GetStringValue() == "kept");
+    REQUIRE(container.GetContent()
+                .GetChild("nested")
+                .GetChild("overridden")
+                .GetIntValue() == 2);
+    REQUIRE(container.GetContent().GetChild("unknown").GetBoolValue());
+    REQUIRE(container.GetContent()
+                .GetChild("array")
+                .GetChild("item")
+                .GetStringValue() == "authored");
+    REQUIRE(container.GetContent()
+                .GetChild("replacedScalar")
+                .GetIntValue() == 7);
+  }
 
   SECTION("Save and load a project with a custom behavior property value") {
     gd::Platform platform;

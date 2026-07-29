@@ -1013,6 +1013,14 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
               'javascript',
               'internal-in-game-editor-only-svg',
             ],
+            capabilitiesByValue: {
+              image: ['image-2d', 'three-texture'],
+              model3D: ['model-3d'],
+            },
+            capabilityNotes: {
+              'three-texture':
+                'Image resources can be uploaded to Three.js from the cached Pixi image, canvas, ImageBitmap, ImageData, video, or OffscreenCanvas source. SVG image files are supported after Pixi rasterizes them.',
+            },
           }),
           settingsField('name', 'unique resource name', { required: true }),
           settingsField('metadata', 'string', { required: true }),
@@ -1872,7 +1880,20 @@ const LAYOUT_TABLES = Object.freeze([
       },
       { name: 'visible', type: 'boolean', default: true },
       { name: 'locked', type: 'boolean', default: false },
-      { name: 'lighting', type: 'boolean', default: false },
+      {
+        name: 'lighting',
+        type: 'boolean',
+        default: false,
+        description:
+          'Marks this layer as a dedicated 2D Lighting Layer. This does not enable Scene3D lighting; use Scene3D light effects for 3D layers.',
+        semanticRole: 'dedicated-2d-lighting-layer',
+        constraints: [
+          {
+            code: 'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
+            incompatibleWhen: { rendering: ['3d', '2d+3d'] },
+          },
+        ],
+      },
       { name: 'follow_base_camera', type: 'boolean', default: false },
       { name: 'ambient', type: '"#RRGGBB"', default: '#C8C8C8' },
       { name: 'near', type: 'number', default: 3 },

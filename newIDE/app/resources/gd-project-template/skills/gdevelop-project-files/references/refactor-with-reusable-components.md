@@ -54,8 +54,8 @@ by stable domain ownership such as `Combat`, `Inventory`, or `UIWidgets`.
    positions, variables, logs, errors, and representative inputs.
 2. Add the new extension/component declarations and empty or comment-only event
    files without deleting old logic.
-3. Reload the project, regenerate/re-read the catalog, and confirm all new
-   instruction/object/behavior types exist.
+3. Run `generate-catalogs`, re-read the catalogs, and confirm all new
+   instruction/object/behavior types exist before changing callers.
 4. Move one coherent behavior at a time:
    - Copy each child object definition and its attached behaviors into an
      individual flat `prefab/objects/<Object>.settings` with `folder` arrays; copy
@@ -64,17 +64,21 @@ by stable domain ownership such as `Combat`, `Inventory`, or `UIWidgets`.
    - Move shared calculations into extension-level functions.
    - Preserve metadata, defaults, resources, and unknown fields.
 5. Rewrite each moved event body to satisfy the current safety rules. Guard all
-   actions and ensure every object action operates on one picked instance.
+   actions and ensure every object action operates on the intended picked set;
+   isolate instances only when the gameplay requires it.
 6. Replace scene/external callers with the new public functions. Use exact
    catalog types and named parameters.
 7. Replace scene object definitions or instances with prefab types only after
    mapping every property, behavior, variable, position, layer, Z order, and
    custom size. Preserve stable instance identifiers when supported.
-8. Reload and preview the migrated slice. Compare it to the baseline.
+8. Validate, commit, reload, and preview the migrated slice. Compare it to the
+   baseline.
 9. Repeat until every caller is migrated.
 10. Remove old event groups, duplicated object definitions, obsolete variables,
     and unused resources only after searches show no remaining references.
-11. Reload after the final deletion and run the complete verification matrix.
+11. Validate and commit after the final deletion, then run the complete
+    verification matrix with `verify_project_change` or an equivalent fresh
+    paused-preview sequence.
 
 Never combine migration and irreversible cleanup in the same unverified step.
 
@@ -154,12 +158,15 @@ Verify at least:
   editor-canvas state; events contain only DSL.
 - Every old caller/instance has a mapped replacement; searches find no dangling
   component, variable, behavior, resource, or instruction references.
-- Every action has an effective condition and every object action receives at
-  most one picked instance.
+- Every action has an effective condition and every object action receives the
+  intended picked set; repeated-instance cases are tested explicitly.
 - Public API parameter/return types match every caller.
 - Scene instance transforms, layers, Z order, custom size, variables, and
   resource bindings match the baseline.
-- The final `reload_project` succeeds after the most recent disk edit.
+- Final validation passes every pre-runtime phase, the task-owned changes are
+  committed, and the reload stage succeeds after the most recent disk edit.
+- Final runtime assertions pass with `runtimeVerified: true` and
+  `completionReady: true`.
 - Fresh preview tests cover creation, normal operation, repeated instances,
   state transitions, deletion, scene changes, and error paths.
 - Runtime logs contain no unknown instruction, missing behavior/object type,

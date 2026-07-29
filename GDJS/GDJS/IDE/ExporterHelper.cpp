@@ -1273,6 +1273,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/commontools.js");
   InsertUnique(includesFiles, "events-tools/variabletools.js");
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
+  InsertUnique(includesFiles, "events-tools/keyboard-key-definitions.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");
   InsertUnique(includesFiles, "events-tools/signaltools.js");

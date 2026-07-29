@@ -396,11 +396,12 @@ void Layout::UnserializeFrom(gd::Project& project,
       // out of the "content" object (to put it directly at the root of the
       // behavior shared data element).
       if (sharedDataElement.HasChild("content")) {
-        sharedData->UnserializeFrom(sharedDataElement.GetChild("content"));
+        sharedData->UnserializeFromWithDefaultContent(
+            sharedDataElement.GetChild("content"));
       }
       // end of compatibility code
       else {
-        sharedData->UnserializeFrom(sharedDataElement);
+        sharedData->UnserializeFromWithDefaultContent(sharedDataElement);
       }
 
       // Handle Quick Customization info.

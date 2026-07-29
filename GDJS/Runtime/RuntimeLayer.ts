@@ -36,6 +36,8 @@ namespace gdjs {
       ? RuntimeLayerCameraType.ORTHOGRAPHIC
       : RuntimeLayerCameraType.PERSPECTIVE;
 
+  const normalizedLightingLayerWarnings = new Set<string>();
+
   /**
    * @category Core Engine > Layers
    */
@@ -110,7 +112,30 @@ namespace gdjs {
       this._initialLayerData = layerData;
       this._runtimeScene = instanceContainer;
       this._effectsManager = instanceContainer.getGame().getEffectsManager();
-      this._isLightingLayer = layerData.isLightingLayer;
+      const isExplicitThreeDimensionalLayer =
+        layerData.renderingType === '3d' || layerData.renderingType === '2d+3d';
+      const lightingLayerWarningKey = `${layerData.name}:${
+        layerData.renderingType || ''
+      }`;
+      if (
+        layerData.isLightingLayer &&
+        isExplicitThreeDimensionalLayer &&
+        !normalizedLightingLayerWarnings.has(lightingLayerWarningKey)
+      ) {
+        normalizedLightingLayerWarnings.add(lightingLayerWarningKey);
+        console.warn(
+          `[RUNTIME_3D_LIGHTING_LAYER_NORMALIZED] Layer "${layerData.name}" ` +
+            `uses rendering="${
+              layerData.renderingType
+            }" and is marked as a dedicated 2D Lighting Layer. ` +
+            'The runtime will use the 3D rendering mode. Disable the lighting-layer flag and add Scene3D light effects instead.'
+        );
+      }
+      // Prefer the explicit 3D rendering type for this otherwise invalid
+      // combination. Keep `_initialLayerData` untouched so debugger
+      // diagnostics can distinguish configured and effective values.
+      this._isLightingLayer =
+        !!layerData.isLightingLayer && !isExplicitThreeDimensionalLayer;
       this._followBaseLayerCamera = layerData.followBaseLayerCamera;
       this._clearColor = [
         layerData.ambientLightColorR / 255,
@@ -893,6 +918,14 @@ namespace gdjs {
       return (
         this._isLightingLayer && !this._runtimeScene.getGame().isInGameEdition()
       );
+    }
+
+    /**
+     * Return whether the serialized layer was configured as a Lighting Layer,
+     * before compatibility normalization.
+     */
+    isConfiguredAsLightingLayer(): boolean {
+      return !!this._initialLayerData.isLightingLayer;
     }
   }
 }

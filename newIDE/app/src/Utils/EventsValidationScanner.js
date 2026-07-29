@@ -4,6 +4,7 @@ import { mapFor } from './MapFor';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import type { EventPath } from './EventPath';
 import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
+import { getKeyboardKeyDefinition } from './KeyboardKeyNames';
 
 const gd: libGDevelop = global.gd;
 
@@ -16,6 +17,7 @@ export type ValidationErrorType =
 
 export type ValidationError = {|
   type: ValidationErrorType,
+  diagnosticCode?: string,
   isCondition: boolean,
   instructionType: string,
   instructionSentence: string,
@@ -366,6 +368,39 @@ const createValidationWorker = (
       // Skip yesorno parameters with empty values (they default to "no")
       if (parameterType === 'yesorno' && value === '') {
         return;
+      }
+
+      if (parameterType === 'keyboardKey') {
+        let literalKeyName = null;
+        try {
+          const parsedValue = JSON.parse(value);
+          if (typeof parsedValue === 'string') literalKeyName = parsedValue;
+        } catch (error) {
+          // Dynamic string expressions cannot be proven invalid statically.
+        }
+        if (
+          literalKeyName !== null &&
+          !getKeyboardKeyDefinition(literalKeyName)
+        ) {
+          errors.push({
+            type: 'invalid-parameter',
+            diagnosticCode: 'INPUT_UNKNOWN_KEY_NAME',
+            isCondition,
+            instructionType: type,
+            instructionSentence: renderInstructionSentenceAsPlainText(
+              instruction,
+              metadata
+            ),
+            parameterIndex,
+            parameterValue: value,
+            parameterType,
+            eventPath: [...currentEventPath],
+            ...getValidationErrorLocationInformationFromProjectScopedContainers(
+              projectScopedContainers
+            ),
+          });
+          return;
+        }
       }
 
       // Check if parameter is valid using the projectScopedContainers

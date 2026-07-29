@@ -697,8 +697,10 @@ module.exports = {
         }
 
         if (propertyName === 'worldScale') {
-          const newValueAsNumber = parseInt(newValue, 10);
-          if (newValueAsNumber !== newValueAsNumber) return false;
+          const newValueAsNumber = parseFloat(newValue);
+          if (!Number.isFinite(newValueAsNumber) || newValueAsNumber <= 0) {
+            return false;
+          }
           if (!sharedContent.hasChild('worldScale')) {
             sharedContent.addChild('worldScale');
           }
@@ -768,6 +770,9 @@ module.exports = {
           sharedData
         )
         .markAsIrrelevantForChildObjects()
+        .addIncludeFile(
+          'Extensions/Physics3DBehavior/Physics3DDataNormalizer.js'
+        )
         .addIncludeFile(
           'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
         )
@@ -1717,6 +1722,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )
@@ -1739,6 +1745,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )
@@ -1761,6 +1768,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )

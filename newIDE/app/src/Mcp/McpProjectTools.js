@@ -522,6 +522,105 @@ const collectExtensionFunctionLintResults = (
   return results;
 };
 
+const collectProjectSemanticDiagnostics = (
+  serializedProject: Object
+): Array<Object> => {
+  const diagnostics: Array<Object> = [];
+  const layouts = Array.isArray(serializedProject.layouts)
+    ? serializedProject.layouts
+    : [];
+  layouts.forEach((layout, layoutIndex) => {
+    if (!layout || typeof layout !== 'object') return;
+    const layoutName =
+      typeof layout.name === 'string' ? layout.name : `#${layoutIndex}`;
+    const layers = Array.isArray(layout.layers) ? layout.layers : [];
+    layers.forEach((layer, layerIndex) => {
+      if (!layer || typeof layer !== 'object') return;
+      if (
+        layer.isLightingLayer === true &&
+        (layer.renderingType === '3d' || layer.renderingType === '2d+3d')
+      ) {
+        diagnostics.push({
+          code: 'LAYOUT_3D_LAYER_MARKED_AS_LIGHTING_LAYER',
+          severity: 'error',
+          stage: 'semantic',
+          message: `Layer "${layer.name ||
+            ''}" in scene "${layoutName}" uses rendering="${
+            layer.renderingType
+          }" and is marked as a dedicated 2D Lighting Layer.`,
+          remediation:
+            'Set isLightingLayer/lighting to false and add Scene3D light effects instead.',
+          source: {
+            projectPath: `layouts[${layoutIndex}].layers[${layerIndex}]`,
+          },
+          details: {
+            sceneName: layoutName,
+            layerName: layer.name || '',
+            renderingType: layer.renderingType,
+          },
+        });
+      }
+    });
+
+    const sharedDataList = Array.isArray(layout.behaviorsSharedData)
+      ? layout.behaviorsSharedData
+      : [];
+    sharedDataList.forEach((sharedData, sharedDataIndex) => {
+      if (
+        !sharedData ||
+        typeof sharedData !== 'object' ||
+        typeof sharedData.type !== 'string' ||
+        !sharedData.type.includes('Physics3D')
+      ) {
+        return;
+      }
+      const source = {
+        projectPath: `layouts[${layoutIndex}].behaviorsSharedData[${sharedDataIndex}]`,
+      };
+      const missingFields = [
+        'gravityX',
+        'gravityY',
+        'gravityZ',
+        'worldScale',
+      ].filter(field => sharedData[field] === undefined);
+      if (missingFields.length > 0) {
+        diagnostics.push({
+          code: 'PHYSICS3D_MISSING_SHARED_DEFAULT',
+          severity: 'warning',
+          stage: 'semantic',
+          message: `Physics3D shared data in scene "${layoutName}" omits editor-defined defaults: ${missingFields.join(
+            ', '
+          )}.`,
+          remediation:
+            'The loader will hydrate these defaults. Save the project in the editor to make them explicit.',
+          source,
+          details: { sceneName: layoutName, missingFields },
+        });
+      }
+      if (
+        sharedData.worldScale !== undefined &&
+        (typeof sharedData.worldScale !== 'number' ||
+          !Number.isFinite(sharedData.worldScale) ||
+          sharedData.worldScale <= 0)
+      ) {
+        diagnostics.push({
+          code: 'PHYSICS3D_INVALID_WORLD_SCALE',
+          severity: 'error',
+          stage: 'semantic',
+          message: `Physics3D worldScale in scene "${layoutName}" must be a finite number greater than zero.`,
+          remediation: 'Set worldScale to a positive value such as 100.',
+          source,
+          details: {
+            sceneName: layoutName,
+            worldScale: sharedData.worldScale,
+          },
+        });
+      }
+    });
+  });
+  return diagnostics;
+};
+
 export const validateSerializedProject = (
   serializedProject: Object,
   args: Object = {}
@@ -536,6 +635,26 @@ export const validateSerializedProject = (
     const projectValidationErrors = scanProjectForValidationErrors(
       validationProject
     );
+    const semanticEventErrors = projectValidationErrors.filter(
+      error => error.diagnosticCode
+    );
+    const structuralProjectValidationErrors = projectValidationErrors.filter(
+      error => !error.diagnosticCode
+    );
+    const semanticDiagnostics = [
+      ...collectProjectSemanticDiagnostics(serializedProject),
+      ...semanticEventErrors.map(error => ({
+        code: error.diagnosticCode,
+        severity: 'error',
+        stage: 'semantic',
+        message: `Invalid keyboard key literal ${String(
+          error.parameterValue || ''
+        )}.`,
+        remediation:
+          'Use a canonical GDevelop key name such as Num1, or a supported alias such as "1" or Digit1.',
+        details: error,
+      })),
+    ];
     const extensionLintFailures =
       args.include_generated_code === false
         ? []
@@ -561,34 +680,76 @@ export const validateSerializedProject = (
       projectApiDeclaration: args.project_api_declaration,
       typescript: args.typescript,
     });
+    const structuralErrors = structuralProjectValidationErrors.map(error => ({
+      severity: 'error',
+      ...error,
+    }));
     const errors = [
-      ...projectValidationErrors.map(error => ({
-        severity: 'error',
-        ...error,
-      })),
+      ...structuralErrors,
+      ...semanticDiagnostics.filter(
+        diagnostic => diagnostic.severity === 'error'
+      ),
       ...extensionErrors,
       ...javascriptAuthoring.errors,
     ].filter(error => error.severity === 'error' || !error.severity);
-    const structurallyValid = errors.length === 0;
+    const structurallyValid = structuralErrors.length === 0;
+    const extensionGeneratedCodeValid =
+      args.include_generated_code === false
+        ? null
+        : extensionErrors.filter(
+            error => error.severity === 'error' || !error.severity
+          ).length === 0;
+    const javascriptAuthoringValid = javascriptAuthoring.checked
+      ? javascriptAuthoring.errors.filter(
+          error => error.severity === 'error' || !error.severity
+        ).length === 0
+      : null;
+    const semanticLintPassed =
+      semanticDiagnostics.filter(diagnostic => diagnostic.severity === 'error')
+        .length === 0;
+    const validationPassed =
+      structurallyValid &&
+      extensionGeneratedCodeValid !== false &&
+      javascriptAuthoringValid !== false &&
+      semanticLintPassed;
     return {
       success: true,
-      valid: structurallyValid,
+      valid: validationPassed,
+      validMeaning: 'pre-runtime-validation-passed',
+      structurallyValid,
+      eventCodeGenerationValid: structurallyValid,
+      extensionGeneratedCodeValid,
+      javascriptAuthoringValid,
+      semanticLintStatus: 'checked',
+      semanticLintPassed,
+      runtimeVerified: false,
+      readyForRuntimeVerification: validationPassed,
+      completionReady: false,
       validationResultKind: 'structural-validation',
-      completionStatus: structurallyValid
+      completionStatus: validationPassed
         ? 'runtime-verification-required'
-        : 'structural-validation-failed',
-      runtimeVerificationRequired: structurallyValid,
-      completionWarning: structurallyValid
+        : !structurallyValid
+        ? 'structural-validation-failed'
+        : !semanticLintPassed
+        ? 'semantic-validation-failed'
+        : javascriptAuthoringValid === false
+        ? 'javascript-authoring-validation-failed'
+        : 'generated-code-validation-failed',
+      runtimeVerificationRequired: validationPassed,
+      completionWarning: validationPassed
         ? 'RUNTIME VERIFICATION REQUIRED: valid:true does not prove that the game works. Do not report runtime correctness or task completion until a paused preview verifies behavior-sensitive changes.'
-        : 'Structural validation failed. Fix every blocking diagnostic before reload or runtime verification.',
+        : 'Pre-runtime validation failed. Fix every blocking diagnostic before reload or runtime verification.',
       projectName: validationProject.getName(),
       projectUuid: validationProject.getProjectUuid(),
       sceneNames: getProjectSceneNames(serializedProject),
       projectValidationErrors,
+      structuralProjectValidationErrors,
+      semanticDiagnostics,
       extensionLintFailures,
       javascriptAuthoring,
       environmentDiagnostics: javascriptAuthoring.environmentDiagnostics || [],
       sourceDiagnostics: javascriptAuthoring.sourceDiagnostics || [],
+      diagnostics: semanticDiagnostics,
       errors,
       generatedCodePreflight:
         args.include_generated_code === false ? 'skipped' : 'checked',
@@ -596,11 +757,13 @@ export const validateSerializedProject = (
         projectUnserialization: 'checked',
         projectSerializationRoundTrip: 'checked',
         projectValidation: 'checked',
+        eventCodeGeneration: structurallyValid ? 'checked' : 'failed',
         extensionGeneratedCode:
           args.include_generated_code === false ? 'skipped' : 'checked',
         javascriptAuthoringApi: javascriptAuthoring.checked
           ? 'checked'
           : 'typescript-unavailable',
+        semanticLint: 'checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,
@@ -611,6 +774,16 @@ export const validateSerializedProject = (
     return {
       success: true,
       valid: false,
+      validMeaning: 'pre-runtime-validation-passed',
+      structurallyValid: false,
+      eventCodeGenerationValid: null,
+      extensionGeneratedCodeValid: null,
+      javascriptAuthoringValid: null,
+      semanticLintStatus: 'not-checked',
+      semanticLintPassed: null,
+      runtimeVerified: false,
+      readyForRuntimeVerification: false,
+      completionReady: false,
       validationResultKind: 'structural-validation',
       completionStatus: 'structural-validation-failed',
       runtimeVerificationRequired: false,
@@ -622,6 +795,7 @@ export const validateSerializedProject = (
         projectValidation: 'not-checked',
         extensionGeneratedCode: 'not-checked',
         javascriptAuthoringApi: 'not-checked',
+        semanticLint: 'not-checked',
         runtimeGameplaySemantics: 'not-verified',
       },
       runtimeSemanticsVerified: false,

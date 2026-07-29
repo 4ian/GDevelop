@@ -112,6 +112,37 @@ describe('EventsValidationScanner', () => {
       }
     });
 
+    it('diagnoses unknown literal keyboard names and accepts digit aliases', () => {
+      const { project, testLayout } = makeTestProject(gd);
+      const events = testLayout.getEvents();
+      const event = events.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        0
+      );
+      const conditions = gd.asStandardEvent(event).getConditions();
+      const addKeyCondition = (value: string, index: number) => {
+        const condition = new gd.Instruction();
+        condition.setType('KeyFromTextJustPressed');
+        condition.setParametersCount(2);
+        condition.setParameter(0, '');
+        condition.setParameter(1, value);
+        conditions.insert(condition, index);
+        condition.delete();
+      };
+      addKeyCondition('"NotARealKey"', 0);
+      addKeyCondition('"1"', 1);
+      addKeyCondition('"Digit2"', 2);
+
+      const errors = scanProjectForValidationErrors(project);
+      const keyboardErrors = errors.filter(
+        error => error.diagnosticCode === 'INPUT_UNKNOWN_KEY_NAME'
+      );
+
+      expect(keyboardErrors).toHaveLength(1);
+      expect(keyboardErrors[0].parameterValue).toBe('"NotARealKey"');
+    });
+
     describe('disabled events', () => {
       it('skips disabled events', () => {
         const { project, testLayout } = makeTestProject(gd);

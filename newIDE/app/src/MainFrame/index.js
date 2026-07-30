@@ -13,6 +13,7 @@ import ExternalEventsIcon from '../UI/CustomSvgIcons/ExternalEvents';
 import ExternalLayoutIcon from '../UI/CustomSvgIcons/ExternalLayout';
 import ExtensionIcon from '../UI/CustomSvgIcons/Extension';
 import SearchIcon from '../UI/CustomSvgIcons/Search';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -35,6 +36,7 @@ import {
   renameEditorTabs,
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
+  closeGameplayTestTabs,
   closeEventsFunctionsExtensionTabs,
   closeCustomObjectTab,
   closeEventsBasedObjectVariantTab,
@@ -63,6 +65,15 @@ import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContai
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
+import { renderGameplayTestEditorContainer } from './EditorContainers/GameplayTestEditorContainer';
+import { getGameplayTestProjectItemName } from './EditorContainers/GameplayTestEditorContainer';
+import { GameplayTestFrame } from '../GameplayTests/GameplayTestFrame';
+import {
+  registerGameplayTestRunnerDependencies,
+  runProjectGameplayTests,
+  stopRunningProjectGameplayTest,
+  type GameplayTestToRun,
+} from '../GameplayTests/GameplayTestRunner';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
@@ -74,6 +85,7 @@ import {
   getRenamedLayoutTabProjectItemName,
   getRenamedExternalLayoutTabProjectItemName,
   getRenamedExternalEventsTabProjectItemName,
+  getRenamedGameplayTestTabProjectItemName,
   getRenamedExtensionTabProjectItemName,
   getRenamedEventsBasedObjectTabProjectItemName,
   type RenamableTab,
@@ -290,6 +302,7 @@ const editorKindToRenderer: {
   'external layout': renderExternalLayoutEditorContainer,
   'events functions extension': renderEventsFunctionsExtensionEditorContainer,
   'custom object': renderCustomObjectEditorContainer,
+  'gameplay-test': renderGameplayTestEditorContainer,
   'start page': renderHomePageContainer,
   resources: renderResourcesEditorContainer,
   'global-search': renderGlobalEventsSearchEditorContainer,
@@ -610,6 +623,19 @@ const MainFrame = (props: Props): React.MixedElement => {
     getWorkingAiRequest,
     suspendAiRequest: suspendWorkingAiRequest,
   } = React.useContext(AiRequestContext);
+
+  // Allow gameplay tests to be run from anywhere in the editor (test editor,
+  // project manager, command palette, CLI, AI function calls).
+  React.useEffect(() => {
+    registerGameplayTestRunnerDependencies({
+      getPreviewLauncher: () => _previewLauncher.current,
+      onTestsRunFinished: () => {
+        // The last run summary of tests was updated on the project.
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      },
+    });
+    return () => registerGameplayTestRunnerDependencies(null);
+  });
   const {
     hasUnsavedChanges,
     sealUnsavedChanges,
@@ -782,6 +808,8 @@ const MainFrame = (props: Props): React.MixedElement => {
           ? parseCustomObjectEditorTabName(name).variantName ||
             parseCustomObjectEditorTabName(name).objectName +
               ` ${i18n._(t`(Object)`)}`
+          : kind === 'gameplay-test'
+          ? (name.split('::').pop() || name) + ` ${i18n._(t`(Test)`)}`
           : name;
       const tabOptions =
         kind === 'layout'
@@ -796,6 +824,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         'external layout',
         'events functions extension',
         'custom object',
+        'gameplay-test',
       ].includes(kind)
         ? `${kind} ${name}`
         : kind;
@@ -834,6 +863,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         ) : kind === 'events functions extension' ||
           kind === 'custom object' ? (
           <ExtensionIcon />
+        ) : kind === 'gameplay-test' ? (
+          <PreviewIcon />
         ) : kind === 'ask-ai' ? (
           <RobotIcon size={16} />
         ) : null;
@@ -1736,6 +1767,128 @@ const MainFrame = (props: Props): React.MixedElement => {
       _onProjectItemModified();
     });
   };
+
+  const deleteGameplayTest = (test: gdTest) => {
+    const { i18n } = props;
+    if (!state.currentProject) return;
+
+    const answer = Window.showConfirmDialog(
+      i18n._(
+        t`Are you sure you want to remove this gameplay test? This can't be undone.`
+      )
+    );
+    if (!answer) return;
+
+    const testName = test.getName();
+    setState(state => ({
+      ...state,
+      editorTabs: closeGameplayTestTabs(
+        state.editorTabs,
+        getGameplayTestProjectItemName('project', testName)
+      ),
+    })).then(state => {
+      if (state.currentProject)
+        state.currentProject.getTests().removeTest(testName);
+      _onProjectItemModified();
+    });
+  };
+
+  const renameGameplayTest = (oldName: string, newName: string) => {
+    const { currentProject } = state;
+    const { i18n } = props;
+    if (!currentProject) return;
+
+    if (!currentProject.getTests().hasTestNamed(oldName) || newName === oldName)
+      return;
+
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.getTests().hasTestNamed(tentativeNewName);
+      }
+    );
+
+    const test = currentProject.getTests().getTest(oldName);
+    test.setName(uniqueNewName);
+    setState(state => ({
+      ...state,
+      editorTabs: getEditorTabsWithRenamedProjectItem(
+        state.editorTabs,
+        currentProject,
+        editorTab =>
+          getRenamedGameplayTestTabProjectItemName(
+            editorTab,
+            getGameplayTestProjectItemName('project', oldName),
+            getGameplayTestProjectItemName('project', uniqueNewName)
+          )
+      ),
+    })).then(() => {
+      _onProjectItemModified();
+    });
+  };
+
+  const runGameplayTestFromUi = React.useCallback(
+    async (testName: string) => {
+      const { currentProject } = state;
+      if (!currentProject) return;
+
+      try {
+        await runProjectGameplayTests({
+          project: currentProject,
+          tests: [{ scope: 'project', testName }],
+          options: {},
+        });
+      } catch (error) {
+        console.error('Error while running the gameplay test:', error);
+      }
+    },
+    [state]
+  );
+
+  const runAllGameplayTestsFromUi = React.useCallback(
+    async () => {
+      const { currentProject } = state;
+      if (!currentProject) return;
+
+      // Run the tests of the project, then the tests of every extension.
+      const tests: Array<GameplayTestToRun> = [];
+      const projectTests = currentProject.getTests();
+      for (let i = 0; i < projectTests.getTestsCount(); i++) {
+        tests.push({
+          scope: 'project',
+          testName: projectTests.getTestAt(i).getName(),
+        });
+      }
+      for (
+        let extensionIndex = 0;
+        extensionIndex < currentProject.getEventsFunctionsExtensionsCount();
+        extensionIndex++
+      ) {
+        const extension = currentProject.getEventsFunctionsExtensionAt(
+          extensionIndex
+        );
+        const extensionTests = extension.getTests();
+        for (let i = 0; i < extensionTests.getTestsCount(); i++) {
+          tests.push({
+            scope: extension.getName(),
+            testName: extensionTests.getTestAt(i).getName(),
+          });
+        }
+      }
+      if (!tests.length) return;
+
+      try {
+        await runProjectGameplayTests({
+          project: currentProject,
+          tests,
+          options: {},
+        });
+      } catch (error) {
+        console.error('Error while running the gameplay tests:', error);
+      }
+    },
+    [state]
+  );
 
   const deleteEventsFunctionsExtension = async (
     eventsFunctionsExtension: gdEventsFunctionsExtension
@@ -2682,6 +2835,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           numberOfWindows: numberOfWindows === undefined ? 1 : numberOfWindows,
           isForInGameEdition: !!isForInGameEdition,
+          isForGameplayTest: false,
           editorId: isForInGameEdition ? isForInGameEdition.editorId : '',
           editorCameraState3D: isForInGameEdition
             ? isForInGameEdition.editorCameraState3D
@@ -3017,6 +3171,23 @@ const MainFrame = (props: Props): React.MixedElement => {
           state.editorTabs,
           // $FlowFixMe[incompatible-type]
           getEditorOpeningOptions({ kind: 'external layout', name })
+        ),
+      }));
+    },
+    [setState, getEditorOpeningOptions]
+  );
+
+  const openGameplayTest = React.useCallback(
+    (scope: 'project' | string, testName: string) => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          // $FlowFixMe[incompatible-type]
+          getEditorOpeningOptions({
+            kind: 'gameplay-test',
+            name: getGameplayTestProjectItemName(scope, testName),
+          })
         ),
       }));
     },
@@ -5288,6 +5459,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
+    onOpenGameplayTest: (testName: string) =>
+      openGameplayTest('project', testName),
+    onRunGameplayTest: runGameplayTestFromUi,
+    onRunAllGameplayTests: runAllGameplayTestsFromUi,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
     onRestartInGameEditor,
@@ -5595,6 +5770,10 @@ const MainFrame = (props: Props): React.MixedElement => {
         previewDebuggerServer={previewDebuggerServer || null}
         onLaunchPreviewForInGameEdition={onLaunchPreviewForInGameEdition}
       />
+      <GameplayTestFrame
+        previewDebuggerServer={previewDebuggerServer || null}
+        onStopRequested={stopRunningProjectGameplayTest}
+      />
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
@@ -5633,10 +5812,16 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDeleteExternalLayout={deleteExternalLayout}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
           onDeleteExternalEvents={deleteExternalEvents}
+          onDeleteGameplayTest={deleteGameplayTest}
           onRenameLayout={renameLayout}
           onRenameExternalLayout={renameExternalLayout}
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
+          onRenameGameplayTest={renameGameplayTest}
+          onOpenGameplayTest={(testName: string) =>
+            openGameplayTest('project', testName)
+          }
+          onRunGameplayTest={runGameplayTestFromUi}
           onOpenResources={openResources}
           onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
           onWillInstallExtension={onWillInstallExtension}

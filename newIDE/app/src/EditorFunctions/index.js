@@ -30,6 +30,7 @@ import {
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { runGameplayTest } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
@@ -157,6 +158,18 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // `run_gameplay_test` output payload. Present only for gameplay test runs.
+  status?: string,
+  testName?: string,
+  framesExecuted?: number,
+  durationMs?: number,
+  gameTimeMs?: number,
+  assertions?: Array<Object>,
+  errors?: Array<string>,
+  eventLog?: Array<Object>,
+  finalState?: Object | null,
+  screenshots?: Array<Object>,
+  performance?: Object | null,
   // Set to true (v12+) when a mutating call was a no-op because the requested
   // state already matched the current state. Lets the no-op rate be counted
   // from `functionCallRecords`/CloudWatch without any new telemetry.
@@ -415,6 +428,11 @@ export type EditorFunction = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -436,6 +454,11 @@ export type EditorFunctionWithoutProject = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -8672,6 +8695,29 @@ const runEditAgent: EditorFunction = {
   modifiesProject: true,
 };
 
+const runTests: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const newTest = SafeExtractor.extractObjectProperty(args, 'new_test');
+    const newTestName = newTest
+      ? SafeExtractor.extractStringProperty(newTest, 'name')
+      : null;
+    if (newTestName) {
+      return {
+        text: <Trans>Running the gameplay test {newTestName}.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Running gameplay tests.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to run gameplay tests - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const readGameProjectJson: EditorFunction = {
   renderForEditor: ({ args }) => {
     return {
@@ -8841,6 +8887,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
 
   run_explorer_agent: runExplorerAgent,
   run_edit_agent: runEditAgent,
+  run_tests: runTests,
+  run_gameplay_test: runGameplayTest,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
   search_resource_store: searchResourceStore,

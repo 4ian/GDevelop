@@ -101,7 +101,8 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v13';
+// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v14';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -130,7 +131,17 @@ const doesFunctionCallModifyProject = (
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
-  return !!(editorFunctionDef && editorFunctionDef.modifiesProject);
+  if (!editorFunctionDef) return false;
+  if (editorFunctionDef.getModifiesProject) {
+    try {
+      return editorFunctionDef.getModifiesProject(
+        JSON.parse(functionCall.arguments)
+      );
+    } catch (error) {
+      return !!editorFunctionDef.modifiesProject;
+    }
+  }
+  return !!editorFunctionDef.modifiesProject;
 };
 
 /**

@@ -17,6 +17,13 @@ namespace gdjs {
     7, 8, 7, 1, 8, 2, 3, 4, 3, 5, 4,
   ];
 
+  const isModel3D = (
+    object: gdjs.RuntimeObject
+  ): object is gdjs.Model3DRuntimeObject => {
+    //@ts-ignore We are checking if the methods are present.
+    return object._modelResourceName;
+  };
+
   /**
    * NavMeshObstaclesManager manages the common objects shared by objects
    * having a pathfinding behavior: In particular, the obstacles behaviors are
@@ -82,45 +89,13 @@ namespace gdjs {
 
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
-
-      const euler = new THREE.Euler();
-      euler.order = 'ZYX';
-      const point = new THREE.Vector3();
-
       for (const obstacle of this.obstacles) {
         //@ts-ignore
         const object: gdjs.RuntimeObject3D = obstacle.owner;
-        const indicesOffset = Math.round(positions.length / 3);
-        for (
-          let index = 0;
-          index + 2 < cubePositions.length;
-          index = index + 3
-        ) {
-          let x = cubePositions[index];
-          let y = cubePositions[index + 2];
-          let z = cubePositions[index + 1];
-
-          x *= object.getWidth();
-          y *= object.getHeight();
-          z *= object.getDepth();
-
-          point.set(x, y, z);
-          euler.set(
-            gdjs.toRad(object.getRotationX()),
-            gdjs.toRad(object.getRotationY()),
-            gdjs.toRad(object.getAngle())
-          );
-          point.applyEuler(euler);
-
-          x = object.getCenterXInScene() + point.x;
-          y = object.getCenterYInScene() + point.y;
-          z = object.getCenterZInScene() + point.z;
-
-          // Y is the top for Recast
-          positions.push(x, z, y);
-        }
-        for (const vertexIndex of cubeIndices) {
-          indices.push(vertexIndex + indicesOffset);
+        if (obstacle._shape === 'Mesh' && isModel3D(object)) {
+          this.addMeshFor(object, positions, indices);
+        } else {
+          this.addBoxFor(object, positions, indices);
         }
       }
 
@@ -139,6 +114,149 @@ namespace gdjs {
           this.rebuildCharacterAgent(character);
         }
       }
+    }
+
+    private addBoxFor(
+      object: gdjs.RuntimeObject3D,
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      const point = new THREE.Vector3();
+      const euler = new THREE.Euler();
+      euler.order = 'ZYX';
+
+      const indicesOffset = Math.round(positions.length / 3);
+      for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
+        let x = cubePositions[index];
+        let y = cubePositions[index + 2];
+        let z = cubePositions[index + 1];
+
+        x *= object.getWidth();
+        y *= object.getHeight();
+        z *= object.getDepth();
+
+        point.set(x, y, z);
+        euler.set(
+          gdjs.toRad(object.getRotationX()),
+          gdjs.toRad(object.getRotationY()),
+          gdjs.toRad(object.getAngle())
+        );
+        point.applyEuler(euler);
+
+        x = object.getCenterXInScene() + point.x;
+        y = object.getCenterYInScene() + point.y;
+        z = object.getCenterZInScene() + point.z;
+
+        // Y is the top for Recast
+        positions.push(x, z, y);
+      }
+      for (const vertexIndex of cubeIndices) {
+        indices.push(vertexIndex + indicesOffset);
+      }
+    }
+
+    private addMeshFor(
+      model3DRuntimeObject: gdjs.Model3DRuntimeObject,
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      const originalModel = model3DRuntimeObject
+        .getInstanceContainer()
+        .getGame()
+        .getModel3DManager()
+        .getModel(
+          this.meshShapeResourceName ||
+            model3DRuntimeObject._modelResourceName ||
+            ''
+        );
+
+      const modelInCube = new THREE.Group();
+      modelInCube.rotation.order = 'ZYX';
+      const root = THREE_ADDONS.SkeletonUtils.clone(originalModel.scene);
+      modelInCube.add(root);
+
+      const data = model3DRuntimeObject._data.content;
+      model3DRuntimeObject._renderer.stretchModelIntoUnitaryCube(
+        modelInCube,
+        data.rotationX,
+        data.rotationY,
+        data.rotationZ
+      );
+
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      threeObject.add(modelInCube);
+      const object = model3DRuntimeObject;
+      const width = object.getWidth();
+      const height = object.getHeight();
+      const depth = object.getDepth();
+      threeObject.scale.set(
+        object.isFlippedX() ? -width : width,
+        object.isFlippedY() ? -height : height,
+        object.isFlippedZ() ? -depth : depth
+      );
+      threeObject.position.set(
+        object.getCenterXInScene(),
+        object.getCenterYInScene(),
+        object.getCenterZInScene(),
+      );
+      threeObject.rotation.set(
+        gdjs.toRad(object.getRotationX()),
+        gdjs.toRad(object.getRotationY()),
+        gdjs.toRad(object.getAngle()),
+      );
+
+      threeObject.updateMatrixWorld();
+
+      // For indexed triangles
+      const vector3 = new THREE.Vector3();
+
+      threeObject.traverse((object3d) => {
+        const mesh = object3d as THREE.Mesh;
+        if (!mesh.isMesh) {
+          return;
+        }
+        const indicesOffset = Math.round(positions.length / 3);
+        const positionAttribute = mesh.geometry.getAttribute('position');
+        object3d.getWorldScale(vector3);
+        // Negate it because we swap Y and Z.
+        const shouldTrianglesBeFlipped = !(vector3.x * vector3.y * vector3.z < 0);
+        const index = mesh.geometry.getIndex();
+        if (index) {
+          for (let i = 0; i < positionAttribute.count; i++) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            positions.push(vector3.x, vector3.z, vector3.y);
+          }
+          for (let i = 0; i < index.count; i += 3) {
+            indices.push(
+              indicesOffset + index.getX(shouldTrianglesBeFlipped ? i + 1 : i),
+              indicesOffset + index.getX(shouldTrianglesBeFlipped ? i : i + 1),
+              indicesOffset + index.getX(i + 2)
+            );
+          }
+        } else {
+          for (let i = 0; i < positionAttribute.count; i += 3) {
+            vector3.fromBufferAttribute(positionAttribute, i);
+            object3d.localToWorld(vector3);
+            positions.push(vector3.x, vector3.z, vector3.y);
+
+            vector3.fromBufferAttribute(positionAttribute, i + 1);
+            object3d.localToWorld(vector3);
+            positions.push(vector3.x, vector3.z, vector3.y);
+
+            vector3.fromBufferAttribute(positionAttribute, i + 2);
+            object3d.localToWorld(vector3);
+            positions.push(vector3.x, vector3.z, vector3.y);
+
+            indices.push(
+              indicesOffset + shouldTrianglesBeFlipped ? i + 1 : i,
+              indicesOffset + shouldTrianglesBeFlipped ? i : i + 1,
+              indicesOffset + i + 2
+            );
+          }
+        }
+      });
     }
 
     private rebuildCharacterAgent(character: NavMeshCharacterRuntimeBehavior) {
@@ -223,6 +341,9 @@ namespace gdjs {
   export class NavMeshObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _impassable: boolean;
     _cost: float;
+    _shape: string;
+    _meshShapeResourceName: string;
+
     _oldX: float = 0;
     _oldY: float = 0;
     _oldWidth: float = 0;
@@ -238,6 +359,8 @@ namespace gdjs {
       super(instanceContainer, behaviorData, owner);
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;
+      this._shape = behaviorData.shape;
+      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
       this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:

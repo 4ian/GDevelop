@@ -115,14 +115,60 @@ module.exports = {
         propertyName,
         newValue
       ) {
+        if (propertyName === 'shape') {
+          const normalizedValue = newValue.toLowerCase();
+          let shapeValue = '';
+          if (normalizedValue === 'box') shapeValue = 'Box';
+          else if (normalizedValue === 'capsule') shapeValue = 'Capsule';
+          else if (normalizedValue === 'sphere') shapeValue = 'Sphere';
+          else if (normalizedValue === 'cylinder') shapeValue = 'Cylinder';
+          else if (normalizedValue === 'mesh') shapeValue = 'Mesh';
+          else return false;
+
+          behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
+          if (shapeValue === 'Mesh') {
+            behaviorContent
+              .getOrCreateChild('bodyType')
+              .setStringValue('Static');
+          }
+          return true;
+        }
+
+        if (propertyName === 'meshShapeResourceName') {
+          behaviorContent
+            .getOrCreateChild('meshShapeResourceName')
+            .setStringValue(newValue);
+          return true;
+        }
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('shape')
+          .setValue(behaviorContent.getChild('shape').getStringValue())
+          .setType('Choice')
+          .setLabel('Shape')
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
+          .addChoice('Box', _('Box'))
+          .addChoice('Mesh', _('Mesh'));
+        behaviorProperties
+          .getOrCreate('meshShapeResourceName')
+          .setValue(
+            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+          )
+          .setType('resource')
+          .addExtraInfo('model3D')
+          .setLabel(_("Simplified 3D model (leave empty to use object's one)"));
+
         return behaviorProperties;
       };
 
-      behavior.initializeContent = function (behaviorContent) {};
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('shape').setStringValue('Box');
+        behaviorContent.addChild('meshShapeResourceName').setStringValue('');
+      };
 
       const sharedData = new gd.BehaviorSharedDataJsImplementation();
       sharedData.updateProperty = function (

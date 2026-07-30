@@ -606,21 +606,30 @@ runtimeScene._instances.length;
         refresh: { __dump: dumpPayload, rendererDiagnostics },
       },
     });
-    const runCommand: any = jest.fn(() => {
+    const staleLaunchPreviewForScene: any = jest.fn(() => {
+      throw new Error('The pre-reload project object was destroyed.');
+    });
+    const freshLaunchPreviewForScene: any = jest.fn(async sceneName => {
+      expect(sceneName).toBe('Scene');
       setTimeout(
         () => previewDebuggerServer.connectDebugger('preview-ws-1'),
         1
       );
-      return true;
+      return { accepted: true };
     });
-    const reloadProjectAndWait: any = jest.fn(async () => ({
-      reloaded: true,
-      catalogsRegenerated: true,
-    }));
+    let currentLaunchPreviewForScene = staleLaunchPreviewForScene;
+    const reloadProjectAndWait: any = jest.fn(async () => {
+      currentLaunchPreviewForScene = freshLaunchPreviewForScene;
+      return {
+        reloaded: true,
+        catalogsRegenerated: true,
+      };
+    });
     const bridge = makeBridge({
       getProject: () => project,
       reloadProjectAndWait,
-      runCommand,
+      launchPreviewForScene: staleLaunchPreviewForScene,
+      getLaunchPreviewForScene: () => currentLaunchPreviewForScene,
       getPreviewDebuggerServer: () => previewDebuggerServer,
     });
 
@@ -684,7 +693,8 @@ runtimeScene._instances.length;
       'assertions',
     ]);
     expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
-    expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
+    expect(staleLaunchPreviewForScene).not.toHaveBeenCalled();
+    expect(freshLaunchPreviewForScene).toHaveBeenCalledTimes(1);
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {

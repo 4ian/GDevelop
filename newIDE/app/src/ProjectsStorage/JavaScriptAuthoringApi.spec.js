@@ -195,6 +195,9 @@ if (bullet) bullet.addPolarForce(0, 720, 1);
         'game://scenes/Main/Main.events': `@js objects="Player" strict=true
 gdjs.evtTools.input.requestPointerLock(runtimeScene, "first-person-camera");
 if (gdjs.evtTools.input.isPointerLocked(runtimeScene)) {
+  const movementX = gdjs.evtTools.input.getPointerMovementX(runtimeScene);
+  const movementY = gdjs.evtTools.input.getPointerMovementY(runtimeScene);
+  objects[0].setPosition(movementX, movementY);
   gdjs.evtTools.input.exitPointerLock(runtimeScene);
 }
 const hits = gdjs.evtTools.scene3d.raycastObjects(

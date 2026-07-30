@@ -2,7 +2,12 @@
  * @jest-environment jsdom
  */
 // @noflow
-import { createBoneLabelElement } from './Model3DBoneLabelUtils';
+import {
+  createBoneJointTooltipElement,
+  createBoneLabelElement,
+  hideBoneJointTooltip,
+  showBoneJointTooltip,
+} from './Model3DBoneLabelUtils';
 
 describe('Model3DBoneLabelUtils', () => {
   it('copies the canonical bone name on click or keyboard activation', () => {
@@ -74,5 +79,44 @@ describe('Model3DBoneLabelUtils', () => {
     expect(onParentPointerDown).not.toHaveBeenCalled();
     expect(onParentClick).not.toHaveBeenCalled();
     expect(onCopy).toHaveBeenCalledWith('Hand');
+  });
+
+  it('shows the complete bone name in a non-interactive tooltip', () => {
+    const parent = document.createElement('div');
+    Object.defineProperty(parent, 'clientWidth', { value: 400 });
+    const element = createBoneJointTooltipElement();
+    parent.appendChild(element);
+    const fullBoneName = 'mixamorig:RightForeArmTwist.WithSuffix';
+
+    showBoneJointTooltip({
+      element,
+      displayName: fullBoneName,
+      x: 320,
+      y: 180,
+      offset: 12,
+    });
+
+    expect(element.getAttribute('role')).toBe('tooltip');
+    expect(element.getAttribute('translate')).toBe('no');
+    expect(element.textContent).toBe(fullBoneName);
+    expect(element.style.left).toBe('320px');
+    expect(element.style.top).toBe('168px');
+    expect(element.style.transform).toBe('translate(-100%, -100%)');
+    expect(element.style.display).toBe('block');
+    expect(element.style.whiteSpace).toBe('nowrap');
+    expect(element.style.pointerEvents).toBe('none');
+
+    hideBoneJointTooltip(element);
+    expect(element.style.display).toBe('none');
+
+    showBoneJointTooltip({
+      element,
+      displayName: fullBoneName,
+      x: 20,
+      y: 20,
+      offset: 12,
+    });
+    expect(element.style.top).toBe('32px');
+    expect(element.style.transform).toBe('translate(0, 0)');
   });
 });

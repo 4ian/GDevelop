@@ -2846,6 +2846,61 @@ runtimeScene._instances.length;
     );
   });
 
+  it('injects a native preview user gesture before simulated mouse input', async () => {
+    const callOrder = [];
+    const previewDebuggerServer = makeTargetedPreviewServer({
+      responders: {
+        simulateInput: () => {
+          callOrder.push('runtime-input');
+          return { applied: ['mouseButtonPressed:0'], error: null };
+        },
+      },
+    });
+    const injectPreviewClickUserGesture: any = jest.fn(async inputs => {
+      callOrder.push('native-user-gesture');
+      return {
+        success: true,
+        attempted: true,
+        supported: true,
+        nativeClickInjected: true,
+        audioContextState: 'running',
+        audioUnlocked: true,
+      };
+    });
+    const bridge = makeBridge({
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+      injectPreviewClickUserGesture,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'simulate_preview_input',
+        arguments: {
+          inputs: [
+            { type: 'mouseMove', x: 320, y: 180 },
+            { type: 'mouseButtonPressed', button: 'left' },
+          ],
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(callOrder).toEqual(['native-user-gesture', 'runtime-input']);
+    expect(injectPreviewClickUserGesture).toHaveBeenCalledWith([
+      { type: 'mouseMove', x: 320, y: 180 },
+      { type: 'mouseButtonPressed', button: 'left' },
+    ]);
+    expect(result.userGesture).toEqual(
+      expect.objectContaining({
+        nativeClickInjected: true,
+        audioContextState: 'running',
+        audioUnlocked: true,
+      })
+    );
+  });
+
   it.each(['2', 'Num2', 'Digit2'])(
     'normalizes main-keyboard digit alias %s for preview input',
     async key => {
@@ -3157,6 +3212,14 @@ runtimeScene._instances.length;
 
   it('run_frames expands clickAndHold and returns cursor world coordinates', async () => {
     let capturedRunFrames: any = null;
+    const injectPreviewClickUserGesture: any = jest.fn(async () => ({
+      success: true,
+      attempted: true,
+      supported: true,
+      nativeClickInjected: true,
+      audioContextState: 'running',
+      audioUnlocked: true,
+    }));
     const previewDebuggerServer = makeTargetedPreviewServer({
       responders: {
         getStatus: { isPaused: true, sceneName: 'Level1' },
@@ -3174,6 +3237,13 @@ runtimeScene._instances.length;
                 stoppedEarly: false,
                 deltaMs: 1000 / 60,
                 heldKeys: [],
+                recentlyPlayedSounds: [
+                  {
+                    soundName: 'sfx_place.wav',
+                    isMusic: false,
+                    channel: null,
+                  },
+                ],
                 cursorWorldCoordinates: {
                   sceneName: 'Level1',
                   canvasX: 420,
@@ -3200,6 +3270,7 @@ runtimeScene._instances.length;
     });
     const bridge = makeBridge({
       getPreviewDebuggerServer: () => previewDebuggerServer,
+      injectPreviewClickUserGesture,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -3226,6 +3297,23 @@ runtimeScene._instances.length;
     ]);
     expect(capturedRunFrames.includeCursorWorldCoordinates).toBe(true);
     expect(capturedRunFrames.cursorLayers).toEqual(['HUD']);
+    expect(injectPreviewClickUserGesture).toHaveBeenCalledWith([
+      { type: 'clickAndHold', x: 420, y: 180, button: 'left' },
+    ]);
+    expect(result.userGesture).toEqual(
+      expect.objectContaining({
+        nativeClickInjected: true,
+        audioContextState: 'running',
+        audioUnlocked: true,
+      })
+    );
+    expect(result.recentSounds).toEqual([
+      {
+        soundName: 'sfx_place.wav',
+        isMusic: false,
+        channel: null,
+      },
+    ]);
     expect(result.cursorWorldCoordinates.layers[0]).toEqual(
       expect.objectContaining({ layerName: 'HUD', worldX: 300 })
     );

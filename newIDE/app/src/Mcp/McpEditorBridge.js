@@ -112,6 +112,7 @@ type McpEditorBridgeContext = {|
   getPreviewDebuggerServer?: () => ?Object,
   closeAllPreviews?: () => mixed,
   focusAllPreviews?: () => void,
+  injectPreviewClickUserGesture?: (inputs: Array<Object>) => Promise<?Object>,
   capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
@@ -2157,6 +2158,44 @@ const expandRunFramesInput = (raw: any): Object => {
   };
 };
 
+const isPreviewClickGestureInput = (input: any): boolean => {
+  const type =
+    input && typeof input.type === 'string'
+      ? input.type.trim().toLowerCase()
+      : '';
+  return (
+    type === 'mousebuttonpressed' ||
+    type === 'clickandhold' ||
+    type === 'mouseclickandhold' ||
+    type === 'click_and_hold'
+  );
+};
+
+const injectPreviewClickUserGesture = async (
+  rawInputs: Array<any>,
+  injectUserGesture?: ?(inputs: Array<Object>) => Promise<?Object>
+): Promise<?Object> => {
+  if (!rawInputs.some(isPreviewClickGestureInput)) return null;
+  if (typeof injectUserGesture !== 'function') {
+    return {
+      success: false,
+      attempted: false,
+      supported: false,
+      error:
+        'Native preview click injection is unavailable in this editor build; runtime input was still injected.',
+    };
+  }
+
+  const result = await injectUserGesture(rawInputs);
+  if (result && result.success === false) {
+    throw new Error(
+      result.error ||
+        'The preview window rejected native click/user-gesture injection.'
+    );
+  }
+  return result;
+};
+
 const releaseHeldPreviewKeys = async (
   previewDebuggerServer: Object,
   targetId: string,
@@ -2193,7 +2232,8 @@ const releaseHeldPreviewKeys = async (
 // (request/response) and returns what was applied.
 const simulatePreviewInput = async (
   previewDebuggerServer: ?Object,
-  args: Object
+  args: Object,
+  injectUserGesture?: ?(inputs: Array<Object>) => Promise<?Object>
 ): Promise<Object> => {
   const guard = requireRunningPreview(previewDebuggerServer, args);
   if (!guard.ok) return guard.result;
@@ -2219,6 +2259,10 @@ const simulatePreviewInput = async (
     normalizedInputs.push(result.normalization);
   }
 
+  const userGesture = await injectPreviewClickUserGesture(
+    rawInputs,
+    injectUserGesture
+  );
   const { matched, payload } = await sendTargetedRequest(
     (previewDebuggerServer: any),
     targetId,
@@ -2231,6 +2275,7 @@ const simulatePreviewInput = async (
       debuggerId: targetId,
       appliedCount: resolved.length,
       normalizedInputs,
+      userGesture: userGesture || undefined,
       note:
         'Input sent but not confirmed (no reply from the targeted preview before timeout). Press and release are separate inputs; hold a key by sending keyPressed without keyReleased.',
     };
@@ -2255,6 +2300,7 @@ const simulatePreviewInput = async (
     debuggerId: targetId,
     applied: payload.applied,
     normalizedInputs,
+    userGesture: userGesture || undefined,
     error: payload.error || undefined,
     // InputManager state right after applying the input (pressedKeyCodes,
     // lastPressedKey, mouseX/Y, pressedMouseButtons). If a key you pressed is
@@ -2273,7 +2319,8 @@ const simulatePreviewInput = async (
 // `runtime` summary as gdevelop_inspect_running_preview.
 const runPreviewFrames = async (
   previewDebuggerServer: ?Object,
-  args: Object
+  args: Object,
+  injectUserGesture?: ?(inputs: Array<Object>) => Promise<?Object>
 ): Promise<Object> => {
   const guard = requireRunningPreview(previewDebuggerServer, args);
   if (!guard.ok) return guard.result;
@@ -2341,6 +2388,10 @@ const runPreviewFrames = async (
     }
   }
 
+  const userGesture = await injectPreviewClickUserGesture(
+    rawInputs,
+    injectUserGesture
+  );
   const autoRelease = !!(args && (args.auto_release || args.autoRelease));
   const { matched, payload } = await sendTargetedRequest(
     (previewDebuggerServer: any),
@@ -2385,6 +2436,7 @@ const runPreviewFrames = async (
       outcome: 'timeout',
       partialStateAvailable: false,
       cleanup,
+      userGesture: userGesture || undefined,
       diagnostics: buildPreviewDiagnostics({
         running: true,
         previewIds: guard.previewIds,
@@ -2459,6 +2511,10 @@ const runPreviewFrames = async (
         ? !!runMeta.partialStateAvailable
         : steppedFrames > 0,
     cleanup,
+    userGesture: userGesture || undefined,
+    recentSounds: Array.isArray(runMeta.recentlyPlayedSounds)
+      ? runMeta.recentlyPlayedSounds
+      : [],
     deltaMs: runMeta.deltaMs,
     // Keys STILL held after this call. A held key (keyPressed with no release)
     // carries over to subsequent run_frames and keeps driving the game — pass
@@ -5277,7 +5333,8 @@ const callMcpTool = async ({
     try {
       const result = await simulatePreviewInput(
         previewDebuggerServer,
-        args || {}
+        args || {},
+        context.injectPreviewClickUserGesture
       );
       return textResult(result);
     } catch (error) {
@@ -5290,7 +5347,11 @@ const callMcpTool = async ({
       ? context.getPreviewDebuggerServer()
       : null;
     try {
-      const result = await runPreviewFrames(previewDebuggerServer, args || {});
+      const result = await runPreviewFrames(
+        previewDebuggerServer,
+        args || {},
+        context.injectPreviewClickUserGesture
+      );
       return textResult(result);
     } catch (error) {
       return errorResult(error.message);

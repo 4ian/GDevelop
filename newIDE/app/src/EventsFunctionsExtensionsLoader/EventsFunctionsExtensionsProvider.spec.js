@@ -135,7 +135,40 @@ describe('EventsFunctionsExtensionsProvider loading queues', () => {
     const firstQueuedLoad = context.loadProjectEventsFunctionsExtensions(
       project
     );
+    await act(async () => {
+      await flushPromises();
+    });
+    expect(loadProjectEventsFunctionsExtensions).toHaveBeenCalledTimes(1);
+
     const secondQueuedLoad = context.loadProjectEventsFunctionsExtensions(
+      project
+    );
+    await act(async () => {
+      finishFirstLoad();
+      await firstQueuedLoad;
+      await secondQueuedLoad;
+    });
+    expect(loadProjectEventsFunctionsExtensions).toHaveBeenCalledTimes(2);
+    await context.ensureLoadFinished(project);
+    act(() => renderer.unmount());
+  });
+
+  it('coalesces repeated loads into one trailing pass', async () => {
+    const project: gdProject = ({}: any);
+    let finishFirstLoad: () => void = () => {};
+    let finishTrailingLoad: () => void = () => {};
+    const firstLoad: Promise<void> = new Promise(resolve => {
+      finishFirstLoad = () => resolve();
+    });
+    const trailingLoad: Promise<void> = new Promise(resolve => {
+      finishTrailingLoad = () => resolve();
+    });
+    mockFn(loadProjectEventsFunctionsExtensions)
+      .mockImplementationOnce(() => firstLoad)
+      .mockImplementationOnce(() => trailingLoad);
+    const { context, renderer } = renderProvider();
+
+    const firstQueuedLoad = context.loadProjectEventsFunctionsExtensions(
       project
     );
     await act(async () => {
@@ -143,10 +176,19 @@ describe('EventsFunctionsExtensionsProvider loading queues', () => {
     });
     expect(loadProjectEventsFunctionsExtensions).toHaveBeenCalledTimes(1);
 
+    const coalescedLoads = Array.from({ length: 6 }, () =>
+      context.loadProjectEventsFunctionsExtensions(project)
+    );
     await act(async () => {
       finishFirstLoad();
+      await flushPromises();
+    });
+    expect(loadProjectEventsFunctionsExtensions).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      finishTrailingLoad();
       await firstQueuedLoad;
-      await secondQueuedLoad;
+      await Promise.all(coalescedLoads);
     });
     expect(loadProjectEventsFunctionsExtensions).toHaveBeenCalledTimes(2);
     await context.ensureLoadFinished(project);

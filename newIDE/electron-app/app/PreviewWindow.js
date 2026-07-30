@@ -12,6 +12,7 @@ const {
   getPreviewBrowserWindowOptionsFittingDisplay,
   getBoundsFittingDisplayHeight,
 } = require('./PreviewWindowBounds');
+const { injectPreviewClickUserGesture } = require('./PreviewWindowUserInput');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -671,6 +672,25 @@ const focusAllPreviewWindows = () => {
   return previewWindows.length;
 };
 
+const injectPreviewUserGesture = async ({ windowId, inputs } = {}) => {
+  let entry = null;
+  if (windowId !== undefined && windowId !== null) {
+    entry = previewWindows.find(e => e.previewWindow.id === windowId);
+  } else if (previewWindows.length) {
+    entry = previewWindows[previewWindows.length - 1];
+  }
+  if (!entry || !entry.previewWindow || entry.previewWindow.isDestroyed()) {
+    return {
+      success: false,
+      attempted: true,
+      supported: true,
+      error: 'No preview window available for native input injection.',
+    };
+  }
+
+  return injectPreviewClickUserGesture(entry.previewWindow, inputs);
+};
+
 // Capture a PNG of a preview window's content from the MAIN process via
 // webContents.capturePage(). Unlike the renderer-side canvas.toDataURL path,
 // this does NOT execute any JS in the (possibly OS-suspended) renderer, so it
@@ -707,6 +727,7 @@ module.exports = {
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
   focusAllPreviewWindows,
+  injectPreviewUserGesture,
   capturePreviewPage,
   setDebuggerPopOutWindow,
 };

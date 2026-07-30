@@ -7840,6 +7840,21 @@ const MainFrame = (props: Props): React.MixedElement => {
             previewLauncher.focusAllPreviews();
           }
         },
+        injectPreviewClickUserGesture: inputs => {
+          const previewLauncher = _previewLauncher.current;
+          if (
+            previewLauncher &&
+            previewLauncher.injectPreviewClickUserGesture
+          ) {
+            return previewLauncher.injectPreviewClickUserGesture(inputs);
+          }
+          return Promise.resolve({
+            success: false,
+            attempted: true,
+            supported: false,
+            error: 'Native preview input injection is unavailable.',
+          });
+        },
         capturePreviewPage: windowId => {
           const previewLauncher = _previewLauncher.current;
           if (previewLauncher && previewLauncher.capturePreviewPage) {

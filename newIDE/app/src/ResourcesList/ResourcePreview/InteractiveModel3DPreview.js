@@ -28,12 +28,24 @@ import {
   getModelBoneCanonicalName,
   getModelBoneDisplayName,
 } from './Model3DBoneUtils';
-import { createBoneLabelElement } from './Model3DBoneLabelUtils';
+import {
+  createBoneJointTooltipElement,
+  createBoneLabelElement,
+  hideBoneJointTooltip,
+  showBoneJointTooltip,
+} from './Model3DBoneLabelUtils';
+import {
+  captureModelMaterialAppearances,
+  findHoveredBoneJointIndex,
+  setModelMaterialsBonesVisibility,
+} from './Model3DBoneVisualizationUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
 const MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18;
 const BONE_JOINT_MARKER_SIZE = 11;
+const BONE_JOINT_HIT_RADIUS = 8;
+const BONE_JOINT_TOOLTIP_OFFSET = BONE_JOINT_MARKER_SIZE / 2 + 6;
 
 const styles = {
   container: {
@@ -130,13 +142,6 @@ type AnimationPlaybackController = {|
   actions: Array<any>,
 |};
 
-type MaterialAppearance = {|
-  material: any,
-  transparent: boolean,
-  opacity: number,
-  depthWrite: boolean,
-|};
-
 type BonesVisualizationController = {|
   update: () => void,
   render: () => void,
@@ -184,11 +189,6 @@ const disposeObject = (object: any) => {
   });
 };
 
-const getMaterials = (node: any): Array<any> => {
-  if (!node.material) return [];
-  return Array.isArray(node.material) ? node.material : [node.material];
-};
-
 const createBoneJointMarkerTexture = (): any => {
   const markerCanvas = document.createElement('canvas');
   markerCanvas.width = 64;
@@ -231,20 +231,7 @@ const createBonesVisualization = ({
   });
   if (!bones.length) return null;
 
-  const materialAppearances: Array<MaterialAppearance> = [];
-  const recordedMaterials = new Set<any>();
-  model.traverse(child => {
-    getMaterials(child).forEach(material => {
-      if (!material || recordedMaterials.has(material)) return;
-      recordedMaterials.add(material);
-      materialAppearances.push({
-        material,
-        transparent: material.transparent,
-        opacity: material.opacity,
-        depthWrite: material.depthWrite,
-      });
-    });
-  });
+  const materialAppearances = captureModelMaterialAppearances(model);
 
   const skeletonHelper = new THREE.SkeletonHelper(model);
   skeletonHelper.visible = false;
@@ -280,6 +267,13 @@ const createBonesVisualization = ({
 
   const inverseModelWorldMatrix = new THREE.Matrix4();
   const bonePosition = new THREE.Vector3();
+  const projectedBonePosition = new THREE.Vector3();
+  const boneScreenPositions = bones.map(() => ({
+    x: 0,
+    y: 0,
+    depth: 0,
+    isVisible: false,
+  }));
   const updateBoneJointPositions = () => {
     model.updateMatrixWorld(true);
     inverseModelWorldMatrix.copy(model.matrixWorld).invert();
@@ -306,11 +300,15 @@ const createBonesVisualization = ({
   labelRenderer.domElement.style.pointerEvents = 'none';
   canvasHost.appendChild(labelRenderer.domElement);
 
+  const boneCanonicalNames = bones.map(bone => getModelBoneCanonicalName(bone));
+  const boneDisplayNames = bones.map((bone, boneIndex) =>
+    getModelBoneDisplayName(bone, boneIndex)
+  );
   const boneLabels = bones.map((bone, boneIndex) => {
-    const canonicalName = getModelBoneCanonicalName(bone);
+    const canonicalName = boneCanonicalNames[boneIndex];
     const label = new CSS2DObject(
       createBoneLabelElement({
-        displayName: getModelBoneDisplayName(bone, boneIndex),
+        displayName: boneDisplayNames[boneIndex],
         canonicalName,
         copyAriaLabel: i18n._(t`Copy bone name ${canonicalName}`),
         copyTooltip: i18n._(t`Click to copy bone name`),
@@ -323,28 +321,115 @@ const createBonesVisualization = ({
     return label;
   });
 
+  const boneJointTooltip = createBoneJointTooltipElement();
+  canvasHost.appendChild(boneJointTooltip);
+  const originalCanvasHostCursor = canvasHost.style.cursor;
+
   let areBonesVisible = false;
   let areBoneNamesVisible = false;
+  let isPointerInside = false;
+  let pointerX = 0;
+  let pointerY = 0;
+  let hoveredBoneIndex = -1;
   const updateBoneNamesVisibility = () => {
     boneLabels.forEach(label => {
       label.visible = areBonesVisible && areBoneNamesVisible;
     });
   };
 
+  const clearHoveredBoneJoint = () => {
+    hoveredBoneIndex = -1;
+    canvasHost.style.cursor = originalCanvasHostCursor;
+    hideBoneJointTooltip(boneJointTooltip);
+  };
+  // Point markers have a constant screen-space size, so their hover targets
+  // are also calculated in screen space and stay accurate while zooming.
+  const updateBoneJointTooltip = () => {
+    if (!areBonesVisible || !isPointerInside) {
+      clearHoveredBoneJoint();
+      return;
+    }
+
+    const width = Math.max(canvasHost.clientWidth, 1);
+    const height = Math.max(canvasHost.clientHeight, 1);
+    bones.forEach((bone, boneIndex) => {
+      projectedBonePosition
+        .setFromMatrixPosition(bone.matrixWorld)
+        .project(camera);
+      const screenPosition = boneScreenPositions[boneIndex];
+      screenPosition.x = ((projectedBonePosition.x + 1) / 2) * width;
+      screenPosition.y = ((1 - projectedBonePosition.y) / 2) * height;
+      screenPosition.depth = projectedBonePosition.z;
+      screenPosition.isVisible =
+        projectedBonePosition.z >= -1 && projectedBonePosition.z <= 1;
+    });
+    hoveredBoneIndex = findHoveredBoneJointIndex({
+      boneScreenPositions,
+      pointerX,
+      pointerY,
+      hitRadius: BONE_JOINT_HIT_RADIUS,
+    });
+    if (hoveredBoneIndex === -1) {
+      clearHoveredBoneJoint();
+      return;
+    }
+
+    const hoveredBoneScreenPosition = boneScreenPositions[hoveredBoneIndex];
+    canvasHost.style.cursor = boneCanonicalNames[hoveredBoneIndex]
+      ? 'copy'
+      : originalCanvasHostCursor;
+    showBoneJointTooltip({
+      element: boneJointTooltip,
+      displayName: boneDisplayNames[hoveredBoneIndex],
+      x: hoveredBoneScreenPosition.x,
+      y: hoveredBoneScreenPosition.y,
+      offset: BONE_JOINT_TOOLTIP_OFFSET,
+    });
+  };
+  const updatePointerPosition = (event: MouseEvent) => {
+    const bounds = canvasHost.getBoundingClientRect();
+    pointerX = event.clientX - bounds.left;
+    pointerY = event.clientY - bounds.top;
+    isPointerInside =
+      pointerX >= 0 &&
+      pointerY >= 0 &&
+      pointerX <= bounds.width &&
+      pointerY <= bounds.height;
+  };
+  const onPointerMove = (event: PointerEvent) => {
+    updatePointerPosition(event);
+    updateBoneJointTooltip();
+  };
+  const onPointerLeave = () => {
+    isPointerInside = false;
+    clearHoveredBoneJoint();
+  };
+  const onBoneJointClick = (event: MouseEvent) => {
+    if (!areBonesVisible) return;
+    updatePointerPosition(event);
+    updateBoneJointTooltip();
+    if (hoveredBoneIndex === -1) return;
+    const canonicalName = boneCanonicalNames[hoveredBoneIndex];
+    if (!canonicalName) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onCopyBoneName(canonicalName);
+  };
+  canvasHost.addEventListener('pointermove', onPointerMove);
+  canvasHost.addEventListener('pointerleave', onPointerLeave);
+  canvasHost.addEventListener('click', onBoneJointClick);
+
   const setBonesVisible = (isVisible: boolean) => {
     areBonesVisible = isVisible;
     skeletonHelper.visible = isVisible;
     boneJoints.visible = isVisible;
     updateBoneNamesVisibility();
-    materialAppearances.forEach(appearance => {
-      const { material } = appearance;
-      material.transparent = isVisible ? true : appearance.transparent;
-      material.opacity = isVisible
-        ? Math.min(appearance.opacity, MODEL_OPACITY_WHEN_SHOWING_BONES)
-        : appearance.opacity;
-      material.depthWrite = isVisible ? false : appearance.depthWrite;
-      material.needsUpdate = true;
+    setModelMaterialsBonesVisibility({
+      materialAppearances,
+      isVisible,
+      previewOpacity: MODEL_OPACITY_WHEN_SHOWING_BONES,
     });
+    if (!isVisible) clearHoveredBoneJoint();
   };
 
   const setBoneNamesVisible = (isVisible: boolean) => {
@@ -354,7 +439,10 @@ const createBonesVisualization = ({
 
   return {
     update: () => {
-      if (areBonesVisible) updateBoneJointPositions();
+      if (areBonesVisible) {
+        updateBoneJointPositions();
+        updateBoneJointTooltip();
+      }
     },
     render: () => labelRenderer.render(scene, camera),
     setSize: (width, height) => labelRenderer.setSize(width, height),
@@ -372,6 +460,13 @@ const createBonesVisualization = ({
       boneJointGeometry.dispose();
       boneJointMaterial.dispose();
       boneJointMarkerTexture.dispose();
+      canvasHost.removeEventListener('pointermove', onPointerMove);
+      canvasHost.removeEventListener('pointerleave', onPointerLeave);
+      canvasHost.removeEventListener('click', onBoneJointClick);
+      canvasHost.style.cursor = originalCanvasHostCursor;
+      if (boneJointTooltip.parentNode === canvasHost) {
+        canvasHost.removeChild(boneJointTooltip);
+      }
       if (labelRenderer.domElement.parentNode === canvasHost) {
         canvasHost.removeChild(labelRenderer.domElement);
       }

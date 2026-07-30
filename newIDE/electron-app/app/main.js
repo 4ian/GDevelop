@@ -47,6 +47,7 @@ const {
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
   focusAllPreviewWindows,
+  injectPreviewUserGesture,
   capturePreviewPage,
   setDebuggerPopOutWindow,
 } = require('./PreviewWindow');
@@ -741,6 +742,10 @@ app.on('ready', function() {
 
   ipcMain.handle('preview-focus-all', async () => {
     return focusAllPreviewWindows();
+  });
+
+  ipcMain.handle('preview-inject-user-gesture', async (event, options) => {
+    return injectPreviewUserGesture(options || {});
   });
 
   ipcMain.handle('preview-capture-page', async (event, options) => {

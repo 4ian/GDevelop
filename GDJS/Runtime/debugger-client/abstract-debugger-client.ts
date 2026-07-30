@@ -848,6 +848,22 @@ namespace gdjs {
       const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
       // Recently played sounds since the last status (cleared after reporting),
       // so a harness can confirm a PlaySound action actually fired.
+      const recentlyPlayedSounds = this._takeRecentlyPlayedSounds();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'status',
+          messageId,
+          payload: {
+            isPaused: this._runtimegame.isPaused(),
+            isInGameEdition: this._runtimegame.isInGameEdition(),
+            sceneName: currentScene ? currentScene.getName() : null,
+            recentlyPlayedSounds,
+          },
+        })
+      );
+    }
+
+    private _takeRecentlyPlayedSounds(): Array<Object> {
       let recentlyPlayedSounds: Array<Object> = [];
       try {
         const soundManager = this._runtimegame.getSoundManager();
@@ -862,18 +878,7 @@ namespace gdjs {
       } catch (e) {
         // Ignore — sound reporting is best-effort.
       }
-      this._sendMessage(
-        circularSafeStringify({
-          command: 'status',
-          messageId,
-          payload: {
-            isPaused: this._runtimegame.isPaused(),
-            isInGameEdition: this._runtimegame.isInGameEdition(),
-            sceneName: currentScene ? currentScene.getName() : null,
-            recentlyPlayedSounds,
-          },
-        })
-      );
+      return recentlyPlayedSounds;
     }
 
     /**
@@ -1526,7 +1531,9 @@ namespace gdjs {
       }
       // 5. Reply once with the full dump plus the run metadata (including which
       // keys are STILL held), so the bridge can summarize live state without a
-      // 2nd call and the caller can see lingering held keys.
+      // 2nd call and the caller can see lingering held keys and sounds fired by
+      // the stepped events.
+      const recentlyPlayedSounds = this._takeRecentlyPlayedSounds();
       this._sendRuntimeGameDumpWith({
         command: 'framesRan',
         messageId,
@@ -1554,6 +1561,7 @@ namespace gdjs {
           cleanup,
           paused: this._runtimegame.isPaused(),
           heldKeys: this._getHeldKeyCodes(),
+          recentlyPlayedSounds,
           cursorWorldCoordinates: includeCursorWorldCoordinates
             ? this._getCursorWorldCoordinates(cursorLayers)
             : undefined,

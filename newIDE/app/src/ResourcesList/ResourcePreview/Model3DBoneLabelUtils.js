@@ -8,6 +8,14 @@ type CreateBoneLabelElementOptions = {|
   onCopy: (boneName: string) => void,
 |};
 
+type ShowBoneJointTooltipOptions = {|
+  element: HTMLDivElement,
+  displayName: string,
+  x: number,
+  y: number,
+  offset: number,
+|};
+
 /**
  * Create a bone label for the CSS2D preview overlay.
  *
@@ -65,4 +73,55 @@ export const createBoneLabelElement = ({
   });
 
   return element;
+};
+
+export const createBoneJointTooltipElement = (): HTMLDivElement => {
+  const element = document.createElement('div');
+  element.setAttribute('role', 'tooltip');
+  element.setAttribute('translate', 'no');
+  element.style.position = 'absolute';
+  element.style.zIndex = '3';
+  element.style.display = 'none';
+  element.style.padding = '4px 7px';
+  element.style.border = '1px solid rgba(87, 218, 255, 0.9)';
+  element.style.borderRadius = '3px';
+  element.style.backgroundColor = 'rgba(15, 20, 28, 0.96)';
+  element.style.color = '#ffffff';
+  element.style.fontFamily = 'sans-serif';
+  element.style.fontSize = '12px';
+  element.style.lineHeight = '16px';
+  element.style.whiteSpace = 'nowrap';
+  element.style.pointerEvents = 'none';
+  element.style.transform = 'translate(-50%, -100%)';
+  return element;
+};
+
+export const showBoneJointTooltip = ({
+  element,
+  displayName,
+  x,
+  y,
+  offset,
+}: ShowBoneJointTooltipOptions) => {
+  const parentWidth = element.parentElement
+    ? element.parentElement.clientWidth
+    : 0;
+  let translateX = '-50%';
+  if (parentWidth > 0 && x < parentWidth / 4) {
+    translateX = '0';
+  } else if (parentWidth > 0 && x > (parentWidth * 3) / 4) {
+    translateX = '-100%';
+  }
+  const showBelowJoint = y - offset < 24;
+  element.textContent = displayName;
+  element.style.left = `${x}px`;
+  element.style.top = `${showBelowJoint ? y + offset : y - offset}px`;
+  element.style.transform = `translate(${translateX}, ${
+    showBelowJoint ? '0' : '-100%'
+  })`;
+  element.style.display = 'block';
+};
+
+export const hideBoneJointTooltip = (element: HTMLDivElement) => {
+  element.style.display = 'none';
 };

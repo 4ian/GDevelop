@@ -240,6 +240,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
+  const { onRunGameplayTest } = handlers;
   useCommandWithOptions('RUN_GAMEPLAY_TEST', !!handlers.project, {
     generateOptions: React.useCallback(
       () =>
@@ -247,10 +248,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
           handlers.project,
           enumerateGameplayTests,
           (testName: string) => {
-            handlers.onRunGameplayTest(testName);
+            onRunGameplayTest(testName);
           }
         ),
-      [handlers.project, handlers.onRunGameplayTest]
+      [handlers.project, onRunGameplayTest]
     ),
   });
 

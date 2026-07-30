@@ -1857,6 +1857,15 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
+      if (
+        // Instances hidden at start are not hidden in the in-game editor:
+        // they must stay visible to be seen and manipulated.
+        !this._runtimeGame.isInGameEdition() &&
+        !oldInstance.hidden !== !newInstance.hidden
+      ) {
+        runtimeObject.hide(!!newInstance.hidden);
+        somethingChanged = true;
+      }
       if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
         if (oldInstance.z !== newInstance.z) {
           runtimeObject.setZ(newInstance.z || 0);

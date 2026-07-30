@@ -1489,6 +1489,8 @@ interface InitialInstance {
     void SetSealed(boolean seal);
     boolean ShouldKeepRatio();
     void SetShouldKeepRatio(boolean keepRatio);
+    boolean IsHidden();
+    void SetHidden(boolean hidden);
     long GetZOrder();
     void SetZOrder(long zOrder);
     long GetOpacity();

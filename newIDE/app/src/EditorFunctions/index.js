@@ -3386,8 +3386,15 @@ const describeInstances: EditorFunction = {
             width,
             height,
             depth,
+            // Expose the per-instance variables (overrides of the object
+            // variables), but only when there are some, to keep the output
+            // compact. Absence means the instance uses the object variables.
+            initialVariables:
+              serializedInstance.initialVariables &&
+              serializedInstance.initialVariables.length > 0
+                ? serializedInstance.initialVariables
+                : undefined,
             // For now, don't expose these:
-            initialVariables: undefined,
             numberProperties: undefined,
             stringProperties: undefined,
           });
@@ -3893,6 +3900,7 @@ const put2dInstances: EditorFunction = {
             originalZOrder: instance.getZOrder(),
             originalRotation: instance.getAngle(),
             originalOpacity: instance.getOpacity(),
+            originalHidden: instance.isHidden(),
             originalCustomWidth: instance.hasCustomSize()
               ? instance.getCustomWidth()
               : null,
@@ -4036,6 +4044,10 @@ const put2dInstances: EditorFunction = {
         args,
         'instances_opacity'
       );
+      const instancesHidden = SafeExtractor.extractBooleanProperty(
+        args,
+        'instances_hidden'
+      );
 
       modifiedAndCreatedInstances.forEach(instance => {
         if (instancesSize) {
@@ -4052,6 +4064,9 @@ const put2dInstances: EditorFunction = {
         if (instancesOpacity !== null) {
           instance.setOpacity(instancesOpacity);
         }
+        if (instancesHidden !== null) {
+          instance.setHidden(instancesHidden);
+        }
       });
 
       // Track specific changes that were made
@@ -4063,6 +4078,8 @@ const put2dInstances: EditorFunction = {
           attrs.push(`rotation ${instancesRotation}°`);
         if (instancesOpacity !== null)
           attrs.push(`opacity ${instancesOpacity}/255`);
+        if (instancesHidden !== null)
+          attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         if (instances_z_order !== null)
           attrs.push(`z-order ${instances_z_order}`);
         const effectiveSize = instancesSize
@@ -4108,6 +4125,7 @@ const put2dInstances: EditorFunction = {
       let resizedCount = 0;
       let rotatedCount = 0;
       let opacityChangedCount = 0;
+      let hiddenChangedCount = 0;
       let zOrderChangedCount = 0;
 
       existingInstanceStates.forEach((originalState, instance) => {
@@ -4138,6 +4156,12 @@ const put2dInstances: EditorFunction = {
           originalState.originalOpacity !== instance.getOpacity()
         ) {
           opacityChangedCount++;
+        }
+        if (
+          instancesHidden !== null &&
+          originalState.originalHidden !== instance.isHidden()
+        ) {
+          hiddenChangedCount++;
         }
         if (
           instances_z_order !== null &&
@@ -4200,6 +4224,18 @@ const put2dInstances: EditorFunction = {
         );
       }
 
+      if (hiddenChangedCount > 0 && instancesHidden !== null) {
+        changes.push(
+          instancesHidden
+            ? `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as hidden at start (they can be displayed with the "Show" action).`
+            : `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as visible at start.`
+        );
+      }
+
       if (zOrderChangedCount > 0 && instances_z_order !== null) {
         changes.push(
           `Changed Z-order of ${zOrderChangedCount} instance${
@@ -4236,6 +4272,7 @@ const put2dInstances: EditorFunction = {
           !!instancesSize ||
           instancesRotation !== null ||
           instancesOpacity !== null ||
+          instancesHidden !== null ||
           instances_z_order !== null;
         const hasPositionBrush =
           brush_kind === 'point' ||
@@ -4749,6 +4786,7 @@ const put3dInstances: EditorFunction = {
             originalRotationX: instance.getRotationX(),
             originalRotationY: instance.getRotationY(),
             originalRotationZ: instance.getAngle(),
+            originalHidden: instance.isHidden(),
             originalCustomWidth: instance.hasCustomSize()
               ? instance.getCustomWidth()
               : null,
@@ -4854,6 +4892,10 @@ const put3dInstances: EditorFunction = {
       const instancesRotationArray = instances_rotation
         ? instances_rotation.split(',').map(coord => parseFloat(coord) || 0)
         : null;
+      const instancesHidden = SafeExtractor.extractBooleanProperty(
+        args,
+        'instances_hidden'
+      );
 
       modifiedAndCreatedInstances.forEach(instance => {
         if (instancesSizeArray) {
@@ -4867,6 +4909,9 @@ const put3dInstances: EditorFunction = {
           instance.setRotationX(instancesRotationArray[0]);
           instance.setRotationY(instancesRotationArray[1]);
           instance.setAngle(instancesRotationArray[2]);
+        }
+        if (instancesHidden !== null) {
+          instance.setHidden(instancesHidden);
         }
       });
 
@@ -4885,6 +4930,8 @@ const put3dInstances: EditorFunction = {
               instancesRotationArray[1]
             }°, ${instancesRotationArray[2]}°)`
           );
+        if (instancesHidden !== null)
+          attrs.push(instancesHidden ? 'hidden at start' : 'visible at start');
         const effectiveSize = instancesSizeArray
           ? instancesSizeArray
           : objectSizeInfo &&
@@ -4928,6 +4975,7 @@ const put3dInstances: EditorFunction = {
       let movedPositionCount = 0;
       let resizedCount = 0;
       let rotatedCount = 0;
+      let hiddenChangedCount = 0;
 
       existingInstanceStates.forEach((originalState, instance) => {
         if (originalState.originalLayer !== instance.getLayer()) {
@@ -4956,6 +5004,12 @@ const put3dInstances: EditorFunction = {
             originalState.originalRotationZ !== instance.getAngle())
         ) {
           rotatedCount++;
+        }
+        if (
+          instancesHidden !== null &&
+          originalState.originalHidden !== instance.isHidden()
+        ) {
+          hiddenChangedCount++;
         }
       });
 
@@ -5008,6 +5062,18 @@ const put3dInstances: EditorFunction = {
         );
       }
 
+      if (hiddenChangedCount > 0 && instancesHidden !== null) {
+        changes.push(
+          instancesHidden
+            ? `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as hidden at start (they can be displayed with the "Show" action).`
+            : `Marked ${hiddenChangedCount} instance${
+                hiddenChangedCount > 1 ? 's' : ''
+              }${ofObjectsSuffix} as visible at start.`
+        );
+      }
+
       if (notFoundExistingInstanceIds.size > 0) {
         // If NONE of the requested instances were found and nothing new was
         // created, the call did nothing. Return a failure so the agent gets a
@@ -5034,7 +5100,8 @@ const put3dInstances: EditorFunction = {
         const matchedCount = existingInstanceStates.size;
         const hasMutationParams =
           !!instancesSizeArray ||
-          (!!instancesRotationArray && instancesRotationArray.length >= 3);
+          (!!instancesRotationArray && instancesRotationArray.length >= 3) ||
+          instancesHidden !== null;
         const hasPositionBrush =
           brush_kind === 'point' ||
           brush_kind === 'line' ||
@@ -7850,17 +7917,78 @@ const resolveVariablesContainers = ({
   variable_scope,
   scene_name,
   object_name,
+  instance_id,
 }: {|
   project: gdProject,
   variable_scope: string,
   scene_name: ?string,
   object_name: ?string,
+  instance_id: ?string,
 |}): VariablesContainersResolution => {
   const fail = (message: string): VariablesContainersResolution => ({
     failure: makeGenericFailure(message),
     variablesContainers: [],
     scopeDescription: '',
   });
+
+  if (variable_scope === 'instance') {
+    if (!scene_name) {
+      return fail(`Missing "scene_name" (required for instance variables).`);
+    }
+    if (!project.hasLayoutNamed(scene_name)) {
+      return fail(getSceneNotFoundMessage(project, scene_name));
+    }
+    const instanceId = instance_id ? instance_id.trim() : '';
+    if (!instanceId) {
+      return fail(
+        `Missing "instance_id" (required for instance variables) - get it from \`describe_instances\` (the \`id\` field of each instance).`
+      );
+    }
+
+    const layout = project.getLayout(scene_name);
+    let wrongObjectDescription = null;
+    // The id is a prefix of the instance persistent uuid (like everywhere
+    // else, see `describe_instances`) - it normally matches a single
+    // instance.
+    const matchedInstances: Array<gdInitialInstance> = [];
+    iterateOnInstances(layout.getInitialInstances(), instance => {
+      if (!instance.getPersistentUuid().startsWith(instanceId)) return;
+      if (object_name && instance.getObjectName() !== object_name) {
+        wrongObjectDescription = `"${instanceId}" (instance of "${instance.getObjectName()}")`;
+        return;
+      }
+      matchedInstances.push(instance);
+    });
+
+    if (object_name && wrongObjectDescription) {
+      return fail(
+        `This instance id is not an instance of object "${object_name}": ${wrongObjectDescription}. Nothing was changed. Pass the right \`object_name\` (or omit it), or fix the id using \`describe_instances\`.`
+      );
+    }
+    if (matchedInstances.length === 0) {
+      return fail(
+        `No instance with id "${instanceId}" found in scene "${scene_name}". Nothing was changed. Call \`describe_instances\` to get valid ids (the \`id\` field of each instance).`
+      );
+    }
+
+    const instancesLabel = matchedInstances
+      .map(
+        instance =>
+          `"${instance
+            .getPersistentUuid()
+            .slice(0, 10)}" (${instance.getObjectName()})`
+      )
+      .join(', ');
+    return {
+      failure: null,
+      variablesContainers: matchedInstances.map(instance =>
+        instance.getVariables()
+      ),
+      scopeDescription: `instance${
+        matchedInstances.length > 1 ? 's' : ''
+      } ${instancesLabel} of scene "${scene_name}"`,
+    };
+  }
 
   if (variable_scope === 'scene') {
     if (!scene_name) {
@@ -7944,7 +8072,7 @@ const resolveVariablesContainers = ({
   }
 
   return fail(
-    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\` or \`global\`.`
+    `Invalid "variable_scope": "${variable_scope}". Use \`scene\`, \`object\`, \`group\`, \`instance\` or \`global\`.`
   );
 };
 
@@ -8011,6 +8139,17 @@ const addOrEditVariable: EditorFunction = {
           details,
           hasDetailsToShow: true,
         };
+      } else if (variable_scope === 'instance') {
+        return {
+          text: (
+            <Trans>
+              Set variable <b>{variable_name_or_path}</b> on an instance of
+              scene {scene_name}.
+            </Trans>
+          ),
+          details,
+          hasDetailsToShow: true,
+        };
       }
 
       return {
@@ -8056,6 +8195,17 @@ const addOrEditVariable: EditorFunction = {
         details,
         hasDetailsToShow: true,
       };
+    } else if (variable_scope === 'instance') {
+      return {
+        text: (
+          <Trans>
+            Update variables <b>{variableNames}</b> on an instance of scene{' '}
+            {scene_name}.
+          </Trans>
+        ),
+        details,
+        hasDetailsToShow: true,
+      };
     }
 
     return {
@@ -8075,6 +8225,10 @@ const addOrEditVariable: EditorFunction = {
       'object_name'
     );
     const scene_name = SafeExtractor.extractStringProperty(args, 'scene_name');
+    const instance_id = SafeExtractor.extractStringProperty(
+      args,
+      'instance_id'
+    );
     const operations = extractVariableOperations(args);
     if (operations.length === 0) {
       return makeGenericFailure(
@@ -8087,6 +8241,7 @@ const addOrEditVariable: EditorFunction = {
       variable_scope,
       scene_name,
       object_name,
+      instance_id,
     });
     if (resolved.failure) return resolved.failure;
     const { variablesContainers, scopeDescription } = resolved;
@@ -8236,6 +8391,7 @@ const inspectVariables: EditorFunction = {
       variable_scope,
       scene_name,
       object_name,
+      instance_id: SafeExtractor.extractStringProperty(args, 'instance_id'),
     });
     if (resolved.failure) return resolved.failure;
     const { variablesContainers, scopeDescription } = resolved;

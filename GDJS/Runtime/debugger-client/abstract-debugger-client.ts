@@ -485,6 +485,37 @@ namespace gdjs {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
           }
+        } else if (data.command === 'gameplayTest.run') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests
+              .runGameplayTest(runtimeGame, data.payload, (frame) => {
+                that.sendGameplayTestProgress(data.messageId, frame);
+              })
+              .then((result) => {
+                that.sendGameplayTestResult(data.messageId, result);
+              })
+              .catch((error) => {
+                // `runGameplayTest` is not supposed to throw - this is a
+                // safety net so the editor always gets an answer.
+                that.sendGameplayTestResult(data.messageId, {
+                  testName: (data.payload && data.payload.testName) || '',
+                  status: 'error',
+                  errors: ['Unexpected error while running the test: ' + error],
+                });
+              });
+          } else {
+            this.sendGameplayTestResult(data.messageId, {
+              testName: (data.payload && data.payload.testName) || '',
+              status: 'error',
+              errors: [
+                'Gameplay tests are not included in this preview - relaunch the preview from the editor.',
+              ],
+            });
+          }
+        } else if (data.command === 'gameplayTest.stop') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests.stopCurrentGameplayTest();
+          }
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -926,6 +957,32 @@ namespace gdjs {
           command: 'handleKeyboardShortcutFromInGameEditor',
           editorId: inGameEditor.getEditorId(),
           payload: keyEventLike,
+        })
+      );
+    }
+
+    /**
+     * Send a progress update about the gameplay test being run.
+     */
+    sendGameplayTestProgress(messageId: number, frame: number): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.progress',
+          messageId,
+          payload: { frame },
+        })
+      );
+    }
+
+    /**
+     * Send the result of a gameplay test run.
+     */
+    sendGameplayTestResult(messageId: number, result: Object): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.result',
+          messageId,
+          payload: result,
         })
       );
     }

@@ -1,0 +1,1597 @@
+/*
+ * GDevelop JS Platform
+ * Copyright 2013-present Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
+namespace gdjs {
+  const logger = new gdjs.Logger('Gameplay tests');
+
+  /**
+   * Gameplay tests: run a JavaScript test script against the running game,
+   * stepping frames deterministically, simulating inputs and asserting on the
+   * game state. Used by the editor (and the AI) through the debugger client
+   * (`gameplayTest.run` command) - see `gdjs.gameplayTests.runGameplayTest`.
+   *
+   * @category Gameplay tests
+   */
+  export namespace gameplayTests {
+    export type GameplayTestRunPayload = {
+      testName: string;
+      /** The body of `async (harness) => { ... }`. */
+      source: string;
+      /** Wall-clock timeout for the whole run. Default: 30000. */
+      timeoutMs?: number;
+      /** Maximum number of frames stepped. Default: 20000. */
+      maxFrames?: number;
+      /** Game frames stepped per animation frame. Default: 2, max 10. */
+      speedFactor?: number;
+      /** Maximum number of screenshots kept. Default: 5. */
+      maxScreenshots?: number;
+    };
+
+    export type GameplayTestAssertion = {
+      message: string;
+      passed: boolean;
+    };
+
+    export type GameplayTestLog = {
+      level: 'log' | 'warn' | 'error';
+      message: string;
+    };
+
+    export type GameplayTestEvent = {
+      frame: integer;
+      event: 'spawned' | 'removed' | 'stuck' | 'sceneChanged';
+      object?: string;
+      count?: integer;
+      sceneName?: string;
+    };
+
+    export type GameplayTestScreenshot = {
+      label: string;
+      frame: integer;
+      jpegBase64: string;
+    };
+
+    export type GameplayTestObjectSnapshot = {
+      id: integer;
+      name: string;
+      x: float;
+      y: float;
+      z?: float;
+      angle: float;
+      rotationX?: float;
+      rotationY?: float;
+      width: float;
+      height: float;
+      depth?: float;
+      centerX: float;
+      centerY: float;
+      centerZ?: float;
+      layer: string;
+      hidden: boolean;
+      animation?: string;
+      text?: string;
+      opacity?: float;
+      variables: Array<Object>;
+      behaviors: { [behaviorName: string]: Object };
+      children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
+    };
+
+    export type GameplayTestNearbyObjectSnapshot =
+      GameplayTestObjectSnapshot & {
+        distance: float;
+        relativeX: float;
+        relativeY: float;
+        relativeZ?: float;
+        above: boolean;
+        below: boolean;
+        left: boolean;
+        right: boolean;
+        bearingFromReference: float;
+      };
+
+    export type GameplayTestNavigationHint = {
+      shouldMoveLeft: boolean;
+      shouldMoveRight: boolean;
+      shouldMoveUp: boolean;
+      shouldMoveDown: boolean;
+      shouldJump: boolean;
+      shouldTurnLeft: boolean;
+      shouldTurnRight: boolean;
+      shouldLookUp: boolean;
+      shouldLookDown: boolean;
+      angleDiff: float;
+      pitchDiff: float;
+      dominantAxis: 'x' | 'y';
+      reached: boolean;
+      distanceTo: float;
+      targetX: float;
+      targetY: float;
+      targetZ?: float;
+      relativeX: float;
+      relativeY: float;
+      relativeZ?: float;
+    };
+
+    export type GameplayTestResult = {
+      testName: string;
+      status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
+      framesExecuted: integer;
+      durationMs: number;
+      gameTimeMs: number;
+      assertions: Array<GameplayTestAssertion>;
+      errors: Array<string>;
+      consoleLogs: Array<GameplayTestLog>;
+      eventLog: Array<GameplayTestEvent>;
+      finalState: {
+        sceneName: string;
+        objectCounts: { [objectName: string]: integer };
+        watchedObjects: {
+          [objectName: string]: Array<GameplayTestObjectSnapshot>;
+        };
+        sceneVariables: Array<Object>;
+      };
+      screenshots: Array<GameplayTestScreenshot>;
+      performance: {
+        avgStepMs: number;
+        worstStepMs: number;
+      } | null;
+    };
+
+    const DEFAULT_TIMEOUT_MS = 30000;
+    const DEFAULT_MAX_FRAMES = 20000;
+    const DEFAULT_SPEED_FACTOR = 2;
+    const MAX_SPEED_FACTOR = 10;
+    const DEFAULT_MAX_SCREENSHOTS = 5;
+    const MAX_CONSOLE_LOGS = 100;
+    const MAX_CONSOLE_LOGS_TOTAL_CHARS = 8000;
+    const MAX_ASSERTIONS = 200;
+    const MAX_EVENT_LOG_ENTRIES = 500;
+    const MAX_ERRORS = 20;
+    const SCREENSHOT_MAX_SIZE = 512;
+    const DEFAULT_FRAME_DT_MS = 1000 / 60;
+
+    class GameplayTestAssertionError extends Error {
+      isGameplayTestAssertionError = true;
+    }
+    class GameplayTestStoppedError extends Error {
+      isGameplayTestStoppedError = true;
+    }
+    class GameplayTestTimeoutError extends Error {
+      isGameplayTestTimeoutError = true;
+    }
+
+    /** Map both GDevelop event-sheet key names and Web API key names to
+     * a location-aware key code usable with the InputManager. */
+    const getLocationAwareKeyCodeForName = (keyName: string): number | null => {
+      const keysNameToCode: { [name: string]: number } =
+        gdjs.evtTools.input.keysNameToCode;
+      const webApiKeyNamesAliases: { [name: string]: string } = {
+        ArrowLeft: 'Left',
+        ArrowRight: 'Right',
+        ArrowUp: 'Up',
+        ArrowDown: 'Down',
+        Enter: 'Return',
+        Backspace: 'Back',
+        Shift: 'LShift',
+        ShiftLeft: 'LShift',
+        ShiftRight: 'RShift',
+        Control: 'LControl',
+        ControlLeft: 'LControl',
+        ControlRight: 'RControl',
+        Alt: 'LAlt',
+        AltLeft: 'LAlt',
+        AltRight: 'RAlt',
+        ' ': 'Space',
+        Minus: 'Dash',
+        Semicolon: 'SemiColon',
+      };
+      let name = keyName;
+      if (webApiKeyNamesAliases.hasOwnProperty(name)) {
+        name = webApiKeyNamesAliases[name];
+      }
+      // Web API "KeyA".."KeyZ" and "Digit0".."Digit9".
+      if (/^Key[A-Z]$/.test(name)) name = name[3].toLowerCase();
+      if (/^Digit[0-9]$/.test(name)) name = 'Num' + name[5];
+      // Single letters are stored lowercase, digits as "Num0".."Num9".
+      if (/^[A-Z]$/.test(name)) name = name.toLowerCase();
+      if (/^[0-9]$/.test(name)) name = 'Num' + name;
+
+      if (!keysNameToCode.hasOwnProperty(name)) return null;
+      return keysNameToCode[name];
+    };
+
+    const mouseButtonNameToCode = (button: string): number => {
+      if (button === 'right') return gdjs.InputManager.MOUSE_RIGHT_BUTTON;
+      if (button === 'middle') return gdjs.InputManager.MOUSE_MIDDLE_BUTTON;
+      return gdjs.InputManager.MOUSE_LEFT_BUTTON;
+    };
+
+    const normalizeAngleDifference = (angleInDegrees: float): float => {
+      let angle = angleInDegrees % 360;
+      if (angle > 180) angle -= 360;
+      if (angle < -180) angle += 360;
+      return angle;
+    };
+
+    /**
+     * The object passed as `harness` to a gameplay test script.
+     */
+    export class GameplayTestHarness {
+      _runtimeGame: gdjs.RuntimeGame;
+      _payload: GameplayTestRunPayload;
+
+      // Run state:
+      _framesExecuted: integer = 0;
+      _gameTimeMs: number = 0;
+      _startTimeMs: number = 0;
+      _stopped: boolean = false;
+      _assertions: Array<GameplayTestAssertion> = [];
+      _consoleLogs: Array<GameplayTestLog> = [];
+      _consoleLogsTotalChars: number = 0;
+      _eventLog: Array<GameplayTestEvent> = [];
+      _screenshots: Array<GameplayTestScreenshot> = [];
+      _watchedObjectNames: Array<string> = [];
+      _timeoutMs: number;
+      _maxFrames: integer;
+      _speedFactor: integer;
+      _maxScreenshots: integer;
+      _totalStepTimeMs: number = 0;
+      _worstStepTimeMs: number = 0;
+      _lastTrackedSceneName: string | null = null;
+      _lastTrackedObjectCounts: { [objectName: string]: integer } = {};
+      _pointerLockRequestedByGame: boolean = false;
+      _onProgress: ((frame: integer) => void) | null = null;
+      _lastProgressTimeMs: number = 0;
+      /** How to notify the input manager of the end of a stepped frame.
+       * Replaced when the game main loop's own call is neutralized. */
+      _callOnFrameEnded: () => void;
+
+      constructor(
+        runtimeGame: gdjs.RuntimeGame,
+        payload: GameplayTestRunPayload
+      ) {
+        this._runtimeGame = runtimeGame;
+        this._payload = payload;
+        this._timeoutMs = payload.timeoutMs || DEFAULT_TIMEOUT_MS;
+        this._maxFrames = payload.maxFrames || DEFAULT_MAX_FRAMES;
+        this._speedFactor = Math.max(
+          1,
+          Math.min(
+            MAX_SPEED_FACTOR,
+            payload.speedFactor || DEFAULT_SPEED_FACTOR
+          )
+        );
+        this._maxScreenshots =
+          payload.maxScreenshots === undefined
+            ? DEFAULT_MAX_SCREENSHOTS
+            : payload.maxScreenshots;
+        const inputManager = runtimeGame.getInputManager();
+        this._callOnFrameEnded = () => inputManager.onFrameEnded();
+      }
+
+      private _getCurrentScene(): gdjs.RuntimeScene {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        if (!currentScene) {
+          throw new Error(
+            'No scene is running. Call `await harness.goToScene(sceneName)` first.'
+          );
+        }
+        return currentScene;
+      }
+
+      private _checkGuards(): void {
+        if (this._stopped) {
+          throw new GameplayTestStoppedError('The test was stopped.');
+        }
+        if (this._framesExecuted >= this._maxFrames) {
+          throw new GameplayTestTimeoutError(
+            `The test reached the maximum number of frames (${this._maxFrames}).`
+          );
+        }
+        if (Date.now() - this._startTimeMs > this._timeoutMs) {
+          throw new GameplayTestTimeoutError(
+            `The test timed out after ${this._timeoutMs}ms (wall-clock).`
+          );
+        }
+      }
+
+      private _recordEvent(event: GameplayTestEvent): void {
+        if (this._eventLog.length >= MAX_EVENT_LOG_ENTRIES) return;
+        this._eventLog.push(event);
+      }
+
+      private _getObjectCounts(): { [objectName: string]: integer } {
+        const objectCounts: { [objectName: string]: integer } = {};
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        if (!currentScene) return objectCounts;
+        const objectNames: Array<string> = [];
+        // Access the protected map of the instances of the container.
+        const instances = (currentScene as any)._instances as Hashtable<
+          Array<gdjs.RuntimeObject>
+        >;
+        instances.keys(objectNames);
+        for (const objectName of objectNames) {
+          const objectInstances = instances.get(objectName);
+          if (objectInstances.length > 0) {
+            objectCounts[objectName] = objectInstances.length;
+          }
+        }
+        return objectCounts;
+      }
+
+      private _trackChangesAfterStep(): void {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        const sceneName = currentScene ? currentScene.getName() : '';
+        if (sceneName !== this._lastTrackedSceneName) {
+          this._recordEvent({
+            frame: this._framesExecuted,
+            event: 'sceneChanged',
+            sceneName,
+          });
+          this._lastTrackedSceneName = sceneName;
+          this._lastTrackedObjectCounts = this._getObjectCounts();
+          return;
+        }
+
+        const newCounts = this._getObjectCounts();
+        for (const objectName in newCounts) {
+          const previousCount = this._lastTrackedObjectCounts[objectName] || 0;
+          if (newCounts[objectName] > previousCount) {
+            this._recordEvent({
+              frame: this._framesExecuted,
+              event: 'spawned',
+              object: objectName,
+              count: newCounts[objectName],
+            });
+          }
+        }
+        for (const objectName in this._lastTrackedObjectCounts) {
+          const newCount = newCounts[objectName] || 0;
+          if (newCount < this._lastTrackedObjectCounts[objectName]) {
+            this._recordEvent({
+              frame: this._framesExecuted,
+              event: 'removed',
+              object: objectName,
+              count: newCount,
+            });
+          }
+        }
+        this._lastTrackedObjectCounts = newCounts;
+      }
+
+      /**
+       * Step a single game frame (game logic + rendering) with a fixed
+       * time delta.
+       */
+      _stepSingleFrame(dtMs: float): void {
+        this._checkGuards();
+        const stepStartTimeMs = Date.now();
+        this._runtimeGame.getSceneStack().step(dtMs);
+        this._callOnFrameEnded();
+        this._framesExecuted++;
+        this._gameTimeMs += dtMs;
+        const stepTimeMs = Date.now() - stepStartTimeMs;
+        this._totalStepTimeMs += stepTimeMs;
+        if (stepTimeMs > this._worstStepTimeMs) {
+          this._worstStepTimeMs = stepTimeMs;
+        }
+        this._trackChangesAfterStep();
+        if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
+          this._lastProgressTimeMs = Date.now();
+          this._onProgress(this._framesExecuted);
+        }
+      }
+
+      private _waitForNextAnimationFrame(): Promise<void> {
+        return new Promise((resolve) => {
+          if (typeof requestAnimationFrame !== 'undefined') {
+            requestAnimationFrame(() => resolve());
+          } else {
+            setTimeout(() => resolve(), 0);
+          }
+        });
+      }
+
+      /**
+       * Load and start the given scene, replacing any running scene.
+       */
+      async goToScene(
+        sceneName: string,
+        options?: { skipCreatingInstances?: boolean }
+      ): Promise<void> {
+        if (!this._runtimeGame.hasScene(sceneName)) {
+          throw new Error(
+            `The scene "${sceneName}" does not exist in the game.`
+          );
+        }
+        if (!this._runtimeGame.areSceneAssetsReady(sceneName)) {
+          await this._runtimeGame.loadSceneAssets(sceneName);
+        }
+        this._checkGuards();
+        this._runtimeGame.getSceneStack().replace({
+          sceneName,
+          clear: true,
+          skipCreatingInstances: options
+            ? options.skipCreatingInstances
+            : undefined,
+        });
+        // Step one frame so the scene is fully initialized ("beginning of
+        // scene" events have run) before the test continues.
+        await this.stepFrames(1);
+      }
+
+      /**
+       * Step the given number of game frames.
+       */
+      async stepFrames(
+        frameCount: integer,
+        options?: {
+          dtMs?: float;
+          onFrame?: (context: { frame: integer }) => void;
+        }
+      ): Promise<void> {
+        const dtMs = (options && options.dtMs) || DEFAULT_FRAME_DT_MS;
+        let framesSinceLastYield = 0;
+        for (let i = 0; i < frameCount; i++) {
+          this._stepSingleFrame(dtMs);
+          if (options && options.onFrame) {
+            options.onFrame({ frame: this._framesExecuted });
+          }
+          framesSinceLastYield++;
+          if (framesSinceLastYield >= this._speedFactor) {
+            framesSinceLastYield = 0;
+            await this._waitForNextAnimationFrame();
+          }
+        }
+      }
+
+      /**
+       * Step frames until the condition returns true, or `maxFrames` frames
+       * were stepped. Returns true if the condition was met.
+       */
+      async stepUntil(
+        condition: () => boolean,
+        options: {
+          maxFrames: integer;
+          onFrame?: (context: { frame: integer }) => void;
+          stuckDetection?: {
+            objectName: string;
+            windowFrames?: integer;
+            minDisplacement?: float;
+            onStuck?: (context: {
+              frame: integer;
+              x: float;
+              y: float;
+              z: float;
+            }) => void;
+          };
+        }
+      ): Promise<boolean> {
+        const stuckDetection = options.stuckDetection || null;
+        const windowFrames =
+          (stuckDetection && stuckDetection.windowFrames) || 30;
+        const minDisplacement =
+          (stuckDetection && stuckDetection.minDisplacement) || 5;
+        let lastCheckPosition: { x: float; y: float; z: float } | null = null;
+        let framesSinceLastCheck = 0;
+        let framesSinceLastYield = 0;
+
+        for (let i = 0; i < options.maxFrames; i++) {
+          if (condition()) return true;
+          this._stepSingleFrame(DEFAULT_FRAME_DT_MS);
+          if (options.onFrame) {
+            options.onFrame({ frame: this._framesExecuted });
+          }
+
+          if (stuckDetection) {
+            const instances = this.getObjects(stuckDetection.objectName);
+            if (instances.length > 0) {
+              const position = {
+                x: instances[0].x,
+                y: instances[0].y,
+                z: instances[0].z || 0,
+              };
+              framesSinceLastCheck++;
+              if (framesSinceLastCheck >= windowFrames) {
+                if (lastCheckPosition) {
+                  const displacement = Math.hypot(
+                    position.x - lastCheckPosition.x,
+                    position.y - lastCheckPosition.y,
+                    position.z - lastCheckPosition.z
+                  );
+                  if (displacement < minDisplacement) {
+                    this._recordEvent({
+                      frame: this._framesExecuted,
+                      event: 'stuck',
+                      object: stuckDetection.objectName,
+                    });
+                    // Give a clean slate to the `onStuck` handler.
+                    this.releaseAllInputs();
+                    if (stuckDetection.onStuck) {
+                      stuckDetection.onStuck({
+                        frame: this._framesExecuted,
+                        ...position,
+                      });
+                    }
+                  }
+                }
+                lastCheckPosition = position;
+                framesSinceLastCheck = 0;
+              }
+            }
+          }
+
+          framesSinceLastYield++;
+          if (framesSinceLastYield >= this._speedFactor) {
+            framesSinceLastYield = 0;
+            await this._waitForNextAnimationFrame();
+          }
+        }
+        return condition();
+      }
+
+      /**
+       * Get the name of the scene being run.
+       */
+      getSceneName(): string {
+        return this._getCurrentScene().getName();
+      }
+
+      /**
+       * Get the names of all the scenes on the scene stack (the last one
+       * is the current scene).
+       */
+      getSceneStack(): Array<string> {
+        return this._runtimeGame.getSceneStack().getAllSceneNames();
+      }
+
+      // INPUT:
+
+      /**
+       * Press or release a keyboard key. Accepts GDevelop event-sheet key
+       * names ("Left", "Space", "a"...) and Web API names ("ArrowLeft"...).
+       */
+      setKeyPressed(keyName: string, pressed: boolean): void {
+        const locationAwareKeyCode = getLocationAwareKeyCodeForName(keyName);
+        if (locationAwareKeyCode === null) {
+          throw new Error(
+            `Unknown key name: "${keyName}". Use GDevelop key names (like "Left", "Space", "a", "Num1") or Web API names (like "ArrowLeft").`
+          );
+        }
+        const inputManager = this._runtimeGame.getInputManager();
+        const rawKeyCode = locationAwareKeyCode % 1000;
+        const location = Math.floor(locationAwareKeyCode / 1000);
+        if (pressed) {
+          inputManager.onKeyPressed(rawKeyCode, location);
+        } else {
+          inputManager.onKeyReleased(rawKeyCode, location);
+        }
+      }
+
+      /**
+       * Move the mouse cursor to a position, expressed in the scene
+       * coordinates of the given layer (pass the layer of the object you
+       * want to point at).
+       */
+      setMousePosition(x: float, y: float, layerName: string = ''): void {
+        const currentScene = this._getCurrentScene();
+        if (!currentScene.hasLayer(layerName)) {
+          throw new Error(`The layer "${layerName}" does not exist.`);
+        }
+        const layer = currentScene.getLayer(layerName);
+        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        this._runtimeGame
+          .getInputManager()
+          .onMouseMove(screenPosition[0], screenPosition[1]);
+      }
+
+      /**
+       * Move the mouse cursor to a position in game resolution ("screen")
+       * coordinates.
+       */
+      setMousePositionScreen(screenX: float, screenY: float): void {
+        this._runtimeGame.getInputManager().onMouseMove(screenX, screenY);
+      }
+
+      /**
+       * Apply a mouse movement delta (for pointer-lock/FPS mouse look).
+       * Call once per frame, from `onFrame`.
+       */
+      setMouseDelta(deltaX: float, deltaY: float): void {
+        const inputManager = this._runtimeGame.getInputManager();
+        inputManager.onMouseMove(
+          inputManager.getMouseX(),
+          inputManager.getMouseY(),
+          { movementX: deltaX, movementY: deltaY }
+        );
+      }
+
+      /**
+       * Press or release a mouse button ('left', 'right' or 'middle').
+       */
+      setMouseButtonPressed(
+        pressed: boolean,
+        button: 'left' | 'right' | 'middle' = 'left'
+      ): void {
+        const inputManager = this._runtimeGame.getInputManager();
+        const buttonCode = mouseButtonNameToCode(button);
+        if (pressed) {
+          inputManager.onMouseButtonPressed(buttonCode);
+        } else {
+          inputManager.onMouseButtonReleased(buttonCode);
+        }
+      }
+
+      /**
+       * Start a touch at a position expressed in the scene coordinates of
+       * the given layer.
+       */
+      touchStart(
+        identifier: integer,
+        x: float,
+        y: float,
+        layerName: string = ''
+      ): void {
+        const layer = this._getCurrentScene().getLayer(layerName);
+        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        this._runtimeGame
+          .getInputManager()
+          .onTouchStart(identifier, screenPosition[0], screenPosition[1]);
+      }
+
+      /**
+       * Move a touch to a position expressed in the scene coordinates of
+       * the given layer.
+       */
+      touchMove(
+        identifier: integer,
+        x: float,
+        y: float,
+        layerName: string = ''
+      ): void {
+        const layer = this._getCurrentScene().getLayer(layerName);
+        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        this._runtimeGame
+          .getInputManager()
+          .onTouchMove(identifier, screenPosition[0], screenPosition[1]);
+      }
+
+      /**
+       * End a touch.
+       */
+      touchEnd(identifier: integer): void {
+        this._runtimeGame.getInputManager().onTouchEnd(identifier);
+      }
+
+      /**
+       * Get the game resolution width, in pixels.
+       */
+      getGameResolutionWidth(): float {
+        return this._runtimeGame.getGameResolutionWidth();
+      }
+
+      /**
+       * Get the game resolution height, in pixels.
+       */
+      getGameResolutionHeight(): float {
+        return this._runtimeGame.getGameResolutionHeight();
+      }
+
+      /**
+       * Release all pressed keys, mouse buttons and touches.
+       */
+      releaseAllInputs(): void {
+        const inputManager = this._runtimeGame.getInputManager();
+        inputManager.releaseAllPressedKeys();
+        inputManager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+        inputManager.onMouseButtonReleased(
+          gdjs.InputManager.MOUSE_RIGHT_BUTTON
+        );
+        inputManager.onMouseButtonReleased(
+          gdjs.InputManager.MOUSE_MIDDLE_BUTTON
+        );
+        for (const identifier of inputManager.getAllTouchIdentifiers()) {
+          // Public identifiers are raw identifiers + 2.
+          inputManager.onTouchEnd(identifier - 2);
+        }
+      }
+
+      // INSPECTION:
+
+      private _makeObjectSnapshot(
+        object: gdjs.RuntimeObject,
+        includeChildren: boolean
+      ): GameplayTestObjectSnapshot {
+        const anyObject = object as any;
+        const behaviors: { [behaviorName: string]: Object } = {};
+        // Access the protected list of behaviors of the object.
+        const objectBehaviors =
+          anyObject._behaviors as Array<gdjs.RuntimeBehavior>;
+        for (const behavior of objectBehaviors) {
+          behaviors[behavior.getName()] = behavior.getNetworkSyncData({});
+        }
+
+        const snapshot: GameplayTestObjectSnapshot = {
+          id: object.id,
+          name: object.getName(),
+          x: object.getX(),
+          y: object.getY(),
+          angle: object.getAngle(),
+          width: object.getWidth(),
+          height: object.getHeight(),
+          centerX: object.getCenterXInScene(),
+          centerY: object.getCenterYInScene(),
+          layer: object.getLayer(),
+          hidden: object.isHidden(),
+          variables: object.getVariables().getNetworkSyncData({}),
+          behaviors,
+        };
+        if (typeof anyObject.getZ === 'function') {
+          snapshot.z = anyObject.getZ();
+          if (typeof anyObject.getCenterZInScene === 'function') {
+            snapshot.centerZ = anyObject.getCenterZInScene();
+          }
+        }
+        if (typeof anyObject.getRotationX === 'function') {
+          snapshot.rotationX = anyObject.getRotationX();
+        }
+        if (typeof anyObject.getRotationY === 'function') {
+          snapshot.rotationY = anyObject.getRotationY();
+        }
+        if (typeof anyObject.getDepth === 'function') {
+          snapshot.depth = anyObject.getDepth();
+        }
+        if (typeof anyObject.getAnimationName === 'function') {
+          snapshot.animation = anyObject.getAnimationName();
+        }
+        if (typeof anyObject.getText === 'function') {
+          snapshot.text = anyObject.getText();
+        } else if (typeof anyObject.getString === 'function') {
+          snapshot.text = anyObject.getString();
+        }
+        if (typeof anyObject.getOpacity === 'function') {
+          snapshot.opacity = anyObject.getOpacity();
+        }
+        if (
+          includeChildren &&
+          typeof anyObject.getChildrenContainer === 'function'
+        ) {
+          const childrenContainer: gdjs.RuntimeInstanceContainer =
+            anyObject.getChildrenContainer();
+          const children: {
+            [objectName: string]: Array<GameplayTestObjectSnapshot>;
+          } = {};
+          for (const child of childrenContainer.getAdhocListOfAllInstances()) {
+            const childName = child.getName();
+            if (!children[childName]) children[childName] = [];
+            children[childName].push(this._makeObjectSnapshot(child, false));
+          }
+          snapshot.children = children;
+        }
+        return snapshot;
+      }
+
+      private _getInstances(objectName: string): Array<gdjs.RuntimeObject> {
+        return this._getCurrentScene().getObjects(objectName) || [];
+      }
+
+      /**
+       * Get a state snapshot of all the instances of an object.
+       * Instances are returned in an unspecified order.
+       */
+      getObjects(objectName: string): Array<GameplayTestObjectSnapshot> {
+        return this._getInstances(objectName).map((object) =>
+          this._makeObjectSnapshot(object, true)
+        );
+      }
+
+      /**
+       * Get the instances of `objectName` within `radius` of the first
+       * instance of `referenceObjectName`, sorted by distance.
+       */
+      getNearby(
+        objectName: string,
+        referenceObjectName: string,
+        radius: float
+      ): Array<GameplayTestNearbyObjectSnapshot> {
+        const referenceInstances = this._getInstances(referenceObjectName);
+        if (referenceInstances.length === 0) return [];
+        const reference = this._makeObjectSnapshot(
+          referenceInstances[0],
+          false
+        );
+        const referenceZ = reference.centerZ || 0;
+
+        const nearby: Array<GameplayTestNearbyObjectSnapshot> = [];
+        for (const object of this._getInstances(objectName)) {
+          const snapshot = this._makeObjectSnapshot(object, true);
+          const relativeX = snapshot.centerX - reference.centerX;
+          const relativeY = snapshot.centerY - reference.centerY;
+          const relativeZ = (snapshot.centerZ || 0) - referenceZ;
+          const distance = Math.hypot(relativeX, relativeY, relativeZ);
+          if (distance > radius) continue;
+          nearby.push({
+            ...snapshot,
+            distance,
+            relativeX,
+            relativeY,
+            relativeZ: snapshot.centerZ === undefined ? undefined : relativeZ,
+            above: relativeY < 0,
+            below: relativeY > 0,
+            left: relativeX < 0,
+            right: relativeX > 0,
+            bearingFromReference: gdjs.toDegrees(
+              Math.atan2(relativeY, relativeX)
+            ),
+          });
+        }
+        nearby.sort((a, b) => a.distance - b.distance);
+        return nearby;
+      }
+
+      /**
+       * Check if the straight segment between the first instance of
+       * `referenceObjectName` and the first instance of `targetObjectName`
+       * is clear of the given blocker objects (2D hitboxes).
+       */
+      hasLineOfSight(
+        referenceObjectName: string,
+        targetObjectName: string,
+        blockerObjectNames: Array<string>
+      ): {
+        clear: boolean;
+        blockedBy?: string;
+        blockedAt?: { x: float; y: float };
+      } {
+        const referenceInstances = this._getInstances(referenceObjectName);
+        const targetInstances = this._getInstances(targetObjectName);
+        if (referenceInstances.length === 0 || targetInstances.length === 0) {
+          return { clear: false, blockedBy: 'missing-object' };
+        }
+        const x0 = referenceInstances[0].getCenterXInScene();
+        const y0 = referenceInstances[0].getCenterYInScene();
+        const x1 = targetInstances[0].getCenterXInScene();
+        const y1 = targetInstances[0].getCenterYInScene();
+
+        let closestResult: {
+          blockedBy: string;
+          x: float;
+          y: float;
+          sqDistance: float;
+        } | null = null;
+        for (const blockerObjectName of blockerObjectNames) {
+          for (const blocker of this._getInstances(blockerObjectName)) {
+            const result = blocker.raycastTest(x0, y0, x1, y1, true);
+            if (result.collision) {
+              const sqDistance =
+                (result.closeX - x0) * (result.closeX - x0) +
+                (result.closeY - y0) * (result.closeY - y0);
+              if (!closestResult || sqDistance < closestResult.sqDistance) {
+                closestResult = {
+                  blockedBy: blockerObjectName,
+                  x: result.closeX,
+                  y: result.closeY,
+                  sqDistance,
+                };
+              }
+            }
+          }
+        }
+        if (closestResult) {
+          return {
+            clear: false,
+            blockedBy: closestResult.blockedBy,
+            blockedAt: { x: closestResult.x, y: closestResult.y },
+          };
+        }
+        return { clear: true };
+      }
+
+      /**
+       * Get the visibility of a layer, or null if the layer does not exist.
+       */
+      getLayer(layerName: string): { visible: boolean } | null {
+        const currentScene = this._getCurrentScene();
+        if (!currentScene.hasLayer(layerName)) return null;
+        return { visible: currentScene.getLayer(layerName).isVisible() };
+      }
+
+      /**
+       * Get a scene variable, or undefined if it does not exist.
+       */
+      getSceneVariable(variableName: string): Object | undefined {
+        return this._getCurrentScene()
+          .getVariables()
+          .getNetworkSyncData({})
+          .find((variable) => (variable as any).name === variableName);
+      }
+
+      /**
+       * Get a global variable, or undefined if it does not exist.
+       */
+      getGlobalVariable(variableName: string): Object | undefined {
+        return this._runtimeGame
+          .getVariables()
+          .getNetworkSyncData({})
+          .find((variable) => (variable as any).name === variableName);
+      }
+
+      /**
+       * Include full snapshots of this object's instances in the final
+       * state of the test result.
+       */
+      watch(objectName: string): void {
+        if (!this._watchedObjectNames.includes(objectName)) {
+          this._watchedObjectNames.push(objectName);
+        }
+      }
+
+      // NAVIGATION INTENT:
+
+      private _resolveNavigationTarget(
+        target:
+          | { name: string; id?: integer }
+          | { x: float; y: float; z?: float }
+      ): { x: float; y: float; z: float | undefined } | null {
+        if ('name' in target) {
+          const instances = this._getInstances(target.name);
+          let instance =
+            target.id !== undefined
+              ? instances.find((object) => object.id === target.id)
+              : instances[0];
+          if (!instance) return null;
+          const anyInstance = instance as any;
+          return {
+            x: instance.getCenterXInScene(),
+            y: instance.getCenterYInScene(),
+            z:
+              typeof anyInstance.getCenterZInScene === 'function'
+                ? anyInstance.getCenterZInScene()
+                : undefined,
+          };
+        }
+        return { x: target.x, y: target.y, z: target.z };
+      }
+
+      /**
+       * Compute navigation hints to move the first instance of
+       * `referenceObjectName` toward a target (an object or a position).
+       * These are hints only: translate them to the game's actual controls.
+       */
+      getNavigationHint(
+        referenceObjectName: string,
+        target:
+          | { name: string; id?: integer }
+          | { x: float; y: float; z?: float },
+        options?: { jumpThreshold?: float; reachRadius?: float }
+      ): GameplayTestNavigationHint | null {
+        const referenceInstances = this._getInstances(referenceObjectName);
+        if (referenceInstances.length === 0) return null;
+        const reference = referenceInstances[0];
+        const anyReference = reference as any;
+        const resolvedTarget = this._resolveNavigationTarget(target);
+        if (!resolvedTarget) return null;
+
+        const jumpThreshold = (options && options.jumpThreshold) || 32;
+        const reachRadius = (options && options.reachRadius) || 30;
+
+        const referenceX = reference.getCenterXInScene();
+        const referenceY = reference.getCenterYInScene();
+        const referenceZ =
+          typeof anyReference.getCenterZInScene === 'function'
+            ? anyReference.getCenterZInScene()
+            : undefined;
+
+        const relativeX = resolvedTarget.x - referenceX;
+        const relativeY = resolvedTarget.y - referenceY;
+        const relativeZ =
+          resolvedTarget.z !== undefined && referenceZ !== undefined
+            ? resolvedTarget.z - referenceZ
+            : undefined;
+
+        const distanceTo = Math.hypot(relativeX, relativeY, relativeZ || 0);
+
+        const desiredAngle = gdjs.toDegrees(Math.atan2(relativeY, relativeX));
+        const angleDiff = normalizeAngleDifference(
+          desiredAngle - reference.getAngle()
+        );
+        const horizontalDistance = Math.hypot(relativeX, relativeY);
+        const desiredPitch =
+          relativeZ === undefined
+            ? 0
+            : gdjs.toDegrees(Math.atan2(relativeZ, horizontalDistance));
+        const currentPitch =
+          typeof anyReference.getRotationX === 'function'
+            ? anyReference.getRotationX()
+            : 0;
+        const pitchDiff =
+          relativeZ === undefined
+            ? 0
+            : normalizeAngleDifference(desiredPitch - currentPitch);
+
+        return {
+          shouldMoveLeft: relativeX < -1,
+          shouldMoveRight: relativeX > 1,
+          shouldMoveUp: relativeY < -1,
+          shouldMoveDown: relativeY > 1,
+          shouldJump: relativeY < -jumpThreshold,
+          shouldTurnLeft: angleDiff < -2,
+          shouldTurnRight: angleDiff > 2,
+          shouldLookUp: pitchDiff < -2,
+          shouldLookDown: pitchDiff > 2,
+          angleDiff,
+          pitchDiff,
+          dominantAxis: Math.abs(relativeX) >= Math.abs(relativeY) ? 'x' : 'y',
+          reached: distanceTo <= reachRadius,
+          distanceTo,
+          targetX: resolvedTarget.x,
+          targetY: resolvedTarget.y,
+          targetZ: resolvedTarget.z,
+          relativeX,
+          relativeY,
+          relativeZ,
+        };
+      }
+
+      /**
+       * Turn the first instance of `referenceObjectName` toward the target,
+       * by applying mouse movements (FPS-style) until it is aiming at it.
+       * Returns true when aimed (within a few degrees), false if it could
+       * not aim after many frames.
+       */
+      async lookToward(
+        referenceObjectName: string,
+        target:
+          | { name: string; id?: integer }
+          | { x: float; y: float; z?: float },
+        options?: { yawOnly?: boolean }
+      ): Promise<boolean> {
+        const maxAimFrames = 180;
+        const toleranceDegrees = 3;
+        // Pixels of mouse movement per degree of desired rotation: adapted
+        // live by measuring the actual rotation achieved.
+        let pixelsPerDegree = 2;
+
+        for (let i = 0; i < maxAimFrames; i++) {
+          const hint = this.getNavigationHint(referenceObjectName, target);
+          if (!hint) return false;
+          const yawDiff = hint.angleDiff;
+          const pitchDiff = options && options.yawOnly ? 0 : hint.pitchDiff;
+          if (
+            Math.abs(yawDiff) <= toleranceDegrees &&
+            Math.abs(pitchDiff) <= toleranceDegrees
+          ) {
+            return true;
+          }
+
+          const clamp = (value: float, maximum: float) =>
+            Math.max(-maximum, Math.min(maximum, value));
+          this.setMouseDelta(
+            clamp(yawDiff * pixelsPerDegree, 100),
+            clamp(pitchDiff * pixelsPerDegree, 100)
+          );
+          await this.stepFrames(1);
+
+          const newHint = this.getNavigationHint(referenceObjectName, target);
+          if (newHint) {
+            const achievedRotation = Math.abs(yawDiff - newHint.angleDiff);
+            if (Math.abs(yawDiff) > toleranceDegrees) {
+              if (achievedRotation < 0.1) {
+                // No response to the mouse: increase the gain (the game may
+                // have a low mouse sensitivity).
+                pixelsPerDegree = Math.min(pixelsPerDegree * 2, 64);
+              } else {
+                const ratio = Math.abs(yawDiff) / achievedRotation;
+                pixelsPerDegree = Math.max(
+                  0.25,
+                  Math.min(64, pixelsPerDegree * Math.min(2, ratio))
+                );
+              }
+            }
+          }
+        }
+        return false;
+      }
+
+      // SCENARIO SETUP:
+
+      /**
+       * Create a new instance of an object at the given position.
+       * Use for test setup only - do not use it to fake a game behavior
+       * you are supposed to test.
+       */
+      spawn(
+        objectName: string,
+        x: float,
+        y: float,
+        z?: float,
+        layerName?: string
+      ): GameplayTestObjectSnapshot {
+        const currentScene = this._getCurrentScene();
+        const object = currentScene.createObject(objectName);
+        if (!object) {
+          throw new Error(
+            `Could not create an instance of "${objectName}" - check the object exists in the scene (or as a global object).`
+          );
+        }
+        object.setX(x);
+        object.setY(y);
+        const anyObject = object as any;
+        if (z !== undefined && typeof anyObject.setZ === 'function') {
+          anyObject.setZ(z);
+        }
+        if (layerName !== undefined) {
+          object.setLayer(layerName);
+        }
+        return this._makeObjectSnapshot(object, false);
+      }
+
+      /**
+       * Remove the instance with the given id (from `getObjects`).
+       */
+      removeObject(id: integer): void {
+        const currentScene = this._getCurrentScene();
+        for (const object of currentScene.getAdhocListOfAllInstances()) {
+          if (object.id === id) {
+            object.deleteFromScene();
+            return;
+          }
+        }
+        throw new Error(`No instance with id ${id} found.`);
+      }
+
+      /**
+       * Move the instance with the given id to a position.
+       * Use for test setup only.
+       */
+      setObjectPosition(id: integer, x: float, y: float, z?: float): void {
+        const currentScene = this._getCurrentScene();
+        for (const object of currentScene.getAdhocListOfAllInstances()) {
+          if (object.id === id) {
+            object.setX(x);
+            object.setY(y);
+            const anyObject = object as any;
+            if (z !== undefined && typeof anyObject.setZ === 'function') {
+              anyObject.setZ(z);
+            }
+            return;
+          }
+        }
+        throw new Error(`No instance with id ${id} found.`);
+      }
+
+      private _setVariableFromValue(
+        variable: gdjs.Variable,
+        value: string | number | boolean
+      ): void {
+        if (typeof value === 'number') variable.setNumber(value);
+        else if (typeof value === 'boolean') variable.setBoolean(value);
+        else variable.setString(value);
+      }
+
+      /**
+       * Set a scene variable (number, string or boolean).
+       * Use for test setup only.
+       */
+      setSceneVariable(
+        variableName: string,
+        value: string | number | boolean
+      ): void {
+        this._setVariableFromValue(
+          this._getCurrentScene().getVariables().get(variableName),
+          value
+        );
+      }
+
+      /**
+       * Set a global variable (number, string or boolean).
+       * Use for test setup only.
+       */
+      setGlobalVariable(
+        variableName: string,
+        value: string | number | boolean
+      ): void {
+        this._setVariableFromValue(
+          this._runtimeGame.getVariables().get(variableName),
+          value
+        );
+      }
+
+      /**
+       * Create the instances of an external layout in the current scene.
+       */
+      loadExternalLayout(
+        externalLayoutName: string,
+        x: float = 0,
+        y: float = 0,
+        z: float = 0
+      ): void {
+        const currentScene = this._getCurrentScene();
+        const externalLayoutData =
+          this._runtimeGame.getExternalLayoutData(externalLayoutName);
+        if (!externalLayoutData) {
+          throw new Error(
+            `The external layout "${externalLayoutName}" does not exist.`
+          );
+        }
+        currentScene.createObjectsFrom(
+          externalLayoutData.instances,
+          x,
+          y,
+          z,
+          /*trackByPersistentUuid=*/ false
+        );
+      }
+
+      // VERDICTS AND EVIDENCE:
+
+      /**
+       * Record a named assertion. Throws immediately on failure, stopping
+       * the script (wrap in try/catch if the check is optional).
+       */
+      assert(condition: boolean, message: string): void {
+        if (this._assertions.length >= MAX_ASSERTIONS) {
+          throw new GameplayTestAssertionError(
+            `Too many assertions (max ${MAX_ASSERTIONS}).`
+          );
+        }
+        this._assertions.push({ message, passed: !!condition });
+        if (!condition) {
+          throw new GameplayTestAssertionError(`Assertion failed: ${message}`);
+        }
+      }
+
+      /**
+       * Unconditionally record a failure and throw immediately, stopping
+       * the script.
+       */
+      fail(message: string): void {
+        this._assertions.push({ message, passed: false });
+        throw new GameplayTestAssertionError(message);
+      }
+
+      /**
+       * Take a screenshot of the game canvas (downscaled). It's returned
+       * in the test result.
+       */
+      async takeScreenshot(label: string = ''): Promise<void> {
+        if (this._screenshots.length >= this._maxScreenshots) {
+          logger.warn(
+            `Ignoring screenshot "${label}": already ${this._maxScreenshots} screenshots taken.`
+          );
+          return;
+        }
+        const canvas = this._runtimeGame.getRenderer().getCanvas();
+        if (!canvas) {
+          logger.warn('No canvas found: unable to take a screenshot.');
+          return;
+        }
+        try {
+          const scale = Math.min(
+            1,
+            SCREENSHOT_MAX_SIZE / Math.max(canvas.width, canvas.height, 1)
+          );
+          const targetWidth = Math.max(1, Math.round(canvas.width * scale));
+          const targetHeight = Math.max(1, Math.round(canvas.height * scale));
+          const downscaledCanvas = document.createElement('canvas');
+          downscaledCanvas.width = targetWidth;
+          downscaledCanvas.height = targetHeight;
+          const context = downscaledCanvas.getContext('2d');
+          if (!context) return;
+          context.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+          const dataUrl = downscaledCanvas.toDataURL('image/jpeg', 0.7);
+          this._screenshots.push({
+            label,
+            frame: this._framesExecuted,
+            jpegBase64: dataUrl.replace(/^data:image\/jpeg;base64,/, ''),
+          });
+        } catch (error) {
+          logger.warn('Error while taking a screenshot: ' + error);
+        }
+      }
+
+      /**
+       * Start profiling the current scene (see `stopProfiling`).
+       */
+      startProfiling(): void {
+        this._runtimeGame.startCurrentSceneProfiler(() => {});
+      }
+
+      /**
+       * Stop profiling and return the average frame measures per section
+       * (events, physics, rendering...).
+       */
+      stopProfiling(): Object | null {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        const profiler = currentScene ? currentScene.getProfiler() : null;
+        if (!profiler) return null;
+        const output = {
+          framesAverageMeasures: profiler.getFramesAverageMeasures(),
+          stats: profiler.getStats(),
+        };
+        this._runtimeGame.stopCurrentSceneProfiler();
+        return output;
+      }
+
+      /**
+       * Record a console log in the test result (also shown in the
+       * browser console). Used by the `console` given to the script.
+       */
+      _recordConsoleLog(
+        level: 'log' | 'warn' | 'error',
+        message: string
+      ): void {
+        if (
+          this._consoleLogs.length >= MAX_CONSOLE_LOGS ||
+          this._consoleLogsTotalChars >= MAX_CONSOLE_LOGS_TOTAL_CHARS
+        ) {
+          return;
+        }
+        const cappedMessage = message.slice(0, 1000);
+        this._consoleLogsTotalChars += cappedMessage.length;
+        this._consoleLogs.push({ level, message: cappedMessage });
+      }
+
+      _installPointerLockShim(): void {
+        const renderer = this._runtimeGame.getRenderer() as any;
+        if (typeof renderer.requestPointerLock !== 'function') return;
+        const harness = this;
+        renderer.requestPointerLock = function () {
+          harness._pointerLockRequestedByGame = true;
+          return true;
+        };
+        renderer.exitPointerLock = function () {
+          harness._pointerLockRequestedByGame = false;
+        };
+        renderer.isPointerLocked = function () {
+          return harness._pointerLockRequestedByGame;
+        };
+      }
+
+      _makeResult(
+        status: GameplayTestResult['status'],
+        errors: Array<string>
+      ): GameplayTestResult {
+        const currentScene = this._runtimeGame
+          .getSceneStack()
+          .getCurrentScene();
+        const watchedObjects: {
+          [objectName: string]: Array<GameplayTestObjectSnapshot>;
+        } = {};
+        if (currentScene) {
+          for (const objectName of this._watchedObjectNames) {
+            try {
+              watchedObjects[objectName] = this.getObjects(objectName);
+            } catch (error) {
+              // Ignore snapshot errors when building the result.
+            }
+          }
+        }
+        return {
+          testName: this._payload.testName,
+          status,
+          framesExecuted: this._framesExecuted,
+          durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
+          gameTimeMs: Math.round(this._gameTimeMs),
+          assertions: this._assertions,
+          errors: errors.slice(0, MAX_ERRORS),
+          consoleLogs: this._consoleLogs,
+          eventLog: this._eventLog,
+          finalState: {
+            sceneName: currentScene ? currentScene.getName() : '',
+            objectCounts: this._getObjectCounts(),
+            watchedObjects,
+            sceneVariables: currentScene
+              ? currentScene.getVariables().getNetworkSyncData({})
+              : [],
+          },
+          screenshots: this._screenshots,
+          performance:
+            this._framesExecuted > 0
+              ? {
+                  avgStepMs:
+                    Math.round(
+                      (this._totalStepTimeMs / this._framesExecuted) * 100
+                    ) / 100,
+                  worstStepMs: this._worstStepTimeMs,
+                }
+              : null,
+        };
+      }
+    }
+
+    /**
+     * The gameplay test being currently run, if any.
+     */
+    let currentlyRunningHarness: GameplayTestHarness | null = null;
+
+    /**
+     * Request the running gameplay test (if any) to stop as soon as
+     * possible.
+     */
+    export const stopCurrentGameplayTest = (): void => {
+      if (currentlyRunningHarness) {
+        currentlyRunningHarness._stopped = true;
+      }
+    };
+
+    /**
+     * Run a gameplay test script against the game and return its result.
+     *
+     * The game main loop keeps rendering (paused) while the test steps the
+     * game logic deterministically, `speedFactor` frames per animation
+     * frame.
+     */
+    export const runGameplayTest = async (
+      runtimeGame: gdjs.RuntimeGame,
+      payload: GameplayTestRunPayload,
+      onProgress?: (frame: integer) => void
+    ): Promise<GameplayTestResult> => {
+      if (currentlyRunningHarness) {
+        const failedResult = new GameplayTestHarness(
+          runtimeGame,
+          payload
+        )._makeResult('error', [
+          'A gameplay test is already running. Wait for it to finish or stop it first.',
+        ]);
+        return failedResult;
+      }
+
+      const harness = new GameplayTestHarness(runtimeGame, payload);
+      currentlyRunningHarness = harness;
+      harness._onProgress = onProgress || null;
+
+      // Compile the script first, so a syntax error is reported cleanly.
+      let scriptFunction: Function;
+      try {
+        scriptFunction = new Function(
+          'harness',
+          'console',
+          '"use strict"; return (async () => {\n' + payload.source + '\n})();'
+        );
+      } catch (error) {
+        currentlyRunningHarness = null;
+        return harness._makeResult('error', [
+          'The test script could not be parsed: ' + error,
+        ]);
+      }
+
+      const inputManager = runtimeGame.getInputManager();
+      const wasPaused = runtimeGame.isPaused();
+
+      // Pause the game: the main loop keeps rendering (`renderWithoutStep`)
+      // but stops stepping the game logic - the harness owns stepping.
+      runtimeGame.pause(true);
+
+      // The paused main loop still calls `onFrameEnded` every animation
+      // frame, which would clear the inputs simulated by the test between
+      // two manually stepped frames. Neutralize it during the test: the
+      // harness calls the original after each stepped frame instead.
+      const originalOnFrameEnded = inputManager.onFrameEnded.bind(inputManager);
+      inputManager.onFrameEnded = () => {};
+      harness._callOnFrameEnded = originalOnFrameEnded;
+
+      harness._installPointerLockShim();
+
+      // Capture the logs of the game itself (in addition to the `console`
+      // passed to the script).
+      const existingLoggerOutput = gdjs.Logger.getLoggerOutput();
+      gdjs.Logger.setLoggerOutput({
+        log: (
+          group: string,
+          message: string,
+          type: 'info' | 'warning' | 'error' = 'info',
+          internal = true
+        ) => {
+          existingLoggerOutput.log(group, message, type, internal);
+          harness._recordConsoleLog(
+            type === 'warning' ? 'warn' : type === 'error' ? 'error' : 'log',
+            `[${group}] ${message}`
+          );
+        },
+      });
+
+      const stringifyConsoleArguments = (args: Array<any>): string =>
+        args
+          .map((value) => {
+            if (typeof value === 'string') return value;
+            try {
+              return JSON.stringify(value);
+            } catch (error) {
+              return String(value);
+            }
+          })
+          .join(' ');
+      const scriptConsole = {
+        log: (...args: Array<any>) => {
+          console.log(...args);
+          harness._recordConsoleLog('log', stringifyConsoleArguments(args));
+        },
+        warn: (...args: Array<any>) => {
+          console.warn(...args);
+          harness._recordConsoleLog('warn', stringifyConsoleArguments(args));
+        },
+        error: (...args: Array<any>) => {
+          console.error(...args);
+          harness._recordConsoleLog('error', stringifyConsoleArguments(args));
+        },
+      };
+
+      harness._startTimeMs = Date.now();
+      let result: GameplayTestResult;
+      try {
+        // A wall-clock watchdog, in case the script awaits something that
+        // never resolves. A synchronous infinite loop can NOT be interrupted
+        // (this is a limit of running in the same thread as the game).
+        let watchdogTimeoutId: any = null;
+        const watchdog = new Promise<never>((_, reject) => {
+          watchdogTimeoutId = setTimeout(
+            () =>
+              reject(
+                new GameplayTestTimeoutError(
+                  `The test timed out after ${harness._timeoutMs}ms (wall-clock).`
+                )
+              ),
+            harness._timeoutMs + 1000
+          );
+        });
+        try {
+          await Promise.race([
+            scriptFunction(harness, scriptConsole),
+            watchdog,
+          ]);
+        } finally {
+          if (watchdogTimeoutId) clearTimeout(watchdogTimeoutId);
+        }
+
+        const hasFailedAssertion = harness._assertions.some(
+          (assertion) => !assertion.passed
+        );
+        result = harness._makeResult(
+          hasFailedAssertion ? 'failed' : 'passed',
+          []
+        );
+      } catch (error: any) {
+        if (error && error.isGameplayTestAssertionError) {
+          result = harness._makeResult('failed', [String(error.message)]);
+        } else if (error && error.isGameplayTestStoppedError) {
+          result = harness._makeResult('stopped', [
+            'The test was stopped before completing.',
+          ]);
+        } else if (error && error.isGameplayTestTimeoutError) {
+          result = harness._makeResult('timeout', [String(error.message)]);
+        } else {
+          result = harness._makeResult('error', [
+            (error && error.stack ? String(error.stack) : String(error)).slice(
+              0,
+              2000
+            ),
+          ]);
+        }
+      } finally {
+        // Restore everything, whatever happened:
+        try {
+          harness.releaseAllInputs();
+        } catch (error) {
+          // Ignore errors during cleanup.
+        }
+        inputManager.onFrameEnded = originalOnFrameEnded;
+        gdjs.Logger.setLoggerOutput(existingLoggerOutput);
+        runtimeGame.pause(wasPaused);
+        currentlyRunningHarness = null;
+      }
+
+      return result;
+    };
+  }
+}

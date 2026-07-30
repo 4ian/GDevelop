@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Blender scripts for supported conversion jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, MCP gameplay test script, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Python templates and Blender scripts for supported jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -311,6 +311,24 @@ Generate a temporary output and inspect or round-trip it before replacing an
 existing project asset. When the final GLB is a project resource, keep it
 inside the project, preserve its registered path when updating it, validate
 the project, commit, reload, and verify it in a fresh preview.
+
+## Reusable MCP test scripts
+
+When the user asks to write a Python or MCP gameplay test script, start from
+[the bundled test template](../../tests/gdevelop_mcp_test_template.py). Copy it
+to a descriptively named file under the project's `tests/` directory, then
+customize `build_scenario` and, only when needed, the arrange, act, or assertion
+hooks. Do not rewrite its MCP transport or preview lifecycle from scratch
+unless the template is incompatible with the requested scenario; report the
+specific incompatibility when deviating.
+
+Preserve the template's environment-token authentication, stale-preview
+cleanup, fresh paused launch, deterministic frame stepping, bounded object
+inspection, runtime/renderer checks, JSON result, nonzero failure exits,
+optional screenshot, and guaranteed preview cleanup. Run `py_compile`, the
+template-derived script's `--self-test`, and the actual scenario against a
+fresh preview. A gameplay test script does not replace the validation,
+Git-commit, and reload gates when project sources changed.
 
 ## Event authoring
 

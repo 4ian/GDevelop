@@ -121,7 +121,7 @@ const PropertiesPanelStory = ({
   runningFrame?: number | null,
   lastResult?: GameplayTestResult | null,
 |}) => (
-  <FixedHeightFlexContainer height={620}>
+  <FixedHeightFlexContainer height={560}>
     <FixedWidthFlexContainer width={310}>
       <Background>
         <GameplayTestProperties

@@ -11,11 +11,11 @@ import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
 import StopIcon from '../UI/CustomSvgIcons/Stop';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import {
+  formatRunDuration,
   GameplayTestStatusChip,
   isGameplayTestStatusInProgress,
   type GameplayTestDisplayStatus,
 } from './GameplayTestStatusIndicator';
-import { formatRunDuration } from './GameplayTestProperties';
 import classes from './GameplayTestFrame.module.css';
 
 /** The status of the run displayed on the gameplay test frame. */
@@ -184,7 +184,12 @@ export const GameplayTestFrameLayout = ({
           onPointerCancel={onPointerUp}
         >
           <span className={classes.grip} />
-          <Text noMargin size="body-small" style={textEllipsisStyle}>
+          <Text
+            noMargin
+            size="body-small"
+            style={textEllipsisStyle}
+            tooltip={runStatus ? runStatus.testName : undefined}
+          >
             {runStatus && runStatus.testName ? (
               runStatus.testName
             ) : (

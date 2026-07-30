@@ -23,6 +23,7 @@ import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import RobotIcon from '../ProjectCreation/RobotIcon';
 import { type GameplayTestResult } from './GameplayTestRunner';
 import {
+  formatRunDuration,
   GameplayTestStatusChip,
   getDisplayStatusFromTest,
   type GameplayTestDisplayStatus,
@@ -36,12 +37,6 @@ import classes from './GameplayTestProperties.module.css';
 const styles = {
   icon: { fontSize: 18 },
   scrollView: { paddingTop: marginsSize, overflowX: 'hidden' },
-};
-
-export const formatRunDuration = (durationMs: number): string => {
-  if (!durationMs) return '-';
-  if (durationMs < 1000) return `${Math.round(durationMs)}ms`;
-  return `${(durationMs / 1000).toFixed(durationMs < 10000 ? 2 : 1)}s`;
 };
 
 /** A row of the result summary: a dimmed label, and its value on the right. */

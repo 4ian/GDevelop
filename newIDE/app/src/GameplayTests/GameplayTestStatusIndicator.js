@@ -41,6 +41,13 @@ export const getDisplayStatusFromTest = (
   return 'never-run';
 };
 
+/** Format the duration of a run, to be shown next to its status. */
+export const formatRunDuration = (durationMs: number): string => {
+  if (!durationMs) return '-';
+  if (durationMs < 1000) return `${Math.round(durationMs)}ms`;
+  return `${(durationMs / 1000).toFixed(durationMs < 10000 ? 2 : 1)}s`;
+};
+
 export const isGameplayTestStatusInProgress = (
   status: GameplayTestDisplayStatus
 ): boolean => status === 'launching' || status === 'running';

@@ -82,6 +82,7 @@ import {
   soloNavMeshGeneratorConfigDefaults,
   tileCacheGeneratorConfigDefaults,
   tiledNavMeshGeneratorConfigDefaults,
+  SoloNavMeshGeneratorConfig,
 } from 'recast-navigation/generators';
 
 declare global {
@@ -167,6 +168,7 @@ declare global {
       soloNavMeshGeneratorConfigDefaults,
       tileCacheGeneratorConfigDefaults,
       tiledNavMeshGeneratorConfigDefaults,
+      SoloNavMeshGeneratorConfig,
     };
   }
 }

@@ -29,6 +29,7 @@ namespace gdjs {
   export class NavMeshObstaclesManager {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
     navMesh: RecastNav.NavMesh | null = null;
+    crowd: RecastNav.Crowd | null = null;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
@@ -45,13 +46,13 @@ namespace gdjs {
     }
 
     rebuildNavMesh() {
-      const navMeshConfig = {
+      const navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
         borderSize: 0,
-        cs: 2,
-        ch: 2,
+        cs: 10,
+        ch: 10,
         walkableSlopeAngle: 60,
-        walkableHeight: 1,
-        walkableClimb: 1,
+        walkableHeight: 10,
+        walkableClimb: 2,
         walkableRadius: 1,
         maxEdgeLen: 12,
         maxSimplificationError: 1.3,
@@ -59,7 +60,7 @@ namespace gdjs {
         mergeRegionArea: 20,
         maxVertsPerPoly: 6,
         detailSampleDist: 6,
-        detailSampleMaxError: 1,
+        detailSampleMaxError: 10,
       };
 
       const positions: Array<float> = [];
@@ -88,9 +89,9 @@ namespace gdjs {
 
           point.set(x, y, z);
           euler.set(
-            object.getRotationX(),
-            object.getRotationY(),
-            object.getAngle()
+            gdjs.toRad(object.getRotationX()),
+            gdjs.toRad(object.getRotationY()),
+            gdjs.toRad(object.getAngle())
           );
           point.applyEuler(euler);
 

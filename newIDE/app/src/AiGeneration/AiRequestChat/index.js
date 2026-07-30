@@ -382,6 +382,7 @@ type Props = {|
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
+  setUserInput: (aiRequestId: string | null, userRequestText: string) => void,
 |};
 
 export const AiRequestChat: React.ComponentType<{
@@ -632,6 +633,11 @@ export const AiRequestChat: React.ComponentType<{
       resetUserInput: (aiRequestId: string | null) => {
         const aiRequestIdToReset: string = aiRequestId || '';
         onUserRequestTextChange('', aiRequestIdToReset);
+
+        scrollToBottom();
+      },
+      setUserInput: (aiRequestId: string | null, userRequestText: string) => {
+        onUserRequestTextChange(userRequestText, aiRequestId || '');
 
         scrollToBottom();
       },

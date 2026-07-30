@@ -31,9 +31,12 @@ const styles = {
     textOverflow: 'ellipsis',
     maxWidth: 180,
   },
+  // The test simulates all the inputs itself: never let the user
+  // interact with (or focus) the game.
   iframe: {
     border: 'none',
     display: 'block',
+    pointerEvents: 'none',
   },
   // The iframe is kept mounted (tiny and invisible) when hidden, so that
   // the game `requestAnimationFrame` loop keeps running and the test can

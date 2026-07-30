@@ -390,6 +390,9 @@ export const runGameplayTests = async ({
         for (const { test } of testsWithSources.slice(results.length)) {
           results.push(makeErrorResult(test.testName, errorMessage));
         }
+      } finally {
+        // The run is finished (or was stopped): close the frame, unloading
+        // the game running in it.
         clearGameplayTestFramePreview();
       }
 

@@ -17,6 +17,7 @@ import {
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
 import Paper from '../UI/Paper';
 import { AiRequestChat, type AiRequestChatInterface } from './AiRequestChat';
+import { registerAskAiPrefillListener } from './AskAiPrefill';
 import {
   addMessageToAiRequest,
   createAiRequest,
@@ -996,6 +997,19 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [setSelectedAiRequestId, selectedAiRequest]
       );
+      // Start a new chat with a pre-filled user request, when asked from
+      // elsewhere in the editor ("Edit with AI" buttons...).
+      React.useEffect(
+        () =>
+          registerAskAiPrefillListener((userRequestText: string) => {
+            onStartOrOpenChat({ aiRequestId: null });
+            if (aiRequestChatRef.current) {
+              aiRequestChatRef.current.setUserInput(null, userRequestText);
+            }
+          }),
+        [onStartOrOpenChat]
+      );
+
       const onStartNewChat = React.useCallback(
         () => {
           onStartOrOpenChat({

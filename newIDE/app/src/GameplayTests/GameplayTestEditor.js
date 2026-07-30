@@ -3,7 +3,10 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { CodeEditor } from '../CodeEditor';
-import EditorMosaic, { type EditorMosaicNode } from '../UI/EditorMosaic';
+import EditorMosaic, {
+  type EditorMosaicInterface,
+  type EditorMosaicNode,
+} from '../UI/EditorMosaic';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { Column, Line } from '../UI/Grid';
@@ -19,6 +22,8 @@ import PlayIcon from '../UI/CustomSvgIcons/Preview';
 
 export type GameplayTestEditorInterface = {|
   forceUpdate: () => void,
+  togglePropertiesPanel: () => void,
+  isPropertiesPanelShown: () => boolean,
 |};
 
 const initialMosaicEditorNodes: EditorMosaicNode = {
@@ -47,6 +52,7 @@ type Props = {|
   onStopTest: () => void,
   onEditWithAi: () => void,
   onTestModified: () => void,
+  onOpenedEditorsChanged: () => void,
 |};
 
 /**
@@ -72,11 +78,23 @@ const GameplayTestEditor: React.ComponentType<{
       getDefaultEditorMosaicNode,
       setDefaultEditorMosaicNode,
     } = React.useContext(PreferencesContext);
+    const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
     const [, forceUpdateCounter] = React.useState<number>(0);
     const forceUpdate = React.useCallback(() => {
       forceUpdateCounter(count => count + 1);
     }, []);
-    React.useImperativeHandle(ref, () => ({ forceUpdate }));
+    React.useImperativeHandle(ref, () => ({
+      forceUpdate,
+      togglePropertiesPanel: () => {
+        if (editorMosaicRef.current)
+          editorMosaicRef.current.toggleEditor('test-properties', 'right');
+      },
+      isPropertiesPanelShown: () =>
+        !!editorMosaicRef.current &&
+        editorMosaicRef.current
+          .getOpenedEditorNames()
+          .includes('test-properties'),
+    }));
 
     const lastRunStatus = test.getLastRunStatus();
 
@@ -203,7 +221,7 @@ const GameplayTestEditor: React.ComponentType<{
     const editors: { [string]: any } = {
       'test-code': {
         type: 'primary',
-        title: t`Test code`,
+        noTitleBar: true,
         renderEditor: renderCodeEditor,
       },
       'test-properties': {
@@ -217,12 +235,14 @@ const GameplayTestEditor: React.ComponentType<{
       <I18n>
         {({ i18n }) => (
           <EditorMosaic
+            ref={editorMosaicRef}
             editors={editors}
             centralNodeId="test-code"
             initialNodes={
               getDefaultEditorMosaicNode('gameplay-test-editor') ||
               initialMosaicEditorNodes
             }
+            onOpenedEditorsChanged={props.onOpenedEditorsChanged}
             onPersistNodes={node =>
               setDefaultEditorMosaicNode('gameplay-test-editor', node)
             }

@@ -179,6 +179,9 @@ export type PreviewLauncherInterface = {
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,
   +closeAllPreviews?: () => void | Promise<void>,
+  +focusAllPreviews?: () => void,
+  +injectPreviewClickUserGesture?: (inputs: Array<Object>) => Promise<?Object>,
+  +capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

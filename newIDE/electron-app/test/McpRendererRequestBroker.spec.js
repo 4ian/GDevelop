@@ -372,33 +372,53 @@ const run = async () => {
   };
   const stalledBroker = createMcpRendererRequestBroker({
     getWebContents: () => stalledWebContents,
-    defaultReloadTimeoutMs: 100,
+    defaultReloadTimeoutMs: 250,
     minimumRequestTimeoutMs: 1,
     reloadOperationRetentionMs: 1000,
     reloadOperationInactivityTimeoutMs: 10,
   });
-  const stalledError = await getRejectedError(
-    stalledBroker.send(reloadRequest(100))
-  );
+  const stalledPromise = stalledBroker.send(reloadRequest(250));
   const stalledOperationId = stalledRequests[0].request.operationId;
-  assert.strictEqual(stalledError.data.code, 'MCP_RELOAD_OPERATION_STALLED');
-  assert.strictEqual(stalledError.data.reloadOperation.status, 'failed');
-  assert.strictEqual(stalledError.data.reloadOperation.phase, 'request-sent');
+  await delay(30);
+  const stalledStatus = await stalledBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: { mode: 'status', operation_id: stalledOperationId },
+    },
+  });
+  const stalledMetadata = stalledStatus.structuredContent.reloadOperation;
+  assert.strictEqual(stalledMetadata.status, 'running');
+  assert.strictEqual(stalledMetadata.phase, 'request-sent');
   assert.strictEqual(
-    stalledError.data.reloadOperation.retentionExpiresAtMs >
-      stalledError.data.reloadOperation.completedAtMs,
+    stalledMetadata.lastInactivityIncident.code,
+    'MCP_RELOAD_OPERATION_STALLED'
+  );
+  assert.strictEqual(
+    stalledMetadata.lastInactivityIncident.recoveredAtMs,
+    null
+  );
+  assert.strictEqual(
+    stalledMetadata.catalogGeneration.queue.lockReleased,
+    false
+  );
+  assert.strictEqual(stalledRequests.length, 1);
+  stalledBroker.handleResponse(stalledWebContents, {
+    id: stalledRequests[0].request.id,
+    result: toolResult({ success: true, reloaded: true }),
+  });
+  const stalledResult = await stalledPromise;
+  assert.strictEqual(
+    stalledResult.structuredContent.reloadOperation.status,
+    'completed'
+  );
+  assert.strictEqual(
+    stalledResult.structuredContent.reloadOperation.lastInactivityIncident
+      .recoveredAtMs >=
+      stalledResult.structuredContent.reloadOperation.lastInactivityIncident
+        .detectedAtMs,
     true
   );
-  const stalledPollError = await getRejectedError(
-    stalledBroker.send({
-      method: 'tools/call',
-      params: {
-        name: 'reload_project',
-        arguments: { operation_id: stalledOperationId },
-      },
-    })
-  );
-  assert.strictEqual(stalledPollError, stalledError);
   assert.strictEqual(stalledRequests.length, 1);
 
   const catalogStalledRequests = [];
@@ -410,13 +430,13 @@ const run = async () => {
   };
   const catalogStalledBroker = createMcpRendererRequestBroker({
     getWebContents: () => catalogStalledWebContents,
-    defaultReloadTimeoutMs: 100,
+    defaultReloadTimeoutMs: 250,
     minimumRequestTimeoutMs: 1,
     reloadOperationRetentionMs: 1000,
     reloadOperationInactivityTimeoutMs: 1000,
     reloadCatalogSubphaseInactivityTimeoutMs: 10,
   });
-  const catalogStalledPromise = catalogStalledBroker.send(reloadRequest(100));
+  const catalogStalledPromise = catalogStalledBroker.send(reloadRequest(250));
   const catalogStalledRequest = catalogStalledRequests[0].request;
   catalogStalledBroker.handleProgress(catalogStalledWebContents, {
     id: catalogStalledRequest.id,
@@ -428,13 +448,27 @@ const run = async () => {
     operationId: catalogStalledRequest.operationId,
     progress: { phase: 'catalog-instructions-writing' },
   });
-  const catalogStalledError = await getRejectedError(catalogStalledPromise);
-  const catalogStalledMetadata = catalogStalledError.data.reloadOperation;
+  await delay(30);
+  const catalogStalledStatus = await catalogStalledBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'reload_project',
+      arguments: {
+        mode: 'status',
+        operation_id: catalogStalledRequest.operationId,
+      },
+    },
+  });
+  const catalogStalledMetadata =
+    catalogStalledStatus.structuredContent.reloadOperation;
   assert.strictEqual(
-    catalogStalledError.data.code,
+    catalogStalledMetadata.lastInactivityIncident.code,
     'MCP_RELOAD_CATALOG_SUBPHASE_STALLED'
   );
-  assert.strictEqual(catalogStalledError.data.catalogArtifact, 'instructions');
+  assert.strictEqual(
+    catalogStalledMetadata.lastInactivityIncident.catalogArtifact,
+    'instructions'
+  );
   assert.strictEqual(
     catalogStalledMetadata.phase,
     'catalog-instructions-writing'
@@ -444,14 +478,14 @@ const run = async () => {
     catalogStalledMetadata.inactivityDeadlineAtMs,
     catalogStalledMetadata.lastProgressAtMs + 10
   );
-  assert.strictEqual(catalogStalledMetadata.catalogGeneration.state, 'failed');
+  assert.strictEqual(catalogStalledMetadata.catalogGeneration.state, 'pending');
   assert.strictEqual(
     catalogStalledMetadata.catalogGeneration.currentArtifact,
     'instructions'
   );
   assert.strictEqual(
     catalogStalledMetadata.catalogGeneration.artifacts.instructions.status,
-    'failed'
+    'running'
   );
   assert.strictEqual(
     catalogStalledMetadata.catalogGeneration.lastRendererCatalogLog.subphase,
@@ -459,7 +493,16 @@ const run = async () => {
   );
   assert.strictEqual(
     catalogStalledMetadata.catalogGeneration.queue.lockReleased,
-    true
+    false
+  );
+  catalogStalledBroker.handleResponse(catalogStalledWebContents, {
+    id: catalogStalledRequest.id,
+    result: toolResult({ success: true, reloaded: true }),
+  });
+  const catalogStalledResult = await catalogStalledPromise;
+  assert.strictEqual(
+    catalogStalledResult.structuredContent.reloadOperation.status,
+    'completed'
   );
 
   const disconnectedRequests = [];

@@ -65,19 +65,24 @@ describe('InteractiveModel3DPreview', () => {
     expect(source).toContain('new THREE.Points(');
     expect(source).toContain('context.arc(32, 32, 24, 0, Math.PI * 2)');
     expect(source).toContain('boneJointPositions.setXYZ(');
+    expect(source).toContain("addEventListener('pointermove', onPointerMove)");
+    expect(source).toContain('findHoveredBoneJointIndex({');
+    expect(source).toContain('displayName: boneDisplayNames[hoveredBoneIndex]');
+    expect(source).toContain('showBoneJointTooltip({');
+    expect(source).toContain(
+      "canvasHost.addEventListener('click', onBoneJointClick)"
+    );
+    expect(source).toContain('onCopyBoneName(canonicalName)');
+    expect(source).toContain("? 'copy'");
     expect(source).toContain('new CSS2DObject(');
-    expect(source).toContain(
-      'displayName: getModelBoneDisplayName(bone, boneIndex)'
-    );
-    expect(source).toContain(
-      'const canonicalName = getModelBoneCanonicalName(bone)'
-    );
+    expect(source).toContain('getModelBoneDisplayName(bone, boneIndex)');
+    expect(source).toContain('getModelBoneCanonicalName(bone)');
     expect(source).toContain('copyTooltip: i18n._(t`Click to copy bone name`)');
     expect(source).toContain('copyTextToClipboard(boneName)');
     expect(source).toContain('<Trans>Bone name copied to clipboard!</Trans>');
     expect(source).toContain('MODEL_OPACITY_WHEN_SHOWING_BONES = 0.18');
-    expect(source).toContain('material.transparent = isVisible');
-    expect(source).toContain('material.depthWrite = isVisible');
+    expect(source).toContain('captureModelMaterialAppearances(model)');
+    expect(source).toContain('setModelMaterialsBonesVisibility({');
     expect(source).toContain('id="model-show-bones"');
     expect(source).toContain('id="model-show-bone-names"');
     expect(source).toContain('<Trans>Show bones</Trans>');

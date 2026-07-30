@@ -30,6 +30,13 @@ type Props = {|
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
 
+type ProjectLoadState = {|
+  promise: Promise<void>,
+  isLoadPassRunning: boolean,
+  shouldRunTrailingPass: boolean,
+  coalescedRequestCount: number,
+|};
+
 /**
  * Allow children components to request the loading (or unloading) of
  * the events functions extensions of the project.
@@ -51,7 +58,12 @@ export const EventsFunctionsExtensionsProvider = ({
   // Extension generation is serialized per project. A single application-wide
   // queue makes a newly opened project wait for stale work from the project
   // that was just closed, which can block project creation indefinitely.
-  const lastLoadPromises = React.useRef<WeakMap<gdProject, Promise<void>>>(
+  //
+  // Multiple editor callbacks can request generation while a pass is already
+  // running. Keep at most one trailing pass: it observes the latest project
+  // state without replaying every intermediate request and multiplying reload
+  // time by the number of callbacks.
+  const projectLoadStates = React.useRef<WeakMap<gdProject, ProjectLoadState>>(
     new WeakMap()
   );
 
@@ -76,8 +88,8 @@ export const EventsFunctionsExtensionsProvider = ({
         return;
       }
 
-      let loadPromise = lastLoadPromises.current.get(project);
-      if (!loadPromise) {
+      let loadState = projectLoadStates.current.get(project);
+      if (!loadState) {
         console.info('Events functions extensions are ready.');
         return;
       }
@@ -87,11 +99,11 @@ export const EventsFunctionsExtensionsProvider = ({
       );
 
       // A new generation pass for this project can be queued while the
-      // previous promise is settling. Keep reading this project's entry until
-      // its queue is actually empty.
-      while (loadPromise) {
-        await loadPromise;
-        loadPromise = lastLoadPromises.current.get(project);
+      // previous state is settling. Keep reading this project's entry until
+      // its coalesced queue is actually empty.
+      while (loadState) {
+        await loadState.promise;
+        loadState = projectLoadStates.current.get(project);
       }
 
       console.info('Events functions extensions finished loading.');
@@ -103,47 +115,82 @@ export const EventsFunctionsExtensionsProvider = ({
     (project: ?gdProject): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
-      const previousLastLoadPromise =
-        lastLoadPromises.current.get(project) || Promise.resolve();
+      const existingLoadState = projectLoadStates.current.get(project);
+      if (existingLoadState) {
+        existingLoadState.coalescedRequestCount++;
+        // A request made before the scheduled pass starts is already covered
+        // by that pass. Once generation is running, preserve one trailing pass
+        // so changes made during generation are reflected.
+        if (existingLoadState.isLoadPassRunning) {
+          existingLoadState.shouldRunTrailingPass = true;
+        }
+        console.info(
+          `Coalescing project extension load request (${
+            existingLoadState.coalescedRequestCount
+          } request(s) coalesced).`
+        );
+        return existingLoadState.promise;
+      }
 
-      let startTime;
+      const loadState: ProjectLoadState = {
+        promise: Promise.resolve(),
+        isLoadPassRunning: false,
+        shouldRunTrailingPass: false,
+        coalescedRequestCount: 0,
+      };
+      const overallStartTime = Date.now();
+      let passCount = 0;
 
-      const currentPromise: Promise<void> = previousLastLoadPromise
-        .then(() => {
-          console.info('Loading project extensions...');
-          startTime = Date.now();
-          return loadProjectEventsFunctionsExtensions(
-            project,
-            eventsFunctionCodeWriter,
-            i18n
-          );
-        })
-        .then(() => setEventsFunctionsExtensionsError(null))
-        .catch((eventsFunctionsExtensionsError: Error) => {
-          setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
-          showErrorBox({
-            message: i18n._(
-              t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
-            ),
-            rawError: eventsFunctionsExtensionsError,
-            errorId: 'events-functions-extensions-load-error',
-          });
+      const loadPromise: Promise<void> = Promise.resolve()
+        .then(async () => {
+          do {
+            loadState.shouldRunTrailingPass = false;
+            loadState.isLoadPassRunning = true;
+            passCount++;
+            const passStartTime = Date.now();
+            console.info(`Loading project extensions (pass ${passCount})...`);
+            try {
+              await loadProjectEventsFunctionsExtensions(
+                project,
+                eventsFunctionCodeWriter,
+                i18n
+              );
+              setEventsFunctionsExtensionsError(null);
+            } catch (eventsFunctionsExtensionsError) {
+              setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
+              showErrorBox({
+                message: i18n._(
+                  t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+                ),
+                rawError: eventsFunctionsExtensionsError,
+                errorId: 'events-functions-extensions-load-error',
+              });
+            } finally {
+              loadState.isLoadPassRunning = false;
+              console.info(
+                `Finished loading project extensions pass ${passCount} in ${(
+                  Date.now() - passStartTime
+                ).toFixed(2)}ms.`
+              );
+            }
+          } while (loadState.shouldRunTrailingPass);
         })
         .then(() => {
           console.info(
-            `Finished loading project extensions in ${(
-              Date.now() - startTime
+            `Project extensions are ready after ${passCount} pass(es), ${
+              loadState.coalescedRequestCount
+            } coalesced request(s), and ${(
+              Date.now() - overallStartTime
             ).toFixed(2)}ms.`
           );
-          // Only clear this project's entry if no newer load has been queued
-          // for it since.
-          if (lastLoadPromises.current.get(project) === currentPromise) {
-            lastLoadPromises.current.delete(project);
+          if (projectLoadStates.current.get(project) === loadState) {
+            projectLoadStates.current.delete(project);
           }
         });
 
-      lastLoadPromises.current.set(project, currentPromise);
-      return currentPromise;
+      loadState.promise = loadPromise;
+      projectLoadStates.current.set(project, loadState);
+      return loadPromise;
     },
     [eventsFunctionCodeWriter, i18n]
   );

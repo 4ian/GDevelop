@@ -243,7 +243,7 @@ const simulatePreviewInputSchema = {
     inputs: {
       type: 'array',
       description:
-        'Ordered list of input events to inject into the running game. Press and release are separate events; hold a key by sending keyPressed without a matching keyReleased (the game keeps it pressed across frames until released).',
+        'Ordered list of input events to inject into the running game. In the Electron editor, mouseButtonPressed also injects a native Chromium click/user gesture so pointer lock and WebAudio are unlocked before runtime input is applied. Press and release are separate events; hold a key by sending keyPressed without a matching keyReleased (the game keeps it pressed across frames until released).',
       items: {
         type: 'object',
         properties: {
@@ -344,7 +344,7 @@ const runFramesSchema = {
     inputs: {
       type: 'array',
       description:
-        'Optional input events to inject BEFORE stepping (same shape as simulate_preview_input: [{ type, key/key_code/button/x/y, ... }]). Held keys (keyPressed without keyReleased) stay pressed across all stepped frames. run_frames also supports { type:"clickAndHold", x, y, button?, frames? }: it moves the cursor, presses before stepping, releases after stepping, and uses frames as the hold duration when top-level frames is omitted.',
+        'Optional input events to inject BEFORE stepping (same shape as simulate_preview_input: [{ type, key/key_code/button/x/y, ... }]). In the Electron editor, mouse presses also inject a native Chromium click/user gesture before deterministic stepping, which unlocks pointer lock and WebAudio. Held keys (keyPressed without keyReleased) stay pressed across all stepped frames. run_frames also supports { type:"clickAndHold", x, y, button?, frames? }: it moves the cursor, presses before stepping, releases after stepping, and uses frames as the hold duration when top-level frames is omitted.',
       items: {
         type: 'object',
         properties: {
@@ -1053,7 +1053,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'simulate_preview_input',
     description:
-      'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Returns inputState (the InputManager state after injecting) so you can confirm the game actually received the input — if a pressed key is missing from inputState.pressedKeyCodes, the window likely was not focused (try control_preview action:"focus"), which is different from a logic bug. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
+      'Inject simulated keyboard/mouse/touch input into a running preview so you can verify input-driven gameplay (movement, shooting, restart) end-to-end, not just autonomous logic. Mouse presses in Electron additionally pass through the native preview window and a Chromium user gesture, unlocking pointer lock and WebAudio; the result includes a userGesture receipt. Press and release are separate events; hold a key by sending keyPressed without keyReleased. Returns inputState so you can confirm the game received the input. Then use gdevelop_inspect_running_preview / capture_preview_screenshot to verify the effect. Launch a preview first.',
     inputSchema: simulatePreviewInputSchema,
   },
   {
@@ -1077,7 +1077,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'run_frames',
     description:
-      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. Pass objects plus include for bounded per-instance position, angle, force, variable, and behavior state in the same receipt. The receipt distinguishes completed, partial, failed, timeout, preflight-failed, and cleanup-failed outcomes with requested/stepped frames, failed frame, event/instruction ids when available, and cleanup status. auto_release runs in guaranteed cleanup even after event failure.',
+      'ATOMIC runtime test: preflight the selected preview, inject inputs, step up to N frames, and return live or partial state. Mouse presses in Electron first inject a native Chromium click/user gesture so pointer lock and WebAudio work during automated verification; the result includes userGesture and recentSounds receipts. Pass objects plus include for bounded per-instance position, angle, force, variable, and behavior state in the same receipt. auto_release runs in guaranteed cleanup even after event failure.',
     inputSchema: runFramesSchema,
   },
   {

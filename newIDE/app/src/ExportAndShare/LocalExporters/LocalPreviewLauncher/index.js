@@ -164,6 +164,25 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
+  injectPreviewClickUserGesture = (inputs: Array<Object>): Promise<?Object> => {
+    if (!ipcRenderer) {
+      return Promise.resolve({
+        success: false,
+        attempted: true,
+        supported: false,
+        error: 'Native preview input injection requires Electron.',
+      });
+    }
+    return ipcRenderer
+      .invoke('preview-inject-user-gesture', { inputs })
+      .catch(error => ({
+        success: false,
+        attempted: true,
+        supported: true,
+        error: error.message || String(error),
+      }));
+  };
+
   // Capture a preview window's content from the MAIN process (immune to renderer
   // suspension of an occluded preview). Returns { dataUrl, width, height } or
   // { error }. Resolves null if not running in Electron.

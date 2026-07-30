@@ -177,6 +177,10 @@ const getReloadOperationMetadata = (
   lastProgressAtMs: operation.lastProgressAtMs,
   inactivityTimeoutMs: operation.inactivityTimeoutMs,
   inactivityDeadlineAtMs: operation.inactivityDeadlineAtMs,
+  inactivityIncidents: operation.inactivityIncidents.slice(),
+  lastInactivityIncident: operation.inactivityIncidents.length
+    ? operation.inactivityIncidents[operation.inactivityIncidents.length - 1]
+    : null,
   startedAtMs: operation.startedAtMs,
   completedAtMs: operation.completedAtMs,
   retentionExpiresAtMs: operation.retentionExpiresAtMs,
@@ -347,6 +351,12 @@ const createMcpRendererRequestBroker = ({
   const updateReloadOperationPhase = (operation, progress) => {
     if (!operation.operationId || operation.status !== 'running') return;
     const progressAtMs = now();
+    const lastInactivityIncident = operation.inactivityIncidents.length
+      ? operation.inactivityIncidents[operation.inactivityIncidents.length - 1]
+      : null;
+    if (lastInactivityIncident && !lastInactivityIncident.recoveredAtMs) {
+      lastInactivityIncident.recoveredAtMs = progressAtMs;
+    }
     const nextPhase =
       progress && typeof progress.phase === 'string' && progress.phase
         ? progress.phase
@@ -414,29 +424,37 @@ const createMcpRendererRequestBroker = ({
       progressAtMs + operation.inactivityTimeoutMs;
     operation.inactivityTimeoutId = setTimeoutFn(() => {
       if (operation.status !== 'running') return;
+      operation.inactivityTimeoutId = null;
       const catalogArtifact = operation.currentCatalogArtifact;
-      const error = makeRequestError(
+      const inactivityIncident = {
+        code: isCatalogSubphase
+          ? 'MCP_RELOAD_CATALOG_SUBPHASE_STALLED'
+          : 'MCP_RELOAD_OPERATION_STALLED',
+        timeoutMs: operation.inactivityTimeoutMs,
+        operationId: operation.operationId,
+        operation_id: operation.operationId,
+        phase: operation.phase,
+        catalogArtifact,
+        detectedAtMs: now(),
+        recoveredAtMs: null,
+      };
+      operation.inactivityIncidents.push(inactivityIncident);
+      if (operation.inactivityIncidents.length > 16) {
+        operation.inactivityIncidents.shift();
+      }
+      console.warn(
         isCatalogSubphase
           ? `Reload operation ${operation.operationId} made no progress for ${
               operation.inactivityTimeoutMs
             } ms in catalog subphase ${operation.phase}${
               catalogArtifact ? ` (artifact ${catalogArtifact})` : ''
-            }.`
+            }. The renderer operation is still running and keeps the reload lock.`
           : `Reload operation ${operation.operationId} made no progress for ${
               operation.inactivityTimeoutMs
-            } ms while in phase ${operation.phase}.`,
-        {
-          code: isCatalogSubphase
-            ? 'MCP_RELOAD_CATALOG_SUBPHASE_STALLED'
-            : 'MCP_RELOAD_OPERATION_STALLED',
-          timeoutMs: operation.inactivityTimeoutMs,
-          operationId: operation.operationId,
-          operation_id: operation.operationId,
-          phase: operation.phase,
-          catalogArtifact,
-        }
+            } ms while in phase ${
+              operation.phase
+            }. The renderer operation is still running and keeps the reload lock.`
       );
-      settleOperation(operation, null, error);
     }, operation.inactivityTimeoutMs);
     if (
       operation.inactivityTimeoutId &&
@@ -454,6 +472,12 @@ const createMcpRendererRequestBroker = ({
   ) => {
     pendingRequests.delete(operation.requestId);
     operation.completedAtMs = now();
+    const lastInactivityIncident = operation.inactivityIncidents.length
+      ? operation.inactivityIncidents[operation.inactivityIncidents.length - 1]
+      : null;
+    if (lastInactivityIncident && !lastInactivityIncident.recoveredAtMs) {
+      lastInactivityIncident.recoveredAtMs = operation.completedAtMs;
+    }
     if (operation.inactivityTimeoutId) {
       clearTimeoutFn(operation.inactivityTimeoutId);
       operation.inactivityTimeoutId = null;
@@ -542,6 +566,7 @@ const createMcpRendererRequestBroker = ({
       inactivityTimeoutId: null,
       inactivityTimeoutMs: reloadOperationInactivityTimeoutMs,
       inactivityDeadlineAtMs: null,
+      inactivityIncidents: [],
       promise,
       resolve,
       reject,

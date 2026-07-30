@@ -87,9 +87,17 @@ export class GameplayTestEditorContainer extends React.Component<
         onStopTest={this.stopTest}
         isRunning={this.state.isRunning}
         canRun={!!this.getGameplayTest()}
+        onToggleProperties={this.togglePropertiesPanel}
+        isPropertiesShown={
+          this.editor ? this.editor.isPropertiesPanelShown() : true
+        }
       />
     );
   }
+
+  togglePropertiesPanel = () => {
+    if (this.editor) this.editor.togglePropertiesPanel();
+  };
 
   forceUpdateEditor() {
     if (this.editor) this.editor.forceUpdate();
@@ -203,12 +211,7 @@ export class GameplayTestEditorContainer extends React.Component<
     const prompt = `Edit the gameplay test "${testName}" ${
       scope === 'project' ? 'of the project' : `in the extension "${scope}"`
     } to `;
-    // Opening the Ask AI with a pre-filled prompt is not supported yet:
-    // copy the prompt so the user can paste and complete it.
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(prompt).catch(() => {});
-    }
-    this.props.onOpenAskAi(null);
+    this.props.onOpenAskAi({ prefilledUserRequest: prompt });
   };
 
   render(): any {
@@ -235,6 +238,7 @@ export class GameplayTestEditorContainer extends React.Component<
           onStopTest={this.stopTest}
           onEditWithAi={this.editWithAi}
           onTestModified={this.onTestModified}
+          onOpenedEditorsChanged={() => this.updateToolbar()}
         />
       </div>
     );

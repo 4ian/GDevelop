@@ -711,6 +711,10 @@ const EditorTabsPane: React.ComponentType<{
             currentTab ? currentTab.key : null
           )
         }
+        showPreviewAndShareButtons={
+          // A gameplay test is run with its own button: no preview or share.
+          !currentTab || currentTab.kind !== 'gameplay-test'
+        }
         canSave={canSave}
         onSave={saveProject}
         openShareDialog={() =>

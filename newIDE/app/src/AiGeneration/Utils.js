@@ -1413,6 +1413,8 @@ export type OpenAskAiOptions = {|
   aiRequestId?: string | null, // If null, a new request will be created.
   paneIdentifier?: 'left' | 'center' | 'right',
   continueProcessingFunctionCallsOnMount?: boolean,
+  // When set, a new chat is started with this text pre-filled in the input.
+  prefilledUserRequest?: string,
 |};
 
 export type NewAiRequestOptions = {|

@@ -93,6 +93,7 @@ import {
   type RenamableTab,
 } from './EditorTabs/EditorTabsRenaming';
 import { renderAskAiEditorContainer } from '../AiGeneration/AskAiEditorContainer';
+import { requestAskAiPrefill } from '../AiGeneration/AskAiPrefill';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import { renderGlobalEventsSearchEditorContainer } from './EditorContainers/GlobalEventsSearchEditorContainer';
 import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
@@ -1089,9 +1090,16 @@ const MainFrame = (props: Props): React.MixedElement => {
         aiRequestId,
         paneIdentifier,
         continueProcessingFunctionCallsOnMount,
+        prefilledUserRequest,
       } = options || {};
       const newPaneIdentifier =
         paneIdentifier || (currentProject ? 'right' : 'center');
+
+      if (prefilledUserRequest) {
+        // Delivered to the Ask AI editor as soon as it's mounted (or
+        // immediately if it already is).
+        requestAskAiPrefill(prefilledUserRequest);
+      }
 
       setState(state => {
         let openedEditor = getOpenedAskAiEditor(state.editorTabs);

@@ -134,6 +134,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     ref={toolbarRef}
                     hidden={false}
                     showProjectButtons={false}
+                    showPreviewAndShareButtons={false}
                     canSave={props.canSave}
                     onSave={props.saveProject}
                     openShareDialog={() => props.openShareDialog()}

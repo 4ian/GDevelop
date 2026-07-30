@@ -172,7 +172,7 @@ namespace gdjs {
             height: 100,
             maxAcceleration: 1000,
             maxSpeed: 300,
-            collisionQueryRange: 60,
+            collisionQueryRange: 120,
             pathOptimizationRange: 0.0,
             separationWeight: 1.0,
           })

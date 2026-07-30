@@ -59,6 +59,7 @@ namespace gdjs {
     _acceleration: float;
     _maxSpeed: float;
     _angularMaxSpeed: float;
+    _angularAcceleration: float;
     _rotateObject: boolean;
     _angleOffset: float;
     _cellWidth: float;
@@ -108,7 +109,8 @@ namespace gdjs {
       // TODO Remove
       this._acceleration = 1000;
       this._maxSpeed = 300;
-      this._angularMaxSpeed = 360;
+      this._angularMaxSpeed = 720;
+      this._angularAcceleration = 7200;
       this._rotateObject = true;
       this._angleOffset = 0;
       this._angularSpeed = this._angularMaxSpeed;
@@ -527,11 +529,45 @@ namespace gdjs {
         this._rotateObject &&
         this.owner.getAngle() !== this._movementAngle + this._angleOffset
       ) {
-        this.owner.rotateTowardAngle(
-          this._movementAngle + this._angleOffset,
-          this._angularSpeed
-        );
+        this.rotateTowardAngle(this._movementAngle + this._angleOffset);
       }
+    }
+
+    /**
+     * @param angle The targeted angle.
+     * @param speed The rotation speed. 0 for an immediate rotation to the target angle.
+     */
+    private rotateTowardAngle(angle: float): void {
+      const angularDiff = gdjs.evtTools.common.angleDifference(
+        this.owner.getAngle(),
+        angle
+      );
+      const diffWasPositive = angularDiff >= 0;
+
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+      // Always rotate the right way.
+      if ((this._angularSpeed > 0) ^ diffWasPositive) {
+        this._angularSpeed = 0;
+      }
+      this._angularSpeed = gdjs.evtTools.common.clamp(
+        this._angularSpeed +
+          (diffWasPositive ? -1.0 : 1.0) *
+            this._angularAcceleration *
+            timeDelta,
+        -this._angularMaxSpeed,
+        this._angularMaxSpeed
+      );
+      let newAngle =
+        this.owner.getAngle() + this._angularSpeed * timeDelta;
+
+      if (
+        // @ts-ignore
+        (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0) ^
+        diffWasPositive
+      ) {
+        newAngle = angle;
+      }
+      this.owner.setAngle(newAngle);
     }
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {

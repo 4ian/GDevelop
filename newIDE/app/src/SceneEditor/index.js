@@ -460,6 +460,9 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.unregisterDebuggerCallback();
       this.unregisterDebuggerCallback = null;
     }
+    // Cancelled, not flushed: the history lives in the state of this
+    // component, so there is nothing left to save it to.
+    this._saveInstancesModificationsToHistoryDebounced.cancel();
   }
 
   onEditorReloaded() {
@@ -1164,6 +1167,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     { leading: false, trailing: true }
   ): any);
 
+  /**
+   * Return the history, with any instance modification pending a debounced
+   * save (see `_onInstancesModified`) committed to it. Must be used by
+   * undo/redo: an uncommitted modification would otherwise be reverted
+   * without being redoable (`undo` restores the last *saved* snapshot).
+   */
+  _getHistoryWithPendingInstancesModificationsSaved = (): HistoryState => {
+    this._saveInstancesModificationsToHistoryDebounced.cancel();
+    if (!this._hasPendingInstancesModificationsToSave) {
+      return this.state.history;
+    }
+
+    this._hasPendingInstancesModificationsToSave = false;
+    return saveToHistory(this.state.history, this.props.initialInstances);
+  };
+
   undo = () => {
     // /!\ Drop the selection to avoid keeping any references to deleted instances.
     // This could be avoided if the selection used something like UUID to address instances.
@@ -1171,7 +1190,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState(
       {
         history: undo(
-          this.state.history,
+          this._getHistoryWithPendingInstancesModificationsSaved(),
           this.props.initialInstances,
           this.props.project
         ),
@@ -1194,7 +1213,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState(
       {
         history: redo(
-          this.state.history,
+          this._getHistoryWithPendingInstancesModificationsSaved(),
           this.props.initialInstances,
           this.props.project
         ),
@@ -1502,8 +1521,23 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this._sendUpdatedInstances(instances);
     this.forceUpdate();
-    //TODO: Save for redo with debounce (and cancel on unmount)
+    // Save the modification for undo/redo, debounced so a rapid series of
+    // changes (like typing a position digit by digit) makes a single
+    // undoable step.
+    this._hasPendingInstancesModificationsToSave = true;
+    this._saveInstancesModificationsToHistoryDebounced();
   };
+
+  _hasPendingInstancesModificationsToSave = false;
+
+  // $FlowFixMe[missing-local-annot]
+  _saveInstancesModificationsToHistoryDebounced = (debounce(() => {
+    if (!this._hasPendingInstancesModificationsToSave) return;
+    this._hasPendingInstancesModificationsToSave = false;
+    this.setState({
+      history: saveToHistory(this.state.history, this.props.initialInstances),
+    });
+  }, 500): any);
 
   _sendUpdatedInstances = (instances: Array<gdInitialInstance>) => {
     const { previewDebuggerServer } = this.props;

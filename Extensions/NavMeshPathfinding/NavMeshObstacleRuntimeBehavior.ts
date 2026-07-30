@@ -30,6 +30,11 @@ namespace gdjs {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
     navMesh: RecastNav.NavMesh | null = null;
     crowd: RecastNav.Crowd | null = null;
+    characterAgents = new Map<
+      NavMeshCharacterRuntimeBehavior,
+      RecastNav.CrowdAgent | null
+    >();
+    hasStepped = false;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
@@ -43,6 +48,18 @@ namespace gdjs {
           new gdjs.NavMeshObstaclesManager(instanceContainer);
       }
       return instanceContainer.navMeshObstaclesManager;
+    }
+
+    step(timeDelta: float) {
+      if (this.hasStepped) {
+        return;
+      }
+      this.hasStepped = true;
+
+      if (!this.crowd) {
+        return;
+      }
+      this.crowd.update(1 / 60, timeDelta, 8);
     }
 
     rebuildNavMesh() {
@@ -114,7 +131,53 @@ namespace gdjs {
       );
       if (result.success) {
         this.navMesh = result.navMesh;
+        this.crowd = new RecastNav.Crowd(this.navMesh, {
+          maxAgents: 100,
+          maxAgentRadius: 50,
+        });
+        for (const character of this.characterAgents.keys()) {
+          this.rebuildCharacterAgent(character);
+        }
       }
+    }
+
+    private rebuildCharacterAgent(character: NavMeshCharacterRuntimeBehavior) {
+      if (!this.navMesh || !this.crowd) {
+        this.characterAgents.set(character, null);
+        return;
+      }
+      const owner = character.owner;
+      const navMeshQuery = new RecastNav.NavMeshQuery(this.navMesh);
+      const { success: hasFindOrigin, point: origin } =
+        navMeshQuery.findClosestPoint(
+          {
+            x: owner.getX(),
+            y: owner.getZ(),
+            z: owner.getY(),
+          },
+          { halfExtents: { x: 100, y: 100, z: 100 } }
+        );
+      if (!hasFindOrigin) {
+        console.log(
+          "Can't find origin",
+          owner.getX(),
+          owner.getY(),
+          owner.getZ()
+        );
+        return;
+      }
+      const agent = this.crowd
+        ? this.crowd.addAgent(origin, {
+            radius: 40,
+            height: 100,
+            maxAcceleration: 1000,
+            maxSpeed: 300,
+            collisionQueryRange: 60,
+            pathOptimizationRange: 0.0,
+            separationWeight: 1.0,
+          })
+        : null;
+      this.characterAgents.set(character, agent);
     }
 
     /**
@@ -132,6 +195,23 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior
     ) {
       this.obstacles.delete(pathfindingObstacleBehavior);
+    }
+
+    /**
+     * Add a character to the list of existing characters.
+     */
+    addCharacter(character: NavMeshCharacterRuntimeBehavior) {
+      if (this.characterAgents.get(character)) {
+        return;
+      }
+      this.rebuildCharacterAgent(character);
+    }
+
+    /**
+     * Remove a character from the list of existing characters.
+     */
+    removeCharacter(character: NavMeshCharacterRuntimeBehavior) {
+      this.characterAgents.delete(character);
     }
   }
 

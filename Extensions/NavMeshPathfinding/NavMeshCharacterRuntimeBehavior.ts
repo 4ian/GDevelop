@@ -104,15 +104,18 @@ namespace gdjs {
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
       this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
-      this._manager =
-        gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
 
       // TODO Remove
       this._acceleration = 1000;
       this._maxSpeed = 300;
-      this._angularMaxSpeed = 720;
+      this._angularMaxSpeed = 360;
       this._rotateObject = true;
       this._angleOffset = 0;
+      this._angularSpeed = this._angularMaxSpeed;
+
+      this._manager =
+        gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
+      this._manager.addCharacter(this);
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
@@ -210,6 +213,22 @@ namespace gdjs {
       if (behaviorSpecificProps.dos !== undefined) {
         this._distanceOnSegment = behaviorSpecificProps.dos;
       }
+    }
+
+    onActivate() {
+      if (this._registeredInManager) {
+        return;
+      }
+      this._manager.addCharacter(this);
+      this._registeredInManager = true;
+    }
+
+    onDeActivate() {
+      if (!this._registeredInManager) {
+        return;
+      }
+      this._manager.removeCharacter(this);
+      this._registeredInManager = false;
     }
 
     setCellWidth(width: float): void {
@@ -424,26 +443,6 @@ namespace gdjs {
     moveTo(x: float, y: float, z: float) {
       const owner = this.owner;
 
-      // First be sure that there is a path to compute.
-      const targetCellX = Math.round((x - this._gridOffsetX) / this._cellWidth);
-      const targetCellY = Math.round(
-        (y - this._gridOffsetY) / this._cellHeight
-      );
-      const startCellX = Math.round(
-        (owner.getX() - this._gridOffsetX) / this._cellWidth
-      );
-      const startCellY = Math.round(
-        (owner.getY() - this._gridOffsetY) / this._cellHeight
-      );
-      if (startCellX == targetCellX && startCellY == targetCellY) {
-        this._path.length = 0;
-        this._path.push({ x: owner.getX(), y: owner.getY(), z: owner.getZ() });
-        this._path.push({ x, y, z });
-        this._enterSegment(0);
-        this._pathFound = true;
-        return;
-      }
-
       if (!this._manager.navMesh) {
         this._manager.rebuildNavMesh();
       }
@@ -455,25 +454,6 @@ namespace gdjs {
       // Start searching for a path
       const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
 
-      const { success: hasFindOrigin, point: origin } =
-        navMeshQuery.findClosestPoint(
-          {
-            x: owner.getX(),
-            y: owner.getZ(),
-            z: owner.getY(),
-          },
-          { halfExtents: { x: 100, y: 100, z: 100 } }
-        );
-      if (!hasFindOrigin) {
-        this._pathFound = false;
-        console.log(
-          "Can't find origin",
-          owner.getX(),
-          owner.getY(),
-          owner.getZ()
-        );
-        return;
-      }
       const { success: hasFindDestination, point: destination } =
         navMeshQuery.findClosestPoint(
           { x, y: z, z: y },
@@ -484,35 +464,14 @@ namespace gdjs {
         console.log("Can't find destination", x, y, z);
         return;
       }
-      const {
-        success: hasFindPath,
-        error,
-        path,
-      } = navMeshQuery.computePath(origin, destination);
-      if (!hasFindPath) {
-        this._pathFound = false;
-        console.log(
-          "Can't find a path from",
-          origin.x,
-          origin.z,
-          origin.y,
-          'to',
-          destination.x,
-          destination.z,
-          destination.y
-        );
+
+      const agent = this._manager.characterAgents.get(this);
+      if (!agent) {
+        console.log('No agent');
         return;
       }
-
-      // Path found: memorize it
-      for (const point of path) {
-        const y = point.y;
-        point.y = point.z;
-        point.z = y;
-      }
-      console.log('path', path);
-      this._path = path;
-      this._enterSegment(0);
+      const hasFindPath = agent.requestMoveTarget(destination);
+      console.log('hasFindPath', hasFindPath);
     }
 
     _enterSegment(segmentNumber: integer) {
@@ -542,86 +501,42 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      if (this._path.length === 0 || this._reachedEnd) {
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+      this._manager.step(timeDelta);
+
+      const agent = this._manager.characterAgents.get(this);
+      if (!agent) {
         return;
       }
 
-      // Update the speed of the object
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      const previousSpeed = this._speed;
-      if (this._speed !== this._maxSpeed) {
-        this._speed += this._acceleration * timeDelta;
-        if (this._speed > this._maxSpeed) {
-          this._speed = this._maxSpeed;
-        }
-      }
-      this._angularSpeed = this._angularMaxSpeed;
+      const oldX = this.owner.getX();
+      const oldY = this.owner.getY();
+      const newX = agent.interpolatedPosition.x;
+      const newY = agent.interpolatedPosition.z;
+      const newZ = agent.interpolatedPosition.y;
+      this.owner.setX(newX);
+      this.owner.setY(newY);
+      this.owner.setZ(newZ);
 
-      // Update the time on the segment and change segment if needed
-      // Use a Verlet integration to be frame rate independent.
-      this._distanceOnSegment +=
-        ((this._speed + previousSpeed) / 2) * timeDelta;
-      const remainingDistanceOnSegment =
-        this._totalSegmentDistance - this._distanceOnSegment;
+      if (newX != oldX && newY != oldY) {
+        this._movementAngle = gdjs.toDegrees(
+          Math.atan2(newY - oldY, newX - oldX)
+        );
+      }
       if (
-        remainingDistanceOnSegment <= 0 &&
-        this._currentSegment < this._path.length
+        this._rotateObject &&
+        this.owner.getAngle() !== this._movementAngle + this._angleOffset
       ) {
-        this._enterSegment(this._currentSegment + 1);
-        this._distanceOnSegment = -remainingDistanceOnSegment;
+        this.owner.rotateTowardAngle(
+          this._movementAngle + this._angleOffset,
+          this._angularSpeed
+        );
       }
-
-      // Position object on the segment and update its angle
-      let x = 0;
-      let y = 0;
-      let z = 0;
-      if (this._currentSegment < this._path.length - 1) {
-        x = gdjs.evtTools.common.lerp(
-          this._path[this._currentSegment].x,
-          this._path[this._currentSegment + 1].x,
-          this._distanceOnSegment / this._totalSegmentDistance
-        );
-        y = gdjs.evtTools.common.lerp(
-          this._path[this._currentSegment].y,
-          this._path[this._currentSegment + 1].y,
-          this._distanceOnSegment / this._totalSegmentDistance
-        );
-        z = gdjs.evtTools.common.lerp(
-          this._path[this._currentSegment].z,
-          this._path[this._currentSegment + 1].z,
-          this._distanceOnSegment / this._totalSegmentDistance
-        );
-        if (
-          this._rotateObject &&
-          this.owner.getAngle() !== this._movementAngle + this._angleOffset
-        ) {
-          this.owner.rotateTowardAngle(
-            this._movementAngle + this._angleOffset,
-            this._angularSpeed
-          );
-        }
-      } else {
-        const newPos = this._path[this._path.length - 1];
-        x = newPos.x;
-        y = newPos.y;
-        z = newPos.z;
-      }
-      console.log(
-        'move',
-        this._distanceOnSegment,
-        '/',
-        this._totalSegmentDistance,
-        'at',
-        x,
-        y,
-        z
-      );
-      this.owner.setX(x);
-      this.owner.setY(y);
-      this.owner.setZ(z);
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      this._manager.hasStepped = false;
+    }
   }
   gdjs.registerBehavior(
     'NavMeshPathfinding::NavMeshCharacterBehavior',

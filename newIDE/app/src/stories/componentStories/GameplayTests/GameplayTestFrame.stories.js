@@ -8,14 +8,17 @@ import {
 } from '../../../GameplayTests/GameplayTestFrame';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
+import { getPaperDecorator } from '../../PaperDecorator';
+import { type StoryDecorator } from '@storybook/react';
 
 export default {
   title: 'GameplayTests/GameplayTestFrame',
   component: GameplayTestFrameLayout,
+  decorators: [(getPaperDecorator('dark'): StoryDecorator)],
 };
 
 const styles = {
-  storyContainer: { height: 500, position: 'relative' },
+  storyContainer: { height: 460, position: 'relative' },
   fakeGame: {
     display: 'flex',
     flex: 1,

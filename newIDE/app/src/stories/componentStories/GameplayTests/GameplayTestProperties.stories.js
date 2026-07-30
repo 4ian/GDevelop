@@ -2,15 +2,11 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-// Keep first as it creates the `global.gd` object:
-import { testProject } from '../../GDevelopJsInitializerDecorator';
-
 import { GameplayTestProperties } from '../../../GameplayTests/GameplayTestProperties';
 import { type GameplayTestResult } from '../../../GameplayTests/GameplayTestRunner';
 import Background from '../../../UI/Background';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../FixedWidthFlexContainer';
-import newNameGenerator from '../../../Utils/NewNameGenerator';
 
 export default {
   title: 'GameplayTests/GameplayTestProperties',
@@ -25,10 +21,11 @@ await harness.stepFrames(60);
 harness.assert(harness.getSceneVariable('Score') === 1, 'Score is 1');`;
 
 /**
- * Create a gameplay test in the test project (removed when the story is
- * unmounted), so that the panel can be shown like in the editor.
+ * A stand-in for a `gd.Test`: the tests of a project are only available in
+ * libGD.js, which is not what these stories are about (and the panel only
+ * reads/writes these fields).
  */
-const useStoryGameplayTest = ({
+const makeFakeGameplayTest = ({
   name,
   description,
   lastRunStatus,
@@ -42,39 +39,28 @@ const useStoryGameplayTest = ({
   lastRunAt?: number,
   lastRunDurationMs?: number,
   lastRunFramesExecuted?: number,
-|}): gdTest | null => {
-  const test = React.useMemo(
-    () => {
-      const testsContainer = testProject.project.getTests();
-      const uniqueName = newNameGenerator(name, name =>
-        testsContainer.hasTestNamed(name)
-      );
-      const test = testsContainer.insertNewTest(
-        uniqueName,
-        testsContainer.getTestsCount()
-      );
-      test.setDescription(description);
-      test.setSource(testSource);
-      if (lastRunStatus) {
-        test.setLastRunStatus(lastRunStatus);
-        test.setLastRunAt(lastRunAt || Date.now() - 5 * 60 * 1000);
-        test.setLastRunDurationMs(lastRunDurationMs || 0);
-        test.setLastRunFramesExecuted(lastRunFramesExecuted || 0);
-      }
-      return test;
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+|}): gdTest => {
+  let currentDescription = description;
+  let currentSource = testSource;
 
-  React.useEffect(
-    () => () => {
-      testProject.project.getTests().removeTest(test.getName());
+  // $FlowFixMe[incompatible-cast] - only the methods used by the panel are faked.
+  return ({
+    getName: () => name,
+    getType: () => 'gameplay',
+    getDescription: () => currentDescription,
+    setDescription: (newDescription: string) => {
+      currentDescription = newDescription;
     },
-    [test]
-  );
-
-  return test;
+    getSource: () => currentSource,
+    setSource: (newSource: string) => {
+      currentSource = newSource;
+    },
+    getLastRunStatus: () => lastRunStatus || '',
+    getLastRunAt: () =>
+      lastRunStatus ? lastRunAt || Date.now() - 5 * 60 * 1000 : 0,
+    getLastRunDurationMs: () => lastRunDurationMs || 0,
+    getLastRunFramesExecuted: () => lastRunFramesExecuted || 0,
+  }: any);
 };
 
 const makeResult = (
@@ -95,7 +81,7 @@ const makeResult = (
   ...partialResult,
 });
 
-/** Draw a fake game screenshot, to show the screenshots section. */
+/** Draw fake game screenshots, to show the screenshots section. */
 const useFakeScreenshots = (labels: Array<string>) =>
   React.useMemo(
     () =>
@@ -124,72 +110,76 @@ const useFakeScreenshots = (labels: Array<string>) =>
 
 const PropertiesPanelStory = ({
   test,
+  scope,
   isRunning,
   runningFrame,
   lastResult,
 }: {|
-  test: gdTest | null,
+  test: gdTest,
+  scope?: string,
   isRunning?: boolean,
   runningFrame?: number | null,
   lastResult?: GameplayTestResult | null,
-|}) => {
-  if (!test) return null;
-  return (
-    <FixedHeightFlexContainer height={750}>
-      <FixedWidthFlexContainer width={310}>
-        <Background>
-          <GameplayTestProperties
-            test={test}
-            scope="project"
-            isRunning={!!isRunning}
-            runningFrame={runningFrame || null}
-            lastResult={lastResult || null}
-            onRunTest={action('run test')}
-            onStopTest={action('stop test')}
-            onEditWithAi={action('edit with AI')}
-            onTestModified={action('test modified')}
-          />
-        </Background>
-      </FixedWidthFlexContainer>
-    </FixedHeightFlexContainer>
-  );
-};
+|}) => (
+  <FixedHeightFlexContainer height={620}>
+    <FixedWidthFlexContainer width={310}>
+      <Background>
+        <GameplayTestProperties
+          test={test}
+          scope={scope || 'project'}
+          isRunning={!!isRunning}
+          runningFrame={runningFrame || null}
+          lastResult={lastResult || null}
+          onRunTest={action('run test')}
+          onStopTest={action('stop test')}
+          onEditWithAi={action('edit with AI')}
+          onTestModified={action('test modified')}
+        />
+      </Background>
+    </FixedWidthFlexContainer>
+  </FixedHeightFlexContainer>
+);
+
+const description =
+  'The player walks right and collects the first coin: the score is incremented.';
 
 export const NeverRun = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description: '',
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({ name: 'PlayerCanCollectCoin', description: '' }),
+    []
+  );
   return <PropertiesPanelStory test={test} />;
 };
 
-export const Running = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description:
-      'The player walks right and collects the first coin: the score is incremented.',
-  });
-  return <PropertiesPanelStory test={test} isRunning runningFrame={247} />;
-};
-
 export const Launching = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description:
-      'The player walks right and collects the first coin: the score is incremented.',
-  });
+  const test = React.useMemo(
+    () => makeFakeGameplayTest({ name: 'PlayerCanCollectCoin', description }),
+    []
+  );
   return <PropertiesPanelStory test={test} isRunning />;
 };
 
+export const Running = (): React.Node => {
+  const test = React.useMemo(
+    () => makeFakeGameplayTest({ name: 'PlayerCanCollectCoin', description }),
+    []
+  );
+  return <PropertiesPanelStory test={test} isRunning runningFrame={247} />;
+};
+
 export const Passed = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description:
-      'The player walks right and collects the first coin: the score is incremented.',
-    lastRunStatus: 'passed',
-    lastRunDurationMs: 5423,
-    lastRunFramesExecuted: 320,
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'PlayerCanCollectCoin',
+        description,
+        lastRunStatus: 'passed',
+        lastRunDurationMs: 5423,
+        lastRunFramesExecuted: 320,
+      }),
+    []
+  );
   return (
     <PropertiesPanelStory
       test={test}
@@ -213,14 +203,17 @@ export const Passed = (): React.Node => {
 };
 
 export const Failed = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description:
-      'The player walks right and collects the first coin: the score is incremented.',
-    lastRunStatus: 'failed',
-    lastRunDurationMs: 8102,
-    lastRunFramesExecuted: 481,
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'PlayerCanCollectCoin',
+        description,
+        lastRunStatus: 'failed',
+        lastRunDurationMs: 8102,
+        lastRunFramesExecuted: 481,
+      }),
+    []
+  );
   return (
     <PropertiesPanelStory
       test={test}
@@ -248,14 +241,17 @@ export const Failed = (): React.Node => {
 };
 
 export const FailedWithScreenshots = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description:
-      'The player walks right and collects the first coin: the score is incremented.',
-    lastRunStatus: 'failed',
-    lastRunDurationMs: 8102,
-    lastRunFramesExecuted: 481,
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'PlayerCanCollectCoin',
+        description,
+        lastRunStatus: 'failed',
+        lastRunDurationMs: 8102,
+        lastRunFramesExecuted: 481,
+      }),
+    []
+  );
   const screenshots = useFakeScreenshots(screenshotLabels);
   return (
     <PropertiesPanelStory
@@ -276,13 +272,16 @@ export const FailedWithScreenshots = (): React.Node => {
 };
 
 export const ScriptError = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerCanCollectCoin',
-    description: 'This test has a broken script.',
-    lastRunStatus: 'error',
-    lastRunDurationMs: 312,
-    lastRunFramesExecuted: 0,
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'PlayerCanCollectCoin',
+        description: 'This test has a broken script.',
+        lastRunStatus: 'error',
+        lastRunDurationMs: 312,
+      }),
+    []
+  );
   return (
     <PropertiesPanelStory
       test={test}
@@ -300,13 +299,17 @@ export const ScriptError = (): React.Node => {
 };
 
 export const TimedOut = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'PlayerReachesTheExit',
-    description: 'The player walks right until the exit of the level.',
-    lastRunStatus: 'timeout',
-    lastRunDurationMs: 30000,
-    lastRunFramesExecuted: 1800,
-  });
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'PlayerReachesTheExit',
+        description: 'The player walks right until the exit of the level.',
+        lastRunStatus: 'timeout',
+        lastRunDurationMs: 30000,
+        lastRunFramesExecuted: 1800,
+      }),
+    []
+  );
   return (
     <PropertiesPanelStory
       test={test}
@@ -323,32 +326,18 @@ export const TimedOut = (): React.Node => {
   );
 };
 
-export const InExtension = (): React.Node => {
-  const test = useStoryGameplayTest({
-    name: 'HealthBarIsUpdated',
-    description: 'The health bar of the extension is updated when hit.',
-    lastRunStatus: 'passed',
-    lastRunDurationMs: 1240,
-    lastRunFramesExecuted: 74,
-  });
-  if (!test) return null;
-  return (
-    <FixedHeightFlexContainer height={750}>
-      <FixedWidthFlexContainer width={310}>
-        <Background>
-          <GameplayTestProperties
-            test={test}
-            scope="Health"
-            isRunning={false}
-            runningFrame={null}
-            lastResult={null}
-            onRunTest={action('run test')}
-            onStopTest={action('stop test')}
-            onEditWithAi={action('edit with AI')}
-            onTestModified={action('test modified')}
-          />
-        </Background>
-      </FixedWidthFlexContainer>
-    </FixedHeightFlexContainer>
+export const InExtensionAndRunInAPreviousSession = (): React.Node => {
+  const test = React.useMemo(
+    () =>
+      makeFakeGameplayTest({
+        name: 'HealthBarIsUpdated',
+        description: 'The health bar of the extension is updated when hit.',
+        lastRunStatus: 'passed',
+        lastRunAt: Date.now() - 3 * 24 * 3600 * 1000,
+        lastRunDurationMs: 1240,
+        lastRunFramesExecuted: 74,
+      }),
+    []
   );
+  return <PropertiesPanelStory test={test} scope="Health" />;
 };

@@ -346,10 +346,14 @@ export const GameplayTestProperties = ({
                 </div>
               ) : (
                 <Text noMargin size="body-small" color="secondary">
-                  <Trans>
-                    The checks made by the test (with `harness.assert`) will be
-                    listed here.
-                  </Trans>
+                  {lastResult ? (
+                    <Trans>This run did not check anything.</Trans>
+                  ) : (
+                    <Trans>
+                      The checks made by the test (with `harness.assert`) will
+                      be listed here.
+                    </Trans>
+                  )}
                 </Text>
               )
             }
@@ -363,7 +367,7 @@ export const GameplayTestProperties = ({
                 lines={errorLines}
                 canCopy
                 placeholder={
-                  status === 'passed' ? (
+                  lastResult ? (
                     <Trans>No error: the test ran until the end.</Trans>
                   ) : (
                     <Trans>
@@ -383,10 +387,16 @@ export const GameplayTestProperties = ({
                 lines={consoleLines}
                 canCopy
                 placeholder={
-                  <Trans>
-                    Everything logged by the game with `console.log` while the
-                    test runs will be shown here.
-                  </Trans>
+                  lastResult ? (
+                    <Trans>
+                      The game did not log anything during this run.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Everything logged by the game with `console.log` while the
+                      test runs will be shown here.
+                    </Trans>
+                  )
                 }
               />
             )}

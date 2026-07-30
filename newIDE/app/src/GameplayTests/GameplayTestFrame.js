@@ -9,6 +9,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
 import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
 import StopIcon from '../UI/CustomSvgIcons/Stop';
+import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import {
   GameplayTestStatusChip,
   isGameplayTestStatusInProgress,
@@ -221,7 +222,11 @@ export const GameplayTestFrameLayout = ({
             tooltip={isInProgress ? t`Stop the test` : t`Close`}
             onClick={onStopRequested}
           >
-            <StopIcon className={classes.headerIcon} />
+            {isInProgress ? (
+              <StopIcon className={classes.headerIcon} />
+            ) : (
+              <CrossIcon className={classes.headerIcon} />
+            )}
           </IconButton>
         </div>
       </div>

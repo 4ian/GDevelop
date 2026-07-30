@@ -53,10 +53,22 @@ namespace gdjs {
       invalidFields.push(name);
       return defaultValue;
     };
+    const bodyType =
+      typeof source.bodyType === 'string' ? source.bodyType : 'Dynamic';
+    let layers = readInteger('layers', 17);
+    const bodyTypeLayersMask = bodyType === 'Static' ? 0x0f : 0xf0;
+    const defaultBodyTypeLayer = bodyType === 'Static' ? 1 : 1 << 4;
+    // A non-zero bitfield containing only layers for the other body type is
+    // invalid: the runtime body-type filter would otherwise turn it into an
+    // effective layer of zero. Keep an explicit zero as a supported way to
+    // opt out of collisions, but repair legacy or hand-authored mismatches.
+    if (layers !== 0 && (layers & bodyTypeLayersMask) === 0) {
+      layers |= defaultBodyTypeLayer;
+      invalidFields.push('layers');
+    }
     return {
       ...source,
-      bodyType:
-        typeof source.bodyType === 'string' ? source.bodyType : 'Dynamic',
+      bodyType,
       bullet: !!source.bullet,
       fixedRotation: !!source.fixedRotation,
       shape: typeof source.shape === 'string' ? source.shape : 'Box',
@@ -80,7 +92,7 @@ namespace gdjs {
       linearDamping: Math.max(0, readFinite('linearDamping', 0.1)),
       angularDamping: Math.max(0, readFinite('angularDamping', 0.1)),
       gravityScale: readFinite('gravityScale', 1),
-      layers: readInteger('layers', 17),
+      layers,
       masks: readInteger('masks', 17),
       invalidFields,
     };

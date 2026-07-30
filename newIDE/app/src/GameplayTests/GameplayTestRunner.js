@@ -1,0 +1,479 @@
+// @flow
+import {
+  type PreviewDebuggerServer,
+  type PreviewLauncherInterface,
+} from '../ExportAndShare/PreviewLauncher.flow';
+import {
+  clearGameplayTestFramePreview,
+  setGameplayTestFrameStatusText,
+} from './GameplayTestFrame';
+
+export type GameplayTestScope = 'project' | string;
+
+export type GameplayTestAssertion = {|
+  message: string,
+  passed: boolean,
+|};
+
+export type GameplayTestResult = {
+  testName: string,
+  status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout',
+  framesExecuted: number,
+  durationMs: number,
+  gameTimeMs: number,
+  assertions: Array<GameplayTestAssertion>,
+  errors: Array<string>,
+  consoleLogs: Array<{ level: 'log' | 'warn' | 'error', message: string }>,
+  eventLog: Array<Object>,
+  finalState: Object | null,
+  screenshots: Array<{ label: string, frame: number, jpegBase64: string }>,
+  performance: Object | null,
+};
+
+export type GameplayTestToRun = {|
+  scope: GameplayTestScope,
+  testName: string,
+  // When provided, this source is run (used for unsaved test code or tests
+  // being created by the AI). Otherwise the source of the stored test is used.
+  source?: string,
+|};
+
+export type GameplayTestRunOptions = {|
+  timeoutMs?: number,
+  screenshots?: 'off' | 'on-failure',
+  speedFactor?: number,
+  onTestStarted?: (test: GameplayTestToRun) => void,
+  onProgress?: (test: GameplayTestToRun, frame: number) => void,
+|};
+
+const GAMEPLAY_TEST_FRAME_DEBUGGER_ID = 'gameplay-test-frame';
+const GAME_READY_TIMEOUT_MS = 60 * 1000;
+const GAME_READY_POLL_INTERVAL_MS = 300;
+const RESULT_EXTRA_TIMEOUT_MS = 10 * 1000;
+const DEFAULT_TIMEOUT_MS = 30 * 1000;
+
+let nextRunMessageId = 1;
+
+// Only one gameplay test run (which can run multiple tests sequentially)
+// at a time: subsequent calls are queued.
+let lastRunPromise: Promise<mixed> = Promise.resolve();
+
+const makeErrorResult = (
+  testName: string,
+  errorMessage: string
+): GameplayTestResult => ({
+  testName,
+  status: 'error',
+  framesExecuted: 0,
+  durationMs: 0,
+  gameTimeMs: 0,
+  assertions: [],
+  errors: [errorMessage],
+  consoleLogs: [],
+  eventLog: [],
+  finalState: null,
+  screenshots: [],
+  performance: null,
+});
+
+/**
+ * Get the tests container for a scope ('project' or an extension name),
+ * or null if the scope does not exist.
+ */
+export const getTestsContainer = (
+  project: gdProject,
+  scope: GameplayTestScope
+): gdTestsContainer | null => {
+  if (scope === 'project') return project.getTests();
+  if (project.hasEventsFunctionsExtensionNamed(scope)) {
+    return project.getEventsFunctionsExtension(scope).getTests();
+  }
+  return null;
+};
+
+/**
+ * Update the last run summary persisted on a test.
+ */
+export const updateTestLastRun = (
+  project: gdProject,
+  test: GameplayTestToRun,
+  result: GameplayTestResult
+): void => {
+  const testsContainer = getTestsContainer(project, test.scope);
+  if (!testsContainer || !testsContainer.hasTestNamed(test.testName)) return;
+
+  const storedTest = testsContainer.getTest(test.testName);
+  storedTest.setLastRunStatus(result.status);
+  storedTest.setLastRunAt(Date.now());
+  storedTest.setLastRunDurationMs(result.durationMs);
+  storedTest.setLastRunFramesExecuted(result.framesExecuted);
+};
+
+/**
+ * Wait for the game in the gameplay test frame to be booted, by polling
+ * it with `getStatus` until it answers.
+ */
+const waitForGameToBeReady = async (
+  previewDebuggerServer: PreviewDebuggerServer
+): Promise<void> => {
+  const startTime = Date.now();
+  return new Promise((resolve, reject) => {
+    let pollIntervalId: ?IntervalID = null;
+    const unregisterCallbacks: () => void = previewDebuggerServer.registerCallbacks(
+      {
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: () => {},
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          if (id !== GAMEPLAY_TEST_FRAME_DEBUGGER_ID) return;
+          // Any message coming from the frame means the game (and its
+          // debugger client) is up.
+          if (pollIntervalId !== null) clearInterval(pollIntervalId);
+          unregisterCallbacks();
+          resolve();
+        },
+      }
+    );
+
+    pollIntervalId = setInterval(() => {
+      if (Date.now() - startTime > GAME_READY_TIMEOUT_MS) {
+        if (pollIntervalId !== null) clearInterval(pollIntervalId);
+        unregisterCallbacks();
+        reject(
+          new Error(
+            'The game preview for the gameplay test did not boot in time.'
+          )
+        );
+        return;
+      }
+      previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
+        command: 'getStatus',
+      });
+    }, GAME_READY_POLL_INTERVAL_MS);
+  });
+};
+
+const runSingleTest = async ({
+  previewDebuggerServer,
+  test,
+  source,
+  timeoutMs,
+  screenshots,
+  speedFactor,
+  onProgress,
+}: {|
+  previewDebuggerServer: PreviewDebuggerServer,
+  test: GameplayTestToRun,
+  source: string,
+  timeoutMs: number,
+  screenshots: 'off' | 'on-failure',
+  speedFactor: number | null,
+  onProgress: ?(test: GameplayTestToRun, frame: number) => void,
+|}): Promise<GameplayTestResult> => {
+  const messageId = 'gameplay-test-' + nextRunMessageId++;
+
+  return new Promise(resolve => {
+    let watchdogTimeoutId: ?TimeoutID = null;
+    const unregisterCallbacks: () => void = previewDebuggerServer.registerCallbacks(
+      {
+        onErrorReceived: () => {},
+        onServerStateChanged: () => {},
+        onConnectionClosed: ({ id }) => {
+          if (id !== GAMEPLAY_TEST_FRAME_DEBUGGER_ID) return;
+          finish(
+            makeErrorResult(
+              test.testName,
+              'The game preview was closed while the test was running.'
+            )
+          );
+        },
+        onConnectionOpened: () => {},
+        onConnectionErrored: () => {},
+        onHandleParsedMessage: ({ id, parsedMessage }) => {
+          if (id !== GAMEPLAY_TEST_FRAME_DEBUGGER_ID) return;
+          if (parsedMessage.messageId !== messageId) return;
+
+          if (parsedMessage.command === 'gameplayTest.progress') {
+            if (onProgress && parsedMessage.payload) {
+              onProgress(test, parsedMessage.payload.frame || 0);
+            }
+          } else if (parsedMessage.command === 'gameplayTest.result') {
+            finish({
+              ...makeErrorResult(test.testName, ''),
+              errors: [],
+              ...(parsedMessage.payload || {}),
+            });
+          }
+        },
+      }
+    );
+
+    const finish = (result: GameplayTestResult) => {
+      if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
+      unregisterCallbacks();
+      resolve(result);
+    };
+
+    // An editor-side watchdog, in case the game dies without sending
+    // its result.
+    watchdogTimeoutId = setTimeout(() => {
+      finish(
+        makeErrorResult(
+          test.testName,
+          `No result received from the game after ${timeoutMs +
+            RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
+        )
+      );
+    }, timeoutMs + RESULT_EXTRA_TIMEOUT_MS);
+
+    const payload: Object = {
+      testName: test.testName,
+      source,
+      timeoutMs,
+    };
+    if (speedFactor) payload.speedFactor = speedFactor;
+    if (screenshots === 'off') payload.maxScreenshots = 0;
+
+    previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
+      command: 'gameplayTest.run',
+      messageId,
+      payload,
+    });
+  });
+};
+
+/**
+ * Run gameplay tests sequentially in a fresh preview of the project,
+ * displayed in the gameplay test frame. Runs are globally serialized:
+ * a second call waits for the first one to complete.
+ *
+ * The last-run summary of each stored test is updated: the caller is
+ * responsible for triggering the unsaved changes tracking and UI refreshes.
+ */
+export const runGameplayTests = async ({
+  project,
+  tests,
+  previewLauncher,
+  previewDebuggerServer,
+  options,
+}: {|
+  project: gdProject,
+  tests: Array<GameplayTestToRun>,
+  previewLauncher: PreviewLauncherInterface,
+  previewDebuggerServer: PreviewDebuggerServer,
+  options: GameplayTestRunOptions,
+|}): Promise<Array<GameplayTestResult>> => {
+  const runPromise = lastRunPromise.then(
+    async (): Promise<Array<GameplayTestResult>> => {
+      const results: Array<GameplayTestResult> = [];
+      const timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
+
+      // Resolve the sources of the tests first, so an unknown test does not
+      // interrupt the batch in the middle.
+      const testsWithSources = tests.map(test => {
+        if (test.source !== undefined) {
+          return { test, source: test.source, error: null };
+        }
+        const testsContainer = getTestsContainer(project, test.scope);
+        if (!testsContainer) {
+          return {
+            test,
+            source: null,
+            error: `The scope "${test.scope}" does not exist in the project.`,
+          };
+        }
+        if (!testsContainer.hasTestNamed(test.testName)) {
+          return {
+            test,
+            source: null,
+            error: `No test named "${test.testName}" in the scope "${
+              test.scope
+            }".`,
+          };
+        }
+        return {
+          test,
+          source: testsContainer.getTest(test.testName).getSource(),
+          error: null,
+        };
+      });
+
+      try {
+        // Export and launch a fresh preview into the gameplay test frame.
+        await previewLauncher.launchPreview(
+          // $FlowFixMe[prop-missing] - the launchers accept partial preview options for gameplay tests.
+          ({
+            project,
+            sceneName: project.getFirstLayout(),
+            externalLayoutName: null,
+            eventsBasedObjectType: null,
+            eventsBasedObjectVariantName: null,
+            networkPreview: false,
+            hotReload: false,
+            shouldReloadProjectData: true,
+            shouldReloadLibraries: true,
+            shouldGenerateScenesEventsCode: true,
+            shouldReloadResources: false,
+            shouldHardReload: false,
+            fullLoadingScreen: false,
+            fallbackAuthor: null,
+            authenticatedPlayer: null,
+            isForInGameEdition: false,
+            isForGameplayTest: true,
+            editorId: '',
+            getIsMenuBarHiddenInPreview: () => true,
+            getIsAlwaysOnTopInPreview: () => false,
+            captureOptions: null,
+            onCaptureFinished: async () => {},
+            inAppTutorialMessageInPreview: '',
+            inAppTutorialMessagePositionInPreview: '',
+            editorCameraState3D: null,
+            inGameEditorSettings: null,
+            numberOfWindows: 0,
+            previewWindows: null,
+          }: any)
+        );
+
+        await waitForGameToBeReady(previewDebuggerServer);
+
+        for (const { test, source, error } of testsWithSources) {
+          if (error !== null || source === null) {
+            results.push(
+              makeErrorResult(test.testName, error || 'No source found.')
+            );
+            continue;
+          }
+
+          if (options.onTestStarted) options.onTestStarted(test);
+          setGameplayTestFrameStatusText(test.testName);
+
+          const result = await runSingleTest({
+            previewDebuggerServer,
+            test,
+            source,
+            timeoutMs,
+            screenshots: options.screenshots || 'off',
+            speedFactor: options.speedFactor || null,
+            onProgress: options.onProgress,
+          });
+          updateTestLastRun(project, test, result);
+          setGameplayTestFrameStatusText(`${test.testName}: ${result.status}`);
+          results.push(result);
+        }
+      } catch (error) {
+        const errorMessage =
+          'Unable to run the gameplay tests: ' +
+          (error.message || String(error));
+        console.error('[GameplayTestRunner] ' + errorMessage, error);
+        // Fill the results of the tests that could not be run.
+        for (const { test } of testsWithSources.slice(results.length)) {
+          results.push(makeErrorResult(test.testName, errorMessage));
+        }
+        clearGameplayTestFramePreview();
+      }
+
+      return results;
+    }
+  );
+
+  // Keep the queue going even if this run fails.
+  lastRunPromise = runPromise.catch(() => {});
+
+  return runPromise;
+};
+
+/**
+ * Ask the game to stop the gameplay test being currently run, if any.
+ */
+export const stopRunningGameplayTest = (
+  previewDebuggerServer: PreviewDebuggerServer
+): void => {
+  previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
+    command: 'gameplayTest.stop',
+  });
+};
+
+/**
+ * Close the gameplay test frame (unloading the game running in it).
+ */
+export const closeGameplayTestFrame = (): void => {
+  clearGameplayTestFramePreview();
+};
+
+// The dependencies needed to run gameplay tests are registered by the
+// MainFrame (which owns the preview launcher), so that any part of the
+// editor (project manager, test editor, command palette, CLI, AI function
+// calls) can run tests without threading everything through props.
+type GameplayTestRunnerDependencies = {|
+  getPreviewLauncher: () => ?PreviewLauncherInterface,
+  // Called after tests were run (last-run summaries were updated on the
+  // project): trigger unsaved changes and refresh the UI.
+  onTestsRunFinished: () => void,
+|};
+
+let gameplayTestRunnerDependencies: GameplayTestRunnerDependencies | null = null;
+
+export const registerGameplayTestRunnerDependencies = (
+  dependencies: GameplayTestRunnerDependencies | null
+): void => {
+  gameplayTestRunnerDependencies = dependencies;
+};
+
+/**
+ * Run gameplay tests using the dependencies registered by the MainFrame.
+ * See `runGameplayTests`.
+ */
+export const runProjectGameplayTests = async ({
+  project,
+  tests,
+  options,
+}: {|
+  project: gdProject,
+  tests: Array<GameplayTestToRun>,
+  options: GameplayTestRunOptions,
+|}): Promise<Array<GameplayTestResult>> => {
+  const dependencies = gameplayTestRunnerDependencies;
+  if (!dependencies) {
+    throw new Error(
+      'Gameplay tests can not be run (no editor registered to run them).'
+    );
+  }
+  const previewLauncher = dependencies.getPreviewLauncher();
+  const previewDebuggerServer = previewLauncher
+    ? previewLauncher.getPreviewDebuggerServer()
+    : null;
+  if (!previewLauncher || !previewDebuggerServer) {
+    throw new Error(
+      'Gameplay tests can not be run (no preview launcher available).'
+    );
+  }
+
+  try {
+    return await runGameplayTests({
+      project,
+      tests,
+      previewLauncher,
+      previewDebuggerServer,
+      options,
+    });
+  } finally {
+    dependencies.onTestsRunFinished();
+  }
+};
+
+/**
+ * Ask the game to stop the gameplay test being currently run, if any,
+ * using the dependencies registered by the MainFrame.
+ */
+export const stopRunningProjectGameplayTest = (): void => {
+  const dependencies = gameplayTestRunnerDependencies;
+  if (!dependencies) return;
+  const previewLauncher = dependencies.getPreviewLauncher();
+  const previewDebuggerServer = previewLauncher
+    ? previewLauncher.getPreviewDebuggerServer()
+    : null;
+  if (!previewDebuggerServer) return;
+  stopRunningGameplayTest(previewDebuggerServer);
+};

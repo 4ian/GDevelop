@@ -10,6 +10,7 @@ import {
   enumerateExternalEvents,
   enumerateExternalLayouts,
   enumerateEventsFunctionsExtensions,
+  enumerateGameplayTests,
 } from '../ProjectManager/EnumerateProjectItems';
 import { type FileMetadata } from '../ProjectsStorage';
 
@@ -17,7 +18,8 @@ type Item =
   | gdLayout
   | gdExternalEvents
   | gdExternalLayout
-  | gdEventsFunctionsExtension;
+  | gdEventsFunctionsExtension
+  | gdTest;
 
 /**
  * Helper function to generate options list
@@ -66,6 +68,9 @@ type CommandHandlers = {|
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
+  onOpenGameplayTest: string => void,
+  onRunGameplayTest: string => void | Promise<void>,
+  onRunAllGameplayTests: () => void | Promise<void>,
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
@@ -221,6 +226,36 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
         ),
       [handlers.project, handlers.onOpenExternalEvents]
     ),
+  });
+
+  useCommandWithOptions('OPEN_GAMEPLAY_TEST', !!handlers.project, {
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateGameplayTests,
+          handlers.onOpenGameplayTest
+        ),
+      [handlers.project, handlers.onOpenGameplayTest]
+    ),
+  });
+
+  useCommandWithOptions('RUN_GAMEPLAY_TEST', !!handlers.project, {
+    generateOptions: React.useCallback(
+      () =>
+        generateProjectItemOptions(
+          handlers.project,
+          enumerateGameplayTests,
+          (testName: string) => {
+            handlers.onRunGameplayTest(testName);
+          }
+        ),
+      [handlers.project, handlers.onRunGameplayTest]
+    ),
+  });
+
+  useCommand('RUN_ALL_GAMEPLAY_TESTS', !!handlers.project, {
+    handler: handlers.onRunAllGameplayTests,
   });
 
   useCommandWithOptions('OPEN_EXTERNAL_LAYOUT', !!handlers.project, {

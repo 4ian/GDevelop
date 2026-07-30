@@ -16,6 +16,7 @@ import {
 import { type AskAiEditorInterface } from '../../AiGeneration/AskAiEditorContainer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 import { CustomObjectEditorContainer } from '../EditorContainers/CustomObjectEditorContainer';
+import { GameplayTestEditorContainer } from '../EditorContainers/GameplayTestEditorContainer';
 
 // Supported editors
 type EditorRef =
@@ -24,6 +25,7 @@ type EditorRef =
   | EventsFunctionsExtensionEditorContainer
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
+  | GameplayTestEditorContainer
   | ResourcesEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
@@ -38,6 +40,7 @@ export type EditorKind =
   | 'external events'
   | 'events functions extension'
   | 'custom object'
+  | 'gameplay-test'
   | 'debugger'
   | 'resources'
   | 'global-search'
@@ -614,6 +617,24 @@ export const closeExternalEventsTabs = (
 
     return true;
   });
+};
+
+export const closeGameplayTestTabs = (
+  state: EditorTabsState,
+  gameplayTestProjectItemName: string
+): {
+  panes: {
+    [paneIdentifier: string]: { currentTab: number, editors: Array<EditorTab> },
+  },
+} => {
+  return closeTabsExceptIf(
+    state,
+    editorTab =>
+      !(
+        editorTab.kind === 'gameplay-test' &&
+        editorTab.projectItemName === gameplayTestProjectItemName
+      )
+  );
 };
 
 export const closeEventsFunctionsExtensionTabs = (

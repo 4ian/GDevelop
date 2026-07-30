@@ -24,6 +24,9 @@ import {
   type GameplayTestResult,
 } from '../../GameplayTests/GameplayTestRunner';
 import { Toolbar } from '../../GameplayTests/GameplayTestEditorToolbar';
+import Background from '../../UI/Background';
+import EmptyMessage from '../../UI/EmptyMessage';
+import { Column } from '../../UI/Grid';
 
 const styles = {
   container: {
@@ -55,6 +58,8 @@ const parseGameplayTestProjectItemName = (
 
 type State = {|
   isRunning: boolean,
+  /** The frame reached by the test being run, if it started playing. */
+  runningFrame: number | null,
   lastResult: GameplayTestResult | null,
 |};
 
@@ -67,6 +72,7 @@ export class GameplayTestEditorContainer extends React.Component<
   // $FlowFixMe[missing-local-annot]
   state = {
     isRunning: false,
+    runningFrame: null,
     lastResult: null,
   };
 
@@ -181,20 +187,25 @@ export class GameplayTestEditorContainer extends React.Component<
     if (!project || !test || this.state.isRunning) return;
 
     const { scope, testName } = this.getScopeAndTestName();
-    this.setState({ isRunning: true, lastResult: null }, () =>
-      this.updateToolbar()
+    this.setState(
+      { isRunning: true, runningFrame: null, lastResult: null },
+      () => this.updateToolbar()
     );
     try {
       const results = await runProjectGameplayTests({
         project,
         tests: [{ scope, testName }],
-        options: {},
+        options: {
+          onProgress: (test, frame) => this.setState({ runningFrame: frame }),
+        },
       });
       this.setState({ lastResult: results[0] || null });
     } catch (error) {
       console.error('Error while running the gameplay test:', error);
     } finally {
-      this.setState({ isRunning: false }, () => this.updateToolbar());
+      this.setState({ isRunning: false, runningFrame: null }, () =>
+        this.updateToolbar()
+      );
       if (this.editor) this.editor.forceUpdate();
     }
   };
@@ -219,8 +230,19 @@ export class GameplayTestEditorContainer extends React.Component<
     const test = this.getGameplayTest();
 
     if (!test || !project) {
-      //TODO: Error component
-      return <div>No gameplay test called {projectItemName} found!</div>;
+      return (
+        <div style={styles.container}>
+          <Background>
+            <Column expand alignItems="center" justifyContent="center">
+              <EmptyMessage>
+                <Trans>
+                  No gameplay test called {projectItemName} was found.
+                </Trans>
+              </EmptyMessage>
+            </Column>
+          </Background>
+        </div>
+      );
     }
 
     const { scope } = this.getScopeAndTestName();
@@ -233,6 +255,7 @@ export class GameplayTestEditorContainer extends React.Component<
           test={test}
           scope={scope}
           isRunning={this.state.isRunning}
+          runningFrame={this.state.runningFrame}
           lastResult={this.state.lastResult}
           onRunTest={this.runTest}
           onStopTest={this.stopTest}

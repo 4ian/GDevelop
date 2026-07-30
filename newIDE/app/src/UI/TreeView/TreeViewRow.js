@@ -28,7 +28,7 @@ import { TreeViewRightPrimaryButton } from './TreeViewRightPrimaryButton';
 const stopPropagation = e => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
-const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
+const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 600;
 export const TREE_VIEW_ROW_HEIGHT = 32;
 const COLLAPSABLE_LINE_SIDE_DROP_ZONE_HEIGHT = 6;
 

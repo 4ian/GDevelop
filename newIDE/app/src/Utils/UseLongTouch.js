@@ -51,7 +51,8 @@ export const useLongTouch = (
   }
 ): {|
   contextMenuProps: {|
-    onTouchEnd: () => void,
+    onTouchCancel: (event: TouchEvent) => void,
+    onTouchEnd: (event: TouchEvent) => void,
     onTouchMove: (event: TouchEvent) => void,
     onTouchStart: (event: TouchEvent) => void,
   |},
@@ -60,6 +61,7 @@ export const useLongTouch = (
   const context = options && options.context ? options.context : null;
   const delay = options && options.delay ? options.delay : defaultDelay;
   const currentClientCoordinates = React.useRef<?ClientCoordinates>(null);
+  const longTouchFired = React.useRef<boolean>(false);
   const clear = React.useCallback(
     () => {
       if (context) delete contextLocks[context];
@@ -103,6 +105,9 @@ export const useLongTouch = (
       // if there is one already. This can happen if start is called
       // multiple times.
       timeout.current && clearTimeout(timeout.current);
+      // Reset before the context-lock early return below: an element that
+      // won't fire must not cancel this gesture's touchend.
+      longTouchFired.current = false;
       if (context) {
         if (contextLocks[context]) return;
         contextLocks[context] = true;
@@ -111,6 +116,10 @@ export const useLongTouch = (
       const clientCoordinates = getClientXY(event);
       currentClientCoordinates.current = clientCoordinates;
       timeout.current = setTimeout(() => {
+        // Release the lock now: if the callback opens a context menu, the
+        // menu swallows the touchend and `clear` would never run.
+        if (context) delete contextLocks[context];
+        longTouchFired.current = true;
         callback(clientCoordinates);
       }, delay);
     },
@@ -142,11 +151,25 @@ export const useLongTouch = (
     [currentClientCoordinates, clear]
   );
 
+  const end = React.useCallback(
+    (event: TouchEvent) => {
+      if (longTouchFired.current) {
+        // Prevent the synthesized mouse events/click, which would land on
+        // whatever is now under the finger (context menu, backdrop, item).
+        if (event.cancelable !== false) event.preventDefault();
+        longTouchFired.current = false;
+      }
+      clear();
+    },
+    [clear]
+  );
+
   return {
     contextMenuProps: {
       onTouchStart: start,
       onTouchMove: onMove,
-      onTouchEnd: clear,
+      onTouchEnd: end,
+      onTouchCancel: end,
     },
   };
 };

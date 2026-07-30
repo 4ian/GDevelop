@@ -46,6 +46,25 @@ export type GameplayTestRunOptions = {|
   onProgress?: (test: GameplayTestToRun, frame: number) => void,
 |};
 
+/**
+ * Callbacks to open/rename/delete/run gameplay tests of any scope, provided
+ * by the MainFrame (which owns the editor tabs and the runner) to the
+ * editors listing tests.
+ */
+export type GameplayTestsCallbacks = {|
+  onOpenGameplayTest: (scope: GameplayTestScope, testName: string) => void,
+  onRenameGameplayTest: (
+    scope: GameplayTestScope,
+    oldName: string,
+    newName: string
+  ) => void,
+  onDeleteGameplayTest: (scope: GameplayTestScope, test: gdTest) => void,
+  onRunGameplayTest: (
+    scope: GameplayTestScope,
+    testName: string
+  ) => void | Promise<void>,
+|};
+
 const GAMEPLAY_TEST_FRAME_DEBUGGER_ID = 'gameplay-test-frame';
 const GAME_READY_TIMEOUT_MS = 60 * 1000;
 const GAME_READY_POLL_INTERVAL_MS = 300;

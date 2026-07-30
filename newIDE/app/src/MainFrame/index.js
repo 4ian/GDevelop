@@ -69,10 +69,12 @@ import { renderGameplayTestEditorContainer } from './EditorContainers/GameplayTe
 import { getGameplayTestProjectItemName } from './EditorContainers/GameplayTestEditorContainer';
 import { GameplayTestFrame } from '../GameplayTests/GameplayTestFrame';
 import {
+  getTestsContainer,
   registerGameplayTestRunnerDependencies,
   runProjectGameplayTests,
   stopRunningProjectGameplayTest,
   type GameplayTestToRun,
+  type GameplayTestsCallbacks,
 } from '../GameplayTests/GameplayTestRunner';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
@@ -1768,9 +1770,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
-  const deleteGameplayTest = (test: gdTest) => {
+  const deleteGameplayTest = (scope: string, test: gdTest) => {
     const { i18n } = props;
-    if (!state.currentProject) return;
+    const { currentProject } = state;
+    if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -1784,31 +1787,38 @@ const MainFrame = (props: Props): React.MixedElement => {
       ...state,
       editorTabs: closeGameplayTestTabs(
         state.editorTabs,
-        getGameplayTestProjectItemName('project', testName)
+        getGameplayTestProjectItemName(scope, testName)
       ),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.getTests().removeTest(testName);
+      if (!state.currentProject) return;
+      const testsContainer = getTestsContainer(state.currentProject, scope);
+      if (testsContainer) testsContainer.removeTest(testName);
       _onProjectItemModified();
     });
   };
 
-  const renameGameplayTest = (oldName: string, newName: string) => {
+  const renameGameplayTest = (
+    scope: string,
+    oldName: string,
+    newName: string
+  ) => {
     const { currentProject } = state;
     const { i18n } = props;
     if (!currentProject) return;
 
-    if (!currentProject.getTests().hasTestNamed(oldName) || newName === oldName)
-      return;
+    const testsContainer = getTestsContainer(currentProject, scope);
+    if (!testsContainer) return;
+
+    if (!testsContainer.hasTestNamed(oldName) || newName === oldName) return;
 
     const uniqueNewName = newNameGenerator(
       newName || i18n._(t`Unnamed`),
       tentativeNewName => {
-        return currentProject.getTests().hasTestNamed(tentativeNewName);
+        return testsContainer.hasTestNamed(tentativeNewName);
       }
     );
 
-    const test = currentProject.getTests().getTest(oldName);
+    const test = testsContainer.getTest(oldName);
     test.setName(uniqueNewName);
     setState(state => ({
       ...state,
@@ -1818,8 +1828,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         editorTab =>
           getRenamedGameplayTestTabProjectItemName(
             editorTab,
-            getGameplayTestProjectItemName('project', oldName),
-            getGameplayTestProjectItemName('project', uniqueNewName)
+            getGameplayTestProjectItemName(scope, oldName),
+            getGameplayTestProjectItemName(scope, uniqueNewName)
           )
       ),
     })).then(() => {
@@ -1828,14 +1838,14 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const runGameplayTestFromUi = React.useCallback(
-    async (testName: string) => {
+    async (scope: string, testName: string) => {
       const { currentProject } = state;
       if (!currentProject) return;
 
       try {
         await runProjectGameplayTests({
           project: currentProject,
-          tests: [{ scope: 'project', testName }],
+          tests: [{ scope, testName }],
           options: {},
         });
       } catch (error) {
@@ -5461,7 +5471,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenGameplayTest: (testName: string) =>
       openGameplayTest('project', testName),
-    onRunGameplayTest: runGameplayTestFromUi,
+    onRunGameplayTest: (testName: string) =>
+      runGameplayTestFromUi('project', testName),
     onRunAllGameplayTests: runAllGameplayTestsFromUi,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
@@ -5626,6 +5637,15 @@ const MainFrame = (props: Props): React.MixedElement => {
     !isSavingProject &&
     (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
 
+  // Not memoized: the handlers close over the current state (like the other
+  // project item handlers).
+  const gameplayTestsCallbacks: GameplayTestsCallbacks = {
+    onOpenGameplayTest: openGameplayTest,
+    onRenameGameplayTest: renameGameplayTest,
+    onDeleteGameplayTest: deleteGameplayTest,
+    onRunGameplayTest: runGameplayTestFromUi,
+  };
+
   const editorTabsPaneProps: EditorTabsPaneCommonProps = {
     gameEditorMode,
     setGameEditorMode,
@@ -5662,6 +5682,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onQuitVersionHistory: onQuitVersionHistory,
     onOpenAskAi: openAskAi,
     onCloseAskAi: closeAskAi,
+    gameplayTestsCallbacks,
     getStorageProvider: getStorageProvider,
     // $FlowFixMe[incompatible-type]
     setPreviewedLayout: setPreviewedLayout,
@@ -5812,16 +5833,22 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDeleteExternalLayout={deleteExternalLayout}
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
           onDeleteExternalEvents={deleteExternalEvents}
-          onDeleteGameplayTest={deleteGameplayTest}
+          onDeleteGameplayTest={(test: gdTest) =>
+            deleteGameplayTest('project', test)
+          }
           onRenameLayout={renameLayout}
           onRenameExternalLayout={renameExternalLayout}
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
-          onRenameGameplayTest={renameGameplayTest}
+          onRenameGameplayTest={(oldName: string, newName: string) =>
+            renameGameplayTest('project', oldName, newName)
+          }
           onOpenGameplayTest={(testName: string) =>
             openGameplayTest('project', testName)
           }
-          onRunGameplayTest={runGameplayTestFromUi}
+          onRunGameplayTest={(testName: string) =>
+            runGameplayTestFromUi('project', testName)
+          }
           onOpenResources={openResources}
           onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}
           onWillInstallExtension={onWillInstallExtension}

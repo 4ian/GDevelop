@@ -23,6 +23,7 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../../GameplayTests/GameplayTestRunner';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
 import type {
   SceneEventsOutsideEditorChanges,
@@ -115,6 +116,9 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+
+  // Gameplay tests management:
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
 
   // Events function management:
   onLoadEventsFunctionsExtensions: ({|

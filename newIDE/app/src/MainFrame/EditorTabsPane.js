@@ -64,6 +64,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../GameplayTests/GameplayTestRunner';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
 
@@ -145,6 +146,7 @@ export type EditorTabsPaneCommonProps = {|
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
     layoutName: string | null,
@@ -356,6 +358,7 @@ const EditorTabsPane: React.ComponentType<{
     onQuitVersionHistory,
     onOpenAskAi,
     onCloseAskAi,
+    gameplayTestsCallbacks,
     getStorageProvider,
     setPreviewedLayout,
     openExternalEvents,
@@ -770,6 +773,7 @@ const EditorTabsPane: React.ComponentType<{
                     setPreviewedLayout,
                     onOpenAskAi,
                     onCloseAskAi,
+                    gameplayTestsCallbacks,
                     onOpenExternalEvents: openExternalEvents,
                     onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {

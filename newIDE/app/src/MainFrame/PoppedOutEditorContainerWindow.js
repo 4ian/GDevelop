@@ -216,6 +216,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         projectItemName: editorTab.projectItemName,
                         setPreviewedLayout: props.setPreviewedLayout,
                         onOpenAskAi: props.onOpenAskAi,
+                        gameplayTestsCallbacks: props.gameplayTestsCallbacks,
                         onCloseAskAi: props.onCloseAskAi,
                         onOpenExternalEvents: props.openExternalEvents,
                         onOpenEvents: (sceneName: string) => {

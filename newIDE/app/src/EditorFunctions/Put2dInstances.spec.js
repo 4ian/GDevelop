@@ -346,3 +346,137 @@ describe('put_2d_instances (modifications of existing instances)', () => {
     expect(positions).toEqual([{ x: 0, y: 50 }, { x: 300, y: 50 }]);
   });
 });
+
+describe('put_2d_instances (instances_hidden)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const getRawInstances = (scene: gdLayout): Array<gdInitialInstance> => {
+    const instances = [];
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    functor.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      instances.push(instance);
+    };
+    // $FlowFixMe[incompatible-type]
+    scene.getInitialInstances().iterateOverInstances(functor);
+    functor.delete();
+    return instances;
+  };
+
+  const putInstances = async (args: any) =>
+    editorFunctions.put_2d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Player',
+        layer_name: '',
+        ...args,
+      },
+    });
+
+  it('creates instances hidden at start', async () => {
+    const result = await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 1,
+      instances_hidden: true,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(expect.stringContaining('hidden at start'));
+    const [created] = getRawInstances(testScene);
+    expect(created.isHidden()).toBe(true);
+  });
+
+  it('hides then shows an existing instance with the none brush', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 1,
+    });
+    const [created] = getRawInstances(testScene);
+    expect(created.isHidden()).toBe(false);
+    const id = created.getPersistentUuid().slice(0, 10);
+
+    const hideResult = await putInstances({
+      brush_kind: 'none',
+      existing_instance_ids: id,
+      instances_hidden: true,
+    });
+    expect(hideResult.success).toBe(true);
+    expect(hideResult.message).toEqual(
+      expect.stringContaining(
+        'Marked 1 instance of "Player" as hidden at start'
+      )
+    );
+    expect(created.isHidden()).toBe(true);
+
+    const showResult = await putInstances({
+      brush_kind: 'none',
+      existing_instance_ids: id,
+      instances_hidden: false,
+    });
+    expect(showResult.success).toBe(true);
+    expect(showResult.message).toEqual(
+      expect.stringContaining(
+        'Marked 1 instance of "Player" as visible at start'
+      )
+    );
+    expect(created.isHidden()).toBe(false);
+  });
+
+  it('leaves the hidden flag untouched when instances_hidden is omitted', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 1,
+      instances_hidden: true,
+    });
+    const [created] = getRawInstances(testScene);
+    const id = created.getPersistentUuid().slice(0, 10);
+
+    const result = await putInstances({
+      brush_kind: 'none',
+      existing_instance_ids: id,
+      instances_z_order: 5,
+    });
+    expect(result.success).toBe(true);
+    expect(created.isHidden()).toBe(true);
+  });
+
+  it('accepts instances_hidden alone as a change on existing instances', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '100,200',
+      new_instances_count: 1,
+    });
+    const [created] = getRawInstances(testScene);
+
+    // instances_hidden must count as a requested mutation (no
+    // "no change was requested" failure), even when it is the only parameter.
+    const result = await putInstances({
+      brush_kind: 'none',
+      existing_instance_ids: created.getPersistentUuid().slice(0, 10),
+      instances_hidden: true,
+    });
+    expect(result.success).toBe(true);
+    expect(created.isHidden()).toBe(true);
+  });
+});

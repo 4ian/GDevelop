@@ -329,3 +329,86 @@ describe('put_3d_instances (modifications of existing instances)', () => {
     expect(instances[0].z).toBe(30);
   });
 });
+
+describe('put_3d_instances (instances_hidden)', () => {
+  let project: gdProject;
+  let testScene: gdLayout;
+
+  beforeEach(() => {
+    makeTestExtensions(gd);
+    // $FlowFixMe[invalid-constructor]
+    project = new gd.ProjectHelper.createNewGDJSProject();
+    testScene = project.insertNewLayout('TestScene', 0);
+    testScene
+      .getObjects()
+      .insertNewObject(project, 'FakeScene3D::Cube3DObject', 'Cube', 0);
+  });
+
+  afterEach(() => {
+    project.delete();
+  });
+
+  const getRawInstances = (scene: gdLayout): Array<gdInitialInstance> => {
+    const instances = [];
+    const functor = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe[cannot-write]
+    functor.invoke = instancePtr => {
+      const instance: gdInitialInstance = gd.wrapPointer(
+        // $FlowFixMe[incompatible-type]
+        instancePtr,
+        gd.InitialInstance
+      );
+      instances.push(instance);
+    };
+    // $FlowFixMe[incompatible-type]
+    scene.getInitialInstances().iterateOverInstances(functor);
+    functor.delete();
+    return instances;
+  };
+
+  const putInstances = async (args: any) =>
+    editorFunctions.put_3d_instances.launchFunction({
+      ...makeFakeLaunchFunctionOptionsWithProject(project),
+      args: {
+        scene_name: 'TestScene',
+        object_name: 'Cube',
+        layer_name: '',
+        ...args,
+      },
+    });
+
+  it('creates 3D instances hidden at start', async () => {
+    const result = await putInstances({
+      brush_kind: 'point',
+      brush_position: '10,20,30',
+      new_instances_count: 1,
+      instances_hidden: true,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(expect.stringContaining('hidden at start'));
+    const [created] = getRawInstances(testScene);
+    expect(created.isHidden()).toBe(true);
+  });
+
+  it('hides an existing 3D instance with the none brush, alone as a change', async () => {
+    await putInstances({
+      brush_kind: 'point',
+      brush_position: '10,20,30',
+      new_instances_count: 1,
+    });
+    const [created] = getRawInstances(testScene);
+    expect(created.isHidden()).toBe(false);
+
+    const result = await putInstances({
+      brush_kind: 'none',
+      existing_instance_ids: created.getPersistentUuid().slice(0, 10),
+      instances_hidden: true,
+    });
+    expect(result.success).toBe(true);
+    expect(result.message).toEqual(
+      expect.stringContaining('Marked 1 instance of "Cube" as hidden at start')
+    );
+    expect(created.isHidden()).toBe(true);
+  });
+});

@@ -13,12 +13,11 @@ import { type MenuButton } from '../UI/TreeView';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { mapFor } from '../Utils/MapFor';
 import { getSceneTreeViewItemId } from './SceneTreeViewItemContent';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import {
   buildMoveToFolderSubmenu,
-  createNewFolderAndMoveItem,
-  hasFolderNamed,
   moveNewSceneToFolder,
 } from './SceneTreeViewHelpers';
 
@@ -26,7 +25,6 @@ const SCENE_FOLDER_CLIPBOARD_KIND = 'SceneFolder';
 
 export type SceneFolderTreeViewItemProps = {|
   project: gdProject,
-  forceUpdate: () => void,
   forceUpdateList: () => void,
   editName: (itemId: string) => void,
   scrollToItem: (itemId: string) => void,
@@ -35,7 +33,6 @@ export type SceneFolderTreeViewItemProps = {|
     options: ShowConfirmDeleteDialogOptions
   ) => Promise<boolean>,
   expandFolders: (folderIds: Array<string>) => void,
-  onDeleteLayout: (layout: gdLayout, skipConfirmation?: boolean) => void,
 |};
 
 export const getSceneFolderTreeViewItemId = (
@@ -131,24 +128,9 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
         submenu: buildMoveToFolderSubmenu(
           i18n,
           project,
-          currentParent,
           this.folder,
-          targetFolder => {
-            currentParent.moveLayoutFolderOrLayoutToAnotherFolder(
-              this.folder,
-              targetFolder,
-              0
-            );
-            this._onFolderStructureModified();
-          },
-          () =>
-            createNewFolderAndMoveItem(
-              project,
-              this.folder,
-              this.props.forceUpdateList,
-              this.props.expandFolders,
-              this.props.editName
-            )
+          () => this._onFolderStructureModified(),
+          () => this._addFolderIn(currentParent)
         ),
       },
       {
@@ -160,7 +142,7 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Add a folder`),
-        click: () => this._addFolder(),
+        click: () => this._addFolderIn(this.folder),
       },
     ];
   }
@@ -175,100 +157,48 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
 
   delete(): void {
     const { showDeleteConfirmation } = this.props;
+    const parent = this.folder.getParent();
+    const childrenCount = this.folder.getChildrenCount();
 
-    const contentCount = this._countFolderContents();
-    const hasStartScene = this._containsStartScene();
-
-    let message;
-    let confirmLabel = t`Delete`;
-
-    if (contentCount.scenes === 0 && contentCount.folders === 0) {
-      message = t`Are you sure you want to remove this empty folder?`;
-    } else {
-      message = t`⚠️ This will permanently delete:
-  - ${contentCount.scenes} scene(s)
-  - ${contentCount.folders} subfolder(s)
-
-  This action cannot be undone.`;
-      confirmLabel = t`Delete permanently`;
-
-      if (hasStartScene) {
-        message += t`
-
-  ⚠️ Warning: This includes your start scene. Another scene will be set as the new start scene.`;
-      }
+    // Removing a folder never removes the scenes it contains: they are moved
+    // back to the parent folder, so that a scene can only ever be deleted
+    // explicitly, one by one.
+    if (childrenCount === 0) {
+      parent.removeFolderChild(this.folder);
+      this._onFolderStructureModified();
+      return;
     }
 
     showDeleteConfirmation({
       title: t`Remove folder`,
-      message: message,
-      confirmButtonLabel: confirmLabel,
+      message: t`The content of this folder will be moved out of it, in "${this._getParentName()}". Do you want to continue?`,
+      confirmButtonLabel: t`Remove folder`,
     }).then(answer => {
       if (!answer) return;
 
-      this._deleteRecursively(this.folder);
+      const positionInParent = this.getIndex();
+      // The children are collected first, as moving them out changes the
+      // indices while iterating.
+      const childrenToMove = mapFor(0, this.folder.getChildrenCount(), i =>
+        this.folder.getChildAt(i)
+      );
+      childrenToMove.forEach((child, i) => {
+        this.folder.moveLayoutFolderOrLayoutToAnotherFolder(
+          child,
+          parent,
+          positionInParent + i
+        );
+      });
 
-      this.folder.getParent().removeFolderChild(this.folder);
+      parent.removeFolderChild(this.folder);
 
       this._onFolderStructureModified();
     });
   }
 
-  _deleteRecursively(folder: gdLayoutFolderOrLayout): void {
-    // The children are collected first because deleting a layout removes it
-    // from the folder structure, which would shift the indices while iterating.
-    const childrenToDelete = [];
-    for (let i = 0; i < folder.getChildrenCount(); i++) {
-      childrenToDelete.push(folder.getChildAt(i));
-    }
-    childrenToDelete.forEach(child => {
-      if (child.isFolder()) {
-        this._deleteRecursively(child);
-        folder.removeFolderChild(child);
-      } else {
-        // The confirmation was already asked for the whole folder.
-        this.props.onDeleteLayout(child.getLayout(), true);
-      }
-    });
-  }
-
-  _countFolderContents(): { scenes: number, folders: number } {
-    let scenes = 0;
-    let folders = 0;
-
-    const countRecursive = (folder: gdLayoutFolderOrLayout) => {
-      for (let i = 0; i < folder.getChildrenCount(); i++) {
-        const child = folder.getChildAt(i);
-        if (child.isFolder()) {
-          folders++;
-          countRecursive(child);
-        } else {
-          scenes++;
-        }
-      }
-    };
-
-    countRecursive(this.folder);
-    return { scenes, folders };
-  }
-
-  _containsStartScene(): boolean {
-    const { project } = this.props;
-    const firstLayout = project.getFirstLayout();
-
-    const checkRecursive = (folder: gdLayoutFolderOrLayout): boolean => {
-      for (let i = 0; i < folder.getChildrenCount(); i++) {
-        const child = folder.getChildAt(i);
-        if (child.isFolder()) {
-          if (checkRecursive(child)) return true;
-        } else if (child.getLayout().getName() === firstLayout) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    return checkRecursive(this.folder);
+  _getParentName(): string {
+    const parent = this.folder.getParent();
+    return parent.isRootFolder() ? 'Scenes' : parent.getFolderName();
   }
 
   getIndex(): number {
@@ -285,7 +215,11 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     if (destinationFolder === currentParent) {
       const originIndex = this.getIndex();
       if (destinationIndex === originIndex) return;
-      currentParent.moveChild(originIndex, destinationIndex);
+      currentParent.moveChild(
+        originIndex,
+        // When moving the item down, it must not be counted.
+        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+      );
     } else {
       currentParent.moveLayoutFolderOrLayoutToAnotherFolder(
         this.folder,
@@ -320,13 +254,10 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
     if (!name || !copiedFolder) return;
 
-    const newName = newNameGenerator(name, name =>
-      hasFolderNamed(this.folder, name)
-    );
-
-    const newFolder = this.folder.insertNewFolder(newName, 0);
+    const newFolder = this.folder.insertNewFolder(name, 0);
     unserializeFromJSObject(newFolder, copiedFolder);
-    newFolder.setFolderName(newName);
+    // Unserialization has overwritten the name.
+    newFolder.setFolderName(name);
 
     this._onFolderStructureModified();
     this.props.editName(getSceneFolderTreeViewItemId(newFolder));
@@ -358,17 +289,18 @@ export class SceneFolderTreeViewItemContent implements TreeViewItemContent {
     }, 100);
   }
 
-  _addFolder(): void {
+  _addFolderIn(parentFolder: gdLayoutFolderOrLayout): void {
     const { editName, expandFolders } = this.props;
 
-    const newFolderName = newNameGenerator('NewFolder', name =>
-      hasFolderNamed(this.folder, name)
-    );
-
-    const newFolder = this.folder.insertNewFolder(newFolderName, 0);
+    const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
 
     this._onFolderStructureModified();
-    expandFolders([this.getId()]);
+    expandFolders([
+      parentFolder.isRootFolder()
+        ? scenesRootFolderId
+        : getSceneFolderTreeViewItemId(parentFolder),
+    ]);
+    // We focus it so the user can edit the name directly.
     editName(getSceneFolderTreeViewItemId(newFolder));
   }
 

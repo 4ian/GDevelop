@@ -1674,19 +1674,17 @@ const MainFrame = (props: Props): React.MixedElement => {
     [openProjectManager]
   );
 
-  const deleteLayout = (layout: gdLayout, skipConfirmation: boolean = false) => {
+  const deleteLayout = (layout: gdLayout) => {
     const { currentProject } = state;
     const { i18n } = props;
     if (!currentProject) return;
 
-    if (!skipConfirmation) {
-      const answer = Window.showConfirmDialog(
-        i18n._(
-          t`Are you sure you want to remove this scene? This can't be undone.`
-        )
-      );
-      if (!answer) return;
-    }
+    const answer = Window.showConfirmDialog(
+      i18n._(
+        t`Are you sure you want to remove this scene? This can't be undone.`
+      )
+    );
+    if (!answer) return;
 
     onWillDeleteScene({ scene: layout }).then(() => {
       if (currentProject.getFirstLayout() === layout.getName())

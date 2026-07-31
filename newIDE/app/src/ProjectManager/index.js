@@ -54,7 +54,6 @@ import {
   getSceneFolderTreeViewItemId,
   type SceneFolderTreeViewItemProps,
 } from './SceneFolderTreeViewItemContent';
-import { hasFolderNamed } from './SceneTreeViewHelpers';
 import {
   ExtensionTreeViewItemContent,
   getExtensionTreeViewItemId,
@@ -149,7 +148,9 @@ export interface TreeViewItemContent {
   paste(): void;
   cut(): void;
   getIndex(): number;
-  moveAt(destinationIndex: number): void;
+  // `targetFolder` is only used by the items of the scenes folder structure,
+  // to move an item into another folder than its current parent.
+  moveAt(destinationIndex: number, targetFolder?: gdLayoutFolderOrLayout): void;
   isDescendantOf(itemContent: TreeViewItemContent): boolean;
   getRootId(): string;
 }
@@ -755,11 +756,8 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         if (!project) return;
 
         const layoutsRootFolder = project.getLayoutsRootFolder();
-        const newFolderName = newNameGenerator('NewFolder', name =>
-          hasFolderNamed(layoutsRootFolder, name)
-        );
         const newFolder = layoutsRootFolder.insertNewFolder(
-          newFolderName,
+          'NewFolder',
           layoutsRootFolder.getChildrenCount()
         );
 
@@ -1025,26 +1023,22 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         project
           ? {
               project,
-              forceUpdate,
               forceUpdateList,
               editName,
               scrollToItem,
               showDeleteConfirmation,
               onProjectItemModified,
               expandFolders,
-              onDeleteLayout,
             }
           : null,
       [
         project,
-        forceUpdate,
         forceUpdateList,
         editName,
         scrollToItem,
         showDeleteConfirmation,
         onProjectItemModified,
         expandFolders,
-        onDeleteLayout,
       ]
     );
 
@@ -1405,9 +1399,22 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           return;
         }
         const selectedItem = selectedItems[0];
-        selectedItem.content.moveAt(
-          destinationItem.content.getIndex() + (where === 'after' ? 1 : 0)
-        );
+        const destinationContent = destinationItem.content;
+        if (
+          where === 'inside' &&
+          destinationContent instanceof SceneFolderTreeViewItemContent
+        ) {
+          // Dropping on a scenes folder puts the item at the end of it.
+          const destinationFolder = destinationContent.getFolder();
+          selectedItem.content.moveAt(
+            destinationFolder.getChildrenCount(),
+            destinationFolder
+          );
+        } else {
+          selectedItem.content.moveAt(
+            destinationContent.getIndex() + (where === 'after' ? 1 : 0)
+          );
+        }
         onTreeModified(true);
       },
       [onTreeModified, selectedItems]

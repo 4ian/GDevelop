@@ -21,7 +21,6 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
 import {
   buildMoveToFolderSubmenu,
-  createNewFolderAndMoveItem,
   moveNewSceneToFolder,
 } from './SceneTreeViewHelpers';
 
@@ -33,7 +32,7 @@ const styles = {
 
 export type SceneTreeViewItemCallbacks = {|
   onSceneAdded: () => void,
-  onDeleteLayout: (gdLayout, skipConfirmation?: boolean) => void,
+  onDeleteLayout: gdLayout => void,
   onRenameLayout: (string, string) => void,
   onOpenLayout: (
     name: string,
@@ -154,7 +153,6 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   buildMenuTemplate(i18n: I18nType, index: number): any {
     const { project } = this.props;
     const layoutFolderOrLayout = this.layoutFolderOrLayout;
-    const currentParent = layoutFolderOrLayout.getParent();
 
     return [
       {
@@ -203,24 +201,9 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
         submenu: buildMoveToFolderSubmenu(
           i18n,
           project,
-          currentParent,
           layoutFolderOrLayout,
-          targetFolder => {
-            currentParent.moveLayoutFolderOrLayoutToAnotherFolder(
-              layoutFolderOrLayout,
-              targetFolder,
-              0
-            );
-            this._onFolderStructureModified();
-          },
-          () =>
-            createNewFolderAndMoveItem(
-              project,
-              layoutFolderOrLayout,
-              this.props.forceUpdateList,
-              this.props.expandFolders,
-              this.props.editName
-            )
+          () => this._onFolderStructureModified(),
+          () => this._addFolderInParent()
         ),
       },
       {
@@ -288,10 +271,10 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return icons.length > 0 ? icons : null;
   }
 
-  delete(skipConfirmation: boolean = false): void {
+  delete(): void {
     // Removing the layout from the project also removes it from the scenes
     // folder structure, so nothing else has to be done here.
-    this.props.onDeleteLayout(this.scene, skipConfirmation);
+    this.props.onDeleteLayout(this.scene);
   }
 
   getIndex(): number {
@@ -310,7 +293,11 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     if (destinationFolder === currentParentFolder) {
       const originIndex = this.getIndex();
       if (destinationIndex === originIndex) return;
-      currentParentFolder.moveChild(originIndex, destinationIndex);
+      currentParentFolder.moveChild(
+        originIndex,
+        // When moving the item down, it must not be counted.
+        destinationIndex + (destinationIndex <= originIndex ? 0 : -1)
+      );
     } else {
       currentParentFolder.moveLayoutFolderOrLayoutToAnotherFolder(
         this.layoutFolderOrLayout,
@@ -416,12 +403,29 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
   }
 
   /**
-   * The tree view caches the children of each item, so it must be told to
+   * Add a new folder next to this scene and start editing its name, like the
+   * objects list does.
+   */
+  _addFolderInParent(): void {
+    const parentFolder = this.layoutFolderOrLayout.getParent();
+    const newFolder = parentFolder.insertNewFolder('NewFolder', 0);
+
+    this._onFolderStructureModified();
+    this.props.expandFolders([
+      parentFolder.isRootFolder()
+        ? scenesRootFolderId
+        : getSceneFolderTreeViewItemId(parentFolder),
+    ]);
+    // We focus it so the user can edit the name directly.
+    this.props.editName(getSceneFolderTreeViewItemId(newFolder));
+  }
+
+  /**
+   * The tree view caches the children of each item, so it must also be told to
    * rebuild them when the folder structure itself changed.
    */
   _onFolderStructureModified() {
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
+    this._onProjectItemModified();
     this.props.forceUpdateList();
   }
 

@@ -1,41 +1,56 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import { getSceneFolderTreeViewItemId } from './SceneFolderTreeViewItemContent';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { enumerateSceneFoldersInProject } from './EnumerateSceneFolders';
 
 /**
- * List all the folders of the scenes folder structure, with the path used to
- * display them in the "Move to folder" menus.
+ * Build the "Move to folder" submenu of a scene or of a scenes folder, in the
+ * same way the objects list does it for objects and object folders.
+ *
+ * `itemToMove` and its own children are filtered out of the destinations, as a
+ * folder can't be moved inside itself.
  */
-export const collectFoldersAndPaths = (
-  folder: gdLayoutFolderOrLayout,
-  parentPath: string = '',
-  result: Array<{| folder: gdLayoutFolderOrLayout, path: string |}> = []
-): Array<{| folder: gdLayoutFolderOrLayout, path: string |}> => {
-  for (let i = 0; i < folder.getChildrenCount(); i++) {
-    const child = folder.getChildAt(i);
-    if (child.isFolder()) {
-      const folderName = child.getFolderName();
-      const path = parentPath ? `${parentPath}/${folderName}` : folderName;
-      result.push({ folder: child, path });
-      collectFoldersAndPaths(child, path, result);
-    }
-  }
-  return result;
-};
+export const buildMoveToFolderSubmenu = (
+  i18n: I18nType,
+  project: gdProject,
+  itemToMove: gdLayoutFolderOrLayout,
+  onMoved: () => void,
+  onAddFolder: () => void
+): Array<MenuItemTemplate> => {
+  const foldersAndPaths = enumerateSceneFoldersInProject(project);
+  foldersAndPaths.unshift({
+    path: i18n._(t`Root folder`),
+    folder: project.getLayoutsRootFolder(),
+  });
 
-export const hasFolderNamed = (
-  parentFolder: gdLayoutFolderOrLayout,
-  name: string
-): boolean => {
-  for (let i = 0; i < parentFolder.getChildrenCount(); i++) {
-    const child = parentFolder.getChildAt(i);
-    if (child.isFolder() && child.getFolderName() === name) {
-      return true;
-    }
-  }
-  return false;
+  const currentParent = itemToMove.getParent();
+  const filteredFoldersAndPaths = foldersAndPaths.filter(
+    folderAndPath =>
+      !folderAndPath.folder.isADescendantOf(itemToMove) &&
+      folderAndPath.folder !== itemToMove
+  );
+
+  return [
+    ...filteredFoldersAndPaths.map(({ folder, path }) => ({
+      label: path,
+      enabled: folder !== currentParent,
+      click: () => {
+        if (folder === currentParent) return;
+        currentParent.moveLayoutFolderOrLayoutToAnotherFolder(
+          itemToMove,
+          folder,
+          0
+        );
+        onMoved();
+      },
+    })),
+    { type: 'separator' },
+    {
+      label: i18n._(t`Create new folder...`),
+      click: onAddFolder,
+    },
+  ];
 };
 
 /**
@@ -57,69 +72,4 @@ export const moveNewSceneToFolder = (
     parentFolder,
     position
   );
-};
-
-export const buildMoveToFolderSubmenu = (
-  i18n: I18nType,
-  project: gdProject,
-  currentParent: ?gdLayoutFolderOrLayout,
-  itemToMove: gdLayoutFolderOrLayout,
-  onMove: (targetFolder: gdLayoutFolderOrLayout) => void,
-  onCreateNewFolder: () => void
-): Array<any> => {
-  const layoutsRootFolder = project.getLayoutsRootFolder();
-  const foldersAndPaths = collectFoldersAndPaths(layoutsRootFolder);
-
-  return [
-    {
-      label: i18n._(t`Root`),
-      enabled: currentParent !== layoutsRootFolder,
-      click: () => onMove(layoutsRootFolder),
-    },
-    ...foldersAndPaths
-      // A folder can't be moved inside itself or inside one of its children.
-      .filter(
-        ({ folder }) =>
-          !itemToMove.isFolder() ||
-          (folder !== itemToMove && !folder.isADescendantOf(itemToMove))
-      )
-      .map(({ folder, path }) => ({
-        label: path,
-        enabled: folder !== currentParent,
-        click: () => onMove(folder),
-      })),
-    { type: 'separator' },
-    {
-      label: i18n._(t`Create new folder...`),
-      click: onCreateNewFolder,
-    },
-  ];
-};
-
-export const createNewFolderAndMoveItem = (
-  project: gdProject,
-  itemToMove: gdLayoutFolderOrLayout,
-  onProjectItemModified: () => void,
-  expandFolders: (folderIds: Array<string>) => void,
-  editName: (itemId: string) => void
-): void => {
-  const layoutsRootFolder = project.getLayoutsRootFolder();
-
-  const newFolderName = newNameGenerator('NewFolder', name =>
-    hasFolderNamed(layoutsRootFolder, name)
-  );
-  const newFolder = layoutsRootFolder.insertNewFolder(newFolderName, 0);
-
-  itemToMove
-    .getParent()
-    .moveLayoutFolderOrLayoutToAnotherFolder(itemToMove, newFolder, 0);
-
-  onProjectItemModified();
-  expandFolders([getSceneFolderTreeViewItemId(newFolder)]);
-
-  // The item is only rendered after the tree view is refreshed, so wait for
-  // the next render before starting to edit its name.
-  setTimeout(() => {
-    editName(getSceneFolderTreeViewItemId(newFolder));
-  }, 100);
 };

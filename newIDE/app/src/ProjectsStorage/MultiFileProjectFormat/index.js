@@ -3530,6 +3530,7 @@ const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
     if (normalized.flippedZ === false) delete normalized.flippedZ;
     if (normalized.locked === false) delete normalized.locked;
     if (normalized.sealed === false) delete normalized.sealed;
+    if (normalized.hidden === false) delete normalized.hidden;
     if (normalized.behaviorOverridings) {
       normalized.behaviorOverridings = normalized.behaviorOverridings.map(
         behavior => {

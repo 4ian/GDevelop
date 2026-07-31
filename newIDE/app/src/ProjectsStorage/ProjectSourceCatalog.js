@@ -1965,6 +1965,7 @@ const LAYOUT_TABLES = Object.freeze([
       { name: 'flip', type: 'unique string array', values: ['x', 'y', 'z'] },
       { name: 'locked', type: 'boolean', default: false },
       { name: 'sealed', type: 'boolean', default: false },
+      { name: 'hidden', type: 'boolean', default: false },
       { name: 'keep_ratio', type: 'boolean', default: true },
       {
         name: 'properties',

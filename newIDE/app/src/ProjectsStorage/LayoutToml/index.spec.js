@@ -142,6 +142,7 @@ opacity = 42
 flip = ["x", "z"]
 locked = true
 sealed = true
+hidden = true
 keep_ratio = false
 properties = { animation = 1, text = "Ready" }
 
@@ -236,6 +237,7 @@ property_visibility = { speed = "hidden" }
           opacity: 42,
           flippedX: true,
           flippedZ: true,
+          hidden: true,
           behaviorOverridings: [
             { name: 'Move', type: 'Movement::Move', speed: 12 },
           ],
@@ -247,6 +249,7 @@ property_visibility = { speed = "hidden" }
       'fast = true\nmode = "soft"\nstrength = 2'
     );
     expect(canonicalSource).not.toContain('params =');
+    expect(canonicalSource).toContain('hidden = true');
     expect(compileLayoutToml(canonicalSource, context)).toEqual(output);
   });
 

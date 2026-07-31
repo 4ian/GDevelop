@@ -391,8 +391,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onExtensionInstalled: props.onExtensionInstalled,
                         onEffectAdded: props.onEffectAdded,
                         onObjectListsModified: props.onObjectListsModified,
-                        onExternalLayoutAssociationChanged:
-                          props.onExternalLayoutAssociationChanged,
+                        onExternalAssociationChanged:
+                          props.onExternalAssociationChanged,
                         triggerHotReloadInGameEditorIfNeeded:
                           props.triggerHotReloadInGameEditorIfNeeded,
                         gamesList: props.gamesList,

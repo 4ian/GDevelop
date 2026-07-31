@@ -15,9 +15,12 @@ import {
   type TreeItemProps,
   externalsRootFolderId,
   externalLayoutsRootFolderId,
+  getSceneExternalsTreeViewItemId,
+  scenesRootFolderId,
 } from '.';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type ProjectItemUsageTarget } from './ProjectItemUsageFinder';
+import { getSceneTreeViewItemId } from './SceneTreeViewItemContent';
 
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
@@ -77,14 +80,20 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   }
 
   isDescendantOf(itemContent: TreeViewItemContent): boolean {
-    return (
-      itemContent.getId() === externalsRootFolderId ||
-      itemContent.getId() === externalLayoutsRootFolderId
-    );
+    const itemId = itemContent.getId();
+    const associatedScene = this._getAssociatedScene();
+    return associatedScene
+      ? itemId === scenesRootFolderId ||
+          itemId === getSceneTreeViewItemId(associatedScene) ||
+          itemId === getSceneExternalsTreeViewItemId(associatedScene)
+      : itemId === externalsRootFolderId;
   }
 
   getRootId(): string {
-    return externalLayoutsRootFolderId;
+    const associatedScene = this._getAssociatedScene();
+    return associatedScene
+      ? `${externalLayoutsRootFolderId}-${associatedScene.ptr}`
+      : externalLayoutsRootFolderId;
   }
 
   getName(): string | React.Node {
@@ -267,6 +276,13 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.props.forceUpdate();
+  }
+
+  _getAssociatedScene(): ?gdLayout {
+    const associatedLayoutName = this.externalLayout.getAssociatedLayout();
+    return this.props.project.hasLayoutNamed(associatedLayoutName)
+      ? this.props.project.getLayout(associatedLayoutName)
+      : null;
   }
 
   getRightButton(i18n: I18nType): any {

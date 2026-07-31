@@ -413,6 +413,33 @@ describe('GDevelop multi-file project format', () => {
       });
   });
 
+  test('round-trips instances that start hidden through layout TOML', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].instances.push({
+      name: 'Player',
+      x: 10,
+      y: 20,
+      angle: 0,
+      zOrder: 0,
+      layer: '',
+      customSize: false,
+      width: 0,
+      height: 0,
+      hidden: true,
+      persistentUuid: '00000000-0000-4000-8000-000000000001',
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    });
+
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(files['game://scenes/Main/Main.layout']).toContain('hidden = true');
+
+    const output = composeLegacyProjectFromFiles(files);
+    expect(output.layouts[0].instances[0].hidden).toBe(true);
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
+  });
+
   test('omits empty scene shared-data entries for custom and native behaviors', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.layouts[0].behaviorsSharedData = [

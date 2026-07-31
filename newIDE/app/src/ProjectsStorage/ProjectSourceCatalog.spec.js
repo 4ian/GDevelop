@@ -158,6 +158,11 @@ describe('project source catalogs', () => {
     expect(
       catalog.tables.find(table => table.table === 'instances').fields
     ).toContainEqual(expect.objectContaining({ name: 'properties' }));
+    expect(
+      catalog.tables.find(table => table.table === 'instances').fields
+    ).toContainEqual(
+      expect.objectContaining({ name: 'hidden', default: false })
+    );
     const effectTable = catalog.tables.find(table => table.table === 'effects');
     expect(effectTable.fields).not.toContainEqual(
       expect.objectContaining({ name: 'params' })

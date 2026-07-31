@@ -239,6 +239,7 @@ export class ExternalEventsEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
+    this.props.onExternalAssociationChanged();
   };
 
   openExternalPropertiesDialog = () => {

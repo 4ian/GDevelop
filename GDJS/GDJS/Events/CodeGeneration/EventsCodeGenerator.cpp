@@ -36,32 +36,6 @@ using namespace std;
 
 namespace gdjs {
 
-namespace {
-
-gd::String GenerateObjectListAssertExpression(
-    const gd::String& objectListCode,
-    const gd::String& usage) {
-  return "gdjs.assertObjectListHasNoMoreThanOnePickedInstance(" +
-         objectListCode + ", " +
-         gdjs::EventsCodeGenerator::ConvertToStringExplicit(usage) + ")";
-}
-
-gd::String GenerateObjectListsArrayCode(
-    gdjs::EventsCodeGenerator& codeGenerator,
-    const std::vector<gd::String>& objectNames,
-    gd::EventsCodeGenerationContext& context) {
-  gd::String objectListsArrayCode = "[";
-  for (std::size_t i = 0; i < objectNames.size(); ++i) {
-    if (i != 0) objectListsArrayCode += ", ";
-    objectListsArrayCode +=
-        codeGenerator.GetObjectListName(objectNames[i], context);
-  }
-  objectListsArrayCode += "]";
-  return objectListsArrayCode;
-}
-
-}  // namespace
-
 gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
     gdjs::EventsCodeGenerator& codeGenerator,
     gd::String fullyQualifiedFunctionName,
@@ -840,11 +814,7 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(
            codeInfo.functionCallName + "(" + parametersStr + "))";
   else
     return "(( " + objectListCode + ".length === 0 ) ? " + defaultOutput +
-           " : " +
-           GenerateObjectListAssertExpression(objectListCode,
-                                              "object expression \"" +
-                                                  objectListName + "\"") +
-           "[0]." +
+           " : " + objectListCode + "[0]." +
            codeInfo.functionCallName + "(" + parametersStr + "))";
 }
 
@@ -866,35 +836,25 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
            ")." + codeInfo.functionCallName + "(" + parametersStr + "))";
   else
     return "(( " + objectListCode + ".length === 0 ) ? " + defaultOutput +
-           " : " +
-           GenerateObjectListAssertExpression(objectListCode,
-                                              "behavior expression \"" +
-                                                  objectListName + "\"") +
-           "[0].getBehavior(" +
+           " : " + objectListCode + "[0].getBehavior(" +
            GenerateGetBehaviorNameCode(behaviorName) + ")." +
            codeInfo.functionCallName + "(" + parametersStr + "))";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectListsPickedInstancesAssertCode(
-    const std::vector<gd::String>& objectNames,
-    gd::EventsCodeGenerationContext& context,
-    const gd::String& usage) {
-  if (objectNames.empty()) return "";
-  return "gdjs.assertObjectListsHaveNoMoreThanOnePickedInstance(" +
-         GenerateObjectListsArrayCode(*this, objectNames, context) + ", " +
-         ConvertToStringExplicit(usage) + ");\n";
+    const std::vector<gd::String>&,
+    gd::EventsCodeGenerationContext&,
+    const gd::String&) {
+  return "";
 }
 
 gd::String
 EventsCodeGenerator::GenerateObjectListsPickedInstancesAssertExpression(
-    const std::vector<gd::String>& objectNames,
-    gd::EventsCodeGenerationContext& context,
-    const gd::String& usage,
+    const std::vector<gd::String>&,
+    gd::EventsCodeGenerationContext&,
+    const gd::String&,
     const gd::String& expressionCode) {
-  if (objectNames.empty()) return expressionCode;
-  return "(gdjs.assertObjectListsHaveNoMoreThanOnePickedInstance(" +
-         GenerateObjectListsArrayCode(*this, objectNames, context) + ", " +
-         ConvertToStringExplicit(usage) + "), " + expressionCode + ")";
+  return expressionCode;
 }
 
 gd::String EventsCodeGenerator::GenerateFreeCondition(
@@ -1516,10 +1476,7 @@ gd::String EventsCodeGenerator::GenerateObject(
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         context.ObjectsListNeeded(realObjects[i]);
         gd::String objectListCode = GetObjectListName(realObjects[i], context);
-        output += "(" + objectListCode + ".length !== 0 ? " +
-                  GenerateObjectListAssertExpression(
-                      objectListCode,
-                      "object pointer \"" + realObjects[i] + "\"") +
+        output += "(" + objectListCode + ".length !== 0 ? " + objectListCode +
                   "[0] : ";
       }
       output += GenerateBadObject();
@@ -1648,11 +1605,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
         output = objectListCode + "[i].getVariables()";
       else
         output = "((" + objectListCode + ".length === 0 ) ? " + output +
-                 " : " +
-                 GenerateObjectListAssertExpression(
-                     objectListCode,
-                     "object variable \"" + realObjects[i] + "\"") +
-                 "[0].getVariables())";
+                 " : " + objectListCode + "[0].getVariables())";
     }
 
     if (context.GetCurrentObject().empty() || realObjects.size() != 1 ||

@@ -4,24 +4,13 @@ const {
   generateCompiledEventsFromSerializedEvents,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 
-const expectAmbiguousObjectPickingError = (fn) => {
-  const consoleErrorSpy = jest
-    .spyOn(console, 'error')
-    .mockImplementation(() => {});
-  try {
-    expect(fn).toThrow(/Ambiguous object picking/);
-  } finally {
-    consoleErrorSpy.mockRestore();
-  }
-};
-
-describe('libGD.js - GDJS deterministic object picking integration tests', function () {
+describe('libGD.js - GDJS multiple object picking integration tests', function () {
   let gd = null;
   beforeAll(async () => {
     gd = await initializeGDevelopJs();
   });
 
-  it('throws when an object action receives more than one picked instance', function () {
+  it('applies an object action to every picked instance', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -53,12 +42,16 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
     ];
     const objectLists = gdjs.Hashtable.newFrom({ MyObject: myObjects });
 
-    expectAmbiguousObjectPickingError(() =>
-      runCompiledEvents(gdjs, runtimeScene, [objectLists])
-    );
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    expect(
+      myObjects.every(
+        (object) => object.getVariables().get('Touched').getAsNumber() === 1
+      )
+    ).toBe(true);
   });
 
-  it('throws when an object expression receives more than one picked instance', function () {
+  it('uses the first picked instance for an object expression', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -84,6 +77,14 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const objectListAssertionSpy = jest.spyOn(
+      gdjs,
+      'assertObjectListHasNoMoreThanOnePickedInstance'
+    );
+    const objectListsAssertionSpy = jest.spyOn(
+      gdjs,
+      'assertObjectListsHaveNoMoreThanOnePickedInstance'
+    );
     const myObject1 = runtimeScene.createObject('MyObject');
     const myObject2 = runtimeScene.createObject('MyObject');
     myObject1.getVariables().get('Value').setNumber(1);
@@ -92,12 +93,14 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
       MyObject: [myObject1, myObject2],
     });
 
-    expectAmbiguousObjectPickingError(() =>
-      runCompiledEvents(gdjs, runtimeScene, [objectLists])
-    );
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(1);
+    expect(objectListAssertionSpy).not.toHaveBeenCalled();
+    expect(objectListsAssertionSpy).not.toHaveBeenCalled();
   });
 
-  it('throws when an object-list function parameter receives more than one picked instance', function () {
+  it('passes every picked instance to an object-list function parameter', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -123,6 +126,10 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const objectMapAssertionSpy = jest.spyOn(
+      gdjs,
+      'assertObjectMapHasNoMoreThanOnePickedInstance'
+    );
     const objectLists = gdjs.Hashtable.newFrom({
       MyObject: [
         runtimeScene.createObject('MyObject'),
@@ -130,9 +137,10 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
       ],
     });
 
-    expectAmbiguousObjectPickingError(() =>
-      runCompiledEvents(gdjs, runtimeScene, [objectLists])
-    );
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(2);
+    expect(objectMapAssertionSpy).not.toHaveBeenCalled();
   });
 
   it('allows a picking condition to narrow multiple picked instances', function () {
@@ -181,7 +189,7 @@ describe('libGD.js - GDJS deterministic object picking integration tests', funct
     ).toHaveLength(1);
   });
 
-  it('allows deterministic object actions inside a for each object event', function () {
+  it('applies object actions inside a for each object event', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::ForEach',

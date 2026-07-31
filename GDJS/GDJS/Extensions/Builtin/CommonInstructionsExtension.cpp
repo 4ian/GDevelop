@@ -1330,12 +1330,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 "const objects = " +
                 codeGenerator.GetObjectListName(realObjects[0], parentContext) +
                 ";\n";
-            callingCode +=
-                "gdjs.assertObjectListHasNoMoreThanOnePickedInstance(objects, " +
-                gd::EventsCodeGenerator::ConvertToStringExplicit(
-                    "JavaScript event object parameter \"" +
-                    event.GetParameterObjects() + "\"") +
-                ");\n";
           } else {
             // Groups are rarely used in JS events so it's fine to make
             // allocations.
@@ -1347,12 +1341,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                                                              parentContext) +
                              ");\n";
             }
-            callingCode +=
-                "gdjs.assertObjectListHasNoMoreThanOnePickedInstance(objects, " +
-                gd::EventsCodeGenerator::ConvertToStringExplicit(
-                    "JavaScript event object parameter \"" +
-                    event.GetParameterObjects() + "\"") +
-                ");\n";
           }
         }
 

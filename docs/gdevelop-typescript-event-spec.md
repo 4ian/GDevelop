@@ -223,12 +223,13 @@ Version 1 does not:
    authoring changes.
 8. The wrapper name remains `GDJSInlineCode` so current debugger detection keeps
    working.
-9. The event passes at most one picked instance through `objects`, exactly like
-   the existing JavaScript event.
+9. The event passes every picked instance through `objects`, exactly like the
+   existing JavaScript event.
 10. Missing `sourceLanguage` means `javascript`.
 11. Unknown source-language values are errors. They never fall back to
     JavaScript or an empty event silently.
-12. Existing JavaScript serialization and generated output remain unchanged.
+12. Existing JavaScript serialization and code-event wrapper shape remain
+    unchanged.
 
 ---
 
@@ -743,11 +744,10 @@ At runtime the generator continues to:
 
 1. Expand an object group when necessary.
 2. Build the picked object array.
-3. Assert that it contains no more than one picked instance.
-4. Pass the array as `objects`.
+3. Pass the full array as `objects`.
 
-Typing an array as one object or group does not create a pick and does not prove
-cardinality. The deterministic object-picking rules continue to apply.
+Typing an array as one object or group does not create a pick. The picked list
+is passed through with the same semantics as a JavaScript code event.
 
 ### 8.4 Signals and Constants
 
@@ -936,10 +936,6 @@ namespace.userFunc123 = function GDJSInlineCode(runtimeScene, objects) {
 };
 
 const objects = namespace.SomeObjectObjects1;
-gdjs.assertObjectListHasNoMoreThanOnePickedInstance(
-  objects,
-  'TypeScript event object parameter "Player"'
-);
 namespace.userFunc123(runtimeScene, objects);
 ```
 
@@ -952,10 +948,9 @@ or declaration file in the exported game.
 `CommonInstructionsExtension.cpp` should make only language-aware changes:
 
 - Run the integrity guard before reading `inlineCode` for TypeScript.
-- Keep existing JavaScript output byte-for-byte unchanged.
+- Keep the existing JavaScript wrapper and invocation shape.
 - Keep `GDJSInlineCode` as the function name.
-- Use "TypeScript event object parameter" in the object-cardinality assertion
-  for TypeScript and the current JavaScript wording for JavaScript.
+- Pass the full picked object list without a runtime cardinality assertion.
 - Add a blocking diagnostic and report failure when the artifact is invalid.
 
 The event registration type and icon identifier remain compatible. The
@@ -1834,7 +1829,7 @@ Determinism cases:
 ### 19.6 Code generation and runtime tests
 
 - TypeScript output executes in a scene.
-- Picked object and object-group cardinality assertion remains enforced.
+- Picked object and object-group parameters receive every picked instance.
 - `useStrict` matches JavaScript behavior.
 - Free function receives `eventsFunctionContext`.
 - Behavior, prefab/object, external event, and linked event contexts execute.
@@ -1877,8 +1872,8 @@ The feature is complete only when all of the following are true:
    project symbols.
 3. Editor, save, preview, generated-code view, extension loader, MCP, and export
    use one compiler contract and produce the same output hash.
-4. Existing JavaScript event serialization and generation snapshots are
-   unchanged.
+4. Existing JavaScript event serialization and code-event wrapper snapshots
+   are unchanged.
 5. TypeScript source is authoritative and generated JavaScript is never shown as
    editable source.
 6. A source, parameter, owner, declaration, compiler, or option change
@@ -1890,7 +1885,7 @@ The feature is complete only when all of the following are true:
 10. Legacy JSON contains an executable fallback for older GDevelop builds.
 11. Older multi-file loaders reject version 3.1 before rewriting source.
 12. Source-located diagnostics map to the exact TypeScript body line.
-13. Object-picking cardinality and runtime wrapper semantics match JavaScript.
+13. Picked-list and runtime wrapper semantics match JavaScript.
 14. Browser and Electron work offline with the shipped pinned compiler.
 15. Exported games contain JavaScript only and add no runtime compiler cost.
 16. All audited search/render/MCP/runtime strings and consumers are

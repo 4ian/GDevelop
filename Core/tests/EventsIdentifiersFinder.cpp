@@ -89,6 +89,18 @@ const void UseExternalEvents(gd::Layout &layout,
 }
 } // namespace
 
+TEST_CASE("Builtin time extension timer parameter hint", "[common]") {
+  gd::PlatformExtension extension;
+  gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(extension);
+
+  const auto &resetTimer = extension.GetAllActions().at("ResetTimer");
+  REQUIRE(
+      resetTimer.GetParameter(1).GetHint() ==
+      "Scene timers must be started (for example, with the ResetTimer action) "
+      "before being used. They are scene-wide and should not be (re)started at "
+      "each frame, otherwise they keep restarting.");
+}
+
 TEST_CASE("EventsIdentifiersFinder (scene timers)", "[common]") {
   SECTION("Can find scene timers in scenes") {
     gd::Project project;

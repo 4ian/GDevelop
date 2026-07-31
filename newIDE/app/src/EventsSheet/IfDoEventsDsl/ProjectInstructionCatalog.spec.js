@@ -622,6 +622,17 @@ describe('project IfDo instruction catalog', () => {
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
+    const resetTimer = catalog.actions.find(
+      ({ type }) => type === 'ResetTimer'
+    );
+    expect(resetTimer).toBeDefined();
+    const resetTimerHint = resetTimer.parameters.find(({ hint }) => hint).hint;
+    expect(resetTimerHint).toBe(
+      'Scene timers must be started (for example, with the ResetTimer action) ' +
+        'before being used. They are scene-wide and should not be (re)started ' +
+        'at each frame, otherwise they keep restarting.'
+    );
+    expect(resetTimerHint).not.toContain('"');
     expect(
       deprecatedActionTypes.size + deprecatedConditionTypes.size
     ).toBeGreaterThan(0);

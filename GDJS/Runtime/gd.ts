@@ -719,39 +719,6 @@ namespace gdjs {
     return result;
   };
 
-  const throwAmbiguousObjectPickingError = function (
-    usage: string,
-    pickedInstancesCount: number
-  ): never {
-    const error: any = new Error(
-      'Ambiguous object picking for ' +
-        usage +
-        ': expected at most one picked instance, but ' +
-        pickedInstancesCount +
-        ' are picked. Add conditions to pick a single instance, or use a "For each object" event.'
-    );
-    const objectNameMatch = /"([^"]+)"/.exec(usage);
-    const objectName = objectNameMatch ? objectNameMatch[1] : undefined;
-    error.code = 'AMBIGUOUS_OBJECT_PICKING';
-    error.usage = usage;
-    error.objectName = objectName;
-    error.pickedInstancesCount = pickedInstancesCount;
-    error.suggestedEventStructure = {
-      kind: 'for_each',
-      object: objectName,
-      children: [
-        {
-          kind: 'standard',
-          conditions: [
-            '<keep or add conditions that narrow this object when needed>',
-          ],
-          actions: ['<move the failing single-instance instruction here>'],
-        },
-      ],
-    };
-    throw error;
-  };
-
   /**
    * Throw when objects from an external layout are created from an event that
    * runs without conditions.
@@ -769,55 +736,44 @@ namespace gdjs {
   };
 
   /**
-   * Assert that a generated object-consuming instruction is deterministic.
+   * Return an object list unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
    *
    * @internal
    */
   export const assertObjectListHasNoMoreThanOnePickedInstance = function <
     T extends RuntimeObject,
-  >(objectsList: Array<T>, usage: string): Array<T> {
-    if (objectsList.length > 1) {
-      throwAmbiguousObjectPickingError(usage, objectsList.length);
-    }
+  >(objectsList: Array<T>, _usage: string): Array<T> {
     return objectsList;
   };
 
   /**
-   * Assert that a generated object-consuming instruction is deterministic
-   * across all concrete object lists of an object group.
+   * Return object lists unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
    *
    * @internal
    */
   export const assertObjectListsHaveNoMoreThanOnePickedInstance = function <
     T extends RuntimeObject,
-  >(objectsLists: Array<Array<T>>, usage: string): Array<Array<T>> {
-    let pickedInstancesCount = 0;
-    for (let i = 0; i < objectsLists.length; ++i) {
-      pickedInstancesCount += objectsLists[i].length;
-    }
-    if (pickedInstancesCount > 1) {
-      throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
-    }
+  >(objectsLists: Array<Array<T>>, _usage: string): Array<Array<T>> {
     return objectsLists;
   };
 
   /**
-   * Assert that a generated object-list parameter is deterministic.
+   * Return an object map unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
    *
    * @internal
    */
   export const assertObjectMapHasNoMoreThanOnePickedInstance = function <
     T extends RuntimeObject,
-  >(objectsMap: Hashtable<Array<T>>, usage: string): Hashtable<Array<T>> {
-    let pickedInstancesCount = 0;
-    const objectLists: Array<Array<T>> = [];
-    objectsMap.values(objectLists);
-    for (let i = 0; i < objectLists.length; ++i) {
-      pickedInstancesCount += objectLists[i].length;
-    }
-    if (pickedInstancesCount > 1) {
-      throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
-    }
+  >(objectsMap: Hashtable<Array<T>>, _usage: string): Hashtable<Array<T>> {
     return objectsMap;
   };
 

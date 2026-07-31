@@ -680,6 +680,32 @@ export class Project extends EmscriptenObject {
   getWholeProjectDiagnosticReport(): WholeProjectDiagnosticReport;
   static isNameSafe(name: string): boolean;
   static getSafeName(name: string): string;
+  getLayoutsRootFolder(): LayoutFolderOrLayout;
+}
+
+export class LayoutFolderOrLayout extends EmscriptenObject {
+  constructor();
+  isFolder(): boolean;
+  isRootFolder(): boolean;
+  getLayout(): Layout;
+  getFolderName(): string;
+  setFolderName(name: string): void;
+  hasLayoutNamed(name: string): boolean;
+  getLayoutNamed(name: string): LayoutFolderOrLayout;
+  getChildrenCount(): number;
+  getChildAt(pos: number): LayoutFolderOrLayout;
+  getLayoutChild(name: string): LayoutFolderOrLayout;
+  getChildPosition(child: LayoutFolderOrLayout): number;
+  getParent(): LayoutFolderOrLayout;
+  insertLayout(layout: Layout, position: number): void;
+  insertNewFolder(name: string, newPosition: number): LayoutFolderOrLayout;
+  getOrCreateFolderChild(name: string): LayoutFolderOrLayout;
+  moveLayoutFolderOrLayoutToAnotherFolder(layoutFolderOrLayout: LayoutFolderOrLayout, newParentFolder: LayoutFolderOrLayout, newPosition: number): void;
+  moveChild(oldIndex: number, newIndex: number): void;
+  removeFolderChild(childToRemove: LayoutFolderOrLayout): void;
+  removeRecursivelyLayoutNamed(name: string): void;
+  isADescendantOf(otherLayoutFolderOrLayout: LayoutFolderOrLayout): boolean;
+  clear(): void;
 }
 
 export class ObjectsContainersList extends EmscriptenObject {

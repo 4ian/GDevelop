@@ -6,7 +6,8 @@ import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
-import EditIcon from '../UI/CustomSvgIcons/Edit';
+import StopIcon from '../UI/CustomSvgIcons/Stop';
+import PropertiesPanelIcon from '../UI/CustomSvgIcons/Edit';
 
 type Props = {|
   onRunTest: () => void | Promise<void>,
@@ -41,12 +42,13 @@ export class Toolbar extends React.PureComponent<Props> {
               : t`Open Properties Panel`
           }
         >
-          <EditIcon />
+          <PropertiesPanelIcon />
         </IconButton>
         {isRunning ? (
           <FlatButton
             primary
             onClick={onStopTest}
+            leftIcon={<StopIcon />}
             label={<Trans>Stop the test</Trans>}
           />
         ) : (

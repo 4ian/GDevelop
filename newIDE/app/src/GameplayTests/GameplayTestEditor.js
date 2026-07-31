@@ -1,6 +1,5 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import { CodeEditor } from '../CodeEditor';
 import EditorMosaic, {
@@ -9,16 +8,10 @@ import EditorMosaic, {
 } from '../UI/EditorMosaic';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
-import { Column, Line } from '../UI/Grid';
-import { ColumnStackLayout } from '../UI/Layout';
-import Text from '../UI/Text';
-import TextField from '../UI/TextField';
-import RaisedButton from '../UI/RaisedButton';
-import FlatButton from '../UI/FlatButton';
-import ScrollView from '../UI/ScrollView';
+import { Column } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { type GameplayTestResult } from './GameplayTestRunner';
-import PlayIcon from '../UI/CustomSvgIcons/Preview';
+import { GameplayTestProperties } from './GameplayTestProperties';
 
 export type GameplayTestEditorInterface = {|
   forceUpdate: () => void,
@@ -33,20 +26,12 @@ const initialMosaicEditorNodes: EditorMosaicNode = {
   splitPercentage: 70,
 };
 
-const formatLastRunDate = (lastRunAt: number): string => {
-  if (!lastRunAt) return '';
-  try {
-    return new Date(lastRunAt).toLocaleString();
-  } catch (error) {
-    return '';
-  }
-};
-
 type Props = {|
   project: gdProject,
   test: gdTest,
   scope: 'project' | string,
   isRunning: boolean,
+  runningFrame: number | null,
   lastResult: GameplayTestResult | null,
   onRunTest: () => void | Promise<void>,
   onStopTest: () => void,
@@ -57,7 +42,7 @@ type Props = {|
 
 /**
  * The editor content of a gameplay test: a code editor and a properties
- * panel (description, last run summary, run button).
+ * panel (description, run button and outcome of the last run).
  */
 const GameplayTestEditor: React.ComponentType<{
   ...Props,
@@ -68,6 +53,7 @@ const GameplayTestEditor: React.ComponentType<{
       test,
       scope,
       isRunning,
+      runningFrame,
       lastResult,
       onRunTest,
       onStopTest,
@@ -96,101 +82,19 @@ const GameplayTestEditor: React.ComponentType<{
           .includes('test-properties'),
     }));
 
-    const lastRunStatus = test.getLastRunStatus();
-
     const renderProperties = () => (
       <Background>
-        <ScrollView>
-          <ColumnStackLayout>
-            <Text size="block-title">{test.getName()}</Text>
-            <Text size="body-small" color="secondary">
-              {scope === 'project' ? (
-                <Trans>Test of the project</Trans>
-              ) : (
-                <Trans>Test of the extension {scope}</Trans>
-              )}
-            </Text>
-            <TextField
-              floatingLabelText={<Trans>Description</Trans>}
-              value={test.getDescription()}
-              onChange={(e, text) => {
-                test.setDescription(text);
-                onTestModified();
-                forceUpdate();
-              }}
-              multiline
-              rows={3}
-              fullWidth
-              translatableHintText={t`What does this test verify?`}
-            />
-            {lastRunStatus ? (
-              <ColumnStackLayout noMargin>
-                <Text noMargin>
-                  <Trans>Last run: {lastRunStatus}</Trans>
-                </Text>
-                <Text noMargin size="body-small" color="secondary">
-                  {formatLastRunDate(test.getLastRunAt())}
-                </Text>
-                <Text noMargin size="body-small" color="secondary">
-                  <Trans>
-                    {Math.round(test.getLastRunDurationMs())}ms,{' '}
-                    {test.getLastRunFramesExecuted()} frames
-                  </Trans>
-                </Text>
-              </ColumnStackLayout>
-            ) : (
-              <Text size="body-small" color="secondary">
-                <Trans>This test was never run.</Trans>
-              </Text>
-            )}
-            {lastResult && lastResult.assertions.length > 0 && (
-              <ColumnStackLayout noMargin>
-                <Text size="sub-title">
-                  <Trans>Assertions</Trans>
-                </Text>
-                {lastResult.assertions.map((assertion, index) => (
-                  <Text noMargin size="body-small" key={index}>
-                    {assertion.passed ? '✓' : '✗'} {assertion.message}
-                  </Text>
-                ))}
-              </ColumnStackLayout>
-            )}
-            {lastResult && lastResult.errors.length > 0 && (
-              <ColumnStackLayout noMargin>
-                <Text size="sub-title">
-                  <Trans>Errors</Trans>
-                </Text>
-                {lastResult.errors.map((error, index) => (
-                  <Text noMargin size="body-small" key={index}>
-                    {error}
-                  </Text>
-                ))}
-              </ColumnStackLayout>
-            )}
-            <Line noMargin>
-              {isRunning ? (
-                <RaisedButton
-                  primary
-                  label={<Trans>Stop the test</Trans>}
-                  onClick={onStopTest}
-                />
-              ) : (
-                <RaisedButton
-                  primary
-                  icon={<PlayIcon />}
-                  label={<Trans>Run the test</Trans>}
-                  onClick={onRunTest}
-                />
-              )}
-            </Line>
-            <Line noMargin>
-              <FlatButton
-                label={<Trans>Edit with AI</Trans>}
-                onClick={onEditWithAi}
-              />
-            </Line>
-          </ColumnStackLayout>
-        </ScrollView>
+        <GameplayTestProperties
+          test={test}
+          scope={scope}
+          isRunning={isRunning}
+          runningFrame={runningFrame}
+          lastResult={lastResult}
+          onRunTest={onRunTest}
+          onStopTest={onStopTest}
+          onEditWithAi={onEditWithAi}
+          onTestModified={onTestModified}
+        />
       </Background>
     );
 
@@ -232,23 +136,19 @@ const GameplayTestEditor: React.ComponentType<{
     };
 
     return (
-      <I18n>
-        {({ i18n }) => (
-          <EditorMosaic
-            ref={editorMosaicRef}
-            editors={editors}
-            centralNodeId="test-code"
-            initialNodes={
-              getDefaultEditorMosaicNode('gameplay-test-editor') ||
-              initialMosaicEditorNodes
-            }
-            onOpenedEditorsChanged={props.onOpenedEditorsChanged}
-            onPersistNodes={node =>
-              setDefaultEditorMosaicNode('gameplay-test-editor', node)
-            }
-          />
-        )}
-      </I18n>
+      <EditorMosaic
+        ref={editorMosaicRef}
+        editors={editors}
+        centralNodeId="test-code"
+        initialNodes={
+          getDefaultEditorMosaicNode('gameplay-test-editor') ||
+          initialMosaicEditorNodes
+        }
+        onOpenedEditorsChanged={props.onOpenedEditorsChanged}
+        onPersistNodes={node =>
+          setDefaultEditorMosaicNode('gameplay-test-editor', node)
+        }
+      />
     );
   }
 );

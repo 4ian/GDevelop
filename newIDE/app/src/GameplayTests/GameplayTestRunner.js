@@ -5,7 +5,8 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import {
   clearGameplayTestFramePreview,
-  setGameplayTestFrameStatusText,
+  setGameplayTestFrameRunStatus,
+  type GameplayTestFrameRunStatus,
 } from './GameplayTestFrame';
 
 export type GameplayTestScope = 'project' | string;
@@ -319,6 +320,18 @@ export const runGameplayTests = async ({
         };
       });
 
+      const firstTest = testsWithSources[0];
+      if (firstTest) {
+        setGameplayTestFrameRunStatus({
+          testName: firstTest.test.testName,
+          status: 'launching',
+          frame: null,
+          durationMs: null,
+          testIndex: 0,
+          testsCount: testsWithSources.length,
+        });
+      }
+
       try {
         // Export and launch a fresh preview into the gameplay test frame.
         await previewLauncher.launchPreview(
@@ -357,7 +370,12 @@ export const runGameplayTests = async ({
 
         await waitForGameToBeReady(previewDebuggerServer);
 
-        for (const { test, source, error } of testsWithSources) {
+        for (
+          let testIndex = 0;
+          testIndex < testsWithSources.length;
+          testIndex++
+        ) {
+          const { test, source, error } = testsWithSources[testIndex];
           if (error !== null || source === null) {
             results.push(
               makeErrorResult(test.testName, error || 'No source found.')
@@ -366,7 +384,15 @@ export const runGameplayTests = async ({
           }
 
           if (options.onTestStarted) options.onTestStarted(test);
-          setGameplayTestFrameStatusText(test.testName);
+          const frameRunStatus: GameplayTestFrameRunStatus = {
+            testName: test.testName,
+            status: 'launching',
+            frame: null,
+            durationMs: null,
+            testIndex,
+            testsCount: testsWithSources.length,
+          };
+          setGameplayTestFrameRunStatus(frameRunStatus);
 
           const result = await runSingleTest({
             previewDebuggerServer,
@@ -375,10 +401,22 @@ export const runGameplayTests = async ({
             timeoutMs,
             screenshots: options.screenshots || 'off',
             speedFactor: options.speedFactor || null,
-            onProgress: options.onProgress,
+            onProgress: (test: GameplayTestToRun, frame: number) => {
+              setGameplayTestFrameRunStatus({
+                ...frameRunStatus,
+                status: 'running',
+                frame,
+              });
+              if (options.onProgress) options.onProgress(test, frame);
+            },
           });
           updateTestLastRun(project, test, result);
-          setGameplayTestFrameStatusText(`${test.testName}: ${result.status}`);
+          setGameplayTestFrameRunStatus({
+            ...frameRunStatus,
+            status: result.status,
+            frame: result.framesExecuted,
+            durationMs: result.durationMs,
+          });
           results.push(result);
         }
       } catch (error) {

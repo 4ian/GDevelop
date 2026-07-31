@@ -1,63 +1,282 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
+import classNames from 'classnames';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
-import FlatButton from '../UI/FlatButton';
+import Text from '../UI/Text';
+import IconButton from '../UI/IconButton';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
+import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
+import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
+import StopIcon from '../UI/CustomSvgIcons/Stop';
+import CrossIcon from '../UI/CustomSvgIcons/Cross';
+import {
+  formatRunDuration,
+  GameplayTestStatusChip,
+  isGameplayTestStatusInProgress,
+  type GameplayTestDisplayStatus,
+} from './GameplayTestStatusIndicator';
+import classes from './GameplayTestFrame.module.css';
 
-const styles = {
-  container: {
-    position: 'fixed',
-    left: 8,
-    bottom: 8,
-    zIndex: 1500,
-    display: 'flex',
-    flexDirection: 'column',
-    borderRadius: 8,
-    overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
-    backgroundColor: 'rgba(33, 33, 33, 0.95)',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingLeft: 8,
-  },
-  statusText: {
-    color: '#eeeeee',
-    fontSize: 12,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    maxWidth: 180,
-  },
-  // The test simulates all the inputs itself: never let the user
-  // interact with (or focus) the game.
-  iframe: {
-    border: 'none',
-    display: 'block',
-    pointerEvents: 'none',
-  },
-  // The iframe is kept mounted (tiny and invisible) when hidden, so that
-  // the game `requestAnimationFrame` loop keeps running and the test can
-  // continue in the background.
-  hiddenIframe: {
-    border: 'none',
-    display: 'block',
-    width: 1,
-    height: 1,
-    opacity: 0,
-    pointerEvents: 'none',
-  },
-};
-
-type GameplayTestFrameState = {|
-  // The new location, or null to keep the current one unchanged.
-  previewIndexHtmlLocation: string | null,
-  statusText: string,
+/** The status of the run displayed on the gameplay test frame. */
+export type GameplayTestFrameRunStatus = {|
+  testName: string,
+  status: GameplayTestDisplayStatus,
+  /** The frame reached by the test, if it started playing. */
+  frame: number | null,
+  durationMs: number | null,
+  /** The position of the test in the batch being run (0-based) and its size. */
+  testIndex: number,
+  testsCount: number,
 |};
 
-let onSetGameplayTestFrameState: null | (GameplayTestFrameState => void) = null;
+// Distance kept between the frame and the borders of the window.
+const windowMargin = 12;
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
+type Position = {| left: number, bottom: number |};
+
+const clampPositionToWindow = (
+  position: Position,
+  element: HTMLElement | null
+): Position => {
+  if (!element) return position;
+  const { width, height } = element.getBoundingClientRect();
+  return {
+    left: clamp(
+      position.left,
+      windowMargin,
+      Math.max(windowMargin, window.innerWidth - width - windowMargin)
+    ),
+    bottom: clamp(
+      position.bottom,
+      windowMargin,
+      Math.max(windowMargin, window.innerHeight - height - windowMargin)
+    ),
+  };
+};
+
+type GameplayTestFrameLayoutProps = {|
+  runStatus: GameplayTestFrameRunStatus | null,
+  isMinimized: boolean,
+  onToggleMinimized: () => void,
+  onStopRequested: () => void,
+  /**
+   * The game itself (an iframe running the preview). It is always rendered,
+   * even when minimized, so that the test keeps running.
+   */
+  children: React.Node,
+|};
+
+/**
+ * The floating window shown while a gameplay test is running: a draggable
+ * title bar with the status of the run, the game itself and a summary of
+ * the run.
+ *
+ * Kept separate from `GameplayTestFrame` so that it can be shown in Storybook
+ * without a running preview.
+ */
+export const GameplayTestFrameLayout = ({
+  runStatus,
+  isMinimized,
+  onToggleMinimized,
+  onStopRequested,
+  children,
+}: GameplayTestFrameLayoutProps): React.Node => {
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const [position, setPosition] = React.useState<Position>({
+    left: windowMargin,
+    bottom: windowMargin,
+  });
+  const [isDragging, setIsDragging] = React.useState<boolean>(false);
+  const dragOrigin = React.useRef<{|
+    pointerId: number,
+    clientX: number,
+    clientY: number,
+    position: Position,
+  |} | null>(null);
+
+  // Keep the frame inside the window when it is resized (or when the frame
+  // grows back after being minimized).
+  React.useEffect(() => {
+    const onWindowResized = () => {
+      setPosition(position =>
+        clampPositionToWindow(position, containerRef.current)
+      );
+    };
+    window.addEventListener('resize', onWindowResized);
+    return () => window.removeEventListener('resize', onWindowResized);
+  }, []);
+  React.useEffect(
+    () => {
+      setPosition(position =>
+        clampPositionToWindow(position, containerRef.current)
+      );
+    },
+    [isMinimized]
+  );
+
+  const onPointerDown = React.useCallback(
+    (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      const currentTarget = event.currentTarget;
+      if (!(currentTarget instanceof HTMLElement)) return;
+
+      dragOrigin.current = {
+        pointerId: event.pointerId,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        position,
+      };
+      // $FlowFixMe[incompatible-type] - the Flow definition of `setPointerCapture` wrongly takes a string.
+      currentTarget.setPointerCapture(event.pointerId);
+      setIsDragging(true);
+    },
+    [position]
+  );
+
+  const onPointerMove = React.useCallback((event: PointerEvent) => {
+    const origin = dragOrigin.current;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+
+    setPosition(
+      clampPositionToWindow(
+        {
+          left: origin.position.left + (event.clientX - origin.clientX),
+          // The frame is anchored to the bottom of the window.
+          bottom: origin.position.bottom - (event.clientY - origin.clientY),
+        },
+        containerRef.current
+      )
+    );
+  }, []);
+
+  const onPointerUp = React.useCallback((event: PointerEvent) => {
+    const origin = dragOrigin.current;
+    if (!origin || origin.pointerId !== event.pointerId) return;
+
+    dragOrigin.current = null;
+    setIsDragging(false);
+  }, []);
+
+  const isInProgress = runStatus
+    ? isGameplayTestStatusInProgress(runStatus.status)
+    : false;
+
+  return (
+    <div
+      ref={containerRef}
+      className={classNames({
+        [classes.container]: true,
+        [classes.minimized]: isMinimized,
+        [classes.dragging]: isDragging,
+      })}
+      style={{ left: position.left, bottom: position.bottom }}
+    >
+      <div className={classes.header}>
+        <div
+          className={classes.dragHandle}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+        >
+          <span className={classes.grip} />
+          <Text
+            noMargin
+            size="body-small"
+            style={textEllipsisStyle}
+            tooltip={runStatus ? runStatus.testName : undefined}
+          >
+            {runStatus && runStatus.testName ? (
+              runStatus.testName
+            ) : (
+              <Trans>Gameplay test</Trans>
+            )}
+          </Text>
+          {runStatus && runStatus.testsCount > 1 && (
+            <Text
+              noMargin
+              size="body-small"
+              color="secondary"
+              noShrink
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              <Trans>
+                {runStatus.testIndex + 1}/{runStatus.testsCount}
+              </Trans>
+            </Text>
+          )}
+        </div>
+        <div className={classes.headerButtons}>
+          <IconButton
+            size="small"
+            tooltip={isMinimized ? t`Show the game` : t`Minimize`}
+            onClick={onToggleMinimized}
+          >
+            {isMinimized ? (
+              <MaximizeIcon className={classes.headerIcon} />
+            ) : (
+              <MinimizeIcon className={classes.headerIcon} />
+            )}
+          </IconButton>
+          <IconButton
+            size="small"
+            tooltip={isInProgress ? t`Stop the test` : t`Close`}
+            onClick={onStopRequested}
+          >
+            {isInProgress ? (
+              <StopIcon className={classes.headerIcon} />
+            ) : (
+              <CrossIcon className={classes.headerIcon} />
+            )}
+          </IconButton>
+        </div>
+      </div>
+      <div
+        className={classNames({
+          [classes.gameArea]: true,
+          [classes.hiddenGameArea]: isMinimized,
+        })}
+      >
+        {children}
+      </div>
+      <div className={classes.footer}>
+        <GameplayTestStatusChip
+          size="small"
+          status={runStatus ? runStatus.status : 'launching'}
+        />
+        {runStatus && runStatus.frame !== null && (
+          <Text
+            noMargin
+            size="body-small"
+            color="secondary"
+            noShrink
+            style={{ fontVariantNumeric: 'tabular-nums' }}
+          >
+            {isInProgress ? (
+              <Trans>frame {runStatus.frame}</Trans>
+            ) : (
+              <Trans>
+                {runStatus.frame} frames in{' '}
+                {formatRunDuration(runStatus.durationMs || 0)}
+              </Trans>
+            )}
+          </Text>
+        )}
+      </div>
+    </div>
+  );
+};
+
+let onSetGameplayTestFramePreviewLocation:
+  | null
+  | ((previewIndexHtmlLocation: string) => void) = null;
+let onSetGameplayTestFrameRunStatus:
+  | null
+  | ((runStatus: GameplayTestFrameRunStatus | null) => void) = null;
 
 /**
  * Point the gameplay test frame to a preview (and show it).
@@ -69,25 +288,27 @@ export const setGameplayTestFramePreviewLocation = ({
 }: {|
   previewIndexHtmlLocation: string,
 |}) => {
-  if (!onSetGameplayTestFrameState)
+  if (!onSetGameplayTestFramePreviewLocation)
     throw new Error('No GameplayTestFrame registered.');
-  onSetGameplayTestFrameState({ previewIndexHtmlLocation, statusText: '' });
+  onSetGameplayTestFramePreviewLocation(previewIndexHtmlLocation);
 };
 
 /**
  * Close the gameplay test frame (unloading the game running in it).
  */
 export const clearGameplayTestFramePreview = () => {
-  if (!onSetGameplayTestFrameState) return;
-  onSetGameplayTestFrameState({ previewIndexHtmlLocation: '', statusText: '' });
+  if (!onSetGameplayTestFramePreviewLocation) return;
+  onSetGameplayTestFramePreviewLocation('');
 };
 
 /**
- * Update the status text displayed on the gameplay test frame.
+ * Update the status of the run displayed on the gameplay test frame.
  */
-export const setGameplayTestFrameStatusText = (statusText: string) => {
-  if (!onSetGameplayTestFrameState) return;
-  onSetGameplayTestFrameState({ previewIndexHtmlLocation: null, statusText });
+export const setGameplayTestFrameRunStatus = (
+  runStatus: GameplayTestFrameRunStatus | null
+) => {
+  if (!onSetGameplayTestFrameRunStatus) return;
+  onSetGameplayTestFrameRunStatus(runStatus);
 };
 
 type Props = {|
@@ -96,9 +317,9 @@ type Props = {|
 |};
 
 /**
- * A small overlay (bottom left of the screen) showing the game while a
- * gameplay test is running, with controls to stop the test or hide the
- * frame (the test keeps running when hidden).
+ * The floating window showing the game while a gameplay test is running,
+ * with controls to stop the test or minimize the window (the test keeps
+ * running when minimized).
  */
 export const GameplayTestFrame = ({
   previewDebuggerServer,
@@ -109,19 +330,23 @@ export const GameplayTestFrame = ({
     previewIndexHtmlLocation,
     setPreviewIndexHtmlLocation,
   ] = React.useState<string>('');
-  const [statusText, setStatusText] = React.useState<string>('');
-  const [isHidden, setIsHidden] = React.useState<boolean>(false);
+  const [
+    runStatus,
+    setRunStatus,
+  ] = React.useState<GameplayTestFrameRunStatus | null>(null);
+  const [isMinimized, setIsMinimized] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    onSetGameplayTestFrameState = (newState: GameplayTestFrameState) => {
-      if (newState.previewIndexHtmlLocation !== null) {
-        setPreviewIndexHtmlLocation(newState.previewIndexHtmlLocation);
-        setIsHidden(false);
-      }
-      setStatusText(newState.statusText);
+    onSetGameplayTestFramePreviewLocation = (
+      newPreviewIndexHtmlLocation: string
+    ) => {
+      setPreviewIndexHtmlLocation(newPreviewIndexHtmlLocation);
+      setIsMinimized(false);
     };
+    onSetGameplayTestFrameRunStatus = setRunStatus;
     return () => {
-      onSetGameplayTestFrameState = null;
+      onSetGameplayTestFramePreviewLocation = null;
+      onSetGameplayTestFrameRunStatus = null;
     };
   }, []);
 
@@ -135,9 +360,9 @@ export const GameplayTestFrame = ({
   // Unregister the iframe window when the frame is closed or unmounted.
   React.useEffect(
     () => {
+      const iframe = iframeRef.current;
       const previousPreviewDebuggerServer = previewDebuggerServer;
       return () => {
-        const iframe = iframeRef.current;
         if (previousPreviewDebuggerServer && iframe) {
           previousPreviewDebuggerServer.unregisterGameplayTestFrame(
             iframe.contentWindow
@@ -151,30 +376,21 @@ export const GameplayTestFrame = ({
   if (!previewIndexHtmlLocation) return null;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <span style={styles.statusText}>
-          {statusText || <Trans>Running test...</Trans>}
-        </span>
-        <div style={{ display: 'flex' }}>
-          <FlatButton
-            label={isHidden ? <Trans>Show</Trans> : <Trans>Hide</Trans>}
-            onClick={() => setIsHidden(!isHidden)}
-          />
-          <FlatButton label={<Trans>Stop</Trans>} onClick={onStopRequested} />
-        </div>
-      </div>
+    <GameplayTestFrameLayout
+      runStatus={runStatus}
+      isMinimized={isMinimized}
+      onToggleMinimized={() => setIsMinimized(!isMinimized)}
+      onStopRequested={onStopRequested}
+    >
       <iframe
         ref={iframeRef}
         title="Gameplay Test"
         src={previewIndexHtmlLocation}
         tabIndex={-1}
-        style={
-          isHidden
-            ? styles.hiddenIframe
-            : { ...styles.iframe, width: 320, height: 180 }
-        }
+        // The test simulates all the inputs itself: never let the user
+        // interact with (or focus) the game.
+        className={classes.gameIframe}
       />
-    </div>
+    </GameplayTestFrameLayout>
   );
 };

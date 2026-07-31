@@ -22,6 +22,7 @@ export type CreateExternalPayload = {|
 
 type Props = {|
   project: gdProject,
+  initialLayoutName?: string,
   onCancel: () => void,
   onCreate: CreateExternalPayload => void,
 |};
@@ -34,6 +35,7 @@ const styles = {
 
 const CreateExternalDialog = ({
   project,
+  initialLayoutName,
   onCancel,
   onCreate,
 }: Props): React.Node => {
@@ -46,7 +48,11 @@ const CreateExternalDialog = ({
   );
   const [kind, setKind] = React.useState<ExternalKind>('external-layout');
   const [layoutName, setLayoutName] = React.useState<string>(
-    layoutNames.length === 1 ? layoutNames[0] : ''
+    initialLayoutName && layoutNames.includes(initialLayoutName)
+      ? initialLayoutName
+      : layoutNames.length === 1
+      ? layoutNames[0]
+      : ''
   );
   const [name, setName] = React.useState<string>('');
 

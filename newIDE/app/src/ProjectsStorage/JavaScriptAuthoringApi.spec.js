@@ -4,6 +4,7 @@ import {
   buildJavaScriptAuthoringArtifacts,
   buildProjectApiDeclaration,
   buildRuntimeApiDeclaration,
+  collectSerializedProjectJavaScriptBlocks,
   collectSourceFileJavaScriptBlocks,
   validateJavaScriptAuthoringBlocks,
   validateProjectJavaScriptAuthoring,
@@ -160,6 +161,44 @@ const value = 1;
         inlineCode: 'const value = 1;',
       }),
     ]);
+  });
+
+  test('uses scene-owned source paths and scene context for external JavaScript', () => {
+    const projectWithExternal = {
+      ...serializedProject,
+      externalEvents: [
+        {
+          name: 'Shared Combat',
+          associatedLayout: 'Main',
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::JsCode',
+              useStrict: true,
+              inlineCode: 'runtimeScene.getObjects("Plaeyr");',
+            },
+          ],
+        },
+      ],
+    };
+    expect(
+      collectSerializedProjectJavaScriptBlocks(projectWithExternal)
+    ).toEqual([
+      expect.objectContaining({
+        fileUri: 'game://scenes/Main/externals/Shared%20Combat.events',
+      }),
+    ]);
+    expect(
+      validateProjectJavaScriptAuthoring({
+        serializedProject: projectWithExternal,
+      }).errors
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'JS_API_TYPE_MISMATCH',
+          fileUri: 'game://scenes/Main/externals/Shared%20Combat.events',
+        }),
+      ])
+    );
   });
 
   test('accepts public project-aware JavaScript in strict blocks', () => {

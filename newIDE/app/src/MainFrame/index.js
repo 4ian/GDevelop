@@ -2902,17 +2902,22 @@ const MainFrame = (props: Props): React.MixedElement => {
     gameEditorMode,
   });
 
-  const onExternalLayoutAssociationChanged = React.useCallback(
+  const onExternalAssociationChanged = React.useCallback(
     () => {
+      triggerUnsavedChanges();
+      forceUpdate();
+      if (projectManagerRef.current) {
+        projectManagerRef.current.forceUpdateList();
+      }
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true,
         shouldReloadLibraries: false,
         shouldReloadResources: false,
         shouldHardReload: false,
-        reasons: ['external-layout-association-changed'],
+        reasons: ['external-association-changed'],
       });
     },
-    [notifyChangesToInGameEditor]
+    [forceUpdate, notifyChangesToInGameEditor, triggerUnsavedChanges]
   );
 
   const onResourceExternallyChanged = React.useCallback(
@@ -8182,7 +8187,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onExtensionInstalled: onExtensionInstalled,
     onEffectAdded: onEffectAdded,
     onObjectListsModified: onObjectListsModified,
-    onExternalLayoutAssociationChanged,
+    onExternalAssociationChanged,
     gamesList: gamesList,
     triggerHotReloadInGameEditorIfNeeded,
     onRestartInGameEditor,

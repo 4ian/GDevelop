@@ -734,9 +734,8 @@ scenes/<encoded-name>/scene.settings
 scenes/<encoded-name>/<encoded-name>.layout
 scenes/<encoded-name>/<encoded-name>.events
 scenes/<encoded-name>/objects/*.settings
-externals/external.settings
-externals/*.layout
-externals/*.events
+scenes/<encoded-name>/externals/*.layout
+scenes/<encoded-name>/externals/*.events
 extensions/<encoded-name>/extension.settings
 extensions/<encoded-name>/functions/.../*.settings|*.events
 extensions/<encoded-name>/behaviors/.../*.settings|*.events

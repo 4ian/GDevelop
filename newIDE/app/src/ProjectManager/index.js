@@ -127,6 +127,10 @@ import { projectManagerItemReactDndType } from './ProjectManagerItemDragAndDrop'
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { createEventsFunctionExtensionItem } from './CreateEventsFunctionExtensionItem';
 import { getGameRootTreeViewItemDescription } from './GameRootTreeViewItem';
+import {
+  enumerateExternalsByScene,
+  type SceneExternals,
+} from './EnumerateExternals';
 
 const electron = optionalRequire('electron');
 
@@ -172,6 +176,9 @@ const customObjectsEmptyPlaceholderId = 'custom-objects-placeholder';
 const behaviorsEmptyPlaceholderId = 'behaviors-placeholder';
 const functionsEmptyPlaceholderId = 'functions-placeholder';
 const externalsEmptyPlaceholderId = 'externals-placeholder';
+
+export const getSceneExternalsTreeViewItemId = (scene: gdLayout): string =>
+  `scene-externals-${scene.ptr}`;
 
 const getProjectManagerShortcutExtensionLabelId = (
   rootFolderId: string,
@@ -418,6 +425,31 @@ class TreeViewItemWithChildren implements TreeViewItem {
     return this.children;
   }
 }
+
+const makeExternalTreeViewItems = (
+  sceneExternals: SceneExternals,
+  externalLayoutTreeViewItemProps: ExternalLayoutTreeViewItemProps,
+  externalEventsTreeViewItemProps: ExternalEventsTreeViewItemProps
+): Array<TreeViewItem> => [
+  ...sceneExternals.externalLayouts.map(
+    externalLayout =>
+      new LeafTreeViewItem(
+        new ExternalLayoutTreeViewItemContent(
+          externalLayout,
+          externalLayoutTreeViewItemProps
+        )
+      )
+  ),
+  ...sceneExternals.externalEvents.map(
+    externalEvents =>
+      new LeafTreeViewItem(
+        new ExternalEventsTreeViewItemContent(
+          externalEvents,
+          externalEventsTreeViewItemProps
+        )
+      )
+  ),
+];
 
 // $FlowFixMe[incompatible-type]
 class PlaceHolderTreeViewItem implements TreeViewItem {
@@ -1095,9 +1127,17 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       createExternalDialogOpen,
       setCreateExternalDialogOpen,
     ] = React.useState(false);
-    const openCreateExternalDialog = React.useCallback(() => {
-      setCreateExternalDialogOpen(true);
-    }, []);
+    const [
+      createExternalDialogInitialLayoutName,
+      setCreateExternalDialogInitialLayoutName,
+    ] = React.useState('');
+    const openCreateExternalDialog = React.useCallback(
+      (initialLayoutName?: string) => {
+        setCreateExternalDialogInitialLayoutName(initialLayoutName || '');
+        setCreateExternalDialogOpen(true);
+      },
+      []
+    );
     const [
       openedExtensionShortHeader,
       setOpenedExtensionShortHeader,
@@ -1359,8 +1399,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         const externalEventsItemId = getExternalEventsTreeViewItemId(
           newExternalEvents
         );
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([externalsRootFolderId]);
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const scene = project.getLayout(associatedLayoutName);
+          treeView.openItems([
+            scenesRootFolderId,
+            getSceneTreeViewItemId(scene),
+            getSceneExternalsTreeViewItemId(scene),
+          ]);
         }
         // Scroll to the new behavior.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -1392,8 +1438,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         const externalLayoutItemId = getExternalLayoutTreeViewItemId(
           newExternalLayout
         );
-        if (treeViewRef.current) {
-          treeViewRef.current.openItems([externalsRootFolderId]);
+        const treeView = treeViewRef.current;
+        if (treeView) {
+          const scene = project.getLayout(associatedLayoutName);
+          treeView.openItems([
+            scenesRootFolderId,
+            getSceneTreeViewItemId(scene),
+            getSceneExternalsTreeViewItemId(scene),
+          ]);
         }
         // Scroll to the new behavior.
         // Ideally, we'd wait for the list to be updated to scroll, but
@@ -1807,13 +1859,28 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           i18n,
           mainMenuCallbacks.onCreateProject
         );
+        const externalsByScene = project
+          ? enumerateExternalsByScene(project)
+          : null;
+        const unlinkedExternalItems =
+          externalsByScene &&
+          externalLayoutTreeViewItemProps &&
+          externalEventsTreeViewItemProps
+            ? makeExternalTreeViewItems(
+                externalsByScene.unlinkedExternals,
+                externalLayoutTreeViewItemProps,
+                externalEventsTreeViewItemProps
+              )
+            : [];
+
         return !project ||
           !sceneTreeViewItemProps ||
           !customObjectTreeViewItemProps ||
           !behaviorShortcutTreeViewItemProps ||
           !functionShortcutTreeViewItemProps ||
           !externalEventsTreeViewItemProps ||
-          !externalLayoutTreeViewItemProps
+          !externalLayoutTreeViewItemProps ||
+          !externalsByScene
           ? []
           : [
               {
@@ -1895,6 +1962,19 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   }
                   return mapFor(0, project.getLayoutsCount(), i => {
                     const scene = project.getLayoutAt(i);
+                    const sceneExternals = externalsByScene.bySceneName.get(
+                      scene.getName()
+                    );
+                    const externalItems = sceneExternals
+                      ? makeExternalTreeViewItems(
+                          sceneExternals,
+                          externalLayoutTreeViewItemProps,
+                          externalEventsTreeViewItemProps
+                        )
+                      : [];
+                    const sceneExternalsItemId = getSceneExternalsTreeViewItemId(
+                      scene
+                    );
                     return new TreeViewItemWithChildren(
                       new SceneTreeViewItemContent(
                         scene,
@@ -1915,61 +1995,46 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                             i18n._(t`Events`)
                           )
                         ),
+                        new TreeViewItemWithChildren(
+                          new LabelTreeViewItemContent(
+                            sceneExternalsItemId,
+                            i18n._(t`Externals`),
+                            {
+                              icon: <Add />,
+                              label: i18n._(t`Create external`),
+                              click: () =>
+                                openCreateExternalDialog(scene.getName()),
+                              id: `create-external-button-${scene.ptr}`,
+                            }
+                          ),
+                          externalItems.length > 0
+                            ? externalItems
+                            : [
+                                new PlaceHolderTreeViewItem(
+                                  `${sceneExternalsItemId}-${externalsEmptyPlaceholderId}`,
+                                  i18n._(t`Start by creating an external.`)
+                                ),
+                              ]
+                        ),
                       ]
                     );
                   });
                 },
               },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  externalsRootFolderId,
-                  i18n._(t`Externals`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Create`),
-                    click: openCreateExternalDialog,
-                    id: 'create-external-button',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  const externalItems: Array<TreeViewItem> = [
-                    ...mapFor(
-                      0,
-                      project.getExternalLayoutsCount(),
-                      i =>
-                        new LeafTreeViewItem(
-                          new ExternalLayoutTreeViewItemContent(
-                            project.getExternalLayoutAt(i),
-                            externalLayoutTreeViewItemProps
-                          )
-                        )
-                    ),
-                    ...mapFor(
-                      0,
-                      project.getExternalEventsCount(),
-                      i =>
-                        new LeafTreeViewItem(
-                          new ExternalEventsTreeViewItemContent(
-                            project.getExternalEventsAt(i),
-                            externalEventsTreeViewItemProps
-                          )
-                        )
-                    ),
-                  ];
-
-                  if (externalItems.length === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        externalsEmptyPlaceholderId,
-                        i18n._(t`Start by creating an external.`)
+              ...(unlinkedExternalItems.length > 0
+                ? [
+                    {
+                      isRoot: true,
+                      content: new LabelTreeViewItemContent(
+                        externalsRootFolderId,
+                        i18n._(t`Unlinked externals`)
                       ),
-                    ];
-                  }
-
-                  return externalItems;
-                },
-              },
+                      getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                        return unlinkedExternalItems;
+                      },
+                    },
+                  ]
+                : []),
               {
                 isRoot: true,
                 content: new LabelTreeViewItemContent(
@@ -2686,6 +2751,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                     {project && createExternalDialogOpen && (
                       <CreateExternalDialog
                         project={project}
+                        initialLayoutName={
+                          createExternalDialogInitialLayoutName
+                        }
                         onCancel={() => setCreateExternalDialogOpen(false)}
                         onCreate={onCreateExternal}
                       />

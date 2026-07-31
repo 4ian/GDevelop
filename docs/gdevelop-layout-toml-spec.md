@@ -249,6 +249,7 @@ opacity = 220
 flip = ["x", "y"]
 locked = true
 sealed = true
+hidden = true
 keep_ratio = false
 properties = { animation = 1, skin = "red" }
 ```
@@ -269,7 +270,8 @@ Required fields are `id`, `object`, `layer`, and `at`.
 - `properties` contains only catalog-declared numeric/string properties.
 
 Defaults are zero rotation/order, automatic size, opacity 255, no flips,
-unlocked, unsealed, and `keep_ratio = true`.
+unlocked, unsealed, visible at start (`hidden = false`), and
+`keep_ratio = true`.
 
 `unresolved = true` preserves an imported stale object reference. It is invalid
 for a resolvable object and must never be introduced for new content.

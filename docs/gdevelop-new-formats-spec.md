@@ -2,7 +2,7 @@
 
 ## TOML settings, flat layout TOML, and IfDo event source files
 
-**Status:** Version 1.0 implemented format contract
+**Status:** Version 3.0 implemented format contract
 **Entry file:** `project.gdevelop`
 
 **Text encoding:** UTF-8 without BOM
@@ -36,7 +36,7 @@
 20. [Security and resource limits](#20-security-and-resource-limits)
 21. [Implementation plan](#21-implementation-plan)
 22. [Verification requirements](#22-verification-requirements)
-23. [Non-goals for version 1](#23-non-goals-for-version-1)
+23. [Non-goals for version 3](#23-non-goals-for-version-3)
 24. [Final contract](#24-final-contract)
 
 ---
@@ -150,15 +150,13 @@ MyGame/
       Main.events
       objects/
         Player.settings             # folder = ["Actors"]
+      externals/
+        Shared%20Combat.events
+        Shared%20Combat.layout
     GameOver/
       scene.settings
       GameOver.layout
       GameOver.events
-
-  externals/
-    external.settings
-    Shared%20Combat.events
-    Shared%20Combat.layout
 
   extensions/
     Combat/
@@ -219,11 +217,10 @@ and `.events` sources they reference, are managed project source.
 other settings files. `.gdevelop/` is editor state and should normally be
 ignored by Git.
 
-The root `externals/` directory is a sibling of `scenes/` and `extensions/`.
-It contains one `external.settings` manifest plus all external event sheets and
-external layouts. A base name may have an `.events` file, a `.layout` file, or
-both; the two files remain independent unless both are listed in
-`external.settings`.
+Each scene may own an `externals/` directory beside its primary layout, events,
+and object sources. External event sheets and layouts are stored only below the
+scene they are associated with. Their manifest entries live in that scene's
+`scene.settings`; there is no project-root external manifest.
 
 ### 4.1 Required files
 
@@ -249,8 +246,8 @@ both; the two files remain independent unless both are listed in
 ### 4.2 Optional files
 
 - Additional prefab variant layouts under `variants/`.
-- An `externals/` directory containing exactly one `external.settings` and any
-  referenced external `.events`/`.layout` files when the project uses those
+- A `scenes/<Scene>/externals/` directory containing the external
+  `.events`/`.layout` files owned by that scene when the project uses those
   features.
 - `.gdevelop/instructions-catalog.json`, regenerated on every manual project
   save from the loaded project/platform catalog. It contains every usable
@@ -316,7 +313,7 @@ Examples of local settings documents:
 
 ```toml
 kind = "project"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 ```
 
 For example, the root above in
@@ -344,6 +341,8 @@ There is no compatibility reader for the retired markup format or earlier
 wrapped TOML drafts. The complete normative schema,
 compiler/decompiler mapping, defaults, semantic checks, and canonical writer
 are defined by [gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md).
+Multi-file settings trees whose combined or local settings marker is earlier
+than version 3 are rejected; there is no version-2 reader or in-place migration.
 
 ### 5.1.1 Strict extension ownership
 
@@ -369,14 +368,13 @@ All `.settings` files are combined in this deterministic dependency order:
 1. `project.gdevelop`.
 2. `resources.settings`.
 3. Root object settings in global object order.
-4. `externals/external.settings`, when that fixed path exists.
-5. Scene settings in project scene order, followed by that scene's flat
+4. Scene settings in project scene order, followed by that scene's flat
    object settings in object order.
-6. Extension settings in project extension order.
-7. Each extension's per-function, prefab, and behavior settings in their
+5. Extension settings in project extension order.
+6. Each extension's per-function, prefab, and behavior settings in their
    locally owned contiguous `order` values.
-8. Each prefab's flat default and variant object settings in object order.
-9. Each prefab and behavior's flat function settings in function order.
+7. Each prefab's flat default and variant object settings in object order.
+8. Each prefab and behavior's flat function settings in function order.
 
 `constants.toml` is parsed separately as editor-only Constants. It is not
 mounted into or merged with the combined project settings document.
@@ -385,7 +383,6 @@ The loader discovers settings fragments only from the fixed paths
 `resources.settings`, `constants.toml`,
 `objects/*.settings`, `scenes/*/scene.settings`,
 `scenes/*/objects/*.settings`,
-`externals/external.settings`,
 `extensions/*/extension.settings`,
 `extensions/*/functions/*/function.settings`,
 `extensions/*/prefabs/*/prefab.settings`, and
@@ -458,8 +455,10 @@ Additional rules for stored fragments and their combined shape:
   `behaviorFiles`, or `externalSettings` settings-file indexes. Scenes,
   extensions, extension functions, prefabs, and behaviors each carry a
   contiguous zero-based `order` value in their own settings namespace.
-- `external.settings` may use `eventFiles` and `layoutFiles` because those
-  entries describe `.events` and `.layout` sources, not other settings files.
+- A scene may use `externalEventFiles` and `externalLayoutFiles` because those
+  entries describe scene-owned `.events` and `.layout` sources, not other
+  settings files. Their `order` values are project-wide and contiguous within
+  each external container.
 - Dynamic names are path components and are encoded by the canonical `game://`
   path rules; they are not repeated in TOML table headers.
 - Two files resolving to the same mounted namespace are a hard duplicate-identity
@@ -473,7 +472,7 @@ The combined in-memory document has a shape like:
 
 ```toml
 [gdevelop]
-combinedSettingsFormatVersion = 1
+combinedSettingsFormatVersion = 3
 
 [project]
 kind = "project"
@@ -739,9 +738,8 @@ Suggested filenames are generated as follows:
 5. Escape `.` and `..` and Windows device names such as `CON`, `NUL`, and `COM1`.
 6. Compare paths case-insensitively and with Unicode normalization. On collision, append `~` plus the first eight hex characters of SHA-256 of the unescaped name.
 
-`externals` is a reserved project-root directory alongside `scenes` and
-`extensions`. It is owned by `external.settings` and must not be reused for
-another managed component kind.
+`externals` is a reserved child directory inside every scene folder. It is
+owned by that scene and must not be reused for another managed component kind.
 
 The generated path is a suggestion. Once created, a managed folder path remains
 stable until an explicit rename/move operation. This avoids path churn when
@@ -780,13 +778,14 @@ Canonical and safety rules:
 - Writers preserve an already-recorded canonical URI until an explicit move or
   rename operation changes it.
 
-Stored reference examples include `game://externals/Shared%20Combat.events` and
+Stored reference examples include
+`game://scenes/Main/externals/Shared%20Combat.events` and
 `game://extensions/Combat/functions/CalculateDamage/CalculateDamage.events`.
 The loader may use `game://project.gdevelop` and other settings URIs internally
 for identity and diagnostics, but it never serializes one settings URI inside
 another settings fragment.
 
-Version 1 does not automatically rewrite legacy runtime asset/resource paths
+Version 3 does not automatically rewrite legacy runtime asset/resource paths
 to `game://`; this rule governs managed new-format source references stored in
 settings.
 
@@ -818,10 +817,10 @@ TOML-compatible Constants object.
 ### 6.2 Example
 
 ```toml
-combinedSettingsFormatVersion = 1
+combinedSettingsFormatVersion = 3
 eventsDslVersion = "3.0"
 kind = "project"
-settingsFormatVersion = 2
+settingsFormatVersion = 3
 firstLayout = "Main"
 previewLayout = "Main"
 initialGDVersion = ""
@@ -872,7 +871,7 @@ objects/<Object>.settings
 
 ```toml
 kind = "object"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 folder = []
 name = "Player"
@@ -894,7 +893,7 @@ by the current editor. Empty logical folders are not source data.
 
 ```toml
 kind = "resources"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 resourceFolders = []
 
 [[resources]]
@@ -955,9 +954,10 @@ other owned source. The normal project-save transaction also writes
 - Every managed `.layout` or `.events` reference is a canonical project-root
   `game://` URI; relative paths and `.settings` references are invalid.
 - A referenced path occurs only once in the complete project graph.
-- `externals/external.settings` is discovered when that fixed path exists.
-  External names, linked scenes, source URIs, and legacy-container ordering are
-  owned by that file.
+- Each `scene.settings` may declare `externalEventFiles` and
+  `externalLayoutFiles`. The owning scene supplies the association, while each
+  entry supplies its external name, source URI, and project-wide
+  legacy-container order.
 - `firstLayout` and `previewLayout`, when present, must name a scene.
 - The root entry does not store content hashes. Hashes belong in ignored editor state so editing one event file does not force a root-file Git conflict.
 
@@ -984,9 +984,9 @@ from the parsed Constants payload. The project content has this shape:
 ```
 
 The global `objects` array is composed from root object settings in their
-locally owned order. The four split arrays are filled in locally owned order:
-scenes from `scene.settings`, extensions from `extension.settings`, and both
-external containers from `external.settings`.
+locally owned order. Scenes come from `scene.settings`, extensions come from
+`extension.settings`, and both external containers are collected from all
+scene settings and sorted by their project-wide `order` values.
 
 The storage loader initializes `gd::Project::constantsJson` from the separate
 parsed `constants.toml` payload after the project content is unserialized.
@@ -1019,7 +1019,7 @@ extracted from the current `gd::Layout` serializer object:
 
 ```toml
 kind = "scene"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 layout = "game://scenes/Main/Main.layout"
 events = "game://scenes/Main/Main.events"
@@ -1061,7 +1061,7 @@ scenes/<Scene>/objects/<Object>.settings
 
 ```toml
 kind = "object"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 folder = []
 name = "Player"
@@ -1190,7 +1190,7 @@ files.
 
 ```toml
 kind = "extension"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 name = "Combat"
 fullName = "Combat"
@@ -1248,7 +1248,7 @@ except its `events` body:
 
 ```toml
 kind = "function"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 extension = "Combat"
 name = "CalculateDamage"
@@ -1323,7 +1323,7 @@ In current code, a prefab corresponds to an `EventsBasedObject` (also called an 
 
 ```toml
 kind = "prefab"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 name = "Enemy"
 fullName = "Enemy"
@@ -1431,7 +1431,7 @@ example:
 
 ```toml
 kind = "function"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 folder = ["Combat"]
 name = "TakeDamage"
@@ -1462,7 +1462,7 @@ do Object.health -= amount
 
 ```toml
 kind = "behavior"
-settingsFormatVersion = 1
+settingsFormatVersion = 3
 order = 0
 name = "Health"
 fullName = "Health"
@@ -1534,60 +1534,65 @@ Legacy function-type mapping is defined normatively in the events DSL specificat
 
 ## 12. External event and layout files
 
-The root external-source directory is a sibling of `scenes/`:
+External sources belong to their associated scene:
 
 ```text
-externals/
-  external.settings
-  <ExternalName>.events
-  <ExternalName>.layout
+scenes/<Scene>/
+  scene.settings
+  externals/
+    <ExternalName>.events
+    <ExternalName>.layout
 ```
 
-No per-external subfolder is used in version 1. `external.settings` owns the
-identity, linked scene, source URI, and order for every external event and
-layout. The `.events` and `.layout` files own only their DSL body or UI layout
-payload.
+No per-external subfolder is used. The owning `scene.settings` stores the
+identity, source URI, and project-wide order for every external event and
+layout. The scene association is derived from this ownership; source manifests
+must not repeat it. The `.events` and `.layout` files own only their DSL body or
+UI layout payload.
 
-### 12.1 `external.settings`
+### 12.1 Scene-owned external entries
 
-`external.settings` is a local-root TOML document mounted at `externals`:
+External entries are optional child records in the local-root
+`scene.settings` document:
 
 ```toml
-kind = "externals"
-settingsFormatVersion = 1
+kind = "scene"
+settingsFormatVersion = 3
+order = 0
+name = "Main"
+layout = "game://scenes/Main/Main.layout"
+events = "game://scenes/Main/Main.events"
 
-[[eventFiles]]
+[[externalEventFiles]]
 name = "Shared Combat"
-linkedScene = "Main"
-events = "game://externals/Shared%20Combat.events"
+order = 0
+events = "game://scenes/Main/externals/Shared%20Combat.events"
 
-[[layoutFiles]]
+[[externalLayoutFiles]]
 name = "Shared Combat"
-linkedScene = "Main"
-layout = "game://externals/Shared%20Combat.layout"
+order = 0
+layout = "game://scenes/Main/externals/Shared%20Combat.layout"
 ```
 
-`eventFiles` and `layoutFiles` independently preserve the order of the current
-`externalEvents` and `externalLayouts` containers. Names are unique within each
-container, and every referenced URI resolves directly inside `externals/`.
+`externalEventFiles` and `externalLayoutFiles` independently preserve the
+current `externalEvents` and `externalLayouts` container order. Their `order`
+values are unique and contiguous from zero across all scene settings, not
+within one scene. Names are globally unique within each external kind, and
+every referenced URI resolves directly inside the declaring scene's
+`externals/` directory with its canonical filename.
 
-`linkedScene` maps bidirectionally to the current serializer field
-`associatedLayout`. It is normally a scene name, but an empty or stale value
-from an older project is preserved exactly and reported as a project diagnostic
-rather than changed during migration. Newly authored non-empty values must name
-an existing scene.
-
-For a stale external layout link only, migration also writes
-`unresolvedScene = true` on that `layoutFiles` entry. This explicit marker lets
-the layout and its association round-trip without disabling linked-scene
-validation for new entries. It is rejected if `linkedScene` resolves and is
-not emitted into the reconstructed legacy JSON.
+`associatedLayout`, `linkedScene`, and `unresolvedScene` are forbidden in these
+source records. Composition derives legacy `associatedLayout` from the owning
+scene name. Empty, stale, or missing associations are rejected before a source
+tree is staged. The retired root `externals/external.settings` file is invalid
+in format version 3 and is never parsed or mounted.
 
 ### 12.2 External events
 
 An external event sheet is one pure DSL
-`externals/<ExternalName>.events` file. Its `name`, `linkedScene`, and order
-come from the matching `external.settings` `eventFiles` entry:
+`scenes/<Scene>/externals/<ExternalName>.events` file. Its `name` and global
+order come from the matching `scene.settings` `externalEventFiles` entry, and
+its legacy `associatedLayout` is the owning scene:
 
 ```events
 @comment "Shared events follow." background=[255,230,109] text=[0,0,0]
@@ -1596,18 +1601,19 @@ if collision Player Enemy
 do Player.health -= Enemy.damage
 ```
 
-It maps to a legacy object with `name`, `associatedLayout` from `linkedScene`,
-and compiled `events`.
+It maps to a legacy object with `name`, derived `associatedLayout`, and
+compiled `events`.
 
 ### 12.3 External layouts
 
 An external layout is one layout-only
-`externals/<ExternalName>.layout` TOML file compiled in external context.
+`scenes/<Scene>/externals/<ExternalName>.layout` TOML file compiled in external
+context.
 It owns only `instances` and `editionSettings`; its `[[layers]]` records reference
 the linked scene's existing layers rather than defining layers.
-Its `name`, `linkedScene`, and order come from the corresponding
-`external.settings` `layoutFiles` entry. The composer maps `linkedScene` to
-`associatedLayout` to match `ExternalLayout::SerializeTo`.
+Its `name` and global order come from the corresponding `scene.settings`
+`externalLayoutFiles` entry. The composer derives `associatedLayout` from the
+owning scene to match `ExternalLayout::SerializeTo`.
 
 ---
 
@@ -1624,7 +1630,7 @@ project.gdevelop
   + scene settings
   + visual scene layouts
   + compiled scene events
-  + external.settings and external events/layouts
+  + scene-owned external events/layouts
   + extension settings
   + prefab/behavior settings and layouts
   + compiled function events
@@ -1642,8 +1648,8 @@ project.gdevelop
 | `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
 | `constants.toml` direct root                                               | Editor-only Constants object without adding or removing user keys                                                           |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
-| `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
-| `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
+| Scene `externalEventFiles` entry + owned external `.events`                | One `externalEvents[]` item; owning scene becomes `associatedLayout`                                                        |
+| Scene `externalLayoutFiles` entry + owned external `.layout`               | One `externalLayouts[]` item; owning scene becomes `associatedLayout`                                                       |
 | `extension.settings` + children                                            | One `eventsFunctionsExtensions[]` item                                                                                      |
 | Physical extension component directories + per-component `order`           | Extension functions, prefabs, and behaviors in deterministic order                                                          |
 | `extensions/<E>/functions/<F>/function.settings` + sibling `<F>.events`    | One extension `eventsFunctions[]` entry                                                                                     |
@@ -1785,7 +1791,7 @@ unrelated extensions, or `project.gdevelop`.
 | Behavior declaration, flat property descriptors, and variables                                        | `behavior.settings`                                              |
 | Behavior function metadata/signature or function-folder grouping                                      | Its flat `functions/<Function>/function.settings` (`folder`)     |
 | Behavior function event body                                                                          | The sibling `<Function>.events`                                  |
-| External event/layout identity, linked scene, source URI, and order                                   | `external.settings`                                              |
+| External event/layout identity, owning scene, source URI, and global order                            | The owning `scene.settings` entry                                |
 | External event body                                                                                   | Its `.events`                                                    |
 | External layout instances/editor layout data                                                          | Its `.layout`                                                    |
 
@@ -1920,10 +1926,11 @@ When a legacy project is opened and no associated `project.gdevelop` exists:
    unsupported-schema diagnostic before staging files if any construct is not.
 7. Canonically reserialize known data to obtain the normalized current schema.
 8. Split the normalized tree according to this specification, including a
-   `scene.settings`/visual `.layout`/`.events` trio for every scene and all
-   external sheets/layouts plus `external.settings` under the root
-   `externals/` directory. Copy every legacy `associatedLayout` string exactly
-   into the corresponding `linkedScene` field.
+   `scene.settings`/visual `.layout`/`.events` trio for every scene. Require
+   every external's legacy `associatedLayout` to name an existing scene, place
+   its source below that scene's `externals/` directory, and add the
+   corresponding entry to that `scene.settings`. Stop before staging if any
+   association is empty or stale.
 9. Decompile known event arrays to IfDo with source maps.
 10. Stage all new files and run a full new-source -> legacy-tree -> `gd::Project` verification load.
 11. Compare a canonical legacy serialization of the verified project against the normalized source project, allowing only documented normalization differences.
@@ -2041,18 +2048,18 @@ A semantic rename updates:
 
 Content rename and path rename are distinct. Keeping an old path after a display-name rename is valid.
 
-Changing an external entry's `linkedScene` rewrites only
-`externals/external.settings`; the external source file stays in the root
-`externals/` directory. Renaming an external source updates its manifest entry,
-filename, and `game://` URI transactionally.
+Changing an external's associated scene moves its source between scene-owned
+`externals/` directories and moves its manifest record between the two
+`scene.settings` documents in one transaction. Renaming an external source
+updates its scene manifest entry, filename, and `game://` URI transactionally.
 
 ### 18.2 Delete
 
 Delete computes references first. After confirmation, it removes only the
 component's fixed-path settings fragment and files exclusively owned by that
 component. Shared resources and unrecognized files are not deleted. Deleting a
-scene is blocked until external `linkedScene` references to it are explicitly
-changed or cleared.
+scene requires deleting or moving every external source and manifest entry it
+owns in the same confirmed transaction.
 
 ### 18.3 Move between folders/extensions
 
@@ -2192,9 +2199,10 @@ legacy JSON
   `*FolderStructure` field.
 - Extension dependencies and cross-extension prefab/behavior references.
 - Prefab default and additional variants.
-- Root-level `externals/external.settings`, external events, and external
-  layouts, including matching basenames, independent files, container ordering,
-  `linkedScene` mapping, empty or stale associations, and root-directory path
+- Scene-owned external events and layouts, including matching basenames,
+  independent files, global container ordering across scene manifests, derived
+  scene association, rejection of empty/stale associations and link metadata,
+  rejection of retired root `external.settings`, and owner-directory path
   validation.
 - Legacy French/XML field fallbacks and version compatibility branches.
 - Existing folder-project split references.
@@ -2219,7 +2227,7 @@ Tests must fail if a converter drops a key, changes array order, replaces an unk
 
 ---
 
-## 23. Non-goals for version 1
+## 23. Non-goals for version 3
 
 - Changing GDJS runtime project data.
 - Replacing `gd::Project` or existing C++ serializers.
@@ -2256,10 +2264,11 @@ A conforming implementation must satisfy all of the following:
    layout TOML file, an events DSL file, and flat object
    settings. Object definitions and their behaviors belong to individual
    object settings; instances and layers belong to the layout.
-7. The root `externals/` directory is a sibling of `scenes/`; it contains
-   `external.settings` plus each `<ExternalName>.events` and
-   `<ExternalName>.layout`, and `external.settings` owns linked-scene metadata
-   and external-container ordering.
+7. Each scene may own an `externals/` directory containing its associated
+   `<ExternalName>.events` and `<ExternalName>.layout` sources. That scene's
+   `scene.settings` owns their manifests; association is derived from the
+   owner, and global external-container order is explicit across all scene
+   manifests.
 8. Every extension-level function has a
    `functions/<Function>/function.settings` and matching
    `<Function>.events`. Every prefab and behavior function similarly has

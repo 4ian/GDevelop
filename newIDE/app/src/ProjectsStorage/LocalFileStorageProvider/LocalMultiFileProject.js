@@ -5,6 +5,7 @@ import {
   MULTI_FILE_ENTRY_NAME,
   MULTI_FILE_CONSTANTS_URI,
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
   composeLegacyProjectFromFiles,
@@ -329,7 +330,7 @@ const discoverOwnedSettingsUris = async (
     'external.settings'
   );
   if (fs.existsSync(externalSettingsPath)) {
-    discovered.push('game://externals/external.settings');
+    discovered.push(MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI);
   }
 
   const extensionsRoot = path.join(projectRoot, 'extensions');
@@ -470,7 +471,10 @@ export const readMultiFileSourceTree = async (
       );
     }
     files[uri] = source;
-    if (uri.endsWith('.settings')) {
+    if (
+      uri.endsWith('.settings') &&
+      uri !== MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI
+    ) {
       const document = parseTomlSource(source, uri);
       const references: Set<string> = new Set();
       findGameUris(document, references);
@@ -531,8 +535,7 @@ const sortForCommit = (left: string, right: string): number => {
   const priority = (uri: string): number =>
     uri === MULTI_FILE_ENTRY_URI
       ? 4
-      : uri.endsWith('/extension.settings') ||
-        uri === 'game://externals/external.settings'
+      : uri.endsWith('/extension.settings')
       ? 3
       : uri.endsWith('.settings')
       ? 2

@@ -350,9 +350,22 @@ describe('GDevelop multi-file project format', () => {
     expect(files['game://scenes/Main/scene.settings']).toContain('order = 0');
     expect(files['game://scenes/Main/Main.layout']).not.toContain('events');
     expect(files['game://scenes/Main/Main.events']).toContain('@event');
-    expect(files['game://externals/external.settings']).toContain(
-      '[[eventFiles]]'
+    expect(files['game://scenes/Main/scene.settings']).toContain(
+      '[[externalEventFiles]]'
     );
+    expect(files['game://scenes/Main/scene.settings']).toContain(
+      'events = "game://scenes/Main/externals/Shared%20Combat.events"'
+    );
+    expect(files['game://scenes/Main/scene.settings']).toContain(
+      '[[externalLayoutFiles]]'
+    );
+    expect(files['game://externals/external.settings']).toBeUndefined();
+    expect(
+      files['game://scenes/Main/externals/Shared%20Combat.events']
+    ).toContain('@event');
+    expect(
+      files['game://scenes/Main/externals/Shared%20Combat.layout']
+    ).toContain('[layout]');
     expect(
       files[
         'game://extensions/Combat/functions/CalculateDamage/function.settings'
@@ -411,6 +424,33 @@ describe('GDevelop multi-file project format', () => {
           /(?:eventsFunctions|objects|properties|sharedProperties)FolderStructure/
         );
       });
+  });
+
+  test('round-trips instances that start hidden through layout TOML', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts[0].instances.push({
+      name: 'Player',
+      x: 10,
+      y: 20,
+      angle: 0,
+      zOrder: 0,
+      layer: '',
+      customSize: false,
+      width: 0,
+      height: 0,
+      hidden: true,
+      persistentUuid: '00000000-0000-4000-8000-000000000001',
+      numberProperties: [],
+      stringProperties: [],
+      initialVariables: [],
+    });
+
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(files['game://scenes/Main/Main.layout']).toContain('hidden = true');
+
+    const output = composeLegacyProjectFromFiles(files);
+    expect(output.layouts[0].instances[0].hidden).toBe(true);
+    expect(areLegacyProjectsEquivalent(project, output)).toBe(true);
   });
 
   test('omits empty scene shared-data entries for custom and native behaviors', () => {
@@ -527,6 +567,19 @@ settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
       'eventsDslVersion = "3.0"',
       'eventsDslVersion = "1.3"'
     );
+
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_UNSUPPORTED_VERSION' })
+    );
+  });
+
+  test('rejects version 2 multi-file settings without compatibility loading', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files[MULTI_FILE_ENTRY_URI] = files[MULTI_FILE_ENTRY_URI].replace(
+      `combinedSettingsFormatVersion = ${MULTI_FILE_FORMAT_VERSION}`,
+      'combinedSettingsFormatVersion = 2'
+    );
+    files['game://externals/external.settings'] = 'not valid TOML';
 
     expect(() => composeLegacyProjectFromFiles(files)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_UNSUPPORTED_VERSION' })
@@ -1142,7 +1195,7 @@ folderName = "__ROOT"
     );
     filesWithStraySettings[
       'game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings'
-    ] = 'kind = "function"\nsettingsFormatVersion = 1\n';
+    ] = `kind = "function"\nsettingsFormatVersion = ${MULTI_FILE_FORMAT_VERSION}\n`;
     expect(() => composeLegacyProjectFromFiles(filesWithStraySettings)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_ORPHAN_SETTINGS' })
     );
@@ -1842,26 +1895,98 @@ objects = [ "Player" ]
     ).toEqual(['getmoney', 'GetMoney']);
   });
 
-  test('preserves an external layout whose linked scene was removed', () => {
+  test('rejects an external layout whose linked scene was removed', () => {
     const project = JSON.parse(JSON.stringify(projectFixture));
     project.externalLayouts[0].associatedLayout = 'Removed Scene';
-    const files = decomposeLegacyProjectToFiles(project);
-
-    expect(files['game://externals/external.settings']).toContain(
-      'unresolvedScene = true'
+    expect(() => decomposeLegacyProjectToFiles(project)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_EXTERNAL_SCENE_REQUIRED' })
     );
+  });
+
+  test('rejects empty external scene associations and retired external settings', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.externalEvents[0].associatedLayout = '';
+    expect(() => decomposeLegacyProjectToFiles(project)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_EXTERNAL_SCENE_REQUIRED' })
+    );
+
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    files['game://externals/external.settings'] = 'not valid TOML';
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({
+        code: 'MULTIFILE_RETIRED_EXTERNAL_SETTINGS',
+      })
+    );
+  });
+
+  test('derives external ownership from scene settings and enforces global order', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.layouts.push({
+      ...JSON.parse(JSON.stringify(project.layouts[0])),
+      name: 'Secondary',
+      objects: [],
+      instances: [],
+      events: [],
+    });
+    project.externalEvents.push({
+      name: 'Secondary Logic',
+      associatedLayout: 'Secondary',
+      events: [],
+    });
+    const files = decomposeLegacyProjectToFiles(project);
     expect(
-      composeLegacyProjectFromFiles(files).externalLayouts[0].associatedLayout
-    ).toBe('Removed Scene');
+      composeLegacyProjectFromFiles(files).externalEvents.map(external => ({
+        name: external.name,
+        associatedLayout: external.associatedLayout,
+      }))
+    ).toEqual([
+      { name: 'Shared Combat', associatedLayout: 'Main' },
+      { name: 'Secondary Logic', associatedLayout: 'Secondary' },
+    ]);
+
+    const secondarySettingsUri = 'game://scenes/Secondary/scene.settings';
+    files[secondarySettingsUri] = files[secondarySettingsUri].replace(
+      /(\[\[externalEventFiles\]\][\s\S]*?\norder = )1(\n)/,
+      (match, prefix, suffix) => `${prefix}3${suffix}`
+    );
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_SCHEMA' })
+    );
+  });
+
+  test('rejects link metadata and external sources outside the owning scene folder', () => {
+    const filesWithLinkMetadata = decomposeLegacyProjectToFiles(projectFixture);
+    const sceneSettingsUri = 'game://scenes/Main/scene.settings';
+    filesWithLinkMetadata[sceneSettingsUri] = filesWithLinkMetadata[
+      sceneSettingsUri
+    ].replace(
+      '[[externalEventFiles]]',
+      '[[externalEventFiles]]\nlinkedScene = "Main"'
+    );
+    expect(() => composeLegacyProjectFromFiles(filesWithLinkMetadata)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_SCHEMA' })
+    );
+
+    const filesWithMovedSource = decomposeLegacyProjectToFiles(projectFixture);
+    const canonicalUri = 'game://scenes/Main/externals/Shared%20Combat.events';
+    const movedUri = 'game://scenes/Main/Shared%20Combat.events';
+    filesWithMovedSource[movedUri] = filesWithMovedSource[canonicalUri];
+    delete filesWithMovedSource[canonicalUri];
+    filesWithMovedSource[sceneSettingsUri] = filesWithMovedSource[
+      sceneSettingsUri
+    ].replace(canonicalUri, movedUri);
+    expect(() => composeLegacyProjectFromFiles(filesWithMovedSource)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_MANIFEST_PATH' })
+    );
   });
 
   test('uses canonical safe game URIs and encoded names', () => {
     expect(encodeManagedName('Shared Combat')).toBe('Shared%20Combat');
     expect(encodeManagedName('NUL')).toBe('%4EUL');
     expect(encodeManagedName('场景')).toBe('%E5%9C%BA%E6%99%AF');
-    expect(validateGameUri('game://externals/Shared%20Combat.events')).toBe(
-      'externals/Shared Combat.events'
-    );
+    expect(
+      validateGameUri('game://scenes/Main/externals/Shared%20Combat.events')
+    ).toBe('scenes/Main/externals/Shared Combat.events');
     expect(validateGameUri('game://scenes/%4EUL/scene.settings')).toBe(
       'scenes/NUL/scene.settings'
     );
@@ -2043,7 +2168,9 @@ objects = [ "Player" ]
       ]
     ).toContain(childInstance.persistentUuid);
     expect(
-      duplicateAcrossLayoutsFiles['game://externals/Duplicate.layout']
+      duplicateAcrossLayoutsFiles[
+        'game://scenes/Main/externals/Duplicate.layout'
+      ]
     ).toContain(project.layouts[0].instances[0].persistentUuid);
   });
 });

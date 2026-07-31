@@ -1078,6 +1078,7 @@ const compileInstance = (record, layerName, context, state) => {
       'flip',
       'locked',
       'sealed',
+      'hidden',
       'keep_ratio',
       'properties',
     ],
@@ -1221,6 +1222,11 @@ const compileInstance = (record, layerName, context, state) => {
     expectBoolean(instance.sealed, 'sealed', record, state)
   )
     output.sealed = true;
+  if (
+    instance.hidden !== undefined &&
+    expectBoolean(instance.hidden, 'hidden', record, state)
+  )
+    output.hidden = true;
   if (instance.keep_ratio === undefined) output.keepRatio = true;
   else if (expectBoolean(instance.keep_ratio, 'keep_ratio', record, state))
     output.keepRatio = true;
@@ -1945,6 +1951,7 @@ const decompileInstance = (instance, layerId, context) => {
       'depth',
       'locked',
       'sealed',
+      'hidden',
       'keepRatio',
       'persistentUuid',
       'numberProperties',
@@ -2012,6 +2019,7 @@ const decompileInstance = (instance, layerId, context) => {
   if (flip.length) output.flip = flip;
   if (instance.locked) output.locked = true;
   if (instance.sealed) output.sealed = true;
+  if (instance.hidden) output.hidden = true;
   if (instance.keepRatio !== true) output.keep_ratio = false;
   const properties = mergeInstancePropertyMaps(
     propertyArrayToMap(instance.numberProperties, 'number'),

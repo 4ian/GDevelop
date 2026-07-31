@@ -759,17 +759,16 @@ const safeDecode = (value: string): string => {
 };
 
 const getSourceContext = (fileUri: string, model: Object): Object => {
-  const sceneMatch = /^game:\/\/scenes\/([^/]+)\//.exec(fileUri);
-  if (sceneMatch) {
-    const physicalName = safeDecode(sceneMatch[1]);
-    const scene = model.scenes.find(scene => scene.name === physicalName);
-    return { sceneName: scene ? scene.name : null, isFunction: false };
-  }
-  const externalMatch = /^game:\/\/externals\/([^/]+)\.events$/.exec(fileUri);
+  const externalMatch = /^game:\/\/scenes\/([^/]+)\/externals\/([^/]+)\.events$/.exec(
+    fileUri
+  );
   if (externalMatch) {
-    const externalName = safeDecode(externalMatch[1]);
+    const physicalSceneName = safeDecode(externalMatch[1]);
+    const externalName = safeDecode(externalMatch[2]);
     const external = (model.externalEvents || []).find(
-      external => external.name === externalName
+      external =>
+        external.name === externalName &&
+        external.sceneName === physicalSceneName
     );
     const scene = external
       ? model.scenes.find(scene => scene.name === external.sceneName)
@@ -779,6 +778,12 @@ const getSourceContext = (fileUri: string, model: Object): Object => {
       isFunction: false,
       external: true,
     };
+  }
+  const sceneMatch = /^game:\/\/scenes\/([^/]+)\//.exec(fileUri);
+  if (sceneMatch) {
+    const physicalName = safeDecode(sceneMatch[1]);
+    const scene = model.scenes.find(scene => scene.name === physicalName);
+    return { sceneName: scene ? scene.name : null, isFunction: false };
   }
   return {
     sceneName: null,
@@ -832,9 +837,9 @@ export const collectSerializedProjectJavaScriptBlocks = (
   (serializedProject.externalEvents || []).forEach(external =>
     collectEventsJavaScriptBlocks(
       external.events,
-      `game://externals/${encodeURIComponent(
-        String(external.name || '')
-      )}.events`,
+      `game://scenes/${encodeURIComponent(
+        String(external.associatedLayout || '')
+      )}/externals/${encodeURIComponent(String(external.name || ''))}.events`,
       blocks
     )
   );

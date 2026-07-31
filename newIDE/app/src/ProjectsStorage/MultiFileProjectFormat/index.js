@@ -3603,7 +3603,7 @@ export const normalizeLegacyProjectForMultiFile = (
   options = {}
 ) => {
   const project = removeLegacyFolderStructuresFromProject(legacyProject);
-  project.layouts = project.layouts || [];
+  project.layouts = (project.layouts || []).map(removeEmptyBehaviorSharedData);
   project.externalEvents = project.externalEvents || [];
   project.externalLayouts = project.externalLayouts || [];
   project.eventsFunctionsExtensions = project.eventsFunctionsExtensions || [];
@@ -3654,11 +3654,48 @@ const canonicalValue = value => {
   return value;
 };
 
-const findFirstValueDifference = (left, right, path = '$') => {
+const normalizeInstructionParametersForComparison = (
+  value,
+  ignoredIndices = []
+) => {
+  value = value.map((parameter, index) =>
+    ignoredIndices.includes(index) ? '' : parameter
+  );
+  let length = value.length;
+  while (length > 0 && value[length - 1] === '') length--;
+  return length === value.length ? value : value.slice(0, length);
+};
+
+const isLegacyInstructionForComparison = value =>
+  !!(
+    value &&
+    typeof value === 'object' &&
+    value.type &&
+    typeof value.type === 'object' &&
+    typeof value.type.value === 'string' &&
+    Array.isArray(value.parameters)
+  );
+
+const findFirstValueDifference = (
+  left,
+  right,
+  path = '$',
+  instructionType = null,
+  instructionParameterIndicesToIgnoreByType = {}
+) => {
   if (Object.is(left, right)) return null;
   if (Array.isArray(left) || Array.isArray(right)) {
     if (!Array.isArray(left) || !Array.isArray(right)) {
       return { path, left, right };
+    }
+    if (instructionType) {
+      const ignoredIndices =
+        instructionParameterIndicesToIgnoreByType[instructionType] || [];
+      left = normalizeInstructionParametersForComparison(left, ignoredIndices);
+      right = normalizeInstructionParametersForComparison(
+        right,
+        ignoredIndices
+      );
     }
     if (left.length !== right.length) {
       return {
@@ -3671,7 +3708,9 @@ const findFirstValueDifference = (left, right, path = '$') => {
       const difference = findFirstValueDifference(
         left[index],
         right[index],
-        `${path}[${index}]`
+        `${path}[${index}]`,
+        null,
+        instructionParameterIndicesToIgnoreByType
       );
       if (difference) return difference;
     }
@@ -3688,7 +3727,13 @@ const findFirstValueDifference = (left, right, path = '$') => {
       const difference = findFirstValueDifference(
         left[key],
         right[key],
-        `${path}${pathSegment}`
+        `${path}${pathSegment}`,
+        key === 'parameters' &&
+          isLegacyInstructionForComparison(left) &&
+          isLegacyInstructionForComparison(right)
+          ? left.type.value
+          : null,
+        instructionParameterIndicesToIgnoreByType
       );
       if (difference) return difference;
     }
@@ -3713,7 +3758,10 @@ export const getLegacyProjectFirstDifferenceDescription = (
 ) => {
   const difference = findFirstValueDifference(
     canonicalValue(normalizeLegacyProjectForMultiFile(left, options)),
-    canonicalValue(normalizeLegacyProjectForMultiFile(right, options))
+    canonicalValue(normalizeLegacyProjectForMultiFile(right, options)),
+    '$',
+    null,
+    options.instructionParameterIndicesToIgnoreByType || {}
   );
   if (!difference) return null;
   if (

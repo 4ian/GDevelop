@@ -46,6 +46,9 @@ deprecated instruction and you must understand or minimally edit that exact
 instruction. Never use a deprecated-catalog entry to construct a new event or
 introduce another deprecated instruction. Prefer a current replacement from
 `instructions-catalog.json` whenever a safe migration is part of the edit.
+Imported projects can add inferred signatures for removed instructions to the
+deprecated catalog. Treat these as legacy read/edit entries, never as APIs for
+new events.
 
 Use only symbols and instructions available to the owning context. When the
 catalog appears stale, save through the editor to regenerate it before
@@ -61,24 +64,36 @@ exact type containing whitespace is written as a JSON string:
 if SceneJustBegins
 if CollisionNP first_object="Player" second_object="Enemy"
 do Delete object="Enemy"
-do "Physics2::Remove joint" object="Object" behavior="PhysicsBehavior" joint_id="MouseJointID"
+do "Physics2::Remove joint" object="Object" behavior="PhysicsBehavior" joint_id=12
 ```
 
-Use every required parameter exactly once by its catalog `dslName`. Parameter
-values are JSON strings containing the exact serialized GDevelop operand:
+When authoring a new instruction, use every required parameter exactly once by
+its catalog `dslName`. Write the value according to the catalog parameter's
+`valueKind`:
 
 ```events
-do DebuggerTools::ConsoleLog message_to_log="\"Game started\""
-do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value="1"
+do DebuggerTools::ConsoleLog message_to_log="Game started"
+do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value=1
+do TextContainerCapability::TextContainerBehavior::SetValue object="ScoreText" behavior="Text" modification_sign="=" text=expr("Score: " + ToString(Variable(Score)))
 ```
 
-Preserve embedded quotes for string expressions. Omit a code-only parameter
-only when its standard value is the empty string. Respect the catalog's kind,
-event scopes, accepted values, owner, and parameter order/signature.
+Use direct strings for `text`, object, behavior, variable, resource, and name
+values. Use unquoted literals for numbers and booleans. Use `expr(...)` only
+for calculated `text` or `number` values. Omit every code-only parameter.
+Respect the catalog's kind, event scopes, accepted values, owner, and parameter
+order/signature.
 
-Never author `@exact`. It is a compiler/import fallback, not AI-authored
-project syntax. If a type is absent after catalog regeneration, do not use it.
-The catalog intentionally excludes hidden and deprecated instructions.
+An omitted named parameter in an existing migrated instruction represents a
+blank stored slot. Preserve that omission instead of adding a placeholder.
+This applies even when current metadata marks the parameter required; new
+instructions must still provide the required semantic value.
+
+Calculated expressions may span physical lines. Keep delimiters balanced.
+Formatting canonicalizes insignificant leading and trailing whitespace outside
+string literals while preserving whitespace inside a multiline string literal.
+
+If a type is absent after catalog regeneration, do not use it. The catalog
+intentionally excludes hidden and deprecated instructions.
 
 Keyboard parameters use the canonical definitions exposed by the generated
 instruction catalog. Main-row digits have canonical names `Num0` through
@@ -98,7 +113,7 @@ Put one statement on each line. Multiple `if` groups mean AND; consecutive
 if CollisionNP first_object="Player" second_object="Enemy"
 or CollisionNP first_object="Player" second_object="Projectile"
 if PlatformBehavior::IsOnFloor object="Player" behavior="PlatformerObject"
-do DebuggerTools::ConsoleLog message_to_log="\"player contact\""
+do DebuggerTools::ConsoleLog message_to_log="player contact"
 ```
 
 The meaning is `on floor AND (Player collides with Enemy OR Projectile)`.
@@ -116,10 +131,10 @@ every statement belonging to the child event:
 
 ```events
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="\"ready\""
+do DebuggerTools::ConsoleLog message_to_log="ready"
 
-> if NumberVariable variable="Ready" comparison_sign="=" value="1"
-> do DebuggerTools::ConsoleLog message_to_log="\"space\""
+> if NumberVariable variable="Ready" comparison_sign="=" value=1
+> do DebuggerTools::ConsoleLog message_to_log="space"
 ```
 
 Use `>>` for the next depth. Never jump over a depth. Spaces after the prefix
@@ -144,7 +159,7 @@ Use `@event` immediately before the event whose current metadata it preserves:
 ```events
 @event disabled=true folded=true aiGeneratedEventId="initialize-ui"
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="\"initializing\""
+do DebuggerTools::ConsoleLog message_to_log="initializing"
 ```
 
 Use `@instruction` immediately before its condition or action only when
@@ -159,7 +174,7 @@ the `@group` line:
 
 @event aiGeneratedEventId="damage-enemy"
 for each Enemy
-> if NumberObjectVariable object="Enemy" variable="HP" comparison_sign="<=" value="0"
+> if NumberObjectVariable object="Enemy" variable="HP" comparison_sign="<=" value=0
 > do Delete object="Enemy"
 
 @end group
@@ -176,13 +191,13 @@ Use JSON string escapes inside comment text. Never use `#` or inline comments.
 
 ## Local variables and branches
 
-Declare locals before their owning event. In a catalog parameter, use the exact
-serialized GDevelop operand for that local, normally its in-scope name:
+Declare locals before their owning event. Use `expr(...)` when a calculated
+catalog parameter reads the local:
 
 ```events
 local damage = 10
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="ToString(damage)"
+do DebuggerTools::ConsoleLog message_to_log=expr(ToString(damage))
 ```
 
 Simple initializers are numbers, strings, booleans, arrays, or structures.
@@ -194,12 +209,12 @@ Place an `else` chain immediately after its matching conditional event at the
 same depth:
 
 ```events
-if NumberVariable variable="HasSave" comparison_sign="=" value="1"
-do DebuggerTools::ConsoleLog message_to_log="\"load save\""
-else if NumberVariable variable="Attempts" comparison_sign=">" value="0"
-do DebuggerTools::ConsoleLog message_to_log="\"retry\""
+if NumberVariable variable="HasSave" comparison_sign="=" value=1
+do DebuggerTools::ConsoleLog message_to_log="load save"
+else if NumberVariable variable="Attempts" comparison_sign=">" value=0
+do DebuggerTools::ConsoleLog message_to_log="retry"
 else
-do DebuggerTools::ConsoleLog message_to_log="\"new game\""
+do DebuggerTools::ConsoleLog message_to_log="new game"
 ```
 
 Branch locals follow `else` or `else if` and precede branch instructions.
@@ -212,20 +227,20 @@ Use these canonical structural forms:
 ```events
 if SceneJustBegins
 > for each Enemy index=i order_by="Enemy.Variable(HP)" order=desc limit=10
->> if NumberObjectVariable object="Enemy" variable="Active" comparison_sign="=" value="1"
->> do SetNumberObjectVariable object="Enemy" variable="Rank" modification_sign="=" value="i"
+>> if NumberObjectVariable object="Enemy" variable="Active" comparison_sign="=" value=1
+>> do SetNumberObjectVariable object="Enemy" variable="Rank" modification_sign="=" value=expr(i)
 
 if SceneJustBegins
 > for each child "inventory" value="item" key="itemKey" index="i"
->> if NumberVariable variable="item" comparison_sign=">" value="0"
->> do DebuggerTools::ConsoleLog message_to_log="ToString(item)"
+>> if NumberVariable variable="item" comparison_sign=">" value=0
+>> do DebuggerTools::ConsoleLog message_to_log=expr(ToString(item))
 
 if SceneJustBegins
 > repeat 5 index=i
->> do DebuggerTools::ConsoleLog message_to_log="ToString(i)"
+>> do DebuggerTools::ConsoleLog message_to_log=expr(ToString(i))
 
-while NumberVariable variable="QueueSize" comparison_sign=">" value="0" limit=100 index=i
-> do SetNumberVariable variable="QueueSize" modification_sign="-" value="1"
+while NumberVariable variable="QueueSize" comparison_sign=">" value=0 limit=100 index=i
+> do SetNumberVariable variable="QueueSize" modification_sign="-" value=1
 ```
 
 `for each` guarantees one picked instance per iteration. Loop aliases and
@@ -299,10 +314,10 @@ explicitly permitted.
 ## Canonical editing checklist
 
 - Use only catalog `type` and `dslName` values; never guess an instruction.
-- Never author `@exact`, deprecated instructions, prose aliases, or an `@`
-  prefix on a catalog type.
-- Use one statement per line, double-quoted JSON escaping, blank lines between
-  sibling events, and one final newline.
+- Never author deprecated instructions, prose aliases, or an `@` prefix on a
+  catalog type.
+- Use one statement per line, normal JSON string-literal escaping, blank lines
+  between sibling events, and one final newline.
 - Preserve event order, instruction order, depth, metadata, locals, picking,
   and owner scope.
 - Use `@group ... @end group`, `@js ... @end js`, and

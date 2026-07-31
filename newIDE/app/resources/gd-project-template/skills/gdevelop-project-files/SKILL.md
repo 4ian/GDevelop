@@ -160,7 +160,9 @@ generated compatibility/runtime output, not multi-file source.
   never introduce a new use of a deprecated instruction. Preserve or minimally
   edit an existing deprecated instruction only when the user's legacy project
   requires it; use a current replacement from `instructions-catalog.json`
-  whenever the edit can migrate it safely.
+  whenever the edit can migrate it safely. Imported projects may contain
+  inferred signatures for removed instructions in this deprecated catalog;
+  treat them with the same legacy-only restriction.
   `runtime-api.d.ts` and `project-api.d.ts` are the only approved JavaScript
   authoring surface. Read them before changing `@js`; never hand-edit either
   declaration or recover private APIs from runtime source/generated code.
@@ -244,7 +246,7 @@ Load only the references required by the task:
 - Read [references/layout-toml.md](references/layout-toml.md) in full before
   creating or changing any `.layout` file. Preserve existing UUIDs and use its
   exact scene, prefab/variant, or external-layout context rules.
-- Read [references/events-dls.md](references/events-dls.md) in full before
+- Read [references/events-dsl.md](references/events-dsl.md) in full before
   creating or changing any `.events` file. Use only its canonical IfDo
   structures and the exact types and `dslName` parameters found in the
   generated project instruction catalog.
@@ -334,12 +336,12 @@ Git-commit, and reload gates when project sources changed.
 
 Use the generated catalog for every instruction. Find the entry under
 `conditions` or `actions`, use its exact `type`, and supply parameters by their
-exact `dslName`. Values are JSON strings containing the exact serialized
-GDevelop operand. The DSL has no hardcoded instruction aliases:
+exact `dslName`. Write each value according to the parameter's `valueKind`.
+The DSL has no hardcoded instruction aliases:
 
 ```events
-if Extension::Condition target="Player" threshold="Variable(Limit)"
-do Extension::Action target="Player" text="\"Ready\"" runtime=""
+if Extension::Condition target="Player" threshold=expr(Variable(Limit))
+do Extension::Action target="Player" text="Ready"
 if SceneJustBegins
 ```
 
@@ -348,12 +350,17 @@ Rules:
 - Write catalog instruction types directly; never prefix them with `@`.
 - Do not replace catalog types with prose aliases such as `scene begins`.
 - Use only catalog entries valid for the target event scope.
-- Use every required parameter exactly once.
-- Omit code-only parameters when their value is the standard empty string.
-- Preserve quotes inside string-expression operands.
-- Never write `@exact`. If a persisted type is absent, first regenerate the
-  catalog by saving with the editor. Do not reuse it for new events if it stays
-  absent; the catalog intentionally excludes editor-hidden and deprecated APIs.
+- Supply every required parameter exactly once when authoring a new
+  instruction. Preserve an omitted named parameter in an existing migrated
+  instruction when its stored legacy slot is blank; do not invent a placeholder
+  value.
+- Omit every code-only parameter.
+- Write `text`, object, behavior, variable, resource, and name values as direct
+  strings; write numbers and booleans as unquoted literals.
+- Use `expr(...)` only for calculated `text` or `number` values.
+- If a persisted type is absent, first regenerate the catalog by saving with
+  the editor. Do not reuse it for new events if it stays absent; the catalog
+  intentionally excludes editor-hidden and deprecated APIs.
 - Guard every action with at least one effective condition in its event or an
   ancestor event. Never place an action on an unconditional path that executes
   every frame. Use an explicit trigger, state/input check, timer, comparison,
@@ -381,7 +388,7 @@ Common structure:
 ```events
 @event aiGeneratedEventId="descriptive-id"
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="\"started\""
+do DebuggerTools::ConsoleLog message_to_log="started"
 
 > @event aiGeneratedEventId="child-id"
 > if CollisionNP first_object="Player" second_object="Enemy"
@@ -390,7 +397,7 @@ do DebuggerTools::ConsoleLog message_to_log="\"started\""
 @group "Combat" source="" creationTime=0 color=[74,176,228] parameters=[]
 @event aiGeneratedEventId="damage-enemy"
 if CollisionNP first_object="Bullet" second_object="Enemy"
-do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value="1"
+do SetNumberObjectVariable object="Enemy" variable="HP" modification_sign="-" value=1
 do Delete object="Bullet"
 @end group
 ```

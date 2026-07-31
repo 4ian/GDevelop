@@ -2,9 +2,11 @@
 
 ## A Minimal AI-Friendly DSL for GDevelop Events JSON and Functions
 
-**Status:** Version 2.0 codebase-aligned design specification
+**Status:** Version 3.0 codebase-aligned design specification
 **Canonical source filename:** `xx.events`
+
 **File extension:** `.events`
+
 **Encoding:** UTF-8
 **Target:** GDevelop scene event sheets, external event sheets, and extension functions
 
@@ -71,16 +73,15 @@ function
 event
 >
 ?
-@event / @instruction / @comment / @group / @while / @js / @end / @exact
+@event / @instruction / @comment / @group / @while / @js / @end
 ```
 
 A compiler converts `.events` source into the exact GDevelop event-sheet or extension-function data expected by the loaded project, GDevelop version, installed extensions, objects, behaviors, variables, resources, scenes, external event sheets, and registered functions.
 
 The AI model uses the exact action or condition `type` and named parameters from
 the generated project catalog rather than positional JSON parameter arrays.
-The DSL core does not hardcode instruction aliases. The typed `@exact` form is
-the lossless fallback when a named catalog signature cannot reproduce stored
-parameters.
+The DSL core does not hardcode instruction aliases. Every instruction must be
+represented by a complete named catalog signature.
 
 > **Implementation status:** the core parser, compiler, canonical decompiler,
 > catalog adapter, JSON normalizer, and equivalence checker are implemented in
@@ -105,7 +106,7 @@ do SetNumberVariable variable="score" modification_sign="+" value="1"
 
 ```events
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="\"scene started\""
+do DebuggerTools::ConsoleLog message_to_log="scene started"
 
 > if CollisionNP first_object="Player" second_object="Enemy"
 > do Delete object="Enemy"
@@ -362,7 +363,7 @@ game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.setti
 All identity, owner, function type, parameters, return type, ordering, and
 editor configuration live in `.settings` TOML. `.layout` TOML is limited to
 visual/UI data. `.events` contains only DSL statements, DSL comments, typed
-metadata annotations, and typed exact catalog instructions defined in this
+metadata annotations, and typed catalog instructions defined in this
 document. Raw event or instruction JSON is forbidden.
 
 A standalone authoring API may optionally accept a `function` declaration as
@@ -1112,8 +1113,8 @@ AND
 (scene.queueSize > 0 OR scene.forceDrain)
 ```
 
-The canonical exact profile also represents the full range accepted by the
-current event serializer. A bare `while` preserves an empty
+The canonical profile also represents the full range accepted by the current
+event serializer. A bare `while` preserves an empty
 `whileConditions` array, and each immediately following `and while` preserves
 another sibling entry in that array, in source order:
 
@@ -1122,9 +1123,9 @@ another sibling entry in that array, in source order:
 while index="i"
 
 @while
-while @exact id="FirstCondition" parameters=[]
-and while @exact id="SecondCondition" parameters=[]
-if @exact id="AdditionalBodyCondition" parameters=[]
+while FirstCondition
+and while SecondCondition
+if AdditionalBodyCondition
 ```
 
 `and while` is reserved for exact round-trip fidelity. It must immediately
@@ -1909,30 +1910,38 @@ The registry stores parameter names and types even when GDevelop JSON stores a p
 The model writes:
 
 ```events
-do AdvancedCamera::ShakeCamera strength="20" duration="0.4"
+do AdvancedCamera::ShakeCamera strength=20 duration=0.4
 ```
 
 The compiler writes the exact parameter order expected by GDevelop.
 
-### 18.3 Exact catalog instruction form
+### 18.3 Semantic catalog instruction form
 
 Every instruction uses its catalog type directly, without a marker prefix:
 
 ```events
-do AdvancedCamera::ShakeCamera duration=0.4s amplitude=20 layer="" camera=0
+do AdvancedCamera::ShakeCamera duration=0.4 amplitude=20 layer="" camera=0
 ```
 
 In the multi-file project profile, the authoritative named signatures are
 generated at `.gdevelop/instructions-catalog.json` on every project save. The
-generic persisted form uses each catalog parameter's exact `dslName` and a JSON
-string containing the exact serialized operand:
+persisted form uses each catalog parameter's exact `dslName` and semantic
+`valueKind`:
 
 ```events
-do AdvancedCamera::ShakeCamera duration="0.4" amplitude="20" layer="\"\"" camera="0"
+do AdvancedCamera::ShakeCamera duration=0.4 amplitude=20 layer="" camera=0
+do DebuggerTools::ConsoleLog message_to_log="Camera ready"
+do DebuggerTools::ConsoleLog message_to_log=expr("Zoom: " + ToString(CameraZoom()))
 ```
 
-The JSON-string rule makes catalog forms lossless without guessing whether an
-operand is an object name, resource name, or nested GDevelop expression.
+Direct strings represent semantic text and names. Numbers and booleans are
+unquoted literals. A calculated text or number value uses `expr(...)`; the
+compiler validates and lowers it according to the catalog parameter.
+New instructions supply every required argument. When an imported instruction
+has a blank stored slot, its named argument is omitted and the compiler
+reconstructs that blank position. Multiline expression formatting removes
+insignificant line-edge whitespace outside string literals while preserving
+string content.
 
 Every generated `dslName` obeys the normal identifier grammar. After ordinary
 normalization, a parameter name beginning with a digit is prefixed with
@@ -1940,23 +1949,25 @@ normalization, a parameter name beginning with a digit is prefixed with
 `parameter_3d_capability`. The formatter and parser use this same deterministic
 name so generated DSL always recompiles.
 
-The generated artifact is deliberately lean and line-oriented. Each action,
-condition, or expression occupies one compact JSON line and contains only
-authoring-relevant names, descriptions, valid scope names, parameter
-signatures, defaults, accepted values, and owner identity. Editor UI metadata
-and fields derivable from structure or the parameter list are not stored. In
-particular, entries omit `kind` because the parent `actions`, `conditions`, or
-`expressions` array already defines it, and parameters omit `index` because
-their array position is authoritative. Editor-hidden instructions (which the
-events editor labels `[DEPRECATED]`), instructions carrying a deprecation
-message, and expressions hidden or marked deprecated are excluded so an AI
-cannot select APIs that the editor warns against.
+The generated artifact has `formatVersion: 2` and is deliberately lean and
+line-oriented. Each action, condition, or expression occupies one compact JSON
+line and contains only project-specific authoring data. Every non-code-only
+parameter declares one of `text`, `number`, `boolean`, `object`, `behavior`,
+`variable`, `resource`, or `name` as its `valueKind`; defaults use the same
+semantic type. The catalog contains no prose encoding guide. Editor UI metadata
+and fields derivable from structure or the parameter list are not stored.
+Editor-hidden instructions (which the events editor labels `[DEPRECATED]`),
+instructions carrying a deprecation message, and expressions hidden or marked
+deprecated are excluded so an AI cannot select APIs that the editor warns
+against.
 
 Lossless conversion is separate from AI authoring. The editor also generates
 `.gdevelop/deprecated-instructions-catalog.json` alongside the normal catalog.
 It contains only valid deprecated or hidden compatibility instructions needed
-to round-trip existing or imported projects. The compiler and formatter merge
-both catalogs in memory when saving and loading project sources. AI models may
+to round-trip existing or imported projects, including inferred semantic
+signatures for removed instructions still used by the imported source. The
+compiler and formatter merge both catalogs in memory when saving and loading
+project sources. AI models may
 consult the deprecated catalog only to understand a legacy project or make a
 targeted edit to a deprecated instruction already present. They must never use
 it to construct new events or introduce another deprecated instruction; all
@@ -1964,7 +1975,7 @@ new event logic must come from `.gdevelop/instructions-catalog.json`.
 
 Rules:
 
-- The exact instruction must exist in the catalog.
+- The instruction must exist in the catalog.
 - Write ordinary instruction types as bare tokens. If an exact catalog type
   contains whitespace, write the type as a JSON string (for example,
   `do "Physics2::Remove joint" ...`); the decoded string is the instruction
@@ -1973,19 +1984,15 @@ Rules:
 - The model may not invent an instruction type.
 - Catalog instruction types never use an `@` prefix; `@` is reserved for
   structural metadata directives such as `@event` and `@instruction`.
-- Every argument remains type-checked.
+- Every argument is type-checked by `valueKind`.
+- Direct text and name/reference values use strings, numbers and booleans use
+  their native literals, and calculated text or number values use `expr(...)`.
+- Code-only parameters are omitted and synthesized by the compiler.
+- Blank stored parameter positions are omitted from migrated named source and
+  reconstructed as blank positions by the compiler.
 
-When named catalog parameters cannot reproduce the stored parameter strings or
-sub-instruction tree exactly, the canonical typed form uses `@exact`:
-
-```events
-@instruction disabled=false inverted=false awaited=false
-if @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(Score)", ">=", "100"]
-```
-
-`@instruction` is only the closed metadata annotation for the following
-instruction. `@exact` identifies the registered instruction and carries its
-catalog-validated positional strings. Neither construct accepts arbitrary JSON.
+`@instruction` remains the closed metadata annotation for the following
+instruction. It does not accept arbitrary JSON.
 
 ---
 
@@ -2269,9 +2276,6 @@ else-branch         = "else", newline,
 
 action              = "do", [ "await" ], action-expression, newline ;
 
-exact-instruction   = "@exact", "id=", string,
-                      "parameters=", string-array ;
-
 foreach-object-loop = "for", "each", object-reference,
                       [ "index=", identifier ],
                       [ "order_by=", expression ],
@@ -2344,7 +2348,6 @@ statement           = comment-statement
                     | link-statement
                     | javascript-header
                     | javascript-end
-                    | exact-instruction
                     | metadata-annotation ;
 
 comment-statement   = "@comment", string, { named-argument } ;
@@ -2367,10 +2370,18 @@ custom-expression-call = qualified-name, "(",
 
 named-argument      = identifier, "=", expression ;
 
+catalog-argument    = identifier, "=", semantic-operand ;
+
+semantic-operand    = string | number | boolean
+                    | "expr", "(", gdevelop-expression, ")" ;
+
 range               = integer, "..", integer ;
 ```
 
-The instruction catalog and expression parser define `condition-expression`, `action-expression`, and ordinary expressions.
+The instruction catalog and expression parser define `condition-expression`,
+`action-expression`, and ordinary expressions. Catalog instruction arguments
+use `catalog-argument`; structural metadata continues to use
+`named-argument`.
 
 ---
 
@@ -2441,16 +2452,16 @@ areLegacyEventsEquivalent(left, right) -> boolean
 `options.resolveInstruction` is the sole boundary to the loaded project catalog
 for conditions and actions. The core contains no built-in instruction-name,
 comparison, assignment, collision, input, timer, object, sound, scene, or
-capability aliases. Without a loaded catalog, the lossless converter emits and
-accepts typed `@exact` instructions.
+capability aliases. Compiling or formatting an instruction without a loaded
+catalog is an error.
 `options.lowerWhileLimit` supplies the catalog-aware lowering for the
 source-only `while limit=` guard. The richer project-aware result below remains
 the editor integration API to build on top of this core.
 
 `options.formatInstruction` is the reverse boundary. The multi-file storage
 adapter builds both callbacks from the saved internal serialization instruction
-catalog, so a
-generic named catalog instruction compiles and decompiles without `@exact`.
+catalog, so a generic named catalog instruction compiles and decompiles through
+its semantic signature.
 The separate AI catalog enumerates the non-deprecated authoring surface.
 Editor-hidden compatibility identifiers, instructions with deprecation
 messages, and hidden or deprecated expressions are omitted from the AI catalog
@@ -3412,7 +3423,7 @@ objects picked by successful alternatives. A compiler must not lower this to
 three sibling events, because that changes action count and picking semantics.
 
 Nested `BuiltinCommonInstructions::And`, `Or`, or `Not` instructions that
-cannot be represented by the simple `if`/`or` grouping use the typed exact
+cannot be represented by the simple `if`/`or` grouping use the typed
 catalog instruction form with instruction-depth prefixes. In particular, the
 decompiler must not expand an `Or` whose direct child is another `Or`, because
 the parser's `or` sugar intentionally flattens alternatives and would change
@@ -3423,7 +3434,7 @@ the serialized instruction tree.
 The catalog condition:
 
 ```events
-if NumberVariable variable="score" comparison_sign=">=" value="100"
+if NumberVariable variable="score" comparison_sign=">=" value=100
 ```
 
 maps directly through catalog metadata to the registered `NumberVariable`
@@ -3433,7 +3444,7 @@ comparisons use their own exact registered types.
 Similarly:
 
 ```events
-do SetNumberVariable variable="score" modification_sign="+" value="10"
+do SetNumberVariable variable="score" modification_sign="+" value=10
 ```
 
 maps directly to that registered action identifier and exact parameter order;
@@ -3452,12 +3463,12 @@ there is no universal JSON `assign` node.
 ### 32.5 Sub-instructions
 
 Catalog instructions that accept sub-instructions use instruction-depth
-prefixes. The exact fallback form is:
+prefixes:
 
 ```events
-if @exact id="BuiltinCommonInstructions::Or" parameters=[]
-  ? @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(A)", ">", "0"]
-  ? @exact id="BuiltinCommonInstructions::CompareNumbers" parameters=["Variable(B)", ">", "0"]
+if BuiltinCommonInstructions::Or
+  ? FirstNumberComparison left=expr(Variable(A)) comparison_sign=">" right=0
+  ? SecondNumberComparison left=expr(Variable(B)) comparison_sign=">" right=0
 ```
 
 Leading `?` increases instruction depth and is separate from event depth `>`.
@@ -3466,8 +3477,8 @@ instruction-depth prefix. For example, a nested event containing an OR child
 condition begins with `> if ...` and its instruction children begin with
 `> ? ...`.
 
-The canonical AI profile uses `if`/`or` and exact catalog types. The `@exact`
-form exists only for lossless fallback and advanced editing.
+The canonical profile uses `if`/`or` and named catalog types at every
+instruction depth.
 
 ---
 
@@ -3720,6 +3731,7 @@ owned by physical `functions/<Function>/` directories. Prefab and behavior
 methods are owned by physical `functions/<Function>/` directories containing
 both `function.settings` and the sibling `.events` body. Contiguous `order`
 values preserve deterministic legacy array order. Each `function.settings`
+
 `folder` array is the source of truth for editor grouping; only a transient
 legacy folder tree is reconstructed in memory.
 
@@ -3751,22 +3763,15 @@ instruction JSON fallback constructs are not part of IfDo.
 ### 35.2 Instruction completeness
 
 Every condition and action registered in the closed project catalog must be
-representable in one of two typed forms:
-
-1. Its exact catalog `type` with named, catalog-typed arguments.
-2. The exact `@exact` form using a registered instruction identifier,
-   its catalog-validated positional parameter strings, flags, and recursively
-   typed `?` sub-instructions.
-
-The exact form is still IfDo syntax: its identifier must exist in the loaded
-catalog, its condition/action kind must match its source position, parameters
-must match the registered signature, and its sub-instruction structure must be
-valid. It is not an arbitrary JSON container.
+representable by its exact catalog `type` with named, semantically typed
+arguments and recursively typed `?` sub-instructions. Its identifier must exist
+in the loaded catalog, its condition/action kind must match its source
+position, parameters must match the registered signature, and its
+sub-instruction structure must be valid.
 
 Canonical multi-file project saves use the named catalog form for every
-registered serializable instruction. `@exact` remains a lossless core/import
-form and backward-reading construct; it is not emitted when the complete
-project catalog is available.
+registered serializable instruction. If any registered instruction cannot be
+represented by that form, generation fails before project source is replaced.
 
 ### 35.3 Unsupported schema handling
 

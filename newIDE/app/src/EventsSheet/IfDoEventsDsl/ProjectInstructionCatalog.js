@@ -23,6 +23,15 @@ const fail = (code: string, message: string): empty => {
 };
 
 type CatalogKind = 'action' | 'condition';
+type CatalogValueKind =
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'object'
+  | 'behavior'
+  | 'variable'
+  | 'resource'
+  | 'name';
 type LegacyInstruction = {
   type: { value: string, inverted?: boolean, await?: boolean },
   disabled?: boolean,
@@ -37,10 +46,12 @@ type ResolveInstruction = (input: {
 type FormatInstruction = (input: {
   kind: CatalogKind,
   instruction: LegacyInstruction,
-}) => ?string;
+}) => string;
 type CatalogParameter = {
   index?: number,
   dslName: string,
+  type?: string,
+  valueKind?: CatalogValueKind,
   isOptional?: boolean,
   isCodeOnly?: boolean,
   defaultValue?: any,
@@ -66,6 +77,198 @@ type CatalogLookup = {
 };
 const DSL_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const UNQUOTED_INSTRUCTION_TYPE = /^[^@\s][^\s]*$/;
+const CATALOG_VALUE_KINDS: Set<string> = new Set([
+  'text',
+  'number',
+  'boolean',
+  'object',
+  'behavior',
+  'variable',
+  'resource',
+  'name',
+]);
+
+const isExpressionOperand = (value: any): boolean =>
+  !!(
+    value &&
+    typeof value === 'object' &&
+    value.__ifdoExpression === true &&
+    typeof value.source === 'string'
+  );
+
+const assertSemanticValue = (
+  value: any,
+  parameter: CatalogParameter,
+  label: string
+) => {
+  const valueKind = parameter.valueKind;
+  if (!valueKind) {
+    return fail(
+      'IFDO_CATALOG_VALUE_KIND_MISSING',
+      `${label} has no semantic valueKind.`
+    );
+  }
+  if (isExpressionOperand(value)) {
+    if (valueKind !== 'text' && valueKind !== 'number') {
+      fail(
+        'IFDO_EXPRESSION_NOT_ALLOWED',
+        `${label} does not accept expr(...); expected ${valueKind}.`
+      );
+    }
+    if (!value.source.trim()) {
+      fail('IFDO_EXPRESSION_INVALID', `${label} expression cannot be empty.`);
+    }
+    return;
+  }
+  const valid =
+    valueKind === 'number'
+      ? typeof value === 'number' && Number.isFinite(value)
+      : valueKind === 'boolean'
+      ? typeof value === 'boolean'
+      : typeof value === 'string';
+  if (!valid) {
+    fail(
+      'IFDO_OPERAND_TYPE_MISMATCH',
+      `${label} expects a semantic ${valueKind} value.`
+    );
+  }
+  if (
+    valueKind === 'name' &&
+    parameter.acceptedValues &&
+    Array.isArray(parameter.acceptedValues) &&
+    !parameter.acceptedValues.includes(value)
+  ) {
+    fail(
+      'IFDO_OPERAND_TYPE_MISMATCH',
+      `${label} must be one of ${parameter.acceptedValues.join(', ')}.`
+    );
+  }
+};
+
+const lowerBooleanValue = (value: boolean, parameterType: ?string): string => {
+  if (parameterType === 'yesorno') return value ? 'yes' : 'no';
+  if (parameterType === 'trueorfalse') return value ? 'True' : 'False';
+  return value ? 'true' : 'false';
+};
+
+const stringifyJsonValue = (value: any, label: string): string => {
+  const source = JSON.stringify(value);
+  if (typeof source !== 'string') {
+    return fail(
+      'IFDO_PARAMETER_UNREPRESENTABLE',
+      `${label} cannot be represented as an IfDo value.`
+    );
+  }
+  return source;
+};
+
+const lowerSemanticValue = (
+  value: any,
+  parameter: CatalogParameter,
+  label: string
+): string => {
+  assertSemanticValue(value, parameter, label);
+  if (isExpressionOperand(value)) return value.source.trim();
+  switch (parameter.valueKind) {
+    case 'text':
+      return stringifyJsonValue(value, label);
+    case 'number':
+      return String(value);
+    case 'boolean':
+      return lowerBooleanValue(value, parameter.type);
+    default:
+      return String(value);
+  }
+};
+
+const parseTextLiteralExpression = (source: string): ?string => {
+  if (!source.startsWith('"')) return null;
+  try {
+    const value = JSON.parse(source);
+    return typeof value === 'string' ? value : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const parseBooleanParameter = (
+  source: string,
+  parameterType: ?string
+): ?boolean => {
+  if (parameterType === 'yesorno') {
+    if (source === 'yes' || source === 'true') return true;
+    if (source === 'no' || source === 'false') return false;
+    return null;
+  }
+  if (parameterType === 'trueorfalse') {
+    if (source === 'True' || source === 'true') return true;
+    if (source === 'False' || source === 'false') return false;
+    return null;
+  }
+  if (source === 'true') return true;
+  if (source === 'false') return false;
+  return null;
+};
+
+const formatSemanticValue = (
+  source: string,
+  parameter: CatalogParameter,
+  label: string
+): string => {
+  switch (parameter.valueKind) {
+    case 'text': {
+      const literal = parseTextLiteralExpression(source);
+      if (literal !== null) return stringifyJsonValue(literal, label);
+      const trimmed = source.trim();
+      if (!trimmed) {
+        return fail(
+          'IFDO_PARAMETER_UNREPRESENTABLE',
+          `${label} contains an empty text expression.`
+        );
+      }
+      return `expr(${trimmed})`;
+    }
+    case 'number': {
+      const trimmed = source.trim();
+      if (
+        /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(trimmed) &&
+        Number.isFinite(Number(trimmed))
+      ) {
+        return String(Number(trimmed));
+      }
+      if (!trimmed) {
+        fail(
+          'IFDO_PARAMETER_UNREPRESENTABLE',
+          `${label} contains an empty numeric expression.`
+        );
+      }
+      return `expr(${trimmed})`;
+    }
+    case 'boolean': {
+      const value = parseBooleanParameter(source, parameter.type);
+      if (value === null) {
+        fail(
+          'IFDO_PARAMETER_UNREPRESENTABLE',
+          `${label} contains an invalid boolean value ${JSON.stringify(
+            source
+          )}.`
+        );
+      }
+      return value ? 'true' : 'false';
+    }
+    case 'object':
+    case 'behavior':
+    case 'variable':
+    case 'resource':
+    case 'name':
+      return JSON.stringify(source);
+    default:
+      return fail(
+        'IFDO_CATALOG_VALUE_KIND_INVALID',
+        `${label} has an unsupported semantic valueKind.`
+      );
+  }
+};
 
 const parseCatalogInstructionSource = (
   source: string,
@@ -101,12 +304,14 @@ const parseCatalogInstructionSource = (
       }
     }
   } else {
-    const match = /^([^@\s][^\s]*)(?:\s+(.*))?$/.exec(source);
+    const match = /^([^@\s][^\s]*)(?:\s+([\s\S]*))?$/.exec(source);
     if (match) return { type: match[1], argumentsSource: match[2] || '' };
   }
   throw new ProjectInstructionCatalogError(
     'IFDO_CATALOG_INSTRUCTION_REQUIRED',
-    `Line ${line}: expected InstructionType with named arguments.`
+    `Line ${line}: expected InstructionType with named arguments, got ${JSON.stringify(
+      source
+    )}.`
   );
 };
 
@@ -116,7 +321,10 @@ const entriesForKind = (
 ): Array<CatalogEntry> =>
   kind === 'condition' ? catalog.conditions : catalog.actions;
 
-const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
+const validateCatalogEntry = (
+  entry: any,
+  kind: 'action' | 'condition' | 'expression'
+) => {
   if (
     !entry ||
     typeof entry !== 'object' ||
@@ -148,6 +356,35 @@ const validateCatalogEntry = (entry: any, kind: CatalogKind) => {
         'IFDO_CATALOG_INVALID',
         `${kind} ${entry.type} repeats dslName ${parameter.dslName}.`
       );
+    if (parameter.isCodeOnly) {
+      if (parameter.valueKind !== undefined) {
+        fail(
+          'IFDO_CATALOG_VALUE_KIND_INVALID',
+          `${kind} ${entry.type}.${
+            parameter.dslName
+          } is code-only and must not declare valueKind.`
+        );
+      }
+    } else {
+      if (
+        typeof parameter.valueKind !== 'string' ||
+        !CATALOG_VALUE_KINDS.has(parameter.valueKind)
+      ) {
+        fail(
+          'IFDO_CATALOG_VALUE_KIND_MISSING',
+          `${kind} ${entry.type}.${
+            parameter.dslName
+          } has no supported valueKind.`
+        );
+      }
+      if (parameter.defaultValue !== undefined) {
+        assertSemanticValue(
+          parameter.defaultValue,
+          parameter,
+          `${kind} ${entry.type}.${parameter.dslName} default`
+        );
+      }
+    }
     names.add(parameter.dslName);
   });
 };
@@ -157,12 +394,23 @@ export const validateProjectInstructionCatalog = (catalog: any): Catalog => {
     !catalog ||
     typeof catalog !== 'object' ||
     catalog.format !== 'gdevelop-ifdo-instruction-catalog' ||
-    catalog.formatVersion !== 1 ||
     !Array.isArray(catalog.actions) ||
     !Array.isArray(catalog.conditions) ||
     !Array.isArray(catalog.expressions)
   )
     fail('IFDO_CATALOG_INVALID', 'Unsupported instruction catalog format.');
+  if (catalog.formatVersion !== 2) {
+    fail(
+      'IFDO_CATALOG_VERSION_UNSUPPORTED',
+      'Unsupported instruction catalog version; expected version 2.'
+    );
+  }
+  if (catalog.authoring !== undefined) {
+    fail(
+      'IFDO_CATALOG_INVALID',
+      'Instruction catalog version 2 must not contain authoring prose.'
+    );
+  }
   const kinds: Array<CatalogKind> = ['action', 'condition'];
   kinds.forEach(kind => {
     const seen: Set<string> = new Set();
@@ -175,6 +423,18 @@ export const validateProjectInstructionCatalog = (catalog: any): Catalog => {
         );
       seen.add(entry.type);
     });
+  });
+  const expressionKeys = new Set<string>();
+  catalog.expressions.forEach(entry => {
+    validateCatalogEntry(entry, 'expression');
+    const key = `${entry.type}\u0000${String(entry.returnType)}`;
+    if (expressionKeys.has(key)) {
+      fail(
+        'IFDO_CATALOG_INVALID',
+        `Duplicate expression catalog type ${entry.type}.`
+      );
+    }
+    expressionKeys.add(key);
   });
   return (catalog: Catalog);
 };
@@ -227,33 +487,26 @@ export const createCatalogInstructionResolver = (
           'IFDO_CATALOG_UNKNOWN_PARAMETER',
           `Line ${line}: ${kind} ${type} has no parameter ${name}.`
         );
-      if (typeof argumentsByName[name] !== 'string')
+      const parameter = entry.parameters.find(
+        candidate => candidate.dslName === name
+      );
+      if (parameter && parameter.isCodeOnly) {
         fail(
-          'IFDO_CATALOG_PARAMETER_STRING_REQUIRED',
-          `Line ${line}: ${kind} ${type}.${name} must be a JSON string containing the serialized operand.`
+          'IFDO_OPERAND_TYPE_MISMATCH',
+          `Line ${line}: ${kind} ${type}.${name} is code-only and must be omitted.`
         );
+      }
     });
     const parameters: Array<string> = entry.parameters.map(parameter => {
       const argument = argumentsByName[parameter.dslName];
       if (argument !== undefined) {
-        if (typeof argument !== 'string')
-          throw new ProjectInstructionCatalogError(
-            'IFDO_CATALOG_PARAMETER_STRING_REQUIRED',
-            `Line ${line}: ${kind} ${type}.${
-              parameter.dslName
-            } must be a JSON string containing the serialized operand.`
-          );
-        return argument;
+        return lowerSemanticValue(
+          argument,
+          parameter,
+          `Line ${line}: ${kind} ${type}.${parameter.dslName}`
+        );
       }
-      if (parameter.isCodeOnly) return '';
-      if (parameter.isOptional)
-        return parameter.defaultValue === undefined
-          ? ''
-          : String(parameter.defaultValue);
-      throw new ProjectInstructionCatalogError(
-        'IFDO_CATALOG_MISSING_PARAMETER',
-        `Line ${line}: ${kind} ${type} requires ${parameter.dslName}.`
-      );
+      return '';
     });
     return {
       type: { value: type, inverted: false, await: false },
@@ -275,26 +528,341 @@ export const createCatalogInstructionFormatter = (
   }: {
     kind: CatalogKind,
     instruction: LegacyInstruction,
-  }): ?string => {
+  }): string => {
     const entry = lookup[kind].get(instruction.type.value);
     const instructionParameters = instruction.parameters || [];
-    if (!entry || entry.parameters.length !== instructionParameters.length)
-      return null;
+    if (!entry) {
+      return fail(
+        'IFDO_CATALOG_UNKNOWN_INSTRUCTION',
+        `${kind} ${
+          instruction.type.value
+        } is not in the project instruction catalog.`
+      );
+    }
+    if (instructionParameters.length > entry.parameters.length) {
+      fail(
+        'IFDO_PARAMETER_UNREPRESENTABLE',
+        `${kind} ${instruction.type.value} has ${
+          instructionParameters.length
+        } parameters but its catalog signature has ${entry.parameters.length}.`
+      );
+    }
+    const normalizedInstructionParameters = entry.parameters.map(
+      (_parameter, index) =>
+        index < instructionParameters.length ? instructionParameters[index] : ''
+    );
     const operands = entry.parameters
       .map((parameter, index) => ({
         parameter,
-        value: instructionParameters[index],
+        value: normalizedInstructionParameters[index],
       }))
-      .filter(({ parameter, value }) => !(parameter.isCodeOnly && value === ''))
-      .map(
-        ({ parameter, value }) =>
-          `${parameter.dslName}=${JSON.stringify(value)}`
-      );
+      .filter(({ parameter, value }) => {
+        if (parameter.isCodeOnly) {
+          return false;
+        }
+        return value !== '';
+      })
+      .map(({ parameter, value }) => {
+        const semanticValue = formatSemanticValue(
+          value,
+          parameter,
+          `${kind} ${entry.type}.${parameter.dslName}`
+        );
+        return `${parameter.dslName}=${semanticValue}`;
+      });
     const formattedType = UNQUOTED_INSTRUCTION_TYPE.test(entry.type)
       ? entry.type
-      : JSON.stringify(entry.type);
+      : stringifyJsonValue(entry.type, `${kind} instruction type`);
     return `${formattedType}${operands.length ? ` ${operands.join(' ')}` : ''}`;
   };
+};
+
+export const getCatalogCodeOnlyParameterIndicesByType = (
+  catalogInput: any
+): { [string]: Array<number> } => {
+  const catalog = validateProjectInstructionCatalog(catalogInput);
+  const indicesByType = {};
+  [...catalog.actions, ...catalog.conditions].forEach(entry => {
+    entry.parameters.forEach((parameter, index) => {
+      if (!parameter.isCodeOnly) return;
+      const indices = indicesByType[entry.type] || [];
+      if (!indices.includes(index)) indices.push(index);
+      indicesByType[entry.type] = indices;
+    });
+  });
+  return indicesByType;
+};
+
+export const normalizeLegacyProjectInstructionParameters = (
+  legacyProject: Object,
+  catalogInput: any
+): Object => {
+  const catalog = validateProjectInstructionCatalog(catalogInput);
+  const lookup = createLookup(catalog);
+  const normalizeExpressionSource = (source: string): string => {
+    let inString = false;
+    let escaped = false;
+    return source
+      .trim()
+      .replace(/\r\n?/g, '\n')
+      .split('\n')
+      .map(line => {
+        const normalizedLine = inString ? line : line.trimStart();
+        for (let index = 0; index < normalizedLine.length; index++) {
+          const character = normalizedLine[index];
+          if (inString) {
+            if (escaped) escaped = false;
+            else if (character === '\\') escaped = true;
+            else if (character === '"') inString = false;
+          } else if (character === '"') {
+            inString = true;
+          }
+        }
+        return inString ? normalizedLine : normalizedLine.trimEnd();
+      })
+      .join('\n');
+  };
+  const normalizeParameterSource = (
+    source: string,
+    parameter: CatalogParameter
+  ): string => {
+    if (!source) return '';
+    if (parameter.valueKind === 'text') {
+      const literal = parseTextLiteralExpression(source);
+      return literal !== null
+        ? stringifyJsonValue(literal, parameter.dslName)
+        : normalizeExpressionSource(source);
+    }
+    if (parameter.valueKind === 'number') {
+      const normalized = normalizeExpressionSource(source);
+      if (
+        /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(normalized) &&
+        Number.isFinite(Number(normalized))
+      ) {
+        return String(Number(normalized));
+      }
+      return normalized;
+    }
+    if (parameter.valueKind === 'boolean') {
+      const value = parseBooleanParameter(source, parameter.type);
+      return value === null ? '' : lowerBooleanValue(value, parameter.type);
+    }
+    if (
+      parameter.acceptedValues &&
+      Array.isArray(parameter.acceptedValues) &&
+      !parameter.acceptedValues.includes(source)
+    ) {
+      return '';
+    }
+    return source;
+  };
+  const canRepresentParameterSource = (
+    source: string,
+    parameter: CatalogParameter
+  ): boolean => {
+    if (!source) return true;
+    if (parameter.valueKind === 'boolean') {
+      return parseBooleanParameter(source, parameter.type) !== null;
+    }
+    return !(
+      parameter.acceptedValues &&
+      Array.isArray(parameter.acceptedValues) &&
+      !parameter.acceptedValues.includes(source)
+    );
+  };
+  const getOmittedParameterSource = (parameter: CatalogParameter): string => {
+    if (parameter.defaultValue !== undefined) {
+      if (parameter.valueKind === 'text') {
+        return stringifyJsonValue(parameter.defaultValue, parameter.dslName);
+      }
+      if (parameter.valueKind === 'boolean') {
+        return lowerBooleanValue(parameter.defaultValue, parameter.type);
+      }
+      return String(parameter.defaultValue);
+    }
+    if (
+      parameter.acceptedValues &&
+      Array.isArray(parameter.acceptedValues) &&
+      parameter.acceptedValues.length
+    ) {
+      return String(parameter.acceptedValues[0]);
+    }
+    return '';
+  };
+  const cloneValue = (value: any, instructionKind: ?CatalogKind): any => {
+    if (Array.isArray(value)) {
+      return value.map(item => cloneValue(item, instructionKind));
+    }
+    if (!value || typeof value !== 'object') return value;
+    const clone = {};
+    Object.keys(value).forEach(key => {
+      const childInstructionKind =
+        key === 'actions'
+          ? 'action'
+          : key === 'conditions'
+          ? 'condition'
+          : key === 'whileConditions'
+          ? 'condition'
+          : key === 'subInstructions'
+          ? instructionKind
+          : null;
+      clone[key] = cloneValue(value[key], childInstructionKind);
+    });
+    if (
+      instructionKind &&
+      clone.type &&
+      typeof clone.type === 'object' &&
+      typeof clone.type.value === 'string' &&
+      Array.isArray(clone.parameters)
+    ) {
+      const entry = lookup[instructionKind].get(clone.type.value);
+      if (entry) {
+        const sourceParameters = clone.parameters;
+        let sourceIndex = 0;
+        clone.parameters = entry.parameters.map((parameter, index) => {
+          const source =
+            sourceIndex < sourceParameters.length
+              ? sourceParameters[sourceIndex]
+              : '';
+          if (parameter.isCodeOnly) {
+            if (sourceIndex < sourceParameters.length) sourceIndex++;
+            return '';
+          }
+          const hasLaterValueParameter = entry.parameters
+            .slice(index + 1)
+            .some(candidate => !candidate.isCodeOnly);
+          if (
+            source &&
+            !canRepresentParameterSource(source, parameter) &&
+            hasLaterValueParameter
+          ) {
+            return getOmittedParameterSource(parameter);
+          }
+          if (sourceIndex < sourceParameters.length) sourceIndex++;
+          return normalizeParameterSource(source, parameter);
+        });
+      }
+    }
+    return clone;
+  };
+  return cloneValue(legacyProject, null);
+};
+
+export const buildLegacyInstructionCatalogDelta = (
+  catalogInput: any,
+  legacyProject: Object
+): Object => {
+  const catalog = validateProjectInstructionCatalog(catalogInput);
+  const lookup = createLookup(catalog);
+  const sourcesByKindAndType: {
+    action: Map<string, Array<Array<string>>>,
+    condition: Map<string, Array<Array<string>>>,
+  } = {
+    action: new Map(),
+    condition: new Map(),
+  };
+  const collectInstruction = (value: any, kind: CatalogKind) => {
+    if (
+      !value ||
+      typeof value !== 'object' ||
+      !value.type ||
+      typeof value.type !== 'object' ||
+      typeof value.type.value !== 'string' ||
+      !Array.isArray(value.parameters) ||
+      lookup[kind].has(value.type.value)
+    ) {
+      return;
+    }
+    const sourcesByIndex =
+      sourcesByKindAndType[kind].get(value.type.value) || [];
+    value.parameters.forEach((source, index) => {
+      if (!sourcesByIndex[index]) sourcesByIndex[index] = [];
+      sourcesByIndex[index].push(String(source));
+    });
+    sourcesByKindAndType[kind].set(value.type.value, sourcesByIndex);
+  };
+  const visit = (value: any, instructionKind: ?CatalogKind) => {
+    if (Array.isArray(value)) {
+      value.forEach(item => visit(item, instructionKind));
+      return;
+    }
+    if (!value || typeof value !== 'object') return;
+    if (instructionKind) collectInstruction(value, instructionKind);
+    Object.keys(value).forEach(key => {
+      const childInstructionKind =
+        key === 'actions'
+          ? 'action'
+          : key === 'conditions' || key === 'whileConditions'
+          ? 'condition'
+          : key === 'subInstructions'
+          ? instructionKind
+          : null;
+      visit(value[key], childInstructionKind);
+    });
+  };
+  visit(legacyProject, null);
+
+  const inferParameter = (
+    sources: Array<string>,
+    index: number
+  ): CatalogParameter => {
+    const nonEmptySources = sources.filter(source => source !== '');
+    let type = 'identifier';
+    let valueKind: CatalogValueKind = 'name';
+    if (
+      nonEmptySources.length &&
+      nonEmptySources.some(
+        source => parseTextLiteralExpression(source) !== null
+      )
+    ) {
+      type = 'string';
+      valueKind = 'text';
+    } else if (
+      nonEmptySources.length &&
+      nonEmptySources.every(source =>
+        ['yes', 'no', 'true', 'false', 'True', 'False'].includes(source)
+      )
+    ) {
+      type = nonEmptySources.some(source => ['True', 'False'].includes(source))
+        ? 'trueorfalse'
+        : 'yesorno';
+      valueKind = 'boolean';
+    } else if (
+      nonEmptySources.some(
+        source =>
+          /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(source.trim()) ||
+          /[()[\]{}]/.test(source)
+      )
+    ) {
+      type = 'expression';
+      valueKind = 'number';
+    }
+    return {
+      dslName: `parameter_${index}`,
+      type,
+      valueKind,
+    };
+  };
+  const buildEntries = (kind: CatalogKind): Array<CatalogEntry> =>
+    Array.from(sourcesByKindAndType[kind].entries())
+      .map(([type, sourcesByIndex]) => ({
+        type,
+        parameters: sourcesByIndex.map(inferParameter),
+      }))
+      .sort((left, right) => left.type.localeCompare(right.type));
+  const actions = buildEntries('action');
+  const conditions = buildEntries('condition');
+  return validateProjectInstructionCatalog({
+    ...catalog,
+    counts: {
+      actions: actions.length,
+      conditions: conditions.length,
+      expressions: 0,
+    },
+    actions,
+    conditions,
+    expressions: [],
+  });
 };
 
 export const buildProjectInstructionCatalog = (
@@ -358,16 +926,6 @@ export const buildProjectDeprecatedInstructionCatalog = (
   );
   return validateProjectInstructionCatalog({
     ...completeCatalog,
-    authoring: {
-      ...completeCatalog.authoring,
-      preferredSyntax:
-        'Compatibility metadata for reading and minimally editing existing deprecated instructions only.',
-      rules: [
-        'Never use this catalog to construct new events.',
-        'Use .gdevelop/instructions-catalog.json for all newly authored instructions.',
-        'Entries here may only preserve or minimally edit deprecated instructions already present in legacy project event code.',
-      ],
-    },
     counts: {
       actions: actions.length,
       conditions: conditions.length,
@@ -394,7 +952,7 @@ export const mergeProjectInstructionCatalogs = (
     additionalEntries: Array<Object>,
     getKey: Object => string
   ): Array<Object> => {
-    const entriesByKey = new Map();
+    const entriesByKey: Map<string, Object> = new Map();
     [...primaryEntries, ...additionalEntries].forEach(entry => {
       const key = getKey(entry);
       if (!entriesByKey.has(key)) entriesByKey.set(key, entry);

@@ -212,6 +212,98 @@ describe('GDevelop multi-file project format', () => {
     expect(getLegacyProjectFirstDifferenceDescription(left, left)).toBeNull();
   });
 
+  test('treats omitted and empty trailing instruction parameters as equivalent', () => {
+    const withOmittedParameters = {
+      ...projectFixture,
+      layouts: [
+        {
+          ...projectFixture.layouts[0],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [
+                {
+                  type: { value: 'CollisionNP' },
+                  parameters: ['Player', 'Platform', ''],
+                },
+              ],
+              actions: [],
+            },
+          ],
+        },
+      ],
+    };
+    const withEmptyParameters = {
+      ...withOmittedParameters,
+      layouts: [
+        {
+          ...withOmittedParameters.layouts[0],
+          events: [
+            {
+              ...withOmittedParameters.layouts[0].events[0],
+              conditions: [
+                {
+                  ...withOmittedParameters.layouts[0].events[0].conditions[0],
+                  parameters: ['Player', 'Platform', '', '', ''],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(
+      getLegacyProjectFirstDifferenceDescription(
+        withOmittedParameters,
+        withEmptyParameters
+      )
+    ).toBeNull();
+  });
+
+  test('ignores configured code-only instruction parameters during verification', () => {
+    const withRuntimeData = {
+      ...projectFixture,
+      layouts: [
+        {
+          ...projectFixture.layouts[0],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: { value: 'Extension::Action' },
+                  parameters: ['Object', 'stale runtime data', 'Value'],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const withoutRuntimeData = JSON.parse(JSON.stringify(withRuntimeData));
+    withoutRuntimeData.layouts[0].events[0].actions[0].parameters[1] = '';
+
+    expect(
+      getLegacyProjectFirstDifferenceDescription(
+        withRuntimeData,
+        withoutRuntimeData
+      )
+    ).not.toBeNull();
+    expect(
+      getLegacyProjectFirstDifferenceDescription(
+        withRuntimeData,
+        withoutRuntimeData,
+        {
+          instructionParameterIndicesToIgnoreByType: {
+            'Extension::Action': [1],
+          },
+        }
+      )
+    ).toBeNull();
+  });
+
   test('round-trips every component kind through settings/layout TOML and IfDo', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture, {
       migration: {
@@ -228,7 +320,7 @@ describe('GDevelop multi-file project format', () => {
       `combinedSettingsFormatVersion = ${MULTI_FILE_FORMAT_VERSION}`
     );
     expect(files[MULTI_FILE_ENTRY_URI]).toContain('variables = [ ]');
-    expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "2.0"');
+    expect(files[MULTI_FILE_ENTRY_URI]).toContain('eventsDslVersion = "3.0"');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('sceneFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('extensionFiles');
     expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('externalSettings');
@@ -432,7 +524,7 @@ settings = "game://extensions/Combat/behaviors/Health/behavior.settings"
   test('rejects a project that declares an obsolete events DSL grammar', () => {
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files[MULTI_FILE_ENTRY_URI] = files[MULTI_FILE_ENTRY_URI].replace(
-      'eventsDslVersion = "2.0"',
+      'eventsDslVersion = "3.0"',
       'eventsDslVersion = "1.3"'
     );
 

@@ -22,6 +22,14 @@ import {
 import {
   PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  buildLegacyInstructionCatalogDelta,
+  buildProjectDeprecatedInstructionCatalog,
+  buildProjectInstructionCatalog,
+  createCatalogInstructionFormatter,
+  createCatalogInstructionResolver,
+  getCatalogCodeOnlyParameterIndicesByType,
+  mergeProjectInstructionCatalogs,
+  normalizeLegacyProjectInstructionParameters,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import {
   generateEventsFunctionExtensionMetadata,
@@ -39,6 +47,108 @@ import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationT
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
+
+const eventsFunctionCodeWriter: EventsFunctionCodeWriter = {
+  getIncludeFileFor: (functionName: string) => `${functionName}.js`,
+  writeFunctionCode: async () => {},
+  writeBehaviorCode: async () => {},
+  writeObjectCode: async () => {},
+};
+const catalogI18n = ({
+  _: value =>
+    typeof value === 'string' ? value : value.id || value.message || '',
+}: any);
+
+const generateProjectAdditionalExtensions = (
+  project: gdProject
+): Array<gdPlatformExtension> => {
+  const additionalExtensions = [];
+  for (
+    let index = 0;
+    index < project.getEventsFunctionsExtensionsCount();
+    index++
+  ) {
+    additionalExtensions.push(
+      generateEventsFunctionExtensionMetadata(
+        project,
+        project.getEventsFunctionsExtensionAt(index),
+        { eventsFunctionCodeWriter, i18n: catalogI18n }
+      )
+    );
+  }
+  return additionalExtensions;
+};
+
+type MigrationInstructionCatalogs = {|
+  authoringCatalog: Object,
+  deprecatedCatalog: Object,
+  serializationCatalog: Object,
+|};
+
+const buildMigrationInstructionCatalogs = (
+  legacyProject: Object
+): MigrationInstructionCatalogs => {
+  const project = gd.ProjectHelper.createNewGDJSProject();
+  const additionalExtensions: Array<gdPlatformExtension> = [];
+  try {
+    unserializeFromJSObject(project, legacyProject);
+    additionalExtensions.push(...generateProjectAdditionalExtensions(project));
+    const authoringCatalog = buildProjectInstructionCatalog(
+      project,
+      catalogI18n,
+      additionalExtensions
+    );
+    const baseDeprecatedCatalog = buildProjectDeprecatedInstructionCatalog(
+      project,
+      catalogI18n,
+      authoringCatalog,
+      additionalExtensions
+    );
+    const baseSerializationCatalog = mergeProjectInstructionCatalogs(
+      authoringCatalog,
+      baseDeprecatedCatalog
+    );
+    const deprecatedCatalog = mergeProjectInstructionCatalogs(
+      baseDeprecatedCatalog,
+      buildLegacyInstructionCatalogDelta(
+        baseSerializationCatalog,
+        legacyProject
+      )
+    );
+    return {
+      authoringCatalog,
+      deprecatedCatalog,
+      serializationCatalog: mergeProjectInstructionCatalogs(
+        authoringCatalog,
+        deprecatedCatalog
+      ),
+    };
+  } finally {
+    additionalExtensions.forEach(extension => extension.delete());
+    project.delete();
+  }
+};
+
+const writeMigrationProjectSourceCatalogs = async (
+  legacyProject: Object,
+  projectRoot: string,
+  catalogs: MigrationInstructionCatalogs
+): Promise<void> => {
+  const project = gd.ProjectHelper.createNewGDJSProject();
+  const additionalExtensions: Array<gdPlatformExtension> = [];
+  try {
+    unserializeFromJSObject(project, legacyProject);
+    additionalExtensions.push(...generateProjectAdditionalExtensions(project));
+    await writeProjectSourceCatalogs(project, projectRoot, {
+      additionalExtensions,
+      instructionCatalog: catalogs.authoringCatalog,
+      deprecatedInstructionCatalog: catalogs.deprecatedCatalog,
+    });
+  } finally {
+    additionalExtensions.forEach(extension => extension.delete());
+    project.delete();
+  }
+};
 
 const bootstrapProjectSourceCatalogs = async (
   projectFile: string
@@ -69,32 +179,12 @@ const bootstrapProjectSourceCatalogs = async (
   });
   const catalogProject = gd.ProjectHelper.createNewGDJSProject();
   const additionalExtensions: Array<gdPlatformExtension> = [];
-  const eventsFunctionCodeWriter: EventsFunctionCodeWriter = {
-    getIncludeFileFor: (functionName: string) => `${functionName}.js`,
-    writeFunctionCode: async () => {},
-    writeBehaviorCode: async () => {},
-    writeObjectCode: async () => {},
-  };
-  const i18n = ({
-    _: value =>
-      typeof value === 'string' ? value : value.id || value.message || '',
-  }: any);
 
   try {
     unserializeFromJSObject(catalogProject, catalogSource);
-    for (
-      let index = 0;
-      index < catalogProject.getEventsFunctionsExtensionsCount();
-      index++
-    ) {
-      additionalExtensions.push(
-        generateEventsFunctionExtensionMetadata(
-          catalogProject,
-          catalogProject.getEventsFunctionsExtensionAt(index),
-          { eventsFunctionCodeWriter, i18n }
-        )
-      );
-    }
+    additionalExtensions.push(
+      ...generateProjectAdditionalExtensions(catalogProject)
+    );
     await writeProjectSourceCatalogs(catalogProject, projectRoot, {
       additionalExtensions,
     });
@@ -219,7 +309,17 @@ export const onOpen = (
             },
           };
         }
-        const content = normalizeLegacyProjectWithCurrentSerializer(object);
+        const serializedContent = normalizeLegacyProjectWithCurrentSerializer(
+          object
+        );
+        const instructionCatalogs = buildMigrationInstructionCatalogs(
+          serializedContent
+        );
+        const instructionCatalog = instructionCatalogs.serializationCatalog;
+        const content = normalizeLegacyProjectInstructionParameters(
+          serializedContent,
+          instructionCatalog
+        );
         const constants = await readConstantsSource(projectPath);
         const migration = await migrateLegacyProject({
           legacyPath: filePath,
@@ -228,7 +328,29 @@ export const onOpen = (
             ...content,
             constants,
           },
+          decomposeOptions: {
+            instructionParameterIndicesToIgnoreByType: getCatalogCodeOnlyParameterIndicesByType(
+              instructionCatalog
+            ),
+            eventsDslOptions: {
+              formatInstruction: createCatalogInstructionFormatter(
+                instructionCatalog
+              ),
+            },
+          },
+          composeOptions: {
+            compileOptions: {
+              resolveInstruction: createCatalogInstructionResolver(
+                instructionCatalog
+              ),
+            },
+          },
         });
+        await writeMigrationProjectSourceCatalogs(
+          content,
+          projectPath,
+          instructionCatalogs
+        );
         const lastModifiedDate = await getLocalProjectLastModifiedDate(
           migration.entryPath
         );

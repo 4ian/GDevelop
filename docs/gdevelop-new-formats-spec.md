@@ -4,6 +4,7 @@
 
 **Status:** Version 1.0 implemented format contract
 **Entry file:** `project.gdevelop`
+
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
 **Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
@@ -818,7 +819,7 @@ TOML-compatible Constants object.
 
 ```toml
 combinedSettingsFormatVersion = 1
-eventsDslVersion = "2.0"
+eventsDslVersion = "3.0"
 kind = "project"
 settingsFormatVersion = 2
 firstLayout = "Main"
@@ -943,7 +944,7 @@ other owned source. The normal project-save transaction also writes
   is not part of the combined settings merge.
 - `project.gdevelop` must not contain global objects in canonical output.
   Each global object owns one flat root object settings file.
-- Root `eventsDslVersion` must equal `"2.0"`. Earlier DSL grammars are
+- Root `eventsDslVersion` must equal `"3.0"`. Earlier DSL grammars are
   intentionally rejected rather than rewritten during multi-file loading;
   legacy JSON import always emits the current grammar.
 - Scene and extension order are contiguous zero-based `order` values owned by
@@ -1636,10 +1637,10 @@ project.gdevelop
 
 | New source                                                                 | Legacy destination                                                                                                          |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `project.gdevelop` ordinary payload                                        | Project root excluding resources, constants, global object definitions, and four split arrays                             |
+| `project.gdevelop` ordinary payload                                        | Project root excluding resources, constants, global object definitions, and four split arrays                               |
 | Flat root `objects/*.settings`                                             | Project root `objects[]`; each `folder` array produces only the transient editor folder tree                                |
 | `resources.settings` local root                                            | Project root `resources` object after removing format-only markers                                                          |
-| `constants.toml` direct root                                             | Editor-only Constants object without adding or removing user keys                                                         |
+| `constants.toml` direct root                                               | Editor-only Constants object without adding or removing user keys                                                           |
 | Each scene `scene.settings` + flat object settings + `.layout` + `.events` | One `layouts[]` item, merging scene settings, object definitions/grouping, visual/editor layout data, and compiled `events` |
 | `external.settings` event entry + external `.events`                       | One `externalEvents[]` item; `linkedScene` becomes `associatedLayout`                                                       |
 | `external.settings` layout entry + external `.layout`                      | One `externalLayouts[]` item; `linkedScene` becomes `associatedLayout`                                                      |
@@ -1768,7 +1769,7 @@ unrelated extensions, or `project.gdevelop`.
 | Project properties, global object groups, and global variables                                        | `project.gdevelop`                                               |
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
-| Editor-only Constants                                                                               | `constants.toml`                                               |
+| Editor-only Constants                                                                                 | `constants.toml`                                                 |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
 | A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
 | Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
@@ -1833,8 +1834,9 @@ The writer:
    warnings. No JavaScript executes during validation.
 8. Regenerates `.gdevelop/deprecated-instructions-catalog.json` alongside the
    normal instruction catalog. It stores only deprecated/hidden compatibility
-   entries. Serialization and loading merge both catalogs in memory for
-   lossless legacy conversion. AI authoring uses only the filtered
+   entries plus inferred semantic signatures for removed instructions found in
+   an imported project. Serialization and loading merge both catalogs in memory
+   for lossless legacy conversion. AI authoring uses only the filtered
    `.gdevelop/instructions-catalog.json`; the deprecated catalog may be read
    only to understand or minimally edit deprecated instructions already found
    in a legacy project, never to construct new events.
@@ -1845,12 +1847,18 @@ The writer:
 The generated authoring and deprecated compatibility catalogs share one
 named-instruction contract.
 Every instruction uses its exact catalog type and each parameter's exact
-`dslName`; values are JSON strings containing the serialized operand. The DSL
-does not hardcode instruction aliases. This lets an AI edit `.events` directly without MCP
-instruction-discovery or event-writing tools. The loader merges the two
-instruction catalogs to resolve all existing named forms. Missing,
-invalid, or stale catalog entries produce diagnostics rather than guessed
-positional arrays.
+`dslName`; catalog format version 2 assigns every non-code-only parameter a
+semantic `valueKind`. Direct strings represent text and names/references,
+numbers and booleans use native literals, and calculated text or numbers use
+`expr(...)`. Code-only parameters are omitted. The generated catalog contains
+project-specific data only, with no embedded authoring or encoding prose. The
+DSL does not hardcode instruction aliases. This lets an AI edit `.events`
+directly without MCP instruction-discovery or event-writing tools. The loader
+merges the two instruction catalogs to resolve all existing named forms.
+Blank migrated operands are omitted and reconstructed as blank positions.
+Missing current entries produce diagnostics; removed imported instructions are
+isolated to deterministic inferred signatures in the deprecated catalog rather
+than guessed positional source arrays.
 
 AI integrations treat the project files as the authoring API. MCP exposure is
 limited to editor-state queries and preview/runtime debugging; it does not

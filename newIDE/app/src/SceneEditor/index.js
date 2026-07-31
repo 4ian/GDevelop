@@ -46,6 +46,8 @@ import {
   redoComposite,
 } from '../Utils/History';
 import { diffInstancesSnapshots } from '../Utils/InstancesSnapshotDiff';
+import './UndoRedoFlash.css';
+
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
@@ -111,6 +113,28 @@ import { type LastSelectionType } from './EditorsDisplay.flow';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
 
 const gd: libGDevelop = global.gd;
+
+// How the attributes of a serialized instance (as found in the history
+// snapshots) map to the field ids of the compact instance properties editor
+// (see `CompactInstancePropertiesSchema.js`).
+const serializedInstanceKeyToPropertyFieldId: { [string]: string } = {
+  x: 'X',
+  y: 'Y',
+  z: 'Z',
+  angle: 'Angle',
+  rotationX: 'Rotation X',
+  rotationY: 'Rotation Y',
+  zOrder: 'Z Order',
+  layer: 'Layer',
+  width: 'Width',
+  height: 'Height',
+  depth: 'Depth',
+  // Toggling the custom size is seen in the size fields.
+  customSize: 'Width',
+  customDepth: 'Depth',
+  hidden: 'Hide instance',
+  locked: 'Lock instance',
+};
 
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -601,7 +625,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           history: saveCompositeToHistory(
             this.state.history,
             this._getHistoryTargets(),
-            'DELETE'
+            'DELETE',
+            { source: 'canvas' }
           ),
         },
         () => {
@@ -1296,7 +1321,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._hasPendingModificationsToSave = false;
     return saveCompositeToHistory(
       this.state.history,
-      this._getHistoryTargets()
+      this._getHistoryTargets(),
+      undefined,
+      { source: 'panel' }
     );
   };
 
@@ -1317,6 +1344,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     // that are deleted (or re-created) when the history is applied.
     this.instancesSelection.clearSelection();
     const valueBeforeChange = history.currentValue;
+    const undoneActionChangeContext =
+      history.previousActions[history.previousActions.length - 1]
+        .changeContext || null;
     const newHistory = undoComposite(
       history,
       this._getHistoryTargets(),
@@ -1365,7 +1395,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._sendHotReloadAllInstances();
         this._sendHotReloadLayers();
 
-        this._revealHistoryChanges(valueBeforeChange, newHistory.currentValue);
+        this._revealHistoryChanges(
+          valueBeforeChange,
+          newHistory.currentValue,
+          undoneActionChangeContext
+        );
       }
     );
   };
@@ -1387,6 +1421,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     // that are deleted (or re-created) when the history is applied.
     this.instancesSelection.clearSelection();
     const valueBeforeChange = history.currentValue;
+    const undoneActionChangeContext =
+      history.futureActions[history.futureActions.length - 1].changeContext ||
+      null;
     const newHistory = redoComposite(
       history,
       this._getHistoryTargets(),
@@ -1435,7 +1472,11 @@ export default class SceneEditor extends React.Component<Props, State> {
         this._sendHotReloadAllInstances();
         this._sendHotReloadLayers();
 
-        this._revealHistoryChanges(valueBeforeChange, newHistory.currentValue);
+        this._revealHistoryChanges(
+          valueBeforeChange,
+          newHistory.currentValue,
+          undoneActionChangeContext
+        );
       }
     );
   };
@@ -1574,7 +1615,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveCompositeToHistory(
           this.state.history,
           this._getHistoryTargets(),
-          'ADD'
+          'ADD',
+          { source: 'canvas' }
         ),
       },
       () => this.updateToolbar()
@@ -1688,7 +1730,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveCompositeToHistory(
           this.state.history,
           this._getHistoryTargets(),
-          'EDIT'
+          'EDIT',
+          { source: 'canvas' }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1702,7 +1745,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveCompositeToHistory(
           this.state.history,
           this._getHistoryTargets(),
-          'EDIT'
+          'EDIT',
+          { source: 'canvas' }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1716,7 +1760,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveCompositeToHistory(
           this.state.history,
           this._getHistoryTargets(),
-          'EDIT'
+          'EDIT',
+          { source: 'canvas' }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1756,7 +1801,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       history: saveCompositeToHistory(
         this.state.history,
-        this._getHistoryTargets()
+        this._getHistoryTargets(),
+        undefined,
+        { source: 'panel' }
       ),
     });
   }, 500): any);
@@ -2017,7 +2064,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               history: saveCompositeToHistory(
                 this.state.history,
                 this._getHistoryTargets(),
-                'DELETE'
+                'DELETE',
+                { source: 'panel' }
               ),
             });
           }
@@ -2042,7 +2090,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       history: saveCompositeToHistory(
         this.state.history,
-        this._getHistoryTargets()
+        this._getHistoryTargets(),
+        undefined,
+        { source: 'panel' }
       ),
     });
     this.forceUpdatePropertiesEditor();
@@ -2098,7 +2148,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       history: saveCompositeToHistory(
         this.state.history,
-        this._getHistoryTargets()
+        this._getHistoryTargets(),
+        undefined,
+        { source: 'panel' }
       ),
     });
 
@@ -2525,7 +2577,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveCompositeToHistory(
           this.state.history,
           this._getHistoryTargets(),
-          'DELETE'
+          'DELETE',
+          { source: 'canvas' }
         ),
       },
       () => {
@@ -3283,6 +3336,80 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   /**
+   * After an undo/redo touching instances, briefly highlight the rows of
+   * the properties panel showing the values it changed.
+   */
+  _flashChangedInstancePropertyRows = (
+    instancesBeforeChange: ?Array<Object>,
+    instancesAfterChange: ?Array<Object>,
+    changedOrAddedPersistentUuids: Array<string>,
+    changeContext: ?{ source: 'canvas' | 'panel' }
+  ) => {
+    if (changedOrAddedPersistentUuids.length === 0) return;
+    const containerElement = this._containerElement;
+    if (!containerElement) return;
+
+    const byUuid = (instances: ?Array<Object>) =>
+      new Map(
+        (instances || [])
+          .filter(instance => instance.persistentUuid)
+          .map(instance => [instance.persistentUuid, instance])
+      );
+    const instancesByUuidBeforeChange = byUuid(instancesBeforeChange);
+    const instancesByUuidAfterChange = byUuid(instancesAfterChange);
+
+    const changedFieldIds = new Set<string>();
+    changedOrAddedPersistentUuids.forEach(persistentUuid => {
+      const beforeInstance = instancesByUuidBeforeChange.get(persistentUuid);
+      const afterInstance = instancesByUuidAfterChange.get(persistentUuid);
+      // Only flash edited instances: an instance appearing or disappearing
+      // (undo/redo of an addition or deletion) is seen on the canvas, and
+      // flashing all its rows would be noise.
+      if (!beforeInstance || !afterInstance) return;
+      new Set([
+        ...Object.keys(beforeInstance),
+        ...Object.keys(afterInstance),
+      ]).forEach(key => {
+        if (
+          JSON.stringify(beforeInstance[key]) !==
+          JSON.stringify(afterInstance[key])
+        ) {
+          const fieldId = serializedInstanceKeyToPropertyFieldId[key];
+          if (fieldId) changedFieldIds.add(fieldId);
+        }
+      });
+    });
+    if (changedFieldIds.size === 0) return;
+
+    // A change made from a panel is only visible there: open the
+    // properties panel to show it. A change made on the canvas is already
+    // visible: don't open the panel (but still flash if it is open).
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    if (changeContext && changeContext.source === 'panel') {
+      editorDisplay.ensureEditorVisible('properties');
+    } else if (!editorDisplay.isEditorVisible('properties')) {
+      return;
+    }
+
+    // Wait for the properties panel to (re-)render with the new values
+    // before flashing its rows.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        changedFieldIds.forEach(fieldId => {
+          // Field ids can contain spaces: use an attribute selector.
+          const element = containerElement.querySelector(`[id="${fieldId}"]`);
+          if (!element) return;
+          element.classList.remove('undo-redo-property-flash');
+          // Force a reflow so re-adding the class restarts the animation.
+          void element.offsetWidth;
+          element.classList.add('undo-redo-property-flash');
+        });
+      });
+    });
+  };
+
+  /**
    * After an undo/redo, make sure its effect can be seen - otherwise the
    * undo/redo feels like it did nothing:
    * - a change on state only shown in a panel (layers, scene properties)
@@ -3291,7 +3418,8 @@ export default class SceneEditor extends React.Component<Props, State> {
    */
   _revealHistoryChanges = (
     valueBeforeChange: ?Object,
-    valueAfterChange: ?Object
+    valueAfterChange: ?Object,
+    changeContext: ?{ source: 'canvas' | 'panel' }
   ) => {
     const { editorDisplay } = this;
     if (!editorDisplay) return;
@@ -3318,6 +3446,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       changedOrAddedPersistentUuids,
       removedInstances,
     } = diffInstancesSnapshots(beforeChange.instances, afterChange.instances);
+
+    this._flashChangedInstancePropertyRows(
+      beforeChange.instances,
+      afterChange.instances,
+      changedOrAddedPersistentUuids,
+      changeContext
+    );
 
     const changedInstances = changedOrAddedPersistentUuids
       .map(persistentUuid =>
@@ -3572,7 +3707,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         this.setState({
                           history: saveCompositeToHistory(
                             this.state.history,
-                            this._getHistoryTargets()
+                            this._getHistoryTargets(),
+                            undefined,
+                            { source: 'panel' }
                           ),
                         }),
                     }}
@@ -3911,7 +4048,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                         this.setState({
                           history: saveCompositeToHistory(
                             this.state.history,
-                            this._getHistoryTargets()
+                            this._getHistoryTargets(),
+                            undefined,
+                            { source: 'panel' }
                           ),
                         });
                         this.openSceneProperties(false);

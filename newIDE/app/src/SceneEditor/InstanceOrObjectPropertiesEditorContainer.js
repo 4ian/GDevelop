@@ -69,6 +69,7 @@ type Props = {|
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: (objectName: string) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onScenePropertiesModified?: () => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
   tileMapTileSelection: ?TileMapTileSelection,
@@ -158,6 +159,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       instances,
       editObjectInPropertiesPanel,
       onInstancesModified,
+      onScenePropertiesModified,
       onGetInstanceSize,
       editInstanceVariables,
       tileMapTileSelection,
@@ -308,6 +310,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             i18n={i18n}
             onBackgroundColorChanged={onBackgroundColorChanged}
             openSceneVariables={openSceneVariables}
+            onScenePropertiesModified={onScenePropertiesModified}
           />
         ) : null}
       </Paper>

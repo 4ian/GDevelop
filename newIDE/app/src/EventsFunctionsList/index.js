@@ -61,6 +61,7 @@ import {
   type GameplayTestProps,
   type GameplayTestCallbacks,
 } from './GameplayTestTreeViewItemContent';
+import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -994,6 +995,7 @@ const EventsFunctionsList = React.forwardRef<
           name,
           testsContainer.getTestsCount()
         );
+        newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
         if (unsavedChanges) {
           unsavedChanges.triggerUnsavedChanges();
         }

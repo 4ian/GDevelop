@@ -27,6 +27,12 @@ namespace gdjs {
       speedFactor?: number;
       /** Maximum number of screenshots kept. Default: 5. */
       maxScreenshots?: number;
+      /**
+       * When true, the game is left paused and muted when the test finishes,
+       * instead of resuming. Used when the game only exists to run tests
+       * (the editor gameplay test frame), so the last frame stays visible.
+       */
+      freezeWhenFinished?: boolean;
     };
 
     export type GameplayTestAssertion = {
@@ -244,6 +250,10 @@ namespace gdjs {
       _pointerLockRequestedByGame: boolean = false;
       _onProgress: ((frame: integer) => void) | null = null;
       _lastProgressTimeMs: number = 0;
+      /** Rejects the promise raced against the test script, so a stop
+       * interrupts the script even when it awaits something else than the
+       * harness (a timer, a fetch...). */
+      _rejectOnStop: ((error: Error) => void) | null = null;
       /** How to notify the input manager of the end of a stepped frame.
        * Replaced when the game main loop's own call is neutralized. */
       _callOnFrameEnded: () => void;
@@ -281,6 +291,21 @@ namespace gdjs {
           );
         }
         return currentScene;
+      }
+
+      /**
+       * Request the test to stop as soon as possible: the next stepped frame
+       * throws, and any pending `await` of the script is interrupted (see
+       * `_rejectOnStop`).
+       */
+      requestStop(): void {
+        this._stopped = true;
+        if (this._rejectOnStop) {
+          this._rejectOnStop(
+            new GameplayTestStoppedError('The test was stopped.')
+          );
+          this._rejectOnStop = null;
+        }
       }
 
       private _checkGuards(): void {
@@ -1421,7 +1446,7 @@ namespace gdjs {
      */
     export const stopCurrentGameplayTest = (): void => {
       if (currentlyRunningHarness) {
-        currentlyRunningHarness._stopped = true;
+        currentlyRunningHarness.requestStop();
       }
     };
 
@@ -1545,13 +1570,23 @@ namespace gdjs {
             harness._timeoutMs + 1000
           );
         });
+        // A stop rejects this promise, interrupting the script even when
+        // it awaits something else than the harness (a timer, a fetch...).
+        const stopSignal = new Promise<never>((_, reject) => {
+          harness._rejectOnStop = reject;
+        });
+        // Report the test as started (frame 0): a test can legitimately
+        // spend time without stepping any frame.
+        if (harness._onProgress) harness._onProgress(0);
         try {
           await Promise.race([
             scriptFunction(harness, scriptConsole),
             watchdog,
+            stopSignal,
           ]);
         } finally {
           if (watchdogTimeoutId) clearTimeout(watchdogTimeoutId);
+          harness._rejectOnStop = null;
         }
 
         const hasFailedAssertion = harness._assertions.some(
@@ -1561,7 +1596,10 @@ namespace gdjs {
           hasFailedAssertion ? 'failed' : 'passed',
           []
         );
-      } catch (error: any) {
+      } catch (error) {
+        // (No type annotation on `error`: this file must stay parseable by
+        // the older TypeScript bundled in the Monaco editor, which reads it
+        // to provide autocompletions in the test editor.)
         if (error && error.isGameplayTestAssertionError) {
           result = harness._makeResult('failed', [String(error.message)]);
         } else if (error && error.isGameplayTestStoppedError) {
@@ -1587,7 +1625,18 @@ namespace gdjs {
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
-        runtimeGame.pause(wasPaused);
+        if (payload.freezeWhenFinished) {
+          // Keep the game paused (the main loop keeps rendering the last
+          // frame) and muted, so it can stay visible without playing.
+          runtimeGame.pause(true);
+          try {
+            runtimeGame.getSoundManager().setGlobalVolume(0);
+          } catch (error) {
+            // Ignore errors while muting the game.
+          }
+        } else {
+          runtimeGame.pause(wasPaused);
+        }
         currentlyRunningHarness = null;
       }
 

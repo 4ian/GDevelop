@@ -342,6 +342,9 @@ export const GameplayTestFrame = ({
     ) => {
       setPreviewIndexHtmlLocation(newPreviewIndexHtmlLocation);
       setIsMinimized(false);
+      // Don't show the status of a previous run when the frame is closed
+      // then shown again.
+      if (!newPreviewIndexHtmlLocation) setRunStatus(null);
     };
     onSetGameplayTestFrameRunStatus = setRunStatus;
     return () => {
@@ -375,12 +378,27 @@ export const GameplayTestFrame = ({
 
   if (!previewIndexHtmlLocation) return null;
 
+  const isInProgress = runStatus
+    ? isGameplayTestStatusInProgress(runStatus.status)
+    : false;
+
   return (
     <GameplayTestFrameLayout
       runStatus={runStatus}
       isMinimized={isMinimized}
       onToggleMinimized={() => setIsMinimized(!isMinimized)}
-      onStopRequested={onStopRequested}
+      onStopRequested={() => {
+        if (isInProgress) {
+          // Stop the test (and the whole run) - the frame stays open,
+          // showing the outcome.
+          onStopRequested();
+        } else {
+          // The run is finished: the button closes the frame, unloading
+          // the game running in it.
+          setPreviewIndexHtmlLocation('');
+          setRunStatus(null);
+        }
+      }}
     >
       <iframe
         ref={iframeRef}

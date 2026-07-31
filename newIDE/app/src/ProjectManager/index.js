@@ -73,6 +73,7 @@ import {
   type GameplayTestTreeViewItemProps,
   type GameplayTestTreeViewItemCallbacks,
 } from './GameplayTestTreeViewItemContent';
+import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -811,6 +812,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
           project.getTests().hasTestNamed(name)
         );
         const newTest = project.getTests().insertNewTest(newName, index + 1);
+        newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
         onProjectItemModified();
 
         const gameplayTestItemId = getGameplayTestTreeViewItemId(newTest);

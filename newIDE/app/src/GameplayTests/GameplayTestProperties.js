@@ -149,7 +149,7 @@ export const GameplayTestProperties = ({
   }, []);
 
   const status: GameplayTestDisplayStatus = isRunning
-    ? runningFrame
+    ? runningFrame != null
       ? 'running'
       : 'launching'
     : lastResult
@@ -230,7 +230,7 @@ export const GameplayTestProperties = ({
                   <LinearProgress variant="indeterminate" />
                 </Line>
                 <Text noMargin size="body-small" color="secondary">
-                  {runningFrame ? (
+                  {runningFrame != null ? (
                     <Trans>Playing the game - frame {runningFrame}</Trans>
                   ) : (
                     <Trans>Starting the game...</Trans>

@@ -78,12 +78,22 @@ let nextRunMessageId = 1;
 // at a time: subsequent calls are queued.
 let lastRunPromise: Promise<mixed> = Promise.resolve();
 
-const makeErrorResult = (
+// The stop controller of the batch being currently run, allowing to stop
+// it even when the game is not started yet (still exporting or booting)
+// or between two tests.
+type BatchStopController = {|
+  stopRequested: boolean,
+  abortBootWait: () => void,
+|};
+let currentBatchStopController: BatchStopController | null = null;
+
+const makeResultWithoutRun = (
   testName: string,
+  status: 'error' | 'stopped',
   errorMessage: string
 ): GameplayTestResult => ({
   testName,
-  status: 'error',
+  status,
   framesExecuted: 0,
   durationMs: 0,
   gameTimeMs: 0,
@@ -95,6 +105,18 @@ const makeErrorResult = (
   screenshots: [],
   performance: null,
 });
+
+const makeErrorResult = (
+  testName: string,
+  errorMessage: string
+): GameplayTestResult => makeResultWithoutRun(testName, 'error', errorMessage);
+
+const makeStoppedResult = (testName: string): GameplayTestResult =>
+  makeResultWithoutRun(
+    testName,
+    'stopped',
+    'The test was not run because the run was stopped.'
+  );
 
 /**
  * Get the tests container for a scope ('project' or an extension name),
@@ -134,7 +156,8 @@ export const updateTestLastRun = (
  * it with `getStatus` until it answers.
  */
 const waitForGameToBeReady = async (
-  previewDebuggerServer: PreviewDebuggerServer
+  previewDebuggerServer: PreviewDebuggerServer,
+  stopController: BatchStopController
 ): Promise<void> => {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
@@ -156,6 +179,17 @@ const waitForGameToBeReady = async (
         },
       }
     );
+
+    // Allow a stop to interrupt the wait (the game may take a long time
+    // to export and boot).
+    stopController.abortBootWait = () => {
+      if (pollIntervalId !== null) clearInterval(pollIntervalId);
+      unregisterCallbacks();
+      const error = new Error('The gameplay test run was stopped.');
+      // $FlowFixMe[prop-missing] - tag the error so the runner knows this is a stop, not a failure.
+      error.isStopRequested = true;
+      reject(error);
+    };
 
     pollIntervalId = setInterval(() => {
       if (Date.now() - startTime > GAME_READY_TIMEOUT_MS) {
@@ -252,6 +286,9 @@ const runSingleTest = async ({
       testName: test.testName,
       source,
       timeoutMs,
+      // The game in the gameplay test frame only exists to run tests: leave
+      // it paused and muted when the test finishes, showing the last frame.
+      freezeWhenFinished: true,
     };
     if (speedFactor) payload.speedFactor = speedFactor;
     if (screenshots === 'off') payload.maxScreenshots = 0;
@@ -289,6 +326,17 @@ export const runGameplayTests = async ({
     async (): Promise<Array<GameplayTestResult>> => {
       const results: Array<GameplayTestResult> = [];
       const timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
+      const stopController: BatchStopController = {
+        stopRequested: false,
+        abortBootWait: () => {},
+      };
+      currentBatchStopController = stopController;
+      let anyTestRan = false;
+
+      // Close any frame left open by a previous run, so the new preview
+      // always loads in a fresh frame (and a stale game can never answer
+      // in place of the new one).
+      clearGameplayTestFramePreview();
 
       // Resolve the sources of the tests first, so an unknown test does not
       // interrupt the batch in the middle.
@@ -368,7 +416,7 @@ export const runGameplayTests = async ({
           }: any)
         );
 
-        await waitForGameToBeReady(previewDebuggerServer);
+        await waitForGameToBeReady(previewDebuggerServer, stopController);
 
         for (
           let testIndex = 0;
@@ -376,6 +424,11 @@ export const runGameplayTests = async ({
           testIndex++
         ) {
           const { test, source, error } = testsWithSources[testIndex];
+          if (stopController.stopRequested) {
+            // The run was stopped: don't run the remaining tests.
+            results.push(makeStoppedResult(test.testName));
+            continue;
+          }
           if (error !== null || source === null) {
             results.push(
               makeErrorResult(test.testName, error || 'No source found.')
@@ -384,6 +437,7 @@ export const runGameplayTests = async ({
           }
 
           if (options.onTestStarted) options.onTestStarted(test);
+          anyTestRan = true;
           const frameRunStatus: GameplayTestFrameRunStatus = {
             testName: test.testName,
             status: 'launching',
@@ -420,18 +474,31 @@ export const runGameplayTests = async ({
           results.push(result);
         }
       } catch (error) {
-        const errorMessage =
-          'Unable to run the gameplay tests: ' +
-          (error.message || String(error));
-        console.error('[GameplayTestRunner] ' + errorMessage, error);
-        // Fill the results of the tests that could not be run.
-        for (const { test } of testsWithSources.slice(results.length)) {
-          results.push(makeErrorResult(test.testName, errorMessage));
+        if (error.isStopRequested) {
+          // The run was stopped while the game was still exporting or
+          // booting: mark the tests that could not be run as stopped.
+          for (const { test } of testsWithSources.slice(results.length)) {
+            results.push(makeStoppedResult(test.testName));
+          }
+        } else {
+          const errorMessage =
+            'Unable to run the gameplay tests: ' +
+            (error.message || String(error));
+          console.error('[GameplayTestRunner] ' + errorMessage, error);
+          // Fill the results of the tests that could not be run.
+          for (const { test } of testsWithSources.slice(results.length)) {
+            results.push(makeErrorResult(test.testName, errorMessage));
+          }
         }
       } finally {
-        // The run is finished (or was stopped): close the frame, unloading
-        // the game running in it.
-        clearGameplayTestFramePreview();
+        currentBatchStopController = null;
+        // When at least one test ran, the frame stays open (showing the
+        // frozen game and the outcome of the run) until its close button
+        // is used or another run starts. Otherwise (the game could not
+        // boot, or the run was stopped before the first test), close it.
+        if (!anyTestRan) {
+          clearGameplayTestFramePreview();
+        }
       }
 
       return results;
@@ -445,11 +512,17 @@ export const runGameplayTests = async ({
 };
 
 /**
- * Ask the game to stop the gameplay test being currently run, if any.
+ * Stop the gameplay test run being currently run, if any: the test being
+ * run in the game is interrupted, the remaining tests of the batch are not
+ * run, and a run still exporting or booting the game is aborted.
  */
 export const stopRunningGameplayTest = (
   previewDebuggerServer: PreviewDebuggerServer
 ): void => {
+  if (currentBatchStopController) {
+    currentBatchStopController.stopRequested = true;
+    currentBatchStopController.abortBootWait();
+  }
   previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
     command: 'gameplayTest.stop',
   });

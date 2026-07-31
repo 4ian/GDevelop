@@ -115,6 +115,7 @@ export const setupAutocompletions = (monaco: any) => {
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
     const inGameEditorPath = path.join(runtimePath, 'InGameEditor');
+    const gameplayTestsPath = path.join(runtimePath, 'gameplay-tests');
     const threeTypesPath = path.join(runtimeTypesPath, 'three');
     const pixiTypesPath = path.join(runtimeTypesPath, 'pixi');
 
@@ -126,6 +127,7 @@ export const setupAutocompletions = (monaco: any) => {
     importAllJsFilesFromFolder(runtimeFontfaceobserverFontManagerPath);
     importAllJsFilesFromFolder(eventToolsPath);
     importAllJsFilesFromFolder(inGameEditorPath);
+    importAllJsFilesFromFolder(gameplayTestsPath);
     importAllJsFilesFromFolderRecursively(threeTypesPath);
     importAllJsFilesFromFolderRecursively(pixiTypesPath);
 
@@ -169,6 +171,19 @@ var objects = [];
 var eventsFunctionContext = {};
 `,
       'this-mock-the-context-of-events.js'
+    );
+
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      `
+/**
+ * The harness driving the game in a gameplay test: step frames, simulate
+ * the player inputs and inspect the objects of the scene.
+ * (Only defined in gameplay test scripts.)
+ * @type {gdjs.gameplayTests.GameplayTestHarness}
+ */
+var harness;
+`,
+      'this-mock-the-context-of-gameplay-tests.js'
     );
   });
 };

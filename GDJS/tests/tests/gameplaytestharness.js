@@ -131,6 +131,50 @@ describe('gdjs.gameplayTests', () => {
     expect(result.framesExecuted).to.be(50);
   });
 
+  it('can be stopped while the script awaits something else than the harness', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const resultPromise = runTestScript(
+      runtimeGame,
+      `
+      console.log('Before the long wait');
+      await new Promise((resolve) => setTimeout(resolve, 60 * 1000));
+      console.log('This must never be logged');
+      `,
+      { timeoutMs: 120 * 1000 }
+    );
+
+    // Let the script start and reach its `await`.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    gdjs.gameplayTests.stopCurrentGameplayTest();
+
+    const result = await resultPromise;
+    expect(result.status).to.be('stopped');
+    expect(
+      result.consoleLogs.some(
+        (log) => log.message.indexOf('Before the long wait') !== -1
+      )
+    ).to.be(true);
+    expect(
+      result.consoleLogs.some(
+        (log) => log.message.indexOf('never be logged') !== -1
+      )
+    ).to.be(false);
+  });
+
+  it('leaves the game paused when freezeWhenFinished is set', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      `,
+      { freezeWhenFinished: true }
+    );
+
+    expect(result.status).to.be('passed');
+    expect(runtimeGame.isPaused()).to.be(true);
+  });
+
   it('supports scene changes, spawning objects and reading them back', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

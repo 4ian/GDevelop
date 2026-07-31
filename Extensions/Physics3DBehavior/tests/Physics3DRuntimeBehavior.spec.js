@@ -99,5 +99,35 @@ describe('Physics3DRuntimeBehavior', () => {
       expect(normalized.layers).to.be(17);
       expect(normalized.masks).to.be(17);
     });
+
+    [
+      { bodyType: 'Dynamic', layers: 1, expectedLayers: 17 },
+      { bodyType: 'Kinematic', layers: 1, expectedLayers: 17 },
+      { bodyType: 'Static', layers: 16, expectedLayers: 17 },
+    ].forEach(({ bodyType, layers, expectedLayers }) => {
+      it(`repairs ${bodyType} layers that only select the other body-type group`, () => {
+        const normalized = gdjs.normalizePhysics3DBehaviorData({
+          name: 'Physics3D',
+          bodyType,
+          layers,
+          masks: 17,
+        });
+
+        expect(normalized.layers).to.be(expectedLayers);
+        expect(normalized.invalidFields).to.contain('layers');
+      });
+    });
+
+    it('preserves an explicit zero layer bitfield', () => {
+      const normalized = gdjs.normalizePhysics3DBehaviorData({
+        name: 'Physics3D',
+        bodyType: 'Dynamic',
+        layers: 0,
+        masks: 17,
+      });
+
+      expect(normalized.layers).to.be(0);
+      expect(normalized.invalidFields).not.to.contain('layers');
+    });
   });
 });

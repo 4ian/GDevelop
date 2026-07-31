@@ -406,10 +406,6 @@ const RESOURCE_PARAMETER_TYPES = new Set([
   'musicfile',
 ]);
 
-// Describe, in one line, how to write a literal value for a parameter type in
-// event JSON. Used in metadata output and validation suggestions so callers stop
-// guessing which parameters need embedded quotes.
-
 // Default behavior NAMES for built-in capability behaviors, so a `behavior`
 // parameter whose extraInfo names one of these types can hint what to fill.
 const CAPABILITY_BEHAVIOR_DEFAULT_NAMES = {
@@ -1917,6 +1913,54 @@ const getUniqueInstructionParameterNames = (metadata: any): Array<string> => {
   });
 };
 
+const getCatalogParameterValueKind = (parameter: Object): string => {
+  if (parameter.type === 'yesorno' || parameter.type === 'trueorfalse') {
+    return 'boolean';
+  }
+  const valueType = parameter.valueType || {};
+  if (valueType.isObject) return 'object';
+  if (valueType.isBehavior) return 'behavior';
+  if (valueType.isVariable) return 'variable';
+  if (valueType.isResource) return 'resource';
+  if (valueType.isNumber) return 'number';
+  if (valueType.isString) return 'text';
+  return 'name';
+};
+
+const getSemanticCatalogDefaultValue = (
+  defaultValue: any,
+  valueKind: string,
+  parameterType: string
+): any => {
+  if (defaultValue === undefined) return undefined;
+  const source = String(defaultValue);
+  if (valueKind === 'text') {
+    try {
+      const value = JSON.parse(source);
+      if (typeof value === 'string') return value;
+    } catch (error) {
+      // Selector metadata often stores its literal default without expression
+      // quotes. Catalog version 2 normalizes it to the semantic string value.
+    }
+    return source;
+  }
+  if (valueKind === 'number') {
+    const value = Number(source);
+    if (Number.isFinite(value)) return value;
+    throw new Error(
+      `Cannot convert default value for number parameter type ${parameterType}.`
+    );
+  }
+  if (valueKind === 'boolean') {
+    if (['yes', 'true', 'True'].includes(source)) return true;
+    if (['no', 'false', 'False'].includes(source)) return false;
+    throw new Error(
+      `Cannot convert default value for boolean parameter type ${parameterType}.`
+    );
+  }
+  return source;
+};
+
 const catalogParameters = (parameters: Array<Object>): Array<Object> =>
   parameters.map(parameter => {
     const catalogParameter: Object = {
@@ -1927,9 +1971,18 @@ const catalogParameters = (parameters: Array<Object>): Array<Object> =>
     if (description) catalogParameter.description = description;
     if (parameter.isOptional) catalogParameter.isOptional = true;
     if (parameter.isCodeOnly) catalogParameter.isCodeOnly = true;
-    if (parameter.defaultValue !== undefined)
-      catalogParameter.defaultValue = parameter.defaultValue;
-    if (parameter.acceptedValues)
+    if (!parameter.isCodeOnly) {
+      const valueKind = getCatalogParameterValueKind(parameter);
+      catalogParameter.valueKind = valueKind;
+      if (parameter.defaultValue !== undefined) {
+        catalogParameter.defaultValue = getSemanticCatalogDefaultValue(
+          parameter.defaultValue,
+          valueKind,
+          parameter.type
+        );
+      }
+    }
+    if (parameter.acceptedValues && catalogParameter.valueKind !== 'boolean')
       catalogParameter.acceptedValues = parameter.acceptedValues;
     if (parameter.extraInfo) catalogParameter.extraInfo = parameter.extraInfo;
     if (parameter.hint) catalogParameter.hint = parameter.hint;
@@ -2094,40 +2147,10 @@ export const buildCompleteProjectInstructionCatalog = ({
 
   return {
     format: 'gdevelop-ifdo-instruction-catalog',
-    formatVersion: 1,
+    formatVersion: 2,
     project: {
       name: project.getName(),
       uuid: project.getProjectUuid(),
-    },
-    authoring: {
-      sourceExtension: '.events',
-      preferredSyntax:
-        'Use the exact instruction type and named parameters from this catalog. The DSL does not define hardcoded instruction aliases.',
-      catalogConditionSyntax:
-        'if InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)',
-      catalogActionSyntax:
-        'do InstructionType dslName="exact serialized operand" (JSON-quote the exact type when it contains whitespace)',
-      eventScopes: {
-        scene: 'Scene and external events',
-        extensionFunction: 'Free extension function events',
-        behaviorFunction: 'Events-based behavior function events',
-        objectFunction: 'Events-based object function events',
-        asyncFunction: 'Asynchronous function events',
-        customObjectInternal: 'Custom object internal events',
-      },
-      rules: [
-        'Write catalog instruction types directly without an @ prefix.',
-        'Write an exact instruction type containing whitespace as a JSON string.',
-        'Use each parameter dslName exactly as listed.',
-        'Catalog-form argument values are JSON strings containing the exact GDevelop serialized operand.',
-        'Include every required parameter. Code-only parameters may be omitted and compile to an empty string.',
-        'Keep parameter expressions inside the JSON string, including embedded quotes where required.',
-        'Use only entries compatible with the target event scope.',
-        'Never write @exact. Use only instruction and expression types represented by this catalog.',
-        includeDeprecatedAndHidden
-          ? 'This internal catalog is lossless serialization metadata and is not an AI authoring catalog.'
-          : 'Editor-hidden or deprecated instructions and expressions are intentionally excluded and must not be authored.',
-      ],
     },
     counts: {
       actions: actions.length,

@@ -280,8 +280,8 @@ objectGroups = { }
 
 ```events
 @event aiGeneratedEventId="take-damage"
-if NumberObjectVariable object="Object" variable="HP" comparison_sign=">" value="0"
-do SetNumberObjectVariable object="Object" variable="HP" modification_sign="-" value="Amount"
+if NumberObjectVariable object="Object" variable="HP" comparison_sign=">" value=0
+do SetNumberObjectVariable object="Object" variable="HP" modification_sign="-" value=expr(Amount)
 ```
 
 The object and behavior parameters identify one caller instance. Do not remove

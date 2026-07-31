@@ -225,11 +225,11 @@ describe('Local multi-file project storage', () => {
     const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
     files['game://scenes/Main/Main.events'] =
-      '@event\ndo Network::Send url="\\"https://example.com\\"" runtime=""\n';
+      '@event\ndo Network::Send url="https://example.com"\n';
     await writeMultiFileSourceTree({ entryPath, files });
     const catalog = {
       format: 'gdevelop-ifdo-instruction-catalog',
-      formatVersion: 1,
+      formatVersion: 2,
       actions: [
         {
           kind: 'action',
@@ -237,6 +237,8 @@ describe('Local multi-file project storage', () => {
           parameters: [
             {
               dslName: 'url',
+              type: 'string',
+              valueKind: 'text',
               isOptional: false,
               isCodeOnly: false,
             },
@@ -1040,9 +1042,13 @@ describe('Local multi-file project storage', () => {
         )
       )
     ).toBe(false);
-    expect(JSON.parse(fs.readFileSync(catalogPath, 'utf8')).counts).toEqual(
-      catalog.counts
-    );
+    const serializedCatalog = fs.readFileSync(catalogPath, 'utf8');
+    const parsedCatalog = JSON.parse(serializedCatalog);
+    expect(parsedCatalog.formatVersion).toBe(2);
+    expect(parsedCatalog.authoring).toBeUndefined();
+    expect(serializedCatalog).not.toContain('serialized operand');
+    expect(serializedCatalog).not.toContain('embedded quotes');
+    expect(parsedCatalog.counts).toEqual(catalog.counts);
     expect(catalog.counts.actions).toBeGreaterThan(100);
     expect(catalog.counts.conditions).toBeGreaterThan(100);
     expect(catalog.counts.expressions).toBeGreaterThan(100);
@@ -1331,6 +1337,67 @@ column2 = "333"
 `);
     expect(fs.readFileSync(entryPath, 'utf8')).toBe(originalEntrySource);
     project.delete();
+  });
+
+  test('saves a platformer collision with its optional boolean default omitted', async () => {
+    const gd: libGDevelop = global.gd;
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const legacyProject = JSON.parse(JSON.stringify(projectFixture));
+    legacyProject.properties.name = 'Platformer collision regression';
+    legacyProject.properties.platforms = [{ name: 'GDevelop JS platform' }];
+    legacyProject.properties.currentPlatform = 'GDevelop JS platform';
+    legacyProject.layouts[0].objects = [
+      { name: 'Player', type: 'Sprite', behaviors: [] },
+      { name: 'Platform', type: 'Sprite', behaviors: [] },
+    ];
+    legacyProject.layouts[0].events = [
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'CollisionNP' },
+            parameters: ['Player', 'Platform', ''],
+          },
+        ],
+        actions: [],
+      },
+    ];
+    try {
+      unserializeFromJSObject(project, legacyProject);
+      await onSaveProject(
+        project,
+        ({
+          fileIdentifier: entryPath,
+          name: project.getName(),
+          gameId: project.getProjectUuid(),
+          lastModifiedDate: 0,
+        }: any),
+        undefined,
+        {
+          showAlert: jest.fn(),
+          showConfirmation: jest.fn(),
+        }
+      );
+
+      const eventsSource = fs.readFileSync(
+        path.join(temporaryDirectory, 'scenes/Main/Main.events'),
+        'utf8'
+      );
+      expect(eventsSource).toContain(
+        'if CollisionNP first_object="Player" second_object="Platform"'
+      );
+      expect(eventsSource).not.toContain(
+        'ignore_objects_that_are_touching_each_other'
+      );
+      const reopened = await openMultiFileProject(entryPath);
+      expect(reopened.layouts[0].events[0].conditions[0]).toMatchObject({
+        type: { value: 'CollisionNP' },
+        parameters: ['Player', 'Platform', '', '', ''],
+      });
+    } finally {
+      project.delete();
+    }
   });
 
   test('saves and reopens the Physics2 template instruction whose type contains whitespace', async () => {

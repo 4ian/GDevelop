@@ -374,24 +374,22 @@ for (var i = 0, len = objects.length; i < len; ++i) {
 
 ### Object picking and single-instance consumption
 
-This branch adds stricter behavior, but its exact scope matters:
+Picked object lists keep classic GDevelop runtime behavior:
 
 - Scalar object/behavior expressions, object-variable access, and object
-  pointers use the first picked instance only after generated helpers in
-  `GDJS/Runtime/gd.ts` assert that the relevant concrete lists contain at most
-  one instance in total.
-- Editor and MCP validation do not inspect object-picking cardinality or require
-  a picking condition/`For each` structure. Object-picking behavior therefore
-  stays compatible with classic GDevelop authoring.
+  pointers use the first picked instance when evaluated outside a current
+  object loop.
+- Runtime, editor, and MCP validation do not reject a picked list because it
+  contains multiple instances.
 - Conditions may consume multi-instance candidate lists because filtering them
   is their job.
 - Normal object/behavior actions still intentionally iterate all picked
   instances. They are not globally converted into single-target operations.
 
-Event authors should narrow scalar targets with picking conditions such as
-`Pick random` or `Pick nearest`, or use `For each object` when every instance
-needs an isolated selection context. A singleton assertion violation throws at
-runtime rather than silently choosing the first candidate.
+Event authors can narrow scalar targets with picking conditions such as `Pick
+random` or `Pick nearest`, or use `For each object` when every instance needs
+an isolated selection context. Without that narrowing, scalar consumers use
+the first picked instance.
 
 `GDJS/GDJS/Events/CodeGeneration/EventsCodeGenerator.cpp`, `GDJS/Runtime/gd.ts`,
 and
@@ -920,7 +918,8 @@ reconciliation; structural changes can still require a scene/game reload.
 4. **Scopes come from `ProjectScopedContainers`.** Do not reconstruct partial
    scope rules ad hoc in a UI component or code generator.
 5. **Picking is inherited list state.** Conditions narrow, subevents inherit,
-   actions iterate, and scalar/single-target consumers may assert cardinality.
+   actions iterate, and scalar/single-target consumers use the first picked
+   instance outside a current-object loop.
 6. **WASM wrappers have manual ownership.** Delete owned temporaries, never
    borrowed children, and do not outlive parents.
 7. **Project compatibility is read-time normalization.** Keep old-key fallbacks
@@ -1007,8 +1006,8 @@ Consider a scene event: “when `Player` is on the floor, set its Y position to
    `gdjs::EventsCodeGenerator` creates a picked `Player` array, emits a
    filtering loop for the floor condition, then emits an action loop calling
    `setY(100)` for every remaining picked player. If the event instead evaluated
-   scalar `Player.X()` outside a current-object loop, generated code would first
-   require at most one picked instance.
+   scalar `Player.X()` outside a current-object loop, generated code would read
+   the first picked instance.
 6. **Runtime projection.** `ExporterHelper` resolves Constants, strips editor
    content, computes used resources, writes generated scene/extension code, and
    produces `data.js` with `gdjs.projectData` and runtime options.

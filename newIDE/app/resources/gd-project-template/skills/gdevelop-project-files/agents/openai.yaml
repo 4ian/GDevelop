@@ -1,4 +1,4 @@
 interface:
   display_name: "GDevelop Project Files"
-  short_description: "Build GDevelop games and convert 3D assets"
-  default_prompt: "Use $gdevelop-project-files to edit and verify this GDevelop project or run the bundled Blender scripts for glTF/GLB conversion jobs."
+  short_description: "Build and test GDevelop games and 3D assets"
+  default_prompt: "Use $gdevelop-project-files to edit, test, and verify this GDevelop project with its bundled templates and conversion scripts."

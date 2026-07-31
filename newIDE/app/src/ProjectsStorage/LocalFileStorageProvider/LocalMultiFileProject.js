@@ -707,10 +707,14 @@ export const migrateLegacyProject = async ({
   legacyPath,
   legacySource,
   legacyProject,
+  decomposeOptions,
+  composeOptions,
 }: {
   legacyPath: string,
   legacySource: string,
   legacyProject: Object,
+  decomposeOptions?: Object,
+  composeOptions?: Object,
 }): Promise<{| entryPath: string, files: { [string]: string } |}> => {
   requireFileSystem();
   const entryPath = path.join(path.dirname(legacyPath), MULTI_FILE_ENTRY_NAME);
@@ -721,11 +725,22 @@ export const migrateLegacyProject = async ({
       importedAt: new Date().toISOString(),
       importerVersion: 1,
     },
+    ...(decomposeOptions || {}),
   });
-  const verificationProject = composeLegacyProjectFromFiles(files);
+  const verificationProject = composeLegacyProjectFromFiles(
+    files,
+    composeOptions || {}
+  );
   const verificationDifference = getLegacyProjectFirstDifferenceDescription(
     legacyProject,
-    verificationProject
+    verificationProject,
+    {
+      behaviorPropertySchemasByType:
+        decomposeOptions && decomposeOptions.behaviorPropertySchemasByType,
+      instructionParameterIndicesToIgnoreByType:
+        decomposeOptions &&
+        decomposeOptions.instructionParameterIndicesToIgnoreByType,
+    }
   );
   if (verificationDifference) {
     throw new MultiFileProjectError(
@@ -778,6 +793,8 @@ export const writeLegacyProjectAsMultiFile = async (
     {
       behaviorPropertySchemasByType:
         decomposeOptions.behaviorPropertySchemasByType,
+      instructionParameterIndicesToIgnoreByType:
+        decomposeOptions.instructionParameterIndicesToIgnoreByType,
     }
   );
   if (verificationDifference) {

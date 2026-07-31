@@ -33,7 +33,7 @@ Related specifications:
 9. [Editor behavior](#9-editor-behavior)
 10. [Runtime and C++ code generation](#10-runtime-and-c-code-generation)
 11. [Project open, save, preview, and export](#11-project-open-save-preview-and-export)
-12. [IfDo Events DSL 2.1](#12-ifdo-events-dsl-21)
+12. [IfDo Events DSL 3.1](#12-ifdo-events-dsl-31)
 13. [Diagnostics](#13-diagnostics)
 14. [Compatibility and migration](#14-compatibility-and-migration)
 15. [Other consumers and integrations](#15-other-consumers-and-integrations)
@@ -95,20 +95,20 @@ This gives the feature all of the following properties:
 
 The current JavaScript event crosses these layers:
 
-| Layer | Current implementation | Consequence for TypeScript |
-| --- | --- | --- |
-| C++ event model | `GDJS/GDJS/Events/Builtin/JsCodeEvent.{h,cpp}` stores `inlineCode`, `parameterObjects`, `useStrict`, and editor state | The compatible extension point is this model |
-| Event registration | `CommonInstructionsExtension.cpp` registers `BuiltinCommonInstructions::JsCode` | A new event type would need new registration and compatibility handling |
-| Code generation | The generator creates `function GDJSInlineCode(...)`, inserts `inlineCode` verbatim, then calls it | The generator requires executable JavaScript synchronously |
-| WebAssembly bindings | `Bindings.idl`, generated Flow types, and generated TypeScript types expose `JsCodeEvent` | New model fields need bindings and regenerated types |
-| Events editor | `EventsTree/Renderers/JsCodeEvent.js` edits `inlineCode` live | TypeScript needs a language-aware source accessor and asynchronous compilation |
-| Monaco | `CodeEditor` and `PoppedOutMonacoEditor` hard-code `javascript` | Both embedded and popped-out editors must accept a language and wrapped model |
-| Type information | `JavaScriptAuthoringApi.js` builds curated runtime/project declarations and validates JS with the TypeScript checker | The same declarations should type TypeScript source |
-| Multi-file source | `IfDoEventsDsl/index.js` owns raw `@js` scanning and round-trip conversion | TypeScript needs an equally raw, lossless block form |
-| Project writer | `LocalProjectWriter.js` validates code before publishing project sources and writes generated declarations/game JSON | Compilation belongs before serialization/publication |
-| Preview/export | local and browser launchers call synchronous C++ exporters; extension loaders call synchronous C++ generators | Every supported generation boundary needs a shared preflight |
-| Runtime errors | runtime and debugger clients detect `GDJSInlineCode` in stacks | Keeping this wrapper name preserves detection |
-| Search/render/tooling | text renderer, graph preview, global search, MCP tools, and AI validation special-case the JS event | They must read the authoritative source according to language |
+| Layer                 | Current implementation                                                                                                | Consequence for TypeScript                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| C++ event model       | `GDJS/GDJS/Events/Builtin/JsCodeEvent.{h,cpp}` stores `inlineCode`, `parameterObjects`, `useStrict`, and editor state | The compatible extension point is this model                                   |
+| Event registration    | `CommonInstructionsExtension.cpp` registers `BuiltinCommonInstructions::JsCode`                                       | A new event type would need new registration and compatibility handling        |
+| Code generation       | The generator creates `function GDJSInlineCode(...)`, inserts `inlineCode` verbatim, then calls it                    | The generator requires executable JavaScript synchronously                     |
+| WebAssembly bindings  | `Bindings.idl`, generated Flow types, and generated TypeScript types expose `JsCodeEvent`                             | New model fields need bindings and regenerated types                           |
+| Events editor         | `EventsTree/Renderers/JsCodeEvent.js` edits `inlineCode` live                                                         | TypeScript needs a language-aware source accessor and asynchronous compilation |
+| Monaco                | `CodeEditor` and `PoppedOutMonacoEditor` hard-code `javascript`                                                       | Both embedded and popped-out editors must accept a language and wrapped model  |
+| Type information      | `JavaScriptAuthoringApi.js` builds curated runtime/project declarations and validates JS with the TypeScript checker  | The same declarations should type TypeScript source                            |
+| Multi-file source     | `IfDoEventsDsl/index.js` owns raw `@js` scanning and round-trip conversion                                            | TypeScript needs an equally raw, lossless block form                           |
+| Project writer        | `LocalProjectWriter.js` validates code before publishing project sources and writes generated declarations/game JSON  | Compilation belongs before serialization/publication                           |
+| Preview/export        | local and browser launchers call synchronous C++ exporters; extension loaders call synchronous C++ generators         | Every supported generation boundary needs a shared preflight                   |
+| Runtime errors        | runtime and debugger clients detect `GDJSInlineCode` in stacks                                                        | Keeping this wrapper name preserves detection                                  |
+| Search/render/tooling | text renderer, graph preview, global search, MCP tools, and AI validation special-case the JS event                   | They must read the authoritative source according to language                  |
 
 Events are editor-time C++ model objects, but no event object exists in the
 GDJS runtime. A TypeScript event therefore cannot be interpreted at runtime.
@@ -223,12 +223,13 @@ Version 1 does not:
    authoring changes.
 8. The wrapper name remains `GDJSInlineCode` so current debugger detection keeps
    working.
-9. The event passes at most one picked instance through `objects`, exactly like
-   the existing JavaScript event.
+9. The event passes every picked instance through `objects`, exactly like the
+   existing JavaScript event.
 10. Missing `sourceLanguage` means `javascript`.
 11. Unknown source-language values are errors. They never fall back to
     JavaScript or an empty event silently.
-12. Existing JavaScript serialization and generated output remain unchanged.
+12. Existing JavaScript serialization and code-event wrapper shape remain
+    unchanged.
 
 ---
 
@@ -238,12 +239,12 @@ Version 1 does not:
 
 `gdjs::JsCodeEvent` gains these persisted values:
 
-| Field | Type | JavaScript event | TypeScript event |
-| --- | --- | --- | --- |
-| `sourceLanguage` | enum string | Omitted; missing means `javascript` | Required, value `typescript` |
-| `sourceCode` | multiline string | Omitted | Required authoritative TypeScript |
-| `inlineCode` | multiline string | Authoritative JavaScript | Generated JavaScript body |
-| `transpilation` | object | Omitted | Required for current output |
+| Field            | Type             | JavaScript event                    | TypeScript event                  |
+| ---------------- | ---------------- | ----------------------------------- | --------------------------------- |
+| `sourceLanguage` | enum string      | Omitted; missing means `javascript` | Required, value `typescript`      |
+| `sourceCode`     | multiline string | Omitted                             | Required authoritative TypeScript |
+| `inlineCode`     | multiline string | Authoritative JavaScript            | Generated JavaScript body         |
+| `transpilation`  | object           | Omitted                             | Required for current output       |
 
 Existing `parameterObjects`, `useStrict`, `eventsSheetExpanded`, disabled/folded
 state, AI event id, and non-serialized cursor state retain their meanings.
@@ -401,15 +402,15 @@ callers do not pass hashes in the wrong order.
 
 A code event has one of these logical states:
 
-| State | Meaning | Editable | Save | Preview/export |
-| --- | --- | --- | --- | --- |
-| `javascript` | `inlineCode` is source/output | Yes | Yes | Yes |
-| `typescript-current` | source, context, output, and receipt match | Yes | Yes | Yes |
-| `typescript-compiling` | a compile request is pending | Yes | Wait for result | Wait for result |
-| `typescript-invalid` | current source has blocking diagnostics | Yes | Block publishing, preserve source in memory | Block |
-| `typescript-stale` | last-good output exists but receipt does not match | Yes | Recompile; block if unsuccessful | Block |
-| `typescript-unavailable` | compiler could not load | Read/write source | Block publishing | Block |
-| `unknown-language` | serialized language is unsupported | Recovery display only | Block | Block |
+| State                    | Meaning                                            | Editable              | Save                                        | Preview/export  |
+| ------------------------ | -------------------------------------------------- | --------------------- | ------------------------------------------- | --------------- |
+| `javascript`             | `inlineCode` is source/output                      | Yes                   | Yes                                         | Yes             |
+| `typescript-current`     | source, context, output, and receipt match         | Yes                   | Yes                                         | Yes             |
+| `typescript-compiling`   | a compile request is pending                       | Yes                   | Wait for result                             | Wait for result |
+| `typescript-invalid`     | current source has blocking diagnostics            | Yes                   | Block publishing, preserve source in memory | Block           |
+| `typescript-stale`       | last-good output exists but receipt does not match | Yes                   | Recompile; block if unsuccessful            | Block           |
+| `typescript-unavailable` | compiler could not load                            | Read/write source     | Block publishing                            | Block           |
+| `unknown-language`       | serialized language is unsupported                 | Recovery display only | Block                                       | Block           |
 
 The editor may retain last-good output in invalid/stale states to support undo
 and legacy recovery, but current-editor code generation must not call it.
@@ -513,14 +514,14 @@ Each compilation unit contains:
 ```js
 {
   eventKey,
-  fileUri,
-  bodyLine,
-  sourceCode,
-  parameterObjects,
-  useStrict,
-  ownerContext,
-  runtimeApiDeclaration,
-  projectApiDeclaration
+    fileUri,
+    bodyLine,
+    sourceCode,
+    parameterObjects,
+    useStrict,
+    ownerContext,
+    runtimeApiDeclaration,
+    projectApiDeclaration;
 }
 ```
 
@@ -537,9 +538,7 @@ generator will create:
 ```ts
 function __gdevelopTypeScriptEvent_42(
   runtimeScene: GDevelopProject.SceneRuntime<"Main">,
-  objects: Array<
-    GDevelopProject.ScenePickedObjectType<"Main", "Player">
-  >
+  objects: Array<GDevelopProject.ScenePickedObjectType<"Main", "Player">>
 ) {
   // Exact user source begins here.
 }
@@ -724,13 +723,13 @@ into language-neutral helpers so JavaScript and TypeScript cannot drift.
 
 ### 8.2 Context matrix
 
-| Owner | `runtimeScene` | `objects` | `eventsFunctionContext` |
-| --- | --- | --- | --- |
-| Scene | `SceneRuntime<SceneName>` | Exact object/group picked type when configured | Absent |
-| External events | `gdjs.RuntimeScene` unless a single linked scene is proven | Generic or proven picked type | Absent |
-| Free extension function | `gdjs.RuntimeScene` | `gdjs.RuntimeObject[]` when configured | Present |
-| Prefab/object function | `gdjs.RuntimeScene` | Owner-aware type when declarations support it | Present |
-| Behavior function | `gdjs.RuntimeScene` | Owner-aware type when declarations support it | Present |
+| Owner                   | `runtimeScene`                                             | `objects`                                      | `eventsFunctionContext` |
+| ----------------------- | ---------------------------------------------------------- | ---------------------------------------------- | ----------------------- |
+| Scene                   | `SceneRuntime<SceneName>`                                  | Exact object/group picked type when configured | Absent                  |
+| External events         | `gdjs.RuntimeScene` unless a single linked scene is proven | Generic or proven picked type                  | Absent                  |
+| Free extension function | `gdjs.RuntimeScene`                                        | `gdjs.RuntimeObject[]` when configured         | Present                 |
+| Prefab/object function  | `gdjs.RuntimeScene`                                        | Owner-aware type when declarations support it  | Present                 |
+| Behavior function       | `gdjs.RuntimeScene`                                        | Owner-aware type when declarations support it  | Present                 |
 
 An unavailable parameter is an unknown identifier, not an optional global. The
 embedded editor, popped-out editor, save checker, and compiler must agree.
@@ -745,11 +744,10 @@ At runtime the generator continues to:
 
 1. Expand an object group when necessary.
 2. Build the picked object array.
-3. Assert that it contains no more than one picked instance.
-4. Pass the array as `objects`.
+3. Pass the full array as `objects`.
 
-Typing an array as one object or group does not create a pick and does not prove
-cardinality. The deterministic object-picking rules continue to apply.
+Typing an array as one object or group does not create a pick. The picked list
+is passed through with the same semantics as a JavaScript code event.
 
 ### 8.4 Signals and Constants
 
@@ -832,7 +830,7 @@ syntax as JavaScript. Undo restores the TypeScript event.
 prop:
 
 ```js
-language: 'javascript' | 'typescript'
+language: "javascript" | "typescript";
 ```
 
 JavaScript remains the default for all existing call sites. Both code-editor
@@ -906,7 +904,7 @@ Expanding/collapsing the editor does not.
 All display/search consumers use a single helper:
 
 ```js
-getCodeEventAuthoritativeSource(jsCodeEvent)
+getCodeEventAuthoritativeSource(jsCodeEvent);
 ```
 
 It returns `sourceCode` for TypeScript and `inlineCode` for JavaScript. This
@@ -938,10 +936,6 @@ namespace.userFunc123 = function GDJSInlineCode(runtimeScene, objects) {
 };
 
 const objects = namespace.SomeObjectObjects1;
-gdjs.assertObjectListHasNoMoreThanOnePickedInstance(
-  objects,
-  'TypeScript event object parameter "Player"'
-);
 namespace.userFunc123(runtimeScene, objects);
 ```
 
@@ -954,10 +948,9 @@ or declaration file in the exported game.
 `CommonInstructionsExtension.cpp` should make only language-aware changes:
 
 - Run the integrity guard before reading `inlineCode` for TypeScript.
-- Keep existing JavaScript output byte-for-byte unchanged.
+- Keep the existing JavaScript wrapper and invocation shape.
 - Keep `GDJSInlineCode` as the function name.
-- Use "TypeScript event object parameter" in the object-cardinality assertion
-  for TypeScript and the current JavaScript wording for JavaScript.
+- Pass the full picked object list without a runtime cardinality assertion.
 - Add a blocking diagnostic and report failure when the artifact is invalid.
 
 The event registration type and icon identifier remain compatible. The
@@ -1130,28 +1123,28 @@ clear, preserving the current all-or-nothing expectation.
 
 ---
 
-## 12. IfDo Events DSL 2.1
+## 12. IfDo Events DSL 3.1
 
 ### 12.1 Version change
 
 Adding TypeScript changes the raw-block scanner and supported event fields. The
-Events DSL version becomes `2.1`; it must not be smuggled into `2.0` under an
+Events DSL version becomes `3.1`; it must not be smuggled into `3.0` under an
 unchanged version marker.
 
-The multi-file loader supports both `2.0` and `2.1`:
+The multi-file loader supports both `3.0` and `3.1`:
 
-- `2.0` accepts existing syntax and rejects `@ts`.
-- `2.1` accepts existing syntax plus `@ts`.
-- A project containing `@ts` requires and emits `2.1`.
-- A project opened as `2.0` and still using only 2.0 features remains `2.0` on
+- `3.0` accepts existing syntax and rejects `@ts`.
+- `3.1` accepts existing syntax plus `@ts`.
+- A project containing `@ts` requires and emits `3.1`.
+- A project opened as `3.0` and still using only 3.0 features remains `3.0` on
   save, so merely using a newer editor does not break older-editor access.
-- Once a source tree is `2.1`, normal saves preserve `2.1` even after the last
+- Once a source tree is `3.1`, normal saves preserve `3.1` even after the last
   TypeScript event is removed; version markers do not oscillate.
-- Older editors see the unsupported `2.1` marker and stop before rewriting
+- Older editors see the unsupported `3.1` marker and stop before rewriting
   source, which is safer than parsing TypeScript as JavaScript.
 
-Newly decomposed legacy projects emit the minimum required version: `2.0` when
-they contain no TypeScript event and `2.1` when they do. The existing strict
+Newly decomposed legacy projects emit the minimum required version: `3.0` when
+they contain no TypeScript event and `3.1` when they do. The existing strict
 equality check in `MultiFileProjectFormat/index.js` must become an explicit
 supported-version dispatch, not an unbounded "greater than" check.
 
@@ -1247,7 +1240,7 @@ chunk is asynchronous and complete context typing requires the composed project.
 Add an asynchronous composition path used by local project open:
 
 ```js
-composeLegacyProjectFromFilesAsync(files, options)
+composeLegacyProjectFromFilesAsync(files, options);
 ```
 
 It:
@@ -1261,7 +1254,7 @@ It:
    table.
 6. Returns only after every TypeScript event has current output.
 
-The existing synchronous composer remains valid for 2.0 and 2.1 source without
+The existing synchronous composer remains valid for 3.0 and 3.1 source without
 `@ts`. If it encounters `@ts`, it throws
 `MULTIFILE_TYPESCRIPT_COMPILER_REQUIRED`; it never returns an executable-looking
 event with empty code.
@@ -1284,7 +1277,7 @@ Generated output and receipts never appear in `.events` source.
 
 ### 12.6 Coverage table
 
-`IFDO_EVENTS_DSL_COVERAGE` changes to version `2.1` and adds these fields to the
+`IFDO_EVENTS_DSL_COVERAGE` changes to version `3.1` and adds these fields to the
 existing event type:
 
 ```text
@@ -1297,7 +1290,7 @@ Its metadata section adds `ts` with the same four arguments as `js`. The
 normalizer validates the nested receipt keys and rejects unknown keys. This is
 required for lossless legacy JSON conversion and no-silent-fallback behavior.
 Version-selection helpers separately report the minimum grammar needed by a
-source tree, so the coverage constant does not force a JavaScript-only 2.0 tree
+source tree, so the coverage constant does not force a JavaScript-only 3.0 tree
 to upgrade.
 
 ---
@@ -1330,22 +1323,22 @@ is still present. Wrapper offsets are removed before returning diagnostics.
 
 ### 13.2 Initial codes
 
-| Code | Meaning |
-| --- | --- |
-| `TS_EVENT_COMPILER_UNAVAILABLE` | The built-in compiler chunk could not load |
-| `TS_EVENT_RESOURCE_LIMIT` | Project block/source limits were exceeded |
-| `TS_EVENT_SYNTAX_ERROR` | TypeScript cannot parse the wrapped body |
-| `TS_EVENT_TYPE_ERROR` | Generic semantic type error |
-| `TS_EVENT_UNKNOWN_MEMBER` | Public API member or project symbol is unknown |
-| `TS_EVENT_NULLABILITY` | Nullable value was used without narrowing |
-| `TS_EVENT_PRIVATE_MEMBER` | Runtime-private/generated member was accessed |
-| `TS_EVENT_FORBIDDEN_GLOBAL` | Disallowed browser/Node/Electron/global API |
-| `TS_EVENT_UNSUPPORTED_MODULE` | Import/export/module syntax was used |
-| `TS_EVENT_UNSUPPORTED_EMIT` | Compiler output cannot be safely extracted |
-| `TS_EVENT_STALE_OUTPUT` | Receipt does not match current source/context |
-| `TS_EVENT_CORRUPT_OUTPUT` | Generated JavaScript hash does not match |
-| `TS_EVENT_INTERNAL_COMPILER_ERROR` | Compiler/extractor invariant failed |
-| `CODE_EVENT_PERFORMANCE_RISK` | Unbounded loop or expensive pattern warning |
+| Code                               | Meaning                                        |
+| ---------------------------------- | ---------------------------------------------- |
+| `TS_EVENT_COMPILER_UNAVAILABLE`    | The built-in compiler chunk could not load     |
+| `TS_EVENT_RESOURCE_LIMIT`          | Project block/source limits were exceeded      |
+| `TS_EVENT_SYNTAX_ERROR`            | TypeScript cannot parse the wrapped body       |
+| `TS_EVENT_TYPE_ERROR`              | Generic semantic type error                    |
+| `TS_EVENT_UNKNOWN_MEMBER`          | Public API member or project symbol is unknown |
+| `TS_EVENT_NULLABILITY`             | Nullable value was used without narrowing      |
+| `TS_EVENT_PRIVATE_MEMBER`          | Runtime-private/generated member was accessed  |
+| `TS_EVENT_FORBIDDEN_GLOBAL`        | Disallowed browser/Node/Electron/global API    |
+| `TS_EVENT_UNSUPPORTED_MODULE`      | Import/export/module syntax was used           |
+| `TS_EVENT_UNSUPPORTED_EMIT`        | Compiler output cannot be safely extracted     |
+| `TS_EVENT_STALE_OUTPUT`            | Receipt does not match current source/context  |
+| `TS_EVENT_CORRUPT_OUTPUT`          | Generated JavaScript hash does not match       |
+| `TS_EVENT_INTERNAL_COMPILER_ERROR` | Compiler/extractor invariant failed            |
+| `CODE_EVENT_PERFORMANCE_RISK`      | Unbounded loop or expensive pattern warning    |
 
 Raw TypeScript diagnostic numbers are retained in `typescriptCode`, but stable
 GDevelop codes drive UI, tests, MCP responses, and documentation.
@@ -1402,13 +1395,13 @@ it with `EmptyEvent` and could lose executable behavior too.
 
 ### 14.3 Older GDevelop opening multi-file source
 
-The `eventsDslVersion = "2.1"` marker makes an older multi-file loader reject
+The `eventsDslVersion = "3.1"` marker makes an older multi-file loader reject
 the project before parsing/rewrite. This is deliberately fail-closed and
 preserves authoritative `@ts` source.
 
 The generated `.gdevelop/game.json` remains available as a compatibility
 artifact, but it is not the source of truth and must not be used to overwrite
-the 2.1 source tree.
+the 3.1 source tree.
 
 ### 14.4 Compiler upgrades
 
@@ -1580,84 +1573,84 @@ record source or project names.
 
 ### 17.1 C++ model, serialization, and generation
 
-| File/area | Required change |
-| --- | --- |
-| `GDJS/GDJS/Events/Builtin/JsCodeEvent.h` | Add language/source/receipt model, invalidation, atomic result API, clone fields |
-| `GDJS/GDJS/Events/Builtin/JsCodeEvent.cpp` | Serialize TS-only fields, default missing language to JS, validate receipt shape |
+| File/area                                                      | Required change                                                                                 |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `GDJS/GDJS/Events/Builtin/JsCodeEvent.h`                       | Add language/source/receipt model, invalidation, atomic result API, clone fields                |
+| `GDJS/GDJS/Events/Builtin/JsCodeEvent.cpp`                     | Serialize TS-only fields, default missing language to JS, validate receipt shape                |
 | `GDJS/GDJS/Extensions/Builtin/CommonInstructionsExtension.cpp` | Language-neutral metadata, integrity guard, language-aware assertion label, blocking diagnostic |
-| `Core/GDCore/Events/CodeGeneration/DiagnosticReport.*` | Add invalid-code-event diagnostic/blocking propagation if not implemented elsewhere |
-| `Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.*` | Propagate code-event generation failure instead of leaving `ErrorOccurred` unused |
-| `GDJS/GDJS/Events/CodeGeneration/*` | Return/expose failure through layout/free/behavior/object generators |
-| `GDJS/GDJS/IDE/ExporterHelper.cpp` | Abort generated event export on blocking code-event diagnostics |
-| Core tools | Add deterministic SHA-256 helper shared by native/WASM integrity guard |
+| `Core/GDCore/Events/CodeGeneration/DiagnosticReport.*`         | Add invalid-code-event diagnostic/blocking propagation if not implemented elsewhere             |
+| `Core/GDCore/Events/CodeGeneration/EventsCodeGenerator.*`      | Propagate code-event generation failure instead of leaving `ErrorOccurred` unused               |
+| `GDJS/GDJS/Events/CodeGeneration/*`                            | Return/expose failure through layout/free/behavior/object generators                            |
+| `GDJS/GDJS/IDE/ExporterHelper.cpp`                             | Abort generated event export on blocking code-event diagnostics                                 |
+| Core tools                                                     | Add deterministic SHA-256 helper shared by native/WASM integrity guard                          |
 
 ### 17.2 Bindings and generated types
 
-| File/area | Required change |
-| --- | --- |
-| `GDevelop.js/Bindings/Bindings.idl` | Expose source language/source and atomic result/integrity state |
-| `GDevelop.js/Bindings/Wrapper.cpp` | Existing class include remains; regenerate wrappers |
-| `GDevelop.js/Bindings/postjs.js` | Existing cast remains; optional helper for atomic result |
-| `GDevelop.js/scripts/generate-types.js` | Ensure new methods flow to Flow types |
-| `GDevelop.js/scripts/generate-dts.mjs` | Ensure new methods flow to TypeScript declarations |
-| generated glue/types | Regenerate, do not hand-diverge |
+| File/area                               | Required change                                                 |
+| --------------------------------------- | --------------------------------------------------------------- |
+| `GDevelop.js/Bindings/Bindings.idl`     | Expose source language/source and atomic result/integrity state |
+| `GDevelop.js/Bindings/Wrapper.cpp`      | Existing class include remains; regenerate wrappers             |
+| `GDevelop.js/Bindings/postjs.js`        | Existing cast remains; optional helper for atomic result        |
+| `GDevelop.js/scripts/generate-types.js` | Ensure new methods flow to Flow types                           |
+| `GDevelop.js/scripts/generate-dts.mjs`  | Ensure new methods flow to TypeScript declarations              |
+| generated glue/types                    | Regenerate, do not hand-diverge                                 |
 
 ### 17.3 Compiler and authoring API
 
-| File/area | Required change |
-| --- | --- |
-| new `ProjectsStorage/TypeScriptEventCompiler.js` | Compiler contract, hashes, AST extraction, diagnostics |
-| new compiler worker | Browser/Electron background execution |
-| generated virtual standard-library module/build script | Bundle the pinned `lib.es2020.d.ts` reference closure for browser and Electron |
-| `ProjectsStorage/JavaScriptAuthoringApi.js` | Extract shared code-event descriptors/context/policy and add TS validation inputs |
-| `newIDE/app/package.json` | Pin exact TypeScript compiler used by the feature |
-| lockfile | Regenerated only as part of the dependency change |
+| File/area                                              | Required change                                                                   |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| new `ProjectsStorage/TypeScriptEventCompiler.js`       | Compiler contract, hashes, AST extraction, diagnostics                            |
+| new compiler worker                                    | Browser/Electron background execution                                             |
+| generated virtual standard-library module/build script | Bundle the pinned `lib.es2020.d.ts` reference closure for browser and Electron    |
+| `ProjectsStorage/JavaScriptAuthoringApi.js`            | Extract shared code-event descriptors/context/policy and add TS validation inputs |
+| `newIDE/app/package.json`                              | Pin exact TypeScript compiler used by the feature                                 |
+| lockfile                                               | Regenerated only as part of the dependency change                                 |
 
 ### 17.4 Editor
 
-| File/area | Required change |
-| --- | --- |
+| File/area                             | Required change                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------ |
 | `EventsTree/Renderers/JsCodeEvent.js` | Language selector, authoritative source, status, compile lifecycle, conversion |
-| `CodeEditor/index.js` | Language prop and wrapped-model adapter |
-| `CodeEditor/PoppedOutMonacoEditor.js` | Same language/model mapping as embedded editor |
-| `CodeEditor/MonacoSetup.js` | TypeScript defaults/options and language-aware diagnostics |
-| local/browser autocomplete files | Register reviewed declarations for TS and avoid global context leakage |
-| `EventsRenderingService.js` | Existing type mapping remains |
-| event toolbar/picker | Language-neutral event name and discoverability |
-| preferences | Rename type-error preference/copy |
+| `CodeEditor/index.js`                 | Language prop and wrapped-model adapter                                        |
+| `CodeEditor/PoppedOutMonacoEditor.js` | Same language/model mapping as embedded editor                                 |
+| `CodeEditor/MonacoSetup.js`           | TypeScript defaults/options and language-aware diagnostics                     |
+| local/browser autocomplete files      | Register reviewed declarations for TS and avoid global context leakage         |
+| `EventsRenderingService.js`           | Existing type mapping remains                                                  |
+| event toolbar/picker                  | Language-neutral event name and discoverability                                |
+| preferences                           | Rename type-error preference/copy                                              |
 
 ### 17.5 Source formats and storage
 
-| File/area | Required change |
-| --- | --- |
-| `EventsSheet/IfDoEventsDsl/index.js` | `@ts`, generalized raw scanner, v2.1 coverage, TS fields/decompiler |
-| `ProjectsStorage/MultiFileProjectFormat/index.js` | supported version dispatch, async TS composition/provenance |
-| `LocalFileStorageProvider/LocalMultiFileProject.js` | Load compiler and use async composition |
-| `LocalFileStorageProvider/LocalProjectOpener.js` | Recovery/current-receipt validation for legacy JSON |
-| `LocalFileStorageProvider/LocalProjectWriter.js` | Await preparation before serialization/transaction |
-| central `MainFrame` project load/save and `loadProjectFromSavedFileForPreview` boundaries | Prepare code events for every storage provider, autosave, reload, and preview copy |
+| File/area                                                                                 | Required change                                                                                                          |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `EventsSheet/IfDoEventsDsl/index.js`                                                      | `@ts`, generalized raw scanner, v3.1 coverage, TS fields/decompiler                                                      |
+| `ProjectsStorage/MultiFileProjectFormat/index.js`                                         | supported version dispatch, async TS composition/provenance                                                              |
+| `LocalFileStorageProvider/LocalMultiFileProject.js`                                       | Load compiler and use async composition                                                                                  |
+| `LocalFileStorageProvider/LocalProjectOpener.js`                                          | Recovery/current-receipt validation for legacy JSON                                                                      |
+| `LocalFileStorageProvider/LocalProjectWriter.js`                                          | Await preparation before serialization/transaction                                                                       |
+| central `MainFrame` project load/save and `loadProjectFromSavedFileForPreview` boundaries | Prepare code events for every storage provider, autosave, reload, and preview copy                                       |
 | `CloudProjectWriter.js`, download/Save As, URL/cloud readers, and other storage providers | Preserve TS fields in legacy JSON and assert or defensively invoke the central preparation boundary before serialization |
-| background serializer path | Ensure current artifacts are present before off-thread serialization |
+| background serializer path                                                                | Ensure current artifacts are present before off-thread serialization                                                     |
 
 ### 17.6 Generation boundaries and secondary consumers
 
-| File/area | Required change |
-| --- | --- |
-| local/browser preview launchers | Await shared preflight |
-| local/browser exporters | Use shared prepared-project boundary |
-| `EventsFunctionsExtensionsLoader/index.js` | Preflight extension-owned events |
-| `EventsSheet/GenerateEventsCode.js` | Async preflight and diagnostic result |
-| `EventsSheet/index.js` | Await generated-code preparation and carry diagnostics into the dialog state |
-| runtime/debugger client strings | Language-neutral code-event crash wording |
-| text renderer/graph/global search | Authoritative source and language labels |
-| MCP event/project/extension tools and schemas | Language-aware write/validation/permissions |
+| File/area                                     | Required change                                                              |
+| --------------------------------------------- | ---------------------------------------------------------------------------- |
+| local/browser preview launchers               | Await shared preflight                                                       |
+| local/browser exporters                       | Use shared prepared-project boundary                                         |
+| `EventsFunctionsExtensionsLoader/index.js`    | Preflight extension-owned events                                             |
+| `EventsSheet/GenerateEventsCode.js`           | Async preflight and diagnostic result                                        |
+| `EventsSheet/index.js`                        | Await generated-code preparation and carry diagnostics into the dialog state |
+| runtime/debugger client strings               | Language-neutral code-event crash wording                                    |
+| text renderer/graph/global search             | Authoritative source and language labels                                     |
+| MCP event/project/extension tools and schemas | Language-aware write/validation/permissions                                  |
 
 ### 17.7 Documentation to update with implementation
 
-- Events DSL: add version 2.1 and normative `@ts` mapping.
+- Events DSL: add version 3.1 and normative `@ts` mapping.
 - JavaScript authoring API: broaden event context/validation to code-event
   source while retaining declaration filenames.
-- Multi-file format: 2.0/2.1 version selection and generated compatibility
+- Multi-file format: 3.0/3.1 version selection and generated compatibility
   artifact.
 - Architecture: dual-source model and pre-generation compiler seam.
 - Deterministic picking: TypeScript uses the same single-picked-instance rule.
@@ -1703,11 +1696,11 @@ JS for TypeScript events in every owner kind without stale async results.
 
 ### Phase 4: Storage and DSL
 
-1. Add Events DSL 2.1 `@ts` scanner/parser/decompiler.
+1. Add Events DSL 3.1 `@ts` scanner/parser/decompiler.
 2. Add async multi-file composition and source provenance.
 3. Integrate project open/save preparation.
 4. Write source-only `.events` and current generated `.gdevelop/game.json`.
-5. Add conditional 2.0/2.1 version-selection and round-trip fixtures.
+5. Add conditional 3.0/3.1 version-selection and round-trip fixtures.
 
 Exit criterion: multi-file source round-trips without generated-code churn and
 invalid TS cannot partially publish a save.
@@ -1825,9 +1818,9 @@ Determinism cases:
 - Literal `@end ts` at other depth/instruction depth.
 - JS and TS blocks adjacent and nested among structural events.
 - JSON-to-DSL-to-JSON equivalence excluding regenerated artifact bytes.
-- Events DSL 2.0 stays 2.0 until a 2.1 feature is introduced; 2.0 rejects
-  `@ts`; adding TypeScript raises the marker; 2.1 accepts and remains 2.1.
-- Old loader rejects 2.1 marker before rewriting.
+- Events DSL 3.0 stays 3.0 until a 3.1 feature is introduced; 3.0 rejects
+  `@ts`; adding TypeScript raises the marker; 3.1 accepts and remains 3.1.
+- Old loader rejects 3.1 marker before rewriting.
 - Multi-file save excludes output/receipt from `.events`.
 - `.gdevelop/game.json` includes current source/output/receipt.
 - Save transaction remains atomic on TypeScript diagnostics.
@@ -1836,7 +1829,7 @@ Determinism cases:
 ### 19.6 Code generation and runtime tests
 
 - TypeScript output executes in a scene.
-- Picked object and object-group cardinality assertion remains enforced.
+- Picked object and object-group parameters receive every picked instance.
 - `useStrict` matches JavaScript behavior.
 - Free function receives `eventsFunctionContext`.
 - Behavior, prefab/object, external event, and linked event contexts execute.
@@ -1879,24 +1872,24 @@ The feature is complete only when all of the following are true:
    project symbols.
 3. Editor, save, preview, generated-code view, extension loader, MCP, and export
    use one compiler contract and produce the same output hash.
-4. Existing JavaScript event serialization and generation snapshots are
-   unchanged.
+4. Existing JavaScript event serialization and code-event wrapper snapshots
+   are unchanged.
 5. TypeScript source is authoritative and generated JavaScript is never shown as
    editable source.
 6. A source, parameter, owner, declaration, compiler, or option change
    invalidates the correct receipt.
 7. No supported current-editor path executes stale or corrupt output.
 8. C++ generation fails closed when its integrity guard fails.
-9. Multi-file `.events` stores canonical `@ts` source only and the 2.0/2.1
+9. Multi-file `.events` stores canonical `@ts` source only and the 3.0/3.1
    version is selected and preserved safely.
 10. Legacy JSON contains an executable fallback for older GDevelop builds.
-11. Older multi-file loaders reject version 2.1 before rewriting source.
+11. Older multi-file loaders reject version 3.1 before rewriting source.
 12. Source-located diagnostics map to the exact TypeScript body line.
-13. Object-picking cardinality and runtime wrapper semantics match JavaScript.
+13. Picked-list and runtime wrapper semantics match JavaScript.
 14. Browser and Electron work offline with the shipped pinned compiler.
 15. Exported games contain JavaScript only and add no runtime compiler cost.
 16. All audited search/render/MCP/runtime strings and consumers are
-   language-aware.
+    language-aware.
 17. Compiler upgrades are deterministic, reviewed migrations.
 18. Documentation explains the older-editor downgrade boundary explicitly.
 
@@ -1964,7 +1957,7 @@ dual-source event contract.
 - Product name is language-neutral; JavaScript remains the insertion default.
 - TypeScript source is separate from generated `inlineCode`.
 - Generated JavaScript and deterministic receipt are persisted in legacy JSON.
-- Multi-file source uses `@ts` and Events DSL 2.1.
+- Multi-file source uses `@ts` and Events DSL 3.1.
 - Compiler is pinned TypeScript, lazy-loaded but shipped in browser/Electron.
 - Checking is strict for TypeScript regardless of runtime `useStrict`.
 - Imports/modules/TSX/decorators/top-level await are out of scope.

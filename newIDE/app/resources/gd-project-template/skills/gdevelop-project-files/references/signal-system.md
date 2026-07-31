@@ -11,10 +11,10 @@ the project-file authoring surface.
 
 There are exactly two destinations:
 
-| Kind | Emit action | Receivers |
-| --- | --- | --- |
-| Scene signal | `EmitSceneSignal` | Scene events automatically; prefab and behavior instances only after their own explicit subscription |
-| Direct instance signal | `EmitSignalToObjectInstance` | Exactly one prefab instance, through that prefab's `onSignal` |
+| Kind                   | Emit action                  | Receivers                                                                                            |
+| ---------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Scene signal           | `EmitSceneSignal`            | Scene events automatically; prefab and behavior instances only after their own explicit subscription |
+| Direct instance signal | `EmitSignalToObjectInstance` | Exactly one prefab instance, through that prefab's `onSignal`                                        |
 
 There is no action for an object name, object group, or picked-object list.
 Direct signals never invoke behavior handlers and never appear in scene signal
@@ -33,14 +33,14 @@ rg 'SignalName|SignalPayload' .gdevelop/instructions-catalog.json
 
 The normal surface is:
 
-| Kind | Type/name | Scope |
-| --- | --- | --- |
-| Condition | `SignalReceived` (shown as **Scene signal received**) | Scene and external-scene events |
-| Action | `EmitSceneSignal` | Scene, external scene, prefab, and behavior events |
-| Action | `EmitSignalToObjectInstance` | Scene, external scene, prefab, and behavior events |
-| Action | `SubscribeSceneSignal` | Prefab and behavior events only |
-| Text expression | `SignalName()` | Matching scene-signal event and descendants |
-| Text expression | `SignalPayload()` | Matching scene-signal event and descendants |
+| Kind            | Type/name                                             | Scope                                              |
+| --------------- | ----------------------------------------------------- | -------------------------------------------------- |
+| Condition       | `SignalReceived` (shown as **Scene signal received**) | Scene and external-scene events                    |
+| Action          | `EmitSceneSignal`                                     | Scene, external scene, prefab, and behavior events |
+| Action          | `EmitSignalToObjectInstance`                          | Scene, external scene, prefab, and behavior events |
+| Action          | `SubscribeSceneSignal`                                | Prefab and behavior events only                    |
+| Text expression | `SignalName()`                                        | Matching scene-signal event and descendants        |
+| Text expression | `SignalPayload()`                                     | Matching scene-signal event and descendants        |
 
 Always accept the current generated catalog over this summary.
 
@@ -70,7 +70,7 @@ it does not run accidentally every frame.
 ```events
 @event aiGeneratedEventId="announce-game-ready"
 if SceneJustBegins
-do EmitSceneSignal signal_name="\"Game.Ready\"" payload="\"level-1\""
+do EmitSceneSignal signal_name="Game.Ready" payload="level-1"
 ```
 
 Scene events can observe this without registering anything. A prefab or
@@ -84,8 +84,8 @@ non-inverted, top-level condition of a standard scene or external-scene event:
 
 ```events
 @event aiGeneratedEventId="handle-game-ready"
-if SignalReceived signal_name="\"Game.Ready\""
-do DebuggerTools::ConsoleLog message_to_log="SignalPayload()"
+if SignalReceived signal_name="Game.Ready"
+do DebuggerTools::ConsoleLog message_to_log=expr(SignalPayload())
 ```
 
 The event runs once for every matching delivered signal, in FIFO order. Use
@@ -102,7 +102,7 @@ Usually subscribe from `onCreated`:
 
 ```events
 @event aiGeneratedEventId="subscribe-locale-change"
-do SubscribeSceneSignal signal_name="\"Locale.Changed\""
+do SubscribeSceneSignal signal_name="Locale.Changed"
 ```
 
 Repeating the same subscription has no additional effect. It remains for the
@@ -147,7 +147,7 @@ instance signals. Branch on the fixed parameters, not the scene expressions:
 
 ```events
 @event aiGeneratedEventId="handle-card-refresh"
-if BuiltinCommonInstructions::CompareStrings first_string_expression="SignalName" comparison_sign="=" second_string_expression="\"Card.Refresh\""
+if BuiltinCommonInstructions::CompareStrings first_string_expression=expr(SignalName) comparison_sign="=" second_string_expression="Card.Refresh"
 do SetBooleanObjectVariable object="Object" variable="RefreshPending" modification_sign="True"
 ```
 
@@ -171,7 +171,7 @@ Use a positive live `InstanceId()` value:
 ```events
 @event aiGeneratedEventId="refresh-one-card"
 if BooleanObjectVariable object="CardSlot" variable="NeedsRefresh" check_if_the_value_is="True"
-do EmitSignalToObjectInstance instance_id="CardSlot.InstanceId()" signal_name="\"Card.Refresh\"" payload="\"inventory-changed\""
+do EmitSignalToObjectInstance instance_id=expr(CardSlot.InstanceId()) signal_name="Card.Refresh" payload="inventory-changed"
 ```
 
 Only that prefab's `onSignal` can receive it. No subscription is needed. If
@@ -185,7 +185,7 @@ parameter and has no event expression or public getter. When application logic
 needs source information, encode it explicitly in the payload, for example:
 
 ```json
-{"sourceInstanceId":42,"value":"selected"}
+{ "sourceInstanceId": 42, "value": "selected" }
 ```
 
 Receivers must validate any structured payload they parse. Do not treat source

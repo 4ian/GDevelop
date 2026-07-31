@@ -379,9 +379,7 @@ class Variable {
    * @param {string | number | boolean} value
    */
   pushValue(value) {
-    this._childrenArray.push(
-      new Variable({ value })
-    );
+    this._childrenArray.push(new Variable({ value }));
     return this;
   }
 
@@ -392,7 +390,7 @@ class Variable {
     this._childrenArray.push(variable.clone());
     return this;
   }
-  
+
   /**
    * @param {Variable} variable
    */
@@ -501,10 +499,10 @@ class VariablesContainer {
         const variable = new Variable();
         this._indexedVariables[index] = variable;
         return variable;
-      }
-      else {
+      } else {
         throw new Error(
-          'Trying to access to an indexed variable that does not exist: ' + index
+          'Trying to access to an indexed variable that does not exist: ' +
+            index
         );
       }
     }
@@ -850,60 +848,24 @@ const objectsListsToArray = function (objectsLists) {
   return result;
 };
 
-const throwAmbiguousObjectPickingError = function (
-  usage,
-  pickedInstancesCount
-) {
-  const error = new Error(
-    'Ambiguous object picking for ' +
-      usage +
-      ': expected at most one picked instance, but ' +
-      pickedInstancesCount +
-      ' are picked. Add conditions to pick a single instance, or use a "For each object" event.'
-  );
-  if (typeof console !== 'undefined' && console.error) {
-    console.error(error);
-  }
-  throw error;
-};
-
 const assertObjectListHasNoMoreThanOnePickedInstance = function (
   objectsList,
-  usage
+  _usage
 ) {
-  if (objectsList.length > 1) {
-    throwAmbiguousObjectPickingError(usage, objectsList.length);
-  }
   return objectsList;
 };
 
 const assertObjectListsHaveNoMoreThanOnePickedInstance = function (
   objectsLists,
-  usage
+  _usage
 ) {
-  let pickedInstancesCount = 0;
-  for (let i = 0; i < objectsLists.length; ++i) {
-    pickedInstancesCount += objectsLists[i].length;
-  }
-  if (pickedInstancesCount > 1) {
-    throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
-  }
   return objectsLists;
 };
 
 const assertObjectMapHasNoMoreThanOnePickedInstance = function (
   objectsMap,
-  usage
+  _usage
 ) {
-  let pickedInstancesCount = 0;
-  const objectLists = [];
-  objectsMap.values(objectLists);
-  for (let i = 0; i < objectLists.length; ++i) {
-    pickedInstancesCount += objectLists[i].length;
-  }
-  if (pickedInstancesCount > 1) {
-    throwAmbiguousObjectPickingError(usage, pickedInstancesCount);
-  }
   return objectsMap;
 };
 

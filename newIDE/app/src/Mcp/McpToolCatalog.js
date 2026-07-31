@@ -536,7 +536,7 @@ const launchPreviewSchema = {
     timeout_ms: {
       type: 'number',
       description:
-        'How long to wait for debugger connection and runtime getStatus readiness (500-30000 ms, default 6000). If start_paused is true, pause must also be confirmed before success:true is returned.',
+        'How long to wait for debugger connection and runtime getStatus readiness (500-30000 ms, default 15000). If start_paused is true, pause must also be confirmed before success:true is returned.',
     },
   },
   additionalProperties: false,

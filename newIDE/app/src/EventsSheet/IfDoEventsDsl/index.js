@@ -4,8 +4,9 @@
  * Bidirectional converter for the canonical IfDo event DSL.
  *
  * Instruction names and named parameters come exclusively from the generated
- * project catalog. The core owns event structure and the lossless `@exact`
- * fallback, but does not hardcode action or condition aliases.
+ * project catalog. Catalog arguments are semantic typed values; the core does
+ * not expose legacy positional parameter strings or hardcode instruction
+ * aliases.
  */
 
 export type LegacyInstruction = {
@@ -24,7 +25,7 @@ export type ResolveInstruction = (input: {
 export type FormatInstruction = (input: {
   kind: 'condition' | 'action',
   instruction: LegacyInstruction,
-}) => ?string;
+}) => string;
 
 export type LowerWhileLimit = (input: {
   limit: string,
@@ -159,7 +160,7 @@ const EVENT_KEYS = {
 };
 
 export const IFDO_EVENTS_DSL_COVERAGE = Object.freeze({
-  formatVersion: '2.0',
+  formatVersion: '3.0',
   serializerContract: 'repository-current',
   persistedEventTypes: Object.keys(EVENT_KEYS).map(type => ({
     type,
@@ -530,7 +531,76 @@ const parseLeadingStringAndNamedArguments = (
 };
 
 export const parseCatalogInstructionArguments = (source: string): Metadata =>
-  parseNamedArguments(source);
+  (() => {
+    const reader = new ValueReader(source);
+    const result = {};
+    while (!reader.eof()) {
+      const key = reader.readIdentifier();
+      reader.expect('=');
+      if (Object.prototype.hasOwnProperty.call(result, key)) {
+        fail('IFDO_SYNTAX', `Duplicate argument ${key}.`);
+      }
+      reader.skip();
+      if (reader.source.startsWith('expr(', reader.index)) {
+        reader.index += 'expr('.length;
+        const expressionStart = reader.index;
+        let depth = 1;
+        let inString = false;
+        let escaped = false;
+        while (reader.index < reader.source.length) {
+          const character = reader.source[reader.index++];
+          if (inString) {
+            if (escaped) escaped = false;
+            else if (character === '\\') escaped = true;
+            else if (character === '"') inString = false;
+            continue;
+          }
+          if (character === '"') {
+            inString = true;
+            continue;
+          }
+          if (character === '(') depth++;
+          else if (character === ')') {
+            depth--;
+            if (depth === 0) break;
+          }
+        }
+        if (depth !== 0) {
+          fail('IFDO_SYNTAX', `Unterminated expr(...) argument ${key}.`);
+        }
+        const expression = reader.source
+          .slice(expressionStart, reader.index - 1)
+          .trim();
+        if (!expression) {
+          fail('IFDO_SYNTAX', `expr(...) argument ${key} cannot be empty.`);
+        }
+        if (
+          reader.index < reader.source.length &&
+          !/\s/.test(reader.source[reader.index])
+        ) {
+          fail(
+            'IFDO_SYNTAX',
+            `Expected whitespace after expr(...) argument ${key}.`
+          );
+        }
+        result[key] = { __ifdoExpression: true, source: expression };
+        continue;
+      }
+      const value = reader.readValue();
+      if (
+        typeof value !== 'string' &&
+        typeof value !== 'number' &&
+        typeof value !== 'boolean'
+      ) {
+        fail(
+          'IFDO_SYNTAX',
+          `Catalog argument ${key} must be a string, number, boolean, or expr(...).`
+        );
+      }
+      result[key] = value;
+    }
+    return result;
+  })();
 
 const balanceDelta = (source: string): number => {
   let delta = 0;
@@ -654,10 +724,16 @@ const scanSource = (source: string): Array<SourceLine> => {
     while (balance > 0 && index + 1 < physical.length) {
       const continuation = parsePrefix(physical[++index].text, index + 1);
       parsed.text += `\n${continuation.text.trim()}`;
-      balance += balanceDelta(continuation.text);
+      balance = balanceDelta(parsed.text);
     }
     if (balance !== 0)
-      fail('IFDO_SYNTAX', 'Unbalanced delimiters.', parsed.line);
+      fail(
+        'IFDO_SYNTAX',
+        `Unbalanced delimiters in ${JSON.stringify(
+          parsed.text.slice(0, 240)
+        )}.`,
+        parsed.line
+      );
     lines.push(parsed);
   }
   return lines;
@@ -705,7 +781,7 @@ const commonEvent = (type: string, metadata: Metadata): Object => {
   return event;
 };
 
-const parseExactInstruction = (
+const parseCatalogInstruction = (
   source: string,
   kind: 'condition' | 'action',
   metadata: Metadata,
@@ -718,46 +794,29 @@ const parseExactInstruction = (
     '@instruction',
     line
   );
-  if (!source.startsWith('@exact')) {
-    if (!options.resolveInstruction) {
-      fail(
-        'IFDO_CATALOG_REQUIRED',
-        `${kind} requires a project instruction catalog: ${source}`,
-        line
-      );
-    }
-    const resolved = normalizeInstruction(
-      options.resolveInstruction({ kind, source, line }),
-      `${kind} resolved at line ${line}`
+  if (source.startsWith('@exact')) {
+    fail(
+      'IFDO_EXACT_REMOVED',
+      '@exact is not supported. Use a named instruction from the project catalog.',
+      line
     );
-    if (metadata.disabled !== undefined) resolved.disabled = metadata.disabled;
-    if (metadata.inverted !== undefined)
-      resolved.type.inverted = metadata.inverted;
-    if (metadata.awaited !== undefined) resolved.type.await = metadata.awaited;
-    return resolved;
   }
-  const args = parseNamedArguments(source.slice('@exact'.length));
-  if (typeof args.id !== 'string' || !Array.isArray(args.parameters)) {
-    fail('IFDO_SYNTAX', '@exact requires id="..." and parameters=[...].', line);
+  if (!options.resolveInstruction) {
+    fail(
+      'IFDO_CATALOG_REQUIRED',
+      `${kind} requires a project instruction catalog: ${source}`,
+      line
+    );
   }
-  if (!args.parameters.every(parameter => typeof parameter === 'string')) {
-    fail('IFDO_SYNTAX', '@exact parameters must be strings.', line);
-  }
-  Object.keys(args).forEach(key => {
-    if (key !== 'id' && key !== 'parameters') {
-      fail('IFDO_SYNTAX', `Unknown @exact argument ${key}.`, line);
-    }
-  });
-  return {
-    type: {
-      value: args.id,
-      inverted: !!metadata.inverted,
-      await: !!metadata.awaited,
-    },
-    disabled: !!metadata.disabled,
-    parameters: args.parameters,
-    subInstructions: [],
-  };
+  const resolved = normalizeInstruction(
+    options.resolveInstruction({ kind, source, line }),
+    `${kind} resolved at line ${line}`
+  );
+  if (metadata.disabled !== undefined) resolved.disabled = metadata.disabled;
+  if (metadata.inverted !== undefined)
+    resolved.type.inverted = metadata.inverted;
+  if (metadata.awaited !== undefined) resolved.type.await = metadata.awaited;
+  return resolved;
 };
 
 const normalizeInstruction = (value: any, label: string): LegacyInstruction => {
@@ -827,7 +886,7 @@ class IfDoParser {
     source: string,
     line: SourceLine
   ): LegacyInstruction {
-    const instruction = parseExactInstruction(
+    const instruction = parseCatalogInstruction(
       source,
       kind,
       this.takeInstructionMetadata(line.depth, line.instructionDepth),
@@ -2114,18 +2173,24 @@ const formatInstructionLines = (
   if (Object.keys(flags).length) {
     lines.push(`${prefix}${formatMetadata('@instruction', flags)}`);
   }
-  const instructionText = `@exact id=${quote(
-    instruction.type.value
-  )} parameters=${JSON.stringify(instruction.parameters || [])}`;
-  const catalogInstructionText = options.formatInstruction
-    ? options.formatInstruction({ kind, instruction })
-    : null;
+  if (!options.formatInstruction) {
+    fail(
+      'IFDO_CATALOG_REQUIRED',
+      `Cannot format ${kind} ${
+        instruction.type.value
+      } without a project instruction catalog.`
+    );
+  }
+  const catalogInstructionText = options.formatInstruction({
+    kind,
+    instruction,
+  });
   const rootKeyword =
     options.rootKeyword || (kind === 'condition' ? 'if' : 'do');
   lines.push(
     `${prefix}${
       instructionDepth === 0 ? `${rootKeyword} ` : ''
-    }${catalogInstructionText || instructionText}${
+    }${catalogInstructionText}${
       instructionDepth === 0 ? options.rootSuffix || '' : ''
     }`
   );

@@ -277,7 +277,7 @@ Pre-generated documentation of the game engine is [available here](https://docs.
 
 - [Constants](docs/Constants.md): project-wide `constants.toml` configuration, editor support, and code-generation-time placeholder replacement.
 - [Signal System](docs/SignalSystem.md): queued signal notification design for scene events, custom objects and prefabs.
-- [Object picking and single-instance consumption](docs/Architecture.md#object-picking-and-single-instance-consumption): runtime and editor rules for picked object lists, scalar consumers, and conditionless actions.
+- [Object picking and scalar consumption](docs/Architecture.md#object-picking-and-single-instance-consumption): runtime and editor rules for picked object lists, scalar consumers, and conditionless actions.
 
 ### Local third-party tools
 

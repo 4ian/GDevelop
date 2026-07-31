@@ -97,6 +97,10 @@ type McpEditorBridgeContext = {|
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
   launchPreviewForScene?: (sceneName: ?string) => mixed,
+  // Resolve the current scene-aware launcher at call time. A project reload
+  // replaces and deletes the native gdProject, so a callback captured before
+  // reload must not be reused by a later verify_project_change stage.
+  getLaunchPreviewForScene?: () => ?(sceneName: ?string) => mixed,
   getPreviewLaunchState?: () => Object,
   reloadProjectAndWait?: (
     reportProgress?: McpRequestProgressReporter
@@ -3793,7 +3797,7 @@ const launchPreview = async (
 
   const startPaused = !!(args && (args.start_paused || args.startPaused));
   const forceNew = !!(args && (args.force_new || args.forceNew));
-  const timeoutMs = getPreviewReadinessTimeoutMs(args, 6000);
+  const timeoutMs = getPreviewReadinessTimeoutMs(args, 15000);
 
   const getProject =
     options && typeof options.getProject === 'function'
@@ -5450,6 +5454,9 @@ const callMcpTool = async ({
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
       : null;
+    const launchPreviewForScene = context.getLaunchPreviewForScene
+      ? context.getLaunchPreviewForScene()
+      : context.launchPreviewForScene;
     try {
       const result = await launchPreview(
         previewDebuggerServer,
@@ -5457,7 +5464,7 @@ const callMcpTool = async ({
         args || {},
         {
           getProject: context.getProject,
-          launchPreviewForScene: context.launchPreviewForScene,
+          launchPreviewForScene,
         }
       );
       return textResult(result);

@@ -39,11 +39,14 @@ import {
 import {
   PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
   PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
+  buildLegacyInstructionCatalogDelta,
   buildProjectDeprecatedInstructionCatalog,
   buildProjectInstructionCatalog,
   createCatalogInstructionFormatter,
   createCatalogInstructionResolver,
+  getCatalogCodeOnlyParameterIndicesByType,
   mergeProjectInstructionCatalogs,
+  normalizeLegacyProjectInstructionParameters,
   serializeProjectInstructionCatalog,
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
@@ -486,9 +489,9 @@ export const writeProjectSourceCatalogs = async (
       projectPath,
       {
         ...trackedOptions,
-        instructionCatalog: cachedCatalogs
-          ? cachedCatalogs.instructionCatalog
-          : undefined,
+        instructionCatalog:
+          (options && options.instructionCatalog) ||
+          (cachedCatalogs ? cachedCatalogs.instructionCatalog : undefined),
       }
     );
     const deprecatedInstructionCatalog = await writeProjectDeprecatedInstructionCatalog(
@@ -497,9 +500,11 @@ export const writeProjectSourceCatalogs = async (
       {
         ...trackedOptions,
         instructionCatalog,
-        deprecatedInstructionCatalog: cachedCatalogs
-          ? cachedCatalogs.deprecatedInstructionCatalog
-          : undefined,
+        deprecatedInstructionCatalog:
+          (options && options.deprecatedInstructionCatalog) ||
+          (cachedCatalogs
+            ? cachedCatalogs.deprecatedInstructionCatalog
+            : undefined),
       }
     );
     cachedInstructionCatalogs = {
@@ -572,15 +577,32 @@ const writeProjectFiles = async ({
 
   if (path.basename(filePath).toLowerCase() === MULTI_FILE_ENTRY_NAME) {
     const authoringCatalog = buildProjectInstructionCatalog(project);
-    const deprecatedCatalog = buildProjectDeprecatedInstructionCatalog(project);
+    const baseDeprecatedCatalog = buildProjectDeprecatedInstructionCatalog(
+      project
+    );
+    const baseSerializationCatalog = mergeProjectInstructionCatalogs(
+      authoringCatalog,
+      baseDeprecatedCatalog
+    );
+    const serializedProjectWithConstants = {
+      ...serializedProjectObject,
+      constants,
+    };
+    const deprecatedCatalog = mergeProjectInstructionCatalogs(
+      baseDeprecatedCatalog,
+      buildLegacyInstructionCatalogDelta(
+        baseSerializationCatalog,
+        serializedProjectWithConstants
+      )
+    );
     const serializationCatalog = mergeProjectInstructionCatalogs(
       authoringCatalog,
       deprecatedCatalog
     );
-    const authoringSerializedProjectObject = {
-      ...serializedProjectObject,
-      constants,
-    };
+    const authoringSerializedProjectObject = normalizeLegacyProjectInstructionParameters(
+      serializedProjectWithConstants,
+      serializationCatalog
+    );
     const settingsCatalog = buildProjectSettingsCatalog({
       project,
       serializedProject: authoringSerializedProjectObject,
@@ -614,6 +636,9 @@ const writeProjectFiles = async ({
       {
         decomposeOptions: {
           behaviorPropertySchemasByType,
+          instructionParameterIndicesToIgnoreByType: getCatalogCodeOnlyParameterIndicesByType(
+            serializationCatalog
+          ),
           eventsDslOptions: {
             formatInstruction: createCatalogInstructionFormatter(
               serializationCatalog

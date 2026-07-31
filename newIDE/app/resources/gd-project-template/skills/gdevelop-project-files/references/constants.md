@@ -216,7 +216,7 @@ Cost: {{cards.Sunflower.price}} / Cooldown: {{cards.Sunflower.cooldown}}s
 
 Values convert as follows:
 
-| Constant value                      | Substitution text                                         |
+| Constant value                         | Substitution text                                         |
 | -------------------------------------- | --------------------------------------------------------- |
 | String                                 | Raw string contents                                       |
 | Number                                 | Number text                                               |
@@ -250,13 +250,12 @@ parameters) also pass through the resolver, but use them only when the current
 editor/catalog accepts the value and preview/export verification proves the
 result. Numeric-expression operands are not textual placeholder surfaces.
 
-The IfDo parameter value remains a JSON string containing a serialized GDevelop
-operand. For a constant string expression, preserve both layers of quoting:
+Use a direct IfDo text value for a constant string placeholder:
 
 ```events
 @event aiGeneratedEventId="emit-configured-signal"
 if SceneJustBegins
-do EmitSceneSignal signal_name="\"{{signals.card.refresh}}\"" payload="\"startup\""
+do EmitSceneSignal signal_name="{{signals.card.refresh}}" payload="startup"
 ```
 
 If `signals.card.refresh` is `Card.Refresh`, generated code receives the literal
@@ -267,15 +266,14 @@ String interpolation in an action operand:
 ```events
 @event aiGeneratedEventId="log-configured-price"
 if SceneJustBegins
-do DebuggerTools::ConsoleLog message_to_log="\"Sunflower costs {{cards.Sunflower.price}}\""
+do DebuggerTools::ConsoleLog message_to_log="Sunflower costs {{cards.Sunflower.price}}"
 ```
 
 Safe event-use principles:
 
 - Prefer placeholders in catalog-declared string-expression parameters on
   ordinary actions or conditions.
-- Preserve GDevelop expression quoting; the braces live inside the serialized
-  string expression, not around the IfDo argument.
+- Keep the braces inside the direct IfDo string value.
 - Keep numeric expressions literal/runtime-driven.
 - Keep the special `SignalReceived` signal-name filter literal. Its standard
   event code generator performs a separate delivered-signal lookup, so do not
@@ -537,7 +535,7 @@ Guarded emit action:
 
 ```events
 if SceneJustBegins
-do EmitSceneSignal signal_name="\"{{signals.inventory.request}}\"" payload="\"initial-load\""
+do EmitSceneSignal signal_name="{{signals.inventory.request}}" payload="initial-load"
 ```
 
 Read [signal-system.md](signal-system.md) for target semantics, receiver rules,
@@ -611,7 +609,7 @@ error with a fabricated value unless that default is part of the user's design.
 - Putting `value = "{{...}}"` on a structure/array descriptor even though those
   descriptor types serialize `children`.
 - Assuming a resolved string variable remains linked to Constants at runtime.
-- Omitting the nested GDevelop-expression quotes in an IfDo string operand.
+- Wrapping a direct IfDo text value in another quoted expression layer.
 - Using number/boolean interpolation instead of an exact whole placeholder.
 - Replacing a `JsonObject` descriptor's concrete JSON example with a placeholder.
 - Referencing a `JsonObject` child absent from its example schema.

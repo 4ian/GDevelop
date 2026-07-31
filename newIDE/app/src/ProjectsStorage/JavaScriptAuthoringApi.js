@@ -293,6 +293,8 @@ declare namespace gdjs {
       function requestPointerLock(runtimeScene: RuntimeScene, reason?: string): boolean;
       function exitPointerLock(runtimeScene: RuntimeScene, reason?: string): void;
       function isPointerLocked(runtimeScene: RuntimeScene): boolean;
+      function getPointerMovementX(runtimeScene: RuntimeScene): number;
+      function getPointerMovementY(runtimeScene: RuntimeScene): number;
     }
     export namespace scene3d {
       interface RaycastResult {

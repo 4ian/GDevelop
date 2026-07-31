@@ -278,6 +278,7 @@ if (!RUN_COMPATIBILITY_TEST) {
         );
         try {
           copyJsonSources(example.directoryPath, temporaryDirectory);
+          fs.ensureFileSync(path.join(temporaryDirectory, 'constants.toml'));
           const legacyPath = path.join(
             temporaryDirectory,
             path.relative(example.directoryPath, example.projectPath)

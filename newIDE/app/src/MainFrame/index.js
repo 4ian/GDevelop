@@ -7710,6 +7710,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       }),
     [hasExtensionLoadErrors, isSaveProjectInProgress, saveProject]
   );
+  const launchPreviewForSceneRef = useStableUpToDateRef(launchPreviewForScene);
 
   const mcpEditorBridge = React.useMemo(
     () =>
@@ -7728,8 +7729,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           return true;
         },
         getPreviewLaunchState: getPreviewLaunchStateForMcp,
-        launchPreviewForScene: (sceneName: ?string) =>
-          launchPreviewForScene(sceneName),
+        getLaunchPreviewForScene: () => launchPreviewForSceneRef.current,
         reloadProjectAndWait: async reportProgress => {
           if (!currentFileMetadata) {
             return {
@@ -7892,7 +7892,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       setState,
       eventsFunctionsExtensionsState,
       getPreviewLaunchStateForMcp,
-      launchPreviewForScene,
+      launchPreviewForSceneRef,
       getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,

@@ -11,9 +11,14 @@ import {
   canonicalizeLegacyEventsJson,
   compileIfDoToLegacyEventsJson,
   convertLegacyEventsJsonToIfDo,
+  parseCatalogInstructionArguments,
   parseIfDoEvents,
   parseLegacyEventsJson,
 } from './index';
+import {
+  createCatalogInstructionFormatter,
+  createCatalogInstructionResolver,
+} from './ProjectInstructionCatalog';
 
 declare var __dirname: string;
 
@@ -39,15 +44,155 @@ const standard = (overrides: Object = {}) => ({
   ...overrides,
 });
 
-const collectJsonFiles = (directory: string): Array<string> =>
-  fs.readdirSync(directory).flatMap(name => {
-    const filePath = path.join(directory, name);
-    return fs.statSync(filePath).isDirectory()
-      ? collectJsonFiles(filePath)
-      : filePath.endsWith('.json')
-      ? [filePath]
-      : [];
+const testInstructionResolver = ({ kind, source, line }: Object): Object => {
+  const match = /^([^\s]+)(?:\s+(.*))?$/.exec(source);
+  if (!match) throw new Error(`Line ${line}: invalid test ${kind}.`);
+  const args = parseCatalogInstructionArguments(match[2] || '');
+  const parameters = Object.keys(args)
+    .sort()
+    .map(name => {
+      const value = args[name];
+      return value && value.__ifdoExpression ? value.source : String(value);
+    });
+  return instruction(match[1], parameters);
+};
+
+const TEST_COMPILE_OPTIONS = {
+  resolveInstruction: testInstructionResolver,
+};
+
+const isExactTextLiteral = (source: string): boolean => {
+  if (!source.startsWith('"')) return false;
+  try {
+    return typeof JSON.parse(source) === 'string';
+  } catch (error) {
+    return false;
+  }
+};
+
+const createTestCatalog = (events: Array<Object>): Object => {
+  const entriesByKey: Map<string, any> = new Map();
+  const visitInstruction = (kind: 'action' | 'condition', value: any): void => {
+    const key = `${kind}\u0000${value.type.value}`;
+    let entry = entriesByKey.get(key);
+    if (!entry) {
+      entry = {
+        type: value.type.value,
+        valuesByParameter: (value.parameters || []).map(parameter => [
+          parameter,
+        ]),
+      };
+      entriesByKey.set(key, entry);
+    } else {
+      const existingEntry: any = entry;
+      (value.parameters || []).forEach((parameter, index) => {
+        if (!existingEntry.valuesByParameter[index])
+          existingEntry.valuesByParameter[index] = [];
+        existingEntry.valuesByParameter[index].push(parameter);
+      });
+    }
+    (value.subInstructions || []).forEach(child =>
+      visitInstruction(kind, child)
+    );
+  };
+  const visitEvent = (event: any): void => {
+    (event.conditions || []).forEach(value =>
+      visitInstruction('condition', value)
+    );
+    (event.whileConditions || []).forEach(value =>
+      visitInstruction('condition', value)
+    );
+    (event.actions || []).forEach(value => visitInstruction('action', value));
+    (event.events || []).forEach(visitEvent);
+  };
+  events.forEach(visitEvent);
+  const entries: {
+    action: Array<any>,
+    condition: Array<any>,
+  } = { action: [], condition: [] };
+  entriesByKey.forEach((entry, key) => {
+    const kind = key.startsWith('action\u0000') ? 'action' : 'condition';
+    entries[kind].push({
+      type: entry.type,
+      parameters: entry.valuesByParameter.map((values, index) => {
+        if (values.every(value => value === '')) {
+          return {
+            dslName: `parameter_${index}`,
+            type: 'codeOnly',
+            isCodeOnly: true,
+          };
+        }
+        if (
+          values.every(
+            value =>
+              isExactTextLiteral(value) ||
+              (value.startsWith('"') && value.includes('+'))
+          )
+        ) {
+          return {
+            dslName: `parameter_${index}`,
+            type: 'string',
+            valueKind: 'text',
+          };
+        }
+        if (
+          values.every(value =>
+            /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(value)
+          )
+        ) {
+          return {
+            dslName: `parameter_${index}`,
+            type: 'number',
+            valueKind: 'number',
+          };
+        }
+        if (values.every(value => value === 'yes' || value === 'no')) {
+          return {
+            dslName: `parameter_${index}`,
+            type: 'yesorno',
+            valueKind: 'boolean',
+          };
+        }
+        if (values.every(value => value === 'True' || value === 'False')) {
+          return {
+            dslName: `parameter_${index}`,
+            type: 'trueorfalse',
+            valueKind: 'boolean',
+          };
+        }
+        return {
+          dslName: `parameter_${index}`,
+          type: 'identifier',
+          valueKind: 'name',
+        };
+      }),
+    });
   });
+  return {
+    format: 'gdevelop-ifdo-instruction-catalog',
+    formatVersion: 2,
+    actions: entries.action.sort((left, right) =>
+      left.type.localeCompare(right.type)
+    ),
+    conditions: entries.condition.sort((left, right) =>
+      left.type.localeCompare(right.type)
+    ),
+    expressions: [],
+  };
+};
+
+const roundTripWithTestCatalog = (
+  input: string
+): {| dsl: string, output: string |} => {
+  const catalog = createTestCatalog(JSON.parse(input));
+  const dsl = convertLegacyEventsJsonToIfDo(input, {
+    formatInstruction: createCatalogInstructionFormatter(catalog),
+  });
+  const output = compileIfDoToLegacyEventsJson(dsl, {
+    resolveInstruction: createCatalogInstructionResolver(catalog),
+  });
+  return { dsl, output };
+};
 
 const allEventTypesFixture = [
   standard({
@@ -191,45 +336,15 @@ const allEventTypesFixture = [
   },
 ];
 
-const persistedEventTypes = new Set(
-  allEventTypesFixture.map(event => event.type)
-);
-
-const collectSerializedEventLists = (root: any): Array<Array<Object>> => {
-  const lists = [];
-  const visit = (value: any) => {
-    if (Array.isArray(value)) {
-      if (
-        value.length > 0 &&
-        value.every(
-          item =>
-            item &&
-            typeof item === 'object' &&
-            typeof item.type === 'string' &&
-            persistedEventTypes.has(item.type)
-        )
-      ) {
-        lists.push(value);
-      }
-      value.forEach(visit);
-    } else if (value && typeof value === 'object') {
-      Object.keys(value).forEach(key => visit(value[key]));
-    }
-  };
-  visit(root);
-  return lists;
-};
-
 describe('IfDo events DSL', () => {
   describe('legacy JSON -> DSL -> legacy JSON', () => {
     test('round-trips every persisted event type and field', () => {
       const input = JSON.stringify(allEventTypesFixture);
-      const dsl = convertLegacyEventsJsonToIfDo(input);
-      const output = compileIfDoToLegacyEventsJson(dsl);
+      const { dsl, output } = roundTripWithTestCatalog(input);
 
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
-      expect(dsl).toContain('or @exact id="Compare"');
-      expect(dsl).not.toContain('@exact id="BuiltinCommonInstructions::Or"');
+      expect(dsl).toContain('or Compare');
+      expect(dsl).not.toContain('@exact');
       expect(dsl).toContain('for each child');
       expect(dsl).toContain('@js');
       expect(dsl).toContain('@end js');
@@ -244,9 +359,15 @@ describe('IfDo events DSL', () => {
 
     test('is canonical and deterministic', () => {
       const input = JSON.stringify(allEventTypesFixture);
-      const first = convertLegacyEventsJsonToIfDo(input);
+      const catalog = createTestCatalog(allEventTypesFixture);
+      const formatInstruction = createCatalogInstructionFormatter(catalog);
+      const resolveInstruction = createCatalogInstructionResolver(catalog);
+      const first = convertLegacyEventsJsonToIfDo(input, {
+        formatInstruction,
+      });
       const second = convertLegacyEventsJsonToIfDo(
-        compileIfDoToLegacyEventsJson(first)
+        compileIfDoToLegacyEventsJson(first, { resolveInstruction }),
+        { formatInstruction }
       );
       expect(second).toBe(first);
       expect(first.endsWith('\n')).toBe(true);
@@ -295,29 +416,27 @@ describe('IfDo events DSL', () => {
         }),
       ];
       const input = JSON.stringify(events);
-      const dsl = convertLegacyEventsJsonToIfDo(input);
-      const output = compileIfDoToLegacyEventsJson(dsl);
+      const { dsl, output } = roundTripWithTestCatalog(input);
 
       expect(areLegacyEventsEquivalent(input, output)).toBe(true);
-      expect(dsl).toContain('@exact id="SceneJustBegins" parameters=[""]');
-      expect(dsl).toContain('@exact id="CollisionNP"');
-      expect(dsl).toContain('@exact id="SetNumberVariable"');
+      expect(dsl).toContain('if SceneJustBegins');
+      expect(dsl).toContain('if CollisionNP');
+      expect(dsl).toContain('do SetNumberVariable');
+      expect(dsl).not.toContain('@exact');
       expect(dsl).not.toContain('scene begins');
       expect(dsl).not.toContain('collision Enemy Player');
       expect(dsl).not.toContain('scene.Score');
     });
 
-    test('falls back to exact when a friendly candidate is ambiguous', () => {
+    test('never falls back to raw positional instruction syntax', () => {
       const input = JSON.stringify([
         standard({
           actions: [instruction('SetNumberVariable', ['Score', '=', '"5"'])],
         }),
       ]);
-      const dsl = convertLegacyEventsJsonToIfDo(input);
-      expect(dsl).toContain('@exact id="SetNumberVariable"');
-      expect(
-        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
-      ).toBe(true);
+      expect(() => convertLegacyEventsJsonToIfDo(input)).toThrow(
+        'without a project instruction catalog'
+      );
     });
 
     test.each([
@@ -337,29 +456,13 @@ describe('IfDo events DSL', () => {
       );
     });
 
-    test('round-trips serialized event lists from repository game fixtures', () => {
-      const repositoryRoot = path.resolve(__dirname, '../../../../..');
-      const fixturePaths = collectJsonFiles(
-        path.join(repositoryRoot, 'GDJS/tests/games')
+    test('requires a project catalog for instruction-bearing legacy fixtures', () => {
+      const input = JSON.stringify([
+        standard({ conditions: [instruction('SceneJustBegins', [''])] }),
+      ]);
+      expect(() => convertLegacyEventsJsonToIfDo(input)).toThrow(
+        'without a project instruction catalog'
       );
-      let checkedLists = 0;
-      fixturePaths.forEach(filePath => {
-        const relativePath = path.relative(repositoryRoot, filePath);
-        const project = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        collectSerializedEventLists(project).forEach(events => {
-          const input = JSON.stringify(events);
-          const dsl = convertLegacyEventsJsonToIfDo(input);
-          let output;
-          try {
-            output = compileIfDoToLegacyEventsJson(dsl);
-          } catch (error) {
-            throw new Error(`${relativePath}: ${error.message}\n${dsl}`);
-          }
-          expect(areLegacyEventsEquivalent(input, output)).toBe(true);
-          checkedLists++;
-        });
-      });
-      expect(checkedLists).toBeGreaterThan(100);
     });
 
     test('preserves zero and multiple sibling while conditions', () => {
@@ -386,14 +489,10 @@ describe('IfDo events DSL', () => {
         },
       ]);
 
-      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const { dsl, output } = roundTripWithTestCatalog(input);
       expect(dsl).toContain('while index="emptyLoopIndex"');
-      expect(dsl).toContain(
-        'and while @exact id="SecondWhileCondition" parameters=[]'
-      );
-      expect(
-        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
-      ).toBe(true);
+      expect(dsl).toContain('and while SecondWhileCondition');
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
     test('preserves instruction trees in while conditions and nested logical Or', () => {
@@ -421,17 +520,12 @@ describe('IfDo events DSL', () => {
         standard({ conditions: [nestedOr] }),
       ];
       const input = JSON.stringify(events);
-      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const { dsl, output } = roundTripWithTestCatalog(input);
 
-      expect(dsl).toContain(
-        'while @exact id="BuiltinCommonInstructions::And" parameters=[]'
-      );
-      expect(dsl).toContain(
-        'if @exact id="BuiltinCommonInstructions::Or" parameters=[]'
-      );
-      expect(
-        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
-      ).toBe(true);
+      expect(dsl).toContain('while BuiltinCommonInstructions::And');
+      expect(dsl).toContain('if BuiltinCommonInstructions::Or');
+      expect(dsl).not.toContain('@exact');
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
     test('preserves JavaScript line endings and delimiter-looking body lines', () => {
@@ -544,13 +638,11 @@ describe('IfDo events DSL', () => {
         }),
       ]);
 
-      const dsl = convertLegacyEventsJsonToIfDo(input);
+      const { dsl, output } = roundTripWithTestCatalog(input);
 
       expect(dsl).toContain('> @js strict=true expanded=false');
       expect(dsl).not.toContain('> @event\n> @js');
-      expect(
-        areLegacyEventsEquivalent(input, compileIfDoToLegacyEventsJson(dsl))
-      ).toBe(true);
+      expect(areLegacyEventsEquivalent(input, output)).toBe(true);
     });
 
     test('preserves structural expressions, names, and comment whitespace', () => {
@@ -615,18 +707,18 @@ describe('IfDo events DSL', () => {
   });
 
   describe('DSL -> legacy JSON', () => {
-    test('compiles exact standard events and nested instructions', () => {
+    test('compiles named standard events and nested instructions', () => {
       const source = `
 @event disabled=true folded=true aiGeneratedEventId="id"
 @instruction inverted=true
-if @exact id="Or" parameters=[]
-? @exact id="A" parameters=["one"]
+if Or
+? A parameter_0="one"
 ? @instruction disabled=true
-? @exact id="B" parameters=[]
+? B
 @instruction awaited=true
-do await @exact id="Async" parameters=["x"]
+do await Async parameter_0="x"
 `;
-      const events = parseIfDoEvents(source);
+      const events = parseIfDoEvents(source, TEST_COMPILE_OPTIONS);
       expect(events).toHaveLength(1);
       expect(events[0].disabled).toBe(true);
       expect(events[0].conditions[0].type.inverted).toBe(true);
@@ -774,9 +866,11 @@ event
 local value = var(type="number",value=1,persistentUuid="uuid",folded=true)
 event
 > @event
-> do @exact id="Child" parameters=[]
+> do Child
 `;
-      const events = JSON.parse(compileIfDoToLegacyEventsJson(source));
+      const events = JSON.parse(
+        compileIfDoToLegacyEventsJson(source, TEST_COMPILE_OPTIONS)
+      );
       expect(events).toHaveLength(2);
       expect(events[1].variables[0]).toMatchObject({
         name: 'value',
@@ -792,14 +886,16 @@ event
       const source = `
 @event
 local state:enum("idle", "run") = "idle" uuid="state-id" folded=true
-if @exact id="A" parameters=[]
-do @exact id="X" parameters=[]
+if A
+do X
 @event
-else if @exact id="B" parameters=[]
+else if B
 local fallback:boolean = true
-do @exact id="Y" parameters=[]
+do Y
 `;
-      const events = JSON.parse(compileIfDoToLegacyEventsJson(source));
+      const events = JSON.parse(
+        compileIfDoToLegacyEventsJson(source, TEST_COMPILE_OPTIONS)
+      );
       expect(events[0].variables[0]).toMatchObject({
         name: 'state',
         type: 'enum',
@@ -817,15 +913,16 @@ do @exact id="Y" parameters=[]
 
     test('accepts CRLF and a UTF-8 BOM', () => {
       const output = compileIfDoToLegacyEventsJson(
-        '\uFEFF@event\r\ndo @exact id="Action" parameters=[]\r\n'
+        '\uFEFF@event\r\ndo Action\r\n',
+        TEST_COMPILE_OPTIONS
       );
       expect(JSON.parse(output)[0].actions[0].type.value).toBe('Action');
     });
 
     test('delegates source-only while limits to project-aware lowering', () => {
-      const source =
-        'while @exact id="KeepRunning" parameters=[] limit="100"\n';
+      const source = 'while KeepRunning limit="100"\n';
       const events = parseIfDoEvents(source, {
+        ...TEST_COMPILE_OPTIONS,
         lowerWhileLimit: ({ limit, event }) => ({
           ...event,
           whileConditions: [
@@ -882,7 +979,7 @@ do @exact id="Y" parameters=[]
     });
 
     test('publishes the closed serializer coverage manifest', () => {
-      expect(IFDO_EVENTS_DSL_COVERAGE.formatVersion).toBe('2.0');
+      expect(IFDO_EVENTS_DSL_COVERAGE.formatVersion).toBe('3.0');
       expect(IFDO_EVENTS_DSL_COVERAGE.persistedEventTypes).toHaveLength(10);
       expect(
         IFDO_EVENTS_DSL_COVERAGE.persistedEventTypes.map(entry => entry.type)
@@ -974,7 +1071,8 @@ do @exact id="Y" parameters=[]
       expectCode(
         () =>
           compileIfDoToLegacyEventsJson(
-            'while @exact id="A" parameters=[] limit=100\n'
+            'while A limit=100\n',
+            TEST_COMPILE_OPTIONS
           ),
         'IFDO_LOWERING_REQUIRED'
       );
@@ -991,13 +1089,13 @@ do @exact id="Y" parameters=[]
       );
     });
 
-    test('rejects unknown exact arguments and unterminated blocks', () => {
+    test('rejects removed exact syntax and unterminated blocks', () => {
       expectCode(
         () =>
           compileIfDoToLegacyEventsJson(
             'do @exact id="A" parameters=[] unknown=true\n'
           ),
-        'IFDO_SYNTAX'
+        'IFDO_EXACT_REMOVED'
       );
       expectCode(
         () => compileIfDoToLegacyEventsJson('@group "A"\nevent\n'),
@@ -1021,7 +1119,8 @@ do @exact id="Y" parameters=[]
       expectCode(
         () =>
           compileIfDoToLegacyEventsJson(
-            '@instruction awaited=false\ndo await @exact id="A" parameters=[]'
+            '@instruction awaited=false\ndo await A',
+            TEST_COMPILE_OPTIONS
           ),
         'IFDO_SYNTAX'
       );

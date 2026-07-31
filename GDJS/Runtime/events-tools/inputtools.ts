@@ -559,6 +559,26 @@ namespace gdjs {
           renderer.isPointerLocked()
         );
       };
+
+      /**
+       * Return the horizontal pointer movement accumulated during this frame.
+       *
+       * This is exposed through the input tools so pointer-lock extensions do
+       * not need to install their own DOM listeners or keep a private global
+       * movement accumulator.
+       */
+      export const getPointerMovementX = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): number =>
+        instanceContainer.getGame().getInputManager().getMouseMovementX();
+
+      /**
+       * Return the vertical pointer movement accumulated during this frame.
+       */
+      export const getPointerMovementY = (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): number =>
+        instanceContainer.getGame().getInputManager().getMouseMovementY();
     }
 
     export namespace scene3d {

@@ -55,8 +55,9 @@ namespace gdjs {
             const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
             const frustumSize = this._frustumSize * inverseWorldScale;
 
-            this._light.shadow.camera.near = 1;
-            this._light.shadow.camera.far = this._distanceFromCamera + 10000;
+            this._light.shadow.camera.near = 1 * inverseWorldScale;
+            this._light.shadow.camera.far =
+              (this._distanceFromCamera + 10000) * inverseWorldScale;
             this._light.shadow.camera.right = frustumSize / 2;
             this._light.shadow.camera.left = -frustumSize / 2;
             this._light.shadow.camera.top = frustumSize / 2;
@@ -154,6 +155,8 @@ namespace gdjs {
             const y = layer.getCameraY();
             const z = layer.getCameraZ(layer.getInitialCamera3DFieldOfView());
 
+            // Contrary to cameras, lights are within the scene so they already
+            // take world scale into account.
             const roundedX = Math.floor(x / 100) * 100;
             const roundedY = Math.floor(y / 100) * 100;
             const roundedZ = Math.floor(z / 100) * 100;
@@ -189,17 +192,8 @@ namespace gdjs {
                 roundedZ +
                 this._distanceFromCamera *
                   Math.sin(gdjs.toRad(this._elevation));
-
-              this._light.position.set(
-                posLightX * inverseWorldScale,
-                posLightY * inverseWorldScale,
-                posLightZ * inverseWorldScale
-              );
-              this._light.target.position.set(
-                roundedX * inverseWorldScale,
-                roundedY * inverseWorldScale,
-                roundedZ * inverseWorldScale
-              );
+              this._light.position.set(posLightX, posLightY, posLightZ);
+              this._light.target.position.set(roundedX, roundedY, roundedZ);
             }
           }
           updateDoubleParameter(parameterName: string, value: number): void {

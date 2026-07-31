@@ -100,7 +100,7 @@ export const AI_CHAT_TOOLS_VERSION = 'v8';
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v12';
+export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v13';
 export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
 export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
 

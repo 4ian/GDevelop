@@ -8,6 +8,7 @@ import {
 import {
   MULTI_FILE_ENTRY_NAME,
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_FORMAT_VERSION,
 } from './MultiFileProjectFormat';
 
 const gd: libGDevelop = global.gd;
@@ -491,7 +492,7 @@ const formatFields = ({
   settingsField('kind', 'string', { required: true, value: kind }),
   settingsField('settingsFormatVersion', 'integer', {
     required: true,
-    value: 1,
+    value: MULTI_FILE_FORMAT_VERSION,
   }),
   ...(ordered
     ? [
@@ -829,7 +830,7 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
     rootFields: [
       settingsField('combinedSettingsFormatVersion', 'integer', {
         required: true,
-        value: 1,
+        value: MULTI_FILE_FORMAT_VERSION,
       }),
       settingsField('eventsDslVersion', 'string', {
         required: true,
@@ -1120,75 +1121,58 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
         additionalFields:
           'preserve unlisted existing shared-data serializer fields',
       },
+      {
+        table: 'externalEventFiles',
+        header: '[[externalEventFiles]]',
+        repeated: true,
+        emptyForm: 'externalEventFiles = [ ]',
+        fields: [
+          settingsField('name', 'globally unique external-event name', {
+            required: true,
+          }),
+          settingsField('order', 'project-wide contiguous zero-based integer', {
+            required: true,
+          }),
+          settingsField(
+            'events',
+            'canonical game://scenes/<owner>/externals URI ending in .events',
+            {
+              required: true,
+            }
+          ),
+        ],
+        forbiddenFields: ['associatedLayout', 'linkedScene', 'unresolvedScene'],
+        additionalFields:
+          'preserve unknown ExternalEvents serializer metadata fields; the owning scene supplies associatedLayout',
+      },
+      {
+        table: 'externalLayoutFiles',
+        header: '[[externalLayoutFiles]]',
+        repeated: true,
+        emptyForm: 'externalLayoutFiles = [ ]',
+        fields: [
+          settingsField('name', 'globally unique external-layout name', {
+            required: true,
+          }),
+          settingsField('order', 'project-wide contiguous zero-based integer', {
+            required: true,
+          }),
+          settingsField(
+            'layout',
+            'canonical game://scenes/<owner>/externals URI ending in .layout',
+            {
+              required: true,
+            }
+          ),
+        ],
+        forbiddenFields: ['associatedLayout', 'linkedScene', 'unresolvedScene'],
+        additionalFields:
+          'preserve unknown ExternalLayout serializer metadata fields; the owning scene supplies associatedLayout',
+      },
       rawJsonTable,
     ],
     additionalFields:
       'preserve unknown current Layout serializer fields except layout/events/object ownership fields',
-  },
-  externals: {
-    rootFields: formatFields({ kind: 'externals' }),
-    childTables: [
-      {
-        table: 'eventFiles',
-        header: '[[eventFiles]]',
-        repeated: true,
-        emptyForm: 'eventFiles = [ ]',
-        fields: [
-          settingsField('name', 'unique external-event name', {
-            required: true,
-          }),
-          settingsField(
-            'linkedScene',
-            'scene name, empty string, or preserved stale scene name',
-            {
-              required: true,
-            }
-          ),
-          settingsField(
-            'events',
-            'canonical game://externals URI ending in .events',
-            {
-              required: true,
-            }
-          ),
-        ],
-        additionalFields:
-          'preserve unknown ExternalEvents serializer metadata fields',
-      },
-      {
-        table: 'layoutFiles',
-        header: '[[layoutFiles]]',
-        repeated: true,
-        emptyForm: 'layoutFiles = [ ]',
-        fields: [
-          settingsField('name', 'unique external-layout name', {
-            required: true,
-          }),
-          settingsField(
-            'linkedScene',
-            'scene name, empty string, or preserved stale scene name',
-            {
-              required: true,
-            }
-          ),
-          settingsField('unresolvedScene', 'boolean import marker', {
-            default: false,
-            note:
-              'Allowed only when linkedScene does not resolve to an existing scene.',
-          }),
-          settingsField(
-            'layout',
-            'canonical game://externals URI ending in .layout',
-            {
-              required: true,
-            }
-          ),
-        ],
-        additionalFields:
-          'preserve unknown ExternalLayout serializer metadata fields',
-      },
-      rawJsonTable,
-    ],
   },
   extension: {
     rootFields: [
@@ -1447,6 +1431,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'objectGroupRequiredBehaviors',
       'variables',
       'behaviorsSharedData',
+      'externalEventFiles',
+      'externalLayoutFiles',
       'runtime/loading/input/sound/sort settings',
     ],
     forbiddenFields: [
@@ -1482,16 +1468,6 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     ],
     forbiddenFields: ['instances', 'layers', 'events'],
     schema: SETTINGS_FILE_SCHEMAS.object,
-  },
-  {
-    kind: 'externals',
-    requiredMarker: { field: 'kind', value: 'externals' },
-    path: 'externals/external.settings',
-    mountedNamespace: 'externals',
-    tomlRoot: true,
-    requiredFields: ['kind', 'settingsFormatVersion'],
-    commonFields: ['eventFiles', 'layoutFiles'],
-    schema: SETTINGS_FILE_SCHEMAS.externals,
   },
   {
     kind: 'extension',
@@ -1769,7 +1745,8 @@ export const buildProjectSettingsCatalog = ({
         'Write component fields at the TOML root. Never repeat project, scene, extension, prefab, behavior, function, or object names in TOML table headers; the canonical physical path supplies that namespace.',
         'At load time the editor parses each local .settings document, mounts it at fileKinds.mountedNamespace, and strictly merges all mounted settings documents. constants.toml is loaded separately as editor-only Constants. Duplicate ownership is an error.',
         'Use canonical game:// URIs for .layout and .events references.',
-        'Use kind, settingsFormatVersion=1, and contiguous zero-based order fields exactly where the file-kind entry requires them.',
+        `Use kind, settingsFormatVersion=${MULTI_FILE_FORMAT_VERSION}, and contiguous zero-based order fields exactly where the file-kind entry requires them. External event/layout order is global across all scene.settings documents.`,
+        'Store external event and layout manifests as [[externalEventFiles]] and [[externalLayoutFiles]] records in their owning scene.settings. Store their sources below that scene folder in externals/. The scene owner supplies associatedLayout; do not write associatedLayout, linkedScene, or unresolvedScene in source manifests.',
         'Write every non-empty variable container as repeated [[variables]], [[globalVariables]], or [[sceneVariables]] records. Each record contains an explicit non-empty name and the complete descriptor fields, for example name = "Controllers", type = "array", and children = [...]. Write variables = [ ], globalVariables = [ ], or sceneVariables = [ ] only for an empty container. Keyed [variables] tables, whole-container inline tables, and non-empty inline descriptor arrays are forbidden.',
         'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
         'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',

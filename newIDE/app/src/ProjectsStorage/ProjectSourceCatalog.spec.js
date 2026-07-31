@@ -337,18 +337,21 @@ describe('project source catalogs', () => {
           Array.isArray(fileKind.schema.childTables)
       )
     ).toBe(true);
-    const externalsSchema = catalog.fileKinds.find(
-      fileKind => fileKind.kind === 'externals'
+    expect(
+      catalog.fileKinds.some(fileKind => fileKind.kind === 'externals')
+    ).toBe(false);
+    const sceneSchema = catalog.fileKinds.find(
+      fileKind => fileKind.kind === 'scene'
     ).schema;
-    expect(externalsSchema.childTables).toEqual(
+    expect(sceneSchema.childTables).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          table: 'eventFiles',
-          header: '[[eventFiles]]',
+          table: 'externalEventFiles',
+          header: '[[externalEventFiles]]',
           fields: expect.arrayContaining([
             expect.objectContaining({
-              name: 'linkedScene',
-              type: expect.stringContaining('scene name'),
+              name: 'order',
+              type: expect.stringContaining('project-wide'),
               required: true,
             }),
             expect.objectContaining({
@@ -359,10 +362,10 @@ describe('project source catalogs', () => {
           ]),
         }),
         expect.objectContaining({
-          table: 'layoutFiles',
-          header: '[[layoutFiles]]',
+          table: 'externalLayoutFiles',
+          header: '[[externalLayoutFiles]]',
           fields: expect.arrayContaining([
-            expect.objectContaining({ name: 'linkedScene', required: true }),
+            expect.objectContaining({ name: 'order', required: true }),
             expect.objectContaining({
               name: 'layout',
               type: expect.stringContaining('.layout'),
@@ -372,6 +375,18 @@ describe('project source catalogs', () => {
         }),
       ])
     );
+    sceneSchema.childTables
+      .filter(table =>
+        ['externalEventFiles', 'externalLayoutFiles'].includes(table.table)
+      )
+      .forEach(table => {
+        expect(table.fields.map(field => field.name)).not.toContain(
+          'linkedScene'
+        );
+        expect(table.forbiddenFields).toEqual(
+          expect.arrayContaining(['linkedScene', 'unresolvedScene'])
+        );
+      });
     expect(
       catalog.fileKinds
         .find(fileKind => fileKind.kind === 'function')

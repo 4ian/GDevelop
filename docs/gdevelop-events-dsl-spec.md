@@ -284,7 +284,7 @@ All DSL source files use the `.events` extension:
 
 ```text
 scenes/Main/Main.events
-externals/SharedCombat.events
+scenes/Main/externals/SharedCombat.events
 extensions/Combat/functions/Damage/Damage.events
 ```
 
@@ -293,7 +293,8 @@ extensions/Combat/functions/Damage/Damage.events
 A source file has one of two kinds:
 
 1. **Event-sheet body** — compiled for the scene target supplied by project and
-   scene settings, or the external target supplied by `external.settings`.
+   scene settings. External event sheets derive the same target from the
+   `scene.settings` document that declares them.
 2. **Function body** — compiled for the function signature supplied by
    its dedicated `function.settings`.
 
@@ -304,7 +305,7 @@ Canonical names are:
 
 ```text
 scenes/<SceneName>/<SceneName>.events
-externals/<ExternalEventSheetName>.events
+scenes/<SceneName>/externals/<ExternalEventSheetName>.events
 extensions/<ExtensionName>/functions/<FunctionName>/function.settings
 extensions/<ExtensionName>/functions/<FunctionName>/<FunctionName>.events
 extensions/<ExtensionName>/prefabs/<PrefabName>/functions/<FunctionName>/function.settings
@@ -314,8 +315,8 @@ extensions/<ExtensionName>/behaviors/<BehaviorName>/functions/<FunctionName>/<Fu
 ```
 
 In a project, the filename is cross-checked but settings are authoritative.
-External event-sheet paths and linked scenes are listed in
-`externals/external.settings`.
+External event-sheet paths are listed in the owning scene's
+`externalEventFiles`; the owner supplies the scene association.
 All function settings are discovered from fixed physical `functions/`
 directories. Prefab and behavior `function.settings` files store editor
 grouping in `folder = ["Parent", "Child"]`; no owner settings file lists them. The `ifdo-ai` profile
@@ -326,7 +327,7 @@ project-root URI, not a relative path. For example:
 
 ```toml
 events = "game://scenes/Main/Main.events"
-events = "game://externals/SharedCombat.events"
+events = "game://scenes/Main/externals/SharedCombat.events"
 events = "game://extensions/Combat/functions/Damage/Damage.events"
 events = "game://extensions/Combat/prefabs/Enemy/functions/TakeDamage/TakeDamage.events"
 events = "game://extensions/Combat/behaviors/Health/functions/Heal/Heal.events"
@@ -354,7 +355,7 @@ then binds its own `.events` target out of band:
 
 ```text
 game://scenes/Main/scene.settings -> game://scenes/Main/Main.events
-game://externals/external.settings -> game://externals/SharedCombat.events
+game://scenes/Main/scene.settings -> game://scenes/Main/externals/SharedCombat.events
 game://extensions/Combat/functions/Damage/function.settings -> game://extensions/Combat/functions/Damage/Damage.events
 game://extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/function.settings -> game://extensions/Combat/prefabs/Enemy/functions/Combat/TakeDamage/TakeDamage.events
 game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/function.settings -> game://extensions/Combat/behaviors/Health/functions/Recovery/Heal/Heal.events

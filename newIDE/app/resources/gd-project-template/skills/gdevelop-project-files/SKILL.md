@@ -208,9 +208,8 @@ scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
 scenes/<Scene>/objects/<Object>.settings
-externals/external.settings
-externals/<External>.layout
-externals/<External>.events
+scenes/<Scene>/externals/<External>.layout
+scenes/<Scene>/externals/<External>.events
 extensions/<Extension>/extension.settings
 extensions/<Extension>/functions/<Function>/function.settings
 extensions/<Extension>/functions/<Function>/<Function>.events
@@ -235,6 +234,14 @@ extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.even
 Do not create optional grouping folders. Canonical component directories are
 fixed; object/function grouping belongs in each settings file's `folder`
 array. Settings files never reference other settings files.
+
+Declare external sources in the associated scene's `scene.settings` using
+`[[externalEventFiles]]` and `[[externalLayoutFiles]]`. Each record requires
+`name`, a project-wide contiguous `order` within its external kind, and its
+scene-local `events` or `layout` URI. The declaring scene supplies
+`associatedLayout`; never write `associatedLayout`, `linkedScene`, or
+`unresolvedScene` in these records, and never create a root
+`externals/external.settings`.
 
 ## Task references
 

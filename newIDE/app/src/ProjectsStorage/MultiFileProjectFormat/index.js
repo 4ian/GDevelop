@@ -16,11 +16,13 @@ import {
   decompileLayoutToml,
 } from '../LayoutToml';
 
-export const MULTI_FILE_FORMAT_VERSION = 2;
+export const MULTI_FILE_FORMAT_VERSION = 3;
 export const MULTI_FILE_ENTRY_NAME = 'project.gdevelop';
 export const MULTI_FILE_ENTRY_URI = 'game://project.gdevelop';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
 export const MULTI_FILE_CONSTANTS_URI = 'game://constants.toml';
+export const MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI =
+  'game://externals/external.settings';
 
 const PROJECT_SPLIT_FIELDS = new Set([
   'resources',
@@ -1148,7 +1150,6 @@ const settingsNamespacePathForUri = (uri, payload) => {
     .map(segment => decodeURIComponent(segment));
   const name = String(payload.name || '');
   if (uri === MULTI_FILE_RESOURCES_URI) return ['project', 'resources'];
-  if (uri === 'game://externals/external.settings') return ['externals'];
   if (segments.length === 2 && segments[0] === 'objects')
     return ['project', 'objects', name];
   if (
@@ -1596,66 +1597,224 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     );
   }
 
-  (project.layouts || []).forEach((layout, order) => {
-    const layoutWithoutEmptyBehaviorSharedData = removeEmptyBehaviorSharedData(
-      layout
-    );
+  const sceneInfos = (project.layouts || []).map((layout, order) => {
     const name = String(layout.name || '');
-    const folderName = uniqueManagedName(name, sceneNames);
-    const settingsUri = encodeUriPath(['scenes', folderName, 'scene.settings']);
-    const layoutUri = encodeUriPath([
-      'scenes',
-      folderName,
-      `${folderName}.layout`,
-    ]);
+    return {
+      layout,
+      layoutWithoutEmptyBehaviorSharedData: removeEmptyBehaviorSharedData(
+        layout
+      ),
+      name,
+      order,
+      folderName: uniqueManagedName(name, sceneNames),
+      externalEventFiles: [],
+      externalLayoutFiles: [],
+    };
+  });
+  const sceneInfoByName = new Map();
+  sceneInfos.forEach(sceneInfo => {
+    if (sceneInfoByName.has(sceneInfo.name)) {
+      fail(
+        'MULTIFILE_DUPLICATE_IDENTITY',
+        `Scene settings contain duplicate name ${JSON.stringify(
+          sceneInfo.name
+        )}.`
+      );
+    }
+    sceneInfoByName.set(sceneInfo.name, sceneInfo);
+  });
+  const requireExternalSceneInfo = (external, kind) => {
+    const associatedLayout = String(external.associatedLayout || '');
+    const sceneInfo = sceneInfoByName.get(associatedLayout);
+    if (!associatedLayout || !sceneInfo) {
+      fail(
+        'MULTIFILE_EXTERNAL_SCENE_REQUIRED',
+        `${kind} ${JSON.stringify(
+          String(external.name || '')
+        )} must be associated with an existing scene before saving.`
+      );
+    }
+    return sceneInfo;
+  };
+  const externalEventNames = new Set();
+  const externalEventDisplayNames = new Set();
+  (project.externalEvents || []).forEach((external, order) => {
+    const name = String(external.name || '');
+    if (!name || externalEventDisplayNames.has(name)) {
+      fail(
+        name ? 'MULTIFILE_DUPLICATE_IDENTITY' : 'MULTIFILE_INVALID_SCHEMA',
+        name
+          ? `External event settings contain duplicate name ${JSON.stringify(
+              name
+            )}.`
+          : 'External event name must not be empty.'
+      );
+    }
+    externalEventDisplayNames.add(name);
+    const sceneInfo = requireExternalSceneInfo(external, 'External event');
+    const fileName = uniqueManagedName(name, externalEventNames);
     const eventsUri = encodeUriPath([
       'scenes',
-      folderName,
-      `${folderName}.events`,
+      sceneInfo.folderName,
+      'externals',
+      `${fileName}.events`,
     ]);
-    const settingsPayload = omitFields(
-      layoutWithoutEmptyBehaviorSharedData,
-      new Set([...SCENE_LAYOUT_FIELDS, 'events', 'objects'])
-    );
-    splitObjectDefinitions({
-      objects: layout.objects,
-      folderStructure: layout.objectsFolderStructure,
-      baseSegments: ['scenes', folderName, 'objects'],
-      files,
-      namespaceForObject: (objectName, payload) => ({
-        scenes: {
-          [name]: {
-            objects: { [objectName]: payload },
-          },
-        },
-      }),
+    sceneInfo.externalEventFiles.push({
+      ...omitFields(
+        external,
+        new Set([
+          'name',
+          'order',
+          'associatedLayout',
+          'linkedScene',
+          'unresolvedScene',
+          'events',
+        ])
+      ),
+      name,
+      order,
+      events: eventsUri,
     });
-    putSettingsFile(files, settingsUri, {
-      scenes: {
-        [name]: {
-          kind: 'scene',
-          settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
-          order,
-          layout: layoutUri,
-          events: eventsUri,
-          ...settingsPayload,
-        },
-      },
+    putEventsFile(
+      files,
+      eventsUri,
+      external.events || [],
+      options.eventsDslOptions
+    );
+  });
+  const externalLayoutNames = new Set();
+  const externalLayoutDisplayNames = new Set();
+  (project.externalLayouts || []).forEach((external, order) => {
+    const name = String(external.name || '');
+    if (!name || externalLayoutDisplayNames.has(name)) {
+      fail(
+        name ? 'MULTIFILE_DUPLICATE_IDENTITY' : 'MULTIFILE_INVALID_SCHEMA',
+        name
+          ? `External layout settings contain duplicate name ${JSON.stringify(
+              name
+            )}.`
+          : 'External layout name must not be empty.'
+      );
+    }
+    externalLayoutDisplayNames.add(name);
+    const sceneInfo = requireExternalSceneInfo(external, 'External layout');
+    const fileName = uniqueManagedName(name, externalLayoutNames);
+    const layoutUri = encodeUriPath([
+      'scenes',
+      sceneInfo.folderName,
+      'externals',
+      `${fileName}.layout`,
+    ]);
+    sceneInfo.externalLayoutFiles.push({
+      ...omitFields(
+        external,
+        new Set([
+          'name',
+          'order',
+          'associatedLayout',
+          'linkedScene',
+          'unresolvedScene',
+          ...EXTERNAL_LAYOUT_FIELDS,
+        ])
+      ),
+      name,
+      order,
+      layout: layoutUri,
     });
     putLayoutFile(
       files,
       layoutUri,
-      'gdevelop-scene-layout',
-      takeFields(layout, SCENE_LAYOUT_FIELDS),
-      layoutObjectContext(layout.objects || [], project.objects || [])
-    );
-    putEventsFile(
-      files,
-      eventsUri,
-      layout.events || [],
-      options.eventsDslOptions
+      'gdevelop-external-layout',
+      takeFields(external, EXTERNAL_LAYOUT_FIELDS),
+      {
+        ...layoutObjectContext(
+          sceneInfo.layout.objects || [],
+          project.objects || []
+        ),
+        layerNames: (sceneInfo.layout.layers || []).map(layer =>
+          String(layer.name || '')
+        ),
+      }
     );
   });
+
+  sceneInfos.forEach(
+    ({
+      layout,
+      layoutWithoutEmptyBehaviorSharedData,
+      name,
+      order,
+      folderName,
+      externalEventFiles,
+      externalLayoutFiles,
+    }) => {
+      const settingsUri = encodeUriPath([
+        'scenes',
+        folderName,
+        'scene.settings',
+      ]);
+      const layoutUri = encodeUriPath([
+        'scenes',
+        folderName,
+        `${folderName}.layout`,
+      ]);
+      const eventsUri = encodeUriPath([
+        'scenes',
+        folderName,
+        `${folderName}.events`,
+      ]);
+      const settingsPayload = omitFields(
+        layoutWithoutEmptyBehaviorSharedData,
+        new Set([
+          ...SCENE_LAYOUT_FIELDS,
+          'events',
+          'objects',
+          'externalEventFiles',
+          'externalLayoutFiles',
+        ])
+      );
+      splitObjectDefinitions({
+        objects: layout.objects,
+        folderStructure: layout.objectsFolderStructure,
+        baseSegments: ['scenes', folderName, 'objects'],
+        files,
+        namespaceForObject: (objectName, payload) => ({
+          scenes: {
+            [name]: {
+              objects: { [objectName]: payload },
+            },
+          },
+        }),
+      });
+      putSettingsFile(files, settingsUri, {
+        scenes: {
+          [name]: {
+            kind: 'scene',
+            settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+            order,
+            layout: layoutUri,
+            events: eventsUri,
+            ...settingsPayload,
+            ...(externalEventFiles.length ? { externalEventFiles } : {}),
+            ...(externalLayoutFiles.length ? { externalLayoutFiles } : {}),
+          },
+        },
+      });
+      putLayoutFile(
+        files,
+        layoutUri,
+        'gdevelop-scene-layout',
+        takeFields(layout, SCENE_LAYOUT_FIELDS),
+        layoutObjectContext(layout.objects || [], project.objects || [])
+      );
+      putEventsFile(
+        files,
+        eventsUri,
+        layout.events || [],
+        options.eventsDslOptions
+      );
+    }
+  );
 
   (project.eventsFunctionsExtensions || []).forEach((extension, order) => {
     const extensionName = String(extension.name || '');
@@ -1755,81 +1914,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       },
     });
   });
-
-  if (
-    (project.externalEvents || []).length ||
-    (project.externalLayouts || []).length
-  ) {
-    const externalSettings = 'game://externals/external.settings';
-    const eventFiles = [];
-    const layoutFiles = [];
-    const eventNames = new Set();
-    const layoutNames = new Set();
-    (project.externalEvents || []).forEach(external => {
-      const name = String(external.name || '');
-      const fileName = uniqueManagedName(name, eventNames);
-      const eventsUri = encodeUriPath(['externals', `${fileName}.events`]);
-      eventFiles.push({
-        ...omitFields(
-          external,
-          new Set(['name', 'associatedLayout', 'events'])
-        ),
-        name,
-        linkedScene: String(external.associatedLayout || ''),
-        events: eventsUri,
-      });
-      putEventsFile(
-        files,
-        eventsUri,
-        external.events || [],
-        options.eventsDslOptions
-      );
-    });
-    (project.externalLayouts || []).forEach(external => {
-      const name = String(external.name || '');
-      const fileName = uniqueManagedName(name, layoutNames);
-      const layoutUri = encodeUriPath(['externals', `${fileName}.layout`]);
-      const linkedScene = (project.layouts || []).find(
-        layout =>
-          String(layout.name || '') === String(external.associatedLayout || '')
-      );
-      layoutFiles.push({
-        ...omitFields(
-          external,
-          new Set(['name', 'associatedLayout', ...EXTERNAL_LAYOUT_FIELDS])
-        ),
-        name,
-        linkedScene: String(external.associatedLayout || ''),
-        ...(!linkedScene ? { unresolvedScene: true } : {}),
-        layout: layoutUri,
-      });
-      putLayoutFile(
-        files,
-        layoutUri,
-        'gdevelop-external-layout',
-        takeFields(external, EXTERNAL_LAYOUT_FIELDS),
-        linkedScene
-          ? {
-              ...layoutObjectContext(
-                linkedScene.objects || [],
-                project.objects || []
-              ),
-              layerNames: (linkedScene.layers || []).map(layer =>
-                String(layer.name || '')
-              ),
-            }
-          : {}
-      );
-    });
-    putSettingsFile(files, externalSettings, {
-      externals: {
-        kind: 'externals',
-        settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
-        eventFiles,
-        layoutFiles,
-      },
-    });
-  }
 
   const projectNamespace = {
     kind: 'project',
@@ -2188,19 +2272,65 @@ const validateChildSettingsPath = (ownerUri, childUri, childKind) => {
   }
 };
 
-const validateExternalSourceUri = (uri, extension) => {
+const validateExternalSourceUri = (
+  sceneSettingsUri,
+  uri,
+  extension,
+  externalName
+) => {
+  const sceneSegments = rawGameUriSegments(sceneSettingsUri);
   const segments = validateGameUri(uri).split('/');
+  const encodedName = encodeManagedName(externalName);
+  const expectedFilenames = [
+    `${decodeURIComponent(encodedName)}${extension}`,
+    `${decodeURIComponent(encodedName)}~${stableHash8(
+      externalName
+    )}${extension}`,
+  ];
   if (
-    segments.length !== 2 ||
-    segments[0] !== 'externals' ||
-    !segments[1].endsWith(extension)
+    sceneSegments.length !== 3 ||
+    sceneSegments[0] !== 'scenes' ||
+    sceneSegments[2] !== 'scene.settings' ||
+    segments.length !== 4 ||
+    segments[0] !== 'scenes' ||
+    segments[1] !== sceneSegments[1] ||
+    segments[2] !== 'externals' ||
+    !expectedFilenames.includes(segments[3])
   ) {
     fail(
       'MULTIFILE_INVALID_MANIFEST_PATH',
-      `External ${extension} source must be stored directly in externals/.`,
+      `External ${externalName} ${extension} source must be stored in the owning scene's externals folder with its canonical filename.`,
       uri
     );
   }
+};
+
+const validateSceneOwnedExternalEntry = (entry, label, sceneSettingsUri) => {
+  const payload = asObject(entry, label, sceneSettingsUri);
+  ['associatedLayout', 'linkedScene', 'unresolvedScene'].forEach(
+    forbiddenField => {
+      if (payload[forbiddenField] !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_SCHEMA',
+          `${label}.${forbiddenField} is forbidden because the owning scene.settings supplies the association.`,
+          sceneSettingsUri
+        );
+      }
+    }
+  );
+  const name = expectString(payload.name, `${label}.name`, sceneSettingsUri);
+  if (!name) {
+    fail(
+      'MULTIFILE_INVALID_SCHEMA',
+      `${label}.name must not be empty.`,
+      sceneSettingsUri
+    );
+  }
+  return {
+    ...payload,
+    name,
+    order: readSettingsOrder(payload, label, sceneSettingsUri),
+  };
 };
 
 const readSettingsOrder = (namespace, label, uri) => {
@@ -2506,6 +2636,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       MULTI_FILE_ENTRY_URI
     );
   }
+  if (files[MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI] !== undefined) {
+    fail(
+      'MULTIFILE_RETIRED_EXTERNAL_SETTINGS',
+      'external.settings is retired; declare externalEventFiles and externalLayoutFiles in the owning scene.settings.',
+      MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI
+    );
+  }
   [
     'sceneFiles',
     'extensionFiles',
@@ -2758,24 +2895,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   }
   const constantsUri = registerUri(MULTI_FILE_CONSTANTS_URI);
   const constantsPayload = parseConstantsFromToml(files[constantsUri]);
-  let externalDocument = null;
-  const externalSettingsUri = 'game://externals/external.settings';
-  if (
-    projectNamespace.externalSettings !== undefined &&
-    projectNamespace.externalSettings !== externalSettingsUri
-  ) {
-    fail(
-      'MULTIFILE_INVALID_MANIFEST_PATH',
-      'externalSettings must be game://externals/external.settings.'
-    );
-  }
-  if (files[externalSettingsUri] !== undefined) {
-    const uri = registerUri(externalSettingsUri);
-    settingsUris.push(uri);
-    externalDocument = parseSettings(files, uri);
-  } else if (projectNamespace.externalSettings !== undefined) {
-    parseSettings(files, externalSettingsUri);
-  }
   const legacySceneEntries = asArray(
     projectNamespace.sceneFiles,
     'project.sceneFiles'
@@ -2845,6 +2964,65 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     assertContiguousSettingsOrder(sceneDocuments, 'Scene');
   }
+  const externalEventDocuments = [];
+  const externalLayoutDocuments = [];
+  sceneDocuments.forEach(sceneDocument => {
+    const { entry: sceneEntry, uri, document } = sceneDocument;
+    const namespace = restoreTomlPayload(
+      requireNamespace(document, ['scenes', sceneEntry.name], uri),
+      uri
+    );
+    asArray(
+      namespace.externalEventFiles,
+      `scenes.${sceneEntry.name}.externalEventFiles`,
+      uri
+    ).forEach((rawEntry, index) => {
+      const label = `scenes.${sceneEntry.name}.externalEventFiles[${index}]`;
+      const entry = validateSceneOwnedExternalEntry(rawEntry, label, uri);
+      const sourceUri = expectString(entry.events, `${label}.events`, uri);
+      validateExternalSourceUri(uri, sourceUri, '.events', entry.name);
+      externalEventDocuments.push({
+        entry,
+        uri,
+        sourceUri,
+        sceneName: sceneEntry.name,
+      });
+    });
+    asArray(
+      namespace.externalLayoutFiles,
+      `scenes.${sceneEntry.name}.externalLayoutFiles`,
+      uri
+    ).forEach((rawEntry, index) => {
+      const label = `scenes.${sceneEntry.name}.externalLayoutFiles[${index}]`;
+      const entry = validateSceneOwnedExternalEntry(rawEntry, label, uri);
+      const sourceUri = expectString(entry.layout, `${label}.layout`, uri);
+      validateExternalSourceUri(uri, sourceUri, '.layout', entry.name);
+      externalLayoutDocuments.push({
+        entry,
+        uri,
+        sourceUri,
+        sceneName: sceneEntry.name,
+      });
+    });
+  });
+  externalEventDocuments.sort(
+    (left, right) => left.entry.order - right.entry.order
+  );
+  externalLayoutDocuments.sort(
+    (left, right) => left.entry.order - right.entry.order
+  );
+  assertUniqueManifestNames(
+    externalEventDocuments.map(({ entry }) => entry),
+    'external event settings',
+    MULTI_FILE_ENTRY_URI
+  );
+  assertUniqueManifestNames(
+    externalLayoutDocuments.map(({ entry }) => entry),
+    'external layout settings',
+    MULTI_FILE_ENTRY_URI
+  );
+  assertContiguousSettingsOrder(externalEventDocuments, 'External event');
+  assertContiguousSettingsOrder(externalLayoutDocuments, 'External layout');
   sceneDocuments = sceneDocuments.map(sceneDocument => {
     const sceneSegments = rawGameUriSegments(sceneDocument.uri);
     return {
@@ -3175,7 +3353,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
   });
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/externals\/external\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -3223,7 +3401,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       validateManifestIdentity(entry, namespace, uri);
       const settings = omitFields(
         removeFormatFields(namespace),
-        new Set(['order', 'layout', 'events'])
+        new Set([
+          'order',
+          'layout',
+          'events',
+          'externalEventFiles',
+          'externalLayoutFiles',
+        ])
       );
       if (settings.objects !== undefined) {
         fail(
@@ -3269,105 +3453,50 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     }
   );
 
-  project.externalEvents = [];
-  project.externalLayouts = [];
-  if (externalDocument) {
-    const uri = externalSettingsUri;
-    const namespace = restoreTomlPayload(
-      asObject(externalDocument.externals, 'externals', uri),
-      uri
-    );
-    if (
-      namespace.kind !== 'externals' ||
-      namespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
-    ) {
-      fail('MULTIFILE_UNSUPPORTED_VERSION', 'Invalid externals marker.', uri);
-    }
-    project.externalEvents = asArray(
-      namespace.eventFiles,
-      'externals.eventFiles',
-      uri
-    );
-    assertUniqueManifestNames(
-      project.externalEvents,
-      'externals.eventFiles',
-      uri
-    );
-    project.externalEvents = project.externalEvents.map(entry => {
-      validateExternalSourceUri(entry.events, '.events');
-      return {
-        ...omitFields(entry, new Set(['linkedScene', 'events'])),
-        name: expectString(entry.name, 'external event name', uri),
-        associatedLayout: String(entry.linkedScene || ''),
-        events: compileEvents(
-          files,
-          registerUri(expectString(entry.events, 'external events URI', uri)),
-          options
-        ),
-      };
-    });
-    project.externalLayouts = asArray(
-      namespace.layoutFiles,
-      'externals.layoutFiles',
-      uri
-    );
-    assertUniqueManifestNames(
-      project.externalLayouts,
-      'externals.layoutFiles',
-      uri
-    );
-    project.externalLayouts = project.externalLayouts.map(entry => {
-      validateExternalSourceUri(entry.layout, '.layout');
-      const linkedSceneName = String(entry.linkedScene || '');
+  project.externalEvents = externalEventDocuments.map(
+    ({ entry, sourceUri, sceneName }) => ({
+      ...omitFields(entry, new Set(['name', 'order', 'events'])),
+      name: entry.name,
+      associatedLayout: sceneName,
+      events: compileEvents(files, registerUri(sourceUri), options),
+    })
+  );
+  project.externalLayouts = externalLayoutDocuments.map(
+    ({ entry, uri, sourceUri, sceneName }) => {
       const linkedScene = project.layouts.find(
-        layout => layout.name === linkedSceneName
+        layout => layout.name === sceneName
       );
-      const unresolvedScene = entry.unresolvedScene === true;
-      if (!linkedScene && !unresolvedScene) {
+      if (!linkedScene) {
         fail(
-          'LAYOUT_UNKNOWN_SCENE',
-          `External layout ${String(
-            entry.name || ''
-          )} references missing scene ${linkedSceneName}.`,
-          uri
-        );
-      }
-      if (linkedScene && unresolvedScene) {
-        fail(
-          'MULTIFILE_INVALID_MANIFEST',
-          `External layout ${String(
-            entry.name || ''
-          )} resolves to scene ${linkedSceneName} and must not be marked unresolved.`,
+          'MULTIFILE_EXTERNAL_SCENE_REQUIRED',
+          `External layout ${JSON.stringify(
+            entry.name
+          )} must be owned by an existing scene.`,
           uri
         );
       }
       return {
-        ...omitFields(
-          entry,
-          new Set(['linkedScene', 'unresolvedScene', 'layout'])
-        ),
-        name: expectString(entry.name, 'external layout name', uri),
-        associatedLayout: linkedSceneName,
+        ...omitFields(entry, new Set(['name', 'order', 'layout'])),
+        name: entry.name,
+        associatedLayout: sceneName,
         ...readLayout(
           files,
-          registerUri(expectString(entry.layout, 'external layout URI', uri)),
+          registerUri(sourceUri),
           'gdevelop-external-layout',
-          linkedScene
-            ? {
-                ...layoutObjectContext(
-                  linkedScene.objects || [],
-                  project.objects || [],
-                  options.behaviorPropertySchemasByType
-                ),
-                layerNames: (linkedScene.layers || []).map(layer =>
-                  String(layer.name || '')
-                ),
-              }
-            : {}
+          {
+            ...layoutObjectContext(
+              linkedScene.objects || [],
+              project.objects || [],
+              options.behaviorPropertySchemasByType
+            ),
+            layerNames: (linkedScene.layers || []).map(layer =>
+              String(layer.name || '')
+            ),
+          }
         ),
       };
-    });
-  }
+    }
+  );
 
   project.eventsFunctionsExtensions = extensionDocuments.map(extensionInfo => {
     const { entry, uri, namespace, childDocuments } = extensionInfo;

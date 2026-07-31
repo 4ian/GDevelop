@@ -25,7 +25,8 @@ Use the owner to determine available objects, behaviors, variables, functions,
 and event scope:
 
 - `scene.settings` owns a scene event sheet.
-- `external.settings` owns an external event sheet and its linked scene.
+- A scene's `[[externalEventFiles]]` entry owns each external event sheet below
+  `scenes/<Scene>/externals/`; the declaring scene supplies its event context.
 - A dedicated `function.settings` owns every extension, prefab, or behavior
   function body. Prefab/behavior methods live under
   `functions/<Function>/` with their sibling `.events`; editor grouping is the

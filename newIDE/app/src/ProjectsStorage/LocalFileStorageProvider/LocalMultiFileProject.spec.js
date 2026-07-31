@@ -137,6 +137,92 @@ describe('Local multi-file project storage', () => {
     );
   });
 
+  test('stores external sources below their owning scene folder', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.externalEvents = [
+      { name: 'Shared Combat', associatedLayout: 'Main', events: [] },
+    ];
+    project.externalLayouts = [
+      {
+        name: 'Shared Combat',
+        associatedLayout: 'Main',
+        instances: [],
+        editionSettings: {},
+      },
+    ];
+
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    const sceneSettingsPath = path.join(
+      temporaryDirectory,
+      'scenes/Main/scene.settings'
+    );
+    const sceneSettings = fs.readFileSync(sceneSettingsPath, 'utf8');
+    expect(sceneSettings).toContain('[[externalEventFiles]]');
+    expect(sceneSettings).toContain('[[externalLayoutFiles]]');
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/externals/Shared Combat.events'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/externals/Shared Combat.layout'
+        )
+      )
+    ).toBe(true);
+    expect(fs.existsSync(path.join(temporaryDirectory, 'externals'))).toBe(
+      false
+    );
+    expect(
+      areLegacyProjectsEquivalent(
+        project,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
+  test('rejects retired external.settings without parsing it', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    const retiredSettingsPath = path.join(
+      temporaryDirectory,
+      'externals/external.settings'
+    );
+    fs.ensureDirSync(path.dirname(retiredSettingsPath));
+    fs.writeFileSync(retiredSettingsPath, 'not valid TOML', 'utf8');
+
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_RETIRED_EXTERNAL_SETTINGS',
+    });
+  });
+
+  test('leaves an unowned root externals directory untouched', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    const userSourcePath = path.join(
+      temporaryDirectory,
+      'externals/notes.events'
+    );
+    fs.ensureDirSync(path.dirname(userSourcePath));
+    fs.writeFileSync(userSourcePath, 'user-owned source', 'utf8');
+
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    expect(fs.readFileSync(userSourcePath, 'utf8')).toBe('user-owned source');
+  });
+
   test('rejects retired keyed variable tables without rewriting files during open', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const project = JSON.parse(JSON.stringify(projectFixture));
@@ -1102,15 +1188,21 @@ describe('Local multi-file project storage', () => {
     ).toBe(true);
     expect(
       persistedSettingsCatalog.fileKinds
-        .find(fileKind => fileKind.kind === 'externals')
-        .schema.childTables.find(table => table.table === 'eventFiles').fields
+        .find(fileKind => fileKind.kind === 'scene')
+        .schema.childTables.find(table => table.table === 'externalEventFiles')
+        .fields
     ).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'linkedScene', required: true }),
+        expect.objectContaining({ name: 'order', required: true }),
         expect.objectContaining({ name: 'events', required: true }),
       ])
     );
-    expect(settingsCatalog.counts.fileKinds).toBe(14);
+    expect(
+      persistedSettingsCatalog.fileKinds.some(
+        fileKind => fileKind.kind === 'externals'
+      )
+    ).toBe(false);
+    expect(settingsCatalog.counts.fileKinds).toBe(13);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
     expect(layoutCatalog.contexts).toEqual(

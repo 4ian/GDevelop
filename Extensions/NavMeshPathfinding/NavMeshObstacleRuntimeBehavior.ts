@@ -42,17 +42,39 @@ namespace gdjs {
       RecastNav.CrowdAgent | null
     >();
     hasStepped = false;
+    private navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
+      borderSize: 0,
+      cs: 10,
+      ch: 10,
+      walkableSlopeAngle: 60,
+      walkableHeight: 10,
+      walkableClimb: 2,
+      walkableRadius: 0.5,
+      maxEdgeLen: 12,
+      maxSimplificationError: 1.3,
+      minRegionArea: 8,
+      mergeRegionArea: 20,
+      maxVertsPerPoly: 6,
+      detailSampleDist: 6,
+      detailSampleMaxError: 10,
+    };
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+      this.navMeshConfig.cs = sharedData.cellSize;
+      this.navMeshConfig.ch = sharedData.cellDepth;
+      this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
+    }
 
     /**
      * Get the obstacles manager of an instance container.
      */
     static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (!instanceContainer.navMeshObstaclesManager) {
-        //Create the shared manager if necessary.
+        // Create the shared manager if necessary.
+        const initialData =
+          instanceContainer.getInitialSharedDataForBehavior('NavMeshCharacter');
         instanceContainer.navMeshObstaclesManager =
-          new gdjs.NavMeshObstaclesManager(instanceContainer);
+          new gdjs.NavMeshObstaclesManager(instanceContainer, initialData);
       }
       return instanceContainer.navMeshObstaclesManager;
     }
@@ -70,30 +92,13 @@ namespace gdjs {
     }
 
     rebuildNavMesh() {
-      const navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
-        borderSize: 0,
-        cs: 10,
-        ch: 10,
-        walkableSlopeAngle: 60,
-        walkableHeight: 10,
-        walkableClimb: 2,
-        walkableRadius: 1,
-        maxEdgeLen: 12,
-        maxSimplificationError: 1.3,
-        minRegionArea: 8,
-        mergeRegionArea: 20,
-        maxVertsPerPoly: 6,
-        detailSampleDist: 6,
-        detailSampleMaxError: 10,
-      };
-
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
         //@ts-ignore
         const object: gdjs.RuntimeObject3D = obstacle.owner;
         if (obstacle._shape === 'Mesh' && isModel3D(object)) {
-          this.addMeshFor(object, positions, indices);
+          this.addMeshFor(object, obstacle, positions, indices);
         } else {
           this.addBoxFor(object, positions, indices);
         }
@@ -102,7 +107,7 @@ namespace gdjs {
       const result = RecastNav.generateSoloNavMesh(
         positions,
         indices,
-        navMeshConfig
+        this.navMeshConfig
       );
       if (result.success) {
         this.navMesh = result.navMesh;
@@ -157,6 +162,7 @@ namespace gdjs {
 
     private addMeshFor(
       model3DRuntimeObject: gdjs.Model3DRuntimeObject,
+      obstacle: NavMeshObstacleRuntimeBehavior,
       positions: Array<float>,
       indices: Array<integer>
     ): void {
@@ -165,7 +171,7 @@ namespace gdjs {
         .getGame()
         .getModel3DManager()
         .getModel(
-          this.meshShapeResourceName ||
+          obstacle._meshShapeResourceName ||
             model3DRuntimeObject._modelResourceName ||
             ''
         );
@@ -198,12 +204,12 @@ namespace gdjs {
       threeObject.position.set(
         object.getCenterXInScene(),
         object.getCenterYInScene(),
-        object.getCenterZInScene(),
+        object.getCenterZInScene()
       );
       threeObject.rotation.set(
         gdjs.toRad(object.getRotationX()),
         gdjs.toRad(object.getRotationY()),
-        gdjs.toRad(object.getAngle()),
+        gdjs.toRad(object.getAngle())
       );
 
       threeObject.updateMatrixWorld();
@@ -220,7 +226,10 @@ namespace gdjs {
         const positionAttribute = mesh.geometry.getAttribute('position');
         object3d.getWorldScale(vector3);
         // Negate it because we swap Y and Z.
-        const shouldTrianglesBeFlipped = !(vector3.x * vector3.y * vector3.z < 0);
+        const shouldTrianglesBeFlipped = !(
+          vector3.x * vector3.y * vector3.z <
+          0
+        );
         const index = mesh.geometry.getIndex();
         if (index) {
           for (let i = 0; i < positionAttribute.count; i++) {
@@ -250,8 +259,8 @@ namespace gdjs {
             positions.push(vector3.x, vector3.z, vector3.y);
 
             indices.push(
-              indicesOffset + shouldTrianglesBeFlipped ? i + 1 : i,
-              indicesOffset + shouldTrianglesBeFlipped ? i : i + 1,
+              indicesOffset + (shouldTrianglesBeFlipped ? i + 1 : i),
+              indicesOffset + (shouldTrianglesBeFlipped ? i : i + 1),
               indicesOffset + i + 2
             );
           }
@@ -284,16 +293,12 @@ namespace gdjs {
         );
         return;
       }
+
+      character._crowdAgentParams.radius =
+        character._radius || Math.min(owner.getWidth(), owner.getHeight());
+      character._crowdAgentParams.height = owner.getDepth();
       const agent = this.crowd
-        ? this.crowd.addAgent(origin, {
-            radius: 40,
-            height: 100,
-            maxAcceleration: 1000,
-            maxSpeed: 300,
-            collisionQueryRange: 120,
-            pathOptimizationRange: 0.0,
-            separationWeight: 1.0,
-          })
+        ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;
       this.characterAgents.set(character, agent);
     }
@@ -360,7 +365,7 @@ namespace gdjs {
       this._impassable = behaviorData.impassable;
       this._cost = behaviorData.cost;
       this._shape = behaviorData.shape;
-      this.meshShapeResourceName = behaviorData.meshShapeResourceName || '';
+      this._meshShapeResourceName = behaviorData.meshShapeResourceName || '';
       this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:

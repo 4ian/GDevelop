@@ -55,19 +55,19 @@ namespace gdjs {
     static _smoothingWorkingVertices: Array<FloatPoint> = [];
 
     //Behavior configuration:
-    _allowDiagonals: boolean;
-    _acceleration: float;
-    _maxSpeed: float;
     _angularMaxSpeed: float;
     _angularAcceleration: float;
     _rotateObject: boolean;
     _angleOffset: float;
-    _cellWidth: float;
-    _cellHeight: float;
-    _gridOffsetX: float;
-    _gridOffsetY: float;
-    _extraBorder: float;
-    _smoothingMaxCellGap: float;
+    _radius: float;
+    _crowdAgentParams: Partial<RecastNav.CrowdAgentParams> = {
+      radius: 40,
+      height: 100,
+      maxAcceleration: 1000,
+      maxSpeed: 300,
+      collisionQueryRange: 120,
+      separationWeight: 1.0,
+    };
 
     //Attributes used for traveling on the path:
     _pathFound: boolean = false;
@@ -93,27 +93,16 @@ namespace gdjs {
       } else {
         this._path.length = 0;
       }
-      this._allowDiagonals = behaviorData.allowDiagonals;
-      this._acceleration = behaviorData.acceleration;
-      this._maxSpeed = behaviorData.maxSpeed;
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
-      this._cellWidth = behaviorData.cellWidth;
-      this._cellHeight = behaviorData.cellHeight;
-      this._gridOffsetX = behaviorData.gridOffsetX || 0;
-      this._gridOffsetY = behaviorData.gridOffsetY || 0;
-      this._extraBorder = behaviorData.extraBorder;
-      this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
+      this._radius = behaviorData.radius;
+      this._crowdAgentParams.maxAcceleration = behaviorData.acceleration;
+      this._crowdAgentParams.maxSpeed = behaviorData.maxSpeed;
+      this._crowdAgentParams.collisionQueryRange = behaviorData.avoidanceSightRange;
 
       // TODO Remove
-      this._acceleration = 1000;
-      this._maxSpeed = 300;
-      this._angularMaxSpeed = 720;
       this._angularAcceleration = 7200;
-      this._rotateObject = true;
-      this._angleOffset = 0;
-      this._angularSpeed = this._angularMaxSpeed;
 
       this._manager =
         gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
@@ -121,9 +110,6 @@ namespace gdjs {
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
-      if (behaviorData.allowDiagonals !== undefined) {
-        this.allowDiagonals(behaviorData.allowDiagonals);
-      }
       if (behaviorData.acceleration !== undefined) {
         this.setAcceleration(behaviorData.acceleration);
       }
@@ -139,28 +125,10 @@ namespace gdjs {
       if (behaviorData.angleOffset !== undefined) {
         this.setAngleOffset(behaviorData.angleOffset);
       }
-      if (behaviorData.cellWidth !== undefined) {
-        this.setCellWidth(behaviorData.cellWidth);
-      }
-      if (behaviorData.cellHeight !== undefined) {
-        this.setCellHeight(behaviorData.cellHeight);
-      }
-      if (behaviorData.gridOffsetX !== undefined) {
-        this._gridOffsetX = behaviorData.gridOffsetX;
-      }
-      if (behaviorData.gridOffsetY !== undefined) {
-        this._gridOffsetY = behaviorData.gridOffsetY;
-      }
-      if (behaviorData.extraBorder !== undefined) {
-        this.setExtraBorder(behaviorData.extraBorder);
-      }
-      if (behaviorData.smoothingMaxCellGap !== undefined) {
-        this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap;
-      }
       return true;
     }
 
-    getNetworkSyncData(
+    override getNetworkSyncData(
       options: GetNetworkSyncDataOptions
     ): NavMeshCharacterNetworkSyncData {
       return {
@@ -179,7 +147,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(
+    override updateFromNetworkSyncData(
       networkSyncData: NavMeshCharacterNetworkSyncData,
       options: UpdateFromNetworkSyncDataOptions
     ): void {
@@ -217,83 +185,43 @@ namespace gdjs {
       }
     }
 
-    onActivate() {
-      if (this._registeredInManager) {
-        return;
-      }
+    override onActivate() {
       this._manager.addCharacter(this);
-      this._registeredInManager = true;
     }
 
-    onDeActivate() {
-      if (!this._registeredInManager) {
-        return;
-      }
+    override onDeActivate() {
       this._manager.removeCharacter(this);
-      this._registeredInManager = false;
-    }
-
-    setCellWidth(width: float): void {
-      this._cellWidth = width;
-    }
-
-    getCellWidth(): float {
-      return this._cellWidth;
-    }
-
-    setCellHeight(height: float): void {
-      this._cellHeight = height;
-    }
-
-    getCellHeight(): float {
-      return this._cellHeight;
-    }
-
-    setGridOffsetX(gridOffsetX: float): void {
-      this._gridOffsetX = gridOffsetX;
-    }
-
-    getGridOffsetX(): float {
-      return this._gridOffsetX;
-    }
-
-    setGridOffsetY(gridOffsetY: float): void {
-      this._gridOffsetY = gridOffsetY;
-    }
-
-    getGridOffsetY(): float {
-      return this._gridOffsetY;
     }
 
     setAcceleration(acceleration: float): void {
-      this._acceleration = acceleration;
+      this._crowdAgentParams.maxAcceleration = acceleration;
     }
 
-    getAcceleration() {
-      return this._acceleration;
+    getAcceleration(): float {
+      return this._crowdAgentParams.maxAcceleration || 0;
     }
 
     setMaxSpeed(maxSpeed: float): void {
-      this._maxSpeed = maxSpeed;
+      this._crowdAgentParams.maxSpeed = maxSpeed;
     }
 
-    getMaxSpeed() {
-      return this._maxSpeed;
+    getMaxSpeed(): float {
+      return this._crowdAgentParams.maxSpeed || 0;
     }
 
     setSpeed(speed: float): void {
       this._speed = speed;
     }
 
-    getSpeed() {
+    getSpeed(): float {
       return this._speed;
     }
 
-    getMovementAngle() {
+    getMovementAngle(): float {
       return this._movementAngle;
     }
 
-    movementAngleIsAround(degreeAngle: float, tolerance: float) {
+    movementAngleIsAround(degreeAngle: float, tolerance: float): boolean {
       return (
         Math.abs(
           gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
@@ -315,22 +243,6 @@ namespace gdjs {
 
     getAngleOffset() {
       return this._angleOffset;
-    }
-
-    setExtraBorder(extraBorder): void {
-      this._extraBorder = extraBorder;
-    }
-
-    getExtraBorder() {
-      return this._extraBorder;
-    }
-
-    allowDiagonals(allow: boolean) {
-      this._allowDiagonals = allow;
-    }
-
-    diagonalsAllowed() {
-      return this._allowDiagonals;
     }
 
     setRotateObject(allow: boolean): void {
@@ -443,8 +355,6 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(x: float, y: float, z: float) {
-      const owner = this.owner;
-
       if (!this._manager.navMesh) {
         this._manager.rebuildNavMesh();
       }
@@ -502,7 +412,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const timeDelta = this.owner.getElapsedTime() / 1000;
       this._manager.step(timeDelta);
 
@@ -546,7 +456,7 @@ namespace gdjs {
 
       const timeDelta = this.owner.getElapsedTime() / 1000;
       // Always rotate the right way.
-      if ((this._angularSpeed > 0) ^ diffWasPositive) {
+      if (this._angularSpeed > 0 !== diffWasPositive) {
         this._angularSpeed = 0;
       }
       this._angularSpeed = gdjs.evtTools.common.clamp(
@@ -557,8 +467,7 @@ namespace gdjs {
         -this._angularMaxSpeed,
         this._angularMaxSpeed
       );
-      let newAngle =
-        this.owner.getAngle() + this._angularSpeed * timeDelta;
+      let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
 
       if (
         // @ts-ignore
@@ -570,7 +479,9 @@ namespace gdjs {
       this.owner.setAngle(newAngle);
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._manager.hasStepped = false;
     }
   }

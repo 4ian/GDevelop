@@ -39,14 +39,144 @@ module.exports = {
         propertyName,
         newValue
       ) {
+        if (propertyName === 'acceleration') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('acceleration')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'maxSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('maxSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'angularMaxSpeed') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('angularMaxSpeed')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'rotateObject') {
+          behaviorContent
+            .getOrCreateChild('rotateObject')
+            .setBoolValue(newValue === '1');
+          return true;
+        }
+
+        if (propertyName === 'angleOffset') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('angleOffset')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'radius') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('radius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
+        if (propertyName === 'avoidanceSightRange') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          behaviorContent
+            .getOrCreateChild('avoidanceSightRange')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+
         return false;
       };
       behavior.getProperties = function (behaviorContent) {
         const behaviorProperties = new gd.MapStringPropertyDescriptor();
+
+        behaviorProperties
+          .getOrCreate('acceleration')
+          .setValue(behaviorContent.getChild('acceleration').getStringValue())
+          .setLabel(_('Acceleration'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelAcceleration());
+
+        behaviorProperties
+          .getOrCreate('maxSpeed')
+          .setValue(behaviorContent.getChild('maxSpeed').getStringValue())
+          .setLabel(_('Max. speed'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixelSpeed());
+
+        behaviorProperties
+          .getOrCreate('angularMaxSpeed')
+          .setValue(
+            behaviorContent.getChild('angularMaxSpeed').getStringValue()
+          )
+          .setLabel(_('Rotation speed'))
+          .setGroup(_('Rotation'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getAngularSpeed());
+
+        behaviorProperties
+          .getOrCreate('rotateObject')
+          .setValue(
+            behaviorContent.getChild('rotateObject').getBoolValue()
+              ? 'true'
+              : 'false'
+          )
+          .setLabel(_('Rotate object'))
+          .setGroup(_('Rotation'))
+          .setType('Boolean');
+
+        behaviorProperties
+          .getOrCreate('angleOffset')
+          .setValue(behaviorContent.getChild('angleOffset').getStringValue())
+          .setLabel(_('Angle offset'))
+          .setGroup(_('Rotation'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle());
+
+        behaviorProperties
+          .getOrCreate('radius')
+          .setValue(behaviorContent.getChild('radius').getStringValue())
+          .setLabel(_('Radius'))
+          .setGroup(_('Collision'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setAdvanced(true);
+
+        behaviorProperties
+          .getOrCreate('avoidanceSightRange')
+          .setValue(behaviorContent.getChild('avoidanceSightRange').getStringValue())
+          .setLabel(_('Avoidance sight range'))
+          .setGroup(_('Collision'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel());
+
         return behaviorProperties;
       };
 
-      behavior.initializeContent = function (behaviorContent) {};
+      behavior.initializeContent = function (behaviorContent) {
+        behaviorContent.addChild('acceleration').setDoubleValue(400);
+        behaviorContent.addChild('maxSpeed').setDoubleValue(200);
+        behaviorContent.addChild('angularMaxSpeed').setDoubleValue(180);
+        behaviorContent.addChild('rotateObject').setBoolValue(true);
+        behaviorContent.addChild('angleOffset').setDoubleValue(0);
+        behaviorContent.addChild('radius').setDoubleValue(0);
+        behaviorContent.addChild('avoidanceSightRange').setDoubleValue(120);
+      };
 
       const sharedData = new gd.BehaviorSharedDataJsImplementation();
       sharedData.updateProperty = function (
@@ -54,13 +184,81 @@ module.exports = {
         propertyName,
         newValue
       ) {
+        if (propertyName === 'cellSize') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('cellSize')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+        if (propertyName === 'cellDepth') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('cellDepth')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+        if (propertyName === 'slopeMaxAngle') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('slopeMaxAngle')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
         return false;
       };
       sharedData.getProperties = function (sharedContent) {
         const sharedProperties = new gd.MapStringPropertyDescriptor();
+
+        sharedProperties
+          .getOrCreate('cellSize')
+          .setLabel('Cell size')
+          .setGroup('')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            sharedContent.getChild('cellSize').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        sharedProperties
+          .getOrCreate('cellDepth')
+          .setLabel('Cell depth')
+          .setGroup('')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            sharedContent.getChild('cellDepth').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        sharedProperties
+          .getOrCreate('slopeMaxAngle')
+          .setLabel('Slope max. angle')
+          .setGroup('')
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
+          .setValue(
+            sharedContent
+              .getChild('slopeMaxAngle')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return sharedProperties;
       };
-      sharedData.initializeContent = function (behaviorContent) {};
+      sharedData.initializeContent = function (sharedContent) {
+        sharedContent.addChild('cellSize').setDoubleValue(10);
+        sharedContent.addChild('cellDepth').setDoubleValue(10);
+        sharedContent.addChild('slopeMaxAngle').setDoubleValue(50);
+      };
 
       const aut = extension
         .addBehavior(
@@ -94,19 +292,22 @@ module.exports = {
           'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
         );
 
-      aut.addAction("MoveTo",
-                    _("Move to a position"),
-                    _("Move the object to a position"),
-                    _("Move _PARAM0_ to _PARAM2_ ; _PARAM3_ ; _PARAM4_"),
-                    _("Movement on the path"),
-                    "CppPlatform/Extensions/AStaricon24.png",
-                    "CppPlatform/Extensions/AStaricon16.png")
-          .addParameter("object", _("Object"))
-          .addParameter("behavior", _("Behavior"), "NavMeshCharacterBehavior")
-          .addParameter("expression", _("Destination X position"))
-          .addParameter("expression", _("Destination Y position"))
-          .addParameter("expression", _("Destination Z position"))
-          .setFunctionName("moveTo");
+      aut
+        .addAction(
+          'MoveTo',
+          _('Move to a position'),
+          _('Move the object to a position'),
+          _('Move _PARAM0_ to _PARAM2_ ; _PARAM3_ ; _PARAM4_'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('expression', _('Destination X position'))
+        .addParameter('expression', _('Destination Y position'))
+        .addParameter('expression', _('Destination Z position'))
+        .setFunctionName('moveTo');
     }
     {
       const behavior = new gd.BehaviorJsImplementation();
@@ -182,7 +383,7 @@ module.exports = {
         const sharedProperties = new gd.MapStringPropertyDescriptor();
         return sharedProperties;
       };
-      sharedData.initializeContent = function (behaviorContent) {};
+      sharedData.initializeContent = function (sharedContent) {};
 
       const aut = extension
         .addBehavior(

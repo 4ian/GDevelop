@@ -2,14 +2,6 @@ const shell = require('shelljs');
 const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
-const allowDevelopmentLibGD = !!args['allow-development-libgd'];
-
-// Maximum size (in MiB) allowed for a production (release) libGD.js. This guard
-// only exists to catch a development/debug build (which ships debugging symbols
-// and unoptimized/unminified glue and is many megabytes larger) being packaged
-// by mistake. The optimized release build grows slowly over time, so keep some
-// headroom above its current size; a real dev/debug build is far larger still.
-const MAX_LIBGDJS_SIZE_IN_MIB = 4;
 
 // Sanity check electron-builder installation
 if (!shell.test('-f', './node_modules/.bin/electron-builder')) {
@@ -29,17 +21,34 @@ const checkLibGDjsSize = () => {
         shell.exit(1);
       }
 
-      const sizeInMiB = stats.size / 1024 / 1024;
-      if (sizeInMiB > MAX_LIBGDJS_SIZE_IN_MIB && !allowDevelopmentLibGD) {
+      // A release build is minified into a handful of very long lines, while a
+      // 'dev' or 'debug' build is not minified at all (tens of thousands of lines).
+      // Their sizes are too close to tell them apart, so check the line count.
+      const lineCount = fs
+        .readFileSync(path.join(appPublicPath, 'libGD.js'), 'utf8')
+        .split('\n').length;
+      if (lineCount > 1000) {
         shell.echo(
-          `❌ libGD.js size is too big (${sizeInMiB.toFixed(
-            2
-          )}MiB, limit ${MAX_LIBGDJS_SIZE_IN_MIB}MiB) - are you sure you're not trying to deploy the development version?`
+          `❌ libGD.js does not look minified (${lineCount} lines) - are you sure you're not trying to deploy the development version?`
         );
         shell.exit(1);
       }
 
-      shell.echo(`✅ libGD.js size seems correct (${sizeInMiB.toFixed(2)}MiB)`);
+      const sizeInMiB = stats.size / 1024 / 1024;
+      if (sizeInMiB > 4) {
+        shell.echo(
+          `❌ libGD.js size is too big (${sizeInMiB.toFixed(
+            2
+          )}MiB) - are you sure it was built properly?`
+        );
+        shell.exit(1);
+      }
+
+      shell.echo(
+        `✅ libGD.js seems correct (${sizeInMiB.toFixed(
+          2
+        )}MiB, ${lineCount} lines)`
+      );
 
       if (!fs.existsSync(path.join(appPublicPath, 'libGD.wasm'))) {
         shell.echo(

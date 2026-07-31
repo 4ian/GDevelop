@@ -26,6 +26,7 @@
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
+#include "GDCore/Project/LayoutFolderOrLayout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -66,8 +67,8 @@ Project::Project()
       variables(gd::VariablesContainer::SourceType::Global),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
-      sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
-}
+      sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never"),
+      layoutsRootFolder(gd::make_unique<gd::LayoutFolderOrLayout>("__ROOT")) {}
 
 Project::~Project() {}
 
@@ -335,6 +336,8 @@ gd::Layout& Project::InsertNewLayout(const gd::String& name,
   newlyInsertedLayout.SetName(name);
   newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
 
+  layoutsRootFolder->InsertLayout(&newlyInsertedLayout);
+
   return newlyInsertedLayout;
 }
 
@@ -346,6 +349,8 @@ gd::Layout& Project::InsertLayout(const gd::Layout& layout,
 
   newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
 
+  layoutsRootFolder->InsertLayout(&newlyInsertedLayout);
+
   return newlyInsertedLayout;
 }
 
@@ -356,7 +361,19 @@ void Project::RemoveLayout(const gd::String& name) {
       });
   if (scene == scenes.end()) return;
 
+  // Remove the layout from the folder structure first, so that it does not
+  // keep a dangling pointer to the layout being destroyed.
+  layoutsRootFolder->RemoveRecursivelyLayoutNamed(name);
+
   scenes.erase(scene);
+}
+
+void Project::AddMissingLayoutsInRootFolder() {
+  for (std::size_t i = 0; i < scenes.size(); ++i) {
+    if (!layoutsRootFolder->HasLayoutNamed(scenes[i]->GetName())) {
+      layoutsRootFolder->InsertLayout(scenes[i].get());
+    }
+  }
 }
 
 bool Project::HasExternalEventsNamed(const gd::String& name) const {
@@ -891,6 +908,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   scenes.clear();
+  // Clear the folder structure too: it points to the layouts being destroyed.
+  layoutsRootFolder->Clear();
   const SerializerElement& layoutsElement =
       element.GetChild("layouts", 0, "Scenes");
   layoutsElement.ConsiderAsArrayOf("layout", "Scene");
@@ -903,6 +922,14 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
   SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
   SetPreviewLayout(element.GetChild("previewLayout").GetStringValue());
+
+  // `InsertNewLayout` added all the layouts at the root of the folder
+  // structure: replace it by the saved one, if any.
+  if (element.HasChild("layoutsFolderStructure")) {
+    layoutsRootFolder->UnserializeFrom(
+        *this, element.GetChild("layoutsFolderStructure", 0));
+  }
+  AddMissingLayoutsInRootFolder();
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -1165,6 +1192,8 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < GetLayoutsCount(); i++)
     GetLayout(i).SerializeTo(layoutsElement.AddChild("layout"));
 
+  layoutsRootFolder->SerializeTo(element.AddChild("layoutsFolderStructure"));
+
   SerializerElement& externalEventsElement = element.AddChild("externalEvents");
   externalEventsElement.ConsiderAsArrayOf("externalEvents");
   for (std::size_t i = 0; i < GetExternalEventsCount(); ++i)
@@ -1291,6 +1320,13 @@ void Project::Init(const gd::Project& game) {
   objectsContainer = game.objectsContainer;
 
   scenes = gd::Clone(game.scenes);
+
+  // The layouts folder structure is not copied (it points to the layouts of
+  // the other project). It's not an issue because the UI uses the
+  // serialization for duplication: rebuild a flat structure so that every
+  // layout stays reachable.
+  layoutsRootFolder = gd::make_unique<gd::LayoutFolderOrLayout>("__ROOT");
+  AddMissingLayoutsInRootFolder();
 
   externalEvents = gd::Clone(game.externalEvents);
 

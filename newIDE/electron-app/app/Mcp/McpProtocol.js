@@ -79,15 +79,6 @@ const getInitializeResult = () => ({
   },
 });
 
-const validateBearerToken = (authorizationHeader, expectedToken) => {
-  if (!expectedToken) return false;
-  if (!authorizationHeader || typeof authorizationHeader !== 'string') {
-    return false;
-  }
-
-  return authorizationHeader === `Bearer ${expectedToken}`;
-};
-
 module.exports = {
   MCP_PROTOCOL_VERSION,
   JSON_RPC_ERROR_CODES,
@@ -96,5 +87,4 @@ module.exports = {
   createTextToolResult,
   createErrorToolResult,
   getInitializeResult,
-  validateBearerToken,
 };

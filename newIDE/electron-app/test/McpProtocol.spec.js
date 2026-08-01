@@ -6,7 +6,6 @@ const {
   createTextToolResult,
   createErrorToolResult,
   getInitializeResult,
-  validateBearerToken,
 } = require('../app/Mcp/McpProtocol');
 
 const run = () => {
@@ -52,16 +51,6 @@ const run = () => {
       error: 'No project opened.',
     },
   });
-
-  assert.strictEqual(
-    validateBearerToken('Bearer secret-token', 'secret-token'),
-    true
-  );
-  assert.strictEqual(
-    validateBearerToken('Bearer wrong-token', 'secret-token'),
-    false
-  );
-  assert.strictEqual(validateBearerToken(null, 'secret-token'), false);
 
   const initializeResult = getInitializeResult();
   assert.strictEqual(initializeResult.protocolVersion, '2025-06-18');

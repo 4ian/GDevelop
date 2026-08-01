@@ -14,7 +14,7 @@ Add a built-in MCP server to the GDevelop desktop app so MCP-compatible AI clien
 
 ## Architecture
 
-The MCP server runs in the Electron main process and listens on `127.0.0.1:<configuredPort>/mcp`. It implements MCP Streamable HTTP using JSON-RPC over HTTP. The main process owns transport concerns, sessions, authorization, tool/resource/prompt catalogues, and request routing.
+The MCP server runs in the Electron main process and listens on `127.0.0.1:<configuredPort>/mcp`. It implements MCP Streamable HTTP using JSON-RPC over HTTP. The main process owns transport concerns, sessions, tool/resource/prompt catalogues, and request routing.
 
 Actual editor actions run in the renderer because the renderer owns the active project, editor callbacks, command palette, preview state, storage providers, and unsaved changes tracking. The main process forwards MCP calls to the active BrowserWindow through IPC and waits for a structured result.
 
@@ -44,20 +44,19 @@ The server is disabled by default.
 Preferences add a dedicated MCP tab with:
 
 - `enableMcpServer`: boolean, default `false`
-- `mcpServerPort`: number, default `3211`
-- `mcpAuthorizationToken`: string, generated locally on first enable
+- `mcpServerPort`: number, default `32110`
 - `mcpAllowWriteTools`: boolean, default `false`
 - `mcpAllowCommandTools`: boolean, default `false`
-- `mcpShowServerUrl`: display-only URL and token hint
+- Server status, URL, and startup errors are display-only.
 
 Runtime constraints:
 
 - Bind only to `127.0.0.1`.
-- Require `Authorization: Bearer <token>` for every HTTP request after initialization. If a client omits auth during `initialize`, return a clear authentication error.
+- Do not require application-level authentication. Any local process can connect while the explicitly enabled server is running.
 - Treat write tools as unavailable unless `mcpAllowWriteTools` is enabled.
 - Treat command execution as unavailable unless `mcpAllowCommandTools` is enabled.
 - Return tool errors as MCP tool results with `isError: true` when the request reached a tool.
-- Return JSON-RPC errors for protocol/auth/session/method problems.
+- Return JSON-RPC errors for protocol/session/method problems.
 
 ## Tool Catalogue
 
@@ -175,7 +174,7 @@ The main process server must:
 - Start/stop/restart when preferences change.
 - Choose the configured port or return a clear port conflict error.
 - Track the active BrowserWindow and fail gracefully when no window is ready.
-- Validate authorization and protocol shape before forwarding.
+- Validate protocol shape before forwarding.
 - Map MCP methods to bridge calls.
 - Normalize errors into MCP-compatible JSON-RPC or tool result objects.
 - Shut down on app quit and when all windows close.
@@ -188,7 +187,7 @@ The main process server must:
 4. MCP client calls `initialize`.
 5. MCP client calls `tools/list`, `resources/list`, or `prompts/list`.
 6. MCP client calls `tools/call`.
-7. Main validates token and permission, then forwards to renderer via IPC.
+7. Main applies tool permissions, then forwards to renderer via IPC.
 8. Renderer executes `processEditorFunctionCalls` or state/resource command.
 9. Renderer returns JSON-safe result.
 10. Main returns a MCP `CallToolResult`.
@@ -207,7 +206,7 @@ The main process server must:
 
 Unit tests:
 
-- MCP JSON-RPC handler: initialize, list tools, call tool, list/read resources, list/get prompts, auth failures, unknown methods.
+- MCP JSON-RPC handler: unauthenticated initialize, list tools, call tool, list/read resources, list/get prompts, unknown methods.
 - Permission filtering: write tools hidden or blocked when disabled.
 - Tool result normalization: success, editor failure, thrown exception.
 - Server lifecycle: start, stop, restart config, port conflict handling using mocked HTTP server.
@@ -244,6 +243,6 @@ Implement in phases:
 
 - Transport: Streamable HTTP only for the built-in server.
 - Binding: localhost only.
-- Authentication: bearer token required.
+- Authentication: none; access relies on the opt-in server and localhost-only binding.
 - Write access: disabled by default.
 - Tool implementation: reuse existing EditorFunctions and add MCP-specific wrappers only where needed.

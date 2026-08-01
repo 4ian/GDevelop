@@ -331,13 +331,13 @@ hooks. Do not rewrite its MCP transport or preview lifecycle from scratch
 unless the template is incompatible with the requested scenario; report the
 specific incompatibility when deviating.
 
-Preserve the template's environment-token authentication, stale-preview
-cleanup, fresh paused launch, deterministic frame stepping, bounded object
-inspection, runtime/renderer checks, JSON result, nonzero failure exits,
-optional screenshot, and guaranteed preview cleanup. Run `py_compile`, the
-template-derived script's `--self-test`, and the actual scenario against a
-fresh preview. A gameplay test script does not replace the validation,
-Git-commit, and reload gates when project sources changed.
+Preserve the template's local MCP transport, stale-preview cleanup, fresh
+paused launch, deterministic frame stepping, bounded object inspection,
+runtime/renderer checks, JSON result, nonzero failure exits, optional
+screenshot, and guaranteed preview cleanup. MCP authentication is not required.
+Run `py_compile`, the template-derived script's `--self-test`, and the actual
+scenario against a fresh preview. A gameplay test script does not replace the
+validation, Git-commit, and reload gates when project sources changed.
 
 ## Event authoring
 
@@ -498,24 +498,21 @@ asset is appropriate.
 
 MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
-The complete public protocol surface is the following 27-tool allowlist:
+The complete public protocol surface is the following 22-tool allowlist:
 
 - Editor/project inspection:
   `gdevelop_get_editor_state`, `gdevelop_get_editor_selection`,
   `gdevelop_get_project_summary`, `gdevelop_list_scenes`,
   `gdevelop_list_objects`, and `gdevelop_inspect_signal_usage`.
-- Catalog, validation, and instruction construction:
+- Catalog, validation, and tool discovery:
   `generate-catalogs`, `validate_project_files`, `inspect_tool_schema`,
-  `get_tool_usage_examples`, `create_action`,
-  `create_signal_emit_action`, `create_signal_subscription_action`, and
-  `create_signal_received_condition`.
+  and `get_tool_usage_examples`.
 - Synchronization and runtime verification:
   `reload_project`, `launch_preview`, `wait_until_preview_ready`,
   `preview_health_check`, `gdevelop_inspect_running_preview`, `run_frames`,
   `verify_project_change`, `simulate_preview_input`, `control_preview`,
   `set_runtime_state`, and `capture_preview_screenshot`.
-- Public write operations: `import_extension` and the permissioned
-  `gdevelop_create_or_update_on_signal`.
+- Public write operation: `import_extension`.
 
 No other MCP tool name is supported, introspectable, or callable, even when
 write/command permissions are enabled. In particular, there is no generic

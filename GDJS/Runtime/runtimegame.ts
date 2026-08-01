@@ -263,6 +263,10 @@ namespace gdjs {
     _isPreview: boolean;
     _isInGameEdition: boolean;
 
+    /** The locale selected for the game. */
+    private _locale: string =
+      (typeof navigator !== 'undefined' && navigator.language) || 'en';
+
     /**
      * The capture manager, used to manage captures (screenshots, videos, etc...).
      */
@@ -442,6 +446,20 @@ namespace gdjs {
      */
     getAdditionalOptions(): RuntimeGameOptions {
       return this._options;
+    }
+
+    /**
+     * Return the locale selected for the game.
+     */
+    getLocale(): string {
+      return this._locale;
+    }
+
+    /**
+     * Change the locale selected for the game.
+     */
+    setLocale(locale: string): void {
+      this._locale = locale;
     }
 
     getRenderer(): gdjs.RuntimeGameRenderer {

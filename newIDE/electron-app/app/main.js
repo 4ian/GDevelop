@@ -668,16 +668,6 @@ app.on('ready', function() {
       return serializeMcpServerState(null);
     }
 
-    const token =
-      config && typeof config.token === 'string' ? config.token.trim() : '';
-    if (!token) {
-      await stopMcpServer();
-      return serializeMcpServerState(
-        null,
-        'MCP server requires an authorization token.'
-      );
-    }
-
     const configuredPort =
       config && typeof config.port === 'number'
         ? config.port
@@ -690,11 +680,7 @@ app.on('ready', function() {
         : 32110;
     const currentServerState = getMcpServerState();
 
-    if (
-      currentServerState &&
-      currentServerState.port === port &&
-      currentServerState.token === token
-    ) {
+    if (currentServerState && currentServerState.port === port) {
       return serializeMcpServerState(currentServerState);
     }
 
@@ -705,7 +691,6 @@ app.on('ready', function() {
     try {
       const serverState = await startMcpServer({
         port,
-        token,
         sendRendererRequest: sendMcpRendererRequest,
       });
       log.info(`MCP server listening on ${serverState.url}`);

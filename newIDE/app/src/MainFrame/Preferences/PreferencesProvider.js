@@ -62,6 +62,10 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       }
     }
 
+    // MCP connections no longer use authentication. Remove tokens persisted
+    // by older versions instead of keeping an obsolete secret in storage.
+    delete values.mcpServerAuthorizationToken;
+
     // Migrate renamed themes.
     if (values.themeName === 'GDevelop default') {
       values.themeName = 'GDevelop default Light';
@@ -115,7 +119,6 @@ export const getInitialPreferences = (): {
   enableMcpServer: boolean,
   mcpAllowCommandTools: boolean,
   mcpAllowWriteTools: boolean,
-  mcpServerAuthorizationToken: string,
   mcpServerPort: number,
   newFeaturesAcknowledgements: {},
   newObjectDialogDefaultTab: any,
@@ -150,58 +153,12 @@ export const getInitialPreferences = (): {
   return { ...initialPreferences.values };
 };
 
-const mcpServerAuthorizationTokenPrefix = 'mcp';
-const mcpServerAuthorizationTokenRandomByteCount = 16;
-const base64UrlAlphabet =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-
-const encodeBytesAsBase64Url = (bytes: Uint8Array): string => {
-  let encoded = '';
-
-  for (let index = 0; index < bytes.length; index += 3) {
-    const byte1 = bytes[index];
-    const byte2 = index + 1 < bytes.length ? bytes[index + 1] : 0;
-    const byte3 = index + 2 < bytes.length ? bytes[index + 2] : 0;
-    const triplet = (byte1 << 16) | (byte2 << 8) | byte3;
-
-    encoded += base64UrlAlphabet[(triplet >> 18) & 63];
-    encoded += base64UrlAlphabet[(triplet >> 12) & 63];
-    if (index + 1 < bytes.length)
-      encoded += base64UrlAlphabet[(triplet >> 6) & 63];
-    if (index + 2 < bytes.length) encoded += base64UrlAlphabet[triplet & 63];
-  }
-
-  return encoded;
-};
-
-export const generateMcpServerAuthorizationToken = (): string => {
-  const bytes = new Uint8Array(mcpServerAuthorizationTokenRandomByteCount);
-
-  if (
-    typeof window !== 'undefined' &&
-    window.crypto &&
-    typeof window.crypto.getRandomValues === 'function'
-  ) {
-    window.crypto.getRandomValues(bytes);
-  } else {
-    for (let index = 0; index < bytes.length; index++) {
-      bytes[index] = Math.floor(Math.random() * 256);
-    }
-  }
-
-  return `${mcpServerAuthorizationTokenPrefix}-${encodeBytesAsBase64Url(
-    bytes
-  )}`;
-};
-
 const hasMcpServerConfigurationChanged = (
   oldValues: PreferencesValues,
   newValues: PreferencesValues
 ): boolean =>
   oldValues.enableMcpServer !== newValues.enableMcpServer ||
-  oldValues.mcpServerPort !== newValues.mcpServerPort ||
-  oldValues.mcpServerAuthorizationToken !==
-    newValues.mcpServerAuthorizationToken;
+  oldValues.mcpServerPort !== newValues.mcpServerPort;
 
 const getPreferences = (): PreferencesValues => {
   const preferences =
@@ -460,14 +417,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // $FlowFixMe[method-unbinding]
     setMcpServerPort: (this._setMcpServerPort.bind(this): any),
     // $FlowFixMe[method-unbinding]
-    setMcpServerAuthorizationToken: (this._setMcpServerAuthorizationToken.bind(
-      this
-    ): any),
-    // $FlowFixMe[method-unbinding]
-    regenerateMcpServerAuthorizationToken: (this._regenerateMcpServerAuthorizationToken.bind(
-      this
-    ): any),
-    // $FlowFixMe[method-unbinding]
     setMcpAllowWriteTools: (this._setMcpAllowWriteTools.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setMcpAllowCommandTools: (this._setMcpAllowCommandTools.bind(this): any),
@@ -509,16 +458,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _notifyMcpServerConfiguration() {
     if (!ipcRenderer || !ipcRenderer.invoke) return;
 
-    const {
-      enableMcpServer,
-      mcpServerPort,
-      mcpServerAuthorizationToken,
-    } = this.state.values;
+    const { enableMcpServer, mcpServerPort } = this.state.values;
     ipcRenderer
       .invoke('mcp-server-update-config', {
         enabled: enableMcpServer,
         port: mcpServerPort,
-        token: mcpServerAuthorizationToken,
       })
       .catch(error => {
         console.error('Unable to update MCP server configuration:', error);
@@ -1540,10 +1484,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           enableMcpServer: newValue,
-          mcpServerAuthorizationToken:
-            newValue && !state.values.mcpServerAuthorizationToken
-              ? generateMcpServerAuthorizationToken()
-              : state.values.mcpServerAuthorizationToken,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -1560,22 +1500,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
-  }
-
-  _setMcpServerAuthorizationToken(newValue: string) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          mcpServerAuthorizationToken: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _regenerateMcpServerAuthorizationToken() {
-    this._setMcpServerAuthorizationToken(generateMcpServerAuthorizationToken());
   }
 
   _setMcpAllowWriteTools(newValue: boolean) {

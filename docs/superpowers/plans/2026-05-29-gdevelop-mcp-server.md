@@ -4,7 +4,7 @@
 
 **Goal:** Add a localhost-only MCP Streamable HTTP server to the GDevelop desktop app, exposing editor state, resources, prompts, command execution, and existing EditorFunctions as MCP tools.
 
-**Architecture:** Electron main owns the HTTP/JSON-RPC MCP transport, authorization, and lifecycle. The renderer owns project-aware operations through a focused IPC bridge that reuses `processEditorFunctionCalls` and existing editor callbacks.
+**Architecture:** Electron main owns the localhost-only HTTP/JSON-RPC MCP transport and lifecycle. The renderer owns project-aware operations through a focused IPC bridge that reuses `processEditorFunctionCalls` and existing editor callbacks.
 
 **Tech Stack:** Electron main process CommonJS, Node `http`, renderer Flow/React, existing GDevelop `PreferencesContext`, `processEditorFunctionCalls`, Jest/unit tests, MCP JSON-RPC over Streamable HTTP.
 
@@ -13,16 +13,18 @@
 ### Task 1: MCP Protocol Core
 
 **Files:**
+
 - Create: `newIDE/electron-app/app/Mcp/McpProtocol.js`
 - Test: `newIDE/electron-app/test/McpProtocol.spec.js`
 
-- [ ] Write failing tests for JSON-RPC success, JSON-RPC error, auth failure, initialize response, tool result normalization.
-- [ ] Implement protocol helpers: `createJsonRpcResult`, `createJsonRpcError`, `createTextToolResult`, `createErrorToolResult`, `validateBearerToken`, `getInitializeResult`.
+- [ ] Write failing tests for JSON-RPC success, JSON-RPC error, initialize response, and tool result normalization.
+- [ ] Implement protocol helpers: `createJsonRpcResult`, `createJsonRpcError`, `createTextToolResult`, `createErrorToolResult`, `getInitializeResult`.
 - [ ] Run `node test/McpProtocol.spec.js`.
 
 ### Task 2: Tool, Resource, And Prompt Catalogues
 
 **Files:**
+
 - Create: `newIDE/app/src/Mcp/McpToolCatalog.js`
 - Test: `newIDE/app/src/Mcp/McpToolCatalog.spec.js`
 
@@ -34,11 +36,12 @@
 ### Task 3: Electron MCP HTTP Server
 
 **Files:**
+
 - Create: `newIDE/electron-app/app/Mcp/McpServer.js`
 - Modify: `newIDE/electron-app/app/main.js`
 - Test: `newIDE/electron-app/test/McpServer.spec.js`
 
-- [ ] Write failing tests for start/stop, POST `/mcp`, invalid method, auth failure, and renderer forwarding.
+- [ ] Write failing tests for start/stop, unauthenticated POST `/mcp`, invalid method, and renderer forwarding.
 - [ ] Implement localhost `http.createServer` with POST handling.
 - [ ] Forward MCP methods to the active BrowserWindow using `webContents.invoke`-style request/response through IPC.
 - [ ] Add lifecycle exports `startMcpServer`, `stopMcpServer`, `getMcpServerState`.
@@ -48,6 +51,7 @@
 ### Task 4: Renderer MCP Bridge
 
 **Files:**
+
 - Create: `newIDE/app/src/Mcp/McpEditorBridge.js`
 - Modify: `newIDE/app/src/MainFrame/index.js`
 - Test: `newIDE/app/src/Mcp/McpEditorBridge.spec.js`
@@ -61,6 +65,7 @@
 ### Task 5: Preferences UI
 
 **Files:**
+
 - Modify: `newIDE/app/src/MainFrame/Preferences/PreferencesContext.js`
 - Modify: `newIDE/app/src/MainFrame/Preferences/PreferencesProvider.js`
 - Modify: `newIDE/app/src/MainFrame/Preferences/PreferencesDialog.js`
@@ -68,13 +73,13 @@
 
 - [ ] Add persisted MCP preference values and setters.
 - [ ] Add a dedicated Preferences tab for MCP server configuration.
-- [ ] Generate a local token when enabling MCP for the first time.
 - [ ] Notify Electron main when MCP preferences change.
-- [ ] Show server URL, enabled state, port, token, write tools toggle, command tools toggle, and server error.
+- [ ] Show server URL, enabled state, port, write tools toggle, command tools toggle, and server error.
 
 ### Task 6: Command Tool And Read Resources
 
 **Files:**
+
 - Modify: `newIDE/app/src/Mcp/McpEditorBridge.js`
 - Modify: `newIDE/app/src/MainFrame/index.js`
 - Test: `newIDE/app/src/Mcp/McpEditorBridge.spec.js`
@@ -86,6 +91,7 @@
 ### Task 7: Verification
 
 **Commands:**
+
 - `node test/McpProtocol.spec.js`
 - `node test/McpServer.spec.js`
 - `npm test -- --runTestsByPath src/Mcp/McpToolCatalog.spec.js src/Mcp/McpEditorBridge.spec.js --watchAll=false`

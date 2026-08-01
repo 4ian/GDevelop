@@ -7,7 +7,7 @@ const {
   stopMcpServer,
 } = require('../app/Mcp/McpServer');
 
-const request = ({ port, token, body }) =>
+const request = ({ port, body }) =>
   new Promise((resolve, reject) => {
     const req = http.request(
       {
@@ -18,7 +18,6 @@ const request = ({ port, token, body }) =>
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          Authorization: `Bearer ${token}`,
         },
       },
       res => {
@@ -46,8 +45,6 @@ const run = async () => {
       method: 'initialize',
       params: {},
     },
-    authorizationHeader: 'Bearer test-token',
-    token: 'test-token',
     sendRendererRequest: async () => {
       throw new Error('Renderer should not be called for initialize');
     },
@@ -57,18 +54,6 @@ const run = async () => {
     'gdevelop-editor'
   );
 
-  const authFailureResponse = await handleMcpJsonRpcRequest({
-    request: {
-      jsonrpc: '2.0',
-      id: 2,
-      method: 'tools/list',
-    },
-    authorizationHeader: 'Bearer wrong-token',
-    token: 'test-token',
-    sendRendererRequest: async () => ({ tools: [] }),
-  });
-  assert.strictEqual(authFailureResponse.error.code, -32001);
-
   const forwarded = [];
   const toolsResponse = await handleMcpJsonRpcRequest({
     request: {
@@ -76,8 +61,6 @@ const run = async () => {
       id: 3,
       method: 'tools/list',
     },
-    authorizationHeader: 'Bearer test-token',
-    token: 'test-token',
     sendRendererRequest: async rendererRequest => {
       forwarded.push(rendererRequest);
       return { tools: [{ name: 'gdevelop_get_editor_state' }] };
@@ -94,8 +77,6 @@ const run = async () => {
       id: 4,
       method: 'not/a-method',
     },
-    authorizationHeader: 'Bearer test-token',
-    token: 'test-token',
     sendRendererRequest: async () => ({ ok: true }),
   });
   assert.strictEqual(unknownMethodResponse.error.code, -32601);
@@ -112,8 +93,6 @@ const run = async () => {
       method: 'tools/call',
       params: { name: 'reload_project', arguments: {} },
     },
-    authorizationHeader: 'Bearer test-token',
-    token: 'test-token',
     sendRendererRequest: async () => {
       throw rendererError;
     },
@@ -126,7 +105,6 @@ const run = async () => {
 
   const server = await startMcpServer({
     port: 0,
-    token: 'server-token',
     sendRendererRequest: async rendererRequest => {
       if (rendererRequest.method === 'tools/list') {
         return { tools: [{ name: 'read_scene_events' }] };
@@ -139,7 +117,6 @@ const run = async () => {
     assert.strictEqual(server.url, `http://127.0.0.1:${server.port}/mcp`);
     const response = await request({
       port: server.port,
-      token: 'server-token',
       body: {
         jsonrpc: '2.0',
         id: 'http-tools',

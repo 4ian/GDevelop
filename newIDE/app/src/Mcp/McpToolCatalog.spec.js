@@ -20,10 +20,6 @@ const expectedAlwaysAvailableTools = [
   'gdevelop_inspect_signal_usage',
   'gdevelop_list_scenes',
   'gdevelop_list_objects',
-  'create_action',
-  'create_signal_emit_action',
-  'create_signal_subscription_action',
-  'create_signal_received_condition',
   'generate-catalogs',
   'validate_project_files',
   'inspect_tool_schema',
@@ -42,10 +38,9 @@ const expectedAlwaysAvailableTools = [
 ].sort();
 
 const expectedAlwaysAvailableWriteTools = ['import_extension'];
-const expectedPermissionedWriteTools = ['gdevelop_create_or_update_on_signal'];
 
 describe('McpToolCatalog', () => {
-  it('requires write permission for permissioned editing tools', () => {
+  it('publishes the exact file-first tool surface under all permissions', () => {
     const withoutPermissions = getMcpTools({
       allowWriteTools: false,
       allowCommandTools: false,
@@ -65,7 +60,6 @@ describe('McpToolCatalog', () => {
       [
         ...expectedAlwaysAvailableTools,
         ...expectedAlwaysAvailableWriteTools,
-        ...expectedPermissionedWriteTools,
       ].sort()
     );
     expect(
@@ -76,7 +70,6 @@ describe('McpToolCatalog', () => {
       [
         ...expectedAlwaysAvailableTools,
         ...expectedAlwaysAvailableWriteTools,
-        ...expectedPermissionedWriteTools,
       ].sort()
     );
     expect(isWriteTool('import_extension')).toBe(true);
@@ -111,6 +104,11 @@ describe('McpToolCatalog', () => {
       'gdevelop_set_constants',
       'gdevelop_set_constants_value',
       'gdevelop_delete_constants_value',
+      'create_action',
+      'create_signal_emit_action',
+      'create_signal_subscription_action',
+      'create_signal_received_condition',
+      'gdevelop_create_or_update_on_signal',
     ].forEach(name => {
       expect(isKnownMcpTool(name)).toBe(false);
       expect(isWriteTool(name)).toBe(false);
@@ -137,11 +135,10 @@ describe('McpToolCatalog', () => {
     });
     expect(Object.keys(capabilities.categories).sort()).toEqual([
       'Editor queries',
-      'Extension events',
       'Extension import',
-      'Instruction discovery',
       'Preview runtime',
       'Project-file validation',
+      'Tool discovery',
     ]);
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');

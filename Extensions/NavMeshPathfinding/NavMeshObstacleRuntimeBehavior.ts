@@ -43,25 +43,17 @@ namespace gdjs {
     >();
     hasStepped = false;
     private navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
-      borderSize: 0,
       cs: 10,
       ch: 10,
-      walkableSlopeAngle: 60,
+      walkableSlopeAngle: 50,
       walkableHeight: 10,
-      walkableClimb: 2,
-      walkableRadius: 0.5,
-      maxEdgeLen: 12,
-      maxSimplificationError: 1.3,
-      minRegionArea: 8,
-      mergeRegionArea: 20,
-      maxVertsPerPoly: 6,
-      detailSampleDist: 6,
-      detailSampleMaxError: 10,
+      detailSampleMaxError: 50,
     };
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
       this.navMeshConfig.ch = sharedData.cellDepth;
+      this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
     }
 
@@ -279,7 +271,8 @@ namespace gdjs {
         navMeshQuery.findClosestPoint(
           {
             x: owner.getX(),
-            y: owner.getZ(),
+            //@ts-ignore
+            y: owner.getZ ? owner.getZ() : 0,
             z: owner.getY(),
           },
           { halfExtents: { x: 100, y: 100, z: 100 } }
@@ -296,7 +289,8 @@ namespace gdjs {
 
       character._crowdAgentParams.radius =
         character._radius || Math.min(owner.getWidth(), owner.getHeight());
-      character._crowdAgentParams.height = owner.getDepth();
+      //@ts-ignore
+      character._crowdAgentParams.height = owner.getDepth ? owner.getDepth() : 1;
       const agent = this.crowd
         ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;

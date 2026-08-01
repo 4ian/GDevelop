@@ -99,9 +99,10 @@ namespace gdjs {
       this._radius = behaviorData.radius;
       this._crowdAgentParams.maxAcceleration = behaviorData.acceleration;
       this._crowdAgentParams.maxSpeed = behaviorData.maxSpeed;
-      this._crowdAgentParams.collisionQueryRange = behaviorData.avoidanceSightRange;
+      this._crowdAgentParams.collisionQueryRange =
+        behaviorData.avoidanceSightRange;
 
-      // TODO Remove
+      // TODO Add a property for it?
       this._angularAcceleration = 7200;
 
       this._manager =
@@ -428,7 +429,11 @@ namespace gdjs {
       const newZ = agent.interpolatedPosition.y;
       this.owner.setX(newX);
       this.owner.setY(newY);
-      this.owner.setZ(newZ);
+      //@ts-ignore
+      if (this.owner.setZ) {
+        //@ts-ignore
+        this.owner.setZ(newZ);
+      }
 
       if (newX != oldX && newY != oldY) {
         this._movementAngle = gdjs.toDegrees(

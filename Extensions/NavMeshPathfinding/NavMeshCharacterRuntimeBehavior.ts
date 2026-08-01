@@ -356,9 +356,7 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(x: float, y: float, z: float) {
-      if (!this._manager.navMesh) {
-        this._manager.rebuildNavMesh();
-      }
+      this._manager.rebuildNavMeshIfNeeded();
       if (!this._manager.navMesh) {
         console.log("Can't build the nav mesh");
         return;

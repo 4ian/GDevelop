@@ -36,6 +36,9 @@ namespace gdjs {
   export class NavMeshObstaclesManager {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
     navMesh: RecastNav.NavMesh | null = null;
+    timeSinceLastNavMeshLastRebuild: float = 1;
+    isNavMeshDirty = true;
+    isFirstFrame = true;
     crowd: RecastNav.Crowd | null = null;
     characterAgents = new Map<
       NavMeshCharacterRuntimeBehavior,
@@ -76,6 +79,13 @@ namespace gdjs {
         return;
       }
       this.hasStepped = true;
+      this.timeSinceLastNavMeshLastRebuild += timeDelta;
+      // Don't try to build the nav mesh before the events get a chance
+      // to build the level.
+      if (!this.isFirstFrame) {
+        this.rebuildNavMeshIfNeeded();
+      }
+      this.isFirstFrame = false;
 
       if (!this.crowd) {
         return;
@@ -83,7 +93,16 @@ namespace gdjs {
       this.crowd.update(1 / 60, timeDelta, 8);
     }
 
-    rebuildNavMesh() {
+    invalidateNavMesh() {
+      this.isNavMeshDirty = true;
+    }
+
+    rebuildNavMeshIfNeeded() {
+      if (!this.isNavMeshDirty || this.timeSinceLastNavMeshLastRebuild < 1) {
+        return;
+      }
+      console.log('Rebuild the NavMesh');
+      this.timeSinceLastNavMeshLastRebuild = 0;
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
@@ -110,6 +129,7 @@ namespace gdjs {
         for (const character of this.characterAgents.keys()) {
           this.rebuildCharacterAgent(character);
         }
+        this.isNavMeshDirty = false;
       }
     }
 
@@ -289,11 +309,22 @@ namespace gdjs {
 
       character._crowdAgentParams.radius =
         character._radius || Math.min(owner.getWidth(), owner.getHeight());
-      //@ts-ignore
-      character._crowdAgentParams.height = owner.getDepth ? owner.getDepth() : 1;
+      character._crowdAgentParams.height =
+        //@ts-ignore
+        owner.getDepth
+          ? //@ts-ignore
+            owner.getDepth()
+          : 1;
       const agent = this.crowd
         ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;
+
+      if (agent) {
+        const oldAgent = this.characterAgents.get(character);
+        if (oldAgent) {
+          agent.requestMoveTarget(oldAgent.target());
+        }
+      }
       this.characterAgents.set(character, agent);
     }
 
@@ -302,6 +333,7 @@ namespace gdjs {
      */
     addObstacle(pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior) {
       this.obstacles.add(pathfindingObstacleBehavior);
+      this.invalidateNavMesh();
     }
 
     /**
@@ -312,6 +344,7 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior
     ) {
       this.obstacles.delete(pathfindingObstacleBehavior);
+      this.invalidateNavMesh();
     }
 
     /**
@@ -345,8 +378,13 @@ namespace gdjs {
 
     _oldX: float = 0;
     _oldY: float = 0;
+    _oldZ: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
+    _oldDepth: float = 0;
+    _oldRotationX: float = 0;
+    _oldRotationY: float = 0;
+    _oldRotationZ: float = 0;
     _manager: NavMeshObstaclesManager;
     _registeredInManager: boolean = false;
 
@@ -383,7 +421,6 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      //Make sure the obstacle is or is not in the obstacles manager.
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);
         this._registeredInManager = false;
@@ -394,20 +431,52 @@ namespace gdjs {
         }
       }
 
-      //Track changes in size or position
+      const newX = this.owner.getX();
+      const newY = this.owner.getY();
+      //@ts-ignore
+      const newZ = this.owner.getZ ? this.owner.getZ() : 0;
+      const newWidth = this.owner.getWidth();
+      const newHeight = this.owner.getHeight();
+      //@ts-ignore
+      const newDepth = this.owner.getDepth ? this.owner.getDepth() : 0;
+      //@ts-ignore
+      const newRotationX = this.owner.getRotationX
+        ? //@ts-ignore
+          this.owner.getRotationX()
+        : 0;
+      //@ts-ignore
+      const newRotationY = this.owner.getRotationY
+        ? //@ts-ignore
+          this.owner.getRotationY()
+        : 0;
+      //@ts-ignore
+      const newRotationZ = this.owner.getRotationZ
+        ? //@ts-ignore
+          this.owner.getRotationZ()
+        : 0;
       if (
-        this._oldX !== this.owner.getX() ||
-        this._oldY !== this.owner.getY() ||
-        this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight()
+        this._oldX !== newX ||
+        this._oldY !== newY ||
+        this._oldZ !== newZ ||
+        this._oldWidth !== newWidth ||
+        this._oldHeight !== newHeight ||
+        this._oldDepth !== newDepth ||
+        this._oldRotationX !== newRotationX ||
+        this._oldRotationY !== newRotationY ||
+        this._oldRotationZ !== newRotationZ
       ) {
         if (this._registeredInManager) {
-          // TODO Notify that the mesh is out of date?
+          this._manager.invalidateNavMesh();
         }
-        this._oldX = this.owner.getX();
-        this._oldY = this.owner.getY();
-        this._oldWidth = this.owner.getWidth();
-        this._oldHeight = this.owner.getHeight();
+        this._oldX = newX;
+        this._oldY = newY;
+        this._oldZ = newZ;
+        this._oldWidth = newWidth;
+        this._oldHeight = newHeight;
+        this._oldDepth = newDepth;
+        this._oldRotationX = newRotationX;
+        this._oldRotationY = newRotationY;
+        this._oldRotationZ = newRotationZ;
       }
     }
 

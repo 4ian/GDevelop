@@ -35,6 +35,7 @@ namespace gdjs {
    */
   export class NavMeshObstaclesManager {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
+    is3D = false;
     navMesh: RecastNav.NavMesh | null = null;
     timeSinceLastNavMeshLastRebuild: float = 1;
     isNavMeshDirty = true;
@@ -51,6 +52,7 @@ namespace gdjs {
       walkableSlopeAngle: 50,
       walkableHeight: 10,
       detailSampleMaxError: 50,
+      walkableClimb: 2,
     };
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
@@ -108,11 +110,19 @@ namespace gdjs {
       for (const obstacle of this.obstacles) {
         //@ts-ignore
         const object: gdjs.RuntimeObject3D = obstacle.owner;
-        if (obstacle._shape === 'Mesh' && isModel3D(object)) {
-          this.addMeshFor(object, obstacle, positions, indices);
-        } else {
-          this.addBoxFor(object, positions, indices);
+        if (gdjs.Base3DHandler.is3D(object)) {
+          if (isModel3D(object) && obstacle._shape === 'Mesh') {
+            this.addMeshFor(object, obstacle, positions, indices);
+          } else {
+            this.addBoxFor(object, positions, indices);
+          }
+        } else if (!this.is3D) {
+          this.addPolygonsFor(object, positions, indices);
         }
+      }
+      if (!this.is3D && positions.length > 0) {
+        this.addGroundFor2D(positions, indices);
+        this.navMeshConfig.walkableClimb = 0;
       }
 
       const result = RecastNav.generateSoloNavMesh(
@@ -120,16 +130,127 @@ namespace gdjs {
         indices,
         this.navMeshConfig
       );
+      console.log("Built", result.success);
+      this.navMeshConfig.walkableClimb = 2;
       if (result.success) {
         this.navMesh = result.navMesh;
         this.crowd = new RecastNav.Crowd(this.navMesh, {
           maxAgents: 100,
-          maxAgentRadius: 50,
+          maxAgentRadius: 100,
         });
         for (const character of this.characterAgents.keys()) {
           this.rebuildCharacterAgent(character);
         }
-        this.isNavMeshDirty = false;
+      }
+      this.isNavMeshDirty = false;
+    }
+
+    private addGroundFor2D(
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      let minX = Number.POSITIVE_INFINITY;
+      let minY = Number.POSITIVE_INFINITY;
+      let maxX = Number.NEGATIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      for (let index = 0; index + 2 < positions.length; index += 3) {
+        const x = positions[index];
+        const y = positions[index + 2];
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+      const width = maxX - minX;
+      const height = maxY - minY;
+      const centerX = (maxX + minX) / 2;
+      const centerY = (maxY + minY) / 2;
+
+      console.log(width, height, centerX, centerY);
+
+      const indicesOffset = Math.round(positions.length / 3);
+      for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
+        let x = cubePositions[index];
+        let y = cubePositions[index + 2];
+        let z = cubePositions[index + 1];
+
+        x *= width;
+        y *= height;
+        z *= 10;
+
+        x += centerX;
+        y += centerY;
+        z -= 5;
+
+        // Y is the top for Recast
+        positions.push(x, z, y);
+      }
+      for (const vertexIndex of cubeIndices) {
+        indices.push(vertexIndex + indicesOffset);
+      }
+    }
+
+    private addPolygonsFor(
+      object: gdjs.RuntimeObject3D,
+      positions: Array<float>,
+      indices: Array<integer>
+    ): void {
+      const vertexFlags: Array<boolean> = [];
+      for (const hitBox of object.getHitBoxes()) {
+        let indicesOffset = Math.round(positions.length / 3);
+        const vertices: Array<Point> = hitBox.vertices.map(([x, y]) => ({
+          x,
+          y,
+        }));
+        if (
+          getSignedAreaX2(
+            vertices[0].x,
+            vertices[0].y,
+            vertices[1].x,
+            vertices[1].y,
+            vertices[2].x,
+            vertices[2].y
+          ) > 0
+        ) {
+          vertices.reverse();
+        }
+        triangulate(
+          vertices,
+          vertexFlags,
+          (p1: Point, p2: Point, p3: Point) => {
+            // Top
+            positions.push(p1.x, 10, p1.y);
+            positions.push(p2.x, 10, p2.y);
+            positions.push(p3.x, 10, p3.y);
+            indices.push(
+              indicesOffset + 0,
+              indicesOffset + 1,
+              indicesOffset + 2
+            );
+            // Bottom
+            positions.push(p1.x, 0, p1.y);
+            positions.push(p2.x, 0, p2.y);
+            positions.push(p3.x, 0, p3.y);
+            indices.push(
+              indicesOffset + 3,
+              indicesOffset + 5,
+              indicesOffset + 4
+            );
+            indicesOffset += 6;
+          }
+        );
+        for (let index = 0; index < vertices.length; index++) {
+          const vertex = vertices[index];
+          // Side
+          positions.push(vertex.x, 10, vertex.y);
+          positions.push(vertex.x, 0, vertex.y);
+          indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
+          indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
+          indicesOffset += 2;
+        }
+        const vertex = vertices[0];
+        positions.push(vertex.x, 10, vertex.y);
+        positions.push(vertex.x, 0, vertex.y);
       }
     }
 
@@ -302,13 +423,15 @@ namespace gdjs {
           "Can't find origin",
           owner.getX(),
           owner.getY(),
-          owner.getZ()
+          //@ts-ignore
+          owner.getZ ? owner.getZ() : 0
         );
         return;
       }
 
       character._crowdAgentParams.radius =
         character._radius || Math.min(owner.getWidth(), owner.getHeight());
+      console.log(character._crowdAgentParams.radius);
       character._crowdAgentParams.height =
         //@ts-ignore
         owner.getDepth
@@ -321,7 +444,7 @@ namespace gdjs {
 
       if (agent) {
         const oldAgent = this.characterAgents.get(character);
-        if (oldAgent) {
+        if (oldAgent && !character.destinationReached()) {
           agent.requestMoveTarget(oldAgent.target());
         }
       }
@@ -331,8 +454,11 @@ namespace gdjs {
     /**
      * Add a obstacle to the list of existing obstacles.
      */
-    addObstacle(pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior) {
-      this.obstacles.add(pathfindingObstacleBehavior);
+    addObstacle(obstacle: NavMeshObstacleRuntimeBehavior) {
+      this.obstacles.add(obstacle);
+      if (gdjs.Base3DHandler.is3D(obstacle.owner)) {
+        this.is3D = true;
+      }
       this.invalidateNavMesh();
     }
 
@@ -340,10 +466,8 @@ namespace gdjs {
      * Remove a obstacle from the list of existing obstacles. Be sure that the obstacle was
      * added before.
      */
-    removeObstacle(
-      pathfindingObstacleBehavior: NavMeshObstacleRuntimeBehavior
-    ) {
-      this.obstacles.delete(pathfindingObstacleBehavior);
+    removeObstacle(obstacle: NavMeshObstacleRuntimeBehavior) {
+      this.obstacles.delete(obstacle);
       this.invalidateNavMesh();
     }
 
@@ -353,6 +477,9 @@ namespace gdjs {
     addCharacter(character: NavMeshCharacterRuntimeBehavior) {
       if (this.characterAgents.get(character)) {
         return;
+      }
+      if (gdjs.Base3DHandler.is3D(character.owner)) {
+        this.is3D = true;
       }
       this.rebuildCharacterAgent(character);
     }
@@ -518,4 +645,596 @@ namespace gdjs {
     'NavMeshPathfinding::NavMeshObstacleBehavior',
     gdjs.NavMeshObstacleRuntimeBehavior
   );
+
+  interface Point {
+    x: number;
+    y: number;
+  }
+
+  /**
+   * Attempts to triangulate a polygon.
+   *
+   * @param vertices the polygon to be triangulate.
+   * The content is manipulated during the operation
+   * and it will be left in an undefined state at the end of
+   * the operation.
+   * @param vertexFlags only used internally
+   * @param outTriangles is called for each triangle derived
+   * from the original polygon.
+   * @return The number of triangles generated. Or, if triangulation
+   * failed, a negative number.
+   */
+  function triangulate(
+    vertices: Array<Point>,
+    vertexFlags: Array<boolean>,
+    outTriangles: (p1: Point, p2: Point, p3: Point) => void
+  ): void {
+    // Terminology, concepts and such:
+    //
+    // This algorithm loops around the edges of a polygon looking for
+    // new internal edges to add that will partition the polygon into a
+    // new valid triangle internal to the starting polygon. During each
+    // iteration the shortest potential new edge is selected to form that
+    // iteration's new triangle.
+    //
+    // Triangles will only be formed if a single new edge will create
+    // a triangle. Two new edges will never be added during a single
+    // iteration. This means that the triangulated portions of the
+    // original polygon will only contain triangles and the only
+    // non-triangle polygon will exist in the untriangulated portion
+    // of the original polygon.
+    //
+    // "Partition edge" refers to a potential new edge that will form a
+    // new valid triangle.
+    //
+    // "Center" vertex refers to the vertex in a potential new triangle
+    // which, if the triangle is formed, will be external to the
+    // remaining untriangulated portion of the polygon. Since it
+    // is now external to the polygon, it can't be used to form any
+    // new triangles.
+    //
+    // Some documentation refers to "iPlus2" even though the variable is
+    // not in scope or does not exist for that section of code. For
+    // documentation purposes, iPlus2 refers to the 2nd vertex after the
+    // primary vertex.
+    // E.g.: i, iPlus1, and iPlus2.
+    //
+    // Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#triangulation
+
+    // Loop through all vertices, flagging all indices that represent
+    // a center vertex of a valid new triangle.
+    vertexFlags.length = vertices.length;
+    for (let i = 0; i < vertices.length; i++) {
+      const iPlus1 = (i + 1) % vertices.length;
+      const iPlus2 = (i + 2) % vertices.length;
+      // A triangle formed by i, iPlus1, and iPlus2 will result
+      // in a valid internal triangle.
+      // Flag the center vertex (iPlus1) to indicate a valid triangle
+      // location.
+      vertexFlags[iPlus1] = isValidPartition(i, iPlus2, vertices);
+    }
+
+    // Loop through the vertices creating triangles. When there is only a
+    // single triangle left,  the operation is complete.
+    //
+    // When a valid triangle is formed, remove its center vertex. So for
+    // each loop, a single vertex will be removed.
+    //
+    // At the start of each iteration the indices list is in the following
+    // state:
+    // - Represents a simple polygon representing the un-triangulated
+    //   portion of the original polygon.
+    // - All valid center vertices are flagged.
+    while (vertices.length > 3) {
+      // Find the shortest new valid edge.
+
+      // NOTE: i and iPlus1 are defined in two different scopes in
+      // this section. So be careful.
+
+      // Loop through all indices in the remaining polygon.
+      let minLengthSq = Number.MAX_VALUE;
+      let minLengthSqVertexIndex = -1;
+      for (let i = 0; i < vertices.length; i++) {
+        if (vertexFlags[(i + 1) % vertices.length]) {
+          // Indices i, iPlus1, and iPlus2 are known to form a
+          // valid triangle.
+          const vert = vertices[i];
+          const vertPlus2 = vertices[(i + 2) % vertices.length];
+
+          // Determine the length of the partition edge.
+          // (i -> iPlus2)
+          const deltaX = vertPlus2.x - vert.x;
+          const deltaY = vertPlus2.y - vert.y;
+          const lengthSq = deltaX * deltaX + deltaY * deltaY;
+
+          if (lengthSq < minLengthSq) {
+            minLengthSq = lengthSq;
+            minLengthSqVertexIndex = i;
+          }
+        }
+      }
+
+      if (minLengthSqVertexIndex === -1)
+        // Could not find a new triangle. Triangulation failed.
+        // This happens if there are three or more vertices
+        // left, but none of them are flagged as being a
+        // potential center vertex.
+        return;
+
+      let i = minLengthSqVertexIndex;
+      let iPlus1 = (i + 1) % vertices.length;
+
+      // Add the new triangle to the output.
+      outTriangles(
+        vertices[i],
+        vertices[iPlus1],
+        vertices[(i + 2) % vertices.length]
+      );
+
+      // iPlus1, the "center" vert in the new triangle, is now external
+      // to the untriangulated portion of the polygon. Remove it from
+      // the vertices list since it cannot be a member of any new
+      // triangles.
+      vertices.splice(iPlus1, 1);
+      vertexFlags.splice(iPlus1, 1);
+
+      if (iPlus1 === 0 || iPlus1 >= vertices.length) {
+        // The vertex removal has invalidated iPlus1 and/or i. So
+        // force a wrap, fixing the indices so they reference the
+        // correct indices again. This only occurs when the new
+        // triangle is formed across the wrap location of the polygon.
+        // Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
+        // Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
+        i = vertices.length - 1;
+        iPlus1 = 0;
+      }
+
+      // At this point i and iPlus1 refer to the two indices from a
+      // successful triangulation that will be part of another new
+      // triangle. We now need to re-check these indices to see if they
+      // can now be the center index in a potential new partition.
+      vertexFlags[i] = isValidPartition(
+        (i - 1 + vertices.length) % vertices.length,
+        iPlus1,
+        vertices
+      );
+      vertexFlags[iPlus1] = isValidPartition(
+        i,
+        (i + 2) % vertices.length,
+        vertices
+      );
+    }
+
+    // Only 3 vertices remain.
+    // Add their triangle to the output list.
+    outTriangles(vertices[0], vertices[1], vertices[2]);
+  }
+
+  /**
+   * Check if the line segment formed by vertex A and vertex B will
+   * form a valid partition of the polygon.
+   *
+   * I.e. the line segment AB is internal to the polygon and will not
+   * cross existing line segments.
+   *
+   * Assumptions:
+   * - The vertices arguments define a valid simple polygon
+   * with vertices wrapped clockwise.
+   * - indexA != indexB
+   *
+   * Behavior is undefined if the arguments to not meet these
+   * assumptions
+   *
+   * @param indexA the index of the vertex that will form the segment AB.
+   * @param indexB the index of the vertex that will form the segment AB.
+   * @param vertices a polygon wrapped clockwise.
+   * @return true if the line segment formed by vertex A and vertex B will
+   * form a valid partition of the polygon.
+   */
+  function isValidPartition(
+    indexA: integer,
+    indexB: integer,
+    vertices: Point[]
+  ): boolean {
+    //  First check whether the segment AB lies within the internal
+    //  angle formed at A (this is the faster check).
+    //  If it does, then perform the more costly check.
+    return (
+      liesWithinInternalAngle(indexA, indexB, vertices) &&
+      !hasIllegalEdgeIntersection(indexA, indexB, vertices)
+    );
+  }
+
+  /**
+   * Check if vertex B lies within the internal angle of the polygon
+   * at vertex A.
+   *
+   * Vertex B does not have to be within the polygon border. It just has
+   * be be within the area encompassed by the internal angle formed at
+   * vertex A.
+   *
+   * This operation is a fast way of determining whether a line segment
+   * can possibly form a valid polygon partition. If this test returns
+   * FALSE, then more expensive checks can be skipped.
+   *
+   * Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#anglecheck
+   *
+   * Special case:
+   * FALSE is returned if vertex B lies directly on either of the rays
+   * cast from vertex A along its associated polygon edges. So the test
+   * on vertex B is exclusive of the polygon edges.
+   *
+   * Assumptions:
+   * - The vertices and indices arguments define a valid simple polygon
+   * with vertices wrapped clockwise.
+   * -indexA != indexB
+   *
+   * Behavior is undefined if the arguments to not meet these
+   * assumptions
+   *
+   * @param indexA the index of the vertex that will form the segment AB.
+   * @param indexB the index of the vertex that will form the segment AB.
+   * @param vertices a polygon wrapped clockwise.
+   * @return true if vertex B lies within the internal angle of
+   * the polygon at vertex A.
+   */
+  function liesWithinInternalAngle(
+    indexA: integer,
+    indexB: integer,
+    vertices: Point[]
+  ): boolean {
+    // Get pointers to the main vertices being tested.
+    const vertexA = vertices[indexA];
+    const vertexB = vertices[indexB];
+
+    // Get pointers to the vertices just before and just after vertA.
+    const vertexAMinus =
+      vertices[(indexA - 1 + vertices.length) % vertices.length];
+    const vertexAPlus = vertices[(indexA + 1) % vertices.length];
+
+    // First, find which of the two angles formed by the line segments
+    //  AMinus->A->APlus is internal to (pointing towards) the polygon.
+    // Then test to see if B lies within the area formed by that angle.
+
+    // TRUE if A is left of or on line AMinus->APlus
+    if (
+      isLeftOrCollinear(
+        vertexA.x,
+        vertexA.y,
+        vertexAMinus.x,
+        vertexAMinus.y,
+        vertexAPlus.x,
+        vertexAPlus.y
+      )
+    )
+      // The angle internal to the polygon is <= 180 degrees
+      // (non-reflex angle).
+      // Test to see if B lies within this angle.
+      return (
+        isLeft(
+          // TRUE if B is left of line A->AMinus
+          vertexB.x,
+          vertexB.y,
+          vertexA.x,
+          vertexA.y,
+          vertexAMinus.x,
+          vertexAMinus.y
+        ) &&
+        // TRUE if B is right of line A->APlus
+        isRight(
+          vertexB.x,
+          vertexB.y,
+          vertexA.x,
+          vertexA.y,
+          vertexAPlus.x,
+          vertexAPlus.y
+        )
+      );
+
+    // The angle internal to the polygon is > 180 degrees (reflex angle).
+    // Test to see if B lies within the external (<= 180 degree) angle and
+    // flip the result. (If B lies within the external angle, it can't
+    // lie within the internal angle)
+    return !(
+      // TRUE if B is left of or on line A->APlus
+      (
+        isLeftOrCollinear(
+          vertexB.x,
+          vertexB.y,
+          vertexA.x,
+          vertexA.y,
+          vertexAPlus.x,
+          vertexAPlus.y
+        ) &&
+        // TRUE if B is right of or on line A->AMinus
+        isRightOrCollinear(
+          vertexB.x,
+          vertexB.y,
+          vertexA.x,
+          vertexA.y,
+          vertexAMinus.x,
+          vertexAMinus.y
+        )
+      )
+    );
+  }
+
+  /**
+   * Check if point P is to the left of line AB when looking
+   * from A to B.
+   * @param px The x-value of the point to test.
+   * @param py The y-value of the point to test.
+   * @param ax The x-value of the point (ax, ay) that is point A on line AB.
+   * @param ay The y-value of the point (ax, ay) that is point A on line AB.
+   * @param bx The x-value of the point (bx, by) that is point B on line AB.
+   * @param by The y-value of the point (bx, by) that is point B on line AB.
+   * @return TRUE if point P is to the left of line AB when looking
+   * from A to B.
+   */
+  function isLeft(
+    px: integer,
+    py: integer,
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer
+  ): boolean {
+    return getSignedAreaX2(ax, ay, px, py, bx, by) < 0;
+  }
+
+  /**
+   * Check if point P is to the left of line AB when looking
+   * from A to B or is collinear with line AB.
+   * @param px The x-value of the point to test.
+   * @param py The y-value of the point to test.
+   * @param ax The x-value of the point (ax, ay) that is point A on line AB.
+   * @param ay The y-value of the point (ax, ay) that is point A on line AB.
+   * @param bx The x-value of the point (bx, by) that is point B on line AB.
+   * @param by The y-value of the point (bx, by) that is point B on line AB.
+   * @return TRUE if point P is to the left of line AB when looking
+   * from A to B, or is collinear with line AB.
+   */
+  function isLeftOrCollinear(
+    px: integer,
+    py: integer,
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer
+  ): boolean {
+    return getSignedAreaX2(ax, ay, px, py, bx, by) <= 0;
+  }
+
+  /**
+   * Check if point P is to the right of line AB when looking
+   * from A to B.
+   * @param px The x-value of the point to test.
+   * @param py The y-value of the point to test.
+   * @param ax The x-value of the point (ax, ay) that is point A on line AB.
+   * @param ay The y-value of the point (ax, ay) that is point A on line AB.
+   * @param bx The x-value of the point (bx, by) that is point B on line AB.
+   * @param by The y-value of the point (bx, by) that is point B on line AB.
+   * @return TRUE if point P is to the right of line AB when looking
+   * from A to B.
+   */
+  function isRight(
+    px: integer,
+    py: integer,
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer
+  ): boolean {
+    return getSignedAreaX2(ax, ay, px, py, bx, by) > 0;
+  }
+
+  /**
+   * Check if point P is to the right of or on line AB when looking
+   * from A to B.
+   * @param px The x-value of the point to test.
+   * @param py The y-value of the point to test.
+   * @param ax The x-value of the point (ax, ay) that is point A on line AB.
+   * @param ay The y-value of the point (ax, ay) that is point A on line AB.
+   * @param bx The x-value of the point (bx, by) that is point B on line AB.
+   * @param by The y-value of the point (bx, by) that is point B on line AB.
+   * @return TRUE if point P is to the right of or on line AB when looking
+   * from A to B.
+   */
+  function isRightOrCollinear(
+    px: integer,
+    py: integer,
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer
+  ): boolean {
+    return getSignedAreaX2(ax, ay, px, py, bx, by) >= 0;
+  }
+
+  /**
+   * The absolute value of the returned value is two times the area of the
+   * triangle defined by points (A, B, C).
+   *
+   * A positive value indicates:
+   * - Counterclockwise wrapping of the points.
+   * - Point B lies to the right of line AC, looking from A to C.
+   *
+   * A negative value indicates:
+   * - Clockwise wrapping of the points.<
+   * - Point B lies to the left of line AC, looking from A to C.
+   *
+   * A value of zero indicates that all points are collinear or
+   * represent the same point.
+   *
+   * This is a fast operation.
+   *
+   * @param ax The x-value for point (ax, ay) for vertex A of the triangle.
+   * @param ay The y-value for point (ax, ay) for vertex A of the triangle.
+   * @param bx The x-value for point (bx, by) for vertex B of the triangle.
+   * @param by The y-value for point (bx, by) for vertex B of the triangle.
+   * @param cx The x-value for point (cx, cy) for vertex C of the triangle.
+   * @param cy The y-value for point (cx, cy) for vertex C of the triangle.
+   * @return The signed value of two times the area of the triangle defined
+   * by the points (A, B, C).
+   */
+  function getSignedAreaX2(
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer,
+    cx: integer,
+    cy: integer
+  ): integer {
+    // References:
+    // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Modern%20Triangles
+    // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed")
+    return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
+  }
+
+  /**
+   * Check if the line segment AB intersects any edges not already
+   * connected to one of the two vertices.
+   *
+   * Assumptions:
+   * - The vertices and indices arguments define a valid simple polygon
+   * with vertices wrapped clockwise.
+   * - indexA != indexB
+   *
+   * Behavior is undefined if the arguments to not meet these
+   * assumptions
+   *
+   * @param indexA the index of the vertex that will form the segment AB.
+   * @param indexB the index of the vertex that will form the segment AB.
+   * @param vertices a polygon wrapped clockwise.
+   * @return true if the line segment AB intersects any edges not already
+   * connected to one of the two vertices.
+   */
+  function hasIllegalEdgeIntersection(
+    indexA: integer,
+    indexB: integer,
+    vertices: Point[]
+  ): boolean {
+    // Get pointers to the primary vertices being tested.
+    const vertexA = vertices[indexA];
+    const vertexB = vertices[indexB];
+
+    // Loop through the polygon edges.
+    for (
+      let edgeBeginIndex = 0;
+      edgeBeginIndex < vertices.length;
+      edgeBeginIndex++
+    ) {
+      const edgeEndIndex = (edgeBeginIndex + 1) % vertices.length;
+      if (
+        edgeBeginIndex === indexA ||
+        edgeBeginIndex === indexB ||
+        edgeEndIndex === indexA ||
+        edgeEndIndex === indexB
+      ) {
+        continue;
+      }
+      // Neither of the test indices are endpoints of this edge.
+      // Get this edge's vertices.
+      const edgeBegin = vertices[edgeBeginIndex];
+      const edgeEnd = vertices[edgeEndIndex];
+      if (
+        (edgeBegin.x === vertexA.x && edgeBegin.y === vertexA.y) ||
+        (edgeBegin.x === vertexB.x && edgeBegin.y === vertexB.y) ||
+        (edgeEnd.x === vertexA.x && edgeEnd.y === vertexA.y) ||
+        (edgeEnd.x === vertexB.x && edgeEnd.y === vertexB.y)
+      ) {
+        // One of the test vertices is co-located
+        // with one of the endpoints of this edge (this is a
+        // test of the actual position of the vertices rather than
+        // simply the index check performed earlier).
+        // Skip this edge.
+        continue;
+      }
+      // This edge is not connected to either of the test vertices.
+      // If line segment AB intersects  with this edge, then the
+      // intersection is illegal.
+      // I.e. New edges cannot cross existing edges.
+      if (
+        segmentsIntersect(
+          vertexA.x,
+          vertexA.y,
+          vertexB.x,
+          vertexB.y,
+          edgeBegin.x,
+          edgeBegin.y,
+          edgeEnd.x,
+          edgeEnd.y
+        )
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns TRUE if line segment AB intersects with line segment CD in any
+   * manner. Either collinear or at a single point.
+   * @param ax The x-value for point (ax, ay) in line segment AB.
+   * @param ay The y-value for point (ax, ay) in line segment AB.
+   * @param bx The x-value for point (bx, by) in line segment AB.
+   * @param by The y-value for point (bx, by) in line segment AB.
+   * @param cx The x-value for point (cx, cy) in line segment CD.
+   * @param cy The y-value for point (cx, cy) in line segment CD.
+   * @param dx The x-value for point (dx, dy) in line segment CD.
+   * @param dy The y-value for point (dx, dy) in line segment CD.
+   * @return TRUE if line segment AB intersects with line segment CD in any
+   * manner.
+   */
+  function segmentsIntersect(
+    ax: integer,
+    ay: integer,
+    bx: integer,
+    by: integer,
+    cx: integer,
+    cy: integer,
+    dx: integer,
+    dy: integer
+  ): boolean {
+    // This is modified 2D line-line intersection/segment-segment
+    // intersection test.
+
+    const deltaABx = bx - ax;
+    const deltaABy = by - ay;
+    const deltaCAx = ax - cx;
+    const deltaCAy = ay - cy;
+    const deltaCDx = dx - cx;
+    const deltaCDy = dy - cy;
+
+    const numerator = deltaCAy * deltaCDx - deltaCAx * deltaCDy;
+    const denominator = deltaABx * deltaCDy - deltaABy * deltaCDx;
+
+    // Perform early exit tests.
+    if (denominator === 0 && numerator !== 0) {
+      // If numerator is zero, then the lines are colinear.
+      // Since it isn't, then the lines must be parallel.
+      return false;
+    }
+
+    // Lines intersect. But do the segments intersect?
+
+    // Forcing float division on both of these via casting of the
+    // denominator.
+    const factorAB = numerator / denominator;
+    const factorCD = (deltaCAy * deltaABx - deltaCAx * deltaABy) / denominator;
+
+    // Determine the type of intersection
+    if (
+      factorAB >= 0.0 &&
+      factorAB <= 1.0 &&
+      factorCD >= 0.0 &&
+      factorCD <= 1.0
+    ) {
+      return true; // The two segments intersect.
+    }
+
+    // The lines intersect, but segments to not.
+
+    return false;
+  }
 }

@@ -359,6 +359,7 @@ namespace gdjs {
       this._manager.rebuildNavMeshIfNeeded();
       if (!this._manager.navMesh) {
         console.log("Can't build the nav mesh");
+        this._pathFound = false;
         return;
       }
 
@@ -379,10 +380,25 @@ namespace gdjs {
       const agent = this._manager.characterAgents.get(this);
       if (!agent) {
         console.log('No agent');
+        this._pathFound = false;
         return;
       }
-      const hasFindPath = agent.requestMoveTarget(destination);
-      console.log('hasFindPath', hasFindPath);
+      this._pathFound = agent.requestMoveTarget(destination);
+      console.log(
+        'hasFindPath',
+        this._pathFound,
+        this.owner.x,
+        this.owner.y,
+        //@ts-ignore
+        this.owner.getZ ? this.owner.getZ() : 0,
+        ' -> ',
+        x,
+        y,
+        z
+      );
+      if (this._pathFound) {
+        this._reachedEnd = false;
+      }
     }
 
     _enterSegment(segmentNumber: integer) {

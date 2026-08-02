@@ -31,8 +31,6 @@ class GD_CORE_API BuiltinExtensionsImplementer {
       gd::PlatformExtension& extension);
   static void ImplementsFileExtension(gd::PlatformExtension& extension);
   static void ImplementsKeyboardExtension(gd::PlatformExtension& extension);
-  static void ImplementsLocalizationExtension(
-      gd::PlatformExtension& extension);
   static void ImplementsMathematicalToolsExtension(
       gd::PlatformExtension& extension);
   static void ImplementsMouseExtension(gd::PlatformExtension& extension);

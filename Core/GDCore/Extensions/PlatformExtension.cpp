@@ -600,8 +600,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
       name == "BuiltinFile" || name == "BuiltinInterface" ||
       name == "BuiltinVariables" || name == "BuiltinCamera" ||
       name == "BuiltinWindow" || name == "BuiltinNetwork" ||
-      name == "BuiltinScene" || name == "BuiltinLocalization" ||
-      name == "BuiltinAdvanced" ||
+      name == "BuiltinScene" || name == "BuiltinAdvanced" ||
       name == "BuiltinCommonConversions" ||
       name == "BuiltinStringInstructions" ||
       name == "BuiltinMathematicalTools" ||

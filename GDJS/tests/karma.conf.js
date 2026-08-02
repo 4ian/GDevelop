@@ -99,7 +99,6 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/events-tools/runtimescenetools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/keyboard-key-definitions.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js',
-      './newIDE/app/resources/GDJS/Runtime/events-tools/localizationtools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Physics3DBehavior/Physics3DDataNormalizer.js',
       {
         pattern:

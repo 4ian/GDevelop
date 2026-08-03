@@ -121,7 +121,11 @@ export const useGenerateEvents = ({
 
         // Poll with exponential backoff (fast initially, capped), bounded by a
         // total time budget rather than a fixed attempt count.
-        const maxTotalWaitMs = 60000;
+        // The budget must stay above the backend events-generation LLM call
+        // timeout (120s in GDevelop-services `llm-models.js`), plus room for
+        // repair rounds: giving up while the backend is still generating
+        // makes the agent re-submit the whole generation from scratch.
+        const maxTotalWaitMs = 180000;
         const maxPollIntervalMs = 5000;
         const startTime = Date.now();
         let pollIntervalMs = 1000;

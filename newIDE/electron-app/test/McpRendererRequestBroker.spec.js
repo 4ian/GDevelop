@@ -197,6 +197,36 @@ const run = async () => {
   });
   assert.deepStrictEqual(await listPromise, { tools: [] });
 
+  const verificationRequests = [];
+  const verificationWebContents = {
+    isDestroyed: () => false,
+    send: (channel, request) => verificationRequests.push({ channel, request }),
+  };
+  const verificationBroker = createMcpRendererRequestBroker({
+    getWebContents: () => verificationWebContents,
+    defaultRequestTimeoutMs: 10,
+    defaultVerifyProjectChangeTimeoutMs: 100,
+    minimumRequestTimeoutMs: 1,
+  });
+  const verificationPromise = verificationBroker.send({
+    method: 'tools/call',
+    params: {
+      name: 'verify_project_change',
+      arguments: { timeout_ms: 500 },
+    },
+  });
+  assert.strictEqual(verificationRequests.length, 1);
+  await delay(30);
+  verificationBroker.handleResponse(verificationWebContents, {
+    id: verificationRequests[0].request.id,
+    result: toolResult({ success: true, runtimeVerified: true }),
+  });
+  const verificationResult = await verificationPromise;
+  assert.strictEqual(
+    verificationResult.structuredContent.runtimeVerified,
+    true
+  );
+
   const coalescedFirst = broker.send(reloadRequest(100));
   const coalescedSecond = broker.send(reloadRequest(100));
   assert.strictEqual(sentRequests.length, 3);

@@ -5,11 +5,25 @@ description: Create, inspect, prepare, optimize, animate, convert, merge, export
 
 # Blender Workflow
 
-## Use Blender MCP
+## Require Blender's official MCP
 
-Use Blender Foundation's official [Blender MCP server](https://www.blender.org/lab/mcp-server/) to inspect and operate Blender. Its tools include `get_blendfile_summary_path_info`, `get_objects_summary`, `get_python_api_docs`, and `execute_blender_code`.
+Use Blender Foundation's official [Blender MCP server](https://www.blender.org/lab/mcp-server/) for every Blender inspection or mutation. Do not substitute a third-party Blender MCP, UI automation, a direct `blender` shell command, or system Python calling `bpy`.
 
-The integration executes LLM-generated Blender code without data guards, so inspect paths, avoid sensitive workspaces, preserve the source `.blend`, and use task-owned copies or temporary outputs for destructive operations.
+Before doing any Blender work:
+
+1. Confirm that the official MCP tool surface is available. It includes tools such as `get_blendfile_summary_path_info`, `get_objects_summary`, `get_python_api_docs`, `execute_blender_code`, and `execute_blender_code_for_cli`.
+2. Call a non-mutating summary tool against the intended open scene or `.blend` file to prove that the server can reach Blender.
+3. Continue only after that call succeeds.
+
+If the official tools are not exposed, stop and show this error:
+
+> ERROR: Blender Workflow requires Blender Foundation's official Blender MCP server, but its tools are not installed or available. Install and configure Blender 5.1 or newer, the official Blender MCP add-on, and the official MCP server from https://www.blender.org/lab/mcp-server/, then retry.
+
+If the tools are exposed but the connectivity check fails, stop and show this error:
+
+> ERROR: Blender Foundation's official MCP tools are installed but cannot reach Blender. Open Blender 5.1 or newer, enable and start the official Blender MCP add-on, and retry.
+
+Do not continue with a fallback after either error. The official integration executes LLM-generated Blender code without data guards; inspect paths, avoid sensitive workspaces, preserve the source `.blend`, and use task-owned copies or temporary outputs for destructive operations.
 
 ## Coordinate the two skills
 
@@ -27,33 +41,51 @@ When the task also changes GDevelop project sources, read [the GDevelop project-
 6. Export binary `.glb`, keep stable data-block and animation names, and verify output existence, non-zero size, intended object/action counts, and absence of missing external resources.
 7. If the GLB is a GDevelop resource, keep it inside the project and continue with the GDevelop skill's project validation and fresh-preview workflow.
 
-## Use the bundled conversion scripts
+## Use the bundled workflow scripts
 
 Use the bundled scripts directly for supported jobs; do not rewrite their logic in an ad hoc script.
 
-- Use [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py) for one-file or batch `.gltf` to `.glb` conversion. Pass `input` with `output` for one file, or `output_dir` for a directory; set `recursive` for nested inputs and `overwrite` only for an approved replacement. Require the returned summary to report `success: true` and zero failures.
-- Use [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py) to embed animations from a GLB into a character GLB that uses the same skeleton. Pass `character`, `animations`, and `output`; use the `actions` list to select clips. Keep strict compatibility checking unless the user explicitly accepts a weaker check. This performs direct action reuse, not retargeting; stop and use a real retargeting workflow when rigs differ.
+- Use [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py) for one-file or batch `.gltf` to `.glb` conversion. Use `--input` with `--output` for one file, or `--output-dir` for a directory; add `--recursive` for nested inputs and `--overwrite` only for an approved replacement. Require the returned summary to report `success: true` and zero failures.
+- Use [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py) to embed animations from a GLB into a character GLB that uses the same skeleton. Supply `--character`, `--animations`, and `--output`; repeat `--action` to select clips. Keep strict compatibility checking unless the user explicitly accepts a weaker check. This performs direct action reuse, not retargeting; stop and use a real retargeting workflow when rigs differ.
+- Use [scripts/bake_material_textures.py](scripts/bake_material_textures.py) for repeatable image-space material preparation. Supply a version-1 JSON recipe containing one or more jobs. Each job may color-adjust a base texture while preserving alpha, derive a normal map from height, and optionally wire the verified outputs into a glTF-compatible Principled material. Use `--apply-materials` only on a task-owned `.blend`; add `--pack-images` when the generated images must travel with it, and use `--save-blend` to persist to a new path. The script deliberately does not perform geometry/cage, ambient-occlusion, or high-to-low projection bakes.
 
-Run either payload through the official MCP's `execute_blender_code` tool in the already connected Blender session. The payloads do not discover, configure, or launch a local Blender executable. Use a dedicated blank Blender session and save any open work first because the payloads clear task data-blocks while processing. They do not reset Blender or unload the MCP add-on.
+Run the conversion and animation-combination scripts only through the official MCP's `execute_blender_code_for_cli` tool so they execute in a background Blender process. Pass a disposable or task-owned `.blend` file as `blend_file`; if necessary, first create a temporary copy through `execute_blender_code`. Never run them against the user's live unsaved scene because conversion resets Blender to factory state while processing.
 
-Send code shaped like this to `execute_blender_code`, using the selected script's absolute path and an MCP options mapping:
+Prefer the same background-MCP workflow for material recipes that apply materials or save a `.blend`. A texture-only `bake_material_textures.py` recipe may run through live `execute_blender_code` when the scene was preserved first, because texture-only mode does not reset or rewire the scene.
+
+Send code shaped like this to `execute_blender_code_for_cli`, using the selected script's absolute path and arguments:
 
 ```python
 import runpy
 
-payload = runpy.run_path(r"ABSOLUTE_PATH_TO_SCRIPT")
-result = payload["run_mcp"]({
-    "input": r"ABSOLUTE_INPUT_PATH",
-    "output": r"ABSOLUTE_OUTPUT_PATH",
-})
+tool = runpy.run_path(r"ABSOLUTE_PATH_TO_SCRIPT")
+result = tool["run_with_arguments"]([
+    "--input", r"ABSOLUTE_INPUT_PATH",
+    "--output", r"ABSOLUTE_OUTPUT_PATH",
+])
 ```
 
 Generate a temporary output first and inspect it through the official MCP before replacing an existing project asset.
+
+Material-bake invocation uses the same `runpy` pattern with recipe arguments:
+
+```python
+import runpy
+
+tool = runpy.run_path(r"ABSOLUTE_PATH_TO_SCRIPTS\bake_material_textures.py")
+result = tool["run_with_arguments"]([
+    "--recipe", r"ABSOLUTE_PATH_TO_RECIPE\materials.json",
+    "--apply-materials",
+    "--pack-images",
+    "--save-blend", r"ABSOLUTE_TASK_OWNED_OUTPUT\materials_baked.blend",
+])
+```
 
 ## Verify completion
 
 Before finishing:
 
+- Confirm the official Blender MCP preflight succeeded.
 - Confirm the source `.blend` or its safe copy is preserved.
 - Confirm transforms, origin, normals, materials, actions, export selection, and GLB settings against the detailed workflow.
 - Confirm every expected output exists and has non-zero size.

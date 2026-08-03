@@ -1,5 +1,6 @@
 const DEFAULT_REQUEST_TIMEOUT_MS = 30000;
 const DEFAULT_RELOAD_TIMEOUT_MS = 120000;
+const DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS = 180000;
 const MINIMUM_REQUEST_TIMEOUT_MS = 1000;
 const MAXIMUM_REQUEST_TIMEOUT_MS = 600000;
 const RELOAD_OPERATION_RETENTION_MS = 5 * 60 * 1000;
@@ -65,6 +66,12 @@ const isReloadProjectRequest = request =>
   !!request.params &&
   request.params.name === 'reload_project';
 
+const isVerifyProjectChangeRequest = request =>
+  !!request &&
+  request.method === 'tools/call' &&
+  !!request.params &&
+  request.params.name === 'verify_project_change';
+
 const getReloadArguments = request => {
   if (!isReloadProjectRequest(request)) return {};
   const args = request.params.arguments;
@@ -80,12 +87,17 @@ const getRequestTimeout = ({
   request,
   defaultRequestTimeoutMs,
   defaultReloadTimeoutMs,
+  defaultVerifyProjectChangeTimeoutMs,
   minimumRequestTimeoutMs,
   maximumRequestTimeoutMs,
 }) => {
+  // verify_project_change.timeout_ms bounds its launch and inspection stages,
+  // not the aggregate validation/reload/preview workflow.
   const requestedTimeout = getReloadArguments(request).timeout_ms;
   const defaultTimeout = isReloadProjectRequest(request)
     ? defaultReloadTimeoutMs
+    : isVerifyProjectChangeRequest(request)
+    ? defaultVerifyProjectChangeTimeoutMs
     : defaultRequestTimeoutMs;
   if (
     typeof requestedTimeout !== 'number' ||
@@ -293,6 +305,7 @@ const createMcpRendererRequestBroker = ({
   getWebContents,
   defaultRequestTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
   defaultReloadTimeoutMs = DEFAULT_RELOAD_TIMEOUT_MS,
+  defaultVerifyProjectChangeTimeoutMs = DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS,
   minimumRequestTimeoutMs = MINIMUM_REQUEST_TIMEOUT_MS,
   maximumRequestTimeoutMs = MAXIMUM_REQUEST_TIMEOUT_MS,
   reloadOperationRetentionMs = RELOAD_OPERATION_RETENTION_MS,
@@ -620,6 +633,7 @@ const createMcpRendererRequestBroker = ({
       request,
       defaultRequestTimeoutMs,
       defaultReloadTimeoutMs,
+      defaultVerifyProjectChangeTimeoutMs,
       minimumRequestTimeoutMs,
       maximumRequestTimeoutMs,
     });
@@ -886,6 +900,7 @@ const createMcpRendererRequestBroker = ({
 module.exports = {
   DEFAULT_REQUEST_TIMEOUT_MS,
   DEFAULT_RELOAD_TIMEOUT_MS,
+  DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS,
   MINIMUM_REQUEST_TIMEOUT_MS,
   MAXIMUM_REQUEST_TIMEOUT_MS,
   RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,

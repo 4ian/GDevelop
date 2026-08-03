@@ -60,6 +60,7 @@ namespace gdjs {
     _rotateObject: boolean;
     _angleOffset: float;
     _radius: float;
+    _agent: RecastNav.CrowdAgent | null = null;
     _crowdAgentParams: Partial<RecastNav.CrowdAgentParams> = {
       radius: 40,
       height: 100,
@@ -196,6 +197,9 @@ namespace gdjs {
 
     setAcceleration(acceleration: float): void {
       this._crowdAgentParams.maxAcceleration = acceleration;
+      if (this._agent) {
+        this._agent.setParameters(this._crowdAgentParams);
+      }
     }
 
     getAcceleration(): float {
@@ -204,6 +208,9 @@ namespace gdjs {
 
     setMaxSpeed(maxSpeed: float): void {
       this._crowdAgentParams.maxSpeed = maxSpeed;
+      if (this._agent) {
+        this._agent.setParameters(this._crowdAgentParams);
+      }
     }
 
     getMaxSpeed(): float {
@@ -212,20 +219,42 @@ namespace gdjs {
 
     setSpeed(speed: float): void {
       this._speed = speed;
+      if (this._agent) {
+        const velocity = this._agent.desiredVelocityObstacleAdjusted();
+        const oldSpeed = Math.hypot(velocity.x, velocity.y, velocity.z);
+        if (oldSpeed === 0) {
+          this._agent.requestMoveVelocity({ x: speed, y: 0, z: 0 });
+        } else {
+          const ratio = speed / oldSpeed;
+          this._agent.requestMoveVelocity({
+            x: velocity.x * ratio,
+            y: velocity.y * ratio,
+            z: velocity.z * ratio,
+          });
+        }
+      }
     }
 
     getSpeed(): float {
-      return this._speed;
+      if (!this._agent) {
+        return 0;
+      }
+      const velocity = this._agent.desiredVelocityObstacleAdjusted();
+      return Math.hypot(velocity.x, velocity.y, velocity.z);
     }
 
     getMovementAngle(): float {
-      return this._movementAngle;
+      if (!this._agent) {
+        return 0;
+      }
+      const velocity = this._agent.desiredVelocityObstacleAdjusted();
+      return Math.atan2(velocity.z, velocity.x);
     }
 
     movementAngleIsAround(degreeAngle: float, tolerance: float): boolean {
       return (
         Math.abs(
-          gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
+          gdjs.evtTools.common.angleDifference(this.getMovementAngle(), degreeAngle)
         ) <= tolerance
       );
     }
@@ -377,13 +406,12 @@ namespace gdjs {
         return;
       }
 
-      const agent = this._manager.characterAgents.get(this);
-      if (!agent) {
+      if (!this._agent) {
         console.log('No agent');
         this._pathFound = false;
         return;
       }
-      this._pathFound = agent.requestMoveTarget(destination);
+      this._pathFound = this._agent.requestMoveTarget(destination);
       console.log(
         'hasFindPath',
         this._pathFound,
@@ -401,37 +429,11 @@ namespace gdjs {
       }
     }
 
-    _enterSegment(segmentNumber: integer) {
-      if (this._path.length === 0) {
-        return;
-      }
-      this._currentSegment = segmentNumber;
-      if (this._currentSegment < this._path.length - 1) {
-        const pathX =
-          this._path[this._currentSegment + 1].x -
-          this._path[this._currentSegment].x;
-        const pathY =
-          this._path[this._currentSegment + 1].y -
-          this._path[this._currentSegment].y;
-        const pathZ =
-          this._path[this._currentSegment + 1].z -
-          this._path[this._currentSegment].z;
-        this._totalSegmentDistance = Math.hypot(pathX, pathY, pathZ);
-        this._distanceOnSegment = 0;
-        this._reachedEnd = false;
-        this._movementAngle =
-          (gdjs.toDegrees(Math.atan2(pathY, pathX)) + 360) % 360;
-      } else {
-        this._reachedEnd = true;
-        this._speed = 0;
-      }
-    }
-
     override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const timeDelta = this.owner.getElapsedTime() / 1000;
       this._manager.step(timeDelta);
 
-      const agent = this._manager.characterAgents.get(this);
+      const agent = this._agent;
       if (!agent) {
         return;
       }

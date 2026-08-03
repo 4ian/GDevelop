@@ -35,17 +35,9 @@ namespace gdjs {
    */
   export class NavMeshObstaclesManager {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
+    characters = new Set<NavMeshCharacterRuntimeBehavior>();
     is3D = false;
     navMesh: RecastNav.NavMesh | null = null;
-    timeSinceLastNavMeshLastRebuild: float = 1;
-    isNavMeshDirty = true;
-    isFirstFrame = true;
-    crowd: RecastNav.Crowd | null = null;
-    characterAgents = new Map<
-      NavMeshCharacterRuntimeBehavior,
-      RecastNav.CrowdAgent | null
-    >();
-    hasStepped = false;
     private navMeshConfig: Partial<RecastNav.SoloNavMeshGeneratorConfig> = {
       cs: 10,
       ch: 10,
@@ -54,6 +46,11 @@ namespace gdjs {
       detailSampleMaxError: 50,
       walkableClimb: 2,
     };
+    timeSinceLastNavMeshLastRebuild: float = 1;
+    isNavMeshDirty = true;
+    isFirstFrame = true;
+    crowd: RecastNav.Crowd | null = null;
+    hasStepped = false;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
@@ -130,7 +127,7 @@ namespace gdjs {
         indices,
         this.navMeshConfig
       );
-      console.log("Built", result.success);
+      console.log('Built', result.success);
       this.navMeshConfig.walkableClimb = 2;
       if (result.success) {
         this.navMesh = result.navMesh;
@@ -138,7 +135,7 @@ namespace gdjs {
           maxAgents: 100,
           maxAgentRadius: 100,
         });
-        for (const character of this.characterAgents.keys()) {
+        for (const character of this.characters) {
           this.rebuildCharacterAgent(character);
         }
       }
@@ -403,7 +400,7 @@ namespace gdjs {
 
     private rebuildCharacterAgent(character: NavMeshCharacterRuntimeBehavior) {
       if (!this.navMesh || !this.crowd) {
-        this.characterAgents.set(character, null);
+        character._agent = null;
         return;
       }
       const owner = character.owner;
@@ -443,12 +440,12 @@ namespace gdjs {
         : null;
 
       if (agent) {
-        const oldAgent = this.characterAgents.get(character);
+        const oldAgent = character._agent;
         if (oldAgent && !character.destinationReached()) {
           agent.requestMoveTarget(oldAgent.target());
         }
       }
-      this.characterAgents.set(character, agent);
+      character._agent = agent;
     }
 
     /**
@@ -475,9 +472,10 @@ namespace gdjs {
      * Add a character to the list of existing characters.
      */
     addCharacter(character: NavMeshCharacterRuntimeBehavior) {
-      if (this.characterAgents.get(character)) {
+      if (this.characters.has(character)) {
         return;
       }
+      this.characters.add(character);
       if (gdjs.Base3DHandler.is3D(character.owner)) {
         this.is3D = true;
       }
@@ -488,7 +486,7 @@ namespace gdjs {
      * Remove a character from the list of existing characters.
      */
     removeCharacter(character: NavMeshCharacterRuntimeBehavior) {
-      this.characterAgents.delete(character);
+      this.characters.delete(character);
     }
   }
 

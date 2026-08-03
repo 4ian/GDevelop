@@ -94,6 +94,8 @@ type McpEditorBridgeContext = {|
   // reload must not be reused by a later verify_project_change stage.
   getLaunchPreviewForScene?: () => ?(sceneName: ?string) => mixed,
   getPreviewLaunchState?: () => Object,
+  beginPreviewLaunchSequence?: () => boolean,
+  endPreviewLaunchSequence?: () => void,
   reloadProjectAndWait?: (
     reportProgress?: McpRequestProgressReporter
   ) => Promise<any>,
@@ -3033,12 +3035,16 @@ const waitForPreviewRuntimeReady = async (
     timeoutMs?: number,
     pollIntervalMs?: number,
     requirePaused?: boolean,
+    requireSceneName?: boolean,
+    expectedSceneName?: ?string,
     operation?: string,
   |}
 ): Promise<Object> => {
   const timeoutMs = (options && options.timeoutMs) || 6000;
   const pollIntervalMs = (options && options.pollIntervalMs) || 150;
   const requirePaused = !!(options && options.requirePaused);
+  const requireSceneName = !!(options && options.requireSceneName);
+  const expectedSceneName = options && options.expectedSceneName;
   const operation =
     (options && options.operation) || 'wait_until_preview_ready';
   const startedAt = Date.now();
@@ -3058,7 +3064,15 @@ const waitForPreviewRuntimeReady = async (
     );
     if (matched) {
       lastStatus = payload;
-      if (!requirePaused || (payload && payload.isPaused === true)) {
+      const actualSceneName = getStatusSceneName(payload);
+      const isSceneReady =
+        !requireSceneName ||
+        (!!actualSceneName &&
+          (!expectedSceneName || actualSceneName === expectedSceneName));
+      if (
+        (!requirePaused || (payload && payload.isPaused === true)) &&
+        isSceneReady
+      ) {
         return {
           ready: true,
           responsive: true,
@@ -3635,6 +3649,11 @@ const launchPreview = async (
     connection.debuggerId,
     {
       timeoutMs: Math.max(500, timeoutMs - (connection.elapsedMs || 0)),
+      // A debugger websocket connects before the RuntimeScene is necessarily
+      // installed. Pausing at that instant freezes an empty scene stack and
+      // makes the first run_frames call incorrectly report zero instances.
+      requireSceneName: !!expectedScene,
+      expectedSceneName: sceneSelectionSupported ? expectedScene : null,
       operation: 'launch_preview.runtime-ready',
     }
   );
@@ -4035,128 +4054,125 @@ const callMcpTool = async ({
   const project = context.getProject();
 
   if (toolName === 'verify_project_change') {
-    const receipts: Array<Object> = [];
-    const runStage = async (
-      stage: string,
-      name: string,
-      stageArgs: Object
-    ): Promise<
-      | {| failed: true, result: McpToolResult |}
-      | {| failed: false, receipt: Object |}
-    > => {
-      const response = await callMcpTool({
-        toolName: name,
-        args: stageArgs,
-        context,
-      });
-      const receipt = parseMcpToolResult(response);
-      receipts.push({ stage, toolName: name, receipt });
-      if (
-        response.isError ||
-        receipt.success === false ||
-        receipt.valid === false
-      ) {
-        return {
-          failed: true,
-          result: errorResult(
-            `verify_project_change stopped during ${stage}.`,
-            {
-              code: 'VERIFY_PROJECT_CHANGE_STAGE_FAILED',
-              success: false,
-              runtimeVerified: false,
-              completionReady: false,
-              failureStage: stage,
-              receipts,
-            }
-          ),
-        };
-      }
-      return { failed: false, receipt };
-    };
-
-    let stageResult = await runStage(
-      'validation',
-      'validate_project_files',
-      {}
-    );
-    if (stageResult.failed) return stageResult.result;
-
-    stageResult = await runStage('reload', 'reload_project', {});
-    if (stageResult.failed) return stageResult.result;
-
-    if (!args || args.close_existing_previews !== false) {
-      stageResult = await runStage('close-previews', 'control_preview', {
-        action: 'close',
-        close_all: true,
-      });
-      if (stageResult.failed) return stageResult.result;
+    const hasPreviewLaunchSequenceReservation =
+      typeof context.beginPreviewLaunchSequence === 'function';
+    if (
+      hasPreviewLaunchSequenceReservation &&
+      !context.beginPreviewLaunchSequence()
+    ) {
+      return errorResult(
+        'Could not start verification because another MCP preview workflow is already in progress.',
+        {
+          code: 'PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS',
+          success: false,
+          runtimeVerified: false,
+          completionReady: false,
+        }
+      );
     }
 
-    stageResult = await runStage('launch', 'launch_preview', {
-      scene_name:
-        args && typeof args.scene_name === 'string'
-          ? args.scene_name
-          : undefined,
-      start_paused: true,
-      force_new: true,
-      timeout_ms:
-        args && typeof args.timeout_ms === 'number'
-          ? args.timeout_ms
-          : undefined,
-    });
-    if (stageResult.failed) return stageResult.result;
-    const debuggerId = stageResult.receipt.debuggerId;
+    try {
+      const receipts: Array<Object> = [];
+      const runStage = async (
+        stage: string,
+        name: string,
+        stageArgs: Object
+      ): Promise<
+        | {| failed: true, result: McpToolResult |}
+        | {| failed: false, receipt: Object |}
+      > => {
+        const response = await callMcpTool({
+          toolName: name,
+          args: stageArgs,
+          context,
+        });
+        const receipt = parseMcpToolResult(response);
+        receipts.push({ stage, toolName: name, receipt });
+        if (
+          response.isError ||
+          receipt.success === false ||
+          receipt.valid === false
+        ) {
+          return {
+            failed: true,
+            result: errorResult(
+              `verify_project_change stopped during ${stage}.`,
+              {
+                code: 'VERIFY_PROJECT_CHANGE_STAGE_FAILED',
+                success: false,
+                runtimeVerified: false,
+                completionReady: false,
+                failureStage: stage,
+                receipts,
+              }
+            ),
+          };
+        }
+        return { failed: false, receipt };
+      };
 
-    const assertions =
-      args && Array.isArray(args.assertions) ? args.assertions : [];
-    const assertionObjectNames = assertions
-      .filter(
-        assertion =>
-          assertion &&
-          (assertion.type === 'object_count' ||
-            assertion.type === 'instance_position_finite') &&
-          typeof assertion.object_name === 'string'
-      )
-      .map(assertion => assertion.object_name);
-    const requestedObjects =
-      args && Array.isArray(args.objects) ? args.objects : [];
-    const objects = Array.from(
-      new Set([...requestedObjects, ...assertionObjectNames])
-    );
+      let stageResult = await runStage(
+        'validation',
+        'validate_project_files',
+        {}
+      );
+      if (stageResult.failed) return stageResult.result;
 
-    stageResult = await runStage('frames', 'run_frames', {
-      inputs: args && Array.isArray(args.inputs) ? args.inputs : undefined,
-      frames: args && typeof args.frames === 'number' ? args.frames : 1,
-      frame_delta_ms:
-        args && typeof args.frame_delta_ms === 'number'
-          ? args.frame_delta_ms
-          : undefined,
-      auto_release: true,
-      debugger_id: debuggerId || undefined,
-      objects: objects.length ? objects : undefined,
-      instance_positions_for: objects.length ? objects : undefined,
-      include:
-        args && Array.isArray(args.include)
-          ? args.include
-          : objects.length
-          ? ['position', 'angle', 'variables', 'behaviors']
-          : undefined,
-      instance_indexes:
-        args && Array.isArray(args.instance_indexes)
-          ? args.instance_indexes
-          : undefined,
-    });
-    if (stageResult.failed) return stageResult.result;
+      if (!args || args.close_existing_previews !== false) {
+        stageResult = await runStage('close-previews', 'control_preview', {
+          action: 'close',
+          close_all: true,
+        });
+        if (stageResult.failed) return stageResult.result;
+      }
 
-    stageResult = await runStage(
-      'inspect',
-      'gdevelop_inspect_running_preview',
-      {
-        debugger_id: debuggerId || undefined,
+      // Stop any preview that may still be compiling from the current native
+      // project before reload_project replaces and deletes that project. The
+      // sequence reservation prevents tab effects from starting another one.
+      stageResult = await runStage('reload', 'reload_project', {});
+      if (stageResult.failed) return stageResult.result;
+
+      stageResult = await runStage('launch', 'launch_preview', {
+        scene_name:
+          args && typeof args.scene_name === 'string'
+            ? args.scene_name
+            : undefined,
+        start_paused: true,
+        force_new: true,
         timeout_ms:
           args && typeof args.timeout_ms === 'number'
             ? args.timeout_ms
             : undefined,
+      });
+      if (stageResult.failed) return stageResult.result;
+      const debuggerId = stageResult.receipt.debuggerId;
+
+      const assertions =
+        args && Array.isArray(args.assertions) ? args.assertions : [];
+      const assertionObjectNames = assertions
+        .filter(
+          assertion =>
+            assertion &&
+            (assertion.type === 'object_count' ||
+              assertion.type === 'instance_position_finite') &&
+            typeof assertion.object_name === 'string'
+        )
+        .map(assertion => assertion.object_name);
+      const requestedObjects =
+        args && Array.isArray(args.objects) ? args.objects : [];
+      const objects = Array.from(
+        new Set([...requestedObjects, ...assertionObjectNames])
+      );
+
+      stageResult = await runStage('frames', 'run_frames', {
+        inputs: args && Array.isArray(args.inputs) ? args.inputs : undefined,
+        frames: args && typeof args.frames === 'number' ? args.frames : 1,
+        frame_delta_ms:
+          args && typeof args.frame_delta_ms === 'number'
+            ? args.frame_delta_ms
+            : undefined,
+        auto_release: true,
+        debugger_id: debuggerId || undefined,
         objects: objects.length ? objects : undefined,
         instance_positions_for: objects.length ? objects : undefined,
         include:
@@ -4169,53 +4185,89 @@ const callMcpTool = async ({
           args && Array.isArray(args.instance_indexes)
             ? args.instance_indexes
             : undefined,
-      }
-    );
-    if (stageResult.failed) return stageResult.result;
-    const inspection = stageResult.receipt;
+      });
+      if (stageResult.failed) return stageResult.result;
 
-    const assertionResults = evaluateProjectChangeAssertions(
-      assertions,
-      inspection
-    );
-    receipts.push({
-      stage: 'assertions',
-      assertions: assertionResults,
-    });
-    const failedAssertion = assertionResults.find(result => !result.passed);
-    if (failedAssertion) {
-      return errorResult('A runtime verification assertion failed.', {
-        code: 'VERIFY_PROJECT_CHANGE_ASSERTION_FAILED',
-        success: false,
-        runtimeVerified: false,
-        completionReady: false,
-        failureStage: 'assertions',
-        failedAssertion,
+      stageResult = await runStage(
+        'inspect',
+        'gdevelop_inspect_running_preview',
+        {
+          debugger_id: debuggerId || undefined,
+          timeout_ms:
+            args && typeof args.timeout_ms === 'number'
+              ? args.timeout_ms
+              : undefined,
+          objects: objects.length ? objects : undefined,
+          instance_positions_for: objects.length ? objects : undefined,
+          include:
+            args && Array.isArray(args.include)
+              ? args.include
+              : objects.length
+              ? ['position', 'angle', 'variables', 'behaviors']
+              : undefined,
+          instance_indexes:
+            args && Array.isArray(args.instance_indexes)
+              ? args.instance_indexes
+              : undefined,
+        }
+      );
+      if (stageResult.failed) return stageResult.result;
+      const inspection = stageResult.receipt;
+
+      const assertionResults = evaluateProjectChangeAssertions(
+        assertions,
+        inspection
+      );
+      receipts.push({
+        stage: 'assertions',
+        assertions: assertionResults,
+      });
+      const failedAssertion = assertionResults.find(result => !result.passed);
+      if (failedAssertion) {
+        return errorResult('A runtime verification assertion failed.', {
+          code: 'VERIFY_PROJECT_CHANGE_ASSERTION_FAILED',
+          success: false,
+          runtimeVerified: false,
+          completionReady: false,
+          failureStage: 'assertions',
+          failedAssertion,
+          assertions: assertionResults,
+          receipts,
+        });
+      }
+
+      if (args && args.screenshot) {
+        stageResult = await runStage(
+          'screenshot',
+          'capture_preview_screenshot',
+          {
+            ...args.screenshot,
+            debugger_id: debuggerId || args.screenshot.debugger_id,
+          }
+        );
+        if (stageResult.failed) return stageResult.result;
+      }
+
+      return textResult({
+        success: true,
+        runtimeVerified: true,
+        completionReady: true,
+        sceneName:
+          args && typeof args.scene_name === 'string'
+            ? args.scene_name
+            : undefined,
+        debuggerId,
         assertions: assertionResults,
         receipts,
       });
+    } finally {
+      if (
+        hasPreviewLaunchSequenceReservation &&
+        context.endPreviewLaunchSequence
+      ) {
+        context.endPreviewLaunchSequence();
+      }
     }
-
-    if (args && args.screenshot) {
-      stageResult = await runStage('screenshot', 'capture_preview_screenshot', {
-        ...args.screenshot,
-        debugger_id: debuggerId || args.screenshot.debugger_id,
-      });
-      if (stageResult.failed) return stageResult.result;
-    }
-
-    return textResult({
-      success: true,
-      runtimeVerified: true,
-      completionReady: true,
-      sceneName:
-        args && typeof args.scene_name === 'string'
-          ? args.scene_name
-          : undefined,
-      debuggerId,
-      assertions: assertionResults,
-      receipts,
-    });
   }
 
   if (toolName === 'gdevelop_get_editor_state') {

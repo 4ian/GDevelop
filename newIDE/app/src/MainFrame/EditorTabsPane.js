@@ -106,6 +106,7 @@ export type EditorTabsPaneCommonProps = {|
   isSavingProject: boolean,
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
+  isPreviewLaunchInProgress: boolean,
   previewState: PreviewState,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
@@ -766,7 +767,9 @@ const EditorTabsPane: React.ComponentType<{
         canDoNetworkPreview={canDoNetworkPreview}
         setPreviewOverride={setPreviewOverride}
         isPreviewEnabled={
-          !!currentProject && currentProject.getLayoutsCount() > 0
+          !!currentProject &&
+          currentProject.getLayoutsCount() > 0 &&
+          !props.isPreviewLaunchInProgress
         }
         previewState={previewState}
         onOpenVersionHistory={openVersionHistoryPanel}

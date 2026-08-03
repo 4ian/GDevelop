@@ -482,10 +482,14 @@ runtimeScene._instances.length;
     await writeMultiFileSourceTree({ entryPath: projectFile, files });
     const reloadProjectAndWait: any = jest.fn();
     const runCommand: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     const bridge = makeBridge({
       getProject: () => project,
       reloadProjectAndWait,
       runCommand,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -521,6 +525,34 @@ runtimeScene._instances.length;
     );
     expect(reloadProjectAndWait).not.toHaveBeenCalled();
     expect(runCommand).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects verify_project_change when another preview workflow owns the sequence', async () => {
+    const reloadProjectAndWait: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => false);
+    const endPreviewLaunchSequence: any = jest.fn();
+    const bridge = makeBridge({
+      reloadProjectAndWait,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'verify_project_change',
+        arguments: { scene_name: 'Scene' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.code).toBe('PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS');
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).not.toHaveBeenCalled();
   });
 
   it('completes verify_project_change only after runtime and renderer assertions pass', async () => {
@@ -609,8 +641,10 @@ runtimeScene._instances.length;
     const staleLaunchPreviewForScene: any = jest.fn(() => {
       throw new Error('The pre-reload project object was destroyed.');
     });
+    const workflowOrder: Array<string> = [];
     const freshLaunchPreviewForScene: any = jest.fn(async sceneName => {
       expect(sceneName).toBe('Scene');
+      workflowOrder.push('launch');
       setTimeout(
         () => previewDebuggerServer.connectDebugger('preview-ws-1'),
         1
@@ -619,6 +653,7 @@ runtimeScene._instances.length;
     });
     let currentLaunchPreviewForScene = staleLaunchPreviewForScene;
     const reloadProjectAndWait: any = jest.fn(async () => {
+      workflowOrder.push('reload');
       currentLaunchPreviewForScene = freshLaunchPreviewForScene;
       return {
         reloaded: true,
@@ -631,6 +666,9 @@ runtimeScene._instances.length;
       launchPreviewForScene: staleLaunchPreviewForScene,
       getLaunchPreviewForScene: () => currentLaunchPreviewForScene,
       getPreviewDebuggerServer: () => previewDebuggerServer,
+      closeAllPreviews: jest.fn(async () => {
+        workflowOrder.push('close');
+      }),
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -639,7 +677,6 @@ runtimeScene._instances.length;
         name: 'verify_project_change',
         arguments: {
           scene_name: 'Scene',
-          close_existing_previews: false,
           frames: 2,
           timeout_ms: 1000,
           assertions: [
@@ -686,6 +723,7 @@ runtimeScene._instances.length;
     expect(result.assertions.every(assertion => assertion.passed)).toBe(true);
     expect(result.receipts.map(receipt => receipt.stage)).toEqual([
       'validation',
+      'close-previews',
       'reload',
       'launch',
       'frames',
@@ -695,6 +733,7 @@ runtimeScene._instances.length;
     expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
     expect(staleLaunchPreviewForScene).not.toHaveBeenCalled();
     expect(freshLaunchPreviewForScene).toHaveBeenCalledTimes(1);
+    expect(workflowOrder).toEqual(['close', 'reload', 'launch']);
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {
@@ -2062,6 +2101,58 @@ runtimeScene._instances.length;
     expect(result.sceneSelectionSupported).toBe(true);
     // The first scene was launched, not the editor's active tab.
     expect(launchedScenes).toEqual(['main']);
+
+    project.delete();
+  });
+
+  it('waits for the first runtime scene before pausing a newly connected preview', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Game', 0);
+    project.setFirstLayout('Game');
+
+    let statusProbeCount = 0;
+    const previewDebuggerServer: any = makeTargetedPreviewServer({
+      debuggerIds: [],
+      responders: {
+        getStatus: () => ({
+          isPaused: false,
+          sceneName: ++statusProbeCount >= 2 ? 'Game' : null,
+        }),
+        pause: { isPaused: true, sceneName: 'Game' },
+      },
+    });
+    const launchPreviewForScene = jest.fn(() => {
+      setTimeout(
+        () => previewDebuggerServer.connectDebugger('preview-ws-0'),
+        1
+      );
+      return { accepted: true };
+    });
+    const bridge = makeBridge({
+      getProject: () => project,
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: {
+          scene_name: 'Game',
+          start_paused: true,
+          timeout_ms: 1000,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.pauseConfirmed).toBe(true);
+    expect(result.actualScene).toBe('Game');
+    expect(statusProbeCount).toBeGreaterThanOrEqual(2);
+    expect(launchPreviewForScene).toHaveBeenCalledWith('Game');
 
     project.delete();
   });

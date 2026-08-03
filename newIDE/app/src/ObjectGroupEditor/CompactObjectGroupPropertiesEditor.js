@@ -404,16 +404,20 @@ export const CompactObjectGroupPropertiesEditor = ({
                             ) : null
                           }
                           title={behaviors[0].getName()}
-                          titleBarButtons={[
-                            {
-                              id: 'remove-behavior',
-                              icon: RemoveIcon,
-                              label: t`Remove behavior`,
-                              onClick: () => {
-                                removeBehavior(behaviorName);
-                              },
-                            },
-                          ]}
+                          titleBarButtons={
+                            isBehaviorListLocked
+                              ? []
+                              : [
+                                  {
+                                    id: 'remove-behavior',
+                                    icon: RemoveIcon,
+                                    label: t`Remove behavior`,
+                                    onClick: () => {
+                                      removeBehavior(behaviorName);
+                                    },
+                                  },
+                                ]
+                          }
                         />
                       );
                     })}

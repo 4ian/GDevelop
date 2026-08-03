@@ -6,6 +6,10 @@ import {
   getModelAnimationClipLabel,
 } from './Model3DAnimationUtils';
 import { getModelBoneDisplayName } from './Model3DBoneUtils';
+import {
+  getModelPreviewCameraZoom,
+  MODEL_PREVIEW_FULLSCREEN_CAMERA_ZOOM,
+} from './Model3DFullscreenUtils';
 
 describe('InteractiveModel3DPreview', () => {
   it('uses balanced lighting that preserves model colors and highlights', () => {
@@ -53,6 +57,26 @@ describe('InteractiveModel3DPreview', () => {
     expect(source).toContain('placeholder={t`Filter animations by name`}');
     expect(source).toContain('filteredAnimationClips.map');
     expect(source).toContain('isPlaying ? <Pause /> : <Play />');
+  });
+
+  it('can show the model preview full screen with closer framing', () => {
+    const source = fs.readFileSync(
+      path.join(__dirname, 'InteractiveModel3DPreview.js'),
+      'utf8'
+    );
+
+    expect(getModelPreviewCameraZoom(false)).toBe(1);
+    expect(getModelPreviewCameraZoom(true)).toBe(
+      MODEL_PREVIEW_FULLSCREEN_CAMERA_ZOOM
+    );
+    expect(MODEL_PREVIEW_FULLSCREEN_CAMERA_ZOOM).toBeGreaterThan(1);
+    expect(source).toContain("addEventListener('fullscreenchange'");
+    expect(source).toContain('previewContainer.requestFullscreen()');
+    expect(source).toContain('document.exitFullscreen()');
+    expect(source).toContain('camera.zoom = getModelPreviewCameraZoom(');
+    expect(source).toContain('id="model-toggle-fullscreen"');
+    expect(source).toContain('<Trans>Full screen</Trans>');
+    expect(source).toContain('<Trans>Exit full screen</Trans>');
   });
 
   it('can reveal the model skeleton and bone names', () => {

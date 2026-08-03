@@ -39,7 +39,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         fullWidth
         initialResourceName={props.value}
         onChange={props.onChange}
-        floatingLabelText={<Trans>Choose the spine json file to use</Trans>}
+        floatingLabelText={<Trans>Choose the spine skeleton file to use</Trans>}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
         ref={field}

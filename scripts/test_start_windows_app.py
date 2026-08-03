@@ -209,7 +209,10 @@ class StartWindowsAppScriptTest(unittest.TestCase):
             )
 
         self.assertEqual(launched_process, process.pid)
-        self.assertEqual(popen.call_args.args[0], [str(electron_exe), "app"])
+        self.assertEqual(
+            popen.call_args.args[0],
+            [str(electron_exe), "--force_high_performance_gpu", "app"],
+        )
         self.assertEqual(popen.call_args.kwargs["cwd"], electron_app_dir)
         self.assertEqual(popen.call_args.kwargs["env"]["ELECTRON_IS_DEV"], "0")
         self.assertIs(popen.call_args.kwargs["stdin"], subprocess.DEVNULL)

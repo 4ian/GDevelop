@@ -15,6 +15,33 @@ const run = () => {
 
   assert.deepStrictEqual(
     getElectronAppCommandLineArguments(
+      ['electron.exe', '--force_high_performance_gpu', 'app'],
+      {
+        isDev: false,
+        isDefaultApp: true,
+      }
+    ),
+    []
+  );
+
+  assert.deepStrictEqual(
+    getElectronAppCommandLineArguments(
+      [
+        'electron.exe',
+        '--force_high_performance_gpu',
+        'app',
+        'C:\\Projects\\game.json',
+      ],
+      {
+        isDev: false,
+        isDefaultApp: true,
+      }
+    ),
+    ['C:\\Projects\\game.json']
+  );
+
+  assert.deepStrictEqual(
+    getElectronAppCommandLineArguments(
       ['electron.exe', 'app', 'C:\\Projects\\game.json'],
       {
         isDev: false,

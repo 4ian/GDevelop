@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import { type State } from './MainFrameState';
+import {
+  canReleaseCancelledPreviewPreparation,
+  type PreviewLaunchPhase,
+} from './PreviewLaunchCancellation';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
@@ -490,7 +494,6 @@ const initialPreviewState: PreviewState = {
   overridenPreviewExternalLayoutName: null,
 };
 
-type PreviewLaunchPhase = 'idle' | 'preparing' | 'launching';
 type PreviewLaunchKind = 'standard' | 'in-game-edition';
 
 const usePreviewLoadingState = () => {
@@ -1254,6 +1257,39 @@ const MainFrame = (props: Props): React.MixedElement => {
       // Keep the shared lock owned by this launch until its finally block
       // runs. Releasing it here would let another launch read/write preview
       // files while the cancelled async launch is still unwinding.
+    },
+    [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
+  );
+
+  const releaseCancelledPreviewPreparation = React.useCallback(
+    (reason: string): boolean => {
+      const previewLaunchId = activePreviewLaunchIdRef.current;
+      if (
+        !canReleaseCancelledPreviewPreparation({
+          launchInProgress: previewLaunchInProgressRef.current,
+          activePreviewLaunchId: previewLaunchId,
+          isActivePreviewLaunchCancelled:
+            previewLaunchId != null &&
+            cancelledPreviewLaunchIdsRef.current.has(previewLaunchId),
+          launchPhase: previewLaunchPhaseRef.current,
+        })
+      ) {
+        return false;
+      }
+
+      console.warn(
+        `Releasing cancelled preview preparation #${String(
+          previewLaunchId
+        )} because ${reason}. Its pending preparation step may still finish, but cancellation checks prevent it from launching a preview.`
+      );
+      activePreviewLaunchIdRef.current = null;
+      setPreviewLaunchInProgress(false);
+      previewLaunchPhaseRef.current = 'idle';
+      activePreviewLaunchKindRef.current = null;
+      if (previewLoadingRef.current) {
+        setPreviewLoading(null);
+      }
+      return true;
     },
     [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
   );
@@ -4701,6 +4737,9 @@ const MainFrame = (props: Props): React.MixedElement => {
           ) {
             await new Promise(resolve => setTimeout(resolve, 50));
           }
+          releaseCancelledPreviewPreparation(
+            'it did not unwind before the MCP preview launch timeout'
+          );
         }
 
         if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
@@ -4747,6 +4786,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       hasNonEditionPreviewsRunning,
       getPreviewLaunchStateForMcp,
       previewLoadingRef,
+      releaseCancelledPreviewPreparation,
       setMcpPreviewLaunchInProgress,
     ]
   );
@@ -7970,6 +8010,9 @@ const MainFrame = (props: Props): React.MixedElement => {
             ) {
               await new Promise(resolve => setTimeout(resolve, 50));
             }
+            releaseCancelledPreviewPreparation(
+              'it did not unwind after all previews were closed through MCP'
+            );
             // A cancelled launch may have created its native window while it
             // was unwinding. Close once more after the lock is released so no
             // stale debugger connection can race the next explicit launch.
@@ -8037,6 +8080,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       beginMcpPreviewLaunchSequence,
       endMcpPreviewLaunchSequence,
       cancelPendingPreviewLaunchAfterWindowClosed,
+      releaseCancelledPreviewPreparation,
       launchPreviewForSceneRef,
       getMcpEditorSelection,
       generateEvents,

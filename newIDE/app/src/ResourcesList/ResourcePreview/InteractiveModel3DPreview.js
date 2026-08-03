@@ -41,7 +41,10 @@ import {
   findHoveredBoneJointIndex,
   setModelMaterialsBonesVisibility,
 } from './Model3DBoneVisualizationUtils';
-import { getModelPreviewCameraZoom } from './Model3DFullscreenUtils';
+import {
+  exitAllFullscreenLayers,
+  getModelPreviewCameraZoom,
+} from './Model3DFullscreenUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
@@ -617,45 +620,79 @@ const InteractiveModel3DPreviewContent = ({
     [isShowingBoneNames, isShowingBones]
   );
 
-  const updateFullscreenState = React.useCallback(() => {
-    if (typeof document === 'undefined') return;
+  const setPreviewFullscreenState = React.useCallback(
+    (isPreviewFullscreen: boolean) => {
+      setIsFullscreen(isPreviewFullscreen);
 
-    const isPreviewFullscreen =
-      document.fullscreenElement === previewContainerRef.current;
-    setIsFullscreen(isPreviewFullscreen);
-
-    const camera = previewCameraRef.current;
-    if (camera) {
-      camera.zoom = getModelPreviewCameraZoom(isPreviewFullscreen);
-      camera.updateProjectionMatrix();
-    }
-  }, []);
-
-  const toggleFullscreen = React.useCallback(async () => {
-    if (typeof document === 'undefined') return;
-
-    const previewContainer = previewContainerRef.current;
-    if (!previewContainer) return;
-
-    try {
-      if (document.fullscreenElement === previewContainer) {
-        await document.exitFullscreen();
-      } else {
-        await previewContainer.requestFullscreen();
+      const camera = previewCameraRef.current;
+      if (camera) {
+        camera.zoom = getModelPreviewCameraZoom(isPreviewFullscreen);
+        camera.updateProjectionMatrix();
       }
-      setHasFullscreenError(false);
-    } catch (error) {
-      setHasFullscreenError(true);
-    }
-  }, []);
+    },
+    []
+  );
+
+  const updateFullscreenState = React.useCallback(
+    () => {
+      if (typeof document === 'undefined') return;
+
+      const previewContainer = previewContainerRef.current;
+      const previewDocument = previewContainer
+        ? previewContainer.ownerDocument
+        : document;
+      const fullscreenElement = previewDocument.fullscreenElement;
+      setPreviewFullscreenState(
+        !!previewContainer &&
+          !!fullscreenElement &&
+          (fullscreenElement === previewContainer ||
+            previewContainer.contains(fullscreenElement) ||
+            fullscreenElement.contains(previewContainer))
+      );
+    },
+    [setPreviewFullscreenState]
+  );
+
+  const toggleFullscreen = React.useCallback(
+    async () => {
+      if (typeof document === 'undefined') return;
+
+      const previewContainer = previewContainerRef.current;
+      if (!previewContainer) return;
+      const previewDocument = previewContainer.ownerDocument;
+
+      try {
+        if (previewDocument.fullscreenElement || isFullscreen) {
+          await exitAllFullscreenLayers(previewDocument);
+          setPreviewFullscreenState(false);
+        } else {
+          await previewContainer.requestFullscreen();
+          setPreviewFullscreenState(true);
+        }
+        setHasFullscreenError(false);
+      } catch (error) {
+        setHasFullscreenError(true);
+      }
+    },
+    [isFullscreen, setPreviewFullscreenState]
+  );
 
   React.useEffect(
     () => {
       if (typeof document === 'undefined') return;
 
-      document.addEventListener('fullscreenchange', updateFullscreenState);
+      const previewDocument = previewContainerRef.current
+        ? previewContainerRef.current.ownerDocument
+        : document;
+      previewDocument.addEventListener(
+        'fullscreenchange',
+        updateFullscreenState
+      );
       return () =>
-        document.removeEventListener('fullscreenchange', updateFullscreenState);
+        previewDocument.removeEventListener(
+          'fullscreenchange',
+          updateFullscreenState
+        );
     },
     [updateFullscreenState]
   );
@@ -945,7 +982,7 @@ const InteractiveModel3DPreviewContent = ({
               id="model-toggle-fullscreen"
               label={
                 isFullscreen ? (
-                  <Trans>Exit full screen</Trans>
+                  <Trans>Exit fullscreen</Trans>
                 ) : (
                   <Trans>Full screen</Trans>
                 )

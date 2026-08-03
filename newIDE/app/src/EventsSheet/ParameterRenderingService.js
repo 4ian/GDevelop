@@ -204,7 +204,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   jsonResource: t`JSON resource`,
   tilemapResource: t`Tile map resource`,
   atlasResource: t`Atlas resource`,
-  spineResource: t`Spine json resource`,
+  spineResource: t`Spine skeleton resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,

@@ -126,6 +126,7 @@ type Props = {|
   selectedItem: ?ProjectFileSelection,
   onSelectProjectFile: (?ProjectFileSelection) => void,
   onViewProjectFileProperties: ProjectFileSelection => void,
+  onUnregisterResource: (resource: gdResource) => Promise<void>,
   onRefreshProjectFiles: () => void | Promise<void>,
   onProjectFilesRefreshed: ProjectFileNode => void,
 |};
@@ -1441,24 +1442,6 @@ export const getRenamedProjectFilePath = ({
     ? path.join(path.dirname(node.absolutePath), newName)
     : `${node.absolutePath}/${newName}`;
 
-export const getProjectTemplateSkillsFolderUpdatePaths = ({
-  projectRootPath,
-  projectTemplatePath,
-}: {|
-  projectRootPath: string,
-  projectTemplatePath: string,
-|}): ?{|
-  sourceSkillsFolderPath: string,
-  targetSkillsFolderPath: string,
-|} => {
-  if (!path) return null;
-
-  return {
-    sourceSkillsFolderPath: path.join(projectTemplatePath, 'skills'),
-    targetSkillsFolderPath: path.join(projectRootPath, 'skills'),
-  };
-};
-
 export const getResourceFileAfterProjectFileMove = ({
   projectRootPath,
   previousResourceFile,
@@ -1578,39 +1561,58 @@ const buildFileMoveBlockersMessage = (
     blockers
   )}`;
 
-const copyDirectoryContents = async ({
-  sourcePath,
-  targetPath,
+export const copyProjectTemplateFolderContents = async ({
+  projectTemplatePath,
+  projectRootPath,
+  fs: fsModule = fs,
+  path: pathModule = path,
 }: {|
-  sourcePath: string,
-  targetPath: string,
+  projectTemplatePath: string,
+  projectRootPath: string,
+  fs?: any,
+  path?: any,
 |}): Promise<void> => {
-  if (!fs || !path) return;
-
-  await fs.promises.mkdir(targetPath, { recursive: true });
-  const entries = await fs.promises.readdir(sourcePath, {
-    withFileTypes: true,
-  });
-
-  for (const entry of entries) {
-    const sourceEntryPath = path.join(sourcePath, entry.name);
-    const targetEntryPath = path.join(targetPath, entry.name);
-
-    if (entry.isDirectory()) {
-      await copyDirectoryContents({
-        sourcePath: sourceEntryPath,
-        targetPath: targetEntryPath,
-      });
-      continue;
-    }
-
-    if (entry.isFile()) {
-      await fs.promises.mkdir(path.dirname(targetEntryPath), {
-        recursive: true,
-      });
-      await fs.promises.copyFile(sourceEntryPath, targetEntryPath);
-    }
+  if (!fsModule || !pathModule) {
+    throw new Error('Filesystem is not supported.');
   }
+
+  const copyDirectoryContents = async ({
+    sourcePath,
+    targetPath,
+  }: {|
+    sourcePath: string,
+    targetPath: string,
+  |}): Promise<void> => {
+    await fsModule.promises.mkdir(targetPath, { recursive: true });
+    const entries = await fsModule.promises.readdir(sourcePath, {
+      withFileTypes: true,
+    });
+
+    for (const entry of entries) {
+      const sourceEntryPath = pathModule.join(sourcePath, entry.name);
+      const targetEntryPath = pathModule.join(targetPath, entry.name);
+
+      if (entry.isDirectory()) {
+        await copyDirectoryContents({
+          sourcePath: sourceEntryPath,
+          targetPath: targetEntryPath,
+        });
+        continue;
+      }
+
+      if (entry.isFile()) {
+        await fsModule.promises.mkdir(pathModule.dirname(targetEntryPath), {
+          recursive: true,
+        });
+        await fsModule.promises.copyFile(sourceEntryPath, targetEntryPath);
+      }
+    }
+  };
+
+  await copyDirectoryContents({
+    sourcePath: projectTemplatePath,
+    targetPath: projectRootPath,
+  });
 };
 
 const updateResourcesAfterProjectFileMove = ({
@@ -1687,6 +1689,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
       selectedItem,
       onSelectProjectFile,
       onViewProjectFileProperties,
+      onUnregisterResource,
       onRefreshProjectFiles,
       onProjectFilesRefreshed,
     },
@@ -2903,7 +2906,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
       [project, refresh, selectedItem, onSelectProjectFile, showConfirmation]
     );
 
-    const updateProjectSkillsFolderFromTemplate = React.useCallback(
+    const updateProjectFolderFromTemplate = React.useCallback(
       async (node: ProjectFileNode) => {
         if (!canUpdateProjectFolderFromTemplate(node)) return;
 
@@ -2916,13 +2919,7 @@ const ProjectFilesPanelContent: React.ComponentType<{
         }
 
         const projectTemplatePath = findLocalProjectTemplatePath();
-        const updatePaths = projectTemplatePath
-          ? getProjectTemplateSkillsFolderUpdatePaths({
-              projectRootPath: node.absolutePath,
-              projectTemplatePath,
-            })
-          : null;
-        if (!updatePaths) {
+        if (!projectTemplatePath) {
           await showAlert({
             title: t`Unable to update from template`,
             message: t`The bundled project template could not be found.`,
@@ -2931,24 +2928,20 @@ const ProjectFilesPanelContent: React.ComponentType<{
         }
 
         try {
-          await copyDirectoryContents({
-            sourcePath: updatePaths.sourceSkillsFolderPath,
-            targetPath: updatePaths.targetSkillsFolderPath,
+          await copyProjectTemplateFolderContents({
+            projectTemplatePath,
+            projectRootPath: node.absolutePath,
           });
           setOpenedNodeIds(openedNodeIds =>
             Array.from(
-              new Set([
-                normalizeSlashes(node.absolutePath),
-                normalizeSlashes(updatePaths.targetSkillsFolderPath),
-                ...openedNodeIds,
-              ])
+              new Set([normalizeSlashes(node.absolutePath), ...openedNodeIds])
             )
           );
           await refresh();
         } catch (error) {
           await showAlert({
             title: t`Unable to update from template`,
-            message: `The skills folder could not be updated from the bundled template:\n\n${
+            message: `The project folder could not be updated from the bundled template:\n\n${
               error.message
             }`,
           });
@@ -3095,32 +3088,39 @@ const ProjectFilesPanelContent: React.ComponentType<{
             {
               label: i18n._(t`Update from template`),
               click: () => {
-                updateProjectSkillsFolderFromTemplate(node);
+                updateProjectFolderFromTemplate(node);
               },
             }
           );
         }
 
-        menu.push(
-          { type: 'separator' },
-          {
-            label:
-              node.type === 'folder'
-                ? i18n._(t`Delete folder`)
-                : i18n._(t`Delete file`),
-            enabled:
-              node.type === 'file' ||
-              (node.type === 'folder' && canDeleteProjectFolder(node)),
-            click: () => {
-              if (node.type === 'folder') {
-                deleteProjectFolder(node);
-                return;
-              }
+        menu.push({ type: 'separator' });
 
-              deleteProjectFile(node);
-            },
-          }
-        );
+        const resource = getResourceFromNode(project, node);
+        if (resource) {
+          menu.push({
+            label: i18n._(t`Unregister resource`),
+            click: () => onUnregisterResource(resource),
+          });
+        }
+
+        menu.push({
+          label:
+            node.type === 'folder'
+              ? i18n._(t`Delete folder`)
+              : i18n._(t`Delete file`),
+          enabled:
+            node.type === 'file' ||
+            (node.type === 'folder' && canDeleteProjectFolder(node)),
+          click: () => {
+            if (node.type === 'folder') {
+              deleteProjectFolder(node);
+              return;
+            }
+
+            deleteProjectFile(node);
+          },
+        });
 
         return menu;
       },
@@ -3134,8 +3134,10 @@ const ProjectFilesPanelContent: React.ComponentType<{
         openMarkdownDialogForNode,
         openRenameDialogForNode,
         openNodePath,
+        onUnregisterResource,
+        project,
         removeLinkedFolder,
-        updateProjectSkillsFolderFromTemplate,
+        updateProjectFolderFromTemplate,
         viewPropertiesForNode,
       ]
     );

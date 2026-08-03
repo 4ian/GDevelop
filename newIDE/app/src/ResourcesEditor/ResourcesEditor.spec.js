@@ -37,4 +37,14 @@ describe('ResourcesEditor', () => {
       'bounds.height - minProjectFilesHeight - resizeHandleSize'
     );
   });
+
+  it('uses the existing resource deletion workflow to unregister project files', () => {
+    const source = getSource('index.js');
+
+    expect(source).toContain('onUnregisterResource={this.deleteResource}');
+    expect(source).toContain('onDeleteResource(resource, doRemove => {');
+    expect(source).toContain(
+      'resourcesManager.removeResource(resource.getName());'
+    );
+  });
 });

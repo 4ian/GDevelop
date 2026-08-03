@@ -2,6 +2,28 @@
 
 This guide describes a reusable workflow for creating 3D assets in Blender and using them in GDevelop. It does not depend on a particular scene, model, scale, camera angle, or project structure.
 
+## Contents
+
+- [Pipeline overview](#pipeline-overview)
+- [1. Decide the asset boundary](#1-decide-the-asset-boundary)
+- [2. Set Blender units and axes](#2-set-blender-units-and-axes)
+- [3. Build clean transforms and origins](#3-build-clean-transforms-and-origins)
+- [4. Organize the Blender scene](#4-organize-the-blender-scene)
+- [5. Create glTF-compatible materials](#5-create-gltf-compatible-materials)
+- [6. Prepare animation](#6-prepare-animation)
+- [7. Optimize before export](#7-optimize-before-export)
+- [8. Validate inside Blender](#8-validate-inside-blender)
+- [9. Export a binary GLB](#9-export-a-binary-glb)
+- [10. Import the GLB into GDevelop](#10-import-the-glb-into-gdevelop)
+- [11. Configure the 3D layer and camera](#11-configure-the-3d-layer-and-camera)
+- [12. Add lighting in GDevelop](#12-add-lighting-in-gdevelop)
+- [13. Add collision and physics separately](#13-add-collision-and-physics-separately)
+- [14. Verify in preview](#14-verify-in-preview)
+- [15. Standard update loop](#15-standard-update-loop)
+- [16. Troubleshooting](#16-troubleshooting)
+- [17. Reusable release checklist](#17-reusable-release-checklist)
+- [Official references](#official-references)
+
 ## Pipeline overview
 
 ```text
@@ -190,7 +212,9 @@ Use `.glb`, not a separate `.gltf` plus `.bin` and texture files. GDevelop suppo
 
 ### Optional Blender Python export
 
-For repeatable exports, run a script in Blender's Scripting workspace or through Blender MCP:
+For repeatable exports, send the script through Blender Foundation's official
+[Blender MCP server](https://www.blender.org/lab/mcp-server/) using
+`execute_blender_code`:
 
 ```python
 import bpy
@@ -385,6 +409,7 @@ Keep the same GLB path when the asset identity has not changed. This preserves o
 
 - [Blender Manual: glTF 2.0 import/export](https://docs.blender.org/manual/en/latest/addons/import_export/scene_gltf2.html)
 - [Blender Manual: Apply transforms](https://docs.blender.org/manual/en/latest/scene_layout/object/editing/apply.html)
+- [Blender Foundation: Official Blender MCP server](https://www.blender.org/lab/mcp-server/)
 - [GDevelop Documentation: 3D Model object](https://wiki.gdevelop.io/gdevelop5/objects/3d-model/)
 - [GDevelop Documentation: Layers and cameras](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layers-and-cameras/)
 - [GDevelop Documentation: 3D reference](https://wiki.gdevelop.io/gdevelop5/all-features/scene3d/reference/)

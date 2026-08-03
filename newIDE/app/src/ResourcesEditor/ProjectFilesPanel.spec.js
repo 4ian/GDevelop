@@ -11,13 +11,13 @@ import {
   canMoveProjectFileToFolder,
   canRenameProjectFileNode,
   canUpdateProjectFolderFromTemplate,
+  copyProjectTemplateFolderContents,
   findNodeById,
   getProjectFileNodeIdsAfterSelection,
   getLinkedFoldersFilePath,
   getExternalFileCopyDestinationPath,
   getExternalFileDropPaths,
   getMovedProjectFilePath,
-  getProjectTemplateSkillsFolderUpdatePaths,
   getProjectFolderDropOperation,
   getProjectFileDragEffectAllowed,
   getRenamedProjectFilePath,
@@ -601,18 +601,51 @@ describe('ProjectFilesPanel', () => {
     );
   });
 
-  it('computes skills folder paths for project template updates', () => {
-    expect(
-      getProjectTemplateSkillsFolderUpdatePaths({
-        projectRootPath: 'D:\\Project',
-        projectTemplatePath:
-          'D:\\GDevelop\\newIDE\\app\\resources\\gd-project-template',
-      })
-    ).toEqual({
-      sourceSkillsFolderPath:
-        'D:\\GDevelop\\newIDE\\app\\resources\\gd-project-template\\skills',
-      targetSkillsFolderPath: 'D:\\Project\\skills',
+  it('recursively overwrites project files with every template file', async () => {
+    const fileEntry = name => ({
+      name,
+      isDirectory: () => false,
+      isFile: () => true,
     });
+    const directoryEntry = name => ({
+      name,
+      isDirectory: () => true,
+      isFile: () => false,
+    });
+    const fs = {
+      promises: {
+        mkdir: jest.fn(async () => {}),
+        readdir: jest.fn(async directoryPath => {
+          if (directoryPath === 'D:\\Template') {
+            return [
+              fileEntry('.gitignore'),
+              fileEntry('AGENTS.md'),
+              fileEntry('CLAUDE.md'),
+              directoryEntry('skills'),
+            ];
+          }
+          if (directoryPath === 'D:\\Template\\skills') {
+            return [fileEntry('SKILL.md')];
+          }
+          return [];
+        }),
+        copyFile: jest.fn(async () => {}),
+      },
+    };
+
+    await copyProjectTemplateFolderContents({
+      projectTemplatePath: 'D:\\Template',
+      projectRootPath: 'D:\\Project',
+      fs,
+      path: path.win32,
+    });
+
+    expect(fs.promises.copyFile.mock.calls).toEqual([
+      ['D:\\Template\\.gitignore', 'D:\\Project\\.gitignore'],
+      ['D:\\Template\\AGENTS.md', 'D:\\Project\\AGENTS.md'],
+      ['D:\\Template\\CLAUDE.md', 'D:\\Project\\CLAUDE.md'],
+      ['D:\\Template\\skills\\SKILL.md', 'D:\\Project\\skills\\SKILL.md'],
+    ]);
   });
 
   it('shows the update from template context menu action for root folders', () => {
@@ -620,7 +653,10 @@ describe('ProjectFilesPanel', () => {
 
     expect(source).toContain('canUpdateProjectFolderFromTemplate(node)');
     expect(source).toContain('label: i18n._(t`Update from template`)');
-    expect(source).toContain('updateProjectSkillsFolderFromTemplate(node);');
+    expect(source).toContain('updateProjectFolderFromTemplate(node);');
+    expect(source).toContain('await copyProjectTemplateFolderContents({');
+    expect(source).toContain('projectTemplatePath,');
+    expect(source).toContain('projectRootPath: node.absolutePath');
   });
 
   it('shows the add folder link action only on the linked folders root', () => {
@@ -671,6 +707,20 @@ describe('ProjectFilesPanel', () => {
     expect(menu).toContain('click: () => openFolderForNode(node)');
     expect(menu).toContain('label: i18n._(t`Copy absolute path`)');
     expect(menu).toContain('click: () => copyNodeAbsolutePath(node)');
+  });
+
+  it('shows the unregister action for registered project files', () => {
+    const source = getSource();
+    const menuStart = source.indexOf('const menu: Array<MenuItemTemplate> = [');
+    const menuEnd = source.indexOf('return menu;', menuStart);
+    const menu = source.slice(menuStart, menuEnd);
+
+    expect(menu).toContain(
+      'const resource = getResourceFromNode(project, node);'
+    );
+    expect(menu).toContain('if (resource) {');
+    expect(menu).toContain('label: i18n._(t`Unregister resource`)');
+    expect(menu).toContain('click: () => onUnregisterResource(resource)');
   });
 
   it('does not auto-select a newly created folder', () => {

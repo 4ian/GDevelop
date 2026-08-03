@@ -1,26 +1,10 @@
-#!/usr/bin/env python3
 """Convert glTF 2.0 JSON files and their dependencies into standalone GLBs.
 
-Run this script with Blender, not a system Python interpreter. It supports one
-file or a directory batch while preserving relative paths in the output tree.
-
-Single-file example (PowerShell):
-
-  & "D:\\Program Files\\Blender Foundation\\Blender 5.1\\blender.exe" `
-    --background --factory-startup `
-    --python skills/gdevelop-project-files/scripts/convert_gltf_to_glb.py -- `
-    --input "D:\\models\\wand.gltf" `
-    --output "D:\\models\\wand.glb" `
-    --overwrite
-
-Batch example:
-
-  & "D:\\Program Files\\Blender Foundation\\Blender 5.1\\blender.exe" `
-    --background --factory-startup `
-    --python skills/gdevelop-project-files/scripts/convert_gltf_to_glb.py -- `
-    --input "D:\\models\\gltf" `
-    --output-dir "D:\\models\\glb" `
-    --recursive --overwrite
+Load this payload with ``runpy`` inside Blender Foundation's official Blender
+MCP ``execute_blender_code`` tool, then call ``run_mcp`` with a mapping. The
+payload uses the connected Blender session and never locates or launches a
+local Blender executable. It supports one file or a directory batch while
+preserving relative paths in the output tree.
 
 By default cameras, punctual lights, and Blender-generated bone-display helper
 objects are excluded. Meshes, materials, textures, skins, and animations are
@@ -29,10 +13,8 @@ kept, and each output is checked as a valid GLB 2.0 container.
 
 from __future__ import annotations
 
-import argparse
 import json
 import struct
-import sys
 import traceback
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,6 +34,22 @@ class ConversionError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class ConversionOptions:
+    input: str
+    output: str | None = None
+    output_dir: str | None = None
+    recursive: bool = False
+    overwrite: bool = False
+    include_cameras: bool = False
+    include_lights: bool = False
+    export_animations: bool = True
+    apply_modifiers: bool = True
+    allow_animation_count_change: bool = False
+    dry_run: bool = False
+    debug: bool = False
+
+
+@dataclass(frozen=True)
 class ConversionJob:
     source: Path
     output: Path
@@ -61,75 +59,79 @@ def log(message: str) -> None:
     print(f"[gltf-to-glb] {message}", flush=True)
 
 
-def blender_cli_arguments() -> list[str]:
-    if "--" not in sys.argv:
-        return []
-    return sys.argv[sys.argv.index("--") + 1 :]
+def clear_working_data() -> None:
+    """Clear task data without resetting Blender or unloading the MCP add-on."""
+    for obj in list(bpy.data.objects):
+        bpy.data.objects.remove(obj, do_unlink=True)
+    for action in list(bpy.data.actions):
+        bpy.data.actions.remove(action)
+    bpy.data.orphans_purge(do_recursive=True)
 
 
-def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Convert a .gltf file or a directory of .gltf files into "
-            "standalone binary .glb files."
-        )
-    )
-    parser.add_argument("--input", required=True, help="Input .gltf file or directory")
-    destination = parser.add_mutually_exclusive_group()
-    destination.add_argument("--output", help="Output .glb path for a single file")
-    destination.add_argument(
-        "--output-dir",
-        help="Output directory; required when --input is a directory",
-    )
-    parser.add_argument(
-        "--recursive",
-        action="store_true",
-        help="Search input directories recursively and preserve subdirectories",
-    )
-    parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Replace existing output files; otherwise they are skipped",
-    )
-    parser.add_argument(
-        "--include-cameras",
-        action="store_true",
-        help="Keep imported cameras in the output GLB",
-    )
-    parser.add_argument(
-        "--include-lights",
-        action="store_true",
-        help="Keep imported punctual lights in the output GLB",
-    )
-    parser.add_argument(
-        "--no-animations",
-        action="store_true",
-        help="Do not export animations",
-    )
-    parser.add_argument(
-        "--no-apply-modifiers",
-        action="store_true",
-        help="Do not ask Blender's glTF exporter to apply compatible modifiers",
-    )
-    parser.add_argument(
-        "--allow-animation-count-change",
-        action="store_true",
-        help=(
-            "Allow the output animation count to differ from the source. "
-            "Without this option, a changed count is treated as a failure."
+def options_from_mcp(values: dict[str, Any]) -> ConversionOptions:
+    """Validate the mapping passed by Blender MCP."""
+    if not isinstance(values, dict):
+        raise ConversionError("MCP options must be a mapping")
+
+    allowed = {
+        "input",
+        "output",
+        "output_dir",
+        "recursive",
+        "overwrite",
+        "include_cameras",
+        "include_lights",
+        "export_animations",
+        "apply_modifiers",
+        "allow_animation_count_change",
+        "dry_run",
+        "debug",
+    }
+    unknown = sorted(set(values) - allowed)
+    if unknown:
+        raise ConversionError(f"Unknown MCP options: {unknown}")
+
+    def required_text(name: str) -> str:
+        value = values.get(name)
+        if not isinstance(value, str) or not value.strip():
+            raise ConversionError(f"MCP option {name!r} must be a non-empty string")
+        return value
+
+    def optional_text(name: str) -> str | None:
+        value = values.get(name)
+        if value is None:
+            return None
+        if not isinstance(value, str) or not value.strip():
+            raise ConversionError(f"MCP option {name!r} must be a non-empty string")
+        return value
+
+    def boolean(name: str, default: bool) -> bool:
+        value = values.get(name, default)
+        if not isinstance(value, bool):
+            raise ConversionError(f"MCP option {name!r} must be a boolean")
+        return value
+
+    output = optional_text("output")
+    output_dir = optional_text("output_dir")
+    if output and output_dir:
+        raise ConversionError("MCP options 'output' and 'output_dir' are mutually exclusive")
+
+    return ConversionOptions(
+        input=required_text("input"),
+        output=output,
+        output_dir=output_dir,
+        recursive=boolean("recursive", False),
+        overwrite=boolean("overwrite", False),
+        include_cameras=boolean("include_cameras", False),
+        include_lights=boolean("include_lights", False),
+        export_animations=boolean("export_animations", True),
+        apply_modifiers=boolean("apply_modifiers", True),
+        allow_animation_count_change=boolean(
+            "allow_animation_count_change", False
         ),
+        dry_run=boolean("dry_run", False),
+        debug=boolean("debug", False),
     )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Print planned conversions without importing or exporting",
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Print Python tracebacks for failed conversions",
-    )
-    return parser.parse_args(blender_cli_arguments())
 
 
 def resolved_path(path_text: str) -> Path:
@@ -144,7 +146,7 @@ def discover_gltf_files(root: Path, recursive: bool) -> list[Path]:
     )
 
 
-def build_jobs(args: argparse.Namespace) -> list[ConversionJob]:
+def build_jobs(args: ConversionOptions) -> list[ConversionJob]:
     source = resolved_path(args.input)
     if not source.exists():
         raise ConversionError(f"Input does not exist: {source}")
@@ -163,9 +165,9 @@ def build_jobs(args: argparse.Namespace) -> list[ConversionJob]:
         return [ConversionJob(source=source, output=output)]
 
     if args.output:
-        raise ConversionError("--output can only be used with a single input file")
+        raise ConversionError("MCP option 'output' can only be used with one input file")
     if not args.output_dir:
-        raise ConversionError("--output-dir is required when --input is a directory")
+        raise ConversionError("MCP option 'output_dir' is required for a directory input")
     output_root = resolved_path(args.output_dir)
     source_files = discover_gltf_files(source, args.recursive)
     if not source_files:
@@ -385,13 +387,13 @@ def load_glb_json(path: Path) -> tuple[dict[str, Any], dict[str, int]]:
     return data, gltf_stats(data)
 
 
-def convert_job(job: ConversionJob, args: argparse.Namespace) -> dict[str, Any]:
+def convert_job(job: ConversionJob, args: ConversionOptions) -> dict[str, Any]:
     source_data = load_gltf_json(job.source)
     dependencies = verify_external_dependencies(job.source, source_data)
     source_counts = gltf_stats(source_data)
 
     job.output.parent.mkdir(parents=True, exist_ok=True)
-    bpy.ops.wm.read_factory_settings(use_empty=True)
+    clear_working_data()
     result = bpy.ops.import_scene.gltf(filepath=str(job.source))
     if "FINISHED" not in result:
         raise ConversionError(f"Blender failed to import: {job.source}")
@@ -406,14 +408,14 @@ def convert_job(job: ConversionJob, args: argparse.Namespace) -> dict[str, Any]:
         job.output,
         include_cameras=args.include_cameras,
         include_lights=args.include_lights,
-        export_animations=not args.no_animations,
-        apply_modifiers=not args.no_apply_modifiers,
+        export_animations=args.export_animations,
+        apply_modifiers=args.apply_modifiers,
     )
     _output_data, output_counts = load_glb_json(job.output)
 
     if source_counts["meshes"] > 0 and output_counts["meshes"] == 0:
         raise ConversionError(f"Output lost all meshes: {job.output}")
-    if not args.no_animations and not args.allow_animation_count_change:
+    if args.export_animations and not args.allow_animation_count_change:
         if output_counts["animations"] != source_counts["animations"]:
             raise ConversionError(
                 "Animation count changed during conversion: "
@@ -434,7 +436,7 @@ def convert_job(job: ConversionJob, args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
-def run(args: argparse.Namespace) -> dict[str, Any]:
+def run(args: ConversionOptions) -> dict[str, Any]:
     jobs = build_jobs(args)
     log(f"Blender {bpy.app.version_string}")
     log(f"Planned conversions: {len(jobs)}")
@@ -461,7 +463,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             record = {
                 "source": str(job.source),
                 "output": str(job.output),
-                "reason": "output exists; pass --overwrite to replace it",
+                "reason": "output exists; set MCP option 'overwrite' to true to replace it",
             }
             skipped.append(record)
             log(f"SKIP [{index}/{len(jobs)}] {job.output}")
@@ -478,7 +480,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "error": str(error),
             }
             failed.append(record)
-            print(f"[gltf-to-glb] ERROR: {job.source}: {error}", file=sys.stderr, flush=True)
+            log(f"ERROR: {job.source}: {error}")
             if args.debug:
                 traceback.print_exc()
 
@@ -493,18 +495,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "failures": failed,
     }
     log("SUMMARY " + json.dumps(summary, sort_keys=True))
-    if failed:
-        raise SystemExit(2)
     return summary
 
 
-def main() -> None:
+def run_mcp(values: dict[str, Any]) -> dict[str, Any]:
+    """Run in the connected Blender session and return an MCP-safe result."""
     try:
-        run(parse_arguments())
+        return run(options_from_mcp(values))
     except ConversionError as error:
-        print(f"[gltf-to-glb] ERROR: {error}", file=sys.stderr, flush=True)
-        raise SystemExit(2) from error
-
-
-if __name__ == "__main__":
-    main()
+        return {"success": False, "error": str(error)}

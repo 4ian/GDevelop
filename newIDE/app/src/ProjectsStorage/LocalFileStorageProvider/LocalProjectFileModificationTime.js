@@ -29,6 +29,21 @@ const getFileModificationTime = async (filePath: string): Promise<?number> => {
   }
 };
 
+const getFileModificationTimeSync = (filePath: string): ?number => {
+  try {
+    const stats = fs.statSync(filePath);
+    return stats.isFile() ? stats.mtimeMs : null;
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      console.warn(
+        `Unable to read the modification time of project file "${filePath}":`,
+        error
+      );
+    }
+    return null;
+  }
+};
+
 const getLatestProjectFileModificationTimeInDirectory = async (
   directoryPath: string
 ): Promise<?number> => {
@@ -61,8 +76,8 @@ const getLatestProjectFileModificationTimeInDirectory = async (
     }
 
     if (
-      modificationTime !== null &&
-      (latestModificationTime === null ||
+      typeof modificationTime === 'number' &&
+      (typeof latestModificationTime !== 'number' ||
         modificationTime > latestModificationTime)
     ) {
       latestModificationTime = modificationTime;
@@ -70,6 +85,73 @@ const getLatestProjectFileModificationTimeInDirectory = async (
   }
   return latestModificationTime;
 };
+
+const getLatestProjectFileModificationTimeInDirectorySync = (
+  directoryPath: string
+): ?number => {
+  let entries;
+  try {
+    entries = fs.readdirSync(directoryPath, { withFileTypes: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      console.warn(
+        `Unable to inspect local project directory "${directoryPath}":`,
+        error
+      );
+    }
+    return null;
+  }
+
+  let latestModificationTime = null;
+  for (const entry of entries) {
+    const entryPath = path.join(directoryPath, entry.name);
+    let modificationTime = null;
+    if (entry.isDirectory()) {
+      modificationTime = getLatestProjectFileModificationTimeInDirectorySync(
+        entryPath
+      );
+    } else if (
+      entry.isFile() &&
+      multiFileProjectExtensions.has(path.extname(entry.name).toLowerCase())
+    ) {
+      modificationTime = getFileModificationTimeSync(entryPath);
+    }
+
+    if (
+      typeof modificationTime === 'number' &&
+      (typeof latestModificationTime !== 'number' ||
+        modificationTime > latestModificationTime)
+    ) {
+      latestModificationTime = modificationTime;
+    }
+  }
+  return latestModificationTime;
+};
+
+const getMultiFileProjectPathsToInspect = (projectRoot: string) => [
+  ...multiFileProjectRootFiles.map(fileName =>
+    path.join(projectRoot, fileName)
+  ),
+  path.join(
+    projectRoot,
+    ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
+  ),
+  path.join(projectRoot, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')),
+  path.join(projectRoot, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')),
+];
+
+const getLatestModificationTime = (
+  modificationTimes: Array<?number>
+): ?number =>
+  modificationTimes.reduce<?number>(
+    (latestModificationTime, modificationTime) =>
+      typeof modificationTime === 'number' &&
+      (typeof latestModificationTime !== 'number' ||
+        modificationTime > latestModificationTime)
+        ? modificationTime
+        : latestModificationTime,
+    null
+  );
 
 /**
  * Returns the newest modification time among files that make up a local
@@ -88,20 +170,7 @@ export const getLocalProjectLastModifiedDate = async (
   }
 
   const projectRoot = path.dirname(fileIdentifier);
-  const pathsToInspect = [
-    ...multiFileProjectRootFiles.map(fileName =>
-      path.join(projectRoot, fileName)
-    ),
-    path.join(
-      projectRoot,
-      ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
-    ),
-    path.join(
-      projectRoot,
-      ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
-    ),
-    path.join(projectRoot, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')),
-  ];
+  const pathsToInspect = getMultiFileProjectPathsToInspect(projectRoot);
   const modificationTimes = await Promise.all([
     ...pathsToInspect.map(getFileModificationTime),
     ...multiFileProjectDirectories.map(directoryName =>
@@ -111,13 +180,32 @@ export const getLocalProjectLastModifiedDate = async (
     ),
   ]);
 
-  return modificationTimes.reduce<?number>(
-    (latestModificationTime, modificationTime) =>
-      modificationTime !== null &&
-      (latestModificationTime === null ||
-        modificationTime > latestModificationTime)
-        ? modificationTime
-        : latestModificationTime,
-    null
-  );
+  return getLatestModificationTime(modificationTimes);
+};
+
+/**
+ * Synchronous counterpart used by reload_project after its synchronous catalog
+ * writes. Keeping this final acknowledgement on the same execution path avoids
+ * stranding the reload on a filesystem callback that is never delivered.
+ */
+export const getLocalProjectLastModifiedDateSync = (
+  fileIdentifier: string
+): ?number => {
+  if (!fs || !path || !fileIdentifier) return null;
+
+  if (path.basename(fileIdentifier).toLowerCase() !== MULTI_FILE_ENTRY_NAME) {
+    return getFileModificationTimeSync(fileIdentifier);
+  }
+
+  const projectRoot = path.dirname(fileIdentifier);
+  return getLatestModificationTime([
+    ...getMultiFileProjectPathsToInspect(projectRoot).map(
+      getFileModificationTimeSync
+    ),
+    ...multiFileProjectDirectories.map(directoryName =>
+      getLatestProjectFileModificationTimeInDirectorySync(
+        path.join(projectRoot, directoryName)
+      )
+    ),
+  ]);
 };

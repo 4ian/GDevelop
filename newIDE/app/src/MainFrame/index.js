@@ -272,7 +272,7 @@ import useLocalProjectChangesWatcher, {
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
+import { getLocalProjectLastModifiedDateSync } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import {
   MULTI_FILE_ENTRY_NAME,
@@ -7775,7 +7775,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             { reportProgress: reportReloadProgress }
           );
           reportReloadProgress('catalogs-modification-time-reading');
-          const lastModifiedDate = await getLocalProjectLastModifiedDate(
+          const lastModifiedDate = getLocalProjectLastModifiedDateSync(
             reloadedProject.getProjectFile()
           );
           if (lastModifiedDate !== null) {

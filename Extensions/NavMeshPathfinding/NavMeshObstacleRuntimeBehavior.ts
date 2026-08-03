@@ -89,7 +89,7 @@ namespace gdjs {
       if (!this.crowd) {
         return;
       }
-      this.crowd.update(1 / 60, timeDelta, 8);
+      this.crowd.update(timeDelta);//1 / 60, timeDelta, 8);
     }
 
     invalidateNavMesh() {
@@ -163,7 +163,7 @@ namespace gdjs {
       const centerX = (maxX + minX) / 2;
       const centerY = (maxY + minY) / 2;
 
-      console.log(width, height, centerX, centerY);
+      console.log("Ground", width, height, centerX, centerY);
 
       const indicesOffset = Math.round(positions.length / 3);
       for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {

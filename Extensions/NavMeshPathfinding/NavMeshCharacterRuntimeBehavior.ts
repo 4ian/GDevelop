@@ -71,12 +71,8 @@ namespace gdjs {
     };
 
     //Attributes used for traveling on the path:
-    _pathFound: boolean = false;
-    _speed: float = 0;
     _angularSpeed: float = 0;
-    _distanceOnSegment: float = 0;
-    _totalSegmentDistance: float = 0;
-    _currentSegment: integer = 0;
+    _pathFound: boolean = false;
     _reachedEnd: boolean = false;
     _manager: NavMeshObstaclesManager;
 
@@ -218,7 +214,6 @@ namespace gdjs {
     }
 
     setSpeed(speed: float): void {
-      this._speed = speed;
       if (this._agent) {
         const velocity = this._agent.desiredVelocityObstacleAdjusted();
         const oldSpeed = Math.hypot(velocity.x, velocity.y, velocity.z);
@@ -244,17 +239,13 @@ namespace gdjs {
     }
 
     getMovementAngle(): float {
-      if (!this._agent) {
-        return 0;
-      }
-      const velocity = this._agent.desiredVelocityObstacleAdjusted();
-      return Math.atan2(velocity.z, velocity.x);
+      return this._movementAngle;
     }
 
     movementAngleIsAround(degreeAngle: float, tolerance: float): boolean {
       return (
         Math.abs(
-          gdjs.evtTools.common.angleDifference(this.getMovementAngle(), degreeAngle)
+          gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
         ) <= tolerance
       );
     }
@@ -298,11 +289,13 @@ namespace gdjs {
     }
 
     getNextNodeIndex() {
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._currentSegment + 1;
-      } else {
-        return this._path.length - 1;
+      if (!this._agent) {
+        return 0;
       }
+      const remainingNodes = this._agent.raw.ncorners;
+      return remainingNodes === 0
+        ? this._path.length - 1
+        : this._path.length - remainingNodes;
     }
 
     getNodeCount(): integer {
@@ -313,44 +306,42 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._path[this._currentSegment + 1][0];
-      } else {
-        return this._path[this._path.length - 1][0];
-      }
+      const nextNodeIndex = this.getNextNodeIndex();
+      return this._path[nextNodeIndex].x;
     }
 
     getNextNodeY(): float {
       if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._path[this._currentSegment + 1][1];
-      } else {
-        return this._path[this._path.length - 1][1];
+      const nextNodeIndex = this.getNextNodeIndex();
+      return this._path[nextNodeIndex].y;
+    }
+
+    getPreviousNodeIndex() {
+      if (!this._agent) {
+        return 0;
       }
+      const remainingNodes = this._agent.raw.ncorners;
+      return remainingNodes === this._path.length
+        ? 0
+        : this._path.length - remainingNodes - 1;
     }
 
     getLastNodeX(): float {
       if (this._path.length < 2) {
         return 0;
       }
-      if (this._currentSegment < this._path.length - 1) {
-        return this._path[this._currentSegment][0];
-      } else {
-        return this._path[this._path.length - 1][0];
-      }
+      const previousNodeIndex = this.getPreviousNodeIndex();
+      return this._path[previousNodeIndex].x;
     }
 
     getLastNodeY(): float {
       if (this._path.length < 2) {
         return 0;
       }
-      if (this._currentSegment < this._path.length - 1) {
-        return this._path[this._currentSegment][1];
-      } else {
-        return this._path[this._path.length - 1][1];
-      }
+      const previousNodeIndex = this.getPreviousNodeIndex();
+      return this._path[previousNodeIndex].y;
     }
 
     getDestinationX(): float {
@@ -385,6 +376,7 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(x: float, y: float, z: float) {
+      this._path = [];
       this._manager.rebuildNavMeshIfNeeded();
       if (!this._manager.navMesh) {
         console.log("Can't build the nav mesh");
@@ -424,6 +416,16 @@ namespace gdjs {
         y,
         z
       );
+
+      // Path found: memorize it
+      const path = this._agent.corners();
+      for (const point of path) {
+        const y = point.y;
+        point.y = point.z;
+        point.z = y;
+      }
+      console.log('path', path);
+      this._path = path;
       if (this._pathFound) {
         this._reachedEnd = false;
       }
@@ -431,6 +433,7 @@ namespace gdjs {
 
     override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const timeDelta = this.owner.getElapsedTime() / 1000;
+      // The wrapper interpolation seems bugged, so we don't use it.
       this._manager.step(timeDelta);
 
       const agent = this._agent;
@@ -440,9 +443,10 @@ namespace gdjs {
 
       const oldX = this.owner.getX();
       const oldY = this.owner.getY();
-      const newX = agent.interpolatedPosition.x;
-      const newY = agent.interpolatedPosition.z;
-      const newZ = agent.interpolatedPosition.y;
+      const newPosition = agent.position();
+      const newX = newPosition.x;
+      const newY = newPosition.z;
+      const newZ = newPosition.y;
       this.owner.setX(newX);
       this.owner.setY(newY);
       //@ts-ignore
@@ -451,9 +455,13 @@ namespace gdjs {
         this.owner.setZ(newZ);
       }
 
-      if (newX != oldX && newY != oldY) {
+      // Avoid to frequently change of direction when not moving much.
+      const deltaX = newX - oldX;
+      const deltaY = newY - oldY;
+      if (Math.abs(deltaX) + Math.abs(deltaY) > 1
+      ) {
         this._movementAngle = gdjs.toDegrees(
-          Math.atan2(newY - oldY, newX - oldX)
+          Math.atan2(deltaY, deltaX)
         );
       }
       if (
@@ -476,18 +484,21 @@ namespace gdjs {
       const diffWasPositive = angularDiff >= 0;
 
       const timeDelta = this.owner.getElapsedTime() / 1000;
+      this._angularSpeed =
+        (diffWasPositive ? -1.0 : 1.0) * this._angularMaxSpeed;
       // Always rotate the right way.
-      if (this._angularSpeed > 0 !== diffWasPositive) {
-        this._angularSpeed = 0;
-      }
-      this._angularSpeed = gdjs.evtTools.common.clamp(
-        this._angularSpeed +
-          (diffWasPositive ? -1.0 : 1.0) *
-            this._angularAcceleration *
-            timeDelta,
-        -this._angularMaxSpeed,
-        this._angularMaxSpeed
-      );
+      // if (this._angularSpeed > 0 !== diffWasPositive) {
+      //   this._angularSpeed = 0;
+      // }
+      // this._angularSpeed = gdjs.evtTools.common.clamp(
+      //   this._angularSpeed +
+      //     (diffWasPositive ? -1.0 : 1.0) *
+      //       this._angularAcceleration *
+      //       timeDelta,
+      //   -this._angularMaxSpeed,
+      //   this._angularMaxSpeed
+      // );
+
       let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
 
       if (

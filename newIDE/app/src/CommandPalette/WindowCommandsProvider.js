@@ -72,7 +72,7 @@ type Props = {|
  * shortcuts running them - from the commands of the other windows.
  * To be used around the editors of a window (see `WindowCommandManager`).
  */
-const CommandsContextWindowProvider = (props: Props): React.Node => {
+const WindowCommandsProvider = (props: Props): React.Node => {
   const sharedCommandManager = React.useContext(CommandsContext);
   const windowCommandManager = useValueWithInit(
     () => new WindowCommandManager(sharedCommandManager)
@@ -85,4 +85,4 @@ const CommandsContextWindowProvider = (props: Props): React.Node => {
   );
 };
 
-export default CommandsContextWindowProvider;
+export default WindowCommandsProvider;

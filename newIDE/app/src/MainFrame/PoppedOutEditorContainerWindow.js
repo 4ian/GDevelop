@@ -2,8 +2,8 @@
 import * as React from 'react';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ToolbarTitlebar from './ToolbarTitlebar';
-import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
-import CommandsContextWindowProvider from '../CommandPalette/CommandsWindowContext';
+import ActiveTabCommandsProvider from '../CommandPalette/ActiveTabCommandsProvider';
+import WindowCommandsProvider from '../CommandPalette/WindowCommandsProvider';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -176,7 +176,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   overflow: 'hidden',
                 }}
               >
-                <CommandsContextScopedProvider active={true}>
+                <ActiveTabCommandsProvider active={true}>
                   <DragAndDropContextProvider
                     key={
                       externalWindowDocument
@@ -374,7 +374,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                       })}
                     </ErrorBoundary>
                   </DragAndDropContextProvider>
-                </CommandsContextScopedProvider>
+                </ActiveTabCommandsProvider>
               </div>
               <I18n>
                 {({ i18n }) =>
@@ -426,9 +426,9 @@ const PoppedOutWindowBackgroundColor = () => {
 const PoppedOutEditorContainerWindowWithOwnCommands = (
   props: Props
 ): React.Node => (
-  <CommandsContextWindowProvider>
+  <WindowCommandsProvider>
     <PoppedOutEditorContainerWindow {...props} />
-  </CommandsContextWindowProvider>
+  </WindowCommandsProvider>
 );
 
 export default PoppedOutEditorContainerWindowWithOwnCommands;

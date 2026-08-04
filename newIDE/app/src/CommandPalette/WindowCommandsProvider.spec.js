@@ -4,7 +4,7 @@ import CommandManager, {
   type SimpleCommand,
 } from './CommandManager';
 import { type CommandName } from './CommandsList';
-import { WindowCommandManager } from './CommandsWindowContext';
+import { WindowCommandManager } from './WindowCommandsProvider';
 
 /**
  * Each fake command has its own handler, so that the handler identity tells

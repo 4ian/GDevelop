@@ -9,15 +9,24 @@ import { type CommandName } from './CommandsList';
 import CommandsContext from './CommandsContext';
 import useValueWithInit from '../Utils/UseRefInitHook';
 
-export class ScopedCommandManager implements CommandManagerInterface {
+/**
+ * A command manager for the editor of a single tab.
+ *
+ * Editors of background tabs stay mounted, so their commands stay registered.
+ * This manager keeps them parked here, and only publishes them to the command
+ * manager of the window while the tab is the active one - so that a keyboard
+ * shortcut or the command palette only sees the commands of the editor
+ * currently displayed.
+ */
+export class TabCommandManager implements CommandManagerInterface {
   _commands: { [CommandName]: Command };
-  _centralManager: CommandManagerInterface;
+  _windowCommandManager: CommandManagerInterface;
   _isActive: boolean;
 
-  constructor(centralCommandManager: CommandManagerInterface) {
+  constructor(windowCommandManager: CommandManagerInterface) {
     this._commands = {};
     this._isActive = false;
-    this._centralManager = centralCommandManager;
+    this._windowCommandManager = windowCommandManager;
   }
 
   setActive = (active: boolean) => {
@@ -27,7 +36,7 @@ export class ScopedCommandManager implements CommandManagerInterface {
   registerCommand = (commandName: CommandName, command: Command) => {
     this._commands[commandName] = command;
     if (this._isActive)
-      this._centralManager.registerCommand(commandName, command);
+      this._windowCommandManager.registerCommand(commandName, command);
   };
 
   deregisterCommand = (commandName: CommandName, command?: Command) => {
@@ -35,22 +44,25 @@ export class ScopedCommandManager implements CommandManagerInterface {
     if (command && registeredCommand !== command) return;
     delete this._commands[commandName];
     if (this._isActive && registeredCommand) {
-      this._centralManager.deregisterCommand(commandName, registeredCommand);
+      this._windowCommandManager.deregisterCommand(
+        commandName,
+        registeredCommand
+      );
     }
   };
 
-  registerAllCommandsToCentralManager = () => {
+  registerAllCommandsToWindowManager = () => {
     Object.keys(this._commands).forEach(commandName => {
-      this._centralManager.registerCommand(
+      this._windowCommandManager.registerCommand(
         commandName,
         this._commands[commandName]
       );
     });
   };
 
-  deregisterAllCommandsFromCentralManager = () => {
+  deregisterAllCommandsFromWindowManager = () => {
     Object.keys(this._commands).forEach(commandName => {
-      this._centralManager.deregisterCommand(
+      this._windowCommandManager.deregisterCommand(
         commandName,
         this._commands[commandName]
       );
@@ -68,7 +80,7 @@ export class ScopedCommandManager implements CommandManagerInterface {
   getNamedCommand = (commandName: CommandName): ?NamedCommand => {
     const command = this._commands[commandName];
     if (command) return { name: commandName, ...(command: Command) };
-    return this._centralManager.getNamedCommand(commandName);
+    return this._windowCommandManager.getNamedCommand(commandName);
   };
 }
 
@@ -77,30 +89,35 @@ type Props = {|
   active: boolean,
 |};
 
-const CommandsContextScopedProvider = (props: Props): React.Node => {
-  const centralManager = React.useContext(CommandsContext);
-  const scopedManager = useValueWithInit(
-    () => new ScopedCommandManager(centralManager)
+/**
+ * Publishes the commands registered by its children (the editor of a tab) to
+ * the command manager of the window, only while `active` is true (the tab is
+ * the active one of its pane). See `TabCommandManager`.
+ */
+const ActiveTabCommandsProvider = (props: Props): React.Node => {
+  const windowCommandManager = React.useContext(CommandsContext);
+  const tabCommandManager = useValueWithInit(
+    () => new TabCommandManager(windowCommandManager)
   );
 
   React.useEffect(
     () => {
       if (!props.active) return;
-      scopedManager.setActive(true);
-      scopedManager.registerAllCommandsToCentralManager();
+      tabCommandManager.setActive(true);
+      tabCommandManager.registerAllCommandsToWindowManager();
       return () => {
-        scopedManager.setActive(false);
-        scopedManager.deregisterAllCommandsFromCentralManager();
+        tabCommandManager.setActive(false);
+        tabCommandManager.deregisterAllCommandsFromWindowManager();
       };
     },
-    [props.active, scopedManager]
+    [props.active, tabCommandManager]
   );
 
   return (
-    <CommandsContext.Provider value={scopedManager}>
+    <CommandsContext.Provider value={tabCommandManager}>
       {props.children}
     </CommandsContext.Provider>
   );
 };
 
-export default CommandsContextScopedProvider;
+export default ActiveTabCommandsProvider;

@@ -160,7 +160,7 @@ import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtensio
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
-import CommandsContextWindowProvider from '../CommandPalette/CommandsWindowContext';
+import WindowCommandsProvider from '../CommandPalette/WindowCommandsProvider';
 import {
   type ImportExtension,
   type SaveProject,
@@ -5671,7 +5671,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       command manager, so that they stay separated from the ones of the popped
       out windows (rendered above, outside of this provider): a keyboard
       shortcut must always run the command of the window where it was pressed. */}
-      <CommandsContextWindowProvider>
+      <WindowCommandsProvider>
         <LeaderboardProvider
           gameId={currentProject ? currentProject.getProjectUuid() : ''}
         >
@@ -5710,7 +5710,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           />
         </LeaderboardProvider>
         <CommandPalette ref={commandPaletteRef} />
-      </CommandsContextWindowProvider>
+      </WindowCommandsProvider>
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

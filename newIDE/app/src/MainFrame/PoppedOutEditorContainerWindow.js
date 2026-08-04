@@ -23,6 +23,7 @@ import AlertProvider from '../UI/Alert/AlertProvider';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import { I18n } from '@lingui/react';
 import useNewResourceDialog from '../ResourcesList/useNewResourceDialog';
+import useWindowHasFocus from '../Utils/UseWindowHasFocus';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -63,6 +64,10 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   const externalWindowDocument = externalWindow
     ? externalWindow.document
     : null;
+  // Only publish this editor's commands while the popped-out window is focused.
+  // Otherwise Shift+A / other editor shortcuts keep targeting this sheet after
+  // the user returns to an Events tab in the main window.
+  const hasWindowFocus = useWindowHasFocus(externalWindow);
 
   const onWindowReady = React.useCallback((externalWindow: any) => {
     setExternalWindow(externalWindow);
@@ -172,7 +177,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   overflow: 'hidden',
                 }}
               >
-                <CommandsContextScopedProvider active={true}>
+                <CommandsContextScopedProvider active={hasWindowFocus}>
                   <DragAndDropContextProvider
                     key={
                       externalWindowDocument

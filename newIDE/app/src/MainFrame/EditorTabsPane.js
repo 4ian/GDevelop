@@ -5,6 +5,7 @@ import Toolbar, { type ToolbarInterface } from './Toolbar';
 import { TabContentContainer } from '../UI/ClosableTabs';
 import { DraggableEditorTabs } from './EditorTabs/DraggableEditorTabs';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import useWindowHasFocus from '../Utils/UseWindowHasFocus';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -441,6 +442,10 @@ const EditorTabsPane: React.ComponentType<{
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  // Only publish editor commands from the focused window. Otherwise a
+  // popped-out editor keeps owning shortcuts like Shift+A after focus returns
+  // to the main window.
+  const hasWindowFocus = useWindowHasFocus(window);
 
   const [
     tabsTitleBarAndEditorToolbarHidden,
@@ -747,7 +752,9 @@ const EditorTabsPane: React.ComponentType<{
             );
 
             const editorContent = (
-              <CommandsContextScopedProvider active={isCurrentTab}>
+              <CommandsContextScopedProvider
+                active={isCurrentTab && hasWindowFocus}
+              >
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
                   scope={errorBoundaryProps.scope}

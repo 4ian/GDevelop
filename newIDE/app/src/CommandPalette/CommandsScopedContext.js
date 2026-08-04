@@ -30,9 +30,12 @@ class ScopedCommandManager implements CommandManagerInterface {
       this._centralManager.registerCommand(commandName, command);
   };
 
-  deregisterCommand = (commandName: CommandName) => {
+  deregisterCommand = (commandName: CommandName, _command?: Command) => {
+    const command = this._commands[commandName];
     delete this._commands[commandName];
-    if (this._isActive) this._centralManager.deregisterCommand(commandName);
+    if (this._isActive && command) {
+      this._centralManager.deregisterCommand(commandName, command);
+    }
   };
 
   registerAllCommandsToCentralManager = () => {
@@ -46,7 +49,10 @@ class ScopedCommandManager implements CommandManagerInterface {
 
   deregisterAllCommandsFromCentralManager = () => {
     Object.keys(this._commands).forEach(commandName => {
-      this._centralManager.deregisterCommand(commandName);
+      this._centralManager.deregisterCommand(
+        commandName,
+        this._commands[commandName]
+      );
     });
   };
 

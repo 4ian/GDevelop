@@ -32,7 +32,7 @@ export type NamedCommandWithOptions = {|
 
 export interface CommandManagerInterface {
   registerCommand: (commandName: CommandName, command: Command) => void;
-  deregisterCommand: (commandName: CommandName) => void;
+  deregisterCommand: (commandName: CommandName, command?: Command) => void;
   getNamedCommand: (commandName: CommandName) => ?NamedCommand;
   getAllNamedCommands: () => Array<NamedCommand>;
 }
@@ -45,19 +45,17 @@ export default class CommandManager implements CommandManagerInterface {
   }
 
   registerCommand = (commandName: CommandName, command: Command) => {
-    if (this._commands[commandName]) return;
-    // if (this._commands[commandName])
-    //   return console.warn(
-    //     `Tried to register command ${commandName}, but it is already registered.`
-    //   );
+    // Last registration wins. This allows a newly focused editor/window to take
+    // ownership of a command even if a previous scope has not finished
+    // deregistering yet (focus/blur can commit in separate React updates).
     this._commands[commandName] = command;
   };
 
-  deregisterCommand = (commandName: CommandName) => {
-    // if (!this._commands[commandName])
-    //   return console.warn(
-    //     `Tried to deregister command ${commandName}, but it is not registered.`
-    //   );
+  deregisterCommand = (commandName: CommandName, command?: Command) => {
+    // If a specific command object is provided, only remove it when it is still
+    // the registered one. This prevents a blurred window from deleting the
+    // command that a newly focused window just registered.
+    if (command && this._commands[commandName] !== command) return;
     delete this._commands[commandName];
   };
 

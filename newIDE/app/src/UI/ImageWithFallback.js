@@ -46,7 +46,7 @@ export const ImageWithFallback = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [hasError, setHasError] = React.useState(false);
   const [isLoaded, setIsLoaded] = React.useState(false);
-  const imgRef = React.useRef<?HTMLImageElement>(null);
+  const imageRef = React.useRef<HTMLImageElement | null>(null);
 
   // Reset the loading/error state if the source changes (e.g. when navigating
   // through a carousel, or when a tile is reused in a list).
@@ -62,13 +62,17 @@ export const ImageWithFallback = ({
   // which don't trigger onLoad event in browsers).
   React.useEffect(
     () => {
-      const img = imgRef.current;
-      if (!img) return;
+      const image = imageRef.current;
+      if (!image) return;
 
       // If image is already in browser cache, `complete` will be true and
       // onLoad won't fire, so we need to manually check and update state.
-      if (img.complete && !hasError) {
-        setIsLoaded(true);
+      if (image.complete && !hasError) {
+        if (image.naturalWidth > 0) {
+          setIsLoaded(true);
+        } else {
+          setHasError(true);
+        }
       }
     },
     [src, hasError]
@@ -99,7 +103,7 @@ export const ImageWithFallback = ({
   return (
     <CorsAwareImage
       {...props}
-      ref={imgRef}
+      imageRef={imageRef}
       src={src}
       alt={alt}
       // Keep the image invisible until it has successfully loaded, so the

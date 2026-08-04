@@ -20,8 +20,14 @@ describe('ScopedCommandManager', () => {
   it('keeps inactive commands local and falls back to its parent', () => {
     const parentManager = new CommandManager();
     const localManager = new ScopedCommandManager(parentManager);
-    const saveProject = jest.fn();
-    const addEvent = jest.fn();
+    let saveProjectCallCount = 0;
+    let addEventCallCount = 0;
+    const saveProject = () => {
+      saveProjectCallCount++;
+    };
+    const addEvent = () => {
+      addEventCallCount++;
+    };
 
     parentManager.registerCommand('SAVE_PROJECT', { handler: saveProject });
     localManager.registerCommand('ADD_STANDARD_EVENT', { handler: addEvent });
@@ -29,8 +35,8 @@ describe('ScopedCommandManager', () => {
     getHandler(localManager, 'ADD_STANDARD_EVENT')();
     getHandler(localManager, 'SAVE_PROJECT')();
 
-    expect(addEvent).toHaveBeenCalledTimes(1);
-    expect(saveProject).toHaveBeenCalledTimes(1);
+    expect(addEventCallCount).toBe(1);
+    expect(saveProjectCallCount).toBe(1);
     expect(parentManager.getNamedCommand('ADD_STANDARD_EVENT')).toBeNull();
   });
 
@@ -38,8 +44,14 @@ describe('ScopedCommandManager', () => {
     const rootManager = new CommandManager();
     const windowManager = new ScopedCommandManager(rootManager);
     const editorManager = new ScopedCommandManager(windowManager);
-    const mainWindowAddEvent = jest.fn();
-    const poppedOutWindowAddEvent = jest.fn();
+    let mainWindowAddEventCallCount = 0;
+    let poppedOutWindowAddEventCallCount = 0;
+    const mainWindowAddEvent = () => {
+      mainWindowAddEventCallCount++;
+    };
+    const poppedOutWindowAddEvent = () => {
+      poppedOutWindowAddEventCallCount++;
+    };
 
     rootManager.registerCommand('ADD_STANDARD_EVENT', {
       handler: mainWindowAddEvent,
@@ -52,12 +64,12 @@ describe('ScopedCommandManager', () => {
     getHandler(windowManager, 'ADD_STANDARD_EVENT')();
     getHandler(rootManager, 'ADD_STANDARD_EVENT')();
 
-    expect(poppedOutWindowAddEvent).toHaveBeenCalledTimes(1);
-    expect(mainWindowAddEvent).toHaveBeenCalledTimes(1);
+    expect(poppedOutWindowAddEventCallCount).toBe(1);
+    expect(mainWindowAddEventCallCount).toBe(1);
 
     editorManager.deregisterCommand('ADD_STANDARD_EVENT');
 
     getHandler(windowManager, 'ADD_STANDARD_EVENT')();
-    expect(mainWindowAddEvent).toHaveBeenCalledTimes(2);
+    expect(mainWindowAddEventCallCount).toBe(2);
   });
 });

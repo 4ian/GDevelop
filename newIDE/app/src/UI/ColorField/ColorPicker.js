@@ -3,10 +3,12 @@
 
 import * as React from 'react';
 import { SketchPicker } from 'react-color';
-import Popover from '@material-ui/core/Popover';
+import Popper from '@material-ui/core/Popper';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import { type RGBColor } from '../../Utils/ColorTransformer';
 import PortalContainerContext from '../PortalContainerContext';
+import { shouldCloseOrCancel } from '../KeyboardShortcuts/InteractionKeys';
 
 export type ColorResult = {
   rgb: RGBColor,
@@ -22,6 +24,7 @@ type Props = {|
   disableAlpha?: boolean,
   disabled?: boolean,
   size?: 'compact',
+  initiallyOpen?: boolean,
 |};
 
 const styles = {
@@ -60,9 +63,14 @@ const ColorPicker = ({
   disableAlpha,
   disabled,
   size,
+  initiallyOpen,
 }: Props): React.Node => {
-  const swatchRef = React.useRef<?HTMLDivElement>(null);
-  const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
+  const [swatchElement, setSwatchElement] = React.useState<?HTMLDivElement>(
+    null
+  );
+  const [displayColorPicker, setDisplayColorPicker] = React.useState(
+    !!initiallyOpen && !disabled
+  );
   const portalContainer = React.useContext(PortalContainerContext);
 
   const handleClick = () => {
@@ -73,6 +81,23 @@ const ColorPicker = ({
   const handleClose = () => {
     setDisplayColorPicker(false);
   };
+
+  React.useEffect(
+    () => {
+      if (!displayColorPicker || !swatchElement) return;
+
+      const pickerDocument = swatchElement.ownerDocument;
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (!shouldCloseOrCancel(event)) return;
+        event.stopPropagation();
+        setDisplayColorPicker(false);
+      };
+      pickerDocument.addEventListener('keydown', onKeyDown, true);
+      return () =>
+        pickerDocument.removeEventListener('keydown', onKeyDown, true);
+    },
+    [displayColorPicker, swatchElement]
+  );
 
   const displayedColor = color
     ? color
@@ -94,7 +119,7 @@ const ColorPicker = ({
           ...style,
         }}
         onClick={handleClick}
-        ref={swatchRef}
+        ref={setSwatchElement}
       >
         <div
           style={{
@@ -107,23 +132,30 @@ const ColorPicker = ({
           {color ? null : '?'}
         </div>
       </div>
-      {displayColorPicker && swatchRef.current ? (
-        <Popover
-          open
-          onClose={handleClose}
-          anchorEl={swatchRef.current}
-          container={portalContainer}
-          style={styles.popover}
+      {displayColorPicker && swatchElement ? (
+        <ClickAwayListener
+          mouseEvent="onMouseDown"
+          onClickAway={event => {
+            if (!swatchElement.contains((event.target: any))) handleClose();
+          }}
         >
-          <SketchPicker
-            // $FlowFixMe[incompatible-type]
-            color={displayedColor}
-            // $FlowFixMe[incompatible-type]
-            onChange={onChange}
-            onChangeComplete={onChangeComplete}
-            disableAlpha={disableAlpha}
-          />
-        </Popover>
+          <Popper
+            open
+            anchorEl={swatchElement}
+            container={portalContainer}
+            style={styles.popover}
+            placement="bottom-start"
+          >
+            <SketchPicker
+              // $FlowFixMe[incompatible-type]
+              color={displayedColor}
+              // $FlowFixMe[incompatible-type]
+              onChange={onChange}
+              onChangeComplete={onChangeComplete}
+              disableAlpha={disableAlpha}
+            />
+          </Popper>
+        </ClickAwayListener>
       ) : null}
     </>
   );

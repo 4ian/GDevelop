@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import {
   getUserSigningCredentials,
@@ -105,7 +105,11 @@ export const SigningCredentialsDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/publishing/ios" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/publishing/ios"
+          scopeName={t`iOS publishing`}
+        />,
         signingCredentials && signingCredentials.length > 0 ? (
           <RaisedButton
             key="add-new"

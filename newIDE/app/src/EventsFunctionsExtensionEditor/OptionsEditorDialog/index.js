@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -45,7 +45,11 @@ export default function OptionsEditorDialog({
     <Dialog
       title={<Trans>{eventsFunctionsExtension.getName()} options</Trans>}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/extensions/create" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/extensions/create"
+          scopeName={t`Extensions`}
+        />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
             leftIcon={<Upload />}

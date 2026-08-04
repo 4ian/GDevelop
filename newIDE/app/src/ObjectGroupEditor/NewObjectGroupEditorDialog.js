@@ -97,7 +97,11 @@ const NewObjectGroupEditorDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton key="help-button" helpPagePath="/objects/object-group" />,
+        <HelpButton
+          key="help-button"
+          helpPagePath="/objects/object-group"
+          scopeName={t`Object groups`}
+        />,
       ]}
       onRequestClose={onCancel}
       onApply={apply}

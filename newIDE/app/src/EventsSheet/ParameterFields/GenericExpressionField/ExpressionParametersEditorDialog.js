@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
@@ -71,6 +71,7 @@ const ExpressionParametersEditorDialog = ({
               <HelpButton
                 key="help-button"
                 helpPagePath={expressionMetadata.getHelpPath()}
+                scopeName={t`Expressions`}
               />,
             ]
           : []

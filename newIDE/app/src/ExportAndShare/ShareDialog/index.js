@@ -235,6 +235,7 @@ const ShareDialog = ({
           <HelpButton
             key="help"
             helpPagePath="/collaboration/invite-collaborators"
+            scopeName={t`Collaboration`}
           />,
         ];
 

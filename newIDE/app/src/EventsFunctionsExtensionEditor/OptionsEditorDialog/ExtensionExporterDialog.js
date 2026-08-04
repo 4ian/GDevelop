@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
@@ -102,7 +102,11 @@ const ExtensionExporterDialog = (props: Props): React.Node => {
     <Dialog
       title={<Trans>Export extension</Trans>}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath="/extensions/share-extension/" />,
+        <HelpButton
+          key="help"
+          helpPagePath="/extensions/share-extension/"
+          scopeName={t`Extensions`}
+        />,
         <FlatButton
           label={
             isFromTheStore ? (

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -173,7 +173,11 @@ const CreateAccountDialog = ({
         </LeftLoader>,
       ]}
       secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+        <HelpButton
+          key="help"
+          helpPagePath={'/interface/profile'}
+          scopeName={t`Account`}
+        />,
       ]}
       cannotBeDismissed={createAccountInProgress}
       onApply={createAccount}

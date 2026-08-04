@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
@@ -47,6 +47,7 @@ export default function ExtractAsExternalLayoutDialog({
         <HelpButton
           helpPagePath="/interface/scene-editor/external-layouts/"
           key="help"
+          scopeName={t`External layouts`}
         />,
       ]}
       onRequestClose={onCancel}

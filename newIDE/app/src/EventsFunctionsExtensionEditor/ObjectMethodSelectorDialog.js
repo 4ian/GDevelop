@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
@@ -35,8 +35,8 @@ export default function ObjectMethodSelectorDialog({
       secondaryActions={[
         <HelpButton
           key="help"
-          // TODO EBO Replace it with a new page about objects.
-          helpPagePath="/behaviors/events-based-behaviors"
+          helpPagePath="/objects/custom-objects-prefab-template"
+          scopeName={t`Object functions`}
         />,
       ]}
       actions={[

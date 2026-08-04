@@ -1,11 +1,19 @@
 // @flow
-import CommandManager from './CommandManager';
+import CommandManager, { type SimpleCommand } from './CommandManager';
 
 describe('CommandManager', () => {
   test('last registration wins for the same command name', () => {
     const manager = new CommandManager();
-    const first = { handler: () => {} };
-    const second = { handler: () => {} };
+    const first: SimpleCommand = {
+      handler: () => {
+        return;
+      },
+    };
+    const second: SimpleCommand = {
+      handler: () => {
+        return;
+      },
+    };
 
     manager.registerCommand('ADD_STANDARD_EVENT', first);
     manager.registerCommand('ADD_STANDARD_EVENT', second);
@@ -18,8 +26,16 @@ describe('CommandManager', () => {
 
   test('deregister only removes the owned command object', () => {
     const manager = new CommandManager();
-    const first = { handler: () => {} };
-    const second = { handler: () => {} };
+    const first: SimpleCommand = {
+      handler: () => {
+        return;
+      },
+    };
+    const second: SimpleCommand = {
+      handler: () => {
+        return;
+      },
+    };
 
     manager.registerCommand('ADD_STANDARD_EVENT', first);
     manager.registerCommand('ADD_STANDARD_EVENT', second);
@@ -38,7 +54,12 @@ describe('CommandManager', () => {
 
   test('deregister without a command object still removes the command', () => {
     const manager = new CommandManager();
-    manager.registerCommand('ADD_STANDARD_EVENT', { handler: () => {} });
+    const command: SimpleCommand = {
+      handler: () => {
+        return;
+      },
+    };
+    manager.registerCommand('ADD_STANDARD_EVENT', command);
 
     manager.deregisterCommand('ADD_STANDARD_EVENT');
 

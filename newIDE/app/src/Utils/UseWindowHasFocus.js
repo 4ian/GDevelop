@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 
-const getWindowHasFocus = (targetWindow: Window): boolean => {
+const getWindowHasFocus = (targetWindow: any): boolean => {
   try {
     return targetWindow.document.hasFocus();
   } catch (error) {
@@ -16,7 +16,7 @@ const getWindowHasFocus = (targetWindow: Window): boolean => {
  * Used so editor-scoped commands (shortcuts like Shift+A) are only published
  * from the focused window when multiple windows are open (popped-out editors).
  */
-const useWindowHasFocus = (targetWindow: ?Window): boolean => {
+const useWindowHasFocus = (targetWindow: ?any): boolean => {
   const [hasFocus, setHasFocus] = React.useState(() =>
     targetWindow ? getWindowHasFocus(targetWindow) : false
   );

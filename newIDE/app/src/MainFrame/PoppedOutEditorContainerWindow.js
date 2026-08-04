@@ -2,7 +2,9 @@
 import * as React from 'react';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ToolbarTitlebar from './ToolbarTitlebar';
-import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import CommandsContextScopedProvider, {
+  CommandsContextLocalProvider,
+} from '../CommandPalette/CommandsScopedContext';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -413,4 +415,12 @@ const PoppedOutWindowBackgroundColor = () => {
   return null;
 };
 
-export default PoppedOutEditorContainerWindow;
+const PoppedOutEditorContainerWindowWithLocalCommands = (
+  props: Props
+): React.Node => (
+  <CommandsContextLocalProvider>
+    <PoppedOutEditorContainerWindow {...props} />
+  </CommandsContextLocalProvider>
+);
+
+export default PoppedOutEditorContainerWindowWithLocalCommands;

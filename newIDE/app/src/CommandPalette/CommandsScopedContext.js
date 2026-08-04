@@ -9,7 +9,7 @@ import { type CommandName } from './CommandsList';
 import CommandsContext from './CommandsContext';
 import useValueWithInit from '../Utils/UseRefInitHook';
 
-class ScopedCommandManager implements CommandManagerInterface {
+export class ScopedCommandManager implements CommandManagerInterface {
   _commands: { [CommandName]: Command };
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
@@ -91,6 +91,29 @@ const CommandsContextScopedProvider = (props: Props): React.Node => {
 
   return (
     <CommandsContext.Provider value={scopedManager}>
+      {props.children}
+    </CommandsContext.Provider>
+  );
+};
+
+/**
+ * Keeps commands registered by children local to this provider, while still
+ * allowing command lookups to fall back to the parent manager.
+ *
+ * This is useful for UI rendered in another window: editor commands must be
+ * handled by that window's command palette without replacing commands from
+ * the main window.
+ */
+export const CommandsContextLocalProvider = (props: {|
+  children: React.Node,
+|}): React.Node => {
+  const parentManager = React.useContext(CommandsContext);
+  const localManager = useValueWithInit(
+    () => new ScopedCommandManager(parentManager)
+  );
+
+  return (
+    <CommandsContext.Provider value={localManager}>
       {props.children}
     </CommandsContext.Provider>
   );

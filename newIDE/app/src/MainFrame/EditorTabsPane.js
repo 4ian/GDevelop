@@ -4,7 +4,7 @@ import TabsTitlebar from './TabsTitlebar';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import { TabContentContainer } from '../UI/ClosableTabs';
 import { DraggableEditorTabs } from './EditorTabs/DraggableEditorTabs';
-import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import ActiveTabCommandsProvider from '../CommandPalette/ActiveTabCommandsProvider';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -747,7 +747,7 @@ const EditorTabsPane: React.ComponentType<{
             );
 
             const editorContent = (
-              <CommandsContextScopedProvider active={isCurrentTab}>
+              <ActiveTabCommandsProvider active={isCurrentTab}>
                 <ErrorBoundary
                   componentTitle={errorBoundaryProps.componentTitle}
                   scope={errorBoundaryProps.scope}
@@ -889,7 +889,7 @@ const EditorTabsPane: React.ComponentType<{
                     gamesPlatformFrameTools,
                   })}
                 </ErrorBoundary>
-              </CommandsContextScopedProvider>
+              </ActiveTabCommandsProvider>
             );
 
             return (

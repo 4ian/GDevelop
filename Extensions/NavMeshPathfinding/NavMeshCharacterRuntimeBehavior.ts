@@ -191,6 +191,13 @@ namespace gdjs {
       this._manager.removeCharacter(this);
     }
 
+    getRadius(): float {
+      return (
+        this._radius ||
+        Math.min(this.owner.getWidth(), this.owner.getHeight()) / 2
+      );
+    }
+
     setAcceleration(acceleration: float): void {
       this._crowdAgentParams.maxAcceleration = acceleration;
       if (this._agent) {
@@ -458,11 +465,8 @@ namespace gdjs {
       // Avoid to frequently change of direction when not moving much.
       const deltaX = newX - oldX;
       const deltaY = newY - oldY;
-      if (Math.abs(deltaX) + Math.abs(deltaY) > 1
-      ) {
-        this._movementAngle = gdjs.toDegrees(
-          Math.atan2(deltaY, deltaX)
-        );
+      if (Math.abs(deltaX) + Math.abs(deltaY) > 1) {
+        this._movementAngle = gdjs.toDegrees(Math.atan2(deltaY, deltaX));
       }
       if (
         this._rotateObject &&

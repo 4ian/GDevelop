@@ -208,6 +208,14 @@ module.exports = {
             .setDoubleValue(newValueAsNumber);
           return true;
         }
+        if (propertyName === 'walkableRadius') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('walkableRadius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
         return false;
       };
       sharedData.getProperties = function (sharedContent) {
@@ -215,8 +223,7 @@ module.exports = {
 
         sharedProperties
           .getOrCreate('cellSize')
-          .setLabel('Cell size')
-          .setGroup('')
+          .setLabel(_('Cell size'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -227,8 +234,7 @@ module.exports = {
 
         sharedProperties
           .getOrCreate('cellDepth')
-          .setLabel('Cell depth')
-          .setGroup('')
+          .setLabel(_('Cell depth'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -239,8 +245,7 @@ module.exports = {
 
         sharedProperties
           .getOrCreate('slopeMaxAngle')
-          .setLabel('Slope max. angle')
-          .setGroup('')
+          .setLabel(_('Slope max. angle'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
           .setValue(
@@ -252,12 +257,25 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        sharedProperties
+          .getOrCreate('walkableRadius')
+          .setLabel(_('Walkable radius'))
+          .setDescription(_('The biggest character radius is automatically used when left negative.'))
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            sharedContent.getChild('walkableRadius').getDoubleValue().toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return sharedProperties;
       };
       sharedData.initializeContent = function (sharedContent) {
         sharedContent.addChild('cellSize').setDoubleValue(10);
         sharedContent.addChild('cellDepth').setDoubleValue(10);
         sharedContent.addChild('slopeMaxAngle').setDoubleValue(50);
+        sharedContent.addChild('walkableRadius').setDoubleValue(-1);
       };
 
       const aut = extension

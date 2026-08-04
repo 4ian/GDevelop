@@ -45,7 +45,10 @@ namespace gdjs {
       walkableHeight: 10,
       detailSampleMaxError: 50,
       walkableClimb: 2,
+      // TODO
+      walkableRadius: 5,
     };
+    walkableRadius: float = -1;
     timeSinceLastNavMeshLastRebuild: float = 1;
     isNavMeshDirty = true;
     isFirstFrame = true;
@@ -57,6 +60,7 @@ namespace gdjs {
       this.navMeshConfig.ch = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
+      this.walkableRadius = sharedData.walkableRadius;
     }
 
     /**
@@ -89,7 +93,7 @@ namespace gdjs {
       if (!this.crowd) {
         return;
       }
-      this.crowd.update(timeDelta);//1 / 60, timeDelta, 8);
+      this.crowd.update(timeDelta); //1 / 60, timeDelta, 8);
     }
 
     invalidateNavMesh() {
@@ -122,6 +126,18 @@ namespace gdjs {
         this.navMeshConfig.walkableClimb = 0;
       }
 
+      let characterRadiusMax = 0;
+      for (const character of this.characters) {
+        characterRadiusMax = Math.max(
+          characterRadiusMax,
+          character.getRadius()
+        );
+      }
+      this.navMeshConfig.walkableRadius = this.navMeshConfig.cs
+        ? (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
+          this.navMeshConfig.cs
+        : 0;
+
       const result = RecastNav.generateSoloNavMesh(
         positions,
         indices,
@@ -133,7 +149,7 @@ namespace gdjs {
         this.navMesh = result.navMesh;
         this.crowd = new RecastNav.Crowd(this.navMesh, {
           maxAgents: 100,
-          maxAgentRadius: 100,
+          maxAgentRadius: characterRadiusMax,
         });
         for (const character of this.characters) {
           this.rebuildCharacterAgent(character);
@@ -163,7 +179,7 @@ namespace gdjs {
       const centerX = (maxX + minX) / 2;
       const centerY = (maxY + minY) / 2;
 
-      console.log("Ground", width, height, centerX, centerY);
+      console.log('Ground', width, height, centerX, centerY);
 
       const indicesOffset = Math.round(positions.length / 3);
       for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
@@ -426,8 +442,7 @@ namespace gdjs {
         return;
       }
 
-      character._crowdAgentParams.radius =
-        character._radius || Math.min(owner.getWidth(), owner.getHeight());
+      character._crowdAgentParams.radius = character.getRadius();
       console.log(character._crowdAgentParams.radius);
       character._crowdAgentParams.height =
         //@ts-ignore

@@ -36,8 +36,8 @@ export class WindowCommandManager implements CommandManagerInterface {
     this._windowCommands.registerCommand(commandName, command);
   };
 
-  deregisterCommand = (commandName: CommandName) => {
-    this._windowCommands.deregisterCommand(commandName);
+  deregisterCommand = (commandName: CommandName, command?: Command) => {
+    this._windowCommands.deregisterCommand(commandName, command);
   };
 
   getNamedCommand = (commandName: CommandName): ?NamedCommand => {

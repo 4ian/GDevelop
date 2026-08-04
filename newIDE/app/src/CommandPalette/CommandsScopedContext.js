@@ -9,7 +9,7 @@ import { type CommandName } from './CommandsList';
 import CommandsContext from './CommandsContext';
 import useValueWithInit from '../Utils/UseRefInitHook';
 
-class ScopedCommandManager implements CommandManagerInterface {
+export class ScopedCommandManager implements CommandManagerInterface {
   _commands: { [CommandName]: Command };
   _centralManager: CommandManagerInterface;
   _isActive: boolean;
@@ -30,9 +30,13 @@ class ScopedCommandManager implements CommandManagerInterface {
       this._centralManager.registerCommand(commandName, command);
   };
 
-  deregisterCommand = (commandName: CommandName) => {
+  deregisterCommand = (commandName: CommandName, command?: Command) => {
+    const registeredCommand = this._commands[commandName];
+    if (command && registeredCommand !== command) return;
     delete this._commands[commandName];
-    if (this._isActive) this._centralManager.deregisterCommand(commandName);
+    if (this._isActive && registeredCommand) {
+      this._centralManager.deregisterCommand(commandName, registeredCommand);
+    }
   };
 
   registerAllCommandsToCentralManager = () => {
@@ -46,7 +50,10 @@ class ScopedCommandManager implements CommandManagerInterface {
 
   deregisterAllCommandsFromCentralManager = () => {
     Object.keys(this._commands).forEach(commandName => {
-      this._centralManager.deregisterCommand(commandName);
+      this._centralManager.deregisterCommand(
+        commandName,
+        this._commands[commandName]
+      );
     });
   };
 

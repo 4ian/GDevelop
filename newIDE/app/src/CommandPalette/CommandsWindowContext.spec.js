@@ -1,5 +1,9 @@
 // @flow
-import CommandManager, { type SimpleCommand } from './CommandManager';
+import CommandManager, {
+  type CommandManagerInterface,
+  type SimpleCommand,
+} from './CommandManager';
+import { type CommandName } from './CommandsList';
 import { WindowCommandManager } from './CommandsWindowContext';
 
 /**
@@ -9,6 +13,17 @@ import { WindowCommandManager } from './CommandsWindowContext';
 const createFakeCommand = (): SimpleCommand => ({
   handler: () => {},
 });
+
+const getHandler = (
+  commandManager: CommandManagerInterface,
+  commandName: CommandName
+): (() => void | Promise<void>) => {
+  const namedCommand = commandManager.getNamedCommand(commandName);
+  if (!namedCommand || !namedCommand.handler) {
+    throw new Error(`Expected ${commandName} to have a handler.`);
+  }
+  return namedCommand.handler;
+};
 
 describe('WindowCommandManager', () => {
   it('keeps the commands of the window out of the shared command manager', () => {
@@ -24,10 +39,9 @@ describe('WindowCommandManager', () => {
     ).toBeNull();
     expect(sharedCommandManager.getAllNamedCommands()).toHaveLength(0);
 
-    const foundCommand = windowCommandManager.getNamedCommand(
-      'ADD_STANDARD_EVENT'
+    expect(getHandler(windowCommandManager, 'ADD_STANDARD_EVENT')).toBe(
+      windowCommand.handler
     );
-    expect(foundCommand && foundCommand.handler).toBe(windowCommand.handler);
   });
 
   it('finds the shared commands that are not overridden by the window', () => {
@@ -37,8 +51,7 @@ describe('WindowCommandManager', () => {
     const saveProjectCommand = createFakeCommand();
     sharedCommandManager.registerCommand('SAVE_PROJECT', saveProjectCommand);
 
-    const foundCommand = windowCommandManager.getNamedCommand('SAVE_PROJECT');
-    expect(foundCommand && foundCommand.handler).toBe(
+    expect(getHandler(windowCommandManager, 'SAVE_PROJECT')).toBe(
       saveProjectCommand.handler
     );
     expect(
@@ -55,16 +68,12 @@ describe('WindowCommandManager', () => {
     sharedCommandManager.registerCommand('ADD_STANDARD_EVENT', sharedCommand);
     windowCommandManager.registerCommand('ADD_STANDARD_EVENT', windowCommand);
 
-    const foundInWindow = windowCommandManager.getNamedCommand(
-      'ADD_STANDARD_EVENT'
+    expect(getHandler(windowCommandManager, 'ADD_STANDARD_EVENT')).toBe(
+      windowCommand.handler
     );
-    expect(foundInWindow && foundInWindow.handler).toBe(windowCommand.handler);
 
     // The other windows are not impacted and keep running the shared command.
-    const foundInSharedManager = sharedCommandManager.getNamedCommand(
-      'ADD_STANDARD_EVENT'
-    );
-    expect(foundInSharedManager && foundInSharedManager.handler).toBe(
+    expect(getHandler(sharedCommandManager, 'ADD_STANDARD_EVENT')).toBe(
       sharedCommand.handler
     );
   });
@@ -108,17 +117,13 @@ describe('WindowCommandManager', () => {
     // Happens when the editor of the window is closed (or popped back in).
     windowCommandManager.deregisterCommand('ADD_STANDARD_EVENT');
 
-    const foundInSharedManager = sharedCommandManager.getNamedCommand(
-      'ADD_STANDARD_EVENT'
-    );
-    expect(foundInSharedManager && foundInSharedManager.handler).toBe(
+    expect(getHandler(sharedCommandManager, 'ADD_STANDARD_EVENT')).toBe(
       sharedCommand.handler
     );
 
     // The window now falls back on the shared command.
-    const foundInWindow = windowCommandManager.getNamedCommand(
-      'ADD_STANDARD_EVENT'
+    expect(getHandler(windowCommandManager, 'ADD_STANDARD_EVENT')).toBe(
+      sharedCommand.handler
     );
-    expect(foundInWindow && foundInWindow.handler).toBe(sharedCommand.handler);
   });
 });

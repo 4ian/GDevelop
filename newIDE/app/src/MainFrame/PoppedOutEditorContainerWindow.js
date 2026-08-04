@@ -3,6 +3,7 @@ import * as React from 'react';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ToolbarTitlebar from './ToolbarTitlebar';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import CommandsContextWindowProvider from '../CommandPalette/CommandsWindowContext';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -416,4 +417,18 @@ const PoppedOutWindowBackgroundColor = () => {
   return null;
 };
 
-export default PoppedOutEditorContainerWindow;
+/**
+ * Gives the popped out window its own command manager, so that the commands
+ * registered by its editor stay in this window: a keyboard shortcut must
+ * always run the command of the window where it was pressed, and not the one
+ * of an editor displayed in another window.
+ */
+const PoppedOutEditorContainerWindowWithOwnCommands = (
+  props: Props
+): React.Node => (
+  <CommandsContextWindowProvider>
+    <PoppedOutEditorContainerWindow {...props} />
+  </CommandsContextWindowProvider>
+);
+
+export default PoppedOutEditorContainerWindowWithOwnCommands;

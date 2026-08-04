@@ -6,7 +6,6 @@ import {
   type EditorTab,
 } from './EditorTabs/EditorTabsHandler';
 import { type EditorTabsPaneCommonProps } from './EditorTabsPane';
-import CommandsContextWindowProvider from '../CommandPalette/CommandsWindowContext';
 
 type Props = {|
   ...EditorTabsPaneCommonProps,
@@ -23,18 +22,13 @@ const PoppedOutWindows = (props: Props): React.Node => {
   return (
     <>
       {externalEditors.map(editorTab => (
-        // Give each popped out window its own command manager, so that the
-        // commands registered by its editor stay in this window: a keyboard
-        // shortcut must always run the command of the window where it was
-        // pressed, and not the one of another window.
-        <CommandsContextWindowProvider key={`external-${editorTab.key}`}>
-          <PoppedOutEditorContainerWindow
-            editorTab={editorTab}
-            onClose={onClose}
-            onPopIn={onPopIn}
-            {...sharedProps}
-          />
-        </CommandsContextWindowProvider>
+        <PoppedOutEditorContainerWindow
+          key={`external-${editorTab.key}`}
+          editorTab={editorTab}
+          onClose={onClose}
+          onPopIn={onPopIn}
+          {...sharedProps}
+        />
       ))}
     </>
   );

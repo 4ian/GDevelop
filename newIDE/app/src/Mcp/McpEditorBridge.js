@@ -4129,7 +4129,12 @@ const callMcpTool = async ({
       // Stop any preview that may still be compiling from the current native
       // project before reload_project replaces and deletes that project. The
       // sequence reservation prevents tab effects from starting another one.
-      stageResult = await runStage('reload', 'reload_project', {});
+      stageResult = await runStage('reload', 'reload_project', {
+        // verify_project_change already owns the preview launch sequence for
+        // the whole validate/close/reload/launch workflow. Avoid trying to
+        // acquire the same non-reentrant reservation again in reload_project.
+        _preview_launch_sequence_already_reserved: true,
+      });
       if (stageResult.failed) return stageResult.result;
 
       stageResult = await runStage('launch', 'launch_preview', {
@@ -4549,6 +4554,35 @@ const callMcpTool = async ({
     }
     const reloadProjectAndWait = context.reloadProjectAndWait;
 
+    // Reloading a project remounts editor tabs. A 3D scene tab normally starts
+    // its embedded preview as it mounts, which can race the explicit MCP
+    // preview, load large 3D resources into the editor renderer, and keep the
+    // shared preview launch lock busy. Reserve the preview sequence for a
+    // standalone reload just like verify_project_change does for its complete
+    // workflow. The internal flag is only used by verify_project_change, which
+    // already owns this non-reentrant reservation.
+    const previewLaunchSequenceAlreadyReserved = !!(
+      args && args._preview_launch_sequence_already_reserved === true
+    );
+    const beginPreviewLaunchSequence = context.beginPreviewLaunchSequence;
+    let didReservePreviewLaunchSequence = false;
+    if (
+      typeof beginPreviewLaunchSequence === 'function' &&
+      !previewLaunchSequenceAlreadyReserved
+    ) {
+      didReservePreviewLaunchSequence = !!beginPreviewLaunchSequence();
+      if (!didReservePreviewLaunchSequence) {
+        return errorResult(
+          'Could not reload the project because another MCP preview workflow is already in progress.',
+          {
+            code: 'PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS',
+            success: false,
+            reloaded: false,
+          }
+        );
+      }
+    }
+
     const persistenceState = context.getPersistenceState
       ? context.getPersistenceState()
       : null;
@@ -4595,6 +4629,10 @@ const callMcpTool = async ({
             error && error.catalogArtifact ? error.catalogArtifact : undefined,
         }
       );
+    } finally {
+      if (didReservePreviewLaunchSequence && context.endPreviewLaunchSequence) {
+        context.endPreviewLaunchSequence();
+      }
     }
   }
 

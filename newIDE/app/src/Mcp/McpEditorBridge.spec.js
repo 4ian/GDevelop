@@ -738,6 +738,8 @@ runtimeScene._instances.length;
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {
     const reportProgress = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     let currentProject: any = {
       getName: () => 'Before reload',
       getProjectFile: () => 'C:\\game\\project.gdevelop',
@@ -768,6 +770,8 @@ runtimeScene._instances.length;
         changesCount: 2,
         timeOfFirstChangeSinceLastSave: 123,
       }),
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -797,6 +801,36 @@ runtimeScene._instances.length;
     );
     expect(result.nextAction).toContain('catalogs are refreshed');
     expect(result.nextAction).toContain('launch_preview');
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects reload_project when another MCP preview workflow owns the sequence', async () => {
+    const reloadProjectAndWait: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => false);
+    const endPreviewLaunchSequence: any = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => ({
+        getName: () => 'Busy project',
+        getProjectFile: () => 'C:\\game\\project.gdevelop',
+      }),
+      reloadProjectAndWait,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.code).toBe('PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS');
+    expect(result.reloaded).toBe(false);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).not.toHaveBeenCalled();
   });
 
   it('preserves catalog subphase diagnostics when reload fails', async () => {
@@ -804,6 +838,8 @@ runtimeScene._instances.length;
     catalogError.code = 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED';
     catalogError.catalogPhase = 'catalog-settings-writing';
     catalogError.catalogArtifact = 'settings';
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     const bridge = makeBridge({
       getProject: () => ({
         getName: () => 'Catalog failure project',
@@ -812,6 +848,8 @@ runtimeScene._instances.length;
       reloadProjectAndWait: jest.fn(async () => {
         throw catalogError;
       }),
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -830,6 +868,8 @@ runtimeScene._instances.length;
         catalogArtifact: 'settings',
       })
     );
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
   });
 
   it('imports a reviewed extension with JavaScript warnings and returns generated multi-file sources', async () => {

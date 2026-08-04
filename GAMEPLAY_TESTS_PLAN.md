@@ -60,7 +60,7 @@ Non-goals for v1 (explicitly deferred, see §11):
 ```mermaid
 flowchart LR
   subgraph Backend [GDevelop-services generation-api]
-    ORCH[Orchestrator LLM<br/>toolsVersion v13]
+    ORCH[Orchestrator LLM<br/>toolsVersion v14]
     TESTER[Tester sub-agent<br/>mode: agent-tester]
     ORCH -- run_tests --> TESTER
   end
@@ -526,7 +526,7 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
   `read_game_project_json` path examples gain `tests[*]` — including `source`
   under the reader (full project JSON has it), so the orchestrator can inspect test code
   through the existing tool, per the product intent.
-- Bump `AI_ORCHESTRATOR_TOOLS_VERSION` to `'v13'` (`AiGeneration/Utils.js:104`) in the
+- Bump `AI_ORCHESTRATOR_TOOLS_VERSION` to `'v14'` (`AiGeneration/Utils.js:104`) in the
   same release train as the backend (§6).
 - Add the tool's output schema to `ScriptExecution/TypedOutputsSchemas.fixture.json`
   (checked by `TypedOutputsConformance.spec.js`).
@@ -545,13 +545,14 @@ RUN_ALL_TESTS: async (project, i18n, { commandArgs, gameplayTestRunnerDeps }) =>
 
 ## 6. Part D — Backend (GDevelop-services, generation-api)
 
-### 6.1 New tools version `v13`
+### 6.1 New tools version `v14`
 
-- `src/lib/llm-gdevelop-tools.js`: new orchestrator list entry for `v13` = the v12 list +
+- `src/lib/llm-gdevelop-tools.js`: new orchestrator list entry for `v14` = the v13 list
+  (v13 was taken by the "hidden instances / set instance variables" tooling) +
   `runTestsV1`. (Resolve the stale `// TODO: Add testGameplayV1` comment at
   line 5346.)
-- `handle.js` `choosePrompts` (line 1119): map v13 →
-  `ai-request/orchestrator/compact-system-prompt-v13.md`. Nothing else — `>= v10`
+- `handle.js` `choosePrompts` (line 1119): map v14 →
+  `ai-request/orchestrator/compact-system-prompt-v14.md`. Nothing else — `>= v10`
   already resolves `/latest`.
 
 ### 6.2 Orchestrator tool: `run_tests` (server-side)
@@ -669,12 +670,12 @@ Carried from the prior branch (commit `60ca168a`), updated for the sub-agent spl
     the orchestrator have enough context to write tests": the compact API rides the
     cacheable system prompt, exactly like `GDEVELOP_SCRIPT_API_DEFINITION` does for
     `run_script`; the full doc only exists in the tester sub-agent's context.
-- Versioned artifacts as usual (`writeVersionedFile`); post-build guard: v13 prompts must
+- Versioned artifacts as usual (`writeVersionedFile`); post-build guard: v14 prompts must
   contain the placeholder.
 
 ### 7.2 New/updated prompts
 
-- `ai-request/orchestrator/system-prompt-template-v13.md` (copy v12 +):
+- `ai-request/orchestrator/system-prompt-template-v14.md` (copy v12 +):
   - `<gameplay-testing>` section: what the tool does, WHEN to test (after completing a
     milestone/plan task with new logic; before declaring done; when the user reports a
     bug — reproduce first, fix, re-run; when asked "make my game fast" — run with
@@ -688,7 +689,7 @@ Carried from the prior branch (commit `60ca168a`), updated for the sub-agent spl
   may legitimately fail — that is a valid final result"; full harness doc; loop budget;
   wrap-up format.
 - Deprecate/ignore `pr-33` (it targets the legacy v1 prompt; its 2 useful lines are
-  subsumed by the v13 section).
+  subsumed by the v14 section).
 - e2e: add orchestrator benchmark cases where the mock editor returns canned
   `run_tests` outputs (pass, assertion-fail, script-error) and assert the
   orchestrator's next action matches the protocol.
@@ -718,7 +719,7 @@ Each phase is shippable/testable on its own; later phases depend on earlier ones
   Exit: acceptance criteria §4.6, driven manually via debugger console. ~No UI.
 - **P1 — Core model + bindings (GDevelop: C++/IDL)**: §3. Exit: §3.5.
 - **P2 — Editor UI + runner + CLI (GDevelop: newIDE)**: §5. Exit: §5.8.
-- **P3 — AI integration (services + prompts + editor v13 bump)**: §6 + §7.1–7.2 minus
+- **P3 — AI integration (services + prompts + editor v14 bump)**: §6 + §7.1–7.2 minus
   screenshots-to-model. Exit: on `starting-platformer`, the prompt "Add a double jump
   and verify it works" produces: events edit → new test persisted → run → pass, within
   one conversation, on dev stage.
@@ -762,7 +763,7 @@ validated against a manually exported preview before any Core work lands).
    origin and Electron; fall back to a `<script>` blob injection if not.
 9. **Browser throttling of background frames**: keep the overlay visible-but-small; do
    not `display:none` a running test.
-10. **Backend/editor version skew**: everything rides `toolsVersion v13` — old editors
+10. **Backend/editor version skew**: everything rides `toolsVersion v14` — old editors
     keep v12 behavior untouched (the exact mechanism that exists for this).
 
 ## 10. Lessons from the prior attempt (checklist for the implementer)

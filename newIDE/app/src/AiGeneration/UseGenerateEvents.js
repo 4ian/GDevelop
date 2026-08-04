@@ -121,7 +121,7 @@ export const useGenerateEvents = ({
 
         // Poll with exponential backoff (fast initially, capped), bounded by a
         // total time budget rather than a fixed attempt count.
-        const maxTotalWaitMs = 60000;
+        const maxTotalWaitMs = 180000;
         const maxPollIntervalMs = 5000;
         const startTime = Date.now();
         let pollIntervalMs = 1000;

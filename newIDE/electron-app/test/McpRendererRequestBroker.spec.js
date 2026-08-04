@@ -227,6 +227,137 @@ const run = async () => {
     true
   );
 
+  const previewRequests = [];
+  const previewWebContents = {
+    isDestroyed: () => false,
+    send: (channel, request) => previewRequests.push({ channel, request }),
+  };
+  const previewBroker = createMcpRendererRequestBroker({
+    getWebContents: () => previewWebContents,
+    defaultRequestTimeoutMs: 10,
+    defaultPreviewOperationTimeoutMs: 100,
+    minimumRequestTimeoutMs: 1,
+  });
+  const previewRequest = {
+    method: 'tools/call',
+    params: {
+      name: 'launch_preview',
+      arguments: { scene_name: 'Game', timeout_ms: 30000 },
+    },
+  };
+  const previewPromise = previewBroker.send(previewRequest);
+  await delay(30);
+  assert.strictEqual(previewRequests.length, 1);
+  previewBroker.handleResponse(previewWebContents, {
+    id: previewRequests[0].request.id,
+    result: toolResult({ success: true, actualScene: 'Game' }),
+  });
+  assert.strictEqual(
+    (await previewPromise).structuredContent.actualScene,
+    'Game'
+  );
+
+  const timedOutPreviewRequests = [];
+  const timedOutPreviewWebContents = {
+    isDestroyed: () => false,
+    send: (channel, request) =>
+      timedOutPreviewRequests.push({ channel, request }),
+  };
+  const timedOutPreviewBroker = createMcpRendererRequestBroker({
+    getWebContents: () => timedOutPreviewWebContents,
+    defaultPreviewOperationTimeoutMs: 10,
+    minimumRequestTimeoutMs: 1,
+  });
+  const timedOutPreviewError = await getRejectedError(
+    timedOutPreviewBroker.send(previewRequest)
+  );
+  assert.strictEqual(
+    timedOutPreviewError.data.retryAttachesToExistingOperation,
+    true
+  );
+  const attachedPreview = timedOutPreviewBroker.send(previewRequest);
+  assert.strictEqual(timedOutPreviewRequests.length, 1);
+  timedOutPreviewBroker.handleResponse(timedOutPreviewWebContents, {
+    id: timedOutPreviewRequests[0].request.id,
+    result: toolResult({ success: true, actualScene: 'Game' }),
+  });
+  assert.strictEqual(
+    (await attachedPreview).structuredContent.actualScene,
+    'Game'
+  );
+
+  const projectFilesRequests = [];
+  const projectFilesWebContents = {
+    isDestroyed: () => false,
+    send: (channel, request) => projectFilesRequests.push({ channel, request }),
+  };
+  const projectFilesBroker = createMcpRendererRequestBroker({
+    getWebContents: () => projectFilesWebContents,
+    defaultRequestTimeoutMs: 10,
+    defaultProjectFilesOperationTimeoutMs: 100,
+    minimumRequestTimeoutMs: 1,
+  });
+  const validationRequest = {
+    method: 'tools/call',
+    params: { name: 'validate_project_files', arguments: {} },
+  };
+  const firstValidationWaiter = projectFilesBroker.send(validationRequest);
+  await delay(30);
+  assert.strictEqual(projectFilesRequests.length, 1);
+  const secondValidationWaiter = projectFilesBroker.send(validationRequest);
+  assert.strictEqual(
+    projectFilesRequests.length,
+    1,
+    'an identical validation request should attach to the running operation'
+  );
+  projectFilesBroker.handleResponse(projectFilesWebContents, {
+    id: projectFilesRequests[0].request.id,
+    result: toolResult({ success: true, valid: true }),
+  });
+  const [firstValidationResult, secondValidationResult] = await Promise.all([
+    firstValidationWaiter,
+    secondValidationWaiter,
+  ]);
+  assert.strictEqual(firstValidationResult.structuredContent.valid, true);
+  assert.strictEqual(secondValidationResult.structuredContent.valid, true);
+
+  const timedOutProjectFilesRequests = [];
+  const timedOutProjectFilesWebContents = {
+    isDestroyed: () => false,
+    send: (channel, request) =>
+      timedOutProjectFilesRequests.push({ channel, request }),
+  };
+  const timedOutProjectFilesBroker = createMcpRendererRequestBroker({
+    getWebContents: () => timedOutProjectFilesWebContents,
+    defaultProjectFilesOperationTimeoutMs: 10,
+    minimumRequestTimeoutMs: 1,
+  });
+  const timedOutValidationError = await getRejectedError(
+    timedOutProjectFilesBroker.send(validationRequest)
+  );
+  assert.strictEqual(timedOutValidationError.data.operationStatus, 'running');
+  assert.strictEqual(timedOutValidationError.data.waiterDetached, true);
+  assert.strictEqual(
+    timedOutValidationError.data.underlyingOperationContinues,
+    true
+  );
+  assert.strictEqual(
+    timedOutValidationError.data.retryAttachesToExistingOperation,
+    true
+  );
+  const attachedAfterTimeout = timedOutProjectFilesBroker.send(
+    validationRequest
+  );
+  assert.strictEqual(timedOutProjectFilesRequests.length, 1);
+  timedOutProjectFilesBroker.handleResponse(timedOutProjectFilesWebContents, {
+    id: timedOutProjectFilesRequests[0].request.id,
+    result: toolResult({ success: true, valid: true }),
+  });
+  assert.strictEqual(
+    (await attachedAfterTimeout).structuredContent.valid,
+    true
+  );
+
   const coalescedFirst = broker.send(reloadRequest(100));
   const coalescedSecond = broker.send(reloadRequest(100));
   assert.strictEqual(sentRequests.length, 3);
@@ -557,6 +688,29 @@ const run = async () => {
     disconnectedError.data.reloadOperation.rendererConnectionState,
     'disconnected'
   );
+
+  const crashedRequests = [];
+  const crashedWebContents = {
+    isDestroyed: () => false,
+    getOSProcessId: () => 1357,
+    send: (channel, request) => crashedRequests.push({ channel, request }),
+  };
+  const crashedBroker = createMcpRendererRequestBroker({
+    getWebContents: () => crashedWebContents,
+    defaultRequestTimeoutMs: 100,
+  });
+  const crashedPromise = crashedBroker.send({
+    method: 'tools/call',
+    params: { name: 'gdevelop_get_editor_state', arguments: {} },
+  });
+  crashedBroker.clearFor(crashedWebContents, {
+    code: 'MCP_RENDERER_PROCESS_GONE',
+    message: 'The GDevelop editor renderer process exited (oom).',
+    rendererProcessGone: { reason: 'oom', exitCode: 0 },
+  });
+  const crashedError = await getRejectedError(crashedPromise);
+  assert.strictEqual(crashedError.data.code, 'MCP_RENDERER_PROCESS_GONE');
+  assert.strictEqual(crashedError.data.rendererProcessGone.reason, 'oom');
   activeWebContents = { isDestroyed: () => false, send: () => {} };
   const retainedDisconnectError = await getRejectedError(
     disconnectedBroker.send({

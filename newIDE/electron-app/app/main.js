@@ -141,8 +141,8 @@ const mcpRendererRequestBroker = createMcpRendererRequestBroker({
 const sendMcpRendererRequest = request =>
   mcpRendererRequestBroker.send(request);
 
-const clearPendingMcpRendererRequestsFor = webContents =>
-  mcpRendererRequestBroker.clearFor(webContents);
+const clearPendingMcpRendererRequestsFor = (webContents, disconnectDetails) =>
+  mcpRendererRequestBroker.clearFor(webContents, disconnectDetails);
 
 // Parse arguments (knowing that in dev, we run electron with an argument,
 // so have to ignore one more).
@@ -366,6 +366,7 @@ function createNewWindow(windowArgs = args) {
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
   const windowWebContents = newWindow.webContents;
+  let lastKnownRendererProcessId = null;
   const isPrimaryWindow = windowNumber === 0;
   windowArgsById[windowId] = windowArgs;
   log.info(
@@ -401,6 +402,7 @@ function createNewWindow(windowArgs = args) {
     newWindow.webContents
       .executeJavaScript('process.pid')
       .then(pid => {
+        lastKnownRendererProcessId = pid;
         log.info(
           `Window ${windowId} (window number ${windowNumber}) is running in renderer process PID: ${pid}`
         );
@@ -408,6 +410,39 @@ function createNewWindow(windowArgs = args) {
       .catch(err => {
         log.warn('Could not get renderer process PID:', err);
       });
+  });
+
+  newWindow.webContents.on('unresponsive', () => {
+    log.warn(
+      `Window ${windowId} (window number ${windowNumber}) renderer became unresponsive.`
+    );
+  });
+  newWindow.webContents.on('responsive', () => {
+    log.info(
+      `Window ${windowId} (window number ${windowNumber}) renderer became responsive again.`
+    );
+  });
+  newWindow.webContents.on('render-process-gone', (_event, details) => {
+    log.error(
+      `Window ${windowId} (window number ${windowNumber}) renderer process is gone. ` +
+        `PID: ${lastKnownRendererProcessId || 'unknown'}, reason: ${
+          details.reason
+        }, exit code: ${details.exitCode}.`
+    );
+    clearPendingMcpRendererRequestsFor(windowWebContents, {
+      code: 'MCP_RENDERER_PROCESS_GONE',
+      message: `The GDevelop editor renderer process exited (${
+        details.reason
+      }).`,
+      rendererProcessId: lastKnownRendererProcessId,
+      rendererProcessGone: {
+        reason: details.reason,
+        exitCode: details.exitCode,
+      },
+    });
+    if (mcpRendererWebContents === windowWebContents) {
+      mcpRendererWebContents = null;
+    }
   });
 
   if (isDev)

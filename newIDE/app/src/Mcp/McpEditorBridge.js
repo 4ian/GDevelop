@@ -4435,14 +4435,17 @@ const callMcpTool = async ({
         behaviorPropertySchemasByType,
       });
       const sourceTree = await readMultiFileSourceTree(projectFile);
-      const generatedJson = JSON.stringify(serializedProject, null, 2);
+      // Avoid a pretty-printed JSON string plus encodeURIComponent/unescape
+      // copies. On large 3D projects, those transient strings compete with the
+      // embedded scene renderer for the same renderer-process heap.
+      const generatedJson = JSON.stringify(serializedProject);
       const generatedGameJson = {
         reconstructedInMemory: true,
         writtenToDisk: false,
         targetPath: path
           ? path.join(path.dirname(projectFile), '.gdevelop', 'game.json')
           : undefined,
-        byteLength: unescape(encodeURIComponent(generatedJson)).length,
+        byteLength: Buffer.byteLength(generatedJson, 'utf8'),
       };
       const validation = validateSerializedProject(serializedProject, {
         include_generated_code: true,

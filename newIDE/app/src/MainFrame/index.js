@@ -328,6 +328,7 @@ import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
 import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
+  shouldHardReloadForExternallyChangedResource,
 } from '../MainFrame/ResourcesWatcher';
 import {
   type EditorCameraState,
@@ -3013,16 +3014,27 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onResourceExternallyChanged = React.useCallback(
-    () => {
+    (resourceInfo: {| identifier: string |}) => {
       console.info(
         'Resource externally changed: notifying changes to in-game editor.'
+      );
+      const shouldHardReload = shouldHardReloadForExternallyChangedResource(
+        resourceInfo.identifier
       );
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true, // A resource file might have been changed.
         shouldReloadLibraries: false,
         shouldReloadResources: true,
-        shouldHardReload: false,
-        reasons: ['resource-externally-changed'],
+        // In-place 3D model hot reload temporarily retains both the previous
+        // parsed model/live clones and the replacement. Reload the embedded
+        // game document so large animated models cannot spike the editor
+        // renderer heap and take the whole Electron UI down.
+        shouldHardReload,
+        reasons: [
+          shouldHardReload
+            ? '3d-model-resource-externally-changed'
+            : 'resource-externally-changed',
+        ],
       });
     },
     [notifyChangesToInGameEditor]

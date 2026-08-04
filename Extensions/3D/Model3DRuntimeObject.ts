@@ -359,6 +359,11 @@ namespace gdjs {
       return this._renderer;
     }
 
+    override onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.onDestroyed();
+    }
+
     /** @internal */
     hasBone(boneName: string): boolean {
       return this._renderer.hasBone(boneName);

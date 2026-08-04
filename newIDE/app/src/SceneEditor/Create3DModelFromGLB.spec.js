@@ -120,7 +120,7 @@ describe('Create3DModelFromGLB', () => {
       .replace(/\r\n/g, '\n');
 
   beforeAll(() => {
-    const translate = message => message;
+    const translate = (message) => message;
     const extension = scene3DExtensionModule.createExtension(translate, gd);
     gd.JsPlatform.get().addNewExtension(extension);
   });
@@ -231,7 +231,7 @@ describe('Create3DModelFromGLB', () => {
       files: [heroFile, notesFile],
     };
     const webUtils = {
-      getPathForFile: file =>
+      getPathForFile: (file) =>
         file === heroFile ? 'C:\\project\\Hero.glb' : 'C:\\project\\notes.txt',
     };
 
@@ -243,7 +243,7 @@ describe('Create3DModelFromGLB', () => {
   test('extracts supported GLB paths from project file drag data', () => {
     const dataTransfer = {
       types: [projectFileDragDataMimeType],
-      getData: mimeType =>
+      getData: (mimeType) =>
         mimeType === projectFileDragDataMimeType
           ? JSON.stringify({
               type: 'file',
@@ -366,9 +366,8 @@ describe('Create3DModelFromGLB', () => {
     const unloadResourceStart = model3DManagerSource.indexOf(
       'unloadResource(resourceData: ResourceData): void'
     );
-    const unloadResourceSource = model3DManagerSource.slice(
-      unloadResourceStart
-    );
+    const unloadResourceSource =
+      model3DManagerSource.slice(unloadResourceStart);
 
     expect(model3DManagerSource).toContain(
       'loadedThreeModel.scene.children.length > 0'
@@ -379,6 +378,42 @@ describe('Create3DModelFromGLB', () => {
     expect(unloadResourceSource).toContain(
       'this._loadedThreeModels.delete(resourceData)'
     );
+  });
+
+  test('disposes the current runtime before navigating for a hard reload', () => {
+    const debuggerClientSource = getDebuggerClientSource();
+    const hardReloadStart = debuggerClientSource.indexOf(
+      'launchHardReload(): void'
+    );
+    const hardReloadSource = debuggerClientSource.slice(hardReloadStart);
+    const disposeRuntimeIndex = hardReloadSource.indexOf(
+      'this._runtimegame.dispose(true)'
+    );
+    const replaceLocationIndex = hardReloadSource.indexOf(
+      'location.replace(reloadUrl)'
+    );
+
+    expect(disposeRuntimeIndex).toBeGreaterThanOrEqual(0);
+    expect(replaceLocationIndex).toBeGreaterThan(disposeRuntimeIndex);
+    expect(hardReloadSource).toContain('disposeRuntimeBeforeReload();');
+  });
+
+  test('closes browser-backed GLTF texture sources when disposing a runtime', () => {
+    const model3DManagerSource = getModel3DManagerSource();
+    const disposeStart = model3DManagerSource.indexOf('dispose(): void');
+    const disposeSource = model3DManagerSource.slice(disposeStart);
+    const disposeModelsIndex = disposeSource.indexOf(
+      'this._disposeModel(loadedThreeModel)'
+    );
+    const clearCacheIndex = disposeSource.indexOf(
+      'this._loadedThreeModels.clear()'
+    );
+
+    expect(model3DManagerSource).toContain('textureSource.close()');
+    expect(model3DManagerSource).toContain('geometry.dispose()');
+    expect(model3DManagerSource).toContain('material.dispose()');
+    expect(disposeModelsIndex).toBeGreaterThanOrEqual(0);
+    expect(clearCacheIndex).toBeGreaterThan(disposeModelsIndex);
   });
 
   test('does not warn for old Physics3D behavior data without a mesh shape resource', () => {

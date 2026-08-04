@@ -2016,6 +2016,22 @@ namespace gdjs {
     }
 
     launchHardReload(): void {
+      let hasDisposedRuntime = false;
+      const disposeRuntimeBeforeReload = () => {
+        if (hasDisposedRuntime) return;
+
+        // A hard reload is used for resources such as 3D models that can't be
+        // safely hot-reloaded in place. Explicitly dispose the current game so
+        // cloned scenes, animation mixers, resource caches and WebGL renderers
+        // don't stay alive while the next document is being loaded.
+        hasDisposedRuntime = true;
+        try {
+          this._runtimegame.dispose(true);
+        } catch (error) {
+          logger.warn('Could not dispose the game before reloading it', error);
+        }
+      };
+
       try {
         const reloadUrl = new URL(location.href);
 
@@ -2043,12 +2059,14 @@ namespace gdjs {
           'runtimeGameStatus',
           JSON.stringify(runtimeGameStatus)
         );
+        disposeRuntimeBeforeReload();
         location.replace(reloadUrl);
       } catch (error) {
         logger.error(
           'Could not reload the game with the new initial status',
           error
         );
+        disposeRuntimeBeforeReload();
         location.reload();
       }
     }

@@ -922,14 +922,26 @@ namespace gdjs {
             topLeftCellY < yPos &&
             yPos < bottomRightCellY
           ) {
-            objectsOnCell = true;
-            if (this._closeObstacles[k].isImpassable()) {
-              //The cell is impassable, stop here.
-              newNode.cost = -1;
+            let hasAnyHitBoxInCell = false;
+            for (const _hitbox of obj.getHitBoxesAround(
+              nodeCenterX - this._cellWidth / 2,
+              nodeCenterY - this._cellHeight / 2,
+              nodeCenterX + this._cellWidth / 2 - 1,
+              nodeCenterY + this._cellHeight / 2 - 1
+            )) {
+              hasAnyHitBoxInCell = true;
               break;
-            } else {
-              //Superimpose obstacles
-              newNode.cost += this._closeObstacles[k].getCost();
+            }
+            if (hasAnyHitBoxInCell) {
+              objectsOnCell = true;
+              if (this._closeObstacles[k].isImpassable()) {
+                //The cell is impassable, stop here.
+                newNode.cost = -1;
+                break;
+              } else {
+                //Superimpose obstacles
+                newNode.cost += this._closeObstacles[k].getCost();
+              }
             }
           }
         }

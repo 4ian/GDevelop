@@ -179,6 +179,10 @@ class GD_CORE_API ValueTypeMetadata {
     return type == "scenevar" || type == "globalvar" || type == "objectvar";
   }
 
+  static bool IsTypeObjectVariable(const gd::String &type) {
+    return type == "objectvar";
+  }
+
   /**
    * \brief Return true if the type is representing one object
    * (or more, i.e: an object group).

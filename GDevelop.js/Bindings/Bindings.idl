@@ -3233,6 +3233,7 @@ interface ExpressionValidator {
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const] DOMString rootType,
+        [Const] DOMString rootObjectName,
         [Const] DOMString extraInfo);
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();

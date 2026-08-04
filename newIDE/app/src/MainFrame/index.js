@@ -160,6 +160,7 @@ import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtensio
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import CommandsContextWindowProvider from '../CommandPalette/CommandsWindowContext';
 import {
   type ImportExtension,
   type SaveProject,
@@ -5661,49 +5662,55 @@ const MainFrame = (props: Props): React.MixedElement => {
       {// Render games platform frame before the editors, so the editor have priority
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <LeaderboardProvider
-        gameId={currentProject ? currentProject.getProjectUuid() : ''}
-      >
-        {renderNpmScriptConfirmDialog()}
-        <PanesContainer
-          hasEditorsInLeftPane={hasEditorsInLeftPane}
-          hasEditorsInRightPane={hasEditorsInRightPane}
-          onRequestDrawerClose={requestCloseAskAiDrawerInPane}
-          renderPane={({
-            paneIdentifier,
-            isLeftMostPane,
-            isRightMostPane,
-            isDrawer,
-            areSidePanesDrawers,
-            onSetPointerEventsNone,
-            onSetPaneDrawerState,
-            onRequestPaneClose,
-            drawerState,
-            rightPaneDrawerOpen,
-          }) => (
-            <EditorTabsPane
-              {...editorTabsPaneProps}
-              paneIdentifier={paneIdentifier}
-              isLeftMostPane={isLeftMostPane}
-              isRightMostPane={isRightMostPane}
-              isDrawer={isDrawer}
-              areSidePanesDrawers={areSidePanesDrawers}
-              onSetPointerEventsNone={onSetPointerEventsNone}
-              onSetPaneDrawerState={onSetPaneDrawerState}
-              onPopOutTab={onPopOutTab}
-              onRequestPaneClose={onRequestPaneClose}
-              drawerState={drawerState}
-              rightPaneDrawerOpen={rightPaneDrawerOpen}
-            />
-          )}
-        />
-      </LeaderboardProvider>
       <PoppedOutWindows
         {...editorTabsPaneProps}
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}
       />
-      <CommandPalette ref={commandPaletteRef} />
+      {/* Editors of the main window register their commands in their own
+      command manager, so that they stay separated from the ones of the popped
+      out windows (rendered above, outside of this provider): a keyboard
+      shortcut must always run the command of the window where it was pressed. */}
+      <CommandsContextWindowProvider>
+        <LeaderboardProvider
+          gameId={currentProject ? currentProject.getProjectUuid() : ''}
+        >
+          {renderNpmScriptConfirmDialog()}
+          <PanesContainer
+            hasEditorsInLeftPane={hasEditorsInLeftPane}
+            hasEditorsInRightPane={hasEditorsInRightPane}
+            onRequestDrawerClose={requestCloseAskAiDrawerInPane}
+            renderPane={({
+              paneIdentifier,
+              isLeftMostPane,
+              isRightMostPane,
+              isDrawer,
+              areSidePanesDrawers,
+              onSetPointerEventsNone,
+              onSetPaneDrawerState,
+              onRequestPaneClose,
+              drawerState,
+              rightPaneDrawerOpen,
+            }) => (
+              <EditorTabsPane
+                {...editorTabsPaneProps}
+                paneIdentifier={paneIdentifier}
+                isLeftMostPane={isLeftMostPane}
+                isRightMostPane={isRightMostPane}
+                isDrawer={isDrawer}
+                areSidePanesDrawers={areSidePanesDrawers}
+                onSetPointerEventsNone={onSetPointerEventsNone}
+                onSetPaneDrawerState={onSetPaneDrawerState}
+                onPopOutTab={onPopOutTab}
+                onRequestPaneClose={onRequestPaneClose}
+                drawerState={drawerState}
+                rightPaneDrawerOpen={rightPaneDrawerOpen}
+              />
+            )}
+          />
+        </LeaderboardProvider>
+        <CommandPalette ref={commandPaletteRef} />
+      </CommandsContextWindowProvider>
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

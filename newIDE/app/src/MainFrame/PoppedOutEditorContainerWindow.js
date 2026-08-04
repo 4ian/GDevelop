@@ -77,7 +77,10 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   // Register keyboard shortcuts in the external window.
   useKeyboardShortcuts({
     targetDocument: externalWindowDocument || undefined,
-    previewDebuggerServer: props.previewDebuggerServer,
+    // Shortcuts pressed in the in-game editor are handled by the main window
+    // (where the in-game editor is displayed): don't listen to them here, or
+    // they would be run once per window.
+    previewDebuggerServer: null,
     ignoreHandledByElectron: true,
     onRunCommand: React.useCallback(commandName => {
       if (commandName === 'OPEN_COMMAND_PALETTE') {

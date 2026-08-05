@@ -9,10 +9,13 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import GenericExpressionField from './GenericExpressionField';
 import { renderInlineDefaultField } from './DefaultField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
-import {
-  rgbStringAndAlphaToRGBColor,
-  rgbColorToHex,
-} from '../../Utils/ColorTransformer';
+import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
+
+const inlineColorPickerStyle = {
+  width: 'var(--icon-size)',
+  height: 'var(--icon-size)',
+  verticalAlign: 'sub',
+};
 
 let wasSwatchClicked = false;
 
@@ -81,16 +84,15 @@ export const renderInlineColor = (
   return (
     <>
       {renderInlineDefaultField(props)}{' '}
-      <span
-        className="icon"
-        style={{
-          display: 'inline-block',
-          borderRadius: 2,
-          border: '1px solid rgba(128, 128, 128, 0.5)',
-          backgroundColor: rgbColorToHex(rgbColor.r, rgbColor.g, rgbColor.b),
-        }}
-        onClick={() => (wasSwatchClicked = true)}
-      />
+      <span onClick={() => (wasSwatchClicked = true)}>
+        <ColorPicker
+          size="compact"
+          disableAlpha
+          readOnly
+          color={rgbColor}
+          style={inlineColorPickerStyle}
+        />
+      </span>
     </>
   );
 };

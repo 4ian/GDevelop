@@ -22,9 +22,17 @@ type Props = {|
   onChange?: ColorChangeHandler,
   onChangeComplete?: ColorChangeHandler,
   disableAlpha?: boolean,
+  /**
+   * Prevent opening the picker and dim the swatch.
+   */
   disabled?: boolean,
   size?: 'compact',
   initiallyOpen?: boolean,
+  /**
+   * Prevent opening the picker, but keep the swatch fully visible: use this
+   * when the color is only previewed and edited from somewhere else.
+   */
+  readOnly?: boolean,
 |};
 
 const styles = {
@@ -47,6 +55,9 @@ const styles = {
     opacity: 0.2,
     cursor: 'default',
   },
+  readOnly: {
+    cursor: 'inherit',
+  },
   popover: {
     // Ensure the popover is above everything (modal, dialog, snackbar, tooltips, etc).
     // There will be only one ColorPicker opened at a time, so it's fair to put the
@@ -64,17 +75,18 @@ const ColorPicker = ({
   disabled,
   size,
   initiallyOpen,
+  readOnly,
 }: Props): React.Node => {
   const [swatchElement, setSwatchElement] = React.useState<?HTMLDivElement>(
     null
   );
   const [displayColorPicker, setDisplayColorPicker] = React.useState(
-    !!initiallyOpen && !disabled
+    !!initiallyOpen && !disabled && !readOnly
   );
   const portalContainer = React.useContext(PortalContainerContext);
 
   const handleClick = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setDisplayColorPicker(!displayColorPicker);
   };
 
@@ -114,6 +126,7 @@ const ColorPicker = ({
         style={{
           ...styles.swatch,
           ...(disabled ? styles.disabled : {}),
+          ...(readOnly ? styles.readOnly : {}),
           width: size === 'compact' ? 16 : 38,
           height: size === 'compact' ? 16 : 18,
           ...style,

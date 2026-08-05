@@ -155,7 +155,9 @@ namespace gdjs {
         for (const character of this.characters) {
           this.rebuildCharacterAgent(character);
         }
-        this.debuggerRenderer.renderFor3D();
+        if (this.debuggerRenderer) {
+          this.debuggerRenderer.renderFor3D();
+        }
       }
       this.isNavMeshDirty = false;
     }

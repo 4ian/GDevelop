@@ -38,8 +38,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -236,16 +235,6 @@ namespace gdjs {
         y,
         z
       );
-
-      // Path found: memorize it
-      const path = this._agent.corners();
-      for (const point of path) {
-        const y = point.y;
-        point.y = point.z;
-        point.z = y;
-      }
-      console.log('path', path.length);
-      this._path = path;
       if (this._pathFound) {
         this._reachedEnd = false;
       }
@@ -261,19 +250,31 @@ namespace gdjs {
         return;
       }
 
+      // Path found: memorize it
+      // We can't get the agent path before a first step, so we do it here.
+      if (this._path.length === 0 && agent.raw.ncorners > 0) {
+        const path = agent.corners();
+        path.push(agent.target());
+        for (const point of path) {
+          const y = point.y;
+          point.y = point.z;
+          point.z = y;
+        }
+        this._path = path;
+        console.log('path', this._path);
+
+        console.log(
+          'Destination',
+          this.getDestinationX(),
+          this.getDestinationY()
+        );
+      }
+
       const oldX = this.owner.getX();
       const oldY = this.owner.getY();
-      const newPosition = agent.position();
-      const newX = newPosition.x;
-      const newY = newPosition.z;
-      const newZ = newPosition.y;
-      this.owner.setX(newX);
-      this.owner.setY(newY);
-      //@ts-ignore
-      if (this.owner.setZ) {
-        //@ts-ignore
-        this.owner.setZ(newZ);
-      }
+      let newX = agent.raw.get_npos(0);
+      let newY = agent.raw.get_npos(2);
+      let newZ = agent.raw.get_npos(1);
 
       //console.log("newZ", newZ);
 
@@ -288,6 +289,27 @@ namespace gdjs {
         this.owner.getAngle() !== this._movementAngle + this._angleOffset
       ) {
         this.rotateTowardAngle(this._movementAngle + this._angleOffset);
+      }
+
+      const destinationX = this.getDestinationX();
+      const destinationY = this.getDestinationY();
+      const destinationZ = this.getDestinationZ();
+      if (
+        Math.abs(newX - destinationX) < 0.5 &&
+        Math.abs(newY - destinationY) < 0.5 &&
+        //@ts-ignore
+        (!this.owner.getZ || Math.abs(newZ - destinationZ) < 0.5)
+      ) {
+        this._reachedEnd = true;
+        agent.resetMoveTarget();
+        console.log('Reached end');
+      }
+      this.owner.setX(newX);
+      this.owner.setY(newY);
+      //@ts-ignore
+      if (this.owner.setZ) {
+        //@ts-ignore
+        this.owner.setZ(newZ);
       }
     }
 
@@ -428,14 +450,21 @@ namespace gdjs {
 
     getNodeX(index: integer): float {
       if (index < this._path.length) {
-        return this._path[index][0];
+        return this._path[index].x;
       }
       return 0;
     }
 
     getNodeY(index: integer): float {
       if (index < this._path.length) {
-        return this._path[index][1];
+        return this._path[index].y;
+      }
+      return 0;
+    }
+
+    getNodeZ(index: integer): float {
+      if (index < this._path.length) {
+        return this._path[index].z;
       }
       return 0;
     }
@@ -470,6 +499,14 @@ namespace gdjs {
       return this._path[nextNodeIndex].y;
     }
 
+    getNextNodeZ(): float {
+      if (this._path.length === 0) {
+        return 0;
+      }
+      const nextNodeIndex = this.getNextNodeIndex();
+      return this._path[nextNodeIndex].z;
+    }
+
     getPreviousNodeIndex() {
       if (!this._agent) {
         return 0;
@@ -496,18 +533,33 @@ namespace gdjs {
       return this._path[previousNodeIndex].y;
     }
 
+    getLastNodeZ(): float {
+      if (this._path.length < 2) {
+        return 0;
+      }
+      const previousNodeIndex = this.getPreviousNodeIndex();
+      return this._path[previousNodeIndex].z;
+    }
+
     getDestinationX(): float {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path[this._path.length - 1][0];
+      return this._path[this._path.length - 1].x;
     }
 
     getDestinationY(): float {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path[this._path.length - 1][1];
+      return this._path[this._path.length - 1].y;
+    }
+
+    getDestinationZ(): float {
+      if (this._path.length === 0) {
+        return 0;
+      }
+      return this._path[this._path.length - 1].z;
     }
 
     /**

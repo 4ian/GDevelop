@@ -335,6 +335,34 @@ module.exports = {
         .addParameter('expression', _('Destination Y position'))
         .addParameter('expression', _('Destination Z position'))
         .setFunctionName('moveTo');
+
+      aut
+        .addCondition(
+          'PathFound',
+          _('Path found'),
+          _('Check if a path has been found.'),
+          _('A path has been found for _PARAM0_'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('pathFound');
+
+      aut
+        .addCondition(
+          'DestinationReached',
+          _('Destination reached'),
+          _('Check if the destination was reached.'),
+          _('_PARAM0_ reached its destination'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('destinationReached');
     }
     {
       const behavior = new gd.BehaviorJsImplementation();

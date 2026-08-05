@@ -1476,13 +1476,26 @@ namespace gdjs {
       currentlyRunningHarness = harness;
       harness._onProgress = onProgress || null;
 
+      // The source must be the BODY of `async (harness) => { ... }`, but
+      // AI models (and users pasting code) sometimes send the whole function
+      // instead. Evaluated as-is it would be a no-op expression: detect the
+      // wrapper and call it instead.
+      let source = payload.source;
+      if (
+        /^\s*(?:async\s*)?(?:\(\s*harness\s*(?:,\s*console\s*)?\)|harness)\s*=>/.test(
+          source
+        )
+      ) {
+        source = 'return (\n' + source + '\n)(harness, console);';
+      }
+
       // Compile the script first, so a syntax error is reported cleanly.
       let scriptFunction: Function;
       try {
         scriptFunction = new Function(
           'harness',
           'console',
-          '"use strict"; return (async () => {\n' + payload.source + '\n})();'
+          '"use strict"; return (async () => {\n' + source + '\n})();'
         );
       } catch (error) {
         currentlyRunningHarness = null;
@@ -1592,10 +1605,23 @@ namespace gdjs {
         const hasFailedAssertion = harness._assertions.some(
           (assertion) => !assertion.passed
         );
-        result = harness._makeResult(
-          hasFailedAssertion ? 'failed' : 'passed',
-          []
-        );
+        if (
+          !hasFailedAssertion &&
+          harness._framesExecuted === 0 &&
+          harness._assertions.length === 0
+        ) {
+          // A "passed" run that stepped no frame and asserted nothing is a
+          // no-op script, not a passing test: never report a false green.
+          result = harness._makeResult('error', [
+            'The test completed without stepping a single frame nor making any assertion — it did nothing. ' +
+              'The test source must be the BODY of `async (harness) => { ... }` (statements starting with `await harness...`), not a function definition.',
+          ]);
+        } else {
+          result = harness._makeResult(
+            hasFailedAssertion ? 'failed' : 'passed',
+            []
+          );
+        }
       } catch (error) {
         // (No type annotation on `error`: this file must stay parseable by
         // the older TypeScript bundled in the Monaco editor, which reads it

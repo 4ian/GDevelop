@@ -116,6 +116,39 @@ describe('gdjs.gameplayTests', () => {
     expect(result.errors[0]).to.contain('could not be parsed');
   });
 
+  it('auto-unwraps a source wrapped in `async (harness) => {...}` and runs it', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `async (harness) => {
+        await harness.goToScene('Scene 1');
+        await harness.stepFrames(3);
+        harness.assert(harness.getSceneName() === 'Scene 1', 'Scene is running');
+      }`
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.framesExecuted).to.be(4); // 1 (goToScene) + 3.
+    expect(result.assertions.length).to.be(1);
+  });
+
+  it('reports a no-op script (no frame stepped, no assertion) as an error', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      // A function definition that is never called: without the guard, this
+      // would complete instantly and be reported as a false "passed".
+      `const runIt = async () => {
+        await harness.stepFrames(5);
+        harness.assert(true, 'Never reached');
+      };`
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.framesExecuted).to.be(0);
+    expect(result.errors[0]).to.contain('did nothing');
+  });
+
   it('stops with a timeout when the maximum frames count is reached', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

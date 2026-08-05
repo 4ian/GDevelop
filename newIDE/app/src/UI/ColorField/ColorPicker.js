@@ -125,8 +125,7 @@ const ColorPicker = ({
       <div
         style={{
           ...styles.swatch,
-          ...(disabled ? styles.disabled : {}),
-          ...(readOnly ? styles.readOnly : {}),
+          ...(disabled ? styles.disabled : readOnly ? styles.readOnly : {}),
           width: size === 'compact' ? 16 : 38,
           height: size === 'compact' ? 16 : 18,
           ...style,

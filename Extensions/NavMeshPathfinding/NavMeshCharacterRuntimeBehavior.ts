@@ -38,7 +38,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -431,7 +432,7 @@ namespace gdjs {
         point.y = point.z;
         point.z = y;
       }
-      console.log('path', path);
+      console.log('path', path.length);
       this._path = path;
       if (this._pathFound) {
         this._reachedEnd = false;
@@ -462,10 +463,12 @@ namespace gdjs {
         this.owner.setZ(newZ);
       }
 
+      //console.log("newZ", newZ);
+
       // Avoid to frequently change of direction when not moving much.
       const deltaX = newX - oldX;
       const deltaY = newY - oldY;
-      if (Math.abs(deltaX) + Math.abs(deltaY) > 1) {
+      if (Math.abs(deltaX) + Math.abs(deltaY) > this.getMaxSpeed() / 100) {
         this._movementAngle = gdjs.toDegrees(Math.atan2(deltaY, deltaX));
       }
       if (

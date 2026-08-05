@@ -54,6 +54,7 @@ namespace gdjs {
     isFirstFrame = true;
     crowd: RecastNav.Crowd | null = null;
     hasStepped = false;
+    debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
@@ -124,6 +125,7 @@ namespace gdjs {
       if (!this.is3D && positions.length > 0) {
         this.addGroundFor2D(positions, indices);
         this.navMeshConfig.walkableClimb = 0;
+        this.navMeshConfig.ch = 10;
       }
 
       let characterRadiusMax = 0;
@@ -154,8 +156,18 @@ namespace gdjs {
         for (const character of this.characters) {
           this.rebuildCharacterAgent(character);
         }
+        this.debuggerRenderer.renderFor3D();
       }
       this.isNavMeshDirty = false;
+    }
+
+    setDebugDrawEnabled(enableDebugDraw: boolean): void {
+      if (!this.debuggerRenderer) {
+        this.debuggerRenderer = new gdjs.NavMeshDebuggerRenderer(this);
+        this.debuggerRenderer.registerFor2D();
+      }
+      this.debuggerRenderer.setEnabled(enableDebugDraw);
+      this.debuggerRenderer.renderFor3D();
     }
 
     private addGroundFor2D(
@@ -503,6 +515,26 @@ namespace gdjs {
     removeCharacter(character: NavMeshCharacterRuntimeBehavior) {
       this.characters.delete(character);
     }
+  }
+
+  /** @category Behaviors > 2D Pathfinding */
+  export namespace NavMeshObstaclesManager {
+    /**
+     * Enable or disable the debug draw.
+     * @param instanceContainer The current container.
+     * @param enableDebugDraw true to enable the debug draw, false to disable it.
+     */
+    export const enableDebugDraw = function (
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      enableDebugDraw: boolean
+    ) {
+      if (enableDebugDraw) {
+        instanceContainer._debugDrawEnabled = true;
+      }
+      const manager =
+        gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
+      manager.setDebugDrawEnabled(enableDebugDraw);
+    };
   }
 
   /**

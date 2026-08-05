@@ -159,7 +159,9 @@ module.exports = {
 
         behaviorProperties
           .getOrCreate('avoidanceSightRange')
-          .setValue(behaviorContent.getChild('avoidanceSightRange').getStringValue())
+          .setValue(
+            behaviorContent.getChild('avoidanceSightRange').getStringValue()
+          )
           .setLabel(_('Avoidance sight range'))
           .setGroup(_('Collision'))
           .setType('Number')
@@ -260,11 +262,18 @@ module.exports = {
         sharedProperties
           .getOrCreate('walkableRadius')
           .setLabel(_('Walkable radius'))
-          .setDescription(_('The biggest character radius is automatically used when left negative.'))
+          .setDescription(
+            _(
+              'The biggest character radius is automatically used when left negative.'
+            )
+          )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
-            sharedContent.getChild('walkableRadius').getDoubleValue().toString(10)
+            sharedContent
+              .getChild('walkableRadius')
+              .getDoubleValue()
+              .toString(10)
           )
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
@@ -430,6 +439,34 @@ module.exports = {
           'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
         );
     }
+
+    extension
+      .addAction(
+        'EnableDebugDraw',
+        _('Draw pathfinding walkable area'),
+        _('This activates the display of the walkable area (in blue).'),
+        _('Enable debugging view of pathfinding: _PARAM1_'),
+        '',
+        'res/actions/planicon24.png',
+        'res/actions/planicon.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Enable debug draw'), '', true)
+      .getCodeExtraInformation()
+      .addIncludeFile(
+        'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'
+      )
+      .addIncludeFile('Extensions/NavMeshPathfinding/recast-navigation.wasm.js')
+      .addIncludeFile(
+        'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
+      )
+      .addIncludeFile(
+        'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
+      )
+      .addIncludeFile(
+        'Extensions/NavMeshPathfinding/NavMeshDebugPixiRenderer.js'
+      )
+      .setFunctionName('gdjs.NavMeshObstaclesManager.enableDebugDraw');
 
     return extension;
   },

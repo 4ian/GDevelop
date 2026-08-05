@@ -74,6 +74,7 @@ import {
   type GameplayTestTreeViewItemCallbacks,
 } from './GameplayTestTreeViewItemContent';
 import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
+import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
@@ -1316,43 +1317,48 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   );
                 },
               },
-              {
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  gameplayTestsRootFolderId,
-                  i18n._(t`Gameplay tests`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Add a gameplay test`),
-                    click: () => {
-                      const index = project.getTests().getTestsCount() - 1;
-                      addGameplayTest(index, i18n);
-                    },
-                    id: 'add-new-gameplay-test-button',
-                  }
-                ),
-                getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                  if (project.getTests().getTestsCount() === 0) {
-                    return [
-                      new PlaceHolderTreeViewItem(
-                        gameplayTestsEmptyPlaceholderId,
-                        i18n._(t`Start by adding a new gameplay test.`)
+              ...(areGameplayTestsEnabled()
+                ? [
+                    {
+                      isRoot: true,
+                      content: new LabelTreeViewItemContent(
+                        gameplayTestsRootFolderId,
+                        i18n._(t`Gameplay tests`),
+                        {
+                          icon: <Add />,
+                          label: i18n._(t`Add a gameplay test`),
+                          click: () => {
+                            const index =
+                              project.getTests().getTestsCount() - 1;
+                            addGameplayTest(index, i18n);
+                          },
+                          id: 'add-new-gameplay-test-button',
+                        }
                       ),
-                    ];
-                  }
-                  return mapFor(
-                    0,
-                    project.getTests().getTestsCount(),
-                    i =>
-                      new LeafTreeViewItem(
-                        new GameplayTestTreeViewItemContent(
-                          project.getTests().getTestAt(i),
-                          gameplayTestTreeViewItemProps
-                        )
-                      )
-                  );
-                },
-              },
+                      getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                        if (project.getTests().getTestsCount() === 0) {
+                          return [
+                            new PlaceHolderTreeViewItem(
+                              gameplayTestsEmptyPlaceholderId,
+                              i18n._(t`Start by adding a new gameplay test.`)
+                            ),
+                          ];
+                        }
+                        return mapFor(
+                          0,
+                          project.getTests().getTestsCount(),
+                          i =>
+                            new LeafTreeViewItem(
+                              new GameplayTestTreeViewItemContent(
+                                project.getTests().getTestAt(i),
+                                gameplayTestTreeViewItemProps
+                              )
+                            )
+                        );
+                      },
+                    },
+                  ]
+                : []),
             ];
       },
       [
@@ -1430,7 +1436,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       extensionsRootFolderId,
       externalEventsRootFolderId,
       externalLayoutsRootFolderId,
-      gameplayTestsRootFolderId,
+      ...(areGameplayTestsEnabled() ? [gameplayTestsRootFolderId] : []),
     ];
 
     const [

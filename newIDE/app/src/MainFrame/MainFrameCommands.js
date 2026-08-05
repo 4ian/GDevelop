@@ -12,6 +12,7 @@ import {
   enumerateEventsFunctionsExtensions,
   enumerateGameplayTests,
 } from '../ProjectManager/EnumerateProjectItems';
+import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { type FileMetadata } from '../ProjectsStorage';
 
 type Item =
@@ -228,7 +229,9 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  useCommandWithOptions('OPEN_GAMEPLAY_TEST', !!handlers.project, {
+  const gameplayTestCommandsEnabled =
+    !!handlers.project && areGameplayTestsEnabled();
+  useCommandWithOptions('OPEN_GAMEPLAY_TEST', gameplayTestCommandsEnabled, {
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -241,7 +244,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   const { onRunGameplayTest } = handlers;
-  useCommandWithOptions('RUN_GAMEPLAY_TEST', !!handlers.project, {
+  useCommandWithOptions('RUN_GAMEPLAY_TEST', gameplayTestCommandsEnabled, {
     generateOptions: React.useCallback(
       () =>
         generateProjectItemOptions(
@@ -255,7 +258,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  useCommand('RUN_ALL_GAMEPLAY_TESTS', !!handlers.project, {
+  useCommand('RUN_ALL_GAMEPLAY_TESTS', gameplayTestCommandsEnabled, {
     handler: handlers.onRunAllGameplayTests,
   });
 

@@ -629,16 +629,29 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   // Allow gameplay tests to be run from anywhere in the editor (test editor,
   // project manager, command palette, CLI, AI function calls).
+  //
+  // Registered ONCE (empty dependency list), reading the latest values through
+  // refs: re-registering on every render would leave the registry null during
+  // each commit's effects flush (all cleanups run first, then child effects
+  // run BEFORE this component's) — and the AI function calls processor is a
+  // child effect that synchronously starts a test run, so it would always see
+  // "no editor registered".
+  const unsavedChangesRef = React.useRef(unsavedChanges);
+  React.useEffect(() => {
+    unsavedChangesRef.current = unsavedChanges;
+  });
   React.useEffect(() => {
     registerGameplayTestRunnerDependencies({
       getPreviewLauncher: () => _previewLauncher.current,
       onTestsRunFinished: () => {
         // The last run summary of tests was updated on the project.
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+        const currentUnsavedChanges = unsavedChangesRef.current;
+        if (currentUnsavedChanges)
+          currentUnsavedChanges.triggerUnsavedChanges();
       },
     });
     return () => registerGameplayTestRunnerDependencies(null);
-  });
+  }, []);
   const {
     hasUnsavedChanges,
     sealUnsavedChanges,

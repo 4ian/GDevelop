@@ -22,6 +22,21 @@ if (!branch) {
 const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/${branch}/${
   commitHash ? 'commit/' + commitHash : 'latest'
 }`;
+
+if (!commitHash) {
+  shell.echo(
+    '⚠️ No --commitHash was given: artifacts will be downloaded from "latest".'
+  );
+  shell.echo(
+    '⚠️ This is risky because "latest" is updated independently for each platform as its build finishes.'
+  );
+  shell.echo(
+    '⚠️ If a build is still running, has failed, or was retried for one platform, you may end up mixing artifacts'
+  );
+  shell.echo(
+    '⚠️ coming from different commits. Pass --commitHash to download a consistent set of artifacts for a single commit.'
+  );
+}
 const version = args['version'];
 if (!version) {
   shell.echo(
@@ -38,7 +53,9 @@ if (!version) {
 // - The size in bytes of the file.
 
 shell.echo(
-  `⚠️ This will download the latest artifacts built for ${branch} for version ${version}. Please ensure the CI finished building everything before continuing.`
+  commitHash
+    ? `ℹ️ This will download the artifacts built for ${branch} at commit ${commitHash} for version ${version}. The script will fail if any artifact is not found for this commit.`
+    : `⚠️ This will download the latest artifacts built for ${branch} for version ${version}. Please ensure the CI finished building everything before continuing.`
 );
 
 const artifactsToDownload = {
@@ -107,7 +124,7 @@ const artifactsToDownload = {
   shell.mkdir('-p', outputPath);
 
   await Promise.all(
-    Object.keys(artifactsToDownload).map(async key => {
+    Object.keys(artifactsToDownload).map(async (key) => {
       const { url, outputFilename } = artifactsToDownload[key];
 
       shell.echo(
@@ -119,7 +136,23 @@ const artifactsToDownload = {
           `ℹ️ Done downloading ${key} artifact (${url}) to ${outputFilename}...`
         );
       } catch (error) {
-        shell.echo(`❌ Error while downloading ${key} artifact. Aborting.`);
+        const status = error && error.response && error.response.status;
+        if (status === 403 || status === 404) {
+          // S3 returns 403 (access denied) or 404 for objects that don't exist.
+          shell.echo(
+            `❌ ${key} artifact was not found (${url}).${
+              commitHash
+                ? ` Make sure the build for commit ${commitHash} finished successfully for all platforms.`
+                : ''
+            } Aborting.`
+          );
+        } else {
+          shell.echo(
+            `❌ Error while downloading ${key} artifact (${url}): ${
+              (error && error.message) || error
+            }. Aborting.`
+          );
+        }
         shell.exit(2);
       }
     })

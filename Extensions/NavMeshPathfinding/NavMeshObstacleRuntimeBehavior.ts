@@ -45,8 +45,7 @@ namespace gdjs {
       walkableHeight: 10,
       detailSampleMaxError: 50,
       walkableClimb: 2,
-      // TODO
-      walkableRadius: 5,
+      walkableRadius: 1,
     };
     walkableRadius: float = -1;
     timeSinceLastNavMeshLastRebuild: float = 1;

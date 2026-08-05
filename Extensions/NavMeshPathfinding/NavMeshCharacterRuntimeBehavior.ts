@@ -192,6 +192,150 @@ namespace gdjs {
       this._manager.removeCharacter(this);
     }
 
+    /**
+     * Compute and move on the path to the specified destination.
+     */
+    moveTo(x: float, y: float, z: float) {
+      this._path = [];
+      this._manager.rebuildNavMeshIfNeeded();
+      if (!this._manager.navMesh) {
+        console.log("Can't build the nav mesh");
+        this._pathFound = false;
+        return;
+      }
+
+      // Start searching for a path
+      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
+
+      const { success: hasFindDestination, point: destination } =
+        navMeshQuery.findClosestPoint(
+          { x, y: z, z: y },
+          { halfExtents: { x: 100, y: 100, z: 100 } }
+        );
+      if (!hasFindDestination) {
+        this._pathFound = false;
+        console.log("Can't find destination", x, y, z);
+        return;
+      }
+
+      if (!this._agent) {
+        console.log('No agent');
+        this._pathFound = false;
+        return;
+      }
+      this._pathFound = this._agent.requestMoveTarget(destination);
+      console.log(
+        'hasFindPath',
+        this._pathFound,
+        this.owner.x,
+        this.owner.y,
+        //@ts-ignore
+        this.owner.getZ ? this.owner.getZ() : 0,
+        ' -> ',
+        x,
+        y,
+        z
+      );
+
+      // Path found: memorize it
+      const path = this._agent.corners();
+      for (const point of path) {
+        const y = point.y;
+        point.y = point.z;
+        point.z = y;
+      }
+      console.log('path', path.length);
+      this._path = path;
+      if (this._pathFound) {
+        this._reachedEnd = false;
+      }
+    }
+
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+      // The wrapper interpolation seems bugged, so we don't use it.
+      this._manager.step(timeDelta);
+
+      const agent = this._agent;
+      if (!agent) {
+        return;
+      }
+
+      const oldX = this.owner.getX();
+      const oldY = this.owner.getY();
+      const newPosition = agent.position();
+      const newX = newPosition.x;
+      const newY = newPosition.z;
+      const newZ = newPosition.y;
+      this.owner.setX(newX);
+      this.owner.setY(newY);
+      //@ts-ignore
+      if (this.owner.setZ) {
+        //@ts-ignore
+        this.owner.setZ(newZ);
+      }
+
+      //console.log("newZ", newZ);
+
+      // Avoid to frequently change of direction when not moving much.
+      const deltaX = newX - oldX;
+      const deltaY = newY - oldY;
+      if (Math.abs(deltaX) + Math.abs(deltaY) > this.getMaxSpeed() / 100) {
+        this._movementAngle = gdjs.toDegrees(Math.atan2(deltaY, deltaX));
+      }
+      if (
+        this._rotateObject &&
+        this.owner.getAngle() !== this._movementAngle + this._angleOffset
+      ) {
+        this.rotateTowardAngle(this._movementAngle + this._angleOffset);
+      }
+    }
+
+    /**
+     * @param angle The targeted angle.
+     * @param speed The rotation speed. 0 for an immediate rotation to the target angle.
+     */
+    private rotateTowardAngle(angle: float): void {
+      const angularDiff = gdjs.evtTools.common.angleDifference(
+        this.owner.getAngle(),
+        angle
+      );
+      const diffWasPositive = angularDiff >= 0;
+
+      const timeDelta = this.owner.getElapsedTime() / 1000;
+      this._angularSpeed =
+        (diffWasPositive ? -1.0 : 1.0) * this._angularMaxSpeed;
+      // Always rotate the right way.
+      // if (this._angularSpeed > 0 !== diffWasPositive) {
+      //   this._angularSpeed = 0;
+      // }
+      // this._angularSpeed = gdjs.evtTools.common.clamp(
+      //   this._angularSpeed +
+      //     (diffWasPositive ? -1.0 : 1.0) *
+      //       this._angularAcceleration *
+      //       timeDelta,
+      //   -this._angularMaxSpeed,
+      //   this._angularMaxSpeed
+      // );
+
+      let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
+
+      if (
+        // @ts-ignore
+        (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0) ^
+        diffWasPositive
+      ) {
+        newAngle = angle;
+      }
+      this.owner.setAngle(newAngle);
+    }
+
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
+      this._manager.hasStepped = false;
+    }
+
     getRadius(): float {
       return (
         this._radius ||
@@ -378,150 +522,6 @@ namespace gdjs {
      */
     destinationReached() {
       return this._reachedEnd;
-    }
-
-    /**
-     * Compute and move on the path to the specified destination.
-     */
-    moveTo(x: float, y: float, z: float) {
-      this._path = [];
-      this._manager.rebuildNavMeshIfNeeded();
-      if (!this._manager.navMesh) {
-        console.log("Can't build the nav mesh");
-        this._pathFound = false;
-        return;
-      }
-
-      // Start searching for a path
-      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
-
-      const { success: hasFindDestination, point: destination } =
-        navMeshQuery.findClosestPoint(
-          { x, y: z, z: y },
-          { halfExtents: { x: 100, y: 100, z: 100 } }
-        );
-      if (!hasFindDestination) {
-        this._pathFound = false;
-        console.log("Can't find destination", x, y, z);
-        return;
-      }
-
-      if (!this._agent) {
-        console.log('No agent');
-        this._pathFound = false;
-        return;
-      }
-      this._pathFound = this._agent.requestMoveTarget(destination);
-      console.log(
-        'hasFindPath',
-        this._pathFound,
-        this.owner.x,
-        this.owner.y,
-        //@ts-ignore
-        this.owner.getZ ? this.owner.getZ() : 0,
-        ' -> ',
-        x,
-        y,
-        z
-      );
-
-      // Path found: memorize it
-      const path = this._agent.corners();
-      for (const point of path) {
-        const y = point.y;
-        point.y = point.z;
-        point.z = y;
-      }
-      console.log('path', path.length);
-      this._path = path;
-      if (this._pathFound) {
-        this._reachedEnd = false;
-      }
-    }
-
-    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      // The wrapper interpolation seems bugged, so we don't use it.
-      this._manager.step(timeDelta);
-
-      const agent = this._agent;
-      if (!agent) {
-        return;
-      }
-
-      const oldX = this.owner.getX();
-      const oldY = this.owner.getY();
-      const newPosition = agent.position();
-      const newX = newPosition.x;
-      const newY = newPosition.z;
-      const newZ = newPosition.y;
-      this.owner.setX(newX);
-      this.owner.setY(newY);
-      //@ts-ignore
-      if (this.owner.setZ) {
-        //@ts-ignore
-        this.owner.setZ(newZ);
-      }
-
-      //console.log("newZ", newZ);
-
-      // Avoid to frequently change of direction when not moving much.
-      const deltaX = newX - oldX;
-      const deltaY = newY - oldY;
-      if (Math.abs(deltaX) + Math.abs(deltaY) > this.getMaxSpeed() / 100) {
-        this._movementAngle = gdjs.toDegrees(Math.atan2(deltaY, deltaX));
-      }
-      if (
-        this._rotateObject &&
-        this.owner.getAngle() !== this._movementAngle + this._angleOffset
-      ) {
-        this.rotateTowardAngle(this._movementAngle + this._angleOffset);
-      }
-    }
-
-    /**
-     * @param angle The targeted angle.
-     * @param speed The rotation speed. 0 for an immediate rotation to the target angle.
-     */
-    private rotateTowardAngle(angle: float): void {
-      const angularDiff = gdjs.evtTools.common.angleDifference(
-        this.owner.getAngle(),
-        angle
-      );
-      const diffWasPositive = angularDiff >= 0;
-
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      this._angularSpeed =
-        (diffWasPositive ? -1.0 : 1.0) * this._angularMaxSpeed;
-      // Always rotate the right way.
-      // if (this._angularSpeed > 0 !== diffWasPositive) {
-      //   this._angularSpeed = 0;
-      // }
-      // this._angularSpeed = gdjs.evtTools.common.clamp(
-      //   this._angularSpeed +
-      //     (diffWasPositive ? -1.0 : 1.0) *
-      //       this._angularAcceleration *
-      //       timeDelta,
-      //   -this._angularMaxSpeed,
-      //   this._angularMaxSpeed
-      // );
-
-      let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
-
-      if (
-        // @ts-ignore
-        (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0) ^
-        diffWasPositive
-      ) {
-        newAngle = angle;
-      }
-      this.owner.setAngle(newAngle);
-    }
-
-    override doStepPostEvents(
-      instanceContainer: gdjs.RuntimeInstanceContainer
-    ) {
-      this._manager.hasStepped = false;
     }
   }
   gdjs.registerBehavior(

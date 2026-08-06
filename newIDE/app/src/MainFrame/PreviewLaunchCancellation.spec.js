@@ -1,8 +1,41 @@
 // @flow
 
-import { canReleaseCancelledPreviewPreparation } from './PreviewLaunchCancellation';
+import {
+  beginPreviewFileWriting,
+  canReleaseCancelledPreviewPreparation,
+} from './PreviewLaunchCancellation';
 
 describe('PreviewLaunchCancellation', () => {
+  it('does not let a released, cancelled launcher start writing preview files', () => {
+    let beginWritingCallCount = 0;
+    const onBeginWriting = () => {
+      beginWritingCallCount++;
+    };
+
+    expect(
+      beginPreviewFileWriting({
+        isLaunchCancelled: () => true,
+        onBeginWriting,
+      })
+    ).toBe(false);
+    expect(beginWritingCallCount).toBe(0);
+  });
+
+  it('marks an active launcher as writing at the file-write boundary', () => {
+    let beginWritingCallCount = 0;
+    const onBeginWriting = () => {
+      beginWritingCallCount++;
+    };
+
+    expect(
+      beginPreviewFileWriting({
+        isLaunchCancelled: () => false,
+        onBeginWriting,
+      })
+    ).toBe(true);
+    expect(beginWritingCallCount).toBe(1);
+  });
+
   it('allows a cancelled preparation to release a stale launch lock', () => {
     expect(
       canReleaseCancelledPreviewPreparation({

@@ -80,6 +80,19 @@ export type PreviewOptions = {|
   inGameEditorSettings: InGameEditorSettings | null,
   numberOfWindows: number,
 
+  /**
+   * Returns true when this launch no longer owns the preview pipeline. Launchers
+   * must check it after asynchronous setup and before touching the project.
+   */
+  isLaunchCancelled: () => boolean,
+
+  /**
+   * Called immediately before the launcher starts writing preview files.
+   * Returning false means the launch was cancelled while the launcher was
+   * preparing and must stop without touching the shared preview output.
+   */
+  onWillWritePreviewFiles: () => boolean,
+
   // Only for the web-app:
   previewWindows: Array<WindowProxy> | null,
 |};

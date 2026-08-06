@@ -146,6 +146,14 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
     const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const closePreparedPreviewWindows = () => {
+      if (!previewWindows) return;
+      previewWindows.forEach(previewWindow => {
+        try {
+          previewWindow.close();
+        } catch (error) {}
+      });
+    };
 
     try {
       await this.getPreviewDebuggerServer().startServer({
@@ -168,6 +176,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       } = await prepareExporter({
         isForInGameEdition: previewOptions.isForInGameEdition,
       });
+      if (previewOptions.isLaunchCancelled()) {
+        closePreparedPreviewWindows();
+        exporter.delete();
+        return;
+      }
 
       const previewExportOptions = new gd.PreviewExportOptions(
         project,
@@ -293,6 +306,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       console.log(
         `[BrowserSWPreviewLauncher] Exporting project for preview #${previewId}...`
       );
+      if (!previewOptions.onWillWritePreviewFiles()) {
+        closePreparedPreviewWindows();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
       const exportSuccessful = exporter.exportProjectForPixiPreview(
         previewExportOptions
       );
@@ -301,13 +320,7 @@ export default class BrowserSWPreviewLauncher extends React.Component<
           project.getWholeProjectDiagnosticReport()
         )
       ) {
-        if (previewWindows) {
-          previewWindows.forEach(previewWindow => {
-            try {
-              previewWindow.close();
-            } catch (error) {}
-          });
-        }
+        closePreparedPreviewWindows();
         this.props.onInvalidConstantPlaceholder();
         previewExportOptions.delete();
         exporter.delete();
@@ -327,6 +340,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         `[BrowserSWPreviewLauncher] Storing preview files in IndexedDB for preview #${previewId}...`
       );
       await browserSWFileSystem.applyPendingOperations();
+      if (previewOptions.isLaunchCancelled()) {
+        closePreparedPreviewWindows();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
 
       if (previewOptions.isForInGameEdition) {
         setEmbeddedGameFramePreviewLocation({

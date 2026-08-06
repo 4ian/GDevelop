@@ -293,6 +293,10 @@ export default class LocalPreviewLauncher extends React.Component<
         isForInGameEdition: previewOptions.isForInGameEdition,
       }
     );
+    if (previewOptions.isLaunchCancelled()) {
+      exporter.delete();
+      return;
+    }
 
     var previewStartTime = performance.now();
 
@@ -429,6 +433,12 @@ export default class LocalPreviewLauncher extends React.Component<
       previewExportOptions.setInGameEditorSettingsJson(
         JSON.stringify(previewOptions.inGameEditorSettings)
       );
+    }
+
+    if (!previewOptions.onWillWritePreviewFiles()) {
+      exporter.delete();
+      previewExportOptions.delete();
+      return;
     }
 
     const exportSuccessful = exporter.exportProjectForPixiPreview(

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { type State } from './MainFrameState';
 import {
+  beginPreviewFileWriting,
   canReleaseCancelledPreviewPreparation,
   type PreviewLaunchPhase,
 } from './PreviewLaunchCancellation';
@@ -1296,6 +1297,38 @@ const MainFrame = (props: Props): React.MixedElement => {
     [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
   );
 
+  const resetPreviewLaunchStateForProjectChange = React.useCallback(
+    (reason: string) => {
+      const previewLaunchId = activePreviewLaunchIdRef.current;
+      if (previewLaunchId != null || previewLaunchInProgressRef.current) {
+        console.warn(
+          'Resetting preview launch state' +
+            (previewLaunchId == null
+              ? ''
+              : ' for launch #' + previewLaunchId) +
+            ' because ' +
+            reason +
+            '.'
+        );
+      }
+
+      // Changing projects is a hard ownership boundary. Any launcher that was
+      // awaiting asynchronous preparation now sees a mismatched active id and
+      // exits at its cancellation/file-write gates before touching the new
+      // project or its preview output.
+      activePreviewLaunchIdRef.current = null;
+      setPreviewLaunchInProgress(false);
+      previewLaunchPhaseRef.current = 'idle';
+      activePreviewLaunchKindRef.current = null;
+      inGameEditionPreviewLaunchInProgressRef.current = false;
+      cancelledPreviewLaunchIdsRef.current.clear();
+      if (previewLoadingRef.current) {
+        setPreviewLoading(null);
+      }
+    },
+    [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
+  );
+
   const getPreviewLaunchStateForMcp = React.useCallback(
     () => {
       const isMcpPreviewLaunchInProgress =
@@ -1830,6 +1863,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
       };
       reportProgress('old-project-closing-previews');
+      resetPreviewLaunchStateForProjectChange(
+        'the project was closed or replaced'
+      );
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
 
@@ -1893,6 +1929,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     [
       previewDebuggerServer,
+      resetPreviewLaunchStateForProjectChange,
       currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
@@ -3823,7 +3860,6 @@ const MainFrame = (props: Props): React.MixedElement => {
               inAppTutorialOrchestratorRef.current.getPreviewMessage() ||
               inAppTutorialMessageInPreview;
           }
-          previewLaunchPhaseRef.current = 'launching';
           await previewLauncher.launchPreview({
             project: projectForPreview,
             sceneName: sceneName || projectForPreview.getLayoutAt(0).getName(),
@@ -3875,6 +3911,23 @@ const MainFrame = (props: Props): React.MixedElement => {
               inAppTutorialMessageInPreview.position,
             captureOptions,
             onCaptureFinished,
+
+            isLaunchCancelled: () =>
+              isPreviewLaunchCancelled(previewLaunchId),
+
+            // Preview launchers can do asynchronous setup before they start
+            // writing the shared preview output. Keep the launch in the
+            // releasable "preparing" phase until this exact boundary. If a
+            // cancelled setup is released in the meantime, the stale launcher
+            // must stop here instead of racing a newer launch's file writes.
+            onWillWritePreviewFiles: () =>
+              beginPreviewFileWriting({
+                isLaunchCancelled: () =>
+                  isPreviewLaunchCancelled(previewLaunchId),
+                onBeginWriting: () => {
+                  previewLaunchPhaseRef.current = 'launching';
+                },
+              }),
 
             previewWindows,
           });

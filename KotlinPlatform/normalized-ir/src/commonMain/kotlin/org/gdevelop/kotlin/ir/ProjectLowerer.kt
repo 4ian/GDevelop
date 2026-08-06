@@ -90,6 +90,7 @@ class ProjectLowerer(private val catalog: ExtensionCatalog) {
             return false
         }
         operation.parameters.zip(descriptors).forEachIndexed { index, (value, descriptor) ->
+            val number = value.toDoubleOrNull()
             val valid = when (descriptor.type) {
                 "number" -> value.toDoubleOrNull() != null
                 "boolean" -> value == "true" || value == "false"
@@ -100,6 +101,19 @@ class ProjectLowerer(private val catalog: ExtensionCatalog) {
                 diagnostics += Diagnostic(
                     "GDKP_SEM_PARAMETER_TYPE", Severity.ERROR,
                     "Parameter $index (${descriptor.name}) must be ${descriptor.type}", operation.location,
+                )
+                return false
+            }
+            val coordinateRange = when (descriptor.name) {
+                "longitude", "west", "east" -> -180.0..180.0
+                "latitude", "south", "north" -> -90.0..90.0
+                else -> null
+            }
+            if (coordinateRange != null && (number == null || !number.isFinite() || number !in coordinateRange)) {
+                diagnostics += Diagnostic(
+                    "GDKP_SEM_COORDINATE_RANGE", Severity.ERROR,
+                    "Parameter $index (${descriptor.name}) is outside ${coordinateRange.start}..${coordinateRange.endInclusive}",
+                    operation.location,
                 )
                 return false
             }

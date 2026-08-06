@@ -1,0 +1,39 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::SetCamera"
+              },
+              "parameters": [
+                "0",
+                "0",
+                "1",
+                "0"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "unsupported-headless-capability",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "target": "jvm-headless",
+      "diagnostic": "GDKP_RUNTIME_UNSUPPORTED_CAPABILITY"
+    }
+  }
+}

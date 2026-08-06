@@ -582,3 +582,19 @@ Any request to add a target feature before its gate must identify which metric i
 improves and must not add platform types to common APIs. Unsupported features are
 tracked as capability/catalog gaps with source-located diagnostics, rather than
 TODO branches that silently change behavior.
+
+### Experimental MapTiles Kotlin/JS host slice
+
+A narrow Phase 4 Mode B experiment now defines portable map contracts and a
+MapLibre Kotlin/JS adapter. Focused fixtures cover camera lowering, markers,
+deterministic fake-host projection, bounded animation, click ordering,
+diagnostics, and geographic edges. Common conformance uses a fake `MapHost`;
+JS-host conformance is tracked separately for listener cleanup, projection
+conversion, camera-command mapping, resize forwarding, and error translation.
+No check uses live network tiles as its oracle; future browser automation must
+use a local fixed style and fixture tiles.
+
+This is an experimental Kotlin/JS capability only. It does not establish general
+GDevelop compatibility, renderer parity, JVM map rendering, or cross-target map
+support. JVM/headless runtimes must expose the unsupported capability rather than
+silently accepting map operations.

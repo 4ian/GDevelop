@@ -17,4 +17,5 @@ kotlin {
 	sourceSets.commonMain.dependencies {
 		api(project(":extension-catalog"))
 	}
+	sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
 }

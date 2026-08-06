@@ -1,0 +1,41 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::Project"
+              },
+              "parameters": [
+                "10",
+                "20",
+                "projectedX",
+                "projectedY"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "geo-to-screen-fake-host",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "fakeProjection": {
+        "x": 1020,
+        "y": 2010
+      }
+    }
+  }
+}

@@ -94,8 +94,9 @@ class MapOverlayAnimationRuntime(
         val elapsed = (now - old.startedAtGameTimeMillis).coerceAtLeast(0).coerceAtMost(old.durationMillis)
         val progress = if (old.durationMillis == 0L) 1.0 else elapsed.toDouble() / old.durationMillis
         val eased = ease(old.easing, progress)
+        val longitudeDelta = shortestLongitudeDelta(old.start.longitude, old.end.longitude)
         val coordinate = GeoCoordinate(
-            old.start.longitude + (old.end.longitude - old.start.longitude) * eased,
+            wrapLongitude(old.start.longitude + longitudeDelta * eased),
             old.start.latitude + (old.end.latitude - old.start.latitude) * eased,
         )
         val status = if (elapsed == old.durationMillis) MapOverlayAnimationStatus.COMPLETED else MapOverlayAnimationStatus.RUNNING
@@ -106,6 +107,21 @@ class MapOverlayAnimationRuntime(
             trace(MapAnimationTraceRecord.Completed("overlay", overlayId = id))
         return next
     }
+}
+
+private fun shortestLongitudeDelta(start: Double, end: Double): Double {
+    val direct = end - start
+    return when {
+        direct > 180.0 -> direct - 360.0
+        direct < -180.0 -> direct + 360.0
+        else -> direct
+    }
+}
+
+private fun wrapLongitude(value: Double): Double = when {
+    value > 180.0 -> value - 360.0
+    value < -180.0 -> value + 360.0
+    else -> value
 }
 
 private fun ease(easing: MapAnimationEasing, value: Double): Double = when (easing) {

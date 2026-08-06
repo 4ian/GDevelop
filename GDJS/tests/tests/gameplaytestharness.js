@@ -383,6 +383,55 @@ describe('gdjs.gameplayTests', () => {
     ).to.be(true);
   });
 
+  it('records a sceneReset event when the same scene is restarted', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      // Restart the same scene: objects are back to their initial state.
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      harness.assert(true, 'done');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const sceneEvents = result.eventLog.filter(
+      (event) => event.event === 'sceneChanged' || event.event === 'sceneReset'
+    );
+    expect(sceneEvents.length).to.be(2);
+    expect(sceneEvents[0].event).to.be('sceneChanged');
+    expect(sceneEvents[0].sceneName).to.be('Scene 1');
+    expect(sceneEvents[1].event).to.be('sceneReset');
+    expect(sceneEvents[1].sceneName).to.be('Scene 1');
+  });
+
+  it('records a sceneChanged event when another scene replaces the current one', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      await harness.goToScene('Scene 2');
+      await harness.stepFrames(2);
+      harness.assert(true, 'done');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    const sceneEvents = result.eventLog.filter(
+      (event) => event.event === 'sceneChanged' || event.event === 'sceneReset'
+    );
+    expect(sceneEvents.length).to.be(2);
+    expect(sceneEvents[0].event).to.be('sceneChanged');
+    expect(sceneEvents[0].sceneName).to.be('Scene 1');
+    expect(sceneEvents[1].event).to.be('sceneChanged');
+    expect(sceneEvents[1].sceneName).to.be('Scene 2');
+  });
+
   it('supports stepUntil with a condition', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

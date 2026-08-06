@@ -84,7 +84,13 @@ namespace gdjs {
 
     export type GameplayTestEvent = {
       frame: integer;
-      event: 'spawned' | 'removed' | 'stuck' | 'sceneChanged';
+      /**
+       * `sceneReset` is recorded when the running scene was replaced by a NEW
+       * instance of the same scene: objects are back to their initial state.
+       * Legitimate when the game restarts the level; a symptom of external
+       * interference otherwise.
+       */
+      event: 'spawned' | 'removed' | 'stuck' | 'sceneChanged' | 'sceneReset';
       object?: string;
       count?: integer;
       sceneName?: string;
@@ -371,6 +377,10 @@ namespace gdjs {
       _totalStepTimeMs: number = 0;
       _worstStepTimeMs: number = 0;
       _lastTrackedSceneName: string | null = null;
+      /** The scene instance itself is tracked (not only its name) so a
+       * replacement by a new instance of the SAME scene is detected too
+       * (recorded as a `sceneReset` event). */
+      _lastTrackedScene: gdjs.RuntimeScene | null = null;
       _lastTrackedObjectCounts: { [objectName: string]: integer } = {};
       _pointerLockRequestedByGame: boolean = false;
       _onProgress: ((frame: integer) => void) | null = null;
@@ -480,12 +490,19 @@ namespace gdjs {
           .getSceneStack()
           .getCurrentScene();
         const sceneName = currentScene ? currentScene.getName() : '';
-        if (sceneName !== this._lastTrackedSceneName) {
+        if (currentScene !== this._lastTrackedScene) {
           this._recordEvent({
             frame: this._framesExecuted,
-            event: 'sceneChanged',
+            // A new instance of the SAME scene means the scene was restarted
+            // (all objects back to their initial state): record it as a
+            // `sceneReset` so it never goes unnoticed in the event log.
+            event:
+              sceneName === this._lastTrackedSceneName
+                ? 'sceneReset'
+                : 'sceneChanged',
             sceneName,
           });
+          this._lastTrackedScene = currentScene;
           this._lastTrackedSceneName = sceneName;
           this._lastTrackedObjectCounts = this._getObjectCounts();
           return;

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "map": {
+    "styleUrl": "",
+    "center": [-73.9857, 40.7484],
+    "zoom": 11.0,
+    "attribution": "Supply the attribution required by your configured style or TileJSON provider"
+  },
+  "overlays": [
+    {
+      "id": "guide",
+      "longitude": -73.9857,
+      "latitude": 40.7484,
+      "label": "Select me, then run the sample flow",
+      "icon": "🚀",
+      "minimumZoom": 3.0,
+      "maximumZoom": 20.0,
+      "visible": true
+    }
+  ],
+  "operations": [
+    { "event": "documentLoaded", "action": "select", "markerId": "guide" },
+    { "event": "runSample", "action": "flyTo", "markerId": "guide", "durationMs": 1200 },
+    { "event": "runSample", "action": "animateMarker", "markerId": "guide", "longitude": -73.9757, "latitude": 40.7584, "durationMs": 1800 }
+  ]
+}

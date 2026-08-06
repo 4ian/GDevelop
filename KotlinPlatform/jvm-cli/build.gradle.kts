@@ -4,14 +4,15 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(libs.versions.toolchain.get().toInt())
     jvm()
     sourceSets.jvmMain.dependencies {
         implementation(project(":project-model"))
         implementation(project(":normalized-ir"))
         implementation(project(":runtime-state"))
         implementation(project(":example-extension"))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+//        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+        implementation(libs.kotlinx.serialization.json)
     }
     sourceSets.jvmTest.dependencies { implementation(kotlin("test")) }
 }

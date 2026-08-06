@@ -1,0 +1,7 @@
+{
+  "gdVersion": "5.5.0-prototype-fixture",
+  "firstLayout": "Main",
+  "objects": [{ "name": "Player", "type": "Sprite" }],
+  "variables": [],
+  "layouts": [{ "name": "Main", "variables": [], "objects": [], "instances": [], "events": [] }]
+}

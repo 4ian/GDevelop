@@ -93,6 +93,7 @@ type McpEditorBridgeContext = {|
   // replaces and deletes the native gdProject, so a callback captured before
   // reload must not be reused by a later verify_project_change stage.
   getLaunchPreviewForScene?: () => ?(sceneName: ?string) => mixed,
+  cancelPreviewLaunch?: (reason: string) => mixed,
   getPreviewLaunchState?: () => Object,
   beginPreviewLaunchSequence?: () => boolean,
   endPreviewLaunchSequence?: () => void,
@@ -3406,6 +3407,7 @@ const launchPreview = async (
   options?: {|
     getProject?: ?() => ?gdProject,
     launchPreviewForScene?: ?(sceneName: ?string) => mixed,
+    cancelPreviewLaunch?: ?(reason: string) => mixed,
   |}
 ): Promise<Object> => {
   if (typeof runCommand !== 'function') {
@@ -3428,6 +3430,10 @@ const launchPreview = async (
   const launchPreviewForScene =
     options && typeof options.launchPreviewForScene === 'function'
       ? options.launchPreviewForScene
+      : null;
+  const cancelPreviewLaunch =
+    options && typeof options.cancelPreviewLaunch === 'function'
+      ? options.cancelPreviewLaunch
       : null;
   const project = getProject ? getProject() : null;
   const sceneResolution = resolveExpectedPreviewScene(project, args);
@@ -3470,7 +3476,7 @@ const launchPreview = async (
   });
   // Launch the preview using the scene-aware launcher when available, falling
   // back to the legacy command which previews the editor's active tab.
-  const runLaunchCommand = async (): Promise<boolean> => {
+  const runLaunchCommandWithoutTimeout = async (): Promise<boolean> => {
     launchFailureDetails = null;
     if (launchPreviewForScene) {
       try {
@@ -3496,6 +3502,40 @@ const launchPreview = async (
       }
     }
     return runCommand('LAUNCH_DEBUG_PREVIEW');
+  };
+  const runLaunchCommand = async (): Promise<boolean> => {
+    let didTimeOut = false;
+    let timeoutId: any = null;
+    const didRun = await Promise.race([
+      runLaunchCommandWithoutTimeout(),
+      new Promise(resolve => {
+        timeoutId = setTimeout(() => {
+          didTimeOut = true;
+          resolve(false);
+        }, timeoutMs);
+      }),
+    ]);
+    if (timeoutId !== null) clearTimeout(timeoutId);
+    if (!didTimeOut) return !!didRun;
+
+    let cancellation = null;
+    if (cancelPreviewLaunch) {
+      try {
+        cancellation = await cancelPreviewLaunch(
+          `the MCP preview launch command did not settle within ${timeoutMs} ms`
+        );
+      } catch (error) {
+        cancellation = {
+          error: error && error.message ? error.message : String(error),
+        };
+      }
+    }
+    launchFailureDetails = {
+      reason: 'preview-launch-command-timeout',
+      timeoutMs,
+      cancellation: cancellation || undefined,
+    };
+    return false;
   };
 
   if (!forceNew && previewDebuggerServer) {
@@ -5093,6 +5133,7 @@ const callMcpTool = async ({
         {
           getProject: context.getProject,
           launchPreviewForScene,
+          cancelPreviewLaunch: context.cancelPreviewLaunch,
         }
       );
       return textResult(result);

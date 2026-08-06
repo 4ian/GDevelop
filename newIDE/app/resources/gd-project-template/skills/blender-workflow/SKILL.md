@@ -1,6 +1,6 @@
 ---
 name: blender-workflow
-description: Create, inspect, prepare, optimize, animate, convert, merge, export, and verify Blender 3D assets for GDevelop through Blender Foundation's official Blender MCP server. Use for Blender-to-GDevelop workflows, `.blend` scene work, glTF/GLB export, `.gltf`-to-`.glb` conversion, same-rig GLB animation merging, material or transform cleanup, collision preparation, and diagnosing imported 3D assets in GDevelop.
+description: Create, inspect, prepare, optimize, animate, convert, merge, export, and verify Blender 3D assets for GDevelop through Blender Foundation's official Blender MCP server. Use for Blender-to-GDevelop workflows, `.blend` scene work, glTF/GLB export, `.fbx`-to-`.glb` or `.gltf`-to-`.glb` conversion, same-rig GLB animation merging, material or transform cleanup, collision preparation, and diagnosing imported 3D assets in GDevelop.
 ---
 
 # Blender Workflow
@@ -45,6 +45,7 @@ When the task also changes GDevelop project sources, read [the GDevelop project-
 
 Use the bundled scripts directly for supported jobs; do not rewrite their logic in an ad hoc script.
 
+- Use [scripts/convert_fbx_to_glb.py](scripts/convert_fbx_to_glb.py) for one-file or batch `.fbx` to `.glb` conversion. FBX animation import and GLB action export are enabled by default, and the script verifies the GLB container plus animation count before replacing the destination. Use `--input` with `--output` for one file, or `--input` with `--output-dir` for a directory; add `--recursive` for nested inputs, `--require-animations` when an animation-less result must fail, and `--overwrite` only for an approved replacement. Bone-orientation flags change the imported skeleton and must be used only when the source rig requires them. Require the returned summary to report `success: true` and zero failures.
 - Use [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py) for one-file or batch `.gltf` to `.glb` conversion. Use `--input` with `--output` for one file, or `--output-dir` for a directory; add `--recursive` for nested inputs and `--overwrite` only for an approved replacement. Require the returned summary to report `success: true` and zero failures.
 - Use [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py) to embed animations from a GLB into a character GLB that uses the same skeleton. Supply `--character`, `--animations`, and `--output`; repeat `--action` to select clips. Keep strict compatibility checking unless the user explicitly accepts a weaker check. This performs direct action reuse, not retargeting; stop and use a real retargeting workflow when rigs differ.
 - Use [scripts/bake_material_textures.py](scripts/bake_material_textures.py) for repeatable image-space material preparation. Supply a version-1 JSON recipe containing one or more jobs. Each job may color-adjust a base texture while preserving alpha, derive a normal map from height, and optionally wire the verified outputs into a glTF-compatible Principled material. Use `--apply-materials` only on a task-owned `.blend`; add `--pack-images` when the generated images must travel with it, and use `--save-blend` to persist to a new path. The script deliberately does not perform geometry/cage, ambient-occlusion, or high-to-low projection bakes.
@@ -58,12 +59,17 @@ Send code shaped like this to `execute_blender_code_for_cli`, using the selected
 ```python
 import runpy
 
-tool = runpy.run_path(r"ABSOLUTE_PATH_TO_SCRIPT")
+tool = runpy.run_path(r"ABSOLUTE_PATH_TO_SCRIPTS\convert_fbx_to_glb.py")
 result = tool["run_with_arguments"]([
-    "--input", r"ABSOLUTE_INPUT_PATH",
-    "--output", r"ABSOLUTE_OUTPUT_PATH",
+    "--input", r"ABSOLUTE_INPUT_PATH\character.fbx",
+    "--output", r"ABSOLUTE_TASK_OWNED_OUTPUT\character.glb",
+    "--require-animations",
 ])
 ```
+
+For a recursive FBX batch, replace `--output` with `--output-dir` and add
+`--recursive`. Animations remain enabled unless `--no-animations` is passed
+explicitly.
 
 Generate a temporary output first and inspect it through the official MCP before replacing an existing project asset.
 

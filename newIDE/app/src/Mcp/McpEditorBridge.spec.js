@@ -2246,6 +2246,58 @@ runtimeScene._instances.length;
     project.delete();
   });
 
+  it('launch_preview cancels a scene-aware launch command that never settles', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('main', 0);
+    project.setFirstLayout('main');
+
+    const launchPreviewForScene = jest.fn(() => new Promise(() => {}));
+    const cancelPreviewLaunch = jest.fn(() => ({
+      cancelled: true,
+      releasedMcpLaunchReservation: true,
+      releasedPreviewPreparation: true,
+    }));
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: jest.fn(() => () => {}),
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene,
+      cancelPreviewLaunch,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 500 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.launched).toBe(false);
+    expect(result.failurePhase).toBe('window-launch');
+    expect(result.error).toContain('preview-launch-command-timeout');
+    expect(result.launchFailureDetails.timeoutMs).toBe(500);
+    expect(result.launchFailureDetails.cancellation).toEqual(
+      expect.objectContaining({
+        releasedMcpLaunchReservation: true,
+        releasedPreviewPreparation: true,
+      })
+    );
+    expect(cancelPreviewLaunch).toHaveBeenCalledTimes(1);
+    expect(cancelPreviewLaunch.mock.calls[0][0]).toContain('500 ms');
+
+    project.delete();
+  });
+
   it('launch_preview honors an explicit scene_name', async () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('main', 0);

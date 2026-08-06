@@ -4803,6 +4803,31 @@ const MainFrame = (props: Props): React.MixedElement => {
     ]
   );
 
+  const cancelPreviewLaunchForMcp = React.useCallback(
+    (reason: string) => {
+      cancelPendingPreviewLaunchAfterWindowClosed(reason);
+      const releasedPreviewPreparation = releaseCancelledPreviewPreparation(
+        reason
+      );
+      // launchPreviewForScene normally clears this in its finally block. MCP
+      // also needs a way to release its reservation when an underlying editor
+      // or preview preparation promise never settles.
+      setMcpPreviewLaunchInProgress(false);
+      return {
+        cancelled: true,
+        releasedMcpLaunchReservation: true,
+        releasedPreviewPreparation,
+        launchState: getPreviewLaunchStateForMcp(),
+      };
+    },
+    [
+      cancelPendingPreviewLaunchAfterWindowClosed,
+      getPreviewLaunchStateForMcp,
+      releaseCancelledPreviewPreparation,
+      setMcpPreviewLaunchInProgress,
+    ]
+  );
+
   const openInstructionOrExpression = (
     extension: gdPlatformExtension,
     type: string
@@ -7906,6 +7931,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         beginPreviewLaunchSequence: beginMcpPreviewLaunchSequence,
         endPreviewLaunchSequence: endMcpPreviewLaunchSequence,
         getLaunchPreviewForScene: () => launchPreviewForSceneRef.current,
+        cancelPreviewLaunch: cancelPreviewLaunchForMcp,
         reloadProjectAndWait: async reportProgress => {
           if (!currentFileMetadata) {
             return {
@@ -8093,6 +8119,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       endMcpPreviewLaunchSequence,
       cancelPendingPreviewLaunchAfterWindowClosed,
       releaseCancelledPreviewPreparation,
+      cancelPreviewLaunchForMcp,
       launchPreviewForSceneRef,
       getMcpEditorSelection,
       generateEvents,

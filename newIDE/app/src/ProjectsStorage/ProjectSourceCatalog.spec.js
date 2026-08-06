@@ -11,6 +11,7 @@ import {
   validateProjectSettingsCatalog,
 } from './ProjectSourceCatalog';
 import { insertNewEventsBasedBehavior } from '../EventsFunctionsList/CreateEventsBasedBehavior';
+import { insertNewEventsBasedObject } from '../EventsFunctionsList/CreateEventsBasedObject';
 import { reloadProjectEventsFunctionsExtensionMetadata } from '../EventsFunctionsExtensionsLoader';
 import { serializeToJSObject } from '../Utils/Serializer';
 
@@ -180,6 +181,104 @@ describe('project source catalogs', () => {
     project.delete();
   });
 
+  test('generates recursive serialized configuration schemas for every object type', () => {
+    // $FlowFixMe[cannot-resolve-module] The extension is loaded by the app in production.
+    const scene3DExtensionModule = require('../../../../Extensions/3D/JsExtension');
+    const platform = gd.JsPlatform.get();
+    const wasScene3DExtensionLoaded = platform.isExtensionLoaded('Scene3D');
+    if (!wasScene3DExtensionLoaded) {
+      const scene3DExtension = scene3DExtensionModule.createExtension(
+        message => message,
+        gd
+      );
+      platform.addNewExtension(scene3DExtension);
+      scene3DExtension.delete();
+    }
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    try {
+      const serializedProject = serializeToJSObject(project, 'serializeTo');
+
+      const catalog = buildProjectSettingsCatalog({
+        project,
+        serializedProject,
+      });
+
+      expect(
+        catalog.objectTypes.every(
+          objectType =>
+            Array.isArray(objectType.properties) &&
+            objectType.schema &&
+            Array.isArray(objectType.schema.rootFields) &&
+            Array.isArray(objectType.schema.childTables)
+        )
+      ).toBe(true);
+      const model3DObject = catalog.objectTypes.find(
+        objectType => objectType.type === 'Scene3D::Model3DObject'
+      );
+      expect(model3DObject).toBeDefined();
+      expect(model3DObject.properties).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            authoringKey: 'modelResourceName',
+            serializedPath: 'content.modelResourceName',
+          }),
+        ])
+      );
+      const contentTable = model3DObject.schema.childTables.find(
+        table => table.table === 'content'
+      );
+      expect(contentTable).toBeDefined();
+      expect(contentTable.fields).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'width', type: 'integer' }),
+          expect.objectContaining({
+            name: 'modelResourceName',
+            type: 'string',
+          }),
+        ])
+      );
+      expect(contentTable.childTables).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            table: 'content.sharedAnimationModelResources',
+            header: '[[content.sharedAnimationModelResources]]',
+            repeated: true,
+            fields: [
+              expect.objectContaining({ name: 'resourceName', type: 'string' }),
+            ],
+          }),
+          expect.objectContaining({
+            table: 'content.animations',
+            header: '[[content.animations]]',
+            repeated: true,
+            fields: expect.arrayContaining([
+              expect.objectContaining({ name: 'name', type: 'string' }),
+              expect.objectContaining({ name: 'source', type: 'string' }),
+              expect.objectContaining({
+                name: 'sourceModelResourceName',
+                type: 'string',
+              }),
+              expect.objectContaining({ name: 'loop', type: 'boolean' }),
+            ]),
+          }),
+        ])
+      );
+      expect(JSON.stringify(model3DObject)).not.toContain(
+        '__gdevelop_catalog_'
+      );
+      expect(serializeProjectSettingsCatalog(catalog)).toContain(
+        '[[content.sharedAnimationModelResources]]'
+      );
+      expect(
+        catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
+          .schema.dynamicFields.schema
+      ).toBe('objectTypes[type].schema');
+    } finally {
+      project.delete();
+      if (!wasScene3DExtensionLoaded) platform.removeExtension('Scene3D');
+    }
+  });
+
   test('reads project behavior details from serialized definitions instead of volatile metadata wrappers', () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const extensionName = 'CatalogLocalBehaviorTest';
@@ -187,6 +286,18 @@ describe('project source catalogs', () => {
       extensionName,
       0
     );
+    const eventsBasedObject = insertNewEventsBasedObject({
+      eventsFunctionsExtension: extension,
+      isRenderedIn3D: false,
+    });
+    eventsBasedObject.setName('Weapon');
+    eventsBasedObject.setFullName('Weapon');
+    eventsBasedObject
+      .getPropertyDescriptors()
+      .insertNew('Ammo', 0)
+      .setType('Number')
+      .setValue('3')
+      .setLabel('Ammo');
     const behavior = insertNewEventsBasedBehavior(extension);
     behavior.setName('Movement');
     behavior.setFullName('Movement');
@@ -257,6 +368,21 @@ describe('project source catalogs', () => {
       ])
     );
     expect(platformerEntry.unknownPropertyPolicy).toBe('preserve');
+    const weaponObjectEntry = catalog.objectTypes.find(
+      objectEntry => objectEntry.type === `${extensionName}::Weapon`
+    );
+    expect(weaponObjectEntry.properties).toEqual([
+      expect.objectContaining({
+        authoringKey: 'Ammo',
+        serializedPath: 'content.Ammo',
+        type: 'Number',
+      }),
+    ]);
+    expect(
+      weaponObjectEntry.schema.childTables
+        .find(table => table.table === 'content')
+        .fields.find(field => field.name === 'Ammo')
+    ).toMatchObject({ type: 'integer', defaultValue: 3 });
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'scene-object')
     ).toMatchObject({

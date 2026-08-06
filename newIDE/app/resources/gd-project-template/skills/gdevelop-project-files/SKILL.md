@@ -186,6 +186,11 @@ and type-specific configuration. `project.gdevelop`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
+For type-specific object configuration, resolve the registered entry in
+`settings-catalog.json` by `objectTypes[].type`: use its `properties` for
+public generic-editor fields and its recursive `schema` for exact serialized
+root fields, child tables, repeated tables, and empty forms. Preserve existing
+unlisted legacy or private serializer fields.
 For each attached behavior, keep its identity fields and complete existing
 serializer data in `<Object>.settings`. Initialize or edit only the
 author-writable properties present in `settings-catalog.json`; preserve

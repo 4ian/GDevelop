@@ -1,0 +1,38 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "kind": "scene-load",
+      "scene": "Main",
+      "seq": 0
+    },
+    {
+      "behavior": "Tween",
+      "enabled": true,
+      "kind": "behavior-state",
+      "object": "Actor",
+      "seq": 1
+    }
+  ],
+  "finalState": {
+    "behaviors": {
+      "Actor.Tween": {
+        "enabled": true
+      }
+    },
+    "scene": "Main"
+  },
+  "fixtureId": "builtin-behavior",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

@@ -1,0 +1,83 @@
+{
+  "eventsFunctionsExtensions": [
+    {
+      "author": "Phase 0",
+      "description": "Minimal embedded extension",
+      "eventsBasedBehaviors": [
+        {
+          "eventsFunctions": [],
+          "name": "LocalBehavior",
+          "objectType": "",
+          "propertyDescriptors": [],
+          "sharedPropertyDescriptors": [],
+          "type": "BuiltinCommonInstructions::EventsBasedBehavior"
+        }
+      ],
+      "eventsBasedObjects": [],
+      "eventsFunctions": [],
+      "name": "Embedded",
+      "shortDescription": "",
+      "tags": [],
+      "version": "1.0.0"
+    }
+  ],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Main",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [],
+      "instances": [],
+      "layers": [],
+      "mangledName": "Main",
+      "name": "Main",
+      "objects": [],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": []
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "events-extension",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

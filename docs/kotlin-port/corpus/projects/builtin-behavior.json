@@ -1,0 +1,83 @@
+{
+  "eventsFunctionsExtensions": [],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Main",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [],
+      "instances": [],
+      "layers": [],
+      "mangledName": "Main",
+      "name": "Main",
+      "objects": [
+        {
+          "animations": [],
+          "behaviors": [
+            {
+              "name": "Tween",
+              "type": "Tween::TweenBehavior"
+            }
+          ],
+          "effects": [],
+          "name": "Actor",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "keep",
+              "type": "boolean",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": []
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "builtin-behavior",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

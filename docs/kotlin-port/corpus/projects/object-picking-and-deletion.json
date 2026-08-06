@@ -1,0 +1,154 @@
+{
+  "eventsFunctionsExtensions": [],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Main",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [
+        {
+          "actions": [
+            {
+              "parameters": [
+                "Token",
+                "=",
+                "11"
+              ],
+              "type": {
+                "value": "MettreX"
+              }
+            },
+            {
+              "parameters": [
+                "Token"
+              ],
+              "type": {
+                "value": "Delete"
+              }
+            }
+          ],
+          "conditions": [
+            {
+              "parameters": [
+                "Token",
+                "<",
+                "15"
+              ],
+              "type": {
+                "value": "PosX"
+              }
+            }
+          ],
+          "type": "BuiltinCommonInstructions::Standard"
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "initialVariables": [],
+          "layer": "",
+          "name": "Token",
+          "numberProperties": [],
+          "persistentUuid": "token-a",
+          "stringProperties": [],
+          "width": 0,
+          "x": 10,
+          "y": 0,
+          "zOrder": 1
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "initialVariables": [],
+          "layer": "",
+          "name": "Token",
+          "numberProperties": [],
+          "persistentUuid": "token-b",
+          "stringProperties": [],
+          "width": 0,
+          "x": 20,
+          "y": 0,
+          "zOrder": 2
+        }
+      ],
+      "layers": [],
+      "mangledName": "Main",
+      "name": "Main",
+      "objects": [
+        {
+          "animations": [],
+          "behaviors": [],
+          "effects": [],
+          "name": "Token",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "keep",
+              "type": "boolean",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [
+        {
+          "name": "Tokens",
+          "objects": [
+            {
+              "name": "Token"
+            }
+          ]
+        }
+      ],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": []
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "object-picking-and-deletion",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

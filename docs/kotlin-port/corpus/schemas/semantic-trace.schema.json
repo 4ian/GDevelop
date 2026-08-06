@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdevelop.io/schemas/kotlin-port/semantic-trace-1.0.0.json",
+  "title": "Normalized semantic trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion","fixtureId","gdevelopRevision","run","hostInputs","events","finalState","diagnostics"],
+  "properties": {
+    "schemaVersion":{"const":"1.0.0"},
+    "fixtureId":{"type":"string","pattern":"^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "gdevelopRevision":{"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "run":{"type":"integer","minimum":1},
+    "hostInputs":{"type":"object","required":["clockStartMs","elapsedTimeMs","randomSeed","inputEvents","locale"],"properties":{"clockStartMs":{"type":"integer"},"elapsedTimeMs":{"type":"array","items":{"type":"integer","minimum":0}},"randomSeed":{"type":"integer"},"inputEvents":{"type":"array"},"locale":{"type":"string"}},"additionalProperties":false},
+    "events":{"type":"array","items":{"type":"object","required":["seq","kind"],"properties":{"seq":{"type":"integer","minimum":0},"kind":{"type":"string"}},"additionalProperties":true}},
+    "finalState":{"type":"object"},
+    "diagnostics":{"type":"array","items":{"type":"object"}}
+  }
+}

@@ -41,6 +41,8 @@ Read these documents as one evidence set:
   experiment using MapLibre as an explicit browser rendering host.
 * [Compatibility roadmap](compatibility-roadmap.md) — observable compatibility
   levels, ledgers, metrics, and acceptance requirements.
+* [Phase 0 corpus](corpus/README.md) — minimized projects, schemas, descriptor
+  snapshot, canonical traces, provenance, capture report, and validator.
 * [Evidence index](evidence-index.md) — revision-pinned claim ledger for the
   static flow audit, including inspected paths and missing executable evidence.
 * [Kotlin Multiplatform prototype](../../KotlinPlatform/README.md) — isolated
@@ -81,9 +83,8 @@ matching API names alone.
   demonstrates source decoding, lowering to normalized IR, deterministic
   bounded-frame execution, stable JSON traces, and a statically registered
   Kotlin extension for a deliberately narrower subset of the milestone. It does
-  not claim compatibility: the pinned differential corpus and GDJS reference
-  traces described in [`target-strategy.md`](target-strategy.md) are not yet
-  checked in.
+  not claim compatibility: the Phase 0 corpus and GDJS reference traces are now
+  checked in, but no Kotlin differential report demonstrates parity with them.
 
 The inspected paths, evidence classification, and audit limitations for these
 claims are recorded in [`evidence-index.md`](evidence-index.md). The revisions
@@ -105,12 +106,12 @@ sections of [`target-strategy.md`](target-strategy.md).
 
 Concrete deliverables:
 
-- [ ] Add the versioned corpus manifest, minimized project JSON, provenance, and
+- [x] Add the versioned corpus manifest, minimized project JSON, provenance, and
       content hashes.
-- [ ] Add schemas for the corpus manifest and normalized semantic trace.
-- [ ] Add a pinned GDJS reference-trace capture command and reviewed canonical
+- [x] Add schemas for the corpus manifest and normalized semantic trace.
+- [x] Add a pinned GDJS reference-trace capture command and reviewed canonical
       traces.
-- [ ] Add a validator for fixture hashes, IDs, references, ordering, coverage,
+- [x] Add a validator for fixture hashes, IDs, references, ordering, coverage,
       and provenance.
 - [ ] Implement the bounded source decoder, source locations, diagnostics, and
       extension-catalog snapshot required by the fixtures.

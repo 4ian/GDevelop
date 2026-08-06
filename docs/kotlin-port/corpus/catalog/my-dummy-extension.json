@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "extension": {
+    "namespace": "MyDummyExtension",
+    "origin": "builtin-js-extension",
+    "version": "source@23f965f5290c176de3666cca9f5ae82ffa70e24a"
+  },
+  "source": "Extensions/ExampleJsExtension/JsExtension.js",
+  "sourceFiles": [
+    { "path": "Extensions/ExampleJsExtension/examplejsextensiontools.js", "position": "standard" },
+    { "path": "Extensions/ExampleJsExtension/dummyeffect.js", "position": "standard" },
+    { "path": "Extensions/ExampleJsExtension/dummyruntimebehavior.js", "position": "standard" },
+    { "path": "Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js", "position": "standard" },
+    { "path": "Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js", "position": "standard" },
+    { "path": "Extensions/ExampleJsExtension/dummyruntimeobject.js", "position": "standard" }
+  ],
+  "members": [
+    { "kind": "action", "id": "DoSomething", "parameters": [{"id":"number1","type":"expression"},{"id":"number2","type":"expression"}], "runtimeEntry": "gdjs._myExtension.doSomething" },
+    { "kind": "condition", "id": "MyCondition", "parameters": [{"id":"number1","type":"expression"},{"id":"number2","type":"expression"}], "runtimeEntry": "gdjs._myExtension.myConditionFunction" },
+    { "kind": "expression", "id": "MyExpression", "parameters": [{"id":"number1","type":"expression"}], "runtimeEntry": "gdjs._myExtension.myExpressionFunction" },
+    { "kind": "behavior", "id": "DummyBehavior", "qualifiedType": "MyDummyExtension::DummyBehavior" },
+    { "kind": "object", "id": "DummyObject", "qualifiedType": "MyDummyExtension::DummyObject" },
+    { "kind": "effect", "id": "DummyEffect", "qualifiedType": "MyDummyExtension::DummyEffect", "headlessDisposition": "unsupported" }
+  ]
+}

@@ -99,6 +99,9 @@ namespace gdjs {
       if (!this.crowd) {
         return;
       }
+      for (const character of this.characters) {
+        character.teleportAgentToObjectIfNeeded();
+      }
       this.crowd.update(timeDelta); //1 / 60, timeDelta, 8);
     }
 

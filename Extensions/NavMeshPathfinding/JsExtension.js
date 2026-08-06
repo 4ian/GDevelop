@@ -152,7 +152,11 @@ module.exports = {
           .getOrCreate('radius')
           .setValue(behaviorContent.getChild('radius').getStringValue())
           .setLabel(_('Radius'))
-          .setLabel(_('Use the circle inside the object width and height when left to 0.'))
+          .setLabel(
+            _(
+              'Use the circle inside the object width and height when left to 0.'
+            )
+          )
           .setGroup(_('Collision'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel());
@@ -319,10 +323,7 @@ module.exports = {
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
-            sharedContent
-              .getChild('speedScaleY')
-              .getDoubleValue()
-              .toString(10)
+            sharedContent.getChild('speedScaleY').getDoubleValue().toString(10)
           )
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);

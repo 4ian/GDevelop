@@ -38,7 +38,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -226,6 +227,7 @@ namespace gdjs {
         this._pathFound = false;
         return;
       }
+      this.teleportAgentToObjectIfNeeded();
       this._pathFound = this._agent.requestMoveTarget(destination);
       console.log(
         'hasFindPath',
@@ -241,6 +243,46 @@ namespace gdjs {
       );
       if (this._pathFound) {
         this._reachedEnd = false;
+      }
+    }
+
+    teleportAgentToObjectIfNeeded(): void {
+      const agent = this._agent;
+      if (!agent) {
+        return;
+      }
+      const oldX = this.owner.getX();
+      const oldY = this.owner.getY();
+      //@ts-ignore
+      const oldZ = this.owner.getZ ? this.owner.getZ() : 0;
+
+      let expectedX = agent.raw.get_npos(0);
+      let expectedY = this._manager.is3D
+        ? agent.raw.get_npos(2)
+        : agent.raw.get_npos(2) * this._manager.speedScaleY;
+      //@ts-ignore
+      let expectedZ = this.owner.getZ ? agent.raw.get_npos(1) : 0;
+
+      if (oldX !== expectedX || oldY !== expectedY || oldZ !== expectedZ) {
+        agent.teleport({
+          x: oldX,
+          y: this._manager.is3D ? oldZ : oldZ,
+          z: oldY * this._manager.inverseSpeedScaleY,
+        });
+        console.log(
+          oldX,
+          '!==',
+          expectedX,
+          '||',
+          oldY,
+          '!==',
+          expectedY,
+          '||',
+          oldZ,
+          '!==',
+          expectedZ
+        );
+        console.log('Teleport to', oldX, oldY, oldZ);
       }
     }
 
@@ -278,9 +320,7 @@ namespace gdjs {
       }
 
       const oldX = this.owner.getX();
-      const oldY = this._manager.is3D
-        ? this.owner.getY()
-        : this.owner.getY() * this._manager.speedScaleY;
+      const oldY = this.owner.getY();
       let newX = agent.raw.get_npos(0);
       let newY = this._manager.is3D
         ? agent.raw.get_npos(2)

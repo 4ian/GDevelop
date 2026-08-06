@@ -62,15 +62,30 @@ namespace gdjs {
                       const positions: Array<float> = [];
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x0, z0 * speedScaleY, 0, workingPoint)
+                        layer.applyLayerTransformation(
+                          x0,
+                          z0 * speedScaleY,
+                          0,
+                          workingPoint
+                        )
                       );
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x1, z1 * speedScaleY, 0, workingPoint)
+                        layer.applyLayerTransformation(
+                          x1,
+                          z1 * speedScaleY,
+                          0,
+                          workingPoint
+                        )
                       );
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x2, z2 * speedScaleY, 0, workingPoint)
+                        layer.applyLayerTransformation(
+                          x2,
+                          z2 * speedScaleY,
+                          0,
+                          workingPoint
+                        )
                       );
                       rendererObject.drawPolygon(positions);
                     }

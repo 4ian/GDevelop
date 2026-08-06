@@ -25,11 +25,16 @@ import {
   ExplanationHeader,
   DoneFooter,
   ExportFlow,
+  PackResourcesField,
 } from '../GenericExporters/HTML5Export';
+import { packResourcesInBlobFiles } from '../ResourcePacking/BrowserResourcePacker';
+import { Column, Line } from '../../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
-type ExportState = null;
+type ExportState = {|
+  packResources: boolean,
+|};
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -60,13 +65,28 @@ export const browserHTML5ExportPipeline: ExportPipeline<
 > = {
   name: exportPipelineName,
 
-  getInitialExportState: () => null,
+  getInitialExportState: () => ({ packResources: true }),
 
   canLaunchBuild: () => true,
 
   isNavigationDisabled: () => false,
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: ({ exportState, updateExportState, exportStep }) =>
+    exportStep !== 'done' ? (
+      <Column noMargin expand>
+        <Line>
+          <ExplanationHeader />
+        </Line>
+        <Line noMargin>
+          <PackResourcesField
+            packResources={exportState.packResources}
+            onChange={packResources =>
+              updateExportState(() => ({ packResources }))
+            }
+          />
+        </Line>
+      </Column>
+    ) : null,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />
@@ -133,14 +153,27 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     }));
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     { textFiles, blobFiles }: ResourcesDownloadOutput
   ): Promise<Blob> => {
+    const basePath = '/export/';
+
+    // Gather the resources into a few ".gdpak" archives before zipping, so
+    // that the zip stays below the file count limit of hosting services.
+    const filesToArchive = context.exportState.packResources
+      ? await packResourcesInBlobFiles({
+          textFiles,
+          blobFiles,
+          basePath,
+          onProgress: context.updateStepProgress,
+        })
+      : { textFiles, blobFiles };
+
     return archiveFiles({
-      blobFiles,
-      textFiles,
-      basePath: '/export/',
+      blobFiles: filesToArchive.blobFiles,
+      textFiles: filesToArchive.textFiles,
+      basePath,
       onProgress: context.updateStepProgress,
     });
   },

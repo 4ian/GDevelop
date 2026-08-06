@@ -184,6 +184,12 @@ namespace gdjs {
     private _spineManager: SpineManager | null = null;
     private _svgManager: InternalInGameEditorOnlySvgManager;
 
+    /**
+     * Gives access to the resources of a game exported with its resources
+     * packed into ".gdpak" archives. Does nothing otherwise.
+     */
+    private _resourcePackManager = new gdjs.ResourcePackManager();
+
     private privateResourceManager = new PrivateResourceManager(this);
     private sceneResourceLoadingQueue = new ResourceLoadingQueue(
       'scene',
@@ -275,6 +281,12 @@ namespace gdjs {
     ): void {
       this._globalResources = globalResources;
 
+      // The exporter writes this at the end of `data.js` when it packed the
+      // game resources. It stays null for previews and for games exported
+      // without packing, in which case every resource is downloaded as its own
+      // file, as before.
+      this._resourcePackManager.setManifest(gdjs.resourcePacks);
+
       // TODO We should probably instanciate new queues to avoid side effects from running tasks.
       this.sceneResourceLoadingQueue.clear();
       for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
@@ -346,7 +358,7 @@ namespace gdjs {
         [...this.privateResourceManager._resources.values()],
         ResourceLoader.maxForegroundConcurrency,
         ResourceLoader.maxAttempt,
-        async (resource) => {
+        async resource => {
           await this.privateResourceManager._loadResource(resource);
           await this.privateResourceManager._processResource(resource);
           loadedCount++;
@@ -369,9 +381,10 @@ namespace gdjs {
         resourceNames,
         ResourceLoader.maxForegroundConcurrency,
         ResourceLoader.maxAttempt,
-        async (resourceName) => {
-          const resource =
-            this.privateResourceManager._resources.get(resourceName);
+        async resourceName => {
+          const resource = this.privateResourceManager._resources.get(
+            resourceName
+          );
           if (resource) {
             await this.privateResourceManager._loadResource(resource);
             await this.privateResourceManager._processResource(resource);
@@ -389,8 +402,9 @@ namespace gdjs {
       firstSceneName: string,
       onProgress: (count: number, total: number) => void
     ): Promise<void> {
-      const firstSceneResourceNames =
-        this.sceneResourceLoadingQueue.getResourceNamesFor(firstSceneName);
+      const firstSceneResourceNames = this.sceneResourceLoadingQueue.getResourceNamesFor(
+        firstSceneName
+      );
       if (!firstSceneResourceNames) {
         logger.warn(
           'Can\'t load resource for unknown scene: "' + firstSceneName + '".'
@@ -403,23 +417,49 @@ namespace gdjs {
         ...this._globalResources,
         ...firstSceneResourceNames,
       ];
-      await ResourceLoader.processAndRetryIfNeededWithPromisePool(
-        resourceNames,
-        ResourceLoader.maxForegroundConcurrency,
-        ResourceLoader.maxAttempt,
-        async (resourceName) => {
-          const resource =
-            this.privateResourceManager._resources.get(resourceName);
-          if (!resource) {
-            logger.warn('Unable to find resource "' + resourceName + '".');
-            return;
-          }
-          await this.privateResourceManager._loadResource(resource);
-          await this.privateResourceManager._processResource(resource);
-          loadedCount++;
-          onProgress(loadedCount, resourceNames.length);
+
+      // No resource can be loaded while its pack is downloading, so without
+      // this the loading bar would stay at 0% for the whole download. Report
+      // the download itself as a fraction of a resource.
+      let lastReportedPackProgress = 0;
+      this._resourcePackManager.setOnProgressCallback(
+        (loadedBytes, totalBytes) => {
+          const packProgress = loadedBytes / totalBytes;
+          if (Math.abs(packProgress - lastReportedPackProgress) < 0.01) return;
+          lastReportedPackProgress = packProgress;
+          onProgress(loadedCount + packProgress, resourceNames.length);
         }
       );
+
+      try {
+        // Resources that are only reachable dynamically (a sound played by
+        // name from an expression) are in no loading task, so nothing else
+        // would ever download the pack holding them - and the engine asks for
+        // their URL synchronously, when it is too late to download anything.
+        const startupPacksPromise = this._resourcePackManager.ensureStartupPacksLoaded();
+        if (startupPacksPromise) await startupPacksPromise;
+
+        await ResourceLoader.processAndRetryIfNeededWithPromisePool(
+          resourceNames,
+          ResourceLoader.maxForegroundConcurrency,
+          ResourceLoader.maxAttempt,
+          async resourceName => {
+            const resource = this.privateResourceManager._resources.get(
+              resourceName
+            );
+            if (!resource) {
+              logger.warn('Unable to find resource "' + resourceName + '".');
+              return;
+            }
+            await this.privateResourceManager._loadResource(resource);
+            await this.privateResourceManager._processResource(resource);
+            loadedCount++;
+            onProgress(loadedCount, resourceNames.length);
+          }
+        );
+      } finally {
+        this._resourcePackManager.setOnProgressCallback(null);
+      }
 
       this.sceneResourceLoadingQueue.setResourcesAs(firstSceneName, 'ready');
     }
@@ -500,8 +540,9 @@ namespace gdjs {
       debugLogger.log(
         `Loading of resources for object ${objectName} was requested.`
       );
-      const objectResourceLoadingQueue =
-        this.getObjectResourceLoadingQueue(sceneName);
+      const objectResourceLoadingQueue = this.getObjectResourceLoadingQueue(
+        sceneName
+      );
       objectResourceLoadingQueue.registerResources(objectName, usedResources);
       const task = objectResourceLoadingQueue.enqueue(objectName);
       objectResourceLoadingQueue.loadAllTasksInBackground();
@@ -523,8 +564,9 @@ namespace gdjs {
     }
 
     private getObjectResourceLoadingQueue(sceneName: string) {
-      let objectResourceLoadingQueue =
-        this.objectResourceLoadingQueues.get(sceneName);
+      let objectResourceLoadingQueue = this.objectResourceLoadingQueues.get(
+        sceneName
+      );
       if (!objectResourceLoadingQueue) {
         objectResourceLoadingQueue = new ResourceLoadingQueue(
           `Independent objects of ${sceneName}`,
@@ -579,9 +621,12 @@ namespace gdjs {
         unloadedSceneName,
         newSceneName
       );
-      const objectResourceLoadingQueue =
-        this.getObjectResourceLoadingQueue(unloadedSceneName);
+      const objectResourceLoadingQueue = this.getObjectResourceLoadingQueue(
+        unloadedSceneName
+      );
       objectResourceLoadingQueue.clear();
+
+      this._unloadUnusedResourcePacks();
 
       debugLogger.log(
         `Unloading of resources for scene ${unloadedSceneName} finished.`
@@ -589,11 +634,44 @@ namespace gdjs {
     }
 
     /**
+     * Give back the memory used by the archives of the scenes that are not
+     * loaded anymore. Does nothing for a game exported without packed
+     * resources.
+     */
+    private _unloadUnusedResourcePacks(): void {
+      const stillLoadedFiles = new Set<string>();
+      const addFilesOf = (resourceNames: Array<string>) => {
+        for (const resourceName of resourceNames) {
+          const resource = this.privateResourceManager._resources.get(
+            resourceName
+          );
+          if (resource) stillLoadedFiles.add(resource.file);
+        }
+      };
+
+      // Global resources are never unloaded.
+      addFilesOf(this._globalResources);
+      for (const loadingState of this.sceneResourceLoadingQueue.loadingStates.values()) {
+        if (loadingState.status === 'not-loaded') continue;
+        addFilesOf(loadingState.resourceNames);
+      }
+      for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
+        for (const loadingState of objectResourceLoadingQueue.loadingStates.values()) {
+          if (loadingState.status === 'not-loaded') continue;
+          addFilesOf(loadingState.resourceNames);
+        }
+      }
+
+      this._resourcePackManager.unloadPacksWithNoFileIn(stillLoadedFiles);
+    }
+
+    /**
      * Unload an object assets in background.
      */
     unloadObjectResources(sceneName: string, objectName: string): void {
-      const objectResourceLoadingQueue =
-        this.getObjectResourceLoadingQueue(sceneName);
+      const objectResourceLoadingQueue = this.getObjectResourceLoadingQueue(
+        sceneName
+      );
       if (!objectResourceLoadingQueue.areAssetsReady(objectName)) {
         debugLogger.log(
           `Can't unload of resources for object ${objectName} as it is not loaded.`
@@ -630,6 +708,9 @@ namespace gdjs {
       for (const objectResourceLoadingQueue of this.objectResourceLoadingQueues.values()) {
         objectResourceLoadingQueue.clear();
       }
+      // Keep the manifest: the packs are downloaded again when the resources
+      // are loaded back.
+      this._resourcePackManager.unloadAllPacks();
       debugLogger.log(`Unloading of all resources finished.`);
     }
 
@@ -667,6 +748,26 @@ namespace gdjs {
       return this.privateResourceManager._resources.get(resourceName) || null;
     }
 
+    /**
+     * Download the resource pack holding this resource, if the game was
+     * exported with packed resources and the pack is not downloaded yet.
+     *
+     * @returns null when there is nothing to wait for. Callers must check it
+     * rather than awaiting unconditionally, so that loading a resource keeps
+     * starting synchronously when there is no pack involved.
+     */
+    ensurePackLoadedFor(resource: ResourceData): Promise<void> | null {
+      return this._resourcePackManager.ensureLoadedFor(resource.file);
+    }
+
+    /**
+     * @returns true when this file is stored inside a resource pack, and so is
+     * read from memory rather than downloaded on its own.
+     */
+    isFileInResourcePack(file: string): boolean {
+      return this._resourcePackManager.isPacked(file);
+    }
+
     // Helper methods used when resources are loaded from an URL.
 
     /**
@@ -674,6 +775,23 @@ namespace gdjs {
      * the resource (this can be for example a token needed to access the resource).
      */
     getFullUrl(url: string) {
+      // When the game was exported with packed resources, the file lives inside
+      // an archive that was already downloaded (`_loadResource` waits for it),
+      // and is read from a `blob:` URL instead of being fetched on its own.
+      const packedUrl = this._resourcePackManager.getObjectUrl(url);
+      if (packedUrl) return packedUrl;
+
+      if (this._resourcePackManager.isPacked(url)) {
+        // The file is in a pack that is not downloaded yet. The URL returned
+        // below points to a file that the export does not contain, so loading
+        // it will fail: warn rather than let it look like a missing file.
+        logger.warn(
+          'The resource file "' +
+            url +
+            '" was requested before its resource pack was downloaded.'
+        );
+      }
+
       if (this._runtimeGame.isInGameEdition()) {
         url = getFetchableLocalFileUrl(url);
         // Avoid adding cache burst to URLs which are assumed to be immutable files,
@@ -879,8 +997,9 @@ namespace gdjs {
       const resourceNamesToUnload = new Set<string>(
         objectLoadingState.resourceNames
       );
-      const currentSceneObjectResourceLoadingQueue =
-        this.getObjectResourceLoadingQueue(currentSceneName);
+      const currentSceneObjectResourceLoadingQueue = this.getObjectResourceLoadingQueue(
+        currentSceneName
+      );
       // The resources used by the current scene are already excluded from the
       // object resources list at export.
       // Other manually loaded objects may use the same resources.
@@ -940,8 +1059,8 @@ namespace gdjs {
             activePromises++;
 
             asyncFunction(item)
-              .then((result) => results.push(result))
-              .catch((error) => errors.push({ item, error }))
+              .then(result => results.push(result))
+              .catch(error => errors.push({ item, error }))
               .finally(() => {
                 activePromises--;
                 if (index === items.length && activePromises === 0) {
@@ -1035,6 +1154,15 @@ namespace gdjs {
         );
         return;
       }
+      // Make sure the archive holding this file is downloaded before the
+      // manager asks for its URL. Concurrent calls share the same download.
+      // Nothing is awaited for a game exported without packed resources, so
+      // that the download of a resource still starts synchronously.
+      const packLoadingPromise = this.resourceLoader.ensurePackLoadedFor(
+        resource
+      );
+      if (packLoadingPromise) await packLoadingPromise;
+
       await resourceManager.loadResource(resource.name);
     }
 
@@ -1046,7 +1174,9 @@ namespace gdjs {
         );
         if (resourceManager) {
           debugLogger.log(
-            `Unloading of resources of kind ${resourceData.kind} : ${resourceName}`
+            `Unloading of resources of kind ${
+              resourceData.kind
+            } : ${resourceName}`
           );
           resourceManager.unloadResource(resourceData);
         }
@@ -1120,7 +1250,11 @@ namespace gdjs {
       debugLogger.log(`Loading all ${this.name} resources, in background.`);
       while (this.loadingTaskQueue.length > 0) {
         debugLogger.log(
-          `Still resources of ${this.loadingTaskQueue.length} ${this.name}(s) to load: ${this.loadingTaskQueue.map((task) => task.identifier).join(', ')}`
+          `Still resources of ${this.loadingTaskQueue.length} ${
+            this.name
+          }(s) to load: ${this.loadingTaskQueue
+            .map(task => task.identifier)
+            .join(', ')}`
         );
         const task = this.loadingTaskQueue[this.loadingTaskQueue.length - 1];
         if (task === undefined) {
@@ -1129,7 +1263,9 @@ namespace gdjs {
         this.currentLoadingTaskIdentifier = task.identifier;
         if (!this.areAssetsLoaded(task.identifier)) {
           debugLogger.log(
-            `Loading (but not processing) resources for ${this.name} ${task.identifier}.`
+            `Loading (but not processing) resources for ${this.name} ${
+              task.identifier
+            }.`
           );
           const loadingState = this.loadingStates.get(task.identifier);
           if (loadingState) {
@@ -1138,18 +1274,22 @@ namespace gdjs {
             );
           } else {
             logger.warn(
-              `Can\'t load resource for unknown ${this.name}: "${task.identifier}".`
+              `Can\'t load resource for unknown ${this.name}: "${
+                task.identifier
+              }".`
             );
             return;
           }
           debugLogger.log(
-            `Done loading (but not processing) resources for ${this.name} ${task.identifier}.`
+            `Done loading (but not processing) resources for ${this.name} ${
+              task.identifier
+            }.`
           );
 
           // A task may have been moved last while awaiting resources to be
           // downloaded (see _prioritize).
           this.loadingTaskQueue.splice(
-            this.loadingTaskQueue.findIndex((element) => element === task),
+            this.loadingTaskQueue.findIndex(element => element === task),
             1
           );
           task.onFinish();
@@ -1172,7 +1312,7 @@ namespace gdjs {
           ? ResourceLoader.maxForegroundConcurrency
           : ResourceLoader.maxBackgroundConcurrency,
         ResourceLoader.maxAttempt,
-        async (resourceName) => {
+        async resourceName => {
           const resource = this.resourceLoader._resources.get(resourceName);
           if (!resource) {
             logger.warn('Unable to find resource "' + resourceName + '".');
@@ -1248,7 +1388,7 @@ namespace gdjs {
 
       // The scene is not loaded: either prioritize it or add it to the loading queue.
       const taskIndex = this.loadingTaskQueue.findIndex(
-        (task) => task.identifier === taskIdentifier
+        task => task.identifier === taskIdentifier
       );
       let task: LoadingTask;
       if (taskIndex !== -1) {
@@ -1285,7 +1425,7 @@ namespace gdjs {
         return;
       }
       this.loadingStates.set(taskIdentifier, {
-        resourceNames: usedResources.map((resource) => resource.name),
+        resourceNames: usedResources.map(resource => resource.name),
         status: 'not-loaded',
       });
     }
@@ -1307,7 +1447,9 @@ namespace gdjs {
       }
       if (objectLoadingState.status !== 'not-loaded') {
         debugLogger.log(
-          `Resources for ${this.name} ${taskIdentifier} are already loading or loaded.`
+          `Resources for ${
+            this.name
+          } ${taskIdentifier} are already loading or loaded.`
         );
         return null;
       }
@@ -1328,7 +1470,9 @@ namespace gdjs {
       }
       if (!unloadedTaskIdentifier) return;
       debugLogger.log(
-        `Unloading of resources for ${this.name} ${unloadedTaskIdentifier} was requested.`
+        `Unloading of resources for ${
+          this.name
+        } ${unloadedTaskIdentifier} was requested.`
       );
 
       const unloadedTaskState = this.loadingStates.get(unloadedTaskIdentifier);
@@ -1348,7 +1492,9 @@ namespace gdjs {
       }
 
       debugLogger.log(
-        `Unloading of resources for ${this.name} ${unloadedTaskIdentifier} finished.`
+        `Unloading of resources for ${
+          this.name
+        } ${unloadedTaskIdentifier} finished.`
       );
 
       unloadedTaskState.status = 'not-loaded';
@@ -1408,8 +1554,8 @@ namespace gdjs {
       return taskIdentifier === this.currentLoadingTaskIdentifier
         ? this.currentTaskProgress
         : this.areAssetsLoaded(taskIdentifier)
-          ? 1
-          : 0;
+        ? 1
+        : 0;
     }
 
     clear() {

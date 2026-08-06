@@ -18,6 +18,49 @@ namespace gdjs {
   };
 
   /**
+   * The file extensions Howler knows how to check support for.
+   * See https://github.com/goldfire/howler.js#format-array-
+   */
+  const supportedAudioFormats = [
+    'mp3',
+    'mpeg',
+    'opus',
+    'ogg',
+    'oga',
+    'wav',
+    'aac',
+    'caf',
+    'm4a',
+    'm4b',
+    'mp4',
+    'weba',
+    'webm',
+    'dolby',
+    'flac',
+  ];
+
+  /**
+   * Howler guesses the codec of a sound from the extension of its URL. This
+   * does not work when the game resources were packed at export: the sound is
+   * then read from a `blob:` URL, which has no extension. Tell Howler the
+   * format explicitly, using the name the resource file had.
+   */
+  const getAudioFormats = (file: string): Array<string> | undefined => {
+    const lastDotIndex = file.lastIndexOf('.');
+    if (lastDotIndex === -1) return undefined;
+
+    const extension = file
+      .slice(lastDotIndex + 1)
+      .toLowerCase()
+      // A resource file can keep a search parameter when it comes from a URL.
+      .replace(/[?#].*$/, '');
+
+    return supportedAudioFormats.indexOf(extension) === -1
+      ? undefined
+      : [extension];
+  };
+
+  /**
    * Ensure the volume is between 0 and 1.
    */
   const clampVolume = (volume: float): float => {
@@ -171,12 +214,12 @@ namespace gdjs {
           // Before loading, howler won't register events as without an ID we cannot set a listener.
           // Once we have an ID, we can transfer control of the events to howler.
           // We also need to call them once as Howler doesn't for the first play event.
-          this._onPlay.forEach((func) => {
+          this._onPlay.forEach(func => {
             // Transfer the event to howler now that we have an ID
             this.on('play', func);
             func(newID);
           });
-          this._oncePlay.forEach((func) => func(newID));
+          this._oncePlay.forEach(func => func(newID));
           this._onPlay = [];
           this._oncePlay = [];
         } else this._howl.once('load', () => this.play()); // Play only once the howl is fully loaded
@@ -524,18 +567,18 @@ namespace gdjs {
         this._clearCachedSpatialPosition.bind(this)
       );
       const that = this;
-      document.addEventListener('deviceready', function () {
+      document.addEventListener('deviceready', function() {
         // pause/resume sounds in Cordova when the app is being paused/resumed
         document.addEventListener(
           'pause',
-          function () {
+          function() {
             that.pauseAllActiveSounds();
           },
           false
         );
         document.addEventListener(
           'resume',
-          function () {
+          function() {
             that.resumeAllActiveSounds();
           },
           false
@@ -667,12 +710,14 @@ namespace gdjs {
         container[file] = new Howl(
           Object.assign({}, HowlParameters, {
             src: this._getSoundUrlsFromResource(resource),
+            format: getAudioFormats(resource.file),
             onload: resolve,
             onloaderror: (soundId: number, error?: string) => reject(error),
             html5: isMusic,
             xhr: {
-              withCredentials:
-                this._resourceLoader.checkIfCredentialsRequired(file),
+              withCredentials: this._resourceLoader.checkIfCredentialsRequired(
+                file
+              ),
             },
             // Cache the sound with no volume. This avoids a bug where it plays at full volume
             // for a split second before setting its correct volume.
@@ -731,12 +776,12 @@ namespace gdjs {
           Object.assign(
             {
               src: this._getSoundUrlsFromResource(resource),
+              format: getAudioFormats(resource.file),
               html5: isMusic,
               xhr: {
-                withCredentials:
-                  this._resourceLoader.checkIfCredentialsRequired(
-                    resource.file
-                  ),
+                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
+                  resource.file
+                ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -792,12 +837,12 @@ namespace gdjs {
           Object.assign(
             {
               src: this._getSoundUrlsFromResource(resource),
+              format: getAudioFormats(resource.file),
               html5: isMusic,
               xhr: {
-                withCredentials:
-                  this._resourceLoader.checkIfCredentialsRequired(
-                    resource.file
-                  ),
+                withCredentials: this._resourceLoader.checkIfCredentialsRequired(
+                  resource.file
+                ),
               },
               // Cache the sound with no volume. This avoids a bug where it plays at full volume
               // for a split second before setting its correct volume.
@@ -1110,36 +1155,38 @@ namespace gdjs {
           throw error;
         }
       } else if (
-        resource.preloadInCache ||
-        // Force downloading of sounds.
-        // TODO Decide if sounds should be allowed to be downloaded after the scene starts.
-        // - they should be requested automatically at the end of the scene loading
-        // - they will be downloaded while the scene is playing
-        // - other scenes will be pre-loaded only when all the sounds for the current scene are in cache
-        !resource.preloadAsMusic
+        // A file read from a resource pack is already in memory: requesting it
+        // to put it in the browser cache would only copy it for nothing.
+        !this._resourceLoader.isFileInResourcePack(resource.file) &&
+        (resource.preloadInCache ||
+          // Force downloading of sounds.
+          // TODO Decide if sounds should be allowed to be downloaded after the scene starts.
+          // - they should be requested automatically at the end of the scene loading
+          // - they will be downloaded while the scene is playing
+          // - other scenes will be pre-loaded only when all the sounds for the current scene are in cache
+          !resource.preloadAsMusic)
       ) {
         // preloading as sound already does a XHR request, hence "else if"
         try {
           const file = resource.file;
           await new Promise((resolve, reject) => {
             const sound = new XMLHttpRequest();
-            sound.withCredentials =
-              this._resourceLoader.checkIfCredentialsRequired(file);
+            sound.withCredentials = this._resourceLoader.checkIfCredentialsRequired(
+              file
+            );
             sound.addEventListener('load', () => {
               if (sound.status >= 200 && sound.status < 300) {
                 resolve(undefined);
               } else {
                 reject(
-                  `HTTP error while preloading audio file in cache. Status is ${sound.status}.`
+                  `HTTP error while preloading audio file in cache. Status is ${
+                    sound.status
+                  }.`
                 );
               }
             });
-            sound.addEventListener('error', (_) =>
-              reject('XHR error: ' + file)
-            );
-            sound.addEventListener('abort', (_) =>
-              reject('XHR abort: ' + file)
-            );
+            sound.addEventListener('error', _ => reject('XHR error: ' + file));
+            sound.addEventListener('abort', _ => reject('XHR abort: ' + file));
             sound.open('GET', this._getDefaultSoundUrl(resource));
             sound.send();
           });
@@ -1155,12 +1202,12 @@ namespace gdjs {
 
     getNetworkSyncData(): SoundManagerSyncData {
       const freeMusicsNetworkSyncData: SoundSyncData[] = [];
-      this._freeMusics.forEach((freeMusic) => {
+      this._freeMusics.forEach(freeMusic => {
         const musicSyncData = freeMusic.getNetworkSyncData();
         if (musicSyncData) freeMusicsNetworkSyncData.push(musicSyncData);
       });
       const freeSoundsNetworkSyncData: SoundSyncData[] = [];
-      this._freeSounds.forEach((freeSound) => {
+      this._freeSounds.forEach(freeSound => {
         const soundSyncData = freeSound.getNetworkSyncData();
         if (soundSyncData) freeSoundsNetworkSyncData.push(soundSyncData);
       });

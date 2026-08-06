@@ -32,3 +32,17 @@ class MapAnimationTest {
         assertEquals(GeoCoordinate(2.0, 2.0), runtime.state(id)?.coordinate)
     }
 }
+
+class MapAntimeridianAnimationTest {
+    @Test
+    fun interpolationTakesShortestWrappedPath() {
+        var time = 0L
+        val runtime = MapOverlayAnimationRuntime(MapRuntimeClock { time })
+        val id = MapOverlayId("date-line")
+        runtime.start(id, GeoCoordinate(179.0, 0.0), GeoCoordinate(-179.0, 0.0), 100)
+        time = 50
+        assertEquals(180.0, runtime.advance(id)?.coordinate?.longitude)
+        time = 100
+        assertEquals(-179.0, runtime.advance(id)?.coordinate?.longitude)
+    }
+}

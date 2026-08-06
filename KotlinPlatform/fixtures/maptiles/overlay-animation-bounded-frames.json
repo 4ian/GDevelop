@@ -1,0 +1,55 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "overlay-animation-bounded-frames",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "coordinates": [
+        [
+          0,
+          0
+        ],
+        [
+          2.5,
+          1.25
+        ],
+        [
+          5,
+          2.5
+        ],
+        [
+          7.5,
+          3.75
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "clockStepMs": 250
+    }
+  }
+}

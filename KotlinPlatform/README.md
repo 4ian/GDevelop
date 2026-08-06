@@ -48,3 +48,18 @@ The example extension is registered explicitly with
 `ExtensionCatalog.of(CounterExtension)`. Its descriptor resolves the serialized
 action type to the interpreted `incrementVariable` entry, while scene-load and
 scene-unload hooks add observable lifecycle records.
+
+## Experimental Kotlin/JS MapTiles capability
+
+`map-runtime`, `maptiles-extension`, and `maplibre-js-host` form a focused,
+experimental Kotlin/JS capability. The common contract covers camera commands,
+projection, geographic overlays, interaction events, deterministic animation,
+and terminal disposal. `fixtures/maptiles/` records the supported and diagnostic
+cases; common tests use a deterministic fake `MapHost`, while MapLibre/browser
+adapter conformance remains separate.
+
+This work is **not** general GDevelop map support and is **not** a cross-target
+compatibility claim. JVM/headless execution intentionally reports the missing
+browser-map capability. MapLibre checks must not use live network tiles as an
+oracle. A future browser automation suite must use a checked-in fixed style and
+local fixture tiles.

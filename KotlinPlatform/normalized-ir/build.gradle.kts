@@ -21,5 +21,6 @@ kotlin {
 	}
 	sourceSets.commonTest.dependencies {
 		implementation(kotlin("test"))
+		implementation(project(":maptiles-extension"))
 	}
 }

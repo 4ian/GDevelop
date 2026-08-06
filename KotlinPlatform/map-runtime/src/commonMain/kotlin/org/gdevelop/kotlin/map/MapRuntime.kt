@@ -5,7 +5,16 @@ import kotlinx.serialization.json.JsonElement
 import kotlin.jvm.JvmInline
 
 @Serializable
-data class GeoCoordinate(val longitude: Double, val latitude: Double)
+data class GeoCoordinate(val longitude: Double, val latitude: Double) {
+    init {
+        require(longitude.isFinite() && longitude in -180.0..180.0) {
+            "longitude must be finite and between -180 and 180 degrees"
+        }
+        require(latitude.isFinite() && latitude in -90.0..90.0) {
+            "latitude must be finite and between -90 and 90 degrees"
+        }
+    }
+}
 
 @Serializable
 data class ProjectedPoint(val x: Double, val y: Double)

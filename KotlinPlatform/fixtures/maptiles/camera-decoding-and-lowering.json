@@ -1,0 +1,54 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::SetCamera"
+              },
+              "parameters": [
+                "12.5",
+                "48.25",
+                "9",
+                "400"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::FitBounds"
+              },
+              "parameters": [
+                "-10",
+                "40",
+                "15",
+                "55",
+                "24",
+                "0"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "camera-decoding-and-lowering",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "runtimeEntries": [
+        "setCamera",
+        "fitBounds"
+      ]
+    }
+  }
+}

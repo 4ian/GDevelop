@@ -574,3 +574,19 @@ The immediate sequence is therefore semantic: freeze the Level 0 corpus, obtain
 Level 1 parity on the risky event edges, add selected Level 2 types/lifecycle,
 then choose host/rendering work. Extension SDK breadth and existing-extension
 mapping build on those guarantees rather than substituting for them.
+
+## Experimental Kotlin/JS MapTiles evidence
+
+The repository contains an experimental browser-map vertical slice: portable
+camera/overlay/event contracts, MapTiles descriptor lowering, deterministic
+common tests backed by a fake `MapHost`, focused fixtures under
+`KotlinPlatform/fixtures/maptiles/`, and a separate MapLibre Kotlin/JS adapter.
+The JS-host conformance surface is listener cleanup, projection conversion,
+camera command mapping, resize, and stable error translation. Browser evidence
+must remain independent of live services; future automation uses a local fixed
+style and fixture tiles, never live network tiles as an oracle.
+
+Ledger status is `partial` for this explicitly bounded Kotlin/JS experiment and
+`incompatible` for JVM/headless rendering, which returns an unsupported-capability
+diagnostic. This is not evidence for general GDevelop MapTiles behavior, broad
+GDJS compatibility, or cross-target compatibility.

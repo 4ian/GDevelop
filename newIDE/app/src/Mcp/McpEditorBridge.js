@@ -100,6 +100,11 @@ type McpEditorBridgeContext = {|
   reloadProjectAndWait?: (
     reportProgress?: McpRequestProgressReporter
   ) => Promise<any>,
+  openProjectAndWait?: ({|
+    projectPath: string,
+    discardUnsavedChanges: boolean,
+    reportProgress?: McpRequestProgressReporter,
+  |}) => Promise<any>,
   reportProgress?: McpRequestProgressReporter,
   saveProjectAndWait?: () => Promise<any>,
   getPersistenceState?: () => {|
@@ -4323,6 +4328,119 @@ const callMcpTool = async ({
         context.getPreviewLaunchState ? context.getPreviewLaunchState() : null
       )
     );
+  }
+
+  if (toolName === 'open_project') {
+    if (!path) {
+      return errorResult(
+        'Opening a local project is only available in the GDevelop desktop app.',
+        { code: 'MCP_OPEN_PROJECT_UNAVAILABLE' }
+      );
+    }
+    const openProjectAndWait = context.openProjectAndWait;
+    if (!openProjectAndWait) {
+      return errorResult(
+        'The GDevelop host did not provide openProjectAndWait, so MCP cannot open a local project.',
+        { code: 'MCP_OPEN_PROJECT_UNAVAILABLE' }
+      );
+    }
+
+    const requestedProjectPath =
+      args && typeof args.project_path === 'string'
+        ? args.project_path.trim()
+        : '';
+    if (!requestedProjectPath) {
+      return errorResult('project_path must be a non-empty string.', {
+        code: 'MCP_OPEN_PROJECT_INVALID_PATH',
+      });
+    }
+    if (!path.isAbsolute(requestedProjectPath)) {
+      return errorResult('project_path must be an absolute local path.', {
+        code: 'MCP_OPEN_PROJECT_PATH_NOT_ABSOLUTE',
+        projectPath: requestedProjectPath,
+      });
+    }
+
+    const normalizedProjectPath = path.normalize(requestedProjectPath);
+    const projectFileName = path.basename(normalizedProjectPath).toLowerCase();
+    const projectFileExtension = path
+      .extname(normalizedProjectPath)
+      .toLowerCase();
+    if (
+      projectFileName !== MULTI_FILE_ENTRY_NAME &&
+      projectFileExtension !== '.json'
+    ) {
+      return errorResult(
+        `project_path must point to ${MULTI_FILE_ENTRY_NAME} or a legacy JSON project file.`,
+        {
+          code: 'MCP_OPEN_PROJECT_INVALID_ENTRY',
+          projectPath: normalizedProjectPath,
+        }
+      );
+    }
+
+    const persistenceState = context.getPersistenceState
+      ? context.getPersistenceState()
+      : null;
+    const discardUnsavedChanges = !!(
+      args && args.discard_unsaved_changes === true
+    );
+    if (
+      persistenceState &&
+      persistenceState.hasUnsavedChanges &&
+      !discardUnsavedChanges
+    ) {
+      return errorResult(
+        'The current project has unsaved in-memory changes. Save them first or retry with discard_unsaved_changes:true.',
+        {
+          code: 'MCP_OPEN_PROJECT_UNSAVED_CHANGES',
+          projectPath: normalizedProjectPath,
+          hasUnsavedChanges: true,
+          changesCount: persistenceState.changesCount,
+        }
+      );
+    }
+
+    try {
+      const openResult = await openProjectAndWait({
+        projectPath: normalizedProjectPath,
+        discardUnsavedChanges,
+        reportProgress: context.reportProgress,
+      });
+      if (!openResult || openResult.opened === false) {
+        return errorResult(
+          (openResult && openResult.reason) ||
+            'The requested project could not be opened.',
+          {
+            code: (openResult && openResult.code) || 'MCP_OPEN_PROJECT_FAILED',
+            projectPath: normalizedProjectPath,
+            open: openResult || undefined,
+          }
+        );
+      }
+      return textResult({
+        success: true,
+        opened: true,
+        requestedProjectPath: normalizedProjectPath,
+        projectName: openResult.projectName,
+        projectFile: openResult.projectFile || normalizedProjectPath,
+        discardedUnsavedInMemoryChanges:
+          !!persistenceState && persistenceState.hasUnsavedChanges,
+        open: openResult,
+        nextAction:
+          'The requested project is loaded in the editor. Use gdevelop_get_editor_state or gdevelop_get_project_summary to inspect it.',
+      });
+    } catch (error) {
+      return errorResult(
+        error && error.message
+          ? error.message
+          : 'Unable to open the requested project.',
+        {
+          code: error && error.code ? error.code : 'MCP_OPEN_PROJECT_FAILED',
+          projectPath: normalizedProjectPath,
+        }
+      );
+    }
   }
 
   if (toolName === 'gdevelop_get_editor_selection') {

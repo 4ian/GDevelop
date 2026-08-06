@@ -5848,7 +5848,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         rethrowOpenError?: boolean,
         reportProgress?: (phase: string) => void,
       |}
-    ): Promise<void> => {
+    ): Promise<?State> => {
       if (hasUnsavedChanges && !(options && options.ignoreUnsavedChanges)) {
         const answer = Window.showConfirmDialog(
           i18n._(
@@ -5868,7 +5868,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      await openFromFileMetadata(fileMetadata, {
+      return openFromFileMetadata(fileMetadata, {
         openingMessage: (options && options.openingMessage) || null,
         ignoreAutoSave: (options && options.ignoreAutoSave) || false,
         suppressOpenErrorAlert:
@@ -5921,10 +5921,12 @@ const MainFrame = (props: Props): React.MixedElement => {
               });
             }
           }
+          return state;
         })
         .catch(error => {
           if (options && options.rethrowOpenError) throw error;
           /* Ignore error, it was already surfaced to the user unless explicitly suppressed. */
+          return null;
         });
     },
     [
@@ -7923,6 +7925,59 @@ const MainFrame = (props: Props): React.MixedElement => {
         i18n,
         editorCallbacks: mcpEditorCallbacks,
         triggerUnsavedChanges,
+        openProjectAndWait: async ({
+          projectPath,
+          discardUnsavedChanges,
+          reportProgress,
+        }) => {
+          const hasUnsavedInMemoryChanges = getChangesCount() > 0;
+          if (hasUnsavedInMemoryChanges && !discardUnsavedChanges) {
+            return {
+              opened: false,
+              code: 'MCP_OPEN_PROJECT_UNSAVED_CHANGES',
+              reason:
+                'The current project has unsaved in-memory changes. Save them first or retry with discard_unsaved_changes:true.',
+            };
+          }
+
+          if (reportProgress) reportProgress({ phase: 'open-requested' });
+          const openedState = await openFromFileMetadataWithStorageProvider(
+            {
+              fileMetadata: { fileIdentifier: projectPath },
+              storageProviderName: localFileStorageProviderInternalName,
+            },
+            {
+              ignoreUnsavedChanges: true,
+              ignoreAutoSave: true,
+              suppressOpenErrorAlert: true,
+              rethrowOpenError: true,
+              reportProgress: phase => {
+                if (reportProgress) reportProgress({ phase });
+              },
+            }
+          );
+          const openedProject = openedState && openedState.currentProject;
+          if (!openedProject) {
+            return {
+              opened: false,
+              code: 'MCP_OPEN_PROJECT_FAILED',
+              reason:
+                'The requested project did not become the active project.',
+            };
+          }
+
+          if (reportProgress) reportProgress({ phase: 'extensions-waiting' });
+          await eventsFunctionsExtensionsState.ensureLoadFinished(
+            openedProject
+          );
+          await ensureProjectSettingsApplied();
+          if (reportProgress) reportProgress({ phase: 'open-complete' });
+          return {
+            opened: true,
+            projectName: openedProject.getName(),
+            projectFile: openedProject.getProjectFile() || projectPath,
+          };
+        },
         runCommand: commandName => {
           if (!commandPaletteRef.current) return false;
           commandPaletteRef.current.launchCommand((commandName: any));
@@ -8107,6 +8162,8 @@ const MainFrame = (props: Props): React.MixedElement => {
       i18n,
       mcpEditorCallbacks,
       triggerUnsavedChanges,
+      openFromFileMetadataWithStorageProvider,
+      ensureProjectSettingsApplied,
       getChangesCount,
       getTimeOfFirstChangeSinceLastSave,
       saveProjectForMcpAndWait,

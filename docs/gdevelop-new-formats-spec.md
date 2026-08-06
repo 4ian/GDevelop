@@ -1875,9 +1875,9 @@ isolated to deterministic inferred signatures in the deprecated catalog rather
 than guessed positional source arrays.
 
 AI integrations treat the project files as the authoring API. MCP exposure is
-limited to editor-state queries and preview/runtime debugging; it does not
-expose project mutation, event authoring, generic editor-call, command, or save
-tools.
+limited to local project opening, editor-state queries, synchronization, and
+preview/runtime debugging; it does not expose project mutation, event
+authoring, generic editor-call, command, or save tools.
 
 ### 15.2 Multi-file transactions
 

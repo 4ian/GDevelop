@@ -75,6 +75,7 @@ const isVerifyProjectChangeRequest = request =>
   request.params.name === 'verify_project_change';
 
 const PROJECT_FILES_OPERATION_TOOL_NAMES = new Set([
+  'open_project',
   'generate-catalogs',
   'validate_project_files',
 ]);

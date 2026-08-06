@@ -472,8 +472,9 @@ asset is appropriate.
 
 MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
-The complete public protocol surface is the following 22-tool allowlist:
+The complete public protocol surface is the following 23-tool allowlist:
 
+- Local project opening: `open_project`.
 - Editor/project inspection:
   `gdevelop_get_editor_state`, `gdevelop_get_editor_selection`,
   `gdevelop_get_project_summary`, `gdevelop_list_scenes`,
@@ -502,6 +503,7 @@ reading and editing `constants.toml` directly.
   `import_extension`. This is the only MCP tool allowed to create project
   source. It must return the generated source paths; all later adaptation is a
   direct file edit.
+- Opening a specific local project entry in the editor with `open_project`.
 - Reloading direct disk edits into the editor with `reload_project`.
 - Regenerating and synchronously waiting for the three generated source
   catalogs and two JavaScript declaration files with `generate-catalogs` after

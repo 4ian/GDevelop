@@ -14,6 +14,7 @@ import {
 } from './McpToolCatalog';
 
 const expectedAlwaysAvailableTools = [
+  'open_project',
   'gdevelop_get_editor_state',
   'gdevelop_get_editor_selection',
   'gdevelop_get_project_summary',
@@ -137,6 +138,7 @@ describe('McpToolCatalog', () => {
       'Editor queries',
       'Extension import',
       'Preview runtime',
+      'Project opening',
       'Project-file validation',
       'Tool discovery',
     ]);
@@ -147,6 +149,42 @@ describe('McpToolCatalog', () => {
     expect(
       capabilities.categories['Project-file validation'].map(tool => tool.name)
     ).toContain('reload_project');
+  });
+
+  it('exposes open_project as an always-available destructive synchronization tool', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'open_project');
+
+    expect(tool).toEqual(
+      expect.objectContaining({
+        inputSchema: expect.objectContaining({
+          required: ['project_path'],
+          additionalProperties: false,
+          properties: expect.objectContaining({
+            project_path: expect.objectContaining({ type: 'string' }),
+            discard_unsaved_changes: expect.objectContaining({
+              type: 'boolean',
+            }),
+          }),
+        }),
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+          idempotentHint: true,
+        }),
+      })
+    );
+    expect(
+      canCallMcpTool('open_project', {
+        allowWriteTools: false,
+        allowCommandTools: false,
+      })
+    ).toEqual({ canCall: true });
+    expect(getMcpToolUsageExamples('open_project').open_project).toHaveLength(
+      2
+    );
   });
 
   it('marks reload_project as an always-available destructive synchronization tool', () => {

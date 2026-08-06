@@ -186,7 +186,156 @@ describe('McpEditorBridge', () => {
       'generate-catalogs'
     );
     expect(response.tools.map(tool => tool.name)).toContain('reload_project');
+    expect(response.tools.map(tool => tool.name)).toContain('open_project');
     expect(response.tools.map(tool => tool.name)).not.toContain('create_scene');
+  });
+
+  it('opens a specific local project and returns the loaded project receipt', async () => {
+    const projectPath = path.join(
+      os.tmpdir(),
+      'gdevelop-mcp-open-project',
+      'project.gdevelop'
+    );
+    const reportProgress: any = jest.fn();
+    const openProjectAndWait: any = jest.fn(async request => ({
+      opened: true,
+      projectName: 'Opened project',
+      projectFile: request.projectPath,
+    }));
+    const bridge = makeBridge({
+      openProjectAndWait,
+      getPersistenceState: () => ({
+        hasUnsavedChanges: false,
+        changesCount: 0,
+        timeOfFirstChangeSinceLastSave: null,
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'open_project',
+        arguments: { project_path: projectPath },
+      },
+      reportProgress,
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        opened: true,
+        projectName: 'Opened project',
+        projectFile: path.normalize(projectPath),
+        discardedUnsavedInMemoryChanges: false,
+      })
+    );
+    expect(openProjectAndWait).toHaveBeenCalledWith({
+      projectPath: path.normalize(projectPath),
+      discardUnsavedChanges: false,
+      reportProgress,
+    });
+  });
+
+  it('refuses to replace unsaved editor state unless explicitly allowed', async () => {
+    const projectPath = path.join(
+      os.tmpdir(),
+      'gdevelop-mcp-open-project',
+      'project.gdevelop'
+    );
+    const openProjectAndWait: any = jest.fn();
+    const bridge = makeBridge({
+      openProjectAndWait,
+      getPersistenceState: () => ({
+        hasUnsavedChanges: true,
+        changesCount: 3,
+        timeOfFirstChangeSinceLastSave: 123,
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'open_project',
+        arguments: { project_path: projectPath },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.code).toBe('MCP_OPEN_PROJECT_UNSAVED_CHANGES');
+    expect(result.changesCount).toBe(3);
+    expect(openProjectAndWait).not.toHaveBeenCalled();
+  });
+
+  it('opens another project when unsaved-state discard is explicit', async () => {
+    const projectPath = path.join(
+      os.tmpdir(),
+      'gdevelop-mcp-open-project',
+      'project.gdevelop'
+    );
+    const openProjectAndWait: any = jest.fn(async request => ({
+      opened: true,
+      projectName: 'Replacement project',
+      projectFile: request.projectPath,
+    }));
+    const bridge = makeBridge({
+      openProjectAndWait,
+      getPersistenceState: () => ({
+        hasUnsavedChanges: true,
+        changesCount: 3,
+        timeOfFirstChangeSinceLastSave: 123,
+      }),
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'open_project',
+        arguments: {
+          project_path: projectPath,
+          discard_unsaved_changes: true,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.discardedUnsavedInMemoryChanges).toBe(true);
+    expect(openProjectAndWait).toHaveBeenCalledWith(
+      expect.objectContaining({ discardUnsavedChanges: true })
+    );
+  });
+
+  it('rejects relative and unsupported project entry paths', async () => {
+    const openProjectAndWait: any = jest.fn();
+    const bridge = makeBridge({ openProjectAndWait });
+
+    const relativeResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'open_project',
+        arguments: { project_path: 'games/project.gdevelop' },
+      },
+    });
+    const unsupportedResponse = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'open_project',
+        arguments: {
+          project_path: path.join(os.tmpdir(), 'games', 'renamed.gdevelop'),
+        },
+      },
+    });
+
+    expect(JSON.parse(relativeResponse.content[0].text).code).toBe(
+      'MCP_OPEN_PROJECT_PATH_NOT_ABSOLUTE'
+    );
+    expect(JSON.parse(unsupportedResponse.content[0].text).code).toBe(
+      'MCP_OPEN_PROJECT_INVALID_ENTRY'
+    );
+    expect(openProjectAndWait).not.toHaveBeenCalled();
   });
 
   it('generates and verifies all catalogs and JavaScript declarations before returning', async () => {

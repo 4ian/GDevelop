@@ -321,6 +321,29 @@ const run = async () => {
   assert.strictEqual(firstValidationResult.structuredContent.valid, true);
   assert.strictEqual(secondValidationResult.structuredContent.valid, true);
 
+  const openProjectRequest = {
+    method: 'tools/call',
+    params: {
+      name: 'open_project',
+      arguments: { project_path: 'C:\\Games\\Test\\project.gdevelop' },
+    },
+  };
+  const openProjectPromise = projectFilesBroker.send(openProjectRequest);
+  await delay(30);
+  assert.strictEqual(
+    projectFilesRequests.length,
+    2,
+    'open_project should use the longer project-files operation timeout'
+  );
+  projectFilesBroker.handleResponse(projectFilesWebContents, {
+    id: projectFilesRequests[1].request.id,
+    result: toolResult({ success: true, opened: true }),
+  });
+  assert.strictEqual(
+    (await openProjectPromise).structuredContent.opened,
+    true
+  );
+
   const timedOutProjectFilesRequests = [];
   const timedOutProjectFilesWebContents = {
     isDestroyed: () => false,

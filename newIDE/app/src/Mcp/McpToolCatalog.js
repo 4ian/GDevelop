@@ -48,6 +48,24 @@ const noInputSchema = {
   additionalProperties: false,
 };
 
+const openProjectSchema = {
+  type: 'object',
+  properties: {
+    project_path: {
+      type: 'string',
+      description:
+        'Absolute path to a local project.gdevelop entry file or a legacy GDevelop JSON project file.',
+    },
+    discard_unsaved_changes: {
+      type: 'boolean',
+      description:
+        'Default false. Must be true when the currently open project has unsaved in-memory changes; those changes will be discarded before opening the requested project.',
+    },
+  },
+  required: ['project_path'],
+  additionalProperties: false,
+};
+
 const reloadProjectSchema = {
   type: 'object',
   properties: {
@@ -796,6 +814,18 @@ const inspectSignalUsageSchema = {
 
 const readTools: Array<McpTool> = [
   {
+    name: 'open_project',
+    description:
+      'Open a specific local GDevelop project in the current editor window by absolute entry-file path. Accepts project.gdevelop or a legacy JSON project file and waits for project loading, resource fetching, and extension loading to finish. By default, refuses to replace a project with unsaved in-memory changes; pass discard_unsaved_changes:true to explicitly discard them. Opening project.gdevelop may bootstrap missing generated .gdevelop catalogs; opening legacy JSON may migrate it to the multi-file format.',
+    inputSchema: openProjectSchema,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'gdevelop_get_editor_state',
     description:
       'Return the current GDevelop editor state, including project availability, scene names, MCP permission state, and basic active project metadata.',
@@ -993,6 +1023,22 @@ const writeTools: Array<McpTool> = [
 const commandTools: Array<McpTool> = [];
 
 const toolUsageExamples: { [string]: Array<Object> } = {
+  open_project: [
+    {
+      description: 'Open a local multi-file GDevelop project.',
+      arguments: {
+        project_path: 'C:\\Games\\MyGame\\project.gdevelop',
+      },
+    },
+    {
+      description:
+        'Open another project and explicitly discard unsaved changes in the current editor project.',
+      arguments: {
+        project_path: 'C:\\Games\\AnotherGame\\project.gdevelop',
+        discard_unsaved_changes: true,
+      },
+    },
+  ],
   'generate-catalogs': [
     {
       description:
@@ -1385,6 +1431,7 @@ export const getCapabilitiesSummary = (
   });
   const categories: { [string]: Array<string> } = {
     'Extension import': ['import_extension'],
+    'Project opening': ['open_project'],
     'Editor queries': [
       'gdevelop_get_editor_state',
       'gdevelop_get_editor_selection',
@@ -1424,7 +1471,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to one extension import/conversion tool, editor queries, synchronization, validation, and preview debugging. There are no Constants MCP tools: the AI model must read and modify constants.toml directly on disk. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
+      'GDevelop MCP is intentionally limited to local project opening, one extension import/conversion tool, editor queries, synchronization, validation, and preview debugging. There are no Constants MCP tools: the AI model must read and modify constants.toml directly on disk. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

@@ -1,169 +1,47 @@
 package org.gdevelop.kotlin.runtime
 
 import kotlinx.serialization.Serializable
-import org.gdevelop.kotlin.diagnostics.Diagnostic
-import org.gdevelop.kotlin.diagnostics.Severity
-import org.gdevelop.kotlin.diagnostics.SourceLocation
-import org.gdevelop.kotlin.extensions.ExtensionCatalog
-import org.gdevelop.kotlin.extensions.ExtensionContext
-import org.gdevelop.kotlin.extensions.ExtensionDescriptor
-import org.gdevelop.kotlin.ir.ActionIr
-import org.gdevelop.kotlin.ir.ConditionIr
-import org.gdevelop.kotlin.ir.EventIr
-import org.gdevelop.kotlin.ir.ProgramIr
-import org.gdevelop.kotlin.ir.ExtensionHostOperation
+import org.gdevelop.kotlin.diagnostics.*
+import org.gdevelop.kotlin.extensions.*
+import org.gdevelop.kotlin.ir.*
 import org.gdevelop.kotlin.project.Value
 
-@Serializable
-data class TraceRecord(val sequence: Int, val frame: Int, val kind: String, val detail: String)
+@Serializable data class TraceRecord(val sequence:Int,val frame:Int,val kind:String,val detail:String)
+@Serializable data class ObjectReport(val handle:String,val objectName:String,val x:Double,val y:Double,val variables:Map<String,String>)
+@Serializable data class SelectionReport(val objectOrGroup:String,val orderedHandles:List<String>)
+@Serializable data class ExecutionReport(val schemaVersion:Int=2,val framesExecuted:Int,val trace:List<TraceRecord>,val currentScene:String,val globals:Map<String,String>,val sceneVariables:Map<String,String>,val objects:List<ObjectReport>,val selections:List<SelectionReport>,val diagnostics:List<Diagnostic>,val resolvedExtensions:List<ExtensionDescriptor>)
+private data class Obj(val handle:String,val name:String,var x:Double,var y:Double,val variables:MutableMap<String,Value>,var deleted:Boolean=false)
+private data class SceneState(val ir:SceneIr,val variables:MutableMap<String,Value>,val objects:MutableList<Obj>,val timers:MutableMap<String,Long>)
 
-@Serializable
-data class ExecutionReport(
-    val schemaVersion: Int = 1,
-    val framesExecuted: Int,
-    val trace: List<TraceRecord>,
-    val globals: Map<String, String>,
-    val sceneVariables: Map<String, String>,
-    val diagnostics: List<Diagnostic>,
-    val resolvedExtensions: List<ExtensionDescriptor>,
-)
-
-class HeadlessRuntime(private val catalog: ExtensionCatalog) {
-    fun execute(program: ProgramIr, frameLimit: Int): ExecutionReport {
-        require(frameLimit in 0..10_000) { "frameLimit must be between 0 and 10000" }
-        val scene = program.scenes.first { it.name == program.firstScene }
-        val globals = program.globals.toMutableMap()
-        val sceneVariables = scene.variables.toMutableMap()
-        val trace = mutableListOf<TraceRecord>()
-        val diagnostics = mutableListOf<Diagnostic>()
-        var currentFrame = -1
-        fun emit(kind: String, detail: String) { trace += TraceRecord(trace.size, currentFrame, kind, detail) }
-        val context = object : ExtensionContext {
-            override fun readNumber(scope: String, name: String): Double? = variableMap(scope, globals, sceneVariables)?.get(name).asNumber()
-            override fun writeNumber(scope: String, name: String, value: Double) {
-                val variables = variableMap(scope, globals, sceneVariables)
-                if (variables == null) {
-                    diagnostics += runtimeError("GDKP_RUNTIME_UNKNOWN_SCOPE", "Unknown variable scope: $scope")
-                } else variables[name] = Value.NumberValue(value)
-            }
-            override fun trace(kind: String, detail: String) = emit(kind, detail)
-        }
-
-        catalog.lifecycleProviders().forEach { it.runtime.onSceneLoaded(context) }
-        emit("lifecycle", "scene-loaded:${scene.name}")
-        repeat(frameLimit) { frame ->
-            currentFrame = frame
-            emit("frame", "start")
-            scene.events.forEach { executeEvent(it, globals, sceneVariables, context, diagnostics, ::emit) }
-            emit("frame", "end")
-        }
-        currentFrame = frameLimit
-        catalog.lifecycleProviders().asReversed().forEach { it.runtime.onSceneUnloaded(context) }
-        emit("lifecycle", "scene-unloaded:${scene.name}")
-        return ExecutionReport(
-            framesExecuted = frameLimit,
-            trace = trace,
-            globals = globals.toSortedMap().mapValues { format(it.value) },
-            sceneVariables = sceneVariables.toSortedMap().mapValues { format(it.value) },
-            diagnostics = diagnostics,
-            resolvedExtensions = catalog.descriptors,
-        )
-    }
-
-    private fun executeEvent(
-        event: EventIr,
-        globals: MutableMap<String, Value>,
-        sceneVariables: MutableMap<String, Value>,
-        context: ExtensionContext,
-        diagnostics: MutableList<Diagnostic>,
-        emit: (String, String) -> Unit,
-    ) {
-        val passed = event.conditions.all { condition ->
-            when (condition) {
-                is ConditionIr.HostOperation -> {
-                    emit("host-operation", operationTrace(condition.operation))
-                    diagnostics += unsupportedCapability(condition.operation)
-                    false
-                }
-                else -> evaluate(condition, globals, sceneVariables)
-            }
-        }
-        emit("event", "${event.origin.jsonPointer}:${if (passed) "passed" else "failed"}")
-        if (!passed) return
-        event.actions.forEach { action ->
-            when (action) {
-                is ActionIr.SetNumber -> mutate(action.scope, action.variable, action.value, false, globals, sceneVariables, diagnostics, emit)
-                is ActionIr.AddNumber -> mutate(action.scope, action.variable, action.value, true, globals, sceneVariables, diagnostics, emit)
-                is ActionIr.ExtensionCall -> {
-                    val registered = catalog.resolveAction(action.type)!!
-                    if (!registered.runtime.invoke(registered.descriptor.runtimeEntry, action.arguments, context)) {
-                        diagnostics += runtimeError("GDKP_RUNTIME_EXTENSION_ENTRY", "Extension rejected entry ${registered.descriptor.runtimeEntry}")
-                    }
-                    emit("extension-call", action.type)
-                }
-                is ActionIr.HostOperation -> {
-                    emit("host-operation", operationTrace(action.operation))
-                    diagnostics += unsupportedCapability(action.operation)
-                }
-            }
-        }
-        event.children.forEach { executeEvent(it, globals, sceneVariables, context, diagnostics, emit) }
-    }
-
-    private fun evaluate(condition: ConditionIr, globals: Map<String, Value>, sceneVariables: Map<String, Value>): Boolean = when (condition) {
-        ConditionIr.Always -> true
-        is ConditionIr.CompareNumber -> {
-            val actual = variableMap(condition.scope, globals, sceneVariables)?.get(condition.variable).asNumber() ?: return false
-            when (condition.operator) {
-                "=" -> actual == condition.value
-                "!=" -> actual != condition.value
-                "<" -> actual < condition.value
-                "<=" -> actual <= condition.value
-                ">" -> actual > condition.value
-                ">=" -> actual >= condition.value
-                else -> false
-            }
-        }
-        is ConditionIr.HostOperation -> false
-    }
-
-    private fun mutate(scope: String, name: String, operand: Double, add: Boolean, globals: MutableMap<String, Value>, scene: MutableMap<String, Value>, diagnostics: MutableList<Diagnostic>, emit: (String, String) -> Unit) {
-        val variables = variableMap(scope, globals, scene)
-        if (variables == null) {
-            diagnostics += runtimeError("GDKP_RUNTIME_UNKNOWN_SCOPE", "Unknown variable scope: $scope")
-            return
-        }
-        val value = if (add) (variables[name].asNumber() ?: 0.0) + operand else operand
-        variables[name] = Value.NumberValue(value)
-        emit("variable-write", "$scope:$name=${format(Value.NumberValue(value))}")
-    }
-
-    private fun <T : Map<String, Value>> variableMap(scope: String, globals: T, scene: T): T? = when (scope) {
-        "global" -> globals
-        "scene" -> scene
-        else -> null
-    }
-
-    private fun Value?.asNumber(): Double? = (this as? Value.NumberValue)?.value
-    private fun format(value: Value): String = when (value) {
-        is Value.NumberValue -> if (value.value % 1.0 == 0.0) value.value.toLong().toString() else value.value.toString()
-        is Value.StringValue -> value.value
-        is Value.BooleanValue -> value.value.toString()
-    }
-    private fun runtimeError(code: String, message: String) = Diagnostic(code, Severity.ERROR, message, SourceLocation("runtime", ""))
-
-    private fun operationTrace(operation: ExtensionHostOperation): String = buildString {
-        append("extension=").append(operation.extensionIdentity.namespace).append('@').append(operation.extensionIdentity.version)
-        append(";origin=").append(operation.extensionIdentity.origin)
-        append(";type=").append(operation.descriptorType)
-        append(";entry=").append(operation.runtimeEntry)
-        append(";parameters=").append(operation.parameterOrder.zip(operation.arguments).joinToString(",") { "${it.first}=${it.second}" })
-        append(";source=").append(operation.origin.sourceId).append(':').append(operation.origin.jsonPointer)
-        append(";capabilities=").append(operation.requiredCapabilities.map { it.value }.sorted().joinToString(","))
-    }
-
-    private fun unsupportedCapability(operation: ExtensionHostOperation) = Diagnostic(
-        "GDKP_RUNTIME_UNSUPPORTED_CAPABILITY", Severity.ERROR,
-        "No host installed for ${operation.requiredCapabilities.map { it.value }.sorted().joinToString()}", operation.origin,
-    )
+class HeadlessRuntime(private val catalog:ExtensionCatalog,private val elapsedMillisecondsPerFrame:Long=16){
+ fun execute(program:ProgramIr,frameLimit:Int):ExecutionReport{
+  require(frameLimit in 0..10_000);val globals=program.globals.toMutableMap();val trace=mutableListOf<TraceRecord>();val diagnostics=mutableListOf<Diagnostic>();val once=mutableSetOf<String>();var frame=-1;var sequence=0;var created=0
+  fun emit(k:String,v:String){trace+=TraceRecord(sequence++,frame,k,v)}
+  fun load(name:String):SceneState{val ir=program.scenes.firstOrNull{it.name==name}?:error("Unknown scene $name");return SceneState(ir,ir.variables.toMutableMap(),ir.instances.map{Obj(it.stableId,it.objectName,it.x,it.y,(ir.objects[it.objectName]?.variables.orEmpty()+it.variables).toMutableMap())}.toMutableList(),mutableMapOf())}
+  var state=load(program.firstScene);var lastSelections=mutableMapOf<String,List<String>>();var requested:String?=null
+  val context=object:ExtensionContext{override fun readNumber(scope:String,name:String)=when(scope){"global"->globals[name].num();"scene"->state.variables[name].num();else->null};override fun writeNumber(scope:String,name:String,value:Double){when(scope){"global"->globals[name]=Value.NumberValue(value);"scene"->state.variables[name]=Value.NumberValue(value);else->diagnostics+=runtime("GDKP_RUNTIME_UNKNOWN_SCOPE","Unknown variable scope: $scope")}};override fun trace(kind:String,detail:String)=emit(kind,detail)}
+  catalog.lifecycleProviders().forEach{it.runtime.onSceneLoaded(context)};emit("lifecycle","scene-load:${state.ir.name}")
+  repeat(frameLimit){f->frame=f;state.timers.replaceAll{_,v->v+elapsedMillisecondsPerFrame};emit("lifecycle","pre-events:${state.ir.name}");emit("lifecycle","generated-events:${state.ir.name}")
+   state.ir.events.forEach{e->val selections=initialSelections(state);executeEvent(e,state,globals,selections,mutableMapOf(),once,context,diagnostics,::emit,{requested=it},{name,x,y->created++;val h="created:${state.ir.name}:$created";state.objects+=Obj(h,name,x,y,state.ir.objects[name]?.variables.orEmpty().toMutableMap());h});lastSelections=selections.mapValues{it.value.toList()}.toMutableMap()}
+   emit("lifecycle","post-events:${state.ir.name}");val next=requested;if(next!=null){emit("scene-transition","requested:${state.ir.name}->$next");catalog.lifecycleProviders().asReversed().forEach{it.runtime.onSceneUnloaded(context)};emit("lifecycle","scene-unload:${state.ir.name}");val old=state.ir.name;state=load(next);emit("scene-transition","committed:$old->$next");catalog.lifecycleProviders().forEach{it.runtime.onSceneLoaded(context)};emit("lifecycle","scene-load:${state.ir.name}");requested=null}
+  }
+  catalog.lifecycleProviders().asReversed().forEach{it.runtime.onSceneUnloaded(context)};emit("lifecycle","scene-unload:${state.ir.name}")
+  return ExecutionReport(framesExecuted=frameLimit,trace=trace,currentScene=state.ir.name,globals=globals.sorted(),sceneVariables=state.variables.sorted(),objects=state.objects.filterNot{it.deleted}.map{ObjectReport(it.handle,it.name,it.x,it.y,it.variables.sorted())},selections=lastSelections.toSortedMap().map{SelectionReport(it.key,it.value)},diagnostics=diagnostics,resolvedExtensions=catalog.descriptors)
+ }
+ private fun initialSelections(s:SceneState):MutableMap<String,MutableList<String>>{val r=mutableMapOf<String,MutableList<String>>();s.ir.objects.keys.forEach{n->r[n]=s.objects.filter{!it.deleted&&it.name==n}.map{it.handle}.toMutableList()};s.ir.groups.forEach{(g,names)->r[g]=names.flatMap{r[it].orEmpty()}.toMutableList()};return r}
+ private fun executeEvent(e:EventIr,s:SceneState,g:MutableMap<String,Value>,sel:MutableMap<String,MutableList<String>>,parameters:MutableMap<String,Value>,once:MutableSet<String>,ctx:ExtensionContext,d:MutableList<Diagnostic>,emit:(String,String)->Unit,replace:(String)->Unit,create:(String,Double,Double)->String){val locals=e.locals.toMutableMap();var passed=true
+  for(c in e.conditions){val result=when(c){ConditionIr.Always->true;is ConditionIr.CompareNumber->read(c.variable,s,g,locals,parameters,null)?.num()?.let{compare(it,c.operator,c.value)}?:false;is ConditionIr.PickByX->{val handles=sel[c.objectOrGroup].orEmpty();val picked=handles.filter{h->s.objects.firstOrNull{it.handle==h&&!it.deleted}?.x?.let{compare(it,c.operator,c.value)}==true};sel[c.objectOrGroup]=picked.toMutableList();emit("selection","${c.objectOrGroup}=${picked.joinToString(",")}");picked.isNotEmpty()};is ConditionIr.Once->once.add(c.triggerId);is ConditionIr.TimerElapsed->(s.timers[c.timer]?:0)>=c.milliseconds;is ConditionIr.HostOperation->{d+=unsupported(c.operation);false}};emit("condition","${c::class.simpleName}:$result");if(!result){passed=false;break}}
+  emit("event","${e.origin.jsonPointer}:${if(passed)"passed" else "failed"}");if(!passed)return
+  e.actions.forEach{a->when(a){is ActionIr.WriteNumber->{val old=read(a.variable,s,g,locals,parameters,null).num()?:0.0;write(a.variable,if(a.operator=="+")old+a.value else a.value,s,g,locals,parameters,null,d);emit("variable-write","${a.variable.scope}:${a.variable.name}")};is ActionIr.SetString->{writeValue(a.variable,Value.StringValue(a.value),s,g,locals,parameters,null,d);emit("variable-write","${a.variable.scope}:${a.variable.name}")};is ActionIr.SetSelectedX->{val hs=sel[a.objectOrGroup].orEmpty().toList();hs.forEach{h->s.objects.firstOrNull{it.handle==h&&!it.deleted}?.let{it.x=if(a.operator=="+")it.x+a.value else a.value}};emit("action-receivers","set-x:${hs.joinToString(",")}")};is ActionIr.SetSelectedString->{val hs=sel[a.objectOrGroup].orEmpty().toList();hs.forEach{h->s.objects.firstOrNull{it.handle==h&&!it.deleted}?.variables?.set(a.property,Value.StringValue(a.value))};emit("action-receivers","set-${a.property}:${hs.joinToString(",")}")};is ActionIr.DeleteSelected->{val hs=sel[a.objectOrGroup].orEmpty().toList();hs.forEach{h->s.objects.firstOrNull{it.handle==h&&!it.deleted}?.let{it.deleted=true;emit("delete",h)}};sel.values.forEach{it.removeAll(hs.toSet())}};is ActionIr.CreateObject->{val h=create(a.objectName,a.x,a.y);sel.getOrPut(a.objectName){mutableListOf()}.add(h);emit("create",h)};is ActionIr.ReplaceScene->replace(a.sceneName);is ActionIr.ResetTimer->s.timers[a.timer]=0;is ActionIr.ExtensionCall->{val r=catalog.resolveAction(a.type);if(r!=null&&!r.runtime.invoke(r.descriptor.runtimeEntry,a.arguments,ctx))d+=runtime("GDKP_RUNTIME_EXTENSION_ENTRY","Extension rejected ${a.type}");emit("extension-call",a.type)};is ActionIr.HostOperation->d+=unsupported(a.operation)}}
+  e.children.forEach{executeEvent(it,s,g,sel,parameters,once,ctx,d,emit,replace,create)}
+ }
+ private fun read(r:VariableRefIr,s:SceneState,g:Map<String,Value>,l:Map<String,Value>,p:Map<String,Value>,o:Obj?)=when(r.scope){VariableScope.GLOBAL->g[r.name];VariableScope.SCENE->s.variables[r.name];VariableScope.LOCAL->l[r.name];VariableScope.PARAMETER->p[r.name];VariableScope.OBJECT->o?.variables?.get(r.name)}
+ private fun write(r:VariableRefIr,v:Double,s:SceneState,g:MutableMap<String,Value>,l:MutableMap<String,Value>,p:MutableMap<String,Value>,o:Obj?,d:MutableList<Diagnostic>)=writeValue(r,Value.NumberValue(v),s,g,l,p,o,d)
+ private fun writeValue(r:VariableRefIr,v:Value,s:SceneState,g:MutableMap<String,Value>,l:MutableMap<String,Value>,p:MutableMap<String,Value>,o:Obj?,d:MutableList<Diagnostic>){when(r.scope){VariableScope.GLOBAL->g[r.name]=v;VariableScope.SCENE->s.variables[r.name]=v;VariableScope.LOCAL->l[r.name]=v;VariableScope.PARAMETER->p[r.name]=v;VariableScope.OBJECT->if(o==null)d+=runtime("GDKP_RUNTIME_MISSING_OBJECT_RECEIVER","No object receiver for ${r.name}")else o.variables[r.name]=v}}
+ private fun compare(a:Double,o:String,b:Double)=when(o){"="->a==b;"!="->a!=b;"<"->a<b;"<="->a<=b;">"->a>b;">="->a>=b;else->false}
+ private fun Value?.num()=(this as? Value.NumberValue)?.value
+ private fun Map<String,Value>.sorted()=toSortedMap().mapValues{format(it.value)}
+ private fun format(v:Value)=when(v){is Value.NumberValue->if(v.value%1.0==0.0)v.value.toLong().toString()else v.value.toString();is Value.StringValue->v.value;is Value.BooleanValue->v.value.toString()}
+ private fun runtime(c:String,m:String)=Diagnostic(c,Severity.ERROR,m,SourceLocation("runtime",""))
+ private fun unsupported(o:ExtensionHostOperation)=Diagnostic("GDKP_RUNTIME_UNSUPPORTED_CAPABILITY",Severity.ERROR,"No host installed for ${o.requiredCapabilities.map{it.value}.sorted().joinToString()}",o.origin)
 }

@@ -3,7 +3,7 @@ plugins {
 }
 
 kotlin {
-	jvmToolchain(21)
+	jvmToolchain(libs.versions.toolchain.get().toInt())
 	jvm()
 	js(IR) {
 		browser {
@@ -19,5 +19,7 @@ kotlin {
 		api(project(":project-model"))
 		api(project(":extension-catalog"))
 	}
-	sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
+	sourceSets.commonTest.dependencies {
+		implementation(kotlin("test"))
+	}
 }

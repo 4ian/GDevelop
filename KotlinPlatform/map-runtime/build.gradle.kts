@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-	jvmToolchain(21)
+	jvmToolchain(libs.versions.toolchain.get().toInt())
 	jvm()
 	js(IR) {
 		browser {
@@ -17,7 +17,9 @@ kotlin {
 	}
 	sourceSets.commonMain.dependencies {
 		api(project(":extension-catalog"))
-		api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+//		api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+		api(libs.kotlinx.serialization.json)
+
 	}
 	sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
 }

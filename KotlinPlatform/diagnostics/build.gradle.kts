@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-	jvmToolchain(21)
+	jvmToolchain(libs.versions.toolchain.get().toInt())
 	jvm()
 	js(IR) {
 		browser {
@@ -16,6 +16,8 @@ kotlin {
 		}
 	}
 	sourceSets.commonMain.dependencies {
-		api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+//		api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+		api(libs.kotlinx.serialization.json)
+
 	}
 }

@@ -1,7 +1,9 @@
-plugins { kotlin("multiplatform") }
+plugins {
+	kotlin("multiplatform")
+}
 
 kotlin {
-	jvmToolchain(21)
+	jvmToolchain(libs.versions.toolchain.get().toInt())
 	jvm()
 	js(IR) {
 		browser {
@@ -12,5 +14,7 @@ kotlin {
 			}
 		}
 	}
-	sourceSets.commonMain.dependencies { api(project(":extension-catalog")) }
+	sourceSets.commonMain.dependencies {
+		api(project(":extension-catalog"))
+	}
 }

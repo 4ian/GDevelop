@@ -1,5 +1,6 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
+import { type GameplayTestRunSpeedOptions } from './GameplayTestEditorToolbar';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
@@ -118,7 +119,7 @@ type Props = {|
   /** The frame currently reached by the running test, if known. */
   runningFrame?: number | null,
   lastResult: GameplayTestResult | null,
-  onRunTest: () => void | Promise<void>,
+  onRunTest: (options: GameplayTestRunSpeedOptions) => void | Promise<void>,
   onStopTest: () => void,
   onEditWithAi: () => void,
   onTestModified: () => void,
@@ -246,7 +247,7 @@ export const GameplayTestProperties = ({
                 fullWidth
                 icon={<PreviewIcon />}
                 label={<Trans>Run the test</Trans>}
-                onClick={onRunTest}
+                onClick={() => onRunTest({ speedFactor: null })}
               />
             )}
             <FlatButton

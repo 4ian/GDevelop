@@ -185,18 +185,12 @@ export class GameplayTestEditorContainer extends React.Component<
     }
   };
 
-  runTest = async (runOptions?: GameplayTestRunSpeedOptions) => {
+  runTest = async (runOptions: GameplayTestRunSpeedOptions) => {
     const { project } = this.props;
     const test = this.getGameplayTest();
     if (!project || !test || this.state.isRunning) return;
 
-    // `runTest` can be called from a button `onClick` (receiving the click
-    // event): only honor an explicitly given speed factor.
-    const speedFactor =
-      runOptions && typeof runOptions.speedFactor === 'number'
-        ? runOptions.speedFactor
-        : null;
-
+    const { speedFactor } = runOptions;
     const { scope, testName } = this.getScopeAndTestName();
     this.setState(
       { isRunning: true, runningFrame: null, lastResult: null },

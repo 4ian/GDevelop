@@ -21,6 +21,7 @@ import {
   type GameplayTestScope,
 } from './GameplayTestRunner';
 import { GameplayTestProperties } from './GameplayTestProperties';
+import { type GameplayTestRunSpeedOptions } from './GameplayTestEditorToolbar';
 
 export type GameplayTestEditorInterface = {|
   forceUpdate: () => void,
@@ -42,7 +43,7 @@ type Props = {|
   isRunning: boolean,
   runningFrame: number | null,
   lastResult: GameplayTestResult | null,
-  onRunTest: () => void | Promise<void>,
+  onRunTest: (options: GameplayTestRunSpeedOptions) => void | Promise<void>,
   onStopTest: () => void,
   onEditWithAi: () => void,
   onTestModified: () => void,

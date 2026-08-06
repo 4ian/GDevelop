@@ -12,12 +12,12 @@ import PropertiesPanelIcon from '../UI/CustomSvgIcons/Edit';
 
 export type GameplayTestRunSpeedOptions = {|
   // Game seconds simulated per real second (1 = normal speed, 4 = 4x...).
-  // Omitted: run as fast as possible.
-  speedFactor?: number,
+  // null: run as fast as possible.
+  speedFactor: number | null,
 |};
 
 type Props = {|
-  onRunTest: (options?: GameplayTestRunSpeedOptions) => void | Promise<void>,
+  onRunTest: (options: GameplayTestRunSpeedOptions) => void | Promise<void>,
   onStopTest: () => void,
   isRunning: boolean,
   canRun: boolean,
@@ -61,14 +61,14 @@ export class Toolbar extends React.PureComponent<Props> {
         ) : (
           <RaisedButtonWithSplitMenu
             primary
-            onClick={() => onRunTest()}
+            onClick={() => onRunTest({ speedFactor: null })}
             icon={<PlayIcon />}
             label={<Trans>Run the test</Trans>}
             disabled={!canRun}
             buildMenuTemplate={(i18n: I18nType) => [
               {
                 label: i18n._(t`Run as quickly as possible`),
-                click: () => onRunTest(),
+                click: () => onRunTest({ speedFactor: null }),
               },
               {
                 label: i18n._(t`Run at 4x speed`),

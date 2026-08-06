@@ -45,7 +45,7 @@ namespace gdjs {
             const workingPoint: FloatPoint = [0, 0];
 
             rendererObject.beginFill();
-            rendererObject.fill.alpha = 0.2;
+            rendererObject.fill.alpha = 0.5;
             rendererObject.fill.color = 0x778ee8;
 
             const speedScaleY = this.obstaclesManager.speedScaleY;

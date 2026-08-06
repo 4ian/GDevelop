@@ -14,7 +14,6 @@ namespace gdjs {
       const Recast = await initializeRecast();
 
       await RecastNav.init();
-      console.log('Initialized Recast');
       //@ts-ignore
       window.Recast = Recast;
     } catch (err) {

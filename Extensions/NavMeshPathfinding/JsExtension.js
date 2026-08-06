@@ -415,6 +415,260 @@ module.exports = {
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
         .setFunctionName('destinationReached');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Acceleration',
+          _('Acceleration'),
+          _('the acceleration when moving the object'),
+          _('the acceleration on the path'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+        .setFunctionName('setAcceleration')
+        .setGetter('getAcceleration');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'MaxSpeed',
+          _('Maximum speed'),
+          _('the maximum speed when moving the object'),
+          _('the max. speed on the path'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Max speed (in pixels per second)')
+          )
+        )
+        .setFunctionName('setMaxSpeed')
+        .setGetter('getMaxSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'Speed',
+          _('Speed'),
+          _('Change the speed of the object on the path'),
+          _('the speed on the path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon24.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Speed (in pixels per second)')
+          )
+        )
+        .setFunctionName('setSpeed')
+        .setGetter('getSpeed');
+
+      aut
+        .addScopedCondition(
+          'MovementAngleIsAround',
+          _('Angle of movement on its path'),
+          _('Compare the angle of movement of an object on its path.'),
+          _('Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('expression', _('Angle, in degrees'))
+        .addParameter('expression', _('Tolerance, in degrees'));
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AngularMaxSpeed',
+          _('Angular maximum speed'),
+          _('the maximum angular speed when moving the object'),
+          _('the max. angular speed on the path'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Max angular speed (in degrees per second)')
+          )
+        )
+        .setFunctionName('setAngularMaxSpeed')
+        .setGetter('getAngularMaxSpeed');
+
+      aut
+        .addExpressionAndConditionAndAction(
+          'number',
+          'AngleOffset',
+          _('Rotation offset'),
+          _('the rotation offset applied when moving the object'),
+          _('the rotation offset on the path'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .useStandardParameters(
+          'number',
+          gd.ParameterOptions.makeNewOptions().setDescription(
+            _('Angle (in degrees)')
+          )
+        )
+        .setFunctionName('setAngleOffset')
+        .setGetter('getAngleOffset');
+
+      aut
+        .addScopedAction(
+          'RotateObject',
+          _('Rotate the object'),
+          _('Enable or disable rotation of the object on the path'),
+          _('Enable rotation of _PARAM0_ on the path: _PARAM2_'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('yesorno', _('Rotate object?'))
+        .setFunctionName('setRotateObject');
+
+      aut
+        .addScopedCondition(
+          'ObjectRotated',
+          _('Object rotated'),
+          _('Check if the object is rotated when traveling on its path.'),
+          _('_PARAM0_ is rotated when traveling on its path'),
+          _('Pathfinding configuration'),
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('isObjectRotated');
+
+      aut
+        .addExpression(
+          'GetNodeX',
+          _('Get a waypoint X position'),
+          _('Get next waypoint X position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('expression', _('Node index (start at 0!)'))
+        .setFunctionName('getNodeX');
+
+      aut
+        .addExpression(
+          'GetNodeY',
+          _('Get a waypoint Y position'),
+          _('Get next waypoint Y position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('expression', _('Node index (start at 0!)'))
+        .setFunctionName('getNodeY');
+
+      aut
+        .addExpression(
+          'NextNodeIndex',
+          _('Index of the next waypoint'),
+          _('Get the index of the next waypoint to reach'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getNextNodeIndex');
+
+      aut
+        .addExpression(
+          'NodeCount',
+          _('Waypoint count'),
+          _('Get the number of waypoints on the path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getNodeCount');
+
+      aut
+        .addExpression(
+          'NextNodeX',
+          _('Get next waypoint X position'),
+          _('Get next waypoint X position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getNextNodeX');
+
+      aut
+        .addExpression(
+          'NextNodeY',
+          _('Get next waypoint Y position'),
+          _('Get next waypoint Y position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getNextNodeY');
+
+      aut
+        .addExpression(
+          'LastNodeX',
+          _('Last waypoint X position'),
+          _('Last waypoint X position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getLastNodeX');
+
+      aut
+        .addExpression(
+          'LastNodeY',
+          _('Last waypoint Y position'),
+          _('Last waypoint Y position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getLastNodeY');
+
+      aut
+        .addExpression(
+          'MovementAngle',
+          _('Angle of movement on its path'),
+          _('Angle of movement on its path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getMovementAngle');
     }
     {
       const behavior = new gd.BehaviorJsImplementation();

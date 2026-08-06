@@ -1,16 +1,23 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { ToolbarGroup } from '../UI/Toolbar';
-import RaisedButton from '../UI/RaisedButton';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import PlayIcon from '../UI/CustomSvgIcons/Preview';
 import StopIcon from '../UI/CustomSvgIcons/Stop';
 import PropertiesPanelIcon from '../UI/CustomSvgIcons/Edit';
 
+export type GameplayTestRunSpeedOptions = {|
+  // Game seconds simulated per real second (1 = normal speed, 4 = 4x...).
+  // Omitted: run as fast as possible.
+  speedFactor?: number,
+|};
+
 type Props = {|
-  onRunTest: () => void | Promise<void>,
+  onRunTest: (options?: GameplayTestRunSpeedOptions) => void | Promise<void>,
   onStopTest: () => void,
   isRunning: boolean,
   canRun: boolean,
@@ -52,12 +59,26 @@ export class Toolbar extends React.PureComponent<Props> {
             label={<Trans>Stop the test</Trans>}
           />
         ) : (
-          <RaisedButton
+          <RaisedButtonWithSplitMenu
             primary
-            onClick={onRunTest}
+            onClick={() => onRunTest()}
             icon={<PlayIcon />}
             label={<Trans>Run the test</Trans>}
             disabled={!canRun}
+            buildMenuTemplate={(i18n: I18nType) => [
+              {
+                label: i18n._(t`Run as quickly as possible`),
+                click: () => onRunTest(),
+              },
+              {
+                label: i18n._(t`Run at 4x speed`),
+                click: () => onRunTest({ speedFactor: 4 }),
+              },
+              {
+                label: i18n._(t`Run at normal speed`),
+                click: () => onRunTest({ speedFactor: 1 }),
+              },
+            ]}
           />
         )}
       </ToolbarGroup>

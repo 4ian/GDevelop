@@ -60,6 +60,12 @@ namespace gdjs {
       timeoutMs?: number;
       /** Maximum number of frames stepped. Default: 20000. */
       maxFrames?: number;
+      /**
+       * Pace the run for a human watching it: game seconds simulated per
+       * real second (1 = normal speed, 4 = 4x...). Omitted: run as fast
+       * as possible.
+       */
+      speedFactor?: number;
       /** Maximum number of screenshots kept. Default: 5. */
       maxScreenshots?: number;
       /**
@@ -419,6 +425,11 @@ namespace gdjs {
       /** Last time the stepping loop yielded to the browser (see
        * `_maybeYield`). */
       _lastYieldTimeMs: number = 0;
+      /** Game seconds simulated per real second, or null to run as fast
+       * as possible (see `_maybeYield`). */
+      _paceSpeedFactor: float | null = null;
+      _paceReferenceWallTimeMs: number = 0;
+      _paceReferenceGameTimeMs: number = 0;
       _maxScreenshots: integer;
       _totalStepTimeMs: number = 0;
       _worstStepTimeMs: number = 0;
@@ -448,6 +459,11 @@ namespace gdjs {
         this._timeoutMs = payload.timeoutMs || DEFAULT_TIMEOUT_MS;
         this._maxFrames = payload.maxFrames || DEFAULT_MAX_FRAMES;
         this._lastYieldTimeMs = Date.now();
+        this._paceSpeedFactor = payload.speedFactor
+          ? Math.max(0.1, Math.min(100, payload.speedFactor))
+          : null;
+        this._paceReferenceWallTimeMs = Date.now();
+        this._paceReferenceGameTimeMs = 0;
         this._maxScreenshots =
           payload.maxScreenshots === undefined
             ? DEFAULT_MAX_SCREENSHOTS
@@ -614,8 +630,30 @@ namespace gdjs {
        * stop request) get processed - whatever the stepping pattern of the
        * test script (one big `stepFrames`, a `stepUntil` or a manual
        * `stepFrames(1)` loop).
+       *
+       * When the run is paced (`speedFactor` in the payload), also wait
+       * until the wall clock catches up with the game time simulated at
+       * the desired speed.
        */
       private async _maybeYield(): Promise<void> {
+        if (this._paceSpeedFactor !== null) {
+          const targetWallTimeMs =
+            this._paceReferenceWallTimeMs +
+            (this._gameTimeMs - this._paceReferenceGameTimeMs) /
+              this._paceSpeedFactor;
+          if (Date.now() < targetWallTimeMs) {
+            while (Date.now() < targetWallTimeMs) {
+              await this._waitForNextAnimationFrame();
+            }
+            this._lastYieldTimeMs = Date.now();
+            return;
+          }
+          // The run fell behind its pace (a heavy frame, or work outside of
+          // frame stepping like a scene load): re-anchor the pace instead
+          // of rushing at full speed to catch up.
+          this._paceReferenceWallTimeMs = Date.now();
+          this._paceReferenceGameTimeMs = this._gameTimeMs;
+        }
         if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
         await this._waitForNextAnimationFrame();
         this._lastYieldTimeMs = Date.now();

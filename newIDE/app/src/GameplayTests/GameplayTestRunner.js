@@ -61,6 +61,9 @@ export type GameplayTestToRun = {|
 export type GameplayTestRunOptions = {|
   timeoutMs?: number,
   screenshots?: 'off' | 'on-failure',
+  // Pace the run for a human watching it: game seconds simulated per real
+  // second (1 = normal speed, 4 = 4x...). Omitted: run as fast as possible.
+  speedFactor?: number,
   onTestStarted?: (test: GameplayTestToRun) => void,
   onProgress?: (test: GameplayTestToRun, frame: number) => void,
 |};
@@ -89,6 +92,9 @@ const GAME_READY_TIMEOUT_MS = 60 * 1000;
 const GAME_READY_POLL_INTERVAL_MS = 300;
 const RESULT_EXTRA_TIMEOUT_MS = 10 * 1000;
 const DEFAULT_TIMEOUT_MS = 30 * 1000;
+// Paced runs are slow by design (a human is watching): give them room.
+// They can always be stopped with the stop button.
+const PACED_RUN_DEFAULT_TIMEOUT_MS = 5 * 60 * 1000;
 
 let nextRunMessageId = 1;
 
@@ -269,6 +275,7 @@ const runSingleTest = async ({
   source,
   timeoutMs,
   screenshots,
+  speedFactor,
   stateInspectors,
   onProgress,
 }: {|
@@ -277,6 +284,7 @@ const runSingleTest = async ({
   source: string,
   timeoutMs: number,
   screenshots: 'off' | 'on-failure',
+  speedFactor: number | null,
   stateInspectors: GameplayTestStateInspectors,
   onProgress: ?(test: GameplayTestToRun, frame: number) => void,
 |}): Promise<GameplayTestResult> => {
@@ -347,6 +355,7 @@ const runSingleTest = async ({
       // it paused and muted when the test finishes, showing the last frame.
       freezeWhenFinished: true,
     };
+    if (speedFactor) payload.speedFactor = speedFactor;
     if (screenshots === 'off') payload.maxScreenshots = 0;
 
     previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
@@ -381,7 +390,11 @@ export const runGameplayTests = async ({
   const runPromise = lastRunPromise.then(
     async (): Promise<Array<GameplayTestResult>> => {
       const results: Array<GameplayTestResult> = [];
-      const timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
+      const timeoutMs =
+        options.timeoutMs ||
+        (options.speedFactor
+          ? PACED_RUN_DEFAULT_TIMEOUT_MS
+          : DEFAULT_TIMEOUT_MS);
       const stopController: BatchStopController = {
         stopRequested: false,
         abortBootWait: () => {},
@@ -517,6 +530,7 @@ export const runGameplayTests = async ({
             source,
             timeoutMs,
             screenshots: options.screenshots || 'off',
+            speedFactor: options.speedFactor || null,
             stateInspectors,
             onProgress: (test: GameplayTestToRun, frame: number) => {
               setGameplayTestFrameRunStatus({

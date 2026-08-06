@@ -588,6 +588,24 @@ describe('gdjs.gameplayTests', () => {
     ).to.be(true);
   });
 
+  it('paces the run when a speedFactor is set in the payload', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(12);
+      harness.assert(true, 'done');
+      `,
+      { speedFactor: 1 }
+    );
+
+    expect(result.status).to.be('passed');
+    // 13 frames at normal speed take ~216ms of wall-clock time (a run at
+    // full speed takes a few milliseconds).
+    expect(result.durationMs >= 120).to.be(true);
+  });
+
   it('supports stepUntil with a condition', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

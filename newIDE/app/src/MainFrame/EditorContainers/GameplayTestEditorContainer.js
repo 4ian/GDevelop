@@ -25,7 +25,10 @@ import {
   type GameplayTestResult,
   type GameplayTestScope,
 } from '../../GameplayTests/GameplayTestRunner';
-import { Toolbar } from '../../GameplayTests/GameplayTestEditorToolbar';
+import {
+  Toolbar,
+  type GameplayTestRunSpeedOptions,
+} from '../../GameplayTests/GameplayTestEditorToolbar';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Column } from '../../UI/Grid';
@@ -182,10 +185,17 @@ export class GameplayTestEditorContainer extends React.Component<
     }
   };
 
-  runTest = async () => {
+  runTest = async (runOptions?: GameplayTestRunSpeedOptions) => {
     const { project } = this.props;
     const test = this.getGameplayTest();
     if (!project || !test || this.state.isRunning) return;
+
+    // `runTest` can be called from a button `onClick` (receiving the click
+    // event): only honor an explicitly given speed factor.
+    const speedFactor =
+      runOptions && typeof runOptions.speedFactor === 'number'
+        ? runOptions.speedFactor
+        : null;
 
     const { scope, testName } = this.getScopeAndTestName();
     this.setState(
@@ -197,6 +207,7 @@ export class GameplayTestEditorContainer extends React.Component<
         project,
         tests: [{ scope, testName }],
         options: {
+          ...(speedFactor ? { speedFactor } : {}),
           onProgress: (test, frame) => this.setState({ runningFrame: frame }),
         },
       });

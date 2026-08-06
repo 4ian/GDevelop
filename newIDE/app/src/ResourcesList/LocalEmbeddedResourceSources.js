@@ -273,7 +273,7 @@ export async function listSpineEmbeddedResources(
 ): Promise<?EmbeddedResources> {
   if (!fs || !path) return null;
 
-  const atlasPath = filePath.replace('.json', '.atlas');
+  const atlasPath = filePath.replace(/\.(json|skel)$/i, '.atlas');
   const hasAtlasWithSameBasename = await new Promise<boolean>(resolve => {
     fs.promises
       .access(atlasPath, fs.constants.F_OK)
@@ -282,7 +282,7 @@ export async function listSpineEmbeddedResources(
   });
 
   // Spine resources usually have the same base names:
-  // e.g. skeleton.json, skeleton.atlas and skeleton.png.
+  // e.g. skeleton.json or skeleton.skel, skeleton.atlas and skeleton.png.
   if (!hasAtlasWithSameBasename) {
     console.error(`Could not find an atlas file for Spine file ${filePath}.`);
     return null;

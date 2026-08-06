@@ -11,6 +11,7 @@ type Props = {|
   onError?: (?Error) => void,
   onLoad?: (e: any) => void,
   loading?: 'lazy',
+  imageRef?: { current: HTMLImageElement | null },
 |};
 
 const addSearchParameterToUrl = (
@@ -38,6 +39,7 @@ const addSearchParameterToUrl = (
  */
 export const CorsAwareImage = ({
   src,
+  imageRef,
   ...props
 }: Props): React.MixedElement => {
   const correctedSrc =
@@ -64,6 +66,7 @@ export const CorsAwareImage = ({
   return (
     <img // eslint-disable-line jsx-a11y/alt-text
       {...props}
+      ref={imageRef}
       src={correctedSrc}
     />
   );

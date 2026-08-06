@@ -775,15 +775,16 @@ workflows:
                 - master
                 - stable
                 - /experimental-build.*/
-      - trigger-appveyor-windows-build:
-          requires:
-            - build-gdevelop_js-wasm-only
-          filters:
-            branches:
-              only:
-                - master
-                - stable
-                - /experimental-build.*/
+      # Disabled as Windows builds are now done by CircleCI.
+      # - trigger-appveyor-windows-build:
+      #     requires:
+      #       - build-gdevelop_js-wasm-only
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #           - stable
+      #           - /experimental-build.*/
 
   # Daily end-to-end test of the GDevelop CLI HTML5 export. Runs every day
   # at 16:00 UTC (4pm UTC) against the latest portable build uploaded to S3

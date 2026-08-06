@@ -56,7 +56,11 @@ const resourceKindToInputAcceptedMimes = {
     // Same as above: .atlas files have no recognized mime type on iOS Safari, so the
     // 'file' pseudo-mime is used and validation happens post-picking.
   ],
-  spine: ['application/json'],
+  spine: [
+    'file',
+    // .skel has no recognized mime type; .json would be filtered out on iOS if mixed
+    // with application/json. Validation happens post-picking (json and skel).
+  ],
   javascript: ['text/javascript'],
 };
 

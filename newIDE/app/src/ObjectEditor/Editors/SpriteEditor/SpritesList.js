@@ -582,11 +582,11 @@ const SpritesList = ({
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
-      const firstSpritePtr = animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSprite(0).ptr;
-      const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
+      // The first direction of the first animation can be empty (for example,
+      // when editing another animation of the object).
+      const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
+      const isObjectFirstSpriteDeleted =
+        !!firstObjectSprite && !!sprites[firstObjectSprite.ptr];
 
       const totalSpritesCount = getTotalSpritesCount(animations);
       const isDeletingLastSprites =
@@ -655,11 +655,10 @@ const SpritesList = ({
   );
 
   const addSpriteToSelection = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (sprite, selected) => {
+    (spritePtr: number, selected: boolean) => {
       selectedSprites.current = {
         ...selectedSprites.current,
-        [sprite.ptr]: selected,
+        [spritePtr]: selected,
       };
       forceUpdate();
     },
@@ -667,9 +666,9 @@ const SpritesList = ({
   );
 
   const selectUniqueSprite = React.useCallback(
-    (sprite: gdSprite) => {
+    (spritePtr: number) => {
       selectedSprites.current = {
-        [sprite.ptr]: true,
+        [spritePtr]: true,
       };
       forceUpdate();
     },
@@ -746,8 +745,7 @@ const SpritesList = ({
   );
 
   const openSpriteContextMenu = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (x, y, sprite) => {
+    (x: number, y: number, spritePtr: number) => {
       // When the context menu opens (long press on mobile), it intercepts
       // subsequent touch events, so the drag backend would never receive
       // touchend and a drag started by the press would stay active
@@ -756,8 +754,8 @@ const SpritesList = ({
         dragDropManager.getActions().endDrag();
       }
       // If the sprite is not selected, select only it.
-      if (!selectedSprites.current[sprite.ptr]) {
-        selectUniqueSprite(sprite);
+      if (!selectedSprites.current[spritePtr]) {
+        selectUniqueSprite(spritePtr);
       }
       // Otherwise, keep the selection as is.
       if (spriteContextMenu.current) {
@@ -800,13 +798,21 @@ const SpritesList = ({
           <div style={styles.spritesList} ref={spritesListRef}>
             {mapFor(0, spritesCount, i => {
               const sprite = direction.getSprite(i);
+              // Extract the sprite pointer and image name right away: the
+              // closures below can be called by react-dnd after the underlying
+              // C++ sprite was moved or deleted (following a drag'n'drop or a
+              // deletion), but before this component is re-rendered. `sprite`
+              // would then be a dangling wrapper: calling any of its methods
+              // would crash the editor - so closures must only capture these
+              // primitives.
+              const spritePtr = sprite.ptr;
+              const imageName = sprite.getImageName();
               return (
                 <DragSourceAndDropTarget
-                  key={sprite.ptr}
+                  key={spritePtr}
                   beginDrag={() => {
                     draggedSpriteIndex.current = i;
                     startAutoScroll();
-                    const imageName = sprite.getImageName();
                     return {
                       directionPtr: direction.ptr,
                       name: imageName,
@@ -837,14 +843,14 @@ const SpritesList = ({
                           <div style={styles.spriteDragSource}>
                             <ImageThumbnail
                               selectable
-                              selected={!!selectedSprites.current[sprite.ptr]}
+                              selected={!!selectedSprites.current[spritePtr]}
                               onSelect={selected =>
-                                addSpriteToSelection(sprite, selected)
+                                addSpriteToSelection(spritePtr, selected)
                               }
                               onContextMenu={(x, y) =>
-                                openSpriteContextMenu(x, y, sprite)
+                                openSpriteContextMenu(x, y, spritePtr)
                               }
-                              resourceName={sprite.getImageName()}
+                              resourceName={imageName}
                               resourcesLoader={resourcesLoader}
                               project={project}
                               style={i === 0 ? {} : styles.thumbnailExtraStyle}

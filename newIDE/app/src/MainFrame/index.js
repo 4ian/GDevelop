@@ -205,6 +205,7 @@ import { useImportExtension } from '../AssetStore/ExtensionStore/InstallExtensio
 import CommandPalette, {
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
+import WindowCommandsProvider from '../CommandPalette/WindowCommandsProvider';
 import {
   type ImportExtension,
   type SaveProject,
@@ -8557,177 +8558,187 @@ const MainFrame = (props: Props): React.MixedElement => {
       {// Render games platform frame before the editors, so the editor have priority
       // in what to display (ex: Loader of play section)
       gamesPlatformFrameTools.renderGamesPlatformFrame()}
-      <div className="main-frame-content">
-        {isProjectManagerPinnedForCurrentProject && (
-          <ProjectManagerDrawer
-            isPinned
-            projectManagerOpen={false}
-            closeProjectManager={closePinnedProjectManager}
-            onPinProjectManager={pinProjectManager}
-            title={projectManagerTitle}
-          >
-            {projectManagerNode}
-          </ProjectManagerDrawer>
-        )}
-        <div
-          className="main-frame-editors-content"
-          onClickCapture={closeTemporarySideMenusOnEditorClick}
-          style={
-            gameEditorMode === 'embedded-game' &&
-            activeEmbeddedGameFrameHoleCount > 0
-              ? { pointerEvents: 'none' }
-              : undefined
-          }
-        >
-          <LeaderboardProvider
-            gameId={currentProject ? currentProject.getProjectUuid() : ''}
-          >
-            {renderNpmScriptConfirmDialog()}
-            <PanesContainer
-              hasEditorsInLeftPane={hasEditorsInLeftPane}
-              hasEditorsInRightPane={hasEditorsInRightPane}
-              renderPane={({
-                paneIdentifier,
-                isLeftMostPane,
-                isRightMostPane,
-                isDrawer,
-                areSidePanesDrawers,
-                onSetPointerEventsNone,
-                onSetPaneDrawerState,
-                onRequestPaneClose,
-                drawerState,
-                rightPaneDrawerOpen,
-              }) => (
-                <EditorTabsPane
-                  {...editorTabsPaneProps}
-                  paneIdentifier={paneIdentifier}
-                  isLeftMostPane={isLeftMostPane}
-                  isRightMostPane={isRightMostPane}
-                  isDrawer={isDrawer}
-                  areSidePanesDrawers={areSidePanesDrawers}
-                  onSetPointerEventsNone={onSetPointerEventsNone}
-                  onSetPaneDrawerState={onSetPaneDrawerState}
-                  onPopOutTab={onPopOutTab}
-                  onRequestPaneClose={onRequestPaneClose}
-                  drawerState={drawerState}
-                  rightPaneDrawerOpen={rightPaneDrawerOpen}
-                />
-              )}
-            />
-          </LeaderboardProvider>
-          {currentProject && (
-            <StickyNotes
-              ref={stickyNotesRef}
-              project={currentProject}
-              isManagerShown={isStickyNotesManagerShown}
-              onManagerShownChange={setStickyNotesManagerShown}
-            />
-          )}
-        </div>
-      </div>
       <PoppedOutWindows
         {...editorTabsPaneProps}
         onClose={onExternalWindowClose}
         onPopIn={onPopInTab}
         focusRequest={poppedOutEditorFocusRequest}
       />
-      {currentProject && standalonePrefabSettingsDialog && (
-        <PrefabDetailEditor
-          key={`prefab-settings-dialog-${
-            standalonePrefabSettingsDialog.eventsBasedObject.ptr
-          }`}
-          dialogOnly
-          project={currentProject}
-          eventsFunctionsExtension={
-            standalonePrefabSettingsDialog.eventsFunctionsExtension
-          }
-          eventsBasedObject={standalonePrefabSettingsDialog.eventsBasedObject}
-          setToolbar={ignoreToolbarUpdate}
-          resourceManagementProps={resourceManagementProps}
-          openInstructionOrExpression={openInstructionOrExpression}
-          openBehaviorEvents={openBehaviorEvents}
-          onCreateEventsFunction={onCreateEventsFunction}
-          initiallyFocusedFunctionName={null}
-          initiallyOpenSettingsDialog
-          onPrefabSettingsDialogClose={() =>
-            setStandalonePrefabSettingsDialog(null)
-          }
-          onObjectEdited={onStandaloneSettingsEdited}
-          onFunctionEdited={onStandaloneSettingsEdited}
-          unsavedChanges={unsavedChanges}
-          onOpenCustomObjectEditor={eventsBasedObject => {
-            openCustomObjectEditor(
-              standalonePrefabSettingsDialog.eventsFunctionsExtension,
-              eventsBasedObject,
-              ''
-            );
-          }}
-          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+      {/* Editors of the main window register their commands in their own
+      command manager, so that they stay separated from the ones of the popped
+      out windows (rendered above, outside of this provider): a keyboard
+      shortcut must always run the command of the window where it was pressed. */}
+      <WindowCommandsProvider>
+        <div className="main-frame-content">
+          {isProjectManagerPinnedForCurrentProject && (
+            <ProjectManagerDrawer
+              isPinned
+              projectManagerOpen={false}
+              closeProjectManager={closePinnedProjectManager}
+              onPinProjectManager={pinProjectManager}
+              title={projectManagerTitle}
+            >
+              {projectManagerNode}
+            </ProjectManagerDrawer>
+          )}
+          <div
+            className="main-frame-editors-content"
+            onClickCapture={closeTemporarySideMenusOnEditorClick}
+            style={
+              gameEditorMode === 'embedded-game' &&
+              activeEmbeddedGameFrameHoleCount > 0
+                ? { pointerEvents: 'none' }
+                : undefined
+            }
+          >
+            <LeaderboardProvider
+              gameId={currentProject ? currentProject.getProjectUuid() : ''}
+            >
+              {renderNpmScriptConfirmDialog()}
+              <PanesContainer
+                hasEditorsInLeftPane={hasEditorsInLeftPane}
+                hasEditorsInRightPane={hasEditorsInRightPane}
+                renderPane={({
+                  paneIdentifier,
+                  isLeftMostPane,
+                  isRightMostPane,
+                  isDrawer,
+                  areSidePanesDrawers,
+                  onSetPointerEventsNone,
+                  onSetPaneDrawerState,
+                  onRequestPaneClose,
+                  drawerState,
+                  rightPaneDrawerOpen,
+                }) => (
+                  <EditorTabsPane
+                    {...editorTabsPaneProps}
+                    paneIdentifier={paneIdentifier}
+                    isLeftMostPane={isLeftMostPane}
+                    isRightMostPane={isRightMostPane}
+                    isDrawer={isDrawer}
+                    areSidePanesDrawers={areSidePanesDrawers}
+                    onSetPointerEventsNone={onSetPointerEventsNone}
+                    onSetPaneDrawerState={onSetPaneDrawerState}
+                    onPopOutTab={onPopOutTab}
+                    onRequestPaneClose={onRequestPaneClose}
+                    drawerState={drawerState}
+                    rightPaneDrawerOpen={rightPaneDrawerOpen}
+                  />
+                )}
+              />
+            </LeaderboardProvider>
+            {currentProject && (
+              <StickyNotes
+                ref={stickyNotesRef}
+                project={currentProject}
+                isManagerShown={isStickyNotesManagerShown}
+                onManagerShownChange={setStickyNotesManagerShown}
+              />
+            )}
+          </div>
+        </div>
+        {currentProject && standalonePrefabSettingsDialog && (
+          <PrefabDetailEditor
+            key={`prefab-settings-dialog-${
+              standalonePrefabSettingsDialog.eventsBasedObject.ptr
+            }`}
+            dialogOnly
+            project={currentProject}
+            eventsFunctionsExtension={
+              standalonePrefabSettingsDialog.eventsFunctionsExtension
+            }
+            eventsBasedObject={standalonePrefabSettingsDialog.eventsBasedObject}
+            setToolbar={ignoreToolbarUpdate}
+            resourceManagementProps={resourceManagementProps}
+            openInstructionOrExpression={openInstructionOrExpression}
+            openBehaviorEvents={openBehaviorEvents}
+            onCreateEventsFunction={onCreateEventsFunction}
+            initiallyFocusedFunctionName={null}
+            initiallyOpenSettingsDialog
+            onPrefabSettingsDialogClose={() =>
+              setStandalonePrefabSettingsDialog(null)
+            }
+            onObjectEdited={onStandaloneSettingsEdited}
+            onFunctionEdited={onStandaloneSettingsEdited}
+            unsavedChanges={unsavedChanges}
+            onOpenCustomObjectEditor={eventsBasedObject => {
+              openCustomObjectEditor(
+                standalonePrefabSettingsDialog.eventsFunctionsExtension,
+                eventsBasedObject,
+                ''
+              );
+            }}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onEventsBasedObjectChildrenEdited={
+              onEventsBasedObjectChildrenEdited
+            }
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+          />
+        )}
+        {currentProject && standaloneBehaviorSettingsDialog && (
+          <EventsFunctionsExtensionEditor
+            key={`behavior-settings-dialog-${
+              standaloneBehaviorSettingsDialog.eventsBasedBehavior.ptr
+            }`}
+            dialogOnly
+            project={currentProject}
+            eventsFunctionsExtension={
+              standaloneBehaviorSettingsDialog.eventsFunctionsExtension
+            }
+            setToolbar={ignoreToolbarUpdate}
+            resourceManagementProps={resourceManagementProps}
+            openInstructionOrExpression={openInstructionOrExpression}
+            onCreateEventsFunction={onCreateEventsFunction}
+            onBehaviorEdited={onStandaloneSettingsEdited}
+            onObjectEdited={onStandaloneSettingsEdited}
+            onFunctionEdited={onStandaloneSettingsEdited}
+            initiallyFocusedFunctionName={null}
+            initiallyFocusedBehaviorName={standaloneBehaviorSettingsDialog.eventsBasedBehavior.getName()}
+            initiallyFocusedObjectName={null}
+            focusedEventsBasedBehavior={
+              standaloneBehaviorSettingsDialog.eventsBasedBehavior
+            }
+            focusedEventsFunction={null}
+            initiallyOpenSettingsDialog
+            onBehaviorSettingsDialogClose={() =>
+              setStandaloneBehaviorSettingsDialog(null)
+            }
+            unsavedChanges={unsavedChanges}
+            onOpenCustomObjectEditor={eventsBasedObject => {
+              openCustomObjectEditor(
+                standaloneBehaviorSettingsDialog.eventsFunctionsExtension,
+                eventsBasedObject,
+                ''
+              );
+            }}
+            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            onEventsBasedObjectChildrenEdited={
+              onEventsBasedObjectChildrenEdited
+            }
+            onRenamedEventsBasedObject={onRenamedEventsBasedObject}
+            onDeletedEventsBasedObject={onDeletedEventsBasedObject}
+            onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+          />
+        )}
+        <CommandPalette ref={commandPaletteRef} />
+        <RecentEditorSwitcher
+          open={recentEditorSwitcherOpen}
+          editorTabs={state.editorTabs}
+          sideMenuItems={recentEditorSwitcherSideMenuItems}
+          actionItems={recentEditorSwitcherActionItems}
+          recentNavigationEntryIds={recentNavigationEntryIds}
+          recentNavigationEntryUseCounts={recentNavigationEntryUseCounts}
+          shortcut={shortcutMap['OPEN_RECENT_EDITOR']}
+          onClose={() => setRecentEditorSwitcherOpen(false)}
+          onActivate={activateRecentEditorSwitcherEntry}
+          onActivateSideMenuItem={activateRecentEditorSwitcherSideMenuItem}
+          onActivateActionItem={activateRecentEditorSwitcherActionItem}
         />
-      )}
-      {currentProject && standaloneBehaviorSettingsDialog && (
-        <EventsFunctionsExtensionEditor
-          key={`behavior-settings-dialog-${
-            standaloneBehaviorSettingsDialog.eventsBasedBehavior.ptr
-          }`}
-          dialogOnly
-          project={currentProject}
-          eventsFunctionsExtension={
-            standaloneBehaviorSettingsDialog.eventsFunctionsExtension
-          }
-          setToolbar={ignoreToolbarUpdate}
-          resourceManagementProps={resourceManagementProps}
-          openInstructionOrExpression={openInstructionOrExpression}
-          onCreateEventsFunction={onCreateEventsFunction}
-          onBehaviorEdited={onStandaloneSettingsEdited}
-          onObjectEdited={onStandaloneSettingsEdited}
-          onFunctionEdited={onStandaloneSettingsEdited}
-          initiallyFocusedFunctionName={null}
-          initiallyFocusedBehaviorName={standaloneBehaviorSettingsDialog.eventsBasedBehavior.getName()}
-          initiallyFocusedObjectName={null}
-          focusedEventsBasedBehavior={
-            standaloneBehaviorSettingsDialog.eventsBasedBehavior
-          }
-          focusedEventsFunction={null}
-          initiallyOpenSettingsDialog
-          onBehaviorSettingsDialogClose={() =>
-            setStandaloneBehaviorSettingsDialog(null)
-          }
-          unsavedChanges={unsavedChanges}
-          onOpenCustomObjectEditor={eventsBasedObject => {
-            openCustomObjectEditor(
-              standaloneBehaviorSettingsDialog.eventsFunctionsExtension,
-              eventsBasedObject,
-              ''
-            );
-          }}
-          hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-          onEventsBasedObjectChildrenEdited={onEventsBasedObjectChildrenEdited}
-          onRenamedEventsBasedObject={onRenamedEventsBasedObject}
-          onDeletedEventsBasedObject={onDeletedEventsBasedObject}
-          onEventBasedObjectTypeChanged={onEventBasedObjectTypeChanged}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-        />
-      )}
-      <CommandPalette ref={commandPaletteRef} />
-      <RecentEditorSwitcher
-        open={recentEditorSwitcherOpen}
-        editorTabs={state.editorTabs}
-        sideMenuItems={recentEditorSwitcherSideMenuItems}
-        actionItems={recentEditorSwitcherActionItems}
-        recentNavigationEntryIds={recentNavigationEntryIds}
-        recentNavigationEntryUseCounts={recentNavigationEntryUseCounts}
-        shortcut={shortcutMap['OPEN_RECENT_EDITOR']}
-        onClose={() => setRecentEditorSwitcherOpen(false)}
-        onActivate={activateRecentEditorSwitcherEntry}
-        onActivateSideMenuItem={activateRecentEditorSwitcherSideMenuItem}
-        onActivateActionItem={activateRecentEditorSwitcherActionItem}
-      />
+      </WindowCommandsProvider>
       <LoaderModal
         showImmediately={showLoaderImmediately}
         showAfterDelay={showLoaderAfterDelay}

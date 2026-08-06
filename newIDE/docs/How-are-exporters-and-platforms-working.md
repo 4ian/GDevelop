@@ -26,7 +26,7 @@ For now, there is a _single_ **platform** used in the GDevelop editor, which is 
 
 It depends on what you are targeting:
 
-- If your target is running in a **recent browser environment**, with JavaScript and WebGL, you might just want to define a [new export in the IDE](https://github.com/4ian/GDevelop/tree/master/newIDE/app/src/Export) and a few different files like an `index.html` or a set of files to export.
+- If your target is running in a **recent browser environment**, with JavaScript and WebGL, you might just want to define a [new export in the IDE](https://github.com/4ian/GDevelop/tree/master/newIDE/app/src/ExportAndShare) (preview launchers and exporter UIs currently live under `ExportAndShare/BrowserExporters` and `ExportAndShare/LocalExporters`) and a few different files like an `index.html` or a set of files to export.
 - If your target is an **environment running JavaScript**, you might want to use GDJS and define _new renderers_ for the objects. This is what is done for the experimental export to Cocos2d-JS: objects have renderers that are written in JavaScript and rendering objects with the Cocos2d-JS API, instead of Pixi.js
 - If your target is **something not running JavaScript**, you might want to re-create a platform (like GDJS). While the **Core** library will help you, you'll still have to re-make a code generator, make a brand new game engine (or adapt the existing one), rewrite extension objects using the new game engine/renderer.
 

@@ -37,6 +37,8 @@ Read these documents as one evidence set:
   IR, analysis, extension catalog, runtime state, host capabilities, and targets.
 * [Target strategy](target-strategy.md) — staged experiments, fixtures, evidence
   gates, target comparisons, and stop/go criteria.
+* [Map tiles prototype](maptiles-prototype.md) — a post-headless Kotlin/JS
+  experiment using MapLibre as an explicit browser rendering host.
 * [Compatibility roadmap](compatibility-roadmap.md) — observable compatibility
   levels, ledgers, metrics, and acceptance requirements.
 * [Kotlin Multiplatform prototype](../../KotlinPlatform/README.md) — isolated

@@ -4,3 +4,4 @@ node_modules/
 .gdevelop/
 __pycache__/
 *.py[cod]
+*.blend1

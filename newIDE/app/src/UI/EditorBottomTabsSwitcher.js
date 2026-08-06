@@ -93,7 +93,7 @@ const EditorBottomTabsSwitcher = <TabName: string>({
 }: Props<TabName>): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <Column expand noMargin>
+    <Column expand noMargin noOverflowParent>
       <div style={styles.editorsContainer}>
         {tabs.map(tab => (
           <div

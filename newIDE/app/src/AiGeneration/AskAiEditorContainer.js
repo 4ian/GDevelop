@@ -12,7 +12,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
-type WillDeleteGameplayTestChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';

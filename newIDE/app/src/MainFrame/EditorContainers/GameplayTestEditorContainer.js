@@ -34,6 +34,7 @@ const styles = {
   container: {
     display: 'flex',
     flex: 1,
+    minWidth: 0,
   },
 };
 

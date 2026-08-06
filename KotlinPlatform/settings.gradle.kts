@@ -18,6 +18,7 @@ include(
     ":extension-catalog",
     ":normalized-ir",
     ":runtime-state",
+    ":map-runtime",
     ":example-extension",
     ":jvm-cli",
 )

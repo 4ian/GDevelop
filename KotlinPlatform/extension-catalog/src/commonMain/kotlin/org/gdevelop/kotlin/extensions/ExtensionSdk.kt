@@ -8,11 +8,21 @@ data class ExtensionIdentity(val namespace: String, val version: String, val ori
 @Serializable
 data class ParameterDescriptor(val name: String, val type: String)
 
+/** A stable identifier for a facility that must be supplied by a runtime host. */
+@Serializable
+@JvmInline
+value class RuntimeCapabilityId(val value: String)
+
+object RuntimeCapabilities {
+    val BrowserMapRenderingHost = RuntimeCapabilityId("org.gdevelop.runtime.browser-map-rendering-host.v1")
+}
+
 @Serializable
 data class ActionDescriptor(
     val type: String,
     val parameters: List<ParameterDescriptor>,
     val runtimeEntry: String,
+    val requiredCapabilities: Set<RuntimeCapabilityId> = emptySet(),
 )
 
 @Serializable

@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import { type State } from './MainFrameState';
+import {
+  canReleaseCancelledPreviewPreparation,
+  type PreviewLaunchPhase,
+} from './PreviewLaunchCancellation';
 import './MainFrame.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
@@ -123,7 +127,6 @@ import { getProjectRootPath } from '../ResourcesEditor/ProjectFilesPanel';
 import {
   type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
-  type ExtensionFunctionEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
@@ -273,7 +276,7 @@ import useLocalProjectChangesWatcher, {
 } from './LocalProjectChangesWatcher';
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import { getLocalProjectLastModifiedDate } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
+import { getLocalProjectLastModifiedDateSync } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
 import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import {
   MULTI_FILE_ENTRY_NAME,
@@ -325,6 +328,7 @@ import { ObjectStoreContext } from '../AssetStore/ObjectStoreContext';
 import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
+  shouldHardReloadForExternallyChangedResource,
 } from '../MainFrame/ResourcesWatcher';
 import {
   type EditorCameraState,
@@ -491,7 +495,7 @@ const initialPreviewState: PreviewState = {
   overridenPreviewExternalLayoutName: null,
 };
 
-type PreviewLaunchPhase = 'idle' | 'preparing' | 'launching';
+type PreviewLaunchKind = 'standard' | 'in-game-edition';
 
 const usePreviewLoadingState = () => {
   const forceUpdate = useForceUpdate();
@@ -678,8 +682,56 @@ const MainFrame = (props: Props): React.MixedElement => {
   } = useAlertDialog();
   const { previewLoadingRef, setPreviewLoading } = usePreviewLoadingState();
   const previewLaunchInProgressRef = React.useRef<boolean>(false);
+  const [
+    isPreviewLaunchInProgress,
+    setIsPreviewLaunchInProgress,
+  ] = React.useState<boolean>(false);
+  const setPreviewLaunchInProgress = React.useCallback(
+    (isInProgress: boolean) => {
+      previewLaunchInProgressRef.current = isInProgress;
+      setIsPreviewLaunchInProgress(isInProgress);
+    },
+    []
+  );
+  // Opening the debugger for an MCP preview changes the editor tabs. In 3D
+  // edition mode, that tab change would otherwise start an embedded preview
+  // before the explicitly requested MCP preview can acquire the launch lock.
+  const mcpPreviewLaunchInProgressRef = React.useRef<boolean>(false);
+  const [
+    isMcpPreviewLaunchInProgress,
+    setIsMcpPreviewLaunchInProgress,
+  ] = React.useState<boolean>(false);
+  const setMcpPreviewLaunchInProgress = React.useCallback(
+    (isInProgress: boolean) => {
+      mcpPreviewLaunchInProgressRef.current = isInProgress;
+      setIsMcpPreviewLaunchInProgress(isInProgress);
+    },
+    []
+  );
+  const mcpPreviewLaunchSequenceInProgressRef = React.useRef<boolean>(false);
+  const [
+    isMcpPreviewLaunchSequenceInProgress,
+    setIsMcpPreviewLaunchSequenceInProgress,
+  ] = React.useState<boolean>(false);
+  const beginMcpPreviewLaunchSequence = React.useCallback(() => {
+    if (
+      mcpPreviewLaunchSequenceInProgressRef.current ||
+      mcpPreviewLaunchInProgressRef.current
+    ) {
+      return false;
+    }
+    mcpPreviewLaunchSequenceInProgressRef.current = true;
+    setIsMcpPreviewLaunchSequenceInProgress(true);
+    return true;
+  }, []);
+  const endMcpPreviewLaunchSequence = React.useCallback(() => {
+    mcpPreviewLaunchSequenceInProgressRef.current = false;
+    setIsMcpPreviewLaunchSequenceInProgress(false);
+  }, []);
+  const inGameEditionPreviewLaunchInProgressRef = React.useRef<boolean>(false);
   const previewLaunchIdRef = React.useRef<number>(0);
   const activePreviewLaunchIdRef = React.useRef<?number>(null);
+  const activePreviewLaunchKindRef = React.useRef<?PreviewLaunchKind>(null);
   const cancelledPreviewLaunchIdsRef = React.useRef<Set<number>>(new Set());
   const previewLaunchPhaseRef = React.useRef<PreviewLaunchPhase>('idle');
   const saveProjectRef = React.useRef<?(options?: {|
@@ -1185,8 +1237,9 @@ const MainFrame = (props: Props): React.MixedElement => {
 
       if (previewLaunchId == null) {
         if (previewLaunchInProgressRef.current) {
-          previewLaunchInProgressRef.current = false;
+          setPreviewLaunchInProgress(false);
           previewLaunchPhaseRef.current = 'idle';
+          activePreviewLaunchKindRef.current = null;
         }
         if (previewLoadingRef.current) {
           setPreviewLoading(null);
@@ -1199,26 +1252,66 @@ const MainFrame = (props: Props): React.MixedElement => {
         setPreviewLoading(null);
       }
 
-      if (previewLaunchPhaseRef.current === 'preparing') {
-        console.info(
-          `Cancelling preview launch #${previewLaunchId} because ${reason}.`
-        );
-        activePreviewLaunchIdRef.current = null;
-        previewLaunchInProgressRef.current = false;
-        previewLaunchPhaseRef.current = 'idle';
-      }
+      console.info(
+        `Cancelling preview launch #${previewLaunchId} because ${reason}.`
+      );
+      // Keep the shared lock owned by this launch until its finally block
+      // runs. Releasing it here would let another launch read/write preview
+      // files while the cancelled async launch is still unwinding.
     },
-    [previewLoadingRef, setPreviewLoading]
+    [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
+  );
+
+  const releaseCancelledPreviewPreparation = React.useCallback(
+    (reason: string): boolean => {
+      const previewLaunchId = activePreviewLaunchIdRef.current;
+      if (
+        !canReleaseCancelledPreviewPreparation({
+          launchInProgress: previewLaunchInProgressRef.current,
+          activePreviewLaunchId: previewLaunchId,
+          isActivePreviewLaunchCancelled:
+            previewLaunchId != null &&
+            cancelledPreviewLaunchIdsRef.current.has(previewLaunchId),
+          launchPhase: previewLaunchPhaseRef.current,
+        })
+      ) {
+        return false;
+      }
+
+      console.warn(
+        `Releasing cancelled preview preparation #${String(
+          previewLaunchId
+        )} because ${reason}. Its pending preparation step may still finish, but cancellation checks prevent it from launching a preview.`
+      );
+      activePreviewLaunchIdRef.current = null;
+      setPreviewLaunchInProgress(false);
+      previewLaunchPhaseRef.current = 'idle';
+      activePreviewLaunchKindRef.current = null;
+      if (previewLoadingRef.current) {
+        setPreviewLoading(null);
+      }
+      return true;
+    },
+    [previewLoadingRef, setPreviewLoading, setPreviewLaunchInProgress]
   );
 
   const getPreviewLaunchStateForMcp = React.useCallback(
-    () => ({
-      previewLoading: previewLoadingRef.current,
-      launchInProgress: previewLaunchInProgressRef.current,
-      launchPhase: previewLaunchPhaseRef.current,
-      activePreviewLaunchId: activePreviewLaunchIdRef.current,
-      cancelledPreviewLaunchCount: cancelledPreviewLaunchIdsRef.current.size,
-    }),
+    () => {
+      const isMcpPreviewLaunchInProgress =
+        mcpPreviewLaunchInProgressRef.current;
+      return {
+        previewLoading: previewLoadingRef.current,
+        launchInProgress:
+          isMcpPreviewLaunchInProgress || previewLaunchInProgressRef.current,
+        launchPhase:
+          isMcpPreviewLaunchInProgress &&
+          previewLaunchPhaseRef.current === 'idle'
+            ? 'preparing'
+            : previewLaunchPhaseRef.current,
+        activePreviewLaunchId: activePreviewLaunchIdRef.current,
+        cancelledPreviewLaunchCount: cancelledPreviewLaunchIdsRef.current.size,
+      };
+    },
     [previewLoadingRef]
   );
 
@@ -2921,16 +3014,27 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const onResourceExternallyChanged = React.useCallback(
-    () => {
+    (resourceInfo: {| identifier: string |}) => {
       console.info(
         'Resource externally changed: notifying changes to in-game editor.'
+      );
+      const shouldHardReload = shouldHardReloadForExternallyChangedResource(
+        resourceInfo.identifier
       );
       notifyChangesToInGameEditor({
         shouldReloadProjectData: true, // A resource file might have been changed.
         shouldReloadLibraries: false,
         shouldReloadResources: true,
-        shouldHardReload: false,
-        reasons: ['resource-externally-changed'],
+        // In-place 3D model hot reload temporarily retains both the previous
+        // parsed model/live clones and the replacement. Reload the embedded
+        // game document so large animated models cannot spike the editor
+        // renderer heap and take the whole Electron UI down.
+        shouldHardReload,
+        reasons: [
+          shouldHardReload
+            ? '3d-model-resource-externally-changed'
+            : 'resource-externally-changed',
+        ],
       });
     },
     [notifyChangesToInGameEditor]
@@ -3499,18 +3603,38 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (currentProject.getLayoutsCount() === 0) return false;
 
       if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
-        console.error(
-          'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
-        );
-        return false;
+        const launchIdToWaitFor = activePreviewLaunchIdRef.current;
+        const shouldWaitForInGameEditionPreview =
+          !isForInGameEdition &&
+          (activePreviewLaunchKindRef.current === 'in-game-edition' ||
+            previewLoadingRef.current === 'hot-reload-for-in-game-edition');
+        if (shouldWaitForInGameEditionPreview) {
+          const waitDeadline = Date.now() + 10000;
+          while (
+            (previewLaunchInProgressRef.current || previewLoadingRef.current) &&
+            activePreviewLaunchIdRef.current === launchIdToWaitFor &&
+            Date.now() < waitDeadline
+          ) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+        }
+        if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
+          console.info(
+            'Skipping a duplicate preview request because another preview launch still owns the pipeline.'
+          );
+          return false;
+        }
       }
 
       let previewProjectLoadedFromFile: ?gdProject = null;
       const previewLaunchId = previewLaunchIdRef.current + 1;
       previewLaunchIdRef.current = previewLaunchId;
       activePreviewLaunchIdRef.current = previewLaunchId;
+      activePreviewLaunchKindRef.current = isForInGameEdition
+        ? 'in-game-edition'
+        : 'standard';
       cancelledPreviewLaunchIdsRef.current.delete(previewLaunchId);
-      previewLaunchInProgressRef.current = true;
+      setPreviewLaunchInProgress(true);
       previewLaunchPhaseRef.current = 'preparing';
       try {
         if (!isForInGameEdition && !skipDiagnosticErrorBlocking) {
@@ -3557,8 +3681,8 @@ const MainFrame = (props: Props): React.MixedElement => {
         }
 
         if (previewLoadingRef.current) {
-          console.error(
-            'Preview already loading. Ignoring but it should not be even possible to launch a preview while another one is loading, as this could break the game of the first preview when it is loading or reading files.'
+          console.info(
+            'Skipping a duplicate preview request because preview loading started before this launch could continue.'
           );
           // Note that in an ideal situation, each previewed game could continue to load
           // without being impacted by a new preview being worked on.
@@ -3805,8 +3929,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         cancelledPreviewLaunchIdsRef.current.delete(previewLaunchId);
         if (activePreviewLaunchIdRef.current === previewLaunchId) {
           activePreviewLaunchIdRef.current = null;
-          previewLaunchInProgressRef.current = false;
+          setPreviewLaunchInProgress(false);
           previewLaunchPhaseRef.current = 'idle';
+          activePreviewLaunchKindRef.current = null;
           // Always clear the preview loader here, even if an exception was
           // thrown (or an early return happened) after `setPreviewLoading`.
           // When a newer launch is active, this old launch must not touch it.
@@ -3841,6 +3966,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       inGameEditorSettings,
       previewLoadingRef,
       setPreviewLoading,
+      setPreviewLaunchInProgress,
       checkDiagnosticErrorsAndIfShouldBlock,
       isPreviewLaunchCancelled,
       clearPreviewLoadingForLaunch,
@@ -3934,25 +4060,40 @@ const MainFrame = (props: Props): React.MixedElement => {
       ...HotReloadSteps,
       editorCameraState3D: EditorCameraState | null,
     |}) => {
-      await _launchPreview({
-        networkPreview: false,
-        hotReload: true,
-        shouldReloadProjectData,
-        shouldReloadLibraries,
-        shouldGenerateScenesEventsCode: false,
-        shouldReloadResources,
-        shouldHardReload,
-        forceDiagnosticReport: false,
-        isForInGameEdition: {
-          editorId,
-          forcedSceneName: sceneName,
-          forcedExternalLayoutName: externalLayoutName,
-          eventsBasedObjectType,
-          eventsBasedObjectVariantName,
-          editorCameraState3D,
-        },
-        numberOfWindows: 0,
-      });
+      if (
+        mcpPreviewLaunchInProgressRef.current ||
+        mcpPreviewLaunchSequenceInProgressRef.current
+      ) {
+        console.info(
+          'Skipping in-game edition preview launch while an explicit MCP preview launch is being prepared.'
+        );
+        return;
+      }
+
+      inGameEditionPreviewLaunchInProgressRef.current = true;
+      try {
+        await _launchPreview({
+          networkPreview: false,
+          hotReload: true,
+          shouldReloadProjectData,
+          shouldReloadLibraries,
+          shouldGenerateScenesEventsCode: false,
+          shouldReloadResources,
+          shouldHardReload,
+          forceDiagnosticReport: false,
+          isForInGameEdition: {
+            editorId,
+            forcedSceneName: sceneName,
+            forcedExternalLayoutName: externalLayoutName,
+            eventsBasedObjectType,
+            eventsBasedObjectVariantName,
+            editorCameraState3D,
+          },
+          numberOfWindows: 0,
+        });
+      } finally {
+        inGameEditionPreviewLaunchInProgressRef.current = false;
+      }
     },
     [_launchPreview]
   );
@@ -4570,7 +4711,19 @@ const MainFrame = (props: Props): React.MixedElement => {
   const launchPreviewForScene = React.useCallback(
     async (sceneName: ?string) => {
       const launchState = getPreviewLaunchStateForMcp();
-      if (launchState.launchInProgress || launchState.previewLoading) {
+      const isInGameEditionPreviewLaunch =
+        inGameEditionPreviewLaunchInProgressRef.current ||
+        launchState.previewLoading === 'hot-reload-for-in-game-edition';
+      const isCancelledPreviewLaunch =
+        launchState.activePreviewLaunchId != null &&
+        cancelledPreviewLaunchIdsRef.current.has(
+          launchState.activePreviewLaunchId
+        );
+      if (
+        (launchState.launchInProgress || launchState.previewLoading) &&
+        !isInGameEditionPreviewLaunch &&
+        !isCancelledPreviewLaunch
+      ) {
         return {
           accepted: false,
           reason: 'preview-launch-already-in-progress',
@@ -4578,32 +4731,62 @@ const MainFrame = (props: Props): React.MixedElement => {
         };
       }
 
-      const launchCaptureOptions =
-        currentProject && !hasNonEditionPreviewsRunning
-          ? getHotReloadPreviewLaunchCaptureOptions(
-              currentProject.getProjectUuid()
-            )
-          : undefined;
-      const didOpenDebugger = await openDebugger();
-      if (!didOpenDebugger) {
-        return {
-          accepted: false,
-          reason: 'debugger-window-could-not-open',
-          launchState: getPreviewLaunchStateForMcp(),
-        };
-      }
+      setMcpPreviewLaunchInProgress(true);
+      let accepted = false;
+      let reason: ?string = null;
+      try {
+        // Reloading a project can automatically start an embedded 3D preview.
+        // Wait for that launch to release the shared preview files before
+        // starting the explicit MCP preview. The MCP reservation above keeps
+        // editor-tab effects from starting another embedded launch meanwhile.
+        if (isInGameEditionPreviewLaunch || isCancelledPreviewLaunch) {
+          const waitDeadline = Date.now() + 10000;
+          while (
+            (inGameEditionPreviewLaunchInProgressRef.current ||
+              previewLaunchInProgressRef.current ||
+              previewLoadingRef.current) &&
+            Date.now() < waitDeadline
+          ) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+          releaseCancelledPreviewPreparation(
+            'it did not unwind before the MCP preview launch timeout'
+          );
+        }
 
-      const didLaunch = await launchPreviewAndReport({
-        networkPreview: false,
-        forcedPreviewLayoutName: sceneName || null,
-        numberOfWindows: 1,
-        forceAlwaysOnTopInPreview: true,
-        skipDiagnosticErrorBlocking: true,
-        launchCaptureOptions,
-      });
+        if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
+          reason = 'preview-launch-already-in-progress';
+        }
+
+        const launchCaptureOptions =
+          currentProject && !hasNonEditionPreviewsRunning
+            ? getHotReloadPreviewLaunchCaptureOptions(
+                currentProject.getProjectUuid()
+              )
+            : undefined;
+        if (!reason) {
+          const didOpenDebugger = await openDebugger();
+          if (!didOpenDebugger) {
+            reason = 'debugger-window-could-not-open';
+          } else {
+            const didLaunch = await launchPreviewAndReport({
+              networkPreview: false,
+              forcedPreviewLayoutName: sceneName || null,
+              numberOfWindows: 1,
+              forceAlwaysOnTopInPreview: true,
+              skipDiagnosticErrorBlocking: true,
+              launchCaptureOptions,
+            });
+            accepted = !!didLaunch;
+            reason = didLaunch ? null : 'preview-launch-was-not-accepted';
+          }
+        }
+      } finally {
+        setMcpPreviewLaunchInProgress(false);
+      }
       return {
-        accepted: !!didLaunch,
-        reason: didLaunch ? undefined : 'preview-launch-was-not-accepted',
+        accepted,
+        reason: reason || undefined,
         launchState: getPreviewLaunchStateForMcp(),
       };
     },
@@ -4614,6 +4797,34 @@ const MainFrame = (props: Props): React.MixedElement => {
       getHotReloadPreviewLaunchCaptureOptions,
       hasNonEditionPreviewsRunning,
       getPreviewLaunchStateForMcp,
+      previewLoadingRef,
+      releaseCancelledPreviewPreparation,
+      setMcpPreviewLaunchInProgress,
+    ]
+  );
+
+  const cancelPreviewLaunchForMcp = React.useCallback(
+    (reason: string) => {
+      cancelPendingPreviewLaunchAfterWindowClosed(reason);
+      const releasedPreviewPreparation = releaseCancelledPreviewPreparation(
+        reason
+      );
+      // launchPreviewForScene normally clears this in its finally block. MCP
+      // also needs a way to release its reservation when an underlying editor
+      // or preview preparation promise never settles.
+      setMcpPreviewLaunchInProgress(false);
+      return {
+        cancelled: true,
+        releasedMcpLaunchReservation: true,
+        releasedPreviewPreparation,
+        launchState: getPreviewLaunchStateForMcp(),
+      };
+    },
+    [
+      cancelPendingPreviewLaunchAfterWindowClosed,
+      getPreviewLaunchStateForMcp,
+      releaseCancelledPreviewPreparation,
+      setMcpPreviewLaunchInProgress,
     ]
   );
 
@@ -5269,23 +5480,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         const { editorRef } = editor;
         if (editorRef) {
           editorRef.onSceneEventsModifiedOutsideEditor(changes);
-        }
-      }
-    },
-    [state.editorTabs]
-  );
-
-  const onExtensionFunctionEventsModifiedOutsideEditor = React.useCallback(
-    (changes: ExtensionFunctionEventsOutsideEditorChanges) => {
-      for (const editor of getAllEditorTabs(state.editorTabs)) {
-        const { editorRef } = editor;
-        const editorRefAny: any = editorRef;
-        if (
-          editorRefAny &&
-          typeof editorRefAny.onExtensionFunctionEventsModifiedOutsideEditor ===
-            'function'
-        ) {
-          editorRefAny.onExtensionFunctionEventsModifiedOutsideEditor(changes);
         }
       }
     },
@@ -7734,7 +7928,10 @@ const MainFrame = (props: Props): React.MixedElement => {
           return true;
         },
         getPreviewLaunchState: getPreviewLaunchStateForMcp,
+        beginPreviewLaunchSequence: beginMcpPreviewLaunchSequence,
+        endPreviewLaunchSequence: endMcpPreviewLaunchSequence,
         getLaunchPreviewForScene: () => launchPreviewForSceneRef.current,
+        cancelPreviewLaunch: cancelPreviewLaunchForMcp,
         reloadProjectAndWait: async reportProgress => {
           if (!currentFileMetadata) {
             return {
@@ -7793,7 +7990,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             { reportProgress: reportReloadProgress }
           );
           reportReloadProgress('catalogs-modification-time-reading');
-          const lastModifiedDate = await getLocalProjectLastModifiedDate(
+          const lastModifiedDate = getLocalProjectLastModifiedDateSync(
             reloadedProject.getProjectFile()
           );
           if (lastModifiedDate !== null) {
@@ -7833,10 +8030,32 @@ const MainFrame = (props: Props): React.MixedElement => {
           _previewLauncher.current
             ? _previewLauncher.current.getPreviewDebuggerServer()
             : null,
-        closeAllPreviews: () => {
+        closeAllPreviews: async () => {
+          // An embedded 3D preview can be preparing without owning a native
+          // preview window yet. Cancel it explicitly, then allow queued window
+          // close notifications to settle before the MCP workflow launches a
+          // fresh preview.
+          cancelPendingPreviewLaunchAfterWindowClosed(
+            'all previews were closed through MCP'
+          );
           const previewLauncher = _previewLauncher.current;
           if (previewLauncher && previewLauncher.closeAllPreviews) {
-            return previewLauncher.closeAllPreviews();
+            let closeResult = await previewLauncher.closeAllPreviews();
+            const waitDeadline = Date.now() + 10000;
+            while (
+              previewLaunchInProgressRef.current &&
+              Date.now() < waitDeadline
+            ) {
+              await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            releaseCancelledPreviewPreparation(
+              'it did not unwind after all previews were closed through MCP'
+            );
+            // A cancelled launch may have created its native window while it
+            // was unwinding. Close once more after the lock is released so no
+            // stale debugger connection can race the next explicit launch.
+            closeResult = await previewLauncher.closeAllPreviews();
+            return closeResult;
           }
         },
         focusAllPreviews: () => {
@@ -7869,7 +8088,6 @@ const MainFrame = (props: Props): React.MixedElement => {
         },
         generateEvents,
         onSceneEventsModifiedOutsideEditor,
-        onExtensionFunctionEventsModifiedOutsideEditor,
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
@@ -7897,11 +8115,15 @@ const MainFrame = (props: Props): React.MixedElement => {
       setState,
       eventsFunctionsExtensionsState,
       getPreviewLaunchStateForMcp,
+      beginMcpPreviewLaunchSequence,
+      endMcpPreviewLaunchSequence,
+      cancelPendingPreviewLaunchAfterWindowClosed,
+      releaseCancelledPreviewPreparation,
+      cancelPreviewLaunchForMcp,
       launchPreviewForSceneRef,
       getMcpEditorSelection,
       generateEvents,
       onSceneEventsModifiedOutsideEditor,
-      onExtensionFunctionEventsModifiedOutsideEditor,
       onInstancesModifiedOutsideEditor,
       onObjectsModifiedOutsideEditor,
       onObjectGroupsModifiedOutsideEditor,
@@ -8089,6 +8311,10 @@ const MainFrame = (props: Props): React.MixedElement => {
     isSharingEnabled:
       !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId,
     hasPreviewsRunning: hasNonEditionPreviewsRunning,
+    isPreviewLaunchInProgress:
+      isPreviewLaunchInProgress ||
+      isMcpPreviewLaunchInProgress ||
+      isMcpPreviewLaunchSequenceInProgress,
     previewState: previewState,
     checkedOutVersionStatus: checkedOutVersionStatus,
     canDoNetworkPreview:

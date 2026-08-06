@@ -364,7 +364,7 @@ def launch_electron(
 ) -> int | None:
     """Start Electron detached from this launcher and return its process ID."""
     step("Launch Electron")
-    command = [str(electron_exe), "app"]
+    command = [str(electron_exe), "--force_high_performance_gpu", "app"]
     print(
         f"[run] {electron_app_dir}> ELECTRON_IS_DEV=0 {command_line(command)}",
         flush=True,

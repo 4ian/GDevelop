@@ -599,6 +599,27 @@ namespace gdjs {
       this._animationMixer.update(timeDelta);
     }
 
+    private _releaseCurrentModelInstance(): void {
+      this._animationMixer.stopAllAction();
+      if (this._clonedModelRoot) {
+        this._animationMixer.uncacheRoot(this._clonedModelRoot);
+      }
+      this._action = null;
+      this._clonedModelRoot = null;
+      this._bonesByCanonicalName.clear();
+      this._ambiguousBoneNames.clear();
+      this.get3DRendererObject().remove(this._threeObject);
+      // SkeletonUtils clones share geometry, material and texture resources
+      // with the cached GLTF. Only detach the hierarchy here; disposing shared
+      // GPU resources would break other live instances.
+      this._threeObject.clear();
+    }
+
+    onDestroyed(): void {
+      this._releaseCurrentModelInstance();
+      this._sharedAnimationModelCompatibility.clear();
+    }
+
     override updatePosition() {
       const originPoint = this.getOriginPoint();
       const centerPoint = this.getCenterPoint();
@@ -839,6 +860,11 @@ namespace gdjs {
       // - _replaceMaterials is destructive
       // - _updateDefaultTransformation may need to work with meshes in local space
 
+      // Release the old mixer bindings and clone hierarchy before creating the
+      // replacement. This keeps model rebuilds from retaining two animated
+      // skeletons at once longer than necessary.
+      this._releaseCurrentModelInstance();
+
       // This group hold the rotation defined by properties.
       const threeObject = new THREE.Group();
       threeObject.rotation.order = 'ZYX';
@@ -860,7 +886,6 @@ namespace gdjs {
       );
 
       // Replace the 3D object.
-      this.get3DRendererObject().remove(this._threeObject);
       this.get3DRendererObject().add(threeObject);
       this._threeObject = threeObject;
       this.updatePosition();

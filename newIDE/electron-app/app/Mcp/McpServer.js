@@ -4,10 +4,7 @@ const {
   createJsonRpcResult,
   createJsonRpcError,
   getInitializeResult,
-  validateBearerToken,
 } = require('./McpProtocol');
-
-const MCP_AUTH_ERROR_CODE = -32001;
 
 const rendererBackedMethods = new Set([
   'tools/list',
@@ -33,12 +30,7 @@ const readRequestBody = request =>
 const normalizeParams = params =>
   params && typeof params === 'object' ? params : {};
 
-const handleMcpJsonRpcRequest = async ({
-  request,
-  authorizationHeader,
-  token,
-  sendRendererRequest,
-}) => {
+const handleMcpJsonRpcRequest = async ({ request, sendRendererRequest }) => {
   const id =
     request && Object.prototype.hasOwnProperty.call(request, 'id')
       ? request.id
@@ -53,14 +45,6 @@ const handleMcpJsonRpcRequest = async ({
       id,
       JSON_RPC_ERROR_CODES.invalidRequest,
       'Invalid JSON-RPC request.'
-    );
-  }
-
-  if (!validateBearerToken(authorizationHeader, token)) {
-    return createJsonRpcError(
-      id,
-      MCP_AUTH_ERROR_CODE,
-      'Missing or invalid MCP authorization token.'
     );
   }
 
@@ -110,7 +94,7 @@ const writeJsonResponse = (response, statusCode, payload) => {
   response.end(JSON.stringify(payload));
 };
 
-const startMcpServer = ({ port, token, sendRendererRequest }) =>
+const startMcpServer = ({ port, sendRendererRequest }) =>
   new Promise((resolve, reject) => {
     const server = http.createServer(async (request, response) => {
       if (request.method === 'GET' && request.url === '/mcp') {
@@ -146,8 +130,6 @@ const startMcpServer = ({ port, token, sendRendererRequest }) =>
 
       const mcpResponse = await handleMcpJsonRpcRequest({
         request: parsedBody,
-        authorizationHeader: request.headers.authorization || null,
-        token,
         sendRendererRequest,
       });
 
@@ -167,7 +149,6 @@ const startMcpServer = ({ port, token, sendRendererRequest }) =>
       const serverState = {
         server,
         port: address && typeof address === 'object' ? address.port : port,
-        token,
         url: `http://127.0.0.1:${
           address && typeof address === 'object' ? address.port : port
         }/mcp`,

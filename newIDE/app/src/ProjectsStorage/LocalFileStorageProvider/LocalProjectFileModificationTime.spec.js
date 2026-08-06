@@ -6,7 +6,10 @@ import fs from 'fs-extra';
 import os from 'os';
 // $FlowFixMe[cannot-resolve-module]
 import path from 'path';
-import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
+import {
+  getLocalProjectLastModifiedDate,
+  getLocalProjectLastModifiedDateSync,
+} from './LocalProjectFileModificationTime';
 
 const writeFileWithModificationTime = (
   filePath: string,
@@ -105,5 +108,29 @@ describe('getLocalProjectLastModifiedDate', () => {
     writeFileWithModificationTime(entryPath, 600000);
 
     expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(600000);
+  });
+
+  it('can scan without relying on asynchronous filesystem callbacks', () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    writeFileWithModificationTime(entryPath, 100000);
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'scenes', 'Main', 'Main.events'),
+      700000
+    );
+    const statSpy = jest
+      .spyOn(fs, 'stat')
+      .mockImplementation(() => new Promise(() => {}));
+    const readdirSpy = jest
+      .spyOn(fs, 'readdir')
+      .mockImplementation(() => new Promise(() => {}));
+
+    try {
+      expect(getLocalProjectLastModifiedDateSync(entryPath)).toBe(700000);
+      expect(statSpy).not.toHaveBeenCalled();
+      expect(readdirSpy).not.toHaveBeenCalled();
+    } finally {
+      statSpy.mockRestore();
+      readdirSpy.mockRestore();
+    }
   });
 });

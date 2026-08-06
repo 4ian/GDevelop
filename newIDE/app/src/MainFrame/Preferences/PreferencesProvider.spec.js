@@ -2,11 +2,35 @@
 /* global globalThis */
 
 import {
-  generateMcpServerAuthorizationToken,
   getInitialPreferences,
+  loadPreferencesFromLocalStorage,
 } from './PreferencesProvider';
 
 describe('PreferencesProvider', () => {
+  const globalScope: any = globalThis;
+  const previousLocalStorage = globalScope.localStorage;
+
+  beforeEach(() => {
+    const storedValues: { [string]: string } = {};
+    globalScope.localStorage = {
+      getItem: (key: string) => storedValues[key] || null,
+      setItem: (key: string, value: string) => {
+        storedValues[key] = value;
+      },
+      clear: () => {
+        for (const key in storedValues) delete storedValues[key];
+      },
+    };
+  });
+
+  afterEach(() => {
+    if (previousLocalStorage) {
+      globalScope.localStorage = previousLocalStorage;
+    } else {
+      delete globalScope.localStorage;
+    }
+  });
+
   test('uses the diagnostic and advanced preferences defaults', () => {
     expect(getInitialPreferences()).toMatchObject({
       openDiagnosticReportAutomatically: true,
@@ -15,39 +39,22 @@ describe('PreferencesProvider', () => {
       showDeprecatedInstructionWarning: 'icon-and-deprecated-warning-text',
       showJsTypeError: true,
     });
+    expect(getInitialPreferences()).not.toHaveProperty(
+      'mcpServerAuthorizationToken'
+    );
   });
 
-  describe('generateMcpServerAuthorizationToken', () => {
-    const globalScope: any = globalThis;
-    const previousWindow = globalScope.window;
+  test('removes obsolete MCP authorization tokens from stored preferences', () => {
+    localStorage.setItem(
+      'gd-preferences',
+      JSON.stringify({
+        ...getInitialPreferences(),
+        mcpServerAuthorizationToken: 'obsolete-token',
+      })
+    );
 
-    afterEach(() => {
-      if (previousWindow) {
-        globalScope.window = previousWindow;
-      } else {
-        delete globalScope.window;
-      }
-    });
-
-    test('generates a compact base64url token from crypto bytes', () => {
-      const getRandomValues = jest.fn((bytes: Uint8Array) => {
-        for (let index = 0; index < bytes.length; index++) {
-          bytes[index] = index;
-        }
-        return bytes;
-      });
-
-      globalScope.window = {
-        crypto: {
-          getRandomValues,
-        },
-      };
-
-      const token = generateMcpServerAuthorizationToken();
-
-      expect(getRandomValues).toHaveBeenCalledTimes(1);
-      expect(token).toBe('mcp-AAECAwQFBgcICQoLDA0ODw');
-      expect(token).toHaveLength(26);
-    });
+    expect(loadPreferencesFromLocalStorage()).not.toHaveProperty(
+      'mcpServerAuthorizationToken'
+    );
   });
 });

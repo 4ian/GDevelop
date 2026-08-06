@@ -18,6 +18,8 @@ import SearchBar from '../../UI/SearchBar';
 import InfoBar from '../../UI/Messages/InfoBar';
 import Play from '../../UI/CustomSvgIcons/Play';
 import Pause from '../../UI/CustomSvgIcons/Pause';
+import Maximize from '../../UI/CustomSvgIcons/Maximize';
+import Minimize from '../../UI/CustomSvgIcons/Minimize';
 import { copyTextToClipboard } from '../../Utils/Clipboard';
 import CheckeredBackground from '../CheckeredBackground';
 import {
@@ -39,6 +41,10 @@ import {
   findHoveredBoneJointIndex,
   setModelMaterialsBonesVisibility,
 } from './Model3DBoneVisualizationUtils';
+import {
+  exitAllFullscreenLayers,
+  getModelPreviewCameraZoom,
+} from './Model3DFullscreenUtils';
 
 const PREVIEW_HEMISPHERE_LIGHT_INTENSITY = 0.7;
 const PREVIEW_DIRECTIONAL_LIGHT_INTENSITY = 0.4;
@@ -55,6 +61,11 @@ const styles = {
     minHeight: 0,
     minWidth: 0,
     overflow: 'hidden',
+  },
+  fullscreenContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'var(--theme-surface-canvas-background-color)',
   },
   previewStage: {
     position: 'relative',
@@ -512,7 +523,9 @@ const InteractiveModel3DPreviewContent = ({
   modelUrl,
   i18n,
 }: ContentProps): React.Node => {
+  const previewContainerRef = React.useRef<?HTMLDivElement>(null);
   const canvasHostRef = React.useRef<?HTMLDivElement>(null);
+  const previewCameraRef = React.useRef<any>(null);
   const animationPlaybackControllerRef = React.useRef<?AnimationPlaybackController>(
     null
   );
@@ -533,6 +546,8 @@ const InteractiveModel3DPreviewContent = ({
   const [hasBones, setHasBones] = React.useState(false);
   const [isShowingBones, setIsShowingBones] = React.useState(false);
   const [isShowingBoneNames, setIsShowingBoneNames] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [hasFullscreenError, setHasFullscreenError] = React.useState(false);
   const [boneNameCopyStatus, setBoneNameCopyStatus] = React.useState<
     'success' | 'error' | null
   >(null);
@@ -605,6 +620,83 @@ const InteractiveModel3DPreviewContent = ({
     [isShowingBoneNames, isShowingBones]
   );
 
+  const setPreviewFullscreenState = React.useCallback(
+    (isPreviewFullscreen: boolean) => {
+      setIsFullscreen(isPreviewFullscreen);
+
+      const camera = previewCameraRef.current;
+      if (camera) {
+        camera.zoom = getModelPreviewCameraZoom(isPreviewFullscreen);
+        camera.updateProjectionMatrix();
+      }
+    },
+    []
+  );
+
+  const updateFullscreenState = React.useCallback(
+    () => {
+      if (typeof document === 'undefined') return;
+
+      const previewContainer = previewContainerRef.current;
+      const previewDocument = previewContainer
+        ? previewContainer.ownerDocument
+        : document;
+      const fullscreenElement = previewDocument.fullscreenElement;
+      setPreviewFullscreenState(
+        !!previewContainer &&
+          !!fullscreenElement &&
+          (fullscreenElement === previewContainer ||
+            previewContainer.contains(fullscreenElement) ||
+            fullscreenElement.contains(previewContainer))
+      );
+    },
+    [setPreviewFullscreenState]
+  );
+
+  const toggleFullscreen = React.useCallback(
+    async () => {
+      if (typeof document === 'undefined') return;
+
+      const previewContainer = previewContainerRef.current;
+      if (!previewContainer) return;
+      const previewDocument = previewContainer.ownerDocument;
+
+      try {
+        if (previewDocument.fullscreenElement || isFullscreen) {
+          await exitAllFullscreenLayers(previewDocument);
+          setPreviewFullscreenState(false);
+        } else {
+          await previewContainer.requestFullscreen();
+          setPreviewFullscreenState(true);
+        }
+        setHasFullscreenError(false);
+      } catch (error) {
+        setHasFullscreenError(true);
+      }
+    },
+    [isFullscreen, setPreviewFullscreenState]
+  );
+
+  React.useEffect(
+    () => {
+      if (typeof document === 'undefined') return;
+
+      const previewDocument = previewContainerRef.current
+        ? previewContainerRef.current.ownerDocument
+        : document;
+      previewDocument.addEventListener(
+        'fullscreenchange',
+        updateFullscreenState
+      );
+      return () =>
+        previewDocument.removeEventListener(
+          'fullscreenchange',
+          updateFullscreenState
+        );
+    },
+    [updateFullscreenState]
+  );
+
   React.useEffect(
     () => {
       if (bonesVisualizationControllerRef.current) {
@@ -651,6 +743,11 @@ const InteractiveModel3DPreviewContent = ({
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+      previewCameraRef.current = camera;
+      camera.zoom = getModelPreviewCameraZoom(
+        typeof document !== 'undefined' &&
+          document.fullscreenElement === previewContainerRef.current
+      );
       const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
@@ -779,6 +876,9 @@ const InteractiveModel3DPreviewContent = ({
           window.removeEventListener('resize', resize);
         }
         controls.dispose();
+        if (previewCameraRef.current === camera) {
+          previewCameraRef.current = null;
+        }
         animationPlaybackControllerRef.current = null;
         bonesVisualizationControllerRef.current = null;
         if (bonesVisualizationController) {
@@ -802,7 +902,13 @@ const InteractiveModel3DPreviewContent = ({
   );
 
   return (
-    <div style={styles.container}>
+    <div
+      ref={previewContainerRef}
+      style={{
+        ...styles.container,
+        ...(isFullscreen ? styles.fullscreenContainer : undefined),
+      }}
+    >
       <div style={styles.previewStage}>
         <CheckeredBackground />
         <div ref={canvasHostRef} style={styles.canvasHost} />
@@ -819,7 +925,7 @@ const InteractiveModel3DPreviewContent = ({
           </div>
         )}
       </div>
-      {(animationClips.length > 0 || hasBones) && (
+      {(animationClips.length > 0 || hasBones || (!isLoading && !error)) && (
         <div style={styles.animationPanel}>
           <div style={styles.animationPanelHeader}>
             {animationClips.length > 0 && (
@@ -872,6 +978,21 @@ const InteractiveModel3DPreviewContent = ({
                 />
               </React.Fragment>
             )}
+            <FlatButton
+              id="model-toggle-fullscreen"
+              label={
+                isFullscreen ? (
+                  <Trans>Exit fullscreen</Trans>
+                ) : (
+                  <Trans>Full screen</Trans>
+                )
+              }
+              leftIcon={isFullscreen ? <Minimize /> : <Maximize />}
+              primary={isFullscreen}
+              disabled={isLoading || !!error}
+              onClick={toggleFullscreen}
+              style={{ flexShrink: 0 }}
+            />
           </div>
           {animationClips.length > 0 && (
             <div style={styles.animationList}>
@@ -902,14 +1023,19 @@ const InteractiveModel3DPreviewContent = ({
       )}
       <InfoBar
         message={
-          boneNameCopyStatus === 'error' ? (
+          hasFullscreenError ? (
+            <Trans>Unable to change full screen mode.</Trans>
+          ) : boneNameCopyStatus === 'error' ? (
             <Trans>Unable to copy the bone name.</Trans>
           ) : (
             <Trans>Bone name copied to clipboard!</Trans>
           )
         }
-        visible={boneNameCopyStatus !== null}
-        hide={() => setBoneNameCopyStatus(null)}
+        visible={hasFullscreenError || boneNameCopyStatus !== null}
+        hide={() => {
+          setHasFullscreenError(false);
+          setBoneNameCopyStatus(null);
+        }}
       />
     </div>
   );

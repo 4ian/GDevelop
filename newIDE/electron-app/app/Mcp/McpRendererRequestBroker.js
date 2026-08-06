@@ -1,5 +1,8 @@
 const DEFAULT_REQUEST_TIMEOUT_MS = 30000;
 const DEFAULT_RELOAD_TIMEOUT_MS = 120000;
+const DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS = 180000;
+const DEFAULT_PROJECT_FILES_OPERATION_TIMEOUT_MS = 180000;
+const DEFAULT_PREVIEW_OPERATION_TIMEOUT_MS = 120000;
 const MINIMUM_REQUEST_TIMEOUT_MS = 1000;
 const MAXIMUM_REQUEST_TIMEOUT_MS = 600000;
 const RELOAD_OPERATION_RETENTION_MS = 5 * 60 * 1000;
@@ -65,6 +68,49 @@ const isReloadProjectRequest = request =>
   !!request.params &&
   request.params.name === 'reload_project';
 
+const isVerifyProjectChangeRequest = request =>
+  !!request &&
+  request.method === 'tools/call' &&
+  !!request.params &&
+  request.params.name === 'verify_project_change';
+
+const PROJECT_FILES_OPERATION_TOOL_NAMES = new Set([
+  'generate-catalogs',
+  'validate_project_files',
+]);
+
+const PREVIEW_OPERATION_TOOL_NAMES = new Set(['launch_preview']);
+
+const isProjectFilesOperationRequest = request =>
+  !!request &&
+  request.method === 'tools/call' &&
+  !!request.params &&
+  PROJECT_FILES_OPERATION_TOOL_NAMES.has(request.params.name);
+
+const isPreviewOperationRequest = request =>
+  !!request &&
+  request.method === 'tools/call' &&
+  !!request.params &&
+  PREVIEW_OPERATION_TOOL_NAMES.has(request.params.name);
+
+const getCoalescingKey = request => {
+  if (
+    !isProjectFilesOperationRequest(request) &&
+    !isVerifyProjectChangeRequest(request) &&
+    !isPreviewOperationRequest(request)
+  ) {
+    return null;
+  }
+  try {
+    return JSON.stringify([
+      request.params.name,
+      request.params.arguments || {},
+    ]);
+  } catch (error) {
+    return null;
+  }
+};
+
 const getReloadArguments = request => {
   if (!isReloadProjectRequest(request)) return {};
   const args = request.params.arguments;
@@ -80,12 +126,23 @@ const getRequestTimeout = ({
   request,
   defaultRequestTimeoutMs,
   defaultReloadTimeoutMs,
+  defaultVerifyProjectChangeTimeoutMs,
+  defaultProjectFilesOperationTimeoutMs,
+  defaultPreviewOperationTimeoutMs,
   minimumRequestTimeoutMs,
   maximumRequestTimeoutMs,
 }) => {
+  // verify_project_change.timeout_ms bounds its launch and inspection stages,
+  // not the aggregate validation/reload/preview workflow.
   const requestedTimeout = getReloadArguments(request).timeout_ms;
   const defaultTimeout = isReloadProjectRequest(request)
     ? defaultReloadTimeoutMs
+    : isVerifyProjectChangeRequest(request)
+    ? defaultVerifyProjectChangeTimeoutMs
+    : isProjectFilesOperationRequest(request)
+    ? defaultProjectFilesOperationTimeoutMs
+    : isPreviewOperationRequest(request)
+    ? defaultPreviewOperationTimeoutMs
     : defaultRequestTimeoutMs;
   if (
     typeof requestedTimeout !== 'number' ||
@@ -293,6 +350,9 @@ const createMcpRendererRequestBroker = ({
   getWebContents,
   defaultRequestTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
   defaultReloadTimeoutMs = DEFAULT_RELOAD_TIMEOUT_MS,
+  defaultVerifyProjectChangeTimeoutMs = DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS,
+  defaultProjectFilesOperationTimeoutMs = DEFAULT_PROJECT_FILES_OPERATION_TIMEOUT_MS,
+  defaultPreviewOperationTimeoutMs = DEFAULT_PREVIEW_OPERATION_TIMEOUT_MS,
   minimumRequestTimeoutMs = MINIMUM_REQUEST_TIMEOUT_MS,
   maximumRequestTimeoutMs = MAXIMUM_REQUEST_TIMEOUT_MS,
   reloadOperationRetentionMs = RELOAD_OPERATION_RETENTION_MS,
@@ -542,6 +602,7 @@ const createMcpRendererRequestBroker = ({
       operationId: isReloadProjectRequest(request)
         ? `reload-project-${requestId}`
         : null,
+      coalescingKey: getCoalescingKey(request),
       webContents,
       status: 'running',
       startedAtMs,
@@ -620,18 +681,24 @@ const createMcpRendererRequestBroker = ({
       request,
       defaultRequestTimeoutMs,
       defaultReloadTimeoutMs,
+      defaultVerifyProjectChangeTimeoutMs,
+      defaultProjectFilesOperationTimeoutMs,
+      defaultPreviewOperationTimeoutMs,
       minimumRequestTimeoutMs,
       maximumRequestTimeoutMs,
     });
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeoutFn(() => {
         const isReload = !!operation.operationId;
+        const canRetryByAttaching = !!operation.coalescingKey;
         const error = makeRequestError(
           isReload
             ? `Timed out after ${timeoutMs} ms waiting for reload_project. Reload operation ${
                 operation.operationId
               } is still running; call reload_project again with this operation_id to attach to it.`
-            : 'Timed out waiting for the GDevelop editor.',
+            : canRetryByAttaching
+            ? `Timed out after ${timeoutMs} ms waiting for the GDevelop editor. The renderer operation is still running; retry the identical request to attach to it instead of starting duplicate work.`
+            : `Timed out after ${timeoutMs} ms waiting for the GDevelop editor. The renderer operation may still be running because renderer-side MCP work cannot be cancelled safely.`,
           {
             code: 'MCP_RENDERER_TIMEOUT',
             timeoutMs,
@@ -642,9 +709,10 @@ const createMcpRendererRequestBroker = ({
                 : null,
             operationId: operation.operationId,
             operation_id: operation.operationId,
-            operationStatus: isReload ? operation.status : 'abandoned',
-            waiterDetached: isReload,
-            underlyingOperationContinues: isReload,
+            operationStatus: operation.status,
+            waiterDetached: true,
+            underlyingOperationContinues: operation.status === 'running',
+            retryAttachesToExistingOperation: canRetryByAttaching,
             reloadOperation: isReload
               ? getReloadOperationMetadata(operation, {
                   attachedToExistingOperation,
@@ -671,9 +739,6 @@ const createMcpRendererRequestBroker = ({
               : null,
           }
         );
-        if (!isReload && operation.status === 'running') {
-          settleOperation(operation, null, error);
-        }
         reject(error);
       }, timeoutMs);
 
@@ -700,10 +765,24 @@ const createMcpRendererRequestBroker = ({
   const send = request => {
     try {
       if (!isReloadProjectRequest(request)) {
-        return waitForOperation(createOperation(request), request, {
-          attachedToExistingOperation: false,
-          polledCompletedOperation: false,
-        });
+        const coalescingKey = getCoalescingKey(request);
+        const currentWebContents = getWebContents();
+        const existingOperation = coalescingKey
+          ? Array.from(pendingRequests.values()).find(
+              operation =>
+                operation.status === 'running' &&
+                operation.webContents === currentWebContents &&
+                operation.coalescingKey === coalescingKey
+            )
+          : null;
+        return waitForOperation(
+          existingOperation || createOperation(request),
+          request,
+          {
+            attachedToExistingOperation: !!existingOperation,
+            polledCompletedOperation: false,
+          }
+        );
       }
 
       const reloadArguments = getReloadArguments(request);
@@ -864,13 +943,17 @@ const createMcpRendererRequestBroker = ({
     return true;
   };
 
-  const clearFor = webContents => {
+  const clearFor = (webContents, disconnectDetails = {}) => {
     for (const operation of pendingRequests.values()) {
       if (operation.webContents !== webContents) continue;
       operation.rendererConnectionState = 'disconnected';
-      const error = makeRequestError('The GDevelop editor window was closed.', {
-        code: 'MCP_EDITOR_WINDOW_CLOSED',
-      });
+      const error = makeRequestError(
+        disconnectDetails.message || 'The GDevelop editor window was closed.',
+        {
+          ...disconnectDetails,
+          code: disconnectDetails.code || 'MCP_EDITOR_WINDOW_CLOSED',
+        }
+      );
       settleOperation(operation, null, error);
     }
   };
@@ -886,6 +969,9 @@ const createMcpRendererRequestBroker = ({
 module.exports = {
   DEFAULT_REQUEST_TIMEOUT_MS,
   DEFAULT_RELOAD_TIMEOUT_MS,
+  DEFAULT_VERIFY_PROJECT_CHANGE_TIMEOUT_MS,
+  DEFAULT_PROJECT_FILES_OPERATION_TIMEOUT_MS,
+  DEFAULT_PREVIEW_OPERATION_TIMEOUT_MS,
   MINIMUM_REQUEST_TIMEOUT_MS,
   MAXIMUM_REQUEST_TIMEOUT_MS,
   RELOAD_OPERATION_INACTIVITY_TIMEOUT_MS,

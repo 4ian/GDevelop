@@ -29,6 +29,42 @@ namespace gdjs {
     );
   };
 
+  const encodeLocalFilePath = (filePath: string): string =>
+    filePath
+      .split('/')
+      .map((pathPart) => encodeURIComponent(pathPart))
+      .join('/');
+
+  /**
+   * Convert an absolute filesystem path exposed by the in-game editor to a URL
+   * that Chromium loaders can consume. In particular, passing `C:/...`
+   * directly to fetch makes Chromium interpret `c:` as a custom protocol.
+   */
+  const getFetchableLocalFileUrl = (urlOrPath: string): string => {
+    if (urlOrPath.startsWith('file://')) return urlOrPath;
+
+    const normalizedPath = urlOrPath.replace(/\\/g, '/');
+    const windowsDrivePath = /^([a-zA-Z]:)\/(.*)$/.exec(normalizedPath);
+    if (windowsDrivePath) {
+      return `file:///${windowsDrivePath[1]}/${encodeLocalFilePath(
+        windowsDrivePath[2]
+      )}`;
+    }
+
+    if (normalizedPath.startsWith('//')) {
+      const [host, ...pathParts] = normalizedPath.substring(2).split('/');
+      if (host) {
+        return `file://${host}/${encodeLocalFilePath(pathParts.join('/'))}`;
+      }
+    }
+
+    if (normalizedPath.startsWith('/')) {
+      return `file://${encodeLocalFilePath(normalizedPath)}`;
+    }
+
+    return urlOrPath;
+  };
+
   /**
    * A task of pre-loading resources used by a scene.
    *
@@ -639,6 +675,7 @@ namespace gdjs {
      */
     getFullUrl(url: string) {
       if (this._runtimeGame.isInGameEdition()) {
+        url = getFetchableLocalFileUrl(url);
         // Avoid adding cache burst to URLs which are assumed to be immutable files,
         // to avoid costly useless requests each time the game is hot-reloaded.
         if (url.startsWith('file://') || !url.startsWith('http')) {

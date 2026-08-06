@@ -166,6 +166,38 @@ describe('gdjs.ResourceLoader', () => {
     },
   };
 
+  it('converts in-game editor absolute paths to fetchable file URLs', () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
+    runtimeGame._isInGameEdition = true;
+    const resourceLoader = runtimeGame.getResourceLoader();
+    const now = Date.now;
+    Date.now = () => 1234;
+
+    try {
+      expect(
+        resourceLoader.getFullUrl(
+          'D:\\Projects\\Twin Kunai #1?\\character 100%.glb'
+        )
+      ).to.be(
+        'file:///D:/Projects/Twin%20Kunai%20%231%3F/character%20100%25.glb?cache=1234'
+      );
+      expect(
+        resourceLoader.getFullUrl(
+          '\\\\preview-server\\shared assets\\character.glb'
+        )
+      ).to.be('file://preview-server/shared%20assets/character.glb?cache=1234');
+      expect(resourceLoader.getFullUrl('/tmp/Twin Kunai/character.glb')).to.be(
+        'file:///tmp/Twin%20Kunai/character.glb?cache=1234'
+      );
+      expect(
+        resourceLoader.getFullUrl('file:///D:/Projects/character.glb')
+      ).to.be('file:///D:/Projects/character.glb?cache=1234');
+    } finally {
+      Date.now = now;
+      runtimeGame.dispose();
+    }
+  });
+
   it('should load first scene resources, then others in background', async () => {
     const mockedResourceManager = new gdjs.MockedResourceManager();
     const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);

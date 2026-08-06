@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, MCP gameplay test script, Blender-to-GDevelop import, `.gltf`-to-`.glb` conversion, same-rig GLB animation merge, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Python templates and Blender scripts for supported jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, MCP gameplay test script, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Python test template for supported jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -186,6 +186,11 @@ and type-specific configuration. `project.gdevelop`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
 layers, background/bounds, and editor layout state in `.layout`.
+For type-specific object configuration, resolve the registered entry in
+`settings-catalog.json` by `objectTypes[].type`: use its `properties` for
+public generic-editor fields and its recursive `schema` for exact serialized
+root fields, child tables, repeated tables, and empty forms. Preserve existing
+unlisted legacy or private serializer fields.
 For each attached behavior, keep its identity fields and complete existing
 serializer data in `<Object>.settings`. Initialize or edit only the
 author-writable properties present in `settings-catalog.json`; preserve
@@ -273,12 +278,6 @@ Load only the references required by the task:
   before adding or changing a prefab/custom-object `onSignal` function. Read
   the Constants guide too when signal names use placeholders.
 - Read
-  [references/blender-to-gdevelop.md](references/blender-to-gdevelop.md) in full
-  before converting or merging glTF/GLB assets or importing a `.glb` exported
-  from Blender into GDevelop. Follow that workflow for Blender scene
-  preparation, GLB export, GDevelop resource and object setup, collision,
-  preview verification, and re-export updates.
-- Read
   [references/reuse-community-extensions.md](references/reuse-community-extensions.md)
   in full before implementing a substantial reusable system or installing a
   third-party extension. Search the official GDevelop extensions repository
@@ -296,31 +295,6 @@ Build from scratch only when repository search finds no suitable extension,
 the available extension is incompatible or unsafe, or a small project-specific
 implementation is materially simpler. Record that decision in the task result.
 
-## Bundled Blender conversion scripts
-
-Use the bundled scripts directly for supported conversion jobs; do not rewrite
-their logic in an ad hoc script. Run them with Blender using
-`--background --factory-startup --python <script> -- <arguments>`, and call
-the selected script with `--help` when its exact options are needed.
-
-- For any `.gltf` to `.glb` request, run
-  [scripts/convert_gltf_to_glb.py](scripts/convert_gltf_to_glb.py). Use
-  `--input` with `--output` for one file, or `--output-dir` for a directory;
-  add `--recursive` for nested inputs and `--overwrite` only when replacement
-  is intended. Require its final summary to report zero failures.
-- For any request to embed animations from a GLB into a character that uses
-  the same skeleton, run
-  [scripts/combine_same_rig_glb_animations.py](scripts/combine_same_rig_glb_animations.py).
-  Supply `--character`, `--animations`, and `--output`; repeat `--action` to
-  select clips. Keep strict compatibility checking unless the user explicitly
-  accepts a weaker check. This script performs direct action reuse, not
-  retargeting; stop and use a real retargeting workflow when rigs differ.
-
-Generate a temporary output and inspect or round-trip it before replacing an
-existing project asset. When the final GLB is a project resource, keep it
-inside the project, preserve its registered path when updating it, validate
-the project, commit, reload, and verify it in a fresh preview.
-
 ## Reusable MCP test scripts
 
 When the user asks to write a Python or MCP gameplay test script, start from
@@ -331,13 +305,13 @@ hooks. Do not rewrite its MCP transport or preview lifecycle from scratch
 unless the template is incompatible with the requested scenario; report the
 specific incompatibility when deviating.
 
-Preserve the template's environment-token authentication, stale-preview
-cleanup, fresh paused launch, deterministic frame stepping, bounded object
-inspection, runtime/renderer checks, JSON result, nonzero failure exits,
-optional screenshot, and guaranteed preview cleanup. Run `py_compile`, the
-template-derived script's `--self-test`, and the actual scenario against a
-fresh preview. A gameplay test script does not replace the validation,
-Git-commit, and reload gates when project sources changed.
+Preserve the template's local MCP transport, stale-preview cleanup, fresh
+paused launch, deterministic frame stepping, bounded object inspection,
+runtime/renderer checks, JSON result, nonzero failure exits, optional
+screenshot, and guaranteed preview cleanup. MCP authentication is not required.
+Run `py_compile`, the template-derived script's `--self-test`, and the actual
+scenario against a fresh preview. A gameplay test script does not replace the
+validation, Git-commit, and reload gates when project sources changed.
 
 ## Event authoring
 
@@ -498,24 +472,21 @@ asset is appropriate.
 
 MCP is extension-import/synchronization/read/debug-only. Use it only for:
 
-The complete public protocol surface is the following 27-tool allowlist:
+The complete public protocol surface is the following 22-tool allowlist:
 
 - Editor/project inspection:
   `gdevelop_get_editor_state`, `gdevelop_get_editor_selection`,
   `gdevelop_get_project_summary`, `gdevelop_list_scenes`,
   `gdevelop_list_objects`, and `gdevelop_inspect_signal_usage`.
-- Catalog, validation, and instruction construction:
+- Catalog, validation, and tool discovery:
   `generate-catalogs`, `validate_project_files`, `inspect_tool_schema`,
-  `get_tool_usage_examples`, `create_action`,
-  `create_signal_emit_action`, `create_signal_subscription_action`, and
-  `create_signal_received_condition`.
+  and `get_tool_usage_examples`.
 - Synchronization and runtime verification:
   `reload_project`, `launch_preview`, `wait_until_preview_ready`,
   `preview_health_check`, `gdevelop_inspect_running_preview`, `run_frames`,
   `verify_project_change`, `simulate_preview_input`, `control_preview`,
   `set_runtime_state`, and `capture_preview_screenshot`.
-- Public write operations: `import_extension` and the permissioned
-  `gdevelop_create_or_update_on_signal`.
+- Public write operation: `import_extension`.
 
 No other MCP tool name is supported, introspectable, or callable, even when
 write/command permissions are enabled. In particular, there is no generic

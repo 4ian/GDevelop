@@ -6,8 +6,7 @@ then customize ``build_scenario``. Keep the MCP transport, fresh-preview
 lifecycle, bounded runtime inspection, JSON report, and non-zero failure exits.
 
 The template uses only Python's standard library. GDevelop must be open with
-its MCP server enabled. By default, authentication comes from the
-``GDEVELOP_MCP_TOKEN`` environment variable.
+its local MCP server enabled.
 """
 
 from __future__ import annotations
@@ -109,9 +108,8 @@ def build_scenario() -> Scenario:
 class McpHttpClient:
     """Minimal Streamable HTTP MCP client with no third-party dependencies."""
 
-    def __init__(self, url: str, token: str, timeout_seconds: float) -> None:
+    def __init__(self, url: str, timeout_seconds: float) -> None:
         self.url = url
-        self.token = token
         self.timeout_seconds = timeout_seconds
         self.protocol_version = PROTOCOL_VERSION
         self.session_id: str | None = None
@@ -167,7 +165,6 @@ class McpHttpClient:
 
     def _post(self, payload: dict[str, Any]) -> dict[str, Any] | None:
         headers = {
-            "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream",
             "MCP-Protocol-Version": self.protocol_version,
@@ -557,13 +554,7 @@ def run_scenario(args: argparse.Namespace) -> dict[str, Any]:
     scenario = build_scenario()
     validate_scenario(scenario)
 
-    token = os.environ.get(args.token_env)
-    if not token:
-        raise McpError(
-            f"Environment variable {args.token_env} is required for MCP auth"
-        )
-
-    client = McpHttpClient(args.url, token, args.http_timeout)
+    client = McpHttpClient(args.url, args.http_timeout)
     debugger_id: str | None = None
     try:
         log_step("Initialize MCP and verify the open project")
@@ -762,11 +753,6 @@ def parse_args() -> argparse.Namespace:
         "--url",
         default=os.environ.get("GDEVELOP_MCP_URL", DEFAULT_MCP_URL),
         help="GDevelop Streamable HTTP MCP endpoint",
-    )
-    parser.add_argument(
-        "--token-env",
-        default="GDEVELOP_MCP_TOKEN",
-        help="Environment variable containing the MCP bearer token",
     )
     parser.add_argument("--http-timeout", type=float, default=35.0)
     parser.add_argument("--no-screenshot", action="store_true")

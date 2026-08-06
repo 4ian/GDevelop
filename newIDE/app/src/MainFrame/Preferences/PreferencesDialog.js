@@ -89,8 +89,6 @@ const PreferencesDialog = ({
     setAutomaticallyUseCreditsForAiRequests,
     setEnableMcpServer,
     setMcpServerPort,
-    setMcpServerAuthorizationToken,
-    regenerateMcpServerAuthorizationToken,
     setMcpAllowWriteTools,
     setMcpAllowCommandTools,
     setShowCreateSectionByDefault,
@@ -134,12 +132,7 @@ const PreferencesDialog = ({
       const timeoutId = setTimeout(refreshMcpServerState, 150);
       return () => clearTimeout(timeoutId);
     },
-    [
-      refreshMcpServerState,
-      values.enableMcpServer,
-      values.mcpServerPort,
-      values.mcpServerAuthorizationToken,
-    ]
+    [refreshMcpServerState, values.enableMcpServer, values.mcpServerPort]
   );
 
   const mcpServerPreferences = (
@@ -188,28 +181,7 @@ const PreferencesDialog = ({
         readOnly
         fullWidth
       />
-      <TextField
-        value={values.mcpServerAuthorizationToken}
-        floatingLabelText={<Trans>Authorization token</Trans>}
-        onChange={(event, value) => setMcpServerAuthorizationToken(value)}
-        fullWidth
-      />
-      <TextField
-        value={
-          values.mcpServerAuthorizationToken
-            ? `Bearer ${values.mcpServerAuthorizationToken}`
-            : ''
-        }
-        floatingLabelText={<Trans>Authorization header</Trans>}
-        readOnly
-        fullWidth
-      />
       <LineStackLayout noMargin>
-        <FlatButton
-          label={<Trans>Generate token</Trans>}
-          primary={false}
-          onClick={regenerateMcpServerAuthorizationToken}
-        />
         <FlatButton
           label={<Trans>Refresh status</Trans>}
           primary={false}

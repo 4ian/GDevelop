@@ -1821,6 +1821,14 @@ The writer:
    empty forms; `commonFields` remains only a compact search summary. The
    layout catalog contains the layout TOML tables and each
    layout's resolvable objects, attached behaviors, and layers.
+   Every registered `objectTypes[]` entry contains public generic-editor
+   `properties` and a recursive `schema` for its serialized configuration.
+   The schema is built from the type's default serializer, populated public
+   repeated records, and same-type objects in the project, so object settings
+   can describe nested records such as
+   `[[content.sharedAnimationModelResources]]` without requiring an existing
+   sibling object as a template. Unknown legacy or private serializer fields
+   are still preserved.
    Instruction enumeration covers the non-deprecated authoring surface. It
    excludes editor-hidden compatibility instructions, instructions with deprecation
    messages, and expressions that are hidden, marked deprecated, or carry a

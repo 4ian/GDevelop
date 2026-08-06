@@ -313,6 +313,443 @@ const getProjectBehaviorDefinitions = (
   return definitions;
 };
 
+const getProjectObjectDefinitions = (
+  serializedProject: Object
+): Map<string, Object> => {
+  const definitions: Map<string, Object> = new Map();
+  (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
+    const extensionName = String(extension.name || '');
+    (extension.eventsBasedObjects || []).forEach(object => {
+      const objectName = String(object.name || '');
+      definitions.set(`${extensionName}::${objectName}`, object);
+    });
+  });
+  return definitions;
+};
+
+const serializedPropertyDescriptorDefaultValue = (property: Object): any => {
+  const type = String(property.type || '').toLowerCase();
+  const value = property.value;
+  if (
+    type.includes('number') ||
+    type.includes('integer') ||
+    type.includes('float')
+  ) {
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : 0;
+  }
+  if (type.includes('boolean')) {
+    return ['1', 'true'].includes(String(value || '').toLowerCase());
+  }
+  return String(value || '');
+};
+
+const summarizeProjectObjectDefinition = (
+  objectDefinition: Object
+): {| serializedConfiguration: Object, properties: Array<Object> |} => {
+  const properties = summarizeSerializedProperties(
+    objectDefinition.propertyDescriptors
+  ).map(property => ({
+    ...property,
+    serializedPath: `content.${property.serializedKey}`,
+  }));
+  const content: { [string]: any } = {};
+  (objectDefinition.propertyDescriptors || [])
+    .filter(property => !property.hidden && !property.deprecated)
+    .forEach(property => {
+      const name = String(property.name || '');
+      if (name) {
+        content[name] = serializedPropertyDescriptorDefaultValue(property);
+      }
+    });
+  return {
+    serializedConfiguration: { content, variant: '' },
+    properties,
+  };
+};
+
+const OBJECT_DEFINITION_FIELDS = new Set([
+  'assetStoreId',
+  'behaviors',
+  'effects',
+  'name',
+  'persistentUuid',
+  'resourcesPreloading',
+  'type',
+  'variables',
+]);
+
+const collectSerializedObjectConfigurationsByType = (
+  serializedProject: Object
+): Map<string, Array<Object>> => {
+  const configurationsByType: Map<string, Array<Object>> = new Map();
+  const addObjects = (objects: ?Array<Object>) => {
+    (objects || []).forEach(object => {
+      if (!object || typeof object !== 'object' || Array.isArray(object)) {
+        return;
+      }
+      const type = String(object.type || '');
+      if (!type) return;
+      const configuration = {};
+      Object.keys(object).forEach(key => {
+        if (!OBJECT_DEFINITION_FIELDS.has(key)) {
+          configuration[key] = object[key];
+        }
+      });
+      const configurations = configurationsByType.get(type) || [];
+      configurations.push(configuration);
+      configurationsByType.set(type, configurations);
+    });
+  };
+
+  addObjects(serializedProject.objects);
+  (serializedProject.layouts || []).forEach(layout =>
+    addObjects(layout.objects)
+  );
+  (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
+    (extension.eventsBasedObjects || []).forEach(eventsBasedObject => {
+      addObjects(eventsBasedObject.objects);
+      (eventsBasedObject.variants || []).forEach(variant =>
+        addObjects(variant.objects)
+      );
+    });
+  });
+  return configurationsByType;
+};
+
+const serializedValueKind = (value: any): string => {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return 'array';
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? 'integer' : 'number';
+  }
+  return typeof value;
+};
+
+type SerializedValueShape = {
+  kinds: Array<string>,
+  fields: { [string]: SerializedValueShape },
+  item: ?SerializedValueShape,
+  defaultValue?: any,
+  defaultEmpty?: boolean,
+};
+
+const mergeSerializedValueShape = (
+  shape: ?SerializedValueShape,
+  value: any,
+  isDefaultValue: boolean = false
+): SerializedValueShape => {
+  const merged: SerializedValueShape = shape || {
+    kinds: [],
+    fields: {},
+    item: null,
+  };
+  const kind = serializedValueKind(value);
+  if (!merged.kinds.includes(kind)) {
+    merged.kinds.push(kind);
+    merged.kinds.sort((left, right) => left.localeCompare(right));
+  }
+  if (
+    isDefaultValue &&
+    ['boolean', 'integer', 'number', 'string'].includes(kind)
+  ) {
+    merged.defaultValue = value;
+  }
+  if (kind === 'object') {
+    Object.keys(value)
+      .sort((left, right) => left.localeCompare(right))
+      .forEach(key => {
+        merged.fields[key] = mergeSerializedValueShape(
+          merged.fields[key],
+          value[key],
+          isDefaultValue
+        );
+      });
+  } else if (kind === 'array') {
+    value.forEach(item => {
+      merged.item = mergeSerializedValueShape(
+        merged.item,
+        item,
+        isDefaultValue
+      );
+    });
+    if (isDefaultValue && value.length === 0) merged.defaultEmpty = true;
+  }
+  return merged;
+};
+
+const isInlineObjectConfigurationField = (name: string): boolean =>
+  ['originPoint', 'centerPoint', 'points', 'customCollisionMask'].includes(
+    name
+  );
+
+const shapeType = (
+  shape: ?SerializedValueShape,
+  fieldName: string = ''
+): string => {
+  if (!shape) return 'value determined by the object serializer';
+  const types = shape.kinds.map(kind => {
+    if (kind === 'array') {
+      if (!shape.item) return 'array';
+      const itemType = shapeType(shape.item);
+      return isInlineObjectConfigurationField(fieldName)
+        ? `${itemType} inline array`
+        : `${itemType} array`;
+    }
+    if (kind === 'object') return 'inline table';
+    if (kind === 'null') return 'JSON null stored through [rawJson]';
+    return kind;
+  });
+  if (types.includes('number') && types.includes('integer')) {
+    types.splice(types.indexOf('integer'), 1);
+  }
+  return types.join(' or ');
+};
+
+const shapeField = (name: string, shape: SerializedValueShape): Object => {
+  const field: Object = settingsField(name, shapeType(shape, name));
+  if (shape.defaultValue !== undefined) {
+    field.defaultValue = shape.defaultValue;
+  }
+  if (shape.defaultEmpty) field.emptyValue = [];
+  return field;
+};
+
+const buildSerializedObjectChildTable = (
+  name: string,
+  shape: SerializedValueShape,
+  parentPath: string
+): Object => {
+  const path = parentPath ? `${parentPath}.${name}` : name;
+  const repeated = shape.kinds.includes('array');
+  const recordShape = repeated ? shape.item : shape;
+  const fields = [];
+  const childTables = [];
+  if (recordShape && recordShape.fields) {
+    Object.keys(recordShape.fields)
+      .sort((left, right) => left.localeCompare(right))
+      .forEach(fieldName => {
+        const fieldShape = recordShape.fields[fieldName];
+        const isObject = fieldShape.kinds.includes('object');
+        const isObjectArray =
+          fieldShape.kinds.includes('array') &&
+          fieldShape.item &&
+          fieldShape.item.kinds.includes('object');
+        if (
+          !isInlineObjectConfigurationField(fieldName) &&
+          (isObject || isObjectArray)
+        ) {
+          childTables.push(
+            buildSerializedObjectChildTable(fieldName, fieldShape, path)
+          );
+        } else {
+          fields.push(shapeField(fieldName, fieldShape));
+        }
+      });
+  }
+  const table: Object = {
+    table: path,
+    header: repeated ? `[[${path}]]` : `[${path}]`,
+    ...(repeated ? { repeated: true } : {}),
+    fields,
+  };
+  if (repeated) {
+    table.emptyForm = `${name} = [ ]${
+      parentPath ? ` inside [${parentPath}]` : ' at the object root'
+    }`;
+  }
+  if (childTables.length) table.childTables = childTables;
+  return table;
+};
+
+const buildSerializedObjectConfigurationSchema = (
+  configurations: Array<{| value: Object, isDefault: boolean |}>
+): Object => {
+  let rootShape: ?SerializedValueShape = null;
+  configurations.forEach(({ value, isDefault }) => {
+    rootShape = mergeSerializedValueShape(rootShape, value, isDefault);
+  });
+  const rootFields = [];
+  const childTables = [];
+  const fields: { [string]: SerializedValueShape } = rootShape
+    ? rootShape.fields
+    : {};
+  Object.keys(fields)
+    .sort((left, right) => left.localeCompare(right))
+    .forEach(name => {
+      const shape = fields[name];
+      const isObject = shape.kinds.includes('object');
+      const isObjectArray =
+        shape.kinds.includes('array') &&
+        shape.item &&
+        shape.item.kinds.includes('object');
+      if (
+        !isInlineObjectConfigurationField(name) &&
+        (isObject || isObjectArray)
+      ) {
+        childTables.push(buildSerializedObjectChildTable(name, shape, ''));
+      } else {
+        rootFields.push(shapeField(name, shape));
+      }
+    });
+  return { rootFields, childTables };
+};
+
+const collectSerializedPathsNamed = (
+  shape: ?SerializedValueShape,
+  searchedName: string,
+  parentPath: string = ''
+): Array<string> => {
+  if (!shape || !shape.fields) return [];
+  const paths = [];
+  Object.keys(shape.fields).forEach(name => {
+    const fieldShape = shape.fields[name];
+    const path = parentPath ? `${parentPath}.${name}` : name;
+    if (name === searchedName) paths.push(path);
+    if (fieldShape.kinds.includes('object')) {
+      paths.push(
+        ...collectSerializedPathsNamed(fieldShape, searchedName, path)
+      );
+    }
+    if (fieldShape.kinds.includes('array') && fieldShape.item) {
+      paths.push(
+        ...collectSerializedPathsNamed(
+          fieldShape.item,
+          searchedName,
+          `${path}[]`
+        )
+      );
+    }
+  });
+  return sortedUnique(paths);
+};
+
+// A few native object serializers have public repeated records whose default
+// value is an empty array. Populate one record through their public APIs so
+// the generated schema contains the record fields even when the project does
+// not have an object of that type yet. Other object types are fully described
+// by their default serializer and any same-type project objects collected
+// above.
+const safelyBuildPopulatedObjectConfiguration = (
+  objectType: string
+): ?Object => {
+  const ownedValues: Array<any> = [];
+  const own = (value: any): any => {
+    ownedValues.push(value);
+    return value;
+  };
+  let configuration;
+  try {
+    if (
+      objectType === 'Scene3D::Model3DObject' &&
+      gd.Model3DObjectConfiguration &&
+      gd.Model3DAnimation
+    ) {
+      configuration = own(new gd.Model3DObjectConfiguration());
+      configuration.setType(objectType);
+      configuration.addSharedAnimationModelResource(
+        '__gdevelop_catalog_model_resource__'
+      );
+      const animation = own(new gd.Model3DAnimation());
+      animation.setName('__gdevelop_catalog_animation__');
+      animation.setSource('Model');
+      animation.setSourceModelResourceName(
+        '__gdevelop_catalog_source_model_resource__'
+      );
+      animation.setShouldLoop(true);
+      configuration.addAnimation(animation);
+      return serializeToJSObject(configuration);
+    }
+    if (
+      objectType === 'Spine::SpineObject' &&
+      gd.SpineObjectConfiguration &&
+      gd.SpineAnimation
+    ) {
+      configuration = own(new gd.SpineObjectConfiguration());
+      configuration.setType(objectType);
+      const animation = own(new gd.SpineAnimation());
+      animation.setName('__gdevelop_catalog_animation__');
+      animation.setSource('__gdevelop_catalog_animation_source__');
+      animation.setShouldLoop(true);
+      configuration.addAnimation(animation);
+      return serializeToJSObject(configuration);
+    }
+    if (
+      objectType === 'Sprite' &&
+      gd.SpriteObject &&
+      gd.Animation &&
+      gd.Sprite
+    ) {
+      configuration = own(new gd.SpriteObject());
+      configuration.setType(objectType);
+      const animation = own(new gd.Animation());
+      animation.setName('__gdevelop_catalog_animation__');
+      animation.setDirectionsCount(1);
+      const direction = animation.getDirection(0);
+      direction.setMetadata('__gdevelop_catalog_direction_metadata__');
+      const sprite = own(new gd.Sprite());
+      sprite.setImageName('__gdevelop_catalog_image__');
+      sprite.setCustomSourceRect(1, 2, 3, 4);
+      const point = own(new gd.Point('__gdevelop_catalog_point__'));
+      point.setXY(1, 2);
+      sprite.addPoint(point);
+      direction.addSprite(sprite);
+      configuration.getAnimations().addAnimation(animation);
+      return serializeToJSObject(configuration);
+    }
+  } catch (error) {
+    console.warn(
+      `[ProjectSourceCatalog] Unable to populate repeated serializer records for object ${objectType}; falling back to its default and project object schemas.`,
+      error
+    );
+  } finally {
+    ownedValues.reverse().forEach(value => value.delete());
+  }
+  return null;
+};
+
+const safelyReadObjectConfiguration = (
+  platform: gdPlatform,
+  objectType: string
+): {|
+  serializedConfiguration: Object,
+  populatedConfiguration: ?Object,
+  properties: Array<Object>,
+|} => {
+  let ownedConfiguration;
+  try {
+    ownedConfiguration = platform.createObjectConfiguration(objectType);
+    const configuration = ownedConfiguration.get();
+    const serializedConfiguration = serializeToJSObject(configuration);
+    const properties = safelySummarizeMetadataProperties(
+      () => configuration.getProperties(),
+      undefined,
+      `properties for object ${objectType}`
+    );
+    return {
+      serializedConfiguration,
+      populatedConfiguration: safelyBuildPopulatedObjectConfiguration(
+        objectType
+      ),
+      properties,
+    };
+  } catch (error) {
+    console.warn(
+      `[ProjectSourceCatalog] Unable to inspect the default serializer for object ${objectType}; generating its catalog entry from project objects only.`,
+      error
+    );
+    return {
+      serializedConfiguration: {},
+      populatedConfiguration: safelyBuildPopulatedObjectConfiguration(
+        objectType
+      ),
+      properties: [],
+    };
+  } finally {
+    if (ownedConfiguration) ownedConfiguration.delete();
+  }
+};
+
 const collectRegisteredTypes = (
   project: gdProject,
   serializedProject: Object,
@@ -327,6 +764,10 @@ const collectRegisteredTypes = (
   const effectTypes = [];
   const localExtensionNames = getProjectExtensionNames(serializedProject);
   const localBehaviorDefinitions = getProjectBehaviorDefinitions(
+    serializedProject
+  );
+  const localObjectDefinitions = getProjectObjectDefinitions(serializedProject);
+  const serializedObjectConfigurationsByType = collectSerializedObjectConfigurationsByType(
     serializedProject
   );
   const platform = project.getCurrentPlatform();
@@ -363,6 +804,47 @@ const collectRegisteredTypes = (
         extension: extensionName,
         renderedIn3D: metadata.isRenderedIn3D(),
       };
+      const localObjectDefinition = localObjectDefinitions.get(objectType);
+      const {
+        serializedConfiguration,
+        populatedConfiguration = null,
+        properties,
+      } = localObjectDefinition
+        ? summarizeProjectObjectDefinition(localObjectDefinition)
+        : safelyReadObjectConfiguration(platform, objectType);
+      const configurations = [
+        { value: serializedConfiguration, isDefault: true },
+        ...(populatedConfiguration
+          ? [{ value: populatedConfiguration, isDefault: false }]
+          : []),
+        ...(serializedObjectConfigurationsByType.get(objectType) || []).map(
+          value => ({ value, isDefault: false })
+        ),
+      ];
+      let configurationShape: ?SerializedValueShape = null;
+      configurations.forEach(({ value, isDefault }) => {
+        configurationShape = mergeSerializedValueShape(
+          configurationShape,
+          value,
+          isDefault
+        );
+      });
+      entry.properties = properties.map(property => {
+        const serializedPaths = collectSerializedPathsNamed(
+          configurationShape,
+          property.authoringKey
+        );
+        if (serializedPaths.length === 1) {
+          return { ...property, serializedPath: serializedPaths[0] };
+        }
+        if (serializedPaths.length > 1) {
+          return { ...property, serializedPaths };
+        }
+        return property;
+      });
+      entry.schema = buildSerializedObjectConfigurationSchema(configurations);
+      entry.keySpace = 'serialized paths';
+      entry.unknownPropertyPolicy = 'preserve';
       const defaultBehaviors = toArray(metadata.getDefaultBehaviors());
       if (defaultBehaviors.length) {
         entry.defaultBehaviorTypes = sortedUnique(defaultBehaviors);
@@ -817,8 +1299,9 @@ const objectSettingsSchema = {
   ],
   dynamicFields: {
     source: 'the object serializer selected by root field type',
+    schema: 'objectTypes[type].schema',
     policy:
-      'Read an existing object of the same registered type before authoring type-specific configuration; preserve all unknown fields and child tables.',
+      'Use objectTypes[type].schema for public type-specific configuration and preserve unknown legacy or private fields and child tables.',
   },
 };
 
@@ -1753,12 +2236,13 @@ export const buildProjectSettingsCatalog = ({
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its flat objects/<Object>.settings source location; instances and per-instance behavior overrides belong in .layout.',
         'Each prefab or behavior function owns the flat functions/<Function>/function.settings location and a sibling <Function>.events body. Owner settings never embed function metadata.',
+        'For an object, use objectTypes[type].properties for public generic-editor properties and objectTypes[type].schema for the complete known serialized TOML structure, including nested type-specific tables and repeated records. Preserve unlisted legacy or private serializer fields already present in an object definition.',
         'For an attached behavior, use behaviorTypes[].properties for author-writable fields. Editor-hidden and deprecated descriptors are intentionally absent from this catalog, but existing serialized fields not listed there are preserved verbatim because they may be configured by a specialized editor and required at runtime.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',
         'Never edit generated files below .gdevelop or legacy game.json.',
       ],
       objectDefinition:
-        'An object definition requires name, type, and behaviors. Preserve its type-specific serializer fields and nested variables/effects.',
+        'An object definition requires name, type, and behaviors. Author public type-specific fields through objectTypes[type].properties and objectTypes[type].schema; preserve unlisted legacy or private fields and nested variables/effects.',
       behaviorDefinition:
         'An attached behavior requires a unique object-local name and a registered type. Initialize or edit only author-writable properties listed for that type in behaviorTypes[].properties. Preserve unlisted serialized properties already present in an object definition.',
       variableDefinition:
@@ -2361,6 +2845,41 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
     entry => entry.type,
     'object type'
   );
+  validated.objectTypes.forEach(objectType => {
+    const hasConfigurationContract =
+      objectType.properties !== undefined ||
+      objectType.schema !== undefined ||
+      objectType.keySpace !== undefined ||
+      objectType.unknownPropertyPolicy !== undefined;
+    if (!hasConfigurationContract) return;
+    if (
+      objectType.keySpace !== 'serialized paths' ||
+      objectType.unknownPropertyPolicy !== 'preserve' ||
+      !Array.isArray(objectType.properties) ||
+      !objectType.schema
+    ) {
+      fail(
+        `Object type ${objectType.type} has an invalid configuration contract.`
+      );
+    }
+    validateSettingsSchemaFields(
+      objectType.schema.rootFields,
+      `Object type ${objectType.type} root`
+    );
+    validateSettingsChildTables(
+      objectType.schema.childTables,
+      `Object type ${objectType.type}`
+    );
+    objectType.properties.forEach(property => {
+      if (!property.authoringKey || !property.type) {
+        fail(
+          `Object type ${
+            objectType.type
+          } has a public property without an authoring key or type.`
+        );
+      }
+    });
+  });
   validateUniqueEntries(
     validated.behaviorTypes,
     entry => entry.type,

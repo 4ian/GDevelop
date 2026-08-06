@@ -587,6 +587,11 @@ describe('3D model bone attachments', function () {
     const oldBone = /** @type {any} */ (
       target.getRenderer()
     )._bonesByCanonicalName.get('Hand.Socket');
+    const targetRenderer = /** @type {any} */ (target.getRenderer());
+    const oldRoot = targetRenderer._clonedModelRoot;
+    const oldMixer = targetRenderer._animationMixer;
+    sinon.spy(oldMixer, 'stopAllAction');
+    sinon.spy(oldMixer, 'uncacheRoot');
 
     const secondGltf = makeGltf([makeBone('SanitizedAgain', 'Hand.Socket')]);
     /** @type {any} */ (modelManager.getModel).returns(secondGltf);
@@ -595,8 +600,29 @@ describe('3D model bone attachments', function () {
       target.getRenderer()
     )._bonesByCanonicalName.get('Hand.Socket');
     expect(newBone).not.to.be(oldBone);
+    expect(oldMixer.stopAllAction.calledOnce).to.be(true);
+    expect(oldMixer.uncacheRoot.calledOnceWith(oldRoot)).to.be(true);
+    expect(oldRoot.parent).to.be(null);
     gdjs.Model3DBoneAttachmentManager.synchronizeContainer(runtimeScene);
     expect(behavior.isAttachedToModelBone()).to.be(true);
     expect(behavior.isBoneAttachmentResolved()).to.be(true);
+  });
+
+  it('releases mixer bindings and the clone hierarchy when destroyed', function () {
+    const runtimeScene = makeScene(makeGltf([makeBone('Bone')]));
+    const target = addModel(runtimeScene, makeModelData('Target'));
+    const renderer = /** @type {any} */ (target.getRenderer());
+    const root = renderer._clonedModelRoot;
+    const mixer = renderer._animationMixer;
+    sinon.spy(mixer, 'stopAllAction');
+    sinon.spy(mixer, 'uncacheRoot');
+
+    target.onDestroyed();
+
+    expect(mixer.stopAllAction.calledOnce).to.be(true);
+    expect(mixer.uncacheRoot.calledOnceWith(root)).to.be(true);
+    expect(root.parent).to.be(null);
+    expect(renderer._clonedModelRoot).to.be(null);
+    expect(renderer._bonesByCanonicalName.size).to.be(0);
   });
 });

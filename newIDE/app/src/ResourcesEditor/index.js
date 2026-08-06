@@ -730,6 +730,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
               selectedItem={selectedProjectFile}
               onSelectProjectFile={this._onProjectFileSelected}
               onViewProjectFileProperties={this._openPropertiesDialog}
+              onUnregisterResource={this.deleteResource}
               onRefreshProjectFiles={
                 this.refreshResourcesListAndRemoveUnusedResources
               }

@@ -36,17 +36,9 @@ import {
   getKeyboardKeyDefinition,
 } from '../Utils/KeyboardKeyNames';
 import { type EditorCallbacks } from '../EditorFunctions';
-import { buildInstruction } from './McpEventKnowledge';
 
-import {
-  createOrUpdateExtensionFunction,
-  inspectSignalUsage,
-} from './McpExtensionTools';
+import { inspectSignalUsage } from './McpExtensionTools';
 import { validateSerializedProject } from './McpProjectTools';
-import {
-  ensureOnSignalBehaviorEventsFunctionProperParameters,
-  ensureOnSignalObjectEventsFunctionProperParameters,
-} from '../EventsFunctionsExtensionEditor/OnSignalEventsFunctionParameters';
 
 import optionalRequire from '../Utils/OptionalRequire';
 
@@ -101,7 +93,10 @@ type McpEditorBridgeContext = {|
   // replaces and deletes the native gdProject, so a callback captured before
   // reload must not be reused by a later verify_project_change stage.
   getLaunchPreviewForScene?: () => ?(sceneName: ?string) => mixed,
+  cancelPreviewLaunch?: (reason: string) => mixed,
   getPreviewLaunchState?: () => Object,
+  beginPreviewLaunchSequence?: () => boolean,
+  endPreviewLaunchSequence?: () => void,
   reloadProjectAndWait?: (
     reportProgress?: McpRequestProgressReporter
   ) => Promise<any>,
@@ -120,7 +115,6 @@ type McpEditorBridgeContext = {|
   capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   generateEvents?: Function,
   onSceneEventsModifiedOutsideEditor?: Function,
-  onExtensionFunctionEventsModifiedOutsideEditor?: Function,
   onInstancesModifiedOutsideEditor?: Function,
   onObjectsModifiedOutsideEditor?: Function,
   onObjectGroupsModifiedOutsideEditor?: Function,
@@ -2853,389 +2847,6 @@ const getStringArg = (args: ?Object, names: Array<string>): ?string => {
   return null;
 };
 
-const getNonEmptyArg = (args: ?Object, names: Array<string>): ?any => {
-  if (!args) return null;
-  for (const name of names) {
-    const value = args[name];
-    if (typeof value === 'string' && value.trim()) return value;
-    if (typeof value === 'number' && Number.isFinite(value)) return value;
-  }
-  return null;
-};
-
-const getRequiredSignalArg = (
-  args: ?Object,
-  names: Array<string>,
-  label: string
-): any => {
-  const value = getNonEmptyArg(args, names);
-  if (value === null || value === undefined) {
-    throw new Error(`Missing ${label}.`);
-  }
-  return value;
-};
-
-const signalStringExpression = (value: any, label: string): string => {
-  if (value === null || value === undefined) {
-    throw new Error(`Missing ${label}.`);
-  }
-  const serialized = String(value).trim();
-  if (!serialized) throw new Error(`Missing ${label}.`);
-  if (/^".*"$/.test(serialized) || /[+()]/.test(serialized)) {
-    return serialized;
-  }
-  return JSON.stringify(serialized);
-};
-
-const optionalSignalStringExpression = (
-  args: ?Object,
-  names: Array<string>
-): ?string => {
-  const value = getNonEmptyArg(args, names);
-  if (value === null || value === undefined) return null;
-  return signalStringExpression(value, names[0]);
-};
-
-const normalizeSignalTargetKind = (targetKind: any): string => {
-  const normalized = String(targetKind || '')
-    .trim()
-    .toLowerCase()
-    .replace(/[-\s]+/g, '_');
-  if (normalized === 'instance') return 'object_instance';
-  if (normalized === 'scene' || normalized === 'object_instance') {
-    return normalized;
-  }
-  throw new Error('target_kind must be scene or object_instance.');
-};
-
-const buildSignalEmitAction = ({
-  project,
-  i18n,
-  args,
-}: {|
-  project: gdProject,
-  i18n?: any,
-  args: Object,
-|}): Object => {
-  const targetKind = normalizeSignalTargetKind(args && args.target_kind);
-  const signalName = signalStringExpression(
-    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
-    'signal_name'
-  );
-  const payload = optionalSignalStringExpression(args, [
-    'payload',
-    'payload_string',
-    'payloadString',
-  ]);
-  let type = 'EmitSceneSignal';
-  const parameters: Object = {};
-  let outputLastParameterIndex =
-    payload !== null && payload !== undefined ? 2 : 1;
-  const setPayload = (payloadIndex: number) => {
-    if (payload !== null && payload !== undefined) {
-      parameters[String(payloadIndex)] = payload;
-      outputLastParameterIndex = payloadIndex;
-    }
-  };
-
-  if (targetKind === 'scene') {
-    parameters['1'] = signalName;
-    setPayload(2);
-  } else if (targetKind === 'object_instance') {
-    type = 'EmitSignalToObjectInstance';
-    outputLastParameterIndex = 2;
-    parameters['1'] = String(
-      getRequiredSignalArg(
-        args,
-        ['instance_id', 'instanceId', 'object_id', 'objectId'],
-        'instance_id'
-      )
-    );
-    parameters['2'] = signalName;
-    setPayload(3);
-  }
-
-  const built = buildInstruction({
-    project,
-    i18n,
-    type,
-    kind: 'action',
-    parameters,
-  });
-  const parametersLength = outputLastParameterIndex + 1;
-  if (
-    built.instruction &&
-    Array.isArray(built.instruction.parameters) &&
-    built.instruction.parameters.length > parametersLength
-  ) {
-    built.instruction.parameters.length = parametersLength;
-  }
-  if (
-    Array.isArray(built.parameters) &&
-    built.parameters.length > parametersLength
-  ) {
-    built.parameters.length = parametersLength;
-  }
-  return {
-    ...built,
-    actionType: type,
-    targetKind,
-    signalNote:
-      'Drop instruction into an event actions array. Signal payload is a string expression; use ToString(...) for numeric values if needed. Emitter information is debugger-only; put application source identity in the payload when needed.',
-  };
-};
-
-const buildSignalSubscriptionAction = ({
-  project,
-  i18n,
-  args,
-}: {|
-  project: gdProject,
-  i18n?: any,
-  args: Object,
-|}): Object => {
-  const signalName = signalStringExpression(
-    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
-    'signal_name'
-  );
-  const built = buildInstruction({
-    project,
-    i18n,
-    type: 'SubscribeSceneSignal',
-    kind: 'action',
-    parameters: { '2': signalName },
-  });
-  return {
-    ...built,
-    actionType: 'SubscribeSceneSignal',
-    signalNote:
-      'Use only in a prefab/object or behavior event sheet. The current prefab or behavior instance is the implicit receiver.',
-  };
-};
-
-const buildSignalReceivedCondition = ({
-  project,
-  i18n,
-  args,
-}: {|
-  project: gdProject,
-  i18n?: any,
-  args: Object,
-|}): Object => {
-  const signalName = signalStringExpression(
-    getRequiredSignalArg(args, ['signal_name', 'signalName'], 'signal_name'),
-    'signal_name'
-  );
-  const built = buildInstruction({
-    project,
-    i18n,
-    type: 'SignalReceived',
-    kind: 'condition',
-    parameters: { '1': signalName },
-  });
-  return {
-    ...built,
-    conditionType: 'SignalReceived',
-    signalNote:
-      'Drop instruction into a scene or external scene event conditions array only. Use SignalName() and SignalPayload() in this event or its descendants.',
-  };
-};
-
-const createOrUpdateOnSignalFunction = (
-  project: gdProject,
-  args: Object
-): Object => {
-  const parentKind = String((args && args.parent_kind) || '')
-    .trim()
-    .toLowerCase();
-  if (parentKind !== 'object' && parentKind !== 'behavior') {
-    throw new Error('parent_kind must be object or behavior for onSignal.');
-  }
-  const signalArgs = {
-    ...(args || {}),
-    parent_kind: parentKind,
-    function_name: 'onSignal',
-    function_type: 'action',
-    sentence: '',
-  };
-  delete signalArgs.new_function_name;
-  delete signalArgs.parameters;
-  delete signalArgs.parameters_mode;
-  delete signalArgs.serialized_function;
-  const result = createOrUpdateExtensionFunction(project, signalArgs);
-  const signalSignature =
-    parentKind === 'behavior'
-      ? ['Object', 'Behavior', 'SignalName', 'Payload']
-      : ['Object', 'SignalName', 'Payload'];
-  let fixedParameters: Array<Object> = signalSignature.map((name, index) => ({
-    index,
-    name,
-    type: index === 0 ? 'object' : name === 'Behavior' ? 'behavior' : 'string',
-    description:
-      name === 'Object'
-        ? 'Object'
-        : name === 'Behavior'
-        ? 'Behavior'
-        : name === 'SignalName'
-        ? 'Signal name'
-        : 'Payload',
-  }));
-  let repairedEventsFunction = null;
-  const extensionName = args && args.extension_name;
-  const parentName = args && args.parent_name;
-  if (
-    !result.dryRun &&
-    typeof extensionName === 'string' &&
-    typeof parentName === 'string' &&
-    project.hasEventsFunctionsExtensionNamed(extensionName)
-  ) {
-    const extension = project.getEventsFunctionsExtension(extensionName);
-    if (parentKind === 'behavior') {
-      const behaviors = extension.getEventsBasedBehaviors();
-      if (behaviors.has(parentName)) {
-        const behavior = behaviors.get(parentName);
-        ensureOnSignalBehaviorEventsFunctionProperParameters(
-          extension,
-          behavior
-        );
-        const eventsFunctions = behavior.getEventsFunctions();
-        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
-          repairedEventsFunction = eventsFunctions.getEventsFunction(
-            'onSignal'
-          );
-        }
-      }
-    } else {
-      const objects = extension.getEventsBasedObjects();
-      if (objects.has(parentName)) {
-        const object = objects.get(parentName);
-        ensureOnSignalObjectEventsFunctionProperParameters(extension, object);
-        const eventsFunctions = object.getEventsFunctions();
-        if (eventsFunctions.hasEventsFunctionNamed('onSignal')) {
-          repairedEventsFunction = eventsFunctions.getEventsFunction(
-            'onSignal'
-          );
-        }
-      }
-    }
-    if (repairedEventsFunction) {
-      const parameters = repairedEventsFunction.getParameters();
-      fixedParameters = fixedParameters.map((parameter, index) => {
-        const repairedParameter = parameters.getParameterAt(index);
-        return {
-          ...parameter,
-          name: repairedParameter.getName(),
-          type: repairedParameter.getType(),
-          description: repairedParameter.getDescription(),
-          longDescription: repairedParameter.getLongDescription(),
-          extraInfo: repairedParameter.getExtraInfo() || undefined,
-        };
-      });
-    }
-  }
-  const fixedFunction = result.function
-    ? {
-        ...result.function,
-        parameters: fixedParameters,
-        ...(repairedEventsFunction && result.function.serializedFunction
-          ? { serializedFunction: serializeToJSObject(repairedEventsFunction) }
-          : {}),
-      }
-    : result.function;
-  return {
-    ...result,
-    function: fixedFunction,
-    extensionName: args && args.extension_name,
-    parentKind,
-    parentName: args && args.parent_name,
-    functionName: 'onSignal',
-    signalSignature,
-  };
-};
-
-const buildStaleStateAdvisory = (
-  context: McpEditorBridgeContext,
-  target: Object
-): Object => {
-  const previewDebuggerServer = context.getPreviewDebuggerServer
-    ? context.getPreviewDebuggerServer()
-    : null;
-  const previewIds = getPreviewDebuggerIds(previewDebuggerServer);
-  const previewMayBeStale = previewIds.length > 0;
-  const editorPanelsMayBeStale = [];
-
-  if (target.kind === 'scene-events') {
-    editorPanelsMayBeStale.push({
-      kind: 'scene-events',
-      sceneName: target.sceneName || null,
-      reason:
-        'Scene events were modified through MCP. Open event-sheet panels are notified, but if the UI still shows old rows, switch tabs or reopen the scene before trusting it.',
-    });
-  } else if (target.kind === 'extension-function') {
-    editorPanelsMayBeStale.push({
-      kind: 'extension-function',
-      extensionName: target.extensionName || null,
-      parentKind: target.parentKind || 'extension',
-      parentName: target.parentName || null,
-      functionName: target.functionName || null,
-      reason:
-        'An extension function was modified through MCP. Extension instruction metadata and generated preview code can be cached by open editor panels/previews; save/reload or reopen the extension editor before trusting stale function metadata, then relaunch preview before runtime verification.',
-    });
-  } else if (target.kind === 'scene') {
-    editorPanelsMayBeStale.push({
-      kind: 'scene',
-      sceneName: target.sceneName || null,
-      reason:
-        'Scene data was modified through MCP. If the layout/object panels still show old data, switch tabs or reopen the scene before trusting them.',
-    });
-  }
-
-  return {
-    projectStateChanged: true,
-    target,
-    previewMayBeStale,
-    runningPreviewDebuggerIds: previewIds,
-    latestDebuggerId: previewIds.length
-      ? previewIds[previewIds.length - 1]
-      : null,
-    recommendedActions: previewMayBeStale
-      ? [
-          ...(target.kind === 'extension-function'
-            ? [
-                'reload_project',
-                'reload/reopen the project if extension instruction metadata or generated preview code still looks stale',
-              ]
-            : []),
-          PREVIEW_CLEANUP_RELAUNCH_ACTION,
-          'fallback: control_preview { action: "close", close_all: true }; reload_project; launch_preview { start_paused: true, force_new: true, timeout_ms: 15000 }; wait_until_preview_ready { require_paused: true }',
-          'run runtime checks/screenshots only after relaunching the preview',
-        ]
-      : [],
-    editorPanelsMayBeStale,
-    message: previewMayBeStale
-      ? 'The project changed while one or more previews were running. Existing previews do not automatically reload changed events/resources; close all previews with control_preview, then call launch_preview with start_paused=true and force_new=true before final runtime verification.'
-      : 'The project changed through MCP. No running preview was detected, but already-open editor panels can still need a refresh if they show old state.',
-  };
-};
-
-const withStaleStateAdvisory = (
-  payload: any,
-  context: McpEditorBridgeContext,
-  target: Object
-): Object => {
-  const staleStateAdvisory = buildStaleStateAdvisory(context, target);
-  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
-    return {
-      ...payload,
-      staleStateAdvisory,
-    };
-  }
-  return {
-    result: payload,
-    staleStateAdvisory,
-  };
-};
-
 // Send a request to ONE specific preview and resolve with the reply that comes
 // back FROM THAT preview (matched by messageId + source id). This is required
 // because the shared sendMessageWithResponse broadcasts to every connected
@@ -3425,12 +3036,16 @@ const waitForPreviewRuntimeReady = async (
     timeoutMs?: number,
     pollIntervalMs?: number,
     requirePaused?: boolean,
+    requireSceneName?: boolean,
+    expectedSceneName?: ?string,
     operation?: string,
   |}
 ): Promise<Object> => {
   const timeoutMs = (options && options.timeoutMs) || 6000;
   const pollIntervalMs = (options && options.pollIntervalMs) || 150;
   const requirePaused = !!(options && options.requirePaused);
+  const requireSceneName = !!(options && options.requireSceneName);
+  const expectedSceneName = options && options.expectedSceneName;
   const operation =
     (options && options.operation) || 'wait_until_preview_ready';
   const startedAt = Date.now();
@@ -3450,7 +3065,15 @@ const waitForPreviewRuntimeReady = async (
     );
     if (matched) {
       lastStatus = payload;
-      if (!requirePaused || (payload && payload.isPaused === true)) {
+      const actualSceneName = getStatusSceneName(payload);
+      const isSceneReady =
+        !requireSceneName ||
+        (!!actualSceneName &&
+          (!expectedSceneName || actualSceneName === expectedSceneName));
+      if (
+        (!requirePaused || (payload && payload.isPaused === true)) &&
+        isSceneReady
+      ) {
         return {
           ready: true,
           responsive: true,
@@ -3784,6 +3407,7 @@ const launchPreview = async (
   options?: {|
     getProject?: ?() => ?gdProject,
     launchPreviewForScene?: ?(sceneName: ?string) => mixed,
+    cancelPreviewLaunch?: ?(reason: string) => mixed,
   |}
 ): Promise<Object> => {
   if (typeof runCommand !== 'function') {
@@ -3806,6 +3430,10 @@ const launchPreview = async (
   const launchPreviewForScene =
     options && typeof options.launchPreviewForScene === 'function'
       ? options.launchPreviewForScene
+      : null;
+  const cancelPreviewLaunch =
+    options && typeof options.cancelPreviewLaunch === 'function'
+      ? options.cancelPreviewLaunch
       : null;
   const project = getProject ? getProject() : null;
   const sceneResolution = resolveExpectedPreviewScene(project, args);
@@ -3848,7 +3476,7 @@ const launchPreview = async (
   });
   // Launch the preview using the scene-aware launcher when available, falling
   // back to the legacy command which previews the editor's active tab.
-  const runLaunchCommand = async (): Promise<boolean> => {
+  const runLaunchCommandWithoutTimeout = async (): Promise<boolean> => {
     launchFailureDetails = null;
     if (launchPreviewForScene) {
       try {
@@ -3874,6 +3502,40 @@ const launchPreview = async (
       }
     }
     return runCommand('LAUNCH_DEBUG_PREVIEW');
+  };
+  const runLaunchCommand = async (): Promise<boolean> => {
+    let didTimeOut = false;
+    let timeoutId: any = null;
+    const didRun = await Promise.race([
+      runLaunchCommandWithoutTimeout(),
+      new Promise(resolve => {
+        timeoutId = setTimeout(() => {
+          didTimeOut = true;
+          resolve(false);
+        }, timeoutMs);
+      }),
+    ]);
+    if (timeoutId !== null) clearTimeout(timeoutId);
+    if (!didTimeOut) return !!didRun;
+
+    let cancellation = null;
+    if (cancelPreviewLaunch) {
+      try {
+        cancellation = await cancelPreviewLaunch(
+          `the MCP preview launch command did not settle within ${timeoutMs} ms`
+        );
+      } catch (error) {
+        cancellation = {
+          error: error && error.message ? error.message : String(error),
+        };
+      }
+    }
+    launchFailureDetails = {
+      reason: 'preview-launch-command-timeout',
+      timeoutMs,
+      cancellation: cancellation || undefined,
+    };
+    return false;
   };
 
   if (!forceNew && previewDebuggerServer) {
@@ -4027,6 +3689,11 @@ const launchPreview = async (
     connection.debuggerId,
     {
       timeoutMs: Math.max(500, timeoutMs - (connection.elapsedMs || 0)),
+      // A debugger websocket connects before the RuntimeScene is necessarily
+      // installed. Pausing at that instant freezes an empty scene stack and
+      // makes the first run_frames call incorrectly report zero instances.
+      requireSceneName: !!expectedScene,
+      expectedSceneName: sceneSelectionSupported ? expectedScene : null,
       operation: 'launch_preview.runtime-ready',
     }
   );
@@ -4220,16 +3887,6 @@ const setRuntimeState = async (
     applied: payload.applied,
     error: payload.error || undefined,
   };
-};
-
-const getEventsJsonArgument = (args: ?Object): string | null => {
-  if (!args) return null;
-  const eventsJson = args.events_json || args.eventsJson || args.events;
-  if (typeof eventsJson === 'string') return eventsJson;
-  if (eventsJson !== null && eventsJson !== undefined) {
-    return JSON.stringify(eventsJson);
-  }
-  return null;
 };
 
 const getPrompt = (name: string) => {
@@ -4437,128 +4094,130 @@ const callMcpTool = async ({
   const project = context.getProject();
 
   if (toolName === 'verify_project_change') {
-    const receipts: Array<Object> = [];
-    const runStage = async (
-      stage: string,
-      name: string,
-      stageArgs: Object
-    ): Promise<
-      | {| failed: true, result: McpToolResult |}
-      | {| failed: false, receipt: Object |}
-    > => {
-      const response = await callMcpTool({
-        toolName: name,
-        args: stageArgs,
-        context,
-      });
-      const receipt = parseMcpToolResult(response);
-      receipts.push({ stage, toolName: name, receipt });
-      if (
-        response.isError ||
-        receipt.success === false ||
-        receipt.valid === false
-      ) {
-        return {
-          failed: true,
-          result: errorResult(
-            `verify_project_change stopped during ${stage}.`,
-            {
-              code: 'VERIFY_PROJECT_CHANGE_STAGE_FAILED',
-              success: false,
-              runtimeVerified: false,
-              completionReady: false,
-              failureStage: stage,
-              receipts,
-            }
-          ),
-        };
-      }
-      return { failed: false, receipt };
-    };
-
-    let stageResult = await runStage(
-      'validation',
-      'validate_project_files',
-      {}
-    );
-    if (stageResult.failed) return stageResult.result;
-
-    stageResult = await runStage('reload', 'reload_project', {});
-    if (stageResult.failed) return stageResult.result;
-
-    if (!args || args.close_existing_previews !== false) {
-      stageResult = await runStage('close-previews', 'control_preview', {
-        action: 'close',
-        close_all: true,
-      });
-      if (stageResult.failed) return stageResult.result;
+    const hasPreviewLaunchSequenceReservation =
+      typeof context.beginPreviewLaunchSequence === 'function';
+    if (
+      hasPreviewLaunchSequenceReservation &&
+      !context.beginPreviewLaunchSequence()
+    ) {
+      return errorResult(
+        'Could not start verification because another MCP preview workflow is already in progress.',
+        {
+          code: 'PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS',
+          success: false,
+          runtimeVerified: false,
+          completionReady: false,
+        }
+      );
     }
 
-    stageResult = await runStage('launch', 'launch_preview', {
-      scene_name:
-        args && typeof args.scene_name === 'string'
-          ? args.scene_name
-          : undefined,
-      start_paused: true,
-      force_new: true,
-      timeout_ms:
-        args && typeof args.timeout_ms === 'number'
-          ? args.timeout_ms
-          : undefined,
-    });
-    if (stageResult.failed) return stageResult.result;
-    const debuggerId = stageResult.receipt.debuggerId;
+    try {
+      const receipts: Array<Object> = [];
+      const runStage = async (
+        stage: string,
+        name: string,
+        stageArgs: Object
+      ): Promise<
+        | {| failed: true, result: McpToolResult |}
+        | {| failed: false, receipt: Object |}
+      > => {
+        const response = await callMcpTool({
+          toolName: name,
+          args: stageArgs,
+          context,
+        });
+        const receipt = parseMcpToolResult(response);
+        receipts.push({ stage, toolName: name, receipt });
+        if (
+          response.isError ||
+          receipt.success === false ||
+          receipt.valid === false
+        ) {
+          return {
+            failed: true,
+            result: errorResult(
+              `verify_project_change stopped during ${stage}.`,
+              {
+                code: 'VERIFY_PROJECT_CHANGE_STAGE_FAILED',
+                success: false,
+                runtimeVerified: false,
+                completionReady: false,
+                failureStage: stage,
+                receipts,
+              }
+            ),
+          };
+        }
+        return { failed: false, receipt };
+      };
 
-    const assertions =
-      args && Array.isArray(args.assertions) ? args.assertions : [];
-    const assertionObjectNames = assertions
-      .filter(
-        assertion =>
-          assertion &&
-          (assertion.type === 'object_count' ||
-            assertion.type === 'instance_position_finite') &&
-          typeof assertion.object_name === 'string'
-      )
-      .map(assertion => assertion.object_name);
-    const requestedObjects =
-      args && Array.isArray(args.objects) ? args.objects : [];
-    const objects = Array.from(
-      new Set([...requestedObjects, ...assertionObjectNames])
-    );
+      let stageResult = await runStage(
+        'validation',
+        'validate_project_files',
+        {}
+      );
+      if (stageResult.failed) return stageResult.result;
 
-    stageResult = await runStage('frames', 'run_frames', {
-      inputs: args && Array.isArray(args.inputs) ? args.inputs : undefined,
-      frames: args && typeof args.frames === 'number' ? args.frames : 1,
-      frame_delta_ms:
-        args && typeof args.frame_delta_ms === 'number'
-          ? args.frame_delta_ms
-          : undefined,
-      auto_release: true,
-      debugger_id: debuggerId || undefined,
-      objects: objects.length ? objects : undefined,
-      instance_positions_for: objects.length ? objects : undefined,
-      include:
-        args && Array.isArray(args.include)
-          ? args.include
-          : objects.length
-          ? ['position', 'angle', 'variables', 'behaviors']
-          : undefined,
-      instance_indexes:
-        args && Array.isArray(args.instance_indexes)
-          ? args.instance_indexes
-          : undefined,
-    });
-    if (stageResult.failed) return stageResult.result;
+      if (!args || args.close_existing_previews !== false) {
+        stageResult = await runStage('close-previews', 'control_preview', {
+          action: 'close',
+          close_all: true,
+        });
+        if (stageResult.failed) return stageResult.result;
+      }
 
-    stageResult = await runStage(
-      'inspect',
-      'gdevelop_inspect_running_preview',
-      {
-        debugger_id: debuggerId || undefined,
+      // Stop any preview that may still be compiling from the current native
+      // project before reload_project replaces and deletes that project. The
+      // sequence reservation prevents tab effects from starting another one.
+      stageResult = await runStage('reload', 'reload_project', {
+        // verify_project_change already owns the preview launch sequence for
+        // the whole validate/close/reload/launch workflow. Avoid trying to
+        // acquire the same non-reentrant reservation again in reload_project.
+        _preview_launch_sequence_already_reserved: true,
+      });
+      if (stageResult.failed) return stageResult.result;
+
+      stageResult = await runStage('launch', 'launch_preview', {
+        scene_name:
+          args && typeof args.scene_name === 'string'
+            ? args.scene_name
+            : undefined,
+        start_paused: true,
+        force_new: true,
         timeout_ms:
           args && typeof args.timeout_ms === 'number'
             ? args.timeout_ms
             : undefined,
+      });
+      if (stageResult.failed) return stageResult.result;
+      const debuggerId = stageResult.receipt.debuggerId;
+
+      const assertions =
+        args && Array.isArray(args.assertions) ? args.assertions : [];
+      const assertionObjectNames = assertions
+        .filter(
+          assertion =>
+            assertion &&
+            (assertion.type === 'object_count' ||
+              assertion.type === 'instance_position_finite') &&
+            typeof assertion.object_name === 'string'
+        )
+        .map(assertion => assertion.object_name);
+      const requestedObjects =
+        args && Array.isArray(args.objects) ? args.objects : [];
+      const objects = Array.from(
+        new Set([...requestedObjects, ...assertionObjectNames])
+      );
+
+      stageResult = await runStage('frames', 'run_frames', {
+        inputs: args && Array.isArray(args.inputs) ? args.inputs : undefined,
+        frames: args && typeof args.frames === 'number' ? args.frames : 1,
+        frame_delta_ms:
+          args && typeof args.frame_delta_ms === 'number'
+            ? args.frame_delta_ms
+            : undefined,
+        auto_release: true,
+        debugger_id: debuggerId || undefined,
         objects: objects.length ? objects : undefined,
         instance_positions_for: objects.length ? objects : undefined,
         include:
@@ -4571,53 +4230,89 @@ const callMcpTool = async ({
           args && Array.isArray(args.instance_indexes)
             ? args.instance_indexes
             : undefined,
-      }
-    );
-    if (stageResult.failed) return stageResult.result;
-    const inspection = stageResult.receipt;
+      });
+      if (stageResult.failed) return stageResult.result;
 
-    const assertionResults = evaluateProjectChangeAssertions(
-      assertions,
-      inspection
-    );
-    receipts.push({
-      stage: 'assertions',
-      assertions: assertionResults,
-    });
-    const failedAssertion = assertionResults.find(result => !result.passed);
-    if (failedAssertion) {
-      return errorResult('A runtime verification assertion failed.', {
-        code: 'VERIFY_PROJECT_CHANGE_ASSERTION_FAILED',
-        success: false,
-        runtimeVerified: false,
-        completionReady: false,
-        failureStage: 'assertions',
-        failedAssertion,
+      stageResult = await runStage(
+        'inspect',
+        'gdevelop_inspect_running_preview',
+        {
+          debugger_id: debuggerId || undefined,
+          timeout_ms:
+            args && typeof args.timeout_ms === 'number'
+              ? args.timeout_ms
+              : undefined,
+          objects: objects.length ? objects : undefined,
+          instance_positions_for: objects.length ? objects : undefined,
+          include:
+            args && Array.isArray(args.include)
+              ? args.include
+              : objects.length
+              ? ['position', 'angle', 'variables', 'behaviors']
+              : undefined,
+          instance_indexes:
+            args && Array.isArray(args.instance_indexes)
+              ? args.instance_indexes
+              : undefined,
+        }
+      );
+      if (stageResult.failed) return stageResult.result;
+      const inspection = stageResult.receipt;
+
+      const assertionResults = evaluateProjectChangeAssertions(
+        assertions,
+        inspection
+      );
+      receipts.push({
+        stage: 'assertions',
+        assertions: assertionResults,
+      });
+      const failedAssertion = assertionResults.find(result => !result.passed);
+      if (failedAssertion) {
+        return errorResult('A runtime verification assertion failed.', {
+          code: 'VERIFY_PROJECT_CHANGE_ASSERTION_FAILED',
+          success: false,
+          runtimeVerified: false,
+          completionReady: false,
+          failureStage: 'assertions',
+          failedAssertion,
+          assertions: assertionResults,
+          receipts,
+        });
+      }
+
+      if (args && args.screenshot) {
+        stageResult = await runStage(
+          'screenshot',
+          'capture_preview_screenshot',
+          {
+            ...args.screenshot,
+            debugger_id: debuggerId || args.screenshot.debugger_id,
+          }
+        );
+        if (stageResult.failed) return stageResult.result;
+      }
+
+      return textResult({
+        success: true,
+        runtimeVerified: true,
+        completionReady: true,
+        sceneName:
+          args && typeof args.scene_name === 'string'
+            ? args.scene_name
+            : undefined,
+        debuggerId,
         assertions: assertionResults,
         receipts,
       });
+    } finally {
+      if (
+        hasPreviewLaunchSequenceReservation &&
+        context.endPreviewLaunchSequence
+      ) {
+        context.endPreviewLaunchSequence();
+      }
     }
-
-    if (args && args.screenshot) {
-      stageResult = await runStage('screenshot', 'capture_preview_screenshot', {
-        ...args.screenshot,
-        debugger_id: debuggerId || args.screenshot.debugger_id,
-      });
-      if (stageResult.failed) return stageResult.result;
-    }
-
-    return textResult({
-      success: true,
-      runtimeVerified: true,
-      completionReady: true,
-      sceneName:
-        args && typeof args.scene_name === 'string'
-          ? args.scene_name
-          : undefined,
-      debuggerId,
-      assertions: assertionResults,
-      receipts,
-    });
   }
 
   if (toolName === 'gdevelop_get_editor_state') {
@@ -4785,14 +4480,17 @@ const callMcpTool = async ({
         behaviorPropertySchemasByType,
       });
       const sourceTree = await readMultiFileSourceTree(projectFile);
-      const generatedJson = JSON.stringify(serializedProject, null, 2);
+      // Avoid a pretty-printed JSON string plus encodeURIComponent/unescape
+      // copies. On large 3D projects, those transient strings compete with the
+      // embedded scene renderer for the same renderer-process heap.
+      const generatedJson = JSON.stringify(serializedProject);
       const generatedGameJson = {
         reconstructedInMemory: true,
         writtenToDisk: false,
         targetPath: path
           ? path.join(path.dirname(projectFile), '.gdevelop', 'game.json')
           : undefined,
-        byteLength: unescape(encodeURIComponent(generatedJson)).length,
+        byteLength: Buffer.byteLength(generatedJson, 'utf8'),
       };
       const validation = validateSerializedProject(serializedProject, {
         include_generated_code: true,
@@ -4896,6 +4594,35 @@ const callMcpTool = async ({
     }
     const reloadProjectAndWait = context.reloadProjectAndWait;
 
+    // Reloading a project remounts editor tabs. A 3D scene tab normally starts
+    // its embedded preview as it mounts, which can race the explicit MCP
+    // preview, load large 3D resources into the editor renderer, and keep the
+    // shared preview launch lock busy. Reserve the preview sequence for a
+    // standalone reload just like verify_project_change does for its complete
+    // workflow. The internal flag is only used by verify_project_change, which
+    // already owns this non-reentrant reservation.
+    const previewLaunchSequenceAlreadyReserved = !!(
+      args && args._preview_launch_sequence_already_reserved === true
+    );
+    const beginPreviewLaunchSequence = context.beginPreviewLaunchSequence;
+    let didReservePreviewLaunchSequence = false;
+    if (
+      typeof beginPreviewLaunchSequence === 'function' &&
+      !previewLaunchSequenceAlreadyReserved
+    ) {
+      didReservePreviewLaunchSequence = !!beginPreviewLaunchSequence();
+      if (!didReservePreviewLaunchSequence) {
+        return errorResult(
+          'Could not reload the project because another MCP preview workflow is already in progress.',
+          {
+            code: 'PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS',
+            success: false,
+            reloaded: false,
+          }
+        );
+      }
+    }
+
     const persistenceState = context.getPersistenceState
       ? context.getPersistenceState()
       : null;
@@ -4942,6 +4669,10 @@ const callMcpTool = async ({
             error && error.catalogArtifact ? error.catalogArtifact : undefined,
         }
       );
+    } finally {
+      if (didReservePreviewLaunchSequence && context.endPreviewLaunchSequence) {
+        context.endPreviewLaunchSequence();
+      }
     }
   }
 
@@ -5213,69 +4944,6 @@ const callMcpTool = async ({
     );
   }
 
-  if (toolName === 'create_action') {
-    if (!project) return errorResult('No project opened.');
-    const type = args && typeof args.type === 'string' ? args.type : '';
-    if (!type) return errorResult('Missing instruction "type".');
-    try {
-      const built = buildInstruction({
-        project,
-        i18n: context.i18n,
-        type,
-        kind: 'action',
-        parameters: (args && args.parameters) || {},
-      });
-      return textResult(built);
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'create_signal_emit_action') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(
-        buildSignalEmitAction({
-          project,
-          i18n: context.i18n,
-          args: args || {},
-        })
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'create_signal_subscription_action') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(
-        buildSignalSubscriptionAction({
-          project,
-          i18n: context.i18n,
-          args: args || {},
-        })
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  if (toolName === 'create_signal_received_condition') {
-    if (!project) return errorResult('No project opened.');
-    try {
-      return textResult(
-        buildSignalReceivedCondition({
-          project,
-          i18n: context.i18n,
-          args: args || {},
-        })
-      );
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
   if (toolName === 'gdevelop_inspect_running_preview') {
     const previewDebuggerServer = context.getPreviewDebuggerServer
       ? context.getPreviewDebuggerServer()
@@ -5465,74 +5133,10 @@ const callMcpTool = async ({
         {
           getProject: context.getProject,
           launchPreviewForScene,
+          cancelPreviewLaunch: context.cancelPreviewLaunch,
         }
       );
       return textResult(result);
-    } catch (error) {
-      return errorResult(error.message);
-    }
-  }
-
-  let extensionWriteToolHandler = null;
-  if (toolName === 'gdevelop_create_or_update_on_signal') {
-    extensionWriteToolHandler = createOrUpdateOnSignalFunction;
-  }
-
-  if (extensionWriteToolHandler) {
-    if (!project) return errorResult('No project opened.');
-    try {
-      const extensionArgs = args || {};
-      const result = extensionWriteToolHandler(project, extensionArgs);
-      const extensionFunctionEventsChanged =
-        extensionArgs && getEventsJsonArgument(extensionArgs);
-      if (
-        extensionFunctionEventsChanged &&
-        !result.dryRun &&
-        context.onExtensionFunctionEventsModifiedOutsideEditor
-      ) {
-        context.onExtensionFunctionEventsModifiedOutsideEditor({
-          extensionName: result.extensionName || extensionArgs.extension_name,
-          parentKind:
-            result.parentKind || extensionArgs.parent_kind || 'extension',
-          parentName:
-            result.parentKind === 'extension' ||
-            extensionArgs.parent_kind === 'extension'
-              ? null
-              : result.parentName || extensionArgs.parent_name || null,
-          functionName:
-            result.functionName ||
-            (result.function && result.function.name
-              ? result.function.name
-              : extensionArgs.new_function_name || extensionArgs.function_name),
-          newOrChangedAiGeneratedEventIds: new Set(),
-        });
-      }
-      if (
-        !result.dryRun &&
-        result.success !== false &&
-        result.didModifyProject !== false
-      ) {
-        context.triggerUnsavedChanges();
-      }
-      return textResult(
-        withStaleStateAdvisory(result, context, {
-          kind: 'extension-function',
-          extensionName:
-            result.extensionName || extensionArgs.extension_name || null,
-          parentKind:
-            result.parentKind || extensionArgs.parent_kind || 'extension',
-          parentName:
-            result.parentKind === 'extension' ||
-            extensionArgs.parent_kind === 'extension'
-              ? null
-              : result.parentName || extensionArgs.parent_name || null,
-          functionName:
-            result.functionName ||
-            (result.function && result.function.name
-              ? result.function.name
-              : 'onSignal'),
-        })
-      );
     } catch (error) {
       return errorResult(error.message);
     }

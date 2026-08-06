@@ -482,10 +482,14 @@ runtimeScene._instances.length;
     await writeMultiFileSourceTree({ entryPath: projectFile, files });
     const reloadProjectAndWait: any = jest.fn();
     const runCommand: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     const bridge = makeBridge({
       getProject: () => project,
       reloadProjectAndWait,
       runCommand,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -521,6 +525,34 @@ runtimeScene._instances.length;
     );
     expect(reloadProjectAndWait).not.toHaveBeenCalled();
     expect(runCommand).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects verify_project_change when another preview workflow owns the sequence', async () => {
+    const reloadProjectAndWait: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => false);
+    const endPreviewLaunchSequence: any = jest.fn();
+    const bridge = makeBridge({
+      reloadProjectAndWait,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'verify_project_change',
+        arguments: { scene_name: 'Scene' },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.code).toBe('PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS');
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).not.toHaveBeenCalled();
   });
 
   it('completes verify_project_change only after runtime and renderer assertions pass', async () => {
@@ -609,8 +641,10 @@ runtimeScene._instances.length;
     const staleLaunchPreviewForScene: any = jest.fn(() => {
       throw new Error('The pre-reload project object was destroyed.');
     });
+    const workflowOrder: Array<string> = [];
     const freshLaunchPreviewForScene: any = jest.fn(async sceneName => {
       expect(sceneName).toBe('Scene');
+      workflowOrder.push('launch');
       setTimeout(
         () => previewDebuggerServer.connectDebugger('preview-ws-1'),
         1
@@ -619,6 +653,7 @@ runtimeScene._instances.length;
     });
     let currentLaunchPreviewForScene = staleLaunchPreviewForScene;
     const reloadProjectAndWait: any = jest.fn(async () => {
+      workflowOrder.push('reload');
       currentLaunchPreviewForScene = freshLaunchPreviewForScene;
       return {
         reloaded: true,
@@ -631,6 +666,9 @@ runtimeScene._instances.length;
       launchPreviewForScene: staleLaunchPreviewForScene,
       getLaunchPreviewForScene: () => currentLaunchPreviewForScene,
       getPreviewDebuggerServer: () => previewDebuggerServer,
+      closeAllPreviews: jest.fn(async () => {
+        workflowOrder.push('close');
+      }),
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -639,7 +677,6 @@ runtimeScene._instances.length;
         name: 'verify_project_change',
         arguments: {
           scene_name: 'Scene',
-          close_existing_previews: false,
           frames: 2,
           timeout_ms: 1000,
           assertions: [
@@ -686,6 +723,7 @@ runtimeScene._instances.length;
     expect(result.assertions.every(assertion => assertion.passed)).toBe(true);
     expect(result.receipts.map(receipt => receipt.stage)).toEqual([
       'validation',
+      'close-previews',
       'reload',
       'launch',
       'frames',
@@ -695,10 +733,13 @@ runtimeScene._instances.length;
     expect(reloadProjectAndWait).toHaveBeenCalledTimes(1);
     expect(staleLaunchPreviewForScene).not.toHaveBeenCalled();
     expect(freshLaunchPreviewForScene).toHaveBeenCalledTimes(1);
+    expect(workflowOrder).toEqual(['close', 'reload', 'launch']);
   });
 
   it('reloads project files from disk and returns a synchronization receipt', async () => {
     const reportProgress = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     let currentProject: any = {
       getName: () => 'Before reload',
       getProjectFile: () => 'C:\\game\\project.gdevelop',
@@ -729,6 +770,8 @@ runtimeScene._instances.length;
         changesCount: 2,
         timeOfFirstChangeSinceLastSave: 123,
       }),
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -758,6 +801,36 @@ runtimeScene._instances.length;
     );
     expect(result.nextAction).toContain('catalogs are refreshed');
     expect(result.nextAction).toContain('launch_preview');
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects reload_project when another MCP preview workflow owns the sequence', async () => {
+    const reloadProjectAndWait: any = jest.fn();
+    const beginPreviewLaunchSequence: any = jest.fn(() => false);
+    const endPreviewLaunchSequence: any = jest.fn();
+    const bridge = makeBridge({
+      getProject: () => ({
+        getName: () => 'Busy project',
+        getProjectFile: () => 'C:\\game\\project.gdevelop',
+      }),
+      reloadProjectAndWait,
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: { name: 'reload_project', arguments: {} },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).toBe(true);
+    expect(result.code).toBe('PREVIEW_LAUNCH_SEQUENCE_ALREADY_IN_PROGRESS');
+    expect(result.reloaded).toBe(false);
+    expect(reloadProjectAndWait).not.toHaveBeenCalled();
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).not.toHaveBeenCalled();
   });
 
   it('preserves catalog subphase diagnostics when reload fails', async () => {
@@ -765,6 +838,8 @@ runtimeScene._instances.length;
     catalogError.code = 'MCP_RELOAD_CATALOG_SUBPHASE_FAILED';
     catalogError.catalogPhase = 'catalog-settings-writing';
     catalogError.catalogArtifact = 'settings';
+    const beginPreviewLaunchSequence: any = jest.fn(() => true);
+    const endPreviewLaunchSequence: any = jest.fn();
     const bridge = makeBridge({
       getProject: () => ({
         getName: () => 'Catalog failure project',
@@ -773,6 +848,8 @@ runtimeScene._instances.length;
       reloadProjectAndWait: jest.fn(async () => {
         throw catalogError;
       }),
+      beginPreviewLaunchSequence,
+      endPreviewLaunchSequence,
     });
 
     const response = await bridge.handleRendererMcpRequest({
@@ -791,6 +868,8 @@ runtimeScene._instances.length;
         catalogArtifact: 'settings',
       })
     );
+    expect(beginPreviewLaunchSequence).toHaveBeenCalledTimes(1);
+    expect(endPreviewLaunchSequence).toHaveBeenCalledTimes(1);
   });
 
   it('imports a reviewed extension with JavaScript warnings and returns generated multi-file sources', async () => {
@@ -1036,6 +1115,11 @@ runtimeScene._instances.length;
       'validate_current_project_json',
       'gdevelop_refresh_tool_catalog',
       'gdevelop_capabilities',
+      'create_action',
+      'create_signal_emit_action',
+      'create_signal_received_condition',
+      'create_signal_subscription_action',
+      'gdevelop_create_or_update_on_signal',
     ]) {
       const response = await bridge.handleRendererMcpRequest({
         method: 'tools/call',
@@ -1777,238 +1861,6 @@ runtimeScene._instances.length;
     expect(result.debuggerId).toBe('preview-ws-0');
   });
 
-  it('builds an action instruction from named parameters via create_action', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.insertNewLayout('Level1', 0);
-    try {
-      const bridge = makeBridge({ getProject: () => project });
-
-      // SetNumberVariable: [variable, operator, value]. Provide by index.
-      const numberResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_action',
-          arguments: {
-            type: 'SetNumberVariable',
-            parameters: { '0': 'Score', '1': '=', '2': '100' },
-          },
-        },
-      });
-      const numberResult = JSON.parse(numberResponse.content[0].text);
-      expect(numberResponse.isError).not.toBe(true);
-      expect(numberResult.instruction.type.value).toBe('SetNumberVariable');
-      expect(numberResult.instruction.parameters).toEqual([
-        'Score',
-        '=',
-        '100',
-      ]);
-
-      // SetBooleanVariable has a hidden code-only 3rd param — it must be auto
-      // filled with "" so the array length is correct.
-      const boolResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_action',
-          arguments: {
-            type: 'SetBooleanVariable',
-            parameters: { '0': 'GameOver', '1': 'True' },
-          },
-        },
-      });
-      const boolResult = JSON.parse(boolResponse.content[0].text);
-      expect(boolResult.instruction.parameters[0]).toBe('GameOver');
-      expect(boolResult.instruction.parameters[1]).toBe('True');
-      // Trailing code-only param present as "".
-      expect(boolResult.instruction.parameters.length).toBeGreaterThanOrEqual(
-        3
-      );
-      expect(boolResult.instruction.parameters[2]).toBe('');
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('builds signal instructions with dedicated helpers', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    project.insertNewLayout('Level1', 0);
-    try {
-      const bridge = makeBridge({ getProject: () => project });
-
-      const emitSceneResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_signal_emit_action',
-          arguments: {
-            target_kind: 'scene',
-            signal_name: 'Attack',
-            payload: 'heavy',
-          },
-        },
-      });
-      const emitScene = JSON.parse(emitSceneResponse.content[0].text);
-      expect(emitSceneResponse.isError).not.toBe(true);
-      expect(emitScene.actionType).toBe('EmitSceneSignal');
-      expect(emitScene.instruction.parameters).toEqual([
-        '',
-        '"Attack"',
-        '"heavy"',
-      ]);
-
-      const emitInstanceResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_signal_emit_action',
-          arguments: {
-            target_kind: 'object_instance',
-            instance_id: 'Variable(RequesterInstanceId)',
-            signal_name: 'Attack.Reply',
-            payload: 'Blocked',
-          },
-        },
-      });
-      const emitInstance = JSON.parse(emitInstanceResponse.content[0].text);
-      expect(emitInstanceResponse.isError).not.toBe(true);
-      expect(emitInstance.actionType).toBe('EmitSignalToObjectInstance');
-      expect(emitInstance.instruction.parameters).toEqual([
-        '',
-        'Variable(RequesterInstanceId)',
-        '"Attack.Reply"',
-        '"Blocked"',
-      ]);
-
-      const invalidTargetResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_signal_emit_action',
-          arguments: {
-            target_kind: 'picked_objects',
-            signal_name: 'Attack',
-          },
-        },
-      });
-      expect(invalidTargetResponse.isError).toBe(true);
-      expect(invalidTargetResponse.content[0].text).toContain(
-        'scene or object_instance'
-      );
-
-      const receiveResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_signal_received_condition',
-          arguments: {
-            signal_name: 'Attack',
-          },
-        },
-      });
-      const receive = JSON.parse(receiveResponse.content[0].text);
-      expect(receiveResponse.isError).not.toBe(true);
-      expect(receive.instruction.type.value).toBe('SignalReceived');
-      expect(receive.instruction.parameters).toEqual(['', '"Attack"']);
-
-      const genericSignalResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'create_action',
-          arguments: {
-            type: 'EmitSceneSignal',
-            parameters: { '1': 'Attack' },
-          },
-        },
-      });
-      const genericSignal = JSON.parse(genericSignalResponse.content[0].text);
-      expect(genericSignalResponse.isError).not.toBe(true);
-      expect(genericSignal.instruction.parameters[1]).toBe('"Attack"');
-    } finally {
-      project.delete();
-    }
-  });
-
-  it('creates object onSignal lifecycle functions through the dedicated tool', async () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
-    const extension = project.insertNewEventsFunctionsExtension('SignalExt', 0);
-    extension.getEventsBasedObjects().insertNew('SignalReceiver', 0);
-    extension
-      .getEventsBasedBehaviors()
-      .insertNew('SignalBehavior', 0)
-      .setObjectType('Sprite');
-
-    try {
-      const bridge = makeBridge({
-        getProject: () => project,
-        getPermissions: () => ({
-          allowWriteTools: true,
-          allowCommandTools: false,
-        }),
-      });
-
-      const response = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_create_or_update_on_signal',
-          arguments: {
-            extension_name: 'SignalExt',
-            parent_kind: 'object',
-            parent_name: 'SignalReceiver',
-            summary_only: true,
-          },
-        },
-      });
-      const result = JSON.parse(response.content[0].text);
-      expect(response.isError).not.toBe(true);
-      expect(result.functionName).toBe('onSignal');
-      expect(result.signalSignature).toEqual([
-        'Object',
-        'SignalName',
-        'Payload',
-      ]);
-      expect(
-        result.function.parameters.map(parameter => parameter.name)
-      ).toEqual(['Object', 'SignalName', 'Payload']);
-
-      const behaviorResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_create_or_update_on_signal',
-          arguments: {
-            extension_name: 'SignalExt',
-            parent_kind: 'behavior',
-            parent_name: 'SignalBehavior',
-            summary_only: true,
-          },
-        },
-      });
-      const behaviorResult = JSON.parse(behaviorResponse.content[0].text);
-      expect(behaviorResponse.isError).not.toBe(true);
-      expect(behaviorResult.signalSignature).toEqual([
-        'Object',
-        'Behavior',
-        'SignalName',
-        'Payload',
-      ]);
-
-      const inspectResponse = await bridge.handleRendererMcpRequest({
-        method: 'tools/call',
-        params: {
-          name: 'gdevelop_inspect_signal_usage',
-          arguments: {
-            extension_name: 'SignalExt',
-          },
-        },
-      });
-      const usage = JSON.parse(inspectResponse.content[0].text);
-      expect(inspectResponse.isError).not.toBe(true);
-      expect(usage.onSignalHandlers.totalMatches).toBe(2);
-      expect(usage.onSignalHandlers.handlers[0].parentName).toBe(
-        'SignalReceiver'
-      );
-    } finally {
-      project.delete();
-    }
-  });
-
   it('launch_preview with start_paused pauses the new preview on connect', async () => {
     let callbacks: any = null;
     const sent: Array<any> = [];
@@ -2293,6 +2145,58 @@ runtimeScene._instances.length;
     project.delete();
   });
 
+  it('waits for the first runtime scene before pausing a newly connected preview', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Game', 0);
+    project.setFirstLayout('Game');
+
+    let statusProbeCount = 0;
+    const previewDebuggerServer: any = makeTargetedPreviewServer({
+      debuggerIds: [],
+      responders: {
+        getStatus: () => ({
+          isPaused: false,
+          sceneName: ++statusProbeCount >= 2 ? 'Game' : null,
+        }),
+        pause: { isPaused: true, sceneName: 'Game' },
+      },
+    });
+    const launchPreviewForScene = jest.fn(() => {
+      setTimeout(
+        () => previewDebuggerServer.connectDebugger('preview-ws-0'),
+        1
+      );
+      return { accepted: true };
+    });
+    const bridge = makeBridge({
+      getProject: () => project,
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: {
+          scene_name: 'Game',
+          start_paused: true,
+          timeout_ms: 1000,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(true);
+    expect(result.pauseConfirmed).toBe(true);
+    expect(result.actualScene).toBe('Game');
+    expect(statusProbeCount).toBeGreaterThanOrEqual(2);
+    expect(launchPreviewForScene).toHaveBeenCalledWith('Game');
+
+    project.delete();
+  });
+
   it('launch_preview reports scene-aware launch rejection without waiting for a debugger connection', async () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('main', 0);
@@ -2339,6 +2243,58 @@ runtimeScene._instances.length;
       launchInProgress: true,
       launchPhase: 'launching',
     });
+    project.delete();
+  });
+
+  it('launch_preview cancels a scene-aware launch command that never settles', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('main', 0);
+    project.setFirstLayout('main');
+
+    const launchPreviewForScene = jest.fn(() => new Promise(() => {}));
+    const cancelPreviewLaunch = jest.fn(() => ({
+      cancelled: true,
+      releasedMcpLaunchReservation: true,
+      releasedPreviewPreparation: true,
+    }));
+    const previewDebuggerServer = {
+      getServerState: () => 'started',
+      getExistingPreviewDebuggerIds: () => [],
+      getExistingDebuggerIds: () => [],
+      registerCallbacks: jest.fn(() => () => {}),
+    };
+    const bridge = makeBridge({
+      getProject: () => project,
+      runCommand: jest.fn(() => true),
+      launchPreviewForScene,
+      cancelPreviewLaunch,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: { start_paused: true, timeout_ms: 500 },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.success).toBe(false);
+    expect(result.launched).toBe(false);
+    expect(result.failurePhase).toBe('window-launch');
+    expect(result.error).toContain('preview-launch-command-timeout');
+    expect(result.launchFailureDetails.timeoutMs).toBe(500);
+    expect(result.launchFailureDetails.cancellation).toEqual(
+      expect.objectContaining({
+        releasedMcpLaunchReservation: true,
+        releasedPreviewPreparation: true,
+      })
+    );
+    expect(cancelPreviewLaunch).toHaveBeenCalledTimes(1);
+    expect(cancelPreviewLaunch.mock.calls[0][0]).toContain('500 ms');
+
     project.delete();
   });
 

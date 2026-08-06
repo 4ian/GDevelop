@@ -168,7 +168,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     setPreviewOverride={props.setPreviewOverride}
                     isPreviewEnabled={
                       !!props.currentProject &&
-                      props.currentProject.getLayoutsCount() > 0
+                      props.currentProject.getLayoutsCount() > 0 &&
+                      !props.isPreviewLaunchInProgress
                     }
                     previewState={props.previewState}
                     onOpenVersionHistory={props.openVersionHistoryPanel}

@@ -1,31 +1,22 @@
-#!/usr/bin/env python3
 """Combine a skinned character GLB with animations from a same-rig GLB.
 
 This is direct action reuse, not bone retargeting. The target and donor
 armatures must use compatible bone names, hierarchy, and (by default) rest
-poses. Run this script with Blender, not a system Python interpreter.
+poses. Load this payload with ``runpy`` inside Blender Foundation's official
+Blender MCP ``execute_blender_code`` tool, then call ``run_mcp`` with a
+mapping. The payload uses the connected Blender session and never locates or
+launches a local Blender executable.
 
-Example (PowerShell):
-
-  & "C:\\Program Files\\Blender Foundation\\Blender 5.1\\blender.exe" `
-    --background --factory-startup `
-    --python skills/gdevelop-project-files/scripts/combine_same_rig_glb_animations.py -- `
-    --character "D:\\models\\Knight.glb" `
-    --animations "D:\\animations\\Rig_Medium_General.glb" `
-    --output "D:\\game\\assets\\models\\Knight_Animated.glb" `
-    --overwrite
-
-Use repeated ``--action`` arguments to export only selected donor actions.
-Use ``--include-unbound-character-objects`` when the character intentionally
-contains meshes or empties that are not parented or constrained to the rig.
+Set the ``actions`` list to export only selected donor actions. Set
+``include_unbound_character_objects`` when the character intentionally contains
+meshes or empties that are not parented or constrained to the rig.
 """
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
-import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -36,73 +27,109 @@ class CombineError(RuntimeError):
     """A user-facing combination failure."""
 
 
+@dataclass(frozen=True)
+class CombineOptions:
+    character: str
+    animations: str
+    output: str
+    character_armature: str | None = None
+    animation_armature: str | None = None
+    actions: tuple[str, ...] = ()
+    compatibility: str = "strict"
+    rest_pose_tolerance: float = 1e-4
+    include_unbound_character_objects: bool = False
+    apply_modifiers: bool = True
+    overwrite: bool = False
+
+
 def log(message: str) -> None:
     print(f"[combine-glb] {message}", flush=True)
 
 
-def blender_cli_arguments() -> list[str]:
-    """Return arguments placed after Blender's required ``--`` separator."""
-    if "--" not in sys.argv:
-        return []
-    return sys.argv[sys.argv.index("--") + 1 :]
+def clear_working_data() -> None:
+    """Clear task data without resetting Blender or unloading the MCP add-on."""
+    for obj in list(bpy.data.objects):
+        bpy.data.objects.remove(obj, do_unlink=True)
+    for action in list(bpy.data.actions):
+        bpy.data.actions.remove(action)
+    bpy.data.orphans_purge(do_recursive=True)
 
 
-def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=(
-            "Embed animations from a same-rig donor GLB into a character GLB. "
-            "This transfers actions directly and does not perform retargeting."
+def options_from_mcp(values: dict[str, Any]) -> CombineOptions:
+    """Validate the mapping passed by Blender MCP."""
+    if not isinstance(values, dict):
+        raise CombineError("MCP options must be a mapping")
+
+    allowed = {
+        "character",
+        "animations",
+        "output",
+        "character_armature",
+        "animation_armature",
+        "actions",
+        "compatibility",
+        "rest_pose_tolerance",
+        "include_unbound_character_objects",
+        "apply_modifiers",
+        "overwrite",
+    }
+    unknown = sorted(set(values) - allowed)
+    if unknown:
+        raise CombineError(f"Unknown MCP options: {unknown}")
+
+    def required_text(name: str) -> str:
+        value = values.get(name)
+        if not isinstance(value, str) or not value.strip():
+            raise CombineError(f"MCP option {name!r} must be a non-empty string")
+        return value
+
+    def optional_text(name: str) -> str | None:
+        value = values.get(name)
+        if value is None:
+            return None
+        if not isinstance(value, str) or not value.strip():
+            raise CombineError(f"MCP option {name!r} must be a non-empty string")
+        return value
+
+    def boolean(name: str, default: bool) -> bool:
+        value = values.get(name, default)
+        if not isinstance(value, bool):
+            raise CombineError(f"MCP option {name!r} must be a boolean")
+        return value
+
+    raw_actions = values.get("actions", [])
+    if not isinstance(raw_actions, (list, tuple)) or any(
+        not isinstance(action, str) or not action for action in raw_actions
+    ):
+        raise CombineError("MCP option 'actions' must be a list of non-empty strings")
+
+    compatibility = values.get("compatibility", "strict")
+    if compatibility not in {"strict", "hierarchy", "names", "off"}:
+        raise CombineError(
+            "MCP option 'compatibility' must be strict, hierarchy, names, or off"
         )
-    )
-    parser.add_argument("--character", required=True, help="Character/mesh GLB")
-    parser.add_argument("--animations", required=True, help="Animation donor GLB")
-    parser.add_argument("--output", required=True, help="Combined output GLB")
-    parser.add_argument(
-        "--character-armature",
-        help="Target armature object name; required only if the character has several",
-    )
-    parser.add_argument(
-        "--animation-armature",
-        help="Donor armature object name; required only if the donor has several",
-    )
-    parser.add_argument(
-        "--action",
-        dest="actions",
-        action="append",
-        default=[],
-        help="Exact donor action name to include; repeat for multiple actions",
-    )
-    parser.add_argument(
-        "--compatibility",
-        choices=("strict", "hierarchy", "names", "off"),
-        default="strict",
-        help=(
-            "Skeleton check: strict also compares rest poses; hierarchy checks "
-            "bone parents; names checks only the bone set (default: strict)"
+
+    rest_pose_tolerance = values.get("rest_pose_tolerance", 1e-4)
+    if isinstance(rest_pose_tolerance, bool) or not isinstance(
+        rest_pose_tolerance, (int, float)
+    ):
+        raise CombineError("MCP option 'rest_pose_tolerance' must be a number")
+
+    return CombineOptions(
+        character=required_text("character"),
+        animations=required_text("animations"),
+        output=required_text("output"),
+        character_armature=optional_text("character_armature"),
+        animation_armature=optional_text("animation_armature"),
+        actions=tuple(raw_actions),
+        compatibility=compatibility,
+        rest_pose_tolerance=float(rest_pose_tolerance),
+        include_unbound_character_objects=boolean(
+            "include_unbound_character_objects", False
         ),
+        apply_modifiers=boolean("apply_modifiers", True),
+        overwrite=boolean("overwrite", False),
     )
-    parser.add_argument(
-        "--rest-pose-tolerance",
-        type=float,
-        default=1e-4,
-        help="Maximum matrix element difference in strict mode (default: 1e-4)",
-    )
-    parser.add_argument(
-        "--include-unbound-character-objects",
-        action="store_true",
-        help="Also export unbound character meshes/empties",
-    )
-    parser.add_argument(
-        "--no-apply-modifiers",
-        action="store_true",
-        help="Do not ask the glTF exporter to apply compatible modifiers",
-    )
-    parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Allow replacing an existing output GLB",
-    )
-    return parser.parse_args(blender_cli_arguments())
 
 
 def resolve_input(path_text: str, label: str) -> Path:
@@ -121,7 +148,9 @@ def resolve_output(path_text: str, overwrite: bool, inputs: Iterable[Path]) -> P
     if path in set(inputs):
         raise CombineError("Output cannot overwrite either input GLB")
     if path.exists() and not overwrite:
-        raise CombineError(f"Output already exists; pass --overwrite to replace it: {path}")
+        raise CombineError(
+            f"Output already exists; set MCP option 'overwrite' to true: {path}"
+        )
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -163,7 +192,7 @@ def choose_armature(
         available = ", ".join(obj.name for obj in armatures) or "none"
         raise CombineError(
             f"Expected one {label} armature, found {len(armatures)} ({available}). "
-            f"Use the corresponding --{label}-armature option."
+            f"Set the corresponding MCP option '{label}_armature'."
         )
     return armatures[0]
 
@@ -229,7 +258,7 @@ def verify_skeletons(
             )
             raise CombineError(
                 f"Rest-pose mismatch (tolerance {rest_pose_tolerance:g}):\n  {details}\n"
-                "Use --compatibility hierarchy only if the rigs are intentionally compatible "
+                "Use compatibility='hierarchy' only if the rigs are intentionally compatible "
                 "despite rest-pose differences."
             )
         report["restPoseTolerance"] = rest_pose_tolerance
@@ -432,18 +461,18 @@ def export_glb(
         raise CombineError(f"Blender failed to export: {output}")
 
 
-def run(args: argparse.Namespace) -> dict[str, Any]:
+def run(args: CombineOptions) -> dict[str, Any]:
     character_path = resolve_input(args.character, "Character GLB")
     animations_path = resolve_input(args.animations, "Animation GLB")
     output_path = resolve_output(
         args.output, args.overwrite, (character_path, animations_path)
     )
     if args.rest_pose_tolerance < 0:
-        raise CombineError("--rest-pose-tolerance cannot be negative")
+        raise CombineError("MCP option 'rest_pose_tolerance' cannot be negative")
 
     log(f"Blender {bpy.app.version_string}")
     log(f"Importing character: {character_path}")
-    bpy.ops.wm.read_factory_settings(use_empty=True)
+    clear_working_data()
     character_objects, character_actions = import_glb(character_path)
     target = choose_armature(character_objects, args.character_armature, "character")
 
@@ -474,7 +503,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         output_path,
         export_objects,
         target,
-        apply_modifiers=not args.no_apply_modifiers,
+        apply_modifiers=args.apply_modifiers,
     )
 
     report = {
@@ -495,13 +524,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     return report
 
 
-def main() -> None:
+def run_mcp(values: dict[str, Any]) -> dict[str, Any]:
+    """Run in the connected Blender session and return an MCP-safe result."""
     try:
-        run(parse_arguments())
+        return run(options_from_mcp(values))
     except CombineError as error:
-        print(f"[combine-glb] ERROR: {error}", file=sys.stderr, flush=True)
-        raise SystemExit(2) from error
-
-
-if __name__ == "__main__":
-    main()
+        return {"success": False, "error": str(error)}

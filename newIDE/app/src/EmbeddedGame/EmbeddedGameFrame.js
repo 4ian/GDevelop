@@ -22,6 +22,7 @@ import { useInGameEditorSettings } from './InGameEditorSettings';
 import { get3DModelFilePathsFromDataTransfer } from '../SceneEditor/Create3DModelFromGLB';
 import { hasProjectFileDragData } from '../Utils/ProjectFileDragData';
 import { registerPreventGameFramePointerEventsCallback } from './EmbeddedGameFramePointerEvents';
+import { safelyRemoveWindowEventListener } from './CrossOriginWindowEventListener';
 
 type AttachToPreviewOptions = {|
   previewIndexHtmlLocation: string,
@@ -779,18 +780,29 @@ export const EmbeddedGameFrame = ({
 
       const unregisterIframeWindow = () => {
         if (!registeredIframeWindow) return;
-        registeredIframeWindow.removeEventListener(
+        const iframeWindow = registeredIframeWindow;
+        // Clear the reference first: reading properties on this WindowProxy can
+        // throw once the iframe has navigated from the editor origin to the
+        // file:// preview origin.
+        registeredIframeWindow = null;
+        safelyRemoveWindowEventListener(
+          iframeWindow,
           'dragenter',
           onIframeDragEnter,
           true
         );
-        registeredIframeWindow.removeEventListener(
+        safelyRemoveWindowEventListener(
+          iframeWindow,
           'dragover',
           onIframeDragOver,
           true
         );
-        registeredIframeWindow.removeEventListener('drop', onIframeDrop, true);
-        registeredIframeWindow = null;
+        safelyRemoveWindowEventListener(
+          iframeWindow,
+          'drop',
+          onIframeDrop,
+          true
+        );
       };
 
       const registerIframeWindow = () => {

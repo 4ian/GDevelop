@@ -42,6 +42,21 @@ namespace gdjs {
       this._fileToContent.set(resource.file, content);
     }
 
+    /**
+     * Return every distinct cached value.
+     *
+     * This is notably useful for resource managers that must explicitly
+     * dispose browser-backed resources before clearing the cache.
+     */
+    getAll(): C[] {
+      return Array.from(
+        new Set([
+          ...this._nameToContent.values(),
+          ...this._fileToContent.values(),
+        ])
+      );
+    }
+
     delete(resource: ResourceData) {
       this._nameToContent.delete(resource.name);
       this._fileToContent.delete(resource.file);

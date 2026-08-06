@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender Workflow"
+  short_description: "Prepare and export Blender assets for GDevelop"
+  default_prompt: "Use $blender-workflow to prepare, export, and verify this Blender asset in GDevelop."

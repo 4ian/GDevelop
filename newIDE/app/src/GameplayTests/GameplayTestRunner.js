@@ -60,7 +60,6 @@ export type GameplayTestToRun = {|
 export type GameplayTestRunOptions = {|
   timeoutMs?: number,
   screenshots?: 'off' | 'on-failure',
-  speedFactor?: number,
   onTestStarted?: (test: GameplayTestToRun) => void,
   onProgress?: (test: GameplayTestToRun, frame: number) => void,
 |};
@@ -190,8 +189,8 @@ const waitForGameToBeReady = async (
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     let pollIntervalId: ?IntervalID = null;
-    const unregisterCallbacks: () => void =
-      previewDebuggerServer.registerCallbacks({
+    const unregisterCallbacks: () => void = previewDebuggerServer.registerCallbacks(
+      {
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
         onConnectionClosed: () => {},
@@ -205,7 +204,8 @@ const waitForGameToBeReady = async (
           unregisterCallbacks();
           resolve();
         },
-      });
+      }
+    );
 
     // Allow a stop to interrupt the wait (the game may take a long time
     // to export and boot).
@@ -242,7 +242,6 @@ const runSingleTest = async ({
   source,
   timeoutMs,
   screenshots,
-  speedFactor,
   stateInspectors,
   onProgress,
 }: {|
@@ -251,16 +250,15 @@ const runSingleTest = async ({
   source: string,
   timeoutMs: number,
   screenshots: 'off' | 'on-failure',
-  speedFactor: number | null,
   stateInspectors: GameplayTestStateInspectors,
   onProgress: ?(test: GameplayTestToRun, frame: number) => void,
 |}): Promise<GameplayTestResult> => {
   const messageId = 'gameplay-test-' + nextRunMessageId++;
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let watchdogTimeoutId: ?TimeoutID = null;
-    const unregisterCallbacks: () => void =
-      previewDebuggerServer.registerCallbacks({
+    const unregisterCallbacks: () => void = previewDebuggerServer.registerCallbacks(
+      {
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
         onConnectionClosed: ({ id }) => {
@@ -290,7 +288,8 @@ const runSingleTest = async ({
             });
           }
         },
-      });
+      }
+    );
 
     const finish = (result: GameplayTestResult) => {
       if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
@@ -304,9 +303,8 @@ const runSingleTest = async ({
       finish(
         makeErrorResult(
           test.testName,
-          `No result received from the game after ${
-            timeoutMs + RESULT_EXTRA_TIMEOUT_MS
-          }ms - the game may have crashed or been closed.`
+          `No result received from the game after ${timeoutMs +
+            RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
         )
       );
     }, timeoutMs + RESULT_EXTRA_TIMEOUT_MS);
@@ -322,7 +320,6 @@ const runSingleTest = async ({
       // it paused and muted when the test finishes, showing the last frame.
       freezeWhenFinished: true,
     };
-    if (speedFactor) payload.speedFactor = speedFactor;
     if (screenshots === 'off') payload.maxScreenshots = 0;
 
     previewDebuggerServer.sendMessage(GAMEPLAY_TEST_FRAME_DEBUGGER_ID, {
@@ -376,7 +373,7 @@ export const runGameplayTests = async ({
 
       // Resolve the sources of the tests first, so an unknown test does not
       // interrupt the batch in the middle.
-      const testsWithSources = tests.map((test) => {
+      const testsWithSources = tests.map(test => {
         if (test.source !== undefined) {
           return { test, source: test.source, error: null };
         }
@@ -492,7 +489,6 @@ export const runGameplayTests = async ({
             source,
             timeoutMs,
             screenshots: options.screenshots || 'off',
-            speedFactor: options.speedFactor || null,
             stateInspectors,
             onProgress: (test: GameplayTestToRun, frame: number) => {
               setGameplayTestFrameRunStatus({
@@ -585,8 +581,7 @@ type GameplayTestRunnerDependencies = {|
   onTestsRunFinished: () => void,
 |};
 
-let gameplayTestRunnerDependencies: GameplayTestRunnerDependencies | null =
-  null;
+let gameplayTestRunnerDependencies: GameplayTestRunnerDependencies | null = null;
 
 export const registerGameplayTestRunnerDependencies = (
   dependencies: GameplayTestRunnerDependencies | null

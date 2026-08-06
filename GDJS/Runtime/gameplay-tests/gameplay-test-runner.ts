@@ -60,8 +60,6 @@ namespace gdjs {
       timeoutMs?: number;
       /** Maximum number of frames stepped. Default: 20000. */
       maxFrames?: number;
-      /** Game frames stepped per animation frame. Default: 2, max 10. */
-      speedFactor?: number;
       /** Maximum number of screenshots kept. Default: 5. */
       maxScreenshots?: number;
       /**
@@ -152,27 +150,68 @@ namespace gdjs {
         bearingFromReference: float;
       };
 
-    export type GameplayTestNavigationHint = {
-      shouldMoveLeft: boolean;
-      shouldMoveRight: boolean;
-      shouldMoveUp: boolean;
-      shouldMoveDown: boolean;
-      shouldJump: boolean;
-      shouldTurnLeft: boolean;
-      shouldTurnRight: boolean;
-      shouldLookUp: boolean;
-      shouldLookDown: boolean;
-      angleDiff: float;
-      pitchDiff: float;
-      dominantAxis: 'x' | 'y';
-      reached: boolean;
-      distanceTo: float;
-      targetX: float;
-      targetY: float;
-      targetZ?: float;
+    /**
+     * The position of a target relative to a reference object: pure
+     * geometry, no navigation advice. How to move toward the target
+     * (which keys, when to jump...) is up to the test script - see
+     * `probeControls` to discover the controls and `makeProgressTracker`
+     * to detect a lack of progress.
+     */
+    export type GameplayTestRelativePosition = {
       relativeX: float;
       relativeY: float;
       relativeZ?: float;
+      /** Full distance to the target (3D when Z is available). */
+      distance: float;
+      /** Distance to the target ignoring Z (equals `distance` in 2D). */
+      horizontalDistance: float;
+      /** Difference between the reference object's angle (yaw) and the
+       * direction of the target, in degrees, normalized to [-180, 180]. */
+      yawDiff: float;
+      /** Vertical aim difference in degrees (3D only, 0 in 2D). */
+      pitchDiff: float;
+      dominantAxis: 'x' | 'y';
+      /** True when the target is within `reachRadius` (default: 30). */
+      reached: boolean;
+      targetX: float;
+      targetY: float;
+      targetZ?: float;
+    };
+
+    /**
+     * The measured effect of holding one key (or nothing, for the
+     * baseline): the net displacement after the probe, the extreme
+     * displacements observed during it (a jump shows as a negative
+     * `minDy` even if the object lands back), and the yaw change.
+     */
+    export type GameplayTestControlProbeResult = {
+      dx: float;
+      dy: float;
+      dz?: float;
+      minDx: float;
+      maxDx: float;
+      minDy: float;
+      maxDy: float;
+      minDz?: float;
+      maxDz?: float;
+      yawDelta: float;
+    };
+
+    export type GameplayTestProgressStatus = {
+      frame: integer;
+      distance: float;
+      reached: boolean;
+      /** True when the distance to the target shrank by less than
+       * `minProgress` over the last `windowFrames` frames. */
+      stalled: boolean;
+    };
+
+    export type GameplayTestProgressTracker = {
+      /** Sample the current distance to the target and return the current
+       * progress status (null if the reference or target is gone). */
+      update: () => GameplayTestProgressStatus | null;
+      /** Forget the history (call after switching to another target). */
+      reset: () => void;
     };
 
     export type GameplayTestResult = {
@@ -202,9 +241,15 @@ namespace gdjs {
 
     const DEFAULT_TIMEOUT_MS = 30000;
     const DEFAULT_MAX_FRAMES = 20000;
-    const DEFAULT_SPEED_FACTOR = 2;
-    const MAX_SPEED_FACTOR = 10;
+    /** How long frames are stepped before yielding once to the browser:
+     * the game visibly plays (a rendered frame per refresh), stop/progress
+     * messages flow, while keeping near-full stepping throughput. */
+    const YIELD_BUDGET_MS = 12;
     const DEFAULT_MAX_SCREENSHOTS = 5;
+    const DEFAULT_PROBE_FRAMES = 30;
+    const DEFAULT_PROGRESS_WINDOW_FRAMES = 60;
+    const DEFAULT_PROGRESS_MIN_PROGRESS = 8;
+    const DEFAULT_REACH_RADIUS = 30;
     const MAX_CONSOLE_LOGS = 100;
     const MAX_CONSOLE_LOGS_TOTAL_CHARS = 8000;
     const MAX_ASSERTIONS = 200;
@@ -372,7 +417,9 @@ namespace gdjs {
       _watchedObjectNames: Array<string> = [];
       _timeoutMs: number;
       _maxFrames: integer;
-      _speedFactor: integer;
+      /** Last time the stepping loop yielded to the browser (see
+       * `_maybeYield`). */
+      _lastYieldTimeMs: number = 0;
       _maxScreenshots: integer;
       _totalStepTimeMs: number = 0;
       _worstStepTimeMs: number = 0;
@@ -401,13 +448,7 @@ namespace gdjs {
         this._payload = payload;
         this._timeoutMs = payload.timeoutMs || DEFAULT_TIMEOUT_MS;
         this._maxFrames = payload.maxFrames || DEFAULT_MAX_FRAMES;
-        this._speedFactor = Math.max(
-          1,
-          Math.min(
-            MAX_SPEED_FACTOR,
-            payload.speedFactor || DEFAULT_SPEED_FACTOR
-          )
-        );
+        this._lastYieldTimeMs = Date.now();
         this._maxScreenshots =
           payload.maxScreenshots === undefined
             ? DEFAULT_MAX_SCREENSHOTS
@@ -568,6 +609,20 @@ namespace gdjs {
       }
 
       /**
+       * Yield once to the browser when frames were stepped for more than
+       * `YIELD_BUDGET_MS` of wall-clock time: the game gets rendered (the
+       * test is visible while it runs) and pending events/messages (like a
+       * stop request) get processed - whatever the stepping pattern of the
+       * test script (one big `stepFrames`, a `stepUntil` or a manual
+       * `stepFrames(1)` loop).
+       */
+      private async _maybeYield(): Promise<void> {
+        if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
+        await this._waitForNextAnimationFrame();
+        this._lastYieldTimeMs = Date.now();
+      }
+
+      /**
        * Load and start the given scene, replacing any running scene.
        */
       async goToScene(
@@ -606,17 +661,12 @@ namespace gdjs {
         }
       ): Promise<void> {
         const dtMs = (options && options.dtMs) || DEFAULT_FRAME_DT_MS;
-        let framesSinceLastYield = 0;
         for (let i = 0; i < frameCount; i++) {
           this._stepSingleFrame(dtMs);
           if (options && options.onFrame) {
             options.onFrame({ frame: this._framesExecuted });
           }
-          framesSinceLastYield++;
-          if (framesSinceLastYield >= this._speedFactor) {
-            framesSinceLastYield = 0;
-            await this._waitForNextAnimationFrame();
-          }
+          await this._maybeYield();
         }
       }
 
@@ -649,7 +699,6 @@ namespace gdjs {
           (stuckDetection && stuckDetection.minDisplacement) || 5;
         let lastCheckPosition: { x: float; y: float; z: float } | null = null;
         let framesSinceLastCheck = 0;
-        let framesSinceLastYield = 0;
 
         for (let i = 0; i < options.maxFrames; i++) {
           if (condition()) return true;
@@ -696,11 +745,7 @@ namespace gdjs {
             }
           }
 
-          framesSinceLastYield++;
-          if (framesSinceLastYield >= this._speedFactor) {
-            framesSinceLastYield = 0;
-            await this._waitForNextAnimationFrame();
-          }
+          await this._maybeYield();
         }
         return condition();
       }
@@ -1196,17 +1241,20 @@ namespace gdjs {
       }
 
       /**
-       * Compute navigation hints to move the first instance of
-       * `referenceObjectName` toward a target (an object or a position).
-       * These are hints only: translate them to the game's actual controls.
+       * Get the position of a target (an object or a position) relative to
+       * the first instance of `referenceObjectName`: pure geometry, no
+       * navigation advice. Deciding how to move toward the target with the
+       * game's actual controls is the job of the test script (use
+       * `probeControls` to discover the controls, `makeProgressTracker` to
+       * detect a lack of progress).
        */
-      getNavigationHint(
+      getRelativePosition(
         referenceObjectName: string,
         target:
           | { name: string; id?: integer }
           | { x: float; y: float; z?: float },
-        options?: { jumpThreshold?: float; reachRadius?: float }
-      ): GameplayTestNavigationHint | null {
+        options?: { reachRadius?: float }
+      ): GameplayTestRelativePosition | null {
         const referenceInstances = this._getInstances(referenceObjectName);
         if (referenceInstances.length === 0) return null;
         const reference = referenceInstances[0];
@@ -1214,8 +1262,8 @@ namespace gdjs {
         const resolvedTarget = this._resolveNavigationTarget(target);
         if (!resolvedTarget) return null;
 
-        const jumpThreshold = (options && options.jumpThreshold) || 32;
-        const reachRadius = (options && options.reachRadius) || 30;
+        const reachRadius =
+          (options && options.reachRadius) || DEFAULT_REACH_RADIUS;
 
         const referenceX = reference.getCenterXInScene();
         const referenceY = reference.getCenterYInScene();
@@ -1231,10 +1279,10 @@ namespace gdjs {
             ? resolvedTarget.z - referenceZ
             : undefined;
 
-        const distanceTo = Math.hypot(relativeX, relativeY, relativeZ || 0);
+        const distance = Math.hypot(relativeX, relativeY, relativeZ || 0);
 
         const desiredAngle = gdjs.toDegrees(Math.atan2(relativeY, relativeX));
-        const angleDiff = normalizeAngleDifference(
+        const yawDiff = normalizeAngleDifference(
           desiredAngle - reference.getAngle()
         );
         const horizontalDistance = Math.hypot(relativeX, relativeY);
@@ -1252,26 +1300,196 @@ namespace gdjs {
             : normalizeAngleDifference(desiredPitch - currentPitch);
 
         return {
-          shouldMoveLeft: relativeX < -1,
-          shouldMoveRight: relativeX > 1,
-          shouldMoveUp: relativeY < -1,
-          shouldMoveDown: relativeY > 1,
-          shouldJump: relativeY < -jumpThreshold,
-          shouldTurnLeft: angleDiff < -2,
-          shouldTurnRight: angleDiff > 2,
-          shouldLookUp: pitchDiff < -2,
-          shouldLookDown: pitchDiff > 2,
-          angleDiff,
-          pitchDiff,
-          dominantAxis: Math.abs(relativeX) >= Math.abs(relativeY) ? 'x' : 'y',
-          reached: distanceTo <= reachRadius,
-          distanceTo,
-          targetX: resolvedTarget.x,
-          targetY: resolvedTarget.y,
-          targetZ: resolvedTarget.z,
           relativeX,
           relativeY,
           relativeZ,
+          distance,
+          horizontalDistance,
+          yawDiff,
+          pitchDiff,
+          dominantAxis: Math.abs(relativeX) >= Math.abs(relativeY) ? 'x' : 'y',
+          reached: distance <= reachRadius,
+          targetX: resolvedTarget.x,
+          targetY: resolvedTarget.y,
+          targetZ: resolvedTarget.z,
+        };
+      }
+
+      /**
+       * Measure what each key actually does to the first instance of
+       * `objectName`: for the baseline (no key) and then each key, the
+       * scene is restarted, the key held for `frames` frames, and the
+       * displacement (net + extremes: a jump shows as a negative `minDy`
+       * even if the object lands back) and yaw change are measured.
+       * Compare each key's result to `baseline` (gravity or idle drift
+       * affects both). The scene is restarted again at the end, so run
+       * probes BEFORE the scenario of the test. An entry is null if the
+       * instance disappeared during that probe.
+       */
+      async probeControls(
+        objectName: string,
+        keyNames: Array<string>,
+        options?: { frames?: integer }
+      ): Promise<{
+        baseline: GameplayTestControlProbeResult | null;
+        keys: { [keyName: string]: GameplayTestControlProbeResult | null };
+      }> {
+        const frames = (options && options.frames) || DEFAULT_PROBE_FRAMES;
+        const sceneName = this._getCurrentScene().getName();
+
+        const probe = async (
+          keyName: string | null
+        ): Promise<GameplayTestControlProbeResult | null> => {
+          await this.goToScene(sceneName);
+          this.releaseAllInputs();
+          const getPosition = () => {
+            const instances = this._getInstances(objectName);
+            if (instances.length === 0) return null;
+            const instance = instances[0];
+            const anyInstance = instance as any;
+            return {
+              x: instance.getX(),
+              y: instance.getY(),
+              z:
+                typeof anyInstance.getZ === 'function'
+                  ? (anyInstance.getZ() as float)
+                  : undefined,
+              angle: instance.getAngle(),
+            };
+          };
+          const start = getPosition();
+          if (!start) {
+            throw new Error(
+              `No instance of "${objectName}" found to probe controls on (after restarting the scene "${sceneName}").`
+            );
+          }
+          let minDx = 0;
+          let maxDx = 0;
+          let minDy = 0;
+          let maxDy = 0;
+          let minDz: float | undefined = start.z === undefined ? undefined : 0;
+          let maxDz: float | undefined = start.z === undefined ? undefined : 0;
+          if (keyName) this.setKeyPressed(keyName, true);
+          await this.stepFrames(frames, {
+            onFrame: () => {
+              const current = getPosition();
+              if (!current) return;
+              minDx = Math.min(minDx, current.x - start.x);
+              maxDx = Math.max(maxDx, current.x - start.x);
+              minDy = Math.min(minDy, current.y - start.y);
+              maxDy = Math.max(maxDy, current.y - start.y);
+              if (current.z !== undefined && start.z !== undefined) {
+                minDz = Math.min(minDz || 0, current.z - start.z);
+                maxDz = Math.max(maxDz || 0, current.z - start.z);
+              }
+            },
+          });
+          if (keyName) this.setKeyPressed(keyName, false);
+          const end = getPosition();
+          if (!end) return null;
+          return {
+            dx: end.x - start.x,
+            dy: end.y - start.y,
+            dz:
+              end.z !== undefined && start.z !== undefined
+                ? end.z - start.z
+                : undefined,
+            minDx,
+            maxDx,
+            minDy,
+            maxDy,
+            minDz,
+            maxDz,
+            yawDelta: normalizeAngleDifference(end.angle - start.angle),
+          };
+        };
+
+        const baseline = await probe(null);
+        const keys: {
+          [keyName: string]: GameplayTestControlProbeResult | null;
+        } = {};
+        for (const keyName of keyNames) {
+          keys[keyName] = await probe(keyName);
+        }
+        // Leave a clean state for the actual test scenario.
+        await this.goToScene(sceneName);
+        this.releaseAllInputs();
+        return { baseline, keys };
+      }
+
+      /**
+       * Make a tracker measuring the progress of the first instance of
+       * `referenceObjectName` toward a target. Call `update()` regularly
+       * (e.g. once per loop iteration): it reports the current `distance`,
+       * whether the target is `reached`, and whether progress `stalled`
+       * (distance shrank by less than `minProgress` over the last
+       * `windowFrames` frames - time to try an escape strategy). The first
+       * update of a stall also records a `stuck` event in the event log.
+       * Call `reset()` after switching to another target.
+       */
+      makeProgressTracker(
+        referenceObjectName: string,
+        target:
+          | { name: string; id?: integer }
+          | { x: float; y: float; z?: float },
+        options?: {
+          windowFrames?: integer;
+          minProgress?: float;
+          reachRadius?: float;
+        }
+      ): GameplayTestProgressTracker {
+        const windowFrames =
+          (options && options.windowFrames) || DEFAULT_PROGRESS_WINDOW_FRAMES;
+        const minProgress =
+          (options && options.minProgress) || DEFAULT_PROGRESS_MIN_PROGRESS;
+        const reachRadius =
+          (options && options.reachRadius) || DEFAULT_REACH_RADIUS;
+
+        let samples: Array<{ frame: integer; distance: float }> = [];
+        let wasStalled = false;
+
+        return {
+          update: () => {
+            const relativePosition = this.getRelativePosition(
+              referenceObjectName,
+              target,
+              { reachRadius }
+            );
+            if (!relativePosition) return null;
+            const frame = this._framesExecuted;
+            const distance = relativePosition.distance;
+            samples.push({ frame, distance });
+            // Keep only the window (plus the sample right before it, to
+            // always have a reference point `windowFrames` old).
+            while (
+              samples.length > 1 &&
+              samples[1].frame <= frame - windowFrames
+            ) {
+              samples.shift();
+            }
+            const oldest = samples[0];
+            const stalled =
+              frame - oldest.frame >= windowFrames &&
+              oldest.distance - distance < minProgress;
+            if (stalled && !wasStalled) {
+              this._recordEvent({
+                frame,
+                event: 'stuck',
+                object: referenceObjectName,
+              });
+            }
+            wasStalled = stalled;
+            return {
+              frame,
+              distance,
+              reached: relativePosition.reached,
+              stalled,
+            };
+          },
+          reset: () => {
+            samples = [];
+            wasStalled = false;
+          },
         };
       }
 
@@ -1295,10 +1513,14 @@ namespace gdjs {
         let pixelsPerDegree = 2;
 
         for (let i = 0; i < maxAimFrames; i++) {
-          const hint = this.getNavigationHint(referenceObjectName, target);
-          if (!hint) return false;
-          const yawDiff = hint.angleDiff;
-          const pitchDiff = options && options.yawOnly ? 0 : hint.pitchDiff;
+          const relativePosition = this.getRelativePosition(
+            referenceObjectName,
+            target
+          );
+          if (!relativePosition) return false;
+          const yawDiff = relativePosition.yawDiff;
+          const pitchDiff =
+            options && options.yawOnly ? 0 : relativePosition.pitchDiff;
           if (
             Math.abs(yawDiff) <= toleranceDegrees &&
             Math.abs(pitchDiff) <= toleranceDegrees
@@ -1314,9 +1536,14 @@ namespace gdjs {
           );
           await this.stepFrames(1);
 
-          const newHint = this.getNavigationHint(referenceObjectName, target);
-          if (newHint) {
-            const achievedRotation = Math.abs(yawDiff - newHint.angleDiff);
+          const newRelativePosition = this.getRelativePosition(
+            referenceObjectName,
+            target
+          );
+          if (newRelativePosition) {
+            const achievedRotation = Math.abs(
+              yawDiff - newRelativePosition.yawDiff
+            );
             if (Math.abs(yawDiff) > toleranceDegrees) {
               if (achievedRotation < 0.1) {
                 // No response to the mouse: increase the gain (the game may
@@ -1663,8 +1890,9 @@ namespace gdjs {
      * Run a gameplay test script against the game and return its result.
      *
      * The game main loop keeps rendering (paused) while the test steps the
-     * game logic deterministically, `speedFactor` frames per animation
-     * frame.
+     * game logic deterministically at full speed, yielding to the browser
+     * regularly so the run stays visible and interruptible (see
+     * `_maybeYield`).
      */
     export const runGameplayTest = async (
       runtimeGame: gdjs.RuntimeGame,

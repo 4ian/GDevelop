@@ -64,6 +64,29 @@ describe('gdjs.gameplayTests', () => {
     return sceneData;
   };
 
+  const createSceneDataWithInitialPlayerInstance = (name) => {
+    const sceneData = createSceneDataWithPlatformerObject(name);
+    sceneData.instances.push(
+      /** @type {any} */ ({
+        persistentUuid: 'player-1',
+        layer: '',
+        locked: false,
+        name: 'Player',
+        x: 100,
+        y: 100,
+        angle: 0,
+        zOrder: 0,
+        customSize: false,
+        width: 0,
+        height: 0,
+        numberProperties: [],
+        stringProperties: [],
+        initialVariables: [],
+      })
+    );
+    return sceneData;
+  };
+
   // The state inspectors as the editor would derive them from the extensions
   // metadata (see `GameplayTestStateInspectors.js` in the editor).
   const platformerStateInspectors = {
@@ -298,7 +321,7 @@ describe('gdjs.gameplayTests', () => {
       await harness.goToScene('Scene 1');
       await harness.stepFrames(100000);
       `,
-      { maxFrames: 50, speedFactor: 10 }
+      { maxFrames: 50 }
     );
 
     expect(result.status).to.be('timeout');
@@ -432,6 +455,139 @@ describe('gdjs.gameplayTests', () => {
     expect(sceneEvents[1].sceneName).to.be('Scene 2');
   });
 
+  it('reports the relative position of a target (pure geometry, no advice)', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('MyObject', 100, 200);
+      await harness.stepFrames(1);
+
+      const rel = harness.getRelativePosition('MyObject', { x: 400, y: 200 });
+      harness.assert(!!rel, 'Relative position is computed');
+      harness.assert(Math.abs(rel.relativeX - 300) < 1, 'relativeX is 300');
+      harness.assert(Math.abs(rel.relativeY) < 1, 'relativeY is 0');
+      harness.assert(Math.abs(rel.distance - 300) < 1, 'distance is 300');
+      harness.assert(
+        Math.abs(rel.horizontalDistance - 300) < 1,
+        'horizontalDistance equals distance in 2D'
+      );
+      harness.assert(rel.dominantAxis === 'x', 'dominant axis is x');
+      harness.assert(rel.reached === false, 'target is not reached');
+      harness.assert(
+        !('shouldMoveRight' in rel) && !('shouldJump' in rel),
+        'no navigation advice fields'
+      );
+
+      const closeRel = harness.getRelativePosition('MyObject', { x: 110, y: 200 });
+      harness.assert(closeRel.reached === true, 'close target is reached');
+
+      const missing = harness.getRelativePosition('MyObject', { name: 'Nothing' });
+      harness.assert(missing === null, 'missing target gives null');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  });
+
+  it('probes controls by measuring each key effect against a baseline', async () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame({
+      layouts: [createSceneDataWithInitialPlayerInstance('Scene 1')],
+    });
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const probes = await harness.probeControls('Player', ['Right', 'Left'], {
+        frames: 30,
+      });
+      harness.assert(!!probes.baseline, 'Baseline was measured');
+      harness.assert(!!probes.keys.Right && !!probes.keys.Left, 'Both keys were measured');
+      // The player free-falls in this scene: the fall affects the baseline
+      // and every key the same way, only dx differs.
+      harness.assert(
+        probes.keys.Right.dx - probes.baseline.dx > 20,
+        'Right moves the player right vs baseline'
+      );
+      harness.assert(
+        probes.keys.Left.dx - probes.baseline.dx < -20,
+        'Left moves the player left vs baseline'
+      );
+      harness.assert(
+        Math.abs(probes.keys.Right.dy - probes.baseline.dy) < 5,
+        'Right does not change the fall'
+      );
+      harness.assert(
+        probes.keys.Right.maxDx >= probes.keys.Right.dx - 1,
+        'Extremes are tracked'
+      );
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    // Each probe (baseline + 2 keys + final cleanup) restarts the scene.
+    const resets = result.eventLog.filter(
+      (event) => event.event === 'sceneReset'
+    );
+    expect(resets.length >= 3).to.be(true);
+  }).timeout(10000);
+
+  it('tracks progress toward a target and detects stalls', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const spawned = harness.spawn('MyObject', 0, 0);
+      await harness.stepFrames(1);
+
+      const tracker = harness.makeProgressTracker(
+        'MyObject',
+        { x: 500, y: 0 },
+        { windowFrames: 10, minProgress: 5, reachRadius: 30 }
+      );
+
+      // Moving toward the target: never stalled.
+      let sawStallWhileMoving = false;
+      for (let i = 0; i < 20; i++) {
+        harness.setObjectPosition(spawned.id, i * 10, 0);
+        await harness.stepFrames(1);
+        const progress = tracker.update();
+        if (progress && progress.stalled) sawStallWhileMoving = true;
+      }
+      harness.assert(!sawStallWhileMoving, 'No stall while progressing');
+
+      // Standing still: a stall is detected after the window.
+      let stalledAfterStop = false;
+      for (let i = 0; i < 15; i++) {
+        await harness.stepFrames(1);
+        const progress = tracker.update();
+        if (progress && progress.stalled) stalledAfterStop = true;
+      }
+      harness.assert(stalledAfterStop, 'Stall detected when not progressing');
+
+      // Reaching the target.
+      harness.setObjectPosition(spawned.id, 495, 0);
+      await harness.stepFrames(1);
+      const finalProgress = tracker.update();
+      harness.assert(!!finalProgress && finalProgress.reached, 'Target reached');
+
+      // reset() forgets the stall history.
+      tracker.reset();
+      const afterReset = tracker.update();
+      harness.assert(!!afterReset && !afterReset.stalled, 'No stall after reset');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+    expect(
+      result.eventLog.some(
+        (event) => event.event === 'stuck' && event.object === 'MyObject'
+      )
+    ).to.be(true);
+  });
+
   it('supports stepUntil with a condition', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(
@@ -445,8 +601,7 @@ describe('gdjs.gameplayTests', () => {
       });
       harness.assert(done === true, 'Condition was reached');
       harness.assert(frames === 10, 'Stepped 10 frames');
-      `,
-      { speedFactor: 10 }
+      `
     );
 
     expect(result.status).to.be('passed');

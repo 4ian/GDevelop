@@ -2,6 +2,7 @@ package org.gdevelop.kotlin.map
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlin.jvm.JvmInline
 
 @Serializable
 data class GeoCoordinate(val longitude: Double, val latitude: Double)
@@ -12,6 +13,31 @@ data class ProjectedPoint(val x: Double, val y: Double)
 @Serializable
 data class ScreenCoordinate(val x: Double, val y: Double)
 
+/** Altitude is retained portably even when a rendering host only supports ground anchors. */
+@Serializable
+enum class GeoElevationMode { GROUND, ABSOLUTE_METERS }
+
+@Serializable
+enum class GeoAnchorVisibility { VISIBLE, HIDDEN }
+
+/**
+ * Target-neutral source of truth for an object attached to the map.
+ *
+ * [coordinate] is never replaced by its projected screen position. Screen offsets and viewport
+ * culling use CSS pixels; hosts that cannot render elevation project the longitude/latitude at
+ * ground level while preserving [altitudeMeters] for a future capable host.
+ */
+@Serializable
+data class GeoAnchor(
+    val coordinate: GeoCoordinate,
+    val altitudeMeters: Double = 0.0,
+    val elevationMode: GeoElevationMode = GeoElevationMode.GROUND,
+    val screenOffset: ScreenCoordinate = ScreenCoordinate(0.0, 0.0),
+    val visibility: GeoAnchorVisibility = GeoAnchorVisibility.VISIBLE,
+    val minimumZoom: Double? = null,
+    val maximumZoom: Double? = null,
+)
+
 @Serializable
 data class MapCameraState(
     val center: GeoCoordinate,
@@ -21,12 +47,15 @@ data class MapCameraState(
 )
 
 @Serializable
+@JvmInline
 value class MapSourceId(val value: String)
 
 @Serializable
+@JvmInline
 value class MapLayerId(val value: String)
 
 @Serializable
+@JvmInline
 value class MapOverlayId(val value: String)
 
 @Serializable

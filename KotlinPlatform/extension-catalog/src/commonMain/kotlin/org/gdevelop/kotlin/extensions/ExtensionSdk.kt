@@ -1,6 +1,7 @@
 package org.gdevelop.kotlin.extensions
 
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 @Serializable
 data class ExtensionIdentity(val namespace: String, val version: String, val origin: String)
@@ -10,6 +11,7 @@ data class ParameterDescriptor(val name: String, val type: String)
 
 /** A stable identifier for a facility that must be supplied by a runtime host. */
 @Serializable
+@JvmInline
 value class RuntimeCapabilityId(val value: String)
 
 object RuntimeCapabilities {

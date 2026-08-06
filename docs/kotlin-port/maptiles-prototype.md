@@ -60,6 +60,39 @@ Supported source protocols, authentication, CORS policy, browser versions, and
 the exact MapLibre version are fixture inputs, not implicit promises. The lock
 file version and browser/GPU environment must be captured with every result.
 
+### Overlay coordinate and frame conventions
+
+The browser adapter owns three absolute layers in one container: MapLibre at
+z-index 0, a transparent GDevelop/Pixi-compatible canvas at z-index 1, and an
+optional DOM control layer at z-index 2. Overlay positions and sizes are CSS
+pixels measured from the container's top-left (positive x rightward, positive y
+downward). The canvas backing store is resized to CSS size multiplied by the
+current device-pixel ratio; DPR never changes logical object coordinates.
+
+Longitude/latitude remains the authoritative geo-anchor state. Projection
+produces only a transient overlay position, to which a CSS-pixel screen offset
+is added. Objects are culled against the viewport after projection and hidden
+outside their inclusive minimum/maximum zoom range. Altitude and elevation mode
+are retained in the portable anchor, but this first MapLibre adapter projects
+them at ground level because terrain/elevation is outside the supported slice.
+
+Each serialized frame is ordered as: MapLibre event delivery, event-sheet
+execution, projection and visibility/culling, animation update, then overlay
+rendering. Animation-only frames use the last committed event-sheet state and
+repeat projection before animation. The transparent canvas has `pointer-events:
+none`; a root capture listener hit-tests interactive overlay bounds. It stops a
+pointer event only when the overlay handler consumes the hit, so unhandled input
+continues to the MapLibre canvas.
+
+Coordinates are normalized to the conventional longitude interval by the
+application before becoming authoritative state. Projection uses that exact
+longitude and MapLibre's nearest displayed world copy. The adapter does not
+rewrite an anchor when crossing the antimeridian: `179` and `-179` remain
+distinct stored values, while their screen positions may become adjacent when
+world wrapping displays them together. Bounds spanning the antimeridian must
+therefore be split or explicitly unwrapped by the caller; the overlay adapter
+does not infer wrap direction.
+
 ## Not `Extensions/TileMap/`
 
 **Confirmed.** [`Extensions/TileMap/`](../../Extensions/TileMap/) implements

@@ -14,6 +14,8 @@ import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { Column } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
+import ConsoleIcon from '../UI/CustomSvgIcons/Console';
 import {
   type GameplayTestResult,
   type GameplayTestScope,
@@ -123,7 +125,9 @@ const GameplayTestEditor: React.ComponentType<{
     );
 
     const renderCodeEditor = () => (
-      <Column expand noMargin>
+      // `overflow: hidden` + `minWidth: 0` so the code editor can never grow
+      // past the available width (notably on small screens).
+      <Column expand noMargin noOverflowParent>
         <FullSizeMeasurer>
           {({ width, height }) => (
             <CodeEditor
@@ -172,11 +176,17 @@ const GameplayTestEditor: React.ComponentType<{
         {
           value: 'test-properties',
           label: <Trans>Properties</Trans>,
+          getIcon: ({ color, fontSize }) => (
+            <EditIcon color={color} fontSize={fontSize} />
+          ),
           renderEditor: renderProperties,
         },
         {
           value: 'test-code',
           label: <Trans>Code</Trans>,
+          getIcon: ({ color, fontSize }) => (
+            <ConsoleIcon color={color} fontSize={fontSize} />
+          ),
           renderEditor: renderCodeEditor,
         },
       ];

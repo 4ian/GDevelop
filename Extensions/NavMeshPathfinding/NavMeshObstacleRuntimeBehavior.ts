@@ -48,6 +48,7 @@ namespace gdjs {
       walkableRadius: 1,
     };
     walkableRadius: float = -1;
+    stairHeightMax: float = 20;
     timeSinceLastNavMeshLastRebuild: float = 1;
     isNavMeshDirty = true;
     isFirstFrame = true;
@@ -60,6 +61,7 @@ namespace gdjs {
       this.navMeshConfig.ch = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
+      this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableRadius = sharedData.walkableRadius;
     }
 
@@ -138,6 +140,17 @@ namespace gdjs {
         ? (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
           this.navMeshConfig.cs
         : 0;
+      const walkableClimbMin =
+        this.navMeshConfig.walkableSlopeAngle &&
+        this.navMeshConfig.walkableSlopeAngle > 40
+          ? 2
+          : 1;
+      this.navMeshConfig.walkableClimb = this.navMeshConfig.ch
+        ? Math.max(
+            walkableClimbMin,
+            this.stairHeightMax / this.navMeshConfig.ch
+          )
+        : walkableClimbMin;
 
       const result = RecastNav.generateSoloNavMesh(
         positions,

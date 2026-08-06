@@ -586,7 +586,11 @@ camera command mapping, resize, and stable error translation. Browser evidence
 must remain independent of live services; future automation uses a local fixed
 style and fixture tiles, never live network tiles as an oracle.
 
-Ledger status is `partial` for this explicitly bounded Kotlin/JS experiment and
-`incompatible` for JVM/headless rendering, which returns an unsupported-capability
-diagnostic. This is not evidence for general GDevelop MapTiles behavior, broad
-GDJS compatibility, or cross-target compatibility.
+Ledger status remains `planned` for conformance of this explicitly bounded,
+implemented Kotlin/JS experiment: source, fixtures, and tests are checked in,
+but no dated, revision-pinned execution report meeting this roadmap's evidence
+record is checked in. JVM/headless rendering is deliberately unsupported by the
+experiment; the checked-in diagnostic fixture is a test subject, not by itself
+an executed incompatibility report. This is not evidence for general GDevelop
+MapTiles behavior, Kotlin/JS runtime compatibility, broad GDJS compatibility, or
+cross-target compatibility.

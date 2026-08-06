@@ -491,7 +491,7 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   });
 
-  it('probes controls by measuring each key effect against a baseline', async () => {
+  it('resets the scene and probes controls, measuring each key effect against a baseline', async () => {
     const runtimeGame = gdjs.getPixiRuntimeGame({
       layouts: [createSceneDataWithInitialPlayerInstance('Scene 1')],
     });
@@ -499,7 +499,7 @@ describe('gdjs.gameplayTests', () => {
       runtimeGame,
       `
       await harness.goToScene('Scene 1');
-      const probes = await harness.probeControls('Player', ['Right', 'Left'], {
+      const probes = await harness.resetSceneAndProbeControls('Player', ['Right', 'Left'], {
         frames: 30,
       });
       harness.assert(!!probes.baseline, 'Baseline was measured');

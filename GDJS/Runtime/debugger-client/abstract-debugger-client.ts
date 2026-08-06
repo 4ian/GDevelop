@@ -1,6 +1,28 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
+  /** The debugger commands ignored while a gameplay test is running (they
+   * would mutate the game state or stepping the test harness owns). */
+  const DEBUGGER_COMMANDS_MUTATING_GAME_STATE = new Set([
+    'play',
+    'pause',
+    'set',
+    'call',
+    'hotReload',
+    'hotReloadObjects',
+    'hotReloadLayers',
+    'hotReloadAllInstances',
+    'hardReload',
+    'setBackgroundColor',
+    'updateInstances',
+    'addInstances',
+    'deleteSelection',
+    'dragNewInstance',
+    'cancelDragNewInstance',
+    'switchForInGameEdition',
+    'updateInnerArea',
+  ]);
+
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -243,6 +265,30 @@ namespace gdjs {
       if (!data || !data.command) {
         // Not a command that's meant to be handled by the debugger, return silently to
         // avoid polluting the console.
+        return;
+      }
+
+      // While a gameplay test runs, the harness owns the game stepping and
+      // state: ignore any command mutating them (an unpause would make the
+      // main loop step in parallel, a hot-reload would reset instances
+      // mid-test). `gameplayTest.stop` and read-only commands stay allowed.
+      if (
+        gdjs.gameplayTests &&
+        gdjs.gameplayTests.isGameplayTestRunning() &&
+        DEBUGGER_COMMANDS_MUTATING_GAME_STATE.has(data.command)
+      ) {
+        logger.warn(
+          `Ignored debugger command "${data.command}" while a gameplay test is running.`
+        );
+        this._sendMessage(
+          circularSafeStringify({
+            command: 'commandIgnored',
+            payload: {
+              ignoredCommand: data.command,
+              reason: 'gameplay-test-running',
+            },
+          })
+        );
         return;
       }
 

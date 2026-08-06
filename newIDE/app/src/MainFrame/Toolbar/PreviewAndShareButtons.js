@@ -11,6 +11,7 @@ import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
@@ -50,6 +51,9 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
   }: PreviewAndShareButtonsProps) {
     const preferences = React.useContext(PreferencesContext);
     const { isMobile } = useResponsiveWindowSize();
+    // Launching or hot-reloading a preview while a gameplay test runs would
+    // interfere with it (the game also ignores these commands as a backstop).
+    const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
 
     const previewBuildMenuTemplate = React.useCallback(
       (i18n: I18nType) =>
@@ -188,7 +192,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           onClick={
             hasPreviewsRunning ? onHotReloadPreview : onPreviewWithoutHotReload
           }
-          disabled={!isPreviewEnabled}
+          disabled={!isPreviewEnabled || isGameplayTestRunInProgress}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={
             !isMobile ? (

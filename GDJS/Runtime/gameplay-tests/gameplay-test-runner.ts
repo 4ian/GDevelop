@@ -151,11 +151,10 @@ namespace gdjs {
       };
 
     /**
-     * The position of a target relative to a reference object: pure
-     * geometry, no navigation advice. How to move toward the target
-     * (which keys, when to jump...) is up to the test script - see
-     * `probeControls` to discover the controls and `makeProgressTracker`
-     * to detect a lack of progress.
+     * The position of a target relative to a reference object (2D and 3D).
+     * How to move toward the target (which keys, when to jump...) is up to
+     * the test script - see `resetSceneAndProbeControls` to discover the
+     * controls and `makeProgressTracker` to detect a lack of progress.
      */
     export type GameplayTestRelativePosition = {
       relativeX: float;
@@ -1073,7 +1072,8 @@ namespace gdjs {
       /**
        * Check if the straight segment between the first instance of
        * `referenceObjectName` and the first instance of `targetObjectName`
-       * is clear of the given blocker objects (2D hitboxes).
+       * is clear of the given blocker objects. 2D ONLY: the test uses the
+       * 2D hitboxes in the X/Y plane and ignores Z.
        */
       hasLineOfSight(
         referenceObjectName: string,
@@ -1242,11 +1242,11 @@ namespace gdjs {
 
       /**
        * Get the position of a target (an object or a position) relative to
-       * the first instance of `referenceObjectName`: pure geometry, no
-       * navigation advice. Deciding how to move toward the target with the
-       * game's actual controls is the job of the test script (use
-       * `probeControls` to discover the controls, `makeProgressTracker` to
-       * detect a lack of progress).
+       * the first instance of `referenceObjectName` (2D and 3D). Deciding
+       * how to move toward the target with the game's actual controls is
+       * the job of the test script (use `resetSceneAndProbeControls` to
+       * discover the controls, `makeProgressTracker` to detect a lack of
+       * progress).
        */
       getRelativePosition(
         referenceObjectName: string,
@@ -1317,16 +1317,17 @@ namespace gdjs {
 
       /**
        * Measure what each key actually does to the first instance of
-       * `objectName`: for the baseline (no key) and then each key, the
+       * `objectName` (2D and 3D: dz is measured when the object has a Z
+       * coordinate): for the baseline (no key) and then each key, the
        * scene is restarted, the key held for `frames` frames, and the
        * displacement (net + extremes: a jump shows as a negative `minDy`
        * even if the object lands back) and yaw change are measured.
        * Compare each key's result to `baseline` (gravity or idle drift
-       * affects both). The scene is restarted again at the end, so run
-       * probes BEFORE the scenario of the test. An entry is null if the
+       * affects both). The scene is restarted again at the end, so call
+       * this BEFORE the scenario of the test. An entry is null if the
        * instance disappeared during that probe.
        */
-      async probeControls(
+      async resetSceneAndProbeControls(
         objectName: string,
         keyNames: Array<string>,
         options?: { frames?: integer }
@@ -1419,13 +1420,14 @@ namespace gdjs {
 
       /**
        * Make a tracker measuring the progress of the first instance of
-       * `referenceObjectName` toward a target. Call `update()` regularly
-       * (e.g. once per loop iteration): it reports the current `distance`,
-       * whether the target is `reached`, and whether progress `stalled`
-       * (distance shrank by less than `minProgress` over the last
-       * `windowFrames` frames - time to try an escape strategy). The first
-       * update of a stall also records a `stuck` event in the event log.
-       * Call `reset()` after switching to another target.
+       * `referenceObjectName` toward a target (the distance is 3D when the
+       * object has a Z coordinate). Call `update()` regularly (e.g. once
+       * per loop iteration): it reports the current `distance`, whether
+       * the target is `reached`, and whether progress `stalled` (distance
+       * shrank by less than `minProgress` over the last `windowFrames`
+       * frames - time to try an escape strategy). The first update of a
+       * stall also records a `stuck` event in the event log. Call
+       * `reset()` after switching to another target.
        */
       makeProgressTracker(
         referenceObjectName: string,
@@ -1495,11 +1497,13 @@ namespace gdjs {
 
       /**
        * Turn the first instance of `referenceObjectName` toward the target,
-       * by applying mouse movements (FPS-style) until it is aiming at it.
-       * Returns true when aimed (within a few degrees), false if it could
-       * not aim after many frames.
+       * by applying mouse movement deltas (FPS/pointer-lock style, yaw and
+       * pitch in 3D) until it is aiming at it. The mouse sensitivity of the
+       * game is measured and adapted to live. Returns true when aimed
+       * (within a few degrees), false if it could not aim after many
+       * frames.
        */
-      async lookToward(
+      async lookTowardWithMouseDelta(
         referenceObjectName: string,
         target:
           | { name: string; id?: integer }
@@ -1885,6 +1889,13 @@ namespace gdjs {
         currentlyRunningHarness.requestStop();
       }
     };
+
+    /**
+     * True while a gameplay test is running (the harness owns the game
+     * stepping: external state mutations must be avoided).
+     */
+    export const isGameplayTestRunning = (): boolean =>
+      !!currentlyRunningHarness;
 
     /**
      * Run a gameplay test script against the game and return its result.

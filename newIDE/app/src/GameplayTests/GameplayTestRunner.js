@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import {
   type PreviewDebuggerServer,
   type PreviewLauncherInterface,
@@ -103,6 +104,32 @@ type BatchStopController = {|
   abortBootWait: () => void,
 |};
 let currentBatchStopController: BatchStopController | null = null;
+
+// Whether a gameplay test batch is currently running (exporting, booting
+// or running tests). Launching or hot-reloading previews meanwhile would
+// interfere with the run: use `useIsGameplayTestRunInProgress` to disable
+// these actions in the UI (the game also ignores state-mutating debugger
+// commands while a test runs, as a backstop).
+let isRunInProgress = false;
+const runInProgressListeners: Set<() => void> = new Set();
+const setRunInProgress = (running: boolean) => {
+  if (isRunInProgress === running) return;
+  isRunInProgress = running;
+  runInProgressListeners.forEach(listener => listener());
+};
+
+export const useIsGameplayTestRunInProgress = (): boolean => {
+  const [running, setRunning] = React.useState(isRunInProgress);
+  React.useEffect(() => {
+    const listener = () => setRunning(isRunInProgress);
+    runInProgressListeners.add(listener);
+    listener();
+    return () => {
+      runInProgressListeners.delete(listener);
+    };
+  }, []);
+  return running;
+};
 
 const makeResultWithoutRun = (
   testName: string,
@@ -360,6 +387,7 @@ export const runGameplayTests = async ({
         abortBootWait: () => {},
       };
       currentBatchStopController = stopController;
+      setRunInProgress(true);
       let anyTestRan = false;
 
       // Close any frame left open by a previous run, so the new preview
@@ -527,6 +555,7 @@ export const runGameplayTests = async ({
         }
       } finally {
         currentBatchStopController = null;
+        setRunInProgress(false);
         // When at least one test ran, the frame stays open (showing the
         // frozen game and the outcome of the run) until its close button
         // is used or another run starts. Otherwise (the game could not

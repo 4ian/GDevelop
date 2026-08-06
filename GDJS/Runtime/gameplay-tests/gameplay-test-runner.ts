@@ -15,10 +15,47 @@ namespace gdjs {
    * @category Gameplay tests
    */
   export namespace gameplayTests {
+    /**
+     * One readable state entry, derived by the editor from an extension's own
+     * declarations: `name` is the event-sheet name of a condition or
+     * expression ('IsOnFloor', 'CurrentSpeed', 'PropertyHealth'...) and
+     * `functionName` the runtime method evaluating it.
+     */
+    export type GameplayTestStateInspectorEntry = {
+      name: string;
+      functionName: string;
+      kind: 'boolean' | 'number' | 'string';
+    };
+
+    /**
+     * The state inspectors for the behavior and object types used in the
+     * project, computed by the editor from the extensions metadata (single
+     * source of truth) and sent with the run payload.
+     */
+    export type GameplayTestStateInspectors = {
+      behaviors: {
+        [behaviorType: string]: Array<GameplayTestStateInspectorEntry>;
+      };
+      objects: {
+        [objectType: string]: Array<GameplayTestStateInspectorEntry>;
+      };
+    };
+
+    /**
+     * The state of an object or behavior: its conditions and expressions,
+     * evaluated at snapshot time, under the exact names used in the game's
+     * events. Reading an unknown name throws with the list of available ones.
+     */
+    export type GameplayTestEvaluatedState = {
+      [conditionOrExpressionName: string]: boolean | number | string;
+    };
+
     export type GameplayTestRunPayload = {
       testName: string;
       /** The body of `async (harness) => { ... }`. */
       source: string;
+      /** Readable state to evaluate on object/behavior snapshots. */
+      stateInspectors?: GameplayTestStateInspectors;
       /** Wall-clock timeout for the whole run. Default: 30000. */
       timeoutMs?: number;
       /** Maximum number of frames stepped. Default: 20000. */
@@ -80,7 +117,19 @@ namespace gdjs {
       text?: string;
       opacity?: float;
       variables: Array<Object>;
-      behaviors: { [behaviorName: string]: Object };
+      /** The object's own conditions/expressions, evaluated (see
+       * `GameplayTestEvaluatedState`). */
+      state: GameplayTestEvaluatedState;
+      behaviors: {
+        [behaviorName: string]: {
+          act: boolean;
+          /** The behavior's conditions/expressions, evaluated: current state
+           * and configuration, under their event-sheet names
+           * (e.g. `behaviors.PlatformerObject.state.IsOnFloor`). Prefer these
+           * over inferring state from coordinates. */
+          state: GameplayTestEvaluatedState;
+        };
+      };
       children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
     };
 
@@ -157,6 +206,82 @@ namespace gdjs {
     const MAX_ERRORS = 20;
     const SCREENSHOT_MAX_SIZE = 512;
     const DEFAULT_FRAME_DT_MS = 1000 / 60;
+
+    // Keys that must never throw on the self-describing state, so language
+    // internals (JSON.stringify, await inspection, string coercion...) keep
+    // working transparently.
+    const STATE_SAFE_INSPECTION_KEYS: { [key: string]: boolean } = {
+      toJSON: true,
+      then: true,
+      constructor: true,
+      hasOwnProperty: true,
+      toString: true,
+      valueOf: true,
+      inspect: true,
+    };
+
+    /**
+     * Wrap an evaluated state so reading an unknown name (a typo, a wrong
+     * casing, a hallucinated key) throws immediately with the list of
+     * available names, instead of silently returning undefined.
+     */
+    const makeSelfDescribingState = (
+      state: GameplayTestEvaluatedState,
+      ownerDescription: string
+    ): GameplayTestEvaluatedState => {
+      return new Proxy(state, {
+        get(target, key) {
+          if (
+            typeof key === 'string' &&
+            !(key in target) &&
+            !STATE_SAFE_INSPECTION_KEYS[key]
+          ) {
+            const availableKeys = Object.keys(target);
+            throw new Error(
+              `Unknown state "${key}" on ${ownerDescription}. Available: ` +
+                (availableKeys.length > 0
+                  ? availableKeys.join(', ')
+                  : '(no state for this ' + ownerDescription + ')') +
+                '.'
+            );
+          }
+          // @ts-ignore - keys are indexable.
+          return target[key];
+        },
+      });
+    };
+
+    /**
+     * Evaluate the state inspector entries on an object or behavior: each
+     * entry calls the same public getter the game's events call. An entry
+     * must never break a snapshot: mismatching or throwing ones are skipped.
+     */
+    const evaluateStateInspector = (
+      target: any,
+      entries: Array<GameplayTestStateInspectorEntry> | null,
+      ownerDescription: string
+    ): GameplayTestEvaluatedState => {
+      const state: GameplayTestEvaluatedState = {};
+      if (entries) {
+        for (const entry of entries) {
+          const method = target[entry.functionName];
+          if (typeof method !== 'function') continue;
+          try {
+            const value = method.call(target);
+            if (
+              typeof value === 'boolean' ||
+              typeof value === 'number' ||
+              typeof value === 'string'
+            ) {
+              state[entry.name] = value;
+            }
+          } catch (error) {
+            // Skip the entry: an inspector must never break a snapshot.
+          }
+        }
+      }
+      return makeSelfDescribingState(state, ownerDescription);
+    };
 
     class GameplayTestAssertionError extends Error {
       isGameplayTestAssertionError = true;
@@ -736,13 +861,33 @@ namespace gdjs {
         includeChildren: boolean
       ): GameplayTestObjectSnapshot {
         const anyObject = object as any;
-        const behaviors: { [behaviorName: string]: Object } = {};
+        const stateInspectors = this._payload.stateInspectors || null;
+        const behaviors: {
+          [behaviorName: string]: {
+            act: boolean;
+            state: GameplayTestEvaluatedState;
+          };
+        } = {};
         // Access the protected list of behaviors of the object.
         const objectBehaviors =
           anyObject._behaviors as Array<gdjs.RuntimeBehavior>;
         for (const behavior of objectBehaviors) {
-          behaviors[behavior.getName()] = behavior.getNetworkSyncData({});
+          behaviors[behavior.getName()] = {
+            act: behavior.activated(),
+            state: evaluateStateInspector(
+              behavior,
+              (stateInspectors &&
+                stateInspectors.behaviors[(behavior as any).type]) ||
+                null,
+              `the behavior "${behavior.getName()}"`
+            ),
+          };
         }
+        const objectState = evaluateStateInspector(
+          object,
+          (stateInspectors && stateInspectors.objects[object.type]) || null,
+          `the object "${object.getName()}"`
+        );
 
         const snapshot: GameplayTestObjectSnapshot = {
           id: object.id,
@@ -757,6 +902,7 @@ namespace gdjs {
           layer: object.getLayer(),
           hidden: object.isHidden(),
           variables: object.getVariables().getNetworkSyncData({}),
+          state: objectState,
           behaviors,
         };
         if (typeof anyObject.getZ === 'function') {
@@ -957,6 +1103,52 @@ namespace gdjs {
         if (!this._watchedObjectNames.includes(objectName)) {
           this._watchedObjectNames.push(objectName);
         }
+      }
+
+      /**
+       * LAST RESORT escape hatch: the raw internal data of a behavior
+       * (minified field names, unstable across releases). Prefer the readable
+       * `state` of snapshots (`getObjects(...)[i].behaviors[name].state`).
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      getRawBehaviorData(
+        objectIdOrName: integer | string,
+        behaviorName: string
+      ): Object {
+        const currentScene = this._getCurrentScene();
+        let object: gdjs.RuntimeObject | null = null;
+        if (typeof objectIdOrName === 'number') {
+          for (const candidate of currentScene.getAdhocListOfAllInstances()) {
+            if (candidate.id === objectIdOrName) {
+              object = candidate;
+              break;
+            }
+          }
+          if (!object) {
+            throw new Error(`No instance with id ${objectIdOrName} found.`);
+          }
+        } else {
+          object = currentScene.getObjects(objectIdOrName)?.[0] || null;
+          if (!object) {
+            throw new Error(
+              `No instance of "${objectIdOrName}" found in the scene.`
+            );
+          }
+        }
+        const behavior = object.getBehavior(behaviorName);
+        if (!behavior) {
+          const anyObject = object as any;
+          const behaviorNames = (
+            anyObject._behaviors as Array<gdjs.RuntimeBehavior>
+          ).map((objectBehavior) => objectBehavior.getName());
+          throw new Error(
+            `No behavior "${behaviorName}" on "${object.getName()}". Available behaviors: ` +
+              (behaviorNames.join(', ') || '(none)') +
+              '.'
+          );
+        }
+        return behavior.getNetworkSyncData({});
       }
 
       // NAVIGATION INTENT:

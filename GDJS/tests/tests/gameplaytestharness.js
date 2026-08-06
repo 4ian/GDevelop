@@ -35,6 +35,59 @@ describe('gdjs.gameplayTests', () => {
       layouts: [createSceneData('Scene 1'), createSceneData('Scene 2')],
     });
 
+  const createSceneDataWithPlatformerObject = (name) => {
+    const sceneData = createSceneData(name);
+    sceneData.objects.push({
+      name: 'Player',
+      type: '',
+      behaviors: [
+        {
+          type: 'PlatformBehavior::PlatformerObjectBehavior',
+          name: 'PlatformerObject',
+          gravity: 1500,
+          maxFallingSpeed: 1500,
+          acceleration: 500,
+          deceleration: 1500,
+          maxSpeed: 500,
+          jumpSpeed: 900,
+          canGrabPlatforms: false,
+          ignoreDefaultControls: false,
+          slopeMaxAngle: 60,
+          jumpSustainTime: 0.2,
+          useLegacyTrajectory: false,
+          useRepeatedJump: false,
+        },
+      ],
+      variables: [],
+      effects: [],
+    });
+    return sceneData;
+  };
+
+  // The state inspectors as the editor would derive them from the extensions
+  // metadata (see `GameplayTestStateInspectors.js` in the editor).
+  const platformerStateInspectors = {
+    behaviors: {
+      'PlatformBehavior::PlatformerObjectBehavior': [
+        { name: 'IsOnFloor', functionName: 'isOnFloor', kind: 'boolean' },
+        { name: 'IsJumping', functionName: 'isJumping', kind: 'boolean' },
+        { name: 'IsFalling', functionName: 'isFalling', kind: 'boolean' },
+        { name: 'CanJump', functionName: 'canJump', kind: 'boolean' },
+        {
+          name: 'CurrentFallSpeed',
+          functionName: 'getCurrentFallSpeed',
+          kind: 'number',
+        },
+        { name: 'Gravity', functionName: 'getGravity', kind: 'number' },
+        // A stale entry (e.g. an outdated editor): silently skipped.
+        { name: 'DoesNotExist', functionName: 'doesNotExist', kind: 'number' },
+      ],
+    },
+    objects: {
+      '': [{ name: 'X', functionName: 'getX', kind: 'number' }],
+    },
+  };
+
   /**
    * @param {gdjs.RuntimeGame} runtimeGame
    * @param {string} source
@@ -148,6 +201,94 @@ describe('gdjs.gameplayTests', () => {
     expect(result.framesExecuted).to.be(0);
     expect(result.errors[0]).to.contain('did nothing');
   });
+
+  it('evaluates readable object and behavior state in snapshots', async () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame({
+      layouts: [createSceneDataWithPlatformerObject('Scene 1')],
+    });
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const player = harness.spawn('Player', 100, 50);
+      await harness.stepFrames(10);
+
+      const snapshot = harness.getObjects('Player')[0];
+      const state = snapshot.behaviors.PlatformerObject.state;
+      harness.assert(state.IsFalling === true, 'Falling');
+      harness.assert(state.IsOnFloor === false, 'Not on floor');
+      harness.assert(state.CurrentFallSpeed > 0, 'Fall speed > 0');
+      harness.assert(state.Gravity === 1500, 'Configured gravity');
+      harness.assert(!('DoesNotExist' in state), 'Stale entry skipped');
+      harness.assert(
+        snapshot.behaviors.PlatformerObject.act === true,
+        'Behavior activated'
+      );
+      harness.assert(snapshot.state.X === snapshot.x, 'Object-level state');
+      console.log(JSON.stringify(state));
+      `,
+      { stateInspectors: platformerStateInspectors }
+    );
+
+    expect(result.status).to.be('passed');
+    // The state serializes transparently (through the self-describing proxy).
+    expect(
+      result.consoleLogs.some(
+        (log) => log.message.indexOf('"IsFalling":true') !== -1
+      )
+    ).to.be(true);
+  }).timeout(10000);
+
+  it('throws with the available names when reading an unknown state', async () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame({
+      layouts: [createSceneDataWithPlatformerObject('Scene 1')],
+    });
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('Player', 100, 50);
+      await harness.stepFrames(2);
+      // Wrong casing: must throw with the list of available names.
+      const isOnFloor =
+        harness.getObjects('Player')[0].behaviors.PlatformerObject.state
+          .isOnFloor;
+      `,
+      { stateInspectors: platformerStateInspectors }
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors[0]).to.contain('Unknown state "isOnFloor"');
+    expect(result.errors[0]).to.contain('IsOnFloor');
+  }).timeout(10000);
+
+  it('gives the raw behavior data as a last-resort escape hatch', async () => {
+    const runtimeGame = gdjs.getPixiRuntimeGame({
+      layouts: [createSceneDataWithPlatformerObject('Scene 1')],
+    });
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('Player', 100, 50);
+      await harness.stepFrames(2);
+      const rawData = harness.getRawBehaviorData('Player', 'PlatformerObject');
+      harness.assert(!!rawData.props, 'Raw sync data returned');
+      try {
+        harness.getRawBehaviorData('Player', 'Nope');
+        harness.fail('Should have thrown');
+      } catch (error) {
+        harness.assert(
+          error.message.indexOf('PlatformerObject') !== -1,
+          'Unknown behavior error lists available behaviors'
+        );
+      }
+      `,
+      { stateInspectors: platformerStateInspectors }
+    );
+
+    expect(result.status).to.be('passed');
+  }).timeout(10000);
 
   it('stops with a timeout when the maximum frames count is reached', async () => {
     const runtimeGame = makeRuntimeGame();

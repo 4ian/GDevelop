@@ -4,6 +4,7 @@ import org.gdevelop.kotlin.diagnostics.Diagnostic
 import org.gdevelop.kotlin.diagnostics.ResultWithDiagnostics
 import org.gdevelop.kotlin.diagnostics.Severity
 import org.gdevelop.kotlin.extensions.ExtensionCatalog
+import org.gdevelop.kotlin.extensions.ParameterDescriptor
 import org.gdevelop.kotlin.project.EventDeclaration
 import org.gdevelop.kotlin.project.OperationDeclaration
 import org.gdevelop.kotlin.project.ProjectDocument
@@ -48,7 +49,16 @@ class ProjectLowerer(private val catalog: ExtensionCatalog) {
                 ConditionIr.CompareNumber(operation.parameters[0], operation.parameters[1], operation.parameters[2], it)
             } ?: invalidNumber(operation, diagnostics, 3)
         }
-        else -> unsupported(operation, diagnostics, "condition")
+        else -> {
+            val condition = catalog.resolveCondition(operation.type)
+            if (condition == null) unsupported(operation, diagnostics, "condition")
+            else if (!validateParameters(operation, condition.descriptor.parameters, diagnostics)) null
+            else ConditionIr.HostOperation(ExtensionHostOperation(
+                condition.descriptor.type, condition.descriptor.runtimeEntry, condition.identity,
+                operation.parameters, condition.descriptor.parameters.map { it.name },
+                condition.descriptor.requiredCapabilities, operation.location,
+            ))
+        }
     }
 
     private fun lowerAction(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>): ActionIr? = when (operation.type) {
@@ -62,10 +72,39 @@ class ProjectLowerer(private val catalog: ExtensionCatalog) {
         else -> {
             val action = catalog.resolveAction(operation.type)
             if (action == null) unsupported(operation, diagnostics, "action")
-            else if (operation.parameters.size != action.descriptor.parameters.size) {
-                invalidParameters(operation, diagnostics, action.descriptor.parameters.size)
-            } else ActionIr.ExtensionCall(operation.type, operation.parameters)
+            else if (!validateParameters(operation, action.descriptor.parameters, diagnostics)) null
+            else if (action.descriptor.requiredCapabilities.isNotEmpty()) ActionIr.HostOperation(ExtensionHostOperation(
+                action.descriptor.type, action.descriptor.runtimeEntry, action.identity, operation.parameters,
+                action.descriptor.parameters.map { it.name }, action.descriptor.requiredCapabilities, operation.location,
+            )) else ActionIr.ExtensionCall(operation.type, operation.parameters)
         }
+    }
+
+    private fun validateParameters(
+        operation: OperationDeclaration,
+        descriptors: List<ParameterDescriptor>,
+        diagnostics: MutableList<Diagnostic>,
+    ): Boolean {
+        if (operation.parameters.size != descriptors.size) {
+            invalidParameters(operation, diagnostics, descriptors.size)
+            return false
+        }
+        operation.parameters.zip(descriptors).forEachIndexed { index, (value, descriptor) ->
+            val valid = when (descriptor.type) {
+                "number" -> value.toDoubleOrNull() != null
+                "boolean" -> value == "true" || value == "false"
+                "variable", "string", "layer", "identifier" -> value.isNotBlank()
+                else -> false
+            }
+            if (!valid) {
+                diagnostics += Diagnostic(
+                    "GDKP_SEM_PARAMETER_TYPE", Severity.ERROR,
+                    "Parameter $index (${descriptor.name}) must be ${descriptor.type}", operation.location,
+                )
+                return false
+            }
+        }
+        return true
     }
 
     private fun unsupported(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>, kind: String): Nothing? {

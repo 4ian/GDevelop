@@ -20,6 +20,7 @@ include(
     ":normalized-ir",
     ":runtime-state",
     ":map-runtime",
+    ":maptiles-extension",
     ":maplibre-js-host",
     ":example-extension",
     ":jvm-cli",

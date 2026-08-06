@@ -49,6 +49,8 @@ namespace gdjs {
     };
     walkableRadius: float = -1;
     stairHeightMax: float = 20;
+    speedScaleY: float = 1;
+    inverseSpeedScaleY: float = 1;
     timeSinceLastNavMeshLastRebuild: float = 1;
     isNavMeshDirty = true;
     isFirstFrame = true;
@@ -63,6 +65,8 @@ namespace gdjs {
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableRadius = sharedData.walkableRadius;
+      this.speedScaleY = sharedData.speedScaleY;
+      this.inverseSpeedScaleY = 1 / sharedData.speedScaleY;
     }
 
     /**
@@ -127,6 +131,18 @@ namespace gdjs {
         this.addGroundFor2D(positions, indices);
         this.navMeshConfig.walkableClimb = 0;
         this.navMeshConfig.ch = 10;
+      } else {
+        const walkableClimbMin =
+          this.navMeshConfig.walkableSlopeAngle &&
+          this.navMeshConfig.walkableSlopeAngle > 40
+            ? 2
+            : 1;
+        this.navMeshConfig.walkableClimb = this.navMeshConfig.ch
+          ? Math.max(
+              walkableClimbMin,
+              this.stairHeightMax / this.navMeshConfig.ch
+            )
+          : walkableClimbMin;
       }
 
       let characterRadiusMax = 0;
@@ -140,17 +156,6 @@ namespace gdjs {
         ? (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
           this.navMeshConfig.cs
         : 0;
-      const walkableClimbMin =
-        this.navMeshConfig.walkableSlopeAngle &&
-        this.navMeshConfig.walkableSlopeAngle > 40
-          ? 2
-          : 1;
-      this.navMeshConfig.walkableClimb = this.navMeshConfig.ch
-        ? Math.max(
-            walkableClimbMin,
-            this.stairHeightMax / this.navMeshConfig.ch
-          )
-        : walkableClimbMin;
 
       const result = RecastNav.generateSoloNavMesh(
         positions,
@@ -201,9 +206,9 @@ namespace gdjs {
         maxY = Math.max(maxY, y);
       }
       const width = maxX - minX;
-      const height = maxY - minY;
+      const height = (maxY - minY) * this.inverseSpeedScaleY;
       const centerX = (maxX + minX) / 2;
-      const centerY = (maxY + minY) / 2;
+      const centerY = ((maxY + minY) / 2) * this.inverseSpeedScaleY;
 
       console.log('Ground', width, height, centerX, centerY);
 
@@ -258,18 +263,18 @@ namespace gdjs {
           vertexFlags,
           (p1: Point, p2: Point, p3: Point) => {
             // Top
-            positions.push(p1.x, 10, p1.y);
-            positions.push(p2.x, 10, p2.y);
-            positions.push(p3.x, 10, p3.y);
+            positions.push(p1.x, 10, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, 10, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, 10, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 0,
               indicesOffset + 1,
               indicesOffset + 2
             );
             // Bottom
-            positions.push(p1.x, 0, p1.y);
-            positions.push(p2.x, 0, p2.y);
-            positions.push(p3.x, 0, p3.y);
+            positions.push(p1.x, 0, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, 0, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, 0, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 3,
               indicesOffset + 5,
@@ -281,15 +286,15 @@ namespace gdjs {
         for (let index = 0; index < vertices.length; index++) {
           const vertex = vertices[index];
           // Side
-          positions.push(vertex.x, 10, vertex.y);
-          positions.push(vertex.x, 0, vertex.y);
+          positions.push(vertex.x, 10, vertex.y * this.inverseSpeedScaleY);
+          positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
           indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
           indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
           indicesOffset += 2;
         }
         const vertex = vertices[0];
-        positions.push(vertex.x, 10, vertex.y);
-        positions.push(vertex.x, 0, vertex.y);
+        positions.push(vertex.x, 10, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
       }
     }
 

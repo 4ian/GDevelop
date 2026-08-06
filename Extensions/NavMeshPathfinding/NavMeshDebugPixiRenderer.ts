@@ -48,6 +48,7 @@ namespace gdjs {
             rendererObject.fill.alpha = 0.2;
             rendererObject.fill.color = 0x778ee8;
 
+            const speedScaleY = this.obstaclesManager.speedScaleY;
             for (const primitive of primitives) {
               switch (primitive.type) {
                 case 'tris':
@@ -55,21 +56,21 @@ namespace gdjs {
                     const [x0, y0, z0] = primitive.vertices[i];
                     //console.log("y", y0);
                     if (y0 < 15) {
-                      const [x1, y1, z1] = primitive.vertices[i + 1];
-                      const [x2, y2, z2] = primitive.vertices[i + 2];
+                      const [x1, _y1, z1] = primitive.vertices[i + 1];
+                      const [x2, _y2, z2] = primitive.vertices[i + 2];
 
                       const positions: Array<float> = [];
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x0, z0, 0, workingPoint)
+                        layer.applyLayerTransformation(x0, z0 * speedScaleY, 0, workingPoint)
                       );
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x1, z1, 0, workingPoint)
+                        layer.applyLayerTransformation(x1, z1 * speedScaleY, 0, workingPoint)
                       );
                       positions.push.apply(
                         positions,
-                        layer.applyLayerTransformation(x2, z2, 0, workingPoint)
+                        layer.applyLayerTransformation(x2, z2 * speedScaleY, 0, workingPoint)
                       );
                       rendererObject.drawPolygon(positions);
                     }

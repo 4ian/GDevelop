@@ -152,10 +152,10 @@ module.exports = {
           .getOrCreate('radius')
           .setValue(behaviorContent.getChild('radius').getStringValue())
           .setLabel(_('Radius'))
+          .setLabel(_('Use the circle inside the object width and height when left to 0.'))
           .setGroup(_('Collision'))
           .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
-          .setAdvanced(true);
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel());
 
         behaviorProperties
           .getOrCreate('avoidanceSightRange')
@@ -223,6 +223,14 @@ module.exports = {
           if (newValueAsNumber !== newValueAsNumber) return false;
           sharedContent
             .getOrCreateChild('walkableRadius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+        if (propertyName === 'speedScaleY') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('speedScaleY')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -300,6 +308,25 @@ module.exports = {
           .setAdvanced(true)
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
+        sharedProperties
+          .getOrCreate('speedScaleY')
+          .setLabel(_('Y speed scale'))
+          .setDescription(
+            _(
+              'Allow a depth effect for 2D games. Usually set to 0.5 for isometry.'
+            )
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            sharedContent
+              .getChild('speedScaleY')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
         return sharedProperties;
       };
       sharedData.initializeContent = function (sharedContent) {
@@ -308,6 +335,7 @@ module.exports = {
         sharedContent.addChild('slopeMaxAngle').setDoubleValue(50);
         sharedContent.addChild('stairHeightMax').setDoubleValue(20);
         sharedContent.addChild('walkableRadius').setDoubleValue(-1);
+        sharedContent.addChild('speedScaleY').setDoubleValue(1);
       };
 
       const aut = extension

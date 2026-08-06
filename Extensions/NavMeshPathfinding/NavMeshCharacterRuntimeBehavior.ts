@@ -38,8 +38,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -209,7 +208,11 @@ namespace gdjs {
 
       const { success: hasFindDestination, point: destination } =
         navMeshQuery.findClosestPoint(
-          { x, y: z, z: y },
+          {
+            x,
+            y: z,
+            z: this._manager.is3D ? y : y * this._manager.inverseSpeedScaleY,
+          },
           { halfExtents: { x: 100, y: 100, z: 100 } }
         );
       if (!hasFindDestination) {
@@ -260,6 +263,9 @@ namespace gdjs {
           const y = point.y;
           point.y = point.z;
           point.z = y;
+          if (!this._manager.is3D) {
+            point.y *= this._manager.inverseSpeedScaleY;
+          }
         }
         this._path = path;
         console.log('path', this._path);
@@ -272,9 +278,13 @@ namespace gdjs {
       }
 
       const oldX = this.owner.getX();
-      const oldY = this.owner.getY();
+      const oldY = this._manager.is3D
+        ? this.owner.getY()
+        : this.owner.getY() * this._manager.speedScaleY;
       let newX = agent.raw.get_npos(0);
-      let newY = agent.raw.get_npos(2);
+      let newY = this._manager.is3D
+        ? agent.raw.get_npos(2)
+        : agent.raw.get_npos(2) * this._manager.speedScaleY;
       let newZ = agent.raw.get_npos(1);
 
       //console.log("newZ", newZ);
@@ -458,7 +468,11 @@ namespace gdjs {
 
     getNodeY(index: integer): float {
       if (index < this._path.length) {
-        return this._path[index].y;
+        let y = this._path[index].y;
+        if (!this._manager.is3D) {
+          y *= this._manager.inverseSpeedScaleY;
+        }
+        return y;
       }
       return 0;
     }
@@ -497,7 +511,11 @@ namespace gdjs {
         return 0;
       }
       const nextNodeIndex = this.getNextNodeIndex();
-      return this._path[nextNodeIndex].y;
+      let y = this._path[nextNodeIndex].y;
+      if (!this._manager.is3D) {
+        y *= this._manager.inverseSpeedScaleY;
+      }
+      return y;
     }
 
     getNextNodeZ(): float {
@@ -531,7 +549,11 @@ namespace gdjs {
         return 0;
       }
       const previousNodeIndex = this.getPreviousNodeIndex();
-      return this._path[previousNodeIndex].y;
+      let y = this._path[previousNodeIndex].y;
+      if (!this._manager.is3D) {
+        y *= this._manager.inverseSpeedScaleY;
+      }
+      return y;
     }
 
     getLastNodeZ(): float {
@@ -553,7 +575,11 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path[this._path.length - 1].y;
+      let y = this._path[this._path.length - 1].y;
+      if (!this._manager.is3D) {
+        y *= this._manager.inverseSpeedScaleY;
+      }
+      return y;
     }
 
     getDestinationZ(): float {

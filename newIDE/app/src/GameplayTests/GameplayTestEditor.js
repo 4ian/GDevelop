@@ -1,7 +1,11 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { CodeEditor } from '../CodeEditor';
+import EditorBottomTabsSwitcher, {
+  type EditorBottomTab,
+} from '../UI/EditorBottomTabsSwitcher';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorMosaic, {
   type EditorMosaicInterface,
   type EditorMosaicNode,
@@ -10,7 +14,10 @@ import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import Background from '../UI/Background';
 import { Column } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import { type GameplayTestResult } from './GameplayTestRunner';
+import {
+  type GameplayTestResult,
+  type GameplayTestScope,
+} from './GameplayTestRunner';
 import { GameplayTestProperties } from './GameplayTestProperties';
 
 export type GameplayTestEditorInterface = {|
@@ -29,7 +36,7 @@ const initialMosaicEditorNodes: EditorMosaicNode = {
 type Props = {|
   project: gdProject,
   test: gdTest,
-  scope: 'project' | string,
+  scope: GameplayTestScope,
   isRunning: boolean,
   runningFrame: number | null,
   lastResult: GameplayTestResult | null,
@@ -65,6 +72,14 @@ const GameplayTestEditor: React.ComponentType<{
       setDefaultEditorMosaicNode,
     } = React.useContext(PreferencesContext);
     const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
+    const { isMobile } = useResponsiveWindowSize();
+    // On small screens, the editors are shown one at a time, switched with
+    // bottom tabs — the properties (description, run button, last outcome)
+    // by default.
+    const [currentBottomTab, setCurrentBottomTab] = React.useState<
+      'test-properties' | 'test-code'
+    >('test-properties');
+    const { onOpenedEditorsChanged } = props;
     const [, forceUpdateCounter] = React.useState<number>(0);
     const forceUpdate = React.useCallback(() => {
       forceUpdateCounter(count => count + 1);
@@ -72,14 +87,23 @@ const GameplayTestEditor: React.ComponentType<{
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
       togglePropertiesPanel: () => {
+        if (isMobile) {
+          setCurrentBottomTab(currentTab =>
+            currentTab === 'test-properties' ? 'test-code' : 'test-properties'
+          );
+          onOpenedEditorsChanged();
+          return;
+        }
         if (editorMosaicRef.current)
           editorMosaicRef.current.toggleEditor('test-properties', 'right');
       },
       isPropertiesPanelShown: () =>
-        !!editorMosaicRef.current &&
-        editorMosaicRef.current
-          .getOpenedEditorNames()
-          .includes('test-properties'),
+        isMobile
+          ? currentBottomTab === 'test-properties'
+          : !!editorMosaicRef.current &&
+            editorMosaicRef.current
+              .getOpenedEditorNames()
+              .includes('test-properties'),
     }));
 
     const renderProperties = () => (
@@ -140,6 +164,33 @@ const GameplayTestEditor: React.ComponentType<{
         renderEditor: renderProperties,
       },
     };
+
+    if (isMobile) {
+      const bottomTabs: Array<
+        EditorBottomTab<'test-properties' | 'test-code'>
+      > = [
+        {
+          value: 'test-properties',
+          label: <Trans>Properties</Trans>,
+          renderEditor: renderProperties,
+        },
+        {
+          value: 'test-code',
+          label: <Trans>Code</Trans>,
+          renderEditor: renderCodeEditor,
+        },
+      ];
+      return (
+        <EditorBottomTabsSwitcher
+          tabs={bottomTabs}
+          currentTab={currentBottomTab}
+          onChangeTab={newTab => {
+            setCurrentBottomTab(newTab);
+            onOpenedEditorsChanged();
+          }}
+        />
+      );
+    }
 
     return (
       <EditorMosaic

@@ -72,6 +72,7 @@ import {
   getTestsContainer,
   registerGameplayTestRunnerDependencies,
   runProjectGameplayTests,
+  type GameplayTestScope,
   stopRunningProjectGameplayTest,
   type GameplayTestToRun,
   type GameplayTestsCallbacks,
@@ -1792,7 +1793,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     });
   };
 
-  const deleteGameplayTest = (scope: string, test: gdTest) => {
+  const deleteGameplayTest = (scope: GameplayTestScope, test: gdTest) => {
     const { i18n } = props;
     const { currentProject } = state;
     if (!currentProject) return;
@@ -1820,7 +1821,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const renameGameplayTest = (
-    scope: string,
+    scope: GameplayTestScope,
     oldName: string,
     newName: string
   ) => {
@@ -1860,7 +1861,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const runGameplayTestFromUi = React.useCallback(
-    async (scope: string, testName: string) => {
+    async (scope: GameplayTestScope, testName: string) => {
       const { currentProject } = state;
       if (!currentProject) return;
 
@@ -1887,7 +1888,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       const projectTests = currentProject.getTests();
       for (let i = 0; i < projectTests.getTestsCount(); i++) {
         tests.push({
-          scope: 'project',
+          scope: { type: 'project' },
           testName: projectTests.getTestAt(i).getName(),
         });
       }
@@ -1902,7 +1903,7 @@ const MainFrame = (props: Props): React.MixedElement => {
         const extensionTests = extension.getTests();
         for (let i = 0; i < extensionTests.getTestsCount(); i++) {
           tests.push({
-            scope: extension.getName(),
+            scope: { type: 'extension', extensionName: extension.getName() },
             testName: extensionTests.getTestAt(i).getName(),
           });
         }
@@ -3210,7 +3211,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
 
   const openGameplayTest = React.useCallback(
-    (scope: 'project' | string, testName: string) => {
+    (scope: GameplayTestScope, testName: string) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(
@@ -5521,9 +5522,9 @@ const MainFrame = (props: Props): React.MixedElement => {
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenGameplayTest: (testName: string) =>
-      openGameplayTest('project', testName),
+      openGameplayTest({ type: 'project' }, testName),
     onRunGameplayTest: (testName: string) =>
-      runGameplayTestFromUi('project', testName),
+      runGameplayTestFromUi({ type: 'project' }, testName),
     onRunAllGameplayTests: runAllGameplayTestsFromUi,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: onOpenProfileDialog,
@@ -5886,20 +5887,20 @@ const MainFrame = (props: Props): React.MixedElement => {
           onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
           onDeleteExternalEvents={deleteExternalEvents}
           onDeleteGameplayTest={(test: gdTest) =>
-            deleteGameplayTest('project', test)
+            deleteGameplayTest({ type: 'project' }, test)
           }
           onRenameLayout={renameLayout}
           onRenameExternalLayout={renameExternalLayout}
           onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
           onRenameExternalEvents={renameExternalEvents}
           onRenameGameplayTest={(oldName: string, newName: string) =>
-            renameGameplayTest('project', oldName, newName)
+            renameGameplayTest({ type: 'project' }, oldName, newName)
           }
           onOpenGameplayTest={(testName: string) =>
-            openGameplayTest('project', testName)
+            openGameplayTest({ type: 'project' }, testName)
           }
           onRunGameplayTest={(testName: string) =>
-            runGameplayTestFromUi('project', testName)
+            runGameplayTestFromUi({ type: 'project' }, testName)
           }
           onOpenResources={openResources}
           onReloadEventsFunctionsExtensions={onReloadEventsFunctionsExtensions}

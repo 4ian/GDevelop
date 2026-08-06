@@ -23,6 +23,7 @@ import {
   getTestsContainer,
   getGameplayTestProjectItemName,
   type GameplayTestResult,
+  type GameplayTestScope,
 } from '../../GameplayTests/GameplayTestRunner';
 import { Toolbar } from '../../GameplayTests/GameplayTestEditorToolbar';
 import Background from '../../UI/Background';
@@ -42,12 +43,15 @@ export { getGameplayTestProjectItemName };
 
 const parseGameplayTestProjectItemName = (
   projectItemName: string
-): {| scope: 'project' | string, testName: string |} => {
+): {| scope: GameplayTestScope, testName: string |} => {
   const separatorIndex = projectItemName.indexOf('::');
   if (separatorIndex === -1)
-    return { scope: 'project', testName: projectItemName };
+    return { scope: { type: 'project' }, testName: projectItemName };
   return {
-    scope: projectItemName.substring(0, separatorIndex),
+    scope: {
+      type: 'extension',
+      extensionName: projectItemName.substring(0, separatorIndex),
+    },
     testName: projectItemName.substring(separatorIndex + 2),
   };
 };
@@ -156,7 +160,7 @@ export class GameplayTestEditorContainer extends React.Component<
     // No thing to be done.
   }
 
-  getScopeAndTestName(): {| scope: 'project' | string, testName: string |} {
+  getScopeAndTestName(): {| scope: GameplayTestScope, testName: string |} {
     return parseGameplayTestProjectItemName(this.props.projectItemName || '');
   }
 
@@ -216,7 +220,9 @@ export class GameplayTestEditorContainer extends React.Component<
 
     const { scope, testName } = this.getScopeAndTestName();
     const prompt = `Edit the gameplay test "${testName}" ${
-      scope === 'project' ? 'of the project' : `in the extension "${scope}"`
+      scope.type === 'project'
+        ? 'of the project'
+        : `in the extension "${scope.extensionName}"`
     } to `;
     this.props.onOpenAskAi({ prefilledUserRequest: prompt });
   };

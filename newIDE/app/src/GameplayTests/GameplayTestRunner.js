@@ -9,7 +9,21 @@ import {
   type GameplayTestFrameRunStatus,
 } from './GameplayTestFrame';
 
-export type GameplayTestScope = 'project' | string;
+export type GameplayTestScope =
+  | {| type: 'project' |}
+  | {| type: 'extension', extensionName: string |};
+
+export const projectGameplayTestScope: GameplayTestScope = { type: 'project' };
+
+/**
+ * A short human-readable description of a scope, for error messages.
+ */
+export const getGameplayTestScopeDescription = (
+  scope: GameplayTestScope
+): string =>
+  scope.type === 'project'
+    ? 'the project'
+    : `the extension "${scope.extensionName}"`;
 
 export type GameplayTestAssertion = {|
   message: string,
@@ -126,9 +140,9 @@ export const getTestsContainer = (
   project: gdProject,
   scope: GameplayTestScope
 ): gdTestsContainer | null => {
-  if (scope === 'project') return project.getTests();
-  if (project.hasEventsFunctionsExtensionNamed(scope)) {
-    return project.getEventsFunctionsExtension(scope).getTests();
+  if (scope.type === 'project') return project.getTests();
+  if (project.hasEventsFunctionsExtensionNamed(scope.extensionName)) {
+    return project.getEventsFunctionsExtension(scope.extensionName).getTests();
   }
   return null;
 };
@@ -140,7 +154,8 @@ export const getTestsContainer = (
 export const getGameplayTestProjectItemName = (
   scope: GameplayTestScope,
   testName: string
-): string => (scope === 'project' ? testName : scope + '::' + testName);
+): string =>
+  scope.type === 'project' ? testName : scope.extensionName + '::' + testName;
 
 /**
  * Update the last run summary persisted on a test.
@@ -358,16 +373,18 @@ export const runGameplayTests = async ({
           return {
             test,
             source: null,
-            error: `The scope "${test.scope}" does not exist in the project.`,
+            error: `The scope (${getGameplayTestScopeDescription(
+              test.scope
+            )}) does not exist in the project.`,
           };
         }
         if (!testsContainer.hasTestNamed(test.testName)) {
           return {
             test,
             source: null,
-            error: `No test named "${test.testName}" in the scope "${
-              test.scope
-            }".`,
+            error: `No test named "${
+              test.testName
+            }" in ${getGameplayTestScopeDescription(test.scope)}.`,
           };
         }
         return {

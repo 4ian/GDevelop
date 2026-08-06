@@ -141,7 +141,7 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const projectTests = project.getTests();
     for (let i = 0; i < projectTests.getTestsCount(); i++) {
       tests.push({
-        scope: 'project',
+        scope: { type: 'project' },
         testName: projectTests.getTestAt(i).getName(),
       });
     }
@@ -154,7 +154,7 @@ const runners: { [commandName: string]: CliCommandRunner } = {
       const extensionTests = extension.getTests();
       for (let i = 0; i < extensionTests.getTestsCount(); i++) {
         tests.push({
-          scope: extension.getName(),
+          scope: { type: 'extension', extensionName: extension.getName() },
           testName: extensionTests.getTestAt(i).getName(),
         });
       }

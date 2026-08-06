@@ -21,7 +21,10 @@ import StopIcon from '../UI/CustomSvgIcons/Stop';
 import CheckIcon from '../UI/CustomSvgIcons/Check';
 import CrossIcon from '../UI/CustomSvgIcons/Cross';
 import RobotIcon from '../ProjectCreation/RobotIcon';
-import { type GameplayTestResult } from './GameplayTestRunner';
+import {
+  type GameplayTestResult,
+  type GameplayTestScope,
+} from './GameplayTestRunner';
 import {
   formatRunDuration,
   GameplayTestStatusChip,
@@ -110,7 +113,7 @@ const defaultFoldedSections: { [SectionName]: boolean } = {
 
 type Props = {|
   test: gdTest,
-  scope: 'project' | string,
+  scope: GameplayTestScope,
   isRunning: boolean,
   /** The frame currently reached by the running test, if known. */
   runningFrame?: number | null,
@@ -211,10 +214,10 @@ export const GameplayTestProperties = ({
               disabled
             />
             <Text noMargin size="body-small" color="secondary">
-              {scope === 'project' ? (
+              {scope.type === 'project' ? (
                 <Trans>Test of the project</Trans>
               ) : (
-                <Trans>Test of the extension {scope}</Trans>
+                <Trans>Test of the extension {scope.extensionName}</Trans>
               )}
             </Text>
             {isRunning ? (

@@ -6,7 +6,9 @@ import {
   runProjectGameplayTests,
   getTestsContainer,
   getGameplayTestProjectItemName,
+  getGameplayTestScopeDescription,
   type GameplayTestResult,
+  type GameplayTestScope,
 } from '../GameplayTests/GameplayTestRunner';
 import { mapFor } from '../Utils/MapFor';
 
@@ -14,6 +16,29 @@ const makeFailure = (message: string): EditorFunctionGenericOutput => ({
   success: false,
   message,
 });
+
+/**
+ * Parse the `scope` tool argument ({ type: 'project' } or
+ * { type: 'extension', extension_name }) into a `GameplayTestScope`, or null
+ * when malformed.
+ */
+const parseScopeArgument = (scopeArgument: mixed): GameplayTestScope | null => {
+  if (!scopeArgument || typeof scopeArgument !== 'object') return null;
+  if (scopeArgument.type === 'project') return { type: 'project' };
+  if (
+    scopeArgument.type === 'extension' &&
+    typeof scopeArgument.extension_name === 'string' &&
+    scopeArgument.extension_name
+  ) {
+    return { type: 'extension', extensionName: scopeArgument.extension_name };
+  }
+  return null;
+};
+
+const invalidScopeFailure = () =>
+  makeFailure(
+    "Invalid `scope`: pass { type: 'project' } or { type: 'extension', extension_name: '...' }."
+  );
 
 /**
  * The output sent to the AI for a gameplay test run: the full result of the
@@ -58,7 +83,8 @@ export const runGameplayTest: EditorFunction = {
     };
   },
   launchFunction: async ({ project, args }) => {
-    const scope = typeof args.scope === 'string' ? args.scope : 'project';
+    const scope = parseScopeArgument(args.scope);
+    if (!scope) return invalidScopeFailure();
     const testName = args.test_name;
     if (typeof testName !== 'string' || !testName) {
       return makeFailure('Missing or invalid `test_name` argument.');
@@ -75,7 +101,9 @@ export const runGameplayTest: EditorFunction = {
     const testsContainer = getTestsContainer(project, scope);
     if (!testsContainer) {
       return makeFailure(
-        `The scope "${scope}" does not exist: it must be 'project' or the name of an events-based extension of the project.`
+        `Unknown scope: ${getGameplayTestScopeDescription(
+          scope
+        )} does not exist in the project.`
       );
     }
 
@@ -100,7 +128,9 @@ export const runGameplayTest: EditorFunction = {
       }
     } else if (source === null && !testsContainer.hasTestNamed(testName)) {
       return makeFailure(
-        `No test named "${testName}" in the scope "${scope}" - pass its code as \`source\` to create it.`
+        `No test named "${testName}" in ${getGameplayTestScopeDescription(
+          scope
+        )} - pass its code as \`source\` to create it.`
       );
     }
 
@@ -159,11 +189,14 @@ export const changeGameplayTests: EditorFunction = {
     onProjectItemRenamedOutsideEditor,
     onWillDeleteGameplayTest,
   }) => {
-    const scope = typeof args.scope === 'string' ? args.scope : 'project';
+    const scope = parseScopeArgument(args.scope);
+    if (!scope) return invalidScopeFailure();
     const testsContainer = getTestsContainer(project, scope);
     if (!testsContainer) {
       return makeFailure(
-        `The scope "${scope}" does not exist: it must be 'project' or the name of an events-based extension of the project.`
+        `Unknown scope: ${getGameplayTestScopeDescription(
+          scope
+        )} does not exist in the project.`
       );
     }
     const changes = Array.isArray(args.changes) ? args.changes : null;
@@ -204,7 +237,9 @@ export const changeGameplayTests: EditorFunction = {
       }
       if (!testsContainer.hasTestNamed(testName)) {
         failChange(
-          `Unknown test "${testName}" in the scope "${scope}". Existing tests: ${listExistingTestNames()}.`
+          `Unknown test "${testName}" in ${getGameplayTestScopeDescription(
+            scope
+          )}. Existing tests: ${listExistingTestNames()}.`
         );
         continue;
       }
@@ -260,7 +295,9 @@ export const changeGameplayTests: EditorFunction = {
           if (newName === currentName) continue;
           if (testsContainer.hasTestNamed(newName)) {
             failChange(
-              `Cannot rename "${currentName}" to "${newName}": a test with this name already exists in the scope "${scope}".`
+              `Cannot rename "${currentName}" to "${newName}": a test with this name already exists in ${getGameplayTestScopeDescription(
+                scope
+              )}.`
             );
             continue;
           }

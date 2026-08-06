@@ -3,7 +3,10 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import { GameplayTestProperties } from '../../../GameplayTests/GameplayTestProperties';
-import { type GameplayTestResult } from '../../../GameplayTests/GameplayTestRunner';
+import {
+  type GameplayTestResult,
+  type GameplayTestScope,
+} from '../../../GameplayTests/GameplayTestRunner';
 import Background from '../../../UI/Background';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import FixedWidthFlexContainer from '../../FixedWidthFlexContainer';
@@ -116,7 +119,7 @@ const PropertiesPanelStory = ({
   lastResult,
 }: {|
   test: gdTest,
-  scope?: string,
+  scope?: GameplayTestScope,
   isRunning?: boolean,
   runningFrame?: number | null,
   lastResult?: GameplayTestResult | null,
@@ -126,7 +129,7 @@ const PropertiesPanelStory = ({
       <Background>
         <GameplayTestProperties
           test={test}
-          scope={scope || 'project'}
+          scope={scope || { type: 'project' }}
           isRunning={!!isRunning}
           runningFrame={runningFrame || null}
           lastResult={lastResult || null}
@@ -339,5 +342,10 @@ export const InExtensionAndRunInAPreviousSession = (): React.Node => {
       }),
     []
   );
-  return <PropertiesPanelStory test={test} scope="Health" />;
+  return (
+    <PropertiesPanelStory
+      test={test}
+      scope={{ type: 'extension', extensionName: 'Health' }}
+    />
+  );
 };

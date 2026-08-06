@@ -6139,7 +6139,7 @@ describe('editorFunctions', () => {
         {
           ...fakeOptions,
           args: {
-            scope: 'project',
+            scope: { type: 'project' },
             changes: [{ test_name: 'Debug test', delete_this_test: true }],
           },
         }
@@ -6163,7 +6163,7 @@ describe('editorFunctions', () => {
         {
           ...fakeOptions,
           args: {
-            scope: 'project',
+            scope: { type: 'project' },
             changes: [
               {
                 test_name: 'First test',
@@ -6200,7 +6200,7 @@ describe('editorFunctions', () => {
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
-            scope: 'project',
+            scope: { type: 'project' },
             changes: [
               {
                 test_name: 'First test',
@@ -6223,7 +6223,7 @@ describe('editorFunctions', () => {
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
-            scope: 'project',
+            scope: { type: 'project' },
             changes: [
               {
                 test_name: 'Debug test',
@@ -6255,7 +6255,7 @@ describe('editorFunctions', () => {
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
-            scope: 'project',
+            scope: { type: 'project' },
             changes: [
               { test_name: 'Ghost test', delete_this_test: true },
               {
@@ -6283,7 +6283,7 @@ describe('editorFunctions', () => {
         {
           ...makeFakeLaunchFunctionOptionsWithProject(project),
           args: {
-            scope: 'NotAnExtension',
+            scope: { type: 'extension', extension_name: 'NotAnExtension' },
             changes: [{ test_name: 'First test', delete_this_test: true }],
           },
         }

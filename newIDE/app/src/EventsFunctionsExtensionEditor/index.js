@@ -844,14 +844,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   // this extension (its name is the tests "scope").
   _onOpenGameplayTest = (testName: string) => {
     this.props.gameplayTestsCallbacks.onOpenGameplayTest(
-      this.props.eventsFunctionsExtension.getName(),
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
       testName
     );
   };
 
   _onRenameGameplayTest = (oldName: string, newName: string) => {
     this.props.gameplayTestsCallbacks.onRenameGameplayTest(
-      this.props.eventsFunctionsExtension.getName(),
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
       oldName,
       newName
     );
@@ -860,14 +866,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _onDeleteGameplayTest = (test: gdTest) => {
     this.props.gameplayTestsCallbacks.onDeleteGameplayTest(
-      this.props.eventsFunctionsExtension.getName(),
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
       test
     );
   };
 
   _onRunGameplayTest = (testName: string) => {
     this.props.gameplayTestsCallbacks.onRunGameplayTest(
-      this.props.eventsFunctionsExtension.getName(),
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
       testName
     );
   };

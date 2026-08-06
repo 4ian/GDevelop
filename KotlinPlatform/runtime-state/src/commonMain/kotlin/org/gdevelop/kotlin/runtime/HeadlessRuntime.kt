@@ -11,6 +11,7 @@ import org.gdevelop.kotlin.ir.ActionIr
 import org.gdevelop.kotlin.ir.ConditionIr
 import org.gdevelop.kotlin.ir.EventIr
 import org.gdevelop.kotlin.ir.ProgramIr
+import org.gdevelop.kotlin.ir.ExtensionHostOperation
 import org.gdevelop.kotlin.project.Value
 
 @Serializable
@@ -77,7 +78,16 @@ class HeadlessRuntime(private val catalog: ExtensionCatalog) {
         diagnostics: MutableList<Diagnostic>,
         emit: (String, String) -> Unit,
     ) {
-        val passed = event.conditions.all { evaluate(it, globals, sceneVariables) }
+        val passed = event.conditions.all { condition ->
+            when (condition) {
+                is ConditionIr.HostOperation -> {
+                    emit("host-operation", operationTrace(condition.operation))
+                    diagnostics += unsupportedCapability(condition.operation)
+                    false
+                }
+                else -> evaluate(condition, globals, sceneVariables)
+            }
+        }
         emit("event", "${event.origin.jsonPointer}:${if (passed) "passed" else "failed"}")
         if (!passed) return
         event.actions.forEach { action ->
@@ -90,6 +100,10 @@ class HeadlessRuntime(private val catalog: ExtensionCatalog) {
                         diagnostics += runtimeError("GDKP_RUNTIME_EXTENSION_ENTRY", "Extension rejected entry ${registered.descriptor.runtimeEntry}")
                     }
                     emit("extension-call", action.type)
+                }
+                is ActionIr.HostOperation -> {
+                    emit("host-operation", operationTrace(action.operation))
+                    diagnostics += unsupportedCapability(action.operation)
                 }
             }
         }
@@ -110,6 +124,7 @@ class HeadlessRuntime(private val catalog: ExtensionCatalog) {
                 else -> false
             }
         }
+        is ConditionIr.HostOperation -> false
     }
 
     private fun mutate(scope: String, name: String, operand: Double, add: Boolean, globals: MutableMap<String, Value>, scene: MutableMap<String, Value>, diagnostics: MutableList<Diagnostic>, emit: (String, String) -> Unit) {
@@ -136,4 +151,19 @@ class HeadlessRuntime(private val catalog: ExtensionCatalog) {
         is Value.BooleanValue -> value.value.toString()
     }
     private fun runtimeError(code: String, message: String) = Diagnostic(code, Severity.ERROR, message, SourceLocation("runtime", ""))
+
+    private fun operationTrace(operation: ExtensionHostOperation): String = buildString {
+        append("extension=").append(operation.extensionIdentity.namespace).append('@').append(operation.extensionIdentity.version)
+        append(";origin=").append(operation.extensionIdentity.origin)
+        append(";type=").append(operation.descriptorType)
+        append(";entry=").append(operation.runtimeEntry)
+        append(";parameters=").append(operation.parameterOrder.zip(operation.arguments).joinToString(",") { "${it.first}=${it.second}" })
+        append(";source=").append(operation.origin.sourceId).append(':').append(operation.origin.jsonPointer)
+        append(";capabilities=").append(operation.requiredCapabilities.map { it.value }.sorted().joinToString(","))
+    }
+
+    private fun unsupportedCapability(operation: ExtensionHostOperation) = Diagnostic(
+        "GDKP_RUNTIME_UNSUPPORTED_CAPABILITY", Severity.ERROR,
+        "No host installed for ${operation.requiredCapabilities.map { it.value }.sorted().joinToString()}", operation.origin,
+    )
 }

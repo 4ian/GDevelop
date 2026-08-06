@@ -93,6 +93,33 @@ world wrapping displays them together. Bounds spanning the antimeridian must
 therefore be split or explicitly unwrapped by the caller; the overlay adapter
 does not infer wrap direction.
 
+### Animation compatibility modes
+
+The prototype has two deliberately different animation contracts:
+
+* **Portable geo-overlay animation** stores the overlay identity, authoritative
+  start and end longitude/latitude, duration, elapsed game time, easing
+  identity, current coordinate, and running/cancelled/completed status in common
+  state. The runtime samples only the runtime-host game clock—never
+  `Date.now`, `performance.now`, `requestAnimationFrame` timestamps, or another
+  JavaScript wall clock. A seeded sequence of game-time samples must therefore
+  yield the same coordinate updates and semantic trace on every target. Starting
+  another animation for an overlay cancels and replaces its active animation;
+  animations do not queue or blend.
+* **MapLibre host camera animation** delegates `easeTo` and `flyTo` to MapLibre.
+  The common command and every parameter are recorded in invocation order, and
+  the adapter surfaces move-start, movement, cancellation, and idle callbacks
+  through `MapHost`. Camera snapshots at movement and idle are host observations,
+  not deterministic semantic frames. No intermediate pixel, callback time, path,
+  or frame count is compatible until a pinned conformance experiment proves it.
+
+All camera commands use **replace-active** policy. Before issuing a new jump,
+ease, fly, bounds fit, or stop request, the adapter cancels the active host
+animation; commands never queue behind or combine with it. Semantic traces
+distinguish animation requests, overlay-coordinate updates, observed camera
+state, cancellation, and completion. Portable overlay trace records are gating;
+MapLibre movement snapshots remain in the non-gating host-observation stream.
+
 ## Not `Extensions/TileMap/`
 
 **Confirmed.** [`Extensions/TileMap/`](../../Extensions/TileMap/) implements

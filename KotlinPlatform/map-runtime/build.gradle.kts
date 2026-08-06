@@ -11,4 +11,5 @@ kotlin {
         api(project(":extension-catalog"))
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     }
+    sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
 }

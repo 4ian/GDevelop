@@ -9,6 +9,8 @@ import org.gdevelop.kotlin.map.MapHost
 import org.gdevelop.kotlin.map.MapHostResult
 import org.gdevelop.kotlin.map.MapInteractionEvent
 import org.gdevelop.kotlin.map.MapOverlayId
+import org.gdevelop.kotlin.map.MapOverlayAnimationRuntime
+import org.gdevelop.kotlin.map.MapOverlayAnimationStatus
 import org.gdevelop.kotlin.map.ScreenCoordinate
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLElement
@@ -100,6 +102,7 @@ class MapOverlayAdapter(
     private val animate: (List<ProjectedOverlay>) -> Unit = {},
     private val render: (HTMLCanvasElement, List<ProjectedOverlay>, ViewportMetrics) -> Unit,
     private val onOverlayPointer: (MapOverlayId, OverlayPointerEvent) -> Boolean = { _, _ -> false },
+    private val animationRuntime: MapOverlayAnimationRuntime? = null,
 ) {
     private val objects = linkedMapOf<MapOverlayId, GeoOverlayObject>()
     private var projected = emptyList<ProjectedOverlay>()
@@ -137,6 +140,10 @@ class MapOverlayAdapter(
     }
 
     private suspend fun updateProjection(eventCamera: MapCameraState?) {
+        animationRuntime?.advanceAll()?.forEach { animation ->
+            if (animation.status != MapOverlayAnimationStatus.CANCELLED)
+                objects[animation.overlayId]?.let { it.anchor = it.anchor.copy(coordinate = animation.coordinate) }
+        }
         val camera = eventCamera ?: (host.cameraState() as? MapHostResult.Success)?.value ?: return
         projected = objects.values.map { value ->
             val zoomVisible = value.anchor.minimumZoom?.let { camera.zoom >= it } ?: true
@@ -172,6 +179,7 @@ class MapOverlayAdapter(
         is MapInteractionEvent.Loaded -> event.camera
         is MapInteractionEvent.CameraMoved -> event.camera
         is MapInteractionEvent.CameraIdle -> event.camera
+        is MapInteractionEvent.CameraAnimationCancelled, is MapInteractionEvent.CameraMoveStarted -> null
         else -> null
     }
 }

@@ -32,6 +32,7 @@ import type {
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 
@@ -241,6 +242,9 @@ export type RenderEditorContainerProps = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing

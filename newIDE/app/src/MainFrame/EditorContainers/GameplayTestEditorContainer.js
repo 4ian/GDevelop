@@ -21,6 +21,7 @@ import {
   runProjectGameplayTests,
   stopRunningProjectGameplayTest,
   getTestsContainer,
+  getGameplayTestProjectItemName,
   type GameplayTestResult,
 } from '../../GameplayTests/GameplayTestRunner';
 import { Toolbar } from '../../GameplayTests/GameplayTestEditorToolbar';
@@ -35,14 +36,9 @@ const styles = {
   },
 };
 
-/**
- * The name of a gameplay test in editor tabs is either the name of a
- * project test, or `ExtensionName::TestName` for an extension test.
- */
-export const getGameplayTestProjectItemName = (
-  scope: 'project' | string,
-  testName: string
-): string => (scope === 'project' ? testName : scope + '::' + testName);
+// The helper lives with the runner (a pure module) so non-UI code (e.g. the
+// AI editor functions) can use it without importing this editor container.
+export { getGameplayTestProjectItemName };
 
 const parseGameplayTestProjectItemName = (
   projectItemName: string

@@ -8,6 +8,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import {
@@ -246,6 +247,7 @@ export const useProcessFunctionCalls = ({
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -288,6 +290,9 @@ export const useProcessFunctionCalls = ({
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -608,6 +613,8 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: must run before the scene is actually deleted so
           // the tab can be closed while the gdLayout is still valid.
           onWillDeleteScene,
+          onWillDeleteGameplayTest,
+          onWillDeleteGameplayTest,
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,

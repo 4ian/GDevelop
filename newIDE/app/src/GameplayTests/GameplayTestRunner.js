@@ -134,6 +134,15 @@ export const getTestsContainer = (
 };
 
 /**
+ * The name of a gameplay test in editor tabs is either the name of a
+ * project test, or `ExtensionName::TestName` for an extension test.
+ */
+export const getGameplayTestProjectItemName = (
+  scope: GameplayTestScope,
+  testName: string
+): string => (scope === 'project' ? testName : scope + '::' + testName);
+
+/**
  * Update the last run summary persisted on a test.
  */
 export const updateTestLastRun = (

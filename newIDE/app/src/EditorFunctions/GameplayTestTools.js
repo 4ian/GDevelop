@@ -5,8 +5,10 @@ import { type EditorFunction, type EditorFunctionGenericOutput } from '.';
 import {
   runProjectGameplayTests,
   getTestsContainer,
+  getGameplayTestProjectItemName,
   type GameplayTestResult,
 } from '../GameplayTests/GameplayTestRunner';
+import { mapFor } from '../Utils/MapFor';
 
 const makeFailure = (message: string): EditorFunctionGenericOutput => ({
   success: false,
@@ -131,4 +133,195 @@ export const runGameplayTest: EditorFunction = {
   // Only persisting a new/changed test modifies the project (and so requires
   // an approval when auto-edit is off) - just running a test does not.
   getModifiesProject: (args: Object) => typeof args.source === 'string',
+};
+
+// Cap on the ordered test list returned after changes (mirrors the array
+// truncation of `read_game_project_json`).
+const MAX_LISTED_TESTS = 50;
+
+/**
+ * Delete gameplay tests or change their properties (name, description,
+ * index). Never their source: test code must go through the gameplay test
+ * runner (`run_gameplay_test`) so it is always executed and verified.
+ */
+export const changeGameplayTests: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const changesCount = Array.isArray(args.changes) ? args.changes.length : 0;
+    return {
+      text: (
+        <Trans>Change the gameplay tests ({changesCount} change(s)).</Trans>
+      ),
+    };
+  },
+  launchFunction: async ({
+    project,
+    args,
+    onProjectItemRenamedOutsideEditor,
+    onWillDeleteGameplayTest,
+  }) => {
+    const scope = typeof args.scope === 'string' ? args.scope : 'project';
+    const testsContainer = getTestsContainer(project, scope);
+    if (!testsContainer) {
+      return makeFailure(
+        `The scope "${scope}" does not exist: it must be 'project' or the name of an events-based extension of the project.`
+      );
+    }
+    const changes = Array.isArray(args.changes) ? args.changes : null;
+    if (!changes || changes.length === 0) {
+      return makeFailure(
+        'Missing or empty `changes` array: provide at least one change ({test_name, delete_this_test?, changed_properties?}).'
+      );
+    }
+
+    const listExistingTestNames = (): string => {
+      const names = mapFor(0, testsContainer.getTestsCount(), i =>
+        testsContainer.getTestAt(i).getName()
+      );
+      return names.length === 0
+        ? '(no test in this scope)'
+        : names
+            .slice(0, MAX_LISTED_TESTS)
+            .map(name => `"${name}"`)
+            .join(', ');
+    };
+
+    const changeMessages = [];
+    let allChangesApplied = true;
+    let didModifyProject = false;
+    const failChange = (message: string) => {
+      allChangesApplied = false;
+      changeMessages.push(message);
+    };
+
+    for (const change of changes) {
+      const testName =
+        change && typeof change.test_name === 'string'
+          ? change.test_name
+          : null;
+      if (!testName) {
+        failChange('Invalid change: missing `test_name`.');
+        continue;
+      }
+      if (!testsContainer.hasTestNamed(testName)) {
+        failChange(
+          `Unknown test "${testName}" in the scope "${scope}". Existing tests: ${listExistingTestNames()}.`
+        );
+        continue;
+      }
+
+      if (change.delete_this_test === true) {
+        // Close any open tab bound to the test BEFORE deleting it, so no
+        // editor is left rendering a dangling test.
+        await onWillDeleteGameplayTest({
+          gameplayTestProjectItemName: getGameplayTestProjectItemName(
+            scope,
+            testName
+          ),
+        });
+        testsContainer.removeTest(testName);
+        didModifyProject = true;
+        changeMessages.push(`Deleted the test "${testName}".`);
+        continue;
+      }
+
+      const changedProperties = Array.isArray(change.changed_properties)
+        ? change.changed_properties
+        : null;
+      if (!changedProperties || changedProperties.length === 0) {
+        failChange(
+          `No-op change for "${testName}": provide \`changed_properties\` or \`delete_this_test: true\`.`
+        );
+        continue;
+      }
+
+      const test = testsContainer.getTest(testName);
+      let currentName = testName;
+      for (const changedProperty of changedProperties) {
+        const propertyName =
+          changedProperty && typeof changedProperty.property_name === 'string'
+            ? changedProperty.property_name
+            : null;
+        const newValue =
+          changedProperty && typeof changedProperty.new_value === 'string'
+            ? changedProperty.new_value
+            : null;
+        if (!propertyName || newValue === null) {
+          failChange(
+            `Invalid property change for "${currentName}": provide \`property_name\` and \`new_value\` (as a string).`
+          );
+          continue;
+        }
+        if (propertyName === 'name') {
+          const newName = newValue.trim();
+          if (!newName) {
+            failChange(`Cannot rename "${currentName}" to an empty name.`);
+            continue;
+          }
+          if (newName === currentName) continue;
+          if (testsContainer.hasTestNamed(newName)) {
+            failChange(
+              `Cannot rename "${currentName}" to "${newName}": a test with this name already exists in the scope "${scope}".`
+            );
+            continue;
+          }
+          const oldName = currentName;
+          test.setName(newName);
+          currentName = newName;
+          didModifyProject = true;
+          onProjectItemRenamedOutsideEditor({
+            kind: 'gameplay-test',
+            oldName: getGameplayTestProjectItemName(scope, oldName),
+            newName: getGameplayTestProjectItemName(scope, newName),
+          });
+          changeMessages.push(`Renamed "${oldName}" to "${newName}".`);
+        } else if (propertyName === 'description') {
+          test.setDescription(newValue);
+          didModifyProject = true;
+          changeMessages.push(`Updated the description of "${currentName}".`);
+        } else if (propertyName === 'index') {
+          const requestedIndex = parseInt(newValue, 10);
+          if (Number.isNaN(requestedIndex)) {
+            failChange(
+              `Invalid index "${newValue}" for "${currentName}": provide a number (as a string).`
+            );
+            continue;
+          }
+          const newIndex = Math.max(
+            0,
+            Math.min(testsContainer.getTestsCount() - 1, requestedIndex)
+          );
+          const oldIndex = testsContainer.getTestPosition(test);
+          if (newIndex !== oldIndex) {
+            testsContainer.moveTest(oldIndex, newIndex);
+            didModifyProject = true;
+          }
+          changeMessages.push(`Moved "${currentName}" to index ${newIndex}.`);
+        } else {
+          failChange(
+            `Unknown property "${propertyName}" for "${currentName}": only 'name', 'description' and 'index' can be changed. In particular the source can NOT be changed here: test code must go through \`run_gameplay_test\` so it is executed and verified.`
+          );
+        }
+      }
+    }
+
+    const testsCount = testsContainer.getTestsCount();
+    const tests = mapFor(0, Math.min(testsCount, MAX_LISTED_TESTS), i => {
+      const test = testsContainer.getTestAt(i);
+      return { test_name: test.getName(), description: test.getDescription() };
+    });
+    if (testsCount > MAX_LISTED_TESTS) {
+      changeMessages.push(
+        `(Only the first ${MAX_LISTED_TESTS} of the ${testsCount} tests of the scope are listed.)`
+      );
+    }
+
+    return {
+      success: allChangesApplied,
+      message: changeMessages.join('\n'),
+      tests,
+      // A partially-failed batch may still have applied some changes.
+      meta: { didModifyProject },
+    };
+  },
+  modifiesProject: true,
 };

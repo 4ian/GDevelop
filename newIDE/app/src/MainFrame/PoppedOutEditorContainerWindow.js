@@ -358,6 +358,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onProjectItemRenamedOutsideEditor:
                           props.onProjectItemRenamedOutsideEditor,
                         onWillDeleteScene: props.onWillDeleteScene,
+                        onWillDeleteGameplayTest:
+                          props.onWillDeleteGameplayTest,
                         onWillDeleteObject: props.onWillDeleteObject,
                         onWillInstallExtension: props.onWillInstallExtension,
                         onExtensionInstalled: props.onExtensionInstalled,

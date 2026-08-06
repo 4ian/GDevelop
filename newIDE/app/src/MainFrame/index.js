@@ -104,6 +104,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
@@ -3958,6 +3959,21 @@ const MainFrame = (props: Props): React.MixedElement => {
           ),
         };
       }
+      if (kind === 'gameplay-test') {
+        return {
+          ...state,
+          editorTabs: getEditorTabsWithRenamedProjectItem(
+            state.editorTabs,
+            currentProject,
+            editorTab =>
+              getRenamedGameplayTestTabProjectItemName(
+                editorTab,
+                oldName,
+                newName
+              )
+          ),
+        };
+      }
       return state;
     });
   };
@@ -3975,6 +3991,20 @@ const MainFrame = (props: Props): React.MixedElement => {
     await setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, changes.scene),
+    }));
+  };
+
+  // Called before a gameplay test is actually deleted from the project, so
+  // any tab bound to it is closed first (mirrors the manual delete flow).
+  const onWillDeleteGameplayTest = async (
+    changes: WillDeleteGameplayTestChanges
+  ): Promise<void> => {
+    await setState(state => ({
+      ...state,
+      editorTabs: closeGameplayTestTabs(
+        state.editorTabs,
+        changes.gameplayTestProjectItemName
+      ),
     }));
   };
 
@@ -5761,6 +5791,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
     onWillDeleteScene: onWillDeleteScene,
+    onWillDeleteGameplayTest: onWillDeleteGameplayTest,
     onWillDeleteObject: onWillDeleteObject,
     onWillInstallExtension: onWillInstallExtension,
     onExtensionInstalled: onExtensionInstalled,

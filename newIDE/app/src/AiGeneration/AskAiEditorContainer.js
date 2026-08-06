@@ -12,6 +12,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type ObjectWithContext } from '../ObjectsList/EnumerateObjects';
@@ -160,6 +161,9 @@ type Props = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -262,6 +266,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
         onWillInstallExtension,
         onExtensionInstalled,
@@ -931,6 +936,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
         i18n,
         onWillInstallExtension,
@@ -1661,6 +1667,7 @@ export const renderAskAiEditorContainer = (
           props.onProjectItemRenamedOutsideEditor
         }
         onWillDeleteScene={props.onWillDeleteScene}
+        onWillDeleteGameplayTest={props.onWillDeleteGameplayTest}
         onWillDeleteObject={props.onWillDeleteObject}
         onWillInstallExtension={props.onWillInstallExtension}
         onExtensionInstalled={props.onExtensionInstalled}

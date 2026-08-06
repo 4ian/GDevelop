@@ -30,7 +30,7 @@ import {
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
-import { runGameplayTest } from './GameplayTestTools';
+import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
@@ -68,6 +68,7 @@ import type {
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -195,6 +196,9 @@ export type EditorFunctionGenericOutput = {|
     behaviorName: string,
     behaviorType: string,
   |}>,
+  // `change_gameplay_tests`: the ordered tests of the scope after the changes
+  // (capped), so renames/reorders/deletions are self-verifying.
+  tests?: Array<{| test_name: string, description: string |}>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
@@ -373,6 +377,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -8889,6 +8896,7 @@ export const editorFunctions: { [string]: EditorFunction } = {
   run_edit_agent: runEditAgent,
   run_tests: runTests,
   run_gameplay_test: runGameplayTest,
+  change_gameplay_tests: changeGameplayTests,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
   search_resource_store: searchResourceStore,

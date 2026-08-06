@@ -31,6 +31,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
@@ -293,6 +294,9 @@ export type EditorTabsPaneCommonProps = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -413,6 +417,7 @@ const EditorTabsPane: React.ComponentType<{
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteScene,
+    onWillDeleteGameplayTest,
     onWillDeleteObject,
     onWillInstallExtension,
     onExtensionInstalled,
@@ -886,6 +891,7 @@ const EditorTabsPane: React.ComponentType<{
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
                     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
                     onWillDeleteScene: onWillDeleteScene,
+                    onWillDeleteGameplayTest: onWillDeleteGameplayTest,
                     onWillDeleteObject: onWillDeleteObject,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,

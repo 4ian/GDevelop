@@ -20,6 +20,10 @@ enum class GeoElevationMode { GROUND, ABSOLUTE_METERS }
 @Serializable
 enum class GeoAnchorVisibility { VISIBLE, HIDDEN }
 
+/** Stable identity for the interpolation used by a portable overlay animation. */
+@Serializable
+enum class MapAnimationEasing { LINEAR, EASE_IN_QUAD, EASE_OUT_QUAD, EASE_IN_OUT_QUAD }
+
 /**
  * Target-neutral source of truth for an object attached to the map.
  *
@@ -85,6 +89,10 @@ sealed interface MapCameraCommand {
     data object StopAnimation : MapCameraCommand
 }
 
+/** Camera commands never queue or blend: a new command replaces the active host animation. */
+@Serializable
+enum class MapCameraCommandPolicy { REPLACE_ACTIVE }
+
 @Serializable
 sealed interface MapInteractionEvent {
     @Serializable
@@ -96,8 +104,15 @@ sealed interface MapInteractionEvent {
     @Serializable
     data class PointerMoved(val screen: ScreenCoordinate, val coordinate: GeoCoordinate) : MapInteractionEvent
 
+    /** A host camera transition began. Its intermediate timing and pixels are observations only. */
+    @Serializable
+    data class CameraMoveStarted(val commandSequence: Long?) : MapInteractionEvent
+
     @Serializable
     data class CameraMoved(val camera: MapCameraState) : MapInteractionEvent
+
+    @Serializable
+    data class CameraAnimationCancelled(val commandSequence: Long, val camera: MapCameraState) : MapInteractionEvent
 
     @Serializable
     data class CameraIdle(val camera: MapCameraState) : MapInteractionEvent
@@ -139,6 +154,7 @@ sealed interface MapHostResult<out T> {
  */
 interface MapHost {
     val lifecycle: MapHostLifecycle
+    val cameraCommandPolicy: MapCameraCommandPolicy get() = MapCameraCommandPolicy.REPLACE_ACTIVE
 
     suspend fun initialize(eventSink: (MapInteractionEvent) -> Unit): MapHostResult<Unit>
     suspend fun cameraState(): MapHostResult<MapCameraState>

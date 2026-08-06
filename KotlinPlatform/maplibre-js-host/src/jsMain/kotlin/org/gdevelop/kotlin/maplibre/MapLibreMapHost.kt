@@ -13,6 +13,7 @@ import org.gdevelop.kotlin.map.MapHost
 import org.gdevelop.kotlin.map.MapHostLifecycle
 import org.gdevelop.kotlin.map.MapHostResult
 import org.gdevelop.kotlin.map.MapInteractionEvent
+import org.gdevelop.kotlin.map.MapAnimationTraceRecord
 import org.gdevelop.kotlin.map.MapLayerId
 import org.gdevelop.kotlin.map.MapSourceId
 import org.gdevelop.kotlin.map.ProjectedPoint
@@ -47,6 +48,7 @@ data class MapLibreHostOptions(
 
 class MapLibreMapHost(
     private val options: MapLibreHostOptions,
+    private val animationTraceSink: (MapAnimationTraceRecord) -> Unit = {},
     private val diagnosticSink: (MapLibreDiagnostic) -> Unit = {},
 ) : MapHost {
     override var lifecycle: MapHostLifecycle = MapHostLifecycle.NEW
@@ -55,6 +57,8 @@ class MapLibreMapHost(
     private var map: MapLibreGl.Map? = null
     private val listeners = mutableListOf<Pair<String, (dynamic) -> Unit>>()
     private var eventSink: ((MapInteractionEvent) -> Unit)? = null
+    private var nextCommandSequence = 0L
+    private var activeCommandSequence: Long? = null
 
     override suspend fun initialize(eventSink: (MapInteractionEvent) -> Unit): MapHostResult<Unit> {
         if (lifecycle != MapHostLifecycle.NEW) return lifecycleFailure()
@@ -96,23 +100,48 @@ class MapLibreMapHost(
             }
             listen("click") { emitPointer(it, clicked = true) }
             listen("mousemove") { emitPointer(it, clicked = false) }
-            listen("move") { emit(MapInteractionEvent.CameraMoved(readCamera(created))) }
-            listen("idle") { emit(MapInteractionEvent.CameraIdle(readCamera(created))) }
+            listen("movestart") { emit(MapInteractionEvent.CameraMoveStarted(activeCommandSequence)) }
+            listen("move") {
+                val camera = readCamera(created)
+                animationTraceSink(MapAnimationTraceRecord.CameraStateObserved(activeCommandSequence, "move", camera))
+                emit(MapInteractionEvent.CameraMoved(camera))
+            }
+            listen("idle") {
+                val camera = readCamera(created)
+                val completed = activeCommandSequence
+                animationTraceSink(MapAnimationTraceRecord.CameraStateObserved(completed, "idle", camera))
+                if (completed != null) animationTraceSink(MapAnimationTraceRecord.Completed("camera", sequence = completed))
+                activeCommandSequence = null
+                emit(MapInteractionEvent.CameraIdle(camera))
+            }
         }
     }
 
     override suspend fun cameraState() = ready { MapHostResult.Success(readCamera(it)) }
 
     override suspend fun execute(command: MapCameraCommand) = ready { target ->
+        val previous = activeCommandSequence
+        if (previous != null) {
+            val camera = readCamera(target)
+            animationTraceSink(MapAnimationTraceRecord.Cancelled("camera", sequence = previous))
+            emit(MapInteractionEvent.CameraAnimationCancelled(previous, camera))
+            activeCommandSequence = null
+            target.stop()
+        }
+        val sequence = nextCommandSequence++
+        animationTraceSink(MapAnimationTraceRecord.CameraRequested(sequence, command))
         when (command) {
             is MapCameraCommand.Jump -> target.jumpTo(cameraOptions(command.camera))
-            is MapCameraCommand.Ease -> target.easeTo(cameraOptions(command.camera, command.durationMillis))
-            is MapCameraCommand.Fly -> target.flyTo(cameraOptions(command.camera, command.durationMillis))
-            is MapCameraCommand.FitBounds -> target.fitBounds(
-                arrayOf(command.bounds.southWest.array(), command.bounds.northEast.array()),
-                cameraOptions(command.bearing, command.pitch, command.durationMillis, command.padding),
-            )
-            MapCameraCommand.StopAnimation -> target.stop()
+            is MapCameraCommand.Ease -> { activeCommandSequence = sequence; target.easeTo(cameraOptions(command.camera, command.durationMillis)) }
+            is MapCameraCommand.Fly -> { activeCommandSequence = sequence; target.flyTo(cameraOptions(command.camera, command.durationMillis)) }
+            is MapCameraCommand.FitBounds -> {
+                if (command.durationMillis != 0L) activeCommandSequence = sequence
+                target.fitBounds(
+                    arrayOf(command.bounds.southWest.array(), command.bounds.northEast.array()),
+                    cameraOptions(command.bearing, command.pitch, command.durationMillis, command.padding),
+                )
+            }
+            MapCameraCommand.StopAnimation -> Unit
         }
         MapHostResult.Success(Unit)
     }
@@ -171,6 +200,8 @@ class MapLibreMapHost(
 
     override suspend fun dispose(): MapHostResult<Unit> {
         if (lifecycle == MapHostLifecycle.DISPOSED) return MapHostResult.Success(Unit)
+        activeCommandSequence?.let { animationTraceSink(MapAnimationTraceRecord.Cancelled("camera", sequence = it)) }
+        activeCommandSequence = null
         removeMap()
         lifecycle = MapHostLifecycle.DISPOSED
         return MapHostResult.Success(Unit)

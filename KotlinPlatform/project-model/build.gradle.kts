@@ -1,15 +1,23 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
+	kotlin("multiplatform")
+	kotlin("plugin.serialization")
 }
 
 kotlin {
-    jvmToolchain(21)
-    jvm()
-    js(IR) { browser() }
-    sourceSets.commonMain.dependencies {
-        api(project(":diagnostics"))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    }
-    sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
+	jvmToolchain(21)
+	jvm()
+	js(IR) {
+		browser {
+			testTask {
+				useKarma {
+					useChromiumHeadless()
+				}
+			}
+		}
+	}
+	sourceSets.commonMain.dependencies {
+		api(project(":diagnostics"))
+		api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+	}
+	sourceSets.commonTest.dependencies { implementation(kotlin("test")) }
 }

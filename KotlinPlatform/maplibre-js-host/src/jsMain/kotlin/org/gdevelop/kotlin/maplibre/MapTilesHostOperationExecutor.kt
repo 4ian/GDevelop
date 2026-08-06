@@ -44,6 +44,7 @@ class MapTilesHostOperationExecutor(
             is MapInteractionEvent.Clicked -> clicked = true
             is MapInteractionEvent.CameraMoved -> cameraIdle = false
             is MapInteractionEvent.CameraIdle -> { cameraAnimating = false; cameraIdle = true }
+            is MapInteractionEvent.CameraAnimationCancelled -> cameraAnimating = false
             else -> Unit
         }
     }

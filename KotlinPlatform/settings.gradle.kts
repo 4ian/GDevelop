@@ -6,7 +6,8 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // Kotlin/JS registers the Node distribution repository when configuring browser targets.
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories { mavenCentral() }
 }
 
@@ -19,6 +20,7 @@ include(
     ":normalized-ir",
     ":runtime-state",
     ":map-runtime",
+    ":maplibre-js-host",
     ":example-extension",
     ":jvm-cli",
 )

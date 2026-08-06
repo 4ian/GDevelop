@@ -10,7 +10,6 @@ data class ParameterDescriptor(val name: String, val type: String)
 
 /** A stable identifier for a facility that must be supplied by a runtime host. */
 @Serializable
-@JvmInline
 value class RuntimeCapabilityId(val value: String)
 
 object RuntimeCapabilities {

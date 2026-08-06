@@ -21,15 +21,12 @@ data class MapCameraState(
 )
 
 @Serializable
-@JvmInline
 value class MapSourceId(val value: String)
 
 @Serializable
-@JvmInline
 value class MapLayerId(val value: String)
 
 @Serializable
-@JvmInline
 value class MapOverlayId(val value: String)
 
 @Serializable

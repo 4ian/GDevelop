@@ -5,9 +5,15 @@ import { NON_SCRIPTABLE_FUNCTION_NAMES } from './NonScriptableFunctionNames';
 /**
  * Runs an AI-written JavaScript script whose editor functions are exposed as
  * plain async functions, replacing N tool calls (N LLM round trips) by one.
- * Mirrors `EditorFunctionCallRunner.processEditorFunctionCalls`: calls run
+ * Mirrors `EditorFunctionCallRunner.processEditorFunctionCalls`: calls EXECUTE
  * strictly sequentially and the script stops at the first failure, with
  * everything executed before it left applied and reported.
+ *
+ * A script may however START several calls before awaiting them (typically
+ * `Promise.all`): the calls are queued and still run one at a time, in call
+ * order. What stays forbidden is ending the script with a call never awaited
+ * (fire-and-forget): the call is still run and recorded, but the script is
+ * reported as failed, so a missing `await` can never pass silently.
  *
  * `evaluateScript`'s shadowing of the browser globals is hygiene, NOT a
  * security boundary: the script comes from our own backend LLM and can do no
@@ -230,31 +236,77 @@ export const executeScript = async ({
   const newSceneNames: Array<string> = [];
   const maxCallsCount = maxFunctionCallsCount || 600;
 
-  let pendingCallFunctionName: string | null = null;
   let lastCalledFunctionName: string | null = null;
+
+  // Editor functions always EXECUTE strictly sequentially, but through a FIFO
+  // queue instead of forbidding a second call while one is running: a script
+  // can start several calls before awaiting them (`Promise.all`) and they run
+  // one at a time, in call order (covered by ScriptRunner.spec.js).
+  const queuedCalls: Array<{|
+    functionName: string,
+    execute: () => Promise<any>,
+    resolve: (value: any) => void,
+    reject: (error: Error) => void,
+  |}> = [];
+  let runningCallFunctionName: string | null = null;
+  let startedCallsCount = 0;
+
+  // Every call promise handed to the script, tracked until it settles: used to
+  // refuse fire-and-forget calls (a call still unsettled when the script ends)
+  // and to give every call promise a rejection handler (a call whose promise
+  // the script never awaits must not surface as an unhandled rejection).
+  const unsettledCalls: Set<{| functionName: string |}> = new Set();
+  const callSettlements: Array<Promise<void>> = [];
+  const waitForAllCallsToSettle = async (): Promise<void> => {
+    // Settlement promises never reject, and script termination means no new
+    // call can be queued, so a single pass drains everything.
+    await Promise.all(callSettlements);
+  };
+
+  // The script stops at the first failure: the calls queued behind the failed
+  // one (or behind a script error) must never run.
+  const cancelQueuedCalls = (cause: Error) => {
+    const cancelledCalls = queuedCalls.splice(0, queuedCalls.length);
+    for (const cancelledCall of cancelledCalls) {
+      cancelledCall.reject(
+        new Error(
+          `"${cancelledCall.functionName}" was not run — ${cause.message}`
+        )
+      );
+    }
+  };
+
+  const processQueue = () => {
+    if (runningCallFunctionName !== null) return;
+    const call = queuedCalls.shift();
+    if (!call) return;
+    runningCallFunctionName = call.functionName;
+    call.execute().then(
+      result => {
+        runningCallFunctionName = null;
+        call.resolve(result);
+        processQueue();
+      },
+      error => {
+        runningCallFunctionName = null;
+        // `execute` only rejects with a FunctionCallFailedError: stop at the
+        // first failure by cancelling the calls already queued behind it.
+        // The failed call is rejected first, so an `await Promise.all(...)`
+        // surfaces the failure itself, not a cancellation.
+        call.reject(error);
+        cancelQueuedCalls(error);
+      }
+    );
+  };
 
   const scopedValues: { [string]: any } = {};
   for (const exposedFunction of exposedFunctions) {
     const { name, launch, modifiesProject } = exposedFunction;
-    // The closures intentionally share the run-scoped `pendingCallFunctionName`
-    // / `lastCalledFunctionName` state to enforce sequential execution across
-    // all exposed functions (covered by ScriptRunner.spec.js).
-    // eslint-disable-next-line no-loop-func
-    scopedValues[name] = async (args: any) => {
-      if (pendingCallFunctionName) {
-        throw new Error(
-          `Called "${name}" while "${pendingCallFunctionName}" is still running. ` +
-            'Editor functions run sequentially: `await` every call (no Promise.all).'
-        );
-      }
-      if (functionCallRecords.length >= maxCallsCount) {
-        throw new Error(
-          `The script made more than ${maxCallsCount} function calls — it was stopped. ` +
-            'Split the work into smaller scripts.'
-        );
-      }
 
-      pendingCallFunctionName = name;
+    // The closures intentionally share the run-scoped queue and records state
+    // to enforce sequential execution across all exposed functions.
+    // eslint-disable-next-line no-loop-func
+    const executeCall = async (args: any): Promise<any> => {
       lastCalledFunctionName = name;
       try {
         const result = await launch(args);
@@ -296,9 +348,40 @@ export const executeScript = async ({
           `Function "${name}" failed: ${error.message || 'Unknown error'}. ` +
             'The script was stopped (everything executed before is applied).'
         );
-      } finally {
-        pendingCallFunctionName = null;
       }
+    };
+
+    // eslint-disable-next-line no-loop-func
+    scopedValues[name] = (args: any): Promise<any> => {
+      startedCallsCount++;
+      if (startedCallsCount > maxCallsCount) {
+        throw new Error(
+          `The script made more than ${maxCallsCount} function calls — it was stopped. ` +
+            'Split the work into smaller scripts.'
+        );
+      }
+
+      let resolveCall = (value: any) => {};
+      let rejectCall = (error: Error) => {};
+      const callPromise = new Promise((resolve, reject) => {
+        resolveCall = resolve;
+        rejectCall = reject;
+      });
+      const callToken = { functionName: name };
+      unsettledCalls.add(callToken);
+      const onSettled = () => {
+        unsettledCalls.delete(callToken);
+      };
+      callSettlements.push(callPromise.then(onSettled, onSettled));
+
+      queuedCalls.push({
+        functionName: name,
+        execute: () => executeCall(args),
+        resolve: resolveCall,
+        reject: rejectCall,
+      });
+      processQueue();
+      return callPromise;
     };
   }
 
@@ -324,6 +407,35 @@ export const executeScript = async ({
 
   try {
     const returnValue = await evaluateScript({ jsCode, scopedValues });
+
+    if (unsettledCalls.size > 0) {
+      // The script ended while some calls were still running or queued: a
+      // missing `await`. The calls were legitimately requested, so they are
+      // run to completion and recorded — but the script is reported as failed,
+      // so a fire-and-forget call can never pass silently (nor race with this
+      // report).
+      const notAwaitedFunctionNames = [
+        ...new Set(Array.from(unsettledCalls).map(call => call.functionName)),
+      ];
+      await waitForAllCallsToSettle();
+      return {
+        success: false,
+        functionCallRecords,
+        consoleLogs,
+        returnValue: null,
+        error: {
+          message:
+            `The script ended while some calls were still running (${notAwaitedFunctionNames.join(
+              ', '
+            )}). They were still executed and recorded, but every call must be ` +
+            'awaited before the script ends: `await` each call, or `Promise.all` to group them.',
+          lineNumber: null,
+          lastCalledFunctionName,
+        },
+        newSceneNames,
+      };
+    }
+
     return {
       success: true,
       functionCallRecords,
@@ -333,6 +445,14 @@ export const executeScript = async ({
       newSceneNames,
     };
   } catch (error) {
+    // The script stopped: the calls it queued but that did not start must not
+    // run, and the running one (if any) must finish so the records are
+    // complete and no call is still mutating the project after this report.
+    cancelQueuedCalls(
+      new Error(`the script failed (${error.message || 'unknown error'})`)
+    );
+    await waitForAllCallsToSettle();
+
     const isFunctionCallFailure = error instanceof FunctionCallFailedError;
     const undefinedName = isFunctionCallFailure
       ? null

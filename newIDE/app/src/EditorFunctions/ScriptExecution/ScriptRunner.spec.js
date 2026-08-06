@@ -266,27 +266,141 @@ describe('executeScript', () => {
     expect(error.message.length).toBeGreaterThan(0);
   });
 
-  it('refuses concurrent function calls (missing await, Promise.all)', async () => {
-    const slow = makeFakeFunction({
-      name: 'slow_function',
-      launch: async () => {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        return { success: true };
-      },
+  describe('calls started together (Promise.all, deferred await)', () => {
+    const makeSlowLoggingFunction = (executionLog: Array<string>) =>
+      makeFakeFunction({
+        name: 'slow_function',
+        launch: async args => {
+          executionLog.push(`start ${args.id}`);
+          await new Promise(resolve => setTimeout(resolve, 5));
+          executionLog.push(`end ${args.id}`);
+          return { success: true, id: args.id };
+        },
+      });
+
+    it('runs Promise.all calls one at a time, in call order', async () => {
+      const executionLog: Array<string> = [];
+
+      const result = await executeScript({
+        jsCode: [
+          `const results = await Promise.all([`,
+          `  slow_function({ id: 1 }),`,
+          `  slow_function({ id: 2 }),`,
+          `  slow_function({ id: 3 }),`,
+          `]);`,
+          `return results.map((result) => result.id);`,
+        ].join('\n'),
+        exposedFunctions: [makeSlowLoggingFunction(executionLog)],
+      });
+
+      expect(result.error).toBe(null);
+      expect(result.success).toBe(true);
+      expect(result.returnValue).toEqual([1, 2, 3]);
+      // Strictly sequential: a call only starts after the previous one ended.
+      expect(executionLog).toEqual([
+        'start 1',
+        'end 1',
+        'start 2',
+        'end 2',
+        'start 3',
+        'end 3',
+      ]);
+      expect(result.functionCallRecords).toHaveLength(3);
     });
 
-    const result = await executeScript({
-      jsCode: [
-        `const first = slow_function({}); // no await`,
-        `await slow_function({});`,
-        `await first;`,
-      ].join('\n'),
-      exposedFunctions: [slow],
+    it('allows starting a call and awaiting it later, keeping call order', async () => {
+      const executionLog: Array<string> = [];
+
+      const result = await executeScript({
+        jsCode: [
+          `const first = slow_function({ id: 1 }); // awaited below`,
+          `await slow_function({ id: 2 });`,
+          `const firstResult = await first;`,
+          `return firstResult.id;`,
+        ].join('\n'),
+        exposedFunctions: [makeSlowLoggingFunction(executionLog)],
+      });
+
+      expect(result.error).toBe(null);
+      expect(result.success).toBe(true);
+      expect(result.returnValue).toBe(1);
+      expect(executionLog).toEqual(['start 1', 'end 1', 'start 2', 'end 2']);
     });
 
-    expect(result.success).toBe(false);
-    const error = getErrorOrThrow(result);
-    expect(error.message).toContain('sequentially');
+    it('cancels the calls queued behind a failure (stop at the first failure)', async () => {
+      let secondFunctionCalled = false;
+      const failing = makeFakeFunction({
+        name: 'failing_function',
+        launch: async () => ({ success: false, message: 'Object not found.' }),
+      });
+      const neverReached = makeFakeFunction({
+        name: 'never_reached',
+        launch: async () => {
+          secondFunctionCalled = true;
+          return { success: true };
+        },
+      });
+
+      const result = await executeScript({
+        jsCode: `await Promise.all([failing_function({}), never_reached({})]);`,
+        exposedFunctions: [failing, neverReached],
+      });
+
+      expect(result.success).toBe(false);
+      expect(secondFunctionCalled).toBe(false);
+      // Only the executed (failed) call is recorded, like in the sequential case.
+      expect(result.functionCallRecords).toHaveLength(1);
+      expect(result.functionCallRecords[0].functionName).toBe(
+        'failing_function'
+      );
+      const error = getErrorOrThrow(result);
+      expect(error.message).toContain('failing_function');
+      expect(error.message).toContain('Object not found.');
+    });
+
+    it('fails the script when a call is never awaited (fire-and-forget), still running and recording it', async () => {
+      const executionLog: Array<string> = [];
+
+      const result = await executeScript({
+        jsCode: [
+          `slow_function({ id: 1 }); // fire-and-forget: missing await`,
+          `return 'done';`,
+        ].join('\n'),
+        exposedFunctions: [makeSlowLoggingFunction(executionLog)],
+      });
+
+      expect(result.success).toBe(false);
+      // The call was requested, so it ran to completion and is recorded...
+      expect(executionLog).toEqual(['start 1', 'end 1']);
+      expect(result.functionCallRecords).toHaveLength(1);
+      expect(result.functionCallRecords[0].success).toBe(true);
+      // ...but the script is reported as failed, naming the culprit.
+      expect(result.returnValue).toBe(null);
+      const error = getErrorOrThrow(result);
+      expect(error.message).toContain('slow_function');
+      expect(error.message).toContain('await');
+    });
+
+    it('does not run calls queued after a script error', async () => {
+      const executionLog: Array<string> = [];
+
+      const result = await executeScript({
+        jsCode: [
+          `const first = slow_function({ id: 1 });`,
+          `const second = slow_function({ id: 2 });`,
+          `throw new Error('Script bug.');`,
+        ].join('\n'),
+        exposedFunctions: [makeSlowLoggingFunction(executionLog)],
+      });
+
+      expect(result.success).toBe(false);
+      const error = getErrorOrThrow(result);
+      expect(error.message).toContain('Script bug.');
+      // The first call was already running: it finished and is recorded. The
+      // second was still queued: it was cancelled without running.
+      expect(executionLog).toEqual(['start 1', 'end 1']);
+      expect(result.functionCallRecords).toHaveLength(1);
+    });
   });
 
   it('stops runaway loops after the maximum number of function calls', async () => {

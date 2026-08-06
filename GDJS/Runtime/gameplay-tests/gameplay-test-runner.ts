@@ -861,6 +861,20 @@ namespace gdjs {
           inputManager.getMouseY(),
           { movementX: deltaX, movementY: deltaY }
         );
+        // Mouse-look extensions often listen to the canvas `pointermove`
+        // DOM events directly (instead of the input manager): dispatch a
+        // real event carrying the deltas so they receive them too.
+        const renderer = this._runtimeGame.getRenderer() as any;
+        const canvas =
+          typeof renderer.getCanvas === 'function'
+            ? renderer.getCanvas()
+            : null;
+        if (canvas && typeof PointerEvent !== 'undefined') {
+          const event = new PointerEvent('pointermove', { bubbles: true });
+          Object.defineProperty(event, 'movementX', { value: deltaX });
+          Object.defineProperty(event, 'movementY', { value: deltaY });
+          canvas.dispatchEvent(event);
+        }
       }
 
       /**
@@ -1845,19 +1859,87 @@ namespace gdjs {
         this._consoleLogs.push({ level, message: cappedMessage });
       }
 
+      /** Undo the pointer lock shim (see `_installPointerLockShim`). */
+      _uninstallPointerLockShim: () => void = () => {};
+
+      /**
+       * Patch pointer lock during the test: `requestPointerLock` never
+       * really locks the OS mouse, but as soon as the game requests it, a
+       * locked pointer is seen by the game AND by anything reading
+       * `document.pointerLockElement` directly or listening to canvas
+       * `pointermove` events (like mouse-look extensions) - which then
+       * receive the `setMouseDelta` deltas as real DOM events.
+       */
       _installPointerLockShim(): void {
-        const renderer = this._runtimeGame.getRenderer() as any;
-        if (typeof renderer.requestPointerLock !== 'function') return;
+        const restorers: Array<() => void> = [];
         const harness = this;
-        renderer.requestPointerLock = function () {
-          harness._pointerLockRequestedByGame = true;
-          return true;
+        const setFakePointerLock = (locked: boolean) => {
+          if (harness._pointerLockRequestedByGame === locked) return;
+          harness._pointerLockRequestedByGame = locked;
+          try {
+            document.dispatchEvent(new Event('pointerlockchange'));
+          } catch (error) {
+            // Ignore: no DOM support.
+          }
         };
-        renderer.exitPointerLock = function () {
-          harness._pointerLockRequestedByGame = false;
-        };
-        renderer.isPointerLocked = function () {
-          return harness._pointerLockRequestedByGame;
+
+        const renderer = this._runtimeGame.getRenderer() as any;
+        if (typeof renderer.requestPointerLock === 'function') {
+          const original = {
+            requestPointerLock: renderer.requestPointerLock,
+            exitPointerLock: renderer.exitPointerLock,
+            isPointerLocked: renderer.isPointerLocked,
+          };
+          renderer.requestPointerLock = function () {
+            setFakePointerLock(true);
+            return true;
+          };
+          renderer.exitPointerLock = function () {
+            setFakePointerLock(false);
+          };
+          renderer.isPointerLocked = function () {
+            return harness._pointerLockRequestedByGame;
+          };
+          restorers.push(() => {
+            renderer.requestPointerLock = original.requestPointerLock;
+            renderer.exitPointerLock = original.exitPointerLock;
+            renderer.isPointerLocked = original.isPointerLocked;
+          });
+        }
+
+        const canvas =
+          typeof renderer.getCanvas === 'function'
+            ? renderer.getCanvas()
+            : null;
+        if (canvas && typeof document !== 'undefined') {
+          const originalCanvasRequestPointerLock = canvas.requestPointerLock;
+          canvas.requestPointerLock = () => setFakePointerLock(true);
+          restorers.push(() => {
+            canvas.requestPointerLock = originalCanvasRequestPointerLock;
+          });
+
+          const originalDocumentExitPointerLock = document.exitPointerLock;
+          (document as any).exitPointerLock = () => setFakePointerLock(false);
+          restorers.push(() => {
+            (document as any).exitPointerLock = originalDocumentExitPointerLock;
+          });
+
+          try {
+            Object.defineProperty(document, 'pointerLockElement', {
+              get: () => (harness._pointerLockRequestedByGame ? canvas : null),
+              configurable: true,
+            });
+            restorers.push(() => {
+              delete (document as any).pointerLockElement;
+            });
+          } catch (error) {
+            // Ignore: `pointerLockElement` cannot be faked in this browser.
+          }
+        }
+
+        this._uninstallPointerLockShim = () => {
+          restorers.forEach((restore) => restore());
+          this._uninstallPointerLockShim = () => {};
         };
       }
 
@@ -2136,6 +2218,7 @@ namespace gdjs {
           // Ignore errors during cleanup.
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
+        harness._uninstallPointerLockShim();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

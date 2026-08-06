@@ -673,6 +673,54 @@ describe('gdjs.gameplayTests', () => {
       expect(inputManager.isKeyPressed(2016)).to.be(false);
     });
 
+    it('fakes pointer lock at the DOM level and feeds mouse deltas as pointermove events', async () => {
+      const runtimeGame = makeRuntimeGame();
+      // Attach a canvas like a real game has (tests run without one).
+      const canvas = document.createElement('canvas');
+      /** @type {any} */ (runtimeGame.getRenderer())._gameCanvas = canvas;
+
+      // A DOM listener like the ones of mouse-look extensions: accumulates
+      // movement only while the pointer is locked.
+      let movementX = 0;
+      let movementY = 0;
+      canvas.addEventListener('pointermove', (event) => {
+        if (document.pointerLockElement === canvas) {
+          movementX += event.movementX || 0;
+          movementY += event.movementY || 0;
+        }
+      });
+
+      const harness = makeStartedHarness(runtimeGame);
+      harness._installPointerLockShim();
+      try {
+        await harness.goToScene('Scene 1');
+
+        // Deltas sent before the game requests the lock are not accumulated
+        // by the listener (the extension sees an unlocked pointer).
+        harness.setMouseDelta(100, 100);
+        expect(movementX).to.be(0);
+
+        // The game (or an extension) requests the pointer lock: no real
+        // lock happens, but the DOM reports one.
+        canvas.requestPointerLock();
+        expect(document.pointerLockElement).to.be(canvas);
+
+        harness.setMouseDelta(12, -6);
+        harness.setMouseDelta(3, 0);
+        expect(movementX).to.be(15);
+        expect(movementY).to.be(-6);
+
+        document.exitPointerLock();
+        expect(document.pointerLockElement).to.be(null);
+      } finally {
+        harness._uninstallPointerLockShim();
+      }
+
+      // The document is restored once the test is done.
+      expect(document.pointerLockElement).to.be(null);
+      expect(canvas.requestPointerLock).to.not.be(undefined);
+    });
+
     it('simulates mouse buttons and position', async () => {
       const runtimeGame = makeRuntimeGame();
       const inputManager = runtimeGame.getInputManager();

@@ -22,6 +22,7 @@ include(
     ":map-runtime",
     ":maptiles-extension",
     ":maplibre-js-host",
+    ":maptiles-demo",
     ":example-extension",
     ":jvm-cli",
 )

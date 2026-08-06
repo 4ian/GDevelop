@@ -16,6 +16,7 @@ not an editor, renderer, Android application, or GDJS port.
 | `runtime-state` | Deterministic headless state, lifecycle, bounded-frame interpreter, and trace report. |
 | `example-extension` | Statically registered `KotlinExample` metadata, invocation, and lifecycle hooks. |
 | `jvm-cli` | File/argument adapter that composes decoder, lowerer, catalog, and runtime. |
+| `maptiles-demo` | Standalone Kotlin/JS MapLibre authoring demo with versioned map-document import/export. |
 
 The decoder has no dependency on runtime state. The interpreter consumes only
 normalized IR, so a future Cucumber or alternative frontend can construct the

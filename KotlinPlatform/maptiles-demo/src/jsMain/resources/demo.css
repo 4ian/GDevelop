@@ -1,0 +1,26 @@
+:root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #101522; color: #ecf2ff; }
+button, input, textarea { font: inherit; }
+.app { min-height: 100vh; padding: 18px; }
+h1 { margin: 0 0 4px; font-size: 1.35rem; }
+.hint, .status { color: #aebbd1; font-size: .88rem; margin: 4px 0 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 12px; }
+.toolbar label { display: grid; gap: 4px; font-size: .76rem; color: #b9c5d8; }
+.toolbar input { min-width: 92px; }
+.toolbar .style { flex: 1; min-width: 280px; }
+button, input, textarea { color: #ecf2ff; background: #1b2435; border: 1px solid #43516b; border-radius: 6px; padding: 7px 9px; }
+button { cursor: pointer; }
+button:hover { background: #293650; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }
+#map { height: 62vh; min-height: 430px; border: 1px solid #43516b; border-radius: 8px; overflow: hidden; background: #202a3b; }
+.panel { background: #151d2b; border: 1px solid #35425a; border-radius: 8px; padding: 12px; }
+.panel h2 { margin: 0 0 10px; font-size: 1rem; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fields label { display: grid; gap: 3px; font-size: .75rem; color: #b9c5d8; }
+.fields .wide { grid-column: 1 / -1; }
+textarea { width: 100%; min-height: 170px; resize: vertical; font-family: ui-monospace, monospace; font-size: .75rem; }
+.marker { border: 2px solid white; border-radius: 999px; background: #e75168; min-width: 38px; min-height: 38px; display: grid; place-items: center; box-shadow: 0 3px 10px #0008; cursor: pointer; position: relative; font-size: 20px; }
+.marker span { position: absolute; top: 42px; background: #101522e8; padding: 3px 6px; border-radius: 4px; white-space: nowrap; color: white; font-size: 12px; }
+.marker.selected { outline: 4px solid #51d6ff; }
+@media (max-width: 850px) { .workspace { grid-template-columns: 1fr; } #map { height: 52vh; } }

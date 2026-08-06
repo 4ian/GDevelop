@@ -1,0 +1,35 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "extension": "Embedded",
+      "kind": "catalog-resolve",
+      "member": "LocalBehavior",
+      "seq": 0
+    },
+    {
+      "kind": "scene-load",
+      "scene": "Main",
+      "seq": 1
+    }
+  ],
+  "finalState": {
+    "resolved": [
+      "Embedded::LocalBehavior"
+    ],
+    "scene": "Main"
+  },
+  "fixtureId": "events-extension",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

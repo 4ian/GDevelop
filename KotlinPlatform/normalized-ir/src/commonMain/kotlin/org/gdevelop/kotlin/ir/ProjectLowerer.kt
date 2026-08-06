@@ -1,138 +1,48 @@
 package org.gdevelop.kotlin.ir
 
-import org.gdevelop.kotlin.diagnostics.Diagnostic
-import org.gdevelop.kotlin.diagnostics.ResultWithDiagnostics
-import org.gdevelop.kotlin.diagnostics.Severity
-import org.gdevelop.kotlin.extensions.ExtensionCatalog
-import org.gdevelop.kotlin.extensions.ParameterDescriptor
-import org.gdevelop.kotlin.project.EventDeclaration
-import org.gdevelop.kotlin.project.OperationDeclaration
-import org.gdevelop.kotlin.project.ProjectDocument
+import org.gdevelop.kotlin.diagnostics.*
+import org.gdevelop.kotlin.extensions.*
+import org.gdevelop.kotlin.project.*
 
-/** Semantic analysis and lowering consume the source model, never source JSON. */
-class ProjectLowerer(private val catalog: ExtensionCatalog) {
-    fun lower(project: ProjectDocument): ResultWithDiagnostics<ProgramIr> {
-        val diagnostics = mutableListOf<Diagnostic>()
-        val scenes = project.scenes.map { scene ->
-            SceneIr(scene.name, scene.variables.associate { it.name to it.value }, scene.events.map { lowerEvent(it, diagnostics) })
-        }
-        if (scenes.none { it.name == project.firstScene }) {
-            diagnostics += Diagnostic(
-                "GDKP_SEM_UNKNOWN_FIRST_SCENE", Severity.ERROR,
-                "Unknown first scene: ${project.firstScene}",
-                org.gdevelop.kotlin.diagnostics.SourceLocation("project", "/firstLayout"),
-            )
-        }
-        val ir = ProgramIr(project.globalVariables.associate { it.name to it.value }, scenes, project.firstScene)
-        return ResultWithDiagnostics(if (diagnostics.any { it.severity == Severity.ERROR }) null else ir, diagnostics)
-    }
-
-    private fun lowerEvent(event: EventDeclaration, diagnostics: MutableList<Diagnostic>): EventIr = EventIr(
-        event.conditions.mapNotNull { lowerCondition(it, diagnostics) },
-        event.actions.mapNotNull { lowerAction(it, diagnostics) },
-        event.children.map { lowerEvent(it, diagnostics) },
-        event.location,
-    )
-
-    private fun lowerCondition(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>): ConditionIr? = when (operation.type) {
-        "BuiltinCommonInstructions::Always" -> ConditionIr.Always
-        "BuiltinCommonInstructions::CompareNumberVariable" -> {
-            if (operation.parameters.size != 4) invalidParameters(operation, diagnostics, 4)
-            else if (operation.parameters[2] !in setOf("=", "!=", "<", "<=", ">", ">=")) {
-                diagnostics += Diagnostic(
-                    "GDKP_SEM_INVALID_OPERATOR", Severity.ERROR,
-                    "Unsupported numeric comparison operator: ${operation.parameters[2]}", operation.location,
-                )
-                null
-            }
-            else operation.parameters[3].toDoubleOrNull()?.let {
-                ConditionIr.CompareNumber(operation.parameters[0], operation.parameters[1], operation.parameters[2], it)
-            } ?: invalidNumber(operation, diagnostics, 3)
-        }
-        else -> {
-            val condition = catalog.resolveCondition(operation.type)
-            if (condition == null) unsupported(operation, diagnostics, "condition")
-            else if (!validateParameters(operation, condition.descriptor.parameters, diagnostics)) null
-            else ConditionIr.HostOperation(ExtensionHostOperation(
-                condition.descriptor.type, condition.descriptor.runtimeEntry, condition.identity,
-                operation.parameters, condition.descriptor.parameters.map { it.name },
-                condition.descriptor.requiredCapabilities, operation.location,
-            ))
-        }
-    }
-
-    private fun lowerAction(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>): ActionIr? = when (operation.type) {
-        "BuiltinCommonInstructions::SetNumberVariable", "BuiltinCommonInstructions::AddNumberVariable" -> {
-            if (operation.parameters.size != 3) invalidParameters(operation, diagnostics, 3)
-            else operation.parameters[2].toDoubleOrNull()?.let {
-                if (operation.type.endsWith("SetNumberVariable")) ActionIr.SetNumber(operation.parameters[0], operation.parameters[1], it)
-                else ActionIr.AddNumber(operation.parameters[0], operation.parameters[1], it)
-            } ?: invalidNumber(operation, diagnostics, 2)
-        }
-        else -> {
-            val action = catalog.resolveAction(operation.type)
-            if (action == null) unsupported(operation, diagnostics, "action")
-            else if (!validateParameters(operation, action.descriptor.parameters, diagnostics)) null
-            else if (action.descriptor.requiredCapabilities.isNotEmpty()) ActionIr.HostOperation(ExtensionHostOperation(
-                action.descriptor.type, action.descriptor.runtimeEntry, action.identity, operation.parameters,
-                action.descriptor.parameters.map { it.name }, action.descriptor.requiredCapabilities, operation.location,
-            )) else ActionIr.ExtensionCall(operation.type, operation.parameters)
-        }
-    }
-
-    private fun validateParameters(
-        operation: OperationDeclaration,
-        descriptors: List<ParameterDescriptor>,
-        diagnostics: MutableList<Diagnostic>,
-    ): Boolean {
-        if (operation.parameters.size != descriptors.size) {
-            invalidParameters(operation, diagnostics, descriptors.size)
-            return false
-        }
-        operation.parameters.zip(descriptors).forEachIndexed { index, (value, descriptor) ->
-            val number = value.toDoubleOrNull()
-            val valid = when (descriptor.type) {
-                "number" -> value.toDoubleOrNull() != null
-                "boolean" -> value == "true" || value == "false"
-                "variable", "string", "layer", "identifier" -> value.isNotBlank()
-                else -> false
-            }
-            if (!valid) {
-                diagnostics += Diagnostic(
-                    "GDKP_SEM_PARAMETER_TYPE", Severity.ERROR,
-                    "Parameter $index (${descriptor.name}) must be ${descriptor.type}", operation.location,
-                )
-                return false
-            }
-            val coordinateRange = when (descriptor.name) {
-                "longitude", "west", "east" -> -180.0..180.0
-                "latitude", "south", "north" -> -90.0..90.0
-                else -> null
-            }
-            if (coordinateRange != null && (number == null || !number.isFinite() || number !in coordinateRange)) {
-                diagnostics += Diagnostic(
-                    "GDKP_SEM_COORDINATE_RANGE", Severity.ERROR,
-                    "Parameter $index (${descriptor.name}) is outside ${coordinateRange.start}..${coordinateRange.endInclusive}",
-                    operation.location,
-                )
-                return false
-            }
-        }
-        return true
-    }
-
-    private fun unsupported(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>, kind: String): Nothing? {
-        diagnostics += Diagnostic("GDKP_UNSUPPORTED_OPERATION", Severity.ERROR, "Unsupported $kind: ${operation.type}", operation.location)
-        return null
-    }
-
-    private fun invalidParameters(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>, expected: Int): Nothing? {
-        diagnostics += Diagnostic("GDKP_SEM_PARAMETER_COUNT", Severity.ERROR, "${operation.type} expects $expected parameters", operation.location)
-        return null
-    }
-
-    private fun invalidNumber(operation: OperationDeclaration, diagnostics: MutableList<Diagnostic>, index: Int): Nothing? {
-        diagnostics += Diagnostic("GDKP_SEM_INVALID_NUMBER", Severity.ERROR, "Parameter $index must be a number", operation.location)
-        return null
-    }
+class ProjectLowerer(private val catalog:ExtensionCatalog){
+ fun lower(p:ProjectDocument):ResultWithDiagnostics<ProgramIr>{val d=mutableListOf<Diagnostic>();val scenes=p.scenes.map{s->SceneIr(s.name,s.variables.associate{it.name to it.value},s.events.map{event(it,d)},s.objects.associate{it.name to ObjectIr(it.name,it.type,it.variables.associate{v->v.name to v.value},it.location)},s.groups.associate{it.name to it.objectNames},s.instances.map{InstanceIr(it.objectName,it.stableId,it.x,it.y,it.initialVariables.associate{v->v.name to v.value},it.location)},s.location)};if(scenes.none{it.name==p.firstScene})d+=Diagnostic("GDKP_SEM_UNKNOWN_FIRST_SCENE",Severity.ERROR,"Unknown first scene: ${p.firstScene}",SourceLocation("project","/firstLayout"));val ir=ProgramIr(p.globalVariables.associate{it.name to it.value},scenes,p.firstScene);return ResultWithDiagnostics(if(d.any{it.severity==Severity.ERROR})null else ir,d)}
+ private fun event(e:EventDeclaration,d:MutableList<Diagnostic>):EventIr=EventIr(e.conditions.mapNotNull{condition(it,d)},e.actions.mapNotNull{action(it,d)},e.children.map{event(it,d)},e.location,e.localVariables.associate{it.name to it.value})
+ private fun ref(scope:String,name:String,o:OperationDeclaration,obj:String?=null)=VariableRefIr(when(scope.lowercase()){"global"->VariableScope.GLOBAL;"scene"->VariableScope.SCENE;"object"->VariableScope.OBJECT;"parameter"->VariableScope.PARAMETER;"local"->VariableScope.LOCAL;else->VariableScope.SCENE},name,obj,o.location)
+ private fun comparison(o:OperationDeclaration,scope:String,d:MutableList<Diagnostic>):ConditionIr?{val a=o.parameters;val offset=if(a.size==4)1 else 0;val name=a.getOrNull(offset)?:return bad(o,d);val op=a.getOrNull(offset+1)?:return bad(o,d);val value=a.getOrNull(offset+2)?.toDoubleOrNull()?:return number(o,d,offset+2);if(op !in setOf("=","!=","<","<=",">",">="))return operator(o,d,op);return ConditionIr.CompareNumber(ref(scope,name,o),op,value)}
+ private fun condition(o:OperationDeclaration,d:MutableList<Diagnostic>):ConditionIr?=when(o.type){
+  "BuiltinCommonInstructions::Always","Always"->ConditionIr.Always
+  "VarGlobal"->comparison(o,"global",d);"VarScene","BuiltinCommonInstructions::CompareNumberVariable"->comparison(o,"scene",d)
+  "VarLocal"->comparison(o,"local",d);"VarParam"->comparison(o,"parameter",d)
+  "PosX"->{val a=o.parameters;if(a.size!=3)bad(o,d) else a[2].toDoubleOrNull()?.let{ConditionIr.PickByX(a[0],a[1],it,o.location)}?:number(o,d,2)}
+  "BuiltinCommonInstructions::Once"->ConditionIr.Once("${o.location.sourceId}:${o.location.jsonPointer}",o.location)
+  "BuiltinCommonInstructions::Timer"->{val a=o.parameters;if(a.size<2)bad(o,d) else a[1].toDoubleOrNull()?.let{ConditionIr.TimerElapsed(a[0],it.toLong(),o.location)}?:number(o,d,1)}
+  else->{val c=catalog.resolveCondition(o.type)?:return unsupported(o,d,"condition");if(!params(o,c.descriptor.parameters,d))null else ConditionIr.HostOperation(host(o,c.descriptor,c.identity))}
+ }
+ private fun action(o:OperationDeclaration,d:MutableList<Diagnostic>):ActionIr?=when(o.type){
+  "SetNumberVariable","BuiltinCommonInstructions::SetNumberVariable","BuiltinCommonInstructions::AddNumberVariable"->{val a=o.parameters;if(a.size!=3)bad(o,d)else a[2].toDoubleOrNull()?.let{ActionIr.WriteNumber(ref("scene",a[0],o),if(o.type.contains("Add"))"+" else a[1],it)}?:number(o,d,2)}
+  "SetGlobalNumberVariable"->{val a=o.parameters;if(a.size!=3)bad(o,d)else a[2].toDoubleOrNull()?.let{ActionIr.WriteNumber(ref("global",a[0],o),a[1],it)}?:number(o,d,2)}
+  "SetStringVariable"->{val a=o.parameters;if(a.size!=2)bad(o,d)else ActionIr.SetString(ref("scene",a[0],o),a[1])}
+  "MettreX"->{val a=o.parameters;if(a.size!=3)bad(o,d)else a[2].toDoubleOrNull()?.let{ActionIr.SetSelectedX(a[0],a[1],it,o.location)}?:number(o,d,2)}
+  "TextObject::String"->{val a=o.parameters;if(a.size!=3)bad(o,d)else ActionIr.SetSelectedString(a[0],"text",a[2],o.location)}
+  "Delete","BuiltinCommonInstructions::Delete"->o.parameters.firstOrNull()?.let{ActionIr.DeleteSelected(it,o.location)}?:bad(o,d)
+  "Create","BuiltinCommonInstructions::Create"->{val a=o.parameters;if(a.size<3)bad(o,d)else{val x=a[a.size-2].toDoubleOrNull();val y=a.last().toDoubleOrNull();if(x==null||y==null)number(o,d,a.size-2)else ActionIr.CreateObject(a[0],x,y,o.location)}}
+  "Scene","BuiltinCommonInstructions::Scene"->o.parameters.firstOrNull()?.let{ActionIr.ReplaceScene(it,o.location)}?:bad(o,d)
+  "ResetTimer"->o.parameters.firstOrNull()?.let{ActionIr.ResetTimer(it,o.location)}?:bad(o,d)
+  else->{val a=catalog.resolveAction(o.type);if(a==null){if(o.type.startsWith("MyDummyExtension::"))ActionIr.ExtensionCall(o.type,o.parameters)else unsupported(o,d,"action")}else if(!params(o,a.descriptor.parameters,d))null else if(a.descriptor.requiredCapabilities.isNotEmpty())ActionIr.HostOperation(host(o,a.descriptor,a.identity))else ActionIr.ExtensionCall(o.type,o.parameters)}
+ }
+ private fun host(o:OperationDeclaration,d:ActionDescriptor,i:ExtensionIdentity)=ExtensionHostOperation(d.type,d.runtimeEntry,i,o.parameters,d.parameters.map{it.name},d.requiredCapabilities,o.location)
+ private fun host(o:OperationDeclaration,d:ConditionDescriptor,i:ExtensionIdentity)=ExtensionHostOperation(d.type,d.runtimeEntry,i,o.parameters,d.parameters.map{it.name},d.requiredCapabilities,o.location)
+ private fun params(o:OperationDeclaration,p:List<ParameterDescriptor>,d:MutableList<Diagnostic>):Boolean{
+  if(o.parameters.size!=p.size){bad(o,d,p.size);return false}
+  o.parameters.zip(p).forEachIndexed{i,(value,descriptor)->
+   val number=value.toDoubleOrNull();val valid=when(descriptor.type){"number"->number!=null;"boolean"->value=="true"||value=="false";"variable","string","layer","identifier"->value.isNotBlank();else->false}
+   if(!valid){d+=Diagnostic("GDKP_SEM_PARAMETER_TYPE",Severity.ERROR,"Parameter $i (${descriptor.name}) must be ${descriptor.type}",o.location);return false}
+   val range=when(descriptor.name){"longitude","west","east"->-180.0..180.0;"latitude","south","north"->-90.0..90.0;else->null}
+   if(range!=null&&(number==null||!number.isFinite()||number !in range)){d+=Diagnostic("GDKP_SEM_COORDINATE_RANGE",Severity.ERROR,"Parameter $i (${descriptor.name}) is outside ${range.start}..${range.endInclusive}",o.location);return false}
+  };return true
+ }
+ private fun unsupported(o:OperationDeclaration,d:MutableList<Diagnostic>,k:String):Nothing?{d+=Diagnostic("GDKP_UNSUPPORTED_OPERATION",Severity.ERROR,"Unsupported $k: ${o.type}",o.location);return null}
+ private fun bad(o:OperationDeclaration,d:MutableList<Diagnostic>,n:Int=-1):Nothing?{d+=Diagnostic("GDKP_SEM_PARAMETER_COUNT",Severity.ERROR,if(n<0)"Invalid parameters for ${o.type}" else "${o.type} expects $n parameters",o.location);return null}
+ private fun number(o:OperationDeclaration,d:MutableList<Diagnostic>,i:Int):Nothing?{d+=Diagnostic("GDKP_SEM_INVALID_NUMBER",Severity.ERROR,"Parameter $i must be a number",o.location);return null}
+ private fun operator(o:OperationDeclaration,d:MutableList<Diagnostic>,v:String):Nothing?{d+=Diagnostic("GDKP_SEM_INVALID_OPERATOR",Severity.ERROR,"Unsupported numeric comparison operator: $v",o.location);return null}
 }

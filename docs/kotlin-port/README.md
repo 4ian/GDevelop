@@ -41,6 +41,10 @@ Read these documents as one evidence set:
   experiment using MapLibre as an explicit browser rendering host.
 * [Compatibility roadmap](compatibility-roadmap.md) — observable compatibility
   levels, ledgers, metrics, and acceptance requirements.
+* [Phase 0 corpus](corpus/README.md) — minimized projects, schemas, descriptor
+  snapshot, canonical traces, provenance, capture report, and validator.
+* [Evidence index](evidence-index.md) — revision-pinned claim ledger for the
+  static flow audit, including inspected paths and missing executable evidence.
 * [Kotlin Multiplatform prototype](../../KotlinPlatform/README.md) — isolated
   module map, supported headless subset, explicit rejection boundaries, and CLI.
 * Decision records:
@@ -66,8 +70,9 @@ matching API names alone.
 
 ## Current status
 
-**Confirmed** — investigation date **2026-08-06**, repository revision
-`ee333992c575ed846b90ed568c73fa17f2cfaa69`:
+**Confirmed** — investigation date **2026-08-06**, GDevelop revision
+`23f965f5290c176de3666cca9f5ae82ffa70e24a`, Kotlin prototype revision
+`23f965f5290c176de3666cca9f5ae82ffa70e24a`:
 
 * The pipeline and lifecycle investigation is documented with repository paths
   in [`gdevelop-pipeline.md`](gdevelop-pipeline.md).
@@ -78,9 +83,13 @@ matching API names alone.
   demonstrates source decoding, lowering to normalized IR, deterministic
   bounded-frame execution, stable JSON traces, and a statically registered
   Kotlin extension for a deliberately narrower subset of the milestone. It does
-  not claim compatibility: the pinned differential corpus and GDJS reference
-  traces described in [`target-strategy.md`](target-strategy.md) are not yet
-  checked in.
+  not claim compatibility: the Phase 0 corpus and GDJS reference traces are now
+  checked in, but no Kotlin differential report demonstrates parity with them.
+
+The inspected paths, evidence classification, and audit limitations for these
+claims are recorded in [`evidence-index.md`](evidence-index.md). The revisions
+identify the audited input tree; this documentation update necessarily occurs
+in a later commit.
 
 **Decision.** The four accepted ADRs establish current working boundaries: a
 portable normalized IR, explicit extension identity, a capability-based host
@@ -97,12 +106,12 @@ sections of [`target-strategy.md`](target-strategy.md).
 
 Concrete deliverables:
 
-- [ ] Add the versioned corpus manifest, minimized project JSON, provenance, and
+- [x] Add the versioned corpus manifest, minimized project JSON, provenance, and
       content hashes.
-- [ ] Add schemas for the corpus manifest and normalized semantic trace.
-- [ ] Add a pinned GDJS reference-trace capture command and reviewed canonical
+- [x] Add schemas for the corpus manifest and normalized semantic trace.
+- [x] Add a pinned GDJS reference-trace capture command and reviewed canonical
       traces.
-- [ ] Add a validator for fixture hashes, IDs, references, ordering, coverage,
+- [x] Add a validator for fixture hashes, IDs, references, ordering, coverage,
       and provenance.
 - [ ] Implement the bounded source decoder, source locations, diagnostics, and
       extension-catalog snapshot required by the fixtures.
@@ -115,8 +124,10 @@ Concrete deliverables:
 
 ## Confirmed findings
 
-All findings below were investigated on **2026-08-06** at revision
-`ee333992c575ed846b90ed568c73fa17f2cfaa69`. Re-check them before relying on exact
+All findings below were re-investigated on **2026-08-06** at GDevelop revision
+`23f965f5290c176de3666cca9f5ae82ffa70e24a` and Kotlin prototype revision
+`23f965f5290c176de3666cca9f5ae82ffa70e24a`. The exact inspected paths are in
+[`evidence-index.md`](evidence-index.md). Re-check them before relying on exact
 implementation paths at a later revision.
 
 * **Confirmed.** The existing system separates C++ project/editor metadata,
@@ -216,8 +227,8 @@ Collect evidence in this order so implementation does not define its own oracle:
       properties, and lifecycle registrations.
 - [ ] Run each reference capture twice and record canonical hashes; investigate
       every mismatch rather than normalizing it away without evidence.
-- [ ] Add an evidence index mapping every milestone compatibility assertion to a
-      repository trace, fixture assertion, experiment result, or ADR.
+- [x] Add an evidence index mapping every milestone implementation assertion to
+      a repository trace, fixture, experiment result, report, or accepted ADR.
 
 When any flow is re-investigated, append or update its date and full repository
 revision alongside its evidence. Do not silently carry a **Confirmed** marker

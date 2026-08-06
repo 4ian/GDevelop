@@ -49,6 +49,16 @@ The example extension is registered explicitly with
 action type to the interpreted `incrementVariable` entry, while scene-load and
 scene-unload hooks add observable lifecycle records.
 
+Run the pinned Phase 0 corpus and write structured per-fixture reports with:
+
+```sh
+gradle :jvm-cli:run -Pargs="--corpus ../docs/kotlin-port/corpus/manifest.json --reports reports/phase1-corpus"
+```
+
+The reports include ordered selections, stable handles, lifecycle and transition
+records, final variables/objects, and diagnostics. An `executed` corpus entry is
+not a compatibility result; the pinned GDJS traces remain the semantic oracle.
+
 ## Experimental Kotlin/JS MapTiles capability
 
 `map-runtime`, `maptiles-extension`, and `maplibre-js-host` form a focused,

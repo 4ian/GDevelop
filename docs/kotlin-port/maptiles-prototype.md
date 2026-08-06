@@ -122,12 +122,23 @@ MapLibre movement snapshots remain in the non-gating host-observation stream.
 
 ## Not `Extensions/TileMap/`
 
-**Confirmed.** [`Extensions/TileMap/`](../../Extensions/TileMap/) implements
+**Confirmed** (static flow rechecked **2026-08-06**; GDevelop and Kotlin
+prototype revisions `23f965f5290c176de3666cca9f5ae82ffa70e24a`; inspected
+`Extensions/TileMap/`, `Extensions/TileMap/JsExtension.js`,
+`Extensions/TileMap/tilemapruntimeobject.ts`, and `Extensions/TileMap/tests/`).
+[`Extensions/TileMap/`](../../Extensions/TileMap/) implements
 finite tilemaps loaded from Tiled data, including finite map layers, tilesets,
 objects, and collision-oriented runtime behavior. Its checked-in examples use
 `.tmx` and Tiled JSON files. This is a different domain from continuously
 addressed slippy-map raster/vector sources selected by longitude, latitude, and
 zoom.
+
+The MapTiles Kotlin code is an **implemented experiment with unproven
+conformance**. Checked-in source, fixtures, and tests establish an implementation
+and test subjects, but the repository has no dated, revision-pinned execution
+report satisfying the roadmap evidence record. See
+[`evidence-index.md`](evidence-index.md). It is neither Milestone 1 work nor
+evidence of Kotlin/JS runtime compatibility.
 
 **Decision.** The prototype does not port, extend, or claim compatibility with
 `Extensions/TileMap/`. It must use distinct names and serialized identities so a

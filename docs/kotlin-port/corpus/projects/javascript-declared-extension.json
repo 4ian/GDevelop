@@ -1,0 +1,78 @@
+{
+  "eventsFunctionsExtensions": [],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Main",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [
+        {
+          "actions": [
+            {
+              "parameters": [
+                "1",
+                "2"
+              ],
+              "type": {
+                "value": "MyDummyExtension::DoSomething"
+              }
+            }
+          ],
+          "conditions": [],
+          "type": "BuiltinCommonInstructions::Standard"
+        }
+      ],
+      "instances": [],
+      "layers": [],
+      "mangledName": "Main",
+      "name": "Main",
+      "objects": [],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": []
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "javascript-declared-extension",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

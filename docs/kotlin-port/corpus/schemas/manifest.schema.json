@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gdevelop.io/schemas/kotlin-port/corpus-manifest-1.0.0.json",
+  "title": "Kotlin port Phase 0 corpus manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "corpusVersion", "gdevelopRevision", "captureEnvironment", "requiredCoverage", "fixtures"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "corpusVersion": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "gdevelopRevision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "captureEnvironment": {"$ref": "#/$defs/environment"},
+    "requiredCoverage": {"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},
+    "fixtures": {"type":"array","minItems":7,"items":{"$ref":"#/$defs/fixture"}}
+  },
+  "$defs": {
+    "sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "environment": {"type":"object","additionalProperties":false,"required":["os","architecture","node","python","lockFiles","command","hostInputs"],"properties":{"os":{"type":"string"},"architecture":{"type":"string"},"node":{"type":"string"},"python":{"type":"string"},"lockFiles":{"type":"array","items":{"type":"object","required":["path","sha256"],"properties":{"path":{"type":"string"},"sha256":{"$ref":"#/$defs/sha256"}},"additionalProperties":false}},"command":{"type":"string"},"hostInputs":{"type":"object"}}},
+    "artifact": {"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"type":"string"},"sha256":{"$ref":"#/$defs/sha256"}}},
+    "provenance": {"type":"object","additionalProperties":false,"required":["method","sources","reviewedBy","reviewedOn"],"properties":{"method":{"enum":["hand-minimized","source-minimized"]},"sources":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/artifact"}},"reviewedBy":{"type":"string","minLength":1},"reviewedOn":{"type":"string","format":"date"},"notes":{"type":"string"}}},
+    "fixture": {"type":"object","additionalProperties":false,"required":["id","project","trace","features","requiredExtensions","frameBudget","hostInputs","expectedDiagnostics","assertions","provenance"],"properties":{"id":{"type":"string","pattern":"^[a-z0-9]+(?:-[a-z0-9]+)*$"},"project":{"$ref":"#/$defs/artifact"},"trace":{"$ref":"#/$defs/artifact"},"catalogSnapshot":{"$ref":"#/$defs/artifact"},"features":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},"requiredExtensions":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"frameBudget":{"type":"integer","minimum":1},"hostInputs":{"type":"object"},"expectedDiagnostics":{"type":"array","items":{"type":"string"}},"assertions":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string"}},"provenance":{"$ref":"#/$defs/provenance"}}}
+  }
+}

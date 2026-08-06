@@ -1,0 +1,77 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "kind": "scene-load",
+      "scene": "Main",
+      "seq": 0
+    },
+    {
+      "ids": [
+        "token-a",
+        "token-b"
+      ],
+      "kind": "selection",
+      "object": "Token",
+      "seq": 1
+    },
+    {
+      "ids": [
+        "token-a"
+      ],
+      "kind": "selection",
+      "object": "Token",
+      "seq": 2
+    },
+    {
+      "action": "set-x",
+      "ids": [
+        "token-a"
+      ],
+      "kind": "action-receivers",
+      "seq": 3
+    },
+    {
+      "count": 1,
+      "id": "token-a",
+      "kind": "delete",
+      "seq": 4
+    },
+    {
+      "ids": [],
+      "kind": "selection",
+      "object": "Token",
+      "seq": 5
+    },
+    {
+      "ids": [
+        "token-b"
+      ],
+      "kind": "survivors",
+      "seq": 6
+    }
+  ],
+  "finalState": {
+    "instances": [
+      {
+        "id": "token-b",
+        "object": "Token",
+        "x": 20
+      }
+    ],
+    "scene": "Main"
+  },
+  "fixtureId": "object-picking-and-deletion",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

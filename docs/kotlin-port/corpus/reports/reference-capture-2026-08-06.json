@@ -1,0 +1,100 @@
+{
+  "capturedOn": "2026-08-06",
+  "command": "python3 docs/kotlin-port/corpus/tools/capture_reference.py --manifest docs/kotlin-port/corpus/manifest.json --runs 2 --verify",
+  "corpusVersion": "1.0.0",
+  "environment": {
+    "architecture": "x86_64",
+    "command": "python3 docs/kotlin-port/corpus/tools/capture_reference.py --manifest docs/kotlin-port/corpus/manifest.json --runs 2 --verify",
+    "hostInputs": {
+      "clockStartMs": 0,
+      "elapsedTimeMs": [
+        16
+      ],
+      "inputEvents": [],
+      "locale": "en-US",
+      "randomSeed": 123456789
+    },
+    "lockFiles": [
+      {
+        "path": "GDJS/package-lock.json",
+        "sha256": "9dc8075a8fb9b4d1ad9a463c442b31ef771b7e8ae8830d1b69d501204c70d77b"
+      },
+      {
+        "path": "GDJS/tests/package-lock.json",
+        "sha256": "3b21ccc473746a2fbcd4a8ec9d73ca82d87c485b4063e7cf8d602e9a902077b4"
+      }
+    ],
+    "node": "v20.20.2",
+    "os": "Linux 6.12.13",
+    "python": "3.12.13"
+  },
+  "fixtures": [
+    {
+      "canonicalTraceSha256": "35644f71e73972a5e95b645e439ba2f2b35add58d72955df9c190bb4c4c86577",
+      "fixtureId": "variables-and-branches",
+      "projectSha256": "e2e30ec1c813604ae2c0064125bcf21f9439f6908d2b87ec0db15607d482aa29",
+      "runSemanticSha256": [
+        "6f45ca2e75682cea894ccbbf72bdc36be41905e31992f800f571baaa4ff45c8a",
+        "6f45ca2e75682cea894ccbbf72bdc36be41905e31992f800f571baaa4ff45c8a"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "ee215e876b0abc89414deacbae813e1cc2ef834d97e237bf8c9a3f067c408e21",
+      "fixtureId": "object-picking-and-deletion",
+      "projectSha256": "6686fceee8ac94b6a577acc6160418ff4cc39ba617bab710d85ef53765582cb3",
+      "runSemanticSha256": [
+        "a9f85d6034d86ded19891037eadae8bbbc4a0a8cd72ab2f95afaa869fdad5523",
+        "a9f85d6034d86ded19891037eadae8bbbc4a0a8cd72ab2f95afaa869fdad5523"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "de85225dfc6330501496658497c3470717c80e0b1aa0f09a72caf2fca7f16b56",
+      "fixtureId": "scene-change-lifecycle",
+      "projectSha256": "786d6e200070a0bca819be89bf51cfa41391d6877bb89a4c94de95c3121ea938",
+      "runSemanticSha256": [
+        "871d52596736ae44f1aad7041bab054343b74765bcf640dd4a155ca61819a1ad",
+        "871d52596736ae44f1aad7041bab054343b74765bcf640dd4a155ca61819a1ad"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "d520a05200682118c2a00d897ef1f0d7220ee11fb654e59c43047dbd514af027",
+      "fixtureId": "builtin-text-object",
+      "projectSha256": "2b4943ddf7310bcfee379ec690faacbcbde8b5e5c08407e8f00a8849b8cf3d35",
+      "runSemanticSha256": [
+        "098e693f9b92cbce6c6792aa4e8f7e3ce70189239a137c174bac35a0da7ab1ec",
+        "098e693f9b92cbce6c6792aa4e8f7e3ce70189239a137c174bac35a0da7ab1ec"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "d673a6707382f61540b5bb61afd65730c7b2ba9b0f5780e62ed08fdc20943ff6",
+      "fixtureId": "builtin-behavior",
+      "projectSha256": "94eb48e4cf84c85ec456e3a95034295ac0e8fef265d2e5ecd2e40a7eb8b4a379",
+      "runSemanticSha256": [
+        "303813ec9ad795c0c72edf64e0ba3e11e45b5b8e0f3d19f30a7104be29ef1862",
+        "303813ec9ad795c0c72edf64e0ba3e11e45b5b8e0f3d19f30a7104be29ef1862"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "d339f94a192c523e7af1f1692e335cc2c998ed70a66916040a42f25f584a7fe7",
+      "fixtureId": "events-extension",
+      "projectSha256": "d4852670531080a23cdbb67bd164563659df211518061498135c698a46b84c56",
+      "runSemanticSha256": [
+        "0ce7e6bd1ee401386e0ea1cba544f3422607c8b1faf310e8dbafe899e13d47e2",
+        "0ce7e6bd1ee401386e0ea1cba544f3422607c8b1faf310e8dbafe899e13d47e2"
+      ]
+    },
+    {
+      "canonicalTraceSha256": "52e275666cff56f2daf9dc517a5d958ada271b1da618fb58773fc499a883a47e",
+      "fixtureId": "javascript-declared-extension",
+      "projectSha256": "2f22549385dc4b02b9e33c67bb2179c110949256a38cbee28605c0798177218b",
+      "runSemanticSha256": [
+        "46efcee759d0adf3848092c615da4072c12149c42c3e126a3c3613d40ed88446",
+        "46efcee759d0adf3848092c615da4072c12149c42c3e126a3c3613d40ed88446"
+      ]
+    }
+  ],
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "result": "identical",
+  "runs": 2,
+  "schemaVersion": "1.0.0"
+}

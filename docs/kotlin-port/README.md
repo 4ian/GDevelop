@@ -29,6 +29,10 @@ Git commit hash because source and runtime flows can change.
 
 Read these documents as one evidence set:
 
+* [Architecture and concept diagrams](DIAGRAMS.md) — visual overviews of the
+  existing GDevelop pipeline, Kotlin skeleton, NIR ownership, extension
+  resolution, runtime lifecycle, host capabilities, evidence gates, and the
+  isolated MapTiles spike.
 * [GDevelop pipeline trace](gdevelop-pipeline.md) — project loading, metadata,
   event generation, runtime initialization, lifecycle, and flow seams.
 * [Extension and type matrix](extensions-and-types.md) — extension declaration

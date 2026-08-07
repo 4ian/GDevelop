@@ -1085,7 +1085,7 @@ namespace gdjs {
      * @param stats Other measures done during the profiler run.
      */
     sendProfilerOutput(
-      framesAverageMeasures: FrameMeasure,
+      framesAverageMeasures: FrameMeasureOutput,
       stats: ProfilerStats
     ): void {
       this._sendMessage(

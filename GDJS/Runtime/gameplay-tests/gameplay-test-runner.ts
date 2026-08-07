@@ -289,6 +289,9 @@ namespace gdjs {
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
+    /** The scene change cause declared by the harness (see
+     * `SceneStack.runWithSceneChangeCause`). */
+    const GAMEPLAY_TEST_SCENE_CHANGE_CAUSE = 'gameplayTest';
     const DEFAULT_PROGRESS_WINDOW_FRAMES = 60;
     const DEFAULT_PROGRESS_MIN_PROGRESS = 8;
     const DEFAULT_REACH_RADIUS = 30;
@@ -475,24 +478,6 @@ namespace gdjs {
        * replacement by a new instance of the SAME scene is detected too
        * (recorded as a `sceneReset` event). */
       _lastTrackedScene: gdjs.RuntimeScene | null = null;
-      /** The cause of the last scene stack change, recorded by the scene
-       * change tracker (see `_installSceneChangeTracker`). */
-      _lastSceneChangeCause:
-        | 'harness'
-        | 'game'
-        | 'networkSync'
-        | 'external'
-        | null = null;
-      _lastSceneChangeCauseDetail: string | null = null;
-      /** True while `goToScene` is changing the scene itself. */
-      _harnessSceneChangeInProgress: boolean = false;
-      /** True while a frame is being stepped (a scene change happening then
-       * comes from the game's own logic). */
-      _stepInProgress: boolean = false;
-      /** True while the scene stack applies network sync data. */
-      _networkSyncApplyInProgress: boolean = false;
-      /** Undo the scene change tracker (see `_installSceneChangeTracker`). */
-      _uninstallSceneChangeTracker: () => void = () => {};
       _lastTrackedObjectCounts: { [objectName: string]: integer } = {};
       _pointerLockRequestedByGame: boolean = false;
       /** Whether the one-time "mouse deltas without pointer lock" hint was
@@ -599,80 +584,15 @@ namespace gdjs {
         return objectCounts;
       }
 
-      /**
-       * Track who mutates the scene stack while the test runs, so scene
-       * change events can report their cause: a `goToScene` of the test, the
-       * game's own logic (a change/restart action running during a stepped
-       * frame), network sync, or something external to the game.
-       */
-      _installSceneChangeTracker(): void {
-        const sceneStack = this._runtimeGame.getSceneStack() as any;
-        const harness = this;
-        const restorers: Array<() => void> = [];
-
-        for (const methodName of ['replace', 'push', 'pop']) {
-          const original = sceneStack[methodName];
-          if (typeof original !== 'function') continue;
-          sceneStack[methodName] = function () {
-            harness._recordSceneChangeCause();
-            return original.apply(this, arguments);
-          };
-          restorers.push(() => {
-            sceneStack[methodName] = original;
-          });
-        }
-
-        const originalApplyNetworkSync =
-          sceneStack.applyUpdateFromNetworkSyncDataIfAny;
-        if (typeof originalApplyNetworkSync === 'function') {
-          sceneStack.applyUpdateFromNetworkSyncDataIfAny = function () {
-            harness._networkSyncApplyInProgress = true;
-            try {
-              return originalApplyNetworkSync.apply(this, arguments);
-            } finally {
-              harness._networkSyncApplyInProgress = false;
-            }
-          };
-          restorers.push(() => {
-            sceneStack.applyUpdateFromNetworkSyncDataIfAny =
-              originalApplyNetworkSync;
-          });
-        }
-
-        this._uninstallSceneChangeTracker = () => {
-          restorers.forEach((restore) => restore());
-          this._uninstallSceneChangeTracker = () => {};
-        };
-      }
-
-      private _recordSceneChangeCause(): void {
-        this._lastSceneChangeCause = this._harnessSceneChangeInProgress
-          ? 'harness'
-          : this._networkSyncApplyInProgress
-            ? 'networkSync'
-            : this._stepInProgress
-              ? 'game'
-              : 'external';
-        if (this._lastSceneChangeCause === 'external') {
-          // The mystery case: keep where the change came from.
-          const stack = new Error().stack || '';
-          this._lastSceneChangeCauseDetail = stack
-            .split('\n')
-            .slice(2, 5)
-            .map((line) => line.trim())
-            .join(' ')
-            .slice(0, 300);
-        } else {
-          this._lastSceneChangeCauseDetail = null;
-        }
-      }
-
       private _trackChangesAfterStep(): void {
         const currentScene = this._runtimeGame
           .getSceneStack()
           .getCurrentScene();
         const sceneName = currentScene ? currentScene.getName() : '';
         if (currentScene !== this._lastTrackedScene) {
+          const lastChangeCause = this._runtimeGame
+            .getSceneStack()
+            .consumeLastSceneChangeCause();
           this._recordEvent({
             frame: this._framesExecuted,
             // A new instance of the SAME scene means the scene was restarted
@@ -683,13 +603,18 @@ namespace gdjs {
                 ? 'sceneReset'
                 : 'sceneChanged',
             sceneName,
-            cause: this._lastSceneChangeCause || 'unknown',
-            ...(this._lastSceneChangeCauseDetail
-              ? { causeDetail: this._lastSceneChangeCauseDetail }
+            cause: !lastChangeCause
+              ? 'unknown'
+              : lastChangeCause.cause === GAMEPLAY_TEST_SCENE_CHANGE_CAUSE
+                ? 'harness'
+                : lastChangeCause.cause === 'game' ||
+                    lastChangeCause.cause === 'networkSync'
+                  ? lastChangeCause.cause
+                  : 'external',
+            ...(lastChangeCause && lastChangeCause.stack
+              ? { causeDetail: lastChangeCause.stack }
               : {}),
           });
-          this._lastSceneChangeCause = null;
-          this._lastSceneChangeCauseDetail = null;
           this._lastTrackedScene = currentScene;
           this._lastTrackedSceneName = sceneName;
           this._lastTrackedObjectCounts = this._getObjectCounts();
@@ -729,12 +654,7 @@ namespace gdjs {
       _stepSingleFrame(dtMs: float): void {
         this._checkGuards();
         const stepStartTimeMs = Date.now();
-        this._stepInProgress = true;
-        try {
-          this._runtimeGame.getSceneStack().step(dtMs);
-        } finally {
-          this._stepInProgress = false;
-        }
+        this._runtimeGame.getSceneStack().step(dtMs);
         this._callOnFrameEnded();
         this._framesExecuted++;
         this._gameTimeMs += dtMs;
@@ -812,18 +732,17 @@ namespace gdjs {
           await this._runtimeGame.loadSceneAssets(sceneName);
         }
         this._checkGuards();
-        this._harnessSceneChangeInProgress = true;
-        try {
-          this._runtimeGame.getSceneStack().replace({
-            sceneName,
-            clear: true,
-            skipCreatingInstances: options
-              ? options.skipCreatingInstances
-              : undefined,
-          });
-        } finally {
-          this._harnessSceneChangeInProgress = false;
-        }
+        this._runtimeGame
+          .getSceneStack()
+          .runWithSceneChangeCause(GAMEPLAY_TEST_SCENE_CHANGE_CAUSE, () =>
+            this._runtimeGame.getSceneStack().replace({
+              sceneName,
+              clear: true,
+              skipCreatingInstances: options
+                ? options.skipCreatingInstances
+                : undefined,
+            })
+          );
         // Step one frame so the scene is fully initialized ("beginning of
         // scene" events have run) before the test continues.
         await this.stepFrames(1);
@@ -2348,7 +2267,6 @@ namespace gdjs {
       harness._callOnFrameEnded = originalOnFrameEnded;
 
       harness._installPointerLockShim();
-      harness._installSceneChangeTracker();
 
       // Capture the logs of the game itself (in addition to the `console`
       // passed to the script).
@@ -2480,7 +2398,6 @@ namespace gdjs {
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
-        harness._uninstallSceneChangeTracker();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

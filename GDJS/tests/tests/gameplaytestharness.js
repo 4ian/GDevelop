@@ -746,20 +746,15 @@ describe('gdjs.gameplayTests', () => {
     it('records the cause of scene changes (harness vs external)', async () => {
       const runtimeGame = makeRuntimeGame();
       const harness = makeStartedHarness(runtimeGame);
-      harness._installSceneChangeTracker();
-      try {
-        await harness.goToScene('Scene 1');
-        await harness.stepFrames(2);
-        // An external actor (not the harness, not the game logic) replaces
-        // the scene.
-        runtimeGame.getSceneStack().replace({
-          sceneName: 'Scene 1',
-          clear: true,
-        });
-        await harness.stepFrames(1);
-      } finally {
-        harness._uninstallSceneChangeTracker();
-      }
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      // An external actor (not the harness, not the game logic) replaces
+      // the scene.
+      runtimeGame.getSceneStack().replace({
+        sceneName: 'Scene 1',
+        clear: true,
+      });
+      await harness.stepFrames(1);
 
       const sceneEvents = harness._eventLog.filter(
         (event) =>

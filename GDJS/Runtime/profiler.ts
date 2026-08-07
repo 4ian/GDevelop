@@ -17,6 +17,17 @@ namespace gdjs {
   };
 
   /**
+   * Measures output by the profiler (see `getFramesAverageMeasures`): a
+   * plain tree without back-references, safe to serialize with
+   * `JSON.stringify`.
+   * @category Debugging > Profiler
+   */
+  export type FrameMeasureOutput = {
+    time: float;
+    subsections: Record<string, FrameMeasureOutput>;
+  };
+
+  /**
    * A basic profiling tool that can be used to measure time spent in sections of the engine.
    * @category Debugging > Profiler
    */
@@ -134,7 +145,7 @@ namespace gdjs {
 
     static _addAverageSectionTimes(
       section: FrameMeasure,
-      destinationSection: FrameMeasure,
+      destinationSection: FrameMeasureOutput,
       totalCount: integer,
       i: integer
     ): void {
@@ -145,7 +156,6 @@ namespace gdjs {
           const destinationSubsections = destinationSection.subsections;
           const destinationSubsection = (destinationSubsections[sectionName] =
             destinationSubsections[sectionName] || {
-              parent: destinationSection,
               time: 0,
               subsections: {},
             });
@@ -161,13 +171,12 @@ namespace gdjs {
 
     /**
      * Return the measures for all the section of the game during the frames
-     * captured.
+     * captured, as a plain tree (no back-references): safe to serialize
+     * with `JSON.stringify`.
      */
-    getFramesAverageMeasures(): FrameMeasure {
-      const framesAverageMeasures = {
-        parent: null,
+    getFramesAverageMeasures(): FrameMeasureOutput {
+      const framesAverageMeasures: FrameMeasureOutput = {
         time: 0,
-        lastStartTime: 0,
         subsections: {},
       };
       for (let i = 0; i < this._framesCount; ++i) {
@@ -198,15 +207,13 @@ namespace gdjs {
      */
     static getProfilerSectionTexts(
       sectionName: string,
-      profilerSection: any,
-      outputs: any
+      profilerSection: FrameMeasureOutput,
+      outputs: Array<string>,
+      parentTime?: float | null
     ): void {
       const percent =
-        profilerSection.parent && profilerSection.parent.time !== 0
-          ? (
-              (profilerSection.time / profilerSection.parent.time) *
-              100
-            ).toFixed(1)
+        parentTime && parentTime !== 0
+          ? ((profilerSection.time / parentTime) * 100).toFixed(1)
           : '100%';
       const time = profilerSection.time.toFixed(2);
       outputs.push(sectionName + ': ' + time + 'ms (' + percent + ')');
@@ -216,7 +223,8 @@ namespace gdjs {
           Profiler.getProfilerSectionTexts(
             subsectionName,
             profilerSection.subsections[subsectionName],
-            subsectionsOutputs
+            subsectionsOutputs,
+            profilerSection.time
           );
         }
       }

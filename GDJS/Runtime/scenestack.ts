@@ -29,6 +29,14 @@ namespace gdjs {
     _isNextLayoutLoading: boolean = false;
     _sceneStackSyncDataToApply: SceneStackNetworkSyncData | null = null;
     _wasDisposed: boolean = false;
+    /** The cause attributed to the scene stack changes happening now (see
+     * `runWithSceneChangeCause`), or null when nothing declared one. */
+    private _activeChangeCause: string | null = null;
+    /** The cause of the last stack change ('external' when nothing declared
+     * one), read with `consumeLastSceneChangeCause`. */
+    private _lastChangeCause: string | null = null;
+    /** For an 'external' change: where it came from (call stack). */
+    private _lastChangeCauseStack: string | null = null;
 
     /**
      * @param runtimeGame The runtime game that is using the scene stack
@@ -38,6 +46,56 @@ namespace gdjs {
         throw 'SceneStack must be constructed with a gdjs.RuntimeGame.';
       }
       this._runtimeGame = runtimeGame;
+    }
+
+    /**
+     * Attribute any scene stack change done by `action` to `cause` (e.g.
+     * 'game', 'networkSync', 'gameplayTest'...). The stack labels its own
+     * changes: a change requested by the game logic during `step` is
+     * attributed to 'game', an applied network sync to 'networkSync'. A
+     * change happening outside of any declared cause is recorded as
+     * 'external' (with the call stack that made it).
+     */
+    runWithSceneChangeCause<T>(cause: string, action: () => T): T {
+      const previousCause = this._activeChangeCause;
+      this._activeChangeCause = cause;
+      try {
+        return action();
+      } finally {
+        this._activeChangeCause = previousCause;
+      }
+    }
+
+    /**
+     * Return the cause of the last scene stack change (and clear it):
+     * the cause declared with `runWithSceneChangeCause`, or 'external'
+     * (with the call stack of the change). Null if no change happened
+     * since the last call.
+     */
+    consumeLastSceneChangeCause(): {
+      cause: string;
+      stack: string | null;
+    } | null {
+      if (this._lastChangeCause === null) return null;
+      const lastChangeCause = {
+        cause: this._lastChangeCause,
+        stack: this._lastChangeCauseStack,
+      };
+      this._lastChangeCause = null;
+      this._lastChangeCauseStack = null;
+      return lastChangeCause;
+    }
+
+    private _recordSceneStackChange(): void {
+      this._lastChangeCause = this._activeChangeCause || 'external';
+      this._lastChangeCauseStack = this._activeChangeCause
+        ? null
+        : (new Error().stack || '')
+            .split('\n')
+            .slice(2, 5)
+            .map((line) => line.trim())
+            .join(' ')
+            .slice(0, 300);
     }
 
     /**
@@ -57,7 +115,10 @@ namespace gdjs {
         return false;
       }
 
-      const hasMadeChangeToStack = this.applyUpdateFromNetworkSyncDataIfAny();
+      const hasMadeChangeToStack = this.runWithSceneChangeCause(
+        'networkSync',
+        () => this.applyUpdateFromNetworkSyncDataIfAny()
+      );
       if (hasMadeChangeToStack) {
         debugLogger.info(
           'Scene stack has been updated from network sync data, skipping step.'
@@ -68,32 +129,36 @@ namespace gdjs {
         return true;
       }
 
-      const currentScene = this._stack[this._stack.length - 1];
-      if (currentScene.renderAndStep(elapsedTime)) {
-        const request = currentScene.getRequestedChange();
+      // Any scene stack change from here comes from the game's own logic
+      // (a scene change/restart action).
+      return this.runWithSceneChangeCause('game', () => {
+        const currentScene = this._stack[this._stack.length - 1];
+        if (currentScene.renderAndStep(elapsedTime)) {
+          const request = currentScene.getRequestedChange();
 
-        // A scene change was requested by the current scene.
-        if (request === gdjs.SceneChangeRequest.STOP_GAME) {
-          this._runtimeGame.getRenderer().stopGame();
-          return true;
-        } else if (request === gdjs.SceneChangeRequest.POP_SCENE) {
-          this.pop();
-        } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
-          this.push(currentScene.getRequestedScene());
-        } else if (
-          request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
-          request === gdjs.SceneChangeRequest.CLEAR_SCENES
-        ) {
-          this.replace(
-            currentScene.getRequestedScene(),
+          // A scene change was requested by the current scene.
+          if (request === gdjs.SceneChangeRequest.STOP_GAME) {
+            this._runtimeGame.getRenderer().stopGame();
+            return true;
+          } else if (request === gdjs.SceneChangeRequest.POP_SCENE) {
+            this.pop();
+          } else if (request === gdjs.SceneChangeRequest.PUSH_SCENE) {
+            this.push(currentScene.getRequestedScene());
+          } else if (
+            request === gdjs.SceneChangeRequest.REPLACE_SCENE ||
             request === gdjs.SceneChangeRequest.CLEAR_SCENES
-          );
-        } else {
-          logger.error('Unrecognized change in scene stack: ' + request);
+          ) {
+            this.replace(
+              currentScene.getRequestedScene(),
+              request === gdjs.SceneChangeRequest.CLEAR_SCENES
+            );
+          } else {
+            logger.error('Unrecognized change in scene stack: ' + request);
+          }
         }
-      }
 
-      return true;
+        return true;
+      });
     }
 
     renderWithoutStep(): boolean {
@@ -109,6 +174,7 @@ namespace gdjs {
 
     pop(popCount = 1): void {
       this._throwIfDisposed();
+      this._recordSceneStackChange();
 
       let hasDoneAnyChanges = false;
       for (let i = 0; i < popCount; ++i) {
@@ -149,6 +215,7 @@ namespace gdjs {
       deprecatedExternalLayoutName?: string
     ): gdjs.RuntimeScene | null {
       this._throwIfDisposed();
+      this._recordSceneStackChange();
 
       const sceneName =
         typeof options === 'string' ? options : options.sceneName;
@@ -185,15 +252,26 @@ namespace gdjs {
       }
 
       this._isNextLayoutLoading = true;
+      // The scene is created later (once assets are loaded): attribute that
+      // deferred change to the cause active NOW, at request time.
+      const requestChangeCause = this._activeChangeCause;
       this._runtimeGame.loadSceneAssets(sceneName).then(() => {
-        this._loadNewScene({
-          sceneName,
-          externalLayoutName,
-          getExcludedObjectNames,
-          skipStoppingSoundsOnStartup,
-          skipCreatingInstances,
-        });
-        this._isNextLayoutLoading = false;
+        const loadScene = () => {
+          this._loadNewScene({
+            sceneName,
+            externalLayoutName,
+            getExcludedObjectNames,
+            skipStoppingSoundsOnStartup,
+            skipCreatingInstances,
+          });
+          this._recordSceneStackChange();
+          this._isNextLayoutLoading = false;
+        };
+        if (requestChangeCause !== null) {
+          this.runWithSceneChangeCause(requestChangeCause, loadScene);
+        } else {
+          loadScene();
+        }
       });
 
       return null;
@@ -247,6 +325,7 @@ namespace gdjs {
       options: ReplaceSceneOptions | string,
       deprecatedClear?: boolean
     ): gdjs.RuntimeScene | null {
+      this._recordSceneStackChange();
       const clear =
         deprecatedClear || typeof options === 'string' ? false : options.clear;
       const newSceneName =

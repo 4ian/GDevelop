@@ -8,6 +8,13 @@
 > of truth for common source models, normalized IR, event semantics, or runtime
 > state.
 
+> [!CAUTION]
+> **Feature work is paused until the Phase 1 go criterion is satisfied.** Do not
+> add MapTiles authoring features, tile-provider integrations, style editing,
+> offline support, terrain, native rendering, or production packaging. The
+> reviewed [MapTiles common API audit](maptiles-api-audit.md) freezes existing
+> ownership boundaries and promotes no spike API.
+
 This document is an experiment charter in the phase-gate format defined by
 [`target-strategy.md`](target-strategy.md). Claims use the evidence markers from
 [`README.md`](README.md). A successful spike shows that a browser host can
@@ -264,6 +271,10 @@ Until those reports exist, this document records scope and hypotheses—not
 confirmation that MapLibre integration works.
 
 ## Deliverables
+
+The API-audit deliverable is recorded in
+[`maptiles-api-audit.md`](maptiles-api-audit.md). It is a static boundary review,
+not a passing conformance result.
 
 1. An isolated Kotlin/JS browser entry point and narrow MapLibre host adapter.
 2. The three fixture families, deterministic local fixture server, provenance,

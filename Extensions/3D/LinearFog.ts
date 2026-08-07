@@ -59,17 +59,21 @@ namespace gdjs {
           }
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
+            const scene = target.getRuntimeScene().getScene();
+            const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
             if (parameterName === 'near') {
-              this.fog.near = value;
+              this.fog.near = value * inverseWorldScale;
             } else if (parameterName === 'far') {
-              this.fog.far = value;
+              this.fog.far = value * inverseWorldScale;
             }
           }
           getDoubleParameter(parameterName: string): number {
+            const scene = target.getRuntimeScene().getScene();
+            const worldScale = scene.getRenderer3DWorldScale();
             if (parameterName === 'near') {
-              return this.fog.near;
+              return this.fog.near * worldScale;
             } else if (parameterName === 'far') {
-              return this.fog.far;
+              return this.fog.far * worldScale;
             }
             return 0;
           }

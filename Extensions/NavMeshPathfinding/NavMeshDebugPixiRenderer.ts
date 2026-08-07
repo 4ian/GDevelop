@@ -54,7 +54,6 @@ namespace gdjs {
                 case 'tris':
                   for (let i = 0; i + 2 < primitive.vertices.length; i += 3) {
                     const [x0, y0, z0] = primitive.vertices[i];
-                    //console.log("y", y0);
                     if (y0 < 15) {
                       const [x1, _y1, z1] = primitive.vertices[i + 1];
                       const [x2, _y2, z2] = primitive.vertices[i + 2];
@@ -117,7 +116,6 @@ namespace gdjs {
         .values()
         .next().value;
       const scene = firstObstacle.owner.getRuntimeScene();
-      const inverseWorldScale = scene.getRenderer3DInverseWorldScale();
       const layer = scene.getLayer(firstObstacle.owner.getLayer());
       const rendererObject = layer.get3DRendererObject();
       if (!rendererObject) {
@@ -159,8 +157,6 @@ namespace gdjs {
               });
             }
             const mesh = new THREE.Mesh(geometry, this.material);
-
-            console.log(positions);
             meshes.push(mesh);
             rendererObject.add(mesh);
             break;

@@ -152,7 +152,7 @@ module.exports = {
           .getOrCreate('radius')
           .setValue(behaviorContent.getChild('radius').getStringValue())
           .setLabel(_('Radius'))
-          .setLabel(
+          .setDescription(
             _(
               'Use the circle inside the object width and height when left to 0.'
             )
@@ -227,6 +227,14 @@ module.exports = {
           if (newValueAsNumber !== newValueAsNumber) return false;
           sharedContent
             .getOrCreateChild('walkableRadius')
+            .setDoubleValue(newValueAsNumber);
+          return true;
+        }
+        if (propertyName === 'walkableHeight') {
+          const newValueAsNumber = parseFloat(newValue);
+          if (newValueAsNumber !== newValueAsNumber) return false;
+          sharedContent
+            .getOrCreateChild('walkableHeight')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -313,6 +321,25 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         sharedProperties
+          .getOrCreate('walkableHeight')
+          .setLabel(_('Walkable height'))
+          .setDescription(
+            _(
+              'Minimum floor to ceiling height that will still allow the floor area to be considered walkable.'
+            )
+          )
+          .setType('Number')
+          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
+          .setValue(
+            sharedContent
+              .getChild('walkableHeight')
+              .getDoubleValue()
+              .toString(10)
+          )
+          .setAdvanced(true)
+          .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
+
+        sharedProperties
           .getOrCreate('speedScaleY')
           .setLabel(_('Y speed scale'))
           .setDescription(
@@ -336,6 +363,7 @@ module.exports = {
         sharedContent.addChild('slopeMaxAngle').setDoubleValue(50);
         sharedContent.addChild('stairHeightMax').setDoubleValue(20);
         sharedContent.addChild('walkableRadius').setDoubleValue(-1);
+        sharedContent.addChild('walkableHeight').setDoubleValue(150);
         sharedContent.addChild('speedScaleY').setDoubleValue(1);
       };
 

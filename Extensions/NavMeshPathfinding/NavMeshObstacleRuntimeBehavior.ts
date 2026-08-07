@@ -42,12 +42,13 @@ namespace gdjs {
       cs: 10,
       ch: 10,
       walkableSlopeAngle: 50,
-      walkableHeight: 10,
+      walkableHeight: 15,
       detailSampleMaxError: 50,
       walkableClimb: 2,
       walkableRadius: 1,
     };
     walkableRadius: float = -1;
+    walkableHeight: float = 150;
     stairHeightMax: float = 20;
     speedScaleY: float = 1;
     inverseSpeedScaleY: float = 1;
@@ -64,6 +65,7 @@ namespace gdjs {
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
+      this.walkableHeight = sharedData.walkableHeight;
       this.walkableRadius = sharedData.walkableRadius;
       this.speedScaleY = sharedData.speedScaleY;
       this.inverseSpeedScaleY = 1 / sharedData.speedScaleY;
@@ -132,7 +134,8 @@ namespace gdjs {
       }
       if (!this.is3D && positions.length > 0) {
         this.addGroundFor2D(positions, indices);
-        this.navMeshConfig.walkableClimb = 0;
+        this.navMeshConfig.walkableClimb = 0.1;
+        this.navMeshConfig.walkableHeight = 2;
         this.navMeshConfig.ch = 10;
       } else {
         const walkableClimbMin =
@@ -146,6 +149,9 @@ namespace gdjs {
               this.stairHeightMax / this.navMeshConfig.ch
             )
           : walkableClimbMin;
+        this.navMeshConfig.walkableHeight = this.navMeshConfig.ch
+          ? this.walkableHeight / this.navMeshConfig.ch
+          : this.walkableHeight;
       }
 
       let characterRadiusMax = 0;
@@ -477,7 +483,6 @@ namespace gdjs {
       }
 
       character._crowdAgentParams.radius = character.getRadius();
-      console.log(character._crowdAgentParams.radius);
       character._crowdAgentParams.height =
         //@ts-ignore
         owner.getDepth

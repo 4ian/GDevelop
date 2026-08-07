@@ -221,7 +221,40 @@ namespace gdjs {
         this._pathFound = false;
         return;
       }
-      this.teleportAgentToObjectIfNeeded();
+      const { success: hasFindOrigin, point: origin } =
+        navMeshQuery.findClosestPoint(
+          {
+            x: this.owner.getX(),
+            //@ts-ignore
+            y: this.owner.getZ ? this.owner.getZ() : 0,
+            z: this._manager.is3D
+              ? this.owner.getY()
+              : this.owner.getY() * this._manager.inverseSpeedScaleY,
+          },
+          { halfExtents: { x: 100, y: 100, z: 100 } }
+        );
+      if (!hasFindOrigin) {
+        this._pathFound = false;
+        console.log(
+          "Can't find origin",
+          this.owner.getX(),
+          this.owner.getY(),
+          //@ts-ignore
+          this.owner.getZ ? this.owner.getZ() : 0
+        );
+        return;
+      }
+      this._agent.teleport(origin);
+      this.owner.setX(origin.x);
+      this.owner.setY(
+        this._manager.is3D ? origin.z : origin.z * this._manager.speedScaleY
+      );
+      //@ts-ignore
+      if (this.owner.setZ) {
+        //@ts-ignore
+        this.owner.setZ(origin.y);
+      }
+
       this._pathFound = this._agent.requestMoveTarget(destination);
       console.log(
         'hasFindPath',
@@ -231,6 +264,12 @@ namespace gdjs {
         //@ts-ignore
         this.owner.getZ ? this.owner.getZ() : 0,
         ' -> ',
+        destination.x,
+        this._manager.is3D
+          ? destination.z
+          : destination.z * this._manager.speedScaleY,
+        destination.y,
+        'extended from',
         x,
         y,
         z
@@ -247,15 +286,17 @@ namespace gdjs {
       }
       const oldX = this.owner.getX();
       const oldY = this.owner.getY();
+      // For 2D we keep the agent position for Z because the ground may not be
+      // at 0 because of rasterization.
       //@ts-ignore
-      const oldZ = this.owner.getZ ? this.owner.getZ() : 0;
+      const oldZ = this.owner.getZ ? this.owner.getZ() : agent.raw.get_npos(1);
 
       let expectedX = agent.raw.get_npos(0);
       let expectedY = this._manager.is3D
         ? agent.raw.get_npos(2)
         : agent.raw.get_npos(2) * this._manager.speedScaleY;
       //@ts-ignore
-      let expectedZ = this.owner.getZ ? agent.raw.get_npos(1) : 0;
+      let expectedZ = agent.raw.get_npos(1);
 
       if (oldX !== expectedX || oldY !== expectedY || oldZ !== expectedZ) {
         agent.teleport({
@@ -297,6 +338,7 @@ namespace gdjs {
         this._path = path;
         console.log('path', this._path);
       }
+      console.log(agent.raw.get_npos(0), agent.raw.get_npos(2), agent.raw.get_npos(1));
 
       let newX = agent.raw.get_npos(0);
       let newY = this._manager.is3D

@@ -101,7 +101,8 @@ class GD_CORE_API EventsRefactorer {
       bool inConditions,
       bool inActions,
       bool inEventStrings,
-      bool inEventSentences);
+      bool inEventSentences,
+      bool inInstructionNames = false);
 
   /**
    * Replace all occurrences of a gd::String in events
@@ -184,17 +185,20 @@ class GD_CORE_API EventsRefactorer {
                                           gd::Instruction& instruction,
                                           gd::String search,
                                           bool matchCase,
-                                          bool isCondition);
+                                          bool isCondition,
+                                          bool inInstructionNames = false);
   static bool SearchStringInActions(const gd::Platform& platform,
                                     gd::InstructionsList& actions,
                                     gd::String search,
                                     bool matchCase,
-                                    bool inSentences);
+                                    bool inSentences,
+                                    bool inInstructionNames = false);
   static bool SearchStringInConditions(const gd::Platform& platform,
                                        gd::InstructionsList& conditions,
                                        gd::String search,
                                        bool matchCase,
-                                       bool inSentences);
+                                       bool inSentences,
+                                       bool inInstructionNames = false);
   static bool SearchStringInEvent(gd::BaseEvent& events,
                                   gd::String search,
                                   bool matchCase);

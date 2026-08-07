@@ -11,7 +11,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
-#include "GDCore/IDE/ObjectVariableHelper.h"
+#include "GDCore/IDE/ObjectRefactorer.h"
 #include "GDCore/IDE/EventBasedBehaviorBrowser.h"
 #include "GDCore/IDE/EventBasedObjectBrowser.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
@@ -163,6 +163,10 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
     const auto &variable = oldVariablesContainer.Get(i);
     const auto &variableName = oldVariablesContainer.GetNameAt(i);
 
+    // Skip variables with empty UUIDs to avoid all of them mapping to the
+    // same key, which would cause incorrect rename detection.
+    if (variable.GetPersistentUuid().empty()) continue;
+
     // All variables are candidate to be removed.
     removedUuidAndNames[variable.GetPersistentUuid()] = variableName;
   }
@@ -229,6 +233,10 @@ WholeProjectRefactorer::ComputeChangesetForVariable(
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
 
+    // Skip variables with empty UUIDs to avoid all of them mapping to the
+    // same key, which would cause incorrect rename detection.
+    if (oldChild->GetPersistentUuid().empty()) continue;
+
     // All variables are candidate to be removed.
     oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
   }
@@ -281,6 +289,10 @@ bool WholeProjectRefactorer::HasAnyVariableTypeChanged(
   for (const auto &pair : oldVariable.GetAllChildren()) {
     const auto &oldName = pair.first;
     const auto oldChild = pair.second;
+
+    // Skip variables with empty UUIDs to avoid all of them mapping to the
+    // same key, which would cause incorrect rename detection.
+    if (oldChild->GetPersistentUuid().empty()) continue;
 
     // All variables are candidate to be removed.
     oldVariableNamesByUuid[oldChild->GetPersistentUuid()] = oldName;
@@ -352,7 +364,7 @@ void WholeProjectRefactorer::ApplyRefactoringForObjectVariablesContainer(
       project, objectVariablesContainer, changeset,
       originalSerializedVariables);
 
-  gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+  gd::ObjectRefactorer::ApplyChangesToObjectInstances(
       objectVariablesContainer, initialInstancesContainer, objectName,
       changeset);
 }
@@ -382,7 +394,7 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                              : globalObjectsContainer.GetObject(objectName);
     auto &objectVariablesContainer = object.GetVariables();
 
-    gd::ObjectVariableHelper::ApplyChangesToObjectInstances(
+    gd::ObjectRefactorer::ApplyChangesToObjectInstances(
       objectVariablesContainer, initialInstancesContainer, objectName,
       changeset);
 
@@ -401,12 +413,12 @@ void WholeProjectRefactorer::ApplyRefactoringForGroupVariablesContainer(
                                                 eventsVariableReplacer);
 
   // Apply changes to objects.
-  gd::ObjectVariableHelper::FillMissingGroupVariablesToObjects(
+  gd::ObjectRefactorer::FillMissingGroupVariablesToObjects(
       globalObjectsContainer,
       objectsContainer,
       objectGroup,
       originalSerializedVariables);
-  gd::ObjectVariableHelper::ApplyChangesToObjects(
+  gd::ObjectRefactorer::ApplyChangesToObjects(
       globalObjectsContainer, objectsContainer, groupVariablesContainer,
       objectGroup, changeset);
 

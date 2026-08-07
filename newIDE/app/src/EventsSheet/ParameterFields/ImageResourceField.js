@@ -11,6 +11,8 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import { highlightSearchText } from '../../Utils/HighlightSearchText';
 
 const ImageResourceField: React.ComponentType<{
   ...ParameterFieldProps,
@@ -53,3 +55,40 @@ const ImageResourceField: React.ComponentType<{
 );
 
 export default ImageResourceField;
+
+export const renderInlineResourceField = ({
+  value,
+  expressionIsValid,
+  hasDeprecationWarning,
+  parameterMetadata,
+  InvalidParameterValue,
+  DeprecatedParameterValue,
+  MissingParameterValue,
+  highlightedSearchText,
+  highlightedSearchMatchCase,
+}: ParameterInlineRendererProps): string | React.Node => {
+  if (!value && !parameterMetadata.isOptional()) {
+    return <MissingParameterValue />;
+  }
+  if (!expressionIsValid) {
+    return (
+      <InvalidParameterValue>
+        {highlightSearchText(value, highlightedSearchText, {
+          matchCase: highlightedSearchMatchCase,
+        })}
+      </InvalidParameterValue>
+    );
+  }
+  if (hasDeprecationWarning) {
+    return (
+      <DeprecatedParameterValue>
+        {highlightSearchText(value, highlightedSearchText, {
+          matchCase: highlightedSearchMatchCase,
+        })}
+      </DeprecatedParameterValue>
+    );
+  }
+  return highlightSearchText(value, highlightedSearchText, {
+    matchCase: highlightedSearchMatchCase,
+  });
+};

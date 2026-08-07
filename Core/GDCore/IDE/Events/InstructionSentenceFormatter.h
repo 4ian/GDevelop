@@ -30,6 +30,18 @@ class GD_CORE_API InstructionSentenceFormatter {
   std::vector<std::pair<gd::String, gd::TextFormatting> > GetAsFormattedText(
       const gd::Instruction &instr, const gd::InstructionMetadata &metadata);
 
+  /**
+   * \brief Return the value to display for a parameter, normalizing types
+   * (like `yesorno`/`trueorfalse`) whose runtime interpretation differs from
+   * the raw stored value.
+   *
+   * Look at `EventsCodeGenerator::GenerateParameterCodes` and
+   * `AdvancedExtension.cpp` (for GDJS) for related logic that must stay
+   * consistent.
+   */
+  static gd::String GetFormattedParameterValue(const gd::String &rawValue,
+                                               const gd::String &parameterType);
+
   static InstructionSentenceFormatter *Get() {
     if (NULL == _singleton) {
       _singleton = new InstructionSentenceFormatter;

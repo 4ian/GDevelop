@@ -45,6 +45,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
             effects: [],
           },
         ],
+        objectsGroups: [],
         instances: [],
         usedResources: [],
         uiSettings: {

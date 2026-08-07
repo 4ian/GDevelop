@@ -4,10 +4,17 @@ import IconButton from '../UI/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from '../UI/Tooltip';
 
+export type ToolbarButtonHooksNames =
+  | 'onEditorReady'
+  | 'onPreviewStart'
+  | 'onPreviewEnd';
+
 export type ToolbarButtonConfig = {|
   name: string,
   icon: string,
   npmScript: string,
+  hook?: ToolbarButtonHooksNames,
+  keepTerminalOpen?: boolean,
 |};
 
 type Props = {|

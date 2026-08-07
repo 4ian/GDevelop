@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../MainFrame/Preferences/PreferencesContext';
 import AlertMessage from './AlertMessage';
-import Window from '../Utils/Window';
+import useAlertDialog from './Alert/useAlertDialog';
 
 type Props = {|
   kind: 'info' | 'warning',
@@ -20,26 +21,28 @@ const DismissableAlertMessage = ({
   identifier,
   kind,
   children,
-}: Props): React.Node => (
-  <PreferencesContext.Consumer>
-    {({ values, showAlertMessage }) =>
-      !values.hiddenAlertMessages[identifier] && (
-        <AlertMessage
-          kind={kind}
-          children={children}
-          onHide={() => {
-            const answer = Window.showConfirmDialog(
-              "Are you sure you want to hide this hint? You won't see it again, unless you re-activate it from the preferences."
-            );
+}: Props): React.Node => {
+  const { values, showAlertMessage } = React.useContext(PreferencesContext);
+  const { showConfirmation } = useAlertDialog();
 
-            if (!answer) return;
+  if (values.hiddenAlertMessages[identifier]) return null;
 
-            showAlertMessage(identifier, false);
-          }}
-        />
-      )
-    }
-  </PreferencesContext.Consumer>
-);
+  return (
+    <AlertMessage
+      kind={kind}
+      children={children}
+      onHide={async () => {
+        const answer = await showConfirmation({
+          title: t`Hide this hint?`,
+          message: t`Are you sure you want to hide this hint? You won't see it again, unless you re-activate it from the preferences.`,
+        });
+
+        if (!answer) return;
+
+        showAlertMessage(identifier, false);
+      }}
+    />
+  );
+};
 
 export default DismissableAlertMessage;

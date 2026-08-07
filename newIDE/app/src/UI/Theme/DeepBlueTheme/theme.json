@@ -39,7 +39,7 @@
       },
       "alternate-canvas-light": {
         "background-color": {
-          "value": "#21262d" 
+          "value": "#21262d"
         }
       }
     },
@@ -465,6 +465,28 @@
           "value": "rgba(230, 230, 230, 0.20)"
         }
       }
+    },
+    "auto-edit": {
+      "off": {
+        "background-color": {
+          "value": "#494952",
+          "comment": "Palette/Grey/70"
+        },
+        "text-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "on": {
+        "background-color": {
+          "value": "#45D9A1",
+          "comment": "Palette/Green/40"
+        },
+        "text-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        }
+      }
     }
   },
   "input": {
@@ -478,6 +500,11 @@
     "event-tree": {
       "background-color": {
         "value": "#0d1117"
+      }
+    },
+    "conditions-actions-container": {
+      "border-color": {
+        "value": "#30363d"
       }
     },
     "rst": {
@@ -533,9 +560,6 @@
       },
       "border-color": {
         "value": "#30363d"
-      },
-      "border": {
-        "value": "1px solid {event-sheet.conditions.border-color.value}"
       },
       "color": {
         "value": "rgb(201, 209, 217)"

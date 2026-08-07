@@ -105,8 +105,7 @@ const mergeAnimations = function<A: { name: string }>(
     objectsAnimation: A,
     assetAnimation: A
   ) => A
-  // $FlowFixMe[missing-local-annot]
-) {
+): Array<A> {
   const animations = [];
   // Ensure the object don't loose any animation.
   for (const objectAnimation of objectAnimations) {
@@ -300,10 +299,8 @@ const mergeSpriteAnimations = (
 const mergeModel3DAnimation = (
   project: gdProject,
   PixiResourcesLoader: any,
-  // $FlowFixMe[missing-local-annot]
-  objectsAnimation,
-  // $FlowFixMe[missing-local-annot]
-  assetAnimation
+  objectsAnimation: { name: string },
+  assetAnimation: { name: string }
 ) => assetAnimation;
 
 const mergeModel3DAnimations = (

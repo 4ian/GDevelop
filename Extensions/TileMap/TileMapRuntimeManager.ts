@@ -150,7 +150,7 @@ namespace gdjs {
             callback
           );
         } catch (error) {
-          errorCallback(error);
+          errorCallback(error as Error);
         }
       }
 

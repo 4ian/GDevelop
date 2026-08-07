@@ -4,18 +4,64 @@ import { isElseEventValid, getPreviousExecutableEventIndex } from '../helpers';
 
 const gd: libGDevelop = global.gd;
 
+// Returned as the events text when rendering fails entirely.
+export const eventsTextRenderingErrorText =
+  'Error while rendering events as text.';
+
+// A failure to render an event/instruction, with `path` locating the node.
+export type EventsTextRenderingError = {|
+  path: string,
+  message: string,
+|};
+
+const getErrorMessage = (error: mixed): string =>
+  error && typeof error === 'object' && typeof error.message === 'string'
+    ? error.message
+    : String(error);
+
+export const renderInstructionSentenceAsPlainText = (
+  instruction: gdInstruction,
+  metadata: gdInstructionMetadata
+): string => {
+  // Note: we could do like in `MetadataDeclarationHelper` for events-based extensions
+  // and create if necessary a default sentence. Here though we assume all extensions
+  // will have a sentence.
+
+  if (gd.MetadataProvider.isBadInstructionMetadata(metadata)) {
+    // Even if the instruction is bad, we still render it so that it's displayed
+    // as "Unknown or unsupported instruction".
+  }
+
+  const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
+    instruction,
+    metadata
+  );
+
+  return mapFor(0, formattedTexts.size(), i => {
+    const value = formattedTexts.getString(i);
+    return value;
+  }).join('');
+};
+
 // $FlowFixMe[recursive-definition]
 // $FlowFixMe[definition-cycle]
 const renderInstructionsAsText = ({
   instructionsList,
   padding,
   areConditions,
+  eventPath,
+  renderingErrors,
 }: {|
   instructionsList: gdInstructionsList,
   padding: string,
   areConditions: boolean,
+  eventPath: string,
+  renderingErrors: Array<EventsTextRenderingError>,
 |}) => {
-  const renderInstruction = (instruction: gdInstruction) => {
+  const renderInstruction = (
+    instruction: gdInstruction,
+    instructionIndex: number
+  ) => {
     const invertedText = instruction.isInverted() ? '(inverted) ' : '';
     const metadata = areConditions
       ? gd.MetadataProvider.getConditionMetadata(
@@ -27,15 +73,21 @@ const renderInstructionsAsText = ({
           instruction.getType()
         );
 
-    const formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
-      instruction,
-      metadata
-    );
-
-    const sentence = mapFor(0, formattedTexts.size(), i => {
-      const value = formattedTexts.getString(i);
-      return value;
-    }).join('');
+    // Isolate failures so one bad instruction doesn't fail the whole sheet.
+    let sentence;
+    try {
+      sentence = renderInstructionSentenceAsPlainText(instruction, metadata);
+    } catch (error) {
+      renderingErrors.push({
+        path: `${eventPath} > ${
+          areConditions ? 'condition' : 'action'
+        } ${instructionIndex} (${instruction.getType()})`,
+        message: getErrorMessage(error),
+      });
+      sentence = areConditions
+        ? '(this condition could not be rendered)'
+        : '(this action could not be rendered)';
+    }
 
     return {
       text: `${padding}- ${[invertedText, sentence].filter(Boolean).join('')}`,
@@ -51,13 +103,15 @@ const renderInstructionsAsText = ({
 
   return mapFor(0, instructionsList.size(), i => {
     const instruction = instructionsList.get(i);
-    const { text, canHaveSubInstructions } = renderInstruction(instruction);
+    const { text, canHaveSubInstructions } = renderInstruction(instruction, i);
 
     const subInstructionsText = canHaveSubInstructions
       ? renderInstructionsAsText({
           instructionsList: instruction.getSubInstructions(),
           padding: padding + '  ',
           areConditions,
+          eventPath,
+          renderingErrors,
         })
       : '';
 
@@ -75,19 +129,30 @@ const eventsTextRenderers: {
     event: gdBaseEvent,
     padding: string,
     isValidElseEvent: boolean,
+    eventPath: string,
+    renderingErrors: Array<EventsTextRenderingError>,
   |}) => EventTextRendererResult,
 } = {
-  'BuiltinCommonInstructions::Standard': ({ event, padding }) => {
+  'BuiltinCommonInstructions::Standard': ({
+    event,
+    padding,
+    eventPath,
+    renderingErrors,
+  }) => {
     const standardEvent = gd.asStandardEvent(event);
     const conditions = renderInstructionsAsText({
       instructionsList: standardEvent.getConditions(),
       padding: padding,
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: standardEvent.getActions(),
       padding: padding,
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     return {
@@ -108,7 +173,12 @@ ${actions}`,
         : fullText;
     return { content: `${padding}${text}` };
   },
-  'BuiltinCommonInstructions::While': ({ event, padding }) => {
+  'BuiltinCommonInstructions::While': ({
+    event,
+    padding,
+    eventPath,
+    renderingErrors,
+  }) => {
     const whileEvent = gd.asWhileEvent(event);
     const indexVarText = whileEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${whileEvent.getLoopIndexVariableName()}\`)`
@@ -117,16 +187,22 @@ ${actions}`,
       instructionsList: whileEvent.getWhileConditions(),
       padding: padding + ' ',
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const conditions = renderInstructionsAsText({
       instructionsList: whileEvent.getConditions(),
       padding: padding + ' ',
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: whileEvent.getActions(),
       padding: padding + ' ',
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     return {
@@ -139,7 +215,12 @@ ${padding}Actions:
 ${actions}`,
     };
   },
-  'BuiltinCommonInstructions::Repeat': ({ event, padding }) => {
+  'BuiltinCommonInstructions::Repeat': ({
+    event,
+    padding,
+    eventPath,
+    renderingErrors,
+  }) => {
     const repeatEvent = gd.asRepeatEvent(event);
     const indexVarText = repeatEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${repeatEvent.getLoopIndexVariableName()}\`)`
@@ -148,11 +229,15 @@ ${actions}`,
       instructionsList: repeatEvent.getConditions(),
       padding: padding + ' ',
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: repeatEvent.getActions(),
       padding: padding + ' ',
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     return {
@@ -165,7 +250,12 @@ ${padding}Actions:
 ${actions}`,
     };
   },
-  'BuiltinCommonInstructions::ForEach': ({ event, padding }) => {
+  'BuiltinCommonInstructions::ForEach': ({
+    event,
+    padding,
+    eventPath,
+    renderingErrors,
+  }) => {
     const forEachEvent = gd.asForEachEvent(event);
     const indexVarText = forEachEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${forEachEvent.getLoopIndexVariableName()}\`)`
@@ -182,11 +272,15 @@ ${actions}`,
       instructionsList: forEachEvent.getConditions(),
       padding: padding + ' ',
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: forEachEvent.getActions(),
       padding: padding + ' ',
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     return {
@@ -197,7 +291,12 @@ ${padding}Actions:
 ${actions}`,
     };
   },
-  'BuiltinCommonInstructions::ForEachChildVariable': ({ event, padding }) => {
+  'BuiltinCommonInstructions::ForEachChildVariable': ({
+    event,
+    padding,
+    eventPath,
+    renderingErrors,
+  }) => {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(event);
     const indexVarText = forEachChildVariableEvent.getLoopIndexVariableName()
       ? ` (loop index variable: \`${forEachChildVariableEvent.getLoopIndexVariableName()}\`)`
@@ -209,11 +308,15 @@ ${actions}`,
       instructionsList: forEachChildVariableEvent.getConditions(),
       padding: padding + ' ',
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: forEachChildVariableEvent.getActions(),
       padding: padding + ' ',
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     return {
@@ -231,7 +334,13 @@ ${padding}${actions}`,
     const groupEvent = gd.asGroupEvent(event);
     return { content: `${padding}Group called "${groupEvent.getName()}":` };
   },
-  'BuiltinCommonInstructions::Else': ({ event, padding, isValidElseEvent }) => {
+  'BuiltinCommonInstructions::Else': ({
+    event,
+    padding,
+    isValidElseEvent,
+    eventPath,
+    renderingErrors,
+  }) => {
     const elseEvent = gd.asElseEvent(event);
     const hasConditions = elseEvent.getConditions().size() > 0;
     const elseLabel = hasConditions ? 'Else if' : 'Else';
@@ -240,11 +349,15 @@ ${padding}${actions}`,
       instructionsList: elseEvent.getConditions(),
       padding: padding,
       areConditions: true,
+      eventPath,
+      renderingErrors,
     });
     const actions = renderInstructionsAsText({
       instructionsList: elseEvent.getActions(),
       padding: padding,
       areConditions: false,
+      eventPath,
+      renderingErrors,
     });
 
     const prefix = isValidElseEvent
@@ -257,8 +370,9 @@ ${padding}${actions}`,
     };
   },
   'BuiltinCommonInstructions::Link': ({ event, padding }) => {
+    const linkEvent = gd.asLinkEvent(event);
     return {
-      content: `${padding}(link to events in events sheet called "${event.getTarget()}")`,
+      content: `${padding}(link to events in events sheet called "${linkEvent.getTarget()}")`,
     };
   },
 };
@@ -283,7 +397,6 @@ const convertVariableToJsObject = (variable: gdVariable) => {
     return object;
   } else if (variable.getType() === gd.Variable.Array) {
     const children = variable.getAllChildrenArray();
-    // $FlowFixMe[incompatible-exact]
     return mapVector(children, child => convertVariableToJsObject(child));
   }
 
@@ -314,6 +427,7 @@ const renderEventAsText = ({
   padding,
   eventPath,
   isAncestorDisabled,
+  renderingErrors,
 }: {|
   event: gdBaseEvent,
   eventsList: gdEventsList,
@@ -321,35 +435,46 @@ const renderEventAsText = ({
   padding: string,
   eventPath: string,
   isAncestorDisabled: boolean,
+  renderingErrors: Array<EventsTextRenderingError>,
 |}) => {
-  const localVariablesText =
-    event.canHaveVariables() && event.hasVariables()
-      ? renderLocalVariablesAsText({
-          variables: event.getVariables(),
-          padding: padding,
-        })
-      : '';
-
   const textRenderer = eventsTextRenderers[event.getType()];
   // $FlowFixMe[constant-condition]
   if (!textRenderer) {
     return `${padding}(This event is unknown/unsupported - ignored)`;
   }
 
-  const isValid =
-    event.getType() === 'BuiltinCommonInstructions::Else'
-      ? isElseEventValid(eventsList, eventIndex)
-      : false;
+  // Isolate failures: a bad event becomes a placeholder, siblings still render.
+  let eventText;
+  try {
+    const localVariablesText =
+      event.canHaveVariables() && event.hasVariables()
+        ? renderLocalVariablesAsText({
+            variables: event.getVariables(),
+            padding: padding,
+          })
+        : '';
 
-  const { prefix, content } = textRenderer({
-    event,
-    padding,
-    isValidElseEvent: isValid,
-  });
-  const prefixAndVariables = [prefix, localVariablesText]
-    .filter(Boolean)
-    .join('\n');
-  const eventText = [prefixAndVariables, content].filter(Boolean).join('\n\n');
+    const isValid =
+      event.getType() === 'BuiltinCommonInstructions::Else'
+        ? isElseEventValid(eventsList, eventIndex)
+        : false;
+
+    const { prefix, content } = textRenderer({
+      event,
+      padding,
+      isValidElseEvent: isValid,
+      eventPath,
+      renderingErrors,
+    });
+    const prefixAndVariables = [prefix, localVariablesText]
+      .filter(Boolean)
+      .join('\n');
+    eventText = [prefixAndVariables, content].filter(Boolean).join('\n\n');
+  } catch (error) {
+    const message = getErrorMessage(error);
+    renderingErrors.push({ path: eventPath, message });
+    eventText = `${padding}(This event could not be rendered: ${message})`;
+  }
 
   let subEvents = '';
   if (event.canHaveSubEvents()) {
@@ -358,6 +483,7 @@ const renderEventAsText = ({
       parentPath: eventPath,
       padding: padding + ' ',
       isAncestorDisabled: isAncestorDisabled || event.isDisabled(),
+      renderingErrors,
     });
   }
 
@@ -369,11 +495,13 @@ export const renderEventsAsText = ({
   parentPath,
   padding,
   isAncestorDisabled = false,
+  renderingErrors = [],
 }: {|
   eventsList: gdEventsList,
   parentPath: string,
   padding: string,
   isAncestorDisabled?: boolean,
+  renderingErrors?: Array<EventsTextRenderingError>,
 |}): string => {
   return mapFor(0, eventsList.getEventsCount(), i => {
     const event = eventsList.getEventAt(i);
@@ -386,6 +514,7 @@ export const renderEventsAsText = ({
       eventPath,
       padding: padding + ' ',
       isAncestorDisabled,
+      renderingErrors,
     });
 
     let elseOfAttribute = '';
@@ -427,11 +556,14 @@ ${padding}</event-${eventPath}>`;
   }).join('\n');
 };
 
-export const renderNonTranslatedEventsAsText = ({
+export const renderNonTranslatedEventsAsTextWithErrors = ({
   eventsList,
 }: {
   eventsList: gdEventsList,
-}): string | 'Error while rendering events as text.' => {
+}): {|
+  text: string,
+  renderingErrors: Array<EventsTextRenderingError>,
+|} => {
   // Temporarily override the getTranslation function to return the original
   // string, so that events are always rendered in English.
   // $FlowFixMe[incompatible-type]
@@ -441,21 +573,36 @@ export const renderNonTranslatedEventsAsText = ({
   // $FlowFixMe[prop-missing]
   gd.getTranslation = (str: string) => str;
 
+  const renderingErrors: Array<EventsTextRenderingError> = [];
   let text = '';
   try {
     text = renderEventsAsText({
       eventsList,
       parentPath: '',
       padding: '',
+      renderingErrors,
     });
   } catch (error) {
+    // Structural-level safety net (per-event rendering already degrades).
     console.error('Error while rendering events as text:', error);
-    text = 'Error while rendering events as text.';
+    renderingErrors.push({
+      path: '(events sheet)',
+      message: getErrorMessage(error),
+    });
+    text = eventsTextRenderingErrorText;
   } finally {
     // $FlowFixMe[incompatible-type]
     // $FlowFixMe[prop-missing]
     gd.getTranslation = previousGetTranslation;
   }
 
-  return text;
+  return { text, renderingErrors };
+};
+
+export const renderNonTranslatedEventsAsText = ({
+  eventsList,
+}: {
+  eventsList: gdEventsList,
+}): string => {
+  return renderNonTranslatedEventsAsTextWithErrors({ eventsList }).text;
 };

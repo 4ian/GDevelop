@@ -38,6 +38,7 @@ type OtherProps = {|
 export type CompactTextFieldInterface = {|
   blur: () => void,
   focus: () => void,
+  select: () => void,
 |};
 
 export type CompactTextFieldProps = {|
@@ -110,7 +111,14 @@ const CompactTextField: React.ComponentType<{
         if (inputRef.current) inputRef.current.blur();
       },
       focus: () => {
-        if (inputRef.current) inputRef.current.focus();
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      },
+      select: () => {
+        if (inputRef.current) {
+          inputRef.current.select();
+        }
       },
     }));
 

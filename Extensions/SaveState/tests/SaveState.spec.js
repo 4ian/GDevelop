@@ -68,6 +68,7 @@ describe('SaveState', () => {
         updateIfNotVisible: false,
       },
     ],
+    objectsGroups: [],
     instances: instances || [],
     variables: [],
     usedResources: [],
@@ -1231,5 +1232,688 @@ describe('SaveState', () => {
 
     // Game data was restored:
     expect(runtimeGame1.getSoundManager().getGlobalVolume()).to.be(75);
+  });
+
+  describe('Save State with linked objects', () => {
+    it('saves and restores linked objects relations (same type)', async () => {
+      // Start a game.
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [getFakeSceneData({ name: 'Scene1' })],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const object1 = runtimeScene1.createObject('MySpriteObject');
+      const object2 = runtimeScene1.createObject('MySpriteObject');
+      if (!object1 || !object2) {
+        throw new Error('Objects were not created');
+      }
+
+      object1.setPosition(100, 200);
+      object2.setPosition(300, 400);
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, object1, object2);
+
+      // Save the game state.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // Start a new game.
+      const runtimeGame2 = gdjs.getPixiRuntimeGame({
+        layouts: [getFakeSceneData({ name: 'Scene1' })],
+      });
+      await runtimeGame2._resourcesLoader.loadAllResources(() => {});
+
+      // Load the saved state.
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
+      if (!runtimeScene2) throw new Error('No current scene was restored.');
+
+      const restoredObjects = runtimeScene2.getObjects('MySpriteObject');
+      expect(restoredObjects.length).to.be(2);
+
+      const restoredObject1 = restoredObjects.find(
+        (obj) => obj.getX() === 100 && obj.getY() === 200
+      );
+      const restoredObject2 = restoredObjects.find(
+        (obj) => obj.getX() === 300 && obj.getY() === 400
+      );
+      if (!restoredObject1 || !restoredObject2) {
+        throw new Error(
+          'Objects not found at the proper positions after restore.'
+        );
+      }
+
+      const linksManager = gdjs.LinksManager.getManager(runtimeScene2);
+      const object1Links = Array.from(
+        linksManager.getObjectsLinkedWith(restoredObject1)
+      );
+      const object2Links = Array.from(
+        linksManager.getObjectsLinkedWith(restoredObject2)
+      );
+
+      expect(object1Links).to.eql([restoredObject2]);
+      expect(object2Links).to.eql([restoredObject1]);
+    });
+
+    it('saves and restores multiple linked objects across types', async () => {
+      const sceneData = getFakeSceneData({
+        name: 'Scene1',
+        objects: [
+          // @ts-ignore
+          {
+            type: 'Sprite',
+            name: 'ObjectA',
+            behaviors: [],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+          // @ts-ignore
+          {
+            type: 'Sprite',
+            name: 'ObjectB',
+            behaviors: [],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+        ],
+      });
+
+      // Start a game and create linked objects.
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const objectA1 = runtimeScene1.createObject('ObjectA');
+      const objectA2 = runtimeScene1.createObject('ObjectA');
+      const objectB1 = runtimeScene1.createObject('ObjectB');
+      const objectB2 = runtimeScene1.createObject('ObjectB');
+
+      if (!objectA1 || !objectA2 || !objectB1 || !objectB2) {
+        throw new Error('Objects were not created');
+      }
+
+      objectA1.setPosition(10, 20);
+      objectA2.setPosition(30, 40);
+      objectB1.setPosition(50, 60);
+      objectB2.setPosition(70, 80);
+
+      // Link objectA1 <-> objectB1, objectA1 <-> objectB2, objectA2 <-> objectB2.
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA1,
+        objectB1
+      );
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA1,
+        objectB2
+      );
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        objectA2,
+        objectB2
+      );
+
+      // Save the game state.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // Verify links are in the save state.
+      const linkedObjects =
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects;
+      if (!linkedObjects) {
+        throw new Error('Linked objects not found in save state.');
+      }
+      expect(linkedObjects.length).to.be(3);
+
+      // Start a new game and restore.
+      const runtimeGame2 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame2._resourcesLoader.loadAllResources(() => {});
+
+      gdjs.saveState.restoreGameSaveState(runtimeGame2, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const runtimeScene2 = runtimeGame2.getSceneStack().getCurrentScene();
+      if (!runtimeScene2) throw new Error('No current scene was restored.');
+
+      // Find the restored objects by their positions.
+      const allA = runtimeScene2.getObjects('ObjectA');
+      const allB = runtimeScene2.getObjects('ObjectB');
+      expect(allA.length).to.be(2);
+      expect(allB.length).to.be(2);
+
+      const restoredA1 = allA.find(
+        (obj) => obj.getX() === 10 && obj.getY() === 20
+      );
+      const restoredA2 = allA.find(
+        (obj) => obj.getX() === 30 && obj.getY() === 40
+      );
+      const restoredB1 = allB.find(
+        (obj) => obj.getX() === 50 && obj.getY() === 60
+      );
+      const restoredB2 = allB.find(
+        (obj) => obj.getX() === 70 && obj.getY() === 80
+      );
+
+      if (!restoredA1 || !restoredA2 || !restoredB1 || !restoredB2) {
+        throw new Error(
+          'Objects not found at the proper positions after restore.'
+        );
+      }
+
+      // Verify links via the public API.
+      const manager2 = gdjs.LinksManager.getManager(runtimeScene2);
+
+      // objectA1 should be linked to objectB1 and objectB2.
+      const a1Links = Array.from(manager2.getObjectsLinkedWith(restoredA1));
+      expect(a1Links.length).to.be(2);
+      expect(a1Links).to.contain(restoredB1);
+      expect(a1Links).to.contain(restoredB2);
+
+      // objectA2 should be linked to objectB2 only.
+      const a2Links = Array.from(manager2.getObjectsLinkedWith(restoredA2));
+      expect(a2Links).to.eql([restoredB2]);
+
+      // Verify bidirectional: objectB1 linked to objectA1.
+      const b1Links = Array.from(manager2.getObjectsLinkedWith(restoredB1));
+      expect(b1Links).to.eql([restoredA1]);
+
+      // objectB2 linked to both objectA1 and objectA2.
+      const b2Links = Array.from(manager2.getObjectsLinkedWith(restoredB2));
+      expect(b2Links.length).to.be(2);
+      expect(b2Links).to.contain(restoredA1);
+      expect(b2Links).to.contain(restoredA2);
+    });
+
+    it('preserves links between non-saved objects when restoring', async () => {
+      const sceneData = getFakeSceneData({
+        name: 'Scene1',
+        objects: [
+          // @ts-ignore - SavedObject is persisted in the default profile.
+          {
+            type: 'Sprite',
+            name: 'SavedObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'Persisted',
+              },
+            ],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+          // @ts-ignore - NotSavedObject is excluded from save.
+          {
+            type: 'Sprite',
+            name: 'NotSavedObject',
+            behaviors: [
+              {
+                name: 'SaveConfiguration',
+                type: 'SaveState::SaveConfiguration',
+                defaultProfilePersistence: 'DoNotSave',
+              },
+            ],
+            effects: [],
+            variables: [],
+            animations: [],
+            updateIfNotVisible: false,
+          },
+        ],
+      });
+
+      const runtimeGame1 = gdjs.getPixiRuntimeGame({
+        layouts: [sceneData],
+      });
+      await runtimeGame1._resourcesLoader.loadAllResources(() => {});
+
+      const runtimeScene1 = runtimeGame1.getSceneStack().push({
+        sceneName: 'Scene1',
+      });
+      if (!runtimeScene1) throw new Error('No current scene was created.');
+
+      const saved1 = runtimeScene1.createObject('SavedObject');
+      const saved2 = runtimeScene1.createObject('SavedObject');
+      const notSaved1 = runtimeScene1.createObject('NotSavedObject');
+      const notSaved2 = runtimeScene1.createObject('NotSavedObject');
+
+      if (!saved1 || !saved2 || !notSaved1 || !notSaved2) {
+        throw new Error('Objects were not created');
+      }
+
+      saved1.setPosition(10, 20);
+      saved2.setPosition(30, 40);
+      notSaved1.setPosition(50, 60);
+      notSaved2.setPosition(70, 80);
+
+      // Create links:
+      // saved1 <-> saved2 (both saved — should be preserved)
+      // saved1 <-> notSaved1 (mixed — link is lost because notSaved1 has no networkId)
+      // notSaved1 <-> notSaved2 (both not saved — should be preserved)
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, saved1, saved2);
+      gdjs.evtTools.linkedObjects.linkObjects(runtimeScene1, saved1, notSaved1);
+      gdjs.evtTools.linkedObjects.linkObjects(
+        runtimeScene1,
+        notSaved1,
+        notSaved2
+      );
+
+      // Save — only SavedObject instances are included.
+      const saveState = gdjs.saveState.createGameSaveState(runtimeGame1, {
+        profileNames: ['default'],
+      });
+
+      // The save state should only contain the link between the two saved objects.
+      const linkedObjects =
+        saveState.layoutNetworkSyncDatas[0].sceneData.linkedObjects;
+      if (!linkedObjects) {
+        throw new Error('Linked objects not found in save state.');
+      }
+      expect(linkedObjects.length).to.be(1);
+
+      // Restore into the same game (clearSceneStack: false).
+      gdjs.saveState.restoreGameSaveState(runtimeGame1, saveState, {
+        profileNames: ['default'],
+        clearSceneStack: false,
+      });
+
+      const linksManager = gdjs.LinksManager.getManager(runtimeScene1);
+
+      // saved1 <-> saved2 link should be restored.
+      const saved1Links = Array.from(linksManager.getObjectsLinkedWith(saved1));
+      expect(saved1Links).to.contain(saved2);
+      // saved1 <-> notSaved1 link is lost (notSaved1 had no networkId during save).
+      expect(saved1Links).not.to.contain(notSaved1);
+
+      // notSaved1 <-> notSaved2 link should be preserved (neither is managed by save state).
+      const notSaved1Links = Array.from(
+        linksManager.getObjectsLinkedWith(notSaved1)
+      );
+      expect(notSaved1Links).to.contain(notSaved2);
+      // notSaved1 <-> saved1 was cleared from both sides.
+      expect(notSaved1Links).not.to.contain(saved1);
+    });
+  });
+
+  describe('Save State management (list/delete/check/duplicate/metadata)', () => {
+    const dbName = () => gdjs.saveState.getIndexedDbDatabaseName();
+    const storeName = () => gdjs.saveState.getIndexedDbObjectStore();
+    const storageKey = (key) => gdjs.saveState.getIndexedDbStorageKey(key);
+
+    let previousProjectData;
+    before(() => {
+      previousProjectData = gdjs.projectData;
+      // The IndexedDB database name is derived from the project UUID.
+      gdjs.projectData = /** @type {any} */ ({
+        properties: { projectUuid: 'savestate-management-test' },
+      });
+    });
+    after(() => {
+      gdjs.projectData = previousProjectData;
+    });
+
+    const clearAllSaves = async () => {
+      const keys = await gdjs.indexedDb.getAllKeysFromIndexedDB(
+        dbName(),
+        storeName()
+      );
+      for (const key of keys) {
+        await gdjs.indexedDb.deleteFromIndexedDB(
+          dbName(),
+          storeName(),
+          /** @type {string} */ (key)
+        );
+      }
+    };
+    beforeEach(clearAllSaves);
+    afterEach(clearAllSaves);
+
+    const makeGameAndScene = async () => {
+      const runtimeGame = gdjs.getPixiRuntimeGame({
+        layouts: [getFakeSceneData({ name: 'Scene1' })],
+      });
+      await runtimeGame._resourcesLoader.loadAllResources(() => {});
+      const runtimeScene = runtimeGame
+        .getSceneStack()
+        .push({ sceneName: 'Scene1' });
+      if (!runtimeScene) throw new Error('No current scene was created.');
+      return { runtimeGame, runtimeScene };
+    };
+
+    const waitUntil = async (predicate, timeoutMs = 2000) => {
+      const start = Date.now();
+      while (!predicate()) {
+        if (Date.now() - start > timeoutMs) {
+          throw new Error('Timed out while waiting for condition.');
+        }
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+    };
+
+    // The async actions return a gdjs.AsyncTask. The IndexedDB-backed ones
+    // (PromiseTask) expose the underlying promise: await it so assertions run
+    // after the operation actually completed. (Load actions resolve at end of
+    // frame and are awaited via renderAndStep + waitUntil instead.)
+    const completed = (task) =>
+      task && task.promise ? task.promise : Promise.resolve();
+
+    it('saves to storage with metadata and lists it (no save- prefix)', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'slot1',
+          'default'
+        )
+      );
+
+      const listVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.listSavesInVariable(runtimeScene, listVariable)
+      );
+      expect(gdjs.saveState.hasListJustCompleted(runtimeScene)).to.be(true);
+
+      const list = listVariable.toJSObject();
+      expect(list.length).to.be(1);
+      expect(list[0].name).to.be('slot1');
+      expect(list[0].savedAt).to.be.greaterThan(0);
+      expect(list[0].updatedAt).to.be.greaterThan(0);
+    });
+
+    it('lists a legacy raw save (no metadata) with savedAt 0', async () => {
+      const { runtimeGame, runtimeScene } = await makeGameAndScene();
+      const rawSaveState = gdjs.saveState.createGameSaveState(runtimeGame, {
+        profileNames: ['default'],
+      });
+      // Store as the legacy raw GameSaveState format (no envelope).
+      await gdjs.indexedDb.saveToIndexedDB(
+        dbName(),
+        storeName(),
+        storageKey('legacy'),
+        rawSaveState
+      );
+
+      const listVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.listSavesInVariable(runtimeScene, listVariable)
+      );
+      const list = listVariable.toJSObject();
+      expect(list.length).to.be(1);
+      expect(list[0].name).to.be('legacy');
+      expect(list[0].savedAt).to.be(0);
+      expect(list[0].updatedAt).to.be(0);
+    });
+
+    it('restores a legacy raw save from storage', async () => {
+      const { runtimeGame, runtimeScene } = await makeGameAndScene();
+      const object = runtimeScene.createObject('MySpriteObject');
+      if (!object) throw new Error('Object was not created.');
+      object.setX(123);
+      object.setY(456);
+
+      const rawSaveState = gdjs.saveState.createGameSaveState(runtimeGame, {
+        profileNames: ['default'],
+      });
+      await gdjs.indexedDb.saveToIndexedDB(
+        dbName(),
+        storeName(),
+        storageKey('legacy'),
+        rawSaveState
+      );
+
+      // Move the object, then restore the legacy save from storage.
+      object.setX(0);
+      object.setY(0);
+      gdjs.saveState.restoreGameSaveStateFromStorage(
+        runtimeScene,
+        'legacy',
+        'default',
+        false
+      );
+      // Run a frame to consume the restore request (which then loads asynchronously).
+      runtimeScene.renderAndStep(1000 / 60);
+      await waitUntil(() => {
+        const objects = runtimeScene.getObjects('MySpriteObject');
+        return objects.length === 1 && objects[0].getX() === 123;
+      });
+
+      const objects = runtimeScene.getObjects('MySpriteObject');
+      expect(objects.length).to.be(1);
+      expect(objects[0].getX()).to.be(123);
+      expect(objects[0].getY()).to.be(456);
+    });
+
+    it('restores (best effort) a save from a newer/unknown format version', async () => {
+      const { runtimeGame, runtimeScene } = await makeGameAndScene();
+      const object = runtimeScene.createObject('MySpriteObject');
+      if (!object) throw new Error('Object was not created.');
+      object.setX(789);
+      object.setY(987);
+
+      const gameSaveState = gdjs.saveState.createGameSaveState(runtimeGame, {
+        profileNames: ['default'],
+      });
+      // Store an envelope with a format version far newer than this engine knows.
+      await gdjs.indexedDb.saveToIndexedDB(
+        dbName(),
+        storeName(),
+        storageKey('future'),
+        {
+          formatVersion: gdjs.saveState.CURRENT_SAVE_FORMAT_VERSION + 999,
+          metadata: { name: 'future', savedAt: 1, updatedAt: 1 },
+          gameSaveState,
+        }
+      );
+
+      // It should still be loaded as a best effort (with a warning logged).
+      object.setX(0);
+      object.setY(0);
+      gdjs.saveState.restoreGameSaveStateFromStorage(
+        runtimeScene,
+        'future',
+        'default',
+        false
+      );
+      runtimeScene.renderAndStep(1000 / 60);
+      await waitUntil(() => {
+        const objects = runtimeScene.getObjects('MySpriteObject');
+        return objects.length === 1 && objects[0].getX() === 789;
+      });
+
+      const objects = runtimeScene.getObjects('MySpriteObject');
+      expect(objects.length).to.be(1);
+      expect(objects[0].getX()).to.be(789);
+      expect(objects[0].getY()).to.be(987);
+    });
+
+    it('checks whether a save exists', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'present',
+          'default'
+        )
+      );
+
+      const existsVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.checkSaveExistsInStorage(
+          runtimeScene,
+          'present',
+          existsVariable
+        )
+      );
+      expect(existsVariable.getAsBoolean()).to.be(true);
+      expect(gdjs.saveState.hasCheckJustCompleted(runtimeScene)).to.be(true);
+      expect(gdjs.saveState.doesCheckedSaveExist(runtimeScene)).to.be(true);
+      expect(gdjs.saveState.getLastCheckedSaveName(runtimeScene)).to.be(
+        'present'
+      );
+
+      const missingVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.checkSaveExistsInStorage(
+          runtimeScene,
+          'missing',
+          missingVariable
+        )
+      );
+      expect(missingVariable.getAsBoolean()).to.be(false);
+      expect(gdjs.saveState.doesCheckedSaveExist(runtimeScene)).to.be(false);
+    });
+
+    it('deletes a save and resets the flag after a frame', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'toDelete',
+          'default'
+        )
+      );
+
+      await completed(
+        gdjs.saveState.deleteSaveFromStorage(runtimeScene, 'toDelete')
+      );
+      expect(gdjs.saveState.hasDeleteJustSucceeded(runtimeScene)).to.be(true);
+
+      const existsVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.checkSaveExistsInStorage(
+          runtimeScene,
+          'toDelete',
+          existsVariable
+        )
+      );
+      expect(existsVariable.getAsBoolean()).to.be(false);
+
+      // The "delete just succeeded" flag is reset after a frame.
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(gdjs.saveState.hasDeleteJustSucceeded(runtimeScene)).to.be(false);
+    });
+
+    it('duplicates a save under a new name', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      const object = runtimeScene.createObject('MySpriteObject');
+      if (!object) throw new Error('Object was not created.');
+      object.setX(11);
+      object.setY(22);
+
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'slotA',
+          'default'
+        )
+      );
+      await completed(
+        gdjs.saveState.duplicateSaveInStorage(runtimeScene, 'slotA', 'slotB')
+      );
+      expect(gdjs.saveState.hasDuplicateJustSucceeded(runtimeScene)).to.be(
+        true
+      );
+
+      const listVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.listSavesInVariable(runtimeScene, listVariable)
+      );
+      const names = listVariable
+        .toJSObject()
+        .map((save) => save.name)
+        .sort();
+      expect(names).to.eql(['slotA', 'slotB']);
+
+      const sourceSave = await gdjs.indexedDb.loadFromIndexedDB(
+        dbName(),
+        storeName(),
+        storageKey('slotA')
+      );
+      const duplicatedSave = await gdjs.indexedDb.loadFromIndexedDB(
+        dbName(),
+        storeName(),
+        storageKey('slotB')
+      );
+      expect(duplicatedSave.metadata.name).to.be('slotB');
+      expect(duplicatedSave.gameSaveState).to.eql(sourceSave.gameSaveState);
+    });
+
+    it('fails to duplicate a save that does not exist', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      await completed(
+        gdjs.saveState.duplicateSaveInStorage(
+          runtimeScene,
+          'doesNotExist',
+          'destination'
+        )
+      );
+      expect(gdjs.saveState.hasDuplicateJustFailed(runtimeScene)).to.be(true);
+
+      const existsVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.checkSaveExistsInStorage(
+          runtimeScene,
+          'destination',
+          existsVariable
+        )
+      );
+      expect(existsVariable.getAsBoolean()).to.be(false);
+    });
+
+    it('lists saves sorted from most recently updated to oldest', async () => {
+      const { runtimeScene } = await makeGameAndScene();
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'first',
+          'default'
+        )
+      );
+      // Ensure a different timestamp for the second save.
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      await completed(
+        gdjs.saveState.createGameSaveStateInStorage(
+          runtimeScene,
+          'second',
+          'default'
+        )
+      );
+
+      const listVariable = new gdjs.Variable();
+      await completed(
+        gdjs.saveState.listSavesInVariable(runtimeScene, listVariable)
+      );
+      const list = listVariable.toJSObject();
+      expect(list.map((save) => save.name)).to.eql(['second', 'first']);
+      list.forEach((save) => {
+        expect(save.name.indexOf('save-')).to.be(-1);
+      });
+    });
   });
 });

@@ -19,11 +19,14 @@ import { allResourceKindsAndMetadata } from '../ResourcesList/ResourceSource';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type ExtensionDependency } from '../Utils/GDevelopServices/Extension';
 import semverGreaterThan from 'semver/functions/gt';
+import semverValid from 'semver/functions/valid';
 import { addSerializedExtensionsToProject } from '../AssetStore/ExtensionStore/InstallExtension';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import LoaderModal from '../UI/LoaderModal';
 import AlertMessage from '../UI/AlertMessage';
 import { getOrCreate } from '../Utils/Map';
+import { unserializeResourceFromJSObject } from '../Utils/Serializer';
+import { complyVariantsToEventsBasedObjectOf } from '../AssetStore/InstallAsset';
 
 const gd: libGDevelop = global.gd;
 
@@ -276,7 +279,7 @@ const ExtensionAndVariantChooser = ({
       {conflictedExtensions.map(extensionUpdate => (
         <Checkbox
           key={extensionUpdate.name}
-          label={extensionUpdate.label}
+          label={extensionUpdate.label || extensionUpdate.name}
           checked={extensionUpdate.isSelected}
           onCheck={(e, checked) => {
             extensionUpdate.isSelected = checked;
@@ -362,6 +365,9 @@ const addOrReplaceVariants = (
       }
     }
   }
+  complyVariantsToEventsBasedObjectOf(project, [
+    ...variantsByObjectType.keys(),
+  ]);
 };
 
 type AssetPackContent = {|
@@ -383,6 +389,8 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
   onClose: () => void,
 |};
 
@@ -391,6 +399,8 @@ const ObjectImporterDialog = ({
   objectsContainer,
   resourceManagementProps,
   onEventsBasedObjectChildrenEdited,
+  onWillInstallExtension,
+  onExtensionInstalled,
   onClose,
 }: Props): React.Node => {
   const openAssetFile = useOpenAssetFile();
@@ -597,12 +607,14 @@ const ObjectImporterDialog = ({
           const eventsFunctionsExtension = project.getEventsFunctionsExtension(
             extensionName
           );
-          if (
+          const isExtensionUpdate =
+            semverValid(extensionVersion) &&
+            semverValid(eventsFunctionsExtension.getVersion()) &&
             semverGreaterThan(
               extensionVersion,
               eventsFunctionsExtension.getVersion()
-            )
-          ) {
+            );
+          if (isExtensionUpdate) {
             conflictedExtensions.push({
               name: extensionName,
               label: `${eventsFunctionsExtension.getFullName()} (${eventsFunctionsExtension.getVersion()} → ${extensionVersion})`,
@@ -683,14 +695,14 @@ const ObjectImporterDialog = ({
           resourceKind => resourceKind.kind === serializedResource.kind
         );
         if (!resourceKindMetadata) {
-          throw new Error(
+          console.error(
             `Resource of kind "${serializedResource.kind}" is not supported.`
           );
+          continue;
         }
         // The resource does not exist yet, add it. Note that the "origin" will be preserved.
         const newResource = resourceKindMetadata.createNewResource();
-        unserializeFromJSObject(newResource, serializedResource);
-        newResource.setName(serializedResource.name);
+        unserializeResourceFromJSObject(newResource, serializedResource);
 
         const resourceBlob: Blob = await getFileBlob({
           archiveBlob: assetPackBlob,
@@ -720,19 +732,27 @@ const ObjectImporterDialog = ({
         const serializedExtension = JSON.parse(await extensionBlob.text());
         serializedExtensions.push(serializedExtension);
       }
+      const installedExtensionNames = serializedExtensions.map(
+        extensions => extensions.name
+      );
+      onWillInstallExtension(installedExtensionNames);
       await addSerializedExtensionsToProject(
         eventsFunctionsExtensionsState,
         project,
         serializedExtensions,
         []
       );
+      onExtensionInstalled(installedExtensionNames);
 
       addOrReplaceVariants(project, newVariantsByObjectType);
       addOrReplaceVariants(project, replacingVariantsByObjectType);
 
       for (const { objectAsset, folderPathElements } of objectAssets) {
         const objectType: ?string = objectAsset.object.type;
-        if (!objectType) throw new Error('An object has no type specified');
+        if (!objectType) {
+          console.log('An object has no type specified');
+          continue;
+        }
 
         const originalName = gd.Project.getSafeName(objectAsset.object.name);
         const newName = newNameGenerator(originalName, name =>
@@ -781,6 +801,8 @@ const ObjectImporterDialog = ({
       objectsContainer,
       onClose,
       onEventsBasedObjectChildrenEdited,
+      onExtensionInstalled,
+      onWillInstallExtension,
       project,
       resourceManagementProps,
     ]

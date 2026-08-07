@@ -17,7 +17,9 @@ export type CommandName =
   | 'SAVE_PROJECT'
   | 'SAVE_PROJECT_AS'
   | 'CLOSE_PROJECT'
+  | 'RELOAD_PROJECT'
   | 'EXPORT_GAME'
+  | 'EXPORT_HTML5_EXTERNAL'
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
   | 'OPEN_COMMAND_PALETTE'
@@ -28,6 +30,8 @@ export type CommandName =
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
   | 'OPEN_PROJECT_RESOURCES'
   | 'OPEN_SEARCH_EXTENSIONS_DIALOG'
+  | 'IMPORT_EXTENSION'
+  | 'OPEN_GLOBAL_SEARCH'
   | 'OPEN_LAYOUT'
   | 'OPEN_EXTERNAL_EVENTS'
   | 'OPEN_EXTERNAL_LAYOUT'
@@ -66,7 +70,9 @@ export type CommandName =
   | 'DELETE_SELECTION'
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
-  | 'OPEN_PROFILE';
+  | 'OPEN_PROFILE'
+  | 'OPEN_MEMORY_TRACKER_REGISTRY'
+  | 'INSTALL_CLI_IN_PATH';
 
 export const commandAreas = {
   GENERAL: (t`General`: any),
@@ -149,10 +155,19 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Close project`,
     handledByElectron: true,
   },
+  RELOAD_PROJECT: {
+    area: 'GENERAL',
+    displayText: t`Reload project from disk/cloud (lose all changes)`,
+  },
   EXPORT_GAME: {
     area: 'PROJECT',
     displayText: t`Export game`,
     handledByElectron: true,
+  },
+  EXPORT_HTML5_EXTERNAL: {
+    area: 'PROJECT',
+    displayText: t`Export HTML5 (external websites)`,
+    noShortcut: true,
   },
   INVITE_COLLABORATORS: {
     area: 'PROJECT',
@@ -171,6 +186,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   RESTART_IN_GAME_EDITOR: {
     area: 'IDE',
     displayText: t`Restart 3D editor`,
+  },
+  INSTALL_CLI_IN_PATH: {
+    area: 'IDE',
+    displayText: t`Install GDevelop CLI in PATH`,
+    noShortcut: true,
   },
 
   // Project manager commands
@@ -197,6 +217,15 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_SEARCH_EXTENSIONS_DIALOG: {
     area: 'PROJECT',
     displayText: t`Search/import extensions`,
+  },
+  IMPORT_EXTENSION: {
+    area: 'PROJECT',
+    displayText: t`Import extension...`,
+    noShortcut: true,
+  },
+  OPEN_GLOBAL_SEARCH: {
+    area: 'IDE',
+    displayText: t`Global search (search in project)`,
   },
 
   // Tab-opening commands
@@ -342,6 +371,12 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_EXTENSION_SETTINGS: {
     area: 'EVENTS',
     displayText: t`Open extension settings`,
+  },
+
+  // Debug commands
+  OPEN_MEMORY_TRACKER_REGISTRY: {
+    area: 'IDE',
+    displayText: t`Open memory tracker registry`,
   },
 };
 

@@ -76,7 +76,7 @@ class GD_CORE_API AbstractEventsBasedEntity {
   /**
    * \brief Set the internal name of the behavior or object.
    */
-  AbstractEventsBasedEntity& SetName(const gd::String& name_) {
+  virtual AbstractEventsBasedEntity& SetName(const gd::String& name_) {
     name = name_;
     return *this;
   }
@@ -89,8 +89,36 @@ class GD_CORE_API AbstractEventsBasedEntity {
   /**
    * \brief Set the name of the behavior or object, to be displayed in the editor.
    */
-  AbstractEventsBasedEntity& SetFullName(const gd::String& fullName_) {
+  virtual AbstractEventsBasedEntity& SetFullName(const gd::String& fullName_) {
     fullName = fullName_;
+    return *this;
+  }
+
+  const gd::String &GetPreviewIconUrl() const { return previewIconUrl; };
+  virtual AbstractEventsBasedEntity &
+  SetPreviewIconUrl(const gd::String &previewIconUrl_) {
+    previewIconUrl = previewIconUrl_;
+    return *this;
+  }
+
+  const gd::String &GetIconUrl() const { return iconUrl; };
+  virtual AbstractEventsBasedEntity &SetIconUrl(const gd::String &iconUrl_) {
+    iconUrl = iconUrl_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the help path relative to the GDevelop
+   * documentation root.
+   */
+  const gd::String &GetHelpPath() const { return helpPath; };
+
+  /**
+   * \brief Set the help path relative to the GDevelop
+   * documentation root.
+   */
+  virtual AbstractEventsBasedEntity &SetHelpPath(const gd::String &helpPath_) {
+    helpPath = helpPath_;
     return *this;
   }
 
@@ -166,6 +194,10 @@ class GD_CORE_API AbstractEventsBasedEntity {
   gd::PropertiesContainer propertyDescriptors;
   gd::String extensionName;
   bool isPrivate = false;
+  gd::String previewIconUrl;
+  gd::String iconUrl;
+  gd::String helpPath; ///< The relative path to the help in
+                       ///< the documentation (or an absolute URL).
 };
 
 }  // namespace gd

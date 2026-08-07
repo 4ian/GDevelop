@@ -27,8 +27,10 @@ import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import Paper from '../UI/Paper';
 import BackgroundText from '../UI/BackgroundText';
-import SelectOption from '../UI/SelectOption';
-import SearchBarSelectField from '../UI/SearchBarSelectField';
+import GamesListFilterSelector, {
+  type GamesListFilter,
+} from './GamesListFilterSelector';
+import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import {
   type FileMetadataAndStorageProviderName,
   type StorageProvider,
@@ -128,6 +130,25 @@ const areDashboardItemsEqual = (
   return false;
 };
 
+const isProjectRestorable = (
+  deletedCloudProject: CloudProjectWithUserAccessInfo,
+  restorationTimeWindowInSeconds: ?number
+): boolean => {
+  if (
+    restorationTimeWindowInSeconds == null ||
+    restorationTimeWindowInSeconds === -1
+  ) {
+    // Unknown window (limits not loaded yet) or unlimited: let the user try,
+    // the backend enforces the permission anyway.
+    return true;
+  }
+  const deletedAt = deletedCloudProject.deletedAt;
+  if (!deletedAt) return false;
+  return (
+    Date.now() - Date.parse(deletedAt) <= restorationTimeWindowInSeconds * 1000
+  );
+};
+
 const getDashboardItemsToDisplay = ({
   project,
   currentFileMetadata,
@@ -136,6 +157,7 @@ const getDashboardItemsToDisplay = ({
   searchClient,
   currentPage,
   orderBy,
+  filter,
 }: {|
   project: ?gdProject,
   currentFileMetadata: ?FileMetadata,
@@ -145,6 +167,7 @@ const getDashboardItemsToDisplay = ({
   searchClient: Fuse,
   currentPage: number,
   orderBy: GamesDashboardOrderBy,
+  filter: GamesListFilter,
 |}): ?Array<DashboardItem> => {
   if (!allDashboardItems) return null;
   let itemsToDisplay: DashboardItem[] = [...allDashboardItems];
@@ -155,9 +178,16 @@ const getDashboardItemsToDisplay = ({
       getFuseSearchQueryForMultipleKeys(searchText, [
         'game.gameName',
         'projectFiles.fileMetadata.name',
+        'deletedCloudProject.name',
       ])
     );
     itemsToDisplay = searchResults.map(result => result.item);
+  } else if (filter === 'deleted') {
+    // Deleted projects are already sorted by deletion date: just paginate them.
+    itemsToDisplay = itemsToDisplay.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
   } else {
     // If there is no search, sort the items by the selected order.
     if (orderBy) {
@@ -263,11 +293,17 @@ type Props = {|
     file: FileMetadataAndStorageProviderName,
     options?: { skipConfirmation: boolean }
   ) => Promise<void>,
+  onRestoreCloudProject: (
+    i18n: I18nType,
+    cloudProject: CloudProjectWithUserAccessInfo
+  ) => Promise<void>,
   // Controls
   currentPage: number,
   setCurrentPage: (currentPage: number) => void,
   searchText: string,
   setSearchText: (searchText: string) => void,
+  filter: GamesListFilter,
+  setFilter: (filter: GamesListFilter) => void,
 |};
 
 const GamesList = ({
@@ -280,6 +316,7 @@ const GamesList = ({
   onUnregisterGame,
   onRegisterProject,
   onDeleteCloudProject,
+  onRestoreCloudProject,
   disabled,
   storageProviders,
   canOpen,
@@ -294,20 +331,37 @@ const GamesList = ({
   setCurrentPage,
   searchText,
   setSearchText,
+  filter,
+  setFilter,
 }: Props): React.Node => {
-  const { cloudProjects, profile, onCloudProjectsChanged } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    cloudProjects,
+    profile,
+    onCloudProjectsChanged,
+    limits,
+  } = React.useContext(AuthenticatedUserContext);
   const {
     values: { gamesDashboardOrderBy: orderBy },
     setGamesDashboardOrderBy,
   } = React.useContext(PreferencesContext);
 
+  React.useEffect(
+    () => {
+      // Deleted projects are only available for logged-in users: switch back
+      // to the active projects when logging out, to avoid being stuck on an
+      // empty list without the filter selector displayed.
+      if (!profile && filter === 'deleted') {
+        setFilter('active');
+      }
+    },
+    [profile, filter, setFilter]
+  );
+
   const { isMobile } = useResponsiveWindowSize();
   const gameThumbnailWidth = getThumbnailWidth({ isMobile });
 
   const allRecentProjectFiles = useProjectsListFor(null);
-  const allDashboardItems: ?(DashboardItem[]) = React.useMemo(
+  const activeDashboardItems: ?(DashboardItem[]) = React.useMemo(
     () => {
       if (!games) return null;
       const projectFilesWithGame = games.map(game => {
@@ -339,12 +393,27 @@ const GamesList = ({
     [games, allRecentProjectFiles, project]
   );
 
+  const deletedDashboardItems: DashboardItem[] = React.useMemo(
+    () =>
+      (cloudProjects || [])
+        .filter(cloudProject => !!cloudProject.deletedAt)
+        .sort(
+          (cloudProjectA, cloudProjectB) =>
+            Date.parse(cloudProjectB.deletedAt || '') -
+            Date.parse(cloudProjectA.deletedAt || '')
+        )
+        .map(cloudProject => ({ deletedCloudProject: cloudProject })),
+    [cloudProjects]
+  );
+
+  const allDashboardItems: ?(DashboardItem[]) =
+    filter === 'deleted' ? deletedDashboardItems : activeDashboardItems;
+
   const totalNumberOfPages = allDashboardItems
     ? Math.ceil(allDashboardItems.length / pageSize)
     : 1;
   const onCurrentPageChange = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    newPage => {
+    (newPage: number) => {
       const minPage = 1;
       const maxPage = totalNumberOfPages;
       if (newPage < minPage) {
@@ -365,6 +434,7 @@ const GamesList = ({
         keys: [
           { name: 'game.gameName', weight: 1 },
           { name: 'projectFiles.fileMetadata.name', weight: 1 },
+          { name: 'deletedCloudProject.name', weight: 1 },
         ],
       }),
     [allDashboardItems]
@@ -382,6 +452,7 @@ const GamesList = ({
       searchClient,
       currentPage,
       orderBy,
+      filter,
     })
   );
 
@@ -396,6 +467,7 @@ const GamesList = ({
           searchClient,
           currentPage,
           orderBy,
+          filter,
         })
       );
     },
@@ -414,6 +486,7 @@ const GamesList = ({
       games, // games change (when updating a game for instance)
       currentPage, // user changes page
       orderBy, // user changes order
+      filter, // user switches between active and deleted projects
       currentFileMetadata, // opened project changes (when opening or closing a project from here)
       allRecentProjectFiles.length, // list of recent projects changes (when a project is removed from list)
       project, // opened project changes (when closing a project from here)
@@ -466,11 +539,11 @@ const GamesList = ({
 
   React.useEffect(
     () => {
-      // Reset pagination when modifying the sorting order.
+      // Reset pagination when modifying the sorting order or the list shown.
       setCurrentPage(1);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [orderBy]
+    [orderBy, filter]
   );
 
   const shouldShowOpenProject =
@@ -534,13 +607,22 @@ const GamesList = ({
               )}
             </LineStackLayout>
           </Line>
-          {allDashboardItems && allDashboardItems.length > 0 && (
+          {((activeDashboardItems && activeDashboardItems.length > 0) ||
+            deletedDashboardItems.length > 0) && (
             <ResponsiveLineStackLayout
               expand
               noMargin
               alignItems="center"
               noResponsiveLandscape
             >
+              {!isMobile && (
+                <GamesListFilterSelector
+                  filter={filter}
+                  onFilterChange={setFilter}
+                  orderBy={orderBy}
+                  onOrderByChange={setGamesDashboardOrderBy}
+                />
+              )}
               <Column noMargin expand>
                 <SearchBar
                   value={searchText}
@@ -551,26 +633,14 @@ const GamesList = ({
                 />
               </Column>
               <Line noMargin justifyContent="space-between">
-                <SearchBarSelectField
-                  value={orderBy}
-                  onChange={(e, i, value: string) =>
-                    // $FlowFixMe[incompatible-type]
-                    setGamesDashboardOrderBy(value)
-                  }
-                >
-                  <SelectOption
-                    value="lastModifiedAt"
-                    label={t`Last modified`}
+                {isMobile && (
+                  <GamesListFilterSelector
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    orderBy={orderBy}
+                    onOrderByChange={setGamesDashboardOrderBy}
                   />
-                  <SelectOption
-                    value="totalSessions"
-                    label={t`Most sessions (all time)`}
-                  />
-                  <SelectOption
-                    value="weeklySessions"
-                    label={t`Most sessions (past 7 days)`}
-                  />
-                </SearchBarSelectField>
+                )}
                 <Line
                   noMargin
                   expand
@@ -627,12 +697,15 @@ const GamesList = ({
             displayedDashboardItems
               .map((dashboardItem, index) => {
                 const game = dashboardItem.game;
+                const deletedCloudProject = dashboardItem.deletedCloudProject;
                 const projectFileMetadataAndStorageProviderName = dashboardItem.projectFiles
                   ? dashboardItem.projectFiles[0]
                   : null;
 
                 const key = game
                   ? game.id
+                  : deletedCloudProject
+                  ? deletedCloudProject.id
                   : projectFileMetadataAndStorageProviderName
                   ? `${projectFileMetadataAndStorageProviderName.fileMetadata
                       .name || 'project'}-${index}`
@@ -679,6 +752,18 @@ const GamesList = ({
                         skipConfirmation: true,
                       });
                     }}
+                    onRestoreProject={
+                      deletedCloudProject &&
+                      isProjectRestorable(
+                        deletedCloudProject,
+                        limits
+                          ? limits.capabilities.cloudProjects
+                              .projectRestorationTimeWindowInSeconds
+                          : null
+                      )
+                        ? () => onRestoreCloudProject(i18n, deletedCloudProject)
+                        : undefined
+                    }
                   />
                 );
               })
@@ -692,6 +777,18 @@ const GamesList = ({
               >
                 <BackgroundText>
                   <Trans>No game matching your search.</Trans>
+                </BackgroundText>
+              </Paper>
+            </Column>
+          ) : filter === 'deleted' ? (
+            <Column expand noMargin>
+              <Paper
+                variant="outlined"
+                background="dark"
+                style={styles.noGameMessageContainer}
+              >
+                <BackgroundText>
+                  <Trans>You don't have any deleted projects.</Trans>
                 </BackgroundText>
               </Paper>
             </Column>

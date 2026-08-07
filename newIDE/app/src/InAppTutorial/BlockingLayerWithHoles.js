@@ -6,6 +6,13 @@ import { useInterval } from '../Utils/UseInterval';
 const blockingLayerZIndex = aboveMaterialUiMaxZIndex;
 export const itemAboveBlockingLayerZIndex = blockingLayerZIndex + 1;
 
+type Rect = {
+  top: number,
+  left: number,
+  width: number,
+  height: number,
+};
+
 type Props = {|
   elements: Array<HTMLElement>,
 |};
@@ -13,12 +20,11 @@ type Props = {|
 const BlockingLayerWithHoles = ({
   elements,
 }: Props): null | React.MixedElement => {
-  // $FlowFixMe[missing-empty-array-annot]
-  const [holes, setHoles] = React.useState([]);
+  const [holes, setHoles] = React.useState<Array<Rect>>([]);
 
   const updateHoles = React.useCallback(
     () => {
-      const newHoles = elements.map(element => {
+      const newHoles: Array<Rect> = elements.map(element => {
         const { top, left, width, height } = element.getBoundingClientRect();
         return {
           top,

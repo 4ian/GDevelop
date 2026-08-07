@@ -3,7 +3,9 @@ declare class gdPropertyFunctionGenerator {
   static generateBehaviorGetterAndSetter(project: gdProject, extension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, property: gdNamedPropertyDescriptor, isSharedProperties: boolean): void;
   static generateObjectGetterAndSetter(project: gdProject, extension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, property: gdNamedPropertyDescriptor): void;
   static canGenerateGetterAndSetter(eventsBasedBehavior: gdAbstractEventsBasedEntity, property: gdNamedPropertyDescriptor): boolean;
-  static generateConditionSkeleton(project: gdProject, eventFunction: gdEventsFunction): void;
+  static generateConditionSkeleton(project: gdProject, eventsFunction: gdEventsFunction): void;
+  static generateExpressionSkeleton(project: gdProject, eventsFunction: gdEventsFunction): void;
+  static updateReturnActionType(project: gdProject, eventsFunction: gdEventsFunction): void;
   delete(): void;
   ptr: number;
 };

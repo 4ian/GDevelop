@@ -4,12 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_OBJECTGROUPSCONTAINER_H
-#define GDCORE_OBJECTGROUPSCONTAINER_H
+#pragma once
+
 #include <algorithm>
 #include <memory>
 #include <vector>
 
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -189,8 +190,8 @@ class GD_CORE_API ObjectGroupsContainer {
  private:
   std::vector<std::unique_ptr<gd::ObjectGroup>> objectGroups;
   static ObjectGroup badGroup;
+  gd::MemoryTracked _memoryTracked{this, "ObjectGroupsContainer"};
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_OBJECTGROUPSCONTAINER_H

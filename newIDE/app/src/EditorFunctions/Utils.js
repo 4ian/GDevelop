@@ -3,21 +3,40 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 
 const gd: libGDevelop = global.gd;
 
+export type ObjectSizeInfo = {|
+  // `width`/`height`/`centerX`/`centerY` are `null` when size is not known.
+  // `depth`/`originZ`/`centerZ` are `null` when the object is 2D.
+  width: number | null,
+  height: number | null,
+  depth: number | null,
+  originX: number,
+  originY: number,
+  originZ: number | null,
+  centerX: number | null,
+  centerY: number | null,
+  centerZ: number | null,
+|};
+
 /**
- * Returns size, origin and center for an asset short header.
- * Returns null for object types where this information cannot be determined statically.
+ * Returns the default size, origin and center of an object as numeric values.
+ * Uses PixiResourcesLoader to get the actual texture dimensions for Sprite objects.
+ * Accepts an optional assetShortHeader for Sprite objects installed from the asset store,
+ * where the texture may not yet be loaded in PixiResourcesLoader.
+ * Returns 0 for width/height/depth when dimensions are not available.
  */
-export const getObjectSizeAndOriginInfo = (
+export const getObjectSizeInfo = (
   object: gdObject,
   project: gdProject,
+  pixiResourcesLoader: any,
   assetShortHeader?: AssetShortHeader | null
-): {| size: string, origin: string, center: string |} | null => {
+): ObjectSizeInfo | null => {
   const objectConfiguration = object.getConfiguration();
   const objectType = object.getType();
 
   if (objectType === 'Sprite') {
     const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
     const animations = spriteConfiguration.getAnimations();
+    const preScale = spriteConfiguration.getPreScale();
     if (
       animations.getAnimationsCount() > 0 &&
       animations.getAnimation(0).getDirectionsCount() > 0 &&
@@ -26,30 +45,52 @@ export const getObjectSizeAndOriginInfo = (
         .getDirection(0)
         .getSpritesCount() > 0
     ) {
-      const sprite = animations
+      const firstSprite = animations
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0);
-      const origin = sprite.getOrigin();
-      const originStr = `${origin.getX()};${origin.getY()}`;
+      const originX = firstSprite.getOrigin().getX();
+      const originY = firstSprite.getOrigin().getY();
 
-      let centerStr;
-      if (sprite.isDefaultCenterPoint()) {
-        centerStr =
-          assetShortHeader != null
-            ? `${assetShortHeader.width / 2};${assetShortHeader.height / 2}`
-            : 'center of image';
+      // Determine texture dimensions: prefer assetShortHeader (reliable for freshly installed
+      // assets whose texture may not be in PixiResourcesLoader yet), then fall back to the loader.
+      let textureWidth = 0;
+      let textureHeight = 0;
+      if (assetShortHeader && assetShortHeader.width > 0) {
+        textureWidth = assetShortHeader.width;
+        textureHeight = assetShortHeader.height;
       } else {
-        const center = sprite.getCenter();
-        centerStr = `${center.getX()};${center.getY()}`;
+        const texture = pixiResourcesLoader.getPIXITexture(
+          project,
+          firstSprite.getImageName()
+        );
+        if (texture && texture.valid && texture.width > 0) {
+          textureWidth = texture.width;
+          textureHeight = texture.height;
+        }
       }
 
-      const sizeStr =
-        assetShortHeader != null
-          ? `${assetShortHeader.width}x${assetShortHeader.height}`
-          : 'unknown';
-
-      return { size: sizeStr, origin: originStr, center: centerStr };
+      if (textureWidth > 0) {
+        const width = textureWidth * preScale;
+        const height = textureHeight * preScale;
+        const centerX = firstSprite.isDefaultCenterPoint()
+          ? width / 2
+          : firstSprite.getCenter().getX();
+        const centerY = firstSprite.isDefaultCenterPoint()
+          ? height / 2
+          : firstSprite.getCenter().getY();
+        return {
+          width,
+          height,
+          depth: null,
+          originX,
+          originY,
+          originZ: null,
+          centerX,
+          centerY,
+          centerZ: null,
+        };
+      }
     }
     return null;
   }
@@ -59,9 +100,15 @@ export const getObjectSizeAndOriginInfo = (
     const width = config.getWidth();
     const height = config.getHeight();
     return {
-      size: `${width}x${height}`,
-      origin: '0;0',
-      center: `${width / 2};${height / 2}`,
+      width,
+      height,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
     };
   }
 
@@ -70,9 +117,108 @@ export const getObjectSizeAndOriginInfo = (
     const width = config.getWidth();
     const height = config.getHeight();
     return {
-      size: `${width}x${height}`,
-      origin: '0;0',
-      center: `${width / 2};${height / 2}`,
+      width,
+      height,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextObject::Text') {
+    return {
+      width: null,
+      height: null,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: null,
+      centerY: null,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'TextInput::TextInputObject') {
+    // Defaults match DEFAULT_WIDTH/DEFAULT_HEIGHT in Extensions/TextInput/JsExtension.js.
+    const width = 300;
+    const height = 30;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: 0,
+      originY: 0,
+      originZ: null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Lighting::LightObject') {
+    const properties = objectConfiguration.getProperties();
+    const radius = properties.has('radius')
+      ? parseFloat(properties.get('radius').getValue()) || 0
+      : 0;
+    const width = radius * 2;
+    const height = radius * 2;
+    return {
+      width,
+      height,
+      depth: null,
+      originX: radius,
+      originY: radius,
+      originZ: null,
+      centerX: radius,
+      centerY: radius,
+      centerZ: null,
+    };
+  }
+
+  if (objectType === 'Scene3D::Cube3DObject') {
+    const properties = objectConfiguration.getProperties();
+    const width = properties.has('width')
+      ? parseFloat(properties.get('width').getValue()) || 0
+      : 0;
+    const height = properties.has('height')
+      ? parseFloat(properties.get('height').getValue()) || 0
+      : 0;
+    const depth = properties.has('depth')
+      ? parseFloat(properties.get('depth').getValue()) || 0
+      : 0;
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
+    };
+  }
+
+  if (objectType === 'Scene3D::Model3DObject') {
+    const config = gd.asModel3DConfiguration(objectConfiguration);
+    const width = config.getWidth();
+    const height = config.getHeight();
+    const depth = config.getDepth();
+    return {
+      width,
+      height,
+      depth,
+      originX: 0,
+      originY: 0,
+      originZ: 0,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: depth / 2,
     };
   }
 
@@ -99,16 +245,53 @@ export const getObjectSizeAndOriginInfo = (
     const height = maxY - minY;
     const depth = maxZ - minZ;
 
-    const origin = `${-minX};${-minY}${isRenderedIn3D ? `;${-minZ}` : ''}`;
-    const center = `${width / 2};${height / 2}${
-      isRenderedIn3D ? `;${depth / 2}` : ''
-    }`;
     return {
-      size: `${width}x${height}${isRenderedIn3D ? `x${depth}` : ''}`,
-      origin,
-      center,
+      width,
+      height,
+      depth: isRenderedIn3D ? depth : null,
+      originX: -minX || 0,
+      originY: -minY || 0,
+      originZ: isRenderedIn3D ? -minZ || 0 : null,
+      centerX: width / 2,
+      centerY: height / 2,
+      centerZ: isRenderedIn3D ? depth / 2 : null,
     };
   }
 
   return null;
+};
+
+const NO_INTRINSIC_SIZE_MESSAGE =
+  "These objects have no intrinsic size (width/height = null in `objectSizeInfo`). For precise placement of instance(s), set the instance's size (e.g.: via `instances_size` in `put_2d_instances`). Also check origin X;Y (if 0;0, it means the instance position defines the top-left, not the center).";
+
+/**
+ * Build structured hints for an `objectSizeInfo` map.
+ *
+ * Returns at most one `no-intrinsic-size` entry per call, listing all objects
+ * whose width/height is null. `depth` being null is normal for 2D objects —
+ * not a hint trigger.
+ */
+export const getObjectSizeInfoHints = (objectSizeInfoByName: {
+  [string]: ObjectSizeInfo | null,
+}): Array<{|
+  code: string,
+  message: string,
+  objectNames: Array<string>,
+|}> => {
+  const objectNames: Array<string> = [];
+  for (const objectName in objectSizeInfoByName) {
+    const info = objectSizeInfoByName[objectName];
+    if (!info) continue;
+    if (info.width === null || info.height === null) {
+      objectNames.push(objectName);
+    }
+  }
+  if (objectNames.length === 0) return [];
+  return [
+    {
+      code: 'no-intrinsic-size',
+      message: NO_INTRINSIC_SIZE_MESSAGE,
+      objectNames,
+    },
+  ];
 };

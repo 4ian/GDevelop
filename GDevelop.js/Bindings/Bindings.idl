@@ -64,6 +64,11 @@ interface VectorPropertyFolderOrProperty {
     [Const] PropertyFolderOrProperty at(unsigned long index);
 };
 
+interface VectorFunctionFolderOrFunction {
+    unsigned long size();
+    [Const] FunctionFolderOrFunction at(unsigned long index);
+};
+
 interface VectorScreenshot {
     unsigned long size();
     [Const, Ref] Screenshot at(unsigned long index);
@@ -294,7 +299,9 @@ interface Variable {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] Variable ResetPersistentUuid();
+    [Ref] Variable EnsurePersistentUuid();
     [Ref] Variable ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 enum VariablesContainer_SourceType {
@@ -332,7 +339,9 @@ interface VariablesContainer {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] VariablesContainer ResetPersistentUuid();
+    [Ref] VariablesContainer EnsurePersistentUuids();
     [Ref] VariablesContainer ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface VariablesContainersList {
@@ -361,7 +370,7 @@ interface ObjectGroup {
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
-interface ObjectVariableHelper {
+interface ObjectRefactorer {
     [Value] VariablesContainer STATIC_MergeVariableContainers(
         [Const, Ref] ObjectsContainersList objectsContainersList,
         [Const, Ref] ObjectGroup objectGroup);
@@ -373,12 +382,25 @@ interface ObjectVariableHelper {
         [Ref] EventsBasedObject eventsBasedObject,
         [Const] DOMString objectName,
         [Const, Ref] VariablesChangeset changeset);
+    void STATIC_FillMissingGroupVariablesToObject(
+        [Ref] gdObject obj,
+        [ Const, Ref ] VariablesContainer groupVariablesContainer);
+    void STATIC_FillMissingGroupBehaviorToObject(
+        [Const, Ref] Platform platform,
+        [Ref] ObjectsContainer globalObjectsContainer,
+        [Ref] ObjectsContainer objectsContainer,
+        [Ref] gdObject obj,
+        [ Const, Ref ] ObjectGroup objectGroup,
+        [Const] DOMString behaviorName);
 };
 
 interface EventsBasedObjectVariantHelper {
     void STATIC_ComplyVariantsToEventsBasedObject(
         [Ref, Const] Project project,
         [Ref] EventsBasedObject eventsBasedObject);
+    [Value] VectorString STATIC_FindAllChildrenCustomObjectType(
+        [ Ref, Const ] Project project,
+        [ Ref, Const ] EventsBasedObject eventsBasedObject);
 };
 
 interface ObjectGroupsContainer {
@@ -599,8 +621,11 @@ interface Project {
     boolean IsFolderProject();
     void SetUseDeprecatedZeroAsDefaultZOrder(boolean enable);
     boolean GetUseDeprecatedZeroAsDefaultZOrder();
+    void SetUseDeprecatedZeroAsDefaultStringVariable(boolean enable);
+    boolean GetUseDeprecatedZeroAsDefaultStringVariable();
     boolean AreEffectsHiddenInEditor();
     void SetEffectsHiddenInEditor(boolean enable);
+    [Const, Ref] DOMString GetInitialGDVersion();
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
@@ -623,6 +648,8 @@ interface Project {
     void RemoveLayout([Const] DOMString name);
     void SetFirstLayout([Const] DOMString name);
     [Const, Ref] DOMString GetFirstLayout();
+    void SetPreviewLayout([Const] DOMString name);
+    [Const, Ref] DOMString GetPreviewLayout();
     unsigned long GetLayoutPosition([Const] DOMString name);
 
     boolean HasExternalEventsNamed([Const] DOMString name);
@@ -779,6 +806,13 @@ interface ProjectScopedContainers {
   [Const, Ref] ObjectsContainersList GetObjectsContainersList();
   [Const, Ref] VariablesContainersList GetVariablesContainersList();
   [Const, Ref] ResourcesContainersList GetResourcesContainersList();
+
+  [Const, Ref] DOMString GetScopeSceneName();
+  [Const, Ref] DOMString GetScopeExternalEventsName();
+  [Const, Ref] DOMString GetScopeExtensionName();
+  [Const, Ref] DOMString GetScopeFunctionName();
+  [Const, Ref] DOMString GetScopeBehaviorName();
+  [Const, Ref] DOMString GetScopeObjectName();
 };
 
 interface ExtensionProperties {
@@ -841,6 +875,9 @@ interface BehaviorsSharedData {
     boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
     void InitializeContent();
 
+    boolean IsFolded();
+    void SetFolded(boolean folded);
+
     [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
 
@@ -897,6 +934,8 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
+    void SetResourcesPreloading([Const] DOMString value);
+    [Const, Ref] DOMString GetResourcesPreloading();
 
     [Ref] ObjectConfiguration GetConfiguration();
 
@@ -1339,7 +1378,7 @@ interface ResourcesContainer {
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] Resource GetResourceAt(unsigned long index);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
-    [Const, Ref] DOMString GetResourceNameWithFile([Const] DOMString file);
+    [Value] VectorString GetResourceNamesWithFile([Const] DOMString file);
     boolean AddResource([Const, Ref] Resource res);
     void RemoveResource([Const] DOMString name);
     void RenameResource([Const] DOMString oldName, [Const] DOMString name);
@@ -1348,6 +1387,10 @@ interface ResourcesContainer {
     boolean MoveResourceUpInList([Const] DOMString oldName);
     boolean MoveResourceDownInList([Const] DOMString oldName);
     void MoveResource(unsigned long oldIndex, unsigned long newIndex);
+
+    void STATIC_UnserializeResourceFrom(
+        [Ref] Resource resource,
+        [Const, Ref] SerializerElement resourceElement);
 };
 
 interface ResourcesContainersList {
@@ -1446,6 +1489,8 @@ interface InitialInstance {
     void SetSealed(boolean seal);
     boolean ShouldKeepRatio();
     void SetShouldKeepRatio(boolean keepRatio);
+    boolean IsHidden();
+    void SetHidden(boolean hidden);
     long GetZOrder();
     void SetZOrder(long zOrder);
     long GetOpacity();
@@ -1605,6 +1650,7 @@ interface SerializerElement {
     // Use the element as an object ("associative array", "dictionary") or array:
     [Ref] SerializerElement AddChild([Const] DOMString str);
     [Ref] SerializerElement GetChild([Const] DOMString str);
+    [Ref] SerializerElement GetOrCreateChild([Const] DOMString str);
     void WRAPPED_SetChild([Const] DOMString str, [Const, Ref] SerializerElement element);
     boolean HasChild([Const] DOMString str);
 
@@ -1620,6 +1666,8 @@ interface SharedPtrSerializerElement {
 interface Serializer {
     [Const, Value] DOMString STATIC_ToJSON([Const, Ref] SerializerElement element);
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
+    void STATIC_SetCanonicalMode(boolean canonical);
+    boolean STATIC_IsCanonicalMode();
 };
 
 [NoDelete]
@@ -1640,7 +1688,11 @@ interface BinarySerializer {
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,
-        [Ref] VectorString usedResourceNames);
+        [Ref] VectorString usedResourceNames, [Ref] ExtensionDependencyCache ExtensionDependencyCache);
+};
+
+interface ExtensionDependencyCache {
+    void ExtensionDependencyCache();
 };
 
 interface InstructionsList {
@@ -1713,6 +1765,7 @@ interface AbstractFunctionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] AbstractFunctionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] AbstractFunctionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] AbstractFunctionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] AbstractFunctionMetadata SetHidden();
@@ -1765,7 +1818,10 @@ interface InstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] InstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] InstructionMetadata SetHint([Const] DOMString hint);
+    [Const, Ref] DOMString GetHint();
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1832,6 +1888,7 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] ExpressionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] ExpressionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] ExpressionMetadata GetCodeExtraInformation();
@@ -1854,6 +1911,7 @@ interface MultipleInstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] MultipleInstructionMetadata SetParameterHint([Const] DOMString hint);
     [Ref] MultipleInstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type, [Const, Ref] ParameterOptions options);
@@ -1918,6 +1976,8 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDescription([Const] DOMString description_);
     [Const, Ref] DOMString GetLongDescription();
     [Ref] ParameterMetadata SetLongDescription([Const] DOMString longDescription_);
+    [Const, Ref] DOMString GetHint();
+    [Ref] ParameterMetadata SetHint([Const] DOMString hint_);
     boolean IsCodeOnly();
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
@@ -1951,6 +2011,7 @@ interface ValueTypeMetadata {
     boolean IsNumber();
     boolean IsString();
     boolean IsVariable();
+    boolean IsResource();
 
     boolean STATIC_IsTypeObject([Const] DOMString parameterType);
     boolean STATIC_IsTypeBehavior([Const] DOMString parameterType);
@@ -1995,6 +2056,8 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetAssetStoreTag();
 
+
+    [Ref] ObjectMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] ObjectMetadata SetCategory([Const] DOMString categoryFullName);
     [Ref] ObjectMetadata SetAssetStoreTag([Const] DOMString assetStoreTag);
     [Ref] InGameEditorResourceMetadata AddInGameEditorResource();
@@ -2132,6 +2195,8 @@ interface BehaviorMetadata {
     [Const, Ref] DOMString GetGroup();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+
+    [Ref] BehaviorMetadata SetHelpPath([Const] DOMString helpPath);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -2292,7 +2357,10 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
     [Const, Ref] DOMString GetDimension();
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
-    void MarkAsDeprecated();
+    [Ref] PlatformExtension MarkAsDeprecatedSince([Const] DOMString version);
+
+    boolean IsDeprecated();
+    [Const, Ref] DOMString GetDeprecationGDVersion();
 
     [Const, Ref] VectorString GetTags();
     [Ref] PlatformExtension SetTags([Const] DOMString csvTags);
@@ -2463,6 +2531,8 @@ interface BaseEvent {
     void SetDisabled(boolean disable);
     boolean IsFolded();
     void SetFolded(boolean folded);
+
+    InstructionsList GetInstructionList([Const] DOMString label);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -2641,7 +2711,7 @@ interface EventsRefactorer {
         [Const] DOMString oldName,
         [Const] DOMString newName);
     [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
-    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
+    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences, boolean inInstructionNames);
 };
 
 interface UnfilledRequiredBehaviorPropertyProblem {
@@ -2659,7 +2729,9 @@ interface VectorUnfilledRequiredBehaviorPropertyProblem {
 
 interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
+    void STATIC_ExposeProjectEventsWithoutExtensions([Ref] Project project, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
     void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
+    void STATIC_ExposeEventsFunctionsExtensionEvents([Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
 };
 
 interface ResourceExposer {
@@ -2978,22 +3050,13 @@ interface InstructionValidator {
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
   boolean STATIC_IsParameterValid(
     [Const, Ref] Platform platform,
     [Const, Ref] ProjectScopedContainers projectScopedContainers,
     [Const, Ref] Instruction instruction,
     [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
-  boolean STATIC_HasDeprecationWarnings(
-    [Const, Ref] Platform platform,
-    [Const, Ref] ProjectScopedContainers projectScopedContainers,
-    [Const, Ref] Instruction instruction,
-    [Const, Ref] InstructionMetadata metadata,
-    long parameterIndex,
-    [Const] DOMString value);
+    long parameterIndex);
 };
 
 interface ObjectTools {
@@ -3015,7 +3078,10 @@ interface PropertyFunctionGenerator {
     void STATIC_GenerateObjectGetterAndSetter([Ref] Project project, [Ref] EventsFunctionsExtension extension, [Ref] EventsBasedObject eventsBasedObject, [Const, Ref] NamedPropertyDescriptor property);
     boolean STATIC_CanGenerateGetterAndSetter([Const, Ref] AbstractEventsBasedEntity eventsBasedBehavior, [Const, Ref] NamedPropertyDescriptor property);
 
-    void STATIC_GenerateConditionSkeleton([Ref] Project project, [Ref] EventsFunction eventFunction);
+    void STATIC_GenerateConditionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
+    void STATIC_GenerateExpressionSkeleton([Ref] Project project, [Ref] EventsFunction eventsFunction);
+    void STATIC_UpdateReturnActionType([Ref] Project project, [Ref] EventsFunction eventsFunction);
+
 };
 
 interface UsedExtensionsResult {
@@ -3171,6 +3237,7 @@ interface ExpressionValidator {
 
     [Const, Ref] VectorExpressionParserError GetAllErrors();
     [Const, Ref] VectorExpressionParserError GetFatalErrors();
+    [Const, Ref] VectorExpressionParserError GetDeprecationWarnings();
 
     //Inherited from ExpressionParser2NodeWorker:
 };
@@ -3214,6 +3281,37 @@ interface ExpressionCompletionFinder {
     [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ProjectScopedContainers projectScopedContainers, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
+
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
+enum ExpressionColorationDescription_ColorationKind {
+  "ExpressionColorationDescription::String",
+  "ExpressionColorationDescription::Number",
+  "ExpressionColorationDescription::Object",
+  "ExpressionColorationDescription::Variable",
+  "ExpressionColorationDescription::Operator",
+};
+
+interface ExpressionColorationDescription {
+  ExpressionColorationDescription_ColorationKind GetColorationKind();
+  unsigned long GetStartPosition();
+  unsigned long GetEndPosition();
+};
+
+interface VectorExpressionColorationDescription {
+    unsigned long size();
+    [Value] ExpressionColorationDescription at(unsigned long index);
+};
+
+interface ExpressionSyntaxColoringHelper {
+    [Value] VectorExpressionColorationDescription STATIC_GetColorationDescriptionsFor(
+        [Const, Ref] Platform platform, [Const, Ref]
+        ProjectScopedContainers projectScopedContainers,
+        [Const] DOMString rootType,
+        [Ref] ExpressionNode node);
+
+    [Const, Ref] VectorExpressionColorationDescription GetColorationDescriptions();
 
     //Inherited from ExpressionParser2NodeWorker:
 };
@@ -3291,6 +3389,28 @@ interface EventsFunction {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
+interface FunctionFolderOrFunction {
+    void FunctionFolderOrFunction();
+    boolean IsFolder();
+    boolean IsRootFolder();
+    [Ref] EventsFunction GetFunction();
+    [Const, Ref] DOMString GetFolderName();
+    void SetFolderName([Const] DOMString name);
+    boolean HasFunctionNamed([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetFunctionNamed([Const] DOMString name);
+    unsigned long GetChildrenCount();
+    [Ref] FunctionFolderOrFunction GetChildAt(unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetFunctionChild([Const] DOMString name);
+    [Ref] FunctionFolderOrFunction GetOrCreateChildFolder([Const] DOMString name);
+    unsigned long GetChildPosition([Const, Ref] FunctionFolderOrFunction child);
+    [Ref] FunctionFolderOrFunction GetParent();
+    [Ref] FunctionFolderOrFunction InsertNewFolder([Const] DOMString name, unsigned long newPosition);
+    void MoveFunctionFolderOrFunctionToAnotherFolder([Ref] FunctionFolderOrFunction functionFolderOrFunction, [Ref] FunctionFolderOrFunction newParentFolder, unsigned long newPosition);
+    void MoveChild(unsigned long oldIndex, unsigned long newIndex);
+    void RemoveFolderChild([Const, Ref] FunctionFolderOrFunction childToRemove);
+    boolean IsADescendantOf([Const, Ref] FunctionFolderOrFunction otherFunctionFolderOrFunction);
+};
+
 enum EventsFunctionsContainer_FunctionOwner {
     "EventsFunctionsContainer::Extension",
     "EventsFunctionsContainer::Behavior",
@@ -3307,6 +3427,14 @@ interface EventsFunctionsContainer {
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
     unsigned long GetEventsFunctionPosition([Const, Ref] EventsFunction eventsFunction);
+
+    [Ref] EventsFunction InsertNewEventsFunctionInFolder(
+        [Const] DOMString name,
+        [Ref] FunctionFolderOrFunction folder,
+        unsigned long pos);
+    [Ref] FunctionFolderOrFunction GetRootFolder();
+    [Value] VectorFunctionFolderOrFunction GetAllFunctionFolderOrFunction();
+    void AddMissingFunctionsInRootFolder();
 };
 
 interface AbstractEventsBasedEntity {
@@ -3317,6 +3445,9 @@ interface AbstractEventsBasedEntity {
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     boolean IsPrivate();
+    [Const, Ref] DOMString GetPreviewIconUrl();
+    [Const, Ref] DOMString GetIconUrl();
+    [Const, Ref] DOMString GetHelpPath();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -3329,6 +3460,9 @@ interface EventsBasedBehavior {
     [Ref] EventsBasedBehavior SetFullName([Const] DOMString fullName);
     [Ref] EventsBasedBehavior SetDescription([Const] DOMString description);
     [Ref] EventsBasedBehavior SetPrivate(boolean isPrivate);
+    [Ref] EventsBasedBehavior SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Ref] EventsBasedBehavior SetIconUrl([Const] DOMString iconUrl);
+    [Ref] EventsBasedBehavior SetHelpPath([Const] DOMString helpPath);
 
     [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
     [Const, Ref] DOMString GetObjectType();
@@ -3370,6 +3504,9 @@ interface EventsBasedObject {
     [Ref] EventsBasedObject SetFullName([Const] DOMString fullName);
     [Ref] EventsBasedObject SetDescription([Const] DOMString description);
     [Ref] EventsBasedObject SetPrivate(boolean isPrivate);
+    [Ref] EventsBasedObject SetPreviewIconUrl([Const] DOMString previewIconUrl);
+    [Ref] EventsBasedObject SetIconUrl([Const] DOMString iconUrl);
+    [Ref] EventsBasedObject SetHelpPath([Const] DOMString helpPath);
 
 
     [Ref] EventsBasedObject SetDefaultName([Const] DOMString defaultName);
@@ -3660,11 +3797,15 @@ interface EventsContextAnalyzer {
 };
 
 interface ReadOnlyArbitraryEventsWorkerWithContext {
+    void SetSkipDisabledEvents(boolean skip);
     void Launch([Const, Ref] EventsList events, [Const, Ref] ProjectScopedContainers projectScopedContainers);
 };
 [JSImplementation=ReadOnlyArbitraryEventsWorkerWithContext]
 interface ReadOnlyArbitraryEventsWorkerWithContextJS {
     void ReadOnlyArbitraryEventsWorkerWithContextJS();
+
+    // Called at the start of each Launch, before event traversal begins
+    void DoOnLaunch([Const, Ref] EventsList events);
 
     // Called for each event visited
     void DoVisitEvent([Const, Ref] BaseEvent event);
@@ -4323,6 +4464,13 @@ interface JsCodeEvent {
     boolean IsFolded();
     void SetFolded(boolean folded);
 
+    long GetScrollTop();
+    void SetScrollTop(long value);
+    long GetCursorColumn();
+    void SetCursorColumn(long value);
+    long GetCursorLine();
+    void SetCursorLine(long value);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
@@ -4378,4 +4526,18 @@ interface MetadataDeclarationHelper {
     boolean STATIC_IsObjectLifecycleEventsFunction([Const] DOMString functionName);
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString functionName);
     [Const, Value] DOMString STATIC_ShiftSentenceParamIndexes([Const] DOMString sentence, long offset);
+};
+
+interface MemoryTrackedRegistry {
+    void STATIC_add(long ptr, DOMString className);
+    void STATIC_remove(long ptr, DOMString className);
+    boolean STATIC_isDead(long ptr, DOMString className);
+    long STATIC_getDeadCount();
+    long STATIC_getAliveCount();
+    void STATIC_pruneDead(long maxSize);
+    long STATIC_getAliveCountForClass(DOMString className);
+    long STATIC_getDeadCountForClass(DOMString className);
+    void STATIC_setCurrentCallContextId(long id);
+    long STATIC_getDeadContextId(long ptr, DOMString className);
+    double STATIC_getDeadContextTimeMs(long ptr, DOMString className);
 };

@@ -32,6 +32,7 @@ import {
   TitleBarLeftSafeMargins,
   TitleBarRightSafeMargins,
 } from './TitleBarSafeMargins';
+import PortalContainerContext from './PortalContainerContext';
 
 let openedDialogsCount = 0;
 
@@ -331,7 +332,7 @@ const DialogWithoutWindowSizeProvider = ({
     : {};
   const additionalPaddingStyle = {
     paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
-    paddingBottom: hasActions || noPadding ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
+    paddingBottom: 0, // Padding with the content is provided by actions, if any.
   };
   const contentStyle = {
     ...styles.dialogContent,
@@ -389,6 +390,7 @@ const DialogWithoutWindowSizeProvider = ({
     [onCloseDialog, onApply]
   );
 
+  const portalContainer = React.useContext(PortalContainerContext);
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
   const paperMinHeight = fullHeight
@@ -448,6 +450,7 @@ const DialogWithoutWindowSizeProvider = ({
       }
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
+      container={portalContainer}
     >
       {topBackgroundSrc && (
         <div

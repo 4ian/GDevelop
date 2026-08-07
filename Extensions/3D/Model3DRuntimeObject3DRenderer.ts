@@ -117,7 +117,7 @@ namespace gdjs {
       this._animationMixer.update(timeDelta);
     }
 
-    updatePosition() {
+    override updatePosition() {
       const originPoint = this.getOriginPoint();
       const centerPoint = this.getCenterPoint();
       this.get3DRendererObject().position.set(
@@ -130,12 +130,34 @@ namespace gdjs {
       );
     }
 
-    getOriginPoint() {
-      return this._model3DRuntimeObject._originPoint || this._modelOriginPoint;
+    getOriginPoint(): FloatPoint3D {
+      //@ts-ignore
+      const point: FloatPoint3D = gdjs.staticArray(
+        Model3DRuntimeObject3DRenderer.prototype.getOriginPoint
+      );
+      const originPoint = this._model3DRuntimeObject._originPoint;
+      point[0] =
+        originPoint[0] === null ? this._modelOriginPoint[0] : originPoint[0];
+      point[1] =
+        originPoint[1] === null ? this._modelOriginPoint[1] : originPoint[1];
+      point[2] =
+        originPoint[2] === null ? this._modelOriginPoint[2] : originPoint[2];
+      return point;
     }
 
-    getCenterPoint() {
-      return this._model3DRuntimeObject._centerPoint || this._modelOriginPoint;
+    getCenterPoint(): FloatPoint3D {
+      //@ts-ignore
+      const point: FloatPoint3D = gdjs.staticArray(
+        Model3DRuntimeObject3DRenderer.prototype.getCenterPoint
+      );
+      const centerPoint = this._model3DRuntimeObject._centerPoint;
+      point[0] =
+        centerPoint[0] === null ? this._modelOriginPoint[0] : centerPoint[0];
+      point[1] =
+        centerPoint[1] === null ? this._modelOriginPoint[1] : centerPoint[1];
+      point[2] =
+        centerPoint[2] === null ? this._modelOriginPoint[2] : centerPoint[2];
+      return point;
     }
 
     /**
@@ -163,13 +185,28 @@ namespace gdjs {
       threeObject.updateMatrixWorld(true);
       const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
-      const shouldKeepModelOrigin = !this._model3DRuntimeObject._originPoint;
+      const shouldKeepModelOrigin =
+        this._model3DRuntimeObject._originPoint[0] === null ||
+        this._model3DRuntimeObject._originPoint[1] === null ||
+        this._model3DRuntimeObject._originPoint[2] === null;
       if (shouldKeepModelOrigin) {
         // Keep the origin as part of the model.
         // For instance, a model can be 1 face of a cube and we want to keep the
         // inside as part of the object even if it's just void.
         // It also avoids to have the origin outside of the object box.
-        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+        boundingBox.expandByPoint(
+          new THREE.Vector3(
+            this._model3DRuntimeObject._originPoint[0] === null
+              ? 0
+              : boundingBox.min[0],
+            this._model3DRuntimeObject._originPoint[1] === null
+              ? 0
+              : boundingBox.min[1],
+            this._model3DRuntimeObject._originPoint[2] === null
+              ? 0
+              : boundingBox.min[2]
+          )
+        );
       }
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;
@@ -177,12 +214,23 @@ namespace gdjs {
 
       // Center the model.
       const centerPoint = this._model3DRuntimeObject._centerPoint;
-      if (centerPoint) {
-        threeObject.position.set(
-          -(boundingBox.min.x + modelWidth * centerPoint[0]),
-          // The model is flipped on Y axis.
-          -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
-          -(boundingBox.min.z + modelDepth * centerPoint[2])
+      if (centerPoint[0] !== null) {
+        threeObject.position.x = -(
+          boundingBox.min.x +
+          modelWidth * centerPoint[0]
+        );
+      }
+      if (centerPoint[1] !== null) {
+        // The model is flipped on Y axis.
+        threeObject.position.y = -(
+          boundingBox.min.y +
+          modelHeight * (1 - centerPoint[1])
+        );
+      }
+      if (centerPoint[2] !== null) {
+        threeObject.position.z = -(
+          boundingBox.min.z +
+          modelDepth * centerPoint[2]
         );
       }
 

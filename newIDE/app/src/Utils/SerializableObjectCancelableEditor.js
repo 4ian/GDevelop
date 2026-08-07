@@ -3,6 +3,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { exceptionallyGuardAgainstDeadObject } from './IsNullPtr';
 const gd = global.gd;
 
 type Props = {|
@@ -11,14 +12,15 @@ type Props = {|
   onCancel: () => void | Promise<void>,
 
   /**
-   * In the future, most serializable objects will be able to have
-   * persistent UUID to identify them uniquely. In the meantime, some
-   * UUIDs are used to check for changes in a serialized object, but must
-   * not be persisted in the project file. In this case, this will
-   * reset the UUIDs (which are probabably not set) and clear them when cancelled.
-   * If you must manually clear them if changes are applied.
+   * Persistent UUIDs are used to track variables when applying refactoring
+   * after changes - and they are also persisted in the project file, so they
+   * must be kept stable to avoid useless changes in it. This will set the
+   * UUIDs of the object (and its sub elements, like variables) not having
+   * one yet, while preserving the existing ones. Nothing is cleared when
+   * cancelled (the original UUIDs are restored with the rest of the
+   * serialized state).
    */
-  resetThenClearPersistentUuid?: boolean,
+  ensurePersistentUuids?: boolean,
 |};
 
 const changesBeforeShowingWarning = 1;
@@ -32,7 +34,7 @@ export const useSerializableObjectCancelableEditor = ({
   serializableObject,
   useProjectToUnserialize,
   onCancel,
-  resetThenClearPersistentUuid,
+  ensurePersistentUuids,
 }: Props): {
   getOriginalContentSerializedElement: () => gdSerializerElement,
   hasUnsavedChanges: () => boolean,
@@ -54,8 +56,11 @@ export const useSerializableObjectCancelableEditor = ({
         serializedElementRef.current = null;
       }
 
-      if (resetThenClearPersistentUuid)
-        serializableObject.resetPersistentUuid();
+      // Guard against the C++ object having been destroyed before this
+      // effect fires (in case the parent points to a destroyed object).
+      if (!exceptionallyGuardAgainstDeadObject(serializableObject)) return;
+
+      if (ensurePersistentUuids) serializableObject.ensurePersistentUuids();
 
       serializedElementRef.current = new gd.SerializerElement();
       serializableObject.serializeTo(serializedElementRef.current);
@@ -67,7 +72,7 @@ export const useSerializableObjectCancelableEditor = ({
         }
       };
     },
-    [serializableObject, resetThenClearPersistentUuid]
+    [serializableObject, ensurePersistentUuids]
   );
 
   const getOriginalContentSerializedElement = React.useCallback(() => {
@@ -125,9 +130,6 @@ export const useSerializableObjectCancelableEditor = ({
         );
       }
 
-      if (resetThenClearPersistentUuid)
-        serializableObject.clearPersistentUuid();
-
       onCancel();
     },
     [
@@ -136,7 +138,6 @@ export const useSerializableObjectCancelableEditor = ({
       onCancel,
       showConfirmation,
       backdropClickBehavior,
-      resetThenClearPersistentUuid,
     ]
   );
 
@@ -154,14 +155,15 @@ type SerializableObjectsCancelableEditorProps = {|
   onCancel: () => void | Promise<void>,
 
   /**
-   * In the future, most serializable objects will be able to have
-   * persistent UUID to identify them uniquely. In the meantime, some
-   * UUIDs are used to check for changes in a serialized object, but must
-   * not be persisted in the project file. In this case, this will
-   * reset the UUIDs (which are probabably not set) and clear them when cancelled.
-   * If you must manually clear them if changes are applied.
+   * Persistent UUIDs are used to track variables when applying refactoring
+   * after changes - and they are also persisted in the project file, so they
+   * must be kept stable to avoid useless changes in it. This will set the
+   * UUIDs of the objects (and their sub elements, like variables) not having
+   * one yet, while preserving the existing ones. Nothing is cleared when
+   * cancelled (the original UUIDs are restored with the rest of the
+   * serialized state).
    */
-  resetThenClearPersistentUuid?: boolean,
+  ensurePersistentUuids?: boolean,
 |};
 
 /**
@@ -173,7 +175,7 @@ export const useSerializableObjectsCancelableEditor = ({
   serializableObjects,
   useProjectToUnserialize,
   onCancel,
-  resetThenClearPersistentUuid,
+  ensurePersistentUuids,
 }: SerializableObjectsCancelableEditorProps): {
   getOriginalContentSerializedElements: () => Map<string, gdSerializerElement>,
   hasUnsavedChanges: () => boolean,
@@ -200,8 +202,13 @@ export const useSerializableObjectsCancelableEditor = ({
           serializedElements.delete(id);
         }
       }
-      if (resetThenClearPersistentUuid) {
-        serializableObject.resetPersistentUuid();
+
+      // Guard against the C++ objects having been destroyed before this
+      // effect fires (in case the parent points to a destroyed object).
+      if (!exceptionallyGuardAgainstDeadObject(serializableObject)) continue;
+
+      if (ensurePersistentUuids) {
+        serializableObject.ensurePersistentUuids();
       }
       const serializedElement = new gd.SerializerElement();
       serializableObject.serializeTo(serializedElement);
@@ -277,10 +284,6 @@ export const useSerializableObjectsCancelableEditor = ({
         } else {
           serializableObject.unserializeFrom(serializedElement);
         }
-
-        if (resetThenClearPersistentUuid) {
-          serializableObject.clearPersistentUuid();
-        }
       }
 
       onCancel();
@@ -291,7 +294,6 @@ export const useSerializableObjectsCancelableEditor = ({
       showConfirmation,
       serializableObjects,
       useProjectToUnserialize,
-      resetThenClearPersistentUuid,
     ]
   );
 

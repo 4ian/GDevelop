@@ -24,6 +24,7 @@ export type PreviewState = {|
 
 type PreviewDebuggerServerWatcherResults = {|
   hasNonEditionPreviewsRunning: boolean,
+  nonEditionPreviewsCount: number,
 
   gameHotReloadLogs: Array<HotReloaderLog>,
   clearGameHotReloadLogs: () => void,
@@ -155,9 +156,13 @@ export const usePreviewDebuggerServerWatcher = (
   const hasNonEditionPreviewsRunning = Object.keys(debuggerStatus).some(
     key => !debuggerStatus[key].isInGameEdition
   );
+  const nonEditionPreviewsCount = Object.keys(debuggerStatus).filter(
+    key => !debuggerStatus[key].isInGameEdition
+  ).length;
 
   return {
     hasNonEditionPreviewsRunning,
+    nonEditionPreviewsCount,
     gameHotReloadLogs,
     clearGameHotReloadLogs,
     editorHotReloadLogs,

@@ -1,13 +1,14 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
 import {
-  type RenderEditorContainerPropsWithRef,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-} from '../BaseEditor';
+  type WillDeleteObjectChanges,
+} from '../../../EditorFunctions/OutsideEditorChanges';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -197,10 +198,14 @@ export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
-  onEventsBasedObjectChildrenEdited: () => void,
+  onEventsBasedObjectChildrenEdited: (
+    eventsBasedObject: gdEventsBasedObject,
+    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
+  ) => void,
   onSceneObjectEdited: (
     scene: gdLayout,
-    objectWithContext: ObjectWithContext
+    objectWithContext: ObjectWithContext,
+    hasResourceChanged?: boolean
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (
@@ -214,9 +219,11 @@ export type HomePageEditorInterface = {|
   onObjectsModifiedOutsideEditor: (
     changes: ObjectsOutsideEditorChanges
   ) => void,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  selectAllInsideEditor: () => void,
 |};
 
 export const HomePage: React.ComponentType<Props> = React.memo<Props>(
@@ -375,7 +382,10 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           if (!requestedTab) return;
 
           setActiveTab(requestedTab);
-          if (requestedTab === 'shop') {
+          if (requestedTab === 'create' && routeArguments['new-project']) {
+            onOpenNewProjectSetupDialog();
+            removeRouteArguments(['new-project']);
+          } else if (requestedTab === 'shop') {
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             }
@@ -448,6 +458,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
           setInitialBundleCategoryForShop,
           games,
           areCoursesFetched,
+          onOpenNewProjectSetupDialog,
         ]
       );
 
@@ -555,7 +566,9 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
         switchInGameEditorIfNoHotReloadIsNeeded: noop,
         onInstancesModifiedOutsideEditor: noop,
         onObjectsModifiedOutsideEditor: noop,
+        onWillDeleteObject: noop,
         onObjectGroupsModifiedOutsideEditor: noop,
+        selectAllInsideEditor: noop,
       }));
 
       // As the homepage is never unmounted, we need to ensure the games platform
@@ -610,6 +623,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       onWillInstallExtension={onWillInstallExtension}
                       onExtensionInstalled={onExtensionInstalled}
                       onCloseAskAi={onCloseAskAi}
+                      onOpenAskAi={onOpenAskAi}
                       closeProject={closeProject}
                       games={games}
                       onRefreshGames={fetchGames}

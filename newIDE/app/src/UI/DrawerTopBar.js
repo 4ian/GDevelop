@@ -44,9 +44,11 @@ type Props = {|
   title: React.Node,
   onClose: () => void,
   id: string,
+  disableSafeAreaTopMargin?: boolean,
 |};
 
 const DrawerTopBar = (props: Props): React.Node => {
+  const { disableSafeAreaTopMargin } = props;
   const closeButton = (
     <IconButton
       onClick={props.onClose}
@@ -63,7 +65,9 @@ const DrawerTopBar = (props: Props): React.Node => {
       <AppBar
         position="static"
         style={styles.appBar}
-        className="safe-area-aware-top-margin"
+        className={
+          disableSafeAreaTopMargin ? undefined : 'safe-area-aware-top-margin'
+        }
         color="primary"
         elevation={0}
       >

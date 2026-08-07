@@ -1,5 +1,6 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import VariablesList, {
@@ -10,11 +11,8 @@ import { type ProjectScopedContainersAccessor } from '../../InstructionOrExpress
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Column, Line, Spacer, marginsSize } from '../../UI/Grid';
-import { Separator } from '../../CompactPropertiesEditor';
 import Text from '../../UI/Text';
-import { Trans, t } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
-import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { type ObjectEditorTab } from '../../ObjectEditor/ObjectEditorDialog';
 import CompactBehaviorsEditorService from './CompactBehaviorsEditorService';
@@ -26,16 +24,16 @@ import RemoveIcon from '../../UI/CustomSvgIcons/Remove';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
-import ChevronArrowDownWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowDownWithRoundedBorder';
-import ChevronArrowRightWithRoundedBorder from '../../UI/CustomSvgIcons/ChevronArrowRightWithRoundedBorder';
 import Add from '../../UI/CustomSvgIcons/Add';
 import Trash from '../../UI/CustomSvgIcons/Trash';
 import Edit from '../../UI/CustomSvgIcons/ShareExternal';
 import { useManageObjectBehaviors } from '../../BehaviorsEditor';
+import { getAllVisibleBehaviorNames } from '../../Utils/Behavior';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import { mapFor } from '../../Utils/MapFor';
 import { usePersistedScrollPosition } from '../../Utils/UsePersistedScrollPosition';
+import { usePersistedCollapsedSection } from '../../Utils/UsePersistedCollapsedSection';
 import CompactSelectField from '../../UI/CompactSelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ChildObjectPropertiesEditor } from './ChildObjectPropertiesEditor';
@@ -60,6 +58,13 @@ import { CompactEffectsListEditor } from '../../LayersList/CompactLayerPropertie
 import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEditor/CompactPropertiesEditorByVisibility';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
+import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
+import {
+  type Field,
+  type FieldChoices,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
+import useVariablesContainerRefactoring from '../../VariablesList/useVariablesContainerRefactoring';
+import { TopLevelCollapsibleSection } from '../../CompactPropertiesEditor/TopLevelCollapsibleSection';
 
 const gd: libGDevelop = global.gd;
 
@@ -158,75 +163,49 @@ export const CollapsibleSubPanel = ({
   </Paper>
 );
 
-export const TopLevelCollapsibleSection = ({
-  title,
-  isFolded,
-  toggleFolded,
-  renderContent,
-  renderContentAsHiddenWhenFolded,
-  noContentMargin,
-  onOpenFullEditor,
-  onAdd,
-}: {|
-  title: React.Node,
-  isFolded: boolean,
-  toggleFolded: () => void,
-  renderContent: () => React.Node,
-  renderContentAsHiddenWhenFolded?: boolean,
-  noContentMargin?: boolean,
-  onOpenFullEditor?: () => void,
-  onAdd?: (() => void) | null,
-|}): React.Node => (
-  <>
-    <Separator />
-    <Column noOverflowParent>
-      <LineStackLayout alignItems="center" justifyContent="space-between">
-        <LineStackLayout noMargin alignItems="center">
-          <IconButton size="small" onClick={toggleFolded}>
-            {isFolded ? (
-              <ChevronArrowRightWithRoundedBorder style={styles.icon} />
-            ) : (
-              <ChevronArrowDownWithRoundedBorder style={styles.icon} />
-            )}
-          </IconButton>
-          <Text size="sub-title" noMargin style={textEllipsisStyle}>
-            {title}
-          </Text>
-        </LineStackLayout>
-        <Line alignItems="center" noMargin>
-          {onOpenFullEditor && (
-            <IconButton size="small" onClick={onOpenFullEditor}>
-              <ShareExternal style={styles.icon} />
-            </IconButton>
-          )}
-          {onAdd && (
-            <IconButton size="small" onClick={onAdd}>
-              <Add style={styles.icon} />
-            </IconButton>
-          )}
-        </Line>
-      </LineStackLayout>
-    </Column>
-    <Column noMargin={noContentMargin}>
-      {isFolded ? (
-        renderContentAsHiddenWhenFolded ? (
-          <div style={styles.hiddenContent}>{renderContent()}</div>
-        ) : null
-      ) : (
-        renderContent()
-      )}
-    </Column>
-  </>
-);
+const resourcesPreloadingFieldChoices: Array<FieldChoices> = [
+  {
+    value: 'with-scene',
+    label: t`Preload with the scene`,
+  },
+  {
+    value: 'manually',
+    label: t`Preload with an action`,
+  },
+];
+const getResourcesPreloadingField = ({ i18n }: {| i18n: I18nType |}): Field => {
+  return {
+    name: 'LoadingSettings',
+    title: i18n._(t`Loading`),
+    type: 'column',
+    children: [
+      {
+        name: 'ResourcesPreloading',
+        getLabel: () => i18n._(t`Resources preloading`),
+        valueType: 'string',
+        getChoices: () => resourcesPreloadingFieldChoices,
+        getValue: ({ object }: { object: gdObject }): string =>
+          object.getResourcesPreloading(),
+        setValue: ({ object }: { object: gdObject }, newValue: string) =>
+          object.setResourcesPreloading(newValue),
+        defaultValue: 'with-scene',
+        visibility: 'advanced',
+      },
+    ],
+  };
+};
 
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
   layout?: ?gdLayout,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
+  /** Only set when a default variant is edited */
+  eventsBasedObject: gdEventsBasedObject | null,
   onUpdateBehaviorsSharedData: () => void,
   objectsContainer: gdObjectsContainer,
   globalObjectsContainer: gdObjectsContainer | null,
+  initialInstances: gdInitialInstancesContainer,
   layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   unsavedChanges?: ?UnsavedChanges,
@@ -258,9 +237,11 @@ export const CompactObjectPropertiesEditor = ({
   resourceManagementProps,
   layout,
   eventsFunctionsExtension,
+  eventsBasedObject,
   onUpdateBehaviorsSharedData,
   objectsContainer,
   globalObjectsContainer,
+  initialInstances,
   layersContainer,
   projectScopedContainersAccessor,
   unsavedChanges,
@@ -278,9 +259,6 @@ export const CompactObjectPropertiesEditor = ({
   isBehaviorListLocked,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
-  const [isPropertiesFolded, setIsPropertiesFolded] = React.useState(false);
-  const [isBehaviorsFolded, setIsBehaviorsFolded] = React.useState(false);
-  const [isVariablesFolded, setIsVariablesFolded] = React.useState(false);
   const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
   const [
     duplicateAndEditVariantDialogOpen,
@@ -289,6 +267,9 @@ export const CompactObjectPropertiesEditor = ({
   const { showDeleteConfirmation } = useAlertDialog();
   const variablesListRef = React.useRef<?VariablesListInterface>(null);
   const object = objects[0];
+  const variablesContainer = exceptionallyGuardAgainstDeadObject(
+    object.getVariables()
+  );
   const objectConfiguration = object.getConfiguration();
 
   // Don't use a memo for this because metadata from custom objects are built
@@ -315,13 +296,18 @@ export const CompactObjectPropertiesEditor = ({
   );
 
   // Behaviors:
+  const allVisibleBehaviorNames = getAllVisibleBehaviorNames([object]);
+  const allVisibleBehaviors = allVisibleBehaviorNames.map(behaviorName =>
+    object.getBehavior(behaviorName)
+  );
   const {
     openNewBehaviorDialog,
     newBehaviorDialog,
     removeBehavior,
   } = useManageObjectBehaviors({
     project,
-    object,
+    projectScopedContainersAccessor,
+    objects: [object],
     isChildObject: !layout,
     eventsFunctionsExtension,
     onUpdate: forceUpdate,
@@ -329,15 +315,15 @@ export const CompactObjectPropertiesEditor = ({
     onUpdateBehaviorsSharedData,
     onWillInstallExtension,
     onExtensionInstalled,
+    allVisibleBehaviorNames,
   });
 
-  const allVisibleBehaviors = object
-    .getAllBehaviorNames()
-    .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .filter(behavior => !behavior.isDefaultBehavior());
-
   // Events based object children:
+  /** The events-based object according to the selected object type.
+   *
+   * This is not the same as `eventsBasedObject` which is the events-based
+   * object of the edited variant.
+   */
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     objectConfiguration.getType()
   )
@@ -488,14 +474,36 @@ export const CompactObjectPropertiesEditor = ({
     .map((instance: gdObject) => '' + instance.ptr)
     .join(';');
 
-  const persistedScrollId = object.getPersistentUuid();
+  const persistedPanelStateId = object.getPersistentUuid();
 
   const onScroll = usePersistedScrollPosition({
     project,
     scrollViewRef,
     scrollKey,
-    persistedScrollId,
-    persistedScrollType: 'object',
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'object',
+  });
+  const {
+    isSectionFolded,
+    setSectionFolded,
+    toggleSectionFolded,
+  } = usePersistedCollapsedSection({
+    project,
+    persistedPanelStateId: persistedPanelStateId,
+    persistedPanelStateType: 'object',
+  });
+
+  // Variable refactoring: snapshot on object selection, apply on deselection/unmount.
+  const { onVariablesUpdated } = useVariablesContainerRefactoring({
+    project,
+    variablesContainer: object.getVariables(),
+    initialInstances,
+    objectName: object.getName(),
+    eventsBasedObject,
+    enabled: objects.length === 1,
+    objectGroup: null,
+    objectsContainer: null,
+    globalObjectsContainer: null,
   });
 
   const propertiesSchema = React.useMemo(
@@ -504,7 +512,7 @@ export const CompactObjectPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       const properties = objectConfigurationAsGd.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties,
         defaultValueProperties: customObjectEventsBasedObject
           ? customObjectEventsBasedObject.getPropertyDescriptors()
@@ -520,15 +528,25 @@ export const CompactObjectPropertiesEditor = ({
           onObjectsModified([object]);
         },
         object,
+        layersContainer,
         visibility: 'All',
+        shouldDisabledFieldsWithMixedValues: false,
       });
+
+      if (layout && layout.getObjects().hasObjectNamed(object.getName())) {
+        schema.push(getResourcesPreloadingField({ i18n }));
+      }
+      return schema;
     },
     [
       schemaRecomputeTrigger,
       objectConfigurationAsGd,
-      object,
       customObjectEventsBasedObject,
+      object,
+      layersContainer,
+      layout,
       onObjectsModified,
+      i18n,
     ]
   );
 
@@ -580,8 +598,8 @@ export const CompactObjectPropertiesEditor = ({
           </ColumnStackLayout>
           <TopLevelCollapsibleSection
             title={<Trans>Properties</Trans>}
-            isFolded={isPropertiesFolded}
-            toggleFolded={() => setIsPropertiesFolded(!isPropertiesFolded)}
+            isFolded={isSectionFolded('properties')}
+            toggleFolded={() => toggleSectionFolded('properties')}
             onOpenFullEditor={openFullEditor}
             renderContent={() => (
               <ColumnStackLayout noMargin noOverflowParent>
@@ -605,7 +623,6 @@ export const CompactObjectPropertiesEditor = ({
                       onEditObject,
                     })
                   }
-                  // $FlowFixMe[incompatible-type]
                   onRefreshAllFields={forceRecomputeSchema}
                 />
                 {shouldDisplayVariant && (
@@ -734,8 +751,8 @@ export const CompactObjectPropertiesEditor = ({
           />
           <TopLevelCollapsibleSection
             title={<Trans>Behaviors</Trans>}
-            isFolded={isBehaviorsFolded}
-            toggleFolded={() => setIsBehaviorsFolded(!isBehaviorsFolded)}
+            isFolded={isSectionFolded('behaviors')}
+            toggleFolded={() => toggleSectionFolded('behaviors')}
             onOpenFullEditor={() => onEditObject(object, 'behaviors')}
             onAdd={isBehaviorListLocked ? null : openNewBehaviorDialog}
             renderContent={() => (
@@ -773,10 +790,9 @@ export const CompactObjectPropertiesEditor = ({
                         <CompactBehaviorComponent
                           project={project}
                           behaviorMetadata={behaviorMetadata}
-                          behavior={behavior}
-                          behaviorOverriding={null}
-                          initialInstance={null}
+                          behaviors={[behavior]}
                           object={object}
+                          layersContainer={layersContainer}
                           onBehaviorUpdated={() => {}}
                           resourceManagementProps={resourceManagementProps}
                           onOpenFullEditor={() =>
@@ -799,81 +815,88 @@ export const CompactObjectPropertiesEditor = ({
                         ) : null
                       }
                       title={behavior.getName()}
-                      titleBarButtons={[
-                        {
-                          id: 'remove-behavior',
-                          icon: RemoveIcon,
-                          label: t`Remove behavior`,
-                          onClick: () => {
-                            removeBehavior(behavior.getName());
-                          },
-                        },
-                      ]}
+                      titleBarButtons={
+                        isBehaviorListLocked
+                          ? []
+                          : [
+                              {
+                                id: 'remove-behavior',
+                                icon: RemoveIcon,
+                                label: t`Remove behavior`,
+                                onClick: () => {
+                                  removeBehavior(behavior.getName());
+                                },
+                              },
+                            ]
+                      }
                     />
                   );
                 })}
               </ColumnStackLayout>
             )}
           />
-          <TopLevelCollapsibleSection
-            title={<Trans>Object Variables</Trans>}
-            isFolded={isVariablesFolded}
-            toggleFolded={() => setIsVariablesFolded(!isVariablesFolded)}
-            onOpenFullEditor={() => onEditObject(object, 'variables')}
-            onAdd={
-              isVariableListLocked
-                ? null
-                : () => {
-                    if (variablesListRef.current) {
-                      variablesListRef.current.addVariable();
-                    }
-                    setIsVariablesFolded(false);
-                  }
-            }
-            renderContentAsHiddenWhenFolded={
-              true /* Allows to keep a ref to the variables list for add button to work. */
-            }
-            noContentMargin
-            renderContent={() => (
-              <VariablesList
-                ref={variablesListRef}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                directlyStoreValueChangesWhileEditing
-                variablesContainer={object.getVariables()}
-                areObjectVariables
-                size="compact"
-                onComputeAllVariableNames={() =>
-                  object && layout
-                    ? EventsRootVariablesFinder.findAllObjectVariables(
-                        project.getCurrentPlatform(),
-                        project,
-                        layout,
-                        object.getName()
-                      )
-                    : []
-                }
-                historyHandler={historyHandler}
-                toolbarIconStyle={styles.icon}
-                compactEmptyPlaceholderText={
-                  <Trans>
-                    There are no{' '}
-                    <Link
-                      href={objectVariablesHelpLink}
-                      onClick={() =>
-                        Window.openExternalURL(objectVariablesHelpLink)
+          {variablesContainer && (
+            <TopLevelCollapsibleSection
+              title={<Trans>Object Variables</Trans>}
+              isFolded={isSectionFolded('variables')}
+              toggleFolded={() => toggleSectionFolded('variables')}
+              onOpenFullEditor={() => onEditObject(object, 'variables')}
+              onAdd={
+                isVariableListLocked
+                  ? null
+                  : () => {
+                      if (variablesListRef.current) {
+                        variablesListRef.current.addVariable();
                       }
-                    >
-                      variables
-                    </Link>{' '}
-                    on this object.
-                  </Trans>
-                }
-                isListLocked={isVariableListLocked}
-              />
-            )}
-          />
+                      setSectionFolded('variables', false);
+                    }
+              }
+              renderContentAsHiddenWhenFolded={
+                true /* Allows to keep a ref to the variables list for add button to work. */
+              }
+              noContentMargin
+              renderContent={() => (
+                <VariablesList
+                  ref={variablesListRef}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
+                  directlyStoreValueChangesWhileEditing
+                  variablesContainer={object.getVariables()}
+                  areObjectVariables
+                  size="compact"
+                  onComputeAllVariableNames={() =>
+                    object && layout
+                      ? EventsRootVariablesFinder.findAllObjectVariables(
+                          project.getCurrentPlatform(),
+                          project,
+                          layout,
+                          object.getName()
+                        )
+                      : []
+                  }
+                  historyHandler={historyHandler}
+                  onVariablesUpdated={onVariablesUpdated}
+                  toolbarIconStyle={styles.icon}
+                  compactEmptyPlaceholderText={
+                    <Trans>
+                      There are no{' '}
+                      <Link
+                        href={objectVariablesHelpLink}
+                        onClick={() =>
+                          Window.openExternalURL(objectVariablesHelpLink)
+                        }
+                      >
+                        variables
+                      </Link>{' '}
+                      on this object.
+                    </Trans>
+                  }
+                  isListLocked={isVariableListLocked}
+                />
+              )}
+            />
+          )}
           {objectMetadata &&
             objectMetadata.hasDefaultBehavior(
               'EffectCapability::EffectBehavior'
@@ -892,6 +915,7 @@ export const CompactObjectPropertiesEditor = ({
                 onEffectsUpdated={() => onObjectsModified([object])}
                 onOpenFullEditor={() => onEditObject(object, 'effects')}
                 onEffectAdded={onEffectAdded}
+                persistedPanelStateId={persistedPanelStateId}
               />
             )}
         </Column>

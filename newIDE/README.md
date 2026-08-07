@@ -99,6 +99,65 @@ Cloud storage providers are set up with development keys when you're running GDe
 
 > This is only necessary if you want to have cloud storage providers working in development. If not done, GDevelop will simply display an error while trying to use them.
 
+## (Optional) Building a portable bundle for CI / headless usage 🤖
+
+Build a self-contained zip (no installer, no code-signing) that can be
+extracted on a CI runner and used to execute CLI commands:
+
+```bash
+cd newIDE/electron-app
+npm install
+
+# Linux / macOS
+GD_PORTABLE_BUILD=true npm run build -- --publish never
+
+# Windows (PowerShell)
+$Env:GD_PORTABLE_BUILD='true'; npm run build -- --publish never
+```
+
+The resulting zip contains the full editor. After extracting, run commands like:
+
+```bash
+# Windows
+GDevelop.exe --disable-update-check --run-command EXPORT_HTML5_EXTERNAL path\to\game.json
+
+# Linux (install required libs: sudo apt install -y libnss3 libasound2t64)
+./gdevelop --no-sandbox --disable-update-check \
+  --run-command EXPORT_HTML5_EXTERNAL /path/to/game.json
+```
+
+`IMPORT_EXTENSION_AND_SAVE` imports one or more extension files into the project and saves it. Pass
+each extension path with a repeated `--cmd-args` flag:
+
+```bash
+# Windows
+GDevelop.exe --disable-update-check --run-command IMPORT_EXTENSION_AND_SAVE path\to\game.json ^
+  --cmd-args path\to\FirstExtension.json --cmd-args path\to\SecondExtension.json
+
+# Linux
+./gdevelop --no-sandbox --disable-update-check \
+  --run-command IMPORT_EXTENSION_AND_SAVE /path/to/game.json \
+  --cmd-args /path/to/FirstExtension.json --cmd-args /path/to/SecondExtension.json
+```
+
+Extra flags: `--keep-open` (don't quit after command), `--dev-tools` (open DevTools), 
+             `--block-on-diagnostic-errors` / `--no-block-on-diagnostic-errors` (export should fail when the project has diagnostic errors)
+
+If the same project is already open in a running editor, the command runs in that
+window (fire-and-forget; the CLI exits without waiting or reporting the real result).
+Otherwise the command runs headless with a real exit code (including CI).
+
+### Making the CLI available on PATH
+
+When GDevelop is installed with the Windows NSIS installer, the install
+directory is added to the current user's `PATH` automatically. Open a new
+terminal after installing, then run `GDevelop --run-command ...`.
+
+For other builds (macOS `.dmg`, Linux AppImage/`.deb`), run the command
+palette command **"Install GDevelop CLI in PATH"** from the running app:
+on Windows it appends the install directory to the user `PATH`; on
+macOS/Linux it creates a `gdevelop` symlink in `/usr/local/bin`.
+
 ## (Optional) Building and deploying the standalone app 📦
 
 > 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it. You can download ["Nightly Builds" of GDevelop here too](./docs/Nightly-Builds-and-continuous-deployment.md).

@@ -1,6 +1,5 @@
 // @flow
-// $FlowFixMe[import-type-as-value]
-import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
+import { TagSearchFilter, type SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   type AssetShortHeader,
   type PrivateAssetPack,
@@ -43,8 +42,7 @@ export class LicenseAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   attributionFreeOnly: boolean;
 
-  // $FlowFixMe[missing-local-annot]
-  static noAttributionLicenses = [
+  static noAttributionLicenses: Array<string> = [
     'CC0 (public domain)',
     'Apache 2.0',
     'Trademark of GDevelop Ltd (fair use authorised in GDevelop games)',
@@ -251,8 +249,8 @@ export class ColorAssetStoreSearchFilter
     // Not zero because the item should not be excluded.
     let scoreMax = Number.MIN_VALUE;
     for (const dominantColor of searchItem.dominantColors) {
-      const dominantRgb = hexNumberToRGBColor(dominantColor);
       // $FlowFixMe[incompatible-type]
+      const dominantRgb: RGBColor = hexNumberToRGBColor(dominantColor);
       const score = getColorSimilitude(dominantRgb, color);
       scoreMax = Math.max(scoreMax, score);
     }
@@ -500,10 +498,13 @@ export class SimilarAssetStoreSearchFilter
     {
       let scoreMax = 0;
       for (const dominantColor of searchItem.dominantColors) {
-        const dominantRgb = hexNumberToRGBColor(dominantColor);
+        // $FlowFixMe[incompatible-type]
+        const dominantRgb: RGBColor = hexNumberToRGBColor(dominantColor);
         for (const otherDominantColor of this.other.dominantColors) {
-          const otherDominantRgb = hexNumberToRGBColor(otherDominantColor);
           // $FlowFixMe[incompatible-type]
+          const otherDominantRgb: RGBColor = hexNumberToRGBColor(
+            otherDominantColor
+          );
           const score = getColorSimilitude(dominantRgb, otherDominantRgb);
           scoreMax = Math.max(scoreMax, score);
         }

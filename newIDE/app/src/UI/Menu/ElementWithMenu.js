@@ -24,13 +24,23 @@ export default class ElementWithMenu extends React.Component<Props, State> {
   _wrappedElement: ?any;
 
   open = (event?: Event) => {
+    // Prevent the default behavior, notably the browser context menu
+    // on the web version, which is otherwise not prevented because
+    // `stopPropagation` stops the event before it reaches the global
+    // `contextmenu` handler set up by `Window.setUpContextMenu`.
+    // $FlowFixMe[method-unbinding]
+    if (event && event.preventDefault) event.preventDefault();
     // $FlowFixMe[method-unbinding]
     if (event && event.stopPropagation) event.stopPropagation();
     const { _contextMenu } = this;
     if (!_contextMenu) return;
 
     const node = ReactDOM.findDOMNode(this._wrappedElement);
-    if (node instanceof HTMLElement) {
+    // Use nodeType check instead of `instanceof HTMLElement` because
+    // in a cross-window portal the node's constructor comes from the
+    // child window, not the main window.
+    if (node && node.nodeType === 1) {
+      // $FlowFixMe[prop-missing] - nodeType 1 guarantees Element.
       const dimensions = node.getBoundingClientRect();
 
       _contextMenu.open(

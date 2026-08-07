@@ -14,6 +14,7 @@ import { type EnumeratedInstructionOrExpressionMetadata } from '../../../Instruc
 import { Column, Line } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 import Paper from '../../../UI/Paper';
+import PortalContainerContext from '../../../UI/PortalContainerContext';
 import { mapFor } from '../../../Utils/MapFor';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -248,6 +249,7 @@ export default function ExpressionAutocompletionsDisplayer({
   const selectedAutocompletionElement = React.useRef(
     (null: ?React.Component<any, any>)
   );
+  const portalContainer = React.useContext(PortalContainerContext);
   React.useEffect(
     () => {
       if (scrollView.current && selectedAutocompletionElement.current) {
@@ -267,6 +269,7 @@ export default function ExpressionAutocompletionsDisplayer({
           open
           anchorEl={anchorEl}
           placement="bottom-start"
+          container={portalContainer}
           disablePortal={
             // We can use a portal to display this component, because even if it
             // used inside a modal, which has a focus trap, it's entirely

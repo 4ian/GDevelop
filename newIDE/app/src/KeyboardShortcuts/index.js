@@ -6,7 +6,10 @@ import reservedShortcuts from './ReservedShortcuts';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
-import defaultShortcuts, { type ShortcutMap } from './DefaultShortcuts';
+import defaultShortcuts, {
+  defaultSecondaryShortcuts,
+  type ShortcutMap,
+} from './DefaultShortcuts';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import optionalRequire from '../Utils/OptionalRequire';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -243,6 +246,8 @@ export const useShortcutMap = (): ShortcutMap => {
 type UseKeyboardShortcutsProps = {|
   onRunCommand: (commandName: CommandName) => void,
   previewDebuggerServer: ?PreviewDebuggerServer,
+  targetDocument?: Document, // For external windows — defaults to window.document
+  ignoreHandledByElectron?: boolean, // For external windows where Electron menu IPC doesn't reach
 |};
 
 /**
@@ -252,6 +257,8 @@ type UseKeyboardShortcutsProps = {|
 export const useKeyboardShortcuts = ({
   onRunCommand,
   previewDebuggerServer,
+  targetDocument,
+  ignoreHandledByElectron,
 }: UseKeyboardShortcutsProps) => {
   const shortcutMap = useShortcutMap();
 
@@ -264,35 +271,41 @@ export const useKeyboardShortcuts = ({
         if (!shortcutData.isValid) return;
 
         // Get corresponding command, if it exists
-        const commandName = Object.keys(shortcutMap).find(
-          name => shortcutMap[name] === shortcutData.shortcutString
-        );
+        const commandName =
+          Object.keys(shortcutMap).find(
+            name => shortcutMap[name] === shortcutData.shortcutString
+          ) ||
+          Object.keys(defaultSecondaryShortcuts).find(
+            name =>
+              defaultSecondaryShortcuts[name] === shortcutData.shortcutString
+          );
         if (!commandName) return;
 
-        // On desktop app, ignore shortcuts that are handled by Electron
+        // On desktop app, ignore shortcuts that are handled by Electron,
+        // unless ignoreHandledByElectron is set (for external windows where
+        // Electron menu IPC doesn't reach).
         if (electron && commandsList[commandName].handledByElectron) {
-          // console.info(
-          //   `Command ${commandName} triggered from KeyboardEvent but handled by Electron.`
-          // );
-          return;
+          if (!ignoreHandledByElectron) return;
         }
 
         // e.preventDefault tends to block user from typing,
         // so do it only if user is not typing.
-        if (isUserTyping()) return;
+        const doc = targetDocument || document;
+        if (isUserTyping(doc)) return;
         e.preventDefault();
 
         // Discard shortcut presses if a dialog is open
-        if (isDialogOpen()) return;
+        if (isDialogOpen(doc)) return;
 
         // console.info(`Command ${commandName} triggered from KeyboardEvent.`);
         onRunCommand(commandName);
       };
 
-      document.addEventListener('keydown', handler);
-      return () => document.removeEventListener('keydown', handler);
+      const listenerDoc = targetDocument || document;
+      listenerDoc.addEventListener('keydown', handler);
+      return () => listenerDoc.removeEventListener('keydown', handler);
     },
-    [onRunCommand, shortcutMap]
+    [onRunCommand, shortcutMap, targetDocument, ignoreHandledByElectron]
   );
 
   React.useEffect(
@@ -342,9 +355,14 @@ export const useKeyboardShortcuts = ({
           if (!shortcutData.isValid) return;
 
           // Get corresponding command, if it exists
-          const commandName = Object.keys(shortcutMap).find(
-            name => shortcutMap[name] === shortcutData.shortcutString
-          );
+          const commandName =
+            Object.keys(shortcutMap).find(
+              name => shortcutMap[name] === shortcutData.shortcutString
+            ) ||
+            Object.keys(defaultSecondaryShortcuts).find(
+              name =>
+                defaultSecondaryShortcuts[name] === shortcutData.shortcutString
+            );
           if (!commandName) return;
 
           const command = commandsList[commandName];

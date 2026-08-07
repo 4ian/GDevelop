@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import GenericExpressionField from './GenericExpressionField';
 import {
   type ParameterFieldProps,
@@ -10,6 +10,11 @@ import {
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+import Functions from '@material-ui/icons/Functions';
+import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 import getObjectByName from '../../Utils/GetObjectByName';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 
@@ -40,6 +45,9 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     } = props;
 
     const [skinNames, setSkinNames] = React.useState<Array<string>>([]);
+    const [isExpressionField, setIsExpressionField] = React.useState<boolean>(
+      false
+    );
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -77,14 +85,18 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
         let cancelled = false;
         (async () => {
-          const spineData = await PixiResourcesLoader.getSpineData(
+          const spine = await PixiResourcesLoader.createSpine(
             project,
             spineResourceName
           );
-          if (cancelled) return;
+          if (cancelled) {
+            if (spine) spine.destroy();
+            return;
+          }
 
-          if (spineData.skeleton && spineData.skeleton.skins) {
-            setSkinNames(spineData.skeleton.skins.map(skin => skin.name));
+          if (spine && spine.skeleton.data.skins) {
+            setSkinNames(spine.skeleton.data.skins.map(skin => skin.name));
+            spine.destroy();
           } else {
             setSkinNames([]);
           }
@@ -97,14 +109,23 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project, objectName, globalObjectsContainer, objectsContainer]
     );
 
+    const switchFieldType = () => {
+      setIsExpressionField(prev => !prev);
+    };
     // $FlowFixMe[missing-local-annot]
     const onChangeSelectValue = (event, value) => {
       props.onChange(event.target.value);
     };
 
+    const onChangeTextValue = (value: string) => {
+      props.onChange(value);
+    };
+
     const fieldLabel = props.parameterMetadata
       ? props.parameterMetadata.getDescription()
       : undefined;
+
+    const marginValue = props.isInline ? 'none' : 'dense';
 
     const selectOptions = skinNames.map(skinName => {
       return (
@@ -118,27 +139,68 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     return (
-      <SelectField
-        ref={field}
-        id={
-          props.parameterIndex !== undefined
-            ? `parameter-${props.parameterIndex}-skin-name-field`
-            : undefined
+      <TextFieldWithButtonLayout
+        margin={marginValue}
+        noFloatingLabelText={!fieldLabel}
+        renderTextField={() =>
+          !isExpressionField ? (
+            <SelectField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-skin-name-field`
+                  : undefined
+              }
+              value={props.value}
+              onChange={onChangeSelectValue}
+              margin={marginValue}
+              fullWidth
+              floatingLabelText={fieldLabel}
+              translatableHintText={t`Choose a skin`}
+              helperMarkdownText={
+                (props.parameterMetadata &&
+                  props.parameterMetadata.getLongDescription()) ||
+                null
+              }
+            >
+              {selectOptions}
+            </SelectField>
+          ) : (
+            <GenericExpressionField
+              ref={field}
+              id={
+                props.parameterIndex !== undefined
+                  ? `parameter-${props.parameterIndex}-skin-name-field`
+                  : undefined
+              }
+              expressionType="string"
+              {...props}
+              onChange={onChangeTextValue}
+            />
+          )
         }
-        value={props.value}
-        onChange={onChangeSelectValue}
-        margin={props.isInline ? 'none' : 'dense'}
-        fullWidth
-        floatingLabelText={fieldLabel}
-        translatableHintText={t`Choose a skin`}
-        helperMarkdownText={
-          (props.parameterMetadata &&
-            props.parameterMetadata.getLongDescription()) ||
-          null
+        renderButton={style =>
+          isExpressionField ? (
+            <FlatButton
+              id="switch-expression-select"
+              leftIcon={<TypeCursorSelect />}
+              style={style}
+              primary
+              label={<Trans>Select</Trans>}
+              onClick={switchFieldType}
+            />
+          ) : (
+            <RaisedButton
+              id="switch-expression-select"
+              icon={<Functions />}
+              style={style}
+              primary
+              label={<Trans>Use an expression</Trans>}
+              onClick={switchFieldType}
+            />
+          )
         }
-      >
-        {selectOptions}
-      </SelectField>
+      />
     );
   }
 ): React.ComponentType<{

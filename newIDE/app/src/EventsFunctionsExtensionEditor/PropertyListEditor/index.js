@@ -5,7 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
+import CompactSearchBar, {
+  type CompactSearchBarInterface,
+} from '../../UI/CompactSearchBar';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import UnsavedChangesContext, {
   type UnsavedChanges,
@@ -73,13 +75,13 @@ const styles = {
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
 export const getTreeViewItemIdFromPropertyFolderOrProperty = (
-  propertyFolderOrObject: gdPropertyFolderOrProperty,
+  propertyFolderOrFunction: gdPropertyFolderOrProperty,
   isSharedProperties: boolean
 ): string => {
-  return propertyFolderOrObject.isFolder()
-    ? getEventsBasedEntityPropertyFolderTreeViewItemId(propertyFolderOrObject)
+  return propertyFolderOrFunction.isFolder()
+    ? getEventsBasedEntityPropertyFolderTreeViewItemId(propertyFolderOrFunction)
     : getEventsBasedEntityPropertyTreeViewItemId(
-        propertyFolderOrObject.getProperty(),
+        propertyFolderOrFunction.getProperty(),
         isSharedProperties
       );
 };
@@ -291,8 +293,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -388,8 +389,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -560,7 +560,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       }
     }, []);
 
-    const searchBarRef = React.useRef<?SearchBarInterface>(null);
+    const searchBarRef = React.useRef<?CompactSearchBarInterface>(null);
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -1318,10 +1318,9 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
           <ColumnStackLayout noMargin expand>
             <Line noMargin>
               <Column expand>
-                <SearchBar
+                <CompactSearchBar
                   ref={searchBarRef}
                   value={searchText}
-                  onRequestSearch={() => {}}
                   onChange={setSearchText}
                   placeholder={t`Search in properties`}
                 />
@@ -1343,6 +1342,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
                       // $FlowFixMe[incompatible-type]
                       // $FlowFixMe[incompatible-exact]
                       <TreeView
+                        enableStickyAncestors
                         key={listKey}
                         ref={treeViewRef}
                         items={getTreeViewData(i18n)}

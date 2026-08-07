@@ -56,6 +56,8 @@ namespace gdjs {
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
 
+    _onceTriggers: OnceTriggers;
+
     /**
      * @param runtimeGame The game associated to this scene.
      */
@@ -71,6 +73,7 @@ namespace gdjs {
         // Register an UnknownRuntimeObject to use when the object doesn't exist.
         this.registerObject(unknownObjectData);
       }
+      this._onceTriggers = new gdjs.OnceTriggers();
     }
 
     /**
@@ -376,6 +379,12 @@ namespace gdjs {
 
           newObject.setZOrder(instanceData.zOrder);
           newObject.setLayer(instanceData.layer);
+          // Instances hidden at start are not hidden in the in-game editor:
+          // they must stay visible to be seen and manipulated (like in the
+          // 2D editor).
+          if (instanceData.hidden && !this.getGame().isInGameEdition()) {
+            newObject.hide(true);
+          }
           newObject
             .getVariables()
             .initFrom(instanceData.initialVariables, true);
@@ -843,6 +852,13 @@ namespace gdjs {
     }
 
     /**
+     * Get the structure containing the triggers for "Trigger once" conditions.
+     */
+    getOnceTriggers() {
+      return this._onceTriggers;
+    }
+
+    /**
      * Clear any data structures to make sure memory is freed as soon as
      * possible.
      */
@@ -859,6 +875,8 @@ namespace gdjs {
       this._instancesRemoved = [];
       this._layersCameraCoordinates = {};
       this._initialBehaviorSharedData = new Hashtable();
+      // @ts-ignore We are deleting the object
+      this._onceTriggers = null;
     }
   }
 }

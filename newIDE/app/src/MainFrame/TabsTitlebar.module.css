@@ -1,0 +1,21 @@
+@keyframes ai-pulse {
+  0%   { opacity: 0; }
+  50%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.askAiGlow {
+  position: relative;
+  border-radius: 4px;
+}
+
+/* Animated gradient layer behind the button — opacity-only animation is silky smooth. */
+.askAiGlow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(153, 121, 241, 0.35) 0%, rgba(255, 188, 87, 0.35) 100%);
+  animation: ai-pulse 1s ease-in-out;
+  pointer-events: none;
+}

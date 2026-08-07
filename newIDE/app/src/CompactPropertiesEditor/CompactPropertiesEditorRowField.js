@@ -22,6 +22,7 @@ type Props = {|
   markdownDescription?: ?string,
   field: React.Node,
   labelColor?: 'primary' | 'secondary',
+  labelMaxWidth?: number,
 |};
 
 const CompactPropertiesEditorRowField = (props: Props): React.Node => {
@@ -34,7 +35,13 @@ const CompactPropertiesEditorRowField = (props: Props): React.Node => {
       ];
   return (
     <LineStackLayout noMargin alignItems="center" expand>
-      <div style={styles.leftColumn}>
+      <div
+        style={
+          props.labelMaxWidth
+            ? { ...styles.leftColumn, maxWidth: props.labelMaxWidth }
+            : styles.leftColumn
+        }
+      >
         <Tooltip
           title={title}
           enterDelay={tooltipEnterDelay}

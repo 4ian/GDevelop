@@ -11,6 +11,7 @@ import {
 import { marginsSize } from '../../../../UI/Grid';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { type SearchResult } from '../../../../UI/Search/UseSearchStructuredItem';
 import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
 import { type GDevelopTheme } from '../../../../UI/Theme';
 import {
@@ -220,11 +221,14 @@ export const getExampleAndTemplateTiles = ({
   numberOfItemsInCarousel = 0,
   privateGameTemplatesPeriodicity,
   showOwnedGameTemplatesFirst,
+  isSearchActive,
   disabled,
 }: {|
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
-  privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
-  exampleShortHeaders?: ?Array<ExampleShortHeader>,
+  privateGameTemplateListingDatas?: ?Array<
+    SearchResult<PrivateGameTemplateListingData>
+  >,
+  exampleShortHeaders?: ?Array<SearchResult<ExampleShortHeader>>,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -235,76 +239,104 @@ export const getExampleAndTemplateTiles = ({
   numberOfItemsInCarousel?: number,
   privateGameTemplatesPeriodicity: number,
   showOwnedGameTemplatesFirst?: boolean,
+  isSearchActive?: boolean,
   disabled?: boolean,
 |}): Array<React.Node> => {
   if (!exampleShortHeaders || !privateGameTemplateListingDatas) {
     return [];
   }
-  const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
-    exampleShortHeader =>
-      !!exampleShortHeader.previewImageUrls &&
-      !!exampleShortHeader.previewImageUrls[0]
-  );
-  const exampleShortHeadersWithoutThumbnails = exampleShortHeaders.filter(
-    exampleShortHeader =>
-      !exampleShortHeader.previewImageUrls ||
-      !exampleShortHeader.previewImageUrls[0]
-  );
 
   const allItems: Array<
     PrivateGameTemplateListingData | ExampleShortHeader
   > = [];
 
-  const maxIndex = Math.max(
-    exampleShortHeadersWithThumbnails.length,
-    privateGameTemplateListingDatas.length
-  );
+  if (isSearchActive) {
+    // When searching, merge both sorted result lists by relevance score
+    // (lower Fuse.js score = better match) so the most relevant result
+    // appears first regardless of whether it is free or premium.
+    const examplesWithThumbnails = exampleShortHeaders.filter(
+      ({ item }) => !!item.previewImageUrls && !!item.previewImageUrls[0]
+    );
+    const examplesWithoutThumbnails = exampleShortHeaders.filter(
+      ({ item }) => !item.previewImageUrls || !item.previewImageUrls[0]
+    );
 
-  let gameTemplateIndex = 0;
-  let exampleIndex = 0;
-  for (let index = 0; index < maxIndex; index++) {
-    if (
-      gameTemplateIndex >= privateGameTemplateListingDatas.length &&
-      exampleIndex >= exampleShortHeadersWithThumbnails.length
+    let eIdx = 0;
+    let tIdx = 0;
+    while (
+      eIdx < examplesWithThumbnails.length ||
+      tIdx < privateGameTemplateListingDatas.length
     ) {
-      break;
-    }
-    const privateGameTemplateListingData =
-      privateGameTemplateListingDatas[gameTemplateIndex];
-    const exampleShortHeader = exampleShortHeadersWithThumbnails[exampleIndex];
-
-    const shouldAddPrivateGameTemplate =
-      privateGameTemplatesPeriodicity &&
-      index >= 1 && // Do not add them too early.
-      index % privateGameTemplatesPeriodicity === 0;
-
-    // First handle example.
-    if (exampleShortHeader) {
-      allItems.push(exampleShortHeader);
-    }
-
-    // Then handle private game template if in the right periodicity.
-    if (shouldAddPrivateGameTemplate && privateGameTemplateListingData) {
-      if (privateGameTemplateListingData) {
-        allItems.push(privateGameTemplateListingData);
+      const eAvailable = eIdx < examplesWithThumbnails.length;
+      const tAvailable = tIdx < privateGameTemplateListingDatas.length;
+      const eScore = eAvailable
+        ? examplesWithThumbnails[eIdx].score ?? Infinity
+        : Infinity;
+      const tScore = tAvailable
+        ? privateGameTemplateListingDatas[tIdx].score ?? Infinity
+        : Infinity;
+      if (!tAvailable || (eAvailable && eScore <= tScore)) {
+        allItems.push(examplesWithThumbnails[eIdx++].item);
+      } else {
+        allItems.push(privateGameTemplateListingDatas[tIdx++].item);
       }
     }
+    examplesWithoutThumbnails.forEach(({ item }) => allItems.push(item));
+  } else {
+    // When browsing (no active search), interleave with a fixed periodicity
+    // to ensure premium templates appear regularly in the list.
+    const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
+      ({ item }) => !!item.previewImageUrls && !!item.previewImageUrls[0]
+    );
+    const exampleShortHeadersWithoutThumbnails = exampleShortHeaders.filter(
+      ({ item }) => !item.previewImageUrls || !item.previewImageUrls[0]
+    );
 
-    // Increment the index for the next iteration.
-    if (shouldAddPrivateGameTemplate) {
-      gameTemplateIndex++;
+    const maxIndex = Math.max(
+      exampleShortHeadersWithThumbnails.length,
+      privateGameTemplateListingDatas.length
+    );
+
+    let gameTemplateIndex = 0;
+    let exampleIndex = 0;
+    for (let index = 0; index < maxIndex; index++) {
+      if (
+        gameTemplateIndex >= privateGameTemplateListingDatas.length &&
+        exampleIndex >= exampleShortHeadersWithThumbnails.length
+      ) {
+        break;
+      }
+      const privateGameTemplateResult =
+        privateGameTemplateListingDatas[gameTemplateIndex];
+      const exampleResult = exampleShortHeadersWithThumbnails[exampleIndex];
+
+      const shouldAddPrivateGameTemplate =
+        privateGameTemplatesPeriodicity &&
+        index >= 1 && // Do not add them too early.
+        index % privateGameTemplatesPeriodicity === 0;
+
+      if (exampleResult) {
+        allItems.push(exampleResult.item);
+      }
+
+      if (shouldAddPrivateGameTemplate && privateGameTemplateResult) {
+        allItems.push(privateGameTemplateResult.item);
+      }
+
+      if (shouldAddPrivateGameTemplate) {
+        gameTemplateIndex++;
+      }
+      exampleIndex++;
     }
-    exampleIndex++;
-  }
 
-  // Finally, add examples without thumbnails to the grid.
-  exampleShortHeadersWithoutThumbnails.forEach(exampleShortHeader => {
-    allItems.push(exampleShortHeader);
-  });
+    exampleShortHeadersWithoutThumbnails.forEach(({ item }) => {
+      allItems.push(item);
+    });
+  }
 
   const allGridItems = allItems
     .sort((item1, item2) => {
-      if (showOwnedGameTemplatesFirst) {
+      if (showOwnedGameTemplatesFirst && !isSearchActive) {
         const isItem1ATemplateOwned =
           !!item1.sellerId && // Private game template
           !!receivedGameTemplates &&

@@ -4,9 +4,9 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
 import SceneVariablesDialog from '../../VariablesList/SceneVariablesDialog';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -21,8 +21,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [
-      editorOpen,
-      setEditorOpen,
+      variableEditorOpen,
+      setVariableEditorOpen,
     ] = React.useState<VariableDialogOpeningProps | null>(null);
     const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
@@ -67,7 +67,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         if (selectedVariableName && selectedVariableName.startsWith(value)) {
           onChange(selectedVariableName);
         }
-        setEditorOpen(null);
+        setVariableEditorOpen(null);
         if (field.current) field.current.updateAutocompletions();
       },
       [onChange, value]
@@ -86,7 +86,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={setEditorOpen}
+          openVariableEditorDialog={setVariableEditorOpen}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -97,31 +97,29 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
+          openEventsBasedEntityPropertyEditorDialog={null}
         />
-        {editorOpen && layout && project && (
+        {variableEditorOpen && layout && project && (
           <SceneVariablesDialog
             project={project}
             layout={layout}
             open
-            onCancel={() => setEditorOpen(null)}
+            onCancel={() => setVariableEditorOpen(null)}
             onApply={onVariableEditorApply}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={
-              editorOpen.shouldCreate || false
-            }
+            initiallySelectedVariable={variableEditorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />
         )}
-        {editorOpen && eventsFunctionsExtension && !layout && (
+        {variableEditorOpen && eventsFunctionsExtension && !layout && (
           <GlobalAndSceneVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
-            onCancel={() => setEditorOpen(null)}
+            onCancel={() => setVariableEditorOpen(null)}
             onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={false}
-            initiallySelectedVariableName={editorOpen.variableName}
-            shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+            initiallySelectedVariable={variableEditorOpen}
             hotReloadPreviewButtonProps={null}
             isListLocked={false}
           />

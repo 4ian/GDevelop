@@ -10,8 +10,11 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-// $FlowFixMe[import-type-as-value]
-import { TreeViewItemContent, type TreeItemProps, scenesRootFolderId } from '.';
+import {
+  type TreeViewItemContent,
+  type TreeItemProps,
+  scenesRootFolderId,
+} from '.';
 import Tooltip from '@material-ui/core/Tooltip';
 import Flag from '@material-ui/icons/Flag';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
@@ -49,7 +52,7 @@ export type SceneTreeViewItemProps = {|
   ...SceneTreeViewItemCommonProps,
   project: gdProject,
   onOpenLayoutProperties: (layout: ?gdLayout) => void,
-  onOpenLayoutVariables: (layout: ?gdLayout) => void,
+  openSceneVariables: (layout: ?gdLayout) => void,
 |};
 
 export const getSceneTreeViewItemId = (scene: gdLayout): string => {
@@ -150,7 +153,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Edit scene variables`),
         enabled: true,
-        click: () => this.props.onOpenLayoutVariables(this.scene),
+        click: () => this.props.openSceneVariables(this.scene),
       },
       {
         label: i18n._(t`Set as start scene`),

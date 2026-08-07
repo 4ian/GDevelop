@@ -3,6 +3,8 @@ import {
   type Preferences,
   type ProjectSpecificPreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
+import { type CommandName } from '../CommandPalette/CommandsList';
+import { type ParsedProjectSettings } from './ProjectSettingsReader';
 
 /** Allowlist of preference keys that can be overridden per-project. */
 const allowedPreferenceKeys: $ReadOnlyArray<
@@ -46,6 +48,7 @@ const allowedPreferenceKeys: $ReadOnlyArray<
   'takeScreenshotOnPreview',
   'showAiAskButtonInTitleBar',
   'automaticallyUseCreditsForAiRequests',
+  'canonicalEventSerialization',
 ];
 
 const allowedPreferences: Set<string> = new Set(allowedPreferenceKeys);
@@ -85,12 +88,13 @@ const normalizeDeprecatedInstructionWarning = (
 };
 
 /**
- * Applies project-specific preferences from a gdevelop-settings.yaml file to the editor.
+ * Applies project-specific preferences and shortcuts from a gdevelop-settings.yaml file to the editor.
  */
 export const applyProjectPreferences = (
-  rawPreferences: ?{ [string]: boolean | string | number },
+  parsedProjectSettings: ParsedProjectSettings,
   preferences: Preferences
 ): void => {
+  const rawPreferences = parsedProjectSettings.preferences;
   if (rawPreferences) {
     const filtered = filterAllowedPreferences(rawPreferences);
     if (
@@ -105,5 +109,14 @@ export const applyProjectPreferences = (
       );
     }
     preferences.setMultipleValues(filtered);
+  }
+
+  if (parsedProjectSettings.shortcuts) {
+    const shortcuts = parsedProjectSettings.shortcuts;
+    for (const key of Object.keys(shortcuts)) {
+      // $FlowFixMe[incompatible-call]
+      const commandName: CommandName = (key: any);
+      preferences.setShortcutForCommand(commandName, shortcuts[key]);
+    }
   }
 };

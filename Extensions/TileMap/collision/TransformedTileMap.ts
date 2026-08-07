@@ -167,6 +167,12 @@ namespace gdjs {
         return this._source.getDimensionY();
       }
 
+      updateDimensions() {
+        for (const layer of this._layers.values()) {
+          layer.updateDimensions();
+        }
+      }
+
       /**
        * @param tileId The tile identifier
        * @returns The tile definition form the tile set.
@@ -441,6 +447,28 @@ namespace gdjs {
           this._tiles[y].length = dimX;
           for (let x = 0; x < dimX; x++) {
             this._tiles[y][x] = new TransformedCollisionTile(this, x, y);
+          }
+        }
+      }
+
+      updateDimensions() {
+        const dimX = this._source.getDimensionX();
+        const dimY = this._source.getDimensionY();
+        if (dimX === this.getDimensionX() && dimY === this.getDimensionY()) {
+          return;
+        }
+        this._tiles.length = dimY;
+        for (let y = 0; y < dimY; y++) {
+          let row = this._tiles[y];
+          if (!row) {
+            row = [];
+            this._tiles[y] = row;
+          }
+          this._tiles[y].length = dimX;
+          for (let x = 0; x < dimX; x++) {
+            if (!row[x]) {
+              row[x] = new TransformedCollisionTile(this, x, y);
+            }
           }
         }
       }

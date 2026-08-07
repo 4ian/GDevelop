@@ -87,6 +87,7 @@ export default function OptionsEditorDialog({
       }
       cannotBeDismissed={isLoading}
       onRequestClose={isLoading ? () => {} : onClose}
+      maxWidth="md"
     >
       {currentTab === 'options' && (
         <Line>

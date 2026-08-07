@@ -1,6 +1,8 @@
 // @flow
 import { getObjectParameterIndex } from './EnumerateInstructions';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import { mapTypeToOperators } from '../EventsSheet/ParameterFields/OperatorField';
+import { mapTypeToRelationalOperators } from '../EventsSheet/ParameterFields/RelationalOperatorField';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,5 +42,26 @@ export const setupInstructionParameters = (
   );
   hasChangeAnyParameterValue =
     hasChangeAnyParameterValue || hasFilledAnyBehaviorParameter;
+
+  for (let i = 0; i < instructionMetadata.getParametersCount(); i++) {
+    const parameterMetadata = instructionMetadata.getParameter(i);
+    if (!instruction.getParameter(i).getPlainString()) {
+      const type = parameterMetadata.getType();
+      const extraInfo = parameterMetadata.getExtraInfo();
+      if (type === 'operator') {
+        const operators =
+          mapTypeToOperators[extraInfo] || mapTypeToOperators.unknown;
+        instruction.setParameter(i, operators[0]);
+        hasChangeAnyParameterValue = true;
+      } else if (type === 'relationalOperator') {
+        const operators =
+          mapTypeToRelationalOperators[extraInfo] ||
+          mapTypeToRelationalOperators.unknown;
+        instruction.setParameter(i, operators[0]);
+        hasChangeAnyParameterValue = true;
+      }
+    }
+  }
+
   return hasChangeAnyParameterValue;
 };

@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
@@ -9,18 +9,28 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import { type Schema } from '../../PropertiesEditor/PropertiesEditorSchema';
+import {
+  type Schema,
+  type Field,
+} from '../../PropertiesEditor/PropertiesEditorSchema';
 
 import {
   type ResourceSource,
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
+import { type ResourceCustomPropertyConfig } from '../../Utils/ProjectSettingsReader';
+import {
+  type ResourceCustomPropertyValue,
+  getResourceCustomPropertyValue,
+  setResourceCustomPropertyValue,
+} from '../../ResourcesList/ResourceUtils';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
 import { Spacer } from '../../UI/Grid';
 import ScrollView from '../../UI/ScrollView';
 import { ColumnStackLayout } from '../../UI/Layout';
 import AlertMessage from '../../UI/AlertMessage';
+import { triggerOnResourceExternallyChanged } from '../../MainFrame/ResourcesWatcher';
 
 type Props = {|
   project: gdProject,
@@ -28,9 +38,89 @@ type Props = {|
   resources: Array<gdResource>,
   onResourcePathUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
+  i18n: I18nType,
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
+
+const coerceToBoolean = (value: ?ResourceCustomPropertyValue): boolean =>
+  value === true || value === 'true' || value === 1;
+
+const coerceToNumberOrNull = (
+  value: ?ResourceCustomPropertyValue
+): number | null => {
+  if (value == null || value === '') return null;
+  const numberValue = Number(value);
+  return Number.isNaN(numberValue) ? null : numberValue;
+};
+
+const coerceToString = (value: ?ResourceCustomPropertyValue): string =>
+  value == null ? '' : String(value);
+
+const buildCustomPropertyField = (
+  config: ResourceCustomPropertyConfig,
+  forceUpdate: () => void
+): Field => {
+  const { name, label, description, default: configDefault } = config;
+  const defaultValue = configDefault == null ? null : configDefault;
+  const getLabel = () => label;
+  const getDescription = () => description || '';
+  const readValue = (resource: gdResource): ?ResourceCustomPropertyValue =>
+    getResourceCustomPropertyValue(resource, name, defaultValue);
+  const setValue = (
+    resource: gdResource,
+    newValue: ResourceCustomPropertyValue
+  ) => {
+    setResourceCustomPropertyValue(resource, name, newValue);
+    forceUpdate();
+  };
+
+  if (config.type === 'number') {
+    return {
+      name,
+      getLabel,
+      getDescription,
+      valueType: 'number',
+      getValue: (resource: gdResource) =>
+        coerceToNumberOrNull(readValue(resource)),
+      setValue,
+    };
+  }
+
+  if (config.type === 'boolean') {
+    return {
+      name,
+      getLabel,
+      getDescription,
+      valueType: 'boolean',
+      getValue: (resource: gdResource) => coerceToBoolean(readValue(resource)),
+      setValue,
+    };
+  }
+
+  return {
+    name,
+    getLabel,
+    getDescription,
+    valueType: 'string',
+    getValue: (resource: gdResource) => coerceToString(readValue(resource)),
+    setValue,
+  };
+};
+
+const buildCustomPropertiesSchema = (
+  resourceCustomPropertyConfigs: Array<ResourceCustomPropertyConfig>,
+  resourceKind: string,
+  forceUpdate: () => void
+): Schema =>
+  resourceCustomPropertyConfigs
+    .filter(
+      config =>
+        !config.resourceKinds ||
+        config.resourceKinds.length === 0 ||
+        config.resourceKinds.includes(resourceKind)
+    )
+    .map(config => buildCustomPropertyField(config, forceUpdate));
 
 const renderEmpty = () => {
   return (
@@ -55,6 +145,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
       resources,
       onResourcePathUpdated,
       resourceManagementProps,
+      i18n,
     },
     ref
   ) => {
@@ -96,7 +187,11 @@ const ResourcePropertiesEditor: React.ComponentType<{
         );
         if (!selectedResourceSource) return;
 
-        resource.setFile(selectedResources[0].getFile());
+        const newResourceFile = selectedResources[0].getFile();
+        resource.setFile(newResourceFile);
+        triggerOnResourceExternallyChanged({
+          identifier: newResourceFile,
+        });
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak.
@@ -120,19 +215,23 @@ const ResourcePropertiesEditor: React.ComponentType<{
     const schema: Schema = React.useMemo(
       () => [
         {
-          name: 'Resource name',
+          name: i18n._(t`Resource name`),
           valueType: 'string',
-          disabled: () => true,
+          disabled: () => 'always',
           getValue: (resource: gdResource) => resource.getName(),
           setValue: (resource: gdResource, newValue: string) =>
             resource.setName(newValue),
         },
         {
-          name: 'File',
+          name: i18n._(t`File`),
           valueType: 'string',
           getValue: (resource: gdResource) => resource.getFile(),
-          setValue: (resource: gdResource, newValue: string) =>
-            resource.setFile(newValue),
+          setValue: (resource: gdResource, newValue: string) => {
+            resource.setFile(newValue);
+            triggerOnResourceExternallyChanged({
+              identifier: newValue,
+            });
+          },
           onEditButtonClick: () => {
             const firstResourceSource = resourceSources[0];
             if (firstResourceSource) chooseResourcePath(firstResourceSource);
@@ -147,7 +246,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
               : undefined,
         },
       ],
-      [resourceSources, chooseResourcePath]
+      [resourceSources, chooseResourcePath, i18n]
     );
 
     const renderResourcesProperties = React.useCallback(
@@ -166,16 +265,27 @@ const ResourcePropertiesEditor: React.ComponentType<{
             resource.updateProperty(name, value);
             forceUpdate();
           },
+          layersContainer: null,
+          shouldDisabledFieldsWithMixedValues: false,
         });
+
+        const resourceKind = resources[0].getKind();
+        const customPropertiesSchema = buildCustomPropertiesSchema(
+          resourceManagementProps.resourceCustomPropertyConfigs,
+          resourceKind,
+          forceUpdate
+        );
 
         return (
           <PropertiesEditor
-            schema={schema.concat(resourceSchema)}
+            schema={schema
+              .concat(resourceSchema)
+              .concat(customPropertiesSchema)}
             instances={resources}
           />
         );
       },
-      [resources, schema, forceUpdate]
+      [resources, schema, forceUpdate, resourceManagementProps]
     );
 
     const renderPreview = () => {

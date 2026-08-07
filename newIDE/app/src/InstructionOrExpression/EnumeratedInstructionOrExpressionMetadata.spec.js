@@ -14,12 +14,11 @@ const makeFakeI18n = (fakeI18n): I18nType => ({
 
 describe('EnumeratedInstructionOrExpressionMetadata', () => {
   it('can hide actions that are not relevant to layouts', () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const project = gd.ProjectHelper.createNewGDJSProject();
     const layout = new gd.Layout();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateAllInstructions(false, makeFakeI18n()),
+      enumerateAllInstructions(false, project, makeFakeI18n()),
       { project, layout }
     );
 
@@ -36,16 +35,16 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     );
 
     layout.delete();
+    project.delete();
   });
 
   it('can show actions that are only relevant for functions', () => {
-    // $FlowFixMe[invalid-constructor]
-    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const project = gd.ProjectHelper.createNewGDJSProject();
     const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
     const eventsFunction = new gd.EventsFunction();
 
     const instructions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateAllInstructions(false, makeFakeI18n()),
+      enumerateAllInstructions(false, project, makeFakeI18n()),
       {
         project,
         eventsFunctionsExtension,
@@ -67,5 +66,6 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
 
     eventsFunctionsExtension.delete();
     eventsFunction.delete();
+    project.delete();
   });
 });

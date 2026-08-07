@@ -69,8 +69,7 @@ const MultiplayerAdmin = ({ gameId }: Props): React.Node | React.Node => {
 
   const maxPlayersSelectOptions = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const options = new Array(maximumNumberOfPlayersAllowed - 1)
+      const options = new Array<number>(maximumNumberOfPlayersAllowed - 1)
         .fill(0)
         .map((_, index) => (
           <SelectOption

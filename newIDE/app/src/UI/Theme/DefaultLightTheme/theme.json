@@ -291,8 +291,8 @@
       },
       "secondary": {
         "color": {
-          "value": "#494952",
-          "comment": "Palette/Grey/70 - Text/ Secondary"
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50 - Text/ Secondary"
         }
       },
       "disabled": {
@@ -314,8 +314,8 @@
     "message": {
       "warning": {
         "color": {
-          "value": "#FFBC57",
-          "comment": "Palette/Yellow/40"
+          "value": "#FB9600",
+          "comment": "Palette/Yellow/60"
         }
       },
       "error": {
@@ -644,6 +644,28 @@
           "comment": "Palette/Grey/30 and alpha"
         }
       }
+    },
+    "auto-edit": {
+      "off": {
+        "background-color": {
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30"
+        },
+        "text-color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "on": {
+        "background-color": {
+          "value": "#45D9A1",
+          "comment": "Palette/Green/40"
+        },
+        "text-color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        }
+      }
     }
   },
   "input": {
@@ -657,6 +679,11 @@
     "event-tree": {
       "background-color": {
         "value": "#f0f0f2"
+      }
+    },
+    "conditions-actions-container": {
+      "border-color": {
+        "value": "#D9D9DE"
       }
     },
     "rst": {
@@ -683,7 +710,7 @@
       },
       "line": {
         "background-color": {
-          "value": "black"
+          "value": "#D9D9DE"
         }
       },
       "row-contents": {
@@ -708,13 +735,10 @@
     },
     "conditions": {
       "background-color": {
-        "value": "#f1f2f2"
+        "value": "#EBEBED"
       },
       "border-color": {
         "value": "#e2e2e2"
-      },
-      "border": {
-        "value": "1px solid {event-sheet.conditions.border-color.value}"
       },
       "color": {
         "value": "black"
@@ -738,7 +762,7 @@
     },
     "actions": {
       "background-color": {
-        "value": "#FFFFFF"
+        "value": "#FAFAFA"
       },
       "color": {
         "value": "black"
@@ -754,52 +778,52 @@
     },
     "warning-instruction": {
       "background-color": {
-        "value": "rgba(255, 188, 87, 0.125)",
-        "comment": "Palette/Yellow/40 and alpha"
+        "value": "rgba(255, 169, 41, 0.13)",
+        "comment": "Palette/Yellow/50 and alpha"
       }
     },
     "instruction-parameter": {
       "base": {
         "color": {
-          "value": "rgb(78, 78, 78)"
+          "value": "#00724E"
         }
       },
       "number": {
         "color": {
-          "value": "rgb(27, 143, 1)"
+          "value": "#7D6925"
         }
       },
       "object": {
         "color": {
-          "value": "#3c4698"
+          "value": "#7742F8"
         }
       },
       "behavior": {
         "color": {
-          "value": "rgb(119, 119, 119)"
+          "value": "#5D689B"
         }
       },
       "operator": {
         "color": {
-          "value": "rgb(55, 131, 211)"
+          "value": "#C112A8"
         }
       },
       "var": {
         "color": {
-          "value": "rgb(131, 55, 162)"
+          "value": "#046ACA"
         }
       },
       "error": {
         "color": {
-          "value": "#E06C75"
+          "value": "#C92906"
         },
         "background-color": {
-          "value": "#E06C7544"
+          "value": "#F03F1866"
         }
       },
       "warning": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#D24700"
         }
       }
     },
@@ -906,8 +930,8 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#FAFAFA",
-        "comment": "Palette/Grey/00"
+        "value": "#F5F5F7",
+        "comment": "Palette/Grey/10 - Background Primary"
       }
     },
     "toolbar": {
@@ -934,10 +958,15 @@
         "value": "rgb(158, 158, 158)"
       }
     },
+    "header": {
+      "background-color": {
+        "value": "#F5F5F7"
+      }
+    },
     "row": {
       "odd": {
         "background-color": {
-          "value": "#fafafa"
+          "value": "#FAFAFA"
         }
       },
       "even": {
@@ -947,10 +976,12 @@
       },
       "selected": {
         "background-color": {
-          "value": "#4c92ff"
+          "value": "#ECE5FF",
+          "comment": "Palette/Purple/10"
         },
         "color": {
-          "value": "#FFFFFF"
+          "value": "#1D1D26",
+          "comment": "Text/Primary"
         }
       }
     }

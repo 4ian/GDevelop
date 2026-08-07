@@ -6,15 +6,33 @@
 describe('gdjs.ResourceLoader', () => {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  /** @returns {LayoutData} */
-  const createSceneData = (name, usedResources) => {
+  /** @typedef {{name: string, usedResources: Array<ResourceReference>}} ResourcesContainer */
+  /**
+   * @param {ResourcesContainer & {objects?: Array<ResourcesContainer>}} props
+   * @returns {LayoutData}
+   */
+  const createSceneData = ({ name, usedResources, objects }) => {
     return {
       r: 0,
       v: 0,
       b: 0,
       mangledName: name,
       name,
-      objects: [],
+      objects: objects
+        ? objects.map((object) => ({
+            ...object,
+            type: '',
+            variables: [],
+            behaviors: [],
+            effects: [],
+          }))
+        : [],
+      objectsGroups: [
+        {
+          name: 'MyGroup',
+          objects: [{ name: 'Object1' }, { name: 'Object2' }],
+        },
+      ],
       layers: [],
       instances: [],
       behaviorsSharedData: [],
@@ -34,25 +52,50 @@ describe('gdjs.ResourceLoader', () => {
         gridColor: 0,
         gridAlpha: 1,
         snap: false,
-      }
+      },
     };
   };
 
   /** @type {{layouts?: LayoutData[], resources?: ResourcesData}} */
   const gameSettingsWithThreeScenes = {
     layouts: [
-      createSceneData('Scene1', [
-        { name: 'scene1-resource1.png' },
-        { name: 'scene1-resource2.png' },
-      ]),
-      createSceneData('Scene2', [
-        { name: 'scene2-resource1.png' },
-        { name: 'shared-resource.png' },
-      ]),
-      createSceneData('Scene3', [
-        { name: 'scene3-resource1.png' },
-        { name: 'shared-resource.png' },
-      ]),
+      createSceneData({
+        name: 'Scene1',
+        usedResources: [
+          { name: 'scene1-resource1.png' },
+          { name: 'scene1-resource2.png' },
+        ],
+        objects: [
+          {
+            name: 'Object1',
+            usedResources: [
+              { name: 'scene1-object1-resource1.png' },
+              { name: 'scene1-object1-resource2.png' },
+            ],
+          },
+          {
+            name: 'Object2',
+            usedResources: [
+              { name: 'scene1-object2-resource1.png' },
+              { name: 'scene1-object2-resource2.png' },
+            ],
+          },
+        ],
+      }),
+      createSceneData({
+        name: 'Scene2',
+        usedResources: [
+          { name: 'scene2-resource1.png' },
+          { name: 'shared-resource.png' },
+        ],
+      }),
+      createSceneData({
+        name: 'Scene3',
+        usedResources: [
+          { name: 'scene3-resource1.png' },
+          { name: 'shared-resource.png' },
+        ],
+      }),
     ],
     resources: {
       resources: [
@@ -68,6 +111,34 @@ describe('gdjs.ResourceLoader', () => {
           name: 'scene1-resource2.png',
           metadata: '',
           file: 'scene1-resource2.png',
+          userAdded: true,
+        },
+        {
+          kind: 'fake-resource-kind-for-testing-only',
+          name: 'scene1-object1-resource1.png',
+          metadata: '',
+          file: 'scene1-object1-resource1.png',
+          userAdded: true,
+        },
+        {
+          kind: 'fake-resource-kind-for-testing-only',
+          name: 'scene1-object1-resource2.png',
+          metadata: '',
+          file: 'scene1-object1-resource2.png',
+          userAdded: true,
+        },
+        {
+          kind: 'fake-resource-kind-for-testing-only',
+          name: 'scene1-object2-resource1.png',
+          metadata: '',
+          file: 'scene1-object2-resource1.png',
+          userAdded: true,
+        },
+        {
+          kind: 'fake-resource-kind-for-testing-only',
+          name: 'scene1-object2-resource2.png',
+          metadata: '',
+          file: 'scene1-object2-resource2.png',
           userAdded: true,
         },
         {
@@ -356,5 +427,193 @@ describe('gdjs.ResourceLoader', () => {
 
     // Progress should be complete (1.0)
     expect(resourceLoader.getSceneLoadingProgress('Scene2')).to.be(1);
+  });
+
+  /**
+   * @param {gdjs.RuntimeGame} runtimeGame
+   * @param {gdjs.MockedResourceManager} mockedResourceManager
+   */
+  const loadObject1AndCheck = async (runtimeGame, mockedResourceManager) => {
+    runtimeGame.loadObjectOrGroupAssets('Object1', 'Scene1');
+
+    // Object1 resources should be pending download
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object1-resource1.png'
+      )
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object1-resource2.png'
+      )
+    ).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
+
+    // Mark Object1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object1-resource1.png'
+    );
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object1-resource2.png'
+    );
+    await delay(10);
+
+    // Object1 should now be ready
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
+  };
+
+  it('can load object resources with an action', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
+      mockedResourceManager
+    );
+
+    // Start loading first scene and background loading
+    runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
+    // Mark Scene1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource1.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource2.png');
+    await delay(10);
+
+    // Scene1 should now be ready
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(true);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(true);
+
+    runtimeGame._sceneStack.push('Scene1');
+    await loadObject1AndCheck(runtimeGame, mockedResourceManager);
+
+    runtimeGame.unloadObjectOrGroupAssets('Object1', 'Scene1');
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
+
+    await loadObject1AndCheck(runtimeGame, mockedResourceManager);
+  });
+
+  it('can unload a scene with its objects that were manually loaded', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
+      mockedResourceManager
+    );
+
+    // Start loading first scene and background loading
+    runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
+    // Mark Scene1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource1.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource2.png');
+    await delay(10);
+
+    // Scene1 should now be ready
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(true);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(true);
+
+    runtimeGame._sceneStack.push('Scene1');
+    await loadObject1AndCheck(runtimeGame, mockedResourceManager);
+
+    // First, unload Scene2 (which shares resources with Scene3)
+    resourceLoader.unloadSceneResources({
+      unloadedSceneName: 'Scene1',
+      newSceneName: 'Scene2',
+    });
+
+    // Scene resources are unloaded.
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-resource1.png')
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-resource2.png')
+    ).to.be(true);
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(false);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(false);
+    // Scene objects are unloaded too.
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-object1-resource1.png')
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDisposed('scene1-object1-resource2.png')
+    ).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
+  });
+
+  it('can load object group resources with an action', async () => {
+    const mockedResourceManager = new gdjs.MockedResourceManager();
+    const runtimeGame = gdjs.getPixiRuntimeGame(gameSettingsWithThreeScenes);
+    const resourceLoader = runtimeGame.getResourceLoader();
+    resourceLoader.injectMockResourceManagerForTesting(
+      'fake-resource-kind-for-testing-only',
+      mockedResourceManager
+    );
+
+    // Start loading first scene and background loading
+    runtimeGame.loadFirstAssetsAndStartBackgroundLoading('Scene1');
+    // Mark Scene1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource1.png');
+    mockedResourceManager.markPendingResourcesAsLoaded('scene1-resource2.png');
+    await delay(10);
+
+    // Scene1 should now be ready
+    expect(runtimeGame.areSceneAssetsLoaded('Scene1')).to.be(true);
+    expect(runtimeGame.areSceneAssetsReady('Scene1')).to.be(true);
+
+    runtimeGame._sceneStack.push('Scene1');
+    runtimeGame.loadObjectOrGroupAssets('MyGroup');
+
+    // Object1 resources should be pending download
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object1-resource1.png'
+      )
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object1-resource2.png'
+      )
+    ).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
+
+    // Mark Object1 resources as loaded
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object1-resource1.png'
+    );
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object1-resource2.png'
+    );
+    await delay(10);
+
+    // Object1 should now be ready
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
+
+    // Object2 resources should be pending download
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object2-resource1.png'
+      )
+    ).to.be(true);
+    expect(
+      mockedResourceManager.isResourceDownloadPending(
+        'scene1-object2-resource2.png'
+      )
+    ).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2', 'Scene1')).to.be(false);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(false);
+
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object2-resource1.png'
+    );
+    mockedResourceManager.markPendingResourcesAsLoaded(
+      'scene1-object2-resource2.png'
+    );
+    await delay(10);
+
+    // Object1 and Object2 should now be ready
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object1', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('Object2', 'Scene1')).to.be(true);
+    expect(runtimeGame.areObjectOrGroupAssetsLoaded('MyGroup', 'Scene1')).to.be(true);
   });
 });

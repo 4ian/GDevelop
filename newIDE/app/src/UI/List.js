@@ -150,7 +150,9 @@ export const ListItem: React.ComponentType<{
       },
       [elementWithMenu]
     );
-    const longTouchForContextMenuProps = useLongTouch(openContextMenu);
+    const { contextMenuProps: longTouchForContextMenuProps } = useLongTouch(
+      openContextMenu
+    );
 
     const renderListItemSecondaryAction = () => {
       if (props.displayReloadButton) {

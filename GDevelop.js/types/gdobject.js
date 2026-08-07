@@ -8,6 +8,8 @@ declare class gdObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
+  setResourcesPreloading(value: string): void;
+  getResourcesPreloading(): string;
   getConfiguration(): gdObjectConfiguration;
   getVariables(): gdVariablesContainer;
   getEffects(): gdEffectsContainer;

@@ -6,6 +6,7 @@
 
 #include "RepeatEvent.h"
 #include "GDCore/Events/Serialization.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
@@ -17,6 +18,18 @@ RepeatEvent::RepeatEvent()
       repeatNumberExpression(""),
       variables(gd::VariablesContainer::SourceType::Local),
       repeatNumberExpressionSelected(false) {}
+
+gd::InstructionsList* RepeatEvent::GetInstructionList(const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* RepeatEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
 
 vector<gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -70,6 +83,7 @@ vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
 }
 
 void RepeatEvent::SerializeTo(SerializerElement& element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.AddChild("repeatExpression")
       .SetValue(repeatNumberExpression.GetPlainString());
   gd::EventsListSerialization::SerializeInstructionsTo(
@@ -77,13 +91,13 @@ void RepeatEvent::SerializeTo(SerializerElement& element) const {
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
 
-  if (!events.IsEmpty())
+  if (canonical || !events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
-  if (HasVariables()) {
+  if (canonical || HasVariables()) {
     variables.SerializeTo(element.AddChild("variables"));
   }
-  if (!loopIndexVariableName.empty()) {
+  if (canonical || !loopIndexVariableName.empty()) {
     element.AddChild("loopIndexVariable").SetStringValue(loopIndexVariableName);
   }
 }

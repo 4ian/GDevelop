@@ -6,6 +6,7 @@
 
 #include "CommentEvent.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
@@ -29,6 +30,7 @@ bool CommentEvent::ReplaceAllSearchableStrings(
 }
 
 void CommentEvent::SerializeTo(SerializerElement &element) const {
+  const bool canonical = gd::Serializer::IsCanonicalMode();
   element.AddChild("color")
       .SetAttribute("r", r)
       .SetAttribute("g", v)
@@ -38,7 +40,7 @@ void CommentEvent::SerializeTo(SerializerElement &element) const {
       .SetAttribute("textB", textB);
 
   element.AddChild("comment").SetValue(com1);
-  if (!com2.empty()) element.AddChild("comment2").SetValue(com2);
+  if (canonical || !com2.empty()) element.AddChild("comment2").SetValue(com2);
 }
 
 void CommentEvent::UnserializeFrom(gd::Project &project,

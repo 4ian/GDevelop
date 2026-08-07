@@ -12,6 +12,10 @@ import {
 } from './EditorTabsHandler';
 import PreferencesContext from '../Preferences/PreferencesContext';
 import { useDebounce } from '../../Utils/UseDebounce';
+import {
+  parseCustomObjectEditorTabName,
+  getObjectTypeFromCustomObjectEditorTabName,
+} from '../../Utils/CustomObjectEditorTabName';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -36,7 +40,8 @@ const projectHasItem = ({
   kind: EditorKind,
   name: string,
 |}) => {
-  if (['debugger', 'start page', 'resources'].includes(kind)) return true;
+  if (['debugger', 'start page', 'resources', 'global-search'].includes(kind))
+    return true;
   switch (kind) {
     case 'events functions extension':
       return project.hasEventsFunctionsExtensionNamed(name);
@@ -49,9 +54,8 @@ const projectHasItem = ({
     case 'external events':
       return project.hasExternalEventsNamed(name);
     case 'custom object':
-      const nameElements = name.split('::');
-      const objectType = nameElements[0] + '::' + nameElements[1];
-      const variantName = nameElements[2];
+      const objectType = getObjectTypeFromCustomObjectEditorTabName(name);
+      const variantName = parseCustomObjectEditorTabName(name).variantName;
       return (
         project.hasEventsBasedObject(objectType) &&
         (!variantName ||

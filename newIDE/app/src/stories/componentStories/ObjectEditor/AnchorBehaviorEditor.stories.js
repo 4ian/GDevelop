@@ -25,13 +25,14 @@ export const Default = (): React.Node => {
     <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
       <AnchorBehaviorEditor
         project={testProject.project}
-        behavior={anchorBehavior}
+        behaviors={[anchorBehavior]}
         object={spriteObjectWithBehaviors}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}
         projectScopedContainersAccessor={
           testProject.testSceneProjectScopedContainersAccessor
         }
+        layersContainer={testProject.testLayout.getLayers()}
       />
     </SerializedObjectDisplay>
   );

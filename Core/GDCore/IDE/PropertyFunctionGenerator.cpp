@@ -16,6 +16,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
+#include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 
 namespace gd {
 
@@ -57,6 +58,11 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
            ? ""
            : " " + UnCapitalizeFirstLetter(property.GetGroup())) +
       " configuration";
+  auto &folder =
+      functionGroupName.empty()
+          ? functionsContainer.GetRootFolder()
+          : functionsContainer.GetRootFolder().GetOrCreateChildFolder(
+                functionGroupName);
 
   gd::String propertyLabel =
       property.GetLabel().empty() ? property.GetName() : property.GetLabel();
@@ -77,8 +83,8 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   gd::String getterName = capitalizedName;
 
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
-    auto &getter = functionsContainer.InsertNewEventsFunction(
-        getterName, functionsContainer.GetEventsFunctionsCount());
+    auto &getter = functionsContainer.InsertNewEventsFunctionInFolder(
+        getterName, folder, folder.GetChildrenCount());
     auto &expressionType =
         gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
             property.GetType());
@@ -126,8 +132,8 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
   }
 
   if (!functionsContainer.HasEventsFunctionNamed(setterName)) {
-    auto &setter = functionsContainer.InsertNewEventsFunction(
-        setterName, functionsContainer.GetEventsFunctionsCount());
+    auto &setter = functionsContainer.InsertNewEventsFunctionInFolder(
+        setterName, folder, folder.GetChildrenCount());
     if (primitiveType == "boolean") {
       setter.SetFunctionType(gd::EventsFunction::Action)
           .SetFullName(propertyLabel)
@@ -280,15 +286,36 @@ PropertyFunctionGenerator::UnCapitalizeFirstLetter(const gd::String &string) {
 }
 
 void PropertyFunctionGenerator::GenerateConditionSkeleton(
-    gd::Project &project, gd::EventsFunction &eventFunction) {
+    gd::Project &project, gd::EventsFunction &eventsFunction) {
   auto &event = dynamic_cast<gd::StandardEvent &>(
-      eventFunction.GetEvents().InsertNewEvent(
+      eventsFunction.GetEvents().InsertNewEvent(
           project, "BuiltinCommonInstructions::Standard", 0));
 
   gd::Instruction action;
   action.SetType("SetReturnBoolean");
   action.AddParameter("True");
   event.GetActions().Insert(action, 0);
+}
+
+void PropertyFunctionGenerator::GenerateExpressionSkeleton(
+    gd::Project &project, gd::EventsFunction &eventsFunction) {
+  auto &event = dynamic_cast<gd::StandardEvent &>(
+      eventsFunction.GetEvents().InsertNewEvent(
+          project, "BuiltinCommonInstructions::Standard", 0));
+
+  gd::Instruction action;
+  action.SetType("SetReturnNumber");
+  action.AddParameter("");
+  event.GetActions().Insert(action, 0);
+}
+
+void PropertyFunctionGenerator::UpdateReturnActionType(
+    gd::Project &project, gd::EventsFunction &eventsFunction) {
+  bool isReturningNumber = eventsFunction.GetExpressionType().IsNumber();
+  gd::InstructionsTypeRenamer instructionsTypeRenamer(
+      project, isReturningNumber ? "SetReturnString" : "SetReturnNumber",
+      isReturningNumber ? "SetReturnNumber" : "SetReturnString");
+  instructionsTypeRenamer.Launch(eventsFunction.GetEvents());
 }
 
 } // namespace gd

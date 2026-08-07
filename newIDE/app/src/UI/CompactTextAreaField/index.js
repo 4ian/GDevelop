@@ -30,10 +30,12 @@ export type CompactTextAreaFieldProps = {|
   id?: string,
   disabled?: boolean,
   errored?: boolean,
+  errorText?: React.Node,
   placeholder?: MessageDescriptor,
   rows?: number,
   maxLength?: number,
   labelColor?: 'primary' | 'secondary',
+  onFocus?: () => void,
 |};
 
 export const CompactTextAreaField = ({
@@ -44,11 +46,13 @@ export const CompactTextAreaField = ({
   id,
   disabled,
   errored,
+  errorText,
   placeholder,
   rows,
   maxLength,
   onSubmit,
   labelColor,
+  onFocus,
 }: CompactTextAreaFieldProps): React.Node => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
 
@@ -119,8 +123,10 @@ export const CompactTextAreaField = ({
               }
               rows={rows || 3}
               maxLength={maxLength}
+              onFocus={e => onFocus && onFocus()}
             />
           </div>
+          {errorText && <div className={classes.error}>{errorText}</div>}
         </label>
       )}
     </I18n>

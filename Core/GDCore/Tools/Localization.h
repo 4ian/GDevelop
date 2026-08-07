@@ -43,6 +43,12 @@ gd::String GetTranslation(const char* str);
 #endif
 #define _(s) gd::String(u8##s)
 
+#if defined(GetTranslation)
+#undef GetTranslation
+#endif
+
+#define GetTranslation(s) (s)
+
 #endif
 
 #endif  // GDCORE_LOCALIZATION_H

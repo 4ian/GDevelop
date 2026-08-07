@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import InlinePopover from './InlinePopover';
-import ParameterRenderingService from './ParameterRenderingService';
+import ParameterRenderingService, {
+  type ParameterField,
+} from './ParameterRenderingService';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
@@ -15,6 +17,8 @@ import {
   useSoftKeyboardBottomOffset,
 } from '../UI/MobileSoftKeyboard';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import PortalContainerContext from '../UI/PortalContainerContext';
+import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -37,6 +41,10 @@ type Props = {|
   anchorEl: ?any,
 
   resourceManagementProps: ResourceManagementProps,
+  editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
+  openEventsBasedEntityPropertyEditorDialog:
+    | (VariableDialogOpeningProps => void)
+    | null,
 |};
 
 const InlineParameterEditor = ({
@@ -54,7 +62,10 @@ const InlineParameterEditor = ({
   parameterIndex,
   anchorEl,
   resourceManagementProps,
+  editEventsFunctionParameter,
+  openEventsBasedEntityPropertyEditorDialog,
 }: Props): null | React.Node => {
+  const portalContainer = React.useContext(PortalContainerContext);
   const [
     parameterMetadata,
     setParameterMetadata,
@@ -63,7 +74,10 @@ const InlineParameterEditor = ({
     instructionMetadata,
     setInstructionMetadata,
   ] = React.useState<?gdInstructionMetadata>(null);
-  const [ParameterComponent, setParameterComponent] = React.useState(null);
+  const [
+    ParameterComponent,
+    setParameterComponent,
+  ] = React.useState<ParameterField | null>(null);
   const field = React.useRef<?ParameterFieldInterface>(null);
 
   const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
@@ -180,6 +194,10 @@ const InlineParameterEditor = ({
       parameterRenderingService={ParameterRenderingService}
       isInline
       resourceManagementProps={resourceManagementProps}
+      editEventsFunctionParameter={editEventsFunctionParameter}
+      openEventsBasedEntityPropertyEditorDialog={
+        openEventsBasedEntityPropertyEditorDialog
+      }
     />
   );
 
@@ -190,6 +208,7 @@ const InlineParameterEditor = ({
         open={true}
         onClose={onApply}
         transitionDuration={0}
+        container={portalContainer}
         PaperProps={{
           style: {
             ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),

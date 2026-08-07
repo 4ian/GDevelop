@@ -11,6 +11,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 #include "GDCore/Project/QuickCustomization.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 
 namespace gd {
 class Project;
@@ -214,6 +215,8 @@ class GD_CORE_API ObjectFolderOrObject {
   gd::String folderName;  // Empty if object is set.
   std::vector<std::unique_ptr<ObjectFolderOrObject>>
       children;  // Folder children.
+
+  gd::MemoryTracked _memoryTracked{this, "ObjectFolderOrObject"};
 };
 
 }  // namespace gd

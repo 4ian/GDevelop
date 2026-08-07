@@ -474,7 +474,7 @@ namespace gdjs {
           applyTextureSettings(loadedTexture, resource);
         }
       } catch (error) {
-        logFileLoadingError(resource.file, error);
+        logFileLoadingError(resource.file, error as Error);
         PIXI.Texture.removeFromCache(resourceUrl);
         PIXI.BaseTexture.removeFromCache(resourceUrl);
         throw error;

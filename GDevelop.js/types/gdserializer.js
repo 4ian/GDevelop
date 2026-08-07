@@ -5,6 +5,8 @@ declare class gdSerializer {
 
   static toJSON(element: gdSerializerElement): string;
   static fromJSON(json: string): gdSerializerElement;
+  static setCanonicalMode(canonical: boolean): void;
+  static isCanonicalMode(): boolean;
   delete(): void;
   ptr: number;
 };

@@ -29,7 +29,7 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
+    std::size_t parameterIndex) {
   ParameterValidationResult result;
 
   if (parameterIndex >= instruction.GetParametersCount() ||
@@ -45,8 +45,20 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
                                   ? "number"
                                   : parameterMetadata.GetType();
 
+  // The parameter value as stored in the project: empty for an unset optional
+  // parameter or for the base layer. This is what must be validated, as opposed
+  // to the value formatted for display which may show a default value.
+  const gd::String &value =
+      instruction.GetParameter(parameterIndex).GetPlainString();
+
   bool shouldNotBeValidated = parameterType == "layer" && value.empty();
   if (shouldNotBeValidated) {
+    return result;  // Valid by default, no deprecation warning
+  }
+
+  // An optional parameter left empty is valid: the default value is used when
+  // generating the code.
+  if (parameterMetadata.IsOptional() && value.empty()) {
     return result;  // Valid by default, no deprecation warning
   }
 
@@ -60,19 +72,11 @@ ParameterValidationResult InstructionValidator::ValidateParameter(
                                             parameterMetadata.GetExtraInfo());
     expressionNode.Visit(expressionValidator);
 
-    // Check for fatal errors (validation)
-    if (!expressionValidator.GetFatalErrors().empty()) {
+    if (!expressionValidator.GetAllErrors().empty()) {
       result.isValid = false;
     }
-
-    // Check for deprecation warnings in the same pass
-    const auto &allErrors = expressionValidator.GetAllErrors();
-    for (const auto *error : allErrors) {
-      if (error->GetType() ==
-          gd::ExpressionParserError::ErrorType::DeprecatedExpression) {
-        result.hasDeprecationWarning = true;
-        break;
-      }
+    if (!expressionValidator.GetDeprecationWarnings().empty()) {
+      result.hasDeprecationWarning = true;
     }
 
     // New object variable instructions require the variable to be
@@ -121,9 +125,9 @@ bool InstructionValidator::IsParameterValid(
     const gd::Platform &platform,
     const gd::ProjectScopedContainers projectScopedContainers,
     const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
+    std::size_t parameterIndex) {
   return ValidateParameter(platform, projectScopedContainers, instruction,
-                           metadata, parameterIndex, value)
+                           metadata, parameterIndex)
       .isValid;
 }
 
@@ -138,16 +142,6 @@ gd::String InstructionValidator::GetRootVariableName(const gd::String &name) {
                             ? dotPosition
                             : squareBracketPosition);
 };
-
-bool InstructionValidator::HasDeprecationWarnings(
-    const gd::Platform &platform,
-    const gd::ProjectScopedContainers projectScopedContainers,
-    const gd::Instruction &instruction, const InstructionMetadata &metadata,
-    std::size_t parameterIndex, const gd::String &value) {
-  return ValidateParameter(platform, projectScopedContainers, instruction,
-                           metadata, parameterIndex, value)
-      .hasDeprecationWarning;
-}
 
 bool InstructionValidator::HasRequiredBehaviors(
     const gd::Instruction &instruction,

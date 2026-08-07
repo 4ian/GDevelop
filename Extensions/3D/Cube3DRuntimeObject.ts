@@ -21,6 +21,7 @@ namespace gdjs {
       rightFaceResourceRepeat: boolean | undefined;
       topFaceResourceRepeat: boolean | undefined;
       bottomFaceResourceRepeat: boolean | undefined;
+      tileScale: number | undefined;
       frontFaceVisible: boolean;
       backFaceVisible: boolean;
       leftFaceVisible: boolean;
@@ -48,6 +49,7 @@ namespace gdjs {
     bfu: 'X' | 'Y';
     vfb: integer;
     trfb: integer;
+    ts: number;
     frn: [string, string, string, string, string, string];
     mt: number;
     tint: string;
@@ -68,6 +70,7 @@ namespace gdjs {
     // `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
     private _visibleFacesBitmask: integer;
     private _textureRepeatFacesBitmask: integer;
+    private _tileScale: number;
     private _faceResourceNames: [
       string,
       string,
@@ -118,6 +121,7 @@ namespace gdjs {
       if (objectData.content.bottomFaceResourceRepeat)
         this._textureRepeatFacesBitmask |=
           1 << faceNameToBitmaskIndex['bottom'];
+      this._tileScale = objectData.content.tileScale || 1;
       this._backFaceUpThroughWhichAxisRotation =
         objectData.content.backFaceUpThroughWhichAxisRotation || 'X';
       this._faceResourceNames = [
@@ -251,6 +255,23 @@ namespace gdjs {
     setBackFaceUpThroughWhichAxisRotation(axis: 'X' | 'Y'): void {
       this._backFaceUpThroughWhichAxisRotation = axis;
       this._renderer.updateFace(faceNameToBitmaskIndex['back']);
+    }
+
+    /**
+     * Returns the scale applied to the textures when they are tiled
+     * (repeated) over the faces of the cube. A scale of 1 means the texture
+     * is displayed at the same size as in 2D.
+     */
+    getTileScale(): number {
+      return this._tileScale;
+    }
+
+    setTileScale(tileScale: number): void {
+      if (this._tileScale === tileScale) {
+        return;
+      }
+      this._tileScale = tileScale;
+      this._renderer.updateTextureUvMapping();
     }
 
     getFacesOrientation(): 'Y' | 'Z' {
@@ -435,6 +456,9 @@ namespace gdjs {
       ) {
         this.setFacesOrientation(newObjectData.content.facesOrientation || 'Y');
       }
+      if (oldObjectData.content.tileScale !== newObjectData.content.tileScale) {
+        this.setTileScale(newObjectData.content.tileScale || 1);
+      }
       if (
         oldObjectData.content.materialType !==
         newObjectData.content.materialType
@@ -467,6 +491,7 @@ namespace gdjs {
         bfu: this._backFaceUpThroughWhichAxisRotation,
         vfb: this._visibleFacesBitmask,
         trfb: this._textureRepeatFacesBitmask,
+        ts: this._tileScale,
         frn: this._faceResourceNames,
         tint: this._tint,
       };
@@ -508,6 +533,9 @@ namespace gdjs {
             this._renderer.updateFace(i);
           }
         }
+      }
+      if (networkSyncData.ts !== undefined) {
+        this.setTileScale(networkSyncData.ts);
       }
       if (networkSyncData.frn !== undefined) {
         // If one element is different, update all the faces.

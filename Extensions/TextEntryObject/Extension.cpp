@@ -21,7 +21,8 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetShortDescription("Deprecated. Invisible object capturing keyboard text input into a string.")
       .SetCategory("User interface")
-      .SetExtensionHelpPath("/objects/text_entry");
+      .SetExtensionHelpPath("/objects/text_entry")
+      .MarkAsDeprecatedSince("5.6.270");
 
   gd::ObjectMetadata& obj =
       extension

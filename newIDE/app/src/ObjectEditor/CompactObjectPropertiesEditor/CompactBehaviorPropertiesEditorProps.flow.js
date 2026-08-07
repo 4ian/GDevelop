@@ -7,10 +7,9 @@ import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource
 export type CompactBehaviorPropertiesEditorProps = {|
   project: gdProject,
   behaviorMetadata: gdBehaviorMetadata,
-  behavior: gdBehavior,
-  object: gdObject,
-  behaviorOverriding: gdBehavior | null,
-  initialInstance: gdInitialInstance | null,
+  behaviors: Array<gdBehavior>,
+  object: gdObject | null,
+  layersContainer: gdLayersContainer,
   onOpenFullEditor?: () => void,
   onBehaviorUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,

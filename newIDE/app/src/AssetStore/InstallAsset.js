@@ -19,6 +19,7 @@ import {
   checkRequiredExtensionsUpdate,
   type RequiredExtensionInstallation,
 } from './ExtensionStore/InstallExtension.js';
+import { mapVector } from '../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -67,9 +68,9 @@ export const installResource = (
           resourceOriginIdentifier
         )
       : '';
-  const existingResourceNameWithSameFile = resourcesManager.getResourceNameWithFile(
-    resourceFileUrl
-  );
+  const existingResourceNameWithSameFile =
+    resourcesManager.getResourceNamesWithFile(resourceFileUrl).toJSArray()[0] ||
+    null;
 
   if (existingResourceNameFromSameOrigin) {
     // There is a resource with the same origin, use it.
@@ -393,12 +394,22 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
 
 export const complyVariantsToEventsBasedObjectOf = (
   project: gdProject,
-  createdObjects: Array<gdObject>
+  createdObjectTypes: Array<string>
 ) => {
   const installedVariantObjectTypes = new Set<string>();
-  for (const createdObject of createdObjects) {
-    if (project.hasEventsBasedObject(createdObject.getType())) {
-      installedVariantObjectTypes.add(createdObject.getType());
+  for (const createdObjectType of createdObjectTypes) {
+    if (
+      project.hasEventsBasedObject(createdObjectType) &&
+      !installedVariantObjectTypes.has(createdObjectType)
+    ) {
+      installedVariantObjectTypes.add(createdObjectType);
+      mapVector(
+        gd.EventsBasedObjectVariantHelper.findAllChildrenCustomObjectType(
+          project,
+          project.getEventsBasedObject(createdObjectType)
+        ),
+        objectType => installedVariantObjectTypes.add(objectType)
+      );
     }
   }
   for (const installedVariantObjectType of installedVariantObjectTypes) {

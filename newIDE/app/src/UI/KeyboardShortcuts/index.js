@@ -14,6 +14,7 @@ const MINUS_KEY = 189;
 const SPACE_KEY = 32;
 const NUMPAD_ADD = 107;
 const NUMPAD_SUBTRACT = 109;
+const A_KEY = 65;
 const C_KEY = 67;
 const D_KEY = 68;
 const F_KEY = 70;
@@ -48,6 +49,8 @@ type ShortcutCallbacks = {|
   onShift1?: () => void | Promise<void>,
   onShift2?: () => void | Promise<void>,
   onShift3?: () => void | Promise<void>,
+  onSelectAll?: () => void | Promise<void>,
+  onDeselectAll?: () => void | Promise<void>,
   onToggleGrabbingTool?: (isEnabled: boolean) => void | Promise<void>,
   onRename?: () => void | Promise<void>,
 |};
@@ -258,6 +261,8 @@ export default class KeyboardShortcuts {
       onCut,
       onPaste,
       onDuplicate,
+      onSelectAll,
+      onDeselectAll,
       onUndo,
       onRedo,
       onSearch,
@@ -310,6 +315,23 @@ export default class KeyboardShortcuts {
       onDuplicate();
     }
     if (
+      onDeselectAll &&
+      this._isControlOrCmdPressed() &&
+      evt.shiftKey &&
+      evt.which === A_KEY
+    ) {
+      evt.preventDefault();
+      onDeselectAll();
+    } else if (
+      onSelectAll &&
+      this._isControlOrCmdPressed() &&
+      !evt.shiftKey &&
+      evt.which === A_KEY
+    ) {
+      evt.preventDefault();
+      onSelectAll();
+    }
+    if (
       (onUndo || onRedo) &&
       this._isControlOrCmdPressed() &&
       evt.which === Z_KEY
@@ -326,7 +348,12 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onRedo();
     }
-    if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
+    if (
+      onSearch &&
+      this._isControlOrCmdPressed() &&
+      !evt.shiftKey &&
+      evt.which === F_KEY
+    ) {
       evt.preventDefault();
       onSearch();
     }

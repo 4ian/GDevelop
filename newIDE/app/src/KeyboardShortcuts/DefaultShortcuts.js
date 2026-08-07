@@ -17,6 +17,7 @@ const defaultShortcuts: ShortcutMap = {
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',
   SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
   CLOSE_PROJECT: 'CmdOrCtrl+KeyW',
+  RELOAD_PROJECT: '',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',
@@ -27,6 +28,7 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PROJECT_VARIABLES: '',
   OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG: '',
   OPEN_PROJECT_RESOURCES: '',
+  OPEN_GLOBAL_SEARCH: 'CmdOrCtrl+Shift+KeyF',
 
   OPEN_LAYOUT: '',
   OPEN_EXTERNAL_EVENTS: '',
@@ -59,6 +61,15 @@ const defaultShortcuts: ShortcutMap = {
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
   MOVE_EVENTS_IN_NEW_GROUP: 'CmdOrCtrl+KeyG',
   OPEN_EXTENSION_SETTINGS: '',
+};
+
+/**
+ * Secondary (alternative) shortcuts for commands.
+ * These are not user-customizable and provide additional
+ * key bindings for commonly used commands.
+ */
+export const defaultSecondaryShortcuts: ShortcutMap = {
+  OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyK',
 };
 
 export default defaultShortcuts;

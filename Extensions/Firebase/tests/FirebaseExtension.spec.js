@@ -649,7 +649,11 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     });
   });
 
-  describe('Firebase storage', () => {
+  // Skipped: Firebase Storage requires the Blaze (pay-as-you-go) plan.
+  // The test project gdtest-e11a5 is on the free Spark plan which no longer
+  // supports Cloud Storage. Firebase enforced this change on 2026-02-03.
+  // See: https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024
+  describe.skip('Firebase storage', () => {
     const filename = `MyImage-${Math.random().toString(16)}.png`;
     it('uploads an image', async () => {
       await promisifyCallbackVariables((callback) =>

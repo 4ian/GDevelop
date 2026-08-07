@@ -234,6 +234,19 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
   };
 
   /**
+   * \brief Set a hint attached to the last added parameter. See
+   * gd::InstructionMetadata::SetParameterHint.
+   *
+   * \see AddParameter
+   */
+  ExpressionMetadata &SetParameterHint(const gd::String &hint) override {
+    if (parameters.GetParametersCount() > 0) {
+      parameters.GetInternalVector().back()->SetHint(hint);
+    }
+    return *this;
+  };
+
+  /**
    * \brief Set the additional information, used for some parameters
    * with special type (for example, it can contains the type of object accepted
    * by the parameter), for the last added parameter.

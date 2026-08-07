@@ -22,3 +22,21 @@ export function sanitizeFilename(input: string): string {
     .replace(windowsReservedRe, replacement)
     .replace(windowsTrailingRe, replacement);
 }
+
+const windowsPathSeparator = /\\/g;
+const illegalReButSeparator = /[?<>:*|"]/g;
+const urlReservedReButSeparator = /[&$+=?@#]/g; // We still allow comma, colon and semi-colon.
+
+const pathSeparator = '/';
+
+export function sanitizeFilePath(input: string): string {
+  return input
+    .replace(windowsPathSeparator, pathSeparator)
+    .replace(illegalReButSeparator, replacement)
+    .replace(urlReservedReButSeparator, replacement)
+    .replace(urlUnsafeRe, replacement)
+    .replace(controlRe, replacement)
+    .replace(reservedRe, replacement)
+    .replace(windowsReservedRe, replacement)
+    .replace(windowsTrailingRe, replacement);
+}

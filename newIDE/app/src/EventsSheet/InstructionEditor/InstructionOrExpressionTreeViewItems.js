@@ -237,6 +237,6 @@ export class MoreResultsTreeViewItemContent implements TreeViewItemContent {
     return {};
   }
   getThumbnail(): any {
-    return null;
+    return 'res/share-external_black.svg';
   }
 }

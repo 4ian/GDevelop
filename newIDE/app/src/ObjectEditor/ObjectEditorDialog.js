@@ -53,6 +53,7 @@ type Props = {|
   layout: gdLayout | null,
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
+  layersContainer: gdLayersContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
@@ -100,6 +101,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     layout,
     eventsFunctionsExtension,
     eventsBasedObject,
+    layersContainer,
     helpPagePath,
     resourceManagementProps,
     getValidatedObjectOrGroupName,
@@ -122,6 +124,20 @@ const InnerDialog = (props: InnerDialogProps) => {
   );
   const [objectName, setObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
+
+  // Ensure variable UUIDs are set for changeset tracking. This must happen
+  // before the cancelable editor hook serializes the object, so that both
+  // the serialized "original" state and the in-memory "new" state share
+  // the same UUIDs when changes are applied.
+  // Variables persistent UUIDs are persisted in the project file, so they
+  // must be kept stable: only set them for variables not having one yet.
+  // We only touch variable UUIDs (not the object's own UUID).
+  const variableUuidsEnsuredRef = React.useRef(false);
+  if (!variableUuidsEnsuredRef.current) {
+    object.getVariables().ensurePersistentUuids();
+    variableUuidsEnsuredRef.current = true;
+  }
+
   const {
     onCancelChanges,
     notifyOfChange,
@@ -130,7 +146,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   } = useSerializableObjectCancelableEditor({
     serializableObject: object,
     useProjectToUnserialize: project,
-    onCancel: onCancel,
+    onCancel,
   });
 
   const [hasResourceChanged, setResourceChanged] = React.useState<boolean>(
@@ -186,7 +202,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       originalSerializedVariables
     );
     if (eventsBasedObject) {
-      gd.ObjectVariableHelper.applyChangesToVariants(
+      gd.ObjectRefactorer.applyChangesToVariants(
         eventsBasedObject,
         object.getName(),
         changeset
@@ -346,10 +362,11 @@ const InnerDialog = (props: InnerDialogProps) => {
       ) : null}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor
-          object={object}
+          objects={[object]}
           isChildObject={!!eventsBasedObject}
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
+          layersContainer={layersContainer}
           resourceManagementProps={_resourceManagementProps}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
           onSizeUpdated={

@@ -251,8 +251,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -342,8 +341,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     this.onClickCallback();
   }
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -600,7 +598,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
-    const onOpenLayoutVariables = React.useCallback((layout: ?gdLayout) => {
+    const openSceneVariables = React.useCallback((layout: ?gdLayout) => {
       setEditedVariablesLayout(layout);
     }, []);
 
@@ -906,7 +904,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               onRenameLayout,
               onOpenLayout,
               onOpenLayoutProperties,
-              onOpenLayoutVariables,
+              openSceneVariables,
             }
           : null,
       [
@@ -924,7 +922,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         onRenameLayout,
         onOpenLayout,
         onOpenLayoutProperties,
-        onOpenLayoutVariables,
+        openSceneVariables,
       ]
     );
 
@@ -1316,8 +1314,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [
       selectedMainMenuItemIndices,
       setSelectedMainMenuItemIndices,
-      // $FlowFixMe[missing-empty-array-annot]
-    ] = React.useState([]);
+    ] = React.useState<Array<number>>([]);
     const isNavigatingInMainMenuItem = selectedMainMenuItemIndices.length > 0;
     const shouldHideMainMenu = isMacLike() && !!electron;
 
@@ -1384,6 +1381,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                           // $FlowFixMe[incompatible-type]
                           // $FlowFixMe[incompatible-exact]
                           <TreeView
+                            enableStickyAncestors
                             key={listKey}
                             ref={treeViewRef}
                             items={getTreeViewData(i18n)}
@@ -1466,6 +1464,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {!!editedPropertiesLayout &&
@@ -1481,7 +1480,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         }}
                         onClose={() => onOpenLayoutProperties(null)}
                         onEditVariables={() => {
-                          onOpenLayoutVariables(editedPropertiesLayout);
+                          openSceneVariables(editedPropertiesLayout);
                           onOpenLayoutProperties(null);
                         }}
                         resourceManagementProps={resourceManagementProps}
@@ -1498,13 +1497,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       open
                       project={project}
                       layout={editedVariablesLayout}
-                      onCancel={() => onOpenLayoutVariables(null)}
+                      onCancel={() => openSceneVariables(null)}
                       onApply={() => {
                         triggerUnsavedChanges();
-                        onOpenLayoutVariables(null);
+                        openSceneVariables(null);
                       }}
                       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                       isListLocked={false}
+                      initiallySelectedVariable={null}
                     />
                   )}
                   {project && extensionsSearchDialogOpen && (

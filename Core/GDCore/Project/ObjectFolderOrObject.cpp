@@ -263,6 +263,12 @@ void ObjectFolderOrObject::UnserializeFrom(
             make_unique<ObjectFolderOrObject>();
         childObjectFolderOrObject->UnserializeFrom(
             project, childrenElements.GetChild(i), objectsContainer);
+        if (!childObjectFolderOrObject->IsFolder() &&
+            childObjectFolderOrObject->object == nullptr) {
+          // Ignore invalid references to missing objects, that can happen
+          // after manual edits or merges.
+          continue;
+        }
         childObjectFolderOrObject->parent = this;
         children.push_back(std::move(childObjectFolderOrObject));
       }

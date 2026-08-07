@@ -12,6 +12,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/ExtensionDependencyCache.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/AssetResourcePathCleaner.h"
 #include "GDCore/IDE/Project/ResourcesInUseHelper.h"
@@ -42,7 +43,8 @@ ObjectAssetSerializer::GetObjectExtensionName(const gd::Object &object) {
 void ObjectAssetSerializer::SerializeTo(
     gd::Project &project, const gd::Object &object,
     const gd::String &objectFullName, SerializerElement &element,
-    std::vector<gd::String> &usedResourceNames) {
+    std::vector<gd::String> &usedResourceNames,
+    ExtensionDependencyCache &extensionDependencyCache) {
   auto cleanObject = object.Clone();
   cleanObject->GetVariables().Clear();
   cleanObject->GetEffects().Clear();
@@ -110,9 +112,7 @@ void ObjectAssetSerializer::SerializeTo(
     usedResourceNames.push_back(resourceName);
     auto &resource = resourcesManager.GetResource(resourceName);
     SerializerElement &resourceElement = resourcesElement.AddChild("resource");
-    resource.SerializeTo(resourceElement);
-    resourceElement.SetAttribute("kind", resource.GetKind());
-    resourceElement.SetAttribute("name", resource.GetName());
+    gd::ResourcesContainer::SerializeResourceTo(resource, resourceElement);
   }
 
   SerializerElement &requiredExtensionsElement =
@@ -121,10 +121,9 @@ void ObjectAssetSerializer::SerializeTo(
   if (project.HasEventsFunctionsExtensionNamed(extensionName)) {
     auto &eventsFunctionsExtension =
         project.GetEventsFunctionsExtension(extensionName);
-    auto &usedExtensionsResult =
-        gd::UsedExtensionsFinder::ScanEventsFunctionsExtension(
-            project, eventsFunctionsExtension);
-    auto usedExtensionNames = usedExtensionsResult.GetUsedExtensions();
+    auto usedExtensionNames =
+        extensionDependencyCache.FindRequiredExtensionsRecursively(
+            project, eventsFunctionsExtension.GetName());
     // The extension may not use any of its own instructions.
     usedExtensionNames.insert(extensionName);
 

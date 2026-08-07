@@ -59,7 +59,7 @@ type Props = {|
 
 const iconSize = 24;
 
-const getObjectsAndGroupsDataSource = ({
+export const getObjectsAndGroupsDataSource = ({
   project,
   objectsContainersList,
   noGroups,
@@ -135,7 +135,7 @@ export const checkHasRequiredBehaviors = ({
     objectName,
   }).length === 0;
 
-const getMissingBehaviors = ({
+export const getMissingBehaviors = ({
   objectsContainersList,
   requiredBehaviorTypes,
   objectName,

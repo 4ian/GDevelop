@@ -1,0 +1,26 @@
+diff --git a/node_modules/@material-ui/core/ButtonBase/ButtonBase.js b/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
+index 94b4ac5..d5a1177 100644
+--- a/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
++++ b/node_modules/@material-ui/core/ButtonBase/ButtonBase.js
+@@ -157,7 +157,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
+     };
+   }, []);
+   React.useEffect(function () {
+-    if (focusVisible && focusRipple && !disableRipple) {
++    if (focusVisible && focusRipple && !disableRipple && rippleRef.current) {
+       rippleRef.current.pulsate();
+     }
+   }, [disableRipple, focusRipple, focusVisible]);
+diff --git a/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js b/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
+index e340afe..f37af18 100644
+--- a/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
++++ b/node_modules/@material-ui/core/esm/ButtonBase/ButtonBase.js
+@@ -134,7 +134,7 @@ var ButtonBase = /*#__PURE__*/React.forwardRef(function ButtonBase(props, ref) {
+     };
+   }, []);
+   React.useEffect(function () {
+-    if (focusVisible && focusRipple && !disableRipple) {
++    if (focusVisible && focusRipple && !disableRipple && rippleRef.current) {
+       rippleRef.current.pulsate();
+     }
+   }, [disableRipple, focusRipple, focusVisible]);

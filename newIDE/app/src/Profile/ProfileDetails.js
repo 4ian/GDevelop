@@ -21,6 +21,7 @@ import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import {
   communityLinksConfig,
   syncDiscordUsername,
+  syncForumGroup,
 } from '../Utils/GDevelopServices/User';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import IconButton from '../UI/IconButton';
@@ -28,7 +29,7 @@ import Refresh from '../UI/CustomSvgIcons/Refresh';
 import Check from '../UI/CustomSvgIcons/Check';
 import { MarkdownText } from '../UI/MarkdownText';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { canBenefitFromDiscordRole } from '../Utils/GDevelopServices/Usage';
+import { canBenefitFromSocialRole } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const CommunityLinksLines = ({
@@ -136,6 +137,9 @@ const ProfileDetails = ({
     discordUsernameSyncStatus,
     setDiscordUsernameSyncStatus,
   ] = React.useState<null | 'syncing' | 'success'>(null);
+  const [forumGroupSyncStatus, setForumGroupSyncStatus] = React.useState<
+    null | 'syncing' | 'success'
+  >(null);
 
   const onSyncDiscordUsername = React.useCallback(
     async () => {
@@ -173,7 +177,43 @@ const ProfileDetails = ({
     [getAuthorizationHeader, profile, showAlert]
   );
 
-  const canUserBenefitFromDiscordRole = canBenefitFromDiscordRole(subscription);
+  const onSyncForumGroup = React.useCallback(
+    async () => {
+      if (!profile) return;
+      setForumGroupSyncStatus('syncing');
+      try {
+        await syncForumGroup(getAuthorizationHeader, profile.id);
+        setForumGroupSyncStatus('success');
+      } catch (error) {
+        console.error('Error while syncing forum group:', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 400 &&
+          extractedStatusAndCode.code ===
+            'discourse-group-update/discourse-user-not-found'
+        ) {
+          showAlert({
+            title: t`Forum account not found`,
+            message: t`No forum account was found with email ${email ||
+              ''}. Make sure you have created an account on the GDevelop forum with this email.`,
+          });
+          return;
+        }
+        showAlert({
+          title: t`Forum sync failed`,
+          message: t`Something went wrong while syncing your forum access. Please try again later.`,
+        });
+      } finally {
+        setTimeout(() => setForumGroupSyncStatus(null), 3000);
+      }
+    },
+    [getAuthorizationHeader, profile, email, showAlert]
+  );
+
+  const canUserBenefitFromSocialRole = canBenefitFromSocialRole(subscription);
 
   if (!profile) {
     return <PlaceholderLoader />;
@@ -206,52 +246,82 @@ const ProfileDetails = ({
               </Column>
             )}
             {!hideSocials && (
-              <Column noMargin>
-                <LineStackLayout noMargin alignItems="center">
-                  <Text noMargin size="body-small">
-                    <Trans>Discord username</Trans>
-                  </Text>
-                  {canUserBenefitFromDiscordRole && !!discordUsername && (
-                    <IconButton
-                      onClick={onSyncDiscordUsername}
-                      disabled={discordUsernameSyncStatus !== null}
-                      tooltip={t`Sync your role on GDevelop's Discord server`}
-                      size="small"
-                    >
-                      {discordUsernameSyncStatus === 'success' ? (
-                        <Check fontSize="small" />
+              <>
+                <Column noMargin>
+                  <LineStackLayout noMargin alignItems="center">
+                    <Text noMargin size="body-small">
+                      <Trans>Discord username</Trans>
+                    </Text>
+                    {canUserBenefitFromSocialRole && !!discordUsername && (
+                      <IconButton
+                        onClick={onSyncDiscordUsername}
+                        disabled={discordUsernameSyncStatus !== null}
+                        tooltip={t`Sync your role on GDevelop's Discord server`}
+                        size="small"
+                      >
+                        {discordUsernameSyncStatus === 'success' ? (
+                          <Check fontSize="small" />
+                        ) : (
+                          <Refresh fontSize="small" />
+                        )}
+                      </IconButton>
+                    )}
+                  </LineStackLayout>
+                  <Text color={!discordUsername ? 'secondary' : 'primary'}>
+                    {!discordUsername ? (
+                      !canUserBenefitFromSocialRole ? (
+                        <MarkdownText
+                          translatableSource={t`Get access to an exclusive channel on the [GDevelop Discord](https://discord.gg/gdevelop) by subscribing to a Gold, Pro or Education plan.`}
+                        />
                       ) : (
-                        <Refresh fontSize="small" />
-                      )}
-                    </IconButton>
-                  )}
-                </LineStackLayout>
-                <Text color={!discordUsername ? 'secondary' : 'primary'}>
-                  {!discordUsername ? (
-                    !canUserBenefitFromDiscordRole ? (
-                      <MarkdownText
-                        translatableSource={t`Get access to an exclusive channel on the [GDevelop Discord](https://discord.gg/gdevelop) by subscribing to a Gold, Pro or Education plan.`}
-                      />
+                        <MarkdownText
+                          translatableSource={t`Edit your profile and fill your discord username to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        />
+                      )
                     ) : (
-                      <MarkdownText
-                        translatableSource={t`Edit your profile and fill your discord username to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                      />
-                    )
-                  ) : (
-                    <>
-                      {discordUsername}
-                      {!canUserBenefitFromDiscordRole && (
-                        <>
-                          {' - '}
-                          <MarkdownText
-                            translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                          />
-                        </>
-                      )}
-                    </>
-                  )}
-                </Text>
-              </Column>
+                      <>
+                        {discordUsername}
+                        {!canUserBenefitFromSocialRole && (
+                          <>
+                            {' - '}
+                            <MarkdownText
+                              translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Text>
+                </Column>
+                {canUserBenefitFromSocialRole && (
+                  <Column noMargin>
+                    <LineStackLayout noMargin alignItems="center">
+                      <Text noMargin size="body-small">
+                        <Trans>Forum access</Trans>
+                      </Text>
+                      <IconButton
+                        onClick={onSyncForumGroup}
+                        disabled={forumGroupSyncStatus !== null}
+                        tooltip={t`Sync your subscription level on GDevelop's forum`}
+                        size="small"
+                      >
+                        {forumGroupSyncStatus === 'success' ? (
+                          <Check fontSize="small" />
+                        ) : (
+                          <Refresh fontSize="small" />
+                        )}
+                      </IconButton>
+                    </LineStackLayout>
+                    <Text size="body-small" color="secondary">
+                      <Trans>
+                        Your forum account with email {email} will reflect your
+                        subscription level. You can press the sync button to
+                        update it immediately.
+                      </Trans>
+                    </Text>
+                  </Column>
+                )}
+              </>
             )}
             <Column noMargin>
               <Text noMargin size="body-small">

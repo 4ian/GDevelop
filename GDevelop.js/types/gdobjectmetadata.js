@@ -7,6 +7,7 @@ declare class gdObjectMetadata {
   getHelpPath(): string;
   getCategory(): string;
   getAssetStoreTag(): string;
+  setHelpPath(helpPath: string): gdObjectMetadata;
   setCategory(categoryFullName: string): gdObjectMetadata;
   setAssetStoreTag(assetStoreTag: string): gdObjectMetadata;
   addInGameEditorResource(): gdInGameEditorResourceMetadata;

@@ -147,7 +147,7 @@ export const AnnouncementsFeed = ({
                     }
                     hideButtonSize="small"
                     key={announcement.id}
-                    markdownImageOnly={!title}
+                    contentOnly={!title}
                   >
                     {title ? <Text size="block-title">{title}</Text> : null}
                     <div

@@ -21,8 +21,7 @@ const gd: libGDevelop = global.gd;
 
 const emptySearchText = '';
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const noExcludedTiers = new Set();
+const noExcludedTiers = new Set<string>();
 const excludedExperimentalTiers = new Set(['experimental']);
 
 const builtInObjectCategories = [
@@ -362,6 +361,8 @@ export const ObjectStoreStateProvider = ({
               requiredExtensions: repositoryObjectMetadata.requiredExtensions,
 
               // Attributes from the installed extension
+              isDependentWithParent:
+                installedObjectMetadata.isDependentWithParent,
 
               // These ones are less important but its better to use the icon of
               // the installed extension since it's used everywhere in the editor.
@@ -406,8 +407,7 @@ export const ObjectStoreStateProvider = ({
 
   const allCategories = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const categoriesSet = new Set();
+      const categoriesSet = new Set<string>();
       for (const type in allTranslatedObjects) {
         categoriesSet.add(allTranslatedObjects[type].category);
       }
@@ -421,8 +421,7 @@ export const ObjectStoreStateProvider = ({
 
   const filters = React.useMemo(
     () => {
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      const tagsSet = new Set();
+      const tagsSet = new Set<string>();
       for (const type in allTranslatedObjects) {
         const object = allTranslatedObjects[type];
         object.tags.forEach(tag => {

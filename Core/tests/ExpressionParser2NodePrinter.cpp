@@ -91,6 +91,29 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("number", "- + - 000123.4", "-+-123.4");
   }
 
+  SECTION("Negative number literals round-trip") {
+    // A negative number literal is preserved as-is, with no extra space.
+    testPrinter("number", "-123");
+    testPrinter("number", "-3.14");
+    testPrinter("number", "-3.");
+    testPrinter("number", "-.5", "-0.5");
+    testPrinter("number", "-0");
+    testPrinter("number", "-007", "-7");
+  }
+
+  SECTION("Negative numbers inside expressions round-trip") {
+    // `1+-2` keeps the inner negative literal compact while the outer `+` is
+    // spaced like any other binary operator.
+    testPrinter("number", "1+-2", "1 + -2");
+    testPrinter("number", "1--2", "1 - -2");
+    testPrinter("number", "2*-3", "2 * -3");
+    testPrinter("number", "2/-3", "2 / -3");
+    testPrinter("number", "-1+2", "-1 + 2");
+    testPrinter("number", "-1*-2", "-1 * -2");
+    // No spaces are introduced between the leading `-` and the literal.
+    testPrinter("number", "  -123  ", "-123");
+  }
+
   SECTION("Valid unary operators with parenthesis") {
     testPrinter("number", "-(123)");
     testPrinter("number", "+((123))");

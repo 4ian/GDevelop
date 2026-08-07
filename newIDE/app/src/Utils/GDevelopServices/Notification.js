@@ -60,6 +60,12 @@ type ClaimableAssetPackNotification = {
   },
 };
 
+type TeamInvitationNotification = {
+  ...NotificationBaseAttributes,
+  type: 'team-invitation',
+  data: { teamId: string, inviterEmail: string },
+};
+
 type GameSessionsAchievementNotification = {
   ...NotificationBaseAttributes,
   type: 'game-sessions-achievement',
@@ -92,7 +98,8 @@ export type Notification =
   | ClaimableAssetPackNotification
   | OneGameFeedbackReceivedNotification
   | MultipleGameFeedbackReceivedNotification
-  | GameSessionsAchievementNotification;
+  | GameSessionsAchievementNotification
+  | TeamInvitationNotification;
 
 export const listNotifications = async (
   getAuthorizationHeader: () => Promise<string>,

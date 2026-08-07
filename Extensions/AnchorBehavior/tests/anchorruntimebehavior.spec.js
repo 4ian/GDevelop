@@ -38,6 +38,7 @@ describe('gdjs.AnchorRuntimeBehavior', () => {
         title: '',
         behaviorsSharedData: [],
         objects: [],
+        objectsGroups: [],
         instances: [],
         usedResources: [],
         uiSettings: {

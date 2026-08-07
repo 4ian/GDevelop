@@ -538,8 +538,7 @@ export default class Authentication {
     return this.auth.currentUser || null;
   };
 
-  // $FlowFixMe[missing-local-annot]
-  logout = async () => {
+  logout = async (): Promise<void> => {
     try {
       await signOut(this.auth);
       console.log('Logout successful.');
@@ -549,8 +548,9 @@ export default class Authentication {
     }
   };
 
-  // $FlowFixMe[missing-local-annot]
-  deleteAccount = async (getAuthorizationHeader: () => Promise<string>) => {
+  deleteAccount = async (
+    getAuthorizationHeader: () => Promise<string>
+  ): Promise<void> => {
     const { currentUser } = this.auth;
     if (!currentUser) {
       throw new Error('Tried to delete account while not authenticated.');

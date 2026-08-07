@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import VariablesEditorDialog from './VariablesEditorDialog';
+import VariablesEditorDialog, {
+  type VariableDialogOpeningProps,
+} from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
@@ -18,7 +20,7 @@ type Props = {|
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  initiallySelectedVariableName?: string,
+  initiallySelectedVariable: VariableDialogOpeningProps | null,
   onEditObjectVariables: () => void,
   isListLocked: boolean,
 |};
@@ -33,7 +35,7 @@ const ObjectInstanceVariablesDialog = ({
   onCancel,
   onApply,
   hotReloadPreviewButtonProps,
-  initiallySelectedVariableName,
+  initiallySelectedVariable,
   projectScopedContainersAccessor,
   onEditObjectVariables,
   isListLocked,
@@ -90,7 +92,7 @@ const ObjectInstanceVariablesDialog = ({
       title={<Trans>Instance variables</Trans>}
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
-      initiallySelectedVariableName={initiallySelectedVariableName}
+      initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/instance-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="instance-variables-dialog"

@@ -17,6 +17,9 @@ const useStylesForExpandIcon = () =>
         transform: 'rotate(-90deg)',
       },
     },
+    content: {
+      minWidth: 0,
+    },
   }))();
 
 const styles = {
@@ -35,6 +38,7 @@ const styles = {
     alignItems: 'center',
     // Avoids the summary content to overlap the expand icon that was put on the left
     marginLeft: 16,
+    minWidth: 0,
   },
   actionsContainer: { flexGrow: 0, flexShrink: 0, alignSelf: 'center' },
 };
@@ -54,9 +58,9 @@ export const AccordionHeader = (props: AccordionHeadProps): React.Node => {
   const classes = useStylesForExpandIcon();
 
   return (
-    <Column noMargin={props.noMargin} expand>
+    <Column noMargin={props.noMargin} expand noOverflowParent>
       <Line noMargin expand alignItems="center">
-        <Column noMargin expand>
+        <Column noMargin expand noOverflowParent>
           <MUIAccordionSummary
             classes={classes}
             style={styles.accordionSummaryWithExpandOnLeft}

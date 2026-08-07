@@ -12,7 +12,7 @@ declare class gdResourcesContainer {
   getResource(name: string): gdResource;
   getResourceAt(index: number): gdResource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;
-  getResourceNameWithFile(file: string): string;
+  getResourceNamesWithFile(file: string): gdVectorString;
   addResource(res: gdResource): boolean;
   removeResource(name: string): void;
   renameResource(oldName: string, name: string): void;
@@ -21,6 +21,7 @@ declare class gdResourcesContainer {
   moveResourceUpInList(oldName: string): boolean;
   moveResourceDownInList(oldName: string): boolean;
   moveResource(oldIndex: number, newIndex: number): void;
+  static unserializeResourceFrom(resource: gdResource, resourceElement: gdSerializerElement): void;
   delete(): void;
   ptr: number;
 };

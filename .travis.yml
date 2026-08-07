@@ -9,6 +9,9 @@ language: cpp
 sudo: false
 compiler:
   - clang
+branches:
+  only:
+    - master
 
 # Cache .npm folder for faster npm install
 cache:
@@ -55,7 +58,7 @@ install:
 script:
   # GDCore tests:
   - cd .build-tests
-  - Core/GDCore_tests
+  - for i in {1..20}; do echo "Run $i"; Core/GDCore_tests; done
   - cd ..
   # GDevelop.js tests
   - cd GDevelop.js

@@ -4,8 +4,8 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
-  type VariableDialogOpeningProps,
 } from './VariableField';
+import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import ObjectGroupVariablesDialog from '../../VariablesList/ObjectGroupVariablesDialog';
 import {
@@ -163,8 +163,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     );
 
     const onComputeAllVariableNames = React.useCallback(
-      () => {
-        // $FlowFixMe[missing-empty-array-annot]
+      (): Array<string> => {
         if (!project || !layout || !objectName) return [];
 
         return EventsRootVariablesFinder.findAllObjectVariables(
@@ -198,7 +197,9 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={canObjectDeclareVariable ? setEditorOpen : null}
+          openVariableEditorDialog={
+            canObjectDeclareVariable ? setEditorOpen : null
+          }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           projectScopedContainersAccessor={projectScopedContainersAccessor}
@@ -210,6 +211,8 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
           getVariableSourceFromIdentifier={getVariableSourceFromIdentifier}
+          editEventsFunctionParameter={null}
+          openEventsBasedEntityPropertyEditorDialog={null}
         />
         {editorOpen &&
           project &&
@@ -224,8 +227,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               open
               onCancel={() => setEditorOpen(null)}
               onApply={onVariableEditorApply}
-              initiallySelectedVariableName={editorOpen.variableName}
-              shouldCreateInitiallySelectedVariable={editorOpen.shouldCreate}
+              initiallySelectedVariable={editorOpen}
               onComputeAllVariableNames={onComputeAllVariableNames}
               hotReloadPreviewButtonProps={null}
               isListLocked={false}

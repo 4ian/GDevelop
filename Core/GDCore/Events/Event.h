@@ -12,6 +12,7 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -43,6 +44,8 @@ typedef std::shared_ptr<BaseEvent> BaseEventSPtr;
 class GD_CORE_API BaseEvent {
  public:
   BaseEvent();
+  BaseEvent(const BaseEvent& other);
+  BaseEvent& operator=(const BaseEvent& other);
   virtual ~BaseEvent(){};
 
   /**
@@ -116,6 +119,26 @@ class GD_CORE_API BaseEvent {
    * \warning This is only applicable when CanHaveVariables() return true.
    */
   bool HasVariables() const;
+
+  /**
+   * \brief Return the instruction list identified by \a label, or nullptr if
+   * the event has no such list.
+   *
+   * Supported labels are "conditions", "actions", and "whileConditions" (only
+   * for WhileEvent). Derived classes should override this; the base
+   * implementation always returns nullptr.
+   */
+  virtual gd::InstructionsList* GetInstructionList(const gd::String& label) {
+    return nullptr;
+  };
+  virtual const gd::InstructionsList* GetInstructionList(
+      const gd::String& label) const {
+    return nullptr;
+  };
+
+  static const gd::String conditionsLabel;
+  static const gd::String actionsLabel;
+  static const gd::String whileConditionsLabel;
 
   /**
    * \brief Return a list of all conditions of the event.
@@ -322,6 +345,7 @@ class GD_CORE_API BaseEvent {
 
   static gd::EventsList badSubEvents;
   static gd::VariablesContainer badLocalVariables;
+  gd::MemoryTracked _memoryTracked{this, "BaseEvent"};
 };
 
 /**

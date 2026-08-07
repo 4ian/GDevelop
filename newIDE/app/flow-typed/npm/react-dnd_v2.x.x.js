@@ -1,5 +1,5 @@
-// flow-typed signature: 0df5fbd2d164ee9c137293cbb8debfeb
-// flow-typed version: 4618dcebd8/react-dnd_v2.x.x/flow_>=v0.98.x
+// flow-typed signature: react-dnd_v14
+// Manually updated for react-dnd v14 (decorators + DndProvider)
 
 declare module "react-dnd" {
   declare type Identifier = string;
@@ -190,28 +190,39 @@ declare module "react-dnd" {
     ...
   };
 
-  declare function DragLayer<OP: {...}, CP: {...}>(
-    collect: (monitor: DragLayerMonitor) => CP,
-    options?: DndOptions<OP>
-  ): Connector<$Shape<OP & CP>, CP>;
-
-  // Drag Drop Context
+  // DndProvider (v14+)
   // ----------------------------------------------------------------------
 
-  declare type ProviderProps = {
-    backend: mixed,
-    children: React$Element<any>,
-    window?: Object,
+  declare type DndProviderProps = {
+    backend: any,
+    options?: Object,
+    children: React$Node,
     ...
   };
 
-  declare class DragDropContextProvider<ProviderProps> extends React$Component<
-    ProviderProps
-  > {
-    props: ProviderProps;
-  }
+  declare var DndProvider: React$ComponentType<DndProviderProps>;
 
-  declare function DragDropContext<OP: {...}, CP: {...}>(
-    backend: mixed
-  ): Connector<$Shape<OP & CP>, CP>;
+  // useDragDropManager (v11+)
+  // ----------------------------------------------------------------------
+
+  declare type DragDropMonitor = {
+    isDragging(): boolean,
+    getClientOffset(): ClientOffset | null,
+    ...
+  };
+
+  declare type DragDropActions = {
+    endDrag(): void,
+    ...
+  };
+
+  declare type DragDropManager = {
+    getMonitor(): DragDropMonitor,
+    getActions(): DragDropActions,
+    ...
+  };
+
+  declare function useDragDropManager(): DragDropManager;
+
+  declare function useDragLayer<T>(collect: (monitor: DragLayerMonitor) => T): T;
 }

@@ -58,7 +58,9 @@ type CommandHandlers = {|
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
+  onReloadProject: () => Promise<void>,
   onExportGame: () => void,
+  onExportHtml5External: () => void | Promise<void>,
   onInviteCollaborators: () => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
@@ -67,6 +69,11 @@ type CommandHandlers = {|
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
+  onOpenGlobalSearch: () => void,
+  onOpenMemoryTrackerRegistry: () => void,
+  onImportExtension: () => Promise<void>,
+  canInstallCliInPath: boolean,
+  onInstallCliInPath: () => void | Promise<void>,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -148,8 +155,16 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onCloseProject,
   });
 
+  useCommand('RELOAD_PROJECT', !!handlers.project, {
+    handler: handlers.onReloadProject,
+  });
+
   useCommand('EXPORT_GAME', !!handlers.project, {
     handler: handlers.onExportGame,
+  });
+
+  useCommand('EXPORT_HTML5_EXTERNAL', !!handlers.project, {
+    handler: handlers.onExportHtml5External,
   });
 
   useCommand('INVITE_COLLABORATORS', !!handlers.project, {
@@ -160,12 +175,28 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     handler: handlers.onOpenCommandPalette,
   });
 
+  useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {
+    handler: handlers.onOpenGlobalSearch,
+  });
+
+  useCommand('IMPORT_EXTENSION', !!handlers.project, {
+    handler: handlers.onImportExtension,
+  });
+
   const onRestartInGameEditor = handlers.onRestartInGameEditor;
   useCommand('RESTART_IN_GAME_EDITOR', true, {
     handler: React.useCallback(
       () => onRestartInGameEditor('relaunched-manually'),
       [onRestartInGameEditor]
     ),
+  });
+
+  useCommand('OPEN_MEMORY_TRACKER_REGISTRY', true, {
+    handler: handlers.onOpenMemoryTrackerRegistry,
+  });
+
+  useCommand('INSTALL_CLI_IN_PATH', handlers.canInstallCliInPath, {
+    handler: handlers.onInstallCliInPath,
   });
 
   useCommandWithOptions('OPEN_LAYOUT', !!handlers.project, {

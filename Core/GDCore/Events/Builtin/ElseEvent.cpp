@@ -18,6 +18,18 @@ ElseEvent::ElseEvent()
 
 ElseEvent::~ElseEvent(){};
 
+gd::InstructionsList* ElseEvent::GetInstructionList(const gd::String& label) {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+const gd::InstructionsList* ElseEvent::GetInstructionList(
+    const gd::String& label) const {
+  if (label == BaseEvent::conditionsLabel) return &conditions;
+  if (label == BaseEvent::actionsLabel) return &actions;
+  return nullptr;
+}
+
 vector<const gd::InstructionsList*> ElseEvent::GetAllConditionsVectors() const {
   vector<const gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);

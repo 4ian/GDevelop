@@ -567,8 +567,7 @@ export const useManageEffects = ({
   );
 
   const pasteEffects = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    async effectInsertionIndex => {
+    async (effectInsertionIndex: number) => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
       if (!effectContents) return;

@@ -181,8 +181,23 @@ export type User = {|
   +password?: ?string,
 |};
 
-export type Team = {| id: string, createdAt: number, seats: number |};
+export type Team = {|
+  id: string,
+  createdAt: number,
+  seats: number,
+  /**
+   * Overrides applied to the `classrooms` capability of the students of this
+   * team. Keys mirror the `classrooms` capability of the limits.
+   */
+  classrooms?: ?{| hideAskAi: boolean |},
+|};
 export type TeamGroup = {| id: string, name: string |};
+export type TeamInvitation = {|
+  teamId: string,
+  userId: string,
+  email: string,
+  createdAt: number,
+|};
 export type TeamMembership = {|
   userId: string,
   teamId: string,
@@ -339,6 +354,24 @@ export const updateGroup = async (
   });
 };
 
+export const updateTeam = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  attributes: {| classrooms: {| hideAskAi: boolean |} |}
+): Promise<Team> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.patch(`/team/${teamId}`, attributes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/team/{id} of User API',
+  });
+};
+
 export const createGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -401,9 +434,11 @@ export const updateUserGroup = async (
   teamId: string,
   groupId: string,
   userId: string
-): Promise<Array<TeamGroup>> => {
+): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await client.post(
+  // The endpoint responds with a simple 'OK' string, so don't try
+  // to validate the response content.
+  await client.post(
     `/team/${teamId}/action/update-members`,
     [{ groupId, userId }],
     {
@@ -411,10 +446,6 @@ export const updateUserGroup = async (
       params: { userId: adminUserId },
     }
   );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/team/{id}/action/update-members of User API',
-  });
 };
 
 export const getUserPublicProfilesByIds = async (
@@ -529,6 +560,61 @@ export const createTeamMembers = async (
   });
 };
 
+export const listTeamInvitations = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, teamId }: {| userId: string, teamId: string |}
+): Promise<Array<TeamInvitation>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/team/${teamId}/invitation`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return ensureIsArray({
+    data: response.data,
+    endpointName: '/team/{id}/invitation of User API',
+  });
+};
+
+export const acceptTeamInvitation = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { userId, teamId }: {| userId: string, teamId: string |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/accept-invitation`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
+export const setUserAsMember = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    email,
+    activate,
+    teamId,
+    adminUserId,
+  }: {|
+    email: string,
+    activate: boolean,
+    teamId: string,
+    adminUserId: string,
+  |}
+) => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/team/${teamId}/action/set-member`,
+    { email, activate },
+    {
+      params: { userId: adminUserId },
+      headers: { Authorization: authorizationHeader },
+    }
+  );
+};
+
 export const setUserAsAdmin = async (
   getAuthorizationHeader: () => Promise<string>,
   {
@@ -576,6 +662,21 @@ export const syncDiscordUsername = async (
   const authorizationHeader = await getAuthorizationHeader();
   await client.post(
     `/user/${userId}/action/update-discord-role`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+};
+
+export const syncForumGroup = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/user/${userId}/action/update-discourse-group`,
     {},
     {
       headers: { Authorization: authorizationHeader },

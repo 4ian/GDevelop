@@ -166,9 +166,70 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
 
-  SECTION("Valid unary operator generation") {
+  SECTION("Valid negative number generation") {
     {
       auto node = parser.ParseExpression("-12.45");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "-12.45");
+    }
+    {
+      auto node = parser.ParseExpression("12.5 + -2.  /   (.3)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -2. / (0.3)");
+    }
+    // `--3` is a unary minus on the negative literal -3 (no extra unary wrap
+    // around the inner -3 because it's a NumberNode, not a UnaryOperatorNode).
+    {
+      auto node = parser.ParseExpression("--3");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "-(-3)");
+    }
+    // `1 - -2` becomes JS-friendly `1 - -2` (the negative literal is emitted
+    // as-is on the right side of the binary subtract).
+    {
+      auto node = parser.ParseExpression("1 - -2");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "1 - -2");
+    }
+    // A negative literal as a function argument is emitted without an extra
+    // unary wrapper.
+    {
+      auto node = parser.ParseExpression(
+          "MyExtension::GetNumberWith3Params(-1, \"hello\", -2.5)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getNumberWith3Params(-1, \"hello\", -2.5)");
+    }
+  }
+
+  SECTION("Valid unary operator generation") {
+    {
+      auto node = parser.ParseExpression("- 12.45");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
                                                           codeGenerator,
@@ -178,7 +239,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "-(12.45)");
     }
     {
-      auto node = parser.ParseExpression("12.5 + -2.  /   (.3)");
+      auto node = parser.ParseExpression("12.5 + - 2.  /   (.3)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
                                                           codeGenerator,

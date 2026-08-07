@@ -7,7 +7,7 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
-  executableEventContainer,
+  conditionsActionsContainer,
   disabledText,
   instructionParameter,
   instructionInvalidParameter,
@@ -102,6 +102,20 @@ export default class RepeatEvent extends React.Component<
     });
   };
 
+  applyEditing = () => {
+    const repeatEvent = gd.asRepeatEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (
+      editingPreviousValue != null &&
+      editingPreviousValue !==
+        repeatEvent.getRepeatExpression().getPlainString()
+    ) {
+      // Value changed: record the change in the history (this also flags the project as having unsaved changes).
+      this.props.onEndEditingEvent();
+    }
+    this.endEditing();
+  };
+
   render(): any {
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
@@ -123,7 +137,6 @@ export default class RepeatEvent extends React.Component<
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
-          [executableEventContainer]: true,
         })}
       >
         <VariableDeclarationsList
@@ -195,6 +208,9 @@ export default class RepeatEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           eventsSheetWidth={this.props.eventsSheetWidth}
+          className={classNames({
+            [conditionsActionsContainer]: true,
+          })}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
               platform={this.props.project.getCurrentPlatform()}
@@ -226,6 +242,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
           renderActionsList={({ className }) => (
@@ -263,6 +281,8 @@ export default class RepeatEvent extends React.Component<
                 this.props.projectScopedContainersAccessor
               }
               idPrefix={this.props.idPrefix}
+              highlightedSearchText={this.props.highlightedSearchText}
+              highlightedSearchMatchCase={this.props.highlightedSearchMatchCase}
             />
           )}
         />
@@ -270,7 +290,7 @@ export default class RepeatEvent extends React.Component<
           open={this.state.editing}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.cancelEditing}
-          onApply={this.endEditing}
+          onApply={this.applyEditing}
         >
           <ExpressionField
             project={this.props.project}

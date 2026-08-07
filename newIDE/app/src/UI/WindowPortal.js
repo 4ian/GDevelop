@@ -1,0 +1,417 @@
+// @flow
+import * as React from 'react';
+import { t } from '@lingui/macro';
+import ReactDOM from 'react-dom';
+import PortalContainerContext from './PortalContainerContext';
+import Window from '../Utils/Window';
+import {
+  registerDocumentTargetId,
+  unregisterDocumentTargetId,
+} from '../Utils/Window';
+import useAlertDialog from './Alert/useAlertDialog';
+import { getThemeWindowBackgroundColor } from './Theme';
+import { silenceBenignResizeObserverError } from '../Utils/SilenceBenignResizeObserverError';
+
+// There is a high chance of FS operations running while an Electron window is closing.
+// We run into "Uncaught illegal access" errors from V8/Chrome/Electron on Electron when these
+// FS operations are running while a BrowserWindow is destroyed (see WindowPortal).
+// These "Uncaught illegal access" have no stacktrace, which seems to indicate a problem
+// deep in Electron or related.
+//
+// We can't risk this.
+//
+// To avoid this, we use `startWindowClosingIfSafe`/`waitToSafelyStartWindowClosing` to only
+// trigger the closing of a window when it's safe to do so. Conversely, when a window is closing,
+// FS operations will be prevented.
+import {
+  notifyWindowClosed,
+  startWindowClosingIfSafe,
+  waitToSafelyStartWindowClosing,
+} from '../Utils/ElectronConflictingOperationsMutex';
+
+let popOutCounter = 0;
+
+type Props = {|
+  /** The title of the new window. */
+  title: string,
+  /** The content to render in the new window. */
+  renderContent: (props: {
+    windowSize: { width: number, height: number },
+  }) => React.Node,
+  /** Called when the external window is closed by the user. */
+  onClose: () => void,
+  /** Initial width for the new window. */
+  initialWidth: number,
+  /** Initial height for the new window. */
+  initialHeight: number,
+  /** Called when the external window is ready (or null when closing). */
+  onWindowReady: (externalWindow: any) => void,
+|};
+
+/**
+ * A component that renders its children into a separate browser window
+ * using a React portal. Styles from the parent window are copied over
+ * so that Material-UI and GDevelop themes work correctly.
+ *
+ * It also provides a PortalContainerContext so that Material-UI overlays
+ * (Dialog, Menu, Popover, Tooltip, Popper) render inside this window
+ * instead of the main window.
+ *
+ * When the external window is closed, `onClose` is called.
+ * When this component unmounts, the external window is closed.
+ */
+const WindowPortal = ({
+  title,
+  renderContent,
+  onClose,
+  initialWidth,
+  initialHeight,
+  onWindowReady,
+}: Props): React.Node => {
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
+  const externalWindowRef = React.useRef<any>(null);
+  const onCloseRef = React.useRef(onClose);
+  onCloseRef.current = onClose;
+  const onWindowReadyRef = React.useRef(onWindowReady);
+  onWindowReadyRef.current = onWindowReady;
+  const closedRef = React.useRef(false);
+  const [windowSize, setWindowSize] = React.useState<{
+    width: number,
+    height: number,
+  } | null>(null);
+  const { showAlert } = useAlertDialog();
+
+  React.useEffect(() => {
+    // Guard against calling onClose multiple times.
+    const handleClose = () => {
+      if (closedRef.current) return;
+      closedRef.current = true;
+      onCloseRef.current();
+    };
+
+    // Open a new blank window.
+    const left = window.screenX + (window.outerWidth - initialWidth) / 2;
+    const top = window.screenY + (window.outerHeight - initialHeight) / 2;
+    const themeBackgroundColor = getThemeWindowBackgroundColor();
+    const features = `width=${initialWidth},height=${initialHeight},left=${left},top=${top},resizable=yes,scrollbars=yes,themeBackgroundColor=${encodeURIComponent(
+      themeBackgroundColor
+    )}`;
+
+    const targetId = `GDevelopWindowPortal${++popOutCounter}`;
+    const externalWindow = window.open('', targetId, features);
+
+    if (!externalWindow) {
+      showAlert({
+        title: t`Unable to open this window`,
+        message: t`Please check if popups are blocked in your browser settings.`,
+      });
+      handleClose();
+      return;
+    }
+
+    externalWindowRef.current = externalWindow;
+
+    // Apply the theme background color as early as possible to avoid a white flash.
+    externalWindow.document.body.style.backgroundColor = themeBackgroundColor;
+
+    // Register the targetId for this document so we can retrieve it later.
+    registerDocumentTargetId(externalWindow.document, targetId);
+
+    // Set up the new window's document.
+    externalWindow.document.title = title;
+
+    // Set a <base> tag so that relative URLs (e.g. script src for Monaco
+    // AMD loader) resolve against the main window's origin, since the
+    // popped-out window starts as about:blank.
+    const baseTag = externalWindow.document.createElement('base');
+    baseTag.href = window.location.href;
+    if (externalWindow.document.head)
+      externalWindow.document.head.appendChild(baseTag);
+
+    // Add a <meta name="theme-color"> tag so that
+    // Window.setWindowBackgroundColor can update it for this window.
+    const metaThemeColor = externalWindow.document.createElement('meta');
+    metaThemeColor.name = 'theme-color';
+    metaThemeColor.content = '#000000';
+    if (externalWindow.document.head)
+      externalWindow.document.head.appendChild(metaThemeColor);
+
+    // Create a container div in the new window.
+    const containerDiv = externalWindow.document.createElement('div');
+    containerDiv.id = 'window-portal-root';
+    containerDiv.className = 'popped-out-frame';
+    externalWindow.document.body.appendChild(containerDiv);
+
+    // Style the body of the new window to match the parent.
+    externalWindow.document.body.style.margin = '0';
+    externalWindow.document.body.style.padding = '0';
+    externalWindow.document.body.style.overflow = 'hidden';
+
+    // Make the container fill the window.
+    containerDiv.style.width = '100vw';
+    containerDiv.style.height = '100vh';
+    containerDiv.style.display = 'flex';
+    containerDiv.style.flexDirection = 'column';
+
+    // Copy the body class from the parent (used for GDevelop theme).
+    if (document.body) {
+      externalWindow.document.body.className = document.body.className;
+    }
+
+    // Copy all stylesheets from parent window to the new window.
+    // MUI/JSS styles for components rendered in this window are handled
+    // separately by a dedicated JSS instance in FullThemeProvider (via
+    // portalContainer context), so this mainly copies static CSS files
+    // and pre-existing global styles.
+    const styleObserver = copyDocumentStyles(document, externalWindow.document);
+
+    // Suppress the benign "ResizeObserver loop" error in the external window
+    // so that it doesn't propagate to the main window's error handler.
+    silenceBenignResizeObserverError(externalWindow);
+
+    // Set up context menu in the new window (works for both Electron and web).
+    Window.setUpContextMenu(externalWindow);
+
+    // Listen for the external window being closed.
+    const checkClosed: IntervalID = setInterval(() => {
+      if (externalWindow.closed) {
+        clearInterval(checkClosed);
+
+        // The window is now considered as fully closed, so we can notify it's the case
+        // which will let conflicting operations able to run.
+        notifyWindowClosed(targetId);
+
+        // Only call "handleClose" once the window is fully closed.
+        handleClose();
+      }
+    }, 250);
+
+    // Close the popped-out window when the main window/tab is closed.
+    // In Electron, child windows are automatically destroyed with the parent,
+    // but in the web app, React components don't unmount on tab close so the
+    // cleanup in the useEffect return function never fires — leaving "dead"
+    // popped-out windows open.
+    // We use "unload" rather than "beforeunload" because beforeunload fires
+    // before the user confirms the browser's "leave page?" dialog (triggered
+    // by CloseConfirmDialog). "unload" only fires after the user confirms,
+    // so we don't close popped-out windows when the user cancels.
+    const handleMainWindowUnload = () => {
+      if (!externalWindow.closed) {
+        externalWindow.close();
+      }
+    };
+    window.addEventListener('unload', handleMainWindowUnload);
+
+    // Listen to "beforeunload" to know when a window is being closed.
+    externalWindow.addEventListener('beforeunload', event => {
+      // Disconnect as soon as possible to avoid any further interactions with the window.
+      if (styleObserver) styleObserver.disconnect();
+      if (observer) observer.disconnect();
+
+      // Notify the window wants to be closed.
+      const isSafeToClose = startWindowClosingIfSafe(targetId);
+
+      if (!isSafeToClose) {
+        // Something (a FS operation) is preventing the window from closing.
+        // Only close it later, when it's safe to do so.
+        console.info(
+          `Window "${targetId}" is prevented from closing (beforeunload event) as unsafe.`
+        );
+
+        (async () => {
+          await waitToSafelyStartWindowClosing(targetId);
+          console.info(
+            `Triggering close of window "${targetId}" (after previously prevented unload)...`
+          );
+          externalWindow.close(); // It's now safe to close the window.
+        })();
+
+        // Prevent the window from closing immediately in the meantime.
+        event.preventDefault();
+        event.returnValue = 'Waiting for the window to be closed...';
+        return;
+      }
+
+      // Let the window closing be done normally (nothing prevents it).
+      console.info(`Window "${targetId}" is unloaded.`);
+    });
+
+    setContainer(containerDiv);
+
+    // Listen for the size of the container div.
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setWindowSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(containerDiv);
+
+    onWindowReadyRef.current(externalWindow);
+
+    return () => {
+      onWindowReadyRef.current(null);
+
+      // Component is unmounted: deconnect listeners and clear things...
+      if (styleObserver) styleObserver.disconnect();
+      if (observer) observer.disconnect();
+      window.removeEventListener('unload', handleMainWindowUnload);
+      unregisterDocumentTargetId(externalWindow.document);
+
+      // ...and close the window if it's not already.
+      if (!externalWindow.closed) {
+        (async () => {
+          await waitToSafelyStartWindowClosing(targetId);
+          console.info(
+            `Triggering close of window "${targetId}" (WindowPortal unmounted)...`
+          );
+          externalWindow.close(); // It's now safe to close the window.
+        })();
+      }
+      externalWindowRef.current = null;
+    };
+    // We intentionally only run this effect once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update the title if it changes.
+  React.useEffect(
+    () => {
+      if (externalWindowRef.current && !externalWindowRef.current.closed) {
+        externalWindowRef.current.document.title = title;
+      }
+    },
+    [title]
+  );
+
+  if (!container) return null;
+
+  // Provide the external window's document.body as the portal container
+  // for MUI overlay components (Dialog, Menu, Popover, Tooltip, Drawer).
+  // Using document.body (rather than the container div) is important because:
+  // 1. MUI's Modal/Popover positioning assumes the container is the viewport root.
+  // 2. ContextMenu uses anchorReference="anchorPosition" (no anchorEl), so MUI
+  //    derives ownerDocument from the container — must be the external window's body.
+  // 3. ClickAwayListener (used by InlinePopover) attaches event listeners to
+  //    ownerDocument of the portal content — must be the external window's document.
+  const portalBody = container.ownerDocument
+    ? container.ownerDocument.body
+    : container;
+
+  return ReactDOM.createPortal(
+    <PortalContainerContext.Provider value={portalBody}>
+      {windowSize && renderContent({ windowSize })}
+    </PortalContainerContext.Provider>,
+    container
+  );
+};
+
+/**
+ * Copy the CSS content of a <style> element to the target document.
+ * Handles both textContent-based styles and CSSOM-inserted rules
+ * (e.g., from style-loader using insertRule).
+ */
+function copyStyleElementToDocument(
+  sourceStyleEl: HTMLElement,
+  targetDocument: Document
+) {
+  const newStyle = targetDocument.createElement('style');
+
+  // Copy data attributes that MUI/JSS uses to identify style sheets.
+  if (sourceStyleEl instanceof HTMLElement) {
+    const metaAttr = sourceStyleEl.getAttribute('data-meta');
+    if (metaAttr) newStyle.setAttribute('data-meta', metaAttr);
+    const jssAttr = sourceStyleEl.getAttribute('data-jss');
+    if (jssAttr) newStyle.setAttribute('data-jss', jssAttr);
+  }
+
+  // First try textContent (works when style-loader sets text directly).
+  if (sourceStyleEl.textContent) {
+    newStyle.textContent = sourceStyleEl.textContent;
+  } else if (sourceStyleEl instanceof HTMLStyleElement && sourceStyleEl.sheet) {
+    // Fallback: copy CSS rules from the CSSOM (handles style-loader's
+    // insertRule mode where textContent is empty).
+    try {
+      const rules = sourceStyleEl.sheet.cssRules;
+      let cssText = '';
+      for (let i = 0; i < rules.length; i++) {
+        cssText += rules[i].cssText + '\n';
+      }
+      if (cssText) newStyle.textContent = cssText;
+    } catch (e) {
+      // Cross-origin stylesheets can't be read – skip silently.
+    }
+  }
+
+  if (targetDocument.head) targetDocument.head.appendChild(newStyle);
+}
+
+/**
+ * Copy a <link rel="stylesheet"> element to the target document.
+ */
+function copyLinkElementToDocument(
+  sourceLinkEl: HTMLLinkElement,
+  targetDocument: Document
+) {
+  const newLink = targetDocument.createElement('link');
+  newLink.rel = 'stylesheet';
+  newLink.href = sourceLinkEl.href;
+  if (sourceLinkEl.type) newLink.type = sourceLinkEl.type;
+
+  if (targetDocument.head) targetDocument.head.appendChild(newLink);
+}
+
+/**
+ * Copy all <style> and <link rel="stylesheet"> elements from the
+ * source document to the target document. This ensures Material-UI
+ * injected styles and CSS files are available in the new window.
+ */
+function copyDocumentStyles(
+  sourceDocument: Document,
+  targetDocument: Document
+): MutationObserver | null {
+  if (!sourceDocument || !targetDocument) return null;
+
+  // Copy <style> elements (Material-UI injects styles this way).
+  const styleElements = sourceDocument.querySelectorAll('style');
+  styleElements.forEach(styleEl => {
+    copyStyleElementToDocument(styleEl, targetDocument);
+  });
+
+  // Copy <link rel="stylesheet"> elements.
+  const linkElements = sourceDocument.querySelectorAll(
+    'link[rel="stylesheet"]'
+  );
+  linkElements.forEach(linkEl => {
+    if (!(linkEl instanceof HTMLLinkElement)) return;
+    copyLinkElementToDocument(linkEl, targetDocument);
+  });
+
+  // Set up a MutationObserver to copy new <style> and <link> elements as
+  // they are added (Material-UI adds styles lazily when components mount,
+  // and webpack may add <link> elements for dynamically loaded CSS chunks).
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (node.nodeName === 'STYLE') {
+          copyStyleElementToDocument((node: any), targetDocument);
+        } else if (
+          node.nodeName === 'LINK' &&
+          node instanceof HTMLLinkElement &&
+          node.rel === 'stylesheet'
+        ) {
+          copyLinkElementToDocument(node, targetDocument);
+        }
+      });
+    });
+  });
+  if (sourceDocument.head)
+    observer.observe(sourceDocument.head, { childList: true });
+  else console.error('copyDocumentStyles: Source document has no head.');
+
+  return observer;
+}
+
+export default WindowPortal;

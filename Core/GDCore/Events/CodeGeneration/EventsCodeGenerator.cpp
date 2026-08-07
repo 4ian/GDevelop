@@ -950,12 +950,14 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
+    // This is duplicated in `InstructionSentenceFormatter::GetFormattedParameterValue`.
     argOutput += (parameterString == "yes" || parameterString == "oui")
                      ? GenerateTrue()
                      : GenerateFalse();
   } else if (metadata.GetType() == "trueorfalse") {
     auto parameterString = parameter.GetPlainString();
-    // This is duplicated in AdvancedExtension.cpp for GDJS
+    // This is duplicated in `AdvancedExtension.cpp` for GDJS and in
+    // `InstructionSentenceFormatter::GetFormattedParameterValue`.
     argOutput += (parameterString == "True" || parameterString == "Vrai")
                      ? GenerateTrue()
                      : GenerateFalse();

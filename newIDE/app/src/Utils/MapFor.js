@@ -41,9 +41,9 @@ const mapReverseFor = /*:: <T> */ (
 };
 
 /*flow-include
-type CppVector<T> = {
-  +size: () => number,
-  +at: (number) => T,
+interface CppVector<T> {
+  size(): number;
+  at(number): T;
 }
 */
 

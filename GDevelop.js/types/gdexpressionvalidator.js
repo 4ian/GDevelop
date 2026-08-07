@@ -3,6 +3,7 @@ declare class gdExpressionValidator extends gdExpressionParser2NodeWorker {
   constructor(platform: gdPlatform, projectScopedContainers: gdProjectScopedContainers, rootType: string, extraInfo: string): void;
   getAllErrors(): gdVectorExpressionParserError;
   getFatalErrors(): gdVectorExpressionParserError;
+  getDeprecationWarnings(): gdVectorExpressionParserError;
   delete(): void;
   ptr: number;
 };

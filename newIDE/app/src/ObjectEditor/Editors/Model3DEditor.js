@@ -32,6 +32,7 @@ import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import * as THREE from 'three';
 import { PropertyCheckbox, PropertyField } from './PropertyFields';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
+import { ChoiceProperty } from '../../BehaviorsEditor/Editors/Physics2Editor';
 
 const gd: libGDevelop = global.gd;
 
@@ -188,8 +189,7 @@ const Model3DEditor = ({
     properties.get('originLocation').getValue()
   );
   const onOriginLocationChange = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (event, index: number, newValue: string) => {
+    (event: any, index: number, newValue: string) => {
       onChangeProperty('originLocation', newValue);
       setOriginLocation(newValue);
     },
@@ -573,99 +573,27 @@ const Model3DEditor = ({
             expand
             noColumnMargin
           >
-            <SelectField
-              value={originLocation}
-              floatingLabelText={properties.get('originLocation').getLabel()}
-              helperMarkdownText={properties
-                .get('originLocation')
-                .getDescription()}
-              onChange={onOriginLocationChange}
-              fullWidth
-            >
-              <SelectOption
-                label={t`Model origin`}
-                value="ModelOrigin"
-                key="ModelOrigin"
-              />
-              <SelectOption
-                label={t`Top-left corner`}
-                value="TopLeft"
-                key="TopLeftCorner"
-              />
-              <SelectOption
-                label={t`Object center`}
-                value="ObjectCenter"
-                key="ObjectCenter"
-              />
-              <SelectOption
-                label={t`Bottom center (on Z axis)`}
-                value="BottomCenterZ"
-                key="BottomCenterZ"
-              />
-              <SelectOption
-                label={t`Bottom center (on Y axis)`}
-                value="BottomCenterY"
-                key="BottomCenterY"
-              />
-            </SelectField>
-            <SelectField
-              value={properties.get('centerLocation').getValue()}
-              floatingLabelText={properties.get('centerLocation').getLabel()}
-              helperMarkdownText={properties
-                .get('centerLocation')
-                .getDescription()}
-              onChange={(event, index, newValue) => {
+            <ChoiceProperty
+              properties={properties}
+              propertyName={'originLocation'}
+              onUpdate={onOriginLocationChange}
+            />
+            <ChoiceProperty
+              properties={properties}
+              propertyName={'centerLocation'}
+              onUpdate={(e, i, newValue: string) => {
                 onChangeProperty('centerLocation', newValue);
               }}
-              fullWidth
-            >
-              <SelectOption
-                label={t`Model origin`}
-                value="ModelOrigin"
-                key="ModelOrigin"
-              />
-              <SelectOption
-                label={t`Object center`}
-                value="ObjectCenter"
-                key="ObjectCenter"
-              />
-              <SelectOption
-                label={t`Bottom center (on Z axis)`}
-                value="BottomCenterZ"
-                key="BottomCenterZ"
-              />
-              <SelectOption
-                label={t`Bottom center (on Y axis)`}
-                value="BottomCenterY"
-                key="BottomCenterY"
-              />
-            </SelectField>
+            />
           </ResponsiveLineStackLayout>
           <Text size="block-title">Lighting</Text>
-          <SelectField
-            value={properties.get('materialType').getValue()}
-            floatingLabelText={properties.get('materialType').getLabel()}
-            helperMarkdownText={properties.get('materialType').getDescription()}
-            onChange={(event, index, newValue) => {
+          <ChoiceProperty
+            properties={properties}
+            propertyName={'materialType'}
+            onUpdate={(e, i, newValue: string) => {
               onChangeProperty('materialType', newValue);
             }}
-          >
-            <SelectOption
-              label={t`No lighting effect`}
-              value="Basic"
-              key="Basic"
-            />
-            <SelectOption
-              label={t`Emit all ambient light`}
-              value="StandardWithoutMetalness"
-              key="StandardWithoutMetalness"
-            />
-            <SelectOption
-              label={t`Keep model material`}
-              value="KeepOriginal"
-              key="KeepOriginal"
-            />
-          </SelectField>
+          />
           {properties.get('materialType').getValue() !== 'Basic' &&
             !hasLight(layout) && (
               <AlertMessage kind="error">

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
+import { I18n } from '@lingui/react';
 
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -15,6 +16,7 @@ import PreferencesContext, {
 } from '../../../MainFrame/Preferences/PreferencesContext';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
+import { BehaviorStoreStateProvider } from '../../../AssetStore/BehaviorStore/BehaviorStoreContext';
 
 export default {
   title: 'EventsFunctionsExtensionEditor/index',
@@ -22,31 +24,43 @@ export default {
 };
 
 export const Default = (): React.Node => (
-  <DragAndDropContextProvider>
-    <FixedHeightFlexContainer height={700}>
-      <EventsFunctionsExtensionEditor
-        project={testProject.project}
-        eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
-        setToolbar={() => {}}
-        resourceManagementProps={fakeResourceManagementProps}
-        openInstructionOrExpression={action('open instruction or expression')}
-        initiallyFocusedFunctionName={null}
-        initiallyFocusedBehaviorName={null}
-        initiallyFocusedObjectName={null}
-        onCreateEventsFunction={action('on create events function')}
-        onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
-        onRenamedEventsBasedObject={action('onRenamedEventsBasedObject')}
-        onDeletedEventsBasedObject={action('onDeletedEventsBasedObject')}
-        onEventsBasedObjectChildrenEdited={action(
-          'onEventsBasedObjectChildrenEdited'
-        )}
-        hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-        onWillInstallExtension={action('extension will be installed')}
-        onExtensionInstalled={action('extension installed')}
-        onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
-      />
-    </FixedHeightFlexContainer>
-  </DragAndDropContextProvider>
+  <I18n>
+    {({ i18n }) => (
+      <DragAndDropContextProvider>
+        <BehaviorStoreStateProvider i18n={i18n}>
+          <FixedHeightFlexContainer height={700}>
+            <EventsFunctionsExtensionEditor
+              project={testProject.project}
+              eventsFunctionsExtension={
+                testProject.testEventsFunctionsExtension
+              }
+              setToolbar={() => {}}
+              resourceManagementProps={fakeResourceManagementProps}
+              openInstructionOrExpression={action(
+                'open instruction or expression'
+              )}
+              initiallyFocusedFunctionName={null}
+              initiallyFocusedBehaviorName={null}
+              initiallyFocusedObjectName={null}
+              onCreateEventsFunction={action('on create events function')}
+              onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+              onRenamedEventsBasedObject={action('onRenamedEventsBasedObject')}
+              onDeletedEventsBasedObject={action('onDeletedEventsBasedObject')}
+              onEventsBasedObjectChildrenEdited={action(
+                'onEventsBasedObjectChildrenEdited'
+              )}
+              hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+              onWillInstallExtension={action('extension will be installed')}
+              onExtensionInstalled={action('extension installed')}
+              onEventBasedObjectTypeChanged={action(
+                'onEventBasedObjectTypeChanged'
+              )}
+            />
+          </FixedHeightFlexContainer>
+        </BehaviorStoreStateProvider>
+      </DragAndDropContextProvider>
+    )}
+  </I18n>
 );
 
 export const WithObjectEditor = (): React.Node => {
@@ -56,36 +70,48 @@ export const WithObjectEditor = (): React.Node => {
   };
 
   return (
-    <PreferencesContext.Provider value={preferences}>
-      <DragAndDropContextProvider>
-        <FixedHeightFlexContainer height={700}>
-          <EventsFunctionsExtensionEditor
-            project={testProject.project}
-            eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
-            setToolbar={() => {}}
-            resourceManagementProps={fakeResourceManagementProps}
-            openInstructionOrExpression={action(
-              'open instruction or expression'
-            )}
-            initiallyFocusedFunctionName={null}
-            initiallyFocusedBehaviorName={null}
-            initiallyFocusedObjectName={null}
-            onCreateEventsFunction={action('on create events function')}
-            onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
-            onRenamedEventsBasedObject={action('onRenamedEventsBasedObject')}
-            onDeletedEventsBasedObject={action('onDeletedEventsBasedObject')}
-            onEventsBasedObjectChildrenEdited={action(
-              'onEventsBasedObjectChildrenEdited'
-            )}
-            hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
-            onWillInstallExtension={action('extension will be installed')}
-            onExtensionInstalled={action('extension installed')}
-            onEventBasedObjectTypeChanged={action(
-              'onEventBasedObjectTypeChanged'
-            )}
-          />
-        </FixedHeightFlexContainer>
-      </DragAndDropContextProvider>
-    </PreferencesContext.Provider>
+    <I18n>
+      {({ i18n }) => (
+        <PreferencesContext.Provider value={preferences}>
+          <DragAndDropContextProvider>
+            <BehaviorStoreStateProvider i18n={i18n}>
+              <FixedHeightFlexContainer height={700}>
+                <EventsFunctionsExtensionEditor
+                  project={testProject.project}
+                  eventsFunctionsExtension={
+                    testProject.testEventsFunctionsExtension
+                  }
+                  setToolbar={() => {}}
+                  resourceManagementProps={fakeResourceManagementProps}
+                  openInstructionOrExpression={action(
+                    'open instruction or expression'
+                  )}
+                  initiallyFocusedFunctionName={null}
+                  initiallyFocusedBehaviorName={null}
+                  initiallyFocusedObjectName={null}
+                  onCreateEventsFunction={action('on create events function')}
+                  onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onRenamedEventsBasedObject={action(
+                    'onRenamedEventsBasedObject'
+                  )}
+                  onDeletedEventsBasedObject={action(
+                    'onDeletedEventsBasedObject'
+                  )}
+                  onEventsBasedObjectChildrenEdited={action(
+                    'onEventsBasedObjectChildrenEdited'
+                  )}
+                  hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+                  onWillInstallExtension={action('extension will be installed')}
+                  onExtensionInstalled={action('extension installed')}
+                  onEventBasedObjectTypeChanged={action(
+                    'onEventBasedObjectTypeChanged'
+                  )}
+                />
+              </FixedHeightFlexContainer>
+            </BehaviorStoreStateProvider>
+          </DragAndDropContextProvider>
+        </PreferencesContext.Provider>
+      )}
+    </I18n>
   );
 };

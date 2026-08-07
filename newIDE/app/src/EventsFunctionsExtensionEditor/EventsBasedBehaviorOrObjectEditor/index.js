@@ -3,8 +3,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import EventsBasedBehaviorEditor from './EventsBasedBehaviorEditor';
 import {
-  EventsBasedBehaviorPropertiesEditor,
-  type EventsBasedBehaviorPropertiesEditorInterface,
+  EventsBasedBehaviorOrObjectPropertiesEditor,
+  type EventsBasedBehaviorOrObjectPropertiesEditorInterface,
 } from './EventsBasedBehaviorOrObjectPropertiesEditor';
 import Background from '../../UI/Background';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
@@ -20,6 +20,7 @@ import AddIcon from '../../UI/CustomSvgIcons/Add';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import Container from '@material-ui/core/Container';
 
 type Props = {|
   project: gdProject,
@@ -39,12 +40,16 @@ type Props = {|
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
   ) => void,
+  onWillInstallExtension: (extensionNames: Array<string>) => void,
+  onExtensionInstalled: (extensionNames: Array<string>) => void,
+  shouldHideAddPropertyButton?: boolean,
 |};
 
 export type EventsBasedBehaviorOrObjectEditorInterface = {|
   forceUpdateProperties: () => void,
   scrollToConfiguration: () => void,
   scrollToProperty: (propertyName: string, isSharedProperties: boolean) => void,
+  focusOnProperty: (propertyName: string, isSharedProperties: boolean) => void,
 |};
 
 export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
@@ -68,6 +73,9 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
       onFocusProperty,
       onOpenCustomObjectEditor,
       onEventsBasedObjectChildrenEdited,
+      onWillInstallExtension,
+      onExtensionInstalled,
+      shouldHideAddPropertyButton,
     }: Props,
     ref
   ) => {
@@ -84,10 +92,10 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
     );
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
-    const propertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+    const propertiesEditor = React.useRef<?EventsBasedBehaviorOrObjectPropertiesEditorInterface>(
       null
     );
-    const scenePropertiesEditor = React.useRef<?EventsBasedBehaviorPropertiesEditorInterface>(
+    const scenePropertiesEditor = React.useRef<?EventsBasedBehaviorOrObjectPropertiesEditorInterface>(
       null
     );
 
@@ -120,6 +128,17 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
         }
         if (scenePropertiesEditor.current) {
           scenePropertiesEditor.current.forceUpdate();
+        }
+      },
+      focusOnProperty: (propertyName: string, isSharedProperties: boolean) => {
+        if (isSharedProperties) {
+          if (scenePropertiesEditor.current) {
+            scenePropertiesEditor.current.focusOnProperty(propertyName);
+          }
+        } else {
+          if (propertiesEditor.current) {
+            propertiesEditor.current.focusOnProperty(propertyName);
+          }
         }
       },
       scrollToConfiguration: () => {
@@ -163,88 +182,110 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
     return (
       <Background>
         <ScrollView ref={scrollView}>
-          <ColumnStackLayout expand useFullHeight noOverflowParent>
-            {eventsBasedBehavior ? (
-              <EventsBasedBehaviorEditor
-                project={project}
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                unsavedChanges={unsavedChanges}
-                onConfigurationUpdated={onConfigurationUpdated}
-              />
-            ) : eventsBasedObject ? (
-              <EventsBasedObjectEditor
-                eventsFunctionsExtension={eventsFunctionsExtension}
-                eventsBasedObject={eventsBasedObject}
-                unsavedChanges={unsavedChanges}
-                onOpenCustomObjectEditor={onOpenCustomObjectEditor}
-                onEventsBasedObjectChildrenEdited={
-                  onEventsBasedObjectChildrenEdited
-                }
-              />
-            ) : null}
-            <Text size="block-title">
-              {eventsBasedObject ? (
-                <Trans>Object properties</Trans>
-              ) : (
-                <Trans>Behavior properties</Trans>
-              )}
-            </Text>
-            {eventsBasedEntity && (
-              <EventsBasedBehaviorPropertiesEditor
-                ref={propertiesEditor}
-                project={project}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                extension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={eventsBasedObject}
-                properties={eventsBasedEntity.getPropertyDescriptors()}
-                behaviorObjectType={
-                  eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''
-                }
-                onRenameProperty={onRenameProperty}
-                onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={propertyName =>
-                  onFocusProperty(propertyName, false)
-                }
-                onPropertyTypeChanged={onPropertyTypeChanged}
-                onEventsFunctionsAdded={onEventsFunctionsAdded}
-              />
-            )}
-            {eventsBasedBehavior && (
-              <Text size="block-title">
-                <Trans>Scene properties</Trans>
-              </Text>
-            )}
-            {eventsBasedBehavior && (
-              <EventsBasedBehaviorPropertiesEditor
-                ref={scenePropertiesEditor}
-                isSharedProperties
-                project={project}
-                projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
-                }
-                extension={eventsFunctionsExtension}
-                eventsBasedBehavior={eventsBasedBehavior}
-                eventsBasedObject={null}
-                properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
-                behaviorObjectType={
-                  eventsBasedBehavior ? eventsBasedBehavior.getObjectType() : ''
-                }
-                onRenameProperty={onRenameSharedProperty}
-                onPropertiesUpdated={_onPropertiesUpdated}
-                onFocusProperty={propertyName =>
-                  onFocusProperty(propertyName, true)
-                }
-                onPropertyTypeChanged={onPropertyTypeChanged}
-                onEventsFunctionsAdded={onEventsFunctionsAdded}
-              />
-            )}
-          </ColumnStackLayout>
+          <Column
+            noMargin
+            expand
+            useFullHeight
+            noOverflowParent
+            justifyContent="center"
+          >
+            <Container
+              style={{
+                maxWidth: '800px',
+              }}
+            >
+              <ColumnStackLayout expand useFullHeight noOverflowParent>
+                {eventsBasedBehavior ? (
+                  <EventsBasedBehaviorEditor
+                    project={project}
+                    eventsFunctionsExtension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    unsavedChanges={unsavedChanges}
+                    onConfigurationUpdated={onConfigurationUpdated}
+                  />
+                ) : eventsBasedObject ? (
+                  <EventsBasedObjectEditor
+                    eventsFunctionsExtension={eventsFunctionsExtension}
+                    eventsBasedObject={eventsBasedObject}
+                    unsavedChanges={unsavedChanges}
+                    onOpenCustomObjectEditor={onOpenCustomObjectEditor}
+                    onEventsBasedObjectChildrenEdited={
+                      onEventsBasedObjectChildrenEdited
+                    }
+                  />
+                ) : null}
+                <Text size="block-title">
+                  {eventsBasedObject ? (
+                    <Trans>Object properties</Trans>
+                  ) : (
+                    <Trans>Behavior properties</Trans>
+                  )}
+                </Text>
+                {eventsBasedEntity && (
+                  <EventsBasedBehaviorOrObjectPropertiesEditor
+                    ref={propertiesEditor}
+                    project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    eventsBasedObject={eventsBasedObject}
+                    properties={eventsBasedEntity.getPropertyDescriptors()}
+                    behaviorObjectType={
+                      eventsBasedBehavior
+                        ? eventsBasedBehavior.getObjectType()
+                        : ''
+                    }
+                    onRenameProperty={onRenameProperty}
+                    onPropertiesUpdated={_onPropertiesUpdated}
+                    onFocusProperty={propertyName =>
+                      onFocusProperty(propertyName, false)
+                    }
+                    onPropertyTypeChanged={onPropertyTypeChanged}
+                    onEventsFunctionsAdded={onEventsFunctionsAdded}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
+                  />
+                )}
+                {eventsBasedBehavior && (
+                  <Text size="block-title">
+                    <Trans>Scene properties</Trans>
+                  </Text>
+                )}
+                {eventsBasedBehavior && (
+                  <EventsBasedBehaviorOrObjectPropertiesEditor
+                    ref={scenePropertiesEditor}
+                    isSharedProperties
+                    project={project}
+                    projectScopedContainersAccessor={
+                      projectScopedContainersAccessor
+                    }
+                    extension={eventsFunctionsExtension}
+                    eventsBasedBehavior={eventsBasedBehavior}
+                    eventsBasedObject={null}
+                    properties={eventsBasedBehavior.getSharedPropertyDescriptors()}
+                    behaviorObjectType={
+                      eventsBasedBehavior
+                        ? eventsBasedBehavior.getObjectType()
+                        : ''
+                    }
+                    onRenameProperty={onRenameSharedProperty}
+                    onPropertiesUpdated={_onPropertiesUpdated}
+                    onFocusProperty={propertyName =>
+                      onFocusProperty(propertyName, true)
+                    }
+                    onPropertyTypeChanged={onPropertyTypeChanged}
+                    onEventsFunctionsAdded={onEventsFunctionsAdded}
+                    onWillInstallExtension={onWillInstallExtension}
+                    onExtensionInstalled={onExtensionInstalled}
+                  />
+                )}
+              </ColumnStackLayout>
+            </Container>
+          </Column>
         </ScrollView>
-        {windowSize === 'small' && (
+        {windowSize === 'small' && !shouldHideAddPropertyButton && (
           <Column>
             <Line noMargin justifyContent="flex-end" expand>
               <RaisedButton

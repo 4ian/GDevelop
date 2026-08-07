@@ -54,7 +54,9 @@ export const QuickCustomizationGameTiles = ({
 
   const displayedExampleShortHeaders = React.useMemo(
     () => {
-      const allQuickCustomizationExampleShortHeaders = exampleShortHeaders
+      const allQuickCustomizationExampleShortHeaders = Array.isArray(
+        exampleShortHeaders
+      )
         ? quickCustomizationRecommendation.list
             .map(({ type, exampleSlug, thumbnailTitleByLocale }) => {
               if (type !== 'example') {
@@ -106,8 +108,7 @@ export const QuickCustomizationGameTiles = ({
                   />
                 )
               )
-            : // $FlowFixMe[underconstrained-implicit-instantiation]
-              new Array(quickCustomizationRecommendation.list.length)
+            : new Array<number>(quickCustomizationRecommendation.list.length)
                 .fill(0)
                 .map((_, index) => (
                   <ExampleTile

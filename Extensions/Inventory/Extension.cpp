@@ -23,7 +23,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetShortDescription("Named inventories with items, counts, max limits, equip state. Save/load to variable.")
       .SetExtensionHelpPath("/all-features/inventory")
-      .SetCategory("Game mechanic");
+      .SetCategory("Game mechanic")
+      .MarkAsDeprecatedSince("5.6.270");
   extension.AddInstructionOrExpressionGroupMetadata(_("Inventories"))
       .SetIcon("CppPlatform/Extensions/Inventoryicon.png");
 

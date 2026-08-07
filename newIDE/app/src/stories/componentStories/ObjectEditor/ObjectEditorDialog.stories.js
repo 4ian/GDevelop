@@ -23,6 +23,7 @@ export const CustomObject = (): React.Node => (
         testProject.testSceneProjectScopedContainersAccessor
       }
       object={testProject.customObject}
+      layersContainer={testProject.testLayout.getLayers()}
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
       onRename={() => action('Rename object')}
@@ -67,6 +68,7 @@ export const StandardObject = (): React.Node => (
         testProject.testSceneProjectScopedContainersAccessor
       }
       object={testProject.panelSpriteObject}
+      layersContainer={testProject.testLayout.getLayers()}
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
       onRename={() => action('Rename object')}
@@ -111,6 +113,7 @@ export const LockedStandardObject = (): React.Node => (
         testProject.testSceneProjectScopedContainersAccessor
       }
       object={testProject.panelSpriteObject}
+      layersContainer={testProject.testLayout.getLayers()}
       onApply={() => action('Apply changes')}
       onCancel={() => action('Cancel changes')}
       onRename={() => action('Rename object')}

@@ -23,12 +23,13 @@
       ]
     },
     "baseUrl": "./",
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"],
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise", "ES2018.Promise"],
     "typeRoots": ["GDJS/node_modules/@types/"],
     // JSX syntax for lightweight rendering in the game engine:
     "jsx": "react",
     "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    "jsxFragmentFactory": "Fragment",
+    "noImplicitAny": false
   },
   "include": [
     "GDevelop.js/types.d.ts",
@@ -48,7 +49,8 @@
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
     "SharedLibs/TileMapHelper/**/*",
-    "Extensions/Spine/pixi-spine/pixi-spine.js",
+    "Extensions/Spine/spine-pixi-v7/spine-pixi-v7-pre.js",
+    "Extensions/Spine/spine-pixi-v7/spine-pixi-v7.js",
     "Extensions/P2P/A_peer.js",
     "Extensions/Multiplayer/peer.js"
   ]

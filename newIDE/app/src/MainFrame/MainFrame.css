@@ -65,6 +65,14 @@ body {
   app-region: no-drag;
 }
 
+/* Ensure interactive elements inside draggable areas remain clickable. */
+.title-bar-draggable-part button,
+.title-bar-draggable-part a,
+.title-bar-draggable-part [role="button"] {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
 /* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */
 .safe-area-aware-container {
   padding-top: var(--safe-area-inset-top);
@@ -107,12 +115,4 @@ a[href^="https://"],
 a[href^="ftp://"] {
     -webkit-user-drag: auto;
     user-drag: auto; /* Technically not supported in Electron yet */
-}
-
-/* Used for react-sortable-hoc SortableContainer, to make sure the
- * dragged element is visible (and not hidden behind a drawer or dialog)
- */
-.sortable-helper {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Font from the theme*/
-  z-index: 9999;
 }

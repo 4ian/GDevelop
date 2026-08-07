@@ -11,6 +11,7 @@
 
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EffectsContainer.h"
+#include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
@@ -112,6 +113,8 @@ public:
   gd::Behavior *AddNewBehavior(const gd::Project &project,
                                const gd::String &type, const gd::String &name);
 
+  gd::Behavior *AddBehavior(const gd::Behavior &behavior, const gd::String &name);
+
   /**
    * \brief Get a read-only access to the map containing the behaviors with
    * their properties.
@@ -153,6 +156,9 @@ protected:
    * behaviors and it must be a deep copy.
    */
   void Init(const gd::BehaviorsContainer &behaviorsContainer);
+
+private:
+  gd::MemoryTracked _memoryTracked{this, "BehaviorsContainer"};
 };
 
 } // namespace gd

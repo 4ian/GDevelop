@@ -8,6 +8,7 @@ import {
   type EditorFunctionWithoutProject,
   type EditorCallbacks,
   type EditorFunctionCall,
+  type EditorFunctionCallResult,
   type EditorFunctionGenericOutput,
   type EventsGenerationOptions,
   type AssetSearchAndInstallOptions,
@@ -15,38 +16,32 @@ import {
   type RelatedAiRequestLastMessages,
   type ResourceSearchAndInstallOptions,
   type ResourceSearchAndInstallResult,
+  type ToolOptions,
+} from '.';
+import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
   type ObjectGroupsOutsideEditorChanges,
-  type ToolOptions,
-} from '.';
+  type ProjectItemRenamedOutsideEditorChanges,
+  type WillDeleteSceneChanges,
+  type WillDeleteObjectChanges,
+} from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import { type EnsureExtensionInstalledOptions } from '../AiGeneration/UseEnsureExtensionInstalled';
 
-export type EditorFunctionCallResult =
-  | {|
-      status: 'working',
-      call_id: string,
-    |}
-  | {|
-      status: 'finished',
-      call_id: string,
-      success: boolean,
-      output: any,
-    |}
-  | {|
-      status: 'ignored',
-      call_id: string,
-    |};
-
-export type ProcessEditorFunctionCallsOptions = {|
+type ProcessEditorFunctionCallsOptions = {|
   project: ?gdProject,
   functionCalls: Array<EditorFunctionCall>,
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
-  ignore: boolean,
+  // The AI request's tools version (e.g. 'v12'), threaded to the functions so
+  // they can gate version-dependent behavior (e.g. isNoOpConsideredSuccess).
+  toolsVersion?: ?string,
+  // When true, a `run_script` call is exposed only non-mutating functions
+  // (explorer sub-agent scripts, which must stay read-only).
+  runScriptReadOnly?: boolean,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -64,6 +59,11 @@ export type ProcessEditorFunctionCallsOptions = {|
   onObjectGroupsModifiedOutsideEditor: (
     changes: ObjectGroupsOutsideEditorChanges
   ) => void,
+  onProjectItemRenamedOutsideEditor: (
+    changes: ProjectItemRenamedOutsideEditorChanges
+  ) => void,
+  onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
   ) => Promise<void>,
@@ -75,6 +75,7 @@ export type ProcessEditorFunctionCallsOptions = {|
   searchAndInstallResources: (
     options: ResourceSearchAndInstallOptions
   ) => Promise<ResourceSearchAndInstallResult>,
+  getAssetStoreTagForNewObject: (objectType: string) => string | null,
 |};
 
 export const processEditorFunctionCalls = async ({
@@ -83,12 +84,16 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  toolsVersion,
+  runScriptReadOnly,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
   onObjectsModifiedOutsideEditor,
   onObjectGroupsModifiedOutsideEditor,
-  ignore,
+  onProjectItemRenamedOutsideEditor,
+  onWillDeleteScene,
+  onWillDeleteObject,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
   ensureExtensionInstalled,
@@ -96,6 +101,7 @@ export const processEditorFunctionCalls = async ({
   onExtensionInstalled,
   searchAndInstallAsset,
   searchAndInstallResources,
+  getAssetStoreTagForNewObject,
 }: ProcessEditorFunctionCallsOptions): Promise<{|
   results: Array<EditorFunctionCallResult>,
   createdSceneNames: Array<string>,
@@ -107,22 +113,26 @@ export const processEditorFunctionCalls = async ({
 
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
-    if (ignore) {
-      results.push({
-        status: 'ignored',
-        call_id,
-      });
-      continue;
-    }
-
     const name = functionCall.name;
-    if (!project && name !== 'initialize_project') {
+    if (!project && !editorFunctionsWithoutProject[name]) {
       results.push({
         status: 'finished',
         call_id,
         success: false,
         output: {
           message: 'No project opened.',
+        },
+      });
+      continue;
+    }
+    if (project && name === 'initialize_project') {
+      results.push({
+        status: 'finished',
+        call_id,
+        success: false,
+        output: {
+          message:
+            'A project is already open — initialize_project cannot be called. If starting from a new project is the right approach, suggest the user close the current project and start a new AI request.',
         },
       });
       continue;
@@ -141,6 +151,9 @@ export const processEditorFunctionCalls = async ({
             message: 'Invalid arguments (not a valid JSON string).',
           },
         });
+        // Without this, the function would still run with `args: undefined`
+        // and a second result would be pushed for the same call_id.
+        continue;
       }
 
       // $FlowFixMe[invalid-compare]
@@ -190,6 +203,8 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        toolsVersion,
+        runScriptReadOnly,
         editorCallbacks,
         relatedAiRequestId,
         getRelatedAiRequestLastMessages,
@@ -198,11 +213,15 @@ export const processEditorFunctionCalls = async ({
         onInstancesModifiedOutsideEditor,
         onObjectsModifiedOutsideEditor,
         onObjectGroupsModifiedOutsideEditor,
+        onProjectItemRenamedOutsideEditor,
+        onWillDeleteScene,
+        onWillDeleteObject,
         ensureExtensionInstalled,
         onWillInstallExtension,
         onExtensionInstalled,
         searchAndInstallAsset,
         searchAndInstallResources,
+        getAssetStoreTagForNewObject,
         PixiResourcesLoader,
       };
 
@@ -231,12 +250,28 @@ export const processEditorFunctionCalls = async ({
         }: EditorFunctionGenericOutput);
       }
 
+      if (result.aborted) {
+        results.push({ status: 'aborted', call_id });
+        continue;
+      }
+
       const { success, meta, ...output } = result;
+      const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      // `run_script` sets `meta.didModifyProject` explicitly: a script can
+      // apply project-changing calls before failing, so its "did modify" is
+      // NOT `modifiesProject && success` — honor the reported value when given.
+      const didModifyProject =
+        meta && typeof meta.didModifyProject === 'boolean'
+          ? meta.didModifyProject || undefined
+          : editorFunctionDef && editorFunctionDef.modifiesProject && success
+          ? true
+          : undefined;
       results.push({
         status: 'finished',
         call_id,
         success,
         output,
+        didModifyProject,
       });
 
       if (meta && meta.newSceneNames) {

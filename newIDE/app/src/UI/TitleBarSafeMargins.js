@@ -4,6 +4,7 @@ import { isMacLike } from '../Utils/Platform';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Window, { useWindowControlsOverlayWatcher } from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
+import PortalContainerContext from './PortalContainerContext';
 
 const electron = optionalRequire('electron');
 
@@ -15,6 +16,21 @@ const titleBarStyles = {
   rightSideArea: { alignSelf: 'stretch', flexShrink: 0 },
 };
 
+/**
+ * Return the Window object for the current context. When rendered inside
+ * a popped-out window (WindowPortal), PortalContainerContext points to a
+ * DOM element in the external window — so ownerDocument.defaultView gives
+ * us the correct window. Falls back to the global window otherwise.
+ */
+const useCurrentWindow = (): typeof window => {
+  const portalContainer = React.useContext(PortalContainerContext);
+  if (portalContainer) {
+    const ownerWindow = portalContainer.ownerDocument.defaultView;
+    if (ownerWindow) return ownerWindow;
+  }
+  return window;
+};
+
 export const TitleBarLeftSafeMargins = ({
   backgroundColor,
 }: {|
@@ -24,7 +40,11 @@ export const TitleBarLeftSafeMargins = ({
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
   const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
+  const currentWindow = useCurrentWindow();
+  useWindowControlsOverlayWatcher({
+    onChanged: forceUpdate,
+    targetWindow: currentWindow,
+  });
 
   let leftSideOffset = 0;
   // macOS displays the "traffic lights" on the left.
@@ -39,7 +59,7 @@ export const TitleBarLeftSafeMargins = ({
     // This can happen for mac apps, or installed PWA.
     // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
     // $FlowFixMe[prop-missing]
-    const { windowControlsOverlay } = navigator;
+    const { windowControlsOverlay } = currentWindow.navigator;
     if (windowControlsOverlay) {
       if (windowControlsOverlay.visible) {
         const { x } = windowControlsOverlay.getTitlebarAreaRect();
@@ -74,7 +94,11 @@ export const TitleBarRightSafeMargins = ({
   // we set up a listener to detect any change and force a refresh that will read
   // the latest size of the controls.
   const forceUpdate = useForceUpdate();
-  useWindowControlsOverlayWatcher({ onChanged: forceUpdate });
+  const currentWindow = useCurrentWindow();
+  useWindowControlsOverlayWatcher({
+    onChanged: forceUpdate,
+    targetWindow: currentWindow,
+  });
 
   const isDesktopWindowsOrLinux = !!electron && !isMacLike();
   // Windows and Linux have their "window controls" on the right
@@ -84,11 +108,11 @@ export const TitleBarRightSafeMargins = ({
   // which we measure here to set the offsets.
   // $FlowFixMe[incompatible-type] - this API is not handled by Flow.
   // $FlowFixMe[prop-missing]
-  const { windowControlsOverlay } = navigator;
+  const { windowControlsOverlay } = currentWindow.navigator;
   if (windowControlsOverlay) {
     if (windowControlsOverlay.visible) {
       const { x, width } = windowControlsOverlay.getTitlebarAreaRect();
-      rightSideOffset = window.innerWidth - x - width;
+      rightSideOffset = currentWindow.innerWidth - x - width;
     }
   }
 

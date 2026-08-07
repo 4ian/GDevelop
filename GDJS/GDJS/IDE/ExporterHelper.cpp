@@ -19,6 +19,8 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/DiagnosticReport.h"
 #include "GDCore/Events/CodeGeneration/EffectsCodeGenerator.h"
+#include "GDCore/Events/Event.h"
+#include "GDCore/Events/EventsList.h"
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/InGameEditorResourceMetadata.h"
@@ -574,11 +576,16 @@ void ExporterHelper::StripAndSerializeProjectData(
   }
 
   std::unordered_map<gd::String, std::set<gd::String>> scenesUsedResources;
-  for (std::size_t layoutIndex = 0;
-       layoutIndex < project.GetLayoutsCount(); layoutIndex++) {
+  for (std::size_t layoutIndex = 0; layoutIndex < project.GetLayoutsCount();
+       layoutIndex++) {
     auto &layout = project.GetLayout(layoutIndex);
-    scenesUsedResources[layout.GetName()] =
-        gd::SceneResourcesFinder::FindSceneResources(project, layout);
+    auto sceneUsedResources = gd::SceneResourcesFinder::FindSceneResources(
+        project, layout,
+        /* ignoreObjectResourcePreloading= */ isInGameEdition);
+    for (auto &&resourceName : projectUsedResources) {
+      sceneUsedResources.erase(resourceName);
+    }
+    scenesUsedResources[layout.GetName()] = sceneUsedResources;
   }
 
   std::unordered_map<gd::String, std::set<gd::String>>
@@ -615,9 +622,11 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
-  SerializeUsedResources(rootElement, projectUsedResources, scenesUsedResources,
-                         eventsBasedObjectVariantsUsedResources);
+  SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
+                         scenesUsedResources);
   if (isInGameEdition) {
+    SerializeUsedResourcesForInGameEditor(
+        project, rootElement, eventsBasedObjectVariantsUsedResources);
     auto &behaviorsElement = rootElement.AddChild("activatedByDefaultInEditorBehaviors");
     behaviorsElement.ConsiderAsArrayOf("resourceReference");
     auto &platform = project.GetCurrentPlatform();
@@ -634,23 +643,22 @@ void ExporterHelper::StripAndSerializeProjectData(
 }
 
 void ExporterHelper::SerializeUsedResources(
+    gd::SerializerElement &element, std::set<gd::String> &usedResources) {
+  auto &resourcesElement = element.AddChild("usedResources");
+  resourcesElement.ConsiderAsArrayOf("resourceReference");
+  for (auto &resourceName : usedResources) {
+    auto &resourceElement = resourcesElement.AddChild("resourceReference");
+    resourceElement.SetAttribute("name", resourceName);
+  }
+}
+
+void ExporterHelper::SerializeUsedResourcesForRuntime(
+    gd::Project &project,
     gd::SerializerElement &rootElement,
     std::set<gd::String> &projectUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources,
-    std::unordered_map<gd::String, std::set<gd::String>>
-        &eventsBasedObjectVariantsUsedResources) {
-  auto serializeUsedResources =
-      [](gd::SerializerElement &element,
-         std::set<gd::String> &usedResources) -> void {
-    auto &resourcesElement = element.AddChild("usedResources");
-    resourcesElement.ConsiderAsArrayOf("resourceReference");
-    for (auto &resourceName : usedResources) {
-      auto &resourceElement = resourcesElement.AddChild("resourceReference");
-      resourceElement.SetAttribute("name", resourceName);
-    }
-  };
+    std::unordered_map<gd::String, std::set<gd::String>> &scenesUsedResources) {
 
-  serializeUsedResources(rootElement, projectUsedResources);
+  SerializeUsedResources(rootElement, projectUsedResources);
 
   auto &layoutsElement = rootElement.GetChild("layouts");
   for (std::size_t layoutIndex = 0;
@@ -659,10 +667,36 @@ void ExporterHelper::SerializeUsedResources(
     auto &layoutElement = layoutsElement.GetChild(layoutIndex);
     const auto layoutName = layoutElement.GetStringAttribute("name");
 
-    auto &layoutUsedResources = scenesUsedResources[layoutName];
-    serializeUsedResources(layoutElement, layoutUsedResources);
-  }
+    auto &sceneUsedResources = scenesUsedResources[layoutName];
+    SerializeUsedResources(layoutElement, sceneUsedResources);
 
+    auto &scene = project.GetLayout(layoutName);
+    auto &objectsElement = layoutElement.GetChild("objects");
+    for (std::size_t objectIndex = 0;
+         objectIndex < objectsElement.GetChildrenCount(); objectIndex++) {
+      auto &objectElement = objectsElement.GetChild(objectIndex);
+      const auto objectName = objectElement.GetStringAttribute("name");
+
+      auto &object = scene.GetObjects().GetObject(objectName);
+      if (object.GetResourcesPreloading() == "manually") {
+        auto objectUsedResources =
+            gd::SceneResourcesFinder::FindObjectResources(project, object);
+        for (auto &&resourceName : projectUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        for (auto &&resourceName : sceneUsedResources) {
+          objectUsedResources.erase(resourceName);
+        }
+        SerializeUsedResources(objectElement, objectUsedResources);
+      }
+    }
+  }
+}
+
+void ExporterHelper::SerializeUsedResourcesForInGameEditor(
+    gd::Project &project, gd::SerializerElement &rootElement,
+    std::unordered_map<gd::String, std::set<gd::String>>
+        &eventsBasedObjectVariantsUsedResources) {
   auto &extensionsElement = rootElement.GetChild("eventsFunctionsExtensions");
   for (std::size_t extensionIndex = 0;
        extensionIndex < extensionsElement.GetChildrenCount();
@@ -681,7 +715,7 @@ void ExporterHelper::SerializeUsedResources(
           gd::PlatformExtension::GetObjectFullType(extensionName, objectName);
       auto &objectUsedResources =
           eventsBasedObjectVariantsUsedResources[eventsBasedObjectType];
-      serializeUsedResources(objectElement, objectUsedResources);
+      SerializeUsedResources(objectElement, objectUsedResources);
 
       auto &variantsElement = objectElement.GetChild("variants");
       for (std::size_t variantIndex = 0;
@@ -693,7 +727,7 @@ void ExporterHelper::SerializeUsedResources(
             extensionName, objectName, variantName);
         auto &variantUsedResources =
             eventsBasedObjectVariantsUsedResources[variantType];
-        serializeUsedResources(variantElement, variantUsedResources);
+        SerializeUsedResources(variantElement, variantUsedResources);
       }
     }
   }
@@ -1278,6 +1312,18 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
+// Count all events of a list, recursing into sub-events. Used only for the
+// per-scene profiling breakdown below.
+static std::size_t CountEventsRecursively(const gd::EventsList &events) {
+  std::size_t count = events.GetEventsCount();
+  for (std::size_t e = 0; e < events.GetEventsCount(); ++e) {
+    const gd::BaseEvent &event = events.GetEvent(e);
+    if (event.CanHaveSubEvents())
+      count += CountEventsRecursively(event.GetSubEvents());
+  }
+  return count;
+}
+
 bool ExporterHelper::ExportScenesEventsCode(
     const gd::Project &project,
     gd::String outputDir,
@@ -1290,6 +1336,7 @@ bool ExporterHelper::ExportScenesEventsCode(
     std::set<gd::String> eventsIncludes;
     const gd::Layout &layout = project.GetLayout(i);
 
+    double sceneStartTime = GetTimeNow();
     auto &diagnosticReport =
         wholeProjectDiagnosticReport.AddNewDiagnosticReportForScene(
             layout.GetName());
@@ -1298,6 +1345,14 @@ bool ExporterHelper::ExportScenesEventsCode(
         layout, eventsIncludes, diagnosticReport, !exportForPreview);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
+
+    // [Profiling] Per-scene breakdown to find what dominates events code export.
+    gd::LogStatus(
+        "  Scene '" + layout.GetName() + "': " +
+        gd::String::From(GetTimeSpent(sceneStartTime)) + "ms, " +
+        gd::String::From(CountEventsRecursively(layout.GetEvents())) +
+        " events, " + gd::String::From(eventsOutput.size() / 1024) +
+        " KB generated code");
 
     // Export the code
     if (fs.WriteToFile(filename, eventsOutput)) {

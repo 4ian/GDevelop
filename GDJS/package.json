@@ -15,7 +15,7 @@
     "lebab": "^3.1.0",
     "minimist": "^1.2.5",
     "patch-package": "^6.4.7",
-    "pixi-spine": "4.0.4",
+    "@esotericsoftware/spine-pixi-v7": "~4.2.116",
     "pixi.js": "7.4.2",
     "prettier": "3.4.2",
     "recursive-readdir": "^2.2.2",

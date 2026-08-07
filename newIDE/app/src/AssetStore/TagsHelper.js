@@ -22,8 +22,7 @@ export const getFolderTagsFromAssetShortHeaders = ({
   selectedFolders: Array<string>,
 |}): Array<string> => {
   const assetTagsAfterPackTag: string[][] = [];
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const allTagsAfterPackTag = new Set();
+  const allTagsAfterPackTag = new Set<string>();
   // We are in a pack, calculate first level folders based on asset tags.
   // Tags are stored from top to bottom, in the list of tags of an asset.
   // We first detect where the chosen category is, as this is the pack, and
@@ -61,8 +60,7 @@ export const getFolderTagsFromAssetShortHeaders = ({
   );
 
   // Then we create the folders list, corresponding to the first level tags.
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const firstLevelTags = new Set();
+  const firstLevelTags = new Set<string>();
   assetTagsAfterPackTagWithoutNonFolderTags.forEach(
     tags => firstLevelTags.add(tags[0]) // Only add the top one, as this will be the first folder.
   );

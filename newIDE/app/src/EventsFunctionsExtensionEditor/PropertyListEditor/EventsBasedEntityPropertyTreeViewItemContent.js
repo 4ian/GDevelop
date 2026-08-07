@@ -12,8 +12,7 @@ import {
   unserializeFromJSObject,
 } from '../../Utils/Serializer';
 import {
-  // $FlowFixMe[import-type-as-value]
-  TreeViewItemContent,
+  type TreeViewItemContent,
   type TreeItemProps,
   propertiesRootFolderId,
   sharedPropertiesRootFolderId,

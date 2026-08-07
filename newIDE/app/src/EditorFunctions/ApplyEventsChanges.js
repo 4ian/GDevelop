@@ -7,46 +7,45 @@ import {
 } from '../Utils/GDevelopServices/Generation';
 import { mapFor } from '../Utils/MapFor';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
+import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 
 /**
- * Recursively searches for an event with the given aiGeneratedEventId in the events list.
- * Returns the path to the event as an array of indices, or null if not found.
+ * Recursively collects the paths of all events sharing the given aiGeneratedEventId.
+ * A whole generation batch shares one id, so an id can match several events.
  */
-const findEventPathByAiGeneratedEventId = (
+const findAllEventPathsByAiGeneratedEventId = (
   eventsList: gdEventsList,
   targetId: string,
-  currentPath: Array<number> = []
-): Array<number> | null => {
+  currentPath: EventPath = [],
+  foundPaths: Array<EventPath> = []
+): Array<EventPath> => {
   for (let i = 0; i < eventsList.getEventsCount(); i++) {
     const event = eventsList.getEventAt(i);
     const eventPath = [...currentPath, i];
 
     if (event.getAiGeneratedEventId() === targetId) {
-      return eventPath;
+      foundPaths.push(eventPath);
     }
 
     if (event.canHaveSubEvents()) {
-      const subEvents = event.getSubEvents();
-      const foundPath = findEventPathByAiGeneratedEventId(
-        subEvents,
+      findAllEventPathsByAiGeneratedEventId(
+        event.getSubEvents(),
         targetId,
-        eventPath
+        eventPath,
+        foundPaths
       );
-      if (foundPath) {
-        return foundPath;
-      }
     }
   }
-  return null;
+  return foundPaths;
 };
 
 /**
  * Parses an event path string (e.g., "event-0.1.2") into an array of 0-based indices (e.g., [0, 1, 2]).
  * Throws an error for invalid formats or non-positive indices.
  */
-const parseEventPath = (pathString: string): Array<number> => {
+const parseEventPath = (pathString: string): EventPath => {
   const originalPathString = pathString;
   if (!pathString.startsWith('event-')) {
     // Fallback for paths that might not have the "event-" prefix, like "1.2.3"
@@ -94,7 +93,7 @@ const parseEventPath = (pathString: string): Array<number> => {
  */
 const getParentListAndIndex = (
   rootEventsList: gdEventsList,
-  path: Array<number>,
+  path: EventPath,
   operationTypeForErrorMessage: 'access' | 'insertion'
 ): { parentList: gdEventsList, eventIndexInParentList: number } => {
   if (path.length === 0) {
@@ -156,7 +155,7 @@ const getParentListAndIndex = (
  */
 const getEventByPath = (
   rootEventsList: gdEventsList,
-  path: Array<number>
+  path: EventPath
 ): gdBaseEvent => {
   const { parentList, eventIndexInParentList } = getParentListAndIndex(
     rootEventsList,
@@ -176,10 +175,17 @@ type EventOperationType =
   | 'insertActionsConditionsAtStart'
   | 'replaceAllActions'
   | 'replaceAllConditions';
+type EventInsertKind = 'replacement' | 'before' | 'after';
 type EventOperation = {|
   type: EventOperationType,
-  path: Array<number>,
+  path: EventPath,
   eventsToInsert?: gdEventsList,
+  // For 'insert' operations, how the insertion point was defined relatively
+  // to the existing events (used to disambiguate insertions sharing a path).
+  insertKind?: EventInsertKind,
+  // Position of the change in the input, to keep the order of the changes
+  // when several of them target the same insertion point.
+  order?: number,
 |};
 
 /**
@@ -243,9 +249,38 @@ const getEventWhileConditions = (
   return null;
 };
 
+/**
+ * When several operations have the same path, the path means different things:
+ * for an insertion, it's an insertion point (a "gap"), while for the other
+ * operations it designates the existing event at this index. Operations on the
+ * existing event must then run first, otherwise the inserted events would take
+ * its place and be wrongly edited or deleted. Deletions still run just before
+ * insertions, so that the delete+insert pair generated for
+ * "insert_and_replace_event" stays in order.
+ */
+const getOperationPriorityForSamePath = (type: EventOperationType): number => {
+  if (type === 'insert') return 2;
+  if (type === 'delete') return 1;
+  return 0;
+};
+
+/**
+ * At the same insertion point, the events inserted first end up after those
+ * inserted later. Insertions are then applied so that events end up in this
+ * order: events inserted after the previous sibling, then events inserted
+ * before the next sibling, then the replacement of the next sibling.
+ */
+const getInsertKindPriorityForSamePath = (
+  insertKind?: EventInsertKind
+): number => {
+  if (insertKind === 'replacement') return 0;
+  if (insertKind === 'before') return 1;
+  return 2;
+};
+
 const comparePathsReverseLexicographically = (
-  p1: Array<number>,
-  p2: Array<number>
+  p1: EventPath,
+  p2: EventPath
 ): number => {
   const maxLength = Math.max(p1.length, p2.length);
   for (let i = 0; i < maxLength; i++) {
@@ -268,7 +303,7 @@ export const applyEventsChanges = (
 
   eventOperationsInput.forEach(change => {
     const { operationName, operationTargetEvent, generatedEvents } = change;
-    let parsedPath: Array<number> | null = null;
+    let parsedPath: EventPath | null = null;
     let localEventsToInsert: gdEventsList | null = null;
 
     try {
@@ -287,11 +322,23 @@ export const applyEventsChanges = (
           .map(t => t.trim())
           .filter(t => t.length > 0);
         for (const target of targets) {
-          let targetPath = findEventPathByAiGeneratedEventId(
+          let targetPath = null;
+          const matchingPaths = findAllEventPathsByAiGeneratedEventId(
             sceneEvents,
             target
           );
-          if (!targetPath) {
+          if (matchingPaths.length === 1) {
+            targetPath = matchingPaths[0];
+          } else if (matchingPaths.length > 1) {
+            // A whole generation batch shares one aiGeneratedEventId, so it can
+            // match several events. Refuse to guess instead of deleting the wrong one.
+            errors.push(
+              `aiGeneratedEventId "${target}" matches ${
+                matchingPaths.length
+              } events. Target a single event by its path (e.g. "event-7") instead. Skipping deletion of "${target}".`
+            );
+            continue;
+          } else {
             try {
               targetPath = parseEventPath(target);
             } catch (pathParseError) {
@@ -307,13 +354,24 @@ export const applyEventsChanges = (
       }
 
       if (operationTargetEvent) {
-        // First search for an event with the exact aiGeneratedEventId.
-        parsedPath = findEventPathByAiGeneratedEventId(
+        // First search for events with the exact aiGeneratedEventId.
+        const matchingPaths = findAllEventPathsByAiGeneratedEventId(
           sceneEvents,
           operationTargetEvent
         );
 
-        if (!parsedPath) {
+        if (matchingPaths.length === 1) {
+          parsedPath = matchingPaths[0];
+        } else if (matchingPaths.length > 1) {
+          // A whole generation batch shares one aiGeneratedEventId, so it can
+          // match several events. Refuse to guess instead of editing the wrong one.
+          errors.push(
+            `aiGeneratedEventId "${operationTargetEvent}" matches ${
+              matchingPaths.length
+            } events. Target a single event by its path (e.g. "event-7") instead. Skipping operation "${operationName}".`
+          );
+          return;
+        } else {
           // Then try to parse as a path string (e.g., "event-0.1.2" or "0.1.2")
           try {
             parsedPath = parseEventPath(operationTargetEvent);
@@ -370,6 +428,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: parsedPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'replacement',
           });
           // localEventsToInsert is now "owned" by the 'insert' operation,
           // it should not be deleted here in the switch case.
@@ -400,6 +459,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: parsedPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'before',
           });
           break;
         case 'insert_after_event':
@@ -417,6 +477,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: insertAfterPath,
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'after',
           });
           break;
         case 'insert_as_sub_event':
@@ -512,6 +573,7 @@ export const applyEventsChanges = (
             type: 'insert',
             path: [sceneEvents.getEventsCount()],
             eventsToInsert: localEventsToInsert || undefined,
+            insertKind: 'after',
           });
           break;
         default:
@@ -533,19 +595,52 @@ export const applyEventsChanges = (
     }
   });
 
-  operations.sort((opA, opB) => {
+  // The same event can be targeted for deletion by several changes (for
+  // example, a duplicated target in a comma separated list, or two
+  // "insert_and_replace_event" on the same event). Only keep the first
+  // deletion for a given path: applying it twice would delete the event
+  // that took the place of the deleted one.
+  const seenDeletionPaths = new Set<string>();
+  const deduplicatedOperations = operations.filter(op => {
+    if (op.type !== 'delete') return true;
+    const pathKey = op.path.join('.');
+    if (seenDeletionPaths.has(pathKey)) return false;
+    seenDeletionPaths.add(pathKey);
+    return true;
+  });
+
+  deduplicatedOperations.forEach((op, index) => {
+    op.order = index;
+  });
+
+  deduplicatedOperations.sort((opA, opB) => {
     const pathComparison = comparePathsReverseLexicographically(
       opA.path,
       opB.path
     );
     if (pathComparison !== 0) return pathComparison;
-    if (opA.type === 'delete' && opB.type !== 'delete') return -1;
-    if (opA.type !== 'delete' && opB.type === 'delete') return 1;
+
+    const priorityDifference =
+      getOperationPriorityForSamePath(opA.type) -
+      getOperationPriorityForSamePath(opB.type);
+    if (priorityDifference !== 0) return priorityDifference;
+
+    if (opA.type === 'insert' && opB.type === 'insert') {
+      const insertKindDifference =
+        getInsertKindPriorityForSamePath(opA.insertKind) -
+        getInsertKindPriorityForSamePath(opB.insertKind);
+      if (insertKindDifference !== 0) return insertKindDifference;
+
+      // Apply the last change first so that, at the same insertion point,
+      // the events end up in the order of the changes.
+      return (opB.order || 0) - (opA.order || 0);
+    }
+
     return 0;
   });
 
   let applied = 0;
-  operations.forEach(op => {
+  deduplicatedOperations.forEach(op => {
     const pathForLog = op.path.join('.');
     try {
       if (op.type === 'delete') {
@@ -851,14 +946,14 @@ export const addUndeclaredVariables = ({
       const lowerCaseType = type.toLowerCase();
       newVariable.castTo(
         lowerCaseType === 'string'
-          ? 'String'
+          ? 'string'
           : lowerCaseType === 'boolean'
-          ? 'Boolean'
+          ? 'boolean'
           : lowerCaseType === 'array'
-          ? 'Array'
+          ? 'array'
           : lowerCaseType === 'structure'
-          ? 'Structure'
-          : 'Number'
+          ? 'structure'
+          : 'number'
       );
     }
   });
@@ -887,14 +982,14 @@ export const addObjectUndeclaredVariables = ({
     const lowerCaseType = type.toLowerCase();
     variable.castTo(
       lowerCaseType === 'string'
-        ? 'String'
+        ? 'string'
         : lowerCaseType === 'boolean'
-        ? 'Boolean'
+        ? 'boolean'
         : lowerCaseType === 'array'
-        ? 'Array'
+        ? 'array'
         : lowerCaseType === 'structure'
-        ? 'Structure'
-        : 'Number'
+        ? 'structure'
+        : 'number'
     );
   };
 
@@ -902,7 +997,7 @@ export const addObjectUndeclaredVariables = ({
     group: gdObjectGroup,
     undeclaredVariable: AiGeneratedEventUndeclaredVariable
   ) => {
-    const groupVariablesContainer = gd.ObjectVariableHelper.mergeVariableContainers(
+    const groupVariablesContainer = gd.ObjectRefactorer.mergeVariableContainers(
       projectScopedContainers.getObjectsContainersList(),
       group
     );
@@ -919,7 +1014,6 @@ export const addObjectUndeclaredVariables = ({
       originalSerializedVariables,
       groupVariablesContainer
     );
-    originalSerializedVariables.delete();
 
     gd.WholeProjectRefactorer.applyRefactoringForGroupVariablesContainer(
       project,
@@ -931,6 +1025,7 @@ export const addObjectUndeclaredVariables = ({
       changeset,
       originalSerializedVariables
     );
+    originalSerializedVariables.delete();
   };
 
   undeclaredVariables.forEach(undeclaredVariable => {

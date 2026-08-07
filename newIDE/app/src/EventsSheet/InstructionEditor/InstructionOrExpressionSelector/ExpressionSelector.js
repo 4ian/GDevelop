@@ -30,7 +30,11 @@ const style = {
 
 export default class ExpressionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<EnumeratedExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllExpressions(this.props.expressionType, this.props.i18n),
+    enumerateAllExpressions(
+      this.props.expressionType,
+      this.props.scope.project,
+      this.props.i18n
+    ),
     this.props.scope
   );
   instructionsInfoTree: ExpressionTreeNode = createTree(

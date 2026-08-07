@@ -22,7 +22,9 @@ import {
   shouldValidate,
 } from './KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from './TextEllipsis';
+import Popper from '@material-ui/core/Popper';
 import Paper from './Paper';
+import PortalContainerContext from './PortalContainerContext';
 
 export const AutocompletePaperComponent = (props: any): React.Node => (
   // Use light background so that it's in contrast with background that
@@ -42,6 +44,7 @@ export type AutoCompleteOption =
       // $FlowFixMe[prop-missing]
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
       disabled?: boolean, // If true, the item is disabled and cannot be selected.
+      id?: string,
     |};
 
 export type DataSource = Array<AutoCompleteOption>;
@@ -71,6 +74,7 @@ type Props = {|
   openOnFocus?: boolean,
   style?: Object,
   inputStyle?: Object,
+  filterOptionById?: string => boolean,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
@@ -155,12 +159,15 @@ const isOptionDisabled = (option: AutoCompleteOption) =>
 const filterFunction = (
   options: DataSource,
   state: Object,
-  value: string
+  value: string,
+  filterOptionById: (string => boolean) | null
 ): DataSource => {
   const lowercaseInputValue = value.toLowerCase();
   const optionList = options.filter(option => {
     if (option.type === 'separator') return true;
-    if (!option.text) return true;
+    if (!option.text) {
+      return filterOptionById && option.id ? filterOptionById(option.id) : true;
+    }
     return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
   });
 
@@ -259,6 +266,7 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const [inputValue, setInputValue] = useState((null: string | null));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
+    const portalContainer = React.useContext(PortalContainerContext);
 
     const focus: FieldFocusFunction = options => {
       const inputElement = input.current;
@@ -306,6 +314,13 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
           <Autocomplete
             freeSolo
             classes={classes}
+            PopperComponent={
+              portalContainer
+                ? popperProps => (
+                    <Popper {...popperProps} container={portalContainer} />
+                  )
+                : undefined
+            }
             onChange={(
               event: SyntheticKeyboardEvent<HTMLInputElement>,
               option: AutoCompleteOption | null
@@ -333,7 +348,12 @@ export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               getOptionLabel(option, currentInputValue)
             }
             filterOptions={(options: DataSource, state) =>
-              filterFunction(options, state, currentInputValue)
+              filterFunction(
+                options,
+                state,
+                currentInputValue,
+                props.filterOptionById || null
+              )
             }
             id={props.id}
             renderInput={params => {

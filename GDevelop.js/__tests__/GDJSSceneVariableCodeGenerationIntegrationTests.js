@@ -312,7 +312,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push number action', function () {
-    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    scene.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushNumber' },
@@ -325,7 +325,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push string action', function () {
-    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    scene.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushString' },
@@ -338,7 +338,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push boolean action', function () {
-    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    scene.getVariables().insertNew('MyVariable', 0).castTo('array');
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'PushBoolean' },
@@ -351,7 +351,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   });
 
   it('can generate a push variable action', function () {
-    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    scene.getVariables().insertNew('MyVariable', 0).castTo('array');
     scene.getVariables().insertNew('MyOtherVariable', 0).setValue(123);
     const runtimeScene = generateAndRunActionsForLayout([
       {

@@ -354,6 +354,8 @@ class GD_CORE_API ValueTypeMetadata {
   static const gd::String objectAnimationNameValueType;
   static const gd::String objectSkinNameValueType;
   static const gd::String keyboardKeyValueType;
+  static const gd::String layerValueType;
+  static const gd::String layerValueType2;
 };
 
 }  // namespace gd

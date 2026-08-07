@@ -216,6 +216,51 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Scene name"))
       .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "LoadObjectAssets",
+          _("Preload object"),
+          _("Preload an object resources in background."),
+          _("Preload object _PARAM1_ in background (scene: _PARAM2_)"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
+      .AddParameter("sceneName", _("Object scene"), "", true)
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "UnloadObjectAssets",
+          _("Unload object"),
+          _("Unload an object resources. The \"resource preloading\" property must be set to \"preload with an action\" for this action to actually unload resources."),
+          _("Unload object _PARAM1_ (scene: _PARAM2_)"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
+      .AddParameter("sceneName", _("Object scene"), "", true)
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "AreObjectAssetsLoaded",
+          _("Object preloaded"),
+          _("Check if object resources have finished to load in background."),
+          _("Object _PARAM1_ was preloaded in background (scene: _PARAM2_)"),
+          "",
+          "res/actions/hourglass_black.svg",
+          "res/actions/hourglass_black.svg")
+      .SetHelpPath("/all-features/resources-loading")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Object name"))
+      .AddParameter("sceneName", _("Object scene"), "", true)
+      .MarkAsAdvanced();
 }
 
 }  // namespace gd

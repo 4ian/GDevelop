@@ -34,7 +34,7 @@ namespace gdjs {
               .putString(file, type === 'none' ? undefined : type);
           } catch (e) {
             if (typeof callbackStateVariable !== 'undefined')
-              callbackStateVariable.setString(e.message);
+              callbackStateVariable.setString((e as Error).message);
             return;
           }
 

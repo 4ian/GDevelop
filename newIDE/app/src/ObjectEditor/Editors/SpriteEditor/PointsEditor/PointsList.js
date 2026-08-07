@@ -30,7 +30,9 @@ type PointsListBodyProps = {|
 |};
 
 const PointsListBody = (props: PointsListBodyProps) => {
-  const [nameErrors, setNameErrors] = React.useState({});
+  const [nameErrors, setNameErrors] = React.useState<{
+    [key: string]: boolean,
+  }>({});
   const { pointsContainer, onHoverPoint } = props;
   const forceUpdate = useForceUpdate();
 
@@ -80,18 +82,13 @@ const PointsListBody = (props: PointsListBodyProps) => {
   ]);
 
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
-  // $FlowFixMe[incompatible-exact]
   const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
-    // $FlowFixMe[incompatible-use]
     const pointName = point.getName();
 
     return (
       <PointRow
-        // $FlowFixMe[incompatible-use]
         key={`point-${point.ptr}`}
-        // $FlowFixMe[incompatible-use]
         pointX={point.getX()}
-        // $FlowFixMe[incompatible-use]
         pointY={point.getY()}
         onChangePointX={newValue => updatePointX(point, newValue)}
         onChangePointY={newValue => updatePointY(point, newValue)}
@@ -106,9 +103,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
           if (pointsContainer.hasPoint(newName)) {
             success = false;
           } else {
-            // $FlowFixMe[incompatible-use]
             const oldName = point.getName();
-            // $FlowFixMe[incompatible-use]
             point.setName(newName);
             props.onRenamedPoint(oldName, newName);
             if (props.selectedPointName === pointName) {
@@ -117,7 +112,6 @@ const PointsListBody = (props: PointsListBodyProps) => {
             onPointsUpdated();
           }
 
-          // $FlowFixMe[incompatible-type]
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
         onPointerEnter={props.onHoverPoint}

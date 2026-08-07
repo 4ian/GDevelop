@@ -67,6 +67,8 @@ const QuickObjectPropertiesEditor = ({
           object.updateProperty(name, value),
         object,
         visibility: 'Basic-Quick',
+        layersContainer: null,
+        shouldDisabledFieldsWithMixedValues: false,
       });
 
       return schema;

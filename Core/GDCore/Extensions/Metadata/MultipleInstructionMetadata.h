@@ -104,6 +104,17 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
   };
 
   /**
+   * \see gd::InstructionMetadata::SetParameterHint
+   */
+  MultipleInstructionMetadata &SetParameterHint(
+      const gd::String &hint) override {
+    if (expression) expression->SetParameterHint(hint);
+    if (condition) condition->SetParameterHint(hint);
+    if (action) action->SetParameterHint(hint);
+    return *this;
+  };
+
+  /**
    * \see gd::InstructionMetadata::SetHidden
    */
   MultipleInstructionMetadata &SetHidden() override {

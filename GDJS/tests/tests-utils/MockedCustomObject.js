@@ -8,7 +8,6 @@ gdjs.evtsExt__MyExtension__MyCustomObject.MyCustomObject = class MyCustomObject 
     super(parentInstanceContainer, objectData);
     this._parentInstanceContainer = parentInstanceContainer;
 
-    this._onceTriggers = new gdjs.OnceTriggers();
     this._objectData = {};
     
     this._objectData.MyProperty = objectData.content.MyProperty !== undefined ? objectData.content.MyProperty : Number("123") || 0;

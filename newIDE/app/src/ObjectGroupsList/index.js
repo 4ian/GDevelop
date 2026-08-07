@@ -27,6 +27,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { getLabelsForObjectsAndGroupsLists } from '../ObjectsList';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -98,6 +99,8 @@ type Props = {|
   globalObjectGroups: gdObjectGroupsContainer | null,
   objectGroups: gdObjectGroupsContainer,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
+  selectedObjectGroup: gdObjectGroup | null,
+  onSelectObjectGroup: (gdObjectGroup | null) => void,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
   onEditGroup: gdObjectGroup => void,
   onCreateGroup: () => void,
@@ -121,6 +124,8 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       globalObjectGroups,
       projectScopedContainersAccessor,
       objectGroups,
+      selectedObjectGroup,
+      onSelectObjectGroup,
       onCreateGroup,
       onDeleteGroup,
       onGroupRemoved,
@@ -133,10 +138,28 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       canSetAsGlobalGroup,
       isListLocked,
     } = props;
-    const [
-      selectedGroupWithContext,
-      setSelectedGroupWithContext,
-    ] = React.useState<?GroupWithContext>(null);
+    const setSelectedGroupWithContext = React.useCallback(
+      (groupWithContext: GroupWithContext | null) => {
+        if (groupWithContext) {
+          onSelectObjectGroup(groupWithContext.group);
+        }
+      },
+      [onSelectObjectGroup]
+    );
+
+    const selectedGroupWithContext = React.useMemo<GroupWithContext | null>(
+      () =>
+        selectedObjectGroup
+          ? {
+              global: globalObjectGroups
+                ? globalObjectGroups.has(selectedObjectGroup.getName())
+                : false,
+              group: selectedObjectGroup,
+            }
+          : null,
+      [globalObjectGroups, selectedObjectGroup]
+    );
+
     const [searchText, setSearchText] = React.useState<string>('');
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
@@ -244,7 +267,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const onDuplicate = React.useCallback(
-      (groupWithContext: GroupWithContext): ?GroupWithContext => {
+      (groupWithContext: GroupWithContext): void => {
         const { group, global } = groupWithContext;
 
         const newName = newNameGenerator(
@@ -278,7 +301,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         onEditName({ group: newGroup, global });
         onObjectGroupModified();
       },
-      [globalObjectGroups, objectGroups, onObjectGroupModified, onEditName]
+      [
+        globalObjectGroups,
+        objectGroups,
+        setSelectedGroupWithContext,
+        onEditName,
+        onObjectGroupModified,
+      ]
     );
 
     const onRename = React.useCallback(
@@ -340,6 +369,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         if (treeViewRef.current)
           treeViewRef.current.openItems([globalGroupsRootFolderId]);
+        // Clear the group selection now, before actually removing the group
+        // from the scene (which destroys it), to avoid keeping a stale
+        // reference to it.
+        onSelectObjectGroup(null);
         globalObjectGroups.insert(
           group,
           typeof index === 'number' ? index : globalObjectGroups.count()
@@ -357,6 +390,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       [
         globalObjectGroups,
         objectGroups,
+        onSelectObjectGroup,
         onObjectGroupModified,
         beforeSetAsGlobalGroup,
         scrollToItem,
@@ -461,6 +495,14 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       ]
     );
 
+    const onClickItem = React.useCallback(
+      (item: TreeViewItem) => {
+        if (item.isRoot || item.isPlaceholder) return;
+        onSelectObjectGroup(item.group);
+      },
+      [onSelectObjectGroup]
+    );
+
     const editItem = React.useCallback(
       (item: TreeViewItem) => {
         if (item.isRoot || item.isPlaceholder) return;
@@ -470,10 +512,12 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     );
 
     const renderGroupMenuTemplate = React.useCallback(
-      (i18n: I18nType) => (item: TreeViewItem, index: number) =>
+      (i18n: I18nType) => (
+        item: TreeViewItem,
+        index: number
+      ): Array<MenuItemTemplate> =>
         item.isRoot || item.isPlaceholder
-          ? // $FlowFixMe[missing-empty-array-annot]
-            []
+          ? []
           : [
               {
                 label: i18n._(t`Duplicate`),
@@ -493,14 +537,16 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 accelerator: 'F2',
                 enabled: !isListLocked,
               },
-              globalObjectGroups
-                ? {
-                    label: i18n._(t`Set as global group`),
-                    enabled: !isGroupWithContextGlobal(item) && !isListLocked,
-                    click: () => setAsGlobalGroup(item),
-                    visible: canSetAsGlobalGroup !== false,
-                  }
-                : null,
+              ...(globalObjectGroups
+                ? [
+                    {
+                      label: i18n._(t`Set as global group`),
+                      enabled: !isGroupWithContextGlobal(item) && !isListLocked,
+                      click: () => setAsGlobalGroup(item),
+                      visible: canSetAsGlobalGroup !== false,
+                    },
+                  ]
+                : []),
               {
                 label: i18n._(t`Delete`),
                 click: () => onDelete(item),
@@ -513,7 +559,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                 click: onCreateGroup,
                 enabled: !isListLocked,
               },
-            ].filter(Boolean),
+            ],
       [
         isListLocked,
         globalObjectGroups,
@@ -662,6 +708,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                     {({ height }) => (
                       // $FlowFixMe[incompatible-type]
                       <TreeView
+                        enableStickyAncestors
                         key={listKey}
                         ref={treeViewRef}
                         items={treeViewData}
@@ -671,6 +718,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                         getItemChildren={getTreeViewItemChildren}
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
+                        onClickItem={onClickItem}
                         onEditItem={editItem}
                         selectedItems={
                           selectedGroupWithContext
@@ -714,7 +762,8 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
   prevProps.globalObjectGroups === nextProps.globalObjectGroups &&
-  prevProps.objectGroups === nextProps.objectGroups;
+  prevProps.objectGroups === nextProps.objectGroups &&
+  prevProps.selectedObjectGroup === nextProps.selectedObjectGroup;
 
 // $FlowFixMe[incompatible-type]
 const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(

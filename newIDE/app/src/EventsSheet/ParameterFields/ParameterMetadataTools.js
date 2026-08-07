@@ -59,10 +59,10 @@ export const getLastObjectParameterValue = ({
   return objectName;
 };
 
-export const getLastObjectParameterObjectType = (
+export const getLastObjectParameter = (
   parameters: gdParameterMetadataContainer,
   parameterIndex: number
-): string => {
+): gdParameterMetadata | null => {
   const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
     parameters,
     parameterIndex
@@ -71,10 +71,18 @@ export const getLastObjectParameterObjectType = (
     objectParameterIndex < 0 ||
     objectParameterIndex >= parameters.getParametersCount()
   ) {
-    return '';
+    return null;
   }
 
-  return parameters.getParameterAt(objectParameterIndex).getExtraInfo();
+  return parameters.getParameterAt(objectParameterIndex);
+};
+
+export const getLastObjectParameterObjectType = (
+  parameters: gdParameterMetadataContainer,
+  parameterIndex: number
+): string => {
+  const objectParameter = getLastObjectParameter(parameters, parameterIndex);
+  return objectParameter ? objectParameter.getExtraInfo() : '';
 };
 
 /**

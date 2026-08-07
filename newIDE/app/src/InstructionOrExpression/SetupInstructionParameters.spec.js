@@ -33,6 +33,7 @@ describe('setupInstructionParameters', () => {
     // Simulate that we select an instruction
     const enumeratedInstructions = enumerateFreeInstructions(
       false,
+      project,
       makeFakeI18n()
     );
     const playMusicInstruction = enumeratedInstructions.find(
@@ -80,6 +81,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
@@ -105,8 +107,8 @@ describe('setupInstructionParameters', () => {
     expect(instruction.getParametersCount()).toBe(4);
     expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
     expect(instruction.getParameter(1).getPlainString()).toBe(behaviorName);
-    // Operator
-    expect(instruction.getParameter(2).getPlainString()).toBe('');
+    // Operator - defaults to '=' when not set
+    expect(instruction.getParameter(2).getPlainString()).toBe('=');
     // Operand
     expect(instruction.getParameter(3).getPlainString()).toBe('');
   });
@@ -137,6 +139,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -163,7 +166,7 @@ describe('setupInstructionParameters', () => {
     expect(instruction.getParameter(1).getPlainString()).toBe(
       'PlatformerObject'
     );
-    expect(instruction.getParameter(2).getPlainString()).toBe(''); // In the future, this could be set to a default value.
+    expect(instruction.getParameter(2).getPlainString()).toBe('='); // Operator defaults to '='
     expect(instruction.getParameter(3).getPlainString()).toBe('');
   });
 
@@ -198,6 +201,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -257,6 +261,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
@@ -319,6 +324,7 @@ describe('setupInstructionParameters', () => {
       project.getObjects(),
       layout.getObjects(),
       objectName,
+      project,
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(

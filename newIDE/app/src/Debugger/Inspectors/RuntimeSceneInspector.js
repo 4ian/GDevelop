@@ -103,8 +103,7 @@ export default class RuntimeSceneInspector extends React.Component<
   Props,
   State
 > {
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     newObjectName: '',
   };
 

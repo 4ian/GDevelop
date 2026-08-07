@@ -10,7 +10,9 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { type ShortcutMap } from './DefaultShortcuts';
 import { getShortcutDisplayName } from './index';
 import Window from '../Utils/Window';
-import defaultShortcuts from '../KeyboardShortcuts/DefaultShortcuts';
+import defaultShortcuts, {
+  defaultSecondaryShortcuts,
+} from '../KeyboardShortcuts/DefaultShortcuts';
 import ShortcutsListRow from './ShortcutsListRow';
 import commandsList, {
   type CommandName,
@@ -102,6 +104,9 @@ const ShortcutsList = (props: Props): React.Node => {
     props.userShortcutMap['OPEN_COMMAND_PALETTE'] ||
       defaultShortcuts['OPEN_COMMAND_PALETTE']
   );
+  const commandPaletteSecondaryShortcut = getShortcutDisplayName(
+    defaultSecondaryShortcuts['OPEN_COMMAND_PALETTE']
+  );
 
   return (
     <ColumnStackLayout noMargin>
@@ -110,7 +115,8 @@ const ShortcutsList = (props: Props): React.Node => {
         identifier="command-palette-shortcut"
       >
         <Trans>
-          You can open the command palette by pressing {commandPaletteShortcut}.
+          You can open the command palette by pressing {commandPaletteShortcut}{' '}
+          or {commandPaletteSecondaryShortcut}.
         </Trans>
       </DismissableAlertMessage>
       <RaisedButton

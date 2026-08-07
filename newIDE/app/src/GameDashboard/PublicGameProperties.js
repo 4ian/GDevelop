@@ -49,8 +49,7 @@ export const cleanUpGameSlug = (gameSlug: string): string => {
     .slice(0, GAME_SLUG_MAX_LENGTH);
   if (slug.length < GAME_SLUG_MIN_LENGTH) {
     slug = slug.concat(
-      // $FlowFixMe[underconstrained-implicit-instantiation]
-      new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
+      new Array<string>(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
     );
   }
   return slug;

@@ -23,8 +23,7 @@ type State = {
 };
 
 export default class GDI18nProvider extends React.Component<Props, State> {
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     language: 'en',
     catalogs: {},
     i18n: null,

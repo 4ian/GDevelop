@@ -80,6 +80,51 @@ namespace gdjs {
     turnAroundZ(deltaAngle: float): void;
 
     /**
+     * Get the X component of the forward vector of the object.
+     */
+    getForwardX(): float;
+
+    /**
+     * Get the Y component of the forward vector of the object.
+     */
+    getForwardY(): float;
+
+    /**
+     * Get the Z component of the forward vector of the object.
+     */
+    getForwardZ(): float;
+
+    /**
+     * Get the X component of the up vector of the object.
+     */
+    getUpX(): float;
+
+    /**
+     * Get the Y component of the up vector of the object.
+     */
+    getUpY(): float;
+
+    /**
+     * Get the Z component of the up vector of the object.
+     */
+    getUpZ(): float;
+
+    /**
+     * Get the X component of the right vector of the object.
+     */
+    getRightX(): float;
+
+    /**
+     * Get the Y component of the right vector of the object.
+     */
+    getRightY(): float;
+
+    /**
+     * Get the Z component of the right vector of the object.
+     */
+    getRightZ(): float;
+
+    /**
      * Get the object size on the Z axis (called "depth").
      */
     getDepth(): float;
@@ -94,7 +139,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleZ(newScale: number): void;
+    setScaleZ(newScale: float): void;
 
     /**
      * Get the scale of the object on Z axis.
@@ -111,13 +156,13 @@ namespace gdjs {
      * Return the bottom Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getUnrotatedAABBMinZ(): number;
+    getUnrotatedAABBMinZ(): float;
 
     /**
      * Return the top Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getUnrotatedAABBMaxZ(): number;
+    getUnrotatedAABBMaxZ(): float;
 
     /**
      * Return the depth of the object before any custom size is applied.
@@ -229,6 +274,42 @@ namespace gdjs {
 
     turnAroundZ(deltaAngle: float): void {
       this.object.turnAroundZ(deltaAngle);
+    }
+
+    getForwardX(): float {
+      return this.object.getForwardX();
+    }
+
+    getForwardY(): float {
+      return this.object.getForwardY();
+    }
+
+    getForwardZ(): float {
+      return this.object.getForwardZ();
+    }
+
+    getUpX(): float {
+      return this.object.getUpX();
+    }
+
+    getUpY(): float {
+      return this.object.getUpY();
+    }
+
+    getUpZ(): float {
+      return this.object.getUpZ();
+    }
+
+    getRightX(): float {
+      return this.object.getRightX();
+    }
+
+    getRightY(): float {
+      return this.object.getRightY();
+    }
+
+    getRightZ(): float {
+      return this.object.getRightZ();
     }
 
     getDepth(): float {

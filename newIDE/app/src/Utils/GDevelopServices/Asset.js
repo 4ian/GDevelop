@@ -359,6 +359,7 @@ export type Course = {|
   shortDescriptionByLocale: MessageByLocale,
   levelByLocale: MessageByLocale,
   introByLocale?: MessageByLocale,
+  videoPosition?: 'top' | 'bottom',
 
   isLocked?: boolean,
   includedInSubscriptions: string[],
@@ -750,9 +751,9 @@ export const listReceivedBundles = async (
 export const isPublicAssetResourceUrl = (url: string): boolean =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
-// $FlowFixMe[missing-local-annot]
-const escapeStringForRegExp = string =>
-  string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+
+const escapeStringForRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 const resourceFilenameRegex = new RegExp(
   `(${escapeStringForRegExp(
     GDevelopPublicAssetResourcesStorageBaseUrl

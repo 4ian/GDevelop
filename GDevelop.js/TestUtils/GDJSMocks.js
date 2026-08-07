@@ -580,6 +580,15 @@ class CustomRuntimeObject2D extends RuntimeObject {
   constructor(parentInstanceContainer, objectData) {
     super(parentInstanceContainer, objectData);
     this._instanceContainer = parentInstanceContainer;
+
+    const variantData = this._instanceContainer
+      .getGame()
+      .getEventsBasedObjectData(objectData.type);
+    if (variantData) {
+      for (const childObjectData of variantData.objects) {
+        this._instanceContainer.registerObject(childObjectData);
+      }
+    }
   }
   onCreated() {}
 }
@@ -755,12 +764,28 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const pickAllObjects = (objectsContext, objectsLists) => {
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const allObjects = objectsContext.getObjects(name);
+      const objectsList = objectsLists.items[name];
+      copyArray(allObjects, objectsList);
+    }
+  }
+  return true;
+};
+
 class RuntimeGame {
   constructor(gameData) {
     this._variablesContainer = new VariablesContainer(
       gameData && gameData.variables
     );
     this._variablesByExtensionName = new Map();
+    this._eventsBasedObjectDatas = new Map();
     if (gameData) {
       for (const extensionData of gameData.eventsFunctionsExtensions) {
         if (extensionData.globalVariables.length > 0) {
@@ -768,6 +793,16 @@ class RuntimeGame {
             extensionData.name,
             new VariablesContainer(extensionData.globalVariables)
           );
+        }
+      }
+      if (gameData.eventsFunctionsExtensions) {
+        for (const extension of gameData.eventsFunctionsExtensions) {
+          for (const eventsBasedObject of extension.eventsBasedObjects) {
+            this._eventsBasedObjectDatas.set(
+              extension.name + '::' + eventsBasedObject.name,
+              eventsBasedObject
+            );
+          }
         }
       }
     }
@@ -779,6 +814,17 @@ class RuntimeGame {
   
   getVariablesForExtension(extensionName) {
     return this._variablesByExtensionName.get(extensionName) || null;
+  }
+
+  getEventsBasedObjectData(type) {
+    const eventsBasedObjectData = this._eventsBasedObjectDatas.get(type);
+    if (!eventsBasedObjectData) {
+      console.error(
+        'The game has no events-based object of the type "' + type + '"'
+      );
+      return null;
+    }
+    return eventsBasedObjectData;
   }
 }
 
@@ -826,6 +872,10 @@ class RuntimeScene {
   registerObject(objectData) {
     this._objects[objectData.name] = objectData;
     this._instances[objectData.name] = [];
+  }
+
+  isObjectRegistered(objectName) {
+    return !!this._objects[objectName];
   }
 
   createObject(objectName) {
@@ -1024,6 +1074,7 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          pickAllObjects,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),

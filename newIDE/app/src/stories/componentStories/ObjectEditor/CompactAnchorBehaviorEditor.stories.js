@@ -31,14 +31,13 @@ export const Default = (): React.Node => {
     <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
       <CompactAnchorBehaviorEditor
         project={testProject.project}
-        behavior={anchorBehavior}
+        behaviors={[anchorBehavior]}
         object={spriteObjectWithBehaviors}
         behaviorMetadata={behaviorMetadata}
-        behaviorOverriding={null}
-        initialInstance={null}
         onOpenFullEditor={action('onOpenFullEditor')}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}
+        layersContainer={testProject.testLayout.getLayers()}
       />
     </SerializedObjectDisplay>
   );

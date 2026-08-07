@@ -5,6 +5,7 @@ import {
   type TeamGroup,
   type User,
   type TeamMembership,
+  type TeamInvitation,
   type EditUserChanges,
 } from '../../Utils/GDevelopServices/User';
 import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
@@ -15,6 +16,8 @@ export type TeamState = {|
   members: ?Array<User>,
   admins: ?Array<User>,
   memberships: ?Array<TeamMembership>,
+  invitations: ?Array<TeamInvitation>,
+  onRefreshInvitations: () => Promise<TeamInvitation[] | void>,
   onChangeGroupName: (group: TeamGroup, newName: string) => Promise<void>,
   onChangeUserGroup: (user: User, group: TeamGroup) => Promise<void>,
   onListUserProjects: (
@@ -28,11 +31,15 @@ export type TeamState = {|
   onCreateMembers: (quantity: number) => Promise<void>,
   onActivateMembers: (userIds: string[], activate: boolean) => Promise<void>,
   onSetAdmin: (email: string, activate: boolean) => Promise<void>,
+  onSetMember: (email: string, activate: boolean) => Promise<void>,
   onChangeMemberPassword: (
     userId: string,
     newPassword: string
   ) => Promise<void>,
   onEditUser: (editedUserId: string, changes: EditUserChanges) => Promise<void>,
+  onUpdateTeam: (attributes: {|
+    classrooms: {| hideAskAi: boolean |},
+  |}) => Promise<void>,
 |};
 
 export const initialTeamState = {
@@ -41,6 +48,8 @@ export const initialTeamState = {
   members: null,
   admins: null,
   memberships: null,
+  invitations: null,
+  onRefreshInvitations: async () => {},
   onChangeGroupName: async () => {},
   onChangeUserGroup: async () => {},
   onListUserProjects: async (): Promise<Array<empty>> => [],
@@ -52,8 +61,10 @@ export const initialTeamState = {
   onActivateMembers: async () => {},
   onRefreshAdmins: async () => {},
   onSetAdmin: async () => {},
+  onSetMember: async () => {},
   onChangeMemberPassword: async () => {},
   onEditUser: async () => {},
+  onUpdateTeam: async () => {},
 };
 
 const TeamContext: React.Context<TeamState> = React.createContext<TeamState>(

@@ -56,6 +56,7 @@ import { type HTMLDataset } from '../Utils/HTMLDataset';
 import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 const gd: libGDevelop = global.gd;
 
@@ -109,9 +110,14 @@ export const getLabelsForObjectsAndGroupsLists = (
 export const getTreeViewItemIdFromObjectFolderOrObject = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): string => {
-  return objectFolderOrObject.isFolder()
-    ? getObjectFolderTreeViewItemId(objectFolderOrObject)
-    : getObjectTreeViewItemId(objectFolderOrObject.getObject());
+  if (objectFolderOrObject.isFolder()) {
+    return getObjectFolderTreeViewItemId(objectFolderOrObject);
+  }
+  const object = exceptionallyGuardAgainstDeadObject(
+    objectFolderOrObject.getObject()
+  );
+  if (!object) return `deleted-${objectFolderOrObject.ptr}`;
+  return getObjectTreeViewItemId(object);
 };
 
 export interface TreeViewItemContent {
@@ -245,6 +251,9 @@ class ObjectFolderTreeViewItem implements TreeViewItem {
   }
 
   getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+    if (!exceptionallyGuardAgainstDeadObject(this.objectFolderOrObject))
+      return this.placeholder ? [this.placeholder] : [];
+
     if (this.objectFolderOrObject.getChildrenCount() === 0) {
       return this.placeholder ? [this.placeholder] : [];
     }
@@ -320,8 +329,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   onClick(): void {}
 
-  // $FlowFixMe[missing-local-annot]
-  buildMenuTemplate(i18n: I18nType, index: number) {
+  buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate> {
     return this.buildMenuTemplateFunction(i18n, index);
   }
 
@@ -1627,6 +1635,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       renderRightComponent={renderTreeViewItemRightComponent(
                         i18n
                       )}
+                      enableStickyAncestors
                     />
                   )}
                 </AutoSizer>

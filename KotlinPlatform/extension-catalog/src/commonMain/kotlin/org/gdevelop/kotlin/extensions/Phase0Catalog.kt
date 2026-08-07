@@ -12,11 +12,11 @@ object Phase0Catalog {
     )
     val myDummyExtension = ExtensionDescriptor(
         ExtensionIdentity("MyDummyExtension", "source@23f965f5290c176de3666cca9f5ae82ffa70e24a", "builtin-js-extension"),
-        actions = listOf(ActionDescriptor("MyDummyExtension::DoSomething", listOf(ParameterDescriptor("number1", ValueTypes.Number), ParameterDescriptor("number2", ValueTypes.Number)), "gdjs._myExtension.doSomething")),
+        actions = listOf(ActionDescriptor("MyDummyExtension::DoSomething", listOf(ParameterDescriptor("number1", "expression"), ParameterDescriptor("number2", "expression")), "gdjs._myExtension.doSomething")),
         lifecycleHooks = emptyList(),
-        conditions = listOf(ConditionDescriptor("MyDummyExtension::MyCondition", listOf(ParameterDescriptor("number1", ValueTypes.Number), ParameterDescriptor("number2", ValueTypes.Number)), "gdjs._myExtension.myConditionFunction")),
+        conditions = listOf(ConditionDescriptor("MyDummyExtension::MyCondition", listOf(ParameterDescriptor("number1", "expression"), ParameterDescriptor("number2", "expression")), "gdjs._myExtension.myConditionFunction")),
         metadataMembers = listOf(
-            MetadataMemberDescriptor(ExtensionMemberKind.EXPRESSION, listOf("MyDummyExtension", "MyExpression"), listOf(ParameterDescriptor("number1", ValueTypes.Number)), "gdjs._myExtension.myExpressionFunction"),
+            MetadataMemberDescriptor(ExtensionMemberKind.EXPRESSION, listOf("MyDummyExtension", "MyExpression"), listOf(ParameterDescriptor("number1", "expression")), "gdjs._myExtension.myExpressionFunction"),
             MetadataMemberDescriptor(ExtensionMemberKind.BEHAVIOR, listOf("MyDummyExtension", "DummyBehavior")),
             MetadataMemberDescriptor(ExtensionMemberKind.OBJECT, listOf("MyDummyExtension", "DummyObject")),
             MetadataMemberDescriptor(ExtensionMemberKind.EFFECT, listOf("MyDummyExtension", "DummyEffect")),

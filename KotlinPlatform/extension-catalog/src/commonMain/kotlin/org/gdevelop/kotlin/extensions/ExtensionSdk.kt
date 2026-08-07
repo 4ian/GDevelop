@@ -20,6 +20,13 @@ object ValueTypes {
     val Longitude = ValueTypeId("org.gdevelop.value.longitude-degrees.v1")
     val Latitude = ValueTypeId("org.gdevelop.value.latitude-degrees.v1")
     fun legacy(value: String) = when(value) { "number", "expression" -> Number; "boolean" -> Boolean; "variable" -> Variable; "identifier", "layer" -> Identifier; "longitude" -> Longitude; "latitude" -> Latitude; else -> String }
+    fun serializedName(valueType: ValueTypeId) = when (valueType) {
+        Number, Longitude, Latitude -> "number"
+        Boolean -> "boolean"
+        Variable -> "variable"
+        Identifier -> "identifier"
+        else -> "string"
+    }
 }
 @Serializable enum class ValueLoweringKind { NUMBER, BOOLEAN, TEXT, IDENTIFIER }
 @Serializable data class ValueTypeDescriptor(val id:ValueTypeId,val loweringVersion:Int,val kind:ValueLoweringKind,val minimum:Double?=null,val maximum:Double?=null)
@@ -31,9 +38,10 @@ object StandardValueTypeDescriptors {
     @Serializable data class Boolean(override val source:String,val value:kotlin.Boolean):ResolvedArgument
     @Serializable data class Text(override val source:String,val value:String):ResolvedArgument
 }
-@Serializable data class ParameterDescriptor(val name:String,val valueType:ValueTypeId,val optional:Boolean=false,val defaultValue:String?=null) {
-    constructor(name:String,type:String):this(name,ValueTypes.legacy(type))
-    val type:String get()=valueType.value
+@Serializable data class ParameterDescriptor(val name:String,val valueType:ValueTypeId,val optional:Boolean=false,val defaultValue:String?=null,val serializedType:String=ValueTypes.serializedName(valueType)) {
+    constructor(name:String,type:String):this(name,ValueTypes.legacy(type),serializedType=type)
+    /** Legacy serialized category; use [valueType] for lowering and validation identity. */
+    val type:String get()=serializedType
     init { require(!optional || defaultValue != null) { "Optional parameter $name requires a default" } }
 }
 
@@ -89,7 +97,7 @@ class ExtensionCatalog private constructor(val snapshot:CatalogSnapshot,private 
    p.forEach{owner->owner.descriptor.dependencies.forEach{r->require(p.any{it.descriptor.identity.namespace==r.namespace&&(r.origin==null||it.descriptor.identity.origin==r.origin)&&matches(it.descriptor.identity.version,r.versionRange)}){"Unresolved extension dependency ${r.namespace} ${r.versionRange}"}}};return p
   }
   private fun matches(v:String,r:String):Boolean=when{r=="*"->true;r.startsWith("^")->v.substringBefore('.').toIntOrNull()==r.drop(1).substringBefore('.').toIntOrNull();r.contains("..")->{val(a,b)=r.split("..",limit=2);v>=a&&v<=b};else->v==r}
-  private fun canonical(ds:List<ExtensionDescriptor>)=ds.joinToString("\n"){e->listOf(e.identity.namespace,e.identity.version,e.identity.origin,e.contracts.toString(),e.dependencies.sortedBy{it.namespace}.joinToString(),(e.actions.map{"a:${it.memberPath.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}+e.conditions.map{"c:${it.memberPath.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}+e.metadataMembers.map{"m:${it.kind}:${it.path.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}).sorted().joinToString("|"),e.aliases.sortedBy{it.serializedName}.joinToString()).joinToString(";")}
+  private fun canonical(ds:List<ExtensionDescriptor>)=ds.joinToString("\n"){e->listOf(e.identity.namespace,e.identity.version,e.identity.origin,e.contracts.toString(),e.dependencies.sortedBy{it.namespace}.joinToString(),(e.actions.map{"a:${it.memberPath.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.serializedType}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}+e.conditions.map{"c:${it.memberPath.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.serializedType}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}+e.metadataMembers.map{"m:${it.kind}:${it.path.joinToString("/")}:${it.parameters.joinToString{p->"${p.name}:${p.serializedType}:${p.valueType.value}:${p.optional}:${p.defaultValue}"}}:${it.runtimeEntry}:${it.contracts}"}).sorted().joinToString("|"),e.aliases.sortedBy{it.serializedName}.joinToString()).joinToString(";")}
   private fun fnv(s:String):String{var h=1469598103934665603L;s.encodeToByteArray().forEach{h=(h xor (it.toLong() and 255))*1099511628211L};return h.toULong().toString(16).padStart(16,'0')}
  }
 }

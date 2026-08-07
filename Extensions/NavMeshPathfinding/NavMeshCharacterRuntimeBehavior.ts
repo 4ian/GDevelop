@@ -37,8 +37,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -54,9 +53,8 @@ namespace gdjs {
     /** Used by the path simplification algorithm */
     static _smoothingWorkingVertices: Array<FloatPoint> = [];
 
-    //Behavior configuration:
+    // Behavior configuration:
     _angularMaxSpeed: float;
-    _angularAcceleration: float;
     _rotateObject: boolean;
     _angleOffset: float;
     _radius: float;
@@ -70,13 +68,13 @@ namespace gdjs {
       separationWeight: 1.0,
     };
 
-    //Attributes used for traveling on the path:
+    // Attributes used for traveling on the path:
     _angularSpeed: float = 0;
     _pathFound: boolean = false;
     _reachedEnd: boolean = false;
-    _manager: NavMeshObstaclesManager;
-
     _movementAngle: float = 0;
+
+    _manager: NavMeshObstaclesManager;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -98,9 +96,6 @@ namespace gdjs {
       this._crowdAgentParams.maxSpeed = behaviorData.maxSpeed;
       this._crowdAgentParams.collisionQueryRange =
         behaviorData.avoidanceSightRange;
-
-      // TODO Add a property for it?
-      this._angularAcceleration = 7200;
 
       this._manager =
         gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
@@ -318,8 +313,6 @@ namespace gdjs {
         );
       }
 
-      const oldX = this.owner.getX();
-      const oldY = this.owner.getY();
       let newX = agent.raw.get_npos(0);
       let newY = this._manager.is3D
         ? agent.raw.get_npos(2)
@@ -328,11 +321,31 @@ namespace gdjs {
 
       //console.log("newZ", newZ);
 
-      // Avoid to frequently change of direction when not moving much.
-      const deltaX = newX - oldX;
-      const deltaY = newY - oldY;
-      if (Math.abs(deltaX) + Math.abs(deltaY) > this.getMaxSpeed() / 100) {
-        this._movementAngle = gdjs.toDegrees(Math.atan2(deltaY, deltaX));
+      const destinationX = this.getDestinationX();
+      const destinationY = this.getDestinationY();
+      const destinationZ = this.getDestinationZ();
+
+      const velocity = agent.desiredVelocity();
+      const velocityX = velocity.x;
+      const velocityY = this._manager.is3D
+                ? velocity.z
+                : velocity.z * this._manager.speedScaleY;
+      if (
+        Math.abs(velocityX) > 0 &&
+        Math.abs(velocityY) > 0 &&
+        // Avoid to rotate strangely at the end of the path
+        Math.abs(destinationX - newX) > 3 &&
+        Math.abs(destinationY - newY) > 3
+      ) {
+        this._movementAngle = gdjs.evtTools.common.mod(
+          gdjs.toDegrees(
+            Math.atan2(
+              velocityY,
+              velocityX
+            )
+          ),
+          360
+        );
       }
       if (
         this._rotateObject &&
@@ -340,15 +353,11 @@ namespace gdjs {
       ) {
         this.rotateTowardAngle(this._movementAngle + this._angleOffset);
       }
-
-      const destinationX = this.getDestinationX();
-      const destinationY = this.getDestinationY();
-      const destinationZ = this.getDestinationZ();
       if (
-        Math.abs(newX - destinationX) < 0.5 &&
-        Math.abs(newY - destinationY) < 0.5 &&
+        Math.abs(newX - destinationX) < 1 &&
+        Math.abs(newY - destinationY) < 1 &&
         //@ts-ignore
-        (!this.owner.getZ || Math.abs(newZ - destinationZ) < 0.5)
+        (!this.owner.getZ || Math.abs(newZ - destinationZ) < 1)
       ) {
         this._reachedEnd = true;
         agent.resetMoveTarget();
@@ -377,18 +386,6 @@ namespace gdjs {
       const timeDelta = this.owner.getElapsedTime() / 1000;
       this._angularSpeed =
         (diffWasPositive ? -1.0 : 1.0) * this._angularMaxSpeed;
-      // Always rotate the right way.
-      // if (this._angularSpeed > 0 !== diffWasPositive) {
-      //   this._angularSpeed = 0;
-      // }
-      // this._angularSpeed = gdjs.evtTools.common.clamp(
-      //   this._angularSpeed +
-      //     (diffWasPositive ? -1.0 : 1.0) *
-      //       this._angularAcceleration *
-      //       timeDelta,
-      //   -this._angularMaxSpeed,
-      //   this._angularMaxSpeed
-      // );
 
       let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
 
@@ -458,8 +455,13 @@ namespace gdjs {
       if (!this._agent) {
         return 0;
       }
-      const velocity = this._agent.desiredVelocityObstacleAdjusted();
-      return Math.hypot(velocity.x, velocity.y, velocity.z);
+      const velocity = this._agent.desiredVelocity();
+
+      return Math.hypot(
+        velocity.x,
+        velocity.y,
+        this._manager.is3D ? velocity.z : velocity.z * this._manager.speedScaleY
+      );
     }
 
     getMovementAngle(): float {

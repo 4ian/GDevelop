@@ -383,6 +383,14 @@ class GD_CORE_API Variable {
   Variable& ResetPersistentUuid();
 
   /**
+   * \brief Set the persistent UUID if it is not set already, and do the
+   * same for all the children - contrary to `ResetPersistentUuid`, existing
+   * UUIDs are preserved (so that they stay stable across serializations,
+   * avoiding useless changes in the project file).
+   */
+  Variable& EnsurePersistentUuid();
+
+  /**
    * \brief Remove the persistent UUID - when the variable no
    * longer needs to be recognized between serializations.
    */

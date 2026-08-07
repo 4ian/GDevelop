@@ -56,7 +56,11 @@ const resourceKindToInputAcceptedMimes = {
     // Same as above: .atlas files have no recognized mime type on iOS Safari, so the
     // 'file' pseudo-mime is used and validation happens post-picking.
   ],
-  spine: ['application/json'],
+  spine: [
+    'file',
+    // .skel has no recognized mime type; .json would be filtered out on iOS if mixed
+    // with application/json. Validation happens post-picking (json and skel).
+  ],
   javascript: ['text/javascript'],
 };
 
@@ -78,9 +82,20 @@ const getAcceptedMimeTypes = (resourceKind: ResourceKind): string[] => {
   return resourceKindToInputAcceptedMimes[resourceKind] || [];
 };
 
+const usesFilePseudoMime = (resourceKind: ResourceKind): boolean => {
+  const acceptedMimes = getAcceptedMimeTypes(resourceKind);
+  return acceptedMimes.length === 1 && acceptedMimes[0] === 'file';
+};
+
 export const getInputAcceptedMimesAndExtensions = (
   resourceKind: ResourceKind
 ): string => {
+  // iOS Safari/WKWebView maps each extension of the `accept` attribute to a mime type,
+  // dropping the unrecognized ones. If at least one is recognized (like .xml), the picker
+  // is restricted to it, greying out the others (like .fnt). So when the 'file' pseudo-mime
+  // is used, don't send any extension: validation happens post-picking.
+  if (usesFilePseudoMime(resourceKind)) return 'file';
+
   const acceptedExtensions = getAcceptedExtensions(resourceKind);
   const acceptedMimes = getAcceptedMimeTypes(resourceKind);
 
@@ -205,11 +220,9 @@ export const FileToCloudProjectResourceUploader = ({
 
   const shouldValidateFilePostPicking = React.useMemo(
     () => {
-      const acceptedMimeTypes = getAcceptedMimeTypes(options.resourceKind);
-      // Safari does not use file extensions to filter files pre-picking and
-      // Safari also does not recognize all mime types. So if the only accepted
-      // mime type is 'file', the file validation should happen post-picking.
-      return acceptedMimeTypes.length === 1 && acceptedMimeTypes[0] === 'file';
+      // If the only accepted mime type is the 'file' pseudo-mime, no filtering
+      // happens pre-picking, so the file validation should happen post-picking.
+      return usesFilePseudoMime(options.resourceKind);
     },
     [options.resourceKind]
   );

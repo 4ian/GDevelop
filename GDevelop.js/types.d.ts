@@ -370,7 +370,9 @@ export class Variable extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): Variable;
+  ensurePersistentUuid(): Variable;
   clearPersistentUuid(): Variable;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainer extends EmscriptenObject {
@@ -393,7 +395,9 @@ export class VariablesContainer extends EmscriptenObject {
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): VariablesContainer;
+  ensurePersistentUuids(): VariablesContainer;
   clearPersistentUuid(): VariablesContainer;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainersList extends EmscriptenObject {
@@ -423,7 +427,7 @@ export class ObjectRefactorer extends EmscriptenObject {
   static fillAnyVariableBetweenObjects(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, objectGroup: ObjectGroup): void;
   static applyChangesToVariants(eventsBasedObject: EventsBasedObject, objectName: string, changeset: VariablesChangeset): void;
   static fillMissingGroupVariablesToObject(obj: gdObject, groupVariablesContainer: VariablesContainer): void;
-  static fillMissingGroupBehaviorToObject(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
+  static fillMissingGroupBehaviorToObject(platform: Platform, globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer, obj: gdObject, objectGroup: ObjectGroup, behaviorName: string): void;
 }
 
 export class EventsBasedObjectVariantHelper extends EmscriptenObject {
@@ -1251,6 +1255,8 @@ export class InitialInstance extends EmscriptenObject {
   setSealed(seal: boolean): void;
   shouldKeepRatio(): boolean;
   setShouldKeepRatio(keepRatio: boolean): void;
+  isHidden(): boolean;
+  setHidden(hidden: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getOpacity(): number;

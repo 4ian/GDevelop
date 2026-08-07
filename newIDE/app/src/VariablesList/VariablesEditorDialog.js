@@ -97,7 +97,9 @@ const VariablesEditorDialog = ({
   } = useSerializableObjectsCancelableEditor({
     serializableObjects,
     onCancel,
-    resetThenClearPersistentUuid: true,
+    // Variables persistent UUIDs are persisted in the project file, so they
+    // must be kept stable: only set them for variables not having one yet.
+    ensurePersistentUuids: true,
   });
 
   const lastSelectedVariableNodeId = React.useRef<string | null>(null);
@@ -187,7 +189,6 @@ const VariablesEditorDialog = ({
             );
           }
         }
-        variablesContainer.clearPersistentUuid();
       }
       const tab = tabs.find(({ id }) => id === currentTab);
       if (tab) {

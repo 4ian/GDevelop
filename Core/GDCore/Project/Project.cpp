@@ -741,6 +741,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
   watermark.UnserializeFrom(propElement.GetChild("watermark"));
+  sceneResourcesPreloading =
+      propElement.GetStringAttribute("sceneResourcesPreloading", "at-startup");
+  sceneResourcesUnloading =
+      propElement.GetStringAttribute("sceneResourcesUnloading", "never");
 
   authorIds.clear();
   auto& authorIdsElement = propElement.GetChild("authorIds");

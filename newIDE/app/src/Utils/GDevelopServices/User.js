@@ -181,7 +181,16 @@ export type User = {|
   +password?: ?string,
 |};
 
-export type Team = {| id: string, createdAt: number, seats: number |};
+export type Team = {|
+  id: string,
+  createdAt: number,
+  seats: number,
+  /**
+   * Overrides applied to the `classrooms` capability of the students of this
+   * team. Keys mirror the `classrooms` capability of the limits.
+   */
+  classrooms?: ?{| hideAskAi: boolean |},
+|};
 export type TeamGroup = {| id: string, name: string |};
 export type TeamInvitation = {|
   teamId: string,
@@ -342,6 +351,24 @@ export const updateGroup = async (
     data: response.data,
     propertyName: 'id',
     endpointName: '/team/{id}/group/{id} of User API',
+  });
+};
+
+export const updateTeam = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  teamId: string,
+  attributes: {| classrooms: {| hideAskAi: boolean |} |}
+): Promise<Team> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.patch(`/team/${teamId}`, attributes, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return ensureObjectHasProperty({
+    data: response.data,
+    propertyName: 'id',
+    endpointName: '/team/{id} of User API',
   });
 };
 

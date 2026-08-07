@@ -356,6 +356,17 @@ Variable& Variable::ResetPersistentUuid() {
   return *this;
 }
 
+Variable& Variable::EnsurePersistentUuid() {
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  for (auto& it : children) {
+    it.second->EnsurePersistentUuid();
+  }
+  for (auto& it : childrenArray) {
+    it->EnsurePersistentUuid();
+  }
+  return *this;
+}
+
 Variable& Variable::ClearPersistentUuid() {
   persistentUuid = "";
   for (auto& it : children) {

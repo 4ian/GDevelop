@@ -36,6 +36,12 @@ type ProcessEditorFunctionCallsOptions = {|
   i18n: I18nType,
   editorCallbacks: EditorCallbacks,
   toolOptions: ToolOptions | null,
+  // The AI request's tools version (e.g. 'v12'), threaded to the functions so
+  // they can gate version-dependent behavior (e.g. isNoOpConsideredSuccess).
+  toolsVersion?: ?string,
+  // When true, a `run_script` call is exposed only non-mutating functions
+  // (explorer sub-agent scripts, which must stay read-only).
+  runScriptReadOnly?: boolean,
   relatedAiRequestId: string | null,
   getRelatedAiRequestLastMessages: () => RelatedAiRequestLastMessages,
   generateEvents: (
@@ -78,6 +84,8 @@ export const processEditorFunctionCalls = async ({
   i18n,
   editorCallbacks,
   toolOptions,
+  toolsVersion,
+  runScriptReadOnly,
   generateEvents,
   onSceneEventsModifiedOutsideEditor,
   onInstancesModifiedOutsideEditor,
@@ -106,7 +114,7 @@ export const processEditorFunctionCalls = async ({
   for (const functionCall of functionCalls) {
     const call_id = functionCall.call_id;
     const name = functionCall.name;
-    if (!project && name !== 'initialize_project') {
+    if (!project && !editorFunctionsWithoutProject[name]) {
       results.push({
         status: 'finished',
         call_id,
@@ -143,6 +151,9 @@ export const processEditorFunctionCalls = async ({
             message: 'Invalid arguments (not a valid JSON string).',
           },
         });
+        // Without this, the function would still run with `args: undefined`
+        // and a second result would be pushed for the same call_id.
+        continue;
       }
 
       // $FlowFixMe[invalid-compare]
@@ -192,6 +203,8 @@ export const processEditorFunctionCalls = async ({
         args,
         i18n,
         toolOptions,
+        toolsVersion,
+        runScriptReadOnly,
         editorCallbacks,
         relatedAiRequestId,
         getRelatedAiRequestLastMessages,
@@ -244,8 +257,13 @@ export const processEditorFunctionCalls = async ({
 
       const { success, meta, ...output } = result;
       const editorFunctionDef = editorFunction || editorFunctionWithoutProject;
+      // `run_script` sets `meta.didModifyProject` explicitly: a script can
+      // apply project-changing calls before failing, so its "did modify" is
+      // NOT `modifiesProject && success` — honor the reported value when given.
       const didModifyProject =
-        editorFunctionDef && editorFunctionDef.modifiesProject && success
+        meta && typeof meta.didModifyProject === 'boolean'
+          ? meta.didModifyProject || undefined
+          : editorFunctionDef && editorFunctionDef.modifiesProject && success
           ? true
           : undefined;
       results.push({

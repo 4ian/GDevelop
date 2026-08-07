@@ -2,7 +2,6 @@
 import { Trans, t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import DirectionTools from './DirectionTools';
 import ImageThumbnail from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
@@ -39,6 +38,11 @@ import ContextMenu, {
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { groupResourcesByAnimations } from './AnimationImportHelper';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
+import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { makeDropTarget } from '../../../UI/DragAndDrop/DropTarget';
+import { useAutoScrollDuringDrag } from '../../../UI/DragAndDrop/UseAutoScrollDuringDrag';
+import { ColumnDropIndicator } from '../../../MainFrame/EditorTabs/DropIndicator';
+import { useDragDropManager } from 'react-dnd';
 
 const gd: libGDevelop = global.gd;
 
@@ -47,95 +51,43 @@ const SPRITE_SIZE = 100;
 const styles = {
   spritesList: {
     display: 'flex',
+    overflowX: 'auto',
     overflowY: 'hidden',
     flex: 1,
+  },
+  spriteAndIndicator: {
+    display: 'flex',
+    flexShrink: 0,
+  },
+  spriteDragSource: {
+    display: 'flex',
+  },
+  // A drop zone to allow moving a sprite at the end of the list. It also
+  // grows to fill the empty space after the last sprite, if any.
+  endOfListDropZone: {
+    display: 'flex',
+    flex: 1,
+    minWidth: 30,
   },
   thumbnailExtraStyle: {
     marginLeft: 5,
   },
 };
 
-const SortableSpriteThumbnail = SortableElement(
-  ({
-    sprite,
-    project,
-    resourcesLoader,
-    selected,
-    onSelect,
-    onContextMenu,
-    isFirst,
-  }) => (
-    <ImageThumbnail
-      selectable
-      selected={selected}
-      onSelect={onSelect}
-      onContextMenu={onContextMenu}
-      resourceName={sprite.getImageName()}
-      resourcesLoader={resourcesLoader}
-      project={project}
-      style={isFirst ? {} : styles.thumbnailExtraStyle}
-      size={SPRITE_SIZE}
-    />
-  )
-);
+// `name` and `thumbnail` are displayed by the `CustomDragLayer` as a preview
+// under the cursor or finger during the drag.
+type DraggedSpriteItem = {|
+  directionPtr: number,
+  name: string,
+  thumbnail: string,
+|};
 
-const SortableList = SortableContainer(
-  ({
-    direction,
-    project,
-    resourcesLoader,
-    resourceManagementProps,
-    selectedSprites,
-    onSelectSprite,
-    onOpenSpriteContextMenu,
-  }) => {
-    const spritesCount = direction.getSpritesCount();
-    const hasMoreThanOneSprite = spritesCount > 1;
-    return (
-      <div style={styles.spritesList}>
-        {[
-          ...mapFor(0, spritesCount, i => {
-            const sprite = direction.getSprite(i);
-            return hasMoreThanOneSprite ? (
-              <SortableSpriteThumbnail
-                sprite={sprite}
-                key={sprite.ptr}
-                index={i}
-                isFirst={i === 0}
-                selected={!!selectedSprites[sprite.ptr]}
-                onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
-                onSelect={selected => onSelectSprite(sprite, selected)}
-                resourcesLoader={resourcesLoader}
-                project={project}
-              />
-            ) : (
-              // If there is only one sprite, don't make it draggable.
-              <ImageThumbnail
-                key={sprite.ptr}
-                selectable
-                selected={!!selectedSprites[sprite.ptr]}
-                onSelect={selected => onSelectSprite(sprite, selected)}
-                onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
-                resourceName={sprite.getImageName()}
-                resourcesLoader={resourcesLoader}
-                project={project}
-                size={SPRITE_SIZE}
-              />
-            );
-          }),
-          spritesCount === 0 && (
-            <ImageThumbnail
-              key="empty"
-              project={project}
-              resourceName=""
-              resourcesLoader={resourcesLoader}
-              size={SPRITE_SIZE}
-            />
-          ),
-        ]}
-      </div>
-    );
-  }
+const DragSourceAndDropTarget = makeDragSourceAndDropTarget<DraggedSpriteItem>(
+  'sprite-editor-sprites-list',
+  { vibrate: 100 }
+);
+const EndOfListDropTarget = makeDropTarget<DraggedSpriteItem>(
+  'sprite-editor-sprites-list'
 );
 
 /**
@@ -299,6 +251,7 @@ const SpritesList = ({
   const spriteContextMenu = React.useRef<?ContextMenuInterface>(null);
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
+  const dragDropManager = useDragDropManager();
 
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
@@ -349,8 +302,8 @@ const SpritesList = ({
     [direction]
   );
 
-  const onSortEnd = React.useCallback(
-    ({ oldIndex, newIndex }: {| oldIndex: number, newIndex: number |}) => {
+  const moveSpriteToIndex = React.useCallback(
+    (oldIndex: number, newIndex: number) => {
       if (oldIndex === newIndex) return;
       // We store the selection value of the moved sprite, as its pointer will
       // be changed by the move.
@@ -391,6 +344,42 @@ const SpritesList = ({
       updateSelectionIndexesAfterMoveDown,
       updateSelectionIndexesAfterMoveUp,
     ]
+  );
+
+  const draggedSpriteIndex = React.useRef<number | null>(null);
+  const spritesListRef = React.useRef<HTMLDivElement | null>(null);
+  const getSpritesListElement = React.useCallback(
+    () => spritesListRef.current,
+    []
+  );
+  const { startAutoScroll, stopAutoScroll } = useAutoScrollDuringDrag(
+    getSpritesListElement
+  );
+
+  const dropBeforeSprite = React.useCallback(
+    (targetIndex: number) => {
+      const oldIndex = draggedSpriteIndex.current;
+      if (oldIndex === null) return;
+      draggedSpriteIndex.current = null;
+      // The sprite is inserted before the hovered sprite, so when moving
+      // forward, the target index is decreased by one to account for the
+      // removal of the sprite from its previous position.
+      moveSpriteToIndex(
+        oldIndex,
+        targetIndex > oldIndex ? targetIndex - 1 : targetIndex
+      );
+    },
+    [moveSpriteToIndex]
+  );
+
+  const dropAtEndOfList = React.useCallback(
+    () => {
+      const oldIndex = draggedSpriteIndex.current;
+      if (oldIndex === null) return;
+      draggedSpriteIndex.current = null;
+      moveSpriteToIndex(oldIndex, direction.getSpritesCount() - 1);
+    },
+    [moveSpriteToIndex, direction]
   );
 
   const onAddSprite = React.useCallback(
@@ -482,11 +471,11 @@ const SpritesList = ({
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
-      const firstSpritePtr = animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSprite(0).ptr;
-      const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
+      // The first direction of the first animation can be empty (for example,
+      // when editing another animation of the object).
+      const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
+      const isObjectFirstSpriteDeleted =
+        !!firstObjectSprite && !!sprites[firstObjectSprite.ptr];
 
       const totalSpritesCount = getTotalSpritesCount(animations);
       const isDeletingLastSprites =
@@ -555,11 +544,10 @@ const SpritesList = ({
   );
 
   const addSpriteToSelection = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (sprite, selected) => {
+    (spritePtr: number, selected: boolean) => {
       selectedSprites.current = {
         ...selectedSprites.current,
-        [sprite.ptr]: selected,
+        [spritePtr]: selected,
       };
       forceUpdate();
     },
@@ -567,29 +555,107 @@ const SpritesList = ({
   );
 
   const selectUniqueSprite = React.useCallback(
-    (sprite: gdSprite) => {
+    (spritePtr: number) => {
       selectedSprites.current = {
-        [sprite.ptr]: true,
+        [spritePtr]: true,
       };
       forceUpdate();
     },
     [forceUpdate]
   );
 
+  const getSelectedSpriteIndexes = React.useCallback(
+    () => {
+      const selectedIndexes = [];
+      mapFor(0, direction.getSpritesCount(), i => {
+        if (selectedSprites.current[direction.getSprite(i).ptr]) {
+          selectedIndexes.push(i);
+        }
+      });
+      return selectedIndexes;
+    },
+    [direction]
+  );
+
+  const moveSelectedSpritesToPosition = React.useCallback(
+    (targetStartIndex: number) => {
+      const spritesCount = direction.getSpritesCount();
+      const selectedIndexes = getSelectedSpriteIndexes();
+      if (selectedIndexes.length === 0) return;
+      const startIndex = Math.min(
+        targetStartIndex,
+        spritesCount - selectedIndexes.length
+      );
+
+      // First gather the selected sprites at the end of the list, in order:
+      // moving a sprite to the last position never disturbs the sprites
+      // already gathered there. `currentPositions` keeps track of how each
+      // move shifts the other sprites.
+      const selectedCount = selectedIndexes.length;
+      const currentPositions = mapFor(0, spritesCount, i => i);
+      selectedIndexes.forEach(selectedIndex => {
+        const fromIndex = currentPositions.indexOf(selectedIndex);
+        if (fromIndex !== spritesCount - 1) {
+          direction.moveSprite(fromIndex, spritesCount - 1);
+        }
+        currentPositions.push(currentPositions.splice(fromIndex, 1)[0]);
+      });
+      // Then move this block of sprites to its final position, in order:
+      // each move leaves the rest of the block in place.
+      mapFor(0, selectedCount, j => {
+        const fromIndex = spritesCount - selectedCount + j;
+        const toIndex = startIndex + j;
+        if (fromIndex !== toIndex) direction.moveSprite(fromIndex, toIndex);
+      });
+
+      // As sprites were moved, the pointers of the selected sprites are now
+      // the ones at the final positions of the selection.
+      const newSelectedSprites: { [number]: boolean } = {};
+      mapFor(0, selectedCount, j => {
+        newSelectedSprites[direction.getSprite(startIndex + j).ptr] = true;
+      });
+      selectedSprites.current = newSelectedSprites;
+
+      forceUpdate();
+      if (onSpriteUpdated) onSpriteUpdated();
+      if (startIndex === 0 || selectedIndexes[0] === 0) {
+        // A sprite was moved from or to the first position,
+        // so the first sprite has changed.
+        if (onFirstSpriteUpdated) onFirstSpriteUpdated();
+      }
+    },
+    [
+      direction,
+      getSelectedSpriteIndexes,
+      forceUpdate,
+      onSpriteUpdated,
+      onFirstSpriteUpdated,
+    ]
+  );
+
   const openSpriteContextMenu = React.useCallback(
-    // $FlowFixMe[missing-local-annot]
-    (x, y, sprite) => {
+    (x: number, y: number, spritePtr: number) => {
+      // When the context menu opens (long press on mobile), it intercepts
+      // subsequent touch events, so the drag backend would never receive
+      // touchend and a drag started by the press would stay active
+      // indefinitely. End it explicitly before opening the menu.
+      if (dragDropManager.getMonitor().isDragging()) {
+        dragDropManager.getActions().endDrag();
+      }
       // If the sprite is not selected, select only it.
-      if (!selectedSprites.current[sprite.ptr]) {
-        selectUniqueSprite(sprite);
+      if (!selectedSprites.current[spritePtr]) {
+        selectUniqueSprite(spritePtr);
       }
       // Otherwise, keep the selection as is.
       if (spriteContextMenu.current) {
         spriteContextMenu.current.open(x, y);
       }
     },
-    [selectUniqueSprite]
+    [selectUniqueSprite, dragDropManager]
   );
+
+  const spritesCount = direction.getSpritesCount();
+  const hasMoreThanOneSprite = spritesCount > 1;
 
   return (
     <ColumnStackLayout noMargin>
@@ -607,31 +673,145 @@ const SpritesList = ({
         onDirectionUpdated={onSpriteUpdated}
       />
       <ResponsiveLineStackLayout noMargin expand alignItems="center">
-        <SortableList
-          resourcesLoader={resourcesLoader}
-          direction={direction}
-          project={project}
-          resourceManagementProps={resourceManagementProps}
-          selectedSprites={selectedSprites.current}
-          onSelectSprite={addSpriteToSelection}
-          onOpenSpriteContextMenu={openSpriteContextMenu}
-          onSortEnd={onSortEnd}
-          helperClass="sortable-helper"
-          lockAxis="x"
-          axis="x"
-        />
+        <div style={styles.spritesList} ref={spritesListRef}>
+          {mapFor(0, spritesCount, i => {
+            const sprite = direction.getSprite(i);
+            // Extract the sprite pointer and image name right away: the
+            // closures below can be called by react-dnd after the underlying
+            // C++ sprite was moved or deleted (following a drag'n'drop or a
+            // deletion), but before this component is re-rendered. `sprite`
+            // would then be a dangling wrapper: calling any of its methods
+            // would crash the editor - so closures must only capture these
+            // primitives.
+            const spritePtr = sprite.ptr;
+            const imageName = sprite.getImageName();
+            return (
+              <DragSourceAndDropTarget
+                key={spritePtr}
+                beginDrag={() => {
+                  draggedSpriteIndex.current = i;
+                  startAutoScroll();
+                  return {
+                    directionPtr: direction.ptr,
+                    name: imageName,
+                    thumbnail: resourcesLoader.getResourceFullUrl(
+                      project,
+                      imageName,
+                      {}
+                    ),
+                  };
+                }}
+                endDrag={stopAutoScroll}
+                // If there is only one sprite, don't make it draggable.
+                canDrag={() => hasMoreThanOneSprite}
+                // Only allow moving sprites within the same direction.
+                canDrop={item => item.directionPtr === direction.ptr}
+                drop={() => dropBeforeSprite(i)}
+              >
+                {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+                  connectDropTarget(
+                    <div style={styles.spriteAndIndicator}>
+                      {isOver && canDrop && <ColumnDropIndicator />}
+                      {connectDragSource(
+                        <div style={styles.spriteDragSource}>
+                          <ImageThumbnail
+                            selectable
+                            selected={!!selectedSprites.current[spritePtr]}
+                            onSelect={selected =>
+                              addSpriteToSelection(spritePtr, selected)
+                            }
+                            onContextMenu={(x, y) =>
+                              openSpriteContextMenu(x, y, spritePtr)
+                            }
+                            resourceName={imageName}
+                            resourcesLoader={resourcesLoader}
+                            project={project}
+                            style={i === 0 ? {} : styles.thumbnailExtraStyle}
+                            size={SPRITE_SIZE}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+              </DragSourceAndDropTarget>
+            );
+          })}
+          {spritesCount === 0 ? (
+            <ImageThumbnail
+              key="empty"
+              project={project}
+              resourceName=""
+              resourcesLoader={resourcesLoader}
+              size={SPRITE_SIZE}
+            />
+          ) : (
+            <EndOfListDropTarget
+              canDrop={item => item.directionPtr === direction.ptr}
+              drop={dropAtEndOfList}
+            >
+              {({ connectDropTarget, isOver, canDrop }) =>
+                connectDropTarget(
+                  <div style={styles.endOfListDropZone}>
+                    {isOver && canDrop && <ColumnDropIndicator />}
+                  </div>
+                )
+              }
+            </EndOfListDropTarget>
+          )}
+        </div>
         <ContextMenu
           ref={spriteContextMenu}
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              label: i18n._(t`Delete selection`),
-              click: deleteSprites,
-            },
-            {
-              label: i18n._(t`Duplicate selection`),
-              click: duplicateSprites,
-            },
-          ]}
+          buildMenuTemplate={(i18n: I18nType) => {
+            // Read the sprites and the selection when the menu is opened,
+            // so that the menu is always up to date.
+            const menuSpritesCount = direction.getSpritesCount();
+            const selectedIndexes = getSelectedSpriteIndexes();
+            // The position at which the selection starts when moved to the end.
+            const lastStartIndex = menuSpritesCount - selectedIndexes.length;
+            const isSelectionAtPosition = (startIndex: number) =>
+              selectedIndexes.every(
+                (selectedIndex, j) => selectedIndex === startIndex + j
+              );
+            return [
+              {
+                label: i18n._(t`Delete selection`),
+                click: deleteSprites,
+              },
+              {
+                label: i18n._(t`Duplicate selection`),
+                click: duplicateSprites,
+              },
+              ...(menuSpritesCount > 1 && selectedIndexes.length > 0
+                ? [
+                    { type: 'separator' },
+                    {
+                      label: i18n._(t`Move to beginning`),
+                      click: () => moveSelectedSpritesToPosition(0),
+                      enabled: !isSelectionAtPosition(0),
+                    },
+                    ...(lastStartIndex >= 2
+                      ? [
+                          {
+                            label: i18n._(t`Move to position`),
+                            submenu: mapFor(1, lastStartIndex, index => ({
+                              label: i18n._(t`Position ${index}`),
+                              click: () => moveSelectedSpritesToPosition(index),
+                              enabled: !isSelectionAtPosition(index),
+                            })),
+                          },
+                        ]
+                      : []),
+                    {
+                      label: i18n._(t`Move to end`),
+                      click: () =>
+                        moveSelectedSpritesToPosition(lastStartIndex),
+                      enabled: !isSelectionAtPosition(lastStartIndex),
+                    },
+                  ]
+                : []),
+            ];
+          }}
         />
         <Column noMargin>
           <RaisedButtonWithSplitMenu

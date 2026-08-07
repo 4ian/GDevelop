@@ -299,7 +299,9 @@ interface Variable {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] Variable ResetPersistentUuid();
+    [Ref] Variable EnsurePersistentUuid();
     [Ref] Variable ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 enum VariablesContainer_SourceType {
@@ -337,7 +339,9 @@ interface VariablesContainer {
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] VariablesContainer ResetPersistentUuid();
+    [Ref] VariablesContainer EnsurePersistentUuids();
     [Ref] VariablesContainer ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface VariablesContainersList {
@@ -382,6 +386,7 @@ interface ObjectRefactorer {
         [Ref] gdObject obj,
         [ Const, Ref ] VariablesContainer groupVariablesContainer);
     void STATIC_FillMissingGroupBehaviorToObject(
+        [Const, Ref] Platform platform,
         [Ref] ObjectsContainer globalObjectsContainer,
         [Ref] ObjectsContainer objectsContainer,
         [Ref] gdObject obj,
@@ -1484,6 +1489,8 @@ interface InitialInstance {
     void SetSealed(boolean seal);
     boolean ShouldKeepRatio();
     void SetShouldKeepRatio(boolean keepRatio);
+    boolean IsHidden();
+    void SetHidden(boolean hidden);
     long GetZOrder();
     void SetZOrder(long zOrder);
     long GetOpacity();

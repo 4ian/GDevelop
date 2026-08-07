@@ -296,8 +296,8 @@ export class ExternalEventsEditorContainer extends React.Component<
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
             // Scene events don't have parameters nor properties
-            editEventsFunctionParameter={() => {}}
-            openEventsBasedEntityPropertyEditorDialog={() => {}}
+            editEventsFunctionParameter={null}
+            openEventsBasedEntityPropertyEditorDialog={null}
           />
         )}
         {!layout && (

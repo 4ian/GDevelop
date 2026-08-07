@@ -775,6 +775,9 @@ describe('libGD.js', function () {
       expect(initialInstance.getLayer()).toBe('MyLayer');
       initialInstance.setLocked(true);
       expect(initialInstance.isLocked()).toBe(true);
+      expect(initialInstance.isHidden()).toBe(false);
+      initialInstance.setHidden(true);
+      expect(initialInstance.isHidden()).toBe(true);
       initialInstance.setHasCustomSize(true);
       expect(initialInstance.hasCustomSize()).toBe(true);
       initialInstance.setCustomWidth(34);
@@ -820,6 +823,7 @@ describe('libGD.js', function () {
       expect(initialInstance2.getZOrder()).toBe(12);
       expect(initialInstance2.getLayer()).toBe('MyLayer');
       expect(initialInstance2.isLocked()).toBe(true);
+      expect(initialInstance2.isHidden()).toBe(true);
       expect(initialInstance2.hasCustomSize()).toBe(true);
       expect(initialInstance2.hasCustomDepth()).toBe(false);
       expect(initialInstance2.getCustomWidth()).toBe(34);
@@ -1083,6 +1087,25 @@ describe('libGD.js', function () {
       expect(container.getNameAt(0)).toBe('SecondVariable');
       expect(container.getNameAt(1)).toBe('Variable');
       expect(container.getNameAt(2)).toBe('ThirdVariable');
+
+      container.delete();
+    });
+    it('can ensure persistent UUIDs are set, while preserving existing ones', function () {
+      let container = new gd.VariablesContainer();
+      container.insertNew('Variable', 0).setValue(4);
+
+      container.ensurePersistentUuids();
+      const variableUuid = container.get('Variable').getPersistentUuid();
+      expect(variableUuid).toBeTruthy();
+
+      container.insertNew('SecondVariable', 1).setValue(5);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBe('');
+
+      container.ensurePersistentUuids();
+
+      // The existing UUID is preserved, the new variable got one.
+      expect(container.get('Variable').getPersistentUuid()).toBe(variableUuid);
+      expect(container.get('SecondVariable').getPersistentUuid()).toBeTruthy();
 
       container.delete();
     });

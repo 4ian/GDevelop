@@ -31,8 +31,6 @@ The codebase uses the legacy **Decorators/HOC API** (`DragSource`, `DropTarget`,
 > - `npm ls react-dnd`
 > - `npm ls dnd-core`
 
-Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exact version in which this occurs was not determined.
-
 ## Various fixes
 
 - `react-mosaic-component` is the official npm package (v5.3.0). Earlier versions used a custom fork to pin `react-dnd` 7.x; this is no longer needed.

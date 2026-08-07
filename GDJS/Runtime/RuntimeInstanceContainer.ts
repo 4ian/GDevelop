@@ -394,6 +394,12 @@ namespace gdjs {
 
           newObject.setZOrder(instanceData.zOrder);
           newObject.setLayer(instanceData.layer);
+          // Instances hidden at start are not hidden in the in-game editor:
+          // they must stay visible to be seen and manipulated (like in the
+          // 2D editor).
+          if (instanceData.hidden && !this.getGame().isInGameEdition()) {
+            newObject.hide(true);
+          }
           newObject
             .getVariables()
             .initFrom(instanceData.initialVariables, true);

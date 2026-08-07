@@ -12,6 +12,7 @@ import {
   type ConnectDragPreview,
 } from 'react-dnd';
 import { hapticFeedback } from '../../Utils/Haptic';
+import { canStartDragFromCurrentGesture } from './TouchDragDelay';
 
 type Props<DraggedItemType> = {|
   children: ({|
@@ -65,6 +66,10 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
 ): ((Props<DraggedItemType>) => React.Node) => {
   const sourceSpec = {
     canDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
+      // On a touch screen, a finger that just started pressing is scrolling,
+      // not dragging.
+      if (!canStartDragFromCurrentGesture()) return false;
+
       const item = monitor.getItem();
       const canDrag = props.canDrag || null;
       if (canDrag) return canDrag(item);

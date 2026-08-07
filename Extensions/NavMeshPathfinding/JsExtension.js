@@ -865,9 +865,6 @@ module.exports = {
       )
       .addIncludeFile('Extensions/NavMeshPathfinding/recast-navigation.wasm.js')
       .addIncludeFile(
-        'Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm'
-      )
-      .addIncludeFile(
         'Extensions/NavMeshPathfinding/recast-navigation-generators.js'
       )
       .addIncludeFile(

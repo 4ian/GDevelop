@@ -265,19 +265,8 @@ namespace gdjs {
             ? oldY
             : oldY * this._manager.inverseSpeedScaleY,
         });
-        console.log(
-          oldX,
-          '!==',
-          expectedX,
-          '||',
-          oldY,
-          '!==',
-          expectedY,
-          '||',
-          oldZ,
-          '!==',
-          expectedZ
-        );
+        this._path = [];
+        this._pathFound = false;
         console.log('Teleport to', oldX, oldY, oldZ);
       }
     }
@@ -307,12 +296,6 @@ namespace gdjs {
         }
         this._path = path;
         console.log('path', this._path);
-
-        console.log(
-          'Destination',
-          this.getDestinationX(),
-          this.getDestinationY()
-        );
       }
 
       let newX = agent.raw.get_npos(0);
@@ -331,11 +314,9 @@ namespace gdjs {
       const velocityX = velocity.x;
       const velocityY = velocity.z;
       if (
-        Math.abs(velocityX) > 0 &&
-        Math.abs(velocityY) > 0 &&
+        Math.abs(velocityX) + Math.abs(velocityY) > 0 &&
         // Avoid to rotate strangely at the end of the path
-        Math.abs(destinationX - newX) > 3 &&
-        Math.abs(destinationY - newY) > 3
+        (Math.abs(destinationX - newX) > 3 || Math.abs(destinationY - newY) > 3)
       ) {
         this._movementAngle = gdjs.evtTools.common.mod(
           gdjs.toDegrees(Math.atan2(velocityY, velocityX)),

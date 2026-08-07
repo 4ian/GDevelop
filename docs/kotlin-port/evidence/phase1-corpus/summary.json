@@ -1,0 +1,344 @@
+{
+  "fixtures": [
+    {
+      "fixtureId": "variables-and-branches",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 6,
+          "total": 1
+        }
+      },
+      "report": "variables-and-branches.json"
+    },
+    {
+      "fixtureId": "object-picking-and-deletion",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 7,
+          "total": 1
+        }
+      },
+      "report": "object-picking-and-deletion.json"
+    },
+    {
+      "fixtureId": "scene-change-lifecycle",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 9,
+          "total": 1
+        }
+      },
+      "report": "scene-change-lifecycle.json"
+    },
+    {
+      "fixtureId": "builtin-text-object",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 2,
+          "total": 1
+        }
+      },
+      "report": "builtin-text-object.json"
+    },
+    {
+      "fixtureId": "builtin-behavior",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 2,
+          "total": 1
+        }
+      },
+      "report": "builtin-behavior.json"
+    },
+    {
+      "fixtureId": "events-extension",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 0,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 2,
+          "total": 1
+        }
+      },
+      "report": "events-extension.json"
+    },
+    {
+      "fixtureId": "javascript-declared-extension",
+      "gatePassed": false,
+      "metrics": {
+        "decodeCoverage": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "determinism": {
+          "passed": 1,
+          "ratio": 1.0,
+          "total": 1
+        },
+        "diagnosticFidelity": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "hostConformance": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "reachabilityPrecision": {
+          "falseNegatives": 1,
+          "falsePositives": 0
+        },
+        "resolutionAccuracy": {
+          "passed": 0,
+          "ratio": null,
+          "total": 0
+        },
+        "stateParity": {
+          "passed": 0,
+          "ratio": 0.0,
+          "total": 1
+        },
+        "traceParity": {
+          "exactPrefix": 0,
+          "passed": 0,
+          "ratio": 0.0,
+          "referenceLength": 3,
+          "total": 1
+        }
+      },
+      "report": "javascript-declared-extension.json"
+    }
+  ],
+  "gatePassed": false,
+  "manifestDigest": "6fadabec56b7a0adc01eb3512ca2b47cfec7d1ede2a1bb1a6bb4e1b31da69d03",
+  "repeatedRunCount": 100,
+  "schemaVersion": "1.0.0"
+}

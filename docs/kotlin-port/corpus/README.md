@@ -32,3 +32,19 @@ The capture verifier intentionally cannot bless new output. If instrumented GDJS
 observations differ, retain both raw runs, investigate the mismatch, review the
 semantic change against the pinned sources, and explicitly update the canonical
 trace and manifest hash. Compilation or portable-runtime output is not an oracle.
+
+## Portable corpus runner
+
+Run the Phase 1 differential gate with its documented repeated-run count:
+
+```sh
+python3 docs/kotlin-port/corpus/tools/run_corpus.py \
+  --manifest docs/kotlin-port/corpus/manifest.json \
+  --reports docs/kotlin-port/evidence/phase1-corpus \
+  --runs 100
+```
+
+The runner writes one canonical JSON result per fixture and a linked summary. It
+fails for trace/state divergence, diagnostic mismatch, a reachability false
+negative, or non-deterministic canonical NIR, trace, or state. A failing report
+remains evidence; it must not be relabelled as partial compatibility.

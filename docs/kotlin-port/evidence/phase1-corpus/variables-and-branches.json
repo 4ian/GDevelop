@@ -1,0 +1,724 @@
+{
+  "catalog": {
+    "digest": "7f58c9d6850d8c26df4fd59a4e705c4469a8d6cb24e1de981dc18b625dcb24e7",
+    "snapshot": {
+      "extensions": [
+        {
+          "actions": [
+            {
+              "parameters": [
+                {
+                  "name": "scope",
+                  "type": "string"
+                },
+                {
+                  "name": "variable",
+                  "type": "variable"
+                },
+                {
+                  "name": "amount",
+                  "type": "number"
+                }
+              ],
+              "requiredCapabilities": [],
+              "runtimeEntry": "incrementVariable",
+              "type": "KotlinExample::IncrementVariable"
+            }
+          ],
+          "conditions": [],
+          "identity": {
+            "namespace": "KotlinExample",
+            "origin": "prototype",
+            "version": "1.0.0"
+          },
+          "lifecycleHooks": [
+            "sceneLoaded",
+            "sceneUnloaded"
+          ]
+        }
+      ]
+    }
+  },
+  "decoder": {
+    "diagnostics": []
+  },
+  "finalState": {
+    "globalVariables": {
+      "GlobalCount": "2"
+    },
+    "objects": [],
+    "scene": "Main",
+    "sceneVariables": {
+      "Label": "branch",
+      "Ready": "true",
+      "Score": "3"
+    },
+    "selections": []
+  },
+  "fixtureId": "variables-and-branches",
+  "gate": {
+    "missingExpectedDiagnostics": [],
+    "passed": false,
+    "stateDivergence": true,
+    "traceDivergence": true,
+    "unexpectedDiagnostics": []
+  },
+  "metrics": {
+    "decodeCoverage": {
+      "passed": 1,
+      "ratio": 1.0,
+      "total": 1
+    },
+    "determinism": {
+      "passed": 1,
+      "ratio": 1.0,
+      "total": 1
+    },
+    "diagnosticFidelity": {
+      "passed": 0,
+      "ratio": null,
+      "total": 0
+    },
+    "hostConformance": {
+      "passed": 0,
+      "ratio": null,
+      "total": 0
+    },
+    "reachabilityPrecision": {
+      "falseNegatives": 0,
+      "falsePositives": 0
+    },
+    "resolutionAccuracy": {
+      "passed": 0,
+      "ratio": null,
+      "total": 0
+    },
+    "stateParity": {
+      "passed": 0,
+      "ratio": 0.0,
+      "total": 1
+    },
+    "traceParity": {
+      "exactPrefix": 0,
+      "passed": 0,
+      "ratio": 0.0,
+      "referenceLength": 6,
+      "total": 1
+    }
+  },
+  "nir": {
+    "canonical": "ProgramIr(globals={GlobalCount=NumberValue(value=2.0)}, scenes=[SceneIr(name=Main, variables={Score=NumberValue(value=1.0), Label=StringValue(value=start), Ready=BooleanValue(value=true)}, events=[EventIr(conditions=[CompareNumber(variable=VariableRefIr(scope=SCENE, name=Score, objectName=null, origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0/conditions/0)), operator==, value=1.0)], actions=[WriteNumber(variable=VariableRefIr(scope=SCENE, name=Score, objectName=null, origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0/actions/0)), operator=+, value=2.0)], children=[EventIr(conditions=[CompareNumber(variable=VariableRefIr(scope=GLOBAL, name=GlobalCount, objectName=null, origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0/events/0/conditions/0)), operator==, value=2.0)], actions=[SetString(variable=VariableRefIr(scope=SCENE, name=Label, objectName=null, origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0/events/0/actions/0)), value=branch)], children=[], origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0/events/0), locals={})], origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0/events/0), locals={})], objects={}, groups={}, instances=[], origin=SourceLocation(sourceId=/workspace/KDevelop/docs/kotlin-port/corpus/projects/variables-and-branches.json, jsonPointer=/layouts/0))], firstScene=Main)",
+    "digest": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5"
+  },
+  "outputHashes": [
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    },
+    {
+      "nir": "c5fe8a14aea6fb9455a754f84e5de3e8d9aecd899ae7f3ee94edaf9e39e976a5",
+      "state": "481625934494ea176634ffe1790cd91fcb0e4bb9b43be4a4cf4d686b6d2d30b9",
+      "trace": "509428e30e72cd32da2cec9a67e6aa4ed708da3cd656edec3765212b9881a409"
+    }
+  ],
+  "reachability": {
+    "artifacts": [],
+    "capabilities": [],
+    "extensions": [
+      "KotlinExample"
+    ],
+    "falseNegatives": [],
+    "falsePositives": [],
+    "resources": []
+  },
+  "resolution": {
+    "members": [
+      {
+        "extension": {
+          "namespace": "KotlinExample",
+          "origin": "prototype",
+          "version": "1.0.0"
+        },
+        "member": "KotlinExample::IncrementVariable",
+        "parameterBindings": [
+          "scope",
+          "variable",
+          "amount"
+        ]
+      }
+    ]
+  },
+  "runs": 100,
+  "schemaVersion": "1.0.0",
+  "semanticTrace": [
+    {
+      "detail": "loaded",
+      "frame": -1,
+      "kind": "extension-lifecycle",
+      "sequence": 0
+    },
+    {
+      "detail": "scene-load:Main",
+      "frame": -1,
+      "kind": "lifecycle",
+      "sequence": 1
+    },
+    {
+      "detail": "pre-events:Main",
+      "frame": 0,
+      "kind": "lifecycle",
+      "sequence": 2
+    },
+    {
+      "detail": "generated-events:Main",
+      "frame": 0,
+      "kind": "lifecycle",
+      "sequence": 3
+    },
+    {
+      "detail": "CompareNumber:true",
+      "frame": 0,
+      "kind": "condition",
+      "sequence": 4
+    },
+    {
+      "detail": "/layouts/0/events/0:passed",
+      "frame": 0,
+      "kind": "event",
+      "sequence": 5
+    },
+    {
+      "detail": "SCENE:Score",
+      "frame": 0,
+      "kind": "variable-write",
+      "sequence": 6
+    },
+    {
+      "detail": "CompareNumber:true",
+      "frame": 0,
+      "kind": "condition",
+      "sequence": 7
+    },
+    {
+      "detail": "/layouts/0/events/0/events/0:passed",
+      "frame": 0,
+      "kind": "event",
+      "sequence": 8
+    },
+    {
+      "detail": "SCENE:Label",
+      "frame": 0,
+      "kind": "variable-write",
+      "sequence": 9
+    },
+    {
+      "detail": "post-events:Main",
+      "frame": 0,
+      "kind": "lifecycle",
+      "sequence": 10
+    },
+    {
+      "detail": "unloaded",
+      "frame": 0,
+      "kind": "extension-lifecycle",
+      "sequence": 11
+    },
+    {
+      "detail": "scene-unload:Main",
+      "frame": 0,
+      "kind": "lifecycle",
+      "sequence": 12
+    }
+  ]
+}

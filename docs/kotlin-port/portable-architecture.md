@@ -451,6 +451,24 @@ so tests and scenario execution can substitute deterministic implementations.
 
 The `runtime-state` implementation realizes ADR-0003 with a target-neutral `RuntimeHost`. A host publishes a stable set of capability identifiers and integer contract versions before initialization. Each run initializes the host before the first frame and disposes it after unloading. At each frame boundary the runtime supplies one immutable transient-input snapshot, so edge-triggered input is replaced before the next frame.
 
+Capability publication is a target-neutral manifest, not a set of target class
+names. Each requirement records a stable ID, inclusive supported contract-version
+range, required/optional use, and operation or extension scope. Each provided
+contract records its integer version and deterministic `(target, adapter,
+implementationVersion)` provider identity. Reachability starts at the first
+scene, follows statically named scene replacements, collects host operations in
+reachable nested events, and negotiates their requirements against the selected
+manifest. Missing required contracts produce `GDKP_SEM_MISSING_CAPABILITY`;
+versions outside the supported range produce
+`GDKP_SEM_INCOMPATIBLE_CAPABILITY`. Both diagnostics retain the operation's
+source location. Optional misses remain reportable resolutions but are not
+errors.
+
+Negotiated entries are embedded in execution reports and in the shared artifact
+capability report. The ordered runtime repeats the same ID, scope, and range
+check before dispatch; analysis is not treated as a security boundary and an
+incorrectly assembled artifact therefore still fails closed.
+
 Conditions dispatch synchronously in event-sheet order because their result controls later execution. Boolean conditions use `Success("true"|"false")`; failure, cancellation, and unsupported results remain distinguishable and retain the NIR source location in diagnostics.
 
 Actions receive stable invocation IDs made from the frame and a monotonically increasing operation sequence. A host may finish asynchronous work out of order, but `OrderedRuntimeHost` holds later completions until every earlier invocation completes. The runtime drains the queue after generated events and before post-events or scene transitions. Trace records have their own monotonic sequence and cover condition dispatch, action invocation, and completion delivery. This realizes the accepted ADR-0003 boundary without changing it, so no new ADR is required.

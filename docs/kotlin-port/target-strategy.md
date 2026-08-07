@@ -168,6 +168,11 @@ Common modules contain only portable dependencies and APIs:
 
 The JVM prototype supplies a bounded GDevelop JSON decoder, an in-memory
 `ProjectSource`, a deterministic headless `RuntimeHost`, and one execution path.
+Its manifest identity is `jvm-headless:deterministic-runtime:1`; it provides
+deterministic-headless-execution contract 1 and explicitly publishes that
+rendering and browser-map rendering are unavailable. Reachable NIR capability
+requirements are negotiated by inclusive integer range before execution, while
+the runtime repeats the check before every host dispatch.
 The preferred first implementation is an interpreter because it exposes traces
 directly; generating Kotlin source is acceptable if it consumes the same NIR and
 emits equivalent traces. Supporting both is not a Phase 1 requirement.
@@ -593,6 +598,15 @@ JS-host conformance is tracked separately for listener cleanup, projection
 conversion, camera-command mapping, resize forwarding, and error translation.
 No check uses live network tiles as its oracle; future browser automation must
 use a local fixed style and fixture tiles.
+
+MapTiles operations request stable capability
+`org.gdevelop.runtime.browser-map-rendering-host` at operation scope with the
+exact supported contract range `1..1`. The MapLibre adapter publishes that exact
+contract under provider `browser:maplibre-js:1`; it does not imply support for a
+future contract 2 or for generic rendering. Missing and incompatible negotiation
+are covered by the source-located capability-analysis fixtures, while
+`unsupported-headless-capability.json` preserves the assembled-artifact runtime
+failure case.
 
 This is an experimental Kotlin/JS capability only. It does not establish general
 GDevelop compatibility, renderer parity, JVM map rendering, or cross-target map

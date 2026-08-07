@@ -28,10 +28,10 @@ class ProjectLowerer(private val catalog:ExtensionCatalog){
   "Create","BuiltinCommonInstructions::Create"->{val a=o.parameters;if(a.size<3)bad(o,d)else{val x=a[a.size-2].toDoubleOrNull();val y=a.last().toDoubleOrNull();if(x==null||y==null)number(o,d,a.size-2)else ActionIr.CreateObject(a[0],x,y,o.location)}}
   "Scene","BuiltinCommonInstructions::Scene"->o.parameters.firstOrNull()?.let{ActionIr.ReplaceScene(it,o.location)}?:bad(o,d)
   "ResetTimer"->o.parameters.firstOrNull()?.let{ActionIr.ResetTimer(it,o.location)}?:bad(o,d)
-  else->{val a=catalog.resolveAction(o.type)?:return unsupported(o,d,"action");val args=params(o,a.descriptor.parameters,d)?:return null;if(a.descriptor.requiredCapabilities.isNotEmpty())ActionIr.HostOperation(host(o,a,args))else ActionIr.ExtensionCall(a.id,o.originalSerializedType,args,a.descriptor.runtimeEntry)}
+  else->{val a=catalog.resolveAction(o.type)?:return unsupported(o,d,"action");val args=params(o,a.descriptor.parameters,d)?:return null;if(a.descriptor.capabilityRequirements.isNotEmpty())ActionIr.HostOperation(host(o,a,args))else ActionIr.ExtensionCall(a.id,o.originalSerializedType,args,a.descriptor.runtimeEntry)}
  }
- private fun host(o:OperationDeclaration,r:RegisteredAction,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location)
- private fun host(o:OperationDeclaration,r:RegisteredCondition,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location)
+ private fun host(o:OperationDeclaration,r:RegisteredAction,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location,r.descriptor.capabilityRequirements)
+ private fun host(o:OperationDeclaration,r:RegisteredCondition,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location,r.descriptor.capabilityRequirements)
  private fun params(o:OperationDeclaration,p:List<ParameterDescriptor>,d:MutableList<Diagnostic>):List<ResolvedArgument>?{
   val required=p.count{!it.optional};if(o.parameters.size !in required..p.size){bad(o,d,p.size);return null}
   val values=o.parameters+p.drop(o.parameters.size).map{checkNotNull(it.defaultValue)}

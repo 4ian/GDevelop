@@ -1,7 +1,7 @@
 # ADR-0003: Runtime facilities cross a capability-based host boundary
 
 * **Status:** Accepted
-* **Date:** 2026-08-06
+* **Date:** 2026-08-06 (capability negotiation note updated 2026-08-07)
 
 ## Context
 
@@ -58,6 +58,13 @@ handles. Calls made in an invalid lifecycle state return a host failure.
 
 Extension actions declare host needs with stable capability identifiers. Map
 actions that need a browser renderer require
-`org.gdevelop.runtime.browser-map-rendering-host.v1`; resolution or artifact
+`org.gdevelop.runtime.browser-map-rendering-host`, contract version `1`; resolution or artifact
 assembly can consequently reject a headless or otherwise incompatible host
 before the action runs.
+
+The MapTiles catalog attaches an exact `1..1` supported range at operation
+scope. The MapLibre adapter identifies its provider deterministically as
+`browser:maplibre-js:1` and publishes contract 1 only when a `MapHost` is
+installed. This is an exact browser-map claim, not a general rendering claim.
+The JVM headless provider publishes deterministic execution contract 1 and
+explicitly lists both rendering and browser-map rendering as unavailable.

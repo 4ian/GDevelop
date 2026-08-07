@@ -7,6 +7,8 @@ import org.gdevelop.kotlin.extensions.QualifiedMemberId
 import org.gdevelop.kotlin.extensions.ResolvedArgument
 import org.gdevelop.kotlin.extensions.ParameterDescriptor
 import org.gdevelop.kotlin.extensions.ContractVersions
+import org.gdevelop.kotlin.extensions.CapabilityRequirement
+import org.gdevelop.kotlin.extensions.requiredByOperation
 import org.gdevelop.kotlin.project.Value
 
 data class ProgramIr(val globals:Map<String,Value>, val scenes:List<SceneIr>, val firstScene:String)
@@ -37,4 +39,4 @@ sealed interface ActionIr {
  data class ExtensionCall(val memberId:QualifiedMemberId,val serializedType:String,val arguments:List<ResolvedArgument>,val runtimeEntry:String):ActionIr
  data class HostOperation(val operation:ExtensionHostOperation):ActionIr
 }
-data class ExtensionHostOperation(val memberId:QualifiedMemberId,val serializedType:String,val runtimeEntry:String,val arguments:List<ResolvedArgument>,val parameters:List<ParameterDescriptor>,val requiredCapabilities:Set<RuntimeCapabilityId>,val contracts:ContractVersions,val origin:SourceLocation){ val descriptorType get()=memberId.path.joinToString("::");val extensionIdentity get()=memberId.extension;val parameterOrder get()=parameters.map{it.name} }
+data class ExtensionHostOperation(val memberId:QualifiedMemberId,val serializedType:String,val runtimeEntry:String,val arguments:List<ResolvedArgument>,val parameters:List<ParameterDescriptor>,val requiredCapabilities:Set<RuntimeCapabilityId>,val contracts:ContractVersions,val origin:SourceLocation,val capabilityRequirements:Set<CapabilityRequirement> = requiredCapabilities.mapTo(linkedSetOf()){it.requiredByOperation(serializedType)}){ val descriptorType get()=memberId.path.joinToString("::");val extensionIdentity get()=memberId.extension;val parameterOrder get()=parameters.map{it.name} }

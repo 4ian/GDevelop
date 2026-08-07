@@ -20,7 +20,7 @@ import org.gdevelop.kotlin.map.MapLayerId
 import org.gdevelop.kotlin.map.MapOverlayId
 import org.gdevelop.kotlin.map.ScreenCoordinate
 import org.gdevelop.kotlin.maptiles.MapTilesEntries
-import org.gdevelop.kotlin.extensions.RuntimeCapabilities
+import org.gdevelop.kotlin.extensions.*
 import org.gdevelop.kotlin.runtime.*
 
 interface MapOperationVariables {
@@ -36,7 +36,12 @@ class MapTilesHostOperationExecutor(
     private val diagnosticSink: (Diagnostic) -> Unit,
     private val traceSink: (ExtensionHostOperation) -> Unit = {},
 ) : OrderedRuntimeHost() {
-    override val capabilities = if (host == null) emptySet() else setOf(HostCapability(RuntimeCapabilities.BrowserMapRenderingHost, 1))
+    override val capabilityManifest = CapabilityManifest(
+        CapabilityProviderIdentity("browser", "maplibre-js", "1"),
+        if (host == null) emptySet() else setOf(ProvidedCapability(RuntimeCapabilities.BrowserMapRenderingHost, 1)),
+        if (host == null) setOf(RuntimeCapabilities.BrowserMapRenderingHost) else emptySet(),
+    )
+    override val capabilities get() = capabilityManifest.capabilities
     private val scope = MainScope()
     private val markers = linkedMapOf<MapOverlayId, GeoOverlayObject>()
     private var loaded = false

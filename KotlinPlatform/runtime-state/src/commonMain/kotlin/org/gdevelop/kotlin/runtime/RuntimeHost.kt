@@ -1,9 +1,9 @@
 package org.gdevelop.kotlin.runtime
 
 import org.gdevelop.kotlin.ir.ExtensionHostOperation
-import org.gdevelop.kotlin.extensions.RuntimeCapabilityId
+import org.gdevelop.kotlin.extensions.*
 
-data class HostCapability(val id: RuntimeCapabilityId, val version: Int)
+typealias HostCapability = ProvidedCapability
 data class HostInvocationId(val value: String)
 data class HostInvocation(val id: HostInvocationId, val operation: ExtensionHostOperation)
 data class HostTransientInput(val values: Map<String, String> = emptyMap())
@@ -20,7 +20,9 @@ data class HostTraceRecord(val sequence: Long, val invocationId: HostInvocationI
 
 /** Target-neutral host boundary. Completions are delivered in invocation order. */
 interface RuntimeHost {
-    val capabilities: Set<HostCapability>
+    val capabilities: Set<ProvidedCapability>
+    val capabilityManifest: CapabilityManifest get() = CapabilityManifest(
+        CapabilityProviderIdentity("unspecified-target", this::class.simpleName ?: "runtime-host", "unspecified"), capabilities)
     val trace: List<HostTraceRecord>
     fun initialize()
     fun beginFrame(frame: Int, input: HostTransientInput = HostTransientInput())
@@ -62,7 +64,12 @@ abstract class OrderedRuntimeHost : RuntimeHost {
     protected open fun invoke(invocation: HostInvocation, completion: (HostOperationResult) -> Unit) = completion(invoke(invocation))
     protected open fun onDispose() = Unit
     private fun unsupported(operation: ExtensionHostOperation): HostOperationResult.Unsupported? {
-        val missing = operation.requiredCapabilities - capabilities.mapTo(mutableSetOf()) { it.id }
+        val missing = operation.capabilityRequirements.filter { requirement ->
+            requirement.use == CapabilityUse.REQUIRED && capabilities.none { provided ->
+                provided.id == requirement.id && provided.contractVersion in requirement.supportedVersions &&
+                    (provided.scopes.isEmpty() || requirement.scope in provided.scopes)
+            }
+        }.mapTo(mutableSetOf()) { it.id }
         return missing.takeIf { it.isNotEmpty() }?.let(HostOperationResult::Unsupported)
     }
     private fun record(invocation: HostInvocation, phase: String, result: HostOperationResult) {
@@ -74,7 +81,12 @@ abstract class OrderedRuntimeHost : RuntimeHost {
 }
 
 class DeterministicHeadlessHost : OrderedRuntimeHost() {
-    override val capabilities: Set<HostCapability> = emptySet()
+    override val capabilityManifest = CapabilityManifest(
+        CapabilityProviderIdentity("jvm-headless", "deterministic-runtime", "1"),
+        setOf(ProvidedCapability(RuntimeCapabilities.DeterministicHeadlessExecution, 1)),
+        setOf(RuntimeCapabilities.Rendering, RuntimeCapabilities.BrowserMapRenderingHost),
+    )
+    override val capabilities get() = capabilityManifest.capabilities
     override fun evaluate(invocation: HostInvocation) = HostOperationResult.Unsupported(invocation.operation.requiredCapabilities)
     override fun invoke(invocation: HostInvocation) = HostOperationResult.Unsupported(invocation.operation.requiredCapabilities)
 }

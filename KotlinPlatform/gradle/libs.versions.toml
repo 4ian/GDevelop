@@ -1,5 +1,5 @@
 [versions]
-toolchain="21"
+toolchain = "21"
 kotlinx-serialization-json = "1.7.3"
 kotlinx-coroutines-core = "1.9.0"
 

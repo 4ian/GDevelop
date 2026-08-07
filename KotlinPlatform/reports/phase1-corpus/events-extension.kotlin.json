@@ -1,1 +1,89 @@
-{"schemaVersion":2,"framesExecuted":1,"trace":[{"sequence":0,"frame":-1,"kind":"extension-lifecycle","detail":"loaded"},{"sequence":1,"frame":-1,"kind":"lifecycle","detail":"scene-load:Main"},{"sequence":2,"frame":0,"kind":"lifecycle","detail":"pre-events:Main"},{"sequence":3,"frame":0,"kind":"lifecycle","detail":"generated-events:Main"},{"sequence":4,"frame":0,"kind":"lifecycle","detail":"post-events:Main"},{"sequence":5,"frame":0,"kind":"extension-lifecycle","detail":"unloaded"},{"sequence":6,"frame":0,"kind":"lifecycle","detail":"scene-unload:Main"}],"currentScene":"Main","globals":{},"sceneVariables":{},"objects":[],"selections":[],"diagnostics":[],"resolvedExtensions":[{"identity":{"namespace":"KotlinExample","version":"1.0.0","origin":"prototype"},"actions":[{"type":"KotlinExample::IncrementVariable","parameters":[{"name":"scope","type":"string"},{"name":"variable","type":"variable"},{"name":"amount","type":"number"}],"runtimeEntry":"incrementVariable","requiredCapabilities":[]}],"lifecycleHooks":["sceneLoaded","sceneUnloaded"],"conditions":[]}]}
+{
+  "schemaVersion": 2,
+  "framesExecuted": 1,
+  "trace": [
+    {
+      "sequence": 0,
+      "frame": -1,
+      "kind": "extension-lifecycle",
+      "detail": "loaded"
+    },
+    {
+      "sequence": 1,
+      "frame": -1,
+      "kind": "lifecycle",
+      "detail": "scene-load:Main"
+    },
+    {
+      "sequence": 2,
+      "frame": 0,
+      "kind": "lifecycle",
+      "detail": "pre-events:Main"
+    },
+    {
+      "sequence": 3,
+      "frame": 0,
+      "kind": "lifecycle",
+      "detail": "generated-events:Main"
+    },
+    {
+      "sequence": 4,
+      "frame": 0,
+      "kind": "lifecycle",
+      "detail": "post-events:Main"
+    },
+    {
+      "sequence": 5,
+      "frame": 0,
+      "kind": "extension-lifecycle",
+      "detail": "unloaded"
+    },
+    {
+      "sequence": 6,
+      "frame": 0,
+      "kind": "lifecycle",
+      "detail": "scene-unload:Main"
+    }
+  ],
+  "currentScene": "Main",
+  "globals": {},
+  "sceneVariables": {},
+  "objects": [],
+  "selections": [],
+  "diagnostics": [],
+  "resolvedExtensions": [
+    {
+      "identity": {
+        "namespace": "KotlinExample",
+        "version": "1.0.0",
+        "origin": "prototype"
+      },
+      "actions": [
+        {
+          "type": "KotlinExample::IncrementVariable",
+          "parameters": [
+            {
+              "name": "scope",
+              "type": "string"
+            },
+            {
+              "name": "variable",
+              "type": "variable"
+            },
+            {
+              "name": "amount",
+              "type": "number"
+            }
+          ],
+          "runtimeEntry": "incrementVariable",
+          "requiredCapabilities": []
+        }
+      ],
+      "lifecycleHooks": [
+        "sceneLoaded",
+        "sceneUnloaded"
+      ],
+      "conditions": []
+    }
+  ]
+}

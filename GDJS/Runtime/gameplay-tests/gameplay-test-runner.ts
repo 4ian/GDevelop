@@ -98,6 +98,15 @@ namespace gdjs {
       object?: string;
       count?: integer;
       sceneName?: string;
+      /**
+       * Who changed the scene: the test itself (`harness` - a `goToScene`),
+       * the game's own logic (`game` - a scene change/restart action),
+       * multiplayer state (`networkSync`), or something outside of the
+       * game (`external` - a symptom of interference with the test).
+       */
+      cause?: 'harness' | 'game' | 'networkSync' | 'external' | 'unknown';
+      /** For an `external` cause: where the change came from (call stack). */
+      causeDetail?: string;
     };
 
     export type GameplayTestScreenshot = {
@@ -202,6 +211,33 @@ namespace gdjs {
       yawDelta: float;
     };
 
+    /**
+     * A flat, JSON-safe profiling summary: the average step time per frame
+     * and the average time of each profiled section, sorted by time
+     * descending (nested sections are flattened as "parent > child").
+     */
+    export type GameplayTestProfilingResult = {
+      avgStepTimeMs: number;
+      sections: Array<{ name: string; avgTimeMs: number }>;
+    };
+
+    /**
+     * The outcome of `lookTowardWithMouseDelta`: whether the aim succeeded,
+     * the remaining aim error, and whether the game responded to the mouse
+     * at all. `sawYawResponse: false` usually means the game ignores mouse
+     * deltas (e.g. the pointer lock was never engaged: click once first).
+     * `sawPitchResponse: false` (with a yaw response) means the vertical
+     * aim could not be measured: the aim automatically fell back to
+     * yaw-only.
+     */
+    export type GameplayTestAimResult = {
+      aimed: boolean;
+      yawDiff: float;
+      pitchDiff: float;
+      sawYawResponse: boolean;
+      sawPitchResponse: boolean;
+    };
+
     export type GameplayTestProgressStatus = {
       frame: integer;
       distance: float;
@@ -252,6 +288,7 @@ namespace gdjs {
     const YIELD_BUDGET_MS = 12;
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
+    const MAX_PROFILING_SECTIONS = 50;
     const DEFAULT_PROGRESS_WINDOW_FRAMES = 60;
     const DEFAULT_PROGRESS_MIN_PROGRESS = 8;
     const DEFAULT_REACH_RADIUS = 30;
@@ -438,8 +475,29 @@ namespace gdjs {
        * replacement by a new instance of the SAME scene is detected too
        * (recorded as a `sceneReset` event). */
       _lastTrackedScene: gdjs.RuntimeScene | null = null;
+      /** The cause of the last scene stack change, recorded by the scene
+       * change tracker (see `_installSceneChangeTracker`). */
+      _lastSceneChangeCause:
+        | 'harness'
+        | 'game'
+        | 'networkSync'
+        | 'external'
+        | null = null;
+      _lastSceneChangeCauseDetail: string | null = null;
+      /** True while `goToScene` is changing the scene itself. */
+      _harnessSceneChangeInProgress: boolean = false;
+      /** True while a frame is being stepped (a scene change happening then
+       * comes from the game's own logic). */
+      _stepInProgress: boolean = false;
+      /** True while the scene stack applies network sync data. */
+      _networkSyncApplyInProgress: boolean = false;
+      /** Undo the scene change tracker (see `_installSceneChangeTracker`). */
+      _uninstallSceneChangeTracker: () => void = () => {};
       _lastTrackedObjectCounts: { [objectName: string]: integer } = {};
       _pointerLockRequestedByGame: boolean = false;
+      /** Whether the one-time "mouse deltas without pointer lock" hint was
+       * already recorded (see `setMouseDelta`). */
+      _hasWarnedMouseDelta: boolean = false;
       _onProgress: ((frame: integer) => void) | null = null;
       _lastProgressTimeMs: number = 0;
       /** Rejects the promise raced against the test script, so a stop
@@ -541,6 +599,74 @@ namespace gdjs {
         return objectCounts;
       }
 
+      /**
+       * Track who mutates the scene stack while the test runs, so scene
+       * change events can report their cause: a `goToScene` of the test, the
+       * game's own logic (a change/restart action running during a stepped
+       * frame), network sync, or something external to the game.
+       */
+      _installSceneChangeTracker(): void {
+        const sceneStack = this._runtimeGame.getSceneStack() as any;
+        const harness = this;
+        const restorers: Array<() => void> = [];
+
+        for (const methodName of ['replace', 'push', 'pop']) {
+          const original = sceneStack[methodName];
+          if (typeof original !== 'function') continue;
+          sceneStack[methodName] = function () {
+            harness._recordSceneChangeCause();
+            return original.apply(this, arguments);
+          };
+          restorers.push(() => {
+            sceneStack[methodName] = original;
+          });
+        }
+
+        const originalApplyNetworkSync =
+          sceneStack.applyUpdateFromNetworkSyncDataIfAny;
+        if (typeof originalApplyNetworkSync === 'function') {
+          sceneStack.applyUpdateFromNetworkSyncDataIfAny = function () {
+            harness._networkSyncApplyInProgress = true;
+            try {
+              return originalApplyNetworkSync.apply(this, arguments);
+            } finally {
+              harness._networkSyncApplyInProgress = false;
+            }
+          };
+          restorers.push(() => {
+            sceneStack.applyUpdateFromNetworkSyncDataIfAny =
+              originalApplyNetworkSync;
+          });
+        }
+
+        this._uninstallSceneChangeTracker = () => {
+          restorers.forEach((restore) => restore());
+          this._uninstallSceneChangeTracker = () => {};
+        };
+      }
+
+      private _recordSceneChangeCause(): void {
+        this._lastSceneChangeCause = this._harnessSceneChangeInProgress
+          ? 'harness'
+          : this._networkSyncApplyInProgress
+            ? 'networkSync'
+            : this._stepInProgress
+              ? 'game'
+              : 'external';
+        if (this._lastSceneChangeCause === 'external') {
+          // The mystery case: keep where the change came from.
+          const stack = new Error().stack || '';
+          this._lastSceneChangeCauseDetail = stack
+            .split('\n')
+            .slice(2, 5)
+            .map((line) => line.trim())
+            .join(' ')
+            .slice(0, 300);
+        } else {
+          this._lastSceneChangeCauseDetail = null;
+        }
+      }
+
       private _trackChangesAfterStep(): void {
         const currentScene = this._runtimeGame
           .getSceneStack()
@@ -557,7 +683,13 @@ namespace gdjs {
                 ? 'sceneReset'
                 : 'sceneChanged',
             sceneName,
+            cause: this._lastSceneChangeCause || 'unknown',
+            ...(this._lastSceneChangeCauseDetail
+              ? { causeDetail: this._lastSceneChangeCauseDetail }
+              : {}),
           });
+          this._lastSceneChangeCause = null;
+          this._lastSceneChangeCauseDetail = null;
           this._lastTrackedScene = currentScene;
           this._lastTrackedSceneName = sceneName;
           this._lastTrackedObjectCounts = this._getObjectCounts();
@@ -597,7 +729,12 @@ namespace gdjs {
       _stepSingleFrame(dtMs: float): void {
         this._checkGuards();
         const stepStartTimeMs = Date.now();
-        this._runtimeGame.getSceneStack().step(dtMs);
+        this._stepInProgress = true;
+        try {
+          this._runtimeGame.getSceneStack().step(dtMs);
+        } finally {
+          this._stepInProgress = false;
+        }
         this._callOnFrameEnded();
         this._framesExecuted++;
         this._gameTimeMs += dtMs;
@@ -675,13 +812,18 @@ namespace gdjs {
           await this._runtimeGame.loadSceneAssets(sceneName);
         }
         this._checkGuards();
-        this._runtimeGame.getSceneStack().replace({
-          sceneName,
-          clear: true,
-          skipCreatingInstances: options
-            ? options.skipCreatingInstances
-            : undefined,
-        });
+        this._harnessSceneChangeInProgress = true;
+        try {
+          this._runtimeGame.getSceneStack().replace({
+            sceneName,
+            clear: true,
+            skipCreatingInstances: options
+              ? options.skipCreatingInstances
+              : undefined,
+          });
+        } finally {
+          this._harnessSceneChangeInProgress = false;
+        }
         // Step one frame so the scene is fully initialized ("beginning of
         // scene" events have run) before the test continues.
         await this.stepFrames(1);
@@ -855,6 +997,15 @@ namespace gdjs {
        * Call once per frame, from `onFrame`.
        */
       setMouseDelta(deltaX: float, deltaY: float): void {
+        if (!this._pointerLockRequestedByGame && !this._hasWarnedMouseDelta) {
+          this._hasWarnedMouseDelta = true;
+          this._recordConsoleLog(
+            'warn',
+            'setMouseDelta was called but the game never requested the pointer lock. ' +
+              'If the camera does not rotate, the game probably engages mouse-look after a click: ' +
+              'send one first (press, step 1 frame, release, step 1 frame).'
+          );
+        }
         const inputManager = this._runtimeGame.getInputManager();
         inputManager.onMouseMove(
           inputManager.getMouseX(),
@@ -1551,9 +1702,11 @@ namespace gdjs {
        * Turn the first instance of `referenceObjectName` toward the target,
        * by applying mouse movement deltas (FPS/pointer-lock style, yaw and
        * pitch in 3D) until it is aiming at it. The mouse sensitivity of the
-       * game is measured and adapted to live. Returns true when aimed
-       * (within a few degrees), false if it could not aim after many
-       * frames.
+       * game is measured and adapted to live, per axis. When the vertical
+       * aim shows no measurable response (some games map the pitch to
+       * another axis), the vertical input is undone and the aim falls back
+       * to yaw-only, reported as `sawPitchResponse: false`. Returns null if
+       * the object or the target is missing.
        */
       async lookTowardWithMouseDelta(
         referenceObjectName: string,
@@ -1561,35 +1714,74 @@ namespace gdjs {
           | { name: string; id?: integer }
           | { x: float; y: float; z?: float },
         options?: { yawOnly?: boolean }
-      ): Promise<boolean> {
+      ): Promise<GameplayTestAimResult | null> {
         const maxAimFrames = 180;
         const toleranceDegrees = 3;
+        const responseThresholdDegrees = 0.1;
+        const maxPixelsPerDegree = 64;
+        // Frames tolerated with a pitch demand, a maxed-out gain and no
+        // measured response before giving up on the vertical aim.
+        const maxUnresponsivePitchFrames = 10;
         // Pixels of mouse movement per degree of desired rotation: adapted
-        // live by measuring the actual rotation achieved.
-        let pixelsPerDegree = 2;
+        // live (per axis) by measuring the actual rotation achieved.
+        let yawPixelsPerDegree = 2;
+        let pitchPixelsPerDegree = 2;
 
+        let sawYawResponse = false;
+        let sawPitchResponse = false;
+        let pitchGivenUp = false;
+        let unresponsivePitchFrames = 0;
+        let appliedPitchPixels = 0;
+
+        const clamp = (value: float, maximum: float) =>
+          Math.max(-maximum, Math.min(maximum, value));
+        const makeResult = (
+          aimed: boolean,
+          relativePosition: GameplayTestRelativePosition
+        ): GameplayTestAimResult => ({
+          aimed,
+          yawDiff: relativePosition.yawDiff,
+          pitchDiff: relativePosition.pitchDiff,
+          sawYawResponse,
+          sawPitchResponse,
+        });
+
+        // Undo the vertical input applied so far: when the measured pitch
+        // never responded, the actual view may still have been pitched
+        // (e.g. toward the ground) - restore it.
+        const unwindAppliedPitch = async () => {
+          while (Math.abs(appliedPitchPixels) > 1) {
+            const chunk = clamp(-appliedPitchPixels, 100);
+            this.setMouseDelta(0, chunk);
+            appliedPitchPixels += chunk;
+            await this.stepFrames(1);
+          }
+        };
+
+        let lastRelativePosition: GameplayTestRelativePosition | null = null;
         for (let i = 0; i < maxAimFrames; i++) {
           const relativePosition = this.getRelativePosition(
             referenceObjectName,
             target
           );
-          if (!relativePosition) return false;
+          if (!relativePosition) return null;
+          lastRelativePosition = relativePosition;
           const yawDiff = relativePosition.yawDiff;
-          const pitchDiff =
-            options && options.yawOnly ? 0 : relativePosition.pitchDiff;
+          const wantPitch = !(options && options.yawOnly) && !pitchGivenUp;
+          const pitchDiff = wantPitch ? relativePosition.pitchDiff : 0;
           if (
             Math.abs(yawDiff) <= toleranceDegrees &&
             Math.abs(pitchDiff) <= toleranceDegrees
           ) {
-            return true;
+            return makeResult(true, relativePosition);
           }
 
-          const clamp = (value: float, maximum: float) =>
-            Math.max(-maximum, Math.min(maximum, value));
+          const pitchDeltaPixels = clamp(pitchDiff * pitchPixelsPerDegree, 100);
           this.setMouseDelta(
-            clamp(yawDiff * pixelsPerDegree, 100),
-            clamp(pitchDiff * pixelsPerDegree, 100)
+            clamp(yawDiff * yawPixelsPerDegree, 100),
+            pitchDeltaPixels
           );
+          appliedPitchPixels += pitchDeltaPixels;
           await this.stepFrames(1);
 
           const newRelativePosition = this.getRelativePosition(
@@ -1597,25 +1789,69 @@ namespace gdjs {
             target
           );
           if (newRelativePosition) {
-            const achievedRotation = Math.abs(
+            const achievedYawRotation = Math.abs(
               yawDiff - newRelativePosition.yawDiff
             );
+            if (achievedYawRotation >= responseThresholdDegrees) {
+              sawYawResponse = true;
+            }
             if (Math.abs(yawDiff) > toleranceDegrees) {
-              if (achievedRotation < 0.1) {
+              if (achievedYawRotation < responseThresholdDegrees) {
                 // No response to the mouse: increase the gain (the game may
                 // have a low mouse sensitivity).
-                pixelsPerDegree = Math.min(pixelsPerDegree * 2, 64);
-              } else {
-                const ratio = Math.abs(yawDiff) / achievedRotation;
-                pixelsPerDegree = Math.max(
-                  0.25,
-                  Math.min(64, pixelsPerDegree * Math.min(2, ratio))
+                yawPixelsPerDegree = Math.min(
+                  yawPixelsPerDegree * 2,
+                  maxPixelsPerDegree
                 );
+              } else {
+                const ratio = Math.abs(yawDiff) / achievedYawRotation;
+                yawPixelsPerDegree = Math.max(
+                  0.25,
+                  Math.min(
+                    maxPixelsPerDegree,
+                    yawPixelsPerDegree * Math.min(2, ratio)
+                  )
+                );
+              }
+            }
+
+            if (wantPitch && Math.abs(pitchDiff) > toleranceDegrees) {
+              const achievedPitchRotation = Math.abs(
+                pitchDiff - newRelativePosition.pitchDiff
+              );
+              if (achievedPitchRotation >= responseThresholdDegrees) {
+                sawPitchResponse = true;
+                unresponsivePitchFrames = 0;
+                const ratio = Math.abs(pitchDiff) / achievedPitchRotation;
+                pitchPixelsPerDegree = Math.max(
+                  0.25,
+                  Math.min(
+                    maxPixelsPerDegree,
+                    pitchPixelsPerDegree * Math.min(2, ratio)
+                  )
+                );
+              } else if (pitchPixelsPerDegree < maxPixelsPerDegree) {
+                pitchPixelsPerDegree = Math.min(
+                  pitchPixelsPerDegree * 2,
+                  maxPixelsPerDegree
+                );
+              } else {
+                unresponsivePitchFrames++;
+                if (unresponsivePitchFrames >= maxUnresponsivePitchFrames) {
+                  // The measured pitch never responds (the game may map the
+                  // vertical aim to another axis): stop driving it - and
+                  // undo what was applied, in case the actual view WAS
+                  // pitched without the measure seeing it.
+                  pitchGivenUp = true;
+                  await unwindAppliedPitch();
+                }
               }
             }
           }
         }
-        return false;
+        return lastRelativePosition
+          ? makeResult(false, lastRelativePosition)
+          : null;
       }
 
       // SCENARIO SETUP:
@@ -1823,21 +2059,42 @@ namespace gdjs {
       }
 
       /**
-       * Stop profiling and return the average frame measures per section
-       * (events, physics, rendering...).
+       * Stop profiling and return a flat, JSON-safe summary: the average
+       * step time per frame and the average time of each profiled section
+       * (events, physics, rendering... - nested sections are flattened as
+       * "parent > child"), sorted by time descending.
        */
-      stopProfiling(): Object | null {
+      stopProfiling(): GameplayTestProfilingResult | null {
         const currentScene = this._runtimeGame
           .getSceneStack()
           .getCurrentScene();
         const profiler = currentScene ? currentScene.getProfiler() : null;
         if (!profiler) return null;
-        const output = {
-          framesAverageMeasures: profiler.getFramesAverageMeasures(),
-          stats: profiler.getStats(),
-        };
+        const framesAverageMeasures = profiler.getFramesAverageMeasures();
         this._runtimeGame.stopCurrentSceneProfiler();
-        return output;
+
+        const roundMs = (timeMs: float) => Math.round(timeMs * 100) / 100;
+        const sections: Array<{ name: string; avgTimeMs: number }> = [];
+        const visitSubsections = (measure: any, path: string) => {
+          const subsections = (measure && measure.subsections) || {};
+          for (const name in subsections) {
+            const fullName = path ? path + ' > ' + name : name;
+            sections.push({
+              name: fullName,
+              avgTimeMs: roundMs(subsections[name].time || 0),
+            });
+            visitSubsections(subsections[name], fullName);
+          }
+        };
+        visitSubsections(framesAverageMeasures, '');
+        sections.sort((a, b) => b.avgTimeMs - a.avgTimeMs);
+
+        return {
+          avgStepTimeMs: roundMs(
+            (framesAverageMeasures && framesAverageMeasures.time) || 0
+          ),
+          sections: sections.slice(0, MAX_PROFILING_SECTIONS),
+        };
       }
 
       /**
@@ -2088,6 +2345,7 @@ namespace gdjs {
       harness._callOnFrameEnded = originalOnFrameEnded;
 
       harness._installPointerLockShim();
+      harness._installSceneChangeTracker();
 
       // Capture the logs of the game itself (in addition to the `console`
       // passed to the script).
@@ -2219,6 +2477,7 @@ namespace gdjs {
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
+        harness._uninstallSceneChangeTracker();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

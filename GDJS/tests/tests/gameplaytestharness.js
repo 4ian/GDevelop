@@ -427,8 +427,78 @@ describe('gdjs.gameplayTests', () => {
     expect(sceneEvents.length).to.be(2);
     expect(sceneEvents[0].event).to.be('sceneChanged');
     expect(sceneEvents[0].sceneName).to.be('Scene 1');
+    expect(sceneEvents[0].cause).to.be('harness');
     expect(sceneEvents[1].event).to.be('sceneReset');
     expect(sceneEvents[1].sceneName).to.be('Scene 1');
+    expect(sceneEvents[1].cause).to.be('harness');
+  });
+
+  it('returns a flat JSON-safe profiling summary', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.startProfiling();
+      await harness.stepFrames(10);
+      const profile = harness.stopProfiling();
+      harness.assert(!!profile, 'A profile is returned');
+      harness.assert(
+        typeof profile.avgStepTimeMs === 'number',
+        'avgStepTimeMs is a number'
+      );
+      harness.assert(Array.isArray(profile.sections), 'sections is an array');
+      harness.assert(
+        profile.sections.every(
+          (section) =>
+            typeof section.name === 'string' &&
+            typeof section.avgTimeMs === 'number'
+        ),
+        'sections have a name and an avgTimeMs'
+      );
+      // The whole profile is JSON-safe (no circular structure).
+      harness.assert(
+        JSON.stringify(profile).length > 0,
+        'The profile can be stringified'
+      );
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  });
+
+  it('reports an aim result object with the mouse responsiveness', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.spawn('MyObject', 100, 200);
+      await harness.stepFrames(1);
+
+      // This game has no mouse-look: the aim fails and reports that the
+      // mouse showed no response.
+      const aim = await harness.lookTowardWithMouseDelta('MyObject', { x: 100, y: 600 });
+      harness.assert(!!aim, 'An aim result is returned');
+      harness.assert(aim.aimed === false, 'The aim did not succeed');
+      harness.assert(aim.sawYawResponse === false, 'No yaw response was seen');
+      harness.assert(typeof aim.yawDiff === 'number', 'The remaining yawDiff is reported');
+
+      const missing = await harness.lookTowardWithMouseDelta('Nothing', { x: 0, y: 0 });
+      harness.assert(missing === null, 'A missing object gives null');
+      `,
+      { timeoutMs: 20000 }
+    );
+
+    expect(result.status).to.be('passed');
+    // The one-time hint about mouse deltas without pointer lock is recorded.
+    expect(
+      result.consoleLogs.some(
+        (log) =>
+          log.level === 'warn' &&
+          log.message.indexOf('never requested the pointer lock') !== -1
+      )
+    ).to.be(true);
   });
 
   it('records a sceneChanged event when another scene replaces the current one', async () => {
@@ -671,6 +741,36 @@ describe('gdjs.gameplayTests', () => {
       harness.releaseAllInputs();
       expect(inputManager.isKeyPressed(1016)).to.be(false);
       expect(inputManager.isKeyPressed(2016)).to.be(false);
+    });
+
+    it('records the cause of scene changes (harness vs external)', async () => {
+      const runtimeGame = makeRuntimeGame();
+      const harness = makeStartedHarness(runtimeGame);
+      harness._installSceneChangeTracker();
+      try {
+        await harness.goToScene('Scene 1');
+        await harness.stepFrames(2);
+        // An external actor (not the harness, not the game logic) replaces
+        // the scene.
+        runtimeGame.getSceneStack().replace({
+          sceneName: 'Scene 1',
+          clear: true,
+        });
+        await harness.stepFrames(1);
+      } finally {
+        harness._uninstallSceneChangeTracker();
+      }
+
+      const sceneEvents = harness._eventLog.filter(
+        (event) =>
+          event.event === 'sceneChanged' || event.event === 'sceneReset'
+      );
+      expect(sceneEvents.length).to.be(2);
+      expect(sceneEvents[0].event).to.be('sceneChanged');
+      expect(sceneEvents[0].cause).to.be('harness');
+      expect(sceneEvents[1].event).to.be('sceneReset');
+      expect(sceneEvents[1].cause).to.be('external');
+      expect(typeof sceneEvents[1].causeDetail).to.be('string');
     });
 
     it('fakes pointer lock at the DOM level and feeds mouse deltas as pointermove events', async () => {

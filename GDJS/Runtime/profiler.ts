@@ -190,6 +190,65 @@ namespace gdjs {
       return framesAverageMeasures;
     }
 
+    static _addMaxSectionTimes(
+      section: FrameMeasure,
+      destinationSection: FrameMeasureOutput
+    ): void {
+      destinationSection.time = Math.max(
+        destinationSection.time || 0,
+        section.time
+      );
+      for (const sectionName in section.subsections) {
+        if (section.subsections.hasOwnProperty(sectionName)) {
+          const destinationSubsections = destinationSection.subsections;
+          const destinationSubsection = (destinationSubsections[sectionName] =
+            destinationSubsections[sectionName] || {
+              time: 0,
+              subsections: {},
+            });
+          Profiler._addMaxSectionTimes(
+            section.subsections[sectionName],
+            destinationSubsection
+          );
+        }
+      }
+    }
+
+    /**
+     * Return, for each section, the maximum time it took during a single
+     * captured frame - the "worst frame" per section, catching the spikes
+     * that averages hide. Plain tree, safe to serialize with
+     * `JSON.stringify`.
+     */
+    getFramesMaxMeasures(): FrameMeasureOutput {
+      const framesMaxMeasures: FrameMeasureOutput = {
+        time: 0,
+        subsections: {},
+      };
+      for (let i = 0; i < this._framesCount; ++i) {
+        Profiler._addMaxSectionTimes(
+          this._framesMeasures[i],
+          framesMaxMeasures
+        );
+      }
+      return framesMaxMeasures;
+    }
+
+    /**
+     * Return the total time of each captured frame, in chronological order
+     * (up to the last 600 frames).
+     */
+    getFrameTimes(): Array<float> {
+      const frameTimes: Array<float> = [];
+      const isBufferFull = this._framesCount >= this._maxFramesCount;
+      const startIndex = isBufferFull ? this._currentFrameIndex : 0;
+      for (let i = 0; i < this._framesCount; ++i) {
+        const index = (startIndex + i) % this._maxFramesCount;
+        frameTimes.push(this._framesMeasures[index].time);
+      }
+      return frameTimes;
+    }
+
     /**
      * Get stats measured during the frames captured.
      */

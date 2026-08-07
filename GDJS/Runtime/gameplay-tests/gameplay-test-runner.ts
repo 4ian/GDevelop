@@ -212,13 +212,30 @@ namespace gdjs {
     };
 
     /**
-     * A flat, JSON-safe profiling summary: the average step time per frame
-     * and the average time of each profiled section, sorted by time
-     * descending (nested sections are flattened as "parent > child").
+     * A flat, JSON-safe profiling summary. Sections are sorted by average
+     * time descending (nested sections flattened as "parent > child");
+     * `maxTimeMs` is the worst single frame of a section - spikes that
+     * averages hide. `frameTimesMs` is the whole frame-by-frame timeline
+     * (chronological): correlate a spike with the `eventLog` frames.
      */
     export type GameplayTestProfilingResult = {
       avgStepTimeMs: number;
-      sections: Array<{ name: string; avgTimeMs: number }>;
+      /** The worst single frame (total). */
+      maxStepTimeMs: number;
+      sections: Array<{ name: string; avgTimeMs: number; maxTimeMs: number }>;
+      /** Total time of each profiled frame, in order (up to 600). */
+      frameTimesMs: Array<number>;
+      /** Live instances per object at the time profiling stopped. */
+      objectCounts: { [objectName: string]: integer };
+      /** 3D renderer counters (last rendered frame), when the game uses 3D. */
+      renderer: {
+        drawCalls: number;
+        triangles: number;
+        geometries: number;
+        textures: number;
+      } | null;
+      /** JS heap in use (Chromium only), to spot leaks across a long run. */
+      jsHeapUsedMb?: number;
     };
 
     /**
@@ -1981,10 +1998,12 @@ namespace gdjs {
       }
 
       /**
-       * Stop profiling and return a flat, JSON-safe summary: the average
-       * step time per frame and the average time of each profiled section
-       * (events, physics, rendering... - nested sections are flattened as
-       * "parent > child"), sorted by time descending.
+       * Stop profiling and return a flat, JSON-safe summary: average and
+       * worst-frame time per profiled section (events, physics,
+       * rendering... - nested sections are flattened as "parent > child",
+       * sorted by average time descending), the frame-by-frame timeline (to
+       * correlate a spike with the `eventLog` frames), the live object
+       * counts, and renderer/memory counters when available.
        */
       stopProfiling(): GameplayTestProfilingResult | null {
         const currentScene = this._runtimeGame
@@ -1993,29 +2012,70 @@ namespace gdjs {
         const profiler = currentScene ? currentScene.getProfiler() : null;
         if (!profiler) return null;
         const framesAverageMeasures = profiler.getFramesAverageMeasures();
+        const framesMaxMeasures = profiler.getFramesMaxMeasures();
+        const frameTimes = profiler.getFrameTimes();
         this._runtimeGame.stopCurrentSceneProfiler();
 
         const roundMs = (timeMs: float) => Math.round(timeMs * 100) / 100;
-        const sections: Array<{ name: string; avgTimeMs: number }> = [];
-        const visitSubsections = (measure: any, path: string) => {
-          const subsections = (measure && measure.subsections) || {};
+        const sections: Array<{
+          name: string;
+          avgTimeMs: number;
+          maxTimeMs: number;
+        }> = [];
+        const visitSubsections = (
+          averageMeasure: gdjs.FrameMeasureOutput,
+          maxMeasure: gdjs.FrameMeasureOutput | null,
+          path: string
+        ) => {
+          const subsections = averageMeasure.subsections;
           for (const name in subsections) {
             const fullName = path ? path + ' > ' + name : name;
+            const maxSubsection =
+              (maxMeasure && maxMeasure.subsections[name]) || null;
             sections.push({
               name: fullName,
               avgTimeMs: roundMs(subsections[name].time || 0),
+              maxTimeMs: roundMs((maxSubsection && maxSubsection.time) || 0),
             });
-            visitSubsections(subsections[name], fullName);
+            visitSubsections(subsections[name], maxSubsection, fullName);
           }
         };
-        visitSubsections(framesAverageMeasures, '');
+        visitSubsections(framesAverageMeasures, framesMaxMeasures, '');
         sections.sort((a, b) => b.avgTimeMs - a.avgTimeMs);
 
+        const threeRenderer = (this._runtimeGame.getRenderer() as any)
+          .getThreeRenderer
+          ? (this._runtimeGame.getRenderer() as any).getThreeRenderer()
+          : null;
+        const threeInfo = threeRenderer ? threeRenderer.info : null;
+
+        const performanceMemory =
+          typeof performance !== 'undefined' && (performance as any).memory
+            ? (performance as any).memory
+            : null;
+
         return {
-          avgStepTimeMs: roundMs(
-            (framesAverageMeasures && framesAverageMeasures.time) || 0
-          ),
+          avgStepTimeMs: roundMs(framesAverageMeasures.time || 0),
+          maxStepTimeMs: roundMs(framesMaxMeasures.time || 0),
           sections: sections.slice(0, MAX_PROFILING_SECTIONS),
+          frameTimesMs: frameTimes.map(roundMs),
+          objectCounts: this._getObjectCounts(),
+          renderer: threeInfo
+            ? {
+                drawCalls: threeInfo.render.calls,
+                triangles: threeInfo.render.triangles,
+                geometries: threeInfo.memory.geometries,
+                textures: threeInfo.memory.textures,
+              }
+            : null,
+          ...(performanceMemory
+            ? {
+                jsHeapUsedMb:
+                  Math.round(
+                    (performanceMemory.usedJSHeapSize / (1024 * 1024)) * 10
+                  ) / 10,
+              }
+            : {}),
         };
       }
 

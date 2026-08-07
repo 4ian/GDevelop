@@ -452,10 +452,27 @@ describe('gdjs.gameplayTests', () => {
         profile.sections.every(
           (section) =>
             typeof section.name === 'string' &&
-            typeof section.avgTimeMs === 'number'
+            typeof section.avgTimeMs === 'number' &&
+            typeof section.maxTimeMs === 'number' &&
+            section.maxTimeMs >= section.avgTimeMs
         ),
-        'sections have a name and an avgTimeMs'
+        'sections have a name, an avgTimeMs and a maxTimeMs >= avgTimeMs'
       );
+      harness.assert(
+        profile.maxStepTimeMs >= profile.avgStepTimeMs,
+        'The worst frame is at least the average'
+      );
+      harness.assert(
+        Array.isArray(profile.frameTimesMs) &&
+          profile.frameTimesMs.length === 10 &&
+          profile.frameTimesMs.every((time) => typeof time === 'number'),
+        'The frame-by-frame timeline is returned (10 profiled frames)'
+      );
+      harness.assert(
+        profile.objectCounts && typeof profile.objectCounts === 'object',
+        'Object counts are returned'
+      );
+      harness.assert(profile.renderer === null, 'No 3D renderer in this game');
       // The whole profile is JSON-safe (no circular structure).
       harness.assert(
         JSON.stringify(profile).length > 0,

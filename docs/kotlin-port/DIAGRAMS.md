@@ -31,24 +31,17 @@ contracts.
 ```plantuml
 @startuml
 title Existing GDevelop and portable Kotlin paths
+
 left to right direction
-skinparam componentStyle rectangle
-package "Existing GDevelop" #EAF2F8 {
-  [Raw project JSON] as gdjson
-  [gd::Project editor model] as gdproject
-  [Extension metadata] as gdmeta
-  [C++ event code generator] as codegen
-  [Generated JavaScript] as genjs
-  [GDJS runtime] as gdjs
-  [Browser / renderer / platform] as browser
-  gdjson --> gdproject : deserialize
-  gdmeta --> gdproject : registered descriptors
-  gdproject --> codegen
-  gdmeta --> codegen : IDs + parameter order
-  codegen --> genjs
-  genjs --> gdjs
-  gdjs --> browser
-}
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 20
+skinparam PackageFontSize 16
+skinparam NoteFontSize 16
+skinparam ArrowFontStyle bold
+skinparam DefaultFontName jetbrains-mono
+
 package "Portable Kotlin skeleton" #FDF2E9 {
   [GDevelop JSON or scenario] as input
   [Lossless source model] as source
@@ -66,14 +59,37 @@ package "Portable Kotlin skeleton" #FDF2E9 {
   backend --> state
   backend --> hosts : declared capabilities
 }
-[Frozen Phase 0 corpus] as corpus #F4D03F
-[Canonical reference traces] as oracle #F4D03F
+
+package "Existing GDevelop" #EAF2F8 {
+  [Raw project JSON] as gdjson
+  [gd::Project editor model] as gdproject
+  [Extension metadata] as gdmeta
+  [C++ event code generator] as codegen
+  [Generated JavaScript] as genjs
+  [GDJS runtime] as gdjs
+  [Browser / renderer / platform] as browser
+  gdjson --> gdproject : deserialize
+  gdmeta --> gdproject : registered descriptors
+  gdproject --> codegen
+  gdmeta --> codegen : IDs + parameter order
+  codegen --> genjs
+  genjs --> gdjs
+  gdjs --> browser
+}
+
+[**Frozen Phase 0 corpus**] as corpus #F4D03F
 [Differential reports] as reports #F4D03F
-corpus --> gdjson
-corpus --> input
-gdjs --> oracle : pinned capture
+[Canonical reference traces] as oracle #F4D03F
+
 oracle --> reports
 state --> reports
+gdjs --> oracle : pinned capture
+corpus --> gdjson
+corpus --> input
+
+note right of browser
+  **TODO**
+end note
 @enduml
 ```
 
@@ -91,7 +107,19 @@ separate routes.
 ```plantuml
 @startuml
 title Existing project-to-preview/export flow
+
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 20
+skinparam ActorFontSize 24
+skinparam NoteFontSize 16
+skinparam DefaultFontName jetbrains-mono
+
 skinparam sequenceMessageAlign center
+skinparam ActorFontColor #225522FF
+skinparam ActorBackgroundColor #225522AA
+
 actor User
 participant "Storage provider" as Storage
 participant "JS / Embind bridge" as Bridge
@@ -101,6 +129,7 @@ participant "EventsCodeGenerator" as Generator
 participant "Exporter / preview launcher" as Exporter
 participant "GDJS RuntimeGame / RuntimeScene" as Runtime
 participant "Registered extension runtime" as Extension
+
 User -> Storage : open project
 Storage -> Bridge : raw JSON
 Bridge -> Project : deserialize project/layouts
@@ -132,9 +161,18 @@ complete.
 
 ```plantuml
 @startuml
-title Kotlin skeleton modules and allowed direction
-top to bottom direction
-skinparam componentStyle rectangle
+title Kotlin skeleton modules and allowed direction 
+
+left to right direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 20
+skinparam ArtifactFontSize 14
+skinparam PackageFontSize 16
+skinparam NoteFontSize 16
+skinparam DefaultFontName jetbrains-mono
+
 package "Portable common contracts" {
   [diagnostics] as diagnostics
   [project-model] as project
@@ -142,16 +180,28 @@ package "Portable common contracts" {
   [normalized-ir] as ir
   [runtime-state] as runtime
 }
-package "Extensions / experiments" {
+
+package "Extensions / experiments" as Pext {
   [example-extension] as example
   [map-runtime] as mapruntime
+  note right
+    Isolated spike module.
+    Not promoted into runtime core.
+  end note
   [maptiles-extension] as mapext
 }
+
+note left of Pext
+  **TODO** specify further, this entire 
+  Diagram lacks detail and descriptors
+end note
+
 package "Target entry points / adapters" {
   [jvm-cli] as cli
   [maplibre-js-host] as mapjs
   [maptiles-demo] as demo
 }
+
 project --> diagnostics
 catalog --> diagnostics
 ir --> project
@@ -168,10 +218,7 @@ cli --> example
 mapjs --> mapruntime
 mapjs --> mapext
 demo --> mapjs
-note right of mapruntime
-  Isolated spike module.
-  Not promoted into runtime core.
-end note
+
 @enduml
 ```
 
@@ -190,7 +237,17 @@ end note
 ```plantuml
 @startuml
 title Decode, resolve, lower, and execute
-left to right direction
+
+top to bottom direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 20
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle bold
+skinparam NoteFontSize 16
+skinparam DefaultFontName jetbrains-mono
+
 artifact "Raw input\nJSON / scenario" as raw
 component Decoder as decoder
 artifact "Lossless source model\nunknowns + locations" as source
@@ -200,17 +257,19 @@ artifact "Resolved normalized IR\norigin map" as nir
 component Interpreter as interpreter
 component "Generated backend" as generated
 artifact "Trace + final state\ndiagnostics + reachability" as output
+
 raw --> decoder
 decoder --> source
 decoder --> output : decode diagnostics
 source --> analyzer
-catalog --> analyzer
+catalog --> analyzer 
 analyzer --> output : resolution diagnostics
 analyzer --> nir : valid program
 nir --> interpreter
 nir --> generated
 interpreter --> output
 generated --> output
+
 @enduml
 ```
 
@@ -231,7 +290,17 @@ whether execution behaved the same. Canonical-output requirements are in the
 ```plantuml
 @startuml
 title Extension member resolution and execution
+
 skinparam sequenceMessageAlign center
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 20
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 16
+skinparam DefaultFontName jetbrains-mono
+
 participant "Source operation" as Source
 participant ExtensionCatalog as Catalog
 participant "Analyzer / lowerer" as Lowerer
@@ -239,11 +308,12 @@ participant "Normalized IR" as NIR
 participant "Portable runtime" as Runtime
 participant "Extension runtime" as Extension
 participant "Capability host" as Host
+
 Source -> Catalog : qualified member/type ID
 Catalog --> Lowerer : identity + descriptor
 Lowerer -> Lowerer : bind ordered arguments
-Lowerer -> Lowerer : validate receiver, types, dependencies,
-capabilities, and source location
+Lowerer -> Lowerer : validate receiver, types, dependencies, capabilities, and source location
+
 alt portable operation
   Lowerer -> NIR : resolved extension call
   NIR -> Runtime
@@ -255,6 +325,7 @@ else host capability operation
 else unsupported / invalid
   Lowerer --> Source : structured located diagnostic
 end
+
 @enduml
 ```
 
@@ -271,23 +342,37 @@ mutation during iteration, triggers, and scene lifecycle have observable order.
 ```plantuml
 @startuml
 title One deterministic frame and optional scene transition
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 start
+
 :Sample seeded inputs and game time;
 :Run pre-event lifecycle hooks;
 :Initialize ordered object/group selections;
 :Enter events;
 :Evaluate conditions left-to-right;
+
 if (condition filters selection?) then (yes)
   :Record ordered selection before/after;
+else (no)
 endif
+
 if (event passed?) then (yes)
   :Run actions in order;
   :Record receivers, writes,
-creation, deletion, selection;
+  creation, deletion, selection;
   :Run child events with defined scope;
 else (no)
   :Skip actions and children;
 endif
+
 :Run post-event hooks;
 if (scene change requested?) then (yes)
   :Record request;
@@ -302,10 +387,23 @@ stop
 ```plantuml
 @startuml
 title Runtime state ownership
+
+left to right direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam PackageFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 package "Game lifetime" {
   [Global variables] as globals
   [Catalog snapshot] as catalog
 }
+
 package "Scene lifetime" {
   [Scene variables] as scene
   [Stable object/behavior handles] as objects
@@ -313,10 +411,12 @@ package "Scene lifetime" {
   [Trigger/timer state] as triggers
   [Ordered async/event queues] as queues
 }
+
 package "Observations" {
   [Semantic trace] as trace
   [Final asserted state] as final
 }
+
 objects --> selections
 globals --> trace
 scene --> trace
@@ -325,6 +425,7 @@ triggers --> trace
 queues --> trace
 catalog --> trace : resolved identities
 trace --> final
+
 @enduml
 ```
 
@@ -336,39 +437,52 @@ See the [target strategy](target-strategy.md) for required trace records and the
 ```plantuml
 @startuml
 title Capability-based target composition
+
 top to bottom direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 component "Resolved NIR operation" as op
 component "Capability lookup" as lookup
+artifact "Unsupported-capability diagnostic" as reject
+interface "MapHost (spike-local)" as map
 interface Time as time
 interface Input as input
 interface Storage as storage
 interface Audio as audio
 interface Rendering as rendering
-interface "MapHost (spike-local)" as map
+component "Browser JS host" as js
 component "Deterministic fake/headless host" as fake
 component "JVM host" as jvm
-component "Browser JS host" as js
 component "Android / Native host (future)" as native
-artifact "Unsupported-capability diagnostic" as reject
+
 op --> lookup : RuntimeCapabilityIds
-lookup --> time
+lookup --> reject : adapter absent
+lookup --> map
+lookup --> rendering
 lookup --> input
+lookup --> time
 lookup --> storage
 lookup --> audio
-lookup --> rendering
-lookup --> map
+rendering --> js
+map --> js
 time --> fake
 input --> fake
 storage --> jvm
-rendering --> js
-map --> js
 audio --> native
-lookup --> reject : adapter absent
-note right of js
+
+note left of js
   Owns DOM, promises, URLs,
   credentials, WebGL, MapLibre,
   listeners, and target handles.
 end note
+
 @enduml
 ```
 
@@ -388,7 +502,18 @@ promote a feature to `partial` or `compatible`.
 ```plantuml
 @startuml
 title Evidence production and gate decision
+
 left to right direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam FolderFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 folder "Phase 0 corpus" as corpus {
   artifact manifest
   artifact projects
@@ -400,9 +525,11 @@ component "Pinned GDJS capture" as capture
 component "Portable corpus runner" as runner
 artifact "Per-fixture report" as fixture
 artifact "Metric summary" as summary
-diamond "All gates pass?" as gate
+"All metrics passed?" as gate
 artifact "Compatibility ledger" as ledger
 artifact "Stop/revise record" as stop
+
+'gate "passed?" --> gate
 manifest --> validator
 projects --> validator
 snapshot --> validator
@@ -445,7 +572,18 @@ dependency. Its feature work is paused until the Phase 1 go criterion passes.
 ```plantuml
 @startuml
 title MapTiles spike boundary (paused)
+
 left to right direction
+
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam PackageFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 package "Common, spike-local" #FCF3CF {
   [map-runtime values and MapHost] as mapruntime
   [maptiles-extension descriptors] as mapext
@@ -453,6 +591,7 @@ package "Common, spike-local" #FCF3CF {
   mapext --> mapruntime
   animation --> mapruntime
 }
+
 package "Kotlin/JS host only" #F5B7B1 {
   [MapLibre adapter] as adapter
   [DOM overlay] as overlay
@@ -460,19 +599,23 @@ package "Kotlin/JS host only" #F5B7B1 {
   adapter --> browser
   overlay --> browser
 }
+
 [Generic normalized IR] as nir
 [Generic capability catalog] as catalog
 [JVM headless runtime] as headless
+
 catalog --> mapext : descriptor + capability ID
 mapext --> nir : resolved host operation
 nir --> adapter : capability installed
 nir --> headless : stable rejection
 adapter --> mapruntime : implements MapHost
+
 note bottom of mapruntime
   Do not promote MapHostResult, clock,
   lifecycle, events, or animation merely
   to simplify the demo.
 end note
+
 @enduml
 ```
 
@@ -483,18 +626,31 @@ and experiment gates are in the [prototype charter](maptiles-prototype.md).
 
 ```plantuml
 @startuml
+
 title Work advances only through evidence gates
+
+skinparam StateBorderColor #4050B4FF
+skinparam BackgroundColor #FCF1EEFF
+skinparam DefaultFontColor #222222FF
+skinparam DefaultFontSize 14
+skinparam ArrowFontColor #505084FF
+skinparam ArrowFontStyle italic
+skinparam NoteFontSize 12
+skinparam DefaultFontName jetbrains-mono
+
 state "Phase 0\nFrozen static corpus" as P0
 state "Phase 1\nCommon + JVM headless" as P1
 state "Phase 2\nKSP extension SDK" as P2
 state "Later target experiments" as Later
 state "MapTiles Kotlin/JS\nPAUSED" as MapTiles
+
 [*] --> P0
 P0 --> P1 : complete deterministic corpus
 P1 --> P2 : required exact parity
 P2 --> Later : generated/descriptor parity
 P1 -[dashed]-> MapTiles : only after Phase 1 go
 MapTiles --> Later : never bypasses gates
+
 @enduml
 ```
 

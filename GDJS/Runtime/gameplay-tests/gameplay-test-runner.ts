@@ -1278,7 +1278,7 @@ namespace gdjs {
        * is clear of the given blocker objects. 2D ONLY: the test uses the
        * 2D hitboxes in the X/Y plane and ignores Z.
        */
-      hasLineOfSight(
+      has2dLineOfSight(
         referenceObjectName: string,
         targetObjectName: string,
         blockerObjectNames: Array<string>
@@ -1903,7 +1903,10 @@ namespace gdjs {
 
       /**
        * Move the instance with the given id to a position.
-       * Use for test setup only.
+       * Use for test setup only. The move takes effect immediately (physics
+       * bodies included), but the game's logic keeps acting on the object
+       * each stepped frame (forces, AI...): to hold an object somewhere,
+       * re-apply the position every frame via `onFrame`.
        */
       setObjectPosition(id: integer, x: float, y: float, z?: float): void {
         const currentScene = this._getCurrentScene();

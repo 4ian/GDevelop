@@ -80,6 +80,7 @@ const makeResult = (
   eventLog: [],
   finalState: null,
   screenshots: [],
+  profiles: [],
   performance: null,
   ...partialResult,
 });

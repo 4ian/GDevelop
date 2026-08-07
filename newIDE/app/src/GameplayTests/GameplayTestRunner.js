@@ -47,6 +47,8 @@ export type GameplayTestResult = {
   eventLog: Array<Object>,
   finalState: Object | null,
   screenshots: Array<{ label: string, frame: number, jpegBase64: string }>,
+  // The `stopProfiling()` summaries captured during the run.
+  profiles: Array<Object>,
   performance: Object | null,
 };
 
@@ -153,6 +155,7 @@ const makeResultWithoutRun = (
   eventLog: [],
   finalState: null,
   screenshots: [],
+  profiles: [],
   performance: null,
 });
 

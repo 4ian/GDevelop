@@ -212,19 +212,28 @@ namespace gdjs {
     };
 
     /**
-     * A flat, JSON-safe profiling summary. Sections are sorted by average
-     * time descending (nested sections flattened as "parent > child");
-     * `maxTimeMs` is the worst single frame of a section - spikes that
-     * averages hide. `frameTimesMs` is the whole frame-by-frame timeline
-     * (chronological): correlate a spike with the `eventLog` frames.
+     * A flat, JSON-safe profiling summary, also attached to the test result
+     * (`result.profiles`). Sections are sorted by average time descending
+     * (nested sections flattened as "parent > child"); `maxTimeMs` is the
+     * worst single frame of a section - spikes that averages hide.
+     * `worstFrames` and the timeline use the harness frame numbers:
+     * correlate a spike with the `eventLog` frames.
      */
     export type GameplayTestProfilingResult = {
+      /** The profiled window, in harness frame numbers (like `eventLog`). */
+      startFrame: integer;
+      endFrame: integer;
       avgStepTimeMs: number;
       /** The worst single frame (total). */
       maxStepTimeMs: number;
       sections: Array<{ name: string; avgTimeMs: number; maxTimeMs: number }>;
-      /** Total time of each profiled frame, in order (up to 600). */
+      /** The most expensive profiled frames, worst first. */
+      worstFrames: Array<{ frame: integer; timeMs: number }>;
+      /** The frame-by-frame timeline, in order. When the window is longer
+       * than 120 frames, each entry is the MAX of `frameTimesBucketSize`
+       * consecutive frames (spikes are preserved). */
       frameTimesMs: Array<number>;
+      frameTimesBucketSize: integer;
       /** Live instances per object at the time profiling stopped. */
       objectCounts: { [objectName: string]: integer };
       /** 3D renderer counters (last rendered frame), when the game uses 3D. */
@@ -291,6 +300,8 @@ namespace gdjs {
         sceneVariables: Array<Object>;
       };
       screenshots: Array<GameplayTestScreenshot>;
+      /** The `stopProfiling()` summaries captured during the run. */
+      profiles: Array<GameplayTestProfilingResult>;
       performance: {
         avgStepMs: number;
         worstStepMs: number;
@@ -306,6 +317,9 @@ namespace gdjs {
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
+    const MAX_PROFILING_TIMELINE_ENTRIES = 120;
+    const MAX_PROFILING_WORST_FRAMES = 5;
+    const MAX_PROFILES_PER_RESULT = 5;
     /** The scene change cause declared by the harness (see
      * `SceneStack.runWithSceneChangeCause`). */
     const GAMEPLAY_TEST_SCENE_CHANGE_CAUSE = 'gameplayTest';
@@ -477,6 +491,12 @@ namespace gdjs {
       _eventLog: Array<GameplayTestEvent> = [];
       _screenshots: Array<GameplayTestScreenshot> = [];
       _watchedObjectNames: Array<string> = [];
+      /** The harness frame at which the current profiling started (see
+       * `startProfiling`), or null when not profiling. */
+      _profilingStartFrame: integer | null = null;
+      /** The profiling summaries captured during the run (attached to the
+       * result as `profiles`). */
+      _profiles: Array<GameplayTestProfilingResult> = [];
       _timeoutMs: number;
       _maxFrames: integer;
       /** Last time the stepping loop yielded to the browser (see
@@ -1994,6 +2014,7 @@ namespace gdjs {
        * Start profiling the current scene (see `stopProfiling`).
        */
       startProfiling(): void {
+        this._profilingStartFrame = this._framesExecuted;
         this._runtimeGame.startCurrentSceneProfiler(() => {});
       }
 
@@ -2054,11 +2075,53 @@ namespace gdjs {
             ? (performance as any).memory
             : null;
 
-        return {
+        // The frames profiled, in harness frame numbers (like `eventLog`):
+        // the frame times captured are for frames startFrame+1..endFrame.
+        const endFrame = this._framesExecuted;
+        const startFrame =
+          this._profilingStartFrame !== null
+            ? this._profilingStartFrame
+            : Math.max(0, endFrame - frameTimes.length);
+        this._profilingStartFrame = null;
+
+        // The most expensive frames, worst first, with their harness frame
+        // numbers so they can be correlated with the `eventLog`.
+        const worstFrames = frameTimes
+          .map((timeMs, index) => ({
+            frame: startFrame + 1 + index,
+            timeMs: roundMs(timeMs),
+          }))
+          .sort((a, b) => b.timeMs - a.timeMs)
+          .slice(0, MAX_PROFILING_WORST_FRAMES);
+
+        // Keep the timeline compact: past 120 frames, downsample by buckets
+        // keeping the MAX of each bucket (spikes are preserved).
+        const frameTimesBucketSize = Math.max(
+          1,
+          Math.ceil(frameTimes.length / MAX_PROFILING_TIMELINE_ENTRIES)
+        );
+        const frameTimesMs: Array<number> = [];
+        for (let i = 0; i < frameTimes.length; i += frameTimesBucketSize) {
+          let bucketMax = 0;
+          for (
+            let j = i;
+            j < Math.min(i + frameTimesBucketSize, frameTimes.length);
+            j++
+          ) {
+            bucketMax = Math.max(bucketMax, frameTimes[j]);
+          }
+          frameTimesMs.push(roundMs(bucketMax));
+        }
+
+        const profile: GameplayTestProfilingResult = {
+          startFrame,
+          endFrame,
           avgStepTimeMs: roundMs(framesAverageMeasures.time || 0),
           maxStepTimeMs: roundMs(framesMaxMeasures.time || 0),
           sections: sections.slice(0, MAX_PROFILING_SECTIONS),
-          frameTimesMs: frameTimes.map(roundMs),
+          worstFrames,
+          frameTimesMs,
+          frameTimesBucketSize,
           objectCounts: this._getObjectCounts(),
           renderer: threeInfo
             ? {
@@ -2077,6 +2140,13 @@ namespace gdjs {
               }
             : {}),
         };
+        // Also attach the profile to the test result (keeping the last
+        // ones), so it reaches the report even if the script does not log it.
+        this._profiles.push(profile);
+        if (this._profiles.length > MAX_PROFILES_PER_RESULT) {
+          this._profiles.shift();
+        }
+        return profile;
       }
 
       /**
@@ -2220,6 +2290,7 @@ namespace gdjs {
               : [],
           },
           screenshots: this._screenshots,
+          profiles: this._profiles,
           performance:
             this._framesExecuted > 0
               ? {

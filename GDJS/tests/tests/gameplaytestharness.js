@@ -469,6 +469,26 @@ describe('gdjs.gameplayTests', () => {
         'The frame-by-frame timeline is returned (10 profiled frames)'
       );
       harness.assert(
+        profile.frameTimesBucketSize === 1,
+        'A short window is not downsampled'
+      );
+      harness.assert(
+        profile.startFrame === 1 && profile.endFrame === 11,
+        'The profiled window is reported in harness frames (got ' +
+          profile.startFrame + '..' + profile.endFrame + ')'
+      );
+      harness.assert(
+        Array.isArray(profile.worstFrames) &&
+          profile.worstFrames.length === 5 &&
+          profile.worstFrames.every(
+            (worst) =>
+              worst.frame > profile.startFrame &&
+              worst.frame <= profile.endFrame &&
+              typeof worst.timeMs === 'number'
+          ),
+        'The worst frames are reported with harness frame numbers'
+      );
+      harness.assert(
         profile.objectCounts && typeof profile.objectCounts === 'object',
         'Object counts are returned'
       );

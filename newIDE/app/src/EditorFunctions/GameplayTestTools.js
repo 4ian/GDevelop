@@ -75,11 +75,12 @@ export const runGameplayTest: EditorFunction = {
   renderForEditor: ({ args }) => {
     const testName = args.test_name || '';
     return {
-      text: args.source ? (
-        <Trans>Save and run the gameplay test {testName}.</Trans>
-      ) : (
-        <Trans>Run the gameplay test {testName}.</Trans>
-      ),
+      text:
+        args.source && args.persist !== false ? (
+          <Trans>Save and run the gameplay test {testName}.</Trans>
+        ) : (
+          <Trans>Run the gameplay test {testName}.</Trans>
+        ),
     };
   },
   launchFunction: async ({ project, args }) => {
@@ -161,8 +162,11 @@ export const runGameplayTest: EditorFunction = {
   },
   modifiesProject: false,
   // Only persisting a new/changed test modifies the project (and so requires
-  // an approval when auto-edit is off) - just running a test does not.
-  getModifiesProject: (args: Object) => typeof args.source === 'string',
+  // an approval when auto-edit is off). Just running a test does not - and
+  // neither does running an unsaved source with `persist: false` (temporary
+  // probes and diagnostics).
+  getModifiesProject: (args: Object) =>
+    typeof args.source === 'string' && args.persist !== false,
 };
 
 // Cap on the ordered test list returned after changes (mirrors the array

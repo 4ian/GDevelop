@@ -1288,6 +1288,23 @@ namespace gdjs {
       }
 
       /**
+       * LAST RESORT: the raw `gdjs.RuntimeGame` being tested. Prefer the
+       * harness APIs (snapshots, inputs, stepping...) - direct mutations
+       * can invalidate what the test asserts.
+       */
+      getRuntimeGame(): gdjs.RuntimeGame {
+        return this._runtimeGame;
+      }
+
+      /**
+       * LAST RESORT: the raw `gdjs.RuntimeScene` currently being played
+       * (throws if no scene is running). Prefer the harness APIs.
+       */
+      getCurrentRuntimeScene(): gdjs.RuntimeScene {
+        return this._getCurrentScene();
+      }
+
+      /**
        * Get the visibility of a layer, or null if the layer does not exist.
        */
       getLayer(layerName: string): { visible: boolean } | null {

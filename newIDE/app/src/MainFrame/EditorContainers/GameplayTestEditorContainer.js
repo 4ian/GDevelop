@@ -21,7 +21,6 @@ import {
   runProjectGameplayTests,
   stopRunningProjectGameplayTest,
   getTestsContainer,
-  getGameplayTestProjectItemName,
   type GameplayTestResult,
   type GameplayTestScope,
 } from '../../GameplayTests/GameplayTestRunner';
@@ -40,10 +39,6 @@ const styles = {
     minWidth: 0,
   },
 };
-
-// The helper lives with the runner (a pure module) so non-UI code (e.g. the
-// AI editor functions) can use it without importing this editor container.
-export { getGameplayTestProjectItemName };
 
 const parseGameplayTestProjectItemName = (
   projectItemName: string

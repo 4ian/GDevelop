@@ -126,6 +126,9 @@ const setRunInProgress = (running: boolean) => {
   runInProgressListeners.forEach(listener => listener());
 };
 
+/** Non-hook variant, for code outside React components. */
+export const getIsGameplayTestRunInProgress = (): boolean => isRunInProgress;
+
 export const useIsGameplayTestRunInProgress = (): boolean => {
   const [running, setRunning] = React.useState(isRunInProgress);
   React.useEffect(() => {

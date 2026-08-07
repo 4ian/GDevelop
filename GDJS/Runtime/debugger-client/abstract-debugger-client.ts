@@ -1,26 +1,17 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
-  /** The debugger commands ignored while a gameplay test is running (they
-   * would mutate the game state or stepping the test harness owns). */
-  const DEBUGGER_COMMANDS_MUTATING_GAME_STATE = new Set([
-    'play',
-    'pause',
-    'set',
-    'call',
-    'hotReload',
-    'hotReloadObjects',
-    'hotReloadLayers',
-    'hotReloadAllInstances',
-    'hardReload',
-    'setBackgroundColor',
-    'updateInstances',
-    'addInstances',
-    'deleteSelection',
-    'dragNewInstance',
-    'cancelDragNewInstance',
-    'switchForInGameEdition',
-    'updateInnerArea',
+  /** The only debugger commands processed while a gameplay test is running:
+   * read-only inspection and the gameplay test commands themselves. Every
+   * other command is ignored (fail closed: a command added later cannot
+   * accidentally mutate the game state or stepping the harness owns). */
+  const DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS = new Set([
+    'refresh',
+    'getStatus',
+    'profiler.start',
+    'profiler.stop',
+    'gameplayTest.run',
+    'gameplayTest.stop',
   ]);
 
   const originalConsole = {
@@ -269,13 +260,13 @@ namespace gdjs {
       }
 
       // While a gameplay test runs, the harness owns the game stepping and
-      // state: ignore any command mutating them (an unpause would make the
-      // main loop step in parallel, a hot-reload would reset instances
-      // mid-test). `gameplayTest.stop` and read-only commands stay allowed.
+      // state: only read-only and gameplay test commands are processed (an
+      // unpause would make the main loop step in parallel, a hot-reload
+      // would reset instances mid-test).
       if (
         gdjs.gameplayTests &&
         gdjs.gameplayTests.isGameplayTestRunning() &&
-        DEBUGGER_COMMANDS_MUTATING_GAME_STATE.has(data.command)
+        !DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS.has(data.command)
       ) {
         logger.warn(
           `Ignored debugger command "${data.command}" while a gameplay test is running.`

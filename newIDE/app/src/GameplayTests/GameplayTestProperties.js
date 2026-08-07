@@ -1,6 +1,10 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
-import { type GameplayTestRunSpeedOptions } from './GameplayTestEditorToolbar';
+import {
+  buildRunTestSpeedMenuTemplate,
+  type GameplayTestRunSpeedOptions,
+} from './GameplayTestEditorToolbar';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
@@ -8,7 +12,6 @@ import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import ScrollView from '../UI/ScrollView';
 import ErrorBoundary from '../UI/ErrorBoundary';
-import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import LinearProgress from '../UI/LinearProgress';
 import CompactTextField from '../UI/CompactTextField';
@@ -242,12 +245,15 @@ export const GameplayTestProperties = ({
                 </Text>
               </ColumnStackLayout>
             ) : (
-              <RaisedButton
+              <RaisedButtonWithSplitMenu
                 primary
                 fullWidth
                 icon={<PreviewIcon />}
                 label={<Trans>Run the test</Trans>}
                 onClick={() => onRunTest({ speedFactor: null })}
+                buildMenuTemplate={i18n =>
+                  buildRunTestSpeedMenuTemplate(i18n, onRunTest)
+                }
               />
             )}
             <FlatButton

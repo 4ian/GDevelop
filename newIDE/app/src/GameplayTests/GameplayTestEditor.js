@@ -6,6 +6,7 @@ import EditorBottomTabsSwitcher, {
   type EditorBottomTab,
 } from '../UI/EditorBottomTabsSwitcher';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import useForceUpdate from '../Utils/UseForceUpdate';
 import EditorMosaic, {
   type EditorMosaicInterface,
   type EditorMosaicNode,
@@ -83,10 +84,7 @@ const GameplayTestEditor: React.ComponentType<{
       'test-properties' | 'test-code'
     >('test-properties');
     const { onOpenedEditorsChanged } = props;
-    const [, forceUpdateCounter] = React.useState<number>(0);
-    const forceUpdate = React.useCallback(() => {
-      forceUpdateCounter(count => count + 1);
-    }, []);
+    const forceUpdate = useForceUpdate();
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
       togglePropertiesPanel: () => {

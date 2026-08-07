@@ -61,11 +61,12 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           {
             label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
             click: onNetworkPreview,
-            enabled: canDoNetworkPreview,
+            enabled: canDoNetworkPreview && !isGameplayTestRunInProgress,
           },
           {
             label: i18n._(t`Start Preview and Debugger`),
             click: onOpenDebugger,
+            enabled: !isGameplayTestRunInProgress,
           },
           preferences.values.openDiagnosticReportAutomatically
             ? null
@@ -74,7 +75,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 click: async () => {
                   await onLaunchPreviewWithDiagnosticReport();
                 },
-                enabled: !hasPreviewsRunning,
+                enabled: !hasPreviewsRunning && !isGameplayTestRunInProgress,
               },
           {
             label: i18n._(t`Launch preview in...`),
@@ -84,28 +85,28 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 click: async () => {
                   await onPreviewWithoutHotReload({ numberOfWindows: 1 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`2 previews in 2 windows`),
                 click: async () => {
                   await onPreviewWithoutHotReload({ numberOfWindows: 2 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`3 previews in 3 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 3 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`4 previews in 4 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 4 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
             ],
           },
@@ -165,6 +166,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         onPreviewWithoutHotReload,
         isPreviewEnabled,
         hasPreviewsRunning,
+        isGameplayTestRunInProgress,
         preferences.values.openDiagnosticReportAutomatically,
         onLaunchPreviewWithDiagnosticReport,
         previewState.overridenPreviewLayoutName,

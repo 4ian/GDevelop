@@ -66,11 +66,14 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObjectEditorContainer';
 import { renderGameplayTestEditorContainer } from './EditorContainers/GameplayTestEditorContainer';
-import { getGameplayTestProjectItemName } from './EditorContainers/GameplayTestEditorContainer';
+
 import { GameplayTestFrame } from '../GameplayTests/GameplayTestFrame';
 import {
+  getGameplayTestProjectItemName,
+  getIsGameplayTestRunInProgress,
   getTestsContainer,
   registerGameplayTestRunnerDependencies,
+  useIsGameplayTestRunInProgress,
   runProjectGameplayTests,
   type GameplayTestScope,
   stopRunningProjectGameplayTest,
@@ -629,19 +632,12 @@ const MainFrame = (props: Props): React.MixedElement => {
     suspendAiRequest: suspendWorkingAiRequest,
   } = React.useContext(AiRequestContext);
 
-  // Allow gameplay tests to be run from anywhere in the editor (test editor,
-  // project manager, command palette, CLI, AI function calls).
-  //
-  // Registered ONCE (empty dependency list), reading the latest values through
-  // refs: re-registering on every render would leave the registry null during
-  // each commit's effects flush (all cleanups run first, then child effects
-  // run BEFORE this component's) — and the AI function calls processor is a
-  // child effect that synchronously starts a test run, so it would always see
-  // "no editor registered".
-  const unsavedChangesRef = React.useRef(unsavedChanges);
-  React.useEffect(() => {
-    unsavedChangesRef.current = unsavedChanges;
-  });
+  // Allow gameplay tests to be run from anywhere in the editor. Registered
+  // ONCE (empty dependency list), reading the latest values through refs:
+  // re-registering on renders would leave the registry momentarily null,
+  // which the AI function calls processor could hit ("no editor registered").
+  const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
+  const unsavedChangesRef = useStableUpToDateRef(unsavedChanges);
   React.useEffect(() => {
     registerGameplayTestRunnerDependencies({
       getPreviewLauncher: () => _previewLauncher.current,
@@ -2722,6 +2718,13 @@ const MainFrame = (props: Props): React.MixedElement => {
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
+      if (getIsGameplayTestRunInProgress()) {
+        // Launching or hot-reloading a preview would interfere with the
+        // gameplay test being run (the game also ignores these commands,
+        // as a backstop).
+        console.info('Preview not launched: a gameplay test is running.');
+        return;
+      }
 
       if (
         await checkDiagnosticErrorsAndIfShouldBlock(currentProject, 'preview')
@@ -5477,10 +5480,15 @@ const MainFrame = (props: Props): React.MixedElement => {
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
+    // Launching or hot-reloading a preview while a gameplay test runs would
+    // interfere with it: the commands are disabled meanwhile.
     previewEnabled:
-      !!state.currentProject && state.currentProject.getLayoutsCount() > 0,
+      !!state.currentProject &&
+      state.currentProject.getLayoutsCount() > 0 &&
+      !isGameplayTestRunInProgress,
     onOpenProjectManager: toggleProjectManager,
-    hasPreviewsRunning: hasNonEditionPreviewsRunning,
+    hasPreviewsRunning:
+      hasNonEditionPreviewsRunning && !isGameplayTestRunInProgress,
     allowNetworkPreview:
       !!_previewLauncher.current &&
       _previewLauncher.current.canDoNetworkPreview(),

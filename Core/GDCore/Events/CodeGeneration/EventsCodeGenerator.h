@@ -450,6 +450,14 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
+   * \brief Generate breakpoint check code for the given event (keyed by its
+   * persistent UUID). Only emitted in preview mode; default returns "".
+   */
+  virtual gd::String GenerateBreakpointCode(gd::BaseEvent& event) {
+    return "";
+  }
+
+  /**
    * \brief Get the namespace to be used to store code generated
    * objects/values/functions, with the extra "dot" at the end to be used to
    * access to a property/member.

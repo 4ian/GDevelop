@@ -158,9 +158,16 @@ type RunCliCommandIpcPayload = {|
 |};
 
 const ensureProjectExtensionsReadyForCli = async (
+  project: gdProject,
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
 ): Promise<boolean> => {
-  await eventsFunctionsExtensionsState.ensureLoadFinished();
+  // Headless export must ship runtime-flavored extension code (no breakpoint
+  // instrumentation), regardless of what flavor the project load or a prior
+  // preview generated.
+  await eventsFunctionsExtensionsState.ensureProjectEventsFunctionsExtensionsForFlavor(
+    project,
+    false
+  );
 
   if (eventsFunctionsExtensionsState.eventsFunctionsExtensionsError) {
     console.error(
@@ -222,6 +229,7 @@ const runCliCommand = async ({
 }: RunCliCommandOptions): Promise<void> => {
   try {
     const extensionsReady = await ensureProjectExtensionsReadyForCli(
+      project,
       eventsFunctionsExtensionsState
     );
     if (!extensionsReady) {

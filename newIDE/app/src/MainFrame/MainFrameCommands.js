@@ -71,6 +71,8 @@ type CommandHandlers = {|
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
   onOpenMemoryTrackerRegistry: () => void,
+  onTogglePauseExecution: () => void,
+  onStepNextEvent: () => void,
   onImportExtension: () => Promise<void>,
   canInstallCliInPath: boolean,
   onInstallCliInPath: () => void | Promise<void>,
@@ -245,6 +247,14 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
         ),
       [handlers.project, handlers.onOpenEventsFunctionsExtension]
     ),
+  });
+
+  useCommand('TOGGLE_PAUSE_EXECUTION', handlers.hasPreviewsRunning, {
+    handler: handlers.onTogglePauseExecution,
+  });
+
+  useCommand('STEP_NEXT_EVENT', handlers.hasPreviewsRunning, {
+    handler: handlers.onStepNextEvent,
   });
 };
 

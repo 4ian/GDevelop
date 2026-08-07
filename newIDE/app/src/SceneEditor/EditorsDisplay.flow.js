@@ -44,6 +44,7 @@ export type SceneEditorsDisplayProps = {|
     targetPosition?: 'center' | 'upperCenter'
   ) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onScenePropertiesModified?: () => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: ({
     objectName: string,
@@ -198,6 +199,9 @@ export type SceneEditorsDisplayInterface = {|
       Array<gdInitialInstance>,
       offset?: ?[number, number]
     ) => void,
+    isInstanceVisibleInViewport: gdInitialInstance => boolean,
+    scrollViewToLastInstance: (Array<gdInitialInstance>) => void,
+    scrollViewToPoint: (x: number, y: number) => void,
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,

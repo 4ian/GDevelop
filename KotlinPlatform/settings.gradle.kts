@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -7,8 +9,8 @@ pluginManagement {
 
 dependencyResolutionManagement {
     // Kotlin/JS registers the Node distribution repository when configuring browser targets.
-    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
-    repositories { mavenCentral() }
+	repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+	repositories { mavenCentral() }
 }
 
 rootProject.name = "gdevelop-kotlin-prototype"

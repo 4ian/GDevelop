@@ -9,6 +9,7 @@ import org.gdevelop.kotlin.extensions.ExtensionProvider
 import org.gdevelop.kotlin.extensions.ExtensionRuntime
 import org.gdevelop.kotlin.extensions.ParameterDescriptor
 import org.gdevelop.kotlin.extensions.RuntimeCapabilities
+import org.gdevelop.kotlin.extensions.ValueTypes
 
 /** Stable descriptor keys shared by lowering and the browser host-operation executor. */
 object MapTilesEntries {
@@ -30,7 +31,11 @@ object MapTilesEntries {
 }
 
 private val mapCapability = setOf(RuntimeCapabilities.BrowserMapRenderingHost)
-private fun p(name: String, type: String) = ParameterDescriptor(name, type)
+private fun p(name: String, type: String) = ParameterDescriptor(name, when (name) {
+    "longitude", "west", "east" -> ValueTypes.Longitude
+    "latitude", "south", "north" -> ValueTypes.Latitude
+    else -> ValueTypes.legacy(type)
+})
 private fun action(type: String, entry: String, vararg parameters: ParameterDescriptor) =
     ActionDescriptor("MapTiles::$type", parameters.toList(), entry, mapCapability)
 private fun condition(type: String, entry: String, vararg parameters: ParameterDescriptor) =

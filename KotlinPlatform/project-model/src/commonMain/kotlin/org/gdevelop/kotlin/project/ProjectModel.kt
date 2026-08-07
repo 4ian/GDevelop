@@ -10,4 +10,4 @@ data class ObjectGroupDeclaration(val name:String, val objectNames:List<String>,
 data class InstanceDeclaration(val objectName:String, val stableId:String, val x:Double, val y:Double, val initialVariables:List<VariableDeclaration>, val location:SourceLocation)
 data class SceneDeclaration(val name:String, val variables:List<VariableDeclaration>, val events:List<EventDeclaration>, val objects:List<ObjectDeclaration> = emptyList(), val groups:List<ObjectGroupDeclaration> = emptyList(), val instances:List<InstanceDeclaration> = emptyList(), val location:SourceLocation = SourceLocation("project", ""))
 data class EventDeclaration(val conditions:List<OperationDeclaration>, val actions:List<OperationDeclaration>, val children:List<EventDeclaration>, val location:SourceLocation, val localVariables:List<VariableDeclaration> = emptyList())
-data class OperationDeclaration(val type:String, val parameters:List<String>, val location:SourceLocation)
+data class OperationDeclaration(val type:String, val parameters:List<String>, val location:SourceLocation, val originalSerializedType:String = type)

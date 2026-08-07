@@ -1,5 +1,7 @@
 package org.gdevelop.kotlin.maplibre
 
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.gdevelop.kotlin.diagnostics.Diagnostic
 import org.gdevelop.kotlin.diagnostics.Severity
 import org.gdevelop.kotlin.ir.ExtensionHostOperation
@@ -18,6 +20,8 @@ import org.gdevelop.kotlin.map.MapLayerId
 import org.gdevelop.kotlin.map.MapOverlayId
 import org.gdevelop.kotlin.map.ScreenCoordinate
 import org.gdevelop.kotlin.maptiles.MapTilesEntries
+import org.gdevelop.kotlin.extensions.RuntimeCapabilities
+import org.gdevelop.kotlin.runtime.*
 
 interface MapOperationVariables {
     fun writeNumber(name: String, value: Double)
@@ -31,7 +35,9 @@ class MapTilesHostOperationExecutor(
     private val variables: MapOperationVariables,
     private val diagnosticSink: (Diagnostic) -> Unit,
     private val traceSink: (ExtensionHostOperation) -> Unit = {},
-) {
+) : OrderedRuntimeHost() {
+    override val capabilities = if (host == null) emptySet() else setOf(HostCapability(RuntimeCapabilities.BrowserMapRenderingHost, 1))
+    private val scope = MainScope()
     private val markers = linkedMapOf<MapOverlayId, GeoOverlayObject>()
     private var loaded = false
     private var cameraAnimating = false
@@ -52,6 +58,19 @@ class MapTilesHostOperationExecutor(
     /** Clears one event-sheet tick's edge-triggered click/idle conditions. */
     fun clearTransientEvents() { clicked = false; cameraIdle = false }
 
+    override fun onBeginFrame(frame: Int, input: HostTransientInput) = clearTransientEvents()
+    override fun evaluate(invocation: HostInvocation): HostOperationResult =
+        if (evaluateCondition(invocation.operation)) HostOperationResult.Success("true") else HostOperationResult.Success("false")
+    override fun invoke(invocation: HostInvocation) = HostOperationResult.Failure(
+        "GDKP_RUNTIME_HOST_ASYNC_REQUIRED", "Map operations must use asynchronous dispatch")
+    override fun invoke(invocation: HostInvocation, completion: (HostOperationResult) -> Unit) {
+        scope.launch {
+            completion(if (executeAction(invocation.operation)) HostOperationResult.Success()
+            else HostOperationResult.Failure("GDKP_RUNTIME_MAP_HOST_OPERATION", "Map operation failed"))
+        }
+    }
+    override fun onDispose() { scope.launch { host?.dispose() } }
+
     fun evaluateCondition(operation: ExtensionHostOperation): Boolean {
         traceSink(operation)
         if (!available(operation)) return false
@@ -68,7 +87,7 @@ class MapTilesHostOperationExecutor(
         traceSink(operation)
         val target = host ?: return unavailable(operation)
         if (!available(operation)) return false
-        val a = operation.arguments
+        val a = operation.arguments.map { it.source }
         val result: MapHostResult<*> = when (operation.runtimeEntry) {
             MapTilesEntries.SET_CAMERA -> {
                 val camera = target.cameraState().valueOrReport(operation) ?: return false

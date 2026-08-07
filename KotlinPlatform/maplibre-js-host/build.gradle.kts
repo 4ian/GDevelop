@@ -15,6 +15,7 @@ kotlin {
 	}
 	sourceSets.jsMain.dependencies {
 		implementation(project(":map-runtime"))
+		implementation(project(":runtime-state"))
 		implementation(project(":normalized-ir"))
 		implementation(project(":maptiles-extension"))
 		implementation(libs.kotlinx.serialization.json)

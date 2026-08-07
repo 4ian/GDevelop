@@ -12,6 +12,9 @@ import org.gdevelop.kotlin.extensions.ExtensionProvider
 import org.gdevelop.kotlin.extensions.ExtensionRuntime
 import org.gdevelop.kotlin.extensions.ActionDescriptor
 import org.gdevelop.kotlin.extensions.ParameterDescriptor
+import org.gdevelop.kotlin.extensions.QualifiedMemberId
+import org.gdevelop.kotlin.extensions.ResolvedArgument
+import org.gdevelop.kotlin.extensions.ContractVersions
 import org.gdevelop.kotlin.ir.ActionIr
 import org.gdevelop.kotlin.ir.ConditionIr
 import org.gdevelop.kotlin.ir.EventIr
@@ -27,7 +30,7 @@ class HeadlessRuntimeTest {
             globals = mapOf("score" to Value.NumberValue(0.0)),
             scenes = listOf(SceneIr("Main", emptyMap(), listOf(EventIr(
                 conditions = listOf(ConditionIr.Always),
-                actions = listOf(ActionIr.ExtensionCall("Test::Increment", listOf("global", "score", "3"))),
+                actions = listOf(ActionIr.ExtensionCall(QualifiedMemberId(ExtensionIdentity("Test", "1", "test"), listOf("Test", "Increment")), "Test::Increment", listOf(ResolvedArgument.Text("global", "global"), ResolvedArgument.Text("score", "score"), ResolvedArgument.Number("3", 3.0)), "increment")),
                 children = emptyList(),
                 origin = SourceLocation("fixture", "/layouts/0/events/0"),
             )))),
@@ -63,5 +66,35 @@ private object RecordingExtension : ExtensionProvider {
         }
         override fun onSceneLoaded(context: ExtensionContext) = context.trace("extension-lifecycle", "loaded")
         override fun onSceneUnloaded(context: ExtensionContext) = context.trace("extension-lifecycle", "unloaded")
+    }
+}
+
+private class SyntheticHost : OrderedRuntimeHost() {
+    override val capabilities = setOf(HostCapability(org.gdevelop.kotlin.extensions.RuntimeCapabilityId("fixture.synthetic.v1"), 1))
+    val inputs = mutableListOf<String?>(); val completions = mutableListOf<(HostOperationResult) -> Unit>(); var initialized = false; var disposed = false
+    override fun onInitialize() { initialized = true }
+    override fun onBeginFrame(frame: Int, input: HostTransientInput) { inputs += input.values["pulse"] }
+    override fun evaluate(invocation: HostInvocation) = HostOperationResult.Success("true")
+    override fun invoke(invocation: HostInvocation) = HostOperationResult.Failure("SYNC", "not used")
+    override fun invoke(invocation: HostInvocation, completion: (HostOperationResult) -> Unit) { completions += completion }
+    override fun onDispose() { disposed = true }
+}
+
+class RuntimeHostContractTest {
+    @Test fun syntheticCapabilityHasStableIdentityAndOrderedCompletions() {
+        val capability = org.gdevelop.kotlin.extensions.RuntimeCapabilityId("fixture.synthetic.v1")
+        val location = SourceLocation("synthetic.json", "/events/0")
+        fun operation(argument: String) = org.gdevelop.kotlin.ir.ExtensionHostOperation(QualifiedMemberId(ExtensionIdentity("Synthetic", "1", "fixture"), listOf("Synthetic", "Record")), "Synthetic::Record", "record", listOf(ResolvedArgument.Text(argument, argument)), listOf(ParameterDescriptor("value", "string")), setOf(capability), ContractVersions(), location)
+        val host = SyntheticHost(); host.initialize(); host.beginFrame(0, HostTransientInput(mapOf("pulse" to "down")))
+        assertEquals(HostOperationResult.Success("true"), host.evaluateCondition(HostInvocation(HostInvocationId("frame:0:operation:0"), operation("condition"))))
+        host.invokeAction(HostInvocation(HostInvocationId("frame:0:operation:1"), operation("first")))
+        host.invokeAction(HostInvocation(HostInvocationId("frame:0:operation:2"), operation("second")))
+        val completed = mutableListOf<HostCompletion>()
+        host.completions[1](HostOperationResult.Success("second")); host.deliverCompletions(completed::add)
+        assertTrue(completed.isEmpty())
+        host.completions[0](HostOperationResult.Success("first")); host.deliverCompletions(completed::add); host.dispose()
+        assertEquals(listOf("frame:0:operation:1", "frame:0:operation:2"), completed.map { it.invocation.id.value })
+        assertEquals(listOf<String?>("down"), host.inputs); assertTrue(host.initialized); assertTrue(host.disposed)
+        assertEquals(listOf(0L, 1L, 2L, 3L, 4L), host.trace.map { it.sequence })
     }
 }

@@ -3,6 +3,10 @@ package org.gdevelop.kotlin.ir
 import org.gdevelop.kotlin.diagnostics.SourceLocation
 import org.gdevelop.kotlin.extensions.ExtensionIdentity
 import org.gdevelop.kotlin.extensions.RuntimeCapabilityId
+import org.gdevelop.kotlin.extensions.QualifiedMemberId
+import org.gdevelop.kotlin.extensions.ResolvedArgument
+import org.gdevelop.kotlin.extensions.ParameterDescriptor
+import org.gdevelop.kotlin.extensions.ContractVersions
 import org.gdevelop.kotlin.project.Value
 
 data class ProgramIr(val globals:Map<String,Value>, val scenes:List<SceneIr>, val firstScene:String)
@@ -30,7 +34,7 @@ sealed interface ActionIr {
  data class SetSelectedString(val objectOrGroup:String,val property:String,val value:String,val origin:SourceLocation):ActionIr
  data class ReplaceScene(val sceneName:String,val origin:SourceLocation):ActionIr
  data class ResetTimer(val timer:String,val origin:SourceLocation):ActionIr
- data class ExtensionCall(val type:String,val arguments:List<String>):ActionIr
+ data class ExtensionCall(val memberId:QualifiedMemberId,val serializedType:String,val arguments:List<ResolvedArgument>,val runtimeEntry:String):ActionIr
  data class HostOperation(val operation:ExtensionHostOperation):ActionIr
 }
-data class ExtensionHostOperation(val descriptorType:String,val runtimeEntry:String,val extensionIdentity:ExtensionIdentity,val arguments:List<String>,val parameterOrder:List<String>,val requiredCapabilities:Set<RuntimeCapabilityId>,val origin:SourceLocation)
+data class ExtensionHostOperation(val memberId:QualifiedMemberId,val serializedType:String,val runtimeEntry:String,val arguments:List<ResolvedArgument>,val parameters:List<ParameterDescriptor>,val requiredCapabilities:Set<RuntimeCapabilityId>,val contracts:ContractVersions,val origin:SourceLocation){ val descriptorType get()=memberId.path.joinToString("::");val extensionIdentity get()=memberId.extension;val parameterOrder get()=parameters.map{it.name} }

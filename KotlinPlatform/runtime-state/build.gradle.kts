@@ -6,6 +6,7 @@ plugins {
 kotlin {
 	jvmToolchain(libs.versions.toolchain.get().toInt())
 	jvm()
+	js(IR) { browser() }
 	sourceSets.commonMain.dependencies {
 		api(project(":diagnostics"))
 		api(project(":normalized-ir"))

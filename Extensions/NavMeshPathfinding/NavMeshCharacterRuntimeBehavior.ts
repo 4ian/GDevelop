@@ -260,8 +260,10 @@ namespace gdjs {
       if (oldX !== expectedX || oldY !== expectedY || oldZ !== expectedZ) {
         agent.teleport({
           x: oldX,
-          y: this._manager.is3D ? oldZ : oldZ,
-          z: oldY * this._manager.inverseSpeedScaleY,
+          y: oldZ,
+          z: this._manager.is3D
+            ? oldY
+            : oldY * this._manager.inverseSpeedScaleY,
         });
         console.log(
           oldX,
@@ -300,7 +302,7 @@ namespace gdjs {
           point.y = point.z;
           point.z = y;
           if (!this._manager.is3D) {
-            point.y *= this._manager.inverseSpeedScaleY;
+            point.y *= this._manager.speedScaleY;
           }
         }
         this._path = path;
@@ -327,9 +329,7 @@ namespace gdjs {
 
       const velocity = agent.desiredVelocity();
       const velocityX = velocity.x;
-      const velocityY = this._manager.is3D
-                ? velocity.z
-                : velocity.z * this._manager.speedScaleY;
+      const velocityY = velocity.z;
       if (
         Math.abs(velocityX) > 0 &&
         Math.abs(velocityY) > 0 &&
@@ -338,12 +338,7 @@ namespace gdjs {
         Math.abs(destinationY - newY) > 3
       ) {
         this._movementAngle = gdjs.evtTools.common.mod(
-          gdjs.toDegrees(
-            Math.atan2(
-              velocityY,
-              velocityX
-            )
-          ),
+          gdjs.toDegrees(Math.atan2(velocityY, velocityX)),
           360
         );
       }
@@ -457,11 +452,7 @@ namespace gdjs {
       }
       const velocity = this._agent.desiredVelocity();
 
-      return Math.hypot(
-        velocity.x,
-        velocity.y,
-        this._manager.is3D ? velocity.z : velocity.z * this._manager.speedScaleY
-      );
+      return Math.hypot(velocity.x, velocity.y, velocity.z);
     }
 
     getMovementAngle(): float {
@@ -509,11 +500,7 @@ namespace gdjs {
 
     getNodeY(index: integer): float {
       if (index < this._path.length) {
-        let y = this._path[index].y;
-        if (!this._manager.is3D) {
-          y *= this._manager.inverseSpeedScaleY;
-        }
-        return y;
+        return this._path[index].y;
       }
       return 0;
     }
@@ -552,11 +539,7 @@ namespace gdjs {
         return 0;
       }
       const nextNodeIndex = this.getNextNodeIndex();
-      let y = this._path[nextNodeIndex].y;
-      if (!this._manager.is3D) {
-        y *= this._manager.inverseSpeedScaleY;
-      }
-      return y;
+      return this._path[nextNodeIndex].y;
     }
 
     getNextNodeZ(): float {
@@ -577,7 +560,7 @@ namespace gdjs {
         : this._path.length - remainingNodes - 1;
     }
 
-    getLastNodeX(): float {
+    getPreviousNodeX(): float {
       if (this._path.length < 2) {
         return 0;
       }
@@ -585,19 +568,15 @@ namespace gdjs {
       return this._path[previousNodeIndex].x;
     }
 
-    getLastNodeY(): float {
+    getPreviousNodeY(): float {
       if (this._path.length < 2) {
         return 0;
       }
       const previousNodeIndex = this.getPreviousNodeIndex();
-      let y = this._path[previousNodeIndex].y;
-      if (!this._manager.is3D) {
-        y *= this._manager.inverseSpeedScaleY;
-      }
-      return y;
+      return this._path[previousNodeIndex].y;
     }
 
-    getLastNodeZ(): float {
+    getPreviousNodeZ(): float {
       if (this._path.length < 2) {
         return 0;
       }
@@ -616,11 +595,7 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      let y = this._path[this._path.length - 1].y;
-      if (!this._manager.is3D) {
-        y *= this._manager.inverseSpeedScaleY;
-      }
-      return y;
+      return this._path[this._path.length - 1].y;
     }
 
     getDestinationZ(): float {

@@ -588,6 +588,19 @@ module.exports = {
 
       aut
         .addExpression(
+          'GetNodeZ',
+          _('Get a waypoint Z position'),
+          _('Get next waypoint Z position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .addParameter('expression', _('Node index (start at 0!)'))
+        .setFunctionName('getNodeZ');
+
+      aut
+        .addExpression(
           'NextNodeIndex',
           _('Index of the next waypoint'),
           _('Get the index of the next waypoint to reach'),
@@ -636,27 +649,87 @@ module.exports = {
 
       aut
         .addExpression(
-          'LastNodeX',
-          _('Last waypoint X position'),
-          _('Last waypoint X position'),
+          'NextNodeZ',
+          _('Get next waypoint Z position'),
+          _('Get next waypoint Z position'),
           _('Movement on the path'),
           'CppPlatform/Extensions/AStaricon16.png'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
-        .setFunctionName('getLastNodeX');
+        .setFunctionName('getNextNodeZ');
 
       aut
         .addExpression(
-          'LastNodeY',
-          _('Last waypoint Y position'),
-          _('Last waypoint Y position'),
+          'PreviousNodeX',
+          _('Previous waypoint X position'),
+          _('Previous waypoint X position'),
           _('Movement on the path'),
           'CppPlatform/Extensions/AStaricon16.png'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
-        .setFunctionName('getLastNodeY');
+        .setFunctionName('getPreviousNodeX');
+
+      aut
+        .addExpression(
+          'PreviousNodeY',
+          _('Previous waypoint Y position'),
+          _('Previous waypoint Y position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getPreviousNodeY');
+
+      aut
+        .addExpression(
+          'PreviousNodeZ',
+          _('Previous waypoint Z position'),
+          _('Previous waypoint Z position'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getPreviousNodeZ');
+
+      aut
+        .addExpression(
+          'DestinationX',
+          _('Destination X position'),
+          _('Destination X position of the path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getDestinationX');
+
+      aut
+        .addExpression(
+          'DestinationY',
+          _('Destination Y position'),
+          _('Destination Y position of the path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getDestinationY');
+
+      aut
+        .addExpression(
+          'DestinationZ',
+          _('Destination Z position'),
+          _('Destination Z position of the path'),
+          _('Movement on the path'),
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'))
+        .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
+        .setFunctionName('getDestinationZ');
 
       aut
         .addExpression(

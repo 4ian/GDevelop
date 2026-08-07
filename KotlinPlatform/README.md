@@ -2,7 +2,7 @@
 
 This top-level directory is isolated from the production GDevelop build. It is a Milestone 1 research prototype for the
 headless semantic vertical slice in
-[`docs/kotlin-port/compatibility-roadmap.md`](../docs/kotlin-port/compatibility-roadmap.md), not an editor, renderer,
+[`../agents.d/docs/kotlin-port/compatibility-roadmap.md`](../agents.d/docs/kotlin-port/compatibility-roadmap.md), not an editor, renderer,
 Android application, or GDJS port.
 
 ## Modules and boundaries

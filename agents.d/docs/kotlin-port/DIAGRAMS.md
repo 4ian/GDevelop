@@ -229,7 +229,7 @@ demo --> mapjs
 | `extension-catalog` | Identities, descriptors, parameters, dependencies, capabilities. | Reflection discovery or renderer instances. | [Extension model](extensions-and-types.md) |
 | `normalized-ir` | Resolved control flow, operations, origins, selection/lifecycle semantics. | Raw editor JSON or platform handles. | [ADR-0001](decisions/0001-ir-ownership.md) |
 | `runtime-state` | Variables, objects, selections, triggers, queues, lifecycle, traces. | DOM, MapLibre, Android, or target APIs. | [Runtime design](portable-architecture.md) |
-| `jvm-cli` | Headless fixture entry point and report emission. | JVM-only semantic rules. | [Prototype README](../../KotlinPlatform/README.md) |
+| `jvm-cli` | Headless fixture entry point and report emission. | JVM-only semantic rules. | [Prototype README](../../../KotlinPlatform/README.md) |
 | Host modules | Capability implementations and platform resources. | Portable semantic authority. | [ADR-0003](decisions/0003-runtime-host-boundary.md) |
 
 ## Representation ownership and lowering

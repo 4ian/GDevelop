@@ -17,7 +17,7 @@
 
 This document is an experiment charter in the phase-gate format defined by
 [`target-strategy.md`](target-strategy.md). Claims use the evidence markers from
-[`README.md`](README.md). A successful spike shows that a browser host can
+[`../../../README.md`](README.md). A successful spike shows that a browser host can
 compose the portable semantic core with a slippy map; it does not establish
 general rendering compatibility or commit the port to a production map feature.
 
@@ -127,13 +127,13 @@ distinguish animation requests, overlay-coordinate updates, observed camera
 state, cancellation, and completion. Portable overlay trace records are gating;
 MapLibre movement snapshots remain in the non-gating host-observation stream.
 
-## Not `Extensions/TileMap/`
+## Not `../../../Extensions/TileMap`
 
 **Confirmed** (static flow rechecked **2026-08-06**; GDevelop and Kotlin
 prototype revisions `23f965f5290c176de3666cca9f5ae82ffa70e24a`; inspected
-`Extensions/TileMap/`, `Extensions/TileMap/JsExtension.js`,
-`Extensions/TileMap/tilemapruntimeobject.ts`, and `Extensions/TileMap/tests/`).
-[`Extensions/TileMap/`](../../Extensions/TileMap/) implements
+`../../../Extensions/TileMap`, `../../../Extensions/TileMap/JsExtension.js`,
+`../../../Extensions/TileMap/tilemapruntimeobject.ts`, and `../../../Extensions/TileMap/tests`).
+[`../../../Extensions/TileMap`](../../Extensions/TileMap/) implements
 finite tilemaps loaded from Tiled data, including finite map layers, tilesets,
 objects, and collision-oriented runtime behavior. Its checked-in examples use
 `.tmx` and Tiled JSON files. This is a different domain from continuously
@@ -148,7 +148,7 @@ report satisfying the roadmap evidence record. See
 evidence of Kotlin/JS runtime compatibility.
 
 **Decision.** The prototype does not port, extend, or claim compatibility with
-`Extensions/TileMap/`. It must use distinct names and serialized identities so a
+`../../../Extensions/TileMap`. It must use distinct names and serialized identities so a
 finite Tiled tilemap cannot be mistaken for a MapLibre style or slippy-map
 source. Reuse of generic event, object, or host-boundary concepts is permitted
 only when it does not merge the two resource models.

@@ -28,9 +28,9 @@ existing runtime, but must still reproduce the metadata and serialization ABI.
 
 The path from source checkout to an extension visible in the editor is:
 
-1. `newIDE/app/scripts/import-GDJS-Runtime.js` invokes
+1. `../../../newIDE/app/scripts/import-GDJS-Runtime.js` invokes
    `node GDJS/scripts/build.js --out .../Runtime` for both Electron resources
-   and `GDJS-for-web-app-only`. `GDJS/scripts/lib/runtime-files-list.js`
+   and `GDJS-for-web-app-only`. `../../../GDJS/scripts/lib/runtime-files-list.js`
    recursively admits extension `.js`/`.ts` files, transforms TypeScript and
    ordinary JavaScript with esbuild, but recognizes a basename exactly equal to
    `JsExtension.js` as a declaration and copies it untransformed. Thus the
@@ -58,7 +58,7 @@ resulting `gd.PlatformExtension` graph.
 
 ### Metadata population and registration inventory
 
-`Extensions/ExampleJsExtension/JsExtension.js` constructs a
+`../../../Extensions/ExampleJsExtension/JsExtension.js` constructs a
 `gd.PlatformExtension`, and `setExtensionInformation` fixes the namespace
 `MyDummyExtension`, display name, description, author, and license. It then adds
 group/icon and short-description metadata. The rest of the declaration is as
@@ -182,7 +182,7 @@ constructor, or expects PIXI/Three to exist.
 
 ### A C++ `JsExtension.cpp`: AnchorBehavior
 
-`Extensions/AnchorBehavior/JsExtension.cpp` is IDE-only C++. Its
+`../../../Extensions/AnchorBehavior/JsExtension.cpp` is IDE-only C++. Its
 `AnchorBehaviorJsExtension` constructor calls the shared
 `DeclareAnchorBehaviorExtension` declaration, looks up the fully qualified
 `AnchorBehavior::AnchorBehavior` metadata, attaches
@@ -193,7 +193,7 @@ declaration, but at C++ compile/link time. It does **not** imply a C++ game
 runtime: the GDJS linkage is still its JavaScript include.
 
 Built-in declarations such as
-`Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp` are linked
+`../../../Core/GDCore/Extensions/Builtin/SpriteExtension/SpriteExtension.cpp` are linked
 into the core/platform and populate object actions, conditions, and expressions
 through the same metadata classes. The distinction is packaging and lifetime,
 not a different event ABI.

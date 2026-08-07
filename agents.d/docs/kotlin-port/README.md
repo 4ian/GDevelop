@@ -49,7 +49,7 @@ Read these documents as one evidence set:
   snapshot, canonical traces, provenance, capture report, and validator.
 * [Evidence index](evidence-index.md) — revision-pinned claim ledger for the
   static flow audit, including inspected paths and missing executable evidence.
-* [Kotlin Multiplatform prototype](../../KotlinPlatform/README.md) — isolated
+* [Kotlin Multiplatform prototype](../../../KotlinPlatform/README.md) — isolated
   module map, supported headless subset, explicit rejection boundaries, and CLI.
 * Decision records:
   * [ADR-0001: Portable layer owns the normalized IR](decisions/0001-ir-ownership.md)
@@ -83,7 +83,7 @@ matching API names alone.
 * Extension declaration routes and the `ExampleJsExtension` end-to-end trace are
   documented with repository paths in
   [`extensions-and-types.md`](extensions-and-types.md).
-* The isolated [`KotlinPlatform/`](../../KotlinPlatform/README.md) prototype now
+* The isolated [`../../../KotlinPlatform`](../../../KotlinPlatform/README.md) prototype now
   demonstrates source decoding, lowering to normalized IR, deterministic
   bounded-frame execution, stable JSON traces, and a statically registered
   Kotlin extension for a deliberately narrower subset of the milestone. It does

@@ -515,7 +515,7 @@ compatibility.
 | Scene lifecycle | First scene and replacement | `planned` | `scene-change-lifecycle` corpus plan; needs request/commit and first-new-frame trace. |
 | Scene lifecycle | Pause/resume/unloading callback order | `investigated` | Runtime order traced in `gdevelop-pipeline.md`; needs minimal fixture and differential report. |
 | Scene lifecycle | Timers/time scale | `unknown` | No frozen minimal timer fixture; investigate runtime clock ownership and boundaries. |
-| Objects | Built-in Text semantic subset | `planned` | `builtin-text-object` corpus plan from `GDJS/tests/games/Text.json`; needs configuration/state trace. |
+| Objects | Built-in Text semantic subset | `planned` | `builtin-text-object` corpus plan from `../../../GDJS/tests/games/Text.json`; needs configuration/state trace. |
 | Objects | Groups, global/scene inheritance, and ambiguity | `investigated` | Group and selection invariants in `portable-architecture.md`; needs shadowing/member fixtures. |
 | Objects | Custom/events-based objects | `investigated` | Generator trace in `gdevelop-pipeline.md`; no minimal custom-object acceptance fixture yet. |
 | Behaviors | Ownership and object/behavior parameter binding | `planned` | `builtin-behavior` and `events-extension` plans; needs wrong-owner negative fixture. |
@@ -580,7 +580,7 @@ mapping build on those guarantees rather than substituting for them.
 The repository contains an experimental browser-map vertical slice: portable
 camera/overlay/event contracts, MapTiles descriptor lowering, deterministic
 common tests backed by a fake `MapHost`, focused fixtures under
-`KotlinPlatform/fixtures/maptiles/`, and a separate MapLibre Kotlin/JS adapter.
+`../../../KotlinPlatform/fixtures/maptiles`, and a separate MapLibre Kotlin/JS adapter.
 The JS-host conformance surface is listener cleanup, projection conversion,
 camera command mapping, resize, and stable error translation. Browser evidence
 must remain independent of live services; future automation uses a local fixed
@@ -601,7 +601,7 @@ cross-target compatibility.
 |---|---|---|
 | Reachable NIR capability collection | `partial` | The analyzer starts at the first scene, follows statically named scene replacements, includes nested events, and retains operation source locations. Synthetic NIR fixtures in `CapabilityAnalysisTest` cover negotiation; dynamic scene names remain outside the represented NIR subset. |
 | Required/optional and range negotiation | `partial` | Required missing contract emits `GDKP_SEM_MISSING_CAPABILITY`; a provided version outside the inclusive range emits `GDKP_SEM_INCOMPATIBLE_CAPABILITY`; optional absence is recorded without an error. Fixtures prove missing `2..3`, incompatible provider version 1, and accepted provider version 3. |
-| JVM headless manifest | `partial` | Provider `jvm-headless:deterministic-runtime:1` publishes deterministic-execution contract 1 and explicit lack of rendering/browser-map contracts. `KotlinPlatform/fixtures/maptiles/unsupported-headless-capability.json` plus the runtime dispatch guard are the negative artifact fixture; no rendering compatibility is claimed. |
+| JVM headless manifest | `partial` | Provider `jvm-headless:deterministic-runtime:1` publishes deterministic-execution contract 1 and explicit lack of rendering/browser-map contracts. `../../../KotlinPlatform/fixtures/maptiles/unsupported-headless-capability.json` plus the runtime dispatch guard are the negative artifact fixture; no rendering compatibility is claimed. |
 | MapLibre browser-map manifest | `partial` | Provider `browser:maplibre-js:1` publishes exactly browser-map contract 1 when a map host is installed. MapTiles descriptors request exact range `1..1`; existing MapTiles lowering and host conformance fixtures bound the claim. No generic renderer capability is published. |
 | Execution/artifact reporting | `partial` | Execution schema 4 records the host manifest and every resolved/unresolved capability; the same data is exposed as `ArtifactCapabilityReport`. Reproducible exporter integration remains future evidence. |
 

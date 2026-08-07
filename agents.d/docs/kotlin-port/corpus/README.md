@@ -4,7 +4,7 @@ This read-only corpus is versioned independently by `corpusVersion` in
 `manifest.json`. It contains the seven minimized milestone projects, reviewed
 normalized GDJS reference observations, the frozen `MyDummyExtension` descriptor
 snapshot, schemas, provenance, and integrity tooling required by Phase 0.
-`KotlinPlatform/fixtures/maptiles/` is experimental and is deliberately absent
+`../../../../KotlinPlatform/fixtures/maptiles` is experimental and is deliberately absent
 from this manifest and its coverage totals.
 
 The pinned capture input is GDevelop revision

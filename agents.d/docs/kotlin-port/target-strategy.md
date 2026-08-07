@@ -71,8 +71,8 @@ backend, and host divergence.
 
 ### Fixture selection
 
-Create `docs/kotlin-port/corpus/manifest.json` and frozen, hand-minimized project
-documents under `docs/kotlin-port/corpus/projects/`. Each fixture gets a stable
+Create `corpus/manifest.json` and frozen, hand-minimized project
+documents under `corpus/projects`. Each fixture gets a stable
 ID, source revision, SHA-256, declared feature tags, required extension IDs,
 seeded host inputs, frame budget, expected diagnostics, expected trace, and final
 state assertions. Resource bytes are content-addressed and stored only when the
@@ -83,13 +83,13 @@ requirements, but no fixture should contain unrelated editor data.
 
 | Fixture ID | Required semantic slice | Seed/minimization source in this repository | Required observations |
 |---|---|---|---|
-| `variables-and-branches` | Global and scene variables; numeric/string/Boolean expressions; conditions and actions; nested event | Minimize from `GDJS/tests/games/structure-variables-foreach/structure-variables-foreach.json` | Parameter order, value types, scope lookup, left-to-right conditions, writes, child-event order, final values. |
+| `variables-and-branches` | Global and scene variables; numeric/string/Boolean expressions; conditions and actions; nested event | Minimize from `../../../GDJS/tests/games/structure-variables-foreach/structure-variables-foreach.json` | Parameter order, value types, scope lookup, left-to-right conditions, writes, child-event order, final values. |
 | `object-picking-and-deletion` | Two object instances; condition-driven picking; group selection; action on picked instance; deletion during iteration | Minimize from `GDJS/tests/games/count-instances/Instances Count test.json` and the deletion cases in existing GDJS tests | Selection before/after each condition, stable instance IDs/order, action receiver set, exactly-once deletion, survivor iteration. |
 | `scene-change-lifecycle` | Two scenes; scene variables; change/replace scene action; load/pre/post/unload ordering | Hand-minimize from the normal scene transition model traced by the GDJS runtime | Requested versus committed transition, lifecycle sequence, old/new variable lifetime, first frame in the new scene. |
-| `builtin-text-object` | One built-in object and one object expression/action | Minimize from `GDJS/tests/games/Text.json` | `TextObject::Text` identity and configuration shape, creation, picking, text mutation/expression, final instance state. |
+| `builtin-text-object` | One built-in object and one object expression/action | Minimize from `../../../GDJS/tests/games/Text.json` | `TextObject::Text` identity and configuration shape, creation, picking, text mutation/expression, final instance state. |
 | `builtin-behavior` | Object with a built-in behavior; object/behavior parameter ownership; pre/post-event step | Minimize from `GDJS/tests/games/platformer sandbox/platformer sandbox.json` to a non-physics deterministic slice, or select a smaller built-in behavior if minimization cannot remove timing dependence | Qualified behavior identity, owner binding, enabled state, lifecycle order, deterministic property/state update. |
 | `events-extension` | Project-embedded events function and events-based behavior | Minimize from `GDJS/tests/games/events-based-behaviors/Basic EventsBasedBehavior test.json` | `eventsFunctionsExtensions` decoding, synthesized descriptors, object+behavior parameter order, function lowering, property/shared-data state. |
-| `javascript-declared-extension` | Condition, expression, object action, behavior, effect/property metadata, and include dependency from a `JsExtension.js` | Pair a minimal project JSON with a frozen descriptor snapshot derived from `Extensions/ExampleJsExtension/JsExtension.js`; runtime subset uses its deterministic tools/object method and behavior | Stable `MyDummyExtension::*` IDs, parameter bindings, descriptor digest, include order, runtime-entry resolution, explicit unsupported effect rendering in headless mode. |
+| `javascript-declared-extension` | Condition, expression, object action, behavior, effect/property metadata, and include dependency from a `JsExtension.js` | Pair a minimal project JSON with a frozen descriptor snapshot derived from `../../../Extensions/ExampleJsExtension/JsExtension.js`; runtime subset uses its deterministic tools/object method and behavior | Stable `MyDummyExtension::*` IDs, parameter bindings, descriptor digest, include order, runtime-entry resolution, explicit unsupported effect rendering in headless mode. |
 
 The corpus must contain raw GDevelop JSON, not serialized `gd::Project` objects,
 and must not execute `JsExtension.js` to define its expected result. The frozen
@@ -397,7 +397,7 @@ replicated runtime.
 #### Hypothesis
 
 Kotlin/JS plus generated SDK adapters can author typed extensions while existing
-GDevelop metadata, event generation, and `GDJS/Runtime` retain responsibility for
+GDevelop metadata, event generation, and `../../../GDJS/Runtime` retain responsibility for
 game semantics and services.
 
 #### Deliverables and expected artifact
@@ -457,7 +457,7 @@ reuse must be explicit.
 * A browser `RuntimeHost` with deterministic headless adapters first; optional
   GDJS resource/input/audio/rendering adapters are separate packages.
 * A standalone browser bundle that executes the headless corpus without
-  `GDJS/Runtime` event evaluation and emits the standard report.
+  `../../../GDJS/Runtime` event evaluation and emits the standard report.
 * A dependency/reuse ledger distinguishing behavioral delegation from service
   reuse. Calling `RuntimeScene` to execute events counts as delegation, not
   independent replication; wrapping a texture loader may count as service reuse.

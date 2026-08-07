@@ -19,6 +19,10 @@ import {
 } from '../Utils/GDevelopServices/Shop';
 import { useSearchItem, type SearchFilter } from '../UI/Search/UseSearchItem';
 import {
+  getDefaultSearchItemRelevance,
+  SEARCH_BAND_WIDTH,
+} from '../UI/Search/SearchItemRelevance';
+import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
   ObjectTypeAssetStoreSearchFilter,
@@ -147,6 +151,24 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
     '\n' +
     assetShortHeader.tags.join(', ')
   );
+};
+
+// Among the assets exactly matching the search, prefer 3D ones over 2D ones
+// by lifting them one band higher.
+const getAssetShortHeaderRelevance = (
+  assetShortHeader: AssetShortHeader,
+  itemText: string,
+  searchText: string
+): number => {
+  const relevance = getDefaultSearchItemRelevance(
+    assetShortHeader,
+    itemText,
+    searchText
+  );
+  return assetShortHeader.objectType === 'Scene3D::Model3DObject' &&
+    relevance >= SEARCH_BAND_WIDTH
+    ? relevance + SEARCH_BAND_WIDTH
+    : relevance;
 };
 
 const getPublicAssetPackSearchTerms = (assetPack: PublicAssetPack) =>
@@ -514,7 +536,8 @@ export const AssetStoreStateProvider = ({
     searchText,
     chosenCategory,
     chosenFilters,
-    assetSearchFilters
+    assetSearchFilters,
+    getAssetShortHeaderRelevance
   );
 
   // $FlowFixMe[incompatible-type] - this filter works for both public and private packs
@@ -638,7 +661,8 @@ export const AssetStoreStateProvider = ({
           searchText,
           chosenCategory,
           chosenFilters,
-          searchFilters
+          searchFilters,
+          getAssetShortHeaderRelevance
         ),
       setInitialPackUserFriendlySlug,
       getAssetShortHeaderFromId,

@@ -1,0 +1,75 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "kind": "scene-load",
+      "scene": "Old",
+      "seq": 0
+    },
+    {
+      "frame": 0,
+      "kind": "pre-events",
+      "scene": "Old",
+      "seq": 1
+    },
+    {
+      "from": "Old",
+      "kind": "transition-requested",
+      "seq": 2,
+      "to": "New"
+    },
+    {
+      "frame": 0,
+      "kind": "post-events",
+      "scene": "Old",
+      "seq": 3
+    },
+    {
+      "kind": "scene-unload",
+      "scene": "Old",
+      "seq": 4
+    },
+    {
+      "from": "Old",
+      "kind": "transition-committed",
+      "seq": 5,
+      "to": "New"
+    },
+    {
+      "kind": "scene-load",
+      "scene": "New",
+      "seq": 6
+    },
+    {
+      "frame": 0,
+      "kind": "pre-events",
+      "scene": "New",
+      "seq": 7
+    },
+    {
+      "frame": 0,
+      "kind": "post-events",
+      "scene": "New",
+      "seq": 8
+    }
+  ],
+  "finalState": {
+    "scene": "New",
+    "sceneVariables": {
+      "Visits": 0
+    }
+  },
+  "fixtureId": "scene-change-lifecycle",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

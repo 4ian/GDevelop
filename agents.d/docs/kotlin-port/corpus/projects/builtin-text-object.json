@@ -1,0 +1,116 @@
+{
+  "eventsFunctionsExtensions": [],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Main",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [
+        {
+          "actions": [
+            {
+              "parameters": [
+                "Label",
+                "=",
+                "after"
+              ],
+              "type": {
+                "value": "TextObject::String"
+              }
+            }
+          ],
+          "conditions": [],
+          "type": "BuiltinCommonInstructions::Standard"
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "initialVariables": [],
+          "layer": "",
+          "name": "Label",
+          "numberProperties": [],
+          "persistentUuid": "label-a",
+          "stringProperties": [],
+          "width": 0,
+          "x": 0,
+          "y": 0,
+          "zOrder": 1
+        }
+      ],
+      "layers": [],
+      "mangledName": "Main",
+      "name": "Main",
+      "objects": [
+        {
+          "behaviors": [],
+          "bold": false,
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "effects": [],
+          "font": "",
+          "italic": false,
+          "name": "Label",
+          "string": "before",
+          "textAlignment": "left",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "verticalTextAlignment": "top"
+        }
+      ],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": []
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "builtin-text-object",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

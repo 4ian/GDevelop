@@ -1,0 +1,51 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::Teleport"
+              },
+              "parameters": [
+                "0",
+                "0"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::Project"
+              },
+              "parameters": [
+                "not-a-longitude",
+                "91",
+                "x",
+                "y"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "unknown-action-and-malformed-coordinate",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "diagnostics": [
+        "GDKP_UNSUPPORTED_OPERATION",
+        "GDKP_SEM_PARAMETER_TYPE",
+        "GDKP_SEM_COORDINATE_RANGE"
+      ]
+    }
+  }
+}

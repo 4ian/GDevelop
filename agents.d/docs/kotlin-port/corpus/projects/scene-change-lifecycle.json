@@ -1,0 +1,115 @@
+{
+  "eventsFunctionsExtensions": [],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "firstLayout": "Old",
+  "gdVersion": {
+    "build": 99,
+    "major": 5,
+    "minor": 5,
+    "revision": 223
+  },
+  "layouts": [
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [
+        {
+          "actions": [
+            {
+              "parameters": [
+                "New",
+                ""
+              ],
+              "type": {
+                "value": "Scene"
+              }
+            }
+          ],
+          "conditions": [],
+          "type": "BuiltinCommonInstructions::Standard"
+        }
+      ],
+      "instances": [],
+      "layers": [],
+      "mangledName": "Old",
+      "name": "Old",
+      "objects": [],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": [
+        {
+          "name": "Visits",
+          "type": "number",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "b": 0,
+      "behaviorsSharedData": [],
+      "disableInputWhenNotFocused": true,
+      "events": [],
+      "instances": [],
+      "layers": [],
+      "mangledName": "New",
+      "name": "New",
+      "objects": [],
+      "objectsFolderStructure": {
+        "children": [],
+        "folderName": "__ROOT"
+      },
+      "objectsGroups": [],
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": false,
+      "title": "",
+      "uiSettings": {
+        "grid": false
+      },
+      "v": 0,
+      "variables": [
+        {
+          "name": "Visits",
+          "type": "number",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "objects": [],
+  "objectsGroups": [],
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "antialiasingMode": "MSAA",
+    "antialisingEnabledOnMobile": false,
+    "folderProject": false,
+    "name": "scene-change-lifecycle",
+    "orientation": "landscape",
+    "packageName": "org.gdevelop.phase0",
+    "pixelsRounding": false,
+    "projectUuid": "phase0",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "templateSlug": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0"
+  },
+  "resources": {
+    "resourceFolders": [],
+    "resources": []
+  },
+  "variables": []
+}

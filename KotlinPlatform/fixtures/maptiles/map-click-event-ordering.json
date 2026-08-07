@@ -1,0 +1,50 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "MapTiles::MapClicked"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::AddNumberVariable"
+              },
+              "parameters": [
+                "scene",
+                "clickCount",
+                "1"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "map-click-event-ordering",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "events": [
+        "pointer-input",
+        "map-clicked",
+        "condition",
+        "action",
+        "clear-transient"
+      ]
+    }
+  }
+}

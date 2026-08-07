@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 2,
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "fixtures": [
+    {
+      "fixtureId": "variables-and-branches",
+      "status": "executed",
+      "report": "variables-and-branches.kotlin.json"
+    },
+    {
+      "fixtureId": "object-picking-and-deletion",
+      "status": "executed",
+      "report": "object-picking-and-deletion.kotlin.json"
+    },
+    {
+      "fixtureId": "scene-change-lifecycle",
+      "status": "executed",
+      "report": "scene-change-lifecycle.kotlin.json"
+    },
+    {
+      "fixtureId": "builtin-text-object",
+      "status": "executed",
+      "report": "builtin-text-object.kotlin.json"
+    },
+    {
+      "fixtureId": "builtin-behavior",
+      "status": "executed",
+      "report": "builtin-behavior.kotlin.json"
+    },
+    {
+      "fixtureId": "events-extension",
+      "status": "executed",
+      "report": "events-extension.kotlin.json"
+    },
+    {
+      "fixtureId": "javascript-declared-extension",
+      "status": "executed",
+      "report": "javascript-declared-extension.kotlin.json"
+    }
+  ]
+}

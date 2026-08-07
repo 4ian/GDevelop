@@ -1,0 +1,67 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "kind": "scene-load",
+      "scene": "Main",
+      "seq": 0
+    },
+    {
+      "id": "scene-score-is-one",
+      "kind": "condition",
+      "result": true,
+      "seq": 1
+    },
+    {
+      "after": 3,
+      "before": 1,
+      "kind": "variable-write",
+      "name": "Score",
+      "scope": "scene",
+      "seq": 2
+    },
+    {
+      "id": "global-count-is-two",
+      "kind": "condition",
+      "result": true,
+      "seq": 3
+    },
+    {
+      "after": "branch",
+      "before": "start",
+      "kind": "variable-write",
+      "name": "Label",
+      "scope": "scene",
+      "seq": 4
+    },
+    {
+      "frame": 0,
+      "kind": "frame-end",
+      "seq": 5
+    }
+  ],
+  "finalState": {
+    "globalVariables": {
+      "GlobalCount": 2
+    },
+    "scene": "Main",
+    "sceneVariables": {
+      "Label": "branch",
+      "Ready": true,
+      "Score": 3
+    }
+  },
+  "fixtureId": "variables-and-branches",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

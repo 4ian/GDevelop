@@ -1,0 +1,72 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::AddMarker"
+              },
+              "parameters": [
+                "player",
+                "179.5",
+                "45"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::UpdateMarker"
+              },
+              "parameters": [
+                "player",
+                "-179.5",
+                "46"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::HideMarker"
+              },
+              "parameters": [
+                "player"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::ShowMarker"
+              },
+              "parameters": [
+                "player"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::RemoveMarker"
+              },
+              "parameters": [
+                "player"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "marker-creation-and-mutation",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "marker": "player",
+      "finalState": "removed"
+    }
+  }
+}

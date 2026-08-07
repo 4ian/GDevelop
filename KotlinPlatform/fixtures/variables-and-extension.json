@@ -1,0 +1,63 @@
+{
+  "gdVersion": "5.5.0-prototype-fixture",
+  "firstLayout": "Main",
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [
+    {
+      "name": "total",
+      "value": 0
+    }
+  ],
+  "layouts": [
+    {
+      "name": "Main",
+      "objects": [],
+      "instances": [],
+      "variables": [
+        {
+          "name": "frames",
+          "value": 0
+        }
+      ],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::Always"
+              },
+              "parameters": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "value": "BuiltinCommonInstructions::AddNumberVariable"
+              },
+              "parameters": [
+                "scene",
+                "frames",
+                "1"
+              ]
+            },
+            {
+              "type": {
+                "value": "KotlinExample::IncrementVariable"
+              },
+              "parameters": [
+                "global",
+                "total",
+                "2"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": []
+}

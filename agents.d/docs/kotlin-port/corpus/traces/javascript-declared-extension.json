@@ -1,0 +1,43 @@
+{
+  "diagnostics": [],
+  "events": [
+    {
+      "extension": "MyDummyExtension",
+      "kind": "catalog-resolve",
+      "member": "DoSomething",
+      "seq": 0
+    },
+    {
+      "kind": "arguments",
+      "seq": 1,
+      "values": [
+        1,
+        2
+      ]
+    },
+    {
+      "code": "UNSUPPORTED_HEADLESS_EFFECT_RENDERING",
+      "kind": "diagnostic",
+      "seq": 2
+    }
+  ],
+  "finalState": {
+    "resolved": [
+      "MyDummyExtension::DoSomething"
+    ],
+    "scene": "Main"
+  },
+  "fixtureId": "javascript-declared-extension",
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "hostInputs": {
+    "clockStartMs": 0,
+    "elapsedTimeMs": [
+      16
+    ],
+    "inputEvents": [],
+    "locale": "en-US",
+    "randomSeed": 123456789
+  },
+  "run": 1,
+  "schemaVersion": "1.0.0"
+}

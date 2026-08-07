@@ -1,0 +1,430 @@
+{
+  "captureEnvironment": {
+    "architecture": "x86_64",
+    "command": "python3 docs/kotlin-port/corpus/tools/capture_reference.py --manifest docs/kotlin-port/corpus/manifest.json --runs 2 --verify",
+    "hostInputs": {
+      "clockStartMs": 0,
+      "elapsedTimeMs": [
+        16
+      ],
+      "inputEvents": [],
+      "locale": "en-US",
+      "randomSeed": 123456789
+    },
+    "lockFiles": [
+      {
+        "path": "GDJS/package-lock.json",
+        "sha256": "9dc8075a8fb9b4d1ad9a463c442b31ef771b7e8ae8830d1b69d501204c70d77b"
+      },
+      {
+        "path": "GDJS/tests/package-lock.json",
+        "sha256": "3b21ccc473746a2fbcd4a8ec9d73ca82d87c485b4063e7cf8d602e9a902077b4"
+      }
+    ],
+    "node": "v20.20.2",
+    "os": "Linux 6.12.13",
+    "python": "3.12.13"
+  },
+  "corpusVersion": "1.0.0",
+  "fixtures": [
+    {
+      "assertions": [
+        "trace:global-variables",
+        "trace:scene-variables",
+        "trace:primitive-expressions",
+        "trace:ordered-conditions",
+        "trace:nested-events",
+        "trace:variable-writes",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "global-variables",
+        "scene-variables",
+        "primitive-expressions",
+        "ordered-conditions",
+        "nested-events",
+        "variable-writes"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "variables-and-branches",
+      "project": {
+        "path": "projects/variables-and-branches.json",
+        "sha256": "e2e30ec1c813604ae2c0064125bcf21f9439f6908d2b87ec0db15607d482aa29"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/tests/games/structure-variables-foreach/structure-variables-foreach.json",
+            "sha256": "ef865d03c3b9102c3d0608e301125a749f64b5e636d8b925b833b25a54f32c95"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/variables-and-branches.json",
+        "sha256": "35644f71e73972a5e95b645e439ba2f2b35add58d72955df9c190bb4c4c86577"
+      }
+    },
+    {
+      "assertions": [
+        "trace:object-instances",
+        "trace:object-picking",
+        "trace:object-groups",
+        "trace:selection-order",
+        "trace:action-receivers",
+        "trace:deletion-during-iteration",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "object-instances",
+        "object-picking",
+        "object-groups",
+        "selection-order",
+        "action-receivers",
+        "deletion-during-iteration"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "object-picking-and-deletion",
+      "project": {
+        "path": "projects/object-picking-and-deletion.json",
+        "sha256": "6686fceee8ac94b6a577acc6160418ff4cc39ba617bab710d85ef53765582cb3"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/tests/games/count-instances/Instances Count test.json",
+            "sha256": "be093969284ee65d4797ae1776506bdf58cc2dd2210fae341583aec29c57f76c"
+          },
+          {
+            "path": "GDJS/tests/tests/runtimescene.js",
+            "sha256": "23453b1c840ea2f42f3702eb35bab418a1c984fadec8c4fe92ec2225d8fd1d3b"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/object-picking-and-deletion.json",
+        "sha256": "ee215e876b0abc89414deacbae813e1cc2ef834d97e237bf8c9a3f067c408e21"
+      }
+    },
+    {
+      "assertions": [
+        "trace:scene-variables",
+        "trace:scene-transition",
+        "trace:lifecycle-order",
+        "trace:variable-lifetime",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "scene-variables",
+        "scene-transition",
+        "lifecycle-order",
+        "variable-lifetime"
+      ],
+      "frameBudget": 2,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "scene-change-lifecycle",
+      "project": {
+        "path": "projects/scene-change-lifecycle.json",
+        "sha256": "786d6e200070a0bca819be89bf51cfa41391d6877bb89a4c94de95c3121ea938"
+      },
+      "provenance": {
+        "method": "hand-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/Runtime/scenestack.ts",
+            "sha256": "ef7a140b2ba35f0531b1dc3ca6d4da9e93f619b9bb72b3765d039611471fff40"
+          },
+          {
+            "path": "GDJS/Runtime/runtimescene.ts",
+            "sha256": "fc437d5daa2c545b797458301ee179e823adcadc4f74581c9065aa34a95747ab"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/scene-change-lifecycle.json",
+        "sha256": "de85225dfc6330501496658497c3470717c80e0b1aa0f09a72caf2fca7f16b56"
+      }
+    },
+    {
+      "assertions": [
+        "trace:builtin-object",
+        "trace:object-expression",
+        "trace:object-action",
+        "trace:instance-state",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "builtin-object",
+        "object-expression",
+        "object-action",
+        "instance-state"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "builtin-text-object",
+      "project": {
+        "path": "projects/builtin-text-object.json",
+        "sha256": "2b4943ddf7310bcfee379ec690faacbcbde8b5e5c08407e8f00a8849b8cf3d35"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/tests/games/Text.json",
+            "sha256": "9039c17200102b3f6392cf4ec81e88ce76c5b328398f058af46ea76ccef4fc5a"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/builtin-text-object.json",
+        "sha256": "d520a05200682118c2a00d897ef1f0d7220ee11fb654e59c43047dbd514af027"
+      }
+    },
+    {
+      "assertions": [
+        "trace:builtin-behavior",
+        "trace:behavior-owner",
+        "trace:behavior-enabled-state",
+        "trace:behavior-lifecycle",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "builtin-behavior",
+        "behavior-owner",
+        "behavior-enabled-state",
+        "behavior-lifecycle"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "builtin-behavior",
+      "project": {
+        "path": "projects/builtin-behavior.json",
+        "sha256": "94eb48e4cf84c85ec456e3a95034295ac0e8fef265d2e5ecd2e40a7eb8b4a379"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/tests/games/platformer sandbox/platformer sandbox.json",
+            "sha256": "c499e0f7e6bcbf193637bae1360a9f155de8c40cec6c294819d8b1363fbd4491"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/builtin-behavior.json",
+        "sha256": "d673a6707382f61540b5bb61afd65730c7b2ba9b0f5780e62ed08fdc20943ff6"
+      }
+    },
+    {
+      "assertions": [
+        "trace:events-functions-extension",
+        "trace:synthesized-descriptor",
+        "trace:behavior-parameter-order",
+        "trace:shared-data",
+        "final-state"
+      ],
+      "expectedDiagnostics": [],
+      "features": [
+        "events-functions-extension",
+        "synthesized-descriptor",
+        "behavior-parameter-order",
+        "shared-data"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "events-extension",
+      "project": {
+        "path": "projects/events-extension.json",
+        "sha256": "d4852670531080a23cdbb67bd164563659df211518061498135c698a46b84c56"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "GDJS/tests/games/events-based-behaviors/Basic EventsBasedBehavior test.json",
+            "sha256": "c12c62b3c0d4bf76eb7f75aa5b0dc80b50c5d50fb58f64a7d196cc3417aaa3b0"
+          }
+        ]
+      },
+      "requiredExtensions": [],
+      "trace": {
+        "path": "traces/events-extension.json",
+        "sha256": "d339f94a192c523e7af1f1692e335cc2c998ed70a66916040a42f25f584a7fe7"
+      }
+    },
+    {
+      "assertions": [
+        "trace:javascript-declared-metadata",
+        "trace:extension-identity",
+        "trace:parameter-order",
+        "trace:include-order",
+        "trace:catalog-snapshot",
+        "trace:unsupported-headless-rendering",
+        "final-state"
+      ],
+      "catalogSnapshot": {
+        "path": "catalog/my-dummy-extension.json",
+        "sha256": "0056d864ffd137d926dce9caa87af6b91f9bd5eb4973020a98cf50c46e929552"
+      },
+      "expectedDiagnostics": [],
+      "features": [
+        "javascript-declared-metadata",
+        "extension-identity",
+        "parameter-order",
+        "include-order",
+        "catalog-snapshot",
+        "unsupported-headless-rendering"
+      ],
+      "frameBudget": 1,
+      "hostInputs": {
+        "clockStartMs": 0,
+        "elapsedTimeMs": [
+          16
+        ],
+        "inputEvents": [],
+        "locale": "en-US",
+        "randomSeed": 123456789
+      },
+      "id": "javascript-declared-extension",
+      "project": {
+        "path": "projects/javascript-declared-extension.json",
+        "sha256": "2f22549385dc4b02b9e33c67bb2179c110949256a38cbee28605c0798177218b"
+      },
+      "provenance": {
+        "method": "source-minimized",
+        "notes": "Unrelated editor fields and resources removed; semantic identities and ordering retained.",
+        "reviewedBy": "Kotlin port Phase 0 review",
+        "reviewedOn": "2026-08-06",
+        "sources": [
+          {
+            "path": "Extensions/ExampleJsExtension/JsExtension.js",
+            "sha256": "c660809967a7ab8966246b6d9a145c14d624abd5b1609a0d8a70d350832fe100"
+          }
+        ]
+      },
+      "requiredExtensions": [
+        "MyDummyExtension"
+      ],
+      "trace": {
+        "path": "traces/javascript-declared-extension.json",
+        "sha256": "52e275666cff56f2daf9dc517a5d958ada271b1da618fb58773fc499a883a47e"
+      }
+    }
+  ],
+  "gdevelopRevision": "23f965f5290c176de3666cca9f5ae82ffa70e24a",
+  "requiredCoverage": [
+    "action-receivers",
+    "behavior-enabled-state",
+    "behavior-lifecycle",
+    "behavior-owner",
+    "behavior-parameter-order",
+    "builtin-behavior",
+    "builtin-object",
+    "catalog-snapshot",
+    "deletion-during-iteration",
+    "events-functions-extension",
+    "extension-identity",
+    "global-variables",
+    "include-order",
+    "instance-state",
+    "javascript-declared-metadata",
+    "lifecycle-order",
+    "nested-events",
+    "object-action",
+    "object-expression",
+    "object-groups",
+    "object-instances",
+    "object-picking",
+    "ordered-conditions",
+    "parameter-order",
+    "primitive-expressions",
+    "scene-transition",
+    "scene-variables",
+    "selection-order",
+    "shared-data",
+    "synthesized-descriptor",
+    "unsupported-headless-rendering",
+    "variable-lifetime",
+    "variable-writes"
+  ],
+  "schemaVersion": "1.0.0"
+}

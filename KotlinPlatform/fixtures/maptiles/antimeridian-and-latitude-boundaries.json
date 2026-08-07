@@ -1,0 +1,69 @@
+{
+  "gdVersion": "5",
+  "firstLayout": "Map",
+  "variables": [],
+  "layouts": [
+    {
+      "name": "Map",
+      "variables": [],
+      "events": [
+        {
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "value": "MapTiles::AddMarker"
+              },
+              "parameters": [
+                "west",
+                "-180",
+                "-90"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::AddMarker"
+              },
+              "parameters": [
+                "east",
+                "180",
+                "90"
+              ]
+            },
+            {
+              "type": {
+                "value": "MapTiles::UpdateMarker"
+              },
+              "parameters": [
+                "east",
+                "-179",
+                "90"
+              ]
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "_fixture": {
+    "id": "antimeridian-and-latitude-boundaries",
+    "scope": "experimental-kotlin-js-maptiles",
+    "expected": {
+      "validLongitudes": [
+        -180,
+        180
+      ],
+      "validLatitudes": [
+        -90,
+        90
+      ],
+      "antimeridianInterpolation": "shortest-wrapped-path",
+      "invalidLatitudes": [
+        -90.0001,
+        90.0001
+      ]
+    }
+  }
+}

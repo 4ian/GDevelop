@@ -16,7 +16,7 @@ class ProjectLowerer(private val catalog:ExtensionCatalog){
   "PosX"->{val a=o.parameters;if(a.size!=3)bad(o,d) else a[2].toDoubleOrNull()?.let{ConditionIr.PickByX(a[0],a[1],it,o.location)}?:number(o,d,2)}
   "BuiltinCommonInstructions::Once"->ConditionIr.Once("${o.location.sourceId}:${o.location.jsonPointer}",o.location)
   "BuiltinCommonInstructions::Timer"->{val a=o.parameters;if(a.size<2)bad(o,d) else a[1].toDoubleOrNull()?.let{ConditionIr.TimerElapsed(a[0],it.toLong(),o.location)}?:number(o,d,1)}
-  else->{val c=catalog.resolveCondition(o.type)?:return unsupported(o,d,"condition");if(!params(o,c.descriptor.parameters,d))null else ConditionIr.HostOperation(host(o,c.descriptor,c.identity))}
+  else->{val c=catalog.resolveCondition(o.type)?:return unsupported(o,d,"condition");val args=params(o,c.descriptor.parameters,d)?:return null;ConditionIr.HostOperation(host(o,c,args))}
  }
  private fun action(o:OperationDeclaration,d:MutableList<Diagnostic>):ActionIr?=when(o.type){
   "SetNumberVariable","BuiltinCommonInstructions::SetNumberVariable","BuiltinCommonInstructions::AddNumberVariable"->{val a=o.parameters;if(a.size!=3)bad(o,d)else a[2].toDoubleOrNull()?.let{ActionIr.WriteNumber(ref("scene",a[0],o),if(o.type.contains("Add"))"+" else a[1],it)}?:number(o,d,2)}
@@ -28,19 +28,26 @@ class ProjectLowerer(private val catalog:ExtensionCatalog){
   "Create","BuiltinCommonInstructions::Create"->{val a=o.parameters;if(a.size<3)bad(o,d)else{val x=a[a.size-2].toDoubleOrNull();val y=a.last().toDoubleOrNull();if(x==null||y==null)number(o,d,a.size-2)else ActionIr.CreateObject(a[0],x,y,o.location)}}
   "Scene","BuiltinCommonInstructions::Scene"->o.parameters.firstOrNull()?.let{ActionIr.ReplaceScene(it,o.location)}?:bad(o,d)
   "ResetTimer"->o.parameters.firstOrNull()?.let{ActionIr.ResetTimer(it,o.location)}?:bad(o,d)
-  else->{val a=catalog.resolveAction(o.type);if(a==null){if(o.type.startsWith("MyDummyExtension::"))ActionIr.ExtensionCall(o.type,o.parameters)else unsupported(o,d,"action")}else if(!params(o,a.descriptor.parameters,d))null else if(a.descriptor.requiredCapabilities.isNotEmpty())ActionIr.HostOperation(host(o,a.descriptor,a.identity))else ActionIr.ExtensionCall(o.type,o.parameters)}
+  else->{val a=catalog.resolveAction(o.type)?:return unsupported(o,d,"action");val args=params(o,a.descriptor.parameters,d)?:return null;if(a.descriptor.requiredCapabilities.isNotEmpty())ActionIr.HostOperation(host(o,a,args))else ActionIr.ExtensionCall(a.id,o.originalSerializedType,args,a.descriptor.runtimeEntry)}
  }
- private fun host(o:OperationDeclaration,d:ActionDescriptor,i:ExtensionIdentity)=ExtensionHostOperation(d.type,d.runtimeEntry,i,o.parameters,d.parameters.map{it.name},d.requiredCapabilities,o.location)
- private fun host(o:OperationDeclaration,d:ConditionDescriptor,i:ExtensionIdentity)=ExtensionHostOperation(d.type,d.runtimeEntry,i,o.parameters,d.parameters.map{it.name},d.requiredCapabilities,o.location)
- private fun params(o:OperationDeclaration,p:List<ParameterDescriptor>,d:MutableList<Diagnostic>):Boolean{
-  if(o.parameters.size!=p.size){bad(o,d,p.size);return false}
-  o.parameters.zip(p).forEachIndexed{i,(value,descriptor)->
-   val number=value.toDoubleOrNull();val valid=when(descriptor.type){"number"->number!=null;"boolean"->value=="true"||value=="false";"variable","string","layer","identifier"->value.isNotBlank();else->false}
-   if(!valid){d+=Diagnostic("GDKP_SEM_PARAMETER_TYPE",Severity.ERROR,"Parameter $i (${descriptor.name}) must be ${descriptor.type}",o.location);return false}
-   val range=when(descriptor.name){"longitude","west","east"->-180.0..180.0;"latitude","south","north"->-90.0..90.0;else->null}
-   if(range!=null&&(number==null||!number.isFinite()||number !in range)){d+=Diagnostic("GDKP_SEM_COORDINATE_RANGE",Severity.ERROR,"Parameter $i (${descriptor.name}) is outside ${range.start}..${range.endInclusive}",o.location);return false}
-  };return true
+ private fun host(o:OperationDeclaration,r:RegisteredAction,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location)
+ private fun host(o:OperationDeclaration,r:RegisteredCondition,args:List<ResolvedArgument>)=ExtensionHostOperation(r.id,o.originalSerializedType,r.descriptor.runtimeEntry,args,r.descriptor.parameters,r.descriptor.requiredCapabilities,r.descriptor.contracts,o.location)
+ private fun params(o:OperationDeclaration,p:List<ParameterDescriptor>,d:MutableList<Diagnostic>):List<ResolvedArgument>?{
+  val required=p.count{!it.optional};if(o.parameters.size !in required..p.size){bad(o,d,p.size);return null}
+  val values=o.parameters+p.drop(o.parameters.size).map{checkNotNull(it.defaultValue)}
+  return values.zip(p).mapIndexed{i,(value,descriptor)->resolve(value,descriptor,i,o,d)?:return null}
  }
+ private fun resolve(value:String,p:ParameterDescriptor,index:Int,o:OperationDeclaration,d:MutableList<Diagnostic>):ResolvedArgument?{
+  val contract=catalog.resolveValueType(p.valueType)?:return typed(o,d,index,p)
+  return when(contract.kind){
+   ValueLoweringKind.NUMBER->{val number=value.toDoubleOrNull()?:return typed(o,d,index,p);if(!number.isFinite())return typed(o,d,index,p);val minimum=contract.minimum;val maximum=contract.maximum;if(minimum!=null&&number<minimum||maximum!=null&&number>maximum)return range(o,d,index,p,minimum?:Double.NEGATIVE_INFINITY,maximum?:Double.POSITIVE_INFINITY);ResolvedArgument.Number(value,number)}
+   ValueLoweringKind.BOOLEAN->when(value){"true"->ResolvedArgument.Boolean(value,true);"false"->ResolvedArgument.Boolean(value,false);else->typed(o,d,index,p)}
+   ValueLoweringKind.TEXT->ResolvedArgument.Text(value,value)
+   ValueLoweringKind.IDENTIFIER->value.takeIf{it.isNotBlank()}?.let{ResolvedArgument.Text(value,it)}?:typed(o,d,index,p)
+  }
+ }
+ private fun typed(o:OperationDeclaration,d:MutableList<Diagnostic>,i:Int,p:ParameterDescriptor):Nothing?{d+=Diagnostic("GDKP_SEM_PARAMETER_TYPE",Severity.ERROR,"Parameter $i (${p.name}) must be ${p.valueType.value}",o.location);return null}
+ private fun range(o:OperationDeclaration,d:MutableList<Diagnostic>,i:Int,p:ParameterDescriptor,min:Double,max:Double):Nothing?{d+=Diagnostic("GDKP_SEM_COORDINATE_RANGE",Severity.ERROR,"Parameter $i (${p.name}) is outside $min..$max",o.location);return null}
  private fun unsupported(o:OperationDeclaration,d:MutableList<Diagnostic>,k:String):Nothing?{d+=Diagnostic("GDKP_UNSUPPORTED_OPERATION",Severity.ERROR,"Unsupported $k: ${o.type}",o.location);return null}
  private fun bad(o:OperationDeclaration,d:MutableList<Diagnostic>,n:Int=-1):Nothing?{d+=Diagnostic("GDKP_SEM_PARAMETER_COUNT",Severity.ERROR,if(n<0)"Invalid parameters for ${o.type}" else "${o.type} expects $n parameters",o.location);return null}
  private fun number(o:OperationDeclaration,d:MutableList<Diagnostic>,i:Int):Nothing?{d+=Diagnostic("GDKP_SEM_INVALID_NUMBER",Severity.ERROR,"Parameter $i must be a number",o.location);return null}

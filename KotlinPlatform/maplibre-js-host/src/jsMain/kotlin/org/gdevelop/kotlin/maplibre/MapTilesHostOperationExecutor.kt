@@ -87,7 +87,7 @@ class MapTilesHostOperationExecutor(
         traceSink(operation)
         val target = host ?: return unavailable(operation)
         if (!available(operation)) return false
-        val a = operation.arguments
+        val a = operation.arguments.map { it.source }
         val result: MapHostResult<*> = when (operation.runtimeEntry) {
             MapTilesEntries.SET_CAMERA -> {
                 val camera = target.cameraState().valueOrReport(operation) ?: return false

@@ -7,6 +7,7 @@ import {
   getTestsContainer,
   getGameplayTestProjectItemName,
   getGameplayTestScopeDescription,
+  makeGameplayTestResultReadableOutput,
   type GameplayTestResult,
   type GameplayTestScope,
 } from '../GameplayTests/GameplayTestRunner';
@@ -50,18 +51,7 @@ const makeGameplayTestOutput = (
 ): EditorFunctionGenericOutput => {
   return {
     success: result.status === 'passed',
-    status: result.status,
-    testName: result.testName,
-    framesExecuted: result.framesExecuted,
-    durationMs: result.durationMs,
-    gameTimeMs: result.gameTimeMs,
-    assertions: result.assertions,
-    errors: result.errors,
-    consoleLogs: result.consoleLogs.map(log => `[${log.level}] ${log.message}`),
-    eventLog: result.eventLog,
-    finalState: result.finalState,
-    screenshots: result.screenshots,
-    performance: result.performance,
+    ...makeGameplayTestResultReadableOutput(result),
     meta: didModifyProject ? { didModifyProject: true } : undefined,
   };
 };

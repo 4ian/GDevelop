@@ -167,6 +167,28 @@ const makeErrorResult = (
   errorMessage: string
 ): GameplayTestResult => makeResultWithoutRun(testName, 'error', errorMessage);
 
+/**
+ * The full, readable output of a gameplay test run - the same content the
+ * GDevelop AI reads after a run (console logs flattened to strings).
+ */
+export const makeGameplayTestResultReadableOutput = (
+  result: GameplayTestResult
+): Object => ({
+  status: result.status,
+  testName: result.testName,
+  framesExecuted: result.framesExecuted,
+  durationMs: result.durationMs,
+  gameTimeMs: result.gameTimeMs,
+  assertions: result.assertions,
+  errors: result.errors,
+  consoleLogs: result.consoleLogs.map(log => `[${log.level}] ${log.message}`),
+  eventLog: result.eventLog,
+  finalState: result.finalState,
+  screenshots: result.screenshots,
+  profiles: result.profiles,
+  performance: result.performance,
+});
+
 const makeStoppedResult = (testName: string): GameplayTestResult =>
   makeResultWithoutRun(
     testName,

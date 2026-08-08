@@ -51,6 +51,8 @@ AsyncExtension::AsyncExtension() {
         asyncContextBuilder +=
             "asyncObjectsList.backupLocalVariablesContainers(" +
             codeGenerator.GenerateLocalVariablesStackAccessor() + ");\n";
+        asyncContextBuilder +=
+            "asyncObjectsList.backupSceneSignalContext(runtimeScene);\n";
 
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {

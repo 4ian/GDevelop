@@ -3,6 +3,7 @@
 import { sha256 } from 'js-sha256';
 import optionalRequire from '../Utils/OptionalRequire';
 import { extractIfDoJavaScriptBlocks } from '../EventsSheet/IfDoEventsDsl';
+import { encodeManagedName } from './MultiFileProjectFormat';
 
 let cachedTypeScript = null;
 const loadTypeScriptChecker = (): any => {
@@ -759,6 +760,39 @@ const safeDecode = (value: string): string => {
 };
 
 const getSourceContext = (fileUri: string, model: Object): Object => {
+  const externalLifecycleMatch = /^game:\/\/scenes\/([^/]+)\/externals\/([^/]+)\/functions\/(sceneLoad|sceneSignal|sceneUpdate|sceneUnload)\/\3\.events$/.exec(
+    fileUri
+  );
+  if (externalLifecycleMatch) {
+    const physicalSceneName = safeDecode(externalLifecycleMatch[1]);
+    const externalName = safeDecode(externalLifecycleMatch[2]);
+    const external = (model.externalEvents || []).find(
+      external =>
+        external.name === externalName &&
+        external.sceneName === physicalSceneName
+    );
+    const scene = external
+      ? model.scenes.find(scene => scene.name === external.sceneName)
+      : null;
+    return {
+      sceneName: scene ? scene.name : null,
+      isFunction: true,
+      external: true,
+      lifecycleFunctionName: externalLifecycleMatch[3],
+    };
+  }
+  const sceneLifecycleMatch = /^game:\/\/scenes\/([^/]+)\/functions\/(sceneLoad|sceneSignal|sceneUpdate|sceneUnload)\/\2\.events$/.exec(
+    fileUri
+  );
+  if (sceneLifecycleMatch) {
+    const physicalName = safeDecode(sceneLifecycleMatch[1]);
+    const scene = model.scenes.find(scene => scene.name === physicalName);
+    return {
+      sceneName: scene ? scene.name : null,
+      isFunction: true,
+      lifecycleFunctionName: sceneLifecycleMatch[2],
+    };
+  }
   const externalMatch = /^game:\/\/scenes\/([^/]+)\/externals\/([^/]+)\.events$/.exec(
     fileUri
   );
@@ -825,24 +859,35 @@ export const collectSerializedProjectJavaScriptBlocks = (
   serializedProject: Object
 ): Array<Object> => {
   const blocks: Array<Object> = [];
-  (serializedProject.layouts || []).forEach(layout =>
-    collectEventsJavaScriptBlocks(
-      layout.events,
-      `game://scenes/${encodeURIComponent(
-        String(layout.name || '')
-      )}/${encodeURIComponent(String(layout.name || ''))}.events`,
-      blocks
-    )
-  );
-  (serializedProject.externalEvents || []).forEach(external =>
-    collectEventsJavaScriptBlocks(
-      external.events,
-      `game://scenes/${encodeURIComponent(
-        String(external.associatedLayout || '')
-      )}/externals/${encodeURIComponent(String(external.name || ''))}.events`,
-      blocks
-    )
-  );
+  const lifecycleSources = [
+    ['sceneLoad', 'sceneLoadEvents'],
+    ['sceneSignal', 'sceneSignalEvents'],
+    ['sceneUpdate', 'events'],
+    ['sceneUnload', 'sceneUnloadEvents'],
+  ];
+  (serializedProject.layouts || []).forEach(layout => {
+    const sceneName = encodeManagedName(String(layout.name || ''));
+    lifecycleSources.forEach(([role, legacyField]) =>
+      collectEventsJavaScriptBlocks(
+        layout[legacyField],
+        `game://scenes/${sceneName}/functions/${role}/${role}.events`,
+        blocks
+      )
+    );
+  });
+  (serializedProject.externalEvents || []).forEach(external => {
+    const sceneName = encodeManagedName(
+      String(external.associatedLayout || '')
+    );
+    const externalName = encodeManagedName(String(external.name || ''));
+    lifecycleSources.forEach(([role, legacyField]) =>
+      collectEventsJavaScriptBlocks(
+        external[legacyField],
+        `game://scenes/${sceneName}/externals/${externalName}/functions/${role}/${role}.events`,
+        blocks
+      )
+    );
+  });
   (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
     const extensionName = encodeURIComponent(String(extension.name || ''));
     const collectFunctions = (base: string, functions: ?Array<Object>) =>

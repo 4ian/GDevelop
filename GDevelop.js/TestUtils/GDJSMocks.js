@@ -1039,6 +1039,9 @@ class RuntimeScene {
 
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
+    this._isFirstFrame = true;
+    this._deliveredSceneSignals = [];
+    this._currentSceneSignal = null;
 
     /** @type {Object.<string, any>} */
     this._objects = {};
@@ -1117,6 +1120,22 @@ class RuntimeScene {
     return this._asyncTasksManager;
   }
 
+  getTimeManager() {
+    return {
+      isFirstFrame: () => this._isFirstFrame,
+    };
+  }
+
+  /** @param {boolean} isFirstFrame */
+  setIsFirstFrameForTests(isFirstFrame) {
+    this._isFirstFrame = isFirstFrame;
+  }
+
+  /** @param {Array<any>} signals */
+  setDeliveredSceneSignalsForTests(signals) {
+    this._deliveredSceneSignals = signals;
+  }
+
   /** @param {string} objectName */
   getInstancesCountOnScene(objectName) {
     const instances = this._instances[objectName];
@@ -1154,6 +1173,7 @@ class LongLivedObjectsList {
     this.callbacks = new Map();
     /** @type {LongLivedObjectsList | null} */
     this.parent = null;
+    this.sceneSignalContext = null;
   }
 
   /** @param {LongLivedObjectsList} parent */
@@ -1220,6 +1240,32 @@ class LongLivedObjectsList {
   backupLocalVariablesContainers(variablesContainers) {
     copyArray(variablesContainers, this.localVariablesContainers);
   }
+
+  /** @param {RuntimeScene} runtimeScene */
+  backupSceneSignalContext(runtimeScene) {
+    if (runtimeScene._currentSceneSignal) {
+      this.sceneSignalContext = {
+        name: runtimeScene._currentSceneSignal.name,
+        payload: runtimeScene._currentSceneSignal.payload,
+      };
+    }
+  }
+
+  getSceneSignalName() {
+    return this.sceneSignalContext
+      ? this.sceneSignalContext.name
+      : this.parent
+      ? this.parent.getSceneSignalName()
+      : '';
+  }
+
+  getSceneSignalPayload() {
+    return this.sceneSignalContext
+      ? this.sceneSignalContext.payload
+      : this.parent
+      ? this.parent.getSceneSignalPayload()
+      : '';
+  }
 }
 
 /**
@@ -1279,6 +1325,21 @@ function makeMinimalGDJSMock(options) {
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
           toString: (num) => '' + num,
+        },
+        signal: {
+          getDeliveredSceneSignalBatch: (runtimeScene) =>
+            runtimeScene._deliveredSceneSignals,
+          setCurrentSignalForSceneCondition: (runtimeScene, signal) => {
+            runtimeScene._currentSceneSignal = signal;
+          },
+          clearCurrentSignalForSceneCondition: (runtimeScene) => {
+            runtimeScene._currentSceneSignal = null;
+          },
+          recordSceneSignalReceived: () => {},
+          getSignalName: (runtimeScene) =>
+            runtimeScene._currentSceneSignal?.name || '',
+          getSignalPayload: (runtimeScene) =>
+            runtimeScene._currentSceneSignal?.payload || '',
         },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {

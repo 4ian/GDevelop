@@ -106,6 +106,7 @@ export const getFunctionIconUrl = (
           return 'res/functions/action_black.svg';
 
         case 'onSceneUnloading':
+        case 'sceneUnload':
         case 'onDestroy':
           return 'res/functions/destroy_black.svg';
 
@@ -119,16 +120,19 @@ export const getFunctionIconUrl = (
 
         case 'onScenePreEvents':
         case 'onScenePostEvents':
+        case 'sceneUpdate':
         case 'doStepPreEvents':
         case 'doStepPostEvents':
           return 'res/functions/step_black.svg';
 
+        case 'sceneSignal':
         case 'onSignal':
           return containerType === 'behavior'
             ? 'res/functions/action_black.svg'
             : 'res/functions/signal_black.svg';
 
         case 'onSceneLoaded':
+        case 'sceneLoad':
         case 'onFirstSceneLoaded':
         case 'onCreated':
           return 'res/functions/create_black.svg';

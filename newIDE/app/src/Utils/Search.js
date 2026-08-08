@@ -1,6 +1,7 @@
 // @flow
 
 import type { EventPath } from './EventPath';
+import type { SceneLifecycleFunctionName } from '../SceneContextLifecycleFunctions';
 
 export const normalizeString = (str: string): string =>
   str
@@ -28,6 +29,7 @@ export type NavigateToEventFromGlobalSearchParams = {|
   searchText: string,
   extensionName?: string,
   functionName?: string,
+  lifecycleFunctionName?: SceneLifecycleFunctionName,
   behaviorName?: string,
   objectName?: string,
   searchFilterParams: SearchFilterParams,

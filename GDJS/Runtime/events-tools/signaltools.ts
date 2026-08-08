@@ -220,6 +220,7 @@ namespace gdjs {
   export class SignalBus {
     private _queuedSignals: RuntimeSignal[] = [];
     private _deliveredSignalsThisFrame: RuntimeSignal[] = [];
+    private _deliveredSceneSignalsThisFrame: RuntimeSignal[] = [];
     private _sceneSubscriptions = new Map<string, RuntimeSignalReceiver[]>();
     private _signalsThisFrameDebugRecords: InternalSignalDebugRecord[] = [];
     private _recentSignalMonitorDebugRecords: InternalSignalDebugRecord[] = [];
@@ -325,6 +326,7 @@ namespace gdjs {
       this._frameId++;
       this._currentSceneSignal = null;
       this._deliveredSignalsThisFrame.length = 0;
+      this._deliveredSceneSignalsThisFrame.length = 0;
       this._signalsThisFrameDebugRecords.length = 0;
       this._signalDebugRecordsById.clear();
       this._receiversThisFrameCount = 0;
@@ -365,11 +367,18 @@ namespace gdjs {
     }
 
     getDeliveredSceneSignals(signalName: string): RuntimeSignal[] {
-      return this._deliveredSignalsThisFrame.filter(
-        (signal) =>
-          signal.target.kind === 'scene' &&
-          (!signalName || signal.name === signalName)
+      return this._deliveredSceneSignalsThisFrame.filter(
+        (signal) => !signalName || signal.name === signalName
       );
+    }
+
+    /**
+     * Return the scene-signal batch delivered for the current frame without
+     * allocating a filtered copy. Generated lifecycle dispatchers must treat
+     * this array as read-only.
+     */
+    getDeliveredSceneSignalBatch(): readonly RuntimeSignal[] {
+      return this._deliveredSceneSignalsThisFrame;
     }
 
     setCurrentSignalForSceneCondition(signal: RuntimeSignal): void {
@@ -398,6 +407,7 @@ namespace gdjs {
     clear(): void {
       this._queuedSignals.length = 0;
       this._deliveredSignalsThisFrame.length = 0;
+      this._deliveredSceneSignalsThisFrame.length = 0;
       this._sceneSubscriptions.clear();
       this._signalsThisFrameDebugRecords.length = 0;
       this._recentSignalMonitorDebugRecords.length = 0;
@@ -495,6 +505,7 @@ namespace gdjs {
       const record = this._createDebugRecord(runtimeScene, signal, 'delivered');
 
       if (signal.target.kind === 'scene') {
+        this._deliveredSceneSignalsThisFrame.push(signal);
         this._recordTargetPosition(
           record,
           getSceneSignalDebugPoint(runtimeScene),
@@ -874,6 +885,15 @@ namespace gdjs {
         return getSignalRuntimeScene(instanceContainer)
           .getSignalBus()
           .getDeliveredSceneSignals(signalName);
+      };
+
+      /** @internal Non-copying view used by generated scene lifecycle code. */
+      export const getDeliveredSceneSignalBatch = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer
+      ): readonly RuntimeSignal[] {
+        return getSignalRuntimeScene(instanceContainer)
+          .getSignalBus()
+          .getDeliveredSceneSignalBatch();
       };
 
       export const setCurrentSignalForSceneCondition = function (

@@ -915,6 +915,10 @@ namespace gdjs {
       [objectName: string]: Array<string>;
     };
     localVariablesContainers: Array<Array<VariableNetworkSyncData>>;
+    sceneSignalContext?: {
+      name: string;
+      payload: string;
+    };
   };
 
   /**
@@ -927,6 +931,7 @@ namespace gdjs {
     private localVariablesContainers: Array<gdjs.VariablesContainer> = [];
     private callbacks = new Map<RuntimeObject, () => void>();
     private parent: LongLivedObjectsList | null = null;
+    private sceneSignalContext: { name: string; payload: string } | null = null;
 
     /**
      * Create a new container for objects lists, inheriting from another one. This is
@@ -997,6 +1002,7 @@ namespace gdjs {
       this.callbacks.clear();
       this.objectsLists.clear();
       this.localVariablesContainers.length = 0;
+      this.sceneSignalContext = null;
       this.parent = null;
     }
 
@@ -1010,6 +1016,35 @@ namespace gdjs {
       variablesContainers: Array<gdjs.VariablesContainer>
     ): void {
       gdjs.copyArray(variablesContainers, this.localVariablesContainers);
+    }
+
+    /** Capture the signal aliases for an asynchronous continuation. */
+    backupSceneSignalContext(runtimeScene: gdjs.RuntimeScene): void {
+      const signal = runtimeScene.getSignalBus().getCurrentSceneSignal();
+      if (signal) {
+        this.sceneSignalContext = {
+          name: signal.name,
+          payload: signal.payload,
+        };
+      }
+    }
+
+    private getSceneSignalContext(): {
+      name: string;
+      payload: string;
+    } | null {
+      return (
+        this.sceneSignalContext ||
+        (this.parent ? this.parent.getSceneSignalContext() : null)
+      );
+    }
+
+    getSceneSignalName(): string {
+      return this.getSceneSignalContext()?.name || '';
+    }
+
+    getSceneSignalPayload(): string {
+      return this.getSceneSignalContext()?.payload || '';
     }
 
     getNetworkSyncData(
@@ -1032,12 +1067,17 @@ namespace gdjs {
         }
         objectsLists[objectName] = objectNetworkIds;
       }
-      return {
+      const syncData: LongLivedObjectsListNetworkSyncData = {
         objectsLists,
         localVariablesContainers: this.localVariablesContainers.map(
           (container) => container.getNetworkSyncData(syncOptions)
         ),
       };
+      const sceneSignalContext = this.getSceneSignalContext();
+      if (sceneSignalContext) {
+        syncData.sceneSignalContext = sceneSignalContext;
+      }
+      return syncData;
     }
 
     updateFromNetworkSyncData(
@@ -1045,11 +1085,13 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       syncOptions: UpdateFromNetworkSyncDataOptions
     ) {
-      const { objectsLists, localVariablesContainers } = syncData;
+      const { objectsLists, localVariablesContainers, sceneSignalContext } =
+        syncData;
 
       // Clear the current state.
       this.objectsLists.clear();
       this.localVariablesContainers.length = 0;
+      this.sceneSignalContext = sceneSignalContext || null;
 
       // Restore the list of objects.
       for (const [objectName, objectNetworkIds] of Object.entries(

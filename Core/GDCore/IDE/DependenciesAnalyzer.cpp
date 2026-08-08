@@ -15,21 +15,44 @@
 
 DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
                                            const gd::Layout& layout_)
-    : project(project_), layout(&layout_), externalEvents(NULL) {
-  parentScenes.push_back(layout->GetName());
-}
+    : project(project_), layout(&layout_), externalEvents(NULL) {}
 
 DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
                                            const gd::ExternalEvents& externalEvents_)
-    : project(project_), layout(NULL), externalEvents(&externalEvents_) {
-  parentExternalEvents.push_back(externalEvents->GetName());
-}
+    : project(project_), layout(NULL), externalEvents(&externalEvents_) {}
 
 bool DependenciesAnalyzer::Analyze() {
-  if (layout)
-    return Analyze(layout->GetEvents());
-  else if (externalEvents)
-    return Analyze(externalEvents->GetEvents());
+  scenesDependencies.clear();
+  externalEventsDependencies.clear();
+  for (auto& dependencies : scenesDependenciesByRole) dependencies.clear();
+  for (auto& dependencies : externalEventsDependenciesByRole)
+    dependencies.clear();
+  activePath.clear();
+  visitedDependencies.clear();
+
+  bool hasNoCircularDependency = true;
+  if (layout) {
+    layout->GetLifecycleEventsFunctions().ForEach(
+        [&](gd::SceneLifecycleFunctionRole role,
+            const gd::EventsFunction& eventsFunction) {
+          if (!hasNoCircularDependency) return;
+          activePath = {{DependencyOwnerKind::Scene, layout->GetName(), role}};
+          hasNoCircularDependency = Analyze(eventsFunction.GetEvents(), role);
+        });
+    activePath.clear();
+    return hasNoCircularDependency;
+  } else if (externalEvents) {
+    externalEvents->GetLifecycleEventsFunctions().ForEach(
+        [&](gd::SceneLifecycleFunctionRole role,
+            const gd::EventsFunction& eventsFunction) {
+          if (!hasNoCircularDependency) return;
+          activePath = {{DependencyOwnerKind::ExternalEvents,
+                         externalEvents->GetName(), role}};
+          hasNoCircularDependency = Analyze(eventsFunction.GetEvents(), role);
+        });
+    activePath.clear();
+    return hasNoCircularDependency;
+  }
 
   std::cout << "ERROR: DependenciesAnalyzer called without any layout or "
                "external events.";
@@ -38,44 +61,70 @@ bool DependenciesAnalyzer::Analyze() {
 
 DependenciesAnalyzer::~DependenciesAnalyzer() {}
 
-bool DependenciesAnalyzer::Analyze(const gd::EventsList& events) {
+namespace {
+const gd::String& GetLifecycleRoleName(
+    gd::SceneLifecycleFunctionRole role) {
+  static const gd::String sceneLoad = "sceneLoad";
+  static const gd::String sceneSignal = "sceneSignal";
+  static const gd::String sceneUpdate = "sceneUpdate";
+  static const gd::String sceneUnload = "sceneUnload";
+
+  switch (role) {
+    case gd::SceneLifecycleFunctionRole::SceneLoad:
+      return sceneLoad;
+    case gd::SceneLifecycleFunctionRole::SceneSignal:
+      return sceneSignal;
+    case gd::SceneLifecycleFunctionRole::SceneUpdate:
+      return sceneUpdate;
+    case gd::SceneLifecycleFunctionRole::SceneUnload:
+      return sceneUnload;
+  }
+  return sceneUpdate;
+}
+}  // namespace
+
+bool DependenciesAnalyzer::Analyze(
+    const gd::EventsList& events,
+    gd::SceneLifecycleFunctionRole role) {
   for (unsigned int i = 0; i < events.size(); ++i) {
     const gd::LinkEvent* linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
     if (linkEvent) {
       gd::String linked = linkEvent->GetTarget();
+      DependencyNode dependencyNode;
+      bool hasDependency = false;
       if (project.HasExternalEventsNamed(linked)) {
-        if (std::find(parentExternalEvents.begin(),
-                      parentExternalEvents.end(),
-                      linked) != parentExternalEvents.end()) {
-          // Circular dependency!
-          return false;
-        }
-        bool wasDependencyJustAdded = externalEventsDependencies.insert(linked).second;
-        if (wasDependencyJustAdded) {
-          parentExternalEvents.push_back(linked);
-          if (!Analyze(project.GetExternalEvents(linked).GetEvents()))
-            return false;
-          parentExternalEvents.pop_back();
-        }
+        externalEventsDependencies.insert(linked);
+        externalEventsDependenciesByRole[GetRoleIndex(role)].insert(linked);
+        dependencyNode = {DependencyOwnerKind::ExternalEvents, linked, role};
+        hasDependency = true;
       } else if (project.HasLayoutNamed(linked)) {
-        if (std::find(parentScenes.begin(), parentScenes.end(), linked) !=
-            parentScenes.end()) {
-          // Circular dependency!
+        scenesDependencies.insert(linked);
+        scenesDependenciesByRole[GetRoleIndex(role)].insert(linked);
+        dependencyNode = {DependencyOwnerKind::Scene, linked, role};
+        hasDependency = true;
+      }
+
+      if (hasDependency) {
+        if (std::find(activePath.begin(), activePath.end(), dependencyNode) !=
+            activePath.end()) {
           return false;
         }
-        bool wasDependencyJustAdded = scenesDependencies.insert(linked).second;
-        if (wasDependencyJustAdded) {
-          parentScenes.push_back(linked);
-          if (!Analyze(project.GetLayout(linked).GetEvents()))
-            return false;
-          parentScenes.pop_back();
+
+        if (visitedDependencies.find(dependencyNode) ==
+            visitedDependencies.end()) {
+          activePath.push_back(dependencyNode);
+          const gd::EventsList* linkedEvents = linkEvent->GetLinkedEvents(
+              project, GetLifecycleRoleName(role));
+          if (linkedEvents && !Analyze(*linkedEvents, role)) return false;
+          activePath.pop_back();
+          visitedDependencies.insert(dependencyNode);
         }
       }
     }
 
     // Analyze sub events dependencies
     if (events[i].CanHaveSubEvents()) {
-      if (!Analyze(events[i].GetSubEvents())) return false;
+      if (!Analyze(events[i].GetSubEvents(), role)) return false;
     }
   }
 

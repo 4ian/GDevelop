@@ -184,7 +184,8 @@ const value = 1;
       collectSerializedProjectJavaScriptBlocks(projectWithExternal)
     ).toEqual([
       expect.objectContaining({
-        fileUri: 'game://scenes/Main/externals/Shared%20Combat.events',
+        fileUri:
+          'game://scenes/Main/externals/Shared%20Combat/functions/sceneUpdate/sceneUpdate.events',
       }),
     ]);
     expect(
@@ -195,7 +196,8 @@ const value = 1;
       expect.arrayContaining([
         expect.objectContaining({
           code: 'JS_API_TYPE_MISMATCH',
-          fileUri: 'game://scenes/Main/externals/Shared%20Combat.events',
+          fileUri:
+            'game://scenes/Main/externals/Shared%20Combat/functions/sceneUpdate/sceneUpdate.events',
         }),
       ])
     );
@@ -589,7 +591,7 @@ while (true) {}
     );
   });
 
-  test('exposes eventsFunctionContext only in extension function sources', () => {
+  test('exposes eventsFunctionContext in extension and scene lifecycle function sources', () => {
     const functionValidation = validateProjectJavaScriptAuthoring({
       serializedProject,
       sourceFiles: {
@@ -601,6 +603,18 @@ eventsFunctionContext.returnValue = typeof amount === "number" ? amount : 0;
       },
     });
     expect(functionValidation.errors).toEqual([]);
+
+    const lifecycleValidation = validateProjectJavaScriptAuthoring({
+      serializedProject,
+      sourceFiles: {
+        'game://scenes/Main/functions/sceneSignal/sceneSignal.events': `@js strict=true
+const signalName = eventsFunctionContext.getArgument("SignalName");
+if (typeof signalName === "string" && signalName.length > 0) runtimeScene.getElapsedTime();
+@end js
+`,
+      },
+    });
+    expect(lifecycleValidation.errors).toEqual([]);
 
     const sceneValidation = validateProjectJavaScriptAuthoring({
       serializedProject,

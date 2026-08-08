@@ -831,6 +831,9 @@ interface ProjectScopedContainers {
   [Const, Ref] DOMString GetScopeFunctionName();
   [Const, Ref] DOMString GetScopeBehaviorName();
   [Const, Ref] DOMString GetScopeObjectName();
+  [Const, Value] DOMString GetScopeSceneLifecycleFunctionName();
+  [Ref] ProjectScopedContainers SetScopeExternalEventsName([Const] DOMString externalEventsName);
+  [Ref] ProjectScopedContainers SetScopeSceneLifecycleFunctionName([Const] DOMString lifecycleFunctionName);
 };
 
 interface ExtensionProperties {
@@ -1045,6 +1048,25 @@ interface CustomObjectConfiguration {
 };
 CustomObjectConfiguration implements ObjectConfiguration;
 
+enum SceneLifecycleEventsFunctions_Role {
+    "SceneLifecycleEventsFunctions::SceneLoad",
+    "SceneLifecycleEventsFunctions::SceneSignal",
+    "SceneLifecycleEventsFunctions::SceneUpdate",
+    "SceneLifecycleEventsFunctions::SceneUnload"
+};
+
+interface SceneLifecycleEventsFunctions {
+    [Ref] EventsFunction Get(SceneLifecycleEventsFunctions_Role role);
+    [Ref] EventsFunction GetByName([Const] DOMString name);
+    boolean HasRoleName([Const] DOMString name);
+    boolean HasValidMetadata();
+
+    [Ref] EventsFunction GetSceneLoadFunction();
+    [Ref] EventsFunction GetSceneSignalFunction();
+    [Ref] EventsFunction GetSceneUpdateFunction();
+    [Ref] EventsFunction GetSceneUnloadFunction();
+};
+
 interface Layout {
     void Layout();
 
@@ -1060,6 +1082,7 @@ interface Layout {
     [Ref] VariablesContainer GetVariables();
     [Ref] ObjectsContainer GetObjects();
     [Ref] EventsList GetEvents();
+    [Ref] SceneLifecycleEventsFunctions GetLifecycleEventsFunctions();
     [Ref] LayersContainer GetLayers();
 
     void UpdateBehaviorsSharedData([Ref] Project project);
@@ -1102,6 +1125,7 @@ interface ExternalEvents {
     void SetAssociatedLayout([Const] DOMString name);
 
     [Ref] EventsList GetEvents();
+    [Ref] SceneLifecycleEventsFunctions GetLifecycleEventsFunctions();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -1822,6 +1846,9 @@ interface InstructionMetadata {
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
+    boolean RequiresSceneFutureFrame();
+    boolean EmitsDeferredSceneSignal();
+    boolean MutatesSceneStack();
     boolean IsRelevantForLayoutEvents();
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
@@ -1835,6 +1862,9 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetRelevantForFunctionEventsOnly();
     [Ref] InstructionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
     [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
+    [Ref] InstructionMetadata SetRequiresSceneFutureFrame();
+    [Ref] InstructionMetadata SetEmitsDeferredSceneSignal();
+    [Ref] InstructionMetadata SetMutatesSceneStack();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] optional DOMString optionalObjectType,

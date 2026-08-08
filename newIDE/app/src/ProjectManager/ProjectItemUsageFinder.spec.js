@@ -1,5 +1,6 @@
 // @flow
 import { findProjectItemUsages } from './ProjectItemUsageFinder';
+import { getSceneLifecycleEvents } from '../SceneContextLifecycleFunctions';
 
 const gd: libGDevelop = global.gd;
 
@@ -16,11 +17,17 @@ const addActionToLayout = (
   project: gdProject,
   layout: gdLayout,
   type: string,
-  parameters: Array<string>
+  parameters: Array<string>,
+  lifecycleFunctionName:
+    | 'sceneLoad'
+    | 'sceneSignal'
+    | 'sceneUpdate'
+    | 'sceneUnload' = 'sceneUpdate'
 ) => {
-  const event = layout
-    .getEvents()
-    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+  const event = getSceneLifecycleEvents(
+    layout,
+    lifecycleFunctionName
+  ).insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
   const standardEvent = gd.asStandardEvent(event);
   const action = new gd.Instruction();
   action.setType(type);
@@ -141,7 +148,30 @@ describe('ProjectItemUsageFinder', () => {
     expect(report.eventUsages).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          location: 'Scene "SceneA" events - event 1',
+          location: 'Scene "SceneA" / Scene update - event 1',
+          details: 'PlantCards::testfunc',
+        }),
+      ])
+    );
+  });
+
+  it('reports the lifecycle function that owns an event usage', () => {
+    const { project, layout, extension } = makeProject();
+    const eventsFunction = extension
+      .getEventsFunctions()
+      .insertNewEventsFunction('testfunc', 0);
+    addActionToLayout(project, layout, 'PlantCards::testfunc', [], 'sceneLoad');
+
+    const report = findProjectItemUsages(project, {
+      kind: 'events-function',
+      eventsFunctionsExtension: extension,
+      eventsFunction,
+    });
+
+    expect(report.eventUsages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          location: 'Scene "SceneA" / On scene load - event 1',
           details: 'PlantCards::testfunc',
         }),
       ])
@@ -173,7 +203,7 @@ describe('ProjectItemUsageFinder', () => {
     expect(report.eventUsages).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          location: 'Scene "SceneA" events - event 1',
+          location: 'Scene "SceneA" / Scene update - event 1',
           details: 'Link to external events "UI Initial"',
         }),
       ])
@@ -207,7 +237,7 @@ describe('ProjectItemUsageFinder', () => {
     expect(report.eventUsages).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          location: 'Scene "SceneA" events - event 1',
+          location: 'Scene "SceneA" / Scene update - event 1',
         }),
       ])
     );

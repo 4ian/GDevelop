@@ -2,6 +2,11 @@
 import { renderInstructionSentenceAsPlainText } from '../EventsSheet/EventsTree/TextRenderer';
 import { mapFor } from '../Utils/MapFor';
 import type { EventPath } from '../Utils/EventPath';
+import {
+  getSceneLifecycleEvents,
+  getSceneLifecycleFunctionDisplayName,
+  sceneLifecycleFunctionDefinitions,
+} from '../SceneContextLifecycleFunctions';
 
 const gd: libGDevelop = global.gd;
 
@@ -316,17 +321,29 @@ const forEachProjectEventsList = (
 ) => {
   mapFor(0, project.getLayoutsCount(), layoutIndex => {
     const layout = project.getLayoutAt(layoutIndex);
-    callback(
-      { label: `Scene "${layout.getName()}" events` },
-      layout.getEvents()
+    sceneLifecycleFunctionDefinitions.forEach(({ name: role }) =>
+      callback(
+        {
+          label: `Scene "${layout.getName()}" / ${getSceneLifecycleFunctionDisplayName(
+            role
+          )}`,
+        },
+        getSceneLifecycleEvents(layout, role)
+      )
     );
   });
 
   mapFor(0, project.getExternalEventsCount(), externalEventsIndex => {
     const externalEvents = project.getExternalEventsAt(externalEventsIndex);
-    callback(
-      { label: `External events "${externalEvents.getName()}"` },
-      externalEvents.getEvents()
+    sceneLifecycleFunctionDefinitions.forEach(({ name: role }) =>
+      callback(
+        {
+          label: `External events "${externalEvents.getName()}" / ${getSceneLifecycleFunctionDisplayName(
+            role
+          )}`,
+        },
+        getSceneLifecycleEvents(externalEvents, role)
+      )
     );
   });
 

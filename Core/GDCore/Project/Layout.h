@@ -10,7 +10,6 @@
 #include <memory>
 #include <vector>
 
-#include "GDCore/Events/EventsList.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -18,6 +17,7 @@
 #include "GDCore/Project/LayersContainer.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/SceneLifecycleEventsFunctions.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/MemoryTrackedRegistry.h"
 #include "GDCore/String.h"
@@ -150,14 +150,41 @@ class GD_CORE_API Layout {
   ///@{
 
   /**
-   * Get the events of the layout
+   * Get the per-frame events of the layout.
+   *
+   * \note This is a compatibility alias for the sceneUpdate lifecycle
+   * function body. Use GetLifecycleEventsFunctions() for complete scene event
+   * traversal.
    */
-  const gd::EventsList& GetEvents() const { return events; }
+  const gd::EventsList& GetEvents() const {
+    return lifecycleEventsFunctions.GetSceneUpdateFunction().GetEvents();
+  }
 
   /**
-   * Get the events of the layout
+   * Get the per-frame events of the layout.
+   *
+   * \note This is a compatibility alias for the sceneUpdate lifecycle
+   * function body. Use GetLifecycleEventsFunctions() for complete scene event
+   * traversal.
    */
-  gd::EventsList& GetEvents() { return events; }
+  gd::EventsList& GetEvents() {
+    return lifecycleEventsFunctions.GetSceneUpdateFunction().GetEvents();
+  }
+
+  /**
+   * Get all the fixed lifecycle functions of the layout.
+   */
+  const gd::SceneLifecycleEventsFunctions& GetLifecycleEventsFunctions()
+      const {
+    return lifecycleEventsFunctions;
+  }
+
+  /**
+   * Get all the fixed lifecycle functions of the layout.
+   */
+  gd::SceneLifecycleEventsFunctions& GetLifecycleEventsFunctions() {
+    return lifecycleEventsFunctions;
+  }
 
   ///@}
 
@@ -428,7 +455,7 @@ class GD_CORE_API Layout {
                               ///< GetBehaviorSharedData can not find the
                               ///< specified behavior shared data.
 
-  EventsList events;  ///< Scene events
+  gd::SceneLifecycleEventsFunctions lifecycleEventsFunctions;
   gd::EditorSettings editorSettings;
 
   /**

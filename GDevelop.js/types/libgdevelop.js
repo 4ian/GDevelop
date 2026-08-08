@@ -111,6 +111,8 @@ declare class libGDevelop {
   ObjectJsImplementation: Class<gdObjectJsImplementation>;
   CustomObjectConfiguration_EdgeAnchor: Class<CustomObjectConfiguration_EdgeAnchor>;
   CustomObjectConfiguration: Class<gdCustomObjectConfiguration>;
+  SceneLifecycleEventsFunctions_Role: Class<SceneLifecycleEventsFunctions_Role>;
+  SceneLifecycleEventsFunctions: Class<gdSceneLifecycleEventsFunctions>;
   Layout: Class<gdLayout>;
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;

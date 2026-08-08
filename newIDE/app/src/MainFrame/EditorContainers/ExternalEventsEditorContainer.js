@@ -40,6 +40,14 @@ import {
 import Background from '../../UI/Background';
 import type { EventPath } from '../../Utils/EventPath';
 import type { SearchFilterParams } from '../../Utils/Search';
+import SceneContextLifecycleFunctionsList from '../../SceneContextLifecycleFunctionsList';
+import {
+  DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
+  getSceneLifecycleEventsFunction,
+  isSceneLifecycleFunctionName,
+  sceneLifecycleFunctionDefinitions,
+  type SceneLifecycleFunctionName,
+} from '../../SceneContextLifecycleFunctions';
 
 const styles = {
   container: {
@@ -52,19 +60,29 @@ const editSceneIconReactNode = <EditSceneIcon />;
 
 type State = {|
   externalPropertiesDialogOpen: boolean,
+  selectedLifecycleFunctionName: SceneLifecycleFunctionName,
+  mountedLifecycleFunctionNames: Array<SceneLifecycleFunctionName>,
 |};
 
 export class ExternalEventsEditorContainer extends React.Component<
   RenderEditorContainerProps,
   State
 > {
-  editor: ?EventsSheetInterface;
+  editorsByLifecycleFunctionName: {
+    [string]: ?EventsSheetInterface,
+  } = {};
   resourceExternallyChangedCallbackId: ?string;
 
-  // $FlowFixMe[missing-local-annot]
-  state = {
+  state: State = {
     externalPropertiesDialogOpen: false,
+    selectedLifecycleFunctionName: DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
+    mountedLifecycleFunctionNames: [DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME],
   };
+
+  getSelectedEditor = (): ?EventsSheetInterface =>
+    this.editorsByLifecycleFunctionName[
+      this.state.selectedLifecycleFunctionName
+    ];
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
     // We stop updates when the component is inactive.
@@ -85,7 +103,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
-    if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
+    Object.keys(this.editorsByLifecycleFunctionName).forEach(name => {
+      const editor = this.editorsByLifecycleFunctionName[name];
+      if (editor) editor.onResourceExternallyChanged(resourceInfo);
+    });
   };
 
   getProject(): ?gdProject {
@@ -93,8 +114,9 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   updateToolbar() {
-    if (this.editor) {
-      this.editor.updateToolbar();
+    const editor = this.getSelectedEditor();
+    if (editor) {
+      editor.updateToolbar();
     } else {
       // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
       // from the previous editor (e.g., HomePage)
@@ -103,7 +125,8 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   scrollToEventPath(eventPath: EventPath) {
-    if (this.editor) this.editor.scrollToEventPath(eventPath);
+    const editor = this.getSelectedEditor();
+    if (editor) editor.scrollToEventPath(eventPath);
   }
 
   setGlobalSearchResults(
@@ -112,8 +135,9 @@ export class ExternalEventsEditorContainer extends React.Component<
     searchText: string,
     searchFilters?: SearchFilterParams
   ) {
-    if (this.editor) {
-      this.editor.setGlobalSearchResults(
+    const editor = this.getSelectedEditor();
+    if (editor) {
+      editor.setGlobalSearchResults(
         eventPaths,
         focusedEventPath,
         searchText,
@@ -123,22 +147,49 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   clearGlobalSearchResults() {
-    if (this.editor) this.editor.clearGlobalSearchResults();
+    const editor = this.getSelectedEditor();
+    if (editor) editor.clearGlobalSearchResults();
   }
 
   selectAllInsideEditor() {
-    if (this.editor) this.editor.selectAllEvents();
+    const editor = this.getSelectedEditor();
+    if (editor) editor.selectAllEvents();
   }
 
   getEditorSelectionSnapshot(): ?EventsSheetSelectionSnapshot {
-    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
+    const editor = this.getSelectedEditor();
+    return editor ? editor.getEditorSelectionSnapshot() : null;
   }
 
   forceUpdateEditor() {
-    if (this.editor) {
-      this.editor.forceUpdateEditor();
+    const editor = this.getSelectedEditor();
+    if (editor) {
+      editor.forceUpdateEditor();
     }
   }
+
+  selectLifecycleFunctionByName = (name: string): boolean => {
+    if (!isSceneLifecycleFunctionName(name)) return false;
+    if (name === this.state.selectedLifecycleFunctionName) return true;
+
+    const lifecycleFunctionName: SceneLifecycleFunctionName = (name: any);
+    this.setState(
+      state => ({
+        selectedLifecycleFunctionName: lifecycleFunctionName,
+        mountedLifecycleFunctionNames: state.mountedLifecycleFunctionNames.includes(
+          lifecycleFunctionName
+        )
+          ? state.mountedLifecycleFunctionNames
+          : [...state.mountedLifecycleFunctionNames, lifecycleFunctionName],
+      }),
+      () => this.updateToolbar()
+    );
+    return true;
+  };
+
+  selectLifecycleFunction = (name: SceneLifecycleFunctionName): void => {
+    this.selectLifecycleFunctionByName(name);
+  };
 
   onEventsBasedObjectChildrenEdited(
     eventsBasedObject: gdEventsBasedObject,
@@ -160,7 +211,20 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
-    // No thing to be done.
+    if (this.getExternalEvents() === changes.externalEvents) {
+      const lifecycleFunctionName: SceneLifecycleFunctionName = isSceneLifecycleFunctionName(
+        changes.lifecycleFunctionName
+      )
+        ? (changes.lifecycleFunctionName: any)
+        : DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME;
+      const editor = this.editorsByLifecycleFunctionName[lifecycleFunctionName];
+      if (editor) {
+        editor.onEventsModifiedOutsideEditor({
+          newOrChangedAiGeneratedEventIds:
+            changes.newOrChangedAiGeneratedEventIds,
+        });
+      }
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -188,9 +252,10 @@ export class ExternalEventsEditorContainer extends React.Component<
       return;
     }
 
-    if (this.editor) {
-      this.editor.forceUpdateEditor();
-    }
+    Object.keys(this.editorsByLifecycleFunctionName).forEach(name => {
+      const editor = this.editorsByLifecycleFunctionName[name];
+      if (editor) editor.forceUpdateEditor();
+    });
   }
 
   getExternalEvents(): ?gdExternalEvents {
@@ -287,46 +352,96 @@ export class ExternalEventsEditorContainer extends React.Component<
       return <div>No external events called {projectItemName} found!</div>;
     }
 
-    const scope = {
-      project,
-      layout,
-      externalEvents,
-    };
-
     return (
       <div style={styles.container}>
         {layout && (
-          <EventsSheet
-            ref={editor => (this.editor = editor)}
-            setToolbar={this.props.setToolbar}
-            onOpenLayoutEditor={this.openLayoutEditor}
-            onOpenLayout={this.props.onOpenLayout}
-            resourceManagementProps={this.props.resourceManagementProps}
-            openInstructionOrExpression={this.props.openInstructionOrExpression}
-            onCreateEventsFunction={this.onCreateEventsFunction}
-            onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
-            unsavedChanges={this.props.unsavedChanges}
-            project={project}
-            // $FlowFixMe[incompatible-type]
-            scope={scope}
-            globalObjectsContainer={project.getObjects()}
-            objectsContainer={layout.getObjects()}
-            projectScopedContainersAccessor={
-              // $FlowFixMe[incompatible-type]
-              new ProjectScopedContainersAccessor(scope)
-            }
-            events={externalEvents.getEvents()}
-            onOpenSettings={this.openExternalPropertiesDialog}
-            settingsIcon={editSceneIconReactNode}
-            onOpenExternalEvents={this.props.onOpenExternalEvents}
-            isActive={this.props.isActive}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onWillInstallExtension={this.props.onWillInstallExtension}
-            onExtensionInstalled={this.props.onExtensionInstalled}
-            // Scene events don't have parameters nor properties
-            editEventsFunctionParameter={null}
-            openEventsBasedEntityPropertyEditorDialog={null}
-          />
+          <React.Fragment>
+            <SceneContextLifecycleFunctionsList
+              ownerKind="external-events"
+              selectedLifecycleFunctionName={
+                this.state.selectedLifecycleFunctionName
+              }
+              onSelectLifecycleFunction={this.selectLifecycleFunction}
+            />
+            {sceneLifecycleFunctionDefinitions
+              .filter(definition =>
+                this.state.mountedLifecycleFunctionNames.includes(
+                  definition.name
+                )
+              )
+              .map(definition => {
+                const lifecycleFunctionName = definition.name;
+                const eventsFunction = getSceneLifecycleEventsFunction(
+                  externalEvents,
+                  lifecycleFunctionName
+                );
+                const scope = {
+                  project,
+                  layout,
+                  externalEvents,
+                  eventsFunction,
+                  sceneLifecycleFunctionName: lifecycleFunctionName,
+                };
+                const isSelected =
+                  lifecycleFunctionName ===
+                  this.state.selectedLifecycleFunctionName;
+
+                return (
+                  <div
+                    key={lifecycleFunctionName}
+                    style={{
+                      display: isSelected ? 'flex' : 'none',
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    <EventsSheet
+                      ref={editor => {
+                        this.editorsByLifecycleFunctionName[
+                          lifecycleFunctionName
+                        ] = editor;
+                      }}
+                      setToolbar={this.props.setToolbar}
+                      onOpenLayoutEditor={this.openLayoutEditor}
+                      onOpenLayout={this.props.onOpenLayout}
+                      resourceManagementProps={
+                        this.props.resourceManagementProps
+                      }
+                      openInstructionOrExpression={
+                        this.props.openInstructionOrExpression
+                      }
+                      onCreateEventsFunction={this.onCreateEventsFunction}
+                      onBeginCreateEventsFunction={
+                        this.onBeginCreateEventsFunction
+                      }
+                      unsavedChanges={this.props.unsavedChanges}
+                      project={project}
+                      // $FlowFixMe[incompatible-type]
+                      scope={scope}
+                      globalObjectsContainer={project.getObjects()}
+                      objectsContainer={layout.getObjects()}
+                      projectScopedContainersAccessor={
+                        // $FlowFixMe[incompatible-type]
+                        new ProjectScopedContainersAccessor(scope)
+                      }
+                      events={eventsFunction.getEvents()}
+                      onOpenSettings={this.openExternalPropertiesDialog}
+                      settingsIcon={editSceneIconReactNode}
+                      onOpenExternalEvents={this.props.onOpenExternalEvents}
+                      isActive={this.props.isActive && isSelected}
+                      hotReloadPreviewButtonProps={
+                        this.props.hotReloadPreviewButtonProps
+                      }
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
+                      // Scene events don't have parameters nor properties.
+                      editEventsFunctionParameter={null}
+                      openEventsBasedEntityPropertyEditorDialog={null}
+                    />
+                  </div>
+                );
+              })}
+          </React.Fragment>
         )}
         {!layout && (
           <Background>

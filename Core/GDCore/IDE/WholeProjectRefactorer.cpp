@@ -1955,10 +1955,16 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
 
-  // Rename object in the current layout
-  gd::EventsRefactorer::RenameObjectInEvents(
-      project.GetCurrentPlatform(), projectScopedContainers, layout.GetEvents(),
-      layout.GetObjects(), oldName, newName);
+  // Rename object in every lifecycle function of the current layout.
+  layout.GetLifecycleEventsFunctions().ForEach(
+      [&](gd::SceneLifecycleFunctionRole role,
+          gd::EventsFunction& eventsFunction) {
+        auto lifecycleScopedContainers = projectScopedContainers;
+        lifecycleScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+        gd::EventsRefactorer::RenameObjectInEvents(
+            project.GetCurrentPlatform(), lifecycleScopedContainers,
+            eventsFunction.GetEvents(), layout.GetObjects(), oldName, newName);
+      });
 
   // Object groups can't have instances or be in other groups
   if (!isObjectGroup) {
@@ -1973,9 +1979,18 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   for (auto &externalEventsName :
        GetAssociatedExternalEvents(project, layout.GetName())) {
     auto &externalEvents = project.GetExternalEvents(externalEventsName);
-    gd::EventsRefactorer::RenameObjectInEvents(
-        project.GetCurrentPlatform(), projectScopedContainers,
-        externalEvents.GetEvents(), layout.GetObjects(), oldName, newName);
+    externalEvents.GetLifecycleEventsFunctions().ForEach(
+        [&](gd::SceneLifecycleFunctionRole role,
+            gd::EventsFunction& eventsFunction) {
+          auto lifecycleScopedContainers = projectScopedContainers;
+          lifecycleScopedContainers.SetScopeExternalEventsName(
+              externalEvents.GetName());
+          lifecycleScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+          gd::EventsRefactorer::RenameObjectInEvents(
+              project.GetCurrentPlatform(), lifecycleScopedContainers,
+              eventsFunction.GetEvents(), layout.GetObjects(), oldName,
+              newName);
+        });
   }
 
   // Rename object in external layouts

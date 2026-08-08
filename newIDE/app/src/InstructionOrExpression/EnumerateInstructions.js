@@ -309,6 +309,10 @@ const enumerateInstruction = (
     isRelevantForFunctionEvents: instrMetadata.isRelevantForFunctionEvents(),
     isRelevantForAsynchronousFunctionEvents: instrMetadata.isRelevantForAsynchronousFunctionEvents(),
     isRelevantForCustomObjectEvents: instrMetadata.isRelevantForCustomObjectEvents(),
+    isAsync: instrMetadata.isAsync(),
+    requiresSceneFutureFrame: instrMetadata.requiresSceneFutureFrame(),
+    emitsDeferredSceneSignal: instrMetadata.emitsDeferredSceneSignal(),
+    mutatesSceneStack: instrMetadata.mutatesSceneStack(),
   };
 };
 

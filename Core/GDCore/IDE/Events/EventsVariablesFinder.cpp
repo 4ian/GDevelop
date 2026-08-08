@@ -257,31 +257,49 @@ void EventsVariablesFinder::FindArgumentsInEventsAndDependencies(
                                         platform,
                                         parameterType,
                                         objectName);
-  eventWorker.Launch(layout.GetEvents(),
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout));
-
   DependenciesAnalyzer dependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
-  for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
-    const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+  layout.GetLifecycleEventsFunctions().ForEach(
+      [&](gd::SceneLifecycleFunctionRole role,
+          const gd::EventsFunction& eventsFunction) {
+        auto baseProjectScopedContainers = gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
+        auto projectScopedContainers = baseProjectScopedContainers;
+        projectScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+        projectScopedContainers.AddParameters(eventsFunction.GetParameters());
+        eventWorker.Launch(eventsFunction.GetEvents(), projectScopedContainers);
 
-    VariableFinderEventWorker eventWorker(results,
-                                          platform,
-                                          parameterType,
-                                          objectName);
-    eventWorker.Launch(externalEvents.GetEvents(),
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, layout));
-  }
-  for (const gd::String& sceneName : dependenciesAnalyzer.GetScenesDependencies()) {
-    const gd::Layout& dependencyLayout = project.GetLayout(sceneName);
-
-    VariableFinderEventWorker eventWorker(results,
-                                          platform,
-                                          parameterType,
-                                          objectName);
-    eventWorker.Launch(dependencyLayout.GetEvents(),
-        gd::ProjectScopedContainers::MakeNewProjectScopedContainersForProjectAndLayout(project, dependencyLayout));
-  }
+        for (const gd::String& externalEventName :
+             dependenciesAnalyzer.GetExternalEventsDependencies(role)) {
+          const auto& externalEvents =
+              project.GetExternalEvents(externalEventName);
+          const auto& externalEventsFunction =
+              externalEvents.GetLifecycleEventsFunctions().Get(role);
+          auto externalEventsScopedContainers = baseProjectScopedContainers;
+          externalEventsScopedContainers.SetScopeExternalEventsName(
+              externalEvents.GetName());
+          externalEventsScopedContainers.SetScopeSceneLifecycleFunctionRole(
+              role);
+          externalEventsScopedContainers.AddParameters(
+              externalEventsFunction.GetParameters());
+          eventWorker.Launch(externalEventsFunction.GetEvents(),
+                             externalEventsScopedContainers);
+        }
+        for (const gd::String& sceneName :
+             dependenciesAnalyzer.GetScenesDependencies(role)) {
+          const auto& dependencyLayout = project.GetLayout(sceneName);
+          const auto& dependencyEventsFunction =
+              dependencyLayout.GetLifecycleEventsFunctions().Get(role);
+          auto dependencyScopedContainers = gd::ProjectScopedContainers::
+              MakeNewProjectScopedContainersForProjectAndLayout(
+                  project, dependencyLayout);
+          dependencyScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+          dependencyScopedContainers.AddParameters(
+              dependencyEventsFunction.GetParameters());
+          eventWorker.Launch(dependencyEventsFunction.GetEvents(),
+                             dependencyScopedContainers);
+        }
+      });
 }
 
 }  // namespace gd

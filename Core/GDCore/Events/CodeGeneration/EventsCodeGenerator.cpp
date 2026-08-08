@@ -1679,6 +1679,7 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
       diagnosticReport(nullptr) {};
 
 EventsCodeGenerator::EventsCodeGenerator(
@@ -1694,6 +1695,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
       diagnosticReport(nullptr) {};
 
 EventsCodeGenerator::EventsCodeGenerator(
@@ -1710,6 +1712,7 @@ EventsCodeGenerator::EventsCodeGenerator(
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
       diagnosticReport(nullptr) {};
 
 }  // namespace gd

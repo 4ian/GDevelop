@@ -472,6 +472,41 @@ function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
   return compiledFunction;
 }
 
+/**
+ * Generate and evaluate the complete scene module, exposing lifecycle helpers
+ * in addition to the per-frame dispatcher.
+ */
+function generateCompiledLifecycleModuleForLayout(
+  gd,
+  project,
+  layout,
+  gdjs,
+  logCode = false
+) {
+  const includeFiles = new gd.SetString();
+  const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+  const diagnosticReport = new gd.DiagnosticReport();
+  const code = layoutCodeGenerator.generateLayoutCompleteCode(
+    layout,
+    includeFiles,
+    diagnosticReport,
+    true
+  );
+
+  layoutCodeGenerator.delete();
+  diagnosticReport.delete();
+  includeFiles.delete();
+  if (logCode) console.log(code);
+
+  return new Function(
+    'gdjs',
+    `"use strict";
+     const Hashtable = gdjs.Hashtable;
+     ${code}
+     return gdjs['${layout.getName()}Code'];`
+  )(gdjs);
+}
+
 module.exports = {
   generateCompiledEventsForEventsFunction,
   generateCompiledEventsForEventsFunctionWithContext,
@@ -481,4 +516,5 @@ module.exports = {
   generateCompiledEventsForEventsBasedBehavior,
   generateCompiledEventsForEventsBasedObject,
   generateCompiledEventsForLayout,
+  generateCompiledLifecycleModuleForLayout,
 };

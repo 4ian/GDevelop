@@ -1025,6 +1025,22 @@ metadata-driven authoring tree into stripped data plus specialized imperative
 JavaScript loops. The exported game contains the result of authoring—not the
 authoring system itself.
 
+### Scene lifecycle event functions
+
+Each `gd::Layout` and `gd::ExternalEvents` owns four fixed, real
+`gd::EventsFunction` bodies: `sceneLoad`, `sceneSignal`, `sceneUpdate`, and
+`sceneUnload`. `Layout::GetEvents()` and `ExternalEvents::GetEvents()` remain
+compatibility aliases for `sceneUpdate`. Project walkers, refactorers, search,
+validation, code generation, and source tooling traverse all four functions
+with `(owner, lifecycle role)` identity.
+
+At runtime, load executes once before the first logical update; queued scene
+signals invoke signal once per delivered broadcast before update; update runs
+once per logical frame; unload runs once, synchronously, before scene-owned
+state is destroyed. Links preserve the caller lifecycle role when resolving a
+scene or External Events target. The normative design and migration contract is
+in `docs/scene-event-phases-spec.md`.
+
 ---
 
 ## Source map

@@ -63,6 +63,8 @@ export type OpenLayoutHandler = (
 
 export type SceneEventsOutsideEditorChanges = {|
   scene: gdLayout,
+  externalEvents?: gdExternalEvents,
+  lifecycleFunctionName?: string,
   newOrChangedAiGeneratedEventIds: Set<string>,
 |};
 

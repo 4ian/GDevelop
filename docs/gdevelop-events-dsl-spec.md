@@ -3876,3 +3876,26 @@ applied compatibility normalization.
   writing partial source files.
 - Corpus migration across repository game projects.
 - `current JSON -> DSL -> current JSON -> gd::Project -> canonical current JSON` equality.
+
+---
+
+## 37. Scene lifecycle function bodies
+
+An IfDo `.events` file does not declare its lifecycle role. Its sibling
+`function.settings` and owner path identify one of four fixed functions:
+`sceneLoad`, `sceneSignal`, `sceneUpdate`, or `sceneUnload`. Scene and External
+Events functions use the same grammar and instruction catalog as ordinary
+scene events, subject to these role rules:
+
+- `SignalReceived` may be authored only in `sceneUpdate`; `sceneSignal` compares
+  `SignalName()` directly and reads `SignalPayload()`.
+- `SceneJustBegins` is retained for update compatibility but is redundant in
+  load and unload and is not suggested there.
+- `sceneUnload` rejects instructions whose metadata declares asynchronous or
+  future-frame work, deferred scene-signal emission, or scene-stack mutation.
+- Link events resolve the target owner's function with the same lifecycle role;
+  lifecycle-neutral function callers retain the compatibility update role.
+
+Direct authoring, compilation, catalog generation, and MCP edits carry the
+resolved lifecycle identity. Omitting the role from a legacy API request means
+`sceneUpdate`; it never means an arbitrary function inferred from a filename.

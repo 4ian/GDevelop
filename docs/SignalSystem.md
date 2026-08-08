@@ -1146,3 +1146,17 @@ Signals remain queued, next-frame, scene-local notifications with string
 payloads. Removing object-name, group, and picked-object targets makes routing
 explicit. Adding independent behavior subscriptions and behavior `onSignal`
 keeps reusable components self-contained without forcing prefab forwarding.
+
+## Scene lifecycle signal callback
+
+Scenes and External Events expose a fixed `sceneSignal` events function in
+addition to `sceneLoad`, `sceneUpdate`, and `sceneUnload`. The runtime invokes
+the scene function once for every delivered scene broadcast, in FIFO order,
+before `sceneUpdate`. Direct-instance signals never invoke it. Its fixed
+`SignalName` and `Payload` parameters are snapshotted for asynchronous generated
+continuations, and picked-object state is isolated between invocations.
+
+The legacy `SignalReceived` condition remains an iterator available only in
+`sceneUpdate`. Inside `sceneSignal`, authors compare `SignalName()` directly.
+Signals emitted from load, signal, or update are queued for the next frame;
+signal emission is invalid in the terminal synchronous `sceneUnload` function.

@@ -6,10 +6,10 @@
 #if defined(GD_IDE_ONLY)
 #ifndef DEPENDENCIESANALYZER_H
 #define DEPENDENCIESANALYZER_H
-#include <memory>
+#include <array>
 #include <set>
-#include <string>
 #include <vector>
+#include "GDCore/Project/SceneLifecycleEventsFunctions.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -64,6 +64,14 @@ class GD_CORE_API DependenciesAnalyzer {
   };
 
   /**
+   * \brief Return scene dependencies reachable from one lifecycle role.
+   */
+  const std::set<gd::String>& GetScenesDependencies(
+      gd::SceneLifecycleFunctionRole role) const {
+    return scenesDependenciesByRole[GetRoleIndex(role)];
+  }
+
+  /**
    * \brief Return the external events being dependencies of the scene or
    * external events passed in the constructor.
    */
@@ -71,7 +79,42 @@ class GD_CORE_API DependenciesAnalyzer {
     return externalEventsDependencies;
   };
 
+  /**
+   * \brief Return External Events dependencies reachable from one lifecycle
+   * role.
+   */
+  const std::set<gd::String>& GetExternalEventsDependencies(
+      gd::SceneLifecycleFunctionRole role) const {
+    return externalEventsDependenciesByRole[GetRoleIndex(role)];
+  }
+
  private:
+  enum class DependencyOwnerKind { Scene, ExternalEvents };
+
+  struct DependencyNode {
+    DependencyOwnerKind ownerKind;
+    gd::String ownerName;
+    gd::SceneLifecycleFunctionRole role;
+
+    bool operator==(const DependencyNode& other) const {
+      return ownerKind == other.ownerKind && ownerName == other.ownerName &&
+             role == other.role;
+    }
+
+    bool operator<(const DependencyNode& other) const {
+      if (ownerKind != other.ownerKind) {
+        return static_cast<int>(ownerKind) <
+               static_cast<int>(other.ownerKind);
+      }
+      if (ownerName != other.ownerName) return ownerName < other.ownerName;
+      return static_cast<int>(role) < static_cast<int>(other.role);
+    }
+  };
+
+  static std::size_t GetRoleIndex(gd::SceneLifecycleFunctionRole role) {
+    return static_cast<std::size_t>(role);
+  }
+
   /**
    * \brief Analyze the dependencies of the events.
    *
@@ -80,14 +123,15 @@ class GD_CORE_API DependenciesAnalyzer {
    * (they have no parents). \return false if a circular dependency exists, true
    * otherwise.
    */
-  bool Analyze(const gd::EventsList& events);
+  bool Analyze(const gd::EventsList& events,
+               gd::SceneLifecycleFunctionRole role);
 
   std::set<gd::String> scenesDependencies;
   std::set<gd::String> externalEventsDependencies;
-  std::vector<gd::String>
-      parentScenes;  ///< Used to check for circular dependencies.
-  std::vector<gd::String>
-      parentExternalEvents;  ///< Used to check for circular dependencies.
+  std::array<std::set<gd::String>, 4> scenesDependenciesByRole;
+  std::array<std::set<gd::String>, 4> externalEventsDependenciesByRole;
+  std::vector<DependencyNode> activePath;
+  std::set<DependencyNode> visitedDependencies;
 
   const gd::Project& project;
   const gd::Layout* layout;

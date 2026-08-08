@@ -22,14 +22,20 @@ using namespace std;
 
 namespace gd {
 
-const EventsList* LinkEvent::GetLinkedEvents(const gd::Project& project) const {
+const EventsList* LinkEvent::GetLinkedEvents(
+    const gd::Project& project,
+    const gd::String& sceneLifecycleFunctionRole) const {
   const EventsList* events = nullptr;
   if (project.HasExternalEventsNamed(GetTarget())) {
     const gd::ExternalEvents& linkedExternalEvents = project.GetExternalEvents(GetTarget());
-    events = &linkedExternalEvents.GetEvents();
+    events = &linkedExternalEvents.GetLifecycleEventsFunctions()
+                  .GetByName(sceneLifecycleFunctionRole)
+                  .GetEvents();
   } else if (project.HasLayoutNamed(GetTarget())) {
     const gd::Layout& linkedLayout = project.GetLayout(GetTarget());
-    events = &linkedLayout.GetEvents();
+    events = &linkedLayout.GetLifecycleEventsFunctions()
+                  .GetByName(sceneLifecycleFunctionRole)
+                  .GetEvents();
   }
 
   // If the link only includes an events group, search it inside the
@@ -58,11 +64,21 @@ const EventsList* LinkEvent::GetLinkedEvents(const gd::Project& project) const {
 void LinkEvent::ReplaceLinkByLinkedEvents(
     const gd::Project& project,
     EventsList& eventList,
-    std::size_t indexOfTheEventInThisList) {
+    std::size_t indexOfTheEventInThisList,
+    const gd::String& sceneLifecycleFunctionRole) {
   linkWasInvalid = false;
   // Finding what to link to.
-  const EventsList* eventsToInclude = GetLinkedEvents(project);
+  const EventsList* eventsToInclude =
+      GetLinkedEvents(project, sceneLifecycleFunctionRole);
   if (eventsToInclude != NULL) {
+    // Linking an empty lifecycle function is a valid no-op. In particular,
+    // optional scene lifecycle functions are empty by default and must not
+    // turn an otherwise valid same-role Link into an invalid event.
+    if (eventsToInclude->IsEmpty()) {
+      eventList.RemoveEvent(indexOfTheEventInThisList);
+      return;
+    }
+
     std::size_t firstEvent =
         includeConfig == INCLUDE_BY_INDEX ? GetIncludeStart() : 0;
     std::size_t lastEvent = includeConfig == INCLUDE_BY_INDEX

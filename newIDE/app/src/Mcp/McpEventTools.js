@@ -8,6 +8,14 @@ import { renderNonTranslatedEventsAsText } from '../EventsSheet/EventsTree/TextR
 import { scanEventsListForValidationErrors } from '../Utils/EventsValidationScanner';
 import { collectSerializedEventJsonIssues } from './McpEventKnowledge';
 import optionalRequire from '../Utils/OptionalRequire';
+import {
+  DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
+  getSceneLifecycleEvents,
+  getSceneLifecycleEventsFunction,
+  isSceneLifecycleFunctionName,
+  type SceneLifecycleFunctionName,
+} from '../SceneContextLifecycleFunctions';
+import { encodeManagedName } from '../ProjectsStorage/MultiFileProjectFormat';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -40,6 +48,19 @@ type EventToolCallbacks = {|
   onSceneEventsModifiedOutsideEditor?: Function,
 |};
 
+type SceneEventsTarget = {|
+  scene: gdLayout,
+  owner: gdLayout | gdExternalEvents,
+  eventsList: gdEventsList,
+  eventsFunction: gdEventsFunction,
+  lifecycleFunctionName: SceneLifecycleFunctionName,
+  ownerKind: 'scene' | 'externalEvents',
+  ownerName: string,
+  externalEventsName: string | null,
+  functionSettingsUri: string,
+  eventsUri: string,
+|};
+
 type EventReference = {|
   event: gdBaseEvent,
   parentList: gdEventsList,
@@ -67,6 +88,102 @@ const getScene = (project: gdProject, sceneName: string): gdLayout => {
   }
   return project.getLayout(sceneName);
 };
+
+const getRequestedLifecycleFunctionName = (
+  args: Object
+): SceneLifecycleFunctionName => {
+  const lifecycleFunctionName =
+    getOptionalString(args, 'lifecycle_function_name') ||
+    getOptionalString(args, 'lifecycleFunctionName') ||
+    DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME;
+  if (!isSceneLifecycleFunctionName(lifecycleFunctionName)) {
+    throw new Error(
+      `Invalid lifecycleFunctionName: "${lifecycleFunctionName}". Expected sceneLoad, sceneSignal, sceneUpdate, or sceneUnload.`
+    );
+  }
+  return (lifecycleFunctionName: any);
+};
+
+const resolveSceneEventsTarget = (
+  project: gdProject,
+  args: Object
+): SceneEventsTarget => {
+  const requestedSceneName =
+    getOptionalString(args, 'scene_name') ||
+    getOptionalString(args, 'sceneName');
+  const externalEventsName =
+    getOptionalString(args, 'external_events_name') ||
+    getOptionalString(args, 'externalEventsName');
+  const lifecycleFunctionName = getRequestedLifecycleFunctionName(args);
+
+  let sceneName = requestedSceneName;
+  let owner: gdLayout | gdExternalEvents;
+  let ownerKind: 'scene' | 'externalEvents';
+  let ownerName: string;
+  let ownerBaseUri: string;
+
+  if (externalEventsName) {
+    if (!project.hasExternalEventsNamed(externalEventsName)) {
+      throw new Error(`External Events not found: "${externalEventsName}".`);
+    }
+    const externalEvents = project.getExternalEvents(externalEventsName);
+    const associatedSceneName = externalEvents.getAssociatedLayout();
+    if (!associatedSceneName) {
+      throw new Error(
+        `External Events "${externalEventsName}" is not associated with a scene.`
+      );
+    }
+    if (sceneName && sceneName !== associatedSceneName) {
+      throw new Error(
+        `External Events "${externalEventsName}" belongs to scene "${associatedSceneName}", not "${sceneName}".`
+      );
+    }
+    sceneName = associatedSceneName;
+    owner = externalEvents;
+    ownerKind = 'externalEvents';
+    ownerName = externalEventsName;
+    ownerBaseUri = `game://scenes/${encodeManagedName(
+      sceneName
+    )}/externals/${encodeManagedName(externalEventsName)}`;
+  } else {
+    if (!sceneName) throw new Error('Missing scene_name.');
+    owner = getScene(project, sceneName);
+    ownerKind = 'scene';
+    ownerName = sceneName;
+    ownerBaseUri = `game://scenes/${encodeManagedName(sceneName)}`;
+  }
+
+  const scene = getScene(project, sceneName);
+  const functionBaseUri = `${ownerBaseUri}/functions/${lifecycleFunctionName}`;
+  return {
+    scene,
+    owner,
+    eventsList: getSceneLifecycleEvents(owner, lifecycleFunctionName),
+    eventsFunction: getSceneLifecycleEventsFunction(
+      owner,
+      lifecycleFunctionName
+    ),
+    lifecycleFunctionName,
+    ownerKind,
+    ownerName,
+    externalEventsName: externalEventsName || null,
+    functionSettingsUri: `${functionBaseUri}/function.settings`,
+    eventsUri: `${functionBaseUri}/${lifecycleFunctionName}.events`,
+  };
+};
+
+const getSceneEventsTargetIdentity = (target: SceneEventsTarget): Object => ({
+  sceneName: target.scene.getName(),
+  lifecycleFunctionName: target.lifecycleFunctionName,
+  lifecycleRole: target.lifecycleFunctionName,
+  ownerKind: target.ownerKind,
+  ownerName: target.ownerName,
+  ...(target.externalEventsName
+    ? { externalEventsName: target.externalEventsName }
+    : {}),
+  functionSettingsUri: target.functionSettingsUri,
+  eventsUri: target.eventsUri,
+});
 
 const formatEventPath = (path: Array<number>): string =>
   `event-${path.join('.')}`;
@@ -421,7 +538,6 @@ export const replaceJavascriptEventCode = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
   const code =
     getOptionalString(args, 'code_string') ||
     getOptionalString(args, 'codeString') ||
@@ -432,9 +548,9 @@ export const replaceJavascriptEventCode = (
     throw new Error('Missing code_string.');
   }
 
-  const scene = getScene(project, sceneName);
+  const target = resolveSceneEventsTarget(project, args);
   const eventReference = getSingleEventReference(
-    scene.getEvents(),
+    target.eventsList,
     args.event || args.event_id || args.eventId || args,
     'JavaScript event'
   );
@@ -456,11 +572,11 @@ export const replaceJavascriptEventCode = (
     jsCodeEvent.setParameterObjects(parameterObjects);
   }
 
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
 
   const result = {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     eventPath: formatEventPath(eventReference.path),
     aiGeneratedEventId: eventReference.event.getAiGeneratedEventId() || null,
     before: {
@@ -479,9 +595,9 @@ export const replaceJavascriptEventCode = (
 
   return {
     ...result,
-    serializedEvents: serializeToJSObject(scene.getEvents()),
+    serializedEvents: serializeToJSObject(target.eventsList),
     eventsAsText: renderNonTranslatedEventsAsText({
-      eventsList: scene.getEvents(),
+      eventsList: target.eventsList,
     }),
   };
 };
@@ -540,9 +656,9 @@ const colorKeyOf = (r: number, g: number, b: number): string =>
 
 // Collect the color keys already used by Group events in the scene, so a newly
 // created group can pick an unused, non-default one.
-const collectUsedGroupColorKeys = (scene: gdLayout): Set<string> => {
+const collectUsedGroupColorKeys = (eventsList: gdEventsList): Set<string> => {
   const used = new Set<string>();
-  const references = collectEventReferences(scene.getEvents());
+  const references = collectEventReferences(eventsList);
   references.forEach(reference => {
     if (reference.event.getType() === 'BuiltinCommonInstructions::Group') {
       const groupEvent = gd.asGroupEvent(reference.event);
@@ -562,7 +678,7 @@ const collectUsedGroupColorKeys = (scene: gdLayout): Set<string> => {
 // not pass one, assign the first palette color not already used in the scene.
 const autoAssignDistinctGroupColor = (
   groupEvent: gdGroupEvent,
-  scene: gdLayout
+  eventsList: gdEventsList
 ) => {
   const currentKey = colorKeyOf(
     groupEvent.getBackgroundColorR(),
@@ -571,7 +687,7 @@ const autoAssignDistinctGroupColor = (
   );
   // Only auto-color when the group is still the default (unset) color.
   if (currentKey !== DEFAULT_GROUP_COLOR_KEY) return;
-  const used = collectUsedGroupColorKeys(scene);
+  const used = collectUsedGroupColorKeys(eventsList);
   const choice =
     GROUP_COLOR_PALETTE.find(
       color => !used.has(colorKeyOf(color.r, color.g, color.b))
@@ -615,12 +731,16 @@ const applyGroupProperties = (event: gdBaseEvent, args: Object) => {
 };
 
 const notifyEventsChanged = (
-  scene: gdLayout,
+  target: SceneEventsTarget,
   callbacks: EventToolCallbacks
 ) => {
   if (callbacks.onSceneEventsModifiedOutsideEditor) {
     callbacks.onSceneEventsModifiedOutsideEditor({
-      scene,
+      scene: target.scene,
+      ...(target.ownerKind === 'externalEvents'
+        ? { externalEvents: (target.owner: any) }
+        : {}),
+      lifecycleFunctionName: target.lifecycleFunctionName,
       newOrChangedAiGeneratedEventIds: new Set(),
     });
   }
@@ -679,24 +799,30 @@ const getTargetEventReferences = (
 };
 
 export const findSceneEvents = (project: gdProject, args: Object): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
+  const target = resolveSceneEventsTarget(project, args);
   const limit =
     typeof args.limit === 'number' && Number.isFinite(args.limit)
       ? Math.max(1, Math.min(100, Math.floor(args.limit)))
       : 50;
   const matches = findEventsInEventsList({
-    eventsList: scene.getEvents(),
+    eventsList: target.eventsList,
     args,
-    owner: { scope: 'scene', sceneName },
+    owner: {
+      scope: target.ownerKind,
+      sceneName: target.scene.getName(),
+      lifecycleFunctionName: target.lifecycleFunctionName,
+      ...(target.externalEventsName
+        ? { externalEventsName: target.externalEventsName }
+        : {}),
+    },
     defaultIncludeSerialized: false,
   }).slice(0, limit);
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     eventSheetRevision: getSerializedEventsRevision(
-      serializeToJSObject(scene.getEvents())
+      serializeToJSObject(target.eventsList)
     ),
     count: matches.length,
     matches,
@@ -704,8 +830,8 @@ export const findSceneEvents = (project: gdProject, args: Object): Object => {
 };
 
 export const lintSceneEvents = (project: gdProject, args: Object): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
+  const target = resolveSceneEventsTarget(project, args);
+  const scene = target.scene;
   const allowJavaScriptEvents = !!(
     args &&
     (args.allow_javascript_events || args.allowJavaScriptEvents)
@@ -737,7 +863,7 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
   // Default GroupEvent color in GDevelop core (GroupEvent.cpp): rgb(74,176,228).
   const DEFAULT_GROUP_COLOR = '74;176;228';
 
-  const references = collectEventReferences(scene.getEvents());
+  const references = collectEventReferences(target.eventsList);
   references.forEach(reference => {
     const event = reference.event;
     const eventType = event.getType();
@@ -1080,7 +1206,7 @@ export const lintSceneEvents = (project: gdProject, args: Object): Object => {
   return {
     success: true,
     valid: !issues.some(issue => issue.severity === 'error'),
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     eventsCount: references.length,
     disabledRules: Array.from(disabledRules),
     issues,
@@ -1092,9 +1218,8 @@ export const createGroup = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
-  const rootEventsList = scene.getEvents();
+  const target = resolveSceneEventsTarget(project, args);
+  const rootEventsList = target.eventsList;
   const parentTarget = args.parent_event || args.parentEvent;
   let parentList = rootEventsList;
   let parentEventPath = null;
@@ -1124,12 +1249,13 @@ export const createGroup = (
   // Give the new group a distinct color automatically when none was provided,
   // so the caller avoids a separate recolor step and the per-group distinct-color
   // lint passes by construction.
-  if (!args.color) autoAssignDistinctGroupColor(gd.asGroupEvent(event), scene);
-  notifyEventsChanged(scene, callbacks);
+  if (!args.color)
+    autoAssignDistinctGroupColor(gd.asGroupEvent(event), rootEventsList);
+  notifyEventsChanged(target, callbacks);
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     parentEventPath,
     group: summarizeEventReference({
       event,
@@ -1147,17 +1273,16 @@ export const renameGroup = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
   const newGroupName = getRequiredString(args, 'new_group_name');
-  const scene = getScene(project, sceneName);
-  const groupReference = getGroupReference(scene.getEvents(), args);
+  const target = resolveSceneEventsTarget(project, args);
+  const groupReference = getGroupReference(target.eventsList, args);
   gd.asGroupEvent(groupReference.event).setName(newGroupName);
   applyGroupProperties(groupReference.event, args);
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     group: summarizeEventReference(groupReference),
   };
 };
@@ -1167,9 +1292,8 @@ export const wrapEventsInGroup = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
-  const rootEventsList = scene.getEvents();
+  const target = resolveSceneEventsTarget(project, args);
+  const rootEventsList = target.eventsList;
   const references = getTargetEventReferences(rootEventsList, args);
   const parentList = references[0].parentList;
   const parentPath = references[0].path.slice(0, -1).join('.');
@@ -1202,15 +1326,15 @@ export const wrapEventsInGroup = (
   );
   applyGroupProperties(groupEvent, args);
   if (!args.color)
-    autoAssignDistinctGroupColor(gd.asGroupEvent(groupEvent), scene);
+    autoAssignDistinctGroupColor(gd.asGroupEvent(groupEvent), rootEventsList);
   const groupSubEvents = gd.asGroupEvent(groupEvent).getSubEvents();
   insertSerializedEvents(project, groupSubEvents, serializedEvents, 0);
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
 
   const groupPath = [...references[0].path.slice(0, -1), insertionIndex];
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     wrappedCount: serializedEvents.length,
     group: summarizeEventReference({
       event: groupEvent,
@@ -1218,7 +1342,7 @@ export const wrapEventsInGroup = (
       index: insertionIndex,
       path: groupPath,
     }),
-    serializedEvents: serializeToJSObject(scene.getEvents()),
+    serializedEvents: serializeToJSObject(target.eventsList),
   };
 };
 
@@ -1227,9 +1351,8 @@ export const moveEventsToGroup = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
-  const rootEventsList = scene.getEvents();
+  const target = resolveSceneEventsTarget(project, args);
+  const rootEventsList = target.eventsList;
   const groupReference = getGroupReference(rootEventsList, args);
   const targetReferences = getTargetEventReferences(rootEventsList, args);
 
@@ -1262,14 +1385,14 @@ export const moveEventsToGroup = (
       ? Math.max(0, Math.min(subEvents.getEventsCount(), args.insert_index))
       : subEvents.getEventsCount();
   insertSerializedEvents(project, subEvents, serializedEvents, insertIndex);
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     movedCount: serializedEvents.length,
     group: summarizeEventReference(groupReference),
-    serializedEvents: serializeToJSObject(scene.getEvents()),
+    serializedEvents: serializeToJSObject(target.eventsList),
   };
 };
 
@@ -1278,13 +1401,13 @@ export const ensureSceneEventIds = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
+  const target = resolveSceneEventsTarget(project, args);
+  const sceneName = target.scene.getName();
   const prefix =
     getOptionalString(args, 'id_prefix') ||
     getOptionalString(args, 'idPrefix') ||
     `mcp-${sceneName}`;
-  const references = collectEventReferences(scene.getEvents());
+  const references = collectEventReferences(target.eventsList);
   const existingIds = new Set(
     references
       .map(reference => reference.event.getAiGeneratedEventId())
@@ -1308,10 +1431,10 @@ export const ensureSceneEventIds = (
     });
   });
 
-  if (assigned.length) notifyEventsChanged(scene, callbacks);
+  if (assigned.length) notifyEventsChanged(target, callbacks);
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     assignedCount: assigned.length,
     assigned,
   };
@@ -1322,7 +1445,7 @@ export const replaceSceneEventsFromFile = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
+  const target = resolveSceneEventsTarget(project, args);
   const eventsJsonFile = getRequiredString(args, 'events_json_file');
   if (!fs) {
     throw new Error('Filesystem access is not available.');
@@ -1393,7 +1516,6 @@ export const replaceSceneEventsFromFile = (
   };
   const inputSubInstructionsCount = countSubInstructionsInJson(parsedEvents);
 
-  const scene = getScene(project, sceneName);
   const dryRun = !!(args && (args.dry_run === true || args.dryRun === true));
   const validationEventsList = new gd.EventsList();
   try {
@@ -1406,7 +1528,10 @@ export const replaceSceneEventsFromFile = (
     const validationErrors = scanEventsListForValidationErrors({
       project,
       eventsList: validationEventsList,
-      layout: scene,
+      layout: target.scene,
+      lifecycleFunction: target.eventsFunction,
+      lifecycleFunctionName: target.lifecycleFunctionName,
+      externalEventsName: target.externalEventsName,
     });
     if (validationErrors.length) {
       throw new Error(
@@ -1427,7 +1552,7 @@ export const replaceSceneEventsFromFile = (
       return {
         success: true,
         dryRun: true,
-        sceneName,
+        ...getSceneEventsTargetIdentity(target),
         wouldWriteEventsCount: validationEventsList.getEventsCount(),
         inputSubInstructionsCount,
         writtenSubInstructionsCount,
@@ -1443,27 +1568,25 @@ export const replaceSceneEventsFromFile = (
       };
     }
 
-    scene.getEvents().clear();
-    scene
-      .getEvents()
-      .insertEvents(
-        validationEventsList,
-        0,
-        validationEventsList.getEventsCount(),
-        0
-      );
+    target.eventsList.clear();
+    target.eventsList.insertEvents(
+      validationEventsList,
+      0,
+      validationEventsList.getEventsCount(),
+      0
+    );
   } finally {
     validationEventsList.delete();
   }
 
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
   const writtenSubInstructionsCount = countSubInstructionsInList(
-    scene.getEvents()
+    target.eventsList
   );
   const result = {
     success: true,
-    sceneName,
-    eventsCount: scene.getEvents().getEventsCount(),
+    ...getSceneEventsTargetIdentity(target),
+    eventsCount: target.eventsList.getEventsCount(),
     // Write-back verification: confirm nested sub-instructions survived the
     // write. If these differ, nested conditions/actions were lost.
     inputSubInstructionsCount,
@@ -1479,10 +1602,10 @@ export const replaceSceneEventsFromFile = (
   return {
     ...result,
     eventsAsText: renderNonTranslatedEventsAsText({
-      eventsList: scene.getEvents(),
+      eventsList: target.eventsList,
     }),
-    serializedEvents: serializeToJSObject(scene.getEvents()),
-    serializedEventsJson: serializeToJSON(scene.getEvents()),
+    serializedEvents: serializeToJSObject(target.eventsList),
+    serializedEventsJson: serializeToJSON(target.eventsList),
   };
 };
 
@@ -1547,7 +1670,7 @@ export const patchSceneEventInstruction = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
+  const eventsTarget = resolveSceneEventsTarget(project, args);
   const instructionKind =
     getOptionalString(args, 'instruction_kind') ||
     getOptionalString(args, 'instructionKind') ||
@@ -1565,9 +1688,8 @@ export const patchSceneEventInstruction = (
     throw new Error('Missing parameters array.');
   }
 
-  const scene = getScene(project, sceneName);
   const eventReference = getSingleEventReference(
-    scene.getEvents(),
+    eventsTarget.eventsList,
     args.event || args.event_id || args.eventId || args,
     'event'
   );
@@ -1602,31 +1724,33 @@ export const patchSceneEventInstruction = (
     );
   }
 
-  const target = matches[0].instruction;
+  const targetInstruction = matches[0].instruction;
   const beforeParameters = [];
-  for (let index = 0; index < target.getParametersCount(); index++) {
-    beforeParameters.push(target.getParameter(index).getPlainString());
+  for (let index = 0; index < targetInstruction.getParametersCount(); index++) {
+    beforeParameters.push(
+      targetInstruction.getParameter(index).getPlainString()
+    );
   }
-  target.setParametersCount(replacementParameters.length);
+  targetInstruction.setParametersCount(replacementParameters.length);
   replacementParameters.forEach((parameter, index) => {
-    target.setParameter(index, parameter);
+    targetInstruction.setParameter(index, parameter);
   });
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(eventsTarget, callbacks);
 
   const result = {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(eventsTarget),
     eventPath: formatEventPath(eventReference.path),
     aiGeneratedEventId: eventReference.event.getAiGeneratedEventId() || null,
     instructionKind,
     instructionType,
     instructionPath: matches[0].path,
     before: {
-      type: target.getType(),
+      type: targetInstruction.getType(),
       parameters: beforeParameters,
     },
     after: {
-      type: target.getType(),
+      type: targetInstruction.getType(),
       parameters: replacementParameters,
     },
   };
@@ -1637,9 +1761,9 @@ export const patchSceneEventInstruction = (
 
   return {
     ...result,
-    serializedEvents: serializeToJSObject(scene.getEvents()),
+    serializedEvents: serializeToJSObject(eventsTarget.eventsList),
     eventsAsText: renderNonTranslatedEventsAsText({
-      eventsList: scene.getEvents(),
+      eventsList: eventsTarget.eventsList,
     }),
   };
 };
@@ -1654,7 +1778,7 @@ export const attachObjectToObjectTop = (
   args: Object,
   callbacks: EventToolCallbacks = ({}: any)
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
+  const target = resolveSceneEventsTarget(project, args);
   const followerName =
     getOptionalString(args, 'follower_object_name') ||
     getOptionalString(args, 'followerObjectName') ||
@@ -1677,14 +1801,13 @@ export const attachObjectToObjectTop = (
       : typeof args.yOffset === 'number' && Number.isFinite(args.yOffset)
       ? args.yOffset
       : 0;
-  const scene = getScene(project, sceneName);
   const insertIndex =
     typeof args.insert_index === 'number' && Number.isFinite(args.insert_index)
       ? Math.max(
           0,
-          Math.min(scene.getEvents().getEventsCount(), args.insert_index)
+          Math.min(target.eventsList.getEventsCount(), args.insert_index)
         )
-      : scene.getEvents().getEventsCount();
+      : target.eventsList.getEventsCount();
   const eventId =
     getOptionalString(args, 'ai_generated_event_id') ||
     getOptionalString(args, 'aiGeneratedEventId') ||
@@ -1697,13 +1820,11 @@ export const attachObjectToObjectTop = (
     yOffset
   )}`;
   const event = gd.asStandardEvent(
-    scene
-      .getEvents()
-      .insertNewEvent(
-        project,
-        'BuiltinCommonInstructions::Standard',
-        insertIndex
-      )
+    target.eventsList.insertNewEvent(
+      project,
+      'BuiltinCommonInstructions::Standard',
+      insertIndex
+    )
   );
   event.setAiGeneratedEventId(eventId);
   const addAction = (type, parameters) => {
@@ -1721,11 +1842,11 @@ export const attachObjectToObjectTop = (
     { type: 'SetY', parameters: [followerName, '=', yExpression] },
   ];
   actions.forEach(action => addAction(action.type, action.parameters));
-  notifyEventsChanged(scene, callbacks);
+  notifyEventsChanged(target, callbacks);
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     followerObjectName: followerName,
     targetObjectName: targetName,
     eventPath: formatEventPath([insertIndex]),
@@ -1744,9 +1865,8 @@ export const inspectGameplayRules = (
   project: gdProject,
   args: Object
 ): Object => {
-  const sceneName = getRequiredString(args, 'scene_name');
-  const scene = getScene(project, sceneName);
-  const serializedEvents = serializeToJSObject(scene.getEvents());
+  const target = resolveSceneEventsTarget(project, args);
+  const serializedEvents = serializeToJSObject(target.eventsList);
   const serializedText = JSON.stringify(serializedEvents);
   const issues = [];
   const checks = [];
@@ -1840,7 +1960,7 @@ export const inspectGameplayRules = (
 
   return {
     success: true,
-    sceneName,
+    ...getSceneEventsTargetIdentity(target),
     checks,
     issues,
     ok: issues.length === 0,

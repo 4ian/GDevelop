@@ -77,6 +77,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalDebugEmitterContext", "")
+      .SetEmitsDeferredSceneSignal()
       .MarkAsSimple();
 
   extension
@@ -94,6 +95,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("string", _("Signal name"))
       .AddParameter("string", _("Payload"), "", true)
       .AddCodeOnlyParameter("signalDebugEmitterContext", "")
+      .SetEmitsDeferredSceneSignal()
       .MarkAsAdvanced();
 
   extension
@@ -170,6 +172,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
       .SetDefaultValue("true")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -185,6 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -199,6 +203,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "res/actions/popScene.png")
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -211,6 +216,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/quit.png")
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension

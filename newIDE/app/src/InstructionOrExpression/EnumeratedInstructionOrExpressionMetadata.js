@@ -28,6 +28,10 @@ export type EnumeratedInstructionMetadata = {|
   isRelevantForFunctionEvents: boolean,
   isRelevantForAsynchronousFunctionEvents: boolean,
   isRelevantForCustomObjectEvents: boolean,
+  isAsync?: boolean,
+  requiresSceneFutureFrame?: boolean,
+  emitsDeferredSceneSignal?: boolean,
+  mutatesSceneStack?: boolean,
 
   // TODO: remove this reference. While it's useful, it's also a risk
   // to have the editor to keep a reference to a gdInstructionMetadata
@@ -78,12 +82,12 @@ const signalEmitActionTypesAllowedInExtensionEvents = new Set([
  */
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   // $FlowFixMe[unsupported-variance-annotation]
-  +T: EnumeratedInstructionOrExpressionMetadata,
+  +T: EnumeratedInstructionOrExpressionMetadata
 >(
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  return list.filter((enumeratedInstructionOrExpressionMetadata) =>
+  return list.filter(enumeratedInstructionOrExpressionMetadata =>
     isFunctionVisibleInGivenScope(
       enumeratedInstructionOrExpressionMetadata,
       scope
@@ -95,10 +99,46 @@ const isFunctionVisibleInGivenScope = (
   enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   scope: EventsScope
 ): boolean => {
-  const { behaviorMetadata, objectMetadata, extension } =
-    enumeratedInstructionOrExpressionMetadata.scope;
-  const { eventsBasedBehavior, eventsBasedObject, eventsFunctionsExtension } =
-    scope;
+  const {
+    behaviorMetadata,
+    objectMetadata,
+    extension,
+  } = enumeratedInstructionOrExpressionMetadata.scope;
+  const {
+    eventsBasedBehavior,
+    eventsBasedObject,
+    eventsFunctionsExtension,
+  } = scope;
+
+  const lifecycleFunctionName = scope.sceneLifecycleFunctionName;
+  if (lifecycleFunctionName) {
+    const instructionType = enumeratedInstructionOrExpressionMetadata.type;
+
+    if (
+      instructionType === 'SignalReceived' &&
+      lifecycleFunctionName !== 'sceneUpdate'
+    ) {
+      return false;
+    }
+
+    if (
+      instructionType === 'SceneJustBegins' &&
+      (lifecycleFunctionName === 'sceneLoad' ||
+        lifecycleFunctionName === 'sceneUnload')
+    ) {
+      return false;
+    }
+
+    if (
+      lifecycleFunctionName === 'sceneUnload' &&
+      (enumeratedInstructionOrExpressionMetadata.isAsync ||
+        enumeratedInstructionOrExpressionMetadata.requiresSceneFutureFrame ||
+        enumeratedInstructionOrExpressionMetadata.emitsDeferredSceneSignal ||
+        enumeratedInstructionOrExpressionMetadata.mutatesSceneStack)
+    ) {
+      return false;
+    }
+  }
 
   if (
     eventsFunctionsExtension &&

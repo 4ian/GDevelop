@@ -1,6 +1,6 @@
 # Scene and External Lifecycle Functions Specification
 
-Status: proposed
+Status: approved for implementation
 
 Date: 2026-08-07
 

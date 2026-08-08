@@ -32,6 +32,11 @@ import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
 
+const getValidationErrorLocationLabel = (error: ValidationError): string =>
+  `${error.locationType}: ${error.locationName}${
+    error.lifecycleFunctionName ? ` / ${error.lifecycleFunctionName}` : ''
+  }`;
+
 const styles = {
   table: {
     tableLayout: 'fixed',
@@ -99,8 +104,11 @@ const InvalidParameterRow = ({
 }: InvalidParameterRowProps) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const typeLabel = error.isCondition ? 'Condition' : 'Action';
+  const displayedSentence = error.diagnosticMessage
+    ? `${error.diagnosticMessage} (${error.instructionSentence})`
+    : error.instructionSentence;
   const couldBeTruncated =
-    error.instructionSentence.length > TRUNCATION_THRESHOLD_CHARS;
+    displayedSentence.length > TRUNCATION_THRESHOLD_CHARS;
 
   return (
     <TableRow
@@ -112,7 +120,7 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
-            {`${error.locationType}: ${error.locationName}`}
+            {getValidationErrorLocationLabel(error)}
           </Link>
         </div>
       </TableRowColumn>
@@ -130,13 +138,11 @@ const InvalidParameterRow = ({
               couldBeTruncated ? () => setIsExpanded(!isExpanded) : undefined
             }
             title={
-              couldBeTruncated && !isExpanded
-                ? error.instructionSentence
-                : undefined
+              couldBeTruncated && !isExpanded ? displayedSentence : undefined
             }
           >
             <span style={styles.typeLabel}>{typeLabel}</span>{' '}
-            {error.instructionSentence}
+            {displayedSentence}
           </div>
           {couldBeTruncated && (
             <div style={styles.expandButtonContainer}>
@@ -217,10 +223,15 @@ type Props = {|
   project: gdProject,
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport,
   onClose: () => void,
-  onNavigateToLayoutEvent: (layoutName: string, eventPath: EventPath) => void,
+  onNavigateToLayoutEvent: (
+    layoutName: string,
+    eventPath: EventPath,
+    lifecycleFunctionName?: string
+  ) => void,
   onNavigateToExternalEventsEvent: (
     externalEventsName: string,
-    eventPath: EventPath
+    eventPath: EventPath,
+    lifecycleFunctionName?: string
   ) => void,
   onNavigateToExtensionEvent: ({|
     extensionName: string,
@@ -283,9 +294,17 @@ export default function DiagnosticReportDialog({
     (error: ValidationError) => {
       onClose();
       if (error.locationType === 'scene') {
-        onNavigateToLayoutEvent(error.locationName, error.eventPath);
+        onNavigateToLayoutEvent(
+          error.locationName,
+          error.eventPath,
+          error.lifecycleFunctionName
+        );
       } else if (error.locationType === 'external-events') {
-        onNavigateToExternalEventsEvent(error.locationName, error.eventPath);
+        onNavigateToExternalEventsEvent(
+          error.locationName,
+          error.eventPath,
+          error.lifecycleFunctionName
+        );
       } else if (
         error.locationType === 'extension' &&
         error.extensionName &&
@@ -651,15 +670,11 @@ export default function DiagnosticReportDialog({
                       <TableRowColumn>
                         {[
                           ...new Set(
-                            errors.map(
-                              e => `${e.locationType}: ${e.locationName}`
-                            )
+                            errors.map(e => getValidationErrorLocationLabel(e))
                           ),
                         ].map(location => {
                           const error = errors.find(
-                            e =>
-                              `${e.locationType}: ${e.locationName}` ===
-                              location
+                            e => getValidationErrorLocationLabel(e) === location
                           );
                           return (
                             <LineStackLayout key={location} noMargin>

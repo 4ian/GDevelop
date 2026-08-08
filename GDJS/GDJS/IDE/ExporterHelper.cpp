@@ -1403,6 +1403,17 @@ static std::size_t CountEventsRecursively(const gd::EventsList &events) {
   return count;
 }
 
+static std::size_t CountEventsRecursively(
+    const gd::SceneLifecycleEventsFunctions &lifecycleEventsFunctions) {
+  std::size_t count = 0;
+  lifecycleEventsFunctions.ForEach(
+      [&](gd::SceneLifecycleFunctionRole,
+          const gd::EventsFunction &eventsFunction) {
+        count += CountEventsRecursively(eventsFunction.GetEvents());
+      });
+  return count;
+}
+
 bool ExporterHelper::ExportScenesEventsCode(
     const gd::Project &project,
     gd::String outputDir,
@@ -1429,7 +1440,8 @@ bool ExporterHelper::ExportScenesEventsCode(
     gd::LogStatus(
         "  Scene '" + layout.GetName() + "': " +
         gd::String::From(GetTimeSpent(sceneStartTime)) + "ms, " +
-        gd::String::From(CountEventsRecursively(layout.GetEvents())) +
+        gd::String::From(CountEventsRecursively(
+            layout.GetLifecycleEventsFunctions())) +
         " events, " + gd::String::From(eventsOutput.size() / 1024) +
         " KB generated code");
 

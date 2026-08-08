@@ -228,6 +228,61 @@ describe('libGD.js', function() {
           .getEventsCount()
       ).toBe(1);
     });
+    it('exposes four fixed scene lifecycle functions', function() {
+      const lifecycleProject = gd.ProjectHelper.createNewGDJSProject();
+      const lifecycleLayout = lifecycleProject.insertNewLayout(
+        'LifecycleScene',
+        0
+      );
+      const lifecycleFunctions = lifecycleLayout.getLifecycleEventsFunctions();
+
+      expect(lifecycleFunctions.hasValidMetadata()).toBe(true);
+      expect(lifecycleFunctions.hasRoleName('sceneLoad')).toBe(true);
+      expect(lifecycleFunctions.hasRoleName('sceneSignal')).toBe(true);
+      expect(lifecycleFunctions.hasRoleName('sceneUpdate')).toBe(true);
+      expect(lifecycleFunctions.hasRoleName('sceneUnload')).toBe(true);
+      expect(lifecycleFunctions.hasRoleName('unknown')).toBe(false);
+
+      expect(lifecycleFunctions.getSceneLoadFunction().getName()).toBe(
+        'sceneLoad'
+      );
+      expect(
+        lifecycleFunctions.get(gd.SceneLifecycleEventsFunctions.SceneSignal)
+          .ptr
+      ).toBe(lifecycleFunctions.getSceneSignalFunction().ptr);
+      expect(lifecycleFunctions.getSceneUpdateFunction().getName()).toBe(
+        'sceneUpdate'
+      );
+      expect(lifecycleFunctions.getByName('sceneUnload').getName()).toBe(
+        'sceneUnload'
+      );
+
+      const signalParameters = lifecycleFunctions
+        .getSceneSignalFunction()
+        .getParameters();
+      expect(signalParameters.getParametersCount()).toBe(2);
+      expect(signalParameters.getParameterAt(0).getName()).toBe('SignalName');
+      expect(signalParameters.getParameterAt(0).getType()).toBe('string');
+      expect(signalParameters.getParameterAt(1).getName()).toBe('Payload');
+      expect(signalParameters.getParameterAt(1).getType()).toBe('string');
+
+      expect(lifecycleLayout.getEvents().ptr).toBe(
+        lifecycleFunctions.getSceneUpdateFunction().getEvents().ptr
+      );
+
+      const externalEvents = lifecycleProject.insertNewExternalEvents(
+        'Shared lifecycle',
+        0
+      );
+      expect(
+        externalEvents
+          .getLifecycleEventsFunctions()
+          .getSceneUpdateFunction()
+          .getEvents().ptr
+      ).toBe(externalEvents.getEvents().ptr);
+
+      lifecycleProject.delete();
+    });
     it('can have objects', function() {
       let object = layout
         .getObjects()

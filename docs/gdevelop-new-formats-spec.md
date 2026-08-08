@@ -2250,6 +2250,27 @@ Future versions may split resources further, add stable entity IDs, or
 introduce a direct typed source model after the compatibility format has
 proven reliable.
 
+## Version 4 scene lifecycle function sources
+
+Version 4 replaces the single scene/External Events body location with the
+same physical function shape used by prefab functions:
+
+```text
+scenes/<Scene>/functions/<Lifecycle>/function.settings
+scenes/<Scene>/functions/<Lifecycle>/<Lifecycle>.events
+scenes/<Scene>/externals/<External>/external-events.settings
+scenes/<Scene>/externals/<External>/functions/<Lifecycle>/function.settings
+scenes/<Scene>/externals/<External>/functions/<Lifecycle>/<Lifecycle>.events
+```
+
+`<Lifecycle>` is one of `sceneLoad`, `sceneSignal`, `sceneUpdate`, or
+`sceneUnload`. The update directory is always required. Other lifecycle
+directories are omitted while their bodies are empty. A version-3 scene or
+external `.events` body migrates byte-equivalently to `sceneUpdate`; the other
+three functions start empty. The version marker and every affected owner are
+committed transactionally, and version-3 readers reject version 4 before
+writing.
+
 ---
 
 ## 24. Final contract
@@ -2269,14 +2290,13 @@ A conforming implementation must satisfy all of the following:
    reference from or merge into `project.gdevelop`. Generated compatibility
    JSON and runtime exports omit the Constants map.
 6. Every scene has its own subfolder with `scene.settings`, a placement-focused
-   layout TOML file, an events DSL file, and flat object
-   settings. Object definitions and their behaviors belong to individual
+   layout TOML file, flat object settings, and fixed lifecycle function
+   directories. Object definitions and their behaviors belong to individual
    object settings; instances and layers belong to the layout.
-7. Each scene may own an `externals/` directory containing its associated
-   `<ExternalName>.events` and `<ExternalName>.layout` sources. That scene's
-   `scene.settings` owns their manifests; association is derived from the
-   owner, and global external-container order is explicit across all scene
-   manifests.
+7. Each scene may own an `externals/` directory containing External Events
+   owner directories and external-layout sources. An External Events owner has
+   `external-events.settings` plus fixed lifecycle function directories;
+   association is derived from its physical scene owner.
 8. Every extension-level function has a
    `functions/<Function>/function.settings` and matching
    `<Function>.events`. Every prefab and behavior function similarly has
@@ -2305,3 +2325,7 @@ A conforming implementation must satisfy all of the following:
     the verified composed legacy serializer tree.
 18. Prefab and behavior property descriptors are flat ordered arrays. The
     format neither serializes nor reconstructs property folder structures.
+19. Scene and External Events functions use
+    `functions/<Lifecycle>/function.settings` with a matching sibling
+    `<Lifecycle>.events`; `sceneUpdate` is required and empty load, signal, and
+    unload functions do not create managed files.

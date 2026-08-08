@@ -13,11 +13,14 @@ export type ValidationErrorType =
   | 'invalid-parameter'
   | 'missing-parameter'
   | 'unsafe-external-layout-creation'
-  | 'unconditioned-action';
+  | 'unconditioned-action'
+  | 'lifecycle-incompatible'
+  | 'lifecycle-redundant';
 
 export type ValidationError = {|
   type: ValidationErrorType,
   diagnosticCode?: string,
+  diagnosticMessage?: string,
   isCondition: boolean,
   instructionType: string,
   instructionSentence: string,
@@ -32,6 +35,7 @@ export type ValidationError = {|
   eventPath: EventPath,
   extensionName?: string,
   functionName?: string,
+  lifecycleFunctionName?: string,
   behaviorName?: ?string,
   objectName?: ?string,
 |};
@@ -43,12 +47,21 @@ const getValidationErrorLocationInformationFromProjectScopedContainers = (
   locationType: 'scene' | 'external-events' | 'extension',
   extensionName?: string,
   functionName?: string,
+  lifecycleFunctionName?: string,
   behaviorName?: ?string,
   objectName?: ?string,
 } => {
   const extensionName = projectScopedContainers.getScopeExtensionName();
   const externalEventsName = projectScopedContainers.getScopeExternalEventsName();
   const sceneName = projectScopedContainers.getScopeSceneName();
+  // Keep validation usable while opening a project with an older libGD build.
+  // New builds expose this method and preserve the lifecycle identity.
+  const projectScopedContainersWithLifecycle: any = projectScopedContainers;
+  const lifecycleFunctionName =
+    typeof projectScopedContainersWithLifecycle.getScopeSceneLifecycleFunctionName ===
+    'function'
+      ? projectScopedContainersWithLifecycle.getScopeSceneLifecycleFunctionName()
+      : '';
 
   if (extensionName) {
     const functionName = projectScopedContainers.getScopeFunctionName();
@@ -73,11 +86,13 @@ const getValidationErrorLocationInformationFromProjectScopedContainers = (
     return {
       locationType: 'external-events',
       locationName: externalEventsName,
+      ...(lifecycleFunctionName ? { lifecycleFunctionName } : {}),
     };
   } else {
     return {
       locationType: 'scene',
       locationName: sceneName,
+      ...(lifecycleFunctionName ? { lifecycleFunctionName } : {}),
     };
   }
 };
@@ -174,6 +189,20 @@ const shouldValidateUnconditionedActionForScope = (
     project,
     projectScopedContainers
   );
+
+const getSceneLifecycleFunctionLabel = (name: string): string => {
+  switch (name) {
+    case 'sceneLoad':
+      return 'On scene load';
+    case 'sceneSignal':
+      return 'On scene signal';
+    case 'sceneUnload':
+      return 'On scene unload';
+    case 'sceneUpdate':
+    default:
+      return 'Scene update';
+  }
+};
 
 const buildEventPtrToValidationContextMap = (
   eventsList: gdEventsList,
@@ -293,6 +322,82 @@ const createValidationWorker = (
         ),
       });
       return;
+    }
+
+    const lifecycleFunctionName = projectScopedContainers.getScopeSceneLifecycleFunctionName();
+    if (lifecycleFunctionName) {
+      const instructionSentence = renderInstructionSentenceAsPlainText(
+        instruction,
+        metadata
+      );
+      const locationInformation = getValidationErrorLocationInformationFromProjectScopedContainers(
+        projectScopedContainers
+      );
+      const addLifecycleDiagnostic = (
+        diagnosticCode: string,
+        diagnosticMessage: string,
+        validationType: ValidationErrorType = 'lifecycle-incompatible'
+      ) => {
+        errors.push({
+          type: validationType,
+          diagnosticCode,
+          diagnosticMessage,
+          isCondition,
+          instructionType: type,
+          instructionSentence,
+          eventPath: [...currentEventPath],
+          ...locationInformation,
+        });
+      };
+
+      if (
+        type === 'SignalReceived' &&
+        lifecycleFunctionName !== 'sceneUpdate'
+      ) {
+        addLifecycleDiagnostic(
+          'SCENE_LIFECYCLE_FUNCTION_INVALID_SIGNAL_RECEIVED',
+          `“Scene signal received” is only available in “Scene update” and cannot be used inside “${getSceneLifecycleFunctionLabel(
+            lifecycleFunctionName
+          )}”.${
+            lifecycleFunctionName === 'sceneSignal'
+              ? ' In “On scene signal”, compare SignalName() instead.'
+              : ''
+          }`
+        );
+      }
+
+      if (
+        type === 'SceneJustBegins' &&
+        (lifecycleFunctionName === 'sceneLoad' ||
+          lifecycleFunctionName === 'sceneUnload')
+      ) {
+        addLifecycleDiagnostic(
+          'SCENE_LIFECYCLE_FUNCTION_REDUNDANT_SCENE_JUST_BEGINS',
+          lifecycleFunctionName === 'sceneLoad'
+            ? '“At the beginning of the scene” is redundant inside “On scene load”, which already runs once when the scene loads.'
+            : '“At the beginning of the scene” is unnecessary inside “On scene unload”, which runs once immediately before the scene is destroyed.',
+          'lifecycle-redundant'
+        );
+      }
+
+      if (!isCondition && lifecycleFunctionName === 'sceneUnload') {
+        if (metadata.isAsync() || metadata.requiresSceneFutureFrame()) {
+          addLifecycleDiagnostic(
+            'SCENE_LIFECYCLE_FUNCTION_ASYNC_NOT_SUPPORTED',
+            '“On scene unload” is synchronous. This action needs a later scene frame, but the scene is destroyed immediately after the function finishes.'
+          );
+        } else if (metadata.emitsDeferredSceneSignal()) {
+          addLifecycleDiagnostic(
+            'SCENE_LIFECYCLE_FUNCTION_DEFERRED_SIGNAL_NOT_SUPPORTED',
+            'Signals emitted from “On scene unload” cannot be delivered because the scene signal bus is about to be cleared.'
+          );
+        } else if (metadata.mutatesSceneStack()) {
+          addLifecycleDiagnostic(
+            'SCENE_LIFECYCLE_FUNCTION_TRANSITION_NOT_SUPPORTED',
+            'The scene is already unloading. Scene transition actions cannot be requested from “On scene unload”.'
+          );
+        }
+      }
     }
 
     if (
@@ -504,10 +609,16 @@ export const scanEventsListForValidationErrors = ({
   project,
   eventsList,
   layout,
+  lifecycleFunction,
+  lifecycleFunctionName,
+  externalEventsName,
 }: {|
   project: gdProject,
   eventsList: gdEventsList,
   layout?: ?gdLayout,
+  lifecycleFunction?: ?gdEventsFunction,
+  lifecycleFunctionName?: ?string,
+  externalEventsName?: ?string,
 |}): Array<ValidationError> => {
   const errors: Array<ValidationError> = [];
   const platform = gd.JsPlatform.get();
@@ -519,6 +630,17 @@ export const scanEventsListForValidationErrors = ({
     : gd.ProjectScopedContainers.makeNewProjectScopedContainersForProject(
         project
       );
+  if (lifecycleFunction) {
+    projectScopedContainers.addParameters(lifecycleFunction.getParameters());
+  }
+  if (lifecycleFunctionName) {
+    projectScopedContainers.setScopeSceneLifecycleFunctionName(
+      lifecycleFunctionName
+    );
+  }
+  if (externalEventsName) {
+    projectScopedContainers.setScopeExternalEventsName(externalEventsName);
+  }
   const worker = createValidationWorker(project, platform, errors);
 
   try {

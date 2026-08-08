@@ -190,7 +190,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::LinkEvent &event = dynamic_cast<gd::LinkEvent &>(event_);
         event.ReplaceLinkByLinkedEvents(codeGenerator.GetProject(), eventList,
-                                        indexOfTheEventInThisList);
+                                        indexOfTheEventInThisList,
+                                        codeGenerator.GetSceneLifecycleFunctionRole());
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Standard"].SetCodeGenerator(
@@ -236,7 +237,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
         const gd::Instruction* signalReceivedCondition =
-            codeGenerator.HasProjectAndLayout()
+            codeGenerator.HasProjectAndLayout() &&
+                    codeGenerator.GetSceneLifecycleFunctionRole() ==
+                        "sceneUpdate"
                 ? FindTopLevelSignalReceivedCondition(event.GetConditions())
                 : nullptr;
 

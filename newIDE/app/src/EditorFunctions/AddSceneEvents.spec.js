@@ -103,6 +103,51 @@ describe('add_scene_events', () => {
     expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalled();
   });
 
+  it('applies direct serialized events only to the requested lifecycle function', async () => {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const generateEvents = jest.fn();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const onSceneEventsModifiedOutsideEditor = jest.fn();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.add_scene_events.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        generateEvents,
+        relatedAiRequestId: null,
+        onSceneEventsModifiedOutsideEditor,
+        args: {
+          scene_name: 'TestScene',
+          lifecycle_function_name: 'sceneLoad',
+          generated_event_id: 'scene-load-event-id',
+          events_json: JSON.stringify([
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [],
+            },
+          ]),
+        },
+      }
+    );
+
+    const scene = project.getLayout('TestScene');
+    expect(result.success).toBe(true);
+    expect(result.lifecycleFunctionName).toBe('sceneLoad');
+    expect(scene.getEvents().getEventsCount()).toBe(0);
+    expect(
+      scene
+        .getLifecycleEventsFunctions()
+        .getByName('sceneLoad')
+        .getEvents()
+        .getEventsCount()
+    ).toBe(1);
+    expect(onSceneEventsModifiedOutsideEditor).toHaveBeenCalledWith({
+      scene,
+      lifecycleFunctionName: 'sceneLoad',
+      newOrChangedAiGeneratedEventIds: new Set(['scene-load-event-id']),
+    });
+  });
+
   it('fails when no events description (and no event batches) is provided', async () => {
     // $FlowFixMe[underconstrained-implicit-instantiation]
     const generateEvents = jest.fn();

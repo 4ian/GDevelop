@@ -150,4 +150,55 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     eventsFunctionsExtension.delete();
     project.delete();
   });
+
+  it('filters instructions that are invalid for a lifecycle function', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const layout = new gd.Layout();
+    const unloadFunction = layout
+      .getLifecycleEventsFunctions()
+      .getByName('sceneUnload');
+    const signalFunction = layout
+      .getLifecycleEventsFunctions()
+      .getByName('sceneSignal');
+    const allActions = enumerateAllInstructions(false, project, makeFakeI18n());
+    const allConditions = enumerateAllInstructions(
+      true,
+      project,
+      makeFakeI18n()
+    );
+
+    const unloadActions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      allActions,
+      {
+        project,
+        layout,
+        eventsFunction: unloadFunction,
+        sceneLifecycleFunctionName: 'sceneUnload',
+      }
+    ).map(instruction => instruction.type);
+    const signalConditions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      allConditions,
+      {
+        project,
+        layout,
+        eventsFunction: signalFunction,
+        sceneLifecycleFunctionName: 'sceneSignal',
+      }
+    ).map(instruction => instruction.type);
+
+    expect(unloadActions).not.toEqual(
+      expect.arrayContaining([
+        'Wait',
+        'EmitSceneSignal',
+        'EmitSignalToObjectInstance',
+        'Scene',
+        'PushScene',
+        'PopScene',
+      ])
+    );
+    expect(signalConditions).not.toContain('SignalReceived');
+
+    layout.delete();
+    project.delete();
+  });
 });

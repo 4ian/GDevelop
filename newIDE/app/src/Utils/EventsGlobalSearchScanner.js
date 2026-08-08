@@ -4,6 +4,12 @@ import type { EventPath } from './EventPath';
 
 import { mapFor } from './MapFor';
 import type { SearchFilterParams } from './Search';
+import {
+  getSceneLifecycleEvents,
+  getSceneLifecycleFunctionDisplayName,
+  sceneLifecycleFunctionDefinitions,
+  type SceneLifecycleFunctionName,
+} from '../SceneContextLifecycleFunctions';
 
 const gd: libGDevelop = global.gd;
 
@@ -30,12 +36,14 @@ export type LayoutSearchGroup = {|
   ...BaseGroup,
   targetType: 'layout',
   name: string,
+  lifecycleFunctionName: SceneLifecycleFunctionName,
 |};
 
 export type ExternalEventsSearchGroup = {|
   ...BaseGroup,
   targetType: 'external-events',
   name: string,
+  lifecycleFunctionName: SceneLifecycleFunctionName,
 |};
 
 export type ExtensionSearchGroup = {|
@@ -394,35 +402,47 @@ const scanEvents = ({
     mapFor(0, project.getLayoutsCount(), index => {
       const layout = project.getLayoutAt(index);
       const name = layout.getName();
-      const matches = searchInEventsList(layout.getEvents(), inputs);
-      pushIfMatches(
-        groups,
-        matches => ({
-          id: `${where}:${name}`,
-          label: name,
-          targetType: where,
-          name,
-          matches,
-        }),
-        matches
-      );
+      sceneLifecycleFunctionDefinitions.forEach(({ name: role }) => {
+        const matches = searchInEventsList(
+          getSceneLifecycleEvents(layout, role),
+          inputs
+        );
+        pushIfMatches(
+          groups,
+          matches => ({
+            id: `${where}:${name}:${role}`,
+            label: `${name} / ${getSceneLifecycleFunctionDisplayName(role)}`,
+            targetType: where,
+            name,
+            lifecycleFunctionName: role,
+            matches,
+          }),
+          matches
+        );
+      });
     });
   } else if (where === 'external-events') {
     mapFor(0, project.getExternalEventsCount(), index => {
       const externalEvents = project.getExternalEventsAt(index);
       const name = externalEvents.getName();
-      const matches = searchInEventsList(externalEvents.getEvents(), inputs);
-      pushIfMatches(
-        groups,
-        matches => ({
-          id: `${where}:${name}`,
-          label: name,
-          targetType: where,
-          name,
-          matches,
-        }),
-        matches
-      );
+      sceneLifecycleFunctionDefinitions.forEach(({ name: role }) => {
+        const matches = searchInEventsList(
+          getSceneLifecycleEvents(externalEvents, role),
+          inputs
+        );
+        pushIfMatches(
+          groups,
+          matches => ({
+            id: `${where}:${name}:${role}`,
+            label: `${name} / ${getSceneLifecycleFunctionDisplayName(role)}`,
+            targetType: where,
+            name,
+            lifecycleFunctionName: role,
+            matches,
+          }),
+          matches
+        );
+      });
     });
   }
 };

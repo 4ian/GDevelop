@@ -10,6 +10,10 @@ import { findEventsInEventsList } from './McpEventTools';
 import { generateEventsCodeForScope } from '../EventsSheet/GenerateEventsCode';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import optionalRequire from '../Utils/OptionalRequire';
+import {
+  getSceneLifecycleEvents,
+  sceneLifecycleFunctionDefinitions,
+} from '../SceneContextLifecycleFunctions';
 
 const gd: libGDevelop = global.gd;
 const fs = optionalRequire('fs');
@@ -1511,15 +1515,47 @@ export const findProjectEvents = (project: gdProject, args: Object): Object => {
   const matches = [];
   const sceneName =
     args && typeof args.scene_name === 'string' ? args.scene_name : null;
+  const lifecycleFunctionName =
+    args && typeof args.lifecycle_function_name === 'string'
+      ? args.lifecycle_function_name
+      : null;
   for (let index = 0; index < project.getLayoutsCount(); index++) {
     const scene = project.getLayoutAt(index);
     if (sceneName && scene.getName() !== sceneName) continue;
-    findEventsInEventsList({
-      eventsList: scene.getEvents(),
-      args,
-      owner: { scope: 'scene', sceneName: scene.getName() },
-      defaultIncludeSerialized: false,
-    }).forEach(match => matches.push(match));
+    sceneLifecycleFunctionDefinitions.forEach(({ name: role }) => {
+      if (lifecycleFunctionName && lifecycleFunctionName !== role) return;
+      findEventsInEventsList({
+        eventsList: getSceneLifecycleEvents(scene, role),
+        args,
+        owner: {
+          scope: 'scene',
+          sceneName: scene.getName(),
+          lifecycleFunctionName: role,
+        },
+        defaultIncludeSerialized: false,
+      }).forEach(match => matches.push(match));
+    });
+  }
+
+  for (let index = 0; index < project.getExternalEventsCount(); index++) {
+    const externalEvents = project.getExternalEventsAt(index);
+    if (sceneName && externalEvents.getAssociatedLayout() !== sceneName) {
+      continue;
+    }
+    sceneLifecycleFunctionDefinitions.forEach(({ name: role }) => {
+      if (lifecycleFunctionName && lifecycleFunctionName !== role) return;
+      findEventsInEventsList({
+        eventsList: getSceneLifecycleEvents(externalEvents, role),
+        args,
+        owner: {
+          scope: 'external-events',
+          sceneName: externalEvents.getAssociatedLayout(),
+          externalEventsName: externalEvents.getName(),
+          lifecycleFunctionName: role,
+        },
+        defaultIncludeSerialized: false,
+      }).forEach(match => matches.push(match));
+    });
   }
 
   const extensionName =
@@ -1578,6 +1614,7 @@ const buildSignalEventSearchArgs = (
     'parent_kind',
     'parent_name',
     'function_name',
+    'lifecycle_function_name',
     'include_serialized',
     'summary_only',
   ].forEach(name => {

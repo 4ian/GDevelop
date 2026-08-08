@@ -98,6 +98,7 @@
 #include <GDCore/Project/PropertyFolderOrProperty.h>
 #include <GDCore/Project/ResourcesContainer.h>
 #include <GDCore/Project/ResourcesContainersList.h>
+#include <GDCore/Project/SceneLifecycleEventsFunctions.h>
 #include <GDCore/Project/Variable.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Project/VariablesContainersList.h>
@@ -492,6 +493,8 @@ typedef std::vector<gd::EventsFunction> VectorEventsFunction;
 typedef gd::Object gdObject;  // To avoid clashing javascript Object in glue.js
 typedef ParticleEmitterObject::RendererType ParticleEmitterObject_RendererType;
 typedef EventsFunction::FunctionType EventsFunction_FunctionType;
+typedef gd::SceneLifecycleEventsFunctions::Role
+    SceneLifecycleEventsFunctions_Role;
 typedef ObjectsContainersList::VariableExistence ObjectsContainersList_VariableExistence;
 typedef EventsFunctionsContainer::FunctionOwner
     EventsFunctionsContainer_FunctionOwner;

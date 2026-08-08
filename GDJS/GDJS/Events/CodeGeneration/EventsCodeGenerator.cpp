@@ -28,6 +28,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/SceneLifecycleEventsFunctions.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
@@ -108,22 +109,92 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
     std::set<gd::String>& includeFiles,
     gd::DiagnosticReport& diagnosticReport,
     bool compilationForRuntime) {
-  EventsCodeGenerator codeGenerator(project, scene);
-  codeGenerator.SetCodeNamespace(codeNamespace);
-  codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
-  codeGenerator.SetDiagnosticReport(&diagnosticReport);
+  const gd::SceneLifecycleEventsFunctions& lifecycleFunctions =
+      scene.GetLifecycleEventsFunctions();
+  gd::String output = codeNamespace + " = {};\n" + codeNamespace +
+                      ".idToCallbackMap = new Map();\n";
 
-  gd::String output = GenerateEventsListCompleteFunctionCode(
-      codeGenerator,
-      codeGenerator.GetCodeNamespaceAccessor() + "func",
-      "runtimeScene",
-      "runtimeScene.getOnceTriggers().startNewFrame();\n",
-      scene.GetEvents(),
-      "",
-      "return;\n");
+  auto generateLifecycleFunction = [&](const gd::String& role,
+                                       const gd::EventsFunction& function,
+                                       const gd::String& arguments,
+                                       bool omitWhenEmpty) {
+    if (omitWhenEmpty && function.GetEvents().IsEmpty()) return;
 
-  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
-                      codeGenerator.GetIncludeFiles().end());
+    EventsCodeGenerator lifecycleCodeGenerator(project, scene);
+    lifecycleCodeGenerator.SetCodeNamespace(codeNamespace + "." + role +
+                                            "Context");
+    lifecycleCodeGenerator.SetSceneLifecycleFunctionRole(role);
+    lifecycleCodeGenerator.GetProjectScopedContainers().AddParameters(
+        function.GetParameters());
+    lifecycleCodeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+    lifecycleCodeGenerator.SetDiagnosticReport(&diagnosticReport);
+
+    gd::String lifecyclePrelude;
+    if (role == "sceneSignal") {
+      lifecyclePrelude =
+          lifecycleCodeGenerator.GetCodeNamespaceAccessor() +
+          "sceneSignalName = sceneSignalName;\n" +
+          lifecycleCodeGenerator.GetCodeNamespaceAccessor() +
+          "sceneSignalPayload = sceneSignalPayload;\n";
+    }
+
+    output += GenerateEventsListCompleteFunctionCode(
+        lifecycleCodeGenerator,
+        codeNamespace + "." + role,
+        arguments,
+        lifecyclePrelude,
+        function.GetEvents(),
+        "",
+        "return;\n");
+    output += "for (const [id, callback] of " + codeNamespace + "." + role +
+              "Context.idToCallbackMap) " + codeNamespace +
+              ".idToCallbackMap.set(id, callback);\n";
+    includeFiles.insert(lifecycleCodeGenerator.GetIncludeFiles().begin(),
+                        lifecycleCodeGenerator.GetIncludeFiles().end());
+  };
+
+  generateLifecycleFunction(
+      "sceneLoad", lifecycleFunctions.GetSceneLoadFunction(), "runtimeScene", true);
+  generateLifecycleFunction("sceneSignal",
+                            lifecycleFunctions.GetSceneSignalFunction(),
+                            "runtimeScene, sceneSignalName, sceneSignalPayload",
+                            true);
+  generateLifecycleFunction("sceneUpdate",
+                            lifecycleFunctions.GetSceneUpdateFunction(),
+                            "runtimeScene",
+                            false);
+  generateLifecycleFunction("sceneUnload",
+                            lifecycleFunctions.GetSceneUnloadFunction(),
+                            "runtimeScene",
+                            true);
+
+  output += codeNamespace + ".func = function(runtimeScene) {\n";
+  output += "runtimeScene.getOnceTriggers().startNewFrame();\n";
+  output += "if (" + codeNamespace +
+            ".sceneLoad && runtimeScene.getTimeManager().isFirstFrame()) " +
+            codeNamespace + ".sceneLoad(runtimeScene);\n";
+  output += "if (" + codeNamespace + ".sceneSignal) {\n";
+  output +=
+      "const deliveredSceneSignals = "
+      "gdjs.evtTools.signal.getDeliveredSceneSignalBatch(runtimeScene);\n";
+  output +=
+      "for (let signalIndex = 0; signalIndex < "
+      "deliveredSceneSignals.length; ++signalIndex) {\n";
+  output += "const signal = deliveredSceneSignals[signalIndex];\n";
+  output +=
+      "gdjs.evtTools.signal.setCurrentSignalForSceneCondition(runtimeScene, "
+      "signal);\n";
+  output +=
+      "gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, signal);\n";
+  output += "try {\n" + codeNamespace +
+            ".sceneSignal(runtimeScene, signal.name, signal.payload);\n";
+  output +=
+      "} finally {\n"
+      "gdjs.evtTools.signal.clearCurrentSignalForSceneCondition(runtimeScene);\n"
+      "}\n";
+  output += "}\n}\n";
+  output += codeNamespace + ".sceneUpdate(runtimeScene);\n";
+  output += "return;\n};\n";
   return output;
 }
 

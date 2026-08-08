@@ -16,7 +16,8 @@ import {
   decompileLayoutToml,
 } from '../LayoutToml';
 
-export const MULTI_FILE_FORMAT_VERSION = 3;
+export const MULTI_FILE_FORMAT_VERSION = 4;
+export const LEGACY_MULTI_FILE_FORMAT_VERSION = 3;
 export const MULTI_FILE_ENTRY_NAME = 'project.gdevelop';
 export const MULTI_FILE_ENTRY_URI = 'game://project.gdevelop';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
@@ -83,6 +84,65 @@ const LAYOUT_TOML_KIND_BY_FORMAT = Object.freeze({
 });
 const WINDOWS_DEVICE_NAME = /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i;
 const SIMPLE_URI_SEGMENT = /^[A-Za-z0-9_.-]+$/;
+
+const SCENE_LIFECYCLE_FUNCTION_DEFINITIONS = Object.freeze([
+  {
+    name: 'sceneLoad',
+    legacyField: 'sceneLoadEvents',
+    order: 0,
+    fullName: 'On scene load',
+    description:
+      'Events run once after this scene has loaded, before its first update.',
+    parameters: [],
+  },
+  {
+    name: 'sceneSignal',
+    legacyField: 'sceneSignalEvents',
+    order: 1,
+    fullName: 'On scene signal',
+    description:
+      'Events run once for each scene signal delivered to this scene.',
+    parameters: [
+      {
+        name: 'SignalName',
+        type: 'string',
+        description: 'Delivered scene signal name',
+        optional: false,
+        defaultValue: '',
+        codeOnly: false,
+      },
+      {
+        name: 'Payload',
+        type: 'string',
+        description: 'Delivered immutable string payload',
+        optional: false,
+        defaultValue: '',
+        codeOnly: false,
+      },
+    ],
+  },
+  {
+    name: 'sceneUpdate',
+    legacyField: 'events',
+    order: 2,
+    fullName: 'Scene update',
+    description: 'Events run every frame while this scene is active.',
+    parameters: [],
+  },
+  {
+    name: 'sceneUnload',
+    legacyField: 'sceneUnloadEvents',
+    order: 3,
+    fullName: 'On scene unload',
+    description:
+      'Events run once before this scene and its objects are unloaded.',
+    parameters: [],
+  },
+]);
+
+const SCENE_LIFECYCLE_FUNCTION_NAMES = new Set(
+  SCENE_LIFECYCLE_FUNCTION_DEFINITIONS.map(definition => definition.name)
+);
 
 export class MultiFileProjectError extends Error {
   code: string;
@@ -1165,6 +1225,35 @@ const settingsNamespacePathForUri = (uri, payload) => {
   )
     return ['scenes', segments[1], 'objects', name];
   if (
+    segments.length === 5 &&
+    segments[0] === 'scenes' &&
+    segments[2] === 'functions' &&
+    segments[4] === 'function.settings'
+  )
+    return ['scenes', segments[1], 'functions', name];
+  if (
+    segments.length === 5 &&
+    segments[0] === 'scenes' &&
+    segments[2] === 'externals' &&
+    segments[4] === 'external-events.settings'
+  )
+    return ['scenes', segments[1], 'externalEvents', name];
+  if (
+    segments.length === 7 &&
+    segments[0] === 'scenes' &&
+    segments[2] === 'externals' &&
+    segments[4] === 'functions' &&
+    segments[6] === 'function.settings'
+  )
+    return [
+      'scenes',
+      segments[1],
+      'externalEvents',
+      segments[3],
+      'functions',
+      name,
+    ];
+  if (
     segments.length === 3 &&
     segments[0] === 'extensions' &&
     segments[2] === 'extension.settings'
@@ -1332,6 +1421,56 @@ const splitOwnerFunctions = ({
       functionObject.events || [],
       eventsDslOptions
     );
+  });
+};
+
+const lifecycleFunctionSettingsPayload = (definition, eventsUri) => ({
+  kind: 'function',
+  settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+  order: definition.order,
+  folder: ['Lifecycle'],
+  name: definition.name,
+  events: eventsUri,
+  functionType: 'Action',
+  lifecycleRole: definition.name,
+  fullName: definition.fullName,
+  description: definition.description,
+  sentence: '',
+  private: true,
+  async: false,
+  parameters: definition.parameters,
+  objectGroups: [],
+});
+
+const splitSceneLifecycleFunctions = ({
+  owner,
+  baseSegments,
+  namespaceForFunction,
+  files,
+  eventsDslOptions,
+}) => {
+  SCENE_LIFECYCLE_FUNCTION_DEFINITIONS.forEach(definition => {
+    const events = owner[definition.legacyField] || [];
+    if (definition.name !== 'sceneUpdate' && events.length === 0) return;
+
+    const functionSegments = [...baseSegments, 'functions', definition.name];
+    const settingsUri = encodeUriPath([
+      ...functionSegments,
+      'function.settings',
+    ]);
+    const eventsUri = encodeUriPath([
+      ...functionSegments,
+      `${definition.name}.events`,
+    ]);
+    putSettingsFile(
+      files,
+      settingsUri,
+      namespaceForFunction(
+        definition.name,
+        lifecycleFunctionSettingsPayload(definition, eventsUri)
+      )
+    );
+    putEventsFile(files, eventsUri, events, eventsDslOptions);
   });
 };
 
@@ -1607,7 +1746,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       name,
       order,
       folderName: uniqueManagedName(name, sceneNames),
-      externalEventFiles: [],
       externalLayoutFiles: [],
     };
   });
@@ -1653,34 +1791,61 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     externalEventDisplayNames.add(name);
     const sceneInfo = requireExternalSceneInfo(external, 'External event');
     const fileName = uniqueManagedName(name, externalEventNames);
-    const eventsUri = encodeUriPath([
+    const externalBaseSegments = [
       'scenes',
       sceneInfo.folderName,
       'externals',
-      `${fileName}.events`,
+      fileName,
+    ];
+    const ownerSettingsUri = encodeUriPath([
+      ...externalBaseSegments,
+      'external-events.settings',
     ]);
-    sceneInfo.externalEventFiles.push({
-      ...omitFields(
-        external,
-        new Set([
-          'name',
-          'order',
-          'associatedLayout',
-          'linkedScene',
-          'unresolvedScene',
-          'events',
-        ])
-      ),
-      name,
-      order,
-      events: eventsUri,
+    putSettingsFile(files, ownerSettingsUri, {
+      scenes: {
+        [sceneInfo.name]: {
+          externalEvents: {
+            [name]: {
+              kind: 'externalEvents',
+              settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+              order,
+              ...omitFields(
+                external,
+                new Set([
+                  'name',
+                  'order',
+                  'associatedLayout',
+                  'linkedScene',
+                  'unresolvedScene',
+                  'events',
+                  'sceneLoadEvents',
+                  'sceneSignalEvents',
+                  'sceneUnloadEvents',
+                ])
+              ),
+              name,
+            },
+          },
+        },
+      },
     });
-    putEventsFile(
+    splitSceneLifecycleFunctions({
+      owner: external,
+      baseSegments: externalBaseSegments,
+      namespaceForFunction: (functionName, payload) => ({
+        scenes: {
+          [sceneInfo.name]: {
+            externalEvents: {
+              [name]: {
+                functions: { [functionName]: payload },
+              },
+            },
+          },
+        },
+      }),
       files,
-      eventsUri,
-      external.events || [],
-      options.eventsDslOptions
-    );
+      eventsDslOptions: options.eventsDslOptions,
+    });
   });
   const externalLayoutNames = new Set();
   const externalLayoutDisplayNames = new Set();
@@ -1745,7 +1910,6 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
       name,
       order,
       folderName,
-      externalEventFiles,
       externalLayoutFiles,
     }) => {
       const settingsUri = encodeUriPath([
@@ -1758,16 +1922,14 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         folderName,
         `${folderName}.layout`,
       ]);
-      const eventsUri = encodeUriPath([
-        'scenes',
-        folderName,
-        `${folderName}.events`,
-      ]);
       const settingsPayload = omitFields(
         layoutWithoutEmptyBehaviorSharedData,
         new Set([
           ...SCENE_LAYOUT_FIELDS,
           'events',
+          'sceneLoadEvents',
+          'sceneSignalEvents',
+          'sceneUnloadEvents',
           'objects',
           'externalEventFiles',
           'externalLayoutFiles',
@@ -1793,9 +1955,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
             settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
             order,
             layout: layoutUri,
-            events: eventsUri,
             ...settingsPayload,
-            ...(externalEventFiles.length ? { externalEventFiles } : {}),
             ...(externalLayoutFiles.length ? { externalLayoutFiles } : {}),
           },
         },
@@ -1807,12 +1967,19 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
         takeFields(layout, SCENE_LAYOUT_FIELDS),
         layoutObjectContext(layout.objects || [], project.objects || [])
       );
-      putEventsFile(
+      splitSceneLifecycleFunctions({
+        owner: layout,
+        baseSegments: ['scenes', folderName],
+        namespaceForFunction: (functionName, payload) => ({
+          scenes: {
+            [name]: {
+              functions: { [functionName]: payload },
+            },
+          },
+        }),
         files,
-        eventsUri,
-        layout.events || [],
-        options.eventsDslOptions
-      );
+        eventsDslOptions: options.eventsDslOptions,
+      });
     }
   );
 
@@ -2228,6 +2395,24 @@ const validateOwnedScenePaths = (settingsUri, entry) => {
   }
 };
 
+const validateOwnedV4ScenePath = (settingsUri, entry) => {
+  const settingsSegments = validateGameUri(settingsUri).split('/');
+  const folder = settingsSegments[1];
+  const layoutPath = validateGameUri(entry.layout);
+  if (
+    settingsSegments.length !== 3 ||
+    settingsSegments[0] !== 'scenes' ||
+    settingsSegments[2] !== 'scene.settings' ||
+    layoutPath !== `scenes/${folder}/${folder}.layout`
+  ) {
+    fail(
+      'MULTIFILE_INVALID_MANIFEST_PATH',
+      `Scene ${entry.name} must own its canonical layout in its scene folder.`,
+      settingsUri
+    );
+  }
+};
+
 const validateExtensionSettingsPath = entry => {
   const segments = validateGameUri(entry.settings).split('/');
   if (
@@ -2611,8 +2796,10 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     'gdevelop',
     MULTI_FILE_ENTRY_URI
   );
+  const formatVersion = gdevelop.combinedSettingsFormatVersion;
   if (
-    gdevelop.combinedSettingsFormatVersion !== MULTI_FILE_FORMAT_VERSION ||
+    (formatVersion !== LEGACY_MULTI_FILE_FORMAT_VERSION &&
+      formatVersion !== MULTI_FILE_FORMAT_VERSION) ||
     gdevelop.eventsDslVersion !== IFDO_EVENTS_DSL_COVERAGE.formatVersion ||
     (gdevelop.entry !== undefined && gdevelop.entry !== MULTI_FILE_ENTRY_URI)
   ) {
@@ -2628,7 +2815,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   );
   if (
     projectNamespace.kind !== 'project' ||
-    projectNamespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+    projectNamespace.settingsFormatVersion !== formatVersion
   ) {
     fail(
       'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2688,7 +2875,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         const payload = restoreTomlPayload(objectsNamespace[name], objectUri);
         if (
           payload.kind !== 'object' ||
-          payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+          payload.settingsFormatVersion !== formatVersion
         ) {
           fail(
             'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2782,7 +2969,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
         if (
           payload.kind !== 'function' ||
-          payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+          payload.settingsFormatVersion !== formatVersion
         ) {
           fail(
             'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2851,6 +3038,154 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     assertContiguousSettingsOrder(documents, `${label} function`);
     return documents;
   };
+  const readSceneLifecycleFunctionDocuments = ({
+    baseSegments,
+    namespacePath,
+    label,
+  }) => {
+    if (formatVersion !== MULTI_FILE_FORMAT_VERSION) return new Map();
+
+    const documentsByName = new Map();
+    Object.keys(files)
+      .filter(candidateUri => {
+        const segments = rawGameUriSegments(candidateUri);
+        return (
+          segments.length === baseSegments.length + 3 &&
+          baseSegments.every((segment, index) => segments[index] === segment) &&
+          segments[baseSegments.length] === 'functions' &&
+          segments[segments.length - 1] === 'function.settings'
+        );
+      })
+      .forEach(functionUri => {
+        registerUri(functionUri);
+        settingsUris.push(functionUri);
+        const segments = rawGameUriSegments(functionUri);
+        const physicalName = segments[segments.length - 2];
+        const document = parseSettings(files, functionUri);
+        const functionsNamespace = requireNamespace(
+          document,
+          namespacePath,
+          functionUri
+        );
+        const name = onlyNamespaceName(
+          functionsNamespace,
+          `${label}.functions`,
+          functionUri
+        );
+        if (
+          !SCENE_LIFECYCLE_FUNCTION_NAMES.has(name) ||
+          physicalName !== name
+        ) {
+          fail(
+            'MULTIFILE_IDENTITY_MISMATCH',
+            `Lifecycle function ${name} must use one of the four reserved physical directories.`,
+            functionUri
+          );
+        }
+        if (documentsByName.has(name)) {
+          fail(
+            'MULTIFILE_DUPLICATE_IDENTITY',
+            `Lifecycle function ${name} is declared more than once.`,
+            functionUri
+          );
+        }
+
+        const payload = restoreTomlPayload(
+          functionsNamespace[name],
+          functionUri
+        );
+        const definition = SCENE_LIFECYCLE_FUNCTION_DEFINITIONS.find(
+          candidate => candidate.name === name
+        );
+        if (!definition) {
+          fail(
+            'MULTIFILE_INVALID_SCHEMA',
+            `Unknown lifecycle function ${name}.`,
+            functionUri
+          );
+        }
+        const expectedEventsUri = `${functionUri.slice(
+          0,
+          -'function.settings'.length
+        )}${name}.events`;
+        const eventsUri = expectString(
+          payload.events,
+          `${label}.functions.${name}.events`,
+          functionUri
+        );
+        const expectedMetadata = lifecycleFunctionSettingsPayload(
+          definition,
+          expectedEventsUri
+        );
+        const comparablePayload = omitFields(payload, new Set(['events']));
+        const comparableExpected = omitFields(
+          expectedMetadata,
+          new Set(['events'])
+        );
+        if (
+          eventsUri !== expectedEventsUri ||
+          JSON.stringify(canonicalValue(comparablePayload)) !==
+            JSON.stringify(canonicalValue(comparableExpected))
+        ) {
+          fail(
+            'MULTIFILE_IDENTITY_MISMATCH',
+            `Lifecycle function ${name} metadata or source path does not match its fixed registry definition.`,
+            functionUri
+          );
+        }
+        registerUri(eventsUri);
+        documentsByName.set(name, {
+          name,
+          definition,
+          uri: functionUri,
+          eventsUri,
+          document,
+        });
+      });
+
+    if (!documentsByName.has('sceneUpdate')) {
+      fail(
+        'MULTIFILE_MISSING_FILE',
+        `${label} must contain the required sceneUpdate lifecycle function.`,
+        encodeUriPath([
+          ...baseSegments,
+          'functions',
+          'sceneUpdate',
+          'function.settings',
+        ])
+      );
+    }
+    return documentsByName;
+  };
+  const compileSceneLifecycleBodies = (documentsByName, label) => {
+    const legacyBodies = {};
+    SCENE_LIFECYCLE_FUNCTION_DEFINITIONS.forEach(definition => {
+      const document = documentsByName.get(definition.name);
+      if (!document) return;
+      const events = compileEvents(files, document.eventsUri, options);
+      if (
+        definition.name !== 'sceneUpdate' &&
+        !options.skipEventsCompilation &&
+        events.length === 0
+      ) {
+        fail(
+          'MULTIFILE_INVALID_LOCAL_SETTINGS',
+          `${label} must omit an empty optional ${
+            definition.name
+          } lifecycle function directory.`,
+          document.uri
+        );
+      }
+      legacyBodies[definition.legacyField] = events;
+    });
+    if (legacyBodies.events === undefined) {
+      fail(
+        'MULTIFILE_MISSING_FILE',
+        `${label} has no sceneUpdate events body.`
+      );
+    }
+    return legacyBodies;
+  };
   const projectObjectDocuments = readObjectDocuments({
     baseSegments: ['objects'],
     namespacePath: ['project', 'objects'],
@@ -2877,7 +3212,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
     if (
       resourcesPayload.kind !== 'resources' ||
-      resourcesPayload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+      resourcesPayload.settingsFormatVersion !== formatVersion
     ) {
       fail(
         'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2901,6 +3236,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   );
   let sceneDocuments;
   if (legacySceneEntries.length) {
+    if (formatVersion === MULTI_FILE_FORMAT_VERSION) {
+      fail(
+        'MULTIFILE_INVALID_LOCAL_SETTINGS',
+        'Version 4 projects discover scene settings from physical directories.',
+        MULTI_FILE_ENTRY_URI
+      );
+    }
     assertUniqueManifestNames(
       legacySceneEntries,
       'project.sceneFiles',
@@ -2939,7 +3281,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
         if (
           namespace.kind !== 'scene' ||
-          namespace.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+          namespace.settingsFormatVersion !== formatVersion
         ) {
           fail(
             'MULTIFILE_UNSUPPORTED_VERSION',
@@ -2951,9 +3293,25 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           name,
           order: readSettingsOrder(namespace, `scenes.${name}`, uri),
           layout: expectString(namespace.layout, 'scene.layout', uri),
-          events: expectString(namespace.events, 'scene.events', uri),
+          ...(formatVersion === LEGACY_MULTI_FILE_FORMAT_VERSION
+            ? { events: expectString(namespace.events, 'scene.events', uri) }
+            : {}),
         };
-        validateOwnedScenePaths(uri, entry);
+        if (formatVersion === LEGACY_MULTI_FILE_FORMAT_VERSION) {
+          validateOwnedScenePaths(uri, entry);
+        } else {
+          if (
+            namespace.events !== undefined ||
+            namespace.externalEventFiles !== undefined
+          ) {
+            fail(
+              'MULTIFILE_INVALID_LOCAL_SETTINGS',
+              'Version 4 scene settings must not own events or externalEventFiles.',
+              uri
+            );
+          }
+          validateOwnedV4ScenePath(uri, entry);
+        }
         return { entry, uri, document };
       })
       .sort((left, right) => left.entry.order - right.entry.order);
@@ -2972,22 +3330,24 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       requireNamespace(document, ['scenes', sceneEntry.name], uri),
       uri
     );
-    asArray(
-      namespace.externalEventFiles,
-      `scenes.${sceneEntry.name}.externalEventFiles`,
-      uri
-    ).forEach((rawEntry, index) => {
-      const label = `scenes.${sceneEntry.name}.externalEventFiles[${index}]`;
-      const entry = validateSceneOwnedExternalEntry(rawEntry, label, uri);
-      const sourceUri = expectString(entry.events, `${label}.events`, uri);
-      validateExternalSourceUri(uri, sourceUri, '.events', entry.name);
-      externalEventDocuments.push({
-        entry,
-        uri,
-        sourceUri,
-        sceneName: sceneEntry.name,
+    if (formatVersion === LEGACY_MULTI_FILE_FORMAT_VERSION) {
+      asArray(
+        namespace.externalEventFiles,
+        `scenes.${sceneEntry.name}.externalEventFiles`,
+        uri
+      ).forEach((rawEntry, index) => {
+        const label = `scenes.${sceneEntry.name}.externalEventFiles[${index}]`;
+        const entry = validateSceneOwnedExternalEntry(rawEntry, label, uri);
+        const sourceUri = expectString(entry.events, `${label}.events`, uri);
+        validateExternalSourceUri(uri, sourceUri, '.events', entry.name);
+        externalEventDocuments.push({
+          entry,
+          uri,
+          sourceUri,
+          sceneName: sceneEntry.name,
+        });
       });
-    });
+    }
     asArray(
       namespace.externalLayoutFiles,
       `scenes.${sceneEntry.name}.externalLayoutFiles`,
@@ -3005,6 +3365,105 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       });
     });
   });
+  if (formatVersion === MULTI_FILE_FORMAT_VERSION) {
+    Object.keys(files)
+      .filter(uri =>
+        /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\/external-events\.settings$/.test(
+          uri
+        )
+      )
+      .forEach(uri => {
+        registerUri(uri);
+        settingsUris.push(uri);
+        const segments = rawGameUriSegments(uri);
+        const owningSceneDocument = sceneDocuments.find(
+          sceneDocument =>
+            rawGameUriSegments(sceneDocument.uri)[1] === segments[1]
+        );
+        if (!owningSceneDocument) {
+          fail(
+            'MULTIFILE_EXTERNAL_SCENE_REQUIRED',
+            'External Events settings must be stored below an existing scene.',
+            uri
+          );
+        }
+        const sceneName = owningSceneDocument.entry.name;
+        const document = parseSettings(files, uri);
+        const externalEventsNamespace = requireNamespace(
+          document,
+          ['scenes', segments[1], 'externalEvents'],
+          uri
+        );
+        const name = onlyNamespaceName(
+          externalEventsNamespace,
+          `scenes.${sceneName}.externalEvents`,
+          uri
+        );
+        const payload = restoreTomlPayload(externalEventsNamespace[name], uri);
+        if (
+          payload.kind !== 'externalEvents' ||
+          payload.settingsFormatVersion !== formatVersion
+        ) {
+          fail(
+            'MULTIFILE_UNSUPPORTED_VERSION',
+            'Invalid External Events namespace marker.',
+            uri
+          );
+        }
+        const forbiddenFields = [
+          'associatedLayout',
+          'linkedScene',
+          'unresolvedScene',
+          'events',
+          'externalEventFiles',
+          'functionFiles',
+        ];
+        if (forbiddenFields.some(field => payload[field] !== undefined)) {
+          fail(
+            'MULTIFILE_INVALID_LOCAL_SETTINGS',
+            'External Events owner settings must derive association and function ownership from its physical path.',
+            uri
+          );
+        }
+        const expectedDirectoryNames = [
+          decodeURIComponent(encodeManagedName(name)),
+          `${decodeURIComponent(encodeManagedName(name))}~${stableHash8(name)}`,
+        ];
+        if (!expectedDirectoryNames.includes(segments[3])) {
+          fail(
+            'MULTIFILE_IDENTITY_MISMATCH',
+            `External Events ${name} must use its canonical managed owner directory.`,
+            uri
+          );
+        }
+        const entry = {
+          ...payload,
+          name,
+          order: readSettingsOrder(
+            payload,
+            `scenes.${sceneName}.externalEvents.${name}`,
+            uri
+          ),
+        };
+        validateManifestIdentity(entry, payload, uri);
+        externalEventDocuments.push({
+          entry,
+          uri,
+          sceneName,
+          lifecycleFunctionDocuments: readSceneLifecycleFunctionDocuments({
+            baseSegments: segments.slice(0, -1),
+            namespacePath: [
+              'scenes',
+              segments[1],
+              'externalEvents',
+              segments[3],
+              'functions',
+            ],
+            label: `scenes.${sceneName}.externalEvents.${name}`,
+          }),
+        });
+      });
+  }
   externalEventDocuments.sort(
     (left, right) => left.entry.order - right.entry.order
   );
@@ -3030,6 +3489,11 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       objectDocuments: readObjectDocuments({
         baseSegments: [sceneSegments[0], sceneSegments[1], 'objects'],
         namespacePath: ['scenes', sceneDocument.entry.name, 'objects'],
+        label: `scenes.${sceneDocument.entry.name}`,
+      }),
+      lifecycleFunctionDocuments: readSceneLifecycleFunctionDocuments({
+        baseSegments: [sceneSegments[0], sceneSegments[1]],
+        namespacePath: ['scenes', sceneSegments[1], 'functions'],
         label: `scenes.${sceneDocument.entry.name}`,
       }),
     };
@@ -3137,7 +3601,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
             );
             if (
               payload.kind !== childKind.kind ||
-              payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+              payload.settingsFormatVersion !== formatVersion
             ) {
               fail(
                 'MULTIFILE_UNSUPPORTED_VERSION',
@@ -3217,7 +3681,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         const payload = restoreTomlPayload(namespace, uri);
         if (
           payload.kind !== 'extension' ||
-          payload.settingsFormatVersion !== MULTI_FILE_FORMAT_VERSION
+          payload.settingsFormatVersion !== formatVersion
         ) {
           fail(
             'MULTIFILE_UNSUPPORTED_VERSION',
@@ -3353,7 +3817,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
   });
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\/function\.settings|externals\/[^/]+\/(?:external-events\.settings|functions\/[^/]+\/function\.settings))|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\/function\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings|variants\/[^/]+\/objects\/(?:[^/]+\/)*[^/]+\.settings)|behaviors\/[^/]+\/(?:behavior\.settings|functions\/(?:[^/]+\/)*[^/]+\/function\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -3365,6 +3829,20 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
       }
     });
+  if (formatVersion === MULTI_FILE_FORMAT_VERSION) {
+    const legacyOwnedEventsUri = Object.keys(files).find(
+      uri =>
+        /^game:\/\/scenes\/[^/]+\/[^/]+\.events$/.test(uri) ||
+        /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\.events$/.test(uri)
+    );
+    if (legacyOwnedEventsUri) {
+      fail(
+        'MULTIFILE_OWNERSHIP_CONFLICT',
+        'Version 4 projects must not mix legacy flat events sources with lifecycle function directories.',
+        legacyOwnedEventsUri
+      );
+    }
+  }
 
   // Local documents are mounted by physical path, then merged strictly.
   // Duplicate scalar/array ownership is always an error.
@@ -3393,7 +3871,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   }
   project.constants = constantsPayload;
   project.layouts = sceneDocuments.map(
-    ({ entry, uri, document, objectDocuments }) => {
+    ({ entry, uri, document, objectDocuments, lifecycleFunctionDocuments }) => {
       const namespace = restoreTomlPayload(
         requireNamespace(document, ['scenes', entry.name], uri),
         uri
@@ -3422,9 +3900,6 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       const layoutUri = registerUri(
         expectString(entry.layout, 'scene.layout', uri)
       );
-      const eventsUri = registerUri(
-        expectString(entry.events, 'scene.events', uri)
-      );
       const layout = readLayout(files, layoutUri, 'gdevelop-scene-layout', {
         ...layoutObjectContext(
           objects,
@@ -3441,6 +3916,19 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           );
         }
       });
+      const lifecycleBodies =
+        formatVersion === MULTI_FILE_FORMAT_VERSION
+          ? compileSceneLifecycleBodies(
+              lifecycleFunctionDocuments,
+              `Scene ${entry.name}`
+            )
+          : {
+              events: compileEvents(
+                files,
+                registerUri(expectString(entry.events, 'scene.events', uri)),
+                options
+              ),
+            };
       return {
         ...settings,
         objects,
@@ -3448,18 +3936,42 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           objectDocuments
         ),
         ...layout,
-        events: compileEvents(files, eventsUri, options),
+        ...lifecycleBodies,
       };
     }
   );
 
   project.externalEvents = externalEventDocuments.map(
-    ({ entry, sourceUri, sceneName }) => ({
-      ...omitFields(entry, new Set(['name', 'order', 'events'])),
-      name: entry.name,
-      associatedLayout: sceneName,
-      events: compileEvents(files, registerUri(sourceUri), options),
-    })
+    ({ entry, uri, sourceUri, sceneName, lifecycleFunctionDocuments }) => {
+      const metadata =
+        formatVersion === MULTI_FILE_FORMAT_VERSION
+          ? removeFormatFields(entry)
+          : entry;
+      const lifecycleBodies =
+        formatVersion === MULTI_FILE_FORMAT_VERSION
+          ? compileSceneLifecycleBodies(
+              lifecycleFunctionDocuments,
+              `External Events ${entry.name}`
+            )
+          : {
+              events: compileEvents(
+                files,
+                registerUri(
+                  expectString(sourceUri, 'external events URI', uri)
+                ),
+                options
+              ),
+            };
+      return {
+        ...omitFields(
+          metadata,
+          new Set(['name', 'order', 'events', 'functions'])
+        ),
+        name: entry.name,
+        associatedLayout: sceneName,
+        ...lifecycleBodies,
+      };
+    }
   );
   project.externalLayouts = externalLayoutDocuments.map(
     ({ entry, uri, sourceUri, sceneName }) => {
@@ -3739,6 +4251,16 @@ export const normalizeLegacyProjectForMultiFile = (
   project.eventsFunctionsExtensions = project.eventsFunctionsExtensions || [];
   project.layouts.forEach(layout => {
     layout.events = parseLegacyEventsJson(JSON.stringify(layout.events || []));
+    ['sceneLoadEvents', 'sceneSignalEvents', 'sceneUnloadEvents'].forEach(
+      field => {
+        if (layout[field] !== undefined) {
+          layout[field] = parseLegacyEventsJson(
+            JSON.stringify(layout[field] || [])
+          );
+          if (!layout[field].length) delete layout[field];
+        }
+      }
+    );
     normalizeLayoutFragment(layout, 'uiSettings');
   });
   project.externalLayouts.forEach(external =>
@@ -3747,6 +4269,16 @@ export const normalizeLegacyProjectForMultiFile = (
   project.externalEvents.forEach(external => {
     external.events = parseLegacyEventsJson(
       JSON.stringify(external.events || [])
+    );
+    ['sceneLoadEvents', 'sceneSignalEvents', 'sceneUnloadEvents'].forEach(
+      field => {
+        if (external[field] !== undefined) {
+          external[field] = parseLegacyEventsJson(
+            JSON.stringify(external[field] || [])
+          );
+          if (!external[field].length) delete external[field];
+        }
+      }
     );
   });
   project.eventsFunctionsExtensions.forEach(extension => {

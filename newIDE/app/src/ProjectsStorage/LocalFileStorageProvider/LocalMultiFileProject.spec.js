@@ -123,7 +123,12 @@ describe('Local multi-file project storage', () => {
       '[project.constants'
     );
     expect(
-      fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+        )
+      )
     ).toBe(true);
     expect(
       areLegacyProjectsEquivalent(
@@ -159,13 +164,21 @@ describe('Local multi-file project storage', () => {
       'scenes/Main/scene.settings'
     );
     const sceneSettings = fs.readFileSync(sceneSettingsPath, 'utf8');
-    expect(sceneSettings).toContain('[[externalEventFiles]]');
+    expect(sceneSettings).not.toContain('externalEventFiles');
     expect(sceneSettings).toContain('[[externalLayoutFiles]]');
     expect(
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat.events'
+          'scenes/Main/externals/Shared Combat/external-events.settings'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/externals/Shared Combat/functions/sceneUpdate/sceneUpdate.events'
         )
       )
     ).toBe(true);
@@ -247,7 +260,7 @@ describe('Local multi-file project storage', () => {
     fs.writeFileSync(sceneSettingsPath, sceneSource, 'utf8');
     const untouchedEventsPath = path.join(
       temporaryDirectory,
-      'scenes/Main/Main.events'
+      'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
     );
     const untouchedEvents = fs.readFileSync(untouchedEventsPath, 'utf8');
 
@@ -310,7 +323,7 @@ describe('Local multi-file project storage', () => {
   test('loads named IfDo instructions through the generated catalog', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
-    files['game://scenes/Main/Main.events'] =
+    files['game://scenes/Main/functions/sceneUpdate/sceneUpdate.events'] =
       '@event\ndo Network::Send url="https://example.com"\n';
     await writeMultiFileSourceTree({ entryPath, files });
     const catalog = {
@@ -376,8 +389,9 @@ describe('Local multi-file project storage', () => {
       ...serializeToJSObject(project),
       constants: {},
     });
-    files[`game://scenes/${sceneName}/${sceneName}.events`] =
-      '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
+    files[
+      `game://scenes/${sceneName}/functions/sceneUpdate/sceneUpdate.events`
+    ] = '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
     project.delete();
     await writeMultiFileSourceTree({ entryPath, files });
 
@@ -867,11 +881,17 @@ describe('Local multi-file project storage', () => {
       expect.arrayContaining([
         'game://scenes/Main/scene.settings',
         'game://scenes/Main/Main.layout',
-        'game://scenes/Main/Main.events',
+        'game://scenes/Main/functions/sceneUpdate/function.settings',
+        'game://scenes/Main/functions/sceneUpdate/sceneUpdate.events',
       ])
     );
     expect(
-      fs.existsSync(path.join(temporaryDirectory, 'scenes/Main/Main.events'))
+      fs.existsSync(
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+        )
+      )
     ).toBe(false);
     expect(fs.readFileSync(userFile, 'utf8')).toBe('keep me');
     expect(fs.existsSync(path.dirname(userFile))).toBe(true);
@@ -1187,22 +1207,25 @@ describe('Local multi-file project storage', () => {
       )
     ).toBe(true);
     expect(
-      persistedSettingsCatalog.fileKinds
-        .find(fileKind => fileKind.kind === 'scene')
-        .schema.childTables.find(table => table.table === 'externalEventFiles')
-        .fields
+      persistedSettingsCatalog.fileKinds.find(
+        fileKind => fileKind.kind === 'scene-lifecycle-function'
+      )
     ).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: 'order', required: true }),
-        expect.objectContaining({ name: 'events', required: true }),
-      ])
+      expect.objectContaining({
+        path: 'scenes/<Scene>/functions/<Role>/function.settings',
+        requiredFields: expect.arrayContaining([
+          'order',
+          'events',
+          'lifecycleRole',
+        ]),
+      })
     );
     expect(
       persistedSettingsCatalog.fileKinds.some(
         fileKind => fileKind.kind === 'externals'
       )
     ).toBe(false);
-    expect(settingsCatalog.counts.fileKinds).toBe(13);
+    expect(settingsCatalog.counts.fileKinds).toBe(16);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
     expect(layoutCatalog.contexts).toEqual(
@@ -1473,7 +1496,10 @@ column2 = "333"
       );
 
       const eventsSource = fs.readFileSync(
-        path.join(temporaryDirectory, 'scenes/Main/Main.events'),
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+        ),
         'utf8'
       );
       expect(eventsSource).toContain(
@@ -1563,7 +1589,10 @@ column2 = "333"
       );
 
       const eventsSource = fs.readFileSync(
-        path.join(temporaryDirectory, 'scenes/Main/Main.events'),
+        path.join(
+          temporaryDirectory,
+          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+        ),
         'utf8'
       );
       expect(eventsSource).toContain('do "Physics2::Remove joint"');
@@ -1740,7 +1769,11 @@ column2 = "333"
       true
     );
     expect(fs.existsSync(path.join(sceneDirectory, 'Game.layout'))).toBe(true);
-    expect(fs.existsSync(path.join(sceneDirectory, 'Game.events'))).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(sceneDirectory, 'functions/sceneUpdate/sceneUpdate.events')
+      )
+    ).toBe(true);
     project.delete();
   });
 

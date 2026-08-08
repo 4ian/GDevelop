@@ -312,13 +312,9 @@ const discoverOwnedSettingsUris = async (
       if (!entry.isDirectory()) continue;
       const sceneSegment = physicalNameToGameUriSegment(entry.name);
       const sceneRoot = path.join(scenesRoot, entry.name);
-      const filePath = path.join(sceneRoot, 'scene.settings');
-      if (fs.existsSync(filePath)) {
-        discovered.push(`game://scenes/${sceneSegment}/scene.settings`);
-      }
       await discoverSettingsFilesRecursively(
-        path.join(sceneRoot, 'objects'),
-        ['scenes', sceneSegment, 'objects'],
+        sceneRoot,
+        ['scenes', sceneSegment],
         discovered
       );
     }

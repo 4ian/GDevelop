@@ -4,6 +4,29 @@
  */
 
 describe('gdjs.RuntimeScene integration tests', function () {
+  describe('Scene unload lifecycle', function () {
+    it('runs once, guards re-entry and completes teardown after an error', function () {
+      const runtimeScene = new gdjs.TestRuntimeScene(
+        gdjs.getPixiRuntimeGame()
+      );
+      runtimeScene._isLoaded = true;
+      let calls = 0;
+      runtimeScene._sceneUnloadLifecycleFunction = scene => {
+        calls++;
+        expect(scene._isLoaded).to.be(true);
+        scene.unloadScene();
+        throw new Error('Expected author event failure');
+      };
+
+      runtimeScene.unloadScene();
+      runtimeScene.unloadScene();
+
+      expect(calls).to.be(1);
+      expect(runtimeScene._isLoaded).to.be(false);
+      expect(runtimeScene._sceneUnloadLifecycleFunction).to.be(null);
+    });
+  });
+
   describe('Debug draw', function () {
     it('should follow the project collision mask display setting', function () {
       const runtimeGame = gdjs.getPixiRuntimeGame({

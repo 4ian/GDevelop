@@ -67,6 +67,13 @@ export enum CustomObjectConfiguration_EdgeAnchor {
   Center = 4,
 }
 
+export enum SceneLifecycleEventsFunctions_Role {
+  SceneLoad = 0,
+  SceneSignal = 1,
+  SceneUpdate = 2,
+  SceneUnload = 3,
+}
+
 export enum ResourcesContainer_SourceType {
   Unknown = 0,
   Global = 1,
@@ -737,6 +744,9 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getScopeFunctionName(): string;
   getScopeBehaviorName(): string;
   getScopeObjectName(): string;
+  getScopeSceneLifecycleFunctionName(): string;
+  setScopeExternalEventsName(externalEventsName: string): ProjectScopedContainers;
+  setScopeSceneLifecycleFunctionName(lifecycleFunctionName: string): ProjectScopedContainers;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -884,6 +894,17 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
 }
 
+export class SceneLifecycleEventsFunctions extends EmscriptenObject {
+  get(role: SceneLifecycleEventsFunctions_Role): EventsFunction;
+  getByName(name: string): EventsFunction;
+  hasRoleName(name: string): boolean;
+  hasValidMetadata(): boolean;
+  getSceneLoadFunction(): EventsFunction;
+  getSceneSignalFunction(): EventsFunction;
+  getSceneUpdateFunction(): EventsFunction;
+  getSceneUnloadFunction(): EventsFunction;
+}
+
 export class Layout extends EmscriptenObject {
   constructor();
   setName(name: string): void;
@@ -898,6 +919,7 @@ export class Layout extends EmscriptenObject {
   getVariables(): VariablesContainer;
   getObjects(): ObjectsContainer;
   getEvents(): EventsList;
+  getLifecycleEventsFunctions(): SceneLifecycleEventsFunctions;
   getLayers(): LayersContainer;
   updateBehaviorsSharedData(project: Project): void;
   getAllBehaviorSharedDataNames(): VectorString;
@@ -930,6 +952,7 @@ export class ExternalEvents extends EmscriptenObject {
   getAssociatedLayout(): string;
   setAssociatedLayout(name: string): void;
   getEvents(): EventsList;
+  getLifecycleEventsFunctions(): SceneLifecycleEventsFunctions;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -1530,6 +1553,9 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
+  requiresSceneFutureFrame(): boolean;
+  emitsDeferredSceneSignal(): boolean;
+  mutatesSceneStack(): boolean;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -1542,6 +1568,9 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   setRelevantForFunctionEventsOnly(): InstructionMetadata;
   setRelevantForAsynchronousFunctionEventsOnly(): InstructionMetadata;
   setRelevantForCustomObjectEventsOnly(): InstructionMetadata;
+  setRequiresSceneFutureFrame(): InstructionMetadata;
+  setEmitsDeferredSceneSignal(): InstructionMetadata;
+  setMutatesSceneStack(): InstructionMetadata;
   addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): InstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
   setDefaultValue(defaultValue: string): InstructionMetadata;

@@ -19,6 +19,9 @@ declare class gdProjectScopedContainers {
   getScopeFunctionName(): string;
   getScopeBehaviorName(): string;
   getScopeObjectName(): string;
+  getScopeSceneLifecycleFunctionName(): string;
+  setScopeExternalEventsName(externalEventsName: string): gdProjectScopedContainers;
+  setScopeSceneLifecycleFunctionName(lifecycleFunctionName: string): gdProjectScopedContainers;
   delete(): void;
   ptr: number;
 };

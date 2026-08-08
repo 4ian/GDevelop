@@ -38,8 +38,35 @@ SceneExtension::SceneExtension() {
       "gdjs.evtTools.signal.subscribeSceneSignal");
   GetAllStrExpressions()["SignalName"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalName");
+  GetAllStrExpressions()["SignalName"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        if (context.IsInsideAsync()) {
+          return gd::String("asyncObjectsList.getSceneSignalName()");
+        }
+        if (codeGenerator.GetSceneLifecycleFunctionRole() == "sceneSignal") {
+          return codeGenerator.GetCodeNamespaceAccessor() +
+                 "sceneSignalName";
+        }
+        return gd::String("gdjs.evtTools.signal.getSignalName(runtimeScene)");
+      });
   GetAllStrExpressions()["SignalPayload"].SetFunctionName(
       "gdjs.evtTools.signal.getSignalPayload");
+  GetAllStrExpressions()["SignalPayload"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        if (context.IsInsideAsync()) {
+          return gd::String("asyncObjectsList.getSceneSignalPayload()");
+        }
+        if (codeGenerator.GetSceneLifecycleFunctionRole() == "sceneSignal") {
+          return codeGenerator.GetCodeNamespaceAccessor() +
+                 "sceneSignalPayload";
+        }
+        return gd::String(
+            "gdjs.evtTools.signal.getSignalPayload(runtimeScene)");
+      });
   GetAllActions()["SceneBackground"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.setBackgroundColor");
   GetAllActions()["Scene"].SetFunctionName(

@@ -8,6 +8,7 @@
 #include "VariablesContainersList.h"
 #include "ResourcesContainersList.h"
 #include "VariablesContainer.h"
+#include "SceneLifecycleEventsFunctions.h"
 
 namespace gd {
 class Project;
@@ -281,6 +282,84 @@ class ProjectScopedContainers {
   };
 
   /**
+   * \brief Return true when this scope is visiting a scene lifecycle function.
+   *
+   * Lifecycle-neutral event functions deliberately have no role. Callers that
+   * need the legacy Link behavior may use GetScopeSceneLifecycleFunctionRole,
+   * which returns SceneUpdate when no explicit role is set.
+   */
+  bool HasScopeSceneLifecycleFunctionRole() const {
+    return hasScopeSceneLifecycleFunctionRole;
+  }
+
+  /**
+   * \brief Return the lifecycle role in scope.
+   *
+   * SceneUpdate is returned for lifecycle-neutral scopes for backward
+   * compatibility with ordinary Events Functions and legacy callers.
+   */
+  gd::SceneLifecycleFunctionRole GetScopeSceneLifecycleFunctionRole() const {
+    return scopeSceneLifecycleFunctionRole;
+  }
+
+  /**
+   * \brief Return the canonical lifecycle role name, or an empty string when
+   * the current scope is lifecycle-neutral.
+   *
+   * This string accessor is intentionally exposed to editor diagnostics and
+   * navigation. Native code that branches on the role should keep using the
+   * enum accessor above.
+   */
+  gd::String GetScopeSceneLifecycleFunctionName() const {
+    if (!hasScopeSceneLifecycleFunctionRole) return "";
+
+    switch (scopeSceneLifecycleFunctionRole) {
+      case gd::SceneLifecycleFunctionRole::SceneLoad:
+        return "sceneLoad";
+      case gd::SceneLifecycleFunctionRole::SceneSignal:
+        return "sceneSignal";
+      case gd::SceneLifecycleFunctionRole::SceneUpdate:
+        return "sceneUpdate";
+      case gd::SceneLifecycleFunctionRole::SceneUnload:
+        return "sceneUnload";
+    }
+    return "";
+  }
+
+  /**
+   * \brief Set the lifecycle role for the events currently being visited.
+   */
+  ProjectScopedContainers &SetScopeSceneLifecycleFunctionRole(
+      gd::SceneLifecycleFunctionRole role) {
+    scopeSceneLifecycleFunctionRole = role;
+    hasScopeSceneLifecycleFunctionRole = true;
+    return *this;
+  }
+
+  /**
+   * \brief Set the lifecycle role from its canonical serialized name.
+   *
+   * This binding-friendly overload is intended for editor tools that validate
+   * an isolated lifecycle events list outside a whole-project traversal.
+   */
+  ProjectScopedContainers &SetScopeSceneLifecycleFunctionName(
+      const gd::String &name) {
+    if (name == "sceneLoad")
+      return SetScopeSceneLifecycleFunctionRole(
+          gd::SceneLifecycleFunctionRole::SceneLoad);
+    if (name == "sceneSignal")
+      return SetScopeSceneLifecycleFunctionRole(
+          gd::SceneLifecycleFunctionRole::SceneSignal);
+    if (name == "sceneUpdate")
+      return SetScopeSceneLifecycleFunctionRole(
+          gd::SceneLifecycleFunctionRole::SceneUpdate);
+    if (name == "sceneUnload")
+      return SetScopeSceneLifecycleFunctionRole(
+          gd::SceneLifecycleFunctionRole::SceneUnload);
+    return *this;
+  }
+
+  /**
    * \brief Return the name of the extension in scope, or an empty string if
    * the scope is not an extension function.
    */
@@ -334,6 +413,9 @@ private:
   gd::String scopeFunctionName;
   gd::String scopeBehaviorName;
   gd::String scopeObjectName;
+  gd::SceneLifecycleFunctionRole scopeSceneLifecycleFunctionRole =
+      gd::SceneLifecycleFunctionRole::SceneUpdate;
+  bool hasScopeSceneLifecycleFunctionRole = false;
 };
 
 }  // namespace gd

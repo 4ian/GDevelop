@@ -773,6 +773,9 @@ const MainFrame = (props: Props): React.MixedElement => {
         const unconditionedActionErrors = validationErrors.filter(
           error => error.type === 'unconditioned-action'
         );
+        const lifecycleIncompatibleErrors = validationErrors.filter(
+          error => error.type === 'lifecycle-incompatible'
+        );
         const mustBlockForInvalidConstantPlaceholder = hasInvalidConstantPlaceholderValidationError(
           validationErrors
         );
@@ -780,10 +783,13 @@ const MainFrame = (props: Props): React.MixedElement => {
           unsafeExternalLayoutCreationErrors.length > 0;
         const mustBlockForUnconditionedActions =
           unconditionedActionErrors.length > 0;
+        const mustBlockForLifecycleIncompatibilities =
+          lifecycleIncompatibleErrors.length > 0;
         const mustBlockForSpecificValidationErrors =
           mustBlockForInvalidConstantPlaceholder ||
           mustBlockForUnsafeExternalLayoutCreation ||
-          mustBlockForUnconditionedActions;
+          mustBlockForUnconditionedActions ||
+          mustBlockForLifecycleIncompatibilities;
 
         if (mustBlockForInvalidConstantPlaceholder) {
           setDiagnosticReportDialogOpen(true);
@@ -798,6 +804,8 @@ const MainFrame = (props: Props): React.MixedElement => {
             ? t`External layout action needs a condition`
             : mustBlockForUnconditionedActions
             ? t`Action needs a condition`
+            : mustBlockForLifecycleIncompatibilities
+            ? t`Invalid scene lifecycle event`
             : t`Diagnostic errors found`;
           const message = mustBlockForUnsafeExternalLayoutCreation
             ? actionType === 'preview'
@@ -807,6 +815,10 @@ const MainFrame = (props: Props): React.MixedElement => {
             ? actionType === 'preview'
               ? t`This preview cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before launching a preview.`
               : t`This export cannot run because one or more events have actions without any enabled condition, so they would run every frame. Add a condition, for example "At the beginning of the scene", before exporting.`
+            : mustBlockForLifecycleIncompatibilities
+            ? actionType === 'preview'
+              ? t`This preview cannot run because one or more events are not allowed in their scene lifecycle function. Open the diagnostic report to move or replace them.`
+              : t`This export cannot run because one or more events are not allowed in their scene lifecycle function. Open the diagnostic report to move or replace them.`
             : actionType === 'preview'
             ? t`Your project has ${
                 validationErrors.length
@@ -1303,9 +1315,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       if (previewLaunchId != null || previewLaunchInProgressRef.current) {
         console.warn(
           'Resetting preview launch state' +
-            (previewLaunchId == null
-              ? ''
-              : ' for launch #' + previewLaunchId) +
+            (previewLaunchId == null ? '' : ' for launch #' + previewLaunchId) +
             ' because ' +
             reason +
             '.'
@@ -3912,8 +3922,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             captureOptions,
             onCaptureFinished,
 
-            isLaunchCancelled: () =>
-              isPreviewLaunchCancelled(previewLaunchId),
+            isLaunchCancelled: () => isPreviewLaunchCancelled(previewLaunchId),
 
             // Preview launchers can do asynchronous setup before they start
             // writing the shared preview output. Keep the launch in the
@@ -9095,11 +9104,16 @@ const MainFrame = (props: Props): React.MixedElement => {
           project={currentProject}
           wholeProjectDiagnosticReport={currentProject.getWholeProjectDiagnosticReport()}
           onClose={() => setDiagnosticReportDialogOpen(false)}
-          onNavigateToLayoutEvent={(layoutName, eventPath) => {
+          onNavigateToLayoutEvent={(
+            layoutName,
+            eventPath,
+            lifecycleFunctionName
+          ) => {
             setPendingEventNavigation({
               name: layoutName,
               locationType: 'layout',
               eventPath,
+              lifecycleFunctionName,
             });
             openLayout(layoutName, {
               openEventsEditor: true,
@@ -9107,11 +9121,16 @@ const MainFrame = (props: Props): React.MixedElement => {
               focusWhenOpened: 'events',
             });
           }}
-          onNavigateToExternalEventsEvent={(externalEventsName, eventPath) => {
+          onNavigateToExternalEventsEvent={(
+            externalEventsName,
+            eventPath,
+            lifecycleFunctionName
+          ) => {
             setPendingEventNavigation({
               name: externalEventsName,
               locationType: 'external-events',
               eventPath,
+              lifecycleFunctionName,
             });
             openExternalEvents(externalEventsName);
           }}

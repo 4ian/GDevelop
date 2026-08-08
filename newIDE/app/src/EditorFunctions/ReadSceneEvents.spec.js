@@ -58,4 +58,28 @@ describe('read_scene_events', () => {
     // No partial rendering failure is reported.
     expect(result.eventsRenderingErrors).toBeUndefined();
   });
+
+  it('reads only the requested lifecycle function', async () => {
+    testScene
+      .getLifecycleEventsFunctions()
+      .getByName('sceneSignal')
+      .getEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.read_scene_events.launchFunction(
+      {
+        ...makeFakeLaunchFunctionOptionsWithProject(project),
+        args: {
+          scene_name: 'TestScene',
+          lifecycle_function_name: 'sceneSignal',
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.lifecycleFunctionName).toBe('sceneSignal');
+    expect(result.lifecycleFunctionLabel).toBe('On scene signal');
+    expect(result.eventsAsText).toContain('<event-0>');
+    expect(testScene.getEvents().getEventsCount()).toBe(0);
+  });
 });

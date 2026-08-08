@@ -17,6 +17,156 @@ describe('EventsValidationScanner', () => {
       expect(Array.isArray(errors)).toBe(true);
     });
 
+    describe('scene lifecycle functions', () => {
+      const addCondition = (
+        project: gdProject,
+        events: gdEventsList,
+        type: string,
+        parameters: Array<string>
+      ) => {
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          events.getEventsCount()
+        );
+        const condition = new gd.Instruction();
+        condition.setType(type);
+        condition.setParametersCount(parameters.length);
+        parameters.forEach((parameter, index) =>
+          condition.setParameter(index, parameter)
+        );
+        gd.asStandardEvent(event)
+          .getConditions()
+          .insert(condition, 0);
+        condition.delete();
+      };
+
+      const addAction = (
+        project: gdProject,
+        events: gdEventsList,
+        type: string,
+        parameters: Array<string>
+      ) => {
+        const event = events.insertNewEvent(
+          project,
+          'BuiltinCommonInstructions::Standard',
+          events.getEventsCount()
+        );
+        const action = new gd.Instruction();
+        action.setType(type);
+        action.setParametersCount(parameters.length);
+        parameters.forEach((parameter, index) =>
+          action.setParameter(index, parameter)
+        );
+        gd.asStandardEvent(event)
+          .getActions()
+          .insert(action, 0);
+        action.delete();
+      };
+
+      it('rejects SignalReceived outside sceneUpdate with role identity', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const lifecycleFunctions = testLayout.getLifecycleEventsFunctions();
+        addCondition(
+          project,
+          lifecycleFunctions.getByName('sceneSignal').getEvents(),
+          'SignalReceived',
+          ['', '"damage"']
+        );
+        addCondition(
+          project,
+          lifecycleFunctions.getByName('sceneUpdate').getEvents(),
+          'SignalReceived',
+          ['', '"legacy"']
+        );
+
+        const lifecycleErrors = scanProjectForValidationErrors(project).filter(
+          error =>
+            error.diagnosticCode ===
+            'SCENE_LIFECYCLE_FUNCTION_INVALID_SIGNAL_RECEIVED'
+        );
+
+        expect(lifecycleErrors).toHaveLength(1);
+        expect(lifecycleErrors[0].lifecycleFunctionName).toBe('sceneSignal');
+        expect(lifecycleErrors[0].type).toBe('lifecycle-incompatible');
+      });
+
+      it('rejects asynchronous, deferred-signal and transition actions during unload', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const unloadEvents = testLayout
+          .getLifecycleEventsFunctions()
+          .getByName('sceneUnload')
+          .getEvents();
+        addAction(project, unloadEvents, 'Wait', ['0.1']);
+        addAction(project, unloadEvents, 'EmitSceneSignal', [
+          '',
+          '"closed"',
+          '""',
+          '',
+        ]);
+        addAction(project, unloadEvents, 'Scene', ['', 'NextScene', 'true']);
+
+        const diagnosticCodes = scanProjectForValidationErrors(project)
+          .filter(error => error.lifecycleFunctionName === 'sceneUnload')
+          .map(error => error.diagnosticCode);
+
+        expect(diagnosticCodes).toEqual(
+          expect.arrayContaining([
+            'SCENE_LIFECYCLE_FUNCTION_ASYNC_NOT_SUPPORTED',
+            'SCENE_LIFECYCLE_FUNCTION_DEFERRED_SIGNAL_NOT_SUPPORTED',
+            'SCENE_LIFECYCLE_FUNCTION_TRANSITION_NOT_SUPPORTED',
+          ])
+        );
+      });
+
+      it('applies lifecycle validation to external events functions', () => {
+        const { project, testExternalEvents1 } = makeTestProject(gd);
+        addAction(
+          project,
+          testExternalEvents1
+            .getLifecycleEventsFunctions()
+            .getByName('sceneUnload')
+            .getEvents(),
+          'Wait',
+          ['0.1']
+        );
+
+        const targetError = scanProjectForValidationErrors(project).find(
+          error =>
+            error.diagnosticCode ===
+            'SCENE_LIFECYCLE_FUNCTION_ASYNC_NOT_SUPPORTED'
+        );
+
+        expect(targetError).toBeDefined();
+        if (targetError) {
+          expect(targetError.locationType).toBe('external-events');
+          expect(targetError.lifecycleFunctionName).toBe('sceneUnload');
+        }
+      });
+
+      it('explains redundant first-frame checks without making them incompatible', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        addCondition(
+          project,
+          testLayout
+            .getLifecycleEventsFunctions()
+            .getByName('sceneLoad')
+            .getEvents(),
+          'SceneJustBegins',
+          ['']
+        );
+
+        const targetError = scanProjectForValidationErrors(project).find(
+          error =>
+            error.diagnosticCode ===
+            'SCENE_LIFECYCLE_FUNCTION_REDUNDANT_SCENE_JUST_BEGINS'
+        );
+
+        expect(targetError).toBeDefined();
+        if (targetError) expect(targetError.type).toBe('lifecycle-redundant');
+      });
+    });
+
     it('detects missing instructions for invalid action types', () => {
       const { project, testLayout } = makeTestProject(gd);
       const events = testLayout.getEvents();

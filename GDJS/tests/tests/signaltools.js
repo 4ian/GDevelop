@@ -101,6 +101,50 @@ describe('gdjs.evtTools.signal', () => {
     expect(gdjs.evtTools.signal.getSignalPayload(runtimeScene)).to.be('');
   });
 
+  it('exposes a non-copying scene-only delivery batch', () => {
+    const { runtimeScene, receiver } = createSignalRuntimeScene();
+
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Scene', 'payload');
+    gdjs.evtTools.signal.emitSignalToInstance(
+      runtimeScene,
+      receiver.getUniqueId(),
+      'Direct',
+      'ignored'
+    );
+    dispatchFrame(runtimeScene);
+
+    const firstBatch =
+      gdjs.evtTools.signal.getDeliveredSceneSignalBatch(runtimeScene);
+    const secondRead =
+      gdjs.evtTools.signal.getDeliveredSceneSignalBatch(runtimeScene);
+    expect(secondRead).to.be(firstBatch);
+    expect(firstBatch).to.have.length(1);
+    expect(firstBatch[0].name).to.be('Scene');
+  });
+
+  it('captures signal aliases in long-lived asynchronous contexts', () => {
+    const { runtimeScene } = createSignalRuntimeScene();
+    gdjs.evtTools.signal.emitSceneSignal(runtimeScene, 'Captured', 'value');
+    dispatchFrame(runtimeScene);
+    const signal = gdjs.evtTools.signal.getDeliveredSceneSignalBatch(
+      runtimeScene
+    )[0];
+    gdjs.evtTools.signal.setCurrentSignalForSceneCondition(
+      runtimeScene,
+      signal
+    );
+
+    const parent = new gdjs.LongLivedObjectsList();
+    parent.backupSceneSignalContext(runtimeScene);
+    const child = gdjs.LongLivedObjectsList.from(parent);
+    gdjs.evtTools.signal.clearCurrentSignalForSceneCondition(runtimeScene);
+
+    expect(parent.getSceneSignalName()).to.be('Captured');
+    expect(parent.getSceneSignalPayload()).to.be('value');
+    expect(child.getSceneSignalName()).to.be('Captured');
+    expect(child.getSceneSignalPayload()).to.be('value');
+  });
+
   it('notifies prefab and behavior instances only after their own exact subscriptions', () => {
     const { runtimeScene, receiver } = createSignalRuntimeScene();
     const behavior = receiver.getBehavior('SignalBehavior');

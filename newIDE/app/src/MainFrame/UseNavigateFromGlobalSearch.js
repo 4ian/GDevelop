@@ -18,6 +18,7 @@ type Props = {|
     locationType: LocationType,
     eventPath: EventPath,
     functionName?: string,
+    lifecycleFunctionName?: string,
     behaviorName?: ?string,
     objectName?: ?string,
   |}) => void,
@@ -161,6 +162,7 @@ const useNavigateFromGlobalSearch = ({
       searchText,
       extensionName,
       functionName,
+      lifecycleFunctionName,
       behaviorName,
       objectName,
       searchFilterParams,
@@ -179,6 +181,7 @@ const useNavigateFromGlobalSearch = ({
         locationType,
         eventPath,
         functionName,
+        lifecycleFunctionName,
         behaviorName,
         objectName,
       });
@@ -271,6 +274,17 @@ const useNavigateFromGlobalSearch = ({
                     objectName || null
                   );
                   // Defer so React can re-render with the new function's events
+                  requestAnimationFrame(() => {
+                    requestAnimationFrame(applySearchResults);
+                  });
+                } else if (
+                  locationType !== 'extension' &&
+                  lifecycleFunctionName &&
+                  editorRef.selectLifecycleFunctionByName
+                ) {
+                  editorRef.selectLifecycleFunctionByName(
+                    lifecycleFunctionName
+                  );
                   requestAnimationFrame(() => {
                     requestAnimationFrame(applySearchResults);
                   });

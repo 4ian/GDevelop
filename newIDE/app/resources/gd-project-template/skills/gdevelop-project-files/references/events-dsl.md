@@ -24,9 +24,13 @@ declaration, or raw GDevelop event JSON in this file.
 Use the owner to determine available objects, behaviors, variables, functions,
 and event scope:
 
-- `scene.settings` owns a scene event sheet.
-- A scene's `[[externalEventFiles]]` entry owns each external event sheet below
-  `scenes/<Scene>/externals/`; the declaring scene supplies its event context.
+- `scene.settings` owns four fixed lifecycle functions below
+  `scenes/<Scene>/functions/`: `sceneLoad`, `sceneSignal`, `sceneUpdate`, and
+  `sceneUnload`. Each has `function.settings` and a sibling `.events` body.
+- A scene's `[[externalEventFiles]]` entry owns an External Events resource
+  below `scenes/<Scene>/externals/<External>/`; it has the same four fixed
+  lifecycle function directories, and the declaring scene supplies its event
+  context.
 - A dedicated `function.settings` owns every extension, prefab, or behavior
   function body. Prefab/behavior methods live under
   `functions/<Function>/` with their sibling `.events`; editor grouping is the
@@ -300,6 +304,17 @@ explicitly permitted.
 
 ## Runtime safety rules
 
+- Choose the lifecycle deliberately: initialization belongs in `sceneLoad`,
+  delivered scene notification handling in `sceneSignal`, continuous gameplay
+  in `sceneUpdate`, and synchronous final cleanup in `sceneUnload`.
+- `sceneSignal` is invoked once per delivered scene signal. Compare
+  `SignalName()` and read `SignalPayload()` directly; never add the
+  `SignalReceived` iterator there. `SignalReceived` is valid only in
+  `sceneUpdate`.
+- `sceneUnload` is terminal and synchronous. Never author awaited/future-frame
+  actions, deferred signal emission, or scene-stack transitions there.
+- A `link scene` or `link external` resolves the target's same lifecycle
+  function. An empty target body is a valid no-op.
 - Guard every scene/external-sheet action with an effective condition in its
   event or an ancestor. Never create an unconditional every-frame action.
 - Treat object-targeting actions as applying to the current picked set. Multiple

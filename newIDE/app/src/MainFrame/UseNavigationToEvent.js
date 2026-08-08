@@ -9,6 +9,7 @@ export type EventNavigationTarget = {|
   locationType: LocationType,
   eventPath: EventPath,
   functionName?: string,
+  lifecycleFunctionName?: string,
   behaviorName?: ?string,
   objectName?: ?string,
 |};
@@ -47,6 +48,7 @@ export const useNavigationToEvent = ({
           locationType,
           eventPath,
           functionName,
+          lifecycleFunctionName,
           behaviorName,
           objectName,
         } = pendingEventNavigation;
@@ -103,6 +105,26 @@ export const useNavigationToEvent = ({
                   behaviorName,
                   objectName
                 );
+                // $FlowFixMe[method-unbinding]
+                if (ref.scrollToEventPath) {
+                  scrollTimeoutIdRef.current = setTimeout(() => {
+                    scrollTimeoutIdRef.current = null;
+                    // $FlowFixMe[not-a-function]
+                    // $FlowFixMe[prop-missing]
+                    ref.scrollToEventPath(eventPath);
+                    setPendingEventNavigation(null);
+                  }, FUNCTION_SELECT_DELAY_MS);
+                } else {
+                  setPendingEventNavigation(null);
+                }
+              } else if (
+                locationType !== 'extension' &&
+                lifecycleFunctionName &&
+                // $FlowFixMe[method-unbinding]
+                ref.selectLifecycleFunctionByName
+              ) {
+                // $FlowFixMe[not-a-function]
+                ref.selectLifecycleFunctionByName(lifecycleFunctionName);
                 // $FlowFixMe[method-unbinding]
                 if (ref.scrollToEventPath) {
                   scrollTimeoutIdRef.current = setTimeout(() => {

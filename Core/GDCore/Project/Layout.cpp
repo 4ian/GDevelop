@@ -291,8 +291,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
   objectsContainer.SerializeObjectsTo(element.AddChild("objects"));
   objectsContainer.SerializeFoldersTo(
       element.AddChild("objectsFolderStructure"));
-  gd::EventsListSerialization::SerializeEventsTo(events,
-                                                 element.AddChild("events"));
+  lifecycleEventsFunctions.SerializeEventBodiesTo(element);
 
   layers.SerializeLayersTo(element.AddChild("layers"));
 
@@ -351,8 +350,7 @@ void Layout::UnserializeFrom(gd::Project& project,
 
   objectsContainer.GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
-  gd::EventsListSerialization::UnserializeEventsFrom(
-      project, GetEvents(), element.GetChild("events", 0, "Events"));
+  lifecycleEventsFunctions.UnserializeEventBodiesFrom(project, element);
 
   objectsContainer.UnserializeObjectsFrom(
       project, element.GetChild("objects", 0, "Objets"));
@@ -446,7 +444,7 @@ void Layout::Init(const Layout& other) {
         std::unique_ptr<gd::BehaviorsSharedData>(it.second->Clone());
   }
 
-  events = other.events;
+  lifecycleEventsFunctions = other.lifecycleEventsFunctions;
   editorSettings = other.editorSettings;
 }
 

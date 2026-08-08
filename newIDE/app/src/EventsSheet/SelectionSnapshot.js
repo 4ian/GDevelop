@@ -70,6 +70,7 @@ export type EventsSheetSelectionSnapshot = {|
   eventsBasedBehaviorName: string | null,
   eventsBasedObjectName: string | null,
   eventsFunctionName: string | null,
+  sceneLifecycleFunctionName: string | null,
   lastSelectionType: 'event' | 'instruction' | 'instructionList' | null,
   selectedEventPaths: Array<string>,
   selectedEvents: Array<EventsSheetSelectedEventSnapshot>,
@@ -261,10 +262,10 @@ const getScopeKind = (
   | 'extensionFunction'
   | 'extension'
   | 'project' => {
-  if (scope.eventsFunction) return 'extensionFunction';
-  if (scope.eventsFunctionsExtension) return 'extension';
   if (scope.externalEvents) return 'externalEvents';
   if (scope.layout) return 'scene';
+  if (scope.eventsFunction) return 'extensionFunction';
+  if (scope.eventsFunctionsExtension) return 'extension';
   return 'project';
 };
 
@@ -319,6 +320,7 @@ export const getEventsSheetSelectionSnapshot = ({
     eventsBasedBehaviorName: getObjectName(scope.eventsBasedBehavior),
     eventsBasedObjectName: getObjectName(scope.eventsBasedObject),
     eventsFunctionName: getObjectName(scope.eventsFunction),
+    sceneLifecycleFunctionName: scope.sceneLifecycleFunctionName || null,
     lastSelectionType: getLastSelectionType(
       selectedEvents,
       selectedInstructions,

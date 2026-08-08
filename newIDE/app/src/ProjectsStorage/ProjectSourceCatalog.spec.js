@@ -472,22 +472,6 @@ describe('project source catalogs', () => {
     expect(sceneSchema.childTables).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          table: 'externalEventFiles',
-          header: '[[externalEventFiles]]',
-          fields: expect.arrayContaining([
-            expect.objectContaining({
-              name: 'order',
-              type: expect.stringContaining('project-wide'),
-              required: true,
-            }),
-            expect.objectContaining({
-              name: 'events',
-              type: expect.stringContaining('.events'),
-              required: true,
-            }),
-          ]),
-        }),
-        expect.objectContaining({
           table: 'externalLayoutFiles',
           header: '[[externalLayoutFiles]]',
           fields: expect.arrayContaining([
@@ -502,9 +486,7 @@ describe('project source catalogs', () => {
       ])
     );
     sceneSchema.childTables
-      .filter(table =>
-        ['externalEventFiles', 'externalLayoutFiles'].includes(table.table)
-      )
+      .filter(table => table.table === 'externalLayoutFiles')
       .forEach(table => {
         expect(table.fields.map(field => field.name)).not.toContain(
           'linkedScene'
@@ -513,6 +495,28 @@ describe('project source catalogs', () => {
           expect.arrayContaining(['linkedScene', 'unresolvedScene'])
         );
       });
+    expect(
+      catalog.fileKinds.find(
+        fileKind => fileKind.kind === 'scene-lifecycle-function'
+      )
+    ).toEqual(
+      expect.objectContaining({
+        path: 'scenes/<Scene>/functions/<Role>/function.settings',
+        requiredFields: expect.arrayContaining([
+          'order',
+          'events',
+          'lifecycleRole',
+        ]),
+      })
+    );
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'external-events')
+    ).toEqual(
+      expect.objectContaining({
+        path:
+          'scenes/<Scene>/externals/<ExternalEvents>/external-events.settings',
+      })
+    );
     expect(
       catalog.fileKinds
         .find(fileKind => fileKind.kind === 'function')

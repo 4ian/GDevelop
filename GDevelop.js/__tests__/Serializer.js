@@ -238,6 +238,76 @@ describe('libGD.js object serialization', function () {
       expect(event.variables).toBeUndefined();
     });
 
+    it('round-trips scene lifecycle bodies while omitting empty optional keys', function () {
+      gd.Serializer.setCanonicalMode(false);
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+
+      const emptyElement = new gd.SerializerElement();
+      layout.serializeTo(emptyElement);
+      const emptyLayoutData = JSON.parse(gd.Serializer.toJSON(emptyElement));
+      emptyElement.delete();
+      expect(emptyLayoutData.events).toEqual([]);
+      expect(emptyLayoutData.sceneLoadEvents).toBeUndefined();
+      expect(emptyLayoutData.sceneSignalEvents).toBeUndefined();
+      expect(emptyLayoutData.sceneUnloadEvents).toBeUndefined();
+
+      const lifecycleFunctions = layout.getLifecycleEventsFunctions();
+      lifecycleFunctions
+        .getSceneLoadFunction()
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      lifecycleFunctions
+        .getSceneSignalFunction()
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      lifecycleFunctions
+        .getSceneUpdateFunction()
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      lifecycleFunctions
+        .getSceneUnloadFunction()
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+      const element = new gd.SerializerElement();
+      layout.serializeTo(element);
+      const layoutData = JSON.parse(gd.Serializer.toJSON(element));
+      expect(layoutData.sceneLoadEvents).toHaveLength(1);
+      expect(layoutData.sceneSignalEvents).toHaveLength(1);
+      expect(layoutData.events).toHaveLength(1);
+      expect(layoutData.sceneUnloadEvents).toHaveLength(1);
+
+      const roundTrippedLayout = new gd.Layout();
+      roundTrippedLayout.unserializeFrom(project, element);
+      const roundTrippedFunctions =
+        roundTrippedLayout.getLifecycleEventsFunctions();
+      expect(
+        roundTrippedFunctions
+          .getSceneLoadFunction()
+          .getEvents()
+          .getEventsCount()
+      ).toBe(1);
+      expect(
+        roundTrippedFunctions
+          .getSceneSignalFunction()
+          .getEvents()
+          .getEventsCount()
+      ).toBe(1);
+      expect(roundTrippedLayout.getEvents().getEventsCount()).toBe(1);
+      expect(
+        roundTrippedFunctions
+          .getSceneUnloadFunction()
+          .getEvents()
+          .getEventsCount()
+      ).toBe(1);
+      expect(roundTrippedFunctions.hasValidMetadata()).toBe(true);
+
+      roundTrippedLayout.delete();
+      element.delete();
+      project.delete();
+    });
+
     const serializeLayoutEventInstruction = (canonicalMode, disabled) => {
       gd.Serializer.setCanonicalMode(canonicalMode);
 

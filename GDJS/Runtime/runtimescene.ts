@@ -13,6 +13,9 @@ namespace gdjs {
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
+    _sceneUnloadLifecycleFunction: null | ((
+      runtimeScene: RuntimeScene
+    ) => void) = null;
     _idToCallbackMap: null | Map<
       string,
       (
@@ -40,6 +43,7 @@ namespace gdjs {
 
     /** True if loadFromScene was called and the scene is being played. */
     _isLoaded: boolean = false;
+    private _isUnloading: boolean = false;
     /** True in the first frame after resuming the paused scene */
     _isJustResumed: boolean = false;
 
@@ -158,6 +162,7 @@ namespace gdjs {
       if (this._isLoaded) {
         this.unloadScene();
       }
+      this._isUnloading = false;
 
       this._objectGroups.clear();
       const setObjectGroup = (objectGroupData: ObjectGroupData) => {
@@ -314,8 +319,26 @@ namespace gdjs {
      * rendered on the screen.
      */
     unloadScene() {
-      if (!this._isLoaded) {
+      if (!this._isLoaded || this._isUnloading) {
         return;
+      }
+      this._isUnloading = true;
+
+      // Run author cleanup while the scene, its variables and all objects are
+      // still alive. Clear the slot first so recursive unload requests cannot
+      // execute it twice.
+      const sceneUnloadLifecycleFunction =
+        this._sceneUnloadLifecycleFunction;
+      this._sceneUnloadLifecycleFunction = null;
+      if (sceneUnloadLifecycleFunction) {
+        try {
+          sceneUnloadLifecycleFunction(this);
+        } catch (error) {
+          logger.error(
+            'An error occurred in the scene unload lifecycle function: ' +
+              (error instanceof Error ? error.stack || error.message : error)
+          );
+        }
       }
       if (this._profiler) {
         this.stopProfiler();
@@ -364,6 +387,8 @@ namespace gdjs {
       >();
       this._initialBehaviorSharedData = new Hashtable();
       this._eventsFunction = null;
+      this._sceneUnloadLifecycleFunction = null;
+      this._idToCallbackMap = null;
       this._lastId = 0;
       this._runtimeObjectsByUniqueId.clear();
       this.networkId = null;
@@ -388,13 +413,18 @@ namespace gdjs {
       const module = gdjs[sceneData.mangledName + 'Code'];
       if (module && module.func) {
         this._eventsFunction = module.func;
-        this._idToCallbackMap =
-          gdjs[sceneData.mangledName + 'Code'].idToCallbackMap;
+        this._idToCallbackMap = module.idToCallbackMap;
+        if (!this._isUnloading) {
+          this._sceneUnloadLifecycleFunction = module.sceneUnload || null;
+        }
       } else {
         setupWarningLogger.warn(
           'No function found for running logic of scene ' + this._name
         );
         this._eventsFunction = function () {};
+        if (!this._isUnloading) {
+          this._sceneUnloadLifecycleFunction = null;
+        }
       }
     }
 

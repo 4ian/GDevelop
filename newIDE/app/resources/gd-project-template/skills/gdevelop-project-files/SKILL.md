@@ -197,10 +197,14 @@ author-writable properties present in `settings-catalog.json`; preserve
 unlisted fields verbatim because specialized editors may own runtime-required
 configuration that the generic catalog intentionally hides.
 
-Give every prefab and behavior function its own `functions/<Function>/`
-directory containing `function.settings` and `<Function>.events`. Store editor
-grouping in the function settings `folder` array. `prefab.settings` and
-`behavior.settings` must not embed function metadata.
+Give every scene, External Events resource, prefab, and behavior function its
+own `functions/<Function>/` directory containing `function.settings` and
+`<Function>.events`. Scene and External Events owners have exactly four fixed
+functions: `sceneLoad`, `sceneSignal`, `sceneUpdate`, and `sceneUnload`.
+`sceneUpdate` is required; empty optional lifecycle functions may be absent from
+disk. Store editable prefab/behavior grouping in the function settings `folder`
+array. Lifecycle function names, order, roles, types, and parameters are fixed
+and must not be edited.
 
 ## Project layout
 
@@ -210,11 +214,18 @@ resources.settings
 constants.toml
 objects/<Object>.settings
 scenes/<Scene>/<Scene>.layout
-scenes/<Scene>/<Scene>.events
 scenes/<Scene>/scene.settings
 scenes/<Scene>/objects/<Object>.settings
+scenes/<Scene>/functions/sceneUpdate/function.settings
+scenes/<Scene>/functions/sceneUpdate/sceneUpdate.events
+scenes/<Scene>/functions/<OptionalLifecycle>/function.settings # only when non-empty
+scenes/<Scene>/functions/<OptionalLifecycle>/<OptionalLifecycle>.events
 scenes/<Scene>/externals/<External>.layout
-scenes/<Scene>/externals/<External>.events
+scenes/<Scene>/externals/<External>/external-events.settings
+scenes/<Scene>/externals/<External>/functions/sceneUpdate/function.settings
+scenes/<Scene>/externals/<External>/functions/sceneUpdate/sceneUpdate.events
+scenes/<Scene>/externals/<External>/functions/<OptionalLifecycle>/function.settings
+scenes/<Scene>/externals/<External>/functions/<OptionalLifecycle>/<OptionalLifecycle>.events
 extensions/<Extension>/extension.settings
 extensions/<Extension>/functions/<Function>/function.settings
 extensions/<Extension>/functions/<Function>/<Function>.events
@@ -240,13 +251,15 @@ Do not create optional grouping folders. Canonical component directories are
 fixed; object/function grouping belongs in each settings file's `folder`
 array. Settings files never reference other settings files.
 
-Declare external sources in the associated scene's `scene.settings` using
-`[[externalEventFiles]]` and `[[externalLayoutFiles]]`. Each record requires
-`name`, a project-wide contiguous `order` within its external kind, and its
-scene-local `events` or `layout` URI. The declaring scene supplies
-`associatedLayout`; never write `associatedLayout`, `linkedScene`, or
-`unresolvedScene` in these records, and never create a root
-`externals/external.settings`.
+In format version 4, declare each External Events resource with
+`scenes/<Scene>/externals/<External>/external-events.settings`; its physical
+scene owner supplies `associatedLayout`, and its lifecycle logic lives in that
+owner's `functions/` directories. Do not write `externalEventFiles` into
+`scene.settings`. Continue declaring external layouts with
+`[[externalLayoutFiles]]`; each record requires `name`, a project-wide
+contiguous `order`, and its scene-local `layout` URI. Never write
+`associatedLayout`, `linkedScene`, or `unresolvedScene`, and never create a
+root `externals/external.settings`.
 
 ## Task references
 

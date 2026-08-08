@@ -82,6 +82,18 @@ class GD_CORE_API EventsCodeGenerator {
   void PreprocessEventList(gd::EventsList& listEvent);
 
   /**
+   * Set the stable scene lifecycle role for the events currently generated.
+   * Ordinary events use `sceneUpdate` for backward compatibility.
+   */
+  void SetSceneLifecycleFunctionRole(const gd::String& role) {
+    sceneLifecycleFunctionRole = role;
+  }
+
+  const gd::String& GetSceneLifecycleFunctionRole() const {
+    return sceneLifecycleFunctionRole;
+  }
+
+  /**
    * \brief Generate code for executing an event list
    *
    * \param events std::vector of events
@@ -926,6 +938,8 @@ class GD_CORE_API EventsCodeGenerator {
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
+
+  gd::String sceneLifecycleFunctionRole;
 
   gd::DiagnosticReport* diagnosticReport;
 };

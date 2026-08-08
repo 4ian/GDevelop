@@ -12,6 +12,7 @@ export type EventsScope = {|
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
   eventsFunction?: ?gdEventsFunction,
+  sceneLifecycleFunctionName?: ?string,
 |};
 
 const getChoicePropertyValues = (
@@ -119,6 +120,9 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
+      if (eventsFunction && this._scope.sceneLifecycleFunctionName) {
+        projectScopedContainers.addParameters(eventsFunction.getParameters());
+      }
     } else if (eventsFunctionsExtension) {
       if (eventsFunction) {
         if (!this._parameterObjectsContainer) {

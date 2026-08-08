@@ -2378,6 +2378,27 @@ namespace gdjs {
         ]);
       }
 
+      // Wait for the game to be done starting up: a run request can arrive
+      // while the game is still starting. Without this, the test could
+      // create scenes before asynchronously loaded libraries (Jolt
+      // physics...) are ready, or the startup could push the game's first
+      // scene in the middle of the test.
+      const bootDeadlineMs = Date.now() + harness._timeoutMs;
+      while (runtimeGame.isStartingUp()) {
+        if (harness._stopped) {
+          currentlyRunningHarness = null;
+          return harness._makeResult('stopped', ['The test was stopped.']);
+        }
+        if (Date.now() > bootDeadlineMs) {
+          currentlyRunningHarness = null;
+          return harness._makeResult('error', [
+            `The game did not finish starting within ${harness._timeoutMs}ms ` +
+              '(the first scene was never created).',
+          ]);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+
       const inputManager = runtimeGame.getInputManager();
       const wasPaused = runtimeGame.isPaused();
 

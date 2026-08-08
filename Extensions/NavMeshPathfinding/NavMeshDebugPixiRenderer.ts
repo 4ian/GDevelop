@@ -17,6 +17,11 @@ namespace gdjs {
 
     setEnabled(enabled: boolean): void {
       this.enabled = enabled;
+      if (enabled) {
+        this.renderFor3D();
+      } else {
+        this.removeFor3D();
+      }
     }
 
     registerFor2D() {
@@ -97,20 +102,21 @@ namespace gdjs {
       }
     }
 
-    renderFor3D() {
+    removeFor3D() {
       for (const mesh of this.meshes) {
         mesh.removeFromParent();
       }
       this.meshes.length = 0;
+    }
+
+    renderFor3D() {
+      this.removeFor3D();
       if (!this.enabled || !this.obstaclesManager.is3D) {
         return;
       }
       const { navMesh, obstacles } = this.obstaclesManager;
       if (!navMesh) {
         return;
-      }
-      if (!this.debugDrawerUtils) {
-        this.debugDrawerUtils = new RecastNav.DebugDrawerUtils();
       }
       const firstObstacle: gdjs.NavMeshObstacleRuntimeBehavior = obstacles
         .values()
@@ -121,8 +127,10 @@ namespace gdjs {
       if (!rendererObject) {
         return;
       }
+      if (!this.debugDrawerUtils) {
+        this.debugDrawerUtils = new RecastNav.DebugDrawerUtils();
+      }
       const primitives = this.debugDrawerUtils.drawNavMesh(navMesh);
-      const meshes: Array<THREE.Mesh> = [];
       for (const primitive of primitives) {
         switch (primitive.type) {
           case 'tris':
@@ -157,7 +165,7 @@ namespace gdjs {
               });
             }
             const mesh = new THREE.Mesh(geometry, this.material);
-            meshes.push(mesh);
+            this.meshes.push(mesh);
             rendererObject.add(mesh);
             break;
         }

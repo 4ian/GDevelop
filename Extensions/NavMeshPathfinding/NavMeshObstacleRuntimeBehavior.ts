@@ -47,8 +47,9 @@ namespace gdjs {
       walkableClimb: 2,
       walkableRadius: 1,
     };
+    cellDepth: float = 10;
     walkableRadius: float = -1;
-    walkableHeight: float = 150;
+    walkableDepth: float = 150;
     stairHeightMax: float = 20;
     speedScaleY: float = 1;
     inverseSpeedScaleY: float = 1;
@@ -63,11 +64,11 @@ namespace gdjs {
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
-      this.navMeshConfig.ch = sharedData.cellDepth;
+      this.cellDepth = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
       this.stairHeightMax = sharedData.stairHeightMax;
-      this.walkableHeight = sharedData.walkableHeight;
+      this.walkableDepth = sharedData.walkableDepth;
       this.walkableRadius = sharedData.walkableRadius;
       this.speedScaleY = sharedData.speedScaleY;
       this.inverseSpeedScaleY = 1 / sharedData.speedScaleY;
@@ -145,15 +146,12 @@ namespace gdjs {
           this.navMeshConfig.walkableSlopeAngle > 40
             ? 2
             : 1;
-        this.navMeshConfig.walkableClimb = this.navMeshConfig.ch
-          ? Math.max(
-              walkableClimbMin,
-              this.stairHeightMax / this.navMeshConfig.ch
-            )
-          : walkableClimbMin;
-        this.navMeshConfig.walkableHeight = this.navMeshConfig.ch
-          ? this.walkableHeight / this.navMeshConfig.ch
-          : this.walkableHeight;
+        this.navMeshConfig.walkableClimb = Math.max(
+          walkableClimbMin,
+          this.stairHeightMax / this.cellDepth
+        );
+        this.navMeshConfig.walkableHeight = this.walkableDepth / this.cellDepth;
+        this.navMeshConfig.ch = this.cellDepth;
       }
 
       let characterRadiusMax = 0;
@@ -197,7 +195,6 @@ namespace gdjs {
         this.debuggerRenderer.registerFor2D();
       }
       this.debuggerRenderer.setEnabled(enableDebugDraw);
-      this.debuggerRenderer.renderFor3D();
     }
 
     private addGroundFor2D(

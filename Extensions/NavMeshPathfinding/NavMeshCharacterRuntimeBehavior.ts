@@ -362,7 +362,7 @@ namespace gdjs {
         : agent.raw.get_npos(2) * this._manager.speedScaleY;
       let newZ = agent.raw.get_npos(1);
 
-      console.log('New position', newX, newY, newZ);
+      //console.log('New position', newX, newY, newZ);
 
       const destinationX = this.getDestinationX();
       const destinationY = this.getDestinationY();

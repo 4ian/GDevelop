@@ -59,6 +59,8 @@ namespace gdjs {
     hasStepped = false;
     debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
 
+    static readonly cellHeightFor2D = 10;
+
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
       this.navMeshConfig.ch = sharedData.cellDepth;
@@ -136,7 +138,7 @@ namespace gdjs {
         this.addGroundFor2D(positions, indices);
         this.navMeshConfig.walkableClimb = 0.1;
         this.navMeshConfig.walkableHeight = 2;
-        this.navMeshConfig.ch = 10;
+        this.navMeshConfig.ch = gdjs.NavMeshObstaclesManager.cellHeightFor2D;
       } else {
         const walkableClimbMin =
           this.navMeshConfig.walkableSlopeAngle &&
@@ -229,11 +231,11 @@ namespace gdjs {
 
         x *= width;
         y *= height;
-        z *= 10;
+        z *= gdjs.NavMeshObstaclesManager.cellHeightFor2D;
 
         x += centerX;
         y += centerY;
-        z -= 5;
+        z -= gdjs.NavMeshObstaclesManager.cellHeightFor2D / 2;
 
         // Y is the top for Recast
         positions.push(x, z, y);
@@ -267,14 +269,15 @@ namespace gdjs {
         ) {
           vertices.reverse();
         }
+        const cellHeightFor2D = gdjs.NavMeshObstaclesManager.cellHeightFor2D;
         triangulate(
           vertices,
           vertexFlags,
           (p1: Point, p2: Point, p3: Point) => {
             // Top
-            positions.push(p1.x, 10, p1.y * this.inverseSpeedScaleY);
-            positions.push(p2.x, 10, p2.y * this.inverseSpeedScaleY);
-            positions.push(p3.x, 10, p3.y * this.inverseSpeedScaleY);
+            positions.push(p1.x, cellHeightFor2D, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, cellHeightFor2D, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, cellHeightFor2D, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 0,
               indicesOffset + 1,
@@ -295,14 +298,14 @@ namespace gdjs {
         for (let index = 0; index < vertices.length; index++) {
           const vertex = vertices[index];
           // Side
-          positions.push(vertex.x, 10, vertex.y * this.inverseSpeedScaleY);
+          positions.push(vertex.x, cellHeightFor2D, vertex.y * this.inverseSpeedScaleY);
           positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
           indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
           indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
           indicesOffset += 2;
         }
         const vertex = vertices[0];
-        positions.push(vertex.x, 10, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, cellHeightFor2D, vertex.y * this.inverseSpeedScaleY);
         positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
       }
     }

@@ -230,11 +230,11 @@ module.exports = {
             .setDoubleValue(newValueAsNumber);
           return true;
         }
-        if (propertyName === 'walkableHeight') {
+        if (propertyName === 'walkableDepth') {
           const newValueAsNumber = parseFloat(newValue);
           if (newValueAsNumber !== newValueAsNumber) return false;
           sharedContent
-            .getOrCreateChild('walkableHeight')
+            .getOrCreateChild('walkableDepth')
             .setDoubleValue(newValueAsNumber);
           return true;
         }
@@ -265,6 +265,7 @@ module.exports = {
         sharedProperties
           .getOrCreate('cellDepth')
           .setLabel(_('Cell depth'))
+          .setGroup(_('3D only'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -276,6 +277,7 @@ module.exports = {
         sharedProperties
           .getOrCreate('slopeMaxAngle')
           .setLabel(_('Slope max. angle'))
+          .setGroup(_('3D only'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getDegreeAngle())
           .setValue(
@@ -290,6 +292,7 @@ module.exports = {
         sharedProperties
           .getOrCreate('stairHeightMax')
           .setLabel(_('Max. stair height'))
+          .setGroup(_('3D only'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -321,18 +324,19 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden);
 
         sharedProperties
-          .getOrCreate('walkableHeight')
-          .setLabel(_('Walkable height'))
+          .getOrCreate('walkableDepth')
+          .setLabel(_('Walkable depth'))
           .setDescription(
             _(
               'Minimum floor to ceiling height that will still allow the floor area to be considered walkable.'
             )
           )
+          .setGroup(_('3D only'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
             sharedContent
-              .getChild('walkableHeight')
+              .getChild('walkableDepth')
               .getDoubleValue()
               .toString(10)
           )
@@ -347,6 +351,7 @@ module.exports = {
               'Allow a depth effect for 2D games. Usually set to 0.5 for isometry.'
             )
           )
+          .setGroup(_('2D only'))
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
@@ -363,7 +368,7 @@ module.exports = {
         sharedContent.addChild('slopeMaxAngle').setDoubleValue(50);
         sharedContent.addChild('stairHeightMax').setDoubleValue(20);
         sharedContent.addChild('walkableRadius').setDoubleValue(-1);
-        sharedContent.addChild('walkableHeight').setDoubleValue(150);
+        sharedContent.addChild('walkableDepth').setDoubleValue(150);
         sharedContent.addChild('speedScaleY').setDoubleValue(1);
       };
 

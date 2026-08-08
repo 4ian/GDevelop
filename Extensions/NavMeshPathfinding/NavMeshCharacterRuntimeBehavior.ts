@@ -208,7 +208,8 @@ namespace gdjs {
             y: z,
             z: this._manager.is3D ? y : y * this._manager.inverseSpeedScaleY,
           },
-          { halfExtents: { x: 100, y: 100, z: 100 } }
+          { halfExtents: { x: 100, y: this._manager.is3D
+              ? 100 : 10, z: 100 } }
         );
       if (!hasFindDestination) {
         this._pathFound = false;
@@ -231,7 +232,8 @@ namespace gdjs {
               ? this.owner.getY()
               : this.owner.getY() * this._manager.inverseSpeedScaleY,
           },
-          { halfExtents: { x: 100, y: 100, z: 100 } }
+          { halfExtents: { x: 100, y: this._manager.is3D
+              ? 100 : 10, z: 100 } }
         );
       if (!hasFindOrigin) {
         this._pathFound = false;
@@ -338,7 +340,6 @@ namespace gdjs {
         this._path = path;
         console.log('path', this._path);
       }
-      console.log(agent.raw.get_npos(0), agent.raw.get_npos(2), agent.raw.get_npos(1));
 
       let newX = agent.raw.get_npos(0);
       let newY = this._manager.is3D
@@ -346,7 +347,7 @@ namespace gdjs {
         : agent.raw.get_npos(2) * this._manager.speedScaleY;
       let newZ = agent.raw.get_npos(1);
 
-      //console.log("newZ", newZ);
+      console.log("New position", newX, newY, newZ);
 
       const destinationX = this.getDestinationX();
       const destinationY = this.getDestinationY();

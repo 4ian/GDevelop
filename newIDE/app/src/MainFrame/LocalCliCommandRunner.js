@@ -10,6 +10,10 @@ import PreferencesContext, {
   type Preferences,
 } from './Preferences/PreferencesContext';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import {
+  runProjectGameplayTests,
+  type GameplayTestToRun,
+} from '../GameplayTests/GameplayTestRunner';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 import { type FileMetadata } from '../ProjectsStorage';
@@ -128,6 +132,65 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const fileMetadata = await saveProject({ skipNewVersionWarning: true });
     if (!fileMetadata) {
       throw new Error('[CLI] Extension imported but project save failed.');
+    }
+  },
+  RUN_ALL_TESTS: async (project, i18n, { commandArgs }) => {
+    // Run the gameplay tests of the project and of every extension,
+    // optionally filtered by names passed via --cmd-args.
+    const tests: Array<GameplayTestToRun> = [];
+    const projectTests = project.getTests();
+    for (let i = 0; i < projectTests.getTestsCount(); i++) {
+      tests.push({
+        scope: { type: 'project' },
+        testName: projectTests.getTestAt(i).getName(),
+      });
+    }
+    for (
+      let extensionIndex = 0;
+      extensionIndex < project.getEventsFunctionsExtensionsCount();
+      extensionIndex++
+    ) {
+      const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
+      const extensionTests = extension.getTests();
+      for (let i = 0; i < extensionTests.getTestsCount(); i++) {
+        tests.push({
+          scope: { type: 'extension', extensionName: extension.getName() },
+          testName: extensionTests.getTestAt(i).getName(),
+        });
+      }
+    }
+    const filteredTests = commandArgs.length
+      ? tests.filter(test => commandArgs.includes(test.testName))
+      : tests;
+    if (filteredTests.length === 0) {
+      console.info('[CLI] No gameplay tests to run.');
+      return;
+    }
+
+    const results = await runProjectGameplayTests({
+      project,
+      tests: filteredTests,
+      options: {},
+    });
+    let failedCount = 0;
+    for (const result of results) {
+      const passed = result.status === 'passed';
+      if (!passed) failedCount++;
+      console.info(
+        `[CLI] ${passed ? 'PASSED' : 'FAILED'} (${result.status}): ${
+          result.testName
+        } (${result.framesExecuted} frames, ${Math.round(
+          result.durationMs
+        )}ms)${result.errors.length ? ' - ' + result.errors.join(' | ') : ''}`
+      );
+    }
+    console.info(
+      `[CLI] ${results.length - failedCount}/${
+        results.length
+      } gameplay tests passed.`
+    );
+    if (failedCount > 0) {
+      throw new Error(`${failedCount} gameplay test(s) failed.`);
     }
   },
 };

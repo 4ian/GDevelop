@@ -65,6 +65,7 @@ type ErrorBoundaryScope =
   | 'extensions-search-dialog'
   | 'external-events-editor'
   | 'external-layout-editor'
+  | 'gameplay-test-editor-properties'
   | 'variables-list'
   | 'new-object-dialog'
   | 'object-details'

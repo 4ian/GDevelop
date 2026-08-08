@@ -31,4 +31,9 @@ export const NON_SCRIPTABLE_FUNCTION_NAMES: Set<string> = new Set([
   // an edit/explorer script (v1 scope).
   'generate_events',
   'add_scene_events',
+  // Gameplay tests launch a real game preview (seconds long): they are plain
+  // tool calls (`run_tests` for the orchestrator, `run_gameplay_test` for the
+  // tester agent), never called from inside a script.
+  'run_tests',
+  'run_gameplay_test',
 ]);

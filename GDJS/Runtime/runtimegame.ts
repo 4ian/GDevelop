@@ -1193,6 +1193,10 @@ namespace gdjs {
       ) => Promise<void>,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      // Remember if the game was already paused (e.g. by a gameplay test or
+      // the debugger), to restore that state - not blindly unpause - once
+      // the assets are loaded.
+      const wasPaused = this._paused;
       this.pause(true);
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
@@ -1221,7 +1225,7 @@ namespace gdjs {
 
       this._displayedLoadingScreen = null;
       if (!this._isInGameEdition) {
-        this.pause(false);
+        this.pause(wasPaused);
       }
     }
 

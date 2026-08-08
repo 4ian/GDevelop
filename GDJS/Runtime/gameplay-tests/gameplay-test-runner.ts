@@ -1316,6 +1316,29 @@ namespace gdjs {
       }
 
       /**
+       * The raw `gdjs.RuntimeObject` of an instance, or null if not found.
+       * Behaviors can be reached with `getBehavior(behaviorName)` (also null
+       * if not found). Prefer the harness APIs (snapshots, inputs...) -
+       * direct mutations can invalidate what the test asserts.
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      getRuntimeObject(
+        objectIdOrName: integer | string
+      ): gdjs.RuntimeObject | null {
+        const currentScene = this._getCurrentScene();
+        if (typeof objectIdOrName === 'number') {
+          for (const candidate of currentScene.getAdhocListOfAllInstances()) {
+            if (candidate.id === objectIdOrName) {
+              return candidate;
+            }
+          }
+          return null;
+        }
+        return currentScene.getObjects(objectIdOrName)?.[0] || null;
+      }
+
+      /**
        * Get a scene variable, or undefined if it does not exist.
        */
       getSceneVariable(variableName: string): Object | undefined {
@@ -1343,52 +1366,6 @@ namespace gdjs {
         if (!this._watchedObjectNames.includes(objectName)) {
           this._watchedObjectNames.push(objectName);
         }
-      }
-
-      /**
-       * LAST RESORT escape hatch: the raw internal data of a behavior
-       * (minified field names, unstable across releases). Prefer the readable
-       * `state` of snapshots (`getObjects(...)[i].behaviors[name].state`).
-       * @param objectIdOrName An instance id (from `getObjects`) or an object
-       * name (first instance).
-       */
-      getObjectRuntimeBehaviorRawData(
-        objectIdOrName: integer | string,
-        behaviorName: string
-      ): Object {
-        const currentScene = this._getCurrentScene();
-        let object: gdjs.RuntimeObject | null = null;
-        if (typeof objectIdOrName === 'number') {
-          for (const candidate of currentScene.getAdhocListOfAllInstances()) {
-            if (candidate.id === objectIdOrName) {
-              object = candidate;
-              break;
-            }
-          }
-          if (!object) {
-            throw new Error(`No instance with id ${objectIdOrName} found.`);
-          }
-        } else {
-          object = currentScene.getObjects(objectIdOrName)?.[0] || null;
-          if (!object) {
-            throw new Error(
-              `No instance of "${objectIdOrName}" found in the scene.`
-            );
-          }
-        }
-        const behavior = object.getBehavior(behaviorName);
-        if (!behavior) {
-          const anyObject = object as any;
-          const behaviorNames = (
-            anyObject._behaviors as Array<gdjs.RuntimeBehavior>
-          ).map((objectBehavior) => objectBehavior.getName());
-          throw new Error(
-            `No behavior "${behaviorName}" on "${object.getName()}". Available behaviors: ` +
-              (behaviorNames.join(', ') || '(none)') +
-              '.'
-          );
-        }
-        return behavior.getNetworkSyncData({});
       }
 
       // NAVIGATION INTENT:

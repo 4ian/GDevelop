@@ -285,7 +285,7 @@ describe('gdjs.gameplayTests', () => {
     expect(result.errors[0]).to.contain('IsOnFloor');
   }).timeout(10000);
 
-  it('gives the raw behavior data as a last-resort escape hatch', async () => {
+  it('gives the raw runtime objects and behaviors as escape hatches', async () => {
     const runtimeGame = gdjs.getPixiRuntimeGame({
       layouts: [createSceneDataWithPlatformerObject('Scene 1')],
     });
@@ -293,19 +293,33 @@ describe('gdjs.gameplayTests', () => {
       runtimeGame,
       `
       await harness.goToScene('Scene 1');
-      harness.spawn('Player', 100, 50);
+      const spawned = harness.spawn('Player', 100, 50);
       await harness.stepFrames(2);
-      const rawData = harness.getObjectRuntimeBehaviorRawData('Player', 'PlatformerObject');
-      harness.assert(!!rawData.props, 'Raw sync data returned');
-      try {
-        harness.getObjectRuntimeBehaviorRawData('Player', 'Nope');
-        harness.fail('Should have thrown');
-      } catch (error) {
-        harness.assert(
-          error.message.indexOf('PlatformerObject') !== -1,
-          'Unknown behavior error lists available behaviors'
-        );
-      }
+
+      const playerByName = harness.getRuntimeObject('Player');
+      harness.assert(
+        playerByName instanceof gdjs.RuntimeObject,
+        'getRuntimeObject returns the gdjs.RuntimeObject'
+      );
+      harness.assert(
+        harness.getRuntimeObject(spawned.id) === playerByName,
+        'The same instance is found by id'
+      );
+      harness.assert(
+        harness.getRuntimeObject(-1) === null &&
+          harness.getRuntimeObject('Nothing') === null,
+        'Unknown id or object name gives null'
+      );
+
+      const behavior = playerByName.getBehavior('PlatformerObject');
+      harness.assert(
+        behavior instanceof gdjs.RuntimeBehavior,
+        'getBehavior returns the gdjs.RuntimeBehavior'
+      );
+      harness.assert(
+        !playerByName.getBehavior('Nope'),
+        'Unknown behavior gives nothing'
+      );
       `,
       { stateInspectors: platformerStateInspectors }
     );

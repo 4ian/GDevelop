@@ -240,6 +240,9 @@ namespace gdjs {
      */
     _hasJustResumed: boolean = false;
 
+    /** True as soon as the game startup began - see `hasGameStartupBegun`. */
+    _hasGameStartupBegun: boolean = false;
+
     //Inputs :
     private _inputManager: InputManager;
 
@@ -1100,6 +1103,15 @@ namespace gdjs {
     }
 
     /**
+     * True as soon as the game began its startup: initial loading
+     * (`loadAllAssets`) then `startGameLoop`, which creates the first scene.
+     * False for a game that is only driven manually (as in tests).
+     */
+    hasGameStartupBegun(): boolean {
+      return this._hasGameStartupBegun;
+    }
+
+    /**
      * Load all assets needed to display the 1st scene, displaying progress in
      * renderer.
      */
@@ -1125,6 +1137,7 @@ namespace gdjs {
       firstSceneName: string,
       progressCallback?: (progress: float) => void
     ): Promise<void> {
+      this._hasGameStartupBegun = true;
       try {
         // Download the loading screen background image first to be able to
         // display the loading screen as soon as possible.

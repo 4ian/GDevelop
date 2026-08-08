@@ -363,6 +363,72 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   }).timeout(10000);
 
+  it('waits for asynchronously loaded libraries before running the script', async () => {
+    /** @type {any} */ (window).__gameplayTestLibraryLoaded = false;
+    gdjs.registerAsynchronouslyLoadingLibraryPromise(
+      new Promise((resolve) =>
+        setTimeout(() => {
+          /** @type {any} */ (window).__gameplayTestLibraryLoaded = true;
+          resolve(undefined);
+        }, 150)
+      )
+    );
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      harness.assert(
+        window.__gameplayTestLibraryLoaded === true,
+        'Asynchronously loaded libraries are ready before the test starts'
+      );
+      await harness.goToScene('Scene 1');
+      `
+    );
+    delete (/** @type {any} */ (window).__gameplayTestLibraryLoaded);
+
+    expect(result.status).to.be('passed');
+  });
+
+  it('waits for a started game to have loaded its first scene', async () => {
+    const runtimeGame = makeRuntimeGame();
+    // Simulate a game whose startup is in progress: the first scene is
+    // pushed a bit later (as startGameLoop does after the initial loading).
+    runtimeGame._hasGameStartupBegun = true;
+    setTimeout(() => {
+      runtimeGame
+        .getSceneStack()
+        .replace({ sceneName: 'Scene 2', clear: true });
+    }, 100);
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      harness.assert(
+        harness.getRuntimeGame().getSceneStack().wasFirstSceneLoaded(),
+        'The game finished starting before the test began'
+      );
+      harness.assert(
+        harness.getSceneName() === 'Scene 2',
+        'The first scene of the game is running'
+      );
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  });
+
+  it('fails with a clear error when a started game never finishes starting', async () => {
+    const runtimeGame = makeRuntimeGame();
+    runtimeGame._hasGameStartupBegun = true;
+    const result = await runTestScript(
+      runtimeGame,
+      'await harness.stepFrames(1);',
+      { timeoutMs: 300 }
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors[0]).to.contain('did not finish starting');
+  }).timeout(10000);
+
   it('stops with a timeout when the maximum frames count is reached', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

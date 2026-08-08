@@ -295,10 +295,10 @@ describe('gdjs.gameplayTests', () => {
       await harness.goToScene('Scene 1');
       harness.spawn('Player', 100, 50);
       await harness.stepFrames(2);
-      const rawData = harness.getRawBehaviorData('Player', 'PlatformerObject');
+      const rawData = harness.getObjectRuntimeBehaviorRawData('Player', 'PlatformerObject');
       harness.assert(!!rawData.props, 'Raw sync data returned');
       try {
-        harness.getRawBehaviorData('Player', 'Nope');
+        harness.getObjectRuntimeBehaviorRawData('Player', 'Nope');
         harness.fail('Should have thrown');
       } catch (error) {
         harness.assert(
@@ -308,6 +308,42 @@ describe('gdjs.gameplayTests', () => {
       }
       `,
       { stateInspectors: platformerStateInspectors }
+    );
+
+    expect(result.status).to.be('passed');
+  }).timeout(10000);
+
+  it('gives the raw runtime game, scene and layers as escape hatches', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      harness.assert(
+        harness.getRuntimeGame() instanceof gdjs.RuntimeGame,
+        'getRuntimeGame returns the gdjs.RuntimeGame'
+      );
+      harness.assert(
+        harness.getCurrentRuntimeScene() instanceof gdjs.RuntimeScene,
+        'getCurrentRuntimeScene returns the gdjs.RuntimeScene'
+      );
+
+      const baseLayer = harness.getRuntimeLayer('');
+      harness.assert(
+        baseLayer instanceof gdjs.RuntimeLayer,
+        'getRuntimeLayer returns the gdjs.RuntimeLayer'
+      );
+      harness.assert(baseLayer.isVisible(), 'Base layer starts visible');
+      baseLayer.show(false);
+      harness.assert(
+        !harness.getRuntimeLayer('').isVisible(),
+        'Layer visibility can be checked after being changed'
+      );
+      harness.assert(
+        harness.getRuntimeLayer('Nope') === null,
+        'Unknown layer gives null'
+      );
+      `
     );
 
     expect(result.status).to.be('passed');

@@ -1305,12 +1305,14 @@ namespace gdjs {
       }
 
       /**
-       * Get the visibility of a layer, or null if the layer does not exist.
+       * The raw `gdjs.RuntimeLayer` of the current scene, or null if the
+       * layer does not exist. Useful to check the layer visibility
+       * (`isVisible()`) or read the camera (`getCameraX()`, `getCameraZoom()`...).
        */
-      getLayer(layerName: string): { visible: boolean } | null {
+      getRuntimeLayer(layerName: string): gdjs.RuntimeLayer | null {
         const currentScene = this._getCurrentScene();
         if (!currentScene.hasLayer(layerName)) return null;
-        return { visible: currentScene.getLayer(layerName).isVisible() };
+        return currentScene.getLayer(layerName);
       }
 
       /**
@@ -1350,7 +1352,7 @@ namespace gdjs {
        * @param objectIdOrName An instance id (from `getObjects`) or an object
        * name (first instance).
        */
-      getRawBehaviorData(
+      getObjectRuntimeBehaviorRawData(
         objectIdOrName: integer | string,
         behaviorName: string
       ): Object {

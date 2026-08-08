@@ -97,7 +97,7 @@ const pushConditionEntries = (
     if (!hasOnlyImplicitParameters(metadata, isBehavior)) continue;
     const functionName = metadata.getFunctionName();
     if (!functionName) continue;
-    if (entries.some((entry) => entry.name === name)) continue;
+    if (entries.some(entry => entry.name === name)) continue;
     entries.push({ name, functionName, kind: 'boolean' });
   }
 };
@@ -120,7 +120,7 @@ const pushExpressionEntries = (
     if (!hasOnlyImplicitParameters(metadata, isBehavior)) continue;
     const functionName = metadata.getFunctionName();
     if (!functionName) continue;
-    if (entries.some((entry) => entry.name === name)) continue;
+    if (entries.some(entry => entry.name === name)) continue;
     entries.push({ name, functionName, kind });
   }
 };
@@ -174,11 +174,11 @@ const getUsedTypes = (
   const objectTypes: Set<string> = new Set();
 
   const visitObjectsContainer = (objectsContainer: gdObjectsContainer) => {
-    mapFor(0, objectsContainer.getObjectsCount(), (i) => {
+    mapFor(0, objectsContainer.getObjectsCount(), i => {
       const object = objectsContainer.getObjectAt(i);
       objectTypes.add(object.getType());
       const behaviorNames = object.getAllBehaviorNames();
-      mapFor(0, behaviorNames.size(), (j) => {
+      mapFor(0, behaviorNames.size(), j => {
         const behavior = object.getBehavior(behaviorNames.at(j));
         behaviorTypes.add(behavior.getTypeName());
       });
@@ -186,15 +186,15 @@ const getUsedTypes = (
   };
 
   visitObjectsContainer(project.getObjects());
-  mapFor(0, project.getLayoutsCount(), (i) => {
+  mapFor(0, project.getLayoutsCount(), i => {
     visitObjectsContainer(project.getLayoutAt(i).getObjects());
   });
   // Child objects of events-based (custom) objects: their snapshots appear
   // as `children` of custom object instances.
-  mapFor(0, project.getEventsFunctionsExtensionsCount(), (i) => {
+  mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
     const eventsFunctionsExtension = project.getEventsFunctionsExtensionAt(i);
     const eventsBasedObjects = eventsFunctionsExtension.getEventsBasedObjects();
-    mapFor(0, eventsBasedObjects.getCount(), (j) => {
+    mapFor(0, eventsBasedObjects.getCount(), j => {
       visitObjectsContainer(eventsBasedObjects.getAt(j).getObjects());
     });
   });

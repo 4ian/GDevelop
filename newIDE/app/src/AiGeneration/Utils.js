@@ -614,7 +614,6 @@ export const useProcessFunctionCalls = ({
           // the tab can be closed while the gdLayout is still valid.
           onWillDeleteScene,
           onWillDeleteGameplayTest,
-          onWillDeleteGameplayTest,
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
@@ -670,6 +669,7 @@ export const useProcessFunctionCalls = ({
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
       onWillDeleteScene,
+      onWillDeleteGameplayTest,
       onWillDeleteObject,
       ensureExtensionInstalled,
       onWillInstallExtension,

@@ -633,23 +633,27 @@ const MainFrame = (props: Props): React.MixedElement => {
   } = React.useContext(AiRequestContext);
 
   // Allow gameplay tests to be run from anywhere in the editor. Registered
-  // ONCE (empty dependency list), reading the latest values through refs:
-  // re-registering on renders would leave the registry momentarily null,
-  // which the AI function calls processor could hit ("no editor registered").
+  // ONCE (the only dependency is a stable ref), reading the latest values
+  // through refs: re-registering on renders would leave the registry
+  // momentarily null, which the AI function calls processor could hit
+  // ("no editor registered").
   const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
   const unsavedChangesRef = useStableUpToDateRef(unsavedChanges);
-  React.useEffect(() => {
-    registerGameplayTestRunnerDependencies({
-      getPreviewLauncher: () => _previewLauncher.current,
-      onTestsRunFinished: () => {
-        // The last run summary of tests was updated on the project.
-        const currentUnsavedChanges = unsavedChangesRef.current;
-        if (currentUnsavedChanges)
-          currentUnsavedChanges.triggerUnsavedChanges();
-      },
-    });
-    return () => registerGameplayTestRunnerDependencies(null);
-  }, []);
+  React.useEffect(
+    () => {
+      registerGameplayTestRunnerDependencies({
+        getPreviewLauncher: () => _previewLauncher.current,
+        onTestsRunFinished: () => {
+          // The last run summary of tests was updated on the project.
+          const currentUnsavedChanges = unsavedChangesRef.current;
+          if (currentUnsavedChanges)
+            currentUnsavedChanges.triggerUnsavedChanges();
+        },
+      });
+      return () => registerGameplayTestRunnerDependencies(null);
+    },
+    [unsavedChangesRef]
+  );
   const {
     hasUnsavedChanges,
     sealUnsavedChanges,

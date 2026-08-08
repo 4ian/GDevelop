@@ -37,7 +37,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > 2D Pathfinding */
-  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 

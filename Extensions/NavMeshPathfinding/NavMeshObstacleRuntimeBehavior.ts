@@ -299,8 +299,16 @@ namespace gdjs {
         for (let index = 0; index < vertices.length; index++) {
           const vertex = vertices[index];
           // Side
-          positions.push(vertex.x, depthMax, vertex.y * this.inverseSpeedScaleY);
-          positions.push(vertex.x, depthMin, vertex.y * this.inverseSpeedScaleY);
+          positions.push(
+            vertex.x,
+            depthMax,
+            vertex.y * this.inverseSpeedScaleY
+          );
+          positions.push(
+            vertex.x,
+            depthMin,
+            vertex.y * this.inverseSpeedScaleY
+          );
           indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
           indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
           indicesOffset += 2;

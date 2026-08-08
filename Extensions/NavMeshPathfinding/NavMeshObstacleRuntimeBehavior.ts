@@ -59,7 +59,7 @@ namespace gdjs {
     hasStepped = false;
     debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
 
-    static readonly cellHeightFor2D = 10;
+    static readonly cellHeightFor2D = 5;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       this.navMeshConfig.cs = sharedData.cellSize;
@@ -231,7 +231,7 @@ namespace gdjs {
 
         x *= width;
         y *= height;
-        z *= gdjs.NavMeshObstaclesManager.cellHeightFor2D;
+        z *= gdjs.NavMeshObstaclesManager.cellHeightFor2D - 1;
 
         x += centerX;
         y += centerY;
@@ -269,24 +269,25 @@ namespace gdjs {
         ) {
           vertices.reverse();
         }
-        const cellHeightFor2D = gdjs.NavMeshObstaclesManager.cellHeightFor2D;
+        const depthMax = gdjs.NavMeshObstaclesManager.cellHeightFor2D - 1;
+        const depthMin = -1;
         triangulate(
           vertices,
           vertexFlags,
           (p1: Point, p2: Point, p3: Point) => {
             // Top
-            positions.push(p1.x, cellHeightFor2D, p1.y * this.inverseSpeedScaleY);
-            positions.push(p2.x, cellHeightFor2D, p2.y * this.inverseSpeedScaleY);
-            positions.push(p3.x, cellHeightFor2D, p3.y * this.inverseSpeedScaleY);
+            positions.push(p1.x, depthMax, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, depthMax, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, depthMax, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 0,
               indicesOffset + 1,
               indicesOffset + 2
             );
             // Bottom
-            positions.push(p1.x, 0, p1.y * this.inverseSpeedScaleY);
-            positions.push(p2.x, 0, p2.y * this.inverseSpeedScaleY);
-            positions.push(p3.x, 0, p3.y * this.inverseSpeedScaleY);
+            positions.push(p1.x, depthMin, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, depthMin, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, depthMin, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 3,
               indicesOffset + 5,
@@ -298,15 +299,15 @@ namespace gdjs {
         for (let index = 0; index < vertices.length; index++) {
           const vertex = vertices[index];
           // Side
-          positions.push(vertex.x, cellHeightFor2D, vertex.y * this.inverseSpeedScaleY);
-          positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
+          positions.push(vertex.x, depthMax, vertex.y * this.inverseSpeedScaleY);
+          positions.push(vertex.x, depthMin, vertex.y * this.inverseSpeedScaleY);
           indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
           indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
           indicesOffset += 2;
         }
         const vertex = vertices[0];
-        positions.push(vertex.x, cellHeightFor2D, vertex.y * this.inverseSpeedScaleY);
-        positions.push(vertex.x, 0, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, depthMax, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, depthMin, vertex.y * this.inverseSpeedScaleY);
       }
     }
 

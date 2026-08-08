@@ -363,7 +363,7 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   }).timeout(10000);
 
-  it('waits for asynchronously loaded libraries before running the script', async () => {
+  it('waits for a starting game to be done starting up (libraries, first scene)', async () => {
     /** @type {any} */ (window).__gameplayTestLibraryLoaded = false;
     gdjs.registerAsynchronouslyLoadingLibraryPromise(
       new Promise((resolve) =>
@@ -374,6 +374,9 @@ describe('gdjs.gameplayTests', () => {
       )
     );
     const runtimeGame = makeRuntimeGame();
+    // Start the game like a real game launch does - and don't await it:
+    // the test run request arrives while the game is still starting.
+    runtimeGame.loadAllAssets(() => runtimeGame.startGameLoop());
     const result = await runTestScript(
       runtimeGame,
       `
@@ -381,7 +384,14 @@ describe('gdjs.gameplayTests', () => {
         window.__gameplayTestLibraryLoaded === true,
         'Asynchronously loaded libraries are ready before the test starts'
       );
-      await harness.goToScene('Scene 1');
+      harness.assert(
+        !harness.getRuntimeGame().isStartingUp(),
+        'The game is done starting up'
+      );
+      harness.assert(
+        harness.getSceneName() === 'Scene 1',
+        'The first scene of the game is running'
+      );
       `
     );
     delete (/** @type {any} */ (window).__gameplayTestLibraryLoaded);

@@ -2378,42 +2378,13 @@ namespace gdjs {
         ]);
       }
 
-      // Wait for the game to be fully booted: a run request can arrive
+      // Wait for the game to be done starting up: a run request can arrive
       // while the game is still starting. Without this, the test could
       // create scenes before asynchronously loaded libraries (Jolt
-      // physics...) are ready, or the boot could push the game's first
+      // physics...) are ready, or the startup could push the game's first
       // scene in the middle of the test.
-      try {
-        let libraryWaitTimeoutId: any = null;
-        try {
-          await Promise.race([
-            gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
-            new Promise<never>((_, reject) => {
-              libraryWaitTimeoutId = setTimeout(
-                () =>
-                  reject(
-                    new Error(
-                      `Libraries did not finish loading within ${harness._timeoutMs}ms.`
-                    )
-                  ),
-                harness._timeoutMs
-              );
-            }),
-          ]);
-        } finally {
-          clearTimeout(libraryWaitTimeoutId);
-        }
-      } catch (error) {
-        currentlyRunningHarness = null;
-        return harness._makeResult('error', [
-          'A library required by the game failed to load: ' + error,
-        ]);
-      }
       const bootDeadlineMs = Date.now() + harness._timeoutMs;
-      while (
-        runtimeGame.hasGameStartupBegun() &&
-        !runtimeGame.getSceneStack().wasFirstSceneLoaded()
-      ) {
+      while (runtimeGame.isStartingUp()) {
         if (harness._stopped) {
           currentlyRunningHarness = null;
           return harness._makeResult('stopped', ['The test was stopped.']);

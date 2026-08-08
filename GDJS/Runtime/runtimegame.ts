@@ -1103,12 +1103,16 @@ namespace gdjs {
     }
 
     /**
-     * True as soon as the game began its startup: initial loading
-     * (`loadAllAssets`) then `startGameLoop`, which creates the first scene.
-     * False for a game that is only driven manually (as in tests).
+     * True while the game is in its startup sequence: the initial loading
+     * (`loadAllAssets` - assets and asynchronously loaded libraries) has
+     * begun but the first scene (created by `startGameLoop` at the end of
+     * it) does not exist yet. Always false for a game that is never
+     * started and only driven manually (as in tests).
      */
-    hasGameStartupBegun(): boolean {
-      return this._hasGameStartupBegun;
+    isStartingUp(): boolean {
+      return (
+        this._hasGameStartupBegun && !this._sceneStack.wasFirstSceneLoaded()
+      );
     }
 
     /**

@@ -12,7 +12,9 @@ import PreferencesContext, {
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
 import {
   runProjectGameplayTests,
+  makeGameplayTestResultReadableOutput,
   type GameplayTestToRun,
+  type GameplayTestResult,
 } from '../GameplayTests/GameplayTestRunner';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
@@ -82,6 +84,67 @@ export const shouldBlockOnDiagnosticErrorsForCli = (
   if (typeof cliOverride === 'boolean') return cliOverride;
 
   return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
+};
+
+const sanitizeForFileName = (name: string): string =>
+  name.replace(/[^a-zA-Z0-9-_]+/g, '_').substring(0, 60) || 'unnamed';
+
+/**
+ * Write the full results of a gameplay tests run (the same content the
+ * GDevelop AI reads: assertions, logs, event log, final state, profiles...)
+ * to a JSON file, with the screenshots extracted to JPEG files next to it.
+ * The path is taken from `--results-path`, defaulting to
+ * `gameplay-test-results.json` next to the project file.
+ */
+const writeCliGameplayTestResults = (
+  project: gdProject,
+  results: Array<GameplayTestResult>
+): ?string => {
+  if (!fs || !path) return null;
+
+  const appArguments = Window.getArguments();
+  const resultsPath =
+    typeof appArguments['results-path'] === 'string' &&
+    appArguments['results-path']
+      ? path.resolve(appArguments['results-path'])
+      : path.join(
+          path.dirname(project.getProjectFile()),
+          'gameplay-test-results.json'
+        );
+  const screenshotsDirectoryPath = path.join(
+    path.dirname(resultsPath),
+    'gameplay-test-screenshots'
+  );
+
+  const outputs = results.map(result => {
+    const output = makeGameplayTestResultReadableOutput(result);
+    return {
+      ...output,
+      screenshots: result.screenshots.map((screenshot, index) => {
+        const screenshotPath = path.join(
+          screenshotsDirectoryPath,
+          `${sanitizeForFileName(result.testName)}-frame-${
+            screenshot.frame
+          }-${sanitizeForFileName(screenshot.label || `${index}`)}.jpg`
+        );
+        try {
+          fs.mkdirSync(screenshotsDirectoryPath, { recursive: true });
+          fs.writeFileSync(screenshotPath, screenshot.jpegBase64, 'base64');
+          return {
+            label: screenshot.label,
+            frame: screenshot.frame,
+            file: screenshotPath,
+          };
+        } catch (error) {
+          console.error('[CLI] Could not write a screenshot:', error);
+          return { label: screenshot.label, frame: screenshot.frame };
+        }
+      }),
+    };
+  });
+
+  fs.writeFileSync(resultsPath, JSON.stringify(outputs, null, 2));
+  return resultsPath;
 };
 
 const runners: { [commandName: string]: CliCommandRunner } = {
@@ -170,7 +233,7 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const results = await runProjectGameplayTests({
       project,
       tests: filteredTests,
-      options: {},
+      options: { screenshots: 'on-failure' },
     });
     let failedCount = 0;
     for (const result of results) {
@@ -183,6 +246,13 @@ const runners: { [commandName: string]: CliCommandRunner } = {
           result.durationMs
         )}ms)${result.errors.length ? ' - ' + result.errors.join(' | ') : ''}`
       );
+    }
+    try {
+      const resultsPath = writeCliGameplayTestResults(project, results);
+      if (resultsPath)
+        console.info(`[CLI] Full test results written to: ${resultsPath}`);
+    } catch (error) {
+      console.error('[CLI] Could not write the full test results:', error);
     }
     console.info(
       `[CLI] ${results.length - failedCount}/${

@@ -1508,7 +1508,7 @@ namespace gdjs {
        * convention as object angles). `rotationX`/`rotationY` are the 3D
        * camera rotations: `rotationX` is 0 looking straight down (the 2D
        * default) and 90 at the horizon, so the pitch of a first-person
-       * view is `90 - rotationX`.
+       * view is `rotationX - 90` (positive = looking up).
        */
       getCameraState(layerName: string = ''): {
         x: float;
@@ -1741,11 +1741,11 @@ namespace gdjs {
           relativeZ === undefined
             ? 0
             : gdjs.toDegrees(Math.atan2(relativeZ, horizontalDistance));
-        // The pitch of a camera view: 90 - rotationX (rotationX is 0
-        // looking straight down, 90 at the horizon).
+        // The pitch of a camera view: rotationX - 90 (rotationX is 0
+        // looking straight down - a pitch of -90 - and 90 at the horizon).
         const currentPitch =
           camera !== null
-            ? 90 - camera.rotationX
+            ? camera.rotationX - 90
             : typeof anyReference.getRotationX === 'function'
               ? anyReference.getRotationX()
               : 0;

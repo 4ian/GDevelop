@@ -1724,11 +1724,15 @@ namespace gdjs {
 
         const distance = Math.hypot(relativeX, relativeY, relativeZ || 0);
 
+        // The world direction a 3D camera looks at is its angle minus 90
+        // (with the ZYX rotation order, at the horizon the view direction
+        // is the former screen-up - games set the camera angle to
+        // "facing + 90", e.g. LookFromObjectEyes).
         const currentYaw =
           options && options.heading !== undefined
             ? options.heading
             : camera !== null
-              ? camera.angle
+              ? camera.angle - 90
               : reference.getAngle();
         const desiredAngle = gdjs.toDegrees(Math.atan2(relativeY, relativeX));
         const yawDiff = normalizeAngleDifference(desiredAngle - currentYaw);
@@ -1965,10 +1969,17 @@ namespace gdjs {
         target:
           | { name: string; id?: integer }
           | { x: float; y: float; z?: float },
-        options?: { yawOnly?: boolean; fromCamera?: string }
+        options?: {
+          yawOnly?: boolean;
+          fromCamera?: string;
+          /** Consider the aim done when both angles are within this
+           * tolerance (default 3 degrees - lower it to hit a small or far
+           * target). */
+          toleranceDegrees?: float;
+        }
       ): Promise<GameplayTestAimResult | null> {
         const maxAimFrames = 180;
-        const toleranceDegrees = 3;
+        const toleranceDegrees = (options && options.toleranceDegrees) || 3;
         const responseThresholdDegrees = 0.1;
         const maxPixelsPerDegree = 64;
         // Frames tolerated with a demand on an axis, a maxed-out gain and

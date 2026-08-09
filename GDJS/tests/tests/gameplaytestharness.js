@@ -440,6 +440,41 @@ describe('gdjs.gameplayTests', () => {
     expect(result.errors[0]).to.contain('did not finish starting');
   }).timeout(10000);
 
+  it('gives the camera state and camera/heading-relative positions', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const camera = harness.getCameraState('');
+      harness.assert(!!camera, 'The base layer camera exists');
+      harness.assert(
+        typeof camera.x === 'number' && camera.zoom === 1 &&
+          camera.rotationX === 0 && camera.angle === 0,
+        'The camera state is JSON-safe with the expected defaults'
+      );
+      harness.assert(harness.getCameraState('Nope') === null, 'Unknown layer gives null');
+
+      const spawned = harness.spawn('MyObject', 100, 100);
+      // Target straight to the right: yawDiff 0 against the object's
+      // angle (0), -90 against a heading of 90.
+      const straight = harness.getRelativePosition('MyObject', { x: 300, y: 100 });
+      harness.assert(Math.abs(straight.yawDiff) < 0.001, 'yawDiff is 0 toward the right');
+      const withHeading = harness.getRelativePosition('MyObject', { x: 300, y: 100 }, { heading: 90 });
+      harness.assert(Math.abs(withHeading.yawDiff + 90) < 0.001, 'heading is used for yawDiff');
+
+      // fromZ gives an eye height even for a 2D object: a target at the
+      // same height as the eye needs no pitch, one below needs to look down.
+      const level = harness.getRelativePosition('MyObject', { x: 300, y: 100, z: 50 }, { fromZ: 50 });
+      harness.assert(Math.abs(level.pitchDiff) < 0.001, 'No pitch toward a target at eye height');
+      const below = harness.getRelativePosition('MyObject', { x: 300, y: 100, z: 0 }, { fromZ: 50 });
+      harness.assert(below.pitchDiff < -10, 'Negative pitch toward a target below the eye');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  }).timeout(10000);
+
   it('stops with a timeout when the maximum frames count is reached', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

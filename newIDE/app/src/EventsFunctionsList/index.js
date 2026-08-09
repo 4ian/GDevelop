@@ -5,11 +5,8 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import { AutoSizer } from 'react-virtualized';
-import Background from '../UI/Background';
-import CompactSearchBar from '../UI/CompactSearchBar';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import TreeView, {
+import {
   type TreeViewInterface,
   type MenuButton,
 } from '../UI/TreeView';
@@ -18,11 +15,9 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import PreferencesContext, {
   type Preferences,
 } from '../MainFrame/Preferences/PreferencesContext';
-import { Column, Line } from '../UI/Grid';
 import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
-import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
@@ -68,6 +63,7 @@ import {
 import { insertNewEventsBasedObject } from './CreateEventsBasedObject';
 import { insertNewEventsBasedBehavior } from './CreateEventsBasedBehavior';
 import { initializeEventsFunctionDisplayName } from './InitializeEventsFunction';
+import EventsFunctionsTreeView from './EventsFunctionsTreeView';
 
 const gd: libGDevelop = global.gd;
 
@@ -78,16 +74,6 @@ export const extensionFunctionsRootFolderId = 'extension-functions';
 const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
-
-const styles = {
-  listContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  autoSizerContainer: { flex: 1 },
-  autoSizer: { width: '100%' },
-};
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
@@ -764,8 +750,6 @@ const EventsFunctionsList = React.forwardRef<
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
     }));
-
-    const [searchText, setSearchText] = React.useState('');
 
     const scrollToItem = React.useCallback((itemId: string) => {
       if (treeViewRef.current) {
@@ -1909,84 +1893,46 @@ const EventsFunctionsList = React.forwardRef<
     );
 
     return (
-      <Background maxWidth>
-        <Column>
-          <LineStackLayout>
-            <Column expand noMargin>
-              <CompactSearchBar
-                value={searchText}
-                onChange={text => setSearchText(text)}
-                placeholder={t`Search functions`}
-              />
-            </Column>
-          </LineStackLayout>
-          {headerControls && (
-            <Line noMargin justifyContent="flex-end" alignItems="center">
-              {headerControls}
-            </Line>
-          )}
-        </Column>
-        <div
-          style={styles.listContainer}
-          onKeyDown={keyboardShortcutsRef.current.onKeyDown}
-          onKeyUp={keyboardShortcutsRef.current.onKeyUp}
-          id="events-function-list"
-        >
-          <I18n>
-            {({ i18n }) => (
-              <div style={styles.autoSizerContainer}>
-                <AutoSizer style={styles.autoSizer} disableWidth>
-                  {({ height }) => (
-                    // $FlowFixMe[incompatible-type]
-                    // $FlowFixMe[incompatible-exact]
-                    <TreeView
-                      enableStickyAncestors
-                      key={listKey}
-                      ref={treeViewRef}
-                      items={getTreeViewData(i18n)}
-                      height={height}
-                      forceAllOpened={!!currentlyRunningInAppTutorial}
-                      searchText={searchText}
-                      getItemName={getTreeViewItemName}
-                      getItemThumbnail={getTreeViewItemThumbnail}
-                      getItemChildren={getTreeViewItemChildren(i18n)}
-                      multiSelect={false}
-                      getItemId={getTreeViewItemId}
-                      getItemHtmlId={getTreeViewItemHtmlId}
-                      getItemDataset={getTreeViewItemData}
-                      onEditItem={editItem}
-                      onCollapseItem={onCollapseItem}
-                      selectedItems={selectedItems}
-                      onSelectItems={items => {
-                        const itemToSelect = items[0];
-                        if (!itemToSelect) return;
-                        if (itemToSelect.isRoot) return;
-                        itemToSelect.content.onSelect();
-                        setSelectedItems(items);
-                      }}
-                      onClickItem={onClickItem}
-                      onRenameItem={renameItem}
-                      buildMenuTemplate={buildMenuTemplate(i18n)}
-                      getItemRightButton={getTreeViewItemRightButton(i18n)}
-                      renderRightComponent={renderTreeViewItemRightComponent(
-                        i18n
-                      )}
-                      onMoveSelectionToItem={(destinationItem, where) =>
-                        moveSelectionTo(i18n, destinationItem, where)
-                      }
-                      canMoveSelectionToItem={canMoveSelectionTo}
-                      reactDndType={extensionItemReactDndType}
-                      initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      forceDefaultDraggingPreview
-                      shouldHideMenuIcon={() => true}
-                    />
-                  )}
-                </AutoSizer>
-              </div>
-            )}
-          </I18n>
-        </div>
-      </Background>
+      <I18n>
+        {({ i18n }) => (
+          <EventsFunctionsTreeView
+            listKey={listKey}
+            treeViewRef={treeViewRef}
+            items={getTreeViewData(i18n)}
+            selectedItems={selectedItems}
+            getItemName={getTreeViewItemName}
+            getItemThumbnail={getTreeViewItemThumbnail}
+            getItemChildren={getTreeViewItemChildren(i18n)}
+            getItemId={getTreeViewItemId}
+            getItemHtmlId={getTreeViewItemHtmlId}
+            getItemDataset={getTreeViewItemData}
+            onEditItem={editItem}
+            onCollapseItem={onCollapseItem}
+            onSelectItems={(items: Array<TreeViewItem>) => {
+              const itemToSelect = items[0];
+              if (!itemToSelect) return;
+              if (itemToSelect.isRoot) return;
+              itemToSelect.content.onSelect();
+              setSelectedItems(items);
+            }}
+            onClickItem={onClickItem}
+            onRenameItem={renameItem}
+            buildMenuTemplate={buildMenuTemplate(i18n)}
+            getItemRightButton={getTreeViewItemRightButton(i18n)}
+            renderRightComponent={renderTreeViewItemRightComponent(i18n)}
+            onMoveSelectionToItem={(destinationItem, where) =>
+              moveSelectionTo(i18n, destinationItem, where)
+            }
+            canMoveSelectionToItem={canMoveSelectionTo}
+            reactDndType={extensionItemReactDndType}
+            initiallyOpenedNodeIds={initiallyOpenedNodeIds}
+            forceAllOpened={!!currentlyRunningInAppTutorial}
+            headerControls={headerControls}
+            onKeyDown={keyboardShortcutsRef.current.onKeyDown}
+            onKeyUp={keyboardShortcutsRef.current.onKeyUp}
+          />
+        )}
+      </I18n>
     );
   }
 );

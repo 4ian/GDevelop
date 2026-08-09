@@ -18,20 +18,33 @@ const makeEditor = (snapshotName: string): any => {
   };
 };
 
+const makeLifecycleFunctionsEditor = (
+  selectedEditor: any,
+  editorsByName: { [string]: any }
+): any => ({
+  getSelectedEditor: jest.fn(() => selectedEditor),
+  getEditor: jest.fn((name) => editorsByName[name] || null),
+  forEachEditor: jest.fn((callback) =>
+    Object.keys(editorsByName).forEach((name) => callback(editorsByName[name]))
+  ),
+  selectFunctionByName: jest.fn((name) =>
+    ['sceneLoad', 'sceneSignal', 'sceneUpdate', 'sceneUnload'].includes(name)
+  ),
+});
+
 describe('scene lifecycle editor containers', () => {
   it('keeps one editor per visited scene lifecycle function and routes outside changes by role', () => {
     const scene = ({}: any);
     const container: any = new EventsEditorContainer(({}: any));
     const updateEditor = makeEditor('update-selection');
     const signalEditor = makeEditor('signal-selection');
-    container.state = {
-      selectedLifecycleFunctionName: 'sceneSignal',
-      mountedLifecycleFunctionNames: ['sceneUpdate', 'sceneSignal'],
-    };
-    container.editorsByLifecycleFunctionName = {
-      sceneUpdate: (updateEditor: any),
-      sceneSignal: (signalEditor: any),
-    };
+    container.lifecycleFunctionsEditor = makeLifecycleFunctionsEditor(
+      signalEditor,
+      {
+        sceneUpdate: updateEditor,
+        sceneSignal: signalEditor,
+      }
+    );
     container.getLayout = () => scene;
 
     expect(container.getEditorSelectionSnapshot()).toBe('signal-selection');
@@ -54,15 +67,13 @@ describe('scene lifecycle editor containers', () => {
     const container: any = new ExternalEventsEditorContainer(({}: any));
     const loadEditor = makeEditor('load-selection');
     const unloadEditor = makeEditor('unload-selection');
-    container.state = {
-      externalPropertiesDialogOpen: false,
-      selectedLifecycleFunctionName: 'sceneUnload',
-      mountedLifecycleFunctionNames: ['sceneLoad', 'sceneUnload'],
-    };
-    container.editorsByLifecycleFunctionName = {
-      sceneLoad: (loadEditor: any),
-      sceneUnload: (unloadEditor: any),
-    };
+    container.lifecycleFunctionsEditor = makeLifecycleFunctionsEditor(
+      unloadEditor,
+      {
+        sceneLoad: loadEditor,
+        sceneUnload: unloadEditor,
+      }
+    );
     container.getExternalEvents = () => externalEvents;
 
     expect(container.getEditorSelectionSnapshot()).toBe('unload-selection');

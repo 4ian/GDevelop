@@ -252,12 +252,29 @@ Existing function icons should be reused:
 - `res/functions/step_black.svg` for `sceneUpdate`; and
 - `res/functions/destroy_black.svg` for `sceneUnload`.
 
-A dedicated `SceneContextLifecycleFunctionsList` reuses the Prefab
-`EventsFunctionsList` tree item, icon, selection, keyboard navigation, and
-body-opening behavior. It is used by both editor types, with the heading and
-descriptions supplied by the owner. Owner policy hides add, rename, delete,
-duplicate, reorder, signature editing, and “use as instruction” actions for
-these four fixed functions.
+The event-function body editor is shared directly with Prefab functions.
+`EventsFunctionsExtensionEditor/EventsFunctionEditor.js` receives a real
+`gd::EventsFunction`, derives its event list, and owns the common `EventsSheet`
+integration. Prefab functions use the editable capability policy; scene and
+External Events functions use the fixed capability policy, which disables
+parameter and property editing without forking the event editor.
+
+The function-list presentation is also owner-independent.
+`EventsFunctionsList/EventsFunctionsTreeView.js` owns the search field,
+`TreeView`, row layout, icons, selection styling, keyboard navigation,
+responsive sizing, and optional header controls for Extension, Behavior,
+Prefab/Object, Scene, and External Events functions. Each owner supplies only
+its tree data and mutation capabilities. The existing `EventsFunctionsList`
+adapts Extension, Behavior, and Prefab/Object hierarchies; scene owners adapt
+their four fixed functions and expose no create, rename, delete, move, or
+context-menu actions.
+
+`SceneContextLifecycleFunctionsEditor` is the thin owner adapter around that
+shared body editor. It provides the four fixed navigation entries, lazy mounts
+visited bodies so their editor state is retained, and exposes the selected and
+mounted editor instances to the Scene and External Events containers. It does
+not implement another event sheet and does not expose add, rename, delete,
+duplicate, reorder, signature editing, or “use as instruction” actions.
 
 ### 6.2 Selection behavior
 
@@ -1482,8 +1499,13 @@ Primary areas to change include:
 ### 21.3 Editor
 
 - `newIDE/app/src/MainFrame/EditorContainers/EventsEditorContainer.js`
-- a shared fixed lifecycle-functions list adjacent to `EventsSheet`, reusing
-  Prefab function list items
+- `newIDE/app/src/MainFrame/EditorContainers/ExternalEventsEditorContainer.js`
+- `newIDE/app/src/EventsFunctionsExtensionEditor/EventsFunctionEditor.js` as
+  the shared Prefab/scene/External Events function-body editor
+- `newIDE/app/src/EventsFunctionsList/EventsFunctionsTreeView.js` as the shared
+  function-list presentation for every event-function owner
+- `newIDE/app/src/SceneContextLifecycleFunctionsEditor/index.js` as the fixed
+  scene-owner navigation, lazy-mount, and editor-instance adapter
 - event selection snapshots and paths
 - global search, validation, outside-editor changes, analytics, and command
   palette integration

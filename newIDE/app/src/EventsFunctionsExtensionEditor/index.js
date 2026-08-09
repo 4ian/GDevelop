@@ -5,10 +5,13 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import EventsSheet, {
+import {
   type EventsSheetInterface,
   type EventsSheetSelectionSnapshot,
 } from '../EventsSheet';
+import EventsFunctionEditor, {
+  editableEventsFunctionCapabilities,
+} from './EventsFunctionEditor';
 import EditorMosaic, {
   type EditorMosaicNode,
   type EditorMosaicInterface,
@@ -2221,7 +2224,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           this._globalObjectsContainer &&
           this._objectsContainer ? (
             <Background>
-              <EventsSheet
+              <EventsFunctionEditor
                 key={selectedEventsFunction.ptr}
                 ref={(editor) => (this.editor = editor)}
                 project={project}
@@ -2237,7 +2240,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   // $FlowFixMe[incompatible-type]
                   this._projectScopedContainersAccessor
                 }
-                events={selectedEventsFunction.getEvents()}
+                eventsFunction={selectedEventsFunction}
+                capabilities={editableEventsFunctionCapabilities}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}
                 resourceManagementProps={this.props.resourceManagementProps}

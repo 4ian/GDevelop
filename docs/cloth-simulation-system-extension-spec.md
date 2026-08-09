@@ -1,6 +1,6 @@
 # Cloth Simulation System Extension Specification
 
-Status: **Proposed — implementation requires explicit approval**
+Status: **Approved**
 
 Date: 2026-08-07
 
@@ -25,9 +25,9 @@ this document may be added until a reviewer explicitly changes the status to
 
 | Field | Value |
 | --- | --- |
-| Approver | Not yet approved |
-| Approval date | Not yet approved |
-| Approved scope | Not yet approved |
+| Approver | User, via explicit implementation request |
+| Approval date | 2026-08-09 |
+| Approved scope | Full specification as written |
 
 Approval of the separate scene lifecycle-functions specification does not
 approve this feature.

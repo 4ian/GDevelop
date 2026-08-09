@@ -137,6 +137,7 @@ describe('gdjs.gameplayTests', () => {
     );
 
     expect(result.status).to.be('passed');
+    expect(result.timeoutMs).to.be(5000);
     expect(result.framesExecuted).to.be(6); // 1 (goToScene) + 5.
     expect(result.assertions.length).to.be(1);
     expect(result.assertions[0].passed).to.be(true);
@@ -437,6 +438,92 @@ describe('gdjs.gameplayTests', () => {
 
     expect(result.status).to.be('error');
     expect(result.errors[0]).to.contain('did not finish starting');
+  }).timeout(10000);
+
+  it('gives the camera state and camera/heading-relative positions', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const camera = harness.getCameraState('');
+      harness.assert(!!camera, 'The base layer camera exists');
+      harness.assert(
+        typeof camera.x === 'number' && camera.zoom === 1 &&
+          camera.rotationX === 0 && camera.angle === 0,
+        'The camera state is JSON-safe with the expected defaults'
+      );
+      harness.assert(harness.getCameraState('Nope') === null, 'Unknown layer gives null');
+
+      const spawned = harness.spawn('MyObject', 100, 100);
+      // Target straight to the right: yawDiff 0 against the object's
+      // angle (0), -90 against a heading of 90.
+      const straight = harness.getRelativePosition('MyObject', { x: 300, y: 100 });
+      harness.assert(Math.abs(straight.yawDiff) < 0.001, 'yawDiff is 0 toward the right');
+      const withHeading = harness.getRelativePosition('MyObject', { x: 300, y: 100 }, { heading: 90 });
+      harness.assert(Math.abs(withHeading.yawDiff + 90) < 0.001, 'heading is used for yawDiff');
+
+      // fromZ gives an eye height even for a 2D object: a target at the
+      // same height as the eye needs no pitch, one below needs to look down.
+      const level = harness.getRelativePosition('MyObject', { x: 300, y: 100, z: 50 }, { fromZ: 50 });
+      harness.assert(Math.abs(level.pitchDiff) < 0.001, 'No pitch toward a target at eye height');
+      const below = harness.getRelativePosition('MyObject', { x: 300, y: 100, z: 0 }, { fromZ: 50 });
+      harness.assert(below.pitchDiff < -10, 'Negative pitch toward a target below the eye');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  }).timeout(10000);
+
+  it('reads and writes object variables, event log, played sounds, stability', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const spawned = harness.spawn('MyObject', 100, 100);
+
+      // Object variables: write then read, by name and by id.
+      harness.assert(
+        harness.getObjectVariable('MyObject', 'Level') === undefined,
+        'Unknown object variable gives undefined'
+      );
+      harness.setObjectVariable(spawned.id, 'Level', 3);
+      harness.assert(
+        harness.getObjectVariable('MyObject', 'Level').value === 3,
+        'The object variable was written and read back'
+      );
+      harness.setObjectVariable('MyObject', 'Locked', true);
+      harness.assert(
+        harness.getObjectVariable(spawned.id, 'Locked').value === true,
+        'Boolean object variables are real booleans'
+      );
+
+      // Event log: readable from the script, with causes.
+      const eventLog = harness.getEventLog();
+      harness.assert(
+        eventLog.some((e) => e.event === 'sceneChanged' && e.cause === 'harness'),
+        'The scene change appears in the readable event log'
+      );
+
+      // Played sounds: the wrapper records the public play methods.
+      harness.getRuntimeGame().getSoundManager().playSound('pickup.aac', false, 100, 1);
+      const playedSounds = harness.getPlayedSounds();
+      harness.assert(
+        playedSounds.length === 1 && playedSounds[0].sound === 'pickup.aac',
+        'The played sound was recorded with its name'
+      );
+
+      // Stability: a still object settles, within the asked frames.
+      const settled = await harness.stepUntilObjectIsStable('MyObject', {
+        stableFrames: 5,
+        maxFrames: 60,
+      });
+      harness.assert(settled === true, 'A still object is reported stable');
+      `
+    );
+
+    expect(result.status).to.be('passed');
   }).timeout(10000);
 
   it('stops with a timeout when the maximum frames count is reached', async () => {

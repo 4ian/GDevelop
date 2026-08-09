@@ -149,6 +149,8 @@ namespace gdjs {
           state: GameplayTestEvaluatedState;
         };
       };
+      flippedX?: boolean;
+      flippedY?: boolean;
       children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
     };
 
@@ -262,6 +264,9 @@ namespace gdjs {
       pitchDiff: float;
       sawYawResponse: boolean;
       sawPitchResponse: boolean;
+      /** What the aim was measured on: the camera of the object's layer
+       * (first-person views) or the object's own rotations. */
+      measuredFrom: 'camera' | 'object';
     };
 
     export type GameplayTestProgressStatus = {
@@ -286,6 +291,9 @@ namespace gdjs {
       status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
       framesExecuted: integer;
       durationMs: number;
+      /** The wall-clock budget the run had (`durationMs` close to it means
+       * the test is at risk of timing out on a slower machine). */
+      timeoutMs: number;
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
       errors: Array<string>;
@@ -314,6 +322,9 @@ namespace gdjs {
      * the game visibly plays (a rendered frame per refresh), stop/progress
      * messages flow, while keeping near-full stepping throughput. */
     const YIELD_BUDGET_MS = 12;
+    // In fast (unpaced) runs, let the game render at most this often.
+    const FAST_RUN_RENDER_INTERVAL_MS = 250;
+    const MAX_PLAYED_SOUNDS = 500;
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
@@ -502,6 +513,11 @@ namespace gdjs {
       /** Last time the stepping loop yielded to the browser (see
        * `_maybeYield`). */
       _lastYieldTimeMs: number = 0;
+      /** The last time an animation frame was awaited (rendering the game). */
+      _lastRenderTimeMs: number = 0;
+      _playedSounds: Array<{ sound: string; frame: integer }> = [];
+      /** Entries of the sound manager log already copied to `_playedSounds`. */
+      _playedSoundsReadCount: integer = 0;
       /** Game seconds simulated per real second, or null to run as fast
        * as possible (see `_maybeYield`). */
       _paceSpeedFactor: float | null = null;
@@ -701,6 +717,7 @@ namespace gdjs {
           this._worstStepTimeMs = stepTimeMs;
         }
         this._trackChangesAfterStep();
+        this._drainPlayedSounds();
         if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
           this._lastProgressTimeMs = Date.now();
           this._onProgress(this._framesExecuted);
@@ -749,7 +766,21 @@ namespace gdjs {
           this._paceReferenceGameTimeMs = this._gameTimeMs;
         }
         if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
-        await this._waitForNextAnimationFrame();
+        // Fast (unpaced) run: don't wait for an animation frame at every
+        // yield - with a slow renderer (software WebGL...), rendering would
+        // dominate the wall-clock time of the run. Yield through a timer
+        // (pending events, like a stop request, are still processed) and
+        // only let an animation frame - which renders the game - happen a
+        // few times per second.
+        if (
+          Date.now() - this._lastRenderTimeMs >=
+          FAST_RUN_RENDER_INTERVAL_MS
+        ) {
+          await this._waitForNextAnimationFrame();
+          this._lastRenderTimeMs = Date.now();
+        } else {
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        }
         this._lastYieldTimeMs = Date.now();
       }
 
@@ -886,6 +917,57 @@ namespace gdjs {
       }
 
       /**
+       * Step until the first instance of the object stops moving: its
+       * position changed less than `tolerance` (default 0.5) per frame for
+       * `stableFrames` (default 20) consecutive frames. Returns whether it
+       * settled within `maxFrames` (default 300). Use this for physics
+       * objects instead of a hand-written "read, compare, update"
+       * condition in `stepUntil` (which can silently pass without
+       * stepping a frame).
+       */
+      async stepUntilObjectIsStable(
+        objectName: string,
+        options?: {
+          tolerance?: float;
+          stableFrames?: integer;
+          maxFrames?: integer;
+        }
+      ): Promise<boolean> {
+        const tolerance = (options && options.tolerance) || 0.5;
+        const stableFrames = (options && options.stableFrames) || 20;
+        const maxFrames = (options && options.maxFrames) || 300;
+        let previous: [float, float, float] | null = null;
+        let stillFrames = 0;
+        return await this.stepUntil(() => stillFrames >= stableFrames, {
+          maxFrames,
+          onFrame: () => {
+            const instance = this._getInstances(objectName)[0];
+            if (!instance) {
+              previous = null;
+              stillFrames = 0;
+              return;
+            }
+            const anyInstance = instance as any;
+            const x = instance.getX();
+            const y = instance.getY();
+            const z =
+              typeof anyInstance.getZ === 'function' ? anyInstance.getZ() : 0;
+            if (
+              previous &&
+              Math.abs(x - previous[0]) < tolerance &&
+              Math.abs(y - previous[1]) < tolerance &&
+              Math.abs(z - previous[2]) < tolerance
+            ) {
+              stillFrames++;
+            } else {
+              stillFrames = 0;
+            }
+            previous = [x, y, z];
+          },
+        });
+      }
+
+      /**
        * Get the name of the scene being run.
        */
       getSceneName(): string {
@@ -934,10 +1016,52 @@ namespace gdjs {
           throw new Error(`The layer "${layerName}" does not exist.`);
         }
         const layer = currentScene.getLayer(layerName);
-        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        const screenPosition = this._convertSceneToScreenPosition(layer, x, y);
         this._runtimeGame
           .getInputManager()
           .onMouseMove(screenPosition[0], screenPosition[1]);
+      }
+
+      /**
+       * Convert a position in scene coordinates of a layer to screen
+       * coordinates - through the actual 3D camera when the layer has a
+       * 3D-rotated one: the engine's 2D conversion
+       * (`convertInverseCoords`) does not handle 3D rotations, while games
+       * read the cursor back through the 3D-aware `convertCoords`, so the
+       * 2D conversion would place the cursor somewhere else than asked.
+       * TODO: this inversion belongs in GDJS itself
+       * (`RuntimeLayer.convertInverseCoords`), so that every consumer gets
+       * the right conversion - do it there and remove this.
+       */
+      private _convertSceneToScreenPosition(
+        layer: gdjs.RuntimeLayer,
+        x: float,
+        y: float
+      ): FloatPoint {
+        if (
+          Math.abs(layer.getCameraRotationX()) > 0.001 ||
+          Math.abs(layer.getCameraRotationY()) > 0.001
+        ) {
+          const renderer = layer.getRenderer() as any;
+          const threeCamera =
+            renderer && typeof renderer.getThreeCamera === 'function'
+              ? renderer.getThreeCamera()
+              : null;
+          if (threeCamera && typeof THREE !== 'undefined') {
+            threeCamera.updateMatrixWorld();
+            // The three.js world Y axis is the opposite of the scene one
+            // (see `transformTo3DWorld`, the inverse of this projection).
+            const vector = new THREE.Vector3(x, -y, 0);
+            vector.project(threeCamera);
+            if (Number.isFinite(vector.x) && Number.isFinite(vector.y)) {
+              return [
+                ((vector.x + 1) / 2) * layer.getWidth(),
+                ((1 - vector.y) / 2) * layer.getHeight(),
+              ];
+            }
+          }
+        }
+        return layer.convertInverseCoords(x, y, 0, [0, 0]);
       }
 
       /**
@@ -1011,7 +1135,7 @@ namespace gdjs {
         layerName: string = ''
       ): void {
         const layer = this._getCurrentScene().getLayer(layerName);
-        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        const screenPosition = this._convertSceneToScreenPosition(layer, x, y);
         this._runtimeGame
           .getInputManager()
           .onTouchStart(identifier, screenPosition[0], screenPosition[1]);
@@ -1028,7 +1152,7 @@ namespace gdjs {
         layerName: string = ''
       ): void {
         const layer = this._getCurrentScene().getLayer(layerName);
-        const screenPosition = layer.convertInverseCoords(x, y, 0, [0, 0]);
+        const screenPosition = this._convertSceneToScreenPosition(layer, x, y);
         this._runtimeGame
           .getInputManager()
           .onTouchMove(identifier, screenPosition[0], screenPosition[1]);
@@ -1151,6 +1275,12 @@ namespace gdjs {
         if (typeof anyObject.getOpacity === 'function') {
           snapshot.opacity = anyObject.getOpacity();
         }
+        if (typeof anyObject.isFlippedX === 'function') {
+          snapshot.flippedX = anyObject.isFlippedX();
+        }
+        if (typeof anyObject.isFlippedY === 'function') {
+          snapshot.flippedY = anyObject.isFlippedY();
+        }
         if (
           includeChildren &&
           typeof anyObject.getChildrenContainer === 'function'
@@ -1160,10 +1290,42 @@ namespace gdjs {
           const children: {
             [objectName: string]: Array<GameplayTestObjectSnapshot>;
           } = {};
+          const canTransformToScene =
+            typeof anyObject.applyObjectTransformation === 'function';
           for (const child of childrenContainer.getAdhocListOfAllInstances()) {
             const childName = child.getName();
             if (!children[childName]) children[childName] = [];
-            children[childName].push(this._makeObjectSnapshot(child, false));
+            const childSnapshot = this._makeObjectSnapshot(child, false);
+            // The children live in the coordinates space of the custom
+            // object: convert to scene coordinates, like every other
+            // snapshot (so clicking a child at its centerX/centerY works).
+            if (canTransformToScene) {
+              const point: FloatPoint = [0, 0];
+              anyObject.applyObjectTransformation(
+                childSnapshot.x,
+                childSnapshot.y,
+                point
+              );
+              childSnapshot.x = point[0];
+              childSnapshot.y = point[1];
+              anyObject.applyObjectTransformation(
+                childSnapshot.centerX,
+                childSnapshot.centerY,
+                point
+              );
+              childSnapshot.centerX = point[0];
+              childSnapshot.centerY = point[1];
+              if (typeof anyObject.getZ === 'function') {
+                if (childSnapshot.z !== undefined)
+                  childSnapshot.z += anyObject.getZ();
+                if (childSnapshot.centerZ !== undefined)
+                  childSnapshot.centerZ += anyObject.getZ();
+              }
+            }
+            // The internal layer name of the parent means nothing outside
+            // of it: report the layer of the custom object itself.
+            childSnapshot.layer = object.getLayer();
+            children[childName].push(childSnapshot);
           }
           snapshot.children = children;
         }
@@ -1316,6 +1478,37 @@ namespace gdjs {
       }
 
       /**
+       * The camera of a layer (JSON-safe), or null if the layer does not
+       * exist. `angle` is the 2D rotation (the yaw of the view, same
+       * convention as object angles). `rotationX`/`rotationY` are the 3D
+       * camera rotations: `rotationX` is 0 looking straight down (the 2D
+       * default) and 90 at the horizon, so the pitch of a first-person
+       * view is `90 - rotationX`.
+       */
+      getCameraState(layerName: string = ''): {
+        x: float;
+        y: float;
+        z: float;
+        rotationX: float;
+        rotationY: float;
+        angle: float;
+        zoom: float;
+      } | null {
+        const currentScene = this._getCurrentScene();
+        if (!currentScene.hasLayer(layerName)) return null;
+        const layer = currentScene.getLayer(layerName);
+        return {
+          x: layer.getCameraX(),
+          y: layer.getCameraY(),
+          z: layer.getCameraZ(null),
+          rotationX: layer.getCameraRotationX(),
+          rotationY: layer.getCameraRotationY(),
+          angle: layer.getCameraRotation(),
+          zoom: layer.getCameraZoom(),
+        };
+      }
+
+      /**
        * The raw `gdjs.RuntimeObject` of an instance, or null if not found.
        * Behaviors can be reached with `getBehavior(behaviorName)` (also null
        * if not found). Prefer the harness APIs (snapshots, inputs...) -
@@ -1341,21 +1534,68 @@ namespace gdjs {
       /**
        * Get a scene variable, or undefined if it does not exist.
        */
-      getSceneVariable(variableName: string): Object | undefined {
+      getSceneVariable(
+        variableName: string
+      ): VariableNetworkSyncData | undefined {
         return this._getCurrentScene()
           .getVariables()
           .getNetworkSyncData({})
-          .find((variable) => (variable as any).name === variableName);
+          .find((variable) => variable.name === variableName);
       }
 
       /**
        * Get a global variable, or undefined if it does not exist.
        */
-      getGlobalVariable(variableName: string): Object | undefined {
+      getGlobalVariable(
+        variableName: string
+      ): VariableNetworkSyncData | undefined {
         return this._runtimeGame
           .getVariables()
           .getNetworkSyncData({})
-          .find((variable) => (variable as any).name === variableName);
+          .find((variable) => variable.name === variableName);
+      }
+
+      /**
+       * The notable events recorded so far (scene changes and resets with
+       * their cause, stuck detections...), as a JSON-safe copy: lets a
+       * test assert, for example, that the game restarted its scene.
+       */
+      getEventLog(): Array<GameplayTestEvent> {
+        return this._eventLog.map((event) => ({ ...event }));
+      }
+
+      /**
+       * The sounds and musics played during the test so far, with the
+       * frame they were played at - a direct signal that a mechanic fired
+       * (a pickup, a shot, an explosion...).
+       */
+      getPlayedSounds(): Array<{ sound: string; frame: integer }> {
+        this._drainPlayedSounds();
+        return this._playedSounds.slice();
+      }
+
+      _installSoundLog(): void {
+        this._runtimeGame.getSoundManager().setPlayedSoundsLogEnabled(true);
+      }
+
+      _uninstallSoundLog(): void {
+        this._runtimeGame.getSoundManager().setPlayedSoundsLogEnabled(false);
+      }
+
+      /** Copy the new entries of the sound manager log, stamped with the
+       * current frame. */
+      private _drainPlayedSounds(): void {
+        const log = this._runtimeGame.getSoundManager().getPlayedSoundsLog();
+        while (
+          this._playedSoundsReadCount < log.length &&
+          this._playedSounds.length < MAX_PLAYED_SOUNDS
+        ) {
+          this._playedSounds.push({
+            sound: log[this._playedSoundsReadCount].soundName,
+            frame: this._framesExecuted,
+          });
+          this._playedSoundsReadCount++;
+        }
       }
 
       /**
@@ -1408,7 +1648,20 @@ namespace gdjs {
         target:
           | { name: string; id?: integer }
           | { x: float; y: float; z?: float },
-        options?: { reachRadius?: float }
+        options?: {
+          reachRadius?: float;
+          /** Measure from the camera of this layer (position, yaw and
+           * pitch) instead of the object: what a first-person view aims
+           * with. */
+          fromCamera?: string;
+          /** Measure from this Z instead of the object's center Z (an eye
+           * or muzzle height). */
+          fromZ?: float;
+          /** Compute `yawDiff` against this heading (in degrees) instead of
+           * the object's angle - for turrets and weapons with their own
+           * rotation. */
+          heading?: float;
+        }
       ): GameplayTestRelativePosition | null {
         const referenceInstances = this._getInstances(referenceObjectName);
         if (referenceInstances.length === 0) return null;
@@ -1419,13 +1672,23 @@ namespace gdjs {
 
         const reachRadius =
           (options && options.reachRadius) || DEFAULT_REACH_RADIUS;
+        const camera =
+          options && options.fromCamera !== undefined
+            ? this.getCameraState(options.fromCamera)
+            : null;
 
-        const referenceX = reference.getCenterXInScene();
-        const referenceY = reference.getCenterYInScene();
+        const referenceX =
+          camera !== null ? camera.x : reference.getCenterXInScene();
+        const referenceY =
+          camera !== null ? camera.y : reference.getCenterYInScene();
         const referenceZ =
-          typeof anyReference.getCenterZInScene === 'function'
-            ? anyReference.getCenterZInScene()
-            : undefined;
+          options && options.fromZ !== undefined
+            ? options.fromZ
+            : camera !== null
+              ? camera.z
+              : typeof anyReference.getCenterZInScene === 'function'
+                ? anyReference.getCenterZInScene()
+                : undefined;
 
         const relativeX = resolvedTarget.x - referenceX;
         const relativeY = resolvedTarget.y - referenceY;
@@ -1436,19 +1699,27 @@ namespace gdjs {
 
         const distance = Math.hypot(relativeX, relativeY, relativeZ || 0);
 
+        const currentYaw =
+          options && options.heading !== undefined
+            ? options.heading
+            : camera !== null
+              ? camera.angle
+              : reference.getAngle();
         const desiredAngle = gdjs.toDegrees(Math.atan2(relativeY, relativeX));
-        const yawDiff = normalizeAngleDifference(
-          desiredAngle - reference.getAngle()
-        );
+        const yawDiff = normalizeAngleDifference(desiredAngle - currentYaw);
         const horizontalDistance = Math.hypot(relativeX, relativeY);
         const desiredPitch =
           relativeZ === undefined
             ? 0
             : gdjs.toDegrees(Math.atan2(relativeZ, horizontalDistance));
+        // The pitch of a camera view: 90 - rotationX (rotationX is 0
+        // looking straight down, 90 at the horizon).
         const currentPitch =
-          typeof anyReference.getRotationX === 'function'
-            ? anyReference.getRotationX()
-            : 0;
+          camera !== null
+            ? 90 - camera.rotationX
+            : typeof anyReference.getRotationX === 'function'
+              ? anyReference.getRotationX()
+              : 0;
         const pitchDiff =
           relativeZ === undefined
             ? 0
@@ -1653,36 +1924,63 @@ namespace gdjs {
       /**
        * Turn the first instance of `referenceObjectName` toward the target,
        * by applying mouse movement deltas (FPS/pointer-lock style, yaw and
-       * pitch in 3D) until it is aiming at it. The mouse sensitivity of the
-       * game is measured and adapted to live, per axis. When the vertical
-       * aim shows no measurable response (some games map the pitch to
-       * another axis), the vertical input is undone and the aim falls back
-       * to yaw-only, reported as `sawPitchResponse: false`. Returns null if
-       * the object or the target is missing.
+       * pitch in 3D) until it is aiming at it. The aim is measured on the
+       * camera of the object's layer when it is a 3D one (the ground truth
+       * of a first-person view: right eye height, right rotations whatever
+       * the game drives to move it - see `measuredFrom` in the result),
+       * with a fallback to the object's own rotations. The mouse
+       * sensitivity and direction of the game are measured and adapted to
+       * live, per axis. When the vertical aim shows no measurable response,
+       * the vertical input is undone and the aim falls back to yaw-only,
+       * reported as `sawPitchResponse: false`. Returns null if the object
+       * or the target is missing.
        */
       async lookTowardWithMouseDelta(
         referenceObjectName: string,
         target:
           | { name: string; id?: integer }
           | { x: float; y: float; z?: float },
-        options?: { yawOnly?: boolean }
+        options?: { yawOnly?: boolean; fromCamera?: string }
       ): Promise<GameplayTestAimResult | null> {
         const maxAimFrames = 180;
         const toleranceDegrees = 3;
         const responseThresholdDegrees = 0.1;
         const maxPixelsPerDegree = 64;
-        // Frames tolerated with a pitch demand, a maxed-out gain and no
-        // measured response before giving up on the vertical aim.
-        const maxUnresponsivePitchFrames = 10;
+        // Frames tolerated with a demand on an axis, a maxed-out gain and
+        // no measured response, before reacting (giving up the vertical
+        // aim, or falling back from the camera to the object).
+        const maxUnresponsiveFrames = 10;
         // Pixels of mouse movement per degree of desired rotation: adapted
         // live (per axis) by measuring the actual rotation achieved.
         let yawPixelsPerDegree = 2;
         let pitchPixelsPerDegree = 2;
+        // Mouse direction giving a positive rotation on each axis: flipped
+        // when a measured response moves the aim away from the target.
+        let yawDirection = 1;
+        let pitchDirection = 1;
+
+        // Measure the aim on the camera of the object's layer (the ground
+        // truth of a first-person view: right eye height, right rotations
+        // whatever the game drives to move it) when it is a 3D camera, on
+        // the object's own rotations otherwise - falling back to the
+        // object if the camera turns out not to respond to the mouse.
+        const firstInstance = this._getInstances(referenceObjectName)[0];
+        if (!firstInstance) return null;
+        const objectLayerName =
+          options && options.fromCamera !== undefined
+            ? options.fromCamera
+            : firstInstance.getLayer();
+        const layerCamera = this.getCameraState(objectLayerName);
+        let aimOptions: { fromCamera?: string } =
+          layerCamera && Math.abs(layerCamera.rotationX) > 0.5
+            ? { fromCamera: objectLayerName }
+            : {};
 
         let sawYawResponse = false;
         let sawPitchResponse = false;
         let pitchGivenUp = false;
         let unresponsivePitchFrames = 0;
+        let unresponsiveYawFrames = 0;
         let appliedPitchPixels = 0;
 
         const clamp = (value: float, maximum: float) =>
@@ -1696,6 +1994,8 @@ namespace gdjs {
           pitchDiff: relativePosition.pitchDiff,
           sawYawResponse,
           sawPitchResponse,
+          measuredFrom:
+            aimOptions.fromCamera !== undefined ? 'camera' : 'object',
         });
 
         // Undo the vertical input applied so far: when the measured pitch
@@ -1714,7 +2014,8 @@ namespace gdjs {
         for (let i = 0; i < maxAimFrames; i++) {
           const relativePosition = this.getRelativePosition(
             referenceObjectName,
-            target
+            target,
+            aimOptions
           );
           if (!relativePosition) return null;
           lastRelativePosition = relativePosition;
@@ -1728,9 +2029,10 @@ namespace gdjs {
             return makeResult(true, relativePosition);
           }
 
-          const pitchDeltaPixels = clamp(pitchDiff * pitchPixelsPerDegree, 100);
+          const pitchDeltaPixels =
+            clamp(pitchDiff * pitchPixelsPerDegree, 100) * pitchDirection;
           this.setMouseDelta(
-            clamp(yawDiff * yawPixelsPerDegree, 100),
+            clamp(yawDiff * yawPixelsPerDegree, 100) * yawDirection,
             pitchDeltaPixels
           );
           appliedPitchPixels += pitchDeltaPixels;
@@ -1738,7 +2040,8 @@ namespace gdjs {
 
           const newRelativePosition = this.getRelativePosition(
             referenceObjectName,
-            target
+            target,
+            aimOptions
           );
           if (newRelativePosition) {
             const achievedYawRotation = Math.abs(
@@ -1746,15 +2049,44 @@ namespace gdjs {
             );
             if (achievedYawRotation >= responseThresholdDegrees) {
               sawYawResponse = true;
+              unresponsiveYawFrames = 0;
+              // The mouse turned the view AWAY from the target: the game
+              // maps this axis in the other direction.
+              if (
+                Math.abs(newRelativePosition.yawDiff) >
+                Math.abs(yawDiff) + responseThresholdDegrees
+              ) {
+                yawDirection = -yawDirection;
+              }
             }
             if (Math.abs(yawDiff) > toleranceDegrees) {
               if (achievedYawRotation < responseThresholdDegrees) {
                 // No response to the mouse: increase the gain (the game may
                 // have a low mouse sensitivity).
-                yawPixelsPerDegree = Math.min(
-                  yawPixelsPerDegree * 2,
-                  maxPixelsPerDegree
-                );
+                if (yawPixelsPerDegree < maxPixelsPerDegree) {
+                  yawPixelsPerDegree = Math.min(
+                    yawPixelsPerDegree * 2,
+                    maxPixelsPerDegree
+                  );
+                } else {
+                  unresponsiveYawFrames++;
+                  if (
+                    unresponsiveYawFrames >= maxUnresponsiveFrames &&
+                    aimOptions.fromCamera !== undefined
+                  ) {
+                    // The camera never responds to the mouse (it may not be
+                    // driven by this object): fall back to measuring on the
+                    // object's own rotations and start over.
+                    aimOptions = {};
+                    yawPixelsPerDegree = 2;
+                    pitchPixelsPerDegree = 2;
+                    sawYawResponse = false;
+                    sawPitchResponse = false;
+                    unresponsiveYawFrames = 0;
+                    unresponsivePitchFrames = 0;
+                    await unwindAppliedPitch();
+                  }
+                }
               } else {
                 const ratio = Math.abs(yawDiff) / achievedYawRotation;
                 yawPixelsPerDegree = Math.max(
@@ -1774,6 +2106,12 @@ namespace gdjs {
               if (achievedPitchRotation >= responseThresholdDegrees) {
                 sawPitchResponse = true;
                 unresponsivePitchFrames = 0;
+                if (
+                  Math.abs(newRelativePosition.pitchDiff) >
+                  Math.abs(pitchDiff) + responseThresholdDegrees
+                ) {
+                  pitchDirection = -pitchDirection;
+                }
                 const ratio = Math.abs(pitchDiff) / achievedPitchRotation;
                 pitchPixelsPerDegree = Math.max(
                   0.25,
@@ -1789,7 +2127,7 @@ namespace gdjs {
                 );
               } else {
                 unresponsivePitchFrames++;
-                if (unresponsivePitchFrames >= maxUnresponsivePitchFrames) {
+                if (unresponsivePitchFrames >= maxUnresponsiveFrames) {
                   // The measured pitch never responds (the game may map the
                   // vertical aim to another axis): stop driving it - and
                   // undo what was applied, in case the actual view WAS
@@ -1900,6 +2238,47 @@ namespace gdjs {
       }
 
       /**
+       * Get a variable of an object (same entry shape as `getSceneVariable`),
+       * or undefined if the object or the variable does not exist.
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      getObjectVariable(
+        objectIdOrName: integer | string,
+        variableName: string
+      ): VariableNetworkSyncData | undefined {
+        const object = this.getRuntimeObject(objectIdOrName);
+        if (!object) return undefined;
+        return object
+          .getVariables()
+          .getNetworkSyncData({})
+          .find((variable) => variable.name === variableName);
+      }
+
+      /**
+       * Set a variable of an object (number, string or boolean).
+       * Use for test setup only. Throws if the object does not exist.
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      setObjectVariable(
+        objectIdOrName: integer | string,
+        variableName: string,
+        value: string | number | boolean
+      ): void {
+        const object = this.getRuntimeObject(objectIdOrName);
+        if (!object) {
+          throw new Error(
+            `No instance "${objectIdOrName}" found to set the variable "${variableName}".`
+          );
+        }
+        this._setVariableFromValue(
+          object.getVariables().get(variableName),
+          value
+        );
+      }
+
+      /**
        * Set a global variable (number, string or boolean).
        * Use for test setup only.
        */
@@ -1977,6 +2356,10 @@ namespace gdjs {
           );
           return;
         }
+        // Let an animation frame happen so the canvas shows the current
+        // state of the game (fast runs only render a few times per second).
+        await this._waitForNextAnimationFrame();
+        this._lastRenderTimeMs = Date.now();
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');
@@ -2272,6 +2655,7 @@ namespace gdjs {
           status,
           framesExecuted: this._framesExecuted,
           durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
+          timeoutMs: this._timeoutMs,
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),
@@ -2415,6 +2799,7 @@ namespace gdjs {
       harness._callOnFrameEnded = originalOnFrameEnded;
 
       harness._installPointerLockShim();
+      harness._installSoundLog();
 
       // Capture the logs of the game itself (in addition to the `console`
       // passed to the script).
@@ -2546,6 +2931,7 @@ namespace gdjs {
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
+        harness._uninstallSoundLog();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

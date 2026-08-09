@@ -9,6 +9,8 @@ declare class gdEventsFunctionsExtension {
   getShortDescription(): string;
   setDescription(description: string): gdEventsFunctionsExtension;
   getDescription(): string;
+  setGameplayTestingNotes(gameplayTestingNotes: string): gdEventsFunctionsExtension;
+  getGameplayTestingNotes(): string;
   setDimension(dimension: string): gdEventsFunctionsExtension;
   getDimension(): string;
   setName(name: string): gdEventsFunctionsExtension;

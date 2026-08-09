@@ -30,6 +30,36 @@ module.exports = {
       .setShortDescription(
         'Online multiplayer lobbies, object sync, variable sync, player ownership. Up to 8 players.'
       )
+      .setGameplayTestingNotes(
+        [
+          'Never open a real lobby in a gameplay test: it needs a logged-in player and a backend.',
+          'Instead, fake one in memory with `gdjs.multiplayerTesting`, which is available in',
+          'previews (so in gameplay tests) but never shipped in an exported game:',
+          '',
+          '```js',
+          '// 2 players, host is player 1, we play as player 2. No network involved.',
+          'gdjs.multiplayerTesting.startFakeLobbyGame({ playersCount: 2, myPlayerNumber: 2 });',
+          '// The next stepped frame is the one where "Lobby game has just started" is true.',
+          'await harness.stepFrames(1);',
+          '```',
+          '',
+          'From then on the game behaves as if the lobby was running: player number, player count,',
+          'ownership and synchronization conditions all work.',
+          '',
+          '- `startFakeLobbyGame({ playersCount, myPlayerNumber })`: player 1 is always the host.',
+          '  `myPlayerNumber` defaults to 1. The heartbeats are already exchanged when it returns,',
+          '  so every player knows the others.',
+          "- `switchToPlayer(playerNumber)`: see the rest of the test from another player's point of",
+          '  view (their message and variables managers). There is still only one running game, so',
+          '  this checks ownership and messages, not a second player really playing.',
+          '- `endFakeLobbyGame()`: restores everything. Call it if the test continues outside multiplayer.',
+          '- `setSynchronizeAsFastAsPossible()`: sync on every frame instead of ~30 times per second,',
+          '  useful when the test only steps a few frames.',
+          '',
+          'An object owned by another player is only moved by the messages of that player: to move it',
+          'from the test, run the "Take ownership of object" action first, then step a frame.',
+        ].join('\n')
+      )
       .setExtensionHelpPath('/all-features/multiplayer')
       .setCategory('Players');
     extension

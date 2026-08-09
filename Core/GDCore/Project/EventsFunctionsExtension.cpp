@@ -38,6 +38,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   extensionNamespace = other.extensionNamespace;
   shortDescription = other.shortDescription;
   description = other.description;
+  gameplayTestingNotes = other.gameplayTestingNotes;
   dimension = other.dimension;
   name = other.name;
   fullName = other.fullName;
@@ -63,6 +64,12 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element, bool isEx
   element.SetAttribute("shortDescription", shortDescription);
   element.SetAttribute("dimension", dimension);
   element.AddChild("description").SetMultilineStringValue(description);
+  // Only serialized when filled, so that extensions without testing
+  // specificities are left untouched.
+  if (!gameplayTestingNotes.empty()) {
+    element.AddChild("gameplayTestingNotes")
+        .SetMultilineStringValue(gameplayTestingNotes);
+  }
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("category", category);
@@ -145,6 +152,10 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   shortDescription = element.GetStringAttribute("shortDescription");
   dimension = element.GetStringAttribute("dimension");
   description = element.GetChild("description").GetMultilineStringValue();
+  gameplayTestingNotes =
+      element.HasChild("gameplayTestingNotes")
+          ? element.GetChild("gameplayTestingNotes").GetMultilineStringValue()
+          : "";
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   category = element.GetStringAttribute("category");

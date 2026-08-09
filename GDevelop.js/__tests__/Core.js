@@ -4805,6 +4805,69 @@ describe('libGD.js', function () {
           .getName()
       ).toBe('MyBehavior1');
     });
+    it('can have gameplay testing notes, round-tripping through serialization', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      eventsFunctionsExtension.setName('MyExtension');
+
+      // The field is optional and empty by default.
+      expect(eventsFunctionsExtension.getGameplayTestingNotes()).toBe('');
+
+      eventsFunctionsExtension.setGameplayTestingNotes(
+        'Call `gdjs.myExtensionTesting.setUp()` first.\nThen step 2 frames.'
+      );
+      expect(eventsFunctionsExtension.getGameplayTestingNotes()).toBe(
+        'Call `gdjs.myExtensionTesting.setUp()` first.\nThen step 2 frames.'
+      );
+
+      const element = new gd.SerializerElement();
+      eventsFunctionsExtension.serializeTo(element);
+
+      const otherEventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      otherEventsFunctionsExtension.unserializeFrom(project, element);
+      expect(otherEventsFunctionsExtension.getGameplayTestingNotes()).toBe(
+        'Call `gdjs.myExtensionTesting.setUp()` first.\nThen step 2 frames.'
+      );
+
+      element.delete();
+      otherEventsFunctionsExtension.delete();
+      eventsFunctionsExtension.delete();
+      project.delete();
+    });
+    it('has no gameplay testing notes when unserializing an extension without them', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      eventsFunctionsExtension.setGameplayTestingNotes('Some stale notes');
+
+      const element = gd.Serializer.fromJSObject({
+        version: '1.0.0',
+        extensionNamespace: '',
+        shortDescription: '',
+        description: '',
+        name: 'ExtensionName',
+        fullName: '',
+        tags: [],
+        author: '',
+        previewIconUrl: '',
+        iconUrl: '',
+        helpPath: '',
+        eventsFunctions: [],
+        eventsBasedBehaviors: [],
+      });
+      eventsFunctionsExtension.unserializeFrom(project, element);
+      element.delete();
+
+      expect(eventsFunctionsExtension.getGameplayTestingNotes()).toBe('');
+
+      // An extension without notes must not write the field at all.
+      const serializedElement = new gd.SerializerElement();
+      eventsFunctionsExtension.serializeTo(serializedElement);
+      expect(serializedElement.hasChild('gameplayTestingNotes')).toBe(false);
+      serializedElement.delete();
+
+      eventsFunctionsExtension.delete();
+      project.delete();
+    });
     it('can be unserialized, with tags as a (deprecated) string', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const eventsFunctionsExtension = new gd.EventsFunctionsExtension();

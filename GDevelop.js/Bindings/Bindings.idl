@@ -2400,6 +2400,8 @@ interface PlatformExtension {
     [Ref] PlatformExtension SetCategory([Const] DOMString category);
     [Ref] PlatformExtension SetShortDescription([Const] DOMString shortDescription);
     [Const, Ref] DOMString GetShortDescription();
+    [Ref] PlatformExtension SetGameplayTestingNotes([Const] DOMString gameplayTestingNotes);
+    [Const, Ref] DOMString GetGameplayTestingNotes();
     [Ref] PlatformExtension SetDimension([Const] DOMString dimension);
     [Const, Ref] DOMString GetDimension();
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
@@ -3713,6 +3715,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetShortDescription();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
+    [Ref] EventsFunctionsExtension SetGameplayTestingNotes([Const] DOMString gameplayTestingNotes);
+    [Const, Ref] DOMString GetGameplayTestingNotes();
     [Ref] EventsFunctionsExtension SetDimension([Const] DOMString dimension);
     [Const, Ref] DOMString GetDimension();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);

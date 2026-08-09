@@ -1894,6 +1894,8 @@ export class PlatformExtension extends EmscriptenObject {
   setCategory(category: string): PlatformExtension;
   setShortDescription(shortDescription: string): PlatformExtension;
   getShortDescription(): string;
+  setGameplayTestingNotes(gameplayTestingNotes: string): PlatformExtension;
+  getGameplayTestingNotes(): string;
   setDimension(dimension: string): PlatformExtension;
   getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): InstructionOrExpressionGroupMetadata;
@@ -2733,6 +2735,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   getShortDescription(): string;
   setDescription(description: string): EventsFunctionsExtension;
   getDescription(): string;
+  setGameplayTestingNotes(gameplayTestingNotes: string): EventsFunctionsExtension;
+  getGameplayTestingNotes(): string;
   setDimension(dimension: string): EventsFunctionsExtension;
   getDimension(): string;
   setName(name: string): EventsFunctionsExtension;

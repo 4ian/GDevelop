@@ -148,6 +148,21 @@ export const ExtensionOptionsEditor = ({
             )}
             rows={6}
           />
+          <CompactTextAreaField
+            label={i18n._(t`Gameplay testing notes (markdown supported)`)}
+            markdownDescription={i18n._(
+              t`Read by the AI when it writes a gameplay test using this extension. Only fill this if testing the extension needs something specific: a fake setup to write instead of a real connection, an input that only works after another one, a way of moving objects that must be avoided...`
+            )}
+            value={eventsFunctionsExtension.getGameplayTestingNotes()}
+            onChange={text => {
+              eventsFunctionsExtension.setGameplayTestingNotes(text);
+              forceUpdate();
+            }}
+            placeholder={i18n._(
+              t`Leave empty if there is nothing specific to know to test this extension.`
+            )}
+            rows={4}
+          />
           <CompactPropertiesEditorRowField
             label={i18n._(t`Version`)}
             field={

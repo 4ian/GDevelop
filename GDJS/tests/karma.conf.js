@@ -138,6 +138,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayertools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayercomponents.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayerobjectruntimebehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Multiplayer/multiplayertestingtools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightobstacleruntimebehavior.js',

@@ -690,6 +690,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testEventsFunctionsExtension.setName('My name');
   testEventsFunctionsExtension.setFullName('My descriptive name');
   testEventsFunctionsExtension.setDescription('My description');
+  testEventsFunctionsExtension.setGameplayTestingNotes(
+    'Call `gdjs.myExtTesting.setUp()` before stepping any frame.'
+  );
 
   // Events function
   const testEventsFunction = testEventsFunctionsExtension

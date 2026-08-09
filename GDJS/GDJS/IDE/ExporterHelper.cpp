@@ -199,6 +199,22 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
       InsertUnique(includesFiles, includeFile);
     }
+
+    // Gameplay tests can fake a multiplayer lobby, entirely in memory, thanks
+    // to `gdjs.multiplayerTesting`. Like the gameplay test runner itself, it's
+    // only shipped when a debugger client is included (i.e: during previews),
+    // so exported games never carry it. It must come after the multiplayer
+    // tools it builds upon.
+    const bool includeGameplayTestingTools =
+        !options.websocketDebuggerServerAddress.empty() ||
+        options.useWindowMessageDebuggerClient;
+    if (includeGameplayTestingTools &&
+        std::find(includesFiles.begin(), includesFiles.end(),
+                  "Extensions/Multiplayer/multiplayertools.js") !=
+            includesFiles.end()) {
+      InsertUnique(includesFiles,
+                   "Extensions/Multiplayer/multiplayertestingtools.js");
+    }
     for (const auto &requiredFile : usedExtensionsResult.GetUsedRequiredFiles()) {
       InsertUnique(resourcesFiles, requiredFile);
     }

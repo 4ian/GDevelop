@@ -121,7 +121,9 @@ namespace gdjs {
     let _isCheckingIfGameIsRegistered = false;
     let _isWaitingForLogin = false;
 
-    let _hasLobbyGameJustStarted = false;
+    // Exported so that `gdjs.multiplayerTesting` can simulate a lobby game
+    // starting without any lobby or backend.
+    export let _hasLobbyGameJustStarted = false;
     export let _isLobbyGameRunning = false;
     let _hasLobbyGameJustEnded = false;
     let _quickJoinLobbyJustFailed = false;

@@ -44,6 +44,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
     extension.SetFullName("");
     extension.SetShortDescription("");
     extension.SetDescription("");
+    extension.SetGameplayTestingNotes("");
     extension.SetHelpPath("");
     extension.SetIconUrl("");
     extension.SetPreviewIconUrl("");

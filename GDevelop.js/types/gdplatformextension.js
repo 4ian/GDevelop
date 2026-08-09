@@ -7,6 +7,8 @@ declare class gdPlatformExtension {
   setCategory(category: string): gdPlatformExtension;
   setShortDescription(shortDescription: string): gdPlatformExtension;
   getShortDescription(): string;
+  setGameplayTestingNotes(gameplayTestingNotes: string): gdPlatformExtension;
+  getGameplayTestingNotes(): string;
   setDimension(dimension: string): gdPlatformExtension;
   getDimension(): string;
   addInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;

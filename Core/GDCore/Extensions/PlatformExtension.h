@@ -119,6 +119,17 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set notes, in markdown, about how to write a gameplay test using
+   * this extension. Optional: only extensions with testing specificities
+   * (fake lobbies, input quirks, physics caveats...) need it.
+   */
+  PlatformExtension& SetGameplayTestingNotes(
+      const gd::String& gameplayTestingNotes_) {
+    gameplayTestingNotes = gameplayTestingNotes_;
+    return *this;
+  }
+
+  /**
    * \brief Set the dimension of the extension ("2D", "3D", "2D/3D" or empty).
    */
   PlatformExtension& SetDimension(const gd::String& dimension_) {
@@ -422,6 +433,14 @@ class GD_CORE_API PlatformExtension {
    * \brief Return a short description of the extension, used by AI/LLM agents.
    */
   const gd::String& GetShortDescription() const { return shortDescription; }
+
+  /**
+   * \brief Return the notes, in markdown, about how to write a gameplay test
+   * using this extension. Empty if the extension has no testing specificity.
+   */
+  const gd::String& GetGameplayTestingNotes() const {
+    return gameplayTestingNotes;
+  }
 
   /**
    * \brief Return the dimension of the extension ("2D", "3D", "2D/3D" or empty).
@@ -746,6 +765,9 @@ static gd::String GetVariantFullType(const gd::String& extensionName,
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
   gd::String shortDescription;  ///< Short description for AI/LLM agents.
+  gd::String gameplayTestingNotes;  ///< Markdown notes for whoever (usually an
+                                    ///< AI/LLM agent) writes a gameplay test
+                                    ///< using this extension.
   gd::String dimension;  ///< "2D", "3D", "2D/3D" or empty.
   gd::String category;
   gd::String author;   ///< Author displayed to users in the editor.

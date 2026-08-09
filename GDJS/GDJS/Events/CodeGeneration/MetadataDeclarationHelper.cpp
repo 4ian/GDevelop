@@ -42,6 +42,9 @@ void MetadataDeclarationHelper::DeclareExtension(
 
   if (!eventsFunctionsExtension.GetShortDescription().empty())
     extension.SetShortDescription(eventsFunctionsExtension.GetShortDescription());
+  if (!eventsFunctionsExtension.GetGameplayTestingNotes().empty())
+    extension.SetGameplayTestingNotes(
+        eventsFunctionsExtension.GetGameplayTestingNotes());
   if (!eventsFunctionsExtension.GetDimension().empty())
     extension.SetDimension(eventsFunctionsExtension.GetDimension());
 

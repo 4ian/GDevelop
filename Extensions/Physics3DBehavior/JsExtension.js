@@ -32,6 +32,23 @@ module.exports = {
       .setShortDescription(
         '3D rigid-body physics behavior: gravity, forces, collisions, joints. Static/dynamic/kinematic bodies. Mass, damping.'
       )
+      .setGameplayTestingNotes(
+        [
+          '`harness.setObjectPosition` teleports an object: the physics simulation only catches up',
+          'on the following frames, and a body dropped inside another one is pushed out in an',
+          'unpredictable direction.',
+          '',
+          '- To set up a situation, move the OTHER object (the platform, the enemy, the pickup),',
+          '  not the physics character. Its own body stays where the simulation put it, on ground',
+          '  it is already resting on.',
+          '- If the character really has to be moved, put it slightly above a surface you know',
+          '  exists, then step frames until it settles (`stepUntilObjectIsStable`) before asserting.',
+          '- Drive the character with its own actions (forces, impulses, velocity, or the character',
+          '  behavior actions) and step frames, rather than by writing its position every frame.',
+          '- Physics runs at a fixed rate: after applying a force or an impulse, step at least a few',
+          '  frames before reading positions, velocities or collisions.',
+        ].join('\n')
+      )
       .setDimension('3D')
       .setExtensionHelpPath('/behaviors/physics3d')
       .setCategory('Movement')

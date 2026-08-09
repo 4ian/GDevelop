@@ -79,6 +79,25 @@ class GD_CORE_API EventsFunctionsExtension {
     return *this;
   }
 
+  /**
+   * \brief Get the notes, in markdown, about how to write a gameplay test
+   * using this extension. Empty if the extension has no testing specificity.
+   */
+  const gd::String& GetGameplayTestingNotes() const {
+    return gameplayTestingNotes;
+  };
+
+  /**
+   * \brief Set notes, in markdown, about how to write a gameplay test using
+   * this extension. Optional: only extensions with testing specificities
+   * need it.
+   */
+  EventsFunctionsExtension& SetGameplayTestingNotes(
+      const gd::String& gameplayTestingNotes_) {
+    gameplayTestingNotes = gameplayTestingNotes_;
+    return *this;
+  }
+
   const gd::String& GetDimension() const { return dimension; };
   EventsFunctionsExtension& SetDimension(const gd::String& dimension_) {
     dimension = dimension_;
@@ -415,6 +434,7 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::String extensionNamespace;
   gd::String shortDescription;
   gd::String description;
+  gd::String gameplayTestingNotes;
   gd::String dimension;
   gd::String name;
   gd::String fullName;

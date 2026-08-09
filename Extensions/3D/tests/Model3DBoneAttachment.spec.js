@@ -220,6 +220,12 @@ describe('3D model bone attachments', function () {
     expect(clonedRoot.quaternion.angleTo(new THREE.Quaternion())).to.be.greaterThan(
       0.1
     );
+    expect(
+      renderer.restoreSpringBoneDynamicsAnimationPose(binding, quaternions)
+    ).to.be(true);
+    expect(
+      clonedRoot.quaternion.angleTo(new THREE.Quaternion())
+    ).to.be.lessThan(1e-6);
 
     renderer._updateModel(0, 0, 0, 100, 100, 100, false);
     expect(

@@ -695,6 +695,28 @@ namespace gdjs {
       return true;
     }
 
+    /** Restore the animation-only pose before the next mixer/capture pass. @internal */
+    restoreSpringBoneDynamicsAnimationPose(
+      binding: gdjs.Model3DSpringBoneDynamicsBinding,
+      animationLocalQuaternions: Float32Array
+    ): boolean {
+      if (
+        binding.generation !== this._modelGeneration ||
+        !this._clonedModelRoot ||
+        animationLocalQuaternions.length !== binding.flatBones.length * 4
+      ) {
+        return false;
+      }
+      for (let index = 0; index < binding.flatBones.length; index++) {
+        binding.flatBones[index].quaternion.fromArray(
+          animationLocalQuaternions,
+          index * 4
+        );
+      }
+      this._clonedModelRoot.updateMatrixWorld(true);
+      return true;
+    }
+
     /** @internal */
     applySpringBoneDynamicsPose(
       binding: gdjs.Model3DSpringBoneDynamicsBinding,

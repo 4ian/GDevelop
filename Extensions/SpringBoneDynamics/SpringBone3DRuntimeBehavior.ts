@@ -367,6 +367,25 @@ namespace gdjs {
       return true;
     }
 
+    private _restoreAnimationPose(): boolean {
+      return !!this._binding &&
+        this.owner.getRenderer().restoreSpringBoneDynamicsAnimationPose(
+          this._binding,
+          this._animationLocalQuaternions
+        );
+    }
+
+    override doStepPreEvents(): void {
+      if (!this._binding || !this._configuration) return;
+      // Animation clips without hair tracks do not overwrite the simulated
+      // local rotations. Restore the clean animation pose every frame so a
+      // previous simulation result never becomes the next frame's target.
+      if (!this._restoreAnimationPose()) {
+        this._unbind();
+        this._bindConfiguration();
+      }
+    }
+
     override doStepPostEvents(): void {
       if (!this._binding || !this._configuration) return;
       if (!this._capturePoseAndColliders()) {
@@ -477,6 +496,7 @@ namespace gdjs {
     }
 
     override onDeActivate(): void {
+      this._restoreAnimationPose();
       this._unbind();
     }
 

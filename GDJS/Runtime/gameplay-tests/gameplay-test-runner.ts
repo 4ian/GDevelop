@@ -286,6 +286,9 @@ namespace gdjs {
       status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
       framesExecuted: integer;
       durationMs: number;
+      /** The wall-clock budget the run had (`durationMs` close to it means
+       * the test is at risk of timing out on a slower machine). */
+      timeoutMs: number;
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
       errors: Array<string>;
@@ -314,6 +317,8 @@ namespace gdjs {
      * the game visibly plays (a rendered frame per refresh), stop/progress
      * messages flow, while keeping near-full stepping throughput. */
     const YIELD_BUDGET_MS = 12;
+    // In fast (unpaced) runs, let the game render at most this often.
+    const FAST_RUN_RENDER_INTERVAL_MS = 250;
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
@@ -502,6 +507,8 @@ namespace gdjs {
       /** Last time the stepping loop yielded to the browser (see
        * `_maybeYield`). */
       _lastYieldTimeMs: number = 0;
+      /** The last time an animation frame was awaited (rendering the game). */
+      _lastRenderTimeMs: number = 0;
       /** Game seconds simulated per real second, or null to run as fast
        * as possible (see `_maybeYield`). */
       _paceSpeedFactor: float | null = null;
@@ -749,7 +756,21 @@ namespace gdjs {
           this._paceReferenceGameTimeMs = this._gameTimeMs;
         }
         if (Date.now() - this._lastYieldTimeMs < YIELD_BUDGET_MS) return;
-        await this._waitForNextAnimationFrame();
+        // Fast (unpaced) run: don't wait for an animation frame at every
+        // yield - with a slow renderer (software WebGL...), rendering would
+        // dominate the wall-clock time of the run. Yield through a timer
+        // (pending events, like a stop request, are still processed) and
+        // only let an animation frame - which renders the game - happen a
+        // few times per second.
+        if (
+          Date.now() - this._lastRenderTimeMs >=
+          FAST_RUN_RENDER_INTERVAL_MS
+        ) {
+          await this._waitForNextAnimationFrame();
+          this._lastRenderTimeMs = Date.now();
+        } else {
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        }
         this._lastYieldTimeMs = Date.now();
       }
 
@@ -1977,6 +1998,10 @@ namespace gdjs {
           );
           return;
         }
+        // Let an animation frame happen so the canvas shows the current
+        // state of the game (fast runs only render a few times per second).
+        await this._waitForNextAnimationFrame();
+        this._lastRenderTimeMs = Date.now();
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');
@@ -2272,6 +2297,7 @@ namespace gdjs {
           status,
           framesExecuted: this._framesExecuted,
           durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
+          timeoutMs: this._timeoutMs,
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
           errors: errors.slice(0, MAX_ERRORS),

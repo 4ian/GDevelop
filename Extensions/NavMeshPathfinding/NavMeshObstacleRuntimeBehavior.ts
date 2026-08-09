@@ -72,7 +72,9 @@ namespace gdjs {
     /**
      * Get the obstacles manager of an instance container.
      */
-    static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    static getManager(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): gdjs.NavMeshObstaclesManager {
       if (!instanceContainer.navMeshObstaclesManager) {
         // Create the shared manager if necessary.
         const initialData =
@@ -83,7 +85,7 @@ namespace gdjs {
       return instanceContainer.navMeshObstaclesManager;
     }
 
-    step(timeDelta: float) {
+    step(timeDelta: float): void {
       if (this.hasStepped) {
         return;
       }
@@ -105,11 +107,11 @@ namespace gdjs {
       this.crowd.update(timeDelta); //1 / 60, timeDelta, 8);
     }
 
-    invalidateNavMesh() {
+    invalidateNavMesh(): void {
       this.isNavMeshDirty = true;
     }
 
-    rebuildNavMeshIfNeeded() {
+    rebuildNavMeshIfNeeded(): void {
       if (!this.isNavMeshDirty || this.timeSinceLastNavMeshLastRebuild < 1) {
         return;
       }
@@ -118,8 +120,7 @@ namespace gdjs {
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
-        //@ts-ignore
-        const object: gdjs.RuntimeObject3D = obstacle.owner;
+        const object = obstacle.owner;
         if (gdjs.Base3DHandler.is3D(object)) {
           if (isModel3D(object) && obstacle._shape === 'Mesh') {
             this.addMeshFor(object, obstacle, positions, indices);
@@ -238,7 +239,7 @@ namespace gdjs {
     }
 
     private addPolygonsFor(
-      object: gdjs.RuntimeObject3D,
+      object: gdjs.RuntimeObject,
       positions: Array<float>,
       indices: Array<integer>
     ): void {
@@ -312,7 +313,7 @@ namespace gdjs {
     }
 
     private addBoxFor(
-      object: gdjs.RuntimeObject3D,
+      object: gdjs.AbstractRuntimeObject3D,
       positions: Array<float>,
       indices: Array<integer>
     ): void {
@@ -458,7 +459,9 @@ namespace gdjs {
       });
     }
 
-    private rebuildCharacterAgent(character: NavMeshCharacterRuntimeBehavior) {
+    private rebuildCharacterAgent(
+      character: NavMeshCharacterRuntimeBehavior
+    ): void {
       if (!this.navMesh || !this.crowd) {
         character._agent = null;
         return;
@@ -469,8 +472,7 @@ namespace gdjs {
         navMeshQuery.findClosestPoint(
           {
             x: owner.getX(),
-            //@ts-ignore
-            y: owner.getZ ? owner.getZ() : 0,
+            y: gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0,
             z: owner.getY(),
           },
           { halfExtents: { x: 100, y: 100, z: 100 } }
@@ -480,19 +482,15 @@ namespace gdjs {
           "Can't find origin",
           owner.getX(),
           owner.getY(),
-          //@ts-ignore
-          owner.getZ ? owner.getZ() : 0
+          gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0
         );
         return;
       }
 
       character._crowdAgentParams.radius = character.getRadius();
-      character._crowdAgentParams.height =
-        //@ts-ignore
-        owner.getDepth
-          ? //@ts-ignore
-            owner.getDepth()
-          : 1;
+      character._crowdAgentParams.height = gdjs.Base3DHandler.is3D(owner)
+        ? owner.getDepth()
+        : 1;
       const agent = this.crowd
         ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;
@@ -509,7 +507,7 @@ namespace gdjs {
     /**
      * Add a obstacle to the list of existing obstacles.
      */
-    addObstacle(obstacle: NavMeshObstacleRuntimeBehavior) {
+    addObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       this.obstacles.add(obstacle);
       if (gdjs.Base3DHandler.is3D(obstacle.owner)) {
         this.is3D = true;
@@ -521,7 +519,7 @@ namespace gdjs {
      * Remove a obstacle from the list of existing obstacles. Be sure that the obstacle was
      * added before.
      */
-    removeObstacle(obstacle: NavMeshObstacleRuntimeBehavior) {
+    removeObstacle(obstacle: NavMeshObstacleRuntimeBehavior): void {
       this.obstacles.delete(obstacle);
       this.invalidateNavMesh();
     }
@@ -529,7 +527,7 @@ namespace gdjs {
     /**
      * Add a character to the list of existing characters.
      */
-    addCharacter(character: NavMeshCharacterRuntimeBehavior) {
+    addCharacter(character: NavMeshCharacterRuntimeBehavior): void {
       if (this.characters.has(character)) {
         return;
       }
@@ -543,7 +541,7 @@ namespace gdjs {
     /**
      * Remove a character from the list of existing characters.
      */
-    removeCharacter(character: NavMeshCharacterRuntimeBehavior) {
+    removeCharacter(character: NavMeshCharacterRuntimeBehavior): void {
       this.characters.delete(character);
     }
   }
@@ -558,7 +556,7 @@ namespace gdjs {
     export const enableDebugDraw = function (
       instanceContainer: gdjs.RuntimeInstanceContainer,
       enableDebugDraw: boolean
-    ) {
+    ): void {
       if (enableDebugDraw) {
         instanceContainer._debugDrawEnabled = true;
       }
@@ -634,27 +632,19 @@ namespace gdjs {
 
       const newX = this.owner.getX();
       const newY = this.owner.getY();
-      //@ts-ignore
-      const newZ = this.owner.getZ ? this.owner.getZ() : 0;
       const newWidth = this.owner.getWidth();
       const newHeight = this.owner.getHeight();
-      //@ts-ignore
-      const newDepth = this.owner.getDepth ? this.owner.getDepth() : 0;
-      //@ts-ignore
-      const newRotationX = this.owner.getRotationX
-        ? //@ts-ignore
-          this.owner.getRotationX()
-        : 0;
-      //@ts-ignore
-      const newRotationY = this.owner.getRotationY
-        ? //@ts-ignore
-          this.owner.getRotationY()
-        : 0;
-      //@ts-ignore
-      const newRotationZ = this.owner.getRotationZ
-        ? //@ts-ignore
-          this.owner.getRotationZ()
-        : 0;
+      const newRotationZ = this.owner.getAngle();
+      let newZ = 0;
+      let newDepth = 0;
+      let newRotationX = 0;
+      let newRotationY = 0;
+      if (gdjs.Base3DHandler.is3D(this.owner)) {
+        newZ = this.owner.getZ();
+        newDepth = this.owner.getDepth();
+        newRotationX = this.owner.getRotationX();
+        newRotationY = this.owner.getRotationY();
+      }
       if (
         this._oldX !== newX ||
         this._oldY !== newY ||

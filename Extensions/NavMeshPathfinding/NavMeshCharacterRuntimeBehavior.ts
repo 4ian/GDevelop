@@ -175,7 +175,7 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(x: float, y: float, z: float) {
+    moveTo(x: float, y: float, z: float): void {
       this._path = [];
       this._manager.rebuildNavMeshIfNeeded();
       if (!this._manager.navMesh) {
@@ -194,8 +194,7 @@ namespace gdjs {
         navMeshQuery.findClosestPoint(
           {
             x: this.owner.getX(),
-            //@ts-ignore
-            y: this.owner.getZ ? this.owner.getZ() : 0,
+            y: gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0,
             z: this._manager.is3D
               ? this.owner.getY()
               : this.owner.getY() * this._manager.inverseSpeedScaleY,
@@ -216,8 +215,7 @@ namespace gdjs {
           "Can't find origin",
           this.owner.getX(),
           this.owner.getY(),
-          //@ts-ignore
-          this.owner.getZ ? this.owner.getZ() : 0
+          gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0
         );
         return;
       }
@@ -226,9 +224,7 @@ namespace gdjs {
       this.owner.setY(
         this._manager.is3D ? origin.z : origin.z * this._manager.speedScaleY
       );
-      //@ts-ignore
-      if (this.owner.setZ) {
-        //@ts-ignore
+      if (gdjs.Base3DHandler.is3D(this.owner)) {
         this.owner.setZ(origin.y);
       }
 
@@ -261,8 +257,7 @@ namespace gdjs {
         this._pathFound,
         this.owner.x,
         this.owner.y,
-        //@ts-ignore
-        this.owner.getZ ? this.owner.getZ() : 0,
+        gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0,
         ' -> ',
         destination.x,
         this._manager.is3D
@@ -288,14 +283,14 @@ namespace gdjs {
       const oldY = this.owner.getY();
       // For 2D we keep the agent position for Z because the ground may not be
       // at 0 because of rasterization.
-      //@ts-ignore
-      const oldZ = this.owner.getZ ? this.owner.getZ() : agent.raw.get_npos(1);
+      const oldZ = gdjs.Base3DHandler.is3D(this.owner)
+        ? this.owner.getZ()
+        : agent.raw.get_npos(1);
 
       let expectedX = agent.raw.get_npos(0);
       let expectedY = this._manager.is3D
         ? agent.raw.get_npos(2)
         : agent.raw.get_npos(2) * this._manager.speedScaleY;
-      //@ts-ignore
       let expectedZ = agent.raw.get_npos(1);
 
       if (oldX !== expectedX || oldY !== expectedY || oldZ !== expectedZ) {
@@ -369,15 +364,15 @@ namespace gdjs {
         this.owner.getAngle() !== this._movementAngle + this._angleOffset
       ) {
         this.owner.rotateTowardAngle(
-            this._movementAngle + this._angleOffset,
-            this._angularMaxSpeed
-          );
+          this._movementAngle + this._angleOffset,
+          this._angularMaxSpeed
+        );
       }
       if (
         Math.abs(newX - destinationX) < 1 &&
         Math.abs(newY - destinationY) < 1 &&
-        //@ts-ignore
-        (!this.owner.getZ || Math.abs(newZ - destinationZ) < 1)
+        (!gdjs.Base3DHandler.is3D(this.owner) ||
+          Math.abs(newZ - destinationZ) < 1)
       ) {
         this._reachedEnd = true;
         agent.resetMoveTarget();
@@ -385,9 +380,7 @@ namespace gdjs {
       }
       this.owner.setX(newX);
       this.owner.setY(newY);
-      //@ts-ignore
-      if (this.owner.setZ) {
-        //@ts-ignore
+      if (gdjs.Base3DHandler.is3D(this.owner)) {
         this.owner.setZ(newZ);
       }
     }
@@ -469,7 +462,7 @@ namespace gdjs {
       this._angularMaxSpeed = angularMaxSpeed;
     }
 
-    getAngularMaxSpeed() {
+    getAngularMaxSpeed(): float {
       return this._angularMaxSpeed;
     }
 
@@ -477,7 +470,7 @@ namespace gdjs {
       this._angleOffset = angleOffset;
     }
 
-    getAngleOffset() {
+    getAngleOffset(): float {
       return this._angleOffset;
     }
 
@@ -510,7 +503,7 @@ namespace gdjs {
       return 0;
     }
 
-    getNextNodeIndex() {
+    getNextNodeIndex(): integer {
       if (!this._agent) {
         return 0;
       }
@@ -548,7 +541,7 @@ namespace gdjs {
       return this._path[nextNodeIndex].z;
     }
 
-    getPreviousNodeIndex() {
+    getPreviousNodeIndex(): integer {
       if (!this._agent) {
         return 0;
       }
@@ -606,14 +599,14 @@ namespace gdjs {
     /**
      * Return true if the latest call to moveTo succeeded.
      */
-    pathFound() {
+    pathFound(): boolean {
       return this._pathFound;
     }
 
     /**
      * Return true if the object reached its destination.
      */
-    destinationReached() {
+    destinationReached(): boolean {
       return this._reachedEnd;
     }
   }

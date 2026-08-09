@@ -3,6 +3,17 @@
 Status: approved and implemented  
 Date: 2026-07-31
 
+> Version 5 amendment (2026-08-09): this document's scene-owned association
+> model remains valid, but its v4 `externalLayoutFiles` manifest and standalone
+> `.layout` paths are retired. External Events uses
+> `scenes/<Scene>/externals/<External>/external-events.settings` plus flat
+> lifecycle function pairs. Each external layout is independently discovered
+> from `scenes/<Scene>/externals/<External>/external-layout.settings`, where
+> its metadata and `[layout]` subtree are embedded. The physical path derives
+> the associated scene. The version 5 contract is
+> [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md);
+> older physical examples below are migration history only.
+
 ## 1. Problem
 
 The multi-file project format currently stores all external event sheets and

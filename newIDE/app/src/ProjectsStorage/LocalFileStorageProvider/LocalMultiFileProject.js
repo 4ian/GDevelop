@@ -5,6 +5,7 @@ import {
   MULTI_FILE_ENTRY_NAME,
   MULTI_FILE_CONSTANTS_URI,
   MULTI_FILE_ENTRY_URI,
+  MULTI_FILE_FORMAT_VERSION,
   MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI,
   MULTI_FILE_RESOURCES_URI,
   MultiFileProjectError,
@@ -29,6 +30,7 @@ const crypto = optionalRequire('crypto');
 
 const MAX_MANAGED_FILES = 10000;
 const MAX_SOURCE_FILE_SIZE = 16 * 1024 * 1024;
+const MAX_COMPOSITE_SOURCE_FILE_SIZE = 32 * 1024 * 1024;
 const MAX_COMPOSED_SOURCE_SIZE = 256 * 1024 * 1024;
 const WINDOWS_INVALID_PATH_CHARACTER = /[<>:"/\\|?*]/;
 const WINDOWS_DEVICE_PATH_SEGMENT = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
@@ -238,14 +240,28 @@ export const recoverMultiFileTransactions = async (
   }
 };
 
-const readBoundedUtf8 = async (filePath: string): Promise<string> => {
-  const stats = await fs.stat(filePath);
+const readBoundedUtf8 = async (
+  filePath: string,
+  maximumSize: number = MAX_SOURCE_FILE_SIZE
+): Promise<string> => {
+  let stats;
+  try {
+    stats = await fs.stat(filePath);
+  } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      throw new MultiFileProjectError(
+        'MULTIFILE_MISSING_FILE',
+        `Managed source is missing: ${filePath}`
+      );
+    }
+    throw error;
+  }
   if (!stats.isFile())
     throw new Error(`Managed source is not a file: ${filePath}`);
-  if (stats.size > MAX_SOURCE_FILE_SIZE) {
+  if (stats.size > maximumSize) {
     throw new MultiFileProjectError(
       'MULTIFILE_RESOURCE_LIMIT',
-      `Managed source exceeds ${MAX_SOURCE_FILE_SIZE} bytes: ${filePath}`
+      `Managed source exceeds ${maximumSize} bytes: ${filePath}`
     );
   }
   return fs.readFile(filePath, 'utf8');
@@ -264,7 +280,15 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
-const discoverSettingsFilesRecursively = async (
+const isCompositeOwnerSettingsUri = (uri: string): boolean =>
+  /^game:\/\/scenes\/[^/]+\/(?:scene\.settings|externals\/[^/]+\/external-layout\.settings)$/.test(
+    uri
+  ) ||
+  /^game:\/\/extensions\/[^/]+\/prefabs\/[^/]+\/(?:prefab\.settings|variants\/[^/]+\/variant\.settings)$/.test(
+    uri
+  );
+
+const discoverDirectSettingsFiles = async (
   directoryPath: string,
   uriSegments: Array<string>,
   output: Array<string>
@@ -273,16 +297,51 @@ const discoverSettingsFilesRecursively = async (
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
   for (const entry of entries) {
     const encodedName = physicalNameToGameUriSegment(entry.name);
-    const entryPath = path.join(directoryPath, entry.name);
-    if (entry.isDirectory()) {
-      await discoverSettingsFilesRecursively(
-        entryPath,
-        [...uriSegments, encodedName],
-        output
-      );
-    } else if (entry.isFile() && entry.name.endsWith('.settings')) {
+    if (entry.isFile() && entry.name.endsWith('.settings')) {
       output.push(`game://${[...uriSegments, encodedName].join('/')}`);
     }
+  }
+};
+
+const discoverDirectRetiredLayoutFiles = async (
+  directoryPath: string,
+  uriSegments: Array<string>,
+  output: Array<string>
+): Promise<void> => {
+  if (!fs.existsSync(directoryPath)) return;
+  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const encodedName = physicalNameToGameUriSegment(entry.name);
+    if (entry.isFile() && entry.name.endsWith('.layout')) {
+      output.push(`game://${[...uriSegments, encodedName].join('/')}`);
+    }
+  }
+};
+
+const discoverRetiredFunctionSettings = async (
+  functionsDirectoryPath: string,
+  uriSegments: Array<string>,
+  output: Array<string>
+): Promise<void> => {
+  if (!fs.existsSync(functionsDirectoryPath)) return;
+  const entries = await fs.readdir(functionsDirectoryPath, {
+    withFileTypes: true,
+  });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const settingsPath = path.join(
+      functionsDirectoryPath,
+      entry.name,
+      'function.settings'
+    );
+    if (!fs.existsSync(settingsPath)) continue;
+    output.push(
+      `game://${[
+        ...uriSegments,
+        physicalNameToGameUriSegment(entry.name),
+        'function.settings',
+      ].join('/')}`
+    );
   }
 };
 
@@ -298,7 +357,7 @@ const discoverOwnedSettingsUris = async (
   if (fs.existsSync(resourcesSettingsPath)) {
     discovered.push(MULTI_FILE_RESOURCES_URI);
   }
-  await discoverSettingsFilesRecursively(
+  await discoverDirectSettingsFiles(
     path.join(projectRoot, 'objects'),
     ['objects'],
     discovered
@@ -312,11 +371,64 @@ const discoverOwnedSettingsUris = async (
       if (!entry.isDirectory()) continue;
       const sceneSegment = physicalNameToGameUriSegment(entry.name);
       const sceneRoot = path.join(scenesRoot, entry.name);
-      await discoverSettingsFilesRecursively(
+      const sceneSettingsPath = path.join(sceneRoot, 'scene.settings');
+      if (fs.existsSync(sceneSettingsPath)) {
+        discovered.push(`game://scenes/${sceneSegment}/scene.settings`);
+      }
+      await discoverDirectSettingsFiles(
+        path.join(sceneRoot, 'objects'),
+        ['scenes', sceneSegment, 'objects'],
+        discovered
+      );
+      const sceneFunctionsRoot = path.join(sceneRoot, 'functions');
+      await discoverDirectSettingsFiles(
+        sceneFunctionsRoot,
+        ['scenes', sceneSegment, 'functions'],
+        discovered
+      );
+      await discoverRetiredFunctionSettings(
+        sceneFunctionsRoot,
+        ['scenes', sceneSegment, 'functions'],
+        discovered
+      );
+      await discoverDirectRetiredLayoutFiles(
         sceneRoot,
         ['scenes', sceneSegment],
         discovered
       );
+      const externalsRoot = path.join(sceneRoot, 'externals');
+      await discoverDirectRetiredLayoutFiles(
+        externalsRoot,
+        ['scenes', sceneSegment, 'externals'],
+        discovered
+      );
+      if (!fs.existsSync(externalsRoot)) continue;
+      const externalEntries = await fs.readdir(externalsRoot, {
+        withFileTypes: true,
+      });
+      for (const externalEntry of externalEntries) {
+        if (!externalEntry.isDirectory()) continue;
+        const externalSegment = physicalNameToGameUriSegment(
+          externalEntry.name
+        );
+        const externalRoot = path.join(externalsRoot, externalEntry.name);
+        await discoverDirectSettingsFiles(
+          externalRoot,
+          ['scenes', sceneSegment, 'externals', externalSegment],
+          discovered
+        );
+        const externalFunctionsRoot = path.join(externalRoot, 'functions');
+        await discoverDirectSettingsFiles(
+          externalFunctionsRoot,
+          ['scenes', sceneSegment, 'externals', externalSegment, 'functions'],
+          discovered
+        );
+        await discoverRetiredFunctionSettings(
+          externalFunctionsRoot,
+          ['scenes', sceneSegment, 'externals', externalSegment, 'functions'],
+          discovered
+        );
+      }
     }
   }
 
@@ -356,6 +468,19 @@ const discoverOwnedSettingsUris = async (
       ]) {
         const childRoot = path.join(extensionRoot, child.folder);
         if (!fs.existsSync(childRoot)) continue;
+        if (child.folder === 'functions') {
+          await discoverDirectSettingsFiles(
+            childRoot,
+            ['extensions', extensionUriSegment, 'functions'],
+            discovered
+          );
+          await discoverRetiredFunctionSettings(
+            childRoot,
+            ['extensions', extensionUriSegment, 'functions'],
+            discovered
+          );
+          continue;
+        }
         const childEntries = await fs.readdir(childRoot, {
           withFileTypes: true,
         });
@@ -372,20 +497,27 @@ const discoverOwnedSettingsUris = async (
             );
           }
           if (child.folder === 'prefabs' || child.folder === 'behaviors') {
-            await discoverSettingsFilesRecursively(
-              path.join(componentRoot, 'functions'),
-              [
-                'extensions',
-                extensionUriSegment,
-                child.folder,
-                childSegment,
-                'functions',
-              ],
+            const functionsRoot = path.join(componentRoot, 'functions');
+            const functionsUriSegments = [
+              'extensions',
+              extensionUriSegment,
+              child.folder,
+              childSegment,
+              'functions',
+            ];
+            await discoverDirectSettingsFiles(
+              functionsRoot,
+              functionsUriSegments,
+              discovered
+            );
+            await discoverRetiredFunctionSettings(
+              functionsRoot,
+              functionsUriSegments,
               discovered
             );
           }
           if (child.folder !== 'prefabs') continue;
-          await discoverSettingsFilesRecursively(
+          await discoverDirectSettingsFiles(
             path.join(componentRoot, 'objects'),
             [
               'extensions',
@@ -396,8 +528,24 @@ const discoverOwnedSettingsUris = async (
             ],
             discovered
           );
+          await discoverDirectRetiredLayoutFiles(
+            componentRoot,
+            ['extensions', extensionUriSegment, 'prefabs', childSegment],
+            discovered
+          );
           const variantsRoot = path.join(componentRoot, 'variants');
           if (!fs.existsSync(variantsRoot)) continue;
+          await discoverDirectRetiredLayoutFiles(
+            variantsRoot,
+            [
+              'extensions',
+              extensionUriSegment,
+              'prefabs',
+              childSegment,
+              'variants',
+            ],
+            discovered
+          );
           const variantEntries = await fs.readdir(variantsRoot, {
             withFileTypes: true,
           });
@@ -406,7 +554,17 @@ const discoverOwnedSettingsUris = async (
             const variantSegment = physicalNameToGameUriSegment(
               variantEntry.name
             );
-            await discoverSettingsFilesRecursively(
+            const variantSettingsPath = path.join(
+              variantsRoot,
+              variantEntry.name,
+              'variant.settings'
+            );
+            if (fs.existsSync(variantSettingsPath)) {
+              discovered.push(
+                `game://extensions/${extensionUriSegment}/prefabs/${childSegment}/variants/${variantSegment}/variant.settings`
+              );
+            }
+            await discoverDirectSettingsFiles(
               path.join(variantsRoot, variantEntry.name, 'objects'),
               [
                 'extensions',
@@ -458,7 +616,12 @@ export const readMultiFileSourceTree = async (
       );
     }
     const filePath = resolveGameUriToPath(projectRoot, uri);
-    const source = await readBoundedUtf8(filePath);
+    const source = await readBoundedUtf8(
+      filePath,
+      isCompositeOwnerSettingsUri(uri)
+        ? MAX_COMPOSITE_SOURCE_FILE_SIZE
+        : MAX_SOURCE_FILE_SIZE
+    );
     totalSize += unescape(encodeURIComponent(source)).length;
     if (totalSize > MAX_COMPOSED_SOURCE_SIZE) {
       throw new MultiFileProjectError(
@@ -472,12 +635,33 @@ export const readMultiFileSourceTree = async (
       uri !== MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI
     ) {
       const document = parseTomlSource(source, uri);
+      if (
+        uri === MULTI_FILE_ENTRY_URI &&
+        (!document.gdevelop ||
+          document.gdevelop.combinedSettingsFormatVersion !==
+            MULTI_FILE_FORMAT_VERSION)
+      ) {
+        throw new MultiFileProjectError(
+          'MULTIFILE_UNSUPPORTED_VERSION',
+          'Unsupported project.gdevelop format marker.',
+          uri
+        );
+      }
       const references: Set<string> = new Set();
       findGameUris(document, references);
       references.forEach(reference => {
         validateGameUri(reference);
         if (files[reference] === undefined) pending.push(reference);
       });
+      if (
+        document.kind === 'function' &&
+        document.settingsFormatVersion === MULTI_FILE_FORMAT_VERSION &&
+        /\/functions\/[^/]+\.settings$/.test(uri)
+      ) {
+        const eventsUri = uri.replace(/\.settings$/, '.events');
+        validateGameUri(eventsUri);
+        if (files[eventsUri] === undefined) pending.push(eventsUri);
+      }
     }
   }
   return { projectRoot, files };

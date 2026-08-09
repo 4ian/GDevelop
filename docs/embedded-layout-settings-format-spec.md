@@ -1,6 +1,6 @@
 # Embedded layout settings and flattened source paths
 
-- **Status:** Proposed for review
+- **Status:** Approved; implementation contract for version 5
 - **Target multi-file format:** 5
 - **Layout schema version:** 1, unchanged
 - **Primary implementation:** `newIDE/app/src/ProjectsStorage`

@@ -4,6 +4,16 @@ Status: approved for implementation
 
 Date: 2026-08-07
 
+> Version 5 storage amendment (2026-08-09): lifecycle semantics in this
+> document are unchanged, but every persisted function now uses the flat
+> same-stem pair `functions/<Function>.settings` and
+> `functions/<Function>.events`. Function settings contain no events URI.
+> Scene layout is embedded in `scene.settings`; external-layout owners are
+> independent `external-layout.settings` files. Any nested
+> `functions/<Function>/function.settings` or standalone `.layout` example
+> below is unsupported v4 migration history. See
+> [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
+
 ## 1. Executive decision
 
 The Scene Events and External Events editors will expose four fixed

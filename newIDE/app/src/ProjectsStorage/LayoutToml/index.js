@@ -2332,6 +2332,42 @@ const serializeLayoutDocument = document => {
   return `${lines.join('\n').trimEnd()}\n`;
 };
 
+export const compileLayoutDocument = (
+  document: Object,
+  context: LayoutTomlContext
+): Object => compileLayoutToml(serializeLayoutDocument(document), context);
+
+const standaloneLayoutSourceFromEmbeddedSettings = (source: string): string => {
+  let insideLayout = false;
+  return source
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map(line => {
+      const header = line.match(
+        /^\s*(\[\[?)([A-Za-z0-9_.-]+)(\]\]?)\s*(?:#.*)?$/
+      );
+      if (header) {
+        insideLayout =
+          header[2] === 'layout' || header[2].startsWith('layout.');
+        if (!insideLayout) return '';
+        const standaloneName =
+          header[2] === 'layout' ? 'layout' : header[2].slice('layout.'.length);
+        return line.replace(header[2], standaloneName);
+      }
+      return insideLayout ? line : '';
+    })
+    .join('\n');
+};
+
+export const compileEmbeddedLayoutToml = (
+  ownerSettingsSource: string,
+  context: LayoutTomlContext
+): Object =>
+  compileLayoutToml(
+    standaloneLayoutSourceFromEmbeddedSettings(ownerSettingsSource),
+    context
+  );
+
 export const decompileLayoutToml = (
   layout: Object,
   context: LayoutTomlContext
@@ -2438,6 +2474,28 @@ export const decompileLayoutToml = (
   });
   return source;
 };
+
+export const decompileLayoutDocument = (
+  layout: Object,
+  context: LayoutTomlContext
+): Object =>
+  parseLayoutToml(decompileLayoutToml(layout, context), context.fileUri);
+
+export const decompileEmbeddedLayoutToml = (
+  layout: Object,
+  context: LayoutTomlContext
+): string =>
+  decompileLayoutToml(layout, context)
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map(line =>
+      line.replace(
+        /^(\s*\[\[?)(editor|layers|effects|instances|variables|behaviors)(\]\]?\s*(?:#.*)?)$/,
+        '$1layout.$2$3'
+      )
+    )
+    .join('\n')
+    .trimEnd();
 
 export const formatLayoutToml = (
   source: string,

@@ -2,8 +2,18 @@
 
 **Status:** normative version 1  
 **Implementation:** `newIDE/app/src/ProjectsStorage/LayoutToml`  
-**Canonical filename:** `<Name>.layout`  
+**Canonical storage:** embedded `[layout]` subtree in the component owner
+`.settings` file
 **Syntax:** standard TOML with a strict GDevelop schema
+
+Version 5 has no managed `.layout` source files. This document remains the
+normative layout schema and compiler contract, but its logical standalone
+examples are embedded by prefixing every non-root layout header with
+`layout.`: `[editor]` becomes `[layout.editor]`, `[[instances]]` becomes
+`[[layout.instances]]`, and so on. Scene and default-prefab layout data lives
+in their existing owner settings; named variants and external layouts have
+independent `variant.settings` and `external-layout.settings` owners. See
+[embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
 
 ## 1. Purpose
 

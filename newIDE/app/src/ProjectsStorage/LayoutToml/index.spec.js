@@ -3,7 +3,11 @@
 import {
   LayoutTomlError,
   areLayoutFragmentsEquivalent,
+  compileLayoutDocument,
+  compileEmbeddedLayoutToml,
   compileLayoutToml,
+  decompileLayoutDocument,
+  decompileEmbeddedLayoutToml,
   decompileLayoutToml,
   formatLayoutToml,
   parseLayoutToml,
@@ -24,6 +28,86 @@ name = ""
 `;
 
 describe('layout TOML', () => {
+  test('compiles and decompiles logical documents without a standalone source owner', () => {
+    const context = {
+      kind: 'scene',
+      fileUri: 'game://scenes/Main/scene.settings',
+      objects: new Map(),
+      usedInstanceUuids: new Set(),
+    };
+    const layout = compileLayoutDocument(
+      {
+        layout: { version: 1, background: '#000000' },
+        layers: [{ id: 'base', name: '' }],
+      },
+      context
+    );
+
+    expect(layout).toMatchObject({ r: 0, v: 0, b: 0, instances: [] });
+    expect(
+      decompileLayoutDocument(layout, {
+        ...context,
+        usedInstanceUuids: new Set(),
+      })
+    ).toMatchObject({
+      layout: { version: 1, background: '#000000' },
+      layers: [{ id: 'base', name: '' }],
+    });
+  });
+
+  test('compiles embedded layout tables while preserving owner-file locations', () => {
+    const fileUri = 'game://scenes/Main/scene.settings';
+    const source = `kind = "scene"
+settingsFormatVersion = 5
+
+[layout]
+version = 1
+background = "#000000"
+
+[[layout.layers]]
+id = "base"
+name = ""
+
+[[layout.instances]]
+id = "not-a-uuid"
+object = "Player"
+layer = "base"
+at = [1, 2]
+`;
+
+    expect(() =>
+      compileEmbeddedLayoutToml(source, {
+        kind: 'scene',
+        fileUri,
+        objects: new Map([['Player', { name: 'Player', behaviors: [] }]]),
+      })
+    ).toThrow(
+      expect.objectContaining({
+        code: 'LAYOUT_INVALID_UUID',
+        fileUri,
+        line: 12,
+      })
+    );
+  });
+
+  test('decompiles embedded layout headers below the reserved owner subtree', () => {
+    const source = decompileEmbeddedLayoutToml(
+      {
+        r: 0,
+        v: 0,
+        b: 0,
+        uiSettings: {},
+        layers: [{ name: '', effects: [], cameras: [] }],
+        instances: [],
+      },
+      { kind: 'scene', usedInstanceUuids: new Set() }
+    );
+
+    expect(source).toContain('[layout]');
+    expect(source).toContain('[[layout.layers]]');
+    expect(source).not.toContain('\n[[layers]]');
+  });
+
   test('parses standard TOML tables and typed inline values', () => {
     const document = parseLayoutToml(
       sceneSource(`${baseLayer}

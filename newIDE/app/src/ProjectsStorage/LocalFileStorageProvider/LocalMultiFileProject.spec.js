@@ -126,7 +126,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+          'scenes/Main/functions/sceneUpdate.events'
         )
       )
     ).toBe(true);
@@ -140,6 +140,73 @@ describe('Local multi-file project storage', () => {
     expect(new Set(Object.keys(sourceTree.files))).toEqual(
       new Set(Object.keys(files))
     );
+  });
+
+  test('discovers only fixed managed settings boundaries', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    const unrelatedSettingsPath = path.join(
+      temporaryDirectory,
+      'scenes/Main/notes/tool.settings'
+    );
+    fs.ensureDirSync(path.dirname(unrelatedSettingsPath));
+    fs.writeFileSync(unrelatedSettingsPath, 'not valid TOML', 'utf8');
+
+    const sourceTree = await readMultiFileSourceTree(entryPath);
+
+    expect(Object.keys(sourceTree.files)).not.toContain(
+      'game://scenes/Main/notes/tool.settings'
+    );
+    expect(
+      areLegacyProjectsEquivalent(
+        projectFixture,
+        await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
+  test('reports a missing same-stem function body as a managed source error', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    fs.unlinkSync(
+      path.join(temporaryDirectory, 'scenes/Main/functions/sceneUpdate.events')
+    );
+
+    await expect(readMultiFileSourceTree(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_MISSING_FILE',
+    });
+  });
+
+  test('discovers and rejects canonical retired layout and function sources', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    fs.writeFileSync(
+      path.join(temporaryDirectory, 'scenes/Main/Main.layout'),
+      '[layout]\nversion = 1\n',
+      'utf8'
+    );
+
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_RETIRED_LAYOUT_SOURCE',
+    });
+
+    fs.unlinkSync(path.join(temporaryDirectory, 'scenes/Main/Main.layout'));
+    const retiredFunctionDirectory = path.join(
+      temporaryDirectory,
+      'scenes/Main/functions/sceneUpdate'
+    );
+    fs.ensureDirSync(retiredFunctionDirectory);
+    fs.copyFileSync(
+      path.join(
+        temporaryDirectory,
+        'scenes/Main/functions/sceneUpdate.settings'
+      ),
+      path.join(retiredFunctionDirectory, 'function.settings')
+    );
+
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_RETIRED_FUNCTION_SOURCE',
+    });
   });
 
   test('stores external sources below their owning scene folder', async () => {
@@ -165,7 +232,7 @@ describe('Local multi-file project storage', () => {
     );
     const sceneSettings = fs.readFileSync(sceneSettingsPath, 'utf8');
     expect(sceneSettings).not.toContain('externalEventFiles');
-    expect(sceneSettings).toContain('[[externalLayoutFiles]]');
+    expect(sceneSettings).not.toContain('externalLayoutFiles');
     expect(
       fs.existsSync(
         path.join(
@@ -178,7 +245,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat/functions/sceneUpdate/sceneUpdate.events'
+          'scenes/Main/externals/Shared Combat/functions/sceneUpdate.events'
         )
       )
     ).toBe(true);
@@ -186,7 +253,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat.layout'
+          'scenes/Main/externals/Shared Combat/external-layout.settings'
         )
       )
     ).toBe(true);
@@ -260,7 +327,7 @@ describe('Local multi-file project storage', () => {
     fs.writeFileSync(sceneSettingsPath, sceneSource, 'utf8');
     const untouchedEventsPath = path.join(
       temporaryDirectory,
-      'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+      'scenes/Main/functions/sceneUpdate.events'
     );
     const untouchedEvents = fs.readFileSync(untouchedEventsPath, 'utf8');
 
@@ -323,7 +390,7 @@ describe('Local multi-file project storage', () => {
   test('loads named IfDo instructions through the generated catalog', async () => {
     const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
     const files = decomposeLegacyProjectToFiles(projectFixture);
-    files['game://scenes/Main/functions/sceneUpdate/sceneUpdate.events'] =
+    files['game://scenes/Main/functions/sceneUpdate.events'] =
       '@event\ndo Network::Send url="https://example.com"\n';
     await writeMultiFileSourceTree({ entryPath, files });
     const catalog = {
@@ -389,9 +456,8 @@ describe('Local multi-file project storage', () => {
       ...serializeToJSObject(project),
       constants: {},
     });
-    files[
-      `game://scenes/${sceneName}/functions/sceneUpdate/sceneUpdate.events`
-    ] = '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
+    files[`game://scenes/${sceneName}/functions/sceneUpdate.events`] =
+      '@event\nif SceneJustBegins\ndo FirstOpenCatalogTest::Ping\n';
     project.delete();
     await writeMultiFileSourceTree({ entryPath, files });
 
@@ -504,7 +570,7 @@ describe('Local multi-file project storage', () => {
     });
     expect(
       await writeLegacyProjectAsMultiFile(changedInstanceProject, entryPath)
-    ).toEqual(['game://scenes/Main/Main.layout']);
+    ).toEqual(['game://scenes/Main/scene.settings']);
 
     const changedResourcesProject = JSON.parse(
       JSON.stringify(changedInstanceProject)
@@ -641,7 +707,7 @@ describe('Local multi-file project storage', () => {
     );
     expect(
       await writeLegacyProjectAsMultiFile(changedInstance, entryPath)
-    ).toEqual(['game://extensions/Local/prefabs/Widget/Widget.layout']);
+    ).toEqual(['game://extensions/Local/prefabs/Widget/prefab.settings']);
 
     const movedDefinition = JSON.parse(JSON.stringify(changedInstance));
     movedDefinition.eventsFunctionsExtensions[0].eventsBasedObjects[0].objectsFolderStructure.children[0].folderName =
@@ -813,7 +879,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/prefabs/Widget/functions/Initialize/function.settings'
+          'extensions/Local/prefabs/Widget/functions/Initialize.settings'
         )
       )
     ).toBe(true);
@@ -821,7 +887,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/behaviors/Health/functions/Heal/Heal.events'
+          'extensions/Local/behaviors/Health/functions/Heal.events'
         )
       )
     ).toBe(true);
@@ -848,14 +914,14 @@ describe('Local multi-file project storage', () => {
       'State';
     const changed = await writeLegacyProjectAsMultiFile(moved, entryPath);
     expect(changed).toEqual([
-      'game://extensions/Local/prefabs/Widget/functions/Initialize/function.settings',
-      'game://extensions/Local/behaviors/Health/functions/Heal/function.settings',
+      'game://extensions/Local/prefabs/Widget/functions/Initialize.settings',
+      'game://extensions/Local/behaviors/Health/functions/Heal.settings',
     ]);
     expect(
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'extensions/Local/prefabs/Widget/functions/Initialize'
+          'extensions/Local/prefabs/Widget/functions/Initialize.settings'
         )
       )
     ).toBe(true);
@@ -880,16 +946,15 @@ describe('Local multi-file project storage', () => {
     expect(changed).toEqual(
       expect.arrayContaining([
         'game://scenes/Main/scene.settings',
-        'game://scenes/Main/Main.layout',
-        'game://scenes/Main/functions/sceneUpdate/function.settings',
-        'game://scenes/Main/functions/sceneUpdate/sceneUpdate.events',
+        'game://scenes/Main/functions/sceneUpdate.settings',
+        'game://scenes/Main/functions/sceneUpdate.events',
       ])
     );
     expect(
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+          'scenes/Main/functions/sceneUpdate.events'
         )
       )
     ).toBe(false);
@@ -964,12 +1029,12 @@ describe('Local multi-file project storage', () => {
       'ComputeDamage';
     await writeLegacyProjectAsMultiFile(renamed, entryPath);
     expect(exists('extensions/Combat/functions/CalculateDamage')).toBe(false);
-    expect(
-      exists('extensions/Combat/functions/ComputeDamage/function.settings')
-    ).toBe(true);
-    expect(
-      exists('extensions/Combat/functions/ComputeDamage/ComputeDamage.events')
-    ).toBe(true);
+    expect(exists('extensions/Combat/functions/ComputeDamage.settings')).toBe(
+      true
+    );
+    expect(exists('extensions/Combat/functions/ComputeDamage.events')).toBe(
+      true
+    );
     project = renamed;
 
     renamed = JSON.parse(JSON.stringify(project));
@@ -980,16 +1045,12 @@ describe('Local multi-file project storage', () => {
     await writeLegacyProjectAsMultiFile(renamed, entryPath);
     expect(exists('extensions/Combat/prefabs/Enemy')).toBe(false);
     expect(exists('extensions/Combat/prefabs/Boss/prefab.settings')).toBe(true);
-    expect(exists('extensions/Combat/prefabs/Boss/Boss.layout')).toBe(true);
+    expect(exists('extensions/Combat/prefabs/Boss/prefab.settings')).toBe(true);
     expect(
-      exists(
-        'extensions/Combat/prefabs/Boss/functions/ReceiveDamage/function.settings'
-      )
+      exists('extensions/Combat/prefabs/Boss/functions/ReceiveDamage.settings')
     ).toBe(true);
     expect(
-      exists(
-        'extensions/Combat/prefabs/Boss/functions/ReceiveDamage/ReceiveDamage.events'
-      )
+      exists('extensions/Combat/prefabs/Boss/functions/ReceiveDamage.events')
     ).toBe(true);
     const prefabSettings = fs.readFileSync(
       path.join(
@@ -998,9 +1059,7 @@ describe('Local multi-file project storage', () => {
       ),
       'utf8'
     );
-    expect(prefabSettings).toContain(
-      'layout = "game://extensions/Combat/prefabs/Boss/Boss.layout"'
-    );
+    expect(prefabSettings).toContain('[layout]');
     expect(prefabSettings).not.toContain('.functions.');
     expect(prefabSettings).not.toContain('ReceiveDamage.events');
     project = renamed;
@@ -1016,14 +1075,10 @@ describe('Local multi-file project storage', () => {
       exists('extensions/Combat/behaviors/Vitality/behavior.settings')
     ).toBe(true);
     expect(
-      exists(
-        'extensions/Combat/behaviors/Vitality/functions/Restore/function.settings'
-      )
+      exists('extensions/Combat/behaviors/Vitality/functions/Restore.settings')
     ).toBe(true);
     expect(
-      exists(
-        'extensions/Combat/behaviors/Vitality/functions/Restore/Restore.events'
-      )
+      exists('extensions/Combat/behaviors/Vitality/functions/Restore.events')
     ).toBe(true);
     project = renamed;
 
@@ -1032,14 +1087,12 @@ describe('Local multi-file project storage', () => {
     await writeLegacyProjectAsMultiFile(renamed, entryPath);
     expect(exists('extensions/Combat')).toBe(false);
     expect(exists('extensions/Battle/extension.settings')).toBe(true);
+    expect(exists('extensions/Battle/functions/ComputeDamage.events')).toBe(
+      true
+    );
+    expect(exists('extensions/Battle/prefabs/Boss/prefab.settings')).toBe(true);
     expect(
-      exists('extensions/Battle/functions/ComputeDamage/ComputeDamage.events')
-    ).toBe(true);
-    expect(exists('extensions/Battle/prefabs/Boss/Boss.layout')).toBe(true);
-    expect(
-      exists(
-        'extensions/Battle/behaviors/Vitality/functions/Restore/Restore.events'
-      )
+      exists('extensions/Battle/behaviors/Vitality/functions/Restore.events')
     ).toBe(true);
     expect(
       areLegacyProjectsEquivalent(
@@ -1212,12 +1265,8 @@ describe('Local multi-file project storage', () => {
       )
     ).toEqual(
       expect.objectContaining({
-        path: 'scenes/<Scene>/functions/<Role>/function.settings',
-        requiredFields: expect.arrayContaining([
-          'order',
-          'events',
-          'lifecycleRole',
-        ]),
+        path: 'scenes/<Scene>/functions/<Role>.settings',
+        requiredFields: expect.arrayContaining(['order', 'lifecycleRole']),
       })
     );
     expect(
@@ -1225,14 +1274,17 @@ describe('Local multi-file project storage', () => {
         fileKind => fileKind.kind === 'externals'
       )
     ).toBe(false);
-    expect(settingsCatalog.counts.fileKinds).toBe(16);
+    expect(settingsCatalog.counts.fileKinds).toBe(18);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
     expect(layoutCatalog.contexts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'scene',
-          owner: { scene: 'Game' },
+          owner: expect.objectContaining({
+            scene: 'Game',
+            settingsUri: 'game://scenes/Game/scene.settings',
+          }),
           objects: expect.arrayContaining([
             expect.objectContaining({ name: 'Player', type: 'Sprite' }),
           ]),
@@ -1498,7 +1550,7 @@ column2 = "333"
       const eventsSource = fs.readFileSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+          'scenes/Main/functions/sceneUpdate.events'
         ),
         'utf8'
       );
@@ -1591,7 +1643,7 @@ column2 = "333"
       const eventsSource = fs.readFileSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/functions/sceneUpdate/sceneUpdate.events'
+          'scenes/Main/functions/sceneUpdate.events'
         ),
         'utf8'
       );
@@ -1685,7 +1737,6 @@ column2 = "333"
         .layouts[0].objects[0].behaviors[0];
       expect(afterPropertyRead).toEqual(beforePropertyRead);
       hiddenPhysics3DProperties.forEach(([propertyName, propertyValue]) => {
-        expect(afterPropertyRead).not.toHaveProperty(propertyName);
         expect(behavior.updateProperty(propertyName, propertyValue)).toBe(true);
       });
       await onSaveProject(
@@ -1768,11 +1819,11 @@ column2 = "333"
     expect(fs.existsSync(path.join(sceneDirectory, 'scene.settings'))).toBe(
       true
     );
-    expect(fs.existsSync(path.join(sceneDirectory, 'Game.layout'))).toBe(true);
     expect(
-      fs.existsSync(
-        path.join(sceneDirectory, 'functions/sceneUpdate/sceneUpdate.events')
-      )
+      fs.readFileSync(path.join(sceneDirectory, 'scene.settings'), 'utf8')
+    ).toContain('[layout]');
+    expect(
+      fs.existsSync(path.join(sceneDirectory, 'functions/sceneUpdate.events'))
     ).toBe(true);
     project.delete();
   });

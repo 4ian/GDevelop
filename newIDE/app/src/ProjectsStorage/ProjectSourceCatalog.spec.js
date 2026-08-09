@@ -140,16 +140,20 @@ describe('project source catalogs', () => {
       behaviorTypes: [],
     });
 
-    expect(catalog.authoring.syntax).toContain('Standard flat TOML');
+    expect(catalog.authoring).toMatchObject({
+      sourceExtension: '.settings',
+      storage: 'embedded-settings',
+      rootTable: 'layout',
+    });
     expect(catalog.tables.map(table => table.header)).toEqual([
       '[layout]',
-      '[editor]',
-      '[[layers]]',
-      '[[layers]]',
-      '[[effects]]',
-      '[[instances]]',
-      '[[variables]]',
-      '[[behaviors]]',
+      '[layout.editor]',
+      '[[layout.layers]]',
+      '[[layout.layers]]',
+      '[[layout.effects]]',
+      '[[layout.instances]]',
+      '[[layout.variables]]',
+      '[[layout.behaviors]]',
     ]);
     expect(
       catalog.tables.find(table => table.table === 'editor').fields
@@ -469,46 +473,33 @@ describe('project source catalogs', () => {
     const sceneSchema = catalog.fileKinds.find(
       fileKind => fileKind.kind === 'scene'
     ).schema;
-    expect(sceneSchema.childTables).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          table: 'externalLayoutFiles',
-          header: '[[externalLayoutFiles]]',
-          fields: expect.arrayContaining([
-            expect.objectContaining({ name: 'order', required: true }),
-            expect.objectContaining({
-              name: 'layout',
-              type: expect.stringContaining('.layout'),
-              required: true,
-            }),
-          ]),
-        }),
-      ])
+    expect(sceneSchema.childTables.map(table => table.table)).not.toContain(
+      'externalLayoutFiles'
     );
-    sceneSchema.childTables
-      .filter(table => table.table === 'externalLayoutFiles')
-      .forEach(table => {
-        expect(table.fields.map(field => field.name)).not.toContain(
-          'linkedScene'
-        );
-        expect(table.forbiddenFields).toEqual(
-          expect.arrayContaining(['linkedScene', 'unresolvedScene'])
-        );
-      });
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'external-layout')
+    ).toEqual(
+      expect.objectContaining({
+        path:
+          'scenes/<Scene>/externals/<ExternalLayout>/external-layout.settings',
+        embeddedLayout: { rootTable: 'layout', contextKind: 'external' },
+      })
+    );
     expect(
       catalog.fileKinds.find(
         fileKind => fileKind.kind === 'scene-lifecycle-function'
       )
     ).toEqual(
       expect.objectContaining({
-        path: 'scenes/<Scene>/functions/<Role>/function.settings',
-        requiredFields: expect.arrayContaining([
-          'order',
-          'events',
-          'lifecycleRole',
-        ]),
+        path: 'scenes/<Scene>/functions/<Role>.settings',
+        requiredFields: expect.arrayContaining(['order', 'lifecycleRole']),
       })
     );
+    expect(
+      catalog.fileKinds.find(
+        fileKind => fileKind.kind === 'scene-lifecycle-function'
+      ).requiredFields
+    ).not.toContain('events');
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'external-events')
     ).toEqual(
@@ -530,13 +521,12 @@ describe('project source catalogs', () => {
     );
     expect(
       catalog.fileKinds
-        .find(fileKind => fileKind.kind === 'prefab')
-        .schema.childTables.find(table => table.table === 'variants')
-        .childTables.map(table => table.header)
+        .find(fileKind => fileKind.kind === 'prefab-variant')
+        .schema.childTables.map(table => table.header)
     ).toEqual(
       expect.arrayContaining([
-        '[variants.objectGroups]',
-        '[variants.objectGroupRequiredBehaviors]',
+        '[objectGroups]',
+        '[objectGroupRequiredBehaviors]',
       ])
     );
     expect(catalog.authoring.rules.join('\n')).toContain(

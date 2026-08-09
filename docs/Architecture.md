@@ -700,13 +700,12 @@ requested.
 | ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Single JSON               | arbitrary `*.json`                              | Legacy input/output path supported by the serializer/storage layer.                                                |
 | Split JSON folder project | a JSON entry plus referenced `*.json` fragments | Legacy format using `ObjectSplitter` and `__REFERENCE_TO_SPLIT_OBJECT`. Still readable; not the new source format. |
-| Multi-file source project | `project.gdevelop`                              | Primary local authoring format on `new-format`; TOML settings plus layout/events DSL files.                        |
+| Multi-file source project | `project.gdevelop`                              | Primary local authoring format; version 5 TOML settings with embedded layout subtrees plus IfDo event files.       |
 
-Opening a legacy JSON project normalizes it through the current libGD
-serializer, decomposes it next to the source, verifies a compose round trip,
-and redirects the open file metadata to `project.gdevelop`. Migration metadata
-records the legacy source URI and SHA-256. If the old JSON later diverges from
-an existing migrated tree, the opener refuses to guess which side is newer.
+Opening a legacy single-JSON project normalizes it through the current libGD
+serializer, decomposes it directly to version 5 next to the source, verifies a
+compose round trip, and redirects the open file metadata to
+`project.gdevelop`. Production does not read version 3 or 4 folder projects.
 
 Packaged desktop builds associate `.gdevelop` with GDevelop. Windows and Linux
 open the selected document through the positional project argument; macOS
@@ -730,27 +729,41 @@ project.gdevelop
 resources.settings
 constants.toml
 objects/<encoded-name>.settings
-scenes/<encoded-name>/scene.settings
-scenes/<encoded-name>/<encoded-name>.layout
-scenes/<encoded-name>/<encoded-name>.events
-scenes/<encoded-name>/objects/*.settings
-scenes/<encoded-name>/externals/*.layout
-scenes/<encoded-name>/externals/*.events
+scenes/<encoded-name>/
+  scene.settings
+  objects/<encoded-name>.settings
+  functions/<lifecycle>.settings
+  functions/<lifecycle>.events
+  externals/<encoded-name>/
+    external-events.settings
+    external-layout.settings
+    functions/<lifecycle>.settings
+    functions/<lifecycle>.events
 extensions/<encoded-name>/extension.settings
-extensions/<encoded-name>/functions/.../*.settings|*.events
-extensions/<encoded-name>/behaviors/.../*.settings|*.events
-extensions/<encoded-name>/prefabs/.../*.settings|*.layout|*.events
+extensions/<encoded-name>/functions/<encoded-name>.settings|.events
+extensions/<encoded-name>/behaviors/<encoded-name>/
+  behavior.settings
+  functions/<encoded-name>.settings|.events
+extensions/<encoded-name>/prefabs/<encoded-name>/
+  prefab.settings
+  objects/<encoded-name>.settings
+  functions/<encoded-name>.settings|.events
+  variants/<encoded-name>/
+    variant.settings
+    objects/<encoded-name>.settings
 ```
 
-- `*.settings` and `constants.toml` use TOML.
-- `*.layout` uses strict flat TOML in
-  `newIDE/app/src/ProjectsStorage/LayoutToml`.
+- `*.settings` and `constants.toml` use TOML. Layout-bearing owners embed the
+  strict layout schema below `[layout]`; there are no managed `.layout` files.
 - `*.events` uses the IfDo DSL in
   `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
-- Canonical `game://` URIs connect owned documents.
+- Physical owner paths derive component association. Same-stem function event
+  bodies and embedded layouts do not use URI fields.
 - Display names are encoded into portable, case-safe physical segments.
-- Logical folder-structure fields from the legacy JSON model are omitted;
-  physical ownership and paths are the source organization.
+- Objects remain first-class sources below a dedicated `objects/` directory in
+  every object-owning scope, including named prefab variants.
+- Logical function/object grouping is stored as a `folder` value inside each
+  first-class component, not as redundant nested function directories.
 
 The converter rejects unknown ownership, duplicate references, path escapes,
 non-canonical URIs, malformed namespaces, unsupported versions, and values that
@@ -767,9 +780,10 @@ Failures restore backups; opening a project recovers any interrupted staged or
 committed transaction. Obsolete managed files and now-empty owned directories
 are removed without deleting user-owned files.
 
-Reader safety limits bound per-file size, total composed size, and managed file
-count. URI resolution checks lexical containment and existing real paths so
-symlinks cannot escape the project root.
+Reader safety limits bound ordinary sources to 16 MiB, layout-bearing composite
+owner settings to 32 MiB, total composed size, and managed file count. URI
+resolution checks lexical containment and existing real paths so symlinks
+cannot escape the project root.
 
 ### Generated `.gdevelop` artifacts
 

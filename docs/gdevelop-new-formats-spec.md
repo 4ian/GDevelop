@@ -1,14 +1,35 @@
 # GDevelop Multi-file Project Format
 
-## TOML settings, flat layout TOML, and IfDo event source files
+## Version 5 TOML settings and IfDo event source files
 
-**Status:** Version 3.0 implemented format contract
+**Status:** Version 5 implemented format contract. The version 3/4 material
+later in this document is retained only as migration history and is not an
+authoring contract.
 **Entry file:** `project.gdevelop`
 
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
 **Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
 [gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md)
+
+The controlling version 5 ownership and path contract is
+[embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
+Production accepts version 5 only. In particular:
+
+- scenes and default prefabs embed their layout below `[layout]` in
+  `scene.settings` or `prefab.settings`;
+- named variants use
+  `variants/<Variant>/variant.settings` and retain
+  `variants/<Variant>/objects/<Object>.settings`;
+- external layouts use
+  `scenes/<Scene>/externals/<External>/external-layout.settings`;
+- all functions use one same-stem
+  `functions/<Function>.settings` + `functions/<Function>.events` pair;
+- no managed `.layout` file, layout URI, events URI, nested variant manifest,
+  or `externalLayoutFiles` manifest is valid in version 5.
+
+When any historical example below conflicts with that contract, it describes
+an unsupported pre-v5 tree and must not be used for direct authoring.
 
 ---
 

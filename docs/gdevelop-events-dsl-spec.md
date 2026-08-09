@@ -2,13 +2,22 @@
 
 ## A Minimal AI-Friendly DSL for GDevelop Events JSON and Functions
 
-**Status:** Version 3.0 codebase-aligned design specification
+**Status:** IfDo syntax contract used by multi-file format version 5
 **Canonical source filename:** `xx.events`
 
 **File extension:** `.events`
 
 **Encoding:** UTF-8
 **Target:** GDevelop scene event sheets, external event sheets, and extension functions
+
+Version 5 stores every function body as the same-stem sibling of its settings
+owner: `functions/<Function>.settings` and
+`functions/<Function>.events`. The settings file does not contain an events
+URI. Logical grouping is the settings `folder` value and never adds path
+segments. Any nested `functions/<Function>/function.settings` example later in
+this document is unsupported v3/v4 path history; it does not change the IfDo
+grammar described here. The controlling physical ownership contract is
+[embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
 
 ---
 

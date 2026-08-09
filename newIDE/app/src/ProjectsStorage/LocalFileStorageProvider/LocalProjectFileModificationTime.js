@@ -12,7 +12,7 @@ const path = optionalRequire('path');
 
 const multiFileProjectDirectories = ['scenes', 'externals', 'extensions'];
 const multiFileProjectRootFiles = [MULTI_FILE_ENTRY_NAME, 'resources.settings'];
-const multiFileProjectExtensions = new Set(['.settings', '.layout', '.events']);
+const multiFileProjectExtensions = new Set(['.settings', '.events']);
 
 const getFileModificationTime = async (filePath: string): Promise<?number> => {
   try {

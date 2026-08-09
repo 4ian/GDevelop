@@ -1,7 +1,3 @@
-/*
-GDevelop - Pathfinding Behavior Extension
-Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
- */
 namespace gdjs {
   const loadRecast = async () => {
     try {
@@ -45,10 +41,6 @@ namespace gdjs {
    */
   export class NavMeshCharacterRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<RecastNav.Vector3> = [];
-    /** Used by the path simplification algorithm */
-    static _smoothingResultVertices: Array<FloatPoint> = [];
-    /** Used by the path simplification algorithm */
-    static _smoothingWorkingVertices: Array<FloatPoint> = [];
 
     // Behavior configuration:
     _angularMaxSpeed: float;
@@ -66,7 +58,6 @@ namespace gdjs {
     };
 
     // Attributes used for traveling on the path:
-    _angularSpeed: float = 0;
     _pathFound: boolean = false;
     _reachedEnd: boolean = false;
     _movementAngle: float = 0;
@@ -80,11 +71,6 @@ namespace gdjs {
     ) {
       super(instanceContainer, behaviorData, owner);
 
-      //The path computed and followed by the object (Array of arrays containing x and y position)
-      if (this._path === undefined) {
-      } else {
-        this._path.length = 0;
-      }
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
@@ -134,7 +120,7 @@ namespace gdjs {
         props: {
           d: this._path[this._path.length - 1],
           pf: this._pathFound,
-          as: this._angularSpeed,
+          as: this._angularMaxSpeed,
           re: this._reachedEnd,
           ma: this._movementAngle,
         },
@@ -168,7 +154,7 @@ namespace gdjs {
         this._pathFound = behaviorSpecificProps.pf;
       }
       if (behaviorSpecificProps.as !== undefined) {
-        this._angularSpeed = behaviorSpecificProps.as;
+        this._angularMaxSpeed = behaviorSpecificProps.as;
       }
       if (behaviorSpecificProps.re !== undefined) {
         this._reachedEnd = behaviorSpecificProps.re;
@@ -197,38 +183,13 @@ namespace gdjs {
         this._pathFound = false;
         return;
       }
-
-      // Start searching for a path
-      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
-
-      const { success: hasFindDestination, point: destination } =
-        navMeshQuery.findClosestPoint(
-          {
-            x,
-            y: z,
-            z: this._manager.is3D ? y : y * this._manager.inverseSpeedScaleY,
-          },
-          {
-            halfExtents: {
-              x: 100,
-              y: this._manager.is3D
-                ? 100
-                : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
-              z: 100,
-            },
-          }
-        );
-      if (!hasFindDestination) {
-        this._pathFound = false;
-        console.log("Can't find destination", x, y, z);
-        return;
-      }
-
       if (!this._agent) {
         console.log('No agent');
         this._pathFound = false;
         return;
       }
+
+      const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
       const { success: hasFindOrigin, point: origin } =
         navMeshQuery.findClosestPoint(
           {
@@ -269,6 +230,29 @@ namespace gdjs {
       if (this.owner.setZ) {
         //@ts-ignore
         this.owner.setZ(origin.y);
+      }
+
+      const { success: hasFindDestination, point: destination } =
+        navMeshQuery.findClosestPoint(
+          {
+            x,
+            y: z,
+            z: this._manager.is3D ? y : y * this._manager.inverseSpeedScaleY,
+          },
+          {
+            halfExtents: {
+              x: 100,
+              y: this._manager.is3D
+                ? 100
+                : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
+              z: 100,
+            },
+          }
+        );
+      if (!hasFindDestination) {
+        this._pathFound = false;
+        console.log("Can't find destination", x, y, z);
+        return;
       }
 
       this._pathFound = this._agent.requestMoveTarget(destination);
@@ -384,7 +368,10 @@ namespace gdjs {
         this._rotateObject &&
         this.owner.getAngle() !== this._movementAngle + this._angleOffset
       ) {
-        this.rotateTowardAngle(this._movementAngle + this._angleOffset);
+        this.owner.rotateTowardAngle(
+            this._movementAngle + this._angleOffset,
+            this._angularMaxSpeed
+          );
       }
       if (
         Math.abs(newX - destinationX) < 1 &&
@@ -403,33 +390,6 @@ namespace gdjs {
         //@ts-ignore
         this.owner.setZ(newZ);
       }
-    }
-
-    /**
-     * @param angle The targeted angle.
-     * @param speed The rotation speed. 0 for an immediate rotation to the target angle.
-     */
-    private rotateTowardAngle(angle: float): void {
-      const angularDiff = gdjs.evtTools.common.angleDifference(
-        this.owner.getAngle(),
-        angle
-      );
-      const diffWasPositive = angularDiff >= 0;
-
-      const timeDelta = this.owner.getElapsedTime() / 1000;
-      this._angularSpeed =
-        (diffWasPositive ? -1.0 : 1.0) * this._angularMaxSpeed;
-
-      let newAngle = this.owner.getAngle() + this._angularSpeed * timeDelta;
-
-      if (
-        // @ts-ignore
-        (gdjs.evtTools.common.angleDifference(newAngle, angle) > 0) ^
-        diffWasPositive
-      ) {
-        newAngle = angle;
-      }
-      this.owner.setAngle(newAngle);
     }
 
     override doStepPostEvents(

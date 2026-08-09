@@ -103,8 +103,8 @@ generic serializer data.
 9. Flatten every function pair from
    `functions/<Function>/function.settings` plus `<Function>.events` to
    `functions/<Function>.settings` plus `functions/<Function>.events`.
-10. Remove the redundant `objects/` directory below a named variant while
-    keeping each variant object in its own settings file.
+10. Preserve a dedicated `objects/` directory for every object-owning scope,
+    including named variants, because objects are first-class components.
 11. Continue content-addressed dirty writes: an unchanged canonical component
    must not be replaced merely because another component changed.
 12. Support one explicitly named, one-time conversion of
@@ -174,9 +174,9 @@ The following invariants are normative:
     are not serialized again as URI or name references.
 11. Every function settings file and event body share one filename stem in one
     `functions/` directory. Function settings do not store an events URI.
-12. A named variant directory contains `variant.settings` plus its direct
-    child object settings. The fixed owner filename is reserved before child
-    object filenames are allocated.
+12. A named variant directory contains `variant.settings` plus
+    `objects/<Object>.settings`. Object settings never share the owner directory
+    with `variant.settings`.
 
 ## 6. Current version 4 behavior
 
@@ -266,7 +266,8 @@ extensions/
         variants/
           Armored/
             variant.settings
-            Body.settings
+            objects/
+              Body.settings
         functions/
           TakeDamage.settings
           TakeDamage.events
@@ -298,24 +299,21 @@ filename are retired. The settings and events filenames have the same encoded
 stem; the settings `name` must match that decoded identity, and the event path
 is derived without an `events` URI field.
 
-A named variant keeps one directory because it is a movable component, but its
-objects are direct children:
+A named variant keeps both its movable owner directory and an explicit object
+component directory:
 
 ```text
 prefabs/<Prefab>/variants/<Variant>/variant.settings
-prefabs/<Prefab>/variants/<Variant>/<Object>.settings
+prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 ```
 
-The redundant `variants/<Variant>/objects/` level is retired. The fixed
-`variant.settings` basename is reserved; if a child object would otherwise use
-that physical basename, the existing deterministic managed-name collision
-algorithm assigns a suffixed filename while preserving the object's authored
-`name`.
-
-Owner-level `objects/` directories remain for scenes and default prefabs. They
-prevent large object collections from obscuring scene/prefab metadata and
-functions. The refactor does not flatten unrelated semantic boundaries merely
-to minimize path length.
+The `objects/` level is semantic, not redundant. Objects are first-class
+components and every object-owning scope uses an explicit `objects/` directory,
+including the project, scenes, default prefabs, and named variants. This keeps
+object discovery, ownership, renames, and direct authoring uniform while
+preventing object collections from obscuring owner metadata and functions. The
+refactor flattens only a directory that repeats function identity; it does not
+flatten object ownership boundaries merely to minimize path length.
 
 Representative target mappings are:
 
@@ -326,7 +324,6 @@ Representative target mappings are:
 | `scenes/Game/externals/HUD/functions/sceneUpdate/function.settings` | `scenes/Game/externals/HUD/functions/sceneUpdate.settings` |
 | `extensions/Local/functions/Function/function.settings` | `extensions/Local/functions/Function.settings` |
 | `extensions/Local/prefabs/MyObject/functions/onCreated/function.settings` | `extensions/Local/prefabs/MyObject/functions/onCreated.settings` |
-| `extensions/Local/prefabs/MyObject/variants/New variant/objects/NewSprite.settings` | `extensions/Local/prefabs/MyObject/variants/New variant/NewSprite.settings` |
 
 ### 7.3 Removed paths
 
@@ -339,7 +336,6 @@ extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
 extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
 **/functions/<Function>/function.settings
 **/functions/<Function>/<Function>.events
-extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 ```
 
 The writer also removes the following version 4 association fields:
@@ -608,10 +604,10 @@ The variant owner contains:
 - compatibility `rawJson` for supported non-layout variant metadata;
 - the complete embedded prefab-variant layout.
 
-It must not contain object definitions, an object folder tree, functions,
-events, an owning extension/prefab URI, or a layout URI. All sibling
-`*.settings` files other than the exact reserved `variant.settings` owner are
-variant child object definitions.
+It must not contain object definitions, an embedded object folder tree,
+functions, events, an owning extension/prefab URI, or a layout URI. Variant
+child object definitions remain independent sources below the physical
+`objects/` directory.
 
 ### 11.3 Discovery and composition
 
@@ -630,10 +626,11 @@ This is a keyed temporary settings namespace. Composition converts the sorted
 entries into the legacy `variants[]` array. It must not depend on TOML table or
 filesystem enumeration order.
 
-Variant object definitions are composed from sibling object settings in the
-variant directory using the existing complete-variant object semantics. The
-embedded layout is compiled only after those definitions are available, so
-instance object and behavior references use the correct variant context.
+Variant object definitions are composed from
+`variants/<Variant>/objects/<Object>.settings` using the existing
+complete-variant object semantics. The embedded layout is compiled only after
+those definitions are available, so instance object and behavior references
+use the correct variant context.
 
 ### 11.4 Rename and deletion
 
@@ -754,20 +751,20 @@ The managed settings-path allowlist adds:
 
 ```text
 extensions/*/prefabs/*/variants/*/variant.settings
-extensions/*/prefabs/*/variants/*/*.settings
+extensions/*/prefabs/*/variants/*/objects/*.settings
 scenes/*/externals/*/external-layout.settings
 **/functions/*.settings
 ```
 
-The `variants/*/*.settings` object pattern excludes the exact reserved
-`variant.settings` basename. The function pattern is expanded into the finite
-set of valid owner locations; `**` is explanatory shorthand, not recursive
-filesystem discovery.
+The dedicated variant `objects/*.settings` pattern cannot collide with the
+fixed `variant.settings` owner filename. The function pattern is expanded into
+the finite set of valid owner locations; `**` is explanatory shorthand, not
+recursive filesystem discovery.
 
-Version 5 does not retain version 4 per-function directory patterns, variant
-`objects/` patterns, or any standalone layout pattern. Discovery no longer
-follows layout/events URI fields and no longer registers `.layout`
-references.
+Version 5 retains the established variant `objects/` pattern, but does not
+retain version 4 per-function directory patterns or any standalone layout
+pattern. Discovery no longer follows layout/events URI fields and no longer
+registers `.layout` references.
 
 The deterministic settings discovery and merge order becomes:
 
@@ -790,11 +787,11 @@ cross-component precedence. Duplicate ownership remains a hard error.
 
 ### 14.3 Retired source detection
 
-For a version 5 project, the loader scans canonical retired layout,
-per-function-directory, and variant-object-directory patterns below managed
-scene and extension roots. Finding one produces a retired-source diagnostic;
-it is not silently ignored. This prevents a stale version 4 file from appearing
-editable while having no effect.
+For a version 5 project, the loader scans canonical retired layout and
+per-function-directory patterns below managed scene and extension roots.
+Finding one produces a retired-source diagnostic; it is not silently ignored.
+This prevents a stale version 4 file from appearing editable while having no
+effect.
 
 Files named `*.layout` outside canonical managed-source patterns remain
 ordinary user resource files and are not rejected merely by extension.
@@ -934,10 +931,10 @@ For version 5, commit priority is:
 4. `project.gdevelop` last.
 
 Normal production v5 saves never process old sources. During the sole
-authorized project conversion, obsolete version 4 layouts, per-function
-directories, and the variant `objects/` directory are removed or moved only
-inside the same verified transaction that commits their v5 replacements.
-Unrecognized files are never removed.
+authorized project conversion, obsolete version 4 layouts and per-function
+directories are removed or moved only inside the same verified transaction
+that commits their v5 replacements. The variant `objects/` directory and its
+object source paths are preserved. Unrecognized files are never removed.
 
 ## 17. Version policy and the one-time project conversion
 
@@ -1050,10 +1047,10 @@ The harness performs these transformations in memory.
 2. Extract the `New variant` metadata from `[[variants]]`.
 3. Create `variants/New variant/variant.settings` with explicit `order = 0`
    and the embedded normalized `New variant.layout`.
-4. Move
-   `variants/New variant/objects/NewSprite.settings` to
-   `variants/New variant/NewSprite.settings` without changing its object
-   payload.
+4. Keep
+   `variants/New variant/objects/NewSprite.settings` at its existing
+   first-class object path, changing only the required format marker or
+   canonical content if validation requires it.
 5. Remove the complete `variants` array from `prefab.settings`.
 6. Retire both prefab layout files.
 7. Flatten every prefab function pair and remove every function `events` URI.
@@ -1103,7 +1100,7 @@ Before changing the target tree, the harness must:
 8. compare normalized legacy serializations with no new normalization
    allowance;
 9. verify that no target map key or field uses a retired layout, function
-   directory, variant object directory, layout URI, or events URI;
+   directory, layout URI, or events URI;
 10. verify every new settings and events path against the flattened allowlist;
 11. stage the replacement map and obsolete paths in one recovery journal.
 
@@ -1141,7 +1138,6 @@ present:
 - `scene.settings` contains `externalLayoutFiles`;
 - a function settings file contains an `events` URI;
 - a version 4 per-function directory exists;
-- a variant contains an `objects/` directory;
 - a v5-only owner appears below an old project entry.
 
 There is no parent-wins, embedded-wins, newest-timestamp, or compatibility
@@ -1210,8 +1206,9 @@ Every function file kind changes from
 `functions/<Function>/function.settings` to
 `functions/<Function>.settings`, removes its required `events` URI field, and
 declares the same-stem `.events` sibling as a path-derived body. Variant object
-file kinds change from `variants/<Variant>/objects/<Object>.settings` to
-`variants/<Variant>/<Object>.settings`, excluding the reserved owner basename.
+file kinds retain `variants/<Variant>/objects/<Object>.settings`; the catalog
+continues to describe objects as independently addressable first-class
+components below a dedicated `objects/` directory.
 
 The catalog describes `[layout]` as a reserved strict subtree. It does not copy
 every layout field into the settings schema, because the layout catalog is the
@@ -1258,7 +1255,6 @@ The multi-file layer adds or specializes these errors:
 | `MULTIFILE_RETIRED_LAYOUT_REFERENCE` | A version 5 settings field contains a `.layout` URI. |
 | `MULTIFILE_RETIRED_LAYOUT_SOURCE` | A canonical retired `.layout` file exists in a version 5 source tree. |
 | `MULTIFILE_RETIRED_FUNCTION_SOURCE` | A version 4 per-function directory or function `events` URI exists. |
-| `MULTIFILE_RETIRED_VARIANT_OBJECT_PATH` | A named variant still contains an `objects/` directory. |
 | `MULTIFILE_MISSING_FUNCTION_PAIR` | Exactly one of the same-stem function `.settings`/`.events` files exists. |
 | `MULTIFILE_FUNCTION_PATH_IDENTITY_MISMATCH` | Function name, encoded stem, or sibling body stem disagree. |
 | `MULTIFILE_ORPHAN_VARIANT_SETTINGS` | `variant.settings` has no valid prefab owner. |
@@ -1285,8 +1281,8 @@ Unknown embedded layout data is never downgraded to a warning or moved into
 
 Version 5 reduces managed file count, eliminates separate reads for scene and
 default-prefab layout sources, and reduces directory traversal by flattening
-function pairs and variant objects. Total authored layout/event data remains
-approximately unchanged.
+function pairs. Variant object paths and the semantic `objects/` directory are
+preserved. Total authored layout/event data remains approximately unchanged.
 
 The tradeoff is that scene and prefab settings become larger and are rewritten
 whenever their default layout changes. Canonical record ordering and byte
@@ -1348,7 +1344,8 @@ limit and a project with many small variants and external layouts.
 - split named variants into `variant.settings` owners;
 - split external layouts into `external-layout.settings` owners;
 - flatten every function settings/events pair and derive its body path;
-- discover variant object settings directly below the variant owner;
+- preserve and discover variant object settings below the variant's dedicated
+  `objects/` directory;
 - add fixed-path discovery and ownership validation;
 - compose new child owners into legacy arrays;
 - update managed settings allowlists and orphan checks;
@@ -1368,7 +1365,7 @@ limit and a project with many small variants and external layouts.
 `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`
 
 - discover new owner paths;
-- detect canonical retired layout, function, and variant-object paths for v5;
+- detect canonical retired layout and function paths for v5;
 - add composite source-size limits;
 - update transaction commit ordering.
 
@@ -1384,7 +1381,7 @@ the updated boundaries.
 - add variant and external-layout owner schemas;
 - change every function file kind to a flat same-stem pair without an events
   URI;
-- change variant object owner paths;
+- retain variant object file kinds under their dedicated `objects/` directory;
 - describe embedded layout storage and headers;
 - generate contexts that point to settings owners.
 
@@ -1443,7 +1440,8 @@ implementation continues.
 3. Implement physical named variant settings discovery and composition.
 4. Implement physical external-layout settings discovery and composition.
 5. Flatten all function pairs and remove function body URI fields.
-6. Flatten variant object settings below their variant owner.
+6. Preserve variant object sources below the variant's `objects/` directory
+   and make that boundary explicit in discovery and schemas.
 7. Update managed path validation, ordering, and orphan detection.
 8. Verify native v5 decomposition/composition and direct legacy JSON-to-v5
    conversion without adding automatic folder-project migration.
@@ -1514,8 +1512,10 @@ worktree is dirty.
 - raw JSON attempts to target embedded layout;
 - v5 file maps contain no managed `.layout` key and no retired URI field;
 - every function uses a same-stem flat pair with no events URI;
-- variant objects resolve directly below their variant owner;
-- retired function directories and variant `objects/` directories fail;
+- variant objects resolve only through their owner's dedicated `objects/`
+  directory;
+- retired function directories fail, while variant `objects/` directories are
+  required;
 - compose/decompose idempotence and canonical byte stability.
 
 ### 25.3 One-time target conversion tests
@@ -1528,8 +1528,8 @@ worktree is dirty.
 - convert both scene layouts, the default prefab, `New variant`, and the `HUD`
   external layout;
 - flatten all eight current function pairs without changing `.events` bytes;
-- move the named variant object without changing its settings payload other
-  than the version marker;
+- preserve the named variant object's existing `objects/NewSprite.settings`
+  path and payload, apart from any required version marker;
 - preserve normalized serializer equivalence with no new allowance;
 - verify recovery bundle bytes and manifest hashes;
 - reject unsupported or unknown layout data before staging;
@@ -1545,8 +1545,9 @@ worktree is dirty.
 
 - discover all new fixed owner paths without recursively parsing unrelated
   settings files;
-- reject canonical retired layout, function, and variant-object paths in v5
-  managed locations;
+- reject canonical retired layout and function paths in v5 managed locations;
+- require variant object sources to be below the fixed variant `objects/`
+  directory and reject object settings beside `variant.settings`;
 - reject missing/mismatched same-stem function pairs;
 - preserve unrelated user files during rename and deletion;
 - commit child definitions before their owner and `project.gdevelop` last;
@@ -1560,7 +1561,8 @@ worktree is dirty.
 - settings catalog lists `prefabVariant` and `externalLayout` file kinds;
 - scene and prefab schemas require embedded layout and forbid old URI fields;
 - function schemas use flat paths and forbid events URI fields;
-- variant object schemas use direct variant-child paths;
+- variant object schemas retain
+  `variants/<Variant>/objects/<Object>.settings` paths;
 - layout catalog emits embedded table headers and owner settings URIs;
 - every layout context resolves the same objects, behaviors, effects, layers,
   and instance property types through native v5 composition;
@@ -1674,8 +1676,8 @@ The refactor is complete only when:
    parent manifest entry.
 6. Every function uses `functions/<Function>.settings` plus
    `functions/<Function>.events`, with no per-function directory or events URI.
-7. Every variant object is a direct child of the variant directory, with no
-   nested `objects/` directory.
+7. Every object-owning scope, including a named variant, stores each object at
+   `objects/<Object>.settings`; no object definition sits beside owner settings.
 8. Production accepts v5 only and rejects version 3/4 or mixed trees before
    composition.
 9. The exact authorized `My project116` project converts with no undocumented

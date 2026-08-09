@@ -137,6 +137,7 @@ describe('gdjs.gameplayTests', () => {
     );
 
     expect(result.status).to.be('passed');
+    expect(result.timeoutMs).to.be(5000);
     expect(result.framesExecuted).to.be(6); // 1 (goToScene) + 5.
     expect(result.assertions.length).to.be(1);
     expect(result.assertions[0].passed).to.be(true);

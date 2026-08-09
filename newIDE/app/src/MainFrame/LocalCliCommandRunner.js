@@ -239,13 +239,28 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     for (const result of results) {
       const passed = result.status === 'passed';
       if (!passed) failedCount++;
+      const budgetText = result.timeoutMs
+        ? `, ${(result.durationMs / 1000).toFixed(1)}s / ${result.timeoutMs /
+            1000}s budget`
+        : '';
       console.info(
         `[CLI] ${passed ? 'PASSED' : 'FAILED'} (${result.status}): ${
           result.testName
-        } (${result.framesExecuted} frames, ${Math.round(
-          result.durationMs
-        )}ms)${result.errors.length ? ' - ' + result.errors.join(' | ') : ''}`
+        } (${result.framesExecuted} frames${budgetText})${
+          result.errors.length ? ' - ' + result.errors.join(' | ') : ''
+        }`
       );
+      if (
+        passed &&
+        result.timeoutMs &&
+        result.durationMs >= 0.8 * result.timeoutMs
+      ) {
+        console.warn(
+          `[CLI] WARNING: "${result.testName}" used ${Math.round(
+            (100 * result.durationMs) / result.timeoutMs
+          )}% of its wall-clock budget - it is at risk of timing out on a slower machine. Shorten it or raise its timeout.`
+        );
+      }
     }
     try {
       const resultsPath = writeCliGameplayTestResults(project, results);

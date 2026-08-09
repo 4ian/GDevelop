@@ -475,6 +475,57 @@ describe('gdjs.gameplayTests', () => {
     expect(result.status).to.be('passed');
   }).timeout(10000);
 
+  it('reads and writes object variables, event log, played sounds, stability', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      const spawned = harness.spawn('MyObject', 100, 100);
+
+      // Object variables: write then read, by name and by id.
+      harness.assert(
+        harness.getObjectVariable('MyObject', 'Level') === undefined,
+        'Unknown object variable gives undefined'
+      );
+      harness.setObjectVariable(spawned.id, 'Level', 3);
+      harness.assert(
+        harness.getObjectVariable('MyObject', 'Level').value === 3,
+        'The object variable was written and read back'
+      );
+      harness.setObjectVariable('MyObject', 'Locked', true);
+      harness.assert(
+        harness.getObjectVariable(spawned.id, 'Locked').value === true,
+        'Boolean object variables are real booleans'
+      );
+
+      // Event log: readable from the script, with causes.
+      const eventLog = harness.getEventLog();
+      harness.assert(
+        eventLog.some((e) => e.event === 'sceneChanged' && e.cause === 'harness'),
+        'The scene change appears in the readable event log'
+      );
+
+      // Played sounds: the wrapper records the public play methods.
+      harness.getRuntimeGame().getSoundManager().playSound('pickup.aac', false, 100, 1);
+      const playedSounds = harness.getPlayedSounds();
+      harness.assert(
+        playedSounds.length === 1 && playedSounds[0].sound === 'pickup.aac',
+        'The played sound was recorded with its name'
+      );
+
+      // Stability: a still object settles, within the asked frames.
+      const settled = await harness.stepUntilObjectIsStable('MyObject', {
+        stableFrames: 5,
+        maxFrames: 60,
+      });
+      harness.assert(settled === true, 'A still object is reported stable');
+      `
+    );
+
+    expect(result.status).to.be('passed');
+  }).timeout(10000);
+
   it('stops with a timeout when the maximum frames count is reached', async () => {
     const runtimeGame = makeRuntimeGame();
     const result = await runTestScript(

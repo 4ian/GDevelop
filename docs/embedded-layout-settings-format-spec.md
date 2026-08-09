@@ -562,7 +562,7 @@ extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/variant.settings
 Its child object definitions remain at:
 
 ```text
-extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/<Object>.settings
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 ```
 
 No `variant.settings` file is created for the default variant represented by
@@ -1655,7 +1655,14 @@ and settings metadata, creates the deepest paths in the inspected project, and
 requires a generic `function.settings` basename. A same-stem sibling pair under
 one `functions/` directory preserves ownership without that extra level.
 
-### 27.8 Flatten every semantic directory into compound filenames
+### 27.8 Place variant objects beside `variant.settings`
+
+This saves one path segment but makes variants the only object-owning scope
+without an `objects/` boundary, mixes first-class object components with owner
+metadata, and complicates fixed-path discovery and future object-scoped files.
+The variant `objects/` directory is therefore retained.
+
+### 27.9 Flatten every semantic directory into compound filenames
 
 Paths such as `scenes/Game.Player.settings` or
 `prefabs/MyObject.Armored.Body.settings` would reduce depth further but require

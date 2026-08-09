@@ -25,15 +25,11 @@ namespace gdjs {
 
   interface NavMeshCharacterNetworkSyncDataType {
     // Syncing the path and its position on it should be enough to have a good prediction.
-    path: RecastNav.Vector3[];
+    d: RecastNav.Vector3;
     pf: boolean;
-    sp: number;
     as: number;
-    cs: number;
-    tss: number;
     re: boolean;
     ma: number;
-    dos: number;
   }
 
   /** @category Behaviors > 2D Pathfinding */
@@ -119,6 +115,14 @@ namespace gdjs {
       if (behaviorData.angleOffset !== undefined) {
         this.setAngleOffset(behaviorData.angleOffset);
       }
+      if (behaviorData.angleOffset !== undefined) {
+        this._radius = behaviorData.angleOffset;
+        this._manager.invalidateNavMesh();
+      }
+      if (behaviorData.avoidanceSightRange !== undefined) {
+        this._crowdAgentParams.collisionQueryRange =
+          behaviorData.avoidanceSightRange;
+      }
       return true;
     }
 
@@ -128,15 +132,11 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(options),
         props: {
-          path: this._path,
+          d: this._path[this._path.length - 1],
           pf: this._pathFound,
-          sp: this._speed,
           as: this._angularSpeed,
-          cs: this._currentSegment,
-          tss: this._totalSegmentDistance,
           re: this._reachedEnd,
           ma: this._movementAngle,
-          dos: this._distanceOnSegment,
         },
       };
     }
@@ -147,35 +147,34 @@ namespace gdjs {
     ): void {
       super.updateFromNetworkSyncData(networkSyncData, options);
       const behaviorSpecificProps = networkSyncData.props;
-      if (behaviorSpecificProps.path !== undefined) {
-        this._path = behaviorSpecificProps.path;
+      if (behaviorSpecificProps.d !== undefined) {
+        // TODO Try a more reliable synchronization by overriding the path using the low level API.
+        const destination = this._path[this._path.length - 1];
+        if (
+          behaviorSpecificProps.d == null ||
+          !destination ||
+          destination.x !== behaviorSpecificProps.d.x ||
+          destination.y !== behaviorSpecificProps.d.y ||
+          destination.z !== behaviorSpecificProps.d.z
+        ) {
+          this.moveTo(
+            behaviorSpecificProps.d.x,
+            behaviorSpecificProps.d.y,
+            behaviorSpecificProps.d.z
+          );
+        }
       }
       if (behaviorSpecificProps.pf !== undefined) {
         this._pathFound = behaviorSpecificProps.pf;
       }
-      if (behaviorSpecificProps.sp !== undefined) {
-        this._speed = behaviorSpecificProps.sp;
-      }
       if (behaviorSpecificProps.as !== undefined) {
         this._angularSpeed = behaviorSpecificProps.as;
-      }
-      if (
-        behaviorSpecificProps.cs !== undefined &&
-        behaviorSpecificProps.cs !== this._currentSegment
-      ) {
-        this._currentSegment = behaviorSpecificProps.cs;
-      }
-      if (behaviorSpecificProps.tss !== undefined) {
-        this._totalSegmentDistance = behaviorSpecificProps.tss;
       }
       if (behaviorSpecificProps.re !== undefined) {
         this._reachedEnd = behaviorSpecificProps.re;
       }
       if (behaviorSpecificProps.ma !== undefined) {
         this._movementAngle = behaviorSpecificProps.ma;
-      }
-      if (behaviorSpecificProps.dos !== undefined) {
-        this._distanceOnSegment = behaviorSpecificProps.dos;
       }
     }
 

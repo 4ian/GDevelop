@@ -579,8 +579,6 @@ namespace gdjs {
    * @category Behaviors > 2D Pathfinding
    */
   export class NavMeshObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _impassable: boolean;
-    _cost: float;
     _shape: string;
     _meshShapeResourceName: string;
 
@@ -602,10 +600,8 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(instanceContainer, behaviorData, owner);
-      this._impassable = behaviorData.impassable;
-      this._cost = behaviorData.cost;
       this._shape = behaviorData.shape;
-      this._meshShapeResourceName = behaviorData.meshShapeResourceName || '';
+      this._meshShapeResourceName = behaviorData.meshShapeResourceName;
       this._manager = NavMeshObstaclesManager.getManager(instanceContainer);
 
       //Note that we can't use getX(), getWidth()... of owner here:
@@ -613,22 +609,24 @@ namespace gdjs {
     }
 
     override applyBehaviorOverriding(behaviorData): boolean {
-      if (behaviorData.impassable !== undefined) {
-        this.setImpassable(behaviorData.impassable);
+      if (behaviorData.shape !== undefined) {
+        this._shape = behaviorData.shape;
+        this._manager.invalidateNavMesh();
       }
-      if (behaviorData.cost !== undefined) {
-        this.setCost(behaviorData.cost);
+      if (behaviorData.meshShapeResourceName !== undefined) {
+        this._meshShapeResourceName = behaviorData.meshShapeResourceName;
+        this._manager.invalidateNavMesh();
       }
       return true;
     }
 
-    onDestroy() {
+    override onDestroy() {
       if (this._manager && this._registeredInManager) {
         this._manager.removeObstacle(this);
       }
     }
 
-    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+    override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);
         this._registeredInManager = false;
@@ -688,9 +686,11 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+    override doStepPostEvents(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {}
 
-    onActivate() {
+    override onActivate() {
       if (this._registeredInManager) {
         return;
       }
@@ -698,28 +698,12 @@ namespace gdjs {
       this._registeredInManager = true;
     }
 
-    onDeActivate() {
+    override onDeActivate() {
       if (!this._registeredInManager) {
         return;
       }
       this._manager.removeObstacle(this);
       this._registeredInManager = false;
-    }
-
-    getCost() {
-      return this._cost;
-    }
-
-    setCost(cost: float): void {
-      this._cost = cost;
-    }
-
-    isImpassable(): boolean {
-      return this._impassable;
-    }
-
-    setImpassable(impassable: boolean): void {
-      this._impassable = impassable;
     }
   }
   gdjs.registerBehavior(
@@ -727,6 +711,8 @@ namespace gdjs {
     gdjs.NavMeshObstacleRuntimeBehavior
   );
 
+  // The following code is inspired from Critterai
+  // https://github.com/stevefsp/critterai
   interface Point {
     x: number;
     y: number;

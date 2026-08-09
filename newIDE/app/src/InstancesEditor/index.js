@@ -245,6 +245,7 @@ export default class InstancesEditor extends Component<Props, State> {
     const { onMouseMove, onMouseLeave } = this.props;
 
     this.keyboardShortcuts = new KeyboardShortcuts({
+      isActive: this._shouldHandleKeyboardShortcuts,
       shortcutCallbacks: {
         onMove: this.moveSelection,
         onEscape: this.onPressEscape,
@@ -337,16 +338,21 @@ export default class InstancesEditor extends Component<Props, State> {
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
     // Keyboard shortcuts are listened on the window rather than on the canvas, so that
-    // they also work when the canvas is not focused but only hovered (for example when
-    // the focus is still in the objects list). See `_shouldHandleKeyboardShortcuts`.
-    // The capture phase is used so that a focused component stopping the propagation of
-    // the event (the tree views handle the keyboard) can't prevent the shortcuts from
-    // being handled.
-    window.addEventListener('keydown', this._onWindowKeyDown, true);
-    window.addEventListener('keyup', this._onWindowKeyUp, true);
+    // they also work when the canvas is only hovered and not focused (for example when
+    // the focus is still in the objects list), like the mouse wheel zoom already does.
+    // They are restricted to this editor by `_shouldHandleKeyboardShortcuts`, and the
+    // capture phase is used so that a focused component stopping the event propagation
+    // (the tree views handle the keyboard) can't prevent them from working.
+    window.addEventListener('keydown', this.keyboardShortcuts.onKeyDown, true);
+    // Key releases are always handled, even when the canvas is not hovered anymore, so
+    // that a key released after leaving the canvas (which happens when moving the view
+    // up to its border) is not considered as still pressed. A key can also be released
+    // while the window is blurred (Alt+Tab...), in which case no `keyup` is received.
+    window.addEventListener('keyup', this.keyboardShortcuts.onKeyUp, true);
+    window.addEventListener('blur', this.keyboardShortcuts.resetModifiers);
     this.pixiRenderer.view.addEventListener(
       'mouseover',
-      this._onCanvasPointerEnter
+      this._onPointerOverCanvas
     );
     this.pixiRenderer.view.addEventListener(
       'mousedown',
@@ -357,15 +363,12 @@ export default class InstancesEditor extends Component<Props, State> {
       this.keyboardShortcuts.onMouseUp
     );
     this.pixiRenderer.view.addEventListener('mousemove', event => {
-      // `mouseover` can be missed (for example if the cursor is already over the canvas
-      // when it is created), so also consider the canvas hovered when the mouse moves on it.
-      // Only the hovering is tracked here, not the focus, to avoid fighting with something
-      // else that would take the focus back at every mouse move.
-      this._markPointerOverCanvas();
+      // `mouseover` can be missed, for example if the canvas appears under a still cursor.
+      this._onPointerOverCanvas();
       if (onMouseMove) onMouseMove(event);
     });
     this.pixiRenderer.view.addEventListener('mouseout', event => {
-      this._onCanvasPointerLeave();
+      this._isPointerOverCanvas = false;
       if (onMouseLeave) onMouseLeave(event);
     });
     this.pixiRenderer.view.addEventListener('focusout', event => {
@@ -373,9 +376,6 @@ export default class InstancesEditor extends Component<Props, State> {
         this.keyboardShortcuts.resetModifiers();
       }
     });
-    // The canvas can be removed from the DOM (or the window blurred) while a key is
-    // still held down: in this case no `keyup` would be received, so reset the modifiers.
-    window.addEventListener('blur', this._onWindowBlur);
 
     this.uiPixiContainer = new PIXI.Container();
     this.backgroundPixiContainer = new PIXI.Container();
@@ -672,84 +672,31 @@ export default class InstancesEditor extends Component<Props, State> {
     this.backgroundPixiContainer.addChild(this.background.getPixiObject());
   }
 
-  _markPointerOverCanvas = () => {
+  _onPointerOverCanvas = () => {
     this._isPointerOverCanvas = true;
   };
 
-  _onCanvasPointerEnter = () => {
-    this._markPointerOverCanvas();
-
-    // Give the focus to the canvas as soon as it is hovered, so that the keyboard
-    // shortcuts (notably space to move the view) can be used without having to click on
-    // it first - which is what the mouse wheel zoom already allows.
-    // This is not done if a text is being edited, so that hovering the canvas while
-    // typing (renaming an object, editing a property...) does not interrupt the user.
-    const { activeElement } = document;
-    const isEditingText =
-      activeElement &&
-      // $FlowFixMe[prop-missing] - `closest` is available on the focused element.
-      activeElement.closest('textarea, input, [contenteditable="true"]');
-    if (
-      this.pixiRenderer &&
-      activeElement !== this.pixiRenderer.view &&
-      !isEditingText
-    ) {
-      this.pixiRenderer.view.focus({ preventScroll: true });
-    }
-  };
-
-  _onCanvasPointerLeave = () => {
-    this._isPointerOverCanvas = false;
-    // A key (typically space, used to move the view) could still be held down while
-    // leaving the canvas: as the shortcuts are not handled anymore, its `keyup` would
-    // be ignored and the grabbing tool would stay stuck.
-    if (this.keyboardShortcuts) {
-      this.keyboardShortcuts.resetModifiers();
-    }
-  };
-
-  _onWindowBlur = () => {
-    this._isPointerOverCanvas = false;
-    if (this.keyboardShortcuts) {
-      this.keyboardShortcuts.resetModifiers();
-    }
-  };
-
   /**
-   * Keyboard shortcuts are handled either when the canvas is focused, or when it is
-   * merely hovered by the cursor. The latter allows to use them (notably space to move
-   * the view) without having to first click on the canvas to focus it, which is
-   * consistent with the mouse wheel zoom that already works when only hovering.
+   * Keyboard shortcuts are handled when the canvas is hovered by the cursor, or when it
+   * is focused - so that they can be used without having to click on the canvas first,
+   * consistently with the mouse wheel zoom that already works when only hovering.
    */
-  _shouldHandleKeyboardShortcuts = (): boolean => {
-    if (this._unmounted || !this.pixiRenderer) return false;
-
-    return (
-      this._isPointerOverCanvas ||
-      document.activeElement === this.pixiRenderer.view
-    );
-  };
-
-  _onWindowKeyDown = (event: KeyboardEvent) => {
-    if (!this._shouldHandleKeyboardShortcuts()) return;
-
-    this.keyboardShortcuts.onKeyDown(event);
-  };
-
-  _onWindowKeyUp = (event: KeyboardEvent) => {
-    if (!this._shouldHandleKeyboardShortcuts()) return;
-
-    this.keyboardShortcuts.onKeyUp(event);
-  };
+  _shouldHandleKeyboardShortcuts = (): boolean =>
+    !!this.pixiRenderer &&
+    (this._isPointerOverCanvas ||
+      document.activeElement === this.pixiRenderer.view);
 
   componentWillUnmount() {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
 
-    window.removeEventListener('keydown', this._onWindowKeyDown, true);
-    window.removeEventListener('keyup', this._onWindowKeyUp, true);
-    window.removeEventListener('blur', this._onWindowBlur);
+    if (this.keyboardShortcuts) {
+      const { onKeyDown, onKeyUp, resetModifiers } = this.keyboardShortcuts;
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
+      window.removeEventListener('blur', resetModifiers);
+    }
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.

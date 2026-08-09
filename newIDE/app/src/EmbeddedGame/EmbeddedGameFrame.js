@@ -246,31 +246,27 @@ export const EmbeddedGameFrame = ({
   // the keyboard events if it has the focus. Give it the focus as soon as it is hovered,
   // so that the in-game editor shortcuts (notably space to move the view) can be used
   // without having to click on the game first.
-  const focusGameFrameOnHover = React.useCallback(
-    () => {
-      const iframe = iframeRef.current;
-      if (!iframe || !iframe.contentWindow) return;
+  const focusGameFrameOnHover = React.useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || !iframe.contentWindow) return;
 
-      // Don't take the focus away from a dialog: it would either break its keyboard
-      // navigation or fight with its focus trap.
-      if (hasSomeDialogOpen.current || isPointerEventsPrevented) return;
+    // A dialog can be opened on top of the game, or show it through a "hole": don't
+    // fight with its focus trap.
+    if (hasSomeDialogOpen.current) return;
 
-      const { activeElement } = document;
-      // Don't interrupt the user while a text is being edited (renaming an object,
-      // editing a property...).
-      const isEditingText =
-        activeElement &&
-        // $FlowFixMe[prop-missing] - `closest` is available on the focused element.
-        activeElement.closest('textarea, input, [contenteditable="true"]');
-      if (isEditingText) return;
+    const { activeElement } = document;
+    // Nothing to do if the game is already focused, and don't interrupt the user while
+    // a text is being edited (renaming an object, editing a property...).
+    if (
+      activeElement === iframe ||
+      // $FlowFixMe[prop-missing] - `closest` is available on the focused element.
+      (activeElement &&
+        activeElement.closest('textarea, input, [contenteditable="true"]'))
+    )
+      return;
 
-      // Already focused: nothing to do (also avoids focusing again at every event).
-      if (activeElement === iframe) return;
-
-      iframe.contentWindow.focus();
-    },
-    [isPointerEventsPrevented]
-  );
+    iframe.contentWindow.focus();
+  }, []);
 
   const inGameEditorSettings = useInGameEditorSettings();
   React.useEffect(
@@ -651,16 +647,15 @@ export const EmbeddedGameFrame = ({
       onKeyDown={keyboardShortcuts.current.onKeyDown}
       onKeyUp={keyboardShortcuts.current.onKeyUp}
     >
-      <div
-        style={{ position: 'relative', width: '100%', height: '100%' }}
-        onMouseOver={focusGameFrameOnHover}
-        onMouseMove={focusGameFrameOnHover}
-      >
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <iframe
           ref={iframeRef}
           title="Game Preview"
           src={previewIndexHtmlLocation}
           tabIndex={0}
+          // Listened on the iframe itself and not on its container, so that the overlay
+          // covering it (drop target, pointer events blocker) doesn't take the focus.
+          onMouseOver={focusGameFrameOnHover}
           style={{
             position: 'absolute',
             top: 0,

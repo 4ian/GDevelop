@@ -1,6 +1,6 @@
 ---
 name: gdevelop-project-files
-description: Create, inspect, modify, refactor, and verify GDevelop games through the multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, `.layout`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, MCP gameplay test script, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Python test template for supported jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
+description: Create, inspect, modify, refactor, and verify GDevelop games through the version 5 multi-file project sources (`project.gdevelop`, `constants.toml`, `.settings`, and `.events`). Use for any GDevelop project, scene, object, behavior, prefab, extension, third-party extension installation, reusable-component refactor, variable, resource, MCP gameplay test script, Constants/placeholder, signal-system, layout, event-sheet, or JavaScript-event work. Read the generated authoring catalogs and public JavaScript declarations when relevant; use the bundled Python test template for supported jobs; regenerate catalogs after large structural changes, then validate direct edits before reload and preview debugging.
 ---
 
 # GDevelop Project Files
@@ -20,14 +20,13 @@ Read, in order:
 2. `resources.settings` for the complete project resource registry.
 3. `constants.toml` for the complete editor-only Constants object.
 4. `.gdevelop/settings-catalog.json`, then relevant child `.settings` files
-   for semantic configuration and object definitions, including each object's
-   variables, effects, and behaviors.
-5. `.gdevelop/layout-catalog.json`, then relevant `.layout` files for Layout
-   TOML instances, layers, spatial bounds, background, and editor-canvas layout.
-6. Relevant `.events` files for IfDo event logic.
-7. `.gdevelop/instructions-catalog.json` before adding or changing
+   for semantic configuration, object definitions, and embedded `[layout]`
+   subtrees, including instances, layers, spatial bounds, background, and
+   editor-canvas state.
+5. Relevant `.events` files for IfDo event logic.
+6. `.gdevelop/instructions-catalog.json` before adding or changing
    instructions.
-8. `.gdevelop/runtime-api.d.ts` and `.gdevelop/project-api.d.ts` before adding
+7. `.gdevelop/runtime-api.d.ts` and `.gdevelop/project-api.d.ts` before adding
    or changing any JavaScript event.
 
 The three catalogs and two JavaScript declarations are regenerated from the
@@ -67,16 +66,16 @@ Use the catalogs as authoring contracts:
   serializer properties are deliberately absent from the authoring surface;
   never invent them, but preserve every unlisted field already present in an
   object settings file or legacy JSON source.
-- In `layout-catalog.json`, read `tables` for exact context-specific headers,
-  fields, value types, defaults, and constraints. Select the one
-  `contexts` entry whose `owner` matches the scene, prefab, variant, or external
-  layout, then use only its listed layers, objects, and attached behaviors.
-  Search `effectTypes` for exact effect parameters and types.
+- In `settings-catalog.json`, read `layoutTables` for exact context-specific
+  headers, fields, value types, defaults, and constraints. Select the one
+  `layoutContexts` entry whose `owner` matches the scene, prefab, variant, or
+  external layout, then use only its listed layers, objects, and attached
+  behaviors. Search `effectTypes` for exact effect parameters and types.
 - If the relevant registered type, file kind, layout table, or effect is absent,
   stop instead of guessing. If a direct edit introduces a new object or
   attached behavior name, validate its registered type in the settings catalog,
   define it first in the owning `.settings` file, and then reference that exact
-  new name in the same coherent `.layout` patch; the saved layout context will
+  new name in the same coherent owner-settings `[layout]` patch; the saved layout context will
   list it after GDevelop regenerates the catalogs.
 
 Treat additive semantic and capability metadata as enforceable contracts:
@@ -102,8 +101,8 @@ Search narrowly, for example:
 ```sh
 rg '"type":"Sprite"' .gdevelop/settings-catalog.json
 rg '"type":"Tween::TweenBehavior"' .gdevelop/settings-catalog.json
-rg '"table":"instance"' .gdevelop/layout-catalog.json
-rg '"owner":{"scene":"Main"}' .gdevelop/layout-catalog.json
+rg '"table":"instances"' .gdevelop/settings-catalog.json
+rg '"owner":{"scene":"Main"}' .gdevelop/settings-catalog.json
 ```
 
 Do not edit legacy project JSON, including `.gdevelop/game.json`. It is
@@ -142,13 +141,14 @@ generated compatibility/runtime output, not multi-file source.
 - `constants.toml`: the entire root document is editor-only Constants.
   Author data directly, with no `[settings]`, `[constants]`, format-version,
   or raw-JSON metadata wrapper. Use only values TOML can represent losslessly.
-- `.layout`: standard flat TOML containing placement/layout data only:
-  `[layout]`, optional `[editor]`, and short `[[layers]]`, `[[effects]]`,
-  `[[instances]]`, `[[variables]]`, and `[[behaviors]]` records. Never put object
-  definitions or attached behavior definitions in a `.layout` file. Instance
+- Embedded layout: layout-bearing owner `.settings` files contain `[layout]`,
+  optional `[layout.editor]`, and short `[[layout.layers]]`,
+  `[[layout.effects]]`, `[[layout.instances]]`, `[[layout.variables]]`, and
+  `[[layout.behaviors]]` records. Never put object definitions or attached
+  behavior definitions in the embedded layout subtree. Instance
   behavior overrides are allowed only for behaviors already attached by the
-  owning `.settings` object definition. Follow the matching layout-catalog
-  `contexts` entry and `tables` definitions.
+  owning `.settings` object definition. Follow the matching settings-catalog
+  `layoutContexts` entry and `layoutTables` definitions.
 - `.events`: IfDo DSL only. Do not embed TOML or raw event JSON.
 - References: use canonical `game://...` URIs rooted at `project.gdevelop`.
 - `.gdevelop/`: generated/editor state. Read catalogs; do not author sources
@@ -185,7 +185,8 @@ the complete object definition there, including behaviors, variables, effects,
 and type-specific configuration. `project.gdevelop`, `scene.settings`, and
 `prefab.settings` must not embed object definitions. Keep object groups and
 other owner-wide configuration in the owner settings. Put only instances,
-layers, background/bounds, and editor layout state in `.layout`.
+layers, background/bounds, and editor layout state in the owner's reserved
+`[layout]` subtree.
 For type-specific object configuration, resolve the registered entry in
 `settings-catalog.json` by `objectTypes[].type`: use its `properties` for
 public generic-editor fields and its recursive `schema` for exact serialized
@@ -197,9 +198,10 @@ author-writable properties present in `settings-catalog.json`; preserve
 unlisted fields verbatim because specialized editors may own runtime-required
 configuration that the generic catalog intentionally hides.
 
-Give every scene, External Events resource, prefab, and behavior function its
-own `functions/<Function>/` directory containing `function.settings` and
-`<Function>.events`. Scene and External Events owners have exactly four fixed
+Give every scene, External Events resource, prefab, and behavior function one
+flat same-stem `functions/<Function>.settings` and
+`functions/<Function>.events` pair. Function settings never contain an events
+URI. Scene and External Events owners have exactly four fixed
 functions: `sceneLoad`, `sceneSignal`, `sceneUpdate`, and `sceneUnload`.
 `sceneUpdate` is required; empty optional lifecycle functions may be absent from
 disk. Store editable prefab/behavior grouping in the function settings `folder`
@@ -213,36 +215,33 @@ project.gdevelop
 resources.settings
 constants.toml
 objects/<Object>.settings
-scenes/<Scene>/<Scene>.layout
 scenes/<Scene>/scene.settings
 scenes/<Scene>/objects/<Object>.settings
-scenes/<Scene>/functions/sceneUpdate/function.settings
-scenes/<Scene>/functions/sceneUpdate/sceneUpdate.events
-scenes/<Scene>/functions/<OptionalLifecycle>/function.settings # only when non-empty
-scenes/<Scene>/functions/<OptionalLifecycle>/<OptionalLifecycle>.events
-scenes/<Scene>/externals/<External>.layout
-scenes/<Scene>/externals/<External>/external-events.settings
-scenes/<Scene>/externals/<External>/functions/sceneUpdate/function.settings
-scenes/<Scene>/externals/<External>/functions/sceneUpdate/sceneUpdate.events
-scenes/<Scene>/externals/<External>/functions/<OptionalLifecycle>/function.settings
-scenes/<Scene>/externals/<External>/functions/<OptionalLifecycle>/<OptionalLifecycle>.events
+scenes/<Scene>/functions/sceneUpdate.settings
+scenes/<Scene>/functions/sceneUpdate.events
+scenes/<Scene>/functions/<OptionalLifecycle>.settings # only when non-empty
+scenes/<Scene>/functions/<OptionalLifecycle>.events
+scenes/<Scene>/external-events/<External>/external-events.settings
+scenes/<Scene>/external-events/<External>/functions/sceneUpdate.settings
+scenes/<Scene>/external-events/<External>/functions/sceneUpdate.events
+scenes/<Scene>/external-events/<External>/functions/<OptionalLifecycle>.settings
+scenes/<Scene>/external-events/<External>/functions/<OptionalLifecycle>.events
+scenes/<Scene>/external-layout/<External>.settings
 extensions/<Extension>/extension.settings
-extensions/<Extension>/functions/<Function>/function.settings
-extensions/<Extension>/functions/<Function>/<Function>.events
+extensions/<Extension>/functions/<Function>.settings
+extensions/<Extension>/functions/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/prefab.settings
-extensions/<Extension>/prefabs/<Prefab>/<Prefab>.layout
-extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/function.settings
-extensions/<Extension>/prefabs/<Prefab>/functions/<Function>/<Function>.events
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>.settings
+extensions/<Extension>/prefabs/<Prefab>/functions/<Function>.events
 extensions/<Extension>/prefabs/<Prefab>/objects/<Object>.settings
-extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>.layout
+extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/variant.settings
 extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/objects/<Object>.settings
 extensions/<Extension>/behaviors/<Behavior>/behavior.settings
-extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/function.settings
-extensions/<Extension>/behaviors/<Behavior>/functions/<Function>/<Function>.events
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>.settings
+extensions/<Extension>/behaviors/<Behavior>/functions/<Function>.events
 .gdevelop/instructions-catalog.json
 .gdevelop/deprecated-instructions-catalog.json # legacy read/edit only; never for new events
 .gdevelop/settings-catalog.json
-.gdevelop/layout-catalog.json
 .gdevelop/runtime-api.d.ts
 .gdevelop/project-api.d.ts
 ```
@@ -251,13 +250,14 @@ Do not create optional grouping folders. Canonical component directories are
 fixed; object/function grouping belongs in each settings file's `folder`
 array. Settings files never reference other settings files.
 
-In format version 4, declare each External Events resource with
-`scenes/<Scene>/externals/<External>/external-events.settings`; its physical
-scene owner supplies `associatedLayout`, and its lifecycle logic lives in that
-owner's `functions/` directories. Do not write `externalEventFiles` into
-`scene.settings`. Continue declaring external layouts with
-`[[externalLayoutFiles]]`; each record requires `name`, a project-wide
-contiguous `order`, and its scene-local `layout` URI. Never write
+In format version 5, declare each External Events resource with
+`scenes/<Scene>/external-events/<External>/external-events.settings`; its
+physical scene owner supplies `associatedLayout`, and its lifecycle logic lives
+in that owner's flat same-stem `functions/` pairs. Every managed `.events`
+body has a matching function `.settings` file. Declare an external layout
+independently with `scenes/<Scene>/external-layout/<External>.settings`; it owns
+its identity, project-wide contiguous `order`, and embedded `[layout]` subtree.
+Do not write `externalEventFiles`, `externalLayoutFiles`, layout URIs,
 `associatedLayout`, `linkedScene`, or `unresolvedScene`, and never create a
 root `externals/external.settings`.
 
@@ -269,7 +269,7 @@ Load only the references required by the task:
   full before creating an extension or adding/removing extension-level
   functions, prefabs, behaviors, or their functions.
 - Read [references/layout-toml.md](references/layout-toml.md) in full before
-  creating or changing any `.layout` file. Preserve existing UUIDs and use its
+  creating or changing any embedded `[layout]` subtree. Preserve existing UUIDs and use its
   exact scene, prefab/variant, or external-layout context rules.
 - Read [references/events-dsl.md](references/events-dsl.md) in full before
   creating or changing any `.events` file. Use only its canonical IfDo
@@ -406,9 +406,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
 
 1. Inspect manifests and only the owned files relevant to the request. Search
    `.gdevelop/settings-catalog.json` before adding or changing settings-owned
-   object, behavior, effect, or component definitions. Search
-   `.gdevelop/layout-catalog.json` for the exact layout schema and matching
-   project context before adding or changing layout content.
+   object, behavior, effect, component, or embedded layout definitions. Search
+   its `layoutTables` and `layoutContexts` for the exact layout schema and
+   matching project context before adding or changing layout content.
 2. Search `.gdevelop/instructions-catalog.json` for required instructions and
    expressions. The generated catalog excludes editor-hidden and deprecated
    APIs; never invent or reuse an instruction identifier that is absent from it
@@ -543,16 +543,17 @@ sync, or save tools for authoring.
 
 `generate-catalogs` is a mandatory mid-task refresh after every large
 structural source change. Require `catalogsRegenerated: true`, then read the
-latest relevant `.gdevelop/settings-catalog.json`,
-`.gdevelop/layout-catalog.json`, and `.gdevelop/instructions-catalog.json` and,
+latest relevant `.gdevelop/settings-catalog.json` and
+`.gdevelop/instructions-catalog.json` and,
 for JavaScript work, both generated `.d.ts` files before making dependent edits.
 The tool writes and verifies those five generated authoring files and does not
 validate sources or reload editor memory.
 
 `validate_project_files` is a mandatory reload gate. In every direct-edit task,
 call it successfully with no inputs at least once after the most recent
-source-file edit and before `reload_project`. It regenerates the instruction,
-settings, and layout catalogs and both JavaScript declarations first, then
+source-file edit and before `reload_project`. It regenerates the instruction
+catalogs, the settings catalog (including embedded layout authoring data), and
+both JavaScript declarations first, then
 reconstructs the generated `game.json` representation from the multi-file
 settings, layouts, and events and type-checks JavaScript blocks against the
 fresh public API without replacing editor memory. A later source edit
@@ -588,11 +589,11 @@ second reload while the recorded operation is still running.
 
 Before finishing:
 
-- Confirm every changed `.settings` and `.layout` file is unindented,
-  independently parseable TOML; confirm every `.layout` is canonical flat
-  layout TOML version 1.
-- Confirm `.layout` files contain only placement/layout concepts and contain no
-  `objects`, `objectGroups`, or behavior definitions.
+- Confirm every changed `.settings` file is unindented, independently parseable
+  TOML; confirm every embedded `[layout]` subtree is canonical layout TOML
+  version 1 and uses only `layout.*` child headers.
+- Confirm embedded layout subtrees contain only placement/layout concepts and
+  contain no `objects`, `objectGroups`, or behavior definitions.
 - Confirm no `.settings` file contains a legacy `*FolderStructure` property;
   object/function grouping uses only a valid local `folder` array.
 - Confirm every global, scene, and prefab object definition and its complete
@@ -602,14 +603,15 @@ Before finishing:
   field's absence from the catalog as permission to delete it.
 - Confirm prefab and behavior property descriptor arrays are flat and contain
   no grouping/folder metadata.
-- Confirm every prefab/behavior function has a dedicated flat function
-  directory with `function.settings` and its matching sibling `.events`, and
+- Confirm every prefab/behavior function has a flat same-stem
+  `<Function>.settings` and matching `<Function>.events` pair, and
   owner settings contain no embedded function entries.
 - Confirm settings references use `game://` and resolve to existing files.
 - Confirm settings file kinds and every object/behavior/effect type against
   `settings-catalog.json`.
 - Confirm layout tables, fields, layers, objects, attached behaviors,
-  and effect parameters against the matching `layout-catalog.json` context.
+  and effect parameters against the matching `layoutContexts` entry and
+  `layoutTables` definitions in `settings-catalog.json`.
 - Confirm no `3d` or `2d+3d` layer is marked `lighting = true`; inspect
   renderer diagnostics for a Three scene/group/camera, visible meshes, zero
   rejected objects, and zero failed textures when 3D rendering changed.

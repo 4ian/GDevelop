@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import {
   type EventsSheetInterface,
@@ -31,7 +32,9 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import SceneContextLifecycleFunctionsEditor, {
   type SceneContextLifecycleFunctionsEditorInterface,
 } from '../../SceneContextLifecycleFunctionsEditor';
+import SceneLifecycleFunctionParametersEditor from '../../SceneContextLifecycleFunctionsEditor/SceneLifecycleFunctionParametersEditor';
 import { addFunctionsListToggleButtonToToolbar } from '../../EventsFunctionsList/FunctionsListToggleButton';
+import Tune from '../../UI/CustomSvgIcons/Tune';
 import {
   DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
   getSceneLifecycleEventsFunction,
@@ -284,10 +287,34 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         ownerKind="scene"
         ownerName={layout.getName()}
         onSelectedFunctionChanged={this.onSelectedLifecycleFunctionChanged}
+        renderFunctionParameters={({ lifecycleFunctionName }) => {
+          const eventsFunction = getSceneLifecycleEventsFunction(
+            layout,
+            lifecycleFunctionName
+          );
+          const scope: EventsScope = {
+            project,
+            layout,
+            eventsFunction,
+            sceneLifecycleFunctionName: lifecycleFunctionName,
+          };
+          return (
+            <SceneLifecycleFunctionParametersEditor
+              project={project}
+              projectScopedContainersAccessor={
+                new ProjectScopedContainersAccessor(scope)
+              }
+              eventsFunction={eventsFunction}
+              onWillInstallExtension={this.props.onWillInstallExtension}
+              onExtensionInstalled={this.props.onExtensionInstalled}
+            />
+          );
+        }}
         renderFunctionEditor={({
           lifecycleFunctionName,
           isSelected,
           editorRef,
+          onOpenParameters,
         }) => {
           const eventsFunction = getSceneLifecycleEventsFunction(
             layout,
@@ -322,6 +349,14 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
               }
               eventsFunction={eventsFunction}
               capabilities={fixedEventsFunctionCapabilities}
+              onOpenSettings={onOpenParameters}
+              settingsIcon={onOpenParameters ? <Tune /> : undefined}
+              settingsTooltip={
+                onOpenParameters ? t`Open parameters` : undefined
+              }
+              settingsButtonPosition={
+                onOpenParameters ? 'start' : undefined
+              }
               onOpenExternalEvents={this.props.onOpenExternalEvents}
               isActive={this.props.isActive && isSelected}
               hotReloadPreviewButtonProps={

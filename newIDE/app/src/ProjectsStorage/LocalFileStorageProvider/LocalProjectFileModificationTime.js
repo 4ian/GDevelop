@@ -2,10 +2,7 @@
 import optionalRequire from '../../Utils/OptionalRequire';
 import { PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import { MULTI_FILE_ENTRY_NAME } from '../MultiFileProjectFormat';
-import {
-  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
-  PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
-} from '../ProjectSourceCatalog';
+import { PROJECT_SETTINGS_CATALOG_RELATIVE_PATH } from '../ProjectSourceCatalog';
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
@@ -137,7 +134,6 @@ const getMultiFileProjectPathsToInspect = (projectRoot: string) => [
     ...PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH.split('/')
   ),
   path.join(projectRoot, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')),
-  path.join(projectRoot, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')),
 ];
 
 const getLatestModificationTime = (

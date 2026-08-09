@@ -60,7 +60,7 @@ describe('getLocalProjectLastModifiedDate', () => {
       400000
     );
 
-    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(400000);
+    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(350000);
   });
 
   it('ignores resources and generated autosaves', async () => {

@@ -21,12 +21,20 @@ Production accepts version 5 only. In particular:
 - named variants use
   `variants/<Variant>/variant.settings` and retain
   `variants/<Variant>/objects/<Object>.settings`;
+- External Events owners use
+  `scenes/<Scene>/external-events/<External>/external-events.settings`, with
+  lifecycle function pairs below `functions/`;
 - external layouts use
-  `scenes/<Scene>/externals/<External>/external-layout.settings`;
+  `scenes/<Scene>/external-layout/<External>.settings`;
 - all functions use one same-stem
   `functions/<Function>.settings` + `functions/<Function>.events` pair;
+- every managed `.events` body is a function and must have its same-stem
+  `.settings` owner;
 - no managed `.layout` file, layout URI, events URI, nested variant manifest,
   or `externalLayoutFiles` manifest is valid in version 5.
+- `.gdevelop/settings-catalog.json` format version 2 contains both settings
+  and embedded-layout authoring contracts; the independent layout catalog is
+  retired and deleted during generation.
 
 When any historical example below conflicts with that contract, it describes
 an unsupported pre-v5 tree and must not be used for direct authoring.
@@ -225,7 +233,7 @@ MyGame/
     instructions-catalog.json
     deprecated-instructions-catalog.json
     settings-catalog.json
-    layout-catalog.json
+    layout-catalog.json       # pre-v5 generated artifact; retired in v5
     runtime-api.d.ts
     project-api.d.ts
     state.json
@@ -297,7 +305,7 @@ scene they are associated with. Their manifest entries live in that scene's
   runtime-managed or disposable. AI models must consult the catalog before
   creating settings-owned definitions, must preserve unlisted existing
   behavior fields, and must never edit the generated catalog.
-- `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
+- **Pre-v5 only:** `.gdevelop/layout-catalog.json`, regenerated on every manual project save.
   It describes every layout TOML table and field plus the project-aware
   scene, prefab, variant, and external-layout contexts. Each context lists the
   object definitions, attached behaviors, and layers that can be referenced in
@@ -1829,18 +1837,17 @@ The writer:
 3. Writes a sibling temporary file.
 4. Flushes the file and, where supported, its directory entry.
 5. Atomically replaces the target.
-6. Regenerates the three AI authoring catalogs under `.gdevelop/` from the
+6. Regenerates the AI authoring catalogs under `.gdevelop/` from the
    loaded project and installed platform metadata:
-   `.gdevelop/instructions-catalog.json`,
-   `.gdevelop/settings-catalog.json`, and
-   `.gdevelop/layout-catalog.json`. The instruction catalog contains actions,
+   `.gdevelop/instructions-catalog.json` and
+   `.gdevelop/settings-catalog.json`. The instruction catalog contains actions,
    conditions, expressions, and function signatures. The settings catalog
    contains file ownership schemas and registered object/behavior/effect
    metadata. Every settings `fileKinds` entry contains a complete `schema`
    whose `rootFields` describe root scalars and whose recursive `childTables`
    describe canonical TOML headers, record fields, dynamic-key rules, and
    empty forms; `commonFields` remains only a compact search summary. The
-   layout catalog contains the layout TOML tables and each
+   settings catalog also contains `layoutTables`, `layoutContexts`, and each
    layout's resolvable objects, attached behaviors, and layers.
    Every registered `objectTypes[]` entry contains public generic-editor
    `properties` and a recursive `schema` for its serialized configuration.

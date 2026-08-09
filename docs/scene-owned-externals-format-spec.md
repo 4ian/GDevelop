@@ -6,10 +6,12 @@ Date: 2026-07-31
 > Version 5 amendment (2026-08-09): this document's scene-owned association
 > model remains valid, but its v4 `externalLayoutFiles` manifest and standalone
 > `.layout` paths are retired. External Events uses
-> `scenes/<Scene>/externals/<External>/external-events.settings` plus flat
-> lifecycle function pairs. Each external layout is independently discovered
-> from `scenes/<Scene>/externals/<External>/external-layout.settings`, where
-> its metadata and `[layout]` subtree are embedded. The physical path derives
+> `scenes/<Scene>/external-events/<External>/external-events.settings` plus
+> flat same-stem lifecycle function pairs below `functions/`. Each external
+> layout is independently discovered from
+> `scenes/<Scene>/external-layout/<External>.settings`, where its metadata and
+> `[layout]` subtree are embedded. Every managed `.events` file is a function
+> body and requires a same-stem `.settings` owner. The physical path derives
 > the associated scene. The version 5 contract is
 > [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md);
 > older physical examples below are migration history only.
@@ -337,8 +339,9 @@ The managed settings URI pattern no longer recognizes
 - update generated file-kind counts; and
 - describe scene-owned external paths.
 
-The layout catalog continues to expose external layout contexts associated
-with their scene; its logical model does not change.
+In version 5, `settings-catalog.json` exposes external layout contexts through
+`layoutContexts` and associates each with its scene. The independent layout
+catalog is retired.
 
 ### 12.2 JavaScript authoring paths
 

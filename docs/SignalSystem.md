@@ -1156,7 +1156,10 @@ before `sceneUpdate`. Direct-instance signals never invoke it. Its fixed
 `SignalName` and `Payload` parameters are snapshotted for asynchronous generated
 continuations, and picked-object state is isolated between invocations.
 
-The legacy `SignalReceived` condition remains an iterator available only in
-`sceneUpdate`. Inside `sceneSignal`, authors compare `SignalName()` directly.
+The legacy `SignalReceived` condition remains registered only to load and run
+existing `sceneUpdate` events; it is hidden from new-authoring catalogs and
+instruction choosers. New handlers use `sceneSignal`, whose shared function
+settings UI exposes the fixed, read-only `SignalName` and `Payload` parameters.
+Inside `sceneSignal`, authors compare `SignalName()` directly.
 Signals emitted from load, signal, or update are queued for the next frame;
 signal emission is invalid in the terminal synchronous `sceneUnload` function.

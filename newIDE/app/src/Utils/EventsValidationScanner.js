@@ -180,15 +180,28 @@ const isPerFrameLifecycleFunctionInProjectExtension = (
   return false;
 };
 
+const isSceneUpdateLifecycleScope = (
+  projectScopedContainers: gdProjectScopedContainers
+): boolean => {
+  const lifecycleFunctionName = projectScopedContainers.getScopeSceneLifecycleFunctionName();
+  // An empty role is kept as sceneUpdate for compatibility with callers and
+  // older libGD builds that don't propagate scene lifecycle identity.
+  return !lifecycleFunctionName || lifecycleFunctionName === 'sceneUpdate';
+};
+
 const shouldValidateUnconditionedActionForScope = (
   project: gdProject,
   projectScopedContainers: gdProjectScopedContainers
-): boolean =>
-  !projectScopedContainers.getScopeExtensionName() ||
-  isPerFrameLifecycleFunctionInProjectExtension(
+): boolean => {
+  if (!projectScopedContainers.getScopeExtensionName()) {
+    return isSceneUpdateLifecycleScope(projectScopedContainers);
+  }
+
+  return isPerFrameLifecycleFunctionInProjectExtension(
     project,
     projectScopedContainers
   );
+};
 
 const getSceneLifecycleFunctionLabel = (name: string): string => {
   switch (name) {
@@ -429,7 +442,8 @@ const createValidationWorker = (
       !isCondition &&
       currentStandardEventHasEnabledConditions === false &&
       type === 'BuiltinExternalLayouts::CreateObjectsFromExternalLayout' &&
-      !projectScopedContainers.getScopeExtensionName()
+      !projectScopedContainers.getScopeExtensionName() &&
+      isSceneUpdateLifecycleScope(projectScopedContainers)
     ) {
       errors.push({
         type: 'unsafe-external-layout-creation',

@@ -160,6 +160,9 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
     const signalFunction = layout
       .getLifecycleEventsFunctions()
       .getByName('sceneSignal');
+    const updateFunction = layout
+      .getLifecycleEventsFunctions()
+      .getByName('sceneUpdate');
     const allActions = enumerateAllInstructions(false, project, makeFakeI18n());
     const allConditions = enumerateAllInstructions(
       true,
@@ -185,6 +188,15 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
         sceneLifecycleFunctionName: 'sceneSignal',
       }
     ).map(instruction => instruction.type);
+    const updateConditions = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      allConditions,
+      {
+        project,
+        layout,
+        eventsFunction: updateFunction,
+        sceneLifecycleFunctionName: 'sceneUpdate',
+      }
+    ).map(instruction => instruction.type);
 
     expect(unloadActions).not.toEqual(
       expect.arrayContaining([
@@ -197,6 +209,7 @@ describe('EnumeratedInstructionOrExpressionMetadata', () => {
       ])
     );
     expect(signalConditions).not.toContain('SignalReceived');
+    expect(updateConditions).not.toContain('SignalReceived');
 
     layout.delete();
     project.delete();

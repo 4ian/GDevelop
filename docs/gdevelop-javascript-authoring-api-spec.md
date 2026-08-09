@@ -157,7 +157,7 @@ The JavaScript authoring API must:
 
 Version 1 does not:
 
-- Replace the instruction, settings, or layout catalogs.
+- Replace the instruction or settings catalog.
 - Replace the Events DSL with JavaScript.
 - expose every runtime class, method, global, or renderer implementation.
 - Make underscore-prefixed fields public merely because JavaScript can access
@@ -178,13 +178,12 @@ Version 1 does not:
 
 ## 5. Relationship to the existing authoring catalogs
 
-The project continues to have three normal AI authoring catalogs:
+The project has two normal AI authoring catalogs:
 
-| Artifact                              | Authoritative responsibility                       |
-| ------------------------------------- | -------------------------------------------------- |
-| `.gdevelop/instructions-catalog.json` | Events DSL instructions and expressions            |
-| `.gdevelop/settings-catalog.json`     | Settings-owned definitions and writable properties |
-| `.gdevelop/layout-catalog.json`       | Layout TOML schema and layout contexts             |
+| Artifact                              | Authoritative responsibility                                      |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| `.gdevelop/instructions-catalog.json` | Events DSL instructions and expressions                           |
+| `.gdevelop/settings-catalog.json`     | Settings-owned definitions, embedded layouts, and writable fields |
 
 `.gdevelop/deprecated-instructions-catalog.json` remains a compatibility-only
 event catalog and must not be used to construct new logic.
@@ -886,10 +885,11 @@ The declaration files are generated after the project model and extensions are
 fully available:
 
 1. Read and merge all `.settings` files.
-2. Parse all `.layout` and `.events` files.
+2. Compile embedded `[layout]` subtrees and parse all `.events` files.
 3. Compose and validate the in-memory project model.
 4. Register built-in and project extensions.
-5. Generate instruction, settings, and layout catalogs.
+5. Generate instruction catalogs and the settings catalog, including embedded
+   layout schemas and contexts.
 6. Load the curated core JavaScript API.
 7. Generate `runtime-api.d.ts`.
 8. Generate `project-api.d.ts` from the composed project and function contexts.

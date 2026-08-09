@@ -281,7 +281,10 @@ const findGameUris = (value: any, output: Set<string>) => {
 };
 
 const isCompositeOwnerSettingsUri = (uri: string): boolean =>
-  /^game:\/\/scenes\/[^/]+\/(?:scene\.settings|externals\/[^/]+\/external-layout\.settings)$/.test(
+  /^game:\/\/scenes\/[^/]+\/(?:scene\.settings|external-layout\/[^/]+\.settings)$/.test(
+    uri
+  ) ||
+  /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\/external-layout\.settings$/.test(
     uri
   ) ||
   /^game:\/\/extensions\/[^/]+\/prefabs\/[^/]+\/(?:prefab\.settings|variants\/[^/]+\/variant\.settings)$/.test(
@@ -300,6 +303,23 @@ const discoverDirectSettingsFiles = async (
     if (entry.isFile() && entry.name.endsWith('.settings')) {
       output.push(`game://${[...uriSegments, encodedName].join('/')}`);
     }
+  }
+};
+
+const discoverDirectEventsFiles = async (
+  directoryPath: string,
+  uriSegments: Array<string>,
+  output: Array<string>
+): Promise<void> => {
+  if (!fs.existsSync(directoryPath)) return;
+  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.events')) continue;
+    output.push(
+      `game://${[...uriSegments, physicalNameToGameUriSegment(entry.name)].join(
+        '/'
+      )}`
+    );
   }
 };
 
@@ -386,6 +406,11 @@ const discoverOwnedSettingsUris = async (
         ['scenes', sceneSegment, 'functions'],
         discovered
       );
+      await discoverDirectEventsFiles(
+        sceneFunctionsRoot,
+        ['scenes', sceneSegment, 'functions'],
+        discovered
+      );
       await discoverRetiredFunctionSettings(
         sceneFunctionsRoot,
         ['scenes', sceneSegment, 'functions'],
@@ -396,6 +421,72 @@ const discoverOwnedSettingsUris = async (
         ['scenes', sceneSegment],
         discovered
       );
+      const externalEventsRoot = path.join(sceneRoot, 'external-events');
+      if (fs.existsSync(externalEventsRoot)) {
+        const externalEventEntries = await fs.readdir(externalEventsRoot, {
+          withFileTypes: true,
+        });
+        for (const externalEventEntry of externalEventEntries) {
+          if (!externalEventEntry.isDirectory()) continue;
+          const externalEventSegment = physicalNameToGameUriSegment(
+            externalEventEntry.name
+          );
+          const externalEventRoot = path.join(
+            externalEventsRoot,
+            externalEventEntry.name
+          );
+          await discoverDirectSettingsFiles(
+            externalEventRoot,
+            ['scenes', sceneSegment, 'external-events', externalEventSegment],
+            discovered
+          );
+          const externalFunctionsRoot = path.join(
+            externalEventRoot,
+            'functions'
+          );
+          await discoverDirectSettingsFiles(
+            externalFunctionsRoot,
+            [
+              'scenes',
+              sceneSegment,
+              'external-events',
+              externalEventSegment,
+              'functions',
+            ],
+            discovered
+          );
+          await discoverDirectEventsFiles(
+            externalFunctionsRoot,
+            [
+              'scenes',
+              sceneSegment,
+              'external-events',
+              externalEventSegment,
+              'functions',
+            ],
+            discovered
+          );
+          await discoverRetiredFunctionSettings(
+            externalFunctionsRoot,
+            [
+              'scenes',
+              sceneSegment,
+              'external-events',
+              externalEventSegment,
+              'functions',
+            ],
+            discovered
+          );
+        }
+      }
+      await discoverDirectSettingsFiles(
+        path.join(sceneRoot, 'external-layout'),
+        ['scenes', sceneSegment, 'external-layout'],
+        discovered
+      );
+
+      // Keep discovering the retired combined directory so a save can remove
+      // its managed files transactionally and an open can reject it explicitly.
       const externalsRoot = path.join(sceneRoot, 'externals');
       await discoverDirectRetiredLayoutFiles(
         externalsRoot,
@@ -419,6 +510,11 @@ const discoverOwnedSettingsUris = async (
         );
         const externalFunctionsRoot = path.join(externalRoot, 'functions');
         await discoverDirectSettingsFiles(
+          externalFunctionsRoot,
+          ['scenes', sceneSegment, 'externals', externalSegment, 'functions'],
+          discovered
+        );
+        await discoverDirectEventsFiles(
           externalFunctionsRoot,
           ['scenes', sceneSegment, 'externals', externalSegment, 'functions'],
           discovered
@@ -474,6 +570,11 @@ const discoverOwnedSettingsUris = async (
             ['extensions', extensionUriSegment, 'functions'],
             discovered
           );
+          await discoverDirectEventsFiles(
+            childRoot,
+            ['extensions', extensionUriSegment, 'functions'],
+            discovered
+          );
           await discoverRetiredFunctionSettings(
             childRoot,
             ['extensions', extensionUriSegment, 'functions'],
@@ -506,6 +607,11 @@ const discoverOwnedSettingsUris = async (
               'functions',
             ];
             await discoverDirectSettingsFiles(
+              functionsRoot,
+              functionsUriSegments,
+              discovered
+            );
+            await discoverDirectEventsFiles(
               functionsRoot,
               functionsUriSegments,
               discovered

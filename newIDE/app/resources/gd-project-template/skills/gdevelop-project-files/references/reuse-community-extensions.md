@@ -92,7 +92,7 @@ version, and any later local adaptations in the final report.
 
 Repository extensions are legacy JSON interchange artifacts, not project
 source. Do not reference or retain them in `project.gdevelop`, `.settings`,
-`.layout`, or `.events` and do not ask the model to translate their event trees
+or `.events` and do not ask the model to translate their event trees
 by hand.
 
 1. Before making direct project-file edits, call the GDevelop MCP tool:
@@ -130,7 +130,7 @@ by hand.
 3. Verify that the requested extension has a non-empty generated source list
    containing `extension.settings`. Treat those returned files as the only
    editable source from this point onward.
-4. Read and adapt the generated `.settings`, `.layout`, and `.events` files
+4. Read and adapt the generated `.settings` and `.events` files
    directly. Never edit the downloaded JSON or `.gdevelop/game.json`.
 5. After the final adaptation, run `validate_project_files`, fix every
    structural/generated-code/JavaScript/semantic failure, and commit the
@@ -146,17 +146,17 @@ The native conversion maps the legacy extension as follows:
 | Downloaded extension field                                                        | Multi-file destination                                                                         |
 | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Top-level metadata except implementation arrays                                   | `extensions/<E>/extension.settings`                                                            |
-| `eventsFunctions[]` metadata                                                      | One `functions/<F>/function.settings` each                                                     |
-| `eventsFunctions[].events`                                                        | Matching `functions/<F>/<F>.events`                                                            |
+| `eventsFunctions[]` metadata                                                      | One `functions/<F>.settings` each                                                              |
+| `eventsFunctions[].events`                                                        | Matching `functions/<F>.events`                                                                |
 | `eventsBasedObjects[]` metadata, flat property descriptors, groups, and variables | One `prefabs/<P>/prefab.settings` each                                                         |
 | Default child object definitions and attached behaviors                           | One flat `prefabs/<P>/objects/<Object>.settings` each; grouping is `folder`                    |
-| Prefab default-variant instances/layers/spatial bounds/editor layout state        | `<P>.layout`                                                                                   |
-| Prefab `eventsFunctions[]` metadata/bodies and function grouping                  | `prefabs/<P>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events`             |
-| Prefab non-default variant metadata/groups                                        | Its entry in `prefab.settings`                                                                 |
+| Prefab default-variant instances/layers/spatial bounds/editor layout state        | Embedded `[layout]` in `prefabs/<P>/prefab.settings`                                           |
+| Prefab `eventsFunctions[]` metadata/bodies and function grouping                  | `prefabs/<P>/functions/<F>.settings` (`folder`) plus same-stem `<F>.events`                    |
+| Prefab non-default variant metadata/groups                                        | `prefabs/<P>/variants/<Variant>/variant.settings`                                              |
 | Prefab non-default variant child definitions/behaviors                            | One flat `prefabs/<P>/variants/<Variant>/objects/<Object>.settings` each; grouping is `folder` |
-| Prefab non-default variant instances/layers/spatial bounds/editor state           | `variants/<Variant>.layout`                                                                    |
+| Prefab non-default variant instances/layers/spatial bounds/editor state           | Embedded `[layout]` in `variants/<Variant>/variant.settings`                                  |
 | `eventsBasedBehaviors[]` owner metadata                                           | One `behaviors/<B>/behavior.settings` each                                                     |
-| Behavior `eventsFunctions[]` metadata/bodies and function grouping                | `behaviors/<B>/functions/<F>/function.settings` (`folder`) plus sibling `<F>.events`           |
+| Behavior `eventsFunctions[]` metadata/bodies and function grouping                | `behaviors/<B>/functions/<F>.settings` (`folder`) plus same-stem `<F>.events`                  |
 
 The conversion keeps hidden property descriptors in the owning
 `behavior.settings` because generated runtime code needs their defaults, but it
@@ -180,8 +180,8 @@ dependency/compatibility issue before retrying.
 ## Verify and report
 
 1. Parse every new settings TOML fragment independently and as combined
-   settings; parse and semantically compile every generated `.layout` as flat
-   layout TOML version 1.
+   settings; semantically compile every generated embedded `[layout]` subtree
+   as layout TOML version 1.
 2. Confirm no downloaded `.json` file was added to project source.
 3. Confirm the import receipt lists the requested extension, its generated
    `extension.settings`, source files for all imported dependencies, and the

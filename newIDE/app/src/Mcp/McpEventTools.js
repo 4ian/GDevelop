@@ -144,7 +144,7 @@ const resolveSceneEventsTarget = (
     ownerName = externalEventsName;
     ownerBaseUri = `game://scenes/${encodeManagedName(
       sceneName
-    )}/externals/${encodeManagedName(externalEventsName)}`;
+    )}/external-events/${encodeManagedName(externalEventsName)}`;
   } else {
     if (!sceneName) throw new Error('Missing scene_name.');
     owner = getScene(project, sceneName);
@@ -167,8 +167,8 @@ const resolveSceneEventsTarget = (
     ownerKind,
     ownerName,
     externalEventsName: externalEventsName || null,
-    functionSettingsUri: `${functionBaseUri}/function.settings`,
-    eventsUri: `${functionBaseUri}/${lifecycleFunctionName}.events`,
+    functionSettingsUri: `${functionBaseUri}.settings`,
+    eventsUri: `${functionBaseUri}.events`,
   };
 };
 

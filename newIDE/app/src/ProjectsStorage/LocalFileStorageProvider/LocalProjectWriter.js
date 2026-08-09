@@ -51,12 +51,9 @@ import {
 } from '../../EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog';
 import { getLocalProjectLastModifiedDate } from './LocalProjectFileModificationTime';
 import {
-  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
   PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
   buildBehaviorPropertySchemasByType,
-  buildProjectLayoutCatalog,
   buildProjectSettingsCatalog,
-  serializeProjectLayoutCatalog,
   serializeProjectSettingsCatalog,
 } from '../ProjectSourceCatalog';
 import {
@@ -73,6 +70,8 @@ const crypto = optionalRequire('crypto');
 const gd: libGDevelop = global.gd;
 
 export const GENERATED_LEGACY_PROJECT_RELATIVE_PATH = '.gdevelop/game.json';
+const RETIRED_PROJECT_LAYOUT_CATALOG_RELATIVE_PATH =
+  '.gdevelop/layout-catalog.json';
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 
@@ -389,34 +388,13 @@ export const writeProjectSettingsCatalog = async (
     serializeProjectSettingsCatalog(catalog),
     path.join(projectPath, ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/'))
   );
-  reportCatalogProgress(options, 'catalog-settings-written');
-  return catalog;
-};
-
-export const writeProjectLayoutCatalog = async (
-  project: gdProject,
-  projectPath: string,
-  serializedProjectObject?: Object,
-  effectTypes?: Array<Object>,
-  behaviorTypes?: Array<Object>,
-  options?: ProjectSourceCatalogWriteOptions
-): Promise<Object> => {
-  reportCatalogProgress(options, 'catalog-layout-building');
-  const serializedProject =
-    serializedProjectObject || serializeToJSObject(project, 'serializeTo');
-  const catalog = buildProjectLayoutCatalog({
-    project,
-    serializedProject,
-    effectTypes,
-    behaviorTypes,
-  });
-  reportCatalogProgress(options, 'catalog-layout-built');
-  reportCatalogProgress(options, 'catalog-layout-writing');
-  writeAndCheckGeneratedFileSync(
-    serializeProjectLayoutCatalog(catalog),
-    path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+  fs.removeSync(
+    path.join(
+      projectPath,
+      ...RETIRED_PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')
+    )
   );
-  reportCatalogProgress(options, 'catalog-layout-written');
+  reportCatalogProgress(options, 'catalog-settings-written');
   return catalog;
 };
 
@@ -518,14 +496,6 @@ export const writeProjectSourceCatalogs = async (
       serializedProject,
       trackedOptions
     );
-    const layoutCatalog = await writeProjectLayoutCatalog(
-      project,
-      projectPath,
-      serializedProject,
-      settingsCatalog.effectTypes,
-      settingsCatalog.behaviorTypes,
-      trackedOptions
-    );
     const javascriptApi = await writeProjectJavaScriptAuthoringApi(
       project,
       projectPath,
@@ -536,7 +506,6 @@ export const writeProjectSourceCatalogs = async (
     return {
       instructions: instructionCatalog.counts,
       settings: settingsCatalog.counts,
-      layouts: layoutCatalog.counts,
       javascript: javascriptApi,
     };
   } catch (error) {
@@ -613,12 +582,6 @@ const writeProjectFiles = async ({
     // Hidden behavior properties are omitted from the authoring catalog, but
     // they can still contain data configured by a specialized editor that the
     // runtime needs. Keep the serializer output lossless.
-    const layoutCatalog = buildProjectLayoutCatalog({
-      project,
-      serializedProject: authoringSerializedProjectObject,
-      effectTypes: settingsCatalog.effectTypes,
-      behaviorTypes: settingsCatalog.behaviorTypes,
-    });
     const javascriptArtifacts = buildJavaScriptAuthoringArtifacts(
       authoringSerializedProjectObject
     );
@@ -676,9 +639,11 @@ const writeProjectFiles = async ({
         ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
       )
     );
-    await writeAndCheckFile(
-      serializeProjectLayoutCatalog(layoutCatalog),
-      path.join(projectPath, ...PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/'))
+    fs.removeSync(
+      path.join(
+        projectPath,
+        ...RETIRED_PROJECT_LAYOUT_CATALOG_RELATIVE_PATH.split('/')
+      )
     );
     await writeAndCheckFile(
       javascriptArtifacts.runtimeApi,

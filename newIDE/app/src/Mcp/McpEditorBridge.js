@@ -4503,19 +4503,23 @@ const callMcpTool = async ({
             '.gdevelop',
             'instructions-catalog.json'
           ),
+          deprecatedInstructions: path.join(
+            projectRoot,
+            '.gdevelop',
+            'deprecated-instructions-catalog.json'
+          ),
           settings: path.join(
             projectRoot,
             '.gdevelop',
             'settings-catalog.json'
           ),
-          layouts: path.join(projectRoot, '.gdevelop', 'layout-catalog.json'),
           runtimeApi: path.join(projectRoot, '.gdevelop', 'runtime-api.d.ts'),
           projectApi: path.join(projectRoot, '.gdevelop', 'project-api.d.ts'),
         },
         nextAction:
           'Read the refreshed catalogs before making edits that depend on newly added or changed project structure. Run validate_project_files after the final source edit before reload_project.',
         note:
-          'All three generated catalog files and both JavaScript declaration files were written sequentially and verified before this response. Project source files and editor memory were not modified.',
+          'All three generated catalog files and both JavaScript declaration files were written sequentially and verified before this response. Embedded-layout authoring data is included in settings-catalog.json; the retired layout-catalog.json was removed. Project source files and editor memory were not modified.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(

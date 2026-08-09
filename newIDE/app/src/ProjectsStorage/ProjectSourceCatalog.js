@@ -23,8 +23,7 @@ const SCENE_LIFECYCLE_SOURCES = Object.freeze([
 
 export const PROJECT_SETTINGS_CATALOG_RELATIVE_PATH =
   '.gdevelop/settings-catalog.json';
-export const PROJECT_LAYOUT_CATALOG_RELATIVE_PATH =
-  '.gdevelop/layout-catalog.json';
+export const PROJECT_SETTINGS_CATALOG_FORMAT_VERSION = 2;
 
 export class ProjectSourceCatalogError extends Error {
   code: string;
@@ -1935,7 +1934,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'external-events',
     requiredMarker: { field: 'kind', value: 'externalEvents' },
-    path: 'scenes/<Scene>/externals/<ExternalEvents>/external-events.settings',
+    path:
+      'scenes/<Scene>/external-events/<ExternalEvents>/external-events.settings',
     mountedNamespace: 'scenes."<Scene>".externalEvents."<ExternalEvents>"',
     tomlRoot: true,
     requiredFields: ['kind', 'settingsFormatVersion', 'order', 'name'],
@@ -1954,7 +1954,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'external-layout',
     requiredMarker: { field: 'kind', value: 'externalLayout' },
-    path: 'scenes/<Scene>/externals/<ExternalLayout>/external-layout.settings',
+    path: 'scenes/<Scene>/external-layout/<ExternalLayout>.settings',
     mountedNamespace: 'scenes."<Scene>".externalLayouts."<ExternalLayout>"',
     tomlRoot: true,
     requiredFields: [
@@ -1979,7 +1979,8 @@ const SETTINGS_FILE_KINDS = Object.freeze([
   {
     kind: 'external-lifecycle-function',
     requiredMarker: { field: 'kind', value: 'function' },
-    path: 'scenes/<Scene>/externals/<ExternalEvents>/functions/<Role>.settings',
+    path:
+      'scenes/<Scene>/external-events/<ExternalEvents>/functions/<Role>.settings',
     mountedNamespace:
       'scenes."<Scene>".externalEvents."<ExternalEvents>".functions."<Role>"',
     tomlRoot: true,
@@ -2264,7 +2265,7 @@ const buildSettingsOwners = (serializedProject: Object): Array<Object> => {
     const name = String(externalEvents.name || '');
     const ownerBaseUri = `game://scenes/${encodeManagedName(
       sceneName
-    )}/externals/${encodeManagedName(name)}`;
+    )}/external-events/${encodeManagedName(name)}`;
     owners.push({
       kind: 'external-events',
       scene: sceneName,
@@ -2291,7 +2292,7 @@ const buildSettingsOwners = (serializedProject: Object): Array<Object> => {
       name,
       settingsUri: `game://scenes/${encodeManagedName(
         sceneName
-      )}/externals/${encodeManagedName(name)}/external-layout.settings`,
+      )}/external-layout/${encodeManagedName(name)}.settings`,
     });
   });
   (serializedProject.eventsFunctionsExtensions || []).forEach(extension => {
@@ -2370,9 +2371,13 @@ export const buildProjectSettingsCatalog = ({
     additionalExtensions
   );
   const settingsOwners = buildSettingsOwners(serializedProject);
+  const embeddedLayoutCatalog = buildEmbeddedLayoutCatalog({
+    serializedProject,
+    behaviorTypes: registeredTypes.behaviorTypes,
+  });
   return validateProjectSettingsCatalog({
     format: 'gdevelop-settings-catalog',
-    formatVersion: 1,
+    formatVersion: PROJECT_SETTINGS_CATALOG_FORMAT_VERSION,
     project: projectIdentity(project),
     authoring: {
       sourceExtension: '.settings',
@@ -2386,7 +2391,7 @@ export const buildProjectSettingsCatalog = ({
         'Layout data is embedded below the reserved [layout] subtree of its owning settings file. Functions derive their same-stem .events sibling from the physical settings path; do not write layout or events URI fields.',
         `Use kind and settingsFormatVersion=${MULTI_FILE_FORMAT_VERSION} exactly where the file-kind entry requires them. Ordinary owner order is contiguous and zero based. Lifecycle order is the fixed sparse semantic value sceneLoad=0, sceneSignal=1, sceneUpdate=2, sceneUnload=3. External Events and external-layout order are independently global.`,
         'Scene and External Events bodies live in fixed functions/<Role>.settings plus same-stem <Role>.events sources. sceneUpdate is always materialized. Omit both files for empty sceneLoad, sceneSignal, and sceneUnload roles. Never rename, add, delete, reorder, duplicate, make async/public, or change the signature of a lifecycle function.',
-        'Store every External Events owner at scenes/<Scene>/externals/<ExternalEvents>/external-events.settings and every external layout at scenes/<Scene>/externals/<ExternalLayout>/external-layout.settings. Derive associatedLayout from that path; do not write associatedLayout, linkedScene, unresolvedScene, events, functionFiles, externalLayoutFiles, or layout URI fields.',
+        'Store every External Events owner at scenes/<Scene>/external-events/<ExternalEvents>/external-events.settings and every external layout at scenes/<Scene>/external-layout/<ExternalLayout>.settings. Derive associatedLayout from that path; do not write associatedLayout, linkedScene, unresolvedScene, events, functionFiles, externalLayoutFiles, or layout URI fields.',
         'Write every non-empty variable container as repeated [[variables]], [[globalVariables]], or [[sceneVariables]] records. Each record contains an explicit non-empty name and the complete descriptor fields, for example name = "Controllers", type = "array", and children = [...]. Write variables = [ ], globalVariables = [ ], or sceneVariables = [ ] only for an empty container. Keyed [variables] tables, whole-container inline tables, and non-empty inline descriptor arrays are forbidden.',
         'Write object groups only as an [objectGroups] TOML table whose keys are group names and whose values are arrays of object names, for example Buttons = ["PauseButton", "Retry"]. Preserve per-group requiredBehaviors in the optional [objectGroupRequiredBehaviors] companion table using the same group key and an array of behavior-type strings. Write objectGroups = { } when there are no groups. The retired objectsGroups field and array/table-descriptor forms are forbidden.',
         'Write Sprite originPoint and centerPoint as inline TOML tables. Write named points and customCollisionMask polygons as inline arrays of point tables. Never expand point data into dotted TOML headers.',
@@ -2410,12 +2415,20 @@ export const buildProjectSettingsCatalog = ({
     objectTypes: registeredTypes.objectTypes,
     behaviorTypes: registeredTypes.behaviorTypes,
     effectTypes: registeredTypes.effectTypes,
+    layoutAuthoring: embeddedLayoutCatalog.authoring,
+    layoutTables: embeddedLayoutCatalog.tables,
+    layoutContexts: embeddedLayoutCatalog.contexts,
+    behaviorOverrideSchemas: embeddedLayoutCatalog.behaviorOverrideSchemas,
     counts: {
       fileKinds: SETTINGS_FILE_KINDS.length,
       settingsOwners: settingsOwners.length,
       objectTypes: registeredTypes.objectTypes.length,
       behaviorTypes: registeredTypes.behaviorTypes.length,
       effectTypes: registeredTypes.effectTypes.length,
+      layoutTables: embeddedLayoutCatalog.tables.length,
+      layoutContexts: embeddedLayoutCatalog.contexts.length,
+      behaviorOverrideSchemas:
+        embeddedLayoutCatalog.behaviorOverrideSchemas.length,
     },
   });
 };
@@ -2799,9 +2812,9 @@ const buildLayoutContexts = (serializedProject: Object): Array<Object> => {
           linkedScene: linkedSceneName,
           settingsUri: `game://scenes/${encodeManagedName(
             linkedSceneName
-          )}/externals/${encodeManagedName(
+          )}/external-layout/${encodeManagedName(
             String(external.name || '')
-          )}/external-layout.settings`,
+          )}.settings`,
         },
         objects: linkedScene
           ? mergeObjects(linkedScene.objects || [], globalObjects)
@@ -2816,26 +2829,14 @@ const buildLayoutContexts = (serializedProject: Object): Array<Object> => {
   return contexts;
 };
 
-export const buildProjectLayoutCatalog = ({
-  project,
+const buildEmbeddedLayoutCatalog = ({
   serializedProject,
-  effectTypes,
   behaviorTypes,
 }: {|
-  project: gdProject,
   serializedProject: Object,
-  effectTypes?: Array<Object>,
-  behaviorTypes?: Array<Object>,
+  behaviorTypes: Array<Object>,
 |}): Object => {
-  const registeredTypes =
-    effectTypes && behaviorTypes
-      ? null
-      : collectRegisteredTypes(project, serializedProject);
-  const registeredEffectTypes =
-    effectTypes || (registeredTypes && registeredTypes.effectTypes) || [];
-  const registeredBehaviorTypes =
-    behaviorTypes || (registeredTypes && registeredTypes.behaviorTypes) || [];
-  const behaviorOverrideSchemas = registeredBehaviorTypes.map(behavior => ({
+  const behaviorOverrideSchemas = behaviorTypes.map(behavior => ({
     behaviorType: behavior.type,
     keySpace: 'serialized',
     unknownPropertyPolicy: behavior.unknownPropertyPolicy || 'preserve',
@@ -2848,10 +2849,7 @@ export const buildProjectLayoutCatalog = ({
       })),
   }));
   const contexts = buildLayoutContexts(serializedProject);
-  return validateProjectLayoutCatalog({
-    format: 'gdevelop-layout-catalog',
-    formatVersion: 1,
-    project: projectIdentity(project),
+  return {
     authoring: {
       sourceExtension: '.settings',
       storage: 'embedded-settings',
@@ -2873,15 +2871,8 @@ export const buildProjectLayoutCatalog = ({
     },
     tables: LAYOUT_TABLES,
     contexts,
-    effectTypes: registeredEffectTypes,
     behaviorOverrideSchemas,
-    counts: {
-      tables: LAYOUT_TABLES.length,
-      contexts: contexts.length,
-      effectTypes: registeredEffectTypes.length,
-      behaviorOverrideSchemas: behaviorOverrideSchemas.length,
-    },
-  });
+  };
 };
 
 export const buildBehaviorPropertySchemasByType = (
@@ -2916,7 +2907,7 @@ const validateBaseCatalog = (
     !catalog ||
     typeof catalog !== 'object' ||
     catalog.format !== format ||
-    catalog.formatVersion !== 1 ||
+    catalog.formatVersion !== PROJECT_SETTINGS_CATALOG_FORMAT_VERSION ||
     !catalog.project ||
     typeof catalog.project !== 'object' ||
     !catalog.authoring ||
@@ -3001,6 +2992,9 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
     'objectTypes',
     'behaviorTypes',
     'effectTypes',
+    'layoutTables',
+    'layoutContexts',
+    'behaviorOverrideSchemas',
   ]);
   validateUniqueEntries(validated.fileKinds, entry => entry.kind, 'file kind');
   validated.fileKinds.forEach(fileKind => {
@@ -3121,22 +3115,20 @@ export const validateProjectSettingsCatalog = (catalog: any): Object => {
     entry => entry.type,
     'effect type'
   );
-  return validated;
-};
-
-export const validateProjectLayoutCatalog = (catalog: any): Object => {
-  const validated = validateBaseCatalog(catalog, 'gdevelop-layout-catalog', [
-    'tables',
-    'contexts',
-    'effectTypes',
-    'behaviorOverrideSchemas',
-  ]);
+  if (
+    !validated.layoutAuthoring ||
+    typeof validated.layoutAuthoring !== 'object' ||
+    validated.layoutAuthoring.rootTable !== 'layout' ||
+    validated.layoutAuthoring.storage !== 'embedded-settings'
+  ) {
+    fail('Settings catalog must declare embedded layout authoring metadata.');
+  }
   validateUniqueEntries(
-    validated.tables,
+    validated.layoutTables,
     entry => `${entry.table}\u0000${entry.variant || ''}`,
     'layout table'
   );
-  validated.contexts.forEach(context => {
+  validated.layoutContexts.forEach(context => {
     if (
       !context ||
       !['scene', 'prefab', 'prefab-variant', 'external'].includes(
@@ -3149,11 +3141,6 @@ export const validateProjectLayoutCatalog = (catalog: any): Object => {
       fail('Invalid layout context entry.');
     }
   });
-  validateUniqueEntries(
-    validated.effectTypes,
-    entry => entry.type,
-    'effect type'
-  );
   validateUniqueEntries(
     validated.behaviorOverrideSchemas,
     entry => entry.behaviorType,
@@ -3225,12 +3212,7 @@ export const serializeProjectSettingsCatalog = (catalog: Object): string =>
     'objectTypes',
     'behaviorTypes',
     'effectTypes',
-  ]);
-
-export const serializeProjectLayoutCatalog = (catalog: Object): string =>
-  serializeCatalog(validateProjectLayoutCatalog(catalog), [
-    'tables',
-    'contexts',
-    'effectTypes',
+    'layoutTables',
+    'layoutContexts',
     'behaviorOverrideSchemas',
   ]);

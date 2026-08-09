@@ -10,6 +10,9 @@ import EditorMosaic, {
   mosaicContainsNode,
 } from '../UI/EditorMosaic';
 import EventsFunctionsTreeView from '../EventsFunctionsList/EventsFunctionsTreeView';
+import Dialog from '../UI/Dialog';
+import FlatButton from '../UI/FlatButton';
+import Tune from '../UI/CustomSvgIcons/Tune';
 import PreferencesContext, {
   type EditorMosaicName,
 } from '../MainFrame/Preferences/PreferencesContext';
@@ -39,6 +42,10 @@ type Props = {|
     lifecycleFunctionName: SceneLifecycleFunctionName,
     isSelected: boolean,
     editorRef: React.RefSetter<EventsSheetInterface>,
+    onOpenParameters: ?() => void,
+  |}) => React.Node,
+  renderFunctionParameters: ({|
+    lifecycleFunctionName: 'sceneSignal',
   |}) => React.Node,
   onSelectedFunctionChanged: () => void,
 |};
@@ -46,6 +53,7 @@ type Props = {|
 type State = {|
   selectedLifecycleFunctionName: SceneLifecycleFunctionName,
   mountedLifecycleFunctionNames: Array<SceneLifecycleFunctionName>,
+  parametersDialogOpen: boolean,
 |};
 
 export type SceneContextLifecycleFunctionsEditorInterface = {|
@@ -127,6 +135,7 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
       ownerKind,
       ownerName,
       renderFunctionEditor,
+      renderFunctionParameters,
       onSelectedFunctionChanged,
     }: Props,
     ref
@@ -134,9 +143,13 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
     const [state, setState] = React.useState<State>({
       selectedLifecycleFunctionName: DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
       mountedLifecycleFunctionNames: [DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME],
+      parametersDialogOpen: false,
     });
-    const { selectedLifecycleFunctionName, mountedLifecycleFunctionNames } =
-      state;
+    const {
+      selectedLifecycleFunctionName,
+      mountedLifecycleFunctionNames,
+      parametersDialogOpen,
+    } = state;
     const editorsByLifecycleFunctionName = React.useRef<{
       [string]: ?EventsSheetInterface,
     }>({});
@@ -196,10 +209,20 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
             state.mountedLifecycleFunctionNames.includes(lifecycleFunctionName)
               ? state.mountedLifecycleFunctionNames
               : [...state.mountedLifecycleFunctionNames, lifecycleFunctionName],
+          parametersDialogOpen: false,
         }));
         return true;
       },
       [selectedLifecycleFunctionName]
+    );
+
+    const openParametersDialog = React.useCallback(
+      () =>
+        setState((state) => ({
+          ...state,
+          parametersDialogOpen: true,
+        })),
+      []
     );
 
     React.useEffect(() => {
@@ -272,6 +295,17 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
             canMoveSelectionToItem={() => false}
             reactDndType="GD_SCENE_LIFECYCLE_FUNCTION_ITEM"
             initiallyOpenedNodeIds={[rootTreeItem.id]}
+            headerControls={
+              selectedLifecycleFunctionName === 'sceneSignal' ? (
+                <FlatButton
+                  fullWidth
+                  label={<Trans>Function settings</Trans>}
+                  leftIcon={<Tune />}
+                  onClick={openParametersDialog}
+                  id="function-settings-button"
+                />
+              ) : null
+            }
           />
         ),
       },
@@ -301,6 +335,10 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
                           definition.name
                         ] = editor;
                       },
+                      onOpenParameters:
+                        definition.name === 'sceneSignal'
+                          ? openParametersDialog
+                          : null,
                     })}
                   </div>
                 );
@@ -319,16 +357,53 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
         : getInitialMosaicEditorNodes();
 
     return (
-      <EditorMosaic
-        ref={editorMosaicRef}
-        // $FlowFixMe[incompatible-type]
-        editors={editors}
-        centralNodeId="events-sheet"
-        initialNodes={initialMosaicNode}
-        onPersistNodes={(node) =>
-          setDefaultEditorMosaicNode(mosaicPreferenceName, node)
-        }
-      />
+      <React.Fragment>
+        <EditorMosaic
+          ref={editorMosaicRef}
+          // $FlowFixMe[incompatible-type]
+          editors={editors}
+          centralNodeId="events-sheet"
+          initialNodes={initialMosaicNode}
+          onPersistNodes={(node) =>
+            setDefaultEditorMosaicNode(mosaicPreferenceName, node)
+          }
+        />
+        {parametersDialogOpen &&
+          selectedLifecycleFunctionName === 'sceneSignal' && (
+            <Dialog
+              title={<Trans>Function parameters</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  keyboardFocused
+                  onClick={() =>
+                    setState((state) => ({
+                      ...state,
+                      parametersDialogOpen: false,
+                    }))
+                  }
+                />,
+              ]}
+              open
+              onRequestClose={() =>
+                setState((state) => ({
+                  ...state,
+                  parametersDialogOpen: false,
+                }))
+              }
+              maxWidth="md"
+              fullHeight
+              flexColumnBody
+              disableContentScroll
+            >
+              {renderFunctionParameters({
+                lifecycleFunctionName: 'sceneSignal',
+              })}
+            </Dialog>
+          )}
+      </React.Fragment>
     );
   }
 );

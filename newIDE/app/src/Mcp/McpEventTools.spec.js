@@ -38,7 +38,10 @@ describe('MCP scene lifecycle event tools', () => {
     expect(loadResult.ownerKind).toBe('scene');
     expect(loadResult.lifecycleFunctionName).toBe('sceneLoad');
     expect(loadResult.eventsUri).toBe(
-      'game://scenes/Main%20Scene/functions/sceneLoad/sceneLoad.events'
+      'game://scenes/Main%20Scene/functions/sceneLoad.events'
+    );
+    expect(loadResult.functionSettingsUri).toBe(
+      'game://scenes/Main%20Scene/functions/sceneLoad.settings'
     );
   });
 
@@ -62,7 +65,10 @@ describe('MCP scene lifecycle event tools', () => {
     expect(result.ownerName).toBe('Shared Logic');
     expect(result.lifecycleFunctionName).toBe('sceneUnload');
     expect(result.eventsUri).toBe(
-      'game://scenes/Main%20Scene/externals/Shared%20Logic/functions/sceneUnload/sceneUnload.events'
+      'game://scenes/Main%20Scene/external-events/Shared%20Logic/functions/sceneUnload.events'
+    );
+    expect(result.functionSettingsUri).toBe(
+      'game://scenes/Main%20Scene/external-events/Shared%20Logic/functions/sceneUnload.settings'
     );
   });
 

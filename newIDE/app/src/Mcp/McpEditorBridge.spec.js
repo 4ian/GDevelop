@@ -350,7 +350,8 @@ describe('McpEditorBridge', () => {
     const files = decomposeLegacyProjectToFiles(
       serializeProjectWithConstants(project)
     );
-    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    files['game://scenes/Scene/functions/sceneUpdate.events'] =
+      'if SceneJustBegins\n';
     await writeMultiFileSourceTree({
       entryPath: projectFile,
       files,
@@ -359,18 +360,26 @@ describe('McpEditorBridge', () => {
     fs.mkdirSync(catalogDirectory, { recursive: true });
     const catalogFiles = {
       instructions: path.join(catalogDirectory, 'instructions-catalog.json'),
+      deprecatedInstructions: path.join(
+        catalogDirectory,
+        'deprecated-instructions-catalog.json'
+      ),
       settings: path.join(catalogDirectory, 'settings-catalog.json'),
-      layouts: path.join(catalogDirectory, 'layout-catalog.json'),
       runtimeApi: path.join(catalogDirectory, 'runtime-api.d.ts'),
       projectApi: path.join(catalogDirectory, 'project-api.d.ts'),
     };
+    const retiredLayoutCatalog = path.join(
+      catalogDirectory,
+      'layout-catalog.json'
+    );
     [
       catalogFiles.instructions,
+      catalogFiles.deprecatedInstructions,
       catalogFiles.settings,
-      catalogFiles.layouts,
     ].forEach(catalogFile => {
       fs.writeFileSync(catalogFile, '{ stale catalog', 'utf8');
     });
+    fs.writeFileSync(retiredLayoutCatalog, '{ stale catalog', 'utf8');
     const reloadProjectAndWait = jest.fn();
     const bridge = makeBridge({
       getProject: () => project,
@@ -394,15 +403,14 @@ describe('McpEditorBridge', () => {
         catalogs: expect.objectContaining({
           instructions: expect.any(Object),
           settings: expect.any(Object),
-          layouts: expect.any(Object),
         }),
         catalogFiles,
       })
     );
     [
       catalogFiles.instructions,
+      catalogFiles.deprecatedInstructions,
       catalogFiles.settings,
-      catalogFiles.layouts,
     ].forEach(catalogFile => {
       expect(() =>
         JSON.parse(fs.readFileSync(catalogFile, 'utf8'))
@@ -414,6 +422,7 @@ describe('McpEditorBridge', () => {
     expect(fs.readFileSync(catalogFiles.projectApi, 'utf8')).toContain(
       'declare namespace GDevelopProject'
     );
+    expect(fs.existsSync(retiredLayoutCatalog)).toBe(false);
     expect(result.generatedGameJson).toBeUndefined();
     expect(result.nextAction).toContain('Read the refreshed catalogs');
   });
@@ -430,7 +439,8 @@ describe('McpEditorBridge', () => {
     const files = decomposeLegacyProjectToFiles(
       serializeProjectWithConstants(project)
     );
-    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    files['game://scenes/Scene/functions/sceneUpdate.events'] =
+      'if SceneJustBegins\n';
     await writeMultiFileSourceTree({
       entryPath: projectFile,
       files,
@@ -466,8 +476,9 @@ describe('McpEditorBridge', () => {
         javascriptApiRegenerated: true,
         catalogs: expect.objectContaining({
           instructions: expect.any(Object),
-          settings: expect.any(Object),
-          layouts: expect.any(Object),
+          settings: expect.objectContaining({
+            layoutContexts: expect.any(Number),
+          }),
         }),
         generatedGameJson: expect.objectContaining({
           reconstructedInMemory: true,
@@ -516,7 +527,7 @@ describe('McpEditorBridge', () => {
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json')
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop', 'runtime-api.d.ts')
@@ -545,7 +556,7 @@ describe('McpEditorBridge', () => {
     const files = decomposeLegacyProjectToFiles(
       serializeProjectWithConstants(project)
     );
-    files['game://scenes/Scene/Scene.events'] = `@js strict=true
+    files['game://scenes/Scene/functions/sceneUpdate.events'] = `@js strict=true
 runtimeScene._instances.length;
 @end js
 `;
@@ -565,12 +576,13 @@ runtimeScene._instances.length;
         expect.objectContaining({
           severity: 'error',
           code: 'JS_API_PRIVATE_MEMBER',
-          fileUri: 'game://scenes/Scene/Scene.events',
+          fileUri: 'game://scenes/Scene/functions/sceneUpdate.events',
           filePath: path.join(
             temporaryDirectory,
             'scenes',
             'Scene',
-            'Scene.events'
+            'functions',
+            'sceneUpdate.events'
           ),
           line: 2,
           sourceExcerpt: expect.arrayContaining([
@@ -716,7 +728,8 @@ runtimeScene._instances.length;
     const files = decomposeLegacyProjectToFiles(
       serializeProjectWithConstants(project)
     );
-    files['game://scenes/Scene/Scene.events'] = 'if SceneJustBegins\n';
+    files['game://scenes/Scene/functions/sceneUpdate.events'] =
+      'if SceneJustBegins\n';
     await writeMultiFileSourceTree({ entryPath: projectFile, files });
 
     const dumpPayload = {
@@ -906,8 +919,7 @@ runtimeScene._instances.length;
         catalogsRegenerated: true,
         catalogs: {
           instructions: { actions: 123 },
-          settings: { objectTypes: 45 },
-          layouts: { contexts: 2 },
+          settings: { objectTypes: 45, layoutContexts: 2 },
         },
       };
     }): any);
@@ -943,8 +955,7 @@ runtimeScene._instances.length;
         catalogsRegenerated: true,
         catalogs: {
           instructions: { actions: 123 },
-          settings: { objectTypes: 45 },
-          layouts: { contexts: 2 },
+          settings: { objectTypes: 45, layoutContexts: 2 },
         },
       })
     );
@@ -1127,8 +1138,8 @@ runtimeScene._instances.length;
     );
     expect(result.generatedSources.StarRatingBar).toEqual(
       expect.arrayContaining([
-        'game://extensions/StarRatingBar/functions/FormatRating/function.settings',
-        'game://extensions/StarRatingBar/functions/FormatRating/FormatRating.events',
+        'game://extensions/StarRatingBar/functions/FormatRating.settings',
+        'game://extensions/StarRatingBar/functions/FormatRating.events',
       ])
     );
     project.delete();
@@ -1223,7 +1234,9 @@ runtimeScene._instances.length;
     expect(result).toEqual(
       expect.objectContaining({
         importerVersion: 3,
-        writerError: expect.objectContaining({ code: 'ENOENT' }),
+        writerError: expect.objectContaining({
+          code: 'MULTIFILE_MISSING_FILE',
+        }),
       })
     );
     expect(response.content[0].text).not.toContain(

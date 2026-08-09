@@ -34,7 +34,10 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
-import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
+import {
+  ProjectScopedContainersAccessor,
+  type EventsScope,
+} from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
   setEditorHotReloadNeeded,
@@ -46,6 +49,7 @@ import type { SearchFilterParams } from '../../Utils/Search';
 import SceneContextLifecycleFunctionsEditor, {
   type SceneContextLifecycleFunctionsEditorInterface,
 } from '../../SceneContextLifecycleFunctionsEditor';
+import SceneLifecycleFunctionParametersEditor from '../../SceneContextLifecycleFunctionsEditor/SceneLifecycleFunctionParametersEditor';
 import { addFunctionsListToggleButtonToToolbar } from '../../EventsFunctionsList/FunctionsListToggleButton';
 import {
   DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
@@ -365,6 +369,31 @@ export class ExternalEventsEditorContainer extends React.Component<
             ownerKind="external-events"
             ownerName={externalEvents.getName()}
             onSelectedFunctionChanged={this.onSelectedLifecycleFunctionChanged}
+            renderFunctionParameters={({ lifecycleFunctionName }) => {
+              const eventsFunction = getSceneLifecycleEventsFunction(
+                externalEvents,
+                lifecycleFunctionName
+              );
+              const scope: EventsScope = {
+                project,
+                layout,
+                externalEvents,
+                eventsFunction,
+                sceneLifecycleFunctionName: lifecycleFunctionName,
+              };
+              return (
+                <SceneLifecycleFunctionParametersEditor
+                  project={project}
+                  // $FlowFixMe[incompatible-type]
+                  projectScopedContainersAccessor={
+                    new ProjectScopedContainersAccessor(scope)
+                  }
+                  eventsFunction={eventsFunction}
+                  onWillInstallExtension={this.props.onWillInstallExtension}
+                  onExtensionInstalled={this.props.onExtensionInstalled}
+                />
+              );
+            }}
             renderFunctionEditor={({
               lifecycleFunctionName,
               isSelected,

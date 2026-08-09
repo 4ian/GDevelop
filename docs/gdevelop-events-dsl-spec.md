@@ -18,6 +18,9 @@ segments. Any nested `functions/<Function>/function.settings` example later in
 this document is unsupported v3/v4 path history; it does not change the IfDo
 grammar described here. The controlling physical ownership contract is
 [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
+Every managed `.events` source is therefore a function body; an `.events` file
+without its same-stem `.settings` owner is invalid. External lifecycle pairs
+live below `scenes/<Scene>/external-events/<External>/functions/`.
 
 ---
 
@@ -3896,8 +3899,9 @@ An IfDo `.events` file does not declare its lifecycle role. Its sibling
 Events functions use the same grammar and instruction catalog as ordinary
 scene events, subject to these role rules:
 
-- `SignalReceived` may be authored only in `sceneUpdate`; `sceneSignal` compares
-  `SignalName()` directly and reads `SignalPayload()`.
+- Legacy `SignalReceived` instructions may be parsed and preserved only in
+  `sceneUpdate`, but are not emitted for new authoring; `sceneSignal` compares
+  its fixed `SignalName` parameter directly and reads `Payload`.
 - `SceneJustBegins` is retained for update compatibility but is redundant in
   load and unload and is not suggested there.
 - `sceneUnload` rejects instructions whose metadata declares asynchronous or

@@ -114,10 +114,10 @@ const isFunctionVisibleInGivenScope = (
   if (lifecycleFunctionName) {
     const instructionType = enumeratedInstructionOrExpressionMetadata.type;
 
-    if (
-      instructionType === 'SignalReceived' &&
-      lifecycleFunctionName !== 'sceneUpdate'
-    ) {
+    // SignalReceived is kept as a legacy runtime instruction so existing
+    // projects remain compatible, but new signal handlers must be authored in
+    // the sceneSignal lifecycle function.
+    if (instructionType === 'SignalReceived') {
       return false;
     }
 

@@ -62,6 +62,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Signal name"))
       .SetRelevantForLayoutEventsOnly()
+      // Kept in metadata so existing projects continue to load and run, but
+      // new scene signal handling is authored in the sceneSignal lifecycle
+      // function instead of through this legacy iterator condition.
+      .SetHidden()
       .MarkAsSimple();
 
   extension

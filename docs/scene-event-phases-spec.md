@@ -4,12 +4,22 @@ Status: approved for implementation
 
 Date: 2026-08-07
 
+> **Proposed presence amendment (2026-08-09):**
+> [optional-scene-lifecycle-functions-spec.md](optional-scene-lifecycle-functions-spec.md)
+> changes lifecycle functions from four permanently attached entries to four
+> reserved optional entries. New owners contain `sceneUpdate` by default, all
+> roles can be added or deleted, and a missing role is treated as an empty
+> function. Until that amendment is approved, the fixed-presence rules below
+> remain the approved implementation contract.
+
 > Version 5 storage amendment (2026-08-09): lifecycle semantics in this
 > document are unchanged, but every persisted function now uses the flat
 > same-stem pair `functions/<Function>.settings` and
-> `functions/<Function>.events`. Function settings contain no events URI.
-> Scene layout is embedded in `scene.settings`; external-layout owners are
-> independent `external-layout.settings` files. Any nested
+> `functions/<Function>.events`. Function settings contain no events URI, and
+> an `.events` file without its same-stem `.settings` owner is invalid. Scene
+> layout is embedded in `scene.settings`; External Events owners live below
+> `scenes/<Scene>/external-events/<External>/`, and external layouts use
+> `scenes/<Scene>/external-layout/<External>.settings`. Any nested
 > `functions/<Function>/function.settings` or standalone `.layout` example
 > below is unsupported v4 migration history. See
 > [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
@@ -21,11 +31,11 @@ scene-context lifecycle functions, presented with the same compact navigation
 pattern as the Prefab lifecycle editor but with scene-specific names and
 semantics:
 
-| Fixed function name / lifecycle role | English UI label | Suggested Chinese label | Invocation |
-| ------------------------------------ | ---------------- | ----------------------- | ---------- |
+| Fixed function name / lifecycle role | English UI label | Suggested Chinese label | Invocation                                             |
+| ------------------------------------ | ---------------- | ----------------------- | ------------------------------------------------------ |
 | `sceneLoad`                          | On scene load    | 场景加载时              | Once, on the first logical frame of this runtime scene |
-| `sceneSignal`                        | On scene signal  | 收到场景信号时          | Once for every delivered scene signal |
-| `sceneUpdate`                        | Scene update     | 场景更新                | Once per logical frame while the scene is active |
+| `sceneSignal`                        | On scene signal  | 收到场景信号时          | Once for every delivered scene signal                  |
+| `sceneUpdate`                        | Scene update     | 场景更新                | Once per logical frame while the scene is active       |
 | `sceneUnload`                        | On scene unload  | 场景卸载时              | Once, immediately before the runtime scene is unloaded |
 
 The Scene Events editor section heading is **Scene lifecycle functions**. The
@@ -147,12 +157,12 @@ section 1, never translated labels.
 The selected fixed function names and labels intentionally differ from the
 Prefab editor:
 
-| Prefab concept       | Scene lifecycle function | Reason |
-| -------------------- | ------------------------ | ------ |
-| `onCreated`          | On scene load    | The load function runs after initial objects and variables exist; the scene is not an object being constructed |
-| `onSignal`           | On scene signal   | The scene observes scene broadcasts only; direct-instance signals remain Prefab-only |
-| `doStepPostEvents`   | Scene update      | These events are the scene's main events, so “post events” would be incorrect and implementation-oriented |
-| `onDestroy`          | On scene unload      | The scene lifecycle function runs once before any scene object is destroyed; it is not an object destructor |
+| Prefab concept     | Scene lifecycle function | Reason                                                                                                         |
+| ------------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `onCreated`        | On scene load            | The load function runs after initial objects and variables exist; the scene is not an object being constructed |
+| `onSignal`         | On scene signal          | The scene observes scene broadcasts only; direct-instance signals remain Prefab-only                           |
+| `doStepPostEvents` | Scene update             | These events are the scene's main events, so “post events” would be incorrect and implementation-oriented      |
+| `onDestroy`        | On scene unload          | The scene lifecycle function runs once before any scene object is destroyed; it is not an object destructor    |
 
 “Callback” is not part of the primary label. It suggests immediate
 re-entrant execution, while GDevelop signals are queued until the next frame.
@@ -207,12 +217,12 @@ The functions use the ordinary `gd::EventsFunction` event body, parameters,
 copying, serialization helpers, source maps, and code-generation machinery.
 Their owner container fixes the metadata below:
 
-| Name / role | Type | Order | Parameters |
-| ----------- | ---- | ----- | ---------- |
-| `sceneLoad` | `Action` | 0 | none |
-| `sceneSignal` | `Action` | 1 | `SignalName: string`, `Payload: string` |
-| `sceneUpdate` | `Action` | 2 | none |
-| `sceneUnload` | `Action` | 3 | none |
+| Name / role   | Type     | Order | Parameters                              |
+| ------------- | -------- | ----- | --------------------------------------- |
+| `sceneLoad`   | `Action` | 0     | none                                    |
+| `sceneSignal` | `Action` | 1     | `SignalName: string`, `Payload: string` |
+| `sceneUpdate` | `Action` | 2     | none                                    |
+| `sceneUnload` | `Action` | 3     | none                                    |
 
 All four use `folder = ["Lifecycle"]`, `private = true`, `async = false`, an
 empty sentence, no result, and no object groups. `runtimeScene` and the internal
@@ -225,6 +235,12 @@ folder, or parameter signature. Only the events body is editable. The
 `sceneSignal` parameter names follow Prefab `onSignal`; `SignalName()` and
 `SignalPayload()` remain convenient scene-context aliases that compile to the
 fixed parameters.
+
+When `sceneSignal` is selected, the shared function list exposes the same
+**Function settings** entry used by Prefab, Behavior, and Extension functions.
+It opens the shared parameter editor with `SignalName` and `Payload` visible in
+fully read-only mode. Scene Events and External Events use this same UI and do
+not maintain a separate parameter presentation.
 
 The fixed `async = false` means the lifecycle function is not an awaitable
 public instruction. It does not disable ordinary asynchronous event
@@ -591,11 +607,7 @@ name/payload as function arguments. It must not rely exclusively on one mutable
 Conceptually:
 
 ```js
-sceneCode.sceneSignal = function (
-  runtimeScene,
-  signalName,
-  signalPayload
-) {
+sceneCode.sceneSignal = function(runtimeScene, signalName, signalPayload) {
   // Generated events.
 };
 ```
@@ -645,7 +657,14 @@ in all lifecycle functions unless explicitly restricted below.
 `SignalReceived` is special iteration syntax in the existing update sheet. It
 must not be nested around a lifecycle function that is already invoked per signal.
 
-- `sceneUpdate`: available and unchanged for compatibility.
+The condition is hidden from all new-authoring catalogs and instruction
+choosers. Its metadata and code generation remain registered solely so existing
+projects can be loaded, edited without destructive migration, and executed.
+New signal handlers are authored in `sceneSignal` and inspect its read-only
+`SignalName` and `Payload` parameters.
+
+- `sceneUpdate`: existing serialized uses remain valid for compatibility, but
+  the condition is not offered for new authoring.
 - `sceneLoad`: unavailable and a compile-time lifecycle-role diagnostic.
 - `sceneSignal`: unavailable and a compile-time lifecycle-role diagnostic. Authors use
   `SignalName()` in an ordinary string comparison.
@@ -1012,10 +1031,11 @@ External body:     scenes/<Scene>/externals/<External>/functions/<Role>/<Role>.e
 ```
 
 Scene `functions/` contains only the four reserved lifecycle names in version
+
 4. External Events use one owner directory below the associated scene's
-`externals/` directory. An external layout remains the flat
-`externals/<ExternalLayout>.layout` file, so a same-stem external-event directory
-and external-layout file can coexist.
+   `externals/` directory. An external layout remains the flat
+   `externals/<ExternalLayout>.layout` file, so a same-stem external-event directory
+   and external-layout file can coexist.
 
 ### 14.2 Owner settings
 
@@ -1178,8 +1198,7 @@ header. Identity, role, signature, and owner come exclusively from the sibling
 keeps the IfDo grammar unchanged and prevents duplicated ownership.
 
 The project instruction catalog attaches
-`sceneLifecycleRole: "sceneLoad" | "sceneSignal" | "sceneUpdate" |
-"sceneUnload"` and the owner kind to each lifecycle function source.
+`sceneLifecycleRole: "sceneLoad" | "sceneSignal" | "sceneUpdate" | "sceneUnload"` and the owner kind to each lifecycle function source.
 Role-specific instruction validation follows section 10.
 
 ## 15. Code generation
@@ -1205,11 +1224,16 @@ active-frame orchestrator never invokes it.
 Conceptual output:
 
 ```js
-sceneCode.func = function (runtimeScene) {
+sceneCode.func = function(runtimeScene) {
   runtimeScene.getOnceTriggers().startNewFrame();
 
-  if (sceneCode.sceneLoad &&
-      runtimeScene.getScene().getTimeManager().isFirstFrame()) {
+  if (
+    sceneCode.sceneLoad &&
+    runtimeScene
+      .getScene()
+      .getTimeManager()
+      .isFirstFrame()
+  ) {
     sceneCode.sceneLoad(runtimeScene);
   }
 
@@ -1662,8 +1686,9 @@ function directories but omit them on save.
 - Invalid duplicate/cross-scene/colliding URIs fail before writes.
 - MCP calls without a lifecycle function still edit update; role-aware calls edit only the
   requested source.
-- Catalog and AI placement rules never recommend `SignalReceived` inside the
-  signal or unload function and never recommend deferred work inside unload.
+- Catalog and AI placement rules never recommend `SignalReceived` for new
+  authoring in any lifecycle function and never recommend deferred work inside
+  unload.
 
 ### 23.7 Corpus and regression
 

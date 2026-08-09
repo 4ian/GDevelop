@@ -36,7 +36,7 @@ import {
   type EventsFunctionCodeWriter,
 } from '../../EventsFunctionsExtensionsLoader';
 import {
-  PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
+  PROJECT_SETTINGS_CATALOG_FORMAT_VERSION,
   PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
 } from '../ProjectSourceCatalog';
 import {
@@ -154,15 +154,36 @@ const bootstrapProjectSourceCatalogs = async (
   projectFile: string
 ): Promise<void> => {
   const projectRoot = path.dirname(projectFile);
+  const settingsCatalogPath = path.join(
+    projectRoot,
+    ...PROJECT_SETTINGS_CATALOG_RELATIVE_PATH.split('/')
+  );
+  const retiredLayoutCatalogPath = path.join(
+    projectRoot,
+    '.gdevelop',
+    'layout-catalog.json'
+  );
   const generatedArtifactRelativePaths = [
     PROJECT_INSTRUCTION_CATALOG_RELATIVE_PATH,
     PROJECT_DEPRECATED_INSTRUCTION_CATALOG_RELATIVE_PATH,
     PROJECT_SETTINGS_CATALOG_RELATIVE_PATH,
-    PROJECT_LAYOUT_CATALOG_RELATIVE_PATH,
     PROJECT_RUNTIME_API_RELATIVE_PATH,
     PROJECT_API_RELATIVE_PATH,
   ];
+  let hasCurrentSettingsCatalog = false;
+  try {
+    const settingsCatalog = JSON.parse(
+      fs.readFileSync(settingsCatalogPath, 'utf8')
+    );
+    hasCurrentSettingsCatalog =
+      settingsCatalog.format === 'gdevelop-settings-catalog' &&
+      settingsCatalog.formatVersion === PROJECT_SETTINGS_CATALOG_FORMAT_VERSION;
+  } catch (error) {
+    // Missing, invalid, or retired catalogs are regenerated below.
+  }
   if (
+    hasCurrentSettingsCatalog &&
+    !fs.existsSync(retiredLayoutCatalogPath) &&
     generatedArtifactRelativePaths.every(relativePath =>
       fs.existsSync(path.join(projectRoot, ...relativePath.split('/')))
     )

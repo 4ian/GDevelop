@@ -5,6 +5,12 @@ import TestRenderer, { act } from 'react-test-renderer';
 
 import SceneContextLifecycleFunctionsEditor from '.';
 
+jest.mock('../UI/Dialog', () => {
+  const React = require('react');
+  return ({ children, open }: any): React.Node =>
+    open ? <div id="function-parameters-dialog">{children}</div> : null;
+});
+
 jest.mock('../UI/EditorMosaic', () => {
   const React = require('react');
   const MockEditorMosaic = React.forwardRef(
@@ -51,16 +57,20 @@ jest.mock('../EventsFunctionsList/EventsFunctionsTreeView', () => {
     items,
     buildMenuTemplate,
     canMoveSelectionToItem,
+    headerControls,
   }: any): React.Node => {
     const functionItem = items[0].children[0];
     return (
-      <div
-        id="shared-events-functions-tree-view"
-        data-root-name={items[0].name}
-        data-function-count={items[0].children.length}
-        data-menu-count={buildMenuTemplate(functionItem, 0).length}
-        data-can-move={canMoveSelectionToItem(functionItem, 'inside')}
-      />
+      <>
+        {headerControls}
+        <div
+          id="shared-events-functions-tree-view"
+          data-root-name={items[0].name}
+          data-function-count={items[0].children.length}
+          data-menu-count={buildMenuTemplate(functionItem, 0).length}
+          data-can-move={canMoveSelectionToItem(functionItem, 'inside')}
+        />
+      </>
     );
   };
 });
@@ -77,13 +87,25 @@ describe('SceneContextLifecycleFunctionsEditor', () => {
       sceneUpdate: makeEditor('sceneUpdate'),
       sceneUnload: makeEditor('sceneUnload'),
     };
+    const openParametersByLifecycleFunctionName: {
+      [string]: ?() => void,
+    } = {};
     const renderFunctionEditor = ({
       lifecycleFunctionName,
       editorRef,
+      onOpenParameters,
     }: any): React.Node => {
       editorRef(editors[lifecycleFunctionName]);
+      openParametersByLifecycleFunctionName[
+        lifecycleFunctionName
+      ] = onOpenParameters;
       return <div id={`function-editor-${lifecycleFunctionName}`} />;
     };
+    const renderFunctionParameters = (jest.fn(
+      ({ lifecycleFunctionName }) => (
+        <div id={`function-parameters-${lifecycleFunctionName}`} />
+      )
+    ): any);
     let renderer: any = null;
 
     act(() => {
@@ -94,6 +116,7 @@ describe('SceneContextLifecycleFunctionsEditor', () => {
           ownerName="Test scene"
           onSelectedFunctionChanged={onSelectedFunctionChanged}
           renderFunctionEditor={renderFunctionEditor}
+          renderFunctionParameters={renderFunctionParameters}
         />
       );
     });
@@ -114,6 +137,7 @@ describe('SceneContextLifecycleFunctionsEditor', () => {
     expect(
       renderer.root.findAllByProps({ id: 'function-editor-sceneSignal' })
     ).toHaveLength(0);
+    expect(openParametersByLifecycleFunctionName.sceneUpdate).toBeNull();
 
     act(() => {
       expect(
@@ -130,6 +154,29 @@ describe('SceneContextLifecycleFunctionsEditor', () => {
     expect(
       renderer.root.findAllByProps({ id: 'function-editor-sceneSignal' })
     ).toHaveLength(1);
+    expect(
+      openParametersByLifecycleFunctionName.sceneSignal
+    ).toEqual(expect.any(Function));
+    const functionSettingsButtons = renderer.root.findAll(
+      (node) =>
+        node.type === 'button' &&
+        node.props.id === 'function-settings-button'
+    );
+    expect(functionSettingsButtons).toHaveLength(1);
+
+    act(() => {
+      functionSettingsButtons[0].props.onClick();
+    });
+
+    expect(
+      renderer.root.findAllByProps({ id: 'function-parameters-dialog' })
+    ).toHaveLength(1);
+    expect(
+      renderer.root.findAllByProps({ id: 'function-parameters-sceneSignal' })
+    ).toHaveLength(1);
+    expect(renderFunctionParameters).toHaveBeenCalledWith({
+      lifecycleFunctionName: 'sceneSignal',
+    });
     expect(lifecycleEditorRef.current.selectFunctionByName('unknown')).toBe(
       false
     );

@@ -3,10 +3,25 @@ import { EventsEditorContainer } from './EventsEditorContainer';
 import { ExternalEventsEditorContainer } from './ExternalEventsEditorContainer';
 
 jest.mock('../../SceneContextLifecycleFunctionsEditor', () => function() {});
+jest.mock(
+  '../../SceneContextLifecycleFunctionsEditor/SceneLifecycleFunctionParametersEditor',
+  () => function() {}
+);
 jest.mock('../../EventsSheet', () => function EventsSheet() {});
 jest.mock('../../EmbeddedGame/EmbeddedGameFrame', () => ({
   setEditorHotReloadNeeded: jest.fn(),
 }));
+jest.mock('../../InstructionOrExpression/EventsScope', () => {
+  class ProjectScopedContainersAccessor {
+    scope: any;
+
+    constructor(scope: any) {
+      this.scope = scope;
+    }
+  }
+
+  return { ProjectScopedContainersAccessor };
+});
 
 const makeEditor = (snapshotName: string): any => {
   // $FlowFixMe[underconstrained-implicit-instantiation]
@@ -34,6 +49,49 @@ const makeLifecycleFunctionsEditor = (
 });
 
 describe('scene lifecycle editor containers', () => {
+  it('adds the parameters toolbar button only to the scene signal editor', () => {
+    const eventsFunction = ({}: any);
+    const layout = ({
+      getName: () => 'Test scene',
+      getObjects: () => ({}: any),
+      getLifecycleEventsFunctions: () => ({
+        getByName: () => eventsFunction,
+      }),
+    }: any);
+    const project = ({
+      hasLayoutNamed: () => true,
+      getLayout: () => layout,
+      getObjects: () => ({}: any),
+    }: any);
+    const container: any = new EventsEditorContainer(
+      ({ project, projectItemName: 'Test scene' }: any)
+    );
+    const sceneContextEditor = container.render();
+    const openParameters = (jest.fn(): any);
+
+    const signalEditor = sceneContextEditor.props.renderFunctionEditor({
+      lifecycleFunctionName: 'sceneSignal',
+      isSelected: true,
+      editorRef: jest.fn(),
+      onOpenParameters: openParameters,
+    });
+    expect(signalEditor.props.onOpenSettings).toBe(openParameters);
+    expect(signalEditor.props.settingsIcon).toBeTruthy();
+    expect(signalEditor.props.settingsTooltip).toBeTruthy();
+    expect(signalEditor.props.settingsButtonPosition).toBe('start');
+
+    const updateEditor = sceneContextEditor.props.renderFunctionEditor({
+      lifecycleFunctionName: 'sceneUpdate',
+      isSelected: true,
+      editorRef: jest.fn(),
+      onOpenParameters: null,
+    });
+    expect(updateEditor.props.onOpenSettings).toBeNull();
+    expect(updateEditor.props.settingsIcon).toBeUndefined();
+    expect(updateEditor.props.settingsTooltip).toBeUndefined();
+    expect(updateEditor.props.settingsButtonPosition).toBeUndefined();
+  });
+
   it('keeps one editor per visited scene lifecycle function and routes outside changes by role', () => {
     const scene = ({}: any);
     const container: any = new EventsEditorContainer(({}: any));

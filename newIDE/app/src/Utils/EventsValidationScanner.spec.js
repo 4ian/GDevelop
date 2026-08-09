@@ -64,6 +64,57 @@ describe('EventsValidationScanner', () => {
         action.delete();
       };
 
+      it('only validates unconditioned actions in sceneUpdate', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const lifecycleFunctions = testLayout.getLifecycleEventsFunctions();
+        [
+          'sceneLoad',
+          'sceneSignal',
+          'sceneUpdate',
+          'sceneUnload',
+        ].forEach(lifecycleFunctionName => {
+          addAction(
+            project,
+            lifecycleFunctions.getByName(lifecycleFunctionName).getEvents(),
+            'SetNumberVariable',
+            ['Variable1', '=', '1']
+          );
+        });
+
+        const unconditionedActionErrors = scanProjectForValidationErrors(
+          project
+        ).filter(error => error.type === 'unconditioned-action');
+
+        expect(unconditionedActionErrors).toHaveLength(1);
+        expect(unconditionedActionErrors[0].lifecycleFunctionName).toBe(
+          'sceneUpdate'
+        );
+      });
+
+      it('only validates unconditioned external layout creation in sceneUpdate', () => {
+        const { project, testLayout } = makeTestProject(gd);
+        const lifecycleFunctions = testLayout.getLifecycleEventsFunctions();
+        ['sceneLoad', 'sceneUpdate'].forEach(lifecycleFunctionName => {
+          addAction(
+            project,
+            lifecycleFunctions.getByName(lifecycleFunctionName).getEvents(),
+            'BuiltinExternalLayouts::CreateObjectsFromExternalLayout',
+            ['', '"Main_HUD"', '0', '0', '0']
+          );
+        });
+
+        const unsafeExternalLayoutCreationErrors = scanProjectForValidationErrors(
+          project
+        ).filter(
+          error => error.type === 'unsafe-external-layout-creation'
+        );
+
+        expect(unsafeExternalLayoutCreationErrors).toHaveLength(1);
+        expect(
+          unsafeExternalLayoutCreationErrors[0].lifecycleFunctionName
+        ).toBe('sceneUpdate');
+      });
+
       it('rejects SignalReceived outside sceneUpdate with role identity', () => {
         const { project, testLayout } = makeTestProject(gd);
         const lifecycleFunctions = testLayout.getLifecycleEventsFunctions();

@@ -1778,7 +1778,7 @@ export const inspectSignalUsage = (
       handlers: limitedOnSignalHandlers,
     },
     note:
-      'Scene signal received conditions and SignalName()/SignalPayload() are scene/external-scene only. Prefab and behavior onSignal handlers are listed by receiver; branch on their fixed SignalName and Payload parameters.',
+      'Legacy Scene signal received conditions are reported for existing sceneUpdate events only; new scene/external-scene handlers belong in sceneSignal and branch on its fixed SignalName and Payload parameters. Prefab and behavior onSignal handlers are listed by receiver and use the same fixed value parameters.',
   };
 };
 

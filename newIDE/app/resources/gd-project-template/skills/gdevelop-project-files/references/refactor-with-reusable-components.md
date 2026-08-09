@@ -95,38 +95,33 @@ Refactor as follows:
 ```text
 extensions/Combat/
   extension.settings
-  functions/CalculateDamage/
-    function.settings
-    CalculateDamage.events
+  functions/CalculateDamage.settings
+  functions/CalculateDamage.events
   prefabs/Enemy/
     prefab.settings
-    Enemy.layout
     objects/
       Sprite.settings
       HealthBar.settings
-    functions/Initialize/
-      function.settings
-      Initialize.events
+    functions/Initialize.settings
+    functions/Initialize.events
   behaviors/Health/
     behavior.settings
-    functions/Combat/TakeDamage/
-      function.settings
-      TakeDamage.events
-    functions/Queries/IsDead/
-      function.settings
-      IsDead.events
+    functions/TakeDamage.settings
+    functions/TakeDamage.events
+    functions/IsDead.settings
+    functions/IsDead.events
 ```
 
 1. Put the sprite/health-bar child object definitions and their attached
    behaviors in `Enemy/objects/Sprite.settings` and
    `Enemy/objects/HealthBar.settings`; put layers and default instances in
-   `Enemy.layout`. Keep prefab property descriptors flat in
-   `Enemy/prefab.settings`.
+   the embedded `[layout]` subtree of `Enemy/prefab.settings`. Keep prefab
+   property descriptors flat in the same owner settings.
 2. Put health properties/variables in `Health/behavior.settings`. Put each
-   `TakeDamage`/`IsDead` signature in its dedicated recursive
-   `functions/<Function>/function.settings` (including `folder`) and only its DSL body in the
+   `TakeDamage`/`IsDead` signature in its flat same-stem
+   `functions/<Function>.settings` (including `folder`) and only its DSL body in the
    sibling `<Function>.events`.
-3. Put the stateless damage formula in `CalculateDamage/function.settings` and
+3. Put the stateless damage formula in `CalculateDamage.settings` and
    its DSL body in `CalculateDamage.events`.
 4. Attach `Combat::Health` to the prefab configuration and expose only the
    minimum prefab methods needed by scene callers.

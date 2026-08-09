@@ -143,4 +143,16 @@ describe('MetadataProvider index', () => {
       gd.MetadataProvider.getObjectMetadata(platform, objectType).getFullName()
     ).toBe('Second name');
   });
+
+  it('keeps the legacy scene signal condition registered but hidden', () => {
+    const signalReceived = gd.MetadataProvider.getConditionMetadata(
+      gd.JsPlatform.get(),
+      'SignalReceived'
+    );
+
+    expect(gd.MetadataProvider.isBadInstructionMetadata(signalReceived)).toBe(
+      false
+    );
+    expect(signalReceived.isHidden()).toBe(true);
+  });
 });

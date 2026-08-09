@@ -23,8 +23,8 @@ Keep each child object definition and all of its behaviors in an individual
 `objects/<Object>.settings` file. Store its editor grouping in
 `folder = ["Parent", "Child"]`. Keep prefab-wide
 metadata, groups, variables, and flat property descriptors in
-`prefab.settings`, instance/layer/spatial composition in prefab `.layout`
-files, and executable logic in `.events`.
+`prefab.settings`, its embedded `[layout]` subtree for instance/layer/spatial
+composition, and executable logic in `.events`.
 
 ## Required workflow
 
@@ -38,8 +38,8 @@ files, and executable logic in `.events`.
 5. Keep each settings document independently valid and local-root. Its path
    supplies the mounted namespace. Never add
    child-settings indexes to `project.gdevelop` or `extension.settings`.
-6. Use `game://` URIs for `.events` and `.layout` references. Never reference a
-   `.settings` file.
+6. Derive every function's `.events` sibling from its `.settings` stem. Never
+   store events or layout URI fields.
 7. Write one repeated `[[variables]]`, `[[globalVariables]]`, or
    `[[sceneVariables]]` record per variable, with an explicit `name` and the
    complete descriptor fields. Use `variables = [ ]`,
@@ -65,29 +65,24 @@ their exact parameters against the current project catalog.
 ```text
 extensions/CombatKit/
   extension.settings
-  functions/ResetCombat/
-    function.settings
-    ResetCombat.events
+  functions/ResetCombat.settings
+  functions/ResetCombat.events
   prefabs/Enemy/
     prefab.settings
-    Enemy.layout
-    objects/Visuals/
-      Body.settings
-    functions/Lifecycle/Initialize/
-      function.settings
-      Initialize.events
+    objects/Body.settings
+    functions/Initialize.settings
+    functions/Initialize.events
   behaviors/Health/
     behavior.settings
-    functions/Combat/TakeDamage/
-      function.settings
-      TakeDamage.events
+    functions/TakeDamage.settings
+    functions/TakeDamage.events
 ```
 
 `extensions/CombatKit/extension.settings`:
 
 ```toml
 kind = "extension"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 name = "CombatKit"
 fullName = "Combat Kit"
@@ -111,15 +106,14 @@ paths. Fixed-folder discovery finds the children. Do not add any legacy
 `*FolderStructure` table: `functions/`, `prefabs/`, and `behaviors/` are the
 structure.
 
-`extensions/CombatKit/functions/ResetCombat/function.settings`:
+`extensions/CombatKit/functions/ResetCombat.settings`:
 
 ```toml
 kind = "function"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 extension = "CombatKit"
 name = "ResetCombat"
-events = "game://extensions/CombatKit/functions/ResetCombat/ResetCombat.events"
 functionType = "Action"
 fullName = "Reset combat"
 description = "Resets combat state after an explicit request."
@@ -147,7 +141,7 @@ do SetBooleanVariable variable="ResetRequested" modification_sign="False"
 
 ```toml
 kind = "prefab"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 name = "Enemy"
 fullName = "Enemy"
@@ -163,30 +157,24 @@ isAnimatable = false
 isTextContainer = false
 isInnerAreaFollowingParentSize = false
 isUsingLegacyInstancesRenderer = false
-layout = "game://extensions/CombatKit/prefabs/Enemy/Enemy.layout"
 propertyDescriptors = []
 objectGroups = { }
 
 variables = [ ]
-```
 
-`Enemy.layout`:
-
-```toml
 [layout]
 version = 1
 bounds = { min = [0, 0, 0], max = [64, 64, 64] }
 ```
 
-`extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/function.settings`:
+`extensions/CombatKit/prefabs/Enemy/functions/Initialize.settings`:
 
 ```toml
 kind = "function"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 folder = []
 name = "Initialize"
-events = "game://extensions/CombatKit/prefabs/Enemy/functions/Lifecycle/Initialize/Initialize.events"
 functionType = "Action"
 fullName = "Initialize"
 description = "Initializes one enemy instance."
@@ -209,7 +197,7 @@ do SetBooleanObjectVariable object="Object" variable="Initialized" modification_
 
 ```toml
 kind = "object"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 folder = []
 name = "Body"
@@ -223,7 +211,7 @@ variables = [ ]
 Add every child object definition, its variables/effects, and every attached
 behavior to its own flat object settings file. Its `folder` array is the editor
 object grouping. Add only instances, layers,
-spatial bounds, and editor layout state to `Enemy.layout`. Copy the complete
+spatial bounds, and editor layout state to `prefab.settings` below `[layout]`. Copy the complete
 object-definition shape from an existing compatible object `.settings` file
 rather than inventing serializer fields. For attached behaviors, copy only
 author-writable properties listed for that type in `settings-catalog.json` when
@@ -244,7 +232,7 @@ catalog and preserve all existing unknown fields.
 
 ```toml
 kind = "behavior"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 name = "Health"
 fullName = "Health"
@@ -257,15 +245,14 @@ helpPath = ""
 quickCustomizationVisibility = "default"
 ```
 
-`extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/function.settings`:
+`extensions/CombatKit/behaviors/Health/functions/TakeDamage.settings`:
 
 ```toml
 kind = "function"
-settingsFormatVersion = 1
+settingsFormatVersion = 5
 order = 0
 folder = []
 name = "TakeDamage"
-events = "game://extensions/CombatKit/behaviors/Health/functions/Combat/TakeDamage/TakeDamage.events"
 functionType = "Action"
 fullName = "Take damage"
 description = "Subtracts damage from one picked object."
@@ -276,7 +263,7 @@ parameters = [{ name = "Object", description = "Object", type = "object" }, { na
 objectGroups = { }
 ```
 
-`TakeDamage/TakeDamage.events`:
+`TakeDamage.events`:
 
 ```events
 @event aiGeneratedEventId="take-damage"
@@ -296,28 +283,28 @@ selection through child events and nested private behavior-function calls.
 
 ## Add or change components
 
-- Add a free function in its own `functions/<Name>/` folder. Put its complete
-  signature in `function.settings` and only its body in `<Name>.events`.
-- Add every prefab or behavior function in `functions/<Name>/`. Put its
-  complete metadata and `folder` grouping array in `function.settings` and
+- Add a free function as a flat `functions/<Name>.settings` owner. Put its complete
+  signature there and only its body in the same-stem `<Name>.events`.
+- Add every prefab or behavior function as a flat same-stem pair. Put its
+  complete metadata and `folder` grouping array in `<Name>.settings` and
   only its body in the sibling `<Name>.events`. Never embed a
   function entry in `prefab.settings` or `behavior.settings`.
-- Add prefab variants under `variants/<Variant>.layout`; keep the variant's
-  identity, layout URI, and groups in its `prefab.settings` entry. Put each
+- Add prefab variants under `variants/<Variant>/variant.settings`; keep the
+  variant's identity, order, groups, and embedded `[layout]` in that owner. Put each
   variant child definition and its behaviors in
   `variants/<Variant>/objects/<Object>.settings` and store grouping in `folder`.
-- On rename, update the component directory, path-derived namespace, `name`, `.events` or
-  `.layout` basename, every `game://` reference, and every caller atomically.
+- On rename, update the component directory or same-stem pair, path-derived
+  namespace, `name`, and every caller atomically.
 - On delete, remove callers and scene instances first, reload and verify, then
   remove the component files and close empty folders.
 
 ## Validate the extension
 
 1. Parse every changed settings TOML independently, mount it from its canonical
-   path, and verify the strict combined merge; parse and semantically compile
-   every changed `.layout` as flat layout TOML version 1.
+   path, and verify the strict combined merge; semantically compile every
+   changed embedded `[layout]` subtree as layout TOML version 1.
 2. Verify component orders are contiguous and names/folders/basenames match.
-3. Verify every referenced `.events` and `.layout` file exists.
+3. Verify every required same-stem `.events` file exists and no layout URI is present.
 4. Verify prefab layouts contain no object definitions or behaviors and that
    every definition is present in its own flat object settings file.
    Verify property descriptor arrays are flat and no property folder metadata

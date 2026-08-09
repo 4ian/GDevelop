@@ -264,6 +264,7 @@ type Props = {|
   onParametersUpdated: () => void,
   helpPagePath?: string,
   freezeParameters?: boolean,
+  freezeParameterDescriptions?: boolean,
   onMoveFreeEventsParameter?: (
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -317,6 +318,7 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
       onParametersUpdated,
       helpPagePath,
       freezeParameters,
+      freezeParameterDescriptions = false,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
       onMoveObjectEventsParameter,
@@ -1158,8 +1160,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
                   forceUpdate();
                 }}
                 disabled={
-                  /* When parameter are freezed, long description (if shown) can always be changed */
-                  isParameterDisabled(index) && !freezeParameters
+                  isParameterDisabled(index) &&
+                  (!freezeParameters || freezeParameterDescriptions)
                 }
               />
             }
@@ -1174,8 +1176,8 @@ const CompactEventsFunctionParametersEditor: React.ComponentType<{
               forceUpdate();
             }}
             disabled={
-              /* When parameter are freezed, long description (if shown) can always be changed */
-              isParameterDisabled(index) && !freezeParameters
+              isParameterDisabled(index) &&
+              (!freezeParameters || freezeParameterDescriptions)
             }
           />
         )}

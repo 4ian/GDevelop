@@ -145,7 +145,8 @@ describe('McpToolCatalog', () => {
     expect(capabilities.note).toContain('project files');
     expect(capabilities.note).toContain('instructions-catalog.json');
     expect(capabilities.note).toContain('settings-catalog.json');
-    expect(capabilities.note).toContain('layout-catalog.json');
+    expect(capabilities.note).toContain('embedded-layout authoring data');
+    expect(capabilities.note).not.toContain('layout-catalog.json');
     expect(
       capabilities.categories['Project-file validation'].map(tool => tool.name)
     ).toContain('reload_project');

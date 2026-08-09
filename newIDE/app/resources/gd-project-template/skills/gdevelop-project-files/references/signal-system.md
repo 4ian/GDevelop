@@ -27,20 +27,20 @@ Before editing an `.events` file, inspect the owner settings and search
 `dslName` values, expressions, and scopes:
 
 ```sh
-rg 'SignalReceived|EmitSceneSignal|EmitSignalToObjectInstance|SubscribeSceneSignal' .gdevelop/instructions-catalog.json
+rg 'EmitSceneSignal|EmitSignalToObjectInstance|SubscribeSceneSignal' .gdevelop/instructions-catalog.json
 rg 'SignalName|SignalPayload' .gdevelop/instructions-catalog.json
 ```
 
 The normal surface is:
 
-| Kind            | Type/name                                             | Scope                                              |
-| --------------- | ----------------------------------------------------- | -------------------------------------------------- |
-| Condition       | `SignalReceived` (shown as **Scene signal received**) | Scene and external-scene events                    |
-| Action          | `EmitSceneSignal`                                     | Scene, external scene, prefab, and behavior events |
-| Action          | `EmitSignalToObjectInstance`                          | Scene, external scene, prefab, and behavior events |
-| Action          | `SubscribeSceneSignal`                                | Prefab and behavior events only                    |
-| Text expression | `SignalName()`                                        | Matching scene-signal event and descendants        |
-| Text expression | `SignalPayload()`                                     | Matching scene-signal event and descendants        |
+| Kind               | Type/name                           | Scope                                              |
+| ------------------ | ----------------------------------- | -------------------------------------------------- |
+| Lifecycle function | `sceneSignal`                       | Scene and external-scene events                    |
+| Fixed parameters   | `SignalName`, `Payload`             | `sceneSignal` only                                 |
+| Action             | `EmitSceneSignal`                   | Scene, external scene, prefab, and behavior events |
+| Action             | `EmitSignalToObjectInstance`        | Scene, external scene, prefab, and behavior events |
+| Action             | `SubscribeSceneSignal`              | Prefab and behavior events only                    |
+| Text aliases       | `SignalName()`, `SignalPayload()`   | `sceneSignal` only                                 |
 
 Always accept the current generated catalog over this summary.
 
@@ -51,7 +51,7 @@ emit during frame N
   -> pending scene-local queue
   -> fixed delivery batch before events in frame N+1
   -> subscribed prefab/behavior handlers
-  -> matching scene events
+  -> sceneSignal lifecycle callbacks
 ```
 
 - Delivery is FIFO.
@@ -79,18 +79,22 @@ case-sensitive name.
 
 ## Receive a scene signal in scene events
 
-`SignalReceived` is special iteration syntax. Put it as an enabled,
-non-inverted, top-level condition of a standard scene or external-scene event:
+Put the handler in the fixed `sceneSignal` lifecycle function of the Scene or
+External Events owner. It runs once per delivered scene broadcast and exposes
+the fixed, read-only `SignalName` and `Payload` string parameters:
 
 ```events
 @event aiGeneratedEventId="handle-game-ready"
-if SignalReceived signal_name="Game.Ready"
-do DebuggerTools::ConsoleLog message_to_log=expr(SignalPayload())
+if BuiltinCommonInstructions::CompareStrings first_string_expression=expr(SignalName) comparison_sign="=" second_string_expression="Game.Ready"
+do DebuggerTools::ConsoleLog message_to_log=expr(Payload)
 ```
 
-The event runs once for every matching delivered signal, in FIFO order. Use
-`SignalName()` and `SignalPayload()` only in that event or its descendants.
-They return empty text outside the temporary scene-signal context.
+The lifecycle function is invoked in FIFO order. `SignalName()` and
+`SignalPayload()` remain aliases for the same captured values, but prefer the
+visible parameters when authoring function bodies.
+
+`SignalReceived` is legacy iterator syntax. Never author it in new source. It
+is parsed and preserved only so existing `sceneUpdate` events continue to run.
 
 ## Subscribe a prefab or behavior instance
 
@@ -228,7 +232,8 @@ Verify:
 - Expecting a scene broadcast to invoke every `onSignal` automatically.
 - Expecting a direct signal to invoke a behavior.
 - Trying to target an object name, group, or picked-object list.
-- Polling `SignalReceived` outside its supported standard-event shape.
+- Authoring the legacy `SignalReceived` iterator instead of using
+  `sceneSignal`.
 - Using `SignalName()` or `SignalPayload()` inside prefab/behavior `onSignal`.
 - Emitting unconditionally every frame.
 - Expecting a handler-emitted signal to arrive in the same frame.

@@ -1,26 +1,27 @@
 # Author layout TOML
 
-Read `.gdevelop/layout-catalog.json` and the owning `.settings` files before
-editing a `.layout`. Select the catalog `contexts` entry whose owner identifies
-the scene, prefab, variant, or external layout. It is the generated authority
-for resolvable objects, attached behaviors, layers, effects, and writable
-properties.
+Read `.gdevelop/settings-catalog.json` and the owning `.settings` file before
+editing its `[layout]` subtree. Select the catalog `layoutContexts` entry whose
+owner identifies the scene, prefab, variant, or external layout. It is the
+generated authority for resolvable objects, attached behaviors, layers,
+effects, and writable properties; `layoutTables` is the structural schema.
 
-`.layout` files are standard TOML. They contain placement and editor-layout
-data only; object definitions and attached behaviors remain in `.settings`, and
-logic remains in `.events`.
+Version 5 has no managed `.layout` files. Layout-bearing owner settings embed
+placement and editor-layout data below `[layout]`; object definitions and
+attached behaviors remain in dedicated `objects/<Object>.settings`, and logic
+remains in `.events`.
 
 ## Canonical table order
 
 Use this exact order and one final newline:
 
 1. `[layout]`
-2. Optional `[editor]`
-3. All `[[layers]]` records
-4. All `[[effects]]` records
-5. All `[[instances]]` records
-6. All `[[variables]]` records
-7. All `[[behaviors]]` records
+2. Optional `[layout.editor]`
+3. All `[[layout.layers]]` records
+4. All `[[layout.effects]]` records
+5. All `[[layout.instances]]` records
+6. All `[[layout.variables]]` records
+7. All `[[layout.behaviors]]` records
 
 Do not indent TOML lines. Use snake_case field names exactly as cataloged.
 Comments are allowed, but generated canonical output omits them.
@@ -34,17 +35,17 @@ A scene requires a quoted RGB background:
 version = 1
 background = "#202030"
 
-[editor]
+[layout.editor]
 grid = true
 grid_type = "rectangular"
 grid_size = [32, 32, 32]
 
-[[layers]]
+[[layout.layers]]
 id = "base"
 name = ""
 cameras = [{ size = "default", viewport = "default" }]
 
-[[instances]]
+[[layout.instances]]
 id = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 object = "Player"
 layer = "base"
@@ -60,11 +61,11 @@ A prefab or prefab variant forbids `background` and requires integer bounds:
 version = 1
 bounds = { min = [0, 0, 0], max = [128, 96, 0] }
 
-[[layers]]
+[[layout.layers]]
 id = "base"
 name = ""
 
-[[instances]]
+[[layout.instances]]
 id = "37662871-3864-42a8-ae4d-c9ec0ebd6371"
 object = "Body"
 layer = "base"
@@ -80,11 +81,11 @@ An external layout forbids `background`, `bounds`, effects, and cameras. Its
 [layout]
 version = 1
 
-[[layers]]
+[[layout.layers]]
 id = "world"
 name = "World"
 
-[[instances]]
+[[layout.instances]]
 id = "492deedb-eab1-498c-8daf-5ebd0e313c98"
 object = "Coin"
 layer = "world"
@@ -96,7 +97,7 @@ at = [320, 180]
 `[editor]` maps to scene `uiSettings` or prefab/external `editionSettings`:
 
 ```toml
-[editor]
+[layout.editor]
 grid = true
 grid_type = "rectangular"
 grid_size = [32, 32, 32]
@@ -125,7 +126,7 @@ uses lowercase letters, digits, and hyphens. Effects and instances refer to the
 ID, while `selected_layer` uses the runtime name.
 
 ```toml
-[[layers]]
+[[layout.layers]]
 id = "world"
 name = "World"
 rendering = "2d+3d"
@@ -174,7 +175,7 @@ fix the source instead of relying on that fallback.
 Effects use a short top-level record and a layer ID:
 
 ```toml
-[[effects]]
+[[layout.effects]]
 layer = "world"
 name = "Glow"
 type = "Effects::Glow"
@@ -185,8 +186,8 @@ fast = true
 ```
 
 Effect names are unique per layer. Effect parameters are direct fields on the
-`[[effects]]` record. Use only effect types and parameter names listed in the
-layout catalog, and match their TOML value types. `params` is not a valid
+`[[layout.effects]]` record. Use only effect types and parameter names listed in the
+settings catalog, and match their TOML value types. `params` is not a valid
 field. Optional `folded` defaults to false and `enabled` defaults to true.
 
 ## Instances
@@ -195,7 +196,7 @@ Every instance requires an existing object name, existing layer ID, lowercase
 UUIDv4, and a two- or three-number position:
 
 ```toml
-[[instances]]
+[[layout.instances]]
 id = "01fce651-91cd-4d11-bd56-ef1370807527"
 object = "Model"
 layer = "world"
@@ -223,34 +224,34 @@ would change that order.
 An imported stale object may use `unresolved = true`. Preserve it only while
 the object definition is missing. Never add it to a new or resolvable instance.
 Preserve existing UUIDs; generate a new UUIDv4 only for a genuinely new
-instance. UUIDs are unique within one `.layout`, not across the project.
+instance. UUIDs are unique within one embedded owner layout, not across the project.
 
 ## Variables
 
 Top-level instance variables reference their owner by instance UUID:
 
 ```toml
-[[variables]]
+[[layout.variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 id = "4f0234fc-e34d-41b9-88b9-e4a73316f7be"
 name = "Health"
 type = "number"
 value = 100
 
-[[variables]]
+[[layout.variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Mode"
 type = "enum"
 value = "Idle"
 values = ["Idle", "Run"]
 
-[[variables]]
+[[layout.variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Stats"
 type = "structure"
 children = [{ name = "Armor", type = "number", value = 20 }]
 
-[[variables]]
+[[layout.variables]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "Path"
 type = "array"
@@ -267,7 +268,7 @@ value when non-empty. Optional `id` is a UUIDv4.
 A behavior override also references its owning instance by UUID:
 
 ```toml
-[[behaviors]]
+[[layout.behaviors]]
 instance = "ef3ef49d-f20f-4450-b373-0ce43291a002"
 name = "PlatformerObject"
 properties = { maxSpeed = 500, acceleration = 1500 }
@@ -284,9 +285,10 @@ record may exist for each attached behavior on one instance.
 ## Checklist
 
 - Parse as standard TOML and keep one final newline.
-- Use only tables and fields listed in the generated layout catalog.
-- Preserve `[[layers]]`, `[[effects]]`, `[[instances]]`, `[[variables]]`, and
-  `[[behaviors]]` array order.
+- Use only tables and fields listed in the generated settings catalog's
+  `layoutTables`.
+- Preserve `[[layout.layers]]`, `[[layout.effects]]`, `[[layout.instances]]`,
+  `[[layout.variables]]`, and `[[layout.behaviors]]` array order.
 - Preserve every existing instance UUID.
 - Resolve every layer ID, instance UUID, object, behavior, effect, and property
   against the matching catalog context.

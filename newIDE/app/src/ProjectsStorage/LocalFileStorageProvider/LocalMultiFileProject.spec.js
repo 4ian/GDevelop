@@ -28,7 +28,6 @@ import {
   onAutoSaveConstants,
   onSaveProject,
   writeProjectInstructionCatalog,
-  writeProjectLayoutCatalog,
   writeProjectSettingsCatalog,
   writeProjectSourceCatalogs,
 } from './LocalProjectWriter';
@@ -237,7 +236,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat/external-events.settings'
+          'scenes/Main/external-events/Shared Combat/external-events.settings'
         )
       )
     ).toBe(true);
@@ -245,7 +244,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat/functions/sceneUpdate.events'
+          'scenes/Main/external-events/Shared Combat/functions/sceneUpdate.events'
         )
       )
     ).toBe(true);
@@ -253,7 +252,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(
           temporaryDirectory,
-          'scenes/Main/externals/Shared Combat/external-layout.settings'
+          'scenes/Main/external-layout/Shared Combat.settings'
         )
       )
     ).toBe(true);
@@ -264,6 +263,68 @@ describe('Local multi-file project storage', () => {
       areLegacyProjectsEquivalent(
         project,
         await openMultiFileProject(entryPath)
+      )
+    ).toBe(true);
+  });
+
+  test('rejects an events body without a same-stem function settings file', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    const orphanEventsPath = path.join(
+      temporaryDirectory,
+      'scenes/Main/functions/orphan.events'
+    );
+    fs.writeFileSync(orphanEventsPath, '', 'utf8');
+
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_ORPHAN_EVENTS',
+    });
+  });
+
+  test('removes the retired combined external directory on the next save', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.externalEvents = [
+      { name: 'Shared Combat', associatedLayout: 'Main', events: [] },
+    ];
+    project.externalLayouts = [
+      {
+        name: 'Shared Combat',
+        associatedLayout: 'Main',
+        instances: [],
+        editionSettings: {},
+      },
+    ];
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    const sceneRoot = path.join(temporaryDirectory, 'scenes/Main');
+    const retiredOwnerRoot = path.join(sceneRoot, 'externals/Shared Combat');
+    fs.ensureDirSync(path.dirname(retiredOwnerRoot));
+    fs.moveSync(
+      path.join(sceneRoot, 'external-events/Shared Combat'),
+      retiredOwnerRoot,
+      { overwrite: true }
+    );
+    fs.moveSync(
+      path.join(sceneRoot, 'external-layout/Shared Combat.settings'),
+      path.join(retiredOwnerRoot, 'external-layout.settings'),
+      { overwrite: true }
+    );
+
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    expect(fs.existsSync(path.join(sceneRoot, 'externals'))).toBe(false);
+    expect(
+      fs.existsSync(
+        path.join(
+          sceneRoot,
+          'external-events/Shared Combat/external-events.settings'
+        )
+      )
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(sceneRoot, 'external-layout/Shared Combat.settings')
       )
     ).toBe(true);
   });
@@ -503,13 +564,64 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
     ).toBe(true);
     expect(
       fs.existsSync(path.join(temporaryDirectory, '.gdevelop/project-api.d.ts'))
     ).toBe(true);
+  });
+
+  test('rebuilds a pre-merge settings catalog and removes the retired layout catalog', async () => {
+    const gd: libGDevelop = global.gd;
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    project.setName('Catalog upgrade project');
+    ensureProjectHasDefaultScene(project);
+    const files = decomposeLegacyProjectToFiles({
+      ...serializeToJSObject(project),
+      constants: {},
+    });
+    project.delete();
+    await writeMultiFileSourceTree({ entryPath, files });
+    await onOpen({ fileIdentifier: entryPath });
+
+    const settingsCatalogPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/settings-catalog.json'
+    );
+    const retiredLayoutCatalogPath = path.join(
+      temporaryDirectory,
+      '.gdevelop/layout-catalog.json'
+    );
+    const staleSettingsCatalog = JSON.parse(
+      fs.readFileSync(settingsCatalogPath, 'utf8')
+    );
+    staleSettingsCatalog.formatVersion = 1;
+    fs.writeFileSync(
+      settingsCatalogPath,
+      JSON.stringify(staleSettingsCatalog),
+      'utf8'
+    );
+    fs.writeFileSync(retiredLayoutCatalogPath, '{"stale":true}\n', 'utf8');
+
+    await onOpen({ fileIdentifier: entryPath });
+
+    const rebuiltSettingsCatalog = JSON.parse(
+      fs.readFileSync(settingsCatalogPath, 'utf8')
+    );
+    expect(rebuiltSettingsCatalog).toMatchObject({
+      format: 'gdevelop-settings-catalog',
+      formatVersion: 2,
+      layoutAuthoring: {
+        storage: 'embedded-settings',
+        rootTable: 'layout',
+      },
+    });
+    expect(rebuiltSettingsCatalog.layoutTables.length).toBeGreaterThan(0);
+    expect(rebuiltSettingsCatalog.layoutContexts).toHaveLength(1);
+    expect(fs.existsSync(retiredLayoutCatalogPath)).toBe(false);
   });
 
   test('writes only changed owned components', async () => {
@@ -1214,7 +1326,7 @@ describe('Local multi-file project storage', () => {
     project.delete();
   });
 
-  test('writes project-aware AI settings and layout catalogs in .gdevelop', async () => {
+  test('writes one settings catalog with embedded layout authoring data', async () => {
     const gd: libGDevelop = global.gd;
     const project = gd.ProjectHelper.createNewGDJSProject();
     project.setName('Catalog project');
@@ -1222,17 +1334,6 @@ describe('Local multi-file project storage', () => {
     const layout = project.getLayoutAt(0);
     layout.getObjects().insertNewObject(project, 'Sprite', 'Player', 0);
 
-    const settingsCatalog = await writeProjectSettingsCatalog(
-      project,
-      temporaryDirectory
-    );
-    const layoutCatalog = await writeProjectLayoutCatalog(
-      project,
-      temporaryDirectory,
-      undefined,
-      settingsCatalog.effectTypes,
-      settingsCatalog.behaviorTypes
-    );
     const settingsPath = path.join(
       temporaryDirectory,
       '.gdevelop/settings-catalog.json'
@@ -1241,9 +1342,15 @@ describe('Local multi-file project storage', () => {
       temporaryDirectory,
       '.gdevelop/layout-catalog.json'
     );
+    fs.ensureDirSync(path.dirname(layoutPath));
+    fs.writeFileSync(layoutPath, '{"stale":true}\n', 'utf8');
+    const settingsCatalog = await writeProjectSettingsCatalog(
+      project,
+      temporaryDirectory
+    );
 
     expect(fs.existsSync(settingsPath)).toBe(true);
-    expect(fs.existsSync(layoutPath)).toBe(true);
+    expect(fs.existsSync(layoutPath)).toBe(false);
     const persistedSettingsCatalog = JSON.parse(
       fs.readFileSync(settingsPath, 'utf8')
     );
@@ -1277,7 +1384,7 @@ describe('Local multi-file project storage', () => {
     expect(settingsCatalog.counts.fileKinds).toBe(18);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
-    expect(layoutCatalog.contexts).toEqual(
+    expect(settingsCatalog.layoutContexts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'scene',
@@ -1291,7 +1398,7 @@ describe('Local multi-file project storage', () => {
         }),
       ])
     );
-    expect(layoutCatalog.behaviorOverrideSchemas.length).toBeGreaterThan(5);
+    expect(settingsCatalog.behaviorOverrideSchemas.length).toBeGreaterThan(5);
     project.delete();
   });
 
@@ -1330,7 +1437,7 @@ describe('Local multi-file project storage', () => {
     expect(ensureDirSpy).not.toHaveBeenCalled();
     expect(counts.instructions.actions).toBeGreaterThan(100);
     expect(counts.settings.objectTypes).toBeGreaterThan(5);
-    expect(counts.layouts.contexts).toBe(1);
+    expect(counts.settings.layoutContexts).toBe(1);
     expect(counts.javascript.counts.scenes).toBe(1);
     expect(cachedCounts).toEqual(counts);
     expect(counts.javascript.hashes.runtimeApi).toMatch(/^[0-9a-f]{64}$/);
@@ -1356,7 +1463,7 @@ describe('Local multi-file project storage', () => {
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
     ).toBe(true);
@@ -1386,10 +1493,6 @@ describe('Local multi-file project storage', () => {
       'catalog-settings-built',
       'catalog-settings-writing',
       'catalog-settings-written',
-      'catalog-layout-building',
-      'catalog-layout-built',
-      'catalog-layout-writing',
-      'catalog-layout-written',
       'catalog-javascript-api-building',
       'catalog-javascript-api-built',
       'catalog-runtime-api-writing',
@@ -1460,7 +1563,7 @@ column = "editor only"
       fs.existsSync(
         path.join(temporaryDirectory, '.gdevelop/layout-catalog.json')
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       fs.existsSync(path.join(temporaryDirectory, '.gdevelop/runtime-api.d.ts'))
     ).toBe(true);

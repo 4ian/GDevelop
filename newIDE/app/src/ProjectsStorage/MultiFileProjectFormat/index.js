@@ -1233,14 +1233,14 @@ const settingsNamespacePathForUri = (uri, payload) => {
   if (
     segments.length === 5 &&
     segments[0] === 'scenes' &&
-    segments[2] === 'externals' &&
+    segments[2] === 'external-events' &&
     segments[4] === 'external-events.settings'
   )
     return ['scenes', segments[1], 'externalEvents', name];
   if (
     segments.length === 6 &&
     segments[0] === 'scenes' &&
-    segments[2] === 'externals' &&
+    segments[2] === 'external-events' &&
     segments[4] === 'functions' &&
     segments[5].endsWith('.settings')
   )
@@ -1253,10 +1253,10 @@ const settingsNamespacePathForUri = (uri, payload) => {
       name,
     ];
   if (
-    segments.length === 5 &&
+    segments.length === 4 &&
     segments[0] === 'scenes' &&
-    segments[2] === 'externals' &&
-    segments[4] === 'external-layout.settings'
+    segments[2] === 'external-layout' &&
+    segments[3].endsWith('.settings')
   )
     return ['scenes', segments[1], 'externalLayouts', name];
   if (
@@ -1837,7 +1837,7 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     const externalBaseSegments = [
       'scenes',
       sceneInfo.folderName,
-      'externals',
+      'external-events',
       fileName,
     ];
     const ownerSettingsUri = encodeUriPath([
@@ -1910,9 +1910,8 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
     const ownerSettingsUri = encodeUriPath([
       'scenes',
       sceneInfo.folderName,
-      'externals',
-      fileName,
-      'external-layout.settings',
+      'external-layout',
+      `${fileName}.settings`,
     ]);
     const metadata = omitFields(
       external,
@@ -3233,7 +3232,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
   const externalLayoutDocuments = [];
   Object.keys(files)
     .filter(uri =>
-      /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\/external-events\.settings$/.test(
+      /^game:\/\/scenes\/[^/]+\/external-events\/[^/]+\/external-events\.settings$/.test(
         uri
       )
     )
@@ -3331,9 +3330,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
 
   Object.keys(files)
     .filter(uri =>
-      /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\/external-layout\.settings$/.test(
-        uri
-      )
+      /^game:\/\/scenes\/[^/]+\/external-layout\/[^/]+\.settings$/.test(uri)
     )
     .forEach(uri => {
       registerUri(uri);
@@ -3387,14 +3384,14 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
           uri
         );
       }
-      const expectedDirectoryNames = [
+      const expectedFileNames = [
         decodeURIComponent(encodeManagedName(name)),
         `${decodeURIComponent(encodeManagedName(name))}~${stableHash8(name)}`,
-      ];
-      if (!expectedDirectoryNames.includes(segments[3])) {
+      ].map(fileName => `${fileName}.settings`);
+      if (!expectedFileNames.includes(segments[3])) {
         fail(
           'MULTIFILE_IDENTITY_MISMATCH',
-          `External layout ${name} must use its canonical managed owner directory.`,
+          `External layout ${name} must use its canonical managed settings filename.`,
           uri
         );
       }
@@ -3804,7 +3801,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
   }
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|externals\/[^/]+\/(?:external-events\.settings|external-layout\.settings|functions\/[^/]+\.settings))|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|variants\/[^/]+\/(?:variant\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings))|behaviors\/[^/]+\/(?:behavior\.settings|functions\/[^/]+\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|external-events\/[^/]+\/(?:external-events\.settings|functions\/[^/]+\.settings)|external-layout\/[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|variants\/[^/]+\/(?:variant\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings))|behaviors\/[^/]+\/(?:behavior\.settings|functions\/[^/]+\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -3816,6 +3813,18 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
       }
     });
+  const orphanFunctionEventsUri = Object.keys(files).find(
+    uri =>
+      /\/functions\/[^/]+\.events$/.test(uri) &&
+      files[uri.replace(/\.events$/, '.settings')] === undefined
+  );
+  if (orphanFunctionEventsUri) {
+    fail(
+      'MULTIFILE_ORPHAN_EVENTS',
+      'Every managed events body must have a same-stem function settings file.',
+      orphanFunctionEventsUri
+    );
+  }
   const retiredOwnedEventsUri = Object.keys(files).find(
     uri =>
       /^game:\/\/scenes\/[^/]+\/[^/]+\.events$/.test(uri) ||
@@ -3826,6 +3835,18 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       'MULTIFILE_OWNERSHIP_CONFLICT',
       'Version 5 projects must not contain retired scene-owned flat events sources outside a functions directory.',
       retiredOwnedEventsUri
+    );
+  }
+  const retiredExternalOwnerUri = Object.keys(files).find(uri =>
+    /^game:\/\/scenes\/[^/]+\/externals\/[^/]+\/(?:external-events\.settings|external-layout\.settings|functions\/[^/]+\.(?:settings|events))$/.test(
+      uri
+    )
+  );
+  if (retiredExternalOwnerUri) {
+    fail(
+      'MULTIFILE_RETIRED_EXTERNAL_SOURCE',
+      'Version 5 External Events and External Layout sources must use the external-events and external-layout directories.',
+      retiredExternalOwnerUri
     );
   }
 

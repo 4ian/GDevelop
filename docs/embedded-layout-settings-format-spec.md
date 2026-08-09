@@ -15,14 +15,14 @@ domain, but it is stored as a namespaced `[layout]` subtree inside the
 
 The ownership model is:
 
-| Component | Version 4 sources | Version 5 source |
-| --- | --- | --- |
-| Scene | `scene.settings` + `<Scene>.layout` | `scene.settings` with embedded layout |
-| Prefab default variant | `prefab.settings` + `<Prefab>.layout` | `prefab.settings` with embedded layout |
-| Named prefab variant | `[[variants]]` in `prefab.settings` + `variants/<Variant>.layout` | `variants/<Variant>/variant.settings` with metadata and embedded layout |
-| External layout | `[[externalLayoutFiles]]` in `scene.settings` + `externals/<External>.layout` | `externals/<External>/external-layout.settings` with metadata and embedded layout |
-| Function pair | `functions/<Function>/function.settings` + `<Function>.events` | `functions/<Function>.settings` + `functions/<Function>.events` |
-| Event body syntax | IfDo `.events` | IfDo `.events`, unchanged |
+| Component              | Version 4 sources                                                             | Version 5 source                                                        |
+| ---------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Scene                  | `scene.settings` + `<Scene>.layout`                                           | `scene.settings` with embedded layout                                   |
+| Prefab default variant | `prefab.settings` + `<Prefab>.layout`                                         | `prefab.settings` with embedded layout                                  |
+| Named prefab variant   | `[[variants]]` in `prefab.settings` + `variants/<Variant>.layout`             | `variants/<Variant>/variant.settings` with metadata and embedded layout |
+| External layout        | `[[externalLayoutFiles]]` in `scene.settings` + `externals/<External>.layout` | `external-layout/<External>.settings` with metadata and embedded layout |
+| Function pair          | `functions/<Function>/function.settings` + `<Function>.events`                | `functions/<Function>.settings` + `functions/<Function>.events`         |
+| Event body syntax      | IfDo `.events`                                                                | IfDo `.events`, unchanged                                               |
 
 There are no managed `.layout` files in a version 5 source tree. The editable
 component fragments use `.settings` for declarative data and `.events` for
@@ -106,7 +106,7 @@ generic serializer data.
 10. Preserve a dedicated `objects/` directory for every object-owning scope,
     including named variants, because objects are first-class components.
 11. Continue content-addressed dirty writes: an unchanged canonical component
-   must not be replaced merely because another component changed.
+    must not be replaced merely because another component changed.
 12. Support one explicitly named, one-time conversion of
     `D:\Users\Administrator\Documents\GDevelop projects\My project116`; do
     not ship a general version 4 reader or migration path.
@@ -134,9 +134,9 @@ generic serializer data.
    canonical-source policy remains unchanged.
 9. It does not rename `project.gdevelop`, `constants.toml`, generated files
    below `.gdevelop/`, or resource files used by the game.
-10. It does not remove the generated layout catalog. The catalog continues to
-    describe a semantic domain even though `.layout` is no longer a source
-    extension.
+10. It removes the generated layout catalog and merges its tables, contexts,
+    authoring metadata, and behavior-override schemas into the settings
+    catalog.
 11. It does not provide production read compatibility for multi-file format
     version 4 or earlier.
 12. It does not provide a reusable public v4-to-v5 converter. The only v4
@@ -244,14 +244,14 @@ scenes/
       sceneUpdate.events
       sceneUnload.settings
       sceneUnload.events
-    externals/
+    external-events/
       SharedCombat/
         external-events.settings
         functions/
           sceneUpdate.settings
           sceneUpdate.events
-      BonusRoom/
-        external-layout.settings
+    external-layout/
+      BonusRoom.settings
 extensions/
   Combat/
     extension.settings
@@ -273,17 +273,16 @@ extensions/
           TakeDamage.events
 ```
 
-An external event and external layout with the same canonical managed folder
-name may coexist in one `externals/<Name>/` directory because their owner
-filenames are distinct. Their names and project-wide order sequences remain
-independent.
+An external event and external layout with the same canonical name may coexist
+because they belong to independent `external-events/` and `external-layout/`
+namespaces. Their names and project-wide order sequences remain independent.
 
 ### 7.2 Flattening rules
 
 Version 5 deliberately keeps semantic owner directories such as `scenes/`,
 `objects/`, `extensions/`, `prefabs/`, `variants/`, `behaviors/`,
-`externals/`, and `functions/`. It removes directory levels that repeat a type
-already expressed by a filename or owning path.
+`external-events/`, `external-layout/`, and `functions/`. It removes directory
+levels that repeat a type already expressed by a filename or owning path.
 
 All function owners use one sibling pair:
 
@@ -317,12 +316,12 @@ flatten object ownership boundaries merely to minimize path length.
 
 Representative target mappings are:
 
-| Version 4 path | Version 5 path |
-| --- | --- |
-| `scenes/Game/functions/sceneUpdate/function.settings` | `scenes/Game/functions/sceneUpdate.settings` |
-| `scenes/Game/functions/sceneUpdate/sceneUpdate.events` | `scenes/Game/functions/sceneUpdate.events` |
-| `scenes/Game/externals/HUD/functions/sceneUpdate/function.settings` | `scenes/Game/externals/HUD/functions/sceneUpdate.settings` |
-| `extensions/Local/functions/Function/function.settings` | `extensions/Local/functions/Function.settings` |
+| Version 4 path                                                            | Version 5 path                                                   |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `scenes/Game/functions/sceneUpdate/function.settings`                     | `scenes/Game/functions/sceneUpdate.settings`                     |
+| `scenes/Game/functions/sceneUpdate/sceneUpdate.events`                    | `scenes/Game/functions/sceneUpdate.events`                       |
+| `scenes/Game/externals/HUD/functions/sceneUpdate/function.settings`       | `scenes/Game/external-events/HUD/functions/sceneUpdate.settings` |
+| `extensions/Local/functions/Function/function.settings`                   | `extensions/Local/functions/Function.settings`                   |
 | `extensions/Local/prefabs/MyObject/functions/onCreated/function.settings` | `extensions/Local/prefabs/MyObject/functions/onCreated.settings` |
 
 ### 7.3 Removed paths
@@ -647,7 +646,7 @@ recursively.
 Every external layout has one scene-owned settings component:
 
 ```text
-scenes/<Scene>/externals/<ExternalLayout>/external-layout.settings
+scenes/<Scene>/external-layout/<ExternalLayout>.settings
 ```
 
 Its association is derived from the physical scene owner. Its identity and
@@ -752,7 +751,7 @@ The managed settings-path allowlist adds:
 ```text
 extensions/*/prefabs/*/variants/*/variant.settings
 extensions/*/prefabs/*/variants/*/objects/*.settings
-scenes/*/externals/*/external-layout.settings
+scenes/*/external-layout/*.settings
 **/functions/*.settings
 ```
 
@@ -883,16 +882,16 @@ No runtime or Core model reads embedded layout TOML directly.
 
 Version 5 uses this write ownership:
 
-| Editor mutation | Dirty source |
-| --- | --- |
-| Scene metadata, variables, groups, shared data | `scene.settings` |
-| Scene background, editor state, layers, effects, instances, overrides | `scene.settings` |
-| Prefab declaration, properties, variables, groups | `prefab.settings` |
-| Default-prefab bounds, editor state, layers, instances, overrides | `prefab.settings` |
-| Named variant metadata, groups, bounds, editor state, layers, instances, overrides | Its `variant.settings` |
-| Named variant child definition | Its `objects/<Object>.settings` |
-| External-layout metadata, order, editor state, layer references, instances | Its `external-layout.settings` |
-| Any event body | Its existing `.events` file |
+| Editor mutation                                                                    | Dirty source                    |
+| ---------------------------------------------------------------------------------- | ------------------------------- |
+| Scene metadata, variables, groups, shared data                                     | `scene.settings`                |
+| Scene background, editor state, layers, effects, instances, overrides              | `scene.settings`                |
+| Prefab declaration, properties, variables, groups                                  | `prefab.settings`               |
+| Default-prefab bounds, editor state, layers, instances, overrides                  | `prefab.settings`               |
+| Named variant metadata, groups, bounds, editor state, layers, instances, overrides | Its `variant.settings`          |
+| Named variant child definition                                                     | Its `objects/<Object>.settings` |
+| External-layout metadata, order, editor state, layer references, instances         | Its `external-layout.settings`  |
+| Any event body                                                                     | Its existing `.events` file     |
 
 The initial implementation may continue decomposing the complete in-memory
 project on save, provided it compares canonical bytes and stages only changed
@@ -1062,13 +1061,13 @@ The harness performs these transformations in memory.
 2. Flatten its lifecycle function pair and remove the function `events` URI.
 3. Extract the `HUD` external-layout identity, global `order = 0`, and metadata
    from `Game/scene.settings`.
-4. Create `externals/HUD/external-layout.settings` with the normalized embedded
-   content of `externals/HUD.layout`.
+4. Create `external-layout/HUD.settings` with the normalized embedded content
+   of `externals/HUD.layout`.
 5. Remove `externalLayoutFiles` from `Game/scene.settings` and retire the old
    external layout file.
 
-The two independent `HUD` component kinds intentionally coexist in the same
-directory.
+The two independent `HUD` component kinds intentionally coexist in separate
+type directories.
 
 #### Extension function and all remaining settings
 
@@ -1195,12 +1194,12 @@ validated inside-root cleanup.
 - `prefabVariant` at
   `extensions/<Extension>/prefabs/<Prefab>/variants/<Variant>/variant.settings`;
 - `externalLayout` at
-  `scenes/<Scene>/externals/<ExternalLayout>/external-layout.settings`.
+  `scenes/<Scene>/external-layout/<ExternalLayout>.settings`.
 
 Scene and prefab file kinds remove required layout URI fields and add a
-required embedded-layout reference to the layout catalog. Prefab no longer
-declares a nested `variants` table. Scene no longer declares
-`externalLayoutFiles`.
+required embedded-layout reference to the layout schema within the same
+settings catalog. Prefab no longer declares a nested `variants` table. Scene
+no longer declares `externalLayoutFiles`.
 
 Every function file kind changes from
 `functions/<Function>/function.settings` to
@@ -1210,14 +1209,23 @@ file kinds retain `variants/<Variant>/objects/<Object>.settings`; the catalog
 continues to describe objects as independently addressable first-class
 components below a dedicated `objects/` directory.
 
-The catalog describes `[layout]` as a reserved strict subtree. It does not copy
-every layout field into the settings schema, because the layout catalog is the
-single source of truth for those fields.
+The catalog describes `[layout]` as a reserved strict subtree. File-kind
+schemas reference the shared `layoutTables` contract rather than duplicating
+every layout field into each owner schema.
 
-### 19.2 Layout catalog
+### 19.2 Embedded layout catalog section
 
-`.gdevelop/layout-catalog.json` remains generated. Its authoring metadata
-changes from a standalone `.layout` extension to:
+`.gdevelop/settings-catalog.json` format version 2 is the only settings/layout
+authoring catalog. It contains these layout-specific top-level members:
+
+- `layoutAuthoring`;
+- `layoutTables`;
+- `layoutContexts`;
+- `behaviorOverrideSchemas`.
+
+`effectTypes` remains shared with ordinary settings authoring. The retired
+`.gdevelop/layout-catalog.json` is deleted whenever catalogs are generated or
+the project is saved. `layoutAuthoring` declares:
 
 ```text
 storage: embedded-settings
@@ -1225,10 +1233,10 @@ rootTable: layout
 sourceExtension: .settings
 ```
 
-Every context points at an owner settings URI and identifies one of `scene`,
-`prefab`, `prefab-variant`, or `external`. Existing table definitions are
-rendered using embedded headers such as `[[layout.instances]]` while retaining
-the same field contracts.
+Every `layoutContexts` entry points at an owner settings URI and identifies one
+of `scene`, `prefab`, `prefab-variant`, or `external`. `layoutTables` uses
+embedded headers such as `[[layout.instances]]` while retaining the same field
+contracts.
 
 ### 19.3 Instructions and source API
 
@@ -1246,22 +1254,24 @@ settings URI and embedded table location in version 5.
 
 The multi-file layer adds or specializes these errors:
 
-| Code | Meaning |
-| --- | --- |
-| `MULTIFILE_UNSUPPORTED_VERSION` | Either root format marker is not exactly 5. |
-| `MULTIFILE_MISSING_EMBEDDED_LAYOUT` | A scene, prefab, variant, or external-layout owner has no `[layout]` table. |
-| `MULTIFILE_INVALID_EMBEDDED_LAYOUT` | The `layout` key is not a table or cannot be normalized. |
-| `MULTIFILE_LAYOUT_OWNERSHIP_CONFLICT` | Layout fields exist both inside and outside the reserved subtree. |
-| `MULTIFILE_RETIRED_LAYOUT_REFERENCE` | A version 5 settings field contains a `.layout` URI. |
-| `MULTIFILE_RETIRED_LAYOUT_SOURCE` | A canonical retired `.layout` file exists in a version 5 source tree. |
-| `MULTIFILE_RETIRED_FUNCTION_SOURCE` | A version 4 per-function directory or function `events` URI exists. |
-| `MULTIFILE_MISSING_FUNCTION_PAIR` | Exactly one of the same-stem function `.settings`/`.events` files exists. |
-| `MULTIFILE_FUNCTION_PATH_IDENTITY_MISMATCH` | Function name, encoded stem, or sibling body stem disagree. |
-| `MULTIFILE_ORPHAN_VARIANT_SETTINGS` | `variant.settings` has no valid prefab owner. |
-| `MULTIFILE_ORPHAN_EXTERNAL_LAYOUT_SETTINGS` | `external-layout.settings` has no valid scene owner. |
-| `MULTIFILE_DUPLICATE_VARIANT_IDENTITY` | Variant name or order collides within a prefab. |
-| `MULTIFILE_DUPLICATE_EXTERNAL_LAYOUT_IDENTITY` | External-layout name or global order collides. |
-| `MULTIFILE_MIXED_FORMAT_VERSION` | Old and new ownership models appear in one source tree. |
+| Code                                           | Meaning                                                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `MULTIFILE_UNSUPPORTED_VERSION`                | Either root format marker is not exactly 5.                                                       |
+| `MULTIFILE_MISSING_EMBEDDED_LAYOUT`            | A scene, prefab, variant, or external-layout owner has no `[layout]` table.                       |
+| `MULTIFILE_INVALID_EMBEDDED_LAYOUT`            | The `layout` key is not a table or cannot be normalized.                                          |
+| `MULTIFILE_LAYOUT_OWNERSHIP_CONFLICT`          | Layout fields exist both inside and outside the reserved subtree.                                 |
+| `MULTIFILE_RETIRED_LAYOUT_REFERENCE`           | A version 5 settings field contains a `.layout` URI.                                              |
+| `MULTIFILE_RETIRED_LAYOUT_SOURCE`              | A canonical retired `.layout` file exists in a version 5 source tree.                             |
+| `MULTIFILE_RETIRED_FUNCTION_SOURCE`            | A version 4 per-function directory or function `events` URI exists.                               |
+| `MULTIFILE_MISSING_FUNCTION_PAIR`              | Exactly one of the same-stem function `.settings`/`.events` files exists.                         |
+| `MULTIFILE_ORPHAN_EVENTS`                      | A managed `.events` body has no same-stem function `.settings` owner.                             |
+| `MULTIFILE_FUNCTION_PATH_IDENTITY_MISMATCH`    | Function name, encoded stem, or sibling body stem disagree.                                       |
+| `MULTIFILE_RETIRED_EXTERNAL_SOURCE`            | A version 5 source tree contains a retired combined `scenes/<Scene>/externals/<External>/` owner. |
+| `MULTIFILE_ORPHAN_VARIANT_SETTINGS`            | `variant.settings` has no valid prefab owner.                                                     |
+| `MULTIFILE_ORPHAN_EXTERNAL_LAYOUT_SETTINGS`    | `external-layout.settings` has no valid scene owner.                                              |
+| `MULTIFILE_DUPLICATE_VARIANT_IDENTITY`         | Variant name or order collides within a prefab.                                                   |
+| `MULTIFILE_DUPLICATE_EXTERNAL_LAYOUT_IDENTITY` | External-layout name or global order collides.                                                    |
+| `MULTIFILE_MIXED_FORMAT_VERSION`               | Old and new ownership models appear in one source tree.                                           |
 
 The temporary converter uses `V5_ONESHOT_*` diagnostics for target identity,
 dirty-worktree, source-hash, recovery-bundle, and equivalence failures. These
@@ -1448,7 +1458,8 @@ implementation continues.
 
 ### Phase 3: catalogs, watchers, and authoring APIs
 
-1. Update settings and layout catalogs.
+1. Merge layout authoring data into settings catalog format version 2 and
+   remove the independent generated layout catalog.
 2. Update direct authoring path descriptions.
 3. Add owner/layout fingerprints and semantic invalidation.
 4. Update rename, reassociation, delete, and same-stem function orchestration.
@@ -1563,7 +1574,8 @@ worktree is dirty.
 - function schemas use flat paths and forbid events URI fields;
 - variant object schemas retain
   `variants/<Variant>/objects/<Object>.settings` paths;
-- layout catalog emits embedded table headers and owner settings URIs;
+- settings catalog `layoutTables` and `layoutContexts` emit embedded table
+  headers and owner settings URIs;
 - every layout context resolves the same objects, behaviors, effects, layers,
   and instance property types through native v5 composition;
 - generated authoring instructions contain no editable `.layout` path.
@@ -1635,6 +1647,7 @@ diagnostics harder. Independent `variant.settings` owners are preferred.
 
 This would embed variant layout in a new settings file while leaving identity
 and order in the parent, preserving the same split-brain ownership as version
+
 4. The variant owner must own both metadata and layout.
 
 ### 27.5 Embed layout as raw JSON or a multiline TOML string

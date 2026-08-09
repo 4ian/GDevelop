@@ -386,8 +386,7 @@ Picked object lists keep classic GDevelop runtime behavior:
 - Normal object/behavior actions still intentionally iterate all picked
   instances. They are not globally converted into single-target operations.
 
-Event authors can narrow scalar targets with picking conditions such as `Pick
-random` or `Pick nearest`, or use `For each object` when every instance needs
+Event authors can narrow scalar targets with picking conditions such as `Pick random` or `Pick nearest`, or use `For each object` when every instance needs
 an isolated selection context. Without that narrowing, scalar consumers use
 the first picked instance.
 
@@ -734,11 +733,11 @@ scenes/<encoded-name>/
   objects/<encoded-name>.settings
   functions/<lifecycle>.settings
   functions/<lifecycle>.events
-  externals/<encoded-name>/
+  external-events/<encoded-name>/
     external-events.settings
-    external-layout.settings
     functions/<lifecycle>.settings
     functions/<lifecycle>.events
+  external-layout/<encoded-name>.settings
 extensions/<encoded-name>/extension.settings
 extensions/<encoded-name>/functions/<encoded-name>.settings|.events
 extensions/<encoded-name>/behaviors/<encoded-name>/
@@ -759,6 +758,8 @@ extensions/<encoded-name>/prefabs/<encoded-name>/
   `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
 - Physical owner paths derive component association. Same-stem function event
   bodies and embedded layouts do not use URI fields.
+- Every managed `.events` file is a function body and has a same-stem
+  `.settings` file in the same `functions/` directory.
 - Display names are encoded into portable, case-safe physical segments.
 - Objects remain first-class sources below a dedicated `objects/` directory in
   every object-owning scope, including named prefab variants.
@@ -790,7 +791,8 @@ cannot escape the project root.
 A multi-file save also regenerates editor/tooling projections:
 
 - `.gdevelop/instructions-catalog.json` and the deprecated instruction catalog;
-- `.gdevelop/settings-catalog.json` and `layout-catalog.json`;
+- `.gdevelop/settings-catalog.json`, including settings and embedded-layout
+  authoring schemas and owner contexts;
 - `.gdevelop/runtime-api.d.ts` and `project-api.d.ts`;
 - `.gdevelop/game.json`, a legacy-shaped compatibility projection without
   Constants;
@@ -861,7 +863,7 @@ Major domain areas include:
 | Objects and behaviors           | `ObjectEditor`, `BehaviorsEditor`, `CompactPropertiesEditor`                              |
 | Events-based extensions/prefabs | `EventsFunctionsExtensionEditor`, `PrefabDetailEditor`, `EventsFunctionsExtensionsLoader` |
 | Resources and project files     | `ResourcesEditor`, `ResourcesList`, `ProjectsStorage`                                     |
-| Constants                     | `Constants`, `ConstantsEditorContainer`                                                 |
+| Constants                       | `Constants`, `ConstantsEditorContainer`                                                   |
 | Preview/debug/in-game editing   | `ExportAndShare`, `EmbeddedGame`, `Debugger`, `HotReload`                                 |
 
 ### The editor works on C++ objects through wrappers
@@ -1074,6 +1076,6 @@ in `docs/scene-event-phases-spec.md`.
 | Logical serialization           | `Core/GDCore/Serialization`, model `SerializeTo`/`UnserializeFrom` methods                                                                                                                                                                                                |
 | Multi-file source format        | `newIDE/app/src/ProjectsStorage/MultiFileProjectFormat`, `newIDE/app/src/ProjectsStorage/LayoutToml`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject.js`, `newIDE/app/src/ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter.js` |
 | Source catalogs/APIs            | `newIDE/app/src/ProjectsStorage/ProjectSourceCatalog.js`, `newIDE/app/src/ProjectsStorage/JavaScriptAuthoringApi.js`, `newIDE/app/src/EventsSheet/IfDoEventsDsl/ProjectInstructionCatalog.js`                                                                             |
-| Constants                     | `Core/GDCore/Project/Project.*`, `newIDE/app/src/Constants`, `docs/Constants.md`                                                                                                                                                                                        |
+| Constants                       | `Core/GDCore/Project/Project.*`, `newIDE/app/src/Constants`, `docs/Constants.md`                                                                                                                                                                                          |
 | Preview and export              | `GDJS/GDJS/IDE/Exporter*`, `newIDE/app/src/ExportAndShare`, `newIDE/app/src/HotReload`, `newIDE/app/src/EmbeddedGame`                                                                                                                                                     |
 | Editor shell                    | `newIDE/app/src/index.js`, `newIDE/app/src/LocalApp.js`, `newIDE/app/src/BrowserApp.js`, `newIDE/app/src/MainFrame`, domain editor directories                                                                                                                            |

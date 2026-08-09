@@ -358,18 +358,16 @@ describe('GDevelop multi-file project format', () => {
     expect(files['game://externals/external.settings']).toBeUndefined();
     expect(
       files[
-        'game://scenes/Main/externals/Shared%20Combat/functions/sceneUpdate.events'
+        'game://scenes/Main/external-events/Shared%20Combat/functions/sceneUpdate.events'
       ]
     ).toContain('@event');
     expect(
       files[
-        'game://scenes/Main/externals/Shared%20Combat/external-events.settings'
+        'game://scenes/Main/external-events/Shared%20Combat/external-events.settings'
       ]
     ).toContain('kind = "externalEvents"');
     expect(
-      files[
-        'game://scenes/Main/externals/Shared%20Combat/external-layout.settings'
-      ]
+      files['game://scenes/Main/external-layout/Shared%20Combat.settings']
     ).toContain('[layout]');
     expect(
       files['game://extensions/Combat/functions/CalculateDamage.settings']
@@ -447,7 +445,7 @@ describe('GDevelop multi-file project format', () => {
       );
       expect(
         files[
-          `game://scenes/Main/externals/Shared%20Combat/functions/${role}.settings`
+          `game://scenes/Main/external-events/Shared%20Combat/functions/${role}.settings`
         ]
       ).toContain(`lifecycleRole = "${role}"`);
     }
@@ -2026,7 +2024,7 @@ objects = [ "Player" ]
     ]);
 
     const secondarySettingsUri =
-      'game://scenes/Secondary/externals/Secondary%20Logic/external-events.settings';
+      'game://scenes/Secondary/external-events/Secondary%20Logic/external-events.settings';
     files[secondarySettingsUri] = files[secondarySettingsUri].replace(
       'order = 1',
       'order = 3'
@@ -2039,7 +2037,7 @@ objects = [ "Player" ]
   test('rejects link metadata and external sources outside the owning scene folder', () => {
     const filesWithLinkMetadata = decomposeLegacyProjectToFiles(projectFixture);
     const ownerSettingsUri =
-      'game://scenes/Main/externals/Shared%20Combat/external-events.settings';
+      'game://scenes/Main/external-events/Shared%20Combat/external-events.settings';
     filesWithLinkMetadata[ownerSettingsUri] = `${
       filesWithLinkMetadata[ownerSettingsUri]
     }linkedScene = "Main"\n`;
@@ -2049,12 +2047,40 @@ objects = [ "Player" ]
 
     const filesWithMovedSource = decomposeLegacyProjectToFiles(projectFixture);
     const canonicalUri =
-      'game://scenes/Main/externals/Shared%20Combat/functions/sceneUpdate.events';
+      'game://scenes/Main/external-events/Shared%20Combat/functions/sceneUpdate.events';
     const movedUri = 'game://scenes/Main/Shared%20Combat.events';
     filesWithMovedSource[movedUri] = filesWithMovedSource[canonicalUri];
     delete filesWithMovedSource[canonicalUri];
     expect(() => composeLegacyProjectFromFiles(filesWithMovedSource)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_OWNERSHIP_CONFLICT' })
+    );
+  });
+
+  test('rejects retired combined external directories and orphan events bodies', () => {
+    const filesWithRetiredExternalPath = decomposeLegacyProjectToFiles(
+      projectFixture
+    );
+    const canonicalOwnerUri =
+      'game://scenes/Main/external-events/Shared%20Combat/external-events.settings';
+    const retiredOwnerUri =
+      'game://scenes/Main/externals/Shared%20Combat/external-events.settings';
+    filesWithRetiredExternalPath[retiredOwnerUri] =
+      filesWithRetiredExternalPath[canonicalOwnerUri];
+    Object.keys(filesWithRetiredExternalPath)
+      .filter(uri => uri.includes('/external-events/Shared%20Combat/'))
+      .forEach(uri => delete filesWithRetiredExternalPath[uri]);
+    expect(() =>
+      composeLegacyProjectFromFiles(filesWithRetiredExternalPath)
+    ).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_RETIRED_EXTERNAL_SOURCE' })
+    );
+
+    const filesWithOrphanEvents = decomposeLegacyProjectToFiles(projectFixture);
+    filesWithOrphanEvents[
+      'game://scenes/Main/external-events/Shared%20Combat/functions/sceneLoad.events'
+    ] = '';
+    expect(() => composeLegacyProjectFromFiles(filesWithOrphanEvents)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_ORPHAN_EVENTS' })
     );
   });
 
@@ -2247,7 +2273,7 @@ objects = [ "Player" ]
     ).toContain(childInstance.persistentUuid);
     expect(
       duplicateAcrossLayoutsFiles[
-        'game://scenes/Main/externals/Duplicate/external-layout.settings'
+        'game://scenes/Main/external-layout/Duplicate.settings'
       ]
     ).toContain(project.layouts[0].instances[0].persistentUuid);
   });

@@ -275,9 +275,9 @@ Safe event-use principles:
   ordinary actions or conditions.
 - Keep the braces inside the direct IfDo string value.
 - Keep numeric expressions literal/runtime-driven.
-- Keep the special `SignalReceived` signal-name filter literal. Its standard
-  event code generator performs a separate delivered-signal lookup, so do not
-  assume the general condition replacement path applies to that lookup.
+- When preserving a legacy `SignalReceived` event, keep its signal-name filter
+  literal. Never generate a new use; new handlers belong in `sceneSignal` and
+  compare its fixed `SignalName` parameter.
 - Treat resource placeholders as a dependency change: verify that the resolved
   resource exists and is included in generated/exported data.
 - Re-read the instruction catalog for scope and exact `dslName` arguments.

@@ -881,7 +881,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'generate-catalogs',
     description:
-      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, .gdevelop/runtime-api.d.ts, and .gdevelop/project-api.d.ts from the current local multi-file project sources. The call waits for all five generated authoring files to be written and verified before returning. Accepts no inputs, writes only generated authoring files, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs and declarations before making dependent edits.',
+      'Regenerate .gdevelop/instructions-catalog.json, .gdevelop/deprecated-instructions-catalog.json, .gdevelop/settings-catalog.json, .gdevelop/runtime-api.d.ts, and .gdevelop/project-api.d.ts from the current local multi-file project sources. The settings catalog includes the embedded-layout schema and contexts. The call waits for all five generated authoring files to be written and verified before returning. Accepts no inputs, writes only generated authoring files, removes the retired layout-catalog.json, and does not validate sources or reload editor memory. Call this after structural project-file changes, then read the refreshed catalogs and declarations before making dependent edits.',
     inputSchema: noInputSchema,
     annotations: {
       readOnlyHint: false,
@@ -1471,7 +1471,7 @@ export const getCapabilitiesSummary = (
   });
   return {
     note:
-      'GDevelop MCP is intentionally limited to local project opening, one extension import/conversion tool, editor queries, synchronization, validation, and preview debugging. There are no Constants MCP tools: the AI model must read and modify constants.toml directly on disk. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json, .gdevelop/layout-catalog.json, and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
+      'GDevelop MCP is intentionally limited to local project opening, one extension import/conversion tool, editor queries, synchronization, validation, and preview debugging. There are no Constants MCP tools: the AI model must read and modify constants.toml directly on disk. After import_extension generates canonical sources, author the game through project files and the generated .gdevelop/settings-catalog.json (including embedded-layout authoring data) and .gdevelop/instructions-catalog.json. Before authoring JavaScript events, also read .gdevelop/runtime-api.d.ts and .gdevelop/project-api.d.ts.',
     permissions: {
       writeToolsEnabled: !!permissions.allowWriteTools,
       commandToolsEnabled: !!permissions.allowCommandTools,

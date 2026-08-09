@@ -37,6 +37,30 @@ export const getSceneLifecycleEventsFunction = (
   return lifecycleEventsFunctions.getByName(name);
 };
 
+export const hasSceneLifecycleEventsFunction = (
+  owner: gdLayout | gdExternalEvents,
+  name: SceneLifecycleFunctionName
+): boolean => {
+  const lifecycleEventsFunctions = (owner: any).getLifecycleEventsFunctions();
+  return lifecycleEventsFunctions.hasByName(name);
+};
+
+export const insertSceneLifecycleEventsFunction = (
+  owner: gdLayout | gdExternalEvents,
+  name: SceneLifecycleFunctionName
+): gdEventsFunction => {
+  const lifecycleEventsFunctions = (owner: any).getLifecycleEventsFunctions();
+  return lifecycleEventsFunctions.insertByName(name);
+};
+
+export const removeSceneLifecycleEventsFunction = (
+  owner: gdLayout | gdExternalEvents,
+  name: SceneLifecycleFunctionName
+): boolean => {
+  const lifecycleEventsFunctions = (owner: any).getLifecycleEventsFunctions();
+  return lifecycleEventsFunctions.removeByName(name);
+};
+
 export const getSceneLifecycleEvents = (
   owner: gdLayout | gdExternalEvents,
   name: SceneLifecycleFunctionName

@@ -121,13 +121,13 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
     ): WebGpuClothDeviceManager {
       let manager = WebGpuClothDeviceManager._managers.get(runtimeGame);
       if (!manager) {
-        const gpu =
-          typeof navigator !== 'undefined' && navigator.gpu
-            ? navigator.gpu
-            : null;
-        manager = new WebGpuClothDeviceManager(gpu, () => {
-          WebGpuClothDeviceManager._managers.delete(runtimeGame);
-        });
+        manager = new WebGpuClothDeviceManager(
+          null,
+          () => {
+            WebGpuClothDeviceManager._managers.delete(runtimeGame);
+          },
+          runtimeGame
+        );
         WebGpuClothDeviceManager._managers.set(runtimeGame, manager);
       }
       manager._referenceCount++;
@@ -135,23 +135,39 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
       return manager;
     }
 
-    private _gpu: GPU | null;
+    private _computeManager: gdjs.WebGpuComputeDeviceManager;
+    private _usesSharedManager: boolean;
     private _onFinalRelease: () => void;
     private _referenceCount = 0;
     private _failureListeners = new Set<WebGpuFailureListener>();
     private _initializationPromise: Promise<void> | null = null;
-    private _device: GPUDevice | null = null;
     private _springPipeline: GPUComputePipeline | null = null;
     private _particlePipeline: GPUComputePipeline | null = null;
     private _pinPipeline: GPUComputePipeline | null = null;
     private _bindGroupLayout: GPUBindGroupLayout | null = null;
-    private _commandEncoder: GPUCommandEncoder | null = null;
-    private _afterSubmitCallbacks: Array<() => void> = [];
     private _terminalFailure: ClothFallbackReason | null = null;
     private _disposed = false;
+    private _onComputeFailure = (
+      reason: gdjs.WebGpuComputeFailureReason
+    ): void => {
+      this._notifyFailure(reason as ClothFallbackReason);
+    };
 
-    constructor(gpu: GPU | null, onFinalRelease: () => void = () => {}) {
-      this._gpu = gpu;
+    constructor(
+      gpu: GPU | null,
+      onFinalRelease: () => void = () => {},
+      runtimeGame: gdjs.RuntimeGame | null = null
+    ) {
+      this._usesSharedManager = !!runtimeGame;
+      this._computeManager = runtimeGame
+        ? gdjs.WebGpuComputeDeviceManager.acquire(
+            runtimeGame,
+            this._onComputeFailure
+          )
+        : new gdjs.WebGpuComputeDeviceManager(gpu);
+      if (!runtimeGame) {
+        this._computeManager.addFailureListener(this._onComputeFailure);
+      }
       this._onFinalRelease = onFinalRelease;
     }
 
@@ -169,42 +185,19 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
     }
 
     private async _initialize(): Promise<void> {
-      if (!this._gpu) throw new ClothWebGpuError('webgpu-unavailable');
-      let adapter: GPUAdapter | null;
       try {
-        adapter = await this._gpu.requestAdapter();
-      } catch (_error) {
-        throw new ClothWebGpuError('webgpu-adapter-unavailable');
-      }
-      if (!adapter) {
-        throw new ClothWebGpuError('webgpu-adapter-unavailable');
-      }
-      if (
-        adapter.limits.maxComputeWorkgroupSizeX < 64 ||
-        adapter.limits.maxComputeInvocationsPerWorkgroup < 64 ||
-        adapter.limits.maxStorageBuffersPerShaderStage < 8
-      ) {
-        throw new ClothWebGpuError('webgpu-limit-insufficient');
-      }
-
-      let device: GPUDevice;
-      try {
-        device = await adapter.requestDevice({
-          requiredLimits: {
-            maxStorageBuffersPerShaderStage: 8,
-          },
-        });
-      } catch (_error) {
-        throw new ClothWebGpuError('webgpu-device-failed');
+        await this._computeManager.initialize();
+      } catch (error) {
+        throw new ClothWebGpuError(
+          error instanceof gdjs.WebGpuComputeError
+            ? (error.reason as ClothFallbackReason)
+            : 'webgpu-device-failed'
+        );
       }
       if (this._disposed) {
-        device.destroy();
         throw new ClothWebGpuError('webgpu-device-failed');
       }
-      this._device = device;
-      device.lost
-        .then(() => this._notifyFailure('webgpu-device-lost'))
-        .catch(() => this._notifyFailure('webgpu-device-lost'));
+      const device = this._computeManager.device;
 
       try {
         if (device.pushErrorScope) device.pushErrorScope('validation');
@@ -297,12 +290,20 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
     }
 
     get device(): GPUDevice {
-      if (!this._device || this._terminalFailure) {
+      if (this._terminalFailure) {
         throw new ClothWebGpuError(
           this._terminalFailure || 'webgpu-device-failed'
         );
       }
-      return this._device;
+      try {
+        return this._computeManager.device;
+      } catch (error) {
+        throw new ClothWebGpuError(
+          error instanceof gdjs.WebGpuComputeError
+            ? (error.reason as ClothFallbackReason)
+            : 'webgpu-device-failed'
+        );
+      }
     }
 
     get springPipeline(): GPUComputePipeline {
@@ -335,44 +336,26 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
 
     beginFrame(): void {
       if (this._disposed || this._terminalFailure) return;
-      this._commandEncoder = null;
-      this._afterSubmitCallbacks.length = 0;
+      this._computeManager.beginFrame();
     }
 
     getCommandEncoder(): GPUCommandEncoder {
-      if (!this._commandEncoder) {
-        this._commandEncoder = this.device.createCommandEncoder({
-          label: 'GDevelop cloth frame commands',
-        });
-      }
-      return this._commandEncoder;
+      return this._computeManager.getCommandEncoder(
+        'GDevelop cloth frame commands'
+      );
     }
 
     afterSubmit(callback: () => void): void {
-      this._afterSubmitCallbacks.push(callback);
+      this._computeManager.afterSubmit(callback);
     }
 
     endFrame(): void {
-      const commandEncoder = this._commandEncoder;
-      this._commandEncoder = null;
-      if (!commandEncoder) return;
-      try {
-        this.device.queue.submit([commandEncoder.finish()]);
-      } catch (_error) {
-        this._afterSubmitCallbacks.length = 0;
-        this._notifyFailure('webgpu-submit-failed');
-        return;
-      }
-      const callbacks = this._afterSubmitCallbacks.slice();
-      this._afterSubmitCallbacks.length = 0;
-      for (let index = 0; index < callbacks.length; index++) callbacks[index]();
+      this._computeManager.endFrame();
     }
 
     private _notifyFailure(reason: ClothFallbackReason): void {
       if (this._terminalFailure) return;
       this._terminalFailure = reason;
-      this._commandEncoder = null;
-      this._afterSubmitCallbacks.length = 0;
       this._failureListeners.forEach((listener) => listener(reason));
     }
 
@@ -387,11 +370,13 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
     dispose(): void {
       if (this._disposed) return;
       this._disposed = true;
-      this._commandEncoder = null;
-      this._afterSubmitCallbacks.length = 0;
       this._failureListeners.clear();
-      if (this._device) this._device.destroy();
-      this._device = null;
+      if (this._usesSharedManager) {
+        this._computeManager.release(this._onComputeFailure);
+      } else {
+        this._computeManager.removeFailureListener(this._onComputeFailure);
+        this._computeManager.dispose();
+      }
       this._springPipeline = null;
       this._particlePipeline = null;
       this._pinPipeline = null;

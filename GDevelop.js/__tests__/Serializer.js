@@ -247,6 +247,9 @@ describe('libGD.js object serialization', function () {
       layout.serializeTo(emptyElement);
       const emptyLayoutData = JSON.parse(gd.Serializer.toJSON(emptyElement));
       emptyElement.delete();
+      expect(emptyLayoutData.sceneLifecycleFunctions).toEqual([
+        'sceneUpdate',
+      ]);
       expect(emptyLayoutData.events).toEqual([]);
       expect(emptyLayoutData.sceneLoadEvents).toBeUndefined();
       expect(emptyLayoutData.sceneSignalEvents).toBeUndefined();
@@ -273,6 +276,12 @@ describe('libGD.js object serialization', function () {
       const element = new gd.SerializerElement();
       layout.serializeTo(element);
       const layoutData = JSON.parse(gd.Serializer.toJSON(element));
+      expect(layoutData.sceneLifecycleFunctions).toEqual([
+        'sceneLoad',
+        'sceneSignal',
+        'sceneUpdate',
+        'sceneUnload',
+      ]);
       expect(layoutData.sceneLoadEvents).toHaveLength(1);
       expect(layoutData.sceneSignalEvents).toHaveLength(1);
       expect(layoutData.events).toHaveLength(1);

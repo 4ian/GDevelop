@@ -164,6 +164,14 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
 
   onSelectedLifecycleFunctionChanged = (): void => this.updateToolbar();
 
+  onLifecycleFunctionsChanged = (): void => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+    this.forceUpdate();
+    this.props.triggerHotReloadInGameEditorIfNeeded();
+  };
+
   onEventsBasedObjectChildrenEdited(
     eventsBasedObject?: gdEventsBasedObject,
     options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
@@ -286,7 +294,9 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         ref={(editor) => (this.lifecycleFunctionsEditor = editor)}
         ownerKind="scene"
         ownerName={layout.getName()}
+        owner={layout}
         onSelectedFunctionChanged={this.onSelectedLifecycleFunctionChanged}
+        onLifecycleFunctionsChanged={this.onLifecycleFunctionsChanged}
         renderFunctionParameters={({ lifecycleFunctionName }) => {
           const eventsFunction = getSceneLifecycleEventsFunction(
             layout,

@@ -2,6 +2,12 @@
 declare class gdSceneLifecycleEventsFunctions {
   get(role: SceneLifecycleEventsFunctions_Role): gdEventsFunction;
   getByName(name: string): gdEventsFunction;
+  has(role: SceneLifecycleEventsFunctions_Role): boolean;
+  hasByName(name: string): boolean;
+  insert(role: SceneLifecycleEventsFunctions_Role): gdEventsFunction;
+  insertByName(name: string): gdEventsFunction;
+  remove(role: SceneLifecycleEventsFunctions_Role): boolean;
+  removeByName(name: string): boolean;
   hasRoleName(name: string): boolean;
   hasValidMetadata(): boolean;
   getSceneLoadFunction(): gdEventsFunction;

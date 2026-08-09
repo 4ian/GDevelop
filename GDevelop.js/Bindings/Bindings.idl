@@ -1058,6 +1058,12 @@ enum SceneLifecycleEventsFunctions_Role {
 interface SceneLifecycleEventsFunctions {
     [Ref] EventsFunction Get(SceneLifecycleEventsFunctions_Role role);
     [Ref] EventsFunction GetByName([Const] DOMString name);
+    boolean Has(SceneLifecycleEventsFunctions_Role role);
+    boolean HasByName([Const] DOMString name);
+    [Ref] EventsFunction Insert(SceneLifecycleEventsFunctions_Role role);
+    [Ref] EventsFunction InsertByName([Const] DOMString name);
+    boolean Remove(SceneLifecycleEventsFunctions_Role role);
+    boolean RemoveByName([Const] DOMString name);
     boolean HasRoleName([Const] DOMString name);
     boolean HasValidMetadata();
 

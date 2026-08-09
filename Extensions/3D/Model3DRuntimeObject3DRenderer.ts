@@ -12,6 +12,14 @@ namespace gdjs {
     quaternionW: float;
   };
 
+  /** @internal Generation-checked access to selected bones for spring dynamics. */
+  export type Model3DSpringBoneDynamicsBinding = {
+    generation: number;
+    chains: THREE.Bone[][];
+    flatBones: THREE.Bone[];
+    bonesByCanonicalName: Map<string, THREE.Bone>;
+  };
+
   type RigBoneDescription = {
     name: string;
     parentName: string;
@@ -448,6 +456,7 @@ namespace gdjs {
     private _clonedModelRoot: THREE.Object3D | null = null;
     private _bonesByCanonicalName = new Map<string, THREE.Bone>();
     private _ambiguousBoneNames = new Set<string>();
+    private _modelGeneration = 0;
     private _relativeInverseMatrix = new THREE.Matrix4();
     private _boneRelativeMatrix = new THREE.Matrix4();
     private _boneQuaternion = new THREE.Quaternion();
@@ -460,6 +469,16 @@ namespace gdjs {
     );
     private _scaleFreeRotationExtractor =
       new gdjs.Model3DScaleFreeRotationExtractor();
+    private _springBonePosition = new THREE.Vector3();
+    private _springBoneChildPosition = new THREE.Vector3();
+    private _springBoneCurrentDirection = new THREE.Vector3();
+    private _springBoneTargetDirection = new THREE.Vector3();
+    private _springBoneParentQuaternion = new THREE.Quaternion();
+    private _springBoneParentInverseQuaternion = new THREE.Quaternion();
+    private _springBoneWorldDeltaQuaternion = new THREE.Quaternion();
+    private _springBoneLocalDeltaQuaternion = new THREE.Quaternion();
+    private _springBoneAnimationQuaternion = new THREE.Quaternion();
+    private _springBoneTargetQuaternion = new THREE.Quaternion();
     private _originalModel: THREE_ADDONS.GLTF;
     private _animationMixer: THREE.AnimationMixer;
     private _action: THREE.AnimationAction | null;
@@ -595,11 +614,229 @@ namespace gdjs {
       return true;
     }
 
+    /** @internal */
+    getSpringBoneModelGeneration(): number {
+      return this._modelGeneration;
+    }
+
+    /** @internal */
+    createSpringBoneDynamicsBinding(
+      chainBoneNames: readonly (readonly string[])[],
+      additionalBoneNames: readonly string[]
+    ): gdjs.Model3DSpringBoneDynamicsBinding | null {
+      if (!this._clonedModelRoot) return null;
+      const chains: THREE.Bone[][] = [];
+      const flatBones: THREE.Bone[] = [];
+      const bonesByCanonicalName = new Map<string, THREE.Bone>();
+      const ownedBones = new Set<THREE.Bone>();
+
+      for (let chainIndex = 0; chainIndex < chainBoneNames.length; chainIndex++) {
+        const names = chainBoneNames[chainIndex];
+        const chain: THREE.Bone[] = [];
+        for (let boneIndex = 0; boneIndex < names.length; boneIndex++) {
+          const name = names[boneIndex];
+          const bone = this._bonesByCanonicalName.get(name);
+          if (!bone || ownedBones.has(bone)) return null;
+          if (
+            boneIndex > 0 &&
+            getNearestParentBone(bone) !== chain[boneIndex - 1]
+          ) {
+            return null;
+          }
+          ownedBones.add(bone);
+          bonesByCanonicalName.set(name, bone);
+          chain.push(bone);
+          flatBones.push(bone);
+        }
+        chains.push(chain);
+      }
+      for (let index = 0; index < additionalBoneNames.length; index++) {
+        const name = additionalBoneNames[index];
+        const bone = this._bonesByCanonicalName.get(name);
+        if (!bone) return null;
+        bonesByCanonicalName.set(name, bone);
+      }
+      return {
+        generation: this._modelGeneration,
+        chains,
+        flatBones,
+        bonesByCanonicalName,
+      };
+    }
+
+    /** @internal */
+    captureSpringBoneDynamicsPose(
+      binding: gdjs.Model3DSpringBoneDynamicsBinding,
+      worldPositions: Float32Array,
+      localQuaternions: Float32Array
+    ): boolean {
+      if (
+        binding.generation !== this._modelGeneration ||
+        !this._clonedModelRoot ||
+        worldPositions.length !== binding.flatBones.length * 3 ||
+        localQuaternions.length !== binding.flatBones.length * 4
+      ) {
+        return false;
+      }
+      this._clonedModelRoot.updateMatrixWorld(true);
+      for (let index = 0; index < binding.flatBones.length; index++) {
+        const bone = binding.flatBones[index];
+        this._springBonePosition.setFromMatrixPosition(bone.matrixWorld);
+        const positionOffset = index * 3;
+        worldPositions[positionOffset] = this._springBonePosition.x;
+        worldPositions[positionOffset + 1] = this._springBonePosition.y;
+        worldPositions[positionOffset + 2] = this._springBonePosition.z;
+        const quaternionOffset = index * 4;
+        localQuaternions[quaternionOffset] = bone.quaternion.x;
+        localQuaternions[quaternionOffset + 1] = bone.quaternion.y;
+        localQuaternions[quaternionOffset + 2] = bone.quaternion.z;
+        localQuaternions[quaternionOffset + 3] = bone.quaternion.w;
+      }
+      return true;
+    }
+
+    /** @internal */
+    applySpringBoneDynamicsPose(
+      binding: gdjs.Model3DSpringBoneDynamicsBinding,
+      simulatedWorldPositions: Float32Array,
+      animationLocalQuaternions: Float32Array,
+      blendWeight: number
+    ): boolean {
+      if (
+        binding.generation !== this._modelGeneration ||
+        !this._clonedModelRoot ||
+        simulatedWorldPositions.length !== binding.flatBones.length * 3 ||
+        animationLocalQuaternions.length !== binding.flatBones.length * 4
+      ) {
+        return false;
+      }
+      const weight = Math.min(1, Math.max(0, blendWeight));
+      let flatIndex = 0;
+      for (let chainIndex = 0; chainIndex < binding.chains.length; chainIndex++) {
+        const chain = binding.chains[chainIndex];
+        for (let boneIndex = 0; boneIndex < chain.length - 1; boneIndex++) {
+          const bone = chain[boneIndex];
+          const child = chain[boneIndex + 1];
+          const quaternionOffset = flatIndex * 4;
+          this._springBoneAnimationQuaternion.fromArray(
+            animationLocalQuaternions,
+            quaternionOffset
+          );
+          bone.quaternion.copy(this._springBoneAnimationQuaternion);
+          this._clonedModelRoot.updateMatrixWorld(true);
+          this._springBonePosition.setFromMatrixPosition(bone.matrixWorld);
+          this._springBoneChildPosition.setFromMatrixPosition(child.matrixWorld);
+          this._springBoneCurrentDirection
+            .subVectors(this._springBoneChildPosition, this._springBonePosition);
+          const positionOffset = flatIndex * 3;
+          const childPositionOffset = (flatIndex + 1) * 3;
+          this._springBoneTargetDirection.set(
+            simulatedWorldPositions[childPositionOffset] -
+              simulatedWorldPositions[positionOffset],
+            simulatedWorldPositions[childPositionOffset + 1] -
+              simulatedWorldPositions[positionOffset + 1],
+            simulatedWorldPositions[childPositionOffset + 2] -
+              simulatedWorldPositions[positionOffset + 2]
+          );
+          if (
+            this._springBoneCurrentDirection.lengthSq() > epsilon * epsilon &&
+            this._springBoneTargetDirection.lengthSq() > epsilon * epsilon
+          ) {
+            this._springBoneCurrentDirection.normalize();
+            this._springBoneTargetDirection.normalize();
+            this._springBoneWorldDeltaQuaternion.setFromUnitVectors(
+              this._springBoneCurrentDirection,
+              this._springBoneTargetDirection
+            );
+            if (bone.parent) {
+              bone.parent.getWorldQuaternion(this._springBoneParentQuaternion);
+            } else {
+              this._springBoneParentQuaternion.identity();
+            }
+            this._springBoneParentInverseQuaternion
+              .copy(this._springBoneParentQuaternion)
+              .invert();
+            this._springBoneLocalDeltaQuaternion
+              .copy(this._springBoneParentInverseQuaternion)
+              .multiply(this._springBoneWorldDeltaQuaternion)
+              .multiply(this._springBoneParentQuaternion);
+            this._springBoneTargetQuaternion
+              .copy(this._springBoneLocalDeltaQuaternion)
+              .multiply(this._springBoneAnimationQuaternion)
+              .normalize();
+            bone.quaternion
+              .copy(this._springBoneAnimationQuaternion)
+              .slerp(this._springBoneTargetQuaternion, weight)
+              .normalize();
+          }
+          flatIndex++;
+        }
+        flatIndex++;
+      }
+      this._clonedModelRoot.updateMatrixWorld(true);
+      return true;
+    }
+
+    /** Convert a source-model bind-space point into a named bone's local space. @internal */
+    convertSpringBoneModelPointToBoneLocal(
+      binding: gdjs.Model3DSpringBoneDynamicsBinding,
+      boneName: string,
+      x: number,
+      y: number,
+      z: number,
+      result: Float32Array,
+      offset: number
+    ): boolean {
+      if (binding.generation !== this._modelGeneration) return false;
+      let sourceBone: THREE.Bone | null = null;
+      this._originalModel.scene.traverse((node) => {
+        const bone = node as THREE.Bone;
+        if (sourceBone || !bone.isBone) return;
+        const authoredName =
+          bone.userData && typeof bone.userData.name === 'string'
+            ? bone.userData.name
+            : '';
+        if ((authoredName || bone.name) === boneName) sourceBone = bone;
+      });
+      if (!sourceBone) return false;
+      this._originalModel.scene.updateMatrixWorld(true);
+      this._springBonePosition
+        .set(x, y, z)
+        .applyMatrix4(this._originalModel.scene.matrixWorld);
+      (sourceBone as THREE.Bone).worldToLocal(this._springBonePosition);
+      result[offset] = this._springBonePosition.x;
+      result[offset + 1] = this._springBonePosition.y;
+      result[offset + 2] = this._springBonePosition.z;
+      return true;
+    }
+
+    /** Resolve a named bone-local point in the current animated world pose. @internal */
+    getSpringBoneLocalPointInWorld(
+      binding: gdjs.Model3DSpringBoneDynamicsBinding,
+      boneName: string,
+      x: number,
+      y: number,
+      z: number,
+      result: Float32Array,
+      offset: number
+    ): boolean {
+      if (binding.generation !== this._modelGeneration) return false;
+      const bone = binding.bonesByCanonicalName.get(boneName);
+      if (!bone) return false;
+      this._springBonePosition.set(x, y, z);
+      bone.localToWorld(this._springBonePosition);
+      result[offset] = this._springBonePosition.x;
+      result[offset + 1] = this._springBonePosition.y;
+      result[offset + 2] = this._springBonePosition.z;
+      return true;
+    }
+
     updateAnimation(timeDelta: float) {
       this._animationMixer.update(timeDelta);
     }
 
     private _releaseCurrentModelInstance(): void {
+      this._modelGeneration++;
       this._animationMixer.stopAllAction();
       if (this._clonedModelRoot) {
         this._animationMixer.uncacheRoot(this._clonedModelRoot);

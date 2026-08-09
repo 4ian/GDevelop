@@ -228,7 +228,7 @@ describe('libGD.js', function() {
           .getEventsCount()
       ).toBe(1);
     });
-    it('exposes four fixed scene lifecycle functions', function() {
+    it('exposes optional reserved scene lifecycle functions', function() {
       const lifecycleProject = gd.ProjectHelper.createNewGDJSProject();
       const lifecycleLayout = lifecycleProject.insertNewLayout(
         'LifecycleScene',
@@ -242,10 +242,15 @@ describe('libGD.js', function() {
       expect(lifecycleFunctions.hasRoleName('sceneUpdate')).toBe(true);
       expect(lifecycleFunctions.hasRoleName('sceneUnload')).toBe(true);
       expect(lifecycleFunctions.hasRoleName('unknown')).toBe(false);
+      expect(lifecycleFunctions.hasByName('sceneLoad')).toBe(false);
+      expect(lifecycleFunctions.hasByName('sceneSignal')).toBe(false);
+      expect(lifecycleFunctions.hasByName('sceneUpdate')).toBe(true);
+      expect(lifecycleFunctions.hasByName('sceneUnload')).toBe(false);
 
-      expect(lifecycleFunctions.getSceneLoadFunction().getName()).toBe(
+      expect(lifecycleFunctions.insertByName('sceneLoad').getName()).toBe(
         'sceneLoad'
       );
+      lifecycleFunctions.insert(gd.SceneLifecycleEventsFunctions.SceneSignal);
       expect(
         lifecycleFunctions.get(gd.SceneLifecycleEventsFunctions.SceneSignal)
           .ptr
@@ -253,6 +258,7 @@ describe('libGD.js', function() {
       expect(lifecycleFunctions.getSceneUpdateFunction().getName()).toBe(
         'sceneUpdate'
       );
+      lifecycleFunctions.insertByName('sceneUnload');
       expect(lifecycleFunctions.getByName('sceneUnload').getName()).toBe(
         'sceneUnload'
       );
@@ -269,6 +275,11 @@ describe('libGD.js', function() {
       expect(lifecycleLayout.getEvents().ptr).toBe(
         lifecycleFunctions.getSceneUpdateFunction().getEvents().ptr
       );
+      expect(lifecycleFunctions.removeByName('sceneUpdate')).toBe(true);
+      expect(lifecycleFunctions.hasByName('sceneUpdate')).toBe(false);
+      expect(lifecycleFunctions.removeByName('sceneUpdate')).toBe(false);
+      lifecycleLayout.getEvents();
+      expect(lifecycleFunctions.hasByName('sceneUpdate')).toBe(true);
 
       const externalEvents = lifecycleProject.insertNewExternalEvents(
         'Shared lifecycle',

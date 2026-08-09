@@ -27,11 +27,13 @@ enum class SceneLifecycleFunctionRole {
 };
 
 /**
- * \brief Owns the four fixed lifecycle functions of a scene-like event source.
+ * \brief Owns the four reserved lifecycle function slots of a scene-like
+ * event source.
  *
- * Unlike EventsFunctionsContainer, this container deliberately has no insert,
- * remove or reorder API. The function metadata and presentation order are part
- * of the scene lifecycle contract; only the event bodies are author-editable.
+ * The slots have stable addresses, but each role has an explicit presence
+ * state. This allows functions to be attached or removed without invalidating
+ * borrowed wrappers for the other roles. Metadata and presentation order are
+ * fixed by the scene lifecycle contract.
  */
 class GD_CORE_API SceneLifecycleEventsFunctions {
  public:
@@ -50,6 +52,12 @@ class GD_CORE_API SceneLifecycleEventsFunctions {
   };
 
   SceneLifecycleEventsFunctions();
+
+  bool Has(gd::SceneLifecycleFunctionRole role) const;
+  bool Has(Role role) const {
+    return Has(static_cast<gd::SceneLifecycleFunctionRole>(role));
+  }
+  bool HasByName(const gd::String& name) const;
 
   gd::EventsFunction& Get(gd::SceneLifecycleFunctionRole role);
   const gd::EventsFunction& Get(
@@ -71,24 +79,57 @@ class GD_CORE_API SceneLifecycleEventsFunctions {
   gd::EventsFunction& GetByName(const gd::String& name);
   const gd::EventsFunction& GetByName(const gd::String& name) const;
 
+  gd::EventsFunction& Insert(gd::SceneLifecycleFunctionRole role);
+  gd::EventsFunction& Insert(Role role) {
+    return Insert(static_cast<gd::SceneLifecycleFunctionRole>(role));
+  }
+  gd::EventsFunction& InsertByName(const gd::String& name);
+
+  bool Remove(gd::SceneLifecycleFunctionRole role);
+  bool Remove(Role role) {
+    return Remove(static_cast<gd::SceneLifecycleFunctionRole>(role));
+  }
+  bool RemoveByName(const gd::String& name);
+
+  /**
+   * \brief Return the stable slot for a role, whether present or not.
+   *
+   * An absent slot always has canonical metadata and an empty body. This is a
+   * read-only semantic fallback for consumers that treat missing functions as
+   * empty functions.
+   */
+  const gd::EventsFunction& GetOrEmpty(
+      gd::SceneLifecycleFunctionRole role) const;
+  const gd::EventsFunction& GetOrEmptyByName(const gd::String& name) const;
+
   bool HasRoleName(const gd::String& name) const;
 
-  gd::EventsFunction& GetSceneLoadFunction() { return sceneLoad; }
-  const gd::EventsFunction& GetSceneLoadFunction() const { return sceneLoad; }
+  gd::EventsFunction& GetSceneLoadFunction() {
+    return Insert(gd::SceneLifecycleFunctionRole::SceneLoad);
+  }
+  const gd::EventsFunction& GetSceneLoadFunction() const {
+    return GetOrEmpty(gd::SceneLifecycleFunctionRole::SceneLoad);
+  }
 
-  gd::EventsFunction& GetSceneSignalFunction() { return sceneSignal; }
+  gd::EventsFunction& GetSceneSignalFunction() {
+    return Insert(gd::SceneLifecycleFunctionRole::SceneSignal);
+  }
   const gd::EventsFunction& GetSceneSignalFunction() const {
-    return sceneSignal;
+    return GetOrEmpty(gd::SceneLifecycleFunctionRole::SceneSignal);
   }
 
-  gd::EventsFunction& GetSceneUpdateFunction() { return sceneUpdate; }
+  gd::EventsFunction& GetSceneUpdateFunction() {
+    return Insert(gd::SceneLifecycleFunctionRole::SceneUpdate);
+  }
   const gd::EventsFunction& GetSceneUpdateFunction() const {
-    return sceneUpdate;
+    return GetOrEmpty(gd::SceneLifecycleFunctionRole::SceneUpdate);
   }
 
-  gd::EventsFunction& GetSceneUnloadFunction() { return sceneUnload; }
+  gd::EventsFunction& GetSceneUnloadFunction() {
+    return Insert(gd::SceneLifecycleFunctionRole::SceneUnload);
+  }
   const gd::EventsFunction& GetSceneUnloadFunction() const {
-    return sceneUnload;
+    return GetOrEmpty(gd::SceneLifecycleFunctionRole::SceneUnload);
   }
 
   gd::EventsList& GetEvents(gd::SceneLifecycleFunctionRole role) {
@@ -104,10 +145,14 @@ class GD_CORE_API SceneLifecycleEventsFunctions {
    */
   template <typename Callback>
   void ForEach(Callback callback) {
-    callback(gd::SceneLifecycleFunctionRole::SceneLoad, sceneLoad);
-    callback(gd::SceneLifecycleFunctionRole::SceneSignal, sceneSignal);
-    callback(gd::SceneLifecycleFunctionRole::SceneUpdate, sceneUpdate);
-    callback(gd::SceneLifecycleFunctionRole::SceneUnload, sceneUnload);
+    if (sceneLoadPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneLoad, sceneLoad);
+    if (sceneSignalPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneSignal, sceneSignal);
+    if (sceneUpdatePresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneUpdate, sceneUpdate);
+    if (sceneUnloadPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneUnload, sceneUnload);
   }
 
   /**
@@ -115,14 +160,18 @@ class GD_CORE_API SceneLifecycleEventsFunctions {
    */
   template <typename Callback>
   void ForEach(Callback callback) const {
-    callback(gd::SceneLifecycleFunctionRole::SceneLoad, sceneLoad);
-    callback(gd::SceneLifecycleFunctionRole::SceneSignal, sceneSignal);
-    callback(gd::SceneLifecycleFunctionRole::SceneUpdate, sceneUpdate);
-    callback(gd::SceneLifecycleFunctionRole::SceneUnload, sceneUnload);
+    if (sceneLoadPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneLoad, sceneLoad);
+    if (sceneSignalPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneSignal, sceneSignal);
+    if (sceneUpdatePresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneUpdate, sceneUpdate);
+    if (sceneUnloadPresent)
+      callback(gd::SceneLifecycleFunctionRole::SceneUnload, sceneUnload);
   }
 
   /**
-   * \brief Return whether all four functions still have their fixed metadata.
+   * \brief Return whether all four stable slots still have fixed metadata.
    */
   bool HasValidMetadata() const;
 
@@ -137,25 +186,33 @@ class GD_CORE_API SceneLifecycleEventsFunctions {
    * \brief Serialize lifecycle event bodies using the legacy single-file
    * project keys.
    *
-   * The sceneUpdate body is always stored as `events`. Empty optional bodies
-   * are omitted to avoid changing untouched projects.
+   * Presence is stored independently from body emptiness. `events` remains the
+   * compatibility body key for sceneUpdate.
    */
   void SerializeEventBodiesTo(gd::SerializerElement& element) const;
 
   /**
    * \brief Load lifecycle event bodies from the legacy single-file project
-   * keys and reconstruct all fixed metadata.
+   * keys and reconstruct fixed metadata and presence.
    */
   void UnserializeEventBodiesFrom(gd::Project& project,
                                   const gd::SerializerElement& element);
 
  private:
-  void InitializeFunctions();
+  void InitializeSlots();
+  gd::EventsFunction& GetSlot(gd::SceneLifecycleFunctionRole role);
+  const gd::EventsFunction& GetSlot(
+      gd::SceneLifecycleFunctionRole role) const;
+  bool& GetPresence(gd::SceneLifecycleFunctionRole role);
 
   gd::EventsFunction sceneLoad;
   gd::EventsFunction sceneSignal;
   gd::EventsFunction sceneUpdate;
   gd::EventsFunction sceneUnload;
+  bool sceneLoadPresent;
+  bool sceneSignalPresent;
+  bool sceneUpdatePresent;
+  bool sceneUnloadPresent;
 };
 
 }  // namespace gd

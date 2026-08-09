@@ -178,6 +178,59 @@ describe('3D model bone attachments', function () {
     expect(model.hasBone('Bone 4')).to.be(false);
   });
 
+  it('binds, captures and generation-checks spring bone chains', function () {
+    const rootBone = makeBone('HairRoot');
+    const endBone = makeBone('HairEnd');
+    endBone.position.set(0, 0, -1);
+    rootBone.add(endBone);
+    const runtimeScene = makeScene(makeGltf([rootBone]));
+    const modelData = makeModelData('Model');
+    const model = addModel(runtimeScene, modelData);
+    const renderer = model.getRenderer();
+    const binding = renderer.createSpringBoneDynamicsBinding(
+      [['HairRoot', 'HairEnd']],
+      []
+    );
+    expect(binding).to.not.be(null);
+    if (!binding) throw new Error('Expected a spring-bone binding.');
+    const positions = new Float32Array(6);
+    const quaternions = new Float32Array(8);
+    expect(
+      renderer.captureSpringBoneDynamicsPose(
+        binding,
+        positions,
+        quaternions
+      )
+    ).to.be(true);
+    const simulated = positions.slice();
+    simulated[3] = positions[0] + 1;
+    simulated[4] = positions[1];
+    simulated[5] = positions[2];
+    expect(
+      renderer.applySpringBoneDynamicsPose(
+        binding,
+        simulated,
+        quaternions,
+        1
+      )
+    ).to.be(true);
+    const clonedRoot = /** @type {any} */ (renderer)._bonesByCanonicalName.get(
+      'HairRoot'
+    );
+    expect(clonedRoot.quaternion.angleTo(new THREE.Quaternion())).to.be.greaterThan(
+      0.1
+    );
+
+    renderer._updateModel(0, 0, 0, 100, 100, 100, false);
+    expect(
+      renderer.captureSpringBoneDynamicsPose(
+        binding,
+        positions,
+        quaternions
+      )
+    ).to.be(false);
+  });
+
   it('synchronizes logical transforms without inheriting dimensions, flips or renderer parenting', function () {
     const bone = makeBone('Hand', 'Hand.Socket');
     const runtimeScene = makeScene(makeGltf([bone]));

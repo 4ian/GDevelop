@@ -5,6 +5,7 @@
  */
 #include "GDCore/Project/SceneLifecycleEventsFunctions.h"
 
+#include <algorithm>
 #include <array>
 #include <stdexcept>
 
@@ -150,12 +151,17 @@ bool HasSceneSignalParameters(const gd::EventsFunction& function) {
 }  // namespace
 
 SceneLifecycleEventsFunctions::SceneLifecycleEventsFunctions() {
-  InitializeFunctions();
+  InitializeSlots();
+  sceneUpdatePresent = true;
 }
 
-void SceneLifecycleEventsFunctions::InitializeFunctions() {
+void SceneLifecycleEventsFunctions::InitializeSlots() {
+  sceneLoadPresent = false;
+  sceneSignalPresent = false;
+  sceneUpdatePresent = false;
+  sceneUnloadPresent = false;
   for (const auto& entry : GetLifecycleRegistry()) {
-    auto& function = Get(entry.role);
+    auto& function = GetSlot(entry.role);
     InitializeFunction(function, entry);
     if (entry.hasSignalParameters) {
       AddStringParameter(function, "SignalName", "Signal name");
@@ -164,7 +170,7 @@ void SceneLifecycleEventsFunctions::InitializeFunctions() {
   }
 }
 
-gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
+gd::EventsFunction& SceneLifecycleEventsFunctions::GetSlot(
     gd::SceneLifecycleFunctionRole role) {
   switch (role) {
     case gd::SceneLifecycleFunctionRole::SceneLoad:
@@ -179,7 +185,7 @@ gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
   throw std::logic_error("Unknown scene lifecycle function role.");
 }
 
-const gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
+const gd::EventsFunction& SceneLifecycleEventsFunctions::GetSlot(
     gd::SceneLifecycleFunctionRole role) const {
   switch (role) {
     case gd::SceneLifecycleFunctionRole::SceneLoad:
@@ -192,6 +198,123 @@ const gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
       return sceneUnload;
   }
   throw std::logic_error("Unknown scene lifecycle function role.");
+}
+
+bool& SceneLifecycleEventsFunctions::GetPresence(
+    gd::SceneLifecycleFunctionRole role) {
+  switch (role) {
+    case gd::SceneLifecycleFunctionRole::SceneLoad:
+      return sceneLoadPresent;
+    case gd::SceneLifecycleFunctionRole::SceneSignal:
+      return sceneSignalPresent;
+    case gd::SceneLifecycleFunctionRole::SceneUpdate:
+      return sceneUpdatePresent;
+    case gd::SceneLifecycleFunctionRole::SceneUnload:
+      return sceneUnloadPresent;
+  }
+  throw std::logic_error("Unknown scene lifecycle function role.");
+}
+
+bool SceneLifecycleEventsFunctions::Has(
+    gd::SceneLifecycleFunctionRole role) const {
+  switch (role) {
+    case gd::SceneLifecycleFunctionRole::SceneLoad:
+      return sceneLoadPresent;
+    case gd::SceneLifecycleFunctionRole::SceneSignal:
+      return sceneSignalPresent;
+    case gd::SceneLifecycleFunctionRole::SceneUpdate:
+      return sceneUpdatePresent;
+    case gd::SceneLifecycleFunctionRole::SceneUnload:
+      return sceneUnloadPresent;
+  }
+  return false;
+}
+
+bool SceneLifecycleEventsFunctions::HasByName(
+    const gd::String& name) const {
+  const auto* entry = FindRegistryEntry(name);
+  return entry && Has(entry->role);
+}
+
+gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
+    gd::SceneLifecycleFunctionRole role) {
+  return GetSlot(role);
+}
+
+const gd::EventsFunction& SceneLifecycleEventsFunctions::Get(
+    gd::SceneLifecycleFunctionRole role) const {
+  return GetSlot(role);
+}
+
+const gd::EventsFunction& SceneLifecycleEventsFunctions::GetOrEmpty(
+    gd::SceneLifecycleFunctionRole role) const {
+  return GetSlot(role);
+}
+
+const gd::EventsFunction& SceneLifecycleEventsFunctions::GetOrEmptyByName(
+    const gd::String& name) const {
+  const auto* entry = FindRegistryEntry(name);
+  if (!entry) {
+    throw std::logic_error("Unknown scene lifecycle function name.");
+  }
+  return GetOrEmpty(entry->role);
+}
+
+gd::EventsFunction& SceneLifecycleEventsFunctions::Insert(
+    gd::SceneLifecycleFunctionRole role) {
+  auto& presence = GetPresence(role);
+  if (!presence) {
+    const auto& entry = *std::find_if(
+        GetLifecycleRegistry().begin(), GetLifecycleRegistry().end(),
+        [role](const LifecycleRegistryEntry& entry) {
+          return entry.role == role;
+        });
+    auto& function = GetSlot(role);
+    InitializeFunction(function, entry);
+    if (entry.hasSignalParameters) {
+      AddStringParameter(function, "SignalName", "Signal name");
+      AddStringParameter(function, "Payload", "Payload");
+    }
+    presence = true;
+  }
+  return GetSlot(role);
+}
+
+gd::EventsFunction& SceneLifecycleEventsFunctions::InsertByName(
+    const gd::String& name) {
+  const auto* entry = FindRegistryEntry(name);
+  if (!entry) {
+    throw std::logic_error("Unknown scene lifecycle function name.");
+  }
+  return Insert(entry->role);
+}
+
+bool SceneLifecycleEventsFunctions::Remove(
+    gd::SceneLifecycleFunctionRole role) {
+  auto& presence = GetPresence(role);
+  if (!presence) return false;
+
+  const auto& entry = *std::find_if(
+      GetLifecycleRegistry().begin(), GetLifecycleRegistry().end(),
+      [role](const LifecycleRegistryEntry& entry) {
+        return entry.role == role;
+      });
+  auto& function = GetSlot(role);
+  InitializeFunction(function, entry);
+  if (entry.hasSignalParameters) {
+    AddStringParameter(function, "SignalName", "Signal name");
+    AddStringParameter(function, "Payload", "Payload");
+  }
+  presence = false;
+  return true;
+}
+
+bool SceneLifecycleEventsFunctions::RemoveByName(const gd::String& name) {
+  const auto* entry = FindRegistryEntry(name);
+  if (!entry) {
+    throw std::logic_error("Unknown scene lifecycle function name.");
+  }
+  return Remove(entry->role);
 }
 
 gd::EventsFunction& SceneLifecycleEventsFunctions::GetByName(
@@ -215,7 +338,7 @@ bool SceneLifecycleEventsFunctions::HasRoleName(
 
 bool SceneLifecycleEventsFunctions::HasValidMetadata() const {
   for (const auto& entry : GetLifecycleRegistry()) {
-    const auto& function = Get(entry.role);
+    const auto& function = GetSlot(entry.role);
     if (!HasExpectedCommonMetadata(function, entry)) return false;
     if (entry.hasSignalParameters ? !HasSceneSignalParameters(function)
                                   : !HasNoParameters(function)) {
@@ -236,24 +359,90 @@ void SceneLifecycleEventsFunctions::SerializeEventBodiesTo(
     gd::SerializerElement& element) const {
   ValidateMetadata();
 
+  auto& presenceElement = element.AddChild("sceneLifecycleFunctions");
+  presenceElement.ConsiderAsArray();
   for (const auto& entry : GetLifecycleRegistry()) {
-    const auto& events = Get(entry.role).GetEvents();
-    if (entry.isOptionalInLegacyFormat && events.IsEmpty()) continue;
+    if (Has(entry.role)) {
+      presenceElement.AddChild("").SetStringValue(entry.name);
+    }
+  }
+
+  for (const auto& entry : GetLifecycleRegistry()) {
+    if (!Has(entry.role)) {
+      if (entry.role == gd::SceneLifecycleFunctionRole::SceneUpdate) {
+        gd::EventsListSerialization::SerializeEventsTo(
+            GetSlot(entry.role).GetEvents(),
+            element.AddChild(entry.legacyEventsKey));
+      }
+      continue;
+    }
     gd::EventsListSerialization::SerializeEventsTo(
-        events, element.AddChild(entry.legacyEventsKey));
+        Get(entry.role).GetEvents(), element.AddChild(entry.legacyEventsKey));
   }
 }
 
 void SceneLifecycleEventsFunctions::UnserializeEventBodiesFrom(
     gd::Project& project,
     const gd::SerializerElement& element) {
-  InitializeFunctions();
+  InitializeSlots();
+
+  if (element.HasChild("sceneLifecycleFunctions")) {
+    const auto& presenceElement =
+        element.GetChild("sceneLifecycleFunctions");
+    int previousOrder = -1;
+    for (std::size_t i = 0; i < presenceElement.GetChildrenCount(); ++i) {
+      const auto name = presenceElement.GetChild(i).GetStringValue();
+      const auto* entry = FindRegistryEntry(name);
+      if (!entry) {
+        throw std::logic_error("Unknown scene lifecycle function name.");
+      }
+      const int order = static_cast<int>(entry->role);
+      if (order <= previousOrder) {
+        throw std::logic_error(
+            "Scene lifecycle function presence must be unique and ordered.");
+      }
+      previousOrder = order;
+      Insert(entry->role);
+    }
+
+    for (const auto& entry : GetLifecycleRegistry()) {
+      const bool hasBody = element.HasChild(entry.legacyEventsKey);
+      if (Has(entry.role)) {
+        if (!hasBody) {
+          throw std::logic_error(
+              "Attached scene lifecycle function has no event body.");
+        }
+        gd::EventsListSerialization::UnserializeEventsFrom(
+            project, Get(entry.role).GetEvents(),
+            element.GetChild(entry.legacyEventsKey));
+      } else if (hasBody) {
+        auto& emptySlot = GetSlot(entry.role);
+        gd::EventsListSerialization::UnserializeEventsFrom(
+            project, emptySlot.GetEvents(),
+            element.GetChild(entry.legacyEventsKey));
+        const bool isAllowedEmptyUpdateShadow =
+            entry.role == gd::SceneLifecycleFunctionRole::SceneUpdate &&
+            emptySlot.GetEvents().IsEmpty();
+        if (!isAllowedEmptyUpdateShadow) {
+          InitializeFunction(emptySlot, entry);
+          if (entry.hasSignalParameters) {
+            AddStringParameter(emptySlot, "SignalName", "Signal name");
+            AddStringParameter(emptySlot, "Payload", "Payload");
+          }
+          throw std::logic_error(
+              "Detached scene lifecycle function has an event body.");
+        }
+      }
+    }
+    return;
+  }
 
   for (const auto& entry : GetLifecycleRegistry()) {
-    if (entry.isOptionalInLegacyFormat &&
-        !element.HasChild(entry.legacyEventsKey)) {
+    const bool hasBody = element.HasChild(entry.legacyEventsKey);
+    if (entry.isOptionalInLegacyFormat && !hasBody) {
       continue;
     }
+    Insert(entry.role);
     const auto& eventsElement =
         entry.role == gd::SceneLifecycleFunctionRole::SceneUpdate
             ? element.GetChild(entry.legacyEventsKey, 0, "Events")

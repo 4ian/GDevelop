@@ -72,6 +72,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'SpringBoneDynamics',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/SpringBoneDynamics/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'ExampleJsExtension',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),

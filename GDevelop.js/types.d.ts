@@ -897,6 +897,12 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
 export class SceneLifecycleEventsFunctions extends EmscriptenObject {
   get(role: SceneLifecycleEventsFunctions_Role): EventsFunction;
   getByName(name: string): EventsFunction;
+  has(role: SceneLifecycleEventsFunctions_Role): boolean;
+  hasByName(name: string): boolean;
+  insert(role: SceneLifecycleEventsFunctions_Role): EventsFunction;
+  insertByName(name: string): EventsFunction;
+  remove(role: SceneLifecycleEventsFunctions_Role): boolean;
+  removeByName(name: string): boolean;
   hasRoleName(name: string): boolean;
   hasValidMetadata(): boolean;
   getSceneLoadFunction(): EventsFunction;

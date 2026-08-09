@@ -80,7 +80,7 @@ class LifecycleScopeRecordingWorker
 }  // namespace
 
 TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
-  SECTION("owns four fixed functions in presentation order") {
+  SECTION("starts with update and attaches reserved functions in order") {
     gd::SceneLifecycleEventsFunctions functions;
 
     REQUIRE(functions.HasValidMetadata());
@@ -89,6 +89,14 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
     REQUIRE(functions.HasRoleName("sceneUpdate"));
     REQUIRE(functions.HasRoleName("sceneUnload"));
     REQUIRE_FALSE(functions.HasRoleName("onCreated"));
+    REQUIRE_FALSE(functions.HasByName("sceneLoad"));
+    REQUIRE_FALSE(functions.HasByName("sceneSignal"));
+    REQUIRE(functions.HasByName("sceneUpdate"));
+    REQUIRE_FALSE(functions.HasByName("sceneUnload"));
+
+    functions.InsertByName("sceneLoad");
+    functions.InsertByName("sceneSignal");
+    functions.InsertByName("sceneUnload");
 
     std::vector<gd::String> visitedNames;
     functions.ForEach(
@@ -118,6 +126,30 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
 
     functions.GetSceneLoadFunction().SetName("changed");
     REQUIRE_FALSE(functions.HasValidMetadata());
+  }
+
+  SECTION("removing functions preserves stable empty slots") {
+    gd::SceneLifecycleEventsFunctions functions;
+    auto& load = functions.InsertByName("sceneLoad");
+    auto& update = functions.GetByName("sceneUpdate");
+    InsertOneEvent(load);
+    InsertOneEvent(update);
+
+    const auto* loadAddress = &load;
+    const auto* updateAddress = &update;
+    REQUIRE(functions.RemoveByName("sceneLoad"));
+    REQUIRE_FALSE(functions.HasByName("sceneLoad"));
+    REQUIRE_FALSE(functions.RemoveByName("sceneLoad"));
+    REQUIRE(&functions.GetOrEmptyByName("sceneLoad") == loadAddress);
+    REQUIRE(functions.GetOrEmptyByName("sceneLoad").GetEvents().IsEmpty());
+    REQUIRE(&functions.GetByName("sceneUpdate") == updateAddress);
+    REQUIRE(functions.GetByName("sceneUpdate")
+                .GetEvents()
+                .GetEventsCount() == 1);
+
+    REQUIRE(functions.RemoveByName("sceneUpdate"));
+    REQUIRE_FALSE(functions.HasByName("sceneUpdate"));
+    REQUIRE(functions.GetOrEmptyByName("sceneUpdate").GetEvents().IsEmpty());
   }
 
   SECTION("layout and External Events keep GetEvents as the update alias") {
@@ -159,18 +191,49 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
         copiedExternalEvents.GetLifecycleEventsFunctions());
   }
 
-  SECTION("legacy serialization omits empty optional lifecycle bodies") {
+  SECTION("serialization preserves present empty functions") {
     gd::Layout layout;
-    InsertOneEvent(layout.GetLifecycleEventsFunctions()
-                       .GetSceneUpdateFunction());
+    layout.GetLifecycleEventsFunctions().InsertByName("sceneLoad");
 
     gd::SerializerElement element;
     layout.SerializeTo(element);
 
+    REQUIRE(element.HasChild("sceneLifecycleFunctions"));
+    const auto& presence = element.GetChild("sceneLifecycleFunctions");
+    REQUIRE(presence.GetChildrenCount() == 2);
+    REQUIRE(presence.GetChild(0).GetStringValue() == "sceneLoad");
+    REQUIRE(presence.GetChild(1).GetStringValue() == "sceneUpdate");
     REQUIRE(element.HasChild("events"));
-    REQUIRE_FALSE(element.HasChild("sceneLoadEvents"));
+    REQUIRE(element.HasChild("sceneLoadEvents"));
     REQUIRE_FALSE(element.HasChild("sceneSignalEvents"));
     REQUIRE_FALSE(element.HasChild("sceneUnloadEvents"));
+  }
+
+  SECTION("serialization preserves an owner without update") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout layout;
+    REQUIRE(layout.GetLifecycleEventsFunctions().RemoveByName("sceneUpdate"));
+    gd::SerializerElement element;
+    layout.SerializeTo(element);
+
+    REQUIRE(element.GetChild("sceneLifecycleFunctions")
+                .GetChildrenCount() == 0);
+    REQUIRE(element.HasChild("events"));
+
+    gd::Layout roundTrippedLayout;
+    roundTrippedLayout.UnserializeFrom(project, element);
+    REQUIRE_FALSE(roundTrippedLayout.GetLifecycleEventsFunctions()
+                      .HasByName("sceneUpdate"));
+    const gd::Layout& readOnlyLayout = roundTrippedLayout;
+    REQUIRE(readOnlyLayout.GetEvents().IsEmpty());
+    REQUIRE_FALSE(roundTrippedLayout.GetLifecycleEventsFunctions()
+                      .HasByName("sceneUpdate"));
+    roundTrippedLayout.GetEvents();
+    REQUIRE(roundTrippedLayout.GetLifecycleEventsFunctions()
+                .HasByName("sceneUpdate"));
   }
 
   SECTION("legacy serialization round-trips all four layout bodies") {
@@ -200,7 +263,7 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
                 .HasValidMetadata());
   }
 
-  SECTION("missing legacy optional fields clear previously loaded bodies") {
+  SECTION("missing legacy optional fields detach previously loaded functions") {
     gd::Platform platform;
     gd::Project project;
     SetupProjectWithDummyPlatform(project, platform);
@@ -216,13 +279,14 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
                        .GetSceneUpdateFunction());
     gd::SerializerElement legacyElement;
     legacyLayout.SerializeTo(legacyElement);
+    legacyElement.RemoveChild("sceneLifecycleFunctions");
 
     layout.UnserializeFrom(project, legacyElement);
-    REQUIRE(functions.GetSceneLoadFunction().GetEvents().IsEmpty());
-    REQUIRE(functions.GetSceneSignalFunction().GetEvents().IsEmpty());
+    REQUIRE_FALSE(functions.HasByName("sceneLoad"));
+    REQUIRE_FALSE(functions.HasByName("sceneSignal"));
     REQUIRE(functions.GetSceneUpdateFunction().GetEvents().GetEventsCount() ==
             1);
-    REQUIRE(functions.GetSceneUnloadFunction().GetEvents().IsEmpty());
+    REQUIRE_FALSE(functions.HasByName("sceneUnload"));
   }
 
   SECTION("External Events use the same legacy lifecycle-body keys") {
@@ -275,6 +339,15 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
     auto& externalEvents =
         project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.SetAssociatedLayout("Scene");
+    auto& layoutFunctions =
+        project.GetLayout("Scene").GetLifecycleEventsFunctions();
+    auto& externalFunctions = externalEvents.GetLifecycleEventsFunctions();
+    layoutFunctions.InsertByName("sceneLoad");
+    layoutFunctions.InsertByName("sceneSignal");
+    layoutFunctions.InsertByName("sceneUnload");
+    externalFunctions.InsertByName("sceneLoad");
+    externalFunctions.InsertByName("sceneSignal");
+    externalFunctions.InsertByName("sceneUnload");
 
     LifecycleScopeRecordingWorker worker;
     gd::ProjectBrowserHelper::ExposeProjectEventsWithoutExtensions(project,
@@ -311,6 +384,7 @@ TEST_CASE("SceneLifecycleEventsFunctions", "[common]") {
     auto& externalEvents =
         project.InsertNewExternalEvents("ExternalEvents", 0);
     externalEvents.SetAssociatedLayout("Scene");
+    externalEvents.GetLifecycleEventsFunctions().InsertByName("sceneSignal");
 
     gd::LinkEvent linkEvent;
     linkEvent.SetTarget("ExternalEvents");

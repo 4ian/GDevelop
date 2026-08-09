@@ -294,6 +294,9 @@ module.exports = {
       .addIncludeFile('Extensions/ClothSimulation/ClothSimulationTopology.js')
       .addIncludeFile('Extensions/ClothSimulation/ClothSimulationBackend.js')
       .addIncludeFile('Extensions/ClothSimulation/CpuClothSimulationBackend.js')
+      .addIncludeFile(
+        'Extensions/SharedWebGpuCompute/WebGpuComputeDeviceManager.js'
+      )
       .addIncludeFile('Extensions/ClothSimulation/WebGpuClothDeviceManager.js')
       .addIncludeFile(
         'Extensions/ClothSimulation/WebGpuClothSimulationBackend.js'

@@ -9,12 +9,12 @@ module.exports = function (config) {
     },
   });
   options.files.push('./GDJS/tests/webgpu/ClothSimulationWebGpuSmoke.spec.js');
+  options.files.push('./GDJS/tests/webgpu/SpringBoneDynamicsWebGpuSmoke.spec.js');
   options.browsers = ['ChromeHeadlessWebGPU'];
   options.customLaunchers.ChromeHeadlessWebGPU = {
     base: 'ChromeHeadless',
     flags: ['--enable-unsafe-webgpu', '--enable-features=Vulkan'],
   };
-  options.client.mocha.grep =
-    'Cloth WebGPU compute and WebGL render coexistence';
+  options.client.mocha.grep = 'WebGPU compute and WebGL render coexistence';
   config.set(options);
 };

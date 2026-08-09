@@ -40,6 +40,9 @@ export type GameplayTestResult = {
   status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout',
   framesExecuted: number,
   durationMs: number,
+  // The wall-clock budget the run had (a duration close to it means the
+  // test is at risk of timing out on a slower machine).
+  timeoutMs: number,
   gameTimeMs: number,
   assertions: Array<GameplayTestAssertion>,
   errors: Array<string>,
@@ -151,6 +154,7 @@ const makeResultWithoutRun = (
   status,
   framesExecuted: 0,
   durationMs: 0,
+  timeoutMs: 0,
   gameTimeMs: 0,
   assertions: [],
   errors: [errorMessage],
@@ -178,6 +182,7 @@ export const makeGameplayTestResultReadableOutput = (
   testName: result.testName,
   framesExecuted: result.framesExecuted,
   durationMs: result.durationMs,
+  timeoutMs: result.timeoutMs,
   gameTimeMs: result.gameTimeMs,
   assertions: result.assertions,
   errors: result.errors,

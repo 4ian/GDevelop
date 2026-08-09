@@ -322,8 +322,14 @@ namespace gdjs {
      * the game visibly plays (a rendered frame per refresh), stop/progress
      * messages flow, while keeping near-full stepping throughput. */
     const YIELD_BUDGET_MS = 12;
-    // In fast (unpaced) runs, let the game render at most this often.
+    // In fast (unpaced) runs, let the game render at most this often...
     const FAST_RUN_RENDER_INTERVAL_MS = 250;
+    // ...and never spend more than ~1/(1+multiplier) of the wall clock
+    // rendering: when a single render costs more than the interval itself
+    // (a 3D scene on software WebGL can take 350ms), an interval cap alone
+    // skips nothing - after such a render, wait for multiplier times its
+    // cost before the next one.
+    const FAST_RUN_RENDER_DUTY_MULTIPLIER = 4;
     const MAX_PLAYED_SOUNDS = 500;
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
@@ -515,6 +521,8 @@ namespace gdjs {
       _lastYieldTimeMs: number = 0;
       /** The last time an animation frame was awaited (rendering the game). */
       _lastRenderTimeMs: number = 0;
+      /** How long the last render (animation frame tick) took. */
+      _lastRenderDurationMs: number = 0;
       _playedSounds: Array<{ sound: string; frame: integer }> = [];
       /** Entries of the sound manager log already copied to `_playedSounds`. */
       _playedSoundsReadCount: integer = 0;
@@ -724,6 +732,21 @@ namespace gdjs {
         }
       }
 
+      /**
+       * Let an animation frame happen (the paused main loop renders the
+       * game in it) and measure its cost, which drives how often fast runs
+       * render (see FAST_RUN_RENDER_DUTY_MULTIPLIER).
+       */
+      private async _renderOnce(): Promise<void> {
+        const renderStartTimeMs = Date.now();
+        await this._waitForNextAnimationFrame();
+        // Pass the whole animation frame tick (game render included)
+        // before measuring: a slow render must lower the render rate.
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        this._lastRenderDurationMs = Date.now() - renderStartTimeMs;
+        this._lastRenderTimeMs = Date.now();
+      }
+
       private _waitForNextAnimationFrame(): Promise<void> {
         return new Promise((resolve) => {
           if (typeof requestAnimationFrame !== 'undefined') {
@@ -774,10 +797,12 @@ namespace gdjs {
         // few times per second.
         if (
           Date.now() - this._lastRenderTimeMs >=
-          FAST_RUN_RENDER_INTERVAL_MS
+          Math.max(
+            FAST_RUN_RENDER_INTERVAL_MS,
+            FAST_RUN_RENDER_DUTY_MULTIPLIER * this._lastRenderDurationMs
+          )
         ) {
-          await this._waitForNextAnimationFrame();
-          this._lastRenderTimeMs = Date.now();
+          await this._renderOnce();
         } else {
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
         }
@@ -2358,8 +2383,7 @@ namespace gdjs {
         }
         // Let an animation frame happen so the canvas shows the current
         // state of the game (fast runs only render a few times per second).
-        await this._waitForNextAnimationFrame();
-        this._lastRenderTimeMs = Date.now();
+        await this._renderOnce();
         const canvas = this._runtimeGame.getRenderer().getCanvas();
         if (!canvas) {
           logger.warn('No canvas found: unable to take a screenshot.');

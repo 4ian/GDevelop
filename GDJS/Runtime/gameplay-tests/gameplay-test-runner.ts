@@ -516,7 +516,8 @@ namespace gdjs {
       /** The last time an animation frame was awaited (rendering the game). */
       _lastRenderTimeMs: number = 0;
       _playedSounds: Array<{ sound: string; frame: integer }> = [];
-      _soundLogRestorers: Array<() => void> = [];
+      /** Entries of the sound manager log already copied to `_playedSounds`. */
+      _playedSoundsReadCount: integer = 0;
       /** Game seconds simulated per real second, or null to run as fast
        * as possible (see `_maybeYield`). */
       _paceSpeedFactor: float | null = null;
@@ -716,6 +717,7 @@ namespace gdjs {
           this._worstStepTimeMs = stepTimeMs;
         }
         this._trackChangesAfterStep();
+        this._drainPlayedSounds();
         if (this._onProgress && Date.now() - this._lastProgressTimeMs > 500) {
           this._lastProgressTimeMs = Date.now();
           this._onProgress(this._framesExecuted);
@@ -1532,21 +1534,25 @@ namespace gdjs {
       /**
        * Get a scene variable, or undefined if it does not exist.
        */
-      getSceneVariable(variableName: string): Object | undefined {
+      getSceneVariable(
+        variableName: string
+      ): VariableNetworkSyncData | undefined {
         return this._getCurrentScene()
           .getVariables()
           .getNetworkSyncData({})
-          .find((variable) => (variable as any).name === variableName);
+          .find((variable) => variable.name === variableName);
       }
 
       /**
        * Get a global variable, or undefined if it does not exist.
        */
-      getGlobalVariable(variableName: string): Object | undefined {
+      getGlobalVariable(
+        variableName: string
+      ): VariableNetworkSyncData | undefined {
         return this._runtimeGame
           .getVariables()
           .getNetworkSyncData({})
-          .find((variable) => (variable as any).name === variableName);
+          .find((variable) => variable.name === variableName);
       }
 
       /**
@@ -1564,45 +1570,32 @@ namespace gdjs {
        * (a pickup, a shot, an explosion...).
        */
       getPlayedSounds(): Array<{ sound: string; frame: integer }> {
+        this._drainPlayedSounds();
         return this._playedSounds.slice();
       }
 
       _installSoundLog(): void {
-        const soundManager = this._runtimeGame.getSoundManager() as any;
-        // Wrap the public play methods of the sound manager for the
-        // duration of the test.
-        for (const methodName of [
-          'playSound',
-          'playSoundOnChannel',
-          'playMusic',
-          'playMusicOnChannel',
-        ]) {
-          const original = soundManager[methodName];
-          if (typeof original !== 'function') continue;
-          soundManager[methodName] = (soundName: unknown, ...args: any[]) => {
-            if (this._playedSounds.length < MAX_PLAYED_SOUNDS) {
-              this._playedSounds.push({
-                sound: String(soundName),
-                frame: this._framesExecuted,
-              });
-            }
-            return original.call(soundManager, soundName, ...args);
-          };
-          this._soundLogRestorers.push(() => {
-            soundManager[methodName] = original;
-          });
-        }
+        this._runtimeGame.getSoundManager().setPlayedSoundsLogEnabled(true);
       }
 
       _uninstallSoundLog(): void {
-        for (const restore of this._soundLogRestorers) {
-          try {
-            restore();
-          } catch (error) {
-            logger.warn('Error while restoring the sound manager: ' + error);
-          }
+        this._runtimeGame.getSoundManager().setPlayedSoundsLogEnabled(false);
+      }
+
+      /** Copy the new entries of the sound manager log, stamped with the
+       * current frame. */
+      private _drainPlayedSounds(): void {
+        const log = this._runtimeGame.getSoundManager().getPlayedSoundsLog();
+        while (
+          this._playedSoundsReadCount < log.length &&
+          this._playedSounds.length < MAX_PLAYED_SOUNDS
+        ) {
+          this._playedSounds.push({
+            sound: log[this._playedSoundsReadCount].soundName,
+            frame: this._framesExecuted,
+          });
+          this._playedSoundsReadCount++;
         }
-        this._soundLogRestorers = [];
       }
 
       /**
@@ -2253,13 +2246,13 @@ namespace gdjs {
       getObjectVariable(
         objectIdOrName: integer | string,
         variableName: string
-      ): Object | undefined {
+      ): VariableNetworkSyncData | undefined {
         const object = this.getRuntimeObject(objectIdOrName);
         if (!object) return undefined;
         return object
           .getVariables()
           .getNetworkSyncData({})
-          .find((variable) => (variable as any).name === variableName);
+          .find((variable) => variable.name === variableName);
       }
 
       /**

@@ -28,16 +28,28 @@ describe('gdjs.RuntimeScene integration tests', function () {
   });
 
   describe('Debug draw', function () {
-    it('should follow the project collision mask display setting', function () {
+    it('should follow the project collision shape display setting', function () {
       const runtimeGame = gdjs.getPixiRuntimeGame({
-        propertiesOverrides: { displayCollisionMask: true },
+        propertiesOverrides: { displayCollisionShapes: true },
       });
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
       expect(runtimeScene._debugDrawEnabled).to.be(true);
     });
 
-    it('should not display collision masks by default', function () {
+    it('should support the legacy collision mask display setting', function () {
+      const runtimeGame = gdjs.getPixiRuntimeGame({
+        propertiesOverrides: {
+          displayCollisionShapes: undefined,
+          displayCollisionMask: true,
+        },
+      });
+      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+
+      expect(runtimeScene._debugDrawEnabled).to.be(true);
+    });
+
+    it('should not display collision shapes by default', function () {
       const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 

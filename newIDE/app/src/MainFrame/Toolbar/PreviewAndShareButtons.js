@@ -24,8 +24,8 @@ export type PreviewAndShareButtonsProps = {|
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
-  displayCollisionMaskInPreview: boolean,
-  setDisplayCollisionMaskInPreview: boolean => void,
+  displayCollisionShapesInPreview: boolean,
+  setDisplayCollisionShapesInPreview: boolean => void,
   displaySignalAnimationsInPreview: boolean,
   setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: ({|
@@ -48,8 +48,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onOpenDebugger,
     onHotReloadPreview,
     onLaunchPreviewWithDiagnosticReport,
-    displayCollisionMaskInPreview,
-    setDisplayCollisionMaskInPreview,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
     displaySignalAnimationsInPreview,
     setDisplaySignalAnimationsInPreview,
     canDoNetworkPreview,
@@ -115,10 +115,12 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           },
           {
             type: 'checkbox',
-            label: i18n._(t`Display collision masks`),
-            checked: displayCollisionMaskInPreview,
+            label: i18n._(t`Display collision shapes`),
+            checked: displayCollisionShapesInPreview,
             click: () =>
-              setDisplayCollisionMaskInPreview(!displayCollisionMaskInPreview),
+              setDisplayCollisionShapesInPreview(
+                !displayCollisionShapesInPreview
+              ),
           },
           {
             type: 'checkbox',
@@ -192,8 +194,8 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         hasPreviewsRunning,
         preferences.values.openDiagnosticReportAutomatically,
         onLaunchPreviewWithDiagnosticReport,
-        displayCollisionMaskInPreview,
-        setDisplayCollisionMaskInPreview,
+        displayCollisionShapesInPreview,
+        setDisplayCollisionShapesInPreview,
         displaySignalAnimationsInPreview,
         setDisplaySignalAnimationsInPreview,
         previewState.overridenPreviewLayoutName,

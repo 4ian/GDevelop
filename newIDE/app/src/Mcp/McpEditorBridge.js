@@ -88,11 +88,17 @@ type McpEditorBridgeContext = {|
   // Launch a preview of a specific scene, independent of the editor's active
   // tab. Optional: when absent, launch_preview falls back to runCommand (which
   // previews the active tab) and flags that scene selection was not honored.
-  launchPreviewForScene?: (sceneName: ?string) => mixed,
+  launchPreviewForScene?: (
+    sceneName: ?string,
+    options?: {| displayCollisionShapes?: boolean |}
+  ) => mixed,
   // Resolve the current scene-aware launcher at call time. A project reload
   // replaces and deletes the native gdProject, so a callback captured before
   // reload must not be reused by a later verify_project_change stage.
-  getLaunchPreviewForScene?: () => ?(sceneName: ?string) => mixed,
+  getLaunchPreviewForScene?: () => ?(
+    sceneName: ?string,
+    options?: {| displayCollisionShapes?: boolean |}
+  ) => mixed,
   cancelPreviewLaunch?: (reason: string) => mixed,
   getPreviewLaunchState?: () => Object,
   beginPreviewLaunchSequence?: () => boolean,
@@ -3411,7 +3417,10 @@ const launchPreview = async (
   args: Object,
   options?: {|
     getProject?: ?() => ?gdProject,
-    launchPreviewForScene?: ?(sceneName: ?string) => mixed,
+    launchPreviewForScene?: ?(
+      sceneName: ?string,
+      options?: {| displayCollisionShapes?: boolean |}
+    ) => mixed,
     cancelPreviewLaunch?: ?(reason: string) => mixed,
   |}
 ): Promise<Object> => {
@@ -3425,7 +3434,17 @@ const launchPreview = async (
   }
 
   const startPaused = !!(args && (args.start_paused || args.startPaused));
-  const forceNew = !!(args && (args.force_new || args.forceNew));
+  const displayCollisionShapes =
+    args && typeof args.display_collision_shapes === 'boolean'
+      ? args.display_collision_shapes
+      : args && typeof args.displayCollisionShapes === 'boolean'
+      ? args.displayCollisionShapes
+      : undefined;
+  // Collision-shape display is an export-time preview option. An attached
+  // preview cannot be reconfigured, so an explicit value requires a new one.
+  const forceNew =
+    !!(args && (args.force_new || args.forceNew)) ||
+    displayCollisionShapes !== undefined;
   const timeoutMs = getPreviewReadinessTimeoutMs(args, 15000);
 
   const getProject =
@@ -3458,13 +3477,18 @@ const launchPreview = async (
   // scene-aware launcher. Otherwise we fall back to the legacy command (active
   // tab) and flag that scene selection was not honored.
   const sceneSelectionSupported = !!launchPreviewForScene;
-  const annotate = (result: Object): Object =>
-    annotateLaunchSceneResult(result, {
+  const annotate = (result: Object): Object => {
+    const annotatedResult = annotateLaunchSceneResult(result, {
       expectedScene,
       requestedScene,
       firstLayout,
       sceneSelectionSupported,
     });
+    if (displayCollisionShapes !== undefined) {
+      annotatedResult.displayCollisionShapes = displayCollisionShapes;
+    }
+    return annotatedResult;
+  };
   let launchFailureDetails: ?Object = null;
   const makeWindowLaunchFailure = () => ({
     success: false,
@@ -3485,7 +3509,12 @@ const launchPreview = async (
     launchFailureDetails = null;
     if (launchPreviewForScene) {
       try {
-        const launchResult = await launchPreviewForScene(expectedScene || null);
+        const launchResult =
+          displayCollisionShapes === undefined
+            ? await launchPreviewForScene(expectedScene || null)
+            : await launchPreviewForScene(expectedScene || null, {
+                displayCollisionShapes,
+              });
         if (launchResult === false) {
           launchFailureDetails = { reason: 'scene-aware launch was rejected' };
           return false;
@@ -3505,6 +3534,12 @@ const launchPreview = async (
         };
         return false;
       }
+    }
+    if (displayCollisionShapes !== undefined) {
+      launchFailureDetails = {
+        reason: 'collision-shape-display-is-not-supported',
+      };
+      return false;
     }
     return runCommand('LAUNCH_DEBUG_PREVIEW');
   };

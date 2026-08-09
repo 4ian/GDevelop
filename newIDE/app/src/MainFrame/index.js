@@ -857,8 +857,8 @@ const MainFrame = (props: Props): React.MixedElement => {
   );
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const [
-    displayCollisionMaskInPreview,
-    setDisplayCollisionMaskInPreview,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
   ] = React.useState<boolean>(false);
   const [
     displaySignalAnimationsInPreview,
@@ -3640,6 +3640,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       shouldGenerateScenesEventsCode,
       shouldReloadResources,
       shouldHardReload,
+      displayCollisionShapes,
       fullLoadingScreen,
       forceDiagnosticReport,
       skipDiagnosticErrorBlocking,
@@ -3649,6 +3650,11 @@ const MainFrame = (props: Props): React.MixedElement => {
     }: LaunchPreviewOptions): Promise<boolean> => {
       if (!currentProject) return false;
       if (currentProject.getLayoutsCount() === 0) return false;
+
+      const shouldDisplayCollisionShapes =
+        displayCollisionShapes === undefined
+          ? displayCollisionShapesInPreview
+          : displayCollisionShapes;
 
       if (previewLaunchInProgressRef.current || previewLoadingRef.current) {
         const launchIdToWaitFor = activePreviewLaunchIdRef.current;
@@ -3711,7 +3717,7 @@ const MainFrame = (props: Props): React.MixedElement => {
             shouldGenerateScenesEventsCode,
             shouldReloadResources,
             shouldHardReload,
-            displayCollisionMaskInPreview,
+            displayCollisionShapes: shouldDisplayCollisionShapes,
             displaySignalAnimationsInPreview,
             fullLoadingScreen,
             forceDiagnosticReport,
@@ -3896,7 +3902,7 @@ const MainFrame = (props: Props): React.MixedElement => {
                 : shouldGenerateScenesEventsCode,
             shouldReloadResources: !!shouldReloadResources,
             shouldHardReload: !!shouldHardReload,
-            displayCollisionMask: displayCollisionMaskInPreview,
+            displayCollisionShapes: shouldDisplayCollisionShapes,
             displaySignalAnimations: displaySignalAnimationsInPreview,
             fullLoadingScreen: !!fullLoadingScreen,
             forceAlwaysOnTopInPreview: !!forceAlwaysOnTopInPreview,
@@ -4012,7 +4018,7 @@ const MainFrame = (props: Props): React.MixedElement => {
       previewState.previewLayoutName,
       previewState.overridenPreviewExternalLayoutName,
       previewState.previewExternalLayoutName,
-      displayCollisionMaskInPreview,
+      displayCollisionShapesInPreview,
       displaySignalAnimationsInPreview,
       autosaveProjectIfNeeded,
       loadProjectFromSavedFileForPreview,
@@ -4772,7 +4778,10 @@ const MainFrame = (props: Props): React.MixedElement => {
   // tab is currently focused. When sceneName is empty/unknown, falls back to
   // the editor's normal scene selection.
   const launchPreviewForScene = React.useCallback(
-    async (sceneName: ?string) => {
+    async (
+      sceneName: ?string,
+      options?: {| displayCollisionShapes?: boolean |}
+    ) => {
       const launchState = getPreviewLaunchStateForMcp();
       const isInGameEditionPreviewLaunch =
         inGameEditionPreviewLaunchInProgressRef.current ||
@@ -4836,6 +4845,10 @@ const MainFrame = (props: Props): React.MixedElement => {
               networkPreview: false,
               forcedPreviewLayoutName: sceneName || null,
               numberOfWindows: 1,
+              displayCollisionShapes:
+                options && typeof options.displayCollisionShapes === 'boolean'
+                  ? options.displayCollisionShapes
+                  : undefined,
               forceAlwaysOnTopInPreview: true,
               skipDiagnosticErrorBlocking: true,
               launchCaptureOptions,
@@ -8459,8 +8472,8 @@ const MainFrame = (props: Props): React.MixedElement => {
     launchHotReloadPreview: launchHotReloadPreview,
     launchPreviewWithDiagnosticReport: launchPreviewWithDiagnosticReport,
     setPreviewOverride: setPreviewOverride,
-    displayCollisionMaskInPreview,
-    setDisplayCollisionMaskInPreview,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
     displaySignalAnimationsInPreview,
     setDisplaySignalAnimationsInPreview,
     openVersionHistoryPanel: openVersionHistoryPanel,

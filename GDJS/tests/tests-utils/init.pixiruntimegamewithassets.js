@@ -42,7 +42,7 @@ gdjs.getPixiRuntimeGameWithAssets = (props = null) => {
       projectFile: '',
       scaleMode: 'linear',
       pixelsRounding: false,
-      displayCollisionMask: false,
+      displayCollisionShapes: false,
       sizeOnStartupMode: 'adaptWidth',
       antialiasingMode: 'MSAA',
       antialisingEnabledOnMobile: false,

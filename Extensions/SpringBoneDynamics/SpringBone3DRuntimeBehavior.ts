@@ -5,6 +5,93 @@ namespace gdjs {
     typeof value === 'number' && Number.isFinite(value) ? value : fallback;
   const clamp = (value: number, minimum: number, maximum: number): number =>
     Math.min(maximum, Math.max(minimum, value));
+  const debugColliderRadialSegments = 12;
+  const debugColliderHemisphereSegments = 4;
+  const debugColliderEpsilon = 1e-5;
+
+  /** Build a tapered capsule centered on the local Z axis. @internal */
+  const makeSpringBoneDebugColliderVertices = (
+    length: number,
+    radiusA: number,
+    radiusB: number
+  ): Float32Array => {
+    const safeLength = Math.max(0, finiteOr(length, 0));
+    const safeRadiusA = Math.max(0, finiteOr(radiusA, 0));
+    const safeRadiusB = Math.max(0, finiteOr(radiusB, 0));
+    if (safeRadiusA <= 0 || safeRadiusB <= 0) {
+      return new Float32Array(0);
+    }
+
+    const rings: Array<{ radius: number; z: number }> = [];
+    if (safeLength <= debugColliderEpsilon) {
+      const radius = Math.max(safeRadiusA, safeRadiusB);
+      for (
+        let index = 0;
+        index <= debugColliderHemisphereSegments * 2;
+        index++
+      ) {
+        const latitude =
+          -Math.PI / 2 +
+          (Math.PI * index) / (debugColliderHemisphereSegments * 2);
+        rings.push({
+          radius: Math.cos(latitude) * radius,
+          z: Math.sin(latitude) * radius,
+        });
+      }
+    } else {
+      const halfLength = safeLength / 2;
+      for (let index = 0; index <= debugColliderHemisphereSegments; index++) {
+        const latitude =
+          -Math.PI / 2 +
+          ((Math.PI / 2) * index) / debugColliderHemisphereSegments;
+        rings.push({
+          radius: Math.cos(latitude) * safeRadiusA,
+          z: -halfLength + Math.sin(latitude) * safeRadiusA,
+        });
+      }
+      for (let index = 0; index <= debugColliderHemisphereSegments; index++) {
+        const latitude =
+          ((Math.PI / 2) * index) / debugColliderHemisphereSegments;
+        rings.push({
+          radius: Math.cos(latitude) * safeRadiusB,
+          z: halfLength + Math.sin(latitude) * safeRadiusB,
+        });
+      }
+    }
+
+    const vertices: number[] = [];
+    const appendVertex = (
+      ring: { radius: number; z: number },
+      angle: number
+    ) => {
+      vertices.push(
+        ring.radius * Math.cos(angle),
+        ring.radius * Math.sin(angle),
+        ring.z
+      );
+    };
+    for (let ringIndex = 0; ringIndex < rings.length - 1; ringIndex++) {
+      const ringA = rings[ringIndex];
+      const ringB = rings[ringIndex + 1];
+      for (
+        let segmentIndex = 0;
+        segmentIndex < debugColliderRadialSegments;
+        segmentIndex++
+      ) {
+        const angleA =
+          (Math.PI * 2 * segmentIndex) / debugColliderRadialSegments;
+        const angleB =
+          (Math.PI * 2 * (segmentIndex + 1)) / debugColliderRadialSegments;
+        appendVertex(ringA, angleA);
+        appendVertex(ringB, angleA);
+        appendVertex(ringB, angleB);
+        appendVertex(ringA, angleA);
+        appendVertex(ringB, angleB);
+        appendVertex(ringA, angleB);
+      }
+    }
+    return new Float32Array(vertices);
+  };
 
   export class SpringBone3DRuntimeBehavior extends gdjs.RuntimeBehavior {
     declare owner: gdjs.Model3DRuntimeObject;
@@ -33,6 +120,10 @@ namespace gdjs {
     private _colliderLocalData = new Float32Array(0);
     private _colliderWorldPoints = new Float32Array(0);
     private _colliderWorldData = new Float32Array(0);
+    private _debugCollisionMasks: gdjs.DebugCollisionMask3D[] = [];
+    private _debugCollisionGeometryParameters = new Float32Array(0);
+    private _debugColliderPointA = new THREE.Vector3();
+    private _debugColliderPointB = new THREE.Vector3();
     private _frameData: SpringBoneFrameData = {
       targets: this._targets,
       colliderWorldData: this._colliderWorldData,
@@ -493,6 +584,133 @@ namespace gdjs {
       this._binding = null;
       this._capturedFrame = false;
       this._activeBackend = null;
+      this.clear3DDebugCollisionMaskCache();
+    }
+
+    override get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const configuration = this._configuration;
+      if (
+        !configuration ||
+        this._configurationStatus !== 'ready' ||
+        this._colliderWorldData.length !== configuration.colliders.length * 8
+      ) {
+        this._debugCollisionMasks.length = 0;
+        return this._debugCollisionMasks;
+      }
+
+      const colliderCount = configuration.colliders.length;
+      if (this._debugCollisionGeometryParameters.length !== colliderCount * 3) {
+        this._debugCollisionMasks = [];
+        this._debugCollisionGeometryParameters = new Float32Array(
+          colliderCount * 3
+        );
+      }
+      this._debugCollisionMasks.length = colliderCount;
+      const debugParent = this.owner.getRenderer().get3DRendererObject().parent;
+      if (debugParent) {
+        debugParent.updateWorldMatrix(true, false);
+      }
+
+      for (let index = 0; index < colliderCount; index++) {
+        const worldOffset = index * 8;
+        this._debugColliderPointA.set(
+          this._colliderWorldData[worldOffset],
+          this._colliderWorldData[worldOffset + 1],
+          this._colliderWorldData[worldOffset + 2]
+        );
+        this._debugColliderPointB.set(
+          this._colliderWorldData[worldOffset + 4],
+          this._colliderWorldData[worldOffset + 5],
+          this._colliderWorldData[worldOffset + 6]
+        );
+        if (debugParent) {
+          debugParent.worldToLocal(this._debugColliderPointA);
+          debugParent.worldToLocal(this._debugColliderPointB);
+        }
+        const ax = this._debugColliderPointA.x;
+        const ay = this._debugColliderPointA.y;
+        const az = this._debugColliderPointA.z;
+        const bx = this._debugColliderPointB.x;
+        const by = this._debugColliderPointB.y;
+        const bz = this._debugColliderPointB.z;
+        const deltaX = bx - ax;
+        const deltaY = by - ay;
+        const deltaZ = bz - az;
+        const length = Math.hypot(deltaX, deltaY, deltaZ);
+        const radiusA = this._colliderWorldData[worldOffset + 3];
+        const radiusB = this._colliderWorldData[worldOffset + 7];
+        const geometryOffset = index * 3;
+        let debugMask = this._debugCollisionMasks[index];
+        if (
+          !debugMask ||
+          Math.abs(
+            this._debugCollisionGeometryParameters[geometryOffset] - length
+          ) > debugColliderEpsilon ||
+          Math.abs(
+            this._debugCollisionGeometryParameters[geometryOffset + 1] - radiusA
+          ) > debugColliderEpsilon ||
+          Math.abs(
+            this._debugCollisionGeometryParameters[geometryOffset + 2] - radiusB
+          ) > debugColliderEpsilon
+        ) {
+          debugMask = this._debugCollisionMasks[index] = {
+            vertices: makeSpringBoneDebugColliderVertices(
+              length,
+              radiusA,
+              radiusB
+            ),
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            rotationX: 0,
+            rotationY: 0,
+            rotationZ: 0,
+            rotationW: 1,
+          };
+          this._debugCollisionGeometryParameters[geometryOffset] = length;
+          this._debugCollisionGeometryParameters[geometryOffset + 1] = radiusA;
+          this._debugCollisionGeometryParameters[geometryOffset + 2] = radiusB;
+        }
+
+        debugMask.positionX = (ax + bx) / 2;
+        debugMask.positionY = (ay + by) / 2;
+        debugMask.positionZ = (az + bz) / 2;
+        if (length <= debugColliderEpsilon) {
+          debugMask.rotationX = 0;
+          debugMask.rotationY = 0;
+          debugMask.rotationZ = 0;
+          debugMask.rotationW = 1;
+        } else {
+          const directionX = deltaX / length;
+          const directionY = deltaY / length;
+          const directionZ = deltaZ / length;
+          if (directionZ < -1 + debugColliderEpsilon) {
+            debugMask.rotationX = 1;
+            debugMask.rotationY = 0;
+            debugMask.rotationZ = 0;
+            debugMask.rotationW = 0;
+          } else {
+            const quaternionX = -directionY;
+            const quaternionY = directionX;
+            const quaternionW = 1 + directionZ;
+            const quaternionLength = Math.hypot(
+              quaternionX,
+              quaternionY,
+              quaternionW
+            );
+            debugMask.rotationX = quaternionX / quaternionLength;
+            debugMask.rotationY = quaternionY / quaternionLength;
+            debugMask.rotationZ = 0;
+            debugMask.rotationW = quaternionW / quaternionLength;
+          }
+        }
+      }
+      return this._debugCollisionMasks;
+    }
+
+    override clear3DDebugCollisionMaskCache(): void {
+      this._debugCollisionMasks = [];
+      this._debugCollisionGeometryParameters = new Float32Array(0);
     }
 
     override onDeActivate(): void {

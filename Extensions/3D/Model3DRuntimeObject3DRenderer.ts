@@ -832,6 +832,10 @@ namespace gdjs {
       this._originalModel.scene.updateMatrixWorld(true);
       this._springBonePosition
         .set(x, y, z)
+        // Collider recipes use the authored model coordinate system. Undo the
+        // renderer's configured model rotation and Y reflection before
+        // resolving the point against the raw GLTF bind-pose hierarchy.
+        .applyMatrix4(this._modelCoordinateSystemInverseMatrix)
         .applyMatrix4(this._originalModel.scene.matrixWorld);
       (sourceBone as THREE.Bone).worldToLocal(this._springBonePosition);
       result[offset] = this._springBonePosition.x;

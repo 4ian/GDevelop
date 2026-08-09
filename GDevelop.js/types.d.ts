@@ -3352,6 +3352,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setShouldReloadLibraries(enable: boolean): PreviewExportOptions;
   setShouldGenerateScenesEventsCode(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
+  setDisplayCollisionShapes(enable: boolean): PreviewExportOptions;
   setDisplayCollisionMask(enable: boolean): PreviewExportOptions;
   setDisplaySignalAnimations(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;

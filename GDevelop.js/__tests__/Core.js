@@ -4162,7 +4162,7 @@ describe('libGD.js', function() {
         project,
         '/path/for/export/'
       );
-      previewExportOptions.setDisplayCollisionMask(true);
+      previewExportOptions.setDisplayCollisionShapes(true);
       previewExportOptions.setDisplaySignalAnimations(true);
 
       exporter.serializeProjectData(
@@ -4171,7 +4171,8 @@ describe('libGD.js', function() {
         projectDataElement
       );
       const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
-      expect(projectData.properties.displayCollisionMask).toBe(true);
+      expect(projectData.properties.displayCollisionShapes).toBe(true);
+      expect(projectData.properties.displayCollisionMask).toBeUndefined();
       expect(projectData.properties.displaySignalAnimations).toBe(true);
 
       previewExportOptions.delete();
@@ -4336,7 +4337,10 @@ describe('libGD.js', function() {
       previewExportOptions.setDisplaySignalAnimations(true);
 
       exporter.exportProjectForPixiPreview(previewExportOptions);
-      expect(exportedProjectData.properties.displayCollisionMask).toBe(true);
+      expect(exportedProjectData.properties.displayCollisionShapes).toBe(true);
+      expect(
+        exportedProjectData.properties.displayCollisionMask
+      ).toBeUndefined();
       expect(exportedProjectData.properties.displaySignalAnimations).toBe(true);
 
       previewExportOptions.delete();

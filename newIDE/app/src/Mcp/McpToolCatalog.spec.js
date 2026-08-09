@@ -228,6 +228,35 @@ describe('McpToolCatalog', () => {
     ).toEqual({ canCall: true });
   });
 
+  it('documents collision-shape display for launch_preview', () => {
+    const tool = getMcpTools({
+      allowWriteTools: false,
+      allowCommandTools: false,
+    }).find(tool => tool.name === 'launch_preview');
+
+    if (!tool) throw new Error('launch_preview tool is missing.');
+    expect(tool.inputSchema).toEqual(
+      expect.objectContaining({
+        additionalProperties: false,
+        properties: expect.objectContaining({
+          display_collision_shapes: expect.objectContaining({
+            type: 'boolean',
+          }),
+        }),
+      })
+    );
+    expect(tool.description).toContain('display_collision_shapes');
+    expect(
+      getMcpToolUsageExamples('launch_preview').launch_preview
+    ).toContainEqual(
+      expect.objectContaining({
+        arguments: expect.objectContaining({
+          display_collision_shapes: true,
+        }),
+      })
+    );
+  });
+
   it('exposes generate-catalogs as an awaited, non-destructive catalog write', () => {
     const tool = getMcpTools({
       allowWriteTools: false,

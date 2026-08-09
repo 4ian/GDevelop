@@ -2226,6 +2226,54 @@ runtimeScene._instances.length;
     expect(runCommand).toHaveBeenCalledWith('LAUNCH_DEBUG_PREVIEW');
   });
 
+  it('launch_preview opens a new preview with the requested collision-shape display', async () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    project.insertNewLayout('Level1', 0);
+    project.setFirstLayout('Level1');
+
+    const previewDebuggerServer: any = makeTargetedPreviewServer({
+      debuggerIds: ['preview-ws-0'],
+      responders: {
+        getStatus: { isPaused: false, sceneName: 'Level1' },
+      },
+    });
+    const launchPreviewForScene = jest.fn(() => {
+      setTimeout(
+        () => previewDebuggerServer.connectDebugger('preview-ws-1'),
+        1
+      );
+      return { accepted: true };
+    });
+    const bridge = makeBridge({
+      getProject: () => project,
+      launchPreviewForScene,
+      getPreviewDebuggerServer: () => previewDebuggerServer,
+    });
+
+    const response = await bridge.handleRendererMcpRequest({
+      method: 'tools/call',
+      params: {
+        name: 'launch_preview',
+        arguments: {
+          display_collision_shapes: true,
+          timeout_ms: 1000,
+        },
+      },
+    });
+    const result = JSON.parse(response.content[0].text);
+
+    expect(response.isError).not.toBe(true);
+    expect(result.launched).toBe(true);
+    expect(result.attached).not.toBe(true);
+    expect(result.debuggerId).toBe('preview-ws-1');
+    expect(result.displayCollisionShapes).toBe(true);
+    expect(launchPreviewForScene).toHaveBeenCalledWith('Level1', {
+      displayCollisionShapes: true,
+    });
+
+    project.delete();
+  });
+
   it('launch_preview defaults to the project first scene, not the active tab', async () => {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     project.insertNewLayout('global (for external)', 0);

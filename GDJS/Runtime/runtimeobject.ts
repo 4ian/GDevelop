@@ -749,9 +749,9 @@ namespace gdjs {
         if (!behavior.activated()) {
           continue;
         }
-        const collisionMask = behavior.get3DDebugCollisionMask();
-        if (collisionMask) {
-          collisionMasks.push(collisionMask);
+        const behaviorCollisionMasks = behavior.get3DDebugCollisionMasks();
+        for (let index = 0; index < behaviorCollisionMasks.length; index++) {
+          collisionMasks.push(behaviorCollisionMasks[index]);
         }
       }
       return collisionMasks;

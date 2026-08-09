@@ -156,11 +156,11 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     onLaunchPreviewWithDiagnosticReport={
                       props.launchPreviewWithDiagnosticReport
                     }
-                    displayCollisionMaskInPreview={
-                      props.displayCollisionMaskInPreview
+                    displayCollisionShapesInPreview={
+                      props.displayCollisionShapesInPreview
                     }
-                    setDisplayCollisionMaskInPreview={
-                      props.setDisplayCollisionMaskInPreview
+                    setDisplayCollisionShapesInPreview={
+                      props.setDisplayCollisionShapesInPreview
                     }
                     displaySignalAnimationsInPreview={
                       props.displaySignalAnimationsInPreview

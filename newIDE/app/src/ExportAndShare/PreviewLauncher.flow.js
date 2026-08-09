@@ -22,6 +22,10 @@ export type LaunchPreviewOptions = {
   shouldGenerateScenesEventsCode?: boolean,
   shouldReloadResources?: boolean,
   shouldHardReload?: boolean,
+  // Override the editor preference for this launch only. Used by MCP to make
+  // collision shapes visible in a newly launched preview without changing the
+  // toolbar checkbox.
+  displayCollisionShapes?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
   skipDiagnosticErrorBlocking?: boolean,
@@ -58,7 +62,7 @@ export type PreviewOptions = {|
   shouldGenerateScenesEventsCode: boolean,
   shouldReloadResources: boolean,
   shouldHardReload: boolean,
-  displayCollisionMask: boolean,
+  displayCollisionShapes: boolean,
   displaySignalAnimations: boolean,
   fullLoadingScreen: boolean,
   forceAlwaysOnTopInPreview: boolean,

@@ -147,8 +147,8 @@ export type EditorTabsPaneCommonProps = {|
   launchNetworkPreview: () => Promise<void>,
   launchHotReloadPreview: () => Promise<void>,
   launchPreviewWithDiagnosticReport: () => Promise<void>,
-  displayCollisionMaskInPreview: boolean,
-  setDisplayCollisionMaskInPreview: boolean => void,
+  displayCollisionShapesInPreview: boolean,
+  setDisplayCollisionShapesInPreview: boolean => void,
   displaySignalAnimationsInPreview: boolean,
   setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: (override: {|
@@ -373,8 +373,8 @@ const EditorTabsPane: React.ComponentType<{
     launchNetworkPreview,
     launchHotReloadPreview,
     launchPreviewWithDiagnosticReport,
-    displayCollisionMaskInPreview,
-    setDisplayCollisionMaskInPreview,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
     displaySignalAnimationsInPreview,
     setDisplaySignalAnimationsInPreview,
     setPreviewOverride,
@@ -758,8 +758,8 @@ const EditorTabsPane: React.ComponentType<{
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
-        displayCollisionMaskInPreview={displayCollisionMaskInPreview}
-        setDisplayCollisionMaskInPreview={setDisplayCollisionMaskInPreview}
+        displayCollisionShapesInPreview={displayCollisionShapesInPreview}
+        setDisplayCollisionShapesInPreview={setDisplayCollisionShapesInPreview}
         displaySignalAnimationsInPreview={displaySignalAnimationsInPreview}
         setDisplaySignalAnimationsInPreview={
           setDisplaySignalAnimationsInPreview

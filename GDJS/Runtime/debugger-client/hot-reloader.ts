@@ -524,14 +524,20 @@ namespace gdjs {
         currentScene.getName(),
         () => {}
       );
-      const wasDisplayCollisionMaskEnabled =
-        !!oldProjectData.properties.displayCollisionMask;
-      const isDisplayCollisionMaskEnabled =
-        !!newProjectData.properties.displayCollisionMask;
-      if (wasDisplayCollisionMaskEnabled !== isDisplayCollisionMaskEnabled) {
+      const wasDisplayCollisionShapesEnabled = !!(
+        oldProjectData.properties.displayCollisionShapes ??
+        oldProjectData.properties.displayCollisionMask
+      );
+      const isDisplayCollisionShapesEnabled = !!(
+        newProjectData.properties.displayCollisionShapes ??
+        newProjectData.properties.displayCollisionMask
+      );
+      if (
+        wasDisplayCollisionShapesEnabled !== isDisplayCollisionShapesEnabled
+      ) {
         sceneStack._stack.forEach((runtimeScene) => {
           runtimeScene.enableDebugDraw(
-            isDisplayCollisionMaskEnabled,
+            isDisplayCollisionShapesEnabled,
             false,
             false,
             false
@@ -543,8 +549,7 @@ namespace gdjs {
       const isDisplaySignalAnimationsEnabled =
         !!newProjectData.properties.displaySignalAnimations;
       if (
-        wasDisplaySignalAnimationsEnabled !==
-        isDisplaySignalAnimationsEnabled
+        wasDisplaySignalAnimationsEnabled !== isDisplaySignalAnimationsEnabled
       ) {
         sceneStack._stack.forEach((runtimeScene) => {
           runtimeScene.enableSignalAnimationDebugDraw(

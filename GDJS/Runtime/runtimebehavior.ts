@@ -261,6 +261,25 @@ namespace gdjs {
       return null;
     }
 
+    /**
+     * Return 3D collision shapes to display while debugging a preview.
+     *
+     * The default implementation preserves behaviors implementing the legacy
+     * single-shape hook. Behaviors owning compound collision geometry can
+     * override this method to expose every shape independently.
+     */
+    get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const collisionMasks: gdjs.DebugCollisionMask3D[] = gdjs.staticArray(
+        RuntimeBehavior.prototype.get3DDebugCollisionMasks
+      );
+      collisionMasks.length = 0;
+      const collisionMask = this.get3DDebugCollisionMask();
+      if (collisionMask) {
+        collisionMasks.push(collisionMask);
+      }
+      return collisionMasks;
+    }
+
     /** Release data cached for 3D collision-mask debug rendering. */
     clear3DDebugCollisionMaskCache(): void {}
 

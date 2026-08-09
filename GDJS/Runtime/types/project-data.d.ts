@@ -551,6 +551,8 @@ declare interface ProjectPropertiesData {
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
+  displayCollisionShapes?: boolean;
+  /** @deprecated Compatibility with previews exported before the option was renamed. */
   displayCollisionMask?: boolean;
   displaySignalAnimations?: boolean;
   antialiasingMode: 'none' | 'MSAA';

@@ -237,6 +237,65 @@ describe('3D model bone attachments', function () {
     ).to.be(false);
   });
 
+  it('converts spring collider points from authored model coordinates', function () {
+    const rootBone = makeBone('Root');
+    const marker = new THREE.Object3D();
+    marker.name = 'AuthoredColliderPoint';
+    marker.position.set(0, 2, 0);
+    rootBone.add(marker);
+    const runtimeScene = makeScene(makeGltf([rootBone]));
+    const modelData = makeModelData('Model', 20, 60, 40);
+    modelData.content.rotationX = 90;
+    const model = addModel(runtimeScene, modelData);
+    model.setPosition(120, 230);
+    model.setZ(340);
+    const renderer = model.getRenderer();
+    const binding = renderer.createSpringBoneDynamicsBinding([], ['Root']);
+    expect(binding).to.not.be(null);
+    if (!binding) throw new Error('Expected a spring-bone binding.');
+
+    const localPoint = new Float32Array(3);
+    expect(
+      renderer.convertSpringBoneModelPointToBoneLocal(
+        binding,
+        'Root',
+        0,
+        0,
+        2,
+        localPoint,
+        0
+      )
+    ).to.be(true);
+    const resolvedPoint = new Float32Array(3);
+    expect(
+      renderer.getSpringBoneLocalPointInWorld(
+        binding,
+        'Root',
+        localPoint[0],
+        localPoint[1],
+        localPoint[2],
+        resolvedPoint,
+        0
+      )
+    ).to.be(true);
+
+    const clonedMarker = /** @type {any} */ (renderer)._clonedModelRoot.getObjectByName(
+      'AuthoredColliderPoint'
+    );
+    clonedMarker.updateWorldMatrix(true, false);
+    const expectedPoint = new THREE.Vector3().setFromMatrixPosition(
+      clonedMarker.matrixWorld
+    );
+    expectVectorClose(
+      new THREE.Vector3(
+        resolvedPoint[0],
+        resolvedPoint[1],
+        resolvedPoint[2]
+      ),
+      expectedPoint
+    );
+  });
+
   it('synchronizes logical transforms without inheriting dimensions, flips or renderer parenting', function () {
     const bone = makeBone('Hand', 'Hand.Socket');
     const runtimeScene = makeScene(makeGltf([bone]));

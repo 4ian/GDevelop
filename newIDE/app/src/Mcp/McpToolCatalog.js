@@ -551,6 +551,11 @@ const launchPreviewSchema = {
       description:
         'When true, always open a NEW preview window. By default (false) this attaches to an already-running preview (the editor shares one debugger channel), avoiding duplicate windows and stale game-over windows; set this only when you specifically need a fresh window.',
     },
+    display_collision_shapes: {
+      type: 'boolean',
+      description:
+        'Show object collision shapes in the preview. When omitted, the editor toolbar setting is used. Passing either true or false opens a new preview window because an already-running preview cannot be reconfigured.',
+    },
     timeout_ms: {
       type: 'number',
       description:
@@ -971,7 +976,7 @@ const readTools: Array<McpTool> = [
   {
     name: 'launch_preview',
     description:
-      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. By DEFAULT it previews the project\'s FIRST scene (firstLayout), independent of which scene tab is open in the editor; pass scene_name to preview a specific layout. New preview windows are opened through the same "Start Preview and Debugger" command used by the UI. With start_paused:true, success also requires the pause to be confirmed. The result reports requestedScene/expectedScene/actualScene and sets sceneMismatch:true when the running scene differs from what was requested. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window (when scene_name is given and the running preview is on another scene, a fresh one is launched on the requested scene).',
+      'Launch or attach to a game preview and confirm the runtime debugger is ready by waiting for getStatus. By DEFAULT it previews the project\'s FIRST scene (firstLayout), independent of which scene tab is open in the editor; pass scene_name to preview a specific layout. Set display_collision_shapes to show or hide object collision shapes; an explicit value opens a new preview so the setting is applied. New preview windows are opened through the same "Start Preview and Debugger" command used by the UI. With start_paused:true, success also requires the pause to be confirmed. The result reports requestedScene/expectedScene/actualScene and sets sceneMismatch:true when the running scene differs from what was requested. Returns success:false with failurePhase details if the window/debugger connects but the runtime stays unresponsive. By default it attaches to an already-running preview; pass force_new:true to always open a fresh window (when scene_name is given and the running preview is on another scene, a fresh one is launched on the requested scene).',
     inputSchema: launchPreviewSchema,
   },
   {
@@ -1308,10 +1313,11 @@ const toolUsageExamples: { [string]: Array<Object> } = {
     },
     {
       description:
-        'Preview a specific scene (independent of the open editor tab), paused.',
+        'Preview a specific scene with collision shapes visible (independent of the open editor tab), paused.',
       arguments: {
         scene_name: 'main',
         start_paused: true,
+        display_collision_shapes: true,
       },
     },
   ],

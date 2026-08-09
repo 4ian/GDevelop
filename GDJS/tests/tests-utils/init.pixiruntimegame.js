@@ -17,7 +17,7 @@ gdjs.createProjectData = (settings) => {
       projectFile: '',
       scaleMode: 'linear',
       pixelsRounding: false,
-      displayCollisionMask: false,
+      displayCollisionShapes: false,
       sizeOnStartupMode: '',
       antialiasingMode: 'MSAA',
       antialisingEnabledOnMobile: false,

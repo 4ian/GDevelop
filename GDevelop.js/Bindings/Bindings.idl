@@ -4481,6 +4481,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetShouldReloadLibraries(boolean enable);
     [Ref] PreviewExportOptions SetShouldGenerateScenesEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
+    [Ref] PreviewExportOptions SetDisplayCollisionShapes(boolean enable);
     [Ref] PreviewExportOptions SetDisplayCollisionMask(boolean enable);
     [Ref] PreviewExportOptions SetDisplaySignalAnimations(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);

@@ -180,8 +180,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
       );
-      previewExportOptions.setDisplayCollisionMask(
-        previewOptions.displayCollisionMask
+      previewExportOptions.setDisplayCollisionShapes(
+        previewOptions.displayCollisionShapes
       );
       previewExportOptions.setDisplaySignalAnimations(
         previewOptions.displaySignalAnimations

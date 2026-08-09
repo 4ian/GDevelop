@@ -472,6 +472,9 @@ loop, comment, and JavaScript metadata when editing existing sources.
     with `objects`, `include`, and optional `instance_indexes`. Runtime
     verification is mandatory for rendering/input changes and extension
     actions that create, delete, pick, or mutate objects.
+    Pass `display_collision_shapes: true` when collision geometry must be
+    visually verified. An explicit true or false starts a fresh preview because
+    the collision-shape display cannot be reconfigured on an attached preview.
     If any project source changes after the reload, call `reload_project` again
     before the next preview, preceded by a new successful
     `validate_project_files` call and Git commit for those edits.

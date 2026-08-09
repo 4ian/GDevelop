@@ -43,7 +43,7 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         useMinimalDebuggerClient(false),
         nativeMobileApp(false),
-        displayCollisionMask(false),
+        displayCollisionShapes(false),
         displaySignalAnimations(false),
         fullLoadingScreen(false),
         isDevelopmentEnvironment(false),
@@ -131,10 +131,18 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set if collision masks should be displayed in the preview.
+   * \brief Set if collision shapes should be displayed in the preview.
+   */
+  PreviewExportOptions &SetDisplayCollisionShapes(bool enable) {
+    displayCollisionShapes = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Compatibility alias for SetDisplayCollisionShapes.
    */
   PreviewExportOptions &SetDisplayCollisionMask(bool enable) {
-    displayCollisionMask = enable;
+    displayCollisionShapes = enable;
     return *this;
   }
 
@@ -408,7 +416,7 @@ struct PreviewExportOptions {
   gd::String inAppTutorialMessageInPreview;
   gd::String inAppTutorialMessagePositionInPreview;
   bool nativeMobileApp;
-  bool displayCollisionMask;
+  bool displayCollisionShapes;
   bool displaySignalAnimations;
   std::map<gd::String, int> includeFileHashes;
   bool shouldClearExportFolder = true;
@@ -515,7 +523,7 @@ class ExporterHelper {
       gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
       const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
       const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources,
-      bool displayCollisionMask = false,
+      bool displayCollisionShapes = false,
       bool displaySignalAnimations = false);
 
   /**

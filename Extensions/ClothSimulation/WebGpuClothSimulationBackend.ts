@@ -1,10 +1,11 @@
-/// <reference types="@webgpu/types" />
+/// <reference types="types" />
 
 namespace gdjs {
   type ClothReadbackSlot = {
     buffer: GPUBuffer;
     busy: boolean;
     sequence: number;
+    epoch: number;
   };
 
   const getBufferUsage = () =>
@@ -32,9 +33,7 @@ namespace gdjs {
     return result;
   };
 
-  export class WebGpuClothSimulationBackend
-    implements ClothSimulationBackend
-  {
+  export class WebGpuClothSimulationBackend implements ClothSimulationBackend {
     readonly kind: ClothBackendKind = 'WebGPU';
     readonly generation: number;
     private _manager: WebGpuClothDeviceManager;
@@ -47,18 +46,20 @@ namespace gdjs {
     private _particleDataBuffer: GPUBuffer | null = null;
     private _adjacencyBuffer: GPUBuffer | null = null;
     private _pinBuffer: GPUBuffer | null = null;
+    private _pinCommandBuffer: GPUBuffer | null = null;
     private _uniformBuffer: GPUBuffer | null = null;
-    private _springBindGroup: GPUBindGroup | null = null;
-    private _particleBindGroup: GPUBindGroup | null = null;
+    private _bindGroup: GPUBindGroup | null = null;
     private _readbackSlots: ClothReadbackSlot[] = [];
     private _positionVec4: Float32Array;
     private _previousPositionVec4: Float32Array;
     private _particleData: Uint32Array;
     private _pinTargetsVec4: Float32Array;
+    private _pinCommandData: Uint32Array;
     private _fixed: Uint8Array;
     private _latestRecoverablePositions: Float32Array;
     private _latestRecoverablePreviousPositions: Float32Array;
     private _latestSnapshot: ClothSimulationSnapshot | null = null;
+    private _readbackEpoch = 0;
     private _parameters: ClothStepParameters = {
       stiffness: 0.2,
       damping: 0.99,
@@ -94,8 +95,8 @@ namespace gdjs {
         return backend;
       } catch (error) {
         backend.dispose();
-        if (error instanceof ClothWebGpuError) throw error;
-        throw new ClothWebGpuError('webgpu-allocation-failed');
+        if (error instanceof gdjs.ClothWebGpuError) throw error;
+        throw new gdjs.ClothWebGpuError('webgpu-allocation-failed');
       }
     }
 
@@ -115,6 +116,7 @@ namespace gdjs {
       this._fixed = state.fixed.slice();
       this._pinTargetsVec4 = stateToVec4(state.pinTargets);
       this._particleData = new Uint32Array(topology.particleCount * 4);
+      this._pinCommandData = new Uint32Array(topology.particleCount);
       this._latestRecoverablePositions = state.positions.slice();
       this._latestRecoverablePreviousPositions =
         state.previousPositions.slice();
@@ -140,7 +142,7 @@ namespace gdjs {
         largestStorageBuffer > maximumStorageSize ||
         stateBufferSize * 2 > maximumBufferSize
       ) {
-        throw new ClothWebGpuError('webgpu-limit-insufficient');
+        throw new gdjs.ClothWebGpuError('webgpu-limit-insufficient');
       }
 
       const createBuffer = (
@@ -183,6 +185,11 @@ namespace gdjs {
         stateBufferSize,
         usage.STORAGE | usage.COPY_DST
       );
+      this._pinCommandBuffer = createBuffer(
+        'GDevelop cloth pin commands',
+        this._topology.particleCount * 4,
+        usage.STORAGE | usage.COPY_DST
+      );
       this._uniformBuffer = createBuffer(
         'GDevelop cloth parameters',
         64,
@@ -210,7 +217,11 @@ namespace gdjs {
         );
       }
       const adjacency = new Uint32Array(this._topology.springCount * 2);
-      for (let particleIndex = 0; particleIndex < this._topology.particleCount; particleIndex++) {
+      for (
+        let particleIndex = 0;
+        particleIndex < this._topology.particleCount;
+        particleIndex++
+      ) {
         this._particleData[particleIndex * 4] = this._fixed[particleIndex];
         this._particleData[particleIndex * 4 + 1] =
           this._topology.adjacencyOffsets[particleIndex + 1] -
@@ -245,15 +256,11 @@ namespace gdjs {
         { binding: 5, resource: { buffer: this._adjacencyBuffer } },
         { binding: 6, resource: { buffer: this._pinBuffer } },
         { binding: 7, resource: { buffer: this._uniformBuffer } },
+        { binding: 8, resource: { buffer: this._pinCommandBuffer } },
       ];
-      this._springBindGroup = device.createBindGroup({
-        label: 'GDevelop cloth spring bindings',
-        layout: this._manager.springPipeline.getBindGroupLayout(0),
-        entries,
-      });
-      this._particleBindGroup = device.createBindGroup({
-        label: 'GDevelop cloth particle bindings',
-        layout: this._manager.particlePipeline.getBindGroupLayout(0),
+      this._bindGroup = device.createBindGroup({
+        label: 'GDevelop cloth bindings',
+        layout: this._manager.bindGroupLayout,
         entries,
       });
       for (let index = 0; index < 3; index++) {
@@ -265,6 +272,7 @@ namespace gdjs {
           ),
           busy: false,
           sequence: -1,
+          epoch: 0,
         });
       }
     }
@@ -275,7 +283,11 @@ namespace gdjs {
 
     applyPinCommands(commands: readonly ClothPinCommand[]): void {
       if (this._disposed || commands.length === 0) return;
-      for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
+      for (
+        let commandIndex = 0;
+        commandIndex < commands.length;
+        commandIndex++
+      ) {
         const command = commands[commandIndex];
         if (command.index < 0 || command.index >= this._topology.particleCount)
           continue;
@@ -283,6 +295,10 @@ namespace gdjs {
         const xyzOffset = index * 3;
         const vec4Offset = index * 4;
         if (command.pinned) {
+          const hasExplicitTarget =
+            Number.isFinite(command.targetX) &&
+            Number.isFinite(command.targetY) &&
+            Number.isFinite(command.targetZ);
           const targetX = Number.isFinite(command.targetX)
             ? command.targetX!
             : this._latestRecoverablePositions[xyzOffset];
@@ -297,33 +313,32 @@ namespace gdjs {
           this._pinTargetsVec4[vec4Offset + 1] = targetY;
           this._pinTargetsVec4[vec4Offset + 2] = targetZ;
           this._pinTargetsVec4[vec4Offset + 3] = 1;
-          this._positionVec4.set(
-            this._pinTargetsVec4.subarray(vec4Offset, vec4Offset + 4),
-            vec4Offset
-          );
-          this._previousPositionVec4.set(
-            this._pinTargetsVec4.subarray(vec4Offset, vec4Offset + 4),
-            vec4Offset
-          );
+          this._pinCommandData[index] = hasExplicitTarget ? 3 : 1;
         } else {
           this._fixed[index] = 0;
-          this._previousPositionVec4.set(
-            this._positionVec4.subarray(vec4Offset, vec4Offset + 4),
-            vec4Offset
-          );
+          this._pinCommandData[index] = 2;
         }
         this._particleData[index * 4] = this._fixed[index];
       }
       try {
         const queue = this._manager.device.queue;
-        queue.writeBuffer(this._positionBuffer!, 0, this._positionVec4);
-        queue.writeBuffer(
-          this._previousPositionBuffer!,
-          0,
-          this._previousPositionVec4
-        );
+        const unsignedView = new Uint32Array(this._uniformData);
+        unsignedView[0] = this._topology.particleCount;
+        unsignedView[1] = this._topology.springCount;
         queue.writeBuffer(this._pinBuffer!, 0, this._pinTargetsVec4);
         queue.writeBuffer(this._particleDataBuffer!, 0, this._particleData);
+        queue.writeBuffer(this._pinCommandBuffer!, 0, this._pinCommandData);
+        queue.writeBuffer(this._uniformBuffer!, 0, this._uniformData);
+        const pinPass = this._manager.getCommandEncoder().beginComputePass({
+          label: 'GDevelop cloth pin maintenance',
+        });
+        pinPass.setPipeline(this._manager.pinPipeline);
+        pinPass.setBindGroup(0, this._bindGroup!);
+        pinPass.dispatchWorkgroups(
+          Math.ceil(this._topology.particleCount / 64)
+        );
+        pinPass.end();
+        this._pinCommandData.fill(0);
       } catch (_error) {
         this._fail('webgpu-submit-failed');
       }
@@ -364,7 +379,7 @@ namespace gdjs {
           label: 'GDevelop cloth springs',
         });
         springPass.setPipeline(this._manager.springPipeline);
-        springPass.setBindGroup(0, this._springBindGroup!);
+        springPass.setBindGroup(0, this._bindGroup!);
         springPass.dispatchWorkgroups(
           Math.ceil(this._topology.springCount / 64)
         );
@@ -373,7 +388,7 @@ namespace gdjs {
           label: 'GDevelop cloth particles',
         });
         particlePass.setPipeline(this._manager.particlePipeline);
-        particlePass.setBindGroup(0, this._particleBindGroup!);
+        particlePass.setBindGroup(0, this._bindGroup!);
         particlePass.dispatchWorkgroups(
           Math.ceil(this._topology.particleCount / 64)
         );
@@ -385,10 +400,11 @@ namespace gdjs {
 
     requestSnapshot(sequence: number): void {
       if (this._disposed) return;
-      const slot = this._readbackSlots.find(candidate => !candidate.busy);
+      const slot = this._readbackSlots.find((candidate) => !candidate.busy);
       if (!slot) return;
       slot.busy = true;
       slot.sequence = sequence;
+      slot.epoch = this._readbackEpoch;
       try {
         const stateBufferSize = this._topology.particleCount * 16;
         const encoder = this._manager.getCommandEncoder();
@@ -417,7 +433,7 @@ namespace gdjs {
       slot.buffer
         .mapAsync(getMapReadMode())
         .then(() => {
-          if (this._disposed) return;
+          if (this._disposed || slot.epoch !== this._readbackEpoch) return;
           const mapped = slot.buffer.getMappedRange();
           const values = new Float32Array(mapped);
           const particleCount = this._topology.particleCount;
@@ -432,7 +448,7 @@ namespace gdjs {
                 !Number.isFinite(currentValue) ||
                 !Number.isFinite(previousValue)
               ) {
-                throw new ClothWebGpuError('webgpu-invalid-snapshot');
+                throw new gdjs.ClothWebGpuError('webgpu-invalid-snapshot');
               }
               positions[index * 3 + component] = currentValue;
               previousPositions[index * 3 + component] = previousValue;
@@ -442,6 +458,12 @@ namespace gdjs {
             !this._latestSnapshot ||
             slot.sequence > this._latestSnapshot.sequence
           ) {
+            for (let index = 0; index < particleCount; index++) {
+              if (!this._fixed[index]) continue;
+              this._pinTargetsVec4[index * 4] = positions[index * 3];
+              this._pinTargetsVec4[index * 4 + 1] = positions[index * 3 + 1];
+              this._pinTargetsVec4[index * 4 + 2] = positions[index * 3 + 2];
+            }
             this._latestRecoverablePositions = positions;
             this._latestRecoverablePreviousPositions = previousPositions;
             this._positionVec4 = stateToVec4(positions);
@@ -453,9 +475,9 @@ namespace gdjs {
             };
           }
         })
-        .catch(error => {
+        .catch((error) => {
           this._fail(
-            error instanceof ClothWebGpuError
+            error instanceof gdjs.ClothWebGpuError
               ? error.reason
               : 'webgpu-map-failed'
           );
@@ -489,6 +511,7 @@ namespace gdjs {
 
     reset(state: ClothSimulationState): void {
       if (this._disposed) return;
+      this._readbackEpoch++;
       this._latestRecoverablePositions = state.positions.slice();
       this._latestRecoverablePreviousPositions =
         state.previousPositions.slice();
@@ -532,6 +555,7 @@ namespace gdjs {
         this._particleDataBuffer,
         this._adjacencyBuffer,
         this._pinBuffer,
+        this._pinCommandBuffer,
         this._uniformBuffer,
       ];
       for (let index = 0; index < buffers.length; index++) {

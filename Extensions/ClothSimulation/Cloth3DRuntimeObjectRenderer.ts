@@ -5,7 +5,6 @@ namespace gdjs {
     private _lastSnapshotSequence = -1;
     private _lastWidth: number;
     private _lastHeight: number;
-    private _lastDepth: number;
     private _disposed = false;
 
     constructor(
@@ -23,7 +22,6 @@ namespace gdjs {
       this._mesh = mesh;
       this._lastWidth = runtimeObject.getWidth();
       this._lastHeight = runtimeObject.getHeight();
-      this._lastDepth = runtimeObject.getDepth();
       this.updateAppearance();
       this.updateSize();
       this.updatePosition();
@@ -55,7 +53,8 @@ namespace gdjs {
     rebuildGeometry(topology: ClothSimulationTopology): void {
       if (this._disposed) return;
       const oldGeometry = this._mesh.geometry;
-      this._mesh.geometry = Cloth3DRuntimeObjectRenderer._makeGeometry(topology);
+      this._mesh.geometry =
+        Cloth3DRuntimeObjectRenderer._makeGeometry(topology);
       oldGeometry.dispose();
       this._lastSnapshotSequence = -1;
     }
@@ -88,7 +87,9 @@ namespace gdjs {
     updateAppearance(): void {
       if (this._disposed) return;
       const data = this._clothObject.getNormalizedContent();
-      const components = data.color.split(';').map(component => Number(component));
+      const components = data.color
+        .split(';')
+        .map((component) => Number(component));
       this._mesh.material.color.setRGB(
         components[0] / 255,
         components[1] / 255,
@@ -117,12 +118,10 @@ namespace gdjs {
       if (!this._clothObject) return;
       const width = object.getWidth();
       const height = object.getHeight();
-      const depth = object.getDepth();
       const topologySizeChanged =
         width !== this._lastWidth || height !== this._lastHeight;
       this._lastWidth = width;
       this._lastHeight = height;
-      this._lastDepth = depth;
       if (topologySizeChanged) this._clothObject._onRuntimeSizeChanged();
     }
 

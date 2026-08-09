@@ -25,6 +25,7 @@ import EventsFunctionConfigurationEditor, {
 import EventsFunctionsListWithErrorBoundary, {
   type EventsFunctionsListInterface,
 } from '../EventsFunctionsList';
+import { addFunctionsListToggleButtonToToolbar } from '../EventsFunctionsList/FunctionsListToggleButton';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import { type EventsBasedObjectCreationParameters } from '../EventsFunctionsList/EventsBasedObjectTreeViewItemContent';
 import Background from '../UI/Background';
@@ -497,10 +498,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.editor.updateToolbar();
     } else if (this.props.focusedEventsBasedBehavior) {
       // Behavior detail pages expose behavior settings from the left panel.
-      this.props.setToolbar(null);
+      this._setToolbar(null);
     } else {
       // Otherwise, show the extension settings buttons.
-      this.props.setToolbar(
+      this._setToolbar(
         <ToolbarGroup lastChild>
           <IconButton
             size="small"
@@ -513,6 +514,37 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         </ToolbarGroup>
       );
     }
+  };
+
+  _isFunctionsListCollapsed = (): boolean =>
+    !!this._editorMosaic &&
+    this._editorMosaic.isEditorCollapsed('functions-list');
+
+  _toggleFunctionsList = (): boolean => {
+    const editorMosaic = this._editorMosaic;
+    if (!editorMosaic) {
+      if (this._editorNavigator) {
+        this._editorNavigator.openEditor('functions-list');
+      }
+      return false;
+    }
+
+    const isCollapsed = this._isFunctionsListCollapsed();
+    if (isCollapsed) {
+      editorMosaic.uncollapseEditor('functions-list', 20);
+    } else {
+      editorMosaic.collapseEditor('functions-list');
+    }
+    return !isCollapsed;
+  };
+
+  _setToolbar = (editorToolbar: ?React.Node): void => {
+    this.props.setToolbar(
+      addFunctionsListToggleButtonToToolbar(editorToolbar, {
+        isFunctionsListCollapsed: this._isFunctionsListCollapsed,
+        onToggleFunctionsList: this._toggleFunctionsList,
+      })
+    );
   };
 
   setGlobalSearchResults = (
@@ -2248,7 +2280,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 openInstructionOrExpression={
                   this.props.openInstructionOrExpression
                 }
-                setToolbar={this.props.setToolbar}
+                setToolbar={this._setToolbar}
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={
@@ -2607,6 +2639,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       // $FlowFixMe[incompatible-type]
                       editors={editors}
                       centralNodeId="events-sheet"
+                      onDragOrResizedEnded={this.updateToolbar}
                       onPersistNodes={(node) =>
                         setDefaultEditorMosaicNode(
                           isDetailMode

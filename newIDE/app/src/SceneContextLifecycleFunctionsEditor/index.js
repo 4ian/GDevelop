@@ -4,7 +4,15 @@ import * as React from 'react';
 
 import { type EventsSheetInterface } from '../EventsSheet';
 import { type TreeViewInterface } from '../UI/TreeView';
+import EditorMosaic, {
+  type EditorMosaicInterface,
+  type EditorMosaicNode,
+  mosaicContainsNode,
+} from '../UI/EditorMosaic';
 import EventsFunctionsTreeView from '../EventsFunctionsList/EventsFunctionsTreeView';
+import PreferencesContext, {
+  type EditorMosaicName,
+} from '../MainFrame/Preferences/PreferencesContext';
 import {
   DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
   isSceneLifecycleFunctionName,
@@ -13,25 +21,11 @@ import {
 } from '../SceneContextLifecycleFunctions';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flex: 1,
-    minWidth: 0,
-  },
-  list: {
-    width: 292,
-    minWidth: 240,
-    maxWidth: 340,
-    flexShrink: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    borderRight: '1px solid rgba(128, 128, 128, 0.25)',
-  },
   editor: {
     display: 'flex',
     flex: 1,
     minWidth: 0,
+    minHeight: 0,
   },
   hiddenEditor: {
     display: 'none',
@@ -59,6 +53,8 @@ export type SceneContextLifecycleFunctionsEditorInterface = {|
   getEditor: (name: SceneLifecycleFunctionName) => ?EventsSheetInterface,
   forEachEditor: (callback: (EventsSheetInterface) => void) => void,
   selectFunctionByName: (name: string) => boolean,
+  isFunctionsListCollapsed: () => boolean,
+  toggleFunctionsList: () => boolean,
 |};
 
 type LifecycleFunctionTreeItem = {|
@@ -108,6 +104,20 @@ const getItemChildren = (item: LifecycleFunctionTreeItem) => item.children;
 const getItemId = (item: LifecycleFunctionTreeItem) => item.id;
 const getItemHtmlId = (item: LifecycleFunctionTreeItem): string => item.id;
 
+const getInitialMosaicEditorNodes = (): EditorMosaicNode => ({
+  direction: 'row',
+  first: 'functions-list',
+  second: 'events-sheet',
+  splitPercentage: 20,
+});
+
+const getMosaicPreferenceName = (
+  ownerKind: 'scene' | 'external-events'
+): EditorMosaicName =>
+  ownerKind === 'scene'
+    ? 'scene-lifecycle-functions-editor'
+    : 'external-events-lifecycle-functions-editor';
+
 const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
   ...Props,
   +ref?: React.RefSetter<SceneContextLifecycleFunctionsEditorInterface>,
@@ -132,6 +142,11 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
     }>({});
     const treeViewRef =
       React.useRef<?TreeViewInterface<LifecycleFunctionTreeItem>>(null);
+    const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
+    const {
+      getDefaultEditorMosaicNode,
+      setDefaultEditorMosaicNode,
+    } = React.useContext(PreferencesContext);
 
     const lifecycleFunctionTreeItems = React.useMemo<
       Array<LifecycleFunctionTreeItem>,
@@ -206,13 +221,33 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
           );
         },
         selectFunctionByName,
+        isFunctionsListCollapsed: () =>
+          !!editorMosaicRef.current &&
+          editorMosaicRef.current.isEditorCollapsed('functions-list'),
+        toggleFunctionsList: () => {
+          const editorMosaic = editorMosaicRef.current;
+          if (!editorMosaic) return false;
+
+          const isCollapsed = editorMosaic.isEditorCollapsed(
+            'functions-list'
+          );
+          if (isCollapsed) {
+            editorMosaic.uncollapseEditor('functions-list', 20);
+          } else {
+            editorMosaic.collapseEditor('functions-list');
+          }
+          return !isCollapsed;
+        },
       }),
       [selectFunctionByName, selectedLifecycleFunctionName]
     );
 
-    return (
-      <div style={styles.container}>
-        <div style={styles.list}>
+    const editors = {
+      'functions-list': {
+        type: 'primary',
+        noTitleBar: true,
+        toolbarControls: [],
+        renderEditor: () => (
           <EventsFunctionsTreeView
             listKey={rootTreeItem.id}
             treeViewRef={treeViewRef}
@@ -238,31 +273,62 @@ const SceneContextLifecycleFunctionsEditor: React.ComponentType<{
             reactDndType="GD_SCENE_LIFECYCLE_FUNCTION_ITEM"
             initiallyOpenedNodeIds={[rootTreeItem.id]}
           />
-        </div>
-        {sceneLifecycleFunctionDefinitions
-          .filter((definition) =>
-            mountedLifecycleFunctionNames.includes(definition.name)
-          )
-          .map((definition) => {
-            const isSelected =
-              definition.name === selectedLifecycleFunctionName;
-            return (
-              <div
-                key={definition.name}
-                style={isSelected ? styles.editor : styles.hiddenEditor}
-              >
-                {renderFunctionEditor({
-                  lifecycleFunctionName: definition.name,
-                  isSelected,
-                  editorRef: (editor) => {
-                    editorsByLifecycleFunctionName.current[definition.name] =
-                      editor;
-                  },
-                })}
-              </div>
-            );
-          })}
-      </div>
+        ),
+      },
+      'events-sheet': {
+        type: 'primary',
+        noTitleBar: true,
+        toolbarControls: [],
+        renderEditor: () => (
+          <>
+            {sceneLifecycleFunctionDefinitions
+              .filter((definition) =>
+                mountedLifecycleFunctionNames.includes(definition.name)
+              )
+              .map((definition) => {
+                const isSelected =
+                  definition.name === selectedLifecycleFunctionName;
+                return (
+                  <div
+                    key={definition.name}
+                    style={isSelected ? styles.editor : styles.hiddenEditor}
+                  >
+                    {renderFunctionEditor({
+                      lifecycleFunctionName: definition.name,
+                      isSelected,
+                      editorRef: (editor) => {
+                        editorsByLifecycleFunctionName.current[
+                          definition.name
+                        ] = editor;
+                      },
+                    })}
+                  </div>
+                );
+              })}
+          </>
+        ),
+      },
+    };
+    const mosaicPreferenceName = getMosaicPreferenceName(ownerKind);
+    const savedMosaicNode = getDefaultEditorMosaicNode(mosaicPreferenceName);
+    const initialMosaicNode =
+      savedMosaicNode &&
+      mosaicContainsNode(savedMosaicNode, 'functions-list') &&
+      mosaicContainsNode(savedMosaicNode, 'events-sheet')
+        ? savedMosaicNode
+        : getInitialMosaicEditorNodes();
+
+    return (
+      <EditorMosaic
+        ref={editorMosaicRef}
+        // $FlowFixMe[incompatible-type]
+        editors={editors}
+        centralNodeId="events-sheet"
+        initialNodes={initialMosaicNode}
+        onPersistNodes={(node) =>
+          setDefaultEditorMosaicNode(mosaicPreferenceName, node)
+        }
+      />
     );
   }
 );

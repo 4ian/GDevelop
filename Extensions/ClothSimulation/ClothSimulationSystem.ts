@@ -1,5 +1,5 @@
 namespace gdjs {
-  interface RuntimeScene {
+  export interface RuntimeScene {
     clothSimulationSystem: gdjs.ClothSimulationSystem | null;
   }
 
@@ -63,7 +63,9 @@ namespace gdjs {
     }
 
     unregisterObject(object: gdjs.Cloth3DRuntimeObject): void {
-      const index = this._records.findIndex(record => record.object === object);
+      const index = this._records.findIndex(
+        (record) => record.object === object
+      );
       if (index === -1) return;
       this._records[index].backend.dispose();
       this._records.splice(index, 1);
@@ -151,10 +153,15 @@ namespace gdjs {
 
       const manager = this._managerReady ? this._manager : null;
       if (manager) manager.beginFrame();
+      const normalizedElapsedTime = Math.max(
+        0,
+        Number.isFinite(elapsedSeconds) ? elapsedSeconds : 0
+      );
       const contributedTime = Math.min(
         maximumFrameDelta,
-        Math.max(0, Number.isFinite(elapsedSeconds) ? elapsedSeconds : 0)
+        normalizedElapsedTime
       );
+      const frameCapDiscardedTime = normalizedElapsedTime - contributedTime;
 
       for (let index = 0; index < this._records.length; index++) {
         const record = this._records[index];
@@ -170,6 +177,9 @@ namespace gdjs {
         if (pinCommands.length !== 0) {
           record.backend.applyPinCommands(pinCommands);
           object._clearPendingPinCommands();
+        }
+        if (frameCapDiscardedTime > 0) {
+          object._addDroppedSimulationTime(frameCapDiscardedTime);
         }
         record.accumulator += contributedTime;
         const fixedDelta = 1 / object.getSimulationFrequency();
@@ -232,7 +242,7 @@ namespace gdjs {
               record.object.getSimulationTopology(),
               record.backend.exportLatestRecoverableState(),
               record.object.getSimulationGeneration(),
-              reason => {
+              (reason) => {
                 if (!this._disposed) this._managerFailureReason = reason;
               }
             );
@@ -242,7 +252,7 @@ namespace gdjs {
             record.object._setActiveBackend('WebGPU');
           } catch (error) {
             const reason =
-              error instanceof ClothWebGpuError
+              error instanceof gdjs.ClothWebGpuError
                 ? error.reason
                 : 'webgpu-allocation-failed';
             record.object._setFallbackReason(reason);
@@ -286,7 +296,7 @@ namespace gdjs {
       if (
         this._disposed ||
         this._managerInitializationStarted ||
-        !this._records.some(record => this._isWebGpuEligible(record.object))
+        !this._records.some((record) => this._isWebGpuEligible(record.object))
       ) {
         return;
       }
@@ -300,10 +310,10 @@ namespace gdjs {
         .then(() => {
           if (!this._disposed) this._managerReady = true;
         })
-        .catch(error => {
+        .catch((error) => {
           if (this._disposed) return;
           this._managerFailureReason =
-            error instanceof ClothWebGpuError
+            error instanceof gdjs.ClothWebGpuError
               ? error.reason
               : 'webgpu-device-failed';
         });
@@ -345,9 +355,7 @@ namespace gdjs {
     private _findRecord(
       object: gdjs.Cloth3DRuntimeObject
     ): ClothSimulationRecord | null {
-      return (
-        this._records.find(record => record.object === object) || null
-      );
+      return this._records.find((record) => record.object === object) || null;
     }
 
     dispose(): void {
@@ -365,13 +373,13 @@ namespace gdjs {
     }
   }
 
-  gdjs.registerRuntimeScenePostEventsCallback(runtimeScene => {
+  gdjs.registerRuntimeScenePostEventsCallback((runtimeScene) => {
     const system = runtimeScene.clothSimulationSystem;
     if (!system) return;
     system.step(runtimeScene.getTimeManager().getElapsedTime() / 1000);
   });
 
-  gdjs.registerRuntimeSceneUnloadedCallback(runtimeScene => {
+  gdjs.registerRuntimeSceneUnloadedCallback((runtimeScene) => {
     const system = runtimeScene.clothSimulationSystem;
     if (!system) return;
     system.dispose();

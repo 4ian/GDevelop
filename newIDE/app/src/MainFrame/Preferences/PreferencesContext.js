@@ -52,7 +52,9 @@ export type EditorMosaicName =
   | 'resources-editor'
   | 'events-functions-extension-editor'
   | 'events-functions-extension-detail-editor'
-  | 'prefab-detail-editor';
+  | 'prefab-detail-editor'
+  | 'scene-lifecycle-functions-editor'
+  | 'external-events-lifecycle-functions-editor';
 
 export type InAppTutorialUserProgress = {|
   step: number,

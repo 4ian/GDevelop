@@ -86,9 +86,7 @@ namespace gdjs {
         );
         topology.restPositions[positionOffset + 2] = 0;
         topology.uvs[particleIndex * 2] = Math.fround(column / segmentsX);
-        topology.uvs[particleIndex * 2 + 1] = Math.fround(
-          1 - row / segmentsY
-        );
+        topology.uvs[particleIndex * 2 + 1] = Math.fround(1 - row / segmentsY);
       }
     }
 

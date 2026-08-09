@@ -31,6 +31,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope';
 import SceneContextLifecycleFunctionsEditor, {
   type SceneContextLifecycleFunctionsEditorInterface,
 } from '../../SceneContextLifecycleFunctionsEditor';
+import { addFunctionsListToggleButtonToToolbar } from '../../EventsFunctionsList/FunctionsListToggleButton';
 import {
   DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
   getSceneLifecycleEventsFunction,
@@ -86,9 +87,27 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     } else {
       // Clear the toolbar if the editor is not ready yet to avoid showing stale toolbar
       // from the previous editor (e.g., HomePage)
-      this.props.setToolbar(null);
+      this.setToolbar(null);
     }
   }
+
+  isFunctionsListCollapsed = (): boolean =>
+    !!this.lifecycleFunctionsEditor &&
+    this.lifecycleFunctionsEditor.isFunctionsListCollapsed();
+
+  toggleFunctionsList = (): boolean =>
+    this.lifecycleFunctionsEditor
+      ? this.lifecycleFunctionsEditor.toggleFunctionsList()
+      : false;
+
+  setToolbar = (editorToolbar: ?React.Node): void => {
+    this.props.setToolbar(
+      addFunctionsListToggleButtonToToolbar(editorToolbar, {
+        isFunctionsListCollapsed: this.isFunctionsListCollapsed,
+        onToggleFunctionsList: this.toggleFunctionsList,
+      })
+    );
+  };
 
   scrollToEventPath(eventPath: EventPath) {
     const editor = this.getSelectedEditor();
@@ -283,7 +302,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
           return (
             <EventsFunctionEditor
               ref={editorRef}
-              setToolbar={this.props.setToolbar}
+              setToolbar={this.setToolbar}
               onOpenLayoutEditor={this.openLayoutEditor}
               onOpenLayout={this.props.onOpenLayout}
               resourceManagementProps={this.props.resourceManagementProps}

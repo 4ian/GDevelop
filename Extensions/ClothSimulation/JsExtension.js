@@ -37,12 +37,32 @@ const defaultContent = {
 const clamp = (value, minimum, maximum) =>
   Math.min(maximum, Math.max(minimum, value));
 const finite = (value, fallback) =>
-  Number.isFinite(Number(value)) ? Number(value) : fallback;
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 const integer = (value, fallback, minimum, maximum) =>
   clamp(Math.trunc(finite(value, fallback)), minimum, maximum);
+const boolean = (value, fallback) =>
+  typeof value === 'boolean' ? value : fallback;
+const normalizeColor = (value) => {
+  if (typeof value !== 'string') return defaultContent.color;
+  const rgbMatch = value.match(
+    /^\s*(\d{1,3})\s*;\s*(\d{1,3})\s*;\s*(\d{1,3})\s*$/
+  );
+  if (rgbMatch) {
+    const red = Number(rgbMatch[1]);
+    const green = Number(rgbMatch[2]);
+    const blue = Number(rgbMatch[3]);
+    if (red <= 255 && green <= 255 && blue <= 255) {
+      return `${red};${green};${blue}`;
+    }
+  }
+  const hexMatch = value.match(/^#?([0-9a-fA-F]{6})$/);
+  if (!hexMatch) return defaultContent.color;
+  const color = parseInt(hexMatch[1], 16);
+  return `${(color >> 16) & 255};${(color >> 8) & 255};${color & 255}`;
+};
 
 /** Normalize editor-side object content before it is stored. */
-const normalizeContent = content => {
+const normalizeContent = (content) => {
   const segmentsX = integer(content.segmentsX, 30, 2, 64);
   const segmentsY = integer(content.segmentsY, 30, 2, 64);
   const backendPreference = ['Auto', 'CPU', 'WebGPUPreferred'].includes(
@@ -55,8 +75,6 @@ const normalizeContent = content => {
   )
     ? content.pinMode
     : 'TopEveryN';
-  const color =
-    typeof content.color === 'string' ? content.color : defaultContent.color;
   return {
     ...defaultContent,
     ...content,
@@ -78,18 +96,27 @@ const normalizeContent = content => {
     windZ: clamp(finite(content.windZ, 0), -100000, 100000),
     pinMode,
     pinInterval: integer(content.pinInterval, 5, 1, segmentsX + 1),
-    sphereColliderEnabled: !!content.sphereColliderEnabled,
+    sphereColliderEnabled: boolean(
+      content.sphereColliderEnabled,
+      defaultContent.sphereColliderEnabled
+    ),
     sphereCenterX: finite(content.sphereCenterX, 0),
     sphereCenterY: finite(content.sphereCenterY, 0),
     sphereCenterZ: finite(content.sphereCenterZ, 0),
     sphereRadius: clamp(finite(content.sphereRadius, 25), 0, 1000000),
-    color,
+    color: normalizeColor(content.color),
     opacity: clamp(finite(content.opacity, 0.85), 0, 1),
     roughness: clamp(finite(content.roughness, 0.8), 0, 1),
     metalness: clamp(finite(content.metalness, 0), 0, 1),
-    doubleSided: content.doubleSided !== false,
-    isCastingShadow: !!content.isCastingShadow,
-    isReceivingShadow: content.isReceivingShadow !== false,
+    doubleSided: boolean(content.doubleSided, defaultContent.doubleSided),
+    isCastingShadow: boolean(
+      content.isCastingShadow,
+      defaultContent.isCastingShadow
+    ),
+    isReceivingShadow: boolean(
+      content.isReceivingShadow,
+      defaultContent.isReceivingShadow
+    ),
   };
 };
 
@@ -106,7 +133,9 @@ module.exports = {
         'MIT'
       )
       .setShortDescription(
-        _('Simulate rectangular cloth with CPU fallback and optional WebGPU compute.')
+        _(
+          'Simulate rectangular cloth with CPU fallback and optional WebGPU compute.'
+        )
       );
     extension
       .addInstructionOrExpressionGroupMetadata(_('3D cloth'))
@@ -114,7 +143,7 @@ module.exports = {
 
     const clothObject = new gd.ObjectJsImplementation();
     clothObject.content = { ...defaultContent };
-    clothObject.updateProperty = function (propertyName, newValue) {
+    clothObject.updateProperty = (propertyName, newValue) => {
       if (!Object.prototype.hasOwnProperty.call(defaultContent, propertyName)) {
         return false;
       }
@@ -131,19 +160,26 @@ module.exports = {
       ]);
       const value = booleanProperties.has(propertyName)
         ? newValue === 'true' || newValue === '1'
+          ? true
+          : newValue === 'false' || newValue === '0'
+            ? false
+            : defaultContent[propertyName]
         : stringProperties.has(propertyName)
           ? newValue
           : Number(newValue);
-      this.content = normalizeContent({ ...this.content, [propertyName]: value });
+      clothObject.content = normalizeContent({
+        ...clothObject.content,
+        [propertyName]: value,
+      });
       return true;
     };
-    clothObject.getProperties = function () {
-      this.content = normalizeContent(this.content || {});
+    clothObject.getProperties = () => {
+      clothObject.content = normalizeContent(clothObject.content || {});
       const properties = new gd.MapStringPropertyDescriptor();
       const addNumber = (name, label, group, advanced = false) => {
         const descriptor = properties
           .getOrCreate(name)
-          .setValue(String(this.content[name]))
+          .setValue(String(clothObject.content[name]))
           .setType('number')
           .setLabel(label)
           .setGroup(group);
@@ -152,7 +188,7 @@ module.exports = {
       const addBoolean = (name, label, group) =>
         properties
           .getOrCreate(name)
-          .setValue(this.content[name] ? 'true' : 'false')
+          .setValue(clothObject.content[name] ? 'true' : 'false')
           .setType('boolean')
           .setLabel(label)
           .setGroup(group);
@@ -164,7 +200,7 @@ module.exports = {
       addNumber('segmentsY', _('Vertical segments'), _('Mesh'));
       properties
         .getOrCreate('backendPreference')
-        .setValue(this.content.backendPreference)
+        .setValue(clothObject.content.backendPreference)
         .setType('choice')
         .addChoice('Auto', _('Automatic (recommended)'))
         .addChoice('CPU', _('CPU'))
@@ -198,7 +234,7 @@ module.exports = {
       addNumber('windZ', _('Wind Z'), _('Forces'));
       properties
         .getOrCreate('pinMode')
-        .setValue(this.content.pinMode)
+        .setValue(clothObject.content.pinMode)
         .setType('choice')
         .addChoice('None', _('None'))
         .addChoice('TopCorners', _('Top corners'))
@@ -218,7 +254,7 @@ module.exports = {
       addNumber('sphereRadius', _('Sphere radius'), _('Sphere collider'));
       properties
         .getOrCreate('color')
-        .setValue(this.content.color)
+        .setValue(clothObject.content.color)
         .setType('color')
         .setLabel(_('Color'))
         .setGroup(_('Appearance'));
@@ -285,7 +321,7 @@ module.exports = {
       'SetSimulationEnabled',
       _('Enable simulation'),
       _('Enable or disable cloth simulation.'),
-      _('Set simulation of _PARAM0_ to _PARAM1_'),
+      _('Set simulation of _PARAM0_ to _PARAM1_')
     )
       .addParameter('yesorno', _('Enable'))
       .setFunctionName('setSimulationEnabled');
@@ -293,19 +329,19 @@ module.exports = {
       'ResetSimulation',
       _('Reset simulation'),
       _('Put the cloth back in its rest pose.'),
-      _('Reset the simulation of _PARAM0_'),
+      _('Reset the simulation of _PARAM0_')
     ).setFunctionName('resetSimulation');
     addAction(
       'ResetPinning',
       _('Reset pinning'),
       _('Restore the authored pinning configuration.'),
-      _('Reset pinning of _PARAM0_'),
+      _('Reset pinning of _PARAM0_')
     ).setFunctionName('resetPinning');
     addAction(
       'SetStiffness',
       _('Set stiffness'),
       _('Set cloth stiffness between 0 and 1.'),
-      _('Set stiffness of _PARAM0_ to _PARAM1_'),
+      _('Set stiffness of _PARAM0_ to _PARAM1_')
     )
       .addParameter('expression', _('Stiffness'))
       .setFunctionName('setStiffness');
@@ -313,7 +349,7 @@ module.exports = {
       'SetDamping',
       _('Set damping'),
       _('Set cloth damping between 0 and 1.'),
-      _('Set damping of _PARAM0_ to _PARAM1_'),
+      _('Set damping of _PARAM0_ to _PARAM1_')
     )
       .addParameter('expression', _('Damping'))
       .setFunctionName('setDamping');
@@ -321,7 +357,7 @@ module.exports = {
       'SetGravity',
       _('Set gravity'),
       _('Set scene-coordinate cloth gravity.'),
-      _('Set gravity of _PARAM0_ to _PARAM1_; _PARAM2_; _PARAM3_'),
+      _('Set gravity of _PARAM0_ to _PARAM1_; _PARAM2_; _PARAM3_')
     )
       .addParameter('expression', _('X'))
       .addParameter('expression', _('Y'))
@@ -331,7 +367,7 @@ module.exports = {
       'SetWind',
       _('Set wind'),
       _('Set scene-coordinate constant wind acceleration.'),
-      _('Set wind of _PARAM0_ to _PARAM1_; _PARAM2_; _PARAM3_'),
+      _('Set wind of _PARAM0_ to _PARAM1_; _PARAM2_; _PARAM3_')
     )
       .addParameter('expression', _('X'))
       .addParameter('expression', _('Y'))
@@ -341,7 +377,7 @@ module.exports = {
       'PinVertex',
       _('Pin a vertex'),
       _('Pin a cloth grid vertex at its current position.'),
-      _('Pin vertex _PARAM1_; _PARAM2_ of _PARAM0_'),
+      _('Pin vertex _PARAM1_; _PARAM2_ of _PARAM0_')
     )
       .addParameter('expression', _('Column'))
       .addParameter('expression', _('Row'))
@@ -350,7 +386,7 @@ module.exports = {
       'UnpinVertex',
       _('Unpin a vertex'),
       _('Unpin a cloth grid vertex without stored release velocity.'),
-      _('Unpin vertex _PARAM1_; _PARAM2_ of _PARAM0_'),
+      _('Unpin vertex _PARAM1_; _PARAM2_ of _PARAM0_')
     )
       .addParameter('expression', _('Column'))
       .addParameter('expression', _('Row'))
@@ -359,7 +395,7 @@ module.exports = {
       'SetSphereColliderEnabled',
       _('Enable sphere collider'),
       _('Enable or disable the local sphere collider.'),
-      _('Set sphere collider of _PARAM0_ to _PARAM1_'),
+      _('Set sphere collider of _PARAM0_ to _PARAM1_')
     )
       .addParameter('yesorno', _('Enable'))
       .setFunctionName('setSphereColliderEnabled');
@@ -367,7 +403,7 @@ module.exports = {
       'SetSphereCollider',
       _('Set sphere collider'),
       _('Set the local sphere center and radius.'),
-      _('Set sphere collider of _PARAM0_'),
+      _('Set sphere collider of _PARAM0_')
     )
       .addParameter('expression', _('Center X'))
       .addParameter('expression', _('Center Y'))
@@ -391,19 +427,19 @@ module.exports = {
       'IsSimulationEnabled',
       _('Simulation is enabled'),
       _('Check if cloth simulation is enabled.'),
-      _('Simulation of _PARAM0_ is enabled'),
+      _('Simulation of _PARAM0_ is enabled')
     ).setFunctionName('isSimulationEnabled');
     addCondition(
       'IsSimulationRunning',
       _('Simulation is running'),
       _('Check if the cloth is admitted and running.'),
-      _('Simulation of _PARAM0_ is running'),
+      _('Simulation of _PARAM0_ is running')
     ).setFunctionName('isSimulationRunning');
     addCondition(
       'IsVertexPinned',
       _('Vertex is pinned'),
       _('Check if a cloth grid vertex is pinned.'),
-      _('Vertex _PARAM1_; _PARAM2_ of _PARAM0_ is pinned'),
+      _('Vertex _PARAM1_; _PARAM2_ of _PARAM0_ is pinned')
     )
       .addParameter('expression', _('Column'))
       .addParameter('expression', _('Row'))
@@ -412,19 +448,19 @@ module.exports = {
       'IsUsingWebGPU',
       _('Is using WebGPU compute'),
       _('Check if WebGPU is the active compute backend.'),
-      _('_PARAM0_ is using WebGPU compute'),
+      _('_PARAM0_ is using WebGPU compute')
     ).setFunctionName('isUsingWebGPU');
     addCondition(
       'HasWebGPUFallbackOccurred',
       _('WebGPU fallback occurred'),
       _('Check if WebGPU failed and simulation fell back to CPU.'),
-      _('_PARAM0_ has fallen back from WebGPU'),
+      _('_PARAM0_ has fallen back from WebGPU')
     ).setFunctionName('hasWebGPUFallbackOccurred');
     addCondition(
       'IsBudgetPaused',
       _('Is budget paused'),
       _('Check if scene safety budgets paused this cloth.'),
-      _('_PARAM0_ is paused by the cloth budget'),
+      _('_PARAM0_ is paused by the cloth budget')
     ).setFunctionName('isBudgetPaused');
 
     object
@@ -438,7 +474,11 @@ module.exports = {
       .addParameter('object', _('3D cloth'), 'Cloth3DObject', false)
       .setFunctionName('getActiveBackend');
     [
-      ['ActualSegmentsX', _('Actual horizontal segments'), 'getActualSegmentsX'],
+      [
+        'ActualSegmentsX',
+        _('Actual horizontal segments'),
+        'getActualSegmentsX',
+      ],
       ['ActualSegmentsY', _('Actual vertical segments'), 'getActualSegmentsY'],
       [
         'DroppedSimulationTime',
@@ -467,7 +507,9 @@ module.exports = {
   registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'ClothSimulation::Cloth3DObject',
-      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({})
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
+        helpPagePath: '/objects/3d-cloth',
+      })
     );
   },
 
@@ -477,11 +519,8 @@ module.exports = {
     const PIXI = objectsRenderingService.PIXI;
     const THREE = objectsRenderingService.THREE;
 
-    const getContent = configuration => {
-      const object = global.gd.castObject(
-        configuration,
-        global.gd.ObjectJsImplementation
-      );
+    const getContent = (configuration) => {
+      const object = gd.castObject(configuration, gd.ObjectJsImplementation);
       return normalizeContent(object.content || {});
     };
 
@@ -509,7 +548,9 @@ module.exports = {
         const content = getContent(this._associatedObjectConfiguration);
         const width = this.getWidth();
         const height = this.getHeight();
-        const color = objectsRenderingService.rgbOrHexToHexNumber(content.color);
+        const color = objectsRenderingService.rgbOrHexToHexNumber(
+          content.color
+        );
         this._pixiObject.clear();
         this._pixiObject.beginFill(color, content.opacity * 0.25);
         this._pixiObject.lineStyle(1, color, content.opacity);

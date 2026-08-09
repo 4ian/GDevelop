@@ -55,6 +55,7 @@ type LeftButtonsToolbarGroupProps = {|
   toolbarButtons: Array<ToolbarButtonConfig>,
   projectPath: ?string,
   triggerNpmScript: TriggerNpmScript,
+  navigationEditorToolbar: ?React.Node,
   leadingEditorToolbar: ?React.Node,
 |};
 
@@ -66,6 +67,7 @@ const LeftButtonsToolbarGroup = React.memo<LeftButtonsToolbarGroupProps>(
     return (
       <>
         <ToolbarGroup firstChild>
+          {props.navigationEditorToolbar}
           <IconButton
             size="small"
             id="toolbar-history-button"
@@ -121,6 +123,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const [editorToolbar, setEditorToolbar] = React.useState<?React.Node>(null);
     const {
+      navigationToolbar: navigationEditorToolbar,
       leadingToolbar: leadingEditorToolbar,
       trailingToolbar: trailingEditorToolbar,
     } = getSplitEditorToolbar(editorToolbar);
@@ -155,6 +158,7 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               toolbarButtons={props.toolbarButtons}
               projectPath={props.projectPath}
               triggerNpmScript={props.triggerNpmScript}
+              navigationEditorToolbar={navigationEditorToolbar}
               leadingEditorToolbar={leadingEditorToolbar}
             />
             <ToolbarGroup>
@@ -190,8 +194,11 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               <Spacer />
             </ToolbarGroup>
           </>
-        ) : leadingEditorToolbar ? (
-          <ToolbarGroup firstChild>{leadingEditorToolbar}</ToolbarGroup>
+        ) : navigationEditorToolbar || leadingEditorToolbar ? (
+          <ToolbarGroup firstChild>
+            {navigationEditorToolbar}
+            {leadingEditorToolbar}
+          </ToolbarGroup>
         ) : null}
         {trailingEditorToolbar || <ToolbarGroup />}
       </Toolbar>

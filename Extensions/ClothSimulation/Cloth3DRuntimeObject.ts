@@ -58,7 +58,9 @@ namespace gdjs {
         this,
         instanceContainer
       );
-      this._system = gdjs.ClothSimulationSystem.get(instanceContainer.getScene());
+      this._system = gdjs.ClothSimulationSystem.get(
+        instanceContainer.getScene()
+      );
       this._system.registerObject(this);
       this.onCreated();
     }
@@ -231,44 +233,44 @@ namespace gdjs {
     setStiffness(value: number): void {
       this._normalizedData.content.stiffness = this._normalizedUnitValue(
         value,
-        cloth3DObjectDefaultContent.stiffness
+        gdjs.cloth3DObjectDefaultContent.stiffness
       );
     }
 
     setDamping(value: number): void {
       this._normalizedData.content.damping = this._normalizedUnitValue(
         value,
-        cloth3DObjectDefaultContent.damping
+        gdjs.cloth3DObjectDefaultContent.damping
       );
     }
 
     setGravity(x: number, y: number, z: number): void {
       this._normalizedData.content.gravityX = this._normalizedForce(
         x,
-        cloth3DObjectDefaultContent.gravityX
+        gdjs.cloth3DObjectDefaultContent.gravityX
       );
       this._normalizedData.content.gravityY = this._normalizedForce(
         y,
-        cloth3DObjectDefaultContent.gravityY
+        gdjs.cloth3DObjectDefaultContent.gravityY
       );
       this._normalizedData.content.gravityZ = this._normalizedForce(
         z,
-        cloth3DObjectDefaultContent.gravityZ
+        gdjs.cloth3DObjectDefaultContent.gravityZ
       );
     }
 
     setWind(x: number, y: number, z: number): void {
       this._normalizedData.content.windX = this._normalizedForce(
         x,
-        cloth3DObjectDefaultContent.windX
+        gdjs.cloth3DObjectDefaultContent.windX
       );
       this._normalizedData.content.windY = this._normalizedForce(
         y,
-        cloth3DObjectDefaultContent.windY
+        gdjs.cloth3DObjectDefaultContent.windY
       );
       this._normalizedData.content.windZ = this._normalizedForce(
         z,
-        cloth3DObjectDefaultContent.windZ
+        gdjs.cloth3DObjectDefaultContent.windZ
       );
     }
 
@@ -311,13 +313,17 @@ namespace gdjs {
       this._pinTargets[offset] = position[0];
       this._pinTargets[offset + 1] = position[1];
       this._pinTargets[offset + 2] = position[2];
-      this._pendingPinCommands.push({
-        index,
-        pinned: true,
-        targetX: position[0],
-        targetY: position[1],
-        targetZ: position[2],
-      });
+      this._pendingPinCommands.push(
+        this._activeBackend === 'WebGPU'
+          ? { index, pinned: true }
+          : {
+              index,
+              pinned: true,
+              targetX: position[0],
+              targetY: position[1],
+              targetZ: position[2],
+            }
+      );
     }
 
     unpinVertex(column: number, row: number): void {

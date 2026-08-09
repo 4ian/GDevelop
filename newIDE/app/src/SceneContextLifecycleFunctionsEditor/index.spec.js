@@ -5,6 +5,46 @@ import TestRenderer, { act } from 'react-test-renderer';
 
 import SceneContextLifecycleFunctionsEditor from '.';
 
+jest.mock('../UI/EditorMosaic', () => {
+  const React = require('react');
+  const MockEditorMosaic = React.forwardRef(
+    ({ editors }: any, ref: any): React.Node => {
+      const [
+        isFunctionsListCollapsed,
+        setFunctionsListCollapsed,
+      ] = React.useState(false);
+      React.useImperativeHandle(ref, () => ({
+        isEditorCollapsed: (editorName: string) =>
+          editorName === 'functions-list' && isFunctionsListCollapsed,
+        collapseEditor: (editorName: string) => {
+          if (editorName === 'functions-list') {
+            setFunctionsListCollapsed(true);
+          }
+          return true;
+        },
+        uncollapseEditor: (editorName: string) => {
+          if (editorName === 'functions-list') {
+            setFunctionsListCollapsed(false);
+          }
+          return true;
+        },
+      }));
+      return (
+        <div id="mock-editor-mosaic">
+          {!isFunctionsListCollapsed &&
+            editors['functions-list'].renderEditor()}
+          {editors['events-sheet'].renderEditor()}
+        </div>
+      );
+    }
+  );
+  return {
+    __esModule: true,
+    default: MockEditorMosaic,
+    mosaicContainsNode: () => true,
+  };
+});
+
 jest.mock('../EventsFunctionsList/EventsFunctionsTreeView', () => {
   const React = require('react');
   return ({
@@ -94,5 +134,15 @@ describe('SceneContextLifecycleFunctionsEditor', () => {
       false
     );
     expect(onSelectedFunctionChanged).toHaveBeenCalledTimes(2);
+
+    expect(lifecycleEditorRef.current.isFunctionsListCollapsed()).toBe(false);
+    act(() => {
+      expect(lifecycleEditorRef.current.toggleFunctionsList()).toBe(true);
+    });
+    expect(lifecycleEditorRef.current.isFunctionsListCollapsed()).toBe(true);
+    act(() => {
+      expect(lifecycleEditorRef.current.toggleFunctionsList()).toBe(false);
+    });
+    expect(lifecycleEditorRef.current.isFunctionsListCollapsed()).toBe(false);
   });
 });

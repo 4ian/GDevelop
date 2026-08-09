@@ -2,6 +2,7 @@
 import { EventsEditorContainer } from './EventsEditorContainer';
 import { ExternalEventsEditorContainer } from './ExternalEventsEditorContainer';
 
+jest.mock('../../SceneContextLifecycleFunctionsEditor', () => function() {});
 jest.mock('../../EventsSheet', () => function EventsSheet() {});
 jest.mock('../../EmbeddedGame/EmbeddedGameFrame', () => ({
   setEditorHotReloadNeeded: jest.fn(),

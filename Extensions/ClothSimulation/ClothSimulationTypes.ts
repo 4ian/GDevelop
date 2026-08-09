@@ -49,8 +49,7 @@ namespace gdjs {
     content: Cloth3DObjectContent;
   }
 
-  export interface NormalizedCloth3DObjectContent
-    extends Object3DDataContent {
+  export interface NormalizedCloth3DObjectContent extends Object3DDataContent {
     width: number;
     height: number;
     depth: number;
@@ -135,20 +134,23 @@ namespace gdjs {
   ): number =>
     clamp(Math.trunc(finiteOrDefault(value, defaultValue)), minimum, maximum);
 
-  const normalizedDimension = (value: unknown, defaultValue: number): number => {
+  const normalizedDimension = (
+    value: unknown,
+    defaultValue: number
+  ): number => {
     const finiteValue = finiteOrDefault(value, defaultValue);
     return finiteValue <= 0 ? 1 : finiteValue;
   };
 
-  const normalizedBoolean = (
-    value: unknown,
-    defaultValue: boolean
-  ): boolean => (typeof value === 'boolean' ? value : defaultValue);
+  const normalizedBoolean = (value: unknown, defaultValue: boolean): boolean =>
+    typeof value === 'boolean' ? value : defaultValue;
 
   /** Convert supported RGB/hex strings to the canonical GDevelop RGB form. */
   export const normalizeClothColor = (value: unknown): string => {
     if (typeof value !== 'string') return cloth3DObjectDefaultContent.color;
-    const rgbMatch = value.match(/^\s*(\d{1,3})\s*;\s*(\d{1,3})\s*;\s*(\d{1,3})\s*$/);
+    const rgbMatch = value.match(
+      /^\s*(\d{1,3})\s*;\s*(\d{1,3})\s*;\s*(\d{1,3})\s*$/
+    );
     if (rgbMatch) {
       const red = Number(rgbMatch[1]);
       const green = Number(rgbMatch[2]);
@@ -227,11 +229,7 @@ namespace gdjs {
           0,
           1
         ),
-        damping: clamp(
-          finiteOrDefault(input.damping, defaults.damping),
-          0,
-          1
-        ),
+        damping: clamp(finiteOrDefault(input.damping, defaults.damping), 0, 1),
         gravityX: clamp(
           finiteOrDefault(input.gravityX, defaults.gravityX),
           -100000,
@@ -291,11 +289,7 @@ namespace gdjs {
           1000000
         ),
         color: normalizeClothColor(input.color),
-        opacity: clamp(
-          finiteOrDefault(input.opacity, defaults.opacity),
-          0,
-          1
-        ),
+        opacity: clamp(finiteOrDefault(input.opacity, defaults.opacity), 0, 1),
         roughness: clamp(
           finiteOrDefault(input.roughness, defaults.roughness),
           0,
@@ -306,10 +300,7 @@ namespace gdjs {
           0,
           1
         ),
-        doubleSided: normalizedBoolean(
-          input.doubleSided,
-          defaults.doubleSided
-        ),
+        doubleSided: normalizedBoolean(input.doubleSided, defaults.doubleSided),
         isCastingShadow: normalizedBoolean(
           input.isCastingShadow,
           defaults.isCastingShadow

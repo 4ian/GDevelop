@@ -301,6 +301,7 @@ const renderMosaicWindowPreview = props => (
 
 export type EditorMosaicInterface = {|
   getOpenedEditorNames: () => Array<string>,
+  isEditorCollapsed: (editorName: string) => boolean,
   toggleEditor: (
     editorName: string,
     position: 'left' | 'right' | 'bottom'
@@ -407,6 +408,13 @@ const EditorMosaic: React.ComponentType<{
     React.useImperativeHandle(ref, () => ({
       getOpenedEditorNames: (): Array<string> => {
         return mosaicNode ? getVisibleLeaves(mosaicNode) : [];
+      },
+      isEditorCollapsed: (editorName: string): boolean => {
+        return (
+          !!mosaicNode &&
+          mosaicContainsNode(mosaicNode, editorName) &&
+          getNodeSize(mosaicNode, editorName) === 0
+        );
       },
       toggleEditor: (
         editorName: string,

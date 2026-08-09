@@ -1,4 +1,4 @@
-/// <reference types="@webgpu/types" />
+/// <reference types="types" />
 
 namespace gdjs {
   export const clothSimulationWgsl = /* wgsl */ `
@@ -22,8 +22,26 @@ struct Parameters {
 @group(0) @binding(3) var<storage, read_write> corrections: array<vec4<f32>>;
 @group(0) @binding(4) var<storage, read> particleData: array<vec4<u32>>;
 @group(0) @binding(5) var<storage, read> adjacency: array<u32>;
-@group(0) @binding(6) var<storage, read> pinTargets: array<vec4<f32>>;
+@group(0) @binding(6) var<storage, read_write> pinTargets: array<vec4<f32>>;
 @group(0) @binding(7) var<uniform> parameters: Parameters;
+@group(0) @binding(8) var<storage, read_write> pinCommands: array<u32>;
+
+@compute @workgroup_size(64)
+fn pinMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
+  let particleIndex = globalId.x;
+  if (particleIndex >= parameters.counts.x) { return; }
+  let command = pinCommands[particleIndex];
+  if (command == 1u) {
+    pinTargets[particleIndex] = positions[particleIndex];
+    previousPositions[particleIndex] = positions[particleIndex];
+  } else if (command == 2u) {
+    previousPositions[particleIndex] = positions[particleIndex];
+  } else if (command == 3u) {
+    positions[particleIndex] = pinTargets[particleIndex];
+    previousPositions[particleIndex] = pinTargets[particleIndex];
+  }
+  pinCommands[particleIndex] = 0u;
+}
 
 @compute @workgroup_size(64)
 fn springMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
@@ -125,6 +143,8 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
     private _device: GPUDevice | null = null;
     private _springPipeline: GPUComputePipeline | null = null;
     private _particlePipeline: GPUComputePipeline | null = null;
+    private _pinPipeline: GPUComputePipeline | null = null;
+    private _bindGroupLayout: GPUBindGroupLayout | null = null;
     private _commandEncoder: GPUCommandEncoder | null = null;
     private _afterSubmitCallbacks: Array<() => void> = [];
     private _terminalFailure: ClothFallbackReason | null = null;
@@ -137,7 +157,7 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
 
     initialize(): Promise<void> {
       if (this._initializationPromise) return this._initializationPromise;
-      this._initializationPromise = this._initialize().catch(error => {
+      this._initializationPromise = this._initialize().catch((error) => {
         const reason =
           error instanceof ClothWebGpuError
             ? error.reason
@@ -162,7 +182,7 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
       if (
         adapter.limits.maxComputeWorkgroupSizeX < 64 ||
         adapter.limits.maxComputeInvocationsPerWorkgroup < 64 ||
-        adapter.limits.maxStorageBuffersPerShaderStage < 7
+        adapter.limits.maxStorageBuffersPerShaderStage < 8
       ) {
         throw new ClothWebGpuError('webgpu-limit-insufficient');
       }
@@ -171,7 +191,7 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
       try {
         device = await adapter.requestDevice({
           requiredLimits: {
-            maxStorageBuffersPerShaderStage: 7,
+            maxStorageBuffersPerShaderStage: 8,
           },
         });
       } catch (_error) {
@@ -192,15 +212,76 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
           label: 'GDevelop cloth simulation shader',
           code: clothSimulationWgsl,
         });
+        const computeVisibility =
+          typeof GPUShaderStage !== 'undefined' ? GPUShaderStage.COMPUTE : 4;
+        this._bindGroupLayout = device.createBindGroupLayout({
+          label: 'GDevelop cloth bind group layout',
+          entries: [
+            {
+              binding: 0,
+              visibility: computeVisibility,
+              buffer: { type: 'storage' },
+            },
+            {
+              binding: 1,
+              visibility: computeVisibility,
+              buffer: { type: 'storage' },
+            },
+            {
+              binding: 2,
+              visibility: computeVisibility,
+              buffer: { type: 'read-only-storage' },
+            },
+            {
+              binding: 3,
+              visibility: computeVisibility,
+              buffer: { type: 'storage' },
+            },
+            {
+              binding: 4,
+              visibility: computeVisibility,
+              buffer: { type: 'read-only-storage' },
+            },
+            {
+              binding: 5,
+              visibility: computeVisibility,
+              buffer: { type: 'read-only-storage' },
+            },
+            {
+              binding: 6,
+              visibility: computeVisibility,
+              buffer: { type: 'storage' },
+            },
+            {
+              binding: 7,
+              visibility: computeVisibility,
+              buffer: { type: 'uniform' },
+            },
+            {
+              binding: 8,
+              visibility: computeVisibility,
+              buffer: { type: 'storage' },
+            },
+          ],
+        });
+        const pipelineLayout = device.createPipelineLayout({
+          label: 'GDevelop cloth pipeline layout',
+          bindGroupLayouts: [this._bindGroupLayout],
+        });
         this._springPipeline = device.createComputePipeline({
           label: 'GDevelop cloth spring pipeline',
-          layout: 'auto',
+          layout: pipelineLayout,
           compute: { module, entryPoint: 'springMain' },
         });
         this._particlePipeline = device.createComputePipeline({
           label: 'GDevelop cloth particle pipeline',
-          layout: 'auto',
+          layout: pipelineLayout,
           compute: { module, entryPoint: 'particleMain' },
+        });
+        this._pinPipeline = device.createComputePipeline({
+          label: 'GDevelop cloth pin pipeline',
+          layout: pipelineLayout,
+          compute: { module, entryPoint: 'pinMain' },
         });
         if (device.popErrorScope) {
           const error = await device.popErrorScope();
@@ -236,6 +317,20 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
         throw new ClothWebGpuError('webgpu-pipeline-failed');
       }
       return this._particlePipeline;
+    }
+
+    get pinPipeline(): GPUComputePipeline {
+      if (!this._pinPipeline) {
+        throw new ClothWebGpuError('webgpu-pipeline-failed');
+      }
+      return this._pinPipeline;
+    }
+
+    get bindGroupLayout(): GPUBindGroupLayout {
+      if (!this._bindGroupLayout) {
+        throw new ClothWebGpuError('webgpu-pipeline-failed');
+      }
+      return this._bindGroupLayout;
     }
 
     beginFrame(): void {
@@ -278,7 +373,7 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
       this._terminalFailure = reason;
       this._commandEncoder = null;
       this._afterSubmitCallbacks.length = 0;
-      this._failureListeners.forEach(listener => listener(reason));
+      this._failureListeners.forEach((listener) => listener(reason));
     }
 
     release(failureListener: WebGpuFailureListener): void {
@@ -299,6 +394,8 @@ fn particleMain(@builtin(global_invocation_id) globalId: vec3<u32>) {
       this._device = null;
       this._springPipeline = null;
       this._particlePipeline = null;
+      this._pinPipeline = null;
+      this._bindGroupLayout = null;
     }
   }
 }

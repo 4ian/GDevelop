@@ -2,15 +2,18 @@
 import * as React from 'react';
 
 export type SplitEditorToolbarProps = {|
+  navigationToolbar?: React.Node,
   leadingToolbar: React.Node,
   trailingToolbar: React.Node,
 |};
 
 export const SplitEditorToolbar = ({
+  navigationToolbar,
   leadingToolbar,
   trailingToolbar,
 }: SplitEditorToolbarProps): React.Node => (
   <>
+    {navigationToolbar}
     {leadingToolbar}
     {trailingToolbar}
   </>
@@ -18,20 +21,25 @@ export const SplitEditorToolbar = ({
 
 export const getSplitEditorToolbar = (
   editorToolbar: ?React.Node
-): {| leadingToolbar: ?React.Node, trailingToolbar: ?React.Node |} => {
+): {|
+  navigationToolbar: ?React.Node,
+  leadingToolbar: ?React.Node,
+  trailingToolbar: ?React.Node,
+|} => {
+  const editorElement: any = editorToolbar;
   if (
     React.isValidElement(editorToolbar) &&
-    editorToolbar.type === SplitEditorToolbar
+    editorElement.type === SplitEditorToolbar
   ) {
     return {
-      // $FlowFixMe[prop-missing] - React validates the element type above.
-      leadingToolbar: editorToolbar.props.leadingToolbar,
-      // $FlowFixMe[prop-missing] - React validates the element type above.
-      trailingToolbar: editorToolbar.props.trailingToolbar,
+      navigationToolbar: editorElement.props.navigationToolbar,
+      leadingToolbar: editorElement.props.leadingToolbar,
+      trailingToolbar: editorElement.props.trailingToolbar,
     };
   }
 
   return {
+    navigationToolbar: null,
     leadingToolbar: null,
     trailingToolbar: editorToolbar,
   };

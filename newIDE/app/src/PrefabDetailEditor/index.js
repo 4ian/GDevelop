@@ -24,6 +24,7 @@ import EventsFunctionConfigurationEditor, {
 import EventsFunctionsListWithErrorBoundary, {
   type EventsFunctionsListInterface,
 } from '../EventsFunctionsList';
+import { addFunctionsListToggleButtonToToolbar } from '../EventsFunctionsList/FunctionsListToggleButton';
 import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import Background from '../UI/Background';
 import { type EventsBasedBehaviorOrObjectEditorInterface } from '../EventsFunctionsExtensionEditor/EventsBasedBehaviorOrObjectEditor';
@@ -336,8 +337,39 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
     if (this.editor) {
       this.editor.updateToolbar();
     } else {
-      this.props.setToolbar(null);
+      this._setToolbar(null);
     }
+  };
+
+  _isFunctionsListCollapsed = (): boolean =>
+    !!this._editorMosaic &&
+    this._editorMosaic.isEditorCollapsed('functions-list');
+
+  _toggleFunctionsList = (): boolean => {
+    const editorMosaic = this._editorMosaic;
+    if (!editorMosaic) {
+      if (this._editorNavigator) {
+        this._editorNavigator.openEditor('functions-list');
+      }
+      return false;
+    }
+
+    const isCollapsed = this._isFunctionsListCollapsed();
+    if (isCollapsed) {
+      editorMosaic.uncollapseEditor('functions-list', 20);
+    } else {
+      editorMosaic.collapseEditor('functions-list');
+    }
+    return !isCollapsed;
+  };
+
+  _setToolbar = (editorToolbar: ?React.Node): void => {
+    this.props.setToolbar(
+      addFunctionsListToggleButtonToToolbar(editorToolbar, {
+        isFunctionsListCollapsed: this._isFunctionsListCollapsed,
+        onToggleFunctionsList: this._toggleFunctionsList,
+      })
+    );
   };
 
   setGlobalSearchResults = (
@@ -1373,7 +1405,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                 openInstructionOrExpression={
                   this.props.openInstructionOrExpression
                 }
-                setToolbar={this.props.setToolbar}
+                setToolbar={this._setToolbar}
                 onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._openParametersDialog}
@@ -1526,6 +1558,7 @@ export default class PrefabDetailEditor extends React.Component<Props, State> {
                       // $FlowFixMe[incompatible-type]
                       editors={editors}
                       centralNodeId="events-sheet"
+                      onDragOrResizedEnded={this.updateToolbar}
                       onPersistNodes={node =>
                         setDefaultEditorMosaicNode('prefab-detail-editor', node)
                       }

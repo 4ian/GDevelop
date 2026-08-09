@@ -58,7 +58,11 @@ namespace gdjs {
 
     applyPinCommands(commands: readonly ClothPinCommand[]): void {
       if (this._disposed) return;
-      for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
+      for (
+        let commandIndex = 0;
+        commandIndex < commands.length;
+        commandIndex++
+      ) {
         const command = commands[commandIndex];
         const index = command.index;
         if (index < 0 || index >= this._topology.particleCount) continue;
@@ -74,12 +78,18 @@ namespace gdjs {
             ? command.targetZ!
             : this._positions[offset + 2];
           this._fixed[index] = 1;
-          this._pinTargets[offset] = this._positions[offset] =
-            this._previousPositions[offset] = Math.fround(targetX);
-          this._pinTargets[offset + 1] = this._positions[offset + 1] =
-            this._previousPositions[offset + 1] = Math.fround(targetY);
-          this._pinTargets[offset + 2] = this._positions[offset + 2] =
-            this._previousPositions[offset + 2] = Math.fround(targetZ);
+          this._pinTargets[offset] =
+            this._positions[offset] =
+            this._previousPositions[offset] =
+              Math.fround(targetX);
+          this._pinTargets[offset + 1] =
+            this._positions[offset + 1] =
+            this._previousPositions[offset + 1] =
+              Math.fround(targetY);
+          this._pinTargets[offset + 2] =
+            this._positions[offset + 2] =
+            this._previousPositions[offset + 2] =
+              Math.fround(targetZ);
         } else {
           this._fixed[index] = 0;
           this._previousPositions[offset] = this._positions[offset];
@@ -98,7 +108,11 @@ namespace gdjs {
       const stiffness = this._parameters.stiffness;
 
       // Pass A: each spring writes only its own correction.
-      for (let springIndex = 0; springIndex < topology.springCount; springIndex++) {
+      for (
+        let springIndex = 0;
+        springIndex < topology.springCount;
+        springIndex++
+      ) {
         const first = topology.springEndpoints[springIndex * 2] * 3;
         const second = topology.springEndpoints[springIndex * 2 + 1] * 3;
         const deltaX = positions[second] - positions[first];
@@ -109,7 +123,8 @@ namespace gdjs {
           solverEpsilon
         );
         const correctionScale =
-          (0.5 * stiffness *
+          (0.5 *
+            stiffness *
             (distance - topology.springRestLengths[springIndex])) /
           distance;
         const correctionOffset = springIndex * 3;
@@ -133,10 +148,12 @@ namespace gdjs {
         if (this._fixed[particleIndex]) {
           positions[positionOffset] = previousPositions[positionOffset] =
             this._pinTargets[positionOffset];
-          positions[positionOffset + 1] = previousPositions[positionOffset + 1] =
-            this._pinTargets[positionOffset + 1];
-          positions[positionOffset + 2] = previousPositions[positionOffset + 2] =
-            this._pinTargets[positionOffset + 2];
+          positions[positionOffset + 1] = previousPositions[
+            positionOffset + 1
+          ] = this._pinTargets[positionOffset + 1];
+          positions[positionOffset + 2] = previousPositions[
+            positionOffset + 2
+          ] = this._pinTargets[positionOffset + 2];
           continue;
         }
 

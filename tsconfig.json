@@ -26,7 +26,7 @@
     "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise", "ES2018.Promise"],
     "typeRoots": [
       "GDJS/node_modules/@types/",
-      "GDJS/node_modules/@webgpu/types/"
+      "GDJS/node_modules/@webgpu/"
     ],
     // JSX syntax for lightweight rendering in the game engine:
     "jsx": "react",

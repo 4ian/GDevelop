@@ -4103,6 +4103,9 @@ interface Model3DAnimation {
 
     void SetShouldLoop(boolean shouldLoop);
     boolean ShouldLoop();
+
+    void SetShouldUseRootMotion(boolean shouldUseRootMotion);
+    boolean ShouldUseRootMotion();
 };
 
 interface Model3DObjectConfiguration {

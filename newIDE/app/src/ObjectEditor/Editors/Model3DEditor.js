@@ -45,6 +45,7 @@ import {
   validateModel3DRig,
   type Model3DRigValidationResult,
 } from '../../ResourcesList/ResourcePreview/Model3DRigUtils';
+import { Accordion, AccordionBody, AccordionHeader } from '../../UI/Accordion';
 
 const gd: libGDevelop = global.gd;
 
@@ -1033,8 +1034,20 @@ const Model3DEditor = ({
             }}
             id={`model3d-object-modelResourceName`}
           />
-          <Column noMargin expand>
-            <Line noMargin expand alignItems="center">
+          <Accordion noMargin costlyBody>
+            <AccordionHeader
+              noMargin
+              actions={[
+                <FlatButton
+                  key="add-shared-animation-models"
+                  label={<Trans>Add models</Trans>}
+                  leftIcon={<Add />}
+                  primary
+                  disabled={!modelResourceSources.length}
+                  onClick={addSharedAnimationModels}
+                />,
+              ]}
+            >
               <Column noMargin expand>
                 <Text size="block-title" noMargin>
                   <Trans>Share animations from models (optional)</Trans>
@@ -1045,49 +1058,48 @@ const Model3DEditor = ({
                   </Trans>
                 </Text>
               </Column>
-              <FlatButton
-                label={<Trans>Add models</Trans>}
-                leftIcon={<Add />}
-                primary
-                disabled={!modelResourceSources.length}
-                onClick={addSharedAnimationModels}
-              />
-            </Line>
-            {sharedAnimationModelResourceNames.length > 0 && (
-              <React.Fragment>
-                <div style={styles.sharedAnimationModelsList}>
-                  {sharedAnimationModelResourceNames.map(
-                    (resourceName, resourceIndex) => (
-                      <SharedAnimationModelRow
-                        key={resourceName}
-                        resourceName={resourceName}
-                        loadState={sharedAnimationModelLoadStates[resourceName]}
-                        validation={
-                          sharedAnimationModelRigValidations[resourceName]
-                        }
-                        onRemove={() =>
-                          removeSharedAnimationModel(
-                            resourceIndex,
-                            resourceName
-                          )
-                        }
-                      />
-                    )
-                  )}
-                </div>
-                <AlertMessage
-                  kind="info"
-                  renderLeftIcon={() => <ShieldChecked />}
-                >
-                  <Trans>
-                    Rig validation checks bone names, hierarchy, and bind pose
-                    against
-                  </Trans>{' '}
-                  {primaryModelResourceName}.
-                </AlertMessage>
-              </React.Fragment>
-            )}
-          </Column>
+            </AccordionHeader>
+            <AccordionBody disableGutters>
+              <Column noMargin expand>
+                {sharedAnimationModelResourceNames.length > 0 && (
+                  <React.Fragment>
+                    <div style={styles.sharedAnimationModelsList}>
+                      {sharedAnimationModelResourceNames.map(
+                        (resourceName, resourceIndex) => (
+                          <SharedAnimationModelRow
+                            key={resourceName}
+                            resourceName={resourceName}
+                            loadState={
+                              sharedAnimationModelLoadStates[resourceName]
+                            }
+                            validation={
+                              sharedAnimationModelRigValidations[resourceName]
+                            }
+                            onRemove={() =>
+                              removeSharedAnimationModel(
+                                resourceIndex,
+                                resourceName
+                              )
+                            }
+                          />
+                        )
+                      )}
+                    </div>
+                    <AlertMessage
+                      kind="info"
+                      renderLeftIcon={() => <ShieldChecked />}
+                    >
+                      <Trans>
+                        Rig validation checks bone names, hierarchy, and bind
+                        pose against
+                      </Trans>{' '}
+                      {primaryModelResourceName}.
+                    </AlertMessage>
+                  </React.Fragment>
+                )}
+              </Column>
+            </AccordionBody>
+          </Accordion>
           <Text size="block-title" noMargin>
             <Trans>Default orientation</Trans>
           </Text>
@@ -1348,6 +1360,14 @@ const Model3DEditor = ({
                                   checked={animation.shouldLoop()}
                                   onCheck={(e, checked) => {
                                     animation.setShouldLoop(checked);
+                                    forceUpdate();
+                                  }}
+                                />
+                                <Checkbox
+                                  label={<Trans>Root motion</Trans>}
+                                  checked={animation.shouldUseRootMotion()}
+                                  onCheck={(e, checked) => {
+                                    animation.setShouldUseRootMotion(checked);
                                     forceUpdate();
                                   }}
                                 />

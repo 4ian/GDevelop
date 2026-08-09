@@ -484,6 +484,14 @@ namespace gdjs {
     private _action: THREE.AnimationAction | null;
     private _model3DManager: gdjs.Model3DManager;
     private _sharedAnimationModelCompatibility = new Map<string, boolean>();
+    private _animationClipsWithoutRootMotion = new WeakMap<
+      THREE.AnimationClip,
+      THREE.AnimationClip
+    >();
+    private _rootMotionTrackTargetNames = new WeakMap<
+      THREE.Object3D,
+      Set<string>
+    >();
 
     /**
      * The model origin evaluated according to the object configuration.
@@ -1232,11 +1240,13 @@ namespace gdjs {
       animationName: string,
       shouldLoop: boolean,
       ignoreCrossFade: boolean = false,
-      sourceModelResourceName: string = ''
+      sourceModelResourceName: string = '',
+      shouldUseRootMotion: boolean = true
     ) {
       const clip = this._getAnimationClip(
         animationName,
-        sourceModelResourceName
+        sourceModelResourceName,
+        shouldUseRootMotion
       );
       if (!clip) {
         return;
@@ -1289,7 +1299,8 @@ namespace gdjs {
 
     private _getAnimationClip(
       animationName: string,
-      sourceModelResourceName: string
+      sourceModelResourceName: string,
+      shouldUseRootMotion: boolean = true
     ): THREE.AnimationClip | null {
       const modelResourceName =
         sourceModelResourceName ||
@@ -1328,7 +1339,81 @@ namespace gdjs {
           `The GLB file: ${modelResourceName} doesn't have any animation named: ${animationName}`
         );
       }
-      return clip;
+      return clip && !shouldUseRootMotion
+        ? this._getAnimationClipWithoutRootMotion(clip, animationModel.scene)
+        : clip;
+    }
+
+    private _getAnimationClipWithoutRootMotion(
+      clip: THREE.AnimationClip,
+      modelRoot: THREE.Object3D
+    ): THREE.AnimationClip {
+      const cachedClip = this._animationClipsWithoutRootMotion.get(clip);
+      if (cachedClip) return cachedClip;
+
+      const rootMotionTrackTargetNames =
+        this._getRootMotionTrackTargetNames(modelRoot);
+      const tracks = clip.tracks.filter((track) => {
+        try {
+          const parsedTrackName = THREE.PropertyBinding.parseTrackName(
+            track.name
+          );
+          return !(
+            rootMotionTrackTargetNames.has(parsedTrackName.nodeName) &&
+            (parsedTrackName.propertyName === 'position' ||
+              parsedTrackName.propertyName === 'quaternion')
+          );
+        } catch (error) {
+          return true;
+        }
+      });
+      const clipWithoutRootMotion = new THREE.AnimationClip(
+        `${clip.name}-without-root-motion`,
+        clip.duration,
+        tracks,
+        clip.blendMode
+      );
+      this._animationClipsWithoutRootMotion.set(clip, clipWithoutRootMotion);
+      return clipWithoutRootMotion;
+    }
+
+    private _getRootMotionTrackTargetNames(
+      modelRoot: THREE.Object3D
+    ): Set<string> {
+      const cachedNames = this._rootMotionTrackTargetNames.get(modelRoot);
+      if (cachedNames) return cachedNames;
+
+      const names = new Set<string>();
+      modelRoot.traverse((node) => {
+        const bone = node as THREE.Bone;
+        let isRootBone: boolean = bone.isBone;
+        if (isRootBone) {
+          let ancestor = node.parent;
+          while (ancestor && ancestor !== modelRoot) {
+            if ((ancestor as THREE.Bone).isBone) {
+              isRootBone = false;
+              break;
+            }
+            ancestor = ancestor.parent;
+          }
+        }
+
+        if (node.parent !== modelRoot && !isRootBone) return;
+
+        let rootMotionNode: THREE.Object3D | null = node;
+        while (rootMotionNode && rootMotionNode !== modelRoot) {
+          if (rootMotionNode.name) names.add(rootMotionNode.name);
+          const authoredName = rootMotionNode.userData
+            ? rootMotionNode.userData.name
+            : null;
+          if (typeof authoredName === 'string' && authoredName) {
+            names.add(authoredName);
+          }
+          rootMotionNode = isRootBone ? rootMotionNode.parent : null;
+        }
+      });
+      this._rootMotionTrackTargetNames.set(modelRoot, names);
+      return names;
     }
 
     getAnimationDuration(

@@ -361,6 +361,74 @@ describe('3D model bone attachments', function () {
     expectClose(attachment.getAngle(), target.getBoneRotationZ('Hand'));
   });
 
+  it('can disable root motion without disabling child bone animation', function () {
+    const rootBone = makeBone('Root');
+    const childBone = makeBone('Hand');
+    rootBone.add(childBone);
+    const clip = new THREE.AnimationClip('Walk', 1, [
+      new THREE.VectorKeyframeTrack(
+        'Root.position',
+        [0, 1],
+        [0, 0, 0, 10, 0, 0]
+      ),
+      new THREE.QuaternionKeyframeTrack(
+        'Root.quaternion',
+        [0, 1],
+        [0, 0, 0, 1, 0, 0, 1, 0]
+      ),
+      new THREE.VectorKeyframeTrack(
+        'Hand.position',
+        [0, 1],
+        [0, 0, 0, 0, 4, 0]
+      ),
+    ]);
+    const runtimeScene = makeScene(makeGltf([rootBone], [clip]));
+    const modelData = makeModelData('Model');
+    modelData.content.animations = [
+      {
+        name: 'Walk',
+        source: 'Walk',
+        loop: false,
+        useRootMotion: false,
+      },
+    ];
+    const model = addModel(runtimeScene, modelData);
+    const renderer = /** @type {any} */ (model.getRenderer());
+
+    renderer.updateAnimation(0.5);
+
+    const clonedRootBone = renderer._bonesByCanonicalName.get('Root');
+    const clonedChildBone = renderer._bonesByCanonicalName.get('Hand');
+    expectVectorClose(clonedRootBone.position, new THREE.Vector3(0, 0, 0));
+    expect(clonedRootBone.quaternion.equals(new THREE.Quaternion())).to.be(
+      true
+    );
+    expectVectorClose(clonedChildBone.position, new THREE.Vector3(0, 2, 0));
+  });
+
+  it('keeps root motion enabled when the option is omitted', function () {
+    const rootBone = makeBone('Root');
+    const clip = new THREE.AnimationClip('Walk', 1, [
+      new THREE.VectorKeyframeTrack(
+        'Root.position',
+        [0, 1],
+        [0, 0, 0, 10, 0, 0]
+      ),
+    ]);
+    const runtimeScene = makeScene(makeGltf([rootBone], [clip]));
+    const modelData = makeModelData('Model');
+    modelData.content.animations = [
+      { name: 'Walk', source: 'Walk', loop: false },
+    ];
+    const model = addModel(runtimeScene, modelData);
+    const renderer = /** @type {any} */ (model.getRenderer());
+
+    renderer.updateAnimation(0.5);
+
+    const clonedRootBone = renderer._bonesByCanonicalName.get('Root');
+    expectVectorClose(clonedRootBone.position, new THREE.Vector3(5, 0, 0));
+  });
+
   it('matches a direct bone child with reflected model coordinates', function () {
     const bone = makeBone('Hand');
     const runtimeScene = makeScene(makeGltf([bone]));

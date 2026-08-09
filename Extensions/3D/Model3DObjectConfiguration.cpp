@@ -297,6 +297,8 @@ void Model3DObjectConfiguration::DoUnserializeFrom(
     animation.SetSourceModelResourceName(
         animationElement.GetStringAttribute("sourceModelResourceName", ""));
     animation.SetShouldLoop(animationElement.GetBoolAttribute("loop", false));
+    animation.SetShouldUseRootMotion(
+        animationElement.GetBoolAttribute("useRootMotion", true));
     AddAnimation(animation);
   }
 }
@@ -337,6 +339,8 @@ void Model3DObjectConfiguration::DoSerializeTo(
     animationElement.SetAttribute("sourceModelResourceName",
                                   animation.GetSourceModelResourceName());
     animationElement.SetAttribute("loop", animation.ShouldLoop());
+    animationElement.SetAttribute("useRootMotion",
+                                  animation.ShouldUseRootMotion());
   }
 }
 

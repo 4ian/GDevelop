@@ -3058,6 +3058,8 @@ export class Model3DAnimation extends EmscriptenObject {
   getSourceModelResourceName(): string;
   setShouldLoop(shouldLoop: boolean): void;
   shouldLoop(): boolean;
+  setShouldUseRootMotion(shouldUseRootMotion: boolean): void;
+  shouldUseRootMotion(): boolean;
 }
 
 export class Model3DObjectConfiguration extends ObjectConfiguration {

@@ -15,7 +15,7 @@ class Project;
 
 class GD_EXTENSION_API Model3DAnimation {
 public:
-  Model3DAnimation() : shouldLoop(false) {};
+  Model3DAnimation() : shouldLoop(false), shouldUseRootMotion(true) {};
   virtual ~Model3DAnimation(){};
 
   /**
@@ -73,11 +73,24 @@ public:
    */
   void SetShouldLoop(bool shouldLoop_) { shouldLoop = shouldLoop_; }
 
+  /**
+   * \brief Return true if root motion from the animation should be applied.
+   */
+  const bool ShouldUseRootMotion() const { return shouldUseRootMotion; }
+
+  /**
+   * \brief Change whether root motion from the animation should be applied.
+   */
+  void SetShouldUseRootMotion(bool shouldUseRootMotion_) {
+    shouldUseRootMotion = shouldUseRootMotion_;
+  }
+
 private:
   gd::String name;
   gd::String source;
   gd::String sourceModelResourceName;
   bool shouldLoop;
+  bool shouldUseRootMotion;
 };
 
 /**

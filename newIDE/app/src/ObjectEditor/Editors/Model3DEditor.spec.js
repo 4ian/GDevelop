@@ -37,6 +37,12 @@ describe('Model3DEditor', () => {
     const source = getSource();
 
     expect(source).toContain('Share animations from models (optional)');
+    expect(source).toContain('<Accordion noMargin costlyBody>');
+    expect(source).toContain('<AccordionHeader\n              noMargin');
+    expect(source).toContain('<AccordionBody disableGutters>');
+    expect(source).not.toContain(
+      '<Accordion noMargin costlyBody defaultExpanded>'
+    );
     expect(source).toContain(
       "multiSelection: true,\n          resourceKind: 'model3D'"
     );
@@ -48,11 +54,16 @@ describe('Model3DEditor', () => {
       'animation.getSourceModelResourceName(),\n                                    animation.getSource()'
     );
     expect(source).toContain('{animationCount} <Trans>animations</Trans>');
-    expect(source).toContain("</Trans>{' '}\n                  {primaryModelResourceName}.");
+    expect(source).toMatch(/<\/Trans>{' '}\n\s+{primaryModelResourceName}\./);
     expect(source).toContain('id="model3d-animation-name-filter"');
     expect(source).toContain('<Trans>Animations</Trans> ({animationsCount})');
-    expect(source).toContain('translatableHintText={t`Filter animations by name`}');
+    expect(source).toContain(
+      'translatableHintText={t`Filter animations by name`}'
+    );
     expect(source).toContain('.includes(normalizedAnimationNameFilter)');
     expect(source).toContain('filteredAnimationIndexes.map(animationIndex =>');
+    expect(source).toContain('label={<Trans>Root motion</Trans>}');
+    expect(source).toContain('checked={animation.shouldUseRootMotion()}');
+    expect(source).toContain('animation.setShouldUseRootMotion(checked)');
   });
 });

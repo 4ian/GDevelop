@@ -9,6 +9,8 @@ declare class gdModel3DAnimation {
   getSourceModelResourceName(): string;
   setShouldLoop(shouldLoop: boolean): void;
   shouldLoop(): boolean;
+  setShouldUseRootMotion(shouldUseRootMotion: boolean): void;
+  shouldUseRootMotion(): boolean;
   delete(): void;
   ptr: number;
 };

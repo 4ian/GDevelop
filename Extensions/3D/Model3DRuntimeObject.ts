@@ -6,6 +6,7 @@ namespace gdjs {
     source: string;
     sourceModelResourceName?: string;
     loop: boolean;
+    useRootMotion?: boolean;
   };
 
   type Model3DObjectNetworkSyncDataType = {
@@ -179,7 +180,8 @@ namespace gdjs {
           this._animations[0].source,
           this._animations[0].loop,
           true,
-          this._animations[0].sourceModelResourceName || ''
+          this._animations[0].sourceModelResourceName || '',
+          this._animations[0].useRootMotion !== false
         );
       }
     }
@@ -263,13 +265,16 @@ namespace gdjs {
           (!oldDefaultAnimation ||
             oldDefaultAnimation.source !== newDefaultAnimation.source ||
             oldDefaultAnimation.sourceModelResourceName !==
-              newDefaultAnimation.sourceModelResourceName)
+              newDefaultAnimation.sourceModelResourceName ||
+            oldDefaultAnimation.useRootMotion !==
+              newDefaultAnimation.useRootMotion)
         ) {
           this._renderer.playAnimation(
             newDefaultAnimation.source,
             this._animations[0].loop,
             true,
-            newDefaultAnimation.sourceModelResourceName || ''
+            newDefaultAnimation.sourceModelResourceName || '',
+            newDefaultAnimation.useRootMotion !== false
           );
         }
       }
@@ -504,7 +509,8 @@ namespace gdjs {
           animation.source,
           animation.loop,
           false,
-          animation.sourceModelResourceName || ''
+          animation.sourceModelResourceName || '',
+          animation.useRootMotion !== false
         );
         if (this._animationPaused) {
           this._renderer.pauseAnimation();

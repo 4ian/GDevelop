@@ -20,6 +20,7 @@ describe('libGD.js - Model3DObjectConfiguration', () => {
     animation.setSource('Run');
     animation.setSourceModelResourceName('Movement.glb');
     animation.setShouldLoop(true);
+    animation.setShouldUseRootMotion(false);
     configuration.addAnimation(animation);
     animation.delete();
 
@@ -37,6 +38,7 @@ describe('libGD.js - Model3DObjectConfiguration', () => {
       name: 'Run',
       source: 'Run',
       sourceModelResourceName: 'Movement.glb',
+      useRootMotion: false,
     });
 
     const restoredConfiguration = new gd.Model3DObjectConfiguration();
@@ -53,6 +55,9 @@ describe('libGD.js - Model3DObjectConfiguration', () => {
     expect(
       restoredConfiguration.getAnimation(0).getSourceModelResourceName()
     ).toBe('Movement.glb');
+    expect(restoredConfiguration.getAnimation(0).shouldUseRootMotion()).toBe(
+      false
+    );
 
     restoredConfiguration.delete();
     element.delete();
@@ -74,6 +79,7 @@ describe('libGD.js - Model3DObjectConfiguration', () => {
 
     expect(configuration.getSharedAnimationModelResourcesCount()).toBe(0);
     expect(configuration.getAnimation(0).getSourceModelResourceName()).toBe('');
+    expect(configuration.getAnimation(0).shouldUseRootMotion()).toBe(true);
 
     configuration.delete();
     project.delete();

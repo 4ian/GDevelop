@@ -149,6 +149,8 @@ namespace gdjs {
           state: GameplayTestEvaluatedState;
         };
       };
+      flippedX?: boolean;
+      flippedY?: boolean;
       children?: { [objectName: string]: Array<GameplayTestObjectSnapshot> };
     };
 
@@ -322,6 +324,7 @@ namespace gdjs {
     const YIELD_BUDGET_MS = 12;
     // In fast (unpaced) runs, let the game render at most this often.
     const FAST_RUN_RENDER_INTERVAL_MS = 250;
+    const MAX_PLAYED_SOUNDS = 500;
     const DEFAULT_MAX_SCREENSHOTS = 5;
     const DEFAULT_PROBE_FRAMES = 30;
     const MAX_PROFILING_SECTIONS = 50;
@@ -512,6 +515,8 @@ namespace gdjs {
       _lastYieldTimeMs: number = 0;
       /** The last time an animation frame was awaited (rendering the game). */
       _lastRenderTimeMs: number = 0;
+      _playedSounds: Array<{ sound: string; frame: integer }> = [];
+      _soundLogRestorers: Array<() => void> = [];
       /** Game seconds simulated per real second, or null to run as fast
        * as possible (see `_maybeYield`). */
       _paceSpeedFactor: float | null = null;
@@ -910,6 +915,57 @@ namespace gdjs {
       }
 
       /**
+       * Step until the first instance of the object stops moving: its
+       * position changed less than `tolerance` (default 0.5) per frame for
+       * `stableFrames` (default 20) consecutive frames. Returns whether it
+       * settled within `maxFrames` (default 300). Use this for physics
+       * objects instead of a hand-written "read, compare, update"
+       * condition in `stepUntil` (which can silently pass without
+       * stepping a frame).
+       */
+      async stepUntilObjectIsStable(
+        objectName: string,
+        options?: {
+          tolerance?: float;
+          stableFrames?: integer;
+          maxFrames?: integer;
+        }
+      ): Promise<boolean> {
+        const tolerance = (options && options.tolerance) || 0.5;
+        const stableFrames = (options && options.stableFrames) || 20;
+        const maxFrames = (options && options.maxFrames) || 300;
+        let previous: [float, float, float] | null = null;
+        let stillFrames = 0;
+        return await this.stepUntil(() => stillFrames >= stableFrames, {
+          maxFrames,
+          onFrame: () => {
+            const instance = this._getInstances(objectName)[0];
+            if (!instance) {
+              previous = null;
+              stillFrames = 0;
+              return;
+            }
+            const anyInstance = instance as any;
+            const x = instance.getX();
+            const y = instance.getY();
+            const z =
+              typeof anyInstance.getZ === 'function' ? anyInstance.getZ() : 0;
+            if (
+              previous &&
+              Math.abs(x - previous[0]) < tolerance &&
+              Math.abs(y - previous[1]) < tolerance &&
+              Math.abs(z - previous[2]) < tolerance
+            ) {
+              stillFrames++;
+            } else {
+              stillFrames = 0;
+            }
+            previous = [x, y, z];
+          },
+        });
+      }
+
+      /**
        * Get the name of the scene being run.
        */
       getSceneName(): string {
@@ -1217,6 +1273,12 @@ namespace gdjs {
         if (typeof anyObject.getOpacity === 'function') {
           snapshot.opacity = anyObject.getOpacity();
         }
+        if (typeof anyObject.isFlippedX === 'function') {
+          snapshot.flippedX = anyObject.isFlippedX();
+        }
+        if (typeof anyObject.isFlippedY === 'function') {
+          snapshot.flippedY = anyObject.isFlippedY();
+        }
         if (
           includeChildren &&
           typeof anyObject.getChildrenContainer === 'function'
@@ -1226,10 +1288,42 @@ namespace gdjs {
           const children: {
             [objectName: string]: Array<GameplayTestObjectSnapshot>;
           } = {};
+          const canTransformToScene =
+            typeof anyObject.applyObjectTransformation === 'function';
           for (const child of childrenContainer.getAdhocListOfAllInstances()) {
             const childName = child.getName();
             if (!children[childName]) children[childName] = [];
-            children[childName].push(this._makeObjectSnapshot(child, false));
+            const childSnapshot = this._makeObjectSnapshot(child, false);
+            // The children live in the coordinates space of the custom
+            // object: convert to scene coordinates, like every other
+            // snapshot (so clicking a child at its centerX/centerY works).
+            if (canTransformToScene) {
+              const point: FloatPoint = [0, 0];
+              anyObject.applyObjectTransformation(
+                childSnapshot.x,
+                childSnapshot.y,
+                point
+              );
+              childSnapshot.x = point[0];
+              childSnapshot.y = point[1];
+              anyObject.applyObjectTransformation(
+                childSnapshot.centerX,
+                childSnapshot.centerY,
+                point
+              );
+              childSnapshot.centerX = point[0];
+              childSnapshot.centerY = point[1];
+              if (typeof anyObject.getZ === 'function') {
+                if (childSnapshot.z !== undefined)
+                  childSnapshot.z += anyObject.getZ();
+                if (childSnapshot.centerZ !== undefined)
+                  childSnapshot.centerZ += anyObject.getZ();
+              }
+            }
+            // The internal layer name of the parent means nothing outside
+            // of it: report the layer of the custom object itself.
+            childSnapshot.layer = object.getLayer();
+            children[childName].push(childSnapshot);
           }
           snapshot.children = children;
         }
@@ -1453,6 +1547,62 @@ namespace gdjs {
           .getVariables()
           .getNetworkSyncData({})
           .find((variable) => (variable as any).name === variableName);
+      }
+
+      /**
+       * The notable events recorded so far (scene changes and resets with
+       * their cause, stuck detections...), as a JSON-safe copy: lets a
+       * test assert, for example, that the game restarted its scene.
+       */
+      getEventLog(): Array<GameplayTestEvent> {
+        return this._eventLog.map((event) => ({ ...event }));
+      }
+
+      /**
+       * The sounds and musics played during the test so far, with the
+       * frame they were played at - a direct signal that a mechanic fired
+       * (a pickup, a shot, an explosion...).
+       */
+      getPlayedSounds(): Array<{ sound: string; frame: integer }> {
+        return this._playedSounds.slice();
+      }
+
+      _installSoundLog(): void {
+        const soundManager = this._runtimeGame.getSoundManager() as any;
+        // Wrap the public play methods of the sound manager for the
+        // duration of the test.
+        for (const methodName of [
+          'playSound',
+          'playSoundOnChannel',
+          'playMusic',
+          'playMusicOnChannel',
+        ]) {
+          const original = soundManager[methodName];
+          if (typeof original !== 'function') continue;
+          soundManager[methodName] = (soundName: unknown, ...args: any[]) => {
+            if (this._playedSounds.length < MAX_PLAYED_SOUNDS) {
+              this._playedSounds.push({
+                sound: String(soundName),
+                frame: this._framesExecuted,
+              });
+            }
+            return original.call(soundManager, soundName, ...args);
+          };
+          this._soundLogRestorers.push(() => {
+            soundManager[methodName] = original;
+          });
+        }
+      }
+
+      _uninstallSoundLog(): void {
+        for (const restore of this._soundLogRestorers) {
+          try {
+            restore();
+          } catch (error) {
+            logger.warn('Error while restoring the sound manager: ' + error);
+          }
+        }
+        this._soundLogRestorers = [];
       }
 
       /**
@@ -2095,6 +2245,47 @@ namespace gdjs {
       }
 
       /**
+       * Get a variable of an object (same entry shape as `getSceneVariable`),
+       * or undefined if the object or the variable does not exist.
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      getObjectVariable(
+        objectIdOrName: integer | string,
+        variableName: string
+      ): Object | undefined {
+        const object = this.getRuntimeObject(objectIdOrName);
+        if (!object) return undefined;
+        return object
+          .getVariables()
+          .getNetworkSyncData({})
+          .find((variable) => (variable as any).name === variableName);
+      }
+
+      /**
+       * Set a variable of an object (number, string or boolean).
+       * Use for test setup only. Throws if the object does not exist.
+       * @param objectIdOrName An instance id (from `getObjects`) or an object
+       * name (first instance).
+       */
+      setObjectVariable(
+        objectIdOrName: integer | string,
+        variableName: string,
+        value: string | number | boolean
+      ): void {
+        const object = this.getRuntimeObject(objectIdOrName);
+        if (!object) {
+          throw new Error(
+            `No instance "${objectIdOrName}" found to set the variable "${variableName}".`
+          );
+        }
+        this._setVariableFromValue(
+          object.getVariables().get(variableName),
+          value
+        );
+      }
+
+      /**
        * Set a global variable (number, string or boolean).
        * Use for test setup only.
        */
@@ -2615,6 +2806,7 @@ namespace gdjs {
       harness._callOnFrameEnded = originalOnFrameEnded;
 
       harness._installPointerLockShim();
+      harness._installSoundLog();
 
       // Capture the logs of the game itself (in addition to the `console`
       // passed to the script).
@@ -2746,6 +2938,7 @@ namespace gdjs {
         }
         inputManager.onFrameEnded = originalOnFrameEnded;
         harness._uninstallPointerLockShim();
+        harness._uninstallSoundLog();
         gdjs.Logger.setLoggerOutput(existingLoggerOutput);
         if (payload.freezeWhenFinished) {
           // Keep the game paused (the main loop keeps rendering the last

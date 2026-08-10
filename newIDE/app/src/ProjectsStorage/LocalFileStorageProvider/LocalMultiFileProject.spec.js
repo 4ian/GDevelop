@@ -117,7 +117,7 @@ describe('Local multi-file project storage', () => {
       path.join(temporaryDirectory, 'tests.settings'),
       'utf8'
     );
-    expect(settingsSource).toContain('source = "tests/Player%20can%20jump.js"');
+    expect(settingsSource).toContain('file = "tests/Player%20can%20jump.js"');
     expect(settingsSource).not.toContain('game://');
     expect(settingsSource).not.toContain('lastRun');
     expect(
@@ -1711,7 +1711,9 @@ describe('Local multi-file project storage', () => {
     const gameplayTest = project
       .getTests()
       .insertNewTest('Generated smoke test', 0);
-    gameplayTest.setSource('gameplayTest.wait(1);');
+    gameplayTest.setSource(
+      'await harness.stepFrames(1);\nconsole.log("Saved");\n'
+    );
     gameplayTest.setLastRunStatus('passed');
     gameplayTest.setLastRunAt(123);
     gameplayTest.setLastRunDurationMs(45);
@@ -1749,6 +1751,15 @@ describe('Local multi-file project storage', () => {
     expect(generatedProject.tests[0]).not.toHaveProperty(
       'lastRunFramesExecuted'
     );
+    expect(
+      fs.readFileSync(
+        resolveGameUriToPath(
+          temporaryDirectory,
+          'game://tests/Generated%20smoke%20test.js'
+        ),
+        'utf8'
+      )
+    ).toBe('await harness.stepFrames(1);\nconsole.log("Saved");\n');
     expect(
       JSON.parse(
         fs.readFileSync(

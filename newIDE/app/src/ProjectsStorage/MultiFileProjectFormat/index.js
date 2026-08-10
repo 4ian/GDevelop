@@ -105,7 +105,7 @@ const AUTHORED_TEST_FIELDS = new Set([
   'name',
   'type',
   'description',
-  'source',
+  'file',
 ]);
 
 const SCENE_LIFECYCLE_FUNCTION_DEFINITIONS = Object.freeze([
@@ -284,6 +284,22 @@ const expectString = (value, label, fileUri) => {
     fail('MULTIFILE_INVALID_SCHEMA', `${label} must be a string.`, fileUri);
   }
   return value;
+};
+
+// SerializerElement represents multiline string values as an array of lines
+// in the legacy JSON projection. Accept that representation at the legacy
+// boundary and restore the exact string before writing the dedicated source
+// file. Authored tests.settings values remain strictly string-only.
+const expectLegacyMultilineString = (value, label, fileUri) => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && value.every(line => typeof line === 'string')) {
+    return value.join('\n');
+  }
+  fail(
+    'MULTIFILE_INVALID_SCHEMA',
+    `${label} must be a string or an array of string lines.`,
+    fileUri
+  );
 };
 
 const quotePointerToken = token =>
@@ -1873,7 +1889,7 @@ const decomposeGameplayTests = (project, files) => {
           `${scope} gameplay test ${name}.description`,
           MULTI_FILE_TESTS_URI
         );
-        const source = expectString(
+        const source = expectLegacyMultilineString(
           test.source,
           `${scope} gameplay test ${name}.source`,
           MULTI_FILE_TESTS_URI
@@ -1942,7 +1958,7 @@ const decomposeGameplayTests = (project, files) => {
       name: testInfo.name,
       type: testInfo.type,
       description: testInfo.description,
-      source: sourcePath,
+      file: sourcePath,
     };
   });
 
@@ -4123,9 +4139,9 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         `tests.settings tests[${index}].description`,
         testsUri
       ),
-      source: expectString(
-        test.source,
-        `tests.settings tests[${index}].source`,
+      file: expectString(
+        test.file,
+        `tests.settings tests[${index}].file`,
         testsUri
       ),
       recordIndex: index,
@@ -4196,18 +4212,18 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     const expectedSourcePath = expectedTestSourcePaths.get(
       gameplayTestLogicalIdentity(record)
     );
-    if (record.source !== expectedSourcePath) {
+    if (record.file !== expectedSourcePath) {
       fail(
         'MULTIFILE_INVALID_TEST_SOURCE',
-        `Gameplay test ${record.name} must use source ${expectedSourcePath}.`,
+        `Gameplay test ${record.name} must use file ${expectedSourcePath}.`,
         testsUri
       );
     }
-    const sourceUri = registerUri(`game://${record.source}`);
+    const sourceUri = registerUri(`game://${record.file}`);
     if (files[sourceUri] === undefined) {
       fail(
         'MULTIFILE_MISSING_TEST_SOURCE',
-        `Gameplay test source is missing: ${record.source}.`,
+        `Gameplay test file is missing: ${record.file}.`,
         sourceUri
       );
     }
@@ -4586,12 +4602,18 @@ const normalizeFunctionEvents = functions =>
     );
   });
 
-const removeGameplayTestRunSummaries = tests =>
+const normalizeGameplayTestsForMultiFile = tests =>
   (tests || []).map(test => {
     const authoredTest = { ...test };
     GAMEPLAY_TEST_RUN_SUMMARY_FIELDS.forEach(
       field => delete authoredTest[field]
     );
+    if (
+      Array.isArray(authoredTest.source) &&
+      authoredTest.source.every(line => typeof line === 'string')
+    ) {
+      authoredTest.source = authoredTest.source.join('\n');
+    }
     return authoredTest;
   });
 
@@ -4745,7 +4767,7 @@ export const normalizeLegacyProjectForMultiFile = (
   project.externalLayouts = project.externalLayouts || [];
   project.eventsFunctionsExtensions = project.eventsFunctionsExtensions || [];
   if (project.tests !== undefined) {
-    project.tests = removeGameplayTestRunSummaries(project.tests);
+    project.tests = normalizeGameplayTestsForMultiFile(project.tests);
   }
   project.layouts.forEach(layout => {
     layout.events = parseLegacyEventsJson(JSON.stringify(layout.events || []));
@@ -4781,7 +4803,7 @@ export const normalizeLegacyProjectForMultiFile = (
   });
   project.eventsFunctionsExtensions.forEach(extension => {
     if (extension.tests !== undefined) {
-      extension.tests = removeGameplayTestRunSummaries(extension.tests);
+      extension.tests = normalizeGameplayTestsForMultiFile(extension.tests);
     }
     extension.eventsFunctions = extension.eventsFunctions || [];
     extension.eventsBasedObjects = extension.eventsBasedObjects || [];

@@ -35,7 +35,7 @@ Gameplay tests are the other deliberate root-owned version 5 domain. Their
 complete ownership, strict schema, flat source allocation, and ignored
 last-run state contract are defined by
 [`gameplay-tests-multifile-serialization-spec.md`](gameplay-tests-multifile-serialization-spec.md).
-In particular, test `source` values are scheme-free root-relative
+In particular, test `file` values are scheme-free root-relative
 `tests/<Encoded basename>.js` paths rather than `game://` event references.
 
 The existing flat layout vocabulary, semantic contexts, defaults, UUID rules,

@@ -760,7 +760,7 @@ extensions/<encoded-name>/prefabs/<encoded-name>/
 - `*.events` uses the IfDo DSL in
   `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
 - Root `tests.settings` owns all project and extension gameplay-test metadata;
-  each scheme-free `source` points to one direct child of root `tests/`.
+  each scheme-free `file` points to one direct child of root `tests/`.
 - Physical owner paths derive component association. Same-stem function event
   bodies and embedded layouts do not use URI fields.
 - Every managed `.events` file is a function body and has a same-stem

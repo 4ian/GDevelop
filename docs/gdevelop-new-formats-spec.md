@@ -137,7 +137,8 @@ phase 5 before they can store this directory format natively.
     to `.layout` and `.events` sources with canonical `game://...` URIs rooted
     at the directory containing `project.gdevelop`, never relative paths. The
     deliberate gameplay-test exception is a scheme-free canonical
-    `tests/<Encoded basename>.js` path in root `tests.settings`. A `.settings`
+    `tests/<Encoded basename>.js` path in the `file` field of root
+    `tests.settings`. A `.settings`
     file never references another `.settings` file.
 13. **Settings stay separate on disk.** A settings file never includes or
     embeds another settings file. The editor creates the combined settings
@@ -830,8 +831,8 @@ for identity and diagnostics, but it never serializes one settings URI inside
 another settings fragment.
 
 Gameplay-test JavaScript references are the deliberate exception: the root
-`tests.settings` file stores canonical scheme-free paths such as
-`tests/Player%20can%20jump.js`. They must resolve to direct `.js` children of
+`tests.settings` file stores canonical scheme-free `file` values such as
+`file = "tests/Player%20can%20jump.js"`. They must resolve to direct `.js` children of
 root `tests/`; `game://`, subfolders, absolute paths, and traversal are
 forbidden. Last-run summaries are not authored references or settings and live
 only in ignored `.gdevelop/gameplay-test-results.json` local editor state.
@@ -1827,7 +1828,7 @@ unrelated extensions, or `project.gdevelop`.
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
 | Editor-only Constants                                                                                 | `constants.toml`                                                 |
-| Gameplay-test identity, order, type, description, or source association                              | `tests.settings`                                                 |
+| Gameplay-test identity, order, type, description, or file association                                | `tests.settings`                                                 |
 | Gameplay-test JavaScript body                                                                         | Its flat root `tests/<Encoded basename>.js` source                |
 | Gameplay-test last-run summary                                                                        | Ignored `.gdevelop/gameplay-test-results.json` editor state       |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
@@ -2372,7 +2373,8 @@ A conforming implementation must satisfy all of the following:
 15. All local-root `.settings` documents mount and merge conflict-free into one
     authoritative in-memory settings tree. Event/layout source references use
     project-root `game://` URIs; gameplay-test JavaScript references use the
-    scheme-free root-relative form defined by the gameplay-test specification.
+    scheme-free root-relative `file` field defined by the gameplay-test
+    specification.
 16. Settings remain separate files on disk with no include/embedding syntax;
     the editor creates the combined project-settings document only in memory
     for validation and compilation, then saves each changed namespace back to

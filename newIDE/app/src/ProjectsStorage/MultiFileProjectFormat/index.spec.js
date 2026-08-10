@@ -216,10 +216,10 @@ describe('GDevelop multi-file project format', () => {
     const files = decomposeLegacyProjectToFiles(project);
     expect(files[MULTI_FILE_TESTS_URI]).toContain('kind = "tests"');
     expect(files[MULTI_FILE_TESTS_URI]).toContain(
-      'source = "tests/Player%20can%20jump.js"'
+      'file = "tests/Player%20can%20jump.js"'
     );
     expect(files[MULTI_FILE_TESTS_URI]).toContain(
-      'source = "tests/Combat%20-%20Enemy%20takes%20damage.js"'
+      'file = "tests/Combat%20-%20Enemy%20takes%20damage.js"'
     );
     expect(files[MULTI_FILE_TESTS_URI]).not.toContain('game://');
     expect(files[MULTI_FILE_TESTS_URI]).not.toContain('lastRun');
@@ -251,6 +251,28 @@ describe('GDevelop multi-file project format', () => {
         source: 'gameplayTest.wait(2);',
       },
     ]);
+  });
+
+  test('decodes multiline gameplay test sources from the legacy serializer', () => {
+    const project = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'New test',
+          type: 'gameplay',
+          description: '',
+          source: ['await harness.stepFrames(1);', '// Done.', ''],
+        },
+      ],
+    };
+
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(files['game://tests/New%20test.js']).toBe(
+      'await harness.stepFrames(1);\n// Done.\n'
+    );
+    expect(composeLegacyProjectFromFiles(files).tests[0].source).toBe(
+      'await harness.stepFrames(1);\n// Done.\n'
+    );
   });
 
   test('requires the v5 tests settings owner and rejects result fields in authored settings', () => {
@@ -286,11 +308,22 @@ describe('GDevelop multi-file project format', () => {
     withUriScheme[MULTI_FILE_TESTS_URI] = withUriScheme[
       MULTI_FILE_TESTS_URI
     ].replace(
-      'source = "tests/Smoke%20test.js"',
-      'source = "game://tests/Smoke%20test.js"'
+      'file = "tests/Smoke%20test.js"',
+      'file = "game://tests/Smoke%20test.js"'
     );
     expect(() => composeLegacyProjectFromFiles(withUriScheme)).toThrow(
       expect.objectContaining({ code: 'MULTIFILE_INVALID_TEST_SOURCE' })
+    );
+
+    const withRetiredSourceField = decomposeLegacyProjectToFiles(project);
+    withRetiredSourceField[MULTI_FILE_TESTS_URI] = withRetiredSourceField[
+      MULTI_FILE_TESTS_URI
+    ].replace(
+      'file = "tests/Smoke%20test.js"',
+      'source = "tests/Smoke%20test.js"'
+    );
+    expect(() => composeLegacyProjectFromFiles(withRetiredSourceField)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_TESTS_SETTINGS' })
     );
   });
 

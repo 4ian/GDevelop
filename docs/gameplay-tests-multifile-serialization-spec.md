@@ -27,7 +27,7 @@ tests/
 
 `tests.settings` owns both project tests and events-function-extension tests.
 Project and extension owner settings no longer contain a legacy `tests`
-array. Each test record has a canonical root-relative `tests/...js` `source`
+array. Each test record has a canonical root-relative `tests/...js` `file`
 path. During composition, the adapter reads that JavaScript file and
 reconstructs the current legacy serializer shape with the JavaScript text
 inline. The existing Core model, test runner, preview, export, and legacy JSON
@@ -73,7 +73,7 @@ sources.
 1. Store all gameplay test metadata in the fixed root file `tests.settings`.
 2. Store exactly one JavaScript source file per test below root `tests/`.
 3. Use canonical project-root-relative `tests/...js` paths, without a URI
-   scheme, in each test's `source` field.
+   scheme, in each test's `file` field.
 4. Support project-scoped and extension-scoped tests without duplicate
    ownership in project or extension settings.
 5. Preserve test container order, names, types, descriptions, and source text
@@ -173,7 +173,7 @@ required, and portable Windows names. If preferred basenames collide after
 case/Unicode normalization, every colliding basename receives a deterministic
 suffix derived from the full logical identity (`project + test` or
 `extension + extension name + test`). A remaining hash collision is an error.
-This allocation is independent of record order. The recorded `source` path is
+This allocation is independent of record order. The recorded `file` path is
 the authoritative association during composition.
 
 Every test owns exactly one `.js` path and every managed `.js` file directly
@@ -195,7 +195,7 @@ order = 0
 name = "Player can jump"
 type = "gameplay"
 description = "The player jumps after Space is pressed."
-source = "tests/Player%20can%20jump.js"
+file = "tests/Player%20can%20jump.js"
 
 [[tests]]
 scope = "extension"
@@ -204,7 +204,7 @@ order = 0
 name = "Enemy takes damage"
 type = "gameplay"
 description = ""
-source = "tests/Combat%20-%20Enemy%20takes%20damage.js"
+file = "tests/Combat%20-%20Enemy%20takes%20damage.js"
 ```
 
 The canonical empty file is:
@@ -227,12 +227,16 @@ tests = [ ]
 | `name` | Required string, unique inside its owning test container. |
 | `type` | Required string; canonical current output is `"gameplay"`, while known serialized future values are preserved. |
 | `description` | Required string, including an empty string. |
-| `source` | Required canonical root-relative `tests/...js` path matching the declared scope. URI schemes are forbidden. |
+| `file` | Required canonical root-relative `tests/...js` path matching the declared scope. URI schemes are forbidden. |
 
 Unknown root fields, unknown test fields, TOML date values, non-finite numbers,
 and mixed empty/record forms are errors. Record order in the TOML file is
 canonical: project tests by `order`, then extensions by their project extension
 order, with each extension's tests by `order`.
+
+The retired authored field name `source` is invalid in `tests.settings`; the
+path field is named `file`. The legacy in-memory `gd::Test::source` property
+continues to hold the JavaScript text itself.
 
 The fields `lastRunStatus`, `lastRunAt`, `lastRunDurationMs`, and
 `lastRunFramesExecuted` are explicitly forbidden in `tests.settings`.
@@ -313,7 +317,7 @@ successful result write prunes stale records.
    flat source path from its scope and name.
 6. Write the inline `source` string to that path.
 7. Write a `tests.settings` record containing all remaining authored test fields,
-   `scope`, `order`, and the source path.
+   `scope`, `order`, and the source path in `file`.
 8. Omit `tests` from `project.gdevelop` and every `extension.settings` file.
 9. Emit the canonical empty `tests.settings` file when there are no tests.
 10. Compose the staged source map back to a legacy project and require authored
@@ -333,11 +337,12 @@ decomposer never returns that editor-state file.
 1. Require version 5 root markers and `tests.settings`.
 2. Discover and parse `tests.settings` independently at its fixed path.
 3. Validate its marker, strict schema, container-local identity/order, scope,
-   referenced extension names, and one-to-one source ownership.
+   referenced extension names, `file` field, and one-to-one source ownership.
 4. Reject inline `tests` ownership in the project or extension settings.
-5. Resolve every source path against the project root with the standard path
+5. Resolve every `file` path against the project root with the standard path
    and symlink safety checks.
-6. Read the JavaScript text and replace the source path with that text in the
+6. Read the JavaScript text and replace the `file` path with inline `source`
+   text in the
    temporary legacy test record.
 7. Reconstruct `project.tests` and each extension's `tests` array in their
    declared order without any `lastRun*` fields. Empty arrays may be omitted to
@@ -450,7 +455,7 @@ the Core model.
 
 ## 13. Security and resource limits
 
-1. A serialized test source is a project-root-relative path with exactly two
+1. A serialized test `file` value is a project-root-relative path with exactly two
    segments: `tests/<Basename>.js`. URI schemes, authorities, queries,
    fragments, leading slashes, colons, empty/`.`/`..` segments, backslashes,
    drive/UNC prefixes, traversal, normalized collisions, and project-root or
@@ -646,9 +651,9 @@ extension locality, but it does not satisfy the requested single dedicated
 root `tests.settings`. The proposed scope fields keep ownership explicit while
 centralizing test discovery.
 
-### 18.4 Derive the script path without a `source` field
+### 18.4 Derive the script path without a `file` field
 
-Rejected because the requested format explicitly associates `source` with a
+Rejected because the requested format explicitly associates `file` with a
 JavaScript file and an explicit root-relative path gives precise
 missing/duplicate diagnostics.
 

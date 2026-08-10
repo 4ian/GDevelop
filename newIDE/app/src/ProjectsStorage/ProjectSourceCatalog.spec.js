@@ -490,9 +490,10 @@ describe('project source catalogs', () => {
       expect.arrayContaining([
         expect.objectContaining({ name: 'scope' }),
         expect.objectContaining({ name: 'extension' }),
-        expect.objectContaining({ name: 'source' }),
+        expect.objectContaining({ name: 'file' }),
       ])
     );
+    expect(testsFileKind.forbiddenFields).toContain('source');
     expect(
       catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
         .forbiddenFields

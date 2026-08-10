@@ -99,12 +99,20 @@ namespace gdjs {
       count?: integer;
       sceneName?: string;
       /**
-       * Who changed the scene: the test itself (`harness` - a `goToScene`),
-       * the game's own logic (`game` - a scene change/restart action),
-       * multiplayer state (`networkSync`), or something outside of the
-       * game (`external` - a symptom of interference with the test).
+       * Who changed the scene: the test itself (`harness` - a `goToScene`,
+       * or `controlsProbe` for the scene restarts that
+       * `resetSceneAndProbeControls` performs itself - expected, not a
+       * malfunction), the game's own logic (`game` - a scene change/restart
+       * action), multiplayer state (`networkSync`), or something outside of
+       * the game (`external` - a symptom of interference with the test).
        */
-      cause?: 'harness' | 'game' | 'networkSync' | 'external' | 'unknown';
+      cause?:
+        | 'harness'
+        | 'controlsProbe'
+        | 'game'
+        | 'networkSync'
+        | 'external'
+        | 'unknown';
       /** For an `external` cause: where the change came from (call stack). */
       causeDetail?: string;
     };
@@ -523,6 +531,9 @@ namespace gdjs {
       _lastRenderTimeMs: number = 0;
       /** How long the last render (animation frame tick) took. */
       _lastRenderDurationMs: number = 0;
+      /** True while resetSceneAndProbeControls runs: its scene restarts are
+       * recorded with the `controlsProbe` cause. */
+      _isProbingControls: boolean = false;
       _playedSounds: Array<{ sound: string; frame: integer }> = [];
       /** Entries of the sound manager log already copied to `_playedSounds`. */
       _playedSoundsReadCount: integer = 0;
@@ -667,7 +678,9 @@ namespace gdjs {
             cause: !lastChangeCause
               ? 'unknown'
               : lastChangeCause.cause === GAMEPLAY_TEST_SCENE_CHANGE_CAUSE
-                ? 'harness'
+                ? this._isProbingControls
+                  ? 'controlsProbe'
+                  : 'harness'
                 : lastChangeCause.cause === 'game' ||
                     lastChangeCause.cause === 'networkSync'
                   ? lastChangeCause.cause
@@ -1792,7 +1805,25 @@ namespace gdjs {
       }> {
         const frames = (options && options.frames) || DEFAULT_PROBE_FRAMES;
         const sceneName = this._getCurrentScene().getName();
+        this._isProbingControls = true;
+        try {
+          return await this._probeControls(sceneName, objectName, keyNames, {
+            frames,
+          });
+        } finally {
+          this._isProbingControls = false;
+        }
+      }
 
+      private async _probeControls(
+        sceneName: string,
+        objectName: string,
+        keyNames: Array<string>,
+        { frames }: { frames: integer }
+      ): Promise<{
+        baseline: GameplayTestControlProbeResult | null;
+        keys: { [keyName: string]: GameplayTestControlProbeResult | null };
+      }> {
         const probe = async (
           keyName: string | null
         ): Promise<GameplayTestControlProbeResult | null> => {

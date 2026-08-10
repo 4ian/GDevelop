@@ -29,8 +29,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > NavMesh pathfinding */
-  export interface NavMeshCharacterNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -211,14 +210,8 @@ namespace gdjs {
         this._pathFound = false;
         return;
       }
+      const agentInitialPosition = this._agent.position();
       this._agent.teleport(origin);
-      this.owner.setX(origin.x);
-      this.owner.setY(
-        this._manager.is3D ? origin.z : origin.z * this._manager.speedScaleY
-      );
-      if (gdjs.Base3DHandler.is3D(this.owner)) {
-        this.owner.setZ(origin.y);
-      }
 
       const { success: hasFoundDestination, point: destination } =
         navMeshQuery.findClosestPoint(
@@ -240,12 +233,22 @@ namespace gdjs {
       navMeshQuery.destroy();
       if (!hasFoundDestination) {
         this._pathFound = false;
+        this._agent.teleport(agentInitialPosition);
         return;
       }
 
       this._pathFound = this._agent.requestMoveTarget(destination);
       if (this._pathFound) {
         this._reachedEnd = false;
+        this.owner.setX(origin.x);
+        this.owner.setY(
+          this._manager.is3D ? origin.z : origin.z * this._manager.speedScaleY
+        );
+        if (gdjs.Base3DHandler.is3D(this.owner)) {
+          this.owner.setZ(origin.y);
+        }
+      } else {
+        this._agent.teleport(agentInitialPosition);
       }
     }
 

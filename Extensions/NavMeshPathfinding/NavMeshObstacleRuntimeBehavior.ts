@@ -483,7 +483,13 @@ namespace gdjs {
               ? owner.getY()
               : owner.getY() * this.inverseSpeedScaleY,
           },
-          { halfExtents: { x: 100, y: 100, z: 100 } }
+          {
+            halfExtents: {
+              x: 100,
+              y: this.is3D ? 100 : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
+              z: 100,
+            },
+          }
         );
       navMeshQuery.destroy();
       if (!hasFoundOrigin) {

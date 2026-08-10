@@ -120,6 +120,7 @@ namespace gdjs {
         return;
       }
       this.timeSinceLastNavMeshLastRebuild = 0;
+      this.isNavMeshDirty = false;
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
       for (const obstacle of this.obstacles) {
@@ -183,13 +184,12 @@ namespace gdjs {
           maxAgentRadius: characterRadiusMax,
         });
         for (const character of this.characters) {
-          this.rebuildCharacterAgent(character);
+          this.buildCharacterAgent(character);
         }
         if (this.debuggerRenderer) {
           this.debuggerRenderer.renderFor3D();
         }
       }
-      this.isNavMeshDirty = false;
     }
 
     setDebugDrawEnabled(
@@ -466,11 +466,10 @@ namespace gdjs {
       });
     }
 
-    private rebuildCharacterAgent(
+    private buildCharacterAgent(
       character: NavMeshCharacterRuntimeBehavior
     ): void {
       if (!this.navMesh || !this.crowd) {
-        character._agent = null;
         return;
       }
       const owner = character.owner;
@@ -499,13 +498,16 @@ namespace gdjs {
         ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;
 
+      character._agent = agent;
       if (agent) {
-        const oldAgent = character._agent;
-        if (oldAgent && !character.destinationReached()) {
-          agent.requestMoveTarget(oldAgent.target());
+        if (character.pathFound() && !character.destinationReached()) {
+          character.moveTo(
+            character.getDestinationX(),
+            character.getDestinationY(),
+            character.getDestinationZ()
+          );
         }
       }
-      character._agent = agent;
     }
 
     /**
@@ -539,7 +541,11 @@ namespace gdjs {
       if (gdjs.Base3DHandler.is3D(character.owner)) {
         this.is3D = true;
       }
-      this.rebuildCharacterAgent(character);
+      if (this.crowd && character._agent) {
+        this.crowd.removeAgent(character._agent);
+        character._agent = null;
+      }
+      this.buildCharacterAgent(character);
     }
 
     /**

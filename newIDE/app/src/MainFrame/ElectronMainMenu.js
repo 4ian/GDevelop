@@ -229,6 +229,11 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
+    ipcEvent: 'main-menu-open-recent-editors',
+    callback: callbacks.onOpenRecentEditorSwitcher,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
     ipcEvent: 'main-menu-open-home-page',
     callback: callbacks.onOpenHomePage,
     shouldApply: isFocusedOnMainWindow,

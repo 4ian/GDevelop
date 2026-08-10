@@ -2364,7 +2364,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       isRoot: true,
                       content: new LabelTreeViewItemContent(
                         gameplayTestsRootFolderId,
-                        i18n._(t`Gameplay tests`),
+                        i18n._(t`Tests`),
                         {
                           icon: <Add />,
                           label: i18n._(t`Add a gameplay test`),

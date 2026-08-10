@@ -96,6 +96,8 @@ import {
   popInTab,
   moveTabToPosition,
 } from './EditorTabs/EditorTabsHandler';
+import { getEditorTabKey } from './EditorTabs/EditorTabKey';
+import { getProjectGameplayTestRecentEditorItems } from './GameplayTestRecentEditorItems';
 import {
   getRenamedLayoutTabProjectItemName,
   getRenamedExternalLayoutTabProjectItemName,
@@ -120,6 +122,7 @@ import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObje
 import { renderGameplayTestEditorContainer } from './EditorContainers/GameplayTestEditorContainer';
 
 import { GameplayTestFrame } from '../GameplayTests/GameplayTestFrame';
+import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import {
   getGameplayTestProjectItemName,
   getIsGameplayTestRunInProgress,
@@ -1493,20 +1496,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           : kind === 'layout events'
           ? { data: { scene: name, type: 'layout-events' } }
           : undefined;
-      const key = [
-        'layout',
-        'layout events',
-        'external events',
-        'external layout',
-        'events functions extension',
-        'behavior detail',
-        'function detail',
-        'prefab detail',
-        'custom object',
-        'gameplay-test',
-      ].includes(kind)
-        ? `${kind} ${name}`
-        : kind;
+      const key = getEditorTabKey(kind, name);
 
       let customIconUrl = '';
       if (
@@ -7625,6 +7615,19 @@ const MainFrame = (props: Props): React.MixedElement => {
       <SettingsIcon />,
       () => activateProjectManagerItemFromSwitcher(gamePropertiesItemId)
     );
+    if (areGameplayTestsEnabled()) {
+      for (const { id, testName } of getProjectGameplayTestRecentEditorItems(
+        currentProject
+      )) {
+        addRecentEditorSwitcherSideMenuItem(
+          id,
+          testName,
+          i18n._(t`Test script`),
+          <PreviewIcon />,
+          () => openGameplayTest({ type: 'project' }, testName)
+        );
+      }
+    }
     addRecentEditorSwitcherSideMenuItem(
       'resources',
       i18n._(t`Resources`),
@@ -8663,6 +8666,7 @@ const MainFrame = (props: Props): React.MixedElement => {
     },
     onCreateProject: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: showProjectManager,
+    onOpenRecentEditorSwitcher: openRecentEditorSwitcher,
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
     onOpenStickyNotes: openStickyNotesManager,

@@ -34,6 +34,7 @@ const mainMenuCallbacks = {
   onInviteCollaborators: () => action('onInviteCollaborators'),
   onCreateProject: () => action('onCreateProject'),
   onOpenProjectManager: () => action('onOpenProjectManager'),
+  onOpenRecentEditorSwitcher: () => action('onOpenRecentEditorSwitcher'),
   onOpenHomePage: () => action('onOpenHomePage'),
   onOpenDebugger: () => action('onOpenDebugger'),
   onOpenAbout: () => action('onOpenAbout'),

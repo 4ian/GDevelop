@@ -103,4 +103,39 @@ describe('MainMenu', () => {
 
     expect(onOpenStickyNotes).toHaveBeenCalledTimes(1);
   });
+
+  it('does not show a standalone gameplay tests item in the View menu', () => {
+    const adaptedMenu = adaptFromDeclarativeTemplate(
+      [buildViewMenu(({}: any))],
+      ({}: any)
+    );
+    const viewMenu: any = adaptedMenu[0];
+    const gameplayTestsItem = viewMenu.submenu.find(
+      item => item.label === 'Show gameplay tests'
+    );
+
+    expect(gameplayTestsItem).toBeUndefined();
+  });
+
+  it('opens Recent editors from the View menu', () => {
+    const onOpenRecentEditorSwitcher: any = (jest.fn(): any);
+    const adaptedMenu = adaptFromDeclarativeTemplate(
+      [buildViewMenu(({}: any))],
+      ({ onOpenRecentEditorSwitcher }: any)
+    );
+    const viewMenu: any = adaptedMenu[0];
+    const recentEditorsItem = viewMenu.submenu.find(
+      item => item.label === 'Recent editors'
+    );
+
+    expect(recentEditorsItem).toEqual(
+      expect.objectContaining({
+        accelerator: expect.any(String),
+        click: expect.any(Function),
+      })
+    );
+    recentEditorsItem.click();
+
+    expect(onOpenRecentEditorSwitcher).toHaveBeenCalledTimes(1);
+  });
 });

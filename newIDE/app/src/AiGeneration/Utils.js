@@ -102,9 +102,7 @@ export const AI_CHAT_TOOLS_VERSION = 'v8';
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-// v14 adds gameplay tests (`run_tests` + the tester sub-agent) and is only
-// used in development while the feature is being finished (see
-// `areGameplayTestsEnabled`).
+// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
 export const AI_ORCHESTRATOR_TOOLS_VERSION: string = areGameplayTestsEnabled()
   ? 'v14'
   : 'v13';

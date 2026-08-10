@@ -44,6 +44,7 @@ export type MainMenuCallbacks = {|
   onInviteCollaborators: () => void,
   onCreateProject: () => void,
   onOpenProjectManager: (open?: boolean) => void,
+  onOpenRecentEditorSwitcher: () => void,
   onOpenHomePage: () => void,
   onOpenDebugger: () => void | Promise<boolean>,
   onOpenStickyNotes: () => void,
@@ -75,6 +76,7 @@ export type MainMenuEvent =
   | 'main-menu-create-project'
   | 'main-menu-create-blank'
   | 'main-menu-open-project-manager'
+  | 'main-menu-open-recent-editors'
   | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
   | 'main-menu-open-sticky-notes'
@@ -104,6 +106,7 @@ const getMainMenuEventCallback = (
     'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
     'main-menu-create-project': callbacks.onCreateProject,
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
+    'main-menu-open-recent-editors': callbacks.onOpenRecentEditorSwitcher,
     'main-menu-open-home-page': callbacks.onOpenHomePage,
     'main-menu-open-debugger': callbacks.onOpenDebugger,
     'main-menu-open-sticky-notes': callbacks.onOpenStickyNotes,
@@ -247,6 +250,11 @@ export const buildMainMenuDeclarativeTemplate = ({
         ),
         onClickSendEvent: 'main-menu-open-project-manager',
         enabled: !!project,
+      },
+      {
+        label: i18n._(t`Recent editors`),
+        accelerator: getElectronAccelerator(shortcutMap['OPEN_RECENT_EDITOR']),
+        onClickSendEvent: 'main-menu-open-recent-editors',
       },
       {
         label: i18n._(t`Show Home`),

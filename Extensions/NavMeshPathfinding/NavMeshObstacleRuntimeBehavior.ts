@@ -115,7 +115,6 @@ namespace gdjs {
       if (!this.isNavMeshDirty || this.timeSinceLastNavMeshLastRebuild < 1) {
         return;
       }
-      console.log('Rebuild the NavMesh');
       this.timeSinceLastNavMeshLastRebuild = 0;
       const positions: Array<float> = [];
       const indices: Array<integer> = [];
@@ -167,8 +166,6 @@ namespace gdjs {
         indices,
         this.navMeshConfig
       );
-      console.log('Built', result.success);
-      this.navMeshConfig.walkableClimb = 2;
       if (result.success) {
         this.navMesh = result.navMesh;
         this.crowd = new RecastNav.Crowd(this.navMesh, {
@@ -213,8 +210,6 @@ namespace gdjs {
       const height = (maxY - minY) * this.inverseSpeedScaleY;
       const centerX = (maxX + minX) / 2;
       const centerY = ((maxY + minY) / 2) * this.inverseSpeedScaleY;
-
-      console.log('Ground', width, height, centerX, centerY);
 
       const indicesOffset = Math.round(positions.length / 3);
       for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
@@ -478,12 +473,6 @@ namespace gdjs {
           { halfExtents: { x: 100, y: 100, z: 100 } }
         );
       if (!hasFindOrigin) {
-        console.log(
-          "Can't find origin",
-          owner.getX(),
-          owner.getY(),
-          gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0
-        );
         return;
       }
 

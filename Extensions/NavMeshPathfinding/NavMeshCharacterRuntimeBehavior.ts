@@ -178,13 +178,7 @@ namespace gdjs {
     moveTo(x: float, y: float, z: float): void {
       this._path = [];
       this._manager.rebuildNavMeshIfNeeded();
-      if (!this._manager.navMesh) {
-        console.log("Can't build the nav mesh");
-        this._pathFound = false;
-        return;
-      }
-      if (!this._agent) {
-        console.log('No agent');
+      if (!this._manager.navMesh || !this._agent) {
         this._pathFound = false;
         return;
       }
@@ -211,12 +205,6 @@ namespace gdjs {
         );
       if (!hasFindOrigin) {
         this._pathFound = false;
-        console.log(
-          "Can't find origin",
-          this.owner.getX(),
-          this.owner.getY(),
-          gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0
-        );
         return;
       }
       this._agent.teleport(origin);
@@ -247,28 +235,10 @@ namespace gdjs {
         );
       if (!hasFindDestination) {
         this._pathFound = false;
-        console.log("Can't find destination", x, y, z);
         return;
       }
 
       this._pathFound = this._agent.requestMoveTarget(destination);
-      console.log(
-        'hasFindPath',
-        this._pathFound,
-        this.owner.x,
-        this.owner.y,
-        gdjs.Base3DHandler.is3D(this.owner) ? this.owner.getZ() : 0,
-        ' -> ',
-        destination.x,
-        this._manager.is3D
-          ? destination.z
-          : destination.z * this._manager.speedScaleY,
-        destination.y,
-        'extended from',
-        x,
-        y,
-        z
-      );
       if (this._pathFound) {
         this._reachedEnd = false;
       }
@@ -303,7 +273,6 @@ namespace gdjs {
         });
         this._path = [];
         this._pathFound = false;
-        console.log('Teleport to', oldX, oldY, oldZ);
       }
     }
 
@@ -331,7 +300,6 @@ namespace gdjs {
           }
         }
         this._path = path;
-        console.log('path', this._path);
       }
 
       let newX = agent.raw.get_npos(0);
@@ -339,8 +307,6 @@ namespace gdjs {
         ? agent.raw.get_npos(2)
         : agent.raw.get_npos(2) * this._manager.speedScaleY;
       let newZ = agent.raw.get_npos(1);
-
-      //console.log('New position', newX, newY, newZ);
 
       const destinationX = this.getDestinationX();
       const destinationY = this.getDestinationY();
@@ -376,7 +342,6 @@ namespace gdjs {
       ) {
         this._reachedEnd = true;
         agent.resetMoveTarget();
-        console.log('Reached end');
       }
       this.owner.setX(newX);
       this.owner.setY(newY);

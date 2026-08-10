@@ -192,11 +192,14 @@ namespace gdjs {
       this.isNavMeshDirty = false;
     }
 
-    setDebugDrawEnabled(enableDebugDraw: boolean): void {
+    setDebugDrawEnabled(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      enableDebugDraw: boolean
+    ): void {
       if (!this.debuggerRenderer) {
         this.debuggerRenderer = new gdjs.NavMeshDebuggerRenderer(this);
       }
-      this.debuggerRenderer.setEnabled(enableDebugDraw);
+      this.debuggerRenderer.setEnabled(instanceContainer, enableDebugDraw);
     }
 
     private addGroundFor2D(
@@ -569,7 +572,7 @@ namespace gdjs {
       }
       const manager =
         gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
-      manager.setDebugDrawEnabled(enableDebugDraw);
+      manager.setDebugDrawEnabled(instanceContainer, enableDebugDraw);
     };
   }
 

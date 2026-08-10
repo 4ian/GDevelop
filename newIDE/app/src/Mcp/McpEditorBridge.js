@@ -4554,7 +4554,7 @@ const callMcpTool = async ({
         nextAction:
           'Read the refreshed catalogs before making edits that depend on newly added or changed project structure. Run validate_project_files after the final source edit before reload_project.',
         note:
-          'All three generated catalog files and both JavaScript declaration files were written sequentially and verified before this response. Embedded-layout authoring data is included in settings-catalog.json; the retired layout-catalog.json was removed. Project source files and editor memory were not modified.',
+          'All generated catalog files and both JavaScript declaration files were written sequentially and verified before this response. Embedded-layout authoring data is included in settings-catalog.json; the retired layout-catalog.json was removed. Project source files and editor memory were not modified.',
       });
     } catch (error) {
       const diagnostic = getProjectFilesValidationDiagnostic(

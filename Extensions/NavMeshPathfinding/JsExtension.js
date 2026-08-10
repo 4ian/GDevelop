@@ -20,18 +20,18 @@ module.exports = {
     extension
       .setExtensionInformation(
         'NavMeshPathfinding',
-        _('Pathfinding behavior'),
+        _('NavMesh pathfinding behavior'),
         'Pathfinding allows to compute an efficient path for objects, avoiding obstacles on the way.',
         '',
         'Open source (MIT License)'
       )
       .setShortDescription(
-        'A* pathfinding: compute paths avoiding obstacles. Configurable speed, grid, diagonals.'
+        'A* pathfinding: compute paths avoiding obstacles.'
       )
-      .setDimension('3D')
+      .setDimension('2D/3D')
       .setCategory('Movement')
       .setTags('pathfinding, obstacle, collision')
-      .setExtensionHelpPath('/behaviors/pathfinding');
+      .setExtensionHelpPath('/behaviors/nav-mesh-pathfinding');
     {
       const behavior = new gd.BehaviorJsImplementation();
       behavior.updateProperty = function (
@@ -375,7 +375,7 @@ module.exports = {
       const aut = extension
         .addBehavior(
           'NavMeshCharacterBehavior',
-          _('3D pathfinding'),
+          _('Pathfinding character (nav-mesh based)'),
           'NavMeshCharacter',
           _(
             'Move objects to a target while avoiding all objects that are  flagged as obstacles.'
@@ -855,9 +855,9 @@ module.exports = {
       const aut = extension
         .addBehavior(
           'NavMeshObstacleBehavior',
-          _('Obstacle for 3D pathfinding'),
+          _('Pathfinding obstacle (nav-mesh based)'),
           'NavMeshObstacle',
-          _('Flag objects as being obstacles for 3D pathfinding.'),
+          _('Flag objects as being obstacles for nav-mesh pathfinding.'),
           '',
           'CppPlatform/Extensions/pathfindingobstacleicon.png',
           'NavMeshObstacle',

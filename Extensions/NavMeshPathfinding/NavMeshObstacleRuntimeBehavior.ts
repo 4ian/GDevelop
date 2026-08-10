@@ -26,7 +26,7 @@ namespace gdjs {
    * `NavMeshObstaclesManager.addObstacle`) to the manager of their
    * associated container (see
    * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
-   * @category Behaviors > 2D Pathfinding
+   * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshObstaclesManager {
     obstacles = new Set<NavMeshObstacleRuntimeBehavior>();
@@ -546,7 +546,7 @@ namespace gdjs {
     }
   }
 
-  /** @category Behaviors > 2D Pathfinding */
+  /** @category Behaviors > NavMesh pathfinding */
   export namespace NavMeshObstaclesManager {
     /**
      * Enable or disable the debug draw.
@@ -568,8 +568,8 @@ namespace gdjs {
 
   /**
    * NavMeshObstacleRuntimeBehavior represents a behavior allowing objects to be
-   * considered as a obstacle by objects having Pathfinding Behavior.
-   * @category Behaviors > 2D Pathfinding
+   * considered as a obstacle by objects having Character Behavior.
+   * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
     _shape: string;
@@ -713,8 +713,6 @@ namespace gdjs {
    * @param vertexFlags only used internally
    * @param outTriangles is called for each triangle derived
    * from the original polygon.
-   * @return The number of triangles generated. Or, if triangulation
-   * failed, a negative number.
    */
   function triangulate(
     vertices: Array<Point>,

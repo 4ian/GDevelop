@@ -28,7 +28,7 @@ namespace gdjs {
     ma: number;
   }
 
-  /** @category Behaviors > 2D Pathfinding */
+  /** @category Behaviors > NavMesh pathfinding */
   export interface NavMeshCharacterNetworkSyncData
     extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
@@ -37,7 +37,7 @@ namespace gdjs {
   /**
    * NavMeshCharacterRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
-   * @category Behaviors > 2D Pathfinding
+   * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshCharacterRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<RecastNav.Vector3> = [];

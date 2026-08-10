@@ -10,7 +10,8 @@ authoring contract.
 **Text encoding:** UTF-8 without BOM
 **Line endings:** LF when written by GDevelop
 **Related specifications:** [gdevelop-events-dsl-spec.md](gdevelop-events-dsl-spec.md),
-[gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md)
+[gdevelop-layout-toml-spec.md](gdevelop-layout-toml-spec.md),
+[gameplay-tests-multifile-serialization-spec.md](gameplay-tests-multifile-serialization-spec.md)
 
 The controlling version 5 ownership and path contract is
 [embedded-layout-settings-format-spec.md](embedded-layout-settings-format-spec.md).
@@ -30,6 +31,9 @@ Production accepts version 5 only. In particular:
   `functions/<Function>.settings` + `functions/<Function>.events` pair;
 - every managed `.events` body is a function and must have its same-stem
   `.settings` owner;
+- root `tests.settings` owns all project and extension gameplay-test metadata,
+  with JavaScript bodies stored as direct children of root `tests/` and
+  referenced by scheme-free root-relative paths;
 - no managed `.layout` file, layout URI, events URI, nested variant manifest,
   or `externalLayoutFiles` manifest is valid in version 5.
 - `.gdevelop/settings-catalog.json` format version 2 contains both settings
@@ -129,10 +133,12 @@ phase 5 before they can store this directory format natively.
     `.settings` file is parsed independently. Its canonical physical path
     determines where its local root is mounted in the combined settings tree;
     mounted documents are then recursively merged with conflicts rejected.
-12. **Managed source references are project-root URIs.** Settings refer to
-    `.layout` and `.events` sources with canonical `game://...` URIs rooted at
-    the directory containing `project.gdevelop`, never relative paths. A
-    `.settings` file never references another `.settings` file.
+12. **Managed event/layout references are project-root URIs.** Settings refer
+    to `.layout` and `.events` sources with canonical `game://...` URIs rooted
+    at the directory containing `project.gdevelop`, never relative paths. The
+    deliberate gameplay-test exception is a scheme-free canonical
+    `tests/<Encoded basename>.js` path in root `tests.settings`. A `.settings`
+    file never references another `.settings` file.
 13. **Settings stay separate on disk.** A settings file never includes or
     embeds another settings file. The editor creates the combined settings
     document only transiently during loading/compilation and writes changes
@@ -168,6 +174,11 @@ MyGame/
   project.gdevelop
   resources.settings
   constants.toml
+  tests.settings
+
+  tests/
+    Player%20can%20jump.js
+    Combat%20-%20Enemy%20takes%20damage.js
 
   objects/
     Player.settings                 # folder = ["Shared"]
@@ -230,6 +241,7 @@ MyGame/
               TakeDamage.events
 
   .gdevelop/
+    gameplay-test-results.json
     instructions-catalog.json
     deprecated-instructions-catalog.json
     settings-catalog.json
@@ -257,6 +269,9 @@ scene they are associated with. Their manifest entries live in that scene's
   registry at the project root.
 - One root `constants.toml`, including an empty document when the project has
   no Constants.
+- One root `tests.settings`, including its canonical empty form when the
+  project has no gameplay tests, plus one flat direct-child `tests/*.js` source
+  per project or extension test.
 - One `objects/<Object>.settings` file for every global
   object definition.
 - Exactly one scene subfolder containing `scene.settings`, one `.layout`, and
@@ -774,12 +789,12 @@ The generated path is a suggestion. Once created, a managed folder path remains
 stable until an explicit rename/move operation. This avoids path churn when
 display names change.
 
-### 5.6 `game://` project-root references
+### 5.6 Managed project-root references
 
-Every managed source-file reference written in a `.settings` file uses a
-canonical `game://` URI. Relative filesystem paths are forbidden. These are
-references to `.layout` and `.events` files only; settings fragments are found
-from fixed folder conventions and must never be referenced. For example:
+Managed `.layout` and `.events` references written in a `.settings` file use a
+canonical `game://` URI. Relative filesystem paths are forbidden for those
+domains. Settings fragments are found from fixed folder conventions and must
+never be referenced. For example:
 
 ```toml
 layout = "game://scenes/Main/Main.layout"
@@ -813,6 +828,13 @@ Stored reference examples include
 The loader may use `game://project.gdevelop` and other settings URIs internally
 for identity and diagnostics, but it never serializes one settings URI inside
 another settings fragment.
+
+Gameplay-test JavaScript references are the deliberate exception: the root
+`tests.settings` file stores canonical scheme-free paths such as
+`tests/Player%20can%20jump.js`. They must resolve to direct `.js` children of
+root `tests/`; `game://`, subfolders, absolute paths, and traversal are
+forbidden. Last-run summaries are not authored references or settings and live
+only in ignored `.gdevelop/gameplay-test-results.json` local editor state.
 
 Version 3 does not automatically rewrite legacy runtime asset/resource paths
 to `game://`; this rule governs managed new-format source references stored in
@@ -1805,6 +1827,9 @@ unrelated extensions, or `project.gdevelop`.
 | A global object definition or its editor-folder grouping                                              | `objects/<Object>.settings` (`folder`)                           |
 | Resource entries, origins, metadata, and resource folders                                             | `resources.settings`                                             |
 | Editor-only Constants                                                                                 | `constants.toml`                                                 |
+| Gameplay-test identity, order, type, description, or source association                              | `tests.settings`                                                 |
+| Gameplay-test JavaScript body                                                                         | Its flat root `tests/<Encoded basename>.js` source                |
+| Gameplay-test last-run summary                                                                        | Ignored `.gdevelop/gameplay-test-results.json` editor state       |
 | Scene identity, object groups, variables, loading/input/sound/sort settings, and shared behavior data | The scene `scene.settings`                                       |
 | A scene object definition, attached behaviors, or editor-folder grouping                              | `scenes/<Scene>/objects/<Object>.settings` (`folder`)            |
 | Scene instances, layers, background, and scene-editor canvas/layout state                             | The scene `.layout`                                              |
@@ -2249,9 +2274,11 @@ legacy JSON
 - No settings fragment embeds another fragment or uses an include directive;
   compilation creates `CombinedProjectSettings` only in memory, and saving a
   child setting rewrites only its owning file.
-- Every managed source reference in settings uses canonical `game://` form;
-  relative paths, backslashes, malformed encodings, `.`/`..`, drive/UNC paths,
-  normalized collisions, and root/symlink escapes are rejected.
+- Every managed event/layout source reference in settings uses canonical
+  `game://` form. Gameplay-test JavaScript uses its specified canonical
+  scheme-free `tests/<Encoded basename>.js` form. Backslashes, malformed
+  encodings, `.`/`..`, drive/UNC paths, normalized collisions, and root/symlink
+  escapes are rejected in both forms.
 - Interrupted writes and recovery at each transaction step.
 - External edits with clean and dirty editor state.
 - Very large projects and bounded-memory composition.
@@ -2343,8 +2370,9 @@ A conforming implementation must satisfy all of the following:
 13. No managed save deletes unrecognized user files.
 14. A full new-source -> legacy -> current-project verification succeeds before migration is considered complete.
 15. All local-root `.settings` documents mount and merge conflict-free into one
-    authoritative in-memory settings tree, and every managed source reference
-    uses a project-root `game://` URI rather than a relative path.
+    authoritative in-memory settings tree. Event/layout source references use
+    project-root `game://` URIs; gameplay-test JavaScript references use the
+    scheme-free root-relative form defined by the gameplay-test specification.
 16. Settings remain separate files on disk with no include/embedding syntax;
     the editor creates the combined project-settings document only in memory
     for validation and compilation, then saves each changed namespace back to
@@ -2357,3 +2385,7 @@ A conforming implementation must satisfy all of the following:
     `functions/<Lifecycle>/function.settings` with a matching sibling
     `<Lifecycle>.events`; `sceneUpdate` is required and empty load, signal, and
     unload functions do not create managed files.
+20. Root `tests.settings` exclusively owns project and extension gameplay-test
+    metadata, direct root `tests/*.js` files own their exact source text, and
+    last-run summaries live only in ignored
+    `.gdevelop/gameplay-test-results.json` state.

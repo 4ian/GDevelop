@@ -5,6 +5,7 @@ import {
   MULTI_FILE_ENTRY_URI,
   MULTI_FILE_FORMAT_VERSION,
   MULTI_FILE_RESOURCES_URI,
+  MULTI_FILE_TESTS_URI,
   MultiFileProjectError,
   areLegacyProjectsEquivalent,
   composeLegacyProjectFromFiles,
@@ -185,6 +186,147 @@ const projectFixture = {
 };
 
 describe('GDevelop multi-file project format', () => {
+  test('stores project and extension gameplay tests in root tests.settings with flat JavaScript sources', () => {
+    const project = JSON.parse(JSON.stringify(projectFixture));
+    project.tests = [
+      {
+        name: 'Player can jump',
+        type: 'gameplay',
+        description: 'The player jumps.',
+        source: 'gameplayTest.wait(1);',
+        lastRunStatus: 'passed',
+        lastRunAt: 123,
+        lastRunDurationMs: 45,
+        lastRunFramesExecuted: 3,
+      },
+    ];
+    project.eventsFunctionsExtensions[0].tests = [
+      {
+        name: 'Enemy takes damage',
+        type: 'gameplay',
+        description: 'The enemy loses health.',
+        source: 'gameplayTest.wait(2);',
+        lastRunStatus: 'failed',
+        lastRunAt: 456,
+        lastRunDurationMs: 78,
+        lastRunFramesExecuted: 5,
+      },
+    ];
+
+    const files = decomposeLegacyProjectToFiles(project);
+    expect(files[MULTI_FILE_TESTS_URI]).toContain('kind = "tests"');
+    expect(files[MULTI_FILE_TESTS_URI]).toContain(
+      'source = "tests/Player%20can%20jump.js"'
+    );
+    expect(files[MULTI_FILE_TESTS_URI]).toContain(
+      'source = "tests/Combat%20-%20Enemy%20takes%20damage.js"'
+    );
+    expect(files[MULTI_FILE_TESTS_URI]).not.toContain('game://');
+    expect(files[MULTI_FILE_TESTS_URI]).not.toContain('lastRun');
+    expect(files['game://tests/Player%20can%20jump.js']).toBe(
+      'gameplayTest.wait(1);'
+    );
+    expect(files['game://tests/Combat%20-%20Enemy%20takes%20damage.js']).toBe(
+      'gameplayTest.wait(2);'
+    );
+    expect(files[MULTI_FILE_ENTRY_URI]).not.toContain('tests');
+    expect(files['game://extensions/Combat/extension.settings']).not.toContain(
+      'tests'
+    );
+
+    const composed = composeLegacyProjectFromFiles(files);
+    expect(composed.tests).toEqual([
+      {
+        name: 'Player can jump',
+        type: 'gameplay',
+        description: 'The player jumps.',
+        source: 'gameplayTest.wait(1);',
+      },
+    ]);
+    expect(composed.eventsFunctionsExtensions[0].tests).toEqual([
+      {
+        name: 'Enemy takes damage',
+        type: 'gameplay',
+        description: 'The enemy loses health.',
+        source: 'gameplayTest.wait(2);',
+      },
+    ]);
+  });
+
+  test('requires the v5 tests settings owner and rejects result fields in authored settings', () => {
+    const files = decomposeLegacyProjectToFiles(projectFixture);
+    delete files[MULTI_FILE_TESTS_URI];
+    expect(() => composeLegacyProjectFromFiles(files)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_MISSING_TESTS_SETTINGS' })
+    );
+
+    const project = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'Smoke test',
+          type: 'gameplay',
+          description: '',
+          source: '',
+        },
+      ],
+    };
+    const withResultField = decomposeLegacyProjectToFiles(project);
+    withResultField[MULTI_FILE_TESTS_URI] = withResultField[
+      MULTI_FILE_TESTS_URI
+    ].replace(
+      'type = "gameplay"',
+      'type = "gameplay"\nlastRunStatus = "passed"'
+    );
+    expect(() => composeLegacyProjectFromFiles(withResultField)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_TESTS_SETTINGS' })
+    );
+
+    const withUriScheme = decomposeLegacyProjectToFiles(project);
+    withUriScheme[MULTI_FILE_TESTS_URI] = withUriScheme[
+      MULTI_FILE_TESTS_URI
+    ].replace(
+      'source = "tests/Smoke%20test.js"',
+      'source = "game://tests/Smoke%20test.js"'
+    );
+    expect(() => composeLegacyProjectFromFiles(withUriScheme)).toThrow(
+      expect.objectContaining({ code: 'MULTIFILE_INVALID_TEST_SOURCE' })
+    );
+  });
+
+  test('allocates deterministic flat names for normalized gameplay test collisions', () => {
+    const project = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'Smoke',
+          type: 'gameplay',
+          description: '',
+          source: 'first',
+        },
+        {
+          name: 'smoke',
+          type: 'gameplay',
+          description: '',
+          source: 'second',
+        },
+      ],
+    };
+    const files = decomposeLegacyProjectToFiles(project);
+    const sourceUris = Object.keys(files).filter(uri =>
+      uri.startsWith('game://tests/')
+    );
+    expect(sourceUris).toHaveLength(2);
+    expect(
+      sourceUris.every(uri =>
+        /^game:\/\/tests\/[^/]+~[0-9a-f]{8}\.js$/.test(uri)
+      )
+    ).toBe(true);
+    expect(
+      areLegacyProjectsEquivalent(project, composeLegacyProjectFromFiles(files))
+    ).toBe(true);
+  });
+
   test('describes the first normalized verification difference without dumping large values', () => {
     const left = {
       ...projectFixture,

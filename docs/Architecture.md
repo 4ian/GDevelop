@@ -699,7 +699,7 @@ requested.
 | ------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Single JSON               | arbitrary `*.json`                              | Legacy input/output path supported by the serializer/storage layer.                                                |
 | Split JSON folder project | a JSON entry plus referenced `*.json` fragments | Legacy format using `ObjectSplitter` and `__REFERENCE_TO_SPLIT_OBJECT`. Still readable; not the new source format. |
-| Multi-file source project | `project.gdevelop`                              | Primary local authoring format; version 5 TOML settings with embedded layout subtrees plus IfDo event files.       |
+| Multi-file source project | `project.gdevelop`                              | Primary local authoring format; version 5 TOML settings with embedded layouts, IfDo events, and flat gameplay-test JavaScript sources. |
 
 Opening a legacy single-JSON project normalizes it through the current libGD
 serializer, decomposes it directly to version 5 next to the source, verifies a
@@ -727,6 +727,9 @@ A representative source tree is:
 project.gdevelop
 resources.settings
 constants.toml
+tests.settings
+tests/<encoded-project-test>.js
+tests/<encoded-extension-and-test>.js
 objects/<encoded-name>.settings
 scenes/<encoded-name>/
   scene.settings
@@ -756,6 +759,8 @@ extensions/<encoded-name>/prefabs/<encoded-name>/
   strict layout schema below `[layout]`; there are no managed `.layout` files.
 - `*.events` uses the IfDo DSL in
   `newIDE/app/src/EventsSheet/IfDoEventsDsl`.
+- Root `tests.settings` owns all project and extension gameplay-test metadata;
+  each scheme-free `source` points to one direct child of root `tests/`.
 - Physical owner paths derive component association. Same-stem function event
   bodies and embedded layouts do not use URI fields.
 - Every managed `.events` file is a function body and has a same-stem
@@ -785,6 +790,9 @@ Reader safety limits bound ordinary sources to 16 MiB, layout-bearing composite
 owner settings to 32 MiB, total composed size, and managed file count. URI
 resolution checks lexical containment and existing real paths so symlinks
 cannot escape the project root.
+Ignored gameplay-test result state is independently bounded to 4 MiB and
+10,000 records; malformed or stale records are diagnostic-only and do not
+prevent authored sources from opening.
 
 ### Generated `.gdevelop` artifacts
 
@@ -795,7 +803,9 @@ A multi-file save also regenerates editor/tooling projections:
   authoring schemas and owner contexts;
 - `.gdevelop/runtime-api.d.ts` and `project-api.d.ts`;
 - `.gdevelop/game.json`, a legacy-shaped compatibility projection without
-  Constants;
+  Constants or gameplay-test last-run summaries;
+- `.gdevelop/gameplay-test-results.json`, bounded ignored local state that is
+  hydrated into the in-memory test model without dirtying authored sources;
 - autosave and transaction state in dedicated subdirectories.
 
 These files support IfDo name resolution, AI/MCP authoring, validation,

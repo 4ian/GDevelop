@@ -8,8 +8,13 @@ const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 
 const multiFileProjectDirectories = ['scenes', 'externals', 'extensions'];
-const multiFileProjectRootFiles = [MULTI_FILE_ENTRY_NAME, 'resources.settings'];
+const multiFileProjectRootFiles = [
+  MULTI_FILE_ENTRY_NAME,
+  'resources.settings',
+  'tests.settings',
+];
 const multiFileProjectExtensions = new Set(['.settings', '.events']);
+const gameplayTestSourceExtensions = new Set(['.js']);
 
 const getFileModificationTime = async (filePath: string): Promise<?number> => {
   try {
@@ -42,7 +47,8 @@ const getFileModificationTimeSync = (filePath: string): ?number => {
 };
 
 const getLatestProjectFileModificationTimeInDirectory = async (
-  directoryPath: string
+  directoryPath: string,
+  extensions: Set<string> = multiFileProjectExtensions
 ): Promise<?number> => {
   let entries;
   try {
@@ -63,11 +69,12 @@ const getLatestProjectFileModificationTimeInDirectory = async (
     let modificationTime = null;
     if (entry.isDirectory()) {
       modificationTime = await getLatestProjectFileModificationTimeInDirectory(
-        entryPath
+        entryPath,
+        extensions
       );
     } else if (
       entry.isFile() &&
-      multiFileProjectExtensions.has(path.extname(entry.name).toLowerCase())
+      extensions.has(path.extname(entry.name).toLowerCase())
     ) {
       modificationTime = await getFileModificationTime(entryPath);
     }
@@ -84,7 +91,8 @@ const getLatestProjectFileModificationTimeInDirectory = async (
 };
 
 const getLatestProjectFileModificationTimeInDirectorySync = (
-  directoryPath: string
+  directoryPath: string,
+  extensions: Set<string> = multiFileProjectExtensions
 ): ?number => {
   let entries;
   try {
@@ -105,11 +113,12 @@ const getLatestProjectFileModificationTimeInDirectorySync = (
     let modificationTime = null;
     if (entry.isDirectory()) {
       modificationTime = getLatestProjectFileModificationTimeInDirectorySync(
-        entryPath
+        entryPath,
+        extensions
       );
     } else if (
       entry.isFile() &&
-      multiFileProjectExtensions.has(path.extname(entry.name).toLowerCase())
+      extensions.has(path.extname(entry.name).toLowerCase())
     ) {
       modificationTime = getFileModificationTimeSync(entryPath);
     }
@@ -174,6 +183,10 @@ export const getLocalProjectLastModifiedDate = async (
         path.join(projectRoot, directoryName)
       )
     ),
+    getLatestProjectFileModificationTimeInDirectory(
+      path.join(projectRoot, 'tests'),
+      gameplayTestSourceExtensions
+    ),
   ]);
 
   return getLatestModificationTime(modificationTimes);
@@ -202,6 +215,10 @@ export const getLocalProjectLastModifiedDateSync = (
       getLatestProjectFileModificationTimeInDirectorySync(
         path.join(projectRoot, directoryName)
       )
+    ),
+    getLatestProjectFileModificationTimeInDirectorySync(
+      path.join(projectRoot, 'tests'),
+      gameplayTestSourceExtensions
     ),
   ]);
 };

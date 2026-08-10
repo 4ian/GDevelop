@@ -302,7 +302,10 @@ import useLocalProjectChangesWatcher, {
 import { localFileStorageProviderInternalName } from '../ProjectsStorage/LocalFileStorageProvider/LocalFileStorageProviderInternalName';
 import { writeProjectSourceCatalogs } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { getLocalProjectLastModifiedDateSync } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectFileModificationTime';
-import { openMultiFileProject } from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
+import {
+  openMultiFileProject,
+  writeGameplayTestResults,
+} from '../ProjectsStorage/LocalFileStorageProvider/LocalMultiFileProject';
 import {
   MULTI_FILE_ENTRY_NAME,
   areLegacyProjectsEquivalent,
@@ -963,20 +966,55 @@ const MainFrame = (props: Props): React.MixedElement => {
   // ("no editor registered").
   const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
   const unsavedChangesRef = useStableUpToDateRef(unsavedChanges);
+  const currentFileMetadataRef = useStableUpToDateRef(
+    state.currentFileMetadata
+  );
+  const gameplayTestProjectRef = useStableUpToDateRef(state.currentProject);
+  const getStorageProviderRef = useStableUpToDateRef(props.getStorageProvider);
   React.useEffect(
     () => {
       registerGameplayTestRunnerDependencies({
         getPreviewLauncher: () => _previewLauncher.current,
-        onTestsRunFinished: () => {
+        onTestsRunFinished: async project => {
           // The last run summary of tests was updated on the project.
           const currentUnsavedChanges = unsavedChangesRef.current;
+          const fileMetadata = currentFileMetadataRef.current;
+          if (gameplayTestProjectRef.current !== project) return;
+          const isLocalMultiFileProject =
+            !!fileMetadata &&
+            getStorageProviderRef.current().internalName ===
+              localFileStorageProviderInternalName &&
+            fileMetadata.fileIdentifier
+              .replace(/\\/g, '/')
+              .toLowerCase()
+              .split('/')
+              .pop() === MULTI_FILE_ENTRY_NAME;
+          if (isLocalMultiFileProject && fileMetadata) {
+            try {
+              await writeGameplayTestResults(
+                serializeToJSObject(project, 'serializeTo'),
+                fileMetadata.fileIdentifier
+              );
+              return;
+            } catch (error) {
+              console.error(
+                'Unable to persist local gameplay test results:',
+                error
+              );
+            }
+          }
           if (currentUnsavedChanges)
             currentUnsavedChanges.triggerUnsavedChanges();
         },
       });
       return () => registerGameplayTestRunnerDependencies(null);
     },
-    [unsavedChangesRef]
+    [
+      currentFileMetadataRef,
+      gameplayTestProjectRef,
+      getStorageProviderRef,
+      unsavedChangesRef,
+    ]
   );
   const {
     hasUnsavedChanges,
@@ -7360,10 +7398,9 @@ const MainFrame = (props: Props): React.MixedElement => {
 
   /**
    * Similar to `currentProjectRef`, a fresh reference (fresh=value of the last render)
-   * to the latest `currentFileMetadata`. Only use this reference in fetchNewlyAddedResources.
-   * Anywhere else, pass the currentFileMetadata directly as argument.
+   * to the latest `currentFileMetadata`. It is shared by callbacks registered
+   * once outside the render lifecycle and by fetchNewlyAddedResources.
    */
-  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
   const fetchNewlyAddedResources = React.useCallback(
     async (): Promise<void> => {
       if (!currentProjectRef.current || !currentFileMetadataRef.current) return;

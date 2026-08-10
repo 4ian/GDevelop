@@ -56,11 +56,27 @@ describe('getLocalProjectLastModifiedDate', () => {
       350000
     );
     writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'tests.settings'),
+      360000
+    );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'tests', 'Smoke test.js'),
+      370000
+    );
+    writeFileWithModificationTime(
       path.join(temporaryDirectory, '.gdevelop', 'layout-catalog.json'),
       400000
     );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, 'scenes', 'Main', 'unmanaged.js'),
+      450000
+    );
+    writeFileWithModificationTime(
+      path.join(temporaryDirectory, '.gdevelop', 'gameplay-test-results.json'),
+      500000
+    );
 
-    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(350000);
+    expect(await getLocalProjectLastModifiedDate(entryPath)).toBe(370000);
   });
 
   it('ignores resources and generated autosaves', async () => {

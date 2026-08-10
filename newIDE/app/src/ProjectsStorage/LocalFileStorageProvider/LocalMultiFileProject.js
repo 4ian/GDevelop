@@ -8,6 +8,8 @@ import {
   MULTI_FILE_FORMAT_VERSION,
   MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI,
   MULTI_FILE_RESOURCES_URI,
+  MULTI_FILE_TESTS_URI,
+  GAMEPLAY_TEST_RUN_SUMMARY_FIELDS,
   MultiFileProjectError,
   composeLegacyProjectFromFiles,
   decomposeLegacyProjectToFiles,
@@ -32,6 +34,19 @@ const MAX_MANAGED_FILES = 10000;
 const MAX_SOURCE_FILE_SIZE = 16 * 1024 * 1024;
 const MAX_COMPOSITE_SOURCE_FILE_SIZE = 32 * 1024 * 1024;
 const MAX_COMPOSED_SOURCE_SIZE = 256 * 1024 * 1024;
+const MAX_GAMEPLAY_TEST_RESULTS_SIZE = 4 * 1024 * 1024;
+const MAX_GAMEPLAY_TEST_RESULTS_COUNT = 10000;
+export const GAMEPLAY_TEST_RESULTS_RELATIVE_PATH =
+  '.gdevelop/gameplay-test-results.json';
+const GAMEPLAY_TEST_RESULTS_FORMAT = 'gdevelop-gameplay-test-results';
+const GAMEPLAY_TEST_RESULTS_VERSION = 1;
+const GAMEPLAY_TEST_RUN_STATUSES = new Set([
+  'passed',
+  'failed',
+  'error',
+  'stopped',
+  'timeout',
+]);
 const WINDOWS_INVALID_PATH_CHARACTER = /[<>:"/\\|?*]/;
 const WINDOWS_DEVICE_PATH_SEGMENT = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
 
@@ -280,6 +295,216 @@ const findGameUris = (value: any, output: Set<string>) => {
     Object.keys(value).forEach(key => findGameUris(value[key], output));
 };
 
+const forEachGameplayTest = (
+  legacyProject: Object,
+  callback: (test: Object, identity: Object) => void
+) => {
+  const projectTests = Array.isArray(legacyProject.tests)
+    ? legacyProject.tests
+    : [];
+  projectTests.forEach(test =>
+    callback(test, { scope: 'project', name: test.name })
+  );
+  const extensions = Array.isArray(legacyProject.eventsFunctionsExtensions)
+    ? legacyProject.eventsFunctionsExtensions
+    : [];
+  extensions.forEach(extension => {
+    const extensionTests = Array.isArray(extension.tests)
+      ? extension.tests
+      : [];
+    extensionTests.forEach(test =>
+      callback(test, {
+        scope: 'extension',
+        extension: extension.name,
+        name: test.name,
+      })
+    );
+  });
+};
+
+const gameplayTestResultIdentityKey = (identity: Object): string =>
+  identity.scope === 'extension'
+    ? `extension\u0000${identity.extension}\u0000${identity.name}`
+    : `project\u0000${identity.name}`;
+
+const stripGameplayTestRunSummary = (test: Object): Object => {
+  const authoredTest = { ...test };
+  GAMEPLAY_TEST_RUN_SUMMARY_FIELDS.forEach(field => {
+    delete authoredTest[field];
+  });
+  return authoredTest;
+};
+
+export const stripGameplayTestResultsFromLegacyProject = (
+  legacyProject: Object
+): Object => {
+  const projectWithoutResults = { ...legacyProject };
+  if (Array.isArray(legacyProject.tests)) {
+    projectWithoutResults.tests = legacyProject.tests.map(
+      stripGameplayTestRunSummary
+    );
+  }
+  if (Array.isArray(legacyProject.eventsFunctionsExtensions)) {
+    projectWithoutResults.eventsFunctionsExtensions = legacyProject.eventsFunctionsExtensions.map(
+      extension => ({
+        ...extension,
+        ...(Array.isArray(extension.tests)
+          ? { tests: extension.tests.map(stripGameplayTestRunSummary) }
+          : {}),
+      })
+    );
+  }
+  return projectWithoutResults;
+};
+
+const isValidGameplayTestResultRecord = (record: any): boolean => {
+  if (!record || typeof record !== 'object' || Array.isArray(record))
+    return false;
+  const resultRecord: any = record;
+  const expectedFields: Set<string> = new Set([
+    'scope',
+    'name',
+    ...(resultRecord.scope === 'extension' ? ['extension'] : []),
+    ...GAMEPLAY_TEST_RUN_SUMMARY_FIELDS,
+  ]);
+  if (
+    Object.keys(resultRecord).length !== expectedFields.size ||
+    Object.keys(resultRecord).some(field => !expectedFields.has(field)) ||
+    !['project', 'extension'].includes(resultRecord.scope) ||
+    typeof resultRecord.name !== 'string' ||
+    !resultRecord.name ||
+    (resultRecord.scope === 'extension' &&
+      (typeof resultRecord.extension !== 'string' ||
+        !resultRecord.extension)) ||
+    !GAMEPLAY_TEST_RUN_STATUSES.has(resultRecord.lastRunStatus) ||
+    typeof resultRecord.lastRunAt !== 'number' ||
+    !Number.isFinite(resultRecord.lastRunAt) ||
+    resultRecord.lastRunAt < 0 ||
+    typeof resultRecord.lastRunDurationMs !== 'number' ||
+    !Number.isFinite(resultRecord.lastRunDurationMs) ||
+    resultRecord.lastRunDurationMs < 0 ||
+    !Number.isInteger(resultRecord.lastRunFramesExecuted) ||
+    resultRecord.lastRunFramesExecuted < 0
+  ) {
+    return false;
+  }
+  return true;
+};
+
+export const extractGameplayTestResultsFromLegacyProject = (
+  legacyProject: Object
+): Object => {
+  const tests = [];
+  forEachGameplayTest(legacyProject, (test, identity) => {
+    const record = {
+      ...identity,
+      lastRunStatus: test.lastRunStatus,
+      lastRunAt: test.lastRunAt,
+      lastRunDurationMs: test.lastRunDurationMs,
+      lastRunFramesExecuted: test.lastRunFramesExecuted,
+    };
+    if (!test.lastRunStatus) return;
+    if (!isValidGameplayTestResultRecord(record)) {
+      console.warn(
+        `[LocalMultiFileProject] Ignoring an invalid gameplay test result for "${
+          identity.name
+        }".`
+      );
+      return;
+    }
+    tests.push(record);
+  });
+  return {
+    format: GAMEPLAY_TEST_RESULTS_FORMAT,
+    version: GAMEPLAY_TEST_RESULTS_VERSION,
+    tests,
+  };
+};
+
+export const readGameplayTestResults = async (
+  entryPath: string
+): Promise<?Object> => {
+  requireFileSystem();
+  try {
+    const resultPath = resolveGameUriToPath(
+      path.dirname(entryPath),
+      `game://${GAMEPLAY_TEST_RESULTS_RELATIVE_PATH}`
+    );
+    if (!fs.existsSync(resultPath)) return null;
+    const parsedState = JSON.parse(
+      await readBoundedUtf8(resultPath, MAX_GAMEPLAY_TEST_RESULTS_SIZE)
+    );
+    const state: any = parsedState;
+    if (
+      !state ||
+      typeof state !== 'object' ||
+      Array.isArray(state) ||
+      Object.keys(state).length !== 3 ||
+      typeof state.format !== 'string' ||
+      String(state.format) !== GAMEPLAY_TEST_RESULTS_FORMAT ||
+      typeof state.version !== 'number' ||
+      Number(state.version) !== GAMEPLAY_TEST_RESULTS_VERSION ||
+      !Array.isArray(state.tests) ||
+      state.tests.length > MAX_GAMEPLAY_TEST_RESULTS_COUNT
+    ) {
+      throw new Error('unsupported gameplay test result-state shape');
+    }
+    const tests: Array<Object> = [];
+    const identities: Set<string> = new Set();
+    state.tests.forEach((record: any, index: number) => {
+      if (!isValidGameplayTestResultRecord(record)) {
+        console.warn(
+          `[LocalMultiFileProject] Ignoring malformed gameplay test result record ${index}.`
+        );
+        return;
+      }
+      const identityKey = gameplayTestResultIdentityKey(record);
+      if (identities.has(identityKey)) {
+        console.warn(
+          `[LocalMultiFileProject] Ignoring duplicate gameplay test result record ${index}.`
+        );
+        return;
+      }
+      identities.add(identityKey);
+      tests.push(record);
+    });
+    return { ...state, tests };
+  } catch (error) {
+    console.warn(
+      `[LocalMultiFileProject] Unable to read ${GAMEPLAY_TEST_RESULTS_RELATIVE_PATH}; gameplay tests will be shown as never run.`,
+      error
+    );
+    return null;
+  }
+};
+
+export const applyGameplayTestResultsToLegacyProject = (
+  legacyProject: Object,
+  state: ?Object
+): Object => {
+  const testsByIdentity: Map<string, Object> = new Map();
+  forEachGameplayTest(legacyProject, (test, identity) => {
+    GAMEPLAY_TEST_RUN_SUMMARY_FIELDS.forEach(field => delete test[field]);
+    testsByIdentity.set(gameplayTestResultIdentityKey(identity), test);
+  });
+  if (!state || !Array.isArray(state.tests)) return legacyProject;
+  state.tests.forEach(record => {
+    const test = testsByIdentity.get(gameplayTestResultIdentityKey(record));
+    if (!test) {
+      console.warn(
+        `[LocalMultiFileProject] Ignoring stale gameplay test result for "${
+          record.name
+        }".`
+      );
+      return;
+    }
+    GAMEPLAY_TEST_RUN_SUMMARY_FIELDS.forEach(field => {
+      test[field] = record[field];
+    });
+  });
+  return legacyProject;
+};
+
 const isCompositeOwnerSettingsUri = (uri: string): boolean =>
   /^game:\/\/scenes\/[^/]+\/(?:scene\.settings|external-layout\/[^/]+\.settings)$/.test(
     uri
@@ -338,6 +563,33 @@ const discoverDirectRetiredLayoutFiles = async (
   }
 };
 
+const discoverGameplayTestSourceUris = async (
+  projectRoot: string
+): Promise<Array<string>> => {
+  const testsRoot = path.join(projectRoot, 'tests');
+  if (!fs.existsSync(testsRoot)) return [];
+  const testsRootStats = await fs.lstat(testsRoot);
+  if (!testsRootStats.isDirectory() || testsRootStats.isSymbolicLink()) {
+    throw new MultiFileProjectError(
+      'MULTIFILE_INVALID_TEST_SOURCE',
+      'The managed tests path must be a directory inside the project root.'
+    );
+  }
+  const entries = await fs.readdir(testsRoot, { withFileTypes: true });
+  const discovered = [];
+  for (const entry of entries) {
+    if (entry.isDirectory() || entry.isSymbolicLink()) {
+      throw new MultiFileProjectError(
+        'MULTIFILE_INVALID_TEST_SOURCE',
+        `Gameplay test sources must be direct children of tests/: ${entry.name}`
+      );
+    }
+    if (!entry.isFile() || !entry.name.endsWith('.js')) continue;
+    discovered.push(`game://tests/${physicalNameToGameUriSegment(entry.name)}`);
+  }
+  return discovered.sort((left, right) => left.localeCompare(right));
+};
+
 const discoverRetiredFunctionSettings = async (
   functionsDirectoryPath: string,
   uriSegments: Array<string>,
@@ -376,6 +628,10 @@ const discoverOwnedSettingsUris = async (
   const resourcesSettingsPath = path.join(projectRoot, 'resources.settings');
   if (fs.existsSync(resourcesSettingsPath)) {
     discovered.push(MULTI_FILE_RESOURCES_URI);
+  }
+  const testsSettingsPath = path.join(projectRoot, 'tests.settings');
+  if (fs.existsSync(testsSettingsPath)) {
+    discovered.push(MULTI_FILE_TESTS_URI);
   }
   await discoverDirectSettingsFiles(
     path.join(projectRoot, 'objects'),
@@ -708,6 +964,7 @@ export const readMultiFileSourceTree = async (
   const pending: Array<string> = [
     MULTI_FILE_ENTRY_URI,
     ...(await discoverOwnedSettingsUris(projectRoot)),
+    ...(await discoverGameplayTestSourceUris(projectRoot)),
   ];
   let totalSize = 0;
 
@@ -814,7 +1071,10 @@ export const openMultiFileProject = async (
     };
   }
   const project = composeLegacyProjectFromFiles(files, effectiveOptions);
-  return project;
+  return applyGameplayTestResultsToLegacyProject(
+    project,
+    await readGameplayTestResults(entryPath)
+  );
 };
 
 const sortForCommit = (left: string, right: string): number => {
@@ -841,6 +1101,107 @@ const writeAndFlush = async (filePath: string, content: string) => {
   const written = await fs.readFile(filePath, 'utf8');
   if (written !== content)
     throw new Error(`Written file verification failed: ${filePath}`);
+};
+
+const gameplayTestResultWriteQueues: Map<string, Promise<void>> = new Map();
+
+const writeGameplayTestResultsTransaction = async (
+  legacyProject: Object,
+  entryPath: string,
+  preserveNewerExistingResults: boolean
+): Promise<void> => {
+  const projectRoot = path.resolve(path.dirname(entryPath));
+  const state = extractGameplayTestResultsFromLegacyProject(legacyProject);
+  const existingState = preserveNewerExistingResults
+    ? await readGameplayTestResults(entryPath)
+    : null;
+  if (existingState) {
+    const currentRecordsByIdentity: Map<string, Object> = new Map(
+      state.tests.map(record => [gameplayTestResultIdentityKey(record), record])
+    );
+    const existingRecordsByIdentity: Map<string, Object> = new Map(
+      existingState.tests.map(record => [
+        gameplayTestResultIdentityKey(record),
+        record,
+      ])
+    );
+    const mergedRecords = [];
+    forEachGameplayTest(legacyProject, (test, identity) => {
+      const identityKey = gameplayTestResultIdentityKey(identity);
+      const currentRecord = currentRecordsByIdentity.get(identityKey);
+      const existingRecord = existingRecordsByIdentity.get(identityKey);
+      const record =
+        existingRecord &&
+        (!currentRecord || existingRecord.lastRunAt > currentRecord.lastRunAt)
+          ? existingRecord
+          : currentRecord;
+      if (record) mergedRecords.push(record);
+    });
+    state.tests = mergedRecords;
+  }
+  if (state.tests.length > MAX_GAMEPLAY_TEST_RESULTS_COUNT) {
+    throw new MultiFileProjectError(
+      'MULTIFILE_RESOURCE_LIMIT',
+      `Gameplay test results exceed ${MAX_GAMEPLAY_TEST_RESULTS_COUNT} records.`
+    );
+  }
+  const content = `${JSON.stringify(state, null, 2)}\n`;
+  if (
+    unescape(encodeURIComponent(content)).length >
+    MAX_GAMEPLAY_TEST_RESULTS_SIZE
+  ) {
+    throw new MultiFileProjectError(
+      'MULTIFILE_RESOURCE_LIMIT',
+      `Gameplay test results exceed ${MAX_GAMEPLAY_TEST_RESULTS_SIZE} bytes.`
+    );
+  }
+  const resultPath = resolveGameUriToPath(
+    projectRoot,
+    `game://${GAMEPLAY_TEST_RESULTS_RELATIVE_PATH}`
+  );
+  const temporaryPath = path.join(
+    path.dirname(resultPath),
+    `.gameplay-test-results-${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}.tmp`
+  );
+  assertInside(projectRoot, temporaryPath);
+  try {
+    await writeAndFlush(temporaryPath, content);
+    await fs.rename(temporaryPath, resultPath);
+    const written = await fs.readFile(resultPath, 'utf8');
+    if (written !== content) {
+      throw new Error(`Written file verification failed: ${resultPath}`);
+    }
+  } finally {
+    if (fs.existsSync(temporaryPath)) await fs.remove(temporaryPath);
+  }
+};
+
+export const writeGameplayTestResults = (
+  legacyProject: Object,
+  entryPath: string,
+  options?: {| preserveNewerExistingResults?: boolean |}
+): Promise<void> => {
+  requireFileSystem();
+  const projectRoot = path.resolve(path.dirname(entryPath));
+  const previousWrite =
+    gameplayTestResultWriteQueues.get(projectRoot) || Promise.resolve();
+  const write = previousWrite.then(() =>
+    writeGameplayTestResultsTransaction(
+      legacyProject,
+      entryPath,
+      !!(options && options.preserveNewerExistingResults)
+    )
+  );
+  const queueTail = write.then(() => undefined, () => undefined);
+  gameplayTestResultWriteQueues.set(projectRoot, queueTail);
+  queueTail.then(() => {
+    if (gameplayTestResultWriteQueues.get(projectRoot) === queueTail) {
+      gameplayTestResultWriteQueues.delete(projectRoot);
+    }
+  });
+  return write;
 };
 
 type WriteMultiFileSourceTreeOptions = {|
@@ -1038,6 +1399,7 @@ export const migrateLegacyProject = async ({
     );
   }
   await writeMultiFileSourceTree({ entryPath, files });
+  await writeGameplayTestResults(legacyProject, entryPath);
   return { entryPath, files };
 };
 
@@ -1095,5 +1457,15 @@ export const writeLegacyProjectAsMultiFile = async (
   const obsoleteUris: Array<string> = Object.keys(previousFiles).filter(
     uri => files[uri] === undefined
   );
-  return writeMultiFileSourceTree({ entryPath, files, obsoleteUris });
+  const changedUris = await writeMultiFileSourceTree({
+    entryPath,
+    files,
+    obsoleteUris,
+  });
+  if (!options || options.persistGameplayTestResults !== false) {
+    await writeGameplayTestResults(legacyProject, entryPath, {
+      preserveNewerExistingResults: true,
+    });
+  }
+  return changedUris;
 };

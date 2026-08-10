@@ -13,11 +13,13 @@ import {
 } from '../MultiFileProjectFormat';
 import {
   hashLegacySource,
+  GAMEPLAY_TEST_RESULTS_RELATIVE_PATH,
   migrateLegacyProject,
   openMultiFileProject,
   readMultiFileSourceTree,
   recoverMultiFileTransactions,
   resolveGameUriToPath,
+  writeGameplayTestResults,
   writeLegacyProjectAsMultiFile,
   writeMultiFileSourceTree,
 } from './LocalMultiFileProject';
@@ -89,6 +91,194 @@ describe('Local multi-file project storage', () => {
       );
     }
     fs.removeSync(resolved);
+  });
+
+  test('stores flat gameplay test sources and hydrates ignored run results', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project: Object = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'Player can jump',
+          type: 'gameplay',
+          description: 'Smoke test',
+          source: 'gameplayTest.wait(1);',
+          lastRunStatus: 'passed',
+          lastRunAt: 123,
+          lastRunDurationMs: 45,
+          lastRunFramesExecuted: 3,
+        },
+      ],
+    };
+
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+
+    const settingsSource = await fs.readFile(
+      path.join(temporaryDirectory, 'tests.settings'),
+      'utf8'
+    );
+    expect(settingsSource).toContain('source = "tests/Player%20can%20jump.js"');
+    expect(settingsSource).not.toContain('game://');
+    expect(settingsSource).not.toContain('lastRun');
+    expect(
+      await fs.readFile(
+        resolveGameUriToPath(
+          temporaryDirectory,
+          'game://tests/Player%20can%20jump.js'
+        ),
+        'utf8'
+      )
+    ).toBe('gameplayTest.wait(1);');
+    expect(
+      JSON.parse(
+        await fs.readFile(
+          path.join(
+            temporaryDirectory,
+            ...GAMEPLAY_TEST_RESULTS_RELATIVE_PATH.split('/')
+          ),
+          'utf8'
+        )
+      ).tests
+    ).toEqual([
+      {
+        scope: 'project',
+        name: 'Player can jump',
+        lastRunStatus: 'passed',
+        lastRunAt: 123,
+        lastRunDurationMs: 45,
+        lastRunFramesExecuted: 3,
+      },
+    ]);
+    expect((await openMultiFileProject(entryPath)).tests[0]).toEqual(
+      project.tests[0]
+    );
+  });
+
+  test('updates only ignored gameplay test results after a run', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project: Object = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'Smoke test',
+          type: 'gameplay',
+          description: '',
+          source: 'gameplayTest.wait(1);',
+        },
+      ],
+    };
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+    const settingsPath = path.join(temporaryDirectory, 'tests.settings');
+    const scriptPath = resolveGameUriToPath(
+      temporaryDirectory,
+      'game://tests/Smoke%20test.js'
+    );
+    const settingsBefore = await fs.readFile(settingsPath, 'utf8');
+    const scriptBefore = await fs.readFile(scriptPath, 'utf8');
+
+    project.tests[0] = {
+      ...project.tests[0],
+      lastRunStatus: 'failed',
+      lastRunAt: 999,
+      lastRunDurationMs: 12,
+      lastRunFramesExecuted: 1,
+    };
+    await writeGameplayTestResults(project, entryPath);
+
+    expect(await fs.readFile(settingsPath, 'utf8')).toBe(settingsBefore);
+    expect(await fs.readFile(scriptPath, 'utf8')).toBe(scriptBefore);
+    expect((await openMultiFileProject(entryPath)).tests[0]).toMatchObject({
+      lastRunStatus: 'failed',
+      lastRunAt: 999,
+      lastRunDurationMs: 12,
+      lastRunFramesExecuted: 1,
+    });
+
+    await writeGameplayTestResults(
+      {
+        ...project,
+        tests: [
+          {
+            ...project.tests[0],
+            lastRunStatus: 'passed',
+            lastRunAt: 100,
+          },
+        ],
+      },
+      entryPath,
+      { preserveNewerExistingResults: true }
+    );
+    expect((await openMultiFileProject(entryPath)).tests[0]).toMatchObject({
+      lastRunStatus: 'failed',
+      lastRunAt: 999,
+    });
+  });
+
+  test('ignores malformed and stale gameplay test result state when opening', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    const project = {
+      ...projectFixture,
+      tests: [
+        {
+          name: 'Current test',
+          type: 'gameplay',
+          description: '',
+          source: '',
+        },
+      ],
+    };
+    await writeLegacyProjectAsMultiFile(project, entryPath);
+    const resultsPath = path.join(
+      temporaryDirectory,
+      ...GAMEPLAY_TEST_RESULTS_RELATIVE_PATH.split('/')
+    );
+    const warning = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await fs.writeFile(resultsPath, '{ invalid', 'utf8');
+      expect(
+        (await openMultiFileProject(entryPath)).tests[0]
+      ).not.toHaveProperty('lastRunStatus');
+
+      await fs.writeJson(resultsPath, {
+        format: 'gdevelop-gameplay-test-results',
+        version: 1,
+        tests: [
+          {
+            scope: 'project',
+            name: 'Deleted test',
+            lastRunStatus: 'passed',
+            lastRunAt: 123,
+            lastRunDurationMs: 45,
+            lastRunFramesExecuted: 3,
+          },
+        ],
+      });
+      expect(
+        (await openMultiFileProject(entryPath)).tests[0]
+      ).not.toHaveProperty('lastRunStatus');
+      expect(warning).toHaveBeenCalled();
+    } finally {
+      warning.mockRestore();
+    }
+  });
+
+  test('rejects gameplay test subfolders and orphan direct scripts', async () => {
+    const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
+    await writeLegacyProjectAsMultiFile(projectFixture, entryPath);
+    await fs.ensureDir(path.join(temporaryDirectory, 'tests', 'nested'));
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_INVALID_TEST_SOURCE',
+    });
+
+    await fs.remove(path.join(temporaryDirectory, 'tests', 'nested'));
+    await fs.writeFile(
+      path.join(temporaryDirectory, 'tests', 'orphan.js'),
+      '',
+      'utf8'
+    );
+    await expect(openMultiFileProject(entryPath)).rejects.toMatchObject({
+      code: 'MULTIFILE_ORPHAN_TEST_SOURCE',
+    });
   });
 
   test('rejects a noncanonical .gdevelop entry name', async () => {
@@ -1381,7 +1571,7 @@ describe('Local multi-file project storage', () => {
         fileKind => fileKind.kind === 'externals'
       )
     ).toBe(false);
-    expect(settingsCatalog.counts.fileKinds).toBe(18);
+    expect(settingsCatalog.counts.fileKinds).toBe(19);
     expect(settingsCatalog.counts.objectTypes).toBeGreaterThan(5);
     expect(settingsCatalog.counts.behaviorTypes).toBeGreaterThan(5);
     expect(settingsCatalog.layoutContexts).toEqual(
@@ -1518,6 +1708,14 @@ describe('Local multi-file project storage', () => {
     project.setConstantsJson(
       JSON.stringify({ sheet: { row: { column: 'editor only' } } })
     );
+    const gameplayTest = project
+      .getTests()
+      .insertNewTest('Generated smoke test', 0);
+    gameplayTest.setSource('gameplayTest.wait(1);');
+    gameplayTest.setLastRunStatus('passed');
+    gameplayTest.setLastRunAt(123);
+    gameplayTest.setLastRunDurationMs(45);
+    gameplayTest.setLastRunFramesExecuted(3);
     const entryPath = path.join(temporaryDirectory, 'project.gdevelop');
 
     await onSaveProject(
@@ -1540,12 +1738,31 @@ describe('Local multi-file project storage', () => {
       ...GENERATED_LEGACY_PROJECT_RELATIVE_PATH.split('/')
     );
     expect(fs.existsSync(generatedPath)).toBe(true);
+    const generatedProject = JSON.parse(fs.readFileSync(generatedPath, 'utf8'));
+    expect(generatedProject.properties.name).toBe(
+      'Generated compatibility project'
+    );
+    expect(generatedProject.constants).toBeUndefined();
+    expect(generatedProject.tests[0]).not.toHaveProperty('lastRunStatus');
+    expect(generatedProject.tests[0]).not.toHaveProperty('lastRunAt');
+    expect(generatedProject.tests[0]).not.toHaveProperty('lastRunDurationMs');
+    expect(generatedProject.tests[0]).not.toHaveProperty(
+      'lastRunFramesExecuted'
+    );
     expect(
-      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).properties.name
-    ).toBe('Generated compatibility project');
-    expect(
-      JSON.parse(fs.readFileSync(generatedPath, 'utf8')).constants
-    ).toBeUndefined();
+      JSON.parse(
+        fs.readFileSync(
+          path.join(
+            temporaryDirectory,
+            ...GAMEPLAY_TEST_RESULTS_RELATIVE_PATH.split('/')
+          ),
+          'utf8'
+        )
+      ).tests[0]
+    ).toMatchObject({
+      name: 'Generated smoke test',
+      lastRunStatus: 'passed',
+    });
     expect(
       fs.readFileSync(path.join(temporaryDirectory, 'constants.toml'), 'utf8')
     ).toBe(`[sheet.row]

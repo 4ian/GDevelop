@@ -21,6 +21,7 @@ export const MULTI_FILE_ENTRY_NAME = 'project.gdevelop';
 export const MULTI_FILE_ENTRY_URI = 'game://project.gdevelop';
 export const MULTI_FILE_RESOURCES_URI = 'game://resources.settings';
 export const MULTI_FILE_CONSTANTS_URI = 'game://constants.toml';
+export const MULTI_FILE_TESTS_URI = 'game://tests.settings';
 export const MULTI_FILE_RETIRED_EXTERNAL_SETTINGS_URI =
   'game://externals/external.settings';
 
@@ -32,6 +33,7 @@ const PROJECT_SPLIT_FIELDS = new Set([
   'externalEvents',
   'externalLayouts',
   'eventsFunctionsExtensions',
+  'tests',
 ]);
 
 export const LEGACY_FOLDER_STRUCTURE_FIELDS = Object.freeze([
@@ -83,6 +85,28 @@ const LAYOUT_TOML_KIND_BY_FORMAT = Object.freeze({
 });
 const WINDOWS_DEVICE_NAME = /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i;
 const SIMPLE_URI_SEGMENT = /^[A-Za-z0-9_.-]+$/;
+export const GAMEPLAY_TEST_RUN_SUMMARY_FIELDS = Object.freeze([
+  'lastRunStatus',
+  'lastRunAt',
+  'lastRunDurationMs',
+  'lastRunFramesExecuted',
+]);
+const LEGACY_TEST_FIELDS = new Set([
+  'name',
+  'type',
+  'description',
+  'source',
+  ...GAMEPLAY_TEST_RUN_SUMMARY_FIELDS,
+]);
+const AUTHORED_TEST_FIELDS = new Set([
+  'scope',
+  'extension',
+  'order',
+  'name',
+  'type',
+  'description',
+  'source',
+]);
 
 const SCENE_LIFECYCLE_FUNCTION_DEFINITIONS = Object.freeze([
   {
@@ -1060,6 +1084,70 @@ const uniqueManagedName = (displayName, used) => {
   return encoded;
 };
 
+const gameplayTestLogicalIdentity = test =>
+  test.scope === 'project'
+    ? `project\0${test.name}`
+    : `extension\0${test.extension}\0${test.name}`;
+
+const gameplayTestPreferredBasename = test =>
+  test.scope === 'project' ? test.name : `${test.extension} - ${test.name}`;
+
+const normalizedManagedBasenameKey = encodedBasename =>
+  decodeURIComponent(encodedBasename)
+    .normalize('NFC')
+    .toLowerCase();
+
+const allocateGameplayTestSourcePaths = tests => {
+  const groupsByPreferredBasename = new Map();
+  tests.forEach(test => {
+    const encodedBasename = encodeManagedName(
+      gameplayTestPreferredBasename(test)
+    );
+    const collisionKey = normalizedManagedBasenameKey(encodedBasename);
+    const group = groupsByPreferredBasename.get(collisionKey) || [];
+    group.push({ test, encodedBasename });
+    groupsByPreferredBasename.set(collisionKey, group);
+  });
+
+  const pathsByIdentity = new Map();
+  const normalizedPaths = new Set();
+  groupsByPreferredBasename.forEach(group => {
+    group.forEach(({ test, encodedBasename }) => {
+      const logicalIdentity = gameplayTestLogicalIdentity(test);
+      const basename =
+        group.length === 1
+          ? encodedBasename
+          : `${encodedBasename}~${stableHash8(logicalIdentity)}`;
+      const sourcePath = `tests/${basename}.js`;
+      validateGameUri(`game://${sourcePath}`);
+      const normalizedPath = normalizedManagedBasenameKey(basename);
+      if (normalizedPaths.has(normalizedPath)) {
+        fail(
+          'MULTIFILE_DUPLICATE_TEST_SOURCE',
+          `Gameplay tests collide at ${sourcePath}.`,
+          MULTI_FILE_TESTS_URI
+        );
+      }
+      normalizedPaths.add(normalizedPath);
+      pathsByIdentity.set(logicalIdentity, sourcePath);
+    });
+  });
+  return pathsByIdentity;
+};
+
+const assertOnlyFields = (value, allowedFields, label, fileUri) => {
+  const unexpectedField = Object.keys(value).find(
+    field => !allowedFields.has(field)
+  );
+  if (unexpectedField !== undefined) {
+    fail(
+      'MULTIFILE_INVALID_TESTS_SETTINGS',
+      `${label} contains unsupported field ${unexpectedField}.`,
+      fileUri
+    );
+  }
+};
+
 const encodeUriPath = segments =>
   `game://${segments.map(segment => String(segment)).join('/')}`;
 
@@ -1209,6 +1297,7 @@ const settingsNamespacePathForUri = (uri, payload) => {
     .map(segment => decodeURIComponent(segment));
   const name = String(payload.name || '');
   if (uri === MULTI_FILE_RESOURCES_URI) return ['project', 'resources'];
+  if (uri === MULTI_FILE_TESTS_URI) return ['tests'];
   if (segments.length === 2 && segments[0] === 'objects')
     return ['project', 'objects', name];
   if (
@@ -1742,12 +1831,138 @@ const removeEmptyBehaviorSharedData = layout =>
         ),
       };
 
+const decomposeGameplayTests = (project, files) => {
+  const testInfos = [];
+  const addTests = ({ tests, scope, extension }) => {
+    const names = new Set();
+    asArray(tests, `${scope} gameplay tests`, MULTI_FILE_TESTS_URI).forEach(
+      (testValue, order) => {
+        const test = asObject(
+          testValue,
+          `${scope} gameplay test ${order}`,
+          MULTI_FILE_TESTS_URI
+        );
+        assertOnlyFields(
+          test,
+          LEGACY_TEST_FIELDS,
+          `${scope} gameplay test ${order}`,
+          MULTI_FILE_TESTS_URI
+        );
+        const name = expectString(
+          test.name,
+          `${scope} gameplay test ${order}.name`,
+          MULTI_FILE_TESTS_URI
+        );
+        if (names.has(name)) {
+          fail(
+            'MULTIFILE_DUPLICATE_TEST_IDENTITY',
+            `${scope} gameplay tests contain duplicate name ${JSON.stringify(
+              name
+            )}.`,
+            MULTI_FILE_TESTS_URI
+          );
+        }
+        names.add(name);
+        const type = expectString(
+          test.type,
+          `${scope} gameplay test ${name}.type`,
+          MULTI_FILE_TESTS_URI
+        );
+        const description = expectString(
+          test.description,
+          `${scope} gameplay test ${name}.description`,
+          MULTI_FILE_TESTS_URI
+        );
+        const source = expectString(
+          test.source,
+          `${scope} gameplay test ${name}.source`,
+          MULTI_FILE_TESTS_URI
+        );
+        testInfos.push({
+          scope,
+          ...(extension === undefined ? {} : { extension }),
+          order,
+          name,
+          type,
+          description,
+          sourceText: source,
+        });
+      }
+    );
+  };
+
+  addTests({ tests: project.tests, scope: 'project' });
+  asArray(
+    project.eventsFunctionsExtensions,
+    'Project eventsFunctionsExtensions',
+    MULTI_FILE_ENTRY_URI
+  ).forEach((extensionValue, extensionIndex) => {
+    const extension = asObject(
+      extensionValue,
+      `Project extension ${extensionIndex}`,
+      MULTI_FILE_ENTRY_URI
+    );
+    const extensionName = expectString(
+      extension.name,
+      `Project extension ${extensionIndex}.name`,
+      MULTI_FILE_ENTRY_URI
+    );
+    addTests({
+      tests: extension.tests,
+      scope: 'extension',
+      extension: extensionName,
+    });
+  });
+
+  const sourcePaths = allocateGameplayTestSourcePaths(testInfos);
+  const records = testInfos.map(testInfo => {
+    const sourcePath = sourcePaths.get(gameplayTestLogicalIdentity(testInfo));
+    if (!sourcePath) {
+      fail(
+        'MULTIFILE_INVALID_TEST_SOURCE',
+        `Unable to allocate a source path for gameplay test ${testInfo.name}.`,
+        MULTI_FILE_TESTS_URI
+      );
+    }
+    const sourceUri = `game://${sourcePath}`;
+    if (files[sourceUri] !== undefined) {
+      fail(
+        'MULTIFILE_DUPLICATE_TEST_SOURCE',
+        `Two gameplay tests resolve to ${sourcePath}.`,
+        MULTI_FILE_TESTS_URI
+      );
+    }
+    files[sourceUri] = testInfo.sourceText;
+    return {
+      scope: testInfo.scope,
+      ...(testInfo.extension === undefined
+        ? {}
+        : { extension: testInfo.extension }),
+      order: testInfo.order,
+      name: testInfo.name,
+      type: testInfo.type,
+      description: testInfo.description,
+      source: sourcePath,
+    };
+  });
+
+  putSettingsFile(files, MULTI_FILE_TESTS_URI, {
+    tests: {
+      kind: 'tests',
+      settingsFormatVersion: MULTI_FILE_FORMAT_VERSION,
+      tests: records,
+    },
+  });
+};
+
 export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
   const project = clone(asObject(legacyProject, 'Project'));
   const files = {};
   const projectPayload = omitFields(project, PROJECT_SPLIT_FIELDS);
   const sceneNames = new Set();
   const extensionNames = new Set();
+
+  decomposeGameplayTests(project, files);
 
   splitObjectDefinitions({
     objects: project.objects,
@@ -2131,7 +2346,12 @@ export const decomposeLegacyProjectToFiles = (legacyProject, options = {}) => {
 
     const extensionMetadata = omitFields(
       extension,
-      new Set(['eventsFunctions', 'eventsBasedObjects', 'eventsBasedBehaviors'])
+      new Set([
+        'eventsFunctions',
+        'eventsBasedObjects',
+        'eventsBasedBehaviors',
+        'tests',
+      ])
     );
     putSettingsFile(files, settingsUri, {
       extensions: {
@@ -2778,6 +2998,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     fail(
       'MULTIFILE_UNSUPPORTED_VERSION',
       'Invalid project namespace marker.',
+      MULTI_FILE_ENTRY_URI
+    );
+  }
+  if (projectNamespace.tests !== undefined) {
+    fail(
+      'MULTIFILE_TEST_OWNERSHIP_CONFLICT',
+      'Project gameplay tests must be stored in tests.settings.',
       MULTI_FILE_ENTRY_URI
     );
   }
@@ -3780,6 +4007,225 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     });
   });
 
+  if (files[MULTI_FILE_TESTS_URI] === undefined) {
+    fail(
+      'MULTIFILE_MISSING_TESTS_SETTINGS',
+      'The project must contain tests.settings.',
+      MULTI_FILE_TESTS_URI
+    );
+  }
+  const testsUri = registerUri(MULTI_FILE_TESTS_URI);
+  settingsUris.push(testsUri);
+  const testsPayload = restoreTomlPayload(
+    requireNamespace(parseSettings(files, testsUri), ['tests'], testsUri),
+    testsUri
+  );
+  assertOnlyFields(
+    testsPayload,
+    new Set(['kind', 'settingsFormatVersion', 'tests']),
+    'tests.settings',
+    testsUri
+  );
+  if (
+    testsPayload.kind !== 'tests' ||
+    testsPayload.settingsFormatVersion !== formatVersion
+  ) {
+    fail(
+      'MULTIFILE_INVALID_TESTS_SETTINGS',
+      'Invalid tests.settings marker.',
+      testsUri
+    );
+  }
+  if (testsPayload.tests === undefined) {
+    fail(
+      'MULTIFILE_INVALID_TESTS_SETTINGS',
+      'tests.settings must contain a tests array.',
+      testsUri
+    );
+  }
+  const extensionOrderByName = new Map(
+    extensionDocuments.map(({ entry }) => [entry.name, entry.order])
+  );
+  const gameplayTestRecords = asArray(
+    testsPayload.tests,
+    'tests.settings tests',
+    testsUri
+  ).map((testValue, index) => {
+    const test = asObject(
+      testValue,
+      `tests.settings tests[${index}]`,
+      testsUri
+    );
+    assertOnlyFields(
+      test,
+      AUTHORED_TEST_FIELDS,
+      `tests.settings tests[${index}]`,
+      testsUri
+    );
+    const scope = expectString(
+      test.scope,
+      `tests.settings tests[${index}].scope`,
+      testsUri
+    );
+    if (scope !== 'project' && scope !== 'extension') {
+      fail(
+        'MULTIFILE_INVALID_TEST_SCOPE',
+        'Gameplay test scope must be project or extension.',
+        testsUri
+      );
+    }
+    let extension;
+    if (scope === 'project') {
+      if (test.extension !== undefined) {
+        fail(
+          'MULTIFILE_INVALID_TEST_SCOPE',
+          'Project gameplay tests must not declare an extension.',
+          testsUri
+        );
+      }
+    } else {
+      extension = expectString(
+        test.extension,
+        `tests.settings tests[${index}].extension`,
+        testsUri
+      );
+      if (!extensionOrderByName.has(extension)) {
+        fail(
+          'MULTIFILE_INVALID_TEST_SCOPE',
+          `Gameplay test extension ${JSON.stringify(
+            extension
+          )} does not exist.`,
+          testsUri
+        );
+      }
+    }
+    const order = readSettingsOrder(
+      test,
+      `tests.settings tests[${index}]`,
+      testsUri
+    );
+    return {
+      scope,
+      ...(extension === undefined ? {} : { extension }),
+      order,
+      name: expectString(
+        test.name,
+        `tests.settings tests[${index}].name`,
+        testsUri
+      ),
+      type: expectString(
+        test.type,
+        `tests.settings tests[${index}].type`,
+        testsUri
+      ),
+      description: expectString(
+        test.description,
+        `tests.settings tests[${index}].description`,
+        testsUri
+      ),
+      source: expectString(
+        test.source,
+        `tests.settings tests[${index}].source`,
+        testsUri
+      ),
+      recordIndex: index,
+    };
+  });
+
+  const gameplayTestRecordsByContainer = new Map();
+  gameplayTestRecords.forEach(record => {
+    const containerKey =
+      record.scope === 'project' ? 'project' : `extension\0${record.extension}`;
+    const records = gameplayTestRecordsByContainer.get(containerKey) || [];
+    records.push(record);
+    gameplayTestRecordsByContainer.set(containerKey, records);
+  });
+  gameplayTestRecordsByContainer.forEach((records, containerKey) => {
+    records.sort((left, right) => left.order - right.order);
+    const names = new Set();
+    records.forEach((record, expectedOrder) => {
+      if (record.order !== expectedOrder) {
+        fail(
+          'MULTIFILE_INVALID_TESTS_SETTINGS',
+          `${containerKey} gameplay test order must be contiguous from 0.`,
+          testsUri
+        );
+      }
+      if (names.has(record.name)) {
+        fail(
+          'MULTIFILE_DUPLICATE_TEST_IDENTITY',
+          `${containerKey} contains duplicate gameplay test ${JSON.stringify(
+            record.name
+          )}.`,
+          testsUri
+        );
+      }
+      names.add(record.name);
+    });
+  });
+  const canonicalGameplayTestRecords = [...gameplayTestRecords].sort(
+    (left, right) => {
+      const leftContainerOrder =
+        left.scope === 'project'
+          ? -1
+          : extensionOrderByName.get(left.extension);
+      const rightContainerOrder =
+        right.scope === 'project'
+          ? -1
+          : extensionOrderByName.get(right.extension);
+      return (
+        leftContainerOrder - rightContainerOrder || left.order - right.order
+      );
+    }
+  );
+  canonicalGameplayTestRecords.forEach((record, index) => {
+    if (record.recordIndex !== index) {
+      fail(
+        'MULTIFILE_INVALID_TESTS_SETTINGS',
+        'Gameplay test records are not in canonical project/extension order.',
+        testsUri
+      );
+    }
+  });
+  const expectedTestSourcePaths = allocateGameplayTestSourcePaths(
+    gameplayTestRecords
+  );
+  const projectGameplayTests = [];
+  const extensionGameplayTestsByName = new Map();
+  gameplayTestRecords.forEach(record => {
+    const expectedSourcePath = expectedTestSourcePaths.get(
+      gameplayTestLogicalIdentity(record)
+    );
+    if (record.source !== expectedSourcePath) {
+      fail(
+        'MULTIFILE_INVALID_TEST_SOURCE',
+        `Gameplay test ${record.name} must use source ${expectedSourcePath}.`,
+        testsUri
+      );
+    }
+    const sourceUri = registerUri(`game://${record.source}`);
+    if (files[sourceUri] === undefined) {
+      fail(
+        'MULTIFILE_MISSING_TEST_SOURCE',
+        `Gameplay test source is missing: ${record.source}.`,
+        sourceUri
+      );
+    }
+    const legacyTest = {
+      name: record.name,
+      type: record.type,
+      description: record.description,
+      source: files[sourceUri],
+    };
+    if (record.scope === 'project') projectGameplayTests.push(legacyTest);
+    else {
+      const extensionTests =
+        extensionGameplayTestsByName.get(record.extension) || [];
+      extensionTests.push(legacyTest);
+      extensionGameplayTestsByName.set(record.extension, extensionTests);
+    }
+  });
+
   const retiredLayoutUri = Object.keys(files).find(uri =>
     uri.endsWith('.layout')
   );
@@ -3801,7 +4247,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     );
   }
 
-  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|external-events\/[^/]+\/(?:external-events\.settings|functions\/[^/]+\.settings)|external-layout\/[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|variants\/[^/]+\/(?:variant\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings))|behaviors\/[^/]+\/(?:behavior\.settings|functions\/[^/]+\.settings)))$/;
+  const managedSettingsUriPattern = /^(?:game:\/\/(?:project|resources|tests)\.settings|game:\/\/objects\/(?:[^/]+\/)*[^/]+\.settings|game:\/\/scenes\/[^/]+\/(?:scene\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|external-events\/[^/]+\/(?:external-events\.settings|functions\/[^/]+\.settings)|external-layout\/[^/]+\.settings)|game:\/\/extensions\/[^/]+\/(?:extension\.settings|functions\/[^/]+\.settings|prefabs\/[^/]+\/(?:prefab\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings|functions\/[^/]+\.settings|variants\/[^/]+\/(?:variant\.settings|objects\/(?:[^/]+\/)*[^/]+\.settings))|behaviors\/[^/]+\/(?:behavior\.settings|functions\/[^/]+\.settings)))$/;
   Object.keys(files)
     .filter(uri => managedSettingsUriPattern.test(uri))
     .forEach(uri => {
@@ -3823,6 +4269,28 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       'MULTIFILE_ORPHAN_EVENTS',
       'Every managed events body must have a same-stem function settings file.',
       orphanFunctionEventsUri
+    );
+  }
+  const invalidTestSourceUri = Object.keys(files).find(
+    uri =>
+      uri.startsWith('game://tests/') &&
+      !/^game:\/\/tests\/[^/]+\.js$/.test(uri)
+  );
+  if (invalidTestSourceUri) {
+    fail(
+      'MULTIFILE_INVALID_TEST_SOURCE',
+      'Gameplay test sources must be flat .js files directly below tests/.',
+      invalidTestSourceUri
+    );
+  }
+  const orphanTestSourceUri = Object.keys(files).find(
+    uri => /^game:\/\/tests\/[^/]+\.js$/.test(uri) && !seenUris.has(uri)
+  );
+  if (orphanTestSourceUri) {
+    fail(
+      'MULTIFILE_ORPHAN_TEST_SOURCE',
+      'Every gameplay test JavaScript source must be referenced by tests.settings.',
+      orphanTestSourceUri
     );
   }
   const retiredOwnedEventsUri = Object.keys(files).find(
@@ -3876,6 +4344,7 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
     project.resources = removeFormatFields(resourcesPayload);
   }
   project.constants = constantsPayload;
+  if (projectGameplayTests.length) project.tests = projectGameplayTests;
   project.layouts = sceneDocuments.map(
     ({ entry, uri, document, objectDocuments, lifecycleFunctionDocuments }) => {
       const namespace = restoreTomlPayload(
@@ -4019,6 +4488,13 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
       removeFormatFields(extensionPayload),
       new Set(['order', 'functionFiles', 'prefabFiles', 'behaviorFiles'])
     );
+    if (extension.tests !== undefined) {
+      fail(
+        'MULTIFILE_TEST_OWNERSHIP_CONFLICT',
+        'Extension gameplay tests must be stored in tests.settings.',
+        uri
+      );
+    }
     extension.eventsFunctions = [];
     extension.eventsBasedObjects = [];
     extension.eventsBasedBehaviors = [];
@@ -4094,6 +4570,10 @@ export const composeLegacyProjectFromFiles = (filesInput, options = {}) => {
         );
       }
     });
+    const extensionGameplayTests = extensionGameplayTestsByName.get(entry.name);
+    if (extensionGameplayTests && extensionGameplayTests.length) {
+      extension.tests = extensionGameplayTests;
+    }
     return extension;
   });
   return project;
@@ -4104,6 +4584,15 @@ const normalizeFunctionEvents = functions =>
     functionObject.events = parseLegacyEventsJson(
       JSON.stringify(functionObject.events || [])
     );
+  });
+
+const removeGameplayTestRunSummaries = tests =>
+  (tests || []).map(test => {
+    const authoredTest = { ...test };
+    GAMEPLAY_TEST_RUN_SUMMARY_FIELDS.forEach(
+      field => delete authoredTest[field]
+    );
+    return authoredTest;
   });
 
 const normalizeLayoutFragment = (layout, editorField, hasLayers = true) => {
@@ -4255,6 +4744,9 @@ export const normalizeLegacyProjectForMultiFile = (
   project.externalEvents = project.externalEvents || [];
   project.externalLayouts = project.externalLayouts || [];
   project.eventsFunctionsExtensions = project.eventsFunctionsExtensions || [];
+  if (project.tests !== undefined) {
+    project.tests = removeGameplayTestRunSummaries(project.tests);
+  }
   project.layouts.forEach(layout => {
     layout.events = parseLegacyEventsJson(JSON.stringify(layout.events || []));
     ['sceneLoadEvents', 'sceneSignalEvents', 'sceneUnloadEvents'].forEach(
@@ -4288,6 +4780,9 @@ export const normalizeLegacyProjectForMultiFile = (
     );
   });
   project.eventsFunctionsExtensions.forEach(extension => {
+    if (extension.tests !== undefined) {
+      extension.tests = removeGameplayTestRunSummaries(extension.tests);
+    }
     extension.eventsFunctions = extension.eventsFunctions || [];
     extension.eventsBasedObjects = extension.eventsBasedObjects || [];
     extension.eventsBasedBehaviors = extension.eventsBasedBehaviors || [];

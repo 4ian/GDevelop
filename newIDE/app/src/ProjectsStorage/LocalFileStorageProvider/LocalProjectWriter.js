@@ -27,6 +27,7 @@ import {
   type ShowConfirmFunction,
 } from '../../UI/Alert/AlertContext';
 import {
+  stripGameplayTestResultsFromLegacyProject,
   writeLegacyProjectAsMultiFile,
   writeMultiFileSourceTree,
 } from './LocalMultiFileProject';
@@ -653,8 +654,8 @@ const writeProjectFiles = async ({
       javascriptArtifacts.projectApi,
       path.join(projectPath, ...PROJECT_API_RELATIVE_PATH.split('/'))
     );
-    const generatedLegacyProject = removeLegacyFolderStructuresFromProject(
-      authoringSerializedProjectObject
+    const generatedLegacyProject = stripGameplayTestResultsFromLegacyProject(
+      removeLegacyFolderStructuresFromProject(authoringSerializedProjectObject)
     );
     delete generatedLegacyProject.constants;
     await writeAndCheckFormattedJSONFile(
@@ -972,7 +973,8 @@ export const onAutoSaveProject = (
     };
     return writeLegacyProjectAsMultiFile(
       serializedProjectObject,
-      autoSaveEntryPath
+      autoSaveEntryPath,
+      { persistGameplayTestResults: false }
     ).then(() => undefined);
   }
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';

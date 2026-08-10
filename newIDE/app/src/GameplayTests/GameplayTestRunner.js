@@ -662,8 +662,8 @@ export const closeGameplayTestFrame = (): void => {
 type GameplayTestRunnerDependencies = {|
   getPreviewLauncher: () => ?PreviewLauncherInterface,
   // Called after tests were run (last-run summaries were updated on the
-  // project): trigger unsaved changes and refresh the UI.
-  onTestsRunFinished: () => void,
+  // project): persist them or trigger unsaved changes, then refresh the UI.
+  onTestsRunFinished: (project: gdProject) => Promise<void> | void,
 |};
 
 let gameplayTestRunnerDependencies: GameplayTestRunnerDependencies | null = null;
@@ -712,7 +712,7 @@ export const runProjectGameplayTests = async ({
       options,
     });
   } finally {
-    dependencies.onTestsRunFinished();
+    await dependencies.onTestsRunFinished(project);
   }
 };
 

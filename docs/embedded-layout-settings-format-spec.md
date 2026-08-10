@@ -23,12 +23,20 @@ The ownership model is:
 | External layout        | `[[externalLayoutFiles]]` in `scene.settings` + `externals/<External>.layout` | `external-layout/<External>.settings` with metadata and embedded layout |
 | Function pair          | `functions/<Function>/function.settings` + `<Function>.events`                | `functions/<Function>.settings` + `functions/<Function>.events`         |
 | Event body syntax      | IfDo `.events`                                                                | IfDo `.events`, unchanged                                               |
+| Gameplay tests         | Inline project/extension records and JavaScript                               | Root `tests.settings` + flat root `tests/*.js` sources                   |
 
 There are no managed `.layout` files in a version 5 source tree. The editable
 component fragments use `.settings` for declarative data and `.events` for
 event logic. `project.gdevelop` remains the bootstrap entry file and
 `constants.toml` remains the direct-root editor-only constants document; this
 proposal does not rename those deliberate exceptions.
+
+Gameplay tests are the other deliberate root-owned version 5 domain. Their
+complete ownership, strict schema, flat source allocation, and ignored
+last-run state contract are defined by
+[`gameplay-tests-multifile-serialization-spec.md`](gameplay-tests-multifile-serialization-spec.md).
+In particular, test `source` values are scheme-free root-relative
+`tests/<Encoded basename>.js` paths rather than `game://` event references.
 
 The existing flat layout vocabulary, semantic contexts, defaults, UUID rules,
 catalog resolution, and strict rejection behavior remain authoritative. This
@@ -228,6 +236,10 @@ legacy object to the existing model.
 project.gdevelop
 resources.settings
 constants.toml
+tests.settings
+tests/
+  Player%20can%20jump.js
+  Combat%20-%20Enemy%20takes%20damage.js
 objects/
   GlobalObject.settings
 scenes/
@@ -271,6 +283,8 @@ extensions/
         functions/
           TakeDamage.settings
           TakeDamage.events
+.gdevelop/
+  gameplay-test-results.json
 ```
 
 An external event and external layout with the same canonical name may coexist

@@ -468,6 +468,39 @@ describe('project source catalogs', () => {
     expect(
       catalog.fileKinds.some(fileKind => fileKind.kind === 'externals')
     ).toBe(false);
+    const testsFileKind = catalog.fileKinds.find(
+      fileKind => fileKind.kind === 'tests'
+    );
+    expect(testsFileKind).toEqual(
+      expect.objectContaining({
+        path: 'tests.settings',
+        requiredMarker: { field: 'kind', value: 'tests' },
+        forbiddenFields: expect.arrayContaining([
+          'lastRunStatus',
+          'lastRunAt',
+          'lastRunDurationMs',
+          'lastRunFramesExecuted',
+        ]),
+      })
+    );
+    expect(
+      testsFileKind.schema.childTables.find(table => table.table === 'tests')
+        .fields
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'scope' }),
+        expect.objectContaining({ name: 'extension' }),
+        expect.objectContaining({ name: 'source' }),
+      ])
+    );
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'project')
+        .forbiddenFields
+    ).toContain('tests');
+    expect(
+      catalog.fileKinds.find(fileKind => fileKind.kind === 'extension')
+        .forbiddenFields
+    ).toContain('tests');
     const sceneSchema = catalog.fileKinds.find(
       fileKind => fileKind.kind === 'scene'
     ).schema;

@@ -1575,6 +1575,44 @@ const SETTINGS_FILE_SCHEMAS = Object.freeze({
       rawJsonTable,
     ],
   },
+  tests: {
+    rootFields: [...formatFields({ kind: 'tests' })],
+    childTables: [
+      {
+        table: 'tests',
+        header: '[[tests]]',
+        repeated: true,
+        emptyForm: 'tests = [ ]',
+        fields: [
+          settingsField('scope', 'enum', {
+            required: true,
+            values: ['project', 'extension'],
+          }),
+          settingsField('extension', 'owning extension name', {
+            requiredForScopes: ['extension'],
+          }),
+          settingsField('order', 'contiguous zero-based integer', {
+            required: true,
+          }),
+          settingsField('name', 'container-unique test name', {
+            required: true,
+          }),
+          settingsField('type', 'enum', {
+            required: true,
+            values: ['gameplay'],
+          }),
+          settingsField('description', 'string', { required: true }),
+          settingsField(
+            'source',
+            'canonical root-relative tests/<Encoded basename>.js path',
+            { required: true }
+          ),
+        ],
+      },
+    ],
+    additionalFields:
+      'No additional fields. lastRunStatus, lastRunAt, lastRunDurationMs, and lastRunFramesExecuted are forbidden editor state.',
+  },
   constants: {
     rootFields: [],
     childTables: [],
@@ -1831,6 +1869,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'eventsFunctionsExtensions',
       'externalEvents',
       'externalLayouts',
+      'tests',
     ],
     schema: SETTINGS_FILE_SCHEMAS.project,
   },
@@ -1866,6 +1905,28 @@ const SETTINGS_FILE_KINDS = Object.freeze([
     requiredFields: ['kind', 'settingsFormatVersion'],
     commonFields: ['resources', 'resourceFolders'],
     schema: SETTINGS_FILE_SCHEMAS.resources,
+  },
+  {
+    kind: 'tests',
+    requiredMarker: { field: 'kind', value: 'tests' },
+    path: 'tests.settings',
+    mountedNamespace: 'tests',
+    tomlRoot: true,
+    requiredFields: ['kind', 'settingsFormatVersion'],
+    commonFields: [
+      'project and extension gameplay test metadata',
+      'flat root-relative JavaScript source references',
+    ],
+    forbiddenFields: [
+      'lastRunStatus',
+      'lastRunAt',
+      'lastRunDurationMs',
+      'lastRunFramesExecuted',
+      'inline JavaScript source',
+    ],
+    note:
+      'Each source is a canonical root-relative tests/<Encoded basename>.js path. JavaScript files are direct children of tests/; folders are forbidden.',
+    schema: SETTINGS_FILE_SCHEMAS.tests,
   },
   {
     kind: 'constants',
@@ -2034,6 +2095,7 @@ const SETTINGS_FILE_KINDS = Object.freeze([
       'eventsFunctions',
       'eventsBasedObjects',
       'eventsBasedBehaviors',
+      'tests',
     ],
     schema: SETTINGS_FILE_SCHEMAS.extension,
   },
@@ -2398,6 +2460,7 @@ export const buildProjectSettingsCatalog = ({
         'Never write a legacy *FolderStructure field or optional grouping directories. For an object or owner function, write its editor grouping as folder = ["Parent", "Child"] in that component settings file. Use folder = [] for the root.',
         'Each global, scene, default-prefab, or variant-prefab object definition and its attached behaviors belong in its dedicated objects/<Object>.settings source location; instances and per-instance behavior overrides belong in the owner settings [layout] subtree.',
         'Each scene, External Events, extension, prefab, or behavior function owns its functions/<Function>.settings location and same-stem <Function>.events body. Function settings never store an events URI, and owner settings never embed function metadata.',
+        'Store all project and extension gameplay-test metadata in root tests.settings. Each source field is a scheme-free canonical tests/<Encoded basename>.js path to a direct child of root tests/. Subfolders, game:// prefixes, inline JavaScript, and lastRunStatus/lastRunAt/lastRunDurationMs/lastRunFramesExecuted fields are forbidden.',
         'For an object, use objectTypes[type].properties for public generic-editor properties and objectTypes[type].schema for the complete known serialized TOML structure, including nested type-specific tables and repeated records. Preserve unlisted legacy or private serializer fields already present in an object definition.',
         'For an attached behavior, use behaviorTypes[].properties for author-writable fields. Editor-hidden and deprecated descriptors are intentionally absent from this catalog, but existing serialized fields not listed there are preserved verbatim because they may be configured by a specialized editor and required at runtime.',
         'Preserve unknown serializer fields. Never invent an object, behavior, or effect type absent from this catalog.',

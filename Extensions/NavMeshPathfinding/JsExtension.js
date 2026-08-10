@@ -843,7 +843,7 @@ module.exports = {
       };
       sharedData.initializeContent = function (sharedContent) {};
 
-      const aut = extension
+      extension
         .addBehavior(
           'NavMeshObstacleBehavior',
           _('Obstacle for pathfinding (nav-mesh based)'),

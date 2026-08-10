@@ -109,6 +109,7 @@ export type InstancesEditorShortcutsCallbacks = {|
   onShift1: () => void,
   onShift2: () => void,
   onShift3: () => void,
+  onFocusOnSelection: () => void,
 |};
 
 export type InstancesEditorPropsWithoutSizeAndScroll = {|

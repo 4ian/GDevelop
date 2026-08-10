@@ -10,6 +10,7 @@ import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { blurActiveElementBeforeUiTransition } from '../../UI/MaterialUISpecificUtil';
+import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
 
 export type PreviewAndShareButtonsProps = {|
   onPreviewWithoutHotReload: (
@@ -62,6 +63,9 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
   }: PreviewAndShareButtonsProps) {
     const preferences = React.useContext(PreferencesContext);
     const { isMobile } = useResponsiveWindowSize();
+    // Launching or hot-reloading a preview while a gameplay test runs would
+    // interfere with it (the game also ignores these commands as a backstop).
+    const isGameplayTestRunInProgress = useIsGameplayTestRunInProgress();
 
     const previewBuildMenuTemplate = React.useCallback(
       (i18n: I18nType) =>
@@ -69,7 +73,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           {
             label: i18n._(t`Start Local Preview`),
             click: onNetworkPreview,
-            enabled: canDoNetworkPreview,
+            enabled: canDoNetworkPreview && !isGameplayTestRunInProgress,
           },
           preferences.values.openDiagnosticReportAutomatically
             ? null
@@ -78,7 +82,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 click: async () => {
                   await onLaunchPreviewWithDiagnosticReport();
                 },
-                enabled: !hasPreviewsRunning,
+                enabled: !hasPreviewsRunning && !isGameplayTestRunInProgress,
               },
           {
             label: i18n._(t`Launch preview in...`),
@@ -88,28 +92,28 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 click: async () => {
                   await onPreviewWithoutHotReload({ numberOfWindows: 1 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`2 previews in 2 windows`),
                 click: async () => {
                   await onPreviewWithoutHotReload({ numberOfWindows: 2 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`3 previews in 3 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 3 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
               {
                 label: i18n._(t`4 previews in 4 windows`),
                 click: async () => {
                   onPreviewWithoutHotReload({ numberOfWindows: 4 });
                 },
-                enabled: isPreviewEnabled,
+                enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
             ],
           },
@@ -192,6 +196,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         onPreviewWithoutHotReload,
         isPreviewEnabled,
         hasPreviewsRunning,
+        isGameplayTestRunInProgress,
         preferences.values.openDiagnosticReportAutomatically,
         onLaunchPreviewWithDiagnosticReport,
         displayCollisionShapesInPreview,
@@ -228,7 +233,7 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
         <FlatButtonWithSplitMenu
           primary
           onClick={onPreviewButtonClick}
-          disabled={!isPreviewEnabled}
+          disabled={!isPreviewEnabled || isGameplayTestRunInProgress}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={
             !isMobile ? (

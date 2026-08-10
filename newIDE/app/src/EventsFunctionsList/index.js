@@ -50,6 +50,14 @@ import {
   type EventsBasedObjectCallbacks,
   type EventsBasedObjectCreationParameters,
 } from './EventsBasedObjectTreeViewItemContent';
+import {
+  GameplayTestTreeViewItemContent,
+  getGameplayTestTreeViewItemId,
+  type GameplayTestProps,
+  type GameplayTestCallbacks,
+} from './GameplayTestTreeViewItemContent';
+import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
+import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -71,9 +79,11 @@ export const extensionConfigurationRootFolderId = 'extension-configuration';
 export const extensionObjectsRootFolderId = 'extension-objects';
 export const extensionBehaviorsRootFolderId = 'extension-behaviors';
 export const extensionFunctionsRootFolderId = 'extension-functions';
+export const extensionTestsRootFolderId = 'extension-tests';
 const extensionObjectsEmptyPlaceholderId = 'extension-objects-placeholder';
 const extensionBehaviorsEmptyPlaceholderId = 'extension-behaviors-placeholder';
 const extensionFunctionsEmptyPlaceholderId = 'extension-functions-placeholder';
+const extensionTestsEmptyPlaceholderId = 'extension-tests-placeholder';
 
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
@@ -653,6 +663,8 @@ type Props = {|
   // Free functions
   selectedEventsFunction: ?gdEventsFunction,
   ...EventsFunctionCallbacks,
+  // Gameplay tests
+  ...GameplayTestCallbacks,
   onSelectExtensionProperties: () => void,
   onSelectExtensionGlobalVariables: () => void,
   onSelectExtensionSceneVariables: () => void,
@@ -691,6 +703,10 @@ const EventsFunctionsList = React.forwardRef<
       onEventsBasedObjectPasted,
       onEventsBasedObjectMetadataChanged,
       onAddEventsBasedObject,
+      onOpenGameplayTest,
+      onRenameGameplayTest,
+      onDeleteGameplayTest,
+      onRunGameplayTest,
       selectedEventsFunction,
       selectedEventsBasedBehavior,
       selectedEventsBasedObject,
@@ -965,6 +981,48 @@ const EventsFunctionsList = React.forwardRef<
         onSelectEventsBasedBehavior,
         unsavedChanges,
         onEventsBasedBehaviorMetadataChanged,
+      ]
+    );
+
+    const addNewGameplayTest = React.useCallback(
+      () => {
+        const testsContainer = eventsFunctionsExtension.getTests();
+
+        const name = newNameGenerator('MyTest', name =>
+          testsContainer.hasTestNamed(name)
+        );
+        const newTest = testsContainer.insertNewTest(
+          name,
+          testsContainer.getTestsCount()
+        );
+        newTest.setSource(DEFAULT_GAMEPLAY_TEST_SOURCE);
+        if (unsavedChanges) {
+          unsavedChanges.triggerUnsavedChanges();
+        }
+        forceUpdate();
+
+        const testItemId = getGameplayTestTreeViewItemId(newTest);
+
+        if (treeViewRef.current) {
+          treeViewRef.current.openItems([
+            testItemId,
+            extensionTestsRootFolderId,
+          ]);
+        }
+        // Scroll to the new test (after a new render was done).
+        setTimeout(() => {
+          scrollToItem(testItemId);
+        }, 100); // A few ms is enough for a new render to be done.
+
+        // We focus it so the user can edit the name directly.
+        editName(testItemId);
+      },
+      [
+        editName,
+        eventsFunctionsExtension,
+        forceUpdate,
+        scrollToItem,
+        unsavedChanges,
       ]
     );
 
@@ -1335,6 +1393,39 @@ const EventsFunctionsList = React.forwardRef<
       ]
     );
 
+    const testsContainer = eventsFunctionsExtension.getTests();
+
+    const gameplayTestProps = React.useMemo<GameplayTestProps>(
+      () => ({
+        ...treeItemProps,
+        testsContainer,
+        onOpenGameplayTest,
+        onRenameGameplayTest,
+        onDeleteGameplayTest,
+        onRunGameplayTest,
+      }),
+      [
+        treeItemProps,
+        testsContainer,
+        onOpenGameplayTest,
+        onRenameGameplayTest,
+        onDeleteGameplayTest,
+        onRunGameplayTest,
+      ]
+    );
+
+    const gameplayTestTreeViewItems = mapFor(
+      0,
+      testsContainer.getTestsCount(),
+      i =>
+        new LeafTreeViewItem(
+          new GameplayTestTreeViewItemContent(
+            testsContainer.getTestAt(i),
+            gameplayTestProps
+          )
+        )
+    );
+
     const objectTreeViewItems = React.useMemo<
       Array<EventsBasedObjectTreeViewItem>
     >(
@@ -1540,6 +1631,33 @@ const EventsFunctionsList = React.forwardRef<
                   behaviorTreeViewItems;
             },
           },
+          ...(areGameplayTestsEnabled()
+            ? [
+                {
+                  isRoot: true,
+                  content: new LabelTreeViewItemContent(
+                    extensionTestsRootFolderId,
+                    i18n._(t`Gameplay tests`),
+                    {
+                      icon: <Add />,
+                      label: i18n._(t`Add a gameplay test`),
+                      click: addNewGameplayTest,
+                    }
+                  ),
+                  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+                    return gameplayTestTreeViewItems.length === 0
+                      ? [
+                          new PlaceHolderTreeViewItem(
+                            extensionTestsEmptyPlaceholderId,
+                            i18n._(t`Start by adding a new gameplay test.`)
+                          ),
+                        ]
+                      : // $FlowFixMe[incompatible-type]
+                        gameplayTestTreeViewItems;
+                  },
+                },
+              ]
+            : []),
           {
             isRoot: true,
             content: new LabelTreeViewItemContent(
@@ -1617,6 +1735,7 @@ const EventsFunctionsList = React.forwardRef<
       [
         addNewEventsBasedObject,
         addNewEventsBehavior,
+        addNewGameplayTest,
         onSelectExtensionProperties,
         onSelectExtensionGlobalVariables,
         onSelectExtensionSceneVariables,
@@ -1626,6 +1745,7 @@ const EventsFunctionsList = React.forwardRef<
         focusedEventsFunction,
         focusedFunctionTreeViewItem,
         behaviorTreeViewItems,
+        gameplayTestTreeViewItems,
         addNewEventsFunction,
         eventsFunctionsExtension,
         addFolder,
@@ -1644,6 +1764,13 @@ const EventsFunctionsList = React.forwardRef<
               destinationItem.content.getFunctionFolderOrFunction() &&
               item.content.getEventsFunctionsContainer() ===
                 destinationItem.content.getEventsFunctionsContainer()
+            );
+          }
+          // Gameplay tests between themselves
+          if (item.content.getId().startsWith('gameplay-test-')) {
+            return (
+              where !== 'inside' &&
+              destinationItem.content.getId().startsWith('gameplay-test-')
             );
           }
           // Behaviors or Objects
@@ -1737,6 +1864,7 @@ const EventsFunctionsList = React.forwardRef<
       extensionBehaviorsRootFolderId,
       extensionFunctionsRootFolderId,
       extensionConfigurationRootFolderId,
+      ...(areGameplayTestsEnabled() ? [extensionTestsRootFolderId] : []),
       ...objectTreeViewItems.map(item => item.content.getId()),
       ...behaviorTreeViewItems.map(item => item.content.getId()),
       ...objectTreeViewItems

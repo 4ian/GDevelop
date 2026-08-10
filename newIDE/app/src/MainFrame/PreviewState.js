@@ -273,6 +273,9 @@ export const usePreviewDebuggerServerWatcher = (
 
       console.info('Hard reloading all previews...');
       previewDebuggerServer.getExistingDebuggerIds().forEach(debuggerId => {
+        // The gameplay test frame is only driven by the gameplay test runner.
+        if (debuggerId === 'gameplay-test-frame') return;
+
         previewDebuggerServer.sendMessage(debuggerId, {
           command: 'hardReload',
         });
@@ -281,10 +284,10 @@ export const usePreviewDebuggerServerWatcher = (
     [previewDebuggerServer]
   );
 
-  // The embedded game frame is an editor surface, not a native preview window.
-  // It must not keep the global Preview button in its "Update" state.
+  // Editor-owned frames are not native preview windows. They must not keep
+  // the global Preview button in its "Update" state.
   const previewDebuggerStatusIds = Object.keys(debuggerStatus).filter(
-    key => key !== 'embedded-game-frame'
+    key => key !== 'embedded-game-frame' && key !== 'gameplay-test-frame'
   );
   const hasNonEditionPreviewsRunning = previewDebuggerStatusIds.some(
     key => !debuggerStatus[key].isInGameEdition

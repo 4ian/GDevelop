@@ -1304,6 +1304,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
     InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
     InsertUnique(includesFiles, "debugger-client/InGameDebugger.js");
+    // Gameplay tests can only be run when a debugger client is included
+    // (i.e: during previews), as the test scripts are sent over the
+    // debugger connection.
+    InsertUnique(includesFiles, "gameplay-tests/gameplay-test-runner.js");
   }
   if (includeWebsocketDebuggerClient) {
     InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");

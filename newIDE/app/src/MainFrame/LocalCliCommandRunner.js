@@ -10,6 +10,12 @@ import PreferencesContext, {
   type Preferences,
 } from './Preferences/PreferencesContext';
 import { scanProjectForValidationErrors } from '../Utils/EventsValidationScanner';
+import {
+  runProjectGameplayTests,
+  makeGameplayTestResultReadableOutput,
+  type GameplayTestToRun,
+  type GameplayTestResult,
+} from '../GameplayTests/GameplayTestRunner';
 import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 import { type FileMetadata } from '../ProjectsStorage';
@@ -80,6 +86,67 @@ export const shouldBlockOnDiagnosticErrorsForCli = (
   return preferences.getBlockPreviewAndExportOnDiagnosticErrors();
 };
 
+const sanitizeForFileName = (name: string): string =>
+  name.replace(/[^a-zA-Z0-9-_]+/g, '_').substring(0, 60) || 'unnamed';
+
+/**
+ * Write the full results of a gameplay tests run (the same content the
+ * GDevelop AI reads: assertions, logs, event log, final state, profiles...)
+ * to a JSON file, with the screenshots extracted to JPEG files next to it.
+ * The path is taken from `--results-path`, defaulting to
+ * `gameplay-test-results.json` next to the project file.
+ */
+const writeCliGameplayTestResults = (
+  project: gdProject,
+  results: Array<GameplayTestResult>
+): ?string => {
+  if (!fs || !path) return null;
+
+  const appArguments = Window.getArguments();
+  const resultsPath =
+    typeof appArguments['results-path'] === 'string' &&
+    appArguments['results-path']
+      ? path.resolve(appArguments['results-path'])
+      : path.join(
+          path.dirname(project.getProjectFile()),
+          'gameplay-test-results.json'
+        );
+  const screenshotsDirectoryPath = path.join(
+    path.dirname(resultsPath),
+    'gameplay-test-screenshots'
+  );
+
+  const outputs = results.map(result => {
+    const output = makeGameplayTestResultReadableOutput(result);
+    return {
+      ...output,
+      screenshots: result.screenshots.map((screenshot, index) => {
+        const screenshotPath = path.join(
+          screenshotsDirectoryPath,
+          `${sanitizeForFileName(result.testName)}-frame-${
+            screenshot.frame
+          }-${sanitizeForFileName(screenshot.label || `${index}`)}.jpg`
+        );
+        try {
+          fs.mkdirSync(screenshotsDirectoryPath, { recursive: true });
+          fs.writeFileSync(screenshotPath, screenshot.jpegBase64, 'base64');
+          return {
+            label: screenshot.label,
+            frame: screenshot.frame,
+            file: screenshotPath,
+          };
+        } catch (error) {
+          console.error('[CLI] Could not write a screenshot:', error);
+          return { label: screenshot.label, frame: screenshot.frame };
+        }
+      }),
+    };
+  });
+
+  fs.writeFileSync(resultsPath, JSON.stringify(outputs, null, 2));
+  return resultsPath;
+};
+
 const runners: { [commandName: string]: CliCommandRunner } = {
   EXPORT_HTML5_EXTERNAL: async (project, i18n, { preferences }) => {
     if (shouldBlockOnDiagnosticErrorsForCli(preferences)) {
@@ -128,6 +195,87 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     const fileMetadata = await saveProject({ skipNewVersionWarning: true });
     if (!fileMetadata) {
       throw new Error('[CLI] Extension imported but project save failed.');
+    }
+  },
+  RUN_ALL_TESTS: async (project, i18n, { commandArgs }) => {
+    // Run the gameplay tests of the project and of every extension,
+    // optionally filtered by names passed via --cmd-args.
+    const tests: Array<GameplayTestToRun> = [];
+    const projectTests = project.getTests();
+    for (let i = 0; i < projectTests.getTestsCount(); i++) {
+      tests.push({
+        scope: { type: 'project' },
+        testName: projectTests.getTestAt(i).getName(),
+      });
+    }
+    for (
+      let extensionIndex = 0;
+      extensionIndex < project.getEventsFunctionsExtensionsCount();
+      extensionIndex++
+    ) {
+      const extension = project.getEventsFunctionsExtensionAt(extensionIndex);
+      const extensionTests = extension.getTests();
+      for (let i = 0; i < extensionTests.getTestsCount(); i++) {
+        tests.push({
+          scope: { type: 'extension', extensionName: extension.getName() },
+          testName: extensionTests.getTestAt(i).getName(),
+        });
+      }
+    }
+    const filteredTests = commandArgs.length
+      ? tests.filter(test => commandArgs.includes(test.testName))
+      : tests;
+    if (filteredTests.length === 0) {
+      console.info('[CLI] No gameplay tests to run.');
+      return;
+    }
+
+    const results = await runProjectGameplayTests({
+      project,
+      tests: filteredTests,
+      options: { screenshots: 'on-failure' },
+    });
+    let failedCount = 0;
+    for (const result of results) {
+      const passed = result.status === 'passed';
+      if (!passed) failedCount++;
+      const budgetText = result.timeoutMs
+        ? `, ${(result.durationMs / 1000).toFixed(1)}s / ${result.timeoutMs /
+            1000}s budget`
+        : '';
+      console.info(
+        `[CLI] ${passed ? 'PASSED' : 'FAILED'} (${result.status}): ${
+          result.testName
+        } (${result.framesExecuted} frames${budgetText})${
+          result.errors.length ? ' - ' + result.errors.join(' | ') : ''
+        }`
+      );
+      if (
+        passed &&
+        result.timeoutMs &&
+        result.durationMs >= 0.8 * result.timeoutMs
+      ) {
+        console.warn(
+          `[CLI] WARNING: "${result.testName}" used ${Math.round(
+            (100 * result.durationMs) / result.timeoutMs
+          )}% of its wall-clock budget - it is at risk of timing out on a slower machine. Shorten it or raise its timeout.`
+        );
+      }
+    }
+    try {
+      const resultsPath = writeCliGameplayTestResults(project, results);
+      if (resultsPath)
+        console.info(`[CLI] Full test results written to: ${resultsPath}`);
+    } catch (error) {
+      console.error('[CLI] Could not write the full test results:', error);
+    }
+    console.info(
+      `[CLI] ${results.length - failedCount}/${
+        results.length
+      } gameplay tests passed.`
+    );
+    if (failedCount > 0) {
+      throw new Error(`${failedCount} gameplay test(s) failed.`);
     }
   },
 };

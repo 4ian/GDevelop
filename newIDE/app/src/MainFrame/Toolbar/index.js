@@ -22,6 +22,7 @@ import { type TriggerNpmScript } from '../NpmScriptRunner/useNpmScriptRunner';
 
 export type MainFrameToolbarProps = {|
   showProjectButtons: boolean,
+  showPreviewAndShareButtons: boolean,
   openShareDialog: () => void,
   onSave: (options?: {|
     skipNewVersionWarning: boolean,
@@ -161,38 +162,42 @@ export default (React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
               navigationEditorToolbar={navigationEditorToolbar}
               leadingEditorToolbar={leadingEditorToolbar}
             />
-            <ToolbarGroup>
-              <Spacer />
-              <PreviewAndShareButtons
-                onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
-                onOpenDebugger={props.onOpenDebugger}
-                onNetworkPreview={props.onNetworkPreview}
-                onHotReloadPreview={props.onHotReloadPreview}
-                onLaunchPreviewWithDiagnosticReport={
-                  props.onLaunchPreviewWithDiagnosticReport
-                }
-                displayCollisionShapesInPreview={
-                  props.displayCollisionShapesInPreview
-                }
-                setDisplayCollisionShapesInPreview={
-                  props.setDisplayCollisionShapesInPreview
-                }
-                displaySignalAnimationsInPreview={
-                  props.displaySignalAnimationsInPreview
-                }
-                setDisplaySignalAnimationsInPreview={
-                  props.setDisplaySignalAnimationsInPreview
-                }
-                setPreviewOverride={props.setPreviewOverride}
-                canDoNetworkPreview={props.canDoNetworkPreview}
-                isPreviewEnabled={props.isPreviewEnabled}
-                previewState={props.previewState}
-                hasPreviewsRunning={props.hasPreviewsRunning}
-                openShareDialog={props.openShareDialog}
-                isSharingEnabled={props.isSharingEnabled}
-              />
-              <Spacer />
-            </ToolbarGroup>
+            {props.showPreviewAndShareButtons ? (
+              <ToolbarGroup>
+                <Spacer />
+                <PreviewAndShareButtons
+                  onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
+                  onOpenDebugger={props.onOpenDebugger}
+                  onNetworkPreview={props.onNetworkPreview}
+                  onHotReloadPreview={props.onHotReloadPreview}
+                  onLaunchPreviewWithDiagnosticReport={
+                    props.onLaunchPreviewWithDiagnosticReport
+                  }
+                  displayCollisionShapesInPreview={
+                    props.displayCollisionShapesInPreview
+                  }
+                  setDisplayCollisionShapesInPreview={
+                    props.setDisplayCollisionShapesInPreview
+                  }
+                  displaySignalAnimationsInPreview={
+                    props.displaySignalAnimationsInPreview
+                  }
+                  setDisplaySignalAnimationsInPreview={
+                    props.setDisplaySignalAnimationsInPreview
+                  }
+                  setPreviewOverride={props.setPreviewOverride}
+                  canDoNetworkPreview={props.canDoNetworkPreview}
+                  isPreviewEnabled={props.isPreviewEnabled}
+                  previewState={props.previewState}
+                  hasPreviewsRunning={props.hasPreviewsRunning}
+                  openShareDialog={props.openShareDialog}
+                  isSharingEnabled={props.isSharingEnabled}
+                />
+                <Spacer />
+              </ToolbarGroup>
+            ) : (
+              <ToolbarGroup />
+            )}
           </>
         ) : navigationEditorToolbar || leadingEditorToolbar ? (
           <ToolbarGroup firstChild>

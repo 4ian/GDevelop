@@ -22,6 +22,7 @@ import {
   addGlobalObjectGroupsToProjectData,
 } from '../../PreviewGlobalObjectGroupsPatch';
 import { hasConstantPlaceholderDiagnostic } from '../../../Utils/ConstantPlaceholderDiagnostics';
+import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -50,8 +51,10 @@ type State = {|
 
 const prepareExporter = async ({
   isForInGameEdition,
+  isForGameplayTest,
 }: {
   isForInGameEdition: boolean,
+  isForGameplayTest: boolean,
 }): Promise<{|
   outputDir: string,
   exporter: gdjsExporter,
@@ -67,7 +70,11 @@ const prepareExporter = async ({
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const outputDir = path.join(
     fileSystem.getTempDir(),
-    isForInGameEdition ? 'in-game-editor-preview' : 'preview'
+    isForGameplayTest
+      ? 'gameplay-test-preview'
+      : isForInGameEdition
+      ? 'in-game-editor-preview'
+      : 'preview'
   );
   const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
@@ -291,6 +298,7 @@ export default class LocalPreviewLauncher extends React.Component<
     const { outputDir, exporter, gdjsRoot, fileSystem } = await prepareExporter(
       {
         isForInGameEdition: previewOptions.isForInGameEdition,
+        isForGameplayTest: !!previewOptions.isForGameplayTest,
       }
     );
     if (previewOptions.isLaunchCancelled()) {
@@ -318,7 +326,7 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    if (previewOptions.isForInGameEdition) {
+    if (previewOptions.isForInGameEdition || previewOptions.isForGameplayTest) {
       previewExportOptions.useWindowMessageDebuggerClient();
     } else {
       const previewDebuggerServerAddress = getDebuggerServerAddress();
@@ -355,7 +363,10 @@ export default class LocalPreviewLauncher extends React.Component<
     const debuggerIds = previewOptions.isForInGameEdition
       ? this.getPreviewDebuggerServer().getExistingEmbeddedGameFrameDebuggerIds()
       : this.getPreviewDebuggerServer().getExistingPreviewDebuggerIds();
-    const shouldHotReload = previewOptions.hotReload && !!debuggerIds.length;
+    const shouldHotReload =
+      previewOptions.hotReload &&
+      !previewOptions.isForGameplayTest &&
+      !!debuggerIds.length;
     if (shouldHotReload) {
       previewExportOptions.setShouldClearExportFolder(
         previewOptions.shouldHardReload
@@ -520,7 +531,14 @@ export default class LocalPreviewLauncher extends React.Component<
         });
       }
 
-      if (previewOptions.numberOfWindows >= 1) {
+      if (previewOptions.isForGameplayTest) {
+        // The preview is shown in (and run by) the gameplay test frame:
+        // no window to open. The previewId in the URL forces the frame to
+        // reload the game when the same preview is re-exported.
+        setGameplayTestFramePreviewLocation({
+          previewIndexHtmlLocation: `file://${outputDir}/index.html?previewId=${previewId}`,
+        });
+      } else if (previewOptions.numberOfWindows >= 1) {
         this._openPreviewWindow(project, outputDir, previewOptions);
       }
     }

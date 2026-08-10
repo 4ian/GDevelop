@@ -292,6 +292,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onBehaviorEdited={this._reloadExtensionMetadata}
           onObjectEdited={this._reloadExtensionMetadata}
           onFunctionEdited={this._reloadExtensionMetadata}
+          gameplayTestsCallbacks={this.props.gameplayTestsCallbacks}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
           onOpenCustomObjectEditor={eventsBasedObject => {

@@ -1,6 +1,19 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
+  /** The only debugger commands processed while a gameplay test is running:
+   * read-only inspection and the gameplay test commands themselves. Every
+   * other command is ignored (fail closed: a command added later cannot
+   * accidentally mutate the game state or stepping the harness owns). */
+  const DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS = new Set([
+    'refresh',
+    'getStatus',
+    'profiler.start',
+    'profiler.stop',
+    'gameplayTest.run',
+    'gameplayTest.stop',
+  ]);
+
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -295,6 +308,30 @@ namespace gdjs {
       if (!data || !data.command) {
         // Not a command that's meant to be handled by the debugger, return silently to
         // avoid polluting the console.
+        return;
+      }
+
+      // While a gameplay test runs, the harness owns the game stepping and
+      // state: only read-only and gameplay test commands are processed (an
+      // unpause would make the main loop step in parallel, a hot-reload
+      // would reset instances mid-test).
+      if (
+        gdjs.gameplayTests &&
+        gdjs.gameplayTests.isGameplayTestRunning() &&
+        !DEBUGGER_COMMANDS_ALLOWED_DURING_GAMEPLAY_TESTS.has(data.command)
+      ) {
+        logger.warn(
+          `Ignored debugger command "${data.command}" while a gameplay test is running.`
+        );
+        this._sendMessage(
+          circularSafeStringify({
+            command: 'commandIgnored',
+            payload: {
+              ignoredCommand: data.command,
+              reason: 'gameplay-test-running',
+            },
+          })
+        );
         return;
       }
 
@@ -664,6 +701,37 @@ namespace gdjs {
           this.sendInputState(data.messageId);
         } else if (data.command === 'getActiveSounds') {
           this.sendActiveSounds(data.messageId);
+        } else if (data.command === 'gameplayTest.run') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests
+              .runGameplayTest(runtimeGame, data.payload, (frame) => {
+                that.sendGameplayTestProgress(data.messageId, frame);
+              })
+              .then((result) => {
+                that.sendGameplayTestResult(data.messageId, result);
+              })
+              .catch((error) => {
+                // `runGameplayTest` is not supposed to throw - this is a
+                // safety net so the editor always gets an answer.
+                that.sendGameplayTestResult(data.messageId, {
+                  testName: (data.payload && data.payload.testName) || '',
+                  status: 'error',
+                  errors: ['Unexpected error while running the test: ' + error],
+                });
+              });
+          } else {
+            this.sendGameplayTestResult(data.messageId, {
+              testName: (data.payload && data.payload.testName) || '',
+              status: 'error',
+              errors: [
+                'Gameplay tests are not included in this preview - relaunch the preview from the editor.',
+              ],
+            });
+          }
+        } else if (data.command === 'gameplayTest.stop') {
+          if (gdjs.gameplayTests) {
+            gdjs.gameplayTests.stopCurrentGameplayTest();
+          }
         } else if (data.command === 'hardReload') {
           // This usually means that the preview was modified so much that an entire reload
           // is needed, or that the runtime itself could have been modified.
@@ -1223,6 +1291,32 @@ namespace gdjs {
           command: 'handleKeyboardShortcutFromInGameEditor',
           editorId: inGameEditor.getEditorId(),
           payload: keyEventLike,
+        })
+      );
+    }
+
+    /**
+     * Send a progress update about the gameplay test being run.
+     */
+    sendGameplayTestProgress(messageId: number, frame: number): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.progress',
+          messageId,
+          payload: { frame },
+        })
+      );
+    }
+
+    /**
+     * Send the result of a gameplay test run.
+     */
+    sendGameplayTestResult(messageId: number, result: Object): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'gameplayTest.result',
+          messageId,
+          payload: result,
         })
       );
     }
@@ -2001,7 +2095,7 @@ namespace gdjs {
      * @param stats Other measures done during the profiler run.
      */
     sendProfilerOutput(
-      framesAverageMeasures: FrameMeasure,
+      framesAverageMeasures: FrameMeasureOutput,
       stats: ProfilerStats
     ): void {
       this._sendMessage(

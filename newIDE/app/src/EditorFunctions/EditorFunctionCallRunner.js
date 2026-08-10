@@ -25,6 +25,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
@@ -63,6 +64,9 @@ type ProcessEditorFunctionCallsOptions = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -93,6 +97,7 @@ export const processEditorFunctionCalls = async ({
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
   relatedAiRequestId,
   getRelatedAiRequestLastMessages,
@@ -215,6 +220,7 @@ export const processEditorFunctionCalls = async ({
         onObjectGroupsModifiedOutsideEditor,
         onProjectItemRenamedOutsideEditor,
         onWillDeleteScene,
+        onWillDeleteGameplayTest,
         onWillDeleteObject,
         ensureExtensionInstalled,
         onWillInstallExtension,

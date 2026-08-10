@@ -12,7 +12,10 @@ import {
   type AiRequestMessageAssistantFunctionCall,
 } from '../../Utils/GDevelopServices/Generation';
 import RaisedButton from '../../UI/RaisedButton';
-import { CompactTextAreaFieldWithControls } from '../../UI/CompactTextAreaFieldWithControls';
+import {
+  CompactTextAreaFieldWithControls,
+  type CompactTextAreaFieldWithControlsInterface,
+} from '../../UI/CompactTextAreaFieldWithControls';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
@@ -370,6 +373,7 @@ type Props = {|
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
+  setUserInput: (aiRequestId: string | null, userRequestText: string) => void,
 |};
 
 export const AiRequestChat: React.ComponentType<{
@@ -480,6 +484,12 @@ export const AiRequestChat: React.ComponentType<{
     ] = React.useState<{ [string]: string }>({});
 
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const newChatTextFieldRef = React.useRef<CompactTextAreaFieldWithControlsInterface | null>(
+      null
+    );
+    const existingChatTextFieldRef = React.useRef<CompactTextAreaFieldWithControlsInterface | null>(
+      null
+    );
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState<boolean>(
       true
     );
@@ -562,6 +572,20 @@ export const AiRequestChat: React.ComponentType<{
         onUserRequestTextChange('', aiRequestIdToReset);
 
         scrollToBottom();
+      },
+      setUserInput: (aiRequestId: string | null, userRequestText: string) => {
+        onUserRequestTextChange(userRequestText, aiRequestId || '');
+
+        scrollToBottom();
+
+        // Focus the field so the user can complete the text right away
+        // (after a render, as the field might just be shown).
+        const textFieldRef = aiRequestId
+          ? existingChatTextFieldRef
+          : newChatTextFieldRef;
+        setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
+        }, 50);
       },
     }));
 
@@ -806,6 +830,7 @@ export const AiRequestChat: React.ComponentType<{
               >
                 {!shouldReplaceFormWithCreditsOrSubscriptionPrompt ? (
                   <CompactTextAreaFieldWithControls
+                    ref={newChatTextFieldRef}
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isWorking}

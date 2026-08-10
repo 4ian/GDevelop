@@ -12,6 +12,14 @@ declare const objects: gdjs.RuntimeObject[];
 declare const eventsFunctionContext: gdjs.EventsFunctionContext;
 `;
 
+const gameplayTestContextDeclaration = `
+/**
+ * The harness driving a gameplay test: it steps frames, simulates player
+ * input and inspects objects in the scene.
+ */
+declare const harness: gdjs.gameplayTests.GameplayTestHarness;
+`;
+
 export const setupAutocompletions = (monaco: any) => {
   // Use the same reviewed public API declaration as save-time validation.
   // Loading the complete runtime source tree exposed implementation-only
@@ -23,5 +31,9 @@ export const setupAutocompletions = (monaco: any) => {
   monaco.languages.typescript.javascriptDefaults.addExtraLib(
     javascriptEventContextDeclaration,
     'gdevelop-javascript-event-context.d.ts'
+  );
+  monaco.languages.typescript.javascriptDefaults.addExtraLib(
+    gameplayTestContextDeclaration,
+    'gdevelop-gameplay-test-context.d.ts'
   );
 };

@@ -16,6 +16,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/TestsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/Watermark.h"
 #include "GDCore/Project/MemoryTrackedRegistry.h"
@@ -767,6 +768,21 @@ class GD_CORE_API Project {
   void RemoveExternalEvents(const gd::String& name);
   ///@}
 
+  /** \name Tests management
+   * Members functions related to the tests of the project.
+   */
+  ///@{
+  /**
+   * \brief Return a reference to the tests of the project.
+   */
+  gd::TestsContainer& GetTests() { return tests; }
+
+  /**
+   * \brief Return a const reference to the tests of the project.
+   */
+  const gd::TestsContainer& GetTests() const { return tests; }
+  ///@}
+
   /** \name External layout management
    * Members functions related to external layout management.
    */
@@ -1243,6 +1259,7 @@ class GD_CORE_API Project {
   gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
+  gd::TestsContainer tests;  ///< The tests of the project.
   ExtensionProperties
       extensionProperties;  ///< The properties of the extensions.
   gd::WholeProjectDiagnosticReport wholeProjectDiagnosticReport;

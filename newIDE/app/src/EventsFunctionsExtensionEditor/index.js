@@ -12,6 +12,7 @@ import {
 import EventsFunctionEditor, {
   editableEventsFunctionCapabilities,
 } from './EventsFunctionEditor';
+import { type GameplayTestsCallbacks } from '../GameplayTests/GameplayTestRunner';
 import EditorMosaic, {
   type EditorMosaicNode,
   type EditorMosaicInterface,
@@ -138,6 +139,7 @@ type Props = {|
   onEventBasedObjectTypeChanged: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
 |};
 
 type DetailSettingsTab = 'properties' | 'private-variables' | 'configuration';
@@ -1244,6 +1246,50 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         sourceEventsBasedBehaviorName
       );
     }
+  };
+
+  // Gameplay tests: delegate to the MainFrame-provided callbacks, bound to
+  // this extension (its name is the tests "scope").
+  _onOpenGameplayTest = (testName: string) => {
+    this.props.gameplayTestsCallbacks.onOpenGameplayTest(
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
+      testName
+    );
+  };
+
+  _onRenameGameplayTest = (oldName: string, newName: string) => {
+    this.props.gameplayTestsCallbacks.onRenameGameplayTest(
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
+      oldName,
+      newName
+    );
+    if (this.eventsFunctionList) this.eventsFunctionList.forceUpdateList();
+  };
+
+  _onDeleteGameplayTest = (test: gdTest) => {
+    this.props.gameplayTestsCallbacks.onDeleteGameplayTest(
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
+      test
+    );
+  };
+
+  _onRunGameplayTest = (testName: string) => {
+    this.props.gameplayTestsCallbacks.onRunGameplayTest(
+      {
+        type: 'extension',
+        extensionName: this.props.eventsFunctionsExtension.getName(),
+      },
+      testName
+    );
   };
 
   _onEventsBasedObjectPasted = (
@@ -2521,6 +2567,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this._onEventsBasedObjectMetadataChanged
                 }
                 onAddEventsBasedObject={this._onAddEventsBasedObject}
+                // Gameplay tests
+                onOpenGameplayTest={this._onOpenGameplayTest}
+                onRenameGameplayTest={this._onRenameGameplayTest}
+                onDeleteGameplayTest={this._onDeleteGameplayTest}
+                onRunGameplayTest={this._onRunGameplayTest}
                 onSelectExtensionProperties={() => this._editOptions(true)}
                 onSelectExtensionGlobalVariables={() =>
                   this._editVariables({ isGlobalTabInitiallyOpen: true })

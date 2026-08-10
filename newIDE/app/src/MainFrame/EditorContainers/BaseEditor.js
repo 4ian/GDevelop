@@ -23,11 +23,13 @@ import { type GamesPlatformFrameTools } from './HomePage/PlaySection/UseGamesPla
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../../GameplayTests/GameplayTestRunner';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
 import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 import type {
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from '../../EditorFunctions/OutsideEditorChanges';
 
@@ -155,6 +157,9 @@ export type RenderEditorContainerProps = {|
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
 
+  // Gameplay tests management:
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
+
   // Events function management:
   onLoadEventsFunctionsExtensions: ({|
     shouldHotReloadEditor: boolean,
@@ -277,6 +282,9 @@ export type RenderEditorContainerProps = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
 
   // Events editing

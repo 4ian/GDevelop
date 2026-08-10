@@ -677,6 +677,8 @@ interface Project {
     void RemoveExternalEvents([Const] DOMString name);
     unsigned long GetExternalEventsPosition([Const] DOMString name);
 
+    [Ref] TestsContainer GetTests();
+
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayoutAt(unsigned long index);
@@ -1135,6 +1137,50 @@ interface ExternalEvents {
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface Test {
+    void Test();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    void SetType([Const] DOMString type);
+    [Const, Ref] DOMString GetType();
+
+    void SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
+
+    void SetSource([Const] DOMString source);
+    [Const, Ref] DOMString GetSource();
+
+    void SetLastRunStatus([Const] DOMString lastRunStatus);
+    [Const, Ref] DOMString GetLastRunStatus();
+
+    void SetLastRunAt(double lastRunAt);
+    double GetLastRunAt();
+
+    void SetLastRunDurationMs(double lastRunDurationMs);
+    double GetLastRunDurationMs();
+
+    void SetLastRunFramesExecuted(long lastRunFramesExecuted);
+    long GetLastRunFramesExecuted();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
+interface TestsContainer {
+    [Ref] Test InsertNewTest([Const] DOMString name, unsigned long pos);
+    [Ref] Test InsertTest([Const, Ref] Test test, unsigned long pos);
+    boolean HasTestNamed([Const] DOMString name);
+    [Ref] Test GetTest([Const] DOMString name);
+    [Ref] Test GetTestAt(unsigned long pos);
+    void RemoveTest([Const] DOMString name);
+    void ClearTests();
+    void MoveTest(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetTestsCount();
+    unsigned long GetTestPosition([Const, Ref] Test test);
 };
 
 interface ExternalLayout {
@@ -3774,6 +3820,8 @@ interface EventsFunctionsExtension {
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
+
+    [Ref] TestsContainer GetTests();
 
     void SerializeTo([Ref] SerializerElement element);
     void SerializeToExternal([Ref] SerializerElement element);

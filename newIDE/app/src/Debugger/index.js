@@ -18,6 +18,8 @@ import {
 } from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
 
+// Mirrors `gdjs.FrameMeasureOutput`: a plain tree (no back-references),
+// as sent by the game's profiler.
 export type ProfilerMeasuresSection = {|
   time: number,
   subsections: { [string]: ProfilerMeasuresSection },

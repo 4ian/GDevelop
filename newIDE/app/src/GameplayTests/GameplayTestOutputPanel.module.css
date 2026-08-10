@@ -1,0 +1,84 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 4px;
+  background-color: var(--theme-surface-window-background-color);
+  border: 1px solid var(--theme-list-item-separator-color);
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  padding: 1px 8px;
+  color: var(--theme-text-secondary-color);
+}
+
+.line:not(:last-child) {
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-list-item-separator-color) 50%, transparent);
+}
+
+.line.info {
+  color: var(--theme-text-default-color);
+}
+
+.line.warn {
+  color: var(--theme-message-warning-color);
+  background-color: color-mix(in srgb, var(--theme-message-warning-color) 8%, transparent);
+}
+
+.line.error {
+  color: var(--theme-message-error-color);
+  background-color: color-mix(in srgb, var(--theme-message-error-color) 8%, transparent);
+}
+
+.linePrefix {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.copyButtonContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.1s;
+  background: linear-gradient(
+    to left,
+    var(--theme-surface-window-background-color) 60%,
+    transparent
+  );
+  border-top-right-radius: 4px;
+}
+
+.container:hover .copyButtonContainer,
+.container:focus-within .copyButtonContainer {
+  opacity: 1;
+}
+
+.copyIcon {
+  font-size: 16px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-radius: 4px;
+  border: 1px dashed var(--theme-list-item-separator-color);
+}

@@ -37,6 +37,9 @@ export type CommandName =
   | 'OPEN_EXTERNAL_EVENTS'
   | 'OPEN_EXTERNAL_LAYOUT'
   | 'OPEN_EXTENSION'
+  | 'OPEN_GAMEPLAY_TEST'
+  | 'RUN_GAMEPLAY_TEST'
+  | 'RUN_ALL_GAMEPLAY_TESTS'
   | 'OPEN_SCENE_PROPERTIES'
   | 'OPEN_SCENE_VARIABLES'
   | 'ADD_OBJECT'
@@ -247,6 +250,18 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Open external layout...`,
   },
   OPEN_EXTENSION: { area: 'IDE', displayText: t`Open extension...` },
+  OPEN_GAMEPLAY_TEST: {
+    area: 'IDE',
+    displayText: t`Open gameplay test...`,
+  },
+  RUN_GAMEPLAY_TEST: {
+    area: 'PROJECT',
+    displayText: t`Run gameplay test...`,
+  },
+  RUN_ALL_GAMEPLAY_TESTS: {
+    area: 'PROJECT',
+    displayText: t`Run all gameplay tests`,
+  },
 
   // Scene editor commands
   OPEN_SCENE_PROPERTIES: {

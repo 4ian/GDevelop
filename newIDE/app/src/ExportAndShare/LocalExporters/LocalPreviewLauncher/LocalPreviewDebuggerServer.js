@@ -21,6 +21,7 @@ const connectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
 const lastConnectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
+let gameplayTestFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
 
 const hasDebuggerId = (id: DebuggerId): boolean =>
@@ -30,11 +31,15 @@ const hasDebuggerId = (id: DebuggerId): boolean =>
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
+  ...getExistingGameplayTestFrameDebuggerIds(),
   ...getExistingPreviewDebuggerIds(),
 ];
 
 const getExistingEmbeddedGameFrameDebuggerIds = (): Array<DebuggerId> =>
   embeddedGameFrameWindow ? ['embedded-game-frame'] : [];
+
+const getExistingGameplayTestFrameDebuggerIds = (): Array<DebuggerId> =>
+  gameplayTestFrameWindow ? ['gameplay-test-frame'] : [];
 
 const getExistingPreviewDebuggerIds = (): Array<DebuggerId> => debuggerIds;
 
@@ -142,20 +147,26 @@ class LocalPreviewDebuggerServer {
 
     if (!isWindowMessageListenerRegistered) {
       window.addEventListener('message', event => {
-        if (!embeddedGameFrameWindow) return;
-        if (event.source !== embeddedGameFrameWindow) return;
+        const id =
+          embeddedGameFrameWindow && event.source === embeddedGameFrameWindow
+            ? 'embedded-game-frame'
+            : gameplayTestFrameWindow &&
+              event.source === gameplayTestFrameWindow
+            ? 'gameplay-test-frame'
+            : null;
+        if (!id) return;
 
         let parsedMessage = null;
         try {
           parsedMessage = JSON.parse(event.data);
         } catch (error) {
           console.warn(
-            'Error while parsing a message received from the embedded game frame:',
+            'Error while parsing a message received from an embedded frame:',
             error
           );
         }
 
-        handleParsedMessage('embedded-game-frame', parsedMessage);
+        handleParsedMessage(id, parsedMessage);
       });
       isWindowMessageListenerRegistered = true;
     }
@@ -296,6 +307,17 @@ class LocalPreviewDebuggerServer {
       embeddedGameFrameWindow.postMessage(message, '*');
       return;
     }
+    if (id === 'gameplay-test-frame') {
+      if (!gameplayTestFrameWindow) {
+        console.error(
+          'Cannot send message to the gameplay test frame as it is not registered.'
+        );
+        return;
+      }
+
+      gameplayTestFrameWindow.postMessage(message, '*');
+      return;
+    }
 
     if (!ipcRenderer) return;
     if (debuggerServerState === 'stopped') {
@@ -411,6 +433,36 @@ class LocalPreviewDebuggerServer {
       reason: 'embedded-frame-unregistered',
     });
   }
+  registerGameplayTestFrame(embeddedWindow: WindowProxy) {
+    if (embeddedWindow === gameplayTestFrameWindow) return;
+
+    if (gameplayTestFrameWindow) {
+      console.warn(
+        'A gameplay test frame window was already registered. It will be replaced by the new one.'
+      );
+    }
+
+    gameplayTestFrameWindow = embeddedWindow;
+    callbacksList.forEach(({ onConnectionOpened }) =>
+      onConnectionOpened({
+        id: 'gameplay-test-frame',
+        debuggerIds: getExistingDebuggerIds(),
+      })
+    );
+  }
+  unregisterGameplayTestFrame(embeddedWindow: WindowProxy) {
+    if (gameplayTestFrameWindow !== embeddedWindow) {
+      if (!!gameplayTestFrameWindow) {
+        console.warn(
+          'The gameplay test frame window to unregister is not the same as the one registered. Ignoring the unregistration.'
+        );
+      }
+      return;
+    }
+
+    gameplayTestFrameWindow = null;
+    notifyConnectionClosed('gameplay-test-frame');
+  }
   closeAllPreviewConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
@@ -438,6 +490,11 @@ class LocalPreviewDebuggerServer {
       notifyConnectionClosed('embedded-game-frame', {
         reason: 'closed-by-editor',
       });
+    }
+
+    if (gameplayTestFrameWindow) {
+      gameplayTestFrameWindow = null;
+      notifyConnectionClosed('gameplay-test-frame');
     }
   }
 }

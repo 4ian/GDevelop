@@ -144,6 +144,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     ref={toolbarRef}
                     hidden={false}
                     showProjectButtons={false}
+                    showPreviewAndShareButtons={false}
                     canSave={props.canSave}
                     onSave={props.saveProject}
                     openShareDialog={() => props.openShareDialog()}
@@ -239,6 +240,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         projectItemName: editorTab.projectItemName,
                         setPreviewedLayout: props.setPreviewedLayout,
                         onOpenAskAi: props.onOpenAskAi,
+                        gameplayTestsCallbacks: props.gameplayTestsCallbacks,
                         onCloseAskAi: props.onCloseAskAi,
                         onOpenExternalEvents: props.openExternalEvents,
                         onOpenEvents: (sceneName: string) => {
@@ -391,6 +393,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onProjectItemRenamedOutsideEditor:
                           props.onProjectItemRenamedOutsideEditor,
                         onWillDeleteScene: props.onWillDeleteScene,
+                        onWillDeleteGameplayTest:
+                          props.onWillDeleteGameplayTest,
                         onWillDeleteObject: props.onWillDeleteObject,
                         onWillInstallExtension: props.onWillInstallExtension,
                         onExtensionInstalled: props.onExtensionInstalled,

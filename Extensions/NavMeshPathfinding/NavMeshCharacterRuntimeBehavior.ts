@@ -224,7 +224,13 @@ namespace gdjs {
         return;
       }
       const agentInitialPosition = this._agent.position();
-      this._agent.teleport(origin);
+      if (
+        agentInitialPosition.x !== origin.x ||
+        agentInitialPosition.y !== origin.y ||
+        agentInitialPosition.z !== origin.z
+      ) {
+        this._agent.teleport(origin);
+      }
 
       const { success: hasFoundDestination, point: destination } =
         navMeshQuery.findClosestPoint(
@@ -408,17 +414,18 @@ namespace gdjs {
 
     setSpeed(speed: float): void {
       if (this._agent) {
-        const velocity = this._agent.desiredVelocityObstacleAdjusted();
-        const oldSpeed = Math.hypot(velocity.x, velocity.y, velocity.z);
+        const velocityX = this._agent.raw.get_vel(0);
+        const velocityY = this._agent.raw.get_vel(1);
+        const velocityZ = this._agent.raw.get_vel(2);
+        const oldSpeed = Math.hypot(velocityX, velocityY, velocityZ);
         if (oldSpeed === 0) {
           this._agent.requestMoveVelocity({ x: speed, y: 0, z: 0 });
         } else {
           const ratio = speed / oldSpeed;
-          this._agent.requestMoveVelocity({
-            x: velocity.x * ratio,
-            y: velocity.y * ratio,
-            z: velocity.z * ratio,
-          });
+
+          this._agent.raw.set_vel(0, velocityX * ratio);
+          this._agent.raw.set_vel(1, velocityY * ratio);
+          this._agent.raw.set_vel(2, velocityZ * ratio);
         }
       }
     }

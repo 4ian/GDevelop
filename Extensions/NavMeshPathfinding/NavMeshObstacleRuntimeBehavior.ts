@@ -172,12 +172,8 @@ namespace gdjs {
         this.navMeshConfig
       );
       if (result.success) {
-        if (this.navMesh) {
-          this.navMesh.destroy();
-        }
-        if (this.crowd) {
-          this.crowd.destroy();
-        }
+        const oldNavMesh = this.navMesh;
+        const oldCrowd = this.crowd;
         this.navMesh = result.navMesh;
         this.crowd = new RecastNav.Crowd(this.navMesh, {
           maxAgents: this.characters.size + 100,
@@ -188,6 +184,13 @@ namespace gdjs {
         }
         if (this.debuggerRenderer) {
           this.debuggerRenderer.renderFor3D();
+        }
+
+        if (oldNavMesh) {
+          oldNavMesh.destroy();
+        }
+        if (oldCrowd) {
+          oldCrowd.destroy();
         }
       }
     }
@@ -504,6 +507,7 @@ namespace gdjs {
         ? this.crowd.addAgent(origin, character._crowdAgentParams)
         : null;
 
+      const oldAgent = character._agent;
       character._agent = agent;
       if (agent) {
         if (character.pathFound() && !character.destinationReached()) {
@@ -512,6 +516,11 @@ namespace gdjs {
             character.getDestinationY(),
             character.getDestinationZ()
           );
+        }
+        if (oldAgent) {
+          agent.raw.set_vel(0, oldAgent.raw.get_vel(0));
+          agent.raw.set_vel(1, oldAgent.raw.get_vel(1));
+          agent.raw.set_vel(2, oldAgent.raw.get_vel(2));
         }
       }
     }

@@ -26,7 +26,7 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setShortDescription(
-        'A* pathfinding: compute paths avoiding obstacles.'
+        'Nav-mesh based pathfinding : compute path avoiding obstacles and handle crowds.'
       )
       .setDimension('2D/3D')
       .setCategory('Movement')
@@ -381,7 +381,7 @@ module.exports = {
             'Move objects to a target while avoiding all objects that are  flagged as obstacles.'
           ),
           '',
-          'CppPlatform/Extensions/AStaricon.png',
+          'JsPlatform/Extensions/nav-mesh-character.svg',
           'PathfindingBehavior',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
@@ -411,8 +411,8 @@ module.exports = {
           _('Move the object to a position'),
           _('Move _PARAM0_ to _PARAM2_ ; _PARAM3_ ; _PARAM4_'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -428,8 +428,8 @@ module.exports = {
           _('Check if a path has been found.'),
           _('A path has been found for _PARAM0_'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -442,8 +442,8 @@ module.exports = {
           _('Check if the destination was reached.'),
           _('_PARAM0_ reached its destination'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -457,7 +457,7 @@ module.exports = {
           _('the acceleration when moving the object'),
           _('the acceleration on the path'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -473,7 +473,7 @@ module.exports = {
           _('the maximum speed when moving the object'),
           _('the max. speed on the path'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -494,7 +494,7 @@ module.exports = {
           _('Change the speed of the object on the path'),
           _('the speed on the path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon24.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -514,8 +514,8 @@ module.exports = {
           _('Compare the angle of movement of an object on its path.'),
           _('Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -530,7 +530,7 @@ module.exports = {
           _('the maximum angular speed when moving the object'),
           _('the max. angular speed on the path'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -551,7 +551,7 @@ module.exports = {
           _('the rotation offset applied when moving the object'),
           _('the rotation offset on the path'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -571,8 +571,8 @@ module.exports = {
           _('Enable or disable rotation of the object on the path'),
           _('Enable rotation of _PARAM0_ on the path: _PARAM2_'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -586,8 +586,8 @@ module.exports = {
           _('Check if the object is rotated when traveling on its path.'),
           _('_PARAM0_ is rotated when traveling on its path'),
           _('Pathfinding configuration'),
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg',
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -599,7 +599,7 @@ module.exports = {
           _('Get a waypoint X position'),
           _('Get next waypoint X position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -612,7 +612,7 @@ module.exports = {
           _('Get a waypoint Y position'),
           _('Get next waypoint Y position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -625,7 +625,7 @@ module.exports = {
           _('Get a waypoint Z position'),
           _('Get next waypoint Z position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -638,7 +638,7 @@ module.exports = {
           _('Index of the next waypoint'),
           _('Get the index of the next waypoint to reach'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -650,7 +650,7 @@ module.exports = {
           _('Waypoint count'),
           _('Get the number of waypoints on the path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -662,7 +662,7 @@ module.exports = {
           _('Get next waypoint X position'),
           _('Get next waypoint X position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -674,7 +674,7 @@ module.exports = {
           _('Get next waypoint Y position'),
           _('Get next waypoint Y position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -686,7 +686,7 @@ module.exports = {
           _('Get next waypoint Z position'),
           _('Get next waypoint Z position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -698,7 +698,7 @@ module.exports = {
           _('Previous waypoint X position'),
           _('Previous waypoint X position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -710,7 +710,7 @@ module.exports = {
           _('Previous waypoint Y position'),
           _('Previous waypoint Y position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -722,7 +722,7 @@ module.exports = {
           _('Previous waypoint Z position'),
           _('Previous waypoint Z position'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -734,7 +734,7 @@ module.exports = {
           _('Destination X position'),
           _('Destination X position of the path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -746,7 +746,7 @@ module.exports = {
           _('Destination Y position'),
           _('Destination Y position of the path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -758,7 +758,7 @@ module.exports = {
           _('Destination Z position'),
           _('Destination Z position of the path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -770,7 +770,7 @@ module.exports = {
           _('Angle of movement on its path'),
           _('Angle of movement on its path'),
           _('Movement on the path'),
-          'CppPlatform/Extensions/AStaricon16.png'
+          'JsPlatform/Extensions/nav-mesh-character.svg'
         )
         .addParameter('object', _('Object'))
         .addParameter('behavior', _('Behavior'), 'NavMeshCharacterBehavior')
@@ -855,11 +855,11 @@ module.exports = {
       const aut = extension
         .addBehavior(
           'NavMeshObstacleBehavior',
-          _('Pathfinding obstacle (nav-mesh based)'),
+          _('Obstacle for pathfinding (nav-mesh based)'),
           'NavMeshObstacle',
           _('Flag objects as being obstacles for nav-mesh pathfinding.'),
           '',
-          'CppPlatform/Extensions/pathfindingobstacleicon.png',
+          'JsPlatform/Extensions/nav-mesh-obstacle.svg',
           'NavMeshObstacle',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,

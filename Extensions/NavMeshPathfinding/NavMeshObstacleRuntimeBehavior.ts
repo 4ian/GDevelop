@@ -58,6 +58,10 @@ namespace gdjs {
     static readonly cellHeightFor2D = 5;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+      if (!sharedData) {
+        // It can happens when there is no object with the character behavior.
+        return;
+      }
       this.navMeshConfig.cs = sharedData.cellSize;
       this.cellDepth = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;

@@ -24,8 +24,7 @@ namespace gdjs {
    * having a pathfinding behavior: In particular, the obstacles behaviors are
    * required to declare themselves (see
    * `NavMeshObstaclesManager.addObstacle`) to the manager of their
-   * associated container (see
-   * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
+   * associated container (see `NavMeshObstaclesManager.getManager`).
    * @category Behaviors > NavMesh pathfinding
    */
   export class NavMeshObstaclesManager {
@@ -69,8 +68,9 @@ namespace gdjs {
       this.stairHeightMax = sharedData.stairHeightMax;
       this.walkableDepth = sharedData.walkableDepth;
       this.walkableRadius = sharedData.walkableRadius;
-      this.speedScaleY = sharedData.speedScaleY;
-      this.inverseSpeedScaleY = 1 / sharedData.speedScaleY;
+      this.speedScaleY =
+        sharedData.speedScaleY > 0 ? sharedData.speedScaleY : 1;
+      this.inverseSpeedScaleY = 1 / this.speedScaleY;
     }
 
     /**
@@ -171,9 +171,15 @@ namespace gdjs {
         this.navMeshConfig
       );
       if (result.success) {
+        if (this.navMesh) {
+          this.navMesh.destroy();
+        }
+        if (this.crowd) {
+          this.crowd.destroy();
+        }
         this.navMesh = result.navMesh;
         this.crowd = new RecastNav.Crowd(this.navMesh, {
-          maxAgents: 100,
+          maxAgents: this.characters.size + 100,
           maxAgentRadius: characterRadiusMax,
         });
         for (const character of this.characters) {
@@ -189,7 +195,6 @@ namespace gdjs {
     setDebugDrawEnabled(enableDebugDraw: boolean): void {
       if (!this.debuggerRenderer) {
         this.debuggerRenderer = new gdjs.NavMeshDebuggerRenderer(this);
-        this.debuggerRenderer.registerFor2D();
       }
       this.debuggerRenderer.setEnabled(enableDebugDraw);
     }
@@ -467,16 +472,18 @@ namespace gdjs {
       }
       const owner = character.owner;
       const navMeshQuery = new RecastNav.NavMeshQuery(this.navMesh);
-      const { success: hasFindOrigin, point: origin } =
+      const { success: hasFoundOrigin, point: origin } =
         navMeshQuery.findClosestPoint(
           {
             x: owner.getX(),
             y: gdjs.Base3DHandler.is3D(owner) ? owner.getZ() : 0,
-            z: owner.getY(),
+            z: this.is3D
+              ? owner.getY()
+              : owner.getY() * this.inverseSpeedScaleY,
           },
           { halfExtents: { x: 100, y: 100, z: 100 } }
         );
-      if (!hasFindOrigin) {
+      if (!hasFoundOrigin) {
         return;
       }
 
@@ -536,6 +543,10 @@ namespace gdjs {
      */
     removeCharacter(character: NavMeshCharacterRuntimeBehavior): void {
       this.characters.delete(character);
+      if (this.crowd && character._agent) {
+        this.crowd.removeAgent(character._agent);
+        character._agent = null;
+      }
     }
   }
 
@@ -551,6 +562,9 @@ namespace gdjs {
       enableDebugDraw: boolean
     ): void {
       if (enableDebugDraw) {
+        // Make sure the debug layer will be displayed.
+        // We never set it back to false because users might have enabled hit-box
+        // debug draw with the other action.
         instanceContainer._debugDrawEnabled = true;
       }
       const manager =
@@ -607,7 +621,7 @@ namespace gdjs {
     }
 
     override onDestroy() {
-      if (this._manager && this._registeredInManager) {
+      if (this._registeredInManager) {
         this._manager.removeObstacle(this);
       }
     }

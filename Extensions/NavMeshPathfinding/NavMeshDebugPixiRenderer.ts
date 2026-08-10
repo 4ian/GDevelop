@@ -10,6 +10,7 @@ namespace gdjs {
     enabled = false;
     meshes: Array<THREE.Mesh> = [];
     material: THREE.MeshStandardMaterial | null = null;
+    isRegisteredFor2D = false;
 
     constructor(obstaclesManager: NavMeshObstaclesManager) {
       this.obstaclesManager = obstaclesManager;
@@ -19,15 +20,19 @@ namespace gdjs {
       this.enabled = enabled;
       if (enabled) {
         this.renderFor3D();
+        if (!this.isRegisteredFor2D) {
+          this.registerFor2D();
+        }
       } else {
         this.removeFor3D();
       }
     }
 
-    registerFor2D() {
+    private registerFor2D() {
       const firstObstacle: NavMeshObstacleRuntimeBehavior =
         this.obstaclesManager.obstacles.values().next().value;
       if (firstObstacle) {
+        this.isRegisteredFor2D = true;
         firstObstacle.owner
           .getRuntimeScene()
           .registerDebugDrawHook((rendererObject: PIXI.Graphics) => {

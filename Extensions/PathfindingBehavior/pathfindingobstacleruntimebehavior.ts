@@ -14,8 +14,7 @@ namespace gdjs {
    * having a pathfinding behavior: In particular, the obstacles behaviors are
    * required to declare themselves (see
    * `PathfindingObstaclesManager.addObstacle`) to the manager of their
-   * associated container (see
-   * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
+   * associated container (see `PathfindingObstaclesManager.getManager`).
    * @category Behaviors > 2D Pathfinding
    */
   export class PathfindingObstaclesManager {

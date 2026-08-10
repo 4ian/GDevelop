@@ -353,7 +353,6 @@ module.exports = {
           )
           .setGroup(_('2D only'))
           .setType('Number')
-          .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setValue(
             sharedContent.getChild('speedScaleY').getDoubleValue().toString(10)
           )
@@ -382,7 +381,7 @@ module.exports = {
           ),
           '',
           'JsPlatform/Extensions/nav-mesh-character.svg',
-          'PathfindingBehavior',
+          'NavMeshCharacterBehavior',
           //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
           behavior,
           sharedData
@@ -597,7 +596,7 @@ module.exports = {
         .addExpression(
           'GetNodeX',
           _('Get a waypoint X position'),
-          _('Get next waypoint X position'),
+          _('Get a waypoint X position'),
           _('Movement on the path'),
           'JsPlatform/Extensions/nav-mesh-character.svg'
         )
@@ -610,7 +609,7 @@ module.exports = {
         .addExpression(
           'GetNodeY',
           _('Get a waypoint Y position'),
-          _('Get next waypoint Y position'),
+          _('Get a waypoint Y position'),
           _('Movement on the path'),
           'JsPlatform/Extensions/nav-mesh-character.svg'
         )
@@ -623,7 +622,7 @@ module.exports = {
         .addExpression(
           'GetNodeZ',
           _('Get a waypoint Z position'),
-          _('Get next waypoint Z position'),
+          _('Get a waypoint Z position'),
           _('Movement on the path'),
           'JsPlatform/Extensions/nav-mesh-character.svg'
         )
@@ -787,18 +786,10 @@ module.exports = {
           const normalizedValue = newValue.toLowerCase();
           let shapeValue = '';
           if (normalizedValue === 'box') shapeValue = 'Box';
-          else if (normalizedValue === 'capsule') shapeValue = 'Capsule';
-          else if (normalizedValue === 'sphere') shapeValue = 'Sphere';
-          else if (normalizedValue === 'cylinder') shapeValue = 'Cylinder';
           else if (normalizedValue === 'mesh') shapeValue = 'Mesh';
           else return false;
 
           behaviorContent.getOrCreateChild('shape').setStringValue(shapeValue);
-          if (shapeValue === 'Mesh') {
-            behaviorContent
-              .getOrCreateChild('bodyType')
-              .setStringValue('Static');
-          }
           return true;
         }
 

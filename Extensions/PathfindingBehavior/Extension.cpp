@@ -404,7 +404,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("GetNodeX",
                       _("Get a waypoint X position"),
-                      _("Get next waypoint X position"),
+                      _("Get a waypoint X position"),
                       _("Movement on the path"),
                       "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
@@ -414,7 +414,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("GetNodeY",
                       _("Get a waypoint Y position"),
-                      _("Get next waypoint Y position"),
+                      _("Get a waypoint Y position"),
                       _("Movement on the path"),
                       "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))

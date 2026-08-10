@@ -101,8 +101,8 @@ namespace gdjs {
       if (behaviorData.angleOffset !== undefined) {
         this.setAngleOffset(behaviorData.angleOffset);
       }
-      if (behaviorData.angleOffset !== undefined) {
-        this._radius = behaviorData.angleOffset;
+      if (behaviorData.radius !== undefined) {
+        this._radius = behaviorData.radius;
         this._manager.invalidateNavMesh();
       }
       if (behaviorData.avoidanceSightRange !== undefined) {
@@ -137,8 +137,7 @@ namespace gdjs {
         // TODO Try a more reliable synchronization by overriding the path using the low level API.
         const destination = this._path[this._path.length - 1];
         if (
-          behaviorSpecificProps.d == null ||
-          !destination ||
+          (behaviorSpecificProps.d !== null && !destination) ||
           destination.x !== behaviorSpecificProps.d.x ||
           destination.y !== behaviorSpecificProps.d.y ||
           destination.z !== behaviorSpecificProps.d.z
@@ -172,6 +171,10 @@ namespace gdjs {
       this._manager.removeCharacter(this);
     }
 
+    override onDestroy() {
+      this._manager.removeCharacter(this);
+    }
+
     /**
      * Compute and move on the path to the specified destination.
      */
@@ -184,7 +187,7 @@ namespace gdjs {
       }
 
       const navMeshQuery = new RecastNav.NavMeshQuery(this._manager.navMesh);
-      const { success: hasFindOrigin, point: origin } =
+      const { success: hasFoundOrigin, point: origin } =
         navMeshQuery.findClosestPoint(
           {
             x: this.owner.getX(),
@@ -203,7 +206,7 @@ namespace gdjs {
             },
           }
         );
-      if (!hasFindOrigin) {
+      if (!hasFoundOrigin) {
         this._pathFound = false;
         return;
       }
@@ -216,7 +219,7 @@ namespace gdjs {
         this.owner.setZ(origin.y);
       }
 
-      const { success: hasFindDestination, point: destination } =
+      const { success: hasFoundDestination, point: destination } =
         navMeshQuery.findClosestPoint(
           {
             x,
@@ -233,7 +236,7 @@ namespace gdjs {
             },
           }
         );
-      if (!hasFindDestination) {
+      if (!hasFoundDestination) {
         this._pathFound = false;
         return;
       }

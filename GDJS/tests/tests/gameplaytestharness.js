@@ -846,11 +846,16 @@ describe('gdjs.gameplayTests', () => {
     );
 
     expect(result.status).to.be('passed');
-    // Each probe (baseline + 2 keys + final cleanup) restarts the scene.
+    // Each probe (baseline + 2 keys + final cleanup) restarts the scene,
+    // and each restart is labelled as caused by the probe itself (not a
+    // plain 'harness' goToScene) so it's clearly expected in the event log.
     const resets = result.eventLog.filter(
       (event) => event.event === 'sceneReset'
     );
     expect(resets.length >= 3).to.be(true);
+    expect(resets.every((event) => event.cause === 'controlsProbe')).to.be(
+      true
+    );
   }).timeout(10000);
 
   it('tracks progress toward a target and detects stalls', async () => {

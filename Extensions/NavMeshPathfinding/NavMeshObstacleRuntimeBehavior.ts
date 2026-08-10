@@ -469,7 +469,7 @@ namespace gdjs {
       });
     }
 
-    private buildCharacterAgent(
+    buildCharacterAgent(
       character: NavMeshCharacterRuntimeBehavior
     ): void {
       if (!this.navMesh || !this.crowd) {
@@ -496,6 +496,7 @@ namespace gdjs {
         );
       navMeshQuery.destroy();
       if (!hasFoundOrigin) {
+        character._agent = null;
         return;
       }
 
@@ -555,10 +556,6 @@ namespace gdjs {
       this.characters.add(character);
       if (gdjs.Base3DHandler.is3D(character.owner)) {
         this.is3D = true;
-      }
-      if (this.crowd && character._agent) {
-        this.crowd.removeAgent(character._agent);
-        character._agent = null;
       }
       this.buildCharacterAgent(character);
     }

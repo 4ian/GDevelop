@@ -29,7 +29,8 @@ namespace gdjs {
   }
 
   /** @category Behaviors > NavMesh pathfinding */
-  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData
+    extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -55,6 +56,10 @@ namespace gdjs {
       collisionQueryRange: 120,
       separationWeight: 1.0,
     };
+
+    _oldX: float = 0;
+    _oldY: float = 0;
+    _oldZ: float = 0;
 
     // Attributes used for traveling on the path:
     _pathFound: boolean = false;
@@ -258,19 +263,38 @@ namespace gdjs {
       this._pathFound = this._agent.requestMoveTarget(destination);
       if (this._pathFound) {
         this._reachedEnd = false;
-        this.owner.setX(origin.x);
-        this.owner.setY(
-          this._manager.is3D ? origin.z : origin.z * this._manager.speedScaleY
-        );
+        const newX = origin.x;
+        const newY = this._manager.is3D
+          ? origin.z
+          : origin.z * this._manager.speedScaleY;
+        const newZ = origin.y;
+        this.owner.setX(newX);
+        this.owner.setY(newY);
         if (gdjs.Base3DHandler.is3D(this.owner)) {
-          this.owner.setZ(origin.y);
+          this.owner.setZ(newZ);
         }
+        this._oldX = newX;
+        this._oldY = newY;
+        this._oldZ = newZ;
       } else {
         this._agent.teleport(agentInitialPosition);
       }
     }
 
     teleportAgentToObjectIfNeeded(): void {
+      if (
+        this._oldX === this.owner.getX() &&
+        this._oldY === this.owner.getY() &&
+        (!gdjs.Base3DHandler.is3D(this.owner) ||
+          this._oldZ === this.owner.getZ())
+      ) {
+        return;
+      }
+      if (!this._agent) {
+        // Try to create the agent at the new object position.
+        this._manager.buildCharacterAgent(this);
+        return;
+      }
       const agent = this._agent;
       if (!agent) {
         return;
@@ -283,23 +307,13 @@ namespace gdjs {
         ? this.owner.getZ()
         : agent.raw.get_npos(1);
 
-      let expectedX = agent.raw.get_npos(0);
-      let expectedY = this._manager.is3D
-        ? agent.raw.get_npos(2)
-        : agent.raw.get_npos(2) * this._manager.speedScaleY;
-      let expectedZ = agent.raw.get_npos(1);
-
-      if (oldX !== expectedX || oldY !== expectedY || oldZ !== expectedZ) {
-        agent.teleport({
-          x: oldX,
-          y: oldZ,
-          z: this._manager.is3D
-            ? oldY
-            : oldY * this._manager.inverseSpeedScaleY,
-        });
-        this._path = [];
-        this._pathFound = false;
-      }
+      agent.teleport({
+        x: oldX,
+        y: oldZ,
+        z: this._manager.is3D ? oldY : oldY * this._manager.inverseSpeedScaleY,
+      });
+      this._path = [];
+      this._pathFound = false;
     }
 
     override doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
@@ -374,6 +388,9 @@ namespace gdjs {
       if (gdjs.Base3DHandler.is3D(this.owner)) {
         this.owner.setZ(newZ);
       }
+      this._oldX = newX;
+      this._oldY = newY;
+      this._oldZ = newZ;
     }
 
     override doStepPostEvents(

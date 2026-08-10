@@ -469,9 +469,7 @@ namespace gdjs {
       });
     }
 
-    buildCharacterAgent(
-      character: NavMeshCharacterRuntimeBehavior
-    ): void {
+    buildCharacterAgent(character: NavMeshCharacterRuntimeBehavior): void {
       if (!this.navMesh || !this.crowd) {
         return;
       }

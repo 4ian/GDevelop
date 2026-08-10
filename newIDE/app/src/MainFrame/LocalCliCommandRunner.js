@@ -239,9 +239,16 @@ const runners: { [commandName: string]: CliCommandRunner } = {
     for (const result of results) {
       const passed = result.status === 'passed';
       if (!passed) failedCount++;
+      // Loading (game boot, scene assets) is excluded from the timeout
+      // budget: only the running time counts against it.
+      const loadingMs = result.loadingMs || 0;
+      const runningMs = Math.max(0, result.durationMs - loadingMs);
+      const loadingText = loadingMs
+        ? ` + ${(loadingMs / 1000).toFixed(1)}s loading`
+        : '';
       const budgetText = result.timeoutMs
-        ? `, ${(result.durationMs / 1000).toFixed(1)}s / ${result.timeoutMs /
-            1000}s budget`
+        ? `, ${(runningMs / 1000).toFixed(1)}s / ${result.timeoutMs /
+            1000}s budget${loadingText}`
         : '';
       console.info(
         `[CLI] ${passed ? 'PASSED' : 'FAILED'} (${result.status}): ${
@@ -250,14 +257,10 @@ const runners: { [commandName: string]: CliCommandRunner } = {
           result.errors.length ? ' - ' + result.errors.join(' | ') : ''
         }`
       );
-      if (
-        passed &&
-        result.timeoutMs &&
-        result.durationMs >= 0.8 * result.timeoutMs
-      ) {
+      if (passed && result.timeoutMs && runningMs >= 0.8 * result.timeoutMs) {
         console.warn(
           `[CLI] WARNING: "${result.testName}" used ${Math.round(
-            (100 * result.durationMs) / result.timeoutMs
+            (100 * runningMs) / result.timeoutMs
           )}% of its wall-clock budget - it is at risk of timing out on a slower machine. Shorten it or raise its timeout.`
         );
       }

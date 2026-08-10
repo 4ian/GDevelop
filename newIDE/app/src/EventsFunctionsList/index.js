@@ -6,10 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import {
-  type TreeViewInterface,
-  type MenuButton,
-} from '../UI/TreeView';
+import { type TreeViewInterface, type MenuButton } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import PreferencesContext, {
@@ -57,7 +54,6 @@ import {
   type GameplayTestCallbacks,
 } from './GameplayTestTreeViewItemContent';
 import { DEFAULT_GAMEPLAY_TEST_SOURCE } from '../GameplayTests/DefaultGameplayTestSource';
-import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { type HTMLDataset } from '../Utils/HTMLDataset';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -1631,33 +1627,29 @@ const EventsFunctionsList = React.forwardRef<
                   behaviorTreeViewItems;
             },
           },
-          ...(areGameplayTestsEnabled()
-            ? [
-                {
-                  isRoot: true,
-                  content: new LabelTreeViewItemContent(
-                    extensionTestsRootFolderId,
-                    i18n._(t`Gameplay tests`),
-                    {
-                      icon: <Add />,
-                      label: i18n._(t`Add a gameplay test`),
-                      click: addNewGameplayTest,
-                    }
-                  ),
-                  getChildren(i18n: I18nType): ?Array<TreeViewItem> {
-                    return gameplayTestTreeViewItems.length === 0
-                      ? [
-                          new PlaceHolderTreeViewItem(
-                            extensionTestsEmptyPlaceholderId,
-                            i18n._(t`Start by adding a new gameplay test.`)
-                          ),
-                        ]
-                      : // $FlowFixMe[incompatible-type]
-                        gameplayTestTreeViewItems;
-                  },
-                },
-              ]
-            : []),
+          {
+            isRoot: true,
+            content: new LabelTreeViewItemContent(
+              extensionTestsRootFolderId,
+              i18n._(t`Gameplay tests`),
+              {
+                icon: <Add />,
+                label: i18n._(t`Add a gameplay test`),
+                click: addNewGameplayTest,
+              }
+            ),
+            getChildren(i18n: I18nType): ?Array<TreeViewItem> {
+              return gameplayTestTreeViewItems.length === 0
+                ? [
+                    new PlaceHolderTreeViewItem(
+                      extensionTestsEmptyPlaceholderId,
+                      i18n._(t`Start by adding a new gameplay test.`)
+                    ),
+                  ]
+                : // $FlowFixMe[incompatible-type]
+                  gameplayTestTreeViewItems;
+            },
+          },
           {
             isRoot: true,
             content: new LabelTreeViewItemContent(
@@ -1864,7 +1856,7 @@ const EventsFunctionsList = React.forwardRef<
       extensionBehaviorsRootFolderId,
       extensionFunctionsRootFolderId,
       extensionConfigurationRootFolderId,
-      ...(areGameplayTestsEnabled() ? [extensionTestsRootFolderId] : []),
+      extensionTestsRootFolderId,
       ...objectTreeViewItems.map(item => item.content.getId()),
       ...behaviorTreeViewItems.map(item => item.content.getId()),
       ...objectTreeViewItems

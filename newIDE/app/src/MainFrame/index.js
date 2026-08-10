@@ -122,7 +122,6 @@ import { renderCustomObjectEditorContainer } from './EditorContainers/CustomObje
 import { renderGameplayTestEditorContainer } from './EditorContainers/GameplayTestEditorContainer';
 
 import { GameplayTestFrame } from '../GameplayTests/GameplayTestFrame';
-import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import {
   getGameplayTestProjectItemName,
   getIsGameplayTestRunInProgress,
@@ -7652,18 +7651,16 @@ const MainFrame = (props: Props): React.MixedElement => {
       <SettingsIcon />,
       () => activateProjectManagerItemFromSwitcher(gamePropertiesItemId)
     );
-    if (areGameplayTestsEnabled()) {
-      for (const { id, testName } of getProjectGameplayTestRecentEditorItems(
-        currentProject
-      )) {
-        addRecentEditorSwitcherSideMenuItem(
-          id,
-          testName,
-          i18n._(t`Test script`),
-          <PreviewIcon />,
-          () => openGameplayTest({ type: 'project' }, testName)
-        );
-      }
+    for (const { id, testName } of getProjectGameplayTestRecentEditorItems(
+      currentProject
+    )) {
+      addRecentEditorSwitcherSideMenuItem(
+        id,
+        testName,
+        i18n._(t`Test script`),
+        <PreviewIcon />,
+        () => openGameplayTest({ type: 'project' }, testName)
+      );
     }
     addRecentEditorSwitcherSideMenuItem(
       'resources',

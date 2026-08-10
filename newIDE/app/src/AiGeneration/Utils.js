@@ -20,7 +20,6 @@ import {
   updateAiRequestMessage,
 } from '../Utils/GDevelopServices/Generation';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { processEditorFunctionCalls } from '../EditorFunctions/EditorFunctionCallRunner';
 import {
   type EditorCallbacks,
@@ -103,9 +102,7 @@ export const AI_CHAT_TOOLS_VERSION = 'v8';
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
 // v14 adds gameplay tests (`run_tests` + the tester sub-agent).
-export const AI_ORCHESTRATOR_TOOLS_VERSION: string = areGameplayTestsEnabled()
-  ? 'v14'
-  : 'v13';
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v14';
 export const AI_AGENT_EXPLORER_TOOLS_VERSION = 'v3'; // TODO: useless?
 export const AI_AGENT_EDIT_TOOLS_VERSION = 'v3';
 

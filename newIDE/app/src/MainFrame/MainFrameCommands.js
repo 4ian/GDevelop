@@ -12,7 +12,6 @@ import {
   enumerateEventsFunctionsExtensions,
   enumerateGameplayTests,
 } from '../ProjectManager/EnumerateProjectItems';
-import { areGameplayTestsEnabled } from '../GameplayTests/AreGameplayTestsEnabled';
 import { type FileMetadata } from '../ProjectsStorage';
 
 type Item =
@@ -234,8 +233,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
     ),
   });
 
-  const gameplayTestCommandsEnabled =
-    !!handlers.project && areGameplayTestsEnabled();
+  const gameplayTestCommandsEnabled = !!handlers.project;
   useCommandWithOptions('OPEN_GAMEPLAY_TEST', gameplayTestCommandsEnabled, {
     generateOptions: React.useCallback(
       () =>

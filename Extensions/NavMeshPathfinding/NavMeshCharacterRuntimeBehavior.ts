@@ -117,7 +117,7 @@ namespace gdjs {
       return {
         ...super.getNetworkSyncData(options),
         props: {
-          d: this._path[this._path.length - 1],
+          d: this._path[this._path.length - 1] || null,
           pf: this._pathFound,
           as: this._angularMaxSpeed,
           re: this._reachedEnd,
@@ -146,6 +146,8 @@ namespace gdjs {
             behaviorSpecificProps.d.y,
             behaviorSpecificProps.d.z
           );
+        } else if (behaviorSpecificProps.d === null && destination) {
+          this.stop();
         }
       }
       if (behaviorSpecificProps.pf !== undefined) {
@@ -172,6 +174,16 @@ namespace gdjs {
 
     override onDestroy() {
       this._manager.removeCharacter(this);
+    }
+
+    stop(): void {
+      if (!this._agent) {
+        return;
+      }
+      this._path = [];
+      this._pathFound = false;
+      this._reachedEnd = false;
+      this._agent.resetMoveTarget();
     }
 
     /**

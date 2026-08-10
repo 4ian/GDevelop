@@ -143,6 +143,25 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/PathTools.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/recast-navigation-generators.js',
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/recast-navigation.wasm.js',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern:
+          './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/recast-navigation.wasm.wasm',
+        watched: true,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/NavMeshPathfinding/NavMeshCharacterRuntimeBehavior.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject.js',

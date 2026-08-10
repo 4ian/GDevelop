@@ -486,6 +486,7 @@ namespace gdjs {
           },
           { halfExtents: { x: 100, y: 100, z: 100 } }
         );
+      navMeshQuery.destroy();
       if (!hasFoundOrigin) {
         return;
       }

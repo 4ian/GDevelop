@@ -207,6 +207,7 @@ namespace gdjs {
           }
         );
       if (!hasFoundOrigin) {
+        navMeshQuery.destroy();
         this._pathFound = false;
         return;
       }
@@ -236,6 +237,7 @@ namespace gdjs {
             },
           }
         );
+      navMeshQuery.destroy();
       if (!hasFoundDestination) {
         this._pathFound = false;
         return;

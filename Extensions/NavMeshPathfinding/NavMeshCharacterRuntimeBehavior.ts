@@ -140,8 +140,10 @@ namespace gdjs {
       if (behaviorSpecificProps.d !== undefined) {
         // TODO Try a more reliable synchronization by overriding the path using the low level API.
         const destination = this._path[this._path.length - 1];
-        if (behaviorSpecificProps.d === null && destination) {
-          this.stop();
+        if (behaviorSpecificProps.d === null) {
+          if (destination) {
+            this.stop();
+          }
         } else if (
           !destination ||
           destination.x !== behaviorSpecificProps.d.x ||

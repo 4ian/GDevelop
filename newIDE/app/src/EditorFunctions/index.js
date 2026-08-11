@@ -5280,27 +5280,72 @@ const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const eventIds = SafeExtractor.extractStringArrayProperty(
+      args,
+      'event_ids'
+    );
+    const searchText = SafeExtractor.extractStringProperty(args, 'search');
+    const objectNames = SafeExtractor.extractStringArrayProperty(
+      args,
+      'object_names'
+    );
 
-    return {
-      text: (
+    const sceneLink = (
+      <Link
+        href="#"
+        onClick={() =>
+          editorCallbacks.onOpenLayout(scene_name, {
+            openEventsEditor: true,
+            openSceneEditor: true,
+            focusWhenOpened: 'events',
+          })
+        }
+      >
+        {scene_name}
+      </Link>
+    );
+
+    // Describe what is being read (search text, objects or specific events)
+    // so it's clear which part of the events source is being inspected,
+    // rather than only showing the scene name.
+    const objectsText = objectNames ? objectNames.join(', ') : '';
+    const eventIdsCount = eventIds ? eventIds.length : 0;
+
+    let text;
+    if (searchText && objectsText) {
+      text = (
         <Trans>
-          Read events source in scene{' '}
-          <Link
-            href="#"
-            onClick={() =>
-              editorCallbacks.onOpenLayout(scene_name, {
-                openEventsEditor: true,
-                openSceneEditor: true,
-                focusWhenOpened: 'events',
-              })
-            }
-          >
-            {scene_name}
-          </Link>
-          .
+          Read events source matching "{searchText}" and involving {objectsText}{' '}
+          in scene {sceneLink}.
         </Trans>
-      ),
-    };
+      );
+    } else if (searchText) {
+      text = (
+        <Trans>
+          Read events source matching "{searchText}" in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (objectsText) {
+      text = (
+        <Trans>
+          Read events source involving {objectsText} in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (eventIdsCount === 1) {
+      text = (
+        <Trans>Read source of 1 specific event in scene {sceneLink}.</Trans>
+      );
+    } else if (eventIdsCount > 1) {
+      text = (
+        <Trans>
+          Read source of {eventIdsCount} specific events in scene {sceneLink}.
+        </Trans>
+      );
+    } else {
+      text = <Trans>Read all events source in scene {sceneLink}.</Trans>;
+    }
+
+    return { text };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');

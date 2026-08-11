@@ -316,6 +316,20 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
+   * \brief Whether breakpoint instrumentation should be generated.
+   * Independent from `GenerateCodeForRuntime()`: a preview can target the
+   * IDE (`false`) with no CDP debugger attached (e.g. web preview).
+   */
+  bool ShouldGenerateBreakpointInstrumentation() {
+    return generateBreakpointInstrumentation;
+  }
+
+  void SetGenerateBreakpointInstrumentation(
+      bool generateBreakpointInstrumentation_) {
+    generateBreakpointInstrumentation = generateBreakpointInstrumentation_;
+  }
+
+  /**
    * \brief Report that an error occurred during code generation ( Event code
    * won't be generated )
    */
@@ -448,6 +462,14 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) {
     return "";
   };
+
+  /**
+   * \brief Generate breakpoint check code for the given event (keyed by its
+   * persistent UUID). Only emitted in preview mode; default returns "".
+   */
+  virtual gd::String GenerateBreakpointCode(gd::BaseEvent& event) {
+    return "";
+  }
 
   /**
    * \brief Get the namespace to be used to store code generated
@@ -859,6 +881,9 @@ class GD_CORE_API EventsCodeGenerator {
   bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
+  bool generateBreakpointInstrumentation =
+      false;  ///< Is set to true if a CDP debugger will be attached to the
+              ///< generated code (local Electron preview only).
 
   std::set<gd::String>
       includeFiles;  ///< List of headers files used by instructions. A (shared)

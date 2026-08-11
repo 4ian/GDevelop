@@ -34,6 +34,7 @@
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
 #include <GDCore/IDE/Events/EventsParametersLister.h>
+#include <GDCore/IDE/Events/EventsPersistentUuidHelper.h>
 #include <GDCore/IDE/Events/EventsPositionFinder.h>
 #include <GDCore/IDE/Events/EventsRefactorer.h>
 #include <GDCore/IDE/Events/EventsRemover.h>
@@ -686,6 +687,10 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
 #define STATIC_ExposeProjectEventsWithoutExtensions ExposeProjectEventsWithoutExtensions
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_EnsureProjectEventsPersistentUuids \
+  EnsureProjectEventsPersistentUuids
+#define STATIC_EnsurePersistentUuids EnsurePersistentUuids
+#define STATIC_ResetPersistentUuids ResetPersistentUuids
 #define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes
@@ -885,11 +890,14 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_DeclareExtension DeclareExtension
 #define STATIC_GenerateBehaviorMetadata GenerateBehaviorMetadata
 #define STATIC_GenerateObjectMetadata GenerateObjectMetadata
+#define STATIC_GetSceneCodeNamespace GetSceneCodeNamespace
 #define STATIC_GetExtensionCodeNamespacePrefix GetExtensionCodeNamespacePrefix
 #define STATIC_GetFreeFunctionCodeName GetFreeFunctionCodeName
 #define STATIC_GetFreeFunctionCodeNamespace GetFreeFunctionCodeNamespace
 #define STATIC_GetBehaviorFunctionCodeNamespace GetBehaviorFunctionCodeNamespace
 #define STATIC_GetObjectFunctionCodeNamespace GetObjectFunctionCodeNamespace
+#define STATIC_GetObjectEventsFunctionFullyQualifiedContextName \
+  GetObjectEventsFunctionFullyQualifiedContextName
 #define STATIC_IsBehaviorLifecycleEventsFunction \
   IsBehaviorLifecycleEventsFunction
 #define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction

@@ -13,6 +13,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/EventsPersistentUuidHelper.h"
+#include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {
 
@@ -53,6 +55,21 @@ BaseEvent& BaseEvent::operator=(const BaseEvent& other) {
 }
 
 bool BaseEvent::HasSubEvents() const { return !GetSubEvents().IsEmpty(); }
+
+const gd::String& BaseEvent::GetOrCreatePersistentUuid() {
+  if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
+  return persistentUuid;
+}
+
+BaseEvent& BaseEvent::ResetPersistentUuid() {
+  persistentUuid = UUID::MakeUuid4();
+  return *this;
+}
+
+BaseEvent& BaseEvent::ClearPersistentUuid() {
+  persistentUuid = "";
+  return *this;
+}
 
 bool BaseEvent::HasVariables() const { return GetVariables().Count() > 0; }
 
@@ -110,13 +127,18 @@ void BaseEvent::PreprocessAsyncActions(const gd::Platform& platform) {
         remainingActions.InsertInstructions(
             *actionsList, aId + 1, actionsList->size() - 1);
         gd::AsyncEvent asyncEvent(action, remainingActions, GetSubEvents());
+        gd::EventsPersistentUuidHelper::CopyPersistentUuids(
+            GetSubEvents(), asyncEvent.GetSubEvents());
 
         // Ensure that the local event no longer has any of the actions/subevent
         // after the async function
         actionsList->RemoveAfter(aId);
         GetSubEvents().Clear();
 
-        GetSubEvents().InsertEvent(asyncEvent);
+        gd::BaseEvent& insertedAsyncEvent =
+            GetSubEvents().InsertEvent(asyncEvent);
+        gd::EventsPersistentUuidHelper::CopyPersistentUuids(
+            asyncEvent.GetSubEvents(), insertedAsyncEvent.GetSubEvents());
 
         // We just moved all the rest, there's nothing left to do in this event.
         return;

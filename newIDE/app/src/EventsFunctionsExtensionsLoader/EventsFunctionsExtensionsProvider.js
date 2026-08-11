@@ -49,6 +49,9 @@ export const EventsFunctionsExtensionsProvider = ({
   ] = React.useState<Error | null>(null);
   const includeFileHashs = React.useRef<{ [string]: number }>({});
   const lastLoadPromise = React.useRef<?Promise<void>>(null);
+  // Flavor (preview vs runtime instrumentation) the last load/reload used, so
+  // a flavor-sensitive caller can skip reloading when it already matches.
+  const lastGeneratedForPreview = React.useRef<?boolean>(null);
 
   const onWriteFile = React.useCallback(
     ({ includeFile, content }: IncludeFileContent) => {
@@ -81,7 +84,10 @@ export const EventsFunctionsExtensionsProvider = ({
   }, []);
 
   const _loadProjectEventsFunctionsExtensions = React.useCallback(
-    (project: ?gdProject): Promise<void> => {
+    (
+      project: ?gdProject,
+      generateForPreview: boolean = true
+    ): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
       const previousLastLoadPromise =
@@ -96,10 +102,16 @@ export const EventsFunctionsExtensionsProvider = ({
           return loadProjectEventsFunctionsExtensions(
             project,
             eventsFunctionCodeWriter,
-            i18n
+            i18n,
+            generateForPreview
           );
         })
-        .then(() => setEventsFunctionsExtensionsError(null))
+        .then(() => {
+          // Only recorded on success: a failed load must not make a later
+          // flavor check believe this flavor is already up to date.
+          lastGeneratedForPreview.current = generateForPreview;
+          setEventsFunctionsExtensionsError(null);
+        })
         .catch((eventsFunctionsExtensionsError: Error) => {
           setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
           showErrorBox({
@@ -169,16 +181,39 @@ export const EventsFunctionsExtensionsProvider = ({
   );
 
   const _reloadProjectEventsFunctionsExtensions = React.useCallback(
-    (project: ?gdProject): Promise<void> => {
+    (
+      project: ?gdProject,
+      generateForPreview: boolean = true
+    ): Promise<void> => {
       if (project) {
         _unloadProjectEventsFunctionsExtensions(project);
       }
-      return _loadProjectEventsFunctionsExtensions(project);
+      return _loadProjectEventsFunctionsExtensions(project, generateForPreview);
     },
     [
       _loadProjectEventsFunctionsExtensions,
       _unloadProjectEventsFunctionsExtensions,
     ]
+  );
+
+  const _ensureProjectEventsFunctionsExtensionsForFlavor = React.useCallback(
+    (
+      project: ?gdProject,
+      generateForPreview: boolean,
+      forceRegeneration: boolean = false
+    ): Promise<void> => {
+      if (
+        !forceRegeneration &&
+        lastGeneratedForPreview.current === generateForPreview
+      ) {
+        return ensureLoadFinished();
+      }
+      return _reloadProjectEventsFunctionsExtensions(
+        project,
+        generateForPreview
+      );
+    },
+    [ensureLoadFinished, _reloadProjectEventsFunctionsExtensions]
   );
 
   const state = React.useMemo<EventsFunctionsExtensionsState>(
@@ -190,12 +225,14 @@ export const EventsFunctionsExtensionsProvider = ({
       reloadProjectEventsFunctionsExtensions: _reloadProjectEventsFunctionsExtensions,
       reloadProjectEventsFunctionsExtensionMetadata: _reloadProjectEventsFunctionsExtensionMetadata,
       ensureLoadFinished,
+      ensureProjectEventsFunctionsExtensionsForFlavor: _ensureProjectEventsFunctionsExtensionsForFlavor,
       getEventsFunctionsExtensionWriter: () => eventsFunctionsExtensionWriter,
       getEventsFunctionsExtensionOpener: () => eventsFunctionsExtensionOpener,
       getIncludeFileHashs: () => includeFileHashs.current,
     }),
     [
       ensureLoadFinished,
+      _ensureProjectEventsFunctionsExtensionsForFlavor,
       _loadProjectEventsFunctionsExtensions,
       _reloadProjectEventsFunctionsExtensionMetadata,
       _reloadProjectEventsFunctionsExtensions,

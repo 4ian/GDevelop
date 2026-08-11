@@ -2585,6 +2585,9 @@ interface BaseEvent {
 
     [Const, Ref] DOMString GetAiGeneratedEventId();
     void SetAiGeneratedEventId([Const] DOMString aiGeneratedEventId);
+
+    [Const, Ref] DOMString GetOrCreatePersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface StandardEvent {
@@ -2778,6 +2781,12 @@ interface ProjectBrowserHelper {
     void STATIC_ExposeProjectEventsWithoutExtensions([Ref] Project project, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
     void STATIC_ExposeProjectObjects([Ref] Project project, [Ref] ArbitraryObjectsWorker worker);
     void STATIC_ExposeEventsFunctionsExtensionEvents([Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Ref] ReadOnlyArbitraryEventsWorkerWithContext worker);
+};
+
+interface EventsPersistentUuidHelper {
+    boolean STATIC_EnsureProjectEventsPersistentUuids([Ref] Project project);
+    boolean STATIC_EnsurePersistentUuids([Ref] EventsList events);
+    void STATIC_ResetPersistentUuids([Ref] EventsList events);
 };
 
 interface ResourceExposer {
@@ -4377,7 +4386,8 @@ interface LayoutCodeGenerator {
         [Const, Ref] Layout layout,
         [Ref] SetString includes,
         [Ref] DiagnosticReport diagnosticReport,
-        boolean compilationForRuntime);
+        boolean compilationForRuntime,
+        boolean generateBreakpointInstrumentation);
 };
 
 [Prefix="gdjs::"]
@@ -4407,7 +4417,8 @@ interface ObjectCodeGenerator {
         [Const] DOMString codeNamespace,
         [Const, Ref] MapStringString objectMethodMangledNames,
         [Ref] SetString includes,
-        boolean compilationForRuntime);
+        boolean compilationForRuntime,
+        boolean generateBreakpointInstrumentation);
     [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -4416,7 +4427,7 @@ interface ObjectCodeGenerator {
 [Prefix="gdjs::"]
 interface EventsFunctionsExtensionCodeGenerator {
     void EventsFunctionsExtensionCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateFreeEventsFunctionCompleteCode([Const, Ref] EventsFunctionsExtension extension, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespac, [Ref] SetString includes, boolean compilationForRuntime, boolean generateBreakpointInstrumentation);
 };
 
 [Prefix="gdjs::"]
@@ -4441,7 +4452,9 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);
+    [Ref] PreviewExportOptions SetCdpDebuggerEnabled(boolean enable);
     [Ref] PreviewExportOptions SetInGameEditorSettingsJson([Const] DOMString inGameEditorSettingsJson);
+    [Ref] PreviewExportOptions SetInitialBreakpointsJson([Const] DOMString initialBreakpointsJson);
     [Ref] PreviewExportOptions SetEditorId([Const] DOMString editorId);
     [Ref] PreviewExportOptions SetEditorCameraState3D(
         [Const] DOMString cameraMode,
@@ -4551,6 +4564,9 @@ interface MetadataDeclarationHelper {
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Ref] MapStringString objectMethodMangledNames);
 
+    [Const, Value] DOMString STATIC_GetSceneCodeNamespace(
+        [Const] DOMString sceneName);
+
     [Const, Value] DOMString STATIC_GetExtensionCodeNamespacePrefix(
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension);
 
@@ -4568,6 +4584,11 @@ interface MetadataDeclarationHelper {
 
     [Const, Value] DOMString STATIC_GetObjectFunctionCodeNamespace(
         [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString codeNamespacePrefix);
+
+    [Const, Value] DOMString STATIC_GetObjectEventsFunctionFullyQualifiedContextName(
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const, Ref] EventsFunction eventsFunction,
         [Const] DOMString codeNamespacePrefix);
 
     boolean STATIC_IsBehaviorLifecycleEventsFunction([Const] DOMString functionName);

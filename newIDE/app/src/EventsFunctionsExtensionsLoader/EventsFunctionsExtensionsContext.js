@@ -14,7 +14,8 @@ export type EventsFunctionsExtensionsState = {|
     extensionName: string
   ) => void,
   reloadProjectEventsFunctionsExtensions: (
-    project: ?gdProject
+    project: ?gdProject,
+    generateForPreview?: boolean
   ) => Promise<void>,
   reloadProjectEventsFunctionsExtensionMetadata: (
     project: ?gdProject,
@@ -23,6 +24,14 @@ export type EventsFunctionsExtensionsState = {|
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
   ensureLoadFinished: () => Promise<void>,
+  // Reloads only if last generated for the other flavor (preview vs runtime
+  // instrumentation); otherwise waits for any load in progress.
+  // `forceRegeneration` bypasses the flavor cache (e.g. new UUIDs assigned).
+  ensureProjectEventsFunctionsExtensionsForFlavor: (
+    project: ?gdProject,
+    generateForPreview: boolean,
+    forceRegeneration?: boolean
+  ) => Promise<void>,
   getIncludeFileHashs: () => { [string]: number },
 |};
 
@@ -40,6 +49,8 @@ const defaultState = {
   getEventsFunctionsExtensionWriter: () => null,
   getEventsFunctionsExtensionOpener: () => null,
   ensureLoadFinished: () => Promise.reject(new Error('Use a provider')),
+  ensureProjectEventsFunctionsExtensionsForFlavor: () =>
+    Promise.reject(new Error('Use a provider')),
   getIncludeFileHashs: () => ({}),
 };
 

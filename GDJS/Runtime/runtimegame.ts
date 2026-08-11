@@ -103,10 +103,23 @@ namespace gdjs {
     /** if true, game is run as a preview launched from an editor. */
     isPreview?: boolean;
 
+    /**
+     * if true, a CDP debugger is attached (local Electron preview), so the
+     * generated `debugger;` statements are live and breakpoints can fire.
+     */
+    cdpDebuggerEnabled?: boolean;
+
     /** if set, the status of the game to be restored. */
     initialRuntimeGameStatus?: RuntimeGameStatus;
 
     inGameEditorSettings?: InGameEditorSettings;
+
+    /**
+     * Breakpoints applied as soon as the debugger manager is installed.
+     * Baked in at build time, unlike a live `setBreakpoints` call, so
+     * delivery doesn't depend on CDP injection timing.
+     */
+    initialBreakpoints?: BreakpointEntry[];
 
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
@@ -260,6 +273,9 @@ namespace gdjs {
      * Optional client to connect to a debugger server.
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
+
+    /** Preview debugger's breakpoint manager; see `getBreakpointManager`. */
+    _breakpointManager: gdjs.DebuggerBreakpointManager | null = null;
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -377,6 +393,10 @@ namespace gdjs {
         logger.info(
           'This game will run on the development version of GDevelop APIs.'
         );
+      }
+
+      if (this._isPreview) {
+        gdjs.installBreakpointDebugSupport(this);
       }
     }
 
@@ -907,6 +927,14 @@ namespace gdjs {
       if (this._debuggerClient) {
         this._debuggerClient.sendRuntimeGameStatus();
       }
+    }
+
+    /** Returns the breakpoint manager, creating it on first use. */
+    getBreakpointManager(): gdjs.DebuggerBreakpointManager {
+      if (!this._breakpointManager) {
+        this._breakpointManager = new gdjs.DebuggerBreakpointManager(this);
+      }
+      return this._breakpointManager;
     }
 
     /**

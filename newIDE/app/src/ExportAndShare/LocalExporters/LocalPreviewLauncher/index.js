@@ -22,6 +22,7 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import { buildAllBreakpointsPayload } from '../../../EventsSheet/BreakpointsSessionStore';
 import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -121,6 +122,10 @@ export default class LocalPreviewLauncher extends React.Component<
 
     if (!ipcRenderer) return;
 
+    // Inject at launch via addScriptToEvaluateOnNewDocument so frame-0
+    // breakpoints are hittable (WS delivery arrives after the first frame).
+    const initialBreakpoints = buildAllBreakpointsPayload();
+
     ipcRenderer.invoke('preview-open', {
       previewBrowserWindowOptions,
       previewGameIndexHtmlPath: `file://${previewGamePath}/index.html`,
@@ -128,6 +133,7 @@ export default class LocalPreviewLauncher extends React.Component<
       hideMenuBar,
       numberOfWindows,
       captureOptions,
+      initialBreakpoints,
     });
 
     ipcRenderer.removeAllListeners('preview-window-closed');
@@ -285,6 +291,18 @@ export default class LocalPreviewLauncher extends React.Component<
         previewExportOptions.useWebsocketDebuggerClientWithServerAddress(
           previewDebuggerServerAddress.address,
           '' + previewDebuggerServerAddress.port
+        );
+      }
+      // The preview window always has a CDP debugger attached (see
+      // attachCdpToPreview), so the generated `debugger;` statements are live.
+      previewExportOptions.setCdpDebuggerEnabled(true);
+
+      // Baked into the generated code so frame-0 breakpoints are hittable
+      // without depending on any CDP injection timing.
+      const initialBreakpoints = buildAllBreakpointsPayload();
+      if (initialBreakpoints.length > 0) {
+        previewExportOptions.setInitialBreakpointsJson(
+          JSON.stringify(initialBreakpoints)
         );
       }
     }

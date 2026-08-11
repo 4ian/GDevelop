@@ -231,7 +231,8 @@ describe('libGD.js - GDJS related tests', function () {
         layout,
         new gd.SetString(),
         diagnosticReport,
-        true
+        true,
+        false
       );
       diagnosticReport.delete();
       layoutCodeGenerator.delete();
@@ -284,7 +285,8 @@ describe('libGD.js - GDJS related tests', function () {
         layout,
         new gd.SetString(),
         diagnosticReport,
-        true
+        true,
+        false
       );
       diagnosticReport.delete();
       layoutCodeGenerator.delete();
@@ -385,7 +387,8 @@ describe('libGD.js - GDJS related tests', function () {
         layout,
         new gd.SetString(),
         diagnosticReport,
-        true
+        true,
+        false
       );
       diagnosticReport.delete();
       layoutCodeGenerator.delete();
@@ -469,7 +472,8 @@ describe('libGD.js - GDJS related tests', function () {
         layout,
         new gd.SetString(),
         diagnosticReport,
-        true
+        true,
+        false
       );
       diagnosticReport.delete();
       layoutCodeGenerator.delete();
@@ -572,7 +576,8 @@ describe('libGD.js - GDJS related tests', function () {
         eventsFunction,
         namespace,
         includeFiles,
-        true
+        true,
+        false
       );
 
       // Check that the function name is properly generated
@@ -676,7 +681,8 @@ describe('libGD.js - GDJS related tests', function () {
         eventsFunction,
         namespace,
         includeFiles,
-        true
+        true,
+        false
       );
 
       // Check that the function name is properly generated

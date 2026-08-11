@@ -75,4 +75,4 @@ Games exported with GDevelop are based on the GDevelop game engine (see `Core` a
 
 Help us spread the word about GDevelop by starring the repository on GitHub!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=4ian/gdevelop&type=Date)](https://star-history.com/#4ian/gdevelop&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=4ian/gdevelop&type=Date)](https://star-history.dera.page/#4ian/gdevelop&Date)

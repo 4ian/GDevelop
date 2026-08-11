@@ -20,18 +20,21 @@ module.exports = {
     extension
       .setExtensionInformation(
         'NavMeshPathfinding',
-        _('NavMesh pathfinding behavior'),
-        'Pathfinding allows to compute an efficient path for objects, avoiding obstacles on the way.',
+        _('Navmesh pathfinding'),
+        'Pathfinding allows to compute an efficient path for objects, including crowds, following walkable floors and avoiding obstacles on the way.',
         '',
         'Open source (MIT License)'
       )
       .setShortDescription(
-        'Nav-mesh based pathfinding : compute path avoiding obstacles and handle crowds.'
+        'Navmesh based pathfinding: compute path avoiding obstacles and handle crowds.'
       )
       .setDimension('2D/3D')
       .setCategory('Movement')
       .setTags('pathfinding, obstacle, collision')
       .setExtensionHelpPath('/behaviors/nav-mesh-pathfinding');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Navmesh pathfinding'))
+      .setIcon('JsPlatform/Extensions/nav-mesh-character.svg');
     {
       const behavior = new gd.BehaviorJsImplementation();
       behavior.updateProperty = function (
@@ -374,10 +377,10 @@ module.exports = {
       const aut = extension
         .addBehavior(
           'NavMeshCharacterBehavior',
-          _('Pathfinding character (nav-mesh based)'),
+          _('Pathfinding character (navmesh based)'),
           'NavMeshCharacter',
           _(
-            'Move objects to a target while avoiding all objects that are  flagged as obstacles.'
+            'Move objects to a target by following walkable floors and avoiding obstacles. Uses a flexible 2D/3D "navmesh"-based pathfinding.'
           ),
           '',
           'JsPlatform/Extensions/nav-mesh-character.svg',
@@ -846,9 +849,11 @@ module.exports = {
       extension
         .addBehavior(
           'NavMeshObstacleBehavior',
-          _('Obstacle for pathfinding (nav-mesh based)'),
+          _('Floor/obstacle for pathfinding (navmesh based)'),
           'NavMeshObstacle',
-          _('Flag objects as being obstacles for nav-mesh pathfinding.'),
+          _(
+            'Flag objects as being walkable floors and/or obstacles for navmesh pathfinding.'
+          ),
           '',
           'JsPlatform/Extensions/nav-mesh-obstacle.svg',
           'NavMeshObstacle',
@@ -876,13 +881,14 @@ module.exports = {
         'EnableDebugDraw',
         _('Draw pathfinding walkable area'),
         _('This activates the display of the walkable area (in blue).'),
-        _('Enable debugging view of pathfinding: _PARAM1_'),
+        _('Enable debugging view of navmesh pathfinding: _PARAM1_'),
         '',
         'res/actions/planicon24.png',
         'res/actions/planicon.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('yesorno', _('Enable debug draw'), '', true)
+      .addParameter('yesorno', _('Enable debug draw'), '', false)
+      .setDefaultValue('yes')
       .getCodeExtraInformation()
       .addIncludeFile(
         'Extensions/NavMeshPathfinding/NavMeshObstacleRuntimeBehavior.js'

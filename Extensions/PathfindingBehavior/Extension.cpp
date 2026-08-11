@@ -36,7 +36,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                               "Pathfinding",
                               _("Move objects to a target "
                                 "while avoiding all objects that are "
-                                "flagged as obstacles."),
+                                "flagged as obstacles. Uses a 2D grid-based pathfinding."),
                               "",
                               "CppPlatform/Extensions/pathfinding-character.svg",
                               "PathfindingBehavior",

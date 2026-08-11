@@ -747,8 +747,7 @@ export default class ExpressionField extends React.Component<Props, State> {
               )}
               renderButton={style => (
                 <React.Fragment>
-                  {!this.props.isInline &&
-                    this.props.renderExtraButton &&
+                  {this.props.renderExtraButton &&
                     this.props.renderExtraButton({
                       style,
                       onChange: this._handleBlur,

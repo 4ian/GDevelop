@@ -37,6 +37,11 @@ export const Default = (): React.Node => (
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}
         onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
+        // Gameplay tests
+        onOpenGameplayTest={action('open gameplay test')}
+        onRenameGameplayTest={action('rename gameplay test')}
+        onDeleteGameplayTest={action('delete gameplay test')}
+        onRunGameplayTest={action('run gameplay test')}
         // Behaviors
         onSelectEventsBasedBehavior={action('behavior selected')}
         onDeleteEventsBasedBehavior={action('behavior deleted')}

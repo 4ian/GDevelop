@@ -2,7 +2,8 @@
 import * as React from 'react';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ToolbarTitlebar from './ToolbarTitlebar';
-import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
+import ActiveTabCommandsProvider from '../CommandPalette/ActiveTabCommandsProvider';
+import WindowCommandsProvider from '../CommandPalette/WindowCommandsProvider';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
@@ -77,7 +78,10 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
   // Register keyboard shortcuts in the external window.
   useKeyboardShortcuts({
     targetDocument: externalWindowDocument || undefined,
-    previewDebuggerServer: props.previewDebuggerServer,
+    // Shortcuts pressed in the in-game editor are handled by the main window
+    // (where the in-game editor is displayed): don't listen to them here, or
+    // they would be run once per window.
+    previewDebuggerServer: null,
     ignoreHandledByElectron: true,
     onRunCommand: React.useCallback(commandName => {
       if (commandName === 'OPEN_COMMAND_PALETTE') {
@@ -134,6 +138,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     ref={toolbarRef}
                     hidden={false}
                     showProjectButtons={false}
+                    showPreviewAndShareButtons={false}
                     canSave={props.canSave}
                     onSave={props.saveProject}
                     openShareDialog={() => props.openShareDialog()}
@@ -172,7 +177,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                   overflow: 'hidden',
                 }}
               >
-                <CommandsContextScopedProvider active={true}>
+                <ActiveTabCommandsProvider active={true}>
                   <DragAndDropContextProvider
                     key={
                       externalWindowDocument
@@ -216,6 +221,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         projectItemName: editorTab.projectItemName,
                         setPreviewedLayout: props.setPreviewedLayout,
                         onOpenAskAi: props.onOpenAskAi,
+                        gameplayTestsCallbacks: props.gameplayTestsCallbacks,
                         onCloseAskAi: props.onCloseAskAi,
                         onOpenExternalEvents: props.openExternalEvents,
                         onOpenEvents: (sceneName: string) => {
@@ -356,6 +362,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onProjectItemRenamedOutsideEditor:
                           props.onProjectItemRenamedOutsideEditor,
                         onWillDeleteScene: props.onWillDeleteScene,
+                        onWillDeleteGameplayTest:
+                          props.onWillDeleteGameplayTest,
                         onWillDeleteObject: props.onWillDeleteObject,
                         onWillInstallExtension: props.onWillInstallExtension,
                         onExtensionInstalled: props.onExtensionInstalled,
@@ -370,7 +378,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                       })}
                     </ErrorBoundary>
                   </DragAndDropContextProvider>
-                </CommandsContextScopedProvider>
+                </ActiveTabCommandsProvider>
               </div>
               <I18n>
                 {({ i18n }) =>
@@ -413,4 +421,18 @@ const PoppedOutWindowBackgroundColor = () => {
   return null;
 };
 
-export default PoppedOutEditorContainerWindow;
+/**
+ * Gives the popped out window its own command manager, so that the commands
+ * registered by its editor stay in this window: a keyboard shortcut must
+ * always run the command of the window where it was pressed, and not the one
+ * of an editor displayed in another window.
+ */
+const PoppedOutEditorContainerWindowWithOwnCommands = (
+  props: Props
+): React.Node => (
+  <WindowCommandsProvider>
+    <PoppedOutEditorContainerWindow {...props} />
+  </WindowCommandsProvider>
+);
+
+export default PoppedOutEditorContainerWindowWithOwnCommands;

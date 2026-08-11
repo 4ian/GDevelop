@@ -382,6 +382,7 @@ type Props = {|
 
 export type AiRequestChatInterface = {|
   resetUserInput: (aiRequestId: string | null) => void,
+  setUserInput: (aiRequestId: string | null, userRequestText: string) => void,
 |};
 
 export const AiRequestChat: React.ComponentType<{
@@ -531,6 +532,9 @@ export const AiRequestChat: React.ComponentType<{
     ] = React.useState<{ [string]: string }>({});
 
     const scrollViewRef = React.useRef<ScrollViewInterface | null>(null);
+    const newChatTextFieldRef = React.useRef<CompactTextAreaFieldWithControlsInterface | null>(
+      null
+    );
     const existingChatTextFieldRef = React.useRef<CompactTextAreaFieldWithControlsInterface | null>(
       null
     );
@@ -634,6 +638,20 @@ export const AiRequestChat: React.ComponentType<{
         onUserRequestTextChange('', aiRequestIdToReset);
 
         scrollToBottom();
+      },
+      setUserInput: (aiRequestId: string | null, userRequestText: string) => {
+        onUserRequestTextChange(userRequestText, aiRequestId || '');
+
+        scrollToBottom();
+
+        // Focus the field so the user can complete the text right away
+        // (after a render, as the field might just be shown).
+        const textFieldRef = aiRequestId
+          ? existingChatTextFieldRef
+          : newChatTextFieldRef;
+        setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
+        }, 50);
       },
     }));
 
@@ -890,6 +908,7 @@ export const AiRequestChat: React.ComponentType<{
               >
                 {!shouldReplaceFormWithCreditsOrSubscriptionPrompt ? (
                   <CompactTextAreaFieldWithControls
+                    ref={newChatTextFieldRef}
                     maxLength={6000}
                     value={userRequestTextPerAiRequestId[''] || ''}
                     disabled={isWorking}

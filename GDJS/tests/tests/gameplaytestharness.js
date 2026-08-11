@@ -449,12 +449,14 @@ describe('gdjs.gameplayTests', () => {
 
   it('excludes slow scene-asset loading from the timeout budget', async () => {
     const runtimeGame = makeRuntimeGame();
-    // Simulate scene assets that take longer to load than the whole test
-    // budget (like the first run of a web preview downloading resources).
-    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
+    // Override members to mock scene assets that take longer to load than
+    // the whole test budget (like the first run of a web preview
+    // downloading resources).
     let slowLoadDone = false;
-    anyRuntimeGame.areSceneAssetsReady = () => slowLoadDone;
-    anyRuntimeGame.loadSceneAssets = async () => {
+    // @ts-ignore
+    runtimeGame.areSceneAssetsReady = () => slowLoadDone;
+    // @ts-ignore
+    runtimeGame.loadSceneAssets = async () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
       slowLoadDone = true;
     };
@@ -476,20 +478,20 @@ describe('gdjs.gameplayTests', () => {
 
   it('waits through a game-driven scene change whose scene is still loading', async () => {
     const runtimeGame = makeRuntimeGame();
-    // "Scene 2" assets take longer to load than the whole test budget: when
-    // the game changes to it, the scene stack stays empty until the load
-    // finishes (the gap that made real tests throw "No scene is running").
-    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
+    // Override members to mock "Scene 2" assets that take longer to load
+    // than the whole test budget: when the game changes to it, the scene
+    // stack stays empty until the load finishes (the gap that made real
+    // tests throw "No scene is running").
     const originalAreSceneAssetsReady =
       runtimeGame.areSceneAssetsReady.bind(runtimeGame);
     let slowLoadDone = false;
-    anyRuntimeGame.areSceneAssetsReady = (
-      /** @type {string} */ sceneName
-    ) =>
+    // @ts-ignore
+    runtimeGame.areSceneAssetsReady = (/** @type {string} */ sceneName) =>
       sceneName === 'Scene 2'
         ? slowLoadDone
         : originalAreSceneAssetsReady(sceneName);
-    anyRuntimeGame.loadSceneAssets = async () => {
+    // @ts-ignore
+    runtimeGame.loadSceneAssets = async () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
       slowLoadDone = true;
     };
@@ -524,14 +526,16 @@ describe('gdjs.gameplayTests', () => {
 
   it('gives a clear error when the game removed its last scene (game over)', async () => {
     const runtimeGame = makeRuntimeGame();
+    const sceneStack = runtimeGame.getSceneStack();
+    // Override members to mock a game that ended: a first scene was loaded
+    // but no scene is running anymore (and none is loading).
+    // @ts-ignore
+    sceneStack.getCurrentScene = () => null;
+    // @ts-ignore
+    sceneStack.wasFirstSceneLoaded = () => true;
     const result = await runTestScript(
       runtimeGame,
       `
-      await harness.goToScene('Scene 1');
-      // Simulate an ended game: an empty scene stack with no scene loading
-      // (SceneStack.pop() refuses to remove the last scene, so reach into
-      // the stack directly).
-      harness.getRuntimeGame().getSceneStack()._stack.pop();
       await harness.stepFrames(1);
       harness.getSceneName();
       `
@@ -543,9 +547,11 @@ describe('gdjs.gameplayTests', () => {
 
   it('fails with a clear error when scene assets never finish loading', async () => {
     const runtimeGame = makeRuntimeGame();
-    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
-    anyRuntimeGame.areSceneAssetsReady = () => false;
-    anyRuntimeGame.loadSceneAssets = () => new Promise(() => {});
+    // Override members to mock a scene-asset load that never completes.
+    // @ts-ignore
+    runtimeGame.areSceneAssetsReady = () => false;
+    // @ts-ignore
+    runtimeGame.loadSceneAssets = () => new Promise(() => {});
     const result = await runTestScript(
       runtimeGame,
       `await harness.goToScene('Scene 1');`,

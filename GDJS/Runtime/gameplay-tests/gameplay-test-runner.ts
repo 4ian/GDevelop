@@ -608,10 +608,26 @@ namespace gdjs {
       }
 
       private _getCurrentScene(): gdjs.RuntimeScene {
-        const currentScene = this._runtimeGame
-          .getSceneStack()
-          .getCurrentScene();
+        const sceneStack = this._runtimeGame.getSceneStack();
+        const currentScene = sceneStack.getCurrentScene();
         if (!currentScene) {
+          if (sceneStack.isNextSceneLoading()) {
+            // Should not happen: every stepped frame waits for a
+            // game-driven scene switch to complete (see
+            // `_waitForGameSceneSwitchIfNeeded`). Kept as a safety net for
+            // a synchronous read racing the switch.
+            throw new Error(
+              'The game is switching scenes and the next scene is still ' +
+                'loading. `await harness.stepFrames(1)` waits for it to be ready.'
+            );
+          }
+          if (sceneStack.wasFirstSceneLoaded()) {
+            throw new Error(
+              'No scene is running anymore: the game removed its last ' +
+                'scene (it likely ended or quit). Use ' +
+                '`await harness.goToScene(sceneName)` to start a scene again.'
+            );
+          }
           throw new Error(
             'No scene is running. Call `await harness.goToScene(sceneName)` first.'
           );
@@ -695,6 +711,38 @@ namespace gdjs {
         }
       }
 
+      /**
+       * When the game's own logic changed scene (a `Scene(...)` action) and
+       * the next scene's assets are not loaded yet, the scene stack is
+       * empty until the load finishes - the game is not over, a scene is on
+       * its way. Wait for it (as loading time, excluded from the timeout
+       * budget) so the test script never observes the gap: without this, a
+       * `getSceneName()` right after the game changed scene throws a
+       * misleading "No scene is running".
+       */
+      async _waitForGameSceneSwitchIfNeeded(): Promise<void> {
+        const sceneStack = this._runtimeGame.getSceneStack();
+        if (sceneStack.getCurrentScene() || !sceneStack.isNextSceneLoading()) {
+          return;
+        }
+        await this._awaitLoading(
+          (async () => {
+            while (
+              !sceneStack.getCurrentScene() &&
+              sceneStack.isNextSceneLoading() &&
+              !this._stopped
+            ) {
+              await new Promise((resolve) => setTimeout(resolve, 20));
+            }
+          })(),
+          'The scene the game is switching to'
+        );
+        // Record the arrival right away (`sceneChanged`/`sceneReset` with
+        // the cause of the game's change request), even if the script never
+        // steps another frame.
+        this._trackChangesAfterStep();
+      }
+
       private _recordEvent(event: GameplayTestEvent): void {
         if (this._eventLog.length >= MAX_EVENT_LOG_ENTRIES) return;
         this._eventLog.push(event);
@@ -725,6 +773,16 @@ namespace gdjs {
         const currentScene = this._runtimeGame
           .getSceneStack()
           .getCurrentScene();
+        if (
+          !currentScene &&
+          this._runtimeGame.getSceneStack().isNextSceneLoading()
+        ) {
+          // The game changed scene and the next one is still loading: the
+          // stack is only transiently empty. Do not record this gap as a
+          // scene change - the arrival is recorded once the new scene
+          // exists (see `_waitForGameSceneSwitchIfNeeded`).
+          return;
+        }
         const sceneName = currentScene ? currentScene.getName() : '';
         if (currentScene !== this._lastTrackedScene) {
           const lastChangeCause = this._runtimeGame
@@ -938,6 +996,7 @@ namespace gdjs {
         const dtMs = (options && options.dtMs) || DEFAULT_FRAME_DT_MS;
         for (let i = 0; i < frameCount; i++) {
           this._stepSingleFrame(dtMs);
+          await this._waitForGameSceneSwitchIfNeeded();
           if (options && options.onFrame) {
             options.onFrame({ frame: this._framesExecuted });
           }
@@ -978,6 +1037,7 @@ namespace gdjs {
         for (let i = 0; i < options.maxFrames; i++) {
           if (condition()) return true;
           this._stepSingleFrame(DEFAULT_FRAME_DT_MS);
+          await this._waitForGameSceneSwitchIfNeeded();
           if (options.onFrame) {
             options.onFrame({ frame: this._framesExecuted });
           }

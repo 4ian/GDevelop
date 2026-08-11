@@ -2,43 +2,34 @@
 import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ToolbarGroup } from '../../UI/Toolbar';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import IconButton from '../../UI/IconButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import ToolbarCommands from '../ToolbarCommands';
-import { type MenuItemTemplate } from '../../UI/Menu/Menu.flow';
-import ObjectIcon from '../../UI/CustomSvgIcons/Object';
-import ObjectGroupIcon from '../../UI/CustomSvgIcons/ObjectGroup';
-import EditIcon from '../../UI/CustomSvgIcons/Edit';
-import InstancesListIcon from '../../UI/CustomSvgIcons/InstancesList';
-import LayersIcon from '../../UI/CustomSvgIcons/Layers';
-import UndoIcon from '../../UI/CustomSvgIcons/Undo';
-import RedoIcon from '../../UI/CustomSvgIcons/Redo';
-import TrashIcon from '../../UI/CustomSvgIcons/Trash';
+import ShowAllPanelsIcon from '../../UI/CustomSvgIcons/ShowAllPanels';
 import GridIcon from '../../UI/CustomSvgIcons/Grid';
-import ZoomInIcon from '../../UI/CustomSvgIcons/ZoomIn';
 import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
-import {
-  OPEN_INSTANCES_PANEL_BUTTON_ID,
-  OPEN_LAYERS_PANEL_BUTTON_ID,
-  OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID,
-  OPEN_OBJECTS_PANEL_BUTTON_ID,
-  OPEN_PROPERTIES_PANEL_BUTTON_ID,
-} from '../utils';
+import EventsIcon from '../../UI/CustomSvgIcons/Events';
+import Add from '../../UI/CustomSvgIcons/Add';
+import { TOGGLE_ALL_PANELS_BUTTON_ID } from '../utils';
 import CompactToggleButtons from '../../UI/CompactToggleButtons';
 import Grid2d from '../../UI/CustomSvgIcons/Grid2d';
 import Grid3d from '../../UI/CustomSvgIcons/Grid3d';
+import {
+  getShortcutDisplayName,
+  useShortcutMap,
+} from '../../KeyboardShortcuts';
 
 type Props = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
   setGameEditorMode: ('embedded-game' | 'instances-editor') => void,
+  onAddObject: () => void,
+  canAddObject: boolean,
   toggleObjectsList: () => void,
-  isObjectsListShown: boolean,
   toggleObjectGroupsList: () => void,
-  isObjectGroupsListShown: boolean,
   toggleProperties: () => void,
-  isPropertiesShown: boolean,
   undo: () => void,
   canUndo: boolean,
   redo: () => void,
@@ -46,16 +37,16 @@ type Props = {|
   deleteSelection: () => void,
   selectedInstancesCount: number,
   toggleInstancesList: () => void,
-  isInstancesListShown: boolean,
   toggleLayersList: () => void,
-  isLayersListShown: boolean,
+  toggleAllPanels: () => void,
+  areAllPanelsShown: boolean,
   isWindowMaskShown: boolean,
   toggleWindowMask: () => void,
   isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
-  getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
-  setZoomFactor: number => void,
+  onOpenEvents?: ?() => void,
+  openEventsTooltip?: MessageDescriptor,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
   onOpenSceneVariables: () => void,
@@ -64,12 +55,17 @@ type Props = {|
 const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
   props
 ) {
+  const shortcutMap = useShortcutMap();
+
   return (
     <>
       <ToolbarCommands
+        addObject={props.onAddObject}
+        canAddObject={props.canAddObject}
         toggleObjectsList={props.toggleObjectsList}
         toggleObjectGroupsList={props.toggleObjectGroupsList}
         togglePropertiesPanel={props.toggleProperties}
+        toggleAllPanels={props.toggleAllPanels}
         toggleInstancesList={props.toggleInstancesList}
         toggleLayersList={props.toggleLayersList}
         undo={props.undo}
@@ -84,6 +80,17 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         onOpenSceneVariables={props.onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
+        <IconButton
+          size="small"
+          color="default"
+          id="toolbar-add-object-button"
+          onClick={props.onAddObject}
+          disabled={!props.canAddObject}
+          tooltip={t`Add object`}
+          acceleratorString={getShortcutDisplayName(shortcutMap['ADD_OBJECT'])}
+        >
+          <Add />
+        </IconButton>
         <CompactToggleButtons
           id="game-editor-toggle"
           noSeparator
@@ -114,72 +121,17 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
         <IconButton
           size="small"
           color="default"
-          id={OPEN_OBJECTS_PANEL_BUTTON_ID}
-          onClick={props.toggleObjectsList}
-          selected={props.isObjectsListShown}
+          id={TOGGLE_ALL_PANELS_BUTTON_ID}
+          onClick={props.toggleAllPanels}
+          selected={props.areAllPanelsShown}
           tooltip={
-            props.isObjectsListShown
-              ? t`Close Objects Panel`
-              : t`Open Objects Panel`
+            props.areAllPanelsShown ? t`Hide all panels` : t`Show all panels`
           }
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['TOGGLE_ALL_PANELS']
+          )}
         >
-          <ObjectIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_OBJECT_GROUPS_PANEL_BUTTON_ID}
-          onClick={props.toggleObjectGroupsList}
-          selected={props.isObjectGroupsListShown}
-          tooltip={
-            props.isObjectGroupsListShown
-              ? t`Close Object Groups Panel`
-              : t`Open Object Groups Panel`
-          }
-        >
-          <ObjectGroupIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_PROPERTIES_PANEL_BUTTON_ID}
-          onClick={props.toggleProperties}
-          selected={props.isPropertiesShown}
-          tooltip={
-            props.isPropertiesShown
-              ? t`Close Properties Panel`
-              : t`Open Properties Panel`
-          }
-        >
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_INSTANCES_PANEL_BUTTON_ID}
-          onClick={props.toggleInstancesList}
-          selected={props.isInstancesListShown}
-          tooltip={
-            props.isInstancesListShown
-              ? t`Close Instances List Panel`
-              : t`Open Instances List Panel`
-          }
-        >
-          <InstancesListIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          id={OPEN_LAYERS_PANEL_BUTTON_ID}
-          onClick={props.toggleLayersList}
-          selected={props.isLayersListShown}
-          tooltip={
-            props.isLayersListShown
-              ? t`Close Layers Panel`
-              : t`Open Layers Panel`
-          }
-        >
-          <LayersIcon />
+          <ShowAllPanelsIcon />
         </IconButton>
         <ElementWithMenu
           element={
@@ -211,58 +163,18 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar(
             },
           ]}
         />
-        <ToolbarSeparator />
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.undo}
-          disabled={!props.canUndo}
-          tooltip={t`Undo the last changes`}
-        >
-          <UndoIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.redo}
-          disabled={!props.canRedo}
-          tooltip={t`Redo the last changes`}
-        >
-          <RedoIcon />
-        </IconButton>
-        <ElementWithMenu
-          element={
-            <IconButton
-              size="small"
-              color="default"
-              tooltip={t`Change editor zoom`}
-            >
-              <ZoomInIcon />
-            </IconButton>
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            ...props.getContextMenuZoomItems(i18n),
-            { type: 'separator' },
-            { label: '5%', click: () => props.setZoomFactor(0.05) },
-            { label: '10%', click: () => props.setZoomFactor(0.1) },
-            { label: '25%', click: () => props.setZoomFactor(0.25) },
-            { label: '50%', click: () => props.setZoomFactor(0.5) },
-            { label: '100%', click: () => props.setZoomFactor(1.0) },
-            { label: '150%', click: () => props.setZoomFactor(1.5) },
-            { label: '200%', click: () => props.setZoomFactor(2.0) },
-            { label: '400%', click: () => props.setZoomFactor(4.0) },
-          ]}
-        />
-        <IconButton
-          size="small"
-          color="default"
-          onClick={props.deleteSelection}
-          disabled={!props.selectedInstancesCount}
-          tooltip={t`Delete the selected instances from the scene`}
-        >
-          <TrashIcon />
-        </IconButton>
-        {props.onOpenSettings && <ToolbarSeparator />}
+        {(props.onOpenEvents || props.onOpenSettings) && <ToolbarSeparator />}
+        {props.onOpenEvents && (
+          <IconButton
+            size="small"
+            color="default"
+            onClick={props.onOpenEvents}
+            tooltip={props.openEventsTooltip || t`Open scene events`}
+            id="toolbar-open-scene-events-button"
+          >
+            <EventsIcon />
+          </IconButton>
+        )}
         {props.onOpenSettings && (
           <IconButton
             size="small"

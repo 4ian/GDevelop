@@ -221,7 +221,6 @@ namespace gdjs {
     _displayedLoadingScreen: gdjs.LoadingScreenRenderer | null = null;
     _sessionId: string | null;
     _playerId: string | null;
-    _watermark: watermark.RuntimeWatermark;
 
     _sceneStack: SceneStack;
     /**
@@ -260,6 +259,8 @@ namespace gdjs {
      * Optional client to connect to a debugger server.
      */
     _debuggerClient: gdjs.AbstractDebuggerClient | null;
+    _hasLoggedUncaughtException = false;
+    _uncaughtExceptionElement: HTMLElement | null = null;
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -295,6 +296,7 @@ namespace gdjs {
         this._options.initialRuntimeGameStatus?.isInGameEdition || false;
 
       this._variables = new gdjs.VariablesContainer(data.variables);
+      this._data = data;
       this._variablesByExtensionName = new Map<
         string,
         gdjs.VariablesContainer
@@ -308,7 +310,6 @@ namespace gdjs {
         }
       }
       this._eventsBasedObjectDatas = new Map<String, EventsBasedObjectData>();
-      this._data = data;
       this._updateSceneAndExtensionsData();
       gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable =
         !!data.properties.useDeprecatedZeroAsDefaultStringVariable;
@@ -353,11 +354,6 @@ namespace gdjs {
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
-      );
-      this._watermark = new gdjs.watermark.RuntimeWatermark(
-        this,
-        data.properties.authorUsernames,
-        this._data.properties.watermark
       );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
@@ -453,6 +449,123 @@ namespace gdjs {
 
     getRenderer(): gdjs.RuntimeGameRenderer {
       return this._renderer;
+    }
+
+    private _normalizeException(exception: unknown): Error {
+      if (exception instanceof Error) return exception;
+
+      return new Error('' + exception);
+    }
+
+    private _isErrorComingFromJavaScriptCode(exception: Error): boolean {
+      return !!exception.stack && exception.stack.includes('GDJSInlineCode');
+    }
+
+    private _displayUncaughtException(exception: Error): void {
+      if (typeof document === 'undefined' || this._uncaughtExceptionElement) {
+        return;
+      }
+
+      const domElementContainer =
+        this.getRenderer().getDomElementContainer() ||
+        this.getRenderer().getCanvas()?.parentElement ||
+        document.body;
+      if (!domElementContainer) return;
+
+      const errorIsInJs = this._isErrorComingFromJavaScriptCode(exception);
+      const errorContainer = document.createElement('div');
+      Object.assign(errorContainer.style, {
+        padding: '15px',
+        backgroundColor: '#a70000cc',
+        borderRadius: '8px',
+        position: 'absolute',
+        bottom: '5px',
+        left: '5px',
+        right: '5px',
+        color: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        pointerEvents: 'all',
+        zIndex: '100000',
+        boxSizing: 'border-box',
+        maxHeight: 'calc(100% - 10px)',
+      });
+
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'x';
+      closeButton.addEventListener('click', () => {
+        errorContainer.parentNode?.removeChild(errorContainer);
+        this._uncaughtExceptionElement = null;
+      });
+      Object.assign(closeButton.style, {
+        padding: '3px',
+        width: '20px',
+        height: '24px',
+        fontSize: '18px',
+        lineHeight: '16px',
+        position: 'absolute',
+        right: '5px',
+        top: '5px',
+        color: 'white',
+        border: '1px solid white',
+        borderRadius: '6px',
+        backgroundColor: 'transparent',
+      });
+
+      const errorTitle = document.createElement('h2');
+      errorTitle.textContent = errorIsInJs
+        ? 'An error happened in a JavaScript code event.'
+        : 'A crash or error happened in the game.';
+      Object.assign(errorTitle.style, {
+        fontFamily: 'system-ui',
+        fontSize: '20px',
+        marginTop: '5px',
+        marginBottom: '5px',
+        userSelect: 'all',
+      });
+
+      const errorMessage = document.createElement('p');
+      errorMessage.textContent =
+        (errorIsInJs
+          ? 'This error comes from a JavaScript code event. Verify your code to ensure no error is happening. You can use the Developer Tools (menu "View" > "Toggle Developer Tools"). Full error is: '
+          : "If you're using JavaScript, verify your code. Otherwise, this might be an issue with GDevelop - consider reporting a bug. Full error is: ") +
+        exception.message;
+      Object.assign(errorMessage.style, {
+        fontFamily: 'system-ui',
+        fontSize: '14px',
+        userSelect: 'all',
+      });
+
+      const stacktrace = document.createElement('pre');
+      stacktrace.textContent = exception.stack || '(No stacktrace).';
+      Object.assign(stacktrace.style, {
+        fontSize: '14px',
+        fontFamily: 'monospace',
+        whiteSpace: 'pre',
+        maxHeight: '510px',
+        overflow: 'auto',
+        userSelect: 'all',
+      });
+
+      errorContainer.append(closeButton, errorTitle, errorMessage, stacktrace);
+      domElementContainer.appendChild(errorContainer);
+      this._uncaughtExceptionElement = errorContainer;
+    }
+
+    private _onUncaughtException(exception: unknown): Error {
+      const error = this._normalizeException(exception);
+
+      if (this._hasLoggedUncaughtException) return error;
+      this._hasLoggedUncaughtException = true;
+
+      if (this._debuggerClient) {
+        this._debuggerClient.onUncaughtException(error);
+      } else {
+        logger.error('Uncaught exception: ', error, error.stack);
+        this._displayUncaughtException(error);
+      }
+
+      return error;
     }
 
     /**
@@ -712,6 +825,14 @@ namespace gdjs {
      */
     getInitialObjectsData(): ObjectData[] {
       return this._data.objects || [];
+    }
+
+    /**
+     * Get the data representing all the global object groups of the game.
+     * @return The data associated to the global object groups.
+     */
+    getInitialObjectGroupsData(): ObjectGroupData[] {
+      return this._data.objectsGroups || [];
     }
 
     /**
@@ -1174,10 +1295,7 @@ namespace gdjs {
           gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
         ]);
       } catch (e) {
-        if (this._debuggerClient)
-          this._debuggerClient.onUncaughtException(e as Error);
-
-        throw e;
+        throw this._onUncaughtException(e);
       }
     }
 
@@ -1219,7 +1337,7 @@ namespace gdjs {
         this.getRenderer(),
         this._resourcesLoader.getImageManager(),
         this._data.properties.loadingScreen,
-        this._data.properties.watermark.showWatermark,
+        false,
         isFirstScene
       );
       this._displayedLoadingScreen = loadingScreen;
@@ -1302,9 +1420,6 @@ namespace gdjs {
             });
           }
         }
-
-        this._watermark.displayAtStartup();
-
         //Uncomment to profile the first x frames of the game.
         // var x = 500;
         // var startTime = Date.now();
@@ -1409,10 +1524,8 @@ namespace gdjs {
             this.getInputManager().onFrameEnded();
             return true;
           } catch (e) {
-            if (this._debuggerClient)
-              this._debuggerClient.onUncaughtException(e as Error);
-
-            throw e;
+            this._onUncaughtException(e);
+            return false;
           }
         });
         setTimeout(() => {
@@ -1422,10 +1535,7 @@ namespace gdjs {
           this._captureManager.setupCaptureOptions(this._isPreview);
         }
       } catch (e) {
-        if (this._debuggerClient)
-          this._debuggerClient.onUncaughtException(e as Error);
-
-        throw e;
+        throw this._onUncaughtException(e);
       }
     }
 

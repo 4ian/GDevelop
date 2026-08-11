@@ -13,6 +13,7 @@ import {
   generateOnChooseSaveProjectAsLocation,
   onSaveProjectAs,
   onAutoSaveProject,
+  onAutoSaveConstants,
   getWriteErrorMessage,
   renderNewProjectSaveAsLocationChooser,
   getProjectLocation,
@@ -42,6 +43,7 @@ import { localFileStorageProviderInternalName } from './LocalFileStorageProvider
 export default ({
   internalName: localFileStorageProviderInternalName,
   name: t`Your computer`,
+  multiFileProjectSupport: 'native',
   renderIcon: props => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
@@ -65,6 +67,7 @@ export default ({
     }),
     onSaveProjectAs,
     onAutoSaveProject,
+    onAutoSaveConstants,
     onGetAutoSave,
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;

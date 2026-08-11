@@ -524,6 +524,39 @@ namespace gdjs {
         currentScene.getName(),
         () => {}
       );
+      const wasDisplayCollisionShapesEnabled = !!(
+        oldProjectData.properties.displayCollisionShapes ??
+        oldProjectData.properties.displayCollisionMask
+      );
+      const isDisplayCollisionShapesEnabled = !!(
+        newProjectData.properties.displayCollisionShapes ??
+        newProjectData.properties.displayCollisionMask
+      );
+      if (
+        wasDisplayCollisionShapesEnabled !== isDisplayCollisionShapesEnabled
+      ) {
+        sceneStack._stack.forEach((runtimeScene) => {
+          runtimeScene.enableDebugDraw(
+            isDisplayCollisionShapesEnabled,
+            false,
+            false,
+            false
+          );
+        });
+      }
+      const wasDisplaySignalAnimationsEnabled =
+        !!oldProjectData.properties.displaySignalAnimations;
+      const isDisplaySignalAnimationsEnabled =
+        !!newProjectData.properties.displaySignalAnimations;
+      if (
+        wasDisplaySignalAnimationsEnabled !== isDisplaySignalAnimationsEnabled
+      ) {
+        sceneStack._stack.forEach((runtimeScene) => {
+          runtimeScene.enableSignalAnimationDebugDraw(
+            isDisplaySignalAnimationsEnabled
+          );
+        });
+      }
       this._hotReloadVariablesContainer(
         oldProjectData.variables,
         newProjectData.variables,

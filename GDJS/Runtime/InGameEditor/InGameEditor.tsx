@@ -276,6 +276,7 @@ namespace gdjs {
   const RIGHT_KEY = 39;
   const DOWN_KEY = 40;
   const ALT_KEY = 18;
+  const TAB_KEY = 9;
   const DEL_KEY = 46;
   const BACKSPACE_KEY = 8;
   const LEFT_ALT_KEY = gdjs.InputManager.getLocationAwareKeyCode(ALT_KEY, 1);
@@ -398,6 +399,35 @@ namespace gdjs {
     max: Point3D;
   };
 
+  const getObjectsAABB = (
+    objects: Array<gdjs.RuntimeObject>,
+    include2DObjects: boolean
+  ): AABB3D | null => {
+    let aabb: AABB3D | null = null;
+    for (const object of objects) {
+      const objectIs3D = is3D(object);
+      if (!include2DObjects && !objectIs3D) continue;
+
+      const aabb2D = object.getAABB();
+      const minZ = objectIs3D ? object.getUnrotatedAABBMinZ() : 0;
+      const maxZ = objectIs3D ? object.getUnrotatedAABBMaxZ() : 0;
+      if (aabb) {
+        aabb.min[0] = Math.min(aabb.min[0], aabb2D.min[0]);
+        aabb.min[1] = Math.min(aabb.min[1], aabb2D.min[1]);
+        aabb.min[2] = Math.min(aabb.min[2], minZ);
+        aabb.max[0] = Math.max(aabb.max[0], aabb2D.max[0]);
+        aabb.max[1] = Math.max(aabb.max[1], aabb2D.max[1]);
+        aabb.max[2] = Math.max(aabb.max[2], maxZ);
+      } else {
+        aabb = {
+          min: [aabb2D.min[0], aabb2D.min[1], minZ],
+          max: [aabb2D.max[0], aabb2D.max[1], maxZ],
+        };
+      }
+    }
+    return aabb;
+  };
+
   const defaultEffectsData: EffectData[] = [
     {
       effectType: 'Scene3D::HemisphereLight',
@@ -411,6 +441,97 @@ namespace gdjs {
       booleanParameters: {},
     },
   ];
+
+  const customObjectEditorCapabilityBehaviors: BehaviorData[] = [
+    {
+      name: 'Animation',
+      type: 'AnimatableCapability::AnimatableBehavior',
+    },
+    { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
+    {
+      name: 'Flippable',
+      type: 'FlippableCapability::FlippableBehavior',
+    },
+    {
+      name: 'Object3D',
+      type: 'Scene3D::Base3DBehavior',
+    },
+    {
+      name: 'Opacity',
+      type: 'OpacityCapability::OpacityBehavior',
+    },
+    {
+      name: 'Resizable',
+      type: 'ResizableCapability::ResizableBehavior',
+    },
+    {
+      name: 'Scale',
+      type: 'ScalableCapability::ScalableBehavior',
+    },
+    {
+      name: 'Text',
+      type: 'TextContainerCapability::TextContainerBehavior',
+    },
+  ];
+
+  const getCustomObjectEditorBehaviors = (
+    eventsBasedObjectData: EventsBasedObjectData
+  ): Array<BehaviorData & any> => {
+    const behaviors = [...(eventsBasedObjectData.behaviors || [])];
+    const behaviorNames = new Set(
+      behaviors.map((behaviorData) => behaviorData.name)
+    );
+
+    // Keep all capabilities available for custom-object events, without
+    // replacing an actual behavior declared on the custom object.
+    for (const capabilityBehavior of customObjectEditorCapabilityBehaviors) {
+      if (!behaviorNames.has(capabilityBehavior.name)) {
+        behaviors.push(capabilityBehavior);
+      }
+    }
+    return behaviors;
+  };
+
+  const getCustomObjectEditorBehaviorsSharedData = (
+    runtimeGame: gdjs.RuntimeGame,
+    behaviors: Array<BehaviorData & any>
+  ): BehaviorSharedData[] => {
+    const behaviorTypesByName = new Map(
+      behaviors.map((behaviorData) => [behaviorData.name, behaviorData.type])
+    );
+    const sharedDataByBehaviorName = new Map<string, BehaviorSharedData>();
+
+    // Shared behavior settings live on layouts. Use the first matching
+    // settings so behavior constructors in the synthetic scene receive the
+    // same shape of data as they do in a normal scene.
+    for (const layoutData of runtimeGame.getGameData().layouts) {
+      for (const behaviorSharedData of layoutData.behaviorsSharedData) {
+        if (
+          behaviorTypesByName.get(behaviorSharedData.name) ===
+            behaviorSharedData.type &&
+          !sharedDataByBehaviorName.has(behaviorSharedData.name)
+        ) {
+          sharedDataByBehaviorName.set(
+            behaviorSharedData.name,
+            behaviorSharedData
+          );
+        }
+      }
+    }
+
+    // A behavior with shared properties may not be used by any layout yet.
+    // Supplying its identity avoids passing null to its constructor; generated
+    // behaviors then fall back to their declared property defaults.
+    for (const behaviorData of behaviors) {
+      if (!sharedDataByBehaviorName.has(behaviorData.name)) {
+        sharedDataByBehaviorName.set(behaviorData.name, {
+          name: behaviorData.name,
+          type: behaviorData.type,
+        });
+      }
+    }
+    return Array.from(sharedDataByBehaviorName.values());
+  };
 
   // TODO: factor this?
   const isMacLike =
@@ -598,35 +719,14 @@ namespace gdjs {
     }
 
     getAABB(): AABB3D | null {
-      let aabb: AABB3D | null = null;
-      for (const object of this._selectedObjects) {
-        if (is3D(object)) {
-          const aabb2D = object.getAABB();
-          const minZ = object.getUnrotatedAABBMinZ();
-          const maxZ = object.getUnrotatedAABBMaxZ();
-          if (aabb) {
-            aabb.min[0] = Math.min(aabb.min[0], aabb2D.min[0]);
-            aabb.min[1] = Math.min(aabb.min[1], aabb2D.min[1]);
-            aabb.min[2] = Math.min(aabb.min[2], minZ);
-            aabb.max[0] = Math.max(aabb.max[0], aabb2D.max[0]);
-            aabb.max[1] = Math.max(aabb.max[1], aabb2D.max[1]);
-            aabb.max[2] = Math.max(aabb.max[2], maxZ);
-          } else {
-            aabb = {
-              min: [aabb2D.min[0], aabb2D.min[1], minZ],
-              max: [aabb2D.max[0], aabb2D.max[1], maxZ],
-            };
-          }
-        }
-      }
-      return aabb;
+      return getObjectsAABB(this._selectedObjects, false);
     }
   }
 
   class ObjectMover {
     private editor: InGameEditor;
     private _changeHappened = false;
-    private startTime = 0;
+    private _isMoving = false;
 
     constructor(editor: InGameEditor) {
       this.editor = editor;
@@ -648,15 +748,17 @@ namespace gdjs {
     > = new Map();
 
     startMove() {
+      if (this._isMoving) return;
+      this._isMoving = true;
       this._changeHappened = false;
       this._objectInitialPositions.clear();
-      this.startTime = Date.now();
     }
 
     endMove(): boolean {
       const changeHappened = this._changeHappened;
       this._objectInitialPositions.clear();
       this._changeHappened = false;
+      this._isMoving = false;
       return changeHappened;
     }
 
@@ -674,10 +776,6 @@ namespace gdjs {
         scaleZ: float;
       }
     ) {
-      if (Date.now() - this.startTime < 150) {
-        // Avoid miss-clicks gizmo dragging point to change object positions.
-        return;
-      }
       selectedObjects.forEach((object) => {
         if (this.editor.isInstanceLocked(object)) {
           return;
@@ -1284,6 +1382,9 @@ namespace gdjs {
         return null;
       }
 
+      const customObjectEditorBehaviors = getCustomObjectEditorBehaviors(
+        eventsBasedObjectData
+      );
       const scene = new gdjs.RuntimeScene(this._runtimeGame);
       scene.loadFromScene({
         sceneData: {
@@ -1314,38 +1415,7 @@ namespace gdjs {
               variant: eventsBasedObjectVariantName,
               content: {},
               variables: [],
-              // Add all capabilities just in case events need them.
-              behaviors: [
-                {
-                  name: 'Animation',
-                  type: 'AnimatableCapability::AnimatableBehavior',
-                },
-                { name: 'Effect', type: 'EffectCapability::EffectBehavior' },
-                {
-                  name: 'Flippable',
-                  type: 'FlippableCapability::FlippableBehavior',
-                },
-                {
-                  name: 'Object3D',
-                  type: 'Scene3D::Base3DBehavior',
-                },
-                {
-                  name: 'Opacity',
-                  type: 'OpacityCapability::OpacityBehavior',
-                },
-                {
-                  name: 'Resizable',
-                  type: 'ResizableCapability::ResizableBehavior',
-                },
-                {
-                  name: 'Scale',
-                  type: 'ScalableCapability::ScalableBehavior',
-                },
-                {
-                  name: 'Text',
-                  type: 'TextContainerCapability::TextContainerBehavior',
-                },
-              ],
+              behaviors: customObjectEditorBehaviors,
               effects: [],
             },
           ],
@@ -1400,12 +1470,10 @@ namespace gdjs {
           name: eventsBasedObjectData.name,
           stopSoundsOnStartup: true,
           title: '',
-          behaviorsSharedData: [
-            {
-              name: 'Text',
-              type: 'TextContainerCapability::TextContainerBehavior',
-            },
-          ],
+          behaviorsSharedData: getCustomObjectEditorBehaviorsSharedData(
+            this._runtimeGame,
+            customObjectEditorBehaviors
+          ),
           usedResources: [],
         },
         usedExtensionsWithVariablesData:
@@ -1594,6 +1662,16 @@ namespace gdjs {
 
     getSelectionAABB(): AABB3D | null {
       return this._selection.getAABB();
+    }
+
+    getContentAABB(): AABB3D | null {
+      const editedInstanceContainer = this.getEditedInstanceContainer();
+      return editedInstanceContainer
+        ? getObjectsAABB(
+            editedInstanceContainer.getAdhocListOfAllInstances(),
+            true
+          )
+        : null;
     }
 
     setSelectedObjects(persistentUuids: Array<string>) {
@@ -2382,9 +2460,13 @@ namespace gdjs {
             const initialDummyPosition = new THREE.Vector3();
             const initialDummyRotation = new THREE.Euler();
             const initialDummyScale = new THREE.Vector3();
+            let xyzClickCursorX: float | null = null;
+            let xyzClickCursorY: float | null = null;
             threeTransformControls.addEventListener('change', (e) => {
               if (!threeTransformControls.dragging) {
                 this._selectionControlsMovementTotalDelta = null;
+                xyzClickCursorX = null;
+                xyzClickCursorY = null;
 
                 this._updateDummyLocation(
                   dummyThreeObject,
@@ -2402,6 +2484,27 @@ namespace gdjs {
                 initialDummyRotation.copy(dummyThreeObject.rotation);
                 initialDummyScale.copy(dummyThreeObject.scale);
                 return;
+              }
+
+              // Avoid moving the object on an XYZ-handle click without drag.
+              if (
+                this._transformControlsMode === 'translate' &&
+                threeTransformControls.axis === 'XYZ'
+              ) {
+                const inputManager = this._runtimeGame.getInputManager();
+                const cursorX = inputManager.getCursorX();
+                const cursorY = inputManager.getCursorY();
+                if (xyzClickCursorX === null) {
+                  xyzClickCursorX = cursorX;
+                  xyzClickCursorY = cursorY;
+                }
+                if (
+                  cursorX === xyzClickCursorX &&
+                  cursorY === xyzClickCursorY
+                ) {
+                  initialDummyPosition.copy(dummyThreeObject.position);
+                  return;
+                }
               }
 
               let translationX =
@@ -2509,6 +2612,15 @@ namespace gdjs {
                 !dummyThreeObject.position.equals(initialDummyPosition) ||
                 !dummyThreeObject.rotation.equals(initialDummyRotation) ||
                 !dummyThreeObject.scale.equals(initialDummyScale);
+
+              // Apply the movement to the selected objects right away,
+              // in the same tick as the gizmo update, so the object
+              // follows the gizmo without any visible delay.
+              this._objectMover.startMove();
+              this._objectMover.move(
+                this._selection.getSelectedObjects(),
+                this._selectionControlsMovementTotalDelta
+              );
             });
 
             this._selectionControls = {
@@ -3008,13 +3120,10 @@ namespace gdjs {
         inputManager.isKeyPressed(RIGHT_META_KEY);
       const isShiftKeyPressed = isShiftPressed(inputManager);
       const isAltKeyPressed = isAltPressed(inputManager);
+      const hasModifierKeyPressed =
+        isCtrlPressed || isMetaPressed || isAltKeyPressed || isShiftKeyPressed;
 
-      if (
-        !isCtrlPressed &&
-        !isMetaPressed &&
-        !isAltKeyPressed &&
-        !isShiftKeyPressed
-      ) {
+      if (!hasModifierKeyPressed && !inputManager.wasKeyJustPressed(TAB_KEY)) {
         return;
       }
 
@@ -3023,6 +3132,9 @@ namespace gdjs {
         .exceptionallyGetAllJustPressedKeys()) {
         const keyCode =
           exceptionallyGetKeyCodeFromLocationAwareKeyCode(locationAwareKeyCode);
+        if (!hasModifierKeyPressed && keyCode !== TAB_KEY) {
+          continue;
+        }
 
         const debuggerClient = this._runtimeGame._debuggerClient;
         if (debuggerClient) {
@@ -3203,6 +3315,71 @@ namespace gdjs {
         this._draggedNewObject = null;
         return;
       }
+    }
+
+    getNewInstanceDropPosition(): {
+      x: float;
+      y: float;
+      z: float;
+      layerName: string;
+    } | null {
+      const currentScene = this._currentScene;
+      if (!currentScene) return null;
+
+      const selectedLayer = this.getEditorLayer(this._selectedLayerName);
+      if (!selectedLayer) return null;
+
+      const isLayer3D = selectedLayer.getRenderer().getThreeGroup();
+      let cursorX: float;
+      let cursorY: float;
+      let cursorZ: float;
+      if (isLayer3D) {
+        const cameraX = selectedLayer.getCameraX();
+        const cameraY = selectedLayer.getCameraY();
+        const cameraZ = getCameraZ(currentScene, selectedLayer.getName(), 0);
+
+        const closestIntersect = this._getClosestIntersectionUnderCursor();
+        if (closestIntersect) {
+          cursorX = closestIntersect.point.x;
+          cursorY = -closestIntersect.point.y;
+          cursorZ = closestIntersect.point.z;
+        } else {
+          const projectedCursor = this._getProjectedCursor();
+          if (!projectedCursor) {
+            // Avoid to create an object behind the camera when it's dropped over the horizon.
+            return null;
+          }
+          cursorX = projectedCursor[0];
+          cursorY = projectedCursor[1];
+          cursorZ = 0;
+        }
+
+        const cursorDistance = Math.hypot(
+          cursorX - cameraX,
+          cursorY - cameraY,
+          cursorZ - cameraZ
+        );
+        if (
+          cursorDistance > selectedLayer.getInitialCamera3DFarPlaneDistance()
+        ) {
+          // Avoid to create an object outside of the rendered area.
+          return null;
+        }
+      } else {
+        const projectedCursor = this._getProjectedCursor();
+        if (!projectedCursor) return null;
+
+        cursorX = projectedCursor[0];
+        cursorY = projectedCursor[1];
+        cursorZ = 0;
+      }
+
+      return {
+        x: Math.round(cursorX),
+        y: Math.round(cursorY),
+        z: cursorZ,
+        layerName: selectedLayer.getName(),
+      };
     }
 
     /**

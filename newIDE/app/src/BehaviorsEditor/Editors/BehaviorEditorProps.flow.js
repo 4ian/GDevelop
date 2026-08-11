@@ -14,4 +14,5 @@ export type BehaviorEditorProps = {|
   resourceManagementProps: ResourceManagementProps,
   onBehaviorUpdated: () => void,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};

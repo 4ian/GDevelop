@@ -211,6 +211,7 @@ describe('SimplifiedProject', () => {
                 ],
                 "variables": Array [
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "A multiline
       str value",
@@ -220,16 +221,19 @@ describe('SimplifiedProject', () => {
                     "type": "Structure",
                     "variableChildren": Array [
                       Object {
+                        "enumValues": undefined,
                         "type": "Number",
                         "value": "564",
                         "variableName": "ObjectChild1",
                       },
                       Object {
+                        "enumValues": undefined,
                         "type": "String",
                         "value": "Guttentag",
                         "variableName": "ObjectChild2",
                       },
                       Object {
+                        "enumValues": undefined,
                         "type": "Boolean",
                         "value": "True",
                         "variableName": "ObjectChild3",
@@ -238,6 +242,7 @@ describe('SimplifiedProject', () => {
                         "type": "Array",
                         "variableChildren": Array [
                           Object {
+                            "enumValues": undefined,
                             "type": "Number",
                             "value": "856.5",
                             "variableName": "0",
@@ -558,6 +563,7 @@ describe('SimplifiedProject', () => {
                 "objectType": "Sprite",
                 "objectVariables": Array [
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "A multiline
       str value",
@@ -567,16 +573,19 @@ describe('SimplifiedProject', () => {
                     "type": "Structure",
                     "variableChildren": Array [
                       Object {
+                        "enumValues": undefined,
                         "type": "Number",
                         "value": "564",
                         "variableName": "ObjectChild1",
                       },
                       Object {
+                        "enumValues": undefined,
                         "type": "String",
                         "value": "Guttentag",
                         "variableName": "ObjectChild2",
                       },
                       Object {
+                        "enumValues": undefined,
                         "type": "Boolean",
                         "value": "True",
                         "variableName": "ObjectChild3",
@@ -585,6 +594,7 @@ describe('SimplifiedProject', () => {
                         "type": "Array",
                         "variableChildren": Array [
                           Object {
+                            "enumValues": undefined,
                             "type": "Number",
                             "value": "856.5",
                             "variableName": "0",
@@ -917,12 +927,14 @@ describe('SimplifiedProject', () => {
             "sceneName": "TestLayout",
             "sceneVariables": Array [
               Object {
+                "enumValues": undefined,
                 "type": "String",
                 "value": "A multiline
       str value",
                 "variableName": "Variable1",
               },
               Object {
+                "enumValues": undefined,
                 "type": "String",
                 "value": "123456",
                 "variableName": "Variable2",
@@ -931,11 +943,13 @@ describe('SimplifiedProject', () => {
                 "type": "Structure",
                 "variableChildren": Array [
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "Child1 str value",
                     "variableName": "Child1",
                   },
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "7891011",
                     "variableName": "Child2",
@@ -944,6 +958,7 @@ describe('SimplifiedProject', () => {
                     "type": "Structure",
                     "variableChildren": Array [
                       Object {
+                        "enumValues": undefined,
                         "type": "String",
                         "value": "Hello
       Multiline
@@ -960,17 +975,20 @@ describe('SimplifiedProject', () => {
                 "type": "Array",
                 "variableChildren": Array [
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "String value
       with Multiline",
                     "variableName": "0",
                   },
                   Object {
+                    "enumValues": undefined,
                     "type": "Number",
                     "value": "4539.42",
                     "variableName": "1",
                   },
                   Object {
+                    "enumValues": undefined,
                     "type": "Boolean",
                     "value": "True",
                     "variableName": "2",
@@ -982,16 +1000,19 @@ describe('SimplifiedProject', () => {
                 "type": "Array",
                 "variableChildren": Array [
                   Object {
+                    "enumValues": undefined,
                     "type": "String",
                     "value": "PlayerName",
                     "variableName": "0",
                   },
                   Object {
+                    "enumValues": undefined,
                     "type": "Number",
                     "value": "25",
                     "variableName": "1",
                   },
                   Object {
+                    "enumValues": undefined,
                     "type": "Boolean",
                     "value": "False",
                     "variableName": "2",

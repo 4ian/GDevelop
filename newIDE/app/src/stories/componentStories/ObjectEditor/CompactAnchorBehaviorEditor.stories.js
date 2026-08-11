@@ -11,8 +11,6 @@ import CompactAnchorBehaviorEditor from '../../../ObjectEditor/CompactObjectProp
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
-const gd: libGDevelop = global.gd;
-
 export default {
   title: 'ObjectEditor/CompactAnchorBehaviorEditor',
   component: CompactAnchorBehaviorEditor,
@@ -22,10 +20,6 @@ export default {
 export const Default = (): React.Node => {
   const spriteObjectWithBehaviors = testProject.spriteObjectWithBehaviors;
   const anchorBehavior = spriteObjectWithBehaviors.getBehavior('Anchor');
-  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-    gd.JsPlatform.get(),
-    'AnchorBehavior::AnchorBehavior'
-  );
 
   return (
     <SerializedObjectDisplay object={spriteObjectWithBehaviors}>
@@ -33,7 +27,7 @@ export const Default = (): React.Node => {
         project={testProject.project}
         behaviors={[anchorBehavior]}
         object={spriteObjectWithBehaviors}
-        behaviorMetadata={behaviorMetadata}
+        behaviorTypeName="AnchorBehavior::AnchorBehavior"
         onOpenFullEditor={action('onOpenFullEditor')}
         onBehaviorUpdated={action('onBehaviorUpdated')}
         resourceManagementProps={fakeResourceManagementProps}

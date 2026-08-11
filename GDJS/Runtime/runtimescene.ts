@@ -13,6 +13,9 @@ namespace gdjs {
    */
   export class RuntimeScene extends gdjs.RuntimeInstanceContainer {
     _eventsFunction: null | ((runtimeScene: RuntimeScene) => void) = null;
+    _sceneUnloadLifecycleFunction: null | ((
+      runtimeScene: RuntimeScene
+    ) => void) = null;
     _idToCallbackMap: null | Map<
       string,
       (
@@ -22,19 +25,25 @@ namespace gdjs {
     > = null;
     _renderer: RuntimeSceneRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
+    _signalBus?: gdjs.SignalBus;
     _variables: gdjs.VariablesContainer;
     _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _runtimeGame: gdjs.RuntimeGame;
     _lastId: integer = 0;
+    private _runtimeObjectsByUniqueId = new Map<integer, gdjs.RuntimeObject>();
     _name: string = '';
     _timeManager: TimeManager;
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _resourcesUnloading: 'at-scene-exit' | 'never' | 'inherit' = 'inherit';
     private _asyncTasksManager = new gdjs.AsyncTasksManager();
+    private _objectGroups = new Map<string, string[]>();
+    private _signalAnimationDebugDrawEnabled: boolean = false;
+    private _lastSentSignalDiagnosticsSignature: string = '';
 
     /** True if loadFromScene was called and the scene is being played. */
     _isLoaded: boolean = false;
+    private _isUnloading: boolean = false;
     /** True in the first frame after resuming the paused scene */
     _isJustResumed: boolean = false;
 
@@ -87,6 +96,10 @@ namespace gdjs {
         runtimeGame ? runtimeGame.getRenderer() : null
       );
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+      const displaySignalAnimations = runtimeGame
+        ? runtimeGame.getGameData().properties.displaySignalAnimations
+        : false;
+      this._signalAnimationDebugDrawEnabled = !!displaySignalAnimations;
 
       // What to do after the frame is rendered.
 
@@ -148,6 +161,21 @@ namespace gdjs {
 
       if (this._isLoaded) {
         this.unloadScene();
+      }
+      this._isUnloading = false;
+
+      this._objectGroups.clear();
+      const setObjectGroup = (objectGroupData: ObjectGroupData) => {
+        this._objectGroups.set(
+          objectGroupData.name,
+          objectGroupData.objects.map(({ name }) => name)
+        );
+      };
+      for (const objectGroupData of this.getGame().getInitialObjectGroupsData()) {
+        setObjectGroup(objectGroupData);
+      }
+      for (const objectGroupData of sceneData.objectsGroups || []) {
+        setObjectGroup(objectGroupData);
       }
 
       //Setup main properties
@@ -291,8 +319,26 @@ namespace gdjs {
      * rendered on the screen.
      */
     unloadScene() {
-      if (!this._isLoaded) {
+      if (!this._isLoaded || this._isUnloading) {
         return;
+      }
+      this._isUnloading = true;
+
+      // Run author cleanup while the scene, its variables and all objects are
+      // still alive. Clear the slot first so recursive unload requests cannot
+      // execute it twice.
+      const sceneUnloadLifecycleFunction =
+        this._sceneUnloadLifecycleFunction;
+      this._sceneUnloadLifecycleFunction = null;
+      if (sceneUnloadLifecycleFunction) {
+        try {
+          sceneUnloadLifecycleFunction(this);
+        } catch (error) {
+          logger.error(
+            'An error occurred in the scene unload lifecycle function: ' +
+              (error instanceof Error ? error.stack || error.message : error)
+          );
+        }
       }
       if (this._profiler) {
         this.stopProfiler();
@@ -341,8 +387,19 @@ namespace gdjs {
       >();
       this._initialBehaviorSharedData = new Hashtable();
       this._eventsFunction = null;
+      this._sceneUnloadLifecycleFunction = null;
+      this._idToCallbackMap = null;
       this._lastId = 0;
+      this._runtimeObjectsByUniqueId.clear();
       this.networkId = null;
+      this._objectGroups.clear();
+    }
+
+    /**
+     * Return the object names declared in an object group.
+     */
+    getObjectNamesInGroup(objectGroupName: string): string[] {
+      return this._objectGroups.get(objectGroupName) || [];
     }
 
     /**
@@ -356,13 +413,18 @@ namespace gdjs {
       const module = gdjs[sceneData.mangledName + 'Code'];
       if (module && module.func) {
         this._eventsFunction = module.func;
-        this._idToCallbackMap =
-          gdjs[sceneData.mangledName + 'Code'].idToCallbackMap;
+        this._idToCallbackMap = module.idToCallbackMap;
+        if (!this._isUnloading) {
+          this._sceneUnloadLifecycleFunction = module.sceneUnload || null;
+        }
       } else {
         setupWarningLogger.warn(
           'No function found for running logic of scene ' + this._name
         );
         this._eventsFunction = function () {};
+        if (!this._isUnloading) {
+          this._sceneUnloadLifecycleFunction = null;
+        }
       }
     }
 
@@ -475,7 +537,14 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      if (this._debugDrawEnabled) {
+      if (
+        this._debugDrawEnabled &&
+        this._debuggerRenderer.isDebugDrawRefreshNeeded(
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        )
+      ) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
           this._debugDrawShowHiddenInstances,
@@ -483,8 +552,129 @@ namespace gdjs {
           this._debugDrawShowCustomPoints
         );
       }
+      if (this._signalAnimationDebugDrawEnabled) {
+        const signalAnimationDebugRecords = this._signalBus
+          ? this._signalBus.getSignalAnimationDebugRecords()
+          : [];
+        const queuedSignalsCount = this._signalBus
+          ? this._signalBus.getQueuedSignalsCount()
+          : 0;
+        this._debuggerRenderer.renderSignalDebugDraw(
+          signalAnimationDebugRecords,
+          queuedSignalsCount
+        );
+      } else {
+        this._debuggerRenderer.clearSignalDebugDraw();
+      }
+      this._sendSignalDiagnostics(
+        this._signalBus ? this._signalBus.getDebugInfo() : null
+      );
 
       this._renderer.render();
+    }
+
+    /**
+     * Activate or deactivate the debug visualization for signal delivery.
+     */
+    enableSignalAnimationDebugDraw(enableSignalAnimationDebugDraw: boolean) {
+      if (
+        this._signalAnimationDebugDrawEnabled &&
+        !enableSignalAnimationDebugDraw
+      ) {
+        this._debuggerRenderer.clearSignalDebugDraw();
+      }
+
+      this._lastSentSignalDiagnosticsSignature = '';
+      this._signalAnimationDebugDrawEnabled = enableSignalAnimationDebugDraw;
+    }
+
+    isSignalAnimationDebugDrawEnabled(): boolean {
+      return this._signalAnimationDebugDrawEnabled;
+    }
+
+    isSignalMonitorDebugEnabled(): boolean {
+      return (
+        !!this._runtimeGame &&
+        typeof this._runtimeGame.isPreview === 'function' &&
+        this._runtimeGame.isPreview()
+      );
+    }
+
+    private _getSignalDiagnosticsSignature(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): string {
+      if (!signalDiagnostics) {
+        return 'disabled';
+      }
+
+      let signature =
+        signalDiagnostics.queuedSignalsCount +
+        ':' +
+        signalDiagnostics.emittedSignalsCount +
+        ':' +
+        signalDiagnostics.throttledSignalsCount +
+        ':' +
+        signalDiagnostics.deliveredSignalsThisFrameCount +
+        ':' +
+        signalDiagnostics.receiversThisFrameCount +
+        ':' +
+        signalDiagnostics.signalsThisFrame.length +
+        ':' +
+        signalDiagnostics.recentSignals.length;
+
+      for (
+        let i = 0, len = signalDiagnostics.signalsThisFrame.length;
+        i < len;
+        ++i
+      ) {
+        const signal = signalDiagnostics.signalsThisFrame[i];
+        signature +=
+          '|' +
+          signal.id +
+          ':' +
+          signal.status +
+          ':' +
+          signal.name +
+          ':' +
+          signal.payload +
+          ':' +
+          signal.target +
+          ':' +
+          signal.receivers.length +
+          ':' +
+          signal.receiverPositions.length +
+          ':' +
+          signal.targetPositions.length;
+
+        if (signal.source) {
+          signature +=
+            ':' + signal.source.objectName + '#' + signal.source.objectId;
+        }
+
+        for (let j = 0, lenj = signal.receivers.length; j < lenj; ++j) {
+          signature += ':' + signal.receivers[j];
+        }
+      }
+
+      return signature;
+    }
+
+    private _sendSignalDiagnostics(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): void {
+      const debuggerClient =
+        this._runtimeGame && this._runtimeGame._debuggerClient;
+      if (!debuggerClient || !this.isSignalMonitorDebugEnabled()) {
+        return;
+      }
+
+      const signature = this._getSignalDiagnosticsSignature(signalDiagnostics);
+      if (signature === this._lastSentSignalDiagnosticsSignature) {
+        return;
+      }
+
+      this._lastSentSignalDiagnosticsSignature = signature;
+      debuggerClient.sendSignalDiagnostics(signalDiagnostics);
     }
 
     /**
@@ -500,6 +690,14 @@ namespace gdjs {
         super._updateObjectsPreRender();
         return;
       } else {
+        for (
+          let i = 0;
+          i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+          ++i
+        ) {
+          gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+        }
+
         // After first frame, optimise rendering by setting only objects
         // near camera as visible.
         // TODO: For compatibility, pass a scale of `2`,
@@ -612,6 +810,26 @@ namespace gdjs {
     /**
      * Create an identifier for a new object of the scene.
      */
+    _registerRuntimeObject(runtimeObject: gdjs.RuntimeObject): void {
+      this._runtimeObjectsByUniqueId.set(
+        runtimeObject.getUniqueId(),
+        runtimeObject
+      );
+    }
+
+    _unregisterRuntimeObject(runtimeObject: gdjs.RuntimeObject): void {
+      if (
+        this._runtimeObjectsByUniqueId.get(runtimeObject.getUniqueId()) ===
+        runtimeObject
+      ) {
+        this._runtimeObjectsByUniqueId.delete(runtimeObject.getUniqueId());
+      }
+    }
+
+    getRuntimeObjectByUniqueId(objectId: integer): gdjs.RuntimeObject | null {
+      return this._runtimeObjectsByUniqueId.get(objectId) || null;
+    }
+
     createNewUniqueId(): integer {
       this._lastId++;
       return this._lastId;

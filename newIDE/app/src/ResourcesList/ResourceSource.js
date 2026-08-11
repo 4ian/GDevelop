@@ -46,7 +46,7 @@ export const allResourceKindsAndMetadata = [
   {
     kind: 'image',
     displayName: (t`Image`: any),
-    fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
+    fileExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'],
     createNewResource: (): gdImageResource => new gd.ImageResource(),
   },
   {
@@ -132,6 +132,9 @@ export type ChooseResourceOptions = {|
   initialSourceName: string,
   multiSelection: boolean,
   resourceKind: ResourceKind,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
 |};
 
 export type ResourceImportationBehavior = 'import' | 'relative' | 'ask';

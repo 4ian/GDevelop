@@ -46,6 +46,7 @@ type Props = {|
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
   isAdvancedSectionInitiallyUncollapsed?: boolean,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const PropertiesEditorByVisibility = ({
@@ -60,6 +61,7 @@ const PropertiesEditorByVisibility = ({
   resourceManagementProps,
   placeholder,
   isAdvancedSectionInitiallyUncollapsed,
+  hideConstantPlaceholderHints,
 }: Props): ?(false | 0 | '' | React$Portal | React.Node) => {
   const [
     shouldShowDeprecatedProperties,
@@ -112,6 +114,7 @@ const PropertiesEditorByVisibility = ({
         projectScopedContainersAccessor={projectScopedContainersAccessor}
         renderExtraDescriptionText={renderExtraDescriptionText}
         unsavedChanges={unsavedChanges}
+        hideConstantPlaceholderHints={hideConstantPlaceholderHints}
       />
       {(advancedPropertiesSchema.length > 0 ||
         deprecatedPropertiesSchema.length > 0) && (
@@ -137,6 +140,7 @@ const PropertiesEditorByVisibility = ({
                 }
                 renderExtraDescriptionText={renderExtraDescriptionText}
                 unsavedChanges={unsavedChanges}
+                hideConstantPlaceholderHints={hideConstantPlaceholderHints}
               />
               {deprecatedPropertiesSchema.length > 0 &&
                 (shouldShowDeprecatedProperties ? (
@@ -151,6 +155,7 @@ const PropertiesEditorByVisibility = ({
                     }
                     renderExtraDescriptionText={renderExtraDescriptionText}
                     unsavedChanges={unsavedChanges}
+                    hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                   />
                 ) : (
                   <Line justifyContent="center">

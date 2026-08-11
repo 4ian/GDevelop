@@ -36,6 +36,7 @@ const getOptions = () => {
   if (!options) {
     options = [
       <SelectOption key="string" label={t`Text`} value={gd.Variable.String} />,
+      <SelectOption key="enum" label={t`Enum`} value={gd.Variable.Enum} />,
       <SelectOption
         key="number"
         label={t`Number`}
@@ -62,6 +63,7 @@ export const getVariableTypeToIcon = (): { [Variable_Type]: any } => {
     variableTypeToIcon = {
       [gd.Variable.MixedTypes]: VariableMixedTypesIcon,
       [gd.Variable.String]: VariableStringIcon,
+      [gd.Variable.Enum]: VariableStringIcon,
       [gd.Variable.Number]: VariableNumberIcon,
       [gd.Variable.Boolean]: VariableBooleanIcon,
       [gd.Variable.Array]: VariableArrayIcon,
@@ -75,6 +77,7 @@ const getVariableTypeToString = () => {
   if (!variableTypeToString) {
     variableTypeToString = {
       [gd.Variable.String]: 'string',
+      [gd.Variable.Enum]: 'enum',
       [gd.Variable.Number]: 'number',
       [gd.Variable.Boolean]: 'boolean',
       [gd.Variable.Array]: 'array',

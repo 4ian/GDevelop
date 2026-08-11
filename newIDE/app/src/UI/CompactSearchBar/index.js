@@ -5,8 +5,11 @@ import classNames from 'classnames';
 import classes from './CompactSearchBar.module.css';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import Search from '../CustomSvgIcons/Search';
+import Cross from '../CustomSvgIcons/Cross';
+import IconButton from '../IconButton';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { t } from '@lingui/macro';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 
 export type CompactSearchBarInterface = {|
   focus: () => void,
@@ -33,6 +36,7 @@ const CompactSearchBar: React.ComponentType<{
   ) => {
     const idToUse = React.useRef<string>(id || makeTimestampedId());
     const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const { isMobile } = useResponsiveWindowSize();
 
     React.useImperativeHandle(ref, () => ({
       focus: () => {
@@ -42,6 +46,14 @@ const CompactSearchBar: React.ComponentType<{
         if (inputRef.current) inputRef.current.blur();
       },
     }));
+
+    const clearSearch = React.useCallback(
+      () => {
+        onChange('');
+        if (!isMobile && inputRef.current) inputRef.current.focus();
+      },
+      [isMobile, onChange]
+    );
 
     return (
       <I18n>
@@ -75,6 +87,17 @@ const CompactSearchBar: React.ComponentType<{
                 }}
                 placeholder={i18n._(placeholder || t`Search`)}
               />
+              {!!value && !disabled && (
+                <IconButton
+                  className={classes.clearButton}
+                  color="default"
+                  size="small"
+                  onClick={clearSearch}
+                  tooltip={t`Clear search`}
+                >
+                  <Cross className={classes.clearIcon} />
+                </IconButton>
+              )}
             </div>
           </div>
         )}

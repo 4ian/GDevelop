@@ -16,6 +16,7 @@ import {
   type EditorTab,
   type EditorKind,
   getEditorTabOpenedWithKey,
+  getAllEditorTabs,
   changeCurrentTab,
   closeEditorTab,
   closeOtherEditorTabs,
@@ -25,6 +26,7 @@ import {
 } from './EditorTabs/EditorTabsHandler';
 import { type PreviewState } from './PreviewState';
 import {
+  type OpenLayoutHandler,
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
   type ObjectsOutsideEditorChanges,
@@ -68,6 +70,7 @@ import { type OpenAskAiOptions } from '../AiGeneration/Utils';
 import { type GameplayTestsCallbacks } from '../GameplayTests/GameplayTestRunner';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
+import { useActiveEmbeddedGameFrameHoleCount } from '../EmbeddedGame/EmbeddedGameFrameHole';
 
 const styles = {
   container: {
@@ -81,11 +84,13 @@ const styles = {
 
 const shouldRemovePointerEvents = (
   kind: EditorKind,
-  gameEditorMode: 'embedded-game' | 'instances-editor'
+  gameEditorMode: 'embedded-game' | 'instances-editor',
+  hasActiveEmbeddedGameFrameHole: boolean
 ) => {
-  if (gameEditorMode === 'embedded-game') {
-    // Scene editors can have an embedded game, so they redefine manually
-    // which components can have clicks/touches.
+  if (gameEditorMode === 'embedded-game' && hasActiveEmbeddedGameFrameHole) {
+    // Scene editors can have an embedded game, so they redefine manually which
+    // components can have clicks/touches. Do this only while the iframe hole is
+    // actually active, as debugger state can outlive the visible editor.
     return (
       kind === 'layout' ||
       kind === 'external layout' ||
@@ -103,6 +108,7 @@ export type EditorTabsPaneCommonProps = {|
   isSavingProject: boolean,
   isSharingEnabled: boolean,
   hasPreviewsRunning: boolean,
+  isPreviewLaunchInProgress: boolean,
   previewState: PreviewState,
   checkedOutVersionStatus: ?OpenedVersionStatus,
   canDoNetworkPreview: boolean,
@@ -115,7 +121,9 @@ export type EditorTabsPaneCommonProps = {|
 
   // Callbacks from MainFrame
   toggleProjectManager: () => void,
+  isProjectManagerPinned: boolean,
   saveProject: () => Promise<?FileMetadata>,
+  autoSaveConstants: (constants: Object) => Promise<boolean>,
   saveProjectAsWithStorageProvider: (
     options: ?{|
       requestedStorageProvider?: StorageProvider,
@@ -131,11 +139,20 @@ export type EditorTabsPaneCommonProps = {|
     versionId: string
   ) => Promise<?ExpandedCloudProjectVersion>,
   openShareDialog: (tab?: ShareTab) => void,
-  launchDebuggerAndPreview: () => void,
-  launchNewPreview: (?{ numberOfWindows: number }) => Promise<void>,
+  launchDebuggerAndPreview: () => void | Promise<void>,
+  launchNewPreview: (
+    ?{|
+      numberOfWindows?: number,
+      forceAlwaysOnTopInPreview?: boolean,
+    |}
+  ) => Promise<void>,
   launchNetworkPreview: () => Promise<void>,
   launchHotReloadPreview: () => Promise<void>,
   launchPreviewWithDiagnosticReport: () => Promise<void>,
+  displayCollisionShapesInPreview: boolean,
+  setDisplayCollisionShapesInPreview: boolean => void,
+  displaySignalAnimationsInPreview: boolean,
+  setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: (override: {|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -147,6 +164,8 @@ export type EditorTabsPaneCommonProps = {|
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+  onCreateStickyNote: () => void,
+  isStickyNotesManagerShown: boolean,
   gameplayTestsCallbacks: GameplayTestsCallbacks,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
@@ -156,18 +175,7 @@ export type EditorTabsPaneCommonProps = {|
     eventsBasedObjectVariantName: string | null,
   |}) => void,
   openExternalEvents: (name: string) => void,
-  openLayout: (
-    name: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  openLayout: OpenLayoutHandler,
   openTemplateFromTutorial: (tutorialId: string) => Promise<void>,
   openTemplateFromCourseChapter: (
     courseChapter: CourseChapter,
@@ -192,6 +200,14 @@ export type EditorTabsPaneCommonProps = {|
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventsBasedObject: gdEventsBasedObject,
     variantName: string
+  ) => void,
+  onOpenPrefabDetailEditor: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject
   ) => void,
   onOpenEventsFunctionsExtension: (
     extensionName: string,
@@ -305,11 +321,15 @@ export type EditorTabsPaneCommonProps = {|
   |}) => Promise<void>,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
-  onExternalLayoutAssociationChanged: () => void,
+  onExternalAssociationChanged: () => void,
   triggerHotReloadInGameEditorIfNeeded: () => void,
   gamesList: GamesList,
 
   setEditorTabs: (editorTabs: EditorTabsState) => void,
+  onFocusedEditorTabChange: (
+    editorTab: EditorTab,
+    options?: {| force?: boolean |}
+  ) => void,
 |};
 
 type Props = {|
@@ -347,7 +367,9 @@ const EditorTabsPane: React.ComponentType<{
     canDoNetworkPreview,
     gamesPlatformFrameTools,
     toggleProjectManager,
+    isProjectManagerPinned,
     saveProject,
+    autoSaveConstants,
     saveProjectAsWithStorageProvider,
     onCheckoutVersion,
     getOrLoadProjectVersion,
@@ -357,11 +379,17 @@ const EditorTabsPane: React.ComponentType<{
     launchNetworkPreview,
     launchHotReloadPreview,
     launchPreviewWithDiagnosticReport,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
     setPreviewOverride,
     openVersionHistoryPanel,
     onQuitVersionHistory,
     onOpenAskAi,
     onCloseAskAi,
+    onCreateStickyNote,
+    isStickyNotesManagerShown,
     gameplayTestsCallbacks,
     getStorageProvider,
     setPreviewedLayout,
@@ -375,6 +403,8 @@ const EditorTabsPane: React.ComponentType<{
     onCreateEventsFunction,
     openInstructionOrExpression,
     onOpenCustomObjectEditor,
+    onOpenPrefabDetailEditor,
+    onOpenPrefabSettings,
     onOpenEventsFunctionsExtension,
     onRenamedEventsBasedObject,
     onDeletedEventsBasedObject,
@@ -423,10 +453,11 @@ const EditorTabsPane: React.ComponentType<{
     onExtensionInstalled,
     onEffectAdded,
     onObjectListsModified,
-    onExternalLayoutAssociationChanged,
+    onExternalAssociationChanged,
     triggerHotReloadInGameEditorIfNeeded,
     gamesList,
     setEditorTabs,
+    onFocusedEditorTabChange,
     onSetPointerEventsNone,
     paneIdentifier,
     isLeftMostPane,
@@ -445,6 +476,8 @@ const EditorTabsPane: React.ComponentType<{
     rightPaneDrawerOpen,
   } = props;
 
+  const hasActiveEmbeddedGameFrameHole =
+    useActiveEmbeddedGameFrameHoleCount() > 0;
   const toolbarRef = React.useRef<?ToolbarInterface>(null);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const askAiPaneIdentifier = getEditorTabOpenedWithKey(editorTabs, 'ask-ai');
@@ -457,7 +490,11 @@ const EditorTabsPane: React.ComponentType<{
 
   const onSetGamesPlatformFrameShown = React.useCallback(
     ({ shown, isMobile }: {| shown: boolean, isMobile: boolean |}) => {
-      onSetPointerEventsNone(shown);
+      // The games platform iframe only needs clicks to pass through the start
+      // page content. Disabling the entire pane is too broad: if the iframe
+      // visibility state gets out of sync, every editor in the pane stops
+      // receiving input.
+      onSetPointerEventsNone(false);
       setTabsTitleBarAndEditorToolbarHidden(shown && isMobile);
     },
     [onSetPointerEventsNone]
@@ -496,27 +533,22 @@ const EditorTabsPane: React.ComponentType<{
   // Tab management functions
   const onEditorTabActivated = React.useCallback(
     (editorTab: EditorTab) => {
-      updateToolbar();
-      // Ensure the editors shown on the screen are updated. This is for
-      // example useful if global objects have been updated in another editor.
-      if (editorTab.editorRef) {
-        editorTab.editorRef.forceUpdateEditor();
+      if (paneIdentifier === 'center') {
+        onFocusedEditorTabChange(editorTab);
       }
     },
-    [updateToolbar]
+    [onFocusedEditorTabChange, paneIdentifier]
   );
 
   const onChangeEditorTab = React.useCallback(
     (value: number) => {
       const newEditorTabs = changeCurrentTab(editorTabs, paneIdentifier, value);
       setEditorTabs(newEditorTabs);
-
-      const newCurrentTab = getCurrentTabForPane(newEditorTabs, paneIdentifier);
-      if (newCurrentTab) {
-        onEditorTabActivated(newCurrentTab);
-      }
+      // The new active prop renders the selected editor and ClosableTab reports
+      // its activation after that commit. Doing either operation imperatively
+      // here would render a large events sheet again while switching tabs.
     },
-    [editorTabs, setEditorTabs, onEditorTabActivated, paneIdentifier]
+    [editorTabs, setEditorTabs, paneIdentifier]
   );
 
   const onCloseEditorTab = React.useCallback(
@@ -637,7 +669,10 @@ const EditorTabsPane: React.ComponentType<{
         <TabsTitlebar
           isLeftMostPane={isLeftMostPane}
           isRightMostPane={isRightMostPane}
-          displayMenuIcon={paneIdentifier === 'center'}
+          displayMenuIcon={
+            paneIdentifier === 'center' && !isProjectManagerPinned
+          }
+          displayLeftSafeMargins={!isProjectManagerPinned}
           hidden={tabsTitleBarAndEditorToolbarHidden}
           toggleProjectManager={toggleProjectManager}
           renderTabs={(onEditorTabHovered, clearTooltipOnTabClose) => (
@@ -706,6 +741,9 @@ const EditorTabsPane: React.ComponentType<{
                 !rightPaneDrawerOpen
           }
           onAskAiClicked={onOpenAskAiFromTitlebar}
+          displayStickyNotes={!!currentProject && isRightMostPane}
+          onStickyNotesClicked={onCreateStickyNote}
+          isStickyNotesManagerShown={isStickyNotesManagerShown}
         />
       )}
       <Toolbar
@@ -732,10 +770,18 @@ const EditorTabsPane: React.ComponentType<{
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
         onLaunchPreviewWithDiagnosticReport={launchPreviewWithDiagnosticReport}
+        displayCollisionShapesInPreview={displayCollisionShapesInPreview}
+        setDisplayCollisionShapesInPreview={setDisplayCollisionShapesInPreview}
+        displaySignalAnimationsInPreview={displaySignalAnimationsInPreview}
+        setDisplaySignalAnimationsInPreview={
+          setDisplaySignalAnimationsInPreview
+        }
         canDoNetworkPreview={canDoNetworkPreview}
         setPreviewOverride={setPreviewOverride}
         isPreviewEnabled={
-          !!currentProject && currentProject.getLayoutsCount() > 0
+          !!currentProject &&
+          currentProject.getLayoutsCount() > 0 &&
+          !props.isPreviewLaunchInProgress
         }
         previewState={previewState}
         onOpenVersionHistory={openVersionHistoryPanel}
@@ -800,6 +846,7 @@ const EditorTabsPane: React.ComponentType<{
                     showRestartInGameEditorAfterErrorButton,
                     resourceManagementProps,
                     onSave: saveProject,
+                    onAutoSaveConstants: autoSaveConstants,
                     onSaveProjectAsWithStorageProvider: saveProjectAsWithStorageProvider,
                     canSave,
                     onCheckoutVersion,
@@ -807,6 +854,8 @@ const EditorTabsPane: React.ComponentType<{
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     onOpenCustomObjectEditor: onOpenCustomObjectEditor,
+                    onOpenPrefabDetailEditor: onOpenPrefabDetailEditor,
+                    onOpenPrefabSettings: onOpenPrefabSettings,
                     onOpenEventsFunctionsExtension,
                     onRenamedEventsBasedObject: onRenamedEventsBasedObject,
                     onDeletedEventsBasedObject: onDeletedEventsBasedObject,
@@ -855,6 +904,12 @@ const EditorTabsPane: React.ComponentType<{
                         currentProject,
                         extension
                       );
+                      for (const editorTab of getAllEditorTabs(editorTabs)) {
+                        const { editorRef } = editorTab;
+                        if (editorRef) {
+                          editorRef.forceUpdateEditor();
+                        }
+                      }
                     },
                     onDeleteResource: (
                       resource: gdResource,
@@ -897,7 +952,7 @@ const EditorTabsPane: React.ComponentType<{
                     onExtensionInstalled: onExtensionInstalled,
                     onEffectAdded: onEffectAdded,
                     onObjectListsModified: onObjectListsModified,
-                    onExternalLayoutAssociationChanged,
+                    onExternalAssociationChanged,
                     triggerHotReloadInGameEditorIfNeeded: triggerHotReloadInGameEditorIfNeeded,
                     gamesList,
                     gamesPlatformFrameTools,
@@ -913,8 +968,13 @@ const EditorTabsPane: React.ComponentType<{
                 removePointerEvents={
                   // Deactivate pointer events when the play tab is active, so the iframe
                   // can be interacted with.
-                  gamesPlatformFrameTools.iframeVisible ||
-                  shouldRemovePointerEvents(editorTab.kind, gameEditorMode)
+                  (editorTab.kind === 'start page' &&
+                    gamesPlatformFrameTools.iframeVisible) ||
+                  shouldRemovePointerEvents(
+                    editorTab.kind,
+                    gameEditorMode,
+                    hasActiveEmbeddedGameFrameHole
+                  )
                 }
               >
                 {editorContent}

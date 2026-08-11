@@ -26,6 +26,22 @@ namespace gdjs {
       ? true
       : false;
 
+  const getCanvasResolution = (): number =>
+    typeof window === 'undefined'
+      ? 1
+      : Math.max(1, window.devicePixelRatio || 1);
+
+  type PreviewOverlayInputInterceptor = {
+    isBlockingPointer: (x: float, y: float) => boolean;
+    handleWheel?: (
+      x: float,
+      y: float,
+      deltaY: float,
+      deltaX: float,
+      deltaZ: float
+    ) => boolean;
+  };
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    * @category Renderers > Game
@@ -46,11 +62,16 @@ namespace gdjs {
     private _threeRenderer: THREE.WebGLRenderer | null = null;
     private _gameCanvas: HTMLCanvasElement | null = null;
     private _domElementsContainer: HTMLDivElement | null = null;
+    private _previewOverlayInputInterceptor: PreviewOverlayInputInterceptor | null =
+      null;
+    private _mouseInputBlockedByPreviewOverlay: boolean = false;
+    private _touchesBlockedByPreviewOverlay: Set<number> = new Set();
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
     _canvasWidth: float = 0;
     // Current height of the canvas (might be scaled down/up compared to renderer)
     _canvasHeight: float = 0;
+    private _canvasResolution: float = 1;
 
     _keepRatio: boolean = true;
     _marginLeft: any;
@@ -104,6 +125,9 @@ namespace gdjs {
     initializeRenderers(gameCanvas: HTMLCanvasElement): void {
       this._throwIfDisposed();
 
+      const canvasResolution = getCanvasResolution();
+      this._canvasResolution = canvasResolution;
+
       if (typeof THREE !== 'undefined') {
         this._threeRenderer = new THREE.WebGLRenderer({
           canvas: gameCanvas,
@@ -115,9 +139,8 @@ namespace gdjs {
         });
         this._threeRenderer.shadowMap.enabled = true;
         this._threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
-        this._threeRenderer.pixelRatio = window.devicePixelRatio;
+        this._threeRenderer.setPixelRatio(canvasResolution);
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
@@ -136,7 +159,7 @@ namespace gdjs {
           preserveDrawingBuffer: true, // Keep to true to allow screenshots.
           antialias: false,
           backgroundAlpha: 0,
-          // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+          resolution: canvasResolution,
         });
       } else {
         // Create the renderer and setup the rendering area.
@@ -148,6 +171,7 @@ namespace gdjs {
           view: gameCanvas,
           preserveDrawingBuffer: true,
           antialias: false,
+          resolution: canvasResolution,
         }) as PIXI.Renderer;
       }
 
@@ -287,26 +311,35 @@ namespace gdjs {
     private _resizeCanvas() {
       if (!this._pixiRenderer || !this._domElementsContainer) return;
 
+      const canvasResolution = getCanvasResolution();
+
       // Set the Pixi (and/or Three) renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
       // should be done with the size set on the game.
       if (
-        this._pixiRenderer.width !== this._game.getGameResolutionWidth() ||
-        this._pixiRenderer.height !== this._game.getGameResolutionHeight()
+        this._pixiRenderer.screen.width !==
+          this._game.getGameResolutionWidth() ||
+        this._pixiRenderer.screen.height !==
+          this._game.getGameResolutionHeight() ||
+        canvasResolution !== this._canvasResolution
       ) {
         // TODO (3D): It might be useful to resize pixi view in 3D depending on FOV value
         // to enable a mode where pixi always fills the whole screen.
+        this._pixiRenderer.resolution = canvasResolution;
         this._pixiRenderer.resize(
           this._game.getGameResolutionWidth(),
           this._game.getGameResolutionHeight()
         );
 
-        if (this._threeRenderer) {
-          this._threeRenderer.setSize(
+        const threeRenderer = this._threeRenderer;
+        if (threeRenderer) {
+          threeRenderer.setPixelRatio(canvasResolution);
+          threeRenderer.setSize(
             this._game.getGameResolutionWidth(),
             this._game.getGameResolutionHeight()
           );
         }
+        this._canvasResolution = canvasResolution;
       }
 
       // Set the canvas size.
@@ -628,6 +661,58 @@ namespace gdjs {
       return pos;
     }
 
+    setPreviewOverlayInputInterceptor(
+      interceptor: PreviewOverlayInputInterceptor | null
+    ): void {
+      this._previewOverlayInputInterceptor = interceptor;
+      if (!interceptor) {
+        this._mouseInputBlockedByPreviewOverlay = false;
+        this._touchesBlockedByPreviewOverlay.clear();
+      }
+    }
+
+    _isPreviewOverlayBlockingPagePosition(pageX: float, pageY: float): boolean {
+      if (!this._game.isPreview() || !this._previewOverlayInputInterceptor) {
+        return false;
+      }
+
+      const pos = this.convertPageToGameCoords(pageX, pageY);
+      return this._previewOverlayInputInterceptor.isBlockingPointer(
+        pos[0],
+        pos[1]
+      );
+    }
+
+    _handlePreviewOverlayWheel(
+      pageX: float,
+      pageY: float,
+      deltaY: float,
+      deltaX: float,
+      deltaZ: float
+    ): boolean {
+      if (!this._game.isPreview() || !this._previewOverlayInputInterceptor) {
+        return false;
+      }
+
+      const pos = this.convertPageToGameCoords(pageX, pageY);
+      if (
+        !this._previewOverlayInputInterceptor.isBlockingPointer(pos[0], pos[1])
+      ) {
+        return false;
+      }
+
+      if (this._previewOverlayInputInterceptor.handleWheel) {
+        return this._previewOverlayInputInterceptor.handleWheel(
+          pos[0],
+          pos[1],
+          deltaY,
+          deltaX,
+          deltaZ
+        );
+      }
+      return true;
+    }
+
     /**
      * Add the standard events handler.
      *
@@ -810,13 +895,30 @@ namespace gdjs {
         return button;
       }
       canvas.onmousemove = (e) => {
+        if (
+          this._mouseInputBlockedByPreviewOverlay ||
+          this._isPreviewOverlayBlockingPagePosition(e.pageX, e.pageY)
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1], {
           movementX: e.movementX,
           movementY: e.movementY,
         });
+        return false;
       };
       canvas.onmousedown = (e) => {
+        if (this._isPreviewOverlayBlockingPagePosition(e.pageX, e.pageY)) {
+          this._mouseInputBlockedByPreviewOverlay = true;
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         const pos = this.convertPageToGameCoords(e.pageX, e.pageY);
         manager.onMouseMove(pos[0], pos[1]);
         manager.onMouseButtonPressed(
@@ -827,7 +929,14 @@ namespace gdjs {
         }
         return false;
       };
-      canvas.onmouseup = function (e) {
+      canvas.onmouseup = (e) => {
+        if (this._mouseInputBlockedByPreviewOverlay) {
+          this._mouseInputBlockedByPreviewOverlay = false;
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+
         manager.onMouseButtonReleased(
           convertHtmlMouseButtonToInputManagerMouseButton(e.button)
         );
@@ -874,8 +983,23 @@ namespace gdjs {
         return false;
       };
       // @ts-ignore
-      canvas.onwheel = function (event) {
+      canvas.onwheel = (event) => {
+        if (
+          this._handlePreviewOverlayWheel(
+            event.pageX,
+            event.pageY,
+            event.deltaY,
+            event.deltaX,
+            event.deltaZ
+          )
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+
         manager.onMouseWheel(-event.deltaY, event.deltaX, event.deltaZ);
+        return false;
       };
 
       // Touches:
@@ -891,8 +1015,14 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
+              if (this._touchesBlockedByPreviewOverlay.has(touch.identifier)) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               const pos = this.convertPageToGameCoords(
                 touch.pageX,
                 touch.pageY
@@ -908,6 +1038,9 @@ namespace gdjs {
                   manager.onMouseLeave();
                 }
               }
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
         },
@@ -926,8 +1059,20 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
               const touch = e.changedTouches[i];
+              if (
+                this._isPreviewOverlayBlockingPagePosition(
+                  touch.pageX,
+                  touch.pageY
+                )
+              ) {
+                this._touchesBlockedByPreviewOverlay.add(touch.identifier);
+                hasBlockedTouch = true;
+                continue;
+              }
+
               const pos = this.convertPageToGameCoords(
                 touch.pageX,
                 touch.pageY
@@ -938,6 +1083,9 @@ namespace gdjs {
                 pos[1]
               );
             }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
+            }
           }
           return false;
         },
@@ -946,7 +1094,7 @@ namespace gdjs {
       );
       window.addEventListener(
         'touchend',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -956,8 +1104,21 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
+              if (
+                this._touchesBlockedByPreviewOverlay.delete(
+                  e.changedTouches[i].identifier
+                )
+              ) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               manager.onTouchEnd(e.changedTouches[i].identifier);
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
           return false;
@@ -967,7 +1128,7 @@ namespace gdjs {
       );
       window.addEventListener(
         'touchcancel',
-        function (e) {
+        (e) => {
           if (isTargetDomElement(e)) {
             // Bail out if the game canvas is not focused. For example,
             // an `<input>` element can be focused, and needs to receive
@@ -977,8 +1138,21 @@ namespace gdjs {
 
           e.preventDefault();
           if (e.changedTouches) {
+            let hasBlockedTouch = false;
             for (let i = 0; i < e.changedTouches.length; ++i) {
+              if (
+                this._touchesBlockedByPreviewOverlay.delete(
+                  e.changedTouches[i].identifier
+                )
+              ) {
+                hasBlockedTouch = true;
+                continue;
+              }
+
               manager.onTouchCancel(e.changedTouches[i].identifier);
+            }
+            if (hasBlockedTouch) {
+              e.stopPropagation();
             }
           }
           return false;

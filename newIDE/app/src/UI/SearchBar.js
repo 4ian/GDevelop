@@ -30,6 +30,8 @@ type Props = {|
   placeholder?: MessageDescriptor,
   /** Fired when the text value changes. */
   onChange?: string => void,
+  /** Fire onChange immediately instead of debouncing it. */
+  onChangeImmediately?: boolean,
   /** Fired when the search icon is clicked. */
   onRequestSearch: string => void,
   /** Set if rounding should be applied or not. */
@@ -70,6 +72,7 @@ const SearchBar: React.ComponentType<{
       disabled,
       placeholder,
       onChange,
+      onChangeImmediately,
       onRequestSearch,
       value: parentValue,
       aspect,
@@ -179,7 +182,11 @@ const SearchBar: React.ComponentType<{
     };
 
     const handleInput = (e: {| target: {| value: string |} |}) => {
-      changeValueDebounced(e.target.value);
+      if (onChangeImmediately) {
+        changeValueImmediately(e.target.value);
+      } else {
+        changeValueDebounced(e.target.value);
+      }
     };
 
     const handleCancel = () => {
@@ -235,7 +242,11 @@ const SearchBar: React.ComponentType<{
         // last typed value in memory.
         setAutocompleteValue('');
       } else {
-        changeValueDebounced(newValue || '');
+        if (onChangeImmediately) {
+          changeValueImmediately(newValue || '');
+        } else {
+          changeValueDebounced(newValue || '');
+        }
       }
     };
 

@@ -22,6 +22,7 @@ export type CommandName =
   | 'EXPORT_HTML5_EXTERNAL'
   | 'INVITE_COLLABORATORS'
   | 'OPEN_RECENT_PROJECT'
+  | 'OPEN_RECENT_EDITOR'
   | 'OPEN_COMMAND_PALETTE'
   | 'RESTART_IN_GAME_EDITOR'
   | 'OPEN_PROJECT_PROPERTIES'
@@ -41,9 +42,11 @@ export type CommandName =
   | 'RUN_ALL_GAMEPLAY_TESTS'
   | 'OPEN_SCENE_PROPERTIES'
   | 'OPEN_SCENE_VARIABLES'
+  | 'ADD_OBJECT'
   | 'OPEN_OBJECTS_PANEL'
   | 'OPEN_OBJECT_GROUPS_PANEL'
   | 'OPEN_PROPERTIES_PANEL'
+  | 'TOGGLE_ALL_PANELS'
   | 'TOGGLE_INSTANCES_PANEL'
   | 'TOGGLE_LAYERS_PANEL'
   | 'SCENE_EDITOR_UNDO'
@@ -181,6 +184,11 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'GENERAL',
     displayText: t`Open recent project...`,
   },
+  OPEN_RECENT_EDITOR: {
+    area: 'IDE',
+    displayText: t`Open recent editors`,
+    ghost: true,
+  },
   OPEN_COMMAND_PALETTE: {
     area: 'IDE',
     displayText: t`Open command palette`,
@@ -264,6 +272,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'SCENE',
     displayText: t`Open scene variables`,
   },
+  ADD_OBJECT: {
+    area: 'SCENE',
+    displayText: t`Add object`,
+  },
 
   // Scene editor toolbar commands
   OPEN_OBJECTS_PANEL: {
@@ -277,6 +289,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROPERTIES_PANEL: {
     area: 'SCENE',
     displayText: t`Toggle Properties Panel`,
+  },
+  TOGGLE_ALL_PANELS: {
+    area: 'SCENE',
+    displayText: t`Toggle all panels`,
   },
   TOGGLE_INSTANCES_PANEL: {
     area: 'SCENE',

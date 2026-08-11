@@ -6,6 +6,7 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -13,6 +14,7 @@ import Window from '../../Utils/Window';
 import Upload from '../../UI/CustomSvgIcons/Upload';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { type ExtensionDependency } from '../../Utils/GDevelopServices/Extension';
+import { findConstantPlaceholderInSerializedData } from '../../Utils/ConstantPlaceholderDiagnostics';
 
 const gd: libGDevelop = global.gd;
 
@@ -57,11 +59,6 @@ const exportExtension = async (
       "The extension can't be exported because it's not supported by the web-app."
     );
   }
-  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseEventsFunctionExtensionFile(
-    eventsFunctionsExtension.getName()
-  );
-
-  if (!pathOrUrl) return;
 
   const serializedObject = serializeToJSObject(
     eventsFunctionsExtension,
@@ -70,6 +67,25 @@ const exportExtension = async (
   if (requiredExtensions.length > 0) {
     serializedObject.requiredExtensions = requiredExtensions;
   }
+  const constantPlaceholderPath = findConstantPlaceholderInSerializedData(
+    serializedObject
+  );
+  if (constantPlaceholderPath != null) {
+    showErrorBox({
+      message: `The extension can't be exported because it contains constants placeholder "{{${constantPlaceholderPath}}}". Extensions with constants placeholders can only be used in the current project.`,
+      rawError: null,
+      errorId: 'extension-export-constants-placeholder',
+      doNotReport: true,
+    });
+    return;
+  }
+
+  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseEventsFunctionExtensionFile(
+    eventsFunctionsExtension.getName()
+  );
+
+  if (!pathOrUrl) return;
+
   await eventsFunctionsExtensionWriter.writeSerializedObject(
     serializedObject,
     pathOrUrl

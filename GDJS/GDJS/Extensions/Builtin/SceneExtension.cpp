@@ -28,6 +28,45 @@ SceneExtension::SceneExtension() {
   // End of compatibility code
   GetAllConditions()["SceneJustResumed"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.sceneJustResumed");
+  GetAllConditions()["SignalReceived"].SetFunctionName(
+      "gdjs.evtTools.signal.isSignalReceived");
+  GetAllActions()["EmitSceneSignal"].SetFunctionName(
+      "gdjs.evtTools.signal.emitSceneSignalFromEvents");
+  GetAllActions()["EmitSignalToObjectInstance"].SetFunctionName(
+      "gdjs.evtTools.signal.emitSignalToInstanceFromEvents");
+  GetAllActions()["SubscribeSceneSignal"].SetFunctionName(
+      "gdjs.evtTools.signal.subscribeSceneSignal");
+  GetAllStrExpressions()["SignalName"].SetFunctionName(
+      "gdjs.evtTools.signal.getSignalName");
+  GetAllStrExpressions()["SignalName"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        if (context.IsInsideAsync()) {
+          return gd::String("asyncObjectsList.getSceneSignalName()");
+        }
+        if (codeGenerator.GetSceneLifecycleFunctionRole() == "sceneSignal") {
+          return codeGenerator.GetCodeNamespaceAccessor() +
+                 "sceneSignalName";
+        }
+        return gd::String("gdjs.evtTools.signal.getSignalName(runtimeScene)");
+      });
+  GetAllStrExpressions()["SignalPayload"].SetFunctionName(
+      "gdjs.evtTools.signal.getSignalPayload");
+  GetAllStrExpressions()["SignalPayload"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression>& parameters,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        if (context.IsInsideAsync()) {
+          return gd::String("asyncObjectsList.getSceneSignalPayload()");
+        }
+        if (codeGenerator.GetSceneLifecycleFunctionRole() == "sceneSignal") {
+          return codeGenerator.GetCodeNamespaceAccessor() +
+                 "sceneSignalPayload";
+        }
+        return gd::String(
+            "gdjs.evtTools.signal.getSignalPayload(runtimeScene)");
+      });
   GetAllActions()["SceneBackground"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.setBackgroundColor");
   GetAllActions()["Scene"].SetFunctionName(

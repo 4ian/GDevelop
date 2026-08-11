@@ -9,16 +9,24 @@ import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/Even
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
-import { CompactObjectPropertiesEditor } from '../ObjectEditor/CompactObjectPropertiesEditor';
+import {
+  CompactObjectPropertiesEditor,
+  CompactObjectPropertiesEditorContent,
+} from '../ObjectEditor/CompactObjectPropertiesEditor';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { CompactLayerPropertiesEditor } from '../LayersList/CompactLayerPropertiesEditor';
 import { CompactEventsBasedObjectVariantPropertiesEditor } from '../SceneEditor/CompactEventsBasedObjectVariantPropertiesEditor';
 import { CompactScenePropertiesEditor } from './CompactScenePropertiesEditor';
-import Rectangle from '../Utils/Rectangle';
-import { type LastSelectionType } from './EditorsDisplay.flow';
 import { CompactObjectGroupPropertiesEditor } from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
+import Rectangle from '../Utils/Rectangle';
+
+// The kind of the current selection whose properties are displayed in the panel.
+// NOTE: Upstream exposes this as `type LastSelectionType` from
+// './EditorsDisplay.flow', but that module (a sibling not owned by this change)
+// does not currently export it, so the union is kept in sync locally here.
+export type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
 
 export const styles = {
   paper: {
@@ -83,9 +91,17 @@ type Props = {|
   // For event-based object variants:
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
-  getContentAABB: () => Rectangle | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   onEventsBasedObjectChildrenEdited: (
     eventsBasedObject: gdEventsBasedObject
+  ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
   ) => void,
 
   // For scenes
@@ -174,6 +190,8 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       eventsBasedObjectVariant,
       getContentAABB,
       onEventsBasedObjectChildrenEdited,
+      onOpenPrefabDetailEditor,
+      onOpenPrefabSettings,
 
       // For objects or instances:
       historyHandler,
@@ -198,6 +216,49 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           <CompactInstancePropertiesEditor
             instances={instances}
             editObjectInPropertiesPanel={editObjectInPropertiesPanel}
+            renderObjectProperties={object => (
+              <CompactObjectPropertiesEditorContent
+                objects={[object]}
+                onEditObject={onEditObject}
+                onObjectsModified={onObjectsModified}
+                onEffectAdded={onEffectAdded}
+                resourceManagementProps={resourceManagementProps}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                // This EventsBasedObject is used to refactor variables in all
+                // variants when editing the default variant.
+                eventsBasedObject={
+                  eventsBasedObject &&
+                  eventsBasedObject.getDefaultVariant() ===
+                    eventsBasedObjectVariant
+                    ? eventsBasedObject
+                    : null
+                }
+                initialInstances={initialInstances}
+                onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+                onWillInstallExtension={onWillInstallExtension}
+                onExtensionInstalled={onExtensionInstalled}
+                isBehaviorListLocked={isBehaviorListLocked}
+                onOpenEventBasedObjectVariantEditor={
+                  onOpenEventBasedObjectVariantEditor
+                }
+                onDeleteEventsBasedObjectVariant={
+                  onDeleteEventsBasedObjectVariant
+                }
+                historyHandler={historyHandler}
+                isVariableListLocked={isVariableListLocked}
+                layout={layout}
+                objectsContainer={objectsContainer}
+                globalObjectsContainer={globalObjectsContainer}
+                layersContainer={layersContainer}
+                project={project}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
+                unsavedChanges={unsavedChanges}
+                i18n={i18n}
+                expand={false}
+              />
+            )}
             onInstancesModified={onInstancesModified}
             onGetInstanceSize={onGetInstanceSize}
             editInstanceVariables={editInstanceVariables}
@@ -294,6 +355,24 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             getContentAABB={getContentAABB}
             onEventsBasedObjectChildrenEdited={() =>
               onEventsBasedObjectChildrenEdited(eventsBasedObject)
+            }
+            onOpenPrefabDetailEditor={
+              eventsFunctionsExtension
+                ? () =>
+                    onOpenPrefabDetailEditor(
+                      eventsFunctionsExtension,
+                      eventsBasedObject
+                    )
+                : null
+            }
+            onOpenPrefabSettings={
+              eventsFunctionsExtension && onOpenPrefabSettings
+                ? () =>
+                    onOpenPrefabSettings(
+                      eventsFunctionsExtension,
+                      eventsBasedObject
+                    )
+                : null
             }
             unsavedChanges={unsavedChanges}
             i18n={i18n}

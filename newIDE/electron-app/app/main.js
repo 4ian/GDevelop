@@ -1,7 +1,6 @@
 const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
-const child_process = require('child_process');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
@@ -26,6 +25,15 @@ const {
 } = require('./MainMenu');
 const { loadExternalEditorWindow } = require('./LocalExternalEditorWindow');
 const { load, registerGdideProtocol } = require('./Utils/UrlLoader');
+const { getElectronAppCommandLineArguments } = require('./Utils/AppArguments');
+const {
+  startMcpServer,
+  stopMcpServer,
+  getMcpServerState,
+} = require('./Mcp/McpServer');
+const {
+  createMcpRendererRequestBroker,
+} = require('./Mcp/McpRendererRequestBroker');
 const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
@@ -38,13 +46,35 @@ const {
   closePreviewWindow,
   closePreviewWindowsForParent,
   closeAllPreviewWindows,
+  focusAllPreviewWindows,
+  injectPreviewUserGesture,
+  capturePreviewPage,
+  setDebuggerPopOutWindow,
 } = require('./PreviewWindow');
+const {
+  imageExtenderScheme,
+  openImageExtenderWindow,
+} = require('./ImageExtenderWindow');
+const {
+  aiGameWorkbenchScheme,
+  openAiGameWorkbenchWindow,
+} = require('./AiGameWorkbenchWindow');
+const {
+  gorestSpritesheetScheme,
+  openGorestSpritesheetWindow,
+} = require('./GorestSpritesheetWindow');
+const {
+  advancedTweenEditorScheme,
+  openAdvancedTweenEditorWindow,
+} = require('./AdvancedTweenEditorWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
   onLocalGDJSDevelopmentWatcherRuntimeUpdated,
 } = require('./LocalGDJSDevelopmentWatcher');
 const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
+const { handleGitToolRequest } = require('./GitTool');
+const { launchNpmScriptInTerminal } = require('./NpmScriptRunner');
 const { installCliInPath } = require('./InstallCliInPath');
 const {
   setWindowFileIdentifier,
@@ -56,11 +86,31 @@ const {
   isCliProjectAlreadyOpenElsewhere,
   routeCliCommandToLiveEditor,
 } = require('./CliCommandHandoff');
+const {
+  createProjectFileOpenHandler,
+  createProjectFileWindowArgs,
+} = require('./ProjectFileOpenHandler');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
 log.info('GDevelop Electron app starting...');
+
+// Keep preview (and editor) renderers alive when their window is occluded or
+// backgrounded. Chromium normally detects a fully-covered window (native window
+// occlusion, Windows in particular) and freezes its renderer's JS/timer/event
+// loop to save resources. For a preview that opened behind the editor this kills
+// the debugger websocket pump: pause/inspect/run_frames/health-check all stop
+// getting answered (the renderer never runs `ws.onmessage` -> handleCommand),
+// while a main-process webContents.capturePage() screenshot still succeeds (it
+// reads the last composited frame, not renderer JS) — so the preview *looks*
+// alive but the debugger channel is silent. These switches must be set before
+// the app is ready. They complement (do not replace) the per-window
+// backgroundThrottling:false option and the powerSaveBlocker held while a
+// preview is open.
+app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 
 // Logs made with electron-logs can be found
 // on Linux: ~/.config/<app name>/log.log
@@ -75,13 +125,97 @@ autoUpdater.autoDownload = false;
 let mainWindows = new Set();
 let mainWindow = null; // Primary window reference for backwards compatibility
 let windowCounter = 0; // Counter for creating unique session partitions
+let mcpRendererWebContents = null;
 
-const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
+const serializeMcpServerState = (state, error) => ({
+  isRunning: !!state,
+  port: state ? state.port : null,
+  url: state ? state.url : null,
+  error: error || null,
+});
+
+const mcpRendererRequestBroker = createMcpRendererRequestBroker({
+  getWebContents: () => mcpRendererWebContents,
+});
+
+const sendMcpRendererRequest = request =>
+  mcpRendererRequestBroker.send(request);
+
+const clearPendingMcpRendererRequestsFor = (webContents, disconnectDetails) =>
+  mcpRendererRequestBroker.clearFor(webContents, disconnectDetails);
+
+// Parse arguments (knowing that in dev, we run electron with an argument,
+// so have to ignore one more).
+const getCommandLineArguments = commandLine =>
+  getElectronAppCommandLineArguments(commandLine, {
+    isDev,
+    isDefaultApp: !!process.defaultApp,
+  });
+const args = parseGDevelopArgs(getCommandLineArguments(process.argv));
+const windowArgsById = {};
+global['args'] = args;
+global['windowArgsById'] = windowArgsById;
+
+const projectFileOpenHandler = createProjectFileOpenHandler({
+  openProjectFile: filePath =>
+    createNewWindow(createProjectFileWindowArgs(args, filePath)),
+});
+app.on('open-file', projectFileOpenHandler.handleOpenFile);
 
 const devTools = !!args['dev-tools'];
+const windowsAppIconPath = path.join(__dirname, '..', 'build', 'icon.ico');
+const appWindowIcon =
+  process.platform === 'win32' && fs.existsSync(windowsAppIconPath)
+    ? windowsAppIconPath
+    : undefined;
+// On macOS, the dock icon is not taken from the BrowserWindow `icon` option:
+// it comes from the app bundle (Info.plist). When running the generic
+// Electron.app (e.g. via scripts/start-macos-app.py), this means the default
+// Electron icon is shown. Set it explicitly at runtime so the dock shows the
+// GDevelop icon, matching the Windows taskbar icon behavior.
+const macAppIconPath = path.join(__dirname, '..', 'build', 'icon.png');
 
-// See registerGdideProtocol (used for HTML modules support)
-protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
+// See registerGdideProtocol (used for HTML modules support). Bundled tools use
+// custom secure schemes so they can call /api without a localhost server.
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'gdide' },
+  {
+    scheme: imageExtenderScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: aiGameWorkbenchScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: gorestSpritesheetScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+  {
+    scheme: advancedTweenEditorScheme,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+    },
+  },
+]);
 
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
@@ -103,24 +237,27 @@ if (!gotTheLock) {
   // Second instance attempted - quit immediately
   app.quit();
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
-    const secondInstanceArgs = parseSecondInstanceArgs({
-      commandLine,
-      additionalData,
-      isDev,
-    });
+  app.on(
+    'second-instance',
+    (event, commandLine, workingDirectory, additionalData) => {
+      const secondInstanceArgs = parseSecondInstanceArgs({
+        commandLine,
+        additionalData,
+        isDev: isDev || !!process.defaultApp,
+      });
 
-    if (routeCliCommandToLiveEditor({ parsedArgs: secondInstanceArgs, mainWindows })) {
-      return;
+      if (
+        routeCliCommandToLiveEditor({
+          parsedArgs: secondInstanceArgs,
+          mainWindows,
+        })
+      ) {
+        return;
+      }
+
+      createNewWindow(secondInstanceArgs);
     }
-
-    // Update the global args so the new window's renderer (which reads them
-    // via remote.getGlobal('args')) picks up the second-instance CLI flags
-    // (e.g. --run-command, positional project file).
-    global['args'] = secondInstanceArgs;
-
-    createNewWindow(secondInstanceArgs);
-  });
+  );
 }
 
 // Quit when all windows are closed.
@@ -133,6 +270,11 @@ app.on('window-all-closed', function() {
   }
   try {
     stopAllDebuggerServers();
+  } catch (e) {
+    // Ignore errors during shutdown
+  }
+  try {
+    stopMcpServer();
   } catch (e) {
     // Ignore errors during shutdown
   }
@@ -177,10 +319,12 @@ function createNewWindow(windowArgs = args) {
       // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
+      webviewTag: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',
   };
+  if (appWindowIcon) options.icon = appWindowIcon;
 
   // First window (windowCounter === 0) uses default storage for backwards compatibility
   // Additional windows get unique partitions for independent auth AND separate renderer processes
@@ -221,7 +365,10 @@ function createNewWindow(windowArgs = args) {
 
   // Capture window ID and whether this is the primary window before it can be destroyed
   const windowId = newWindow.id;
+  const windowWebContents = newWindow.webContents;
+  let lastKnownRendererProcessId = null;
   const isPrimaryWindow = windowNumber === 0;
+  windowArgsById[windowId] = windowArgs;
   log.info(
     `Created window with Electron ID: ${windowId}, window number: ${windowNumber}, isPrimary: ${isPrimaryWindow}`
   );
@@ -255,6 +402,7 @@ function createNewWindow(windowArgs = args) {
     newWindow.webContents
       .executeJavaScript('process.pid')
       .then(pid => {
+        lastKnownRendererProcessId = pid;
         log.info(
           `Window ${windowId} (window number ${windowNumber}) is running in renderer process PID: ${pid}`
         );
@@ -262,6 +410,39 @@ function createNewWindow(windowArgs = args) {
       .catch(err => {
         log.warn('Could not get renderer process PID:', err);
       });
+  });
+
+  newWindow.webContents.on('unresponsive', () => {
+    log.warn(
+      `Window ${windowId} (window number ${windowNumber}) renderer became unresponsive.`
+    );
+  });
+  newWindow.webContents.on('responsive', () => {
+    log.info(
+      `Window ${windowId} (window number ${windowNumber}) renderer became responsive again.`
+    );
+  });
+  newWindow.webContents.on('render-process-gone', (_event, details) => {
+    log.error(
+      `Window ${windowId} (window number ${windowNumber}) renderer process is gone. ` +
+        `PID: ${lastKnownRendererProcessId || 'unknown'}, reason: ${
+          details.reason
+        }, exit code: ${details.exitCode}.`
+    );
+    clearPendingMcpRendererRequestsFor(windowWebContents, {
+      code: 'MCP_RENDERER_PROCESS_GONE',
+      message: `The GDevelop editor renderer process exited (${
+        details.reason
+      }).`,
+      rendererProcessId: lastKnownRendererProcessId,
+      rendererProcessGone: {
+        reason: details.reason,
+        exitCode: details.exitCode,
+      },
+    });
+    if (mcpRendererWebContents === windowWebContents) {
+      mcpRendererWebContents = null;
+    }
   });
 
   if (isDev)
@@ -280,7 +461,15 @@ function createNewWindow(windowArgs = args) {
   newWindow.on('closed', function() {
     // Remove from tracked windows
     mainWindows.delete(newWindow);
+    clearPendingMcpRendererRequestsFor(windowWebContents);
+    if (mcpRendererWebContents === windowWebContents) {
+      mcpRendererWebContents = null;
+      stopMcpServer().catch(error => {
+        log.error('Failed to stop MCP server after window close:', error);
+      });
+    }
     clearWindowFileIdentifier(windowId);
+    delete windowArgsById[windowId];
 
     // If this was the primary window, set a new primary
     if (isPrimaryWindow) {
@@ -308,12 +497,16 @@ function createNewWindow(windowArgs = args) {
   // but open all other URLs in the external browser.
   newWindow.webContents.setWindowOpenHandler(details => {
     if (details.frameName.startsWith('GDevelopWindowPortal')) {
+      const isDebuggerPopOut = details.frameName.startsWith(
+        'GDevelopWindowPortal-debugger-'
+      );
+      const isBrowserPopup = details.frameName.startsWith(
+        'GDevelopWindowPortal-browser-'
+      );
       // Extract the theme background color passed via the features string
       // by WindowPortal (e.g. "...,themeBackgroundColor=%23282828").
       let backgroundColor = '#000';
-      const match = details.features.match(
-        /themeBackgroundColor=([^,]*)/
-      );
+      const match = details.features.match(/themeBackgroundColor=([^,]*)/);
       if (match) {
         try {
           backgroundColor = decodeURIComponent(match[1]);
@@ -332,6 +525,8 @@ function createNewWindow(windowArgs = args) {
           },
           trafficLightPosition: { x: 12, y: 12 },
           backgroundColor,
+          parent: isDebuggerPopOut ? newWindow : undefined,
+          modal: false,
           webPreferences: {
             // No need for Node.js integration or disabled context isolation, because
             // popped-out windows are driven by React portals and don't do any Node operations.
@@ -339,6 +534,7 @@ function createNewWindow(windowArgs = args) {
             // nodeIntegration: true,
             // contextIsolation: false,
             webSecurity: false,
+            webviewTag: isBrowserPopup,
           },
         },
       };
@@ -352,10 +548,21 @@ function createNewWindow(windowArgs = args) {
   // When a child window is created (e.g. a popped-out editor), set up security
   // policies and enable @electron/remote on it.
   newWindow.webContents.on('did-create-window', (childWindow, details) => {
+    windowArgsById[childWindow.id] = windowArgs;
+    childWindow.on('closed', () => {
+      delete windowArgsById[childWindow.id];
+    });
     require('@electron/remote/main').enable(childWindow.webContents);
 
-    if (!details.frameName || !details.frameName.startsWith('GDevelopWindowPortal')) {
-      console.warn(`Unexpected frameName for child window: ${details.frameName} - verify handling on Electron side.`);
+    if (
+      !details.frameName ||
+      !details.frameName.startsWith('GDevelopWindowPortal')
+    ) {
+      console.warn(
+        `Unexpected frameName for child window: ${
+          details.frameName
+        } - verify handling on Electron side.`
+      );
     }
 
     // Track child window by frameName so the renderer can look up its
@@ -365,6 +572,13 @@ function createNewWindow(windowArgs = args) {
       childWindow.on('closed', () => {
         windowTargetIdToBrowserWindowIds.delete(details.frameName);
       });
+    }
+
+    if (
+      details.frameName &&
+      details.frameName.startsWith('GDevelopWindowPortal-debugger-')
+    ) {
+      setDebuggerPopOutWindow(newWindow.id, childWindow);
     }
 
     // Remove the menu bar from popped-out editor windows.
@@ -398,16 +612,26 @@ app.on('ready', function() {
 
   registerGdideProtocol({ isDev });
 
-  // Create the first window
-  createNewWindow(args);
-
-  // Expose program arguments (to be accessed by windows)
-  global['args'] = args;
+  // Finder can deliver document-open events before Electron is ready. Open
+  // every queued project and avoid creating an unrelated blank window.
+  const openedQueuedProjectCount = projectFileOpenHandler.markReady();
+  if (openedQueuedProjectCount === 0) {
+    createNewWindow(args);
+  }
 
   Menu.setApplicationMenu(buildPlaceholderMainMenu());
 
   // Set up dock menu (macOS) for creating new windows
   if (app.dock) {
+    // Show the GDevelop icon in the dock instead of the default Electron icon
+    // when running the generic Electron.app (development launch).
+    if (fs.existsSync(macAppIconPath)) {
+      const dockIcon = electron.nativeImage.createFromPath(macAppIconPath);
+      if (!dockIcon.isEmpty()) {
+        app.dock.setIcon(dockIcon);
+      }
+    }
+
     const dockMenu = Menu.buildFromTemplate([
       {
         label: 'New window',
@@ -458,6 +682,63 @@ app.on('ready', function() {
     );
   });
 
+  ipcMain.on('mcp-renderer-response', (event, response) => {
+    mcpRendererRequestBroker.handleResponse(event.sender, response);
+  });
+
+  ipcMain.on('mcp-renderer-progress', (event, response) => {
+    mcpRendererRequestBroker.handleProgress(event.sender, response);
+  });
+
+  ipcMain.handle('mcp-server-get-state', async () =>
+    serializeMcpServerState(getMcpServerState())
+  );
+
+  ipcMain.handle('mcp-server-update-config', async (event, config) => {
+    mcpRendererWebContents = event.sender;
+
+    const enabled = !!(config && config.enabled);
+    if (!enabled) {
+      await stopMcpServer();
+      return serializeMcpServerState(null);
+    }
+
+    const configuredPort =
+      config && typeof config.port === 'number'
+        ? config.port
+        : parseInt(config && config.port, 10);
+    const port =
+      Number.isInteger(configuredPort) &&
+      configuredPort >= 0 &&
+      configuredPort <= 65535
+        ? configuredPort
+        : 32110;
+    const currentServerState = getMcpServerState();
+
+    if (currentServerState && currentServerState.port === port) {
+      return serializeMcpServerState(currentServerState);
+    }
+
+    if (currentServerState) {
+      await stopMcpServer(currentServerState);
+    }
+
+    try {
+      const serverState = await startMcpServer({
+        port,
+        sendRendererRequest: sendMcpRendererRequest,
+      });
+      log.info(`MCP server listening on ${serverState.url}`);
+      return serializeMcpServerState(serverState);
+    } catch (error) {
+      log.error('Failed to start MCP server:', error);
+      return serializeMcpServerState(
+        null,
+        error && error.message ? error.message : String(error)
+      );
+    }
+  });
+
   ipcMain.handle('preview-open', async (event, options) => {
     const parentWindow = BrowserWindow.fromWebContents(event.sender);
     return openPreviewWindow({
@@ -477,6 +758,18 @@ app.on('ready', function() {
 
   ipcMain.handle('preview-close-all', async () => {
     return closeAllPreviewWindows();
+  });
+
+  ipcMain.handle('preview-focus-all', async () => {
+    return focusAllPreviewWindows();
+  });
+
+  ipcMain.handle('preview-inject-user-gesture', async (event, options) => {
+    return injectPreviewUserGesture(options || {});
+  });
+
+  ipcMain.handle('preview-capture-page', async (event, options) => {
+    return capturePreviewPage(options && options.windowId);
   });
 
   // Piskel image editor
@@ -509,6 +802,47 @@ app.on('ready', function() {
       devTools,
       indexSubPath: 'yarn/yarn-electron-index.html',
       externalEditorInput,
+    });
+  });
+
+  // Image Extender executable app
+  ipcMain.handle('image-extender-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openImageExtenderWindow({
+      parentWindow,
+      devTools,
+    });
+  });
+
+  // AI Game Workbench executable app
+  ipcMain.handle('ai-game-workbench-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openAiGameWorkbenchWindow({
+      parentWindow,
+      devTools,
+    });
+  });
+
+  // Gorest 2D Animation Spritesheet Generator executable app
+  ipcMain.handle('gorest-spritesheet-load', event => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openGorestSpritesheetWindow({
+      parentWindow,
+      devTools,
+    });
+  });
+
+  // AdvancedTween Editor executable app
+  ipcMain.handle('advanced-tween-editor-load', (event, options = {}) => {
+    const parentWindow = BrowserWindow.fromWebContents(event.sender);
+    return openAdvancedTweenEditorWindow({
+      parentWindow,
+      devTools,
+      projectRootPath: options.projectRootPath,
+      waitForResult: !!options.waitForResult,
+      initialJsonFile: options.initialJsonFile,
+      gameResolutionWidth: options.gameResolutionWidth,
+      gameResolutionHeight: options.gameResolutionHeight,
     });
   });
 
@@ -611,6 +945,10 @@ app.on('ready', function() {
     }
   );
 
+  ipcMain.handle('git-tool-request', async (event, request) => {
+    return handleGitToolRequest(request);
+  });
+
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {
     const window = BrowserWindow.fromWebContents(event.sender);
@@ -687,14 +1025,14 @@ app.on('ready', function() {
           event.sender.send('debugger-error-received', error);
         }
       },
-      onConnectionClose: ({ id }) => {
+      onConnectionClose: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-closed', { id });
+          event.sender.send('debugger-connection-closed', details);
         }
       },
-      onConnectionOpen: ({ id }) => {
+      onConnectionOpen: details => {
         if (!event.sender.isDestroyed()) {
-          event.sender.send('debugger-connection-opened', { id });
+          event.sender.send('debugger-connection-opened', details);
         }
       },
       onConnectionError: ({ id, errorMessage }) => {
@@ -718,7 +1056,10 @@ app.on('ready', function() {
     const windowId = window ? window.id : 'unknown';
     sendMessage(windowId, message, err => {
       if (!event.sender.isDestroyed()) {
-        event.sender.send('debugger-send-message-done', err);
+        event.sender.send('debugger-send-message-done', {
+          id: message && message.id,
+          errorMessage: err ? err.message || String(err) : null,
+        });
       }
     });
   });
@@ -824,77 +1165,34 @@ app.on('ready', function() {
 
   setUpDiscordRichPresence(ipcMain);
 
-  const NPM_SCRIPT_COMMAND_FAILED_MESSAGE = 'Command failed!';
-
   // npm script execution in external terminal (cross-platform)
   ipcMain.on(
     'run-npm-script',
-    (event, { projectPath, npmScript, keepTerminalOpen }) => {
+    (
+      event,
+      {
+        projectPath,
+        npmScript,
+        keepTerminalOpen,
+        installDependencies,
+        openFolderAfterSuccess,
+      }
+    ) => {
       log.info(`Running npm script "${npmScript}" in ${projectPath}`);
 
-      const platform = process.platform;
-      const npmCommand = `npm run ${npmScript}`;
-      const keepOpen = !!keepTerminalOpen;
-
       try {
-        if (platform === 'win32') {
-          const innerCmd = keepOpen
-            ? `cd /d ${projectPath} && ${npmCommand}`
-            : `cd /d ${projectPath} && ${npmCommand} || (echo. & echo ${NPM_SCRIPT_COMMAND_FAILED_MESSAGE} & pause)`;
-          const cmdCloseFlag = keepOpen ? '/k' : '/c';
-          child_process
-            .spawn(
-              'cmd.exe',
-              ['/c', 'start', 'cmd.exe', cmdCloseFlag, innerCmd],
-              {
-                detached: true,
-                stdio: 'ignore',
-              }
-            )
-            .unref();
-        } else if (platform === 'darwin') {
-          const escapedPath = projectPath.replace(/'/g, "'\\''");
-          const shellCommand = keepOpen
-            ? `cd '${escapedPath}' && ${npmCommand}`
-            : `cd '${escapedPath}' && ${npmCommand} && exit || echo '${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}'`;
-          const script = `tell application "Terminal" to do script "${shellCommand.replace(
-            /"/g,
-            '\\"'
-          )}"`;
-          child_process.spawn('osascript', ['-e', script], {
-            detached: true,
-            stdio: 'ignore',
-          });
-        } else {
-          const bashCommand = keepOpen
-            ? `cd "${projectPath}" && ${npmCommand}; exec bash`
-            : `cd "${projectPath}" && ${npmCommand} || { echo "${NPM_SCRIPT_COMMAND_FAILED_MESSAGE}"; exec bash; }`;
-          const terminals = [
-            {
-              cmd: 'x-terminal-emulator',
-              args: ['-e', 'bash', '-c', bashCommand],
-            },
-            { cmd: 'gnome-terminal', args: ['--', 'bash', '-c', bashCommand] },
-            { cmd: 'konsole', args: ['-e', 'bash', '-c', bashCommand] },
-            { cmd: 'xterm', args: ['-e', 'bash', '-c', bashCommand] },
-          ];
-
-          const tryTerminal = index => {
-            if (index >= terminals.length) {
-              log.error('No terminal emulator found');
-              return;
-            }
-            const terminal = terminals[index];
-            const proc = child_process.spawn(terminal.cmd, terminal.args, {
-              detached: true,
-              stdio: 'ignore',
-            });
-            proc.on('error', () => tryTerminal(index + 1));
-            proc.unref();
-          };
-
-          tryTerminal(0);
-        }
+        launchNpmScriptInTerminal(
+          {
+            projectPath,
+            npmScript,
+            keepTerminalOpen,
+            installDependencies,
+            openFolderAfterSuccess,
+          },
+          {
+            onError: error => log.error('Failed to run npm script:', error),
+          }
+        );
       } catch (err) {
         log.error('Failed to run npm script:', err);
       }

@@ -17,6 +17,7 @@ import {
   setEditorHotReloadNeeded,
   type HotReloadSteps,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { type ResourcesEditorSelectionSnapshot } from '../../ResourcesEditor';
 
 export class ResourcesEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?ResourcesEditor;
@@ -34,6 +35,13 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
 
   getLayout(): ?gdLayout {
     return null;
+  }
+
+  getEditorSelectionSnapshot(): ?ResourcesEditorSelectionSnapshot {
+    const selection = this.editor
+      ? this.editor.getEditorSelectionSnapshot()
+      : null;
+    return selection ? { ...selection, isActive: this.props.isActive } : null;
   }
 
   updateToolbar() {

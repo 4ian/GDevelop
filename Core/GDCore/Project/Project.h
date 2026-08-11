@@ -557,6 +557,12 @@ class GD_CORE_API Project {
   void EnsureObjectDefaultBehaviors(gd::Object& object) const;
 
   /**
+   * Add or remove inherited behaviors on \a object according to its
+   * events-based object type.
+   */
+  void EnsureObjectInheritedBehaviors(gd::Object& object) const;
+
+  /**
    * Create an event of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
@@ -1082,6 +1088,48 @@ class GD_CORE_API Project {
 
   ///@}
 
+  /** \name Constants
+   * Members functions related to project-wide Constants.
+   */
+  ///@{
+
+  /**
+   * Get the project-wide Constants JSON.
+   */
+  inline const gd::String& GetConstantsJson() const {
+    return constantsJson;
+  }
+
+  /**
+   * Set the project-wide Constants JSON.
+   */
+  inline void SetConstantsJson(const gd::String& constantsJson_) {
+    constantsJson = constantsJson_.empty() ? "{}" : constantsJson_;
+  }
+
+  /**
+   * Get a project-wide Constant value as a string.
+   *
+   * Object and array values are returned as JSON strings.
+   */
+  bool GetConstantValueAsString(const gd::String& path,
+                                gd::String& value) const;
+
+  /**
+   * Replace all `{{path.to.value}}` placeholders with values from the
+   * project-wide Constants.
+   *
+   * \param source The source string that can contain placeholders.
+   * \param resolved The string with placeholders replaced when all paths exist.
+   * \param missingPath The first placeholder path that could not be resolved.
+   * \return true if all placeholders were resolved.
+   */
+  bool ResolveConstantPlaceholders(const gd::String& source,
+                                   gd::String& resolved,
+                                   gd::String& missingPath) const;
+
+  ///@}
+
   /** \name Global objects
    */
   ///@{
@@ -1170,6 +1218,7 @@ class GD_CORE_API Project {
               ///< 5.6.267).
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
+  gd::String constantsJson;  ///< Project-wide Constants JSON
   gd::ObjectsContainer objectsContainer;
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts

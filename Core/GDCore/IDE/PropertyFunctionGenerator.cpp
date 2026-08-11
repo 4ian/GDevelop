@@ -42,6 +42,10 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
     gd::AbstractEventsBasedEntity &eventsBasedEntity,
     const gd::NamedPropertyDescriptor &property, const gd::String &objectType,
     bool isBehavior, bool isSharedProperties) {
+  if (property.GetType() == "JsonObject") {
+    return;
+  }
+
   auto &propertyName = property.GetName();
   const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
@@ -81,6 +85,17 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
            : "");
 
   gd::String getterName = capitalizedName;
+  auto addObjectParameter = [&extension, &eventsBasedEntity](
+                                gd::EventsFunction &eventsFunction) {
+    gd::ParameterMetadata objectParameter;
+    gd::String objectFullType = gd::PlatformExtension::GetObjectFullType(
+        extension.GetName(), eventsBasedEntity.GetName());
+    objectParameter.SetType("object")
+        .SetName("Object")
+        .SetDescription("Object")
+        .SetExtraInfo(objectFullType);
+    eventsFunction.GetParameters().AddParameter(objectParameter);
+  };
 
   if (!functionsContainer.HasEventsFunctionNamed(getterName)) {
     auto &getter = functionsContainer.InsertNewEventsFunctionInFolder(
@@ -100,10 +115,16 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
       getter.SetFunctionType(gd::EventsFunction::Condition)
           .SetDescription("Check " + descriptionSubject)
           .SetSentence("_PARAM0_ " + UnCapitalizeFirstLetter(propertyLabel));
+      if (!isBehavior) {
+        addObjectParameter(getter);
+      }
     } else {
       getter.SetFunctionType(gd::EventsFunction::ExpressionAndCondition)
           .SetDescription(descriptionSubject)
           .SetSentence("the " + UnCapitalizeFirstLetter(propertyLabel));
+      if (!isBehavior) {
+        addObjectParameter(getter);
+      }
     }
 
     auto &event =
@@ -233,6 +254,10 @@ void PropertyFunctionGenerator::GenerateGetterAndSetter(
 bool PropertyFunctionGenerator::CanGenerateGetterAndSetter(
     const gd::AbstractEventsBasedEntity &eventsBasedEntity,
     const gd::NamedPropertyDescriptor &property) {
+  if (property.GetType() == "JsonObject") {
+    return false;
+  }
+
   const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
           property.GetType()));

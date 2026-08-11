@@ -7,6 +7,7 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import LayerEditorDialog from '../LayersList/LayerEditorDialog';
+import enumerateLayers from '../LayersList/EnumerateLayers';
 import ObjectInstanceVariablesDialog from '../VariablesList/ObjectInstanceVariablesDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
 import ObjectExporterDialog from '../ObjectEditor/ObjectExporterDialog';
@@ -18,9 +19,12 @@ import ScenePropertiesDialog from './ScenePropertiesDialog';
 import EventsBasedObjectScenePropertiesDialog from './EventsBasedObjectScenePropertiesDialog';
 import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
 import ExtractAsCustomObjectDialog from './CustomObjectExtractor/ExtractAsCustomObjectDialog';
+import NewObjectDialog from '../AssetStore/NewObjectDialog';
+import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
+import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard from '../Utils/Clipboard';
 import { SafeExtractor } from '../Utils/SafeExtractor';
@@ -78,6 +82,7 @@ import {
   cleanNonExistingObjectFolderOrObjectWithContexts,
   getObjectFolderOrObjectWithContextFromObjectName,
 } from './ObjectFolderOrObjectsSelection';
+import objectTypeToDefaultName from '../ObjectsList/ObjectTypeToDefaultName';
 import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
@@ -92,11 +97,26 @@ import { extractAsCustomObject } from './CustomObjectExtractor/CustomObjectExtra
 import { isVariantEditable } from '../ObjectEditor/Editors/CustomObjectPropertiesEditor';
 import { addSerializedInstances } from '../InstancesEditor/InstancesAdder';
 import { type EditorViewPosition2D } from '../InstancesEditor';
+import { type CustomObjectDragItem } from '../ProjectManager/ProjectManagerItemDragAndDrop';
+import {
+  createSpriteObjectFromImageFile,
+  createSpriteObjectsFromImageFiles,
+  getSupportedImageFilePaths,
+  hasClipboardImage,
+  writeImageFromClipboardToProjectFolder,
+} from './CreateSpriteFromImage';
+import {
+  create3DModelObjectsFromGLBFiles,
+  getSupported3DModelFilePaths,
+} from './Create3DModelFromGLB';
 import {
   changeViewPosition,
+  registerCustomObjectDroppedInEmbeddedGameFrameCallback,
+  register3DModelFilesDroppedInEmbeddedGameFrameCallback,
   setCameraState,
 } from '../EmbeddedGame/EmbeddedGameFrame';
 import Rectangle from '../Utils/Rectangle';
+import { getContentAABB as getEditorContentAABB } from './GetContentAABB';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 import { type WillDeleteObjectChanges } from '../EditorFunctions/OutsideEditorChanges';
 import {
@@ -104,13 +124,129 @@ import {
   getImageResourceNamesForEditedObject,
   shouldResetObjectRendererForCustomObjectChildrenEdit,
 } from './CustomObjectResourceReload';
-import { type LastSelectionType } from './EditorsDisplay.flow';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
+import optionalRequire from '../Utils/OptionalRequire';
 
 const gd: libGDevelop = global.gd;
+const path = optionalRequire('path');
+const url = optionalRequire('url');
+
+// The kind of the last selection whose properties are shown in the side panel.
+// NOTE: Upstream imports this as `type LastSelectionType` from
+// './EditorsDisplay.flow', but that (sibling) module does not currently export
+// it, so the union is kept in sync locally here.
+type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
+
+type EmbeddedGameFrameDropPosition = {|
+  x: number,
+  y: number,
+  z: number,
+  layerName: string,
+|};
 
 const BASE_LAYER_NAME = '';
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
+
+const isExternalResourceFile = (file: string): boolean =>
+  file.indexOf('http://') === 0 ||
+  file.indexOf('https://') === 0 ||
+  file.indexOf('data:') === 0 ||
+  file.indexOf('blob:') === 0 ||
+  file.indexOf('file://') === 0;
+
+const getLocalFileUrl = (absolutePath: string): string => {
+  if (url && url.pathToFileURL)
+    return url.pathToFileURL(absolutePath).toString();
+  return `file:///${absolutePath.replace(/\\/g, '/').replace(/^\/+/, '')}`;
+};
+
+const getRuntimeProjectResourceDataArray = (project: gdProject): Array<any> => {
+  const serializedProject = serializeToJSObject(project);
+  const resourceDataArray =
+    serializedProject.resources &&
+    Array.isArray(serializedProject.resources.resources)
+      ? serializedProject.resources.resources
+      : [];
+
+  if (!path) return resourceDataArray;
+  const projectFile = project.getProjectFile();
+  const projectRootPath = projectFile ? path.dirname(projectFile) : null;
+  if (!projectRootPath) return resourceDataArray;
+
+  return resourceDataArray.map(resourceData => {
+    const file = resourceData.file;
+    if (typeof file !== 'string' || !file || isExternalResourceFile(file)) {
+      return resourceData;
+    }
+
+    const absolutePath = path.isAbsolute(file)
+      ? file
+      : path.join(projectRootPath, file);
+    return {
+      ...resourceData,
+      file: getLocalFileUrl(absolutePath),
+    };
+  });
+};
+
+const normalizeResourceFileIdentifier = (identifier: string): string =>
+  identifier.replace(/\\/g, '/').toLowerCase();
+
+const get3DModelResourceFileIdentifiers = ({
+  project,
+  objects,
+}: {|
+  project: gdProject,
+  objects: Array<gdObject>,
+|}): Array<string> => {
+  const resourceFiles = [];
+  const resourcesManager = project.getResourcesManager();
+
+  objects.forEach(object => {
+    if (object.getType() !== 'Scene3D::Model3DObject') return;
+
+    const model3DConfiguration = gd.asModel3DConfiguration(
+      object.getConfiguration()
+    );
+    const resourceName = model3DConfiguration.getModelResourceName();
+    if (!resourceName || !resourcesManager.hasResource(resourceName)) return;
+
+    const resourceFile = resourcesManager.getResource(resourceName).getFile();
+    if (resourceFile) resourceFiles.push(resourceFile);
+  });
+
+  return resourceFiles;
+};
+
+const getTopLayerName = (
+  layersContainer: gdLayersContainer,
+  ignoredLayerName?: string
+): string => {
+  for (
+    let layerIndex = layersContainer.getLayersCount() - 1;
+    layerIndex >= 0;
+    layerIndex--
+  ) {
+    const layerName = layersContainer.getLayerAt(layerIndex).getName();
+    if (layerName !== ignoredLayerName) return layerName;
+  }
+
+  return BASE_LAYER_NAME;
+};
+
+const getInitialChosenLayer = (
+  layersContainer: gdLayersContainer,
+  initialSelectedLayer: string
+): string => {
+  if (
+    initialSelectedLayer &&
+    layersContainer.hasLayerNamed(initialSelectedLayer)
+  ) {
+    return initialSelectedLayer;
+  }
+
+  return getTopLayerName(layersContainer);
+};
 
 interface InstancePersistentUuidData {
   persistentUuid: string;
@@ -183,6 +319,14 @@ export type EditorId =
   | 'instances-list'
   | 'layers-list';
 
+const PANEL_EDITOR_IDS: Array<EditorId> = [
+  'objects-list',
+  'object-groups-list',
+  'properties',
+  'instances-list',
+  'layers-list',
+];
+
 const styles = {
   container: {
     display: 'flex',
@@ -247,6 +391,14 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   onDeleteEventsBasedObjectVariant: (
@@ -279,10 +431,10 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
-  newObjectInstanceSceneCoordinates: ?[number, number],
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
   extractAsExternalLayoutDialogOpen: boolean,
   extractAsCustomObjectDialogOpen: boolean,
+  newObjectDialogOpen: boolean,
 
   editedGroup: gdObjectGroup | null,
   isCreatingNewGroup: boolean,
@@ -305,9 +457,89 @@ type State = {|
   lastSelectionType: LastSelectionType,
 |};
 
+const getSceneEditorHistoryContext = (
+  props: Props
+): {| editor: string, subject?: string |} => {
+  if (props.layout) {
+    return {
+      editor: 'Scene editor',
+      subject: props.layout.getName(),
+    };
+  }
+  if (props.externalLayout) {
+    return {
+      editor: 'External layout editor',
+      subject: props.externalLayout.getName(),
+    };
+  }
+  if (props.eventsBasedObjectVariant) {
+    return {
+      editor: 'Custom object variant editor',
+      subject: props.eventsBasedObjectVariant.getName(),
+    };
+  }
+  if (props.eventsBasedObject) {
+    return {
+      editor: 'Custom object editor',
+      subject: props.eventsBasedObject.getName(),
+    };
+  }
+
+  return {
+    editor: 'Scene editor',
+  };
+};
+
+const getInstanceOperationLabel = (verb: string, instancesCount: number) =>
+  `${verb} ${instancesCount === 1 ? 'instance' : 'instances'}`;
+
+const getMoveInstancesToLayerOperationLabel = (
+  layerName: string,
+  instancesCount: number
+) =>
+  `Move ${instancesCount === 1 ? 'instance' : 'instances'} to ${layerName ||
+    'Base layer'}`;
+
 type CopyCutPasteOptions = {|
   useLastCursorPosition?: boolean,
   pasteInTheForeground?: boolean,
+|};
+
+export type SceneEditorSelectionSnapshot = {|
+  selectionProvider: 'SceneEditor',
+  isActive: boolean,
+  sceneName: string | null,
+  externalLayoutName: string | null,
+  eventsBasedObjectName: string | null,
+  eventsBasedObjectVariantName: string | null,
+  lastSelectionType: LastSelectionType,
+  selectedLayerName: string | null,
+  chosenLayerName: string,
+  selectedObjectNames: Array<string>,
+  selectedInstanceObjectNames: Array<string>,
+  activeSelectedObjectNames: Array<string>,
+  selectedObjects: Array<{|
+    kind: 'object' | 'folder',
+    name: string,
+    global: boolean,
+  |}>,
+  selectedInstances: Array<{|
+    id: string,
+    objectName: string,
+    layer: string,
+    x: number,
+    y: number,
+    z: number,
+    angle: number,
+    zOrder: number,
+    locked: boolean,
+    sealed: boolean,
+    hasCustomSize: boolean,
+    customWidth: number | null,
+    customHeight: number | null,
+    hasCustomDepth: boolean,
+    customDepth: number | null,
+  |}>,
 |};
 
 const editSceneIconReactNode = <EditSceneIcon />;
@@ -318,8 +550,15 @@ export default class SceneEditor extends React.Component<Props, State> {
   editorDisplay: ?SceneEditorsDisplayInterface;
   resourceExternallyChangedCallbackId: ?string;
   unregisterDebuggerCallback: (() => void) | null = null;
+  unregister3DModelFilesDroppedInEmbeddedGameFrameCallback:
+    | (() => void)
+    | null = null;
+  unregisterCustomObjectDroppedInEmbeddedGameFrameCallback:
+    | (() => void)
+    | null = null;
   editorViewPosition2D: EditorViewPosition2D = { viewX: null, viewY: null };
   _reloadResourcesCounter: number = 0;
+  _ignoredResourceChangeIdentifiers: { [string]: number } = {};
 
   constructor(props: Props) {
     super(props);
@@ -341,16 +580,17 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
       isCreatingNewGroup: false,
       editedGroupInitialTab: null,
       extractAsExternalLayoutDialogOpen: false,
       extractAsCustomObjectDialogOpen: false,
+      newObjectDialogOpen: false,
 
       instancesEditorSettings: initialInstancesEditorSettings,
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
+        historyContext: getSceneEditorHistoryContext(props),
       }),
 
       layoutVariablesDialogOpen: false,
@@ -364,8 +604,10 @@ export default class SceneEditor extends React.Component<Props, State> {
       tileMapTileSelection: null,
 
       selectedObjectFolderOrObjectsWithContext: [],
-      chosenLayer:
-        initialInstancesEditorSettings.selectedLayer || BASE_LAYER_NAME,
+      chosenLayer: getInitialChosenLayer(
+        props.layersContainer,
+        initialInstancesEditorSettings.selectedLayer
+      ),
       selectedLayer: null,
       selectedObjectGroup: null,
       invisibleLayerOnWhichInstancesHaveJustBeenAdded: null,
@@ -378,6 +620,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
+    this._syncCustomObjectDroppedInEmbeddedGameFrameCallback();
   }
 
   componentDidMount() {
@@ -450,6 +695,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         }
       );
     }
+    this._sync3DModelFilesDroppedInEmbeddedGameFrameCallback();
+    this._syncCustomObjectDroppedInEmbeddedGameFrameCallback();
   }
 
   componentWillUnmount() {
@@ -460,7 +707,55 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.unregisterDebuggerCallback();
       this.unregisterDebuggerCallback = null;
     }
+    if (this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
+    if (this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback();
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = null;
+    }
   }
+
+  _sync3DModelFilesDroppedInEmbeddedGameFrameCallback = () => {
+    const shouldRegister =
+      this.props.isActive && this.props.gameEditorMode === 'embedded-game';
+
+    if (
+      shouldRegister &&
+      !this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = register3DModelFilesDroppedInEmbeddedGameFrameCallback(
+        this._on3DModelFilesDroppedInEmbeddedGameFrame
+      );
+    } else if (
+      !shouldRegister &&
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback();
+      this.unregister3DModelFilesDroppedInEmbeddedGameFrameCallback = null;
+    }
+  };
+
+  _syncCustomObjectDroppedInEmbeddedGameFrameCallback = () => {
+    const shouldRegister =
+      this.props.isActive && this.props.gameEditorMode === 'embedded-game';
+
+    if (
+      shouldRegister &&
+      !this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = registerCustomObjectDroppedInEmbeddedGameFrameCallback(
+        this._onCustomObjectDroppedInEmbeddedGameFrame
+      );
+    } else if (
+      !shouldRegister &&
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback
+    ) {
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback();
+      this.unregisterCustomObjectDroppedInEmbeddedGameFrameCallback = null;
+    }
+  };
 
   onEditorReloaded() {
     this._sendSelectedInstances();
@@ -468,6 +763,88 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   getInstancesEditorSettings(): any {
     return this.state.instancesEditorSettings;
+  }
+
+  getEditorSelectionSnapshot(): SceneEditorSelectionSnapshot {
+    const selectedObjects: Array<{|
+      kind: 'object' | 'folder',
+      name: string,
+      global: boolean,
+    |}> = this.state.selectedObjectFolderOrObjectsWithContext.map(
+      objectFolderOrObjectWithContext => {
+        const {
+          objectFolderOrObject,
+          global,
+        } = objectFolderOrObjectWithContext;
+        const kind: 'object' | 'folder' = objectFolderOrObject.isFolder()
+          ? 'folder'
+          : 'object';
+        return {
+          kind,
+          name: getObjectFolderOrObjectUnifiedName(objectFolderOrObject),
+          global,
+        };
+      }
+    );
+    const selectedObjectNames = selectedObjects
+      .filter(selectedObject => selectedObject.kind === 'object')
+      .map(selectedObject => selectedObject.name);
+    const selectedInstances = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => ({
+        id: instance.getPersistentUuid().slice(0, 10),
+        objectName: instance.getObjectName(),
+        layer: instance.getLayer(),
+        x: instance.getX(),
+        y: instance.getY(),
+        z: instance.getZ(),
+        angle: instance.getAngle(),
+        zOrder: instance.getZOrder(),
+        locked: instance.isLocked(),
+        sealed: instance.isSealed(),
+        hasCustomSize: instance.hasCustomSize(),
+        customWidth: instance.hasCustomSize()
+          ? instance.getCustomWidth()
+          : null,
+        customHeight: instance.hasCustomSize()
+          ? instance.getCustomHeight()
+          : null,
+        hasCustomDepth: instance.hasCustomDepth(),
+        customDepth: instance.hasCustomDepth()
+          ? instance.getCustomDepth()
+          : null,
+      }));
+    const selectedInstanceObjectNames = uniq(
+      selectedInstances.map(instance => instance.objectName)
+    );
+
+    return {
+      selectionProvider: 'SceneEditor',
+      isActive: this.props.isActive,
+      sceneName: this.props.layout ? this.props.layout.getName() : null,
+      externalLayoutName: this.props.externalLayout
+        ? this.props.externalLayout.getName()
+        : null,
+      eventsBasedObjectName: this.props.eventsBasedObject
+        ? this.props.eventsBasedObject.getName()
+        : null,
+      eventsBasedObjectVariantName: this.props.eventsBasedObjectVariant
+        ? this.props.eventsBasedObjectVariant.getName()
+        : null,
+      lastSelectionType: this.state.lastSelectionType,
+      selectedLayerName: this.state.selectedLayer
+        ? this.state.selectedLayer.getName()
+        : null,
+      chosenLayerName: this.state.chosenLayer,
+      selectedObjectNames,
+      selectedInstanceObjectNames,
+      activeSelectedObjectNames:
+        this.state.lastSelectionType === 'instance'
+          ? selectedInstanceObjectNames
+          : selectedObjectNames,
+      selectedObjects,
+      selectedInstances,
+    };
   }
 
   onReceiveInstanceChanges(changes: InstanceChanges) {
@@ -583,7 +960,13 @@ export default class SceneEditor extends React.Component<Props, State> {
           history: saveToHistory(
             this.state.history,
             this.props.initialInstances,
-            'DELETE'
+            'DELETE',
+            {
+              operationLabel: getInstanceOperationLabel(
+                'Delete',
+                justRemovedInstances.length
+              ),
+            }
           ),
         },
         () => {
@@ -727,6 +1110,15 @@ export default class SceneEditor extends React.Component<Props, State> {
   |}) => {
     const { project } = this.props;
 
+    if (this._shouldIgnoreResourceExternalChange(resourceInfo.identifier)) {
+      console.info(
+        `Ignoring resource watcher event for "${
+          resourceInfo.identifier
+        }" because it was just imported into the 3D editor.`
+      );
+      return;
+    }
+
     const resourceNames = project
       .getResourcesManager()
       .getResourceNamesWithFile(resourceInfo.identifier)
@@ -741,6 +1133,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     await this._reloadResources(resourceNames, 'resource file changed');
+  };
+
+  _ignoreResourceExternalChangesForFiles = (resourceFiles: Array<string>) => {
+    const expiresAt = Date.now() + 5000;
+    resourceFiles.forEach(resourceFile => {
+      this._ignoredResourceChangeIdentifiers[
+        normalizeResourceFileIdentifier(resourceFile)
+      ] = expiresAt;
+    });
+  };
+
+  _shouldIgnoreResourceExternalChange = (identifier: string): boolean => {
+    const normalizedIdentifier = normalizeResourceFileIdentifier(identifier);
+    const expiresAt = this._ignoredResourceChangeIdentifiers[
+      normalizedIdentifier
+    ];
+    if (!expiresAt) return false;
+
+    if (Date.now() > expiresAt) {
+      delete this._ignoredResourceChangeIdentifiers[normalizedIdentifier];
+      return false;
+    }
+
+    return true;
   };
 
   onInstancesModifiedOutsideEditor = () => {
@@ -797,45 +1213,66 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdateObjectGroupsList();
   };
 
+  _canAddObject = (): boolean => {
+    const { eventsBasedObject, eventsBasedObjectVariant } = this.props;
+    return (
+      !eventsBasedObject ||
+      eventsBasedObject.getDefaultVariant() === eventsBasedObjectVariant
+    );
+  };
+
   updateToolbar = () => {
     const { editorDisplay } = this;
+    const { eventsBasedObject, layout } = this.props;
     if (!editorDisplay) return;
+
+    const canOpenEvents = !!layout || !!eventsBasedObject;
+    const canAddObject = this._canAddObject();
+    const openEventsTooltip = eventsBasedObject
+      ? t`Open object events`
+      : t`Open scene events`;
 
     if (editorDisplay.getName() === 'mosaic') {
       this.props.setToolbar(
-        <MosaicEditorsDisplayToolbar
-          gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
-          setGameEditorMode={this.setGameEditorMode}
-          selectedInstancesCount={
-            this.instancesSelection.getSelectedInstances().length
+        <SplitEditorToolbar
+          leadingToolbar={null}
+          trailingToolbar={
+            <MosaicEditorsDisplayToolbar
+              gameEditorMode={this.state.instancesEditorSettings.gameEditorMode}
+              setGameEditorMode={this.setGameEditorMode}
+              onAddObject={this._openNewObjectDialog}
+              canAddObject={canAddObject}
+              selectedInstancesCount={
+                this.instancesSelection.getSelectedInstances().length
+              }
+              toggleObjectsList={this.toggleObjectsList}
+              toggleObjectGroupsList={this.toggleObjectGroupsList}
+              toggleProperties={this.toggleProperties}
+              deleteSelection={this.deleteSelection}
+              toggleInstancesList={this.toggleInstancesList}
+              toggleLayersList={this.toggleLayersList}
+              toggleAllPanels={this.toggleAllPanels}
+              areAllPanelsShown={PANEL_EDITOR_IDS.every(editorId =>
+                editorDisplay.isEditorVisible(editorId)
+              )}
+              toggleWindowMask={this.toggleWindowMask}
+              isWindowMaskShown={
+                !!this.state.instancesEditorSettings.windowMask
+              }
+              toggleGrid={this.toggleGrid}
+              isGridShown={!!this.state.instancesEditorSettings.grid}
+              openSetupGrid={this.openSetupGrid}
+              canUndo={canUndo(this.state.history)}
+              canRedo={canRedo(this.state.history)}
+              undo={this.undo}
+              redo={this.redo}
+              onOpenEvents={canOpenEvents ? this.openEvents : null}
+              openEventsTooltip={openEventsTooltip}
+              onOpenSettings={this.openSceneProperties}
+              settingsIcon={editSceneIconReactNode}
+              onOpenSceneVariables={this.openSceneVariables}
+            />
           }
-          toggleObjectsList={this.toggleObjectsList}
-          isObjectsListShown={editorDisplay.isEditorVisible('objects-list')}
-          toggleObjectGroupsList={this.toggleObjectGroupsList}
-          isObjectGroupsListShown={editorDisplay.isEditorVisible(
-            'object-groups-list'
-          )}
-          toggleProperties={this.toggleProperties}
-          isPropertiesShown={editorDisplay.isEditorVisible('properties')}
-          deleteSelection={this.deleteSelection}
-          toggleInstancesList={this.toggleInstancesList}
-          isInstancesListShown={editorDisplay.isEditorVisible('instances-list')}
-          toggleLayersList={this.toggleLayersList}
-          isLayersListShown={editorDisplay.isEditorVisible('layers-list')}
-          toggleWindowMask={this.toggleWindowMask}
-          isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
-          toggleGrid={this.toggleGrid}
-          isGridShown={!!this.state.instancesEditorSettings.grid}
-          openSetupGrid={this.openSetupGrid}
-          setZoomFactor={this.setZoomFactor}
-          getContextMenuZoomItems={this.getContextMenuZoomItems}
-          canUndo={canUndo(this.state.history)}
-          canRedo={canRedo(this.state.history)}
-          undo={this.undo}
-          redo={this.redo}
-          onOpenSettings={this.openSceneProperties}
-          settingsIcon={editSceneIconReactNode}
-          onOpenSceneVariables={this.openSceneVariables}
         />
       );
     } else {
@@ -843,6 +1280,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         <SwipeableDrawerEditorsDisplayToolbar
           gameEditorMode={this.props.gameEditorMode}
           setGameEditorMode={this.props.setGameEditorMode}
+          onAddObject={this._openNewObjectDialog}
+          canAddObject={canAddObject}
           selectedInstancesCount={
             this.instancesSelection.getSelectedInstances().length
           }
@@ -852,6 +1291,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           deleteSelection={this.deleteSelection}
           toggleInstancesList={this.toggleInstancesList}
           toggleLayersList={this.toggleLayersList}
+          toggleAllPanels={this.toggleAllPanels}
           toggleWindowMask={this.toggleWindowMask}
           isWindowMaskShown={!!this.state.instancesEditorSettings.windowMask}
           toggleGrid={this.toggleGrid}
@@ -863,6 +1303,8 @@ export default class SceneEditor extends React.Component<Props, State> {
           canRedo={canRedo(this.state.history)}
           undo={this.undo}
           redo={this.redo}
+          onOpenEvents={canOpenEvents ? this.openEvents : null}
+          openEventsTooltip={openEventsTooltip}
           onOpenSettings={this.openSceneProperties}
           settingsIcon={editSceneIconReactNode}
           onOpenSceneVariables={this.openSceneVariables}
@@ -934,6 +1376,26 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.editorDisplay.toggleEditorView('layers-list');
   };
 
+  toggleAllPanels = () => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return;
+    editorDisplay.viewControls.keepCanvasTopCenterScreenCoordinatesOnNextResize();
+    const shouldShowAllPanels = PANEL_EDITOR_IDS.some(
+      editorId => !editorDisplay.isEditorVisible(editorId)
+    );
+    editorDisplay.setEditorViewsVisibility(
+      PANEL_EDITOR_IDS.map(editorId => ({
+        editorId,
+        visible: shouldShowAllPanels,
+      }))
+    );
+  };
+
+  ensureEditorPanelVisible = (editorId: EditorId) => {
+    if (!this.editorDisplay) return;
+    this.editorDisplay.ensureEditorVisible(editorId);
+  };
+
   toggleWindowMask = () => {
     this.setInstancesEditorSettings({
       ...this.state.instancesEditorSettings,
@@ -965,6 +1427,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   openSceneProperties = (open: boolean = true) => {
     this.setState({ scenePropertiesDialogOpen: open });
+  };
+
+  openEvents = () => {
+    const { eventsBasedObject, layout } = this.props;
+    if (!layout && !eventsBasedObject) return;
+
+    this.props.onOpenEvents(layout ? layout.getName() : '');
   };
 
   openObjectEditor = () => {
@@ -1101,9 +1570,17 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     this.setState({
       editedGroup: group,
-      editedGroupInitialTab: initialTab,
+      editedGroupInitialTab: initialTab || null,
       isCreatingNewGroup: false,
     });
+  };
+
+  _isObjectGroupGlobal = (group: gdObjectGroup): boolean => {
+    const { globalObjectsContainer } = this.props;
+    return (
+      !!globalObjectsContainer &&
+      globalObjectsContainer.getObjectGroups().has(group.getName())
+    );
   };
 
   _createObjectGroup = () => {
@@ -1112,10 +1589,9 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _closeObjectGroupEditorDialog = () => {
     if (this.state.editedGroup) {
-      // TODO Set the `global` attribute correctly.
       this.props.onObjectGroupEdited({
         group: this.state.editedGroup,
-        global: false,
+        global: this._isObjectGroupGlobal(this.state.editedGroup),
       });
     }
     this.setState({ editedGroup: null, isCreatingNewGroup: false });
@@ -1232,15 +1708,32 @@ export default class SceneEditor extends React.Component<Props, State> {
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
   ) => {
     const selectedObjectFolderOrObjectsWithContext = [];
-    if (
-      objectFolderOrObjectWithContext &&
-      exceptionallyGuardAgainstDeadObject(
-        objectFolderOrObjectWithContext.objectFolderOrObject
-      )
-    ) {
-      selectedObjectFolderOrObjectsWithContext.push(
-        objectFolderOrObjectWithContext
-      );
+    const objectFolderOrObject = objectFolderOrObjectWithContext
+      ? exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObjectWithContext.objectFolderOrObject
+        )
+      : null;
+
+    const instancesToSelect =
+      objectFolderOrObject && !objectFolderOrObject.isFolder()
+        ? getInstancesInLayoutForObject(
+            this.props.initialInstances,
+            objectFolderOrObject.getObject().getName()
+          )
+        : [];
+    this.instancesSelection.selectInstances({
+      instances: instancesToSelect,
+      multiSelect: false,
+      layersLocks: null,
+      ignoreSeal: true,
+    });
+    this._sendSelectedInstances();
+
+    if (objectFolderOrObjectWithContext && objectFolderOrObject) {
+      selectedObjectFolderOrObjectsWithContext.push({
+        ...objectFolderOrObjectWithContext,
+        objectFolderOrObject,
+      });
     }
 
     this.setState(
@@ -1251,6 +1744,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         selectedObjectGroup: null,
       },
       () => {
+        this.forceUpdateInstancesList();
         // We update the toolbar because we need to update the objects selected
         // (for the rename shortcut)
         this.updateToolbar();
@@ -1264,11 +1758,76 @@ export default class SceneEditor extends React.Component<Props, State> {
       return;
     }
 
-    // Remember where to create the instance, when the object will be created.
-    this.setState({
-      newObjectInstanceSceneCoordinates: editorDisplay.viewControls.getLastCursorSceneCoordinates(),
+    const { viewControls } = editorDisplay;
+    editorDisplay.openNewObjectDialog({
+      instanceSceneCoordinates: viewControls.getLastCursorSceneCoordinates(),
     });
-    editorDisplay.openNewObjectDialog();
+  };
+
+  _openNewObjectDialog = () => {
+    if (!this._canAddObject()) {
+      return;
+    }
+
+    this.setState({ newObjectDialogOpen: true });
+  };
+
+  _addObjectFromNewObjectDialog = (objectType: string) => {
+    const { project, objectsContainer, globalObjectsContainer } = this.props;
+
+    const defaultName = project.hasEventsBasedObject(objectType)
+      ? 'New' +
+        (project.getEventsBasedObject(objectType).getDefaultName() ||
+          project.getEventsBasedObject(objectType).getName())
+      : // $FlowFixMe[invalid-computed-prop]
+        objectTypeToDefaultName[objectType] || 'NewObject';
+    const name = newNameGenerator(
+      defaultName,
+      name =>
+        objectsContainer.hasObjectNamed(name) ||
+        (!!globalObjectsContainer &&
+          globalObjectsContainer.hasObjectNamed(name))
+    );
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
+
+    const object = objectsContainer.insertNewObject(
+      project,
+      objectType,
+      name,
+      objectsContainer.getObjectsCount()
+    );
+    const objectFolderOrObjectWithContext = {
+      objectFolderOrObject: objectsContainer
+        .getRootFolder()
+        .getObjectChild(name),
+      global: false,
+    };
+
+    this.setState({ newObjectDialogOpen: false });
+    this.editObject(object, 'properties');
+    this._onObjectFolderOrObjectWithContextSelected(
+      objectFolderOrObjectWithContext
+    );
+    this._onObjectCreated([object], isTheFirstOfItsTypeInProject, {
+      shouldCreateInstance: true,
+    });
+    this.forceUpdateObjectsList();
+  };
+
+  _onObjectsAddedFromAssetsFromNewObjectDialog = ({
+    createdObjects: objects,
+    isTheFirstOfItsTypeInProject,
+  }: InstallAssetOutput) => {
+    if (!objects.length) return;
+
+    this._onObjectCreated(objects, isTheFirstOfItsTypeInProject, {
+      shouldCreateInstance: true,
+    });
+    this.forceUpdateObjectsList();
   };
 
   addInstanceOnTheScene = (
@@ -1302,6 +1861,194 @@ export default class SceneEditor extends React.Component<Props, State> {
       this.state.chosenLayer
     );
     this._onInstancesAddedAndSendToEditor3D(instances);
+  };
+
+  _addInstancesForObjectsAtPosition = (
+    objects: Array<gdObject>,
+    position: [number, number]
+  ) => {
+    const { editorDisplay } = this;
+    if (!editorDisplay || !objects.length) return;
+
+    const newInstances: Array<gdInitialInstance> = [];
+    objects.forEach((object, index) => {
+      newInstances.push(
+        ...editorDisplay.instancesHandlers.addInstances(
+          [position[0] + index * 16, position[1] + index * 16],
+          [object.getName()],
+          this.state.chosenLayer
+        )
+      );
+    });
+
+    this._onInstancesAddedAndSendToEditor3D(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances({
+      instances: newInstances,
+      multiSelect: true,
+      layersLocks: null,
+    });
+    this._onInstancesSelected(newInstances);
+    this.forceUpdatePropertiesEditor();
+  };
+
+  _doesObjectMatchCustomObjectDragItem = (
+    object: gdObject,
+    objectType: string,
+    variantName: string
+  ): boolean => {
+    if (object.getType() !== objectType) return false;
+
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      object.getConfiguration()
+    );
+    return customObjectConfiguration.getVariantName() === variantName;
+  };
+
+  _findObjectMatchingCustomObjectDragItem = (
+    objectType: string,
+    variantName: string
+  ): gdObject | null => {
+    const { globalObjectsContainer, objectsContainer } = this.props;
+    const findInContainer = (
+      container: gdObjectsContainer
+    ): gdObject | null => {
+      const objectsCount = container.getObjectsCount();
+      for (let objectIndex = 0; objectIndex < objectsCount; objectIndex++) {
+        const object = container.getObjectAt(objectIndex);
+        if (
+          this._doesObjectMatchCustomObjectDragItem(
+            object,
+            objectType,
+            variantName
+          )
+        ) {
+          return object;
+        }
+      }
+      return null;
+    };
+
+    return (
+      findInContainer(objectsContainer) ||
+      (globalObjectsContainer ? findInContainer(globalObjectsContainer) : null)
+    );
+  };
+
+  _getOrCreateObjectFromCustomObjectDragItem = (
+    customObjectDragItem: CustomObjectDragItem,
+    { notifyInGameEditor = true }: {| notifyInGameEditor?: boolean |} = {}
+  ): gdObject | null => {
+    if (!this._canAddObject()) return null;
+
+    const {
+      extensionName,
+      eventsBasedObjectName,
+      variantName,
+    } = customObjectDragItem;
+    const { project, objectsContainer, globalObjectsContainer } = this.props;
+    const objectType = gd.PlatformExtension.getObjectFullType(
+      extensionName,
+      eventsBasedObjectName
+    );
+
+    if (!project.hasEventsBasedObject(objectType)) return null;
+
+    const eventsBasedObject = project.getEventsBasedObject(objectType);
+    if (
+      variantName &&
+      !eventsBasedObject.getVariants().hasVariantNamed(variantName)
+    ) {
+      return null;
+    }
+
+    const requestedObjectName = gd.Project.getSafeName(
+      customObjectDragItem.sceneObjectName || eventsBasedObjectName
+    );
+    const isRequestedObjectNameTaken =
+      objectsContainer.hasObjectNamed(requestedObjectName) ||
+      (!!globalObjectsContainer &&
+        globalObjectsContainer.hasObjectNamed(requestedObjectName));
+
+    const getMatchingObjectNamed = (objectName: string): gdObject | null => {
+      const object = getObjectByName(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName
+      );
+      if (
+        object &&
+        this._doesObjectMatchCustomObjectDragItem(
+          object,
+          objectType,
+          variantName
+        )
+      ) {
+        return object;
+      }
+      return null;
+    };
+
+    const exactObject = getMatchingObjectNamed(requestedObjectName);
+    if (exactObject) return exactObject;
+
+    // If the requested name is already used by another object, reuse an
+    // existing object with the same prefab/variant instead of creating a new
+    // uniquely suffixed object every time this prefab is dragged.
+    if (isRequestedObjectNameTaken) {
+      const matchingObject = this._findObjectMatchingCustomObjectDragItem(
+        objectType,
+        variantName
+      );
+      if (matchingObject) return matchingObject;
+    }
+
+    const objectName = newNameGenerator(
+      requestedObjectName,
+      name =>
+        objectsContainer.hasObjectNamed(name) ||
+        (!!globalObjectsContainer &&
+          globalObjectsContainer.hasObjectNamed(name))
+    );
+
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      project,
+      objectType
+    );
+
+    const object = objectsContainer.insertNewObject(
+      project,
+      objectType,
+      objectName,
+      objectsContainer.getObjectsCount()
+    );
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      object.getConfiguration()
+    );
+    if (variantName) {
+      customObjectConfiguration.setVariantName(variantName);
+    }
+    customObjectConfiguration.setMarkedAsOverridingEventsBasedObjectChildrenConfiguration(
+      false
+    );
+
+    this._onObjectsCreated([object], isTheFirstOfItsTypeInProject, {
+      notifyInGameEditor,
+    });
+    this.forceUpdateObjectsList();
+    return object;
+  };
+
+  _onCustomObjectDropped = (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => {
+    const object = this._getOrCreateObjectFromCustomObjectDragItem(
+      customObjectDragItem
+    );
+    if (!object) return;
+
+    this._addInstancesForObjectsAtPosition([object], position);
   };
 
   _onInstancesAddedAndSendToEditor3D = (
@@ -1344,7 +2091,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'ADD'
+          'ADD',
+          {
+            operationLabel: getInstanceOperationLabel('Add', instances.length),
+          }
         ),
       },
       () => this.updateToolbar()
@@ -1458,7 +2208,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel('Move', instances.length),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1472,12 +2225,97 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Resize',
+              instances.length
+            ),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
     this._sendUpdatedInstances(instances);
+  };
+
+  _fitCustomSizedModel3DInstancesToObjectRatio = (
+    object: gdObject
+  ): Array<gdInitialInstance> => {
+    if (object.getType() !== 'Scene3D::Model3DObject') return [];
+
+    const model3DConfiguration = gd.asModel3DConfiguration(
+      object.getConfiguration()
+    );
+    const defaultWidth = model3DConfiguration.getWidth();
+    const defaultHeight = model3DConfiguration.getHeight();
+    const defaultDepth = model3DConfiguration.getDepth();
+    if (
+      !Number.isFinite(defaultWidth) ||
+      !Number.isFinite(defaultHeight) ||
+      !Number.isFinite(defaultDepth) ||
+      defaultWidth <= 0 ||
+      defaultHeight <= 0 ||
+      defaultDepth <= 0
+    ) {
+      return [];
+    }
+
+    const resizedInstances: Array<gdInitialInstance> = [];
+    const objectInstances = getInstancesInLayoutForObject(
+      this.props.initialInstances,
+      object.getName()
+    );
+    objectInstances.forEach(instance => {
+      if (!instance.hasCustomSize() && !instance.hasCustomDepth()) return;
+
+      const currentWidth = instance.hasCustomSize()
+        ? instance.getCustomWidth()
+        : defaultWidth;
+      const currentHeight = instance.hasCustomSize()
+        ? instance.getCustomHeight()
+        : defaultHeight;
+      const currentDepth = instance.hasCustomDepth()
+        ? instance.getCustomDepth()
+        : defaultDepth;
+      if (
+        !Number.isFinite(currentWidth) ||
+        !Number.isFinite(currentHeight) ||
+        !Number.isFinite(currentDepth) ||
+        currentWidth <= 0 ||
+        currentHeight <= 0 ||
+        currentDepth <= 0
+      ) {
+        return;
+      }
+
+      const scale = Math.min(
+        currentWidth / defaultWidth,
+        currentHeight / defaultHeight,
+        currentDepth / defaultDepth
+      );
+      if (!Number.isFinite(scale) || scale <= 0) return;
+
+      const nextWidth = scale * defaultWidth;
+      const nextHeight = scale * defaultHeight;
+      const nextDepth = scale * defaultDepth;
+      if (
+        Math.abs(currentWidth - nextWidth) < 0.000001 &&
+        Math.abs(currentHeight - nextHeight) < 0.000001 &&
+        Math.abs(currentDepth - nextDepth) < 0.000001
+      ) {
+        return;
+      }
+
+      instance.setHasCustomSize(true);
+      instance.setCustomWidth(nextWidth);
+      instance.setCustomHeight(nextHeight);
+      instance.setHasCustomDepth(true);
+      instance.setCustomDepth(nextDepth);
+      resizedInstances.push(instance);
+    });
+
+    return resizedInstances;
   };
 
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
@@ -1486,7 +2324,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'EDIT'
+          'EDIT',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Rotate',
+              instances.length
+            ),
+          }
         ),
       },
       () => this.forceUpdatePropertiesEditor()
@@ -1552,6 +2396,38 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _hotReloadObjectsAndAddInstancesInEditor3D = ({
+    objects,
+    instances,
+  }: {|
+    objects: Array<gdObject>,
+    instances: Array<gdInitialInstance>,
+  |}) => {
+    const { previewDebuggerServer, project } = this.props;
+    if (!previewDebuggerServer) return;
+
+    const updatedObjects = objects
+      .filter(object => !!exceptionallyGuardAgainstDeadObject(object))
+      .map(object => serializeObjectWithCleanDefaultBehaviorFlags(object));
+    const serializedInstances = instances.map(instance =>
+      serializeToJSObject(instance)
+    );
+    const resources = getRuntimeProjectResourceDataArray(project);
+
+    previewDebuggerServer
+      .getExistingEmbeddedGameFrameDebuggerIds()
+      .forEach(debuggerId => {
+        previewDebuggerServer.sendMessage(debuggerId, {
+          command: 'hotReloadObjectsAndAddInstances',
+          payload: {
+            resources,
+            updatedObjects,
+            instances: serializedInstances,
+          },
+        });
+      });
+  };
+
   _onObjectEdited = (
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
@@ -1587,6 +2463,15 @@ export default class SceneEditor extends React.Component<Props, State> {
       this._hotReloadObjects({
         updatedObjects: [objectWithContext.object],
       });
+    }
+
+    const resizedInstances = hasResourceChanged
+      ? this._fitCustomSizedModel3DInstancesToObjectRatio(
+          objectWithContext.object
+        )
+      : [];
+    if (resizedInstances.length > 0) {
+      this._onInstancesResized(resizedInstances);
     }
   };
 
@@ -1648,48 +2533,409 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _getCanvasCenterSceneCoordinates = (): ?[number, number] => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return null;
+
+    const viewPosition = editorDisplay.viewControls.getViewPosition();
+    if (!viewPosition) return null;
+
+    return viewPosition.toSceneCoordinates(
+      viewPosition.getWidth() / 2,
+      viewPosition.getHeight() / 2
+    );
+  };
+
   /**
-   * Create an instance of the given object, at the position
-   * previously chosen (see `newObjectInstanceSceneCoordinates`).
+   * Create an instance of the given object at the given position,
+   * or at the canvas center.
    */
-  _addInstanceForNewObject = (newObjectName: string) => {
-    const { newObjectInstanceSceneCoordinates } = this.state;
-    if (!newObjectInstanceSceneCoordinates) {
+  _addInstanceForNewObject = (
+    object: gdObject,
+    instanceSceneCoordinates?: ?[number, number]
+  ) => {
+    const instancePosition =
+      instanceSceneCoordinates || this._getCanvasCenterSceneCoordinates();
+
+    if (!instancePosition) {
       return;
     }
 
-    this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
-    this.setState({ newObjectInstanceSceneCoordinates: null });
+    this._addInstancesForObjectsAtPosition([object], instancePosition);
   };
 
   _onObjectCreated = (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => {
     if (objects.length === 0) {
       return;
     }
-    const object = objects[0];
-    const infoBarDetails = onObjectAdded({
-      object,
-      layersContainer: this.props.layersContainer,
-      globalObjectsContainer: this.props.globalObjectsContainer,
-      objectsContainer: this.props.objectsContainer,
-    });
-    if (infoBarDetails) {
-      this.setState({
-        additionalWorkInfoBar: infoBarDetails,
-        showAdditionalWorkInfoBar: true,
-      });
+    this._onObjectsCreated(objects, isTheFirstOfItsTypeInProject);
+    if (options && options.shouldCreateInstance) {
+      this._addInstanceForNewObject(
+        objects[0],
+        options.instanceSceneCoordinates
+      );
     }
+  };
+
+  _onObjectsCreated = (
+    objects: Array<gdObject>,
+    isTheFirstOfItsTypeInProject: boolean,
+    { notifyInGameEditor = true }: {| notifyInGameEditor?: boolean |} = {}
+  ) => {
+    if (objects.length === 0) return;
+
+    objects.forEach(object => {
+      const infoBarDetails = onObjectAdded({
+        object,
+        layersContainer: this.props.layersContainer,
+        globalObjectsContainer: this.props.globalObjectsContainer,
+        objectsContainer: this.props.objectsContainer,
+      });
+      if (infoBarDetails) {
+        this.setState({
+          additionalWorkInfoBar: infoBarDetails,
+          showAdditionalWorkInfoBar: true,
+        });
+      }
+    });
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
-    this._addInstanceForNewObject(object.getName());
+    if (notifyInGameEditor) {
+      this.props.onObjectListsModified({
+        isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+      });
+    }
+  };
 
-    this.props.onObjectListsModified({
-      isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
+  _onImageFilesDropped = async (
+    imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        'Images can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supportedImageFilePaths = getSupportedImageFilePaths(imageFilePaths);
+    if (!supportedImageFilePaths.length) return;
+
+    const isTheFirstSpriteObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Sprite'
+    );
+    try {
+      const objects = await createSpriteObjectsFromImageFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        imageFilePaths: supportedImageFilePaths,
+      });
+      this._onObjectsCreated(objects, isTheFirstSpriteObjectInProject);
+      this._addInstancesForObjectsAtPosition(objects, position);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error(
+        'Unable to create Sprite object from dropped image:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a Sprite object from the dropped image.',
+        'error'
+      );
+    }
+  };
+
+  _on3DModelFilesDropped = async (
+    modelFilePaths: Array<string>,
+    position: [number, number]
+  ) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        '3D models can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supported3DModelFilePaths = getSupported3DModelFilePaths(
+      modelFilePaths
+    );
+    if (!supported3DModelFilePaths.length) return;
+
+    const isTheFirst3DModelObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Scene3D::Model3DObject'
+    );
+    try {
+      const objects = await create3DModelObjectsFromGLBFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        modelFilePaths: supported3DModelFilePaths,
+      });
+      this._onObjectsCreated(objects, isTheFirst3DModelObjectInProject);
+      this._addInstancesForObjectsAtPosition(objects, position);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error(
+        'Unable to create 3D model object from dropped GLB:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a 3D model object from the dropped GLB file.',
+        'error'
+      );
+    }
+  };
+
+  _getDropPositionInEmbeddedGameFrame = async ({
+    x,
+    y,
+  }: {|
+    x: number,
+    y: number,
+  |}): Promise<?EmbeddedGameFrameDropPosition> => {
+    const { previewDebuggerServer } = this.props;
+    if (!previewDebuggerServer) return null;
+
+    try {
+      const answer = await previewDebuggerServer.sendMessageWithResponse({
+        command: 'getInGameEditorDropPosition',
+        x,
+        y,
+      });
+      const position = answer.payload && answer.payload.position;
+      if (!position) return null;
+
+      const dropX = Number(position.x);
+      const dropY = Number(position.y);
+      const dropZ = Number(position.z);
+      if (
+        !Number.isFinite(dropX) ||
+        !Number.isFinite(dropY) ||
+        !Number.isFinite(dropZ)
+      ) {
+        return null;
+      }
+
+      return {
+        x: dropX,
+        y: dropY,
+        z: dropZ,
+        layerName:
+          typeof position.layerName === 'string'
+            ? position.layerName
+            : this.state.chosenLayer,
+      };
+    } catch (error) {
+      console.error(
+        'Unable to get the embedded 3D editor drop position:',
+        error
+      );
+      return null;
+    }
+  };
+
+  _addInstancesForObjectsAt3DPosition = (
+    objects: Array<gdObject>,
+    dropPosition: EmbeddedGameFrameDropPosition
+  ): Array<gdInitialInstance> => {
+    if (!objects.length) return [];
+
+    const zOrderFinder = new gd.HighestZOrderFinder();
+    zOrderFinder.reset();
+    this.props.initialInstances.iterateOverInstances(zOrderFinder);
+    const zOrder = zOrderFinder.getHighestZOrder() + 1;
+    zOrderFinder.delete();
+
+    return objects.map((object, index) => {
+      const instance: gdInitialInstance = this.props.initialInstances.insertNewInitialInstance();
+      instance.setObjectName(object.getName());
+      instance.setX(Math.round(dropPosition.x + index * 16));
+      instance.setY(Math.round(dropPosition.y + index * 16));
+      instance.setZ(dropPosition.z);
+      instance.setLayer(dropPosition.layerName);
+      instance.setZOrder(zOrder + index);
+
+      return instance;
     });
+  };
+
+  _onCustomObjectDroppedInEmbeddedGameFrame = async ({
+    customObjectDragItem,
+    x,
+    y,
+  }: {|
+    customObjectDragItem: CustomObjectDragItem,
+    x: number,
+    y: number,
+  |}) => {
+    const dropPosition = await this._getDropPositionInEmbeddedGameFrame({
+      x,
+      y,
+    });
+    if (!dropPosition) return;
+
+    const objectType = gd.PlatformExtension.getObjectFullType(
+      customObjectDragItem.extensionName,
+      customObjectDragItem.eventsBasedObjectName
+    );
+    const isTheFirstOfItsTypeInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      objectType
+    );
+    const objectCountBeforeDrop = this.props.objectsContainer.getObjectsCount();
+    const object = this._getOrCreateObjectFromCustomObjectDragItem(
+      customObjectDragItem,
+      { notifyInGameEditor: false }
+    );
+    if (!object) return;
+
+    const isNewObject =
+      this.props.objectsContainer.getObjectsCount() > objectCountBeforeDrop;
+    const instances = this._addInstancesForObjectsAt3DPosition(
+      [object],
+      dropPosition
+    );
+    this._onInstancesAdded(instances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances({
+      instances,
+      multiSelect: true,
+      layersLocks: null,
+    });
+    this._onInstancesSelected(instances);
+    this.forceUpdatePropertiesEditor();
+
+    if (isNewObject) {
+      if (isTheFirstOfItsTypeInProject) {
+        this.props.onObjectListsModified({
+          isNewObjectTypeUsed: true,
+        });
+      } else {
+        this._hotReloadObjectsAndAddInstancesInEditor3D({
+          objects: [object],
+          instances,
+        });
+      }
+    } else {
+      this._sendAddedInstances(instances);
+    }
+  };
+
+  _on3DModelFilesDroppedInEmbeddedGameFrame = async ({
+    modelFilePaths,
+    x,
+    y,
+  }: {|
+    modelFilePaths: Array<string>,
+    x: number,
+    y: number,
+  |}) => {
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        '3D models can only be dropped into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    const supported3DModelFilePaths = getSupported3DModelFilePaths(
+      modelFilePaths
+    );
+    if (!supported3DModelFilePaths.length) return;
+
+    const dropPosition = await this._getDropPositionInEmbeddedGameFrame({
+      x,
+      y,
+    });
+    if (!dropPosition) return;
+
+    const isTheFirst3DModelObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+      this.props.project,
+      'Scene3D::Model3DObject'
+    );
+    try {
+      const objects = await create3DModelObjectsFromGLBFiles({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        modelFilePaths: supported3DModelFilePaths,
+      });
+      this._ignoreResourceExternalChangesForFiles(
+        get3DModelResourceFileIdentifiers({
+          project: this.props.project,
+          objects,
+        })
+      );
+      const instances = this._addInstancesForObjectsAt3DPosition(
+        objects,
+        dropPosition
+      );
+
+      this._onObjectsCreated(objects, isTheFirst3DModelObjectInProject, {
+        notifyInGameEditor: false,
+      });
+      this._onInstancesAdded(instances);
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      this.instancesSelection.clearSelection();
+      this.instancesSelection.selectInstances({
+        instances,
+        multiSelect: true,
+        layersLocks: null,
+      });
+      this._onInstancesSelected(instances);
+      this.forceUpdatePropertiesEditor();
+
+      if (isTheFirst3DModelObjectInProject) {
+        this.props.onObjectListsModified({
+          isNewObjectTypeUsed: true,
+        });
+      } else {
+        this._hotReloadObjectsAndAddInstancesInEditor3D({ objects, instances });
+      }
+      this.props.resourceManagementProps
+        .onFetchNewlyAddedResources()
+        .catch(error => {
+          console.error(
+            'Unable to fetch newly added resources after dropped GLB:',
+            error
+          );
+        });
+    } catch (error) {
+      console.error(
+        'Unable to create 3D model object from dropped GLB:',
+        error
+      );
+      Window.showMessageBox(
+        'Unable to create a 3D model object from the dropped GLB file.',
+        'error'
+      );
+    }
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -1702,7 +2948,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         layerRemoved: null,
       };
       if (doRemove && layerName === this.state.chosenLayer) {
-        newState.chosenLayer = BASE_LAYER_NAME;
+        newState.chosenLayer = getTopLayerName(
+          this.props.layersContainer,
+          layerName
+        );
       }
       if (
         doRemove &&
@@ -2118,6 +3367,43 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
+  _onMoveInstancesToLayer = (layerName: string) => {
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const instancesToMove = selectedInstances.filter(
+      instance => !instance.isLocked() && instance.getLayer() !== layerName
+    );
+    if (!instancesToMove.length) return;
+
+    instancesToMove.forEach(instance => {
+      instance.setLayer(layerName);
+    });
+
+    this.setState(
+      {
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT',
+          {
+            operationLabel: getMoveInstancesToLayerOperationLabel(
+              layerName,
+              instancesToMove.length
+            ),
+          }
+        ),
+      },
+      () => {
+        if (this.editorDisplay) {
+          this.editorDisplay.instancesHandlers.forceRemountInstancesRenderers();
+        }
+        this.forceUpdateInstancesList();
+        this.forceUpdatePropertiesEditor();
+        this.updateToolbar();
+        this._sendHotReloadAllInstances();
+      }
+    );
+  };
+
   _onDeleteObjectGroup = (
     groupWithContext: GroupWithContext,
     done: boolean => void
@@ -2246,7 +3532,13 @@ export default class SceneEditor extends React.Component<Props, State> {
         history: saveToHistory(
           this.state.history,
           this.props.initialInstances,
-          'DELETE'
+          'DELETE',
+          {
+            operationLabel: getInstanceOperationLabel(
+              'Delete',
+              instancesToDelete.length
+            ),
+          }
         ),
       },
       () => {
@@ -2288,6 +3580,22 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (this.props.gameEditorMode === 'embedded-game') {
       changeViewPosition('zoomToFitContent');
+    }
+  };
+
+  getContentAABB = async (): Promise<Rectangle | null> => {
+    try {
+      return await getEditorContentAABB({
+        gameEditorMode: this.props.gameEditorMode,
+        previewDebuggerServer: this.props.previewDebuggerServer,
+        getInstancesEditorContentAABB: () =>
+          this.editorDisplay
+            ? this.editorDisplay.instancesHandlers.getContentAABB()
+            : null,
+      });
+    } catch (error) {
+      console.error("Can't get the content AABB.", error);
+      return null;
     }
   };
 
@@ -2377,6 +3685,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   getContextMenuInstancesWiseItems = (i18n: I18nType): any => {
     const hasSelectedInstances = this.instancesSelection.hasSelectedInstances();
+    const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const unlockedSelectedInstances = selectedInstances.filter(
+      instance => !instance.isLocked()
+    );
     return [
       {
         label: i18n._(t`Copy`),
@@ -2393,7 +3705,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       {
         label: i18n._(t`Paste`),
         click: () => this.paste(),
-        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+        enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND) || hasClipboardImage(),
         accelerator: 'CmdOrCtrl+V',
       },
       {
@@ -2425,12 +3737,31 @@ export default class SceneEditor extends React.Component<Props, State> {
           this._onMoveInstancesZOrder('back');
         },
       },
+      {
+        label: i18n._(t`Layer`),
+        submenu: enumerateLayers(this.props.layersContainer).map(layer => {
+          const areAllUnlockedInstancesAlreadyOnLayer =
+            !!unlockedSelectedInstances.length &&
+            unlockedSelectedInstances.every(
+              instance => instance.getLayer() === layer.value
+            );
+          return {
+            type: 'checkbox',
+            label: layer.label,
+            checked: areAllUnlockedInstancesAlreadyOnLayer,
+            enabled:
+              !!unlockedSelectedInstances.length &&
+              !areAllUnlockedInstancesAlreadyOnLayer,
+            click: () => this._onMoveInstancesToLayer(layer.value),
+          };
+        }),
+      },
       { type: 'separator' },
       {
         label: i18n._(t`Extract`),
         submenu: [
           {
-            label: i18n._(t`Extract as a custom object`),
+            label: i18n._(t`Extract as a prefab`),
             click: () =>
               this.setState({ extractAsCustomObjectDialogOpen: true }),
             enabled: hasSelectedInstances,
@@ -2545,7 +3876,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         {
           label: i18n._(t`Paste`),
           click: () => this.paste(),
-          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+          enabled:
+            Clipboard.has(INSTANCES_CLIPBOARD_KIND) || hasClipboardImage(),
           accelerator: 'CmdOrCtrl+V',
         },
         { type: 'separator' },
@@ -2589,8 +3921,30 @@ export default class SceneEditor extends React.Component<Props, State> {
           : null;
 
       return [
-        ...this.getContextMenuInstancesWiseItems(i18n),
-        { type: 'separator' },
+        object && project.hasEventsBasedObject(object.getType())
+          ? {
+              label: i18n._(t`Edit prefab`),
+              enabled: isVariantEditable(
+                gd.asCustomObjectConfiguration(object.getConfiguration()),
+                project.getEventsBasedObject(object.getType()),
+                customObjectExtension
+              ),
+              click: () => {
+                const customObjectConfiguration = gd.asCustomObjectConfiguration(
+                  object.getConfiguration()
+                );
+                this.props.onOpenEventBasedObjectVariantEditor(
+                  gd.PlatformExtension.getExtensionFromFullObjectType(
+                    object.getType()
+                  ),
+                  gd.PlatformExtension.getObjectNameFromFullObjectType(
+                    object.getType()
+                  ),
+                  customObjectConfiguration.getVariantName()
+                );
+              },
+            }
+          : null,
         {
           label: i18n._(t`Edit object ${shortenString(objectName, 14)}`),
           click: () =>
@@ -2632,30 +3986,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               ),
             }
           : null,
-        object && project.hasEventsBasedObject(object.getType())
-          ? {
-              label: i18n._(t`Edit children`),
-              enabled: isVariantEditable(
-                gd.asCustomObjectConfiguration(object.getConfiguration()),
-                project.getEventsBasedObject(object.getType()),
-                customObjectExtension
-              ),
-              click: () => {
-                const customObjectConfiguration = gd.asCustomObjectConfiguration(
-                  object.getConfiguration()
-                );
-                this.props.onOpenEventBasedObjectVariantEditor(
-                  gd.PlatformExtension.getExtensionFromFullObjectType(
-                    object.getType()
-                  ),
-                  gd.PlatformExtension.getObjectNameFromFullObjectType(
-                    object.getType()
-                  ),
-                  customObjectConfiguration.getVariantName()
-                );
-              },
-            }
-          : null,
+        { type: 'separator' },
+        ...this.getContextMenuInstancesWiseItems(i18n),
         { type: 'separator' },
         ...this.getContextMenuLayoutItems(i18n),
       ].filter(Boolean);
@@ -2727,8 +4059,30 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
-    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+  _getScenePastePosition = (
+    useLastCursorPosition?: boolean
+  ): [number, number] => {
+    const { editorDisplay } = this;
+    if (!editorDisplay) return [0, 0];
+
+    const viewPosition = editorDisplay.viewControls.getViewPosition();
+    if (!viewPosition) return [0, 0];
+
+    const lastPosition = useLastCursorPosition
+      ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
+      : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
+    return viewPosition.containsPoint(lastPosition[0], lastPosition[1])
+      ? lastPosition
+      : [viewPosition.getViewX(), viewPosition.getViewY()];
+  };
+
+  _pasteInstancesFromClipboard = ({
+    clipboardContent,
+    useLastCursorPosition,
+  }: {|
+    clipboardContent: any,
+    useLastCursorPosition?: boolean,
+  |}): boolean => {
     const instancesContent = SafeExtractor.extractArrayProperty(
       clipboardContent,
       'instances'
@@ -2740,7 +4094,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         clipboardContent,
         'pasteInTheForeground'
       ) || false;
-    if (x === null || y === null || instancesContent === null) return;
+    if (x === null || y === null || instancesContent === null) return false;
 
     const newInstances = addSerializedInstances({
       project: this.props.project,
@@ -2765,29 +4119,82 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const { editorDisplay } = this;
     if (editorDisplay) {
-      const viewPosition = editorDisplay.viewControls.getViewPosition();
-      if (viewPosition) {
-        const lastPosition = useLastCursorPosition
-          ? editorDisplay.viewControls.getLastCursorSceneCoordinates()
-          : editorDisplay.viewControls.getLastContextMenuSceneCoordinates();
-        const position = viewPosition.containsPoint(
-          lastPosition[0],
-          lastPosition[1]
-        )
-          ? lastPosition
-          : [viewPosition.getViewX(), viewPosition.getViewY()];
-        for (const instance of newInstances) {
-          instance.setX(instance.getX() + position[0]);
-          instance.setY(instance.getY() + position[1]);
-        }
-        editorDisplay.instancesHandlers.snapSelection(newInstances);
-        this._sendUpdatedInstances(newInstances);
+      const position = this._getScenePastePosition(useLastCursorPosition);
+      for (const instance of newInstances) {
+        instance.setX(instance.getX() + position[0]);
+        instance.setY(instance.getY() + position[1]);
       }
+      editorDisplay.instancesHandlers.snapSelection(newInstances);
+      this._sendUpdatedInstances(newInstances);
     }
 
     // Immediately update the properties editor to ensure they keep no reference
     // to the deleted instances.
     this.forceUpdatePropertiesEditor();
+    return true;
+  };
+
+  _pasteImageFromClipboard = async ({
+    useLastCursorPosition,
+  }: CopyCutPasteOptions = {}) => {
+    if (!hasClipboardImage()) return;
+
+    const storageProvider = this.props.resourceManagementProps.getStorageProvider();
+    if (
+      storageProvider.internalName !== 'LocalFile' ||
+      !this.props.project.getProjectFile()
+    ) {
+      Window.showMessageBox(
+        'Images can only be pasted into saved local projects.',
+        'info'
+      );
+      return;
+    }
+
+    try {
+      const imageFilePath = writeImageFromClipboardToProjectFolder(
+        this.props.project
+      );
+      if (!imageFilePath) return;
+
+      const isTheFirstSpriteObjectInProject = !gd.UsedObjectTypeFinder.scanProject(
+        this.props.project,
+        'Sprite'
+      );
+      const object = await createSpriteObjectFromImageFile({
+        project: this.props.project,
+        objectsContainer: this.props.objectsContainer,
+        imageFilePath,
+      });
+      this._onObjectsCreated([object], isTheFirstSpriteObjectInProject);
+      this._addInstancesForObjectsAtPosition(
+        [object],
+        this._getScenePastePosition(useLastCursorPosition)
+      );
+      if (this.editorDisplay) this.editorDisplay.forceUpdateObjectsList();
+      await this.props.resourceManagementProps.onFetchNewlyAddedResources();
+      this.props.resourceManagementProps.onNewResourcesAdded();
+    } catch (error) {
+      console.error('Unable to create Sprite object from pasted image:', error);
+      Window.showMessageBox(
+        'Unable to create a Sprite object from the pasted image.',
+        'error'
+      );
+    }
+  };
+
+  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
+    const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
+    if (
+      this._pasteInstancesFromClipboard({
+        clipboardContent,
+        useLastCursorPosition,
+      })
+    ) {
+      return;
+    }
+
+    this._pasteImageFromClipboard({ useLastCursorPosition });
   };
 
   extractAsExternalLayout = (chosenName: string) => {
@@ -2918,7 +4325,9 @@ export default class SceneEditor extends React.Component<Props, State> {
   forceUpdateLayersList = () => {
     // The selected layer could have been deleted when editing a linked external layout.
     if (!this.props.layersContainer.hasLayerNamed(this.state.chosenLayer)) {
-      this.setState({ chosenLayer: BASE_LAYER_NAME });
+      this.setState({
+        chosenLayer: getTopLayerName(this.props.layersContainer),
+      });
     }
     if (this.editorDisplay) this.editorDisplay.forceUpdateLayersList();
   };
@@ -2940,6 +4349,28 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     const { project, projectScopedContainersAccessor } = this.props;
 
+    // Reset the custom object renderers FIRST, synchronously. When an
+    // events-based object is edited (or an edition is cancelled), its variants'
+    // InitialInstancesContainer is freed and recreated (via
+    // EventsFunctionsExtension.unserializeFrom /
+    // complyVariantsToEventsBasedObject). The cached child renderers still hold
+    // references to the freed instances; if a render frame happens before they
+    // are reset, RenderedCustomObjectInstance.update() iterates over a freed
+    // InitialInstancesContainer and crashes with a use-after-free. Resetting
+    // before the (async) resource reload drops those stale references so the
+    // next frame rebuilds them from the fresh container.
+    // /!\ This reset must stay unconditional (every object) so no stale
+    // reference to a freed container survives, even though the reset below (after
+    // the reload) is scoped to the objects actually affected by the edit.
+    const { editorDisplay } = this;
+    if (editorDisplay) {
+      projectScopedContainersAccessor.forEachObject(object => {
+        editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          object.getName()
+        );
+      });
+    }
+
     // Only the resources of the object that was actually edited may need to be
     // reloaded from the disk, and only if a resource really changed.
     const objectResourceNames =
@@ -2954,8 +4385,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     await this._reloadResources(objectResourceNames, 'custom object edited', {
       reloadFromDisk: hasResourceChanged,
     });
-    const { editorDisplay } = this;
-    if (editorDisplay) {
+    // Reset again after resources have been reloaded so renderers that were
+    // rebuilt (with possibly outdated textures) during the await are refreshed
+    // with the freshly loaded resources. Only the edited object and the objects
+    // depending on the edited events-based object need to be reset.
+    const editorDisplayAfterReload = this.editorDisplay;
+    if (editorDisplayAfterReload) {
       const resetObjectNames = [];
       projectScopedContainersAccessor.forEachObject(object => {
         if (
@@ -2967,7 +4402,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           })
         ) {
           resetObjectNames.push(object.getName());
-          editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+          editorDisplayAfterReload.instancesHandlers.resetInstanceRenderersFor(
             object.getName()
           );
         }
@@ -3091,6 +4526,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                     eventsFunctionsExtension={eventsFunctionsExtension}
                     eventsBasedObject={eventsBasedObject}
                     eventsBasedObjectVariant={eventsBasedObjectVariant}
+                    getContentAABB={this.getContentAABB}
                     layersContainer={this.props.layersContainer}
                     globalObjectsContainer={this.props.globalObjectsContainer}
                     objectsContainer={this.props.objectsContainer}
@@ -3146,6 +4582,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onOpenEventBasedObjectVariantEditor={
                       this.props.onOpenEventBasedObjectVariantEditor
                     }
+                    onOpenPrefabDetailEditor={
+                      this.props.onOpenPrefabDetailEditor
+                    }
+                    onOpenPrefabSettings={this.props.onOpenPrefabSettings}
                     onDeleteEventsBasedObjectVariant={
                       this.props.onDeleteEventsBasedObjectVariant
                     }
@@ -3165,11 +4605,15 @@ export default class SceneEditor extends React.Component<Props, State> {
                       redo: this.redo,
                       canUndo: () => canUndo(this.state.history),
                       canRedo: () => canRedo(this.state.history),
-                      saveToHistory: () =>
+                      saveToHistory: (changeContext?: any) =>
                         this.setState({
                           history: saveToHistory(
                             this.state.history,
-                            this.props.initialInstances
+                            this.props.initialInstances,
+                            'EDIT',
+                            changeContext || {
+                              operationLabel: 'Edit properties',
+                            }
                           ),
                         }),
                     }}
@@ -3200,6 +4644,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onInstancesMoved={this._onInstancesMovedAndSendToEditor3D}
                     onInstancesResized={this._onInstancesResized}
                     onInstancesRotated={this._onInstancesRotated}
+                    onImageFilesDropped={this._onImageFilesDropped}
+                    on3DModelFilesDropped={this._on3DModelFilesDropped}
+                    onCustomObjectDropped={this._onCustomObjectDropped}
                     isInstanceOf3DObject={this.isInstanceOf3DObject}
                     onSelectAllInstancesOfObjectInLayout={
                       this.onSelectAllInstancesOfObjectInLayout
@@ -3405,6 +4852,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                       }}
                       isVariableListLocked={isCustomVariant}
                       isObjectListLocked={isCustomVariant}
+                      isGroupGlobal={
+                        !!this.state.editedGroup &&
+                        this._isObjectGroupGlobal(this.state.editedGroup)
+                      }
+                      onRenameGroup={this._onRenameObjectGroup}
                       getValidatedObjectOrGroupName={(newName, global) =>
                         this._getValidatedObjectOrGroupName(
                           newName,
@@ -3412,6 +4864,26 @@ export default class SceneEditor extends React.Component<Props, State> {
                           i18n
                         )
                       }
+                    />
+                  )}
+                  {this.state.newObjectDialogOpen && (
+                    <NewObjectDialog
+                      onClose={() =>
+                        this.setState({ newObjectDialogOpen: false })
+                      }
+                      onCreateNewObject={this._addObjectFromNewObjectDialog}
+                      onObjectsAddedFromAssets={
+                        this._onObjectsAddedFromAssetsFromNewObjectDialog
+                      }
+                      project={project}
+                      layout={layout}
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      eventsBasedObject={eventsBasedObject}
+                      objectsContainer={this.props.objectsContainer}
+                      resourceManagementProps={resourceManagementProps}
+                      targetObjectFolderOrObjectWithContext={null}
+                      onWillInstallExtension={this.props.onWillInstallExtension}
+                      onExtensionInstalled={this.props.onExtensionInstalled}
                     />
                   )}
                   {this.state.setupGridOpen && (
@@ -3547,12 +5019,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                               });
                           }
                         }}
-                        getContentAABB={
-                          this.editorDisplay
-                            ? this.editorDisplay.instancesHandlers
-                                .getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={this.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           this.props.onEventsBasedObjectChildrenEdited
                         }

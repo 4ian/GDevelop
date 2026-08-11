@@ -1,0 +1,7 @@
+*.autosave
+node_modules/
+.idea/
+.gdevelop/
+__pycache__/
+*.py[cod]
+*.blend1

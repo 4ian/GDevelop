@@ -198,83 +198,114 @@ export const enumerateBehaviorExpressions = (
   ];
 };
 
+/** Enumerate all the expressions provided by an extension. */
+export const enumerateAllExpressionsForExtension = (
+  type: string,
+  extension: gdPlatformExtension,
+  project: gdProject,
+  i18n: I18nType
+): Array<EnumeratedExpressionMetadata> => {
+  const objectsExpressions: Array<EnumeratedExpressionMetadata> = [];
+  const behaviorsExpressions: Array<EnumeratedExpressionMetadata> = [];
+  if (shouldHideExtension(project, extension)) {
+    return [];
+  }
+  const prefix = getExtensionPrefix(extension, i18n);
+  const freeScope: InstructionOrExpressionScope = {
+    extension: { name: extension.getName() },
+    objectMetadata: undefined,
+    behaviorMetadata: undefined,
+  };
+  const freeExpressions = [
+    ...(!shouldOnlyBeNumberType(type)
+      ? enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllStrExpressions(),
+          freeScope
+        )
+      : []),
+    ...enumerateExpressionMetadataMap(
+      prefix,
+      extension.getAllExpressions(),
+      freeScope
+    ),
+  ];
+
+  //Objects expressions:
+  mapVector(extension.getExtensionObjectsTypes(), objectType => {
+    const objectMetadata = extension.getObjectMetadata(objectType);
+    const scope: InstructionOrExpressionScope = {
+      extension: { name: extension.getName() },
+      objectMetadata: {
+        name: objectMetadata.getName(),
+        isPrivate: objectMetadata.isPrivate(),
+      },
+    };
+
+    if (!shouldOnlyBeNumberType(type))
+      objectsExpressions.push(
+        ...enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllStrExpressionsForObject(objectType),
+          scope
+        )
+      );
+    objectsExpressions.push(
+      ...enumerateExpressionMetadataMap(
+        prefix,
+        extension.getAllExpressionsForObject(objectType),
+        scope
+      )
+    );
+  });
+
+  //Behaviors expressions:
+  mapVector(extension.getBehaviorsTypes(), behaviorType => {
+    const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
+    const scope: InstructionOrExpressionScope = {
+      extension: { name: extension.getName() },
+      behaviorMetadata: {
+        name: behaviorMetadata.getName(),
+        isPrivate: behaviorMetadata.isPrivate(),
+      },
+    };
+
+    if (!shouldOnlyBeNumberType(type))
+      behaviorsExpressions.push(
+        ...enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllStrExpressionsForBehavior(behaviorType),
+          scope
+        )
+      );
+    behaviorsExpressions.push(
+      ...enumerateExpressionMetadataMap(
+        prefix,
+        extension.getAllExpressionsForBehavior(behaviorType),
+        scope
+      )
+    );
+  });
+
+  return [...freeExpressions, ...objectsExpressions, ...behaviorsExpressions];
+};
+
 /** Enumerate all the expressions available. */
 export const enumerateAllExpressions = (
   type: string,
   project: gdProject,
   i18n: I18nType
 ): Array<EnumeratedExpressionMetadata> => {
-  const objectsExpressions: Array<EnumeratedExpressionMetadata> = [];
-  const behaviorsExpressions: Array<EnumeratedExpressionMetadata> = [];
-  const freeExpressions = enumerateFreeExpressions(type, project, i18n);
-
+  const allExpressions: Array<EnumeratedExpressionMetadata> = [];
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
   mapVector(allExtensions, extension => {
-    if (shouldHideExtension(project, extension)) {
-      return;
-    }
-    const prefix = getExtensionPrefix(extension, i18n);
-
-    //Objects expressions:
-    mapVector(extension.getExtensionObjectsTypes(), objectType => {
-      const objectMetadata = extension.getObjectMetadata(objectType);
-      const scope: InstructionOrExpressionScope = {
-        extension: { name: extension.getName() },
-        objectMetadata: {
-          name: objectMetadata.getName(),
-          isPrivate: objectMetadata.isPrivate(),
-        },
-      };
-
-      if (!shouldOnlyBeNumberType(type))
-        objectsExpressions.push(
-          ...enumerateExpressionMetadataMap(
-            prefix,
-            extension.getAllStrExpressionsForObject(objectType),
-            scope
-          )
-        );
-      objectsExpressions.push(
-        ...enumerateExpressionMetadataMap(
-          prefix,
-          extension.getAllExpressionsForObject(objectType),
-          scope
-        )
-      );
-    });
-
-    //Behaviors expressions:
-    mapVector(extension.getBehaviorsTypes(), behaviorType => {
-      const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
-      const scope: InstructionOrExpressionScope = {
-        extension: { name: extension.getName() },
-        behaviorMetadata: {
-          name: behaviorMetadata.getName(),
-          isPrivate: behaviorMetadata.isPrivate(),
-        },
-      };
-
-      if (!shouldOnlyBeNumberType(type))
-        behaviorsExpressions.push(
-          ...enumerateExpressionMetadataMap(
-            prefix,
-            extension.getAllStrExpressionsForBehavior(behaviorType),
-            scope
-          )
-        );
-      behaviorsExpressions.push(
-        ...enumerateExpressionMetadataMap(
-          prefix,
-          extension.getAllExpressionsForBehavior(behaviorType),
-          scope
-        )
-      );
-    });
+    allExpressions.push(
+      ...enumerateAllExpressionsForExtension(type, extension, project, i18n)
+    );
   });
-
-  return [...freeExpressions, ...objectsExpressions, ...behaviorsExpressions];
+  return allExpressions;
 };
 
 export const filterExpressions = (

@@ -61,6 +61,13 @@ namespace gdjs {
     return object._modelResourceName;
   };
 
+  const physics3DWarnings = new Set<string>();
+  const warnPhysics3DOnce = (key: string, message: string): void => {
+    if (physics3DWarnings.has(key)) return;
+    physics3DWarnings.add(key);
+    console.warn(message);
+  };
+
   /** @category Behaviors > Physics 3D */
   export class Physics3DSharedData {
     gravityX: float;
@@ -91,12 +98,22 @@ namespace gdjs {
       [];
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+      const normalizedSharedData =
+        gdjs.normalizePhysics3DSharedData(sharedData);
       this._registeredBehaviors = new Set<Physics3DRuntimeBehavior>();
-      this.gravityX = sharedData.gravityX;
-      this.gravityY = sharedData.gravityY;
-      this.gravityZ = sharedData.gravityZ;
-      this.worldScale = sharedData.worldScale;
+      this.gravityX = normalizedSharedData.gravityX;
+      this.gravityY = normalizedSharedData.gravityY;
+      this.gravityZ = normalizedSharedData.gravityZ;
+      this.worldScale = normalizedSharedData.worldScale;
       this.worldInvScale = 1 / this.worldScale;
+      if (normalizedSharedData.invalidFields.length > 0) {
+        warnPhysics3DOnce(
+          `shared:${sharedData && sharedData.name ? sharedData.name : ''}`,
+          `[PHYSICS3D_MISSING_SHARED_DEFAULT] Physics3D shared data contained missing or invalid fields (${normalizedSharedData.invalidFields.join(
+            ', '
+          )}). Editor defaults were applied before creating the physics world.`
+        );
+      }
 
       // Initialize Jolt
       const settings = new Jolt.JoltSettings();
@@ -381,6 +398,13 @@ namespace gdjs {
     _shapeHalfDepth: float = 0;
 
     /**
+     * A cached copy of the Jolt shape triangles, converted to GDevelop scene
+     * units. The physics shape only changes when the body or its shape is
+     * recreated, so rebuilding this for every debug-draw refresh is wasteful.
+     */
+    private _debugCollisionMaskVertices: Float32Array | null = null;
+
+    /**
      * sharedData is a reference to the shared data of the scene, that registers
      * every physics behavior that is created so that collisions can be cleared
      * before stepping the world.
@@ -403,6 +427,17 @@ namespace gdjs {
       owner: gdjs.RuntimeObject3D
     ) {
       super(instanceContainer, behaviorData, owner);
+      behaviorData = gdjs.normalizePhysics3DBehaviorData(behaviorData);
+      if (behaviorData.invalidFields.length > 0) {
+        warnPhysics3DOnce(
+          `behavior:${behaviorData.name || ''}`,
+          `[PHYSICS3D_INVALID_BEHAVIOR_NUMBER] Physics3D behavior "${
+            behaviorData.name || ''
+          }" contained missing or invalid fields (${behaviorData.invalidFields.join(
+            ', '
+          )}). Editor defaults were applied.`
+        );
+      }
       this.bodyUpdater = new gdjs.Physics3DRuntimeBehavior.DefaultBodyUpdater(
         this
       );
@@ -419,18 +454,18 @@ namespace gdjs {
       this.shapeDimensionA = behaviorData.shapeDimensionA;
       this.shapeDimensionB = behaviorData.shapeDimensionB;
       this.shapeDimensionC = behaviorData.shapeDimensionC;
-      this.shapeOffsetX = behaviorData.shapeOffsetX || 0;
-      this.shapeOffsetY = behaviorData.shapeOffsetY || 0;
-      this.shapeOffsetZ = behaviorData.shapeOffsetZ || 0;
-      this.massCenterOffsetX = behaviorData.massCenterOffsetX || 0;
-      this.massCenterOffsetY = behaviorData.massCenterOffsetY || 0;
-      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ || 0;
-      this.density = Math.max(0.0001, behaviorData.density);
-      this.massOverride = behaviorData.massOverride || 0;
+      this.shapeOffsetX = behaviorData.shapeOffsetX;
+      this.shapeOffsetY = behaviorData.shapeOffsetY;
+      this.shapeOffsetZ = behaviorData.shapeOffsetZ;
+      this.massCenterOffsetX = behaviorData.massCenterOffsetX;
+      this.massCenterOffsetY = behaviorData.massCenterOffsetY;
+      this.massCenterOffsetZ = behaviorData.massCenterOffsetZ;
+      this.density = behaviorData.density;
+      this.massOverride = behaviorData.massOverride;
       this.friction = behaviorData.friction;
       this.restitution = behaviorData.restitution;
-      this.linearDamping = Math.max(0, behaviorData.linearDamping);
-      this.angularDamping = Math.max(0, behaviorData.angularDamping);
+      this.linearDamping = behaviorData.linearDamping;
+      this.angularDamping = behaviorData.angularDamping;
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
@@ -663,6 +698,7 @@ namespace gdjs {
     }
 
     _destroyBody() {
+      this._debugCollisionMaskVertices = null;
       this.bodyUpdater.destroyBody();
       this._contactsEndedThisFrame.length = 0;
       this._contactsStartedThisFrame.length = 0;
@@ -1042,6 +1078,7 @@ namespace gdjs {
     }
 
     private _recreateShape(): void {
+      this._debugCollisionMaskVertices = null;
       this.bodyUpdater.recreateShape();
 
       this._objectOldWidth = this.owner3D.getWidth();
@@ -1070,6 +1107,7 @@ namespace gdjs {
     _createBody(): boolean {
       this._needToRecreateBody = false;
       this._needToRecreateShape = false;
+      this._debugCollisionMaskVertices = null;
 
       if (!this.activated() || this._destroyedDuringFrameLogic) return false;
 
@@ -1084,6 +1122,75 @@ namespace gdjs {
       this._objectOldHeight = this.owner3D.getHeight();
       this._objectOldDepth = this.owner3D.getDepth();
       return true;
+    }
+
+    override get3DDebugCollisionMask(): gdjs.DebugCollisionMask3D | null {
+      const source = this.bodyUpdater.getDebugCollisionMaskSource?.();
+      if (!source) {
+        return null;
+      }
+
+      if (!this._debugCollisionMaskVertices) {
+        const shape = source.shape;
+        const bounds = Jolt.AABox.prototype.sBiggest();
+        const centerOfMass = shape.GetCenterOfMass();
+        const identityRotation = Jolt.Quat.prototype.sIdentity();
+        const unitScale = new Jolt.Vec3(1, 1, 1);
+        let triangleContext: Jolt.ShapeGetTriangles | null = null;
+        try {
+          // ShapeGetTriangles returns the exact shape used by Jolt, including
+          // rotated/translated decorators, center-of-mass offsets and mesh
+          // collision shapes. Passing the shape center of mass makes the
+          // vertices local to Body.GetPosition(), as in Jolt's Three.js
+          // integration example.
+          triangleContext = new Jolt.ShapeGetTriangles(
+            shape,
+            bounds,
+            centerOfMass,
+            identityRotation,
+            unitScale
+          );
+          const verticesView = new Float32Array(
+            Jolt.HEAPF32.buffer,
+            triangleContext.GetVerticesData(),
+            triangleContext.GetVerticesSize() / Float32Array.BYTES_PER_ELEMENT
+          );
+          const vertices = new Float32Array(verticesView.length);
+          const worldScale = this._sharedData.worldScale;
+          for (let i = 0, len = verticesView.length; i < len; ++i) {
+            vertices[i] = verticesView[i] * worldScale;
+          }
+          this._debugCollisionMaskVertices = vertices;
+        } finally {
+          if (triangleContext) {
+            Jolt.destroy(triangleContext);
+          }
+          Jolt.destroy(unitScale);
+          Jolt.destroy(identityRotation);
+          Jolt.destroy(centerOfMass);
+          Jolt.destroy(bounds);
+        }
+      }
+
+      if (this._debugCollisionMaskVertices.length === 0) {
+        return null;
+      }
+
+      const worldScale = this._sharedData.worldScale;
+      return {
+        vertices: this._debugCollisionMaskVertices,
+        positionX: source.positionX * worldScale,
+        positionY: source.positionY * worldScale,
+        positionZ: source.positionZ * worldScale,
+        rotationX: source.rotationX,
+        rotationY: source.rotationY,
+        rotationZ: source.rotationZ,
+        rotationW: source.rotationW,
+      };
+    }
+
+    override clear3DDebugCollisionMaskCache(): void {
+      this._debugCollisionMaskVertices = null;
     }
 
     /**
@@ -2120,6 +2227,17 @@ namespace gdjs {
 
   /** @category Behaviors > Physics 3D */
   export namespace Physics3DRuntimeBehavior {
+    export type DebugCollisionMaskSource = {
+      shape: Jolt.Shape;
+      positionX: float;
+      positionY: float;
+      positionZ: float;
+      rotationX: float;
+      rotationY: float;
+      rotationZ: float;
+      rotationW: float;
+    };
+
     /**
      * Allow extensions relying on the 3D physics to customize its
      * behavior a bit.
@@ -2137,6 +2255,7 @@ namespace gdjs {
       updateBodyFromObject(): void;
       recreateShape(): void;
       destroyBody(): void;
+      getDebugCollisionMaskSource?(): DebugCollisionMaskSource | null;
     }
 
     export class DefaultBodyUpdater
@@ -2256,6 +2375,25 @@ namespace gdjs {
           _sharedData.bodyInterface.DestroyBody(behavior._body.GetID());
           behavior._body = null;
         }
+      }
+
+      getDebugCollisionMaskSource(): DebugCollisionMaskSource | null {
+        const body = this.behavior._body;
+        if (!body) {
+          return null;
+        }
+        const position = body.GetPosition();
+        const rotation = body.GetRotation();
+        return {
+          shape: body.GetShape(),
+          positionX: position.GetX(),
+          positionY: position.GetY(),
+          positionZ: position.GetZ(),
+          rotationX: rotation.GetX(),
+          rotationY: rotation.GetY(),
+          rotationZ: rotation.GetZ(),
+          rotationW: rotation.GetW(),
+        };
       }
     }
 

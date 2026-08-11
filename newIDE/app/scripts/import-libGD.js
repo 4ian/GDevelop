@@ -28,6 +28,14 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
     'copy-to-newIDE.js'
   );
   shell.exec(`node ${copyToNewIDEScriptPath}`);
+} else if (
+  alreadyHasLibGdJs &&
+  !process.env.APPVEYOR &&
+  !process.env.REQUIRES_EXACT_LIBGD_JS_VERSION
+) {
+  shell.echo(
+    'Reusing existing libGD.js from newIDE/app/public and node_modules.'
+  );
 } else {
   // Download a pre-built version otherwise
   shell.echo(

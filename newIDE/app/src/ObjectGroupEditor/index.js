@@ -3,7 +3,9 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 
 import { List, ListItem } from '../UI/List';
-import ObjectSelector from '../ObjectsList/ObjectSelector';
+import ObjectSelector, {
+  checkHasRequiredBehaviors,
+} from '../ObjectsList/ObjectSelector';
 import { Column } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
@@ -28,6 +30,9 @@ type Props = {|
   onObjectAdded: (objectName: string) => void,
   onObjectRemoved: (objectName: string) => void,
   isObjectListLocked: boolean,
+  isGlobalGroup?: boolean,
+  objectNameFilter?: string => boolean,
+  requiredBehaviorTypes?: Array<string>,
 |};
 
 const ObjectGroupEditor = ({
@@ -39,15 +44,49 @@ const ObjectGroupEditor = ({
   onObjectAdded,
   onObjectRemoved,
   isObjectListLocked,
+  isGlobalGroup,
+  objectNameFilter,
+  requiredBehaviorTypes,
 }: Props): React.Node => {
   const [objectName, setObjectName] = React.useState<string>('');
+  const isGlobalObject = React.useCallback(
+    (objectName: string) =>
+      !!globalObjectsContainer &&
+      globalObjectsContainer.hasObjectNamed(objectName),
+    [globalObjectsContainer]
+  );
+  const canUseObject = React.useCallback(
+    (objectName: string) => {
+      if (isGlobalGroup && !isGlobalObject(objectName)) return false;
+      if (objectNameFilter && !objectNameFilter(objectName)) return false;
+      return true;
+    },
+    [isGlobalGroup, isGlobalObject, objectNameFilter]
+  );
 
   const addObject = React.useCallback(
     (objectName: string) => {
+      if (!canUseObject(objectName)) return;
+      if (
+        !checkHasRequiredBehaviors({
+          objectsContainersList: projectScopedContainersAccessor
+            .get()
+            .getObjectsContainersList(),
+          objectName,
+          requiredBehaviorTypes,
+        })
+      ) {
+        return;
+      }
       onObjectAdded(objectName);
       setObjectName('');
     },
-    [onObjectAdded]
+    [
+      canUseObject,
+      onObjectAdded,
+      projectScopedContainersAccessor,
+      requiredBehaviorTypes,
+    ]
   );
 
   const renderExplanation = () => {
@@ -72,23 +111,16 @@ const ObjectGroupEditor = ({
         <>
           <Trans>
             This group contains objects of different kinds. You'll only be able
-            to use actions and conditions common to all objects with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
+            to use actions, conditions and expressions common to all objects
+            with this group.
           </Trans>
         </>
       ) : (
         <>
+          <Trans>This group contains objects of the same kind</Trans> ({type}).{' '}
           <Trans>
-            This group contains objects of the same kind ({type}). You can use
-            actions and conditions related to this kind of objects in events
-            with this group.
-          </Trans>{' '}
-          <Trans>
-            Variables declared in all objects of the group will be visible in
-            event expressions.
+            You can use actions, conditions and expressions related to this kind
+            of objects in events with this group.
           </Trans>
         </>
       );
@@ -144,9 +176,19 @@ const ObjectGroupEditor = ({
             onChoose={addObject}
             openOnFocus
             noGroups
-            hintText={t`Choose an object to add to the group`}
+            hintText={
+              isGlobalGroup
+                ? requiredBehaviorTypes && requiredBehaviorTypes.length > 0
+                  ? t`Choose a matching global object to add to the group`
+                  : t`Choose a global object to add to the group`
+                : requiredBehaviorTypes && requiredBehaviorTypes.length > 0
+                ? t`Choose a matching object to add to the group`
+                : t`Choose an object to add to the group`
+            }
             fullWidth
             disabled={isObjectListLocked}
+            objectNameFilter={canUseObject}
+            requiredCapabilitiesBehaviorTypes={requiredBehaviorTypes}
           />
         </Column>
       </Paper>

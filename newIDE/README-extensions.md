@@ -138,7 +138,7 @@ Add an object using [`addObject`](https://docs.gdevelop.io/GDCore%20Documentatio
 
 #### Declare a property
 
-A property is a global configuration value for your extension. An example would be the App ID for AdMob.
+A property is a configuration value for your extension. An example would be the App ID for AdMob.
 
 To declare one, just use `registerProperty`:
 

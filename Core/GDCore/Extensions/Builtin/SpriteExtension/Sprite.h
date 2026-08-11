@@ -43,6 +43,41 @@ class GD_CORE_API Sprite {
   inline gd::String& GetImageName() { return image; }
 
   /**
+   * \brief Return true if the sprite displays only a part of the image.
+   */
+  inline bool HasCustomSourceRect() const { return hasCustomSourceRect; }
+
+  /**
+   * \brief Set the part of the image displayed by the sprite.
+   */
+  void SetCustomSourceRect(double x, double y, double width, double height);
+
+  /**
+   * \brief Clear the custom source rectangle to display the whole image.
+   */
+  void ClearCustomSourceRect();
+
+  /**
+   * \brief Get the X coordinate of the displayed image rectangle.
+   */
+  inline double GetSourceRectX() const { return sourceRectX; }
+
+  /**
+   * \brief Get the Y coordinate of the displayed image rectangle.
+   */
+  inline double GetSourceRectY() const { return sourceRectY; }
+
+  /**
+   * \brief Get the width of the displayed image rectangle.
+   */
+  inline double GetSourceRectWidth() const { return sourceRectWidth; }
+
+  /**
+   * \brief Get the height of the displayed image rectangle.
+   */
+  inline double GetSourceRectHeight() const { return sourceRectHeight; }
+
+  /**
    * \brief Get the collision mask (custom or automatically generated owing to
    * IsFullImageCollisionMask())
    *
@@ -161,6 +196,12 @@ class GD_CORE_API Sprite {
 
  private:
   gd::String image;  ///< Name of the image to be loaded in Image Manager.
+
+  bool hasCustomSourceRect;  ///< True to display a part of the image.
+  double sourceRectX;        ///< X coordinate of the displayed image rectangle.
+  double sourceRectY;        ///< Y coordinate of the displayed image rectangle.
+  double sourceRectWidth;    ///< Width of the displayed image rectangle.
+  double sourceRectHeight;   ///< Height of the displayed image rectangle.
 
   bool fullImageCollisionMask;  ///< True to use a bounding box wrapping the
                                 ///< whole image as collision mask. If false,

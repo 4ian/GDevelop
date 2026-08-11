@@ -28,6 +28,18 @@ TEST_CASE("Project", "[common]") {
     REQUIRE(project.GetName() == "myname");
   }
 }
+
+TEST_CASE("Layout", "[common]") {
+  SECTION("Default background color") {
+    gd::Project project;
+    gd::Layout& layout = project.InsertNewLayout("Scene", 0);
+
+    REQUIRE(layout.GetBackgroundColorRed() == 223);
+    REQUIRE(layout.GetBackgroundColorGreen() == 224);
+    REQUIRE(layout.GetBackgroundColorBlue() == 226);
+  }
+}
+
 TEST_CASE("EventsList", "[common][events]") {
   SECTION("Basics") {
     gd::EventsList list;

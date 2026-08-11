@@ -51,6 +51,10 @@ export type EditorMosaicName =
   | 'debugger'
   | 'resources-editor'
   | 'events-functions-extension-editor'
+  | 'events-functions-extension-detail-editor'
+  | 'prefab-detail-editor'
+  | 'scene-lifecycle-functions-editor'
+  | 'external-events-lifecycle-functions-editor'
   | 'gameplay-test-editor';
 
 export type InAppTutorialUserProgress = {|
@@ -193,6 +197,47 @@ export type EditorStateForProject = {|
 // $FlowFixMe[deprecated-utility]
 export type EditorStateForProjectUpdate = $Shape<EditorStateForProject>;
 
+export type ResourcesToolsSettings = {|
+  activeToolCategory: 'image' | 'sound' | 'animation',
+  selectedImageTool:
+    | 'nano-banana'
+    | 'local-tools'
+    | 'image-extender'
+    | 'ai-game-workbench'
+    | 'gorest-spritesheet',
+  selectedSoundTool: 'elevenlabs',
+  geminiApiKey: string,
+  nanoBananaModel: string,
+  nanoBananaPrompt: string,
+  imageAttachmentPath: string,
+  elevenLabsApiKey: string,
+  elevenLabsMode: 'sound-effect' | 'text-to-speech',
+  elevenLabsText: string,
+  elevenLabsVoiceId: string,
+  elevenLabsModel: string,
+  elevenLabsSoundModel: string,
+  elevenLabsOutputFormat: string,
+  elevenLabsDuration: string,
+|};
+
+export const defaultResourcesToolsSettings: ResourcesToolsSettings = {
+  activeToolCategory: 'image',
+  selectedImageTool: 'nano-banana',
+  selectedSoundTool: 'elevenlabs',
+  geminiApiKey: '',
+  nanoBananaModel: 'gemini-3.1-flash-image',
+  nanoBananaPrompt: '',
+  imageAttachmentPath: '',
+  elevenLabsApiKey: '',
+  elevenLabsMode: 'sound-effect',
+  elevenLabsText: '',
+  elevenLabsVoiceId: 'JBFqnCBsd6RMkjVDRZzb',
+  elevenLabsModel: 'eleven_multilingual_v2',
+  elevenLabsSoundModel: 'eleven_text_to_sound_v2',
+  elevenLabsOutputFormat: 'mp3_44100_128',
+  elevenLabsDuration: '',
+};
+
 export type PreferencesValues = {|
   language: string,
   autoDownloadUpdates: boolean,
@@ -215,6 +260,7 @@ export type PreferencesValues = {|
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
   autoOpenMostRecentProject: boolean,
+  isProjectManagerPinned: boolean,
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
@@ -243,19 +289,23 @@ export type PreferencesValues = {|
   newFeaturesAcknowledgements: {
     [featureId: string]: {| dates: [number] |},
   },
-  displaySaveReminder: {| activated: boolean |}, // Store as object in case we need to add options.
   editorStateByProject: { [string]: EditorStateForProject },
   fetchPlayerTokenForPreviewAutomatically: boolean,
   previewCrashReportUploadLevel: string,
   gamesDashboardOrderBy: GamesDashboardOrderBy,
   takeScreenshotOnPreview: boolean,
   showAiAskButtonInTitleBar: boolean,
+  showAddNoteButtonInTitleBar: boolean,
   automaticallyUseCreditsForAiRequests: boolean,
-  automaticallyApplyAiRequestEditsByProjectId: { [string]: boolean },
+  enableMcpServer: boolean,
+  mcpServerPort: number,
+  mcpAllowWriteTools: boolean,
+  mcpAllowCommandTools: boolean,
   useBackgroundSerializerForSaving: boolean,
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  resourcesToolsSettings: ResourcesToolsSettings,
 |};
 
 /**
@@ -314,6 +364,7 @@ export type Preferences = {|
   ) => void,
   getAutoOpenMostRecentProject: () => boolean,
   setAutoOpenMostRecentProject: (enabled: boolean) => void,
+  setProjectManagerPinned: (enabled: boolean) => void,
   hadProjectOpenedDuringLastSession: () => boolean,
   setHasProjectOpened: (enabled: boolean) => void,
   resetShortcutsToDefault: () => void,
@@ -363,7 +414,6 @@ export type Preferences = {|
   setNewFeaturesAcknowledgements: ({
     [featureId: string]: {| dates: [number] |},
   }) => void,
-  setDisplaySaveReminder: ({| activated: boolean |}) => void,
   getEditorStateForProject: (projectId: string) => ?EditorStateForProject,
   setEditorStateForProject: (
     projectId: string,
@@ -376,11 +426,12 @@ export type Preferences = {|
   ) => void,
   setTakeScreenshotOnPreview: (enabled: boolean) => void,
   setShowAiAskButtonInTitleBar: (enabled: boolean) => void,
+  setShowAddNoteButtonInTitleBar: (enabled: boolean) => void,
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => void,
-  setAutomaticallyApplyAiRequestEditsForProjectId: (
-    projectId: string,
-    enabled: boolean
-  ) => void,
+  setEnableMcpServer: (enabled: boolean) => void,
+  setMcpServerPort: (port: number) => void,
+  setMcpAllowWriteTools: (enabled: boolean) => void,
+  setMcpAllowCommandTools: (enabled: boolean) => void,
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
@@ -413,6 +464,7 @@ export const initialPreferences = {
     defaultEditorMosaicNodes: {},
     recentProjectFiles: ([]: Array<empty>),
     autoOpenMostRecentProject: true,
+    isProjectManagerPinned: false,
     hasProjectOpened: false,
     userShortcutMap: {},
     newObjectDialogDefaultTab: ((electron
@@ -424,12 +476,12 @@ export const initialPreferences = {
     backdropClickBehavior: 'nothing',
     resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
-    showExperimentalExtensions: false,
+    showExperimentalExtensions: true,
     showCreateSectionByDefault: false,
     showInAppTutorialDeveloperMode: false,
     openDiagnosticReportAutomatically: true,
-    blockPreviewAndExportOnDiagnosticErrors: false,
-    showDeprecatedInstructionWarning: 'no',
+    blockPreviewAndExportOnDiagnosticErrors: true,
+    showDeprecatedInstructionWarning: 'icon-and-deprecated-warning-text',
     use3DEditor: (isWebGLSupported(): boolean),
     showBasicProfilingCounters: false,
     inAppTutorialsProgress: {},
@@ -438,19 +490,23 @@ export const initialPreferences = {
     useShortcutToClosePreviewWindow: true,
     watchProjectFolderFilesForLocalProjects: true,
     newFeaturesAcknowledgements: {},
-    displaySaveReminder: { activated: true },
     editorStateByProject: {},
     fetchPlayerTokenForPreviewAutomatically: true,
     previewCrashReportUploadLevel: 'exclude-javascript-code-events',
     gamesDashboardOrderBy: 'lastModifiedAt',
     takeScreenshotOnPreview: true,
     showAiAskButtonInTitleBar: true,
+    showAddNoteButtonInTitleBar: true,
     automaticallyUseCreditsForAiRequests: false,
-    automaticallyApplyAiRequestEditsByProjectId: {},
+    enableMcpServer: false,
+    mcpServerPort: 32110,
+    mcpAllowWriteTools: false,
+    mcpAllowCommandTools: false,
     useBackgroundSerializerForSaving: false,
     disableNpmScriptConfirmation: false,
-    showJsTypeError: false,
+    showJsTypeError: true,
     canonicalEventSerialization: false,
+    resourcesToolsSettings: defaultResourcesToolsSettings,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -487,6 +543,7 @@ export const initialPreferences = {
   removeRecentProjectFile: () => {},
   getAutoOpenMostRecentProject: (): boolean => true,
   setAutoOpenMostRecentProject: () => {},
+  setProjectManagerPinned: () => {},
   hadProjectOpenedDuringLastSession: (): boolean => false,
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
@@ -524,7 +581,6 @@ export const initialPreferences = {
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
-  setDisplaySaveReminder: () => {},
   getEditorStateForProject: (projectId: any): any => {},
   setEditorStateForProject: (projectId: any, editorState: any) => {},
   setFetchPlayerTokenForPreviewAutomatically: (enabled: boolean) => {},
@@ -534,11 +590,12 @@ export const initialPreferences = {
   ) => {},
   setTakeScreenshotOnPreview: (enabled: boolean) => {},
   setShowAiAskButtonInTitleBar: (enabled: boolean) => {},
+  setShowAddNoteButtonInTitleBar: (enabled: boolean) => {},
   setAutomaticallyUseCreditsForAiRequests: (enabled: boolean) => {},
-  setAutomaticallyApplyAiRequestEditsForProjectId: (
-    projectId: string,
-    enabled: boolean
-  ) => {},
+  setEnableMcpServer: (enabled: boolean) => {},
+  setMcpServerPort: (port: number) => {},
+  setMcpAllowWriteTools: (enabled: boolean) => {},
+  setMcpAllowCommandTools: (enabled: boolean) => {},
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},

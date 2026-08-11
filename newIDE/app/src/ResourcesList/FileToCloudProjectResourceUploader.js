@@ -33,7 +33,7 @@ type FileToCloudProjectResourceUploaderProps = {|
 
 const resourceKindToInputAcceptedMimes = {
   audio: ['audio/aac', 'audio/x-wav', 'audio/mpeg', 'audio/mp3', 'audio/ogg'],
-  image: ['image/jpeg', 'image/png', 'image/webp'],
+  image: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   font: ['font/ttf', 'font/otf'],
   video: ['video/mp4', 'video/webm'],
   json: ['application/json'],

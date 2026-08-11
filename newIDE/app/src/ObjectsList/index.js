@@ -8,6 +8,7 @@ import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import Background from '../UI/Background';
 import CompactSearchBar from '../UI/CompactSearchBar';
+import FlatButton from '../UI/FlatButton';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import AssetSwappingDialog from '../AssetStore/AssetSwappingDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -57,6 +58,8 @@ import type { MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { EventsScope } from '../InstructionOrExpression/EventsScope';
 import { type InstallAssetOutput } from '../AssetStore/InstallAsset';
 import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
+import objectTypeToDefaultName from './ObjectTypeToDefaultName';
+import SettingsIcon from '../UI/CustomSvgIcons/Settings';
 
 const gd: libGDevelop = global.gd;
 
@@ -413,31 +416,11 @@ const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
 
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
-const objectTypeToDefaultName = {
-  Sprite: 'NewSprite',
-  'TiledSpriteObject::TiledSprite': 'NewTiledSprite',
-  'ParticleSystem::ParticleEmitter': 'NewParticlesEmitter',
-  'PanelSpriteObject::PanelSprite': 'NewPanelSprite',
-  'PrimitiveDrawing::Drawer': 'NewShapePainter',
-  'TextObject::Text': 'NewText',
-  'BBText::BBText': 'NewBBText',
-  'BitmapText::BitmapTextObject': 'NewBitmapText',
-  'TextEntryObject::TextEntry': 'NewTextEntry',
-  'TileMap::SimpleTileMap': 'NewTileMap',
-  'TileMap::TileMap': 'NewExternalTileMap',
-  'TileMap::CollisionMask': 'NewExternalTileMapMask',
-  'MyDummyExtension::DummyObject': 'NewDummyObject',
-  'Lighting::LightObject': 'NewLight',
-  'TextInput::TextInputObject': 'NewTextInput',
-  'Scene3D::Model3DObject': 'New3DModel',
-  'Scene3D::Cube3DObject': 'New3DBox',
-  'SpineObject::SpineObject': 'NewSpine',
-  'Video::VideoObject': 'NewVideo',
-};
-
 export type ObjectsListInterface = {|
   forceUpdateList: () => void,
-  openNewObjectDialog: () => void,
+  openNewObjectDialog: (options?: {|
+    instanceSceneCoordinates?: ?[number, number],
+  |}) => void,
   closeNewObjectDialog: () => void,
 |};
 
@@ -493,11 +476,19 @@ type Props = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onOpenPrefabSettings?: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    eventsBasedObject: gdEventsBasedObject
+  ) => void,
   onExportAssets: () => void,
   onImportAssets: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onObjectEdited: (
     objectWithContext: ObjectWithContext,
@@ -545,6 +536,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onEditObject,
       onOpenEventBasedObjectEditor,
       onOpenEventBasedObjectVariantEditor,
+      onOpenPrefabSettings,
       onExportAssets,
       onImportAssets,
       onObjectCreated,
@@ -582,6 +574,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
+      instanceSceneCoordinates: ?[number, number],
     } | null>(null);
 
     React.useImperativeHandle(ref, () => ({
@@ -589,8 +582,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         forceUpdate();
         if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      openNewObjectDialog: () => {
-        setNewObjectDialogOpen({ from: null });
+      openNewObjectDialog: options => {
+        setNewObjectDialogOpen({
+          from: null,
+          instanceSceneCoordinates: options
+            ? options.instanceSceneCoordinates || null
+            : null,
+        });
       },
       closeNewObjectDialog: () => {
         setNewObjectDialogOpen(null);
@@ -705,7 +703,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             objectFolderOrObjectWithContext
           );
         }
-        onObjectCreated([object], isTheFirstOfItsTypeInProject);
+        onObjectCreated([object], isTheFirstOfItsTypeInProject, {
+          shouldCreateInstance: true,
+          instanceSceneCoordinates: newObjectDialogOpen
+            ? newObjectDialogOpen.instanceSceneCoordinates
+            : null,
+        });
       },
       [
         project,
@@ -726,7 +729,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       }: InstallAssetOutput) => {
         if (objects.length === 0) return;
 
-        onObjectCreated(objects, isTheFirstOfItsTypeInProject);
+        onObjectCreated(objects, isTheFirstOfItsTypeInProject, {
+          shouldCreateInstance: true,
+          instanceSceneCoordinates: newObjectDialogOpen
+            ? newObjectDialogOpen.instanceSceneCoordinates
+            : null,
+        });
 
         // Here, the last object in the array might not be the last object
         // in the tree view, given the fact that assets are added in parallel
@@ -769,7 +777,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const onAddNewObject = React.useCallback(
       (item: ObjectFolderOrObjectWithContext | null) => {
-        setNewObjectDialogOpen({ from: item });
+        setNewObjectDialogOpen({ from: item, instanceSceneCoordinates: null });
       },
       []
     );
@@ -1570,6 +1578,24 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             />
           </Column>
         </LineStackLayout>
+        {eventsFunctionsExtension && eventsBasedObject && onOpenPrefabSettings && (
+          <LineStackLayout noMargin>
+            <Column expand>
+              <FlatButton
+                fullWidth
+                label={<Trans>Prefab settings</Trans>}
+                leftIcon={<SettingsIcon />}
+                onClick={() =>
+                  onOpenPrefabSettings(
+                    eventsFunctionsExtension,
+                    eventsBasedObject
+                  )
+                }
+                id="objects-list-prefab-settings-button"
+              />
+            </Column>
+          </LineStackLayout>
+        )}
         <div
           style={styles.listContainer}
           onKeyDown={keyboardShortcutsRef.current.onKeyDown}
@@ -1694,6 +1720,9 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   prevProps.selectedObjectFolderOrObjectsWithContext ===
     nextProps.selectedObjectFolderOrObjectsWithContext &&
   prevProps.project === nextProps.project &&
+  prevProps.eventsFunctionsExtension === nextProps.eventsFunctionsExtension &&
+  prevProps.eventsBasedObject === nextProps.eventsBasedObject &&
+  prevProps.onOpenPrefabSettings === nextProps.onOpenPrefabSettings &&
   prevProps.globalObjectsContainer === nextProps.globalObjectsContainer &&
   prevProps.objectsContainer === nextProps.objectsContainer;
 

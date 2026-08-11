@@ -12,7 +12,7 @@ export default function verifyProjectContent(
       message: [
         i18n._(t`Unable to open this file.`),
         i18n._(
-          t`This file is an extension file for GDevelop 5. You should instead import it, using the window to add a new extension to your project.`
+          t`This file is an extension file for GDevelop 6. You should instead import it, using the window to add a new extension to your project.`
         ),
       ].join('\n'),
       rawError: undefined,
@@ -27,7 +27,7 @@ export default function verifyProjectContent(
       message: [
         i18n._(t`Unable to open this file.`),
         i18n._(
-          t`This file is not recognized as a GDevelop 5 project. Be sure to open a file that was saved using GDevelop.`
+          t`This file is not recognized as a GDevelop 6 project. Be sure to open a file that was saved using GDevelop.`
         ),
       ].join('\n'),
       rawError: undefined,

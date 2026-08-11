@@ -13,7 +13,7 @@ namespace gdjs {
   export type Children = Record<string, gdjs.Variable>;
 
   /**
-   * A Variable is an object storing a value (number or a string) or children variables.
+   * A Variable is an object storing a value (number, string, enum or boolean) or children variables.
    * @category Core Engine > Variables
    */
   export class Variable {
@@ -25,6 +25,7 @@ namespace gdjs {
     _value: float = 0;
     _str: string = '0';
     _bool: boolean = false;
+    _enumValues: string[] = [];
     _children: Children = {};
     _childrenArray: gdjs.Variable[] = [];
     _undefinedInContainer: boolean = false;
@@ -46,6 +47,7 @@ namespace gdjs {
       this._value = 0;
       this._str = '0';
       this._bool = false;
+      this._enumValues = [];
       this._children = {};
       this._childrenArray = [];
       this._undefinedInContainer = false;
@@ -56,12 +58,18 @@ namespace gdjs {
           this._value = parseFloat((varData.value as string) || '0');
           // Protect against NaN.
           if (this._value !== this._value) this._value = 0;
-        } else if (this._type === 'string') {
-          this._str = gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable
-            ? '' + varData.value || '0'
-            : varData.value !== undefined
-              ? '' + varData.value
-              : '';
+        } else if (this._type === 'string' || this._type === 'enum') {
+          if (this._type === 'enum' && varData.values) {
+            this.setEnumValues(varData.values);
+          }
+          this._str =
+            this._type === 'string' &&
+            gdjs.Variable.useDeprecatedZeroAsDefaultStringVariable
+              ? '' + varData.value || '0'
+              : varData.value !== undefined
+                ? '' + varData.value
+                : '';
+          this._normalizeEnumValue();
         } else if (this._type === 'boolean') {
           this._bool = !!varData.value;
         } else if (this._type === 'structure') {
@@ -84,8 +92,13 @@ namespace gdjs {
      */
     static isPrimitive(
       type: VariableType
-    ): type is 'string' | 'number' | 'boolean' {
-      return type === 'string' || type === 'number' || type === 'boolean';
+    ): type is 'string' | 'number' | 'boolean' | 'enum' {
+      return (
+        type === 'string' ||
+        type === 'number' ||
+        type === 'boolean' ||
+        type === 'enum'
+      );
     }
 
     /**
@@ -102,6 +115,9 @@ namespace gdjs {
     ): gdjs.Variable {
       if (!merge) target.clearChildren();
       target.castTo(source.getType());
+      if (source.getType() === 'enum') {
+        target.setEnumValues(source.getEnumValues());
+      }
       if (source.isPrimitive()) {
         target.setValue(source.getValue());
       } else if (source.getType() === 'structure') {
@@ -380,6 +396,7 @@ namespace gdjs {
     toJSObject(): any {
       switch (this._type) {
         case 'string':
+        case 'enum':
           return this.getAsString();
         case 'number':
           return this.getAsNumber();
@@ -439,17 +456,26 @@ namespace gdjs {
      * @param newType The new type of the variable
      */
     castTo(newType: VariableType) {
-      if (newType === 'string') this.setString(this.getAsString());
-      else if (newType === 'number') this.setNumber(this.getAsNumber());
+      if (newType === 'string') {
+        this._str = this.getAsString();
+        this._type = 'string';
+        this._enumValues = [];
+      } else if (newType === 'enum') {
+        this._str = this.getAsString();
+        this._type = 'enum';
+        this._normalizeEnumValue();
+      } else if (newType === 'number') this.setNumber(this.getAsNumber());
       else if (newType === 'boolean') this.setBoolean(this.getAsBoolean());
       else if (newType === 'structure') {
         if (this._type === 'structure') return;
         this._children = this.getAllChildren();
         this._type = 'structure';
+        this._enumValues = [];
       } else if (newType === 'array') {
         if (this._type === 'array') return;
         this._childrenArray = this.getAllChildrenArray();
         this._type = 'array';
+        this._enumValues = [];
       }
     }
 
@@ -545,6 +571,7 @@ namespace gdjs {
     replaceChildren(newChildren: Children) {
       this._type = 'structure';
       this._children = newChildren;
+      this._enumValues = [];
     }
 
     /**
@@ -554,6 +581,7 @@ namespace gdjs {
     replaceChildrenArray(newChildren: gdjs.Variable[]) {
       this._type = 'array';
       this._childrenArray = newChildren;
+      this._enumValues = [];
     }
 
     /**
@@ -563,7 +591,8 @@ namespace gdjs {
     getAsNumber(): float {
       if (this._type !== 'number') {
         let number = 0;
-        if (this._type === 'string') number = parseFloat(this._str);
+        if (this._type === 'string' || this._type === 'enum')
+          number = parseFloat(this._str);
         else if (this._type === 'boolean') number = this._bool ? 1 : 0;
 
         return number === number ? number : 0; //Ensure NaN is not returned as a value.
@@ -581,6 +610,7 @@ namespace gdjs {
       //@ts-ignore parseFloat does accept numbers.
       newValue = parseFloat(newValue);
       this._value = newValue === newValue ? newValue : 0; // Prevent NaN
+      this._enumValues = [];
     }
 
     /**
@@ -588,7 +618,7 @@ namespace gdjs {
      * @return The string stored in the variable
      */
     getAsString(): string {
-      if (this._type !== 'string') {
+      if (this._type !== 'string' && this._type !== 'enum') {
         if (this._type === 'number') return this._value.toString();
         else if (this._type === 'boolean') return this._bool ? 'true' : 'false';
         else if (this._type === 'structure') return '[Structure]';
@@ -604,8 +634,78 @@ namespace gdjs {
      * @param newValue The new string to be set
      */
     setString(newValue: string): void {
-      this._type = 'string';
+      this._type = this._type === 'enum' ? 'enum' : 'string';
       this._str = '' + newValue;
+      this._normalizeEnumValue();
+    }
+
+    /**
+     * Get the list of allowed values for an enum variable.
+     * An empty list means the enum is unrestricted.
+     */
+    getEnumValues(): string[] {
+      return this._enumValues;
+    }
+
+    /**
+     * Replace the list of allowed values for an enum variable.
+     */
+    setEnumValues(values: string[]): void {
+      this._enumValues = [];
+      for (const value of values) {
+        if (this._enumValues.indexOf('' + value) === -1) {
+          this._enumValues.push('' + value);
+        }
+      }
+      this._normalizeEnumValue();
+    }
+
+    /**
+     * Add an allowed enum value.
+     */
+    addEnumValue(value: string): void {
+      value = '' + value;
+      if (this._enumValues.indexOf(value) === -1) {
+        this._enumValues.push(value);
+      }
+      this._normalizeEnumValue();
+    }
+
+    /**
+     * Remove an allowed enum value.
+     */
+    removeEnumValueAt(index: integer): void {
+      if (index < 0 || index >= this._enumValues.length) return;
+
+      this._enumValues.splice(index, 1);
+      this._normalizeEnumValue();
+    }
+
+    /**
+     * Remove all allowed enum values.
+     */
+    clearEnumValues(): void {
+      this._enumValues = [];
+    }
+
+    /**
+     * Return true if a string is allowed by the enum definition.
+     */
+    isValidEnumValue(value: string): boolean {
+      return (
+        this._enumValues.length === 0 ||
+        this._enumValues.indexOf('' + value) !== -1
+      );
+    }
+
+    _normalizeEnumValue(): void {
+      if (
+        this._type === 'enum' &&
+        this._enumValues.length > 0 &&
+        !this.isValidEnumValue(this._str)
+      ) {
+        this._str = this._enumValues[0];
+      }
     }
 
     /**
@@ -630,7 +730,7 @@ namespace gdjs {
     getAsBoolean(): boolean {
       if (this._type !== 'boolean') {
         if (this._type === 'number') return this._value !== 0;
-        else if (this._type === 'string')
+        else if (this._type === 'string' || this._type === 'enum')
           return this._str !== '0' && this._str !== '' && this._str !== 'false';
         else return true;
       }
@@ -645,6 +745,7 @@ namespace gdjs {
     setBoolean(newValue: boolean) {
       this._type = 'boolean';
       this._bool = !!newValue;
+      this._enumValues = [];
     }
 
     /**
@@ -659,7 +760,8 @@ namespace gdjs {
      * @param newValue The primitive value of the variable.
      */
     setValue(newValue: string | float | boolean) {
-      if (this._type === 'string') this.setString(newValue as string);
+      if (this._type === 'string' || this._type === 'enum')
+        this.setString(newValue as string);
       else if (this._type === 'number') this.setNumber(newValue as float);
       else if (this._type === 'boolean') this.setBoolean(newValue as boolean);
     }

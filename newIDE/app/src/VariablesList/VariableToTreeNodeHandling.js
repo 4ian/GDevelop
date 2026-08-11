@@ -308,9 +308,15 @@ export const generateListOfNodesMatchingSearchInVariable = ({
       }
       return [];
     case gd.Variable.String:
+    case gd.Variable.Enum:
       if (
         normalizeString(variableName).includes(searchText) ||
-        normalizeString(variable.getString()).includes(searchText)
+        normalizeString(variable.getString()).includes(searchText) ||
+        (variable.getType() === gd.Variable.Enum &&
+          variable
+            .getEnumValues()
+            .toJSArray()
+            .some(enumValue => normalizeString(enumValue).includes(searchText)))
       ) {
         return [nodeId];
       }

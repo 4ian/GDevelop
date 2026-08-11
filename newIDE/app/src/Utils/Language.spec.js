@@ -1,6 +1,8 @@
 // @flow
+/* global globalThis */
 
 import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvider';
+import { selectLanguageOrLocale } from './Language';
 
 jest.mock('../locales/LocalesMetadata', () => [
   {
@@ -29,78 +31,77 @@ jest.mock('../locales/LocalesMetadata', () => [
   },
 ]);
 
-// $FlowFixMe[underconstrained-implicit-instantiation]
-const mockGetBrowserLanguageOrLocale = jest.fn();
-
-jest.mock('./Language', () => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const originalModule = jest.requireActual('./Language');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    getBrowserLanguageOrLocale: () => mockGetBrowserLanguageOrLocale(),
-  };
-});
-
 describe('PreferencesProvider', () => {
   describe('getInitialPreferences', () => {
-    describe('Browser with language', () => {
-      test('return the only translated locale for this language, if good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('es');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('es_ES');
-      });
+    const globalScope: any = globalThis;
+    const previousNavigatorDescriptor = Object.getOwnPropertyDescriptor(
+      globalScope,
+      'navigator'
+    );
 
-      test('return the best translated locale among the possible locales for this language, if good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('pt');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('pt_BR');
-      });
-
-      test('return default if the best translated locale is not good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('fr');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('en');
-      });
-
-      test('return default if there is no matching language or locale', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('zh');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('en');
-      });
+    afterEach(() => {
+      if (previousNavigatorDescriptor) {
+        Object.defineProperty(
+          globalScope,
+          'navigator',
+          previousNavigatorDescriptor
+        );
+      } else {
+        delete globalScope.navigator;
+      }
     });
 
-    describe('Browser with locale', () => {
-      test('return locale if exact match exists and if translation ratio is good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('es_ES');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('es_ES');
+    test('defaults to English without using the browser locale', () => {
+      Object.defineProperty(globalScope, 'navigator', {
+        configurable: true,
+        value: { language: 'es-ES' },
       });
 
-      test('return locale if language match exists and if translation ratio is good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('es_US');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('es_ES');
-      });
+      const preferences = getInitialPreferences();
 
-      test('return default if language match exists but translation ratio is not good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('fr_BE');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('en');
-      });
+      expect(preferences.language).toBe('en');
+    });
+  });
+});
 
-      test('return default if exact match exists but translation ratio is not good enough', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('pt_PT');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('en');
-      });
+describe('selectLanguageOrLocale', () => {
+  describe('Browser with language', () => {
+    test('return the only translated locale for this language, if good enough', () => {
+      expect(selectLanguageOrLocale('es', 'en')).toBe('es_ES');
+    });
 
-      test('return default if there is no matching locale', () => {
-        mockGetBrowserLanguageOrLocale.mockReturnValue('zh_CN');
-        const preferences = getInitialPreferences();
-        expect(preferences.language).toBe('en');
-      });
+    test('return the best translated locale among the possible locales for this language, if good enough', () => {
+      expect(selectLanguageOrLocale('pt', 'en')).toBe('pt_BR');
+    });
+
+    test('return default if the best translated locale is not good enough', () => {
+      expect(selectLanguageOrLocale('fr', 'en')).toBe('en');
+    });
+
+    test('return default if there is no matching language or locale', () => {
+      expect(selectLanguageOrLocale('zh', 'en')).toBe('en');
+    });
+  });
+
+  describe('Browser with locale', () => {
+    test('return locale if exact match exists and if translation ratio is good enough', () => {
+      expect(selectLanguageOrLocale('es_ES', 'en')).toBe('es_ES');
+    });
+
+    test('return locale if language match exists and if translation ratio is good enough', () => {
+      expect(selectLanguageOrLocale('es_US', 'en')).toBe('es_ES');
+    });
+
+    test('return default if language match exists but translation ratio is not good enough', () => {
+      expect(selectLanguageOrLocale('fr_BE', 'en')).toBe('en');
+    });
+
+    test('return default if exact match exists but translation ratio is not good enough', () => {
+      expect(selectLanguageOrLocale('pt_PT', 'en')).toBe('en');
+    });
+
+    test('return default if there is no matching locale', () => {
+      expect(selectLanguageOrLocale('zh_CN', 'en')).toBe('en');
     });
   });
 });

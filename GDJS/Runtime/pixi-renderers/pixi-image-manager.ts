@@ -34,7 +34,19 @@ namespace gdjs {
     }
   };
 
+  const isGifResource = (resourceData: ResourceData): boolean => {
+    const resourcePaths = [resourceData.file, resourceData.name];
+    return resourcePaths.some((resourcePath) =>
+      resourcePath.split('?')[0].toLowerCase().endsWith('.gif')
+    );
+  };
+
   const resourceKinds: Array<ResourceKind> = ['image', 'video'];
+
+  type ImageDecoderConstructor = new (options: {
+    data: ArrayBuffer;
+    type: string;
+  }) => any;
 
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
@@ -51,6 +63,8 @@ namespace gdjs {
      * Map associating a resource name to the loaded PixiJS texture.
      */
     private _loadedTextures = new gdjs.ResourceCache<PIXI.Texture>();
+    private _loadedGifFrameTextures = new gdjs.ResourceCache<PIXI.Texture[]>();
+    private _loadedGifFrameTextureSets = new Set<PIXI.Texture[]>();
 
     /**
      * Map associating a resource name to the loaded Three.js texture.
@@ -62,6 +76,16 @@ namespace gdjs {
       string,
       string
     >();
+    private _threeTextureFailures: Array<{
+      code: string;
+      resourceName: string;
+      sourceType: string;
+      objectName?: string;
+      faceIndex?: number;
+      message: string;
+    }> = [];
+    private _threeTextureFailureKeys = new Set<string>();
+    private _threeTextureFailureRegistryTruncated = false;
 
     private _diskTextures = new Map<float, PIXI.Texture>();
     private _rectangleTextures = new Map<string, PIXI.Texture>();
@@ -94,6 +118,7 @@ namespace gdjs {
     getPIXITexture(resourceName: string): PIXI.Texture {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
+        if (!resourceName) return this._invalidTexture;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -121,6 +146,89 @@ namespace gdjs {
     }
 
     /**
+     * Return a PIXI texture for a frame inside an animated image resource.
+     * It falls back to the whole-image texture for non-animated images.
+     */
+    getPIXITextureForImageFrame(
+      resourceName: string,
+      imageFrameIndex: integer
+    ): PIXI.Texture {
+      const resource = this._getImageResource(resourceName);
+      if (!resource) {
+        if (!resourceName) return this._invalidTexture;
+        logger.warn(
+          'Unable to find texture for resource "' + resourceName + '".'
+        );
+        return this._invalidTexture;
+      }
+
+      const gifFrameTextures = this._loadedGifFrameTextures.get(resource);
+      if (gifFrameTextures && gifFrameTextures.length) {
+        const wrappedFrameIndex =
+          ((imageFrameIndex % gifFrameTextures.length) +
+            gifFrameTextures.length) %
+          gifFrameTextures.length;
+        const frameTexture = gifFrameTextures[wrappedFrameIndex];
+        if (frameTexture && !frameTexture.destroyed && frameTexture.valid) {
+          return frameTexture;
+        }
+      }
+
+      return this.getPIXITexture(resourceName);
+    }
+
+    /**
+     * Return a PIXI texture for a rectangle inside an image resource.
+     * The returned texture shares the same base texture as the full image.
+     */
+    getPIXITextureForSourceRect(
+      resourceName: string,
+      sourceRect: gdjs.SpriteFrameSourceRectData
+    ): PIXI.Texture {
+      const texture = this.getPIXITexture(resourceName);
+      if (
+        texture === this._invalidTexture ||
+        !texture.baseTexture ||
+        !texture.baseTexture.valid ||
+        texture.destroyed ||
+        sourceRect.width <= 0 ||
+        sourceRect.height <= 0
+      ) {
+        return texture;
+      }
+
+      const key = `sourceRect:${resourceName}:${sourceRect.x}:${sourceRect.y}:${
+        sourceRect.width
+      }:${sourceRect.height}`;
+      const existingTexture = this._rectangleTextures.get(key);
+      if (
+        existingTexture &&
+        !existingTexture.destroyed &&
+        existingTexture.baseTexture === texture.baseTexture
+      ) {
+        return existingTexture;
+      }
+
+      try {
+        const frame = new PIXI.Rectangle(
+          sourceRect.x,
+          sourceRect.y,
+          sourceRect.width,
+          sourceRect.height
+        );
+        const sourceRectTexture = new PIXI.Texture(texture.baseTexture, frame);
+        this._rectangleTextures.set(key, sourceRectTexture);
+        return sourceRectTexture;
+      } catch (error) {
+        logger.error(
+          `Unable to create a texture for source rectangle in "${resourceName}".`,
+          error
+        );
+        return this._invalidTexture;
+      }
+    }
+
+    /**
      * Return the PIXI texture associated to the specified resource name.
      * If not found in the loaded textures, this method will try to load it.
      * Warning: this method should only be used in specific cases that cannot rely on
@@ -131,6 +239,7 @@ namespace gdjs {
     getOrLoadPIXITexture(resourceName: string): PIXI.Texture {
       const resource = this._getImageResource(resourceName);
       if (!resource) {
+        if (!resourceName) return this._invalidTexture;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -163,7 +272,7 @@ namespace gdjs {
             ? 'use-credentials'
             : 'anonymous',
         },
-      }).on('error', (error) => {
+      }).on('error', error => {
         logFileLoadingError(file, error);
       });
       if (!texture) {
@@ -186,12 +295,58 @@ namespace gdjs {
      * @param resourceName The name of the resource
      * @returns The requested texture, or a placeholder if not found.
      */
-    getThreeTexture(resourceName: string): THREE.Texture {
+    getThreeTexture(
+      resourceName: string,
+      diagnosticContext?: {
+        objectName?: string;
+        faceIndex?: number;
+      }
+    ): THREE.Texture {
       const loadedThreeTexture = this._loadedThreeTextures.get(resourceName);
       if (loadedThreeTexture) {
         return loadedThreeTexture;
       }
-      const image = this._getImageSource(resourceName);
+      let image: TexImageSource;
+      try {
+        image = this._getThreeTextureSource(resourceName);
+      } catch (error) {
+        const message =
+          error && (error as Error).message
+            ? (error as Error).message
+            : String(error);
+        const sourceTypeMatch = message.match(/source type "([^"]+)"/);
+        const failure = {
+          code: message.includes('THREE_TEXTURE_UNSUPPORTED_SOURCE')
+            ? 'THREE_TEXTURE_UNSUPPORTED_SOURCE'
+            : 'THREE_TEXTURE_LOAD_FAILED',
+          resourceName,
+          sourceType: sourceTypeMatch ? sourceTypeMatch[1] : 'unknown',
+          objectName:
+            diagnosticContext && diagnosticContext.objectName
+              ? diagnosticContext.objectName
+              : undefined,
+          faceIndex:
+            diagnosticContext && typeof diagnosticContext.faceIndex === 'number'
+              ? diagnosticContext.faceIndex
+              : undefined,
+          message,
+        };
+        const failureKey = [
+          failure.code,
+          failure.resourceName,
+          failure.objectName || '',
+          failure.faceIndex === undefined ? '' : failure.faceIndex,
+        ].join(':');
+        if (!this._threeTextureFailureKeys.has(failureKey)) {
+          this._threeTextureFailureKeys.add(failureKey);
+          if (this._threeTextureFailures.length < 64) {
+            this._threeTextureFailures.push(failure);
+          } else {
+            this._threeTextureFailureRegistryTruncated = true;
+          }
+        }
+        throw error;
+      }
 
       const threeTexture = new THREE.Texture(image);
       threeTexture.magFilter = THREE.LinearFilter;
@@ -209,7 +364,17 @@ namespace gdjs {
       return threeTexture;
     }
 
-    private _getImageSource(resourceName: string): HTMLImageElement {
+    getThreeTextureDebugInfo(): Object {
+      return {
+        failedTextureCount: this._threeTextureFailureKeys.size,
+        returnedFailureCount: this._threeTextureFailures.length,
+        failures: this._threeTextureFailures.slice(),
+        truncated: this._threeTextureFailureRegistryTruncated,
+        limit: 64,
+      };
+    }
+
+    private _getThreeTextureSource(resourceName: string): TexImageSource {
       // Texture is not loaded, load it now from the PixiJS texture.
       // TODO (3D) - optimization: don't load the PixiJS Texture if not used by PixiJS.
       // TODO (3D) - optimization: Ideally we could even share the same WebGL texture.
@@ -221,12 +386,28 @@ namespace gdjs {
 
       // @ts-ignore - source does exist on resource.
       const image = pixiTexture.baseTexture.resource.source;
-      if (!(image instanceof HTMLImageElement)) {
+      const isSupportedThreeTextureSource =
+        (typeof HTMLImageElement !== 'undefined' &&
+          image instanceof HTMLImageElement) ||
+        (typeof HTMLCanvasElement !== 'undefined' &&
+          image instanceof HTMLCanvasElement) ||
+        (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) ||
+        (typeof ImageData !== 'undefined' && image instanceof ImageData) ||
+        (typeof HTMLVideoElement !== 'undefined' &&
+          image instanceof HTMLVideoElement) ||
+        (typeof OffscreenCanvas !== 'undefined' &&
+          image instanceof OffscreenCanvas);
+      if (!isSupportedThreeTextureSource) {
+        const sourceType =
+          image && image.constructor && image.constructor.name
+            ? image.constructor.name
+            : typeof image;
         throw new Error(
-          `Can't load texture for resource "${resourceName}" as it's not an image.`
+          `[THREE_TEXTURE_UNSUPPORTED_SOURCE] Can't load texture for resource "${resourceName}" ` +
+            `because the loaded source type "${sourceType}" cannot be uploaded to Three.js.`
         );
       }
-      return image;
+      return image as TexImageSource;
     }
 
     /**
@@ -262,14 +443,26 @@ namespace gdjs {
 
       const cubeTexture = new THREE.CubeTexture();
       // Faces on X axis need to be swapped.
-      cubeTexture.images[0] = this._getImageSource(xNegativeResourceName);
-      cubeTexture.images[1] = this._getImageSource(xPositiveResourceName);
+      cubeTexture.images[0] = this._getThreeTextureSource(
+        xNegativeResourceName
+      );
+      cubeTexture.images[1] = this._getThreeTextureSource(
+        xPositiveResourceName
+      );
       // Faces on Y keep the same order.
-      cubeTexture.images[2] = this._getImageSource(yPositiveResourceName);
-      cubeTexture.images[3] = this._getImageSource(yNegativeResourceName);
+      cubeTexture.images[2] = this._getThreeTextureSource(
+        yPositiveResourceName
+      );
+      cubeTexture.images[3] = this._getThreeTextureSource(
+        yNegativeResourceName
+      );
       // Faces on Z keep the same order.
-      cubeTexture.images[4] = this._getImageSource(zPositiveResourceName);
-      cubeTexture.images[5] = this._getImageSource(zNegativeResourceName);
+      cubeTexture.images[4] = this._getThreeTextureSource(
+        zPositiveResourceName
+      );
+      cubeTexture.images[5] = this._getThreeTextureSource(
+        zNegativeResourceName
+      );
       // The images also need to be mirrored horizontally by users.
 
       cubeTexture.magFilter = THREE.LinearFilter;
@@ -320,6 +513,10 @@ namespace gdjs {
         useTransparentTexture: boolean;
         forceBasicMaterial: boolean;
         vertexColors: boolean;
+        diagnosticContext?: {
+          objectName?: string;
+          faceIndex?: number;
+        };
       }
     ): THREE.Material {
       const loadedThreeMaterial = this._loadedThreeMaterials.get(
@@ -330,7 +527,7 @@ namespace gdjs {
 
       const material = options.forceBasicMaterial
         ? new THREE.MeshBasicMaterial({
-            map: this.getThreeTexture(resourceName),
+            map: this.getThreeTexture(resourceName, options.diagnosticContext),
             side: options.useTransparentTexture
               ? THREE.DoubleSide
               : THREE.FrontSide,
@@ -338,7 +535,7 @@ namespace gdjs {
             vertexColors: options.vertexColors,
           })
         : new THREE.MeshStandardMaterial({
-            map: this.getThreeTexture(resourceName),
+            map: this.getThreeTexture(resourceName, options.diagnosticContext),
             side: options.useTransparentTexture
               ? THREE.DoubleSide
               : THREE.FrontSide,
@@ -396,6 +593,7 @@ namespace gdjs {
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -408,15 +606,112 @@ namespace gdjs {
       // Do nothing because images are light enough to be parsed in background.
     }
 
+    private async _loadGifFrameTextures(
+      resource: ResourceData,
+      resourceUrl: string
+    ): Promise<PIXI.Texture[] | null> {
+      if (!isGifResource(resource)) {
+        return null;
+      }
+
+      const ImageDecoderClass = (globalThis as any).ImageDecoder as
+        | ImageDecoderConstructor
+        | undefined;
+      if (!ImageDecoderClass) {
+        return null;
+      }
+
+      let decoder: any = null;
+      try {
+        const response = await fetch(resourceUrl, {
+          credentials: this._resourceLoader.checkIfCredentialsRequired(
+            resource.file
+          )
+            ? 'include'
+            : 'same-origin',
+        });
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch GIF "${resource.file}": ${response.status} ${
+              response.statusText
+            }`
+          );
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        decoder = new ImageDecoderClass({
+          data: arrayBuffer,
+          type: 'image/gif',
+        });
+        if (decoder.tracks && decoder.tracks.ready) {
+          await decoder.tracks.ready;
+        }
+
+        const selectedTrack = decoder.tracks
+          ? decoder.tracks.selectedTrack
+          : null;
+        const frameCount =
+          selectedTrack &&
+          Number.isFinite(selectedTrack.frameCount) &&
+          selectedTrack.frameCount > 0
+            ? selectedTrack.frameCount
+            : 1;
+        const frameTextures: PIXI.Texture[] = [];
+
+        for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+          const decodedFrame = await decoder.decode({ frameIndex });
+          const image = decodedFrame.image;
+          const width = image.displayWidth || image.codedWidth || image.width;
+          const height =
+            image.displayHeight || image.codedHeight || image.height;
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext('2d');
+          if (!context) {
+            if (typeof image.close === 'function') {
+              image.close();
+            }
+            throw new Error('Unable to create a canvas context for a GIF.');
+          }
+
+          context.drawImage(image, 0, 0);
+          if (typeof image.close === 'function') {
+            image.close();
+          }
+
+          const texture = PIXI.Texture.from(canvas);
+          applyTextureSettings(texture, resource);
+          frameTextures.push(texture);
+        }
+
+        return frameTextures.length ? frameTextures : null;
+      } finally {
+        if (decoder && typeof decoder.close === 'function') {
+          decoder.close();
+        }
+      }
+    }
+
     /**
      * Load the specified resources, so that textures are loaded and can then be
      * used by calling `getPIXITexture`.
      * @param onProgress Callback called each time a new file is loaded.
      */
     async _loadTexture(resource: ResourceData): Promise<void> {
-      if (this._loadedTextures.get(resource)) {
+      const existingTexture = this._loadedTextures.get(resource);
+      if (
+        existingTexture &&
+        !existingTexture.destroyed &&
+        existingTexture.valid
+      ) {
         return;
       }
+      if (existingTexture) {
+        this._destroyLoadedGifFrameTextures(resource);
+        this._loadedTextures.delete(resource);
+      }
+
       const resourceUrl = this._resourceLoader.getFullUrl(resource.file);
       try {
         if (resource.kind === 'video') {
@@ -426,18 +721,21 @@ namespace gdjs {
           // to continue, otherwise if we try to play the video too soon (at the beginning of scene for instance),
           // it will fail.
           await new Promise<void>((resolve, reject) => {
-            const texture = PIXI.Texture.from(resourceUrl, {
-              resourceOptions: {
-                crossorigin: this._resourceLoader.checkIfCredentialsRequired(
-                  resource.file
-                )
-                  ? 'use-credentials'
-                  : 'anonymous',
-                autoPlay: false,
-              },
-            }).on('error', (error) => {
-              reject(error);
+            // The resource is explicitly built as a video one: `PIXI.Texture.from`
+            // picks the kind of resource from the file extension of the URL,
+            // and there is none when the game resources were packed at export
+            // (the video is then read from a `blob:` URL).
+            const videoResource = new PIXI.VideoResource(resourceUrl, {
+              crossorigin: this._resourceLoader.checkIfCredentialsRequired(
+                resource.file
+              )
+                ? 'use-credentials'
+                : 'anonymous',
+              autoPlay: false,
             });
+            const texture = new PIXI.Texture(
+              new PIXI.BaseTexture(videoResource)
+            );
 
             const baseTexture = texture.baseTexture;
             baseTexture
@@ -446,11 +744,31 @@ namespace gdjs {
                 applyTextureSettings(texture, resource);
                 resolve();
               })
-              .on('error', (error) => {
+              .on('error', error => {
                 reject(error);
               });
           });
         } else {
+          try {
+            const gifFrameTextures = await this._loadGifFrameTextures(
+              resource,
+              resourceUrl
+            );
+            if (gifFrameTextures && gifFrameTextures.length) {
+              this._loadedGifFrameTextures.set(resource, gifFrameTextures);
+              this._loadedGifFrameTextureSets.add(gifFrameTextures);
+              this._loadedTextures.set(resource, gifFrameTextures[0]);
+              return;
+            }
+          } catch (error) {
+            logger.warn(
+              'Unable to decode GIF frames for file ' +
+                resource.file +
+                '. Falling back to a standard texture.',
+              error
+            );
+          }
+
           // If the file has no extension, PIXI.assets.load cannot find
           // an adequate load parser and does not load the file although
           // we would like to force it to load (we are confident it's an image).
@@ -560,11 +878,37 @@ namespace gdjs {
       return particleTexture;
     }
 
+    private _destroyGifFrameTextures(gifFrameTextures: PIXI.Texture[]): void {
+      for (const gifFrameTexture of gifFrameTextures) {
+        if (gifFrameTexture.destroyed) {
+          continue;
+        }
+
+        gifFrameTexture.destroy(true);
+      }
+    }
+
+    private _destroyLoadedGifFrameTextures(resourceData: ResourceData): void {
+      const gifFrameTextures = this._loadedGifFrameTextures.get(resourceData);
+      if (!gifFrameTextures) {
+        return;
+      }
+
+      this._destroyGifFrameTextures(gifFrameTextures);
+      this._loadedGifFrameTextures.delete(resourceData);
+      this._loadedGifFrameTextureSets.delete(gifFrameTextures);
+    }
+
     /**
      * To be called when the game is disposed.
      * Clear caches of loaded textures and materials.
      */
     dispose(): void {
+      for (const gifFrameTextures of this._loadedGifFrameTextureSets.values()) {
+        this._destroyGifFrameTextures(gifFrameTextures);
+      }
+      this._loadedGifFrameTextureSets.clear();
+      this._loadedGifFrameTextures.clear();
       this._loadedTextures.clear();
 
       const threeTextures: THREE.Texture[] = [];
@@ -611,9 +955,13 @@ namespace gdjs {
 
     unloadResource(resourceData: ResourceData): void {
       const resourceName = resourceData.name;
+      this._destroyLoadedGifFrameTextures(resourceData);
+
       const texture = this._loadedTextures.getFromName(resourceName);
       if (texture) {
-        texture.destroy(true);
+        if (!texture.destroyed) {
+          texture.destroy(true);
+        }
         this._loadedTextures.delete(resourceData);
       }
 
@@ -625,10 +973,9 @@ namespace gdjs {
 
       this._loadedThreeMaterials.dispose(resourceName);
 
-      const cubeTextureKeys =
-        this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(
-          resourceName
-        );
+      const cubeTextureKeys = this._loadedThreeCubeTextureKeysByResourceName.getValuesFor(
+        resourceName
+      );
       if (cubeTextureKeys) {
         for (const cubeTextureKey of cubeTextureKeys) {
           const cubeTexture = this._loadedThreeCubeTextures.get(cubeTextureKey);

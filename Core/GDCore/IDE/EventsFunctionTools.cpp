@@ -7,8 +7,10 @@
 
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ParameterMetadataContainer.h"
 #include "GDCore/Project/PropertiesContainer.h"
@@ -54,10 +56,11 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
 
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    gd::LogWarning("No \"Object\" in a function of an events based behavior: " +
-                   eventsFunction.GetName() +
-                   ". This means this function is likely misconfigured (check "
-                   "its parameters).");
+    gd::LogWarning(
+        "No \"Object\" in a function of an events based behavior: " +
+        eventsFunction.GetName() +
+        ". This means this function is likely misconfigured (check "
+        "its parameters).");
     return;
   }
 
@@ -79,6 +82,7 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
 
 void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     const gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputObjectsContainer) {
@@ -91,17 +95,30 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
   // TODO EBO Use a constant instead a hard coded value "Object".
   // ...and has an "Object" by convention...
   if (!outputObjectsContainer.HasObjectNamed("Object")) {
-    gd::LogWarning("No \"Object\" in a function of an events based object: " +
-                   eventsFunction.GetName() +
-                   ". This means this function is likely misconfigured (check "
-                   "its parameters).");
-    return;
+    if (eventsFunction.GetName() == "onSignal") {
+      outputObjectsContainer.InsertNewObject(
+          project,
+          gd::PlatformExtension::GetObjectFullType(
+              eventsFunctionsExtension.GetName(), eventsBasedObject.GetName()),
+          "Object", outputObjectsContainer.GetObjectsCount());
+    } else {
+      gd::LogWarning(
+          "No \"Object\" in a function of an events based object: " +
+          eventsFunction.GetName() +
+          ". This means this function is likely misconfigured (check "
+          "its parameters).");
+      return;
+    }
   }
   if (eventsBasedObject.GetObjects().HasObjectNamed("Object")) {
     gd::LogWarning("Child-objects can't be named Object because it's reserved"
                   "for the parent. ");
     return;
   }
+
+  // Prefab variables are exposed through the variables scope only. They must
+  // not be copied to the synthetic parent object, otherwise `Object.Variable`
+  // would alias the prefab's internal state.
 }
 
 void EventsFunctionTools::ParametersToVariablesContainer(
@@ -176,7 +193,25 @@ void EventsFunctionTools::AddPropertiesToVariablesContainer(
     auto &propertyType = gd::ValueTypeMetadata::GetPrimitiveValueType(
         gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
             property.GetType()));
-    if (propertyType == "number") {
+    if (property.GetType() == "JsonObject") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.CastTo(gd::Variable::Type::Structure);
+    } else if (property.GetType() == "Choice") {
+      auto &variable = outputVariablesContainer.InsertNew(
+          property.GetName(), outputVariablesContainer.Count());
+      variable.SetString(property.GetValue());
+      variable.CastTo(gd::Variable::Type::Enum);
+      std::vector<gd::String> enumValues;
+      for (const auto &choice : property.GetChoices()) {
+        enumValues.push_back(choice.GetValue());
+      }
+      // Some older extensions stored choice values in extra info.
+      for (const auto &extraInfo : property.GetExtraInfo()) {
+        enumValues.push_back(extraInfo);
+      }
+      variable.SetEnumValues(enumValues);
+    } else if (propertyType == "number") {
       auto &variable = outputVariablesContainer.InsertNew(
           property.GetName(), outputVariablesContainer.Count());
       variable.SetValue(0);

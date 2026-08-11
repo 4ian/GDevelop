@@ -117,6 +117,7 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instances: Array<gdInitialInstance>,
   editObjectInPropertiesPanel: string => void,
+  renderObjectProperties?: gdObject => React.Node,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   editInstanceVariables: gdInitialInstance => void,
@@ -138,7 +139,7 @@ export const CompactInstancePropertiesEditor = ({
   layersContainer,
   unsavedChanges,
   historyHandler,
-  editObjectInPropertiesPanel,
+  renderObjectProperties,
   onGetInstanceSize,
   editInstanceVariables,
   onInstancesModified,
@@ -294,7 +295,6 @@ export const CompactInstancePropertiesEditor = ({
         canBeFlippedXY,
         canBeFlippedZ,
         onGetInstanceSize,
-        onEditObject: editObjectInPropertiesPanel,
         layersContainer,
         forceUpdate,
       }).concat(reorderedInstanceSchemaForCustomProperties);
@@ -312,7 +312,6 @@ export const CompactInstancePropertiesEditor = ({
       layersContainer,
       i18n,
       onGetInstanceSize,
-      editObjectInPropertiesPanel,
       forceUpdate,
       instances,
     ]
@@ -351,6 +350,16 @@ export const CompactInstancePropertiesEditor = ({
 
   if (!object || !instance || !instanceSchema) return null;
 
+  const shouldDisplayObjectProperties =
+    !!renderObjectProperties &&
+    instances.every(
+      selectedInstance => selectedInstance.getObjectName() === object.getName()
+    );
+  const objectPropertiesContent =
+    renderObjectProperties && shouldDisplayObjectProperties
+      ? renderObjectProperties(object)
+      : null;
+
   return (
     <ErrorBoundary
       componentTitle={<Trans>Instance properties</Trans>}
@@ -374,6 +383,19 @@ export const CompactInstancePropertiesEditor = ({
             />
             <Spacer />
           </Column>
+          {objectPropertiesContent && (
+            <>
+              <Separator />
+              <Column noOverflowParent>
+                <Line alignItems="center" justifyContent="space-between">
+                  <Text size="sub-title" noMargin>
+                    <Trans>Object properties</Trans>
+                  </Text>
+                </Line>
+                {objectPropertiesContent}
+              </Column>
+            </>
+          )}
           {shouldDisplayTileSetVisualizer && (
             <>
               <Separator />
@@ -471,7 +493,6 @@ export const CompactInstancePropertiesEditor = ({
                             : () => (
                                 <CompactInstanceBehaviorComponent
                                   project={project}
-                                  behaviorMetadata={behaviorMetadata}
                                   object={object}
                                   layersContainer={layersContainer}
                                   instancesAndBehaviors={instancesAndBehaviors}

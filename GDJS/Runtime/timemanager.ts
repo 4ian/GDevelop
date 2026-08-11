@@ -39,6 +39,7 @@ namespace gdjs {
       this._timeScale = 1;
       this._timeFromStart = 0;
       this._firstFrame = true;
+      this._firstUpdateDone = false;
       this._timers = new Hashtable();
     }
 

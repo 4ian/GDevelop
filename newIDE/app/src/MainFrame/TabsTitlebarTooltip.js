@@ -12,7 +12,6 @@ import {
 } from './EditorTabs/EditorTabsHandler';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { parseCustomObjectEditorTabName } from '../Utils/CustomObjectEditorTabName';
 
 const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   layout: <Trans>Scene</Trans>,
@@ -20,9 +19,13 @@ const editorKindToLabel: { [kind: EditorKind]: React.Node } = {
   'external layout': <Trans>External layout</Trans>,
   'external events': <Trans>External events</Trans>,
   'events functions extension': <Trans>Extension</Trans>,
-  'custom object': <Trans>Object</Trans>,
+  'behavior detail': <Trans>Behavior</Trans>,
+  'function detail': <Trans>Function</Trans>,
+  'prefab detail': <Trans>Prefab events</Trans>,
+  'custom object': <Trans>UI</Trans>,
   debugger: <Trans>Debugger</Trans>,
   resources: <Trans>Resources</Trans>,
+  constants: <Trans>Constants</Trans>,
   'global-search': <Trans>Global search</Trans>,
   'start page': <Trans>Homepage</Trans>,
   'ask-ai': <Trans>Ask AI</Trans>,
@@ -93,10 +96,27 @@ const TabsTitlebarTooltip = ({
   ) {
     title = editorTab.projectItemName;
     subtitle = editorKindToLabel[editorTab.kind];
+  } else if (
+    (editorTab.kind === 'behavior detail' ||
+      editorTab.kind === 'function detail') &&
+    editorTab.projectItemName
+  ) {
+    const nameParts = editorTab.projectItemName.split('::');
+    const itemName = nameParts[1];
+    if (itemName) {
+      title = itemName;
+      subtitle = editorKindToLabel[editorTab.kind];
+    }
+  } else if (editorTab.kind === 'prefab detail' && editorTab.projectItemName) {
+    const nameParts = editorTab.projectItemName.split('::');
+    const customObjectName = nameParts[1];
+    if (customObjectName) {
+      title = customObjectName;
+      subtitle = editorKindToLabel[editorTab.kind];
+    }
   } else if (editorTab.kind === 'custom object' && editorTab.projectItemName) {
-    const { objectName: customObjectName } = parseCustomObjectEditorTabName(
-      editorTab.projectItemName
-    );
+    const nameParts = editorTab.projectItemName.split('::');
+    const customObjectName = nameParts[1];
     if (customObjectName) {
       title = customObjectName;
       subtitle = editorKindToLabel[editorTab.kind];

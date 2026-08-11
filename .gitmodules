@@ -1,0 +1,12 @@
+[submodule "ThirdParties/ai_game_workbench"]
+	path = ThirdParties/ai_game_workbench
+	url = https://github.com/zhouzhipeng/ai_game_workbench.git
+[submodule "ThirdParties/image-extender"]
+	path = ThirdParties/image-extender
+	url = https://github.com/zhouzhipeng/image-extender.git
+[submodule "ThirdParties/gorest-2d-animation-spritesheet-generator"]
+	path = ThirdParties/gorest-2d-animation-spritesheet-generator
+	url = https://github.com/zhouzhipeng/gorest-2d-animation-spritesheet-generator.git
+[submodule "ThirdParties/AdvancedTweenEditor"]
+	path = ThirdParties/AdvancedTweenEditor
+	url = https://github.com/zhouzhipeng/AdvancedTweenEditor.git

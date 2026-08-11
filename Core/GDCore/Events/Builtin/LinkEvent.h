@@ -95,7 +95,9 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
    * @return NULL if nothing is found or a pointer to the list of events being
    * linked.
    */
-  const EventsList* GetLinkedEvents(const gd::Project& project) const;
+  const EventsList* GetLinkedEvents(
+      const gd::Project& project,
+      const gd::String& sceneLifecycleFunctionRole = "sceneUpdate") const;
 
   /**
    * \brief Replace the link in the events list by the linked events.
@@ -105,7 +107,9 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
    */
   void ReplaceLinkByLinkedEvents(const gd::Project& project,
                                  EventsList& eventList,
-                                 std::size_t indexOfTheEventInThisList);
+                                 std::size_t indexOfTheEventInThisList,
+                                 const gd::String& sceneLifecycleFunctionRole =
+                                     "sceneUpdate");
 
   virtual bool IsExecutable() const override { return true; };
 

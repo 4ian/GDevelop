@@ -35,6 +35,7 @@ const renderOptionIcon = (type: string, className: string): React.Node => {
     case 'identifier':
     case 'keyboardKey':
     case 'mouseButton':
+    case 'signalName':
     case 'objectPointName':
     case 'color':
     case 'leaderboardId':
@@ -103,6 +104,13 @@ const getIdentifierName = (scopedIdentifier: string) =>
     : scopedIdentifier.substring('scene'.length);
 
 const convertTypeToSelectorValue = (value: string) =>
+  value === 'signalName'
+    ? 'string'
+    : value.endsWith('Resource')
+    ? 'jsonResource'
+    : value;
+
+const convertSelectorValueToType = (value: string) =>
   value.endsWith('Resource') ? 'jsonResource' : value;
 
 const convertParameterTypeToPropertyType = (value: string) =>
@@ -134,7 +142,9 @@ export default function CompactValueTypeEditor({
                 <CompactSelectField
                   value={type}
                   onChange={value => {
-                    valueTypeMetadata.setName(value);
+                    valueTypeMetadata.setName(
+                      convertSelectorValueToType(value)
+                    );
                     valueTypeMetadata.setOptional(false);
                     valueTypeMetadata.setDefaultValue('');
                     forceUpdate();

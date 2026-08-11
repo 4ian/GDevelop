@@ -20,9 +20,7 @@ import { type ObjectFolderOrObjectWithContext } from '../ObjectsList/EnumerateOb
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type TileMapTileSelection } from '../InstancesEditor/TileSetVisualizer';
 import { type EditorViewPosition2D } from '../InstancesEditor';
-import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
-
-export type LastSelectionType = 'instance' | 'object' | 'layer' | 'objectGroup';
+import { type CustomObjectDragItem } from '../ProjectManager/ProjectManagerItemDragAndDrop';
 
 export type SceneEditorsDisplayProps = {|
   gameEditorMode: 'embedded-game' | 'instances-editor',
@@ -31,6 +29,7 @@ export type SceneEditorsDisplayProps = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension | null,
   eventsBasedObject: gdEventsBasedObject | null,
   eventsBasedObjectVariant: gdEventsBasedObjectVariant | null,
+  getContentAABB: () => Promise<Rectangle | null>,
   layersContainer: gdLayersContainer,
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
@@ -62,6 +61,14 @@ export type SceneEditorsDisplayProps = {|
     eventsBasedObjectName: string,
     variantName: string
   ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
   onDeleteEventsBasedObjectVariant: (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     eventBasedObject: gdEventsBasedObject,
@@ -84,7 +91,11 @@ export type SceneEditorsDisplayProps = {|
   openSceneVariables: () => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
   onObjectEdited: (
@@ -144,6 +155,18 @@ export type SceneEditorsDisplayProps = {|
   onInstancesMoved: (Array<gdInitialInstance>) => void,
   onInstancesResized: (Array<gdInitialInstance>) => void,
   onInstancesRotated: (Array<gdInitialInstance>) => void,
+  onImageFilesDropped?: (
+    imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
+  on3DModelFilesDropped?: (
+    modelFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
+  onCustomObjectDropped: (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => void,
   isInstanceOf3DObject: gdInitialInstance => boolean,
   onSelectAllInstancesOfObjectInLayout: string => void,
 
@@ -184,8 +207,13 @@ export type SceneEditorsDisplayInterface = {|
   forceUpdateObjectGroupsList: () => void,
   scrollObjectGroupsListToObjectGroup: (objectGroup: gdObjectGroup) => void,
   forceUpdateLayersList: () => void,
-  openNewObjectDialog: () => void,
+  openNewObjectDialog: (options?: {|
+    instanceSceneCoordinates?: ?[number, number],
+  |}) => void,
   toggleEditorView: (editorId: EditorId) => void,
+  setEditorViewsVisibility: (
+    Array<{| editorId: EditorId, visible: boolean |}>
+  ) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
   ensureEditorVisible: (editorId: EditorId) => void,
   viewControls: {|
@@ -201,6 +229,8 @@ export type SceneEditorsDisplayInterface = {|
     getLastCursorSceneCoordinates: () => [number, number],
     getLastContextMenuSceneCoordinates: () => [number, number],
     getViewPosition: () => ?ViewPosition,
+    keepCanvasTopLeftSceneCoordinatesOnNextResize: () => void,
+    keepCanvasTopCenterScreenCoordinatesOnNextResize: () => void,
   |},
   startSceneRendering: (start: boolean, reason: string) => void,
   instancesHandlers: {|

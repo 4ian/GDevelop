@@ -138,6 +138,7 @@ const InstructionOrExpressionSelector = <
     >
       <SearchBar
         value={searchText}
+        onChangeImmediately
         onChange={setSearchText}
         onRequestSearch={onSubmitSearch}
         placeholder={

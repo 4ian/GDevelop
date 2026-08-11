@@ -120,6 +120,12 @@ type BatchStopController = {|
 |};
 let currentBatchStopController: BatchStopController | null = null;
 
+const makeStopRequestedError = (): Error => {
+  const error: any = new Error('The gameplay test run was stopped.');
+  error.isStopRequested = true;
+  return error;
+};
+
 // Whether a gameplay test batch is currently running (exporting, booting
 // or running tests). Launching or hot-reloading previews meanwhile would
 // interfere with the run: use `useIsGameplayTestRunInProgress` to disable
@@ -258,6 +264,10 @@ const waitForGameToBeReady = async (
   previewDebuggerServer: PreviewDebuggerServer,
   stopController: BatchStopController
 ): Promise<void> => {
+  if (stopController.stopRequested) {
+    throw makeStopRequestedError();
+  }
+
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     let pollIntervalId: ?IntervalID = null;
@@ -284,10 +294,7 @@ const waitForGameToBeReady = async (
     stopController.abortBootWait = () => {
       if (pollIntervalId !== null) clearInterval(pollIntervalId);
       unregisterCallbacks();
-      const error = new Error('The gameplay test run was stopped.');
-      // $FlowFixMe[prop-missing] - tag the error so the runner knows this is a stop, not a failure.
-      error.isStopRequested = true;
-      reject(error);
+      reject(makeStopRequestedError());
     };
 
     pollIntervalId = setInterval(() => {
@@ -508,39 +515,41 @@ export const runGameplayTests = async ({
 
       try {
         // Export and launch a fresh preview into the gameplay test frame.
-        await previewLauncher.launchPreview(
-          // $FlowFixMe[prop-missing] - the launchers accept partial preview options for gameplay tests.
-          ({
-            project,
-            sceneName: project.getFirstLayout(),
-            externalLayoutName: null,
-            eventsBasedObjectType: null,
-            eventsBasedObjectVariantName: null,
-            networkPreview: false,
-            hotReload: false,
-            shouldReloadProjectData: true,
-            shouldReloadLibraries: true,
-            shouldGenerateScenesEventsCode: true,
-            shouldReloadResources: false,
-            shouldHardReload: false,
-            fullLoadingScreen: false,
-            fallbackAuthor: null,
-            authenticatedPlayer: null,
-            isForInGameEdition: false,
-            isForGameplayTest: true,
-            editorId: '',
-            getIsMenuBarHiddenInPreview: () => true,
-            getIsAlwaysOnTopInPreview: () => false,
-            captureOptions: null,
-            onCaptureFinished: async () => {},
-            inAppTutorialMessageInPreview: '',
-            inAppTutorialMessagePositionInPreview: '',
-            editorCameraState3D: null,
-            inGameEditorSettings: null,
-            numberOfWindows: 0,
-            previewWindows: null,
-          }: any)
-        );
+        await previewLauncher.launchPreview({
+          project,
+          sceneName: project.getFirstLayout(),
+          externalLayoutName: null,
+          eventsBasedObjectType: null,
+          eventsBasedObjectVariantName: null,
+          networkPreview: false,
+          hotReload: false,
+          shouldReloadProjectData: true,
+          shouldReloadLibraries: true,
+          shouldGenerateScenesEventsCode: true,
+          shouldReloadResources: false,
+          shouldHardReload: false,
+          displayCollisionShapes: false,
+          displaySignalAnimations: false,
+          fullLoadingScreen: false,
+          forceAlwaysOnTopInPreview: false,
+          fallbackAuthor: null,
+          authenticatedPlayer: null,
+          isForInGameEdition: false,
+          isForGameplayTest: true,
+          editorId: '',
+          getIsMenuBarHiddenInPreview: () => true,
+          getIsAlwaysOnTopInPreview: () => false,
+          captureOptions: null,
+          onCaptureFinished: async () => {},
+          inAppTutorialMessageInPreview: '',
+          inAppTutorialMessagePositionInPreview: '',
+          editorCameraState3D: null,
+          inGameEditorSettings: null,
+          numberOfWindows: 0,
+          isLaunchCancelled: () => stopController.stopRequested,
+          onWillWritePreviewFiles: () => !stopController.stopRequested,
+          previewWindows: null,
+        });
 
         await waitForGameToBeReady(previewDebuggerServer, stopController);
 
@@ -670,8 +679,8 @@ export const closeGameplayTestFrame = (): void => {
 type GameplayTestRunnerDependencies = {|
   getPreviewLauncher: () => ?PreviewLauncherInterface,
   // Called after tests were run (last-run summaries were updated on the
-  // project): trigger unsaved changes and refresh the UI.
-  onTestsRunFinished: () => void,
+  // project): persist them or trigger unsaved changes, then refresh the UI.
+  onTestsRunFinished: (project: gdProject) => Promise<void> | void,
 |};
 
 let gameplayTestRunnerDependencies: GameplayTestRunnerDependencies | null = null;
@@ -720,7 +729,7 @@ export const runProjectGameplayTests = async ({
       options,
     });
   } finally {
-    dependencies.onTestsRunFinished();
+    await dependencies.onTestsRunFinished(project);
   }
 };
 

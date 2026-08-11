@@ -74,4 +74,23 @@ describe('EnumerateVariables', () => {
     expect(enumeratedVariables[6].name).toBe('==InvalidName==.ValidName');
     expect(enumeratedVariables[6].isValidName).toBe(false);
   });
+  it('can enumerate enum values', () => {
+    const container = new gd.VariablesContainer(gd.VariablesContainer.Unknown);
+    const variable = new gd.Variable();
+    variable.setString('Idle');
+    variable.castTo('enum');
+    const enumValues = new gd.VectorString();
+    enumValues.push_back('Idle');
+    enumValues.push_back('Running');
+    variable.setEnumValues(enumValues);
+    enumValues.delete();
+    container.insert('State', variable, 0);
+
+    const enumeratedVariables = enumerateVariables(container);
+    expect(enumeratedVariables).toHaveLength(1);
+    expect(enumeratedVariables[0].name).toBe('State');
+    expect(enumeratedVariables[0].type).toBe(gd.Variable.Enum);
+    expect(enumeratedVariables[0].enumValues).toEqual(['Idle', 'Running']);
+    variable.delete();
+  });
 });

@@ -24,14 +24,13 @@ ExternalEvents& ExternalEvents::operator=(const ExternalEvents& rhs) {
 void ExternalEvents::Init(const ExternalEvents& externalEvents) {
   name = externalEvents.GetName();
   associatedScene = externalEvents.GetAssociatedLayout();
-  events = externalEvents.events;
+  lifecycleEventsFunctions = externalEvents.lifecycleEventsFunctions;
 }
 
 void ExternalEvents::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("associatedLayout", associatedScene);
-  gd::EventsListSerialization::SerializeEventsTo(events,
-                                                 element.AddChild("events"));
+  lifecycleEventsFunctions.SerializeEventBodiesTo(element);
 }
 
 void ExternalEvents::UnserializeFrom(gd::Project& project,
@@ -39,8 +38,7 @@ void ExternalEvents::UnserializeFrom(gd::Project& project,
   name = element.GetStringAttribute("name", "", "Name");
   associatedScene =
       element.GetStringAttribute("associatedLayout", "", "AssociatedScene");
-  gd::EventsListSerialization::UnserializeEventsFrom(
-      project, events, element.GetChild("events", 0, "Events"));
+  lifecycleEventsFunctions.UnserializeEventBodiesFrom(project, element);
 }
 
 }  // namespace gd

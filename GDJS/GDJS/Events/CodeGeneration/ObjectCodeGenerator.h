@@ -95,7 +95,12 @@ class ObjectCodeGenerator {
   gd::String GenerateInitializePropertyFromDefaultValueCode(
       const gd::NamedPropertyDescriptor& property);
 
-  gd::String GeneratePropertyValueCode(const gd::PropertyDescriptor& property);
+  gd::String GeneratePropertyValueCode(
+      const gd::NamedPropertyDescriptor& property);
+
+  gd::String GeneratePropertyValueResolutionCode(
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& valueCode);
 
   gd::String GenerateUpdatePropertyFromObjectDataCode(
       const gd::EventsBasedObject& eventsBasedObject,

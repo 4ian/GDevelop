@@ -33,6 +33,28 @@ namespace gdjs {
   }
 
   /**
+   * The geometry and transform of a 3D collision mask to display while
+   * debugging a preview.
+   *
+   * The vertices describe triangles in the local space of the collision
+   * mask. They are kept as plain runtime data so behaviors don't have to
+   * create or own Three.js renderer objects. Providers must return a new
+   * vertices array whenever the mask geometry changes.
+   *
+   * @category Debugging > Debugger Renderer
+   */
+  export type DebugCollisionMask3D = {
+    vertices: Float32Array;
+    positionX: float;
+    positionY: float;
+    positionZ: float;
+    rotationX: float;
+    rotationY: float;
+    rotationZ: float;
+    rotationW: float;
+  };
+
+  /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
    * @category Core Engine > Behavior
    */
@@ -41,6 +63,7 @@ namespace gdjs {
     type: string;
     _nameId: integer;
     _activated: boolean;
+    _activatedByDefault: boolean;
 
     // When synchronised over the network, a behavior is always owned by the player owning the object,
     // and always synced. If set to false, the behavior properties will not be synced to others.
@@ -60,9 +83,10 @@ namespace gdjs {
       this.type = behaviorData.type || '';
       this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
       const game = instanceContainer.getGame();
-      this._activated =
+      this._activatedByDefault =
         !game.isInGameEdition() ||
         !!game.isBehaviorActivatedByDefaultInEditor(this.type);
+      this._activated = this._activatedByDefault && !behaviorData.isMuted;
     }
 
     /**
@@ -90,8 +114,19 @@ namespace gdjs {
           diffBehaviorData[key] = newData[key];
         }
       }
+      const wasMuted = !!oldBehaviorData.isMuted;
+      const isMuted = !!newBehaviorData.isMuted;
+      const didUpdateActivation = wasMuted !== isMuted;
+      if (didUpdateActivation) {
+        this.activate(!isMuted && this._activatedByDefault);
+      }
+      const onlyMuteChanged =
+        didUpdateActivation &&
+        Object.keys(diffBehaviorData).every(
+          (key) => key === 'name' || key === 'type' || key === 'isMuted'
+        );
       // If not redefined, mark by default the hot-reload as failed.
-      return this.applyBehaviorOverriding(diffBehaviorData);
+      return onlyMuteChanged || this.applyBehaviorOverriding(diffBehaviorData);
     }
 
     applyBehaviorOverriding(behaviorOverriding: BehaviorData): boolean {
@@ -204,11 +239,49 @@ namespace gdjs {
     onCreated(): void {}
 
     /**
+     * Reimplement this in an events-based behavior to receive scene signals
+     * that this behavior instance explicitly subscribed to.
+     */
+    onSignal(signalName: string, payload: string): void {}
+
+    /**
      * Return true if the behavior is activated
      */
     activated(): boolean {
       return this._activated;
     }
+
+    /**
+     * Return a 3D collision mask to display while debugging a preview.
+     *
+     * Behaviors that own a 3D collision shape can override this. Returning
+     * `null` keeps the behavior out of the collision-mask debug rendering.
+     */
+    get3DDebugCollisionMask(): gdjs.DebugCollisionMask3D | null {
+      return null;
+    }
+
+    /**
+     * Return 3D collision shapes to display while debugging a preview.
+     *
+     * The default implementation preserves behaviors implementing the legacy
+     * single-shape hook. Behaviors owning compound collision geometry can
+     * override this method to expose every shape independently.
+     */
+    get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const collisionMasks: gdjs.DebugCollisionMask3D[] = gdjs.staticArray(
+        RuntimeBehavior.prototype.get3DDebugCollisionMasks
+      );
+      collisionMasks.length = 0;
+      const collisionMask = this.get3DDebugCollisionMask();
+      if (collisionMask) {
+        collisionMasks.push(collisionMask);
+      }
+      return collisionMasks;
+    }
+
+    /** Release data cached for 3D collision-mask debug rendering. */
+    clear3DDebugCollisionMaskCache(): void {}
 
     /**
      * Reimplement this method to do extra work when the behavior is activated (after

@@ -6,8 +6,10 @@ import PropertiesEditorByVisibility from '../../PropertiesEditor/PropertiesEdito
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import { Column } from '../../UI/Grid';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-
-const gd: libGDevelop = global.gd;
+import {
+  advancedTweenBehaviorType,
+  customizeAdvancedTweenBehaviorPropertiesSchema,
+} from './AdvancedTweenBehaviorEditorOptions';
 
 type Props = BehaviorEditorProps;
 
@@ -20,19 +22,16 @@ const BehaviorPropertiesEditor = ({
   resourceManagementProps,
   projectScopedContainersAccessor,
   isAdvancedSectionInitiallyUncollapsed,
+  hideConstantPlaceholderHints,
 }: Props): React.Node => {
   const behavior = behaviors[0];
 
-  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-    gd.JsPlatform.get(),
-    behavior.getTypeName()
-  );
-
   const schema = React.useMemo(
-    () =>
-      propertiesMapToSchema({
-        properties: behavior.getProperties(),
-        defaultValueProperties: behaviorMetadata.getProperties(),
+    () => {
+      const behaviorProperties = behavior.getProperties();
+      const schema = propertiesMapToSchema({
+        properties: behaviorProperties,
+        defaultValueProperties: null,
         getPropertyValue: (instance, name) =>
           instance
             .getProperties()
@@ -45,8 +44,16 @@ const BehaviorPropertiesEditor = ({
         layersContainer,
         visibility: 'All',
         shouldDisabledFieldsWithMixedValues: true,
-      }),
-    [behavior, behaviorMetadata, layersContainer, object]
+        allowConstantPlaceholders: project.hasEventsBasedBehavior(
+          behavior.getTypeName()
+        ),
+      });
+      if (behavior.getTypeName() === advancedTweenBehaviorType) {
+        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+      }
+      return schema;
+    },
+    [behavior, layersContainer, object, project]
   );
 
   return (
@@ -68,6 +75,7 @@ const BehaviorPropertiesEditor = ({
         isAdvancedSectionInitiallyUncollapsed={
           isAdvancedSectionInitiallyUncollapsed
         }
+        hideConstantPlaceholderHints={hideConstantPlaceholderHints}
       />
     </Column>
   );

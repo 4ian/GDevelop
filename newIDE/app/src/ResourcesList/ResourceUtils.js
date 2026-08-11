@@ -7,6 +7,8 @@ const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
+export const DEFAULT_IMPORTED_RESOURCES_FOLDER = 'assets';
+
 export const createOrUpdateResource = (
   project: gdProject,
   newlyCreatedResource: gdResource,
@@ -25,6 +27,38 @@ export const createOrUpdateResource = (
   resourcesManager.addResource(newlyCreatedResource);
 
   newlyCreatedResource.delete();
+};
+
+export const removeUnusedResources = (
+  project: gdProject,
+  resourceKind: string
+): Array<string> => {
+  const removedResourceNames = gd.ProjectResourcesAdder.getAllUseless(
+    project,
+    resourceKind
+  ).toJSArray();
+  gd.ProjectResourcesAdder.removeAllUseless(project, resourceKind);
+  return removedResourceNames;
+};
+
+export const removeAllUnusedResources = (project: gdProject): Array<string> => {
+  const resourcesManager = project.getResourcesManager();
+  const resourceKinds = Array.from(
+    new Set(
+      resourcesManager
+        .getAllResourceNames()
+        .toJSArray()
+        .map(resourceName =>
+          resourcesManager.getResource(resourceName).getKind()
+        )
+    )
+  );
+
+  return resourceKinds.reduce(
+    (removedResourceNames, resourceKind) =>
+      removedResourceNames.concat(removeUnusedResources(project, resourceKind)),
+    []
+  );
 };
 
 /**
@@ -51,70 +85,123 @@ export const getLocalResourceFullPath = (
   return resourcePath;
 };
 
+export const isPathInFolder = (
+  folderPath: string,
+  resourcePath: string
+): boolean => {
+  const relativePath = path.relative(
+    path.resolve(folderPath),
+    path.resolve(resourcePath)
+  );
+  return (
+    relativePath === '' ||
+    (!!relativePath &&
+      !relativePath.startsWith('..') &&
+      !path.isAbsolute(relativePath))
+  );
+};
+
 export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
 ): boolean => {
   const projectPath = path.dirname(project.getProjectFile());
-  return resourcePath.includes(projectPath);
+  return isPathInFolder(projectPath, resourcePath);
 };
 
 export const copyAllToProjectFolder = (
   project: gdProject,
   resourcePaths: Array<string>,
-  newToOldFilePaths: Map<string, string>
+  newToOldFilePaths: Map<string, string>,
+  importedResourcesFolder?: string
 ): Promise<Array<string>> => {
   if (!fs || !path) {
     return Promise.resolve(resourcePaths);
   }
 
   const projectPath = path.dirname(project.getProjectFile());
+  const destinationFolderPath = importedResourcesFolder
+    ? path.join(projectPath, importedResourcesFolder)
+    : projectPath;
+  const reservedDestinationPaths = new Set<string>();
 
-  // $FlowFixMe[incompatible-type]
-  return Promise.all(
-    resourcePaths.map(resourcePath => {
-      if (isPathInProjectFolder(project, resourcePath)) {
-        newToOldFilePaths.set(resourcePath, resourcePath);
+  const getUniqueResourceDestinationPath = (resourcePath: string): string => {
+    const resourceBasename = path.basename(resourcePath);
+    const fileExtension = path.extname(resourceBasename);
+    const fileNameWithoutExtension = path.basename(
+      resourceBasename,
+      fileExtension
+    );
 
-        return resourcePath;
-      }
-
-      const resourceBasename = path.basename(resourcePath),
-        fileExtension = path.extname(resourceBasename),
-        fileNameWithoutExtension = path.basename(
-          resourceBasename,
-          fileExtension
+    const newFileNameWithoutExtension = newNameGenerator(
+      fileNameWithoutExtension,
+      tentativeFileName => {
+        const tentativePath = path.join(
+          destinationFolderPath,
+          tentativeFileName + fileExtension
         );
+        const normalizedTentativePath = path.resolve(tentativePath);
+        return (
+          reservedDestinationPaths.has(normalizedTentativePath) ||
+          fs.existsSync(tentativePath)
+        );
+      }
+    );
 
-      const newFileNameWithoutExtension = newNameGenerator(
-        fileNameWithoutExtension,
-        tentativeFileName => {
-          const tentativePath =
-            path.join(projectPath, tentativeFileName) + fileExtension;
-          return fs.existsSync(tentativePath);
+    const resourceNewPath = path.join(
+      destinationFolderPath,
+      newFileNameWithoutExtension + fileExtension
+    );
+    reservedDestinationPaths.add(path.resolve(resourceNewPath));
+
+    return resourceNewPath;
+  };
+
+  const copyResources = (): Promise<Array<string>> => {
+    // $FlowFixMe[incompatible-type]
+    return Promise.all(
+      resourcePaths.map(resourcePath => {
+        const isAlreadyInDestinationFolder = importedResourcesFolder
+          ? isPathInFolder(destinationFolderPath, resourcePath)
+          : isPathInProjectFolder(project, resourcePath);
+        if (isAlreadyInDestinationFolder) {
+          newToOldFilePaths.set(resourcePath, resourcePath);
+
+          return resourcePath;
         }
-      );
 
-      const resourceNewPath = path.join(
-        projectPath,
-        newFileNameWithoutExtension + fileExtension
-      );
+        const resourceNewPath = getUniqueResourceDestinationPath(resourcePath);
 
-      return new Promise(resolve => {
-        fs.copyFile(resourcePath, resourceNewPath, err => {
-          if (err) {
-            newToOldFilePaths.set(resourcePath, resourcePath);
+        return new Promise(resolve => {
+          fs.copyFile(resourcePath, resourceNewPath, err => {
+            if (err) {
+              newToOldFilePaths.set(resourcePath, resourcePath);
 
-            return resolve(resourcePath);
-          }
+              return resolve(resourcePath);
+            }
 
-          newToOldFilePaths.set(resourceNewPath, resourcePath);
+            newToOldFilePaths.set(resourceNewPath, resourcePath);
 
-          return resolve(resourceNewPath);
+            return resolve(resourceNewPath);
+          });
         });
-      });
-    })
-  );
+      })
+    );
+  };
+
+  if (importedResourcesFolder) {
+    return new Promise(resolve => {
+      fs.mkdir(
+        destinationFolderPath,
+        { recursive: true },
+        // Continue with the regular copy path if the folder creation failed.
+        // Individual copy failures already fall back to the original file path.
+        () => resolve()
+      );
+    }).then(copyResources);
+  }
+
+  return copyResources();
 };
 
 export const getResourceFilePathStatus = (

@@ -29,6 +29,11 @@ import CanvasCursor from './CanvasCursor';
 import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
+import {
+  projectManagerItemReactDndType,
+  isCustomObjectDragItem,
+  type CustomObjectDragItem,
+} from '../ProjectManager/ProjectManagerItemDragAndDrop';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
@@ -54,6 +59,9 @@ import {
   type TileMapTileSelection,
   getTileMapPaintingSelection,
 } from './TileSetVisualizer';
+import { getImageFilePathsFromDataTransfer } from '../SceneEditor/CreateSpriteFromImage';
+import { get3DModelFilePathsFromDataTransfer } from '../SceneEditor/Create3DModelFromGLB';
+import { hasProjectFileDragData } from '../Utils/ProjectFileDragData';
 import ClickInterceptor from './ClickInterceptor';
 import getObjectByName from '../Utils/GetObjectByName';
 import { AffineTransformation } from '../Utils/AffineTransformation';
@@ -65,6 +73,7 @@ import {
   getTileSet,
   isTileSetBadlyConfigured,
 } from '../Utils/TileMap';
+import { clearPixiCachedShader } from '../Utils/PixiRendererState';
 
 const gd: libGDevelop = global.gd;
 
@@ -74,7 +83,13 @@ const styles = {
   dropCursor: { cursor: 'copy' },
 };
 
-const DropTarget = makeDropTarget<{||}>(objectWithContextReactDndType);
+const getCanvasResolution = (): number =>
+  Math.max(1, window.devicePixelRatio || 1);
+
+const CanvasDropTarget = makeDropTarget<any>([
+  objectWithContextReactDndType,
+  projectManagerItemReactDndType,
+]);
 
 export type EditorViewPosition2D = {|
   viewX: number | null,
@@ -119,6 +134,18 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesMoved: (instances: Array<gdInitialInstance>) => void,
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
+  onImageFilesDropped?: (
+    imageFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
+  on3DModelFilesDropped?: (
+    modelFilePaths: Array<string>,
+    position: [number, number]
+  ) => void | Promise<void>,
+  onCustomObjectDropped?: (
+    customObjectDragItem: CustomObjectDragItem,
+    position: [number, number]
+  ) => void,
   selectedObjectNames: Array<string>,
   onContextMenu: (
     x: number,
@@ -150,6 +177,18 @@ type State = {|
     uniqueErrorId: string,
   |},
 |};
+
+type CanvasSceneCoordinatesToKeepAfterResize =
+  | {|
+      type: 'canvas-position',
+      canvasCoordinates: [number, number],
+      sceneCoordinates: [number, number],
+    |}
+  | {|
+      type: 'screen-position',
+      clientCoordinates: [number, number],
+      sceneCoordinates: [number, number],
+    |};
 
 export default class InstancesEditor extends Component<Props, State> {
   lastContextMenuX = 0;
@@ -196,7 +235,10 @@ export default class InstancesEditor extends Component<Props, State> {
   contextMenuLongTouchTimeoutID: TimeoutID;
   hasCursorMovedSinceItIsDown = false;
   _showObjectInstancesIn3D: boolean = false;
+  _canvasResolution: number = 1;
   _previousToolBeforePicker: ?TileMapTileSelection = null;
+  _canvasSceneCoordinatesToKeepAfterResize: ?CanvasSceneCoordinatesToKeepAfterResize = null;
+  _clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId: ?TimeoutID = null;
 
   state: State = {
     renderingError: null,
@@ -258,14 +300,16 @@ export default class InstancesEditor extends Component<Props, State> {
     // and can cause shader creation to fail on some platforms (e.g. Windows with ANGLE).
     const initialWidth = this.props.width || 1;
     const initialHeight = this.props.height || 1;
+    const canvasResolution = getCanvasResolution();
+    this._canvasResolution = canvasResolution;
     // TODO (3D): Should it handle preference changes without needing to reopen tabs?
     if (this._showObjectInstancesIn3D) {
       gameCanvas = document.createElement('canvas');
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
       });
-      threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
+      threeRenderer.setPixelRatio(canvasResolution);
       threeRenderer.setSize(initialWidth, initialHeight);
 
       // Create a PixiJS renderer that use the same GL context as Three.js
@@ -283,7 +327,8 @@ export default class InstancesEditor extends Component<Props, State> {
         // It's the default value, but it's better to make it explicit.
         // It allows instances composed of several pixi objects to detect hovering.
         eventMode: 'auto',
-        // TODO (3D): add a setting for pixel ratio (`resolution: window.devicePixelRatio`)
+        resolution: canvasResolution,
+        autoDensity: true,
       });
 
       this.threeRenderer = threeRenderer;
@@ -298,6 +343,8 @@ export default class InstancesEditor extends Component<Props, State> {
         antialias: false,
         clearBeforeRender: false,
         backgroundAlpha: 0,
+        resolution: canvasResolution,
+        autoDensity: true,
       });
 
       gameCanvas = this.pixiRenderer.view;
@@ -665,6 +712,7 @@ export default class InstancesEditor extends Component<Props, State> {
     // This is an antipattern and is theoretically not needed, but help
     // to protect against renders after the component is unmounted.
     this._unmounted = true;
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
 
     // We've seen all those elements being undefined in some cases, so
     // by security, check that they are defined before deleting them.
@@ -701,9 +749,11 @@ export default class InstancesEditor extends Component<Props, State> {
 
   // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
+    const canvasResolution = getCanvasResolution();
     if (
       nextProps.width !== this.props.width ||
-      nextProps.height !== this.props.height
+      nextProps.height !== this.props.height ||
+      canvasResolution !== this._canvasResolution
     ) {
       // Ensure we don't resize to 0, which is invalid for PixiJS/WebGL.
       const width = nextProps.width || 1;
@@ -719,16 +769,21 @@ export default class InstancesEditor extends Component<Props, State> {
       try {
         if (this.threeRenderer) {
           this.threeRenderer.resetState();
+          clearPixiCachedShader(this.pixiRenderer);
 
           // Actually do not reset PixiJS renderer as we get crashes when doing it
           // ("Cannot read properties of null (reading '_batchEnabled')").
           // this.pixiRenderer.reset();
         }
 
+        this.pixiRenderer.resolution = canvasResolution;
         this.pixiRenderer.resize(width, height);
-        if (this.threeRenderer) {
-          this.threeRenderer.setSize(width, height);
+        const threeRenderer = this.threeRenderer;
+        if (threeRenderer) {
+          threeRenderer.setPixelRatio(canvasResolution);
+          threeRenderer.setSize(width, height);
         }
+        this._canvasResolution = canvasResolution;
       } catch (error) {
         console.error(
           'Error while resizing the renderers, will be retried on next frame:',
@@ -736,6 +791,46 @@ export default class InstancesEditor extends Component<Props, State> {
         );
       }
       this.viewPosition.resize(width, height);
+      const canvasSceneCoordinatesToKeep = this
+        ._canvasSceneCoordinatesToKeepAfterResize;
+      if (
+        canvasSceneCoordinatesToKeep &&
+        canvasSceneCoordinatesToKeep.type === 'canvas-position'
+      ) {
+        this._canvasSceneCoordinatesToKeepAfterResize = null;
+      }
+      let hasAdjustedViewPosition = false;
+      if (canvasSceneCoordinatesToKeep) {
+        let canvasCoordinates: ?[number, number] = null;
+        if (canvasSceneCoordinatesToKeep.type === 'screen-position') {
+          const { canvasArea } = this;
+          if (canvasArea) {
+            const canvasRect = canvasArea.getBoundingClientRect();
+            canvasCoordinates = [
+              canvasSceneCoordinatesToKeep.clientCoordinates[0] -
+                canvasRect.left,
+              canvasSceneCoordinatesToKeep.clientCoordinates[1] -
+                canvasRect.top,
+            ];
+          }
+        } else {
+          canvasCoordinates = canvasSceneCoordinatesToKeep.canvasCoordinates;
+        }
+
+        if (canvasCoordinates) {
+          const canvasSceneCoordinates = this.viewPosition.toSceneCoordinates(
+            canvasCoordinates[0],
+            canvasCoordinates[1]
+          );
+          this.viewPosition.scrollBy(
+            canvasSceneCoordinatesToKeep.sceneCoordinates[0] -
+              canvasSceneCoordinates[0],
+            canvasSceneCoordinatesToKeep.sceneCoordinates[1] -
+              canvasSceneCoordinates[1]
+          );
+          hasAdjustedViewPosition = true;
+        }
+      }
       this.statusBar.resize(width, height);
       this.backgroundArea.hitArea = new PIXI.Rectangle(0, 0, width, height);
       this.background.resize(width, height);
@@ -743,6 +838,15 @@ export default class InstancesEditor extends Component<Props, State> {
       // Avoid flickering that could happen while waiting for next animation frame.
       this.fpsLimiter.forceNextUpdate();
       this._renderScene();
+      if (hasAdjustedViewPosition && this.props.onViewPositionChanged) {
+        this.props.onViewPositionChanged(this.viewPosition);
+      }
+      if (
+        canvasSceneCoordinatesToKeep &&
+        canvasSceneCoordinatesToKeep.type === 'screen-position'
+      ) {
+        this._clearCanvasSceneCoordinatesToKeepAfterResizeAfterResizeSettled();
+      }
     }
 
     if (
@@ -876,6 +980,173 @@ export default class InstancesEditor extends Component<Props, State> {
     layer: string
   ): Array<gdInitialInstance> => {
     return this._instancesAdder.addInstances(pos, objectNames, layer);
+  };
+
+  _getSceneCoordinatesFromClientPosition = (
+    clientX: number,
+    clientY: number
+  ): ?[number, number] => {
+    const { viewPosition, canvasArea } = this;
+    if (!canvasArea || !viewPosition) return null;
+    const canvasRect = canvasArea.getBoundingClientRect();
+    return viewPosition.toSceneCoordinates(
+      clientX - canvasRect.left,
+      clientY - canvasRect.top
+    );
+  };
+
+  _getSceneCoordinatesFromDropMonitor = (monitor: any): ?[number, number] => {
+    const clientOffset = monitor.getClientOffset();
+    if (!clientOffset) return null;
+
+    return this._getSceneCoordinatesFromClientPosition(
+      clientOffset.x,
+      clientOffset.y
+    );
+  };
+
+  _onObjectDropHover = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+    const { _instancesAdder } = this;
+    if (!_instancesAdder) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) return;
+
+    _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
+      position,
+      this.props.selectedObjectNames,
+      this.props.chosenLayer
+    );
+  };
+
+  _onObjectDrop = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+
+    const { _instancesAdder } = this;
+    if (!_instancesAdder) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) {
+      _instancesAdder.deleteTemporaryInstances();
+      return;
+    }
+
+    const instances = _instancesAdder.updateTemporaryInstancePositions(
+      position
+    );
+    _instancesAdder.commitTemporaryInstances();
+    this.props.onInstancesAdded(instances);
+  };
+
+  _onCustomObjectDropHover = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+    if (this._instancesAdder) {
+      this._instancesAdder.deleteTemporaryInstances();
+    }
+  };
+
+  _onCustomObjectDrop = (monitor: any) => {
+    this.fpsLimiter.notifyInteractionHappened();
+
+    const { onCustomObjectDropped } = this.props;
+    if (!onCustomObjectDropped) return;
+
+    const item = monitor.getItem();
+    if (!isCustomObjectDragItem(item)) return;
+
+    const position = this._getSceneCoordinatesFromDropMonitor(monitor);
+    if (!position) return;
+
+    onCustomObjectDropped(item, position);
+  };
+
+  _isProjectManagerCustomObjectDrop = (monitor: any): boolean => {
+    return (
+      monitor.getItemType() === projectManagerItemReactDndType &&
+      isCustomObjectDragItem(monitor.getItem())
+    );
+  };
+
+  _canDropOnCanvas = (item: any, monitor?: any): boolean => {
+    if (monitor && monitor.getItemType() === projectManagerItemReactDndType) {
+      return !!this.props.onCustomObjectDropped && isCustomObjectDragItem(item);
+    }
+
+    return true;
+  };
+
+  _onCanvasDropHover = (monitor: any) => {
+    if (monitor.getItemType() === projectManagerItemReactDndType) {
+      if (this._isProjectManagerCustomObjectDrop(monitor)) {
+        this._onCustomObjectDropHover(monitor);
+      }
+      return;
+    }
+
+    this._onObjectDropHover(monitor);
+  };
+
+  _onCanvasDrop = (monitor: any) => {
+    if (monitor.getItemType() === projectManagerItemReactDndType) {
+      if (this._isProjectManagerCustomObjectDrop(monitor)) {
+        this._onCustomObjectDrop(monitor);
+      }
+      return;
+    }
+
+    this._onObjectDrop(monitor);
+  };
+
+  _hasImportableFileDragData = (event: DragEvent): boolean => {
+    const { dataTransfer } = event;
+    if (!dataTransfer) return false;
+    const dataTransferTypes = dataTransfer.types || [];
+    return (
+      Array.from(dataTransferTypes).includes('Files') ||
+      hasProjectFileDragData(dataTransferTypes)
+    );
+  };
+
+  _onNativeDragOver = (event: DragEvent) => {
+    if (!this._hasImportableFileDragData(event)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  };
+
+  _onNativeDrop = async (event: DragEvent) => {
+    if (!this._hasImportableFileDragData(event)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const { onImageFilesDropped, on3DModelFilesDropped } = this.props;
+    if (!onImageFilesDropped && !on3DModelFilesDropped) return;
+
+    const imageFilePaths = onImageFilesDropped
+      ? getImageFilePathsFromDataTransfer(event.dataTransfer)
+      : [];
+    const modelFilePaths = on3DModelFilesDropped
+      ? get3DModelFilePathsFromDataTransfer(event.dataTransfer)
+      : [];
+    if (!imageFilePaths.length && !modelFilePaths.length) return;
+
+    const position = this._getSceneCoordinatesFromClientPosition(
+      event.clientX,
+      event.clientY
+    );
+    if (!position) return;
+
+    if (onImageFilesDropped && imageFilePaths.length) {
+      await onImageFilesDropped(imageFilePaths, position);
+    }
+    if (on3DModelFilesDropped && modelFilePaths.length) {
+      await on3DModelFilesDropped(modelFilePaths, position);
+    }
   };
 
   _onMouseMove = (x: number, y: number) => {
@@ -1677,10 +1948,13 @@ export default class InstancesEditor extends Component<Props, State> {
 
   fitViewToRectangle(
     rectangle: Rectangle,
-    { adaptZoom }: {| adaptZoom: boolean |}
+    {
+      adaptZoom,
+      zoomFactorMultiplier = 1,
+    }: {| adaptZoom: boolean, zoomFactorMultiplier?: number |}
   ) {
     const idealZoom = this.viewPosition.fitToRectangle(rectangle);
-    if (adaptZoom) this.setZoomFactor(idealZoom);
+    if (adaptZoom) this.setZoomFactor(idealZoom * zoomFactorMultiplier);
     if (this.props.onViewPositionChanged) {
       this.props.onViewPositionChanged(this.viewPosition);
     }
@@ -1726,7 +2000,12 @@ export default class InstancesEditor extends Component<Props, State> {
 
   zoomToFitContent = () => {
     const contentAABB = this.getContentAABB();
-    if (contentAABB) this.fitViewToRectangle(contentAABB, { adaptZoom: true });
+    if (contentAABB) {
+      this.fitViewToRectangle(contentAABB, {
+        adaptZoom: true,
+        zoomFactorMultiplier: 1 / Math.max(1, this._canvasResolution),
+      });
+    }
   };
 
   _getAreaRectangle = (): Rectangle => {
@@ -1810,6 +2089,49 @@ export default class InstancesEditor extends Component<Props, State> {
 
   getViewPosition = (): ?ViewPosition => {
     return this.viewPosition;
+  };
+
+  _cancelClearCanvasSceneCoordinatesToKeepAfterResize = () => {
+    if (!this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId) return;
+
+    clearTimeout(this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId);
+    this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = null;
+  };
+
+  _clearCanvasSceneCoordinatesToKeepAfterResizeAfterResizeSettled = () => {
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = setTimeout(
+      () => {
+        this._clearCanvasSceneCoordinatesToKeepAfterResizeTimeoutId = null;
+        this._canvasSceneCoordinatesToKeepAfterResize = null;
+      },
+      120
+    );
+  };
+
+  keepCanvasTopLeftSceneCoordinatesOnNextResize = () => {
+    if (!this.viewPosition) return;
+
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    this._canvasSceneCoordinatesToKeepAfterResize = {
+      type: 'canvas-position',
+      canvasCoordinates: [0, 0],
+      sceneCoordinates: this.viewPosition.toSceneCoordinates(0, 0),
+    };
+  };
+
+  keepCanvasTopCenterScreenCoordinatesOnNextResize = () => {
+    const { canvasArea, viewPosition } = this;
+    if (!canvasArea || !viewPosition) return;
+
+    this._cancelClearCanvasSceneCoordinatesToKeepAfterResize();
+    const canvasRect = canvasArea.getBoundingClientRect();
+    const canvasCenterX = viewPosition.getWidth() / 2;
+    this._canvasSceneCoordinatesToKeepAfterResize = {
+      type: 'screen-position',
+      clientCoordinates: [canvasRect.left + canvasCenterX, canvasRect.top],
+      sceneCoordinates: viewPosition.toSceneCoordinates(canvasCenterX, 0),
+    };
   };
 
   _renderScene = () => {
@@ -1918,55 +2240,15 @@ export default class InstancesEditor extends Component<Props, State> {
     }
 
     return (
-      <DropTarget
-        canDrop={() => true}
-        hover={monitor => {
-          this.fpsLimiter.notifyInteractionHappened();
-          const { _instancesAdder, viewPosition, canvasArea } = this;
-          if (!_instancesAdder || !canvasArea || !viewPosition) return;
-
-          const { x, y } = monitor.getClientOffset();
-          const canvasRect = canvasArea.getBoundingClientRect();
-          const pos = viewPosition.toSceneCoordinates(
-            x - canvasRect.left,
-            y - canvasRect.top
-          );
-          _instancesAdder.createOrUpdateTemporaryInstancesFromObjectNames(
-            pos,
-            this.props.selectedObjectNames,
-            this.props.chosenLayer
-          );
-        }}
-        drop={monitor => {
-          this.fpsLimiter.notifyInteractionHappened();
-
-          const { _instancesAdder, viewPosition, canvasArea } = this;
-          if (!_instancesAdder || !canvasArea || !viewPosition) return;
-
-          if (monitor.didDrop()) {
-            // Drop was done somewhere else (in a child of the canvas:
-            // should not happen, but still handling this case).
-            this._deleteTemporaryInstances();
-            return;
-          }
-
-          const { x, y } = monitor.getClientOffset();
-          const canvasRect = canvasArea.getBoundingClientRect();
-          const pos = viewPosition.toSceneCoordinates(
-            x - canvasRect.left,
-            y - canvasRect.top
-          );
-          const instances = _instancesAdder.updateTemporaryInstancePositions(
-            pos
-          );
-          _instancesAdder.commitTemporaryInstances();
-          this.props.onInstancesAdded(instances);
-        }}
+      <CanvasDropTarget
+        canDrop={this._canDropOnCanvas}
+        hover={this._onCanvasDropHover}
+        drop={this._onCanvasDrop}
       >
         {({ connectDropTarget, isOver }) => {
-          // The children are re-rendered when isOver change:
-          // take this opportunity to delete any temporary instances
-          // if the dragging is not done anymore over the canvas.
+          // The children are re-rendered when isOver changes: take this
+          // opportunity to delete any temporary instances if the dragging is
+          // not done anymore over the canvas.
           if (this._instancesAdder && !isOver) {
             this._deleteTemporaryInstances();
           }
@@ -1976,10 +2258,12 @@ export default class InstancesEditor extends Component<Props, State> {
               ref={canvasArea => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
               id={instancesEditorId}
+              onDragOver={this._onNativeDragOver}
+              onDrop={this._onNativeDrop}
             />
           );
         }}
-      </DropTarget>
+      </CanvasDropTarget>
     );
   }
 }

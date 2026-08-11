@@ -25,11 +25,8 @@ import { type CreateProjectResult } from '../../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../../AiGeneration/Utils';
 import { type GameplayTestsCallbacks } from '../../GameplayTests/GameplayTestRunner';
 import type { NavigateToEventFromGlobalSearchParams } from '../../Utils/Search';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 import type {
-  SceneEventsOutsideEditorChanges,
-  InstancesOutsideEditorChanges,
-  ObjectsOutsideEditorChanges,
-  ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
   WillDeleteGameplayTestChanges,
@@ -41,12 +38,57 @@ export type EditorContainerExtraProps = {|
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
   initiallyFocusedObjectName?: ?string,
+  initiallyOpenSettingsDialog?: boolean,
+
+  // Scene editor
+  scenePanelToOpen?: ?SceneEditorPanelId,
+  scenePanelToOpenRequestId?: number,
 
   // Homepage
   storageProviders?: Array<StorageProvider>,
 
   // Ask AI
   continueProcessingFunctionCallsOnMount?: boolean,
+|};
+
+export type OpenLayoutOptions = {|
+  openEventsEditor: boolean,
+  openSceneEditor: boolean,
+  focusWhenOpened: 'scene-or-events-otherwise' | 'scene' | 'events' | 'none',
+  scenePanelToOpen?: ?SceneEditorPanelId,
+|};
+
+export type OpenLayoutHandler = (
+  sceneName: string,
+  options?: OpenLayoutOptions
+) => void;
+
+export type SceneEventsOutsideEditorChanges = {|
+  scene: gdLayout,
+  externalEvents?: gdExternalEvents,
+  lifecycleFunctionName?: string,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
+export type ExtensionFunctionEventsOutsideEditorChanges = {|
+  extensionName: string,
+  parentKind: 'extension' | 'behavior' | 'object',
+  parentName: string | null,
+  functionName: string,
+  newOrChangedAiGeneratedEventIds: Set<string>,
+|};
+
+export type InstancesOutsideEditorChanges = {|
+  scene: gdLayout,
+|};
+
+export type ObjectsOutsideEditorChanges = {|
+  scene: gdLayout,
+  isNewObjectTypeUsed: boolean,
+|};
+
+export type ObjectGroupsOutsideEditorChanges = {|
+  scene: gdLayout,
 |};
 
 export type RenderEditorContainerProps = {|
@@ -83,18 +125,7 @@ export type RenderEditorContainerProps = {|
 
   // Opening other editors:
   onOpenExternalEvents: string => void,
-  onOpenLayout: (
-    sceneName: string,
-    options?: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
   onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -104,6 +135,14 @@ export type RenderEditorContainerProps = {|
     gdEventsFunctionsExtension,
     gdEventsBasedObject,
     variantName: string
+  ) => void,
+  onOpenPrefabDetailEditor: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
+  ) => void,
+  onOpenPrefabSettings: (
+    gdEventsFunctionsExtension,
+    gdEventsBasedObject
   ) => void,
   onOpenEventsFunctionsExtension: (
     extensionName: string,
@@ -197,6 +236,7 @@ export type RenderEditorContainerProps = {|
   onSave: (options?: {|
     skipNewVersionWarning: boolean,
   |}) => Promise<?FileMetadata>,
+  onAutoSaveConstants: (constants: Object) => Promise<boolean>,
   onSaveProjectAsWithStorageProvider: (
     options: ?{|
       requestedStorageProvider?: StorageProvider,
@@ -275,7 +315,7 @@ export type RenderEditorContainerProps = {|
   ) => void,
   onEffectAdded: () => void,
   onObjectListsModified: ({ isNewObjectTypeUsed: boolean }) => void,
-  onExternalLayoutAssociationChanged: () => void,
+  onExternalAssociationChanged: () => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

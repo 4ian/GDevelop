@@ -112,6 +112,9 @@ export const GlobalEventsSearchEditor: React.ComponentType<{
             searchInInstructionNames:
               freezedSearchState.searchFilterParams.searchInInstructionNames,
           },
+          ...(group.targetType !== 'extension'
+            ? { lifecycleFunctionName: group.lifecycleFunctionName }
+            : {}),
         };
 
         if (group.targetType === 'extension') {

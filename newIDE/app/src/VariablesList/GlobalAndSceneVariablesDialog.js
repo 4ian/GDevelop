@@ -44,6 +44,10 @@ const GlobalAndSceneVariablesDialog = ({
     globalVariables = eventsFunctionsExtension.getGlobalVariables();
     sceneVariables = eventsFunctionsExtension.getSceneVariables();
   }
+  const extensionVariableLabelPrefix =
+    !layout && eventsFunctionsExtension
+      ? eventsFunctionsExtension.getName()
+      : null;
 
   const onComputeAllSceneVariableNames = React.useCallback(
     () =>
@@ -73,7 +77,11 @@ const GlobalAndSceneVariablesDialog = ({
       [
         sceneVariables && {
           id: 'scene-variables',
-          label: <Trans>Scene variables</Trans>,
+          label: extensionVariableLabelPrefix ? (
+            `[${extensionVariableLabelPrefix}] Scene variables`
+          ) : (
+            <Trans>Scene variables</Trans>
+          ),
           variablesContainer: sceneVariables,
           emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
           emptyPlaceholderDescription: (
@@ -85,7 +93,11 @@ const GlobalAndSceneVariablesDialog = ({
         },
         globalVariables && {
           id: 'global-variables',
-          label: <Trans>Global variables</Trans>,
+          label: extensionVariableLabelPrefix ? (
+            `[${extensionVariableLabelPrefix}] Global variables`
+          ) : (
+            <Trans>Global variables</Trans>
+          ),
           variablesContainer: globalVariables,
           emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
           emptyPlaceholderDescription: (
@@ -98,6 +110,7 @@ const GlobalAndSceneVariablesDialog = ({
       ].filter(Boolean),
     [
       sceneVariables,
+      extensionVariableLabelPrefix,
       onComputeAllGlobalVariableNames,
       onComputeAllSceneVariableNames,
       globalVariables,

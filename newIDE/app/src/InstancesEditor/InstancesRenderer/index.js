@@ -14,6 +14,7 @@ import {
   increaseThreeRenderingTime,
   increasePixiUiRenderingTime,
 } from './BasicProfilingCounters';
+import { resetPixiRendererState } from '../../Utils/PixiRendererState';
 
 export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
@@ -211,7 +212,7 @@ export default class InstancesRenderer {
     if (threeRenderer) {
       // Ensure the state is clean for PixiJS to render.
       threeRenderer.resetState();
-      pixiRenderer.reset();
+      resetPixiRendererState(pixiRenderer);
     }
 
     const { layout } = this;
@@ -299,7 +300,7 @@ export default class InstancesRenderer {
           // It's important to reset the internal WebGL state of Three.js then PixiJS
           // to ensure the Three rendering does not impact the Pixi rendering.
           threeRenderer.resetState();
-          pixiRenderer.reset();
+          resetPixiRendererState(pixiRenderer);
 
           // Do the rendering of the PixiJS objects of the layer on the render texture.
           // Then, update the texture of the plane showing the PixiJS rendering,
@@ -318,7 +319,7 @@ export default class InstancesRenderer {
 
           // It's important to reset the internal WebGL state of PixiJS, then Three.js
           // to ensure the 3D rendering is made properly by Three.js
-          pixiRenderer.reset();
+          resetPixiRendererState(pixiRenderer);
           threeRenderer.resetState();
 
           // Clear the depth as each layer is independent and display on top of the previous one,
@@ -340,7 +341,7 @@ export default class InstancesRenderer {
     if (threeRenderer) {
       // Ensure the state is clean for PixiJS to render.
       threeRenderer.resetState();
-      pixiRenderer.reset();
+      resetPixiRendererState(pixiRenderer);
     }
 
     const time = performance.now();
@@ -353,7 +354,7 @@ export default class InstancesRenderer {
     if (threeRenderer) {
       // It's important to reset the internal WebGL state of PixiJS, then Three.js
       // to ensure the 3D rendering is made properly by Three.js
-      pixiRenderer.reset();
+      resetPixiRendererState(pixiRenderer);
       threeRenderer.resetState();
     }
   }

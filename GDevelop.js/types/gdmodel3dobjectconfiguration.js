@@ -10,6 +10,12 @@ declare class gdModel3DObjectConfiguration extends gdObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getSharedAnimationModelResourcesCount(): number;
+  getSharedAnimationModelResourceName(index: number): string;
+  hasSharedAnimationModelResourceNamed(resourceName: string): boolean;
+  addSharedAnimationModelResource(resourceName: string): void;
+  removeSharedAnimationModelResource(index: number): void;
+  removeAllSharedAnimationModelResources(): void;
   getWidth(): number;
   getHeight(): number;
   getDepth(): number;

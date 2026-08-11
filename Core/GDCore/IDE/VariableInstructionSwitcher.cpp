@@ -137,7 +137,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
       instruction.GetType() == "BooleanVariable") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("NumberVariable");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("StringVariable");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("BooleanVariable");
@@ -147,7 +148,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
              instruction.GetType() == "SetBooleanVariable") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("SetNumberVariable");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("SetStringVariable");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("SetBooleanVariable");
@@ -157,7 +159,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
              instruction.GetType() == "PushBoolean") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("PushNumber");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("PushString");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("PushBoolean");
@@ -167,7 +170,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
              instruction.GetType() == "BooleanObjectVariable") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("NumberObjectVariable");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("StringObjectVariable");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("BooleanObjectVariable");
@@ -177,7 +181,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
              instruction.GetType() == "SetBooleanObjectVariable") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("SetNumberObjectVariable");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("SetStringObjectVariable");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("SetBooleanObjectVariable");
@@ -187,7 +192,8 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
              instruction.GetType() == "PushBooleanToObjectVariable") {
     if (variableType == gd::Variable::Type::Number) {
       instruction.SetType("PushNumberToObjectVariable");
-    } else if (variableType == gd::Variable::Type::String) {
+    } else if (variableType == gd::Variable::Type::String ||
+               variableType == gd::Variable::Type::Enum) {
       instruction.SetType("PushStringToObjectVariable");
     } else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("PushBooleanToObjectVariable");

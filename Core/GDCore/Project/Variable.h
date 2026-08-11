@@ -35,13 +35,15 @@ class GD_CORE_API Variable {
     MixedTypes,
 
     // Primitive types
-    String,
-    Number,
-    Boolean,
+    String = 2,
+    Number = 3,
+    Boolean = 4,
+    /** A string-backed primitive used for enum-like values. */
+    Enum = 7,
 
     // Collection types
-    Structure,
-    Array
+    Structure = 5,
+    Array = 6
   };
 
   /**
@@ -86,11 +88,40 @@ class GD_CORE_API Variable {
   /**
    * \brief Change the content of the variable, considered as a string.
    */
-  void SetString(const gd::String& newStr) {
-    str = newStr;
-    type = Type::String;
-    hasMixedValues = false;
-  }
+  void SetString(const gd::String& newStr);
+
+  /**
+   * \brief Return the allowed values for an enum variable.
+   */
+  const std::vector<gd::String>& GetEnumValues() const { return enumValues; };
+
+  /**
+   * \brief Replace the allowed values for an enum variable.
+   */
+  void SetEnumValues(const std::vector<gd::String>& values);
+
+  /**
+   * \brief Add an allowed value for an enum variable.
+   */
+  void AddEnumValue(const gd::String& value);
+
+  /**
+   * \brief Remove an allowed value for an enum variable.
+   */
+  void RemoveEnumValueAt(size_t index);
+
+  /**
+   * \brief Remove all allowed values for an enum variable.
+   */
+  void ClearEnumValues();
+
+  /**
+   * \brief Return true if the value is allowed for this enum variable.
+   *
+   * An enum without declared values accepts any string so existing projects can
+   * keep working while the definition is being edited.
+   */
+  bool IsValidEnumValue(const gd::String& value) const;
 
   /**
    * \brief Return the content of the variable, considered as a number.
@@ -105,6 +136,7 @@ class GD_CORE_API Variable {
     // NaN values are not supported by GDevelop nor the serializer.
     if (std::isnan(value)) value = 0.0;
     type = Type::Number;
+    enumValues.clear();
     hasMixedValues = false;
   }
 
@@ -119,6 +151,7 @@ class GD_CORE_API Variable {
   void SetBool(bool val) {
     boolVal = val;
     type = Type::Boolean;
+    enumValues.clear();
     hasMixedValues = false;
   }
 
@@ -420,6 +453,7 @@ private:
   mutable double value;
   mutable bool boolVal = false;
   mutable bool hasMixedValues;
+  mutable std::vector<gd::String> enumValues;
   mutable std::map<gd::String, std::shared_ptr<Variable>>
       children;  ///< Children, when the variable is considered as a structure.
   mutable std::vector<std::shared_ptr<Variable>>
@@ -433,6 +467,11 @@ private:
    * copy-ctor and assign-op.
    */
   void CopyChildren(const Variable& other);
+
+  /**
+   * \brief Keep enum variable values inside their declared value list.
+   */
+  void NormalizeEnumValue();
 };
 
 }  // namespace gd

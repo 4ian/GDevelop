@@ -5,7 +5,9 @@
  * @extends gdjs.RuntimeBehavior
  * @constructor
  */
-gdjs.TestRuntimeBehavior = class TestRuntimeBehavior extends gdjs.RuntimeBehavior {
+gdjs.TestRuntimeBehavior = class TestRuntimeBehavior extends (
+  gdjs.RuntimeBehavior
+) {
   constructor(runtimeScene, behaviorData, owner) {
     super(runtimeScene, behaviorData, owner);
   }

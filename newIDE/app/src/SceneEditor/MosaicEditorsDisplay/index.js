@@ -32,7 +32,7 @@ import {
   type InstanceOrObjectPropertiesEditorInterface,
 } from '../../SceneEditor/InstanceOrObjectPropertiesEditorContainer';
 import { useDoNowOrAfterRender } from '../../Utils/UseDoNowOrAfterRender';
-import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { preventGameFramePointerEvents } from '../../EmbeddedGame/EmbeddedGameFramePointerEvents';
 import { EmbeddedGameFrameHole } from '../../EmbeddedGame/EmbeddedGameFrameHole';
 import { exceptionallyGuardAgainstDeadObject } from '../../Utils/IsNullPtr';
 
@@ -168,6 +168,28 @@ const MosaicEditorsDisplay: React.ComponentType<{
         config.position
       );
     }, []);
+    const setEditorViewsVisibility = React.useCallback(
+      (
+        editorVisibilityChanges: Array<{|
+          editorId: EditorId,
+          visible: boolean,
+        |}>
+      ) => {
+        if (!editorMosaicRef.current) return;
+        editorMosaicRef.current.setEditorsVisibility(
+          editorVisibilityChanges.map(({ editorId, visible }) => {
+            const config = defaultPanelConfigByEditor[editorId];
+            return {
+              editorName: editorId,
+              // $FlowFixMe[incompatible-type]
+              position: config.position,
+              visible,
+            };
+          })
+        );
+      },
+      []
+    );
     const isEditorVisible = React.useCallback((editorId: EditorId) => {
       if (!editorMosaicRef.current) return false;
       return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
@@ -192,7 +214,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
       []
     );
     const openNewObjectDialog = React.useCallback(
-      () => {
+      (options?: {| instanceSceneCoordinates?: ?[number, number] |}) => {
         if (!isEditorVisible('objects-list')) {
           // Objects list is not opened. Open it now.
           toggleEditorView('objects-list');
@@ -200,7 +222,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
 
         // Open the new object dialog when the objects list is opened.
         objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
-          if (objectsList) objectsList.openNewObjectDialog();
+          if (objectsList) objectsList.openNewObjectDialog(options);
         });
       },
       [isEditorVisible, toggleEditorView, objectsListDoNowOrAfterRender]
@@ -219,6 +241,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
         forceUpdateLayersList,
         openNewObjectDialog,
         toggleEditorView,
+        setEditorViewsVisibility,
         isEditorVisible,
         ensureEditorVisible,
         startSceneRendering,
@@ -238,6 +261,12 @@ const MosaicEditorsDisplay: React.ComponentType<{
             ? editor.getLastContextMenuSceneCoordinates
             : () => [0, 0],
           getViewPosition: editor ? editor.getViewPosition : noop,
+          keepCanvasTopLeftSceneCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopLeftSceneCoordinatesOnNextResize
+            : noop,
+          keepCanvasTopCenterScreenCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopCenterScreenCoordinatesOnNextResize
+            : noop,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,
@@ -330,6 +359,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
+                onOpenPrefabDetailEditor={props.onOpenPrefabDetailEditor}
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onDeleteEventsBasedObjectVariant={
                   props.onDeleteEventsBasedObjectVariant
                 }
@@ -341,11 +372,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onLayersModified={props.onLayersModified}
                 eventsBasedObject={props.eventsBasedObject}
                 eventsBasedObjectVariant={props.eventsBasedObjectVariant}
-                getContentAABB={
-                  editorRef.current
-                    ? editorRef.current.getContentAABB
-                    : () => null
-                }
+                getContentAABB={props.getContentAABB}
                 onEventsBasedObjectChildrenEdited={
                   props.onEventsBasedObjectChildrenEdited
                 }
@@ -441,6 +468,9 @@ const MosaicEditorsDisplay: React.ComponentType<{
                   onInstancesMoved={props.onInstancesMoved}
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
+                  onImageFilesDropped={props.onImageFilesDropped}
+                  on3DModelFilesDropped={props.on3DModelFilesDropped}
+                  onCustomObjectDropped={props.onCustomObjectDropped}
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}
                   isInstanceOf3DObject={props.isInstanceOf3DObject}
@@ -492,6 +522,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onOpenEventBasedObjectVariantEditor={
                   props.onOpenEventBasedObjectVariantEditor
                 }
+                onOpenPrefabSettings={props.onOpenPrefabSettings}
                 onExportAssets={props.onExportAssets}
                 onImportAssets={props.onImportAssets}
                 onDeleteObjects={(objectWithContext, cb) =>

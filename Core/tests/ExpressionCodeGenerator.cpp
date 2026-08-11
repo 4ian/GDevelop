@@ -587,6 +587,42 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "getPropertyMyBooleanPropertyAsnumber|string()");
     }
   }
+  SECTION("JsonObject properties") {
+    gd::PropertiesContainer propertiesContainer(gd::EventsFunctionsContainer::Extension);
+
+    auto projectScopedContainersWithProperties =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForProjectAndLayout(project, layout1);
+    projectScopedContainersWithProperties.AddPropertiesContainer(
+        propertiesContainer);
+
+    propertiesContainer.InsertNew("CardConfig").SetType("JsonObject");
+
+    gd::EventsCodeGenerator codeGeneratorWithProperties(
+        platform, projectScopedContainersWithProperties);
+
+    {
+      auto node = parser.ParseExpression("CardConfig.price");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGeneratorWithProperties, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getPropertyCardConfig().getChild(\"price\").getAsNumber()");
+    }
+    {
+      auto node = parser.ParseExpression("CardConfig.stats.price");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(
+          "number", "", codeGeneratorWithProperties, context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getPropertyCardConfig().getChild(\"stats\").getChild("
+              "\"price\").getAsNumber()");
+    }
+  }
   SECTION("Parameters (1 level)") {
     gd::ParameterMetadataContainer parameters;
     parameters.InsertNewParameter("MyParameter1", 0).SetType("number");

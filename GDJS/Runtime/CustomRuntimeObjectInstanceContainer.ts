@@ -62,6 +62,7 @@ namespace gdjs {
     }
 
     _unloadContent() {
+      this._debuggerRenderer.clearDebugDraw();
       this.onDeletedFromScene(this._parent);
       // At this point, layer renderers are already removed by
       // `CustomRuntimeObject._reinitializeRenderer`.
@@ -259,7 +260,33 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+      }
+
       const allInstancesList = this.getAdhocListOfAllInstances();
+      const shouldRenderDebugDraw =
+        this._debugDrawEnabled &&
+        this._customObject.isIncludedInParentCollisionMask();
+      const shouldRefreshDebugDraw =
+        shouldRenderDebugDraw &&
+        this._debuggerRenderer.isDebugDrawRefreshNeeded(
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        );
+      const debugDrawInstancesList = shouldRefreshDebugDraw
+        ? allInstancesList.filter((object) =>
+            object.isIncludedInParentCollisionMask()
+          )
+        : null;
+      if (this._debugDrawEnabled && !shouldRenderDebugDraw) {
+        this._debuggerRenderer.clearDebugDraw();
+      }
       // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
@@ -275,19 +302,18 @@ namespace gdjs {
           }
         }
 
-        // Set to true to enable debug rendering (look for the implementation in the renderer
-        // to see what is rendered).
-        if (this._debugDrawEnabled) {
-          this._debuggerRenderer.renderDebugDraw(
-            allInstancesList,
-            this._debugDrawShowHiddenInstances,
-            this._debugDrawShowPointsNames,
-            this._debugDrawShowCustomPoints
-          );
-        }
-
         // Perform pre-render update.
         object.updatePreRender(this);
+      }
+      // Set to true to enable debug rendering (look for the implementation in
+      // the renderer to see what is rendered).
+      if (shouldRefreshDebugDraw) {
+        this._debuggerRenderer.renderDebugDraw(
+          debugDrawInstancesList!,
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
+        );
       }
       return;
     }
@@ -316,6 +342,14 @@ namespace gdjs {
 
       // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
+
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate[i](this);
+      }
     }
 
     /**

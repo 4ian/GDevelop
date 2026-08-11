@@ -399,7 +399,8 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
  */
 bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
     const gd::String &functionName) {
-  return functionName == "onCreated" || functionName == "onActivate" ||
+  return functionName == "onCreated" || functionName == "onSignal" ||
+         functionName == "onActivate" ||
          functionName == "onDeActivate" || functionName == "doStepPreEvents" ||
          functionName == "doStepPostEvents" || functionName == "onDestroy" ||
          // Compatibility with GD <= 5.0 beta 75
@@ -414,6 +415,7 @@ bool MetadataDeclarationHelper::IsBehaviorLifecycleEventsFunction(
 bool MetadataDeclarationHelper::IsObjectLifecycleEventsFunction(
     const gd::String &functionName) {
   return functionName == "onCreated" || functionName == "doStepPostEvents" ||
+         functionName == "onSignal" ||
          functionName == "onDestroy" || functionName == "onHotReloading";
 }
 
@@ -1121,6 +1123,10 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
         + " " + property.GetGroup() + " properties";
 
+  if (propertyType == "JsonObject") {
+    return;
+  }
+
   if (propertyType == "Boolean") {
     auto &conditionMetadata = entityMetadata.AddScopedCondition(
         conditionName, propertyLabel,
@@ -1716,6 +1722,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
   }
 
   UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
+  UpdateCustomObjectInheritedBehaviors(project, objectMetadata);
 
   return objectMetadata;
 }
@@ -1767,6 +1774,35 @@ void MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors(
   gd::WholeProjectBrowser projectBrowser;
   auto defaultBehaviorUpdater = DefaultBehaviorUpdater(project, objectMetadata);
   projectBrowser.ExposeObjects(project, defaultBehaviorUpdater);
+}
+
+class InheritedBehaviorUpdater : public gd::ArbitraryObjectsWorker {
+
+public:
+  InheritedBehaviorUpdater(const gd::Project &project_,
+                           const gd::ObjectMetadata &objectMetadata_)
+      : project(project_), objectMetadata(objectMetadata_){};
+  virtual ~InheritedBehaviorUpdater(){};
+
+private:
+  void DoVisitObject(gd::Object &object) override {
+    if (object.GetType() != objectMetadata.GetName()) {
+      return;
+    }
+
+    project.EnsureObjectInheritedBehaviors(object);
+  }
+
+  const gd::Project &project;
+  const gd::ObjectMetadata &objectMetadata;
+};
+
+void MetadataDeclarationHelper::UpdateCustomObjectInheritedBehaviors(
+    gd::Project &project, const gd::ObjectMetadata &objectMetadata) {
+  gd::WholeProjectBrowser projectBrowser;
+  auto inheritedBehaviorUpdater =
+      InheritedBehaviorUpdater(project, objectMetadata);
+  projectBrowser.ExposeObjects(project, inheritedBehaviorUpdater);
 }
 
 } // namespace gdjs

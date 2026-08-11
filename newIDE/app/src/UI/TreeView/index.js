@@ -33,6 +33,7 @@ export const navigationKeys = [
 export type ItemBaseAttributes = {
   +isRoot?: boolean,
   +isPlaceholder?: boolean,
+  +isLabel?: boolean,
 };
 
 export type MenuButton = {|
@@ -152,6 +153,7 @@ type Props<Item> = {|
   width?: number,
   items: Item[],
   getItemName: Item => string | React.Node,
+  getItemSearchText?: Item => string,
   getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
   getItemChildren: Item => ?(Item[]),
@@ -196,13 +198,14 @@ type Props<Item> = {|
   enableStickyAncestors?: boolean,
 |};
 
-const InnerTreeView = <Item: ItemBaseAttributes>(
+function InnerTreeView<Item: ItemBaseAttributes>(
   {
     height,
     width,
     items,
     searchText,
     getItemName,
+    getItemSearchText,
     getItemId,
     getItemHtmlId,
     getItemChildren,
@@ -229,9 +232,9 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     shouldHideMenuIcon,
     enableStickyAncestors,
   }: Props<Item>,
-  ref: TreeViewInterface<Item>
   // $FlowFixMe[missing-local-annot]
-) => {
+  ref: TreeViewInterface<Item>
+) {
   const selectedNodeIds = selectedItems.map(getItemId);
   const [openedNodeIds, setOpenedNodeIds] = React.useState<string[]>(
     initiallyOpenedNodeIds || []
@@ -239,6 +242,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
   const [renamedItemId, setRenamedItemId] = React.useState<?string>(null);
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
   const containerRef = React.useRef<?HTMLDivElement>(null);
+  const listOuterRef = React.useRef<?HTMLDivElement>(null);
   // $FlowFixMe[value-as-type]
   const listRef = React.useRef<?FixedSizeList>(null);
   const [
@@ -286,6 +290,11 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       }
 
       const name = getItemName(item);
+      const itemSearchText = getItemSearchText
+        ? getItemSearchText(item)
+        : typeof name === 'string'
+        ? name
+        : '';
       const rightComponent = renderRightComponent && renderRightComponent(item);
       const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
@@ -304,7 +313,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
         !searchText ||
         forceAllOpened ||
         forceOpen ||
-        (typeof name === 'string' && name.toLowerCase().includes(searchText)) ||
+        itemSearchText.toLowerCase().includes(searchText) ||
         flattenedChildren.length > 0
       ) {
         const thumbnailSrc = getItemThumbnail ? getItemThumbnail(item) : null;
@@ -352,6 +361,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [
       getItemId,
       getItemChildren,
+      getItemSearchText,
       forceAllOpened,
       openedNodeIds,
       openedDuringSearchNodeIds,
@@ -479,7 +489,6 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [enableStickyAncestors, hasStickyRows, gdevelopTheme]
   );
   const scrollOffsetRef = React.useRef<number>(0);
-  const listOuterRef = React.useRef<?HTMLDivElement>(null);
 
   const updateStickyRows = React.useCallback(
     () => {
@@ -660,11 +669,41 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [animatedItemId]
   );
 
+  const forceUpdateList = React.useCallback(
+    () => {
+      forceUpdate();
+      if (listRef.current) {
+        // When Electron closes a popped-out window, Chromium can restore the
+        // real DOM scroll position before react-window receives a scroll
+        // event. Sync react-window with the DOM first so rows are not painted
+        // at stale offsets, leaving a blank gap at the top of the tree.
+        if (listOuterRef.current) {
+          listRef.current.scrollTo(listOuterRef.current.scrollTop);
+        }
+        // $FlowFixMe[prop-missing] - FixedSizeList is a React component.
+        listRef.current.forceUpdate();
+      }
+    },
+    [forceUpdate]
+  );
+
+  React.useEffect(
+    () => {
+      window.addEventListener('focus', forceUpdateList);
+      window.addEventListener('resize', forceUpdateList);
+      return () => {
+        window.removeEventListener('focus', forceUpdateList);
+        window.removeEventListener('resize', forceUpdateList);
+      };
+    },
+    [forceUpdateList]
+  );
+
   React.useImperativeHandle(
     // $FlowFixMe[incompatible-type]
     ref,
     () => ({
-      forceUpdateList: forceUpdate,
+      forceUpdateList,
       scrollToItem,
       scrollToItemFromId,
       renameItem,
@@ -867,12 +906,12 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
           itemSize={TREE_VIEW_ROW_HEIGHT}
           width={typeof width === 'number' ? width : '100%'}
           itemKey={index => flattenedData[index].id}
+          outerRef={listOuterRef}
           // Flow does not seem to accept the generic used in FixedSizeList
           // can itself use a generic.
           // $FlowFixMe[incompatible-type]
           itemData={itemData}
           ref={listRef}
-          outerRef={listOuterRef}
           onScroll={enableStickyAncestors ? onScroll : undefined}
           // Keep overscanCount relatively high so that:
           // - during in-app tutorials we make sure the tooltip displayer finds
@@ -950,7 +989,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       />
     </>
   );
-};
+}
 
 // Define the polymorphic component type that will be exported:
 type TreeViewComponent = <Item: ItemBaseAttributes>(

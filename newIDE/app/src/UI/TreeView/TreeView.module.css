@@ -92,7 +92,7 @@
 .rowContainer.selected {
   background-color: var(--theme-selection-background-color);
 }
-.rowContainer:hover:not(.selected) {
+.rowContainer:hover:not(.selected):not(.placeholderRow) {
   background-color: var(--theme-list-item-hover-background-color);
 }
 
@@ -120,12 +120,19 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: none;
-  color: var(--theme-text-secondary-color)
+  color: var(--theme-text-secondary-color);
 }
 
 .itemName.placeholder {
   color: var(--theme-text-secondary-color);
   font-size: 14px;
+}
+
+.itemName.categoryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .itemName.rootFolder {

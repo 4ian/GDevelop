@@ -11,6 +11,12 @@ import { CompactPropertiesEditorByVisibility } from '../../CompactPropertiesEdit
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { useForceRecompute } from '../../Utils/UseForceUpdate';
 import { type CompactBehaviorPropertiesEditorProps } from './CompactBehaviorPropertiesEditorProps.flow';
+import {
+  advancedTweenBehaviorType,
+  customizeAdvancedTweenBehaviorPropertiesSchema,
+} from '../../BehaviorsEditor/Editors/AdvancedTweenBehaviorEditorOptions';
+
+const gd: libGDevelop = global.gd;
 
 export const styles = {
   icon: {
@@ -56,14 +62,25 @@ export const getSchemaWithOpenFullEditorButton = ({
 
 export const CompactBehaviorPropertiesEditor = ({
   project,
-  behaviorMetadata,
+  behaviorTypeName,
   behaviors,
   object,
   layersContainer,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
+  isAdvancedSectionInitiallyUncollapsed,
 }: CompactBehaviorPropertiesEditorProps): React.Node => {
+  const behavior = behaviors[0];
+  // Behavior metadata is owned by the platform extension and is replaced when
+  // extensions are refreshed. Do not keep its WebIDL wrapper in React props:
+  // a deferred render could otherwise call into a freed WASM object.
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behaviorTypeName
+  );
+  const openFullEditorLabel = behaviorMetadata.getOpenFullEditorLabel();
+
   const [schemaRecomputeTrigger, forceRecomputeSchema] = useForceRecompute();
 
   const propertiesSchema = React.useMemo(
@@ -72,7 +89,7 @@ export const CompactBehaviorPropertiesEditor = ({
         // schemaRecomputeTrigger allows to invalidate the schema when required.
       }
       const behaviorMetadataProperties = behaviorMetadata.getProperties();
-      return propertiesMapToSchema({
+      const schema = propertiesMapToSchema({
         properties: behaviorMetadataProperties,
         defaultValueProperties: behaviorMetadataProperties,
         getPropertyValue: (instance, name) =>
@@ -88,8 +105,18 @@ export const CompactBehaviorPropertiesEditor = ({
         visibility: 'All',
         shouldDisabledFieldsWithMixedValues: true,
       });
+      if (behavior.getTypeName() === advancedTweenBehaviorType) {
+        return customizeAdvancedTweenBehaviorPropertiesSchema(schema);
+      }
+      return schema;
     },
-    [schemaRecomputeTrigger, behaviorMetadata, object, layersContainer]
+    [
+      schemaRecomputeTrigger,
+      behaviorMetadata,
+      object,
+      layersContainer,
+      behavior,
+    ]
   );
 
   return (
@@ -102,12 +129,15 @@ export const CompactBehaviorPropertiesEditor = ({
         onInstancesModified={onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}
         placeholder={<Trans>Nothing to configure for this behavior.</Trans>}
+        isAdvancedSectionInitiallyUncollapsed={
+          isAdvancedSectionInitiallyUncollapsed
+        }
         customizeBasicSchema={
           onOpenFullEditor
             ? schema =>
                 getSchemaWithOpenFullEditorButton({
                   schema,
-                  fullEditorLabel: behaviorMetadata.getOpenFullEditorLabel(),
+                  fullEditorLabel: openFullEditorLabel,
                   behavior: behaviors[0],
                   onOpenFullEditor,
                 })

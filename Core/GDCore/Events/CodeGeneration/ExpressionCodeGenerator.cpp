@@ -119,7 +119,8 @@ void ExpressionCodeGenerator::OnVisitNumberNode(NumberNode& node) {
 }
 
 void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
-  output += codeGenerator.ConvertToStringExplicit(node.text);
+  output += codeGenerator.ConvertToStringExplicit(
+      codeGenerator.ResolveConstantPlaceholders(node.text, context));
 }
 
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
@@ -169,8 +170,23 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
       if (node.child) node.child->Visit(*this);
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
-      // Properties are not supported.
-      output += GenerateDefaultValue(type);
+      const auto& propertiesContainersList =
+          codeGenerator.GetProjectScopedContainers()
+              .GetPropertiesContainersList();
+      const auto& propertiesContainerAndProperty =
+          propertiesContainersList.Get(node.name);
+
+      if (propertiesContainerAndProperty.second.get().GetType() ==
+          "JsonObject") {
+        output += codeGenerator.GeneratePropertyGetterWithoutCasting(
+            propertiesContainerAndProperty.first,
+            propertiesContainerAndProperty.second);
+        if (node.child) node.child->Visit(*this);
+        output += codeGenerator.GenerateVariableValueAs(type);
+      } else {
+        // Primitive properties are not supported with variable accessors.
+        output += GenerateDefaultValue(type);
+      }
     }, [&]() {
       // Parameters are not supported.
       output += GenerateDefaultValue(type);
@@ -269,8 +285,18 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
     }, [&]() {
       const auto& propertiesContainerAndProperty = propertiesContainersList.Get(node.identifierName);
 
-      output += codeGenerator.GeneratePropertyGetter(
-        propertiesContainerAndProperty.first, propertiesContainerAndProperty.second, type, context);
+      if (propertiesContainerAndProperty.second.get().GetType() == "JsonObject" &&
+          !node.childIdentifierName.empty()) {
+        output += codeGenerator.GeneratePropertyGetterWithoutCasting(
+            propertiesContainerAndProperty.first,
+            propertiesContainerAndProperty.second);
+        output += codeGenerator.GenerateVariableAccessor(
+            node.childIdentifierName);
+        output += codeGenerator.GenerateVariableValueAs(type);
+      } else {
+        output += codeGenerator.GeneratePropertyGetter(
+          propertiesContainerAndProperty.first, propertiesContainerAndProperty.second, type, context);
+      }
     }, [&]() {
       const auto& parameter = gd::ParameterMetadataTools::Get(parametersVectorsList, node.identifierName);
       output += codeGenerator.GenerateParameterGetter(parameter, type, context);
@@ -379,7 +405,14 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
           context);
   }
 
-  return functionOutput;
+  if (!context.GetCurrentObject().empty() && realObjects.size() == 1 &&
+      context.GetCurrentObject() == realObjects[0]) {
+    return functionOutput;
+  }
+
+  return codeGenerator.GenerateObjectListsPickedInstancesAssertExpression(
+      realObjects, context, "object expression \"" + objectName + "\"",
+      functionOutput);
 }
 gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
     const gd::String& type,
@@ -427,7 +460,14 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
         context);
   }
 
-  return functionOutput;
+  if (!context.GetCurrentObject().empty() && realObjects.size() == 1 &&
+      context.GetCurrentObject() == realObjects[0]) {
+    return functionOutput;
+  }
+
+  return codeGenerator.GenerateObjectListsPickedInstancesAssertExpression(
+      realObjects, context, "behavior expression \"" + objectName + "\"",
+      functionOutput);
 }
 
 gd::String ExpressionCodeGenerator::GenerateParametersCodes(

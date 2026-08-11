@@ -27,6 +27,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
       .SetIcon("res/conditions/depart24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Signals"))
+      .SetIcon("res/actions/texte.png");
 
   extension
       .AddStrExpression("CurrentSceneName",
@@ -47,6 +49,90 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsSimple();
+
+  extension
+      .AddCondition("SignalReceived",
+                    _("Scene signal received"),
+                    _("Run once for each matching scene signal delivered "
+                      "during this frame."),
+                    _("Scene signal _PARAM1_ was received"),
+                    _("Signals"),
+                    "res/conditions/depart24.png",
+                    "res/conditions/depart.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Signal name"))
+      .SetRelevantForLayoutEventsOnly()
+      // Kept in metadata so existing projects continue to load and run, but
+      // new scene signal handling is authored in the sceneSignal lifecycle
+      // function instead of through this legacy iterator condition.
+      .SetHidden()
+      .MarkAsSimple();
+
+  extension
+      .AddAction("EmitSceneSignal",
+                 _("Emit a scene signal"),
+                 _("Queue a signal for scene receivers. It will be delivered "
+                   "before events on the next frame."),
+                 _("Emit scene signal _PARAM1_ with payload : _PARAM2_"),
+                 _("Signals"),
+                 "res/actions/texte.png",
+                 "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Signal name"))
+      .AddParameter("string", _("Payload"), "", true)
+      .AddCodeOnlyParameter("signalDebugEmitterContext", "")
+      .SetEmitsDeferredSceneSignal()
+      .MarkAsSimple();
+
+  extension
+      .AddAction("EmitSignalToObjectInstance",
+                 _("Emit a signal to an object instance"),
+                 _("Queue a signal for one object instance matching an "
+                   "instance id."),
+                 _("Emit signal _PARAM2_ to instance _PARAM1_ with payload : "
+                   "_PARAM3_"),
+                 _("Signals"),
+                 "res/actions/texte.png",
+                 "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Instance id"))
+      .AddParameter("string", _("Signal name"))
+      .AddParameter("string", _("Payload"), "", true)
+      .AddCodeOnlyParameter("signalDebugEmitterContext", "")
+      .SetEmitsDeferredSceneSignal()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("SubscribeSceneSignal",
+                 _("Subscribe to a scene signal"),
+                 _("Subscribe the current prefab or behavior instance to a "
+                   "scene signal for the rest of its lifetime."),
+                 _("Subscribe to scene signal _PARAM2_"),
+                 _("Signals"),
+                 "res/actions/texte.png",
+                 "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("signalReceiverContext", "")
+      .AddParameter("string", _("Signal name"))
+      .MarkAsSimple();
+
+  extension
+      .AddStrExpression("SignalName",
+                        _("Current signal name"),
+                        _("Name of the signal currently being handled."),
+                        _("Signals"),
+                        "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddStrExpression("SignalPayload",
+                        _("Signal payload"),
+                        _("Read text from the current signal payload."),
+                        _("Signals"),
+                        "res/actions/texte.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRelevantForLayoutEventsOnly();
 
   // Compatibility with GD <= 5.6.251
   extension.AddDuplicatedCondition("DepartScene", "SceneJustBegins").SetHidden();
@@ -90,6 +176,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("sceneName", _("Name of the new scene"))
       .AddParameter("yesorno", _("Stop any other paused scenes?"))
       .SetDefaultValue("true")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -105,6 +192,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("sceneName", _("Name of the new scene"))
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -119,6 +207,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "res/actions/popScene.png")
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension
@@ -131,6 +220,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                  "res/actions/quit.png")
       .SetHelpPath("/interface/scene-editor/events")
       .AddCodeOnlyParameter("currentScene", "")
+      .SetMutatesSceneStack()
       .MarkAsAdvanced();
 
   extension

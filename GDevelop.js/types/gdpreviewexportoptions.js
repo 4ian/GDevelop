@@ -17,6 +17,9 @@ declare class gdPreviewExportOptions {
   setShouldReloadLibraries(enable: boolean): gdPreviewExportOptions;
   setShouldGenerateScenesEventsCode(enable: boolean): gdPreviewExportOptions;
   setNativeMobileApp(enable: boolean): gdPreviewExportOptions;
+  setDisplayCollisionShapes(enable: boolean): gdPreviewExportOptions;
+  setDisplayCollisionMask(enable: boolean): gdPreviewExportOptions;
+  setDisplaySignalAnimations(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setIsInGameEdition(enable: boolean): gdPreviewExportOptions;

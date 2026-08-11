@@ -5,6 +5,8 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree, { type EventsTreeInterface } from './EventsTree';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import EventsGraphPreviewPanel from './EventsGraphPreviewPanel';
 import { getInstructionMetadata } from './InstructionEditor/InstructionEditor';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import InstructionEditorMenu from './InstructionEditor/InstructionEditorMenu';
@@ -12,6 +14,13 @@ import EventTextDialog, {
   filterEditableWithEventTextDialog,
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
+import { SplitEditorToolbar } from '../MainFrame/Toolbar/SplitEditorToolbar';
+import ToolbarUndoRedoButtons from '../UI/ToolbarUndoRedoButtons';
+import GeneratedCodeDialog from './GeneratedCodeDialog';
+import {
+  generateEventsCodeForScope,
+  canGenerateEventsCodeForScope,
+} from './GenerateEventsCode';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
 import { type ShortcutMap } from '../KeyboardShortcuts/DefaultShortcuts';
@@ -127,7 +136,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import LocalVariablesDialog from '../VariablesList/LocalVariablesDialog';
-import GlobalAndSceneVariablesDialog from '../VariablesList/GlobalAndSceneVariablesDialog';
+import UnifiedVariablesDialog from '../VariablesList/UnifiedVariablesDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { useHighlightedAiGeneratedEvent } from './UseHighlightedAiGeneratedEvent';
 import { findEventByPath } from '../Utils/EventsValidationScanner';
@@ -135,6 +144,16 @@ import type { SearchFilterParams } from '../Utils/Search';
 import type { InitialSearchFilterParams } from './SearchPanel';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { type VariableDialogOpeningProps } from '../VariablesList/VariablesEditorDialog';
+import {
+  getEventsSheetSelectionSnapshot,
+  type EventsSheetSelectionSnapshot,
+} from './SelectionSnapshot';
+import {
+  collectUsedGroupEventColorKeys,
+  setRandomUniqueGroupEventColor,
+} from './GroupEventColorPicker';
+
+export type { EventsSheetSelectionSnapshot } from './SelectionSnapshot';
 
 const gd: libGDevelop = global.gd;
 
@@ -175,8 +194,11 @@ type Props = {|
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
+  onOpenLayoutEditor?: ?() => void,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
+  settingsTooltip?: MessageDescriptor,
+  settingsButtonPosition?: 'start' | 'end',
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
@@ -255,21 +277,78 @@ type State = {|
   analyzedEventsContextResult: ?EventsContextResult,
 
   serializedEventsToExtract: ?Object,
+  projectScopedContainersAccessorForEventsToExtract: ?ProjectScopedContainersAccessor,
 
   textEditedEvent: ?gdBaseEvent,
 
   showSearchPanel: boolean,
+  showEventsGraphPreview: boolean,
+  eventsGraphPreviewUpdateId: number,
   searchHighlight: ?SearchHighlight,
   localSearchText: string,
   localSearchMatchCase: boolean,
   navigationHighlightEvent: ?gdBaseEvent,
+  catalogBlinkEvent: ?gdBaseEvent,
+  catalogBlinkNonce: number,
 
   layoutVariablesDialogOpen: boolean,
+
+  generatedCode: ?{|
+    name: string,
+    code: ?string,
+    error: ?string,
+    isWholeEntity?: boolean,
+  |},
 
   allEventsMetadata: Array<EventMetadata>,
 
   fontSize: number,
 |};
+
+const getEventsHistoryContext = (
+  scope: EventsScope
+): {| editor: string, subject?: string |} => {
+  if (scope.layout) {
+    return {
+      editor: 'Events editor',
+      subject: scope.layout.getName(),
+    };
+  }
+  if (scope.externalEvents) {
+    return {
+      editor: 'External events editor',
+      subject: scope.externalEvents.getName(),
+    };
+  }
+  if (scope.eventsFunction) {
+    return {
+      editor: 'Function events editor',
+      subject: scope.eventsFunction.getName(),
+    };
+  }
+  if (scope.eventsBasedObject) {
+    return {
+      editor: 'Custom object events editor',
+      subject: scope.eventsBasedObject.getName(),
+    };
+  }
+  if (scope.eventsBasedBehavior) {
+    return {
+      editor: 'Behavior events editor',
+      subject: scope.eventsBasedBehavior.getName(),
+    };
+  }
+  if (scope.eventsFunctionsExtension) {
+    return {
+      editor: 'Extension events editor',
+      subject: scope.eventsFunctionsExtension.getName(),
+    };
+  }
+
+  return {
+    editor: 'Events editor',
+  };
+};
 
 type EventInsertionContext = {|
   eventsList: gdEventsList,
@@ -284,6 +363,19 @@ const styles = {
     flex: 1,
     position: 'relative', // To be sure that absolutely positioned PlaceholderMessage won't go outside of the EventsSheet
   },
+  eventsTreeAndGraphContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+  },
+  eventsTreePane: {
+    display: 'flex',
+    flex: 1,
+    minWidth: 0,
+    overflow: 'hidden',
+  },
 };
 
 export class EventsSheetComponentWithoutHandle extends React.Component<
@@ -293,6 +385,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _eventsTree: ?EventsTreeInterface;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
+  _catalogBlinkTimeoutId: ?TimeoutID;
   // $FlowFixMe[missing-local-annot]
   _containerDiv = (React.createRef<HTMLDivElement>(): React$RefObject<HTMLDivElement | null>);
   // $FlowFixMe[missing-local-annot]
@@ -332,6 +425,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   state = {
     eventsHistory: (getHistoryInitialState(this.props.events, {
       historyMaxSize: 100,
+      historyContext: getEventsHistoryContext(this.props.scope),
     }): HistoryState),
 
     editedInstruction: {
@@ -360,14 +454,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     analyzedEventsContextResult: null,
 
     serializedEventsToExtract: null,
+    projectScopedContainersAccessorForEventsToExtract: null,
 
     showSearchPanel: false,
+    showEventsGraphPreview: true,
+    eventsGraphPreviewUpdateId: 0,
     searchHighlight: null,
     localSearchText: '',
     localSearchMatchCase: false,
     navigationHighlightEvent: null,
+    catalogBlinkEvent: null,
+    catalogBlinkNonce: 0,
 
     layoutVariablesDialogOpen: false,
+
+    // When set, the "generated JavaScript code" dialog is shown.
+    generatedCode: (null: ?{|
+      name: string,
+      code: ?string,
+      error: ?string,
+      isWholeEntity?: boolean,
+    |}),
 
     allEventsMetadata: ([]: Array<empty>),
 
@@ -395,6 +502,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     unregisterOnResourceExternallyChangedCallback(
       this.resourceExternallyChangedCallbackId
     );
+    if (this._catalogBlinkTimeoutId) {
+      clearTimeout(this._catalogBlinkTimeoutId);
+    }
+  }
+
+  getEditorSelectionSnapshot(): EventsSheetSelectionSnapshot {
+    return getEventsSheetSelectionSnapshot({
+      events: this.props.events,
+      selection: this.state.selection,
+      isActive: this.props.isActive,
+      scope: this.props.scope,
+    });
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -424,18 +543,29 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       'Events were modified outside of the editor - dropping selection and storing this in history.'
     );
     this.setState(
-      {
+      state => ({
         // It's important to immediately clear the selection as it could contain references
         // to events that have been deleted/invalidated in memory.
         selection: clearSelection(),
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-      },
+        eventsHistory: saveToHistory(
+          state.eventsHistory,
+          this.props.events,
+          'EDIT',
+          {
+            positions: {
+              positionsBeforeAction: [],
+              positionAfterAction: [],
+            },
+            operationLabel: 'Edit events',
+          }
+        ),
+        eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
+      }),
       () => {
-        this._saveChangesToHistory('EDIT', {
-          positionsBeforeAction: [],
-          positionAfterAction: [],
-        });
+        this.updateToolbar();
+        if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
       }
     );
   };
@@ -560,39 +690,84 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const canAddSubEvent = this._selectionCanHaveSubEvents();
 
     this.props.setToolbar(
-      <Toolbar
-        allEventsMetadata={this.state.allEventsMetadata}
-        onAddStandardEvent={this._addStandardEvent}
-        onAddSubEvent={this.addSubEvent}
-        canAddSubEvent={canAddSubEvent}
-        onAddLocalVariable={this.addLocalVariable}
-        canAddLocalVariable={this._selectionCanHaveLocalVariables()}
-        canToggleEventDisabled={
-          hasEventSelected(this.state.selection) &&
-          this._selectionCanToggleDisabled()
+      <SplitEditorToolbar
+        leadingToolbar={
+          <span
+            aria-hidden="true"
+            style={{ visibility: 'hidden', pointerEvents: 'none' }}
+          >
+            <ToolbarUndoRedoButtons
+              undo={this.undo}
+              canUndo={canUndo(this.state.eventsHistory)}
+              redo={this.redo}
+              canRedo={canRedo(this.state.eventsHistory)}
+              undoAcceleratorString={'CmdOrCtrl+Z'}
+              redoAcceleratorString={'CmdOrCtrl+Shift+Z'}
+            />
+          </span>
         }
-        canToggleInstructionInverted={hasInstructionSelected(
-          this.state.selection
-        )}
-        onAddCommentEvent={this._addCommentEvent}
-        onAddEvent={this.addNewEvent}
-        onToggleInvertedCondition={this._invertSelectedConditions}
-        onToggleDisabledEvent={this.toggleDisabled}
-        canRemove={hasSomethingSelected(this.state.selection)}
-        onRemove={this.deleteSelection}
-        canUndo={canUndo(this.state.eventsHistory)}
-        canRedo={canRedo(this.state.eventsHistory)}
-        undo={this.undo}
-        redo={this.redo}
-        onOpenSettings={this.props.onOpenSettings}
-        settingsIcon={this.props.settingsIcon}
-        onToggleSearchPanel={this._toggleSearchPanel}
-        canMoveEventsIntoNewGroup={hasSomethingSelected(this.state.selection)}
-        moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
-        onOpenSceneVariables={this.openSceneVariables}
+        trailingToolbar={
+          <Toolbar
+            allEventsMetadata={this.state.allEventsMetadata}
+            onAddStandardEvent={this._addStandardEvent}
+            onAddSubEvent={this.addSubEvent}
+            canAddSubEvent={canAddSubEvent}
+            onAddLocalVariable={this.addLocalVariable}
+            canAddLocalVariable={this._selectionCanHaveLocalVariables()}
+            canToggleEventDisabled={
+              hasEventSelected(this.state.selection) &&
+              this._selectionCanToggleDisabled()
+            }
+            canToggleInstructionInverted={hasInstructionSelected(
+              this.state.selection
+            )}
+            onAddCommentEvent={this._addCommentEvent}
+            onAddEvent={this.addNewEvent}
+            onToggleInvertedCondition={this._invertSelectedConditions}
+            onToggleDisabledEvent={this.toggleDisabled}
+            canRemove={hasSomethingSelected(this.state.selection)}
+            onRemove={this.deleteSelection}
+            canUndo={canUndo(this.state.eventsHistory)}
+            canRedo={canRedo(this.state.eventsHistory)}
+            undo={this.undo}
+            redo={this.redo}
+            onOpenLayoutEditor={this.props.onOpenLayoutEditor}
+            onOpenSettings={this.props.onOpenSettings}
+            settingsIcon={this.props.settingsIcon}
+            settingsTooltip={this.props.settingsTooltip}
+            settingsButtonPosition={this.props.settingsButtonPosition}
+            onToggleSearchPanel={this._toggleSearchPanel}
+            onToggleGraphPreview={this._toggleEventsGraphPreview}
+            isGraphPreviewVisible={this.state.showEventsGraphPreview}
+            canMoveEventsIntoNewGroup={hasSomethingSelected(
+              this.state.selection
+            )}
+            moveEventsIntoNewGroup={this.moveEventsIntoNewGroup}
+            onOpenSceneVariables={this.openSceneVariables}
+            onShowGeneratedCode={
+              // Available for scenes AND extension events-functions (free, behavior
+              // and object functions); not for external events.
+              canGenerateEventsCodeForScope(this.props.scope)
+                ? this._showGeneratedCode
+                : null
+            }
+          />
+        }
       />
     );
   }
+
+  _showGeneratedCode = () => {
+    const { project, scope } = this.props;
+    // Generate the JS for the current scope (scene or extension function) using
+    // the same code generators the preview/export/extension-loader use.
+    const generated = generateEventsCodeForScope(project, scope);
+    this.setState({ generatedCode: generated });
+  };
+
+  _closeGeneratedCodeDialog = () => {
+    this.setState({ generatedCode: null });
+  };
 
   _addStandardEvent = () => {
     this.addNewEvent('BuiltinCommonInstructions::Standard');
@@ -641,6 +816,69 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       localSearchMatchCase: false,
       searchHighlight: null,
     });
+  };
+
+  _toggleEventsGraphPreview = () => {
+    this.setState(
+      state => ({
+        showEventsGraphPreview: !state.showEventsGraphPreview,
+      }),
+      () => this.updateToolbar()
+    );
+  };
+
+  _refreshEventsGraphPreview = () => {
+    this.setState(state => ({
+      eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
+    }));
+  };
+
+  _selectEventFromGraphPreview = (eventContext: EventContext) => {
+    const eventsTree = this._eventsTree;
+    if (eventsTree) eventsTree.unfoldForEvent(eventContext.event);
+    if (this._catalogBlinkTimeoutId) {
+      clearTimeout(this._catalogBlinkTimeoutId);
+    }
+
+    this.setState(
+      state => ({
+        selection: selectEvent(clearSelection(), eventContext, false),
+        navigationHighlightEvent: eventContext.event,
+        catalogBlinkEvent: eventContext.event,
+        catalogBlinkNonce: state.catalogBlinkNonce + 1,
+      }),
+      () => {
+        this.updateToolbar();
+        if (!eventsTree) return;
+
+        setTimeout(() => {
+          const row = eventsTree.getEventRow(eventContext.event);
+          if (row !== -1) eventsTree.scrollToRow(row);
+          this._ensureFocused();
+        }, 0);
+      }
+    );
+
+    setTimeout(() => {
+      const { navigationHighlightEvent } = this.state;
+      if (
+        navigationHighlightEvent &&
+        navigationHighlightEvent.ptr === eventContext.event.ptr
+      ) {
+        this.setState({ navigationHighlightEvent: null });
+      }
+    }, 3000);
+
+    this._catalogBlinkTimeoutId = setTimeout(() => {
+      const { catalogBlinkEvent } = this.state;
+      if (
+        catalogBlinkEvent &&
+        catalogBlinkEvent.ptr === eventContext.event.ptr
+      ) {
+        this.setState({ catalogBlinkEvent: null });
+      }
+      this._catalogBlinkTimeoutId = null;
+    }, 5000);
   };
 
   addSubEvent = () => {
@@ -762,11 +1000,23 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       };
     }
 
+    const usedGroupEventColorKeys =
+      type === 'BuiltinCommonInstructions::Group'
+        ? collectUsedGroupEventColorKeys(this.props.events)
+        : null;
+
     const newEvent = insertion.eventsList.insertNewEvent(
       project,
       type,
       insertion.indexInList + 1
     );
+
+    if (type === 'BuiltinCommonInstructions::Group') {
+      setRandomUniqueGroupEventColor(
+        gd.asGroupEvent(newEvent),
+        usedGroupEventColorKeys || new Set()
+      );
+    }
 
     const eventsTree = this._eventsTree;
     if (eventsTree) {
@@ -863,6 +1113,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         click: () => this.deselectAll(),
         accelerator: 'CmdOrCtrl+Shift+A',
         visible: hasSomethingSelected(this.state.selection),
+      },
+      {
+        label: i18n._(t`Toggle Disabled`),
+        click: () => this._toggleDisabledInstructions(),
       },
       hasSelectedAtLeastOneCondition(this.state.selection)
         ? {
@@ -1099,6 +1353,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   expandToLevel = (level: number) => {
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
+  };
+
+  _setGraphPreviewGroupEventsFolded = (
+    groupEvents: Array<gdBaseEvent>,
+    folded: boolean
+  ) => {
+    groupEvents.forEach(groupEvent => {
+      groupEvent.setFolded(folded);
+    });
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };
 
   _buildEventContextMenu = (i18n: I18nType): any => [
@@ -1938,6 +2202,31 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
+  _toggleDisabledInstructions = () => {
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        instructionContext.instruction.setDisabled(
+          !instructionContext.instruction.isDisabled()
+        );
+      }
+    );
+
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
   _hasSelectedOptionallyAsyncActions = (): boolean => {
     return getSelectedInstructionsContexts(this.state.selection).some(
       instructionContext => {
@@ -2020,14 +2309,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     cb: ?Function
   ) => {
     this.setState(
-      {
+      state => ({
         eventsHistory: saveToHistory(
-          this.state.eventsHistory,
+          state.eventsHistory,
           this.props.events,
           actionType,
-          { positions }
+          { positions, operationLabel: 'Edit events' }
         ),
-      },
+        eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
+      }),
       () => {
         this.updateToolbar();
         if (cb) cb();
@@ -2054,10 +2344,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // C++ ptrs from the old selection don't accidentally match newly allocated
     // objects (WASM ptr reuse) and cause a spurious highlight flash during
     // the re-render triggered by forceEventsUpdate below.
-    this.setState({
+    this.setState(state => ({
       selection: clearSelection(),
       eventsHistory: newEventsHistory,
-    });
+      eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
+    }));
 
     eventsTree.forceEventsUpdate(() => {
       const {
@@ -2149,10 +2440,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventsTree) return;
 
     // Clear selection immediately to prevent stale ptr flashes (see undo above).
-    this.setState({
+    this.setState(state => ({
       selection: clearSelection(),
       eventsHistory: newEventsHistory,
-    });
+      eventsGraphPreviewUpdateId: state.eventsGraphPreviewUpdateId + 1,
+    }));
 
     eventsTree.forceEventsUpdate(() => {
       const {
@@ -2292,6 +2584,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   extractEventsToFunction = () => {
+    const selectedEventContext = getLastSelectedTopMostOnlyEventContext(
+      this.state.selection
+    );
+    if (!selectedEventContext) return;
+
     const eventsList = new gd.EventsList();
 
     // Only extract the top-most events, as the other will be contained inside.
@@ -2302,6 +2599,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.props.onBeginCreateEventsFunction();
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
+      projectScopedContainersAccessorForEventsToExtract:
+        selectedEventContext.projectScopedContainersAccessor,
     });
 
     eventsList.delete();
@@ -2354,6 +2653,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return;
 
     const { project } = this.props;
+    const usedGroupEventColorKeys = collectUsedGroupEventColorKeys(
+      this.props.events
+    );
 
     const newEvent = eventContext.eventsList.insertNewEvent(
       project,
@@ -2363,6 +2665,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const groupEvent = gd.asGroupEvent(newEvent);
 
     groupEvent.setName('Grouped events');
+    setRandomUniqueGroupEventColor(groupEvent, usedGroupEventColorKeys);
     groupEvent.setFolded(true);
     groupEvent
       .getSubEvents()
@@ -2705,6 +3008,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       initialSearchInInstructionNames: this.state.searchHighlight
         ?.searchFilterParams?.searchInInstructionNames,
     };
+    const graphPreviewWidth =
+      this.state.showEventsGraphPreview && this._containerDivLastKnownSize
+        ? Math.min(
+            480,
+            Math.max(
+              300,
+              Math.round(this._containerDivLastKnownSize.width * 0.27)
+            )
+          )
+        : 0;
+    const eventsTreeWidth = this._containerDivLastKnownSize
+      ? Math.max(0, this._containerDivLastKnownSize.width - graphPreviewWidth)
+      : 0;
 
     return (
       <>
@@ -2774,88 +3090,115 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   </Line>
                 )}
                 {this._containerDivLastKnownSize && (
-                  <EventsTree
-                    ref={eventsTree => (this._eventsTree = eventsTree)}
-                    key={events.ptr}
-                    indentScale={preferences.values.eventsSheetIndentScale}
-                    onScroll={this._ensureFocused}
-                    events={events}
-                    project={project}
-                    scope={scope}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    projectScopedContainersAccessor={
-                      projectScopedContainersAccessor
-                    }
-                    selection={this.state.selection}
-                    onInstructionClick={this.selectInstruction}
-                    onInstructionDoubleClick={this.openInstructionEditor}
-                    onInstructionContextMenu={this.openInstructionContextMenu}
-                    onAddInstructionContextMenu={
-                      this.openAddInstructionContextMenu
-                    }
-                    onAddNewInstruction={this.openInstructionEditor}
-                    onPasteInstructions={
-                      this.pasteInstructionsInInstructionsList
-                    }
-                    onMoveToInstruction={this.moveSelectionToInstruction}
-                    onMoveToInstructionsList={
-                      this.moveSelectionToInstructionsList
-                    }
-                    onParameterClick={this.openParameterEditor}
-                    onVariableDeclarationClick={() => {
-                      // Nothing to do.
-                    }}
-                    onVariableDeclarationDoubleClick={this.openVariablesEditor}
-                    onEventClick={this.selectEvent}
-                    onEventContextMenu={this.openEventContextMenu}
-                    onAddNewEvent={(
-                      eventType: string,
-                      eventsList: gdEventsList
-                    ) => {
-                      this.addNewEvent(eventType, {
-                        eventsList,
-                        indexInList: eventsList.getEventsCount(),
-                      });
-                    }}
-                    onOpenExternalEvents={onOpenExternalEvents}
-                    onOpenLayout={onOpenLayout}
-                    searchResults={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.results
-                        : null
-                    }
-                    searchFocusOffset={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.focusOffset
-                        : null
-                    }
-                    onEventMoved={this._onEventMoved}
-                    onEndEditingEvent={this._onEndEditingStringEvent}
-                    showObjectThumbnails={
-                      preferences.values.eventsSheetShowObjectThumbnails
-                    }
-                    screenType={screenType}
-                    windowSize={windowSize}
-                    eventsSheetWidth={this._containerDivLastKnownSize.width}
-                    eventsSheetHeight={this._containerDivLastKnownSize.height}
-                    fontSize={preferences.values.eventsSheetZoomLevel}
-                    preferences={preferences}
-                    tutorials={tutorials}
-                    highlightedSearchText={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.text || null
-                        : null
-                    }
-                    highlightedSearchMatchCase={
-                      effectiveSearchHighlight
-                        ? effectiveSearchHighlight.matchCase
-                        : false
-                    }
-                    highlightedAiGeneratedEventIds={
-                      highlightedAiGeneratedEventIds
-                    }
-                  />
+                  <div style={styles.eventsTreeAndGraphContainer}>
+                    <div style={styles.eventsTreePane}>
+                      <EventsTree
+                        ref={eventsTree => (this._eventsTree = eventsTree)}
+                        key={events.ptr}
+                        indentScale={preferences.values.eventsSheetIndentScale}
+                        onScroll={this._ensureFocused}
+                        events={events}
+                        project={project}
+                        scope={scope}
+                        globalObjectsContainer={globalObjectsContainer}
+                        objectsContainer={objectsContainer}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        selection={this.state.selection}
+                        onInstructionClick={this.selectInstruction}
+                        onInstructionDoubleClick={this.openInstructionEditor}
+                        onInstructionContextMenu={
+                          this.openInstructionContextMenu
+                        }
+                        onAddInstructionContextMenu={
+                          this.openAddInstructionContextMenu
+                        }
+                        onAddNewInstruction={this.openInstructionEditor}
+                        onPasteInstructions={
+                          this.pasteInstructionsInInstructionsList
+                        }
+                        onMoveToInstruction={this.moveSelectionToInstruction}
+                        onMoveToInstructionsList={
+                          this.moveSelectionToInstructionsList
+                        }
+                        onParameterClick={this.openParameterEditor}
+                        onVariableDeclarationClick={() => {
+                          // Nothing to do.
+                        }}
+                        onVariableDeclarationDoubleClick={
+                          this.openVariablesEditor
+                        }
+                        onEventClick={this.selectEvent}
+                        onEventContextMenu={this.openEventContextMenu}
+                        onAddNewEvent={(
+                          eventType: string,
+                          eventsList: gdEventsList
+                        ) => {
+                          this.addNewEvent(eventType, {
+                            eventsList,
+                            indexInList: eventsList.getEventsCount(),
+                          });
+                        }}
+                        onOpenExternalEvents={onOpenExternalEvents}
+                        onOpenLayout={onOpenLayout}
+                        searchResults={
+                          effectiveSearchHighlight
+                            ? effectiveSearchHighlight.results
+                            : null
+                        }
+                        searchFocusOffset={
+                          effectiveSearchHighlight
+                            ? effectiveSearchHighlight.focusOffset
+                            : null
+                        }
+                        onEventMoved={this._onEventMoved}
+                        onEndEditingEvent={this._onEndEditingStringEvent}
+                        onEventsUpdated={this._refreshEventsGraphPreview}
+                        showObjectThumbnails={
+                          preferences.values.eventsSheetShowObjectThumbnails
+                        }
+                        screenType={screenType}
+                        windowSize={windowSize}
+                        eventsSheetWidth={eventsTreeWidth}
+                        eventsSheetHeight={
+                          this._containerDivLastKnownSize.height
+                        }
+                        fontSize={preferences.values.eventsSheetZoomLevel}
+                        preferences={preferences}
+                        tutorials={tutorials}
+                        highlightedSearchText={
+                          effectiveSearchHighlight
+                            ? effectiveSearchHighlight.text || null
+                            : null
+                        }
+                        highlightedSearchMatchCase={
+                          effectiveSearchHighlight
+                            ? effectiveSearchHighlight.matchCase
+                            : false
+                        }
+                        highlightedAiGeneratedEventIds={
+                          highlightedAiGeneratedEventIds
+                        }
+                        catalogBlinkEvent={this.state.catalogBlinkEvent}
+                        catalogBlinkNonce={this.state.catalogBlinkNonce}
+                      />
+                    </div>
+                    {this.state.showEventsGraphPreview && (
+                      <EventsGraphPreviewPanel
+                        events={events}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
+                        selection={this.state.selection}
+                        onSelectEvent={this._selectEventFromGraphPreview}
+                        onSetVisibleGroupEventsFolded={
+                          this._setGraphPreviewGroupEventsFolded
+                        }
+                        width={graphPreviewWidth}
+                      />
+                    )}
+                  </div>
                 )}
                 {this.state.showSearchPanel && (
                   <ErrorBoundary
@@ -2995,9 +3338,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={
+              this.state.projectScopedContainersAccessorForEventsToExtract ||
+              projectScopedContainersAccessor
+            }
             onClose={() =>
               this.setState({
                 serializedEventsToExtract: null,
+                projectScopedContainersAccessorForEventsToExtract: null,
               })
             }
             serializedEvents={this.state.serializedEventsToExtract}
@@ -3009,6 +3357,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               );
               this.setState({
                 serializedEventsToExtract: null,
+                projectScopedContainersAccessorForEventsToExtract: null,
               });
             }}
           />
@@ -3069,7 +3418,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           />
         )}
         {this.state.layoutVariablesDialogOpen && (
-          <GlobalAndSceneVariablesDialog
+          <UnifiedVariablesDialog
             projectScopedContainersAccessor={projectScopedContainersAccessor}
             open
             onCancel={() => this.openSceneVariables(false)}
@@ -3088,6 +3437,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             onClose={this.closeEventTextDialog}
           />
         )}
+        {this.state.generatedCode && (
+          <GeneratedCodeDialog
+            name={this.state.generatedCode.name}
+            code={this.state.generatedCode.code}
+            error={this.state.generatedCode.error}
+            isWholeEntity={this.state.generatedCode.isWholeEntity}
+            onClose={this._closeGeneratedCodeDialog}
+          />
+        )}
       </>
     );
   }
@@ -3099,6 +3457,7 @@ type OutOfEditorChanges = {|
 
 export type EventsSheetInterface = {|
   updateToolbar: () => void,
+  forceUpdateEditor: () => void,
   onResourceExternallyChanged: ({| identifier: string |}) => void,
   onEventsModifiedOutsideEditor: (changes: OutOfEditorChanges) => void,
   scrollToEventPath: (eventPath: EventPath) => void,
@@ -3110,6 +3469,7 @@ export type EventsSheetInterface = {|
   ) => void,
   clearGlobalSearchResults: () => void,
   selectAllEvents: () => void,
+  getEditorSelectionSnapshot: () => ?EventsSheetSelectionSnapshot,
 |};
 
 // EventsSheet is a wrapper so that the component can use multiple
@@ -3118,12 +3478,14 @@ export type EventsSheetInterface = {|
 const EventsSheet = (props, ref) => {
   React.useImperativeHandle(ref, () => ({
     updateToolbar,
+    forceUpdateEditor,
     onResourceExternallyChanged,
     onEventsModifiedOutsideEditor,
     scrollToEventPath,
     setGlobalSearchResults,
     clearGlobalSearchResults,
     selectAllEvents,
+    getEditorSelectionSnapshot,
   }));
 
   const {
@@ -3134,6 +3496,9 @@ const EventsSheet = (props, ref) => {
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
+  };
+  const forceUpdateEditor = () => {
+    if (component.current) component.current.forceUpdate();
   };
   const onResourceExternallyChanged = (resourceInfo: any) => {
     if (component.current)
@@ -3165,6 +3530,11 @@ const EventsSheet = (props, ref) => {
   };
   const selectAllEvents = () => {
     if (component.current) component.current.selectAllEvents();
+  };
+  const getEditorSelectionSnapshot = () => {
+    if (component.current)
+      return component.current.getEditorSelectionSnapshot();
+    return null;
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);

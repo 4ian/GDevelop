@@ -2,11 +2,15 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import {
+  copyProjectTemplateFilesToLocalProjectFolder,
   createNewEmptyProject,
   createNewProjectFromExampleShortHeader,
   createNewProjectFromPrivateGameTemplate,
   createNewProjectFromTutorialTemplate,
   createNewProjectFromCourseChapterTemplate,
+  ensureProjectHasDefaultScene,
+  initializeLocalProjectGitRepository,
+  type ProjectTemplateFilesSource,
   type NewProjectSource,
 } from '../ProjectCreation/CreateProject';
 import {
@@ -44,6 +48,121 @@ export type CreateProjectResult = {|
   createdProject: gdProject | null,
 |};
 
+const optionalLocalProjectSetupStepTimeoutMs = 10000;
+const optionalGameRegistrationStepTimeoutMs = 10000;
+const projectCreationStepTimeoutMs = 60000;
+const projectCreationSaveStepTimeoutMs = 120000;
+
+export const runProjectCreationStepWithTimeout = async <Result>({
+  description,
+  operation,
+  timeoutMs = projectCreationStepTimeoutMs,
+}: {|
+  description: string,
+  operation: () => Promise<Result>,
+  timeoutMs?: number,
+|}): Promise<Result> => {
+  let timeoutId: ?TimeoutID = null;
+  try {
+    return await Promise.race([
+      Promise.resolve().then(operation),
+      new Promise<Result>((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          const timeoutError: any = new Error(
+            `Creating the project timed out while trying to ${description} after ${Math.ceil(
+              timeoutMs / 1000
+            )} seconds.`
+          );
+          timeoutError.name = 'ProjectCreationTimeoutError';
+          timeoutError.code = 'PROJECT_CREATION_TIMEOUT';
+          reject(timeoutError);
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
+
+export const getProjectCreationErrorDetails = (rawError: any): string => {
+  const details: Array<string> = [];
+  const seen: Set<any> = new Set();
+  let error = rawError;
+  while (error !== undefined && error !== null && !seen.has(error)) {
+    if (typeof error === 'object') seen.add(error);
+    if (typeof error === 'string') {
+      details.push(error);
+      break;
+    }
+    const name =
+      typeof error.name === 'string' && error.name ? error.name : 'Error';
+    const code =
+      typeof error.code === 'string' && error.code ? ` [${error.code}]` : '';
+    let message =
+      typeof error.message === 'string' && error.message ? error.message : '';
+    if (!message) {
+      try {
+        message = JSON.stringify(error);
+      } catch (serializationError) {
+        message = String(error);
+      }
+    }
+    details.push(`${name}${code}${message ? `: ${message}` : ''}`);
+    if (!error || typeof error !== 'object' || !error.cause) break;
+    error = error.cause;
+  }
+  return details.length
+    ? details.join('\nCaused by: ')
+    : 'Unknown project creation error.';
+};
+
+const runOptionalLocalProjectSetupStep = async (
+  description: string,
+  setupStep: () => Promise<void>
+): Promise<void> => {
+  let timeoutId: ?TimeoutID = null;
+  try {
+    await Promise.race([
+      setupStep(),
+      new Promise((resolve, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(`${description} timed out.`));
+        }, optionalLocalProjectSetupStepTimeoutMs);
+      }),
+    ]);
+  } catch (error) {
+    console.warn(`Unable to ${description}:`, error);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+};
+
+const startOptionalLocalProjectSetup = ({
+  projectFilePath,
+  templateFilesSource,
+}: {|
+  projectFilePath: string,
+  templateFilesSource?: ?ProjectTemplateFilesSource,
+|}): void => {
+  (async () => {
+    await runOptionalLocalProjectSetupStep(
+      'copy project template files to the new local project',
+      () =>
+        copyProjectTemplateFilesToLocalProjectFolder({
+          projectFilePath,
+          templateFilesSource,
+        })
+    );
+    await runOptionalLocalProjectSetupStep(
+      'initialize Git for the new local project',
+      () =>
+        initializeLocalProjectGitRepository({
+          projectFilePath,
+        })
+    );
+  })();
+};
+
 type Props = {|
   beforeCreatingProject: () => void,
   afterCreatingProject: ({|
@@ -62,7 +181,6 @@ type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
-  getStorageProvider: () => StorageProvider,
   loadFromProject: (
     project: gdProject,
     fileMetadata: ?FileMetadata
@@ -72,10 +190,12 @@ type Props = {|
     options?: {|
       openingMessage?: ?MessageDescriptor,
       ignoreAutoSave?: boolean,
+      suppressOpenErrorAlert?: boolean,
       doNotTrackAsProjectOpened?: boolean,
     |}
   ) => Promise<?State>,
   onProjectSaved: (fileMetadata: ?FileMetadata) => void,
+  ensureProjectExtensionsLoaded: (project: gdProject) => Promise<void>,
   ensureResourcesAreMoved: (
     options: MoveAllProjectResourcesOptionsWithoutProgress
   ) => Promise<void>,
@@ -116,10 +236,10 @@ const useCreateProject = ({
   onSuccessOrError,
   onError,
   getStorageProviderOperations,
-  getStorageProvider,
   loadFromProject,
   openFromFileMetadata,
   onProjectSaved,
+  ensureProjectExtensionsLoaded,
   ensureResourcesAreMoved,
   onGameRegistered,
 }: Props): UseCreateProjectReturnType => {
@@ -171,18 +291,27 @@ const useCreateProject = ({
         if (!newProjectSource) return { createdProject: null }; // New project creation aborted.
 
         let state: ?State;
+        const sourceProject = newProjectSource.project;
+        const sourceFileMetadata = newProjectSource.fileMetadata;
         const sourceStorageProvider = newProjectSource.storageProvider;
         const sourceStorageProviderOperations = sourceStorageProvider
           ? getStorageProviderOperations(newProjectSource.storageProvider)
           : null;
-        if (newProjectSource.project) {
-          state = await loadFromProject(newProjectSource.project, null);
-        } else if (newProjectSource.fileMetadata && sourceStorageProvider) {
-          state = await openFromFileMetadata(newProjectSource.fileMetadata, {
-            // This "open" is only loading the template/example that this new
-            // project is based on - it must not be reported as the user
-            // re-opening an existing project.
-            doNotTrackAsProjectOpened: true,
+        if (sourceProject) {
+          state = await runProjectCreationStepWithTimeout({
+            description: 'load the new project in the editor',
+            operation: () => loadFromProject(sourceProject, null),
+          });
+        } else if (sourceFileMetadata && sourceStorageProvider) {
+          state = await runProjectCreationStepWithTimeout({
+            description: 'load the selected project template',
+            operation: () =>
+              openFromFileMetadata(sourceFileMetadata, {
+                // This "open" is only loading the template/example that this new
+                // project is based on - it must not be reported as the user
+                // re-opening an existing project.
+                doNotTrackAsProjectOpened: true,
+              }),
           });
         }
 
@@ -199,6 +328,10 @@ const useCreateProject = ({
 
         const oldProjectId = currentProject.getProjectUuid();
         initialiseProjectProperties(currentProject, newProjectSetup);
+        // The initial save must already contain the default scene. Creating it
+        // later while opening the editor leaves the multi-file project without
+        // scene.settings, layout and events files until a manual save.
+        ensureProjectHasDefaultScene(currentProject);
 
         // Now that the project has its final UUID (assigned by
         // initialiseProjectProperties), report its creation along with that UUID,
@@ -212,8 +345,9 @@ const useCreateProject = ({
           currentProject.setTemplateSlug(newProjectSource.templateSlug);
         }
 
+        const authenticatedUserProfile = authenticatedUser.profile;
         if (
-          authenticatedUser.profile &&
+          authenticatedUserProfile &&
           !newProjectSetup.openQuickCustomizationDialog
         ) {
           // If the user is connected, try to register the game to avoid
@@ -223,24 +357,33 @@ const useCreateProject = ({
           // Skip this if quick customization is requested, as this will be done later
           // at publishing time.
           try {
-            await registerGame(
-              authenticatedUser.getAuthorizationHeader,
-              authenticatedUser.profile.id,
-              // $FlowFixMe[incompatible-type]
-              getDefaultRegisterGameProperties({
-                projectId: currentProject.getProjectUuid(),
-                projectName: currentProject.getName(),
-                projectAuthor: currentProject.getAuthor(),
-                // Project is saved if choosing cloud or local storage provider.
-                savedStatus:
-                  newProjectSetup.storageProvider.internalName ===
-                    'LocalFile' ||
-                  newProjectSetup.storageProvider.internalName === 'Cloud'
-                    ? 'saved'
-                    : 'draft',
-              })
-            );
-            await onGameRegistered();
+            await runProjectCreationStepWithTimeout({
+              description: 'register the game with GDevelop services',
+              timeoutMs: optionalGameRegistrationStepTimeoutMs,
+              operation: () =>
+                registerGame(
+                  authenticatedUser.getAuthorizationHeader,
+                  authenticatedUserProfile.id,
+                  // $FlowFixMe[incompatible-type]
+                  getDefaultRegisterGameProperties({
+                    projectId: currentProject.getProjectUuid(),
+                    projectName: currentProject.getName(),
+                    projectAuthor: currentProject.getAuthor(),
+                    // Project is saved if choosing cloud or local storage provider.
+                    savedStatus:
+                      newProjectSetup.storageProvider.internalName ===
+                        'LocalFile' ||
+                      newProjectSetup.storageProvider.internalName === 'Cloud'
+                        ? 'saved'
+                        : 'draft',
+                  })
+                ),
+            });
+            await runProjectCreationStepWithTimeout({
+              description: 'refresh the registered games list',
+              timeoutMs: optionalGameRegistrationStepTimeoutMs,
+              operation: onGameRegistered,
+            });
           } catch (error) {
             // Do not prevent the user from opening the game if the registration failed.
             console.error(
@@ -250,49 +393,84 @@ const useCreateProject = ({
           }
         }
 
+        // Loading a project starts the two-pass generation of its local
+        // extensions. The initial save also generates source catalogs from
+        // registered behavior metadata, so it must not run while that metadata
+        // is still being replaced between the two passes.
+        await runProjectCreationStepWithTimeout({
+          description: 'generate the project extensions',
+          operation: () => ensureProjectExtensionsLoaded(currentProject),
+        });
+
         const destinationStorageProviderOperations = getStorageProviderOperations(
           newProjectSetup.storageProvider
         );
-        const newStorageProvider = getStorageProvider();
-        const storageProviderInternalName = newStorageProvider.internalName;
+        const storageProviderInternalName =
+          newProjectSetup.storageProvider.internalName;
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
         let updatedFileMetadata: ?FileMetadata = state.currentFileMetadata;
         if (onSaveProjectAs) {
-          const { wasSaved, fileMetadata } = await onSaveProjectAs(
-            currentProject,
-            newProjectSetup.saveAsLocation,
-            {
-              onStartSaving: () => {
-                console.log('Start saving as the new project...');
-              },
-              onMoveResources: async ({ newFileMetadata }) => {
-                console.log('Start moving resources to the new project...');
-                if (
-                  !sourceStorageProvider ||
-                  !sourceStorageProviderOperations ||
-                  !newProjectSource.fileMetadata
-                ) {
-                  console.log(
-                    'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
-                  );
-                  return;
-                }
+          const {
+            wasSaved,
+            fileMetadata,
+          } = await runProjectCreationStepWithTimeout({
+            description: 'save the new project',
+            timeoutMs: projectCreationSaveStepTimeoutMs,
+            operation: () =>
+              onSaveProjectAs(currentProject, newProjectSetup.saveAsLocation, {
+                onStartSaving: () => {
+                  console.log('Start saving as the new project...');
+                },
+                onMoveResources: async ({ newFileMetadata }) => {
+                  console.log('Start moving resources to the new project...');
+                  if (
+                    !sourceStorageProvider ||
+                    !sourceStorageProviderOperations ||
+                    !sourceFileMetadata
+                  ) {
+                    console.log(
+                      'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
+                    );
+                  } else {
+                    await runProjectCreationStepWithTimeout({
+                      description: 'copy the project resources',
+                      timeoutMs: projectCreationSaveStepTimeoutMs,
+                      operation: () =>
+                        ensureResourcesAreMoved({
+                          project: currentProject,
+                          newFileMetadata,
+                          newStorageProvider: newProjectSetup.storageProvider,
+                          newStorageProviderOperations: destinationStorageProviderOperations,
+                          oldFileMetadata: sourceFileMetadata,
+                          oldStorageProvider: sourceStorageProvider,
+                          oldStorageProviderOperations: sourceStorageProviderOperations,
+                          authenticatedUser,
+                        }),
+                    });
+                  }
 
-                await ensureResourcesAreMoved({
-                  project: currentProject,
-                  newFileMetadata,
-                  newStorageProvider: newProjectSetup.storageProvider,
-                  newStorageProviderOperations: destinationStorageProviderOperations,
-                  oldFileMetadata: newProjectSource.fileMetadata,
-                  oldStorageProvider: sourceStorageProvider,
-                  oldStorageProviderOperations: sourceStorageProviderOperations,
-                  authenticatedUser,
-                });
-              },
-            }
-          );
+                  if (
+                    newProjectSetup.storageProvider.internalName === 'LocalFile'
+                  ) {
+                    console.log('Project template files will be copied later.');
+                  }
+
+                  // Resource importing can take long enough for a newer local
+                  // extension generation pass to be queued. This callback is the
+                  // final asynchronous step before the storage provider serializes
+                  // the project, so wait again at the actual serialization
+                  // boundary.
+                  await runProjectCreationStepWithTimeout({
+                    description:
+                      'finish generating the project extensions before saving',
+                    operation: () =>
+                      ensureProjectExtensionsLoaded(currentProject),
+                  });
+                },
+              }),
+          });
 
           if (!wasSaved) {
             return { createdProject: null }; // Saving was cancelled.
@@ -300,6 +478,13 @@ const useCreateProject = ({
 
           if (!fileMetadata) {
             return { createdProject: null };
+          }
+
+          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
+            startOptionalLocalProjectSetup({
+              projectFilePath: fileMetadata.fileIdentifier,
+              templateFilesSource: newProjectSource.templateFilesSource,
+            });
           }
 
           updatedFileMetadata = fileMetadata;
@@ -322,20 +507,25 @@ const useCreateProject = ({
 
         // We were able to load and then save the project. We can now close the dialog,
         // open the project editors and check if leaderboards must be replaced.
-        await afterCreatingProject({
-          project: currentProject,
-          editorTabs,
-          oldProjectId,
-          fileMetadata: updatedFileMetadata,
-          options: {
-            openAllScenes: !!options && options.openAllScenes,
-            openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
-            forceOpenAskAiEditor: !!newProjectSetup.forceOpenAskAiEditor,
-          },
+        await runProjectCreationStepWithTimeout({
+          description: 'open the new project editors',
+          operation: () =>
+            afterCreatingProject({
+              project: currentProject,
+              editorTabs,
+              oldProjectId,
+              fileMetadata: updatedFileMetadata,
+              options: {
+                openAllScenes: !!options && options.openAllScenes,
+                openQuickCustomizationDialog: !!newProjectSetup.openQuickCustomizationDialog,
+                forceOpenAskAiEditor: !!newProjectSetup.forceOpenAskAiEditor,
+              },
+            }),
         });
 
         return { createdProject: currentProject };
       } catch (rawError) {
+        console.error('Unable to create the project:', rawError);
         const { getWriteErrorMessage } = getStorageProviderOperations();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
@@ -343,6 +533,7 @@ const useCreateProject = ({
         showAlert({
           title: t`Unable to create the project`,
           message: errorMessage,
+          details: getProjectCreationErrorDetails(rawError),
         });
 
         onError();
@@ -353,11 +544,11 @@ const useCreateProject = ({
     },
     [
       authenticatedUser,
-      getStorageProvider,
       getStorageProviderOperations,
       loadFromProject,
       onError,
       onProjectSaved,
+      ensureProjectExtensionsLoaded,
       openFromFileMetadata,
       preferences,
       showAlert,
@@ -369,31 +560,67 @@ const useCreateProject = ({
     ]
   );
 
+  const createProjectAfterPreparation = React.useCallback(
+    async ({
+      prepareNewProjectSource,
+      newProjectSetup,
+      options,
+    }: {|
+      prepareNewProjectSource: () => Promise<?NewProjectSource>,
+      newProjectSetup: NewProjectSetup,
+      options?: { openAllScenes: boolean },
+    |}): Promise<CreateProjectResult> => {
+      let didStartProjectCreation = false;
+      try {
+        beforeCreatingProject();
+        const newProjectSource = await runProjectCreationStepWithTimeout({
+          description: 'prepare the new project',
+          operation: prepareNewProjectSource,
+        });
+        didStartProjectCreation = true;
+        return await createProject(newProjectSource, newProjectSetup, options);
+      } catch (error) {
+        if (didStartProjectCreation) throw error;
+
+        console.error('Unable to prepare the new project:', error);
+        showAlert({
+          title: t`Unable to create the project`,
+          message: t`An error occurred when creating the project. Try again later.`,
+          details: getProjectCreationErrorDetails(error),
+        });
+        onError();
+        return { createdProject: null };
+      } finally {
+        if (!didStartProjectCreation) onSuccessOrError();
+      }
+    },
+    [beforeCreatingProject, createProject, onError, onSuccessOrError, showAlert]
+  );
+
   const createEmptyProject = React.useCallback(
     async (newProjectSetup: NewProjectSetup): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const newProjectSource = createNewEmptyProject({
-        creationSource: newProjectSetup.creationSource,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () =>
+          createNewEmptyProject({
+            creationSource: newProjectSetup.creationSource,
+          }),
+        newProjectSetup,
       });
-      return await createProject(newProjectSource, newProjectSetup);
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   const createProjectFromExample = React.useCallback(
     async (
       exampleProjectSetup: ExampleProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const newProjectSource = await createNewProjectFromExampleShortHeader(
-        exampleProjectSetup
-      );
-      return await createProject(
-        newProjectSource,
-        exampleProjectSetup.newProjectSetup
-      );
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: () =>
+          createNewProjectFromExampleShortHeader(exampleProjectSetup),
+        newProjectSetup: exampleProjectSetup.newProjectSetup,
+      });
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   const createProjectFromPrivateGameTemplate = React.useCallback(
@@ -401,32 +628,35 @@ const useCreateProject = ({
       privateGameTemplateListingData: PrivateGameTemplateListingData,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      if (!profile) {
-        throw new Error(
-          'Unable to create the project with the game template because no profile was found.'
-        );
-      }
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          if (!profile) {
+            throw new Error(
+              'Unable to create the project with the game template because no profile was found.'
+            );
+          }
 
-      const token = await getAuthorizationTokenForPrivateGameTemplates(
-        authenticatedUser.getAuthorizationHeader,
-        {
-          userId: profile.id,
-        }
-      );
+          const token = await getAuthorizationTokenForPrivateGameTemplates(
+            authenticatedUser.getAuthorizationHeader,
+            {
+              userId: profile.id,
+            }
+          );
 
-      const privateGameTemplateUrl = await createPrivateGameTemplateUrl(
-        privateGameTemplateListingData,
-        token
-      );
+          const privateGameTemplateUrl = await createPrivateGameTemplateUrl(
+            privateGameTemplateListingData,
+            token
+          );
 
-      const newProjectSource = await createNewProjectFromPrivateGameTemplate(
-        privateGameTemplateUrl,
-        privateGameTemplateListingData.id
-      );
-      return await createProject(newProjectSource, newProjectSetup);
+          return await createNewProjectFromPrivateGameTemplate(
+            privateGameTemplateUrl,
+            privateGameTemplateListingData.id
+          );
+        },
+        newProjectSetup,
+      });
     },
-    [beforeCreatingProject, createProject, profile, authenticatedUser]
+    [authenticatedUser, createProjectAfterPreparation, profile]
   );
 
   const createProjectFromInAppTutorial = React.useCallback(
@@ -434,28 +664,33 @@ const useCreateProject = ({
       tutorialId: string,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
-        tutorialId
-      );
-      if (!selectedInAppTutorialShortHeader) {
-        throw new Error(`No in app tutorial found for id "${tutorialId}"`);
-      }
-      const templateUrl = selectedInAppTutorialShortHeader.initialTemplateUrl;
-      if (!templateUrl) {
-        throw new Error(
-          `No initial template URL for the in-app tutorial "${tutorialId}"`
-        );
-      }
-      const newProjectSource = await createNewProjectFromTutorialTemplate(
-        templateUrl,
-        selectedInAppTutorialShortHeader.id
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+            tutorialId
+          );
+          if (!selectedInAppTutorialShortHeader) {
+            throw new Error(`No in app tutorial found for id "${tutorialId}"`);
+          }
+          const templateUrl =
+            selectedInAppTutorialShortHeader.initialTemplateUrl;
+          if (!templateUrl) {
+            throw new Error(
+              `No initial template URL for the in-app tutorial "${tutorialId}"`
+            );
+          }
+          return await createNewProjectFromTutorialTemplate(
+            templateUrl,
+            selectedInAppTutorialShortHeader.id
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject, getInAppTutorialShortHeader]
+    [createProjectAfterPreparation, getInAppTutorialShortHeader]
   );
 
   const createProjectFromTutorial = React.useCallback(
@@ -463,29 +698,33 @@ const useCreateProject = ({
       tutorialId: string,
       newProjectSetup: NewProjectSetup
     ): Promise<CreateProjectResult> => {
-      beforeCreatingProject();
-      if (!tutorials) {
-        throw new Error(`Tutorials could not be loaded`);
-      }
-      const selectedTutorial = tutorials.find(
-        tutorial => tutorial.id === tutorialId
-      );
-      if (!selectedTutorial) {
-        throw new Error(`No tutorial found for id "${tutorialId}"`);
-      }
-      const { templateUrl } = selectedTutorial;
-      if (!templateUrl) {
-        throw new Error(`No template URL for the tutorial "${tutorialId}"`);
-      }
-      const newProjectSource = await createNewProjectFromTutorialTemplate(
-        templateUrl,
-        tutorialId
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          if (!tutorials) {
+            throw new Error(`Tutorials could not be loaded`);
+          }
+          const selectedTutorial = tutorials.find(
+            tutorial => tutorial.id === tutorialId
+          );
+          if (!selectedTutorial) {
+            throw new Error(`No tutorial found for id "${tutorialId}"`);
+          }
+          const { templateUrl } = selectedTutorial;
+          if (!templateUrl) {
+            throw new Error(`No template URL for the tutorial "${tutorialId}"`);
+          }
+          return await createNewProjectFromTutorialTemplate(
+            templateUrl,
+            tutorialId
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject, tutorials]
+    [createProjectAfterPreparation, tutorials]
   );
 
   const createProjectFromCourseChapter = React.useCallback(
@@ -499,32 +738,36 @@ const useCreateProject = ({
       newProjectSetup: NewProjectSetup,
     |}): Promise<CreateProjectResult> => {
       if (courseChapter.isLocked) return { createdProject: null };
-      beforeCreatingProject();
-      let templateUrl;
-      if (courseChapter.templateUrl) {
-        templateUrl = courseChapter.templateUrl;
-      } else if (courseChapter.templates) {
-        const matchingTemplate = courseChapter.templates.find(
-          template => template.id === templateId
-        );
-        if (matchingTemplate) templateUrl = matchingTemplate.url;
-      }
-      if (!templateUrl) {
-        throw new Error(
-          `No template URL for the course chapter "${
+      return await createProjectAfterPreparation({
+        prepareNewProjectSource: async () => {
+          let templateUrl;
+          if (courseChapter.templateUrl) {
+            templateUrl = courseChapter.templateUrl;
+          } else if (courseChapter.templates) {
+            const matchingTemplate = courseChapter.templates.find(
+              template => template.id === templateId
+            );
+            if (matchingTemplate) templateUrl = matchingTemplate.url;
+          }
+          if (!templateUrl) {
+            throw new Error(
+              `No template URL for the course chapter "${
+                courseChapter.id
+              }" and template id "${templateId || 'undefined'}"`
+            );
+          }
+          return await createNewProjectFromCourseChapterTemplate(
+            templateUrl,
             courseChapter.id
-          }" and template id "${templateId || 'undefined'}"`
-        );
-      }
-      const newProjectSource = await createNewProjectFromCourseChapterTemplate(
-        templateUrl,
-        courseChapter.id
-      );
-      return await createProject(newProjectSource, newProjectSetup, {
-        openAllScenes: true,
+          );
+        },
+        newProjectSetup,
+        options: {
+          openAllScenes: true,
+        },
       });
     },
-    [beforeCreatingProject, createProject]
+    [createProjectAfterPreparation]
   );
 
   return {

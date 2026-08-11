@@ -95,6 +95,10 @@ const styles = {
     paddingLeft: 0, // Remove the default padding of MUI DialogContent.
     paddingRight: 0, // Remove the default padding of MUI DialogContent.
   },
+  dialogContentWithoutScroll: {
+    overflowY: 'hidden',
+    minHeight: 0,
+  },
   flexColumnBody: {
     display: 'flex',
     flexDirection: 'column',
@@ -195,6 +199,7 @@ type DialogProps = {|
   open?: boolean,
   title: React.Node,
   subtitle?: React.Node,
+  titleActions?: React.Node,
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
@@ -249,6 +254,7 @@ type DialogProps = {|
   actionsFullWidthOnMobile?: boolean,
   // Useful when the content of the dialog can change and we want to avoid layout shifts.
   forceScrollVisible?: boolean,
+  disableContentScroll?: boolean,
 
   id?: ?string,
 |};
@@ -266,6 +272,7 @@ const DialogWithoutWindowSizeProvider = ({
   minHeight,
   title,
   subtitle,
+  titleActions,
   fixedContent,
   children,
   flexColumnBody,
@@ -278,6 +285,7 @@ const DialogWithoutWindowSizeProvider = ({
   noPadding,
   actionsFullWidthOnMobile,
   forceScrollVisible,
+  disableContentScroll,
   topBackgroundSrc,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
@@ -334,13 +342,17 @@ const DialogWithoutWindowSizeProvider = ({
     paddingTop: 0, // Let the title container handle the padding, or no padding if there is no title.
     paddingBottom: 0, // Padding with the content is provided by actions, if any.
   };
-  const contentStyle = {
+  const contentStyle: Object = {
     ...styles.dialogContent,
     ...flexStyle,
     ...additionalPaddingStyle,
   };
+  if (disableContentScroll) {
+    contentStyle.overflowY = 'hidden';
+    contentStyle.minHeight = 0;
+  }
 
-  const dialogContainerStyle = {
+  const dialogContainerStyle: Object = {
     ...styles.dialogContainer,
     // Ensure we don't spread an object here, to avoid a styling bug when resizing.
     margin: noPadding
@@ -349,6 +361,9 @@ const DialogWithoutWindowSizeProvider = ({
       ? dialogSmallPadding
       : `${dialogTitlePadding}px ${dialogPaddingX}px ${dialogActionPadding}px ${dialogPaddingX}px`,
   };
+  if (disableContentScroll) {
+    dialogContainerStyle.overflowY = 'hidden';
+  }
 
   const onCloseDialog = React.useCallback(
     (event: any, reason: string) => {
@@ -483,6 +498,9 @@ const DialogWithoutWindowSizeProvider = ({
             </Line>
             <Column noMargin>
               <Line noMargin alignItems="center">
+                {titleActions && (
+                  <div style={styles.closeDialogContainer}>{titleActions}</div>
+                )}
                 {onRequestClose && !cannotBeDismissed && (
                   <div style={styles.closeDialogContainer}>
                     <IconButton

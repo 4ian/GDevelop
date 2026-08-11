@@ -157,7 +157,6 @@ export type EventsBasedEntityPropertyTreeViewItemProps = {|
     existingPropertyNames: string[]
   ) => Promise<boolean>,
   onPropertiesUpdated: () => void,
-  onEventsFunctionsAdded: () => void,
 |};
 
 export const getEventsBasedEntityPropertyTreeViewItemId = (
@@ -249,6 +248,8 @@ export class EventsBasedEntityPropertyTreeViewItemContent
         return 'res/functions/behavior_black.svg';
       case 'Resource':
         return 'res/functions/resource_black.svg';
+      case 'JsonObject':
+        return 'res/actions/var.png';
       default:
         return 'res/functions/string_black.svg';
     }
@@ -319,43 +320,6 @@ export class EventsBasedEntityPropertyTreeViewItemContent
       {
         label: i18n._(t`Duplicate`),
         click: () => this._duplicate(),
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: i18n._(t`Generate expression and action`),
-        click: () => {
-          const {
-            project,
-            extension,
-            eventsBasedBehavior,
-            eventsBasedObject,
-            isSharedProperties,
-            onEventsFunctionsAdded,
-          } = this.props;
-          if (eventsBasedBehavior) {
-            gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
-              project,
-              extension,
-              eventsBasedBehavior,
-              property,
-              isSharedProperties
-            );
-          } else if (eventsBasedObject) {
-            gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
-              project,
-              extension,
-              eventsBasedObject,
-              property
-            );
-          }
-          onEventsFunctionsAdded();
-        },
-        enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-          this.props.eventsBasedEntity,
-          property
-        ),
       },
       ...renderQuickCustomizationMenuItems({
         i18n,

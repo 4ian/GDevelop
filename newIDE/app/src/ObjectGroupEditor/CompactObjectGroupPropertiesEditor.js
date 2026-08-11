@@ -380,7 +380,7 @@ export const CompactObjectGroupPropertiesEditor = ({
                           renderContent={() => (
                             <CompactBehaviorComponent
                               project={project}
-                              behaviorMetadata={behaviorMetadata}
+                              behaviorTypeName={behaviorTypeName}
                               behaviors={behaviors}
                               object={null}
                               layersContainer={layersContainer}

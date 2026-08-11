@@ -3,7 +3,9 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
-import SceneEditor from '../../SceneEditor';
+import SceneEditor, {
+  type SceneEditorSelectionSnapshot,
+} from '../../SceneEditor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -66,6 +68,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
   getProject(): ?gdProject {
     return this.props.project;
+  }
+
+  getEditorSelectionSnapshot(): ?SceneEditorSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
@@ -326,7 +332,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
       },
       () => this.updateToolbar()
     );
-    this.props.onExternalLayoutAssociationChanged();
+    this.props.onExternalAssociationChanged();
   };
 
   openExternalPropertiesDialog = () => {
@@ -415,12 +421,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
             onOpenEventBasedObjectVariantEditor={
               this.props.onOpenEventBasedObjectVariantEditor
             }
-            onObjectEdited={(objectWithContext, hasResourceChanged) =>
-              this.props.onSceneObjectEdited(
-                layout,
-                objectWithContext,
-                hasResourceChanged
-              )
+            onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
+            onOpenPrefabSettings={this.props.onOpenPrefabSettings}
+            onObjectEdited={objectWithContext =>
+              this.props.onSceneObjectEdited(layout, objectWithContext)
             }
             onObjectsDeleted={() => this.props.onSceneObjectsDeleted(layout)}
             // It's only used to refresh events-based object variants.

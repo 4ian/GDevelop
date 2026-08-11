@@ -1,8 +1,9 @@
 // @flow
+import { buildRuntimeApiDeclaration } from '../ProjectsStorage/JavaScriptAuthoringApi';
 
 export const setupAutocompletions = (monaco: any) => {
-  // No autocompletions are implemented in web-app
-  // TODO: Could be provided by a compile time generation of a .d.ts
-  // using TypeScript from the game engine sources, and have a script integrate the .d.ts
-  // into newIDE sources (see LocalCodeEditorAutocompletions).
+  monaco.languages.typescript.javascriptDefaults.addExtraLib(
+    buildRuntimeApiDeclaration(),
+    'gdevelop-runtime-api.d.ts'
+  );
 };

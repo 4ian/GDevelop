@@ -40,6 +40,7 @@ import LayerIcon from '../../UI/CustomSvgIcons/Layers';
 import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
 import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
 import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import { type CompactTextFieldInterface } from '../../UI/CompactTextField';
 
@@ -75,6 +76,9 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
     case 'Boolean':
       return <VariableBooleanIcon className={className} />;
 
+    case 'JsonObject':
+      return <VariableStructureIcon className={className} />;
+
     case 'ObjectAnimationName':
       return <SceneIcon className={className} />;
 
@@ -90,6 +94,28 @@ const renderValueTypeIcon = (type: string, className: string): React.Node => {
     default:
       return null;
   }
+};
+
+const getJsonObjectExampleErrorText = (value: string, i18n: any): ?string => {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return i18n._(t`JSON example is required.`);
+  }
+
+  try {
+    const parsedValue = JSON.parse(trimmedValue);
+    if (
+      !parsedValue ||
+      typeof parsedValue !== 'object' ||
+      Array.isArray(parsedValue)
+    ) {
+      return i18n._(t`Enter a JSON object, for example {"price": 100}.`);
+    }
+  } catch (error) {
+    return i18n._(t`Enter a valid JSON object.`);
+  }
+
+  return null;
 };
 
 export const fillBehaviorProperty = (
@@ -145,6 +171,7 @@ type Props = {|
   behaviorObjectType: string,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  focusedPropertyName?: ?string,
 |};
 
 // Those names are used internally by GDevelop.
@@ -207,6 +234,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
       behaviorObjectType,
       onWillInstallExtension,
       onExtensionInstalled,
+      focusedPropertyName,
     }: Props,
     ref
   ) => {
@@ -324,18 +352,29 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
     propertyRefs.current.clear();
     propertyNameFieldRefs.current.clear();
 
+    const propertyFolderOrProperties = mapVector(
+      properties.getAllPropertyFolderOrProperty(),
+      propertyFolderOrProperty => propertyFolderOrProperty
+    ).filter(propertyFolderOrProperty => {
+      if (!focusedPropertyName) return true;
+      return (
+        !propertyFolderOrProperty.isFolder() &&
+        propertyFolderOrProperty.getProperty().getName() === focusedPropertyName
+      );
+    });
+
+    const hasPropertyToRender = focusedPropertyName
+      ? propertyFolderOrProperties.length > 0
+      : properties.getCount() > 0;
+
     return (
       <I18n>
         {({ i18n }) => (
           <Column noMargin expand useFullHeight noOverflowParent>
-            {properties.getCount() > 0 ? (
+            {hasPropertyToRender ? (
               <Column noMargin expand noOverflowParent>
-                {mapVector(
-                  properties.getAllPropertyFolderOrProperty(),
-                  (
-                    propertyFolderOrProperty: gdPropertyFolderOrProperty,
-                    i: number
-                  ) => {
+                {propertyFolderOrProperties.map(
+                  (propertyFolderOrProperty: gdPropertyFolderOrProperty) => {
                     if (propertyFolderOrProperty.isFolder()) {
                       return (
                         <Text
@@ -470,6 +509,7 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                       key="visibility-hidden"
                                       value="Hidden"
                                       label={t`Hidden`}
+                                      hidden
                                     />
                                   </CompactSelectField>
                                 </Line>
@@ -563,6 +603,11 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                       label={t`Multiline text`}
                                     />
                                     <SelectOption
+                                      key="property-type-json-object"
+                                      value="JsonObject"
+                                      label={t`JSON object`}
+                                    />
+                                    <SelectOption
                                       key="property-type-resource"
                                       value="Resource"
                                       label={t`Resource`}
@@ -642,18 +687,40 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                                 property.getType() === 'ObjectAnimationName' ||
                                 property.getType() === 'KeyboardKey' ||
                                 property.getType() === 'MultilineString' ||
+                                property.getType() === 'JsonObject' ||
                                 property.getType() === 'Layer') && (
                                 <CompactPropertiesEditorRowField
-                                  label={i18n._(t`Default value`)}
+                                  label={
+                                    property.getType() === 'JsonObject'
+                                      ? i18n._(t`JSON example`)
+                                      : i18n._(t`Default value`)
+                                  }
                                   field={
                                     <CompactSemiControlledTextField
                                       commitOnBlur
                                       placeholder={
                                         property.getType() === 'Number'
                                           ? '123'
+                                          : property.getType() === 'JsonObject'
+                                          ? '{"price": 100}'
                                           : 'ABC'
                                       }
                                       value={property.getValue()}
+                                      errored={
+                                        property.getType() === 'JsonObject' &&
+                                        !!getJsonObjectExampleErrorText(
+                                          property.getValue(),
+                                          i18n
+                                        )
+                                      }
+                                      errorText={
+                                        property.getType() === 'JsonObject'
+                                          ? getJsonObjectExampleErrorText(
+                                              property.getValue(),
+                                              i18n
+                                            )
+                                          : null
+                                      }
                                       onChange={newValue => {
                                         property.setValue(newValue);
                                         forceUpdate();
@@ -899,6 +966,12 @@ export const EventsBasedBehaviorOrObjectPropertiesEditor: React.ComponentType<{
                     shouldShowCapabilityBehaviors={true}
                   />
                 )}
+              </Column>
+            ) : focusedPropertyName ? (
+              <Column noMargin justifyContent="center" expand noOverflowParent>
+                <Text align="center" color="secondary">
+                  <Trans>Select a property to see details.</Trans>
+                </Text>
               </Column>
             ) : (
               <Column noMargin justifyContent="center" expand noOverflowParent>

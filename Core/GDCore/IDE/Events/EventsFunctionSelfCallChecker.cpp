@@ -79,7 +79,9 @@ public:
             ParameterMetadata::IsExpression(
                 "string", instrInfos.parameters.GetParameter(pNb).GetType())) {
           auto node = instruction.GetParameter(pNb).GetRootNode();
-          node->Visit(*this);
+          if (node) {
+            node->Visit(*this);
+          }
         }
       }
       StopAnyEventIteration();
@@ -93,12 +95,16 @@ public:
 
   // Handle extra parenthesis.
   void OnVisitSubExpressionNode(SubExpressionNode &node) override {
-    node.expression->Visit(*this);
+    if (node.expression) {
+      node.expression->Visit(*this);
+    }
   }
   void OnVisitOperatorNode(OperatorNode &node) override {}
   // Handle sign that could have been forgotten
   void OnVisitUnaryOperatorNode(UnaryOperatorNode &node) override {
-    node.factor->Visit(*this);
+    if (node.factor) {
+      node.factor->Visit(*this);
+    }
   }
   void OnVisitNumberNode(NumberNode &node) override {}
   void OnVisitTextNode(TextNode &node) override {}

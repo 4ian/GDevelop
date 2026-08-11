@@ -45,6 +45,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
@@ -65,6 +66,51 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
                 "ms");
   return GetTimeNow();
+}
+
+bool ResolveConstantPlaceholdersInString(const gd::Project &project,
+                                         const gd::String &source,
+                                         gd::String &resolvedValue) {
+  gd::String missingPath;
+  if (project.ResolveConstantPlaceholders(source, resolvedValue,
+                                          missingPath)) {
+    return true;
+  }
+
+  gd::LogError("Constant path \"{{" + missingPath +
+               "}}\" does not exist while exporting project data.");
+  return false;
+}
+
+void ResolveConstantPlaceholdersInSerializedData(
+    const gd::Project &project, gd::SerializerElement &element) {
+  if (!element.IsValueUndefined() && element.GetValue().IsString()) {
+    const gd::String &source = element.GetValue().GetRawString();
+    gd::String resolvedValue;
+    if (source.find("{{") != gd::String::npos &&
+        ResolveConstantPlaceholdersInString(project, source,
+                                            resolvedValue)) {
+      element.SetStringValue(resolvedValue);
+    }
+  }
+
+  for (const auto &attribute : element.GetAllAttributes()) {
+    if (attribute.second.IsString()) {
+      const gd::String &source = attribute.second.GetRawString();
+      gd::String resolvedValue;
+      if (source.find("{{") != gd::String::npos &&
+          ResolveConstantPlaceholdersInString(project, source,
+                                              resolvedValue)) {
+        element.SetStringAttribute(attribute.first, resolvedValue);
+      }
+    }
+  }
+
+  for (const auto &child : element.GetAllChildren()) {
+    if (child.second) {
+      ResolveConstantPlaceholdersInSerializedData(project, *child.second);
+    }
+  }
 }
 }  // namespace
 
@@ -313,7 +359,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                                                     includesFiles, runtimeGameOptions);
     ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
                       runtimeGameOptions, options.isInGameEdition,
-                      inGameEditorResources);
+                      inGameEditorResources, options.displayCollisionShapes,
+                      options.displaySignalAnimations);
 
     previousTime = LogTimeSpent("Project data export", previousTime);
   }
@@ -349,13 +396,23 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 gd::String ExporterHelper::ExportProjectData(
     gd::AbstractFileSystem &fs, gd::Project &project, gd::String filename,
     const gd::SerializerElement &runtimeGameOptions, bool isInGameEdition,
-    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+    const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources,
+    bool displayCollisionShapes,
+    bool displaySignalAnimations) {
   fs.MkDir(fs.DirNameFrom(filename));
 
   gd::SerializerElement projectDataElement;
   ExporterHelper::StripAndSerializeProjectData(project, projectDataElement,
                                                 isInGameEdition,
                                                 inGameEditorResources);
+  if (displayCollisionShapes) {
+    projectDataElement.GetChild("properties")
+        .SetAttribute("displayCollisionShapes", true);
+  }
+  if (displaySignalAnimations) {
+    projectDataElement.GetChild("properties")
+        .SetAttribute("displaySignalAnimations", true);
+  }
 
   // Save the project to JSON
   gd::String output =
@@ -560,12 +617,22 @@ void ExporterHelper::SerializeProjectData(gd::AbstractFileSystem &fs,
   ExporterHelper::StripAndSerializeProjectData(clonedProject, rootElement,
                                                 options.isInGameEdition,
                                                 inGameEditorResources);
+  if (options.displayCollisionShapes) {
+    rootElement.GetChild("properties")
+        .SetAttribute("displayCollisionShapes", true);
+  }
+  if (options.displaySignalAnimations) {
+    rootElement.GetChild("properties")
+        .SetAttribute("displaySignalAnimations", true);
+  }
 }
 
 void ExporterHelper::StripAndSerializeProjectData(
     gd::Project &project, gd::SerializerElement &rootElement,
     bool isInGameEdition,
     const std::vector<gd::InGameEditorResourceMetadata> &inGameEditorResources) {
+  project.GetWatermark().ShowGDevelopWatermark(false);
+
   auto projectUsedResources =
       gd::SceneResourcesFinder::FindProjectResources(project);
 
@@ -622,6 +689,7 @@ void ExporterHelper::StripAndSerializeProjectData(
   gd::ProjectStripper::StripProjectForExport(project);
 
   project.SerializeTo(rootElement);
+  ResolveConstantPlaceholdersInSerializedData(project, rootElement);
   SerializeUsedResourcesForRuntime(project, rootElement, projectUsedResources,
                          scenesUsedResources);
   if (isInGameEdition) {
@@ -1120,6 +1188,15 @@ bool ExporterHelper::CompleteIndexFile(
 
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
+    // WebAssembly binaries (e.g. the Draco decoder) are listed as include
+    // files so they get copied next to the game, but they must NOT be added as
+    // `<script>` tags: the browser would try to parse the binary as JavaScript
+    // and throw "SyntaxError: Invalid or unexpected token". They are loaded at
+    // runtime by their own loader (e.g. DRACOLoader fetches the .wasm itself).
+    if (include.size() >= 5 && include.substr(include.size() - 5) == ".wasm") {
+      continue;
+    }
+
     gd::String scriptSrc =
         GetExportedIncludeFilename(fs, gdjsRoot, include, nonRuntimeScriptsCacheBurst);
 
@@ -1165,6 +1242,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "Model3DManager.js");
+  InsertUnique(includesFiles, "ResourcePackManager.js");
   InsertUnique(includesFiles, "ResourceLoader.js");
   InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");
@@ -1179,7 +1257,6 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "layer.js");
   InsertUnique(includesFiles, "RuntimeCustomObjectLayer.js");
   InsertUnique(includesFiles, "timer.js");
-  InsertUnique(includesFiles, "runtimewatermark.js");
   InsertUnique(includesFiles, "runtimegame.js");
   InsertUnique(includesFiles, "variable.js");
   InsertUnique(includesFiles, "variablescontainer.js");
@@ -1197,8 +1274,10 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/commontools.js");
   InsertUnique(includesFiles, "events-tools/variabletools.js");
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
+  InsertUnique(includesFiles, "events-tools/keyboard-key-definitions.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");
+  InsertUnique(includesFiles, "events-tools/signaltools.js");
   InsertUnique(includesFiles, "events-tools/cameratools.js");
   InsertUnique(includesFiles, "events-tools/soundtools.js");
   InsertUnique(includesFiles, "events-tools/storagetools.js");
@@ -1328,6 +1407,17 @@ static std::size_t CountEventsRecursively(const gd::EventsList &events) {
   return count;
 }
 
+static std::size_t CountEventsRecursively(
+    const gd::SceneLifecycleEventsFunctions &lifecycleEventsFunctions) {
+  std::size_t count = 0;
+  lifecycleEventsFunctions.ForEach(
+      [&](gd::SceneLifecycleFunctionRole,
+          const gd::EventsFunction &eventsFunction) {
+        count += CountEventsRecursively(eventsFunction.GetEvents());
+      });
+  return count;
+}
+
 bool ExporterHelper::ExportScenesEventsCode(
     const gd::Project &project,
     gd::String outputDir,
@@ -1354,7 +1444,8 @@ bool ExporterHelper::ExportScenesEventsCode(
     gd::LogStatus(
         "  Scene '" + layout.GetName() + "': " +
         gd::String::From(GetTimeSpent(sceneStartTime)) + "ms, " +
-        gd::String::From(CountEventsRecursively(layout.GetEvents())) +
+        gd::String::From(CountEventsRecursively(
+            layout.GetLifecycleEventsFunctions())) +
         " events, " + gd::String::From(eventsOutput.size() / 1024) +
         " KB generated code");
 

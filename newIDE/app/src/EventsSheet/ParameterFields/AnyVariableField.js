@@ -7,7 +7,7 @@ import VariableField, {
   type VariableFieldInterface,
 } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
-import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
+import UnifiedVariablesDialog from '../../VariablesList/UnifiedVariablesDialog';
 import LocalVariablesDialog from '../../VariablesList/LocalVariablesDialog';
 import {
   type ParameterFieldProps,
@@ -148,7 +148,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               />
             )
           ) : (
-            <GlobalAndSceneVariablesDialog
+            <UnifiedVariablesDialog
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               open
               onCancel={() => setVariableEditorOpen(null)}

@@ -9,6 +9,12 @@
   border-radius: 4px;
 }
 
+.stickyNotesActive {
+  position: relative;
+  border-radius: 4px;
+  background: rgba(255, 214, 102, 0.18);
+}
+
 /* Animated gradient layer behind the button — opacity-only animation is silky smooth. */
 .askAiGlow::before {
   content: '';

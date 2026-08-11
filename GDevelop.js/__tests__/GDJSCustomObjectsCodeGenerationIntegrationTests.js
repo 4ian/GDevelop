@@ -39,6 +39,117 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
     ).toBe('2trueTest');
   });
 
+  it('passes the custom object signal receiver and debug emitter contexts to signal actions', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SubscribeSceneSignal' },
+            parameters: ['', '', '"TestSignal"'],
+          },
+          {
+            type: { value: 'EmitSceneSignal' },
+            parameters: ['', '"TestSignal"', '"payload"', ''],
+          },
+        ],
+      },
+    ]);
+    eventsBasedObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedObject
+    );
+
+    const { gdjs, runtimeScene, object } = generatedCustomObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      { logCode: false }
+    );
+    const subscribeSceneSignal = jest.fn();
+    const emitSceneSignalFromEvents = jest.fn();
+    gdjs.evtTools.signal = {
+      subscribeSceneSignal,
+      emitSceneSignalFromEvents,
+    };
+
+    object.MyFunction();
+
+    expect(subscribeSceneSignal).toHaveBeenCalledWith(
+      runtimeScene,
+      object,
+      'TestSignal'
+    );
+    expect(emitSceneSignalFromEvents).toHaveBeenCalledWith(
+      runtimeScene,
+      'TestSignal',
+      'payload',
+      object
+    );
+  });
+
+  it('logs an error when a custom object JsonObject property value is invalid', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+
+    eventsBasedObject
+      .getPropertyDescriptors()
+      .insertNew('Config', 0)
+      .setValue('{}')
+      .setType('JsonObject');
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const CompiledRuntimeCustomObject = generateCompiledEventsForEventsBasedObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      gdjs,
+      { logCode: false }
+    );
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      new CompiledRuntimeCustomObject(runtimeScene, {
+        type: 'MyExtension::MyCustomObject',
+        content: { Config: 'not-json' },
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Unable to parse JsonObject property Config'),
+        'not-json',
+        expect.any(SyntaxError)
+      );
+    } finally {
+      consoleErrorSpy.mockRestore();
+      project.delete();
+    }
+  });
+
   it('generates a working custom object function with parameters (with different types), all used in an expression ', () => {
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     const extensionModule = generateCompiledEventsForSerializedEventsBasedExtension(
@@ -537,6 +648,70 @@ describe('libGD.js - GDJS Custom Object Code Generation integration tests', func
         .get('MyVariable')
         .getAsNumber()
     ).toBe(456);
+  });
+
+  it('keeps prefab variables isolated from object variables', () => {
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventsFunctionsExtension
+      .getEventsBasedObjects()
+      .insertNew('MyCustomObject', 0);
+
+    eventsBasedObject
+      .getVariables()
+      .insertNew('InternalCounter', 0)
+      .setValue(5);
+
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['InternalCounter', '+', '1'],
+          },
+          {
+            type: { value: 'ModVarObjet' },
+            parameters: ['Object', 'InternalCounter', '+', '1'],
+          },
+        ],
+      },
+    ]);
+    eventsBasedObject
+      .getEventsFunctions()
+      .insertNewEventsFunction('MyFunction', 0)
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+    eventsSerializerElement.delete();
+    gd.WholeProjectRefactorer.ensureObjectEventsFunctionsProperParameters(
+      eventsFunctionsExtension,
+      eventsBasedObject
+    );
+
+    const { runtimeScene, object } = generatedCustomObject(
+      gd,
+      project,
+      eventsFunctionsExtension,
+      eventsBasedObject,
+      { logCode: false }
+    );
+
+    expect(object.getPrefabVariables().has('InternalCounter')).toBe(true);
+    expect(
+      object.getPrefabVariables().get('InternalCounter').getAsNumber()
+    ).toBe(5);
+    expect(object.getVariables().has('InternalCounter')).toBe(false);
+
+    object.MyFunction();
+
+    expect(
+      object.getPrefabVariables().get('InternalCounter').getAsNumber()
+    ).toBe(6);
+    expect(object.getVariables().get('InternalCounter').getAsNumber()).toBe(1);
   });
 
   describe('Child object instance creation', () => {

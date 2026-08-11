@@ -71,7 +71,11 @@ export const pasteEventsFunction = ({
     'unserializeFrom',
     project
   );
+  const sourceFullName = newEventsFunction.getFullName();
   newEventsFunction.setName(newName);
+  if (!sourceFullName || sourceFullName === name) {
+    newEventsFunction.setFullName(newName);
+  }
   newEventsFunction.setGroup(groupPath);
   if (isTargetFreeFunction) {
     // The Object parameter of custom object or behavior functions must be
@@ -89,7 +93,8 @@ export const pasteEventsFunction = ({
 
 export const getFunctionIconUrl = (
   functionType: EventsFunction_FunctionType,
-  functionName?: string | null
+  functionName?: string | null,
+  containerType?: 'extension' | 'behavior' | 'object'
 ): string => {
   switch (functionType) {
     default:
@@ -101,6 +106,7 @@ export const getFunctionIconUrl = (
           return 'res/functions/action_black.svg';
 
         case 'onSceneUnloading':
+        case 'sceneUnload':
         case 'onDestroy':
           return 'res/functions/destroy_black.svg';
 
@@ -114,11 +120,19 @@ export const getFunctionIconUrl = (
 
         case 'onScenePreEvents':
         case 'onScenePostEvents':
+        case 'sceneUpdate':
         case 'doStepPreEvents':
         case 'doStepPostEvents':
           return 'res/functions/step_black.svg';
 
+        case 'sceneSignal':
+        case 'onSignal':
+          return containerType === 'behavior'
+            ? 'res/functions/action_black.svg'
+            : 'res/functions/signal_black.svg';
+
         case 'onSceneLoaded':
+        case 'sceneLoad':
         case 'onFirstSceneLoaded':
         case 'onCreated':
           return 'res/functions/create_black.svg';
@@ -149,6 +163,11 @@ export type EventsFunctionCallbacks = {|
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
     selectedEventsBasedObject: ?gdEventsBasedObject
   ) => void,
+  onOpenEventsFunctionSettings: (
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject
+  ) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
@@ -170,6 +189,7 @@ export type EventsFunctionCallbacks = {|
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject
   ) => void,
+  onEventsFunctionMetadataChanged: () => void,
 |};
 
 export type EventFunctionCommonProps = {|
@@ -205,13 +225,17 @@ export const canFunctionBeRenamed = (
   containerType: 'extension' | 'behavior' | 'object'
 ): boolean => {
   const name = eventsFunction.getName();
+  const isOnSignalLifecycleEventsFunction = name === 'onSignal';
   if (containerType === 'behavior') {
     return !gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
       name
     );
   }
   if (containerType === 'object') {
-    return !gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(name);
+    return !(
+      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(name) ||
+      isOnSignalLifecycleEventsFunction
+    );
   }
   return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(name);
 };
@@ -282,7 +306,12 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     return getFunctionIconUrl(
       eventsFunction.getFunctionType(),
-      eventsFunction.getName()
+      eventsFunction.getName(),
+      this.getEventsBasedBehavior()
+        ? 'behavior'
+        : this.getEventsBasedObject()
+        ? 'object'
+        : 'extension'
     );
   }
 
@@ -345,6 +374,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     } = this.props;
 
     return [
+      {
+        label: i18n._(t`Function settings`),
+        click: () =>
+          this.props.onOpenEventsFunctionSettings(
+            eventsFunction,
+            eventsBasedBehavior,
+            eventsBasedObject
+          ),
+      },
       {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
@@ -455,13 +493,15 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
   _togglePrivate(): void {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
-    this.props.forceUpdateEditor();
+    this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
   }
 
   _toggleAsync(): void {
     const eventsFunction = this.functionFolderOrFunction.getFunction();
     eventsFunction.setAsync(!eventsFunction.isAsync());
-    this.props.forceUpdateEditor();
+    this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
   }
 
   delete(): void {
@@ -491,6 +531,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
       this._onEventsFunctionModified();
+      this.props.onEventsFunctionMetadataChanged();
     });
   }
 
@@ -545,6 +586,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     );
 
     this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
     this.props.onSelectEventsFunction(
       newEventsFunction,
       this.props.eventsBasedBehavior,
@@ -563,7 +605,11 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       eventsFunction,
       eventsFunctionsContainer.getEventsFunctionsCount()
     );
+    const sourceFullName = newEventsFunction.getFullName();
     newEventsFunction.setName(newName);
+    if (!sourceFullName || sourceFullName === eventsFunction.getName()) {
+      newEventsFunction.setFullName(newName);
+    }
     const newFunctionFolderOrFunction = eventsFunctionsContainer
       .getRootFolder()
       .getFunctionNamed(newName);
@@ -574,9 +620,14 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
         this.functionFolderOrFunction.getParent(),
         this.getIndex() + 1
       );
-    this.props.onEventsFunctionAdded(newEventsFunction);
+    this.props.onEventsFunctionAdded(
+      newEventsFunction,
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject
+    );
 
     this._onEventsFunctionModified();
+    this.props.onEventsFunctionMetadataChanged();
     this.props.onSelectEventsFunction(
       newEventsFunction,
       this.props.eventsBasedBehavior,

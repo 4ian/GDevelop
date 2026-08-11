@@ -12,9 +12,11 @@ import {
 } from './ResourceSource';
 import {} from '../Utils/GDevelopServices/Asset';
 import { ResourceStore } from '../AssetStore/ResourceStore';
-import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
+import {
+  DEFAULT_IMPORTED_RESOURCES_FOLDER,
+  copyAllToProjectFolder,
+} from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
-import Window from '../Utils/Window';
 import {
   copyAllEmbeddedResourcesToProjectFolder,
   embeddedResourcesParsers,
@@ -31,6 +33,7 @@ import ProjectResourcesChooser from './ProjectResources/ProjectResourcesChooser'
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
+const fs = optionalRequire('fs');
 
 const ResourceStoreChooser = ({
   options,
@@ -66,7 +69,6 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath,
         project,
         options,
-        resourcesImporationBehavior,
       }: ChooseResourceProps) => {
         if (!dialog)
           throw new Error('Electron dialog not supported in this environment.');
@@ -75,8 +77,19 @@ const localResourceSources: Array<ResourceSource> = [
         if (options.multiSelection) properties.push('multiSelections');
 
         const projectPath = path.dirname(project.getProjectFile());
+        const defaultLocalFileDialogPath = options.defaultLocalFileDialogFolder
+          ? path.join(projectPath, options.defaultLocalFileDialogFolder)
+          : null;
+        if (defaultLocalFileDialogPath && fs) {
+          await fs.promises.mkdir(defaultLocalFileDialogPath, {
+            recursive: true,
+          });
+        }
         // $FlowFixMe[incompatible-type]
-        const latestPath = getLastUsedPath(project, kind) || projectPath;
+        const latestPath =
+          defaultLocalFileDialogPath ||
+          getLastUsedPath(project, kind) ||
+          projectPath;
 
         const browserWindow = remote.getCurrentWindow();
         let { filePaths } = await dialog.showOpenDialog(browserWindow, {
@@ -93,9 +106,8 @@ const localResourceSources: Array<ResourceSource> = [
         // $FlowFixMe[incompatible-type]
         setLastUsedPath(project, kind, lastUsedPath);
 
-        let hasFilesOutsideProjectFolder = filePaths.some(
-          path => !isPathInProjectFolder(project, path)
-        );
+        const importedResourcesFolder =
+          options.importedResourcesFolder || DEFAULT_IMPORTED_RESOURCES_FOLDER;
 
         // Some resources, like tilemaps, can have references to other files.
         // We parse these files, optionally copy them, then create a mapping from the previous file name
@@ -137,44 +149,25 @@ const localResourceSources: Array<ResourceSource> = [
               await recursivelyParseEmbeddedResources(embeddedResources);
 
               filesWithEmbeddedResources.set(filePath, embeddedResources);
-
-              if (embeddedResources.hasAnyEmbeddedResourceOutsideProjectFolder)
-                hasFilesOutsideProjectFolder = true;
             }
           }
         }
 
-        // Check if files should be copied in the project folder.
+        // Copy files into the project assets folder.
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
-        if (hasFilesOutsideProjectFolder) {
-          let answer: boolean;
+        filePaths = await copyAllToProjectFolder(
+          project,
+          filePaths,
+          newToOldFilePaths,
+          importedResourcesFolder
+        );
 
-          if (resourcesImporationBehavior === 'relative') {
-            answer = false;
-          } else if (resourcesImporationBehavior === 'import') {
-            answer = true;
-          } else {
-            answer = Window.showConfirmDialog(
-              i18n._(
-                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-              )
-            );
-          }
-
-          if (answer) {
-            filePaths = await copyAllToProjectFolder(
-              project,
-              filePaths,
-              newToOldFilePaths
-            );
-
-            await copyAllEmbeddedResourcesToProjectFolder(
-              project,
-              filesWithEmbeddedResources
-            );
-          }
-        }
+        await copyAllEmbeddedResourcesToProjectFolder(
+          project,
+          filesWithEmbeddedResources,
+          importedResourcesFolder
+        );
 
         // In case of resources embedded inside others,
         // create a mapping from the file name
@@ -369,6 +362,7 @@ const localResourceSources: Array<ResourceSource> = [
           resourceKind={kind}
           key={`project-resources-${kind}`}
           multiSelection={props.options.multiSelection}
+          includeProjectAssetsFolder={props.options.includeProjectAssetsFolder}
         />
       ),
       renderPrimaryAction: ({

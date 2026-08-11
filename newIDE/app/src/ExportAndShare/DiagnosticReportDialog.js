@@ -22,6 +22,7 @@ import {
   groupValidationErrors,
   type ValidationError,
 } from '../Utils/EventsValidationScanner';
+import { isConstantPlaceholderDiagnostic } from '../Utils/ConstantPlaceholderDiagnostics';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import Link from '../UI/Link';
 import IconButton from '../UI/IconButton';
@@ -30,6 +31,11 @@ import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import type { EventPath } from '../Utils/EventPath';
 
 const gd: libGDevelop = global.gd;
+
+const getValidationErrorLocationLabel = (error: ValidationError): string =>
+  `${error.locationType}: ${error.locationName}${
+    error.lifecycleFunctionName ? ` / ${error.lifecycleFunctionName}` : ''
+  }`;
 
 const styles = {
   table: {
@@ -98,8 +104,11 @@ const InvalidParameterRow = ({
 }: InvalidParameterRowProps) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const typeLabel = error.isCondition ? 'Condition' : 'Action';
+  const displayedSentence = error.diagnosticMessage
+    ? `${error.diagnosticMessage} (${error.instructionSentence})`
+    : error.instructionSentence;
   const couldBeTruncated =
-    error.instructionSentence.length > TRUNCATION_THRESHOLD_CHARS;
+    displayedSentence.length > TRUNCATION_THRESHOLD_CHARS;
 
   return (
     <TableRow
@@ -111,7 +120,7 @@ const InvalidParameterRow = ({
       <TableRowColumn style={styles.locationCell}>
         <div style={styles.locationText}>
           <Link href="#" onClick={() => navigateToError(error)}>
-            {`${error.locationType}: ${error.locationName}`}
+            {getValidationErrorLocationLabel(error)}
           </Link>
         </div>
       </TableRowColumn>
@@ -129,13 +138,11 @@ const InvalidParameterRow = ({
               couldBeTruncated ? () => setIsExpanded(!isExpanded) : undefined
             }
             title={
-              couldBeTruncated && !isExpanded
-                ? error.instructionSentence
-                : undefined
+              couldBeTruncated && !isExpanded ? displayedSentence : undefined
             }
           >
             <span style={styles.typeLabel}>{typeLabel}</span>{' '}
-            {error.instructionSentence}
+            {displayedSentence}
           </div>
           {couldBeTruncated && (
             <div style={styles.expandButtonContainer}>
@@ -171,12 +178,12 @@ const InvalidParametersSection = ({
   return (
     <ColumnStackLayout noMargin>
       <Text size="block-title">
-        <Trans>Invalid parameters in events ({invalidParametersCount})</Trans>
+        <Trans>Invalid events</Trans> ({invalidParametersCount})
       </Text>
       <AlertMessage kind="error">
         <Trans>
-          The following events have invalid parameters (shown with red underline
-          in the events sheet). Click a location to navigate there.
+          The following events have validation errors. Click a location to
+          navigate there.
         </Trans>
       </AlertMessage>
       {/* $FlowFixMe[incompatible-type] */}
@@ -216,10 +223,15 @@ type Props = {|
   project: gdProject,
   wholeProjectDiagnosticReport: gdWholeProjectDiagnosticReport,
   onClose: () => void,
-  onNavigateToLayoutEvent: (layoutName: string, eventPath: EventPath) => void,
+  onNavigateToLayoutEvent: (
+    layoutName: string,
+    eventPath: EventPath,
+    lifecycleFunctionName?: string
+  ) => void,
   onNavigateToExternalEventsEvent: (
     externalEventsName: string,
-    eventPath: EventPath
+    eventPath: EventPath,
+    lifecycleFunctionName?: string
   ) => void,
   onNavigateToExtensionEvent: ({|
     extensionName: string,
@@ -282,9 +294,17 @@ export default function DiagnosticReportDialog({
     (error: ValidationError) => {
       onClose();
       if (error.locationType === 'scene') {
-        onNavigateToLayoutEvent(error.locationName, error.eventPath);
+        onNavigateToLayoutEvent(
+          error.locationName,
+          error.eventPath,
+          error.lifecycleFunctionName
+        );
       } else if (error.locationType === 'external-events') {
-        onNavigateToExternalEventsEvent(error.locationName, error.eventPath);
+        onNavigateToExternalEventsEvent(
+          error.locationName,
+          error.eventPath,
+          error.lifecycleFunctionName
+        );
       } else if (
         error.locationType === 'extension' &&
         error.extensionName &&
@@ -319,12 +339,19 @@ export default function DiagnosticReportDialog({
     (diagnosticReport: gdDiagnosticReport) => {
       // TODO Generalize error aggregation when enough errors are handled to have a clearer view.
       const missingSceneVariables = new Set<string>();
+      const missingConstantPlaceholders = new Set<string>();
       const unknownObjects = new Set<string>();
       const mismatchedTypeObjects = new Set<string>();
+      const unsafeExternalLayouts = new Set<string>();
       const missingObjectVariablesByObject = new Map<string, Set<string>>();
       const missingBehaviorsByObjects = new Map<string, Set<string>>();
       mapFor(0, diagnosticReport.count(), index => {
         const projectDiagnostic = diagnosticReport.get(index);
+
+        if (isConstantPlaceholderDiagnostic(projectDiagnostic)) {
+          missingConstantPlaceholders.add(projectDiagnostic.getActualValue());
+          return;
+        }
 
         const objectName = projectDiagnostic.getObjectName();
         const type = projectDiagnostic.getType();
@@ -360,6 +387,10 @@ export default function DiagnosticReportDialog({
 
           case gd.ProjectDiagnostic.MismatchedObjectType:
             mismatchedTypeObjects.add(objectName);
+            break;
+
+          case gd.ProjectDiagnostic.UnsafeExternalLayoutCreation:
+            unsafeExternalLayouts.add(projectDiagnostic.getActualValue());
             break;
 
           default:
@@ -438,6 +469,24 @@ export default function DiagnosticReportDialog({
                   </TableRowColumn>
                 </TableRow>
               )}
+              {missingConstantPlaceholders.size > 0 && (
+                <TableRow
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>Missing constants values</Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      {[...missingConstantPlaceholders].join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
+              )}
               {[...missingObjectVariablesByObject.entries()].map(
                 ([objectName, missingVariables]) => (
                   <TableRow
@@ -460,6 +509,29 @@ export default function DiagnosticReportDialog({
                     </TableRowColumn>
                   </TableRow>
                 )
+              )}
+              {unsafeExternalLayouts.size > 0 && (
+                <TableRow
+                  key={`unsafe-external-layout-creation`}
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
+                  <TableRowColumn>
+                    <Text size="body">
+                      <Trans>External layout creation without conditions</Trans>
+                    </Text>
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    <Text size="body" allowSelection>
+                      <Trans>
+                        Add a condition, for example "At the beginning of the
+                        scene", before creating objects from an external layout.
+                      </Trans>{' '}
+                      {[...unsafeExternalLayouts].filter(Boolean).join(', ')}
+                    </Text>
+                  </TableRowColumn>
+                </TableRow>
               )}
               {[...missingBehaviorsByObjects.entries()].map(
                 ([objectName, missingBehaviors]) => (
@@ -598,15 +670,11 @@ export default function DiagnosticReportDialog({
                       <TableRowColumn>
                         {[
                           ...new Set(
-                            errors.map(
-                              e => `${e.locationType}: ${e.locationName}`
-                            )
+                            errors.map(e => getValidationErrorLocationLabel(e))
                           ),
                         ].map(location => {
                           const error = errors.find(
-                            e =>
-                              `${e.locationType}: ${e.locationName}` ===
-                              location
+                            e => getValidationErrorLocationLabel(e) === location
                           );
                           return (
                             <LineStackLayout key={location} noMargin>

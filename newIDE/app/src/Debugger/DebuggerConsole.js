@@ -18,6 +18,8 @@ import MiniToolbar from '../UI/MiniToolbar';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import Checkbox from '../UI/Checkbox';
+import InfoBar from '../UI/Messages/InfoBar';
+import { copyTextToClipboard } from '../Utils/Clipboard';
 
 import TimerIcon from '@material-ui/icons/Timer';
 
@@ -26,10 +28,12 @@ import WarningIcon from '../UI/CustomSvgIcons/Warning';
 import ErrorIcon from '../UI/CustomSvgIcons/Error';
 import FilterIcon from '../UI/CustomSvgIcons/Filter';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
 import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
 import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
 import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
 import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
+import CopyIcon from '../UI/CustomSvgIcons/Copy';
 
 export type Log = {
   message: string,
@@ -52,14 +56,14 @@ export class LogsManager {
   _pendingCommit: boolean = false;
 
   _commitLogs() {
-    this.logs.unshift(...this._pendingLogs);
+    this.logs.push(...this._pendingLogs);
     this._pendingLogs.length = 0;
     this._pendingCommit = false;
     this._onNewLog.forEach(f => f());
   }
 
   addLog(log: Log) {
-    this._pendingLogs.unshift(log);
+    this._pendingLogs.push(log);
     if (!this.groups.has(log.group)) {
       this.groups.add(log.group);
       this._onNewGroup.forEach(f => f());
@@ -69,6 +73,12 @@ export class LogsManager {
       setTimeout(this._commitLogs.bind(this), 200);
       this._pendingCommit = true;
     }
+  }
+
+  clearLogs() {
+    this.logs.length = 0;
+    this._pendingLogs.length = 0;
+    this._onNewLog.forEach(f => f());
   }
 
   on(event: 'group' | 'log', handler: () => void) {
@@ -96,9 +106,15 @@ const styles = {
     overflowY: 'scroll',
   },
   tag: { marginRight: 2 },
+  consoleMessageLine: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    width: '100%',
+  },
   consoleTextArea: {
     ...selectableTextStyle,
-    width: '100%',
+    flex: 1,
+    minWidth: 0,
     backgroundColor: '#292929',
     borderRadius: '4px',
     border: '1px solid slategray',
@@ -153,21 +169,32 @@ export const DebuggerConsole = ({
         defaultHeight: 45,
         minHeight: 25,
         fixedWidth: true,
-        // Inverse index so that each log always
-        // get assigned the same ID despite all indices
-        // shifting when a log is added.
-        keyMapper: index => logs.length - index,
       }),
-    [logs]
+    []
   );
 
   const [hideInternal, setHideInternal] = React.useState(false);
-  const [showDetails, _setShowDetails] = React.useState(true);
-  const setShowDetails = (show: boolean) => {
-    _setShowDetails(show);
+  const [hideDetails, _setHideDetails] = React.useState(true);
+  const setHideDetails = (hide: boolean) => {
+    _setHideDetails(hide);
     // As the size of the cells have changed, clear the measurer cache to allow remeasuring them.
     cellMeasurerCache.clearAll();
   };
+  const clearLogs = React.useCallback(
+    () => {
+      logsManager.clearLogs();
+      cellMeasurerCache.clearAll();
+      forceUpdate();
+    },
+    [cellMeasurerCache, forceUpdate, logsManager]
+  );
+  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
+  const copyLogMessage = React.useCallback((message: string) => {
+    copyTextToClipboard(message).then(
+      () => setShowCopiedInfoBar(true),
+      () => {}
+    );
+  }, []);
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
   const hiddenGroups = React.useRef(new Set<string>()).current;
@@ -211,70 +238,82 @@ export const DebuggerConsole = ({
                 style={styles.list}
                 rowCount={filteredLogs.length}
                 rowHeight={cellMeasurerCache.rowHeight}
-                rowRenderer={({ index, key, parent, style }) => (
-                  <CellMeasurer
-                    cache={cellMeasurerCache}
-                    columnIndex={0}
-                    key={key}
-                    parent={parent}
-                    rowIndex={index}
-                  >
-                    {({ registerChild }) => (
-                      <div
-                        key={key}
-                        style={{
-                          ...style,
-                          padding: 2,
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                        }}
-                        ref={registerChild}
-                      >
-                        <Column noMargin>
-                          {iconMap[filteredLogs[index].type] || iconMap['info']}
-                        </Column>
-                        <Spacer />
-                        <Column noMargin expand>
-                          <Line noMargin>
-                            <div style={styles.consoleTextArea}>
-                              {filteredLogs[index].message}
+                scrollToAlignment="end"
+                scrollToIndex={filteredLogs.length - 1}
+                rowRenderer={({ index, key, parent, style }) => {
+                  const log = filteredLogs[index];
+                  return (
+                    <CellMeasurer
+                      cache={cellMeasurerCache}
+                      columnIndex={0}
+                      key={key}
+                      parent={parent}
+                      rowIndex={index}
+                    >
+                      {({ registerChild }) => (
+                        <div
+                          key={key}
+                          style={{
+                            ...style,
+                            padding: 2,
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                          }}
+                          ref={registerChild}
+                        >
+                          <Column noMargin>
+                            {iconMap[log.type] || iconMap['info']}
+                          </Column>
+                          <Spacer />
+                          <Column noMargin expand>
+                            <div style={styles.consoleMessageLine}>
+                              <div style={styles.consoleTextArea}>
+                                {log.message}
+                              </div>
+                              <IconButton
+                                tooltip={t`Copy log message`}
+                                onClick={() => copyLogMessage(log.message)}
+                                size="small"
+                                style={{
+                                  width: 24,
+                                  height: 24,
+                                  padding: 4,
+                                  marginLeft: 4,
+                                }}
+                              >
+                                <CopyIcon fontSize="small" />
+                              </IconButton>
                             </div>
-                          </Line>
-                          {showDetails && (
-                            <>
-                              <Spacer />
-                              <Line noMargin>
-                                {filteredLogs[index].group ? (
+                            {!hideDetails && (
+                              <>
+                                <Spacer />
+                                <Line noMargin>
+                                  {log.group ? (
+                                    <Tag
+                                      icon={<FolderIcon />}
+                                      label={<Trans>Group: {log.group}</Trans>}
+                                    />
+                                  ) : null}
                                   <Tag
-                                    icon={<FolderIcon />}
+                                    icon={<TimerIcon />}
                                     label={
                                       <Trans>
-                                        Group: {filteredLogs[index].group}
+                                        Timestamp:{' '}
+                                        {Math.round(log.timestamp * 1000) /
+                                          1000000 +
+                                          's'}
                                       </Trans>
                                     }
                                   />
-                                ) : null}
-                                <Tag
-                                  icon={<TimerIcon />}
-                                  label={
-                                    <Trans>
-                                      Timestamp:{' '}
-                                      {Math.round(
-                                        filteredLogs[index].timestamp * 1000
-                                      ) /
-                                        1000000 +
-                                        's'}
-                                    </Trans>
-                                  }
-                                />
-                              </Line>
-                            </>
-                          )}
-                        </Column>
-                      </div>
-                    )}
-                  </CellMeasurer>
-                )}
+                                </Line>
+                              </>
+                            )}
+                          </Column>
+                        </div>
+                      )}
+                    </CellMeasurer>
+                  );
+                }}
               />
             );
           }}
@@ -283,17 +322,11 @@ export const DebuggerConsole = ({
       <MiniToolbar>
         <Line justifyContent="space-between" alignItems="center" noMargin>
           <Checkbox
-            label={
-              showDetails ? (
-                <Trans>Hide details</Trans>
-              ) : (
-                <Trans>Show details</Trans>
-              )
-            }
+            label={<Trans>Hide details</Trans>}
             checkedIcon={<MinimizeIcon />}
             uncheckedIcon={<MaximizeIcon />}
-            checked={showDetails}
-            onCheck={(_, enabled) => setShowDetails(enabled)}
+            checked={hideDetails}
+            onCheck={(_, enabled) => setHideDetails(enabled)}
           />
           <Checkbox
             label={<Trans>Show internal</Trans>}
@@ -310,8 +343,22 @@ export const DebuggerConsole = ({
           >
             <FilterIcon />
           </IconButton>
+          <FlatButton
+            label={<Trans>Clear logs</Trans>}
+            leftIcon={<TrashIcon />}
+            onClick={clearLogs}
+            disabled={!logs.length}
+            noBackground
+            noBorder
+          />
         </Line>
       </MiniToolbar>
+
+      <InfoBar
+        message={<Trans>Copied to clipboard!</Trans>}
+        visible={showCopiedInfoBar}
+        hide={() => setShowCopiedInfoBar(false)}
+      />
 
       {editingHiddenGroups && (
         <Dialog

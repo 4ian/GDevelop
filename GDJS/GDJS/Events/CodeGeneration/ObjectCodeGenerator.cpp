@@ -8,8 +8,85 @@
 #include "EventsCodeGenerator.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Tools/Log.h"
 
 namespace gdjs {
+
+namespace {
+gd::String ResolveProjectConstantPlaceholders(
+    const gd::Project& project,
+    const gd::String& value) {
+  gd::String resolvedValue;
+  gd::String missingPath;
+  if (project.ResolveConstantPlaceholders(
+          value, resolvedValue, missingPath)) {
+    return resolvedValue;
+  }
+
+  gd::LogError("Constant path \"{{" + missingPath +
+               "}}\" does not exist while generating object property code.");
+  return value;
+}
+
+gd::String GenerateEmptyStructureVariableCode() {
+  return "(() => { const variable = new gdjs.Variable(); "
+         "variable.castTo(\"structure\"); return variable; })()";
+}
+
+gd::String GenerateVariableFromValueCode(const gd::String& valueCode,
+                                         const gd::String& propertyName) {
+  return gd::String(R"jscode_template((() => {
+    const variable = new gdjs.Variable();
+    const value = VALUE_CODE;
+    const propertyName = PROPERTY_NAME;
+    const reportInvalidValue = (error) => {
+      if (typeof console !== "undefined" && console.error) {
+        console.error(
+          "Unable to parse JsonObject property " + propertyName +
+            ". Expected a JSON object or array.",
+          value,
+          error
+        );
+      }
+    };
+    if (typeof value === "string") {
+      try {
+        const parsedValue = JSON.parse(value);
+        if (parsedValue === null || typeof parsedValue !== "object") {
+          reportInvalidValue();
+          variable.castTo("structure");
+        } else {
+          variable.fromJSObject(parsedValue);
+        }
+      } catch (error) {
+        reportInvalidValue(error);
+        variable.castTo("structure");
+      }
+    } else if (value === null || typeof value !== "object") {
+      reportInvalidValue();
+      variable.castTo("structure");
+    } else {
+      variable.fromJSObject(value);
+    }
+    return variable;
+  })())jscode_template")
+      .FindAndReplace("VALUE_CODE", valueCode)
+      .FindAndReplace(
+          "PROPERTY_NAME",
+          EventsCodeGenerator::ConvertToStringExplicit(propertyName));
+}
+
+gd::String GenerateVariableFromJsonValueCode(const gd::String& value,
+                                             const gd::String& propertyName) {
+  gd::String trimmedValue = value;
+  if (trimmedValue.Trim().empty()) {
+    return GenerateEmptyStructureVariableCode();
+  }
+
+  return GenerateVariableFromValueCode(
+      EventsCodeGenerator::ConvertToStringExplicit(value), propertyName);
+}
+}  // namespace
 
 gd::String ObjectCodeGenerator::onCreatedFunctionName =
     "onCreated";
@@ -261,10 +338,18 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
 // TODO these 2 methods are probably not needed if the properties are merged by GDJS.
 gd::String ObjectCodeGenerator::GenerateInitializePropertyFromDataCode(
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String defaultValueCode =
+      GeneratePropertyValueCode(property);
+  const gd::String dataValueCode =
+      "objectData.content." + property.GetName() +
+      " !== undefined ? objectData.content." + property.GetName() + " : " +
+      defaultValueCode;
   return gd::String(R"jscode_template(
-    this._objectData.PROPERTY_NAME = objectData.content.PROPERTY_NAME !== undefined ? objectData.content.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+    this._objectData.PROPERTY_NAME = RESOLVED_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "RESOLVED_VALUE",
+          GeneratePropertyValueResolutionCode(property, dataValueCode));
 }
 gd::String
 ObjectCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
@@ -272,7 +357,9 @@ ObjectCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
   return gd::String(R"jscode_template(
     this._objectData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+      .FindAndReplace(
+          "DEFAULT_VALUE",
+          GeneratePropertyValueCode(property));
 }
 
 gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
@@ -290,7 +377,9 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectPropertyTemplateCode(
                       GetObjectPropertyGetterName(property.GetName()))
       .FindAndReplace("SETTER_NAME",
                       GetObjectPropertySetterName(property.GetName()))
-      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
+      .FindAndReplace(
+          "DEFAULT_VALUE",
+          GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_OBJECT_CLASSNAME",
                       eventsBasedObject.GetName())
       .FindAndReplace(
@@ -318,28 +407,64 @@ gd::String ObjectCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
 gd::String ObjectCodeGenerator::GenerateUpdatePropertyFromObjectDataCode(
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::NamedPropertyDescriptor& property) {
+  const gd::String newValueCode = GeneratePropertyValueResolutionCode(
+      property,
+      "newObjectData.content." + property.GetName());
   return gd::String(R"jscode_template(
     if (oldObjectData.content.PROPERTY_NAME !== newObjectData.content.PROPERTY_NAME)
-      this._objectData.PROPERTY_NAME = newObjectData.content.PROPERTY_NAME;)jscode_template")
-      .FindAndReplace("PROPERTY_NAME", property.GetName());
+      this._objectData.PROPERTY_NAME = RESOLVED_NEW_VALUE;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("RESOLVED_NEW_VALUE", newValueCode);
 }
 
 gd::String ObjectCodeGenerator::GeneratePropertyValueCode(
-    const gd::PropertyDescriptor& property) {
+    const gd::NamedPropertyDescriptor& property) {
   const auto &primitiveType = gd::ValueTypeMetadata::GetPrimitiveValueType(
       gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
           property.GetType()));
+  const bool isJsonObjectProperty = property.GetType() == "JsonObject";
+  const gd::String propertyValue =
+      ResolveProjectConstantPlaceholders(project, property.GetValue());
+
+  if (isJsonObjectProperty) {
+    return GenerateVariableFromJsonValueCode(propertyValue, property.GetName());
+  }
+
   if (primitiveType == "string") {
-    return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
+    return EventsCodeGenerator::ConvertToStringExplicit(propertyValue);
   } else if (primitiveType == "number") {
     return "Number(" +
-           EventsCodeGenerator::ConvertToStringExplicit(property.GetValue()) +
+           EventsCodeGenerator::ConvertToStringExplicit(propertyValue) +
            ") || 0";
   } else if (primitiveType == "boolean") { // TODO: Check if working
-    return property.GetValue() == "true" ? "true" : "false";
+    return propertyValue == "true" || propertyValue == "1" ? "true" : "false";
   }
 
   return "0 /* Error: property was of an unrecognized type */";
+}
+
+gd::String ObjectCodeGenerator::GeneratePropertyValueResolutionCode(
+    const gd::NamedPropertyDescriptor& property,
+    const gd::String& valueCode) {
+  const auto &valueType =
+      gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(property.GetType());
+  const auto &primitiveType =
+      gd::ValueTypeMetadata::GetPrimitiveValueType(valueType);
+
+  if (property.GetType() == "JsonObject") {
+    return GenerateVariableFromValueCode(valueCode, property.GetName());
+  } else if (primitiveType == "string" || valueType == "behavior") {
+    return "(" + valueCode + " === undefined || " + valueCode +
+           " === null ? \"\" : \"\" + " + valueCode + ")";
+  } else if (primitiveType == "number") {
+    return "(Number(" + valueCode + ") || 0)";
+  } else if (primitiveType == "boolean") {
+    return "(" + valueCode + " === true || " + valueCode +
+           " === 1 || " + valueCode + " === \"true\" || " + valueCode +
+           " === \"1\")";
+  }
+
+  return valueCode;
 }
 
 gd::String ObjectCodeGenerator::GenerateDefaultDoStepPreEventsFunctionCode(

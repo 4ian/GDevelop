@@ -279,6 +279,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
   }, []);
 
   const displayAsFolder = node.canHaveChildren;
+  const itemContent = ((node.item: any).content: any);
+  const hasCustomDragItem = !!(itemContent && itemContent.getDragItem);
 
   // Create an empty pixel image once to override the default drag preview of all items.
   const emptyImage = new Image();
@@ -289,6 +291,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
       <DragSourceAndDropTarget
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
+
+          if (hasCustomDragItem) {
+            const dragItem = itemContent.getDragItem();
+            if (dragItem) return dragItem;
+          }
 
           if (forceDefaultDraggingPreview) {
             return {};
@@ -384,9 +391,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
           setIsStayingOver(isOver, canDrop);
 
           const isRenaming = renamedItemId === node.id;
+          const itemNameTooltip =
+            typeof node.name === 'string' && !isRenaming
+              ? node.name
+              : undefined;
 
           let itemRow = (
             <div
+              title={itemNameTooltip}
               className={classNames(classes.rowContentSide, {
                 [classes.rowContentSideLeft]: !node.item.isRoot,
                 [classes.rowContentExtraPadding]: !displayAsFolder,
@@ -441,6 +453,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                     {
                       [classes.rootFolder]: node.item.isRoot,
                       [classes.placeholder]: node.item.isPlaceholder,
+                      [classes.categoryLabel]: node.item.isLabel,
                     },
                     node.extraClass
                   )}
@@ -453,7 +466,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
           // If this is an object, connect the drag preview with an empty image
           // to override the default drag preview.
-          if (typeof node.name === 'string' && !displayAsFolder) {
+          if (
+            typeof node.name === 'string' &&
+            (!displayAsFolder || hasCustomDragItem)
+          ) {
             connectDragPreview(emptyImage);
           } else {
             // If not (folder for instance), just use the item row as drag preview.
@@ -598,6 +614,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
                 dropIndicatorClassName,
                 {
                   [classes.selected]: node.selected,
+                  [classes.placeholderRow]: node.item.isPlaceholder,
                 }
               )}
               aria-selected={node.selected}

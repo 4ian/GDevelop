@@ -353,7 +353,11 @@ module.exports = {
         behaviorProperties
           .getOrCreate('meshShapeResourceName')
           .setValue(
-            behaviorContent.getChild('meshShapeResourceName').getStringValue()
+            behaviorContent.hasChild('meshShapeResourceName')
+              ? behaviorContent
+                  .getChild('meshShapeResourceName')
+                  .getStringValue()
+              : ''
           )
           .setType('resource')
           .addExtraInfo('model3D')
@@ -411,16 +415,15 @@ module.exports = {
           .setLabel('Shape Dimension C')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('shapeOffsetX')) {
-          behaviorContent.addChild('shapeOffsetX').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('shapeOffsetX')
           .setValue(
-            behaviorContent
-              .getChild('shapeOffsetX')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('shapeOffsetX')
+              ? behaviorContent
+                  .getChild('shapeOffsetX')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -428,32 +431,30 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('shapeOffsetY')) {
-          behaviorContent.addChild('shapeOffsetY').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('shapeOffsetY')
           .setValue(
-            behaviorContent
-              .getChild('shapeOffsetY')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('shapeOffsetY')
+              ? behaviorContent
+                  .getChild('shapeOffsetY')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
           .setLabel('Shape offset Y')
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('shapeOffsetZ')) {
-          behaviorContent.addChild('shapeOffsetZ').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('shapeOffsetZ')
           .setValue(
-            behaviorContent
-              .getChild('shapeOffsetZ')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('shapeOffsetZ')
+              ? behaviorContent
+                  .getChild('shapeOffsetZ')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -461,16 +462,15 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('massCenterOffsetX')) {
-          behaviorContent.addChild('massCenterOffsetX').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('massCenterOffsetX')
           .setValue(
-            behaviorContent
-              .getChild('massCenterOffsetX')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('massCenterOffsetX')
+              ? behaviorContent
+                  .getChild('massCenterOffsetX')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -478,16 +478,15 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('massCenterOffsetY')) {
-          behaviorContent.addChild('massCenterOffsetY').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('massCenterOffsetY')
           .setValue(
-            behaviorContent
-              .getChild('massCenterOffsetY')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('massCenterOffsetY')
+              ? behaviorContent
+                  .getChild('massCenterOffsetY')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -495,16 +494,15 @@ module.exports = {
           .setQuickCustomizationVisibility(gd.QuickCustomization.Hidden)
           .setAdvanced(true)
           .setHidden(true); // Hidden as required to be changed in the full editor.
-        if (!behaviorContent.hasChild('massCenterOffsetZ')) {
-          behaviorContent.addChild('massCenterOffsetZ').setDoubleValue(0);
-        }
         behaviorProperties
           .getOrCreate('massCenterOffsetZ')
           .setValue(
-            behaviorContent
-              .getChild('massCenterOffsetZ')
-              .getDoubleValue()
-              .toString(10)
+            behaviorContent.hasChild('massCenterOffsetZ')
+              ? behaviorContent
+                  .getChild('massCenterOffsetZ')
+                  .getDoubleValue()
+                  .toString(10)
+              : '0'
           )
           .setType('Number')
           .setMeasurementUnit(gd.MeasurementUnit.getPixel())
@@ -699,8 +697,10 @@ module.exports = {
         }
 
         if (propertyName === 'worldScale') {
-          const newValueAsNumber = parseInt(newValue, 10);
-          if (newValueAsNumber !== newValueAsNumber) return false;
+          const newValueAsNumber = parseFloat(newValue);
+          if (!Number.isFinite(newValueAsNumber) || newValueAsNumber <= 0) {
+            return false;
+          }
           if (!sharedContent.hasChild('worldScale')) {
             sharedContent.addChild('worldScale');
           }
@@ -770,6 +770,9 @@ module.exports = {
           sharedData
         )
         .markAsIrrelevantForChildObjects()
+        .addIncludeFile(
+          'Extensions/Physics3DBehavior/Physics3DDataNormalizer.js'
+        )
         .addIncludeFile(
           'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
         )
@@ -1719,6 +1722,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )
@@ -1741,6 +1745,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )
@@ -1763,6 +1768,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .addIncludeFile('Extensions/Physics3DBehavior/Physics3DTools.js')
+      .addIncludeFile('Extensions/Physics3DBehavior/Physics3DDataNormalizer.js')
       .addIncludeFile(
         'Extensions/Physics3DBehavior/Physics3DRuntimeBehavior.js'
       )

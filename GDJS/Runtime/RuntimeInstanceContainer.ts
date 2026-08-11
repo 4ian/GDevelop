@@ -69,6 +69,11 @@ namespace gdjs {
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
       this._orderedLayers = [];
+      const { displayCollisionShapes, displayCollisionMask } =
+        runtimeGame.getGameData().properties;
+      this._debugDrawEnabled = !!(
+        displayCollisionShapes ?? displayCollisionMask
+      );
       if (runtimeGame.isInGameEdition()) {
         // Register an UnknownRuntimeObject to use when the object doesn't exist.
         this.registerObject(unknownObjectData);
@@ -485,6 +490,14 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPreObjectsRender[i](this);
+      }
+
       const allInstancesList = this.getAdhocListOfAllInstances();
       // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
@@ -607,6 +620,14 @@ namespace gdjs {
 
       // Some behaviors may have request objects to be deleted.
       this._cacheOrClearRemovedInstances();
+
+      for (
+        let i = 0;
+        i < gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.length;
+        ++i
+      ) {
+        gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate[i](this);
+      }
     }
 
     _updateObjectsForInGameEditor() {
@@ -643,11 +664,16 @@ namespace gdjs {
         this._instances.put(obj.name, []);
       }
       this._instances.get(obj.name).push(obj);
+      this.getScene()._registerRuntimeObject(obj);
       this._allInstancesListIsUpToDate = false;
     }
 
     /**
      * Get all the instances of the object called name.
+     *
+     * The returned array is the live, engine-owned instance list. Adding or
+     * deleting an instance mutates it immediately. Iterate a snapshot made with
+     * `slice()` or iterate backward when deleting instances from this list.
      * @param name Name of the object for which the instances must be returned.
      * @return The list of objects with the given name
      */
@@ -718,6 +744,8 @@ namespace gdjs {
       if (this._instancesRemoved.indexOf(obj) === -1) {
         this._instancesRemoved.push(obj);
       }
+
+      this.getScene()._unregisterRuntimeObject(obj);
 
       // Delete from the living instances.
       if (this._instances.containsKey(obj.getName())) {
@@ -863,6 +891,9 @@ namespace gdjs {
      * possible.
      */
     _destroy() {
+      // Dispose collision-mask debug rendering resources before their layers
+      // are released.
+      this.getDebuggerRenderer().clearDebugDraw();
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the container is released immediately.
       this._layers = new Hashtable();

@@ -23,7 +23,12 @@ const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 export type ExtensionTreeViewItemCallbacks = {|
   onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => Promise<void>,
   onRenameEventsFunctionsExtension: (string, string) => void,
-  onOpenEventsFunctionsExtension: string => void,
+  onOpenEventsFunctionsExtension: (
+    string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
   onReloadEventsFunctionsExtensions: () => void,
 |};
 

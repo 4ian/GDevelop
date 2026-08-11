@@ -128,4 +128,53 @@ describe('create_scene', () => {
     );
     expect(project.getFirstLayout()).toBe('SceneB');
   });
+
+  it('keeps the legacy rename_scene tool and updates the startup scene', async () => {
+    project.insertNewLayout('Untitled scene', 0);
+    project.setFirstLayout('Untitled scene');
+    const options = makeFakeLaunchFunctionOptionsWithProject(project);
+    const onCloseLayout = jest.fn();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.rename_scene.launchFunction(
+      {
+        ...options,
+        editorCallbacks: {
+          ...options.editorCallbacks,
+          onCloseLayout,
+        },
+        args: {
+          scene_name: 'Untitled scene',
+          new_scene_name: 'Main Menu',
+        },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(project.hasLayoutNamed('Main Menu')).toBe(true);
+    expect(project.getFirstLayout()).toBe('Main Menu');
+    expect(onCloseLayout).toHaveBeenCalledWith('Untitled scene');
+  });
+
+  it('keeps the legacy delete_scene tool and closes its editor first', async () => {
+    project.insertNewLayout('SceneToDelete', 0);
+    project.setFirstLayout('SceneToDelete');
+    const options = makeFakeLaunchFunctionOptionsWithProject(project);
+    const onCloseLayout = jest.fn();
+
+    const result: EditorFunctionGenericOutput = await editorFunctions.delete_scene.launchFunction(
+      {
+        ...options,
+        editorCallbacks: {
+          ...options.editorCallbacks,
+          onCloseLayout,
+        },
+        args: { scene_name: 'SceneToDelete' },
+      }
+    );
+
+    expect(result.success).toBe(true);
+    expect(project.hasLayoutNamed('SceneToDelete')).toBe(false);
+    expect(project.getFirstLayout()).toBe('');
+    expect(onCloseLayout).toHaveBeenCalledWith('SceneToDelete');
+  });
 });

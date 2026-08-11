@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   createResourceSearch,
   type ResourceSearch,
@@ -14,6 +13,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { createNewResource } from '../ResourcesList/ResourceSource';
 import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
+import { useAiGenerationService } from './AiService';
 
 import PromisePool from '@supercharge/promise-pool';
 
@@ -27,16 +27,14 @@ export const useSearchAndInstallResource = ({
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
 |}): _UseSearchAndInstallResourceReturnType => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
 
   return {
     searchAndInstallResources: React.useCallback(
       async ({
         resources,
       }: ResourceSearchAndInstallOptions): Promise<ResourceSearchAndInstallResult> => {
-        if (!profile) throw new Error('User should be authenticated.');
+        if (!userId) throw new Error('You must be logged in to use AI.');
         if (!project) throw new Error('Project should be opened.');
 
         const { results } = await PromisePool.withConcurrency(5)
@@ -47,7 +45,7 @@ export const useSearchAndInstallResource = ({
                 { times: 3, backoff: { initialDelay: 300, factor: 2 } },
                 () =>
                   createResourceSearch(getAuthorizationHeader, {
-                    userId: profile.id,
+                    userId,
                     searchTerms: resourceToSearch.resourceName,
                     resourceKind: resourceToSearch.resourceKind,
                   })
@@ -136,7 +134,7 @@ export const useSearchAndInstallResource = ({
 
         return { results };
       },
-      [profile, getAuthorizationHeader, project, resourceManagementProps]
+      [userId, getAuthorizationHeader, project, resourceManagementProps]
     ),
   };
 };

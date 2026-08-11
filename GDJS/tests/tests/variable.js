@@ -12,6 +12,11 @@ describe('gdjs.Variable', function () {
       value: 'test variable',
       type: 'string',
     });
+    const enumVar = new gdjs.Variable({
+      value: 'Idle',
+      type: 'enum',
+      values: ['Idle', 'Running'],
+    });
     const numStrVar = new gdjs.Variable({ value: '5Apples', type: 'string' });
     const boolVar = new gdjs.Variable({ value: 'true', type: 'boolean' });
 
@@ -35,6 +40,37 @@ describe('gdjs.Variable', function () {
     expect(strVar.getAsNumberOrString()).to.be('test variable');
     expect(strVar.getAsBoolean()).to.be(true);
     expect(strVar.getType()).to.be('string');
+
+    expect(enumVar.getAsNumber()).to.be(0);
+    expect(enumVar.getAsString()).to.be('Idle');
+    expect(enumVar.getEnumValues()).to.eql(['Idle', 'Running']);
+    expect(enumVar.isValidEnumValue('Running')).to.be(true);
+    expect(enumVar.isValidEnumValue('Jumping')).to.be(false);
+    expect(enumVar.getAsNumberOrString()).to.be('Idle');
+    expect(enumVar.getAsBoolean()).to.be(true);
+    expect(enumVar.getType()).to.be('enum');
+    expect(gdjs.Variable.isPrimitive(enumVar.getType())).to.be(true);
+    enumVar.setString('Running');
+    expect(enumVar.getType()).to.be('enum');
+    expect(enumVar.getAsString()).to.be('Running');
+    enumVar.setString('Jumping');
+    expect(enumVar.getType()).to.be('enum');
+    expect(enumVar.getAsString()).to.be('Idle');
+    enumVar.removeEnumValueAt(0);
+    expect(enumVar.getEnumValues()).to.eql(['Running']);
+    expect(enumVar.getAsString()).to.be('Running');
+    enumVar.castTo('string');
+    expect(enumVar.getType()).to.be('string');
+    expect(enumVar.getAsString()).to.be('Running');
+    expect(enumVar.getEnumValues()).to.eql([]);
+    enumVar.castTo('enum');
+    enumVar.setEnumValues(['Idle', 'Running']);
+    enumVar.setString('Running');
+    expect(enumVar.getType()).to.be('enum');
+    const enumVarCopy = enumVar.clone();
+    expect(enumVarCopy.getType()).to.be('enum');
+    expect(enumVarCopy.getAsString()).to.be('Running');
+    expect(enumVarCopy.getEnumValues()).to.eql(['Idle', 'Running']);
 
     strVar.setString('0');
     expect(strVar.getAsBoolean()).to.be(false);

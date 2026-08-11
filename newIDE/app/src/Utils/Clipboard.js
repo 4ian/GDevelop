@@ -7,8 +7,32 @@ export type ClipboardKind = string;
 
 let internalClipboard = '';
 
-export const copyTextToClipboard = (text: string): Promise<void> =>
-  navigator.clipboard.writeText(text);
+const copyTextWithElectronClipboard = (text: string): Promise<void> => {
+  if (!electronClipboard) {
+    return Promise.reject(new Error('Clipboard API is unavailable.'));
+  }
+
+  try {
+    electronClipboard.writeText(text);
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const copyTextToClipboard = (text: string): Promise<void> => {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      return navigator.clipboard
+        .writeText(text)
+        .catch(() => copyTextWithElectronClipboard(text));
+    } catch (error) {
+      return copyTextWithElectronClipboard(text);
+    }
+  }
+
+  return copyTextWithElectronClipboard(text);
+};
 
 const mangleClipboardKind = (kind: ClipboardKind): string => {
   // Mangle the name with GDevelop specific strings and random

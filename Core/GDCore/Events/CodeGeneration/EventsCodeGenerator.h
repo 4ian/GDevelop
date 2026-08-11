@@ -62,6 +62,15 @@ class GD_CORE_API EventsCodeGenerator {
   EventsCodeGenerator(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers_);
+
+  /**
+   * \brief Construct a code generator for the specified project,
+   * objects/groups and platform.
+   */
+  EventsCodeGenerator(
+      const gd::Project& project_,
+      const gd::Platform& platform,
+      const gd::ProjectScopedContainers& projectScopedContainers_);
   virtual ~EventsCodeGenerator() {};
 
   /**
@@ -71,6 +80,18 @@ class GD_CORE_API EventsCodeGenerator {
    * This should be called before any code generation.
    */
   void PreprocessEventList(gd::EventsList& listEvent);
+
+  /**
+   * Set the stable scene lifecycle role for the events currently generated.
+   * Ordinary events use `sceneUpdate` for backward compatibility.
+   */
+  void SetSceneLifecycleFunctionRole(const gd::String& role) {
+    sceneLifecycleFunctionRole = role;
+  }
+
+  const gd::String& GetSceneLifecycleFunctionRole() const {
+    return sceneLifecycleFunctionRole;
+  }
 
   /**
    * \brief Generate code for executing an event list
@@ -355,8 +376,13 @@ class GD_CORE_API EventsCodeGenerator {
   bool HasProjectAndLayout() const { return hasProjectAndLayout; }
 
   /**
+   * \brief Return true if the code generation has access to a project.
+   */
+  bool HasProject() const { return project != nullptr; }
+
+  /**
    * \brief Get the project the code is being generated for.
-   * \warning This is only valid if HasProjectAndLayout() is true.
+   * \warning This is only valid if HasProject() is true.
    */
   const gd::Project& GetProject() const { return *project; }
 
@@ -365,6 +391,14 @@ class GD_CORE_API EventsCodeGenerator {
    * \warning This is only valid if HasProjectAndLayout() is true.
    */
   const gd::Layout& GetLayout() const { return *scene; }
+
+  /**
+   * \brief Replace project constants placeholders in a string when the
+   * current context allows it, and add a diagnostic for missing paths.
+   */
+  gd::String ResolveConstantPlaceholders(
+      const gd::String& plainString,
+      gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Get the platform the code is being generated for.
@@ -702,6 +736,33 @@ class GD_CORE_API EventsCodeGenerator {
       gd::EventsCodeGenerationContext& context);
 
   /**
+   * \brief Generate a statement asserting that object-consuming code is not
+   * receiving more than one picked instance.
+   *
+   * Platforms that don't enforce this invariant can return an empty string.
+   */
+  virtual gd::String GenerateObjectListsPickedInstancesAssertCode(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage) {
+    return "";
+  };
+
+  /**
+   * \brief Wrap an expression with an assertion that object-consuming code is
+   * not receiving more than one picked instance.
+   *
+   * Platforms that don't enforce this invariant can return expressionCode.
+   */
+  virtual gd::String GenerateObjectListsPickedInstancesAssertExpression(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage,
+      const gd::String& expressionCode) {
+    return expressionCode;
+  };
+
+  /**
    * \brief Called when a new scope must be entered.
    * \param context The context : Internal events of the scope have been
    * generated, but GenerateObjectsDeclarationCode was not called. \param
@@ -877,6 +938,8 @@ class GD_CORE_API EventsCodeGenerator {
       instructionUniqueIds;  ///< The unique ids generated for instructions.
   size_t eventsListNextUniqueId;  ///< The next identifier to use for an events
                                   ///< list function name.
+
+  gd::String sceneLifecycleFunctionRole;
 
   gd::DiagnosticReport* diagnosticReport;
 };

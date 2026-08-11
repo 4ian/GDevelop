@@ -12,7 +12,15 @@ export const hasChildThatContainsStringInNameOrValue = (
 ): boolean => {
   switch (variable.getType()) {
     case gd.Variable.String:
-      return normalizeString(variable.getString()).includes(searchText);
+    case gd.Variable.Enum:
+      return (
+        normalizeString(variable.getString()).includes(searchText) ||
+        (variable.getType() === gd.Variable.Enum &&
+          variable
+            .getEnumValues()
+            .toJSArray()
+            .some(enumValue => normalizeString(enumValue).includes(searchText)))
+      );
     case gd.Variable.Number:
       return variable
         .getValue()
@@ -49,7 +57,7 @@ export const insertInVariablesContainer = (
   serializedVariable: any | null,
   index: number,
   inheritedVariablesContainer: ?gdVariablesContainer,
-  variableType?: 'number' | 'string' | 'boolean' | null
+  variableType?: 'number' | 'string' | 'boolean' | 'enum' | null
 ): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
@@ -70,6 +78,9 @@ export const insertInVariablesContainer = (
   if (variableType === 'number') {
     variable.setValue(0);
   } else if (variableType === 'string') {
+    variable.setString('');
+  } else if (variableType === 'enum') {
+    variable.castTo('enum');
     variable.setString('');
   } else if (variableType === 'boolean') {
     variable.setBool(false);

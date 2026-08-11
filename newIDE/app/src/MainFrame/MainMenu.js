@@ -36,6 +36,7 @@ export type MainMenuCallbacks = {|
   ) => Promise<void>,
   onSaveProject: () => Promise<?FileMetadata>,
   onSaveProjectAs: () => void,
+  onReloadProject: () => Promise<void>,
   onShowVersionHistory: () => void,
   onCloseProject: () => Promise<boolean>,
   onCloseApp: () => void,
@@ -43,8 +44,10 @@ export type MainMenuCallbacks = {|
   onInviteCollaborators: () => void,
   onCreateProject: () => void,
   onOpenProjectManager: (open?: boolean) => void,
+  onOpenRecentEditorSwitcher: () => void,
   onOpenHomePage: () => void,
-  onOpenDebugger: () => void,
+  onOpenDebugger: () => void | Promise<boolean>,
+  onOpenStickyNotes: () => void,
   onOpenGlobalSearch: () => void,
   onOpenAbout: (open?: boolean) => void,
   onOpenPreferences: (open?: boolean) => void,
@@ -64,6 +67,7 @@ export type MainMenuEvent =
   | 'main-menu-open-recent'
   | 'main-menu-save'
   | 'main-menu-save-as'
+  | 'main-menu-reload'
   | 'main-menu-show-version-history'
   | 'main-menu-close'
   | 'main-menu-close-app'
@@ -72,8 +76,10 @@ export type MainMenuEvent =
   | 'main-menu-create-project'
   | 'main-menu-create-blank'
   | 'main-menu-open-project-manager'
+  | 'main-menu-open-recent-editors'
   | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
+  | 'main-menu-open-sticky-notes'
   | 'main-menu-open-global-search'
   | 'main-menu-open-about'
   | 'main-menu-open-preferences'
@@ -92,6 +98,7 @@ const getMainMenuEventCallback = (
     'main-menu-open-recent': callbacks.onOpenRecentFile,
     'main-menu-save': callbacks.onSaveProject,
     'main-menu-save-as': callbacks.onSaveProjectAs,
+    'main-menu-reload': callbacks.onReloadProject,
     'main-menu-show-version-history': callbacks.onShowVersionHistory,
     'main-menu-close': callbacks.onCloseProject,
     'main-menu-close-app': callbacks.onCloseApp,
@@ -99,8 +106,10 @@ const getMainMenuEventCallback = (
     'main-menu-invite-collaborators': callbacks.onInviteCollaborators,
     'main-menu-create-project': callbacks.onCreateProject,
     'main-menu-open-project-manager': callbacks.onOpenProjectManager,
+    'main-menu-open-recent-editors': callbacks.onOpenRecentEditorSwitcher,
     'main-menu-open-home-page': callbacks.onOpenHomePage,
     'main-menu-open-debugger': callbacks.onOpenDebugger,
+    'main-menu-open-sticky-notes': callbacks.onOpenStickyNotes,
     'main-menu-open-global-search': callbacks.onOpenGlobalSearch,
     'main-menu-open-about': callbacks.onOpenAbout,
     'main-menu-open-preferences': callbacks.onOpenPreferences,
@@ -168,7 +177,12 @@ export const buildMainMenuDeclarativeTemplate = ({
         enabled: canSaveProjectAs,
       },
       {
-        label: i18n._(t`Show version history`),
+        label: i18n._(t`Reload project`),
+        onClickSendEvent: 'main-menu-reload',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Show Git tool`),
         onClickSendEvent: 'main-menu-show-version-history',
         enabled: !!project,
       },
@@ -238,12 +252,22 @@ export const buildMainMenuDeclarativeTemplate = ({
         enabled: !!project,
       },
       {
+        label: i18n._(t`Recent editors`),
+        accelerator: getElectronAccelerator(shortcutMap['OPEN_RECENT_EDITOR']),
+        onClickSendEvent: 'main-menu-open-recent-editors',
+      },
+      {
         label: i18n._(t`Show Home`),
         onClickSendEvent: 'main-menu-open-home-page',
       },
       {
         label: i18n._(t`Open Debugger`),
         onClickSendEvent: 'main-menu-open-debugger',
+        enabled: !!project,
+      },
+      {
+        label: i18n._(t`Sticky notes`),
+        onClickSendEvent: 'main-menu-open-sticky-notes',
         enabled: !!project,
       },
       {
@@ -386,7 +410,7 @@ export const buildMainMenuDeclarativeTemplate = ({
   // macOS has a menu with the name of the app.
   if (isMacLike() && isApplicationTopLevelMenu) {
     template.unshift({
-      label: i18n._(t`GDevelop 5`),
+      label: i18n._(t`GDevelop 6`),
       submenu: [
         {
           label: i18n._(t`About GDevelop`),
@@ -439,6 +463,56 @@ export const buildMainMenuDeclarativeTemplate = ({
   return template;
 };
 
+// Some menu items are declared only with an Electron `role` (e.g. 'toggledevtools',
+// 'togglefullscreen', 'undo'...). Native Electron menus handle these automatically,
+// but the in-app (Material-UI) menu only calls `item.click()` and ignores `role`.
+// This maps the roles we use to an explicit action so they work in the HTML menu too.
+const getClickFromRole = (role: string): ?() => void => {
+  const remote = optionalRequire('@electron/remote');
+  if (!remote) return null;
+
+  const getFocusedWebContents = () => {
+    const browserWindow =
+      remote.BrowserWindow.getFocusedWindow() || remote.getCurrentWindow();
+    return browserWindow ? browserWindow.webContents : null;
+  };
+
+  switch (role) {
+    case 'toggledevtools':
+      return () => {
+        const webContents = getFocusedWebContents();
+        if (webContents) webContents.toggleDevTools();
+      };
+    case 'togglefullscreen':
+      return () => {
+        const browserWindow =
+          remote.BrowserWindow.getFocusedWindow() || remote.getCurrentWindow();
+        if (browserWindow)
+          browserWindow.setFullScreen(!browserWindow.isFullScreen());
+      };
+    case 'undo':
+    case 'redo':
+    case 'cut':
+    case 'copy':
+    case 'paste':
+    case 'pasteandmatchstyle':
+    case 'delete':
+    case 'selectall':
+    case 'minimize': {
+      return () => {
+        const webContents = getFocusedWebContents();
+        // $FlowFixMe[invalid-computed-prop] - these are all valid WebContents methods.
+        if (webContents && typeof webContents[role] === 'function') {
+          // $FlowFixMe[invalid-computed-prop]
+          webContents[role]();
+        }
+      };
+    }
+    default:
+      return null;
+  }
+};
+
 export const adaptFromDeclarativeTemplate = (
   menuDeclarativeTemplate: Array<MenuDeclarativeItemTemplate>,
   callbacks: MainMenuCallbacks
@@ -458,28 +532,36 @@ export const adaptFromDeclarativeTemplate = (
       } = menuItemTemplate;
 
       const hasOnClick = onClickSendEvent || onClickOpenLink;
+      // $FlowFixMe[incompatible-type] - property can be undefined.
+      const roleClick = menuItemTemplate.role
+        ? // $FlowFixMe[incompatible-call] - role is a string here.
+          getClickFromRole(menuItemTemplate.role)
+        : null;
 
       // $FlowFixMe[incompatible-type] - we're putting both a click and a submenu, so not strictly following the schema.
       return {
         ...menuItemTemplateRest,
-        click: hasOnClick
-          ? function() {
-              if (menuItemTemplate.onClickSendEvent) {
-                const mainMenuEvent = menuItemTemplate.onClickSendEvent;
-                const callback = getMainMenuEventCallback(
-                  mainMenuEvent,
-                  callbacks
-                );
+        click:
+          hasOnClick || roleClick
+            ? function() {
+                if (menuItemTemplate.onClickSendEvent) {
+                  const mainMenuEvent = menuItemTemplate.onClickSendEvent;
+                  const callback = getMainMenuEventCallback(
+                    mainMenuEvent,
+                    callbacks
+                  );
 
-                if (eventArgs) callback(eventArgs);
-                else callback();
-              }
+                  if (eventArgs) callback(eventArgs);
+                  else callback();
+                }
 
-              if (menuItemTemplate.onClickOpenLink) {
-                Window.openExternalURL(menuItemTemplate.onClickOpenLink);
+                if (menuItemTemplate.onClickOpenLink) {
+                  Window.openExternalURL(menuItemTemplate.onClickOpenLink);
+                }
+
+                if (roleClick) roleClick();
               }
-            }
-          : undefined,
+            : undefined,
         submenu: menuItemTemplate.submenu
           ? adaptMenuDeclarativeItemTemplate(menuItemTemplate.submenu)
           : undefined,

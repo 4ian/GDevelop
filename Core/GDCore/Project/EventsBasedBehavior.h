@@ -11,6 +11,7 @@
 #include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/Project/QuickCustomization.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -126,6 +127,22 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
     return sharedPropertyDescriptors;
   }
 
+  /** \name Variables */
+  ///@{
+  /**
+   * \brief Get the variables of the behavior.
+   *
+   * These variables store state owned by each behavior instance and are
+   * available directly in the behavior's events.
+   */
+  const gd::VariablesContainer& GetVariables() const { return variables; }
+
+  /**
+   * \brief Get the variables of the behavior.
+   */
+  gd::VariablesContainer& GetVariables() { return variables; }
+  ///@}
+
   /**
    * \brief Get the name of the action to change a shared property.
    */
@@ -163,6 +180,7 @@ class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
  private:
   gd::String objectType;
   gd::PropertiesContainer sharedPropertyDescriptors;
+  gd::VariablesContainer variables;
   QuickCustomization::Visibility quickCustomizationVisibility;
 };
 

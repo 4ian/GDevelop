@@ -39,6 +39,7 @@ type Props = {|
   helpPagePath?: string,
   onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   freezeEventsFunctionType?: boolean,
+  showAdvancedOptionsInline?: boolean,
 |};
 
 const getFullNameHintText = (
@@ -80,16 +81,22 @@ export const CompactEventsFunctionPropertiesEditor = ({
   eventsBasedBehavior,
   eventsBasedObject,
   eventsFunctionsContainer,
+  showAdvancedOptionsInline,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
   const type = eventsFunction.getFunctionType();
+  const functionName = eventsFunction.getName();
+  const isOnSignalLifecycleEventsFunction =
+    functionName === 'onSignal' &&
+    (!!eventsBasedObject || !!eventsBasedBehavior);
   const isABehaviorLifecycleEventsFunction =
     !!eventsBasedBehavior &&
     !eventsBasedObject &&
-    gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
-      eventsFunction.getName()
-    );
+    (gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
+      functionName
+    ) ||
+      isOnSignalLifecycleEventsFunction);
   if (isABehaviorLifecycleEventsFunction) {
     return (
       <EmptyMessage>
@@ -102,11 +109,12 @@ export const CompactEventsFunctionPropertiesEditor = ({
   }
 
   const isAnObjectLifecycleEventsFunction =
-    !!eventsBasedObject &&
-    !eventsBasedBehavior &&
-    gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
-      eventsFunction.getName()
-    );
+    isOnSignalLifecycleEventsFunction ||
+    (!!eventsBasedObject &&
+      !eventsBasedBehavior &&
+      gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
+        functionName
+      ));
   if (isAnObjectLifecycleEventsFunction) {
     return (
       <EmptyMessage>
@@ -172,11 +180,10 @@ export const CompactEventsFunctionPropertiesEditor = ({
               <CompactSelectField
                 value={type.toString()}
                 disabled={!!freezeEventsFunctionType}
-                onChange={valueString => {
+                onChange={(valueString) => {
                   // $FlowFixMe[incompatible-type]
-                  const value: EventsFunction_FunctionType = Number.parseInt(
-                    valueString
-                  );
+                  const value: EventsFunction_FunctionType =
+                    Number.parseInt(valueString);
                   eventsFunction.setFunctionType(value);
                   if (onConfigurationUpdated) onConfigurationUpdated('type');
                   forceUpdate();
@@ -211,7 +218,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
               field={
                 <CompactSelectField
                   value={(getterFunction && getterFunction.getName()) || ''}
-                  onChange={value => {
+                  onChange={(value) => {
                     if (!value) {
                       return;
                     }
@@ -230,10 +237,9 @@ export const CompactEventsFunctionPropertiesEditor = ({
                     ? mapFor(
                         0,
                         eventsFunctionsContainer.getEventsFunctionsCount(),
-                        i => {
-                          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
-                            i
-                          );
+                        (i) => {
+                          const eventsFunction =
+                            eventsFunctionsContainer.getEventsFunctionAt(i);
 
                           return (
                             eventsFunction.getFunctionType() ===
@@ -268,7 +274,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                     )
                   )}
                   value={eventsFunction.getFullName()}
-                  onChange={text => {
+                  onChange={(text) => {
                     eventsFunction.setFullName(text);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     forceUpdate();
@@ -286,7 +292,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                   ? 'Change ' + getterFunction.getDescription()
                   : ''
               }
-              onChange={text => {}}
+              onChange={(text) => {}}
             />
           ) : (
             <CompactTextAreaField
@@ -302,7 +308,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 eventsFunction.getExpressionType()
               )}
               value={eventsFunction.getDescription()}
-              onChange={text => {
+              onChange={(text) => {
                 eventsFunction.setDescription(text);
                 if (onConfigurationUpdated) onConfigurationUpdated();
                 forceUpdate();
@@ -323,7 +329,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                     ': [...]'
                   : ''
               }
-              onChange={text => {}}
+              onChange={(text) => {}}
             />
           ) : (
             (type === gd.EventsFunction.Action ||
@@ -340,7 +346,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                 }
                 placeholder={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                 value={eventsFunction.getSentence()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsFunction.setSentence(text.replace(/\n/g, ''));
                   if (onConfigurationUpdated) onConfigurationUpdated();
                   forceUpdate();
@@ -381,7 +387,9 @@ export const CompactEventsFunctionPropertiesEditor = ({
               onOpenBehaviorTypeDialog={() => {}}
             />
           )}
-          <CompactCollapsibleAdvancedSection>
+          <CompactCollapsibleAdvancedSection
+            showContentWithoutToggle={showAdvancedOptionsInline}
+          >
             <Line noMargin>
               {(() => {
                 const helpUrl = eventsFunction.getHelpUrl();
@@ -407,7 +415,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                               )
                         }
                         value={helpUrl}
-                        onChange={text => {
+                        onChange={(text) => {
                           eventsFunction.setHelpUrl(text);
                           if (onConfigurationUpdated) onConfigurationUpdated();
                           forceUpdate();
@@ -422,7 +430,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
               <CompactToggleField
                 label={i18n._(t`Private`)}
                 checked={eventsFunction.isPrivate()}
-                onCheck={checked => {
+                onCheck={(checked) => {
                   eventsFunction.setPrivate(checked);
                   if (onConfigurationUpdated)
                     onConfigurationUpdated('isPrivate');
@@ -441,7 +449,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
               <CompactToggleField
                 label={i18n._(t`Asynchronous`)}
                 checked={eventsFunction.isAsync()}
-                onCheck={checked => {
+                onCheck={(checked) => {
                   eventsFunction.setAsync(checked);
                   if (onConfigurationUpdated) onConfigurationUpdated('isAsync');
                   forceUpdate();
@@ -450,7 +458,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
               <CompactToggleField
                 label={i18n._(t`Deprecated`)}
                 checked={eventsFunction.isDeprecated()}
-                onCheck={checked => {
+                onCheck={(checked) => {
                   eventsFunction.setDeprecated(checked);
                   if (onConfigurationUpdated)
                     onConfigurationUpdated('isDeprecated');
@@ -470,7 +478,7 @@ export const CompactEventsFunctionPropertiesEditor = ({
                   placeholder={t`Example: Use "New Action Name" instead.`}
                   label={i18n._(t`Deprecation notice`)}
                   value={eventsFunction.getDeprecationMessage()}
-                  onChange={text => {
+                  onChange={(text) => {
                     eventsFunction.setDeprecationMessage(text);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     forceUpdate();

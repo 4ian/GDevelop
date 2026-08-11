@@ -15,6 +15,7 @@ export type SimplifiedVariable = {|
   variableName: string,
   type: string,
   value?: string,
+  enumValues?: Array<string>,
   variableChildren?: Array<SimplifiedVariable>,
 |};
 
@@ -96,6 +97,8 @@ export const getVariableTypeAsString = (
   const type = variable.getType();
   return type === gd.Variable.String
     ? 'String'
+    : type === gd.Variable.Enum
+    ? 'Enum'
     : type === gd.Variable.Number
     ? 'Number'
     : type === gd.Variable.Boolean
@@ -114,25 +117,21 @@ const getVariableValueAsString = (
   const type = variable.getType();
   return type === gd.Variable.Structure || type === gd.Variable.Array
     ? variable.getChildrenCount() === 0
-      ? `No children`
+      ? 'No children'
       : variable.getChildrenCount() === 1
-      ? `1 child`
+      ? '1 child'
       : `${variable.getChildrenCount()} children`
-    : type === gd.Variable.String
+    : type === gd.Variable.String || type === gd.Variable.Enum
     ? variable.getString()
     : type === gd.Variable.Number
     ? variable.getValue().toString()
     : type === gd.Variable.Boolean
     ? variable.getBool()
-      ? `True`
-      : `False`
+      ? 'True'
+      : 'False'
     : 'unknown';
 };
 
-// Serialize a variable (and its children, recursively) to the shape used in the
-// GAME_PROJECT_JSON overview, so inspection tools and the overview stay in sync.
-// Array children are named by their index ("0", "1", ...), matching the
-// `MyArray[0]` path syntax used by `add_or_edit_variable`.
 export const getSimplifiedVariable = (
   gd: libGDevelop,
   name: string,
@@ -150,7 +149,8 @@ export const getSimplifiedVariable = (
             getSimplifiedVariable(gd, childName, variable.getChild(childName))
           ),
       };
-    } else if (variable.getType() === gd.Variable.Array) {
+    }
+    if (variable.getType() === gd.Variable.Array) {
       return {
         variableName: name,
         type: getVariableTypeAsString(gd, variable),
@@ -169,19 +169,21 @@ export const getSimplifiedVariable = (
     variableName: name,
     type: getVariableTypeAsString(gd, variable),
     value: getVariableValueAsString(gd, variable),
+    enumValues:
+      variable.getType() === gd.Variable.Enum
+        ? variable.getEnumValues().toJSArray()
+        : undefined,
   };
 };
 
 export const getSimplifiedVariablesContainer = (
   gd: libGDevelop,
   container: gdVariablesContainer
-): Array<SimplifiedVariable> => {
-  return mapFor(0, container.count(), (index: number) => {
+): Array<SimplifiedVariable> =>
+  mapFor(0, container.count(), (index: number) => {
     const name = container.getNameAt(index);
-    const variable = container.getAt(index);
-    return getSimplifiedVariable(gd, name, variable);
+    return getSimplifiedVariable(gd, name, container.getAt(index));
   }).filter(Boolean);
-};
 
 export const makeSimplifiedProjectBuilder = (
   gd: libGDevelop
@@ -194,9 +196,102 @@ export const makeSimplifiedProjectBuilder = (
     options: SimplifiedProjectOptions
   ) => SimplifiedProject,
 } => {
+  const getVariableType = (variable: gdVariable) => {
+    const type = variable.getType();
+    return type === gd.Variable.String
+      ? 'String'
+      : type === gd.Variable.Enum
+      ? 'Enum'
+      : type === gd.Variable.Number
+      ? 'Number'
+      : type === gd.Variable.Boolean
+      ? 'Boolean'
+      : type === gd.Variable.Structure
+      ? 'Structure'
+      : type === gd.Variable.Array
+      ? 'Array'
+      : 'unknown';
+  };
+
+  const getVariableValueAsString = (variable: gdVariable) => {
+    const type = variable.getType();
+    return type === gd.Variable.Structure || type === gd.Variable.Array
+      ? variable.getChildrenCount() === 0
+        ? `No children`
+        : variable.getChildrenCount() === 1
+        ? `1 child`
+        : `${variable.getChildrenCount()} children`
+      : type === gd.Variable.String || type === gd.Variable.Enum
+      ? variable.getString()
+      : type === gd.Variable.Number
+      ? variable.getValue().toString()
+      : type === gd.Variable.Boolean
+      ? variable.getBool()
+        ? `True`
+        : `False`
+      : 'unknown';
+  };
+
+  const getSimplifiedVariable = (
+    name: string,
+    variable: gdVariable,
+    // $FlowFixMe[missing-local-annot]
+    depth = 0
+  ): SimplifiedVariable => {
+    const isCollection = isCollectionVariable(variable);
+
+    if (isCollection) {
+      if (variable.getType() === gd.Variable.Structure) {
+        return {
+          variableName: name,
+          type: getVariableType(variable),
+          variableChildren: variable
+            .getAllChildrenNames()
+            .toJSArray()
+            .map(childName => {
+              const childVariable = variable.getChild(childName);
+              return getSimplifiedVariable(childName, childVariable, depth + 1);
+            }),
+        };
+      } else if (variable.getType() === gd.Variable.Array) {
+        return {
+          variableName: name,
+          type: getVariableType(variable),
+          variableChildren: mapFor(0, variable.getChildrenCount(), index => {
+            const childVariable = variable.getAtIndex(index);
+            return getSimplifiedVariable(
+              index.toString(),
+              childVariable,
+              depth + 1
+            );
+          }),
+        };
+      }
+    }
+
+    return {
+      variableName: name,
+      type: getVariableType(variable),
+      value: getVariableValueAsString(variable),
+      enumValues:
+        variable.getType() === gd.Variable.Enum
+          ? variable.getEnumValues().toJSArray()
+          : undefined,
+    };
+  };
+
+  const getSimplifiedVariablesContainerJson = (
+    container: gdVariablesContainer
+  ): Array<SimplifiedVariable> => {
+    return mapFor(0, container.count(), (index: number) => {
+      const name = container.getNameAt(index);
+      const variable = container.getAt(index);
+      return getSimplifiedVariable(name, variable);
+    }).filter(Boolean);
+  };
+
   const getSimplifiedObject = (object: gdObject): SimplifiedObject => {
-    const objectVariables = getSimplifiedVariablesContainer(
-      gd,
+    const objectVariables = getSimplifiedVariablesContainerJson(
       object.getVariables()
     );
     const behaviors = object
@@ -286,7 +381,7 @@ export const makeSimplifiedProjectBuilder = (
             : undefined,
         variables:
           variablesContainer.count() > 0
-            ? getSimplifiedVariablesContainer(gd, variablesContainer)
+            ? getSimplifiedVariablesContainerJson(variablesContainer)
             : undefined,
       };
     });
@@ -393,7 +488,7 @@ export const makeSimplifiedProjectBuilder = (
         scene.getObjects().getObjectGroups(),
         projectScopedContainers.getObjectsContainersList()
       ),
-      sceneVariables: getSimplifiedVariablesContainer(gd, scene.getVariables()),
+      sceneVariables: getSimplifiedVariablesContainerJson(scene.getVariables()),
       layers: getSimplifiedLayers(scene.getLayers()),
       instancesOnSceneDescription: getInstancesDescription(scene),
     };
@@ -434,8 +529,7 @@ export const makeSimplifiedProjectBuilder = (
         projectScopedContainers.getObjectsContainersList()
       ),
       scenes,
-      globalVariables: getSimplifiedVariablesContainer(
-        gd,
+      globalVariables: getSimplifiedVariablesContainerJson(
         project.getVariables()
       ),
     };

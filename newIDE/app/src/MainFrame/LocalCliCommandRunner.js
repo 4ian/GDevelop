@@ -309,9 +309,10 @@ type RunCliCommandIpcPayload = {|
 |};
 
 const ensureProjectExtensionsReadyForCli = async (
-  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject
 ): Promise<boolean> => {
-  await eventsFunctionsExtensionsState.ensureLoadFinished();
+  await eventsFunctionsExtensionsState.ensureLoadFinished(project);
 
   if (eventsFunctionsExtensionsState.eventsFunctionsExtensionsError) {
     console.error(
@@ -373,7 +374,8 @@ const runCliCommand = async ({
 }: RunCliCommandOptions): Promise<void> => {
   try {
     const extensionsReady = await ensureProjectExtensionsReadyForCli(
-      eventsFunctionsExtensionsState
+      eventsFunctionsExtensionsState,
+      project
     );
     if (!extensionsReady) {
       onFinished(1);

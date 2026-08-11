@@ -502,6 +502,7 @@ type Props = {|
   onOpenConfiguration: () => void,
   onOpenProperty: (name: string, isSharedProperties: boolean) => void,
   onEventsFunctionsAdded: () => void,
+  hideConfigurationItem?: boolean,
 |};
 
 const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
@@ -516,7 +517,7 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
       onRenameProperty,
       onOpenConfiguration,
       onOpenProperty,
-      onEventsFunctionsAdded,
+      hideConfigurationItem,
     },
     ref
   ) => {
@@ -864,7 +865,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
               onOpenProperty,
               onPropertiesUpdated,
               onRenameProperty,
-              onEventsFunctionsAdded,
             }
           : null,
       [
@@ -887,7 +887,6 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
         onOpenProperty,
         onPropertiesUpdated,
         onRenameProperty,
-        onEventsFunctionsAdded,
       ]
     );
 
@@ -968,119 +967,130 @@ const PropertyListEditor = React.forwardRef<Props, PropertyListEditorInterface>(
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
-        return !properties ||
+        if (
+          !properties ||
           !propertiesTreeViewItemProps ||
           !propertyFolderTreeViewItemProps
-          ? []
-          : // $FlowFixMe[incompatible-type]
-            [
-              new LeafTreeViewItem(
-                new ActionTreeViewItemContent(
-                  configurationItemId,
-                  i18n._(t`Configuration`),
-                  onOpenConfiguration,
-                  'res/icons_default/properties_black.svg'
-                )
-              ),
-              new PropertyFolderTreeViewItem({
-                propertyFolderOrProperty: properties.getRootFolder(),
-                isRoot: true,
-                content: new LabelTreeViewItemContent(
-                  propertiesRootFolderId,
-                  eventsBasedObject
-                    ? i18n._(t`Object properties`)
-                    : i18n._(t`Behavior properties`),
-                  {
-                    icon: <Add />,
-                    label: i18n._(t`Add a property`),
-                    click: () => {
-                      addProperty(
-                        properties,
-                        false,
-                        properties.getRootFolder(),
-                        0
-                      );
-                    },
-                    id: 'add-property',
+        ) {
+          return [];
+        }
+
+        const treeViewData: Array<TreeViewItem> = [];
+        if (!hideConfigurationItem) {
+          treeViewData.push(
+            new LeafTreeViewItem(
+              new ActionTreeViewItemContent(
+                configurationItemId,
+                i18n._(t`Configuration`),
+                onOpenConfiguration,
+                'res/icons_default/properties_black.svg'
+              )
+            )
+          );
+        }
+
+        treeViewData.push(
+          new PropertyFolderTreeViewItem({
+            propertyFolderOrProperty: properties.getRootFolder(),
+            isRoot: true,
+            content: new LabelTreeViewItemContent(
+              propertiesRootFolderId,
+              eventsBasedObject
+                ? i18n._(t`Object properties`)
+                : i18n._(t`Behavior properties`),
+              {
+                icon: <Add />,
+                label: i18n._(t`Add a property`),
+                click: () => {
+                  addProperty(properties, false, properties.getRootFolder(), 0);
+                },
+                id: 'add-property',
+              },
+              () => [
+                {
+                  label: i18n._(t`Add a folder`),
+                  click: () => addFolder([properties.getRootFolder()], false),
+                },
+                { type: 'separator' },
+                {
+                  label: i18n._(t`Expand all sub folders`),
+                  click: () =>
+                    expandAllSubfolders(
+                      properties.getRootFolder(),
+                      expandFolders
+                    ),
+                },
+              ]
+            ),
+            placeholder: new PlaceHolderTreeViewItem(
+              propertiesEmptyPlaceholderId,
+              i18n._(t`Start by adding a new property.`)
+            ),
+            propertyTreeViewItemProps: propertiesTreeViewItemProps,
+            propertyFolderTreeViewItemProps,
+          })
+        );
+
+        if (
+          sharedProperties &&
+          sharedPropertiesTreeViewItemProps &&
+          sharedPropertyFolderTreeViewItemProps
+        ) {
+          treeViewData.push(
+            new PropertyFolderTreeViewItem({
+              propertyFolderOrProperty: sharedProperties.getRootFolder(),
+              isRoot: true,
+              content: new LabelTreeViewItemContent(
+                sharedPropertiesRootFolderId,
+                i18n._(t`Scene properties`),
+                {
+                  icon: <Add />,
+                  label: i18n._(t`Add a property`),
+                  click: () => {
+                    addProperty(
+                      sharedProperties,
+                      true,
+                      sharedProperties.getRootFolder(),
+                      0
+                    );
                   },
-                  () => [
-                    {
-                      label: i18n._(t`Add a folder`),
-                      click: () =>
-                        addFolder([properties.getRootFolder()], false),
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Expand all sub folders`),
-                      click: () =>
-                        expandAllSubfolders(
-                          properties.getRootFolder(),
-                          expandFolders
-                        ),
-                    },
-                  ]
-                ),
-                placeholder: new PlaceHolderTreeViewItem(
-                  propertiesEmptyPlaceholderId,
-                  i18n._(t`Start by adding a new property.`)
-                ),
-                propertyTreeViewItemProps: propertiesTreeViewItemProps,
-                propertyFolderTreeViewItemProps,
-              }),
-              sharedProperties &&
-              sharedPropertiesTreeViewItemProps &&
-              sharedPropertyFolderTreeViewItemProps
-                ? new PropertyFolderTreeViewItem({
-                    propertyFolderOrProperty: sharedProperties.getRootFolder(),
-                    isRoot: true,
-                    content: new LabelTreeViewItemContent(
-                      sharedPropertiesRootFolderId,
-                      i18n._(t`Scene properties`),
-                      {
-                        icon: <Add />,
-                        label: i18n._(t`Add a property`),
-                        click: () => {
-                          addProperty(
-                            sharedProperties,
-                            true,
-                            sharedProperties.getRootFolder(),
-                            0
-                          );
-                        },
-                        id: 'add-shared-property',
-                      },
-                      () => [
-                        {
-                          label: i18n._(t`Add a folder`),
-                          click: () =>
-                            addFolder([sharedProperties.getRootFolder()], true),
-                        },
-                        { type: 'separator' },
-                        {
-                          label: i18n._(t`Expand all sub folders`),
-                          click: () =>
-                            expandAllSubfolders(
-                              sharedProperties.getRootFolder(),
-                              expandFolders
-                            ),
-                        },
-                      ]
-                    ),
-                    placeholder: new PlaceHolderTreeViewItem(
-                      sharedPropertiesEmptyPlaceholderId,
-                      i18n._(t`Start by adding a new property.`)
-                    ),
-                    propertyTreeViewItemProps: sharedPropertiesTreeViewItemProps,
-                    propertyFolderTreeViewItemProps: sharedPropertyFolderTreeViewItemProps,
-                  })
-                : null,
-            ].filter(Boolean);
+                  id: 'add-shared-property',
+                },
+                () => [
+                  {
+                    label: i18n._(t`Add a folder`),
+                    click: () =>
+                      addFolder([sharedProperties.getRootFolder()], true),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Expand all sub folders`),
+                    click: () =>
+                      expandAllSubfolders(
+                        sharedProperties.getRootFolder(),
+                        expandFolders
+                      ),
+                  },
+                ]
+              ),
+              placeholder: new PlaceHolderTreeViewItem(
+                sharedPropertiesEmptyPlaceholderId,
+                i18n._(t`Start by adding a new property.`)
+              ),
+              propertyTreeViewItemProps: sharedPropertiesTreeViewItemProps,
+              propertyFolderTreeViewItemProps: sharedPropertyFolderTreeViewItemProps,
+            })
+          );
+        }
+
+        return treeViewData;
       },
       [
         addFolder,
         addProperty,
         eventsBasedObject,
         expandFolders,
+        hideConfigurationItem,
         onOpenConfiguration,
         properties,
         propertiesTreeViewItemProps,

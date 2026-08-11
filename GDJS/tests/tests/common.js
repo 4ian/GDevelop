@@ -24,6 +24,34 @@ describe('gdjs', function() {
 	});
 });
 
+describe('gdjs object-picking compatibility helpers', function() {
+	it('should leave multiple picked instances unchanged', function() {
+		const objectList = [{}, {}];
+		const objectLists = [objectList, [{}]];
+		const objectsMap = new Hashtable();
+		objectsMap.put('Object', objectList);
+
+		expect(
+			gdjs.assertObjectListHasNoMoreThanOnePickedInstance(
+				objectList,
+				'object expression "Object"'
+			)
+		).to.be(objectList);
+		expect(
+			gdjs.assertObjectListsHaveNoMoreThanOnePickedInstance(
+				objectLists,
+				'object expression "Object"'
+			)
+		).to.be(objectLists);
+		expect(
+			gdjs.assertObjectMapHasNoMoreThanOnePickedInstance(
+				objectsMap,
+				'object parameter "Object"'
+			)
+		).to.be(objectsMap);
+	});
+});
+
 describe('gdjs.evtTools.object.twoListsTest', function() {
 	it('should properly pick objects', function(){
 		var map1 = new Hashtable();

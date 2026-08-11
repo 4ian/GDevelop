@@ -1,6 +1,14 @@
 namespace gdjs {
   export interface PixiImageManager {
     _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
+    getPIXITextureForSourceRect(
+      resourceName: string,
+      sourceRect: gdjs.SpriteFrameSourceRectData
+    ): PIXI.Texture;
+    getPIXITextureForImageFrame(
+      resourceName: string,
+      imageFrameIndex: integer
+    ): PIXI.Texture;
   }
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using PixiJS.
@@ -222,8 +230,21 @@ namespace gdjs {
       this._imageManager = imageManager;
     }
 
-    getAnimationFrameTexture(imageName: string) {
-      return this._imageManager.getPIXITexture(imageName);
+    getAnimationFrameTexture(
+      imageName: string,
+      sourceRect?: gdjs.SpriteFrameSourceRectData | null,
+      imageFrameIndex: integer = 0
+    ) {
+      if (sourceRect) {
+        return this._imageManager.getPIXITextureForSourceRect(
+          imageName,
+          sourceRect
+        );
+      }
+      return this._imageManager.getPIXITextureForImageFrame(
+        imageName,
+        imageFrameIndex
+      );
     }
 
     getAnimationFrameWidth(pixiTexture: PIXI.Texture) {

@@ -24,11 +24,7 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
-import {
-  getBrowserLanguageOrLocale,
-  setLanguageInDOM,
-  selectLanguageOrLocale,
-} from '../../Utils/Language';
+import { setLanguageInDOM } from '../../Utils/Language';
 import { type GamesDashboardOrderBy } from '../../GameDashboard/GamesList';
 import {
   CHECK_APP_UPDATES_TIMEOUT,
@@ -66,6 +62,10 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
       }
     }
 
+    // MCP connections no longer use authentication. Remove tokens persisted
+    // by older versions instead of keeping an obsolete secret in storage.
+    delete values.mcpServerAuthorizationToken;
+
     // Migrate renamed themes.
     if (values.themeName === 'GDevelop default') {
       values.themeName = 'GDevelop default Light';
@@ -97,7 +97,6 @@ export const getInitialPreferences = (): {
   codeEditorThemeName: string,
   defaultEditorMosaicNodes: {},
   disableNpmScriptConfirmation: boolean,
-  displaySaveReminder: { activated: boolean },
   editorStateByProject: {},
   eventsSheetCancelInlineParameter: string,
   eventsSheetIndentScale: number,
@@ -114,8 +113,13 @@ export const getInitialPreferences = (): {
   inAppTutorialsProgress: {},
   isAlwaysOnTopInPreview: boolean,
   isMenuBarHiddenInPreview: boolean,
+  isProjectManagerPinned: boolean,
   language: string,
   lastLaunchedVersion: void,
+  enableMcpServer: boolean,
+  mcpAllowCommandTools: boolean,
+  mcpAllowWriteTools: boolean,
+  mcpServerPort: number,
   newFeaturesAcknowledgements: {},
   newObjectDialogDefaultTab: any,
   newProjectsDefaultFolder: any,
@@ -124,9 +128,11 @@ export const getInitialPreferences = (): {
   previewCrashReportUploadLevel: string,
   projectLastUsedPaths: {},
   recentProjectFiles: any,
+  resourcesToolsSettings: any,
   resourcesImporationBehavior: string,
   shareDialogDefaultTab: string,
   showAiAskButtonInTitleBar: boolean,
+  showAddNoteButtonInTitleBar: boolean,
   showBasicProfilingCounters: boolean,
   showCreateSectionByDefault: boolean,
   showDeprecatedInstructionWarning: string,
@@ -144,16 +150,15 @@ export const getInitialPreferences = (): {
   userShortcutMap: {},
   watchProjectFolderFilesForLocalProjects: boolean,
 } => {
-  let languageOrLocale = 'en';
-  const browserLanguageOrLocale = getBrowserLanguageOrLocale();
-  if (browserLanguageOrLocale)
-    languageOrLocale = selectLanguageOrLocale(
-      browserLanguageOrLocale,
-      languageOrLocale
-    );
-
-  return { ...initialPreferences.values, language: languageOrLocale };
+  return { ...initialPreferences.values };
 };
+
+const hasMcpServerConfigurationChanged = (
+  oldValues: PreferencesValues,
+  newValues: PreferencesValues
+): boolean =>
+  oldValues.enableMcpServer !== newValues.enableMcpServer ||
+  oldValues.mcpServerPort !== newValues.mcpServerPort;
 
 const getPreferences = (): PreferencesValues => {
   const preferences =
@@ -255,6 +260,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutoOpenMostRecentProject: (this._setAutoOpenMostRecentProject.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setProjectManagerPinned: (this._setProjectManagerPinned.bind(this): any),
     // $FlowFixMe[method-unbinding]
     hadProjectOpenedDuringLastSession: (this._hadProjectOpenedDuringLastSession.bind(
       this
@@ -376,8 +383,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setDisplaySaveReminder: (this._setDisplaySaveReminder.bind(this): any),
-    // $FlowFixMe[method-unbinding]
     getEditorStateForProject: (this._getEditorStateForProject.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setEditorStateForProject: (this._setEditorStateForProject.bind(this): any),
@@ -400,13 +405,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ): any),
     // $FlowFixMe[method-unbinding]
+    setShowAddNoteButtonInTitleBar: (this._setShowAddNoteButtonInTitleBar.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
     setAutomaticallyUseCreditsForAiRequests: (this._setAutomaticallyUseCreditsForAiRequests.bind(
       this
     ): any),
     // $FlowFixMe[method-unbinding]
-    setAutomaticallyApplyAiRequestEditsForProjectId: (this._setAutomaticallyApplyAiRequestEditsForProjectId.bind(
-      this
-    ): any),
+    setEnableMcpServer: (this._setEnableMcpServer.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setMcpServerPort: (this._setMcpServerPort.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setMcpAllowWriteTools: (this._setMcpAllowWriteTools.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setMcpAllowCommandTools: (this._setMcpAllowCommandTools.bind(this): any),
     // $FlowFixMe[method-unbinding]
     setUseBackgroundSerializerForSaving: (this._setUseBackgroundSerializerForSaving.bind(
       this
@@ -428,11 +441,32 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       () => this._checkUpdates(),
       PERIODIC_APP_UPDATES_TIMEOUT
     );
+    this._notifyMcpServerConfiguration();
+  }
+
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (hasMcpServerConfigurationChanged(prevState.values, this.state.values)) {
+      this._notifyMcpServerConfiguration();
+    }
   }
 
   componentWillUnmount() {
     clearTimeout(this._periodicUpdateCheckTimeout);
     clearInterval(this._periodicUpdateCheckInterval);
+  }
+
+  _notifyMcpServerConfiguration() {
+    if (!ipcRenderer || !ipcRenderer.invoke) return;
+
+    const { enableMcpServer, mcpServerPort } = this.state.values;
+    ipcRenderer
+      .invoke('mcp-server-update-config', {
+        enabled: enableMcpServer,
+        port: mcpServerPort,
+      })
+      .catch(error => {
+        console.error('Unable to update MCP server configuration:', error);
+      });
   }
 
   _setMultipleValues(updates: ProjectSpecificPreferencesValues) {
@@ -1085,6 +1119,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setProjectManagerPinned(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isProjectManagerPinned: enabled,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _hadProjectOpenedDuringLastSession(): any {
     return this.state.values.hasProjectOpened;
   }
@@ -1258,18 +1304,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setDisplaySaveReminder(newValue: {| activated: boolean |}) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          displaySaveReminder: newValue,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
   _setUseBackgroundSerializerForSaving(newValue: boolean) {
     this.setState(
       state => ({
@@ -1420,6 +1454,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setShowAddNoteButtonInTitleBar(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showAddNoteButtonInTitleBar: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setAutomaticallyUseCreditsForAiRequests(newValue: boolean) {
     this.setState(
       state => ({
@@ -1432,18 +1478,48 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setAutomaticallyApplyAiRequestEditsForProjectId(
-    projectId: string,
-    newValue: boolean
-  ) {
+  _setEnableMcpServer(newValue: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          automaticallyApplyAiRequestEditsByProjectId: {
-            ...state.values.automaticallyApplyAiRequestEditsByProjectId,
-            [projectId]: newValue,
-          },
+          enableMcpServer: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setMcpServerPort(newValue: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          mcpServerPort: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setMcpAllowWriteTools(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          mcpAllowWriteTools: newValue,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setMcpAllowCommandTools(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          mcpAllowCommandTools: newValue,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

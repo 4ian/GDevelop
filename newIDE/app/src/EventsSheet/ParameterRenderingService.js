@@ -30,7 +30,7 @@ import TrueFalseField, {
   renderInlineTrueFalse,
 } from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
-import StringField from './ParameterFields/StringField';
+import EnumVariableValueField from './ParameterFields/EnumVariableValueField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import NumberWithChoicesField from './ParameterFields/NumberWithChoicesField';
 import BehaviorField from './ParameterFields/BehaviorField';
@@ -74,6 +74,7 @@ import LayerEffectParameterNameField from './ParameterFields/LayerEffectParamete
 import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
 import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
+import Model3DBoneNameField from './ParameterFields/Model3DBoneNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import ObjectSkinNameField from './ParameterFields/ObjectSkinNameField';
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
@@ -112,13 +113,14 @@ const components: {
   trueorfalse: TrueFalseField,
   number: ExpressionField,
   expression: ExpressionField,
-  string: StringField,
+  string: EnumVariableValueField,
   stringWithSelector: StringWithSelectorField,
   numberWithChoices: NumberWithChoicesField,
   behavior: BehaviorField,
   variable: AnyVariableField,
   variableOrProperty: AnyVariableOrPropertyField,
   variableOrPropertyOrParameter: AnyVariableOrPropertyOrParameterField,
+  constantPath: DefaultField,
   scenevar: SceneVariableField,
   globalvar: GlobalVariableField,
   objectvar: ObjectVariableField,
@@ -140,11 +142,13 @@ const components: {
   color: ColorExpressionField,
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
+  signalName: EnumVariableValueField,
   layerEffectName: LayerEffectNameField,
   layerEffectParameterName: LayerEffectParameterNameField,
   objectEffectName: ObjectEffectNameField,
   objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
+  model3DBoneName: Model3DBoneNameField,
   objectAnimationName: ObjectAnimationNameField,
   objectSkinName: ObjectSkinNameField,
   functionParameterName: FunctionParameterNameField,
@@ -160,6 +164,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   variable: renderInlineAnyVariable,
   variableOrProperty: renderInlineAnyVariableOrProperty,
   variableOrPropertyOrParameter: renderInlineAnyVariableOrPropertyOrParameter,
+  constantPath: renderInlineDefaultField,
   globalvar: renderInlineGlobalVariable,
   scenevar: renderInlineSceneVariable,
   objectvar: renderInlineObjectVariable,
@@ -191,6 +196,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   numberWithChoices: t`Number`,
   behavior: t`Behavior`,
   anyvar: t`Variable`,
+  constantPath: t`constant placeholder`,
   scenevar: t`Scene variable`,
   globalvar: t`Global variable`,
   objectvar: t`Object variable`,
@@ -211,11 +217,13 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,
+  signalName: t`String`,
   layerEffectName: t`Layer effect name`,
   layerEffectParameterName: t`Layer effect property name`,
   objectEffectName: t`Object effect name`,
   objectEffectParameterName: t`Object effect property name`,
   objectPointName: t`Object point name`,
+  model3DBoneName: t`3D model bone name`,
   objectAnimationName: t`Object animation name`,
   objectSkinName: t`Object skin name`,
   functionParameterName: t`Parameter name`,

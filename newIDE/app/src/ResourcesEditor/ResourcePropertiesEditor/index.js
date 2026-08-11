@@ -39,6 +39,7 @@ type Props = {|
   onResourcePathUpdated: () => void,
   resourceManagementProps: ResourceManagementProps,
   i18n: I18nType,
+  hidePreview?: boolean,
 |};
 
 export type ResourcePropertiesEditorInterface = {| forceUpdate: () => void |};
@@ -146,6 +147,7 @@ const ResourcePropertiesEditor: React.ComponentType<{
       onResourcePathUpdated,
       resourceManagementProps,
       i18n,
+      hidePreview,
     },
     ref
   ) => {
@@ -302,8 +304,8 @@ const ResourcePropertiesEditor: React.ComponentType<{
 
     return (
       <Background maxWidth>
-        {renderPreview()}
-        <Spacer />
+        {!hidePreview && renderPreview()}
+        {!hidePreview && <Spacer />}
         <ScrollView>
           <ColumnStackLayout
             expand

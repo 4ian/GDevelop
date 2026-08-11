@@ -209,6 +209,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
+  objectExpressions["InstanceId"].SetFunctionName("getUniqueId");
   objectStrExpressions["Layer"].SetFunctionName("getLayer");
   objectExpressions["XFromAngleAndDistance"].SetFunctionName(
       "getXFromAngleAndDistance");
@@ -237,6 +238,10 @@ BaseObjectExtension::BaseObjectExtension() {
 
   GetAllConditions()["CollisionNP"].SetFunctionName(
       "gdjs.evtTools.object.hitBoxesCollisionTest");
+  GetAllConditions()["CollisionEnter"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionEnterTest");
+  GetAllConditions()["CollisionExit"].SetFunctionName(
+      "gdjs.evtTools.object.hitBoxesCollisionExitTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(

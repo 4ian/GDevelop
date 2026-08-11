@@ -13,6 +13,8 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Extensions/Platform.h"
+#include "GDCore/Project/BehaviorConfigurationContainer.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -123,6 +125,61 @@ void CheckBehaviorProperty(ObjectsContainer &container) {
 // TODO EBO Add similar test cases for events-based objects.
 TEST_CASE("BehaviorSerialization", "[common]") {
 
+  SECTION("Overlay serialized behavior content on initialized defaults") {
+    gd::BehaviorConfigurationContainer container;
+    container.GetContent().AddChild("keptDefault").SetIntValue(42);
+    container.GetContent()
+        .AddChild("nested")
+        .AddChild("nestedDefault")
+        .SetStringValue("kept");
+    container.GetContent()
+        .GetChild("nested")
+        .AddChild("overridden")
+        .SetIntValue(1);
+    container.GetContent()
+        .AddChild("array")
+        .ConsiderAsArrayOf("item");
+    container.GetContent()
+        .GetChild("array")
+        .AddChild("item")
+        .SetStringValue("default");
+    container.GetContent()
+        .AddChild("replacedScalar")
+        .AddChild("staleDefault")
+        .SetBoolValue(true);
+
+    gd::SerializerElement serializedContent;
+    serializedContent.AddChild("nested")
+        .AddChild("overridden")
+        .SetIntValue(2);
+    serializedContent.AddChild("unknown").SetBoolValue(true);
+    auto& authoredArray = serializedContent.AddChild("array");
+    authoredArray.ConsiderAsArrayOf("item");
+    authoredArray.AddChild("item").SetStringValue("authored");
+    serializedContent.AddChild("replacedScalar").SetIntValue(7);
+
+    container.UnserializeFromWithDefaultContent(serializedContent);
+
+    REQUIRE(container.GetContent().GetChild("keptDefault").GetIntValue() ==
+            42);
+    REQUIRE(container.GetContent()
+                .GetChild("nested")
+                .GetChild("nestedDefault")
+                .GetStringValue() == "kept");
+    REQUIRE(container.GetContent()
+                .GetChild("nested")
+                .GetChild("overridden")
+                .GetIntValue() == 2);
+    REQUIRE(container.GetContent().GetChild("unknown").GetBoolValue());
+    REQUIRE(container.GetContent()
+                .GetChild("array")
+                .GetChild("item")
+                .GetStringValue() == "authored");
+    REQUIRE(container.GetContent()
+                .GetChild("replacedScalar")
+                .GetIntValue() == 7);
+  }
+
   SECTION("Save and load a project with a custom behavior property value") {
     gd::Platform platform;
     gd::Project writtenProject;
@@ -140,15 +197,146 @@ TEST_CASE("BehaviorSerialization", "[common]") {
     CheckBehaviorProperty(readProject.GetLayout("Scene").GetObjects());
   }
 
+  SECTION("Behaviors without shared properties have no scene shared data") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProject(project, platform);
+    auto &layout = project.GetLayout("Scene");
+    auto &object = layout.GetObjects().GetObject("MyObject");
+    REQUIRE(object.AddNewBehavior(
+                project,
+                "ResizableCapability::ResizableBehavior",
+                "Resizable") != nullptr);
+
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.GetAllBehaviorSharedDataNames().empty());
+
+    SerializerElement projectElement;
+    project.SerializeTo(projectElement);
+    auto &sharedDataElement = projectElement.GetChild("layouts")
+                                  .GetChild(0)
+                                  .GetChild("behaviorsSharedData");
+    sharedDataElement.ConsiderAsArrayOf("behaviorSharedData");
+    REQUIRE(sharedDataElement.GetChildrenCount() == 0);
+  }
+
+  SECTION("Scene shared data follows custom behavior shared properties") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProject(project, platform);
+    auto &layout = project.GetLayout("Scene");
+    auto &sharedProperties =
+        project
+            .GetEventsBasedBehavior(
+                "MyEventsExtension::MyEventsBasedBehavior")
+            .GetSharedPropertyDescriptors();
+    sharedProperties.InsertNew("MySharedProperty", 0)
+        .SetType("Number")
+        .SetValue("42");
+
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.HasBehaviorSharedData("MyEventsBasedBehavior"));
+    REQUIRE(layout.GetBehaviorSharedData("MyEventsBasedBehavior")
+                .GetProperties()
+                .size() == 1);
+
+    sharedProperties.Remove("MySharedProperty");
+    layout.UpdateBehaviorsSharedData(project);
+
+    REQUIRE(layout.GetAllBehaviorSharedDataNames().empty());
+  }
+
+  SECTION("Loading drops a stale empty shared-data entry") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+    auto &sharedDataElement = projectElement.GetChild("layouts")
+                                  .GetChild(0)
+                                  .GetChild("behaviorsSharedData");
+    auto &staleSharedData =
+        sharedDataElement.AddChild("behaviorSharedData");
+    staleSharedData.SetAttribute("name", "MyEventsBasedBehavior");
+    staleSharedData.SetAttribute(
+        "type", "MyEventsExtension::MyEventsBasedBehavior");
+    auto &staleNativeSharedData =
+        sharedDataElement.AddChild("behaviorSharedData");
+    staleNativeSharedData.SetAttribute("name", "Resizable");
+    staleNativeSharedData.SetAttribute(
+        "type", "ResizableCapability::ResizableBehavior");
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    REQUIRE(readProject.GetLayout("Scene")
+                .GetAllBehaviorSharedDataNames()
+                .empty());
+  }
+
   SECTION("Copy constructor of Behavior") {
     gd::Platform platform;
     gd::Project originalProject;
     SetupProject(originalProject, platform);
+    auto &originalBehavior = originalProject.GetLayout("Scene")
+                                 .GetObjects()
+                                 .GetObject("MyObject")
+                                 .GetBehavior("MyEventsBasedBehavior");
+    originalBehavior.SetMuted(true);
     CheckBehaviorProperty(originalProject.GetLayout("Scene").GetObjects());
 
     auto clonedProject = originalProject;
 
     CheckBehaviorProperty(clonedProject.GetLayout("Scene").GetObjects());
+    REQUIRE(clonedProject.GetLayout("Scene")
+                .GetObjects()
+                .GetObject("MyObject")
+                .GetBehavior("MyEventsBasedBehavior")
+                .IsMuted());
+  }
+
+  SECTION("Save and load a project with a muted behavior") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+    auto &behavior = writtenProject.GetLayout("Scene")
+                         .GetObjects()
+                         .GetObject("MyObject")
+                         .GetBehavior("MyEventsBasedBehavior");
+    behavior.SetMuted(true);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+    auto &layoutElement = projectElement.GetChild("layouts").GetChild(0);
+    auto &behaviorElement = layoutElement.GetChild("objects")
+                                .GetChild(0)
+                                .GetChild("behaviors")
+                                .GetChild(0);
+    REQUIRE(behaviorElement.GetBoolAttribute("isMuted", false));
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+    auto &readBehavior = readProject.GetLayout("Scene")
+                             .GetObjects()
+                             .GetObject("MyObject")
+                             .GetBehavior("MyEventsBasedBehavior");
+    REQUIRE(readBehavior.IsMuted());
+
+    readBehavior.SetMuted(false);
+    SerializerElement unmutedProjectElement;
+    readProject.SerializeTo(unmutedProjectElement);
+    auto &unmutedBehaviorElement = unmutedProjectElement.GetChild("layouts")
+                                      .GetChild(0)
+                                      .GetChild("objects")
+                                      .GetChild(0)
+                                      .GetChild("behaviors")
+                                      .GetChild(0);
+    REQUIRE(!unmutedBehaviorElement.HasAttribute("isMuted"));
   }
 
   SECTION("Load a project with a property value on a custom behavior that no longer exists") {
@@ -219,5 +407,146 @@ TEST_CASE("BehaviorSerialization", "[common]") {
         readProject
             .GetEventsBasedObject("MyOtherEventsExtension::MyEventsBasedObject")
             .GetObjects());
+  }
+
+  SECTION("Save and load behaviors on an event based object type") {
+    gd::Platform platform;
+    gd::Project writtenProject;
+    SetupProject(writtenProject, platform);
+    AddAnotherEventsBasedExtensionWithDependency(writtenProject);
+
+    auto &eventsBasedObject = writtenProject.GetEventsBasedObject(
+        "MyOtherEventsExtension::MyEventsBasedObject");
+    auto *prefabBehavior = eventsBasedObject.AddNewBehavior(
+        writtenProject, "MyEventsExtension::MyEventsBasedBehavior",
+        "MyPrefabBehavior");
+    prefabBehavior->UpdateProperty("MyProperty", "123456");
+    prefabBehavior->SetMuted(true);
+
+    SerializerElement projectElement;
+    writtenProject.SerializeTo(projectElement);
+
+    auto &extensionsElement =
+        projectElement.GetChild("eventsFunctionsExtensions");
+    extensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+    auto &eventsBasedObjectsElement =
+        extensionsElement.GetChild(0).GetChild("eventsBasedObjects");
+    eventsBasedObjectsElement.ConsiderAsArrayOf("eventsBasedObject");
+    auto &eventsBasedObjectElement = eventsBasedObjectsElement.GetChild(0);
+    auto &behaviorsElement = eventsBasedObjectElement.GetChild("behaviors");
+    behaviorsElement.ConsiderAsArrayOf("behavior");
+    REQUIRE(behaviorsElement.GetChildrenCount() == 1);
+    auto &behaviorElement = behaviorsElement.GetChild(0);
+    REQUIRE(behaviorElement.GetStringAttribute("name") == "MyPrefabBehavior");
+    REQUIRE(behaviorElement.GetStringAttribute("type") ==
+            "MyEventsExtension::MyEventsBasedBehavior");
+    REQUIRE(behaviorElement.GetStringAttribute("MyProperty") == "123456");
+    REQUIRE(behaviorElement.GetBoolAttribute("isMuted", false));
+
+    gd::Project readProject;
+    readProject.AddPlatform(platform);
+    readProject.UnserializeFrom(projectElement);
+
+    auto &readEventsBasedObject = readProject.GetEventsBasedObject(
+        "MyOtherEventsExtension::MyEventsBasedObject");
+    REQUIRE(readEventsBasedObject.HasBehaviorNamed("MyPrefabBehavior"));
+    REQUIRE(readEventsBasedObject.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "123456");
+    REQUIRE(readEventsBasedObject.GetBehavior("MyPrefabBehavior").IsMuted());
+
+    gd::Layout &layout = readProject.InsertNewLayout("PrefabInstances", 0);
+    auto &object = layout.GetObjects().InsertNewObject(
+        readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+        "PrefabInstance", 0);
+    REQUIRE(object.HasBehaviorNamed("MyPrefabBehavior"));
+    auto &objectBehavior = object.GetBehavior("MyPrefabBehavior");
+    REQUIRE(objectBehavior.IsInheritedFromObjectType());
+    REQUIRE(objectBehavior.IsMuted());
+    REQUIRE(objectBehavior.GetProperties().at("MyProperty").GetValue() ==
+            "123456");
+
+    objectBehavior.UpdateProperty("MyProperty", "654321");
+    readProject.EnsureObjectInheritedBehaviors(object);
+    REQUIRE(object.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
+    auto &objectWithExistingBehavior = layout.GetObjects().InsertNewObject(
+        readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+        "PrefabInstanceWithExistingBehavior", 1);
+    objectWithExistingBehavior.RemoveBehavior("MyPrefabBehavior");
+    objectWithExistingBehavior.AddNewBehavior(
+        readProject, "MyEventsExtension::MyEventsBasedBehavior",
+        "MyPrefabBehavior");
+
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "0");
+
+    readProject.EnsureObjectInheritedBehaviors(objectWithExistingBehavior);
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsMuted());
+    REQUIRE(objectWithExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "123456");
+
+    auto &objectWithCustomizedExistingBehavior =
+        layout.GetObjects().InsertNewObject(
+            readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+            "PrefabInstanceWithCustomizedExistingBehavior", 2);
+    objectWithCustomizedExistingBehavior.RemoveBehavior("MyPrefabBehavior");
+    auto *customizedExistingBehavior =
+        objectWithCustomizedExistingBehavior.AddNewBehavior(
+            readProject, "MyEventsExtension::MyEventsBasedBehavior",
+            "MyPrefabBehavior");
+    customizedExistingBehavior->UpdateProperty("MyProperty", "654321");
+
+    readProject.EnsureObjectInheritedBehaviors(
+        objectWithCustomizedExistingBehavior);
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .IsMuted());
+    REQUIRE(objectWithCustomizedExistingBehavior.GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
+    auto &globalObjectWithCustomizedExistingBehavior =
+        readProject.GetObjects().InsertNewObject(
+            readProject, "MyOtherEventsExtension::MyEventsBasedObject",
+            "GlobalPrefabInstanceWithCustomizedExistingBehavior", 0);
+    globalObjectWithCustomizedExistingBehavior.RemoveBehavior(
+        "MyPrefabBehavior");
+    auto *customizedExistingGlobalBehavior =
+        globalObjectWithCustomizedExistingBehavior.AddNewBehavior(
+            readProject, "MyEventsExtension::MyEventsBasedBehavior",
+            "MyPrefabBehavior");
+    customizedExistingGlobalBehavior->UpdateProperty("MyProperty", "654321");
+
+    readProject.EnsureObjectInheritedBehaviors(
+        globalObjectWithCustomizedExistingBehavior);
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .IsInheritedFromObjectType());
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .IsMuted());
+    REQUIRE(globalObjectWithCustomizedExistingBehavior
+                .GetBehavior("MyPrefabBehavior")
+                .GetProperties()
+                .at("MyProperty")
+                .GetValue() == "654321");
+
+    readEventsBasedObject.RemoveBehavior("MyPrefabBehavior");
+    readProject.EnsureObjectInheritedBehaviors(object);
+    REQUIRE(!object.HasBehaviorNamed("MyPrefabBehavior"));
   }
 }

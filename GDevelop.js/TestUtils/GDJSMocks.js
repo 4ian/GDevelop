@@ -116,8 +116,13 @@ class Variable {
   constructor(data) {
     /** @type {string|number} */
     this._value = data ? data.value : 0;
+    this._type = data && data.type ? data.type : 'number';
+    this._enumValues = data && data.values ? [...data.values] : [];
     this._children = {};
     this._childrenArray = [];
+    if (this._type === 'enum') {
+      this._normalizeEnumValue();
+    }
   }
 
   add(value) {
@@ -126,6 +131,8 @@ class Variable {
 
   setNumber(value) {
     this._value = value;
+    this._type = 'number';
+    this._enumValues = [];
   }
 
   getAsNumber() {
@@ -133,15 +140,29 @@ class Variable {
   }
 
   getValue() {
+    if (this._type === 'string' || this._type === 'enum') {
+      return this.getAsString();
+    }
+    if (this._type === 'boolean') {
+      return this.getAsBoolean();
+    }
     return this.getAsNumber();
   }
 
   setValue(value) {
-    this.setNumber(value);
+    if (this._type === 'string' || this._type === 'enum') {
+      this.setString(value);
+    } else if (this._type === 'boolean') {
+      this.setBoolean(!!value);
+    } else {
+      this.setNumber(value);
+    }
   }
 
   setBoolean(value) {
     this._value = value;
+    this._type = 'boolean';
+    this._enumValues = [];
   }
 
   toggle(value) {
@@ -191,13 +212,28 @@ class Variable {
   }
 
   castTo(newType) {
-    if (newType === 'string' || newType === 'number' || newType === 'boolean') {
+    if (
+      newType === 'string' ||
+      newType === 'number' ||
+      newType === 'boolean' ||
+      newType === 'enum'
+    ) {
       this._children = {};
       this._childrenArray = [];
+      this._type = newType;
+      if (newType === 'enum') {
+        this._normalizeEnumValue();
+      } else {
+        this._enumValues = [];
+      }
     } else if (newType === 'structure') {
       this._childrenArray = [];
+      this._type = newType;
+      this._enumValues = [];
     } else if (newType === 'array') {
       this._children = {};
+      this._type = newType;
+      this._enumValues = [];
     }
   }
 
@@ -215,7 +251,7 @@ class Variable {
     if (Object.keys(this._children).length > 0) {
       return 'structure';
     }
-    return 'number';
+    return this._type;
   }
 
   removeChild(childName) {
@@ -270,6 +306,8 @@ class Variable {
 
   setString(value) {
     this._value = value;
+    this._type = this._type === 'enum' ? 'enum' : 'string';
+    this._normalizeEnumValue();
   }
 
   getAsString() {
@@ -282,6 +320,50 @@ class Variable {
 
   getAsNumberOrString() {
     return this._value;
+  }
+
+  getEnumValues() {
+    return {
+      toJSArray: () => [...this._enumValues],
+    };
+  }
+
+  setEnumValues(values) {
+    this._enumValues =
+      values && values.toJSArray ? values.toJSArray() : [...values];
+    this._normalizeEnumValue();
+  }
+
+  addEnumValue(value) {
+    if (!this._enumValues.includes(value)) {
+      this._enumValues.push(value);
+    }
+    this._normalizeEnumValue();
+  }
+
+  removeEnumValueAt(index) {
+    if (index >= 0 && index < this._enumValues.length) {
+      this._enumValues.splice(index, 1);
+      this._normalizeEnumValue();
+    }
+  }
+
+  clearEnumValues() {
+    this._enumValues = [];
+  }
+
+  isValidEnumValue(value) {
+    return this._enumValues.length === 0 || this._enumValues.includes(value);
+  }
+
+  _normalizeEnumValue() {
+    if (
+      this._type === 'enum' &&
+      this._enumValues.length > 0 &&
+      !this._enumValues.includes('' + this._value)
+    ) {
+      this._value = this._enumValues[0];
+    }
   }
 
   /**
@@ -297,9 +379,7 @@ class Variable {
    * @param {string | number | boolean} value
    */
   pushValue(value) {
-    this._childrenArray.push(
-      new Variable({ value })
-    );
+    this._childrenArray.push(new Variable({ value }));
     return this;
   }
 
@@ -310,7 +390,7 @@ class Variable {
     this._childrenArray.push(variable.clone());
     return this;
   }
-  
+
   /**
    * @param {Variable} variable
    */
@@ -328,6 +408,9 @@ class Variable {
   static copy(source, target, merge) {
     if (!merge) target.clearChildren();
     target.castTo(source.getType());
+    if (source.getType() === 'enum') {
+      target.setEnumValues(source.getEnumValues());
+    }
     if (source.isPrimitive()) {
       target.setValue(source.getValue());
     } else if (source.getType() === 'structure') {
@@ -352,7 +435,10 @@ class VariablesContainer {
       const setupVariableFromVariableData = (variable, variableData) => {
         if (variableData.type === 'number') {
           variable.setNumber(variableData.value);
-        } else if (variableData.type === 'string') {
+        } else if (
+          variableData.type === 'string' ||
+          variableData.type === 'enum'
+        ) {
           variable.setString(variableData.value);
         } else if (variableData.type === 'boolean') {
           variable.setBoolean(variableData.value);
@@ -413,10 +499,10 @@ class VariablesContainer {
         const variable = new Variable();
         this._indexedVariables[index] = variable;
         return variable;
-      }
-      else {
+      } else {
         throw new Error(
-          'Trying to access to an indexed variable that does not exist: ' + index
+          'Trying to access to an indexed variable that does not exist: ' +
+            index
         );
       }
     }
@@ -506,6 +592,52 @@ class RuntimeObject {
     return variable.getAsString();
   }
 
+  static _getVariableEnumValues(variable) {
+    const enumValues = variable.getEnumValues();
+    return enumValues && enumValues.toJSArray
+      ? enumValues.toJSArray()
+      : enumValues;
+  }
+
+  static _validateVariableEnumValue(variable, value) {
+    value = '' + value;
+    const enumValues = RuntimeObject._getVariableEnumValues(variable);
+    if (variable.getType() !== 'enum') {
+      throw new Error(
+        `Expected an enum variable, but got a ${variable.getType()} variable.`
+      );
+    }
+    if (enumValues.length > 0 && enumValues.indexOf(value) === -1) {
+      throw new Error(
+        `"${value}" is not a valid enum value. Allowed values are: ${enumValues.join(
+          ', '
+        )}.`
+      );
+    }
+  }
+
+  static getVariableEnum(variable) {
+    const value = variable.getAsString();
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    return value;
+  }
+
+  getVariableEnum(variable) {
+    const value = variable.getAsString();
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    return value;
+  }
+
+  static setVariableEnum(variable, value) {
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    variable.setString(value);
+  }
+
+  setVariableEnum(variable, value) {
+    RuntimeObject._validateVariableEnumValue(variable, value);
+    variable.setString(value);
+  }
+
   static getVariableBoolean(variable) {
     return variable.getAsBoolean();
   }
@@ -581,14 +713,22 @@ class CustomRuntimeObject2D extends RuntimeObject {
     super(parentInstanceContainer, objectData);
     this._instanceContainer = parentInstanceContainer;
 
-    const variantData = this._instanceContainer
-      .getGame()
-      .getEventsBasedObjectData(objectData.type);
+    const variantData = objectData.type
+      ? this._instanceContainer
+          .getGame()
+          .getEventsBasedObjectData(objectData.type)
+      : null;
+    this._prefabVariables = new VariablesContainer(
+      variantData ? variantData.variables || [] : undefined
+    );
     if (variantData) {
       for (const childObjectData of variantData.objects) {
         this._instanceContainer.registerObject(childObjectData);
       }
     }
+  }
+  getPrefabVariables() {
+    return this._prefabVariables;
   }
   onCreated() {}
 }
@@ -708,6 +848,27 @@ const objectsListsToArray = function (objectsLists) {
   return result;
 };
 
+const assertObjectListHasNoMoreThanOnePickedInstance = function (
+  objectsList,
+  _usage
+) {
+  return objectsList;
+};
+
+const assertObjectListsHaveNoMoreThanOnePickedInstance = function (
+  objectsLists,
+  _usage
+) {
+  return objectsLists;
+};
+
+const assertObjectMapHasNoMoreThanOnePickedInstance = function (
+  objectsMap,
+  _usage
+) {
+  return objectsMap;
+};
+
 /**
  * @template T
  * @param {Array<T>} src
@@ -779,6 +940,37 @@ const pickAllObjects = (objectsContext, objectsLists) => {
   return true;
 };
 
+/**
+ * @param {any} instanceContainer
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const pickRandomObject = (instanceContainer, objectsLists) => {
+  let pickedObject = null;
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const objectsList = objectsLists.items[name];
+      if (objectsList.length > 0) {
+        pickedObject = objectsList[0];
+        break;
+      }
+    }
+  }
+  if (!pickedObject) {
+    return false;
+  }
+
+  for (const name in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(name)) {
+      const objectsList = objectsLists.items[name];
+      objectsList.length = 0;
+      if (pickedObject.getName() === name) {
+        objectsList.push(pickedObject);
+      }
+    }
+  }
+  return true;
+};
+
 class RuntimeGame {
   constructor(gameData) {
     this._variablesContainer = new VariablesContainer(
@@ -811,7 +1003,7 @@ class RuntimeGame {
   getVariables() {
     return this._variablesContainer;
   }
-  
+
   getVariablesForExtension(extensionName) {
     return this._variablesByExtensionName.get(extensionName) || null;
   }
@@ -847,6 +1039,9 @@ class RuntimeScene {
 
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
+    this._isFirstFrame = true;
+    this._deliveredSceneSignals = [];
+    this._currentSceneSignal = null;
 
     /** @type {Object.<string, any>} */
     this._objects = {};
@@ -925,6 +1120,22 @@ class RuntimeScene {
     return this._asyncTasksManager;
   }
 
+  getTimeManager() {
+    return {
+      isFirstFrame: () => this._isFirstFrame,
+    };
+  }
+
+  /** @param {boolean} isFirstFrame */
+  setIsFirstFrameForTests(isFirstFrame) {
+    this._isFirstFrame = isFirstFrame;
+  }
+
+  /** @param {Array<any>} signals */
+  setDeliveredSceneSignalsForTests(signals) {
+    this._deliveredSceneSignals = signals;
+  }
+
   /** @param {string} objectName */
   getInstancesCountOnScene(objectName) {
     const instances = this._instances[objectName];
@@ -962,6 +1173,7 @@ class LongLivedObjectsList {
     this.callbacks = new Map();
     /** @type {LongLivedObjectsList | null} */
     this.parent = null;
+    this.sceneSignalContext = null;
   }
 
   /** @param {LongLivedObjectsList} parent */
@@ -1028,6 +1240,32 @@ class LongLivedObjectsList {
   backupLocalVariablesContainers(variablesContainers) {
     copyArray(variablesContainers, this.localVariablesContainers);
   }
+
+  /** @param {RuntimeScene} runtimeScene */
+  backupSceneSignalContext(runtimeScene) {
+    if (runtimeScene._currentSceneSignal) {
+      this.sceneSignalContext = {
+        name: runtimeScene._currentSceneSignal.name,
+        payload: runtimeScene._currentSceneSignal.payload,
+      };
+    }
+  }
+
+  getSceneSignalName() {
+    return this.sceneSignalContext
+      ? this.sceneSignalContext.name
+      : this.parent
+      ? this.parent.getSceneSignalName()
+      : '';
+  }
+
+  getSceneSignalPayload() {
+    return this.sceneSignalContext
+      ? this.sceneSignalContext.payload
+      : this.parent
+      ? this.parent.getSceneSignalPayload()
+      : '';
+  }
 }
 
 /**
@@ -1049,7 +1287,6 @@ function makeMinimalGDJSMock(options) {
     options && options.sceneData,
     runtimeGame
   );
-
   return {
     gdjs: {
       evtTools: {
@@ -1075,6 +1312,7 @@ function makeMinimalGDJSMock(options) {
           getSceneInstancesCount,
           getPickedInstancesCount,
           pickAllObjects,
+          pickRandomObject,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
@@ -1087,6 +1325,21 @@ function makeMinimalGDJSMock(options) {
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
           toString: (num) => '' + num,
+        },
+        signal: {
+          getDeliveredSceneSignalBatch: (runtimeScene) =>
+            runtimeScene._deliveredSceneSignals,
+          setCurrentSignalForSceneCondition: (runtimeScene, signal) => {
+            runtimeScene._currentSceneSignal = signal;
+          },
+          clearCurrentSignalForSceneCondition: (runtimeScene) => {
+            runtimeScene._currentSceneSignal = null;
+          },
+          recordSceneSignalReceived: () => {},
+          getSignalName: (runtimeScene) =>
+            runtimeScene._currentSceneSignal?.name || '',
+          getSignalPayload: (runtimeScene) =>
+            runtimeScene._currentSceneSignal?.payload || '',
         },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
@@ -1105,6 +1358,9 @@ function makeMinimalGDJSMock(options) {
       },
       copyArray,
       objectsListsToArray,
+      assertObjectListHasNoMoreThanOnePickedInstance,
+      assertObjectListsHaveNoMoreThanOnePickedInstance,
+      assertObjectMapHasNoMoreThanOnePickedInstance,
       RuntimeBehavior,
       RuntimeObject,
       OnceTriggers,

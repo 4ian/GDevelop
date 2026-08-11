@@ -7,7 +7,10 @@ import WindowCommandsProvider from '../CommandPalette/WindowCommandsProvider';
 import ErrorBoundary, {
   getEditorErrorBoundaryProps,
 } from '../UI/ErrorBoundary';
-import { type EditorTab } from './EditorTabs/EditorTabsHandler';
+import {
+  getAllEditorTabs,
+  type EditorTab,
+} from './EditorTabs/EditorTabsHandler';
 import UnsavedChangesContext from './UnsavedChangesContext';
 import { SpecificDimensionsWindowSizeProvider } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import WindowPortal from '../UI/WindowPortal';
@@ -30,6 +33,7 @@ type Props = {|
   editorTab: EditorTab,
   onClose: (editorTab: EditorTab) => void,
   onPopIn: (editorTab: EditorTab) => void,
+  focusRequestId: number,
 |};
 
 const getPopOutDimensions = (
@@ -113,7 +117,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
 
   return (
     <WindowPortal
-      key={`popout-${editorTab.id}`}
+      key={`popout-${editorTab.key}`}
+      role={editorTab.kind === 'debugger' ? 'debugger' : undefined}
       title={editorTab.label || 'GDevelop'}
       onClose={() => {
         props.onEditorTabClosing(editorTab);
@@ -122,6 +127,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
       initialWidth={popOutWidth}
       initialHeight={popOutHeight}
       onWindowReady={onWindowReady}
+      focusRequestId={props.focusRequestId}
       renderContent={({ windowSize }) => (
         <SpecificDimensionsWindowSizeProvider
           innerWidth={windowSize.width}
@@ -151,11 +157,24 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                     onLaunchPreviewWithDiagnosticReport={
                       props.launchPreviewWithDiagnosticReport
                     }
+                    displayCollisionShapesInPreview={
+                      props.displayCollisionShapesInPreview
+                    }
+                    setDisplayCollisionShapesInPreview={
+                      props.setDisplayCollisionShapesInPreview
+                    }
+                    displaySignalAnimationsInPreview={
+                      props.displaySignalAnimationsInPreview
+                    }
+                    setDisplaySignalAnimationsInPreview={
+                      props.setDisplaySignalAnimationsInPreview
+                    }
                     canDoNetworkPreview={props.canDoNetworkPreview}
                     setPreviewOverride={props.setPreviewOverride}
                     isPreviewEnabled={
                       !!props.currentProject &&
-                      props.currentProject.getLayoutsCount() > 0
+                      props.currentProject.getLayoutsCount() > 0 &&
+                      !props.isPreviewLaunchInProgress
                     }
                     previewState={props.previewState}
                     onOpenVersionHistory={props.openVersionHistoryPanel}
@@ -244,6 +263,7 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.showRestartInGameEditorAfterErrorButton,
                         resourceManagementProps: poppedOutResourceManagementProps,
                         onSave: props.saveProject,
+                        onAutoSaveConstants: props.autoSaveConstants,
                         onSaveProjectAsWithStorageProvider:
                           props.saveProjectAsWithStorageProvider,
                         canSave: props.canSave,
@@ -254,6 +274,9 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                           props.openInstructionOrExpression,
                         onOpenCustomObjectEditor:
                           props.onOpenCustomObjectEditor,
+                        onOpenPrefabDetailEditor:
+                          props.onOpenPrefabDetailEditor,
+                        onOpenPrefabSettings: props.onOpenPrefabSettings,
                         onOpenEventsFunctionsExtension:
                           props.onOpenEventsFunctionsExtension,
                         onRenamedEventsBasedObject:
@@ -313,6 +336,14 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                             props.currentProject,
                             extension
                           );
+                          for (const tab of getAllEditorTabs(
+                            props.editorTabs
+                          )) {
+                            const { editorRef } = tab;
+                            if (editorRef) {
+                              editorRef.forceUpdateEditor();
+                            }
+                          }
                         },
                         onDeleteResource: (
                           resource: gdResource,
@@ -369,8 +400,8 @@ const PoppedOutEditorContainerWindow = (props: Props): React.Node => {
                         onExtensionInstalled: props.onExtensionInstalled,
                         onEffectAdded: props.onEffectAdded,
                         onObjectListsModified: props.onObjectListsModified,
-                        onExternalLayoutAssociationChanged:
-                          props.onExternalLayoutAssociationChanged,
+                        onExternalAssociationChanged:
+                          props.onExternalAssociationChanged,
                         triggerHotReloadInGameEditorIfNeeded:
                           props.triggerHotReloadInGameEditorIfNeeded,
                         gamesList: props.gamesList,

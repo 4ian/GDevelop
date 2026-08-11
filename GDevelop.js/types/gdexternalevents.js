@@ -6,6 +6,7 @@ declare class gdExternalEvents {
   getAssociatedLayout(): string;
   setAssociatedLayout(name: string): void;
   getEvents(): gdEventsList;
+  getLifecycleEventsFunctions(): gdSceneLifecycleEventsFunctions;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   delete(): void;

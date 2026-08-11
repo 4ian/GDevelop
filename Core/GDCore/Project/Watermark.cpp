@@ -10,7 +10,7 @@
 
 namespace gd {
 
-Watermark::Watermark() : showWatermark(true), placement("bottom-left"){};
+Watermark::Watermark() : showWatermark(false), placement("bottom-left"){};
 
 void Watermark::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("showWatermark", showWatermark);
@@ -18,7 +18,7 @@ void Watermark::SerializeTo(SerializerElement& element) const {
 }
 
 void Watermark::UnserializeFrom(const SerializerElement& element) {
-  showWatermark = element.GetBoolAttribute("showWatermark", true);
+  showWatermark = element.GetBoolAttribute("showWatermark", false);
   placement = element.GetStringAttribute("placement", "bottom-left");
 }
 }  // namespace gd

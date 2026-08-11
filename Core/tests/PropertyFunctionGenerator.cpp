@@ -326,8 +326,13 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "the movement angle of the object. The "
               "angle of the trajectory direction.");
       REQUIRE(getter.GetSentence() == "the movement angle");
-      // Object parameter is added automatically.
-      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 1);
+      const auto &getterObjectParameter =
+          getter.GetParameters().GetParameter(0);
+      REQUIRE(getterObjectParameter.GetName() == "Object");
+      REQUIRE(getterObjectParameter.GetType() == "object");
+      REQUIRE(getterObjectParameter.GetExtraInfo() ==
+              "MyEventsExtension::MyEventsBasedObject");
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==
@@ -354,8 +359,20 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
       REQUIRE(setter.GetSentence() == "");
       // The group is automatically filled according to the function folder.
       REQUIRE(setter.GetGroup() == "My events based object movement configuration");
-      // Object parameter is added automatically.
+      // The action with operator event parameters are derived from the getter.
       REQUIRE(setter.GetParameters().GetParametersCount() == 0);
+      const auto &setterParameters =
+          setter.GetParametersForEvents(object.GetEventsFunctions());
+      REQUIRE(setterParameters.GetParametersCount() == 2);
+      const auto &setterObjectParameter = setterParameters.GetParameter(0);
+      REQUIRE(setterObjectParameter.GetName() == "Object");
+      REQUIRE(setterObjectParameter.GetType() == "object");
+      REQUIRE(setterObjectParameter.GetExtraInfo() ==
+              "MyEventsExtension::MyEventsBasedObject");
+      const auto &setterValueParameter = setterParameters.GetParameter(1);
+      REQUIRE(setterValueParameter.GetName() == "Value");
+      REQUIRE(setterValueParameter.GetValueTypeMetadata().GetName() ==
+              "expression");
 
       REQUIRE(setter.GetEvents().GetEventsCount() == 1);
       REQUIRE(setter.GetEvents().GetEvent(0).GetType() ==
@@ -439,8 +456,13 @@ TEST_CASE("PropertyFunctionGenerator", "[common]") {
               "Check if rotate object. The rotation follows movements done by "
               "this object.");
       REQUIRE(getter.GetSentence() == "_PARAM0_ rotate object");
-      // The Object parameter is added automatically.
-      REQUIRE(getter.GetParameters().GetParametersCount() == 0);
+      REQUIRE(getter.GetParameters().GetParametersCount() == 1);
+      const auto &getterObjectParameter =
+          getter.GetParameters().GetParameter(0);
+      REQUIRE(getterObjectParameter.GetName() == "Object");
+      REQUIRE(getterObjectParameter.GetType() == "object");
+      REQUIRE(getterObjectParameter.GetExtraInfo() ==
+              "MyEventsExtension::MyEventsBasedObject");
 
       REQUIRE(getter.GetEvents().GetEventsCount() == 1);
       REQUIRE(getter.GetEvents().GetEvent(0).GetType() ==

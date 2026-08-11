@@ -26,7 +26,10 @@ InstructionMetadata::InstructionMetadata()
       usageComplexity(5),
       isPrivate(false),
       isObjectInstruction(false),
-      isBehaviorInstruction(false) {}
+      isBehaviorInstruction(false),
+      requiresSceneFutureFrame(false),
+      emitsDeferredSceneSignal(false),
+      mutatesSceneStack(false) {}
 
 InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
                                          const gd::String& name_,
@@ -50,7 +53,10 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       isPrivate(false),
       isObjectInstruction(false),
       isBehaviorInstruction(false),
-      relevantContext("Any") {}
+      relevantContext("Any"),
+      requiresSceneFutureFrame(false),
+      emitsDeferredSceneSignal(false),
+      mutatesSceneStack(false) {}
 
 InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& type,

@@ -51,6 +51,9 @@ const ObjectPropertiesEditor = (props: Props): React.Node => {
     onUpdateProperty: (object, name, value) =>
       object.updateProperty(name, value),
     layersContainer: null,
+    allowConstantPlaceholders: project.hasEventsBasedObject(
+      objectConfigurationAsGd.getType()
+    ),
     shouldDisabledFieldsWithMixedValues: false,
   });
 

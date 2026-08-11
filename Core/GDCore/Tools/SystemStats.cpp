@@ -26,7 +26,11 @@ int parseLine(char* line) {
 }
 
 size_t SystemStats::GetUsedVirtualMemory() {
-#if defined(LINUX)
+#if defined(EMSCRIPTEN)
+  // Emscripten defines LINUX, but its virtual filesystem does not expose
+  // /proc/self/status. Memory consumption tracking is not available there.
+  return 0;
+#elif defined(LINUX)
   FILE* file = fopen("/proc/self/status", "r");
   int result = -1;
   char line[128];

@@ -3,3 +3,5 @@ app/www/
 .env
 app/extensions/ReactDeveloperTools
 app/extensions/__MACOSX
+output/
+build/

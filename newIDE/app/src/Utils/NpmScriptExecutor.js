@@ -1,7 +1,12 @@
 // @flow
 import optionalRequire from './OptionalRequire';
 
-export type ScriptEntry = {| script: string, keepTerminalOpen?: boolean |};
+export type ScriptEntry = {|
+  script: string,
+  keepTerminalOpen?: boolean,
+  installDependencies?: boolean,
+  openFolderAfterSuccess?: string,
+|};
 
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -24,6 +29,8 @@ export const runNpmScript = (
     projectPath,
     npmScript: entry.script,
     keepTerminalOpen: !!entry.keepTerminalOpen,
+    installDependencies: !!entry.installDependencies,
+    openFolderAfterSuccess: entry.openFolderAfterSuccess,
   });
   return true;
 };

@@ -12,10 +12,7 @@ import {
 } from './EditorTabsHandler';
 import PreferencesContext from '../Preferences/PreferencesContext';
 import { useDebounce } from '../../Utils/UseDebounce';
-import {
-  parseCustomObjectEditorTabName,
-  getObjectTypeFromCustomObjectEditorTabName,
-} from '../../Utils/CustomObjectEditorTabName';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 
 type Props = {|
   editorTabs: EditorTabsState,
@@ -28,6 +25,7 @@ type Props = {|
     project?: ?gdProject,
     paneIdentifier?: 'left' | 'center' | 'right',
     continueProcessingFunctionCallsOnMount?: boolean,
+    scenePanelToOpen?: ?SceneEditorPanelId,
   |}) => EditorOpeningOptions,
 |};
 
@@ -40,11 +38,56 @@ const projectHasItem = ({
   kind: EditorKind,
   name: string,
 |}) => {
-  if (['debugger', 'start page', 'resources', 'global-search'].includes(kind))
+  if (
+    [
+      'debugger',
+      'start page',
+      'resources',
+      'constants',
+      'global-search',
+    ].includes(kind)
+  )
     return true;
   switch (kind) {
     case 'events functions extension':
       return project.hasEventsFunctionsExtensionNamed(name);
+    case 'behavior detail': {
+      const nameElements = name.split('::');
+      const extensionName = nameElements[0];
+      const behaviorName = nameElements[1];
+      if (
+        !extensionName ||
+        !behaviorName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return false;
+      }
+      return project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsBasedBehaviors()
+        .has(behaviorName);
+    }
+    case 'function detail': {
+      const nameElements = name.split('::');
+      const extensionName = nameElements[0];
+      const functionName = nameElements[1];
+      if (
+        !extensionName ||
+        !functionName ||
+        !project.hasEventsFunctionsExtensionNamed(extensionName)
+      ) {
+        return false;
+      }
+      return project
+        .getEventsFunctionsExtension(extensionName)
+        .getEventsFunctions()
+        .hasEventsFunctionNamed(functionName);
+    }
+    case 'prefab detail': {
+      const nameElements = name.split('::');
+      const objectType = nameElements[0] + '::' + nameElements[1];
+      return project.hasEventsBasedObject(objectType);
+    }
     case 'layout':
       return project.hasLayoutNamed(name);
     case 'layout events':
@@ -54,8 +97,9 @@ const projectHasItem = ({
     case 'external events':
       return project.hasExternalEventsNamed(name);
     case 'custom object':
-      const objectType = getObjectTypeFromCustomObjectEditorTabName(name);
-      const variantName = parseCustomObjectEditorTabName(name).variantName;
+      const nameElements = name.split('::');
+      const objectType = nameElements[0] + '::' + nameElements[1];
+      const variantName = nameElements[2];
       return (
         project.hasEventsBasedObject(objectType) &&
         (!variantName ||
@@ -90,7 +134,12 @@ const useEditorTabsStateSaving = ({
       const editorState = {
         currentTab: editorTabs.panes.center.currentTab,
         editors: editorTabs.panes.center.editors
-          .filter(editor => editor.key !== 'start page')
+          .filter(
+            editor =>
+              editor.key !== 'start page' &&
+              editor.kind !== 'resources' &&
+              editor.kind !== 'constants'
+          )
           .map(editor => ({
             projectItemName: editor.projectItemName,
             editorKind: editor.kind,
@@ -145,6 +194,8 @@ const useEditorTabsStateSaving = ({
       let shouldOpenSavedCurrentTab = true;
 
       const editorsOpeningOptions = editorState.editorTabs.editors
+        .filter(editorMetadata => editorMetadata.editorKind !== 'resources')
+        .filter(editorMetadata => editorMetadata.editorKind !== 'constants')
         .map(editorMetadata => {
           if (
             projectHasItem({

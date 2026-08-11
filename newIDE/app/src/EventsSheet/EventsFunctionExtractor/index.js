@@ -18,6 +18,7 @@ const gd: libGDevelop = global.gd;
 export const setupFunctionFromEvents = ({
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainersAccessor,
   scope,
   serializedEvents,
   project,
@@ -27,6 +28,7 @@ export const setupFunctionFromEvents = ({
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   serializedEvents: Object,
   eventsFunction: gdEventsFunction,
 }) => {
@@ -41,9 +43,9 @@ export const setupFunctionFromEvents = ({
   );
 
   // Analyze events...
-  const projectScopedContainers = new ProjectScopedContainersAccessor(
-    scope
-  ).get();
+  const projectScopedContainers = projectScopedContainersAccessor
+    ? projectScopedContainersAccessor.get()
+    : new ProjectScopedContainersAccessor(scope).get();
   const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
     gd.JsPlatform.get()
   );

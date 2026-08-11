@@ -141,15 +141,26 @@ void BehaviorsContainer::UnserializeFrom(gd::Project &project,
         contentElement.RemoveChild("type");
       }
 
-      behavior->UnserializeFrom(contentElement);
+      if (isOverriding) {
+        behavior->UnserializeFrom(contentElement);
+      } else {
+        behavior->UnserializeFromWithDefaultContent(contentElement);
+      }
     }
     // end of compatibility code
     else {
-      behavior->UnserializeFrom(behaviorElement);
+      if (isOverriding) {
+        behavior->UnserializeFrom(behaviorElement);
+      } else {
+        behavior->UnserializeFromWithDefaultContent(behaviorElement);
+      }
     }
 
     bool isFolded = behaviorElement.GetBoolAttribute("isFolded", false);
     behavior->SetFolded(isFolded);
+    behavior->SetMuted(behaviorElement.GetBoolAttribute("isMuted", false));
+    behavior->SetInheritedFromObjectType(
+        behaviorElement.GetBoolAttribute("isInheritedFromObjectType", false));
 
     // Handle Quick Customization info.
     if (behaviorElement.HasChild("propertiesQuickCustomizationVisibilities")) {
@@ -184,10 +195,18 @@ void BehaviorsContainer::SerializeTo(SerializerElement &element) const {
                                          // name properties, remove them.
     behaviorElement.RemoveChild("name");
     behaviorElement.RemoveChild("isFolded");
+    behaviorElement.RemoveChild("isMuted");
+    behaviorElement.RemoveChild("isInheritedFromObjectType");
+    behaviorElement.RemoveAttribute("isMuted");
     behaviorElement.SetAttribute("type", behavior.GetTypeName());
     behaviorElement.SetAttribute("name", behavior.GetName());
     if (behavior.IsFolded())
       behaviorElement.SetAttribute("isFolded", true);
+    if (behavior.IsMuted())
+      behaviorElement.SetAttribute("isMuted", true);
+    if (behavior.IsInheritedFromObjectType()) {
+      behaviorElement.SetAttribute("isInheritedFromObjectType", true);
+    }
 
     // Handle Quick Customization info.
     behaviorElement.RemoveChild("propertiesQuickCustomizationVisibilities");

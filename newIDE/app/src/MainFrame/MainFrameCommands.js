@@ -45,7 +45,7 @@ type CommandHandlers = {|
   hasPreviewsRunning: boolean,
   onOpenProjectManager: () => void,
   onLaunchPreview: () => void | Promise<void>,
-  onLaunchDebugPreview: () => void,
+  onLaunchDebugPreview: () => void | Promise<void>,
   onLaunchNetworkPreview: () => void,
   onHotReloadPreview: () => void,
   onLaunchNetworkPreview: () => Promise<void>,
@@ -72,6 +72,7 @@ type CommandHandlers = {|
   onRunGameplayTest: string => void | Promise<void>,
   onRunAllGameplayTests: () => void | Promise<void>,
   onOpenCommandPalette: () => void,
+  onOpenRecentEditorSwitcher: () => void,
   onOpenProfile: () => void,
   onRestartInGameEditor: (reason: string) => void,
   onOpenGlobalSearch: () => void,
@@ -178,6 +179,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_COMMAND_PALETTE', true, {
     handler: handlers.onOpenCommandPalette,
+  });
+
+  useCommand('OPEN_RECENT_EDITOR', true, {
+    handler: handlers.onOpenRecentEditorSwitcher,
   });
 
   useCommand('OPEN_GLOBAL_SEARCH', !!handlers.project, {

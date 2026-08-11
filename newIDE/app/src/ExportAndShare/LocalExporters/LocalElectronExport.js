@@ -20,6 +20,7 @@ import {
   ExportFlow,
 } from '../GenericExporters/ElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { runNpmScript } from '../../Utils/NpmScriptExecutor';
 // It's important to use remote and not electron for folder actions,
 // otherwise they will be opened in the background.
 // See https://github.com/electron/electron/issues/4349#issuecomment-777475765
@@ -181,6 +182,20 @@ export const localElectronExportPipeline: ExportPipeline<
             label={<Trans>Open folder</Trans>}
             primary={true}
             onClick={openExportFolder}
+          />
+        )}
+        renderBuildButton={() => (
+          <RaisedButton
+            key="build-binary"
+            label={<Trans>Build binary</Trans>}
+            primary
+            onClick={() => {
+              runNpmScript(exportState.outputDir, {
+                script: 'build',
+                installDependencies: true,
+                openFolderAfterSuccess: 'dist',
+              });
+            }}
           />
         )}
       />

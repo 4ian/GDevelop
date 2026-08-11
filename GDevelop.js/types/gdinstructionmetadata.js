@@ -18,6 +18,9 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
+  requiresSceneFutureFrame(): boolean;
+  emitsDeferredSceneSignal(): boolean;
+  mutatesSceneStack(): boolean;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -30,6 +33,9 @@ declare class gdInstructionMetadata extends gdAbstractFunctionMetadata {
   setRelevantForFunctionEventsOnly(): gdInstructionMetadata;
   setRelevantForAsynchronousFunctionEventsOnly(): gdInstructionMetadata;
   setRelevantForCustomObjectEventsOnly(): gdInstructionMetadata;
+  setRequiresSceneFutureFrame(): gdInstructionMetadata;
+  setEmitsDeferredSceneSignal(): gdInstructionMetadata;
+  setMutatesSceneStack(): gdInstructionMetadata;
   addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): gdInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdInstructionMetadata;
   setDefaultValue(defaultValue: string): gdInstructionMetadata;

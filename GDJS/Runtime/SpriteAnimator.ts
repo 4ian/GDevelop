@@ -39,12 +39,29 @@ namespace gdjs {
   };
 
   /**
+   * Represents the part of an image used by a frame.
+   * @category Objects > Animations
+   */
+  export type SpriteFrameSourceRectData = {
+    /** X position of the rectangle inside the image. */
+    x: float;
+    /** Y position of the rectangle inside the image. */
+    y: float;
+    /** Width of the rectangle inside the image. */
+    width: float;
+    /** Height of the rectangle inside the image. */
+    height: float;
+  };
+
+  /**
    * Represents a {@link gdjs.SpriteAnimationFrame}.
    * @category Objects > Animations
    */
   export type SpriteFrameData = {
     /** The resource name of the image used in this frame. */
     image: string;
+    /** The part of the image used in this frame. If omitted, the whole image is used. */
+    sourceRect?: SpriteFrameSourceRectData;
     /** The points of the frame. */
     points: Array<SpriteCustomPointData>;
     /** The origin point. */
@@ -101,7 +118,11 @@ namespace gdjs {
    * @category Objects > Animations
    */
   export interface AnimationFrameTextureManager<T> {
-    getAnimationFrameTexture(imageName: string): T;
+    getAnimationFrameTexture(
+      imageName: string,
+      sourceRect?: SpriteFrameSourceRectData | null,
+      imageFrameIndex?: integer
+    ): T;
     getAnimationFrameWidth(pixiTexture: T);
     getAnimationFrameHeight(pixiTexture: T);
   }
@@ -115,6 +136,7 @@ namespace gdjs {
    */
   export class SpriteAnimationFrame<T> {
     image: string;
+    sourceRect: SpriteFrameSourceRectData | null = null;
 
     //TODO: Rename in imageName, and do not store it in the object?
     texture: T;
@@ -130,12 +152,19 @@ namespace gdjs {
      */
     constructor(
       frameData: SpriteFrameData,
-      textureManager: gdjs.AnimationFrameTextureManager<T>
+      textureManager: gdjs.AnimationFrameTextureManager<T>,
+      imageFrameIndex: integer = 0
     ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.sourceRect =
+        frameData && frameData.sourceRect ? { ...frameData.sourceRect } : null;
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        this.sourceRect,
+        imageFrameIndex
+      );
       this.points = new Hashtable();
-      this.reinitialize(frameData, textureManager);
+      this.reinitialize(frameData, textureManager, imageFrameIndex);
     }
 
     /**
@@ -144,10 +173,18 @@ namespace gdjs {
      */
     reinitialize(
       frameData: SpriteFrameData,
-      textureManager: gdjs.AnimationFrameTextureManager<T>
+      textureManager: gdjs.AnimationFrameTextureManager<T>,
+      imageFrameIndex: integer = 0
     ) {
       this.image = frameData.image;
-      this.texture = textureManager.getAnimationFrameTexture(this.image);
+      this.sourceRect = frameData.sourceRect
+        ? { ...frameData.sourceRect }
+        : null;
+      this.texture = textureManager.getAnimationFrameTexture(
+        this.image,
+        this.sourceRect,
+        imageFrameIndex
+      );
 
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {
@@ -255,13 +292,36 @@ namespace gdjs {
         : 1.0;
       this.loop = !!directionData.looping;
       let i = 0;
+      let previousWholeImageName: string | null = null;
+      let consecutiveWholeImageFrameIndex: integer = 0;
       for (const len = directionData.sprites.length; i < len; ++i) {
         const frameData = directionData.sprites[i];
+        let imageFrameIndex: integer = 0;
+        if (!frameData.sourceRect && frameData.image) {
+          if (frameData.image === previousWholeImageName) {
+            consecutiveWholeImageFrameIndex++;
+          } else {
+            previousWholeImageName = frameData.image;
+            consecutiveWholeImageFrameIndex = 0;
+          }
+          imageFrameIndex = consecutiveWholeImageFrameIndex;
+        } else {
+          previousWholeImageName = null;
+          consecutiveWholeImageFrameIndex = 0;
+        }
         if (i < this.frames.length) {
-          this.frames[i].reinitialize(frameData, textureManager);
+          this.frames[i].reinitialize(
+            frameData,
+            textureManager,
+            imageFrameIndex
+          );
         } else {
           this.frames.push(
-            new gdjs.SpriteAnimationFrame<T>(frameData, textureManager)
+            new gdjs.SpriteAnimationFrame<T>(
+              frameData,
+              textureManager,
+              imageFrameIndex
+            )
           );
         }
       }

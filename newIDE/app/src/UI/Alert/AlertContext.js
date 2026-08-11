@@ -7,6 +7,8 @@ export type ShowAlertDialogOptions = {|
   title: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
+  /** Non-translatable technical details, typically an underlying error. */
+  details?: string,
 |};
 export type ShowAlertDialogOptionsWithCallback = {|
   ...ShowAlertDialogOptions,
@@ -19,10 +21,20 @@ export type ShowConfirmDialogOptions = {|
   title: MessageDescriptor,
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
+  secondaryActionButtonLabel?: MessageDescriptor,
+  secondaryActionButtonColor?:
+    | 'primary'
+    | 'success'
+    | 'danger'
+    | 'premium'
+    | 'ai',
+  onClickSecondaryAction?: () => void,
   message: MessageDescriptor,
   level?: 'info' | 'warning',
   maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
+  /** Closes the dialog as a dismissal when the signal is aborted. */
+  dismissOnAbortSignal?: AbortSignal,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|
   ...ShowConfirmDialogOptions,

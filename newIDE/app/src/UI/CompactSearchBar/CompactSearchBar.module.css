@@ -67,6 +67,25 @@
   border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
 }
 
+.clearButton {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  margin-right: 3px;
+  padding: 4px;
+  align-self: center;
+  color: var(--theme-text-field-placeholder-color);
+}
+
+.clearButton:hover {
+  color: var(--theme-text-default-color);
+}
+
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.clearIcon {
+  font-size: 16px;
+}
+
 .compactSearchBar input::placeholder {
   color: var(--theme-text-field-placeholder-color);
 }

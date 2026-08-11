@@ -269,9 +269,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   ] = React.useState(initialProperties.isAntialisingEnabledOnMobile);
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
-  let [isFolderProject, setIsFolderProject] = React.useState(
-    initialProperties.isFolderProject
-  );
+  const [isFolderProject] = React.useState(initialProperties.isFolderProject);
   let [
     useDeprecatedZeroAsDefaultZOrder,
     setUseDeprecatedZeroAsDefaultZOrder,
@@ -873,34 +871,6 @@ const ProjectPropertiesDialog = (props: Props) => {
                 </SelectField>
 
                 <Text size="block-title">
-                  <Trans>Project files</Trans>
-                </Text>
-                <SelectField
-                  fullWidth
-                  floatingLabelText={<Trans>Project file type</Trans>}
-                  value={isFolderProject ? 'folder-project' : 'single-file'}
-                  onChange={(e, i, value: string) => {
-                    const newIsFolderProject = value === 'folder-project';
-                    if (newIsFolderProject === isFolderProject) {
-                      return;
-                    }
-                    setIsFolderProject(newIsFolderProject);
-                    notifyOfChange();
-                  }}
-                  helperMarkdownText={i18n._(
-                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app. Read about [using Git or GitHub with projects in multiple files](https://wiki.gdevelop.io/gdevelop5/tutorials/using-github-desktop/).`
-                  )}
-                >
-                  <SelectOption
-                    value={'single-file'}
-                    label={t`Single file (default)`}
-                  />
-                  <SelectOption
-                    value={'folder-project'}
-                    label={t`Multiple files, saved in folder next to the main file`}
-                  />
-                </SelectField>
-                <Text size="block-title">
                   <Trans>Resources loading</Trans>
                 </Text>
                 <SelectField
@@ -945,7 +915,6 @@ const ProjectPropertiesDialog = (props: Props) => {
                 loadingScreen={project.getLoadingScreen()}
                 watermark={project.getWatermark()}
                 onLoadingScreenUpdated={notifyOfLoadingScreenChange}
-                onChangeSubscription={onCancelChanges}
                 project={project}
                 resourceManagementProps={props.resourceManagementProps}
                 projectScopedContainersAccessor={

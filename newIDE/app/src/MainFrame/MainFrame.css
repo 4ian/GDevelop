@@ -44,6 +44,7 @@ body {
   display: flex;
   flex-direction: column;
   max-width: 100%;
+  min-height: 0;
 
   /* Support portrait and landscape right only */
   padding-top: var(--safe-area-inset-top);
@@ -51,6 +52,24 @@ body {
 
   /* Smoother startup */
   animation: fade-in 0.5s;
+}
+
+.main-frame-content {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-frame-editors-content {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* The part of the window which can be drag'n'dropped on desktop (Electron and installed PWA). */

@@ -36,6 +36,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { mapVector } from '../Utils/MapFor';
+import { createProjectAssetResourceFromResourceName } from './ProjectResources/ProjectAssetsFolderResources';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -48,6 +49,10 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fallbackResourceKind?: ?ResourceKind,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
+  resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
@@ -79,6 +84,10 @@ const ResourceSelector: React.ComponentType<{
     resourcesLoader,
     resourceKind,
     fallbackResourceKind,
+    importedResourcesFolder,
+    includeProjectAssetsFolder,
+    defaultLocalFileDialogFolder,
+    resourceNameFilter,
     onChange,
     disabled,
   } = props;
@@ -164,29 +173,6 @@ const ResourceSelector: React.ComponentType<{
     [_onChange]
   );
 
-  const onChangeResourceName = React.useCallback(
-    (newResourceName: string) => {
-      if (newResourceName === '') {
-        onResetResourceName();
-        return;
-      }
-      if (newResourceName === resourceName) {
-        return;
-      }
-      const isMissing =
-        allResourcesNamesRef.current.indexOf(newResourceName) === -1;
-
-      if (!isMissing) {
-        _onChange(newResourceName);
-      }
-      setResourceName(newResourceName);
-      if (autoCompleteRef.current)
-        autoCompleteRef.current.forceInputValueTo(newResourceName);
-      setNotFoundError(isMissing);
-    },
-    [resourceName, _onChange, onResetResourceName]
-  );
-
   const onInputValueChange = React.useCallback(
     (newInputValue: string) => {
       if (forceShowResourceSources) {
@@ -212,9 +198,10 @@ const ResourceSelector: React.ComponentType<{
         mapVector(
           resourcesContainer.getAllResourceNames(),
           (resourceName, index) => {
+            const resource = resourcesContainer.getResource(resourceName);
             if (
-              resourcesContainer.getResource(resourceName).getKind() ===
-              resourceKind
+              resource.getKind() === resourceKind &&
+              (!resourceNameFilter || resourceNameFilter(resourceName, resource))
             ) {
               allResourcesNames.add(resourceName);
             }
@@ -225,9 +212,11 @@ const ResourceSelector: React.ComponentType<{
           mapVector(
             resourcesContainer.getAllResourceNames(),
             (resourceName, index) => {
+              const resource = resourcesContainer.getResource(resourceName);
               if (
-                resourcesContainer.getResource(resourceName).getKind() ===
-                fallbackResourceKind
+                resource.getKind() === fallbackResourceKind &&
+                (!resourceNameFilter ||
+                  resourceNameFilter(resourceName, resource))
               ) {
                 allResourcesNames.add(resourceName);
               }
@@ -238,7 +227,7 @@ const ResourceSelector: React.ComponentType<{
         allResourcesNamesRef.current = [...allResourcesNames];
       }
     },
-    [resourceKind, fallbackResourceKind]
+    [resourceKind, fallbackResourceKind, resourceNameFilter]
   );
 
   const refreshResources = React.useCallback(
@@ -264,6 +253,114 @@ const ResourceSelector: React.ComponentType<{
     callback: refreshResources,
   });
 
+  const hasMatchingResource = React.useCallback(
+    (resourceNameToCheck: string): boolean => {
+      const resourcesManager = project.getResourcesManager();
+      if (!resourcesManager.hasResource(resourceNameToCheck)) return false;
+
+      const resource = resourcesManager.getResource(resourceNameToCheck);
+      return (
+        resource.getKind() === resourceKind &&
+        (!resourceNameFilter ||
+          resourceNameFilter(resourceNameToCheck, resource))
+      );
+    },
+    [project, resourceKind, resourceNameFilter]
+  );
+
+  const registerProjectAssetResourceName = React.useCallback(
+    (resourceNameToRegister: string): boolean => {
+      if (!includeProjectAssetsFolder || !resourceNameToRegister) {
+        return false;
+      }
+
+      const resourcesManager = project.getResourcesManager();
+      if (hasMatchingResource(resourceNameToRegister)) {
+        return true;
+      }
+
+      const projectAssetResource = createProjectAssetResourceFromResourceName({
+        project,
+        resourceKind,
+        resourceName: resourceNameToRegister,
+      });
+      if (!projectAssetResource) return false;
+      if (
+        resourceNameFilter &&
+        !resourceNameFilter(resourceNameToRegister, projectAssetResource)
+      ) {
+        projectAssetResource.delete();
+        return false;
+      }
+
+      applyResourceDefaults(project, projectAssetResource);
+      const hasCreatedAnyResource = resourcesManager.addResource(
+        projectAssetResource
+      );
+      projectAssetResource.delete();
+
+      if (hasCreatedAnyResource) {
+        resourceManagementProps.onNewResourcesAdded();
+        triggerResourcesHaveChanged();
+      }
+
+      return hasMatchingResource(resourceNameToRegister);
+    },
+    [
+      hasMatchingResource,
+      includeProjectAssetsFolder,
+      project,
+      resourceKind,
+      resourceNameFilter,
+      resourceManagementProps,
+      triggerResourcesHaveChanged,
+    ]
+  );
+
+  React.useEffect(
+    () => {
+      if (!initialResourceName) return;
+      if (registerProjectAssetResourceName(initialResourceName)) {
+        setNotFoundError(false);
+      }
+    },
+    [initialResourceName, registerProjectAssetResourceName]
+  );
+
+  const onChangeResourceName = React.useCallback(
+    (newResourceName: string) => {
+      if (newResourceName === '') {
+        onResetResourceName();
+        return;
+      }
+      if (newResourceName === resourceName) {
+        return;
+      }
+
+      let isMissing =
+        allResourcesNamesRef.current.indexOf(newResourceName) === -1 &&
+        !hasMatchingResource(newResourceName);
+      if (isMissing && registerProjectAssetResourceName(newResourceName)) {
+        isMissing = false;
+      }
+
+      if (!isMissing) {
+        _onChange(newResourceName);
+      }
+      setResourceName(newResourceName);
+      if (autoCompleteRef.current)
+        autoCompleteRef.current.forceInputValueTo(newResourceName);
+      setNotFoundError(isMissing);
+    },
+    [
+      hasMatchingResource,
+      resourceName,
+      _onChange,
+      onResetResourceName,
+      registerProjectAssetResourceName,
+    ]
+  );
+
   const addFrom = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
       try {
@@ -276,6 +373,9 @@ const ResourceSelector: React.ComponentType<{
           initialSourceName: initialResourceSource.name,
           multiSelection: false,
           resourceKind: resourceKind,
+          importedResourcesFolder,
+          includeProjectAssetsFolder,
+          defaultLocalFileDialogFolder,
         });
 
         if (!selectedResources.length) return;
@@ -287,6 +387,17 @@ const ResourceSelector: React.ComponentType<{
         const resource = selectedResources[0];
 
         const resourceName: string = resource.getName();
+        if (
+          resourceNameFilter &&
+          !resourceNameFilter(resourceName, resource)
+        ) {
+          showErrorBox({
+            message:
+              'This resource cannot be used here. Choose a resource from the expected project folder.',
+            errorId: 'resource-folder-mismatch',
+          });
+          return;
+        }
 
         // Imperatively set the value of the autoComplete, as it can be (on Windows for example),
         // still focused. This means that when it's then getting blurred, the value we
@@ -324,6 +435,10 @@ const ResourceSelector: React.ComponentType<{
       project,
       resourceManagementProps,
       resourceKind,
+      importedResourcesFolder,
+      includeProjectAssetsFolder,
+      defaultLocalFileDialogFolder,
+      resourceNameFilter,
       onChangeResourceName,
       triggerResourcesHaveChanged,
       resourceSources,
@@ -353,7 +468,10 @@ const ResourceSelector: React.ComponentType<{
       abortControllerRef.current = new AbortController();
       const { signal } = abortControllerRef.current;
       const resourcesManager = project.getResourcesManager();
-      const initialResource = resourcesManager.getResource(resourceName);
+      const initialResource =
+        resourceName && resourcesManager.hasResource(resourceName)
+          ? resourcesManager.getResource(resourceName)
+          : null;
 
       try {
         setExternalEditorOpened(true);
@@ -364,7 +482,9 @@ const ResourceSelector: React.ComponentType<{
           resourceManagementProps,
           resourceNames: [resourceName],
           extraOptions: {
-            existingMetadata: initialResource.getMetadata(),
+            existingMetadata: initialResource
+              ? initialResource.getMetadata()
+              : '',
 
             // Only useful for images:
             singleFrame: true,

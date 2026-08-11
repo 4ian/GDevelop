@@ -112,7 +112,10 @@ declare class gdProject {
   getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): gdEventsBasedObject;
+  ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): gdVariablesContainer;
+  setConstantsJson(constantsJson: string): void;
+  getConstantsJson(): string;
   getObjects(): gdObjectsContainer;
   getResourcesManager(): gdResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;

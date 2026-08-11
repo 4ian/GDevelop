@@ -7,6 +7,10 @@ declare class gdObjectGroup {
   removeObject(objectName: string): void;
   find(objectName: string): boolean;
   getAllObjectsNames(): gdVectorString;
+  addRequiredBehavior(behaviorType: string): void;
+  removeRequiredBehavior(behaviorType: string): void;
+  hasRequiredBehavior(behaviorType: string): boolean;
+  getAllRequiredBehaviorTypes(): gdVectorString;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
-import SceneEditor from '../../SceneEditor';
+import SceneEditor, {
+  type SceneEditorSelectionSnapshot,
+} from '../../SceneEditor';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -25,12 +27,17 @@ import {
   type HotReloadSteps,
   switchInGameEditorIfNoHotReloadIsNeeded,
 } from '../../EmbeddedGame/EmbeddedGameFrame';
+import { type EditorId as SceneEditorPanelId } from '../../SceneEditor/utils';
 
 export class SceneEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?SceneEditor;
 
   getProject(): ?gdProject {
     return this.props.project;
+  }
+
+  getEditorSelectionSnapshot(): ?SceneEditorSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
@@ -48,6 +55,27 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
     if (this.props.isActive) {
       this._setPreviewedLayout();
     }
+    this._openRequestedScenePanel();
+  }
+
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (
+      prevProps.extraEditorProps !== this.props.extraEditorProps ||
+      prevProps.isActive !== this.props.isActive
+    ) {
+      this._openRequestedScenePanel();
+    }
+  }
+
+  _openRequestedScenePanel() {
+    if (!this.props.isActive) return;
+
+    const scenePanelToOpen: ?SceneEditorPanelId =
+      this.props.extraEditorProps &&
+      this.props.extraEditorProps.scenePanelToOpen;
+    if (!scenePanelToOpen || !this.editor) return;
+
+    this.editor.ensureEditorPanelVisible(scenePanelToOpen);
   }
 
   _setPreviewedLayout() {
@@ -304,6 +332,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         onOpenEventBasedObjectVariantEditor={
           this.props.onOpenEventBasedObjectVariantEditor
         }
+        onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
+        onOpenPrefabSettings={this.props.onOpenPrefabSettings}
         onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
         onDeleteEventsBasedObjectVariant={

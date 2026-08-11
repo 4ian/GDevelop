@@ -72,6 +72,7 @@ namespace gdjs {
     async processResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -99,6 +100,7 @@ namespace gdjs {
     async loadResource(resourceName: string): Promise<void> {
       const resource = this._resourceLoader.getResource(resourceName);
       if (!resource) {
+        if (!resourceName) return;
         logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
@@ -108,9 +110,14 @@ namespace gdjs {
       if (!loader) {
         return;
       }
-      if (this._loadedThreeModels.get(resource)) {
+      const loadedThreeModel = this._loadedThreeModels.get(resource);
+      if (loadedThreeModel && loadedThreeModel.scene.children.length > 0) {
         return;
       }
+      if (loadedThreeModel) {
+        this._loadedThreeModels.delete(resource);
+      }
+
       const url = this._resourceLoader.getFullUrl(resource.file);
       try {
         const response = await fetch(url, {
@@ -145,11 +152,102 @@ namespace gdjs {
       );
     }
 
+    private _disposeModel(model: THREE_ADDONS.GLTF): void {
+      const disposedGeometries = new Set<THREE.BufferGeometry>();
+      const disposedMaterials = new Set<THREE.Material>();
+      const disposedTextures = new Set<THREE.Texture>();
+      const closedTextureSources = new Set<object>();
+
+      const closeTextureSource = (textureSource: any): void => {
+        if (Array.isArray(textureSource)) {
+          for (const source of textureSource) closeTextureSource(source);
+          return;
+        }
+        if (
+          !textureSource ||
+          typeof textureSource !== 'object' ||
+          closedTextureSources.has(textureSource)
+        ) {
+          return;
+        }
+
+        closedTextureSources.add(textureSource);
+        if (typeof textureSource.close === 'function') {
+          textureSource.close();
+        }
+      };
+
+      const disposeTexture = (texture: THREE.Texture): void => {
+        if (disposedTextures.has(texture)) return;
+
+        disposedTextures.add(texture);
+        texture.dispose();
+
+        // GLTFLoader uses ImageBitmapLoader when available. ImageBitmap memory
+        // is not released automatically when a texture is disposed, so close
+        // it explicitly when the whole runtime is being destroyed.
+        const textureAsAny = texture as any;
+        closeTextureSource(
+          textureAsAny.source?.data || textureAsAny.image || null
+        );
+      };
+
+      const disposeMaterial = (material: THREE.Material): void => {
+        if (disposedMaterials.has(material)) return;
+
+        disposedMaterials.add(material);
+        for (const propertyValue of Object.values(material)) {
+          if (propertyValue && (propertyValue as any).isTexture) {
+            disposeTexture(propertyValue as THREE.Texture);
+          }
+        }
+        material.dispose();
+      };
+
+      const scenes = new Set<THREE.Object3D>(model.scenes);
+      scenes.add(model.scene);
+      for (const scene of scenes) {
+        scene.traverse((object) => {
+          const objectAsAny = object as any;
+          const geometry = objectAsAny.geometry as
+            | THREE.BufferGeometry
+            | undefined;
+          if (geometry && !disposedGeometries.has(geometry)) {
+            disposedGeometries.add(geometry);
+            geometry.dispose();
+          }
+
+          const materialOrMaterials = objectAsAny.material as
+            | THREE.Material
+            | THREE.Material[]
+            | undefined;
+          if (!materialOrMaterials) return;
+          const materials = Array.isArray(materialOrMaterials)
+            ? materialOrMaterials
+            : [materialOrMaterials];
+          for (const material of materials) disposeMaterial(material);
+        });
+        scene.clear();
+      }
+
+      model.animations = [];
+      model.cameras = [];
+      model.scenes = [];
+      model.userData = {};
+      model.asset = {};
+      // The GLTF parser caches dependencies including decoded buffers and
+      // images. It is no longer useful once the runtime has been disposed.
+      (model as any).parser = null;
+    }
+
     /**
      * To be called when the game is disposed.
      * Clear the models, resources loaded and destroy 3D models loaders in this manager.
      */
     dispose(): void {
+      for (const loadedThreeModel of this._loadedThreeModels.getAll()) {
+        this._disposeModel(loadedThreeModel);
+      }
       this._loadedThreeModels.clear();
       this._downloadedArrayBuffers.clear();
       this._loader = null;
@@ -170,7 +268,9 @@ namespace gdjs {
         resourceData.name
       );
       if (loadedThreeModel) {
-        loadedThreeModel.scene.clear();
+        // Don't clear the scene: existing 3D renderers can keep a reference to
+        // this GLTF during editor hot-reload. Deleting the cache entry is enough
+        // to allow collection when no renderer references it anymore.
         this._loadedThreeModels.delete(resourceData);
       }
 

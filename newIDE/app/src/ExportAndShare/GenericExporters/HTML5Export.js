@@ -17,6 +17,7 @@ import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Help from '../../UI/CustomSvgIcons/Help';
 import RaisedButton from '../../UI/RaisedButton';
+import Checkbox from '../../UI/Checkbox';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
 const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
@@ -51,6 +52,35 @@ export const ExplanationHeader = (): React.Node => {
     </Column>
   );
 };
+
+type PackResourcesFieldProps = {|
+  packResources: boolean,
+  onChange: (packResources: boolean) => void,
+|};
+
+/**
+ * Most hosting services limit the number of files an uploaded archive may
+ * contain (itch.io refuses more than 1000). A game with a few detailed
+ * animations goes past that easily, so resources are packed by default.
+ */
+export const PackResourcesField = ({
+  packResources,
+  onChange,
+}: PackResourcesFieldProps): React.Node => (
+  <Checkbox
+    label={<Trans>Pack the game resources into a few files</Trans>}
+    tooltipOrHelperText={
+      <Trans>
+        Images, sounds and other resources are gathered into a handful of files
+        instead of one file each, so that the game can be uploaded to itch.io
+        and other services limiting the number of files. The game then has to be
+        served by a web server: opening index.html directly will not work.
+      </Trans>
+    }
+    checked={packResources}
+    onCheck={(e, checked) => onChange(checked)}
+  />
+);
 
 type HTML5ExportFlowProps = {|
   ...ExportFlowProps,

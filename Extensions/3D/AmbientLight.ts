@@ -1,4 +1,5 @@
 namespace gdjs {
+  const lightIntensityMigrationFactor = Math.PI;
   interface AmbientLightFilterNetworkSyncData {
     i: number;
     c: number;
@@ -62,12 +63,12 @@ namespace gdjs {
           updatePreRender(target: gdjs.EffectsTarget): any {}
           updateDoubleParameter(parameterName: string, value: number): void {
             if (parameterName === 'intensity') {
-              this.light.intensity = value;
+              this.light.intensity = value * lightIntensityMigrationFactor;
             }
           }
           getDoubleParameter(parameterName: string): number {
             if (parameterName === 'intensity') {
-              return this.light.intensity;
+              return this.light.intensity / lightIntensityMigrationFactor;
             }
             return 0;
           }
@@ -90,12 +91,12 @@ namespace gdjs {
           updateBooleanParameter(parameterName: string, value: boolean): void {}
           getNetworkSyncData(): AmbientLightFilterNetworkSyncData {
             return {
-              i: this.light.intensity,
+              i: this.getDoubleParameter('intensity'),
               c: this.light.color.getHex(),
             };
           }
           updateFromNetworkSyncData(data: AmbientLightFilterNetworkSyncData) {
-            this.light.intensity = data.i;
+            this.updateDoubleParameter('intensity', data.i);
             this.light.color.setHex(data.c);
           }
         })();

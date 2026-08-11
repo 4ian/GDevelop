@@ -1743,6 +1743,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
           logsManager={consoleTestData}
+          signalDiagnostics={null}
           onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
@@ -1763,6 +1764,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
           logsManager={consoleTestData}
+          signalDiagnostics={null}
           onOpenedEditorsChanged={() => {}}
         />
       </FixedHeightFlexContainer>
@@ -2458,7 +2460,6 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
       loadingScreen={testProject.project.getLoadingScreen()}
       watermark={testProject.project.getWatermark()}
       onLoadingScreenUpdated={action('onLoadingscreenUpdated')}
-      onChangeSubscription={action('onChangeSubscription')}
       project={testProject.project}
       resourceManagementProps={fakeResourceManagementProps}
       projectScopedContainersAccessor={

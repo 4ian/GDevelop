@@ -260,6 +260,17 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String defaultOutput,
       gd::EventsCodeGenerationContext& context) override;
 
+  virtual gd::String GenerateObjectListsPickedInstancesAssertCode(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage) override;
+
+  virtual gd::String GenerateObjectListsPickedInstancesAssertExpression(
+      const std::vector<gd::String>& objectNames,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& usage,
+      const gd::String& expressionCode) override;
+
   virtual gd::String GenerateFreeCondition(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
@@ -469,6 +480,13 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   EventsCodeGenerator(
       const gd::ProjectScopedContainers& projectScopedContainers);
+
+  /**
+   * \brief Construct a code generator for the specified project and containers.
+   */
+  EventsCodeGenerator(
+      const gd::Project& project,
+      const gd::ProjectScopedContainers& projectScopedContainers);
   virtual ~EventsCodeGenerator();
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,
@@ -489,7 +507,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String& objectArraysMap,
       gd::String& behaviorNamesMap,
       const gd::String& thisObjectName = "",
-      const gd::String& thisBehaviorName = "");
+      const gd::String& thisBehaviorName = "",
+      const gd::String& behaviorVariablesAccessor = "");
 };
 
 }  // namespace gdjs

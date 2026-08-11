@@ -1,5 +1,9 @@
 // @flow
 import { serializeToJSObject, unserializeFromJSObject } from './Serializer';
+import {
+  recordEditorOperation,
+  type EditorOperationHistoryContext,
+} from './EditorOperationHistory';
 
 // Tools function to keep track of the history of changes made
 // on a serializable object from libGD.js
@@ -27,6 +31,7 @@ export type HistoryState = {|
   currentValue: Object,
   futureActions: Array<RedoAction>,
   maxSize: number,
+  historyContext?: EditorOperationHistoryContext,
 |};
 
 /**
@@ -38,8 +43,10 @@ export const getHistoryInitialState = (
   serializableObject: gdSerializable,
   {
     historyMaxSize,
+    historyContext,
   }: {
     historyMaxSize: number,
+    historyContext?: EditorOperationHistoryContext,
   }
 ): HistoryState => {
   return {
@@ -47,6 +54,7 @@ export const getHistoryInitialState = (
     currentValue: serializeToJSObject(serializableObject),
     futureActions: [],
     maxSize: historyMaxSize,
+    historyContext,
   };
 };
 
@@ -89,12 +97,21 @@ export const saveToHistory = (
     newPreviousActions.splice(0, newPreviousActions.length - history.maxSize);
   }
 
-  return {
+  const newHistory = {
     ...history,
     currentValue: newCurrentValue,
     previousActions: newPreviousActions,
     futureActions: newFutureActions,
   };
+
+  recordEditorOperation({
+    kind: 'change',
+    actionType,
+    historyContext: history.historyContext,
+    changeContext,
+  });
+
+  return newHistory;
 };
 
 /**
@@ -133,12 +150,21 @@ export const undo = (
     },
   ];
 
-  return {
+  const newHistory = {
     ...history,
     previousActions: newPreviousActions,
     futureActions: newFutureActions,
     currentValue: newCurrentValue,
   };
+
+  recordEditorOperation({
+    kind: 'undo',
+    actionType: previousAction.type,
+    historyContext: history.historyContext,
+    changeContext: previousAction.changeContext,
+  });
+
+  return newHistory;
 };
 
 /**
@@ -176,10 +202,19 @@ export const redo = (
   ];
   const newFutureActions = history.futureActions.slice(0, -1);
 
-  return {
+  const newHistory = {
     ...history,
     previousActions: newPreviousActions,
     futureActions: newFutureActions,
     currentValue: newCurrentValue,
   };
+
+  recordEditorOperation({
+    kind: 'redo',
+    actionType: futureAction.type,
+    historyContext: history.historyContext,
+    changeContext: futureAction.changeContext,
+  });
+
+  return newHistory;
 };

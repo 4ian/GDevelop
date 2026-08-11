@@ -12,7 +12,63 @@ export type EventsScope = {|
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
   eventsFunction?: ?gdEventsFunction,
+  sceneLifecycleFunctionName?: ?string,
 |};
+
+const getChoicePropertyValues = (
+  property: gdNamedPropertyDescriptor
+): Array<string> => {
+  const values: Array<string> = [];
+
+  const choices = property.getChoices();
+  for (let choiceIndex = 0; choiceIndex < choices.size(); choiceIndex++) {
+    values.push(choices.at(choiceIndex).getValue());
+  }
+
+  // Some older extensions stored choice values in extraInfo.
+  const extraInfo = property.getExtraInfo();
+  for (
+    let extraInfoIndex = 0;
+    extraInfoIndex < extraInfo.size();
+    extraInfoIndex++
+  ) {
+    values.push(extraInfo.at(extraInfoIndex));
+  }
+
+  return [...new Set(values)];
+};
+
+const syncChoicePropertiesToEnumVariables = (
+  properties: gdPropertiesContainer,
+  propertyVariablesContainer: gdVariablesContainer | null
+) => {
+  if (!propertyVariablesContainer) return;
+
+  const gd: libGDevelop = global.gd;
+
+  for (
+    let propertyIndex = 0;
+    propertyIndex < properties.getCount();
+    propertyIndex++
+  ) {
+    const property = properties.getAt(propertyIndex);
+    if (property.getType() !== 'Choice') continue;
+
+    const propertyName = property.getName();
+    if (!propertyVariablesContainer.has(propertyName)) continue;
+
+    const enumValues = getChoicePropertyValues(property);
+    const variable = propertyVariablesContainer.get(propertyName);
+    variable.castTo('enum');
+
+    const enumValuesVector = new gd.VectorString();
+    for (const enumValue of enumValues) {
+      enumValuesVector.push_back(enumValue);
+    }
+    variable.setEnumValues(enumValuesVector);
+    enumValuesVector.delete();
+  }
+};
 
 export class ProjectScopedContainersAccessor {
   _scope: EventsScope;
@@ -64,6 +120,9 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
+      if (eventsFunction && this._scope.sceneLifecycleFunctionName) {
+        projectScopedContainers.addParameters(eventsFunction.getParameters());
+      }
     } else if (eventsFunctionsExtension) {
       if (eventsFunction) {
         if (!this._parameterObjectsContainer) {
@@ -101,6 +160,14 @@ export class ProjectScopedContainersAccessor {
             this._parameterResourcesContainer,
             this._propertyResourcesContainer
           );
+          syncChoicePropertiesToEnumVariables(
+            eventsBasedBehavior.getPropertyDescriptors(),
+            this._propertyVariablesContainer
+          );
+          syncChoicePropertiesToEnumVariables(
+            eventsBasedBehavior.getSharedPropertyDescriptors(),
+            this._propertyVariablesContainer
+          );
         } else if (eventsBasedObject) {
           if (!this._propertyVariablesContainer) {
             throw new Error(
@@ -122,6 +189,10 @@ export class ProjectScopedContainersAccessor {
             this._propertyVariablesContainer,
             this._parameterResourcesContainer,
             this._propertyResourcesContainer
+          );
+          syncChoicePropertiesToEnumVariables(
+            eventsBasedObject.getPropertyDescriptors(),
+            this._propertyVariablesContainer
           );
         } else {
           projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(

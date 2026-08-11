@@ -114,5 +114,42 @@ describe('gdjs.RuntimeBehavior', () => {
       const result = behavior.updateFromBehaviorData(behaviorData, updatedData);
       expect(result).to.be(false);
     });
+
+    it('starts muted behaviors deactivated', () => {
+      const behavior = makeBehavior({
+        name: 'MyBehavior',
+        type: 'TestBehavior::RecordingBehavior',
+        isMuted: true,
+      });
+
+      expect(behavior.activated()).to.be(false);
+    });
+
+    it('hot-reloads mute changes even when behavior overriding is not redefined', () => {
+      const object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        variables: [],
+        behaviors: [],
+        effects: [],
+      });
+      const behaviorData = {
+        name: 'MyBehavior',
+        type: 'TestBehavior::TestBehavior',
+      };
+      const behavior = new gdjs.TestRuntimeBehavior(
+        runtimeScene,
+        behaviorData,
+        object
+      );
+
+      const result = behavior.updateFromBehaviorData(behaviorData, {
+        ...behaviorData,
+        isMuted: true,
+      });
+
+      expect(result).to.be(true);
+      expect(behavior.activated()).to.be(false);
+    });
   });
 });

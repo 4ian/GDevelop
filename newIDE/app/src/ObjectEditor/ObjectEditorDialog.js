@@ -25,6 +25,7 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
+import AlertMessage from '../UI/AlertMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -60,6 +61,7 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
   initialTab: ?ObjectEditorTab,
+  titleSubtitle?: React.Node,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -108,6 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
     onCancel,
     onRename,
     initialTab,
+    titleSubtitle,
     projectScopedContainersAccessor,
     onUpdateBehaviorsSharedData,
     onComputeAllVariableNames,
@@ -170,6 +173,17 @@ const InnerDialog = (props: InnerDialogProps) => {
     project.getCurrentPlatform(),
     object.getType()
   );
+  const hasEventBasedObjectProperties = project.hasEventsBasedObject(
+    object.getType()
+  );
+  const hasEventBasedBehaviorProperties = object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .some(behaviorName =>
+      project.hasEventsBasedBehavior(
+        object.getBehavior(behaviorName).getTypeName()
+      )
+    );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
@@ -181,32 +195,29 @@ const InnerDialog = (props: InnerDialogProps) => {
       (layout && layout.getInitialInstances()) ||
       (eventsBasedObject && eventsBasedObject.getInitialInstances()) ||
       null;
-    if (!initialInstances) {
-      // This can't actually happen.
-      return;
-    }
-
-    const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
-      'variables'
-    );
-    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-      originalSerializedVariables,
-      object.getVariables()
-    );
-    gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
-      project,
-      object.getVariables(),
-      initialInstances,
-      object.getName(),
-      changeset,
-      originalSerializedVariables
-    );
-    if (eventsBasedObject) {
-      gd.ObjectRefactorer.applyChangesToVariants(
-        eventsBasedObject,
-        object.getName(),
-        changeset
+    if (initialInstances) {
+      const originalSerializedVariables = getOriginalContentSerializedElement().getChild(
+        'variables'
       );
+      const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+        originalSerializedVariables,
+        object.getVariables()
+      );
+      gd.WholeProjectRefactorer.applyRefactoringForObjectVariablesContainer(
+        project,
+        object.getVariables(),
+        initialInstances,
+        object.getName(),
+        changeset,
+        originalSerializedVariables
+      );
+      if (eventsBasedObject) {
+        gd.ObjectRefactorer.applyChangesToVariants(
+          eventsBasedObject,
+          object.getName(),
+          changeset
+        );
+      }
     }
 
     // Do the renaming *after* applying changes, as "withSerializableObject"
@@ -217,6 +228,20 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-variables'
+  );
+
+  const renderConstantPlaceholderHint = () => (
+    <Line>
+      <Column noMargin expand>
+        <AlertMessage kind="info">
+          <Trans>
+            constant placeholders can be used here in text or number property
+            values, and in supported scene-event condition and action
+            parameters. Use {'{{cards.sunflower.price}}'} as a placeholder path.
+          </Trans>
+        </AlertMessage>
+      </Column>
+    </Line>
   );
 
   React.useEffect(
@@ -249,6 +274,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   return (
     <Dialog
       title={<Trans>Edit {objectName}</Trans>}
+      subtitle={titleSubtitle}
       key={object && object.ptr}
       actions={[
         <FlatButton
@@ -320,6 +346,9 @@ const InnerDialog = (props: InnerDialogProps) => {
             true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
           }
         >
+          {hasEventBasedObjectProperties
+            ? renderConstantPlaceholderHint()
+            : null}
           <EditorComponent
             objectConfiguration={object.getConfiguration()}
             project={project}
@@ -361,24 +390,30 @@ const InnerDialog = (props: InnerDialogProps) => {
         </Column>
       ) : null}
       {currentTab === 'behaviors' && (
-        <BehaviorsEditor
-          objects={[object]}
-          isChildObject={!!eventsBasedObject}
-          project={project}
-          eventsFunctionsExtension={eventsFunctionsExtension}
-          layersContainer={layersContainer}
-          resourceManagementProps={_resourceManagementProps}
-          projectScopedContainersAccessor={projectScopedContainersAccessor}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
-          onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
-          onBehaviorsUpdated={notifyOfChange}
-          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
-          onWillInstallExtension={onWillInstallExtension}
-          onExtensionInstalled={onExtensionInstalled}
-          isListLocked={isBehaviorListLocked}
-        />
+        <Column noMargin expand useFullHeight noOverflowParent>
+          {hasEventBasedBehaviorProperties
+            ? renderConstantPlaceholderHint()
+            : null}
+          <BehaviorsEditor
+            object={object}
+            isChildObject={!!eventsBasedObject}
+            project={project}
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            layersContainer={layersContainer}
+            resourceManagementProps={_resourceManagementProps}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            onUpdateBehaviorsSharedData={onUpdateBehaviorsSharedData}
+            onBehaviorsUpdated={notifyOfChange}
+            openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
+            onWillInstallExtension={onWillInstallExtension}
+            onExtensionInstalled={onExtensionInstalled}
+            isListLocked={isBehaviorListLocked}
+            canToggleBehaviorMute
+          />
+        </Column>
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>

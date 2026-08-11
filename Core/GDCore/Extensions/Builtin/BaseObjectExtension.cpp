@@ -1704,8 +1704,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Include or exclude a child from its parent collision mask."),
                 _("Include _PARAM0_ in parent object collision mask: _PARAM1_"),
                 _("Collision"),
-                "res/functions/extension.svg",
-                "res/functions/extension.svg")
+                "res/functions/extension_black.svg",
+                "res/functions/extension_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("yesorno", "Include in parent collision mask")
       .SetRelevantForCustomObjectEventsOnly();
@@ -1877,7 +1877,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "res/conditions/add.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden()
+      .SetDeprecationMessage(_(
+          "This condition is deprecated because it selects several instances "
+          "at once. Use picking conditions to select a single instance, or use "
+          "a \"For each object\" event to handle every instance explicitly."));
 
   // Compatibility with GD <= 5.6.251
   extension.AddDuplicatedCondition("AjoutObjConcern", "PickAllInstances")
@@ -1991,6 +1996,54 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition(
+          "CollisionEnter",
+          _("Collision enter"),
+          _("Check if two objects have started colliding during this frame."),
+          _("_PARAM0_ started colliding with _PARAM1_"),
+          _("Collision"),
+          "res/conditions/collision24.png",
+          "res/conditions/collision.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionUniqueId", "")
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsSimple();
+
+  extension
+      .AddCondition(
+          "CollisionExit",
+          _("Collision exit"),
+          _("Check if two objects have stopped colliding during this frame."),
+          _("_PARAM0_ stopped colliding with _PARAM1_"),
+          _("Collision"),
+          "res/conditions/collision24.png",
+          "res/conditions/collision.png")
+      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectList", _("Object"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("conditionUniqueId", "")
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
+      .SetHelpPath("/all-features/collisions/")
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsSimple();
+
+  extension
       .AddCondition("EstTourne",
                     _("An object is turned toward another"),
                     _("Check if an object is turned toward another"),
@@ -2100,6 +2153,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Return the name of the object"),
                        "",
                        "res/conditions/text_black.png")
+      .AddParameter("object", _("Object"));
+
+  obj.AddExpression("InstanceId",
+                    _("Object instance id"),
+                    _("Return the unique id of the object instance"),
+                    "",
+                    "res/actions/texte.png")
       .AddParameter("object", _("Object"));
 
   obj.AddStrExpression("Layer",

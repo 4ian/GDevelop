@@ -1,9 +1,11 @@
 // @flow
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
+import { type EventsSheetSelectionSnapshot } from '../../EventsSheet';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
+  type ExtensionFunctionEventsOutsideEditorChanges,
 } from './BaseEditor';
 import {
   type SceneEventsOutsideEditorChanges,
@@ -41,6 +43,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   getLayout(): ?gdLayout {
     return null;
+  }
+
+  getEditorSelectionSnapshot(): ?EventsSheetSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   updateToolbar() {
@@ -112,6 +118,17 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
   onSceneEventsModifiedOutsideEditor(changes: SceneEventsOutsideEditorChanges) {
     // No thing to be done.
+  }
+
+  onExtensionFunctionEventsModifiedOutsideEditor(
+    changes: ExtensionFunctionEventsOutsideEditorChanges
+  ) {
+    if (this.getEventsFunctionsExtensionName() !== changes.extensionName) {
+      return;
+    }
+    if (this.editor) {
+      this.editor.onExtensionFunctionEventsModifiedOutsideEditor(changes);
+    }
   }
 
   notifyChangesToInGameEditor(hotReloadSteps: HotReloadSteps) {
@@ -237,6 +254,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   selectEventsBasedBehaviorByName(eventBasedBehaviorName: string) {
     if (this.editor)
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
+  }
+
+  selectEventsBasedObjectByName(eventBasedObjectName: string) {
+    if (this.editor)
+      this.editor.selectEventsBasedObjectByName(eventBasedObjectName);
   }
 
   render(): any {

@@ -12,8 +12,8 @@ namespace gd {
 
 namespace {
 const gd::String sceneTimerHint =
-    "Scene timers must be started (e.g. with the \"Start (or reset) a "
-    "scene timer\" action) before being used. They are scene-wide and "
+    "Scene timers must be started (for example, with the ResetTimer action) "
+    "before being used. They are scene-wide and "
     "should not be (re)started at each frame, otherwise they keep "
     "restarting.";
 }  // namespace
@@ -181,7 +181,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/timer_black.svg",
                  "res/timer_black.svg")
       .AddParameter("expression", _("Time to wait in seconds"))
-      .SetHelpPath("/all-features/timers-and-time/wait-action");
+      .SetHelpPath("/all-features/timers-and-time/wait-action")
+      .SetRequiresSceneFutureFrame();
 
   extension
       .AddExpression("TimeDelta",

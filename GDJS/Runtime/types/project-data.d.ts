@@ -4,9 +4,6 @@
  * This project is released under the MIT License.
  */
 
-/**
- * Contains the data of a serialized exported project.
- */
 declare interface ProjectData {
   firstLayout: string;
   gdVersion: GdVersionData;
@@ -14,6 +11,7 @@ declare interface ProjectData {
   resources: ResourcesData;
   usedResources: ResourceReference[];
   objects: ObjectData[];
+  objectsGroups: ObjectGroupData[];
   variables: RootVariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
@@ -150,6 +148,7 @@ declare type TimerNetworkSyncData = {
 
 declare type VariableType =
   | 'string'
+  | 'enum'
   | 'number'
   | 'boolean'
   | 'structure'
@@ -161,6 +160,8 @@ declare type VariableData = Readonly<{
   name?: string;
   /** The value of the variable. Leave blank for structures. */
   value?: string | float | boolean;
+  /** The allowed values of an enum variable. Leave blank for unrestricted enums. */
+  values?: string[];
   /** The children of the structure. Leave blank if value is defined. */
   children?: VariableData[];
   /** The type of the variable. Defaults to number. */
@@ -208,6 +209,8 @@ declare type BehaviorData = {
   name: string;
   /** The behavior type. Used by GDJS to find the proper behavior to construct. */
   type: string;
+  /** When true, the behavior is initially deactivated. */
+  isMuted?: boolean;
 };
 
 declare type BehaviorNetworkSyncData = {
@@ -393,6 +396,7 @@ declare interface EventsBasedObjectData
   extends EventsBasedObjectVariantData,
     InstanceContainerData {
   name: string;
+  behaviors: Array<BehaviorData & any>;
   isInnerAreaFollowingParentSize: boolean;
   variants: Array<EventsBasedObjectVariantData>;
   /** Added at runtime to have the default variant with an empty name instead
@@ -547,6 +551,10 @@ declare interface ProjectPropertiesData {
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
+  displayCollisionShapes?: boolean;
+  /** @deprecated Compatibility with previews exported before the option was renamed. */
+  displayCollisionMask?: boolean;
+  displaySignalAnimations?: boolean;
   antialiasingMode: 'none' | 'MSAA';
   antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: '' | 'scaleOuter' | 'adaptWidth' | 'adaptHeight';

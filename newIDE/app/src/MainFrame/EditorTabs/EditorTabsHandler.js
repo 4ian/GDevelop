@@ -4,9 +4,12 @@ import findIndex from 'lodash/findIndex';
 import { EventsEditorContainer } from '../EditorContainers/EventsEditorContainer';
 import { DebuggerEditorContainer } from '../EditorContainers/DebuggerEditorContainer';
 import { EventsFunctionsExtensionEditorContainer } from '../EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { PrefabDetailEditorContainer } from '../EditorContainers/PrefabDetailEditorContainer';
+import { ExtensionItemDetailEditorContainer } from '../EditorContainers/ExtensionItemDetailEditorContainer';
 import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
 import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
 import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
+import { ConstantsEditorContainer } from '../EditorContainers/ConstantsEditorContainer';
 import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import { type HomePageEditorInterface } from '../EditorContainers/HomePage';
 import {
@@ -23,10 +26,13 @@ type EditorRef =
   | DebuggerEditorContainer
   | EventsEditorContainer
   | EventsFunctionsExtensionEditorContainer
+  | PrefabDetailEditorContainer
+  | ExtensionItemDetailEditorContainer
   | ExternalEventsEditorContainer
   | ExternalLayoutEditorContainer
   | GameplayTestEditorContainer
   | ResourcesEditorContainer
+  | ConstantsEditorContainer
   | SceneEditorContainer
   | HomePageEditorInterface
   | AskAiEditorInterface;
@@ -39,10 +45,14 @@ export type EditorKind =
   | 'external layout'
   | 'external events'
   | 'events functions extension'
+  | 'behavior detail'
+  | 'function detail'
+  | 'prefab detail'
   | 'custom object'
   | 'gameplay-test'
   | 'debugger'
   | 'resources'
+  | 'constants'
   | 'global-search'
   | 'ask-ai'
   | 'start page';
@@ -112,9 +122,58 @@ export type EditorOpeningOptions = {|
   closable?: boolean,
 |};
 
+export const MAX_OPEN_EDITOR_TABS_PER_PANE = 5;
+
 // Source of stable EditorTab.id. `openEditorTab` is the only tab creator; other
 // transforms spread an existing tab and so preserve the id.
 let nextEditorTabId = 0;
+
+const isEditorTabIncludedInLimit = (editorTab: EditorTab): boolean =>
+  editorTab.closable &&
+  editorTab.kind !== 'debugger' &&
+  editorTab.kind !== 'resources' &&
+  editorTab.kind !== 'constants';
+
+const limitOpenEditorTabsForPane = ({
+  editors,
+  editorTabToKeep,
+  currentEditorTabToKeep,
+}: {|
+  editors: Array<EditorTab>,
+  editorTabToKeep: EditorTab,
+  currentEditorTabToKeep: ?EditorTab,
+|}): Array<EditorTab> => {
+  let nextEditors = editors;
+
+  while (
+    nextEditors.filter(isEditorTabIncludedInLimit).length >
+    MAX_OPEN_EDITOR_TABS_PER_PANE
+  ) {
+    let editorIndexToClose = findIndex(
+      nextEditors,
+      editorTab =>
+        isEditorTabIncludedInLimit(editorTab) &&
+        editorTab !== editorTabToKeep &&
+        editorTab !== currentEditorTabToKeep
+    );
+
+    if (editorIndexToClose === -1) {
+      editorIndexToClose = findIndex(
+        nextEditors,
+        editorTab =>
+          isEditorTabIncludedInLimit(editorTab) && editorTab !== editorTabToKeep
+      );
+    }
+
+    if (editorIndexToClose === -1) break;
+
+    nextEditors = nextEditors.filter(
+      (editorTab, index) => index !== editorIndexToClose
+    );
+  }
+
+  return nextEditors;
+};
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
   return {
@@ -164,11 +223,33 @@ export const openEditorTab = (
       editor => editor.key === key
     );
     if (existingEditorId !== -1) {
+      let nextState = state;
+      if (extraEditorProps) {
+        const nextEditors: Array<EditorTab> = pane.editors.slice();
+        const existingEditor = nextEditors[existingEditorId];
+        nextEditors[existingEditorId] = {
+          ...existingEditor,
+          extraEditorProps: {
+            ...(existingEditor.extraEditorProps || {}),
+            ...extraEditorProps,
+          },
+        };
+        nextState = {
+          ...state,
+          panes: {
+            ...state.panes,
+            [statePaneIdentifier]: {
+              ...pane,
+              editors: nextEditors,
+            },
+          },
+        };
+      }
       // If the tab is already open (including in an external/popped-out window),
       // don't re-open or move it — just focus it in its current pane.
       return dontFocusTab
-        ? { ...state }
-        : changeCurrentTab(state, statePaneIdentifier, existingEditorId);
+        ? nextState
+        : changeCurrentTab(nextState, statePaneIdentifier, existingEditorId);
     }
   }
 
@@ -193,24 +274,34 @@ export const openEditorTab = (
     throw new Error(`Pane with identifier "${paneIdentifier}" is not valid.`);
   }
 
+  const currentEditorTab = pane.editors[pane.currentTab] || null;
+  const editorsWithNewTab =
+    // Make sure the home page is always the first tab.
+    key === 'start page'
+      ? [editorTab, ...pane.editors]
+      : [...pane.editors, editorTab];
+  const nextEditors = limitOpenEditorTabsForPane({
+    editors: editorsWithNewTab,
+    editorTabToKeep: editorTab,
+    // Keep the active tab when a tab is opened in the background.
+    currentEditorTabToKeep: dontFocusTab ? currentEditorTab : null,
+  });
+  const nextCurrentEditorTab = dontFocusTab ? currentEditorTab : editorTab;
+  const nextCurrentTab = nextCurrentEditorTab
+    ? nextEditors.indexOf(nextCurrentEditorTab)
+    : -1;
+
   let newState = {
     ...state,
     panes: {
       ...state.panes,
       [paneIdentifier]: {
         ...pane,
-        editors:
-          // Make sure the home page is always the first tab.
-          key === 'start page'
-            ? [editorTab, ...pane.editors]
-            : [...pane.editors, editorTab],
-        currentTab: pane.currentTab,
+        editors: nextEditors,
+        currentTab: nextCurrentTab === -1 ? 0 : nextCurrentTab,
       },
     },
   };
-  if (!dontFocusTab) {
-    newState = changeCurrentTab(newState, paneIdentifier, pane.editors.length);
-  }
   return newState;
 };
 
@@ -506,7 +597,11 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
     pane.editors.forEach(editorTab => {
       const editor = editorTab.editorRef;
 
-      if (editor instanceof EventsFunctionsExtensionEditorContainer) {
+      if (
+        editor instanceof EventsFunctionsExtensionEditorContainer ||
+        editor instanceof ExtensionItemDetailEditorContainer ||
+        editor instanceof PrefabDetailEditorContainer
+      ) {
         editor.previewOrExportWillStart();
       }
     });
@@ -649,6 +744,8 @@ export const closeEventsFunctionsExtensionTabs = (
     const editor = editorTab.editorRef;
     if (
       editor instanceof EventsFunctionsExtensionEditorContainer ||
+      editor instanceof ExtensionItemDetailEditorContainer ||
+      editor instanceof PrefabDetailEditorContainer ||
       editor instanceof CustomObjectEditorContainer
     ) {
       return (
@@ -672,7 +769,10 @@ export const closeCustomObjectTab = (
 } => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
-    if (editor instanceof CustomObjectEditorContainer) {
+    if (
+      editor instanceof CustomObjectEditorContainer ||
+      editor instanceof PrefabDetailEditorContainer
+    ) {
       return (
         (!editor.getEventsFunctionsExtensionName() ||
           editor.getEventsFunctionsExtensionName() !==
@@ -727,6 +827,84 @@ export const getEventsFunctionsExtensionEditor = (
       if (
         editor instanceof EventsFunctionsExtensionEditorContainer &&
         editor.getEventsFunctionsExtension() === eventsFunctionsExtension
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
+    }
+  }
+
+  return null;
+};
+
+export const getPrefabDetailEditor = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedObject: gdEventsBasedObject
+): ?{|
+  editor: PrefabDetailEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof PrefabDetailEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+        editor.getEventsBasedObject() === eventsBasedObject
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
+    }
+  }
+
+  return null;
+};
+
+export const getEventsBasedBehaviorDetailEditor = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedBehavior: gdEventsBasedBehavior
+): ?{|
+  editor: ExtensionItemDetailEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof ExtensionItemDetailEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+        editor.getEventsBasedBehavior() === eventsBasedBehavior
+      ) {
+        return { editor, paneIdentifier, tabIndex };
+      }
+    }
+  }
+
+  return null;
+};
+
+export const getEventsFunctionDetailEditor = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsFunction: gdEventsFunction
+): ?{|
+  editor: ExtensionItemDetailEditorContainer,
+  paneIdentifier: string,
+  tabIndex: number,
+|} => {
+  for (const paneIdentifier in state.panes) {
+    const pane = state.panes[paneIdentifier];
+    for (let tabIndex = 0; tabIndex < pane.editors.length; ++tabIndex) {
+      const editor = pane.editors[tabIndex].editorRef;
+      if (
+        editor instanceof ExtensionItemDetailEditorContainer &&
+        editor.getEventsFunctionsExtension() === eventsFunctionsExtension &&
+        editor.getEventsFunction() === eventsFunction
       ) {
         return { editor, paneIdentifier, tabIndex };
       }

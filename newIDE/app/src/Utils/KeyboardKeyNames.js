@@ -1,115 +1,25 @@
 // @flow
 
-export const keyNames = [
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f',
-  'g',
-  'h',
-  'i',
-  'j',
-  'k',
-  'l',
-  'm',
-  'n',
-  'o',
-  'p',
-  'q',
-  'r',
-  's',
-  't',
-  'u',
-  'v',
-  'w',
-  'x',
-  'y',
-  'z',
-  'Num0',
-  'Num1',
-  'Num2',
-  'Num3',
-  'Num4',
-  'Num5',
-  'Num6',
-  'Num7',
-  'Num8',
-  'Num9',
-  'Numpad0',
-  'Numpad1',
-  'Numpad2',
-  'Numpad3',
-  'Numpad4',
-  'Numpad5',
-  'Numpad6',
-  'Numpad7',
-  'Numpad8',
-  'Numpad9',
-  'LShift',
-  'RShift',
-  'LControl',
-  'RControl',
-  'LAlt',
-  'RAlt',
-  'LSystem',
-  'RSystem',
-  'SemiColon',
-  'Comma',
-  'Period',
-  'Quote',
-  'Slash',
-  'BackSlash',
-  'Equal',
-  'Dash',
-  'Menu',
-  'LBracket',
-  'RBracket',
-  'Tilde',
-  'Space',
-  'Back',
-  'Tab',
-  'Delete',
-  'Insert',
-  'Escape',
-  'PageUp',
-  'PageDown',
-  'End',
-  'Home',
-  'Return',
-  'NumpadPageUp',
-  'NumpadPageDown',
-  'NumpadEnd',
-  'NumpadHome',
-  'NumpadReturn',
-  'Add',
-  'Subtract',
-  'Multiply',
-  'Divide',
-  'NumpadAdd',
-  'NumpadSubtract',
-  'NumpadMultiply',
-  'NumpadDivide',
-  'Left',
-  'Up',
-  'Right',
-  'Down',
-  'NumpadLeft',
-  'NumpadUp',
-  'NumpadRight',
-  'NumpadDown',
-  'F1',
-  'F2',
-  'F3',
-  'F4',
-  'F5',
-  'F6',
-  'F7',
-  'F8',
-  'F9',
-  'F10',
-  'F11',
-  'F12',
-  'Pause',
-];
+// This dependency-free runtime file is also the canonical source used by GDJS.
+// $FlowFixMe[cannot-resolve-module]
+// $FlowFixMe[untyped-import]
+const keyboardDefinitions = require('../../../../GDJS/Runtime/events-tools/keyboard-key-definitions.js');
+
+export const keyDefinitions: Array<Object> =
+  keyboardDefinitions.keyboardKeyDefinitions;
+
+export const keyNames: Array<string> = keyDefinitions
+  .filter(definition => typeof definition.gdevelopKeyName === 'string')
+  .map(definition => definition.gdevelopKeyName);
+
+export const keyAliases: Array<string> = keyDefinitions.reduce(
+  (aliases, definition) =>
+    aliases.concat(Array.isArray(definition.aliases) ? definition.aliases : []),
+  []
+);
+
+export const getKeyboardKeyDefinition = (keyName: string): ?Object =>
+  keyboardDefinitions.getKeyboardKeyDefinition(keyName);
+
+export const normalizeKeyboardKeyName = (keyName: string): string =>
+  keyboardDefinitions.normalizeKeyboardKeyName(keyName);

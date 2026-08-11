@@ -225,6 +225,12 @@
     underline wavy;
 }
 
+.gd-events-sheet .selectable.instruction-invalid-parameter {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  text-decoration: var(--event-sheet-instruction-parameter-error-color)
+    underline wavy;
+}
+
 .gd-events-sheet .instruction-parameter .instruction-warning-parameter {
   color: var(--event-sheet-instruction-parameter-warning-color);
   text-decoration: var(--event-sheet-instruction-parameter-warning-color)

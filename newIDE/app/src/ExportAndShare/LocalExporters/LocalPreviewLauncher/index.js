@@ -1,6 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
 import * as React from 'react';
 import LocalFileSystem from '../LocalFileSystem';
 import optionalRequire from '../../../Utils/OptionalRequire';
@@ -12,9 +10,6 @@ import {
   type PreviewLauncherProps,
   type CaptureOptions,
 } from '../../PreviewLauncher.flow';
-import SubscriptionChecker, {
-  type SubscriptionCheckerInterface,
-} from '../../../Profile/Subscription/SubscriptionChecker';
 import {
   getDebuggerServerAddress,
   localPreviewDebuggerServer,
@@ -22,6 +17,11 @@ import {
 import Window from '../../../Utils/Window';
 import { getIDEVersionWithHash } from '../../../Version';
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
+import {
+  addGlobalObjectGroupsToDataJs,
+  addGlobalObjectGroupsToProjectData,
+} from '../../PreviewGlobalObjectGroupsPatch';
+import { hasConstantPlaceholderDiagnostic } from '../../../Utils/ConstantPlaceholderDiagnostics';
 import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -35,7 +35,6 @@ type State = {|
   networkPreviewHost: ?string,
   networkPreviewPort: ?number,
   networkPreviewError: ?any,
-  hotReloadsCount: number,
   previewGamePath: ?string,
   previewBrowserWindowOptions: ?{
     width: number,
@@ -60,6 +59,7 @@ const prepareExporter = async ({
   outputDir: string,
   exporter: gdjsExporter,
   gdjsRoot: string,
+  fileSystem: any,
 |}> => {
   const { gdjsRoot } = await findGDJS();
   console.info('GDJS found in ', gdjsRoot);
@@ -82,6 +82,7 @@ const prepareExporter = async ({
     outputDir,
     exporter,
     gdjsRoot,
+    fileSystem,
   };
 };
 
@@ -90,6 +91,7 @@ export default class LocalPreviewLauncher extends React.Component<
   State
 > {
   canDoNetworkPreview = (): any => true;
+  _onPreviewWindowClosed: ?(event: any) => Promise<void>;
 
   // $FlowFixMe[missing-local-annot]
   state = {
@@ -99,15 +101,11 @@ export default class LocalPreviewLauncher extends React.Component<
     networkPreviewError: null,
     previewGamePath: null,
     previewBrowserWindowOptions: null,
-    hotReloadsCount: 0,
     hideMenuBar: true,
     alwaysOnTop: true,
     numberOfWindows: 1,
     captureOptions: null,
   };
-  _networkPreviewSubscriptionChecker: ?SubscriptionCheckerInterface = null;
-  _hotReloadSubscriptionChecker: ?SubscriptionCheckerInterface = null;
-
   _openPreviewBrowserWindow = () => {
     const {
       previewGamePath,
@@ -130,12 +128,19 @@ export default class LocalPreviewLauncher extends React.Component<
       captureOptions,
     });
 
-    ipcRenderer.removeAllListeners('preview-window-closed');
-    ipcRenderer.on('preview-window-closed', async event => {
+    if (this._onPreviewWindowClosed) {
+      ipcRenderer.removeListener(
+        'preview-window-closed',
+        this._onPreviewWindowClosed
+      );
+    }
+
+    this._onPreviewWindowClosed = async event => {
       if (captureOptions) {
         await this.props.onCaptureFinished(captureOptions);
       }
-    });
+    };
+    ipcRenderer.on('preview-window-closed', this._onPreviewWindowClosed);
   };
 
   closePreview = (windowId: number) => {
@@ -143,11 +148,13 @@ export default class LocalPreviewLauncher extends React.Component<
     ipcRenderer.invoke('preview-close', { windowId });
   };
 
-  closeAllPreviews = () => {
+  closeAllPreviews = async (): Promise<void> => {
     if (ipcRenderer) {
-      ipcRenderer.invoke('preview-close-all').catch(error => {
+      try {
+        await ipcRenderer.invoke('preview-close-all');
+      } catch (error) {
         console.info('Unable to close all preview windows - ignoring.', error);
-      });
+      }
     }
 
     // This should be unnecessary since the preview windows are closed above.
@@ -155,6 +162,42 @@ export default class LocalPreviewLauncher extends React.Component<
     if (previewDebuggerServer) {
       previewDebuggerServer.closeAllConnections();
     }
+  };
+
+  focusAllPreviews = () => {
+    if (!ipcRenderer) return;
+    ipcRenderer.invoke('preview-focus-all').catch(error => {
+      console.info('Unable to focus preview windows - ignoring.', error);
+    });
+  };
+
+  injectPreviewClickUserGesture = (inputs: Array<Object>): Promise<?Object> => {
+    if (!ipcRenderer) {
+      return Promise.resolve({
+        success: false,
+        attempted: true,
+        supported: false,
+        error: 'Native preview input injection requires Electron.',
+      });
+    }
+    return ipcRenderer
+      .invoke('preview-inject-user-gesture', { inputs })
+      .catch(error => ({
+        success: false,
+        attempted: true,
+        supported: true,
+        error: error.message || String(error),
+      }));
+  };
+
+  // Capture a preview window's content from the MAIN process (immune to renderer
+  // suspension of an occluded preview). Returns { dataUrl, width, height } or
+  // { error }. Resolves null if not running in Electron.
+  capturePreviewPage = (windowId: ?number): Promise<?Object> => {
+    if (!ipcRenderer) return Promise.resolve(null);
+    return ipcRenderer
+      .invoke('preview-capture-page', { windowId })
+      .catch(error => ({ error: error.message || String(error) }));
   };
 
   _openPreviewWindow = (
@@ -182,7 +225,9 @@ export default class LocalPreviewLauncher extends React.Component<
         },
         previewGamePath: gamePath,
         hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
-        alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
+        alwaysOnTop:
+          options.forceAlwaysOnTopInPreview ||
+          options.getIsAlwaysOnTopInPreview(),
         numberOfWindows: options.numberOfWindows,
         captureOptions: options.captureOptions,
       },
@@ -208,8 +253,6 @@ export default class LocalPreviewLauncher extends React.Component<
                 networkPreviewPort: serverParams.port,
               });
             }
-
-            setTimeout(() => this._checkSubscriptionForNetworkPreview());
           });
           ipcRenderer.on('local-network-ip', (event, ipAddress) => {
             this.setState({
@@ -252,10 +295,16 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    const { outputDir, exporter, gdjsRoot } = await prepareExporter({
-      isForInGameEdition: previewOptions.isForInGameEdition,
-      isForGameplayTest: !!previewOptions.isForGameplayTest,
-    });
+    const { outputDir, exporter, gdjsRoot, fileSystem } = await prepareExporter(
+      {
+        isForInGameEdition: previewOptions.isForInGameEdition,
+        isForGameplayTest: !!previewOptions.isForGameplayTest,
+      }
+    );
+    if (previewOptions.isLaunchCancelled()) {
+      exporter.delete();
+      return;
+    }
 
     var previewStartTime = performance.now();
 
@@ -334,6 +383,12 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
+    previewExportOptions.setDisplayCollisionShapes(
+      previewOptions.displayCollisionShapes
+    );
+    previewExportOptions.setDisplaySignalAnimations(
+      previewOptions.displaySignalAnimations
+    );
     previewExportOptions.setFullLoadingScreen(previewOptions.fullLoadingScreen);
     previewExportOptions.setGDevelopVersionWithHash(getIDEVersionWithHash());
     previewExportOptions.setCrashReportUploadLevel(
@@ -391,7 +446,36 @@ export default class LocalPreviewLauncher extends React.Component<
       );
     }
 
-    exporter.exportProjectForPixiPreview(previewExportOptions);
+    if (!previewOptions.onWillWritePreviewFiles()) {
+      exporter.delete();
+      previewExportOptions.delete();
+      return;
+    }
+
+    const exportSuccessful = exporter.exportProjectForPixiPreview(
+      previewExportOptions
+    );
+    if (
+      hasConstantPlaceholderDiagnostic(
+        project.getWholeProjectDiagnosticReport()
+      )
+    ) {
+      this.props.onInvalidConstantPlaceholder();
+      exporter.delete();
+      previewExportOptions.delete();
+      return;
+    }
+    if (!exportSuccessful) {
+      exporter.delete();
+      previewExportOptions.delete();
+      throw new Error('Unable to export the project for preview.');
+    }
+
+    const dataJsPath = path.join(outputDir, 'data.js');
+    fileSystem.writeToFile(
+      dataJsPath,
+      addGlobalObjectGroupsToDataJs(project, fileSystem.readFile(dataJsPath))
+    );
 
     if (shouldHotReload) {
       const projectDataElement = new gd.SerializerElement();
@@ -400,7 +484,10 @@ export default class LocalPreviewLauncher extends React.Component<
         previewExportOptions,
         projectDataElement
       );
-      const projectData = JSON.parse(gd.Serializer.toJSON(projectDataElement));
+      const projectData = addGlobalObjectGroupsToProjectData(
+        project,
+        JSON.parse(gd.Serializer.toJSON(projectDataElement))
+      );
       projectDataElement.delete();
 
       const runtimeGameOptionsElement = new gd.SerializerElement();
@@ -437,17 +524,6 @@ export default class LocalPreviewLauncher extends React.Component<
           });
         });
       }
-      if (!previewOptions.isForInGameEdition) {
-        if (
-          this.state.hotReloadsCount % 16 === 0 &&
-          this._hotReloadSubscriptionChecker
-        ) {
-          this._hotReloadSubscriptionChecker.checkUserHasSubscription();
-        }
-        this.setState(state => ({
-          hotReloadsCount: state.hotReloadsCount + 1,
-        }));
-      }
     } else {
       if (previewOptions.isForInGameEdition) {
         setEmbeddedGameFramePreviewLocation({
@@ -481,12 +557,6 @@ export default class LocalPreviewLauncher extends React.Component<
     return localPreviewDebuggerServer;
   }
 
-  _checkSubscriptionForNetworkPreview = (): any => {
-    if (!this._networkPreviewSubscriptionChecker) return true;
-
-    return this._networkPreviewSubscriptionChecker.checkUserHasSubscription();
-  };
-
   render(): any {
     const {
       networkPreviewDialogOpen,
@@ -496,45 +566,18 @@ export default class LocalPreviewLauncher extends React.Component<
     } = this.state;
 
     return (
-      <React.Fragment>
-        <SubscriptionChecker
-          ref={subscriptionChecker =>
-            (this._networkPreviewSubscriptionChecker = subscriptionChecker)
-          }
-          onChangeSubscription={() =>
-            this.setState({ networkPreviewDialogOpen: false })
-          }
-          id="Preview over wifi"
-          title={<Trans>Preview over wifi</Trans>}
-          placementId="preview-wifi"
-          mode="try"
-          isNotShownDuringInAppTutorial
-        />
-        <SubscriptionChecker
-          ref={subscriptionChecker =>
-            (this._hotReloadSubscriptionChecker = subscriptionChecker)
-          }
-          id="Hot reloading"
-          title={
-            <Trans>Live preview (apply changes to the running preview)</Trans>
-          }
-          placementId="hot-reloading"
-          mode="try"
-          isNotShownDuringInAppTutorial
-        />
-        <LocalNetworkPreviewDialog
-          open={networkPreviewDialogOpen}
-          url={
-            networkPreviewHost && networkPreviewPort
-              ? `${networkPreviewHost}:${networkPreviewPort}`
-              : null
-          }
-          error={networkPreviewError}
-          onClose={() => this.setState({ networkPreviewDialogOpen: false })}
-          onExport={this.props.onExport}
-          onRunPreviewLocally={this._openPreviewBrowserWindow}
-        />
-      </React.Fragment>
+      <LocalNetworkPreviewDialog
+        open={networkPreviewDialogOpen}
+        url={
+          networkPreviewHost && networkPreviewPort
+            ? `${networkPreviewHost}:${networkPreviewPort}`
+            : null
+        }
+        error={networkPreviewError}
+        onClose={() => this.setState({ networkPreviewDialogOpen: false })}
+        onExport={this.props.onExport}
+        onRunPreviewLocally={this._openPreviewBrowserWindow}
+      />
     );
   }
 }

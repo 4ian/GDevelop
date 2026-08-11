@@ -1,0 +1,4 @@
+interface:
+  display_name: "GDevelop Project Files"
+  short_description: "Build and verify GDevelop project files"
+  default_prompt: "Use $gdevelop-project-files to edit, test, and verify this GDevelop project."

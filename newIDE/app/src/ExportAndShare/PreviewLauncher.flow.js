@@ -12,15 +12,25 @@ export type LaunchCaptureOptions = {|
 
 export type LaunchPreviewOptions = {
   networkPreview?: boolean,
+  // When set, preview this specific layout instead of the editor's currently
+  // active/previewed tab. Used by MCP so an agent can preview the project's
+  // first scene (or a named scene) without controlling which tab is focused.
+  forcedPreviewLayoutName?: ?string,
   hotReload?: boolean,
   shouldReloadProjectData?: boolean,
   shouldReloadLibraries?: boolean,
   shouldGenerateScenesEventsCode?: boolean,
   shouldReloadResources?: boolean,
   shouldHardReload?: boolean,
+  // Override the editor preference for this launch only. Used by MCP to make
+  // collision shapes visible in a newly launched preview without changing the
+  // toolbar checkbox.
+  displayCollisionShapes?: boolean,
   fullLoadingScreen?: boolean,
   forceDiagnosticReport?: boolean,
+  skipDiagnosticErrorBlocking?: boolean,
   numberOfWindows?: number,
+  forceAlwaysOnTopInPreview?: boolean,
   isForInGameEdition?: {|
     editorId: string,
     forcedSceneName: string | null,
@@ -52,7 +62,10 @@ export type PreviewOptions = {|
   shouldGenerateScenesEventsCode: boolean,
   shouldReloadResources: boolean,
   shouldHardReload: boolean,
+  displayCollisionShapes: boolean,
+  displaySignalAnimations: boolean,
   fullLoadingScreen: boolean,
+  forceAlwaysOnTopInPreview: boolean,
   fallbackAuthor: ?{ id: string, username: string },
   authenticatedPlayer: ?{
     playerId: string,
@@ -72,6 +85,19 @@ export type PreviewOptions = {|
   inGameEditorSettings: InGameEditorSettings | null,
   numberOfWindows: number,
 
+  /**
+   * Returns true when this launch no longer owns the preview pipeline. Launchers
+   * must check it after asynchronous setup and before touching the project.
+   */
+  isLaunchCancelled: () => boolean,
+
+  /**
+   * Called immediately before the launcher starts writing preview files.
+   * Returning false means the launch was cancelled while the launcher was
+   * preparing and must stop without touching the shared preview output.
+   */
+  onWillWritePreviewFiles: () => boolean,
+
   // Only for the web-app:
   previewWindows: Array<WindowProxy> | null,
 |};
@@ -90,6 +116,7 @@ export type PreviewLauncherProps = {|
   sourceGameId: string,
   getIncludeFileHashs: () => { [string]: number },
   onExport: () => void,
+  onInvalidConstantPlaceholder: () => void,
   onCaptureFinished: CaptureOptions => Promise<void>,
 |};
 
@@ -110,6 +137,7 @@ export type PreviewDebuggerServerCallbacks = {|
   onConnectionClosed: ({|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
+    connectionInfo?: Object,
   |}) => void | Promise<void>,
   onConnectionOpened: ({|
     id: DebuggerId,
@@ -138,11 +166,15 @@ export interface PreviewDebuggerServer {
   getExistingDebuggerIds(): Array<DebuggerId>;
   getExistingEmbeddedGameFrameDebuggerIds(): Array<DebuggerId>;
   getExistingPreviewDebuggerIds(): Array<DebuggerId>;
+  getRecentLogs(id: DebuggerId): Array<Object>;
+  getConnectionInfo(id: DebuggerId): ?Object;
+  getLastConnectionInfo(): ?Object;
   sendMessage(id: DebuggerId, message: Object): void;
   sendMessageWithResponse(message: Object): Promise<Object>;
   registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void;
   registerEmbeddedGameFrame(window: WindowProxy): void;
   unregisterEmbeddedGameFrame(window: WindowProxy): void;
+  closeAllPreviewConnections(): void;
   registerGameplayTestFrame(window: WindowProxy): void;
   unregisterGameplayTestFrame(window: WindowProxy): void;
   closeAllConnections(): void;
@@ -166,7 +198,10 @@ export type PreviewLauncherInterface = {
   launchPreview: (previewOptions: PreviewOptions) => Promise<any>,
   canDoNetworkPreview: () => boolean,
   +closePreview?: (windowId: number) => void,
-  +closeAllPreviews?: () => void,
+  +closeAllPreviews?: () => void | Promise<void>,
+  +focusAllPreviews?: () => void,
+  +injectPreviewClickUserGesture?: (inputs: Array<Object>) => Promise<?Object>,
+  +capturePreviewPage?: (windowId: ?number) => Promise<?Object>,
   +getPreviewDebuggerServer: () => ?PreviewDebuggerServer,
 };
 

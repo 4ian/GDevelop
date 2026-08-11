@@ -196,6 +196,7 @@ export type EventFunctionFolderCommonProps = {|
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject
   ) => void,
+  onEventsFunctionMetadataChanged: () => void,
 |};
 
 export type EventsFunctionFolderProps = {|
@@ -449,6 +450,7 @@ export class EventsFunctionFolderTreeViewItemContent
     }
     this.functionFolder.getParent().removeFolderChild(this.functionFolder);
     this._onProjectItemModified();
+    this.props.onEventsFunctionMetadataChanged();
   }
 
   copy(): void {}
@@ -474,6 +476,7 @@ export class EventsFunctionFolderTreeViewItemContent
       this.props.eventsBasedBehavior,
       this.props.eventsBasedObject
     );
+    this.props.onEventsFunctionMetadataChanged();
 
     this.props.onSelectEventsFunction(
       newEventsFunction,

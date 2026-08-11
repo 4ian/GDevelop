@@ -10,6 +10,7 @@
 
 namespace gd {
 class Project;
+class EventsFunctionsExtension;
 class EventsFunctionsContainer;
 class ObjectsContainer;
 class ParameterMetadataContainer;
@@ -69,6 +70,7 @@ class GD_CORE_API EventsFunctionTools {
    */
   static void ObjectEventsFunctionToObjectsContainer(
       const gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputObjectsContainer);

@@ -21,6 +21,7 @@ const defaultShortcuts: ShortcutMap = {
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
   INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',
+  OPEN_RECENT_EDITOR: 'CmdOrCtrl+KeyE',
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',
 
   OPEN_PROJECT_PROPERTIES: '',
@@ -37,10 +38,12 @@ const defaultShortcuts: ShortcutMap = {
 
   OPEN_SCENE_PROPERTIES: '',
   OPEN_SCENE_VARIABLES: 'KeyV',
+  ADD_OBJECT: 'Shift+KeyA',
 
   OPEN_OBJECTS_PANEL: 'KeyO',
   OPEN_OBJECT_GROUPS_PANEL: 'KeyG',
   OPEN_PROPERTIES_PANEL: 'KeyP',
+  TOGGLE_ALL_PANELS: 'Tab',
   TOGGLE_INSTANCES_PANEL: 'KeyI',
   TOGGLE_LAYERS_PANEL: 'KeyL',
   TOGGLE_WINDOW_MASK: 'KeyM',

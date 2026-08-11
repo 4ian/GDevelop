@@ -27,6 +27,7 @@ export enum Variable_Type {
   Boolean = 4,
   Structure = 5,
   Array = 6,
+  Enum = 7,
 }
 
 export enum VariablesContainer_SourceType {
@@ -39,6 +40,8 @@ export enum VariablesContainer_SourceType {
   ExtensionScene = 6,
   Parameters = 7,
   Properties = 8,
+  Prefab = 9,
+  Behavior = 10,
 }
 
 export enum ObjectsContainer_SourceType {
@@ -64,6 +67,13 @@ export enum CustomObjectConfiguration_EdgeAnchor {
   Center = 4,
 }
 
+export enum SceneLifecycleEventsFunctions_Role {
+  SceneLoad = 0,
+  SceneSignal = 1,
+  SceneUpdate = 2,
+  SceneUnload = 3,
+}
+
 export enum ResourcesContainer_SourceType {
   Unknown = 0,
   Global = 1,
@@ -82,6 +92,7 @@ export enum ProjectDiagnostic_ErrorType {
   MissingBehavior = 1,
   UnknownObject = 2,
   MismatchedObjectType = 3,
+  UnsafeExternalLayoutCreation = 4,
 }
 
 export enum ExpressionParserError_ErrorType {
@@ -344,6 +355,12 @@ export class Variable extends EmscriptenObject {
   castTo(type: string): void;
   setString(str: string): void;
   getString(): string;
+  getEnumValues(): VectorString;
+  setEnumValues(values: VectorString): void;
+  addEnumValue(value: string): void;
+  removeEnumValueAt(index: number): void;
+  clearEnumValues(): void;
+  isValidEnumValue(value: string): boolean;
   setValue(val: number): void;
   getValue(): number;
   setBool(val: boolean): void;
@@ -418,6 +435,10 @@ export class ObjectGroup extends EmscriptenObject {
   removeObject(objectName: string): void;
   find(objectName: string): boolean;
   getAllObjectsNames(): VectorString;
+  addRequiredBehavior(behaviorType: string): void;
+  removeRequiredBehavior(behaviorType: string): void;
+  hasRequiredBehavior(behaviorType: string): boolean;
+  getAllRequiredBehaviorTypes(): VectorString;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
 }
@@ -669,7 +690,10 @@ export class Project extends EmscriptenObject {
   getEventsBasedBehavior(type: string): EventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
   getEventsBasedObject(type: string): EventsBasedObject;
+  ensureObjectInheritedBehaviors(objectToUpdate: gdObject): void;
   getVariables(): VariablesContainer;
+  setConstantsJson(constantsJson: string): void;
+  getConstantsJson(): string;
   getObjects(): ObjectsContainer;
   getResourcesManager(): ResourcesContainer;
   setSceneResourcesPreloading(resourcesPreloading: string): void;
@@ -721,6 +745,9 @@ export class ProjectScopedContainers extends EmscriptenObject {
   getScopeFunctionName(): string;
   getScopeBehaviorName(): string;
   getScopeObjectName(): string;
+  getScopeSceneLifecycleFunctionName(): string;
+  setScopeExternalEventsName(externalEventsName: string): ProjectScopedContainers;
+  setScopeSceneLifecycleFunctionName(lifecycleFunctionName: string): ProjectScopedContainers;
 }
 
 export class ExtensionProperties extends EmscriptenObject {
@@ -750,7 +777,11 @@ export class Behavior extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
   isFolded(): boolean;
   setFolded(folded: boolean): void;
+  isMuted(): boolean;
+  setMuted(muted: boolean): void;
   isDefaultBehavior(): boolean;
+  isInheritedFromObjectType(): boolean;
+  setInheritedFromObjectType(isInheritedFromObjectType: boolean): void;
   getPropertiesQuickCustomizationVisibilities(): QuickCustomizationVisibilitiesContainer;
 }
 
@@ -864,6 +895,23 @@ export class CustomObjectConfiguration extends ObjectConfiguration {
   static getEdgeAnchorFromString(value: string): CustomObjectConfiguration_EdgeAnchor;
 }
 
+export class SceneLifecycleEventsFunctions extends EmscriptenObject {
+  get(role: SceneLifecycleEventsFunctions_Role): EventsFunction;
+  getByName(name: string): EventsFunction;
+  has(role: SceneLifecycleEventsFunctions_Role): boolean;
+  hasByName(name: string): boolean;
+  insert(role: SceneLifecycleEventsFunctions_Role): EventsFunction;
+  insertByName(name: string): EventsFunction;
+  remove(role: SceneLifecycleEventsFunctions_Role): boolean;
+  removeByName(name: string): boolean;
+  hasRoleName(name: string): boolean;
+  hasValidMetadata(): boolean;
+  getSceneLoadFunction(): EventsFunction;
+  getSceneSignalFunction(): EventsFunction;
+  getSceneUpdateFunction(): EventsFunction;
+  getSceneUnloadFunction(): EventsFunction;
+}
+
 export class Layout extends EmscriptenObject {
   constructor();
   setName(name: string): void;
@@ -878,6 +926,7 @@ export class Layout extends EmscriptenObject {
   getVariables(): VariablesContainer;
   getObjects(): ObjectsContainer;
   getEvents(): EventsList;
+  getLifecycleEventsFunctions(): SceneLifecycleEventsFunctions;
   getLayers(): LayersContainer;
   updateBehaviorsSharedData(project: Project): void;
   getAllBehaviorSharedDataNames(): VectorString;
@@ -910,6 +959,7 @@ export class ExternalEvents extends EmscriptenObject {
   getAssociatedLayout(): string;
   setAssociatedLayout(name: string): void;
   getEvents(): EventsList;
+  getLifecycleEventsFunctions(): SceneLifecycleEventsFunctions;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(project: Project, element: SerializerElement): void;
 }
@@ -1476,6 +1526,8 @@ export class Instruction extends EmscriptenObject {
   isInverted(): boolean;
   setAwaited(awaited: boolean): void;
   isAwaited(): boolean;
+  setDisabled(disable: boolean): void;
+  isDisabled(): boolean;
   setParameter(id: number, value: string): void;
   getParameter(id: number): Expression;
   setParametersCount(count: number): void;
@@ -1543,6 +1595,9 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   isPrivate(): boolean;
   isAsync(): boolean;
   isOptionallyAsync(): boolean;
+  requiresSceneFutureFrame(): boolean;
+  emitsDeferredSceneSignal(): boolean;
+  mutatesSceneStack(): boolean;
   isRelevantForLayoutEvents(): boolean;
   isRelevantForFunctionEvents(): boolean;
   isRelevantForAsynchronousFunctionEvents(): boolean;
@@ -1555,6 +1610,9 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   setRelevantForFunctionEventsOnly(): InstructionMetadata;
   setRelevantForAsynchronousFunctionEventsOnly(): InstructionMetadata;
   setRelevantForCustomObjectEventsOnly(): InstructionMetadata;
+  setRequiresSceneFutureFrame(): InstructionMetadata;
+  setEmitsDeferredSceneSignal(): InstructionMetadata;
+  setMutatesSceneStack(): InstructionMetadata;
   addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): InstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
   setDefaultValue(defaultValue: string): InstructionMetadata;
@@ -2558,6 +2616,7 @@ export class EventsBasedBehavior extends AbstractEventsBasedEntity {
   setQuickCustomizationVisibility(visibility: QuickCustomization_Visibility): EventsBasedBehavior;
   getQuickCustomizationVisibility(): QuickCustomization_Visibility;
   getSharedPropertyDescriptors(): PropertiesContainer;
+  getVariables(): VariablesContainer;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;
@@ -2610,6 +2669,13 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getInitialInstances(): InitialInstancesContainer;
   getLayers(): LayersContainer;
   getObjects(): ObjectsContainer;
+  getVariables(): VariablesContainer;
+  getAllBehaviorNames(): VectorString;
+  hasBehaviorNamed(name: string): boolean;
+  addNewBehavior(project: Project, type: string, name: string): Behavior;
+  getBehavior(name: string): Behavior;
+  removeBehavior(name: string): void;
+  renameBehavior(oldName: string, name: string): boolean;
   getAreaMinX(): number;
   getAreaMinY(): number;
   getAreaMinZ(): number;
@@ -2942,6 +3008,13 @@ export class Sprite extends EmscriptenObject {
   constructor();
   setImageName(name: string): void;
   getImageName(): string;
+  hasCustomSourceRect(): boolean;
+  setCustomSourceRect(x: number, y: number, width: number, height: number): void;
+  clearCustomSourceRect(): void;
+  getSourceRectX(): number;
+  getSourceRectY(): number;
+  getSourceRectWidth(): number;
+  getSourceRectHeight(): number;
   getOrigin(): Point;
   getCenter(): Point;
   isDefaultCenterPoint(): boolean;
@@ -3018,8 +3091,12 @@ export class Model3DAnimation extends EmscriptenObject {
   getName(): string;
   setSource(name: string): void;
   getSource(): string;
+  setSourceModelResourceName(resourceName: string): void;
+  getSourceModelResourceName(): string;
   setShouldLoop(shouldLoop: boolean): void;
   shouldLoop(): boolean;
+  setShouldUseRootMotion(shouldUseRootMotion: boolean): void;
+  shouldUseRootMotion(): boolean;
 }
 
 export class Model3DObjectConfiguration extends ObjectConfiguration {
@@ -3033,6 +3110,12 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  getSharedAnimationModelResourcesCount(): number;
+  getSharedAnimationModelResourceName(index: number): string;
+  hasSharedAnimationModelResourceNamed(resourceName: string): boolean;
+  addSharedAnimationModelResource(resourceName: string): void;
+  removeSharedAnimationModelResource(index: number): void;
+  removeAllSharedAnimationModelResources(): void;
   getWidth(): number;
   getHeight(): number;
   getDepth(): number;
@@ -3306,6 +3389,9 @@ export class PreviewExportOptions extends EmscriptenObject {
   setShouldReloadLibraries(enable: boolean): PreviewExportOptions;
   setShouldGenerateScenesEventsCode(enable: boolean): PreviewExportOptions;
   setNativeMobileApp(enable: boolean): PreviewExportOptions;
+  setDisplayCollisionShapes(enable: boolean): PreviewExportOptions;
+  setDisplayCollisionMask(enable: boolean): PreviewExportOptions;
+  setDisplaySignalAnimations(enable: boolean): PreviewExportOptions;
   setFullLoadingScreen(enable: boolean): PreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): PreviewExportOptions;
   setIsInGameEdition(enable: boolean): PreviewExportOptions;

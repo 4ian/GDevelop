@@ -67,6 +67,61 @@ const gd::String WholeProjectRefactorer::behaviorObjectParameterName = "Object";
 // always called "Object".
 const gd::String WholeProjectRefactorer::parentObjectParameterName = "Object";
 
+namespace {
+const gd::String onSignalFunctionName = "onSignal";
+const gd::String onSignalSignalNameParameterName = "SignalName";
+const gd::String onSignalPayloadParameterName = "Payload";
+const gd::String onSignalObjectParameterName = "Object";
+
+void AddFunctionParameter(gd::ParameterMetadataContainer &parameters,
+                          const gd::String &name,
+                          const gd::String &type,
+                          const gd::String &description,
+                          const gd::String &extraInfo = "") {
+  gd::ParameterMetadata newParameter;
+  newParameter.SetType(type)
+      .SetName(name)
+      .SetDescription(description)
+      .SetExtraInfo(extraInfo);
+  parameters.AddParameter(newParameter);
+}
+
+void AddOnSignalDataParameters(gd::ParameterMetadataContainer &parameters) {
+  AddFunctionParameter(parameters, onSignalSignalNameParameterName, "string",
+                       "Signal name");
+  AddFunctionParameter(parameters, onSignalPayloadParameterName, "string",
+                       "Payload");
+}
+
+void EnsureOnSignalObjectEventsFunctionProperParameters(
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
+    gd::ParameterMetadataContainer &parameters) {
+  parameters.ClearParameters();
+
+  AddFunctionParameter(
+      parameters, onSignalObjectParameterName, "object", "Object",
+      gd::PlatformExtension::GetObjectFullType(eventsFunctionsExtension.GetName(),
+                                               eventsBasedObject.GetName()));
+  AddOnSignalDataParameters(parameters);
+}
+
+void EnsureOnSignalBehaviorEventsFunctionProperParameters(
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
+    gd::ParameterMetadataContainer &parameters) {
+  parameters.ClearParameters();
+
+  AddFunctionParameter(parameters, onSignalObjectParameterName, "object",
+                       "Object", eventsBasedBehavior.GetObjectType());
+  AddFunctionParameter(
+      parameters, "Behavior", "behavior", "Behavior",
+      gd::PlatformExtension::GetBehaviorFullType(
+          eventsFunctionsExtension.GetName(), eventsBasedBehavior.GetName()));
+  AddOnSignalDataParameters(parameters);
+}
+}  // namespace
+
 std::set<gd::String>
 WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(
     const gd::Project &project,
@@ -102,6 +157,12 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
   for (auto &eventsFunction :
        eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
     auto &parameters = eventsFunction->GetParameters();
+    if (eventsFunction->GetName() == onSignalFunctionName) {
+      EnsureOnSignalBehaviorEventsFunctionProperParameters(
+          eventsFunctionsExtension, eventsBasedBehavior, parameters);
+      continue;
+    }
+
     while (parameters.GetParametersCount() < 2) {
       gd::ParameterMetadata newParameter;
       parameters.AddParameter(newParameter);
@@ -127,6 +188,12 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
   for (auto &eventsFunction :
        eventsBasedObject.GetEventsFunctions().GetInternalVector()) {
     auto &parameters = eventsFunction->GetParameters();
+    if (eventsFunction->GetName() == onSignalFunctionName) {
+      EnsureOnSignalObjectEventsFunctionProperParameters(
+          eventsFunctionsExtension, eventsBasedObject, parameters);
+      continue;
+    }
+
     while (parameters.GetParametersCount() < 1) {
       gd::ParameterMetadata newParameter;
       parameters.AddParameter(newParameter);
@@ -1888,10 +1955,16 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForProjectAndLayout(project, layout);
 
-  // Rename object in the current layout
-  gd::EventsRefactorer::RenameObjectInEvents(
-      project.GetCurrentPlatform(), projectScopedContainers, layout.GetEvents(),
-      layout.GetObjects(), oldName, newName);
+  // Rename object in every lifecycle function of the current layout.
+  layout.GetLifecycleEventsFunctions().ForEach(
+      [&](gd::SceneLifecycleFunctionRole role,
+          gd::EventsFunction& eventsFunction) {
+        auto lifecycleScopedContainers = projectScopedContainers;
+        lifecycleScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+        gd::EventsRefactorer::RenameObjectInEvents(
+            project.GetCurrentPlatform(), lifecycleScopedContainers,
+            eventsFunction.GetEvents(), layout.GetObjects(), oldName, newName);
+      });
 
   // Object groups can't have instances or be in other groups
   if (!isObjectGroup) {
@@ -1906,9 +1979,18 @@ void WholeProjectRefactorer::ObjectOrGroupRenamedInScene(
   for (auto &externalEventsName :
        GetAssociatedExternalEvents(project, layout.GetName())) {
     auto &externalEvents = project.GetExternalEvents(externalEventsName);
-    gd::EventsRefactorer::RenameObjectInEvents(
-        project.GetCurrentPlatform(), projectScopedContainers,
-        externalEvents.GetEvents(), layout.GetObjects(), oldName, newName);
+    externalEvents.GetLifecycleEventsFunctions().ForEach(
+        [&](gd::SceneLifecycleFunctionRole role,
+            gd::EventsFunction& eventsFunction) {
+          auto lifecycleScopedContainers = projectScopedContainers;
+          lifecycleScopedContainers.SetScopeExternalEventsName(
+              externalEvents.GetName());
+          lifecycleScopedContainers.SetScopeSceneLifecycleFunctionRole(role);
+          gd::EventsRefactorer::RenameObjectInEvents(
+              project.GetCurrentPlatform(), lifecycleScopedContainers,
+              eventsFunction.GetEvents(), layout.GetObjects(), oldName,
+              newName);
+        });
   }
 
   // Rename object in external layouts

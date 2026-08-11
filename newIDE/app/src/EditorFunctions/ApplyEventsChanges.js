@@ -292,14 +292,66 @@ const comparePathsReverseLexicographically = (
   return 0;
 };
 
+const normalizeSerializedEventsInput = (value: any): any => {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === 'object') {
+    if (typeof value.type === 'string') return [value];
+    if (Array.isArray(value.events)) return value.events;
+  }
+  return value;
+};
+
 export const applyEventsChanges = (
   project: gdProject,
   sceneEvents: gdEventsList,
   eventOperationsInput: Array<AiGeneratedEventChange>,
   aiGeneratedEventId: string
-): {| applied: number, errors: Array<string> |} => {
+): {|
+  applied: number,
+  errors: Array<string>,
+  aiGeneratedEventIds: Array<string>,
+|} => {
   const operations: Array<EventOperation> = [];
   const errors: Array<string> = [];
+  const aiGeneratedEventIds = new Set<string>();
+
+  const collectAiGeneratedEventIds = (eventsList: gdEventsList) => {
+    mapFor(0, eventsList.getEventsCount(), i => {
+      const event = eventsList.getEventAt(i);
+      const eventId = event.getAiGeneratedEventId();
+      if (eventId) aiGeneratedEventIds.add(eventId);
+      if (event.canHaveSubEvents()) {
+        collectAiGeneratedEventIds(event.getSubEvents());
+      }
+    });
+  };
+
+  const preserveOrAssignRootAiGeneratedEventIds = (
+    eventsList: gdEventsList
+  ) => {
+    const assignMissingIds = (list: gdEventsList, path: Array<number>) => {
+      mapFor(0, list.getEventsCount(), i => {
+        const event = list.getEventAt(i);
+        const eventPath = [...path, i];
+        if (!event.getAiGeneratedEventId()) {
+          const isOnlyRootEvent =
+            eventPath.length === 1 && list.getEventsCount() === 1;
+          event.setAiGeneratedEventId(
+            isOnlyRootEvent
+              ? aiGeneratedEventId
+              : `${aiGeneratedEventId}-${eventPath
+                  .map(index => index + 1)
+                  .join('-')}`
+          );
+        }
+        if (event.canHaveSubEvents()) {
+          assignMissingIds(event.getSubEvents(), eventPath);
+        }
+      });
+    };
+    assignMissingIds(eventsList, []);
+    collectAiGeneratedEventIds(eventsList);
+  };
 
   eventOperationsInput.forEach(change => {
     const { operationName, operationTargetEvent, generatedEvents } = change;
@@ -391,7 +443,9 @@ export const applyEventsChanges = (
       }
 
       if (generatedEvents && operationName !== 'delete_event') {
-        const eventsListContent = JSON.parse(generatedEvents);
+        const eventsListContent = normalizeSerializedEventsInput(
+          JSON.parse(generatedEvents)
+        );
         localEventsToInsert = new gd.EventsList();
         unserializeFromJSObject(
           localEventsToInsert,
@@ -405,12 +459,7 @@ export const applyEventsChanges = (
               'N/A'}) are empty. Insertion might not add any events.`
           );
         }
-        mapFor(0, localEventsToInsert.getEventsCount(), i => {
-          if (!localEventsToInsert) return;
-
-          const event = localEventsToInsert.getEventAt(i);
-          event.setAiGeneratedEventId(aiGeneratedEventId);
-        });
+        preserveOrAssignRootAiGeneratedEventIds(localEventsToInsert);
       }
 
       switch (operationName) {
@@ -913,7 +962,11 @@ export const applyEventsChanges = (
     }
   });
 
-  return { applied, errors };
+  return {
+    applied,
+    errors,
+    aiGeneratedEventIds: Array.from(aiGeneratedEventIds),
+  };
 };
 
 export const addUndeclaredVariables = ({

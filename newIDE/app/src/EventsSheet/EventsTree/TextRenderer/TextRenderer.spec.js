@@ -623,6 +623,33 @@ describe('EventsTree/TextRenderer', () => {
     }
   });
 
+  it('renders JavaScript events with a code preview', () => {
+    const { project } = makeTestProject(gd);
+    const eventsList = new gd.EventsList();
+    try {
+      const event = eventsList.insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::JsCode',
+        0
+      );
+      const jsCodeEvent = gd.asJsCodeEvent(event);
+      jsCodeEvent.setInlineCode(
+        'const score = runtimeScene.getVariables().get("Score");\nscore.add(1);'
+      );
+      jsCodeEvent.setParameterObjects('Player');
+
+      const renderedText = renderNonTranslatedEventsAsText({ eventsList });
+      expect(renderedText).toContain('JavaScript event (objects: Player):');
+      expect(renderedText).toContain(
+        'const score = runtimeScene.getVariables().get("Score");'
+      );
+      expect(renderedText).not.toContain('unknown/unsupported');
+    } finally {
+      eventsList.delete();
+      project.delete();
+    }
+  });
+
   it('renders a link event', () => {
     const { project } = makeTestProject(gd);
     try {

@@ -99,6 +99,20 @@ describe('applyVariableChange', () => {
       expect(variable.getString()).toBe('123');
     });
 
+    it('should respect forced enum variable type', () => {
+      const result = applyVariableChange({
+        variablePath: 'forcedEnum',
+        forcedVariableType: 'Enum',
+        variablesContainer,
+        value: 'Idle',
+      });
+
+      expect(result.addedNewVariable).toBe(true);
+      const variable = variablesContainer.get('forcedEnum');
+      expect(variable.getType()).toBe(gd.Variable.Enum);
+      expect(variable.getString()).toBe('Idle');
+    });
+
     // `Number('')` is 0, which used to make an empty value inferred as a
     // number and stored as `parseFloat('')`, i.e. NaN.
     it('should store an empty value as an empty string, not NaN', () => {

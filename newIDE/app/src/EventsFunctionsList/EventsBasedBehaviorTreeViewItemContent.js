@@ -57,6 +57,7 @@ export type EventsBasedBehaviorCallbacks = {|
     sourceExtensionName: string,
     sourceEventsBasedBehaviorName: string
   ) => void,
+  onEventsBasedBehaviorMetadataChanged: () => void,
 |};
 
 export type EventsBasedBehaviorProps = {|
@@ -275,13 +276,15 @@ export class EventsBasedBehaviorTreeViewItemContent
 
         eventsBasedBehaviorsList.remove(this.eventsBasedBehavior.getName());
         this._onEventsBasedBehaviorModified();
+        this.props.onEventsBasedBehaviorMetadataChanged();
       }
     );
   }
 
   _togglePrivate(): void {
     this.eventsBasedBehavior.setPrivate(!this.eventsBasedBehavior.isPrivate());
-    this.props.forceUpdateEditor();
+    this._onEventsBasedBehaviorModified();
+    this.props.onEventsBasedBehaviorMetadataChanged();
   }
 
   getIndex(): number {
@@ -353,7 +356,11 @@ export class EventsBasedBehaviorTreeViewItemContent
       'unserializeFrom',
       project
     );
+    const sourceFullName = newEventsBasedBehavior.getFullName();
     newEventsBasedBehavior.setName(newName);
+    if (!sourceFullName || sourceFullName === sourceEventsBasedBehaviorName) {
+      newEventsBasedBehavior.setFullName(newName);
+    }
 
     const sourceExtensionName = SafeExtractor.extractStringProperty(
       clipboardContent,
@@ -368,6 +375,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     }
 
     this._onEventsBasedBehaviorModified();
+    this.props.onEventsBasedBehaviorMetadataChanged();
     this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
     this.props.editName(
       getEventsBasedBehaviorTreeViewItemId(newEventsBasedBehavior)
@@ -384,7 +392,9 @@ export class EventsBasedBehaviorTreeViewItemContent
       name,
       eventsBasedBehaviorsList.getCount()
     );
+    newEventsBasedBehavior.setFullName(name);
     this._onEventsBasedBehaviorModified();
+    this.props.onEventsBasedBehaviorMetadataChanged();
 
     const newEventsBasedBehaviorId = getEventsBasedBehaviorTreeViewItemId(
       newEventsBasedBehavior

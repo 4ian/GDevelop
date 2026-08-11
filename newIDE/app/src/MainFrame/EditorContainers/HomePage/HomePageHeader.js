@@ -61,7 +61,7 @@ export const HomePageHeader = ({
                     size="small"
                     id="main-toolbar-history-button"
                     onClick={onOpenVersionHistory}
-                    tooltip={t`Open version history`}
+                    tooltip={t`Open Git tool`}
                     color="default"
                   >
                     <HistoryIcon />

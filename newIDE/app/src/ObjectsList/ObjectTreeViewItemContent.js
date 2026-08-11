@@ -75,7 +75,11 @@ export type ObjectTreeViewItemProps = {|
   onObjectModified: (shouldForceUpdateList: boolean) => void,
   onObjectCreated: (
     objects: Array<gdObject>,
-    isTheFirstOfItsTypeInProject: boolean
+    isTheFirstOfItsTypeInProject: boolean,
+    options?: {|
+      shouldCreateInstance?: boolean,
+      instanceSceneCoordinates?: ?[number, number],
+    |}
   ) => void,
   onMovedObjectFolderOrObjectToAnotherFolderInSameContainer: (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext
@@ -428,28 +432,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
         enabled: !isListLocked,
       },
       { type: 'separator' },
-      {
-        label: i18n._(t`Edit object`),
-        click: () => onEditObject(object),
-      },
-      {
-        label: i18n._(t`Edit object variables`),
-        click: () => onEditObject(object, 'variables'),
-      },
-      {
-        label: i18n._(t`Edit behaviors`),
-        click: () => onEditObject(object, 'behaviors'),
-      },
-      {
-        label: i18n._(t`Edit effects`),
-        click: () => onEditObject(object, 'effects'),
-        enabled: objectMetadata.hasDefaultBehavior(
-          'EffectCapability::EffectBehavior'
-        ),
-      },
       project.hasEventsBasedObject(object.getType())
         ? {
-            label: i18n._(t`Edit children`),
+            label: i18n._(t`Edit prefab`),
             enabled: isVariantEditable(
               gd.asCustomObjectConfiguration(object.getConfiguration()),
               project.getEventsBasedObject(object.getType()),
@@ -471,6 +456,25 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
             },
           }
         : null,
+      {
+        label: i18n._(t`Edit object`),
+        click: () => onEditObject(object),
+      },
+      {
+        label: i18n._(t`Edit object variables`),
+        click: () => onEditObject(object, 'variables'),
+      },
+      {
+        label: i18n._(t`Edit behaviors`),
+        click: () => onEditObject(object, 'behaviors'),
+      },
+      {
+        label: i18n._(t`Edit effects`),
+        click: () => onEditObject(object, 'effects'),
+        enabled: objectMetadata.hasDefaultBehavior(
+          'EffectCapability::EffectBehavior'
+        ),
+      },
       { type: 'separator' },
       {
         label: i18n._(t`Swap assets`),

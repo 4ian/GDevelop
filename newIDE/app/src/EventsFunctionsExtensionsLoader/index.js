@@ -234,7 +234,7 @@ const generateEventsFunctionExtension = (
 /**
  * Generate the metadata for the events based extension
  */
-const generateEventsFunctionExtensionMetadata = (
+export const generateEventsFunctionExtensionMetadata = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   options: Options

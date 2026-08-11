@@ -729,6 +729,45 @@ namespace gdjs {
       return undefined;
     }
 
+    /**
+     * Return the 3D collision masks provided by activated behaviors.
+     *
+     * This is used by the preview debugger so it does not need to know which
+     * behaviors own collision shapes.
+     */
+    get3DDebugCollisionMasks(): gdjs.DebugCollisionMask3D[] {
+      const collisionMasks: gdjs.DebugCollisionMask3D[] = gdjs.staticArray(
+        RuntimeObject.prototype.get3DDebugCollisionMasks
+      );
+      collisionMasks.length = 0;
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        const behavior = behaviors[behaviorName];
+        if (!behavior.activated()) {
+          continue;
+        }
+        const behaviorCollisionMasks = behavior.get3DDebugCollisionMasks();
+        for (let index = 0; index < behaviorCollisionMasks.length; index++) {
+          collisionMasks.push(behaviorCollisionMasks[index]);
+        }
+      }
+      return collisionMasks;
+    }
+
+    /** Release behavior data cached for 3D collision-mask debug rendering. */
+    clear3DDebugCollisionMaskCache(): void {
+      const behaviors = this._behaviorsTable.items;
+      for (const behaviorName in behaviors) {
+        if (!Object.prototype.hasOwnProperty.call(behaviors, behaviorName)) {
+          continue;
+        }
+        behaviors[behaviorName].clear3DDebugCollisionMaskCache();
+      }
+    }
+
     //Common properties:
     /**
      * Get the name of the object.
@@ -1079,6 +1118,38 @@ namespace gdjs {
       return variable.getAsString();
     }
 
+    private static validateVariableEnumValue(
+      variable: gdjs.Variable,
+      value: string
+    ): void {
+      value = '' + value;
+      const enumValues = variable.getEnumValues();
+      if (variable.getType() !== 'enum') {
+        throw new Error(
+          `Expected an enum variable, but got a ${variable.getType()} variable.`
+        );
+      }
+      if (enumValues.length > 0 && enumValues.indexOf(value) === -1) {
+        throw new Error(
+          `"${value}" is not a valid enum value. Allowed values are: ${enumValues.join(
+            ', '
+          )}.`
+        );
+      }
+    }
+
+    /**
+     * Get the value of a variable considered as an enum.
+     * @param variable The variable to be accessed
+     * @return The enum value of the specified variable
+     * @static
+     */
+    static getVariableEnum(variable: gdjs.Variable): string {
+      const value = variable.getAsString();
+      RuntimeObject.validateVariableEnumValue(variable, value);
+      return value;
+    }
+
     /**
      * Shortcut to set the value of a variable considered as a boolean.
      * This shortcut function is needed for events code generation.
@@ -1147,6 +1218,16 @@ namespace gdjs {
      * @param newValue {String} The value to be set
      */
     static setVariableString(variable: gdjs.Variable, newValue: string) {
+      variable.setString(newValue);
+    }
+
+    /**
+     * Shortcut to set the value of a variable considered as an enum.
+     * @param variable The variable to be changed
+     * @param newValue The value to be set
+     */
+    static setVariableEnum(variable: gdjs.Variable, newValue: string) {
+      RuntimeObject.validateVariableEnumValue(variable, newValue);
       variable.setString(newValue);
     }
 
@@ -2131,6 +2212,9 @@ namespace gdjs {
       if (!behavior) {
         return false;
       }
+      this._runtimeScene
+        .getScene()
+        ._signalBus?.removeSubscriptionsForBehavior(behavior);
       behavior.onDestroy();
       const behaviorIndex = this._behaviors.indexOf(behavior);
       if (behaviorIndex !== -1) {
@@ -2922,8 +3006,10 @@ namespace gdjs {
     getVariableNumber = RuntimeObject.getVariableNumber;
     returnVariable = RuntimeObject.returnVariable;
     getVariableString = RuntimeObject.getVariableString;
+    getVariableEnum = RuntimeObject.getVariableEnum;
     setVariableNumber = RuntimeObject.setVariableNumber;
     setVariableString = RuntimeObject.setVariableString;
+    setVariableEnum = RuntimeObject.setVariableEnum;
     getVariableBoolean = RuntimeObject.getVariableBoolean;
     setVariableBoolean = RuntimeObject.setVariableBoolean;
     getVariableChildCount = RuntimeObject.getVariableChildCount;

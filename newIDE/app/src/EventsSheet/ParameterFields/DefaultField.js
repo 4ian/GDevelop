@@ -15,6 +15,7 @@ import {
   getHighlightSearchTextParts,
   applySyntaxColoring,
 } from '../../Utils/HighlightSearchText';
+import { getMissingConstantPlaceholderPath } from '../../Utils/ConstantPlaceholderDiagnostics';
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
@@ -69,8 +70,17 @@ export const renderInlineDefaultField = ({
     return <MissingParameterValue />;
   }
   if (!expressionIsValid) {
+    const missingConstantPath = getMissingConstantPlaceholderPath(
+      expression.getPlainString(),
+      scope.project
+    );
+    const errorMessage =
+      missingConstantPath != null
+        ? `Constant path "{{${missingConstantPath}}}" does not exist.`
+        : undefined;
+
     return (
-      <InvalidParameterValue>
+      <InvalidParameterValue errorMessage={errorMessage}>
         {renderStylizedText(
           value,
           getHighlightSearchTextParts(value, highlightedSearchText, {

@@ -41,28 +41,21 @@ import RaisedButton from '../../../UI/RaisedButton';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import {
   ResponsiveLineStackLayout,
-  LineStackLayout,
   ColumnStackLayout,
 } from '../../../UI/Layout';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../UI/CustomSvgIcons/Add';
-import Copy from '../../../UI/CustomSvgIcons/Copy';
-import Trash from '../../../UI/CustomSvgIcons/Trash';
-import Edit from '../../../UI/CustomSvgIcons/ShareExternal';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
 import RestoreIcon from '../../../UI/CustomSvgIcons/Restore';
 import SelectField from '../../../UI/SelectField';
 import SelectOption from '../../../UI/SelectOption';
-import NewVariantDialog from './NewVariantDialog';
 import newNameGenerator from '../../../Utils/NewNameGenerator';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../../../Utils/Serializer';
-import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { MarkdownText } from '../../../UI/MarkdownText';
-import ResponsiveFlatButton from '../../../UI/ResponsiveFlatButton';
 import propertiesMapToSchema from '../../../PropertiesEditor/PropertiesMapToSchema';
 
 const gd: libGDevelop = global.gd;
@@ -222,8 +215,6 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
     unsavedChanges,
     renderObjectNameField,
     isChildObject,
-    onOpenEventBasedObjectVariantEditor,
-    onDeleteEventsBasedObjectVariant,
   } = props;
 
   const { isMobile } = useResponsiveWindowSize();
@@ -236,18 +227,9 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
     customObjectConfiguration.getType()
   ];
 
-  const { showDeleteConfirmation } = useAlertDialog();
   const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
 
-  const customObjectExtensionName = gd.PlatformExtension.getExtensionFromFullObjectType(
-    customObjectConfiguration.getType()
-  );
-  const customObjectExtension = project.hasEventsFunctionsExtensionNamed(
-    customObjectExtensionName
-  )
-    ? project.getEventsFunctionsExtension(customObjectExtensionName)
-    : null;
   const customObjectEventsBasedObject = project.hasEventsBasedObject(
     customObjectConfiguration.getType()
   )
@@ -317,120 +299,14 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
     collisionMasksEditorOpen,
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
-  const [newVariantDialogOpen, setNewVariantDialogOpen] = React.useState(false);
-  const [
-    duplicateAndEditVariantDialogOpen,
-    setDuplicateAndEditVariantDialogOpen,
-  ] = React.useState(false);
-
-  const editVariant = React.useCallback(
-    () => {
-      if (
-        !isVariantEditable(
-          customObjectConfiguration,
-          customObjectEventsBasedObject,
-          customObjectExtension
-        )
-      ) {
-        setDuplicateAndEditVariantDialogOpen(true);
-        return;
-      }
-      customObjectExtension &&
-        customObjectEventsBasedObject &&
-        onOpenEventBasedObjectVariantEditor &&
-        onOpenEventBasedObjectVariantEditor(
-          customObjectExtension.getName(),
-          customObjectEventsBasedObject.getName(),
-          customObjectConfiguration.getVariantName()
-        );
-    },
-    [
-      customObjectConfiguration,
-      onOpenEventBasedObjectVariantEditor,
-      customObjectExtension,
-      customObjectEventsBasedObject,
-    ]
-  );
-
-  const doDuplicateVariant = React.useCallback(
-    (i18n: I18nType, newName: string) => {
-      duplicateVariant(
-        newName,
-        customObjectConfiguration,
-        customObjectEventsBasedObject,
-        customObjectExtension,
-        project,
-        i18n
-      );
-      setNewVariantDialogOpen(false);
-      forceUpdate();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      customObjectExtension,
-      forceUpdate,
-      project,
-    ]
-  );
-
-  const duplicateAndEditVariant = React.useCallback(
-    (i18n: I18nType, newName: string) => {
-      duplicateVariant(
-        newName,
-        customObjectConfiguration,
-        customObjectEventsBasedObject,
-        customObjectExtension,
-        project,
-        i18n
-      );
-      setDuplicateAndEditVariantDialogOpen(false);
-      forceUpdate();
-      editVariant();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      customObjectExtension,
-      forceUpdate,
-      project,
-      editVariant,
-    ]
-  );
-
-  const doDeleteVariant = React.useCallback(
-    async () => {
-      const hasConfirmedDeletion = await showDeleteConfirmation({
-        title: t`Remove variant`,
-        message: t`Are you sure you want to remove this variant from your project? This can't be undone.`,
-      });
-      if (!hasConfirmedDeletion) {
-        return;
-      }
-      deleteVariant(
-        customObjectConfiguration,
-        customObjectEventsBasedObject,
-        customObjectExtension,
-        project,
-        onDeleteEventsBasedObjectVariant
-      );
-      forceUpdate();
-    },
-    [
-      customObjectConfiguration,
-      customObjectEventsBasedObject,
-      forceUpdate,
-      onDeleteEventsBasedObjectVariant,
-      project,
-      customObjectExtension,
-      showDeleteConfirmation,
-    ]
-  );
-
   const variantName = getVariantName(
     customObjectEventsBasedObject,
     customObjectConfiguration
   );
+  const prefabName = customObjectEventsBasedObject
+    ? customObjectEventsBasedObject.getFullName() ||
+      customObjectEventsBasedObject.getName()
+    : '';
 
   const schema = React.useMemo(
     () =>
@@ -450,10 +326,56 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         object,
         visibility: 'All',
         layersContainer: null,
+        allowConstantPlaceholders: true,
         shouldDisabledFieldsWithMixedValues: false,
       }),
     [customObjectConfiguration, customObjectEventsBasedObject, object]
   );
+  const shouldDisplayVariantSelector = !customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration();
+  const variantSelector = shouldDisplayVariantSelector ? (
+    <>
+      <Text size="block-title">
+        <Trans>Variant</Trans>
+        {prefabName ? ` - ${prefabName}` : null}
+      </Text>
+      <ColumnStackLayout expand noMargin>
+        <SelectField
+          id={'variant-name'}
+          floatingLabelText={<Trans>Variant</Trans>}
+          value={variantName}
+          onChange={(e, i, value: string) => {
+            customObjectConfiguration.setVariantName(value);
+            if (onObjectUpdated) {
+              onObjectUpdated();
+            }
+            forceUpdate();
+          }}
+        >
+          <SelectOption key="default-variant" value="" label={t`Default`} />
+          {customObjectEventsBasedObject &&
+            mapFor(
+              0,
+              customObjectEventsBasedObject.getVariants().getVariantsCount(),
+              i => {
+                if (!customObjectEventsBasedObject) {
+                  return null;
+                }
+                const variant = customObjectEventsBasedObject
+                  .getVariants()
+                  .getVariantAt(i);
+                return (
+                  <SelectOption
+                    key={'variant-' + variant.getName()}
+                    value={variant.getName()}
+                    label={variant.getName()}
+                  />
+                );
+              }
+            )}
+        </SelectField>
+      </ColumnStackLayout>
+    </>
+  ) : null;
 
   return (
     <I18n>
@@ -461,6 +383,7 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
         <>
           <ScrollView ref={scrollView}>
             <ColumnStackLayout noMargin>
+              {variantSelector}
               {renderObjectNameField && renderObjectNameField()}
               {tutorialIds.map(tutorialId => (
                 <DismissableTutorialMessage
@@ -504,82 +427,6 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                       ) : null
                     }
                   />
-                  {!customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration() && (
-                    <>
-                      <LineStackLayout
-                        noMargin
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Text size="block-title">Variant</Text>
-                        <Column>
-                          <LineStackLayout>
-                            <ResponsiveFlatButton
-                              key={'delete-variant'}
-                              label={<Trans>Delete</Trans>}
-                              leftIcon={<Trash />}
-                              onClick={doDeleteVariant}
-                              disabled={!variantName}
-                            />
-                            <ResponsiveFlatButton
-                              key={'duplicate-variant'}
-                              label={<Trans>Duplicate</Trans>}
-                              leftIcon={<Copy />}
-                              onClick={() => setNewVariantDialogOpen(true)}
-                            />
-                            <FlatButton
-                              key={'edit-variant'}
-                              label={<Trans>Edit</Trans>}
-                              leftIcon={<Edit />}
-                              onClick={editVariant}
-                            />
-                          </LineStackLayout>
-                        </Column>
-                      </LineStackLayout>
-                      <ColumnStackLayout expand noMargin>
-                        <SelectField
-                          id={'variant-name'}
-                          floatingLabelText={<Trans>Variant</Trans>}
-                          value={variantName}
-                          onChange={(e, i, value: string) => {
-                            customObjectConfiguration.setVariantName(value);
-                            if (onObjectUpdated) {
-                              onObjectUpdated();
-                            }
-                            forceUpdate();
-                          }}
-                        >
-                          <SelectOption
-                            key="default-variant"
-                            value=""
-                            label={t`Default`}
-                          />
-                          {customObjectEventsBasedObject &&
-                            mapFor(
-                              0,
-                              customObjectEventsBasedObject
-                                .getVariants()
-                                .getVariantsCount(),
-                              i => {
-                                if (!customObjectEventsBasedObject) {
-                                  return null;
-                                }
-                                const variant = customObjectEventsBasedObject
-                                  .getVariants()
-                                  .getVariantAt(i);
-                                return (
-                                  <SelectOption
-                                    key={'variant-' + variant.getName()}
-                                    value={variant.getName()}
-                                    label={variant.getName()}
-                                  />
-                                );
-                              }
-                            )}
-                        </SelectField>
-                      </ColumnStackLayout>
-                    </>
-                  )}
                   {(!variantName ||
                     customObjectConfiguration.isForcedToOverrideEventsBasedObjectChildrenConfiguration()) &&
                     (customObjectEventsBasedObject &&
@@ -890,25 +737,6 @@ const CustomObjectPropertiesEditor = (props: Props): React.Node => {
                 }
               />
             </Dialog>
-          )}
-          {newVariantDialogOpen && customObjectEventsBasedObject && (
-            <NewVariantDialog
-              initialName={variantName || i18n._(t`New variant`)}
-              onApply={name => doDuplicateVariant(i18n, name)}
-              onCancel={() => {
-                setNewVariantDialogOpen(false);
-              }}
-            />
-          )}
-          {duplicateAndEditVariantDialogOpen && customObjectEventsBasedObject && (
-            <NewVariantDialog
-              isDuplicationBeforeEdition
-              initialName={variantName || i18n._(t`New variant`)}
-              onApply={name => duplicateAndEditVariant(i18n, name)}
-              onCancel={() => {
-                setDuplicateAndEditVariantDialogOpen(false);
-              }}
-            />
           )}
         </>
       )}

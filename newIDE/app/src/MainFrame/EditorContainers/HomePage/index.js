@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type RenderEditorContainerPropsWithRef } from '../BaseEditor';
+import {
+  type OpenLayoutHandler,
+  type RenderEditorContainerPropsWithRef,
+} from '../BaseEditor';
 import {
   type SceneEventsOutsideEditorChanges,
   type InstancesOutsideEditorChanges,
@@ -19,6 +22,7 @@ import { type LearnCategory } from './LearnSection/Utils';
 import PlaySection from './PlaySection';
 import CreateSection from './CreateSection';
 import StoreSection from './StoreSection';
+import BrowserSection from './BrowserSection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
@@ -78,6 +82,8 @@ const getRequestedTab = (routeArguments: RouteArguments): HomeTab | null => {
     return 'play';
   } else if (routeArguments['initial-dialog'] === 'learn') {
     return 'learn';
+  } else if (routeArguments['initial-dialog'] === 'browser') {
+    return 'browser';
   }
 
   return null;
@@ -178,18 +184,7 @@ type Props = {|
   canSave: boolean,
 
   resourceManagementProps: ResourceManagementProps,
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
 
   gameEditorMode: 'embedded-game' | 'instances-editor',
 |};
@@ -198,14 +193,10 @@ export type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
-  onEventsBasedObjectChildrenEdited: (
-    eventsBasedObject: gdEventsBasedObject,
-    options?: {| editedObject?: ?gdObject, hasResourceChanged?: boolean |}
-  ) => void,
+  onEventsBasedObjectChildrenEdited: () => void,
   onSceneObjectEdited: (
     scene: gdLayout,
-    objectWithContext: ObjectWithContext,
-    hasResourceChanged?: boolean
+    objectWithContext: ObjectWithContext
   ) => void,
   onSceneObjectsDeleted: (scene: gdLayout) => void,
   onSceneEventsModifiedOutsideEditor: (
@@ -537,8 +528,9 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
       // as the rest of the interface (same React render).
       React.useLayoutEffect(
         () => {
-          // Hide the toolbars when on mobile in the "play" tab.
-          if (activeTab === 'play') {
+          // HomePage stays mounted while another editor tab is active, so only
+          // disable pane input while its Play tab is actually visible.
+          if (isActive && activeTab === 'play') {
             setGamesPlatformFrameShown({ shown: true, isMobile });
           } else {
             setGamesPlatformFrameShown({ shown: false, isMobile });
@@ -550,7 +542,13 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
             setGamesPlatformFrameShown({ shown: false, isMobile });
           };
         },
-        [updateToolbar, activeTab, setGamesPlatformFrameShown, isMobile]
+        [
+          updateToolbar,
+          isActive,
+          activeTab,
+          setGamesPlatformFrameShown,
+          isMobile,
+        ]
       );
 
       // $FlowFixMe[incompatible-type]
@@ -711,6 +709,7 @@ export const HomePage: React.ComponentType<Props> = React.memo<Props>(
                       getCourseCompletion={getCourseCompletion}
                     />
                   )}
+                  {activeTab === 'browser' && <BrowserSection />}
                   {activeTab === 'team-view' &&
                     (canUseClassroomFeature(limits) ? (
                       <TeamSection

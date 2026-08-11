@@ -55,6 +55,30 @@ function ConfirmProvider({ children }: Props): React.Node {
     },
     [isCli]
   );
+  React.useEffect(
+    () => {
+      if (!confirmDialogOpen || !confirmDialogConfig) return;
+
+      const dismissOnAbortSignal = confirmDialogConfig.dismissOnAbortSignal;
+      if (!dismissOnAbortSignal) return;
+
+      const dismissConfirmDialog = () => {
+        setConfirmDialogOpen(false);
+        confirmDialogConfig.callback(false);
+      };
+      if (dismissOnAbortSignal.aborted) {
+        dismissConfirmDialog();
+        return;
+      }
+
+      dismissOnAbortSignal.addEventListener('abort', dismissConfirmDialog, {
+        once: true,
+      });
+      return () =>
+        dismissOnAbortSignal.removeEventListener('abort', dismissConfirmDialog);
+    },
+    [confirmDialogConfig, confirmDialogOpen]
+  );
 
   // Confirm Delete
   const [
@@ -118,6 +142,7 @@ function ConfirmProvider({ children }: Props): React.Node {
           dismissButtonLabel={alertDialogConfig.dismissButtonLabel}
           title={alertDialogConfig.title}
           message={alertDialogConfig.message}
+          details={alertDialogConfig.details}
         />
       )}
       {confirmDialogConfig && (
@@ -128,6 +153,22 @@ function ConfirmProvider({ children }: Props): React.Node {
             confirmDialogConfig.callback(true);
           }}
           confirmButtonLabel={confirmDialogConfig.confirmButtonLabel}
+          onClickSecondaryAction={
+            confirmDialogConfig.onClickSecondaryAction
+              ? () => {
+                  setConfirmDialogOpen(false);
+                  confirmDialogConfig.onClickSecondaryAction &&
+                    confirmDialogConfig.onClickSecondaryAction();
+                  confirmDialogConfig.callback(false);
+                }
+              : undefined
+          }
+          secondaryActionButtonLabel={
+            confirmDialogConfig.secondaryActionButtonLabel
+          }
+          secondaryActionButtonColor={
+            confirmDialogConfig.secondaryActionButtonColor
+          }
           onDismiss={() => {
             setConfirmDialogOpen(false);
             confirmDialogConfig.callback(false);

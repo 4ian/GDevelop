@@ -21,7 +21,9 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/CustomObjectConfiguration.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -45,6 +47,119 @@ using namespace std;
 #undef CreateEvent
 
 namespace gd {
+namespace {
+struct ConstantPathSegment {
+  explicit ConstantPathSegment(const gd::String& key_)
+      : key(key_), index(0), isIndex(false) {}
+  explicit ConstantPathSegment(std::size_t index_)
+      : key(""), index(index_), isIndex(true) {}
+
+  gd::String key;
+  std::size_t index;
+  bool isIndex;
+};
+
+std::vector<ConstantPathSegment> ParseConstantPath(gd::String path) {
+  std::vector<ConstantPathSegment> segments;
+  path = path.Trim();
+
+  gd::String current;
+  std::size_t position = 0;
+  const auto pushCurrent = [&]() {
+    if (!current.empty()) {
+      segments.push_back(ConstantPathSegment(current));
+      current.clear();
+    }
+  };
+
+  while (position < path.length()) {
+    const auto character = path[position];
+
+    if (character == '.') {
+      pushCurrent();
+      position++;
+      continue;
+    }
+
+    if (character == '[') {
+      pushCurrent();
+      position++;
+      while (position < path.length() &&
+             std::isspace(static_cast<unsigned char>(path[position]))) {
+        position++;
+      }
+
+      if (position < path.length() &&
+          (path[position] == '"' || path[position] == '\'')) {
+        const auto quote = path[position];
+        position++;
+        gd::String quotedSegment;
+        while (position < path.length() && path[position] != quote) {
+          if (path[position] == '\\' && position + 1 < path.length()) {
+            position++;
+          }
+          quotedSegment += path[position];
+          position++;
+        }
+        if (position < path.length() && path[position] == quote) position++;
+        while (position < path.length() &&
+               std::isspace(static_cast<unsigned char>(path[position]))) {
+          position++;
+        }
+        if (position < path.length() && path[position] == ']') position++;
+        segments.push_back(ConstantPathSegment(quotedSegment));
+        continue;
+      }
+
+      gd::String bracketSegment;
+      while (position < path.length() && path[position] != ']') {
+        bracketSegment += path[position];
+        position++;
+      }
+      if (position < path.length() && path[position] == ']') position++;
+      bracketSegment = bracketSegment.Trim();
+      if (bracketSegment.empty()) continue;
+
+      bool isIndex = true;
+      for (const auto bracketCharacter : bracketSegment) {
+        if (!std::isdigit(static_cast<unsigned char>(bracketCharacter))) {
+          isIndex = false;
+          break;
+        }
+      }
+      if (isIndex) {
+        segments.push_back(
+            ConstantPathSegment(
+                static_cast<std::size_t>(bracketSegment.To<unsigned int>())));
+      } else {
+        segments.push_back(ConstantPathSegment(bracketSegment));
+      }
+      continue;
+    }
+
+    current += character;
+    position++;
+  }
+
+  pushCurrent();
+  return segments;
+}
+
+gd::String ConstantValueToString(const gd::SerializerElement& element) {
+  if (!element.IsValueUndefined()) {
+    const auto& value = element.GetValue();
+    if (value.IsString()) return value.GetRawString();
+    return value.GetString();
+  }
+
+  if (element.ConsideredAsArray() || !element.GetAllChildren().empty() ||
+      !element.GetAllAttributes().empty()) {
+    return gd::Serializer::ToJSON(element);
+  }
+
+  return "";
+}
+}  // namespace
 
 Project::Project()
     : name(_("Project")), version("1.0.0"), packageName("com.example.gamename"),
@@ -64,6 +179,7 @@ Project::Project()
                        gd::String::From(gd::VersionWrapper::Minor()) + "." +
                        gd::String::From(gd::VersionWrapper::Build())),
       variables(gd::VariablesContainer::SourceType::Global),
+      constantsJson("{}"),
       objectsContainer(gd::ObjectsContainer::SourceType::Global),
       resourcesContainer(gd::ResourcesContainer::SourceType::Global),
       sceneResourcesPreloading("at-startup"), sceneResourcesUnloading("never") {
@@ -71,7 +187,190 @@ Project::Project()
 
 Project::~Project() {}
 
+bool Project::GetConstantValueAsString(const gd::String& path,
+                                       gd::String& value) const {
+  gd::SerializerElement constantsElement =
+      gd::Serializer::FromJSON(GetConstantsJson().c_str());
+  const gd::SerializerElement* currentElement = &constantsElement;
+
+  for (const auto& segment : ParseConstantPath(path)) {
+    if (segment.isIndex) {
+      if (!currentElement->ConsideredAsArray() ||
+          segment.index >= currentElement->GetChildrenCount()) {
+        return false;
+      }
+      currentElement = &currentElement->GetChild(segment.index);
+    } else {
+      if (!currentElement->HasChild(segment.key)) {
+        return false;
+      }
+      currentElement = &currentElement->GetChild(segment.key);
+    }
+  }
+
+  value = ConstantValueToString(*currentElement);
+  return true;
+}
+
+bool Project::ResolveConstantPlaceholders(
+    const gd::String& source,
+    gd::String& resolved,
+    gd::String& missingPath) const {
+  resolved.clear();
+  missingPath.clear();
+
+  std::size_t position = 0;
+  while (position < source.length()) {
+    const std::size_t placeholderStart = source.find("{{", position);
+    if (placeholderStart == gd::String::npos) {
+      resolved += source.substr(position);
+      return true;
+    }
+
+    resolved += source.substr(position, placeholderStart - position);
+
+    const std::size_t placeholderEnd = source.find("}}", placeholderStart + 2);
+    if (placeholderEnd == gd::String::npos) {
+      resolved += source.substr(placeholderStart);
+      return true;
+    }
+
+    const gd::String path =
+        source.substr(placeholderStart + 2,
+                      placeholderEnd - placeholderStart - 2)
+            .Trim();
+    gd::String value;
+    if (path.empty() || !GetConstantValueAsString(path, value)) {
+      missingPath = path;
+      resolved = source;
+      return false;
+    }
+
+    resolved += value;
+    position = placeholderEnd + 2;
+  }
+
+  return true;
+}
+
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
+
+void Project::EnsureObjectInheritedBehaviors(gd::Object& object) const {
+  auto& objectType = object.GetType();
+  if (!HasEventsBasedObject(objectType)) {
+    return;
+  }
+
+  const auto& eventsBasedObject = GetEventsBasedObject(objectType);
+
+  for (const auto& behaviorName : object.GetAllBehaviorNames()) {
+    auto& behavior = object.GetBehavior(behaviorName);
+    if (!behavior.IsInheritedFromObjectType()) {
+      continue;
+    }
+
+    if (!eventsBasedObject.HasBehaviorNamed(behaviorName) ||
+        eventsBasedObject.GetBehavior(behaviorName).GetTypeName() !=
+            behavior.GetTypeName()) {
+      object.RemoveBehavior(behaviorName);
+    }
+  }
+
+  for (const auto& behaviorName : eventsBasedObject.GetAllBehaviorNames()) {
+    const auto& inheritedBehavior = eventsBasedObject.GetBehavior(behaviorName);
+    const auto& inheritedBehaviorType = inheritedBehavior.GetTypeName();
+    auto getDefaultProperties = [this](const gd::String& behaviorType) {
+      if (HasEventsBasedBehavior(behaviorType)) {
+        gd::CustomBehavior defaultBehavior("", *this, behaviorType);
+        defaultBehavior.InitializeContent();
+        return defaultBehavior.GetProperties();
+      }
+
+      const gd::BehaviorMetadata& behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(GetCurrentPlatform(),
+                                                    behaviorType);
+      if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+        return std::map<gd::String, gd::PropertyDescriptor>();
+      }
+
+      return behaviorMetadata.GetProperties();
+    };
+    auto copyInheritedBehaviorConfiguration =
+        [&inheritedBehavior, &getDefaultProperties](
+            gd::Behavior& behavior, bool preserveNonDefaultValues = false) {
+      std::map<gd::String, gd::String> propertyValuesToRestore;
+      if (preserveNonDefaultValues) {
+        const auto existingProperties = behavior.GetProperties();
+        const auto defaultProperties =
+            getDefaultProperties(behavior.GetTypeName());
+        for (const auto& property : existingProperties) {
+          const auto defaultProperty = defaultProperties.find(property.first);
+          if (defaultProperty == defaultProperties.end() ||
+              property.second.GetValue() !=
+                  defaultProperty->second.GetValue()) {
+            propertyValuesToRestore[property.first] =
+                property.second.GetValue();
+          }
+        }
+      }
+
+      behavior.UnserializeFrom(inheritedBehavior.GetContent());
+      behavior.SetFolded(inheritedBehavior.IsFolded());
+      behavior.SetMuted(inheritedBehavior.IsMuted());
+      behavior.SetQuickCustomizationVisibility(
+          inheritedBehavior.GetQuickCustomizationVisibility());
+      behavior.GetPropertiesQuickCustomizationVisibilities() =
+          inheritedBehavior.GetPropertiesQuickCustomizationVisibilities();
+      behavior.SetDefaultBehavior(false);
+      behavior.SetInheritedFromObjectType(true);
+
+      if (preserveNonDefaultValues && !propertyValuesToRestore.empty()) {
+        const auto inheritedProperties = behavior.GetProperties();
+        for (const auto& propertyValue : propertyValuesToRestore) {
+          if (inheritedProperties.find(propertyValue.first) ==
+              inheritedProperties.end()) {
+            continue;
+          }
+          behavior.UpdateProperty(propertyValue.first, propertyValue.second);
+        }
+      }
+    };
+
+    if (object.HasBehaviorNamed(behaviorName)) {
+      auto& behavior = object.GetBehavior(behaviorName);
+      if (behavior.GetTypeName() == inheritedBehaviorType) {
+        if (!behavior.IsInheritedFromObjectType()) {
+          copyInheritedBehaviorConfiguration(behavior, true);
+        } else {
+          behavior.SetInheritedFromObjectType(true);
+        }
+        continue;
+      }
+
+      if (behavior.IsInheritedFromObjectType()) {
+        object.RemoveBehavior(behaviorName);
+      } else {
+        gd::LogWarning("Object: " + object.GetName() + " of type " +
+                       objectType +
+                       " has a behavior named like an inherited prefab "
+                       "behavior, but with another type: " +
+                       behaviorName);
+        continue;
+      }
+    }
+
+    auto* behavior =
+        object.AddNewBehavior(*this, inheritedBehaviorType, behaviorName);
+    if (!behavior) {
+      gd::LogWarning("Object: " + object.GetName() + " of type " +
+                     objectType +
+                     " could not create inherited behavior: " +
+                     inheritedBehaviorType);
+      continue;
+    }
+    copyInheritedBehaviorConfiguration(*behavior);
+  }
+}
 
 void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
   auto& platform = GetCurrentPlatform();
@@ -135,6 +434,8 @@ void Project::EnsureObjectDefaultBehaviors(gd::Object& object) const {
   else if (!project.HasEventsBasedObject(objectType)) {
     gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
+
+  EnsureObjectInheritedBehaviors(object);
 }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
@@ -889,7 +1190,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   objectsContainer.AddMissingObjectsInRootFolder();
 
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
-
   scenes.clear();
   const SerializerElement& layoutsElement =
       element.GetChild("layouts", 0, "Scenes");
@@ -1309,6 +1609,7 @@ void Project::Init(const gd::Project& game) {
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   variables = game.GetVariables();
+  constantsJson = game.GetConstantsJson();
 
   projectFile = game.GetProjectFile();
 

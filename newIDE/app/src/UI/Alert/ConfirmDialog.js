@@ -17,6 +17,14 @@ type Props = {|
   onDismiss: () => void,
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
+  secondaryActionButtonLabel?: MessageDescriptor,
+  secondaryActionButtonColor?:
+    | 'primary'
+    | 'success'
+    | 'danger'
+    | 'premium'
+    | 'ai',
+  onClickSecondaryAction?: () => void,
   level: 'info' | 'warning' | 'error',
   maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
@@ -67,6 +75,22 @@ function ConfirmDialog(props: Props): React.Node {
           />
         );
         const dialogActions = [dismissActionButton, confirmActionButton];
+        const secondaryActions = props.onClickSecondaryAction
+          ? [
+              <FlatButton
+                key="secondary-action"
+                label={
+                  props.secondaryActionButtonLabel ? (
+                    i18n._(props.secondaryActionButtonLabel)
+                  ) : (
+                    <Trans>Continue</Trans>
+                  )
+                }
+                color={props.secondaryActionButtonColor}
+                onClick={props.onClickSecondaryAction}
+              />,
+            ]
+          : undefined;
         return (
           <Dialog
             dangerLevel={
@@ -80,6 +104,7 @@ function ConfirmDialog(props: Props): React.Node {
             open={props.open}
             // $FlowFixMe[incompatible-type]
             actions={dialogActions}
+            secondaryActions={secondaryActions}
             maxWidth={props.maxWidth || 'xs'}
             fullscreen="never-even-on-mobile"
             onRequestClose={props.onDismiss}

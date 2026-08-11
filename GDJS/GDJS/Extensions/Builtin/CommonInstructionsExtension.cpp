@@ -38,6 +38,74 @@ using namespace gd;
 
 namespace gdjs {
 
+namespace {
+bool HasEnabledInstructions(const gd::InstructionsList& instructions) {
+  for (std::size_t i = 0; i < instructions.size(); ++i) {
+    if (!instructions[i].IsDisabled()) return true;
+  }
+
+  return false;
+}
+
+gd::String GenerateUnsafeExternalLayoutCreationValidationCodeIfNeeded(
+    const gd::StandardEvent& event,
+    gd::EventsCodeGenerator& codeGenerator) {
+  gd::String runtimeValidationCode;
+  if (!codeGenerator.HasProjectAndLayout() ||
+      HasEnabledInstructions(event.GetConditions())) {
+    return runtimeValidationCode;
+  }
+
+  const gd::InstructionsList& actions = event.GetActions();
+  for (std::size_t i = 0; i < actions.size(); ++i) {
+    const gd::Instruction& action = actions[i];
+    if (action.IsDisabled() ||
+        action.GetType() !=
+            "BuiltinExternalLayouts::CreateObjectsFromExternalLayout") {
+      continue;
+    }
+
+    const gd::String externalLayoutName =
+        action.GetParametersCount() > 1
+            ? action.GetParameter(1).GetPlainString()
+            : "";
+    gd::DiagnosticReport* diagnosticReport = codeGenerator.GetDiagnosticReport();
+    if (diagnosticReport) {
+      gd::ProjectDiagnostic projectDiagnostic(
+          gd::ProjectDiagnostic::ErrorType::UnsafeExternalLayoutCreation,
+          "Create objects from an external layout must not be used in an event "
+          "without conditions.",
+          externalLayoutName,
+          "Add a condition, for example At the beginning of the scene.");
+      diagnosticReport->Add(projectDiagnostic);
+    }
+
+    if (codeGenerator.GenerateCodeForRuntime()) {
+      runtimeValidationCode +=
+          "gdjs.assertExternalLayoutCreationHasCondition(" +
+          gd::EventsCodeGenerator::ConvertToStringExplicit(
+              externalLayoutName) +
+          ");\n";
+    }
+  }
+
+  return runtimeValidationCode;
+}
+
+const gd::Instruction* FindTopLevelSignalReceivedCondition(
+    const gd::InstructionsList& instructions) {
+  for (std::size_t i = 0; i < instructions.size(); ++i) {
+    const gd::Instruction& instruction = instructions[i];
+    if (!instruction.IsDisabled() && !instruction.IsInverted() &&
+        instruction.GetType() == "SignalReceived") {
+      return &instruction;
+    }
+  }
+
+  return nullptr;
+}
+}  // namespace
+
 CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
@@ -122,7 +190,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::LinkEvent &event = dynamic_cast<gd::LinkEvent &>(event_);
         event.ReplaceLinkByLinkedEvents(codeGenerator.GetProject(), eventList,
-                                        indexOfTheEventInThisList);
+                                        indexOfTheEventInThisList,
+                                        codeGenerator.GetSceneLifecycleFunctionRole());
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Standard"].SetCodeGenerator(
@@ -141,15 +210,22 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
-        gd::String ifPredicate = event.GetConditions().empty()
-                                     ? ""
-                                     : codeGenerator.GenerateBooleanFullName(
-                                           "isConditionTrue", context);
+        gd::String ifPredicate =
+            !HasEnabledInstructions(event.GetConditions())
+                ? ""
+                : codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                        context);
+
+        gd::String runtimeValidationCode =
+            GenerateUnsafeExternalLayoutCreationValidationCodeIfNeeded(
+                event, codeGenerator);
 
         gd::EventsCodeGenerationContext actionsContext;
         actionsContext.Reuse(context);
-        gd::String actionsCode = codeGenerator.GenerateActionsListCode(
-            event.GetActions(), actionsContext);
+        gd::String actionsCode =
+            runtimeValidationCode +
+            codeGenerator.GenerateActionsListCode(event.GetActions(),
+                                                  actionsContext);
         if (event.HasSubEvents()) // Sub events
         {
           actionsCode += "\n{ //Subevents\n";
@@ -160,22 +236,89 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsDeclarationsCode =
             codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
-        gd::String outputCode;
-        outputCode += localVariablesInitializationCode;
-        outputCode += conditionsCode;
-        if (!ifPredicate.empty())
-          outputCode += "if (" + ifPredicate + ") ";
-        outputCode += "{\n";
-        outputCode += actionsDeclarationsCode;
-        outputCode += actionsCode;
-        if (context.IsFollowedByElseEvent()) {
-          outputCode += chainSatisfiedVariable + " = true;\n";
-        }
-        outputCode += "}\n";
+        const gd::Instruction* signalReceivedCondition =
+            codeGenerator.HasProjectAndLayout() &&
+                    codeGenerator.GetSceneLifecycleFunctionRole() ==
+                        "sceneUpdate"
+                ? FindTopLevelSignalReceivedCondition(event.GetConditions())
+                : nullptr;
 
-        if (event_.HasVariables()) {
-          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
-                        ".pop();\n";
+        gd::String outputCode;
+        if (signalReceivedCondition) {
+          const gd::String signalIteratorId = gd::String::From(
+              codeGenerator.GenerateSingleUsageUniqueIdFor(
+                  signalReceivedCondition));
+          const gd::String signalsListName =
+              "signalsForEvent" + signalIteratorId;
+          const gd::String signalIndexName =
+              "signalIndex" + signalIteratorId;
+          const std::size_t signalNameParameterIndex =
+              signalReceivedCondition->GetParameters().size() > 1 ? 1 : 0;
+          const gd::String signalNameCode =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator,
+                  context,
+                  "string",
+                  signalReceivedCondition->GetParameters().empty()
+                      ? ""
+                      : signalReceivedCondition
+                            ->GetParameter(signalNameParameterIndex)
+                            .GetPlainString());
+
+          outputCode += "const " + signalsListName +
+                        " = gdjs.evtTools.signal.getDeliveredSceneSignals("
+                        "runtimeScene, " +
+                        signalNameCode + ");\n";
+          outputCode += "for (let " + signalIndexName + " = 0, " +
+                        signalIndexName + "Len = " + signalsListName +
+                        ".length; " + signalIndexName + " < " +
+                        signalIndexName + "Len; ++" + signalIndexName +
+                        ") {\n";
+          outputCode +=
+              "gdjs.evtTools.signal.setCurrentSignalForSceneCondition("
+              "runtimeScene, " +
+              signalsListName + "[" + signalIndexName + "]);\n";
+          outputCode += localVariablesInitializationCode;
+          outputCode += conditionsCode;
+          if (!ifPredicate.empty())
+            outputCode += "if (" + ifPredicate + ") ";
+          outputCode += "{\n";
+          outputCode +=
+              "gdjs.evtTools.signal.recordSceneSignalReceived(runtimeScene, " +
+              signalsListName + "[" + signalIndexName + "]);\n";
+          outputCode += actionsDeclarationsCode;
+          outputCode += actionsCode;
+          if (context.IsFollowedByElseEvent()) {
+            outputCode += chainSatisfiedVariable + " = true;\n";
+          }
+          outputCode += "}\n";
+
+          if (event_.HasVariables()) {
+            outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                          ".pop();\n";
+          }
+
+          outputCode += "}\n";
+          outputCode +=
+              "gdjs.evtTools.signal.clearCurrentSignalForSceneCondition("
+              "runtimeScene);\n";
+        } else {
+          outputCode += localVariablesInitializationCode;
+          outputCode += conditionsCode;
+          if (!ifPredicate.empty())
+            outputCode += "if (" + ifPredicate + ") ";
+          outputCode += "{\n";
+          outputCode += actionsDeclarationsCode;
+          outputCode += actionsCode;
+          if (context.IsFollowedByElseEvent()) {
+            outputCode += chainSatisfiedVariable + " = true;\n";
+          }
+          outputCode += "}\n";
+
+          if (event_.HasVariables()) {
+            outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                          ".pop();\n";
+          }
         }
 
         return outputCode;
@@ -198,7 +341,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
         gd::String ifPredicate =
-            event.GetConditions().empty()
+            !HasEnabledInstructions(event.GetConditions())
                 ? "!" + chainSatisfiedVariable
                 : "!" + chainSatisfiedVariable + " && " +
                       codeGenerator.GenerateBooleanFullName("isConditionTrue",
@@ -263,6 +406,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // parent event.
         set<gd::String> emptyListsNeeded;
         for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
+          if (conditions[cId].IsDisabled()) continue;
+
           // Each condition inherits the context from the "Or" condition:
           // For example, two sub conditions using an object called
           // "MyObject" will both have to declare a "MyObject" object list.
@@ -426,8 +571,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (event.GetWhileConditions().empty() &&
-            event.GetConditions().empty() && event.GetActions().empty())
+        if (!HasEnabledInstructions(event.GetWhileConditions()) &&
+            !HasEnabledInstructions(event.GetConditions()) &&
+            !HasEnabledInstructions(event.GetActions()))
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 
@@ -460,7 +606,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(),
                                                      context);
         gd::String whileIfPredicate = "true";
-        if (!event.GetWhileConditions().empty())
+        if (HasEnabledInstructions(event.GetWhileConditions()))
           whileIfPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -469,7 +615,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -538,10 +684,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicate = event.GetConditions().empty()
-                                     ? "true"
-                                     : codeGenerator.GenerateBooleanFullName(
-                                           "isConditionTrue", context);
+        gd::String ifPredicate =
+            !HasEnabledInstructions(event.GetConditions())
+                ? "true"
+                : codeGenerator.GenerateBooleanFullName("isConditionTrue",
+                                                        context);
 
         // Prepare object declaration and sub events
         gd::String subevents =
@@ -725,7 +872,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -836,7 +983,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
         gd::String ifPredicate = "true";
-        if (!event.GetConditions().empty())
+        if (HasEnabledInstructions(event.GetConditions()))
           ifPredicate =
               codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
@@ -1240,6 +1387,20 @@ void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
     code += variableCodeName + ".setString(" +
             EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
             ");\n";
+  } else if (variable.GetType() == gd::Variable::Enum) {
+    code += variableCodeName + ".setString(" +
+            EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
+            ");\n";
+    code += variableCodeName + ".castTo(\"enum\");\n";
+    const auto &enumValues = variable.GetEnumValues();
+    if (!enumValues.empty()) {
+      code += variableCodeName + ".setEnumValues([";
+      for (std::size_t i = 0; i < enumValues.size(); ++i) {
+        if (i != 0) code += ", ";
+        code += EventsCodeGenerator::ConvertToStringExplicit(enumValues[i]);
+      }
+      code += "]);\n";
+    }
   } else if (variable.GetType() == gd::Variable::Structure) {
     const auto &childrenNames = variable.GetAllChildrenNames();
     for (const auto &childName : variable.GetAllChildrenNames()) {

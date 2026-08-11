@@ -224,11 +224,13 @@ class GD_CORE_API ValueTypeMetadata {
              parameterType == "color" || parameterType == "file" ||
              parameterType == "stringWithSelector" ||
              parameterType == "sceneName" ||
+             parameterType == "signalName" ||
              parameterType == "layerEffectName" ||
              parameterType == "layerEffectParameterName" ||
              parameterType == "objectEffectName" ||
              parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
+             parameterType == "model3DBoneName" ||
              parameterType == "objectAnimationName" ||
              parameterType == "objectSkinName" ||
              parameterType == "functionParameterName" ||

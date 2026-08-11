@@ -6,21 +6,29 @@ import { LineStackLayout } from '../../UI/Layout';
 import { type PreviewState } from '../PreviewState';
 import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
-import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { blurActiveElementBeforeUiTransition } from '../../UI/MaterialUISpecificUtil';
 import { useIsGameplayTestRunInProgress } from '../../GameplayTests/GameplayTestRunner';
 
 export type PreviewAndShareButtonsProps = {|
-  onPreviewWithoutHotReload: (?{ numberOfWindows: number }) => Promise<void>,
-  onOpenDebugger: () => void,
+  onPreviewWithoutHotReload: (
+    ?{|
+      numberOfWindows?: number,
+      forceAlwaysOnTopInPreview?: boolean,
+    |}
+  ) => Promise<void>,
+  onOpenDebugger: () => void | Promise<boolean>,
   onNetworkPreview: () => void,
   onHotReloadPreview: () => void,
   onNetworkPreview: () => Promise<void>,
   onHotReloadPreview: () => Promise<void>,
   onLaunchPreviewWithDiagnosticReport: () => Promise<void>,
+  displayCollisionShapesInPreview: boolean,
+  setDisplayCollisionShapesInPreview: boolean => void,
+  displaySignalAnimationsInPreview: boolean,
+  setDisplaySignalAnimationsInPreview: boolean => void,
   setPreviewOverride: ({|
     isPreviewOverriden: boolean,
     overridenPreviewLayoutName: ?string,
@@ -41,6 +49,10 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
     onOpenDebugger,
     onHotReloadPreview,
     onLaunchPreviewWithDiagnosticReport,
+    displayCollisionShapesInPreview,
+    setDisplayCollisionShapesInPreview,
+    displaySignalAnimationsInPreview,
+    setDisplaySignalAnimationsInPreview,
     canDoNetworkPreview,
     isPreviewEnabled,
     hasPreviewsRunning,
@@ -59,14 +71,9 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
       (i18n: I18nType) =>
         [
           {
-            label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
+            label: i18n._(t`Start Local Preview`),
             click: onNetworkPreview,
             enabled: canDoNetworkPreview && !isGameplayTestRunInProgress,
-          },
-          {
-            label: i18n._(t`Start Preview and Debugger`),
-            click: onOpenDebugger,
-            enabled: !isGameplayTestRunInProgress,
           },
           preferences.values.openDiagnosticReportAutomatically
             ? null
@@ -109,6 +116,24 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
                 enabled: isPreviewEnabled && !isGameplayTestRunInProgress,
               },
             ],
+          },
+          {
+            type: 'checkbox',
+            label: i18n._(t`Display collision shapes`),
+            checked: displayCollisionShapesInPreview,
+            click: () =>
+              setDisplayCollisionShapesInPreview(
+                !displayCollisionShapesInPreview
+              ),
+          },
+          {
+            type: 'checkbox',
+            label: i18n._(t`Display Signal Animations`),
+            checked: displaySignalAnimationsInPreview,
+            click: () =>
+              setDisplaySignalAnimationsInPreview(
+                !displaySignalAnimationsInPreview
+              ),
           },
           { type: 'separator' },
           ...(previewState.overridenPreviewLayoutName
@@ -158,42 +183,56 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
               previewState.previewExternalLayoutName !==
                 previewState.overridenPreviewExternalLayoutName,
           },
+          { type: 'separator' },
+          {
+            label: i18n._(t`Export & Share`),
+            click: openShareDialog,
+            enabled: isSharingEnabled,
+          },
         ].filter(Boolean),
       [
         onNetworkPreview,
         canDoNetworkPreview,
-        onOpenDebugger,
         onPreviewWithoutHotReload,
         isPreviewEnabled,
         hasPreviewsRunning,
         isGameplayTestRunInProgress,
         preferences.values.openDiagnosticReportAutomatically,
         onLaunchPreviewWithDiagnosticReport,
+        displayCollisionShapesInPreview,
+        setDisplayCollisionShapesInPreview,
+        displaySignalAnimationsInPreview,
+        setDisplaySignalAnimationsInPreview,
         previewState.overridenPreviewLayoutName,
         previewState.overridenPreviewExternalLayoutName,
         previewState.isPreviewOverriden,
         previewState.previewExternalLayoutName,
         previewState.previewLayoutName,
         setPreviewOverride,
+        openShareDialog,
+        isSharingEnabled,
       ]
     );
 
-    // Create a separate function to avoid the button passing its event as
-    // the first argument.
-    const onShareClick = React.useCallback(
-      () => {
-        openShareDialog();
+    const onPreviewButtonClick = React.useCallback(
+      async () => {
+        blurActiveElementBeforeUiTransition();
+
+        if (hasPreviewsRunning) {
+          await onHotReloadPreview();
+          return;
+        }
+
+        await onOpenDebugger();
       },
-      [openShareDialog]
+      [hasPreviewsRunning, onHotReloadPreview, onOpenDebugger]
     );
 
     return (
       <LineStackLayout noMargin>
         <FlatButtonWithSplitMenu
           primary
-          onClick={
-            hasPreviewsRunning ? onHotReloadPreview : onPreviewWithoutHotReload
-          }
+          onClick={onPreviewButtonClick}
           disabled={!isPreviewEnabled || isGameplayTestRunInProgress}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={
@@ -209,15 +248,6 @@ const PreviewAndShareButtons: React.ComponentType<PreviewAndShareButtonsProps> =
           splitMenuButtonId="toolbar-preview-split-menu-button"
           // $FlowFixMe[incompatible-type]
           buildMenuTemplate={previewBuildMenuTemplate}
-        />
-        <ResponsiveRaisedButton
-          primary
-          onClick={onShareClick}
-          disabled={!isSharingEnabled}
-          icon={<PublishIcon />}
-          label={<Trans>Share</Trans>}
-          // This ID is used for guided lessons, let's keep it stable.
-          id="toolbar-publish-button"
         />
       </LineStackLayout>
     );

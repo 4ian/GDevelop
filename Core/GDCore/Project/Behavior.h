@@ -24,17 +24,27 @@ namespace gd {
 class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
  public:
 
-  Behavior(): BehaviorConfigurationContainer(), isDefaultBehavior(false) {};
+  Behavior()
+      : BehaviorConfigurationContainer(),
+        isDefaultBehavior(false),
+        isInheritedFromObjectType(false),
+        isMuted(false) {};
   Behavior(const gd::String& name_, const gd::String& type_)
       : BehaviorConfigurationContainer(name_, type_),
-      isDefaultBehavior(false) {};
+        isDefaultBehavior(false),
+        isInheritedFromObjectType(false),
+        isMuted(false) {};
   Behavior(const Behavior& other)
       : BehaviorConfigurationContainer(other),
-        isDefaultBehavior(other.isDefaultBehavior) {};
+        isDefaultBehavior(other.isDefaultBehavior),
+        isInheritedFromObjectType(other.isInheritedFromObjectType),
+        isMuted(other.isMuted) {};
   Behavior& operator=(const Behavior& other) {
     if (this != &other) {
       BehaviorConfigurationContainer::operator=(other);
       isDefaultBehavior = other.isDefaultBehavior;
+      isInheritedFromObjectType = other.isInheritedFromObjectType;
+      isMuted = other.isMuted;
     }
     return *this;
   }
@@ -51,9 +61,27 @@ class GD_CORE_API Behavior: public BehaviorConfigurationContainer {
     isDefaultBehavior = isDefaultBehavior_;
   }
 
+  bool IsInheritedFromObjectType() const {
+    return isInheritedFromObjectType;
+  }
+
+  void SetInheritedFromObjectType(bool isInheritedFromObjectType_) {
+    isInheritedFromObjectType = isInheritedFromObjectType_;
+  }
+
+  bool IsMuted() const {
+    return isMuted;
+  }
+
+  void SetMuted(bool isMuted_) {
+    isMuted = isMuted_;
+  }
+
   private:
   gd::MemoryTracked _memoryTracked{this, "Behavior"};
   bool isDefaultBehavior;
+  bool isInheritedFromObjectType;
+  bool isMuted;
 };
 
 }  // namespace gd

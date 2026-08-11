@@ -56,6 +56,7 @@ export type DraggedItem = {|
   name: string,
   thumbnail?: string,
   is3D?: boolean,
+  keepPreviewOnCanvas?: boolean,
 |};
 
 type Options = {| vibrate?: number |};

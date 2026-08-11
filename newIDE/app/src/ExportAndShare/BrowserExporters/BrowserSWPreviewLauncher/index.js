@@ -25,6 +25,11 @@ import {
 import { setEmbeddedGameFramePreviewLocation } from '../../../EmbeddedGame/EmbeddedGameFrame';
 import { setGameplayTestFramePreviewLocation } from '../../../GameplayTests/GameplayTestFrame';
 import { immediatelyOpenNewPreviewWindow } from '../BrowserPreview/BrowserPreviewWindow';
+import {
+  addGlobalObjectGroupsToDataJs,
+  addGlobalObjectGroupsToProjectData,
+} from '../../PreviewGlobalObjectGroupsPatch';
+import { hasConstantPlaceholderDiagnostic } from '../../../Utils/ConstantPlaceholderDiagnostics';
 const gd: libGDevelop = global.gd;
 
 let nextPreviewId = 1;
@@ -151,6 +156,14 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       previewOptions.hotReload &&
       !previewOptions.isForGameplayTest &&
       !!debuggerIds.length;
+    const closePreparedPreviewWindows = () => {
+      if (!previewWindows) return;
+      previewWindows.forEach(previewWindow => {
+        try {
+          previewWindow.close();
+        } catch (error) {}
+      });
+    };
 
     try {
       await this.getPreviewDebuggerServer().startServer({
@@ -174,6 +187,11 @@ export default class BrowserSWPreviewLauncher extends React.Component<
         isForInGameEdition: previewOptions.isForInGameEdition,
         isForGameplayTest: !!previewOptions.isForGameplayTest,
       });
+      if (previewOptions.isLaunchCancelled()) {
+        closePreparedPreviewWindows();
+        exporter.delete();
+        return;
+      }
 
       const previewExportOptions = new gd.PreviewExportOptions(
         project,
@@ -225,6 +243,12 @@ export default class BrowserSWPreviewLauncher extends React.Component<
 
       previewExportOptions.setFullLoadingScreen(
         previewOptions.fullLoadingScreen
+      );
+      previewExportOptions.setDisplayCollisionShapes(
+        previewOptions.displayCollisionShapes
+      );
+      previewExportOptions.setDisplaySignalAnimations(
+        previewOptions.displaySignalAnimations
       );
 
       previewExportOptions.setNativeMobileApp(isNativeMobileApp());
@@ -293,12 +317,46 @@ export default class BrowserSWPreviewLauncher extends React.Component<
       console.log(
         `[BrowserSWPreviewLauncher] Exporting project for preview #${previewId}...`
       );
-      exporter.exportProjectForPixiPreview(previewExportOptions);
+      if (!previewOptions.onWillWritePreviewFiles()) {
+        closePreparedPreviewWindows();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
+      const exportSuccessful = exporter.exportProjectForPixiPreview(
+        previewExportOptions
+      );
+      if (
+        hasConstantPlaceholderDiagnostic(
+          project.getWholeProjectDiagnosticReport()
+        )
+      ) {
+        closePreparedPreviewWindows();
+        this.props.onInvalidConstantPlaceholder();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
+      if (!exportSuccessful) {
+        previewExportOptions.delete();
+        exporter.delete();
+        throw new Error('Unable to export the project for preview.');
+      }
+
+      browserSWFileSystem.patchPendingTextFile('data.js', contents =>
+        addGlobalObjectGroupsToDataJs(project, contents)
+      );
 
       console.log(
         `[BrowserSWPreviewLauncher] Storing preview files in IndexedDB for preview #${previewId}...`
       );
       await browserSWFileSystem.applyPendingOperations();
+      if (previewOptions.isLaunchCancelled()) {
+        closePreparedPreviewWindows();
+        previewExportOptions.delete();
+        exporter.delete();
+        return;
+      }
 
       if (previewOptions.isForInGameEdition) {
         setEmbeddedGameFramePreviewLocation({
@@ -320,8 +378,9 @@ export default class BrowserSWPreviewLauncher extends React.Component<
           previewExportOptions,
           projectDataElement
         );
-        const projectData = JSON.parse(
-          gd.Serializer.toJSON(projectDataElement)
+        const projectData = addGlobalObjectGroupsToProjectData(
+          project,
+          JSON.parse(gd.Serializer.toJSON(projectDataElement))
         );
         projectDataElement.delete();
 

@@ -22,6 +22,58 @@ namespace gdjs {
     error: console.error,
   };
 
+  const mergeResourcesByName = (
+    currentResources: ResourceData[],
+    newResources: ResourceData[]
+  ): ResourceData[] => {
+    const resourcesByName = new Map<string, ResourceData>();
+    currentResources.forEach((resource) => {
+      resourcesByName.set(resource.name, resource);
+    });
+    newResources.forEach((resource) => {
+      resourcesByName.set(resource.name, resource);
+    });
+    return Array.from(resourcesByName.values());
+  };
+
+  const getUsedResourcesForObjectData = (
+    objectData: ObjectData
+  ): ResourceReference[] => {
+    if (Array.isArray(objectData.usedResources)) {
+      return objectData.usedResources;
+    }
+
+    const modelResourceName =
+      objectData.type === 'Scene3D::Model3DObject'
+        ? (objectData as any).content &&
+          (objectData as any).content.modelResourceName
+        : null;
+    return typeof modelResourceName === 'string' && modelResourceName
+      ? [{ name: modelResourceName }]
+      : [];
+  };
+
+  const getObjectDataWithUsedResources = (
+    objectData: ObjectData
+  ): ObjectData => {
+    const usedResources = getUsedResourcesForObjectData(objectData);
+    return usedResources.length ? { ...objectData, usedResources } : objectData;
+  };
+
+  const upsertObjectData = (
+    objectDatas: ObjectData[],
+    objectData: ObjectData
+  ): void => {
+    const objectIndex = objectDatas.findIndex(
+      (existingObjectData) => existingObjectData.name === objectData.name
+    );
+    if (objectIndex >= 0) {
+      objectDatas[objectIndex] = objectData;
+    } else {
+      objectDatas.push(objectData);
+    }
+  };
+
   /**
    * A function used to replace circular references with a new value.
    * @param key - The key corresponding to the value.
@@ -286,13 +338,24 @@ namespace gdjs {
       try {
         if (data.command === 'play') {
           runtimeGame.pause(false);
+          if (data.messageId) {
+            that.sendRuntimeGameStatus(data.messageId);
+          }
         } else if (data.command === 'pause') {
           runtimeGame.pause(true);
-          that.sendRuntimeGameDump();
+          if (data.messageId) {
+            that.sendRuntimeGameStatus(data.messageId);
+          }
+          if (!data.skipDump) {
+            // Let the pause status flush before the heavier runtime dump.
+            setTimeout(() => {
+              that.sendRuntimeGameDump();
+            }, 0);
+          }
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
         } else if (data.command === 'getStatus') {
-          that.sendRuntimeGameStatus();
+          that.sendRuntimeGameStatus(data.messageId);
         } else if (data.command === 'set') {
           that.set(data.path, data.newValue);
         } else if (data.command === 'call') {
@@ -336,6 +399,84 @@ namespace gdjs {
                 data.payload.updatedObjects,
                 editedInstanceContainer
               );
+            }
+          }
+        } else if (data.command === 'hotReloadObjectsAndAddInstances') {
+          if (inGameEditor) {
+            const editor = inGameEditor;
+            const editedInstanceContainer = editor.getEditedInstanceContainer();
+            if (editedInstanceContainer) {
+              const resources = data.payload.resources || [];
+              const updatedObjects = (data.payload.updatedObjects || []).map(
+                getObjectDataWithUsedResources
+              );
+              const instances = data.payload.instances || [];
+              const sceneName =
+                editedInstanceContainer instanceof gdjs.RuntimeScene
+                  ? editedInstanceContainer.getName()
+                  : undefined;
+              const projectData = runtimeGame._data;
+              if (resources.length) {
+                projectData.resources.resources = mergeResourcesByName(
+                  projectData.resources.resources,
+                  resources
+                );
+                runtimeGame.getResourceLoader().upsertResources(resources);
+              }
+              if (sceneName) {
+                const sceneData = runtimeGame.getSceneData(sceneName);
+                if (sceneData) {
+                  updatedObjects.forEach((objectData: ObjectData) => {
+                    upsertObjectData(sceneData.objects, objectData);
+                  });
+                }
+              }
+              that._hotReloader.hotReloadRuntimeSceneObjects(
+                updatedObjects,
+                editedInstanceContainer
+              );
+
+              const objectNames = updatedObjects
+                .map((objectData: ObjectData) => objectData.name)
+                .filter(
+                  (objectName: string | null): objectName is string =>
+                    !!objectName
+                );
+              objectNames.forEach((objectName: string) => {
+                runtimeGame.loadObjectOrGroupAssets(objectName, sceneName);
+              });
+
+              const waitForAssets = async () => {
+                const startTime = Date.now();
+                while (
+                  objectNames.some(
+                    (objectName: string) =>
+                      !runtimeGame.areObjectOrGroupAssetsLoaded(
+                        objectName,
+                        sceneName
+                      )
+                  ) &&
+                  Date.now() - startTime < 30000
+                ) {
+                  await new Promise((resolve) => setTimeout(resolve, 50));
+                }
+              };
+
+              waitForAssets()
+                .catch((error) => {
+                  logger.error(
+                    'Unable to load object resources before adding instances: ' +
+                      error
+                  );
+                })
+                .then(() => {
+                  editor.addInstances(instances);
+                  editor.setSelectedObjects(
+                    instances.map(
+                      (instance: InstanceData) => instance.persistentUuid
+                    )
+                  );
+                });
             }
           }
         } else if (data.command === 'hotReloadLayers') {
@@ -443,6 +584,17 @@ namespace gdjs {
               inGameEditor.moveSelectionUnderCursor();
             }
           }
+        } else if (data.command === 'getInGameEditorDropPosition') {
+          const gameCoords = runtimeGame
+            .getRenderer()
+            .convertPageToGameCoords(data.x, data.y);
+          runtimeGame
+            .getInputManager()
+            .onMouseMove(gameCoords[0], gameCoords[1]);
+
+          if (data.messageId) {
+            this.sendInGameEditorDropPosition(data.messageId);
+          }
         } else if (data.command === 'deleteSelection') {
           if (inGameEditor) {
             inGameEditor.deleteSelection();
@@ -522,6 +674,33 @@ namespace gdjs {
           if (inGameEditor) {
             this.sendSelectionAABB(data.messageId);
           }
+        } else if (data.command === 'getContentAABB') {
+          if (inGameEditor) {
+            this.sendContentAABB(data.messageId);
+          }
+        } else if (data.command === 'captureScreenshot') {
+          this.sendScreenshot(data.messageId);
+        } else if (data.command === 'simulateInput') {
+          this.simulateInput(data.inputs, data.messageId);
+        } else if (data.command === 'stepFrames') {
+          this.stepFrames(data.count, data.fakeElapsedTimeMs, data.messageId);
+        } else if (data.command === 'runFrames') {
+          this.runFrames(
+            data.inputs,
+            data.postInputs,
+            data.count,
+            data.fakeElapsedTimeMs,
+            data.messageId,
+            data.autoRelease,
+            data.includeCursorWorldCoordinates,
+            data.cursorLayers
+          );
+        } else if (data.command === 'setRuntimeState') {
+          this.setRuntimeState(data.operations, data.messageId);
+        } else if (data.command === 'getInputState') {
+          this.sendInputState(data.messageId);
+        } else if (data.command === 'getActiveSounds') {
+          this.sendActiveSounds(data.messageId);
         } else if (data.command === 'gameplayTest.run') {
           if (gdjs.gameplayTests) {
             gdjs.gameplayTests
@@ -733,16 +912,53 @@ namespace gdjs {
       return true;
     }
 
-    sendRuntimeGameStatus(): void {
+    sendRuntimeGameStatus(messageId?: number): void {
       const currentScene = this._runtimegame.getSceneStack().getCurrentScene();
+      // Recently played sounds since the last status (cleared after reporting),
+      // so a harness can confirm a PlaySound action actually fired.
+      const recentlyPlayedSounds = this._takeRecentlyPlayedSounds();
       this._sendMessage(
         circularSafeStringify({
           command: 'status',
+          messageId,
           payload: {
             isPaused: this._runtimegame.isPaused(),
             isInGameEdition: this._runtimegame.isInGameEdition(),
             sceneName: currentScene ? currentScene.getName() : null,
+            recentlyPlayedSounds,
           },
+        })
+      );
+    }
+
+    private _takeRecentlyPlayedSounds(): Array<Object> {
+      let recentlyPlayedSounds: Array<Object> = [];
+      try {
+        const soundManager = this._runtimegame.getSoundManager();
+        if (
+          soundManager &&
+          typeof (soundManager as any).getRecentlyPlayedSounds === 'function'
+        ) {
+          recentlyPlayedSounds = (soundManager as any).getRecentlyPlayedSounds(
+            true
+          );
+        }
+      } catch (e) {
+        // Ignore — sound reporting is best-effort.
+      }
+      return recentlyPlayedSounds;
+    }
+
+    /**
+     * Send the latest signal diagnostics to the debugger server.
+     */
+    sendSignalDiagnostics(
+      signalDiagnostics: gdjs.SignalDebugInfo | null
+    ): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'signalDiagnostics',
+          payload: signalDiagnostics,
         })
       );
     }
@@ -752,7 +968,11 @@ namespace gdjs {
      */
     sendRuntimeGameDump(): void {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
+      const message = {
+        command: 'dump',
+        payload: this._runtimegame,
+        rendererDiagnostics: this._getRendererDiagnostics(),
+      };
       const serializationStartTime = Date.now();
 
       // Stringify the message, excluding some known data that are big and/or not
@@ -761,8 +981,10 @@ namespace gdjs {
       const excludedKeys = [
         // Exclude reference to the debugger
         '_debuggerClient',
+        '_debuggerRenderer',
         // Exclude some RuntimeScene fields:
         '_allInstancesList',
+        '_signalBus',
         // Exclude circular references to parent runtimeGame or runtimeScene:
         '_runtimeGame',
         '_runtimeScene',
@@ -817,6 +1039,81 @@ namespace gdjs {
         );
       }
       this._sendMessage(stringifiedMessage);
+    }
+
+    /**
+     * Build a bounded, JSON-safe renderer summary before normal debugger dump
+     * serialization redacts all renderer fields.
+     */
+    private _getRendererDiagnostics(): Object {
+      const maxScenes = 16;
+      const maxLayers = 64;
+      const scenes = this._runtimegame.getSceneStack().getAllScenes();
+      const sceneDiagnostics: Array<Object> = [];
+      let returnedLayerCount = 0;
+      let totalLayerCount = 0;
+
+      scenes.slice(0, maxScenes).forEach((scene) => {
+        const layerNames: Array<string> = [];
+        scene.getAllLayerNames(layerNames);
+        totalLayerCount += layerNames.length;
+        const layers: Array<Object> = [];
+        for (
+          let index = 0;
+          index < layerNames.length && returnedLayerCount < maxLayers;
+          index++
+        ) {
+          const layerName = layerNames[index];
+          returnedLayerCount++;
+          try {
+            const layer = scene.getLayer(layerName);
+            const renderer = layer.getRenderer();
+            layers.push(
+              renderer &&
+                typeof (renderer as any).getRendererDebugInfo === 'function'
+                ? (renderer as any).getRendererDebugInfo()
+                : {
+                    layerName,
+                    available: false,
+                    error:
+                      'The active layer renderer does not expose diagnostics.',
+                  }
+            );
+          } catch (error) {
+            layers.push({
+              layerName,
+              available: false,
+              error:
+                error && (error as Error).message
+                  ? (error as Error).message
+                  : String(error),
+            });
+          }
+        }
+        sceneDiagnostics.push({
+          sceneName: scene.getName(),
+          layers,
+          totalLayerCount: layerNames.length,
+          returnedLayerCount: layers.length,
+          truncated: layers.length < layerNames.length,
+        });
+      });
+
+      return {
+        available: true,
+        scenes: sceneDiagnostics,
+        totalSceneCount: scenes.length,
+        returnedSceneCount: sceneDiagnostics.length,
+        totalLayerCount,
+        returnedLayerCount,
+        truncated:
+          scenes.length > maxScenes || returnedLayerCount < totalLayerCount,
+        limits: {
+          scenes: maxScenes,
+          layers: maxLayers,
+          threeNodesPerLayer: 5000,
+        },
+      };
     }
 
     /**
@@ -1056,6 +1353,728 @@ namespace gdjs {
       );
     }
 
+    sendContentAABB(messageId: number): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      if (!inGameEditor) {
+        return;
+      }
+      const contentAABB = inGameEditor.getContentAABB();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'contentAABB',
+          editorId: inGameEditor.getEditorId(),
+          messageId,
+          payload: contentAABB
+            ? {
+                minX: contentAABB.min[0],
+                minY: contentAABB.min[1],
+                minZ: contentAABB.min[2],
+                maxX: contentAABB.max[0],
+                maxY: contentAABB.max[1],
+                maxZ: contentAABB.max[2],
+              }
+            : null,
+        })
+      );
+    }
+
+    sendInGameEditorDropPosition(messageId: number): void {
+      const inGameEditor = this._runtimegame.getInGameEditor();
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inGameEditorDropPosition',
+          editorId: inGameEditor ? inGameEditor.getEditorId() : null,
+          messageId,
+          payload: {
+            position: inGameEditor
+              ? inGameEditor.getNewInstanceDropPosition()
+              : null,
+          },
+        })
+      );
+    }
+
+    /**
+     * Capture the current rendered frame as a PNG data URL and send it back to
+     * the debugger server, addressed by messageId so the editor can resolve a
+     * pending sendMessageWithResponse() call. Works in any preview (not only the
+     * in-game editor) because it reads the shared game canvas directly.
+     */
+    sendScreenshot(messageId: number): void {
+      let dataUrl: string | null = null;
+      let width = 0;
+      let height = 0;
+      let error: string | null = null;
+      let rendered = false;
+      try {
+        // Force one render pass without advancing game logic. This makes the
+        // canvas capture deterministic while the preview is paused and avoids
+        // reading a partially composited frame left by a throttled rAF loop.
+        rendered = this._runtimegame.getSceneStack().renderWithoutStep();
+        const canvas = this._runtimegame.getRenderer().getCanvas();
+        if (!canvas) {
+          error = 'No game canvas is available to capture.';
+        } else {
+          width = canvas.width;
+          height = canvas.height;
+          // preserveDrawingBuffer is enabled on the renderers so this captures
+          // the composited 2D + 3D frame.
+          dataUrl = canvas.toDataURL('image/png');
+        }
+      } catch (e) {
+        error = (e as Error).message || 'Failed to capture the canvas.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'screenshot',
+          messageId,
+          payload: {
+            dataUrl,
+            width,
+            height,
+            error,
+            rendered,
+            capturedAt: Date.now(),
+          },
+        })
+      );
+    }
+
+    /**
+     * Inject simulated input events into the running game's InputManager, so an
+     * automated harness can drive the game (press keys, move/click the mouse,
+     * touch). Each input is an object: { type, ... }.
+     *   keyPressed/keyReleased: { type, keyCode, location? }
+     *   releaseAllKeys: { type }
+     *   mouseMove: { type, x, y }   (game coordinates)
+     *   mouseButtonPressed/mouseButtonReleased: { type, button }
+     *   touchStart/touchMove: { type, identifier, x, y }
+     *   touchEnd: { type, identifier }
+     * Mouse/touch coordinates are in game (scene) coordinates.
+     */
+    simulateInput(inputs: Array<any>, messageId: number): void {
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      try {
+        (inputs || []).forEach((input) => {
+          this._applySimulatedInput(input, applied);
+        });
+      } catch (e) {
+        error = (e as Error).message || 'Failed to simulate input.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inputSimulated',
+          messageId,
+          payload: { applied, error },
+        })
+      );
+    }
+
+    /**
+     * Apply a single simulated input event to the InputManager. Shared by
+     * `simulateInput` and the atomic `runFrames` command so the two stay in sync.
+     */
+    private _applySimulatedInput(input: any, applied: Array<string>): void {
+      const inputManager = this._runtimegame.getInputManager();
+      if (!input || typeof input !== 'object') return;
+      switch (input.type) {
+        case 'keyPressed':
+          inputManager.onKeyPressed(input.keyCode, input.location);
+          applied.push('keyPressed:' + input.keyCode);
+          break;
+        case 'keyReleased':
+          inputManager.onKeyReleased(input.keyCode, input.location);
+          applied.push('keyReleased:' + input.keyCode);
+          break;
+        case 'releaseAllKeys':
+          inputManager.releaseAllPressedKeys();
+          applied.push('releaseAllKeys');
+          break;
+        case 'mouseMove':
+          inputManager.onMouseMove(input.x, input.y);
+          applied.push('mouseMove');
+          break;
+        case 'mouseButtonPressed':
+          inputManager.onMouseButtonPressed(input.button || 0);
+          applied.push('mouseButtonPressed:' + (input.button || 0));
+          break;
+        case 'mouseButtonReleased':
+          inputManager.onMouseButtonReleased(input.button || 0);
+          applied.push('mouseButtonReleased:' + (input.button || 0));
+          break;
+        case 'touchStart':
+          inputManager.onTouchStart(input.identifier || 0, input.x, input.y);
+          applied.push('touchStart');
+          break;
+        case 'touchMove':
+          inputManager.onTouchMove(input.identifier || 0, input.x, input.y);
+          applied.push('touchMove');
+          break;
+        case 'touchEnd':
+          inputManager.onTouchEnd(input.identifier || 0);
+          applied.push('touchEnd');
+          break;
+        default:
+          applied.push('unknown:' + input.type);
+      }
+    }
+
+    /**
+     * Atomic runtime-test primitive: inject inputs, then step exactly `count`
+     * frames, then reply ONCE with the full game dump — all synchronously on the
+     * websocket callback, with NO dependency on requestAnimationFrame. This is
+     * what makes runtime verification work even when the OS has throttled a
+     * backgrounded/occluded preview window (whose rAF loop is paused): the game
+     * logic still advances because we drive `step()` directly here.
+     *
+     * The single reply (`framesRan`) carries the same serialized RuntimeGame the
+     * `dump` command produces, so a harness gets injected-input + N-frame-advance
+     * + resulting state in one round-trip that cannot half-fail mid-sequence.
+     */
+    runFrames(
+      inputs: Array<any>,
+      postInputs: Array<any>,
+      count: number,
+      fakeElapsedTimeMs: number,
+      messageId: number,
+      autoRelease?: boolean,
+      includeCursorWorldCoordinates?: boolean,
+      cursorLayers?: Array<string>
+    ): void {
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      const frames = Math.max(1, Math.min(2000, count || 1));
+      const delta =
+        typeof fakeElapsedTimeMs === 'number' && fakeElapsedTimeMs > 0
+          ? fakeElapsedTimeMs
+          : 1000 / 60;
+      let steppedFrames = 0;
+      let stoppedEarly = false;
+      let failedFrame: number | null = null;
+      let failure: any = null;
+      const cleanup = {
+        attempted: !!autoRelease || !!(postInputs && postInputs.length),
+        postInputsApplied: 0,
+        keysReleased: false,
+        success: true,
+        error: null as string | null,
+      };
+      try {
+        // 1. Inject inputs (held keys persist across the stepped frames).
+        (inputs || []).forEach((input) => {
+          this._applySimulatedInput(input, applied);
+        });
+        // 2. Pause so the rAF loop (if it is running at all) does not also step.
+        if (!this._runtimegame.isPaused()) {
+          this._runtimegame.pause(true);
+        }
+        // 3. Step the simulation directly — independent of rendering.
+        for (let i = 0; i < frames; i++) {
+          const keepGoing = this._runtimegame.getSceneStack().step(delta);
+          steppedFrames++;
+          if (!keepGoing) {
+            stoppedEarly = true;
+            break;
+          }
+        }
+      } catch (e) {
+        failure = e;
+        error = (e as Error).message || 'Failed to run frames.';
+        failedFrame = Math.min(frames, steppedFrames + 1);
+        stoppedEarly = true;
+      } finally {
+        // Post-inputs and key release are cleanup operations: they must run even
+        // when game events throw in the middle of a stepped frame.
+        try {
+          (postInputs || []).forEach((input) => {
+            this._applySimulatedInput(input, applied);
+            cleanup.postInputsApplied++;
+          });
+        } catch (cleanupError) {
+          cleanup.success = false;
+          cleanup.error =
+            (cleanupError as Error).message ||
+            'Runtime post-input cleanup failed.';
+          if (!error) error = cleanup.error;
+        }
+
+        // Keep key release in its own guarded block. A malformed post-input must
+        // never prevent auto_release from clearing keys held before the failure.
+        if (autoRelease) {
+          try {
+            const inputManager: any = this._runtimegame.getInputManager();
+            if (typeof inputManager.releaseAllPressedKeys !== 'function') {
+              throw new Error(
+                'The runtime input manager cannot release all pressed keys.'
+              );
+            }
+            inputManager.releaseAllPressedKeys();
+            applied.push('autoReleasedKeys');
+            cleanup.keysReleased = true;
+          } catch (cleanupError) {
+            cleanup.success = false;
+            const releaseError =
+              (cleanupError as Error).message || 'Runtime key release failed.';
+            cleanup.error = cleanup.error
+              ? cleanup.error + ' ' + releaseError
+              : releaseError;
+            if (!error) error = releaseError;
+          }
+        }
+      }
+      // 5. Reply once with the full dump plus the run metadata (including which
+      // keys are STILL held), so the bridge can summarize live state without a
+      // 2nd call and the caller can see lingering held keys and sounds fired by
+      // the stepped events.
+      const recentlyPlayedSounds = this._takeRecentlyPlayedSounds();
+      this._sendRuntimeGameDumpWith({
+        command: 'framesRan',
+        messageId,
+        runFrames: {
+          applied,
+          requestedFrames: frames,
+          steppedFrames,
+          deltaMs: delta,
+          stoppedEarly: stoppedEarly || steppedFrames < frames,
+          failedFrame,
+          partialStateAvailable: steppedFrames > 0,
+          failure:
+            failure && typeof failure === 'object'
+              ? {
+                  code: failure.code,
+                  name: failure.name,
+                  usage: failure.usage,
+                  pickedInstancesCount: failure.pickedInstancesCount,
+                  eventId: failure.eventId || failure.aiGeneratedEventId,
+                  instructionId: failure.instructionId,
+                  suggestedEventStructure: failure.suggestedEventStructure,
+                  stack: failure.stack,
+                }
+              : undefined,
+          cleanup,
+          paused: this._runtimegame.isPaused(),
+          heldKeys: this._getHeldKeyCodes(),
+          recentlyPlayedSounds,
+          cursorWorldCoordinates: includeCursorWorldCoordinates
+            ? this._getCursorWorldCoordinates(cursorLayers)
+            : undefined,
+          error,
+        },
+      });
+    }
+
+    // The key codes currently held down in the InputManager (truthy entries in
+    // _pressedKeys.items). Used by runFrames to surface lingering held keys.
+    private _getHeldKeyCodes(): Array<number> {
+      const held: Array<number> = [];
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        const pressedItems =
+          inputManager._pressedKeys && inputManager._pressedKeys.items;
+        if (pressedItems) {
+          for (const keyCode in pressedItems) {
+            if (
+              Object.prototype.hasOwnProperty.call(pressedItems, keyCode) &&
+              pressedItems[keyCode]
+            ) {
+              held.push(parseInt(keyCode, 10));
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      return held;
+    }
+
+    private _getCursorWorldCoordinates(cursorLayers?: Array<string>): Object {
+      const payload: any = {
+        sceneName: null,
+        canvasX: 0,
+        canvasY: 0,
+        layers: [],
+        error: null,
+      };
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        payload.canvasX = inputManager.getCursorX
+          ? inputManager.getCursorX()
+          : 0;
+        payload.canvasY = inputManager.getCursorY
+          ? inputManager.getCursorY()
+          : 0;
+
+        const scene = this._runtimegame.getSceneStack().getCurrentScene();
+        if (!scene) {
+          payload.error = 'No current scene.';
+          return payload;
+        }
+        payload.sceneName = scene.getName();
+
+        const layerNames =
+          cursorLayers && cursorLayers.length ? cursorLayers.slice(0, 50) : [];
+        if (!layerNames.length) {
+          scene.getAllLayerNames(layerNames);
+        }
+
+        layerNames.forEach((layerName) => {
+          const exists = scene.hasLayer(layerName);
+          if (!exists) {
+            payload.layers.push({
+              layerName,
+              exists,
+              error: 'Layer does not exist.',
+            });
+            return;
+          }
+          const layer = scene.getLayer(layerName);
+          const point = layer.convertCoords(
+            payload.canvasX,
+            payload.canvasY,
+            0,
+            [0, 0]
+          );
+          payload.layers.push({
+            layerName,
+            exists,
+            worldX: point[0],
+            worldY: point[1],
+            cameraX:
+              typeof layer.getCameraX === 'function'
+                ? layer.getCameraX(0)
+                : undefined,
+            cameraY:
+              typeof layer.getCameraY === 'function'
+                ? layer.getCameraY(0)
+                : undefined,
+            cameraZoom:
+              typeof layer.getCameraZoom === 'function'
+                ? layer.getCameraZoom(0)
+                : undefined,
+            cameraRotation:
+              typeof layer.getCameraRotation === 'function'
+                ? layer.getCameraRotation(0)
+                : undefined,
+          });
+        });
+      } catch (e) {
+        payload.error =
+          (e as Error).message || 'Failed to read cursor coordinates.';
+      }
+      return payload;
+    }
+
+    /**
+     * Serialize the RuntimeGame dump (same exclusions/limits as
+     * `sendRuntimeGameDump`) but merge extra top-level fields into the message
+     * and send it under a caller-chosen command. Lets `runFrames` return the
+     * dump in a single matched reply.
+     */
+    private _sendRuntimeGameDumpWith(extraTopLevel: Object): void {
+      const that = this;
+      const message = {
+        ...extraTopLevel,
+        command: (extraTopLevel as any).command || 'dump',
+        payload: this._runtimegame,
+        rendererDiagnostics: this._getRendererDiagnostics(),
+      };
+      const excludedValues = [that._runtimegame.getGameData()];
+      const excludedKeys = [
+        '_debuggerClient',
+        '_debuggerRenderer',
+        '_allInstancesList',
+        '_signalBus',
+        '_runtimeGame',
+        '_runtimeScene',
+        '_behaviorsTable',
+        '_animations',
+        '_animationFrame',
+        'linkedObjectsManager',
+        '_platformRBush',
+        'HSHG',
+        '_obstaclesHSHG',
+        'owner',
+        '_renderer',
+        '_gameRenderer',
+        '_imageManager',
+        '_rendererEffects',
+        'baseTexture',
+        '_baseTexture',
+        '_invalidTexture',
+      ];
+      const stringifiedMessage = circularSafeStringify(
+        message,
+        function (key, value) {
+          if (
+            excludedValues.indexOf(value) !== -1 ||
+            excludedKeys.indexOf(key) !== -1
+          ) {
+            return '[Removed from the debugger]';
+          }
+          return value;
+        },
+        18
+      );
+      this._sendMessage(stringifiedMessage);
+    }
+
+    /**
+     * Advance the game by exactly `count` frames using a fixed per-frame delta,
+     * for deterministic, reproducible testing. The game is paused first so the
+     * normal rAF loop only renders; each manual step runs full event logic. This
+     * lets a harness do: pause → inject input → step N frames → read state.
+     */
+    stepFrames(
+      count: number,
+      fakeElapsedTimeMs: number,
+      messageId: number
+    ): void {
+      const frames = Math.max(1, Math.min(1000, count || 1));
+      // 16.667 ms ≈ one 60 FPS frame. Kept per-frame small so TimeManager's
+      // minimal-framerate clamp does not distort the delta.
+      const delta =
+        typeof fakeElapsedTimeMs === 'number' && fakeElapsedTimeMs > 0
+          ? fakeElapsedTimeMs
+          : 1000 / 60;
+      // Ensure the game is paused so the rAF loop does not also step.
+      if (!this._runtimegame.isPaused()) {
+        this._runtimegame.pause(true);
+      }
+      let steppedFrames = 0;
+      let stoppedEarly = false;
+      for (let i = 0; i < frames; i++) {
+        const keepGoing = this._runtimegame.getSceneStack().step(delta);
+        steppedFrames++;
+        if (!keepGoing) {
+          stoppedEarly = true;
+          break;
+        }
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'framesStepped',
+          messageId,
+          payload: {
+            steppedFrames,
+            deltaMs: delta,
+            stoppedEarly,
+            paused: this._runtimegame.isPaused(),
+          },
+        })
+      );
+    }
+
+    /**
+     * Apply test/debug state operations to the running game: set a scene/global
+     * variable, move/spawn/delete an instance. Each op is { type, ... }.
+     *   setVariable: { type, scope: 'scene'|'global', name, value }
+     *   moveInstance: { type, objectName, index?, x, y }
+     *   spawnInstance: { type, objectName, x?, y? }
+     *   deleteInstance: { type, objectName, index? }
+     *   deleteAllInstances: { type, objectName }
+     */
+    setRuntimeState(operations: Array<any>, messageId: number): void {
+      const applied: Array<string> = [];
+      let error: string | null = null;
+      const scene = this._runtimegame.getSceneStack().getCurrentScene();
+      try {
+        (operations || []).forEach((op) => {
+          if (!op || typeof op !== 'object') return;
+          if (op.type === 'setVariable') {
+            const container =
+              op.scope === 'global'
+                ? this._runtimegame.getVariables()
+                : scene
+                  ? scene.getVariables()
+                  : null;
+            if (!container) {
+              applied.push('setVariable:no-scene');
+              return;
+            }
+            const variable = container.get(op.name);
+            if (typeof op.value === 'number') variable.setNumber(op.value);
+            else if (typeof op.value === 'boolean')
+              variable.setBoolean(op.value);
+            else variable.setString('' + op.value);
+            applied.push('setVariable:' + op.scope + '.' + op.name);
+          } else if (op.type === 'moveInstance' && scene) {
+            const instances = scene.getInstancesOf(op.objectName) || [];
+            const target = instances[op.index || 0];
+            if (target) {
+              target.setPosition(op.x, op.y);
+              applied.push('moveInstance:' + op.objectName);
+            } else {
+              applied.push('moveInstance:not-found:' + op.objectName);
+            }
+          } else if (op.type === 'spawnInstance' && scene) {
+            const created = scene.createObject(op.objectName);
+            if (created) {
+              if (typeof op.x === 'number' && typeof op.y === 'number')
+                created.setPosition(op.x, op.y);
+              applied.push('spawnInstance:' + op.objectName);
+            } else {
+              applied.push('spawnInstance:unknown-object:' + op.objectName);
+            }
+          } else if (op.type === 'deleteInstance' && scene) {
+            const instances = scene.getInstancesOf(op.objectName) || [];
+            const target = instances[op.index || 0];
+            if (target) {
+              target.deleteFromScene();
+              applied.push('deleteInstance:' + op.objectName);
+            } else {
+              applied.push('deleteInstance:not-found:' + op.objectName);
+            }
+          } else if (op.type === 'deleteAllInstances' && scene) {
+            // Delete every live instance of the object in one op (no need to
+            // know the count or call index-by-index).
+            const instances = (
+              scene.getInstancesOf(op.objectName) || []
+            ).slice();
+            for (const instance of instances) {
+              instance.deleteFromScene();
+            }
+            applied.push(
+              'deleteAllInstances:' + op.objectName + ':' + instances.length
+            );
+          } else {
+            applied.push('unknown:' + op.type);
+          }
+        });
+      } catch (e) {
+        error = (e as Error).message || 'Failed to apply runtime state.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'runtimeStateSet',
+          messageId,
+          payload: { applied, error },
+        })
+      );
+    }
+
+    /**
+     * Report the InputManager's CURRENT state (pressed keys, last pressed key,
+     * mouse position/buttons). Lets a harness confirm simulated input actually
+     * reached the game (distinguishes "input not received" from "logic bug").
+     */
+    sendInputState(messageId: number): void {
+      const payload: any = {
+        pressedKeyCodes: [],
+        lastPressedKey: 0,
+        mouseX: 0,
+        mouseY: 0,
+        pressedMouseButtons: [],
+        error: null,
+      };
+      try {
+        const inputManager: any = this._runtimegame.getInputManager();
+        // Enumerate currently-pressed keys (truthy values in _pressedKeys.items).
+        const pressedItems =
+          inputManager._pressedKeys && inputManager._pressedKeys.items;
+        if (pressedItems) {
+          for (const keyCode in pressedItems) {
+            if (
+              Object.prototype.hasOwnProperty.call(pressedItems, keyCode) &&
+              pressedItems[keyCode]
+            ) {
+              payload.pressedKeyCodes.push(parseInt(keyCode, 10));
+            }
+          }
+        }
+        payload.lastPressedKey =
+          typeof inputManager.getLastPressedKey === 'function'
+            ? inputManager.getLastPressedKey()
+            : inputManager._lastPressedKey || 0;
+        payload.anyKeyPressed =
+          typeof inputManager.anyKeyPressed === 'function'
+            ? inputManager.anyKeyPressed()
+            : payload.pressedKeyCodes.length > 0;
+        payload.mouseX = inputManager.getCursorX
+          ? inputManager.getCursorX()
+          : 0;
+        payload.mouseY = inputManager.getCursorY
+          ? inputManager.getCursorY()
+          : 0;
+        for (let button = 0; button < 5; button++) {
+          if (
+            inputManager.isMouseButtonPressed &&
+            inputManager.isMouseButtonPressed(button)
+          ) {
+            payload.pressedMouseButtons.push(button);
+          }
+        }
+      } catch (e) {
+        payload.error = (e as Error).message || 'Failed to read input state.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'inputState',
+          messageId,
+          payload,
+        })
+      );
+    }
+
+    /**
+     * Report currently-playing sounds and musics (channel, resource name,
+     * looping). Lets a harness confirm a looping BGM is actually playing, even
+     * when the recentlyPlayedSounds history buffer is flooded by SFX.
+     */
+    sendActiveSounds(messageId: number): void {
+      const sounds: Array<any> = [];
+      const musics: Array<any> = [];
+      let error: string | null = null;
+      try {
+        const soundManager: any = this._runtimegame.getSoundManager();
+        const describe = (sound: any, channel: number | null) => {
+          if (!sound || typeof sound.playing !== 'function') return null;
+          if (!sound.playing()) return null;
+          const data =
+            typeof sound.getNetworkSyncData === 'function'
+              ? sound.getNetworkSyncData()
+              : null;
+          return {
+            channel,
+            soundName: data ? data.resourceName : undefined,
+            looping:
+              typeof sound.getLoop === 'function' ? sound.getLoop() : undefined,
+          };
+        };
+        (soundManager._freeSounds || []).forEach((sound: any) => {
+          const d = describe(sound, null);
+          if (d) sounds.push(d);
+        });
+        (soundManager._freeMusics || []).forEach((music: any) => {
+          const d = describe(music, null);
+          if (d) musics.push(d);
+        });
+        const soundChannels = soundManager._sounds || {};
+        for (const channel in soundChannels) {
+          if (Object.prototype.hasOwnProperty.call(soundChannels, channel)) {
+            const d = describe(soundChannels[channel], parseInt(channel, 10));
+            if (d) sounds.push(d);
+          }
+        }
+        const musicChannels = soundManager._musics || {};
+        for (const channel in musicChannels) {
+          if (Object.prototype.hasOwnProperty.call(musicChannels, channel)) {
+            const d = describe(musicChannels[channel], parseInt(channel, 10));
+            if (d) musics.push(d);
+          }
+        }
+      } catch (e) {
+        error = (e as Error).message || 'Failed to read active sounds.';
+      }
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'activeSounds',
+          messageId,
+          payload: { sounds, musics, error },
+        })
+      );
+    }
+
     sendGraphicsContextLost(): void {
       const inGameEditor = this._runtimegame.getInGameEditor();
       if (!inGameEditor) {
@@ -1091,6 +2110,22 @@ namespace gdjs {
     }
 
     launchHardReload(): void {
+      let hasDisposedRuntime = false;
+      const disposeRuntimeBeforeReload = () => {
+        if (hasDisposedRuntime) return;
+
+        // A hard reload is used for resources such as 3D models that can't be
+        // safely hot-reloaded in place. Explicitly dispose the current game so
+        // cloned scenes, animation mixers, resource caches and WebGL renderers
+        // don't stay alive while the next document is being loaded.
+        hasDisposedRuntime = true;
+        try {
+          this._runtimegame.dispose(true);
+        } catch (error) {
+          logger.warn('Could not dispose the game before reloading it', error);
+        }
+      };
+
       try {
         const reloadUrl = new URL(location.href);
 
@@ -1118,12 +2153,14 @@ namespace gdjs {
           'runtimeGameStatus',
           JSON.stringify(runtimeGameStatus)
         );
+        disposeRuntimeBeforeReload();
         location.replace(reloadUrl);
       } catch (error) {
         logger.error(
           'Could not reload the game with the new initial status',
           error
         );
+        disposeRuntimeBeforeReload();
         location.reload();
       }
     }

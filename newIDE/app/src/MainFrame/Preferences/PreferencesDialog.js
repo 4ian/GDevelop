@@ -27,6 +27,7 @@ import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
+import TextField from '../../UI/TextField';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -80,12 +81,16 @@ const PreferencesDialog = ({
     setNewProjectsDefaultFolder,
     setUseShortcutToClosePreviewWindow,
     setWatchProjectFolderFilesForLocalProjects,
-    setDisplaySaveReminder,
     setFetchPlayerTokenForPreviewAutomatically,
     setPreviewCrashReportUploadLevel,
     setTakeScreenshotOnPreview,
     setShowAiAskButtonInTitleBar,
+    setShowAddNoteButtonInTitleBar,
     setAutomaticallyUseCreditsForAiRequests,
+    setEnableMcpServer,
+    setMcpServerPort,
+    setMcpAllowWriteTools,
+    setMcpAllowCommandTools,
     setShowCreateSectionByDefault,
     setDisableNpmScriptConfirmation,
     setUseBackgroundSerializerForSaving,
@@ -93,6 +98,112 @@ const PreferencesDialog = ({
   } = React.useContext(PreferencesContext);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
+  const [mcpServerState, setMcpServerState] = React.useState<{
+    isRunning: boolean,
+    port: ?number,
+    url: ?string,
+    error: ?string,
+  }>({
+    isRunning: false,
+    port: null,
+    url: null,
+    error: null,
+  });
+
+  const refreshMcpServerState = React.useCallback(() => {
+    if (!electron || !electron.ipcRenderer) return;
+    electron.ipcRenderer
+      .invoke('mcp-server-get-state')
+      .then(state => {
+        if (state) setMcpServerState(state);
+      })
+      .catch(error => {
+        setMcpServerState({
+          isRunning: false,
+          port: null,
+          url: null,
+          error: error && error.message ? error.message : String(error),
+        });
+      });
+  }, []);
+
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(refreshMcpServerState, 150);
+      return () => clearTimeout(timeoutId);
+    },
+    [refreshMcpServerState, values.enableMcpServer, values.mcpServerPort]
+  );
+
+  const mcpServerPreferences = (
+    <ColumnStackLayout noMargin>
+      <Text size="block-title">
+        <Trans>Gdevelop MCP</Trans>
+      </Text>
+      <CompactToggleField
+        labelColor="primary"
+        hideTooltip
+        onCheck={setEnableMcpServer}
+        checked={values.enableMcpServer}
+        label={i18n._(t`Enable local MCP server`)}
+      />
+      <LineStackLayout noMargin alignItems="center">
+        <Column noMargin expand>
+          <Text noMargin>
+            <Trans>Status</Trans>
+          </Text>
+        </Column>
+        <Column noMargin expand>
+          <Text noMargin>
+            {mcpServerState.error
+              ? mcpServerState.error
+              : mcpServerState.isRunning
+              ? i18n._(t`Running`)
+              : i18n._(t`Stopped`)}
+          </Text>
+        </Column>
+      </LineStackLayout>
+      <TextField
+        type="number"
+        value={values.mcpServerPort}
+        floatingLabelText={<Trans>Port</Trans>}
+        min={0}
+        max={65535}
+        onChange={(event, value) => {
+          const port = parseInt(value, 10);
+          setMcpServerPort(Number.isFinite(port) ? port : 0);
+        }}
+        fullWidth
+      />
+      <TextField
+        value={mcpServerState.url || ''}
+        floatingLabelText={<Trans>Server URL</Trans>}
+        readOnly
+        fullWidth
+      />
+      <LineStackLayout noMargin>
+        <FlatButton
+          label={<Trans>Refresh status</Trans>}
+          primary={false}
+          onClick={refreshMcpServerState}
+        />
+      </LineStackLayout>
+      <CompactToggleField
+        labelColor="primary"
+        hideTooltip
+        onCheck={setMcpAllowWriteTools}
+        checked={values.mcpAllowWriteTools}
+        label={i18n._(t`Allow MCP write tools`)}
+      />
+      <CompactToggleField
+        labelColor="primary"
+        hideTooltip
+        onCheck={setMcpAllowCommandTools}
+        checked={values.mcpAllowCommandTools}
+        label={i18n._(t`Allow MCP command tools`)}
+      />
+    </ColumnStackLayout>
+  );
 
   return (
     <Dialog
@@ -114,6 +225,9 @@ const PreferencesDialog = ({
           onChange={setCurrentTab}
           options={[
             { value: 'preferences', label: <Trans>Preferences</Trans> },
+            ...(electron
+              ? [{ value: 'mcp-server', label: <Trans>MCP server</Trans> }]
+              : []),
             { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
             ...(electron
               ? [{ value: 'folders', label: <Trans>Folders</Trans> }]
@@ -558,19 +672,17 @@ const PreferencesDialog = ({
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip
-                onCheck={setAutomaticallyUseCreditsForAiRequests}
-                checked={values.automaticallyUseCreditsForAiRequests}
-                label={i18n._(
-                  t`Automatically use GDevelop credits for AI requests when run out of AI credits`
-                )}
+                onCheck={setShowAddNoteButtonInTitleBar}
+                checked={values.showAddNoteButtonInTitleBar}
+                label={i18n._(t`Show "Add Note" button in the title bar`)}
               />
               <CompactToggleField
                 labelColor="primary"
                 hideTooltip
-                onCheck={check => setDisplaySaveReminder({ activated: check })}
-                checked={values.displaySaveReminder.activated}
+                onCheck={setAutomaticallyUseCreditsForAiRequests}
+                checked={values.automaticallyUseCreditsForAiRequests}
                 label={i18n._(
-                  t`Display save reminder after significant changes in project`
+                  t`Automatically use GDevelop credits for AI requests when run out of AI credits`
                 )}
               />
               <CompactToggleField
@@ -694,6 +806,7 @@ const PreferencesDialog = ({
           )}
         </ColumnStackLayout>
       )}
+      {electron && currentTab === 'mcp-server' && mcpServerPreferences}
       {currentTab === 'shortcuts' && (
         <Line expand>
           <Column expand noMargin>

@@ -277,6 +277,7 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
 
     instruction.SetAwaited(
         instrElement.GetChild("type", 0, "Type").GetBoolAttribute("await"));
+    instruction.SetDisabled(instrElement.GetBoolAttribute("disabled", false));
 
     // Read parameters
     vector<gd::Expression> parameters;
@@ -358,6 +359,8 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
       instruction.GetChild("type").SetAttribute("inverted", list[k].IsInverted());
     if (canonical || list[k].IsAwaited())
       instruction.GetChild("type").SetAttribute("await", list[k].IsAwaited());
+    if (canonical || list[k].IsDisabled())
+      instruction.SetAttribute("disabled", list[k].IsDisabled());
 
     // Parameters
     SerializerElement& parameters = instruction.AddChild("parameters");

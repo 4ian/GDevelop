@@ -68,6 +68,7 @@ type Props = {|
     eventsFunction: gdEventsFunction,
     parameterName: string
   ) => void,
+  parameterLayout?: 'stacked' | 'split',
   unsavedChanges?: ?UnsavedChanges,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -100,6 +101,7 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
       onMoveObjectEventsParameter,
       onFunctionParameterWillBeRenamed,
       onFunctionParameterTypeChanged,
+      parameterLayout,
       unsavedChanges,
       onWillInstallExtension,
       onExtensionInstalled,
@@ -218,6 +220,7 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
                   onFunctionParameterWillBeRenamed
                 }
                 onFunctionParameterTypeChanged={onFunctionParameterTypeChanged}
+                parameterLayout={parameterLayout}
                 onWillInstallExtension={onWillInstallExtension}
                 onExtensionInstalled={onExtensionInstalled}
                 key={eventsFunction ? eventsFunction.ptr : null}
@@ -239,6 +242,7 @@ const EventsFunctionConfigurationEditor: React.ComponentType<{
                     forceUpdate();
                   }}
                   freezeEventsFunctionType={freezeEventsFunctionType}
+                  showAdvancedOptionsInline={parameterLayout === 'split'}
                 />
               </CompactEventsFunctionParametersEditor>
             ) : null}

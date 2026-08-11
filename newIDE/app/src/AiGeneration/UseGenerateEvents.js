@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { delay } from '../Utils/Delay';
 import { getBackedOffIntervalInMs } from '../Utils/UseAdaptivePollingInterval';
@@ -15,6 +14,7 @@ import {
 } from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
+import { useAiGenerationService } from './AiService';
 
 const gd: libGDevelop = global.gd;
 
@@ -37,9 +37,7 @@ export const useGenerateEvents = ({
 }: {|
   project: ?gdProject,
 |}): UseGenerateEventsReturnType => {
-  const { profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { userId, getAuthorizationHeader } = useAiGenerationService();
 
   const generateEvents = React.useCallback(
     async ({
@@ -66,7 +64,7 @@ export const useGenerateEvents = ({
       estimatedComplexity: number | null,
     |}): Promise<EventsGenerationResult> => {
       if (!project) throw new Error('No project is opened.');
-      if (!profile) throw new Error('User should be authenticated.');
+      if (!userId) throw new Error('You must be logged in to use AI.');
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const simplifiedProjectJson = JSON.stringify(
@@ -79,7 +77,7 @@ export const useGenerateEvents = ({
       try {
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
-          userId: profile.id,
+          userId,
           simplifiedProjectJson,
           projectSpecificExtensionsSummaryJson,
           eventsJson: existingEventsJson,
@@ -89,7 +87,7 @@ export const useGenerateEvents = ({
           { times: 3, backoff: { initialDelay: 200, factor: 2 } },
           () =>
             createAiGeneratedEvent(getAuthorizationHeader, {
-              userId: profile.id,
+              userId,
               gameProjectJsonUserRelativeKey:
                 preparedAiUserContent.gameProjectJsonUserRelativeKey,
               gameProjectJson: preparedAiUserContent.gameProjectJson,
@@ -133,7 +131,7 @@ export const useGenerateEvents = ({
             aiGeneratedEvent = await getAiGeneratedEvent(
               getAuthorizationHeader,
               {
-                userId: profile.id,
+                userId,
                 aiGeneratedEventId: aiGeneratedEvent.id,
               }
             );
@@ -171,7 +169,7 @@ export const useGenerateEvents = ({
         };
       }
     },
-    [getAuthorizationHeader, project, profile]
+    [getAuthorizationHeader, project, userId]
   );
 
   return { generateEvents };

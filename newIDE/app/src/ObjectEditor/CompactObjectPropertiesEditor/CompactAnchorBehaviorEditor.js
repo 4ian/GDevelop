@@ -16,7 +16,7 @@ const CompactAnchorBehaviorEditor = ({
   behaviors,
   object,
   layersContainer,
-  behaviorMetadata,
+  behaviorTypeName,
   onOpenFullEditor,
   onBehaviorUpdated,
   resourceManagementProps,
@@ -73,7 +73,7 @@ const CompactAnchorBehaviorEditor = ({
         object={object}
         layersContainer={layersContainer}
         behaviors={behaviors}
-        behaviorMetadata={behaviorMetadata}
+        behaviorTypeName={behaviorTypeName}
         onOpenFullEditor={onOpenFullEditor}
         onBehaviorUpdated={_onBehaviorUpdated}
         resourceManagementProps={resourceManagementProps}

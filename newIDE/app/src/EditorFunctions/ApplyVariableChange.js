@@ -10,6 +10,8 @@ const readOrInferVariableType = (
     const lowercaseSpecifiedType = specifiedType.toLowerCase();
     if (lowercaseSpecifiedType === 'string') {
       return 'String';
+    } else if (lowercaseSpecifiedType === 'enum') {
+      return 'Enum';
     } else if (lowercaseSpecifiedType === 'number') {
       return 'Number';
     } else if (lowercaseSpecifiedType === 'boolean') {
@@ -270,6 +272,11 @@ export const applyVariableChange = ({
       readOrInferVariableType(forcedVariableType, value);
 
     if (variableType === 'String') {
+      // $FlowFixMe[incompatible-use]
+      variable.setString(value);
+    } else if (variableType === 'Enum') {
+      // $FlowFixMe[incompatible-use]
+      variable.castTo('enum');
       // $FlowFixMe[incompatible-use]
       variable.setString(value);
     } else if (variableType === 'Number') {

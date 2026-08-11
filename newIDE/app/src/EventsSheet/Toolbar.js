@@ -4,20 +4,16 @@ import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import IconButton from '../UI/IconButton';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import ToolbarCommands from './ToolbarCommands';
 import { type EventMetadata } from './EnumerateEventsMetadata';
-import AddEventIcon from '../UI/CustomSvgIcons/AddEvent';
-import AddSubEventIcon from '../UI/CustomSvgIcons/AddSubEvent';
-import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
-import CircledAddIcon from '../UI/CustomSvgIcons/CircledAdd';
-import TrashIcon from '../UI/CustomSvgIcons/Trash';
-import UndoIcon from '../UI/CustomSvgIcons/Undo';
-import RedoIcon from '../UI/CustomSvgIcons/Redo';
 import ToolbarSearchIcon from '../UI/CustomSvgIcons/ToolbarSearch';
 import EditSceneIcon from '../UI/CustomSvgIcons/EditScene';
 import { getShortcutDisplayName, useShortcutMap } from '../KeyboardShortcuts';
-import AddLocalVariableIcon from '../UI/CustomSvgIcons/LocalVariable';
+import GraphsIcon from '../UI/CustomSvgIcons/Graphs';
+import VariableTreeIcon from '../UI/CustomSvgIcons/VariableTree';
+import JavaScriptIcon from '../UI/CustomSvgIcons/JavaScript';
+import SceneIcon from '../UI/CustomSvgIcons/Scene';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 
 type Props = {|
   onAddStandardEvent: () => void,
@@ -38,12 +34,18 @@ type Props = {|
   canUndo: boolean,
   redo: () => void,
   canRedo: boolean,
+  onOpenLayoutEditor?: ?() => void,
   onToggleSearchPanel: () => void,
+  onToggleGraphPreview: () => void,
+  isGraphPreviewVisible: boolean,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
+  settingsTooltip?: MessageDescriptor,
+  settingsButtonPosition?: 'start' | 'end',
   moveEventsIntoNewGroup: () => void,
   canMoveEventsIntoNewGroup: boolean,
   onOpenSceneVariables: () => void,
+  onShowGeneratedCode?: ?() => void,
 |};
 
 const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
@@ -65,14 +67,30 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
   canUndo,
   redo,
   canRedo,
+  onOpenLayoutEditor,
   onToggleSearchPanel,
+  onToggleGraphPreview,
+  isGraphPreviewVisible,
   onOpenSettings,
   settingsIcon,
+  settingsTooltip,
+  settingsButtonPosition = 'end',
   moveEventsIntoNewGroup,
   canMoveEventsIntoNewGroup,
   onOpenSceneVariables,
+  onShowGeneratedCode,
 }: Props) {
   const shortcutMap = useShortcutMap();
+  const settingsButton = onOpenSettings ? (
+    <IconButton
+      size="small"
+      color="default"
+      onClick={onOpenSettings}
+      tooltip={settingsTooltip || t`Open settings`}
+    >
+      {settingsIcon || <EditSceneIcon />}
+    </IconButton>
+  ) : null;
 
   return (
     <>
@@ -102,119 +120,34 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         onOpenSceneVariables={onOpenSceneVariables}
       />
       <ToolbarGroup lastChild>
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onAddStandardEvent}
-          id="toolbar-add-event-button"
-          tooltip={t`Add a new empty event`}
-          acceleratorString={getShortcutDisplayName(
-            shortcutMap['ADD_STANDARD_EVENT']
-          )}
-        >
-          <AddEventIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onAddSubEvent}
-          disabled={!canAddSubEvent}
-          id="toolbar-add-sub-event-button"
-          tooltip={t`Add a sub-event to the selected event`}
-          acceleratorString={getShortcutDisplayName(
-            shortcutMap['ADD_SUBEVENT']
-          )}
-        >
-          <AddSubEventIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onAddLocalVariable}
-          disabled={!canAddLocalVariable}
-          id="toolbar-add-local-variable-button"
-          tooltip={t`Add a local variable`}
-          acceleratorString={getShortcutDisplayName(
-            shortcutMap['ADD_LOCAL_VARIABLE']
-          )}
-        >
-          <AddLocalVariableIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={onAddCommentEvent}
-          id="toolbar-add-comment-button"
-          tooltip={t`Add a comment`}
-          acceleratorString={getShortcutDisplayName(
-            shortcutMap['ADD_COMMENT_EVENT']
-          )}
-        >
-          <AddCommentIcon />
-        </IconButton>
-        <ElementWithMenu
-          element={
+        {onOpenLayoutEditor && (
+          <>
             <IconButton
               size="small"
               color="default"
-              tooltip={t`Choose and add an event`}
-              acceleratorString={getShortcutDisplayName(
-                shortcutMap['CHOOSE_AND_ADD_EVENT']
-              )}
+              onClick={onOpenLayoutEditor}
+              id="toolbar-open-layout-editor-button"
+              tooltip={t`Open the associated scene`}
             >
-              <CircledAddIcon />
+              <SceneIcon />
             </IconButton>
-          }
-          buildMenuTemplate={() =>
-            allEventsMetadata.map(metadata => {
-              return {
-                label: metadata.fullName,
-                click: () => {
-                  onAddEvent(metadata.type);
-                },
-              };
-            })
-          }
-        />
-        <ToolbarSeparator />
-
+            <ToolbarSeparator />
+          </>
+        )}
+        {settingsButtonPosition === 'start' && settingsButton}
         <IconButton
           size="small"
           color="default"
-          onClick={onRemove}
-          disabled={!canRemove}
-          tooltip={t`Delete the selected event(s)`}
-          acceleratorString={'Delete'}
+          onClick={onOpenSceneVariables}
+          id="toolbar-open-variables-button"
+          tooltip={t`Edit variables`}
+          acceleratorString={getShortcutDisplayName(
+            shortcutMap['OPEN_SCENE_VARIABLES']
+          )}
         >
-          <TrashIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={undo}
-          disabled={!canUndo}
-          tooltip={t`Undo the last changes`}
-          acceleratorString={'CmdOrCtrl+Z'}
-        >
-          <UndoIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="default"
-          onClick={redo}
-          disabled={!canRedo}
-          tooltip={t`Redo the last changes`}
-          acceleratorString={'CmdOrCtrl+Shift+Z'}
-        >
-          <RedoIcon />
+          <VariableTreeIcon />
         </IconButton>
         <ToolbarSeparator />
-
         <IconButton
           size="small"
           color="default"
@@ -224,17 +157,31 @@ const Toolbar: React.ComponentType<Props> = React.memo<Props>(function Toolbar({
         >
           <ToolbarSearchIcon />
         </IconButton>
-        {onOpenSettings && <ToolbarSeparator />}
-        {onOpenSettings && (
+        {onShowGeneratedCode && (
           <IconButton
             size="small"
             color="default"
-            onClick={onOpenSettings}
-            tooltip={t`Open settings`}
+            onClick={onShowGeneratedCode}
+            id="toolbar-show-generated-code-button"
+            tooltip={t`Show the generated JavaScript code for these events`}
           >
-            {settingsIcon || <EditSceneIcon />}
+            <JavaScriptIcon />
           </IconButton>
         )}
+        <IconButton
+          size="small"
+          color="default"
+          selected={isGraphPreviewVisible}
+          onClick={onToggleGraphPreview}
+          tooltip={t`Catalog`}
+          id="toolbar-toggle-events-graph-preview-button"
+        >
+          <GraphsIcon />
+        </IconButton>
+        {settingsButtonPosition === 'end' && onOpenSettings && (
+          <ToolbarSeparator />
+        )}
+        {settingsButtonPosition === 'end' && settingsButton}
       </ToolbarGroup>
     </>
   );

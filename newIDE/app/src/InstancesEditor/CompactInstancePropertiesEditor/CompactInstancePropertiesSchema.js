@@ -31,8 +31,6 @@ import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Visibility from '../../UI/CustomSvgIcons/Visibility';
 import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
 import Restore from '../../UI/CustomSvgIcons/Restore';
-import Object3d from '../../UI/CustomSvgIcons/Object3d';
-import Object2d from '../../UI/CustomSvgIcons/Object2d';
 import RotateX from '../../UI/CustomSvgIcons/RotateX';
 import RotateY from '../../UI/CustomSvgIcons/RotateY';
 import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
@@ -53,32 +51,7 @@ const applyRatio = ({
   return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
 };
 
-const getEditObjectButton = ({
-  i18n,
-  onEditObject,
-  is3DInstance,
-}: {|
-  i18n: I18nType,
-  onEditObject: (name: string) => void,
-  is3DInstance: boolean,
-|}) => ({
-  label: i18n._(t`Edit object`),
-  disabled: 'onValuesDifferent',
-  nonFieldType: 'button',
-  getIcon: is3DInstance
-    ? // $FlowFixMe[missing-local-annot]
-      props => <Object3d {...props} />
-    : props => <Object2d {...props} />,
-  getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-  onClick: (instance: gdInitialInstance) =>
-    onEditObject(instance.getObjectName()),
-});
-
-const getRotationXAndRotationYFields = ({
-  i18n,
-}: {|
-  i18n: I18nType,
-|}): Schema => [
+const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
   {
     name: 'Rotation X',
     getLabel: () => i18n._(t`Rotation (X)`),
@@ -527,7 +500,6 @@ export const makeSchema = ({
   canBeFlippedZ,
   i18n,
   forceUpdate,
-  onEditObject,
   onGetInstanceSize,
   layersContainer,
 }: {|
@@ -537,7 +509,6 @@ export const makeSchema = ({
   canBeFlippedZ: boolean,
   i18n: I18nType,
   forceUpdate: () => void,
-  onEditObject: (name: string) => void,
   onGetInstanceSize: gdInitialInstance => [number, number, number],
   layersContainer: gdLayersContainer,
 |}): Schema => {
@@ -560,7 +531,6 @@ export const makeSchema = ({
     // $FlowFixMe[incompatible-type]
     return [
       getTitleRow({ i18n }),
-      getEditObjectButton({ i18n, onEditObject, is3DInstance }),
       {
         name: 'Position',
         type: 'row',
@@ -649,7 +619,6 @@ export const makeSchema = ({
   // $FlowFixMe[incompatible-type]
   return [
     getTitleRow({ i18n }),
-    getEditObjectButton({ i18n, onEditObject, is3DInstance }),
     {
       name: 'Position',
       type: 'row',

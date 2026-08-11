@@ -66,6 +66,18 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'ClothSimulation',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ClothSimulation/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'SpringBoneDynamics',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/SpringBoneDynamics/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'ExampleJsExtension',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
@@ -75,6 +87,12 @@ const jsExtensions = [
     name: 'Tween',
     // $FlowFixMe[cannot-resolve-module]
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'AdvancedTween',
+    // $FlowFixMe[cannot-resolve-module]
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdvancedTween/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
   {

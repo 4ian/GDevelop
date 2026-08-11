@@ -10,7 +10,6 @@ import CloseButton from './CloseButton';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { useDebounce } from '../../Utils/UseDebounce';
 import { addNode } from './NodesHandling';
-import { getVisibleLeaves, toggleLeafVisibility } from './Visibility';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -185,6 +184,59 @@ const stripSourceReferences = (node: EditorMosaicNode): EditorMosaicNode => {
   };
 };
 
+const toggleNodeVisibility = (
+  currentNode: EditorMosaicNode,
+  leafName: string
+): void => {
+  if (typeof currentNode === 'string') {
+    return;
+  }
+  const { first, second } = currentNode;
+  if (first === leafName) {
+    currentNode.firstHidden = !currentNode.firstHidden;
+    if (!currentNode.firstHidden && currentNode.splitPercentage === 0) {
+      currentNode.splitPercentage = 20;
+    }
+    return;
+  }
+  if (second === leafName) {
+    currentNode.secondHidden = !currentNode.secondHidden;
+    if (!currentNode.secondHidden && currentNode.splitPercentage === 100) {
+      currentNode.splitPercentage = 80;
+    }
+    return;
+  }
+  toggleNodeVisibility(first, leafName);
+  toggleNodeVisibility(second, leafName);
+};
+
+const setNodeVisibility = (
+  currentNode: EditorMosaicNode,
+  leafName: string,
+  visible: boolean
+): void => {
+  if (typeof currentNode === 'string') {
+    return;
+  }
+  const { first, second } = currentNode;
+  if (first === leafName) {
+    currentNode.firstHidden = !visible;
+    if (visible && currentNode.splitPercentage === 0) {
+      currentNode.splitPercentage = 20;
+    }
+    return;
+  }
+  if (second === leafName) {
+    currentNode.secondHidden = !visible;
+    if (visible && currentNode.splitPercentage === 100) {
+      currentNode.splitPercentage = 80;
+    }
+    return;
+  }
+  setNodeVisibility(first, leafName, visible);
+  setNodeVisibility(second, leafName, visible);
+};
+
 const updateSourceSplit = (currentNode: EditorMosaicNode): void => {
   if (typeof currentNode === 'string') {
     return;
@@ -195,6 +247,24 @@ const updateSourceSplit = (currentNode: EditorMosaicNode): void => {
   }
   updateSourceSplit(first);
   updateSourceSplit(second);
+};
+
+const getVisibleLeaves = (
+  currentNode: EditorMosaicNode,
+  result?: Array<string> = []
+): Array<string> => {
+  if (typeof currentNode === 'string') {
+    result.push(currentNode);
+    return result;
+  }
+  const { first, second, firstHidden, secondHidden } = currentNode;
+  if (!firstHidden) {
+    getVisibleLeaves(first, result);
+  }
+  if (!secondHidden) {
+    getVisibleLeaves(second, result);
+  }
+  return result;
 };
 
 const haveSameBranches = (
@@ -231,10 +301,18 @@ const renderMosaicWindowPreview = props => (
 
 export type EditorMosaicInterface = {|
   getOpenedEditorNames: () => Array<string>,
+  isEditorCollapsed: (editorName: string) => boolean,
   toggleEditor: (
     editorName: string,
     position: 'left' | 'right' | 'bottom'
   ) => boolean,
+  setEditorsVisibility: (
+    Array<{|
+      editorName: string,
+      position: 'left' | 'right' | 'bottom',
+      visible: boolean,
+    |}>
+  ) => void,
   collapseEditor: (editorName: string) => boolean,
   uncollapseEditor: (
     editorName: string,
@@ -331,6 +409,13 @@ const EditorMosaic: React.ComponentType<{
       getOpenedEditorNames: (): Array<string> => {
         return mosaicNode ? getVisibleLeaves(mosaicNode) : [];
       },
+      isEditorCollapsed: (editorName: string): boolean => {
+        return (
+          !!mosaicNode &&
+          mosaicContainsNode(mosaicNode, editorName) &&
+          getNodeSize(mosaicNode, editorName) === 0
+        );
+      },
       toggleEditor: (
         editorName: string,
         position: 'left' | 'right' | 'bottom'
@@ -338,17 +423,32 @@ const EditorMosaic: React.ComponentType<{
         const editor = editors[editorName];
         if (!editor) return false;
 
-        // The editor is in the tree if any node references it, regardless of
-        // whether it's currently hidden.
-        const isInTree =
-          getLeaves(hidableMosaicNode).indexOf(editorName) !== -1;
-        if (isInTree) {
-          toggleLeafVisibility(hidableMosaicNode, editorName);
+        const openedEditorNames = getLeaves(hidableMosaicNode);
+        if (openedEditorNames.indexOf(editorName) !== -1) {
+          toggleNodeVisibility(hidableMosaicNode, editorName);
           setHidableMosaicNode(shallowClone(hidableMosaicNode));
           return false;
         }
         // The editor position is not set yet, add it to its default position.
         return openEditor(editorName, position);
+      },
+      setEditorsVisibility: editorVisibilityChanges => {
+        let nextNode = hidableMosaicNode;
+        editorVisibilityChanges.forEach(({ editorName, position, visible }) => {
+          const editor = editors[editorName];
+          if (!editor) return;
+
+          const openedEditorNames = getLeaves(nextNode);
+          if (openedEditorNames.indexOf(editorName) === -1) {
+            if (visible) {
+              nextNode = addNode(nextNode, editorName, position, centralNodeId);
+            }
+            return;
+          }
+
+          setNodeVisibility(nextNode, editorName, visible);
+        });
+        setHidableMosaicNode(shallowClone(nextNode));
       },
       collapseEditor: (editorName: string) => {
         const editor = editors[editorName];

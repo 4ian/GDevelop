@@ -5,15 +5,12 @@ import { type I18n as I18nType } from '@lingui/core';
 import { type MenuItemTemplate } from './Menu.flow';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
-import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
-import optionalRequire from '../../Utils/OptionalRequire';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Drawer } from '@material-ui/core';
 import { isMobile } from '../../Utils/Platform';
 import { itemAboveBlockingLayerZIndex } from '../../InAppTutorial/BlockingLayerWithHoles';
 import PortalContainerContext from '../PortalContainerContext';
-const electron = optionalRequire('electron');
 
 const getValidPortalContainer = (
   portalContainer: ?HTMLElement
@@ -152,33 +149,7 @@ const MaterialUIContextMenu = React.forwardRef<
   );
 });
 
-const ElectronContextMenu = React.forwardRef<
-  ContextMenuProps,
-  ContextMenuInterface
->((props, ref) => {
-  const menuImplementation = new ElectronMenuImplementation();
-
-  // $FlowFixMe[missing-local-annot]
-  const open = (x, y, options) => {
-    menuImplementation.buildFromTemplate(
-      props.buildMenuTemplate(props.i18n, options)
-    );
-    menuImplementation.showMenu({
-      left: x || 0,
-      top: y || 0,
-      width: 0,
-      height: 0,
-    });
-  };
-
-  React.useImperativeHandle(ref, () => ({
-    open,
-  }));
-
-  return null;
-});
-
-const ContextMenu = electron ? ElectronContextMenu : MaterialUIContextMenu;
+const ContextMenu = MaterialUIContextMenu;
 
 export default (React.forwardRef<ContextMenuWrapperProps, ContextMenuInterface>(
   (props, ref) => {

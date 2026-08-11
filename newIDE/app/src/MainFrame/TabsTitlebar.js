@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 
+import AddCommentIcon from '../UI/CustomSvgIcons/AddComment';
 import MenuIcon from '../UI/CustomSvgIcons/Menu';
 import IconButton from '../UI/IconButton';
 import {
@@ -46,6 +47,12 @@ const styles = {
     marginRight: 1,
     marginLeft: 2,
   },
+  stickyNotesContainer: {
+    zIndex: 0,
+    marginBottom: 4,
+    marginRight: 1,
+    marginLeft: 2,
+  },
 };
 
 type TabsTitlebarProps = {|
@@ -58,9 +65,13 @@ type TabsTitlebarProps = {|
   isLeftMostPane: boolean,
   isRightMostPane: boolean,
   displayMenuIcon: boolean,
+  displayLeftSafeMargins: boolean,
 
   displayAskAi: boolean,
   onAskAiClicked: () => void,
+  displayStickyNotes: boolean,
+  onStickyNotesClicked: () => void,
+  isStickyNotesManagerShown: boolean,
 |};
 
 const useIsAskAiIconAnimated = (shouldDisplayAskAi: boolean) => {
@@ -113,8 +124,12 @@ export default function TabsTitlebar({
   isLeftMostPane,
   isRightMostPane,
   displayMenuIcon,
+  displayLeftSafeMargins,
   displayAskAi,
   onAskAiClicked,
+  displayStickyNotes,
+  onStickyNotesClicked,
+  isStickyNotesManagerShown,
 }: TabsTitlebarProps): React.MixedElement {
   const isTouchscreen = useScreenType() === 'touch';
   const preferences = React.useContext(PreferencesContext);
@@ -195,6 +210,8 @@ export default function TabsTitlebar({
 
   const shouldDisplayAskAi =
     preferences.values.showAiAskButtonInTitleBar && displayAskAi && !hideAskAi;
+  const shouldDisplayStickyNotes =
+    preferences.values.showAddNoteButtonInTitleBar && displayStickyNotes;
   const isAskAiIconAnimated = useIsAskAiIconAnimated(shouldDisplayAskAi);
 
   const [isGlowing, setIsGlowing] = React.useState(false);
@@ -251,7 +268,7 @@ export default function TabsTitlebar({
       className={WINDOW_DRAGGABLE_PART_CLASS_NAME}
       onDoubleClick={handleDoubleClick}
     >
-      {isLeftMostPane && <TitleBarLeftSafeMargins />}
+      {isLeftMostPane && displayLeftSafeMargins && <TitleBarLeftSafeMargins />}
       {displayMenuIcon && (
         // $FlowFixMe[incompatible-type]
         <IconButton
@@ -269,6 +286,24 @@ export default function TabsTitlebar({
         </IconButton>
       )}
       {renderTabs(onEditorTabHovered, onEditorTabClosing)}
+      {shouldDisplayStickyNotes ? (
+        <div
+          style={styles.stickyNotesContainer}
+          className={WINDOW_NON_DRAGGABLE_PART_CLASS_NAME}
+        >
+          <div
+            className={
+              isStickyNotesManagerShown ? classes.stickyNotesActive : undefined
+            }
+          >
+            <TextButton
+              icon={<AddCommentIcon />}
+              label={'Add Note'}
+              onClick={onStickyNotesClicked}
+            />
+          </div>
+        </div>
+      ) : null}
       {shouldDisplayAskAi ? (
         <div
           style={styles.askAiContainer}

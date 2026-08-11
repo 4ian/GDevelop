@@ -2839,6 +2839,54 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "Accessing a child variable of a property is not possible - just write the property name.");
     }
   }
+  SECTION("Valid JsonObject property with child syntax") {
+    {
+      gd::PropertiesContainer propertiesContainer(
+          gd::EventsFunctionsContainer::Extension);
+
+      auto projectScopedContainersWithProperties =
+          gd::ProjectScopedContainers::
+              MakeNewProjectScopedContainersForProjectAndLayout(project,
+                                                                layout1);
+      projectScopedContainersWithProperties.AddPropertiesContainer(
+          propertiesContainer);
+
+      propertiesContainer.InsertNew("CardConfig")
+          .SetType("JsonObject")
+          .SetValue(
+              "{\"price\":100,\"stats\":{\"price\":20},\"name\":\"PeaShooter\"}");
+
+      {
+        auto node = parser.ParseExpression("CardConfig.price");
+
+        gd::ExpressionValidator validator(
+            platform, projectScopedContainersWithProperties, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+
+      {
+        auto node = parser.ParseExpression("CardConfig.stats.price");
+
+        gd::ExpressionValidator validator(
+            platform, projectScopedContainersWithProperties, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+
+      {
+        auto node = parser.ParseExpression("CardConfig.stats.missing");
+
+        gd::ExpressionValidator validator(
+            platform, projectScopedContainersWithProperties, "number|string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 1);
+        REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+                "The JSON example for property \"CardConfig\" does not define "
+                "the child: missing");
+      }
+    }
+  }
 
   SECTION("Valid property (in variableOrPropertyOrParameter parameter)") {
     {
@@ -2858,11 +2906,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
                                         projectScopedContainersWithProperties,
                                         "variableOrPropertyOrParameter");
       node->Visit(validator);
-      RequireNoError(validator);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+      REQUIRE(validator.GetDeprecationWarnings().size() == 0);
     }
   }
 
-  SECTION("Valid property (in variableOrProperty parameter)") {
+  SECTION("Deprecated property write (in variableOrProperty parameter)") {
     {
       gd::PropertiesContainer propertiesContainer(
           gd::EventsFunctionsContainer::Extension);
@@ -2880,7 +2929,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
                                         projectScopedContainersWithProperties,
                                         "variableOrProperty");
       node->Visit(validator);
-      RequireNoError(validator);
+      REQUIRE(validator.GetAllErrors().size() == 0);
+      REQUIRE(validator.GetDeprecationWarnings().size() == 1);
+      REQUIRE(validator.GetDeprecationWarnings()[0]->GetMessage() ==
+              "Writing to properties from events is deprecated. Use object "
+              "variables or behavior variables to store values that change at "
+              "runtime.");
     }
   }
 

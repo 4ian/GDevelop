@@ -9,7 +9,7 @@ import mapValues from 'lodash/mapValues';
 
 // This mirrors the internals of gdjs.Variable.
 type Variable = {|
-  _type: 'string' | 'number' | 'boolean' | 'structure' | 'array',
+  _type: 'string' | 'enum' | 'number' | 'boolean' | 'structure' | 'array',
   _str: string,
   _value: number,
   _bool: boolean,
@@ -32,7 +32,8 @@ const transformVariable = (variable: Variable) => {
     value: null,
   };
 
-  if (variable._type === 'string') transformedVariable.value = variable._str;
+  if (variable._type === 'string' || variable._type === 'enum')
+    transformedVariable.value = variable._str;
   else if (variable._type === 'number')
     transformedVariable.value = variable._value;
   else if (variable._type === 'boolean')
@@ -118,6 +119,7 @@ const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
     path.push('castTo');
     if (
       edit.new_value === 'string' ||
+      edit.new_value === 'enum' ||
       edit.new_value === 'number' ||
       edit.new_value === 'boolean' ||
       edit.new_value === 'structure' ||
@@ -130,7 +132,10 @@ const handleEdit = (edit, { onCall, onEdit, variablesContainer }: Props) => {
     }
   } else if (edit.name === 'value') {
     // Validate data type
-    if (variable._type === 'string' && typeof edit.new_value !== 'string')
+    if (
+      (variable._type === 'string' || variable._type === 'enum') &&
+      typeof edit.new_value !== 'string'
+    )
       edit.new_value = '' + edit.new_value;
     else if (
       variable._type === 'number' &&

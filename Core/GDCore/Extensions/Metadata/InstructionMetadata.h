@@ -183,6 +183,41 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   }
 
   /**
+   * \brief Mark an instruction as requiring a future frame of the runtime
+   * scene that owns the events invocation.
+   *
+   * This capability is used by lifecycle-aware tooling to reject instructions
+   * from terminal scene functions, where the scene is destroyed as soon as the
+   * function returns.
+   */
+  InstructionMetadata &SetRequiresSceneFutureFrame() {
+    requiresSceneFutureFrame = true;
+    return *this;
+  }
+
+  bool RequiresSceneFutureFrame() const { return requiresSceneFutureFrame; }
+
+  /**
+   * \brief Mark an instruction as queueing a scene signal for later delivery.
+   */
+  InstructionMetadata &SetEmitsDeferredSceneSignal() {
+    emitsDeferredSceneSignal = true;
+    return *this;
+  }
+
+  bool EmitsDeferredSceneSignal() const { return emitsDeferredSceneSignal; }
+
+  /**
+   * \brief Mark an instruction as requesting a mutation of the scene stack.
+   */
+  InstructionMetadata &SetMutatesSceneStack() {
+    mutatesSceneStack = true;
+    return *this;
+  }
+
+  bool MutatesSceneStack() const { return mutatesSceneStack; }
+
+  /**
    * Notify that the instruction can have sub instructions.
    */
   InstructionMetadata &SetCanHaveSubInstructions() {
@@ -633,6 +668,9 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
   gd::String relevantContext;
   gd::String deprecationMessage;
   gd::String hint;
+  bool requiresSceneFutureFrame;
+  bool emitsDeferredSceneSignal;
+  bool mutatesSceneStack;
 };
 
 }  // namespace gd

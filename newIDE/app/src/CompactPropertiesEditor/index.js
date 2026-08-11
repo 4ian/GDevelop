@@ -96,6 +96,10 @@ const styles = {
   },
 };
 
+const hasConstantPlaceholderSyntax = (value: any): boolean =>
+  typeof value === 'string' &&
+  (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
+
 export const Separator = (): React.MixedElement => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -450,6 +454,12 @@ const CompactPropertiesEditor = ({
               }),
           placeholder: mixedValues ? '(Multiple values)' : undefined,
           onChange: (newValue: string) => {
+            if (
+              field.forbidConstantPlaceholder &&
+              hasConstantPlaceholderSyntax(newValue)
+            ) {
+              return;
+            }
             instances.forEach(i => setValue(i, newValue || ''));
             onFieldChanged({
               instances,
@@ -685,6 +695,12 @@ const CompactPropertiesEditor = ({
 
     const { setValue } = field;
     const mixedValues = hasMixedValues({ instances, field });
+    const resourceManagementPropsToUse = field.resourceExternalEditors
+      ? {
+          ...resourceManagementProps,
+          resourceExternalEditors: field.resourceExternalEditors,
+        }
+      : resourceManagementProps;
     return (
       <CompactPropertiesEditorRowField
         key={field.name}
@@ -693,8 +709,12 @@ const CompactPropertiesEditor = ({
         field={
           <CompactResourceSelectorWithThumbnail
             project={project}
-            resourceManagementProps={resourceManagementProps}
+            resourceManagementProps={resourceManagementPropsToUse}
             resourceKind={field.resourceKind}
+            importedResourcesFolder={field.importedResourcesFolder}
+            includeProjectAssetsFolder={field.includeProjectAssetsFolder}
+            defaultLocalFileDialogFolder={field.defaultLocalFileDialogFolder}
+            resourceNameFilter={field.resourceNameFilter}
             resourceName={
               mixedValues
                 ? ''

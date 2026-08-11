@@ -6,8 +6,23 @@
 /**
  * @file Tests covering EventsFunction
  */
+#include "DummyPlatform.h"
+#include "GDCore/Extensions/Platform.h"
+#include "GDCore/IDE/EventsFunctionTools.h"
+#include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
+#include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/ResourcesContainer.h"
+#include "GDCore/Project/Variable.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
 
@@ -83,6 +98,274 @@ TEST_CASE("EventsFunction", "[common]") {
     REQUIRE(eventsFunction2.GetFullName() == "My Function");
     REQUIRE(eventsFunction2.GetDescription() == "A test function");
     REQUIRE(eventsFunction2.GetHelpUrl() == "");
+  }
+
+  SECTION("Object events function scope keeps inherited prefab behaviors") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.AddNewBehavior(project, "MyExtension::MyBehavior",
+                                     "MyPrefabBehavior");
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+        project, eventsExtension, eventsBasedObject, eventsFunction,
+        objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    auto &object = objectsContainer.GetObject("Object");
+    REQUIRE(object.GetType() == "MyEventsExtension::MyEventsBasedObject");
+    REQUIRE(object.HasBehaviorNamed("MyPrefabBehavior"));
+    REQUIRE(object.GetBehavior("MyPrefabBehavior").GetTypeName() ==
+            "MyExtension::MyBehavior");
+    REQUIRE(
+        object.GetBehavior("MyPrefabBehavior").IsInheritedFromObjectType());
+  }
+
+  SECTION("Object onSignal has signal parameters and keeps Object scope") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "onSignal", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    auto &parameters = eventsFunction.GetParameters();
+    REQUIRE(parameters.GetParametersCount() == 3);
+    REQUIRE(parameters.GetParameter(0).GetName() == "Object");
+    REQUIRE(parameters.GetParameter(0).GetType() == "object");
+    REQUIRE(parameters.GetParameter(0).GetExtraInfo() ==
+            "MyEventsExtension::MyEventsBasedObject");
+    REQUIRE(parameters.GetParameter(1).GetName() == "SignalName");
+    REQUIRE(parameters.GetParameter(1).GetType() == "string");
+    REQUIRE(parameters.GetParameter(2).GetName() == "Payload");
+    REQUIRE(parameters.GetParameter(2).GetType() == "string");
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+        project, eventsExtension, eventsBasedObject, eventsFunction,
+        objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    REQUIRE(objectsContainer.GetObject("Object").GetType() ==
+            "MyEventsExtension::MyEventsBasedObject");
+  }
+
+  SECTION("Prefab variables are exposed in prefab event scopes") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedObject = eventsExtension.GetEventsBasedObjects().InsertNew(
+        "MyEventsBasedObject", 0);
+    eventsBasedObject.GetVariables()
+        .InsertNew("PrefabState", eventsBasedObject.GetVariables().Count())
+        .SetString("Idle");
+    REQUIRE(eventsBasedObject.GetVariables().GetSourceType() ==
+            gd::VariablesContainer::SourceType::Prefab);
+
+    gd::ObjectsContainer prefabConfigurationObjectsContainer(
+        gd::ObjectsContainer::SourceType::Unknown);
+    auto prefabConfigurationScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForEventsBasedObject(
+                project, eventsExtension, eventsBasedObject,
+                prefabConfigurationObjectsContainer);
+    const auto &prefabConfigurationVariablesContainersList =
+        prefabConfigurationScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(prefabConfigurationVariablesContainersList.Has("PrefabState"));
+    REQUIRE(&prefabConfigurationVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("PrefabState") ==
+            &eventsBasedObject.GetVariables());
+    REQUIRE(prefabConfigurationObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!prefabConfigurationObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("PrefabState"));
+
+    auto &eventsFunction =
+        eventsBasedObject.GetEventsFunctions().InsertNewEventsFunction(
+            "MyObjectEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedObject);
+
+    gd::ObjectsContainer parameterObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto objectFunctionScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForObjectEventsFunction(
+                project, eventsExtension, eventsBasedObject, eventsFunction,
+                parameterObjectsContainer, parameterVariablesContainer,
+                propertyVariablesContainer, parameterResourcesContainer,
+                propertyResourcesContainer);
+    const auto &objectFunctionVariablesContainersList =
+        objectFunctionScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(objectFunctionVariablesContainersList.Has("PrefabState"));
+    REQUIRE(&objectFunctionVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("PrefabState") ==
+            &eventsBasedObject.GetVariables());
+    REQUIRE(objectFunctionVariablesContainersList.Get("PrefabState")
+                .GetString() == "Idle");
+    REQUIRE(parameterObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!parameterObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("PrefabState"));
+  }
+
+  SECTION("Behavior variables are exposed in behavior event scopes") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
+    eventsBasedBehavior.GetVariables()
+        .InsertNew("BehaviorState", eventsBasedBehavior.GetVariables().Count())
+        .SetString("Idle");
+    REQUIRE(eventsBasedBehavior.GetVariables().GetSourceType() ==
+            gd::VariablesContainer::SourceType::Behavior);
+
+    gd::SerializerElement serializedBehavior;
+    eventsBasedBehavior.SerializeTo(serializedBehavior);
+    gd::EventsBasedBehavior unserializedBehavior;
+    unserializedBehavior.UnserializeFrom(project, serializedBehavior);
+    REQUIRE(unserializedBehavior.GetVariables().Has("BehaviorState"));
+    REQUIRE(unserializedBehavior.GetVariables().Get("BehaviorState")
+                .GetString() == "Idle");
+
+    auto &eventsFunction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "MyBehaviorEventsFunction", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+
+    gd::ObjectsContainer parameterObjectsContainer(
+        gd::ObjectsContainer::SourceType::Function);
+    gd::VariablesContainer parameterVariablesContainer(
+        gd::VariablesContainer::SourceType::Parameters);
+    gd::VariablesContainer propertyVariablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    gd::ResourcesContainer parameterResourcesContainer(
+        gd::ResourcesContainer::SourceType::Parameters);
+    gd::ResourcesContainer propertyResourcesContainer(
+        gd::ResourcesContainer::SourceType::Properties);
+    auto behaviorFunctionScopedContainers =
+        gd::ProjectScopedContainers::
+            MakeNewProjectScopedContainersForBehaviorEventsFunction(
+                project, eventsExtension, eventsBasedBehavior, eventsFunction,
+                parameterObjectsContainer, parameterVariablesContainer,
+                propertyVariablesContainer, parameterResourcesContainer,
+                propertyResourcesContainer);
+    const auto &behaviorFunctionVariablesContainersList =
+        behaviorFunctionScopedContainers.GetVariablesContainersList();
+
+    REQUIRE(behaviorFunctionVariablesContainersList.Has("BehaviorState"));
+    REQUIRE(&behaviorFunctionVariablesContainersList
+                 .GetVariablesContainerFromVariableNameOnly("BehaviorState") ==
+            &eventsBasedBehavior.GetVariables());
+    REQUIRE(behaviorFunctionVariablesContainersList.Get("BehaviorState")
+                .GetString() == "Idle");
+    REQUIRE(parameterObjectsContainer.HasObjectNamed("Object"));
+    REQUIRE(!parameterObjectsContainer.GetObject("Object")
+                 .GetVariables()
+                 .Has("BehaviorState"));
+  }
+
+  SECTION("Behavior onSignal has signal parameters and keeps behavior scope") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &eventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyEventsExtension", 0);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior", 0);
+    eventsBasedBehavior.SetObjectType("MyExtension::Sprite");
+
+    auto &eventsFunction =
+        eventsBasedBehavior.GetEventsFunctions().InsertNewEventsFunction(
+            "onSignal", 0);
+    gd::WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+        eventsExtension, eventsBasedBehavior);
+
+    auto &parameters = eventsFunction.GetParameters();
+    REQUIRE(parameters.GetParametersCount() == 4);
+    REQUIRE(parameters.GetParameter(0).GetName() == "Object");
+    REQUIRE(parameters.GetParameter(0).GetType() == "object");
+    REQUIRE(parameters.GetParameter(0).GetExtraInfo() == "MyExtension::Sprite");
+    REQUIRE(parameters.GetParameter(1).GetName() == "Behavior");
+    REQUIRE(parameters.GetParameter(1).GetType() == "behavior");
+    REQUIRE(parameters.GetParameter(1).GetExtraInfo() ==
+            "MyEventsExtension::MyBehavior");
+    REQUIRE(parameters.GetParameter(2).GetName() == "SignalName");
+    REQUIRE(parameters.GetParameter(2).GetType() == "string");
+    REQUIRE(parameters.GetParameter(3).GetName() == "Payload");
+    REQUIRE(parameters.GetParameter(3).GetType() == "string");
+
+    gd::ObjectsContainer objectsContainer(gd::ObjectsContainer::Function);
+    gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
+        project, eventsBasedBehavior, eventsFunction, objectsContainer);
+
+    REQUIRE(objectsContainer.HasObjectNamed("Object"));
+    REQUIRE(objectsContainer.GetObject("Object").GetType() ==
+            "MyExtension::Sprite");
+  }
+
+  SECTION("Choice properties are exposed as enum variables") {
+    gd::PropertiesContainer properties(
+        gd::EventsFunctionsContainer::FunctionOwner::Behavior);
+    auto &property = properties.InsertNew("State", 0);
+    property.SetType("Choice").SetValue("Idle");
+    property.AddChoice("Idle", "Idle");
+    property.AddChoice("Running", "Running");
+    // Older extensions can still store choices in extra info.
+    property.AddExtraInfo("Attacking");
+
+    gd::VariablesContainer variablesContainer(
+        gd::VariablesContainer::SourceType::Properties);
+    gd::EventsFunctionTools::PropertiesToVariablesContainer(
+        properties, variablesContainer);
+
+    REQUIRE(variablesContainer.Has("State"));
+    const auto &variable = variablesContainer.Get("State");
+    REQUIRE(variable.GetType() == gd::Variable::Type::Enum);
+    REQUIRE(variable.GetString() == "Idle");
+    REQUIRE(variable.GetEnumValues().size() == 3);
+    REQUIRE(variable.GetEnumValues()[0] == "Idle");
+    REQUIRE(variable.GetEnumValues()[1] == "Running");
+    REQUIRE(variable.GetEnumValues()[2] == "Attacking");
   }
 }
 

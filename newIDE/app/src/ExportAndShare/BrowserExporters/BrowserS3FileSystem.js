@@ -152,6 +152,24 @@ export default class BrowserS3FileSystem {
     return true;
   };
 
+  patchPendingTextFile = (
+    filePathSuffix: string,
+    patchText: (contents: string) => string
+  ): boolean => {
+    const normalizedFilePathSuffix = filePathSuffix.replace(/\\/g, '/');
+    for (const file of this._pendingUploadObjects) {
+      const normalizedFilePath = file.Key.replace(/\\/g, '/');
+      if (
+        normalizedFilePath === normalizedFilePathSuffix ||
+        normalizedFilePath.endsWith('/' + normalizedFilePathSuffix)
+      ) {
+        file.Body = patchText(file.Body);
+        return true;
+      }
+    }
+    return false;
+  };
+
   readFile = (file: string): any => {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;

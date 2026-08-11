@@ -270,6 +270,41 @@ class GD_CORE_API EventsCodeGenerationContext {
   bool IsFollowedByElseEvent() const { return followedByElseEvent; }
 
   /**
+   * \brief Allow object-list parameters to receive multiple picked instances.
+   *
+   * This is used while generating conditions, because conditions are the event
+   * mechanism that narrows candidate object lists before actions and
+   * expressions consume them.
+   */
+  void SetObjectListParameterPickingAllowed(bool allowed) {
+    objectListParameterPickingAllowed = allowed;
+  }
+
+  /**
+   * \brief Return true when object-list parameters can receive multiple picked
+   * instances while the generated instruction narrows the selection.
+   */
+  bool IsObjectListParameterPickingAllowed() const {
+    return objectListParameterPickingAllowed;
+  }
+
+  /**
+   * \brief Enable replacing constants placeholders in strings generated
+   * for event instructions.
+   */
+  void SetConstantPlaceholderReplacementEnabled(bool enabled) {
+    constantPlaceholderReplacementEnabled = enabled;
+  }
+
+  /**
+   * \brief Return true if strings generated in the current context should have
+   * constants placeholders replaced.
+   */
+  bool IsConstantPlaceholderReplacementEnabled() const {
+    return constantPlaceholderReplacementEnabled;
+  }
+
+  /**
    * \brief Returns true if the given object is already going to be declared
    * in this context (either as a traditional objects list, or an empty one).
    */
@@ -340,6 +375,13 @@ class GD_CORE_API EventsCodeGenerationContext {
       false;  ///< If set to true, this event is followed by an Else event
               ///< in the events list, meaning the else chain tracking variable
               ///< should be updated.
+  bool objectListParameterPickingAllowed =
+      false;  ///< True while condition object-list parameters are being
+              ///< generated, so conditions can narrow multiple candidates.
+  bool constantPlaceholderReplacementEnabled =
+      false;  ///< True while strings generated for event instructions should
+              ///< have constants placeholders replaced at code generation
+              ///< time.
 };
 
 }  // namespace gd

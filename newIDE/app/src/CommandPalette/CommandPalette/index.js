@@ -56,17 +56,27 @@ const CommandPalette: React.ComponentType<any> = React.forwardRef<
    */
   const handleCommandChoose = React.useCallback(
     (command: NamedCommand) => {
-      if (command.handler) {
+      if (typeof command.handler === 'function') {
         // Simple command
         command.handler();
         if (command.name !== 'OPEN_COMMAND_PALETTE') {
           // Don't close palette if the command is for opening it
           setMode('closed');
         }
-      } else {
+      } else if (typeof command.generateOptions === 'function') {
         // Command with options
-        selectCommand(command);
+        selectCommand({
+          name: command.name,
+          generateOptions: command.generateOptions,
+        });
         setMode('option');
+      } else {
+        console.warn(
+          `Tried to launch command ${
+            command.name
+          }, but it has no handler or options generator.`
+        );
+        setMode('closed');
       }
     },
     [selectCommand, setMode]

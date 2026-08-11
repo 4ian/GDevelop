@@ -95,7 +95,7 @@ const buildPlaceholderMainMenu = () => {
 
   if (process.platform === 'darwin') {
     template.unshift({
-      label: 'GDevelop 5',
+      label: 'GDevelop 6',
       submenu: [placeholderMenuItem],
     });
 

@@ -34,6 +34,7 @@ export const Default = (): React.Node => (
         onRenameEventsBasedObject={action('rename object')}
         onEventsBasedObjectRenamed={action('object renamed')}
         onEventsBasedObjectPasted={action('object pasted')}
+        onEventsBasedObjectMetadataChanged={action('object metadata changed')}
         onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
         onAddEventsBasedObject={cb => cb({ isRenderedIn3D: false })}
         onEventBasedObjectTypeChanged={action('onEventBasedObjectTypeChanged')}
@@ -48,13 +49,18 @@ export const Default = (): React.Node => (
         onRenameEventsBasedBehavior={action('rename behavior')}
         onEventsBasedBehaviorRenamed={action('behavior renamed')}
         onEventsBasedBehaviorPasted={action('behavior pasted')}
+        onEventsBasedBehaviorMetadataChanged={action(
+          'behavior metadata changed'
+        )}
         // Free functions
         onSelectEventsFunction={action('function selected')}
+        onOpenEventsFunctionSettings={action('function settings opened')}
         onDeleteEventsFunction={action('function deleted')}
         onAddEventsFunction={(eventsBasedBehavior, eventsBasedObject, cb) =>
           cb({ functionType: 0, name: null })
         }
         onEventsFunctionAdded={action('function added')}
+        onEventsFunctionMetadataChanged={action('function metadata changed')}
         onRenameEventsFunction={action('function renamed')}
         forceUpdateEditor={action('force editor update')}
         onSelectExtensionProperties={action('open extension properties')}

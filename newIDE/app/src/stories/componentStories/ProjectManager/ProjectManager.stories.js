@@ -26,6 +26,7 @@ const mainMenuCallbacks = {
   onOpenRecentFile: () => action('onOpenRecentFile'),
   onSaveProject: () => action('onSaveProject'),
   onSaveProjectAs: () => action('onSaveProjectAs'),
+  onReloadProject: () => action('onReloadProject'),
   onShowVersionHistory: () => action('onShowVersionHistory'),
   onCloseProject: () => action('onCloseProject'),
   onCloseApp: () => action('onCloseApp'),
@@ -33,6 +34,7 @@ const mainMenuCallbacks = {
   onInviteCollaborators: () => action('onInviteCollaborators'),
   onCreateProject: () => action('onCreateProject'),
   onOpenProjectManager: () => action('onOpenProjectManager'),
+  onOpenRecentEditorSwitcher: () => action('onOpenRecentEditorSwitcher'),
   onOpenHomePage: () => action('onOpenHomePage'),
   onOpenDebugger: () => action('onOpenDebugger'),
   onOpenAbout: () => action('onOpenAbout'),
@@ -62,6 +64,42 @@ export const NoProjectOpen = (): React.Node => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
+                  onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
+                  onOpenPrefabSettings={action('onOpenPrefabSettings')}
+                  onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
+                  onOpenConstants={action('onOpenConstants')}
+                  openBehaviorEvents={action('openBehaviorEvents')}
+                  onOpenEventBasedObjectEditor={action(
+                    'onOpenEventBasedObjectEditor'
+                  )}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'onOpenEventBasedObjectVariantEditor'
+                  )}
+                  onGlobalObjectEdited={action('onGlobalObjectEdited')}
+                  onSceneObjectEdited={action('onSceneObjectEdited')}
+                  onRenamedEventsBasedObject={action(
+                    'onRenamedEventsBasedObject'
+                  )}
+                  onDeletedEventsBasedObject={action(
+                    'onDeletedEventsBasedObject'
+                  )}
+                  onRenamedEventsBasedObjectVariant={action(
+                    'onRenamedEventsBasedObjectVariant'
+                  )}
+                  onDeletedEventsBasedObjectVariant={action(
+                    'onDeletedEventsBasedObjectVariant'
+                  )}
+                  onEventsBasedObjectChildrenEdited={action(
+                    'onEventsBasedObjectChildrenEdited'
+                  )}
+                  onEventBasedObjectTypeChanged={action(
+                    'onEventBasedObjectTypeChanged'
+                  )}
+                  onObjectGroupsModifiedOutsideEditor={action(
+                    'onObjectGroupsModifiedOutsideEditor'
+                  )}
+                  onObjectListsModified={action('onObjectListsModified')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -86,7 +124,10 @@ export const NoProjectOpen = (): React.Node => {
                   )}
                   onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
-                  onShareProject={action('onShareProject')}
+                  onEffectAdded={action('onEffectAdded')}
+                  triggerHotReloadInGameEditorIfNeeded={action(
+                    'triggerHotReloadInGameEditorIfNeeded'
+                  )}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
@@ -101,7 +142,7 @@ export const NoProjectOpen = (): React.Node => {
                     markGameAsSavedIfRelevant: async () => {},
                   }}
                   onOpenHomePage={action('openHomepage')}
-                  toggleProjectManager={action('toggleProjectManager')}
+                  closeProjectManager={action('closeProjectManager')}
                   buildMainMenuProps={{
                     i18n,
                     project: testProject.project,
@@ -142,6 +183,42 @@ export const ProjectOpen = (): React.Node => {
                   onOpenEventsFunctionsExtension={action(
                     'onOpenEventsFunctionsExtension'
                   )}
+                  onOpenCustomObjectEditor={action('onOpenCustomObjectEditor')}
+                  onOpenPrefabDetailEditor={action('onOpenPrefabDetailEditor')}
+                  onOpenPrefabSettings={action('onOpenPrefabSettings')}
+                  onOpenBehaviorSettings={action('onOpenBehaviorSettings')}
+                  onOpenConstants={action('onOpenConstants')}
+                  openBehaviorEvents={action('openBehaviorEvents')}
+                  onOpenEventBasedObjectEditor={action(
+                    'onOpenEventBasedObjectEditor'
+                  )}
+                  onOpenEventBasedObjectVariantEditor={action(
+                    'onOpenEventBasedObjectVariantEditor'
+                  )}
+                  onGlobalObjectEdited={action('onGlobalObjectEdited')}
+                  onSceneObjectEdited={action('onSceneObjectEdited')}
+                  onRenamedEventsBasedObject={action(
+                    'onRenamedEventsBasedObject'
+                  )}
+                  onDeletedEventsBasedObject={action(
+                    'onDeletedEventsBasedObject'
+                  )}
+                  onRenamedEventsBasedObjectVariant={action(
+                    'onRenamedEventsBasedObjectVariant'
+                  )}
+                  onDeletedEventsBasedObjectVariant={action(
+                    'onDeletedEventsBasedObjectVariant'
+                  )}
+                  onEventsBasedObjectChildrenEdited={action(
+                    'onEventsBasedObjectChildrenEdited'
+                  )}
+                  onEventBasedObjectTypeChanged={action(
+                    'onEventBasedObjectTypeChanged'
+                  )}
+                  onObjectGroupsModifiedOutsideEditor={action(
+                    'onObjectGroupsModifiedOutsideEditor'
+                  )}
+                  onObjectListsModified={action('onObjectListsModified')}
                   onSceneAdded={action('onSceneAdded')}
                   onExternalLayoutAdded={action('onExternalLayoutAdded')}
                   onDeleteLayout={action('onDeleteLayout')}
@@ -166,7 +243,10 @@ export const ProjectOpen = (): React.Node => {
                   )}
                   onWillInstallExtension={action('extension will be installed')}
                   onExtensionInstalled={action('onExtensionInstalled')}
-                  onShareProject={action('onShareProject')}
+                  onEffectAdded={action('onEffectAdded')}
+                  triggerHotReloadInGameEditorIfNeeded={action(
+                    'triggerHotReloadInGameEditorIfNeeded'
+                  )}
                   isOpen
                   hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
                   resourceManagementProps={fakeResourceManagementProps}
@@ -181,7 +261,7 @@ export const ProjectOpen = (): React.Node => {
                     markGameAsSavedIfRelevant: async () => {},
                   }}
                   onOpenHomePage={action('openHomepage')}
-                  toggleProjectManager={action('toggleProjectManager')}
+                  closeProjectManager={action('closeProjectManager')}
                   buildMainMenuProps={{
                     i18n,
                     project: testProject.project,

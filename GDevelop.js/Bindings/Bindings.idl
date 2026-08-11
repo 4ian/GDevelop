@@ -238,7 +238,8 @@ enum Variable_Type {
     "Variable::Number",
     "Variable::Boolean",
     "Variable::Structure",
-    "Variable::Array"
+    "Variable::Array",
+    "Variable::Enum"
 };
 
 interface VariableInstructionSwitcher {
@@ -269,6 +270,12 @@ interface Variable {
 
     void SetString([Const] DOMString str);
     [Const, Ref] DOMString GetString();
+    [Const, Ref] VectorString GetEnumValues();
+    void SetEnumValues([Const, Ref] VectorString values);
+    void AddEnumValue([Const] DOMString value);
+    void RemoveEnumValueAt([Const] unsigned long index);
+    void ClearEnumValues();
+    boolean IsValidEnumValue([Const] DOMString value);
     void SetValue([Const] double val);
     double GetValue();
     void SetBool([Const] boolean val);
@@ -314,6 +321,8 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::ExtensionScene",
   "VariablesContainer::Parameters",
   "VariablesContainer::Properties",
+  "VariablesContainer::Prefab",
+  "VariablesContainer::Behavior",
 };
 
 interface VariablesContainer {
@@ -365,6 +374,12 @@ interface ObjectGroup {
     boolean Find([Const] DOMString objectName);
 
     [Const, Ref] VectorString GetAllObjectsNames();
+
+    void AddRequiredBehavior([Const] DOMString behaviorType);
+    void RemoveRequiredBehavior([Const] DOMString behaviorType);
+    boolean HasRequiredBehavior([Const] DOMString behaviorType);
+
+    [Const, Ref] VectorString GetAllRequiredBehaviorTypes();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -690,8 +705,11 @@ interface Project {
     [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
     boolean HasEventsBasedObject([Const] DOMString type);
     [Ref] EventsBasedObject GetEventsBasedObject([Const] DOMString type);
+    void EnsureObjectInheritedBehaviors([Ref] gdObject objectToUpdate);
 
     [Ref] VariablesContainer GetVariables();
+    void SetConstantsJson([Const] DOMString constantsJson);
+    [Const, Ref] DOMString GetConstantsJson();
     [Ref] ObjectsContainer GetObjects();
     [Ref] ResourcesContainer GetResourcesManager();
 
@@ -815,6 +833,9 @@ interface ProjectScopedContainers {
   [Const, Ref] DOMString GetScopeFunctionName();
   [Const, Ref] DOMString GetScopeBehaviorName();
   [Const, Ref] DOMString GetScopeObjectName();
+  [Const, Value] DOMString GetScopeSceneLifecycleFunctionName();
+  [Ref] ProjectScopedContainers SetScopeExternalEventsName([Const] DOMString externalEventsName);
+  [Ref] ProjectScopedContainers SetScopeSceneLifecycleFunctionName([Const] DOMString lifecycleFunctionName);
 };
 
 interface ExtensionProperties {
@@ -852,7 +873,12 @@ interface Behavior {
     boolean IsFolded();
     void SetFolded(boolean folded);
 
+    boolean IsMuted();
+    void SetMuted(boolean muted);
+
     boolean IsDefaultBehavior();
+    boolean IsInheritedFromObjectType();
+    void SetInheritedFromObjectType(boolean isInheritedFromObjectType);
 
     [Ref] QuickCustomizationVisibilitiesContainer GetPropertiesQuickCustomizationVisibilities();
 };
@@ -1024,6 +1050,31 @@ interface CustomObjectConfiguration {
 };
 CustomObjectConfiguration implements ObjectConfiguration;
 
+enum SceneLifecycleEventsFunctions_Role {
+    "SceneLifecycleEventsFunctions::SceneLoad",
+    "SceneLifecycleEventsFunctions::SceneSignal",
+    "SceneLifecycleEventsFunctions::SceneUpdate",
+    "SceneLifecycleEventsFunctions::SceneUnload"
+};
+
+interface SceneLifecycleEventsFunctions {
+    [Ref] EventsFunction Get(SceneLifecycleEventsFunctions_Role role);
+    [Ref] EventsFunction GetByName([Const] DOMString name);
+    boolean Has(SceneLifecycleEventsFunctions_Role role);
+    boolean HasByName([Const] DOMString name);
+    [Ref] EventsFunction Insert(SceneLifecycleEventsFunctions_Role role);
+    [Ref] EventsFunction InsertByName([Const] DOMString name);
+    boolean Remove(SceneLifecycleEventsFunctions_Role role);
+    boolean RemoveByName([Const] DOMString name);
+    boolean HasRoleName([Const] DOMString name);
+    boolean HasValidMetadata();
+
+    [Ref] EventsFunction GetSceneLoadFunction();
+    [Ref] EventsFunction GetSceneSignalFunction();
+    [Ref] EventsFunction GetSceneUpdateFunction();
+    [Ref] EventsFunction GetSceneUnloadFunction();
+};
+
 interface Layout {
     void Layout();
 
@@ -1039,6 +1090,7 @@ interface Layout {
     [Ref] VariablesContainer GetVariables();
     [Ref] ObjectsContainer GetObjects();
     [Ref] EventsList GetEvents();
+    [Ref] SceneLifecycleEventsFunctions GetLifecycleEventsFunctions();
     [Ref] LayersContainer GetLayers();
 
     void UpdateBehaviorsSharedData([Ref] Project project);
@@ -1081,6 +1133,7 @@ interface ExternalEvents {
     void SetAssociatedLayout([Const] DOMString name);
 
     [Ref] EventsList GetEvents();
+    [Ref] SceneLifecycleEventsFunctions GetLifecycleEventsFunctions();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -1768,6 +1821,8 @@ interface Instruction {
     boolean IsInverted();
     void SetAwaited(boolean awaited);
     boolean IsAwaited();
+    void SetDisabled(boolean disable);
+    boolean IsDisabled();
     void SetParameter(unsigned long id, [Const] DOMString value);
     [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
@@ -1843,6 +1898,9 @@ interface InstructionMetadata {
     boolean IsPrivate();
     boolean IsAsync();
     boolean IsOptionallyAsync();
+    boolean RequiresSceneFutureFrame();
+    boolean EmitsDeferredSceneSignal();
+    boolean MutatesSceneStack();
     boolean IsRelevantForLayoutEvents();
     boolean IsRelevantForFunctionEvents();
     boolean IsRelevantForAsynchronousFunctionEvents();
@@ -1856,6 +1914,9 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetRelevantForFunctionEventsOnly();
     [Ref] InstructionMetadata SetRelevantForAsynchronousFunctionEventsOnly();
     [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
+    [Ref] InstructionMetadata SetRequiresSceneFutureFrame();
+    [Ref] InstructionMetadata SetEmitsDeferredSceneSignal();
+    [Ref] InstructionMetadata SetMutatesSceneStack();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] optional DOMString optionalObjectType,
@@ -3218,6 +3279,7 @@ enum ProjectDiagnostic_ErrorType {
     "ProjectDiagnostic::MissingBehavior",
     "ProjectDiagnostic::UnknownObject",
     "ProjectDiagnostic::MismatchedObjectType",
+    "ProjectDiagnostic::UnsafeExternalLayoutCreation",
 };
 
 interface ProjectDiagnostic {
@@ -3516,6 +3578,7 @@ interface EventsBasedBehavior {
     QuickCustomization_Visibility GetQuickCustomizationVisibility();
 
     [Ref] PropertiesContainer GetSharedPropertyDescriptors();
+    [Ref] VariablesContainer GetVariables();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
@@ -3576,6 +3639,13 @@ interface EventsBasedObject {
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] LayersContainer GetLayers();
     [Ref] ObjectsContainer GetObjects();
+    [Ref] VariablesContainer GetVariables();
+    [Value] VectorString GetAllBehaviorNames();
+    boolean HasBehaviorNamed([Const] DOMString name);
+    Behavior AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
+    [Ref] Behavior GetBehavior([Const] DOMString name);
+    void RemoveBehavior([Const] DOMString name);
+    boolean RenameBehavior([Const] DOMString oldName, [Const] DOMString name);
     double GetAreaMinX();
     double GetAreaMinY();
     double GetAreaMinZ();
@@ -3976,6 +4046,14 @@ interface Sprite {
     void SetImageName([Const] DOMString name);
     [Const, Ref] DOMString GetImageName();
 
+    boolean HasCustomSourceRect();
+    void SetCustomSourceRect(double x, double y, double width, double height);
+    void ClearCustomSourceRect();
+    double GetSourceRectX();
+    double GetSourceRectY();
+    double GetSourceRectWidth();
+    double GetSourceRectHeight();
+
     [Ref] Point GetOrigin();
     [Ref] Point GetCenter();
     boolean IsDefaultCenterPoint();
@@ -4068,8 +4146,14 @@ interface Model3DAnimation {
     void SetSource([Const] DOMString name);
     [Const, Ref] DOMString GetSource();
 
+    void SetSourceModelResourceName([Const] DOMString resourceName);
+    [Const, Ref] DOMString GetSourceModelResourceName();
+
     void SetShouldLoop(boolean shouldLoop);
     boolean ShouldLoop();
+
+    void SetShouldUseRootMotion(boolean shouldUseRootMotion);
+    boolean ShouldUseRootMotion();
 };
 
 interface Model3DObjectConfiguration {
@@ -4084,6 +4168,13 @@ interface Model3DObjectConfiguration {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    unsigned long GetSharedAnimationModelResourcesCount();
+    [Const, Ref] DOMString GetSharedAnimationModelResourceName(unsigned long index);
+    boolean HasSharedAnimationModelResourceNamed([Const] DOMString resourceName);
+    void AddSharedAnimationModelResource([Const] DOMString resourceName);
+    void RemoveSharedAnimationModelResource(unsigned long index);
+    void RemoveAllSharedAnimationModelResources();
 
     double GetWidth();
     double GetHeight();
@@ -4438,6 +4529,9 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetShouldReloadLibraries(boolean enable);
     [Ref] PreviewExportOptions SetShouldGenerateScenesEventsCode(boolean enable);
     [Ref] PreviewExportOptions SetNativeMobileApp(boolean enable);
+    [Ref] PreviewExportOptions SetDisplayCollisionShapes(boolean enable);
+    [Ref] PreviewExportOptions SetDisplayCollisionMask(boolean enable);
+    [Ref] PreviewExportOptions SetDisplaySignalAnimations(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetIsDevelopmentEnvironment(boolean enable);
     [Ref] PreviewExportOptions SetIsInGameEdition(boolean enable);

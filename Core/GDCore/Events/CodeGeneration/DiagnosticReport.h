@@ -23,6 +23,7 @@ class GD_CORE_API ProjectDiagnostic {
     MissingBehavior,
     UnknownObject,
     MismatchedObjectType,
+    UnsafeExternalLayoutCreation,
   };
 
   ProjectDiagnostic(ErrorType type_,

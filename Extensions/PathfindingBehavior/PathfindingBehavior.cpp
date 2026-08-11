@@ -107,6 +107,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
           gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
   properties["SmoothingMaxCellGap"]
       .SetLabel(_("Smoothing max cell gap"))
+      .SetType("Number")
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
       .SetGroup(_("Path smoothing"))

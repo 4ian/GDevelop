@@ -374,6 +374,7 @@ namespace gdjs {
       _bool: false,
       _children: {},
       _childrenArray: [],
+      _enumValues: [],
       _str: '',
       _undefinedInContainer: true,
       _value: 0,
@@ -417,6 +418,27 @@ namespace gdjs {
         return;
       },
       setString: function () {
+        return;
+      },
+      getEnumValues: function () {
+        return [];
+      },
+      setEnumValues: function () {
+        return;
+      },
+      addEnumValue: function () {
+        return;
+      },
+      removeEnumValueAt: function () {
+        return;
+      },
+      clearEnumValues: function () {
+        return;
+      },
+      isValidEnumValue: function () {
+        return true;
+      },
+      _normalizeEnumValue: function () {
         return;
       },
       setBoolean: function () {

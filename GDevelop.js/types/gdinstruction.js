@@ -8,6 +8,8 @@ declare class gdInstruction {
   isInverted(): boolean;
   setAwaited(awaited: boolean): void;
   isAwaited(): boolean;
+  setDisabled(disable: boolean): void;
+  isDisabled(): boolean;
   setParameter(id: number, value: string): void;
   getParameter(id: number): gdExpression;
   setParametersCount(count: number): void;

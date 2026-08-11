@@ -177,6 +177,27 @@ namespace gdjs {
     height: float;
     depth: float;
   }
+
+  /** @internal */
+  export type BoneAttachmentFailure =
+    | 'deleted-object'
+    | 'container-mismatch'
+    | 'layer-mismatch'
+    | 'layer-group-mismatch'
+    | 'renderer-parent-mismatch'
+    | 'missing-bone'
+    | 'ambiguous-bone'
+    | 'invalid-bone-transform';
+
+  /** @internal */
+  export type Model3DBoneAttachment = {
+    target: gdjs.Model3DRuntimeObject;
+    boneName: string;
+    positionOffset: [number, number, number];
+    rotationOffset: [number, number, number];
+    isResolved: boolean;
+    lastFailure: gdjs.BoneAttachmentFailure | null;
+  };
   /**
    * Base parameters for {@link gdjs.RuntimeObject3D}
    * @category Objects > 3D Objects
@@ -209,6 +230,7 @@ namespace gdjs {
     implements Base3DHandler
   {
     private object: gdjs.RuntimeObject & Base3DHandler;
+    private _model3DBoneAttachment: gdjs.Model3DBoneAttachment | null = null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -226,11 +248,106 @@ namespace gdjs {
 
     onDeActivate() {}
 
-    onDestroy() {}
+    onDestroy() {
+      const manager = gdjs.Model3DBoneAttachmentManager.getForScene(
+        this.owner.getRuntimeScene()
+      );
+      if (manager) manager.detach(this);
+      this._model3DBoneAttachment = null;
+    }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
+
+    /** @internal */
+    _getModel3DBoneAttachment(): gdjs.Model3DBoneAttachment | null {
+      return this._model3DBoneAttachment;
+    }
+
+    /** @internal */
+    _setModel3DBoneAttachment(
+      attachment: gdjs.Model3DBoneAttachment | null
+    ): void {
+      this._model3DBoneAttachment = attachment;
+    }
+
+    attachToModelBone(
+      target: gdjs.Model3DRuntimeObject,
+      boneName: string
+    ): void {
+      gdjs.Model3DBoneAttachmentManager.getOrCreateForScene(
+        this.owner.getRuntimeScene()
+      ).attach(this, target, boneName);
+    }
+
+    detachFromModelBone(): void {
+      const manager = gdjs.Model3DBoneAttachmentManager.getForScene(
+        this.owner.getRuntimeScene()
+      );
+      if (manager) manager.detach(this);
+      else this._model3DBoneAttachment = null;
+    }
+
+    setBoneAttachmentPositionOffset(x: float, y: float, z: float): void {
+      const attachment = this._model3DBoneAttachment;
+      if (!attachment) return;
+      attachment.positionOffset[0] = x;
+      attachment.positionOffset[1] = y;
+      attachment.positionOffset[2] = z;
+      const manager = gdjs.Model3DBoneAttachmentManager.getForScene(
+        this.owner.getRuntimeScene()
+      );
+      if (manager) manager.synchronizeBehavior(this);
+    }
+
+    setBoneAttachmentRotationOffset(x: float, y: float, z: float): void {
+      const attachment = this._model3DBoneAttachment;
+      if (!attachment) return;
+      attachment.rotationOffset[0] = x;
+      attachment.rotationOffset[1] = y;
+      attachment.rotationOffset[2] = z;
+      const manager = gdjs.Model3DBoneAttachmentManager.getForScene(
+        this.owner.getRuntimeScene()
+      );
+      if (manager) manager.synchronizeBehavior(this);
+    }
+
+    isAttachedToModelBone(): boolean {
+      return !!this._model3DBoneAttachment;
+    }
+
+    isBoneAttachmentResolved(): boolean {
+      return !!this._model3DBoneAttachment?.isResolved;
+    }
+
+    getAttachedBoneName(): string {
+      return this._model3DBoneAttachment?.boneName || '';
+    }
+
+    getBoneAttachmentOffsetX(): float {
+      return this._model3DBoneAttachment?.positionOffset[0] || 0;
+    }
+
+    getBoneAttachmentOffsetY(): float {
+      return this._model3DBoneAttachment?.positionOffset[1] || 0;
+    }
+
+    getBoneAttachmentOffsetZ(): float {
+      return this._model3DBoneAttachment?.positionOffset[2] || 0;
+    }
+
+    getBoneAttachmentRotationOffsetX(): float {
+      return this._model3DBoneAttachment?.rotationOffset[0] || 0;
+    }
+
+    getBoneAttachmentRotationOffsetY(): float {
+      return this._model3DBoneAttachment?.rotationOffset[1] || 0;
+    }
+
+    getBoneAttachmentRotationOffsetZ(): float {
+      return this._model3DBoneAttachment?.rotationOffset[2] || 0;
+    }
 
     setZ(z: float): void {
       this.object.setZ(z);

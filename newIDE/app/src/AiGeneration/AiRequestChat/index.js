@@ -22,6 +22,7 @@ import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import AlertMessage from '../../UI/AlertMessage';
 import classes from './AiRequestChat.module.css';
 import RobotIcon from '../../ProjectCreation/RobotIcon';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   type Quota,
   type UsagePrice,
@@ -36,6 +37,8 @@ import {
   getFunctionCallOutputsFromEditorFunctionCallResults,
   getFunctionCallsToProcess,
 } from '../AiRequestUtils';
+import HelpQuestion from '../../UI/CustomSvgIcons/HelpQuestion';
+import Hammer from '../../UI/CustomSvgIcons/Hammer';
 import { ChatMessages } from './ChatMessages';
 import Send from '../../UI/CustomSvgIcons/Send';
 import classNames from 'classnames';
@@ -43,26 +46,22 @@ import {
   type AiConfigurationPresetWithAvailability,
   getDefaultAiConfigurationPresetId,
 } from '../AiConfiguration';
-import { ReasoningLevelSelector } from './ReasoningLevelSelector';
+import { AiConfigurationPresetSelector } from './AiConfigurationPresetSelector';
 import { AiRequestContext } from '../AiRequestContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useStickyVisibility } from './UseStickyVisibility';
-import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import CircledInfo from '../../UI/CustomSvgIcons/CircledInfo';
 import Coin from '../../Credits/Icons/Coin';
-import LinearProgress from '../../UI/LinearProgress';
 import FlatButton from '../../UI/FlatButton';
 import GoldCompact from '../../Profile/Subscription/Icons/GoldCompact';
 import { SubscriptionContext } from '../../Profile/Subscription/SubscriptionContext';
 import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import Paper from '../../UI/Paper';
+import SelectOption from '../../UI/SelectOption';
+import CompactSelectField from '../../UI/CompactSelectField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type FileMetadata } from '../../ProjectsStorage';
 import Stop from '../../UI/CustomSvgIcons/Stop';
-import AutoEditButton from './AutoEditButton';
-import { EditApprovalRow } from './EditApprovalRow';
-import { type EditApprovalRequest } from '../Utils';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -84,36 +83,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
-  quotaContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    overflow: 'hidden',
-    gap: 4,
-    width: '100%',
-  },
-  quotaInfoIconSpan: {
-    flexShrink: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
-  },
-  quotaInfoIcon: {
-    fontSize: 18,
-  },
-  quotaProgressBarWrapper: {
-    width: 30,
-  },
-  quotaProgressBar: {
-    height: 4,
-    borderRadius: 2,
-  },
-  quotaCoinSpan: {
-    verticalAlign: 'middle',
-    display: 'inline-block',
-    marginRight: 4,
-  },
-  quotaPlaceholder: {
-    height: 29,
-  },
 };
 
 const getRowsAndHeight = ({
@@ -131,100 +100,94 @@ const getPriceAndRequestsTextAndTooltip = ({
   quota,
   price,
   availableCredits,
+  selectedMode,
   automaticallyUseCreditsForAiRequests,
   isRefreshingLimits,
-  progressBarColor,
-  progressTrackColor,
-  onOpenSubscriptionDialog,
-  hideLabel,
 }: {|
   quota: Quota | null,
   price: UsagePrice | null,
   availableCredits: number,
+  selectedMode: 'chat' | 'agent' | 'orchestrator',
   automaticallyUseCreditsForAiRequests: boolean,
   isRefreshingLimits?: boolean,
-  progressBarColor: string,
-  progressTrackColor: string,
-  onOpenSubscriptionDialog: () => void,
-  hideLabel?: boolean,
 |}): React.Node => {
   if (!quota || !price) {
     if (isRefreshingLimits) {
-      // No value yet: show only the indeterminate bar and the (i) icon, no label.
+      // Placeholder to avoid layout shift, while showing the (i) icon.
       return (
-        <div style={styles.quotaContainer}>
-          <div style={styles.quotaProgressBarWrapper}>
-            <LinearProgress
-              variant="indeterminate"
-              barColor={progressBarColor}
-              trackColor={progressTrackColor}
-              style={{ ...styles.quotaProgressBar }}
-            />
-          </div>
-          <span style={styles.quotaInfoIconSpan}>
-            <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
+        <Text
+          size="body-small"
+          color="secondary"
+          noMargin
+          // $FlowFixMe[incompatible-type]
+          style={{ textAlign: 'right' }}
+        >
+          <Trans>Calculating...</Trans>
+          <span
+            style={{
+              verticalAlign: 'middle',
+              display: 'inline-block',
+              marginRight: -3,
+              marginTop: 1,
+            }}
+          >
+            <CircledInfo color="inherit" />
           </span>
-        </div>
+        </Text>
       );
     }
     // Placeholder to avoid layout shift.
-    return <div style={styles.quotaPlaceholder} />;
+    return <div style={{ height: 29 }} />;
   }
 
   const aiCreditsAvailable = Math.max(0, quota.max - quota.current);
-  const percentage =
-    quota.max > 0 ? Math.round((aiCreditsAvailable / quota.max) * 100) : 0;
+
+  const currentQuotaText = (
+    <Trans>{aiCreditsAvailable} AI credits available</Trans>
+  );
+  const creditsText = (
+    <Trans>{Math.max(0, availableCredits)} credits available</Trans>
+  );
 
   const timeForReset = quota.resetsAt ? new Date(quota.resetsAt) : null;
   const now = new Date();
-
-  let dateString = '';
-  let timeString = '';
-  if (timeForReset && timeForReset.getTime() - now.getTime() > 0) {
-    dateString = timeForReset.toLocaleDateString(undefined, {
+  let summarySentence =
+    quota.period === '7days' ? (
+      <Trans>Your credits reset every week.</Trans>
+    ) : quota.period === '30days' ? (
+      <Trans>Your credits reset every month.</Trans>
+    ) : (
+      <Trans>Your credits reset every day.</Trans>
+    );
+  if (timeForReset) {
+    const timeDiff = timeForReset.getTime() - now.getTime();
+    // Date to look like 'Nov 30th'
+    const dateString = timeForReset.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     });
-    timeString = timeForReset.toLocaleTimeString(undefined, {
+    // Time to look like '14:05'
+    const timeString = timeForReset.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
     });
+    if (timeDiff <= 0) {
+      summarySentence = <Trans>Your credits will reset soon.</Trans>;
+    } else {
+      summarySentence = (
+        <Trans>
+          You need to wait until {dateString} at {timeString} to reset to
+          {quota.max} AI credits.
+        </Trans>
+      );
+    }
   }
-  const hasTimeForReset = !!dateString;
-
-  const tooltipSentence = hasTimeForReset ? (
-    quota.period === '7days' ? (
-      <Trans>
-        You still have {percentage}% left on this week's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    ) : quota.period === '30days' ? (
-      <Trans>
-        You still have {percentage}% left on this month's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    ) : (
-      <Trans>
-        You still have {percentage}% left on today's AI usage. It resets on{' '}
-        {dateString} at {timeString}.
-      </Trans>
-    )
-  ) : quota.period === '7days' ? (
-    <Trans>You still have {percentage}% left on this week's AI usage.</Trans>
-  ) : quota.period === '30days' ? (
-    <Trans>You still have {percentage}% left on this month's AI usage.</Trans>
-  ) : (
-    <Trans>You still have {percentage}% left on today's AI usage.</Trans>
-  );
 
   const tooltipText = (
     <ColumnStackLayout noMargin>
-      <Line noMargin>{tooltipSentence}</Line>
-      <Line noMargin justifyContent="space-between">
-        <Link href="#" color="secondary" onClick={onOpenSubscriptionDialog}>
-          <Trans>Need more?</Trans>
-        </Link>
+      {summarySentence && <Line noMargin>{summarySentence}</Line>}
+      <Line noMargin>
         <Link
           href={getHelpLink('/interface/ai/', 'cost-of-ai-requests')}
           color="secondary"
@@ -234,7 +197,7 @@ const getPriceAndRequestsTextAndTooltip = ({
             )
           }
         >
-          <Trans>Learn more</Trans>
+          Learn more
         </Link>
       </Line>
     </ColumnStackLayout>
@@ -243,50 +206,86 @@ const getPriceAndRequestsTextAndTooltip = ({
   const shouldShowCredits =
     quota.limitReached && automaticallyUseCreditsForAiRequests;
 
+  const iconSpanStyle = {
+    verticalAlign: 'middle',
+    display: 'inline-block',
+    marginTop: 1,
+  };
+
   return (
-    <div style={styles.quotaContainer}>
-      {!hideLabel && (
-        <Text size="body-small" color="secondary" noMargin>
-          {shouldShowCredits ? (
-            <>
-              <span style={styles.quotaCoinSpan}>
-                <Coin fontSize="small" />
-              </span>
-              <Trans>{Math.max(0, availableCredits)} credits available</Trans>
-            </>
-          ) : (
-            <Trans>{percentage}% left</Trans>
-          )}
-        </Text>
+    <Text
+      size="body-small"
+      color="secondary"
+      noMargin
+      // $FlowFixMe[incompatible-type]
+      style={{ textAlign: 'right' }}
+    >
+      {!isRefreshingLimits && shouldShowCredits && (
+        <span style={{ ...iconSpanStyle, marginRight: 4 }}>
+          <Coin fontSize="small" />
+        </span>
       )}
-      {!shouldShowCredits && (
-        <div style={styles.quotaProgressBarWrapper}>
-          <LinearProgress
-            variant={isRefreshingLimits ? 'indeterminate' : 'determinate'}
-            value={isRefreshingLimits ? undefined : percentage}
-            barColor={progressBarColor}
-            trackColor={progressTrackColor}
-            style={{ ...styles.quotaProgressBar }}
-          />
-        </div>
+      {isRefreshingLimits ? (
+        <Trans>Calculating...</Trans>
+      ) : shouldShowCredits ? (
+        creditsText
+      ) : (
+        currentQuotaText
       )}
-      <span style={styles.quotaInfoIconSpan}>
-        <Tooltip
-          title={tooltipText}
-          placement="top"
-          interactive
-          // Show on simple touch (not long press) and leave time to tap the links.
-          enterTouchDelay={0}
-          leaveTouchDelay={5000}
-        >
-          <CircledInfo color="inherit" style={styles.quotaInfoIcon} />
+      <span style={{ ...iconSpanStyle, marginRight: -3 }}>
+        <Tooltip title={tooltipText} placement="top" interactive>
+          <CircledInfo color="inherit" />
         </Tooltip>
       </span>
-    </div>
+    </Text>
   );
 };
 
-const getSendButtonIcon = (): React.Node => <Send fontSize="small" />;
+const getSendButtonLabelAndIcon = ({
+  aiRequest,
+  selectedMode,
+  isWorking,
+  isMobile,
+  hasOpenedProject,
+  standAloneForm,
+}: {|
+  aiRequest: AiRequest | null,
+  selectedMode?: 'chat' | 'agent' | 'orchestrator',
+  isWorking: boolean,
+  isMobile: boolean,
+  hasOpenedProject: boolean,
+  standAloneForm?: boolean,
+|}): { label: React.Node, icon: React.Node } => {
+  if (aiRequest && !standAloneForm) {
+    // We're in a running chat, that is not standalone,
+    // hide label.
+    return { label: null, icon: <Send fontSize="small" /> };
+  }
+
+  return selectedMode === 'agent' || selectedMode === 'orchestrator'
+    ? isWorking
+      ? { label: <Trans>Building...</Trans>, icon: <Send fontSize="small" /> }
+      : isMobile
+      ? { label: <Trans>Build</Trans>, icon: <Send fontSize="small" /> }
+      : hasOpenedProject && !standAloneForm
+      ? {
+          label: <Trans>Build this on my game</Trans>,
+          icon: <Send fontSize="small" />,
+        }
+      : {
+          label: <Trans>Start building the game</Trans>,
+          icon: <Send fontSize="small" />,
+        }
+    : isWorking
+    ? { label: <Trans>Sending...</Trans>, icon: <Send fontSize="small" /> }
+    : { label: <Trans>Send</Trans>, icon: <Send fontSize="small" /> };
+};
+
+const actionsOnExistingProject = [
+  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
+  t`Add a score and display it on the screen`,
+  t`Create a 3D explosion when the player is hit`,
+];
 
 const actionsToCreateAProject = [
   t`Start a simple platformer with a player that can move and jump`,
@@ -299,17 +298,17 @@ const actionsToCreateAProject = [
   t`Create a simple flying game with obstacles to avoid`,
 ];
 
-const actionsOnExistingProject = [
+const generalQuestions = [
+  t`How to add a leaderboard?`,
+  t`How to display the health of my player?`,
+  t`How to add an explosion when an enemy is destroyed?`,
+  t`How to create a main menu for my game?`,
+];
+
+const questionsOnExistingProject = [
   t`What would you add to my game?`,
   t`How to make my game more fun?`,
   t`What is a good GDevelop feature I could use in my game?`,
-  t`I want to add a leaderboard`,
-  t`I want to display the health of my player`,
-  t`I want to add an explosion when an enemy is destroyed`,
-  t`I want to create a main menu for my game`,
-  t`Add solid rocks that falls from the sky at a random position around the player every 0.5 seconds`,
-  t`Add a score and display it on the screen`,
-  t`Create a 3D explosion when the player is hit`,
 ];
 
 type Props = {|
@@ -323,15 +322,12 @@ type Props = {|
   onStartNewAiRequest: ({|
     mode: 'chat' | 'agent' | 'orchestrator',
     userRequest: string,
-    aiConfigurationPresetId: string,
+    aiConfigurationPresetId: string | null,
   |}) => void,
   onSendUserMessage: ({|
     userMessage: string,
+    mode: 'chat' | 'agent' | 'orchestrator',
   |}) => Promise<void>,
-  // Called whenever the local "Auto edit" toggle changes (and on mount), so the
-  // container can gate project-modifying tool calls behind a confirmation when
-  // it is off. Auto edit is a frontend-only concern and is not sent to the API.
-  onIsAutoEditEnabledChange?: (isAutoEditEnabled: boolean) => void,
   onSendFeedback: (
     aiRequestId: string,
     messageIndex: number,
@@ -373,11 +369,6 @@ type Props = {|
     message: AiRequestMessage,
     aiRequest: AiRequest,
   |}) => Promise<void>,
-  // Inline "Apply this edit?" approval, shown when auto-edit is off and the AI
-  // is about to modify the project. Absent in contexts that never gate edits
-  // (e.g. the standalone form).
-  pendingEditApproval?: EditApprovalRequest | null,
-  onResolveEditApproval?: (accepted: boolean) => void,
 |};
 
 export type AiRequestChatInterface = {|
@@ -418,68 +409,24 @@ export const AiRequestChat: React.ComponentType<{
       savingProjectForMessageId,
       forkingState,
       onRestore,
-      onIsAutoEditEnabledChange,
-      pendingEditApproval,
-      onResolveEditApproval,
     }: Props,
     ref
   ) => {
     const project = exceptionallyGuardAgainstDeadObject(nullableProject);
-    const { isMobile } = useResponsiveWindowSize();
     const {
       aiRequestHistory: { handleNavigateHistory, resetNavigation },
       activeSubAgents,
     } = React.useContext(AiRequestContext);
+    const [selectedMode, setSelectedMode] = React.useState<
+      'chat' | 'agent' | 'orchestrator'
+    >(
+      (aiRequest && aiRequest.mode) ||
+        (hasOpenedProject ? 'chat' : 'orchestrator')
+    );
     const {
-      values: {
-        automaticallyUseCreditsForAiRequests,
-        automaticallyApplyAiRequestEditsByProjectId,
-      },
+      values: { automaticallyUseCreditsForAiRequests },
       setAutomaticallyUseCreditsForAiRequests,
-      setAutomaticallyApplyAiRequestEditsForProjectId,
     } = React.useContext(PreferencesContext);
-    const selectedMode = 'orchestrator';
-    const aiRequestId: string = aiRequest ? aiRequest.id : '';
-    const projectId = project ? project.getProjectUuid() : null;
-    // "Auto edit" defaults to on, unless the user turned it off for this project.
-    const isAutoEditEnabled =
-      !hasOpenedProject ||
-      !!standAloneForm ||
-      projectId == null ||
-      automaticallyApplyAiRequestEditsByProjectId[projectId] !== false;
-    // Persist the choice for the project.
-    const toggleAutoEdit = React.useCallback(
-      () => {
-        if (projectId == null) return;
-        setAutomaticallyApplyAiRequestEditsForProjectId(
-          projectId,
-          !isAutoEditEnabled
-        );
-      },
-      [
-        projectId,
-        isAutoEditEnabled,
-        setAutomaticallyApplyAiRequestEditsForProjectId,
-      ]
-    );
-    // Accept the pending edit and turn auto-edit on for the project.
-    const acceptEditAndEnableAutoEdit = React.useCallback(
-      () => {
-        if (projectId != null)
-          setAutomaticallyApplyAiRequestEditsForProjectId(projectId, true);
-        if (onResolveEditApproval) onResolveEditApproval(true);
-      },
-      [
-        projectId,
-        setAutomaticallyApplyAiRequestEditsForProjectId,
-        onResolveEditApproval,
-      ]
-    );
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const progressBarColor =
-      gdevelopTheme.palette.type === 'light' ? '#7046EC' : '#9979F1';
-    const progressTrackColor =
-      gdevelopTheme.palette.type === 'light' ? '#D9D9DE' : '#32323B';
     const { openSubscriptionDialog } = React.useContext(SubscriptionContext);
     const { openCreditsPackageDialog } = React.useContext(
       CreditsPackageStoreContext
@@ -523,9 +470,14 @@ export const AiRequestChat: React.ComponentType<{
         );
         setAiConfigurationPresetId(null);
       },
-      [aiConfigurationPresetsWithAvailability, aiConfigurationPresetId]
+      [
+        selectedMode,
+        aiConfigurationPresetsWithAvailability,
+        aiConfigurationPresetId,
+      ]
     );
 
+    const aiRequestId: string = aiRequest ? aiRequest.id : '';
     const [
       userRequestTextPerAiRequestId,
       setUserRequestTextPerRequestId,
@@ -563,16 +515,6 @@ export const AiRequestChat: React.ComponentType<{
       ]
     );
 
-    // Always scroll to the bottom when an edit approval prompt appears
-    // ("Apply this change?"), even if the user scrolled up: the request is
-    // paused on it, so they must see it to answer.
-    React.useEffect(
-      () => {
-        if (pendingEditApproval) scrollToBottom();
-      },
-      [pendingEditApproval, scrollToBottom]
-    );
-
     const onScroll = React.useCallback(
       ({ remainingScreensToBottom }: { remainingScreensToBottom: number }) => {
         // Consider the user is at the bottom when they are less than 0.1 screen away from the bottom.
@@ -585,15 +527,19 @@ export const AiRequestChat: React.ComponentType<{
     const newChatPlaceholder = React.useMemo(
       () => {
         const newChatPlaceholders: Array<MessageDescriptor> =
-          !hasOpenedProject || standAloneForm
-            ? actionsToCreateAProject
-            : actionsOnExistingProject;
+          selectedMode === 'agent' || selectedMode === 'orchestrator'
+            ? hasOpenedProject && !standAloneForm
+              ? actionsOnExistingProject
+              : actionsToCreateAProject
+            : hasOpenedProject && !standAloneForm
+            ? [...questionsOnExistingProject, ...generalQuestions]
+            : generalQuestions;
 
         return newChatPlaceholders[
           Math.floor(Math.random() * newChatPlaceholders.length)
         ];
       },
-      [hasOpenedProject, standAloneForm]
+      [selectedMode, hasOpenedProject, standAloneForm]
     );
 
     const onUserRequestTextChange = React.useCallback(
@@ -620,18 +566,6 @@ export const AiRequestChat: React.ComponentType<{
       [resetNavigation, aiRequestId]
     );
 
-    // Bridge the local "Auto edit" toggle up to the container so it can gate
-    // project-modifying tool calls behind a confirmation when it is off. Auto
-    // edit is a frontend-only concern (not persisted on the AI request).
-    React.useEffect(
-      () => {
-        if (onIsAutoEditEnabledChange) {
-          onIsAutoEditEnabledChange(isAutoEditEnabled);
-        }
-      },
-      [isAutoEditEnabled, onIsAutoEditEnabledChange]
-    );
-
     React.useImperativeHandle(ref, () => ({
       resetUserInput: (aiRequestId: string | null) => {
         const aiRequestIdToReset: string = aiRequestId || '';
@@ -655,6 +589,8 @@ export const AiRequestChat: React.ComponentType<{
       },
     }));
 
+    const { isMobile } = useResponsiveWindowSize();
+
     const errorText = lastSendError ? (
       <Text size="body-small" color="error">
         <Trans>
@@ -673,27 +609,22 @@ export const AiRequestChat: React.ComponentType<{
       quota,
       price,
       availableCredits,
+      selectedMode,
       automaticallyUseCreditsForAiRequests,
       isRefreshingLimits: isRefreshingLimitsStable,
-      progressBarColor,
-      progressTrackColor,
-      hideLabel: isMobile,
-      onOpenSubscriptionDialog: () =>
-        openSubscriptionDialog({
-          analyticsMetadata: {
-            reason: 'AI requests (subscribe)',
-            recommendedPlanId: 'gdevelop_gold',
-            placementId: 'ai-requests',
-          },
-        }),
     });
 
-    const chosenOrDefaultAiConfigurationPresetId =
-      aiConfigurationPresetId ||
-      getDefaultAiConfigurationPresetId(
-        selectedMode,
-        aiConfigurationPresetsWithAvailability
-      );
+    const shouldDisplayAiConfigurationPresetSelector =
+      aiConfigurationPresetsWithAvailability.filter(
+        preset => preset.mode === selectedMode
+      ).length > 0;
+    const chosenOrDefaultAiConfigurationPresetId = shouldDisplayAiConfigurationPresetSelector
+      ? aiConfigurationPresetId ||
+        getDefaultAiConfigurationPresetId(
+          selectedMode,
+          aiConfigurationPresetsWithAvailability
+        )
+      : null;
     const hasFunctionsCallsToProcess =
       aiRequest &&
       getFunctionCallsToProcess({
@@ -720,31 +651,9 @@ export const AiRequestChat: React.ComponentType<{
       !!hasWorkingFunctionCalls ||
       !!hasFunctionsCallsToProcess ||
       hasActiveSubAgents ||
-      // Fetching suggestions also flips the request to "working" on the backend,
-      // but that is best-effort background work and must not block the input.
-      (!!aiRequest && aiRequest.status === 'working' && !isFetchingSuggestions);
+      (!!aiRequest && aiRequest.status === 'working');
     const isWorking = isSending || hasWorkToProcess;
     const canRequestBeStopped = isWorking && !!aiRequest;
-
-    // When the AI finishes working, the input field gets re-enabled but has
-    // lost the focus (it was disabled while working). Focus it again, unless
-    // the user moved the focus to another element in the meantime.
-    const previousIsWorkingRef = React.useRef<boolean>(isWorking);
-    React.useEffect(
-      () => {
-        if (previousIsWorkingRef.current && !isWorking) {
-          const activeElement = document.activeElement;
-          if (
-            (!activeElement || activeElement === document.body) &&
-            existingChatTextFieldRef.current
-          ) {
-            existingChatTextFieldRef.current.focus();
-          }
-        }
-        previousIsWorkingRef.current = isWorking;
-      },
-      [isWorking]
-    );
 
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
@@ -777,7 +686,17 @@ export const AiRequestChat: React.ComponentType<{
       // If a request is ongoing, the ChatMessages.js will show the prompt instead.
       !aiRequest;
 
-    const sendButtonIcon = getSendButtonIcon();
+    const {
+      label: sendButtonLabel,
+      icon: sendButtonIcon,
+    } = getSendButtonLabelAndIcon({
+      aiRequest,
+      selectedMode,
+      isWorking,
+      isMobile,
+      hasOpenedProject,
+      standAloneForm,
+    });
 
     const onSubmitForNewChat = React.useCallback(
       async () => {
@@ -812,6 +731,7 @@ export const AiRequestChat: React.ComponentType<{
         cannotContinue,
         hasOpenedProject,
         showConfirmation,
+        selectedMode,
         standAloneForm,
       ]
     );
@@ -825,6 +745,7 @@ export const AiRequestChat: React.ComponentType<{
 
         return onSendUserMessage({
           userMessage: userRequestTextPerAiRequestId[aiRequestId] || '',
+          mode: selectedMode,
         });
       },
       [
@@ -833,6 +754,7 @@ export const AiRequestChat: React.ComponentType<{
         userRequestTextPerAiRequestId,
         scrollToBottom,
         cannotContinue,
+        selectedMode,
       ]
     );
 
@@ -930,11 +852,29 @@ export const AiRequestChat: React.ComponentType<{
                       <Column>
                         <LineStackLayout
                           alignItems="flex-end"
-                          justifyContent="flex-end"
+                          justifyContent="space-between"
                         >
+                          {shouldDisplayAiConfigurationPresetSelector ? (
+                            <AiConfigurationPresetSelector
+                              chosenOrDefaultAiConfigurationPresetId={
+                                chosenOrDefaultAiConfigurationPresetId || ''
+                              }
+                              setAiConfigurationPresetId={
+                                setAiConfigurationPresetId
+                              }
+                              aiConfigurationPresetsWithAvailability={
+                                aiConfigurationPresetsWithAvailability
+                              }
+                              aiRequestMode={selectedMode}
+                              disabled={isWorking}
+                            />
+                          ) : (
+                            <span />
+                          )}
                           <RaisedButton
                             color="primary"
                             icon={sendButtonIcon}
+                            label={sendButtonLabel}
                             style={{ flexShrink: 0 }}
                             disabled={isButtonLoading || shouldDisableButton}
                             onClick={onClickNewChatButton}
@@ -1048,37 +988,47 @@ export const AiRequestChat: React.ComponentType<{
                   noMargin
                   expand
                   alignItems="center"
-                  justifyContent={
-                    // In the standalone form the left-side controls (auto-edit,
-                    // reasoning selector) are never rendered, so keep the usage
-                    // text on the right whether or not a project is open.
-                    standAloneForm ? 'flex-end' : 'space-between'
-                  }
+                  justifyContent="space-between"
                 >
-                  {!standAloneForm && (
-                    <LineStackLayout noMargin alignItems="center" neverShrink>
-                      {hasOpenedProject && (
-                        <AutoEditButton
-                          isAutoEditEnabled={isAutoEditEnabled}
-                          onToggle={toggleAutoEdit}
-                        />
-                      )}
-                      <ReasoningLevelSelector
-                        chosenOrDefaultAiConfigurationPresetId={
-                          chosenOrDefaultAiConfigurationPresetId
-                        }
-                        setAiConfigurationPresetId={setAiConfigurationPresetId}
-                        aiConfigurationPresetsWithAvailability={
-                          aiConfigurationPresetsWithAvailability
-                        }
+                  <Column noMargin>
+                    {!standAloneForm && (
+                      <CompactSelectField
                         disabled={isWorking}
-                        showSelectedLabel={!hasOpenedProject}
-                      />
-                    </LineStackLayout>
-                  )}
-                  <Column noMargin noOverflowParent>
-                    {errorText || priceAndRequestsText}
+                        value={selectedMode}
+                        onChange={value => {
+                          if (
+                            value !== 'chat' &&
+                            value !== 'agent' &&
+                            value !== 'orchestrator'
+                          ) {
+                            return;
+                          }
+                          setSelectedMode(value);
+                        }}
+                        renderOptionIcon={className =>
+                          selectedMode === 'chat' ? (
+                            <HelpQuestion className={className} />
+                          ) : (
+                            <Hammer className={className} />
+                          )
+                        }
+                        rounded
+                      >
+                        <SelectOption key="chat" value="chat" label={t`Ask`} />
+                        <SelectOption
+                          key="agent"
+                          value="agent"
+                          label={t`Simple change`}
+                        />
+                        <SelectOption
+                          key="orchestrator"
+                          value="orchestrator"
+                          label={t`Build`}
+                        />
+                      </CompactSelectField>
+                    )}
                   </Column>
+                  <Column noMargin>{errorText || priceAndRequestsText}</Column>
                 </LineStackLayout>
               </ColumnStackLayout>
             </form>
@@ -1165,21 +1115,14 @@ export const AiRequestChat: React.ComponentType<{
               setHasSwitchedToGDevelopCreditsMidChat(true)
             }
             onStartOrOpenChat={onStartOrOpenChat}
+            isFetchingSuggestions={isFetchingSuggestions}
             isSending={isSendingUserMessage}
-            isWaitingForEditApproval={!!pendingEditApproval}
             savingProjectForMessageId={savingProjectForMessageId}
             forkingState={forkingState}
             onRestore={onRestore}
           />
           <Spacer />
           <ColumnStackLayout noMargin>
-            {pendingEditApproval && onResolveEditApproval ? (
-              <EditApprovalRow
-                pendingEditApproval={pendingEditApproval}
-                onResolveEditApproval={onResolveEditApproval}
-                onAcceptAndEnableAutoEdit={acceptEditAndEnableAutoEdit}
-              />
-            ) : null}
             {userMessagesCount >= TOO_MANY_USER_MESSAGES_WARNING_COUNT ? (
               <AlertMessage
                 kind={
@@ -1212,7 +1155,6 @@ export const AiRequestChat: React.ComponentType<{
             {/* $FlowFixMe[constant-condition] */}
             {!standAloneForm && (
               <CompactTextAreaFieldWithControls
-                ref={existingChatTextFieldRef}
                 maxLength={6000}
                 value={userRequestTextPerAiRequestId[aiRequestId] || ''}
                 disabled={isWorking || isForAnotherProject}
@@ -1255,7 +1197,7 @@ export const AiRequestChat: React.ComponentType<{
                             sendButtonIcon
                           )
                         }
-                        label={null}
+                        label={canRequestBeStopped ? null : sendButtonLabel}
                         onClick={onClickExistingChatButton}
                       />
                     </LineStackLayout>
@@ -1269,26 +1211,43 @@ export const AiRequestChat: React.ComponentType<{
               alignItems="center"
               justifyContent="space-between"
             >
-              <LineStackLayout noMargin alignItems="center" neverShrink>
-                {hasOpenedProject && (
-                  <AutoEditButton
-                    isAutoEditEnabled={isAutoEditEnabled}
-                    onToggle={toggleAutoEdit}
-                  />
-                )}
-                <ReasoningLevelSelector
-                  chosenOrDefaultAiConfigurationPresetId={
-                    chosenOrDefaultAiConfigurationPresetId
-                  }
-                  setAiConfigurationPresetId={setAiConfigurationPresetId}
-                  aiConfigurationPresetsWithAvailability={
-                    aiConfigurationPresetsWithAvailability
-                  }
+              <Column noMargin>
+                <CompactSelectField
                   disabled={isWorking}
-                  showSelectedLabel={!hasOpenedProject}
-                />
-              </LineStackLayout>
-              <Column noMargin noOverflowParent>
+                  value={selectedMode}
+                  onChange={value => {
+                    if (
+                      value !== 'chat' &&
+                      value !== 'agent' &&
+                      value !== 'orchestrator'
+                    ) {
+                      return;
+                    }
+                    setSelectedMode(value);
+                  }}
+                  renderOptionIcon={className =>
+                    selectedMode === 'chat' ? (
+                      <HelpQuestion className={className} />
+                    ) : (
+                      <Hammer className={className} />
+                    )
+                  }
+                  rounded
+                >
+                  <SelectOption key="chat" value="chat" label={t`Ask`} />
+                  <SelectOption
+                    key="agent"
+                    value="agent"
+                    label={t`Simple change`}
+                  />
+                  <SelectOption
+                    key="orchestrator"
+                    value="orchestrator"
+                    label={t`Build`}
+                  />
+                </CompactSelectField>
+              </Column>
+              <Column noMargin>
                 {isForAnotherProjectText || errorText || priceAndRequestsText}
               </Column>
             </LineStackLayout>

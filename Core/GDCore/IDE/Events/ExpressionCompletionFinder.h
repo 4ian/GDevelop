@@ -20,6 +20,7 @@
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariablePathFinder.h"
+#include "GDCore/Project/JsonObjectPropertyTools.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
 
@@ -542,6 +543,10 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (AddCompletionsForJsonObjectPropertyAccessor(node)) {
+      return;
+    }
+
     VariableAndItsParent variableAndItsParent =
         gd::ExpressionVariablePathFinder::GetLastParentOfNode(
             platform, projectScopedContainers, node);
@@ -693,8 +698,19 @@ class GD_CORE_API ExpressionCompletionFinder
                   node.childIdentifierName);
             },
             [&]() {
-              // Ignore properties here.
-              // There is no support for "children" of properties.
+              const gd::NamedPropertyDescriptor& property =
+                  projectScopedContainers.GetPropertiesContainersList()
+                      .Get(node.identifierName)
+                      .second;
+              if (property.GetType() == "JsonObject") {
+                gd::Variable jsonExample =
+                    gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(
+                        property);
+                AddCompletionsForChildrenVariablesOf(
+                    &jsonExample,
+                    node.childIdentifierNameLocation,
+                    node.childIdentifierName);
+              }
             },
             [&]() {
               // Ignore parameters here.
@@ -1044,7 +1060,26 @@ class GD_CORE_API ExpressionCompletionFinder
           }
         },
         [&](const gd::NamedPropertyDescriptor& property) {
-          // Ignore properties here.
+          if (property.GetType() != "JsonObject") {
+            return;
+          }
+
+          ExpressionCompletionDescription description(
+              ExpressionCompletionDescription::Property,
+              location.GetStartPosition(),
+              location.GetEndPosition());
+          description.SetCompletion(property.GetName());
+          description.SetType(property.GetType());
+          completions.push_back(description);
+
+          if (eagerlyCompleteIfExactMatch &&
+              property.GetName() == search) {
+            gd::Variable jsonExample =
+                gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(
+                    property);
+            AddEagerCompletionForVariableChildren(
+                jsonExample, property.GetName(), location);
+          }
         },
         [&](const gd::ParameterMetadata& parameter) {
           // Ignore parameters here.
@@ -1098,7 +1133,8 @@ class GD_CORE_API ExpressionCompletionFinder
         [&](const gd::NamedPropertyDescriptor &property) {
           auto propertyType = gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(
               property.GetType());
-          if (gd::ValueTypeMetadata::IsTypeValue("number", propertyType) ||
+          if (property.GetType() == "JsonObject" ||
+              gd::ValueTypeMetadata::IsTypeValue("number", propertyType) ||
               gd::ValueTypeMetadata::IsTypeValue("string", propertyType)) {
             ExpressionCompletionDescription description(
                 ExpressionCompletionDescription::Property,
@@ -1106,6 +1142,16 @@ class GD_CORE_API ExpressionCompletionFinder
             description.SetCompletion(property.GetName());
             description.SetType(property.GetType());
             completions.push_back(description);
+
+            if (property.GetType() == "JsonObject" &&
+                eagerlyCompleteIfExactMatch &&
+                property.GetName() == search) {
+              gd::Variable jsonExample =
+                  gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(
+                      property);
+              AddEagerCompletionForVariableChildren(
+                  jsonExample, property.GetName(), location);
+            }
           }
         },
         [&](const gd::ParameterMetadata &parameter) {
@@ -1135,6 +1181,73 @@ class GD_CORE_API ExpressionCompletionFinder
         rootObjectName("")  // Always empty, might be changed if variable fields
                             // in the editor are changed to use completion.
         {};
+
+  bool AddCompletionsForJsonObjectPropertyAccessor(
+      VariableAccessorNode& node) {
+    const gd::VariableNode* rootNode = GetRootVariableNode(node);
+    if (!rootNode) return false;
+
+    return projectScopedContainers.MatchIdentifierWithName<bool>(
+        rootNode->name,
+        [&]() { return false; },
+        [&]() { return false; },
+        [&]() {
+          const gd::NamedPropertyDescriptor& property =
+              projectScopedContainers.GetPropertiesContainersList()
+                  .Get(rootNode->name)
+                  .second;
+          if (property.GetType() != "JsonObject") return false;
+
+          std::vector<gd::String> pathToParent;
+          if (!CollectPathToAccessor(*rootNode, node, pathToParent)) {
+            return false;
+          }
+
+          gd::Variable jsonExample =
+              gd::JsonObjectPropertyTools::ParseJsonExampleAsVariable(
+                  property);
+          const gd::Variable* parentVariable =
+              gd::JsonObjectPropertyTools::GetChildAtPath(jsonExample,
+                                                          pathToParent);
+          AddCompletionsForChildrenVariablesOf(parentVariable,
+                                               node.nameLocation,
+                                               node.name);
+          return true;
+        },
+        [&]() { return false; },
+        [&]() { return false; });
+  }
+
+  const gd::VariableNode* GetRootVariableNode(
+      const gd::ExpressionNode& node) const {
+    const gd::ExpressionNode* currentNode = &node;
+    while (currentNode) {
+      const gd::VariableNode* variableNode =
+          dynamic_cast<const gd::VariableNode*>(currentNode);
+      if (variableNode) return variableNode;
+
+      currentNode = currentNode->parent;
+    }
+
+    return nullptr;
+  }
+
+  bool CollectPathToAccessor(const gd::VariableNode& rootNode,
+                             const gd::VariableAccessorNode& accessorToFind,
+                             std::vector<gd::String>& pathToParent) const {
+    const gd::VariableAccessorOrVariableBracketAccessorNode* accessor =
+        rootNode.child.get();
+    while (accessor && accessor != &accessorToFind) {
+      const gd::VariableAccessorNode* directAccessor =
+          dynamic_cast<const gd::VariableAccessorNode*>(accessor);
+      if (!directAccessor) return false;
+
+      pathToParent.push_back(directAccessor->name);
+      accessor = directAccessor->child.get();
+    }
+
+    return accessor == &accessorToFind;
+  }
 
   std::vector<ExpressionCompletionDescription> completions;
   size_t searchedPosition;

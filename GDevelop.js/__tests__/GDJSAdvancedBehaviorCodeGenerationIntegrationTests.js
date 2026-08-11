@@ -206,5 +206,406 @@ describe('libGD.js - GDJS Advanced Behavior Code Generation integration tests', 
         .sort();
       expect(counterValues).toEqual([0, 1, 1]);
     });
+
+    it('keeps a created object picked in child events and nested private behavior actions', () => {
+      const extensionName = 'BehaviorCreatedObjectPickingExtension';
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+        extensionName,
+        0
+      );
+      const eventsBasedBehavior = eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('Creator', 0);
+      const functions = eventsBasedBehavior.getEventsFunctions();
+      const directCreate = functions.insertNewEventsFunction('DirectCreate', 0);
+      const privateCreate = functions.insertNewEventsFunction(
+        'PrivateCreate',
+        1
+      );
+      privateCreate.setPrivate(true);
+      const publicCreate = functions.insertNewEventsFunction('PublicCreate', 2);
+
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedBehavior
+      );
+      [directCreate, privateCreate, publicCreate].forEach(eventsFunction => {
+        eventsFunction
+          .getParameters()
+          .insertNewParameter(
+            'CreatedObject',
+            eventsFunction.getParameters().getParametersCount()
+          )
+          .setType('objectListOrEmptyIfJustDeclared');
+      });
+
+      const makeCreateAndInitializeEvents = () => [
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'Create' },
+              parameters: ['', 'CreatedObject', '0', '0', ''],
+            },
+          ],
+          events: [
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: { value: 'ModVarObjet' },
+                  parameters: ['CreatedObject', 'Initialized', '+', '1'],
+                },
+              ],
+            },
+          ],
+        },
+      ];
+      const directEventsElement = gd.Serializer.fromJSObject(
+        makeCreateAndInitializeEvents()
+      );
+      directCreate.getEvents().unserializeFrom(project, directEventsElement);
+      directEventsElement.delete();
+      const privateEventsElement = gd.Serializer.fromJSObject(
+        makeCreateAndInitializeEvents()
+      );
+      privateCreate.getEvents().unserializeFrom(project, privateEventsElement);
+      privateEventsElement.delete();
+      const publicEventsElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: {
+                value: `${extensionName}::Creator::PrivateCreate`,
+              },
+              parameters: ['Object', 'Behavior', 'CreatedObject'],
+            },
+          ],
+        },
+      ]);
+      publicCreate.getEvents().unserializeFrom(project, publicEventsElement);
+      publicEventsElement.delete();
+
+      const layout = project.insertNewLayout('MyScene', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'DirectBullet', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'NestedBullet', 1);
+      const cannon = layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Cannon', 2);
+
+      const platformExtension = new gd.PlatformExtension();
+      gd.MetadataDeclarationHelper.declareExtension(
+        platformExtension,
+        eventsFunctionsExtension
+      );
+      const behaviorMethodMangledNames = new gd.MapStringString();
+      gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+        project,
+        platformExtension,
+        eventsFunctionsExtension,
+        eventsBasedBehavior,
+        behaviorMethodMangledNames
+      );
+      behaviorMethodMangledNames.delete();
+      gd.JsPlatform.get().addNewExtension(platformExtension);
+      platformExtension.delete();
+      cannon.addNewBehavior(project, `${extensionName}::Creator`, 'Creator');
+
+      const layoutEventsElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: `${extensionName}::Creator::DirectCreate` },
+              parameters: ['Cannon', 'Creator', 'DirectBullet'],
+            },
+            {
+              type: { value: `${extensionName}::Creator::PublicCreate` },
+              parameters: ['Cannon', 'Creator', 'NestedBullet'],
+            },
+          ],
+        },
+      ]);
+      layout.getEvents().unserializeFrom(project, layoutEventsElement);
+      layoutEventsElement.delete();
+
+      try {
+        const serializedProjectElement = new gd.SerializerElement();
+        project.serializeTo(serializedProjectElement);
+        const serializedSceneElement = new gd.SerializerElement();
+        layout.serializeTo(serializedSceneElement);
+        const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+          gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+          sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+        });
+        const CompiledRuntimeBehavior = generateCompiledEventsForEventsBasedBehavior(
+          gd,
+          project,
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          gdjs,
+          { logCode: false }
+        );
+        const runCompiledLayoutEvents = generateCompiledEventsForLayout(
+          gd,
+          project,
+          layout,
+          false
+        );
+        serializedProjectElement.delete();
+        serializedSceneElement.delete();
+
+        const cannonInstance = runtimeScene.createObject('Cannon');
+        const behaviorInstance = new CompiledRuntimeBehavior(
+          runtimeScene,
+          { name: 'Creator', type: `${extensionName}::Creator` },
+          cannonInstance
+        );
+        cannonInstance.addBehavior(behaviorInstance);
+
+        runCompiledLayoutEvents(gdjs, runtimeScene);
+
+        ['DirectBullet', 'NestedBullet'].forEach(objectName => {
+          const instances = runtimeScene.getObjects(objectName);
+          expect(instances).toHaveLength(1);
+          expect(
+            instances[0]
+              .getVariables()
+              .get('Initialized')
+              .getAsNumber()
+          ).toBe(1);
+        });
+      } finally {
+        gd.JsPlatform.get().removeExtension(extensionName);
+        project.delete();
+      }
+    });
+
+    it('passes regular object parameters to behavior events function actions', () => {
+      const extensionName = 'BehaviorObjectParamCallExtension';
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+        extensionName,
+        0
+      );
+      const eventsBasedBehavior = eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('PlayerController', 0);
+
+      const behaviorEventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['Target', 'Touched', '+', '1'],
+            },
+          ],
+        },
+      ]);
+      const behaviorEventsFunction = eventsBasedBehavior
+        .getEventsFunctions()
+        .insertNewEventsFunction('Update', 0);
+      behaviorEventsFunction
+        .getEvents()
+        .unserializeFrom(project, behaviorEventsSerializerElement);
+      behaviorEventsSerializerElement.delete();
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedBehavior
+      );
+      behaviorEventsFunction
+        .getParameters()
+        .insertNewParameter(
+          'Target',
+          behaviorEventsFunction.getParameters().getParametersCount()
+        )
+        .setType('object');
+
+      const layout = project.insertNewLayout('MyScene', 0);
+      const ownerObject = layout
+        .getObjects()
+        .insertNewObject(project, 'Sprite', 'Player', 0);
+      layout.getObjects().insertNewObject(project, 'Sprite', 'Enemy', 1);
+
+      const platformExtension = new gd.PlatformExtension();
+      gd.MetadataDeclarationHelper.declareExtension(
+        platformExtension,
+        eventsFunctionsExtension
+      );
+      const behaviorMethodMangledNames = new gd.MapStringString();
+      gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+        project,
+        platformExtension,
+        eventsFunctionsExtension,
+        eventsBasedBehavior,
+        behaviorMethodMangledNames
+      );
+      behaviorMethodMangledNames.delete();
+      gd.JsPlatform.get().addNewExtension(platformExtension);
+      platformExtension.delete();
+
+      ownerObject.addNewBehavior(
+        project,
+        `${extensionName}::PlayerController`,
+        'PlayerController'
+      );
+
+      const layoutEventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: {
+                value: `${extensionName}::PlayerController::Update`,
+              },
+              parameters: ['Player', 'PlayerController', 'Enemy'],
+            },
+          ],
+        },
+      ]);
+      layout
+        .getEvents()
+        .unserializeFrom(project, layoutEventsSerializerElement);
+      layoutEventsSerializerElement.delete();
+
+      try {
+        const serializedProjectElement = new gd.SerializerElement();
+        project.serializeTo(serializedProjectElement);
+        const serializedSceneElement = new gd.SerializerElement();
+        layout.serializeTo(serializedSceneElement);
+
+        const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+          gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+          sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+        });
+
+        const CompiledRuntimeBehavior = generateCompiledEventsForEventsBasedBehavior(
+          gd,
+          project,
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          gdjs,
+          { logCode: false }
+        );
+        const runCompiledLayoutEvents = generateCompiledEventsForLayout(
+          gd,
+          project,
+          layout,
+          false
+        );
+
+        serializedProjectElement.delete();
+        serializedSceneElement.delete();
+
+        const player = runtimeScene.createObject('Player');
+        const enemy = runtimeScene.createObject('Enemy');
+        const behaviorInstance = new CompiledRuntimeBehavior(
+          runtimeScene,
+          {
+            name: 'PlayerController',
+            type: `${extensionName}::PlayerController`,
+          },
+          player
+        );
+        player.addBehavior(behaviorInstance);
+
+        runCompiledLayoutEvents(gdjs, runtimeScene);
+
+        expect(
+          enemy
+            .getVariables()
+            .get('Touched')
+            .getAsNumber()
+        ).toBe(1);
+      } finally {
+        gd.JsPlatform.get().removeExtension(extensionName);
+        project.delete();
+      }
+    });
+  });
+
+  describe('Behavior variables', () => {
+    it('keeps behavior variables isolated from owner object variables', () => {
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunctionsExtension =
+        project.insertNewEventsFunctionsExtension('MyExtension', 0);
+      const eventsBasedBehavior = eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('MyBehavior', 0);
+
+      eventsBasedBehavior
+        .getVariables()
+        .insertNew('InternalCounter', 0)
+        .setValue(5);
+
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['InternalCounter', '+', '1'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['Object', 'InternalCounter', '+', '1'],
+            },
+          ],
+        },
+      ]);
+      eventsBasedBehavior
+        .getEventsFunctions()
+        .insertNewEventsFunction('doStepPreEvents', 0)
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+      eventsSerializerElement.delete();
+      gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+        eventsFunctionsExtension,
+        eventsBasedBehavior
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const CompiledRuntimeBehavior =
+        generateCompiledEventsForEventsBasedBehavior(
+          gd,
+          project,
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          gdjs,
+          { logCode: false }
+        );
+      project.delete();
+
+      const owner = runtimeScene.createObject('Owner');
+      const behavior = new CompiledRuntimeBehavior(
+        runtimeScene,
+        { name: 'MyBehavior', type: 'MyExtension::MyBehavior' },
+        owner
+      );
+      owner.addBehavior(behavior);
+
+      expect(behavior.getBehaviorVariables().has('InternalCounter')).toBe(true);
+      expect(
+        behavior.getBehaviorVariables().get('InternalCounter').getAsNumber()
+      ).toBe(5);
+      expect(owner.getVariables().has('InternalCounter')).toBe(false);
+
+      behavior.doStepPreEvents();
+
+      expect(
+        behavior.getBehaviorVariables().get('InternalCounter').getAsNumber()
+      ).toBe(6);
+      expect(owner.getVariables().get('InternalCounter').getAsNumber()).toBe(1);
+    });
   });
 });

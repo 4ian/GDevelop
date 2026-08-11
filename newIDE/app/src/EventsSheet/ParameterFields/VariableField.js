@@ -44,6 +44,7 @@ import GlobalVariableIcon from '../../UI/CustomSvgIcons/GlobalVariable';
 import SceneVariableIcon from '../../UI/CustomSvgIcons/SceneVariable';
 import ObjectVariableIcon from '../../UI/CustomSvgIcons/ObjectVariable';
 import LocalVariableIcon from '../../UI/CustomSvgIcons/LocalVariable';
+import VariableTreeIcon from '../../UI/CustomSvgIcons/VariableTree';
 import PropertyIcon from '../../UI/CustomSvgIcons/Settings';
 import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
@@ -62,6 +63,7 @@ const getVariableTypeName = (
     case gd.Variable.Boolean:
       return 'boolean';
     case gd.Variable.String:
+    case gd.Variable.Enum:
     default:
       return 'string';
   }
@@ -219,6 +221,9 @@ export const getVariableSourceIcon = (
       return SceneVariableIcon;
     case gd.VariablesContainer.Object:
       return ObjectVariableIcon;
+    case gd.VariablesContainer.Prefab:
+    case gd.VariablesContainer.Behavior:
+      return VariableTreeIcon;
     case gd.VariablesContainer.Local:
       return LocalVariableIcon;
     case gd.VariablesContainer.Parameters:
@@ -235,6 +240,7 @@ export const getVariableTypeIcon = (variableType: Variable_Type): any => {
     case gd.Variable.Number:
       return VariableNumberIcon;
     case gd.Variable.String:
+    case gd.Variable.Enum:
       return VariableStringIcon;
     case gd.Variable.Boolean:
       return VariableBooleanIcon;
@@ -443,6 +449,14 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       projectScopedContainersAccessor,
       isObjectVariable
     );
+    const isWritingToProperty =
+      !!value &&
+      !!parameterMetadata &&
+      parameterMetadata.getType() === 'variableOrProperty' &&
+      getVariableSourceFromIdentifier(
+        value,
+        projectScopedContainersAccessor.get()
+      ) === gd.VariablesContainer.Properties;
 
     const errorText =
       quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
@@ -488,16 +502,17 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
           VariableNameQuickAnalyzeResults.PROPERTY_WITH_CHILD ? (
         <Trans>Properties can't have children.</Trans>
       ) : null;
-    const warningTranslatableText =
-      !forceDeclaration &&
-      quicklyAnalysisResult ===
-        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
-        ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
-        : !forceDeclaration &&
-          quicklyAnalysisResult ===
-            VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
-        ? t`This variable has the same name as an object. Consider renaming one or the other.`
-        : null;
+    const warningTranslatableText = isWritingToProperty
+      ? t`Writing to properties from events is deprecated. Use object variables or behavior variables to store values that change at runtime.`
+      : !forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+      ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
+      : !forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.NAME_COLLISION_WITH_OBJECT
+      ? t`This variable has the same name as an object. Consider renaming one or the other.`
+      : null;
 
     const isSwitchableInstruction =
       instruction &&
@@ -517,6 +532,7 @@ export default (React.forwardRef<Props, VariableFieldInterface>(
       isSwitchableInstruction &&
       variableType !== gd.Variable.Number &&
       variableType !== gd.Variable.String &&
+      variableType !== gd.Variable.Enum &&
       variableType !== gd.Variable.Boolean &&
       !errorText &&
       value;

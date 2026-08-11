@@ -212,6 +212,7 @@ export const EventsBasedBehaviorOrObjectEditor: React.ComponentType<{
                     onEventsBasedObjectChildrenEdited={
                       onEventsBasedObjectChildrenEdited
                     }
+                    onConfigurationUpdated={onConfigurationUpdated}
                   />
                 ) : null}
                 <Text size="block-title">

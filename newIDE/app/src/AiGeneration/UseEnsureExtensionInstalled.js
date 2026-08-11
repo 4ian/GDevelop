@@ -5,20 +5,29 @@ import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionSto
 import {
   useInstallExtension,
   checkRequiredExtensionsUpdate,
+  ensureExtensionsRegistryLoaded,
   getRequiredExtensions,
   getExtensionHeader,
-  ensureExtensionsRegistryLoaded,
 } from '../AssetStore/ExtensionStore/InstallExtension';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import {
+  getExtension,
+  type ExtensionShortHeader,
+  type SerializedExtension,
+} from '../Utils/GDevelopServices/Extension';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 export type EnsureExtensionInstalledOptions = {|
   extensionName: string,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  preflightExtension?: ({
+    serializedExtension: SerializedExtension,
+    registryHeader: ExtensionShortHeader,
+  }) => Promise<Object>,
 |};
 
 type _UseEnsureExtensionInstalledReturnType = {
-  ensureExtensionInstalled: EnsureExtensionInstalledOptions => Promise<void>,
+  ensureExtensionInstalled: EnsureExtensionInstalledOptions => Promise<Object>,
 };
 export const useEnsureExtensionInstalled = ({
   project,
@@ -29,7 +38,6 @@ export const useEnsureExtensionInstalled = ({
 |}): _UseEnsureExtensionInstalledReturnType => {
   const {
     translatedExtensionShortHeadersByName: extensionShortHeadersByName,
-    fetchExtensionsAndFilters,
   } = React.useContext(ExtensionStoreContext);
   const installExtension = useInstallExtension();
 
@@ -39,26 +47,19 @@ export const useEnsureExtensionInstalled = ({
         extensionName,
         onExtensionInstalled,
         onWillInstallExtension,
+        preflightExtension,
       }: EnsureExtensionInstalledOptions) => {
-        if (!project) return;
+        if (!project) return { installed: false, reason: 'no-project' };
         if (project.getCurrentPlatform().isExtensionLoaded(extensionName))
-          return;
+          return { installed: false, alreadyInstalled: true };
 
-        // Warm the context for following installs, and get a loaded registry
-        // (fetched directly if it was never loaded in this session).
-        fetchExtensionsAndFilters();
-        const extensionShortHeadersByNameToUse = await ensureExtensionsRegistryLoaded(
-          extensionShortHeadersByName
+        const availableExtensionShortHeadersByName = await ensureExtensionsRegistryLoaded(
+          extensionShortHeadersByName[extensionName]
+            ? extensionShortHeadersByName
+            : {}
         );
-
-        if (!extensionShortHeadersByNameToUse[extensionName]) {
-          throw new Error(
-            `Extension "${extensionName}" does not exist in the extension registry. Use a different extension or behavior.`
-          );
-        }
-
         const extensionShortHeader = getExtensionHeader(
-          extensionShortHeadersByNameToUse,
+          availableExtensionShortHeadersByName,
           extensionName
         );
         const extensionShortHeaders: Array<ExtensionShortHeader> = [
@@ -73,10 +74,45 @@ export const useEnsureExtensionInstalled = ({
           {
             requiredExtensions,
             project,
-            extensionShortHeadersByName: extensionShortHeadersByNameToUse,
+            extensionShortHeadersByName: availableExtensionShortHeadersByName,
           }
         );
-        await installExtension({
+        const preflightReceipts: Array<Object> = [];
+        if (preflightExtension) {
+          const headersByName: {
+            [string]: ExtensionShortHeader,
+          } = {};
+          [
+            ...requiredExtensionInstallation.missingExtensionShortHeaders,
+            ...requiredExtensionInstallation.safeToUpdateExtensions,
+          ].forEach(header => {
+            headersByName[header.name] = header;
+          });
+          const headers = Object.keys(headersByName).map(
+            name => headersByName[name]
+          );
+          for (const registryHeader of headers) {
+            const serializedExtension = await retryIfFailed({ times: 3 }, () =>
+              getExtension(registryHeader)
+            );
+            const receipt = await preflightExtension({
+              serializedExtension,
+              registryHeader,
+            });
+            preflightReceipts.push(receipt);
+            if (!receipt || receipt.valid !== true) {
+              const error: any = new Error(
+                `Extension "${
+                  registryHeader.name
+                }" is incompatible with the strict JavaScript authoring policy.`
+              );
+              error.code = 'EXTENSION_STRICT_API_INCOMPATIBLE';
+              error.extensionCompatibility = receipt;
+              throw error;
+            }
+          }
+        }
+        const installed = await installExtension({
           project,
           requiredExtensionInstallation,
           importedSerializedExtensions: [],
@@ -85,13 +121,9 @@ export const useEnsureExtensionInstalled = ({
           updateMode: 'safeOnly',
           reason: 'extension',
         });
+        return { installed, preflightReceipts };
       },
-      [
-        extensionShortHeadersByName,
-        fetchExtensionsAndFilters,
-        installExtension,
-        project,
-      ]
+      [extensionShortHeadersByName, installExtension, project]
     ),
   };
 };

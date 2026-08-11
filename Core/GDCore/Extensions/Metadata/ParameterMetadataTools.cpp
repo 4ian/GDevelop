@@ -115,9 +115,11 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     auto& object = outputObjectsContainer.GetObject(objectName);
     const auto& allBehaviorNames = allObjectNonDefaultBehaviorNames[objectName];
     for (const auto& behaviorName : object.GetAllBehaviorNames()) {
-      if (object.GetBehavior(behaviorName).IsDefaultBehavior()) {
-        // Default behaviors are already ensured to be all present
-        // (and no more than required by the object type).
+      const auto& behavior = object.GetBehavior(behaviorName);
+      if (behavior.IsDefaultBehavior() ||
+          behavior.IsInheritedFromObjectType()) {
+        // Behaviors coming from the object type are already ensured to be all
+        // present (and no more than required by the object type).
         continue;
       }
 

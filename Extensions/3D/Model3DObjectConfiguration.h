@@ -15,7 +15,7 @@ class Project;
 
 class GD_EXTENSION_API Model3DAnimation {
 public:
-  Model3DAnimation() : shouldLoop(false) {};
+  Model3DAnimation() : shouldLoop(false), shouldUseRootMotion(true) {};
   virtual ~Model3DAnimation(){};
 
   /**
@@ -39,6 +39,31 @@ public:
   void SetSource(const gd::String &source_) { source = source_; }
 
   /**
+   * \brief Return the resource containing the animation.
+   *
+   * An empty resource name means the object's primary model resource.
+   */
+  const gd::String &GetSourceModelResourceName() const {
+    return sourceModelResourceName;
+  }
+
+  /**
+   * \brief Return a mutable reference to the resource containing the animation.
+   *
+   * This is used by resource workers when a resource is renamed.
+   */
+  gd::String &GetSourceModelResourceName() { return sourceModelResourceName; }
+
+  /**
+   * \brief Change the resource containing the animation.
+   *
+   * An empty resource name means the object's primary model resource.
+   */
+  void SetSourceModelResourceName(const gd::String &resourceName) {
+    sourceModelResourceName = resourceName;
+  }
+
+  /**
    * \brief Return true if the animation should loop.
    */
   const bool ShouldLoop() const { return shouldLoop; }
@@ -48,10 +73,24 @@ public:
    */
   void SetShouldLoop(bool shouldLoop_) { shouldLoop = shouldLoop_; }
 
+  /**
+   * \brief Return true if root motion from the animation should be applied.
+   */
+  const bool ShouldUseRootMotion() const { return shouldUseRootMotion; }
+
+  /**
+   * \brief Change whether root motion from the animation should be applied.
+   */
+  void SetShouldUseRootMotion(bool shouldUseRootMotion_) {
+    shouldUseRootMotion = shouldUseRootMotion_;
+  }
+
 private:
   gd::String name;
   gd::String source;
+  gd::String sourceModelResourceName;
   bool shouldLoop;
+  bool shouldUseRootMotion;
 };
 
 /**
@@ -142,6 +181,29 @@ public:
   }
   ///@}
 
+  /** \name Shared animation model resources
+   * Model resources whose animation clips can be used by this object.
+   */
+  ///@{
+  std::size_t GetSharedAnimationModelResourcesCount() const {
+    return sharedAnimationModelResourceNames.size();
+  }
+
+  const gd::String &
+  GetSharedAnimationModelResourceName(std::size_t index) const;
+
+  bool HasSharedAnimationModelResourceNamed(
+      const gd::String &resourceName) const;
+
+  void AddSharedAnimationModelResource(const gd::String &resourceName);
+
+  bool RemoveSharedAnimationModelResource(std::size_t index);
+
+  void RemoveAllSharedAnimationModelResources() {
+    sharedAnimationModelResourceNames.clear();
+  }
+  ///@}
+
   /** \name Getters
    * Fast access for rendering instances.
    */
@@ -187,7 +249,9 @@ private:
   bool isCastingShadow;
   bool isReceivingShadow;
 
+  std::vector<gd::String> sharedAnimationModelResourceNames;
   std::vector<Model3DAnimation> animations;
+  static gd::String badSharedAnimationModelResourceName;
   static Model3DAnimation badAnimation; //< Bad animation when an out of bound
                                         // animation is requested.
 };

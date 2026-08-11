@@ -40,8 +40,8 @@ class GD_CORE_API AbstractArbitraryEventsWorker : private EventVisitor {
   virtual ~AbstractArbitraryEventsWorker();
 
   /**
-   * \brief When enabled, disabled events and their entire subtree are skipped
-   * during traversal.
+   * \brief When enabled, disabled events, disabled instructions and their
+   * entire subtree are skipped during traversal.
    */
   void SetSkipDisabledEvents(bool skip) { skipDisabledEvents_ = skip; }
 
@@ -189,8 +189,8 @@ class GD_CORE_API AbstractReadOnlyArbitraryEventsWorker : private ReadOnlyEventV
   virtual ~AbstractReadOnlyArbitraryEventsWorker();
 
   /**
-   * \brief When enabled, disabled events and their entire subtree are skipped
-   * during traversal.
+   * \brief When enabled, disabled events, disabled instructions and their
+   * entire subtree are skipped during traversal.
    */
   void SetSkipDisabledEvents(bool skip) { skipDisabledEvents_ = skip; }
 

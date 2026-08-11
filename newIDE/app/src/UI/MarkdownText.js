@@ -7,6 +7,40 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import classNames from 'classnames';
 import Window from '../Utils/Window';
 
+const escapeRegExp = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export const interpolateMessageDescriptorValues = (
+  translatedSource: string,
+  translatableSource: MessageDescriptor
+): string => {
+  if (!translatableSource || typeof translatableSource !== 'object') {
+    return translatedSource;
+  }
+
+  const values = translatableSource.values;
+  if (!values || typeof values !== 'object') return translatedSource;
+
+  return Object.keys(values).reduce((source, key) => {
+    const value = values[key];
+    if (value === null || value === undefined) return source;
+
+    return source.replace(
+      new RegExp(`\\{${escapeRegExp(key)}\\}`, 'g'),
+      String(value)
+    );
+  }, translatedSource);
+};
+
+const translateMessageDescriptor = (
+  i18n: any,
+  translatableSource: MessageDescriptor
+): string =>
+  interpolateMessageDescriptorValues(
+    i18n._(translatableSource),
+    translatableSource
+  );
+
 // Sensible defaults for react-markdown
 const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
@@ -116,7 +150,7 @@ export const MarkdownText = (props: Props): React.MixedElement => {
           remarkPlugins={[remarkGfm]}
         >
           {props.translatableSource
-            ? i18n._(props.translatableSource)
+            ? translateMessageDescriptor(i18n, props.translatableSource)
             : props.source}
         </ReactMarkdown>
       )}

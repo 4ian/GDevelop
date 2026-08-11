@@ -15,10 +15,19 @@ const callbacksList: Array<PreviewDebuggerServerCallbacks> = [];
 const debuggerIds: Array<DebuggerId> = [];
 const responseCallbacks = new Map<number, (value: Object) => void>();
 let nextMessageWithResponseId = 1;
+const recentLogsByDebuggerId: { [DebuggerId]: Array<Object> } = {};
+const maxRecentLogsPerDebugger = 200;
+const connectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
+const lastConnectionInfoByDebuggerId: { [DebuggerId]: Object } = {};
 
 let embeddedGameFrameWindow: WindowProxy | null = null;
 let gameplayTestFrameWindow: WindowProxy | null = null;
 let isWindowMessageListenerRegistered = false;
+
+const hasDebuggerId = (id: DebuggerId): boolean =>
+  id === 'embedded-game-frame'
+    ? !!embeddedGameFrameWindow
+    : debuggerIds.indexOf(id) !== -1;
 
 const getExistingDebuggerIds = (): Array<DebuggerId> => [
   ...getExistingEmbeddedGameFrameDebuggerIds(),
@@ -39,6 +48,30 @@ const handleParsedMessage = (
   parsedMessage: Object | null
 ): void => {
   if (!parsedMessage) return;
+  if (!hasDebuggerId(id)) {
+    console.warn(
+      `Ignoring message from closed or unknown preview debugger id "${id}".`
+    );
+    return;
+  }
+  if (connectionInfoByDebuggerId[id]) {
+    connectionInfoByDebuggerId[id].lastSeenAt = new Date().toISOString();
+    connectionInfoByDebuggerId[id].lastCommand = parsedMessage.command;
+  }
+
+  if (
+    parsedMessage.command === 'console.log' ||
+    parsedMessage.command === 'hotReloader.logs' ||
+    parsedMessage.command === 'uncaughtException' ||
+    parsedMessage.command === 'game.crashed'
+  ) {
+    const recentLogs = recentLogsByDebuggerId[id] || [];
+    recentLogs.push(parsedMessage);
+    if (recentLogs.length > maxRecentLogsPerDebugger) {
+      recentLogs.splice(0, recentLogs.length - maxRecentLogsPerDebugger);
+    }
+    recentLogsByDebuggerId[id] = recentLogs;
+  }
 
   if (parsedMessage.messageId) {
     const answerCallback = responseCallbacks.get(parsedMessage.messageId);
@@ -59,13 +92,35 @@ const handleParsedMessage = (
   );
 };
 
-const notifyConnectionClosed = (id: DebuggerId) => {
+const notifyConnectionClosed = (id: DebuggerId, reason?: ?Object) => {
+  const existing = connectionInfoByDebuggerId[id] || {
+    debuggerId: id,
+  };
+  const closedInfo = {
+    ...existing,
+    connected: false,
+    closedAt: new Date().toISOString(),
+    disconnectReason:
+      (reason && (reason.errorMessage || reason.reason)) || 'connection-closed',
+    ...(reason || {}),
+  };
+  lastConnectionInfoByDebuggerId[id] = closedInfo;
+  delete connectionInfoByDebuggerId[id];
   callbacksList.forEach(({ onConnectionClosed }) =>
     onConnectionClosed({
       id,
       debuggerIds: getExistingDebuggerIds(),
+      connectionInfo: closedInfo,
     })
   );
+};
+
+const removeDebuggerId = (id: DebuggerId): boolean => {
+  const debuggerIdIndex = debuggerIds.indexOf(id);
+  if (debuggerIdIndex === -1) return false;
+  debuggerIds.splice(debuggerIdIndex, 1);
+  delete recentLogsByDebuggerId[id];
+  return true;
 };
 
 const removeServerListeners = () => {
@@ -131,15 +186,52 @@ class LocalPreviewDebuggerServer {
         callbacksList.forEach(({ onErrorReceived }) => onErrorReceived(err));
       });
 
-      ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
-        const debuggerIdIndex = debuggerIds.indexOf(id);
-        if (debuggerIdIndex !== -1) debuggerIds.splice(debuggerIdIndex, 1);
+      ipcRenderer.on('debugger-send-message-done', (event, result) => {
+        const id =
+          result && typeof result === 'object' && typeof result.id === 'string'
+            ? result.id
+            : '';
+        const errorMessage =
+          result &&
+          typeof result === 'object' &&
+          typeof result.errorMessage === 'string'
+            ? result.errorMessage
+            : typeof result === 'string'
+            ? result
+            : null;
+        if (!errorMessage) return;
 
-        notifyConnectionClosed(id);
+        const wasConnected = id ? removeDebuggerId(id) : false;
+        callbacksList.forEach(({ onConnectionErrored }) =>
+          onConnectionErrored({
+            id,
+            errorMessage,
+          })
+        );
+        if (id && wasConnected)
+          notifyConnectionClosed(id, {
+            reason: 'send-message-failed',
+            errorMessage,
+          });
       });
 
-      ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
+      ipcRenderer.on('debugger-connection-closed', (event, details) => {
+        const { id } = details;
+        removeDebuggerId(id);
+        notifyConnectionClosed(id, details);
+      });
+
+      ipcRenderer.on('debugger-connection-opened', (event, details) => {
+        const { id } = details;
         debuggerIds.push(id);
+        recentLogsByDebuggerId[id] = [];
+        connectionInfoByDebuggerId[id] = {
+          ...details,
+          debuggerId: id,
+          connected: true,
+          connectedAt: new Date().toISOString(),
+          lastSeenAt: new Date().toISOString(),
+        };
         callbacksList.forEach(({ onConnectionOpened }) =>
           onConnectionOpened({
             id,
@@ -271,7 +363,28 @@ class LocalPreviewDebuggerServer {
   getExistingPreviewDebuggerIds(): Array<DebuggerId> {
     return getExistingPreviewDebuggerIds();
   }
-  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks): () => void {
+  // $FlowFixMe[missing-local-annot]
+  getRecentLogs(id: DebuggerId) {
+    return [...(recentLogsByDebuggerId[id] || [])];
+  }
+  getConnectionInfo(id: DebuggerId): ?Object {
+    return (
+      connectionInfoByDebuggerId[id] ||
+      lastConnectionInfoByDebuggerId[id] ||
+      null
+    );
+  }
+  getLastConnectionInfo(): ?Object {
+    const closedConnections = Object.keys(lastConnectionInfoByDebuggerId)
+      .map(id => lastConnectionInfoByDebuggerId[id])
+      .filter(Boolean)
+      .sort((left, right) =>
+        String(right.closedAt || '').localeCompare(String(left.closedAt || ''))
+      );
+    return closedConnections[0] || null;
+  }
+  // $FlowFixMe[missing-local-annot]
+  registerCallbacks(callbacks: PreviewDebuggerServerCallbacks) {
     callbacksList.push(callbacks);
 
     return () => {
@@ -289,6 +402,14 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = embeddedWindow;
+    recentLogsByDebuggerId['embedded-game-frame'] = [];
+    connectionInfoByDebuggerId['embedded-game-frame'] = {
+      debuggerId: 'embedded-game-frame',
+      connected: true,
+      connectedAt: new Date().toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      windowType: 'embedded-game-frame',
+    };
     callbacksList.forEach(({ onConnectionOpened }) =>
       onConnectionOpened({
         id: 'embedded-game-frame',
@@ -307,7 +428,10 @@ class LocalPreviewDebuggerServer {
     }
 
     embeddedGameFrameWindow = null;
-    notifyConnectionClosed('embedded-game-frame');
+    delete recentLogsByDebuggerId['embedded-game-frame'];
+    notifyConnectionClosed('embedded-game-frame', {
+      reason: 'embedded-frame-unregistered',
+    });
   }
   registerGameplayTestFrame(embeddedWindow: WindowProxy) {
     if (embeddedWindow === gameplayTestFrameWindow) return;
@@ -339,23 +463,33 @@ class LocalPreviewDebuggerServer {
     gameplayTestFrameWindow = null;
     notifyConnectionClosed('gameplay-test-frame');
   }
-  closeAllConnections() {
+  closeAllPreviewConnections() {
     const previousDebuggerIds = [...debuggerIds];
     debuggerIds.length = 0;
 
     previousDebuggerIds.forEach(id => {
-      notifyConnectionClosed(id);
+      delete recentLogsByDebuggerId[id];
+      notifyConnectionClosed(id, { reason: 'closed-by-editor' });
     });
 
     responseCallbacks.clear();
 
-    if (ipcRenderer && previousDebuggerIds.length) {
+    // The main process can still have websocket connections even when the
+    // renderer-side list is empty (for example after a renderer reload or a
+    // missed close event). Always ask it to close its side of the bridge.
+    if (ipcRenderer) {
       ipcRenderer.send('debugger-close-all-connections');
     }
+  }
 
+  closeAllConnections() {
+    this.closeAllPreviewConnections();
     if (embeddedGameFrameWindow) {
       embeddedGameFrameWindow = null;
-      notifyConnectionClosed('embedded-game-frame');
+      delete recentLogsByDebuggerId['embedded-game-frame'];
+      notifyConnectionClosed('embedded-game-frame', {
+        reason: 'closed-by-editor',
+      });
     }
 
     if (gameplayTestFrameWindow) {

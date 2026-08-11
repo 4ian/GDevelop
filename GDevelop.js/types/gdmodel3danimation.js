@@ -5,8 +5,12 @@ declare class gdModel3DAnimation {
   getName(): string;
   setSource(name: string): void;
   getSource(): string;
+  setSourceModelResourceName(resourceName: string): void;
+  getSourceModelResourceName(): string;
   setShouldLoop(shouldLoop: boolean): void;
   shouldLoop(): boolean;
+  setShouldUseRootMotion(shouldUseRootMotion: boolean): void;
+  shouldUseRootMotion(): boolean;
   delete(): void;
   ptr: number;
 };

@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "GDCore/Events/EventsList.h"
+#include "GDCore/Project/SceneLifecycleEventsFunctions.h"
 #include "GDCore/String.h"
 namespace gd {
 class BaseEvent;
@@ -68,14 +68,39 @@ class GD_CORE_API ExternalEvents {
   };
 
   /**
-   * \brief Get the events.
+   * \brief Get the per-frame events.
+   *
+   * \note This is a compatibility alias for the sceneUpdate lifecycle
+   * function body. Use GetLifecycleEventsFunctions() for complete traversal.
    */
-  virtual const gd::EventsList& GetEvents() const { return events; }
+  virtual const gd::EventsList& GetEvents() const {
+    return lifecycleEventsFunctions.GetSceneUpdateFunction().GetEvents();
+  }
 
   /**
-   * \brief Get the events.
+   * \brief Get the per-frame events.
+   *
+   * \note This is a compatibility alias for the sceneUpdate lifecycle
+   * function body. Use GetLifecycleEventsFunctions() for complete traversal.
    */
-  virtual gd::EventsList& GetEvents() { return events; }
+  virtual gd::EventsList& GetEvents() {
+    return lifecycleEventsFunctions.GetSceneUpdateFunction().GetEvents();
+  }
+
+  /**
+   * \brief Get all the fixed lifecycle functions.
+   */
+  virtual const gd::SceneLifecycleEventsFunctions&
+  GetLifecycleEventsFunctions() const {
+    return lifecycleEventsFunctions;
+  }
+
+  /**
+   * \brief Get all the fixed lifecycle functions.
+   */
+  virtual gd::SceneLifecycleEventsFunctions& GetLifecycleEventsFunctions() {
+    return lifecycleEventsFunctions;
+  }
 
   /**
    * \brief Serialize external events.
@@ -91,7 +116,7 @@ class GD_CORE_API ExternalEvents {
  private:
   gd::String name;
   gd::String associatedScene;
-  gd::EventsList events;       ///< List of events
+  gd::SceneLifecycleEventsFunctions lifecycleEventsFunctions;
 
   /**
    * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.

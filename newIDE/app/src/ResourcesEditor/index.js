@@ -1,24 +1,38 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import ResourcesList, { type ResourcesListInterface } from '../ResourcesList';
 import ResourcePropertiesEditor, {
   type ResourcePropertiesEditorInterface,
 } from './ResourcePropertiesEditor';
+import FilePropertiesPanel from './FilePropertiesPanel';
+import ProjectFilesPanel, {
+  findNodeByAbsolutePath,
+  findNodeById,
+  getResourceFromNode,
+  type ProjectFilesPanelInterface,
+  type ProjectFileNode,
+  type ProjectFileSelection,
+} from './ProjectFilesPanel';
+import WorkingDesk from './WorkingDesk';
+import ToolsPanel from './ToolsPanel';
 import Toolbar from './Toolbar';
-import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
+import { type WorkingDeskToolTabUpdate } from './WorkingDeskTabTypes';
 import ResourcesLoader from '../ResourcesLoader';
-import optionalRequire from '../Utils/OptionalRequire';
 import AlertContext, { type ConfirmState } from '../UI/Alert/AlertContext';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import Dialog from '../UI/Dialog';
+import FlatButton from '../UI/FlatButton';
 import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
 import { type FileMetadata } from '../ProjectsStorage';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
+import {
+  getResourceFilePathStatus,
+  removeAllUnusedResources,
+  removeUnusedResources,
+} from '../ResourcesList/ResourceUtils';
 import type { StorageProvider } from '../ProjectsStorage';
 import {
   registerOnResourceExternallyChangedCallback,
@@ -26,14 +40,67 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 
-const gd: libGDevelop = global.gd;
+const layoutStorageKey = 'gdevelop.resourcesEditor.layout.v1';
+const minWorkingDeskHeight = 220;
+const minProjectFilesHeight = 150;
+const minToolsWidth = 300;
+const resizeHandleSize = 6;
 
-// It's important to use remote and not electron for folder actions,
-// otherwise they will be opened in the background.
-// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
-const remote = optionalRequire('@electron/remote');
-const shell = remote ? remote.shell : null;
-const path = optionalRequire('path');
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(Math.max(value, min), max);
+
+const getPersistedLayout = (): {|
+  workingDeskHeight: number,
+  toolsWidth: number,
+|} => {
+  try {
+    const serializedLayout = window.localStorage.getItem(layoutStorageKey);
+    if (!serializedLayout) {
+      return { workingDeskHeight: 420, toolsWidth: 380 };
+    }
+    const layout = JSON.parse(serializedLayout);
+    return {
+      workingDeskHeight:
+        typeof layout.workingDeskHeight === 'number'
+          ? layout.workingDeskHeight
+          : 420,
+      toolsWidth:
+        typeof layout.toolsWidth === 'number' ? layout.toolsWidth : 380,
+    };
+  } catch (error) {
+    return { workingDeskHeight: 420, toolsWidth: 380 };
+  }
+};
+
+const persistLayout = ({
+  workingDeskHeight,
+  toolsWidth,
+}: {|
+  workingDeskHeight: number,
+  toolsWidth: number,
+|}) => {
+  try {
+    window.localStorage.setItem(
+      layoutStorageKey,
+      JSON.stringify({ workingDeskHeight, toolsWidth })
+    );
+  } catch (error) {
+    // Ignore local storage errors.
+  }
+};
+
+const getResizeEventDocument = (
+  event: SyntheticMouseEvent<HTMLDivElement>
+): Document =>
+  event.currentTarget.ownerDocument
+    ? event.currentTarget.ownerDocument
+    : document;
+
+const initialLayout: {|
+  workingDeskHeight: number,
+  toolsWidth: number,
+|} = getPersistedLayout();
+
 const styles = {
   container: {
     display: 'flex',
@@ -41,10 +108,63 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
   },
+  mainColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minWidth: 0,
+    minHeight: 0,
+  },
+  workingDeskPane: {
+    display: 'flex',
+    // The preferred height is kept in the layout state, but this pane must be
+    // able to shrink when the editor is displayed in a shorter window.
+    minHeight: 0,
+    minWidth: 0,
+    overflow: 'hidden',
+  },
+  horizontalResizeHandle: {
+    flex: `0 0 ${resizeHandleSize}px`,
+    boxSizing: 'border-box',
+    cursor: 'ns-resize',
+    backgroundColor: 'rgba(128, 128, 128, 0.12)',
+    borderTop: '1px solid rgba(128, 128, 128, 0.2)',
+    borderBottom: '1px solid rgba(128, 128, 128, 0.2)',
+    position: 'relative',
+    zIndex: 2,
+  },
+  projectFilesPane: {
+    display: 'flex',
+    flex: 1,
+    minHeight: minProjectFilesHeight,
+    minWidth: 0,
+    overflow: 'hidden',
+  },
+  verticalResizeHandle: {
+    flex: `0 0 ${resizeHandleSize}px`,
+    boxSizing: 'border-box',
+    cursor: 'ew-resize',
+    backgroundColor: 'rgba(128, 128, 128, 0.12)',
+    borderLeft: '1px solid rgba(128, 128, 128, 0.2)',
+    borderRight: '1px solid rgba(128, 128, 128, 0.2)',
+    position: 'relative',
+    zIndex: 2,
+  },
+  toolsPane: {
+    display: 'flex',
+    minWidth: minToolsWidth,
+    overflow: 'hidden',
+  },
 };
 
 type State = {|
   selectedResource: ?gdResource,
+  selectedProjectFile: ?ProjectFileSelection,
+  propertiesDialogSelection: ?ProjectFileSelection,
+  workingDeskToolTabUpdate: ?WorkingDeskToolTabUpdate,
+  isPropertiesShown: boolean,
+  workingDeskHeight: number,
+  toolsWidth: number,
 |};
 
 type Props = {|
@@ -61,12 +181,53 @@ type Props = {|
   storageProvider: StorageProvider,
 |};
 
-const initialMosaicEditorNodes = {
-  direction: 'row',
-  first: 'properties',
-  second: 'resources-list',
-  splitPercentage: 66,
-};
+export type ResourcesEditorProjectFileSelectionSnapshot = {|
+  id: string,
+  name: string,
+  absolutePath: string,
+  relativePath: string,
+  type: 'folder' | 'file',
+  extension: string,
+  resourceName: ?string,
+  resourceKind: ?string,
+|};
+
+export type ResourcesEditorResourceSelectionSnapshot = {|
+  name: string,
+  kind: string,
+  file: string,
+|};
+
+export type ResourcesEditorSelectionSnapshot = {|
+  selectionProvider: 'ResourcesEditor',
+  isActive?: boolean,
+  selectedProjectFile: ?ResourcesEditorProjectFileSelectionSnapshot,
+  selectedResource: ?ResourcesEditorResourceSelectionSnapshot,
+|};
+
+const serializeProjectFileNodeForSelection = (
+  node: ProjectFileNode
+): ResourcesEditorProjectFileSelectionSnapshot => ({
+  id: node.id,
+  name: node.name,
+  absolutePath: node.absolutePath,
+  relativePath: node.relativePath,
+  type: node.type,
+  extension: node.extension,
+  resourceName: node.resourceName || null,
+  resourceKind: node.resourceKind || null,
+});
+
+const serializeResourceForSelection = (
+  resource: ?gdResource
+): ?ResourcesEditorResourceSelectionSnapshot =>
+  resource
+    ? {
+        name: resource.getName(),
+        kind: resource.getKind(),
+        file: resource.getFile(),
+      }
+    : null;
 
 export default class ResourcesEditor extends React.Component<Props, State> {
   static contextType: React.Context<ConfirmState> = AlertContext;
@@ -75,19 +236,27 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     setToolbar: () => {},
   };
   resourceExternallyChangedCallbackId: ?string;
-  editorMosaic: ?EditorMosaicInterface = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
-  _resourcesList: ?ResourcesListInterface = null;
+  _projectFilesPanel: ?ProjectFilesPanelInterface = null;
+  _container: ?HTMLDivElement = null;
+  _mainColumn: ?HTMLDivElement = null;
   // $FlowFixMe[missing-local-annot]
   resourcesLoader = ResourcesLoader;
   state: State = {
     selectedResource: null,
+    selectedProjectFile: null,
+    propertiesDialogSelection: null,
+    workingDeskToolTabUpdate: null,
+    isPropertiesShown: false,
+    workingDeskHeight: initialLayout.workingDeskHeight,
+    toolsWidth: initialLayout.toolsWidth,
   };
 
   componentDidMount() {
     this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
       this.onResourceExternallyChanged.bind(this)
     );
+    this.updateToolbar();
   }
 
   componentWillUnmount() {
@@ -96,30 +265,74 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   }
 
-  refreshResourcesList() {
-    if (this._resourcesList) this._resourcesList.forceUpdateList();
+  refreshResourcesList = async (): Promise<void> => {
+    if (!this._projectFilesPanel) return;
+    await this._projectFilesPanel.refresh();
+  };
+
+  refreshResourcesListAndRemoveUnusedResources = async (): Promise<void> => {
+    this._removeUnusedResourcesFromProject();
+    await this.refreshResourcesList();
+  };
+
+  getEditorSelectionSnapshot(): ResourcesEditorSelectionSnapshot {
+    const { selectedProjectFile } = this.state;
+
+    return {
+      selectionProvider: 'ResourcesEditor',
+      selectedProjectFile: selectedProjectFile
+        ? serializeProjectFileNodeForSelection(selectedProjectFile.node)
+        : null,
+      selectedResource: selectedProjectFile
+        ? serializeResourceForSelection(selectedProjectFile.resource)
+        : null,
+    };
   }
 
   updateToolbar = () => {
-    const openedEditorNames = this.editorMosaic
-      ? this.editorMosaic.getOpenedEditorNames()
-      : [];
-
     this.props.setToolbar(
       <Toolbar
-        onOpenProjectFolder={this.openProjectFolder}
-        canOpenProjectFolder={
-          !!remote &&
-          !!this.props.fileMetadata &&
-          this.props.storageProvider.internalName === 'LocalFile'
-        }
         onToggleProperties={this.toggleProperties}
-        isPropertiesShown={openedEditorNames.includes('properties')}
-        canDelete={!!this.state.selectedResource}
-        onDeleteSelection={() =>
-          this.deleteResource(this.state.selectedResource)
-        }
+        isPropertiesShown={this.state.isPropertiesShown}
       />
+    );
+  };
+
+  _updateSelectedProjectFileFromRootNode = (rootNode: ProjectFileNode) => {
+    const { project } = this.props;
+    const { selectedProjectFile } = this.state;
+    if (!selectedProjectFile) return;
+
+    const refreshedNode =
+      findNodeById(rootNode, selectedProjectFile.node.id) ||
+      findNodeByAbsolutePath(rootNode, selectedProjectFile.node.absolutePath);
+    if (!refreshedNode) {
+      this.setState(
+        {
+          selectedResource: null,
+          selectedProjectFile: null,
+        },
+        () => {
+          if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+          this.updateToolbar();
+        }
+      );
+      return;
+    }
+
+    const refreshedResource = getResourceFromNode(project, refreshedNode);
+    this.setState(
+      {
+        selectedProjectFile: {
+          node: refreshedNode,
+          resource: refreshedResource,
+        },
+        selectedResource: refreshedResource,
+      },
+      () => {
+        if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
+        this.updateToolbar();
+      }
     );
   };
 
@@ -138,31 +351,24 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     if (!answer) return;
 
     const resourcesManager = project.getResourcesManager();
-    const currentIndex = resourcesManager.getResourcePosition(
-      resource.getName()
-    );
 
     onDeleteResource(resource, doRemove => {
       if (!doRemove || !resource) return;
 
       resourcesManager.removeResource(resource.getName());
 
-      const newCount = resourcesManager.count();
-      const nextResourceToSelect =
-        newCount > 0
-          ? resourcesManager.getResourceAt(Math.min(currentIndex, newCount - 1))
-          : null;
-
       this.setState(
         {
-          selectedResource: nextResourceToSelect,
+          selectedResource: null,
+          selectedProjectFile: this.state.selectedProjectFile
+            ? {
+                node: this.state.selectedProjectFile.node,
+                resource: null,
+              }
+            : null,
         },
         () => {
-          const resourcesList = this._resourcesList;
-          if (resourcesList) {
-            resourcesList.forceUpdateList();
-            resourcesList.focusList();
-          }
+          this.refreshResourcesList();
           const propertiesEditor = this._propertiesEditor;
           if (propertiesEditor) propertiesEditor.forceUpdate();
           this.updateToolbar();
@@ -191,47 +397,53 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
       resource.setName(newName);
 
-      const resourcesList = this._resourcesList;
-      if (resourcesList) {
-        resourcesList.forceUpdateList();
-        resourcesList.focusList();
-      }
+      this.refreshResourcesList();
       const propertiesEditor = this._propertiesEditor;
       if (propertiesEditor) propertiesEditor.forceUpdate();
     });
   };
 
-  _removeUnusedResources = (resourceKind: ResourceKind) => {
-    const { project } = this.props;
+  _removeUnusedResourcesFromProject = (
+    resourceKind?: ResourceKind
+  ): Array<string> => {
+    const { project, resourceManagementProps } = this.props;
     const selectedResourceName = this.state.selectedResource
       ? this.state.selectedResource.getName()
       : null;
 
-    const removedResourceNames = gd.ProjectResourcesAdder.getAllUseless(
-      project,
-      resourceKind
-    ).toJSArray();
-    console.info(
-      `Removing ${
-        removedResourceNames.length
-      } unused ${resourceKind} resource(s):`,
-      removedResourceNames
-    );
+    const removedResourceNames = resourceKind
+      ? removeUnusedResources(project, resourceKind)
+      : removeAllUnusedResources(project);
+    if (!removedResourceNames.length) return removedResourceNames;
 
-    gd.ProjectResourcesAdder.removeAllUseless(project, resourceKind);
+    console.info('Removing unused resource(s):', removedResourceNames);
 
     // The selectedResource might be *invalid* now if it was removed.
     // Be sure to drop the reference to it if that's the case.
     // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
-      this._onResourceSelected(null);
+      this.setState({
+        selectedResource: null,
+        selectedProjectFile: this.state.selectedProjectFile
+          ? {
+              node: this.state.selectedProjectFile.node,
+              resource: null,
+            }
+          : null,
+      });
     }
+
+    resourceManagementProps.onResourceUsageChanged();
+
+    return removedResourceNames;
+  };
+
+  _removeUnusedResources = (resourceKind: ResourceKind) => {
+    this._removeUnusedResourcesFromProject(resourceKind);
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
-    if (this._resourcesList) {
-      this._resourcesList.forceUpdateList();
-    }
+    this.refreshResourcesList();
   };
 
   _removeAllResourcesWithInvalidPath = () => {
@@ -257,30 +469,115 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     // Be sure to drop the reference to it if that's the case.
     // $FlowFixMe[incompatible-type]
     if (removedResourceNames.includes(selectedResourceName)) {
-      this._onResourceSelected(null);
+      this.setState({
+        selectedResource: null,
+        selectedProjectFile: this.state.selectedProjectFile
+          ? {
+              node: this.state.selectedProjectFile.node,
+              resource: null,
+            }
+          : null,
+      });
     }
 
     // Force update of the resources list as otherwise it could render
     // resources that were just deleted.
-    if (this._resourcesList) {
-      this._resourcesList.forceUpdateList();
-    }
-  };
-
-  openProjectFolder = () => {
-    if (shell)
-      shell.openPath(path.dirname(this.props.project.getProjectFile()));
+    this.refreshResourcesList();
   };
 
   toggleProperties = () => {
-    if (!this.editorMosaic) return;
-    this.editorMosaic.toggleEditor('properties', 'left');
+    this.setState(
+      state => ({
+        isPropertiesShown: !state.isPropertiesShown,
+      }),
+      this.updateToolbar
+    );
   };
 
-  _onResourceSelected = (selectedResource: ?gdResource) => {
+  _updateLayout = (partialLayout: {|
+    workingDeskHeight?: number,
+    toolsWidth?: number,
+  |}) => {
+    this.setState(state => {
+      const nextLayout = {
+        workingDeskHeight:
+          typeof partialLayout.workingDeskHeight === 'number'
+            ? partialLayout.workingDeskHeight
+            : state.workingDeskHeight,
+        toolsWidth:
+          typeof partialLayout.toolsWidth === 'number'
+            ? partialLayout.toolsWidth
+            : state.toolsWidth,
+      };
+      persistLayout(nextLayout);
+      return nextLayout;
+    });
+  };
+
+  _startWorkingDeskResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const mainColumn = this._mainColumn;
+    if (!mainColumn) return;
+    const bounds = mainColumn.getBoundingClientRect();
+    const eventDocument = getResizeEventDocument(event);
+
+    const onMouseMove = (event: MouseEvent) => {
+      const maxWorkingDeskHeight = Math.max(
+        0,
+        bounds.height - minProjectFilesHeight - resizeHandleSize
+      );
+      const minimumWorkingDeskHeight = Math.min(
+        minWorkingDeskHeight,
+        maxWorkingDeskHeight
+      );
+      this._updateLayout({
+        workingDeskHeight: clamp(
+          event.clientY - bounds.top,
+          minimumWorkingDeskHeight,
+          maxWorkingDeskHeight
+        ),
+      });
+    };
+    const onMouseUp = () => {
+      eventDocument.removeEventListener('mousemove', onMouseMove);
+      eventDocument.removeEventListener('mouseup', onMouseUp);
+    };
+    eventDocument.addEventListener('mousemove', onMouseMove);
+    eventDocument.addEventListener('mouseup', onMouseUp);
+  };
+
+  _startToolsResize = (event: SyntheticMouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const container = this._container;
+    if (!container) return;
+    const bounds = container.getBoundingClientRect();
+    const eventDocument = getResizeEventDocument(event);
+
+    const onMouseMove = (event: MouseEvent) => {
+      const maxToolsWidth = Math.max(minToolsWidth, bounds.width - 420);
+      this._updateLayout({
+        toolsWidth: clamp(
+          bounds.right - event.clientX,
+          minToolsWidth,
+          maxToolsWidth
+        ),
+      });
+    };
+    const onMouseUp = () => {
+      eventDocument.removeEventListener('mousemove', onMouseMove);
+      eventDocument.removeEventListener('mouseup', onMouseUp);
+    };
+    eventDocument.addEventListener('mousemove', onMouseMove);
+    eventDocument.addEventListener('mouseup', onMouseUp);
+  };
+
+  _onProjectFileSelected = (selectedProjectFile: ?ProjectFileSelection) => {
     this.setState(
       {
-        selectedResource,
+        selectedProjectFile,
+        selectedResource: selectedProjectFile
+          ? selectedProjectFile.resource
+          : null,
       },
       () => {
         if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
@@ -296,83 +593,178 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     this.refreshResourcesList();
   };
 
-  render(): any {
-    const { project, resourceManagementProps, fileMetadata } = this.props;
-    const { selectedResource } = this.state;
-    const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
+  _openPropertiesDialog = (selectedProjectFile: ProjectFileSelection) => {
+    this.setState({ propertiesDialogSelection: selectedProjectFile });
+  };
 
-    const editors = {
-      properties: {
-        type: 'secondary',
-        title: t`Properties`,
-        renderEditor: () => (
-          <I18n>
-            {({ i18n }) => (
-              <ResourcePropertiesEditor
-                key={selectedResource ? selectedResource.ptr : undefined}
-                resources={selectedResource ? [selectedResource] : []}
-                project={project}
-                resourcesLoader={this.resourcesLoader}
-                ref={propertiesEditor =>
-                  (this._propertiesEditor = propertiesEditor)
-                }
-                onResourcePathUpdated={() => {
-                  if (this._resourcesList) {
-                    this._resourcesList.checkMissingPaths();
-                  }
-                }}
-                resourceManagementProps={resourceManagementProps}
-                i18n={i18n}
-              />
-            )}
-          </I18n>
-        ),
-      },
-      'resources-list': {
-        type: 'primary',
-        noTitleBar: true,
-        renderEditor: () => (
-          <ResourcesList
-            project={project}
-            fileMetadata={fileMetadata}
-            onDeleteResource={this.deleteResource}
-            onRenameResource={this.renameResource}
-            onSelectResource={this._onResourceSelected}
-            selectedResource={selectedResource}
-            ref={resourcesList => (this._resourcesList = resourcesList)}
-            onRemoveUnusedResources={this._removeUnusedResources}
-            onRemoveAllResourcesWithInvalidPath={
-              this._removeAllResourcesWithInvalidPath
-            }
-            getResourceActionsSpecificToStorageProvider={
-              resourcesActionsMenuBuilder
-            }
-          />
-        ),
-      },
-    };
+  _closePropertiesDialog = () => {
+    this.setState({ propertiesDialogSelection: null });
+  };
 
-    return (
-      <div style={styles.container}>
-        <PreferencesContext.Consumer>
-          {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
-            <EditorMosaic
-              // $FlowFixMe[incompatible-type]
-              editors={editors}
-              centralNodeId="resources-list"
-              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-              initialNodes={
-                getDefaultEditorMosaicNode('resources-editor') ||
-                // $FlowFixMe[incompatible-type]
-                initialMosaicEditorNodes
+  _openWorkingDeskToolTab = (
+    workingDeskToolTabUpdate: WorkingDeskToolTabUpdate
+  ) => {
+    this.setState({ workingDeskToolTabUpdate });
+  };
+
+  _renderPropertiesContent = (
+    selectedProjectFile: ?ProjectFileSelection
+  ): React.Node => {
+    const { project, resourceManagementProps } = this.props;
+    const selectedResource = selectedProjectFile
+      ? selectedProjectFile.resource
+      : null;
+
+    if (selectedResource) {
+      return (
+        <I18n>
+          {({ i18n }) => (
+            <ResourcePropertiesEditor
+              key={selectedResource.ptr}
+              resources={[selectedResource]}
+              project={project}
+              resourcesLoader={this.resourcesLoader}
+              ref={propertiesEditor =>
+                (this._propertiesEditor = propertiesEditor)
               }
-              onOpenedEditorsChanged={this.updateToolbar}
-              onPersistNodes={node =>
-                setDefaultEditorMosaicNode('resources-editor', node)
-              }
+              onResourcePathUpdated={() => {
+                this.refreshResourcesList();
+              }}
+              resourceManagementProps={resourceManagementProps}
+              i18n={i18n}
+              hidePreview
             />
           )}
-        </PreferencesContext.Consumer>
+        </I18n>
+      );
+    }
+
+    this._propertiesEditor = null;
+    return <FilePropertiesPanel selectedItem={selectedProjectFile} />;
+  };
+
+  _renderPropertiesDialog = (): React.Node => {
+    const { propertiesDialogSelection } = this.state;
+    if (!propertiesDialogSelection) return null;
+
+    return (
+      <Dialog
+        title={
+          <React.Fragment>
+            <Trans>Properties</Trans>: {propertiesDialogSelection.node.name}
+          </React.Fragment>
+        }
+        open
+        onRequestClose={this._closePropertiesDialog}
+        maxWidth="md"
+        fullHeight
+        noPadding
+        flexBody
+        actions={[
+          <FlatButton
+            key="close"
+            label={<Trans>Close</Trans>}
+            onClick={this._closePropertiesDialog}
+          />,
+        ]}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flex: 1,
+            minHeight: 0,
+            minWidth: 0,
+          }}
+        >
+          {this._renderPropertiesContent(propertiesDialogSelection)}
+        </div>
+      </Dialog>
+    );
+  };
+
+  render(): any {
+    const { project, fileMetadata } = this.props;
+    const {
+      selectedProjectFile,
+      isPropertiesShown,
+      workingDeskHeight,
+      toolsWidth,
+      workingDeskToolTabUpdate,
+    } = this.state;
+
+    return (
+      <div
+        style={styles.container}
+        ref={container => (this._container = container)}
+      >
+        <div
+          style={styles.mainColumn}
+          ref={mainColumn => (this._mainColumn = mainColumn)}
+        >
+          <div
+            style={{
+              ...styles.workingDeskPane,
+              // Treat the persisted height as a preferred size. Allowing this
+              // pane to shrink prevents it from hiding the panel below when a
+              // popped-out editor window is shorter than the main editor.
+              flex: `0 1 ${workingDeskHeight}px`,
+            }}
+          >
+            <WorkingDesk
+              project={project}
+              resourcesLoader={this.resourcesLoader}
+              selectedItem={selectedProjectFile}
+              toolTabUpdate={workingDeskToolTabUpdate}
+              onProjectFilesChanged={this.refreshResourcesList}
+            />
+          </div>
+          <div
+            style={styles.horizontalResizeHandle}
+            onMouseDown={this._startWorkingDeskResize}
+          />
+          <div style={styles.projectFilesPane}>
+            <ProjectFilesPanel
+              project={project}
+              fileMetadata={fileMetadata}
+              storageProvider={this.props.storageProvider}
+              selectedItem={selectedProjectFile}
+              onSelectProjectFile={this._onProjectFileSelected}
+              onViewProjectFileProperties={this._openPropertiesDialog}
+              onUnregisterResource={this.deleteResource}
+              onRefreshProjectFiles={
+                this.refreshResourcesListAndRemoveUnusedResources
+              }
+              onProjectFilesRefreshed={
+                this._updateSelectedProjectFileFromRootNode
+              }
+              ref={projectFilesPanel =>
+                (this._projectFilesPanel = projectFilesPanel)
+              }
+            />
+          </div>
+        </div>
+        {isPropertiesShown && (
+          <>
+            <div
+              style={styles.verticalResizeHandle}
+              onMouseDown={this._startToolsResize}
+            />
+            <div
+              style={{
+                ...styles.toolsPane,
+                width: toolsWidth,
+              }}
+            >
+              <ToolsPanel
+                project={project}
+                selectedItem={selectedProjectFile}
+                onOpenWorkingDeskTask={this._openWorkingDeskToolTab}
+                onProjectFilesChanged={this.refreshResourcesList}
+              />
+            </div>
+          </>
+        )}
+        {this._renderPropertiesDialog()}
       </div>
     );
   }

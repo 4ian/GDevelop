@@ -7,14 +7,14 @@ import VariableField, {
   type VariableFieldInterface,
 } from './VariableField';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
-import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
+import UnifiedVariablesDialog from '../../VariablesList/UnifiedVariablesDialog';
 import LocalVariablesDialog from '../../VariablesList/LocalVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariablesOrPropertiesOfContainersList } from './EnumerateVariables';
+import { enumerateVariablesOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
@@ -46,7 +46,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
-        enumerateVariablesOrPropertiesOfContainersList(
+        enumerateVariablesOfContainersList(
           projectScopedContainersAccessor.get().getVariablesContainersList()
         ),
       [projectScopedContainersAccessor]
@@ -149,7 +149,7 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               />
             )
           ) : (
-            <GlobalAndSceneVariablesDialog
+            <UnifiedVariablesDialog
               projectScopedContainersAccessor={projectScopedContainersAccessor}
               open
               onCancel={() => setVariableEditorOpen(null)}
@@ -187,4 +187,16 @@ export const getVariableSourceFromIdentifier = (
 export const renderInlineAnyVariableOrProperty = (
   props: ParameterInlineRendererProps
 ): any =>
-  renderVariableWithIcon(props, 'variable', getVariableSourceFromIdentifier);
+  renderVariableWithIcon(
+    {
+      ...props,
+      hasDeprecationWarning:
+        props.hasDeprecationWarning ||
+        getVariableSourceFromIdentifier(
+          props.value,
+          props.projectScopedContainersAccessor.get()
+        ) === gd.VariablesContainer.Properties,
+    },
+    'variable',
+    getVariableSourceFromIdentifier
+  );

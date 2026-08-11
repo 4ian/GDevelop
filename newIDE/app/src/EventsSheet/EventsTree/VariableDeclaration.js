@@ -46,6 +46,8 @@ const getVariableTypeLabel = (variable: gdVariable, i18n: I18nType) => {
   const type = variable.getType();
   return type === gd.Variable.String
     ? i18n._('Text')
+    : type === gd.Variable.Enum
+    ? i18n._('Enum')
     : type === gd.Variable.Number
     ? i18n._('Number')
     : type === gd.Variable.Boolean
@@ -67,7 +69,7 @@ const getVariableValueAsString = (variable: gdVariable, i18n: I18nType) => {
           ? t`1 child`
           : t`${variable.getChildrenCount()} children`
       )
-    : type === gd.Variable.String
+    : type === gd.Variable.String || type === gd.Variable.Enum
     ? variable.getString()
     : type === gd.Variable.Number
     ? variable.getValue().toString()

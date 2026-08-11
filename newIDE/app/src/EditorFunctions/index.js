@@ -11,7 +11,11 @@ import {
   serializeToJSON,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { type AiGeneratedEvent } from '../Utils/GDevelopServices/Generation';
+import {
+  type AiGeneratedEvent,
+  type AiGeneratedEventChange,
+  type AiGeneratedEventMissingResource,
+} from '../Utils/GDevelopServices/Generation';
 import {
   renderNonTranslatedEventsAsText,
   renderNonTranslatedEventsAsTextWithErrors,
@@ -28,6 +32,10 @@ import {
   addUndeclaredVariables,
   applyEventsChanges,
 } from './ApplyEventsChanges';
+import {
+  scanEventsListForValidationErrors,
+  type ValidationError,
+} from '../Utils/EventsValidationScanner';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
@@ -81,10 +89,20 @@ import {
   getObjectSizeInfoHints,
   type ObjectSizeInfo,
 } from './Utils';
+import { type OpenLayoutHandler } from '../MainFrame/EditorContainers/BaseEditor';
 import { executeScript } from './ScriptExecution/ScriptRunner';
 import { buildExposedScriptFunctions } from './ScriptExecution/ExposedFunctions';
 import { capScriptExecutionResult } from './ScriptExecution/CapScriptOutput';
 import { isNoOpConsideredSuccess } from './IsNoOpConsideredSuccess';
+import {
+  DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME,
+  getSceneLifecycleEvents,
+  getSceneLifecycleEventsFunction,
+  getSceneLifecycleFunctionDisplayName,
+  isSceneLifecycleFunctionName,
+  sceneLifecycleFunctionDefinitions,
+  type SceneLifecycleFunctionName,
+} from '../SceneContextLifecycleFunctions';
 
 export type HintEntry = {|
   code: string,
@@ -176,6 +194,8 @@ export type EditorFunctionGenericOutput = {|
   // from `functionCallRecords`/CloudWatch without any new telemetry.
   nothingChanged?: boolean,
   eventsAsText?: string,
+  lifecycleFunctionName?: SceneLifecycleFunctionName,
+  lifecycleFunctionLabel?: string,
   // Per-event/instruction rendering failures (the rest still rendered).
   eventsRenderingErrors?: Array<EventsTextRenderingError>,
   objectName?: string,
@@ -209,6 +229,11 @@ export type EditorFunctionGenericOutput = {|
   notes?: Array<string>,
   generatedEventsErrorDiagnostics?: string,
   aiGeneratedEventId?: string,
+  // Compatibility receipt returned by the fork's direct event JSON path.
+  aiGeneratedEventIds?: Array<string>,
+  requestedOperations?: Array<Object>,
+  operationSummary?: { [string]: number },
+  lowLevelMutations?: number,
   warnings?: string,
   errors?: Array<string>,
 
@@ -301,18 +326,10 @@ export type AssetSearchAndInstallOptions = {|
 |};
 
 export type EditorCallbacks = {|
-  onOpenLayout: (
-    sceneName: string,
-    options: {|
-      openEventsEditor: boolean,
-      openSceneEditor: boolean,
-      focusWhenOpened:
-        | 'scene-or-events-otherwise'
-        | 'scene'
-        | 'events'
-        | 'none',
-    |}
-  ) => void,
+  onOpenLayout: OpenLayoutHandler,
+  // Kept for legacy scene deletion/rename tools. Editors are closed before
+  // mutating the layout so mounted views cannot retain freed C++ wrappers.
+  onCloseLayout?: (sceneName: string) => void,
   onCreateProject: ({|
     name: string,
     exampleSlug: string | null,
@@ -5199,6 +5216,37 @@ const put3dInstances: EditorFunction = {
 
 export const noEventsInSceneText = 'This scene has no events.';
 
+const extractSceneLifecycleFunctionName = (
+  args: any
+): SceneLifecycleFunctionName => {
+  const lifecycleFunctionName =
+    SafeExtractor.extractStringProperty(args, 'lifecycle_function_name') ||
+    SafeExtractor.extractStringProperty(args, 'lifecycleFunctionName') ||
+    DEFAULT_SCENE_LIFECYCLE_FUNCTION_NAME;
+  if (!isSceneLifecycleFunctionName(lifecycleFunctionName)) {
+    throw new Error(
+      `Invalid lifecycle function "${lifecycleFunctionName}". Expected sceneLoad, sceneSignal, sceneUpdate, or sceneUnload.`
+    );
+  }
+  return (lifecycleFunctionName: any);
+};
+
+const getSceneLifecyclePlacementGuidance = (
+  lifecycleFunctionName: SceneLifecycleFunctionName
+): string => {
+  switch (lifecycleFunctionName) {
+    case 'sceneLoad':
+      return 'Place only initialization and one-time scene setup here. Do not add SceneJustBegins or SignalReceived.';
+    case 'sceneSignal':
+      return 'This function runs once per delivered scene signal. Compare SignalName() directly and read SignalPayload(); do not add SignalReceived.';
+    case 'sceneUnload':
+      return 'Place only final synchronous cleanup here. Do not add awaited/future-frame work, signal emission, or scene transitions.';
+    case 'sceneUpdate':
+    default:
+      return 'Place input, movement, timers, continuous comparisons, and ordinary per-frame gameplay here.';
+  }
+};
+
 /**
  * Retrieves the event sheet structure for a scene
  */
@@ -5229,13 +5277,14 @@ const readSceneEvents: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const lifecycleFunctionName = extractSceneLifecycleFunctionName(args);
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
-    const events = scene.getEvents();
+    const events = getSceneLifecycleEvents(scene, lifecycleFunctionName);
 
     const {
       text: eventsAsText,
@@ -5257,6 +5306,10 @@ const readSceneEvents: EditorFunction = {
     return {
       success: true,
       eventsForSceneNamed: scene_name,
+      lifecycleFunctionName,
+      lifecycleFunctionLabel: getSceneLifecycleFunctionDisplayName(
+        lifecycleFunctionName
+      ),
       // Disambiguate a genuinely empty scene from a failed/empty read.
       eventsAsText: eventsAsText || noEventsInSceneText,
       // Surface partial failures so the cause is reported, not dropped.
@@ -5304,12 +5357,14 @@ const readEventsSource: EditorFunction = {
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const lifecycleFunctionName = extractSceneLifecycleFunctionName(args);
 
     if (!project.hasLayoutNamed(scene_name)) {
       return makeSceneNotFoundFailure(project, scene_name);
     }
 
     const scene = project.getLayout(scene_name);
+    const events = getSceneLifecycleEvents(scene, lifecycleFunctionName);
     const eventIds = SafeExtractor.extractStringArrayProperty(
       args,
       'event_ids'
@@ -5342,7 +5397,7 @@ const readEventsSource: EditorFunction = {
       notes,
       renderingErrors,
     } = buildEventScriptSourceView({
-      eventsList: scene.getEvents(),
+      eventsList: events,
       eventIds,
       searchText,
       objectNames,
@@ -5353,12 +5408,12 @@ const readEventsSource: EditorFunction = {
     const output: EditorFunctionGenericOutput = {
       success: true,
       eventsForSceneNamed: scene_name,
+      lifecycleFunctionName,
       // An empty `text` does NOT mean the scene has no events: a filter can
       // match nothing on a populated sheet (the notes say which case it
       // is). Only a truly empty sheet gets the "no events" text.
       eventScript:
-        text ||
-        (scene.getEvents().getEventsCount() === 0 ? noEventsInSceneText : ''),
+        text || (events.getEventsCount() === 0 ? noEventsInSceneText : ''),
       selectedEventIds,
     };
     if (truncated) output.truncated = true;
@@ -5370,6 +5425,320 @@ const readEventsSource: EditorFunction = {
     return output;
   },
   modifiesProject: false,
+};
+
+// Legacy agent/chat and MCP callers can provide already-generated serialized
+// events. Keep this path alongside the v11 EventScript generation contract.
+const getStringPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): string | null => {
+  for (const propertyName of propertyNames) {
+    const extractedValue = SafeExtractor.extractStringProperty(
+      value,
+      propertyName
+    );
+    if (extractedValue !== null) return extractedValue;
+  }
+
+  return null;
+};
+
+const getJsonStringPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): string | null => {
+  const object = SafeExtractor.extractObject(value);
+  if (!object) return null;
+
+  for (const propertyName of propertyNames) {
+    const propertyValue = object[propertyName];
+    if (typeof propertyValue === 'string') return propertyValue;
+    if (propertyValue !== null && propertyValue !== undefined) {
+      return JSON.stringify(propertyValue);
+    }
+  }
+
+  return null;
+};
+
+const getArrayPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): Array<any> | null => {
+  for (const propertyName of propertyNames) {
+    const extractedValue = SafeExtractor.extractArrayProperty(
+      value,
+      propertyName
+    );
+    if (extractedValue !== null) return extractedValue;
+  }
+
+  return null;
+};
+
+const getObjectPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): Object | null => {
+  for (const propertyName of propertyNames) {
+    const extractedValue = SafeExtractor.extractObjectProperty(
+      value,
+      propertyName
+    );
+    if (extractedValue !== null) return extractedValue;
+  }
+
+  return null;
+};
+
+const getStringArrayPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): Array<string> => {
+  const array = getArrayPropertyWithAliases(value, propertyNames);
+  if (!array) return [];
+
+  return array.filter(item => typeof item === 'string');
+};
+
+const getMissingResourcesPropertyWithAliases = (
+  value: any,
+  propertyNames: Array<string>
+): Array<AiGeneratedEventMissingResource> => {
+  const array = getArrayPropertyWithAliases(value, propertyNames);
+  if (!array) return [];
+
+  return array
+    .map(resource => {
+      const resourceName = getStringPropertyWithAliases(resource, [
+        'resource_name',
+        'resourceName',
+      ]);
+      const resourceKind = getStringPropertyWithAliases(resource, [
+        'resource_kind',
+        'resourceKind',
+      ]);
+      if (!resourceName || !resourceKind) return null;
+
+      return {
+        resourceName,
+        resourceKind,
+      };
+    })
+    .filter(Boolean);
+};
+
+const makeDirectEventChange = (
+  input: any,
+  fallbackOperationName: string
+): AiGeneratedEventChange | null => {
+  const generatedEvents = getJsonStringPropertyWithAliases(input, [
+    'generated_events',
+    'generatedEvents',
+    'events_json',
+    'eventsJson',
+  ]);
+
+  const operationName =
+    getStringPropertyWithAliases(input, ['operation_name', 'operationName']) ||
+    fallbackOperationName;
+
+  return {
+    operationName,
+    operationTargetEvent: getStringPropertyWithAliases(input, [
+      'operation_target_event',
+      'operationTargetEvent',
+    ]),
+    isEventsJsonValid: true,
+    generatedEvents,
+    areEventsValid: true,
+    extensionNames: getStringArrayPropertyWithAliases(input, [
+      'extension_names',
+      'extensionNames',
+    ]),
+    diagnosticLines: [],
+    undeclaredVariables:
+      getArrayPropertyWithAliases(input, [
+        'undeclared_variables',
+        'undeclaredVariables',
+      ]) || [],
+    undeclaredObjectVariables:
+      getObjectPropertyWithAliases(input, [
+        'undeclared_object_variables',
+        'undeclaredObjectVariables',
+      ]) || {},
+    missingObjectBehaviors:
+      getObjectPropertyWithAliases(input, [
+        'missing_object_behaviors',
+        'missingObjectBehaviors',
+      ]) || {},
+    missingResources: getMissingResourcesPropertyWithAliases(input, [
+      'missing_resources',
+      'missingResources',
+    ]),
+  };
+};
+
+const makeDirectEventChanges = (
+  args: any
+): Array<AiGeneratedEventChange> | null => {
+  const eventsJson = getJsonStringPropertyWithAliases(args, [
+    'events_json',
+    'eventsJson',
+    'events',
+  ]);
+  if (eventsJson) {
+    return [
+      {
+        operationName:
+          SafeExtractor.extractStringProperty(args, 'operation_name') ||
+          'insert_at_end',
+        operationTargetEvent: SafeExtractor.extractStringProperty(
+          args,
+          'operation_target_event'
+        ),
+        isEventsJsonValid: true,
+        generatedEvents: eventsJson,
+        areEventsValid: true,
+        extensionNames: getStringArrayPropertyWithAliases(args, [
+          'extension_names',
+          'extensionNames',
+        ]),
+        diagnosticLines: [],
+        undeclaredVariables: [],
+        undeclaredObjectVariables: {},
+        missingObjectBehaviors: {},
+        missingResources: getMissingResourcesPropertyWithAliases(args, [
+          'missing_resources',
+          'missingResources',
+        ]),
+      },
+    ];
+  }
+
+  const eventChanges = SafeExtractor.extractArrayProperty(
+    args,
+    'event_changes'
+  );
+  if (!eventChanges) return null;
+
+  return eventChanges
+    .map(change => makeDirectEventChange(change, 'insert_at_end'))
+    .filter(Boolean);
+};
+
+const formatEventValidationError = (error: ValidationError): string => {
+  const instructionKind = error.isCondition ? 'condition' : 'action';
+  const eventPath =
+    error.eventPath.length > 0 ? error.eventPath.join('.') : 'root';
+  const parameterIndex =
+    typeof error.parameterIndex === 'number'
+      ? ` parameter ${error.parameterIndex}`
+      : '';
+  const parameterValue =
+    typeof error.parameterValue === 'string'
+      ? ` value "${error.parameterValue}"`
+      : '';
+  return `${error.type} in ${instructionKind} "${
+    error.instructionType
+  }" at event ${eventPath}${parameterIndex}${parameterValue}: ${
+    error.instructionSentence
+  }`;
+};
+
+const normalizeSerializedEventsInput = (value: any): any => {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === 'object') {
+    if (typeof value.type === 'string') return [value];
+    if (Array.isArray(value.events)) return value.events;
+  }
+  return value;
+};
+
+const validateDirectEventChangesBeforeApply = ({
+  project,
+  scene,
+  lifecycleFunction,
+  lifecycleFunctionName,
+  eventChanges,
+}: {|
+  project: gdProject,
+  scene: gdLayout,
+  lifecycleFunction: gdEventsFunction,
+  lifecycleFunctionName: SceneLifecycleFunctionName,
+  eventChanges: Array<AiGeneratedEventChange>,
+|}): Array<string> => {
+  const errors: Array<string> = [];
+
+  eventChanges.forEach((change, changeIndex) => {
+    if (change.operationName === 'delete_event') return;
+
+    const generatedEvents = change.generatedEvents;
+    if (!generatedEvents) {
+      errors.push(
+        `Event change ${changeIndex + 1} is missing generated events.`
+      );
+      return;
+    }
+
+    let parsedEvents;
+    try {
+      parsedEvents = normalizeSerializedEventsInput(
+        JSON.parse(generatedEvents)
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      errors.push(
+        `Event change ${changeIndex + 1} has invalid JSON: ${errorMessage}`
+      );
+      return;
+    }
+
+    if (!Array.isArray(parsedEvents)) {
+      errors.push(
+        `Event change ${changeIndex +
+          1} generated_events must be a serialized event array, a single serialized event object, or an object with an events array.`
+      );
+      return;
+    }
+
+    const eventsList = new gd.EventsList();
+    try {
+      unserializeFromJSObject(
+        eventsList,
+        parsedEvents,
+        'unserializeFrom',
+        project
+      );
+      const validationErrors = scanEventsListForValidationErrors({
+        project,
+        eventsList,
+        layout: scene,
+        lifecycleFunction,
+        lifecycleFunctionName,
+      });
+      for (const validationError of validationErrors) {
+        errors.push(
+          `Event change ${changeIndex + 1}: ${formatEventValidationError(
+            validationError
+          )}`
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      errors.push(
+        `Event change ${changeIndex +
+          1} could not be unserialized: ${errorMessage}`
+      );
+    } finally {
+      eventsList.delete();
+    }
+  });
+
+  return errors;
 };
 
 /**
@@ -5646,6 +6015,7 @@ const addSceneEvents: EditorFunction = {
     searchAndInstallResources,
   }) => {
     const sceneName = extractRequiredString(args, 'scene_name');
+    const lifecycleFunctionName = extractSceneLifecycleFunctionName(args);
     const eventsDescription = SafeExtractor.extractStringProperty(
       args,
       'events_description'
@@ -5653,10 +6023,6 @@ const addSceneEvents: EditorFunction = {
     const eventBatches = SafeExtractor.extractArrayProperty(
       args,
       'event_batches'
-    );
-    const extensionNamesList = extractRequiredString(
-      args,
-      'extension_names_list'
     );
     const objectsListArgument = SafeExtractor.extractStringProperty(
       args,
@@ -5667,19 +6033,258 @@ const addSceneEvents: EditorFunction = {
       'estimated_complexity'
     );
     const objectsList = objectsListArgument === null ? '' : objectsListArgument;
-    const placementHint =
+    const requestedPlacementHint =
       SafeExtractor.extractStringProperty(args, 'placement_hint') || '';
+    const lifecyclePlacementGuidance = getSceneLifecyclePlacementGuidance(
+      lifecycleFunctionName
+    );
+    const placementHint = requestedPlacementHint
+      ? `${lifecyclePlacementGuidance} Additional placement request: ${requestedPlacementHint}`
+      : lifecyclePlacementGuidance;
 
     if (!project.hasLayoutNamed(sceneName)) {
       return makeSceneNotFoundFailure(project, sceneName);
     }
+    const scene = project.getLayout(sceneName);
+    const currentSceneEvents = getSceneLifecycleEvents(
+      scene,
+      lifecycleFunctionName
+    );
+
+    const directEventChanges = makeDirectEventChanges(args);
+    if (directEventChanges) {
+      if (directEventChanges.length === 0) {
+        return makeGenericFailure(
+          'No event changes provided. Provide events_json or one or more event_changes.'
+        );
+      }
+
+      const invalidDirectEventChange = directEventChanges.find(
+        change =>
+          change.operationName !== 'delete_event' && !change.generatedEvents
+      );
+      if (invalidDirectEventChange) {
+        return makeGenericFailure(
+          `Missing generated events for operation "${
+            invalidDirectEventChange.operationName
+          }".`
+        );
+      }
+
+      const directGeneratedEventId =
+        SafeExtractor.extractStringProperty(args, 'generated_event_id') ||
+        'mcp-direct-event';
+
+      try {
+        const extensionNames = new Set<string>();
+        for (const change of directEventChanges) {
+          for (const extensionName of change.extensionNames || []) {
+            extensionNames.add(extensionName);
+          }
+        }
+        for (const extensionName of extensionNames) {
+          await ensureExtensionInstalled({
+            extensionName,
+            onWillInstallExtension,
+            onExtensionInstalled,
+          });
+        }
+      } catch (error) {
+        return makeGenericFailure(
+          `Error installing extensions: ${
+            error.message
+          }. Try again or a different approach.`
+        );
+      }
+
+      try {
+        const applyDirectEventDependencies = ({
+          targetProject,
+          targetScene,
+        }: {|
+          targetProject: gdProject,
+          targetScene: gdLayout,
+        |}) => {
+          for (const change of directEventChanges) {
+            addUndeclaredVariables({
+              project: targetProject,
+              scene: targetScene,
+              undeclaredVariables: change.undeclaredVariables,
+            });
+
+            for (const objectName of Object.keys(
+              change.undeclaredObjectVariables
+            )) {
+              addObjectUndeclaredVariables({
+                project: targetProject,
+                scene: targetScene,
+                objectName,
+                undeclaredVariables:
+                  change.undeclaredObjectVariables[objectName],
+              });
+            }
+
+            for (const objectName of Object.keys(
+              change.missingObjectBehaviors
+            )) {
+              addMissingObjectBehaviors({
+                project: targetProject,
+                scene: targetScene,
+                objectName,
+                missingBehaviors: change.missingObjectBehaviors[objectName],
+              });
+            }
+          }
+        };
+
+        // Validate dependencies, paths and serialized events on a clone so a
+        // rejected direct patch cannot partially modify the real project.
+        const validationProject = gd.ProjectHelper.createNewGDJSProject();
+        try {
+          unserializeFromJSObject(
+            validationProject,
+            serializeToJSObject(project)
+          );
+          const validationScene = validationProject.getLayout(sceneName);
+          const validationLifecycleFunction = getSceneLifecycleEventsFunction(
+            validationScene,
+            lifecycleFunctionName
+          );
+          applyDirectEventDependencies({
+            targetProject: validationProject,
+            targetScene: validationScene,
+          });
+          const validationErrors = validateDirectEventChangesBeforeApply({
+            project: validationProject,
+            scene: validationScene,
+            lifecycleFunction: validationLifecycleFunction,
+            lifecycleFunctionName,
+            eventChanges: directEventChanges,
+          });
+          if (validationErrors.length > 0) {
+            return {
+              success: false,
+              message:
+                'Events validation failed. No project changes were applied. Fix the event payload and validate it again before writing.',
+              errors: validationErrors,
+            };
+          }
+
+          const simulatedApplication = applyEventsChanges(
+            validationProject,
+            validationLifecycleFunction.getEvents(),
+            directEventChanges,
+            directGeneratedEventId
+          );
+          if (
+            simulatedApplication.applied === 0 ||
+            simulatedApplication.errors.length > 0
+          ) {
+            return {
+              success: false,
+              message:
+                'Event patch preflight failed. No project changes were applied.',
+              errors: simulatedApplication.errors,
+            };
+          }
+        } finally {
+          validationProject.delete();
+        }
+
+        const allMissingResources = directEventChanges.flatMap(
+          change => change.missingResources || []
+        );
+        const newlyAddedResources = allMissingResources.length
+          ? (await searchAndInstallResources({
+              resources: allMissingResources,
+            })).results
+          : [];
+
+        applyDirectEventDependencies({
+          targetProject: project,
+          targetScene: scene,
+        });
+
+        const eventsBeforeApply = serializeToJSObject(currentSceneEvents);
+        const { applied, errors, aiGeneratedEventIds } = applyEventsChanges(
+          project,
+          currentSceneEvents,
+          directEventChanges,
+          directGeneratedEventId
+        );
+
+        if (applied === 0 || errors.length > 0) {
+          unserializeFromJSObject(
+            currentSceneEvents,
+            eventsBeforeApply,
+            'unserializeFrom',
+            project
+          );
+          return {
+            success: false,
+            message:
+              'Event patch failed while applying and the event sheet was restored.',
+            errors,
+          };
+        }
+
+        const changedAiGeneratedEventIds =
+          aiGeneratedEventIds.length > 0
+            ? aiGeneratedEventIds
+            : [directGeneratedEventId];
+        onSceneEventsModifiedOutsideEditor({
+          scene,
+          lifecycleFunctionName,
+          newOrChangedAiGeneratedEventIds: new Set(changedAiGeneratedEventIds),
+        });
+
+        const requestedOperations = directEventChanges.map(change => ({
+          operation: change.operationName,
+          target: change.operationTargetEvent || null,
+        }));
+        const operationSummary: { [string]: number } = {};
+        requestedOperations.forEach(operation => {
+          operationSummary[operation.operation] =
+            (operationSummary[operation.operation] || 0) + 1;
+        });
+
+        return {
+          success: true,
+          lifecycleFunctionName,
+          lifecycleFunctionLabel: getSceneLifecycleFunctionDisplayName(
+            lifecycleFunctionName
+          ),
+          message: `Applied ${
+            requestedOperations.length
+          } requested event operation(s) (${Object.keys(operationSummary)
+            .map(name => `${name}: ${operationSummary[name]}`)
+            .join(', ')}); ${applied} low-level event mutation(s).`,
+          requestedOperations,
+          operationSummary,
+          lowLevelMutations: applied,
+          aiGeneratedEventId: changedAiGeneratedEventIds[0],
+          aiGeneratedEventIds: changedAiGeneratedEventIds,
+          newlyAddedResources,
+        };
+      } catch (error) {
+        console.error('Unexpected error when adding direct events:', error);
+        return makeGenericFailure(
+          `Unexpected error adding provided events: ${
+            error.message
+          }. Try a different approach.`
+        );
+      }
+    }
+
+    const extensionNamesList = extractRequiredString(
+      args,
+      'extension_names_list'
+    );
     if (!relatedAiRequestId) {
       return makeGenericFailure(
         'No related AI request ID found for events generation.'
       );
     }
-    const scene = project.getLayout(sceneName);
-    const currentSceneEvents = scene.getEvents();
 
     const existingEventsAsText = renderNonTranslatedEventsAsText({
       eventsList: currentSceneEvents,
@@ -5820,6 +6425,10 @@ const addSceneEvents: EditorFunction = {
           success: false,
           message,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          lifecycleFunctionName,
+          lifecycleFunctionLabel: getSceneLifecycleFunctionDisplayName(
+            lifecycleFunctionName
+          ),
           ...details,
         };
       };
@@ -5943,6 +6552,7 @@ Events were not changed (extensions, variables or behaviors needed by them may h
 
         onSceneEventsModifiedOutsideEditor({
           scene,
+          lifecycleFunctionName,
           newOrChangedAiGeneratedEventIds: new Set([aiGeneratedEvent.id]),
         });
 
@@ -5999,6 +6609,10 @@ See errors; verify event contents if needed.`
           success: true,
           message: resultMessage,
           aiGeneratedEventId: aiGeneratedEvent.id,
+          lifecycleFunctionName,
+          lifecycleFunctionLabel: getSceneLifecycleFunctionDisplayName(
+            lifecycleFunctionName
+          ),
         };
         if (newlyAddedResources.length > 0) {
           output.newlyAddedResources = newlyAddedResources;
@@ -6127,6 +6741,81 @@ const createScene: EditorFunction = {
         newSceneNames: [scene_name],
       },
     };
+  },
+  modifiesProject: true,
+};
+
+// Legacy tools kept for agent/chat tool versions that predate the consolidated
+// `change_scene_properties_layers_effects_groups` contract.
+const deleteScene: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Remove scene <b>{scene_name}</b>.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeGenericSuccess(`Scene "${scene_name}" already absent.`);
+    }
+
+    if (editorCallbacks.onCloseLayout) {
+      editorCallbacks.onCloseLayout(scene_name);
+    }
+    if (project.getFirstLayout() === scene_name) {
+      project.setFirstLayout('');
+    }
+    project.removeLayout(scene_name);
+
+    return makeGenericSuccess(`Deleted scene "${scene_name}".`);
+  },
+  modifiesProject: true,
+};
+
+const renameScene: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const new_scene_name = extractRequiredString(args, 'new_scene_name');
+
+    return {
+      text: (
+        <Trans>
+          Rename scene <b>{scene_name}</b> to <b>{new_scene_name}</b>.
+        </Trans>
+      ),
+    };
+  },
+  launchFunction: async ({ project, args, editorCallbacks }) => {
+    const scene_name = extractRequiredString(args, 'scene_name');
+    const new_scene_name = extractRequiredString(args, 'new_scene_name');
+
+    if (!project.hasLayoutNamed(scene_name)) {
+      return makeSceneNotFoundFailure(project, scene_name);
+    }
+    if (scene_name === new_scene_name) {
+      return makeGenericSuccess(`Scene already named "${scene_name}".`);
+    }
+    if (project.hasLayoutNamed(new_scene_name)) {
+      return makeGenericFailure(
+        `A scene named "${new_scene_name}" already exists.`
+      );
+    }
+
+    if (editorCallbacks.onCloseLayout) {
+      editorCallbacks.onCloseLayout(scene_name);
+    }
+    renameLayoutInProject(project, scene_name, new_scene_name);
+
+    return makeGenericSuccess(
+      `Renamed scene "${scene_name}" to "${new_scene_name}".`
+    );
   },
   modifiesProject: true,
 };
@@ -8613,13 +9302,20 @@ const initializeProject: EditorFunctionWithoutProject = {
         const eventsAsTextByScene = {};
         mapFor(0, createdProject.getLayoutsCount(), i => {
           const scene = createdProject.getLayoutAt(i);
-          const events = scene.getEvents();
           eventsAsTextByScene[
             // $FlowFixMe[prop-missing]
             scene.getName()
-          ] = renderNonTranslatedEventsAsText({
-            eventsList: events,
-          });
+          ] = sceneLifecycleFunctionDefinitions
+            .map(({ name }) => {
+              const events = getSceneLifecycleEvents(scene, name);
+              const renderedEvents = renderNonTranslatedEventsAsText({
+                eventsList: events,
+              });
+              return `## ${getSceneLifecycleFunctionDisplayName(
+                name
+              )} (${name})\n${renderedEvents || noEventsInSceneText}`;
+            })
+            .join('\n\n');
         });
 
         output.eventsAsTextByScene = eventsAsTextByScene;
@@ -8881,6 +9577,8 @@ export const editorFunctions: { [string]: EditorFunction } = {
   read_events_source: readEventsSource,
   add_scene_events: addSceneEvents,
   create_scene: createScene,
+  delete_scene: deleteScene,
+  rename_scene: renameScene,
   inspect_scene_properties_layers_effects: inspectScenePropertiesLayersEffects,
   change_scene_properties_layers_effects_groups: changeScenePropertiesLayersEffectsGroups,
   inspect_project_properties_resources: inspectProjectPropertiesResources,

@@ -28,6 +28,10 @@ export type EnumeratedInstructionMetadata = {|
   isRelevantForFunctionEvents: boolean,
   isRelevantForAsynchronousFunctionEvents: boolean,
   isRelevantForCustomObjectEvents: boolean,
+  isAsync?: boolean,
+  requiresSceneFutureFrame?: boolean,
+  emitsDeferredSceneSignal?: boolean,
+  mutatesSceneStack?: boolean,
 
   // TODO: remove this reference. While it's useful, it's also a risk
   // to have the editor to keep a reference to a gdInstructionMetadata
@@ -62,6 +66,16 @@ export type EnumeratedInstructionOrExpressionMetadata =
   | EnumeratedInstructionMetadata
   | EnumeratedExpressionMetadata;
 
+const signalEmitActionTypes = new Set([
+  'EmitSceneSignal',
+  'EmitSignalToObjectInstance',
+]);
+
+const signalEmitActionTypesAllowedInExtensionEvents = new Set([
+  'EmitSceneSignal',
+  'EmitSignalToObjectInstance',
+]);
+
 /**
  * Given a list of expression or instructions that were previously enumerated,
  * filter the ones that are not usable from the current "scope".
@@ -95,6 +109,56 @@ const isFunctionVisibleInGivenScope = (
     eventsBasedObject,
     eventsFunctionsExtension,
   } = scope;
+
+  const lifecycleFunctionName = scope.sceneLifecycleFunctionName;
+  if (lifecycleFunctionName) {
+    const instructionType = enumeratedInstructionOrExpressionMetadata.type;
+
+    // SignalReceived is kept as a legacy runtime instruction so existing
+    // projects remain compatible, but new signal handlers must be authored in
+    // the sceneSignal lifecycle function.
+    if (instructionType === 'SignalReceived') {
+      return false;
+    }
+
+    if (
+      instructionType === 'SceneJustBegins' &&
+      (lifecycleFunctionName === 'sceneLoad' ||
+        lifecycleFunctionName === 'sceneUnload')
+    ) {
+      return false;
+    }
+
+    if (
+      lifecycleFunctionName === 'sceneUnload' &&
+      (enumeratedInstructionOrExpressionMetadata.isAsync ||
+        enumeratedInstructionOrExpressionMetadata.requiresSceneFutureFrame ||
+        enumeratedInstructionOrExpressionMetadata.emitsDeferredSceneSignal ||
+        enumeratedInstructionOrExpressionMetadata.mutatesSceneStack)
+    ) {
+      return false;
+    }
+  }
+
+  if (
+    eventsFunctionsExtension &&
+    scope.eventsFunction &&
+    extension.name === 'BuiltinScene' &&
+    signalEmitActionTypes.has(enumeratedInstructionOrExpressionMetadata.type) &&
+    !signalEmitActionTypesAllowedInExtensionEvents.has(
+      enumeratedInstructionOrExpressionMetadata.type
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    extension.name === 'BuiltinScene' &&
+    enumeratedInstructionOrExpressionMetadata.type === 'SubscribeSceneSignal' &&
+    (!scope.eventsFunction || (!eventsBasedObject && !eventsBasedBehavior))
+  ) {
+    return false;
+  }
 
   return !!(
     ((enumeratedInstructionOrExpressionMetadata.isRelevantForLayoutEvents &&

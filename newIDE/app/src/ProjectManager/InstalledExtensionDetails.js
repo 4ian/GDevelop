@@ -74,7 +74,12 @@ type Props = {|
   extensionName: string,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onOpenEventsFunctionsExtension: string => void,
+  onOpenEventsFunctionsExtension: (
+    string,
+    initiallyFocusedFunctionName?: ?string,
+    initiallyFocusedBehaviorName?: ?string,
+    initiallyFocusedObjectName?: ?string
+  ) => void,
 |};
 
 function InstalledExtensionDetails({

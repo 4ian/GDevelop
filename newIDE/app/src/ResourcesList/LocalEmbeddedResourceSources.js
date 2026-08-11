@@ -1,7 +1,7 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { isPathInProjectFolder } from './ResourceUtils';
+import { isPathInFolder, isPathInProjectFolder } from './ResourceUtils';
 import { createNewResource } from './ResourceSource';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
@@ -39,46 +39,85 @@ type ParseEmbeddedFiles = (
  */
 export async function copyAllEmbeddedResourcesToProjectFolder(
   project: gdProject,
-  filesWithEmbeddedResources: Map<string, EmbeddedResources>
+  filesWithEmbeddedResources: Map<string, EmbeddedResources>,
+  importedResourcesFolder?: string
 ): Promise<void> | Promise<Array<Awaited<any>>> {
   if (!fs || !path) {
     return;
   }
 
   const projectPath = path.dirname(project.getProjectFile());
+  const destinationFolderPath = importedResourcesFolder
+    ? path.join(projectPath, importedResourcesFolder)
+    : projectPath;
+  const reservedDestinationPaths = new Set<string>();
   const copies = [];
+
+  const toProjectRelativePath = (filePath: string): string =>
+    path.relative(projectPath, filePath).replace(/\\/g, '/');
+
+  const getUniqueResourceDestinationPath = (resourcePath: string): string => {
+    const resourceBasename = path.basename(resourcePath);
+    const fileExtension = path.extname(resourceBasename);
+    const fileNameWithoutExtension = path.basename(
+      resourceBasename,
+      fileExtension
+    );
+
+    const newFileNameWithoutExtension = newNameGenerator(
+      fileNameWithoutExtension,
+      tentativeFileName => {
+        const tentativePath = path.join(
+          destinationFolderPath,
+          tentativeFileName + fileExtension
+        );
+        const normalizedTentativePath = path.resolve(tentativePath);
+        return (
+          reservedDestinationPaths.has(normalizedTentativePath) ||
+          fs.existsSync(tentativePath)
+        );
+      }
+    );
+
+    const resourceNewPath = path.join(
+      destinationFolderPath,
+      newFileNameWithoutExtension + fileExtension
+    );
+    reservedDestinationPaths.add(path.resolve(resourceNewPath));
+
+    return resourceNewPath;
+  };
+
+  if (importedResourcesFolder) {
+    try {
+      await fs.promises.mkdir(destinationFolderPath, { recursive: true });
+    } catch (error) {
+      // Continue with the regular copy path if the folder creation failed.
+      // Individual copy failures will still be reported by copyFile.
+    }
+  }
 
   for (const {
     hasAnyEmbeddedResourceOutsideProjectFolder,
     embeddedResources,
   } of filesWithEmbeddedResources.values()) {
-    if (!hasAnyEmbeddedResourceOutsideProjectFolder) continue;
+    if (!hasAnyEmbeddedResourceOutsideProjectFolder && !importedResourcesFolder)
+      continue;
 
     for (const embedded of embeddedResources.values()) {
-      if (!embedded.isOutsideProjectFolder) continue;
+      const isAlreadyInDestinationFolder = importedResourcesFolder
+        ? isPathInFolder(destinationFolderPath, embedded.fullPath)
+        : !embedded.isOutsideProjectFolder;
+      if (isAlreadyInDestinationFolder) {
+        embedded.resourceName = toProjectRelativePath(embedded.fullPath);
+        continue;
+      }
 
-      const resourceBasename = path.basename(embedded.fullPath);
-      const fileExtension = path.extname(resourceBasename);
-      const fileNameWithoutExtension = path.basename(
-        resourceBasename,
-        fileExtension
+      const resourceNewPath = getUniqueResourceDestinationPath(
+        embedded.fullPath
       );
 
-      const newFileNameWithoutExtension = newNameGenerator(
-        fileNameWithoutExtension,
-        tentativeFileName => {
-          const tentativePath =
-            path.join(projectPath, tentativeFileName) + fileExtension;
-          return fs.existsSync(tentativePath);
-        }
-      );
-
-      const resourceNewPath = path.join(
-        projectPath,
-        newFileNameWithoutExtension + fileExtension
-      );
-
-      embedded.resourceName = newFileNameWithoutExtension + fileExtension;
+      embedded.resourceName = toProjectRelativePath(resourceNewPath);
 
       copies.push(fs.promises.copyFile(embedded.fullPath, resourceNewPath));
     }

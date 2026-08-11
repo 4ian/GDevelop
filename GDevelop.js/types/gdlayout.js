@@ -13,6 +13,7 @@ declare class gdLayout {
   getVariables(): gdVariablesContainer;
   getObjects(): gdObjectsContainer;
   getEvents(): gdEventsList;
+  getLifecycleEventsFunctions(): gdSceneLifecycleEventsFunctions;
   getLayers(): gdLayersContainer;
   updateBehaviorsSharedData(project: gdProject): void;
   getAllBehaviorSharedDataNames(): gdVectorString;

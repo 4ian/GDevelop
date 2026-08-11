@@ -35,6 +35,10 @@ export const triggerOnResourceExternallyChanged = (resourceInfo: {|
   );
 };
 
+export const shouldHardReloadForExternallyChangedResource = (
+  identifier: string
+): boolean => /\.(?:glb|gltf)(?:[?#].*)?$/i.test(identifier);
+
 const useResourcesWatcher = ({
   getStorageProvider,
   fileMetadata,

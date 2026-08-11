@@ -36,6 +36,9 @@ namespace gdjs {
     instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
+  type RuntimeInstanceContainerCallback = (
+    instanceContainer: gdjs.RuntimeInstanceContainer
+  ) => void;
   type RuntimeSceneGetSyncDataCallback = (
     runtimeScene: gdjs.RuntimeScene,
     currentSyncData: LayoutNetworkSyncData,
@@ -78,6 +81,14 @@ namespace gdjs {
 
   /** @internal */
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> =
+    [];
+
+  /** @internal */
+  export const callbacksRuntimeInstanceContainerPostObjectsUpdate: Array<RuntimeInstanceContainerCallback> =
+    [];
+
+  /** @internal */
+  export const callbacksRuntimeInstanceContainerPreObjectsRender: Array<RuntimeInstanceContainerCallback> =
     [];
 
   /** @internal */
@@ -528,6 +539,34 @@ namespace gdjs {
   };
 
   /**
+   * Register a function called after every object and pre-event behavior in an
+   * instance container has been updated, before the container events run.
+   *
+   * This callback is container-scoped, so it is also called for children of
+   * custom objects.
+   *
+   * @internal
+   */
+  export const registerRuntimeInstanceContainerPostObjectsUpdateCallback =
+    function (callback: RuntimeInstanceContainerCallback): void {
+      gdjs.callbacksRuntimeInstanceContainerPostObjectsUpdate.push(callback);
+    };
+
+  /**
+   * Register a function called before objects in an instance container perform
+   * their pre-render update.
+   *
+   * This callback is container-scoped, so it is also called for children of
+   * custom objects.
+   *
+   * @internal
+   */
+  export const registerRuntimeInstanceContainerPreObjectsRenderCallback =
+    function (callback: RuntimeInstanceContainerCallback): void {
+      gdjs.callbacksRuntimeInstanceContainerPreObjectsRender.push(callback);
+    };
+
+  /**
    * Register a function to be called each time a scene is getting its sync
    * data retrieved (via getNetworkSyncData).
    * @param callback The function to be called.
@@ -580,6 +619,8 @@ namespace gdjs {
     filterArrayInPlace(callbacksRuntimeSceneUnloading);
     filterArrayInPlace(callbacksRuntimeSceneUnloaded);
     filterArrayInPlace(callbacksObjectDeletedFromScene);
+    filterArrayInPlace(callbacksRuntimeInstanceContainerPostObjectsUpdate);
+    filterArrayInPlace(callbacksRuntimeInstanceContainerPreObjectsRender);
   };
 
   /**
@@ -676,6 +717,64 @@ namespace gdjs {
       }
     }
     return result;
+  };
+
+  /**
+   * Throw when objects from an external layout are created from an event that
+   * runs without conditions.
+   *
+   * @internal
+   */
+  export const assertExternalLayoutCreationHasCondition = function (
+    externalLayoutName: string
+  ): never {
+    throw new Error(
+      'External layout action needs a condition: an event creates objects from external layout "' +
+        externalLayoutName +
+        '" without any condition. Add a condition, for example "At the beginning of the scene", before creating objects from an external layout.'
+    );
+  };
+
+  /**
+   * Return an object list unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
+   *
+   * @internal
+   */
+  export const assertObjectListHasNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsList: Array<T>, _usage: string): Array<T> {
+    return objectsList;
+  };
+
+  /**
+   * Return object lists unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
+   *
+   * @internal
+   */
+  export const assertObjectListsHaveNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsLists: Array<Array<T>>, _usage: string): Array<Array<T>> {
+    return objectsLists;
+  };
+
+  /**
+   * Return an object map unchanged.
+   *
+   * Kept for compatibility with code generated when ambiguous object picking
+   * was validated at runtime.
+   *
+   * @internal
+   */
+  export const assertObjectMapHasNoMoreThanOnePickedInstance = function <
+    T extends RuntimeObject,
+  >(objectsMap: Hashtable<Array<T>>, _usage: string): Hashtable<Array<T>> {
+    return objectsMap;
   };
 
   /**

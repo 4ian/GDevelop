@@ -224,6 +224,24 @@ export default class BrowserSWFileSystem {
     return true;
   };
 
+  patchPendingTextFile = (
+    filePathSuffix: string,
+    patchText: (contents: string) => string
+  ): boolean => {
+    const normalizedFilePathSuffix = filePathSuffix.replace(/\\/g, '/');
+    for (const file of this._pendingFiles) {
+      const normalizedFilePath = file.path.replace(/\\/g, '/');
+      if (
+        normalizedFilePath === normalizedFilePathSuffix ||
+        normalizedFilePath.endsWith('/' + normalizedFilePathSuffix)
+      ) {
+        file.content = patchText(file.content);
+        return true;
+      }
+    }
+    return false;
+  };
+
   readFile = (file: string): any => {
     if (!!this._indexedFilesContent[file])
       return this._indexedFilesContent[file].text;

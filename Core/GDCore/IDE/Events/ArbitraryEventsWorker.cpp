@@ -70,6 +70,11 @@ void AbstractArbitraryEventsWorker::VisitInstructionList(
   DoVisitInstructionList(instructions, areConditions);
 
   for (std::size_t i = 0; i < instructions.size();) {
+    if (skipDisabledEvents_ && instructions[i].IsDisabled()) {
+      ++i;
+      continue;
+    }
+
     if (VisitInstruction(instructions[i], areConditions))
       instructions.Remove(i);
     else {
@@ -145,6 +150,10 @@ void AbstractReadOnlyArbitraryEventsWorker::VisitInstructionList(
     if (shouldStopIteration) {
       break;
     }
+    if (skipDisabledEvents_ && instructions[i].IsDisabled()) {
+      continue;
+    }
+
     VisitInstruction(instructions[i], areConditions);
     if (!instructions[i].GetSubInstructions().empty()) {
       VisitInstructionList(instructions[i].GetSubInstructions(),

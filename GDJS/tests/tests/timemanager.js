@@ -15,4 +15,17 @@ describe('gdjs.TimeManager', () => {
     expect(timeManager.getTimer('timer1').getTime()).to.be(31);
     expect(timeManager.getTimer('timer2').getTime()).to.be(15);
   });
+
+  it('should restore first-frame state when reset', () => {
+    const timeManager = new gdjs.TimeManager();
+    timeManager.update(16, 1);
+    timeManager.update(16, 1);
+    expect(timeManager.isFirstFrame()).to.be(false);
+
+    timeManager.reset();
+    timeManager.update(16, 1);
+    expect(timeManager.isFirstFrame()).to.be(true);
+    timeManager.update(16, 1);
+    expect(timeManager.isFirstFrame()).to.be(false);
+  });
 });

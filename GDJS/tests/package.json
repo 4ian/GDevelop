@@ -17,7 +17,8 @@
     "test:edge": "karma start --browsers EdgeHeadless --single-run",
     "test:edge:watch": "karma start --browsers EdgeHeadless",
     "test:chromium": "karma start --browsers ChromiumHeadless --single-run",
-    "test:chromium:watch": "karma start --browsers ChromiumHeadless"
+    "test:chromium:watch": "karma start --browsers ChromiumHeadless",
+    "test-webgpu": "karma start karma.webgpu.conf.js --single-run"
   },
   "keywords": [
     "HTML5",

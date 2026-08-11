@@ -57,6 +57,7 @@ type Props = {|
   project?: ?gdProject,
   projectScopedContainersAccessor?: ProjectScopedContainersAccessor,
   resourceManagementProps?: ?ResourceManagementProps,
+  hideConstantPlaceholderHints?: boolean,
 |};
 
 const styles = {
@@ -77,6 +78,53 @@ const styles = {
   subHeader: {
     paddingLeft: 0,
   },
+};
+
+const constantPlaceholderExample = '{{cards.sunflower.price}}';
+
+const hasConstantPlaceholderSyntax = (value: any): boolean =>
+  typeof value === 'string' &&
+  (value.indexOf('{{') !== -1 || value.indexOf('}}') !== -1);
+
+const isExactConstantPlaceholder = (value: string): boolean =>
+  /^\s*\{\{\s*[^{}]+\s*\}\}\s*$/.test(value);
+
+const isValidNumberOrConstantPlaceholder = (value: string): boolean => {
+  if (isExactConstantPlaceholder(value)) return true;
+  if (hasConstantPlaceholderSyntax(value)) return false;
+
+  const numberValue = parseFloat(value);
+  return !isNaN(numberValue);
+};
+
+const getConstantPlaceholderErrorText = (
+  field: ValueField,
+  value: any
+): React.Node => {
+  const valueAsString = value == null ? '' : '' + value;
+  if (!hasConstantPlaceholderSyntax(valueAsString)) return null;
+
+  if (field.forbidConstantPlaceholder) {
+    return (
+      <Trans>
+        constant placeholders can only be edited from the object editor window.
+      </Trans>
+    );
+  }
+
+  if (
+    field.valueType === 'number' &&
+    !isExactConstantPlaceholder(valueAsString)
+  ) {
+    return (
+      <Trans>
+        Use a whole placeholder for number properties, for example{' '}
+        {constantPlaceholderExample}.
+      </Trans>
+    );
+  }
+
+  return null;
 };
 
 export const getDisabled = ({
@@ -185,6 +233,7 @@ const PropertiesEditor = ({
   project,
   projectScopedContainersAccessor,
   resourceManagementProps,
+  hideConstantPlaceholderHints,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
 
@@ -255,17 +304,38 @@ const PropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'number') {
-        const { setValue, getEndAdornment } = field;
+        const { setValue, getEndAdornment, getRawValue, setRawValue } = field;
         const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
+        const allowConstantPlaceholder = !!field.allowConstantPlaceholder;
+        const value =
+          allowConstantPlaceholder && getRawValue
+            ? getRawValue(instances[0])
+            : getFieldValue({ instances, field });
         return (
           <SemiControlledTextField
-            value={getFieldValue({ instances, field })}
+            value={'' + value}
             key={field.name}
             id={field.name}
             floatingLabelText={getFieldLabel({ instances, field })}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
+            hintText={
+              allowConstantPlaceholder && !hideConstantPlaceholderHints
+                ? constantPlaceholderExample
+                : undefined
+            }
+            errorText={getConstantPlaceholderErrorText(field, value)}
             onChange={newValue => {
+              if (allowConstantPlaceholder) {
+                if (!setRawValue) return;
+                if (!isValidNumberOrConstantPlaceholder(newValue)) return;
+
+                instances.forEach(i => setRawValue(i, newValue));
+                _onInstancesModified(instances);
+                return;
+              }
+              if (hasConstantPlaceholderSyntax(newValue)) return;
+
               const newNumberValue = parseFloat(newValue);
               // If the value is not a number, the user is probably still typing, adding a dot or a comma.
               // So don't update the value, it will be reverted if they leave the field.
@@ -273,7 +343,7 @@ const PropertiesEditor = ({
               instances.forEach(i => setValue(i, newNumberValue));
               _onInstancesModified(instances);
             }}
-            type="number"
+            type={allowConstantPlaceholder ? 'text' : 'number'}
             style={styles.field}
             disabled={getDisabled({ instances, field, mixedValues: false })}
             endAdornment={
@@ -349,7 +419,27 @@ const PropertiesEditor = ({
                 floatingLabelText={getFieldLabel({ instances, field })}
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
+                hintText={
+                  field.allowConstantPlaceholder &&
+                  !hideConstantPlaceholderHints
+                    ? constantPlaceholderExample
+                    : undefined
+                }
+                errorText={getConstantPlaceholderErrorText(
+                  field,
+                  getFieldValue({
+                    instances,
+                    field,
+                    mixedValueFallback: '(Multiple values)',
+                  })
+                )}
                 onChange={newValue => {
+                  if (
+                    field.forbidConstantPlaceholder &&
+                    hasConstantPlaceholderSyntax(newValue)
+                  ) {
+                    return;
+                  }
                   instances.forEach(i => setValue(i, newValue || ''));
                   _onInstancesModified(instances);
                 }}
@@ -383,7 +473,12 @@ const PropertiesEditor = ({
         );
       }
     },
-    [instances, getFieldDescription, _onInstancesModified]
+    [
+      instances,
+      getFieldDescription,
+      _onInstancesModified,
+      hideConstantPlaceholderHints,
+    ]
   );
 
   const renderSelectField = React.useCallback(
@@ -546,22 +641,28 @@ const PropertiesEditor = ({
     }
 
     const { setValue } = field;
-    const mixedValues = hasMixedValues({ instances, field });
+    const resourceManagementPropsToUse = field.resourceExternalEditors
+      ? {
+          ...resourceManagementProps,
+          resourceExternalEditors: field.resourceExternalEditors,
+        }
+      : resourceManagementProps;
     return (
       <ResourceSelectorWithThumbnail
         key={field.name}
         project={project}
         projectScopedContainersAccessor={projectScopedContainersAccessor}
-        resourceManagementProps={resourceManagementProps}
+        resourceManagementProps={resourceManagementPropsToUse}
         resourceKind={field.resourceKind}
-        resourceName={
-          mixedValues
-            ? '(Multiple values)' //TODO
-            : getFieldValue({
-                instances,
-                field,
-              })
-        }
+        importedResourcesFolder={field.importedResourcesFolder}
+        includeProjectAssetsFolder={field.includeProjectAssetsFolder}
+        defaultLocalFileDialogFolder={field.defaultLocalFileDialogFolder}
+        resourceNameFilter={field.resourceNameFilter}
+        resourceName={getFieldValue({
+          instances,
+          field,
+          mixedValueFallback: '(Multiple values)', //TODO
+        })}
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
@@ -649,6 +750,7 @@ const PropertiesEditor = ({
                   mode="row"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
+                  hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                 />
               )}
             </UnsavedChangesContext.Consumer>
@@ -680,6 +782,7 @@ const PropertiesEditor = ({
                   mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
+                  hideConstantPlaceholderHints={hideConstantPlaceholderHints}
                 />
               )}
             </UnsavedChangesContext.Consumer>

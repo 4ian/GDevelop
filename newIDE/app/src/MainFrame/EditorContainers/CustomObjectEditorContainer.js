@@ -16,7 +16,9 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
-import SceneEditor from '../../SceneEditor';
+import SceneEditor, {
+  type SceneEditorSelectionSnapshot,
+} from '../../SceneEditor';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import { type ObjectWithContext } from '../../ObjectsList/EnumerateObjects';
 import {
@@ -53,6 +55,10 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
 
   getProject(): ?gdProject {
     return this.props.project;
+  }
+
+  getEditorSelectionSnapshot(): ?SceneEditorSelectionSnapshot {
+    return this.editor ? this.editor.getEditorSelectionSnapshot() : null;
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps): any {
@@ -383,6 +389,8 @@ export class CustomObjectEditorContainer extends React.Component<RenderEditorCon
           onOpenEventBasedObjectVariantEditor={
             this.props.onOpenEventBasedObjectVariantEditor
           }
+          onOpenPrefabDetailEditor={this.props.onOpenPrefabDetailEditor}
+          onOpenPrefabSettings={this.props.onOpenPrefabSettings}
           onWillInstallExtension={this.props.onWillInstallExtension}
           onExtensionInstalled={this.props.onExtensionInstalled}
           onDeleteEventsBasedObjectVariant={

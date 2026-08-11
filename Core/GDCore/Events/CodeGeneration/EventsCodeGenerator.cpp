@@ -19,10 +19,30 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ObjectsContainersList.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
 namespace gd {
+namespace {
+class ConstantPlaceholderReplacementScope {
+ public:
+  ConstantPlaceholderReplacementScope(
+      gd::EventsCodeGenerationContext& context_, bool enabled)
+      : context(context_),
+        wasEnabled(context_.IsConstantPlaceholderReplacementEnabled()) {
+    context.SetConstantPlaceholderReplacementEnabled(enabled);
+  }
+
+  ~ConstantPlaceholderReplacementScope() {
+    context.SetConstantPlaceholderReplacementEnabled(wasEnabled);
+  }
+
+ private:
+  gd::EventsCodeGenerationContext& context;
+  const bool wasEnabled;
+};
+}  // namespace
 
 /**
  * Generate call using a relational operator.
@@ -321,6 +341,9 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   maxConditionsListsSize =
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
+  ConstantPlaceholderReplacementScope
+      constantPlaceholderReplacementScope(context, HasProject());
+
   if (instrInfos.HasCustomCodeGenerator()) {
     context.EnterCustomCondition();
     conditionCode += instrInfos.codeExtraInformation.customCodeGenerator(
@@ -345,11 +368,15 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
        ++pNb) {
     if (ParameterMetadata::IsObject(
             instrInfos.parameters.GetParameter(pNb).GetType())) {
+      const gd::ParameterMetadata& parameterMetadata =
+          instrInfos.parameters.GetParameter(pNb);
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
+      if (parameterMetadata.IsOptional() && objectInParameter.empty()) {
+        continue;
+      }
 
-      const auto& expectedObjectType =
-          instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
+      const auto& expectedObjectType = parameterMetadata.GetExtraInfo();
       const auto& actualObjectType =
           GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(
@@ -379,6 +406,25 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     return "/* Missing behavior - skipped. */";
   }
 
+  auto generateConditionParametersCodes =
+      [this, &context](
+          const std::vector<gd::Expression>& parameters,
+          const gd::ParameterMetadataContainer& parametersInfo,
+          std::vector<std::pair<gd::String, gd::String> >*
+              supplementaryParametersTypes = nullptr) {
+        const bool wasObjectListParameterPickingAllowed =
+            context.IsObjectListParameterPickingAllowed();
+        context.SetObjectListParameterPickingAllowed(true);
+        std::vector<gd::String> arguments =
+            GenerateParametersCodes(parameters,
+                                    parametersInfo,
+                                    context,
+                                    supplementaryParametersTypes);
+        context.SetObjectListParameterPickingAllowed(
+            wasObjectListParameterPickingAllowed);
+        return arguments;
+      };
+
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = condition.GetParameter(0).GetPlainString();
     if (!objectName.empty() && instrInfos.parameters.GetParametersCount() > 0) {
@@ -399,8 +445,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], condition, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the condition whole code
-          vector<gd::String> arguments = GenerateParametersCodes(
-              condition.GetParameters(), instrInfos.parameters, context);
+          vector<gd::String> arguments = generateConditionParametersCodes(
+              condition.GetParameters(), instrInfos.parameters);
           conditionCode += GenerateObjectCondition(
               realObjects[i], objInfo, arguments, instrInfos, returnBoolean,
               condition.IsInverted(), context);
@@ -432,8 +478,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         if (gd::EventsCodeGenerator::AreBehaviorParametersOfFirstObjectValid(
                 realObjects[i], condition, instrInfos, realObjects.size() != 1)) {
           // Prepare arguments and generate the whole condition code
-          vector<gd::String> arguments = GenerateParametersCodes(
-              condition.GetParameters(), instrInfos.parameters, context);
+          vector<gd::String> arguments = generateConditionParametersCodes(
+              condition.GetParameters(), instrInfos.parameters);
           conditionCode += GenerateBehaviorCondition(
               realObjects[i], behaviorName, autoInfo, arguments, instrInfos,
               returnBoolean, condition.IsInverted(), context);
@@ -446,11 +492,13 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         supplementaryParametersTypes;
     supplementaryParametersTypes.push_back(std::make_pair(
         "conditionInverted", condition.IsInverted() ? "true" : "false"));
+    supplementaryParametersTypes.push_back(std::make_pair(
+        "conditionUniqueId",
+        gd::String::From(GenerateSingleUsageUniqueIdFor(&condition))));
     vector<gd::String> arguments =
-        GenerateParametersCodes(condition.GetParameters(),
-                                instrInfos.parameters,
-                                context,
-                                &supplementaryParametersTypes);
+        generateConditionParametersCodes(condition.GetParameters(),
+                                         instrInfos.parameters,
+                                         &supplementaryParametersTypes);
 
     conditionCode += GenerateFreeCondition(
         arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
@@ -466,17 +514,23 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::InstructionsList& conditions, EventsCodeGenerationContext& context) {
   gd::String outputCode;
+  std::vector<std::size_t> enabledConditionIndexes;
 
-  for (std::size_t i = 0; i < conditions.size(); ++i)
+  for (std::size_t i = 0; i < conditions.size(); ++i) {
+    if (!conditions[i].IsDisabled()) enabledConditionIndexes.push_back(i);
+  }
+
+  for (std::size_t i = 0; i < enabledConditionIndexes.size(); ++i)
     outputCode += GenerateBooleanInitializationToFalse(
         "condition" + gd::String::From(i) + "IsTrue", context);
 
-  for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
+  for (std::size_t cId = 0; cId < enabledConditionIndexes.size(); ++cId) {
+    gd::Instruction& condition = conditions[enabledConditionIndexes[cId]];
     gd::String conditionCode =
-        GenerateConditionCode(conditions[cId],
+        GenerateConditionCode(condition,
                               "condition" + gd::String::From(cId) + "IsTrue",
                               context);
-    if (!conditions[cId].GetType().empty()) {
+    if (!condition.GetType().empty()) {
       for (std::size_t i = 0; i < cId;
            ++i)  // Skip conditions if one condition is false. //TODO : Can be
                  // optimized
@@ -500,7 +554,8 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
     }
   }
 
-  maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
+  maxConditionsListsSize =
+      std::max(maxConditionsListsSize, enabledConditionIndexes.size());
 
   return outputCode;
 }
@@ -607,6 +662,9 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   AddIncludeFiles(instrInfos.GetIncludeFiles());
 
+  ConstantPlaceholderReplacementScope
+      constantPlaceholderReplacementScope(context, HasProject());
+
   if (instrInfos.HasCustomCodeGenerator()) {
     return instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
@@ -633,10 +691,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
        ++pNb) {
     if (ParameterMetadata::IsObject(
             instrInfos.parameters.GetParameter(pNb).GetType())) {
+      const gd::ParameterMetadata& parameterMetadata =
+          instrInfos.parameters.GetParameter(pNb);
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
+      if (parameterMetadata.IsOptional() && objectInParameter.empty()) {
+        continue;
+      }
 
-      const auto& expectedObjectType =
-          instrInfos.parameters.GetParameter(pNb).GetExtraInfo();
+      const auto& expectedObjectType = parameterMetadata.GetExtraInfo();
       const auto& actualObjectType =
           GetObjectsContainersList().GetTypeOfObject(objectInParameter);
       if (!GetObjectsContainersList().HasObjectOrGroupNamed(
@@ -851,6 +913,11 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     gd::InstructionsList& actions, EventsCodeGenerationContext& context) {
   gd::String outputCode;
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
+    if (actions[aId].IsDisabled()) {
+      outputCode += "{/* Disabled action - skipped. */}\n";
+      continue;
+    }
+
     gd::String actionCode = GenerateActionCode(actions[aId], context);
 
     outputCode += "{";
@@ -868,6 +935,37 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
   return outputCode;
 }
 
+gd::String EventsCodeGenerator::ResolveConstantPlaceholders(
+    const gd::String& plainString,
+    gd::EventsCodeGenerationContext& context) {
+  if (!HasProject() ||
+      !context.IsConstantPlaceholderReplacementEnabled()) {
+    return plainString;
+  }
+
+  gd::String resolvedString;
+  gd::String missingPath;
+  if (GetProject().ResolveConstantPlaceholders(
+          plainString, resolvedString, missingPath)) {
+    return resolvedString;
+  }
+
+  gd::LogError("Constant path \"{{" + missingPath +
+               "}}\" does not exist.");
+
+  gd::DiagnosticReport* diagnosticReport = GetDiagnosticReport();
+  if (diagnosticReport) {
+    gd::ProjectDiagnostic projectDiagnostic(
+        gd::ProjectDiagnostic::ErrorType::UndeclaredVariable,
+        "Constant path \"{{" + missingPath + "}}\" does not exist.",
+        "{{" + missingPath + "}}",
+        "A project constant");
+    diagnosticReport->Add(projectDiagnostic);
+  }
+
+  return plainString;
+}
+
 gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
@@ -878,6 +976,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   if (ParameterMetadata::IsExpression("number", metadata.GetType())) {
+    if (metadata.IsOptional() && parameter.GetPlainString().empty()) {
+      return "0";
+    }
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this,
         context,
@@ -886,6 +987,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         lastObjectName,
         metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("string", metadata.GetType())) {
+    if (metadata.IsOptional() && parameter.GetPlainString().empty()) {
+      return ConvertToStringExplicit("");
+    }
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this,
         context,
@@ -922,9 +1026,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (ParameterMetadata::IsBehavior(metadata.GetType())) {
     argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.GetType() == "key") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = ConvertToStringExplicit(
+        ResolveConstantPlaceholders(parameter.GetPlainString(), context));
   } else if (ParameterMetadata::IsExpression("resource", metadata.GetType())) {
-    const auto &resourceName = parameter.GetPlainString();
+    const auto resourceName =
+        ResolveConstantPlaceholders(parameter.GetPlainString(), context);
     const auto &resourcesContainersList =
         GetProjectScopedContainers().GetResourcesContainersList();
     const auto sourceType =
@@ -947,7 +1053,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput = "\"" + ConvertToString(resourceName) + "\"";
     }
   } else if (metadata.GetType() == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+    argOutput = ConvertToStringExplicit(
+        ResolveConstantPlaceholders(parameter.GetPlainString(), context));
   } else if (metadata.GetType() == "yesorno") {
     auto parameterString = parameter.GetPlainString();
     // This is duplicated in `InstructionSentenceFormatter::GetFormattedParameterValue`.
@@ -979,7 +1086,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       if (!metadata.GetType().empty())
         cout << "Warning: Unknown type of parameter \"" << metadata.GetType()
              << "\"." << std::endl;
-      argOutput += "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
+      argOutput += ConvertToStringExplicit(
+          ResolveConstantPlaceholders(parameter.GetPlainString(), context));
     }
   }
 
@@ -1571,6 +1679,7 @@ EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
       diagnosticReport(nullptr) {};
 
 EventsCodeGenerator::EventsCodeGenerator(
@@ -1586,6 +1695,24 @@ EventsCodeGenerator::EventsCodeGenerator(
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0),
       eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
+      diagnosticReport(nullptr) {};
+
+EventsCodeGenerator::EventsCodeGenerator(
+    const gd::Project& project_,
+    const gd::Platform& platform_,
+    const gd::ProjectScopedContainers& projectScopedContainers_)
+    : platform(platform_),
+      projectScopedContainers(projectScopedContainers_),
+      hasProjectAndLayout(false),
+      project(&project_),
+      scene(nullptr),
+      errorOccurred(false),
+      compilationForRuntime(false),
+      maxCustomConditionsDepth(0),
+      maxConditionsListsSize(0),
+      eventsListNextUniqueId(0),
+      sceneLifecycleFunctionRole("sceneUpdate"),
       diagnosticReport(nullptr) {};
 
 }  // namespace gd

@@ -182,8 +182,27 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
       },
       [halfOpenOrCloseDrawerOnEditor, isEditorVisible]
     );
+    const setEditorViewsVisibility = React.useCallback(
+      (
+        editorVisibilityChanges: Array<{|
+          editorId: EditorId,
+          visible: boolean,
+        |}>
+      ) => {
+        const editorToShow = editorVisibilityChanges.find(
+          ({ visible }) => visible
+        );
+        if (editorToShow) {
+          setSelectedEditorId(editorToShow.editorId);
+          setDrawerOpeningState('halfOpen');
+        } else {
+          setDrawerOpeningState('closed');
+        }
+      },
+      []
+    );
     const openNewObjectDialog = React.useCallback(
-      () => {
+      (options?: {| instanceSceneCoordinates?: ?[number, number] |}) => {
         if (!isEditorVisible('objects-list')) {
           // Objects list is not opened. Open it now.
           halfOpenOrCloseDrawerOnEditor('objects-list');
@@ -191,7 +210,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
 
         // Open the new object dialog when the objects list is opened.
         objectsListDoNowOrAfterRender((objectsList: ?ObjectsListInterface) => {
-          if (objectsList) objectsList.openNewObjectDialog();
+          if (objectsList) objectsList.openNewObjectDialog(options);
         });
       },
       [
@@ -237,6 +256,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
         forceUpdateLayersList,
         openNewObjectDialog,
         toggleEditorView: halfOpenOrCloseDrawerOnEditor,
+        setEditorViewsVisibility,
         isEditorVisible,
         ensureEditorVisible,
         startSceneRendering,
@@ -256,6 +276,12 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
             ? editor.getLastContextMenuSceneCoordinates
             : () => [0, 0],
           getViewPosition: editor ? editor.getViewPosition : noop,
+          keepCanvasTopLeftSceneCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopLeftSceneCoordinatesOnNextResize
+            : noop,
+          keepCanvasTopCenterScreenCoordinatesOnNextResize: editor
+            ? editor.keepCanvasTopCenterScreenCoordinatesOnNextResize
+            : noop,
         },
         instancesHandlers: {
           getContentAABB: editor ? editor.getContentAABB : () => null,
@@ -354,6 +380,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                   onInstancesMoved={props.onInstancesMoved}
                   onInstancesResized={props.onInstancesResized}
                   onInstancesRotated={props.onInstancesRotated}
+                  onImageFilesDropped={props.onImageFilesDropped}
+                  on3DModelFilesDropped={props.on3DModelFilesDropped}
+                  onCustomObjectDropped={props.onCustomObjectDropped}
                   selectedObjectNames={selectedObjectNames}
                   onContextMenu={props.onContextMenu}
                   isInstanceOf3DObject={props.isInstanceOf3DObject}
@@ -411,6 +440,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }
+                        onOpenPrefabSettings={props.onOpenPrefabSettings}
                         onExportAssets={props.onExportAssets}
                         onImportAssets={props.onImportAssets}
                         onDeleteObjects={(objectWithContext, cb) =>
@@ -492,6 +522,10 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onOpenEventBasedObjectVariantEditor={
                           props.onOpenEventBasedObjectVariantEditor
                         }
+                        onOpenPrefabDetailEditor={
+                          props.onOpenPrefabDetailEditor
+                        }
+                        onOpenPrefabSettings={props.onOpenPrefabSettings}
                         onDeleteEventsBasedObjectVariant={
                           props.onDeleteEventsBasedObjectVariant
                         }
@@ -505,11 +539,7 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         eventsBasedObjectVariant={
                           props.eventsBasedObjectVariant
                         }
-                        getContentAABB={
-                          editorRef.current
-                            ? editorRef.current.getContentAABB
-                            : () => null
-                        }
+                        getContentAABB={props.getContentAABB}
                         onEventsBasedObjectChildrenEdited={
                           props.onEventsBasedObjectChildrenEdited
                         }

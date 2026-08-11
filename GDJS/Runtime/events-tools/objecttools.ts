@@ -234,6 +234,283 @@ namespace gdjs {
         );
       };
 
+      type CollisionLifecycleKind = 'enter' | 'exit';
+
+      type CollisionLifecycleState = {
+        previousPairs: Set<string>;
+        consideredPairs: Set<string>;
+        collidingPairs: Set<string>;
+      };
+
+      const collisionLifecycleStatesByScene = new WeakMap<
+        gdjs.RuntimeScene,
+        Map<number | string, CollisionLifecycleState>
+      >();
+
+      let areCollisionLifecycleCallbacksRegistered = false;
+
+      const getCollisionLifecyclePairKey = function (
+        object1: gdjs.RuntimeObject,
+        object2: gdjs.RuntimeObject
+      ): string {
+        return object1.id < object2.id
+          ? object1.id + ':' + object2.id
+          : object2.id + ':' + object1.id;
+      };
+
+      const collisionLifecyclePairKeyHasObjectId = function (
+        pairKey: string,
+        objectId: integer
+      ): boolean {
+        const objectIdString = objectId.toString();
+        return (
+          pairKey.startsWith(objectIdString + ':') ||
+          pairKey.endsWith(':' + objectIdString)
+        );
+      };
+
+      const deleteCollisionLifecyclePairsWithObjectId = function (
+        pairs: Set<string>,
+        objectId: integer
+      ) {
+        pairs.forEach((pairKey) => {
+          if (collisionLifecyclePairKeyHasObjectId(pairKey, objectId)) {
+            pairs.delete(pairKey);
+          }
+        });
+      };
+
+      const ensureCollisionLifecycleCallbacksRegistered = function () {
+        if (areCollisionLifecycleCallbacksRegistered) {
+          return;
+        }
+
+        gdjs.registerRuntimeScenePostEventsCallback((runtimeScene) => {
+          const sceneStates = collisionLifecycleStatesByScene.get(runtimeScene);
+          if (!sceneStates) {
+            return;
+          }
+
+          sceneStates.forEach((state) => {
+            state.consideredPairs.forEach((pairKey) => {
+              if (state.collidingPairs.has(pairKey)) {
+                state.previousPairs.add(pairKey);
+              } else {
+                state.previousPairs.delete(pairKey);
+              }
+            });
+
+            state.consideredPairs.clear();
+            state.collidingPairs.clear();
+          });
+        });
+
+        gdjs.registerObjectDeletedFromSceneCallback(
+          (instanceContainer, object) => {
+            const runtimeScene = instanceContainer.getScene();
+            const sceneStates =
+              collisionLifecycleStatesByScene.get(runtimeScene);
+            if (!sceneStates) {
+              return;
+            }
+
+            sceneStates.forEach((state) => {
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.previousPairs,
+                object.id
+              );
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.consideredPairs,
+                object.id
+              );
+              deleteCollisionLifecyclePairsWithObjectId(
+                state.collidingPairs,
+                object.id
+              );
+            });
+          }
+        );
+
+        gdjs.registerRuntimeSceneUnloadedCallback((runtimeScene) => {
+          collisionLifecycleStatesByScene.delete(runtimeScene);
+        });
+
+        areCollisionLifecycleCallbacksRegistered = true;
+      };
+
+      const getCollisionLifecycleState = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string
+      ): CollisionLifecycleState {
+        ensureCollisionLifecycleCallbacksRegistered();
+
+        const runtimeScene = instanceContainer.getScene();
+        let sceneStates = collisionLifecycleStatesByScene.get(runtimeScene);
+        if (!sceneStates) {
+          sceneStates = new Map();
+          collisionLifecycleStatesByScene.set(runtimeScene, sceneStates);
+        }
+
+        let state = sceneStates.get(conditionUniqueId);
+        if (!state) {
+          state = {
+            previousPairs: new Set(),
+            consideredPairs: new Set(),
+            collidingPairs: new Set(),
+          };
+          sceneStates.set(conditionUniqueId, state);
+        }
+
+        return state;
+      };
+
+      const hitBoxesCollisionLifecycleTest = function (
+        kind: CollisionLifecycleKind,
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ): boolean {
+        const state = getCollisionLifecycleState(
+          instanceContainer,
+          conditionUniqueId
+        );
+        const currentCollidingPairs = new Set<string>();
+        let isTrue = false;
+        const objects1Lists = gdjs.staticArray(hitBoxesCollisionLifecycleTest);
+        objectsLists1.values(objects1Lists);
+        const objects2Lists = gdjs.staticArray2(hitBoxesCollisionLifecycleTest);
+        objectsLists2.values(objects2Lists);
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr = objects1Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+        for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+          const arr = objects2Lists[i];
+          for (let k = 0, lenk = arr.length; k < lenk; ++k) {
+            arr[k].pick = false;
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr1 = objects1Lists[i];
+          for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+            for (let j = 0, lenj = objects2Lists.length; j < lenj; ++j) {
+              const arr2 = objects2Lists[j];
+              for (let l = 0, lenl = arr2.length; l < lenl; ++l) {
+                if (arr1[k].id === arr2[l].id) {
+                  continue;
+                }
+
+                const pairKey = getCollisionLifecyclePairKey(arr1[k], arr2[l]);
+                state.consideredPairs.add(pairKey);
+
+                if (
+                  gdjs.RuntimeObject.collisionTest(
+                    arr1[k],
+                    arr2[l],
+                    ignoreTouchingEdges
+                  )
+                ) {
+                  currentCollidingPairs.add(pairKey);
+                  state.collidingPairs.add(pairKey);
+                }
+              }
+            }
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          const arr1 = objects1Lists[i];
+          for (let k = 0, lenk = arr1.length; k < lenk; ++k) {
+            let atLeastOneObject = false;
+            for (let j = 0, lenj = objects2Lists.length; j < lenj; ++j) {
+              const arr2 = objects2Lists[j];
+              for (let l = 0, lenl = arr2.length; l < lenl; ++l) {
+                if (arr1[k].id === arr2[l].id) {
+                  continue;
+                }
+
+                const pairKey = getCollisionLifecyclePairKey(arr1[k], arr2[l]);
+                const pairHasChanged =
+                  kind === 'enter'
+                    ? currentCollidingPairs.has(pairKey) &&
+                      !state.previousPairs.has(pairKey)
+                    : state.previousPairs.has(pairKey) &&
+                      !currentCollidingPairs.has(pairKey);
+
+                if (pairHasChanged) {
+                  if (!inverted) {
+                    isTrue = true;
+                    arr1[k].pick = true;
+                    arr2[l].pick = true;
+                  }
+                  atLeastOneObject = true;
+                }
+              }
+            }
+            if (!atLeastOneObject && inverted) {
+              isTrue = true;
+              arr1[k].pick = true;
+            }
+          }
+        }
+
+        for (let i = 0, leni = objects1Lists.length; i < leni; ++i) {
+          gdjs.evtTools.object.filterPickedObjectsList(objects1Lists[i]);
+        }
+        if (!inverted) {
+          for (let i = 0, leni = objects2Lists.length; i < leni; ++i) {
+            gdjs.evtTools.object.filterPickedObjectsList(objects2Lists[i]);
+          }
+        }
+
+        return isTrue;
+      };
+
+      export const hitBoxesCollisionEnterTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ) {
+        return hitBoxesCollisionLifecycleTest(
+          'enter',
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          instanceContainer,
+          conditionUniqueId,
+          ignoreTouchingEdges
+        );
+      };
+
+      export const hitBoxesCollisionExitTest = function (
+        objectsLists1: ObjectsLists,
+        objectsLists2: ObjectsLists,
+        inverted: boolean,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        conditionUniqueId: number | string,
+        ignoreTouchingEdges: boolean
+      ) {
+        return hitBoxesCollisionLifecycleTest(
+          'exit',
+          objectsLists1,
+          objectsLists2,
+          inverted,
+          instanceContainer,
+          conditionUniqueId,
+          ignoreTouchingEdges
+        );
+      };
+
       export const _distanceBetweenObjects = function (obj1, obj2, distance) {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };
@@ -638,6 +915,10 @@ namespace gdjs {
       [objectName: string]: Array<string>;
     };
     localVariablesContainers: Array<Array<VariableNetworkSyncData>>;
+    sceneSignalContext?: {
+      name: string;
+      payload: string;
+    };
   };
 
   /**
@@ -650,6 +931,7 @@ namespace gdjs {
     private localVariablesContainers: Array<gdjs.VariablesContainer> = [];
     private callbacks = new Map<RuntimeObject, () => void>();
     private parent: LongLivedObjectsList | null = null;
+    private sceneSignalContext: { name: string; payload: string } | null = null;
 
     /**
      * Create a new container for objects lists, inheriting from another one. This is
@@ -679,6 +961,16 @@ namespace gdjs {
       return this.objectsLists.get(objectName) || [];
     }
 
+    getObjectNames(): string[] {
+      const objectNames = Array.from(this.objectsLists.keys());
+      if (this.parent) {
+        for (const objectName of this.parent.getObjectNames()) {
+          if (!this.objectsLists.has(objectName)) objectNames.push(objectName);
+        }
+      }
+      return objectNames;
+    }
+
     addObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
       const list = this.getOrCreateList(objectName);
       if (list.includes(runtimeObject)) return;
@@ -703,6 +995,17 @@ namespace gdjs {
       this.callbacks.delete(runtimeObject);
     }
 
+    clear(): void {
+      for (const [runtimeObject, callback] of this.callbacks.entries()) {
+        runtimeObject.unregisterDestroyCallback(callback);
+      }
+      this.callbacks.clear();
+      this.objectsLists.clear();
+      this.localVariablesContainers.length = 0;
+      this.sceneSignalContext = null;
+      this.parent = null;
+    }
+
     restoreLocalVariablesContainers(
       variablesContainers: Array<gdjs.VariablesContainer>
     ): void {
@@ -713,6 +1016,35 @@ namespace gdjs {
       variablesContainers: Array<gdjs.VariablesContainer>
     ): void {
       gdjs.copyArray(variablesContainers, this.localVariablesContainers);
+    }
+
+    /** Capture the signal aliases for an asynchronous continuation. */
+    backupSceneSignalContext(runtimeScene: gdjs.RuntimeScene): void {
+      const signal = runtimeScene.getSignalBus().getCurrentSceneSignal();
+      if (signal) {
+        this.sceneSignalContext = {
+          name: signal.name,
+          payload: signal.payload,
+        };
+      }
+    }
+
+    private getSceneSignalContext(): {
+      name: string;
+      payload: string;
+    } | null {
+      return (
+        this.sceneSignalContext ||
+        (this.parent ? this.parent.getSceneSignalContext() : null)
+      );
+    }
+
+    getSceneSignalName(): string {
+      return this.getSceneSignalContext()?.name || '';
+    }
+
+    getSceneSignalPayload(): string {
+      return this.getSceneSignalContext()?.payload || '';
     }
 
     getNetworkSyncData(
@@ -735,12 +1067,17 @@ namespace gdjs {
         }
         objectsLists[objectName] = objectNetworkIds;
       }
-      return {
+      const syncData: LongLivedObjectsListNetworkSyncData = {
         objectsLists,
         localVariablesContainers: this.localVariablesContainers.map(
           (container) => container.getNetworkSyncData(syncOptions)
         ),
       };
+      const sceneSignalContext = this.getSceneSignalContext();
+      if (sceneSignalContext) {
+        syncData.sceneSignalContext = sceneSignalContext;
+      }
+      return syncData;
     }
 
     updateFromNetworkSyncData(
@@ -748,11 +1085,13 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       syncOptions: UpdateFromNetworkSyncDataOptions
     ) {
-      const { objectsLists, localVariablesContainers } = syncData;
+      const { objectsLists, localVariablesContainers, sceneSignalContext } =
+        syncData;
 
       // Clear the current state.
       this.objectsLists.clear();
       this.localVariablesContainers.length = 0;
+      this.sceneSignalContext = sceneSignalContext || null;
 
       // Restore the list of objects.
       for (const [objectName, objectNetworkIds] of Object.entries(

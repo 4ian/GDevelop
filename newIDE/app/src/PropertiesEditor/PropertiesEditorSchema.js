@@ -3,6 +3,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -26,6 +27,8 @@ export type ValueFieldCommonProperties = {|
   onEditButtonClick?: () => void,
   getValueFromDisplayedValue?: string => string,
   getDisplayedValueFromValue?: string => string,
+  allowConstantPlaceholder?: boolean,
+  forbidConstantPlaceholder?: boolean,
   visibility?: FieldVisibility | null,
   defaultValue?: string | number | boolean | null,
 |};
@@ -42,6 +45,8 @@ export type PrimitiveValueField =
       valueType: 'number',
       getValue: Instance => number | null,
       setValue: (instance: Instance, newValue: number) => void,
+      getRawValue?: Instance => string,
+      setRawValue?: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<FieldChoices>,
       /** Only supported on non compact property editors. */
       getEndAdornment?: Instance => {|
@@ -103,6 +108,11 @@ export type PrimitiveValueField =
 export type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
+  importedResourcesFolder?: string,
+  includeProjectAssetsFolder?: boolean,
+  defaultLocalFileDialogFolder?: string,
+  resourceNameFilter?: (resourceName: string, resource: gdResource) => boolean,
+  resourceExternalEditors?: Array<ResourceExternalEditor>,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
   renderLeftIcon?: (className?: string) => React.Node,

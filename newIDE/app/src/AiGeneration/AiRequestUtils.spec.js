@@ -3,7 +3,6 @@ import {
   getAllSubAgentFunctionCalls,
   getFunctionCallsToProcess,
   getPendingSubAgentFunctionCalls,
-  aiRequestPollSawActivity,
 } from './AiRequestUtils';
 import { type AiRequest } from '../Utils/GDevelopServices/Generation';
 
@@ -167,45 +166,5 @@ describe('getAllSubAgentFunctionCalls', () => {
     const result = getAllSubAgentFunctionCalls({ aiRequest });
 
     expect(result).toEqual([]);
-  });
-});
-
-describe('aiRequestPollSawActivity', () => {
-  const makeRequestWithStatus = (
-    status: 'working' | 'ready' | 'error' | 'suspended',
-    output: Array<any>
-  ): AiRequest => ({ ...makeAiRequest(output), status });
-
-  it('is true when the status changed', () => {
-    const previous = makeRequestWithStatus('working', [{ messageId: 'm1' }]);
-    const fetched = makeRequestWithStatus('ready', [{ messageId: 'm1' }]);
-    expect(aiRequestPollSawActivity(previous, fetched)).toBe(true);
-  });
-
-  it('is false when the status is unchanged and the incremental fetch only echoes the last known message', () => {
-    const previous = makeRequestWithStatus('working', [{ messageId: 'm1' }]);
-    // Incremental fetch returns just the echoed last known message.
-    const fetched = makeRequestWithStatus('working', [{ messageId: 'm1' }]);
-    expect(aiRequestPollSawActivity(previous, fetched)).toBe(false);
-  });
-
-  it('is true when the incremental fetch returns new messages beyond the echo', () => {
-    const previous = makeRequestWithStatus('working', [{ messageId: 'm1' }]);
-    const fetched = makeRequestWithStatus('working', [
-      { messageId: 'm1' },
-      { messageId: 'm2' },
-    ]);
-    expect(aiRequestPollSawActivity(previous, fetched)).toBe(true);
-  });
-
-  it('is true on the first fetch, when there is no previously known request', () => {
-    const fetched = makeRequestWithStatus('working', [{ messageId: 'm1' }]);
-    expect(aiRequestPollSawActivity(null, fetched)).toBe(true);
-  });
-
-  it('is false when status is unchanged and there are no messages', () => {
-    const previous = makeRequestWithStatus('working', []);
-    const fetched = makeRequestWithStatus('working', []);
-    expect(aiRequestPollSawActivity(previous, fetched)).toBe(false);
   });
 });

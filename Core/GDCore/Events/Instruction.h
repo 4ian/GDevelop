@@ -19,9 +19,9 @@ namespace gd {
  * action.
  *
  * An instruction has a type, which define what it does, and some parameters. It
- * can also be set as inverted (when the instruction is a condition) and it
- * can have sub instructions. This class does nothing particular except storing
- * these data.
+ * can also be set as inverted (when the instruction is a condition), disabled
+ * and it can have sub instructions. This class does nothing particular except
+ * storing these data.
  *
  * \see gd::BaseEvent
  *
@@ -87,6 +87,20 @@ class GD_CORE_API Instruction {
    * \param inverted true if the instruction must be awaited
    */
   void SetAwaited(bool awaited) { awaitAsync = awaited; }
+
+  /**
+   * \brief Return true if the instruction is disabled.
+   *
+   * Disabled instructions are ignored by code generation.
+   */
+  bool IsDisabled() const { return disabled; }
+
+  /**
+   * \brief Set if the instruction is disabled or not.
+   *
+   * \param disable true if the instruction must not be generated.
+   */
+  void SetDisabled(bool disable = true) { disabled = disable; }
 
   /**
    * \brief Return the number of parameters of the instruction.
@@ -171,6 +185,8 @@ class GD_CORE_API Instruction {
   gd::String type;  ///< Instruction type
   bool inverted;  ///< True if the instruction if inverted. Only applicable for
                   ///< instruction used as conditions by events
+  bool disabled =
+      false;  ///< True if the instruction is disabled and must not be executed
   bool awaitAsync =
       false;  ///< Tells the code generator whether the optionally asynchronous
               ///< instruction should be generated as asynchronous (awaited) or not.

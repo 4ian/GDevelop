@@ -60,10 +60,7 @@ type SimplifiedTest = {|
   testName: string,
   type: string,
   description?: string,
-  // The test source ("the body of `async (harness) => {...}`"). Served on
-  // demand by `read_game_project_json` (`tests[*].code`) — the backend strips
-  // it from the project embedded in prompts, so it costs nothing until read.
-  code?: string,
+  source?: string,
   lastRunStatus?: string,
   lastRunAt?: number,
 |};
@@ -454,7 +451,7 @@ export const makeSimplifiedProjectBuilder = (
         };
         if (test.getDescription())
           simplifiedTest.description = test.getDescription();
-        if (test.getSource()) simplifiedTest.code = test.getSource();
+        if (test.getSource()) simplifiedTest.source = test.getSource();
         if (test.getLastRunStatus()) {
           simplifiedTest.lastRunStatus = test.getLastRunStatus();
           simplifiedTest.lastRunAt = test.getLastRunAt();

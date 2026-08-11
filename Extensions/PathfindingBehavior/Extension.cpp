@@ -27,18 +27,18 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
       .SetTags("pathfinding, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/pathfinding");
   extension.AddInstructionOrExpressionGroupMetadata(_("Pathfinding behavior"))
-      .SetIcon("CppPlatform/Extensions/AStaricon16.png");
+      .SetIcon("CppPlatform/Extensions/pathfinding-character.svg");
 
   {
     gd::BehaviorMetadata& aut =
         extension.AddBehavior("PathfindingBehavior",
-                              _("Pathfinding"),
+                              _("Pathfinding character (grid-based)"),
                               "Pathfinding",
                               _("Move objects to a target "
                                 "while avoiding all objects that are "
                                 "flagged as obstacles."),
                               "",
-                              "CppPlatform/Extensions/AStaricon.png",
+                              "CppPlatform/Extensions/pathfinding-character.svg",
                               "PathfindingBehavior",
                               std::make_shared<PathfindingBehavior>(),
                               std::make_shared<gd::BehaviorsSharedData>());
@@ -48,8 +48,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Move the object to a position"),
                   _("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
                   _("Movement on the path"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddCodeOnlyParameter("currentScene", "")
@@ -63,8 +63,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Check if a path has been found."),
                      _("A path has been found for _PARAM0_"),
                      _("Movement on the path"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -75,8 +75,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Check if the destination was reached."),
                      _("_PARAM0_ reached its destination"),
                      _("Movement on the path"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -87,8 +87,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the width of the cells of the virtual grid."),
                   _("the width of the virtual cells"),
                   _("Virtual grid"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -102,8 +102,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the width of the cells of the virtual grid."),
                      _("the width of the virtual cells"),
                      _("Virtual grid"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -116,8 +116,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the height of the cells of the virtual grid."),
                   _("the height of the virtual cells"),
                   _("Virtual grid"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -131,8 +131,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the height of the cells of the virtual grid."),
                      _("the height of the virtual cells"),
                      _("Virtual grid"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -145,8 +145,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the acceleration when moving the object"),
                   _("the acceleration on the path"),
                   _("Pathfinding configuration"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -160,8 +160,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the acceleration when moving the object"),
                      _("the acceleration"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -174,8 +174,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the maximum speed when moving the object"),
                   _("the max. speed on the path"),
                   _("Pathfinding configuration"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -191,8 +191,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the maximum speed when moving the object"),
                      _("the max. speed"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -207,8 +207,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the speed of the object on the path"),
                   _("the speed on the path"),
                   _("Movement on the path"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -224,8 +224,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the speed of the object on its path."),
                      _("the speed"),
                      _("Movement on the path"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -241,8 +241,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the angle of movement of an object on its path."),
            _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
            _("Movement on the path"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+           "CppPlatform/Extensions/pathfinding-character.svg",
+           "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -254,8 +254,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the maximum angular speed when moving the object"),
                   _("the max. angular speed on the path"),
                   _("Pathfinding configuration"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -272,8 +272,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the maximum angular speed when moving the object"),
            _("the max. angular speed"),
            _("Pathfinding configuration"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+           "CppPlatform/Extensions/pathfinding-character.svg",
+           "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -289,8 +289,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Change the rotation offset applied when moving the object"),
            _("the rotation offset on the path"),
            _("Pathfinding configuration"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+           "CppPlatform/Extensions/pathfinding-character.svg",
+           "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -306,8 +306,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the rotation offset when moving the object"),
                      _("the rotation offset"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -324,8 +324,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
              "planning a path"),
            _("the size of the extra border on the path"),
            _("Pathfinding configuration"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+           "CppPlatform/Extensions/pathfinding-character.svg",
+           "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -340,8 +340,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                        "object when planning a path"),
                      _("the size of the extra border on the path"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -355,8 +355,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Allow or restrict diagonal movement on the path"),
            _("Allow diagonal movement for _PARAM0_ on the path: _PARAM2_"),
            _("Pathfinding configuration"),
-           "CppPlatform/Extensions/AStaricon24.png",
-           "CppPlatform/Extensions/AStaricon16.png")
+           "CppPlatform/Extensions/pathfinding-character.svg",
+           "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -369,8 +369,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                        "diagonally on the path"),
                      _("Diagonal moves allowed for _PARAM0_"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -381,8 +381,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Enable or disable rotation of the object on the path"),
                   _("Enable rotation of _PARAM0_ on the path: _PARAM2_"),
                   _("Pathfinding configuration"),
-                  "CppPlatform/Extensions/AStaricon24.png",
-                  "CppPlatform/Extensions/AStaricon16.png")
+                  "CppPlatform/Extensions/pathfinding-character.svg",
+                  "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -395,8 +395,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                        "its path."),
                      _("_PARAM0_ is rotated when traveling on its path"),
                      _("Pathfinding configuration"),
-                     "CppPlatform/Extensions/AStaricon24.png",
-                     "CppPlatform/Extensions/AStaricon16.png")
+                     "CppPlatform/Extensions/pathfinding-character.svg",
+                     "CppPlatform/Extensions/pathfinding-character.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -404,9 +404,9 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("GetNodeX",
                       _("Get a waypoint X position"),
-                      _("Get next waypoint X position"),
+                      _("Get a waypoint X position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("expression", _("Node index (start at 0!)"))
@@ -414,9 +414,9 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("GetNodeY",
                       _("Get a waypoint Y position"),
-                      _("Get next waypoint Y position"),
+                      _("Get a waypoint Y position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("expression", _("Node index (start at 0!)"))
@@ -426,7 +426,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Index of the next waypoint"),
                       _("Get the index of the next waypoint to reach"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeIndex");
@@ -435,7 +435,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Waypoint count"),
                       _("Get the number of waypoints on the path"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNodeCount");
@@ -444,7 +444,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Get next waypoint X position"),
                       _("Get next waypoint X position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeX");
@@ -453,7 +453,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Get next waypoint Y position"),
                       _("Get next waypoint Y position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeY");
@@ -462,7 +462,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Last waypoint X position"),
                       _("Last waypoint X position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetLastNodeX");
@@ -471,7 +471,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Last waypoint Y position"),
                       _("Last waypoint Y position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetLastNodeY");
@@ -480,7 +480,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Destination X position"),
                       _("Destination X position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetDestinationX");
@@ -489,7 +489,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Destination Y position"),
                       _("Destination Y position"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetDestinationY");
@@ -498,7 +498,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Acceleration"),
                       _("Acceleration of the object on the path"),
                       _("Pathfinding configuration"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAcceleration");
@@ -507,7 +507,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Maximum speed"),
                       _("Maximum speed of the object on the path"),
                       _("Pathfinding configuration"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetMaxSpeed");
@@ -516,7 +516,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Speed"),
                       _("Speed of the object on the path"),
                       _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetSpeed");
@@ -525,7 +525,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Angular maximum speed"),
                       _("Angular maximum speed of the object on the path"),
                       _("Pathfinding configuration"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAngularMaxSpeed");
@@ -534,7 +534,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Rotation offset"),
                       _("Rotation offset applied the object on the path"),
                       _("Pathfinding configuration"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAngleOffset");
@@ -543,7 +543,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Extra border size"),
                       _("Extra border applied the object on the path"),
                       _("Pathfinding configuration"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetExtraBorder");
@@ -552,7 +552,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Width of a cell"),
                       _("Width of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetCellWidth");
@@ -561,7 +561,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Height of a cell"),
                       _("Height of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetCellHeight");
@@ -570,7 +570,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                     _("Angle of movement on its path"),
                     _("Angle of movement on its path"),
                     _("Movement on the path"),
-                    "CppPlatform/Extensions/AStaricon16.png")
+                    "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior");
 
@@ -580,7 +580,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("X offset of the virtual grid"),
                       _("X offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon24.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
@@ -591,7 +591,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Y offset of the virtual grid"),
                       _("Y offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon24.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
@@ -600,11 +600,11 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(
         "PathfindingObstacleBehavior",
-        _("Obstacle for pathfinding"),
+        _("Obstacle for pathfinding (grid-based)"),
         "PathfindingObstacle",
         _("Flag objects as being obstacles for pathfinding."),
         "",
-        "CppPlatform/Extensions/pathfindingobstacleicon.png",
+        "CppPlatform/Extensions/pathfinding-obstacle.svg",
         "PathfindingObstacleBehavior",
         std::make_shared<PathfindingObstacleBehavior>(),
         std::make_shared<gd::BehaviorsSharedData>());
@@ -614,8 +614,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Change the cost of going through the object."),
                   _("the cost"),
                   _("Obstacles"),
-                  "CppPlatform/Extensions/pathfindingobstacleicon24.png",
-                  "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+                  "CppPlatform/Extensions/pathfinding-obstacle.svg",
+                  "CppPlatform/Extensions/pathfinding-obstacle.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
@@ -629,8 +629,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the cost of going through the object"),
                      _("the cost"),
                      _("Obstacles"),
-                     "CppPlatform/Extensions/pathfindingobstacleicon24.png",
-                     "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+                     "CppPlatform/Extensions/pathfinding-obstacle.svg",
+                     "CppPlatform/Extensions/pathfinding-obstacle.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
@@ -643,8 +643,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Decide if the object is an impassable obstacle."),
                   _("Set _PARAM0_ as an impassable obstacle: _PARAM2_"),
                   _("Obstacles"),
-                  "CppPlatform/Extensions/pathfindingobstacleicon24.png",
-                  "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+                  "CppPlatform/Extensions/pathfinding-obstacle.svg",
+                  "CppPlatform/Extensions/pathfinding-obstacle.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
@@ -656,8 +656,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Check if the obstacle is impassable."),
                      _("_PARAM0_ is impassable"),
                      _("Obstacles"),
-                     "CppPlatform/Extensions/pathfindingobstacleicon24.png",
-                     "CppPlatform/Extensions/pathfindingobstacleicon16.png")
+                     "CppPlatform/Extensions/pathfinding-obstacle.svg",
+                     "CppPlatform/Extensions/pathfinding-obstacle.svg")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
@@ -667,7 +667,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Cost"),
                       _("Obstacle cost"),
                       _("Obstacles"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/pathfinding-character.svg")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .SetFunctionName("GetCost");

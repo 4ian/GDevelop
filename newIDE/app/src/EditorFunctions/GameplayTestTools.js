@@ -47,11 +47,20 @@ const invalidScopeFailure = () =>
  */
 const makeGameplayTestOutput = (
   result: GameplayTestResult,
-  didModifyProject: boolean
+  didModifyProject: boolean,
+  executedSource: string | null
 ): EditorFunctionGenericOutput => {
   return {
     success: result.status === 'passed',
     ...makeGameplayTestResultReadableOutput(result),
+    // When the test script could not execute, give back the code that was
+    // run: the repair (by the AI tester agent) can then be a minimal edit of
+    // the real source instead of a rewrite from scratch - the only option
+    // when running a stored test, whose source is not in the conversation.
+    ...(executedSource !== null &&
+    (result.status === 'error' || result.status === 'timeout')
+      ? { source: executedSource }
+      : {}),
     meta: didModifyProject ? { didModifyProject: true } : undefined,
   };
 };
@@ -143,7 +152,17 @@ export const runGameplayTest: EditorFunction = {
       if (!results[0]) {
         return makeFailure('The gameplay test did not return a result.');
       }
-      return makeGameplayTestOutput(results[0], didModifyProject);
+      const executedSource =
+        source !== null
+          ? source
+          : testsContainer.hasTestNamed(testName)
+          ? testsContainer.getTest(testName).getSource()
+          : null;
+      return makeGameplayTestOutput(
+        results[0],
+        didModifyProject,
+        executedSource
+      );
     } catch (error) {
       return makeFailure(
         'Unable to run the gameplay test: ' + (error.message || String(error))

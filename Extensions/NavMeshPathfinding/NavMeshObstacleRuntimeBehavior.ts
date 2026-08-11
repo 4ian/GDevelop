@@ -1,6 +1,18 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('NavMesh pathfinding');
+
   export interface RuntimeInstanceContainer {
     navMeshObstaclesManager: gdjs.NavMeshObstaclesManager;
+  }
+
+  interface NavMeshCharacterSharedData {
+    cellSize: float;
+    cellDepth: float;
+    slopeMaxAngle: float;
+    stairHeightMax: float;
+    walkableRadius: float;
+    walkableDepth: float;
+    speedScaleY: float;
   }
 
   const cubePositions = [
@@ -56,11 +68,57 @@ namespace gdjs {
 
     static readonly cellHeightFor2D = 5;
 
-    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
+    private appliedSharedData: NavMeshCharacterSharedData | null = null;
+
+    /**
+     * Set the configuration of the nav mesh from the shared data of a
+     * character behavior (see
+     * `NavMeshCharacterRuntimeBehavior` constructor).
+     *
+     * There is only one nav mesh per container, so only the first
+     * configuration is applied. Following calls with different values log
+     * a warning and are ignored.
+     */
+    setSharedDataIfNeeded(
+      sharedData: NavMeshCharacterSharedData | null,
+      behaviorName: string
+    ): void {
       if (!sharedData) {
-        // It can happens when there is no object with the character behavior.
+        logger.warn(
+          `No shared data was found for the character behavior "${behaviorName}". ` +
+            'The default nav mesh configuration is used instead.'
+        );
         return;
       }
+      const appliedSharedData = this.appliedSharedData;
+      if (appliedSharedData) {
+        if (
+          appliedSharedData.cellSize !== sharedData.cellSize ||
+          appliedSharedData.cellDepth !== sharedData.cellDepth ||
+          appliedSharedData.slopeMaxAngle !== sharedData.slopeMaxAngle ||
+          appliedSharedData.stairHeightMax !== sharedData.stairHeightMax ||
+          appliedSharedData.walkableRadius !== sharedData.walkableRadius ||
+          appliedSharedData.walkableDepth !== sharedData.walkableDepth ||
+          appliedSharedData.speedScaleY !== sharedData.speedScaleY
+        ) {
+          logger.warn(
+            `The character behavior "${behaviorName}" has a different configuration ` +
+              'than the one already used to build the nav mesh. ' +
+              'There is only one nav mesh per scene: the configuration of the ' +
+              'first created character is used.'
+          );
+        }
+        return;
+      }
+      this.appliedSharedData = {
+        cellSize: sharedData.cellSize,
+        cellDepth: sharedData.cellDepth,
+        slopeMaxAngle: sharedData.slopeMaxAngle,
+        stairHeightMax: sharedData.stairHeightMax,
+        walkableRadius: sharedData.walkableRadius,
+        walkableDepth: sharedData.walkableDepth,
+        speedScaleY: sharedData.speedScaleY,
+      };
       this.navMeshConfig.cs = sharedData.cellSize;
       this.cellDepth = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
@@ -71,20 +129,28 @@ namespace gdjs {
       this.speedScaleY =
         sharedData.speedScaleY > 0 ? sharedData.speedScaleY : 1;
       this.inverseSpeedScaleY = 1 / this.speedScaleY;
+      // The nav mesh may have been built with the default configuration
+      // if the manager was created by an obstacle behavior or the debug
+      // draw action before any character existed.
+      this.invalidateNavMesh();
     }
 
     /**
      * Get the obstacles manager of an instance container.
+     *
+     * The manager is created with a default configuration if it doesn't
+     * exist yet: the configuration from the character behavior shared data
+     * is applied when the first character is created (see
+     * `setSharedDataIfNeeded`), as only character behaviors know the
+     * behavior name the shared data is registered under.
      */
     static getManager(
       instanceContainer: gdjs.RuntimeInstanceContainer
     ): gdjs.NavMeshObstaclesManager {
       if (!instanceContainer.navMeshObstaclesManager) {
         // Create the shared manager if necessary.
-        const initialData =
-          instanceContainer.getInitialSharedDataForBehavior('NavMeshCharacter');
         instanceContainer.navMeshObstaclesManager =
-          new gdjs.NavMeshObstaclesManager(instanceContainer, initialData);
+          new gdjs.NavMeshObstaclesManager();
       }
       return instanceContainer.navMeshObstaclesManager;
     }

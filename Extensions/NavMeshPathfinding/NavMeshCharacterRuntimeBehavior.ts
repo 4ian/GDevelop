@@ -86,6 +86,14 @@ namespace gdjs {
 
       this._manager =
         gdjs.NavMeshObstaclesManager.getManager(instanceContainer);
+      // The shared data can only be found from here as other users of the
+      // manager (obstacle behaviors, debug draw action) don't know the
+      // name the character behavior shared data is registered under.
+      this._manager.setSharedDataIfNeeded(
+        // @ts-ignore - the shared data properties are not typed.
+        instanceContainer.getInitialSharedDataForBehavior(behaviorData.name),
+        behaviorData.name
+      );
       this._manager.addCharacter(this);
     }
 

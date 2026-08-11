@@ -8,7 +8,11 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     await gdjs.getAllAsynchronouslyLoadingLibraryPromise();
   });
 
-  const createScene = (framePerSecond = 60) => {
+  const createScene = (
+    framePerSecond = 60,
+    behaviorName = characterBehaviorName,
+    sharedDataProperties = {}
+  ) => {
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
@@ -57,7 +61,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       usedExtensionsWithVariablesData: [],
     });
     const characterSharedData = {
-      name: characterBehaviorName,
+      name: behaviorName,
       type: 'NavMeshPathfinding::NavMeshCharacterBehavior',
       cellSize: 10,
       cellDepth: 10,
@@ -66,9 +70,10 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       walkableRadius: -1,
       walkableDepth: 150,
       speedScaleY: 1,
+      ...sharedDataProperties,
     };
     runtimeScene.setInitialSharedDataForBehavior(
-      characterBehaviorName,
+      behaviorName,
       characterSharedData
     );
     setFramePerSecond(runtimeScene, framePerSecond);
@@ -80,7 +85,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     };
   };
 
-  const addCharacter = (runtimeScene) => {
+  const addCharacter = (runtimeScene, behaviorName = characterBehaviorName) => {
     const character = new gdjs.RuntimeObject(
       runtimeScene,
       {
@@ -89,7 +94,7 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
         behaviors: [
           {
             type: 'NavMeshPathfinding::NavMeshCharacterBehavior',
-            name: characterBehaviorName,
+            name: behaviorName,
             // @ts-ignore - properties are not typed
             acceleration: 400,
             maxSpeed: 200,
@@ -158,9 +163,12 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
   };
 
   /** @returns {gdjs.NavMeshCharacterRuntimeBehavior} */
-  const getCharacterBehavior = (character) =>
+  const getCharacterBehavior = (
+    character,
+    behaviorName = characterBehaviorName
+  ) =>
     // @ts-ignore - the behavior is from this extension.
-    character.getBehavior(characterBehaviorName);
+    character.getBehavior(behaviorName);
 
   /**
    * The path nodes are the remaining corners of the path (not including
@@ -311,6 +319,68 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
     // The path is a straight line as the obstacle is gone.
     expect(getPathLength(character)).to.be.within(180, 220);
+  });
+
+  describe('(renamed behavior)', function () {
+    const renamedBehaviorName = 'MyCharacter';
+
+    /**
+     * Create a scene with a narrow passage (80 pixels wide) between
+     * 2 obstacles and a character (of the given behavior configuration)
+     * near it.
+     */
+    const createSceneWithNarrowPassage = (sharedDataProperties) => {
+      const passageScene = createScene(
+        60,
+        renamedBehaviorName,
+        sharedDataProperties
+      );
+      const passageCharacter = addCharacter(passageScene, renamedBehaviorName);
+      addGroundDelimiters(passageScene);
+      const topObstacle = addObstacle(passageScene, 200, 200);
+      topObstacle.setPosition(400, 100);
+      const bottomObstacle = addObstacle(passageScene, 200, 200);
+      bottomObstacle.setPosition(400, 380);
+      passageCharacter.setPosition(250, 340);
+      // To ensure obstacles are registered.
+      passageScene.renderAndStep(1000 / 60);
+      return passageCharacter;
+    };
+
+    it('can find a path to a narrow passage with the default configuration', function () {
+      const passageCharacter = createSceneWithNarrowPassage({});
+
+      // The destination is inside the passage.
+      getCharacterBehavior(passageCharacter, renamedBehaviorName).moveTo(
+        500,
+        340,
+        0
+      );
+      expect(
+        getCharacterBehavior(passageCharacter, renamedBehaviorName).pathFound()
+      ).to.be(true);
+    });
+
+    it('uses the shared data registered under the name given to the behavior', function () {
+      // The walkable radius is bigger than the passage half-width, so the
+      // passage (and its surroundings) are excluded from the walkable area.
+      // If the shared data were not found (because the behavior is not using
+      // the default name), the default configuration would allow the passage
+      // and a path would wrongly be found.
+      const passageCharacter = createSceneWithNarrowPassage({
+        walkableRadius: 60,
+      });
+
+      // The destination is inside the passage.
+      getCharacterBehavior(passageCharacter, renamedBehaviorName).moveTo(
+        500,
+        340,
+        0
+      );
+      expect(
+        getCharacterBehavior(passageCharacter, renamedBehaviorName).pathFound()
+      ).to.be(false);
+    });
   });
 
   describe('(network synchronization)', function () {

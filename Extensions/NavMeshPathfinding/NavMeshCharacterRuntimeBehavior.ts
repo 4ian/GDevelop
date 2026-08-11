@@ -230,12 +230,16 @@ namespace gdjs {
         return;
       }
       const agentInitialPosition = this._agent.position();
+      // Teleporting the agent resets its velocity and move target,
+      // so it's only done (and rolled back) when actually needed.
+      let hasTeleported = false;
       if (
         agentInitialPosition.x !== origin.x ||
         agentInitialPosition.y !== origin.y ||
         agentInitialPosition.z !== origin.z
       ) {
         this._agent.teleport(origin);
+        hasTeleported = true;
       }
 
       const { success: hasFoundDestination, point: destination } =
@@ -258,7 +262,9 @@ namespace gdjs {
       navMeshQuery.destroy();
       if (!hasFoundDestination) {
         this._pathFound = false;
-        this._agent.teleport(agentInitialPosition);
+        if (hasTeleported) {
+          this._agent.teleport(agentInitialPosition);
+        }
         return;
       }
 
@@ -278,7 +284,7 @@ namespace gdjs {
         this._oldX = newX;
         this._oldY = newY;
         this._oldZ = newZ;
-      } else {
+      } else if (hasTeleported) {
         this._agent.teleport(agentInitialPosition);
       }
     }
@@ -298,9 +304,6 @@ namespace gdjs {
         return;
       }
       const agent = this._agent;
-      if (!agent) {
-        return;
-      }
       const oldX = this.owner.getX();
       const oldY = this.owner.getY();
       // For 2D we keep the agent position for Z because the ground may not be

@@ -43,8 +43,8 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
   getItemId,
 }: {|
   multiSelect: boolean,
-  selectedItems: Array<Item>,
-  flattenedData: Array<SelectionNode<Item>>,
+  selectedItems: $ReadOnlyArray<Item>,
+  flattenedData: $ReadOnlyArray<SelectionNode<Item>>,
   onSelectItems: (items: Array<Item>) => void,
   getItemId: (item: Item) => string,
 |}): (SelectCallArgs<Item>) => void {
@@ -137,4 +137,5 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
   );
 }
 
+export type { SelectionNode };
 export { useShiftRangeSelection };

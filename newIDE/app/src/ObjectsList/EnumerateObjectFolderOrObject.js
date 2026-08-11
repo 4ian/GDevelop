@@ -144,7 +144,7 @@ const collectObjectsToDelete = (
   if (!objectFolderOrObject.isFolder()) {
     return [objectFolderOrObject.getObject()];
   }
-  const objects = [];
+  const objects: Array<gdObject> = [];
   mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
     objects.push(...collectObjectsToDelete(objectFolderOrObject.getChildAt(i)));
   });
@@ -175,7 +175,7 @@ const collectFoldersBottomUp = (
 export const getObjectsToDeleteFromSelection = (
   topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>
 ): Array<gdObject> => {
-  const objects = [];
+  const objects: Array<gdObject> = [];
   topLevelObjectFolderOrObjects.forEach(objectFolderOrObject => {
     objects.push(...collectObjectsToDelete(objectFolderOrObject));
   });
@@ -190,7 +190,7 @@ export const getObjectsToDeleteFromSelection = (
 export const removeEmptyFoldersFromSelection = (
   topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>
 ): void => {
-  const foldersToRemove = [];
+  const foldersToRemove: Array<gdObjectFolderOrObject> = [];
   topLevelObjectFolderOrObjects.forEach(objectFolderOrObject =>
     collectFoldersBottomUp(objectFolderOrObject, foldersToRemove)
   );

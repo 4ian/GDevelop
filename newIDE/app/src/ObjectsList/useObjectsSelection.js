@@ -40,11 +40,15 @@ function useObjectsSelection({
   const lastSectionRef = React.useRef<boolean>(false);
 
   const selectObjectFolderOrObjectsWithContext = React.useCallback(
-    (objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>) => {
+    (
+      objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>
+    ) => {
       if (objectFolderOrObjectsWithContext.length > 0) {
         lastSectionRef.current = objectFolderOrObjectsWithContext[0].global;
       }
-      onObjectFolderOrObjectWithContextSelected(objectFolderOrObjectsWithContext);
+      onObjectFolderOrObjectWithContextSelected(
+        objectFolderOrObjectsWithContext
+      );
     },
     [onObjectFolderOrObjectWithContextSelected]
   );

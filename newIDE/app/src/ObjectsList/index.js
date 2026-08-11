@@ -1447,7 +1447,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       ]
     );
 
-
     const buildContextMenuTemplate = React.useCallback(
       (i18n: I18nType) => (
         item: TreeViewItem,
@@ -1576,8 +1575,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 destinationItem.content.isDescendantOf(selectedItem.content) ||
                 // Block dropping a folder onto itself (isDescendantOf is false
                 // for the node itself in C++, so we must check separately).
-                destinationItem.content.getId() ===
-                  selectedItem.content.getId()
+                destinationItem.content.getId() === selectedItem.content.getId()
             )
           ) {
             return false;

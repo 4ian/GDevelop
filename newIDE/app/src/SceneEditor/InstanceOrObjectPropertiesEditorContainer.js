@@ -261,7 +261,8 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : selectedObjectFolderOrObjectsCount > 0 && lastSelectionType === 'object' ? (
+        ) : selectedObjectFolderOrObjectsCount > 0 &&
+          lastSelectionType === 'object' ? (
           <EmptyMessage>
             <Trans>Folder selected. No properties to display.</Trans>
           </EmptyMessage>

@@ -20,6 +20,7 @@ import {
   pasteObjectFolderOrObjectsFromClipboard,
 } from './ObjectFolderOrObjectsClipboard';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -36,7 +37,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
   objectsContainer: gdObjectsContainer,
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
-  canSetAsGlobalObject: boolean | null,
+  canSetAsGlobalObject: ?boolean,
 
   selectObjectFolderOrObjectsWithContext: (
     items: Array<ObjectFolderOrObjectWithContext>
@@ -46,7 +47,7 @@ type Props = {|
     objects: Array<gdObject>,
     isTheFirstOfItsTypeInProject: boolean
   ) => void,
-  onObjectPasted: ((objects: gdObject) => void) | null,
+  onObjectPasted: ?(gdObject) => void,
   onDeleteObjects: (
     objectsWithContext: Array<ObjectWithContext>,
     cb: (doRemove: boolean) => void
@@ -55,11 +56,8 @@ type Props = {|
     item: ObjectFolderOrObjectWithContext
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
-  beforeSetAsGlobalObject: ((objectName: string) => boolean) | null,
-  showDeleteConfirmation: ({|
-    title: string,
-    message: string,
-  |}) => Promise<boolean>,
+  beforeSetAsGlobalObject: ?(objectName: string) => boolean,
+  showDeleteConfirmation: ShowConfirmDeleteDialogOptions => Promise<boolean>,
   forceUpdateList: () => void,
   // Called after a new folder is created so the caller can expand the tree
   // and start renaming without the hook knowing about treeViewRef or folder IDs.
@@ -220,8 +218,7 @@ function useBulkObjectOperations({
         : destinationFolder.getChildPosition(objectFolderOrObject) + 1;
 
       const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
-        objectType =>
-          !gd.UsedObjectTypeFinder.scanProject(project, objectType)
+        objectType => !gd.UsedObjectTypeFinder.scanProject(project, objectType)
       );
 
       const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
@@ -304,9 +301,10 @@ function useBulkObjectOperations({
       );
       if (!answer) return;
 
-      const destinationFolder =
-        options && options.folder && options.folder.isFolder()
-          ? options.folder
+      const optionsFolder = options && options.folder;
+      const destinationFolder: gdObjectFolderOrObject =
+        optionsFolder && optionsFolder.isFolder()
+          ? optionsFolder
           : globalObjectsContainer.getRootFolder();
       const baseIndex =
         options && typeof options.index === 'number'
@@ -465,7 +463,7 @@ function useBulkObjectOperations({
         canSetAsGlobalObject !== false &&
         topLevelItems.every(item => !item.objectFolderOrObject.isFolder());
 
-      return [
+      const menuItems: Array<MenuItemTemplate | null> = [
         {
           label: i18n._(t`Copy`),
           click: () => bulkCopy(),
@@ -482,7 +480,9 @@ function useBulkObjectOperations({
         },
         {
           label: i18n._(t`Delete`),
-          click: () => bulkDelete(),
+          click: () => {
+            bulkDelete();
+          },
           accelerator: 'Backspace',
           enabled: !isListLocked,
         },
@@ -510,7 +510,8 @@ function useBulkObjectOperations({
               click: () => bulkSetAsGlobalObject(i18n),
             }
           : null,
-      ].filter(Boolean);
+      ];
+      return menuItems.filter(Boolean);
     },
     [
       selectedObjectFolderOrObjectsWithContext,

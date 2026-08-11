@@ -21,7 +21,10 @@ import {
   findSurfaceBackgroundColor,
 } from './StickyRows';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
-import { useShiftRangeSelection } from './useShiftRangeSelection';
+import {
+  useShiftRangeSelection,
+  type SelectionNode,
+} from './useShiftRangeSelection';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -65,7 +68,7 @@ type FlattenedNode<Item> = {|
 |};
 
 export type SelectArgs<Item> = {|
-  node: FlattenedNode<Item>,
+  node: SelectionNode<Item>,
   exclusive?: boolean,
   extendFromAnchor?: boolean,
 |};

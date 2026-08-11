@@ -168,7 +168,7 @@ const collectNodeObjectTypes = (
 export const getObjectFolderOrObjectsClipboardObjectTypes = (): Array<string> => {
   const content = getObjectFolderOrObjectsClipboardContent();
   if (!content) return [];
-  const types = [];
+  const types: Array<string> = [];
   content.items.forEach(node => collectNodeObjectTypes(node, types));
   return types;
 };
@@ -211,7 +211,7 @@ const pasteNode = ({
   if (node.kind === 'folder') {
     const uniqueFolderName = getUniqueFolderName(parentFolder, node.name);
     const newFolder = parentFolder.insertNewFolder(uniqueFolderName, position);
-    const createdObjects = [];
+    const createdObjects: Array<gdObject> = [];
     node.children.forEach(childNode => {
       const pastedChild = pasteNode({
         node: childNode,
@@ -282,8 +282,8 @@ export const pasteObjectFolderOrObjectsFromClipboard = ({
       ? globalObjectsContainer
       : objectsContainer;
 
-  const createdObjects = [];
-  const topLevelObjectFolderOrObjects = [];
+  const createdObjects: Array<gdObject> = [];
+  const topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject> = [];
   clipboardContent.items.forEach((node, index) => {
     const pastedNode = pasteNode({
       node,
@@ -326,8 +326,8 @@ export const duplicateObjectFolderOrObjects = ({
   const topLevelItems = getSelectionTopLevelNodes(items);
   if (topLevelItems.length === 0) return null;
 
-  const createdObjects = [];
-  const topLevelObjectFolderOrObjects = [];
+  const createdObjects: Array<gdObject> = [];
+  const topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject> = [];
   topLevelItems.forEach((item, index) => {
     const container =
       item.global && globalObjectsContainer
@@ -349,4 +349,3 @@ export const duplicateObjectFolderOrObjects = ({
 
   return { createdObjects, topLevelObjectFolderOrObjects };
 };
-

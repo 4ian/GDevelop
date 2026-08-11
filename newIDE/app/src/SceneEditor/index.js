@@ -1242,7 +1242,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // The selection must stay within a single section (scene objects or
     // global objects): keep only the items matching the first one's scope.
-    const selectedObjectFolderOrObjectsWithContext =
+    const selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> =
       aliveObjectFolderOrObjectsWithContext.length === 0
         ? []
         : aliveObjectFolderOrObjectsWithContext.filter(

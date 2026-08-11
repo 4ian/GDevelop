@@ -482,9 +482,11 @@ namespace gdjs {
       if (this._debugDrawEnabled) {
         this._debuggerRenderer.renderDebugDraw(
           this.getAdhocListOfAllInstances(),
+          this._debugDrawShowHitBoxes,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
+          this._debugDrawShowCustomPoints,
+          this._debugDrawHooks
         );
       }
 

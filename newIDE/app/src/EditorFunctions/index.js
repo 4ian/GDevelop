@@ -30,6 +30,7 @@ import {
 } from './ApplyEventsChanges';
 import { isBehaviorDefaultCapability } from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { runGameplayTest, changeGameplayTests } from './GameplayTestTools';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import Link from '../UI/Link';
@@ -67,6 +68,7 @@ import type {
   ObjectGroupsOutsideEditorChanges,
   ProjectItemRenamedOutsideEditorChanges,
   WillDeleteSceneChanges,
+  WillDeleteGameplayTestChanges,
   WillDeleteObjectChanges,
 } from './OutsideEditorChanges';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -157,6 +159,18 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // `run_gameplay_test` output payload. Present only for gameplay test runs.
+  status?: string,
+  testName?: string,
+  framesExecuted?: number,
+  durationMs?: number,
+  gameTimeMs?: number,
+  assertions?: Array<Object>,
+  errors?: Array<string>,
+  eventLog?: Array<Object>,
+  finalState?: Object | null,
+  screenshots?: Array<Object>,
+  performance?: Object | null,
   // Set to true (v12+) when a mutating call was a no-op because the requested
   // state already matched the current state. Lets the no-op rate be counted
   // from `functionCallRecords`/CloudWatch without any new telemetry.
@@ -182,6 +196,9 @@ export type EditorFunctionGenericOutput = {|
     behaviorName: string,
     behaviorType: string,
   |}>,
+  // `change_gameplay_tests`: the ordered tests of the scope after the changes
+  // (capped), so renames/reorders/deletions are self-verifying.
+  tests?: Array<{| test_name: string, description: string |}>,
   variables?: Array<SimplifiedVariable>,
   reminder?: string,
   animationNames?: string,
@@ -360,6 +377,9 @@ export type LaunchFunctionOptionsWithoutProject = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   ensureExtensionInstalled: (
     options: EnsureExtensionInstalledOptions
@@ -415,6 +435,11 @@ export type EditorFunction = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -436,6 +461,11 @@ export type EditorFunctionWithoutProject = {|
   ) => Promise<EditorFunctionGenericOutput>,
   /** True if this function modifies the project (triggers unsaved changes tracking). */
   modifiesProject: boolean,
+  /**
+   * Optional: refine `modifiesProject` per call from its (parsed) arguments -
+   * used to gate edits behind a user confirmation when auto-edit is off.
+   */
+  getModifiesProject?: (args: any) => boolean,
 |};
 
 /**
@@ -5250,27 +5280,72 @@ const EVENTS_SOURCE_MAX_CHARS_LIMIT = 30000;
 const readEventsSource: EditorFunction = {
   renderForEditor: ({ args, editorCallbacks }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
+    const eventIds = SafeExtractor.extractStringArrayProperty(
+      args,
+      'event_ids'
+    );
+    const searchText = SafeExtractor.extractStringProperty(args, 'search');
+    const objectNames = SafeExtractor.extractStringArrayProperty(
+      args,
+      'object_names'
+    );
 
-    return {
-      text: (
+    const sceneLink = (
+      <Link
+        href="#"
+        onClick={() =>
+          editorCallbacks.onOpenLayout(scene_name, {
+            openEventsEditor: true,
+            openSceneEditor: true,
+            focusWhenOpened: 'events',
+          })
+        }
+      >
+        {scene_name}
+      </Link>
+    );
+
+    // Describe what is being read (search text, objects or specific events)
+    // so it's clear which part of the events source is being inspected,
+    // rather than only showing the scene name.
+    const objectsText = objectNames ? objectNames.join(', ') : '';
+    const eventIdsCount = eventIds ? eventIds.length : 0;
+
+    let text;
+    if (searchText && objectsText) {
+      text = (
         <Trans>
-          Read events source in scene{' '}
-          <Link
-            href="#"
-            onClick={() =>
-              editorCallbacks.onOpenLayout(scene_name, {
-                openEventsEditor: true,
-                openSceneEditor: true,
-                focusWhenOpened: 'events',
-              })
-            }
-          >
-            {scene_name}
-          </Link>
-          .
+          Read events source matching "{searchText}" and involving {objectsText}{' '}
+          in scene {sceneLink}.
         </Trans>
-      ),
-    };
+      );
+    } else if (searchText) {
+      text = (
+        <Trans>
+          Read events source matching "{searchText}" in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (objectsText) {
+      text = (
+        <Trans>
+          Read events source involving {objectsText} in scene {sceneLink}.
+        </Trans>
+      );
+    } else if (eventIdsCount === 1) {
+      text = (
+        <Trans>Read source of 1 specific event in scene {sceneLink}.</Trans>
+      );
+    } else if (eventIdsCount > 1) {
+      text = (
+        <Trans>
+          Read source of {eventIdsCount} specific events in scene {sceneLink}.
+        </Trans>
+      );
+    } else {
+      text = <Trans>Read all events source in scene {sceneLink}.</Trans>;
+    }
+
+    return { text };
   },
   launchFunction: async ({ project, args }) => {
     const scene_name = extractRequiredString(args, 'scene_name');
@@ -8672,6 +8747,29 @@ const runEditAgent: EditorFunction = {
   modifiesProject: true,
 };
 
+const runTests: EditorFunction = {
+  renderForEditor: ({ args }) => {
+    const newTest = SafeExtractor.extractObjectProperty(args, 'new_test');
+    const newTestName = newTest
+      ? SafeExtractor.extractStringProperty(newTest, 'name')
+      : null;
+    if (newTestName) {
+      return {
+        text: <Trans>Running the gameplay test {newTestName}.</Trans>,
+      };
+    }
+    return {
+      text: <Trans>Running gameplay tests.</Trans>,
+    };
+  },
+  launchFunction: async ({ args }) => {
+    return makeGenericFailure(
+      `Unable to run gameplay tests - this is handled server-side.`
+    );
+  },
+  modifiesProject: false,
+};
+
 const readGameProjectJson: EditorFunction = {
   renderForEditor: ({ args }) => {
     return {
@@ -8841,6 +8939,9 @@ export const editorFunctions: { [string]: EditorFunction } = {
 
   run_explorer_agent: runExplorerAgent,
   run_edit_agent: runEditAgent,
+  run_tests: runTests,
+  run_gameplay_test: runGameplayTest,
+  change_gameplay_tests: changeGameplayTests,
   read_game_project_json: readGameProjectJson,
   search_object_asset_store: searchObjectAssetStore,
   search_resource_store: searchResourceStore,

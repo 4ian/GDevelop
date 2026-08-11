@@ -8,6 +8,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import {
@@ -101,7 +102,8 @@ export const useRefreshLimits = (
 // The tools of the orchestrator AND of the sub-agents it creates server-side.
 // Only bump it once the matching prompts and generation-api are deployed;
 // reverting it is the flip-back (every past version stays served).
-export const AI_ORCHESTRATOR_TOOLS_VERSION = 'v13';
+// v14 adds gameplay tests (`run_tests` + the tester sub-agent).
+export const AI_ORCHESTRATOR_TOOLS_VERSION: string = 'v14';
 
 /**
  * A pending request for the user to approve (or refuse) a project-modifying
@@ -130,7 +132,17 @@ const doesFunctionCallModifyProject = (
     editorFunctions[functionCall.name] ||
     editorFunctionsWithoutProject[functionCall.name] ||
     null;
-  return !!(editorFunctionDef && editorFunctionDef.modifiesProject);
+  if (!editorFunctionDef) return false;
+  if (editorFunctionDef.getModifiesProject) {
+    try {
+      return editorFunctionDef.getModifiesProject(
+        JSON.parse(functionCall.arguments)
+      );
+    } catch (error) {
+      return !!editorFunctionDef.modifiesProject;
+    }
+  }
+  return !!editorFunctionDef.modifiesProject;
 };
 
 /**
@@ -230,6 +242,7 @@ export const useProcessFunctionCalls = ({
   onObjectGroupsModifiedOutsideEditor,
   onProjectItemRenamedOutsideEditor,
   onWillDeleteScene,
+  onWillDeleteGameplayTest,
   onWillDeleteObject,
   onWillInstallExtension,
   onExtensionInstalled,
@@ -272,6 +285,9 @@ export const useProcessFunctionCalls = ({
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -592,6 +608,7 @@ export const useProcessFunctionCalls = ({
           // Not coalesced: must run before the scene is actually deleted so
           // the tab can be closed while the gdLayout is still valid.
           onWillDeleteScene,
+          onWillDeleteGameplayTest,
           // Not coalesced: must run before the object is actually deleted so
           // editors can safely read it to close a dialog/panel referring to it.
           onWillDeleteObject,
@@ -647,6 +664,7 @@ export const useProcessFunctionCalls = ({
       onObjectGroupsModifiedOutsideEditor,
       onProjectItemRenamedOutsideEditor,
       onWillDeleteScene,
+      onWillDeleteGameplayTest,
       onWillDeleteObject,
       ensureExtensionInstalled,
       onWillInstallExtension,
@@ -1402,6 +1420,8 @@ export type OpenAskAiOptions = {|
   aiRequestId?: string | null, // If null, a new request will be created.
   paneIdentifier?: 'left' | 'center' | 'right',
   continueProcessingFunctionCallsOnMount?: boolean,
+  // When set, a new chat is started with this text pre-filled in the input.
+  prefilledUserRequest?: string,
 |};
 
 export type NewAiRequestOptions = {|

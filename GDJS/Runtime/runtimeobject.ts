@@ -4,6 +4,21 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  export type AbstractRuntimeObject3D = gdjs.RuntimeObject &
+    gdjs.Base3DHandler &
+    gdjs.Resizable &
+    gdjs.Scalable &
+    gdjs.Flippable;
+  /** @category Objects > 3D Objects */
+  export namespace Base3DHandler {
+    export const is3D = (
+      object: gdjs.RuntimeObject
+    ): object is AbstractRuntimeObject3D => {
+      //@ts-ignore We are checking if the methods are present.
+      return object.getZ && object.setZ;
+    };
+  }
+
   /**
    * An axis-aligned bounding box. Used to represents a box around an object for example.
    * @category Core Engine > Object

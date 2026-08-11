@@ -45,6 +45,19 @@ export const getRenamedExternalEventsTabProjectItemName = (
     : null;
 
 /**
+ * Gameplay test tabs are named after the test (`TestName` for project tests,
+ * `ExtensionName::TestName` for extension tests).
+ */
+export const getRenamedGameplayTestTabProjectItemName = (
+  tab: RenamableTab,
+  oldProjectItemName: string,
+  newProjectItemName: string
+): ?string =>
+  tab.kind === 'gameplay-test' && tab.projectItemName === oldProjectItemName
+    ? newProjectItemName
+    : null;
+
+/**
  * Renaming an extension affects its extension tab and every custom-object tab
  * whose name starts with that extension (`extension::object[::variant]`).
  */

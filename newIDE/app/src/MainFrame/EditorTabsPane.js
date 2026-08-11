@@ -31,6 +31,7 @@ import {
   type ObjectGroupsOutsideEditorChanges,
   type ProjectItemRenamedOutsideEditorChanges,
   type WillDeleteSceneChanges,
+  type WillDeleteGameplayTestChanges,
   type WillDeleteObjectChanges,
 } from '../EditorFunctions/OutsideEditorChanges';
 import { type NavigateToEventFromGlobalSearchParams } from '../Utils/Search';
@@ -64,6 +65,7 @@ import DrawerTopBar from '../UI/DrawerTopBar';
 import { type FloatingPaneState } from './PanesContainer';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
 import { type OpenAskAiOptions } from '../AiGeneration/Utils';
+import { type GameplayTestsCallbacks } from '../GameplayTests/GameplayTestRunner';
 import { type ToolbarButtonConfig } from './CustomToolbarButton';
 import { type TriggerNpmScript } from './NpmScriptRunner/useNpmScriptRunner';
 
@@ -145,6 +147,7 @@ export type EditorTabsPaneCommonProps = {|
   onQuitVersionHistory: () => Promise<void>,
   onOpenAskAi: (?OpenAskAiOptions) => void,
   onCloseAskAi: () => void,
+  gameplayTestsCallbacks: GameplayTestsCallbacks,
   getStorageProvider: () => StorageProvider,
   setPreviewedLayout: ({|
     layoutName: string | null,
@@ -291,6 +294,9 @@ export type EditorTabsPaneCommonProps = {|
     changes: ProjectItemRenamedOutsideEditorChanges
   ) => void,
   onWillDeleteScene: (changes: WillDeleteSceneChanges) => Promise<void>,
+  onWillDeleteGameplayTest: (
+    changes: WillDeleteGameplayTestChanges
+  ) => Promise<void>,
   onWillDeleteObject: (changes: WillDeleteObjectChanges) => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
@@ -356,6 +362,7 @@ const EditorTabsPane: React.ComponentType<{
     onQuitVersionHistory,
     onOpenAskAi,
     onCloseAskAi,
+    gameplayTestsCallbacks,
     getStorageProvider,
     setPreviewedLayout,
     openExternalEvents,
@@ -410,6 +417,7 @@ const EditorTabsPane: React.ComponentType<{
     onObjectGroupsModifiedOutsideEditor,
     onProjectItemRenamedOutsideEditor,
     onWillDeleteScene,
+    onWillDeleteGameplayTest,
     onWillDeleteObject,
     onWillInstallExtension,
     onExtensionInstalled,
@@ -708,6 +716,10 @@ const EditorTabsPane: React.ComponentType<{
             currentTab ? currentTab.key : null
           )
         }
+        showPreviewAndShareButtons={
+          // A gameplay test is run with its own button: no preview or share.
+          !currentTab || currentTab.kind !== 'gameplay-test'
+        }
         canSave={canSave}
         onSave={saveProject}
         openShareDialog={() =>
@@ -770,6 +782,7 @@ const EditorTabsPane: React.ComponentType<{
                     setPreviewedLayout,
                     onOpenAskAi,
                     onCloseAskAi,
+                    gameplayTestsCallbacks,
                     onOpenExternalEvents: openExternalEvents,
                     onOpenEvents: (sceneName: string) => {
                       openLayout(sceneName, {
@@ -878,6 +891,7 @@ const EditorTabsPane: React.ComponentType<{
                     onObjectGroupsModifiedOutsideEditor: onObjectGroupsModifiedOutsideEditor,
                     onProjectItemRenamedOutsideEditor: onProjectItemRenamedOutsideEditor,
                     onWillDeleteScene: onWillDeleteScene,
+                    onWillDeleteGameplayTest: onWillDeleteGameplayTest,
                     onWillDeleteObject: onWillDeleteObject,
                     onWillInstallExtension: onWillInstallExtension,
                     onExtensionInstalled: onExtensionInstalled,

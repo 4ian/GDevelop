@@ -74,6 +74,7 @@ export const Default = (): React.Node => (
           onShift1: () => {},
           onShift2: () => {},
           onShift3: () => {},
+          onFocusOnSelection: () => {},
         }}
         wrappedEditorRef={() => {}}
         pauseRendering={false}

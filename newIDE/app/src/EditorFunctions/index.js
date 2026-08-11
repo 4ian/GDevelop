@@ -5278,39 +5278,37 @@ const readEventsSource: EditorFunction = {
     // Describe what is being read (search text, objects or specific events)
     // so it's clear which part of the events source is being inspected,
     // rather than only showing the scene name.
-    const hasSearch = !!searchText;
-    const hasObjects = !!objectNames && objectNames.length > 0;
-    const objectsText = hasObjects ? objectNames.join(', ') : '';
-    const hasEventIds = !!eventIds && eventIds.length > 0;
+    const objectsText = objectNames ? objectNames.join(', ') : '';
+    const eventIdsCount = eventIds ? eventIds.length : 0;
 
     let text;
-    if (hasSearch && hasObjects) {
+    if (searchText && objectsText) {
       text = (
         <Trans>
           Read events source matching "{searchText}" and involving {objectsText}{' '}
           in scene {sceneLink}.
         </Trans>
       );
-    } else if (hasSearch) {
+    } else if (searchText) {
       text = (
         <Trans>
           Read events source matching "{searchText}" in scene {sceneLink}.
         </Trans>
       );
-    } else if (hasObjects) {
+    } else if (objectsText) {
       text = (
         <Trans>
           Read events source involving {objectsText} in scene {sceneLink}.
         </Trans>
       );
-    } else if (hasEventIds && eventIds.length === 1) {
+    } else if (eventIdsCount === 1) {
       text = (
         <Trans>Read source of 1 specific event in scene {sceneLink}.</Trans>
       );
-    } else if (hasEventIds) {
+    } else if (eventIdsCount > 1) {
       text = (
         <Trans>
-          Read source of {eventIds.length} specific events in scene {sceneLink}.
+          Read source of {eventIdsCount} specific events in scene {sceneLink}.
         </Trans>
       );
     } else {

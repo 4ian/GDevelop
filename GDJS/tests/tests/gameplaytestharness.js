@@ -474,6 +474,73 @@ describe('gdjs.gameplayTests', () => {
     expect(result.durationMs >= result.loadingMs).to.be(true);
   }).timeout(10000);
 
+  it('waits through a game-driven scene change whose scene is still loading', async () => {
+    const runtimeGame = makeRuntimeGame();
+    // "Scene 2" assets take longer to load than the whole test budget: when
+    // the game changes to it, the scene stack stays empty until the load
+    // finishes (the gap that made real tests throw "No scene is running").
+    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
+    const originalAreSceneAssetsReady =
+      runtimeGame.areSceneAssetsReady.bind(runtimeGame);
+    let slowLoadDone = false;
+    anyRuntimeGame.areSceneAssetsReady = (
+      /** @type {string} */ sceneName
+    ) =>
+      sceneName === 'Scene 2'
+        ? slowLoadDone
+        : originalAreSceneAssetsReady(sceneName);
+    anyRuntimeGame.loadSceneAssets = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      slowLoadDone = true;
+    };
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      // Simulate the game's own logic changing the scene (a "Scene" action).
+      harness.getRuntimeGame().getSceneStack().replace({ sceneName: 'Scene 2', clear: true });
+      await harness.stepFrames(2);
+      harness.assert(
+        harness.getSceneName() === 'Scene 2',
+        'The new scene is running right after stepping through the switch'
+      );
+      `,
+      // Smaller than the scene load: the wait is loading, not budget.
+      { timeoutMs: 200 }
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.loadingMs >= 280).to.be(true);
+    // The transient empty stack is never recorded: Scene 1 (goToScene)
+    // then Scene 2 (the game's change), no '' scene in between.
+    const sceneEvents = result.eventLog.filter(
+      (event) =>
+        event.event === 'sceneChanged' || event.event === 'sceneReset'
+    );
+    expect(sceneEvents.length).to.be(2);
+    expect(sceneEvents[0].sceneName).to.be('Scene 1');
+    expect(sceneEvents[1].sceneName).to.be('Scene 2');
+  }).timeout(10000);
+
+  it('gives a clear error when the game removed its last scene (game over)', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      // Simulate an ended game: an empty scene stack with no scene loading
+      // (SceneStack.pop() refuses to remove the last scene, so reach into
+      // the stack directly).
+      harness.getRuntimeGame().getSceneStack()._stack.pop();
+      await harness.stepFrames(1);
+      harness.getSceneName();
+      `
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors[0]).to.contain('ended or quit');
+  });
+
   it('fails with a clear error when scene assets never finish loading', async () => {
     const runtimeGame = makeRuntimeGame();
     const anyRuntimeGame = /** @type {any} */ (runtimeGame);

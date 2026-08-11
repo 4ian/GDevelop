@@ -353,6 +353,15 @@ namespace gdjs {
     }
 
     /**
+     * Return true while the next scene, requested by a scene change, is
+     * still loading its assets. The stack can be empty during this time
+     * (after a `replace`): the game is not over, a scene is on its way.
+     */
+    isNextSceneLoading(): boolean {
+      return this._isNextLayoutLoading;
+    }
+
+    /**
      * Return the current gdjs.RuntimeScene being played, or null if none is run.
      */
     getCurrentScene(): gdjs.RuntimeScene | null {

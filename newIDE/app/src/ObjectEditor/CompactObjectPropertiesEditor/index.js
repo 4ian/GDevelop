@@ -246,7 +246,6 @@ export const CompactObjectPropertiesEditor = ({
   projectScopedContainersAccessor,
   unsavedChanges,
   i18n,
-  historyHandler,
   objects,
   onEditObject,
   onObjectsModified,
@@ -875,7 +874,10 @@ export const CompactObjectPropertiesEditor = ({
                         )
                       : []
                   }
-                  historyHandler={historyHandler}
+                  // Don't give the scene editor `historyHandler`: it tracks
+                  // the scene (instances, layers...), not the objects — it
+                  // would record no-op undo steps. Without it, the list
+                  // falls back on its own local history.
                   onVariablesUpdated={onVariablesUpdated}
                   toolbarIconStyle={styles.icon}
                   compactEmptyPlaceholderText={

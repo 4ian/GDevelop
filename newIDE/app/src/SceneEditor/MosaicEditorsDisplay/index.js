@@ -231,6 +231,13 @@ const MosaicEditorsDisplay: React.ComponentType<{
           centerViewOnLastInstance: editor
             ? editor.centerViewOnLastInstance
             : noop,
+          isInstanceVisibleInViewport: editor
+            ? editor.isInstanceVisibleInViewport
+            : () => false,
+          scrollViewToLastInstance: editor
+            ? editor.scrollViewToLastInstance
+            : noop,
+          scrollViewToPoint: editor ? editor.scrollViewToPoint : noop,
           getLastCursorSceneCoordinates: editor
             ? editor.getLastCursorSceneCoordinates
             : () => [0, 0],
@@ -318,6 +325,7 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 onObjectsModified={props.onObjectsModified}
                 onEffectAdded={props.onEffectAdded}
                 onInstancesModified={_onInstancesModified}
+                onScenePropertiesModified={props.onScenePropertiesModified}
                 onGetInstanceSize={getInstanceSize}
                 ref={instanceOrObjectPropertiesEditorRef}
                 unsavedChanges={props.unsavedChanges}

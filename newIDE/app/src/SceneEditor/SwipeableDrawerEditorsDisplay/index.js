@@ -249,6 +249,13 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
           centerViewOnLastInstance: editor
             ? editor.centerViewOnLastInstance
             : noop,
+          isInstanceVisibleInViewport: editor
+            ? editor.isInstanceVisibleInViewport
+            : () => false,
+          scrollViewToLastInstance: editor
+            ? editor.scrollViewToLastInstance
+            : noop,
+          scrollViewToPoint: editor ? editor.scrollViewToPoint : noop,
           getLastCursorSceneCoordinates: editor
             ? editor.getLastCursorSceneCoordinates
             : () => [0, 0],
@@ -481,6 +488,9 @@ const SwipeableDrawerEditorsDisplay: React.ComponentType<{
                         onObjectsModified={props.onObjectsModified}
                         onEffectAdded={props.onEffectAdded}
                         onInstancesModified={forceUpdateInstancesList}
+                        onScenePropertiesModified={
+                          props.onScenePropertiesModified
+                        }
                         onGetInstanceSize={getInstanceSize}
                         ref={instanceOrObjectPropertiesEditorRef}
                         historyHandler={props.historyHandler}

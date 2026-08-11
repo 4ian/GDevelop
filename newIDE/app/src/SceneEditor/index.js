@@ -1066,12 +1066,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.editObject(container.getObject(objectName), initialTab);
     if (shouldSelectTheObject) {
-      this._onObjectFolderOrObjectWithContextSelected({
-        objectFolderOrObject: container
-          .getRootFolder()
-          .getObjectNamed(objectName),
-        global,
-      });
+      this._onObjectFolderOrObjectWithContextSelected([
+        {
+          objectFolderOrObject: container
+            .getRootFolder()
+            .getObjectNamed(objectName),
+          global,
+        },
+      ]);
     }
   };
 
@@ -1229,19 +1231,25 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onObjectFolderOrObjectWithContextSelected = (
-    objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext = null
+    objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> = []
   ) => {
-    const selectedObjectFolderOrObjectsWithContext = [];
-    if (
-      objectFolderOrObjectWithContext &&
-      exceptionallyGuardAgainstDeadObject(
-        objectFolderOrObjectWithContext.objectFolderOrObject
-      )
-    ) {
-      selectedObjectFolderOrObjectsWithContext.push(
-        objectFolderOrObjectWithContext
-      );
-    }
+    const aliveObjectFolderOrObjectsWithContext = objectFolderOrObjectsWithContext.filter(
+      objectFolderOrObjectWithContext =>
+        exceptionallyGuardAgainstDeadObject(
+          objectFolderOrObjectWithContext.objectFolderOrObject
+        )
+    );
+
+    // The selection must stay within a single section (scene objects or
+    // global objects): keep only the items matching the first one's scope.
+    const selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> =
+      aliveObjectFolderOrObjectsWithContext.length === 0
+        ? []
+        : aliveObjectFolderOrObjectsWithContext.filter(
+            objectFolderOrObjectWithContext =>
+              objectFolderOrObjectWithContext.global ===
+              aliveObjectFolderOrObjectsWithContext[0].global
+          );
 
     this.setState(
       {
@@ -1652,13 +1660,13 @@ export default class SceneEditor extends React.Component<Props, State> {
    * Create an instance of the given object, at the position
    * previously chosen (see `newObjectInstanceSceneCoordinates`).
    */
-  _addInstanceForNewObject = (newObjectName: string) => {
+  _addInstancesForNewObjects = (newObjectNames: Array<string>) => {
     const { newObjectInstanceSceneCoordinates } = this.state;
-    if (!newObjectInstanceSceneCoordinates) {
-      return;
-    }
+    if (!newObjectInstanceSceneCoordinates) return;
 
-    this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
+    newObjectNames.forEach(name =>
+      this._addInstance(newObjectInstanceSceneCoordinates, name)
+    );
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
@@ -1685,7 +1693,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
-    this._addInstanceForNewObject(object.getName());
+    // "Add under cursor" coordinates are only meaningful when a single new
+    // object is created through the dialog flow; bulk paste/duplicate should
+    // never auto-place stacked instances at the same position.
+    if (objects.length === 1) {
+      this._addInstancesForNewObjects(objects.map(o => o.getName()));
+    }
 
     this.props.onObjectListsModified({
       isNewObjectTypeUsed: isTheFirstOfItsTypeInProject,
@@ -2055,9 +2068,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     // Avoid triggering renaming refactoring if name has not really changed
     if (unifiedName === newName) {
-      this._onObjectFolderOrObjectWithContextSelected(
-        objectFolderOrObjectWithContext
-      );
+      this._onObjectFolderOrObjectWithContextSelected([
+        objectFolderOrObjectWithContext,
+      ]);
       done(false);
       return;
     }
@@ -2072,9 +2085,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     const object = objectFolderOrObject.getObject();
 
     this._onRenameObjectFinish({ object, global }, newName);
-    this._onObjectFolderOrObjectWithContextSelected(
-      objectFolderOrObjectWithContext
-    );
+    this._onObjectFolderOrObjectWithContextSelected([
+      objectFolderOrObjectWithContext,
+    ]);
     done(true);
   };
 

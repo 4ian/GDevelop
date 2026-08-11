@@ -202,7 +202,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
         if (!isSticky) onOpen(node);
         return;
       }
-      onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
+      onSelect({
+        node,
+        exclusive: !(event.metaKey || event.ctrlKey || event.shiftKey),
+        extendFromAnchor: event.shiftKey,
+      });
       onClick(node);
     },
     [onClick, onSelect, node, onOpen, isSticky]
@@ -219,7 +223,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      if (!node.item.isRoot) onClickItem(event);
+      // Preserve an existing multi-selection when right-clicking one of its
+      // rows (as in most file explorers). Only select the row if it's not
+      // already part of the selection.
+      if (!node.item.isRoot && !node.selected) onClickItem(event);
       openContextMenu(event);
     },
     [node, onClickItem, openContextMenu]

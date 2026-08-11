@@ -56,7 +56,9 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       },
       usedExtensionsWithVariablesData: [],
     });
-    runtimeScene.setInitialSharedDataForBehavior(characterBehaviorName, {
+    const characterSharedData = {
+      name: characterBehaviorName,
+      type: 'NavMeshPathfinding::NavMeshCharacterBehavior',
       cellSize: 10,
       cellDepth: 10,
       slopeMaxAngle: 50,
@@ -64,7 +66,11 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
       walkableRadius: -1,
       walkableDepth: 150,
       speedScaleY: 1,
-    });
+    };
+    runtimeScene.setInitialSharedDataForBehavior(
+      characterBehaviorName,
+      characterSharedData
+    );
     setFramePerSecond(runtimeScene, framePerSecond);
     return runtimeScene;
   };
@@ -235,6 +241,76 @@ describe('gdjs.NavMeshCharacterRuntimeBehavior', function () {
     expect(getCharacterBehavior(character).destinationReached()).to.be(true);
     expect(character.getX()).to.be.within(580, 620);
     expect(character.getY()).to.be.within(280, 320);
+  });
+
+  it('must not find a path to a destination outside of the walkable area', function () {
+    character.setPosition(400, 300);
+    // To ensure obstacles are registered.
+    runtimeScene.renderAndStep(1000 / 60);
+
+    // The destination is way outside of the walkable area
+    // (which is the bounding box of all the obstacles).
+    getCharacterBehavior(character).moveTo(600, 5000, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(false);
+
+    // The character must not move.
+    for (let stepIndex = 0; stepIndex < 10; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(character.getX()).to.be.within(399, 401);
+    expect(character.getY()).to.be.within(299, 301);
+  });
+
+  it("keeps moving to its destination when a new destination can't be found", function () {
+    character.setPosition(400, 300);
+    // To ensure obstacles are registered.
+    runtimeScene.renderAndStep(1000 / 60);
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+
+    // Let the character travel a bit.
+    for (let stepIndex = 0; stepIndex < 30; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(character.getX()).to.be.above(420);
+
+    // Ask for a destination that can't be reached.
+    getCharacterBehavior(character).moveTo(600, 5000, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(false);
+
+    // The character keeps moving to its previous destination.
+    stepUntilDestinationIsReached(runtimeScene, character);
+    expect(getCharacterBehavior(character).destinationReached()).to.be(true);
+    expect(character.getX()).to.be.within(580, 620);
+    expect(character.getY()).to.be.within(280, 320);
+  });
+
+  it('can find a shorter path when an obstacle is deactivated', function () {
+    const blockingObstacle = addObstacle(runtimeScene, 50, 300);
+    blockingObstacle.setPosition(475, 150);
+    character.setPosition(400, 300);
+    // To ensure obstacles are registered.
+    runtimeScene.renderAndStep(1000 / 60);
+    // To build the nav mesh a 1st time with the blocking obstacle.
+    runtimeScene.renderAndStep(1000 / 60);
+
+    const obstacleBehavior =
+      /** @type {gdjs.NavMeshObstacleRuntimeBehavior} */ (
+        blockingObstacle.getBehavior('NavMeshObstacle')
+      );
+    obstacleBehavior.activate(false);
+    // The nav mesh is rebuilt at most once per second.
+    for (let stepIndex = 0; stepIndex < 61; stepIndex++) {
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+
+    getCharacterBehavior(character).moveTo(600, 300, 0);
+    expect(getCharacterBehavior(character).pathFound()).to.be(true);
+    // The path is extracted from the agent at the 1st step following moveTo.
+    runtimeScene.renderAndStep(1000 / 60);
+    // The path is a straight line as the obstacle is gone.
+    expect(getPathLength(character)).to.be.within(180, 220);
   });
 
   describe('(network synchronization)', function () {

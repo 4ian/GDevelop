@@ -138,6 +138,7 @@ describe('gdjs.gameplayTests', () => {
 
     expect(result.status).to.be('passed');
     expect(result.timeoutMs).to.be(5000);
+    expect(typeof result.loadingMs).to.be('number');
     expect(result.framesExecuted).to.be(6); // 1 (goToScene) + 5.
     expect(result.assertions.length).to.be(1);
     expect(result.assertions[0].passed).to.be(true);
@@ -421,10 +422,15 @@ describe('gdjs.gameplayTests', () => {
         harness.getSceneName() === 'Scene 2',
         'The first scene of the game is running'
       );
-      `
+      `,
+      // A budget smaller than the startup delay: the wait for the game to
+      // finish starting is loading, excluded from the timeout budget.
+      { timeoutMs: 50 }
     );
 
     expect(result.status).to.be('passed');
+    // The startup wait is measured and reported as loading time.
+    expect(result.loadingMs >= 90).to.be(true);
   });
 
   it('fails with a clear error when a started game never finishes starting', async () => {
@@ -433,11 +439,54 @@ describe('gdjs.gameplayTests', () => {
     const result = await runTestScript(
       runtimeGame,
       'await harness.stepFrames(1);',
-      { timeoutMs: 300 }
+      // The bound on this wait is the LOADING timeout, not the test budget.
+      { timeoutMs: 5000, loadingTimeoutMs: 300 }
     );
 
     expect(result.status).to.be('error');
     expect(result.errors[0]).to.contain('did not finish starting');
+  }).timeout(10000);
+
+  it('excludes slow scene-asset loading from the timeout budget', async () => {
+    const runtimeGame = makeRuntimeGame();
+    // Simulate scene assets that take longer to load than the whole test
+    // budget (like the first run of a web preview downloading resources).
+    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
+    let slowLoadDone = false;
+    anyRuntimeGame.areSceneAssetsReady = () => slowLoadDone;
+    anyRuntimeGame.loadSceneAssets = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      slowLoadDone = true;
+    };
+    const result = await runTestScript(
+      runtimeGame,
+      `
+      await harness.goToScene('Scene 1');
+      await harness.stepFrames(2);
+      harness.assert(harness.getSceneName() === 'Scene 1', 'Scene is running');
+      `,
+      { timeoutMs: 200 }
+    );
+
+    expect(result.status).to.be('passed');
+    expect(result.loadingMs >= 280).to.be(true);
+    // The wall-clock duration includes the loading time.
+    expect(result.durationMs >= result.loadingMs).to.be(true);
+  }).timeout(10000);
+
+  it('fails with a clear error when scene assets never finish loading', async () => {
+    const runtimeGame = makeRuntimeGame();
+    const anyRuntimeGame = /** @type {any} */ (runtimeGame);
+    anyRuntimeGame.areSceneAssetsReady = () => false;
+    anyRuntimeGame.loadSceneAssets = () => new Promise(() => {});
+    const result = await runTestScript(
+      runtimeGame,
+      `await harness.goToScene('Scene 1');`,
+      { timeoutMs: 5000, loadingTimeoutMs: 200 }
+    );
+
+    expect(result.status).to.be('error');
+    expect(result.errors[0]).to.contain('did not finish loading');
   }).timeout(10000);
 
   it('gives the camera state and camera/heading-relative positions', async () => {
@@ -846,11 +895,16 @@ describe('gdjs.gameplayTests', () => {
     );
 
     expect(result.status).to.be('passed');
-    // Each probe (baseline + 2 keys + final cleanup) restarts the scene.
+    // Each probe (baseline + 2 keys + final cleanup) restarts the scene,
+    // and each restart is labelled as caused by the probe itself (not a
+    // plain 'harness' goToScene) so it's clearly expected in the event log.
     const resets = result.eventLog.filter(
       (event) => event.event === 'sceneReset'
     );
     expect(resets.length >= 3).to.be(true);
+    expect(resets.every((event) => event.cause === 'controlsProbe')).to.be(
+      true
+    );
   }).timeout(10000);
 
   it('tracks progress toward a target and detects stalls', async () => {

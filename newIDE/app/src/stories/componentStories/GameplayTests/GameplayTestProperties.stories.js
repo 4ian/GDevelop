@@ -73,6 +73,7 @@ const makeResult = (
   status: 'passed',
   framesExecuted: 0,
   durationMs: 0,
+  loadingMs: 0,
   timeoutMs: 0,
   gameTimeMs: 0,
   assertions: [],

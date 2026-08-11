@@ -56,8 +56,13 @@ namespace gdjs {
       source: string;
       /** Readable state to evaluate on object/behavior snapshots. */
       stateInspectors?: GameplayTestStateInspectors;
-      /** Wall-clock timeout for the whole run. Default: 30000. */
+      /** Wall-clock timeout for the RUNNING part of the test: the time
+       * spent waiting for the game to boot or for scene assets to load is
+       * excluded (bounded separately by `loadingTimeoutMs`). Default: 30000. */
       timeoutMs?: number;
+      /** Wall-clock bound on each loading wait (game boot, scene assets),
+       * which is excluded from `timeoutMs`. Default: 300000. */
+      loadingTimeoutMs?: number;
       /** Maximum number of frames stepped. Default: 20000. */
       maxFrames?: number;
       /**
@@ -99,12 +104,20 @@ namespace gdjs {
       count?: integer;
       sceneName?: string;
       /**
-       * Who changed the scene: the test itself (`harness` - a `goToScene`),
-       * the game's own logic (`game` - a scene change/restart action),
-       * multiplayer state (`networkSync`), or something outside of the
-       * game (`external` - a symptom of interference with the test).
+       * Who changed the scene: the test itself (`harness` - a `goToScene`,
+       * or `controlsProbe` for the scene restarts that
+       * `resetSceneAndProbeControls` performs itself - expected, not a
+       * malfunction), the game's own logic (`game` - a scene change/restart
+       * action), multiplayer state (`networkSync`), or something outside of
+       * the game (`external` - a symptom of interference with the test).
        */
-      cause?: 'harness' | 'game' | 'networkSync' | 'external' | 'unknown';
+      cause?:
+        | 'harness'
+        | 'controlsProbe'
+        | 'game'
+        | 'networkSync'
+        | 'external'
+        | 'unknown';
       /** For an `external` cause: where the change came from (call stack). */
       causeDetail?: string;
     };
@@ -291,8 +304,13 @@ namespace gdjs {
       status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout';
       framesExecuted: integer;
       durationMs: number;
-      /** The wall-clock budget the run had (`durationMs` close to it means
-       * the test is at risk of timing out on a slower machine). */
+      /** Time spent waiting for the game to boot and for scene assets to
+       * load, excluded from the `timeoutMs` budget. `durationMs` includes
+       * it: `durationMs - loadingMs` is what counted against the budget. */
+      loadingMs: number;
+      /** The wall-clock budget the run had, loading excluded
+       * (`durationMs - loadingMs` close to it means the test is at risk of
+       * timing out on a slower machine). */
       timeoutMs: number;
       gameTimeMs: number;
       assertions: Array<GameplayTestAssertion>;
@@ -317,6 +335,10 @@ namespace gdjs {
     };
 
     const DEFAULT_TIMEOUT_MS = 30000;
+    /** Loading (game boot, scene assets) is excluded from `timeoutMs` -
+     * on the web, a first preview can download assets for minutes - but
+     * still bounded, so a dead network cannot hang a run forever. */
+    const DEFAULT_LOADING_TIMEOUT_MS = 300000;
     const DEFAULT_MAX_FRAMES = 20000;
     /** How long frames are stepped before yielding once to the browser:
      * the game visibly plays (a rendered frame per refresh), stop/progress
@@ -515,6 +537,10 @@ namespace gdjs {
        * result as `profiles`). */
       _profiles: Array<GameplayTestProfilingResult> = [];
       _timeoutMs: number;
+      _loadingTimeoutMs: number;
+      /** Time spent waiting for loading (game boot, scene assets) so far:
+       * excluded from the `_timeoutMs` budget, reported as `loadingMs`. */
+      _loadingTimeMs: number = 0;
       _maxFrames: integer;
       /** Last time the stepping loop yielded to the browser (see
        * `_maybeYield`). */
@@ -523,6 +549,9 @@ namespace gdjs {
       _lastRenderTimeMs: number = 0;
       /** How long the last render (animation frame tick) took. */
       _lastRenderDurationMs: number = 0;
+      /** True while resetSceneAndProbeControls runs: its scene restarts are
+       * recorded with the `controlsProbe` cause. */
+      _isProbingControls: boolean = false;
       _playedSounds: Array<{ sound: string; frame: integer }> = [];
       /** Entries of the sound manager log already copied to `_playedSounds`. */
       _playedSoundsReadCount: integer = 0;
@@ -561,6 +590,8 @@ namespace gdjs {
         this._runtimeGame = runtimeGame;
         this._payload = payload;
         this._timeoutMs = payload.timeoutMs || DEFAULT_TIMEOUT_MS;
+        this._loadingTimeoutMs =
+          payload.loadingTimeoutMs || DEFAULT_LOADING_TIMEOUT_MS;
         this._maxFrames = payload.maxFrames || DEFAULT_MAX_FRAMES;
         this._lastYieldTimeMs = Date.now();
         this._paceSpeedFactor = payload.speedFactor
@@ -612,10 +643,55 @@ namespace gdjs {
             `The test reached the maximum number of frames (${this._maxFrames}).`
           );
         }
-        if (Date.now() - this._startTimeMs > this._timeoutMs) {
+        if (
+          Date.now() - this._startTimeMs - this._loadingTimeMs >
+          this._timeoutMs
+        ) {
           throw new GameplayTestTimeoutError(
-            `The test timed out after ${this._timeoutMs}ms (wall-clock).`
+            `The test timed out after ${this._timeoutMs}ms ` +
+              '(wall-clock, loading time excluded).'
           );
+        }
+      }
+
+      /**
+       * Await a loading promise (game boot, scene assets...) WITHOUT
+       * counting the wait against the `timeoutMs` budget: the timeout is
+       * about the running game, not about how long a web preview takes to
+       * download its resources. The wait is still bounded (by
+       * `loadingTimeoutMs`) so a dead network cannot hang the run, and
+       * progress heartbeats keep flowing so the editor knows the run is
+       * alive.
+       */
+      async _awaitLoading(
+        loadingPromise: Promise<unknown>,
+        description: string
+      ): Promise<void> {
+        const loadingStartTimeMs = Date.now();
+        const heartbeatIntervalId = setInterval(() => {
+          if (this._onProgress) this._onProgress(this._framesExecuted);
+        }, 1000);
+        let loadingTimeoutId: any = null;
+        try {
+          await Promise.race([
+            loadingPromise,
+            new Promise<never>((_, reject) => {
+              loadingTimeoutId = setTimeout(
+                () =>
+                  reject(
+                    new Error(
+                      `${description} did not finish loading within ` +
+                        `${this._loadingTimeoutMs}ms.`
+                    )
+                  ),
+                this._loadingTimeoutMs
+              );
+            }),
+          ]);
+        } finally {
+          clearInterval(heartbeatIntervalId);
+          if (loadingTimeoutId) clearTimeout(loadingTimeoutId);
+          this._loadingTimeMs += Date.now() - loadingStartTimeMs;
         }
       }
 
@@ -667,7 +743,9 @@ namespace gdjs {
             cause: !lastChangeCause
               ? 'unknown'
               : lastChangeCause.cause === GAMEPLAY_TEST_SCENE_CHANGE_CAUSE
-                ? 'harness'
+                ? this._isProbingControls
+                  ? 'controlsProbe'
+                  : 'harness'
                 : lastChangeCause.cause === 'game' ||
                     lastChangeCause.cause === 'networkSync'
                   ? lastChangeCause.cause
@@ -822,7 +900,13 @@ namespace gdjs {
           );
         }
         if (!this._runtimeGame.areSceneAssetsReady(sceneName)) {
-          await this._runtimeGame.loadSceneAssets(sceneName);
+          // On the web, this can download assets for a long time (notably
+          // the first run of a preview): waited for as loading, outside of
+          // the `timeoutMs` budget.
+          await this._awaitLoading(
+            this._runtimeGame.loadSceneAssets(sceneName),
+            `The assets of the scene "${sceneName}"`
+          );
         }
         this._checkGuards();
         this._runtimeGame
@@ -1792,7 +1876,25 @@ namespace gdjs {
       }> {
         const frames = (options && options.frames) || DEFAULT_PROBE_FRAMES;
         const sceneName = this._getCurrentScene().getName();
+        this._isProbingControls = true;
+        try {
+          return await this._probeControls(sceneName, objectName, keyNames, {
+            frames,
+          });
+        } finally {
+          this._isProbingControls = false;
+        }
+      }
 
+      private async _probeControls(
+        sceneName: string,
+        objectName: string,
+        keyNames: Array<string>,
+        { frames }: { frames: integer }
+      ): Promise<{
+        baseline: GameplayTestControlProbeResult | null;
+        keys: { [keyName: string]: GameplayTestControlProbeResult | null };
+      }> {
         const probe = async (
           keyName: string | null
         ): Promise<GameplayTestControlProbeResult | null> => {
@@ -2690,6 +2792,7 @@ namespace gdjs {
           status,
           framesExecuted: this._framesExecuted,
           durationMs: this._startTimeMs ? Date.now() - this._startTimeMs : 0,
+          loadingMs: Math.round(this._loadingTimeMs),
           timeoutMs: this._timeoutMs,
           gameTimeMs: Math.round(this._gameTimeMs),
           assertions: this._assertions,
@@ -2802,7 +2905,13 @@ namespace gdjs {
       // create scenes before asynchronously loaded libraries (Jolt
       // physics...) are ready, or the startup could push the game's first
       // scene in the middle of the test.
-      const bootDeadlineMs = Date.now() + harness._timeoutMs;
+      // This wait is loading: excluded from the `timeoutMs` budget (counted
+      // in `loadingMs` instead), bounded by `loadingTimeoutMs`, with
+      // progress heartbeats so the editor knows the run is alive.
+      harness._startTimeMs = Date.now();
+      const bootWaitStartTimeMs = Date.now();
+      const bootDeadlineMs = bootWaitStartTimeMs + harness._loadingTimeoutMs;
+      let lastBootHeartbeatTimeMs = 0;
       while (runtimeGame.isStartingUp()) {
         if (harness._stopped) {
           currentlyRunningHarness = null;
@@ -2810,13 +2919,23 @@ namespace gdjs {
         }
         if (Date.now() > bootDeadlineMs) {
           currentlyRunningHarness = null;
+          harness._loadingTimeMs += Date.now() - bootWaitStartTimeMs;
           return harness._makeResult('error', [
-            `The game did not finish starting within ${harness._timeoutMs}ms ` +
-              '(the first scene was never created).',
+            `The game did not finish starting within ` +
+              `${harness._loadingTimeoutMs}ms (the first scene was never ` +
+              'created).',
           ]);
+        }
+        if (
+          harness._onProgress &&
+          Date.now() - lastBootHeartbeatTimeMs > 1000
+        ) {
+          lastBootHeartbeatTimeMs = Date.now();
+          harness._onProgress(0);
         }
         await new Promise((resolve) => setTimeout(resolve, 20));
       }
+      harness._loadingTimeMs += Date.now() - bootWaitStartTimeMs;
 
       const inputManager = runtimeGame.getInputManager();
       const wasPaused = runtimeGame.isPaused();
@@ -2880,23 +2999,29 @@ namespace gdjs {
         },
       };
 
-      harness._startTimeMs = Date.now();
       let result: GameplayTestResult;
       try {
         // A wall-clock watchdog, in case the script awaits something that
-        // never resolves. A synchronous infinite loop can NOT be interrupted
-        // (this is a limit of running in the same thread as the game).
-        let watchdogTimeoutId: any = null;
+        // never resolves. Checked periodically (not a one-shot timer) so
+        // the time spent loading - which grows `_loadingTimeMs` - stays
+        // excluded from the budget. A synchronous infinite loop can NOT be
+        // interrupted (this is a limit of running in the same thread as
+        // the game).
+        let watchdogIntervalId: any = null;
         const watchdog = new Promise<never>((_, reject) => {
-          watchdogTimeoutId = setTimeout(
-            () =>
+          watchdogIntervalId = setInterval(() => {
+            if (
+              Date.now() - harness._startTimeMs - harness._loadingTimeMs >
+              harness._timeoutMs + 1000
+            ) {
               reject(
                 new GameplayTestTimeoutError(
-                  `The test timed out after ${harness._timeoutMs}ms (wall-clock).`
+                  `The test timed out after ${harness._timeoutMs}ms ` +
+                    '(wall-clock, loading time excluded).'
                 )
-              ),
-            harness._timeoutMs + 1000
-          );
+              );
+            }
+          }, 250);
         });
         // A stop rejects this promise, interrupting the script even when
         // it awaits something else than the harness (a timer, a fetch...).
@@ -2913,7 +3038,7 @@ namespace gdjs {
             stopSignal,
           ]);
         } finally {
-          if (watchdogTimeoutId) clearTimeout(watchdogTimeoutId);
+          if (watchdogIntervalId) clearInterval(watchdogIntervalId);
           harness._rejectOnStop = null;
         }
 

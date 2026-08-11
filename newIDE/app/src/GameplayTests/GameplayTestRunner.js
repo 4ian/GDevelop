@@ -40,8 +40,12 @@ export type GameplayTestResult = {
   status: 'passed' | 'failed' | 'error' | 'stopped' | 'timeout',
   framesExecuted: number,
   durationMs: number,
-  // The wall-clock budget the run had (a duration close to it means the
-  // test is at risk of timing out on a slower machine).
+  // Time spent waiting for the game to boot and for scene assets to load,
+  // excluded from the `timeoutMs` budget (`durationMs` includes it).
+  loadingMs: number,
+  // The wall-clock budget the run had, loading excluded
+  // (`durationMs - loadingMs` close to it means the test is at risk of
+  // timing out on a slower machine).
   timeoutMs: number,
   gameTimeMs: number,
   assertions: Array<GameplayTestAssertion>,
@@ -160,6 +164,7 @@ const makeResultWithoutRun = (
   status,
   framesExecuted: 0,
   durationMs: 0,
+  loadingMs: 0,
   timeoutMs: 0,
   gameTimeMs: 0,
   assertions: [],
@@ -188,6 +193,7 @@ export const makeGameplayTestResultReadableOutput = (
   testName: result.testName,
   framesExecuted: result.framesExecuted,
   durationMs: result.durationMs,
+  loadingMs: result.loadingMs,
   timeoutMs: result.timeoutMs,
   gameTimeMs: result.gameTimeMs,
   assertions: result.assertions,
@@ -352,6 +358,10 @@ const runSingleTest = async ({
           if (parsedMessage.messageId !== messageId) return;
 
           if (parsedMessage.command === 'gameplayTest.progress') {
+            // The game is alive (stepping frames, or heartbeating while it
+            // loads assets - loading is not counted against the test
+            // timeout): give it a full budget again.
+            armWatchdog();
             if (onProgress && parsedMessage.payload) {
               onProgress(test, parsedMessage.payload.frame || 0);
             }
@@ -372,17 +382,24 @@ const runSingleTest = async ({
       resolve(result);
     };
 
-    // An editor-side watchdog, in case the game dies without sending
-    // its result.
-    watchdogTimeoutId = setTimeout(() => {
-      finish(
-        makeErrorResult(
-          test.testName,
-          `No result received from the game after ${timeoutMs +
-            RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
-        )
-      );
-    }, timeoutMs + RESULT_EXTRA_TIMEOUT_MS);
+    // An editor-side watchdog, in case the game dies without sending its
+    // result. Re-armed by every progress message: a game legitimately
+    // spends long over its own timeout while loading assets (loading is
+    // excluded from the test budget), but it heartbeats while doing so - a
+    // full silence is what means it crashed.
+    const armWatchdog = () => {
+      if (watchdogTimeoutId !== null) clearTimeout(watchdogTimeoutId);
+      watchdogTimeoutId = setTimeout(() => {
+        finish(
+          makeErrorResult(
+            test.testName,
+            `No result nor progress received from the game after ${timeoutMs +
+              RESULT_EXTRA_TIMEOUT_MS}ms - the game may have crashed or been closed.`
+          )
+        );
+      }, timeoutMs + RESULT_EXTRA_TIMEOUT_MS);
+    };
+    armWatchdog();
 
     const payload: Object = {
       testName: test.testName,

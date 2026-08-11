@@ -93,6 +93,71 @@ export const Default = (): React.Node => (
   </AssetStoreProviders>
 );
 
+export const WithMultiSelection = (): React.Node => {
+  const objectFolderOrObjects = testProject.testLayout
+    .getObjects()
+    .getRootFolder();
+  const selectedObjectFolderOrObjectsWithContext = [];
+  for (
+    let i = 0;
+    i < Math.min(2, objectFolderOrObjects.getChildrenCount());
+    i++
+  ) {
+    selectedObjectFolderOrObjectsWithContext.push({
+      objectFolderOrObject: objectFolderOrObjects.getChildAt(i),
+      global: false,
+    });
+  }
+
+  return (
+    <AssetStoreProviders>
+      <DragAndDropContextProvider>
+        <div style={{ height: 400 }}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            eventsFunctionsExtension={null}
+            eventsBasedObject={null}
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
+            }
+            globalObjectsContainer={testProject.project.getObjects()}
+            objectsContainer={testProject.testLayout.getObjects()}
+            resourceManagementProps={fakeResourceManagementProps}
+            onEditObject={action('On edit object')}
+            onOpenEventBasedObjectEditor={action('On edit children')}
+            onOpenEventBasedObjectVariantEditor={action('On edit variant')}
+            onExportAssets={action('On export assets')}
+            onImportAssets={action('On import assets')}
+            onAddObjectInstance={action('On add instance to the scene')}
+            onObjectCreated={action('On object created')}
+            onObjectEdited={action('On object edited')}
+            selectedObjectFolderOrObjectsWithContext={
+              selectedObjectFolderOrObjectsWithContext
+            }
+            getValidatedObjectOrGroupName={newName => newName}
+            onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+            onRenameObjectFolderOrObjectWithContextFinish={(
+              objectWithContext,
+              newName,
+              cb
+            ) => cb(true)}
+            onObjectFolderOrObjectWithContextSelected={action(
+              'On objects selected'
+            )}
+            onSetAsGlobalObject={action('onSetAsGlobalObject')}
+            hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+            isListLocked={false}
+            onWillInstallExtension={action('extension will be installed')}
+            onExtensionInstalled={action('onExtensionInstalled')}
+          />
+        </div>
+      </DragAndDropContextProvider>
+    </AssetStoreProviders>
+  );
+};
+
 export const WithSerializedObjectView = (): React.Node => (
   <AssetStoreProviders>
     <DragAndDropContextProvider>

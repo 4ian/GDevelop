@@ -1,6 +1,7 @@
 // @flow
 
 import { mapFor } from '../Utils/MapFor';
+import { exceptionallyGuardAgainstDeadObject } from '../Utils/IsNullPtr';
 
 type EnumearatedObjectFolderOrObject = {|
   path: string,
@@ -100,4 +101,101 @@ export const getFoldersAscendanceWithoutRootFolder = (
   const parent = objectFolderOrObject.getParent();
   if (parent.isRootFolder()) return [];
   return [parent, ...getFoldersAscendanceWithoutRootFolder(parent)];
+};
+
+/**
+ * Filter out items whose ancestor is also part of the given selection, so
+ * that a bulk operation (copy, cut, delete, move) is not applied twice to
+ * the same object or folder (once directly, once through its ancestor).
+ */
+export const getSelectionTopLevelNodes = (
+  items: Array<ObjectFolderOrObjectWithContext>
+): Array<ObjectFolderOrObjectWithContext> =>
+  items.filter(
+    item =>
+      !items.some(
+        otherItem =>
+          otherItem !== item &&
+          item.objectFolderOrObject.isADescendantOf(
+            otherItem.objectFolderOrObject
+          )
+      )
+  );
+
+/**
+ * Enumerate every direct and indirect child of the given folder (both objects
+ * and sub-folders), in depth-first order. Used by "Select all" in a section.
+ */
+export const enumerateAllChildrenInFolder = (
+  folder: gdObjectFolderOrObject
+): Array<gdObjectFolderOrObject> => {
+  const result = [];
+  mapFor(0, folder.getChildrenCount(), i => {
+    const child = folder.getChildAt(i);
+    result.push(child);
+    if (child.isFolder()) result.push(...enumerateAllChildrenInFolder(child));
+  });
+  return result;
+};
+
+const collectObjectsToDelete = (
+  objectFolderOrObject: gdObjectFolderOrObject
+): Array<gdObject> => {
+  if (!objectFolderOrObject.isFolder()) {
+    return [objectFolderOrObject.getObject()];
+  }
+  const objects = [];
+  mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
+    objects.push(...collectObjectsToDelete(objectFolderOrObject.getChildAt(i)));
+  });
+  return objects;
+};
+
+const collectFoldersBottomUp = (
+  objectFolderOrObject: gdObjectFolderOrObject,
+  result: Array<gdObjectFolderOrObject>
+) => {
+  // Plain (non-folder) objects passed here have already been removed from
+  // the container by the caller (see `removeEmptyFoldersFromSelection`), so
+  // their wrapper is dead: guard against it instead of calling isFolder() on
+  // a destroyed C++ object.
+  const aliveNode = exceptionallyGuardAgainstDeadObject(objectFolderOrObject);
+  if (!aliveNode || !aliveNode.isFolder()) return;
+  mapFor(0, aliveNode.getChildrenCount(), i =>
+    collectFoldersBottomUp(aliveNode.getChildAt(i), result)
+  );
+  result.push(aliveNode);
+};
+
+/**
+ * List all the objects that would be deleted (recursively, for folders) if
+ * the given top-level selection was removed, without any duplicate.
+ * Call `getSelectionTopLevelNodes` first to ensure the input has no duplicates.
+ */
+export const getObjectsToDeleteFromSelection = (
+  topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>
+): Array<gdObject> => {
+  const objects = [];
+  topLevelObjectFolderOrObjects.forEach(objectFolderOrObject => {
+    objects.push(...collectObjectsToDelete(objectFolderOrObject));
+  });
+  return objects;
+};
+
+/**
+ * Remove the (now-empty, after their objects have been removed) folders of
+ * the given top-level selection bottom-up, because a folder containing another
+ * empty sub-folder can only be removed once the sub-folder is gone first.
+ */
+export const removeEmptyFoldersFromSelection = (
+  topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>
+): void => {
+  const foldersToRemove = [];
+  topLevelObjectFolderOrObjects.forEach(objectFolderOrObject =>
+    collectFoldersBottomUp(objectFolderOrObject, foldersToRemove)
+  );
+  foldersToRemove.forEach(folder => {
+    const parent = folder.getParent();
+    parent.removeFolderChild(folder);
+  });
 };

@@ -19,6 +19,7 @@ import Rectangle from '../Utils/Rectangle';
 import { type LastSelectionType } from './EditorsDisplay.flow';
 import { CompactObjectGroupPropertiesEditor } from '../ObjectGroupEditor/CompactObjectGroupPropertiesEditor';
 import { type ObjectGroupEditorTab } from '../ObjectGroupEditor/EditedObjectGroupEditorDialog';
+import EmptyMessage from '../UI/EmptyMessage';
 
 export const styles = {
   paper: {
@@ -45,6 +46,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer | null,
 
   // For objects:
+  selectedObjectFolderOrObjectsCount: number,
   objects: Array<gdObject>,
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectsModified: (objects: Array<gdObject>) => void,
@@ -120,7 +122,11 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           lastSelectionType === 'instance' ? (
             <Trans>Instance properties</Trans>
           ) : lastSelectionType === 'object' ? (
-            <Trans>Object properties</Trans>
+            objects.length > 1 ? (
+              <Trans>{objects.length} objects selected</Trans>
+            ) : (
+              <Trans>Object properties</Trans>
+            )
           ) : lastSelectionType === 'layer' ? (
             <Trans>Layer properties</Trans>
           ) : lastSelectionType === 'objectGroup' ? (
@@ -141,6 +147,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
       lastSelectionType,
 
       // For objects:
+      selectedObjectFolderOrObjectsCount,
       objects,
       onEditObject,
       onObjectsModified,
@@ -214,6 +221,10 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
+        ) : objects.length > 1 && lastSelectionType === 'object' ? (
+          <EmptyMessage>
+            <Trans>{objects.length} objects selected.</Trans>
+          </EmptyMessage>
         ) : !!objects.length && lastSelectionType === 'object' ? (
           <CompactObjectPropertiesEditor
             objects={objects}
@@ -250,6 +261,10 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
+        ) : selectedObjectFolderOrObjectsCount > 0 && lastSelectionType === 'object' ? (
+          <EmptyMessage>
+            <Trans>Folder selected. No properties to display.</Trans>
+          </EmptyMessage>
         ) : objectGroup && lastSelectionType === 'objectGroup' ? (
           <CompactObjectGroupPropertiesEditor
             project={project}

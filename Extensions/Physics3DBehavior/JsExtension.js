@@ -358,7 +358,7 @@ module.exports = {
           .setType('resource')
           .addExtraInfo('model3D')
           .setLabel(_("Simplified 3D model"))
-          .setDescription(_("Leave empty to use object's one"));
+          .setDescription(_("Leave empty to use object's one"))
           // Hidden as required to be changed in the full editor.
           .setHidden(true)
           .setHasImpactOnOtherProperties(true);

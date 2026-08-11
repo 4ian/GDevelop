@@ -139,9 +139,9 @@ export const onPreviewDebuggerClosed = (callback: () => void): (() => void) => {
 };
 
 /**
- * Push the full session breakpoint payload to the preview runtime via CDP
- * `Runtime.evaluate`, which applies atomically even while V8 is paused on
- * a `debugger;` statement.
+ * Push the full session breakpoint payload to every attached preview window
+ * via CDP `Runtime.evaluate`, which applies atomically even while V8 is
+ * paused on a `debugger;` statement.
  */
 export const setPreviewBreakpointsViaCdp = async (
   breakpoints: Array<{|

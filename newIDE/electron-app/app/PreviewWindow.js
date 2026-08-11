@@ -225,9 +225,8 @@ const sendCdpCommand = async (windowId, method, commandParams) => {
 };
 
 /**
- * Resolves a preview window id, preferring `explicitWindowId` when it has an
- * attached session, otherwise falling back to any attached one. Useful for
- * issuing CDP debugger commands.
+ * Resolves a preview window id: `explicitWindowId` if attached, else any
+ * paused session, else the focused window, else any attached one.
  *
  * @param {number | null | undefined} explicitWindowId
  * @returns {number | null}
@@ -241,6 +240,16 @@ const findTargetPreviewWindowId = explicitWindowId => {
   }
   for (const [id, entry] of cdpSessions) {
     if (entry.isPaused) return id;
+  }
+  for (const [id] of cdpSessions) {
+    const previewWindow = BrowserWindow.fromId(id);
+    if (
+      previewWindow &&
+      !previewWindow.isDestroyed() &&
+      previewWindow.isFocused()
+    ) {
+      return id;
+    }
   }
   for (const [id] of cdpSessions) {
     return id;
@@ -267,27 +276,35 @@ const resumePreviewDebugger = async windowId => {
 };
 
 /**
- * @param {number | null | undefined} windowId
+ * Pushes the full breakpoint set to every attached preview window. Safe to
+ * broadcast since it's an idempotent replacement, not a delta.
+ *
+ * @param {number | null | undefined} windowId Unused, kept for call-site
+ * compatibility with the single-target commands.
  * @param {Array<BreakpointEntry>} breakpoints
- * @returns {Promise<boolean>}
+ * @returns {Promise<boolean>} True if at least one window was updated.
  */
 const setBreakpointsPreviewDebugger = async (windowId, breakpoints) => {
-  const target = findTargetPreviewWindowId(windowId);
-  if (target === null) return false;
+  const targets = Array.from(cdpSessions.keys());
+  if (targets.length === 0) return false;
   const expression = serializeFunctionForCdp(
     setBreakpointsInPreview,
     Array.isArray(breakpoints) ? breakpoints : []
   );
-  try {
-    await sendCdpCommand(target, 'Runtime.evaluate', {
-      expression,
-      returnByValue: true,
-    });
-    return true;
-  } catch (error) {
-    console.warn('[preview-cdp] setBreakpoints via CDP failed', error);
-    return false;
-  }
+  const results = await Promise.all(
+    targets.map(target =>
+      sendCdpCommand(target, 'Runtime.evaluate', {
+        expression,
+        returnByValue: true,
+      })
+        .then(() => true)
+        .catch(error => {
+          console.warn('[preview-cdp] setBreakpoints via CDP failed', error);
+          return false;
+        })
+    )
+  );
+  return results.some(Boolean);
 };
 
 /**

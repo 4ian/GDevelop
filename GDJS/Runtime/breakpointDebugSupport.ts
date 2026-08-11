@@ -4,31 +4,26 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /** A container's variables, keyed by name (leaf mirror: `gdjs.Variable`). */
+  type VariablesByName = { [variableName: string]: gdjs.Variable };
+
   /**
-   * Dump shape consumed by `extractVariablesFromDump`. Field names keep the
-   * runtime's underscore-prefixed members so the same extractor also parses the
-   * full `sendRuntimeGameDump` output.
+   * Explicit contract consumed by `extractVariablesFromDump` on the IDE side -
+   * mirrors `RuntimeVariablesMap` field for field, so extraction is a direct
+   * read instead of reaching into runtime-private members.
    */
   type BreakpointDumpPayload = {
-    _variables: gdjs.VariablesContainer;
-    _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
-    _sceneStack: {
-      _stack: Array<{
-        _variables: gdjs.VariablesContainer;
-        _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
-        objectVariablesByName: {
-          [objectName: string]: gdjs.VariablesContainer;
-        };
-      }>;
-    };
+    global: VariablesByName;
+    scene: VariablesByName;
+    extensionGlobal: { [extensionName: string]: VariablesByName };
+    extensionScene: { [extensionName: string]: VariablesByName };
+    object: { [objectName: string]: VariablesByName };
+    localByCodeNamespace: { [codeNamespace: string]: VariablesByName[] };
   };
 
   type BreakpointDumpMessage = {
     command: 'dump';
     payload: BreakpointDumpPayload;
-    activeLocalVariables?: {
-      [namespaceKey: string]: gdjs.VariablesContainer[];
-    };
   };
 
   /** A breakpoint hit frozen on a `debugger;` statement. */
@@ -82,6 +77,10 @@ namespace gdjs {
      * to read object instances. */
     private _lastBpCallingContainer: gdjs.RuntimeInstanceContainer | null =
       null;
+
+    /** Scene of the last breakpoint hit; survives `consumeLastBreakpoint()`
+     * clearing `_lastBreakpoint`, so stepping can still read it. */
+    private _lastBpSceneName = '';
 
     constructor(game: gdjs.RuntimeGame) {
       this._game = game;
@@ -177,14 +176,12 @@ namespace gdjs {
       eventId: string,
       container: gdjs.RuntimeInstanceContainer
     ): boolean {
+      const sceneName = container.getScene().getName();
       // Hit info only; the variable dump is built later by Electron main over
       // CDP, once V8 is paused.
-      this._lastBreakpoint = {
-        functionId,
-        eventId,
-        sceneName: container.getScene().getName(),
-      };
+      this._lastBreakpoint = { functionId, eventId, sceneName };
       this._lastBpCallingContainer = container;
+      this._lastBpSceneName = sceneName;
       return true;
     }
 
@@ -233,21 +230,12 @@ namespace gdjs {
       this._breakpointIds = map.size > 0 ? map : null;
     }
 
-    /**
-     * Applies the breakpoints seeded on `window` by the CDP bootstrap before
-     * the runtime loaded (see bootstrapPreviewCdp), then clears them. `window`
-     * is the only carrier available that early - the runtime didn't exist yet.
-     */
+    /** Applies breakpoints from `RuntimeGameOptions.initialBreakpoints` (see
+     * its doc for why they aren't delivered via `setBreakpoints` instead). */
     consumeInitialBreakpoints(): void {
-      if (typeof window === 'undefined') return;
-      const initial = window.__gdjsInitialBreakpoints;
+      const initial = this._game._options.initialBreakpoints;
       if (Array.isArray(initial) && initial.length > 0) {
         this.setBreakpoints(initial);
-      }
-      try {
-        delete window.__gdjsInitialBreakpoints;
-      } catch (_) {
-        window.__gdjsInitialBreakpoints = undefined;
       }
     }
 
@@ -269,9 +257,7 @@ namespace gdjs {
       this._stepCurrentFunctionId = functionId;
       this._stepStartDepth = -1;
       // Pin to the scene of the pause we are stepping from (if any).
-      this._stepSceneName = this._lastBreakpoint
-        ? this._lastBreakpoint.sceneName
-        : '';
+      this._stepSceneName = this._lastBpSceneName;
     }
 
     /** Pauses the running game at the next event. */
@@ -377,9 +363,18 @@ namespace gdjs {
   ): void => {
     gdjs.BreakpointDebugger.game = game;
 
-    gdjs.BreakpointDebugger.buildDumpJson = (): string => {
-      const activeLocalVariables = gdjs.collectActiveLocalVariables();
+    const byExtensionName = (
+      map: Map<string, gdjs.VariablesContainer> | undefined
+    ): { [extensionName: string]: VariablesByName } => {
+      const result: { [extensionName: string]: VariablesByName } = {};
+      if (!map) return result;
+      map.forEach((container, extensionName) => {
+        result[extensionName] = container._variables.items;
+      });
+      return result;
+    };
 
+    gdjs.BreakpointDebugger.buildDumpJson = (): string => {
       const sceneArray: gdjs.RuntimeScene[] = game._sceneStack
         ? game._sceneStack._stack
         : [];
@@ -391,9 +386,7 @@ namespace gdjs {
       const manager = game._breakpointManager;
       const callingContainer: gdjs.RuntimeInstanceContainer | null =
         (manager && manager.getLastBpCallingContainer()) || topScene;
-      const objectVariablesByName: {
-        [objectName: string]: gdjs.VariablesContainer;
-      } = {};
+      const object: { [objectName: string]: VariablesByName } = {};
       if (callingContainer) {
         const items = callingContainer._instances.items;
         for (const objName in items) {
@@ -403,41 +396,34 @@ namespace gdjs {
           // First instance only; use the Debugger panel for full inspection.
           const firstInstance = list[0];
           if (firstInstance) {
-            objectVariablesByName[objName] = firstInstance.getVariables();
+            object[objName] = firstInstance.getVariables()._variables.items;
           }
         }
+      }
+
+      const localByCodeNamespace: {
+        [codeNamespace: string]: VariablesByName[];
+      } = {};
+      const activeLocalVariables = gdjs.collectActiveLocalVariables();
+      for (const codeNamespace in activeLocalVariables) {
+        localByCodeNamespace[codeNamespace] = activeLocalVariables[
+          codeNamespace
+        ].map((container) => container._variables.items);
       }
 
       const payload: BreakpointDumpPayload = {
-        _variables: game._variables,
-        _variablesByExtensionName: game._variablesByExtensionName,
-        _sceneStack: {
-          _stack: topScene
-            ? [
-                {
-                  _variables: topScene._variables,
-                  _variablesByExtensionName: topScene._variablesByExtensionName,
-                  objectVariablesByName,
-                },
-              ]
-            : [],
-        },
+        global: game._variables._variables.items,
+        scene: topScene ? topScene._variables._variables.items : {},
+        extensionGlobal: byExtensionName(game._variablesByExtensionName),
+        extensionScene: byExtensionName(
+          topScene ? topScene._variablesByExtensionName : undefined
+        ),
+        object,
+        localByCodeNamespace,
       };
 
       const message: BreakpointDumpMessage = { command: 'dump', payload };
-      if (Object.keys(activeLocalVariables).length > 0) {
-        message.activeLocalVariables = activeLocalVariables;
-      }
-
-      return JSON.stringify(
-        message,
-        function (_key: string, value: unknown): unknown {
-          if (value instanceof Map) {
-            return gdjs.convertMapToPlainObjectForJson(value);
-          }
-          return value;
-        }
-      );
+      return JSON.stringify(message);
     };
 
     game.getBreakpointManager().consumeInitialBreakpoints();

@@ -126,25 +126,37 @@ same guard the profiler code uses.
   The IDE uses them to compute `functionId` values that exactly match
   what the generator stamps.
 
-### `compilationForRuntime` gate
+### `compilationForRuntime` / breakpoint instrumentation gates
 
-Breakpoint/profiler code is skipped when `GenerateCodeForRuntime()` is
-true. Flipped in
-`newIDE/app/src/EventsFunctionsExtensionsLoader/index.js`.
+Two independent flags on `gd::EventsCodeGenerator`:
 
-| Code kind                | Runtime mode | Breakpoints?                                                                                         |
-| ------------------------ | ------------ | ---------------------------------------------------------------------------------------------------- |
-| Scene layouts            | `false`      | yes                                                                                                  |
-| Free extension functions | `false`      | yes                                                                                                  |
-| Custom object methods    | `false`      | yes (via the sub-container's `getBreakpointManager()`)                                               |
-| Behavior methods         | `true`       | **no** — lifecycle hooks may not have `runtimeScene` in scope, and behaviors ship to the marketplace |
+- `GenerateCodeForRuntime()` — profiler code and the debugger's local-variable
+  registration are skipped when true (export / runtime-only compilation).
+- `ShouldGenerateBreakpointInstrumentation()` — `checkBreakpoint` and the
+  `pushBreakpointFunction`/`popBreakpointFunction` wrapper are skipped when
+  false, regardless of `GenerateCodeForRuntime()`. A CDP debugger is only
+  ever attached in local Electron preview, so this is false for exports *and*
+  for web previews (Service Worker / S3), which would otherwise ship dead
+  instrumentation code. Threaded from `PreviewExportOptions.cdpDebuggerEnabled`
+  (scenes, via `ExportScenesEventsCode`) and from
+  `isElectronCDPBridgeAvailable()` (extension functions / custom-object
+  methods, via `shouldGenerateBreakpointInstrumentation()` in
+  `newIDE/app/src/EventsFunctionsExtensionsLoader/index.js` — derived from
+  `generateForPreview` rather than a separate cache key, so the flavor cache
+  stays 2-valued).
+
+| Code kind                | `compilationForRuntime` | Breakpoint instrumentation?                             |
+| ------------------------ | ------------------------ | -------------------------------------------------------- |
+| Scene layouts            | `false` (preview)         | only if `cdpDebuggerEnabled` (local Electron preview)    |
+| Free extension functions | `false` (preview)         | only if `isElectronCDPBridgeAvailable()`                 |
+| Custom object methods    | `false` (preview)         | only if `isElectronCDPBridgeAvailable()`, via the sub-container's `getBreakpointManager()` |
+| Behavior methods         | `true` (always)           | **no** — lifecycle hooks may not have `runtimeScene` in scope, and behaviors ship to the marketplace |
 
 ## 4. Runtime (GDJS / TypeScript)
 
 Files: `GDJS/Runtime/runtimegame.ts`, `runtimescene.ts`,
 `RuntimeInstanceContainer.ts`, `oncetriggers.ts`,
-`breakpointDebugSupport.ts`, `types/global-preview-debug.d.ts`,
-`debugger-client/abstract-debugger-client.ts`.
+`breakpointDebugSupport.ts`, `debugger-client/abstract-debugger-client.ts`.
 
 ### Debug surface — one class for everything
 
@@ -179,19 +191,17 @@ The preview-facing API surfaces under the `gdjs.BreakpointDebugger` namespace
 these — the debug logic lives in the runtime, callable straight from
 the Chrome debugger.
 
-The only remaining true global is `window.__gdjsInitialBreakpoints`,
-declared in `GDJS/Runtime/types/global-preview-debug.d.ts`:
-
-| Symbol                            | Set by               | Read by                                          |
-| --------------------------------- | -------------------- | ------------------------------------------------ |
-| `window.__gdjsInitialBreakpoints` | CDP bootstrap script | `DebuggerBreakpointManager.consumeInitialBreakpoints()` |
-
-`window` is used here because the bootstrap script runs (via
-`addScriptToEvaluateOnNewDocument`) **before** `gdjs` is defined — it is
-the only carrier available that early. CDP-attached state, which used to
-be the `gdjs.__cdpAttached` global, now travels typed through
-`RuntimeGameOptions.cdpDebuggerEnabled` and is cached on the manager's
-`_cdpAttached`.
+There is no `window`-level global left for debug state: frame-0
+breakpoints travel typed through `RuntimeGameOptions.initialBreakpoints`
+(baked into the generated preview at export time from
+`buildAllBreakpointsPayload()`, mirroring how
+`RuntimeGameOptions.cdpDebuggerEnabled` tells the manager a CDP debugger
+is attached, cached on `_cdpAttached`). `DebuggerBreakpointManager
+.consumeInitialBreakpoints()` applies them synchronously from
+`RuntimeGame._options` during construction, so it doesn't depend on any
+CDP injection timing. The Electron CDP bootstrap script only re-applies
+the breakpoint set on `gdjs` context re-creation — see
+`PreviewCdpSnippets/previewCdpSnippets.js`.
 
 ### `installBreakpointDebugSupport` (`breakpointDebugSupport.ts`)
 
@@ -203,15 +213,21 @@ gated on `_isPreview`. Does two things:
    `gdjs.BreakpointDebugger.buildDumpJson` — a compact dump builder used by
    Electron main on `Debugger.paused`.
 2. Calls `getBreakpointManager().consumeInitialBreakpoints()`, which
-   applies `window.__gdjsInitialBreakpoints` (if the CDP bootstrap
-   script ran before this constructor) synchronously — so frame-0 events
-   (`At beginning of scene`, `TriggerOnce` fan-outs) already honour
-   breakpoints — then deletes the entry so a reload cannot double-apply
-   it.
+   applies `RuntimeGameOptions.initialBreakpoints` synchronously — so
+   frame-0 events (`At beginning of scene`, `TriggerOnce` fan-outs)
+   already honour breakpoints.
 
-The dump builder serialises only what the IDE tooltip path consumes —
-see [§5](#5-ide-renderer-integration) — and uses a `JSON.stringify` replacer that converts `Map` to a
-plain object (the extension-variables containers are `Map`s).
+`buildDumpJson` emits an explicit contract matching
+`RuntimeVariablesMap` (IDE side) field for field — `{ global, scene,
+extensionGlobal, extensionScene, object, localByCodeNamespace }`, each a
+plain `{ [name]: gdjs.Variable }` map (or, for `extensionGlobal` /
+`extensionScene` / `localByCodeNamespace`, one level of `{ [extensionName
+| codeNamespace]: ... }` nesting on top) — instead of mirroring the
+runtime's private field layout (`_variables._variables.items`,
+`_sceneStack._stack`, ...). `extractVariablesFromDump` on the IDE side is
+therefore a direct read, no path-guessing. `Map`s (extension-variables
+containers) are flattened to plain objects while building the payload,
+so no `JSON.stringify` replacer is needed.
 
 ### `checkBreakpoint(functionId, eventIndex, container)` on the manager
 
@@ -331,31 +347,29 @@ are consolidated in the module-level `styles` object under a shared
 
 ### `Debugger/RuntimeVariablesContext.js` + `EventsSheet/ParameterFields/VariableField.js`
 
-On each `preview-debugger-paused` IPC, `EventsSheet` parses the inline
-`dumpJson` and extracts a structured runtime variables map:
+On each pause, `Debugger/BreakpointDebuggerSession.js` — the single
+owner of pause state, subscribed to by both `UseBreakpointDebugger.js`
+and every `BreakpointSessionController` — parses the inline `dumpJson`
+**once** via `extractVariablesFromDump`, which is a direct read of the
+explicit contract `buildDumpJson` emits (`{ global, scene,
+extensionGlobal, extensionScene, object, localByCodeNamespace }` — see
+[§4](#4-runtime-gdjs--typescript)):
 
-- **Global / scene variables** — from `runtimeGame._variables` /
-  `sceneStack[top]._variables`.
-- **Extension-scoped variables** — from
-  `runtimeGame._variablesByExtensionName` and the per-scene equivalent.
-  These are `Map`s, which don't serialize to JSON natively — the dump
-  builder's replacer converts them to plain objects.
-- **Scene-level locals** — from the top-level `activeLocalVariables`
-  field that the dump builder adds alongside `payload`. It walks every
-  `gdjs[key]` whose value has a non-empty `.localVariables` push/pop
-  stack (populated by generated `Declare local variable` code) and
-  records it under the key `"gdjs." + key`. The IDE picks the stack
-  matching the sheet's code namespace (computed via
-  `MetadataDeclarationHelper.getSceneCodeNamespace` for scene sheets)
-  and walks it **top-down** so inner `Declare local` scopes shadow
-  outer ones — mirroring runtime resolution.
-- **Object variables** — from the paused scene's `objectVariablesByName`
-  field. The dump builder walks the **calling container's**
-  `_instances.items` (picked up from the manager's
-  `getLastBpCallingContainer()` — the scene for scene events, the owning
-  custom object for
-  custom-object methods) and records the first live instance's
-  `_variables` per object name.
+- **Global / scene variables** — `payload.global` / `payload.scene`.
+- **Extension-scoped variables** — `payload.extensionGlobal[extensionName]`
+  and `payload.extensionScene[extensionName]`.
+- **Scene-level locals** — `payload.localByCodeNamespace[codeNamespace]`,
+  an array (one entry per active `Declare local variable` push/pop
+  stack frame). The IDE picks the stack matching the sheet's code
+  namespace (computed via `MetadataDeclarationHelper.getSceneCodeNamespace`
+  for scene sheets) and walks it **top-down** in `lookupRuntimeVariable`
+  so inner `Declare local` scopes shadow outer ones — mirroring runtime
+  resolution.
+- **Object variables** — `payload.object[objectName]`, built by the dump
+  builder from the **calling container's** `_instances.items` (picked up
+  from the manager's `getLastBpCallingContainer()` — the scene for scene
+  events, the owning custom object for custom-object methods), recording
+  the first live instance's variables per object name.
 
   The `objectvar` parameter value only carries the variable path
   (`objnumber`, `objnumber.child`), not the object name.
@@ -374,10 +388,9 @@ On each `preview-debugger-paused` IPC, `EventsSheet` parses the inline
   reachable from globals. The tooltip falls back to the generic
   "variable" label.
 
-The dump is **minimal** — only the fields above, mirroring the shape
-`extractVariablesFromDump` consumes. No renderer internals, no scene
-stack beyond the top, at most one live instance per object. That keeps
-the payload in the tens of KB instead of the tens of MB a full
+The dump is **minimal** — only the fields above, at most one live
+instance per object, no scene stack beyond the top. That keeps the
+payload in the tens of KB instead of the tens of MB a full
 `sendRuntimeGameDump` produces — critical because the dump round-trip
 gates the IDE's paused UI. The Debugger panel's `refresh` WS command
 still uses the full `sendRuntimeGameDump` when explicitly requested.

@@ -2126,6 +2126,12 @@ export class ProjectBrowserHelper extends EmscriptenObject {
   static exposeEventsFunctionsExtensionEvents(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, worker: ReadOnlyArbitraryEventsWorkerWithContext): void;
 }
 
+export class EventsPersistentUuidHelper extends EmscriptenObject {
+  static ensureProjectEventsPersistentUuids(project: Project): boolean;
+  static ensurePersistentUuids(events: EventsList): boolean;
+  static resetPersistentUuids(events: EventsList): void;
+}
+
 export class ResourceExposer extends EmscriptenObject {
   static exposeWholeProjectResources(project: Project, worker: ArbitraryResourceWorker): void;
 }
@@ -3226,7 +3232,7 @@ export class ParticleEmitterObject extends ObjectConfiguration {
 
 export class LayoutCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean): string;
+  generateLayoutCompleteCode(layout: Layout, includes: SetString, diagnosticReport: DiagnosticReport, compilationForRuntime: boolean, generateBreakpointInstrumentation: boolean): string;
 }
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
@@ -3242,7 +3248,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean, generateBreakpointInstrumentation: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;
@@ -3250,7 +3256,7 @@ export class ObjectCodeGenerator extends EmscriptenObject {
 
 export class EventsFunctionsExtensionCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean): string;
+  generateFreeEventsFunctionCompleteCode(extension: EventsFunctionsExtension, eventsFunction: EventsFunction, codeNamespac: string, includes: SetString, compilationForRuntime: boolean, generateBreakpointInstrumentation: boolean): string;
 }
 
 export class PreviewExportOptions extends EmscriptenObject {
@@ -3276,6 +3282,7 @@ export class PreviewExportOptions extends EmscriptenObject {
   setIsInGameEdition(enable: boolean): PreviewExportOptions;
   setCdpDebuggerEnabled(enable: boolean): PreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): PreviewExportOptions;
+  setInitialBreakpointsJson(initialBreakpointsJson: string): PreviewExportOptions;
   setEditorId(editorId: string): PreviewExportOptions;
   setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): PreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): PreviewExportOptions;

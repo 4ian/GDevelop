@@ -3827,6 +3827,32 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('gd.EventsPersistentUuidHelper', function () {
+    it('assigns missing persistent UUIDs, keeping the existing ones', function () {
+      const list = new gd.EventsList();
+      const parentEvent = list.insertEvent(new gd.StandardEvent(), 0);
+      const subEvent = parentEvent
+        .getSubEvents()
+        .insertEvent(new gd.StandardEvent(), 0);
+      const parentEventUuid = parentEvent.getOrCreatePersistentUuid();
+      expect(subEvent.getPersistentUuid()).toBe('');
+
+      expect(gd.EventsPersistentUuidHelper.ensurePersistentUuids(list)).toBe(
+        true
+      );
+
+      expect(parentEvent.getPersistentUuid()).toBe(parentEventUuid);
+      expect(subEvent.getPersistentUuid()).not.toBe('');
+
+      // Nothing left to assign on a second pass.
+      expect(gd.EventsPersistentUuidHelper.ensurePersistentUuids(list)).toBe(
+        false
+      );
+
+      list.delete();
+    });
+  });
+
   describe('gd.EventsRemover', function () {
     it('should remove events', function () {
       let list = new gd.EventsList();

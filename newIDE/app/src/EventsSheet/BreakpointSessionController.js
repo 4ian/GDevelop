@@ -1,18 +1,22 @@
 // @flow
 import {
-  onPreviewDebuggerPauseChange,
   onPreviewDebuggerClosed,
-  resumePausedPreview,
-  stepPausedPreview,
   setPreviewBreakpointsViaCdp,
-  type CDPPausePayload,
+  isElectronCDPBridgeAvailable,
 } from '../Debugger/ElectronCDPBridge';
+import {
+  subscribeToBreakpointDebuggerSession,
+  getBreakpointDebuggerSessionState,
+  resumeBreakpointDebugger,
+  stepBreakpointDebugger,
+  type BreakpointDebuggerSessionState,
+} from '../Debugger/BreakpointDebuggerSession';
 import {
   getBreakpoints as getSessionBreakpoints,
   updateEntry as updateBreakpointsSessionEntry,
   buildAllBreakpointsPayload,
+  markPersistentUuidsAssigned,
 } from './BreakpointsSessionStore';
-import { extractVariablesFromDump } from '../Debugger/RuntimeVariablesContext';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope';
 
 const gd: libGDevelop = global.gd;
@@ -33,6 +37,14 @@ export const canScopeHoldBreakpoints = (scope: EventsScope): boolean => {
   if (scope.eventsBasedBehavior) return false;
   return getFunctionIdFromScope(scope) !== '';
 };
+
+// Namespace prefix the code generator uses for extension (free-function or
+// custom-object method) code, as opposed to top-level scene code. Mirrors
+// the runtime's own `DebuggerBreakpointManager._isExtensionScope`.
+const EXTENSION_FUNCTION_ID_PREFIX = 'gdjs.evtsExt__';
+
+export const isExtensionFunctionId = (functionId: string): boolean =>
+  functionId.startsWith(EXTENSION_FUNCTION_ID_PREFIX);
 
 // Resolves the runtime function/scene namespace for a scope, matching the id
 // the code generator stamps into `checkBreakpoint` calls.
@@ -117,9 +129,8 @@ type Callbacks = {|
  */
 export default class BreakpointSessionController {
   _callbacks: Callbacks;
-  _unregisterPauseListener: ?() => void = null;
+  _unregisterSessionListener: ?() => void = null;
   _unregisterClosedListener: ?() => void = null;
-  _isPaused: boolean = false;
 
   constructor(callbacks: Callbacks) {
     this._callbacks = callbacks;
@@ -134,24 +145,46 @@ export default class BreakpointSessionController {
     return getSessionBreakpoints(getFunctionIdFromScope(scope));
   }
 
+  /**
+   * Assigns the persistent UUIDs breakpoints are keyed by to every event of the
+   * scope, instead of waiting for one to be set. No-op where breakpoints can't
+   * run, so projects edited on the web don't grow UUIDs.
+   */
+  ensureEventsPersistentUuids() {
+    if (!isElectronCDPBridgeAvailable()) return;
+    const scope = this._callbacks.getScope();
+    if (!canScopeHoldBreakpoints(scope)) return;
+    const assignedAny = gd.EventsPersistentUuidHelper.ensurePersistentUuids(
+      this._callbacks.getEvents()
+    );
+    // Scene code is generated at every launch, extension code only when asked.
+    if (assignedAny && isExtensionFunctionId(getFunctionIdFromScope(scope))) {
+      markPersistentUuidsAssigned();
+    }
+  }
+
   start() {
     this._unregisterClosedListener = onPreviewDebuggerClosed(() => {
       this._callbacks.onPreviewClosed();
     });
-    this._unregisterPauseListener = onPreviewDebuggerPauseChange(
-      (isPaused: boolean, payload: ?CDPPausePayload) => {
-        if (isPaused) this._handlePaused(payload);
-        else this._handleResumed();
+    this._unregisterSessionListener = subscribeToBreakpointDebuggerSession(
+      (sessionState: BreakpointDebuggerSessionState) => {
+        this._applySessionState(sessionState);
       }
     );
+    // The subscription only reports later changes, but an events sheet can be
+    // mounted while a pause is already in progress: selecting another extension
+    // function remounts it (and so drops its paused state).
+    const sessionState = getBreakpointDebuggerSessionState();
+    if (sessionState.isPaused) this._applySessionState(sessionState);
     // Sync breakpoints to the runtime in case a preview is already running.
     this.syncBreakpointsToRuntime();
   }
 
   dispose() {
-    if (this._unregisterPauseListener) {
-      this._unregisterPauseListener();
-      this._unregisterPauseListener = null;
+    if (this._unregisterSessionListener) {
+      this._unregisterSessionListener();
+      this._unregisterSessionListener = null;
     }
     if (this._unregisterClosedListener) {
       this._unregisterClosedListener();
@@ -159,31 +192,20 @@ export default class BreakpointSessionController {
     }
   }
 
-  _handlePaused(payload: ?CDPPausePayload) {
-    const breakpoint = payload && payload.breakpoint;
-    if (
-      breakpoint &&
-      typeof breakpoint.eventId === 'string' &&
-      typeof breakpoint.functionId === 'string'
-    ) {
-      this._applyBreakpointHit(breakpoint.functionId, breakpoint.eventId);
+  _applySessionState(sessionState: BreakpointDebuggerSessionState) {
+    if (!sessionState.isPaused) {
+      this._callbacks.onResumed();
+      return;
     }
-    const dumpJson = payload && payload.dumpJson;
-    if (dumpJson) {
-      try {
-        const parsed = JSON.parse(dumpJson);
-        if (parsed && parsed.command === 'dump') {
-          const variables = extractVariablesFromDump(parsed);
-          if (variables) this._callbacks.onRuntimeVariables(variables);
-        }
-      } catch (_) {}
+    if (sessionState.hit) {
+      this._applyBreakpointHit(
+        sessionState.hit.functionId,
+        sessionState.hit.eventId
+      );
     }
-  }
-
-  _handleResumed() {
-    if (!this._isPaused) return;
-    this._isPaused = false;
-    this._callbacks.onResumed();
+    if (sessionState.runtimeVariables) {
+      this._callbacks.onRuntimeVariables(sessionState.runtimeVariables);
+    }
   }
 
   // On a breakpoint hit: resolve the event UUID → path. A resolved
@@ -198,11 +220,10 @@ export default class BreakpointSessionController {
 
     if (found && !isBreakpointableEvent(found.event)) {
       // A comment/group can't hold a pause: step past it.
-      this.step(eventId);
+      this.step();
       return;
     }
 
-    this._isPaused = true;
     this._callbacks.onBreakpointHit({
       path: found ? found.path : null,
       eventId,
@@ -239,15 +260,13 @@ export default class BreakpointSessionController {
     setPreviewBreakpointsViaCdp(buildAllBreakpointsPayload());
   }
 
-  // Resume / step always route through CDP (only available in Electron local preview).
+  // Resume / step always route through the shared session (only available in
+  // Electron local preview), which knows the current hit identity itself.
   resume() {
-    resumePausedPreview();
+    resumeBreakpointDebugger();
   }
 
-  step(eventId: string) {
-    stepPausedPreview({
-      currentEventId: eventId,
-      currentFunctionId: getFunctionIdFromScope(this._callbacks.getScope()),
-    });
+  step() {
+    stepBreakpointDebugger();
   }
 }

@@ -29,6 +29,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/CaptureOptions.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Events/EventsPersistentUuidHelper.h"
 #include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/ExportedDependencyResolver.h"
 #include "GDCore/IDE/ProjectBrowserHelper.h"
@@ -69,13 +70,6 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   return GetTimeNow();
 }
 
-class EventsPersistentUuidAssigner : public gd::ArbitraryEventsWorker {
- private:
-  bool DoVisitEvent(gd::BaseEvent &event) override {
-    event.GetOrCreatePersistentUuid();
-    return false;
-  }
-};
 }  // namespace
 
 namespace gdjs {
@@ -139,12 +133,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   std::vector<gd::InGameEditorResourceMetadata> inGameEditorResources;
 
-  // Breakpoint/step hits are reported by event UUID. Assign them on the live
-  // project before cloning so the generator's clone shares the editor's ids;
-  // otherwise a freshly assigned UUID would live only on the clone.
+  // Ensure live events have UUIDs before codegen clones them (a clone only
+  // inherits ids the source already had - see CopyPersistentUuids). Safety
+  // net for entry points that skip the IDE's own call (in-game edition).
   if (options.cdpDebuggerEnabled) {
-    EventsPersistentUuidAssigner uuidAssigner;
-    gd::ProjectBrowserHelper::ExposeProjectEvents(options.project, uuidAssigner);
+    gd::EventsPersistentUuidHelper::EnsureProjectEventsPersistentUuids(
+        options.project);
   }
 
   // TODO Try to remove side effects to avoid the copy
@@ -290,12 +284,15 @@ bool ExporterHelper::ExportProjectForPixiPreview(
         options.project.GetWholeProjectDiagnosticReport();
     wholeProjectDiagnosticReport.Clear();
 
-    // Generate events code
+    // Generate events code. Breakpoint instrumentation is only useful when a
+    // CDP debugger will actually be attached (local Electron preview) - web
+    // previews would otherwise ship dead `checkBreakpoint`/`debugger;` code.
     if (!ExportScenesEventsCode(immutableProject,
                           codeOutputDir,
                           includesFiles,
                           wholeProjectDiagnosticReport,
-                          true)) {
+                          true,
+                          options.cdpDebuggerEnabled)) {
       return false;
     }
     previousTime = LogTimeSpent("Events code export", previousTime);
@@ -443,6 +440,10 @@ void ExporterHelper::SerializeRuntimeGameOptions(
   if (!options.inGameEditorSettingsJson.empty()) {
     runtimeGameOptions.AddChild("inGameEditorSettings") =
         gd::Serializer::FromJSON(options.inGameEditorSettingsJson);
+  }
+  if (!options.initialBreakpointsJson.empty()) {
+    runtimeGameOptions.AddChild("initialBreakpoints") =
+        gd::Serializer::FromJSON(options.initialBreakpointsJson);
   }
 
   runtimeGameOptions.AddChild("shouldReloadLibraries")
@@ -1352,7 +1353,8 @@ bool ExporterHelper::ExportScenesEventsCode(
     gd::String outputDir,
     std::vector<gd::String> &includesFiles,
     gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
-    bool exportForPreview) {
+    bool exportForPreview,
+    bool generateBreakpointInstrumentation) {
   fs.MkDir(outputDir);
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -1365,7 +1367,8 @@ bool ExporterHelper::ExportScenesEventsCode(
             layout.GetName());
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
-        layout, eventsIncludes, diagnosticReport, !exportForPreview);
+        layout, eventsIncludes, diagnosticReport, !exportForPreview,
+        generateBreakpointInstrumentation);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

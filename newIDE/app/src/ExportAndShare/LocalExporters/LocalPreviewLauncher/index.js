@@ -288,6 +288,15 @@ export default class LocalPreviewLauncher extends React.Component<
       // The preview window always has a CDP debugger attached (see
       // attachCdpToPreview), so the generated `debugger;` statements are live.
       previewExportOptions.setCdpDebuggerEnabled(true);
+
+      // Baked into the generated code so frame-0 breakpoints are hittable
+      // without depending on any CDP injection timing.
+      const initialBreakpoints = buildAllBreakpointsPayload();
+      if (initialBreakpoints.length > 0) {
+        previewExportOptions.setInitialBreakpointsJson(
+          JSON.stringify(initialBreakpoints)
+        );
+      }
     }
 
     const includeFileHashs = this.props.getIncludeFileHashs();

@@ -13,6 +13,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/EventsPersistentUuidHelper.h"
 #include "GDCore/Tools/UUID/UUID.h"
 
 namespace gd {
@@ -126,13 +127,18 @@ void BaseEvent::PreprocessAsyncActions(const gd::Platform& platform) {
         remainingActions.InsertInstructions(
             *actionsList, aId + 1, actionsList->size() - 1);
         gd::AsyncEvent asyncEvent(action, remainingActions, GetSubEvents());
+        gd::EventsPersistentUuidHelper::CopyPersistentUuids(
+            GetSubEvents(), asyncEvent.GetSubEvents());
 
         // Ensure that the local event no longer has any of the actions/subevent
         // after the async function
         actionsList->RemoveAfter(aId);
         GetSubEvents().Clear();
 
-        GetSubEvents().InsertEvent(asyncEvent);
+        gd::BaseEvent& insertedAsyncEvent =
+            GetSubEvents().InsertEvent(asyncEvent);
+        gd::EventsPersistentUuidHelper::CopyPersistentUuids(
+            asyncEvent.GetSubEvents(), insertedAsyncEvent.GetSubEvents());
 
         // We just moved all the rest, there's nothing left to do in this event.
         return;

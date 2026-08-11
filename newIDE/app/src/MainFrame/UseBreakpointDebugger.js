@@ -1,13 +1,17 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
+import { isElectronCDPBridgeAvailable } from '../Debugger/ElectronCDPBridge';
 import {
-  resumePausedPreview,
-  stepPausedPreview,
-  schedulePauseAtNextEvent,
-  onPreviewDebuggerPauseChange,
-  isElectronCDPBridgeAvailable,
-} from '../Debugger/ElectronCDPBridge';
+  subscribeToBreakpointDebuggerSession,
+  resetBreakpointDebuggerSession,
+  getBreakpointDebuggerSessionState,
+  resumeBreakpointDebugger,
+  stepBreakpointDebugger,
+  scheduleBreakpointDebuggerPauseAtNextEvent,
+  type BreakpointDebuggerSessionState,
+} from '../Debugger/BreakpointDebuggerSession';
+import { isExtensionFunctionId } from '../EventsSheet/BreakpointSessionController';
 import { type PreviewDebuggerServer } from '../ExportAndShare/PreviewLauncher.flow';
 import { type ShowAlertDialogOptions } from '../UI/Alert/AlertContext';
 
@@ -51,11 +55,7 @@ const useBreakpointDebugger = ({
   focusOnExtensionFunction,
   showAlert,
 }: Params): Result => {
-  const previewPausedRef = React.useRef<boolean>(false);
-  const lastHitEventIdRef = React.useRef<string>('');
-  const lastHitFunctionIdRef = React.useRef<string>('');
-
-  // Stable ref to the hit handler so the CDP listener never needs to re-subscribe.
+  // Stable ref to the hit handler so the session listener never needs to re-subscribe.
   type BreakpointHitHandler = (
     functionId: string,
     eventId: string,
@@ -65,18 +65,14 @@ const useBreakpointDebugger = ({
 
   React.useEffect(
     () => {
-      const handleBreakpointHit = (
+      handleBreakpointHitRef.current = (
         functionId: string,
         eventId: string,
         sceneName: string
       ) => {
-        previewPausedRef.current = true;
-        lastHitEventIdRef.current = eventId;
-        lastHitFunctionIdRef.current = functionId;
-
         // Behavior object methods are compiled with compilationForRuntime=true
         // and never appear as extension function hits; skip them.
-        if (functionId.startsWith('gdjs.evtsExt__') && currentProject) {
+        if (isExtensionFunctionId(functionId) && currentProject) {
           try {
             const count = currentProject.getEventsFunctionsExtensionsCount();
             for (let i = 0; i < count; i++) {
@@ -146,59 +142,46 @@ const useBreakpointDebugger = ({
           focusWhenOpened: 'events',
         });
       };
-      handleBreakpointHitRef.current = handleBreakpointHit;
+    },
+    [currentProject, previewLayoutName, openLayout, focusOnExtensionFunction]
+  );
 
+  React.useEffect(() => {
+    return subscribeToBreakpointDebuggerSession(
+      (sessionState: BreakpointDebuggerSessionState) => {
+        if (
+          sessionState.isPaused &&
+          sessionState.hit &&
+          handleBreakpointHitRef.current
+        ) {
+          handleBreakpointHitRef.current(
+            sessionState.hit.functionId,
+            sessionState.hit.eventId,
+            sessionState.hit.sceneName
+          );
+        }
+      }
+    );
+  }, []);
+
+  React.useEffect(
+    () => {
       if (!previewDebuggerServer) return;
-      // Safety net: CDP detach doesn't emit a synthetic `Debugger.resumed`,
-      // so reset refs when the preview connection closes.
-      const resetPauseRefs = () => {
-        previewPausedRef.current = false;
-        lastHitEventIdRef.current = '';
-        lastHitFunctionIdRef.current = '';
-      };
+      // Safety net: CDP detach doesn't emit a synthetic `Debugger.resumed`
+      // for the WebSocket debugger client, so reset the shared session when
+      // that connection changes too.
       const unregister = previewDebuggerServer.registerCallbacks({
         onErrorReceived: () => {},
         onServerStateChanged: () => {},
-        onConnectionClosed: resetPauseRefs,
-        onConnectionOpened: resetPauseRefs,
+        onConnectionClosed: resetBreakpointDebuggerSession,
+        onConnectionOpened: resetBreakpointDebuggerSession,
         onConnectionErrored: () => {},
         onHandleParsedMessage: () => {},
       });
       return unregister;
     },
-    [
-      previewDebuggerServer,
-      previewLayoutName,
-      openLayout,
-      focusOnExtensionFunction,
-      currentProject,
-    ]
+    [previewDebuggerServer]
   );
-
-  // CDP pause / resume events forwarded from Electron main.
-  React.useEffect(() => {
-    const unregister = onPreviewDebuggerPauseChange((isPaused, payload) => {
-      const breakpoint = payload && payload.breakpoint;
-      if (
-        isPaused &&
-        breakpoint &&
-        typeof breakpoint.eventId === 'string' &&
-        typeof breakpoint.functionId === 'string' &&
-        handleBreakpointHitRef.current
-      ) {
-        handleBreakpointHitRef.current(
-          breakpoint.functionId,
-          breakpoint.eventId,
-          breakpoint.sceneName || ''
-        );
-      } else if (!isPaused) {
-        previewPausedRef.current = false;
-        lastHitEventIdRef.current = '';
-        lastHitFunctionIdRef.current = '';
-      }
-    });
-    return unregister;
-  }, []);
 
   const notifyBreakpointsUnsupported = React.useCallback(
     () => {
@@ -217,12 +200,11 @@ const useBreakpointDebugger = ({
         notifyBreakpointsUnsupported();
         return;
       }
-      if (previewPausedRef.current) {
-        resumePausedPreview();
-        previewPausedRef.current = false;
+      if (getBreakpointDebuggerSessionState().isPaused) {
+        resumeBreakpointDebugger();
       } else {
         // Pause fires in the next checkBreakpoint call inside the running preview.
-        schedulePauseAtNextEvent();
+        scheduleBreakpointDebuggerPauseAtNextEvent();
       }
     },
     [previewDebuggerServer, notifyBreakpointsUnsupported]
@@ -235,11 +217,8 @@ const useBreakpointDebugger = ({
         notifyBreakpointsUnsupported();
         return;
       }
-      if (!previewPausedRef.current) return;
-      stepPausedPreview({
-        currentEventId: lastHitEventIdRef.current,
-        currentFunctionId: lastHitFunctionIdRef.current,
-      });
+      if (!getBreakpointDebuggerSessionState().isPaused) return;
+      stepBreakpointDebugger();
     },
     [previewDebuggerServer, notifyBreakpointsUnsupported]
   );

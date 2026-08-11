@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { mapVector, mapFor } from '../Utils/MapFor';
+import { isElectronCDPBridgeAvailable } from '../Debugger/ElectronCDPBridge';
 
 const gd: libGDevelop = global.gd;
 
@@ -35,6 +36,13 @@ type CodeGenerationContext = {|
   codeNamespacePrefix: string, // TODO: could this reworked to avoid this entirely?
   extensionIncludeFiles: Array<string>,
 |};
+
+// Derived from `generateForPreview` rather than a separate option, so the
+// flavor cache in EventsFunctionsExtensionsProvider stays 2-valued: web
+// previews (no Electron CDP bridge) must not ship dead breakpoint code.
+const shouldGenerateBreakpointInstrumentation = (
+  options: OptionsForGeneration
+): boolean => !!options.generateForPreview && isElectronCDPBridgeAvailable();
 
 /**
  * Load all events functions of a project in extensions
@@ -364,7 +372,8 @@ const generateFreeFunction = (
         eventsFunction,
         codeNamespace,
         includeFiles,
-        !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
+        !options.generateForPreview, // compilationForRuntime: true for export, false for preview.
+        shouldGenerateBreakpointInstrumentation(options)
       );
     } catch (error) {
       console.error(
@@ -587,7 +596,8 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-        !options.generateForPreview // compilationForRuntime: true strips instrumentation (export), false keeps it (preview)
+        !options.generateForPreview, // compilationForRuntime: true for export, false for preview.
+        shouldGenerateBreakpointInstrumentation(options)
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

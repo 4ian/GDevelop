@@ -252,6 +252,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set the JSON string representation of the breakpoints
+   * (`gdjs.BreakpointEntry[]`) to apply as soon as the preview starts.
+   */
+  PreviewExportOptions &SetInitialBreakpointsJson(const gd::String &initialBreakpointsJson_) {
+    initialBreakpointsJson = initialBreakpointsJson_;
+    return *this;
+  }
+
+  /**
    * \brief Set the in-game editor identifier.
    */
   PreviewExportOptions &SetEditorId(const gd::String &editorId_) {
@@ -411,6 +420,7 @@ struct PreviewExportOptions {
   gd::String editorId;
   gd::String editorCamera3DCameraMode;
   gd::String inGameEditorSettingsJson;
+  gd::String initialBreakpointsJson;
   double editorCamera3DPositionX = 0;
   double editorCamera3DPositionY = 0;
   double editorCamera3DPositionZ = 0;
@@ -601,7 +611,8 @@ class ExporterHelper {
       gd::String outputDir,
       std::vector<gd::String> &includesFiles,
       gd::WholeProjectDiagnosticReport &wholeProjectDiagnosticReport,
-      bool exportForPreview);
+      bool exportForPreview,
+      bool generateBreakpointInstrumentation = false);
 
   /**
    * \brief Add the project effects include files.

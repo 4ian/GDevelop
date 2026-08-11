@@ -9,22 +9,15 @@
  */
 
 /**
- * Seeds the initial breakpoints into the preview runtime.
- *
- * Handles both delivery paths: early (`addScriptToEvaluateOnNewDocument`, gdjs
- * not yet defined) stashes them on `window` for `installBreakpointDebugSupport`
- * to consume; late (`Runtime.evaluate`, game already running) hands them
- * straight to `gdjs.BreakpointDebugger.setBreakpoints`.
+ * Re-applies breakpoints if the runtime is already up. Frame-0 breakpoints
+ * are baked into `RuntimeGameOptions.initialBreakpoints` instead; this only
+ * covers re-injection after a context re-creation `gdjs` survived.
  *
  * @param {Array<BreakpointEntry>} bps
  * @returns {void}
  */
 function bootstrapPreviewCdp(bps) {
   if (bps.length === 0) return;
-
-  if (typeof window !== 'undefined') {
-    window.__gdjsInitialBreakpoints = bps;
-  }
 
   if (typeof gdjs !== 'undefined' && gdjs.BreakpointDebugger) {
     gdjs.BreakpointDebugger.setBreakpoints(bps);

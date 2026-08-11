@@ -90,8 +90,6 @@ export const EventsFunctionsExtensionsProvider = ({
     ): Promise<void> => {
       if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
-      lastGeneratedForPreview.current = generateForPreview;
-
       const previousLastLoadPromise =
         lastLoadPromise.current || Promise.resolve();
 
@@ -108,7 +106,12 @@ export const EventsFunctionsExtensionsProvider = ({
             generateForPreview
           );
         })
-        .then(() => setEventsFunctionsExtensionsError(null))
+        .then(() => {
+          // Only recorded on success: a failed load must not make a later
+          // flavor check believe this flavor is already up to date.
+          lastGeneratedForPreview.current = generateForPreview;
+          setEventsFunctionsExtensionsError(null);
+        })
         .catch((eventsFunctionsExtensionsError: Error) => {
           setEventsFunctionsExtensionsError(eventsFunctionsExtensionsError);
           showErrorBox({
@@ -194,8 +197,15 @@ export const EventsFunctionsExtensionsProvider = ({
   );
 
   const _ensureProjectEventsFunctionsExtensionsForFlavor = React.useCallback(
-    (project: ?gdProject, generateForPreview: boolean): Promise<void> => {
-      if (lastGeneratedForPreview.current === generateForPreview) {
+    (
+      project: ?gdProject,
+      generateForPreview: boolean,
+      forceRegeneration: boolean = false
+    ): Promise<void> => {
+      if (
+        !forceRegeneration &&
+        lastGeneratedForPreview.current === generateForPreview
+      ) {
         return ensureLoadFinished();
       }
       return _reloadProjectEventsFunctionsExtensions(

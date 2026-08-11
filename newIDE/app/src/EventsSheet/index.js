@@ -285,7 +285,6 @@ type State = {|
   breakpoints: Set<string>,
 
   pausedOnEventPath: string | null,
-  pausedOnEventId: string,
   isPausedInDebugger: boolean,
   runtimeVariables: any,
 |};
@@ -370,7 +369,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   // $FlowFixMe[missing-local-annot]
   state = {
-    eventsHistory: (getHistoryInitialState(this.props.events, {
+    eventsHistory: (getHistoryInitialState(this._eventsForHistory(), {
       historyMaxSize: 100,
     }): HistoryState),
 
@@ -418,7 +417,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     breakpoints: (new Set(): Set<string>),
 
     pausedOnEventPath: null,
-    pausedOnEventId: '',
     isPausedInDebugger: false,
     runtimeVariables: null,
   };
@@ -1752,7 +1750,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _stepNextEvent = () => {
     if (!this.state.isPausedInDebugger) return;
-    this._breakpointSession.step(this.state.pausedOnEventId);
+    this._breakpointSession.step();
   };
 
   _scrollToPausedEvent = (path: string) => {
@@ -1771,18 +1769,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _clearPausedState = () => {
     this.setState({
       pausedOnEventPath: null,
-      pausedOnEventId: '',
       isPausedInDebugger: false,
       runtimeVariables: null,
     });
   };
 
   // Mark the paused event row and scroll it into view.
-  _onBreakpointHit = ({ path, eventId }: BreakpointHit) => {
+  _onBreakpointHit = ({ path }: BreakpointHit) => {
     this.setState(
       {
         pausedOnEventPath: path,
-        pausedOnEventId: eventId,
         isPausedInDebugger: true,
         // Toast position is preserved across pauses once the user has dragged it.
       },
@@ -2141,6 +2137,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     return [];
   };
 
+  // Events to snapshot in the history, with UUIDs already assigned: undo/redo
+  // restores from a snapshot, and one taken before an event got its UUID
+  // would bring it back without one, orphaning any breakpoint set meanwhile.
+  _eventsForHistory(): gdEventsList {
+    this._breakpointSession.ensureEventsPersistentUuids();
+    return this.props.events;
+  }
+
   _saveChangesToHistory = (
     // actionType is defined from the point of view of the event.
     actionType: RevertableActionType,
@@ -2156,7 +2160,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         eventsHistory: saveToHistory(
           this.state.eventsHistory,
-          this.props.events,
+          this._eventsForHistory(),
           actionType,
           { positions }
         ),

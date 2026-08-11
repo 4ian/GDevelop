@@ -24,12 +24,13 @@ export type EventsFunctionsExtensionsState = {|
   getEventsFunctionsExtensionWriter: () => ?EventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => ?EventsFunctionsExtensionOpener,
   ensureLoadFinished: () => Promise<void>,
-  // Reloads events functions extensions only if they were last generated for
-  // the other flavor (preview vs runtime instrumentation), otherwise just
-  // waits for any load in progress.
+  // Reloads only if last generated for the other flavor (preview vs runtime
+  // instrumentation); otherwise waits for any load in progress.
+  // `forceRegeneration` bypasses the flavor cache (e.g. new UUIDs assigned).
   ensureProjectEventsFunctionsExtensionsForFlavor: (
     project: ?gdProject,
-    generateForPreview: boolean
+    generateForPreview: boolean,
+    forceRegeneration?: boolean
   ) => Promise<void>,
   getIncludeFileHashs: () => { [string]: number },
 |};

@@ -300,8 +300,9 @@ export default class ExportLauncher extends Component<Props, State> {
           }
         : undefined;
 
-      // Regenerate extensions without preview instrumentation (generateForPreview=false).
-      await eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+      // Regenerate extensions without preview instrumentation (generateForPreview=false),
+      // skipping the reload if a previous export already left them in that flavor.
+      await eventsFunctionsExtensionsState.ensureProjectEventsFunctionsExtensionsForFlavor(
         project,
         false
       );

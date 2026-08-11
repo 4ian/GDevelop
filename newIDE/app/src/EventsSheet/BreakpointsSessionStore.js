@@ -32,6 +32,21 @@ export const updateEntry = (
   entries.set(functionId, new Set(breakpoints));
 };
 
+// Whether an events sheet assigned new event UUIDs since the last preview
+// launch. Extension code is generated once and cached across previews, so the
+// launch has to regenerate it for the new ids to reach the runtime.
+let arePersistentUuidsAssigned = false;
+
+export const markPersistentUuidsAssigned = (): void => {
+  arePersistentUuidsAssigned = true;
+};
+
+export const consumePersistentUuidsAssigned = (): boolean => {
+  const assigned = arePersistentUuidsAssigned;
+  arePersistentUuidsAssigned = false;
+  return assigned;
+};
+
 export type BreakpointsPayloadEntry = {|
   functionId: string,
   eventIds: Array<string>,

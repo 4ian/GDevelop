@@ -106,6 +106,8 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { isElectronCDPBridgeAvailable } from '../Debugger/ElectronCDPBridge';
+import { consumePersistentUuidsAssigned } from '../EventsSheet/BreakpointsSessionStore';
 import optionalRequire from '../Utils/OptionalRequire';
 import {
   getElectronUpdateNotificationTitle,
@@ -2654,9 +2656,23 @@ const MainFrame = (props: Props): React.MixedElement => {
         if (isForInGameEdition) {
           await eventsFunctionsExtensionsState.ensureLoadFinished();
         } else {
+          // Assign UUIDs before extension codegen so breakpoints in extension
+          // functions match the editor's ids, not ones stamped later on the
+          // export clone. Gated on CDP so web users' projects never grow UUIDs.
+          let newUuidsAssigned = false;
+          if (isElectronCDPBridgeAvailable()) {
+            // Open events sheets assign ids too, so both sources are checked
+            // (and the sheets' flag always cleared) before deciding.
+            const assignedByEventsSheets = consumePersistentUuidsAssigned();
+            newUuidsAssigned =
+              gd.EventsPersistentUuidHelper.ensureProjectEventsPersistentUuids(
+                currentProject
+              ) || assignedByEventsSheets;
+          }
           await eventsFunctionsExtensionsState.ensureProjectEventsFunctionsExtensionsForFlavor(
             currentProject,
-            true
+            true,
+            newUuidsAssigned
           );
         }
 
@@ -5354,6 +5370,12 @@ const MainFrame = (props: Props): React.MixedElement => {
       const project = state.currentProject;
       if (!project || !onExportHtml5External) return;
       try {
+        // This bypasses LocalCliCommandRunner, so ensure the runtime flavor
+        // (no breakpoint instrumentation) is generated here too.
+        await eventsFunctionsExtensionsState.ensureProjectEventsFunctionsExtensionsForFlavor(
+          project,
+          false
+        );
         await onExportHtml5External(project, i18n);
       } catch (error) {
         console.error('Headless HTML5 export failed:', error);

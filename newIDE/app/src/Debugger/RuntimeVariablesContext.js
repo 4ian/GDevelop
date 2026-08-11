@@ -31,79 +31,22 @@ const RuntimeVariablesContext: React.Context<RuntimeVariablesMap | null> = React
   null
 );
 
-const extractExtensionVariablesFromMap = (
-  extMap: any
-): { [string]: { [string]: RuntimeVariable } } => {
-  if (!extMap || typeof extMap !== 'object') return {};
-  const result: { [string]: { [string]: RuntimeVariable } } = {};
-  for (const extName in extMap) {
-    const items = extMap[extName]?._variables?.items;
-    if (items) result[extName] = items;
-  }
-  return result;
-};
-
-const extractLocalVariablesFromMessage = (
-  rawLocal: any
-): { [string]: Array<{ [string]: RuntimeVariable }> } => {
-  const result: { [string]: Array<{ [string]: RuntimeVariable }> } = {};
-  if (!rawLocal || typeof rawLocal !== 'object') return result;
-  for (const codeNs in rawLocal) {
-    const containers = rawLocal[codeNs];
-    if (!Array.isArray(containers)) continue;
-    const stack: Array<{ [string]: RuntimeVariable }> = [];
-    for (const container of containers) {
-      const items = container?._variables?.items;
-      if (items && typeof items === 'object') stack.push(items);
-    }
-    if (stack.length > 0) result[codeNs] = stack;
-  }
-  return result;
-};
-
-// Accepts the full parsed dump message (`{ command, payload, activeLocalVariables? }`).
-// Passing `payload` alone still works for the `global`/`scene`/extension maps;
-// only `localByCodeNamespace` needs the top-level `activeLocalVariables` field.
+// Accepts the full parsed dump message (`{ command, payload }`); `payload`
+// already matches `RuntimeVariablesMap` field for field (see `buildDumpJson`
+// in GDJS/Runtime/breakpointDebugSupport.ts), so this is a direct read.
 export const extractVariablesFromDump = (
   message: any
 ): RuntimeVariablesMap | null => {
   if (!message) return null;
   const payload = message.payload || message;
 
-  const globalVars = payload._variables?._variables?.items || {};
-  const sceneStack = payload._sceneStack?._stack;
-  const currentScene =
-    Array.isArray(sceneStack) && sceneStack.length > 0
-      ? sceneStack[sceneStack.length - 1]
-      : null;
-  const sceneVars = currentScene?._variables?._variables?.items || {};
-
-  const extensionGlobal = extractExtensionVariablesFromMap(
-    payload._variablesByExtensionName
-  );
-  const extensionScene = extractExtensionVariablesFromMap(
-    currentScene?._variablesByExtensionName
-  );
-  const localByCodeNamespace = extractLocalVariablesFromMessage(
-    message.activeLocalVariables
-  );
-
-  const object: { [string]: { [string]: RuntimeVariable } } = {};
-  const rawObjectVars = currentScene?.objectVariablesByName;
-  if (rawObjectVars && typeof rawObjectVars === 'object') {
-    for (const objName in rawObjectVars) {
-      const items = rawObjectVars[objName]?._variables?.items;
-      if (items) object[objName] = items;
-    }
-  }
-
   return {
-    global: globalVars,
-    scene: sceneVars,
-    extensionGlobal,
-    extensionScene,
-    localByCodeNamespace,
-    object,
+    global: payload.global || {},
+    scene: payload.scene || {},
+    extensionGlobal: payload.extensionGlobal || {},
+    extensionScene: payload.extensionScene || {},
+    localByCodeNamespace: payload.localByCodeNamespace || {},
+    object: payload.object || {},
   };
 };
 

@@ -114,6 +114,13 @@ namespace gdjs {
 
     inGameEditorSettings?: InGameEditorSettings;
 
+    /**
+     * Breakpoints applied as soon as the debugger manager is installed.
+     * Baked in at build time, unlike a live `setBreakpoints` call, so
+     * delivery doesn't depend on CDP injection timing.
+     */
+    initialBreakpoints?: BreakpointEntry[];
+
     /** Script files, used for hot-reloading. */
     scriptFiles?: Array<RuntimeGameOptionsScriptFile>;
     /** if true, export is a partial preview without reloading libraries. */

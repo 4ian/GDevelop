@@ -34,6 +34,7 @@
 #include <GDCore/IDE/Events/EventsIdentifiersFinder.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
 #include <GDCore/IDE/Events/EventsParametersLister.h>
+#include <GDCore/IDE/Events/EventsPersistentUuidHelper.h>
 #include <GDCore/IDE/Events/EventsPositionFinder.h>
 #include <GDCore/IDE/Events/EventsRefactorer.h>
 #include <GDCore/IDE/Events/EventsRemover.h>
@@ -684,6 +685,10 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
 #define STATIC_ExposeProjectEventsWithoutExtensions ExposeProjectEventsWithoutExtensions
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
+#define STATIC_EnsureProjectEventsPersistentUuids \
+  EnsureProjectEventsPersistentUuids
+#define STATIC_EnsurePersistentUuids EnsurePersistentUuids
+#define STATIC_ResetPersistentUuids ResetPersistentUuids
 #define STATIC_ExposeEventsFunctionsExtensionEvents ExposeEventsFunctionsExtensionEvents
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
 #define STATIC_GetResourceTypes GetResourceTypes

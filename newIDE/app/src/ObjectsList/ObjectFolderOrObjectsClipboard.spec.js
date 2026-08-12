@@ -1,0 +1,245 @@
+// @flow
+import Clipboard from '../Utils/Clipboard';
+import { serializeToJSObject } from '../Utils/Serializer';
+import {
+  getSelectionTopLevelNodes,
+  getObjectsToDeleteFromSelection,
+  removeEmptyFoldersFromSelection,
+} from './EnumerateObjectFolderOrObject';
+import {
+  copyObjectFolderOrObjectsToClipboard,
+  hasObjectFolderOrObjectsInClipboard,
+  pasteObjectFolderOrObjectsFromClipboard,
+  getObjectFolderOrObjectsClipboardObjectTypes,
+  getObjectFolderOrObjectsClipboardSummaryName,
+  OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND,
+  OBJECT_CLIPBOARD_KIND,
+} from './ObjectFolderOrObjectsClipboard';
+import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
+
+const gd: libGDevelop = global.gd;
+
+describe('ObjectFolderOrObjectsClipboard', () => {
+  beforeEach(() => {
+    Clipboard.set(OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND, null);
+    Clipboard.set(OBJECT_CLIPBOARD_KIND, null);
+  });
+
+  const makeProjectWithObjects = () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const globalObjectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const objectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const rootFolder = objectsContainer.getRootFolder();
+
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'MySprite',
+      rootFolder,
+      0
+    );
+    const subFolder = rootFolder.insertNewFolder('MyFolder', 1);
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'MySpriteInFolder',
+      subFolder,
+      0
+    );
+
+    return {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      rootFolder,
+      subFolder,
+    };
+  };
+
+  test('getSelectionTopLevelNodes filters out descendants of selected folders', () => {
+    const {
+      project,
+      rootFolder,
+      subFolder,
+    } = makeProjectWithObjects();
+    const objectInFolder = subFolder.getChildAt(0);
+
+    const topLevelNodes = getSelectionTopLevelNodes([
+      { global: false, objectFolderOrObject: subFolder },
+      { global: false, objectFolderOrObject: objectInFolder },
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+    ]);
+
+    expect(topLevelNodes).toEqual([
+      { global: false, objectFolderOrObject: subFolder },
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+    ]);
+
+    project.delete();
+  });
+
+  test('copy then paste a folder with its content, giving unique names', () => {
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      rootFolder,
+      subFolder,
+    } = makeProjectWithObjects();
+
+    copyObjectFolderOrObjectsToClipboard([
+      { global: false, objectFolderOrObject: subFolder },
+    ]);
+    expect(hasObjectFolderOrObjectsInClipboard()).toBe(true);
+    expect(getObjectFolderOrObjectsClipboardSummaryName()).toBe('MyFolder');
+    expect(getObjectFolderOrObjectsClipboardObjectTypes()).toEqual(['Sprite']);
+
+    const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      global: false,
+      destinationFolder: rootFolder,
+      positionInFolder: rootFolder.getChildrenCount(),
+    });
+
+    expect(pastedContent).not.toBe(null);
+    if (!pastedContent) throw new Error('unreachable');
+    expect(pastedContent.createdObjects).toHaveLength(1);
+    expect(pastedContent.topLevelObjectFolderOrObjects).toHaveLength(1);
+
+    const pastedFolder = pastedContent.topLevelObjectFolderOrObjects[0];
+    expect(pastedFolder.isFolder()).toBe(true);
+    // A sibling folder already named "MyFolder" exists, so the pasted one
+    // must get a unique name.
+    expect(pastedFolder.getFolderName()).not.toBe('MyFolder');
+    expect(pastedFolder.getChildrenCount()).toBe(1);
+    // The pasted object must keep a unique name too, distinct from the
+    // original "MySpriteInFolder".
+    expect(objectsContainer.hasObjectNamed('MySpriteInFolder')).toBe(true);
+    expect(objectsContainer.getObjectsCount()).toBe(3);
+
+    project.delete();
+  });
+
+  test('backward compatibility with the legacy single-object clipboard kind', () => {
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      rootFolder,
+    } = makeProjectWithObjects();
+
+    const object = objectsContainer.getObject('MySprite');
+    Clipboard.set(OBJECT_CLIPBOARD_KIND, {
+      name: object.getName(),
+      type: object.getType(),
+      object: serializeToJSObject(object),
+    });
+
+    expect(hasObjectFolderOrObjectsInClipboard()).toBe(true);
+    expect(Clipboard.has(OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND)).toBe(false);
+
+    const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      global: false,
+      destinationFolder: rootFolder,
+      positionInFolder: rootFolder.getChildrenCount(),
+    });
+
+    expect(pastedContent).not.toBe(null);
+    if (!pastedContent) throw new Error('unreachable');
+    expect(pastedContent.createdObjects).toHaveLength(1);
+
+    project.delete();
+  });
+
+  test('duplicateObjectFolderOrObjects creates independent copies without touching the clipboard', () => {
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      rootFolder,
+    } = makeProjectWithObjects();
+
+    const objectItem = {
+      global: false,
+      objectFolderOrObject: rootFolder.getChildAt(0),
+    };
+
+    const clipboardSummaryBefore = getObjectFolderOrObjectsClipboardSummaryName();
+
+    const duplicatedContent = duplicateObjectFolderOrObjects({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      items: [objectItem],
+      destinationFolder: rootFolder,
+      positionInFolder: 1,
+    });
+
+    expect(duplicatedContent).not.toBe(null);
+    if (!duplicatedContent) throw new Error('unreachable');
+    expect(duplicatedContent.createdObjects).toHaveLength(1);
+    expect(objectsContainer.getObjectsCount()).toBe(3);
+    // Duplication must not read from nor write to the OS clipboard.
+    expect(getObjectFolderOrObjectsClipboardSummaryName()).toBe(
+      clipboardSummaryBefore
+    );
+
+    project.delete();
+  });
+
+  test('getObjectsToDeleteFromSelection and removeEmptyFoldersFromSelection handle nested folders bottom-up', () => {
+    const {
+      project,
+      objectsContainer,
+      rootFolder,
+      subFolder,
+    } = makeProjectWithObjects();
+
+    const nestedFolder = subFolder.insertNewFolder('NestedFolder', 1);
+
+    const objectsToDelete = getObjectsToDeleteFromSelection([subFolder]);
+    expect(objectsToDelete.map(object => object.getName())).toEqual([
+      'MySpriteInFolder',
+    ]);
+
+    objectsContainer.removeObject('MySpriteInFolder');
+    expect(subFolder.getChildrenCount()).toBe(1);
+    expect(nestedFolder.getChildrenCount()).toBe(0);
+
+    removeEmptyFoldersFromSelection([subFolder]);
+
+    expect(rootFolder.getChildrenCount()).toBe(1);
+    expect(rootFolder.getChildAt(0).isFolder()).toBe(false);
+
+    project.delete();
+  });
+
+  test('removeEmptyFoldersFromSelection does not crash when some top-level selected items are plain objects already removed from the container', () => {
+    // Regression test: bulk-deleting a selection made of several plain
+    // objects (no folders at all) used to throw a UseAfterFreeError, because
+    // `collectFoldersBottomUp` called `isFolder()` on objects that had
+    // already been removed from the container (their wrapper is dead).
+    const { project, objectsContainer, rootFolder } = makeProjectWithObjects();
+
+    const topLevelObjectFolderOrObjects = [
+      rootFolder.getChildAt(0), // 'MySprite', a plain object.
+    ];
+
+    objectsContainer.removeObject('MySprite');
+
+    expect(() =>
+      removeEmptyFoldersFromSelection(topLevelObjectFolderOrObjects)
+    ).not.toThrow();
+
+    project.delete();
+  });
+});

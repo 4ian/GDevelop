@@ -10,16 +10,21 @@ import {
   copyObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
   pasteObjectFolderOrObjectsFromClipboard,
-  duplicateObjectFolderOrObjects,
   getObjectFolderOrObjectsClipboardObjectTypes,
   getObjectFolderOrObjectsClipboardSummaryName,
   OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND,
   OBJECT_CLIPBOARD_KIND,
 } from './ObjectFolderOrObjectsClipboard';
+import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
 
 const gd: libGDevelop = global.gd;
 
 describe('ObjectFolderOrObjectsClipboard', () => {
+  beforeEach(() => {
+    Clipboard.set(OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND, null);
+    Clipboard.set(OBJECT_CLIPBOARD_KIND, null);
+  });
+
   const makeProjectWithObjects = () => {
     const project = gd.ProjectHelper.createNewGDJSProject();
     const globalObjectsContainer = new gd.ObjectsContainer(
@@ -57,7 +62,7 @@ describe('ObjectFolderOrObjectsClipboard', () => {
 
   test('getSelectionTopLevelNodes filters out descendants of selected folders', () => {
     const {
-      objectsContainer,
+      project,
       rootFolder,
       subFolder,
     } = makeProjectWithObjects();
@@ -74,7 +79,7 @@ describe('ObjectFolderOrObjectsClipboard', () => {
       { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
     ]);
 
-    objectsContainer.delete();
+    project.delete();
   });
 
   test('copy then paste a folder with its content, giving unique names', () => {

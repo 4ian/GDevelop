@@ -21,10 +21,7 @@ import {
   findSurfaceBackgroundColor,
 } from './StickyRows';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
-import {
-  useShiftRangeSelection,
-  type SelectionNode,
-} from './useShiftRangeSelection';
+import { useTreeViewSelection } from './useTreeViewSelection';
 
 export const navigationKeys = [
   'ArrowDown',
@@ -68,7 +65,7 @@ type FlattenedNode<Item> = {|
 |};
 
 export type SelectArgs<Item> = {|
-  node: SelectionNode<Item>,
+  node: FlattenedNode<Item>,
   exclusive?: boolean,
   extendFromAnchor?: boolean,
 |};
@@ -97,6 +94,7 @@ export type ItemData<Item> = {|
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
   shouldSelectUponContextMenuOpening?: boolean,
+  multiSelect: boolean,
 |};
 
 const getItemProps = memoizeOne(
@@ -124,7 +122,8 @@ const getItemProps = memoizeOne(
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
     forceDefaultDraggingPreview?: boolean,
-    shouldSelectUponContextMenuOpening?: boolean
+    shouldSelectUponContextMenuOpening?: boolean,
+    multiSelect: boolean
   ): ItemData<Item> => ({
     onOpen,
     onClick,
@@ -142,6 +141,7 @@ const getItemProps = memoizeOne(
     getItemHtmlId,
     forceDefaultDraggingPreview,
     shouldSelectUponContextMenuOpening,
+    multiSelect,
   })
 );
 
@@ -421,7 +421,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [flattenOpened, items, searchText]
   );
 
-  const onSelect = useShiftRangeSelection({
+  const onSelect = useTreeViewSelection({
     multiSelect,
     selectedItems,
     flattenedData,
@@ -721,7 +721,8 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
-    shouldSelectUponContextMenuOpening
+    shouldSelectUponContextMenuOpening,
+    multiSelect
   );
 
   // Reset opened nodes during search when user stops searching

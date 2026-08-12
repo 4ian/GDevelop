@@ -33,9 +33,9 @@ import {
 } from './EnumerateObjectFolderOrObject';
 import {
   hasObjectFolderOrObjectsInClipboard,
-  getObjectFolderOrObjectsClipboardSummaryName,
   getObjectFolderOrObjectsClipboardObjectTypes,
   pasteObjectFolderOrObjectsFromClipboard,
+  getPasteMenuLabel,
 } from './ObjectFolderOrObjectsClipboard';
 import { useObjectsSelection } from './useObjectsSelection';
 import { useBulkObjectOperations } from './useBulkObjectOperations';
@@ -393,11 +393,6 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 }
 
-const getPasteMenuLabel = (i18n: I18nType): string =>
-  hasObjectFolderOrObjectsInClipboard()
-    ? i18n._(t`Paste ${getObjectFolderOrObjectsClipboardSummaryName()}`)
-    : i18n._(t`Paste`);
-
 const getTreeViewItemName = (item: TreeViewItem) => item.content.getName();
 const getTreeViewItemId = (item: TreeViewItem) => item.content.getId();
 const getTreeViewItemHtmlId = (item: TreeViewItem, index: number) =>
@@ -525,7 +520,7 @@ type Props = {|
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
   ) => void,
-  onObjectFolderOrObjectWithContextSelected: (
+  onObjectFolderOrObjectsWithContextSelected: (
     Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onObjectPasted?: gdObject => void,
@@ -571,7 +566,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       onImportAssets,
       onObjectCreated,
       onObjectEdited,
-      onObjectFolderOrObjectWithContextSelected,
+      onObjectFolderOrObjectsWithContextSelected,
       onObjectPasted,
       getValidatedObjectOrGroupName,
       onAddObjectInstance,
@@ -723,7 +718,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         // $FlowFixMe[constant-condition]
         if (onEditObject) {
           onEditObject(object);
-          onObjectFolderOrObjectWithContextSelected([
+          onObjectFolderOrObjectsWithContextSelected([
             objectFolderOrObjectWithContext,
           ]);
         }
@@ -737,7 +732,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         globalObjectsContainer,
         scrollToItem,
         onObjectCreated,
-        onObjectFolderOrObjectWithContextSelected,
+        onObjectFolderOrObjectsWithContextSelected,
       ]
     );
 
@@ -812,7 +807,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const objectsRootFolder = objectsContainer.getRootFolder();
 
     const {
-      lastSectionRef,
+      lastSectionWasGlobalRef,
       selectObjectFolderOrObjectsWithContext,
       selectObjectFolderOrObjectWithContext,
       selectAllInSection,
@@ -821,7 +816,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectFolderOrObjectsWithContext,
       globalObjectsRootFolder,
       objectsRootFolder,
-      onObjectFolderOrObjectWithContextSelected,
+      onObjectFolderOrObjectsWithContextSelected,
     });
 
     const editName = React.useCallback(
@@ -1075,6 +1070,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       bulkDelete,
       bulkCut,
       bulkPaste,
+      bulkDuplicate,
       bulkSetAsGlobalObject,
       buildBulkMenuTemplate,
     } = useBulkObjectOperations({
@@ -1118,12 +1114,12 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
         if (topLevelObjectFolderOrObjects.length === 0) return;
 
+        // onObjectModified(true) already calls forceUpdateList internally.
         onObjectModified(true);
         if (createdObjects.length > 0) {
           if (onObjectPasted) onObjectPasted(createdObjects[0]);
           onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
         }
-        forceUpdateList();
         selectObjectFolderOrObjectsWithContext(
           topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
             objectFolderOrObject: pastedObjectFolderOrObject,
@@ -1139,7 +1135,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onObjectPasted,
         onObjectModified,
         onObjectCreated,
-        forceUpdateList,
         selectObjectFolderOrObjectsWithContext,
       ]
     );
@@ -1261,6 +1256,19 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       (!globalObjectsContainer ||
         globalObjectsContainer.getObjectsCount() === 0);
 
+    const buildPasteMenuItem = React.useCallback(
+      (
+        i18n: I18nType,
+        folder: gdObjectFolderOrObject,
+        global: boolean
+      ) => ({
+        label: getPasteMenuLabel(i18n),
+        enabled: hasObjectFolderOrObjectsInClipboard() && !isListLocked,
+        click: () => pasteIntoFolder(folder, global),
+      }),
+      [isListLocked, pasteIntoFolder]
+    );
+
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
         const treeViewItems = [
@@ -1274,12 +1282,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 i18n._(labels.higherScopeObjectsTitle),
                 null,
                 () => [
-                  {
-                    label: getPasteMenuLabel(i18n),
-                    enabled:
-                      hasObjectFolderOrObjectsInClipboard() && !isListLocked,
-                    click: () => pasteIntoFolder(globalObjectsRootFolder, true),
-                  },
+                  buildPasteMenuItem(i18n, globalObjectsRootFolder, true),
                   { type: 'separator' },
                   {
                     label: i18n._(t`Add a folder`),
@@ -1320,12 +1323,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                   </Trans>
                 ),
                 () => [
-                  {
-                    label: getPasteMenuLabel(i18n),
-                    enabled:
-                      hasObjectFolderOrObjectsInClipboard() && !isListLocked,
-                    click: () => pasteIntoFolder(globalObjectsRootFolder, true),
-                  },
+                  buildPasteMenuItem(i18n, globalObjectsRootFolder, true),
                 ]
               ),
               objectTreeViewItemProps,
@@ -1350,12 +1348,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                 enabled: !isListLocked,
               },
               () => [
-                {
-                  label: getPasteMenuLabel(i18n),
-                  enabled:
-                    hasObjectFolderOrObjectsInClipboard() && !isListLocked,
-                  click: () => pasteIntoFolder(objectsRootFolder, false),
-                },
+                buildPasteMenuItem(i18n, objectsRootFolder, false),
                 { type: 'separator' },
                 {
                   label: i18n._(t`Add a folder`),
@@ -1392,14 +1385,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             placeholder: new PlaceHolderTreeViewItem(
               sceneObjectsEmptyPlaceholderId,
               i18n._(t`Start by adding a new object.`),
-              () => [
-                {
-                  label: getPasteMenuLabel(i18n),
-                  enabled:
-                    hasObjectFolderOrObjectsInClipboard() && !isListLocked,
-                  click: () => pasteIntoFolder(objectsRootFolder, false),
-                },
-              ]
+              () => [buildPasteMenuItem(i18n, objectsRootFolder, false)]
             ),
             objectTreeViewItemProps,
             objectFolderTreeViewItemProps,
@@ -1423,7 +1409,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         selectedObjectFolderOrObjectsWithContext,
         onExportAssets,
         onImportAssets,
-        pasteIntoFolder,
+        buildPasteMenuItem,
       ]
     );
 
@@ -1477,9 +1463,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             'onDuplicate',
             () => {
               if (isListLocked) return;
-              // Duplication is only available for a single selected item, to
-              // match what's offered in the context menu.
               if (selectedItems.length === 1) duplicateItem(selectedItems[0]);
+              else if (selectedItems.length > 1) bulkDuplicate();
             }
           );
           keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
@@ -1500,7 +1485,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           keyboardShortcutsRef.current.setShortcutCallback('onPaste', () => {
             if (isListLocked) return;
             if (selectedItems.length === 0) {
-              const isGlobal = lastSectionRef.current;
+              const isGlobal = lastSectionWasGlobalRef.current;
               const targetFolder =
                 isGlobal && globalObjectsRootFolder
                   ? globalObjectsRootFolder
@@ -1530,12 +1515,13 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         bulkCopy,
         bulkCut,
         bulkPaste,
+        bulkDuplicate,
         pasteIntoFolder,
         globalObjectsRootFolder,
         objectsRootFolder,
         selectAllInSection,
         deselectAll,
-        lastSectionRef,
+        lastSectionWasGlobalRef,
       ]
     );
 
@@ -1622,8 +1608,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               globalObjectsEmptyPlaceholderId &&
             topLevelSelectedItems.every(item => !item.content.isGlobal()) &&
             topLevelSelectedItems.every(item => {
-              const fof = item.content.getObjectFolderOrObject();
-              return !!fof && !fof.isFolder();
+              const objectFolderOrObject = item.content.getObjectFolderOrObject();
+              return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
             })
           ) {
             bulkSetAsGlobalObject(i18n);
@@ -1645,8 +1631,8 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
             topLevelSelectedItems.every(item => !item.content.isGlobal()) &&
             destinationItem.content.isGlobal() &&
             topLevelSelectedItems.every(item => {
-              const fof = item.content.getObjectFolderOrObject();
-              return !!fof && !fof.isFolder();
+              const objectFolderOrObject = item.content.getObjectFolderOrObject();
+              return !!objectFolderOrObject && !objectFolderOrObject.isFolder();
             })
           ) {
             let parent, baseIndex;

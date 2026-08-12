@@ -18,16 +18,14 @@ import {
   hasObjectFolderOrObjectsInClipboard,
   getObjectFolderOrObjectsClipboardObjectTypes,
   pasteObjectFolderOrObjectsFromClipboard,
+  getPasteMenuLabel,
+  getUniqueFolderName,
 } from './ObjectFolderOrObjectsClipboard';
+import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 
 const gd: libGDevelop = global.gd;
-
-const getPasteMenuLabel = (i18n: I18nType): string =>
-  hasObjectFolderOrObjectsInClipboard()
-    ? i18n._(t`Paste`)
-    : i18n._(t`Paste (empty clipboard)`);
 
 type ObjectWithContext = {| object: gdObject, global: boolean |};
 
@@ -94,14 +92,25 @@ function useBulkObjectOperations({
   bulkDelete: () => Promise<boolean>,
   bulkCut: () => Promise<void>,
   bulkPaste: () => void,
+  bulkDuplicate: () => void,
   bulkSetAsGlobalObject: (
     i18n: I18nType,
     options?: {| folder?: gdObjectFolderOrObject, index?: number |}
   ) => void,
-  bulkMoveToFolder: (destinationFolder: gdObjectFolderOrObject) => void,
-  bulkMoveToNewFolder: () => void,
   buildBulkMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
 |} {
+  // Pre-compute the de-nested selection once per selection change so that
+  // bulkDelete, bulkMoveToFolder, bulkMoveToNewFolder, and buildBulkMenuTemplate
+  // don't each call getSelectionTopLevelNodes independently.
+  const topLevelSelectedItems = React.useMemo(
+    () => getSelectionTopLevelNodes(selectedObjectFolderOrObjectsWithContext),
+    [selectedObjectFolderOrObjectsWithContext]
+  );
+  const selectionIsGlobal = React.useMemo(
+    () => topLevelSelectedItems.length > 0 && topLevelSelectedItems[0].global,
+    [topLevelSelectedItems]
+  );
+
   const bulkCopy = React.useCallback(
     () => {
       copyObjectFolderOrObjectsToClipboard(
@@ -111,19 +120,71 @@ function useBulkObjectOperations({
     [selectedObjectFolderOrObjectsWithContext]
   );
 
+  const bulkDuplicate = React.useCallback(
+    () => {
+      if (isListLocked) return;
+      if (topLevelSelectedItems.length === 0) return;
+
+      const allCreatedObjects: Array<gdObject> = [];
+      const allNewItems: Array<ObjectFolderOrObjectWithContext> = [];
+      // Track how many items were inserted per parent to adjust positions
+      // correctly when multiple selected siblings share the same folder.
+      const insertionOffsets: Map<gdObjectFolderOrObject, number> = new Map();
+
+      topLevelSelectedItems.forEach(item => {
+        const parent = item.objectFolderOrObject.getParent();
+        const currentOffset = insertionOffsets.get(parent) || 0;
+        const position =
+          parent.getChildPosition(item.objectFolderOrObject) +
+          1 +
+          currentOffset;
+
+        const result = duplicateObjectFolderOrObjects({
+          project,
+          globalObjectsContainer,
+          objectsContainer,
+          items: [item],
+          destinationFolder: parent,
+          positionInFolder: position,
+        });
+        if (!result) return;
+
+        allCreatedObjects.push(...result.createdObjects);
+        result.topLevelObjectFolderOrObjects.forEach(objectFolderOrObject => {
+          allNewItems.push({ objectFolderOrObject, global: item.global });
+        });
+        insertionOffsets.set(parent, currentOffset + 1);
+      });
+
+      if (allNewItems.length === 0) return;
+
+      // Duplicating existing objects can never introduce a new type to the
+      // project — the originals are already present.
+      onObjectCreated(allCreatedObjects, false);
+      onObjectModified(true);
+      selectObjectFolderOrObjectsWithContext(allNewItems);
+    },
+    [
+      isListLocked,
+      topLevelSelectedItems,
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      onObjectCreated,
+      onObjectModified,
+      selectObjectFolderOrObjectsWithContext,
+    ]
+  );
+
   const bulkDelete = React.useCallback(
     async (): Promise<boolean> => {
       if (isListLocked) return false;
-      const topLevelItems = getSelectionTopLevelNodes(
-        selectedObjectFolderOrObjectsWithContext
-      );
-      if (topLevelItems.length === 0) return false;
-      const global = topLevelItems[0].global;
+      if (topLevelSelectedItems.length === 0) return false;
       const container =
-        global && globalObjectsContainer
+        selectionIsGlobal && globalObjectsContainer
           ? globalObjectsContainer
           : objectsContainer;
-      const topLevelObjectFolderOrObjects = topLevelItems.map(
+      const topLevelObjectFolderOrObjects = topLevelSelectedItems.map(
         item => item.objectFolderOrObject
       );
       const objectsToDelete = getObjectsToDeleteFromSelection(
@@ -149,7 +210,7 @@ function useBulkObjectOperations({
 
       const objectsWithContext = objectsToDelete.map(object => ({
         object,
-        global,
+        global: selectionIsGlobal,
       }));
 
       selectObjectFolderOrObjectsWithContext([]);
@@ -169,7 +230,8 @@ function useBulkObjectOperations({
     },
     [
       isListLocked,
-      selectedObjectFolderOrObjectsWithContext,
+      topLevelSelectedItems,
+      selectionIsGlobal,
       globalObjectsContainer,
       objectsContainer,
       showDeleteConfirmation,
@@ -183,13 +245,10 @@ function useBulkObjectOperations({
   const bulkCut = React.useCallback(
     async () => {
       if (isListLocked) return;
-      const topLevelItems = getSelectionTopLevelNodes(
-        selectedObjectFolderOrObjectsWithContext
-      );
-      if (topLevelItems.length === 0) return;
+      if (topLevelSelectedItems.length === 0) return;
       // Serialize while C++ objects are still alive, before any deletion.
       const clipboardPayload = serializeObjectFolderOrObjectsForClipboard(
-        topLevelItems
+        topLevelSelectedItems
       );
       if (!clipboardPayload) return;
       // Write to the OS clipboard only if the user confirms deletion, so
@@ -198,7 +257,7 @@ function useBulkObjectOperations({
       if (!deleted) return;
       writeObjectFolderOrObjectsToClipboard(clipboardPayload);
     },
-    [isListLocked, selectedObjectFolderOrObjectsWithContext, bulkDelete]
+    [isListLocked, topLevelSelectedItems, bulkDelete]
   );
 
   const bulkPaste = React.useCallback(
@@ -233,6 +292,7 @@ function useBulkObjectOperations({
       const { createdObjects, topLevelObjectFolderOrObjects } = pastedContent;
       if (topLevelObjectFolderOrObjects.length === 0) return;
 
+      // onObjectModified(true) already calls forceUpdateList internally.
       onObjectModified(true);
       // Only fire object hooks when actual objects were created; pasting
       // empty folders produces topLevelObjectFolderOrObjects but no objects.
@@ -240,7 +300,6 @@ function useBulkObjectOperations({
         if (onObjectPasted) onObjectPasted(createdObjects[0]);
         onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
       }
-      forceUpdateList();
       selectObjectFolderOrObjectsWithContext(
         topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
           objectFolderOrObject: pastedObjectFolderOrObject,
@@ -257,7 +316,6 @@ function useBulkObjectOperations({
       onObjectPasted,
       onObjectModified,
       onObjectCreated,
-      forceUpdateList,
       selectObjectFolderOrObjectsWithContext,
     ]
   );
@@ -268,14 +326,17 @@ function useBulkObjectOperations({
       options?: {| folder?: gdObjectFolderOrObject, index?: number |}
     ) => {
       if (!globalObjectsContainer) return;
-      const objectItems = selectedObjectFolderOrObjectsWithContext.filter(
+      // Only scene objects (not folders, not already-global) can be promoted.
+      const candidates = selectedObjectFolderOrObjectsWithContext.filter(
         item => !item.global && !item.objectFolderOrObject.isFolder()
       );
-      if (objectItems.length === 0) return;
+      if (candidates.length === 0) return;
 
-      for (const item of objectItems) {
+      // Filter out items that cannot be promoted, showing a warning per
+      // item rather than aborting the whole operation.
+      const objectItems = candidates.filter(item => {
         const objectName = item.objectFolderOrObject.getObject().getName();
-        if (!objectsContainer.hasObjectNamed(objectName)) return;
+        if (!objectsContainer.hasObjectNamed(objectName)) return false;
         if (globalObjectsContainer.hasObjectNamed(objectName)) {
           showWarningBox(
             i18n._(
@@ -283,12 +344,14 @@ function useBulkObjectOperations({
             ),
             { delayToNextTick: true }
           );
-          return;
+          return false;
         }
         if (beforeSetAsGlobalObject && !beforeSetAsGlobalObject(objectName)) {
-          return;
+          return false;
         }
-      }
+        return true;
+      });
+      if (objectItems.length === 0) return;
 
       const answer = Window.showConfirmDialog(
         i18n._(
@@ -306,10 +369,13 @@ function useBulkObjectOperations({
         optionsFolder && optionsFolder.isFolder()
           ? optionsFolder
           : globalObjectsContainer.getRootFolder();
+      // Use getChildrenCount() of the target folder — not getObjectsCount() of
+      // the container — so the index stays in-range when the folder contains
+      // sub-folders (object count ≠ folder child count).
       const baseIndex =
         options && typeof options.index === 'number'
           ? options.index
-          : globalObjectsContainer.getObjectsCount();
+          : destinationFolder.getChildrenCount();
 
       objectItems.forEach((item, i) => {
         objectsContainer.moveObjectFolderOrObjectToAnotherContainerInFolder(
@@ -344,15 +410,11 @@ function useBulkObjectOperations({
   const bulkMoveToFolder = React.useCallback(
     (destinationFolder: gdObjectFolderOrObject) => {
       if (isListLocked) return;
-      const topLevelItems = getSelectionTopLevelNodes(
-        selectedObjectFolderOrObjectsWithContext
-      );
-      if (topLevelItems.length === 0) return;
-      const global = topLevelItems[0].global;
+      if (topLevelSelectedItems.length === 0) return;
       // Start after existing children so items arrive in their original
       // selection order, not reversed.
       let insertPosition = destinationFolder.getChildrenCount();
-      topLevelItems.forEach(item => {
+      topLevelSelectedItems.forEach(item => {
         const currentParent = item.objectFolderOrObject.getParent();
         if (destinationFolder === currentParent) return;
         currentParent.moveObjectFolderOrObjectToAnotherFolder(
@@ -364,12 +426,13 @@ function useBulkObjectOperations({
       });
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
         objectFolderOrObject: destinationFolder,
-        global,
+        global: selectionIsGlobal,
       });
     },
     [
       isListLocked,
-      selectedObjectFolderOrObjectsWithContext,
+      topLevelSelectedItems,
+      selectionIsGlobal,
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
     ]
   );
@@ -377,19 +440,15 @@ function useBulkObjectOperations({
   const bulkMoveToNewFolder = React.useCallback(
     () => {
       if (isListLocked) return;
-      const topLevelItems = getSelectionTopLevelNodes(
-        selectedObjectFolderOrObjectsWithContext
-      );
-      if (topLevelItems.length === 0) return;
-      const global = topLevelItems[0].global;
+      if (topLevelSelectedItems.length === 0) return;
       const container =
-        global && globalObjectsContainer
+        selectionIsGlobal && globalObjectsContainer
           ? globalObjectsContainer
           : objectsContainer;
-      const newFolder = container
-        .getRootFolder()
-        .insertNewFolder('NewFolder', 0);
-      topLevelItems.forEach(item => {
+      const rootFolder = container.getRootFolder();
+      const uniqueName = getUniqueFolderName(rootFolder, 'NewFolder');
+      const newFolder = rootFolder.insertNewFolder(uniqueName, 0);
+      topLevelSelectedItems.forEach(item => {
         const currentParent = item.objectFolderOrObject.getParent();
         currentParent.moveObjectFolderOrObjectToAnotherFolder(
           item.objectFolderOrObject,
@@ -399,16 +458,17 @@ function useBulkObjectOperations({
       });
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer({
         objectFolderOrObject: newFolder,
-        global,
+        global: selectionIsGlobal,
       });
       selectObjectFolderOrObjectsWithContext([
-        { objectFolderOrObject: newFolder, global },
+        { objectFolderOrObject: newFolder, global: selectionIsGlobal },
       ]);
-      onNewFolderCreated(newFolder, global);
+      onNewFolderCreated(newFolder, selectionIsGlobal);
     },
     [
       isListLocked,
-      selectedObjectFolderOrObjectsWithContext,
+      topLevelSelectedItems,
+      selectionIsGlobal,
       globalObjectsContainer,
       objectsContainer,
       onMovedObjectFolderOrObjectToAnotherFolderInSameContainer,
@@ -419,13 +479,9 @@ function useBulkObjectOperations({
 
   const buildBulkMenuTemplate = React.useCallback(
     (i18n: I18nType): Array<MenuItemTemplate> => {
-      const topLevelItems = getSelectionTopLevelNodes(
-        selectedObjectFolderOrObjectsWithContext
-      );
-      if (topLevelItems.length === 0) return [];
-      const global = topLevelItems[0].global;
+      if (topLevelSelectedItems.length === 0) return [];
       const container =
-        global && globalObjectsContainer
+        selectionIsGlobal && globalObjectsContainer
           ? globalObjectsContainer
           : objectsContainer;
       const folderAndPathsInContainer = enumerateFoldersInContainer(container);
@@ -438,7 +494,7 @@ function useBulkObjectOperations({
           // Hide folders that are selected or are descendants of a selected
           // folder (can't move a folder into itself or its own subtree).
           if (
-            topLevelItems.some(
+            topLevelSelectedItems.some(
               item =>
                 folder === item.objectFolderOrObject ||
                 folder.isADescendantOf(item.objectFolderOrObject)
@@ -448,7 +504,7 @@ function useBulkObjectOperations({
           // Hide a folder when every selected item is already a direct
           // child of it — moving there would be a no-op.
           if (
-            topLevelItems.every(
+            topLevelSelectedItems.every(
               item => item.objectFolderOrObject.getParent() === folder
             )
           )
@@ -458,10 +514,10 @@ function useBulkObjectOperations({
       );
 
       const canSetAllAsGlobal =
-        !global &&
+        !selectionIsGlobal &&
         !!globalObjectsContainer &&
         canSetAsGlobalObject !== false &&
-        topLevelItems.every(item => !item.objectFolderOrObject.isFolder());
+        topLevelSelectedItems.every(item => !item.objectFolderOrObject.isFolder());
 
       const menuItems: Array<MenuItemTemplate | null> = [
         {
@@ -479,6 +535,12 @@ function useBulkObjectOperations({
           click: () => bulkPaste(),
         },
         {
+          label: i18n._(t`Duplicate`),
+          click: () => bulkDuplicate(),
+          enabled: !isListLocked,
+          accelerator: 'CmdOrCtrl+D',
+        },
+        {
           label: i18n._(t`Delete`),
           click: () => {
             bulkDelete();
@@ -488,9 +550,9 @@ function useBulkObjectOperations({
         },
         { type: 'separator' },
         isListLocked
-          ? { label: i18n._('Move to folder'), enabled: false }
+          ? { label: i18n._(t`Move to folder`), enabled: false }
           : {
-              label: i18n._('Move to folder'),
+              label: i18n._(t`Move to folder`),
               submenu: [
                 ...movableFolderAndPaths.map(({ folder, path }) => ({
                   label: path,
@@ -514,7 +576,8 @@ function useBulkObjectOperations({
       return menuItems.filter(Boolean);
     },
     [
-      selectedObjectFolderOrObjectsWithContext,
+      topLevelSelectedItems,
+      selectionIsGlobal,
       globalObjectsContainer,
       objectsContainer,
       canSetAsGlobalObject,
@@ -522,6 +585,7 @@ function useBulkObjectOperations({
       bulkCopy,
       bulkCut,
       bulkPaste,
+      bulkDuplicate,
       bulkDelete,
       bulkMoveToFolder,
       bulkMoveToNewFolder,
@@ -534,9 +598,8 @@ function useBulkObjectOperations({
     bulkDelete,
     bulkCut,
     bulkPaste,
+    bulkDuplicate,
     bulkSetAsGlobalObject,
-    bulkMoveToFolder,
-    bulkMoveToNewFolder,
     buildBulkMenuTemplate,
   };
 }

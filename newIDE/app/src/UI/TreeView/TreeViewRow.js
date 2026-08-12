@@ -223,13 +223,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      // Preserve an existing multi-selection when right-clicking one of its
-      // rows (as in most file explorers). Only select the row if it's not
-      // already part of the selection.
-      if (!node.item.isRoot && !node.selected) onClickItem(event);
+      // In multi-select mode, preserve an existing selection when right-clicking
+      // one of its rows. In single-select mode always (re-)select the row so
+      // that the context menu always operates on the correct item.
+      if (!node.item.isRoot && !(data.multiSelect && node.selected))
+        onClickItem(event);
       openContextMenu(event);
     },
-    [node, onClickItem, openContextMenu]
+    [node, data.multiSelect, onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(

@@ -11,6 +11,8 @@ import {
   type ObjectFolderOrObjectWithContext,
   getSelectionTopLevelNodes,
 } from './EnumerateObjectFolderOrObject';
+import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 export const OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND = 'ObjectFolderOrObjects';
 
@@ -32,7 +34,7 @@ type SerializedFolderNode = {|
 |};
 type SerializedNode = SerializedObjectNode | SerializedFolderNode;
 
-const serializeObjectFolderOrObjectNode = (
+export const serializeObjectFolderOrObjectNode = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): SerializedNode => {
   if (objectFolderOrObject.isFolder()) {
@@ -139,8 +141,8 @@ export const getObjectFolderOrObjectsClipboardContent = (): ?{|
 };
 
 /**
- * A short, human readable name of what's in the clipboard, to display in
- * "Paste ..." menu labels.
+ * A short, human readable name of what's in the clipboard, used in
+ * "Paste ..." menu labels for single-item context menus.
  */
 export const getObjectFolderOrObjectsClipboardSummaryName = (): string => {
   const content = getObjectFolderOrObjectsClipboardContent();
@@ -148,6 +150,20 @@ export const getObjectFolderOrObjectsClipboardSummaryName = (): string => {
   if (content.items.length === 1) return content.items[0].name;
   return `${content.items.length} items`;
 };
+
+/**
+ * Returns the localised label for a "Paste" menu item.
+ * Shows the item name when one item is in the clipboard, a pluralised count
+ * when several are, and a disabled hint when the clipboard is empty.
+ */
+export const getPasteMenuLabel = (i18n: I18nType): string => {
+  const content = getObjectFolderOrObjectsClipboardContent();
+  if (!content || content.items.length === 0) return i18n._(t`Paste`);
+  if (content.items.length === 1)
+    return i18n._(t`Paste "${content.items[0].name}"`);
+  return i18n._(t`Paste ${content.items.length} items`);
+};
+
 
 const collectNodeObjectTypes = (
   node: SerializedNode,
@@ -173,7 +189,7 @@ export const getObjectFolderOrObjectsClipboardObjectTypes = (): Array<string> =>
   return types;
 };
 
-const getUniqueFolderName = (
+export const getUniqueFolderName = (
   parentFolder: gdObjectFolderOrObject,
   desiredName: string
 ): string => {
@@ -188,7 +204,7 @@ const getUniqueFolderName = (
   );
 };
 
-const pasteNode = ({
+export const pasteNode = ({
   node,
   project,
   globalObjectsContainer,
@@ -301,51 +317,3 @@ export const pasteObjectFolderOrObjectsFromClipboard = ({
   return { createdObjects, topLevelObjectFolderOrObjects };
 };
 
-/**
- * Duplicate objects and/or folders in place (right after themselves, or at
- * the given position), without touching the OS clipboard.
- */
-export const duplicateObjectFolderOrObjects = ({
-  project,
-  globalObjectsContainer,
-  objectsContainer,
-  items,
-  destinationFolder,
-  positionInFolder,
-}: {|
-  project: gdProject,
-  globalObjectsContainer: gdObjectsContainer | null,
-  objectsContainer: gdObjectsContainer,
-  items: Array<ObjectFolderOrObjectWithContext>,
-  destinationFolder: gdObjectFolderOrObject,
-  positionInFolder: number,
-|}): ?{|
-  createdObjects: Array<gdObject>,
-  topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>,
-|} => {
-  const topLevelItems = getSelectionTopLevelNodes(items);
-  if (topLevelItems.length === 0) return null;
-
-  const createdObjects: Array<gdObject> = [];
-  const topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject> = [];
-  topLevelItems.forEach((item, index) => {
-    const container =
-      item.global && globalObjectsContainer
-        ? globalObjectsContainer
-        : objectsContainer;
-    const node = serializeObjectFolderOrObjectNode(item.objectFolderOrObject);
-    const pastedNode = pasteNode({
-      node,
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      container,
-      parentFolder: destinationFolder,
-      position: positionInFolder + index,
-    });
-    createdObjects.push(...pastedNode.createdObjects);
-    topLevelObjectFolderOrObjects.push(pastedNode.objectFolderOrObject);
-  });
-
-  return { createdObjects, topLevelObjectFolderOrObjects };
-};

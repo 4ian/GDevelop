@@ -1066,7 +1066,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.editObject(container.getObject(objectName), initialTab);
     if (shouldSelectTheObject) {
-      this._onObjectFolderOrObjectWithContextSelected([
+      this._onObjectFolderOrObjectsWithContextSelected([
         {
           objectFolderOrObject: container
             .getRootFolder()
@@ -1230,7 +1230,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       });
   };
 
-  _onObjectFolderOrObjectWithContextSelected = (
+  _onObjectFolderOrObjectsWithContextSelected = (
     objectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext> = []
   ) => {
     const aliveObjectFolderOrObjectsWithContext = objectFolderOrObjectsWithContext.filter(
@@ -1660,13 +1660,10 @@ export default class SceneEditor extends React.Component<Props, State> {
    * Create an instance of the given object, at the position
    * previously chosen (see `newObjectInstanceSceneCoordinates`).
    */
-  _addInstancesForNewObjects = (newObjectNames: Array<string>) => {
+  _addInstanceForNewObject = (newObjectName: string) => {
     const { newObjectInstanceSceneCoordinates } = this.state;
     if (!newObjectInstanceSceneCoordinates) return;
-
-    newObjectNames.forEach(name =>
-      this._addInstance(newObjectInstanceSceneCoordinates, name)
-    );
+    this._addInstance(newObjectInstanceSceneCoordinates, newObjectName);
     this.setState({ newObjectInstanceSceneCoordinates: null });
   };
 
@@ -1697,7 +1694,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     // object is created through the dialog flow; bulk paste/duplicate should
     // never auto-place stacked instances at the same position.
     if (objects.length === 1) {
-      this._addInstancesForNewObjects(objects.map(o => o.getName()));
+      this._addInstanceForNewObject(objects[0].getName());
     }
 
     this.props.onObjectListsModified({
@@ -2068,7 +2065,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
     // Avoid triggering renaming refactoring if name has not really changed
     if (unifiedName === newName) {
-      this._onObjectFolderOrObjectWithContextSelected([
+      this._onObjectFolderOrObjectsWithContextSelected([
         objectFolderOrObjectWithContext,
       ]);
       done(false);
@@ -2085,7 +2082,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const object = objectFolderOrObject.getObject();
 
     this._onRenameObjectFinish({ object, global }, newName);
-    this._onObjectFolderOrObjectWithContextSelected([
+    this._onObjectFolderOrObjectsWithContextSelected([
       objectFolderOrObjectWithContext,
     ]);
     done(true);
@@ -3169,8 +3166,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                     onObjectEdited={this._onObjectEdited}
                     onObjectsModified={this._onObjectsModified}
                     onEffectAdded={this.props.onEffectAdded}
-                    onObjectFolderOrObjectWithContextSelected={
-                      this._onObjectFolderOrObjectWithContextSelected
+                    onObjectFolderOrObjectsWithContextSelected={
+                      this._onObjectFolderOrObjectsWithContextSelected
                     }
                     onSetAsGlobalObject={this._onSetAsGlobalObject}
                     historyHandler={{

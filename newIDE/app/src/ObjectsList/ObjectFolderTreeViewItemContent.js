@@ -16,8 +16,8 @@ import {
   getObjectFolderOrObjectsClipboardSummaryName,
   getObjectFolderOrObjectsClipboardObjectTypes,
   pasteObjectFolderOrObjectsFromClipboard,
-  duplicateObjectFolderOrObjects,
 } from './ObjectFolderOrObjectsClipboard';
+import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
 import { renderQuickCustomizationMenuItems } from '../QuickCustomization/QuickCustomizationMenuItems';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import type { ObjectWithContext } from '../ObjectsList/EnumerateObjects';
@@ -426,7 +426,6 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
   cut(): void {
     this.copy();
-    // TODO It should probably not show an alert
     this.delete();
   }
 

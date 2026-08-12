@@ -1,27 +1,7 @@
 // @flow
 import * as React from 'react';
-
-// Mirrors the exported ItemBaseAttributes from TreeView/index.js.
-// Defined locally to avoid a circular import (index.js imports this file).
-type ItemBaseAttributes = {
-  +isRoot?: boolean,
-  +isPlaceholder?: boolean,
-};
-
-// Minimal structural view of FlattenedNode needed by this hook.
-// The full exact type lives in TreeView/index.js.
-type SelectionNode<Item> = {
-  id: string,
-  item: Item,
-  selected: boolean,
-  ...
-};
-
-type SelectCallArgs<Item> = {|
-  node: SelectionNode<Item>,
-  exclusive?: boolean,
-  extendFromAnchor?: boolean,
-|};
+// `import type` is erased at compile time — no runtime circular dependency.
+import { type ItemBaseAttributes, type FlattenedNode, type SelectArgs } from '.';
 
 /**
  * Manages anchor-based Shift+click / Shift+arrow range selection with
@@ -35,7 +15,7 @@ type SelectCallArgs<Item> = {|
  * (`TreeView`) keeps no selection-state knowledge beyond the controlled
  * `selectedItems` prop.
  */
-function useShiftRangeSelection<Item: ItemBaseAttributes>({
+function useTreeViewSelection<Item: ItemBaseAttributes>({
   multiSelect,
   selectedItems,
   flattenedData,
@@ -44,10 +24,10 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
 }: {|
   multiSelect: boolean,
   selectedItems: $ReadOnlyArray<Item>,
-  flattenedData: $ReadOnlyArray<SelectionNode<Item>>,
+  flattenedData: $ReadOnlyArray<FlattenedNode<Item>>,
   onSelectItems: (items: Array<Item>) => void,
   getItemId: (item: Item) => string,
-|}): (SelectCallArgs<Item>) => void {
+|}): (SelectArgs<Item>) => void {
   // Anchor for Shift+click/Shift+arrow range selection. Updated only on a
   // non-range selection so that consecutive Shift-selections extend from the
   // same starting point.
@@ -60,6 +40,10 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
 
   // When the selection is cleared externally (e.g. Deselect All), stale refs
   // must be reset so a later Shift+click doesn't extend from a ghost anchor.
+  // Note: the anchor is NOT updated when the selection changes externally for
+  // reasons other than clearing (e.g. selecting an item on the canvas or after
+  // paste/duplicate). In those cases the next Shift+click extends from the last
+  // anchor set inside this hook, not from the externally selected item.
   React.useEffect(
     () => {
       if (selectedItems.length === 0) {
@@ -71,7 +55,7 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
   );
 
   return React.useCallback(
-    ({ node, exclusive, extendFromAnchor }: SelectCallArgs<Item>) => {
+    ({ node, exclusive, extendFromAnchor }: SelectArgs<Item>) => {
       if (multiSelect && extendFromAnchor) {
         const anchorId = selectionAnchorIdRef.current;
         const anchorIndex = anchorId
@@ -137,5 +121,4 @@ function useShiftRangeSelection<Item: ItemBaseAttributes>({
   );
 }
 
-export type { SelectionNode };
-export { useShiftRangeSelection };
+export { useTreeViewSelection };

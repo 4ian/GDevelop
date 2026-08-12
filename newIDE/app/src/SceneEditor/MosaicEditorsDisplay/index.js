@@ -505,8 +505,8 @@ const MosaicEditorsDisplay: React.ComponentType<{
                 }
                 onObjectCreated={props.onObjectCreated}
                 onObjectEdited={props.onObjectEdited}
-                onObjectFolderOrObjectWithContextSelected={
-                  props.onObjectFolderOrObjectWithContextSelected
+                onObjectFolderOrObjectsWithContextSelected={
+                  props.onObjectFolderOrObjectsWithContextSelected
                 }
                 onRenameObjectFolderOrObjectWithContextFinish={
                   props.onRenameObjectFolderOrObjectWithContextFinish

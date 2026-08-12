@@ -4,7 +4,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import Paper from '../UI/Paper';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { CompactInstancePropertiesEditor } from '../InstancesEditor/CompactInstancePropertiesEditor';
-import { Trans } from '@lingui/macro';
+import { Trans, Plural } from '@lingui/macro';
 import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HistoryHandler } from '../VariablesList/VariablesList';
@@ -121,9 +121,13 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
         getEditorTitle: () =>
           lastSelectionType === 'instance' ? (
             <Trans>Instance properties</Trans>
-          ) : lastSelectionType === 'object' ? (
+          ) :           lastSelectionType === 'object' ? (
             objects.length > 1 ? (
-              <Trans>{objects.length} objects selected</Trans>
+              <Plural
+                value={objects.length}
+                one="# object selected"
+                other="# objects selected"
+              />
             ) : (
               <Trans>Object properties</Trans>
             )
@@ -223,7 +227,11 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
           />
         ) : objects.length > 1 && lastSelectionType === 'object' ? (
           <EmptyMessage>
-            <Trans>{objects.length} objects selected.</Trans>
+            <Plural
+              value={objects.length}
+              one="# object selected."
+              other="# objects selected."
+            />
           </EmptyMessage>
         ) : !!objects.length && lastSelectionType === 'object' ? (
           <CompactObjectPropertiesEditor

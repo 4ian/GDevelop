@@ -822,7 +822,8 @@ module.exports = {
           )
           .setType('resource')
           .addExtraInfo('model3D')
-          .setLabel(_("Simplified 3D model (leave empty to use object's one)"));
+          .setLabel(_('Simplified 3D model'))
+          .setDescription(_("Leave empty to use object's one"));
 
         return behaviorProperties;
       };

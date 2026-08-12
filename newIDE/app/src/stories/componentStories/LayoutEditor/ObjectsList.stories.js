@@ -49,49 +49,90 @@ const AssetStoreProviders = ({ children }: {| children: React.Node |}) => (
   </AuthenticatedUserContext.Provider>
 );
 
+// Shared props used by all stories.
+const sharedProps = {
+  getThumbnail: () => 'res/unknown32.png',
+  project: testProject.project,
+  layout: testProject.testLayout,
+  eventsFunctionsExtension: null,
+  eventsBasedObject: null,
+  projectScopedContainersAccessor:
+    testProject.testSceneProjectScopedContainersAccessor,
+  globalObjectsContainer: testProject.project.getObjects(),
+  objectsContainer: testProject.testLayout.getObjects(),
+  resourceManagementProps: fakeResourceManagementProps,
+  onEditObject: action('On edit object'),
+  onOpenEventBasedObjectEditor: action('On edit children'),
+  onOpenEventBasedObjectVariantEditor: action('On edit variant'),
+  onExportAssets: action('On export assets'),
+  onImportAssets: action('On import assets'),
+  onAddObjectInstance: action('On add instance to the scene'),
+  onObjectCreated: action('On object created'),
+  onObjectEdited: action('On object edited'),
+  getValidatedObjectOrGroupName: (newName: string) => newName,
+  onDeleteObjects: (objectsWithContext: any, cb: (doRemove: boolean) => void) =>
+    cb(true),
+  onRenameObjectFolderOrObjectWithContextFinish: (
+    objectWithContext: any,
+    newName: string,
+    cb: (success: boolean) => void
+  ) => cb(true),
+  onSetAsGlobalObject: action('onSetAsGlobalObject'),
+  hotReloadPreviewButtonProps: fakeHotReloadPreviewButtonProps,
+  onWillInstallExtension: action('extension will be installed'),
+  onExtensionInstalled: action('onExtensionInstalled'),
+};
+
 export const Default = (): React.Node => (
   <AssetStoreProviders>
     <DragAndDropContextProvider>
       <div style={{ height: 400 }}>
         <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={testProject.project}
-          layout={testProject.testLayout}
-          eventsFunctionsExtension={null}
-          eventsBasedObject={null}
-          projectScopedContainersAccessor={
-            testProject.testSceneProjectScopedContainersAccessor
-          }
-          globalObjectsContainer={testProject.project.getObjects()}
-          objectsContainer={testProject.testLayout.getObjects()}
-          resourceManagementProps={fakeResourceManagementProps}
-          onEditObject={action('On edit object')}
-          onOpenEventBasedObjectEditor={action('On edit children')}
-          onOpenEventBasedObjectVariantEditor={action('On edit variant')}
-          onExportAssets={action('On export assets')}
-          onImportAssets={action('On import assets')}
-          onAddObjectInstance={action('On add instance to the scene')}
-          onObjectCreated={action('On object created')}
-          onObjectEdited={action('On object edited')}
+          {...sharedProps}
           selectedObjectFolderOrObjectsWithContext={[]}
-          getValidatedObjectOrGroupName={newName => newName}
-          onDeleteObjects={(objectsWithContext, cb) => cb(true)}
-          onRenameObjectFolderOrObjectWithContextFinish={(
-            objectWithContext,
-            newName,
-            cb
-          ) => cb(true)}
-          onObjectFolderOrObjectWithContextSelected={() => {}}
-          onSetAsGlobalObject={action('onSetAsGlobalObject')}
-          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onObjectFolderOrObjectsWithContextSelected={() => {}}
           isListLocked={false}
-          onWillInstallExtension={action('extension will be installed')}
-          onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
     </DragAndDropContextProvider>
   </AssetStoreProviders>
 );
+
+export const WithMultiSelection = (): React.Node => {
+  // Pre-select the first 2 children (arbitrary visual default for the story).
+  const INITIAL_SELECTION_COUNT = 2;
+  const rootFolder = testProject.testLayout.getObjects().getRootFolder();
+  const selectedObjectFolderOrObjectsWithContext = [];
+  for (
+    let i = 0;
+    i < Math.min(INITIAL_SELECTION_COUNT, rootFolder.getChildrenCount());
+    i++
+  ) {
+    selectedObjectFolderOrObjectsWithContext.push({
+      objectFolderOrObject: rootFolder.getChildAt(i),
+      global: false,
+    });
+  }
+
+  return (
+    <AssetStoreProviders>
+      <DragAndDropContextProvider>
+        <div style={{ height: 400 }}>
+          <ObjectsList
+            {...sharedProps}
+            selectedObjectFolderOrObjectsWithContext={
+              selectedObjectFolderOrObjectsWithContext
+            }
+            onObjectFolderOrObjectsWithContextSelected={action(
+              'On objects selected'
+            )}
+            isListLocked={false}
+          />
+        </div>
+      </DragAndDropContextProvider>
+    </AssetStoreProviders>
+  );
+};
 
 export const WithSerializedObjectView = (): React.Node => (
   <AssetStoreProviders>
@@ -99,39 +140,10 @@ export const WithSerializedObjectView = (): React.Node => (
       <SerializedObjectDisplay object={testProject.testLayout}>
         <div style={{ height: 250 }}>
           <ObjectsList
-            getThumbnail={() => 'res/unknown32.png'}
-            project={testProject.project}
-            layout={testProject.testLayout}
-            eventsFunctionsExtension={null}
-            eventsBasedObject={null}
-            projectScopedContainersAccessor={
-              testProject.testSceneProjectScopedContainersAccessor
-            }
-            globalObjectsContainer={testProject.project.getObjects()}
-            objectsContainer={testProject.testLayout.getObjects()}
-            resourceManagementProps={fakeResourceManagementProps}
-            onEditObject={action('On edit object')}
-            onOpenEventBasedObjectEditor={action('On edit children')}
-            onOpenEventBasedObjectVariantEditor={action('On edit variant')}
-            onExportAssets={action('On export assets')}
-            onImportAssets={action('On import assets')}
-            onAddObjectInstance={action('On add instance to the scene')}
-            onObjectCreated={action('On object created')}
-            onObjectEdited={action('On object edited')}
+            {...sharedProps}
             selectedObjectFolderOrObjectsWithContext={[]}
-            getValidatedObjectOrGroupName={newName => newName}
-            onDeleteObjects={(objectsWithContext, cb) => cb(true)}
-            onRenameObjectFolderOrObjectWithContextFinish={(
-              objectWithContext,
-              newName,
-              cb
-            ) => cb(true)}
-            onObjectFolderOrObjectWithContextSelected={() => {}}
-            onSetAsGlobalObject={action('onSetAsGlobalObject')}
-            hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+            onObjectFolderOrObjectsWithContextSelected={() => {}}
             isListLocked={false}
-            onWillInstallExtension={action('extension will be installed')}
-            onExtensionInstalled={action('onExtensionInstalled')}
           />
         </div>
       </SerializedObjectDisplay>
@@ -144,39 +156,10 @@ export const Locked = (): React.Node => (
     <DragAndDropContextProvider>
       <div style={{ height: 400 }}>
         <ObjectsList
-          getThumbnail={() => 'res/unknown32.png'}
-          project={testProject.project}
-          layout={testProject.testLayout}
-          eventsFunctionsExtension={null}
-          eventsBasedObject={null}
-          projectScopedContainersAccessor={
-            testProject.testSceneProjectScopedContainersAccessor
-          }
-          globalObjectsContainer={testProject.project.getObjects()}
-          objectsContainer={testProject.testLayout.getObjects()}
-          resourceManagementProps={fakeResourceManagementProps}
-          onEditObject={action('On edit object')}
-          onOpenEventBasedObjectEditor={action('On edit children')}
-          onOpenEventBasedObjectVariantEditor={action('On edit variant')}
-          onExportAssets={action('On export assets')}
-          onImportAssets={action('On import assets')}
-          onAddObjectInstance={action('On add instance to the scene')}
-          onObjectCreated={action('On object created')}
-          onObjectEdited={action('On object edited')}
+          {...sharedProps}
           selectedObjectFolderOrObjectsWithContext={[]}
-          getValidatedObjectOrGroupName={newName => newName}
-          onDeleteObjects={(objectsWithContext, cb) => cb(true)}
-          onRenameObjectFolderOrObjectWithContextFinish={(
-            objectWithContext,
-            newName,
-            cb
-          ) => cb(true)}
-          onObjectFolderOrObjectWithContextSelected={() => {}}
-          onSetAsGlobalObject={action('onSetAsGlobalObject')}
-          hotReloadPreviewButtonProps={fakeHotReloadPreviewButtonProps}
+          onObjectFolderOrObjectsWithContextSelected={() => {}}
           isListLocked={true}
-          onWillInstallExtension={action('extension will be installed')}
-          onExtensionInstalled={action('onExtensionInstalled')}
         />
       </div>
     </DragAndDropContextProvider>

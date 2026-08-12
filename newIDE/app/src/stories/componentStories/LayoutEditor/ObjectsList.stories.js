@@ -69,12 +69,13 @@ const sharedProps = {
   onAddObjectInstance: action('On add instance to the scene'),
   onObjectCreated: action('On object created'),
   onObjectEdited: action('On object edited'),
-  getValidatedObjectOrGroupName: newName => newName,
-  onDeleteObjects: (objectsWithContext, cb) => cb(true),
+  getValidatedObjectOrGroupName: (newName: string) => newName,
+  onDeleteObjects: (objectsWithContext: any, cb: (doRemove: boolean) => void) =>
+    cb(true),
   onRenameObjectFolderOrObjectWithContextFinish: (
-    objectWithContext,
-    newName,
-    cb
+    objectWithContext: any,
+    newName: string,
+    cb: (success: boolean) => void
   ) => cb(true),
   onSetAsGlobalObject: action('onSetAsGlobalObject'),
   hotReloadPreviewButtonProps: fakeHotReloadPreviewButtonProps,

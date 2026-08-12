@@ -46,7 +46,7 @@ export type MenuButton = {|
   showPrimaryLabel?: boolean,
 |};
 
-type FlattenedNode<Item> = {|
+export type FlattenedNode<Item> = {|
   id: string,
   name: string | React.Node,
   rightComponent: ?React.Node,

@@ -8,6 +8,11 @@ import {
   getSelectionTopLevelNodes,
 } from './EnumerateObjectFolderOrObject';
 
+type DuplicateResult = {|
+  createdObjects: Array<gdObject>,
+  topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>,
+|};
+
 /**
  * Duplicate objects and/or folders in place (right after themselves, or at
  * the given position), without touching the OS clipboard.
@@ -26,10 +31,7 @@ export const duplicateObjectFolderOrObjects = ({
   items: Array<ObjectFolderOrObjectWithContext>,
   destinationFolder: gdObjectFolderOrObject,
   positionInFolder: number,
-|}): ?{|
-  createdObjects: Array<gdObject>,
-  topLevelObjectFolderOrObjects: Array<gdObjectFolderOrObject>,
-||} => {
+|}): ?DuplicateResult => {
   const topLevelItems = getSelectionTopLevelNodes(items);
   if (topLevelItems.length === 0) return null;
 

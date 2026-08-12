@@ -164,7 +164,6 @@ export const getPasteMenuLabel = (i18n: I18nType): string => {
   return i18n._(t`Paste ${content.items.length} items`);
 };
 
-
 const collectNodeObjectTypes = (
   node: SerializedNode,
   result: Array<string>
@@ -316,4 +315,3 @@ export const pasteObjectFolderOrObjectsFromClipboard = ({
 
   return { createdObjects, topLevelObjectFolderOrObjects };
 };
-

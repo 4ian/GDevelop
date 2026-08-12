@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react';
 // `import type` is erased at compile time — no runtime circular dependency.
-import { type ItemBaseAttributes, type FlattenedNode, type SelectArgs } from '.';
+import {
+  type ItemBaseAttributes,
+  type FlattenedNode,
+  type SelectArgs,
+} from '.';
 
 /**
  * Manages anchor-based Shift+click / Shift+arrow range selection with

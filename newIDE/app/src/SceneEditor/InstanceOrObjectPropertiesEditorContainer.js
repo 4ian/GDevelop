@@ -121,7 +121,7 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
         getEditorTitle: () =>
           lastSelectionType === 'instance' ? (
             <Trans>Instance properties</Trans>
-          ) :           lastSelectionType === 'object' ? (
+          ) : lastSelectionType === 'object' ? (
             objects.length > 1 ? (
               <Plural
                 value={objects.length}

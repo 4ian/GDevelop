@@ -517,7 +517,9 @@ function useBulkObjectOperations({
         !selectionIsGlobal &&
         !!globalObjectsContainer &&
         canSetAsGlobalObject !== false &&
-        topLevelSelectedItems.every(item => !item.objectFolderOrObject.isFolder());
+        topLevelSelectedItems.every(
+          item => !item.objectFolderOrObject.isFolder()
+        );
 
       const menuItems: Array<MenuItemTemplate | null> = [
         {

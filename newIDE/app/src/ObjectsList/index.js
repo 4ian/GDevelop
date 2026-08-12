@@ -1261,7 +1261,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         i18n: I18nType,
         folder: gdObjectFolderOrObject,
         global: boolean
-      ) => ({
+      ): MenuItemTemplate => ({
         label: getPasteMenuLabel(i18n),
         enabled: hasObjectFolderOrObjectsInClipboard() && !isListLocked,
         click: () => pasteIntoFolder(folder, global),
@@ -1322,9 +1322,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                     yet.
                   </Trans>
                 ),
-                () => [
-                  buildPasteMenuItem(i18n, globalObjectsRootFolder, true),
-                ]
+                () => [buildPasteMenuItem(i18n, globalObjectsRootFolder, true)]
               ),
               objectTreeViewItemProps,
               objectFolderTreeViewItemProps,

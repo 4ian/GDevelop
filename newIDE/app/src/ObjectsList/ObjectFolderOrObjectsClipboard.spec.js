@@ -61,11 +61,7 @@ describe('ObjectFolderOrObjectsClipboard', () => {
   };
 
   test('getSelectionTopLevelNodes filters out descendants of selected folders', () => {
-    const {
-      project,
-      rootFolder,
-      subFolder,
-    } = makeProjectWithObjects();
+    const { project, rootFolder, subFolder } = makeProjectWithObjects();
     const objectInFolder = subFolder.getChildAt(0);
 
     const topLevelNodes = getSelectionTopLevelNodes([

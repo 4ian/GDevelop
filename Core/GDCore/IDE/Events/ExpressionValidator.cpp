@@ -408,7 +408,13 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
       parentType = StringToType(parameterMetadata.GetType());
       auto parentParameterExtraInfo = currentParameterExtraInfo;
       currentParameterExtraInfo = &parameterMetadata.GetExtraInfo();
+      
+      auto parentParameterName = currentParameterName;
+      currentParameterName = parameterMetadata.GetDescription();
+      
       parameter->Visit(*this);
+      
+      currentParameterName = parentParameterName;
       currentParameterExtraInfo = parentParameterExtraInfo;
       parentType = currentParentType;
 

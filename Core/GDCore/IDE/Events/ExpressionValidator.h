@@ -40,7 +40,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   ExpressionValidator(const gd::Platform &platform_,
                       const gd::ProjectScopedContainers & projectScopedContainers_,
                       const gd::String &rootType_,
-                      const gd::String &extraInfo_ = emptyParameterExtraInfo)
+                      const gd::String &extraInfo_ = emptyParameterExtraInfo,
+                      const gd::String &contextDescription_ = "")
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ValueTypeMetadata::GetExpressionPrimitiveValueType(rootType_))),
@@ -48,7 +49,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         forbidsUsageOfBracketsBecauseParentIsObject(false),
         currentParameterExtraInfo(&extraInfo_),
         variableObjectName(),
-        variableObjectNameLocation() {};
+        variableObjectNameLocation(),
+        currentParameterName(contextDescription_) {};
   virtual ~ExpressionValidator(){};
 
   /**
@@ -384,6 +386,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       // It can't happen.
       message = _("You must enter a valid expression.");
     }
+    
+    if (!currentParameterName.empty()) {
+      message += " " + _("Parameter:") + " " + currentParameterName;
+    }
+
     RaiseTypeError(message, node.location);
     childType = Type::Empty;
   }
@@ -570,6 +577,7 @@ private:
   gd::String variableObjectName;
   gd::ExpressionParserLocation variableObjectNameLocation;
   const gd::String *currentParameterExtraInfo;
+  gd::String currentParameterName;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
 };

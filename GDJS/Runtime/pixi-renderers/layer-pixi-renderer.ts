@@ -215,6 +215,7 @@ namespace gdjs {
       | null = null;
     private _threeCameraDirty: boolean = false;
     private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
+    private hasCustomRenderPass = false;
     private _basis: Basis | null = null;
     private static matrix4: THREE.Matrix4 | null = null;
 
@@ -361,10 +362,37 @@ namespace gdjs {
       if (!this._threeEffectComposer) {
         return false;
       }
+      if (this.hasCustomRenderPass) {
+        return true;
+      }
       const game = this._layer.getRuntimeScene().getGame();
       // RenderPass, OutputPass and optionally SMAAPass are default passes.
       const emptyCount = game.getAntialiasingMode() === 'none' ? 2 : 3;
       return this._threeEffectComposer.passes.length > emptyCount;
+    }
+
+    setCustomRenderPass(pass: THREE_ADDONS.Pass | null) {
+      if (
+        !this._threeEffectComposer ||
+        !this._threeScene ||
+        !this._threeCamera
+      ) {
+        return;
+      }
+      if (!this.hasCustomRenderPass && !pass) {
+        return;
+      }
+      const oldRenderPass = this._threeEffectComposer.passes[0];
+
+      this._threeEffectComposer.passes[0] = pass
+        ? pass
+        : new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera);
+
+      if (!this.hasCustomRenderPass) {
+        // Dispose the default render pass
+        oldRenderPass.dispose();
+      }
+      this.hasCustomRenderPass = !!pass;
     }
 
     /**
@@ -516,7 +544,7 @@ namespace gdjs {
             this._threePlaneMaterial = new THREE.ShaderMaterial(
               noGammaCorrectionShader
             );
-            this._threePlaneMaterial;
+            this._threePlaneMaterial.depthWrite = false;
 
             // Finally, create the mesh shown in the scene.
             this._threePlaneMesh = new THREE.Mesh(

@@ -1,6 +1,7 @@
 //import pkg from "./package.json";
 import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
 
 export default [
   {
@@ -29,6 +30,7 @@ export default [
         extensions: ['.js'],
       }),
       terser(),
+      json(),
     ],
   },
   {
@@ -61,6 +63,7 @@ export default [
           extensions: ['.js'],
       }),
 			terser(),
+      json(),
     ],
   },
 ];

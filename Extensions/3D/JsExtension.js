@@ -2511,6 +2511,51 @@ module.exports = {
         .setType('number')
         .setDescription(_('Between -1 and 1'));
     }
+    {
+      const effect = extension
+        .addEffect('N8AO')
+        .setFullName(_('Ambient occlusion'))
+        .setDescription(_('Shadow for ambient light.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/N8AOEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('radius')
+        .setValue('5')
+        .setLabel(_('Radius'))
+        .setType('number');
+      properties
+        .getOrCreate('distanceFalloff')
+        .setValue('1')
+        .setLabel(_('Distance falloff'))
+        .setType('number')
+        .setDescription(
+          _(
+            'How fast the ambient occlusion fades away with distance in proportion to its radius.'
+          )
+        );
+      properties
+        .getOrCreate('intensity')
+        .setValue('5')
+        .setLabel(_('Intensity'))
+        .setType('number');
+      properties
+        .getOrCreate('color')
+        .setValue('0;0;0')
+        .setLabel(_('Color'))
+        .setType('color');
+      properties
+        .getOrCreate('quality')
+        .setValue('Performance')
+        .setLabel(_('Shadow quality'))
+        .setType('choice')
+        .addChoice('Performance', _('Very low quality'))
+        .addChoice('Low', _('Low quality'))
+        .addChoice('Medium', _('Medium quality'))
+        .addChoice('High', _('High quality'))
+        .addChoice('Ultra', _('Ultra-high quality'));
+    }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.
 

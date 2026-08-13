@@ -22,6 +22,8 @@ import { ColorCorrectionShader } from 'three/examples/jsm/shaders/ColorCorrectio
 import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationShader';
 import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
 
+import { N8AOPass } from '../../../SharedLibs/ThreeAddons/src/n8ao/N8AOPass.js';
+
 declare global {
   namespace THREE_ADDONS {
     export {
@@ -45,6 +47,7 @@ declare global {
       ColorCorrectionShader,
       HueSaturationShader,
       ExposureShader,
+      N8AOPass,
     };
   }
 }

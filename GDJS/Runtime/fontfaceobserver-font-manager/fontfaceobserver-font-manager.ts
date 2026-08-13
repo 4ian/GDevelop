@@ -98,12 +98,13 @@ namespace gdjs {
      */
     private _loadFont(fontFamily: string, src: string): Promise<void> {
       const descriptors = {};
-      const srcWithUrl = 'url(' + encodeURI(src) + ')';
+      const fullUrl = this._resourceLoader.getFullUrl(src);
+      const srcWithUrl = 'url(' + encodeURI(fullUrl) + ')';
 
       // @ts-ignore
       if (typeof FontFace !== 'undefined') {
         // Load the given font using CSS Font Loading API.
-        return fetch(this._resourceLoader.getFullUrl(src), {
+        return fetch(fullUrl, {
           credentials: this._resourceLoader.checkIfCredentialsRequired(src)
             ? // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
               // i.e: its gdevelop.io cookie, to be passed.
@@ -111,7 +112,7 @@ namespace gdjs {
             : // For other resources, use "same-origin" as done by default by fetch.
               'same-origin',
         })
-          .then((response) => {
+          .then(response => {
             if (!response.ok) {
               const errorMessage =
                 'Unable to fetch ' +
@@ -125,7 +126,7 @@ namespace gdjs {
 
             return response.arrayBuffer();
           })
-          .then((arrayBuffer) => {
+          .then(arrayBuffer => {
             // @ts-ignore
             const fontFace = new FontFace(fontFamily, arrayBuffer, descriptors);
 

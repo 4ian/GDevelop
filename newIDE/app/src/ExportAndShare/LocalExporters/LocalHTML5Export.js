@@ -18,8 +18,10 @@ import {
   ExplanationHeader,
   DoneFooter,
   ExportFlow,
+  PackResourcesField,
 } from '../GenericExporters/HTML5Export';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import { packResourcesInFolder } from '../ResourcePacking/LocalResourcePacker';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 // It's important to use remote and not electron for folder actions,
@@ -32,6 +34,7 @@ const gd: libGDevelop = global.gd;
 
 type ExportState = {
   outputDir: string,
+  packResources: boolean,
 };
 
 type PreparedExporter = {|
@@ -60,6 +63,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),
+    packResources: true,
   }),
 
   canLaunchBuild: exportState => !!exportState.outputDir,
@@ -82,10 +86,24 @@ export const localHTML5ExportPipeline: ExportPipeline<
             value={exportState.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
             onChange={outputDir => {
-              updateExportState(() => ({ outputDir }));
+              updateExportState(prevExportState => ({
+                ...prevExportState,
+                outputDir,
+              }));
               project.setLastCompilationDirectory(outputDir);
             }}
             fullWidth
+          />
+        </Line>
+        <Line noMargin>
+          <PackResourcesField
+            packResources={exportState.packResources}
+            onChange={packResources =>
+              updateExportState(prevExportState => ({
+                ...prevExportState,
+                packResources,
+              }))
+            }
           />
         </Line>
       </Column>
@@ -163,11 +181,21 @@ export const localHTML5ExportPipeline: ExportPipeline<
     return null;
   },
 
-  launchCompression: (
+  launchCompression: async (
     context: ExportPipelineContext<ExportState>,
     exportOutput: ResourcesDownloadOutput
   ): Promise<CompressionOutput> => {
-    return Promise.resolve(null);
+    // The export is a folder, so there is nothing to compress. This is where
+    // the resources are gathered into a few ".gdpak" archives instead, now
+    // that the ones stored as URLs have been downloaded.
+    if (context.exportState.packResources) {
+      await packResourcesInFolder({
+        exportDir: context.exportState.outputDir,
+        onProgress: context.updateStepProgress,
+      });
+    }
+
+    return null;
   },
 
   renderDoneFooter: ({ exportState }) => {

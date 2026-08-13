@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
@@ -107,6 +107,7 @@ export const SetupExportHeader = ({
             <HelpButton
               helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
               key="help"
+              scopeName={t`Android publishing`}
             />,
           ]}
           open

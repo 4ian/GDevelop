@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -179,6 +179,7 @@ const ObjectGroupVariablesDialog = ({
         <HelpButton
           helpPagePath={'/all-features/variables/object-variables'}
           key="help"
+          scopeName={t`Object variables`}
         />,
       ]}
       onRequestClose={onCancel}

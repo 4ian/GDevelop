@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -65,6 +65,7 @@ const LocalVariablesDialog = ({
       // $FlowFixMe[incompatible-type]
       tabs={tabs}
       helpPagePath={'/all-features/variables/local-variables'}
+      scopeName={t`Local variables`}
       id="local-variables-dialog"
       initiallySelectedVariable={initiallySelectedVariable}
       hotReloadPreviewButtonProps={null}

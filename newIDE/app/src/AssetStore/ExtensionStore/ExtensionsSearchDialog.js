@@ -132,7 +132,11 @@ const ExtensionsSearchDialog = ({
             />,
           ]}
           secondaryActions={[
-            <HelpButton key="help" helpPagePath="/extensions/search" />,
+            <HelpButton
+              key="help"
+              helpPagePath="/extensions/search"
+              scopeName={t`Extensions`}
+            />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton
                 leftIcon={<Download />}

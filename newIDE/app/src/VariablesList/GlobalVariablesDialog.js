@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import VariablesEditorDialog, {
   type VariableDialogOpeningProps,
 } from './VariablesEditorDialog';
@@ -74,6 +74,7 @@ const GlobalVariablesDialog = ({
       tabs={tabs}
       initiallySelectedVariable={initiallySelectedVariable}
       helpPagePath={'/all-features/variables/global-variables'}
+      scopeName={t`Global variables`}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       id="global-variables-dialog"
       isListLocked={isListLocked}

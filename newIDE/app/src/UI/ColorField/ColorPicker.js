@@ -9,6 +9,7 @@ import muiZIndex from '@material-ui/core/styles/zIndex';
 import { type RGBColor } from '../../Utils/ColorTransformer';
 import PortalContainerContext from '../PortalContainerContext';
 import { shouldCloseOrCancel } from '../KeyboardShortcuts/InteractionKeys';
+import { getDialogFocusTrapContainer } from '../MaterialUISpecificUtil';
 
 export type ColorResult = {
   rgb: RGBColor,
@@ -85,6 +86,16 @@ const ColorPicker = ({
   );
   const portalContainer = React.useContext(PortalContainerContext);
 
+  // When the picker is opened from a dialog, it must be rendered inside it:
+  // dialogs are trapping the focus, so a picker rendered outside of them would
+  // never keep it - making the hexadecimal and RGB fields impossible to edit.
+  const pickerContainer = React.useMemo(
+    () =>
+      (swatchElement && getDialogFocusTrapContainer(swatchElement)) ||
+      portalContainer,
+    [swatchElement, portalContainer]
+  );
+
   const handleClick = () => {
     if (disabled || readOnly) return;
     setDisplayColorPicker(!displayColorPicker);
@@ -154,7 +165,7 @@ const ColorPicker = ({
           <Popper
             open
             anchorEl={swatchElement}
-            container={portalContainer}
+            container={pickerContainer}
             style={styles.popover}
             placement="bottom-start"
           >

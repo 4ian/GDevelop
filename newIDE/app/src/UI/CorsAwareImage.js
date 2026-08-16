@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import ResourcesLoader from '../ResourcesLoader';
 
 type Props = {|
   src: ?string,
@@ -25,7 +26,13 @@ const addSearchParameterToUrl = (
   }
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
-  return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+  return (
+    ResourcesLoader.fixedEncodeURIComponent(url) +
+    separator +
+    urlEncodedParameterName +
+    '=' +
+    urlEncodedValue
+  );
 };
 
 /**

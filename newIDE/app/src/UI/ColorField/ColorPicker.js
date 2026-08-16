@@ -63,6 +63,8 @@ const styles = {
     // Ensure the popover is above everything (modal, dialog, snackbar, tooltips, etc).
     // There will be only one ColorPicker opened at a time, so it's fair to put the
     // highest z index. If this is breaking, check the z-index of material-ui.
+    // Note that when rendered inside a dialog (see `pickerContainer`), this only
+    // applies inside the stacking context of the dialog.
     zIndex: muiZIndex.tooltip + 100,
   },
 };
@@ -89,12 +91,9 @@ const ColorPicker = ({
   // When the picker is opened from a dialog, it must be rendered inside it:
   // dialogs are trapping the focus, so a picker rendered outside of them would
   // never keep it - making the hexadecimal and RGB fields impossible to edit.
-  const pickerContainer = React.useMemo(
-    () =>
-      (swatchElement && getDialogFocusTrapContainer(swatchElement)) ||
-      portalContainer,
-    [swatchElement, portalContainer]
-  );
+  const pickerContainer =
+    (swatchElement && getDialogFocusTrapContainer(swatchElement)) ||
+    portalContainer;
 
   const handleClick = () => {
     if (disabled || readOnly) return;

@@ -84,19 +84,22 @@ export const isElementAMuiInput = (element: Element): boolean => {
 
 /**
  * Returns the element on which the Material UI dialog containing the given
- * element is "trapping" the focus, if any.
+ * element is "trapping" the focus, if any (this is the element that `Dialog`
+ * gives to the `TrapFocus` used internally by `Modal`).
  *
- * Material UI dialogs continuously give the focus back to this element as long
- * as the focused element is not one of its children. This means that anything
- * rendered in a portal outside of it (a `Popper` for example) can't be given
- * the focus: its text fields would be impossible to click on or to type in.
- * Rendering such a portal inside this element works around this.
+ * A dialog gives the focus back to this element as long as the focused element
+ * is not one of its children. So anything rendered in a portal outside of it (a
+ * `Popper` for example) can never keep the focus: its text fields are then
+ * impossible to click on or to type in. Rendering the portal inside this
+ * element works around this.
  */
 export const getDialogFocusTrapContainer = (element: Element): ?HTMLElement => {
-  // This is the element that Material UI dialogs pass to the `TrapFocus`
-  // used internally by `Modal`.
-  // Note that `instanceof HTMLElement` can't be used to check the result, as the
-  // element can come from another window (see `WindowPortal`), in which case it
-  // is built from a different constructor than the main window one.
-  return ((element.closest('.MuiDialog-container'): any): ?HTMLElement);
+  // The class name is matched by prefix, and not exactly: because themes are
+  // nested (see `FullThemeProvider`), Material UI appends a counter to its
+  // global class names (`MuiDialog-container-10242` for example).
+  // The result is not checked with `instanceof HTMLElement`, as it can come from
+  // another window (see `WindowPortal`) where constructors are different.
+  return ((element.closest(
+    '[class^="MuiDialog-container"], [class*=" MuiDialog-container"]'
+  ): any): ?HTMLElement);
 };

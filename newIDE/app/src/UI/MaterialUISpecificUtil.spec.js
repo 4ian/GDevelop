@@ -44,7 +44,10 @@ const testCases: Array<{|
 describe('getDialogFocusTrapContainer', () => {
   testCases.forEach(({ title, html, expectedClassName }) => {
     it(`returns ${title}`, () => {
-      document.body.innerHTML = html;
+      const documentBody = document.body;
+      if (!documentBody) throw new Error('The document body is missing.');
+
+      documentBody.innerHTML = html;
       const element = document.querySelector('i');
       if (!element) throw new Error('The test element was not rendered.');
 

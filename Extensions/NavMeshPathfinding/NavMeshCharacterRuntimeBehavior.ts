@@ -219,7 +219,7 @@ namespace gdjs {
               x: 100,
               y: this._manager.is3D
                 ? 100
-                : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
+                : this._manager.cellSize / 2 - 0.5,
               z: 100,
             },
           }
@@ -254,7 +254,7 @@ namespace gdjs {
               x: 100,
               y: this._manager.is3D
                 ? 100
-                : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
+                : this._manager.cellSize / 2 - 0.5,
               z: 100,
             },
           }

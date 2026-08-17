@@ -41,6 +41,7 @@ namespace gdjs {
       walkableClimb: 2,
       walkableRadius: 1,
     };
+    cellSize: float = 10;
     cellDepth: float = 10;
     walkableRadius: float = -1;
     walkableDepth: float = 150;
@@ -54,14 +55,12 @@ namespace gdjs {
     hasStepped = false;
     debuggerRenderer: gdjs.NavMeshDebuggerRenderer | null = null;
 
-    static readonly cellHeightFor2D = 5;
-
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer, sharedData) {
       if (!sharedData) {
         // It can happens when there is no object with the character behavior.
         return;
       }
-      this.navMeshConfig.cs = sharedData.cellSize;
+      this.cellSize = Math.max(0, sharedData.cellSize) || 10;
       this.cellDepth = sharedData.cellDepth;
       this.navMeshConfig.detailSampleMaxError = sharedData.cellDepth * 5;
       this.navMeshConfig.walkableSlopeAngle = sharedData.slopeMaxAngle;
@@ -139,7 +138,7 @@ namespace gdjs {
         this.addGroundFor2D(positions, indices);
         this.navMeshConfig.walkableClimb = 0.1;
         this.navMeshConfig.walkableHeight = 2;
-        this.navMeshConfig.ch = gdjs.NavMeshObstaclesManager.cellHeightFor2D;
+        this.navMeshConfig.ch = this.cellSize;
       } else {
         const walkableClimbMin =
           this.navMeshConfig.walkableSlopeAngle &&
@@ -153,6 +152,7 @@ namespace gdjs {
         this.navMeshConfig.walkableHeight = this.walkableDepth / this.cellDepth;
         this.navMeshConfig.ch = this.cellDepth;
       }
+      this.navMeshConfig.cs = this.cellSize;
 
       let characterRadiusMax = 0;
       for (const character of this.characters) {
@@ -161,10 +161,9 @@ namespace gdjs {
           character.getRadius()
         );
       }
-      this.navMeshConfig.walkableRadius = this.navMeshConfig.cs
-        ? (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
-          this.navMeshConfig.cs
-        : 0;
+      this.navMeshConfig.walkableRadius =
+        (this.walkableRadius < 0 ? characterRadiusMax : this.walkableRadius) /
+        this.cellSize;
 
       const result = RecastNav.generateSoloNavMesh(
         positions,
@@ -226,6 +225,10 @@ namespace gdjs {
       const centerX = (maxX + minX) / 2;
       const centerY = ((maxY + minY) / 2) * this.inverseSpeedScaleY;
 
+      const zMax = -1;
+      const zMin = -this.cellSize;
+      const depth = zMax - zMin;
+      const centerZ = (zMax + zMin) / 2;
       const indicesOffset = Math.round(positions.length / 3);
       for (let index = 0; index + 2 < cubePositions.length; index = index + 3) {
         let x = cubePositions[index];
@@ -234,11 +237,11 @@ namespace gdjs {
 
         x *= width;
         y *= height;
-        z *= gdjs.NavMeshObstaclesManager.cellHeightFor2D - 1;
+        z *= depth;
 
         x += centerX;
         y += centerY;
-        z -= gdjs.NavMeshObstaclesManager.cellHeightFor2D / 2;
+        z += centerZ;
 
         // Y is the top for Recast
         positions.push(x, z, y);
@@ -272,25 +275,25 @@ namespace gdjs {
         ) {
           vertices.reverse();
         }
-        const depthMax = gdjs.NavMeshObstaclesManager.cellHeightFor2D - 1;
-        const depthMin = -1;
+        const zMax = this.cellSize;
+        const zMin = -1;
         triangulate(
           vertices,
           vertexFlags,
           (p1: Point, p2: Point, p3: Point) => {
             // Top
-            positions.push(p1.x, depthMax, p1.y * this.inverseSpeedScaleY);
-            positions.push(p2.x, depthMax, p2.y * this.inverseSpeedScaleY);
-            positions.push(p3.x, depthMax, p3.y * this.inverseSpeedScaleY);
+            positions.push(p1.x, zMax, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, zMax, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, zMax, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 0,
               indicesOffset + 1,
               indicesOffset + 2
             );
             // Bottom
-            positions.push(p1.x, depthMin, p1.y * this.inverseSpeedScaleY);
-            positions.push(p2.x, depthMin, p2.y * this.inverseSpeedScaleY);
-            positions.push(p3.x, depthMin, p3.y * this.inverseSpeedScaleY);
+            positions.push(p1.x, zMin, p1.y * this.inverseSpeedScaleY);
+            positions.push(p2.x, zMin, p2.y * this.inverseSpeedScaleY);
+            positions.push(p3.x, zMin, p3.y * this.inverseSpeedScaleY);
             indices.push(
               indicesOffset + 3,
               indicesOffset + 5,
@@ -302,23 +305,15 @@ namespace gdjs {
         for (let index = 0; index < vertices.length; index++) {
           const vertex = vertices[index];
           // Side
-          positions.push(
-            vertex.x,
-            depthMax,
-            vertex.y * this.inverseSpeedScaleY
-          );
-          positions.push(
-            vertex.x,
-            depthMin,
-            vertex.y * this.inverseSpeedScaleY
-          );
+          positions.push(vertex.x, zMax, vertex.y * this.inverseSpeedScaleY);
+          positions.push(vertex.x, zMin, vertex.y * this.inverseSpeedScaleY);
           indices.push(indicesOffset + 0, indicesOffset + 1, indicesOffset + 2);
           indices.push(indicesOffset + 3, indicesOffset + 2, indicesOffset + 1);
           indicesOffset += 2;
         }
         const vertex = vertices[0];
-        positions.push(vertex.x, depthMax, vertex.y * this.inverseSpeedScaleY);
-        positions.push(vertex.x, depthMin, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, zMax, vertex.y * this.inverseSpeedScaleY);
+        positions.push(vertex.x, zMin, vertex.y * this.inverseSpeedScaleY);
       }
     }
 
@@ -487,7 +482,7 @@ namespace gdjs {
           {
             halfExtents: {
               x: 100,
-              y: this.is3D ? 100 : gdjs.NavMeshObstaclesManager.cellHeightFor2D,
+              y: this.is3D ? 100 : this.cellSize / 2 - 0.5,
               z: 100,
             },
           }

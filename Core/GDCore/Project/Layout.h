@@ -484,10 +484,10 @@ GetBehaviorNamesInObjectOrGroup(const gd::ObjectsContainer& project,
                                 bool searchInGroups);
 
 /**
- * \brief Check if a behavior is a default one or doesn't exist in an object or
+ * \brief Check if a behavior is a default one and exists in an object or
  * all objects of a group.
  */
-bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+bool GD_CORE_API HasDefaultBehavior(const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::String objectOrGroupName,
                                    gd::String behaviorName,

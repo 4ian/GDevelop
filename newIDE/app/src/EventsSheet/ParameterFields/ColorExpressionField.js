@@ -5,33 +5,15 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import GenericExpressionField from './GenericExpressionField';
-import { renderInlineDefaultField } from './DefaultField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
-
-const inlineColorPickerStyle = {
-  width: 'var(--icon-size)',
-  height: 'var(--icon-size)',
-  verticalAlign: 'sub',
-};
-
-let wasSwatchClicked = false;
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ColorExpressionField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
-
-    const [shouldOnlyShowColorPicker] = React.useState(() => {
-      const openedFromSwatchClick = wasSwatchClicked;
-      wasSwatchClicked = false;
-      return !!props.isInline && openedFromSwatchClick;
-    });
-
     const focus: FieldFocusFunction = options => {
-      if (!shouldOnlyShowColorPicker && field.current)
-        field.current.focus(options);
+      if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
       focus,
@@ -45,7 +27,6 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           <ColorPicker
             style={style}
             disableAlpha
-            initiallyOpen={shouldOnlyShowColorPicker}
             color={rgbStringAndAlphaToRGBColor(props.value)}
             onChangeComplete={color => {
               onChange(
@@ -72,27 +53,3 @@ export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   ...ParameterFieldProps,
   +ref?: React.RefSetter<ParameterFieldInterface>,
 }>);
-
-export const renderInlineColor = (
-  props: ParameterInlineRendererProps
-): React.Node => {
-  const rgbColor = props.expressionIsValid
-    ? rgbStringAndAlphaToRGBColor(props.value)
-    : null;
-  if (!rgbColor) return renderInlineDefaultField(props);
-
-  return (
-    <>
-      {renderInlineDefaultField(props)}{' '}
-      <span onClick={() => (wasSwatchClicked = true)}>
-        <ColorPicker
-          size="compact"
-          disableAlpha
-          readOnly
-          color={rgbColor}
-          style={inlineColorPickerStyle}
-        />
-      </span>
-    </>
-  );
-};

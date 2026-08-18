@@ -62,9 +62,7 @@ import JsonResourceField from './ParameterFields/JsonResourceField';
 import SpineResourceField from './ParameterFields/SpineResourceField';
 import BitmapFontResourceField from './ParameterFields/BitmapFontResourceField';
 import FontResourceField from './ParameterFields/FontResourceField';
-import ColorExpressionField, {
-  renderInlineColor,
-} from './ParameterFields/ColorExpressionField';
+import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
@@ -174,7 +172,6 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
   leaderboardId: renderInlineLeaderboardIdField,
-  color: renderInlineColor,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,

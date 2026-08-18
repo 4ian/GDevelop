@@ -14,7 +14,7 @@ import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Text from '../../../UI/Text';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { Column, Line, Spacer } from '../../../UI/Grid';
-import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { useForceRecompute } from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
@@ -89,9 +89,9 @@ type AnimationItemRowProps = {|
   isAnimationListLocked: boolean,
   nameError: React.Node,
   animationRef: { current: ?any } | null,
-  // Bumped when the animation contents change without any other prop
+  // Changed when the animation contents change without any other prop
   // changing, so that this memoized row re-renders.
-  contentRevision: number,
+  animationsChangeTrigger: {},
   project: gdProject,
   objectName: string,
   resourceManagementProps: ResourceManagementProps,
@@ -129,7 +129,7 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
     isAnimationListLocked,
     nameError,
     animationRef,
-    contentRevision,
+    animationsChangeTrigger,
     project,
     objectName,
     resourceManagementProps,
@@ -380,7 +380,6 @@ const AnimationList: React.ComponentType<{
       false
     );
     const abortControllerRef = React.useRef<?AbortController>(null);
-    const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
     const animationsCount = animations.getAnimationsCount();
@@ -420,23 +419,18 @@ const AnimationList: React.ComponentType<{
       [number]: React.Node,
     }>({});
 
-    // The animation rows are memoized on primitive props, so a change made to
-    // the animations is invisible to them: `contentRevision` is what makes
-    // them re-render.
-    //
+    // The animation rows are memoized, and a change made to the animations is
+    // invisible to their props (`animations` is the same object in memory):
+    // `animationsChangeTrigger`, passed to the rows, is what makes them
+    // re-render.
     // Every change to the animations must go through
-    // `notifyAnimationsChanged`, which both bumps the revision and re-renders.
-    // Having a single function to call (instead of a revision bump to remember
-    // *in addition to* the re-render) is what prevents rows from silently
-    // staying memoized with outdated content.
-    const [contentRevision, setContentRevision] = React.useState(0);
-    const notifyAnimationsChanged = React.useCallback(
-      () => {
-        setContentRevision(revision => revision + 1);
-        forceUpdate();
-      },
-      [forceUpdate]
-    );
+    // `notifyAnimationsChanged`: it re-renders this component (like a force
+    // update) and changes `animationsChangeTrigger`, so the memoized rows
+    // can't silently keep outdated content.
+    const [
+      animationsChangeTrigger,
+      notifyAnimationsChanged,
+    ] = useForceRecompute();
 
     const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
       (sprite: gdSprite) => {
@@ -556,8 +550,8 @@ const AnimationList: React.ComponentType<{
     );
 
     React.useImperativeHandle(ref, () => ({
-      // Exposed as `forceUpdate` for the callers, but it must also invalidate
-      // the memoized rows: callers use it after changing the animations.
+      // Exposed as `forceUpdate` for the callers, which use it after changing
+      // the animations - so it must also invalidate the memoized rows.
       forceUpdate: notifyAnimationsChanged,
       addAnimation,
     }));
@@ -997,7 +991,7 @@ const AnimationList: React.ComponentType<{
                       isAnimationListLocked={isAnimationListLocked}
                       nameError={nameErrors[animationIndex]}
                       animationRef={animationRef}
-                      contentRevision={contentRevision}
+                      animationsChangeTrigger={animationsChangeTrigger}
                       project={project}
                       objectName={objectName}
                       resourceManagementProps={resourceManagementProps}

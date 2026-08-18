@@ -68,6 +68,17 @@ const addAllSubEvents = (
   }
 };
 
+// BaseEvent's copy ctor drops persistentUuid (fresh identity for clones -
+// see Event.cpp), so pasted events land with none. Assign fresh ones here
+// so they don't share breakpoint/stepping identity with their source.
+const assignFreshPersistentUuids = (event: gdBaseEvent): void => {
+  event.getOrCreatePersistentUuid();
+  const subEvents = event.getSubEvents();
+  for (let i = 0; i < subEvents.getEventsCount(); i++) {
+    assignFreshPersistentUuids(subEvents.getEventAt(i));
+  }
+};
+
 const excludeEventsChildren = (
   events: Array<gdBaseEvent>
 ): Array<gdBaseEvent> => {
@@ -151,14 +162,18 @@ export const pasteEventsFromClipboardInSelection = (
     'unserializeFrom',
     project
   );
+  const pastedCount = eventsList.getEventsCount();
 
-  lastSelectEventContext.eventsList.insertEvents(
-    eventsList,
-    0,
-    eventsList.getEventsCount(),
-    lastSelectEventContext.indexInList
-  );
+  const destinationList = lastSelectEventContext.eventsList;
+  const destinationIndex = lastSelectEventContext.indexInList;
+  destinationList.insertEvents(eventsList, 0, pastedCount, destinationIndex);
   eventsList.delete();
+
+  for (let i = 0; i < pastedCount; i++) {
+    assignFreshPersistentUuids(
+      destinationList.getEventAt(destinationIndex + i)
+    );
+  }
 
   return true;
 };

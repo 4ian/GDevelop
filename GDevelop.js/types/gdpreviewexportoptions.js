@@ -20,7 +20,9 @@ declare class gdPreviewExportOptions {
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setIsInGameEdition(enable: boolean): gdPreviewExportOptions;
+  setCdpDebuggerEnabled(enable: boolean): gdPreviewExportOptions;
   setInGameEditorSettingsJson(inGameEditorSettingsJson: string): gdPreviewExportOptions;
+  setInitialBreakpointsJson(initialBreakpointsJson: string): gdPreviewExportOptions;
   setEditorId(editorId: string): gdPreviewExportOptions;
   setEditorCameraState3D(cameraMode: string, positionX: number, positionY: number, positionZ: number, rotationAngle: number, elevationAngle: number, distance: number): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;

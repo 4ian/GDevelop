@@ -16,6 +16,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
+#include "GDCore/IDE/Events/EventsPersistentUuidHelper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
@@ -52,6 +53,13 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   // Preprocessing then code generation can make changes to the events, so we
   // need to do the work on a copy of the events.
   gd::EventsList generatedEvents = events;
+  // Only breakpoint instrumentation reads persistentUuid back (see
+  // GenerateBreakpointCode below) - skip the walk entirely for
+  // runtime/web-preview generation, which never emits it.
+  if (codeGenerator.ShouldGenerateBreakpointInstrumentation()) {
+    gd::EventsPersistentUuidHelper::CopyPersistentUuids(events,
+                                                        generatedEvents);
+  }
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
@@ -70,13 +78,31 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
 
   gd::String localVariablesInitializationCode;
   if (codeGenerator.HasProjectAndLayout()) {
-    localVariablesInitializationCode +=
-        codeGenerator.GetCodeNamespace() + ".localVariables = [];\n";
+    gd::String ns = codeGenerator.GetCodeNamespace();
+    localVariablesInitializationCode += ns + ".localVariables = [];\n";
+    // In previews, expose the stack to the debugger so it can inspect
+    // "Declare local variable" scopes.
+    if (!codeGenerator.GenerateCodeForRuntime()) {
+      localVariablesInitializationCode +=
+          "gdjs.registerLocalVariablesContainer(" +
+          codeGenerator.ConvertToStringExplicit(ns) + ", " + ns +
+          ".localVariables);\n";
+    }
   }
 
   gd::String idToCallbackMapCode;
   idToCallbackMapCode +=
       codeGenerator.GetCodeNamespace() + ".idToCallbackMap = new Map();\n";
+
+  gd::String bpPushCode;
+  gd::String bpTryCode;
+  gd::String bpFinallyCode;
+  if (codeGenerator.ShouldGenerateBreakpointInstrumentation()) {
+    gd::String ns = codeGenerator.ConvertToStringExplicit(codeGenerator.GetCodeNamespace());
+    bpPushCode = "if (runtimeScene) runtimeScene.getBreakpointManager().pushBreakpointFunction(" + ns + ");\n";
+    bpTryCode = "try {\n";
+    bpFinallyCode = "} finally { if (runtimeScene) runtimeScene.getBreakpointManager().popBreakpointFunction(); }\n";
+  }
 
   gd::String output =
       // clang-format off
@@ -89,12 +115,18 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
       fullyQualifiedFunctionName + " = function(" +
         functionArgumentsCode +
       ") {\n" +
+        // Prelude must run before pushBreakpointFunction: object methods declare
+        // `var runtimeScene = this._instanceContainer;` there, so pushing
+        // earlier would hit a var-hoisted undefined and silently no-op.
         functionPreEventsCode + "\n" +
+        bpPushCode +
+        bpTryCode +
         globalObjectListsReset + "\n" +
         wholeEventsCode + "\n" +
         globalObjectListsReset + "\n" +
         functionPostEventsCode + "\n" +
         functionReturnCode + "\n" +
+        bpFinallyCode +
       "}\n";
   // clang-format on
 
@@ -107,10 +139,13 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     gd::DiagnosticReport& diagnosticReport,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateBreakpointInstrumentation) {
   EventsCodeGenerator codeGenerator(project, scene);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateBreakpointInstrumentation(
+      generateBreakpointInstrumentation);
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
@@ -133,7 +168,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateBreakpointInstrumentation) {
   gd::ObjectsContainer parameterObjectsAndGroups(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
@@ -152,6 +188,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateBreakpointInstrumentation(
+      generateBreakpointInstrumentation);
 
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
@@ -297,7 +335,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& preludeCode,
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateBreakpointInstrumentation) {
   gd::ObjectsContainer parameterObjectsContainers(
       gd::ObjectsContainer::SourceType::Function);
   gd::VariablesContainer parameterVariablesContainer(
@@ -323,6 +362,8 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetGenerateBreakpointInstrumentation(
+      generateBreakpointInstrumentation);
 
   gd::DiagnosticReport diagnosticReport;
   codeGenerator.SetDiagnosticReport(&diagnosticReport);
@@ -1561,7 +1602,7 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
          ConvertToStringExplicit(section) + "); }";
 }
 
@@ -1569,8 +1610,20 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
     const gd::String& section) {
   if (GenerateCodeForRuntime()) return "";
 
-  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
+  return "if (runtimeScene && runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
          ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GenerateBreakpointCode(gd::BaseEvent& event) {
+  if (!ShouldGenerateBreakpointInstrumentation()) return "";
+
+  // `runtimeScene &&` guards the undefined local during custom-object build.
+  // checkBreakpoint is false unless CDP is attached (local Electron preview), so
+  // `debugger;` is dead code elsewhere. The event UUID is the id shared with the IDE.
+  return "if (runtimeScene && runtimeScene.getBreakpointManager().checkBreakpoint(" +
+         ConvertToStringExplicit(GetCodeNamespace()) + ", " +
+         ConvertToStringExplicit(event.GetOrCreatePersistentUuid()) +
+         ", runtimeScene)) debugger;\n";
 }
 
 gd::String EventsCodeGenerator::GeneratePropertySetterWithoutCasting(

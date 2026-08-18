@@ -49,6 +49,7 @@ import ParameterIcon from '../../UI/CustomSvgIcons/Parameter';
 import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope';
 import Link from '../../UI/Link';
 import Add from '../../UI/CustomSvgIcons/Add';
+import { buildRuntimeVariableTooltip } from '../../Debugger/RuntimeVariablesContext';
 import { type VariableDialogOpeningProps } from '../../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
@@ -731,7 +732,9 @@ export const renderVariableWithIcon = (
     projectScopedContainersAccessor,
     highlightedSearchText,
     highlightedSearchMatchCase,
+    runtimeVariables,
     scope,
+    lastObjectName,
   }: ParameterInlineRendererProps,
   tooltip: string,
   getVariableSourceFromIdentifier: (
@@ -742,12 +745,21 @@ export const renderVariableWithIcon = (
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
-  const VariableIcon = getVariableSourceIcon(
-    getVariableSourceFromIdentifier(
-      value,
-      projectScopedContainersAccessor.get()
-    )
+
+  const sourceType = getVariableSourceFromIdentifier(
+    value,
+    projectScopedContainersAccessor.get()
   );
+  const VariableIcon = getVariableSourceIcon(sourceType);
+
+  const effectiveTooltip = buildRuntimeVariableTooltip({
+    runtimeVariables,
+    value,
+    sourceType,
+    tooltip,
+    scope,
+    lastObjectName,
+  });
 
   let IconAndNameContainer;
   if (!expressionIsValid) {
@@ -760,7 +772,7 @@ export const renderVariableWithIcon = (
 
   return (
     <span
-      title={tooltip}
+      title={effectiveTooltip}
       className={classNames({
         [nameAndIconContainer]: true,
         [instructionWarningParameter]:

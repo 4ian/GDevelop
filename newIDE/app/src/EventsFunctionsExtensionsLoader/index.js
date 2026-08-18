@@ -1,6 +1,7 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import { mapVector, mapFor } from '../Utils/MapFor';
+import { isElectronCDPBridgeAvailable } from '../Debugger/ElectronCDPBridge';
 
 const gd: libGDevelop = global.gd;
 
@@ -28,6 +29,7 @@ type Options = {
 type OptionsForGeneration = {
   ...Options,
   skipCodeGeneration?: boolean,
+  generateForPreview?: boolean,
 };
 
 type CodeGenerationContext = {|
@@ -35,13 +37,21 @@ type CodeGenerationContext = {|
   extensionIncludeFiles: Array<string>,
 |};
 
+// Derived from `generateForPreview` rather than a separate option, so the
+// flavor cache in EventsFunctionsExtensionsProvider stays 2-valued: web
+// previews (no Electron CDP bridge) must not ship dead breakpoint code.
+const shouldGenerateBreakpointInstrumentation = (
+  options: OptionsForGeneration
+): boolean => !!options.generateForPreview && isElectronCDPBridgeAvailable();
+
 /**
  * Load all events functions of a project in extensions
  */
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionCodeWriter: EventsFunctionCodeWriter,
-  i18n: I18nType
+  i18n: I18nType,
+  generateForPreview: boolean = true
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -66,6 +76,7 @@ export const loadProjectEventsFunctionsExtensions = (
             skipCodeGeneration: false,
             eventsFunctionCodeWriter,
             i18n,
+            generateForPreview,
           }
         );
       })
@@ -361,10 +372,8 @@ const generateFreeFunction = (
         eventsFunction,
         codeNamespace,
         includeFiles,
-        // For now, always generate functions for runtime (this disables
-        // generation of profiling for groups (see EventsCodeGenerator))
-        // as extensions generated can be used either for preview or export.
-        true
+        !options.generateForPreview, // compilationForRuntime: true for export, false for preview.
+        shouldGenerateBreakpointInstrumentation(options)
       );
     } catch (error) {
       console.error(
@@ -587,11 +596,8 @@ function generateObject(
         codeNamespace,
         objectMethodMangledNames,
         includeFiles,
-
-        // For now, always generate functions for runtime (this disables
-        // generation of profiling for groups (see EventsCodeGenerator))
-        // as extensions generated can be used either for preview or export.
-        true
+        !options.generateForPreview, // compilationForRuntime: true for export, false for preview.
+        shouldGenerateBreakpointInstrumentation(options)
       );
       objectCodeGenerator.delete();
       objectMethodMangledNames.delete();

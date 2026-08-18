@@ -1,6 +1,20 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
 
+  /**
+   * `Map` doesn't serialize to JSON natively; convert it to a string-keyed
+   * plain object so it survives `JSON.stringify`. Shared by both dump builders.
+   */
+  export const convertMapToPlainObjectForJson = (
+    value: Map<unknown, unknown>
+  ): { [key: string]: unknown } => {
+    const obj: { [key: string]: unknown } = {};
+    value.forEach((v, k) => {
+      obj[String(k)] = v;
+    });
+    return obj;
+  };
+
   /** The only debugger commands processed while a gameplay test is running:
    * read-only inspection and the gameplay test commands themselves. Every
    * other command is ignored (fail closed: a command added later cannot
@@ -286,8 +300,10 @@ namespace gdjs {
       try {
         if (data.command === 'play') {
           runtimeGame.pause(false);
+          that.sendRuntimeGameStatus();
         } else if (data.command === 'pause') {
           runtimeGame.pause(true);
+          that.sendRuntimeGameStatus();
           that.sendRuntimeGameDump();
         } else if (data.command === 'refresh') {
           that.sendRuntimeGameDump();
@@ -752,7 +768,12 @@ namespace gdjs {
      */
     sendRuntimeGameDump(): void {
       const that = this;
-      const message = { command: 'dump', payload: this._runtimegame };
+
+      const activeLocalVariables = gdjs.collectActiveLocalVariables();
+      const message: any = { command: 'dump', payload: this._runtimegame };
+      if (Object.keys(activeLocalVariables).length > 0) {
+        message.activeLocalVariables = activeLocalVariables;
+      }
       const serializationStartTime = Date.now();
 
       // Stringify the message, excluding some known data that are big and/or not
@@ -801,6 +822,9 @@ namespace gdjs {
             excludedKeys.indexOf(key) !== -1
           ) {
             return '[Removed from the debugger]';
+          }
+          if (value instanceof Map) {
+            return gdjs.convertMapToPlainObjectForJson(value);
           }
           return value;
         },

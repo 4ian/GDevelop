@@ -15,7 +15,8 @@ EventsFunctionsExtensionCodeGenerator::GenerateFreeEventsFunctionCompleteCode(
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
-    bool compilationForRuntime) {
+    bool compilationForRuntime,
+    bool generateBreakpointInstrumentation) {
   gd::String lifecycleCleanupCode =
       gd::String(R"jscode_template(
 if (typeof CODE_NAMESPACE !== "undefined") {
@@ -32,7 +33,8 @@ if (typeof CODE_NAMESPACE !== "undefined") {
                                                       eventsFunction,
                                                       codeNamespace,
                                                       includeFiles,
-                                                      compilationForRuntime);
+                                                      compilationForRuntime,
+                                                      generateBreakpointInstrumentation);
 
   gd::String lifecycleRegistrationCode = "";
   lifecycleRegistrationCode +=

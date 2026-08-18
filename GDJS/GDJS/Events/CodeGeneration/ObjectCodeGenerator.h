@@ -39,7 +39,8 @@ class ObjectCodeGenerator {
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& objectMethodMangledNames,
       std::set<gd::String>& includeFiles,
-      bool compilationForRuntime = false);
+      bool compilationForRuntime = false,
+      bool generateBreakpointInstrumentation = false);
 
   /**
    * \brief Generate the name of the method to get the value of the property

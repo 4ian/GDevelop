@@ -15,7 +15,6 @@ const inlineColorPickerStyle = {
   width: 'var(--icon-size)',
   height: 'var(--icon-size)',
   verticalAlign: 'sub',
-  pointerEvents: 'none', // Prevents the color picker from being interactive in the inline renderer, otherwise the focus is steal by the popover react component and the color picker is visible but unsusable.
 };
 
 export default (React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
@@ -83,6 +82,7 @@ export const renderInlineColor = (
         size="compact"
         color={rgbColor}
         style={inlineColorPickerStyle}
+        readOnly
       />
     </>
   );

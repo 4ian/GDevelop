@@ -59,6 +59,7 @@ const ColorPicker = ({
   onChangeComplete,
   disableAlpha,
   disabled,
+  readOnly,
   size,
 }: Props): React.Node => {
   const swatchRef = React.useRef<?HTMLDivElement>(null);
@@ -66,7 +67,7 @@ const ColorPicker = ({
   const portalContainer = React.useContext(PortalContainerContext);
 
   const handleClick = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setDisplayColorPicker(!displayColorPicker);
   };
 

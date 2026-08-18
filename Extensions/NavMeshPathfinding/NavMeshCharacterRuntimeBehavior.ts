@@ -398,9 +398,9 @@ namespace gdjs {
       this.owner.setY(newY);
       if (gdjs.Base3DHandler.is3D(this.owner)) {
         this.owner.setZ(newZ);
-        this.owner.setEstimatedVelocityX(this._agent.raw.get_vel(0));
-        this.owner.setEstimatedVelocityY(this._agent.raw.get_vel(1));
-        this.owner.setEstimatedVelocityZ(this._agent.raw.get_vel(2));
+        this.owner.setEstimatedVelocityX(agent.raw.get_vel(0));
+        this.owner.setEstimatedVelocityY(agent.raw.get_vel(1));
+        this.owner.setEstimatedVelocityZ(agent.raw.get_vel(2));
       }
       this._oldX = newX;
       this._oldY = newY;

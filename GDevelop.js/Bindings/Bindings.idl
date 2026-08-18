@@ -550,7 +550,7 @@ interface ObjectsContainer {
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString name,
         boolean searchInGroups);
-    boolean FREE_IsDefaultBehavior(
+    boolean FREE_HasDefaultBehavior(
         [Const, Ref] ObjectsContainer layout,
         [Const] DOMString objectOrGroupName,
         [Const] DOMString behaviorName,
@@ -731,9 +731,9 @@ interface ObjectsContainersList {
     [Const] DOMString objectOrGroupName,
     [Const] DOMString behaviorType,
     boolean searchInGroups);
-  boolean IsDefaultBehavior(
+  boolean HasDefaultBehavior(
     [Const] DOMString objectOrGroupName,
-    [Const] DOMString behaviorType,
+    [Const] DOMString behaviorName,
     boolean searchInGroups);
   [Value] VectorString GetAnimationNamesOfObject([Const] DOMString name);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);

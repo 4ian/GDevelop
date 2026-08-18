@@ -206,7 +206,11 @@ export const addAnimationFrame = (
 
 type Props = {|
   animations: gdSpriteAnimationList,
-  direction: gdDirection,
+  // The direction is designated by its indexes rather than passed as a
+  // `gdDirection`, so that it can be resolved again on every render.
+  // See `direction` in the component.
+  animationIndex: number,
+  directionIndex: number,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceManagementProps: ResourceManagementProps,
@@ -227,7 +231,8 @@ type Props = {|
 
 const SpritesList = ({
   animations,
-  direction,
+  animationIndex,
+  directionIndex,
   project,
   resourcesLoader,
   resourceManagementProps,
@@ -253,6 +258,31 @@ const SpritesList = ({
   const { showConfirmation } = useAlertDialog();
   const dragDropManager = useDragDropManager();
 
+  // The C++ vectors holding the animations and their sprites are reallocated
+  // as soon as an animation or a sprite is added or removed. Any `gdDirection`
+  // or `gdSprite` wrapper obtained before such a change is then dangling:
+  // using it reads freed memory and crashes the whole editor with a
+  // "memory access out of bounds" error.
+  //
+  // `animations` is stable (it's owned by the object), so the direction is
+  // resolved from it again on every render. This matters because this
+  // component re-renders on its own (selection, drag'n'drop) - i.e. without
+  // its parent re-rendering and so without the direction being resolved again
+  // by the parent.
+  const { direction } = getCurrentElements(
+    animations,
+    animationIndex,
+    directionIndex,
+    0
+  );
+
+  // The callbacks below must not capture `direction`: they can run long after
+  // the render that created them (and, being async, even across a change of
+  // the animations). They read it from this ref instead, which always holds
+  // the direction resolved by the last render.
+  const directionRef = React.useRef<?gdDirection>(direction);
+  directionRef.current = direction;
+
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
     .filter(source => source.kind === 'image')
@@ -264,6 +294,8 @@ const SpritesList = ({
 
   const updateSelectionIndexesAfterMoveUp = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
+      const direction = directionRef.current;
+      if (!direction) return;
       for (let i = oldIndex; i <= newIndex; ++i) {
         const spriteAtIndex = direction.getSprite(i);
         if (i === newIndex) {
@@ -279,11 +311,13 @@ const SpritesList = ({
         }
       }
     },
-    [direction]
+    []
   );
 
   const updateSelectionIndexesAfterMoveDown = React.useCallback(
     (oldIndex: number, newIndex: number, wasMovedItemSelected: boolean) => {
+      const direction = directionRef.current;
+      if (!direction) return;
       for (let i = oldIndex; i >= newIndex; --i) {
         const spriteAtIndex = direction.getSprite(i);
         if (i === newIndex) {
@@ -299,12 +333,14 @@ const SpritesList = ({
         }
       }
     },
-    [direction]
+    []
   );
 
   const moveSpriteToIndex = React.useCallback(
     (oldIndex: number, newIndex: number) => {
       if (oldIndex === newIndex) return;
+      const direction = directionRef.current;
+      if (!direction) return;
       // We store the selection value of the moved sprite, as its pointer will
       // be changed by the move.
       const wasMovedItemSelected = !!selectedSprites.current[
@@ -337,7 +373,6 @@ const SpritesList = ({
       }
     },
     [
-      direction,
       forceUpdate,
       onSpriteUpdated,
       onFirstSpriteUpdated,
@@ -377,14 +412,18 @@ const SpritesList = ({
       const oldIndex = draggedSpriteIndex.current;
       if (oldIndex === null) return;
       draggedSpriteIndex.current = null;
+      const direction = directionRef.current;
+      if (!direction) return;
       moveSpriteToIndex(oldIndex, direction.getSpritesCount() - 1);
     },
-    [moveSpriteToIndex, direction]
+    [moveSpriteToIndex]
   );
 
   const onAddSprite = React.useCallback(
     async (initialResourceSource: ResourceSource) => {
-      const directionSpritesCountBeforeAdding = direction.getSpritesCount();
+      const directionBeforeAdding = directionRef.current;
+      if (!directionBeforeAdding) return;
+      const directionSpritesCountBeforeAdding = directionBeforeAdding.getSpritesCount();
       const {
         selectedResources,
         selectedSourceName,
@@ -399,6 +438,11 @@ const SpritesList = ({
         source => source.name === selectedSourceName
       );
       if (!selectedResourceSource) return;
+
+      // Resolve the direction again: the animations could have been changed
+      // while the resources were being chosen.
+      const direction = directionRef.current;
+      if (!direction) return;
 
       let hasCreatedAnyResource = false;
       if (selectedResourceSource.shouldCreateResource) {
@@ -455,7 +499,6 @@ const SpritesList = ({
       }
     },
     [
-      direction,
       resourceManagementProps,
       forceUpdate,
       onSpriteUpdated,
@@ -480,8 +523,11 @@ const SpritesList = ({
       const totalSpritesCount = getTotalSpritesCount(animations);
       const isDeletingLastSprites =
         Object.keys(sprites).length === totalSpritesCount;
+      const direction = directionRef.current;
       const oneOfSpritesInCurrentDirection =
-        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+        direction && direction.getSpritesCount() > 0
+          ? direction.getSprite(0)
+          : null;
 
       const isUsingCustomCollisionMask =
         !animations.adaptCollisionMaskAutomatically() &&
@@ -523,7 +569,6 @@ const SpritesList = ({
       animations,
       forceUpdate,
       showConfirmation,
-      direction,
     ]
   );
 
@@ -564,21 +609,22 @@ const SpritesList = ({
     [forceUpdate]
   );
 
-  const getSelectedSpriteIndexes = React.useCallback(
-    () => {
-      const selectedIndexes = [];
-      mapFor(0, direction.getSpritesCount(), i => {
-        if (selectedSprites.current[direction.getSprite(i).ptr]) {
-          selectedIndexes.push(i);
-        }
-      });
-      return selectedIndexes;
-    },
-    [direction]
-  );
+  const getSelectedSpriteIndexes = React.useCallback(() => {
+    const selectedIndexes = [];
+    const direction = directionRef.current;
+    if (!direction) return selectedIndexes;
+    mapFor(0, direction.getSpritesCount(), i => {
+      if (selectedSprites.current[direction.getSprite(i).ptr]) {
+        selectedIndexes.push(i);
+      }
+    });
+    return selectedIndexes;
+  }, []);
 
   const moveSelectedSpritesToPosition = React.useCallback(
     (targetStartIndex: number) => {
+      const direction = directionRef.current;
+      if (!direction) return;
       const spritesCount = direction.getSpritesCount();
       const selectedIndexes = getSelectedSpriteIndexes();
       if (selectedIndexes.length === 0) return;
@@ -625,7 +671,6 @@ const SpritesList = ({
       }
     },
     [
-      direction,
       getSelectedSpriteIndexes,
       forceUpdate,
       onSpriteUpdated,
@@ -653,6 +698,11 @@ const SpritesList = ({
     },
     [selectUniqueSprite, dragDropManager]
   );
+
+  // The direction no longer exists (the animation or the direction was
+  // removed): there is nothing to render, and the parent will re-render
+  // without this component soon.
+  if (!direction) return null;
 
   const spritesCount = direction.getSpritesCount();
   const hasMoreThanOneSprite = spritesCount > 1;

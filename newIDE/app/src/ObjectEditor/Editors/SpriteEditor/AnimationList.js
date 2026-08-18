@@ -251,18 +251,16 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                   )}
                   <div style={styles.animationLine}>
                     <Column expand noMargin>
-                      {mapFor(0, directionsCount, directionIndex => {
-                        const direction = animations
-                          .getAnimation(animationIndex)
-                          .getDirection(directionIndex);
-                        return (
-                          <MountOnFirstVisible
-                            key={directionIndex}
-                            placeholderHeight={150}
-                          >
+                      {mapFor(0, directionsCount, directionIndex => (
+                        <MountOnFirstVisible
+                          key={directionIndex}
+                          placeholderHeight={150}
+                        >
+                          {() => (
                             <SpritesList
                               animations={animations}
-                              direction={direction}
+                              animationIndex={animationIndex}
+                              directionIndex={directionIndex}
                               project={project}
                               resourcesLoader={ResourcesLoader}
                               resourceManagementProps={resourceManagementProps}
@@ -303,9 +301,9 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                               onSpriteAdded={onSpriteAdded}
                               addAnimations={addAnimations}
                             />
-                          </MountOnFirstVisible>
-                        );
-                      })}
+                          )}
+                        </MountOnFirstVisible>
+                      ))}
                     </Column>
                   </div>
                 </div>
@@ -422,12 +420,22 @@ const AnimationList: React.ComponentType<{
       [number]: React.Node,
     }>({});
 
-    // Bumped when the content of one or more animations changes without any
-    // prop of the (memoized) animation rows changing, so they re-render.
+    // The animation rows are memoized on primitive props, so a change made to
+    // the animations is invisible to them: `contentRevision` is what makes
+    // them re-render.
+    //
+    // Every change to the animations must go through
+    // `notifyAnimationsChanged`, which both bumps the revision and re-renders.
+    // Having a single function to call (instead of a revision bump to remember
+    // *in addition to* the re-render) is what prevents rows from silently
+    // staying memoized with outdated content.
     const [contentRevision, setContentRevision] = React.useState(0);
-    const bumpContentRevision = React.useCallback(
-      () => setContentRevision(revision => revision + 1),
-      []
+    const notifyAnimationsChanged = React.useCallback(
+      () => {
+        setContentRevision(revision => revision + 1);
+        forceUpdate();
+      },
+      [forceUpdate]
     );
 
     const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
@@ -441,9 +449,9 @@ const AnimationList: React.ComponentType<{
         );
         sprite.setCustomCollisionMask(firstSprite.getCustomCollisionMask());
 
-        forceUpdate();
+        notifyAnimationsChanged();
       },
-      [animations, forceUpdate]
+      [animations, notifyAnimationsChanged]
     );
 
     const moveAnimationToIndex = React.useCallback(
@@ -459,15 +467,9 @@ const AnimationList: React.ComponentType<{
           // then we need to recompute it.
           onCreateMatchingSpriteCollisionMask();
         }
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
       },
-      [
-        animations,
-        forceUpdate,
-        onCreateMatchingSpriteCollisionMask,
-        bumpContentRevision,
-      ]
+      [animations, onCreateMatchingSpriteCollisionMask, notifyAnimationsChanged]
     );
 
     const moveAnimation = React.useCallback(
@@ -509,11 +511,17 @@ const AnimationList: React.ComponentType<{
           animations.addAnimation(animation);
           animation.delete();
         }
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (onObjectUpdated) onObjectUpdated();
       },
-      [forceUpdate, onObjectUpdated, onSizeUpdated, onSpriteAdded, animations]
+      [
+        notifyAnimationsChanged,
+        onObjectUpdated,
+        onSizeUpdated,
+        onSpriteAdded,
+        animations,
+      ]
     );
 
     const addAnimation = React.useCallback(
@@ -524,7 +532,7 @@ const AnimationList: React.ComponentType<{
         emptyAnimation.setDirectionsCount(1);
         animations.addAnimation(emptyAnimation);
         emptyAnimation.delete();
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (onObjectUpdated) onObjectUpdated();
 
@@ -538,11 +546,19 @@ const AnimationList: React.ComponentType<{
           }
         }, 100); // A few ms is enough for a new render to be done.
       },
-      [animations, forceUpdate, onSizeUpdated, onObjectUpdated, scrollView]
+      [
+        animations,
+        notifyAnimationsChanged,
+        onSizeUpdated,
+        onObjectUpdated,
+        scrollView,
+      ]
     );
 
     React.useImperativeHandle(ref, () => ({
-      forceUpdate,
+      // Exposed as `forceUpdate` for the callers, but it must also invalidate
+      // the memoized rows: callers use it after changing the animations.
+      forceUpdate: notifyAnimationsChanged,
       addAnimation,
     }));
 
@@ -581,8 +597,7 @@ const AnimationList: React.ComponentType<{
         setNameErrors({});
 
         animations.removeAnimation(index);
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
         onSizeUpdated();
         if (index === 0 && animations.adaptCollisionMaskAutomatically()) {
           // If the first animation is removed and the collision mask is
@@ -597,13 +612,12 @@ const AnimationList: React.ComponentType<{
         if (onObjectUpdated) onObjectUpdated();
       },
       [
-        forceUpdate,
+        notifyAnimationsChanged,
         onObjectUpdated,
         onSizeUpdated,
         showDeleteConfirmation,
         animations,
         onCreateMatchingSpriteCollisionMask,
-        bumpContentRevision,
       ]
     );
 
@@ -654,7 +668,7 @@ const AnimationList: React.ComponentType<{
             );
           }
         }
-        forceUpdate();
+        notifyAnimationsChanged();
         if (onObjectUpdated) onObjectUpdated();
       },
       [
@@ -663,7 +677,7 @@ const AnimationList: React.ComponentType<{
         object,
         eventsFunctionsExtension,
         eventsBasedObject,
-        forceUpdate,
+        notifyAnimationsChanged,
         onObjectUpdated,
         project,
       ]
@@ -675,11 +689,10 @@ const AnimationList: React.ComponentType<{
         animations
           .getAnimation(animationId)
           .setDirection(newDirection, directionId);
-        bumpContentRevision();
-        forceUpdate();
+        notifyAnimationsChanged();
         if (onObjectUpdated) onObjectUpdated();
       },
-      [forceUpdate, onObjectUpdated, animations, bumpContentRevision]
+      [notifyAnimationsChanged, onObjectUpdated, animations]
     );
 
     const storageProvider = resourceManagementProps.getStorageProvider();
@@ -746,7 +759,7 @@ const AnimationList: React.ComponentType<{
           addAnimations(resourcesByAnimation);
         }
 
-        forceUpdate();
+        notifyAnimationsChanged();
 
         adaptCollisionMaskIfNeeded();
         if (onObjectUpdated) onObjectUpdated();
@@ -754,7 +767,7 @@ const AnimationList: React.ComponentType<{
       [
         resourceManagementProps,
         addAnimations,
-        forceUpdate,
+        notifyAnimationsChanged,
         adaptCollisionMaskIfNeeded,
         onObjectUpdated,
         project,

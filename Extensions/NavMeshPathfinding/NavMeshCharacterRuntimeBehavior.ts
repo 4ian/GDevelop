@@ -29,8 +29,7 @@ namespace gdjs {
   }
 
   /** @category Behaviors > NavMesh pathfinding */
-  export interface NavMeshCharacterNetworkSyncData
-    extends BehaviorNetworkSyncData {
+  export interface NavMeshCharacterNetworkSyncData extends BehaviorNetworkSyncData {
     props: NavMeshCharacterNetworkSyncDataType;
   }
 
@@ -290,11 +289,18 @@ namespace gdjs {
     }
 
     teleportAgentToObjectIfNeeded(): void {
+      // Libraries used by other movement behaviors might have different float
+      // precision (for instance Physics3DRuntimeBehavior).
+      // We take a big error margin because the error is proportional to the
+      // coordinate values, so it can grow quite a lot in huge maps and the old
+      // agent position is still relevant if the object moved less than a pixel.
       if (
-        this._oldX === this.owner.getX() &&
-        this._oldY === this.owner.getY() &&
-        (!gdjs.Base3DHandler.is3D(this.owner) ||
-          this._oldZ === this.owner.getZ())
+        Math.abs(this.owner.getX() - this._oldX) +
+          Math.abs(this.owner.getY() - this._oldY) +
+          (gdjs.Base3DHandler.is3D(this.owner)
+            ? Math.abs(this.owner.getZ() - this._oldZ)
+            : 0) <
+        0.1
       ) {
         return;
       }
@@ -304,19 +310,22 @@ namespace gdjs {
         return;
       }
       const agent = this._agent;
-      const oldX = this.owner.getX();
-      const oldY = this.owner.getY();
+      const newX = this.owner.getX();
+      const newY = this.owner.getY();
       // For 2D we keep the agent position for Z because the ground may not be
       // at 0 because of rasterization.
-      const oldZ = gdjs.Base3DHandler.is3D(this.owner)
+      const newZ = gdjs.Base3DHandler.is3D(this.owner)
         ? this.owner.getZ()
         : agent.raw.get_npos(1);
 
       agent.teleport({
-        x: oldX,
-        y: oldZ,
-        z: this._manager.is3D ? oldY : oldY * this._manager.inverseSpeedScaleY,
+        x: newX,
+        y: newZ,
+        z: this._manager.is3D ? newY : newY * this._manager.inverseSpeedScaleY,
       });
+      this._oldX = newX;
+      this._oldY = newY;
+      this._oldZ = newZ;
       this._path = [];
       this._pathFound = false;
     }

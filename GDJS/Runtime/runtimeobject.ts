@@ -4,11 +4,22 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  export type AbstractRuntimeObject3D = gdjs.RuntimeObject &
-    gdjs.Base3DHandler &
-    gdjs.Resizable &
-    gdjs.Scalable &
-    gdjs.Flippable;
+  export interface AbstractRuntimeObject3D
+    extends gdjs.RuntimeObject,
+      gdjs.Base3DHandler,
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable {
+    hasEstimatedVelocity(): boolean;
+    resetEstimatedVelocity(): void;
+    getEstimatedVelocityX(): float;
+    getEstimatedVelocityY(): float;
+    getEstimatedVelocityZ(): float;
+    setEstimatedVelocityX(velocityX: float): void;
+    setEstimatedVelocityY(velocityY: float): void;
+    setEstimatedVelocityZ(velocityZ: float): void;
+  }
+
   /** @category Objects > 3D Objects */
   export namespace Base3DHandler {
     export const is3D = (

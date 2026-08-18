@@ -24,7 +24,7 @@ namespace gdjs {
    */
   export abstract class RuntimeObject3D
     extends gdjs.RuntimeObject
-    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable, gdjs.Base3DHandler
+    implements gdjs.AbstractRuntimeObject3D
   {
     /**
      * Position on the Z axis.
@@ -66,6 +66,12 @@ namespace gdjs {
      * Note that `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
      */
     private _rotationY: float = 0;
+
+    private _hasEstimatedVelocity = false;
+    private _estimatedVelocityX: float = 0;
+    private _estimatedVelocityY: float = 0;
+    private _estimatedVelocityZ: float = 0;
+
     private static _temporaryVector = new THREE.Vector3();
 
     constructor(
@@ -591,6 +597,44 @@ namespace gdjs {
     hide(enable: boolean): void {
       super.hide(enable);
       this.getRenderer().updateVisibility();
+    }
+
+    hasEstimatedVelocity(): boolean {
+      return this._hasEstimatedVelocity;
+    }
+
+    resetEstimatedVelocity(): void {
+      this._hasEstimatedVelocity = false;
+      this._estimatedVelocityX = 0;
+      this._estimatedVelocityY = 0;
+      this._estimatedVelocityZ = 0;
+    }
+
+    getEstimatedVelocityX(): float {
+      return this._estimatedVelocityX;
+    }
+
+    getEstimatedVelocityY(): float {
+      return this._estimatedVelocityY;
+    }
+
+    getEstimatedVelocityZ(): float {
+      return this._estimatedVelocityZ;
+    }
+
+    setEstimatedVelocityX(velocityX: float): void {
+      this._estimatedVelocityX = velocityX;
+      this._hasEstimatedVelocity = true;
+    }
+
+    setEstimatedVelocityY(velocityY: float): void {
+      this._estimatedVelocityY = velocityY;
+      this._hasEstimatedVelocity = true;
+    }
+
+    setEstimatedVelocityZ(velocityZ: float): void {
+      this._estimatedVelocityZ = velocityZ;
+      this._hasEstimatedVelocity = true;
     }
   }
 }

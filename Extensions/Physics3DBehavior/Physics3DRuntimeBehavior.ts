@@ -264,6 +264,12 @@ namespace gdjs {
       }
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
+        const owner = physicsBehavior.owner3D;
+        if (physicsBehavior.isKinematic() && owner.hasEstimatedVelocity()) {
+          physicsBehavior.setLinearVelocityX(owner.getEstimatedVelocityX());
+          physicsBehavior.setLinearVelocityY(owner.getEstimatedVelocityY());
+          physicsBehavior.setLinearVelocityZ(owner.getEstimatedVelocityZ());
+        }
       }
       for (const physics3DHook of this._physics3DHooks) {
         physics3DHook.doBeforePhysicsStep(deltaTime);
@@ -277,7 +283,11 @@ namespace gdjs {
       // called at the same time because other behavior may move the object in
       // their doStepPreEvents.
       for (const physicsBehavior of this._registeredBehaviors) {
-        physicsBehavior.updateObjectFromBody();
+        const owner = physicsBehavior.owner3D;
+        if (!physicsBehavior.isKinematic() || !owner.hasEstimatedVelocity()) {
+          physicsBehavior.updateObjectFromBody();
+        }
+        owner.resetEstimatedVelocity();
       }
     }
 

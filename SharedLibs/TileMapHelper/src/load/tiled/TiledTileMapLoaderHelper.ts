@@ -65,7 +65,7 @@ export const decodeBase64LayerData = (pako: any, tiledLayer: TiledLayer) => {
 };
 
 export type TiledGID = {
-  id: integer;
+  id: integer | undefined;
   flippedHorizontally: boolean;
   flippedVertically: boolean;
   flippedDiagonally: boolean;
@@ -104,8 +104,6 @@ export const extractTileUidFlippedStates = (
  * This is why the id needs to be decremented.
  * @return the tile identifier.
  */
-export function getTileIdFromTiledGUI(
-  tiledGUI: number
-): number | undefined {
+export function getTileIdFromTiledGUI(tiledGUI: number): number | undefined {
   return tiledGUI === 0 ? undefined : tiledGUI - 1;
 }

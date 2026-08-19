@@ -19,24 +19,24 @@ const {
   getRealEditorActionNames,
   describe,
   click,
-  wait
-} = require("../lib/SpriteEditorActions");
-const { runMonkey, runSteps } = require("../lib/Runner");
+  wait,
+} = require('../lib/SpriteEditorActions');
+const { runMonkey, runSteps } = require('../lib/Runner');
 
-const OBJECT_EDITOR_DIALOG_SELECTOR = "#object-editor-dialog";
+const OBJECT_EDITOR_DIALOG_SELECTOR = '#object-editor-dialog';
 
 const waitForScene = async ({ page, reporter }) => {
-  await page.waitForSelector("[data-object-name]", { timeout: 180000 });
+  await page.waitForSelector('[data-object-name]', { timeout: 180000 });
   await wait(2000);
   const objectNames = await page.evaluate(() =>
-    Array.from(document.querySelectorAll("[data-object-name]")).map(
+    Array.from(document.querySelectorAll('[data-object-name]')).map(
       element =>
-        element.getAttribute("object-name") ||
-        element.getAttribute("data-object-name")
+        element.getAttribute('object-name') ||
+        element.getAttribute('data-object-name')
     )
   );
   reporter.log(
-    `   The scene is opened, with the objects: ${objectNames.join(", ")}.`
+    `   The scene is opened, with the objects: ${objectNames.join(', ')}.`
   );
   return objectNames;
 };
@@ -47,7 +47,7 @@ const openObjectEditor = async ({ page, objectName }) => {
   await row.click({ clickCount: 2, delay: 80 });
   try {
     await page.waitForSelector(OBJECT_EDITOR_DIALOG_SELECTOR, {
-      timeout: 20000
+      timeout: 20000,
     });
   } catch (error) {
     return false;
@@ -57,29 +57,29 @@ const openObjectEditor = async ({ page, objectName }) => {
 };
 
 const closeObjectEditor = async page => {
-  const applyButton = await page.$("#apply-button");
+  const applyButton = await page.$('#apply-button');
   if (applyButton) await applyButton.click();
-  else await page.keyboard.press("Escape");
+  else await page.keyboard.press('Escape');
   await wait(2000);
   return !(await page.$(OBJECT_EDITOR_DIALOG_SELECTOR));
 };
 
 module.exports = [
   {
-    name: "editor/opens-every-object-editor",
+    name: 'editor/opens-every-object-editor',
     description:
-      "The real editor opens an example game, and the editor of every object " +
-      "of its scene can be opened and closed.",
-    example: "platformer",
+      'The real editor opens an example game, and the editor of every object ' +
+      'of its scene can be opened and closed.',
+    example: 'platformer',
     run: async ({ page, pageErrors, reporter, screenshot }) => {
       const failures = [];
       let performed = 0;
       let skipped = 0;
 
       const objectNames = await waitForScene({ page, reporter });
-      await screenshot("scene");
+      await screenshot('scene');
       if (!objectNames.length) {
-        return { failures: ["no object in the scene"], performed, skipped };
+        return { failures: ['no object in the scene'], performed, skipped };
       }
 
       for (const objectName of objectNames) {
@@ -99,7 +99,7 @@ module.exports = [
                   (total, row) => total + row.frames.length,
                   0
                 )} frames displayed)`
-              : " (not an animated object)")
+              : ' (not an animated object)')
         );
         performed++;
         if (!(await closeObjectEditor(page))) {
@@ -111,76 +111,76 @@ module.exports = [
         if (pageErrors.length) break;
       }
 
-      await screenshot("after-opening-the-object-editors");
+      await screenshot('after-opening-the-object-editors');
       return { failures, performed, skipped };
-    }
+    },
   },
   {
-    name: "editor/sprite-editor-manipulations",
+    name: 'editor/sprite-editor-manipulations',
     description:
-      "Manipulate the animations of a real sprite object in the real editor: " +
-      "a smoke test of the same manipulations the Storybook tests cover.",
-    example: "platformer",
+      'Manipulate the animations of a real sprite object in the real editor: ' +
+      'a smoke test of the same manipulations the Storybook tests cover.',
+    example: 'platformer',
     run: async ({ page, pageErrors, reporter, screenshot, options }) => {
       await waitForScene({ page, reporter });
-      if (!(await openObjectEditor({ page, objectName: "Player" }))) {
+      if (!(await openObjectEditor({ page, objectName: 'Player' }))) {
         return {
           failures: ['the editor of the object "Player" did not open'],
           performed: 0,
-          skipped: 0
+          skipped: 0,
         };
       }
       const state = await describe(page);
       reporter.log(
         `   The object "Player" has ${state.rows.length} animations displayed.`
       );
-      await screenshot("sprite-editor");
+      await screenshot('sprite-editor');
 
       const result = await runSteps({
         page,
         pageErrors,
         steps: [
-          ["selectFrames", { row: 0, frames: [0] }],
-          ["setTimeBetweenFrames", { row: 0, value: "0.2" }],
-          ["toggleLoop", { row: 0 }],
-          ["openPreview", { row: 0 }],
-          ["addAnimation"],
-          ["renameAnimation", { row: 0, name: "Walking to the right" }],
-          ["dragAnimation", { from: 0, to: 1 }],
-          ["openPointsEditor"],
-          ["openCollisionMasksEditor"],
-          ["deleteAnimation", { row: 0 }],
-          ["scrollList", { delta: 400 }],
-          ["scrollList", { delta: -400 }]
+          ['selectFrames', { row: 0, frames: [0] }],
+          ['setTimeBetweenFrames', { row: 0, value: '0.2' }],
+          ['toggleLoop', { row: 0 }],
+          ['openPreview', { row: 0 }],
+          ['addAnimation'],
+          ['renameAnimation', { row: 0, name: 'Walking to the right' }],
+          ['dragAnimation', { from: 0, to: 1 }],
+          ['openPointsEditor'],
+          ['openCollisionMasksEditor'],
+          ['deleteAnimation', { row: 0 }],
+          ['scrollList', { delta: 400 }],
+          ['scrollList', { delta: -400 }],
         ],
-        reporter
+        reporter,
       });
-      await screenshot("after-the-manipulations");
+      await screenshot('after-the-manipulations');
 
       if (!(await closeObjectEditor(page))) {
-        result.failures.push("the object editor did not close");
+        result.failures.push('the object editor did not close');
       }
       return result;
-    }
+    },
   },
   {
-    name: "editor/sprite-editor-monkey",
+    name: 'editor/sprite-editor-monkey',
     description:
-      "Random manipulations of the animations of a real sprite object, in the " +
-      "real editor.",
-    example: "platformer",
+      'Random manipulations of the animations of a real sprite object, in the ' +
+      'real editor.',
+    example: 'platformer',
     run: async ({ page, pageErrors, reporter, options }) => {
       await waitForScene({ page, reporter });
-      if (!(await openObjectEditor({ page, objectName: "Player" }))) {
+      if (!(await openObjectEditor({ page, objectName: 'Player' }))) {
         return {
           failures: ['the editor of the object "Player" did not open'],
           performed: 0,
-          skipped: 0
+          skipped: 0,
         };
       }
 
       const actionNames = getRealEditorActionNames();
-      reporter.log(`   Manipulations used: ${actionNames.join(", ")}.`);
+      reporter.log(`   Manipulations used: ${actionNames.join(', ')}.`);
       return await runMonkey({
         page,
         pageErrors,
@@ -188,8 +188,8 @@ module.exports = [
         steps: options.editorMonkeySteps,
         actionNames,
         reporter,
-        verbose: options.verbose
+        verbose: options.verbose,
       });
-    }
-  }
+    },
+  },
 ];

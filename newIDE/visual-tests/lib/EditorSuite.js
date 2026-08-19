@@ -1,13 +1,13 @@
 // @ts-check
 
-const path = require("path");
-const { installSpriteEditorHelpers } = require("./SpriteEditorPageHelpers");
+const path = require('path');
+const { installSpriteEditorHelpers } = require('./SpriteEditorPageHelpers');
 const {
   getPortableBuild,
   getExampleProject,
-  launchEditor
-} = require("./RealEditor");
-const { wait } = require("./SpriteEditorActions");
+  launchEditor,
+} = require('./RealEditor');
+const { wait } = require('./SpriteEditorActions');
 
 const DEBUGGING_PORT = 9333;
 
@@ -20,11 +20,11 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
     zipPath: options.gdevelopZipPath,
     branch: options.gdevelopBranch,
     workDirectory: options.workDirectory,
-    log: reporter.log
+    log: reporter.log,
   });
 
   for (const test of tests) {
-    reporter.log("");
+    reporter.log('');
     reporter.log(`TEST ${test.name}`);
     if (test.description) reporter.log(`   ${test.description}`);
 
@@ -32,7 +32,7 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
       ? getExampleProject({
           slug: test.example,
           workDirectory: options.workDirectory,
-          log: reporter.log
+          log: reporter.log,
         })
       : null;
 
@@ -50,14 +50,14 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
           pageErrors.push(
             message +
               (error.stack
-                ? "\n" +
+                ? '\n' +
                   error.stack
-                    .split("\n")
+                    .split('\n')
                     .slice(0, 8)
-                    .join("\n")
-                : "")
+                    .join('\n')
+                : '')
           );
-        }
+        },
       });
 
       // The helpers are installed in the already loaded page (they can't be
@@ -77,10 +77,10 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
           await editor.page.screenshot({
             path: path.join(
               reporter.getArtifactsDirectory(),
-              `${test.name.replace(/[^a-z0-9]+/gi, "-")}-${name}.png`
-            )
+              `${test.name.replace(/[^a-z0-9]+/gi, '-')}-${name}.png`
+            ),
           });
-        }
+        },
       });
     } catch (error) {
       reporter.log(`   ❌ ${error.message || String(error)}`);
@@ -90,8 +90,8 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
           await editor.page.screenshot({
             path: path.join(
               reporter.getArtifactsDirectory(),
-              `${test.name.replace(/[^a-z0-9]+/gi, "-")}-failure.png`
-            )
+              `${test.name.replace(/[^a-z0-9]+/gi, '-')}-failure.png`
+            ),
           });
         } catch (screenshotError) {
           // Ignore: the window may be gone.
@@ -106,8 +106,8 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
     }
 
     if (pageErrors.length && !result.failures.length) {
-      result.failures.push(`the editor threw: ${pageErrors[0].split("\n")[0]}`);
-      reporter.log(`   💥 the editor threw: ${pageErrors[0].split("\n")[0]}`);
+      result.failures.push(`the editor threw: ${pageErrors[0].split('\n')[0]}`);
+      reporter.log(`   💥 the editor threw: ${pageErrors[0].split('\n')[0]}`);
     }
     reporter.addResult({ name: test.name, ...result });
   }

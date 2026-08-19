@@ -18,31 +18,31 @@
  *   node run.js --suite=all
  */
 
-const fs = require("fs");
-const path = require("path");
-const minimist = require("minimist");
-const { makeReporter } = require("./lib/Reporter");
-const { runStorybookSuite } = require("./lib/StorybookSuite");
-const { runEditorSuite } = require("./lib/EditorSuite");
+const fs = require('fs');
+const path = require('path');
+const minimist = require('minimist');
+const { makeReporter } = require('./lib/Reporter');
+const { runStorybookSuite } = require('./lib/StorybookSuite');
+const { runEditorSuite } = require('./lib/EditorSuite');
 
 const SUITES = {
   storybook: {
-    directory: "storybook-tests",
+    directory: 'storybook-tests',
     run: runStorybookSuite,
-    description: "Storybook stories of a single editor, checked precisely"
+    description: 'Storybook stories of a single editor, checked precisely',
   },
   editor: {
-    directory: "editor-tests",
+    directory: 'editor-tests',
     run: runEditorSuite,
-    description: "A real packaged app opening a real game, checked roughly"
-  }
+    description: 'A real packaged app opening a real game, checked roughly',
+  },
 };
 
 const loadTests = suiteName => {
   const directory = path.join(__dirname, SUITES[suiteName].directory);
   return fs
     .readdirSync(directory)
-    .filter(fileName => fileName.endsWith(".js"))
+    .filter(fileName => fileName.endsWith('.js'))
     .map(fileName => require(path.join(directory, fileName)))
     .reduce((all, tests) => all.concat(tests), [])
     .map(test => ({ ...test, suite: suiteName }));
@@ -51,14 +51,14 @@ const loadTests = suiteName => {
 const main = async () => {
   const args = minimist(process.argv.slice(2));
   const suiteNames =
-    !args.suite || args.suite === "all"
+    !args.suite || args.suite === 'all'
       ? Object.keys(SUITES)
-      : String(args.suite).split(",");
+      : String(args.suite).split(',');
   suiteNames.forEach(suiteName => {
     if (!SUITES[suiteName])
       throw new Error(
         `Unknown suite "${suiteName}" (known: ${Object.keys(SUITES).join(
-          ", "
+          ', '
         )})`
       );
   });
@@ -72,7 +72,7 @@ const main = async () => {
             `${test.monkey.steps} manipulations)`
           : test.steps
           ? ` (${test.steps.length} manipulations)`
-          : "";
+          : '';
         console.log(`  ${test.name}${runs}`);
       });
     });
@@ -83,18 +83,18 @@ const main = async () => {
     headful: !!args.headful,
     verbose: !!args.verbose,
     chromePath:
-      args["chrome-path"] ||
+      args['chrome-path'] ||
       process.env.CHROME_PATH ||
-      "/usr/bin/google-chrome",
-    storybookUrl: args["storybook-url"] || null,
-    storybookPort: Number(args["storybook-port"] || 9010),
-    rebuildStorybook: !!args["rebuild-storybook"],
-    gdevelopZipPath: args["gdevelop-zip"]
-      ? path.resolve(String(args["gdevelop-zip"]))
+      '/usr/bin/google-chrome',
+    storybookUrl: args['storybook-url'] || null,
+    storybookPort: Number(args['storybook-port'] || 9010),
+    rebuildStorybook: !!args['rebuild-storybook'],
+    gdevelopZipPath: args['gdevelop-zip']
+      ? path.resolve(String(args['gdevelop-zip']))
       : null,
-    gdevelopBranch: args["gdevelop-branch"] || "master",
-    editorMonkeySteps: Number(args["editor-monkey-steps"] || 30),
-    workDirectory: path.resolve(String(args["work-dir"] || "./work"))
+    gdevelopBranch: args['gdevelop-branch'] || 'master',
+    editorMonkeySteps: Number(args['editor-monkey-steps'] || 30),
+    workDirectory: path.resolve(String(args['work-dir'] || './work')),
   };
 
   let allPassed = true;
@@ -104,17 +104,17 @@ const main = async () => {
     );
     const reporter = makeReporter({
       artifactsDirectory: path.resolve(
-        String(args["artifacts-dir"] || "./artifacts"),
+        String(args['artifacts-dir'] || './artifacts'),
         suiteName
       ),
-      logFileName: `${suiteName}-visual-tests.log`
+      logFileName: `${suiteName}-visual-tests.log`,
     });
     reporter.log(
       `Running ${tests.length} test(s) of the "${suiteName}" suite ` +
         `(${SUITES[suiteName].description}).`
     );
     if (!tests.length) {
-      reporter.log("No test to run.");
+      reporter.log('No test to run.');
       continue;
     }
 

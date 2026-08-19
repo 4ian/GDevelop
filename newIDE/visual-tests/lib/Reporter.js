@@ -1,7 +1,7 @@
 // @ts-check
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Collects everything the run says, so that it ends up both on the console and
@@ -25,7 +25,7 @@ const makeReporter = ({ artifactsDirectory, logFileName }) => {
       `   ${performed} manipulations performed, ${skipped} skipped, ` +
         (failures.length
           ? `❌ ${failures.length} problem(s)`
-          : "✅ no crash, and the editor stayed consistent")
+          : '✅ no crash, and the editor stayed consistent')
     );
   };
 
@@ -35,15 +35,15 @@ const makeReporter = ({ artifactsDirectory, logFileName }) => {
       (total, result) => total + result.performed,
       0
     );
-    log("");
+    log('');
     log(
-      "================================ SUMMARY ================================"
+      '================================ SUMMARY ================================'
     );
     results.forEach(result =>
       log(
-        `${result.failures.length ? "❌" : "✅"} ${result.name}: ` +
+        `${result.failures.length ? '❌' : '✅'} ${result.name}: ` +
           `${result.performed} manipulations` +
-          (result.failures.length ? ` - ${result.failures[0]}` : "")
+          (result.failures.length ? ` - ${result.failures[0]}` : '')
       )
     );
     log(
@@ -53,10 +53,10 @@ const makeReporter = ({ artifactsDirectory, logFileName }) => {
 
     fs.writeFileSync(
       path.join(artifactsDirectory, logFileName),
-      lines.join("\n") + "\n"
+      lines.join('\n') + '\n'
     );
     fs.writeFileSync(
-      path.join(artifactsDirectory, logFileName.replace(/\.log$/, ".json")),
+      path.join(artifactsDirectory, logFileName.replace(/\.log$/, '.json')),
       JSON.stringify({ results }, null, 2)
     );
     return failed.length === 0;
@@ -66,7 +66,7 @@ const makeReporter = ({ artifactsDirectory, logFileName }) => {
     log,
     addResult,
     writeSummary,
-    getArtifactsDirectory: () => artifactsDirectory
+    getArtifactsDirectory: () => artifactsDirectory,
   };
 };
 

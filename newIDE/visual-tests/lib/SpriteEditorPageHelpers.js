@@ -12,28 +12,32 @@
  * settings of each direction, as there is no header then).
  */
 const installSpriteEditorHelpers = function() {
-  const labelRegExp = /^Animation #(\d+)$/;
+  // In a built Storybook, the translated header of a row is not interpolated
+  // and shows its placeholder instead of the index of the animation (the real
+  // app does show the index): the index is then taken from the position of the
+  // row.
+  const labelRegExp = /^Animation #(\d+|\{animationIndex\})$/;
 
   const isLeaf = element => element.children.length === 0;
-  const textOf = element => (element.textContent || "").trim();
+  const textOf = element => (element.textContent || '').trim();
 
   const getAnimationLabels = () =>
-    Array.from(document.querySelectorAll("*")).filter(
+    Array.from(document.querySelectorAll('*')).filter(
       element => isLeaf(element) && labelRegExp.test(textOf(element))
     );
 
   const getEmptyPlaceholder = () =>
-    Array.from(document.querySelectorAll("*")).find(
+    Array.from(document.querySelectorAll('*')).find(
       element =>
-        isLeaf(element) && textOf(element) === "Add your first animation"
+        isLeaf(element) && textOf(element) === 'Add your first animation'
     ) || null;
 
   const getScrollView = () => {
-    const candidates = Array.from(document.querySelectorAll("div")).filter(
+    const candidates = Array.from(document.querySelectorAll('div')).filter(
       element => {
         const { overflowY } = window.getComputedStyle(element);
         return (
-          (overflowY === "auto" || overflowY === "scroll") &&
+          (overflowY === 'auto' || overflowY === 'scroll') &&
           // Storybook and the editor have hidden scrollable wrappers.
           element.scrollHeight > 0
         );
@@ -53,26 +57,26 @@ const installSpriteEditorHelpers = function() {
   /** All the elements of interest of the animations list, in document order. */
   const collectItems = root => {
     const items = [];
-    Array.from(root.querySelectorAll("*")).forEach(element => {
+    Array.from(root.querySelectorAll('*')).forEach(element => {
       const text = textOf(element);
       if (isLeaf(element) && labelRegExp.test(text)) {
         items.push({
-          kind: "label",
+          kind: 'label',
           element,
-          index: Number(text.match(labelRegExp)[1])
+          index: Number(text.match(labelRegExp)[1]),
         });
-      } else if (element.tagName === "BUTTON") {
-        items.push({ kind: "button", element, text });
-      } else if (element.tagName === "INPUT") {
-        items.push({ kind: "input", element, type: element.type });
+      } else if (element.tagName === 'BUTTON') {
+        items.push({ kind: 'button', element, text });
+      } else if (element.tagName === 'INPUT') {
+        items.push({ kind: 'input', element, type: element.type });
       } else if (
-        element.hasAttribute("title") &&
-        element.querySelector("img")
+        element.hasAttribute('title') &&
+        element.querySelector('img')
       ) {
         items.push({
-          kind: "thumbnail",
+          kind: 'thumbnail',
           element,
-          title: element.getAttribute("title")
+          title: element.getAttribute('title'),
         });
       }
     });
@@ -81,42 +85,45 @@ const installSpriteEditorHelpers = function() {
 
   const buildRows = () => {
     const items = collectItems(getScrollView());
-    const hasLabels = items.some(item => item.kind === "label");
+    const hasLabels = items.some(item => item.kind === 'label');
     const startsARow = item =>
       hasLabels
-        ? item.kind === "label"
-        : item.kind === "input" &&
-          item.element.id === "direction-time-between-frames";
+        ? item.kind === 'label'
+        : item.kind === 'input' &&
+          item.element.id === 'direction-time-between-frames';
 
     const rows = [];
     let row = null;
     items.forEach(item => {
       if (startsARow(item)) {
         row = {
-          index: hasLabels ? item.index : rows.length,
+          index:
+            hasLabels && item.index !== null && item.index !== undefined
+              ? item.index
+              : rows.length,
           labelElement: item.element,
           nameInput: null,
           timeInput: hasLabels ? null : item.element,
           loopCheckbox: null,
           iconButtons: [],
           textButtons: [],
-          frames: []
+          frames: [],
         };
         rows.push(row);
         return;
       }
       if (!row) return;
 
-      if (item.kind === "thumbnail") {
+      if (item.kind === 'thumbnail') {
         row.frames.push({
           element: item.element,
           title: item.title,
-          checkbox: null
+          checkbox: null,
         });
-      } else if (item.kind === "input") {
-        if (item.element.id === "direction-time-between-frames") {
+      } else if (item.kind === 'input') {
+        if (item.element.id === 'direction-time-between-frames') {
           row.timeInput = item.element;
-        } else if (item.type === "checkbox") {
+        } else if (item.type === 'checkbox') {
           const lastFrame = row.frames[row.frames.length - 1];
           if (lastFrame && lastFrame.element.contains(item.element)) {
             lastFrame.checkbox = item.element;
@@ -126,7 +133,7 @@ const installSpriteEditorHelpers = function() {
         } else if (!row.nameInput) {
           row.nameInput = item.element;
         }
-      } else if (item.kind === "button") {
+      } else if (item.kind === 'button') {
         if (item.text)
           row.textButtons.push({ element: item.element, text: item.text });
         else row.iconButtons.push(item.element);
@@ -136,7 +143,7 @@ const installSpriteEditorHelpers = function() {
   };
 
   const findButton = (text, exact) =>
-    Array.from(document.querySelectorAll("button")).find(button =>
+    Array.from(document.querySelectorAll('button')).find(button =>
       exact ? textOf(button) === text : textOf(button).includes(text)
     ) || null;
 
@@ -145,16 +152,30 @@ const installSpriteEditorHelpers = function() {
     const topMostDialog = dialogs[dialogs.length - 1];
     if (!topMostDialog) return null;
     return (
-      Array.from(topMostDialog.querySelectorAll("button")).find(
+      Array.from(topMostDialog.querySelectorAll('button')).find(
         button => textOf(button) === text
       ) || null
     );
   };
 
-  const findMenuItem = text =>
-    Array.from(document.querySelectorAll('[role="menuitem"], li')).find(
-      item => textOf(item) === text
-    ) || null;
+  const findMenuItem = text => {
+    const items = Array.from(
+      document.querySelectorAll('[role="menuitem"], li')
+    );
+    const exactItem = items.find(item => textOf(item) === text);
+    if (exactItem) return exactItem;
+
+    // In a built Storybook, the labels are not interpolated and show their
+    // placeholder ("Position {index}"), so they are all identical: the one to
+    // click is found by its position instead.
+    const match = text.match(/^(.*?)(\d+)$/);
+    if (!match) return null;
+    const itemsWithAPlaceholder = items.filter(item => {
+      const itemText = textOf(item);
+      return itemText.startsWith(match[1]) && /\{[a-zA-Z]+\}$/.test(itemText);
+    });
+    return itemsWithAPlaceholder[Number(match[2]) - 1] || null;
+  };
 
   /**
    * Find the element designated by a target, which is either global
@@ -163,56 +184,56 @@ const installSpriteEditorHelpers = function() {
    */
   const locate = target => {
     if (target.global) {
-      if (target.global === "menuItem") return findMenuItem(target.text);
-      if (target.global === "dialogButton")
+      if (target.global === 'menuItem') return findMenuItem(target.text);
+      if (target.global === 'dialogButton')
         return findDialogButton(target.text);
-      return findButton(target.text, target.global === "exactButton");
+      return findButton(target.text, target.global === 'exactButton');
     }
     const row = buildRows()[target.row];
     if (!row) return null;
     switch (target.kind) {
-      case "name":
+      case 'name':
         return row.nameInput;
-      case "time":
+      case 'time':
         return row.timeInput;
-      case "loop":
+      case 'loop':
         return row.loopCheckbox;
-      case "trash":
+      case 'trash':
         return row.iconButtons[0] || null;
-      case "menu":
+      case 'menu':
         return row.iconButtons[1] || null;
-      case "label":
+      case 'label':
         return row.labelElement;
-      case "dragHandle": {
+      case 'dragHandle': {
         // The drag handle is the icon just before the "Animation #x" header.
         const line = row.labelElement.parentElement;
         if (!line) return null;
         return (
           Array.from(line.children).find(
-            child => child !== row.labelElement && !!child.querySelector("svg")
+            child => child !== row.labelElement && !!child.querySelector('svg')
           ) || null
         );
       }
-      case "textButton": {
+      case 'textButton': {
         const found = row.textButtons.find(button =>
           button.text.includes(target.text)
         );
         return found ? found.element : null;
       }
-      case "addSpriteSplit": {
+      case 'addSpriteSplit': {
         const hasAddASprite = row.textButtons.some(button =>
-          button.text.includes("Add a sprite")
+          button.text.includes('Add a sprite')
         );
         // The split menu arrow is the last icon button of the row.
         return hasAddASprite
           ? row.iconButtons[row.iconButtons.length - 1] || null
           : null;
       }
-      case "frame": {
+      case 'frame': {
         const frame = row.frames[target.frame];
         return frame ? frame.element : null;
       }
-      case "frameCheckbox": {
+      case 'frameCheckbox': {
         const frame = row.frames[target.frame];
         return frame ? frame.checkbox : null;
       }
@@ -227,6 +248,11 @@ const installSpriteEditorHelpers = function() {
       // When locked, the rows have no header: the mounted sprites lists are
       // then matched with the animations by position.
       isAnimationListLocked: !getAnimationLabels().length && rows.length > 0,
+      // False in a built Storybook, where the headers show their placeholder
+      // instead of the index of their animation.
+      hasAnimationIndexes: getAnimationLabels().some(label =>
+        /^Animation #\d+$/.test(textOf(label))
+      ),
       rows: rows.map(row => ({
         index: row.index,
         name: row.nameInput ? row.nameInput.value : null,
@@ -237,10 +263,10 @@ const installSpriteEditorHelpers = function() {
           .filter(frame => !!frame.checkbox)
           .map(frame => ({
             title: frame.title,
-            selected: frame.checkbox.checked
+            selected: frame.checkbox.checked,
           })),
         hasEmptyFramePlaceholder: row.frames.some(frame => !frame.checkbox),
-        textButtons: row.textButtons.map(button => button.text)
+        textButtons: row.textButtons.map(button => button.text),
       })),
       hasEmptyPlaceholder: !!getEmptyPlaceholder(),
       openDialogTitles: Array.from(
@@ -249,7 +275,7 @@ const installSpriteEditorHelpers = function() {
       openMenuItems: Array.from(
         document.querySelectorAll('[role="menuitem"]')
       ).map(item => textOf(item)),
-      imagesCount: document.querySelectorAll("img").length
+      imagesCount: document.querySelectorAll('img').length,
     };
   };
 
@@ -280,7 +306,7 @@ const installSpriteEditorHelpers = function() {
         !described.hasEmptyPlaceholder &&
         !described.openDialogTitles.length
       ) {
-        problems.push("the animations list is not displayed anymore");
+        problems.push('the animations list is not displayed anymore');
       }
       return { problems, described, model: null };
     }
@@ -312,7 +338,11 @@ const installSpriteEditorHelpers = function() {
         problems.push(`the row at position ${position} has no animation`);
         return;
       }
-      if (!described.isAnimationListLocked && row.index !== position) {
+      if (
+        !described.isAnimationListLocked &&
+        described.hasAnimationIndexes &&
+        row.index !== position
+      ) {
         problems.push(
           `the row at position ${position} is labelled "Animation #${
             row.index
@@ -330,11 +360,11 @@ const installSpriteEditorHelpers = function() {
       const direction = animation.directions[0];
       const modelFrames = direction ? direction.frames : [];
       const displayedFrames = row.frames.map(frame => frame.title);
-      if (displayedFrames.join("|") !== modelFrames.join("|")) {
+      if (displayedFrames.join('|') !== modelFrames.join('|')) {
         problems.push(
           `the row #${row.index} displays the frames [${displayedFrames.join(
-            ", "
-          )}] but the animation contains [${modelFrames.join(", ")}]`
+            ', '
+          )}] but the animation contains [${modelFrames.join(', ')}]`
         );
       }
       if (modelFrames.length === 0 && !row.hasEmptyFramePlaceholder) {
@@ -368,7 +398,7 @@ const installSpriteEditorHelpers = function() {
   const rectOf = (target, shouldScroll) => {
     const element = locate(target);
     if (!element) return null;
-    if (shouldScroll !== false) element.scrollIntoView({ block: "center" });
+    if (shouldScroll !== false) element.scrollIntoView({ block: 'center' });
     const rect = element.getBoundingClientRect();
     if (
       rect.width === 0 ||
@@ -383,14 +413,14 @@ const installSpriteEditorHelpers = function() {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
       width: rect.width,
-      height: rect.height
+      height: rect.height,
     };
   };
 
   const click = target => {
     const element = locate(target);
     if (!element) return false;
-    element.scrollIntoView({ block: "center" });
+    element.scrollIntoView({ block: 'center' });
     element.click();
     return true;
   };
@@ -400,26 +430,26 @@ const installSpriteEditorHelpers = function() {
     if (!element) return false;
     const setValue = Object.getOwnPropertyDescriptor(
       window.HTMLInputElement.prototype,
-      "value"
+      'value'
     ).set;
-    element.scrollIntoView({ block: "center" });
+    element.scrollIntoView({ block: 'center' });
     element.focus();
     setValue.call(element, value);
-    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.dispatchEvent(new Event('input', { bubbles: true }));
     element.blur();
     return true;
   };
 
   const openFrameContextMenu = (row, frame) => {
-    const element = locate({ row, kind: "frame", frame });
+    const element = locate({ row, kind: 'frame', frame });
     if (!element) return false;
-    element.scrollIntoView({ block: "center" });
+    element.scrollIntoView({ block: 'center' });
     const rect = element.getBoundingClientRect();
     element.dispatchEvent(
-      new MouseEvent("contextmenu", {
+      new MouseEvent('contextmenu', {
         bubbles: true,
         clientX: rect.left + 10,
-        clientY: rect.top + 10
+        clientY: rect.top + 10,
       })
     );
     return true;
@@ -432,7 +462,7 @@ const installSpriteEditorHelpers = function() {
     return {
       from,
       to: scrollView.scrollTop,
-      max: scrollView.scrollHeight - scrollView.clientHeight
+      max: scrollView.scrollHeight - scrollView.clientHeight,
     };
   };
 
@@ -444,7 +474,7 @@ const installSpriteEditorHelpers = function() {
     rectOf,
     setInputValue,
     openFrameContextMenu,
-    scrollBy
+    scrollBy,
   };
 };
 

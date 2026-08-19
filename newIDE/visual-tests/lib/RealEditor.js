@@ -1,18 +1,18 @@
 // @ts-check
 
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
-const { spawn, spawnSync } = require("child_process");
-const AdmZip = require("adm-zip");
-const puppeteer = require("puppeteer-core");
-const { downloadFile, formatBytes } = require("./Download");
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { spawn, spawnSync } = require('child_process');
+const AdmZip = require('adm-zip');
+const puppeteer = require('puppeteer-core');
+const { downloadFile, formatBytes } = require('./Download');
 
-const electronAppPackageJson = require("../../electron-app/app/package.json");
+const electronAppPackageJson = require('../../electron-app/app/package.json');
 
 const EXAMPLES_REPOSITORY =
-  "https://github.com/GDevelopApp/GDevelop-examples.git";
-const EXAMPLES_BRANCH = "main";
+  'https://github.com/GDevelopApp/GDevelop-examples.git';
+const EXAMPLES_BRANCH = 'main';
 
 const wait = durationInMs =>
   new Promise(resolve => setTimeout(resolve, durationInMs));
@@ -22,7 +22,7 @@ const wait = durationInMs =>
  * `name` field of the package.json by electron-builder).
  */
 const findExecutable = root => {
-  const candidates = ["gdevelop", "GDevelop"];
+  const candidates = ['gdevelop', 'GDevelop'];
   const stack = [root];
   while (stack.length) {
     const directory = stack.pop();
@@ -84,7 +84,7 @@ const getPortableBuild = async ({ zipPath, branch, workDirectory, log }) => {
   if (!binaryPath)
     throw new Error(
       `No GDevelop executable found in ${extractedDirectory}. Contents: ` +
-        fs.readdirSync(extractedDirectory).join(", ")
+        fs.readdirSync(extractedDirectory).join(', ')
     );
   fs.chmodSync(binaryPath, 0o755);
   log(`GDevelop ${version}: ${binaryPath}`);
@@ -96,10 +96,10 @@ const getPortableBuild = async ({ zipPath, branch, workDirectory, log }) => {
  * repository is far too big) and return the path of its project file.
  */
 const getExampleProject = ({ slug, workDirectory, log }) => {
-  const exampleParentDirectory = path.join(workDirectory, "examples", slug);
+  const exampleParentDirectory = path.join(workDirectory, 'examples', slug);
   const projectPath = path.join(
     exampleParentDirectory,
-    "examples",
+    'examples',
     slug,
     `${slug}.json`
   );
@@ -113,17 +113,17 @@ const getExampleProject = ({ slug, workDirectory, log }) => {
   const run = command => {
     const result = spawnSync(command[0], command.slice(1), {
       cwd: exampleParentDirectory,
-      stdio: "inherit"
+      stdio: 'inherit',
     });
     if (result.status !== 0)
-      throw new Error(`Command failed: ${command.join(" ")}`);
+      throw new Error(`Command failed: ${command.join(' ')}`);
   };
-  run(["git", "init", "-q"]);
-  run(["git", "remote", "add", "origin", EXAMPLES_REPOSITORY]);
-  run(["git", "sparse-checkout", "init", "--cone"]);
-  run(["git", "sparse-checkout", "set", `examples/${slug}`]);
-  run(["git", "fetch", "--depth=1", "origin", EXAMPLES_BRANCH]);
-  run(["git", "checkout", "-q", "FETCH_HEAD"]);
+  run(['git', 'init', '-q']);
+  run(['git', 'remote', 'add', 'origin', EXAMPLES_REPOSITORY]);
+  run(['git', 'sparse-checkout', 'init', '--cone']);
+  run(['git', 'sparse-checkout', 'set', `examples/${slug}`]);
+  run(['git', 'fetch', '--depth=1', 'origin', EXAMPLES_BRANCH]);
+  run(['git', 'checkout', '-q', 'FETCH_HEAD']);
 
   if (!fs.existsSync(projectPath))
     throw new Error(`No project file at ${projectPath} after the clone.`);
@@ -139,44 +139,44 @@ const launchEditor = async ({
   projectPath,
   debuggingPort,
   log,
-  onPageError
+  onPageError,
 }) => {
   const userDataDirectory = fs.mkdtempSync(
-    path.join(os.tmpdir(), "gdevelop-visual-tests-")
+    path.join(os.tmpdir(), 'gdevelop-visual-tests-')
   );
   const args = [
-    "--no-sandbox",
-    "--disable-update-check",
-    "--disable-gpu",
+    '--no-sandbox',
+    '--disable-update-check',
+    '--disable-gpu',
     `--remote-debugging-port=${debuggingPort}`,
-    `--user-data-dir=${userDataDirectory}`
+    `--user-data-dir=${userDataDirectory}`,
   ];
   if (projectPath) args.push(projectPath);
 
-  log(`Starting the editor: ${path.basename(binaryPath)} ${args.join(" ")}`);
+  log(`Starting the editor: ${path.basename(binaryPath)} ${args.join(' ')}`);
   const child = spawn(binaryPath, args, {
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env }
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env },
   });
   const output = [];
   const collect = data => {
     output.push(data.toString());
     if (output.length > 200) output.shift();
   };
-  if (child.stdout) child.stdout.on("data", collect);
-  if (child.stderr) child.stderr.on("data", collect);
+  if (child.stdout) child.stdout.on('data', collect);
+  if (child.stderr) child.stderr.on('data', collect);
 
   let browser = null;
   const startedAt = Date.now();
   while (Date.now() - startedAt < 120000) {
     if (child.exitCode !== null)
       throw new Error(
-        `The editor exited with ${child.exitCode}:\n${output.join("")}`
+        `The editor exited with ${child.exitCode}:\n${output.join('')}`
       );
     try {
       browser = await puppeteer.connect({
         browserURL: `http://127.0.0.1:${debuggingPort}`,
-        defaultViewport: null
+        defaultViewport: null,
       });
       break;
     } catch (error) {
@@ -186,7 +186,7 @@ const launchEditor = async ({
   if (!browser)
     throw new Error(
       `Could not connect to the editor on port ${debuggingPort}:\n` +
-        output.join("")
+        output.join('')
     );
 
   // Find the window of the editor itself (there can be other targets).
@@ -194,14 +194,14 @@ const launchEditor = async ({
   const foundAt = Date.now();
   while (Date.now() - foundAt < 60000) {
     const pages = await browser.pages();
-    page = pages.find(onePage => !onePage.url().startsWith("devtools://"));
+    page = pages.find(onePage => !onePage.url().startsWith('devtools://'));
     if (page) break;
     await wait(500);
   }
-  if (!page) throw new Error("No page found in the editor.");
+  if (!page) throw new Error('No page found in the editor.');
   log(`Connected to the editor window (${page.url()}).`);
 
-  page.on("pageerror", error => onPageError(error));
+  page.on('pageerror', error => onPageError(error));
 
   const stop = async () => {
     try {
@@ -209,15 +209,15 @@ const launchEditor = async ({
     } catch (error) {
       // Ignore: the editor may already be gone.
     }
-    child.kill("SIGKILL");
+    child.kill('SIGKILL');
   };
 
-  return { browser, page, stop, getOutput: () => output.join("") };
+  return { browser, page, stop, getOutput: () => output.join('') };
 };
 
 module.exports = {
   getPortableBuild,
   getExampleProject,
   launchEditor,
-  findExecutable
+  findExecutable,
 };

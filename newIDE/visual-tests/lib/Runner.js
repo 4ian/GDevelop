@@ -11,7 +11,7 @@
  * - the manipulation did what it was supposed to do.
  */
 
-const { actions, describe, click, wait } = require("./SpriteEditorActions");
+const { actions, describe, click, wait } = require('./SpriteEditorActions');
 
 /** A reproducible pseudo random number generator. */
 const makeRandom = seed => {
@@ -50,11 +50,11 @@ const describeEffect = (snapshotBefore, snapshotAfter) => {
       changes.push(
         `#${position} ${framesBefore.length} → ${framesAfter.length} frames`
       );
-    else if (framesBefore.join("|") !== framesAfter.join("|"))
+    else if (framesBefore.join('|') !== framesAfter.join('|'))
       changes.push(`#${position} frames reordered`);
     else changes.push(`#${position} direction settings changed`);
   });
-  return changes.length ? changes.join(", ") : "nothing changed";
+  return changes.length ? changes.join(', ') : 'nothing changed';
 };
 
 /**
@@ -72,8 +72,8 @@ const takeSnapshot = async page => {
       animations: model.map(animation => ({
         name: animation.name,
         frames: animation.directions[0] ? animation.directions[0].frames : [],
-        directions: animation.directions
-      }))
+        directions: animation.directions,
+      })),
     };
 
   const described = await describe(page);
@@ -86,10 +86,10 @@ const takeSnapshot = async page => {
         {
           frames: row.frames.map(frame => frame.title),
           timeBetweenFrames: Number(row.timeBetweenFrames),
-          isLooping: row.isLooping
-        }
-      ]
-    }))
+          isLooping: row.isLooping,
+        },
+      ],
+    })),
   };
 };
 
@@ -103,7 +103,7 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
   const stateBefore = await describe(page);
   const stepArgs =
     args || (action.pick ? action.pick(stateBefore, random) : {});
-  if (!stepArgs) return { skipped: "not applicable" };
+  if (!stepArgs) return { skipped: 'not applicable' };
 
   const description = action.describe(stepArgs);
   const snapshotBefore = await takeSnapshot(page);
@@ -126,35 +126,35 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
   const { problems } = await check(page);
   const snapshotAfter = await takeSnapshot(page);
   const effect = describeEffect(snapshotBefore, snapshotAfter);
-  const hadNoEffect = effect === "nothing changed";
+  const hadNoEffect = effect === 'nothing changed';
 
   if (action.mustChangeTheObject && hadNoEffect) {
-    problems.push("the object was not changed");
+    problems.push('the object was not changed');
   }
 
   if (expectation && snapshotAfter.isFromTheObject) {
     const framesAfter = framesOf(snapshotAfter, expectation.row);
     const expected = expectation.frames;
-    if (expected && framesAfter.join("|") !== expected.join("|")) {
+    if (expected && framesAfter.join('|') !== expected.join('|')) {
       problems.push(
         `the frames of the animation #${
           expectation.row
-        } are [${framesAfter.join(", ")}] but [${expected.join(
-          ", "
+        } are [${framesAfter.join(', ')}] but [${expected.join(
+          ', '
         )}] was expected`
       );
     }
     const prefix = expectation.framesStartWith;
     if (
       prefix &&
-      framesAfter.slice(0, prefix.length).join("|") !== prefix.join("|")
+      framesAfter.slice(0, prefix.length).join('|') !== prefix.join('|')
     ) {
       problems.push(
         `the frames of the animation #${
           expectation.row
         } are [${framesAfter.join(
-          ", "
-        )}] but they should start with [${prefix.join(", ")}]`
+          ', '
+        )}] but they should start with [${prefix.join(', ')}]`
       );
     }
     if (
@@ -208,7 +208,7 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
     if (stillSelected.length) {
       problems.push(
         `${stillSelected.length} frame(s) are still shown as selected after ` +
-          `the animations changed: ${stillSelected.join(", ")}`
+          `the animations changed: ${stillSelected.join(', ')}`
       );
     }
   }
@@ -219,9 +219,9 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
         .map(animation => animation.frames)
         .reduce((all, frames) => all.concat(frames), [])
         .sort()
-        .join("|");
+        .join('|');
     if (allFrames(snapshotBefore) !== allFrames(snapshotAfter)) {
-      problems.push("the frames of the object were not only reordered");
+      problems.push('the frames of the object were not only reordered');
     }
   }
 
@@ -230,7 +230,7 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
     problems,
     effect,
     hadNoEffect,
-    isDrop: !!action.mayHaveNoEffect
+    isDrop: !!action.mayHaveNoEffect,
   };
 };
 
@@ -238,17 +238,17 @@ const runStep = async ({ page, pageErrors, actionName, args, random }) => {
 const closeAnyOverlay = async page => {
   const state = await describe(page);
   if (state.openMenuItems.length) {
-    await page.keyboard.press("Escape");
+    await page.keyboard.press('Escape');
     await wait(300);
     return true;
   }
   if (state.openDialogTitles.length) {
     const closed =
-      (await click(page, { global: "exactButton", text: "Apply" })) ||
-      (await click(page, { global: "exactButton", text: "Ok" })) ||
-      (await click(page, { global: "exactButton", text: "Close" })) ||
-      (await click(page, { global: "exactButton", text: "Cancel" }));
-    if (!closed) await page.keyboard.press("Escape");
+      (await click(page, { global: 'exactButton', text: 'Apply' })) ||
+      (await click(page, { global: 'exactButton', text: 'Ok' })) ||
+      (await click(page, { global: 'exactButton', text: 'Close' })) ||
+      (await click(page, { global: 'exactButton', text: 'Cancel' }));
+    if (!closed) await page.keyboard.press('Escape');
     await wait(500);
     return true;
   }
@@ -258,8 +258,8 @@ const closeAnyOverlay = async page => {
 const reportStepResult = ({ reporter, result, prefix, pageErrors }) => {
   if (result.crashed) {
     reporter.log(`   💥 ${prefix}${result.description}: THE EDITOR CRASHED`);
-    (pageErrors[0] || "")
-      .split("\n")
+    (pageErrors[0] || '')
+      .split('\n')
       .slice(0, 6)
       .forEach(line => reporter.log(`      ${line.trim()}`));
     return [`crash after: ${result.description}`];
@@ -287,7 +287,7 @@ const runSteps = async ({ page, pageErrors, steps, reporter }) => {
       pageErrors,
       actionName,
       args,
-      random
+      random,
     });
     if (result.skipped) {
       skipped++;
@@ -304,8 +304,8 @@ const runSteps = async ({ page, pageErrors, steps, reporter }) => {
     const stepFailures = reportStepResult({
       reporter,
       result,
-      prefix: "",
-      pageErrors
+      prefix: '',
+      pageErrors,
     });
     if (stepFailures.length) {
       failures.push(...stepFailures);
@@ -315,8 +315,8 @@ const runSteps = async ({ page, pageErrors, steps, reporter }) => {
   }
 
   if (drops > 0 && effectiveDrops === 0) {
-    failures.push("none of the drag and drops moved anything");
-    reporter.log("   ❌ none of the drag and drops moved anything");
+    failures.push('none of the drag and drops moved anything');
+    reporter.log('   ❌ none of the drag and drops moved anything');
   }
   return { failures, performed, skipped, drops, effectiveDrops };
 };
@@ -329,10 +329,10 @@ const runMonkey = async ({
   steps,
   actionNames,
   reporter,
-  verbose
+  verbose,
 }) => {
   const random = makeRandom(seed);
-  const weights = require("./SpriteEditorActions").monkeyWeights;
+  const weights = require('./SpriteEditorActions').monkeyWeights;
   const weighted = [];
   (actionNames || Object.keys(weights)).forEach(name => {
     for (let index = 0; index < (weights[name] || 1); index++)
@@ -351,7 +351,7 @@ const runMonkey = async ({
       pageErrors,
       actionName,
       args: null,
-      random
+      random,
     });
     if (result.skipped) {
       skipped++;
@@ -362,7 +362,7 @@ const runMonkey = async ({
       reporter,
       result,
       prefix: `step ${step + 1}, `,
-      pageErrors
+      pageErrors,
     });
     if (stepFailures.length) {
       failures.push(...stepFailures);
@@ -382,5 +382,5 @@ module.exports = {
   runMonkey,
   runStep,
   check,
-  closeAnyOverlay
+  closeAnyOverlay,
 };

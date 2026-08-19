@@ -65,7 +65,7 @@ const dragFromTo = async (page, fromTarget, toTarget, dropAfter) => {
 const closeAnyMenu = async page => {
   const state = await describe(page);
   if (!state.openMenuItems.length) return;
-  await page.keyboard.press("Escape");
+  await page.keyboard.press('Escape');
   await wait(300);
 };
 
@@ -77,27 +77,27 @@ const pickOne = (values, random) =>
 
 /** Names of different lengths: the object is then serialized differently. */
 const ANIMATION_NAMES = [
-  "Walk",
-  "Walk right",
-  "Walking to the right",
-  "Player walking right",
-  "Player walking to the right",
-  "Player walking to the right of the screen",
-  "Player character walking slowly to the right of the screen",
-  ""
+  'Walk',
+  'Walk right',
+  'Walking to the right',
+  'Player walking right',
+  'Player walking to the right',
+  'Player walking to the right of the screen',
+  'Player character walking slowly to the right of the screen',
+  '',
 ];
 
 const actions = {
   addAnimation: {
     mustChangeTheObject: true,
     clearsTheFrameSelection: true,
-    describe: () => "add an animation",
+    describe: () => 'add an animation',
     pick: state => (state.hasEmptyPlaceholder ? null : {}),
     run: async page => {
-      if (!(await click(page, { global: "button", text: "Add an animation" })))
+      if (!(await click(page, { global: 'button', text: 'Add an animation' })))
         return 'there is no "Add an animation" button';
       await wait(500);
-    }
+    },
   },
 
   deleteAnimation: {
@@ -109,13 +109,13 @@ const actions = {
         ? { row: Math.floor(random() * state.rows.length) }
         : null,
     run: async (page, args) => {
-      if (!(await click(page, { row: args.row, kind: "trash" })))
-        return "there is no delete button";
+      if (!(await click(page, { row: args.row, kind: 'trash' })))
+        return 'there is no delete button';
       await wait(600);
-      if (!(await click(page, { global: "dialogButton", text: "Remove" })))
-        return "the delete confirmation did not show up";
+      if (!(await click(page, { global: 'dialogButton', text: 'Remove' })))
+        return 'the delete confirmation did not show up';
       await wait(700);
-    }
+    },
   },
 
   renameAnimation: {
@@ -124,16 +124,16 @@ const actions = {
       state.rows.length
         ? {
             row: Math.floor(random() * state.rows.length),
-            name: pickOne(ANIMATION_NAMES, random)
+            name: pickOne(ANIMATION_NAMES, random),
           }
         : null,
     run: async (page, args) => {
       if (
-        !(await setInputValue(page, { row: args.row, kind: "name" }, args.name))
+        !(await setInputValue(page, { row: args.row, kind: 'name' }, args.name))
       )
-        return "there is no name field";
+        return 'there is no name field';
       await wait(600);
-    }
+    },
   },
 
   moveAnimationWithMenu: {
@@ -145,25 +145,36 @@ const actions = {
     pick: (state, random) => {
       if (state.rows.length < 2) return null;
       const row = Math.floor(random() * state.rows.length);
+      // Moving an animation before or after one having the same name and the
+      // same frames leaves the object identical, so nothing could be checked.
+      const signatureOf = position =>
+        `${state.rows[position].name}|${state.rows[position].frames
+          .map(frame => frame.title)
+          .join(',')}`;
+      const isDistinguishableFrom = position =>
+        signatureOf(position) !== signatureOf(row);
       // The menu disables the position the animation already has.
       const items = [];
-      if (row !== 0) items.push("Move to top");
-      if (row !== state.rows.length - 1) items.push("Move to bottom");
-      for (let position = 1; position < state.rows.length - 1; position++) {
-        if (position !== row) items.push(`Move to position ${position}`);
+      if (row !== 0 && isDistinguishableFrom(0)) items.push('Move to top');
+      const lastRow = state.rows.length - 1;
+      if (row !== lastRow && isDistinguishableFrom(lastRow))
+        items.push('Move to bottom');
+      for (let position = 1; position < lastRow; position++) {
+        if (position !== row && isDistinguishableFrom(position))
+          items.push(`Move to position ${position}`);
       }
       return items.length ? { row, item: pickOne(items, random) } : null;
     },
     run: async (page, args) => {
-      if (!(await click(page, { row: args.row, kind: "menu" })))
-        return "there is no menu button";
+      if (!(await click(page, { row: args.row, kind: 'menu' })))
+        return 'there is no menu button';
       await wait(500);
-      if (!(await click(page, { global: "menuItem", text: args.item }))) {
+      if (!(await click(page, { global: 'menuItem', text: args.item }))) {
         await closeAnyMenu(page);
         return `the menu item "${args.item}" is missing`;
       }
       await wait(700);
-    }
+    },
   },
 
   dragAnimation: {
@@ -181,12 +192,12 @@ const actions = {
     run: async (page, args) => {
       const dragged = await dragFromTo(
         page,
-        { row: args.from, kind: "dragHandle" },
-        { row: args.to, kind: "label" }
+        { row: args.from, kind: 'dragHandle' },
+        { row: args.to, kind: 'label' }
       );
-      if (!dragged) return "the two rows were not both visible";
+      if (!dragged) return 'the two rows were not both visible';
       await wait(400);
-    }
+    },
   },
 
   setTimeBetweenFrames: {
@@ -197,20 +208,20 @@ const actions = {
       if (!rows.length) return null;
       return {
         row: pickOne(rows, random).index,
-        value: pickOne(["0.05", "0.2", "1"], random)
+        value: pickOne(['0.05', '0.2', '1'], random),
       };
     },
     run: async (page, args) => {
       if (
         !(await setInputValue(
           page,
-          { row: args.row, kind: "time" },
+          { row: args.row, kind: 'time' },
           args.value
         ))
       )
-        return "there is no time between frames field";
+        return 'there is no time between frames field';
       await wait(500);
-    }
+    },
   },
 
   toggleLoop: {
@@ -222,10 +233,10 @@ const actions = {
       return rows.length ? { row: pickOne(rows, random).index } : null;
     },
     run: async (page, args) => {
-      if (!(await click(page, { row: args.row, kind: "loop" })))
-        return "there is no loop checkbox";
+      if (!(await click(page, { row: args.row, kind: 'loop' })))
+        return 'there is no loop checkbox';
       await wait(400);
-    }
+    },
   },
 
   addFrames: {
@@ -240,13 +251,13 @@ const actions = {
       if (
         !(await click(page, {
           row: args.row,
-          kind: "textButton",
-          text: "Add a sprite"
+          kind: 'textButton',
+          text: 'Add a sprite',
         }))
       )
         return 'there is no "Add a sprite" button';
       await wait(900);
-    }
+    },
   },
 
   importAnimationsInEmptyAnimation: {
@@ -262,25 +273,25 @@ const actions = {
       return row ? { row: row.index } : null;
     },
     run: async (page, args) => {
-      if (!(await click(page, { row: args.row, kind: "addSpriteSplit" })))
+      if (!(await click(page, { row: args.row, kind: 'addSpriteSplit' })))
         return 'there is no split menu next to "Add a sprite"';
       await wait(500);
       if (
         !(await click(page, {
-          global: "menuItem",
-          text: "Import fake images named per animation"
+          global: 'menuItem',
+          text: 'Import fake images named per animation',
         }))
       ) {
         await closeAnyMenu(page);
-        return "the import menu item is missing";
+        return 'the import menu item is missing';
       }
       await wait(1200);
-    }
+    },
   },
 
   selectFrames: {
     describe: args =>
-      `select the frames ${args.frames.join(", ")} of the animation #${
+      `select the frames ${args.frames.join(', ')} of the animation #${
         args.row
       }`,
     pick: (state, random) => {
@@ -295,12 +306,12 @@ const actions = {
     run: async (page, args) => {
       for (const frame of args.frames) {
         if (
-          !(await click(page, { row: args.row, kind: "frameCheckbox", frame }))
+          !(await click(page, { row: args.row, kind: 'frameCheckbox', frame }))
         )
           return `there is no frame ${frame}`;
         await wait(200);
       }
-    }
+    },
   },
 
   frameContextMenuAction: {
@@ -320,11 +331,11 @@ const actions = {
       // The menu disables the positions the selection already has.
       const isSelectionAtPosition = startIndex =>
         selected.every((index, offset) => index === startIndex + offset);
-      const items = ["Delete selection", "Duplicate selection"];
+      const items = ['Delete selection', 'Duplicate selection'];
       if (row.frames.length > 1) {
         const lastStartIndex = row.frames.length - selected.length;
-        if (!isSelectionAtPosition(0)) items.push("Move to beginning");
-        if (!isSelectionAtPosition(lastStartIndex)) items.push("Move to end");
+        if (!isSelectionAtPosition(0)) items.push('Move to beginning');
+        if (!isSelectionAtPosition(lastStartIndex)) items.push('Move to end');
         for (let position = 1; position < lastStartIndex; position++) {
           if (!isSelectionAtPosition(position))
             items.push(`Position ${position}`);
@@ -335,7 +346,7 @@ const actions = {
         row: row.index,
         frame: selected[0],
         item,
-        isSubmenuItem: item.startsWith("Position ")
+        isSubmenuItem: item.startsWith('Position '),
       };
     },
     // What the frames of the animation must be afterwards.
@@ -348,13 +359,13 @@ const actions = {
         .filter(index => index >= 0);
       if (!selected.length) return null;
 
-      if (args.item === "Delete selection") {
+      if (args.item === 'Delete selection') {
         return {
           row: args.row,
-          frames: frames.filter((frame, index) => !selected.includes(index))
+          frames: frames.filter((frame, index) => !selected.includes(index)),
         };
       }
-      if (args.item === "Duplicate selection") {
+      if (args.item === 'Duplicate selection') {
         const expected = [];
         frames.forEach((frame, index) => {
           if (selected.includes(index)) expected.push(frame, frame);
@@ -364,11 +375,11 @@ const actions = {
       }
 
       const startIndex =
-        args.item === "Move to beginning"
+        args.item === 'Move to beginning'
           ? 0
-          : args.item === "Move to end"
+          : args.item === 'Move to end'
           ? frames.length - selected.length
-          : Number(args.item.replace("Position ", ""));
+          : Number(args.item.replace('Position ', ''));
       if (isNaN(startIndex)) return null;
       const clampedStartIndex = Math.min(
         startIndex,
@@ -383,8 +394,8 @@ const actions = {
         frames: [
           ...otherFrames.slice(0, clampedStartIndex),
           ...movedFrames,
-          ...otherFrames.slice(clampedStartIndex)
-        ]
+          ...otherFrames.slice(clampedStartIndex),
+        ],
       };
     },
     run: async (page, args) => {
@@ -393,27 +404,27 @@ const actions = {
         args.row,
         args.frame
       );
-      if (!opened) return "the frame is missing";
+      if (!opened) return 'the frame is missing';
       await wait(500);
       if (args.isSubmenuItem) {
         if (
-          !(await click(page, { global: "menuItem", text: "Move to position" }))
+          !(await click(page, { global: 'menuItem', text: 'Move to position' }))
         ) {
           await closeAnyMenu(page);
           return 'there is no "Move to position" submenu';
         }
         await wait(400);
       }
-      if (!(await click(page, { global: "menuItem", text: args.item }))) {
+      if (!(await click(page, { global: 'menuItem', text: args.item }))) {
         await closeAnyMenu(page);
         return `the menu item "${args.item}" is missing`;
       }
       await wait(700);
       // Deleting the last frames of an object using a custom collision mask
       // asks for a confirmation.
-      await click(page, { global: "dialogButton", text: "Remove" });
+      await click(page, { global: 'dialogButton', text: 'Remove' });
       await wait(300);
-    }
+    },
   },
 
   dragFrame: {
@@ -435,12 +446,12 @@ const actions = {
     run: async (page, args) => {
       const dragged = await dragFromTo(
         page,
-        { row: args.row, kind: "frame", frame: args.from },
-        { row: args.row, kind: "frame", frame: args.to },
+        { row: args.row, kind: 'frame', frame: args.from },
+        { row: args.row, kind: 'frame', frame: args.to },
         args.to > args.from
       );
-      if (!dragged) return "the two frames were not both visible";
-    }
+      if (!dragged) return 'the two frames were not both visible';
+    },
   },
 
   editWithExternalEditor: {
@@ -449,7 +460,7 @@ const actions = {
     describe: args => `edit the animation #${args.row} with the image editor`,
     pick: (state, random) => {
       const rows = state.rows.filter(row =>
-        row.textButtons.some(text => text.includes("the fake image editor"))
+        row.textButtons.some(text => text.includes('the fake image editor'))
       );
       return rows.length ? { row: pickOne(rows, random).index } : null;
     },
@@ -464,21 +475,21 @@ const actions = {
         framesStartWith: frames,
         framesCount: frames.length + 1,
         timeBetweenFrames: Number(row.timeBetweenFrames),
-        isLooping: row.isLooping
+        isLooping: row.isLooping,
       };
     },
     run: async (page, args) => {
       if (
         !(await click(page, {
           row: args.row,
-          kind: "textButton",
-          text: "the fake image editor"
+          kind: 'textButton',
+          text: 'the fake image editor',
         }))
       )
-        return "there is no external editor button";
+        return 'there is no external editor button';
       // The fake session takes a moment, then the frames are written back.
       await wait(1500);
-    }
+    },
   },
 
   openPreview: {
@@ -491,94 +502,94 @@ const actions = {
       if (
         !(await click(page, {
           row: args.row,
-          kind: "textButton",
-          text: "Preview"
+          kind: 'textButton',
+          text: 'Preview',
         }))
       )
-        return "there is no Preview button";
+        return 'there is no Preview button';
       await wait(1200);
-      if (!(await click(page, { global: "dialogButton", text: "Ok" })))
-        return "the preview dialog did not close";
+      if (!(await click(page, { global: 'dialogButton', text: 'Ok' })))
+        return 'the preview dialog did not close';
       await wait(500);
-    }
+    },
   },
 
   openPointsEditor: {
-    describe: () => "open and close the points editor",
+    describe: () => 'open and close the points editor',
     pick: state => (rowsWithFrames(state).length ? {} : null),
     run: async page => {
-      if (!(await click(page, { global: "exactButton", text: "Edit points" })))
+      if (!(await click(page, { global: 'exactButton', text: 'Edit points' })))
         return 'there is no "Edit points" button';
       await wait(1500);
-      if (!(await click(page, { global: "dialogButton", text: "Apply" })))
-        return "the points editor did not close";
+      if (!(await click(page, { global: 'dialogButton', text: 'Apply' })))
+        return 'the points editor did not close';
       await wait(600);
-    }
+    },
   },
 
   openCollisionMasksEditor: {
-    describe: () => "open and close the collision masks editor",
+    describe: () => 'open and close the collision masks editor',
     pick: state => (rowsWithFrames(state).length ? {} : null),
     run: async page => {
       if (
         !(await click(page, {
-          global: "exactButton",
-          text: "Edit collision masks"
+          global: 'exactButton',
+          text: 'Edit collision masks',
         }))
       )
         return 'there is no "Edit collision masks" button';
       await wait(1500);
-      if (!(await click(page, { global: "dialogButton", text: "Apply" })))
-        return "the collision masks editor did not close";
+      if (!(await click(page, { global: 'dialogButton', text: 'Apply' })))
+        return 'the collision masks editor did not close';
       await wait(600);
-    }
+    },
   },
 
   openAdvancedOptions: {
-    describe: () => "open and close the advanced options",
+    describe: () => 'open and close the advanced options',
     pick: state => (rowsWithFrames(state).length ? {} : null),
     run: async page => {
       if (
         !(await click(page, {
-          global: "exactButton",
-          text: "Advanced options"
+          global: 'exactButton',
+          text: 'Advanced options',
         }))
       )
         return 'there is no "Advanced options" button';
       await wait(900);
-      if (!(await click(page, { global: "dialogButton", text: "Close" })))
-        return "the advanced options did not close";
+      if (!(await click(page, { global: 'dialogButton', text: 'Close' })))
+        return 'the advanced options did not close';
       await wait(500);
-    }
+    },
   },
 
   importImagesFromPlaceholder: {
     mustChangeTheObject: true,
     needsFileDialog: true,
-    describe: () => "import images from the empty placeholder",
+    describe: () => 'import images from the empty placeholder',
     pick: state => (state.hasEmptyPlaceholder ? {} : null),
     run: async page => {
-      if (!(await click(page, { global: "button", text: "Import images" })))
+      if (!(await click(page, { global: 'button', text: 'Import images' })))
         return 'there is no "Import images" button';
       await wait(1500);
-    }
+    },
   },
 
   serialize: {
     needsStorybook: true,
-    describe: () => "serialize the object (like saving does)",
+    describe: () => 'serialize the object (like saving does)',
     pick: () => ({}),
     run: async page => {
-      if (!(await click(page, { global: "exactButton", text: "Update" })))
-        return "there is no serialization button on this story";
+      if (!(await click(page, { global: 'exactButton', text: 'Update' })))
+        return 'there is no serialization button on this story';
       await wait(500);
-    }
+    },
   },
 
   scrollList: {
     describe: args => `scroll the animations list by ${args.delta}px`,
     pick: (state, random) => ({
-      delta: (random() < 0.5 ? -1 : 1) * (300 + Math.floor(random() * 900))
+      delta: (random() < 0.5 ? -1 : 1) * (300 + Math.floor(random() * 900)),
     }),
     run: async (page, args) => {
       await page.evaluate(
@@ -586,8 +597,8 @@ const actions = {
         args.delta
       );
       await wait(400);
-    }
-  }
+    },
+  },
 };
 
 /** How often the monkey picks each action. */
@@ -611,7 +622,7 @@ const monkeyWeights = {
   openCollisionMasksEditor: 1,
   openAdvancedOptions: 1,
   serialize: 2,
-  scrollList: 2
+  scrollList: 2,
 };
 
 /**
@@ -639,5 +650,5 @@ module.exports = {
   setInputValue,
   rectOf,
   dragFromTo,
-  wait
+  wait,
 };

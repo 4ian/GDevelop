@@ -1,7 +1,7 @@
 // @ts-check
 
-const fs = require("fs");
-const https = require("https");
+const fs = require('fs');
+const https = require('https');
 
 /**
  * Download a file, following redirects. Kept dependency free so that this
@@ -37,10 +37,10 @@ const downloadFile = (url, destinationPath, redirectsLeft = 5) =>
         }
         const file = fs.createWriteStream(destinationPath);
         response.pipe(file);
-        file.on("finish", () => file.close(() => resolve()));
-        file.on("error", reject);
+        file.on('finish', () => file.close(() => resolve()));
+        file.on('error', reject);
       })
-      .on("error", reject);
+      .on('error', reject);
   });
 
 const formatBytes = size => {

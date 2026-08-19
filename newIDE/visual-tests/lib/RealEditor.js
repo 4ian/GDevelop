@@ -5,7 +5,7 @@ const os = require('os');
 const path = require('path');
 const { spawn, spawnSync } = require('child_process');
 const AdmZip = require('adm-zip');
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const { downloadFile, formatBytes } = require('./Download');
 
 const electronAppPackageJson = require('../../electron-app/app/package.json');

@@ -1,13 +1,14 @@
 // @ts-check
 
 const path = require('path');
-const { installSpriteEditorHelpers } = require('./SpriteEditorPageHelpers');
+const { installPageHelpers } = require('./PageHelpers');
 const {
   getPortableBuild,
   getExampleProject,
   launchEditor,
 } = require('./RealEditor');
-const { wait } = require('./SpriteEditorActions');
+const { runSteps, runMonkey } = require('./Runner');
+const { wait } = require('./PageDriver');
 
 const DEBUGGING_PORT = 9333;
 
@@ -39,6 +40,12 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
     const pageErrors = [];
     let editor = null;
     let result = { failures: [], performed: 0, skipped: 0 };
+    const screenshotPath = name =>
+      path.join(
+        reporter.getArtifactsDirectory(),
+        `${test.name.replace(/[^a-z0-9]+/gi, '-')}-${name}.png`
+      );
+
     try {
       editor = await launchEditor({
         binaryPath,
@@ -60,41 +67,51 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
         },
       });
 
-      // The helpers are installed in the already loaded page (they can't be
-      // installed before, the editor window is opened by the app itself).
-      await editor.page.evaluate(
-        `(${installSpriteEditorHelpers.toString()})()`
-      );
+      // The helpers are installed in the already loaded page: the window of the
+      // editor is opened by the app itself, not by the test.
+      const helpers = test.helpers || (test.helper ? [test.helper] : []);
+      await editor.page.evaluate(`(${installPageHelpers.toString()})()`);
+      for (const helper of helpers) {
+        if (helper.installPageHelpers)
+          await editor.page.evaluate(
+            `(${helper.installPageHelpers.toString()})()`
+          );
+      }
 
+      const page = editor.page;
       result = await test.run({
-        page: editor.page,
+        page,
         pageErrors,
         reporter,
         version,
         projectPath,
         options,
         screenshot: async name => {
-          await editor.page.screenshot({
-            path: path.join(
-              reporter.getArtifactsDirectory(),
-              `${test.name.replace(/[^a-z0-9]+/gi, '-')}-${name}.png`
-            ),
-          });
+          await page.screenshot({ path: screenshotPath(name) });
         },
+        // The same runners as the Storybook tests, already bound to this page.
+        runSteps: ({ helper, steps }) =>
+          runSteps({ page, pageErrors, helper, steps, reporter }),
+        runMonkey: ({ helper, seed, steps, actionNames }) =>
+          runMonkey({
+            page,
+            pageErrors,
+            helper,
+            seed: seed || 1,
+            steps: steps || options.editorMonkeySteps,
+            actionNames,
+            reporter,
+            verbose: options.verbose,
+          }),
       });
     } catch (error) {
       reporter.log(`   ❌ ${error.message || String(error)}`);
       result.failures = [...result.failures, error.message || String(error)];
       if (editor) {
         try {
-          await editor.page.screenshot({
-            path: path.join(
-              reporter.getArtifactsDirectory(),
-              `${test.name.replace(/[^a-z0-9]+/gi, '-')}-failure.png`
-            ),
-          });
+          await editor.page.screenshot({ path: screenshotPath('failure') });
         } catch (screenshotError) {
-          // Ignore: the window may be gone.
+          // Ignore: the window may already be gone.
         }
       }
     } finally {

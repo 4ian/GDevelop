@@ -1,13 +1,21 @@
 // @ts-check
 
 const path = require('path');
-const puppeteer = require('puppeteer-core');
-const { installSpriteEditorHelpers } = require('./SpriteEditorPageHelpers');
+const puppeteer = require('puppeteer');
+const { installPageHelpers } = require('./PageHelpers');
 const { startStorybook } = require('./StorybookServer');
-const { runSteps, runMonkey, check } = require('./Runner');
-const { wait } = require('./SpriteEditorActions');
+const { runSteps, runMonkey } = require('./Runner');
+const { wait } = require('./PageDriver');
+const { findChrome } = require('./Chrome');
 
-const openStory = async ({ browser, storybookUrl, storyId, headful }) => {
+/** Install the generic page helpers, then the ones of the editor being tested. */
+const getPageHelpersScript = helper =>
+  `(${installPageHelpers.toString()})();` +
+  (helper && helper.installPageHelpers
+    ? `(${helper.installPageHelpers.toString()})();`
+    : '');
+
+const openStory = async ({ browser, storybookUrl, test, headful }) => {
   const page = await browser.newPage();
   if (!headful) await page.setViewport({ width: 1500, height: 1000 });
 
@@ -30,25 +38,22 @@ const openStory = async ({ browser, storybookUrl, storyId, headful }) => {
     if (
       message.type() === 'error' &&
       text.includes('The above error occurred in the')
-    ) {
+    )
       pageErrors.push('React reports: ' + text.split('\n')[1]);
-    }
   });
 
-  await page.evaluateOnNewDocument(
-    `(${installSpriteEditorHelpers.toString()})()`
+  await page.evaluateOnNewDocument(getPageHelpersScript(test.helper));
+  await page.goto(
+    `${storybookUrl}/iframe.html?id=${test.story}&viewMode=story`,
+    { waitUntil: 'domcontentloaded', timeout: 120000 }
   );
-  await page.goto(`${storybookUrl}/iframe.html?id=${storyId}&viewMode=story`, {
-    waitUntil: 'domcontentloaded',
-    timeout: 120000,
-  });
   // Wait for GDevelop.js to be loaded and the story to be rendered.
   await page.waitForFunction(
     () =>
-      !!window.spriteEditorManipulations &&
       !!window.gdVisualTests &&
       (document.querySelectorAll('img').length > 0 ||
-        window.gdVisualTests.describe().hasEmptyPlaceholder),
+        (!!window.gdVisualTests.spriteEditor &&
+          window.gdVisualTests.spriteEditor.describe().hasEmptyPlaceholder)),
     { timeout: 180000, polling: 500 }
   );
   await wait(1500);
@@ -65,7 +70,7 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
   });
 
   const browser = await puppeteer.launch({
-    executablePath: options.chromePath,
+    executablePath: findChrome(options.chromePath),
     headless: options.headful ? false : 'new',
     slowMo: options.headful ? 20 : 0,
     defaultViewport: options.headful ? null : { width: 1500, height: 1000 },
@@ -92,10 +97,10 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
         const { page, pageErrors } = await openStory({
           browser,
           storybookUrl: storybook.url,
-          storyId: test.story,
+          test,
           headful: options.headful,
         });
-        const initial = await check(page);
+        const initial = await test.helper.check(page);
         reporter.log(
           `   ${initial.described.rows.length} animations, ` +
             `${initial.described.imagesCount} thumbnails displayed.`
@@ -105,6 +110,7 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
           ? await runMonkey({
               page,
               pageErrors,
+              helper: test.helper,
               seed,
               steps: test.monkey.steps,
               reporter,
@@ -113,11 +119,12 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
           : await runSteps({
               page,
               pageErrors,
+              helper: test.helper,
               steps: test.steps,
               reporter,
             });
 
-        const final = await check(page);
+        const final = await test.helper.check(page);
         if (!result.failures.length && final.problems.length) {
           result.failures.push(...final.problems);
           reporter.log(`   ❌ final check: ${final.problems.join('; ')}`);

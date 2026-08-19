@@ -14,7 +14,7 @@
   "dependencies": {
     "adm-zip": "^0.5.10",
     "minimist": "1.2.5",
-    "puppeteer-core": "^23.11.1",
+    "puppeteer": "^24.15.0",
     "serve-handler": "6.1.6"
   }
 }

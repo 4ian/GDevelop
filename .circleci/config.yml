@@ -724,17 +724,28 @@ jobs:
   run-visual-monkey-tests-storybook-linux:
     resource_class: large
     docker:
-      # The "browsers" image comes with Chrome, which the tests run in.
-      - image: cimg/node:24.13.0-browsers
+      - image: cimg/node:24.13.0
 
     working_directory: ~/GDevelop
 
     steps:
       - checkout
 
+      # The tests run in the Chrome that `npm install` downloads for Puppeteer
+      # (see newIDE/visual-tests/package.json), which needs these libraries.
       - run:
-          name: Check Chrome is available
-          command: google-chrome --version
+          name: Install the libraries Chrome needs
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libasound2t64 \
+              libgbm1 \
+              libgtk-3-0 \
+              libxss1 \
+              libatk-bridge2.0-0 \
+              libdrm2 \
+              libxkbcommon0
 
       - restore_cache:
           keys:
@@ -746,9 +757,19 @@ jobs:
           name: Install GDevelop IDE dependencies
           command: cd newIDE/app && npm install
 
+      - restore_cache:
+          keys:
+            - gd-visual-tests-dependencies-v1-{{ checksum "newIDE/visual-tests/package.json" }}
+
       - run:
-          name: Install the visual tests dependencies
+          name: Install the visual tests dependencies (and the Chrome to run them in)
           command: cd newIDE/visual-tests && npm install --no-audit --no-fund
+
+      - save_cache:
+          paths:
+            - newIDE/visual-tests/node_modules
+            - ~/.cache/puppeteer
+          key: gd-visual-tests-dependencies-v1-{{ checksum "newIDE/visual-tests/package.json" }}
 
       - run:
           name: Build Storybook

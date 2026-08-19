@@ -82,10 +82,7 @@ const main = async () => {
   const options = {
     headful: !!args.headful,
     verbose: !!args.verbose,
-    chromePath:
-      args['chrome-path'] ||
-      process.env.CHROME_PATH ||
-      '/usr/bin/google-chrome',
+    chromePath: args['chrome-path'] || null,
     storybookUrl: args['storybook-url'] || null,
     storybookPort: Number(args['storybook-port'] || 9010),
     rebuildStorybook: !!args['rebuild-storybook'],

@@ -13,6 +13,8 @@
  * are reallocated as soon as one is added or removed).
  */
 
+const spriteEditor = require('../helpers/SpriteEditor');
+
 const stories = {
   manipulations: 'objecteditor-spriteeditormanipulations--manipulations',
   serialized:
@@ -31,6 +33,7 @@ const stories = {
 
 module.exports = [
   {
+    helper: spriteEditor,
     name: 'sprite-editor/add-animations-and-interact',
     description:
       'Adding animations reallocates the vector holding them: everything ' +
@@ -52,6 +55,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/delete-animations',
     description:
       'Removing an animation frees its directions and shifts the following ' +
@@ -74,6 +78,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/move-animations-with-the-menu',
     story: stories.serialized,
     steps: [
@@ -92,6 +97,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/drag-and-drop-animations',
     story: stories.manipulations,
     steps: [
@@ -106,6 +112,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/frames-selection-and-context-menu',
     description:
       'Deleting, duplicating and moving the selected frames must act on ' +
@@ -143,6 +150,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/selection-after-the-animations-changed',
     description:
       'The selection designates frames by their index, so it must be reset ' +
@@ -172,6 +180,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/drag-and-drop-frames',
     story: stories.manyFrames,
     steps: [
@@ -184,6 +193,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/add-frames-and-import-animations',
     story: stories.manipulations,
     steps: [
@@ -200,6 +210,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/external-editor',
     story: stories.manipulations,
     steps: [
@@ -213,6 +224,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/external-editor-changing-the-animations',
     description:
       'The animations are changed (and their vector reallocated) while the ' +
@@ -228,6 +240,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/object-dialogs',
     story: stories.manipulations,
     steps: [
@@ -244,6 +257,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/direction-settings',
     story: stories.manipulations,
     steps: [
@@ -260,6 +274,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/lazily-mounted-animations',
     description:
       'With many animations, the sprites lists are only mounted when they ' +
@@ -281,6 +296,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/locked-animation-list',
     description:
       'Like the editor of a child object of a custom object: only the frames ' +
@@ -306,6 +322,7 @@ module.exports = [
     ],
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/empty-object',
     story: stories.emptyObject,
     steps: [
@@ -326,6 +343,7 @@ module.exports = [
 
   // The random sessions: they do what the scripted tests above do not think of.
   {
+    helper: spriteEditor,
     name: 'sprite-editor/monkey-on-a-serialized-object',
     description:
       'Random manipulations on an object serialized on every change, so that ' +
@@ -334,21 +352,25 @@ module.exports = [
     monkey: { seeds: [1, 2, 3], steps: 60 },
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/monkey-with-many-animations',
     story: stories.manyAnimations,
     monkey: { seeds: [1, 2], steps: 60 },
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/monkey-with-many-frames',
     story: stories.manyFrames,
     monkey: { seeds: [1, 2], steps: 60 },
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/monkey-on-a-locked-animation-list',
     story: stories.lockedList,
     monkey: { seeds: [1, 2], steps: 60 },
   },
   {
+    helper: spriteEditor,
     name: 'sprite-editor/monkey-from-an-empty-object',
     story: stories.emptyObject,
     monkey: { seeds: [1, 2], steps: 50 },

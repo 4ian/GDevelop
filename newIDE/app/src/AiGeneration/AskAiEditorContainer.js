@@ -43,7 +43,10 @@ import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
 } from '../Utils/GDevelopServices/Usage';
-import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
@@ -528,7 +531,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
               return;
             }
 
-            const activeUserId = profile ? profile.id : 'local-byok-user';
+            const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
             // Read the options and reset them (to avoid launching the same request twice).
             const {
@@ -690,7 +693,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
         |}) => {
           if (!profile && !isCustomEndpointEnabled()) return;
 
-          const activeUserId = profile ? profile.id : 'local-byok-user';
+          const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
           const aiRequestForMessage = aiRequests[aiRequestId];
           if (!aiRequestForMessage) return;
@@ -1584,7 +1587,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
                 lastSendError={getLastSendError(selectedAiRequestId)}
                 quota={quota}
                 increaseQuotaOffering={
-                  !hasValidSubscriptionPlan(subscription)
+                  isCustomEndpointEnabled()
+                    ? 'none'
+                    : !hasValidSubscriptionPlan(subscription)
                     ? 'subscribe'
                     : canUpgradeSubscription(subscription)
                     ? 'upgrade'

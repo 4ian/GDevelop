@@ -15,7 +15,10 @@ import {
 } from '../EditorFunctions';
 import { makeSimplifiedProjectBuilder } from '../EditorFunctions/SimplifiedProject/SimplifiedProject';
 import { prepareAiUserContent } from './PrepareAiUserContent';
-import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 
 const gd: libGDevelop = global.gd;
 
@@ -70,7 +73,7 @@ export const useGenerateEvents = ({
       if (!profile && !isCustomEndpointEnabled())
         throw new Error('User should be authenticated.');
 
-      const activeUserId = profile ? profile.id : 'local-byok-user';
+      const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
       const simplifiedProjectBuilder = makeSimplifiedProjectBuilder(gd);
       const simplifiedProjectJson = JSON.stringify(
@@ -137,7 +140,7 @@ export const useGenerateEvents = ({
             aiGeneratedEvent = await getAiGeneratedEvent(
               getAuthorizationHeader,
               {
-                userId: profile.id,
+                userId: activeUserId,
                 aiGeneratedEventId: aiGeneratedEvent.id,
               }
             );

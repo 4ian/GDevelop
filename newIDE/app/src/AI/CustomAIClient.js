@@ -14,6 +14,8 @@ import {
   type AiSettings,
 } from '../Utils/GDevelopServices/Generation';
 
+export const LOCAL_BYOK_USER_ID = 'local-byok-user';
+
 export type CustomAIConfig = {|
   enabled: boolean,
   baseUrl: string,
@@ -34,6 +36,7 @@ export const DEFAULT_CUSTOM_AI_CONFIG: CustomAIConfig = {
 
 const LOCAL_STORAGE_CONFIG_KEY = 'gd-custom-ai-config';
 const LOCAL_STORAGE_REQUESTS_KEY = 'gd-custom-ai-requests';
+const MAX_LOCAL_SAVED_REQUESTS = 20;
 
 /**
  * In-memory configuration cache.
@@ -70,6 +73,7 @@ export const getCustomEndpointConfig = (): CustomAIConfig => {
 
 /**
  * Save custom AI config to local storage and update in-memory cache.
+ * Excludes apiKey from cleartext localStorage while retaining it in memory.
  */
 export const setCustomEndpointConfig = (
   updates: $Shape<CustomAIConfig>
@@ -83,9 +87,10 @@ export const setCustomEndpointConfig = (
 
   try {
     if (typeof localStorage !== 'undefined') {
+      const { apiKey, ...persistableConfig } = nextConfig;
       localStorage.setItem(
         LOCAL_STORAGE_CONFIG_KEY,
-        JSON.stringify(nextConfig)
+        JSON.stringify(persistableConfig)
       );
     }
   } catch (err) {
@@ -105,6 +110,7 @@ export const isCustomEndpointEnabled = (): boolean => {
 
 /**
  * Normalize base URL ensuring protocol and removing trailing slashes.
+ * Preserves the configured path exactly without automatically appending /v1.
  */
 export const normalizeBaseUrl = (baseUrl: string): string => {
   let url = (baseUrl || '').trim();
@@ -113,12 +119,13 @@ export const normalizeBaseUrl = (baseUrl: string): string => {
   }
   // Remove trailing slashes
   url = url.replace(/\/+$/, '');
-  // If user entered just localhost:11434, add http://
+  // If user entered a schemeless URL, default to http:// for loopback and https:// otherwise
   if (!/^https?:\/\//i.test(url)) {
-    url = `http://${url}`;
-  }
-  if (!url.endsWith('/v1')) {
-    url = `${url}/v1`;
+    if (/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/.*)?$/i.test(url)) {
+      url = `http://${url}`;
+    } else {
+      url = `https://${url}`;
+    }
   }
   return url;
 };
@@ -135,11 +142,6 @@ export const getEndpointUrl = (
     ? endpointPath
     : `/${endpointPath}`;
 
-  // If baseUrl already ends with /v1 and endpointPath starts with /v1, don't duplicate /v1
-  if (normalized.endsWith('/v1') && cleanPath.startsWith('/v1/')) {
-    return `${normalized}${cleanPath.substring(3)}`;
-  }
-
   return `${normalized}${cleanPath}`;
 };
 
@@ -147,6 +149,16 @@ export const getEndpointUrl = (
  * In-memory cache for local AI requests.
  */
 const localAiRequestsCache: { [id: string]: AiRequest } = {};
+
+/**
+ * Reset CustomAIClient state (for testing).
+ */
+export const _resetCustomAiClientForTesting = () => {
+  cachedConfig = null;
+  for (const key of Object.keys(localAiRequestsCache)) {
+    delete localAiRequestsCache[key];
+  }
+};
 
 /**
  * Load local AI requests from local storage.
@@ -167,19 +179,28 @@ export const loadLocalAiRequests = (): { [id: string]: AiRequest } => {
 };
 
 /**
- * Save local AI requests to local storage.
+ * Save local AI requests to local storage, retaining a bounded number of requests
+ * and excluding full gameProjectJson to prevent storage quota exhaustion.
  */
 export const saveLocalAiRequests = () => {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(
-        LOCAL_STORAGE_REQUESTS_KEY,
-        JSON.stringify(localAiRequestsCache)
-      );
+  if (typeof localStorage === 'undefined') return;
+
+  const keys = Object.keys(localAiRequestsCache);
+  const recentKeys = keys.slice(-MAX_LOCAL_SAVED_REQUESTS);
+  const persistableMap: { [id: string]: AiRequest } = {};
+
+  for (const key of recentKeys) {
+    const req = localAiRequestsCache[key];
+    if (req) {
+      const { gameProjectJson, ...persistableReq } = req;
+      persistableMap[key] = (persistableReq: any);
     }
-  } catch (err) {
-    console.warn('Error saving local AI requests to localStorage:', err);
   }
+
+  localStorage.setItem(
+    LOCAL_STORAGE_REQUESTS_KEY,
+    JSON.stringify(persistableMap)
+  );
 };
 
 // Initialize requests from localStorage
@@ -1064,7 +1085,7 @@ export const extractThinkingAndContent = (
  */
 export const transformGDevelopMessagesToOpenAi = (
   outputMessages: Array<any>,
-  systemPromptOrProjectJson?: ?string,
+  systemPromptOrGameProjectJson?: ?string,
   projectSpecificExtensionsSummaryJson?: ?string,
   mode?: string
 ): Array<{|
@@ -1082,26 +1103,25 @@ export const transformGDevelopMessagesToOpenAi = (
 |}> => {
   const openAiMessages = [];
 
-  let systemPrompt: ?string = null;
-  if (typeof systemPromptOrProjectJson === 'string') {
+  let effectiveSystemPrompt: ?string = null;
+  if (systemPromptOrGameProjectJson) {
     if (
-      systemPromptOrProjectJson.includes('GDevelop AI Assistant') ||
-      systemPromptOrProjectJson.includes('You are')
+      systemPromptOrGameProjectJson.includes('You are GDevelop AI Assistant')
     ) {
-      systemPrompt = systemPromptOrProjectJson;
+      effectiveSystemPrompt = systemPromptOrGameProjectJson;
     } else {
-      systemPrompt = buildSystemPrompt({
-        gameProjectJson: systemPromptOrProjectJson,
+      effectiveSystemPrompt = buildSystemPrompt({
+        gameProjectJson: systemPromptOrGameProjectJson,
         projectSpecificExtensionsSummaryJson,
-        mode,
+        mode: (mode: any),
       });
     }
   }
 
-  if (systemPrompt) {
+  if (effectiveSystemPrompt) {
     openAiMessages.push({
       role: 'system',
-      content: systemPrompt,
+      content: effectiveSystemPrompt,
     });
   }
 
@@ -1120,142 +1140,129 @@ export const transformGDevelopMessagesToOpenAi = (
               .map(item => item.text)
               .join('\n')
           : '');
-      if (text) {
-        openAiMessages.push({
-          role: 'user',
-          content: text,
-        });
-      }
+      openAiMessages.push({
+        role: 'user',
+        content: text,
+      });
     } else if (
       msg.role === 'assistant' ||
       msg.type === 'assistant' ||
       (msg.type === 'message' && msg.role === 'assistant')
     ) {
-      const textParts = [];
+      const content = msg.text || '';
       const toolCalls = [];
-      const seenCallIds = new Set();
 
-      if (msg.text) {
-        textParts.push(msg.text);
-      } else if (typeof msg.content === 'string') {
-        textParts.push(msg.content);
-      } else if (Array.isArray(msg.content)) {
-        for (const item of msg.content) {
-          if (item.type === 'output_text') {
-            textParts.push(item.text);
-          } else if (item.type === 'function_call') {
-            const callId = item.call_id || item.id;
-            if (callId && !seenCallIds.has(callId)) {
-              seenCallIds.add(callId);
-              toolCalls.push({
-                id: callId,
-                type: 'function',
-                function: {
-                  name: item.name,
-                  arguments:
-                    typeof item.arguments === 'string'
-                      ? item.arguments
-                      : JSON.stringify(item.arguments || {}),
-                },
-              });
-            }
-          }
+      // Extract function calls
+      if (Array.isArray(msg.functionCalls)) {
+        for (const fc of msg.functionCalls) {
+          toolCalls.push({
+            id: fc.id || `call_${Date.now()}`,
+            type: 'function',
+            function: {
+              name: fc.name,
+              arguments:
+                typeof fc.callArguments === 'string'
+                  ? fc.callArguments
+                  : JSON.stringify(fc.callArguments || {}),
+            },
+          });
         }
       }
 
-      if (msg.functionCalls && Array.isArray(msg.functionCalls)) {
-        for (const fc of msg.functionCalls) {
-          const callId = fc.id || fc.call_id;
-          if (callId && !seenCallIds.has(callId)) {
-            seenCallIds.add(callId);
+      if (Array.isArray(msg.content)) {
+        for (const item of msg.content) {
+          if (item.type === 'function_call') {
             toolCalls.push({
-              id: callId,
+              id:
+                item.call_id || item.callId || item.id || `call_${Date.now()}`,
               type: 'function',
               function: {
-                name: fc.name,
+                name: item.name,
                 arguments:
-                  typeof fc.callArguments === 'string'
-                    ? fc.callArguments
-                    : JSON.stringify(fc.callArguments || fc.arguments || {}),
+                  typeof item.arguments === 'string'
+                    ? item.arguments
+                    : JSON.stringify(item.arguments || {}),
               },
             });
           }
         }
       }
 
-      openAiMessages.push({
+      const assistantMsg: Object = {
         role: 'assistant',
-        content: textParts.join('\n') || (toolCalls.length ? null : ''),
-        ...(toolCalls.length > 0 ? { tool_calls: toolCalls } : {}),
-      });
-    } else if (
-      msg.type === 'function_call_output' ||
-      msg.role === 'tool' ||
-      msg.functionCallOutputs
-    ) {
-      const seenToolOutputIds = new Set();
-      if (msg.functionCallOutputs && Array.isArray(msg.functionCallOutputs)) {
-        for (const fco of msg.functionCallOutputs) {
-          const callId = fco.callId || fco.call_id;
-          if (callId && !seenToolOutputIds.has(callId)) {
-            seenToolOutputIds.add(callId);
-            openAiMessages.push({
-              role: 'tool',
-              tool_call_id: callId,
-              content:
-                typeof fco.output === 'string'
-                  ? fco.output
-                  : JSON.stringify(fco.output || {}),
-            });
+        content: content || null,
+      };
+      if (toolCalls.length > 0) {
+        // De-duplicate tool calls by ID
+        const seenCallIds = new Set<string>();
+        const uniqueToolCalls = [];
+        for (const tc of toolCalls) {
+          if (!seenCallIds.has(tc.id)) {
+            seenCallIds.add(tc.id);
+            uniqueToolCalls.push(tc);
           }
         }
-      } else {
-        const callId = msg.call_id || msg.callId || msg.tool_call_id;
-        if (callId && !seenToolOutputIds.has(callId)) {
-          seenToolOutputIds.add(callId);
+        assistantMsg.tool_calls = uniqueToolCalls;
+      }
+      openAiMessages.push(assistantMsg);
+    } else if (msg.type === 'function_call_output' || msg.role === 'tool') {
+      if (Array.isArray(msg.functionCallOutputs)) {
+        for (const fco of msg.functionCallOutputs) {
           openAiMessages.push({
             role: 'tool',
-            tool_call_id: callId,
+            tool_call_id: fco.callId || fco.call_id || fco.id,
             content:
-              typeof msg.output === 'string'
-                ? msg.output
-                : JSON.stringify(msg.output || msg.content || {}),
+              typeof fco.output === 'string'
+                ? fco.output
+                : JSON.stringify(fco.output || {}),
           });
         }
+      } else {
+        openAiMessages.push({
+          role: 'tool',
+          tool_call_id: msg.callId || msg.call_id || msg.id,
+          content:
+            typeof msg.output === 'string'
+              ? msg.output
+              : JSON.stringify(msg.output || {}),
+        });
       }
     }
   }
 
-  return openAiMessages;
+  // Ensure consecutive tool outputs don't have duplicate tool_call_id
+  const seenToolOutputIds = new Set<string>();
+  return openAiMessages.filter(msg => {
+    if (msg.role === 'tool' && msg.tool_call_id) {
+      if (seenToolOutputIds.has(msg.tool_call_id)) {
+        return false;
+      }
+      seenToolOutputIds.add(msg.tool_call_id);
+    }
+    return true;
+  });
 };
 
 /**
- * Build standard system prompt with GDevelop context and instructions.
+ * Build the system prompt with project structure and guidelines.
  */
 export const buildSystemPrompt = ({
   gameProjectJson,
   projectSpecificExtensionsSummaryJson,
   mode,
 }: {|
-  gameProjectJson?: ?string,
-  projectSpecificExtensionsSummaryJson?: ?string,
-  mode?: string,
+  gameProjectJson?: string | null,
+  projectSpecificExtensionsSummaryJson?: string | null,
+  mode?: 'chat' | 'agent' | 'orchestrator',
 |}): string => {
-  let prompt = `You are the GDevelop AI Assistant. You help users create, design, and modify games in GDevelop 5.
-You have access to editor tools to create scenes, objects, behaviors, place instances, change scene properties (such as background color), and generate event logic.
-Always think carefully, explain your design concisely to the user, and call the appropriate tool functions when modifying the game.
+  let prompt = `You are GDevelop AI Assistant, an expert game engine developer. You help users build games in GDevelop 5.
 
-Guidelines for modifying the project:
-1. To change scene properties (background color, dimensions, name, first scene):
-   Call change_scene_properties_layers_effects_groups with scene_name and changed_properties: [{ property_name: "backgroundColor", new_value: "#3498db" }].
-2. To create a scene:
-   Call create_scene with scene_name (e.g. { scene_name: "Level1" }).
-3. To create or replace objects:
-   Call create_or_replace_object.
-4. To add behaviors:
-   Call add_behavior.
-5. To place instances in a scene:
-   Call put_2d_instances.
+Guidelines:
+1. Always use available tools/functions to inspect or modify the project.
+2. When creating objects, use \`create_or_replace_object\`.
+3. When adding behaviors, use \`add_behavior\`.
+4. When placing instances in scenes, use \`put_2d_instances\` or \`put_3d_instances\`.
+5. When changing scene properties (e.g. background color), use \`change_scene_properties_layers_effects_groups\`.
 6. To modify scene events:
    Call add_scene_events.
 7. If using run_script:
@@ -1318,165 +1325,112 @@ export const sendChatCompletion = async ({
     payload.max_tokens = currentConfig.maxTokens;
   }
 
+  let cancelToken;
+  if (signal) {
+    const cancelTokenSource = axios.CancelToken.source();
+    cancelToken = cancelTokenSource.token;
+    if (signal.aborted) {
+      cancelTokenSource.cancel('Aborted');
+    } else {
+      signal.addEventListener('abort', () => {
+        cancelTokenSource.cancel('Aborted');
+      });
+    }
+  }
+
   try {
     const response = await axios.post(endpointUrl, payload, {
       headers,
-      signal,
+      cancelToken,
       timeout: 120000,
     });
 
     if (
       response.data &&
       response.data.choices &&
-      response.data.choices.length > 0
+      response.data.choices[0] &&
+      response.data.choices[0].message
     ) {
       return response.data.choices[0].message;
     }
 
-    throw new Error(
-      'Invalid response structure from custom AI endpoint: choices array is empty.'
-    );
+    return response.data;
   } catch (error) {
+    if (axios.isCancel(error) || (signal && signal.aborted)) {
+      throw new Error('AI request was aborted.');
+    }
     if (error.response) {
       const status = error.response.status;
       const data = error.response.data;
       const errorMsg =
         (data && data.error && (data.error.message || data.error)) ||
-        error.response.statusText ||
-        'Server Error';
-      throw new Error(`Custom AI Endpoint Error (${status}): ${errorMsg}`);
-    } else if (error.request) {
-      throw new Error(
-        `Failed to reach custom AI endpoint at ${endpointUrl}. Please verify that your local model server (Ollama/llama.cpp/LM Studio) or proxy is running and accessible.`
-      );
+        error.message ||
+        `HTTP error ${status}`;
+      throw new Error(`AI Provider Error (${status}): ${errorMsg}`);
     }
     throw error;
   }
 };
 
-/**
- * Test connectivity with the configured custom endpoint.
- */
-export const testConnection = async (
-  customConfig?: $Shape<CustomAIConfig>
-): Promise<{|
-  success: boolean,
-  message: string,
-  models?: Array<string>,
-|}> => {
-  const config = {
-    ...getCustomEndpointConfig(),
-    ...(customConfig || {}),
-  };
-  const baseUrl = normalizeBaseUrl(config.baseUrl);
-
-  // First attempt: Try GET /models
-  try {
-    const modelsUrl = getEndpointUrl(baseUrl, '/models');
-    const headers: { [string]: string } = {
-      'HTTP-Referer': 'https://gdevelop.io',
-      'X-Title': 'GDevelop IDE',
-      ...(config.customHeaders || {}),
-    };
-    if (config.apiKey && config.apiKey.trim()) {
-      headers['Authorization'] = `Bearer ${config.apiKey.trim()}`;
-    }
-
-    const response = await axios.get(modelsUrl, { headers, timeout: 5000 });
-    if (response.status === 200 && response.data) {
-      const data = response.data.data || response.data.models || response.data;
-      const models = Array.isArray(data)
-        ? data.map(item => item.id || item.name || String(item)).filter(Boolean)
-        : [];
-      return {
-        success: true,
-        message: `Successfully connected to endpoint. Found ${
-          models.length
-        } model(s).`,
-        models,
-      };
-    }
-  } catch (err) {
-    // If /models failed, fallback to a lightweight completion test
-  }
-
-  // Second attempt: Minimal chat completion
-  try {
-    const res = await sendChatCompletion({
-      messages: [{ role: 'user', content: 'Say "OK"' }],
-      config,
-    });
-    return {
-      success: true,
-      message: `Successfully connected! Model responded: ${res.content ||
-        'OK'}`,
-    };
-  } catch (err) {
-    return {
-      success: false,
-      message: `Connection failed: ${err.message ||
-        'Failed to connect to custom endpoint.'}`,
-    };
-  }
-};
+const SIDE_EFFECT_FREE_TOOLS = new Set([
+  'describe_instances',
+  'describe_events',
+  'describe_scene_layers_effects_groups',
+  'describe_variables',
+  'read_game_project_json',
+  'read_full_docs',
+  'search_docs',
+  'get_game_starter_summary',
+]);
 
 /**
- * Parse an assistant message into GDevelop AiRequestAssistantMessage structure.
+ * Parse an OpenAI assistant message response into GDevelop's internal format.
  */
 export const parseAssistantMessage = (
-  openAiMessageOrChoice: Object,
+  openAiMessageOrChoiceOrResponse: Object,
   messageId?: string
-): Object => {
-  const openAiMessage = openAiMessageOrChoice.message || openAiMessageOrChoice;
-  const contentArray: Array<any> = [];
-  const functionCalls: Array<{|
-    id: string,
-    name: string,
-    callArguments: Object,
-  |}> = [];
+): AiRequestMessage => {
+  const openAiMessage =
+    openAiMessageOrChoiceOrResponse.message ||
+    (openAiMessageOrChoiceOrResponse.choices &&
+      openAiMessageOrChoiceOrResponse.choices[0] &&
+      openAiMessageOrChoiceOrResponse.choices[0].message) ||
+    openAiMessageOrChoiceOrResponse;
 
-  const rawContent = openAiMessage.content;
-  const reasoningContent = openAiMessage.reasoning_content;
-  const { thinking, cleanContent } = extractThinkingAndContent(
-    rawContent,
-    reasoningContent
-  );
+  const rawContent = openAiMessage.content || '';
+  const reasoningContent = openAiMessage.reasoning_content || null;
 
-  if (thinking) {
-    contentArray.push({
-      type: 'reasoning',
-      status: 'completed',
-      summary: {
-        text: thinking,
-        type: 'summary_text',
-      },
-    });
+  let { thinking, cleanContent } = extractThinkingAndContent(rawContent);
+  if (!thinking && reasoningContent) {
+    thinking = reasoningContent;
   }
 
+  const contentArray: Array<any> = [];
   if (cleanContent) {
     contentArray.push({
-      type: 'output_text',
+      type: 'text',
       status: 'completed',
       text: cleanContent,
-      annotations: [],
     });
   }
 
-  if (openAiMessage.tool_calls && Array.isArray(openAiMessage.tool_calls)) {
+  const functionCalls: Array<any> = [];
+
+  // Standard tool_calls
+  if (Array.isArray(openAiMessage.tool_calls)) {
     for (const toolCall of openAiMessage.tool_calls) {
-      const functionName = toolCall.function && toolCall.function.name;
-      const functionArgs =
-        toolCall.function &&
-        (typeof toolCall.function.arguments === 'string'
-          ? toolCall.function.arguments
-          : JSON.stringify(toolCall.function.arguments || {}));
-
-      let parsedArgs = {};
-      try {
-        parsedArgs = JSON.parse(functionArgs || '{}');
-      } catch (e) {}
-
-      if (functionName) {
+      if (toolCall.function) {
+        const functionName = toolCall.function.name;
+        const functionArgs = toolCall.function.arguments;
+        let parsedArgs = {};
+        try {
+          parsedArgs =
+            typeof functionArgs === 'string'
+              ? JSON.parse(functionArgs)
+              : functionArgs || {};
+        } catch (e) {
+          console.warn('Error parsing function call arguments JSON:', e);
+        }
         const callId =
           toolCall.id ||
           `call_${Date.now()}_${Math.random()
@@ -1498,7 +1452,7 @@ export const parseAssistantMessage = (
     }
   }
 
-  // Fallback: If no tool_calls but content contains markdown JSON tool call blocks
+  // Fallback: If no tool_calls but content contains markdown JSON tool call blocks (restricted to side-effect-free tools)
   if (
     (!openAiMessage.tool_calls || openAiMessage.tool_calls.length === 0) &&
     cleanContent
@@ -1510,7 +1464,11 @@ export const parseAssistantMessage = (
         const parsed = JSON.parse(match[1]);
         const name = parsed.function || parsed.name || parsed.tool;
         const args = parsed.arguments || parsed.args || parsed.parameters || {};
-        if (name && typeof name === 'string') {
+        if (
+          name &&
+          typeof name === 'string' &&
+          SIDE_EFFECT_FREE_TOOLS.has(name)
+        ) {
           const callId = `call_parsed_${Date.now()}_${Math.random()
             .toString(36)
             .substr(2, 5)}`;
@@ -1616,7 +1574,7 @@ export const customCreateAiRequest = async ({
     id: reqId,
     createdAt: now,
     updatedAt: now,
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     gameId: gameId || null,
     gameProjectJson: gameProjectJson || null,
     status: 'ready',
@@ -1658,7 +1616,7 @@ export const customAddMessageToAiRequest = async ({
     id: aiRequestId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     status: 'ready',
     output: [],
     error: null,
@@ -1743,7 +1701,7 @@ export const customGetAiRequest = (aiRequestId: string): AiRequest => {
     id: aiRequestId,
     createdAt: now,
     updatedAt: now,
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     status: 'ready',
     error: null,
     output: [],
@@ -1780,7 +1738,7 @@ export const customGetAiRequestStatuses = (
     return {
       id,
       status: req ? req.status : 'ready',
-      userId: 'local-byok-user',
+      userId: LOCAL_BYOK_USER_ID,
     };
   });
 };
@@ -1828,7 +1786,7 @@ export const customForkAiRequest = (
     id: newReqId,
     createdAt: now,
     updatedAt: now,
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     status: 'ready',
     forkedFromAiRequestId: aiRequestId,
     output,
@@ -1985,7 +1943,7 @@ Ensure generatedEvents is a JSON string of standard GDevelop event objects (e.g.
       id: `local-evt-${Date.now()}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      userId: 'local-byok-user',
+      userId: LOCAL_BYOK_USER_ID,
       status: 'ready',
       partialGameProjectJson: '',
       eventsDescription: eventsDescription || null,
@@ -2032,6 +1990,72 @@ Ensure generatedEvents is a JSON string of standard GDevelop event objects (e.g.
 };
 
 /**
+ * Test connectivity with the configured custom endpoint.
+ */
+export const testConnection = async (
+  customConfig?: $Shape<CustomAIConfig>
+): Promise<{|
+  success: boolean,
+  message: string,
+  models?: Array<string>,
+|}> => {
+  const config = {
+    ...getCustomEndpointConfig(),
+    ...(customConfig || {}),
+  };
+  const baseUrl = normalizeBaseUrl(config.baseUrl);
+
+  // First attempt: Try GET /models
+  try {
+    const modelsUrl = getEndpointUrl(baseUrl, '/models');
+    const headers: { [string]: string } = {
+      'HTTP-Referer': 'https://gdevelop.io',
+      'X-Title': 'GDevelop IDE',
+      ...(config.customHeaders || {}),
+    };
+    if (config.apiKey && config.apiKey.trim()) {
+      headers['Authorization'] = `Bearer ${config.apiKey.trim()}`;
+    }
+
+    const response = await axios.get(modelsUrl, { headers, timeout: 5000 });
+    if (response.status === 200 && response.data) {
+      const data = response.data.data || response.data.models || response.data;
+      const models = Array.isArray(data)
+        ? data.map(item => item.id || item.name || String(item)).filter(Boolean)
+        : [];
+      return {
+        success: true,
+        message: `Successfully connected to endpoint. Found ${
+          models.length
+        } model(s).`,
+        models,
+      };
+    }
+  } catch (err) {
+    // If /models failed, fallback to a lightweight completion test
+  }
+
+  // Second attempt: Minimal chat completion
+  try {
+    const res = await sendChatCompletion({
+      messages: [{ role: 'user', content: 'Say "OK"' }],
+      config,
+    });
+    return {
+      success: true,
+      message: `Successfully connected! Model responded: ${res.content ||
+        'OK'}`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: `Connection failed: ${err.message ||
+        'Failed to connect to custom endpoint.'}`,
+    };
+  }
+};
+
+/**
  * Client-side Asset Search.
  */
 export const customCreateAssetSearch = async ({
@@ -2043,7 +2067,7 @@ export const customCreateAssetSearch = async ({
 |}): Promise<AssetSearch> => {
   return {
     id: `local-asset-search-${Date.now()}`,
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     createdAt: new Date().toISOString(),
     query: {
       searchTerms: [searchTerms],
@@ -2055,16 +2079,7 @@ export const customCreateAssetSearch = async ({
       lastAssistantMessages: [],
     },
     status: 'completed',
-    results: [
-      {
-        asset: {
-          id: `local-asset-${Date.now()}`,
-          name: searchTerms,
-          objectType: objectType || 'Sprite',
-          tags: [searchTerms],
-        },
-      },
-    ],
+    results: [],
   };
 };
 
@@ -2080,24 +2095,14 @@ export const customCreateResourceSearch = async ({
 |}): Promise<ResourceSearch> => {
   return {
     id: `local-resource-search-${Date.now()}`,
-    userId: 'local-byok-user',
+    userId: LOCAL_BYOK_USER_ID,
     createdAt: new Date().toISOString(),
     query: {
       searchTerms: [searchTerms],
       resourceKind,
     },
     status: 'completed',
-    results: [
-      {
-        resource: {
-          name: searchTerms,
-          kind: resourceKind,
-          url: `https://resources.gdevelop.io/${encodeURIComponent(
-            searchTerms
-          )}`,
-        },
-      },
-    ],
+    results: [],
   };
 };
 

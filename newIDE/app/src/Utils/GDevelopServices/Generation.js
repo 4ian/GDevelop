@@ -23,6 +23,7 @@ import {
   customCreateAssetSearch,
   customCreateResourceSearch,
   DEFAULT_LOCAL_AI_SETTINGS,
+  LOCAL_BYOK_USER_ID,
 } from '../../AI/CustomAIClient';
 
 export type Environment = 'staging' | 'live';
@@ -312,7 +313,7 @@ export const getAiRequest = async (
     outputFromMessageId?: ?string,
   |}
 ): Promise<AiRequest> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return customGetAiRequest(aiRequestId);
   }
 
@@ -356,32 +357,33 @@ export const getAiRequestStatuses = async (
 > => {
   if (aiRequestIds.length === 0) return [];
 
-  if (
-    isCustomEndpointEnabled() ||
-    aiRequestIds.every(id => id.startsWith('local-ai-'))
-  ) {
-    return customGetAiRequestStatuses(aiRequestIds);
-  }
+  const localIds = aiRequestIds.filter(id => id.startsWith('local-ai-'));
+  const hostedIds = aiRequestIds.filter(id => !id.startsWith('local-ai-'));
 
-  const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request`,
-    {
-      params: {
-        userId,
-        ids: aiRequestIds.join(','),
-        include: 'status',
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/ai-request?ids=...&include=status of Generation API',
-  });
+  const results = [];
+  if (localIds.length > 0) {
+    const localStatuses = await customGetAiRequestStatuses(localIds);
+    results.push(...localStatuses);
+  }
+  if (hostedIds.length > 0) {
+    const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${GDevelopGenerationApi.baseUrl}/ai-request`,
+      {
+        params: {
+          userId,
+          ids: hostedIds.join(','),
+          include: 'status',
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+    results.push(...(response.data || []));
+  }
+  return results;
 };
 
 export const getAiRequests = async (
@@ -543,7 +545,7 @@ export const addMessageToAiRequest = async (
     toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return customAddMessageToAiRequest({
       aiRequestId,
       userMessage,
@@ -593,7 +595,7 @@ export const suspendAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
 ): Promise<AiRequest> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return customSuspendAiRequest(aiRequestId);
   }
 
@@ -626,7 +628,7 @@ export const updateAiRequestMessage = async (
     projectVersionIdAfterMessage?: ?string,
   |}
 ): Promise<void> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return;
   }
   const authorizationHeader = await getAuthorizationHeader();
@@ -711,7 +713,7 @@ export const getAiRequestSuggestions = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
   |}
 ): Promise<AiRequest> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return customGetAiRequestSuggestions(aiRequestId);
   }
 
@@ -749,7 +751,8 @@ export type CreateAiGeneratedEventResult =
     |}
   | {|
       creationSucceeded: false,
-      errorMessage: string,
+      errorMessage?: string,
+      isCreditLimitReached?: boolean,
     |};
 
 export const createAiGeneratedEvent = async (
@@ -760,14 +763,14 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
+    existingEventsJson,
+    existingEventsJsonUserRelativeKey,
     sceneName,
     eventsDescription,
     eventBatches,
     extensionNamesList,
     objectsList,
     existingEventsAsText,
-    existingEventsJson,
-    existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
     estimatedComplexity,
@@ -777,14 +780,14 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
+    existingEventsJson: string | null,
+    existingEventsJsonUserRelativeKey: string | null,
     sceneName: string,
     eventsDescription: string | null,
-    eventBatches: Array<AiGeneratedEventBatch> | null,
+    eventBatches: ?EventsBatchToGenerate,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
-    existingEventsJson: string | null,
-    existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
     estimatedComplexity: number | null,
@@ -810,14 +813,14 @@ export const createAiGeneratedEvent = async (
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
+      existingEventsJson,
+      existingEventsJsonUserRelativeKey,
       sceneName,
       eventsDescription,
       eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
-      existingEventsJson,
-      existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
       estimatedComplexity,
@@ -829,32 +832,34 @@ export const createAiGeneratedEvent = async (
       headers: {
         Authorization: authorizationHeader,
       },
-      validateStatus: status => true,
     }
   );
 
   if (response.status === 200) {
-    const data = ensureObjectHasProperty({
-      data: response.data,
-      propertyName: 'id',
-      endpointName: '/ai-generated-event of Generation API',
-    });
     return {
       creationSucceeded: true,
-      aiGeneratedEvent: data,
-    };
-  } else if (response.status === 400) {
-    // Report the failure to give a chance to the caller to save this message
-    // and retry the generation in a different way.
-    return {
-      creationSucceeded: false,
-      errorMessage: JSON.stringify(response.data),
+      aiGeneratedEvent: ensureObjectHasProperty({
+        data: response.data,
+        propertyName: 'id',
+        endpointName: '/ai-generated-event of Generation API',
+      }),
     };
   }
 
-  // Unexpected error: throw an exception as this can be something like a network error
-  // or a server error.
-  throw new Error(
+  const errorStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+    response.data
+  );
+  if (
+    errorStatusAndCode &&
+    errorStatusAndCode.code === 'credit-limit-reached'
+  ) {
+    return {
+      creationSucceeded: false,
+      isCreditLimitReached: true,
+    };
+  }
+
+  return makeGenericFailureResult(
     `Error while running AI event generation: ${response.statusText}`
   );
 };
@@ -869,15 +874,12 @@ export const getAiGeneratedEvent = async (
     aiGeneratedEventId: string,
   |}
 ): Promise<AiGeneratedEvent> => {
-  if (
-    isCustomEndpointEnabled() ||
-    aiGeneratedEventId.startsWith('local-evt-')
-  ) {
+  if (aiGeneratedEventId.startsWith('local-evt-')) {
     return {
       id: aiGeneratedEventId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      userId: 'local-byok-user',
+      userId: LOCAL_BYOK_USER_ID,
       status: 'ready',
       partialGameProjectJson: '',
       eventsDescription: null,
@@ -918,8 +920,8 @@ export const createAssetSearch = async (
   {
     userId,
     searchTerms,
-    description,
     objectType,
+    description,
     twoDimensionalViewKind,
     exactOrPartialAssetId,
     relatedAiRequestId,
@@ -928,12 +930,12 @@ export const createAssetSearch = async (
   }: {|
     userId: string,
     searchTerms: string,
-    description: string,
-    objectType: string | null,
-    twoDimensionalViewKind: string,
-    exactOrPartialAssetId?: string | null,
-    relatedAiRequestId?: string | null,
-    lastUserMessage?: string | null,
+    objectType?: ?string,
+    description?: ?string,
+    twoDimensionalViewKind?: ?string,
+    exactOrPartialAssetId?: ?string,
+    relatedAiRequestId?: ?string,
+    lastUserMessage?: ?string,
     lastAssistantMessages?: string[],
   |}
 ): Promise<AssetSearch> => {
@@ -945,10 +947,9 @@ export const createAssetSearch = async (
   const response = await apiClient.post(
     `/asset-search`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
-      description,
       objectType,
+      description,
       twoDimensionalViewKind,
       exactOrPartialAssetId,
       relatedAiRequestId,
@@ -991,7 +992,6 @@ export const createResourceSearch = async (
   const response = await apiClient.post(
     `/resource-search`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
       resourceKind,
     },
@@ -1048,7 +1048,6 @@ export const createAiUserContentPresignedUrls = async (
   const response = await apiClient.post(
     `/ai-user-content/action/create-presigned-urls`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJsonHash,
       projectSpecificExtensionsSummaryJsonHash,
       eventsJsonHash,
@@ -1062,8 +1061,9 @@ export const createAiUserContentPresignedUrls = async (
       },
     }
   );
-  return ensureIsObject({
+  return ensureObjectHasProperty({
     data: response.data,
+    propertyName: 'gameProjectJsonSignedUrl',
     endpointName:
       '/ai-user-content/action/create-presigned-urls of Generation API',
   });
@@ -1097,7 +1097,7 @@ export const forkAiRequest = async (
     upToMessageId?: string,
   |}
 ): Promise<AiRequest> => {
-  if (isCustomEndpointEnabled() || aiRequestId.startsWith('local-ai-')) {
+  if (aiRequestId.startsWith('local-ai-')) {
     return customForkAiRequest(aiRequestId, upToMessageId);
   }
 

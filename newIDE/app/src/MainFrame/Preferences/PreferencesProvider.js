@@ -983,10 +983,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _persistValuesToLocalStorage(preferences: Preferences): any {
     try {
-      localStorage.setItem(
-        localStorageItem,
-        JSON.stringify(preferences.values)
-      );
+      const { aiCustomApiKey, ...persistableValues } = preferences.values;
+      localStorage.setItem(localStorageItem, JSON.stringify(persistableValues));
     } catch (e) {
       console.warn('Unable to persist preferences', e);
     }
@@ -1511,7 +1509,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         },
       }),
       () => {
-        this._persistValuesToLocalStorage(this.state);
         setCustomEndpointConfig({ apiKey: newValue });
       }
     );

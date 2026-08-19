@@ -12,6 +12,8 @@ import {
   DEFAULT_CUSTOM_AI_CONFIG,
   DEFAULT_LOCAL_AI_SETTINGS,
   GDEVELOP_OPENAI_TOOLS,
+  LOCAL_BYOK_USER_ID,
+  _resetCustomAiClientForTesting,
   customCreateAiRequest,
   customAddMessageToAiRequest,
   customGetAiRequest,
@@ -31,6 +33,7 @@ jest.mock('axios');
 describe('CustomAIClient', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    _resetCustomAiClientForTesting();
     setCustomEndpointConfig({
       enabled: false,
       baseUrl: 'http://localhost:11434/v1',
@@ -65,15 +68,21 @@ describe('CustomAIClient', () => {
       expect(config.temperature).toBe(0.2);
     });
 
-    it('normalizes base URLs correctly', () => {
+    it('normalizes base URLs correctly without auto-appending /v1', () => {
       expect(normalizeBaseUrl('http://localhost:11434')).toBe(
-        'http://localhost:11434/v1'
+        'http://localhost:11434'
       );
       expect(normalizeBaseUrl('http://localhost:11434/')).toBe(
-        'http://localhost:11434/v1'
+        'http://localhost:11434'
       );
       expect(normalizeBaseUrl('http://localhost:11434/v1/')).toBe(
         'http://localhost:11434/v1'
+      );
+      expect(normalizeBaseUrl('localhost:11434/v1')).toBe(
+        'http://localhost:11434/v1'
+      );
+      expect(normalizeBaseUrl('api.openai.com/v1')).toBe(
+        'https://api.openai.com/v1'
       );
       expect(normalizeBaseUrl('https://api.openai.com/v1')).toBe(
         'https://api.openai.com/v1'
@@ -89,7 +98,7 @@ describe('CustomAIClient', () => {
         getEndpointUrl('http://localhost:11434/v1', '/chat/completions')
       ).toBe('http://localhost:11434/v1/chat/completions');
       expect(getEndpointUrl('http://localhost:11434', '/models')).toBe(
-        'http://localhost:11434/v1/models'
+        'http://localhost:11434/models'
       );
     });
   });
@@ -240,20 +249,20 @@ describe('CustomAIClient', () => {
       });
     });
 
-    it('extracts embedded JSON function call markdown if tool_calls not present', () => {
+    it('extracts embedded JSON function call markdown if tool_calls not present for side-effect-free tools', () => {
       const choice = {
         message: {
           role: 'assistant',
           content:
-            'I will create the object now:\n```json\n{"name":"create_or_replace_object","arguments":{"objectName":"Coin"}}\n```',
+            'I will inspect the instances now:\n```json\n{"name":"describe_instances","arguments":{"scene_name":"Level1"}}\n```',
         },
       };
 
       const parsed = parseAssistantMessage(choice);
       expect(parsed.functionCalls).toHaveLength(1);
-      expect(parsed.functionCalls[0].name).toBe('create_or_replace_object');
+      expect(parsed.functionCalls[0].name).toBe('describe_instances');
       expect(parsed.functionCalls[0].callArguments).toEqual({
-        objectName: 'Coin',
+        scene_name: 'Level1',
       });
     });
 
@@ -364,7 +373,7 @@ describe('CustomAIClient', () => {
 
       const statuses = await customGetAiRequestStatuses([aiRequest.id]);
       expect(statuses).toEqual([
-        { id: aiRequest.id, status: 'ready', userId: 'local-byok-user' },
+        { id: aiRequest.id, status: 'ready', userId: LOCAL_BYOK_USER_ID },
       ]);
     });
 
@@ -451,20 +460,22 @@ describe('CustomAIClient', () => {
       }
     });
 
-    it('provides mock asset and resource search results', async () => {
+    it('provides empty asset and resource search results in BYOK mode', async () => {
       const assetResult = await customCreateAssetSearch({
         searchTerms: 'coin',
         objectType: 'Sprite',
       });
       expect(assetResult.id).toMatch(/^local-asset-/);
-      expect(assetResult.results.length).toBeGreaterThan(0);
+      expect(assetResult.userId).toBe(LOCAL_BYOK_USER_ID);
+      expect(assetResult.results).toEqual([]);
 
       const resourceResult = await customCreateResourceSearch({
         searchTerms: 'jump sound',
         resourceKind: 'audio',
       });
       expect(resourceResult.id).toMatch(/^local-resource-/);
-      expect(resourceResult.results.length).toBeGreaterThan(0);
+      expect(resourceResult.userId).toBe(LOCAL_BYOK_USER_ID);
+      expect(resourceResult.results).toEqual([]);
     });
   });
 });

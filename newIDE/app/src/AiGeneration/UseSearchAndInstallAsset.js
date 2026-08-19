@@ -13,7 +13,10 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
-import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -53,7 +56,7 @@ export const useSearchAndInstallAsset = ({
         if (!profile && !isCustomEndpointEnabled())
           throw new Error('User should be authenticated.');
 
-        const activeUserId = profile ? profile.id : 'local-byok-user';
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
         let assetShortHeader;
         if (exactOrPartialAssetId) {

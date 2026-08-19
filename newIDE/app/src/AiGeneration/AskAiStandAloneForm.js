@@ -37,8 +37,10 @@ import { prepareAiUserContent } from './PrepareAiUserContent';
 import { AiRequestContext } from './AiRequestContext';
 import { getAiConfigurationPresetsWithAvailability } from './AiConfiguration';
 import { type CreateProjectResult } from '../Utils/UseCreateProject';
-import { SubscriptionContext } from '../Profile/Subscription/SubscriptionContext';
-import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 import {
   useProcessFunctionCalls,
   useRefreshLimits,
@@ -273,7 +275,7 @@ export const AskAiStandAloneForm = ({
           return;
         }
 
-        const activeUserId = profile ? profile.id : 'local-byok-user';
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
         // Read the options and reset them immediately to prevent the effect from firing
         // again if dependencies change during the async operations below (e.g. when
@@ -503,7 +505,7 @@ export const AskAiStandAloneForm = ({
             )
           : null;
 
-        const activeUserId = profile ? profile.id : 'local-byok-user';
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
         const preparedAiUserContent = await prepareAiUserContent({
           getAuthorizationHeader,
@@ -712,7 +714,9 @@ export const AskAiStandAloneForm = ({
         lastSendError={getLastSendError(aiRequestIdForForm)}
         quota={quota}
         increaseQuotaOffering={
-          !hasValidSubscriptionPlan(subscription)
+          isCustomEndpointEnabled()
+            ? 'none'
+            : !hasValidSubscriptionPlan(subscription)
             ? 'subscribe'
             : canUpgradeSubscription(subscription)
             ? 'upgrade'

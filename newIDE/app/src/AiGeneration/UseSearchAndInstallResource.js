@@ -14,7 +14,10 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { createNewResource } from '../ResourcesList/ResourceSource';
 import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
-import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
+import {
+  isCustomEndpointEnabled,
+  LOCAL_BYOK_USER_ID,
+} from '../AI/CustomAIClient';
 
 import PromisePool from '@supercharge/promise-pool';
 
@@ -41,7 +44,7 @@ export const useSearchAndInstallResource = ({
           throw new Error('User should be authenticated.');
         if (!project) throw new Error('Project should be opened.');
 
-        const activeUserId = profile ? profile.id : 'local-byok-user';
+        const activeUserId = profile ? profile.id : LOCAL_BYOK_USER_ID;
 
         const { results } = await PromisePool.withConcurrency(5)
           .for(resources)

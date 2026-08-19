@@ -23,9 +23,8 @@ export const getAiConfigurationPresetsWithAvailability = ({
   getAiSettings: () => AiSettings | null,
   limits: ?Limits,
 |}): Array<AiConfigurationPresetWithAvailability> => {
-  const aiSettings = getAiSettings() || DEFAULT_LOCAL_AI_SETTINGS;
-
   if (isCustomEndpointEnabled()) {
+    const aiSettings = getAiSettings() || DEFAULT_LOCAL_AI_SETTINGS;
     return aiSettings.aiRequest.presets.map(preset => ({
       ...preset,
       enableWith: null,
@@ -34,12 +33,15 @@ export const getAiConfigurationPresetsWithAvailability = ({
     }));
   }
 
+  const aiSettings = getAiSettings();
+  if (!aiSettings) return [];
+
   if (!limits) {
     return aiSettings.aiRequest.presets.map(preset => ({
       ...preset,
       enableWith: null,
       enabledWithPlans: [],
-      disabled: false,
+      disabled: !preset.isDefault,
     }));
   }
 

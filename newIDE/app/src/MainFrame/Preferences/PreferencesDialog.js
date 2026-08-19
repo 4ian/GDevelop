@@ -761,9 +761,14 @@ const PreferencesDialog = ({
             type="number"
             floatingLabelText={<Trans>Temperature (0.0 to 1.0)</Trans>}
             value={values.aiCustomTemperature}
-            onChange={(e, value) =>
-              setAiCustomTemperature(parseFloat(value) || 0.7)
-            }
+            onChange={(e, value) => {
+              const parsed = parseFloat(value);
+              if (Number.isNaN(parsed)) {
+                setAiCustomTemperature(0.7);
+              } else {
+                setAiCustomTemperature(Math.max(0.0, Math.min(1.0, parsed)));
+              }
+            }}
           />
           <LineStackLayout alignItems="center">
             <RaisedButton

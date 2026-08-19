@@ -3663,7 +3663,7 @@ const put2dInstances: EditorFunction = {
     );
     const newInstancesCount =
       new_instances_count === null && existingInstanceIds.length === 0
-        ? Array.isArray(args.instances)
+        ? Array.isArray(args.instances) && args.instances.length > 0
           ? args.instances.length
           : 1
         : new_instances_count;
@@ -3747,33 +3747,63 @@ const put2dInstances: EditorFunction = {
         return makeSceneNotFoundFailure(project, scene_name);
       }
       const layout = project.getLayout(scene_name);
-      const initialInstances = layout.getInitialInstances();
-      const createdCount = args.instances.length;
+      const validEntries = [];
       for (const instData of args.instances) {
+        if (!instData || typeof instData !== 'object') continue;
         const instObjName =
           instData.object_name || instData.name || object_name;
         if (!instObjName) continue;
-        const inst = initialInstances.insertNewInitialInstance();
-        inst.setObjectName(instObjName);
-        inst.setLayer(
-          instData.layer_name !== undefined
-            ? instData.layer_name
-            : instData.layer !== undefined
-            ? instData.layer
-            : layer_name
+        const x = Number(instData.x);
+        const y = Number(instData.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        validEntries.push({
+          objectName: instObjName,
+          layer:
+            instData.layer_name !== undefined
+              ? String(instData.layer_name)
+              : instData.layer !== undefined
+              ? String(instData.layer)
+              : layer_name,
+          x,
+          y,
+          angle:
+            instData.angle !== undefined &&
+            Number.isFinite(Number(instData.angle))
+              ? Number(instData.angle)
+              : null,
+          zOrder:
+            instData.z_order !== undefined &&
+            Number.isFinite(Number(instData.z_order))
+              ? Number(instData.z_order)
+              : instData.zOrder !== undefined &&
+                Number.isFinite(Number(instData.zOrder))
+              ? Number(instData.zOrder)
+              : null,
+        });
+      }
+
+      if (validEntries.length === 0) {
+        return makeGenericFailure(
+          'No valid instances found in the batch to place.'
         );
-        inst.setX(Number(instData.x) || 0);
-        inst.setY(Number(instData.y) || 0);
-        if (instData.angle !== undefined)
-          inst.setAngle(Number(instData.angle) || 0);
-        if (instData.z_order !== undefined || instData.zOrder !== undefined) {
-          inst.setZOrder(Number(instData.z_order || instData.zOrder) || 0);
-        }
+      }
+
+      const initialInstances = layout.getInitialInstances();
+      for (const entry of validEntries) {
+        const inst = initialInstances.insertNewInitialInstance();
+        inst.setObjectName(entry.objectName);
+        inst.setLayer(entry.layer);
+        inst.setX(entry.x);
+        inst.setY(entry.y);
+        if (entry.angle !== null) inst.setAngle(entry.angle);
+        if (entry.zOrder !== null) inst.setZOrder(entry.zOrder);
       }
       onInstancesModifiedOutsideEditor({ scene: layout });
       return {
         success: true,
-        message: `Placed ${createdCount} instance(s) in scene "${scene_name}".`,
+        message: `Placed ${
+          validEntries.length
+        } instance(s) in scene "${scene_name}".`,
       };
     }
 
@@ -3793,11 +3823,7 @@ const put2dInstances: EditorFunction = {
       args,
       'existing_instance_ids'
     );
-    const brush_position =
-      rawBrushPosition ||
-      (requested_brush_kind !== 'none' && !existing_instance_ids
-        ? '0, 0'
-        : null);
+    const brush_position = rawBrushPosition;
     // A "none" brush with both a `brush_position` and `existing_instance_ids`
     // is contradictory ("none" never positions anything) but unambiguous: move
     // THOSE instances there. Read it as the "point" brush, which is what the
@@ -4619,7 +4645,7 @@ const put3dInstances: EditorFunction = {
     );
     const newInstancesCount =
       new_instances_count === null && existingInstanceIds.length === 0
-        ? Array.isArray(args.instances)
+        ? Array.isArray(args.instances) && args.instances.length > 0
           ? args.instances.length
           : 1
         : new_instances_count;
@@ -4703,35 +4729,70 @@ const put3dInstances: EditorFunction = {
         return makeSceneNotFoundFailure(project, scene_name);
       }
       const layout = project.getLayout(scene_name);
-      const initialInstances = layout.getInitialInstances();
-      const createdCount = args.instances.length;
+      const validEntries = [];
       for (const instData of args.instances) {
+        if (!instData || typeof instData !== 'object') continue;
         const instObjName =
           instData.object_name || instData.name || object_name;
         if (!instObjName) continue;
-        const inst = initialInstances.insertNewInitialInstance();
-        inst.setObjectName(instObjName);
-        inst.setLayer(
-          instData.layer_name !== undefined
-            ? instData.layer_name
-            : instData.layer !== undefined
-            ? instData.layer
-            : layer_name
+        const x = Number(instData.x);
+        const y = Number(instData.y);
+        const z = Number(instData.z || 0);
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z))
+          continue;
+        validEntries.push({
+          objectName: instObjName,
+          layer:
+            instData.layer_name !== undefined
+              ? String(instData.layer_name)
+              : instData.layer !== undefined
+              ? String(instData.layer)
+              : layer_name,
+          x,
+          y,
+          z,
+          rotationX:
+            instData.rotation_x !== undefined &&
+            Number.isFinite(Number(instData.rotation_x))
+              ? Number(instData.rotation_x)
+              : null,
+          rotationY:
+            instData.rotation_y !== undefined &&
+            Number.isFinite(Number(instData.rotation_y))
+              ? Number(instData.rotation_y)
+              : null,
+          rotationZ:
+            instData.rotation_z !== undefined &&
+            Number.isFinite(Number(instData.rotation_z))
+              ? Number(instData.rotation_z)
+              : null,
+        });
+      }
+
+      if (validEntries.length === 0) {
+        return makeGenericFailure(
+          'No valid 3D instances found in the batch to place.'
         );
-        inst.setX(Number(instData.x) || 0);
-        inst.setY(Number(instData.y) || 0);
-        inst.setZ(Number(instData.z) || 0);
-        if (instData.rotation_x !== undefined)
-          inst.setRotationX(Number(instData.rotation_x) || 0);
-        if (instData.rotation_y !== undefined)
-          inst.setRotationY(Number(instData.rotation_y) || 0);
-        if (instData.rotation_z !== undefined)
-          inst.setRotationZ(Number(instData.rotation_z) || 0);
+      }
+
+      const initialInstances = layout.getInitialInstances();
+      for (const entry of validEntries) {
+        const inst = initialInstances.insertNewInitialInstance();
+        inst.setObjectName(entry.objectName);
+        inst.setLayer(entry.layer);
+        inst.setX(entry.x);
+        inst.setY(entry.y);
+        inst.setZ(entry.z);
+        if (entry.rotationX !== null) inst.setRotationX(entry.rotationX);
+        if (entry.rotationY !== null) inst.setRotationY(entry.rotationY);
+        if (entry.rotationZ !== null) inst.setAngle(entry.rotationZ);
       }
       onInstancesModifiedOutsideEditor({ scene: layout });
       return {
         success: true,
-        message: `Placed ${createdCount} 3D instance(s) in scene "${scene_name}".`,
+        message: `Placed ${
+          validEntries.length
+        } 3D instance(s) in scene "${scene_name}".`,
       };
     }
 
@@ -4751,11 +4812,7 @@ const put3dInstances: EditorFunction = {
       args,
       'existing_instance_ids'
     );
-    const brush_position =
-      rawBrushPosition ||
-      (requested_brush_kind !== 'none' && !existing_instance_ids
-        ? '0, 0, 0'
-        : null);
+    const brush_position = rawBrushPosition;
     // A "none" brush with both a `brush_position` and `existing_instance_ids`
     // is contradictory ("none" never positions anything) but unambiguous: move
     // THOSE instances there. Read it as the "point" brush, which is what the

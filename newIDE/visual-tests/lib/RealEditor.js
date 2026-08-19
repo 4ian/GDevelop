@@ -222,6 +222,10 @@ const launchEditor = async ({
   if (!page) throw new Error('No page found in the editor.');
   log(`Connected to the editor window (${page.url()}).`);
 
+  // Without a window manager (like on the CI), the window stays at its small
+  // default size: give the editor the same room as the Storybook tests.
+  await page.setViewport({ width: 1500, height: 1000 });
+
   const stop = async () => {
     try {
       await browser.disconnect();

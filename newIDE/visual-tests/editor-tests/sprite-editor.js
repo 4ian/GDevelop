@@ -91,7 +91,10 @@ module.exports = [
           ['openPreview', { row: 0 }],
           ['addAnimation'],
           ['renameAnimation', { row: 0, name: 'Walking to the right' }],
-          ['dragAnimation', { from: 0, to: 1 }],
+          // Upwards, so that the drop moves it (dropping on the row just
+          // after would put it back where it was) - and onto the row just
+          // before, so that both rows fit on the small window of the app.
+          ['dragAnimation', { from: 1, to: 0 }],
           ['openPointsEditor'],
           ['openCollisionMasksEditor'],
           ['deleteAnimation', { row: 0 }],

@@ -157,12 +157,17 @@ const installPageHelpers = function() {
       rect.right > window.innerWidth
     )
       return null;
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-      width: rect.width,
-      height: rect.height,
-    };
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    // The element must really be there: not scrolled out of its list or
+    // behind something else (its rect would still be within the window).
+    const elementAtPoint = document.elementFromPoint(x, y);
+    if (
+      !elementAtPoint ||
+      !(element.contains(elementAtPoint) || elementAtPoint.contains(element))
+    )
+      return null;
+    return { x, y, width: rect.width, height: rect.height };
   };
 
   const openContextMenu = target => {

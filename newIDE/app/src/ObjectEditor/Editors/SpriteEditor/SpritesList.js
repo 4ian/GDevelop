@@ -220,8 +220,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   editDirectionWith: (
     i18n: I18nType,
-    ResourceExternalEditor,
-    direction: gdDirection
+    externalEditor: ResourceExternalEditor
   ) => Promise<void>,
   onReplaceByDirection: (newDirection: gdDirection) => void,
   onSpriteAdded: (sprite: gdSprite) => void,
@@ -665,9 +664,7 @@ const SpritesList = ({
         resourceExternalEditors={
           resourceManagementProps.resourceExternalEditors
         }
-        onEditWith={(i18n, ResourceExternalEditor) =>
-          editDirectionWith(i18n, ResourceExternalEditor, direction)
-        }
+        onEditWith={editDirectionWith}
         onDirectionUpdated={onSpriteUpdated}
       />
       <ResponsiveLineStackLayout noMargin expand alignItems="center">

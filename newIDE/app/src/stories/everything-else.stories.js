@@ -2057,6 +2057,9 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          onCreateNewExtensionWithBehavior={action(
+            'onCreateNewExtensionWithBehavior'
+          )}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
           openEventsBasedEntityPropertyEditorDialog={action(
             'openEventsBasedEntityPropertyEditorDialog'
@@ -2089,6 +2092,9 @@ storiesOf('InstructionEditorDialog', module)
           onPasteInstructions={action('paste instructions')}
           onWillInstallExtension={action('extension will be installed')}
           onExtensionInstalled={action('extension installed')}
+          onCreateNewExtensionWithBehavior={action(
+            'onCreateNewExtensionWithBehavior'
+          )}
           editEventsFunctionParameter={action('editEventsFunctionParameter')}
           openEventsBasedEntityPropertyEditorDialog={action(
             'openEventsBasedEntityPropertyEditorDialog'
@@ -2130,6 +2136,9 @@ storiesOf('InstructionEditorDialog', module)
             onPasteInstructions={action('paste instructions')}
             onWillInstallExtension={action('extension will be installed')}
             onExtensionInstalled={action('extension installed')}
+            onCreateNewExtensionWithBehavior={action(
+              'onCreateNewExtensionWithBehavior'
+            )}
             editEventsFunctionParameter={action('editEventsFunctionParameter')}
             openEventsBasedEntityPropertyEditorDialog={action(
               'openEventsBasedEntityPropertyEditorDialog'
@@ -2182,6 +2191,9 @@ storiesOf('InstructionEditorMenu', module)
                 onPasteInstructions={action('paste instructions')}
                 onWillInstallExtension={action('extension will be installed')}
                 onExtensionInstalled={action('extension installed')}
+                onCreateNewExtensionWithBehavior={action(
+                  'onCreateNewExtensionWithBehavior'
+                )}
                 editEventsFunctionParameter={action(
                   'editEventsFunctionParameter'
                 )}

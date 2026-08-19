@@ -52,8 +52,9 @@
 #include <GDCore/IDE/Events/UsedObjectTypeFinder.h>
 #include <GDCore/IDE/Events/ExampleExtensionUsagesFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
-#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/EventsBasedObjectVariantHelper.h>
+#include <GDCore/IDE/EventsFunctionsExtensionExtractor.h>
+#include <GDCore/IDE/ObjectRefactorer.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ArbitraryObjectsWorker.h>
 #include <GDCore/IDE/Project/ObjectsUsingResourceCollector.h>
@@ -895,6 +896,7 @@ typedef std::vector<gd::PropertyDescriptorChoice> VectorPropertyDescriptorChoice
 #define STATIC_IsObjectLifecycleEventsFunction IsObjectLifecycleEventsFunction
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction
+#define STATIC_CreateCustomBehaviorForObject CreateCustomBehaviorForObject
 #define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo

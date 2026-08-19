@@ -3760,6 +3760,14 @@ interface EventsFunctionsExtension {
     boolean STATIC_IsExtensionLifecycleEventsFunction([Const] DOMString eventsFunctionName);
 };
 
+interface EventsFunctionsExtensionExtractor {
+    void EventsFunctionsExtensionExtractor();
+    [Ref] EventsBasedBehavior STATIC_CreateCustomBehaviorForObject(
+        [Const, Ref] Project project,
+        [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Ref] gdObject obj);
+};
+
 interface AbstractFileSystem {
 };
 

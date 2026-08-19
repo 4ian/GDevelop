@@ -63,6 +63,9 @@ type Props = {|
   onPasteInstructions: () => void, // Unused
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
   openEventsBasedEntityPropertyEditorDialog:
     | (VariableDialogOpeningProps => void)

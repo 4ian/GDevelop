@@ -26,6 +26,8 @@ import {
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
 import { mapVector } from '../Utils/MapFor';
+import Add from '../UI/CustomSvgIcons/Add';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,6 +44,7 @@ type Props = {|
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   shouldShowCapabilityBehaviors: boolean,
   title?: React.Node,
+  onCreateNewExtensionWithBehavior: (() => void) | null,
 |};
 
 export default function NewBehaviorDialog({
@@ -57,7 +60,9 @@ export default function NewBehaviorDialog({
   onExtensionInstalled,
   shouldShowCapabilityBehaviors,
   title,
+  onCreateNewExtensionWithBehavior,
 }: Props): null | React.Node {
+  const { isMobile } = useResponsiveWindowSize();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const {
@@ -268,6 +273,20 @@ export default function NewBehaviorDialog({
           ]}
           secondaryActions={[
             <HelpButton helpPagePath="/behaviors" key="help" />,
+            onCreateNewExtensionWithBehavior ? (
+              <FlatButton
+                key="create-new"
+                onClick={onCreateNewExtensionWithBehavior}
+                label={
+                  isMobile ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new behavior</Trans>
+                  )
+                }
+                leftIcon={<Add />}
+              />
+            ) : null,
           ]}
           open
           onRequestClose={onClose}

@@ -342,6 +342,7 @@ export const useManageObjectBehaviors = ({
   onWillInstallExtension,
   onExtensionInstalled,
   allVisibleBehaviorNames,
+  onCreateNewExtensionWithBehavior,
 }: {
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
@@ -355,6 +356,9 @@ export const useManageObjectBehaviors = ({
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
   allVisibleBehaviorNames: Array<string>,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 }): UseManageBehaviorsState => {
   const [
     justAddedBehaviorName,
@@ -679,6 +683,14 @@ export const useManageObjectBehaviors = ({
       onWillInstallExtension={onWillInstallExtension}
       onExtensionInstalled={onExtensionInstalled}
       shouldShowCapabilityBehaviors={false}
+      onCreateNewExtensionWithBehavior={
+        onCreateNewExtensionWithBehavior
+          ? () => {
+              onCreateNewExtensionWithBehavior(project, objects[0]);
+              setNewBehaviorDialogOpen(false);
+            }
+          : null
+      }
     />
   );
 
@@ -716,6 +728,9 @@ type Props = {|
   ) => Promise<void>,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   isListLocked: boolean,
 |};
 
@@ -739,6 +754,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     openBehaviorEvents,
     onWillInstallExtension,
     onExtensionInstalled,
+    onCreateNewExtensionWithBehavior,
     isListLocked,
   } = props;
   const forceUpdate = useForceUpdate();
@@ -772,6 +788,7 @@ const BehaviorsEditor = (props: Props): React.Node => {
     onWillInstallExtension,
     onExtensionInstalled,
     allVisibleBehaviorNames,
+    onCreateNewExtensionWithBehavior,
   });
 
   React.useEffect(

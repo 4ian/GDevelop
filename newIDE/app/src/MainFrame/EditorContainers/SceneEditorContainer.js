@@ -306,6 +306,9 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         }
         onWillInstallExtension={this.props.onWillInstallExtension}
         onExtensionInstalled={this.props.onExtensionInstalled}
+        onCreateNewExtensionWithBehavior={
+          this.props.onCreateNewExtensionWithBehavior
+        }
         onDeleteEventsBasedObjectVariant={
           this.props.onDeleteEventsBasedObjectVariant
         }

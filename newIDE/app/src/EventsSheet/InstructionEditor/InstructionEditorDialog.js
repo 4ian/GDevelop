@@ -582,7 +582,11 @@ const InstructionEditorDialog = ({
           }}
           onCreateNewExtensionWithBehavior={
             onCreateNewExtensionWithBehavior
-              ? () => onCreateNewExtensionWithBehavior(project, chosenObject)
+              ? () => {
+                  onCreateNewExtensionWithBehavior(project, chosenObject);
+                  setNewBehaviorDialogOpen(false);
+                  onCancel();
+                }
               : null
           }
           shouldShowCapabilityBehaviors={

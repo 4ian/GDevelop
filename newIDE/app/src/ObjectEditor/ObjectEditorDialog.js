@@ -381,7 +381,12 @@ const InnerDialog = (props: InnerDialogProps) => {
           openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
           onWillInstallExtension={onWillInstallExtension}
           onExtensionInstalled={onExtensionInstalled}
-          onCreateNewExtensionWithBehavior={onCreateNewExtensionWithBehavior}
+          onCreateNewExtensionWithBehavior={(project, object) => {
+            if (onCreateNewExtensionWithBehavior) {
+              onApply();
+              onCreateNewExtensionWithBehavior(project, object);
+            }
+          }}
           isListLocked={isBehaviorListLocked}
         />
       )}

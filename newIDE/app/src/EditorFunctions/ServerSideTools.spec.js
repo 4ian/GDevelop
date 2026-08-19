@@ -73,9 +73,16 @@ describe('server-side handled tools', () => {
     );
   });
 
-  it('read_game_project_json is a no-op returning success (the backend computes the result)', async () => {
+  it('read_game_project_json reads the live project client-side (v15+)', async () => {
+    // Not a server-side tool anymore: the editor builds the simplified
+    // project and navigates it itself. An empty path returns the whole
+    // project (depth-truncated).
     const result = await launch('read_game_project_json');
     expect(result.success).toBe(true);
+    expect(result.result).toBeTruthy();
+    expect(Object.keys(result.result || {})).toEqual(
+      expect.arrayContaining(['properties', 'scenes', 'resources'])
+    );
   });
 
   it('keeps old tool names as aliases of the new implementations', () => {

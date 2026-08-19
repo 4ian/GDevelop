@@ -45,7 +45,12 @@ import {
   getSimplifiedVariable,
   getSimplifiedVariablesContainer,
   getVariableTypeAsString,
+  makeSimplifiedProjectBuilder,
 } from './SimplifiedProject/SimplifiedProject';
+import {
+  navigateSimplifiedProjectJson,
+  type ArrayItemsFilter,
+} from './SimplifiedProject/SimplifiedProjectReader';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -159,6 +164,9 @@ export type EditorFunctionGenericOutput = {|
     lastCalledFunctionName: string | null,
   |} | null,
   message?: string,
+  // `read_game_project_json` output payload: the value at the requested path
+  // of the simplified project (its shape entirely depends on the path).
+  result?: any,
   // `run_gameplay_test` output payload. Present only for gameplay test runs.
   status?: string,
   testName?: string,
@@ -8776,11 +8784,57 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
-  // No-op: the function call output is sent to the backend along with an
-  // up-to-date game project JSON, which the backend uses to compute the
-  // actual read result.
-  launchFunction: async ({ args }) => {
-    return { success: true };
+  // Reads the LIVE project client-side (v15+): the simplified project is
+  // built on the spot and navigated with the vendored reader (identical
+  // semantics to the backend's `gdevelop-simplified-project-reader.js`).
+  // The backend only computes the result for tools <= v14 (from a stale
+  // uploaded snapshot) and skips it for tools >= v15.
+  launchFunction: async ({ project, args }) => {
+    const simplifiedProject = makeSimplifiedProjectBuilder(
+      gd
+    ).getSimplifiedProject(project, {});
+
+    // An empty path returns the whole project (limited by maxDepth anyway).
+    const path =
+      typeof (args && args.path) === 'string' ? String(args.path) : '';
+    const filter: ArrayItemsFilter | null =
+      args && args.filter && typeof args.filter === 'object'
+        ? args.filter
+        : null;
+    const maxDepth =
+      args && typeof args.maxDepth === 'number' ? args.maxDepth : 2;
+    const maxStringLength =
+      args && typeof args.maxStringLength === 'number'
+        ? args.maxStringLength
+        : 200;
+    const offset = args && typeof args.offset === 'number' ? args.offset : 0;
+    const limit =
+      args && typeof args.limit === 'number' ? args.limit : undefined;
+    const countOnly = !!(args && args.countOnly === true);
+
+    const navigationResult = navigateSimplifiedProjectJson({
+      project: simplifiedProject,
+      path,
+      filter,
+      offset,
+      limit,
+      countOnly,
+      maxDepth,
+      maxStringLength,
+    });
+
+    if (!navigationResult.success) {
+      return { success: false, message: navigationResult.message };
+    }
+
+    if (navigationResult.truncationWarning) {
+      return {
+        success: true,
+        result: navigationResult.result,
+        message: navigationResult.truncationWarning,
+      };
+    }
+    return { success: true, result: navigationResult.result };
   },
   modifiesProject: false,
 };

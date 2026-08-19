@@ -47,20 +47,29 @@ const installPropertiesPanelPageHelpers = function() {
 
   /**
    * The names of the behaviors of the "Behaviors" section: each one is a
-   * sub-panel whose title bar has a "remove behavior" button.
+   * sub-panel whose title bar has a "remove behavior" button. The name is the
+   * first text next to that button, walking up to the title bar (no CSS
+   * classes: the production build minifies them all away).
    */
   const listBehaviors = () => {
     const panel = getPanel();
     if (!panel) return [];
     return Array.from(panel.querySelectorAll('#remove-behavior'))
       .map(removeButton => {
-        const subPanel = removeButton.closest('.MuiPaper-root');
-        const title =
-          subPanel &&
-          Array.from(subPanel.querySelectorAll('*')).find(
-            element => isLeaf(element) && textOf(element)
+        for (
+          let ancestor = removeButton.parentElement;
+          ancestor && panel.contains(ancestor);
+          ancestor = ancestor.parentElement
+        ) {
+          const title = Array.from(ancestor.querySelectorAll('*')).find(
+            element =>
+              isLeaf(element) &&
+              textOf(element) &&
+              !removeButton.contains(element)
           );
-        return title ? textOf(title) : null;
+          if (title) return textOf(title);
+        }
+        return null;
       })
       .filter(Boolean);
   };

@@ -24,6 +24,9 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import RaisedButton from '../../UI/RaisedButton';
+import TextField from '../../UI/TextField';
+import { testConnection } from '../../AI/CustomAIClient';
 import AlertMessage from '../../UI/AlertMessage';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import CompactSelectField from '../../UI/CompactSelectField';
@@ -90,7 +93,22 @@ const PreferencesDialog = ({
     setDisableNpmScriptConfirmation,
     setUseBackgroundSerializerForSaving,
     setShowJsTypeError,
+    setAiCustomEndpointEnabled,
+    setAiCustomBaseUrl,
+    setAiCustomApiKey,
+    setAiCustomModel,
+    setAiCustomTemperature,
   } = React.useContext(PreferencesContext);
+
+  const [
+    isTestingAiConnection,
+    setIsTestingAiConnection,
+  ] = React.useState<boolean>(false);
+  const [aiTestResult, setAiTestResult] = React.useState<null | {|
+    success: boolean,
+    message: string,
+    models?: Array<string>,
+  |}>(null);
 
   const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
 
@@ -114,6 +132,7 @@ const PreferencesDialog = ({
           onChange={setCurrentTab}
           options={[
             { value: 'preferences', label: <Trans>Preferences</Trans> },
+            { value: 'ai', label: <Trans>AI Settings</Trans> },
             { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
             ...(electron
               ? [{ value: 'folders', label: <Trans>Folders</Trans> }]
@@ -691,6 +710,98 @@ const PreferencesDialog = ({
                 </ColumnStackLayout>
               </ColumnStackLayout>
             </>
+          )}
+        </ColumnStackLayout>
+      )}
+      {currentTab === 'ai' && (
+        <ColumnStackLayout noMargin>
+          <Text size="block-title">
+            <Trans>Custom AI Provider (BYOK)</Trans>
+          </Text>
+          <Text size="body" color="secondary">
+            <Trans>
+              Connect GDevelop to a local AI server (such as Ollama, llama.cpp,
+              LM Studio, LocalAI) or any OpenAI-compatible API endpoint.
+            </Trans>
+          </Text>
+          <CompactToggleField
+            checked={values.aiCustomEndpointEnabled}
+            onCheck={setAiCustomEndpointEnabled}
+            label={<Trans>Enable Custom / Local AI Endpoint (BYOK)</Trans>}
+          />
+          <TextField
+            floatingLabelText={<Trans>Base URL</Trans>}
+            helperMarkdownText={i18n._(
+              t`Examples: \`http://localhost:11434/v1\` (Ollama), \`http://localhost:8080/v1\` (llama.cpp), \`http://localhost:1234/v1\` (LM Studio), \`https://api.openai.com/v1\`, \`https://openrouter.ai/api/v1\``
+            )}
+            fullWidth
+            value={values.aiCustomBaseUrl}
+            onChange={(e, value) => setAiCustomBaseUrl(value)}
+          />
+          <TextField
+            type="password"
+            floatingLabelText={<Trans>API Key</Trans>}
+            helperMarkdownText={i18n._(
+              t`Bearer token for authentication. Leave empty for local servers (Ollama / llama.cpp).`
+            )}
+            fullWidth
+            value={values.aiCustomApiKey}
+            onChange={(e, value) => setAiCustomApiKey(value)}
+          />
+          <TextField
+            floatingLabelText={<Trans>Model Identifier</Trans>}
+            helperMarkdownText={i18n._(
+              t`Examples: \`qwen2.5-coder\`, \`gpt-4o\`, \`llama3.2\`, \`deepseek-chat\`, \`claude-3-5-sonnet\`, \`openrouter/poolside/laguna-s-2.1:free\``
+            )}
+            fullWidth
+            value={values.aiCustomModel}
+            onChange={(e, value) => setAiCustomModel(value)}
+          />
+          <TextField
+            type="number"
+            floatingLabelText={<Trans>Temperature (0.0 to 1.0)</Trans>}
+            value={values.aiCustomTemperature}
+            onChange={(e, value) => {
+              const parsed = parseFloat(value);
+              if (Number.isNaN(parsed)) {
+                setAiCustomTemperature(0.7);
+              } else {
+                setAiCustomTemperature(Math.max(0.0, Math.min(1.0, parsed)));
+              }
+            }}
+          />
+          <LineStackLayout alignItems="center">
+            <RaisedButton
+              label={<Trans>Test Connection</Trans>}
+              primary
+              disabled={isTestingAiConnection}
+              onClick={async () => {
+                setIsTestingAiConnection(true);
+                setAiTestResult(null);
+                try {
+                  const res = await testConnection({
+                    enabled: true,
+                    baseUrl: values.aiCustomBaseUrl,
+                    apiKey: values.aiCustomApiKey,
+                    model: values.aiCustomModel,
+                    temperature: values.aiCustomTemperature,
+                  });
+                  setAiTestResult(res);
+                } catch (err) {
+                  setAiTestResult({
+                    success: false,
+                    message: err.message || 'Connection test failed',
+                  });
+                } finally {
+                  setIsTestingAiConnection(false);
+                }
+              }}
+            />
+          </LineStackLayout>
+          {aiTestResult && (
+            <AlertMessage kind={aiTestResult.success ? 'info' : 'error'}>
+              {aiTestResult.message}
+            </AlertMessage>
           )}
         </ColumnStackLayout>
       )}

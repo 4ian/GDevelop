@@ -472,7 +472,145 @@ export type EditorFunctionWithoutProject = {|
  * Helper function to safely extract required string arguments
  */
 const extractRequiredString = (args: any, propertyName: string): string => {
-  const value = SafeExtractor.extractStringProperty(args, propertyName);
+  if (typeof args === 'string' && args.trim()) {
+    return args.trim();
+  }
+  let value = SafeExtractor.extractStringProperty(args, propertyName);
+  if (
+    value === null &&
+    (propertyName === 'scene_name' || propertyName === 'sceneName')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'scene_name') ||
+      SafeExtractor.extractStringProperty(args, 'name') ||
+      SafeExtractor.extractStringProperty(args, 'sceneName') ||
+      SafeExtractor.extractStringProperty(args, 'scene');
+  } else if (
+    value === null &&
+    (propertyName === 'object_name' || propertyName === 'objectName')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'object_name') ||
+      SafeExtractor.extractStringProperty(args, 'name') ||
+      SafeExtractor.extractStringProperty(args, 'objectName') ||
+      SafeExtractor.extractStringProperty(args, 'object');
+  } else if (
+    value === null &&
+    (propertyName === 'behavior_name' || propertyName === 'behaviorName')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'behavior_name') ||
+      SafeExtractor.extractStringProperty(args, 'name') ||
+      SafeExtractor.extractStringProperty(args, 'behaviorName') ||
+      SafeExtractor.extractStringProperty(args, 'behavior');
+  } else if (
+    value === null &&
+    (propertyName === 'behavior_type' || propertyName === 'behaviorType')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'behavior_type') ||
+      SafeExtractor.extractStringProperty(args, 'type') ||
+      SafeExtractor.extractStringProperty(args, 'behaviorType');
+  } else if (
+    value === null &&
+    (propertyName === 'layer_name' ||
+      propertyName === 'layerName' ||
+      propertyName === 'layer')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'layer_name') ||
+      SafeExtractor.extractStringProperty(args, 'layerName') ||
+      SafeExtractor.extractStringProperty(args, 'layer') ||
+      '';
+  } else if (
+    value === null &&
+    (propertyName === 'brush_kind' ||
+      propertyName === 'brushKind' ||
+      propertyName === 'brush')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'brush_kind') ||
+      SafeExtractor.extractStringProperty(args, 'brushKind') ||
+      SafeExtractor.extractStringProperty(args, 'brush') ||
+      'point';
+  } else if (
+    value === null &&
+    (propertyName === 'variable_scope' ||
+      propertyName === 'variableScope' ||
+      propertyName === 'scope')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'variable_scope') ||
+      SafeExtractor.extractStringProperty(args, 'scope') ||
+      SafeExtractor.extractStringProperty(args, 'variableScope') ||
+      'global';
+  } else if (
+    value === null &&
+    (propertyName === 'project_name' ||
+      propertyName === 'projectName' ||
+      propertyName === 'game_name' ||
+      propertyName === 'gameName' ||
+      propertyName === 'title' ||
+      propertyName === 'name')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'project_name') ||
+      SafeExtractor.extractStringProperty(args, 'game_name') ||
+      SafeExtractor.extractStringProperty(args, 'projectName') ||
+      SafeExtractor.extractStringProperty(args, 'gameName') ||
+      SafeExtractor.extractStringProperty(args, 'title') ||
+      SafeExtractor.extractStringProperty(args, 'name') ||
+      'My Project';
+  } else if (
+    value === null &&
+    (propertyName === 'template_slug' ||
+      propertyName === 'templateSlug' ||
+      propertyName === 'template' ||
+      propertyName === 'slug')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'template_slug') ||
+      SafeExtractor.extractStringProperty(args, 'templateSlug') ||
+      SafeExtractor.extractStringProperty(args, 'template') ||
+      SafeExtractor.extractStringProperty(args, 'slug') ||
+      '';
+  } else if (
+    value === null &&
+    (propertyName === 'test_name' ||
+      propertyName === 'testName' ||
+      propertyName === 'name')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'test_name') ||
+      SafeExtractor.extractStringProperty(args, 'testName') ||
+      SafeExtractor.extractStringProperty(args, 'name') ||
+      'Test';
+  } else if (
+    value === null &&
+    (propertyName === 'events_description' ||
+      propertyName === 'eventsDescription' ||
+      propertyName === 'description')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'events_description') ||
+      SafeExtractor.extractStringProperty(args, 'description') ||
+      SafeExtractor.extractStringProperty(args, 'eventsDescription') ||
+      SafeExtractor.extractStringProperty(args, 'events') ||
+      SafeExtractor.extractStringProperty(args, 'prompt');
+  } else if (
+    value === null &&
+    (propertyName === 'query' ||
+      propertyName === 'search' ||
+      propertyName === 'searchTerm' ||
+      propertyName === 'searchTerms')
+  ) {
+    value =
+      SafeExtractor.extractStringProperty(args, 'query') ||
+      SafeExtractor.extractStringProperty(args, 'search') ||
+      SafeExtractor.extractStringProperty(args, 'searchTerm') ||
+      SafeExtractor.extractStringProperty(args, 'searchTerms') ||
+      '';
+  }
   if (value === null) {
     throw new Error(
       `Missing or invalid required string argument: ${propertyName}`
@@ -3492,10 +3630,23 @@ const put2dInstances: EditorFunction = {
     );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
-    const brush_position = SafeExtractor.extractStringProperty(
-      args,
-      'brush_position'
-    );
+    const rawBrushPos =
+      SafeExtractor.extractStringProperty(args, 'brush_position') ||
+      SafeExtractor.extractStringProperty(args, 'position') ||
+      SafeExtractor.extractStringProperty(args, 'pos') ||
+      (args && args.x !== undefined && args.y !== undefined
+        ? `${args.x}, ${args.y}`
+        : null) ||
+      (args && Array.isArray(args.position) && args.position.length >= 2
+        ? `${args.position[0]}, ${args.position[1]}`
+        : null) ||
+      (args &&
+      Array.isArray(args.instances) &&
+      args.instances.length > 0 &&
+      args.instances[0].x !== undefined
+        ? `${args.instances[0].x}, ${args.instances[0].y}`
+        : null);
+    const brush_position = rawBrushPos;
     const existing_instance_ids = SafeExtractor.extractStringProperty(
       args,
       'existing_instance_ids'
@@ -3512,7 +3663,9 @@ const put2dInstances: EditorFunction = {
     );
     const newInstancesCount =
       new_instances_count === null && existingInstanceIds.length === 0
-        ? 1
+        ? Array.isArray(args.instances) && args.instances.length > 0
+          ? args.instances.length
+          : 1
         : new_instances_count;
 
     const existingInstanceCount = existingInstanceIds.length;
@@ -3588,15 +3741,89 @@ const put2dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
+
+    if (Array.isArray(args.instances) && args.instances.length > 0) {
+      if (!project.hasLayoutNamed(scene_name)) {
+        return makeSceneNotFoundFailure(project, scene_name);
+      }
+      const layout = project.getLayout(scene_name);
+      const validEntries = [];
+      for (const instData of args.instances) {
+        if (!instData || typeof instData !== 'object') continue;
+        const instObjName =
+          instData.object_name || instData.name || object_name;
+        if (!instObjName) continue;
+        const x = Number(instData.x);
+        const y = Number(instData.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        validEntries.push({
+          objectName: instObjName,
+          layer:
+            instData.layer_name !== undefined
+              ? String(instData.layer_name)
+              : instData.layer !== undefined
+              ? String(instData.layer)
+              : layer_name,
+          x,
+          y,
+          angle:
+            instData.angle !== undefined &&
+            Number.isFinite(Number(instData.angle))
+              ? Number(instData.angle)
+              : null,
+          zOrder:
+            instData.z_order !== undefined &&
+            Number.isFinite(Number(instData.z_order))
+              ? Number(instData.z_order)
+              : instData.zOrder !== undefined &&
+                Number.isFinite(Number(instData.zOrder))
+              ? Number(instData.zOrder)
+              : null,
+        });
+      }
+
+      if (validEntries.length === 0) {
+        return makeGenericFailure(
+          'No valid instances found in the batch to place.'
+        );
+      }
+
+      const initialInstances = layout.getInitialInstances();
+      for (const entry of validEntries) {
+        const inst = initialInstances.insertNewInitialInstance();
+        inst.setObjectName(entry.objectName);
+        inst.setLayer(entry.layer);
+        inst.setX(entry.x);
+        inst.setY(entry.y);
+        if (entry.angle !== null) inst.setAngle(entry.angle);
+        if (entry.zOrder !== null) inst.setZOrder(entry.zOrder);
+      }
+      onInstancesModifiedOutsideEditor({ scene: layout });
+      return {
+        success: true,
+        message: `Placed ${
+          validEntries.length
+        } instance(s) in scene "${scene_name}".`,
+      };
+    }
+
     const requested_brush_kind = extractRequiredString(args, 'brush_kind');
-    const brush_position = SafeExtractor.extractStringProperty(
-      args,
-      'brush_position'
-    );
+    const rawBrushPosition =
+      SafeExtractor.extractStringProperty(args, 'brush_position') ||
+      SafeExtractor.extractStringProperty(args, 'position') ||
+      SafeExtractor.extractStringProperty(args, 'pos') ||
+      SafeExtractor.extractStringProperty(args, 'coordinates') ||
+      (args && args.x !== undefined && args.y !== undefined
+        ? `${args.x}, ${args.y}`
+        : null) ||
+      (args && Array.isArray(args.position) && args.position.length >= 2
+        ? `${args.position[0]}, ${args.position[1]}`
+        : null);
     const existing_instance_ids = SafeExtractor.extractStringProperty(
       args,
       'existing_instance_ids'
     );
+    const brush_position = rawBrushPosition;
     // A "none" brush with both a `brush_position` and `existing_instance_ids`
     // is contradictory ("none" never positions anything) but unambiguous: move
     // THOSE instances there. Read it as the "point" brush, which is what the
@@ -4384,10 +4611,24 @@ const put3dInstances: EditorFunction = {
     );
     const layer_name = extractRequiredString(args, 'layer_name');
     const brush_kind = extractRequiredString(args, 'brush_kind');
-    const brush_position = SafeExtractor.extractStringProperty(
-      args,
-      'brush_position'
-    );
+    const rawBrushPos =
+      SafeExtractor.extractStringProperty(args, 'brush_position') ||
+      SafeExtractor.extractStringProperty(args, 'position') ||
+      SafeExtractor.extractStringProperty(args, 'pos') ||
+      (args && args.x !== undefined && args.y !== undefined
+        ? `${args.x}, ${args.y}, ${args.z || 0}`
+        : null) ||
+      (args && Array.isArray(args.position) && args.position.length >= 3
+        ? `${args.position[0]}, ${args.position[1]}, ${args.position[2]}`
+        : null) ||
+      (args &&
+      Array.isArray(args.instances) &&
+      args.instances.length > 0 &&
+      args.instances[0].x !== undefined
+        ? `${args.instances[0].x}, ${args.instances[0].y}, ${args.instances[0]
+            .z || 0}`
+        : null);
+    const brush_position = rawBrushPos;
     const existing_instance_ids = SafeExtractor.extractStringProperty(
       args,
       'existing_instance_ids'
@@ -4404,7 +4645,9 @@ const put3dInstances: EditorFunction = {
     );
     const newInstancesCount =
       new_instances_count === null && existingInstanceIds.length === 0
-        ? 1
+        ? Array.isArray(args.instances) && args.instances.length > 0
+          ? args.instances.length
+          : 1
         : new_instances_count;
 
     const existingInstanceCount = existingInstanceIds.length;
@@ -4480,15 +4723,96 @@ const put3dInstances: EditorFunction = {
       'object_name'
     );
     const layer_name = extractRequiredString(args, 'layer_name');
+
+    if (Array.isArray(args.instances) && args.instances.length > 0) {
+      if (!project.hasLayoutNamed(scene_name)) {
+        return makeSceneNotFoundFailure(project, scene_name);
+      }
+      const layout = project.getLayout(scene_name);
+      const validEntries = [];
+      for (const instData of args.instances) {
+        if (!instData || typeof instData !== 'object') continue;
+        const instObjName =
+          instData.object_name || instData.name || object_name;
+        if (!instObjName) continue;
+        const x = Number(instData.x);
+        const y = Number(instData.y);
+        const z = Number(instData.z || 0);
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z))
+          continue;
+        validEntries.push({
+          objectName: instObjName,
+          layer:
+            instData.layer_name !== undefined
+              ? String(instData.layer_name)
+              : instData.layer !== undefined
+              ? String(instData.layer)
+              : layer_name,
+          x,
+          y,
+          z,
+          rotationX:
+            instData.rotation_x !== undefined &&
+            Number.isFinite(Number(instData.rotation_x))
+              ? Number(instData.rotation_x)
+              : null,
+          rotationY:
+            instData.rotation_y !== undefined &&
+            Number.isFinite(Number(instData.rotation_y))
+              ? Number(instData.rotation_y)
+              : null,
+          rotationZ:
+            instData.rotation_z !== undefined &&
+            Number.isFinite(Number(instData.rotation_z))
+              ? Number(instData.rotation_z)
+              : null,
+        });
+      }
+
+      if (validEntries.length === 0) {
+        return makeGenericFailure(
+          'No valid 3D instances found in the batch to place.'
+        );
+      }
+
+      const initialInstances = layout.getInitialInstances();
+      for (const entry of validEntries) {
+        const inst = initialInstances.insertNewInitialInstance();
+        inst.setObjectName(entry.objectName);
+        inst.setLayer(entry.layer);
+        inst.setX(entry.x);
+        inst.setY(entry.y);
+        inst.setZ(entry.z);
+        if (entry.rotationX !== null) inst.setRotationX(entry.rotationX);
+        if (entry.rotationY !== null) inst.setRotationY(entry.rotationY);
+        if (entry.rotationZ !== null) inst.setAngle(entry.rotationZ);
+      }
+      onInstancesModifiedOutsideEditor({ scene: layout });
+      return {
+        success: true,
+        message: `Placed ${
+          validEntries.length
+        } 3D instance(s) in scene "${scene_name}".`,
+      };
+    }
+
     const requested_brush_kind = extractRequiredString(args, 'brush_kind');
-    const brush_position = SafeExtractor.extractStringProperty(
-      args,
-      'brush_position'
-    );
+    const rawBrushPosition =
+      SafeExtractor.extractStringProperty(args, 'brush_position') ||
+      SafeExtractor.extractStringProperty(args, 'position') ||
+      SafeExtractor.extractStringProperty(args, 'pos') ||
+      SafeExtractor.extractStringProperty(args, 'coordinates') ||
+      (args && args.x !== undefined && args.y !== undefined
+        ? `${args.x}, ${args.y}, ${args.z || 0}`
+        : null) ||
+      (args && Array.isArray(args.position) && args.position.length >= 3
+        ? `${args.position[0]}, ${args.position[1]}, ${args.position[2]}`
+        : null);
     const existing_instance_ids = SafeExtractor.extractStringProperty(
       args,
       'existing_instance_ids'
     );
+    const brush_position = rawBrushPosition;
     // A "none" brush with both a `brush_position` and `existing_instance_ids`
     // is contradictory ("none" never positions anything) but unambiguous: move
     // THOSE instances there. Read it as the "point" brush, which is what the
@@ -6115,10 +6439,10 @@ const createScene: EditorFunction = {
       args,
       'include_ui_layer'
     );
-    const background_color = SafeExtractor.extractStringProperty(
-      args,
-      'background_color'
-    );
+    const background_color =
+      SafeExtractor.extractStringProperty(args, 'background_color') ||
+      SafeExtractor.extractStringProperty(args, 'backgroundColor') ||
+      SafeExtractor.extractStringProperty(args, 'color');
     const is_first_scene = SafeExtractor.extractBooleanProperty(
       args,
       'is_first_scene'
@@ -6715,10 +7039,27 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
     const changes = [];
     const warnings = [];
 
-    const changed_properties = SafeExtractor.extractArrayProperty(
+    let changed_properties = SafeExtractor.extractArrayProperty(
       args,
       'changed_properties'
     );
+    if (!changed_properties || changed_properties.length === 0) {
+      const syntheticProperties = [];
+      const topLevelBg =
+        SafeExtractor.extractStringProperty(args, 'background_color') ||
+        SafeExtractor.extractStringProperty(args, 'backgroundColor') ||
+        SafeExtractor.extractStringProperty(args, 'bgColor') ||
+        SafeExtractor.extractStringProperty(args, 'color');
+      if (topLevelBg) {
+        syntheticProperties.push({
+          property_name: 'backgroundColor',
+          new_value: topLevelBg,
+        });
+      }
+      if (syntheticProperties.length > 0) {
+        changed_properties = syntheticProperties;
+      }
+    }
     const changed_layers = SafeExtractor.extractArrayProperty(
       args,
       'changed_layers'
@@ -6734,14 +7075,21 @@ const changeScenePropertiesLayersEffectsGroups: EditorFunction = {
 
     if (changed_properties)
       changed_properties.forEach(changed_property => {
-        const propertyName = SafeExtractor.extractStringProperty(
-          changed_property,
-          'property_name'
-        );
-        const newValue = SafeExtractor.extractStringProperty(
-          changed_property,
-          'new_value'
-        );
+        const propertyName =
+          SafeExtractor.extractStringProperty(
+            changed_property,
+            'property_name'
+          ) ||
+          SafeExtractor.extractStringProperty(
+            changed_property,
+            'propertyName'
+          ) ||
+          SafeExtractor.extractStringProperty(changed_property, 'name') ||
+          SafeExtractor.extractStringProperty(changed_property, 'property');
+        const newValue =
+          SafeExtractor.extractStringProperty(changed_property, 'new_value') ||
+          SafeExtractor.extractStringProperty(changed_property, 'newValue') ||
+          SafeExtractor.extractStringProperty(changed_property, 'value');
         if (propertyName === null || newValue === null) {
           warnings.push(
             `Missing "property_name" or "new_value" in changed_properties item: ${JSON.stringify(
@@ -7946,33 +8294,62 @@ const extractVariableOperations = (
 |}> => {
   const variablesArray = SafeExtractor.extractArrayProperty(args, 'variables');
   if (variablesArray) {
-    return variablesArray.map(variableArgs => ({
-      variable_name_or_path: SafeExtractor.extractStringProperty(
-        variableArgs,
-        'variable_name_or_path'
-      ),
-      value: SafeExtractor.extractStringProperty(variableArgs, 'value'),
-      variable_type: SafeExtractor.extractStringProperty(
-        variableArgs,
-        'variable_type'
-      ),
-      delete_this_variable:
-        SafeExtractor.extractBooleanProperty(
+    return variablesArray.map(variableArgs => {
+      const varName =
+        SafeExtractor.extractStringProperty(
           variableArgs,
-          'delete_this_variable'
-        ) || false,
-    }));
+          'variable_name_or_path'
+        ) ||
+        SafeExtractor.extractStringProperty(variableArgs, 'variable_name') ||
+        SafeExtractor.extractStringProperty(variableArgs, 'name') ||
+        SafeExtractor.extractStringProperty(variableArgs, 'variableName');
+      const varVal =
+        SafeExtractor.extractStringProperty(variableArgs, 'value') !== null
+          ? SafeExtractor.extractStringProperty(variableArgs, 'value')
+          : variableArgs && variableArgs.value !== undefined
+          ? String(variableArgs.value)
+          : null;
+      const varType =
+        SafeExtractor.extractStringProperty(variableArgs, 'variable_type') ||
+        SafeExtractor.extractStringProperty(variableArgs, 'type') ||
+        SafeExtractor.extractStringProperty(variableArgs, 'variableType');
+      return {
+        variable_name_or_path: varName,
+        value: varVal,
+        variable_type: varType,
+        delete_this_variable:
+          SafeExtractor.extractBooleanProperty(
+            variableArgs,
+            'delete_this_variable'
+          ) || false,
+      };
+    });
   }
+
+  const varName =
+    SafeExtractor.extractStringProperty(args, 'variable_name_or_path') ||
+    SafeExtractor.extractStringProperty(args, 'variable_name') ||
+    SafeExtractor.extractStringProperty(args, 'name') ||
+    SafeExtractor.extractStringProperty(args, 'variableName');
+  const varVal =
+    SafeExtractor.extractStringProperty(args, 'value') !== null
+      ? SafeExtractor.extractStringProperty(args, 'value')
+      : args && args.value !== undefined
+      ? String(args.value)
+      : null;
+  const varType =
+    SafeExtractor.extractStringProperty(args, 'variable_type') ||
+    SafeExtractor.extractStringProperty(args, 'type') ||
+    SafeExtractor.extractStringProperty(args, 'variableType');
 
   return [
     {
-      variable_name_or_path: SafeExtractor.extractStringProperty(
-        args,
-        'variable_name_or_path'
-      ),
-      value: SafeExtractor.extractStringProperty(args, 'value'),
-      variable_type: SafeExtractor.extractStringProperty(args, 'variable_type'),
-      delete_this_variable: false,
+      variable_name_or_path: varName,
+      value: varVal,
+      variable_type: varType,
+      delete_this_variable:
+        SafeExtractor.extractBooleanProperty(args, 'delete_this_variable') ||
+        false,
     },
   ];
 };
@@ -8820,12 +9197,20 @@ const runScript: EditorFunction = {
   },
   launchFunction: async ({ args, project, ...launchOptions }) => {
     const jsCode =
-      args && typeof args.js_code === 'string' ? args.js_code : null;
+      args && typeof args.js_code === 'string'
+        ? args.js_code
+        : args && typeof args.script === 'string'
+        ? args.script
+        : args && typeof args.code === 'string'
+        ? args.code
+        : args && typeof args.javascript === 'string'
+        ? args.javascript
+        : null;
     if (!jsCode) {
       return {
         success: false,
         message:
-          'run_script requires a `js_code` string argument (the JavaScript to run).',
+          'run_script requires a `js_code` or `script` string argument (the JavaScript to run).',
       };
     }
 

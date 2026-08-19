@@ -6,9 +6,24 @@ import { getIDEVersionWithHash } from '../../Version';
 import { extractNextPageUriFromLinkHeader } from './Play';
 import {
   ensureIsArray,
-  ensureIsObject,
   ensureObjectHasProperty,
 } from '../DataValidator';
+import {
+  isCustomEndpointEnabled,
+  customCreateAiRequest,
+  customAddMessageToAiRequest,
+  customGetAiRequest,
+  customGetAiRequests,
+  customGetAiRequestStatuses,
+  customSuspendAiRequest,
+  customForkAiRequest,
+  customGetAiRequestSuggestions,
+  customCreateAiGeneratedEvent,
+  customCreateAssetSearch,
+  customCreateResourceSearch,
+  DEFAULT_LOCAL_AI_SETTINGS,
+  LOCAL_BYOK_USER_ID,
+} from '../../AI/CustomAIClient';
 
 export type Environment = 'staging' | 'live';
 
@@ -297,6 +312,10 @@ export const getAiRequest = async (
     outputFromMessageId?: ?string,
   |}
 ): Promise<AiRequest> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return customGetAiRequest(aiRequestId);
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   // $FlowFixMe[underconstrained-implicit-instantiation]
   const response = await axios.get(
@@ -337,25 +356,33 @@ export const getAiRequestStatuses = async (
 > => {
   if (aiRequestIds.length === 0) return [];
 
-  const authorizationHeader = await getAuthorizationHeader();
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${GDevelopGenerationApi.baseUrl}/ai-request`,
-    {
-      params: {
-        userId,
-        ids: aiRequestIds.join(','),
-        include: 'status',
-      },
-      headers: {
-        Authorization: authorizationHeader,
-      },
-    }
-  );
-  return ensureIsArray({
-    data: response.data,
-    endpointName: '/ai-request?ids=...&include=status of Generation API',
-  });
+  const localIds = aiRequestIds.filter(id => id.startsWith('local-ai-'));
+  const hostedIds = aiRequestIds.filter(id => !id.startsWith('local-ai-'));
+
+  const results = [];
+  if (localIds.length > 0) {
+    const localStatuses = await customGetAiRequestStatuses(localIds);
+    results.push(...localStatuses);
+  }
+  if (hostedIds.length > 0) {
+    const authorizationHeader = await getAuthorizationHeader();
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${GDevelopGenerationApi.baseUrl}/ai-request`,
+      {
+        params: {
+          userId,
+          ids: hostedIds.join(','),
+          include: 'status',
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+    results.push(...(response.data || []));
+  }
+  return results;
 };
 
 export const getAiRequests = async (
@@ -371,6 +398,10 @@ export const getAiRequests = async (
   aiRequests: Array<AiRequest>,
   nextPageUri: ?string,
 }> => {
+  if (isCustomEndpointEnabled()) {
+    return customGetAiRequests();
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const uri = forceUri || '/ai-request';
 
@@ -432,6 +463,17 @@ export const createAiRequest = async (
     toolsVersion: string,
   |}
 ): Promise<AiRequest> => {
+  if (isCustomEndpointEnabled()) {
+    return customCreateAiRequest({
+      userRequest,
+      gameProjectJson,
+      projectSpecificExtensionsSummaryJson,
+      mode,
+      aiConfiguration,
+      gameId,
+    });
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     '/ai-request',
@@ -502,6 +544,17 @@ export const addMessageToAiRequest = async (
     toolsVersion?: string,
   |}
 ): Promise<AiRequest> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return customAddMessageToAiRequest({
+      aiRequestId,
+      userMessage,
+      functionCallOutputs,
+      gameProjectJson,
+      projectSpecificExtensionsSummaryJson,
+      mode,
+    });
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/add-message`,
@@ -541,6 +594,10 @@ export const suspendAiRequest = async (
   getAuthorizationHeader: () => Promise<string>,
   { userId, aiRequestId }: {| userId: string, aiRequestId: string |}
 ): Promise<AiRequest> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return customSuspendAiRequest(aiRequestId);
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/suspend`,
@@ -570,6 +627,9 @@ export const updateAiRequestMessage = async (
     projectVersionIdAfterMessage?: ?string,
   |}
 ): Promise<void> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return;
+  }
   const authorizationHeader = await getAuthorizationHeader();
   await apiClient.patch(
     `/ai-request/${aiRequestId}/message/${aiRequestMessageId}`,
@@ -652,6 +712,10 @@ export const getAiRequestSuggestions = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
   |}
 ): Promise<AiRequest> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return customGetAiRequestSuggestions(aiRequestId);
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/get-suggestions`,
@@ -716,7 +780,7 @@ export const createAiGeneratedEvent = async (
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
     sceneName: string,
     eventsDescription: string | null,
-    eventBatches: Array<AiGeneratedEventBatch> | null,
+    eventBatches: ?EventsBatchToGenerate,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
@@ -727,6 +791,17 @@ export const createAiGeneratedEvent = async (
     estimatedComplexity: number | null,
   |}
 ): Promise<CreateAiGeneratedEventResult> => {
+  if (isCustomEndpointEnabled()) {
+    return customCreateAiGeneratedEvent({
+      sceneName,
+      eventsDescription,
+      eventBatches,
+      extensionNamesList,
+      objectsList,
+      existingEventsAsText,
+    });
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-generated-event`,
@@ -795,6 +870,28 @@ export const getAiGeneratedEvent = async (
     aiGeneratedEventId: string,
   |}
 ): Promise<AiGeneratedEvent> => {
+  if (aiGeneratedEventId.startsWith('local-evt-')) {
+    return {
+      id: aiGeneratedEventId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      userId: LOCAL_BYOK_USER_ID,
+      status: 'ready',
+      partialGameProjectJson: '',
+      eventsDescription: null,
+      eventBatches: null,
+      extensionNamesList: '',
+      objectsList: '',
+      existingEventsAsText: '',
+      existingEventsJson: null,
+      existingEventsJsonUserRelativeKey: null,
+      resultMessage: null,
+      changes: [],
+      error: null,
+      stats: null,
+    };
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.get(
     `/ai-generated-event/${aiGeneratedEventId}`,
@@ -819,8 +916,8 @@ export const createAssetSearch = async (
   {
     userId,
     searchTerms,
-    description,
     objectType,
+    description,
     twoDimensionalViewKind,
     exactOrPartialAssetId,
     relatedAiRequestId,
@@ -829,23 +926,26 @@ export const createAssetSearch = async (
   }: {|
     userId: string,
     searchTerms: string,
-    description: string,
-    objectType: string | null,
-    twoDimensionalViewKind: string,
-    exactOrPartialAssetId?: string | null,
-    relatedAiRequestId?: string | null,
-    lastUserMessage?: string | null,
+    objectType?: ?string,
+    description?: ?string,
+    twoDimensionalViewKind?: ?string,
+    exactOrPartialAssetId?: ?string,
+    relatedAiRequestId?: ?string,
+    lastUserMessage?: ?string,
     lastAssistantMessages?: string[],
   |}
 ): Promise<AssetSearch> => {
+  if (isCustomEndpointEnabled()) {
+    return customCreateAssetSearch({ searchTerms, objectType });
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/asset-search`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
-      description,
       objectType,
+      description,
       twoDimensionalViewKind,
       exactOrPartialAssetId,
       relatedAiRequestId,
@@ -880,11 +980,14 @@ export const createResourceSearch = async (
     resourceKind: string,
   |}
 ): Promise<ResourceSearch> => {
+  if (isCustomEndpointEnabled()) {
+    return customCreateResourceSearch({ searchTerms, resourceKind });
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/resource-search`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       searchTerms,
       resourceKind,
     },
@@ -927,11 +1030,20 @@ export const createAiUserContentPresignedUrls = async (
     eventsJsonHash: string | null,
   |}
 ): Promise<AiUserContentPresignedUrlsResult> => {
+  if (isCustomEndpointEnabled() || (userId && userId.startsWith('local-'))) {
+    return {
+      gameProjectJsonSignedUrl: undefined,
+      gameProjectJsonUserRelativeKey: undefined,
+      projectSpecificExtensionsSummaryJsonSignedUrl: undefined,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey: undefined,
+      eventsJsonSignedUrl: undefined,
+      eventsJsonUserRelativeKey: undefined,
+    };
+  }
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-user-content/action/create-presigned-urls`,
     {
-      gdevelopVersionWithHash: getIDEVersionWithHash(),
       gameProjectJsonHash,
       projectSpecificExtensionsSummaryJsonHash,
       eventsJsonHash,
@@ -945,8 +1057,9 @@ export const createAiUserContentPresignedUrls = async (
       },
     }
   );
-  return ensureIsObject({
+  return ensureObjectHasProperty({
     data: response.data,
+    propertyName: 'gameProjectJsonSignedUrl',
     endpointName:
       '/ai-user-content/action/create-presigned-urls of Generation API',
   });
@@ -980,6 +1093,10 @@ export const forkAiRequest = async (
     upToMessageId?: string,
   |}
 ): Promise<AiRequest> => {
+  if (aiRequestId.startsWith('local-ai-')) {
+    return customForkAiRequest(aiRequestId, upToMessageId);
+  }
+
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.post(
     `/ai-request/${aiRequestId}/action/fork`,
@@ -1007,13 +1124,18 @@ export const fetchAiSettings = async ({
 }: {|
   environment: Environment,
 |}): Promise<AiSettings> => {
-  // $FlowFixMe[underconstrained-implicit-instantiation]
-  const response = await axios.get(
-    `${GDevelopAiCdn.baseUrl[environment]}/ai-settings-v2.json`
-  );
-  return ensureObjectHasProperty({
-    data: response.data,
-    propertyName: 'aiRequest',
-    endpointName: '/ai-settings-v2.json of Generation API',
-  });
+  try {
+    // $FlowFixMe[underconstrained-implicit-instantiation]
+    const response = await axios.get(
+      `${GDevelopAiCdn.baseUrl[environment]}/ai-settings-v2.json`,
+      { timeout: 5000 }
+    );
+    return ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'aiRequest',
+      endpointName: '/ai-settings-v2.json of Generation API',
+    });
+  } catch (err) {
+    return DEFAULT_LOCAL_AI_SETTINGS;
+  }
 };

@@ -18,6 +18,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 import { userCancellationErrorName } from '../../LoginProvider/Utils';
 import { ensureIsObject, ensureObjectHasProperty } from '../DataValidator';
+import { isCustomEndpointEnabled } from '../../AI/CustomAIClient';
 
 export type Profile = {|
   id: string,
@@ -577,13 +578,18 @@ export default class Authentication {
 
   getAuthorizationHeader = async (): Promise<string> => {
     const { currentUser } = this.auth;
-    if (!currentUser) throw new Error('User is not authenticated.');
+    if (!currentUser) {
+      if (isCustomEndpointEnabled()) {
+        return 'Bearer local-byok-token';
+      }
+      throw new Error('User is not authenticated.');
+    }
 
     return currentUser.getIdToken().then(token => `Bearer ${token}`);
   };
 
   isAuthenticated = (): boolean => {
-    return !!this.auth.currentUser;
+    return !!this.auth.currentUser || isCustomEndpointEnabled();
   };
 
   waitForInitialAuthCheck = (): Promise<void> => {

@@ -63,6 +63,10 @@ import Stop from '../../UI/CustomSvgIcons/Stop';
 import AutoEditButton from './AutoEditButton';
 import { EditApprovalRow } from './EditApprovalRow';
 import { type EditApprovalRequest } from '../Utils';
+import {
+  isCustomEndpointEnabled,
+  getCustomEndpointConfig,
+} from '../../AI/CustomAIClient';
 
 const TOO_MANY_USER_MESSAGES_WARNING_COUNT = 15;
 const TOO_MANY_USER_MESSAGES_ERROR_COUNT = 20;
@@ -148,6 +152,17 @@ const getPriceAndRequestsTextAndTooltip = ({
   onOpenSubscriptionDialog: () => void,
   hideLabel?: boolean,
 |}): React.Node => {
+  if (isCustomEndpointEnabled()) {
+    const config = getCustomEndpointConfig();
+    return (
+      <div style={styles.quotaContainer}>
+        <Text size="body-small" color="secondary" noMargin>
+          <Trans>BYOK: {config.model || 'Custom Model'}</Trans>
+        </Text>
+      </div>
+    );
+  }
+
   if (!quota || !price) {
     if (isRefreshingLimits) {
       // No value yet: show only the indeterminate bar and the (i) icon, no label.
@@ -749,6 +764,7 @@ export const AiRequestChat: React.ComponentType<{
     const doesNotHaveEnoughCreditsToContinue =
       !!price && availableCredits < price.priceInCredits;
     const cannotContinue =
+      !isCustomEndpointEnabled() &&
       !!quota &&
       quota.limitReached &&
       (!automaticallyUseCreditsForAiRequests ||

@@ -6,6 +6,7 @@ import {
   type AiUserContentPresignedUrlsResult,
 } from '../Utils/GDevelopServices/Generation';
 import jsSHA from '../Utils/Sha256';
+import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
 
 type UploadInfo = {
   uploadedAt: number,
@@ -110,6 +111,17 @@ export const prepareAiUserContent = async ({
   projectSpecificExtensionsSummaryJson: null | string,
   projectSpecificExtensionsSummaryJsonUserRelativeKey: null | string,
 }> => {
+  if (isCustomEndpointEnabled() || (userId && userId.startsWith('local-'))) {
+    return {
+      gameProjectJsonUserRelativeKey: null,
+      gameProjectJson: simplifiedProjectJson,
+      projectSpecificExtensionsSummaryJsonUserRelativeKey: null,
+      projectSpecificExtensionsSummaryJson: projectSpecificExtensionsSummaryJson,
+      eventsJsonUserRelativeKey: null,
+      eventsJson: eventsJson || null,
+    };
+  }
+
   // Hash the contents, if provided, to then upload it only once (as long as the hash stays
   // the same, no need to re-upload it for a while).
   // If the content is not provided, no hash is computed because there is no content to upload.

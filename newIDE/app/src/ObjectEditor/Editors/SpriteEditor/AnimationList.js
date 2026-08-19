@@ -105,7 +105,6 @@ type AnimationItemRowProps = {|
   editDirectionWith: (
     i18n: I18nType,
     externalEditor: ResourceExternalEditor,
-    direction: gdDirection,
     animationIndex: number,
     directionIndex: number
   ) => Promise<void>,
@@ -261,18 +260,14 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                               animations={animations}
                               animationIndex={animationIndex}
                               directionIndex={directionIndex}
+                              animationsChangeTrigger={animationsChangeTrigger}
                               project={project}
                               resourcesLoader={ResourcesLoader}
                               resourceManagementProps={resourceManagementProps}
-                              editDirectionWith={(
-                                i18n,
-                                externalEditor,
-                                direction
-                              ) =>
+                              editDirectionWith={(i18n, externalEditor) =>
                                 editDirectionWith(
                                   i18n,
                                   externalEditor,
-                                  direction,
                                   animationIndex,
                                   directionIndex
                                 )
@@ -773,17 +768,25 @@ const AnimationList: React.ComponentType<{
       async (
         i18n: I18nType,
         externalEditor: ResourceExternalEditor,
-        direction: gdDirection,
         animationIndex: number,
         directionIndex: number
       ) => {
+        const direction = getCurrentElements(
+          animations,
+          animationIndex,
+          directionIndex,
+          0
+        ).direction;
+        if (!direction) return;
         abortControllerRef.current = new AbortController();
         const { signal } = abortControllerRef.current;
         const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
           return direction.getSprite(i).getImageName();
         });
-        const animation = animations.getAnimation(animationIndex);
-        const animationName = animation.getName();
+        const timeBetweenFrames = direction.getTimeBetweenFrames();
+        const isLooping = direction.isLooping();
+        const existingMetadata = direction.getMetadata();
+        const animationName = animations.getAnimation(animationIndex).getName();
 
         try {
           setExternalEditorOpened(true);
@@ -796,17 +799,14 @@ const AnimationList: React.ComponentType<{
               resourceNames,
               extraOptions: {
                 singleFrame: false,
-                fps:
-                  direction.getTimeBetweenFrames() > 0
-                    ? 1 / direction.getTimeBetweenFrames()
-                    : 1,
+                fps: timeBetweenFrames > 0 ? 1 / timeBetweenFrames : 1,
                 name:
                   animationName ||
                   (resourceNames[0] &&
                     removeExtensionFromFileName(resourceNames[0])) ||
                   objectName,
-                isLooping: direction.isLooping(),
-                existingMetadata: direction.getMetadata(),
+                isLooping,
+                existingMetadata,
               },
               signal,
             }
@@ -815,30 +815,41 @@ const AnimationList: React.ComponentType<{
           setExternalEditorOpened(false);
           if (!editResult) return;
 
+          // Resolve the direction again: the animations could have been
+          // changed while the external editor was opened.
+          const directionAfterEdit = getCurrentElements(
+            animations,
+            animationIndex,
+            directionIndex,
+            0
+          ).direction;
+          if (!directionAfterEdit) return;
+
           const { resources, newMetadata, newName } = editResult;
 
           const newDirection = new gd.Direction();
-          newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
-          newDirection.setLoop(direction.isLooping());
+          newDirection.setTimeBetweenFrames(timeBetweenFrames);
+          newDirection.setLoop(isLooping);
           resources.forEach(resource => {
             const sprite = new gd.Sprite();
             sprite.setImageName(resource.name);
             // Restore collision masks and points
-            if (
-              resource.originalIndex !== undefined &&
-              resource.originalIndex !== null
-            ) {
+            const { originalIndex } = resource;
+            const originalSprite =
+              originalIndex !== undefined &&
+              originalIndex !== null &&
+              originalIndex < directionAfterEdit.getSpritesCount()
+                ? directionAfterEdit.getSprite(originalIndex)
+                : null;
+            if (originalSprite) {
               // The sprite existed before, so we can copy its points and collision masks.
-              const originalSprite = direction.getSprite(
-                resource.originalIndex
-              );
               copySpritePoints(originalSprite, sprite);
               copySpritePolygons(originalSprite, sprite);
             } else {
               // The sprite is new, apply points & collision masks if necessary.
               applyPointsAndMasksToSpriteIfNecessary(
                 animations,
-                direction,
+                directionAfterEdit,
                 sprite
               );
             }
@@ -921,10 +932,9 @@ const AnimationList: React.ComponentType<{
     const createAnimationWith = React.useCallback(
       async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
         addAnimation();
-        const direction = animations.getAnimation(0).getDirection(0);
-        await editDirectionWith(i18n, externalEditor, direction, 0, 0);
+        await editDirectionWith(i18n, externalEditor, 0, 0);
       },
-      [addAnimation, editDirectionWith, animations]
+      [addAnimation, editDirectionWith]
     );
 
     const imageResourceExternalEditors = resourceManagementProps.resourceExternalEditors.filter(

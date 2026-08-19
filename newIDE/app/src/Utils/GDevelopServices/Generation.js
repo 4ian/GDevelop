@@ -6,7 +6,6 @@ import { getIDEVersionWithHash } from '../../Version';
 import { extractNextPageUriFromLinkHeader } from './Play';
 import {
   ensureIsArray,
-  ensureIsObject,
   ensureObjectHasProperty,
 } from '../DataValidator';
 import {
@@ -751,8 +750,7 @@ export type CreateAiGeneratedEventResult =
     |}
   | {|
       creationSucceeded: false,
-      errorMessage?: string,
-      isCreditLimitReached?: boolean,
+      errorMessage: string,
     |};
 
 export const createAiGeneratedEvent = async (
@@ -763,14 +761,14 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey,
     projectSpecificExtensionsSummaryJson,
     projectSpecificExtensionsSummaryJsonUserRelativeKey,
-    existingEventsJson,
-    existingEventsJsonUserRelativeKey,
     sceneName,
     eventsDescription,
     eventBatches,
     extensionNamesList,
     objectsList,
     existingEventsAsText,
+    existingEventsJson,
+    existingEventsJsonUserRelativeKey,
     placementHint,
     relatedAiRequestId,
     estimatedComplexity,
@@ -780,14 +778,14 @@ export const createAiGeneratedEvent = async (
     gameProjectJsonUserRelativeKey: string | null,
     projectSpecificExtensionsSummaryJson: string | null,
     projectSpecificExtensionsSummaryJsonUserRelativeKey: string | null,
-    existingEventsJson: string | null,
-    existingEventsJsonUserRelativeKey: string | null,
     sceneName: string,
     eventsDescription: string | null,
     eventBatches: ?EventsBatchToGenerate,
     extensionNamesList: string,
     objectsList: string,
     existingEventsAsText: string,
+    existingEventsJson: string | null,
+    existingEventsJsonUserRelativeKey: string | null,
     placementHint: string | null,
     relatedAiRequestId: string,
     estimatedComplexity: number | null,
@@ -813,14 +811,14 @@ export const createAiGeneratedEvent = async (
       gameProjectJsonUserRelativeKey,
       projectSpecificExtensionsSummaryJson,
       projectSpecificExtensionsSummaryJsonUserRelativeKey,
-      existingEventsJson,
-      existingEventsJsonUserRelativeKey,
       sceneName,
       eventsDescription,
       eventBatches,
       extensionNamesList,
       objectsList,
       existingEventsAsText,
+      existingEventsJson,
+      existingEventsJsonUserRelativeKey,
       placementHint,
       relatedAiRequestId,
       estimatedComplexity,
@@ -832,34 +830,32 @@ export const createAiGeneratedEvent = async (
       headers: {
         Authorization: authorizationHeader,
       },
+      validateStatus: status => true,
     }
   );
 
   if (response.status === 200) {
+    const data = ensureObjectHasProperty({
+      data: response.data,
+      propertyName: 'id',
+      endpointName: '/ai-generated-event of Generation API',
+    });
     return {
       creationSucceeded: true,
-      aiGeneratedEvent: ensureObjectHasProperty({
-        data: response.data,
-        propertyName: 'id',
-        endpointName: '/ai-generated-event of Generation API',
-      }),
+      aiGeneratedEvent: data,
     };
-  }
-
-  const errorStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-    response.data
-  );
-  if (
-    errorStatusAndCode &&
-    errorStatusAndCode.code === 'credit-limit-reached'
-  ) {
+  } else if (response.status === 400) {
+    // Report the failure to give a chance to the caller to save this message
+    // and retry the generation in a different way.
     return {
       creationSucceeded: false,
-      isCreditLimitReached: true,
+      errorMessage: JSON.stringify(response.data),
     };
   }
 
-  return makeGenericFailureResult(
+  // Unexpected error: throw an exception as this can be something like a network error
+  // or a server error.
+  throw new Error(
     `Error while running AI event generation: ${response.statusText}`
   );
 };

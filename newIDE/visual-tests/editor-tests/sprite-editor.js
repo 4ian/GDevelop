@@ -21,7 +21,7 @@ module.exports = [
       'The editor of every object of the scene of an example game can be ' +
       'opened and closed.',
     example: 'platformer',
-    helpers: [spriteEditor],
+    helpers: [spriteEditor, objectsList],
     run: async ({ page, pageErrors, reporter, screenshot }) => {
       const failures = [];
       let performed = 0;
@@ -66,7 +66,7 @@ module.exports = [
       'Manipulate the animations of a real sprite object: a smoke test of what ' +
       'the Storybook tests cover precisely.',
     example: 'platformer',
-    helpers: [spriteEditor],
+    helpers: [spriteEditor, objectsList],
     run: async ({ page, reporter, screenshot, runSteps }) => {
       await objectsList.waitForTheScene(page);
       if (!(await objectsList.openObjectEditor(page, 'Player')))
@@ -111,7 +111,7 @@ module.exports = [
     description:
       'Random manipulations of the animations of a real sprite object.',
     example: 'platformer',
-    helpers: [spriteEditor],
+    helpers: [spriteEditor, objectsList],
     run: async ({ page, reporter, runMonkey }) => {
       await objectsList.waitForTheScene(page);
       if (!(await objectsList.openObjectEditor(page, 'Player')))

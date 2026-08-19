@@ -46,6 +46,10 @@ const openObjectEditorTab = async (page, tabName) => {
 
 module.exports = {
   name: 'objects-list',
+  paths: [
+    'newIDE/app/src/ObjectsList/',
+    'newIDE/app/src/ObjectEditor/ObjectEditorDialog.js',
+  ],
   OBJECT_EDITOR_DIALOG,
   waitForTheScene,
   openObjectEditor,

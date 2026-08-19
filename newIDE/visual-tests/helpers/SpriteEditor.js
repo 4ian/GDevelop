@@ -878,6 +878,15 @@ const getRealEditorActionNames = () =>
 
 module.exports = {
   name: 'sprite-editor',
+  // The tests using this helper are only run when one of these changed.
+  paths: [
+    'newIDE/app/src/ObjectEditor/Editors/SpriteEditor/',
+    'newIDE/app/src/ObjectEditor/ObjectEditorDialog.js',
+    'newIDE/app/src/ResourcesList/ResourceThumbnail/',
+    'newIDE/app/src/UI/DragAndDrop/',
+    'newIDE/app/src/UI/MountOnFirstVisible.js',
+    'newIDE/app/src/stories/componentStories/ObjectEditor/SpriteEditorManipulations.stories.js',
+  ],
   installPageHelpers: installSpriteEditorPageHelpers,
   actions,
   monkeyWeights,

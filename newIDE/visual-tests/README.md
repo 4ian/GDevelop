@@ -46,6 +46,18 @@ node run.js --suite=all
 | `--editor-monkey-steps=<n>` | Manipulations of a random session on the real app |
 | `--artifacts-dir=<path>` | Where screenshots and logs go (default: `artifacts`) |
 | `--chrome-path=<path>` | The Chrome to run in |
+| `--only-changed --base-ref=<ref>` | Only run the tests related to what changed |
+| `--list-names`, `--tests-file=<path>` | List / run exactly these tests (used to split them across the CI containers) |
+| `--junit-path=<path>` | Write the results as JUnit |
+
+On a branch, the CI only runs the tests related to what it changes (and builds
+nothing if there are none): each helper declares the sources its tests watch, in
+its `paths`. Everything runs on `master` - a change anywhere else can break an
+editor too - and `run-all-visual-tests` on a pipeline forces that on a branch.
+
+A problem these tests find but are not here to guard can be listed in
+`lib/KnownIssues.js`: it is then reported loudly without failing the run, so
+that a branch is not blocked by something it did not introduce.
 
 While writing a test, `--storybook-url=http://localhost:9009 --headful
 --test=<name>` (with `npm run storybook` running) gives the fastest feedback.

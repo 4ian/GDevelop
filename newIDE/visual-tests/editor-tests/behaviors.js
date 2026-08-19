@@ -17,6 +17,7 @@ module.exports = [
       'an object (its extension is downloaded and installed), and check it is ' +
       'there.',
     example: 'platformer',
+    helpers: [objectsList, behaviorsEditor],
     run: async ({ page, pageErrors, reporter, screenshot }) => {
       const failures = [];
       let performed = 0;

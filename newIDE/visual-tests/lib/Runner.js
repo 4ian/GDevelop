@@ -14,6 +14,7 @@
  */
 
 const { closeAnyOverlay } = require('./PageDriver');
+const { findKnownIssue } = require('./KnownIssues');
 
 /** A reproducible pseudo random number generator. */
 const makeRandom = seed => {
@@ -240,27 +241,48 @@ const runStep = async ({
   };
 };
 
+/** Report a step that went wrong, as a failure or as a known issue. */
 const reportStepResult = ({ reporter, result, prefix, pageErrors }) => {
   if (result.crashed) {
+    const message = pageErrors[0] || '';
+    const knownIssue = findKnownIssue(message);
+    if (knownIssue) {
+      reporter.log(
+        `   ⚠️ ${prefix}${
+          result.description
+        }: the editor was taken down by a ` + `known issue (${knownIssue.name})`
+      );
+      reporter.log(`      ${message.split('\n')[0]}`);
+      return { failures: [], knownIssues: [`${knownIssue.name}`] };
+    }
     reporter.log(`   💥 ${prefix}${result.description}: THE EDITOR CRASHED`);
-    (pageErrors[0] || '')
+    message
       .split('\n')
       .slice(0, 6)
       .forEach(line => reporter.log(`      ${line.trim()}`));
-    return [`crash after: ${result.description}`];
+    return {
+      failures: [`crash after: ${result.description}`],
+      knownIssues: [],
+    };
   }
   if (result.problems.length) {
     reporter.log(`   ❌ ${prefix}${result.description}`);
     result.problems.forEach(problem => reporter.log(`      ${problem}`));
-    return result.problems.map(problem => `${result.description}: ${problem}`);
+    return {
+      failures: result.problems.map(
+        problem => `${result.description}: ${problem}`
+      ),
+      knownIssues: [],
+    };
   }
-  return [];
+  return { failures: [], knownIssues: [] };
 };
 
 /** Run the scripted manipulations of a test. */
 const runSteps = async ({ page, pageErrors, helper, steps, reporter }) => {
   const random = makeRandom(1);
   const failures = [];
+  const knownIssues = [];
   let performed = 0;
   let skipped = 0;
   let drops = 0;
@@ -287,24 +309,23 @@ const runSteps = async ({ page, pageErrors, helper, steps, reporter }) => {
       drops++;
       if (!result.hadNoEffect) effectiveDrops++;
     }
-    const stepFailures = reportStepResult({
+    const stepResult = reportStepResult({
       reporter,
       result,
       prefix: '',
       pageErrors,
     });
-    if (stepFailures.length) {
-      failures.push(...stepFailures);
-      break;
-    }
+    failures.push(...stepResult.failures);
+    knownIssues.push(...stepResult.knownIssues);
+    if (stepResult.failures.length || stepResult.knownIssues.length) break;
     reporter.log(`   ✓ ${result.description} → ${result.effect}`);
   }
 
-  if (drops > 0 && effectiveDrops === 0) {
+  if (drops > 0 && effectiveDrops === 0 && !knownIssues.length) {
     failures.push('none of the drag and drops moved anything');
     reporter.log('   ❌ none of the drag and drops moved anything');
   }
-  return { failures, performed, skipped };
+  return { failures, knownIssues, performed, skipped };
 };
 
 /** Run a random sequence of manipulations. */
@@ -327,9 +348,14 @@ const runMonkey = async ({
   });
 
   const failures = [];
+  const knownIssues = [];
   let performed = 0;
   let skipped = 0;
-  for (let step = 0; step < steps && !failures.length; step++) {
+  for (
+    let step = 0;
+    step < steps && !failures.length && !knownIssues.length;
+    step++
+  ) {
     if (await closeAnyOverlay(page)) continue;
 
     const actionName = weighted[Math.floor(random() * weighted.length)];
@@ -346,22 +372,21 @@ const runMonkey = async ({
       continue;
     }
     performed++;
-    const stepFailures = reportStepResult({
+    const stepResult = reportStepResult({
       reporter,
       result,
       prefix: `step ${step + 1}, `,
       pageErrors,
     });
-    if (stepFailures.length) {
-      failures.push(...stepFailures);
-      break;
-    }
+    failures.push(...stepResult.failures);
+    knownIssues.push(...stepResult.knownIssues);
+    if (stepResult.failures.length || stepResult.knownIssues.length) break;
     if (verbose || step % 10 === 0)
       reporter.log(
         `   ✓ step ${step + 1}: ${result.description} → ${result.effect}`
       );
   }
-  return { failures, performed, skipped };
+  return { failures, knownIssues, performed, skipped };
 };
 
 module.exports = { makeRandom, runStep, runSteps, runMonkey };

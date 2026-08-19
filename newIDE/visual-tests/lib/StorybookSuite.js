@@ -125,7 +125,11 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
             });
 
         const final = await test.helper.check(page);
-        if (!result.failures.length && final.problems.length) {
+        if (
+          !result.failures.length &&
+          !result.knownIssues.length &&
+          final.problems.length
+        ) {
           result.failures.push(...final.problems);
           reporter.log(`   ❌ final check: ${final.problems.join('; ')}`);
         }

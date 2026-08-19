@@ -88,6 +88,10 @@ const addBehavior = async (page, { search, behaviorType, name }) => {
 
 module.exports = {
   name: 'behaviors-editor',
+  paths: [
+    'newIDE/app/src/BehaviorsEditor/',
+    'newIDE/app/src/AssetStore/BehaviorStore/',
+  ],
   NEW_BEHAVIOR_DIALOG,
   storeItemOf,
   listBehaviors,

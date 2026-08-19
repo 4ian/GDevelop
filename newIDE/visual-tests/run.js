@@ -3,19 +3,14 @@
 
 /**
  * Runs the visual monkey tests: they manipulate the editor in a real browser
- * and check that nothing is broken.
- *
- * Two suites, see README.md:
- * - `storybook`: precise tests, run on the Storybook stories of one editor.
- * - `editor`: smoke tests, run on a real packaged version of the app.
+ * and check that nothing is broken. See README.md.
  *
  * Examples:
  *   node run.js --list
  *   node run.js --suite=storybook
  *   node run.js --suite=storybook --test=monkey --headful
- *   node run.js --suite=storybook --storybook-url=http://localhost:9009
- *   node run.js --suite=editor --gdevelop-zip=../electron-app/dist/gdevelop-5.6.0.zip
- *   node run.js --suite=all
+ *   node run.js --suite=storybook --only-changed --base-ref=origin/master
+ *   node run.js --suite=editor --gdevelop-zip=../electron-app/dist/gdevelop.zip
  */
 
 const fs = require('fs');
@@ -24,6 +19,10 @@ const minimist = require('minimist');
 const { makeReporter } = require('./lib/Reporter');
 const { runStorybookSuite } = require('./lib/StorybookSuite');
 const { runEditorSuite } = require('./lib/EditorSuite');
+const {
+  getChangedFiles,
+  filterTestsForChangedFiles,
+} = require('./lib/ChangedFiles');
 
 const SUITES = {
   storybook: {
@@ -48,6 +47,15 @@ const loadTests = suiteName => {
     .map(test => ({ ...test, suite: suiteName }));
 };
 
+const describeTest = test =>
+  test.monkey
+    ? ` (${test.monkey.seeds.length} random sessions of ${
+        test.monkey.steps
+      } manipulations)`
+    : test.steps
+    ? ` (${test.steps.length} manipulations)`
+    : '';
+
 const main = async () => {
   const args = minimist(process.argv.slice(2));
   const suiteNames =
@@ -63,18 +71,42 @@ const main = async () => {
       );
   });
 
+  // The tests asked for: by name, by what the changes touch, or from a file
+  // (what `circleci tests split` gives to each parallel container).
+  const namesFromFile = args['tests-file']
+    ? fs
+        .readFileSync(String(args['tests-file']), 'utf8')
+        .split(/\s+/)
+        .filter(Boolean)
+    : null;
+  const changedFiles = args['only-changed']
+    ? getChangedFiles(String(args['base-ref'] || 'origin/master'))
+    : null;
+
+  const getTestsOf = (suiteName, log) => {
+    let tests = loadTests(suiteName);
+    if (args.test)
+      tests = tests.filter(test => test.name.includes(String(args.test)));
+    if (namesFromFile)
+      tests = tests.filter(test => namesFromFile.includes(test.name));
+    if (args['only-changed'])
+      tests = filterTestsForChangedFiles({ tests, changedFiles, log });
+    return tests;
+  };
+
+  // `--list-names` prints one name per line, to be split across containers.
+  if (args['list-names']) {
+    suiteNames.forEach(suiteName =>
+      getTestsOf(suiteName).forEach(test => console.log(test.name))
+    );
+    return true;
+  }
   if (args.list) {
-    Object.keys(SUITES).forEach(suiteName => {
+    suiteNames.forEach(suiteName => {
       console.log(`\n${suiteName} — ${SUITES[suiteName].description}`);
-      loadTests(suiteName).forEach(test => {
-        const runs = test.monkey
-          ? ` (${test.monkey.seeds.length} random sessions of ` +
-            `${test.monkey.steps} manipulations)`
-          : test.steps
-          ? ` (${test.steps.length} manipulations)`
-          : '';
-        console.log(`  ${test.name}${runs}`);
-      });
+      getTestsOf(suiteName).forEach(test =>
+        console.log(`  ${test.name}${describeTest(test)}`)
+      );
     });
     return true;
   }
@@ -96,16 +128,16 @@ const main = async () => {
 
   let allPassed = true;
   for (const suiteName of suiteNames) {
-    const tests = loadTests(suiteName).filter(
-      test => !args.test || test.name.includes(String(args.test))
-    );
     const reporter = makeReporter({
       artifactsDirectory: path.resolve(
         String(args['artifacts-dir'] || './artifacts'),
         suiteName
       ),
       logFileName: `${suiteName}-visual-tests.log`,
+      junitPath: args['junit-path'] ? String(args['junit-path']) : null,
+      suiteName,
     });
+    const tests = getTestsOf(suiteName, reporter.log);
     reporter.log(
       `Running ${tests.length} test(s) of the "${suiteName}" suite ` +
         `(${SUITES[suiteName].description}).`

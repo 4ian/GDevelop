@@ -194,6 +194,9 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
   editEventsFunctionParameter: (VariableDialogOpeningProps => void) | null,
   openEventsBasedEntityPropertyEditorDialog:
     | (VariableDialogOpeningProps => void)
@@ -2540,6 +2543,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             }}
             onWillInstallExtension={this.props.onWillInstallExtension}
             onExtensionInstalled={this.props.onExtensionInstalled}
+            onCreateNewExtensionWithBehavior={
+              this.props.onCreateNewExtensionWithBehavior
+            }
             editEventsFunctionParameter={this.props.editEventsFunctionParameter}
             openEventsBasedEntityPropertyEditorDialog={
               this.props.openEventsBasedEntityPropertyEditorDialog

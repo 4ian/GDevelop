@@ -32,7 +32,7 @@ type Props = {|
   onClose: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
-  onCreateNew?: () => void,
+  onCreateNewExtension?: () => void,
 |};
 
 /**
@@ -43,7 +43,7 @@ const ExtensionsSearchDialog = ({
   onClose,
   onWillInstallExtension,
   onExtensionInstalled,
-  onCreateNew,
+  onCreateNewExtension,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { isMobile } = useResponsiveWindowSize();
@@ -150,10 +150,10 @@ const ExtensionsSearchDialog = ({
                 disabled={isInstalling}
               />
             ) : null,
-            onCreateNew ? (
+            onCreateNewExtension ? (
               <FlatButton
                 key="create-new"
-                onClick={onCreateNew}
+                onClick={onCreateNewExtension}
                 label={
                   isMobile ? (
                     <Trans>Create</Trans>

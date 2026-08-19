@@ -1638,6 +1638,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 }
                 onWillInstallExtension={this.props.onWillInstallExtension}
                 onExtensionInstalled={this.props.onExtensionInstalled}
+                onCreateNewExtensionWithBehavior={null}
                 editEventsFunctionParameter={
                   isLifecycleEventsFunction
                     ? null

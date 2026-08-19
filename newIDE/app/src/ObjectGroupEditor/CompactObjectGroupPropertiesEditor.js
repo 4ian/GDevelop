@@ -94,6 +94,9 @@ type Props = {|
   onUpdateBehaviorsSharedData: () => void,
   onWillInstallExtension: (extensionNames: Array<string>) => void,
   onExtensionInstalled: (extensionNames: Array<string>) => void,
+  onCreateNewExtensionWithBehavior:
+    | ((project: gdProject, object: gdObject) => void)
+    | null,
 |};
 
 export const CompactObjectGroupPropertiesEditor = ({
@@ -117,6 +120,7 @@ export const CompactObjectGroupPropertiesEditor = ({
   onUpdateBehaviorsSharedData,
   onWillInstallExtension,
   onExtensionInstalled,
+  onCreateNewExtensionWithBehavior,
 }: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const { isMobile } = useResponsiveWindowSize();
@@ -186,6 +190,7 @@ export const CompactObjectGroupPropertiesEditor = ({
     onWillInstallExtension,
     onExtensionInstalled,
     allVisibleBehaviorNames,
+    onCreateNewExtensionWithBehavior,
   });
 
   // Variable refactoring: snapshot on object selection, apply on deselection/unmount.

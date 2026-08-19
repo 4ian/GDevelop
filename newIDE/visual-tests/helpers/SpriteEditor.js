@@ -876,6 +876,177 @@ const getRealEditorActionNames = () =>
     );
   });
 
+// ----------------------------------------------- what the runner checks with
+
+const describe = page =>
+  page.evaluate(() => window.gdVisualTests.spriteEditor.describe());
+
+/**
+ * The animations as the edited object contains them when the page gives it
+ * (the stories do), or as the editor displays them otherwise - in the same
+ * shape, so that the runner can compare two snapshots either way.
+ */
+const snapshot = page =>
+  page.evaluate(() => {
+    const { spriteEditor } = window.gdVisualTests;
+    const editedObject = spriteEditor.readAnimations();
+    if (editedObject)
+      return {
+        isFromTheObject: true,
+        animations: editedObject.map(animation => ({
+          name: animation.name,
+          frames: animation.directions[0] ? animation.directions[0].frames : [],
+          directions: animation.directions,
+        })),
+      };
+
+    const described = spriteEditor.describe();
+    return {
+      isFromTheObject: false,
+      animations: (described.rows || []).map(row => ({
+        name: row.name,
+        frames: row.frames.map(frame => frame.title),
+        directions: [
+          {
+            frames: row.frames.map(frame => frame.title),
+            timeBetweenFrames: Number(row.timeBetweenFrames),
+            isLooping: row.isLooping,
+          },
+        ],
+      })),
+    };
+  });
+
+const summarizeAnimation = animation =>
+  JSON.stringify({ name: animation.name, directions: animation.directions });
+
+/** A short description of what a manipulation changed. */
+const describeEffect = (snapshotBefore, snapshotAfter) => {
+  const before = snapshotBefore.animations;
+  const after = snapshotAfter.animations;
+  if (before.length !== after.length)
+    return `${before.length} → ${after.length} animations`;
+
+  const changes = [];
+  before.forEach((animation, position) => {
+    if (summarizeAnimation(animation) === summarizeAnimation(after[position]))
+      return;
+    const framesBefore = animation.frames;
+    const framesAfter = after[position].frames;
+    if (animation.name !== after[position].name)
+      changes.push(`#${position} renamed "${after[position].name}"`);
+    if (framesBefore.length !== framesAfter.length)
+      changes.push(
+        `#${position} ${framesBefore.length} → ${framesAfter.length} frames`
+      );
+    else if (framesBefore.join('|') !== framesAfter.join('|'))
+      changes.push(`#${position} frames reordered`);
+    else changes.push(`#${position} direction settings changed`);
+  });
+  return changes.length ? changes.join(', ') : 'nothing changed';
+};
+
+const framesOf = (snapshot, position) => {
+  const animation = snapshot.animations[position];
+  return animation ? animation.frames : [];
+};
+
+/** Check the precise outcome a manipulation declared with `expect`. */
+const checkExpectation = (expectation, snapshotAfter) => {
+  // Only the object itself is precise enough to be checked against.
+  if (!snapshotAfter.isFromTheObject) return [];
+
+  const problems = [];
+  const framesAfter = framesOf(snapshotAfter, expectation.row);
+  const expected = expectation.frames;
+  if (expected && framesAfter.join('|') !== expected.join('|'))
+    problems.push(
+      `the frames of the animation #${expectation.row} are [${framesAfter.join(
+        ', '
+      )}] but [${expected.join(', ')}] was expected`
+    );
+
+  const prefix = expectation.framesStartWith;
+  if (
+    prefix &&
+    framesAfter.slice(0, prefix.length).join('|') !== prefix.join('|')
+  )
+    problems.push(
+      `the frames of the animation #${expectation.row} are [${framesAfter.join(
+        ', '
+      )}] but they should start with [${prefix.join(', ')}]`
+    );
+
+  if (
+    expectation.framesCount !== undefined &&
+    framesAfter.length !== expectation.framesCount
+  )
+    problems.push(
+      `the animation #${expectation.row} has ${
+        framesAfter.length
+      } frames but ` + `${expectation.framesCount} were expected`
+    );
+
+  const animationAfter = snapshotAfter.animations[expectation.row];
+  const directionAfter = animationAfter && animationAfter.directions[0];
+  if (
+    directionAfter &&
+    expectation.timeBetweenFrames !== undefined &&
+    Math.abs(directionAfter.timeBetweenFrames - expectation.timeBetweenFrames) >
+      0.0001
+  )
+    problems.push(
+      `the animation #${expectation.row} now has ` +
+        `${directionAfter.timeBetweenFrames}s between frames instead of ` +
+        `${expectation.timeBetweenFrames}s`
+    );
+  if (
+    directionAfter &&
+    expectation.isLooping !== undefined &&
+    expectation.isLooping !== null &&
+    directionAfter.isLooping !== expectation.isLooping
+  )
+    problems.push(
+      `the looping of the animation #${expectation.row} became ` +
+        `${String(directionAfter.isLooping)}`
+    );
+  return problems;
+};
+
+/** The invariants checked after every manipulation flagged with their name. */
+const stepChecks = {
+  // A change of the animations must not leave frames selected: the selection
+  // designates them by their index, which would point at other frames.
+  clearsTheFrameSelection: async ({ page, hadNoEffect }) => {
+    if (hadNoEffect) return [];
+    const stateAfter = await describe(page);
+    const stillSelected = (stateAfter.rows || [])
+      .map(row =>
+        row.frames
+          .filter(frame => frame.selected)
+          .map(frame => `#${row.index} ${frame.title}`)
+      )
+      .reduce((all, some) => all.concat(some), []);
+    if (!stillSelected.length) return [];
+    return [
+      `${stillSelected.length} frame(s) are still shown as selected after ` +
+        `the animations changed: ${stillSelected.join(', ')}`,
+    ];
+  },
+
+  // Only reordering never creates or loses anything.
+  keepsTheFrames: ({ snapshotBefore, snapshotAfter }) => {
+    const allFrames = snapshot =>
+      snapshot.animations
+        .map(animation => animation.frames)
+        .reduce((all, frames) => all.concat(frames), [])
+        .sort()
+        .join('|');
+    if (allFrames(snapshotBefore) === allFrames(snapshotAfter)) return [];
+    return ['the frames of the object were not only reordered'];
+  },
+};
+
 module.exports = {
   name: 'sprite-editor',
   // The tests using this helper are only run when one of these changed.
@@ -891,9 +1062,16 @@ module.exports = {
   actions,
   monkeyWeights,
   getRealEditorActionNames,
-  describe: page =>
-    page.evaluate(() => window.gdVisualTests.spriteEditor.describe()),
+  describe,
   check: page => page.evaluate(() => window.gdVisualTests.spriteEditor.check()),
-  readEditedObject: page =>
-    page.evaluate(() => window.gdVisualTests.spriteEditor.readAnimations()),
+  snapshot,
+  describeEffect,
+  checkExpectation,
+  stepChecks,
+  summarize: async page => {
+    const described = await describe(page);
+    return `${described.rows.length} animations, ${
+      described.imagesCount
+    } thumbnails displayed`;
+  },
 };

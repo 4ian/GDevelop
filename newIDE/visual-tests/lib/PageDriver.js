@@ -74,6 +74,33 @@ const dragFromTo = async (page, fromTarget, toTarget, dropAfter) => {
   return true;
 };
 
+/** Collect the uncaught errors of a page (and the errors React reports). */
+const watchPageErrors = page => {
+  const pageErrors = [];
+  page.on('pageerror', error => {
+    const message = error.message || String(error);
+    pageErrors.push(
+      message +
+        (error.stack
+          ? '\n' +
+            error.stack
+              .split('\n')
+              .slice(0, 8)
+              .join('\n')
+          : '')
+    );
+  });
+  page.on('console', message => {
+    const text = message.text();
+    if (
+      message.type() === 'error' &&
+      text.includes('The above error occurred in the')
+    )
+      pageErrors.push('React reports: ' + text.split('\n')[1]);
+  });
+  return pageErrors;
+};
+
 /** Wait for something to be there, without failing the test. */
 const waitFor = async (page, target, timeoutInMs = 10000) => {
   const startedAt = Date.now();
@@ -123,6 +150,7 @@ module.exports = {
   scrollList,
   describeOverlays,
   dragFromTo,
+  watchPageErrors,
   waitFor,
   closeAnyMenu,
   closeAnyOverlay,

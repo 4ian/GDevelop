@@ -1,6 +1,5 @@
 // @ts-check
 
-const path = require('path');
 const { installPageHelpers } = require('./PageHelpers');
 const {
   getPortableBuild,
@@ -8,7 +7,7 @@ const {
   launchEditor,
 } = require('./RealEditor');
 const { runSteps, runMonkey } = require('./Runner');
-const { wait } = require('./PageDriver');
+const { wait, watchPageErrors } = require('./PageDriver');
 
 const DEBUGGING_PORT = 9333;
 
@@ -37,14 +36,11 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
         })
       : null;
 
-    const pageErrors = [];
+    let pageErrors = [];
     let editor = null;
     let result = { failures: [], performed: 0, skipped: 0 };
     const screenshotPath = name =>
-      path.join(
-        reporter.getArtifactsDirectory(),
-        `${test.name.replace(/[^a-z0-9]+/gi, '-')}-${name}.png`
-      );
+      reporter.getScreenshotPath(`${test.name}-${name}`);
 
     try {
       editor = await launchEditor({
@@ -52,33 +48,19 @@ const runEditorSuite = async ({ tests, options, reporter }) => {
         projectPath,
         debuggingPort: DEBUGGING_PORT,
         log: reporter.log,
-        onPageError: error => {
-          const message = error.message || String(error);
-          pageErrors.push(
-            message +
-              (error.stack
-                ? '\n' +
-                  error.stack
-                    .split('\n')
-                    .slice(0, 8)
-                    .join('\n')
-                : '')
-          );
-        },
       });
+      const page = editor.page;
+      pageErrors = watchPageErrors(page);
 
       // The helpers are installed in the already loaded page: the window of the
       // editor is opened by the app itself, not by the test.
       const helpers = test.helpers || (test.helper ? [test.helper] : []);
-      await editor.page.evaluate(`(${installPageHelpers.toString()})()`);
+      await page.evaluate(`(${installPageHelpers.toString()})()`);
       for (const helper of helpers) {
         if (helper.installPageHelpers)
-          await editor.page.evaluate(
-            `(${helper.installPageHelpers.toString()})()`
-          );
+          await page.evaluate(`(${helper.installPageHelpers.toString()})()`);
       }
 
-      const page = editor.page;
       result = await test.run({
         page,
         pageErrors,

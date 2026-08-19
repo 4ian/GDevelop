@@ -1,11 +1,10 @@
 // @ts-check
 
-const path = require('path');
 const puppeteer = require('puppeteer');
 const { installPageHelpers } = require('./PageHelpers');
 const { startStorybook } = require('./StorybookServer');
 const { runSteps, runMonkey } = require('./Runner');
-const { wait } = require('./PageDriver');
+const { wait, watchPageErrors } = require('./PageDriver');
 const { findChrome } = require('./Chrome');
 
 /** Install the generic page helpers, then the ones of the editor being tested. */
@@ -15,47 +14,44 @@ const getPageHelpersScript = helper =>
     ? `(${helper.installPageHelpers.toString()})();`
     : '');
 
+/**
+ * Wait for the story to be rendered and consistent: the editor takes a while
+ * to display everything (GDevelop.js must load first), and `helper.check`
+ * reports problems until it does. Returns the problems left on timeout.
+ */
+const waitUntilConsistent = async (page, helper, timeoutInMs) => {
+  const startedAt = Date.now();
+  let problems = [];
+  while (Date.now() - startedAt < timeoutInMs) {
+    try {
+      problems = (await helper.check(page)).problems;
+    } catch (error) {
+      problems = [error.message || String(error)];
+    }
+    if (!problems.length) return [];
+    await wait(500);
+  }
+  return problems;
+};
+
 const openStory = async ({ browser, storybookUrl, test, headful }) => {
   const page = await browser.newPage();
   if (!headful) await page.setViewport({ width: 1500, height: 1000 });
+  const pageErrors = watchPageErrors(page);
 
-  const pageErrors = [];
-  page.on('pageerror', error => {
-    const message = error.message || String(error);
-    pageErrors.push(
-      message +
-        (error.stack
-          ? '\n' +
-            error.stack
-              .split('\n')
-              .slice(0, 8)
-              .join('\n')
-          : '')
+  try {
+    await page.evaluateOnNewDocument(getPageHelpersScript(test.helper));
+    await page.goto(
+      `${storybookUrl}/iframe.html?id=${test.story}&viewMode=story`,
+      { waitUntil: 'domcontentloaded', timeout: 120000 }
     );
-  });
-  page.on('console', message => {
-    const text = message.text();
-    if (
-      message.type() === 'error' &&
-      text.includes('The above error occurred in the')
-    )
-      pageErrors.push('React reports: ' + text.split('\n')[1]);
-  });
-
-  await page.evaluateOnNewDocument(getPageHelpersScript(test.helper));
-  await page.goto(
-    `${storybookUrl}/iframe.html?id=${test.story}&viewMode=story`,
-    { waitUntil: 'domcontentloaded', timeout: 120000 }
-  );
-  // Wait for GDevelop.js to be loaded and the story to be rendered.
-  await page.waitForFunction(
-    () =>
-      !!window.gdVisualTests &&
-      (document.querySelectorAll('img').length > 0 ||
-        (!!window.gdVisualTests.spriteEditor &&
-          window.gdVisualTests.spriteEditor.describe().hasEmptyPlaceholder)),
-    { timeout: 180000, polling: 500 }
-  );
+    const problems = await waitUntilConsistent(page, test.helper, 180000);
+    if (problems.length)
+      throw new Error(`The story was not displayed: ${problems.join('; ')}`);
+  } catch (error) {
+    await page.close();
+    throw error;
+  }
   await wait(1500);
   return { page, pageErrors };
 };
@@ -94,53 +90,61 @@ const runStorybookSuite = async ({ tests, options, reporter }) => {
         reporter.log(`TEST ${name}`);
         if (test.description) reporter.log(`   ${test.description}`);
 
-        const { page, pageErrors } = await openStory({
-          browser,
-          storybookUrl: storybook.url,
-          test,
-          headful: options.headful,
-        });
-        const initial = await test.helper.check(page);
-        reporter.log(
-          `   ${initial.described.rows.length} animations, ` +
-            `${initial.described.imagesCount} thumbnails displayed.`
-        );
+        let page = null;
+        try {
+          const opened = await openStory({
+            browser,
+            storybookUrl: storybook.url,
+            test,
+            headful: options.headful,
+          });
+          page = opened.page;
+          const pageErrors = opened.pageErrors;
+          if (test.helper.summarize)
+            reporter.log(`   ${await test.helper.summarize(page)}`);
 
-        const result = test.monkey
-          ? await runMonkey({
-              page,
-              pageErrors,
-              helper: test.helper,
-              seed,
-              steps: test.monkey.steps,
-              reporter,
-              verbose: options.verbose,
-            })
-          : await runSteps({
-              page,
-              pageErrors,
-              helper: test.helper,
-              steps: test.steps,
-              reporter,
-            });
+          const result = test.monkey
+            ? await runMonkey({
+                page,
+                pageErrors,
+                helper: test.helper,
+                seed,
+                steps: test.monkey.steps,
+                reporter,
+                verbose: options.verbose,
+              })
+            : await runSteps({
+                page,
+                pageErrors,
+                helper: test.helper,
+                steps: test.steps,
+                reporter,
+              });
 
-        const final = await test.helper.check(page);
-        if (
-          !result.failures.length &&
-          !result.knownIssues.length &&
-          final.problems.length
-        ) {
-          result.failures.push(...final.problems);
-          reporter.log(`   ❌ final check: ${final.problems.join('; ')}`);
+          const final = await test.helper.check(page);
+          if (
+            !result.failures.length &&
+            !result.knownIssues.length &&
+            final.problems.length
+          ) {
+            result.failures.push(...final.problems);
+            reporter.log(`   ❌ final check: ${final.problems.join('; ')}`);
+          }
+          reporter.addResult({ name, ...result });
+        } catch (error) {
+          const message = error.message || String(error);
+          reporter.log(`   ❌ ${message}`);
+          reporter.addResult({
+            name,
+            failures: [message],
+            performed: 0,
+            skipped: 0,
+          });
         }
-        await page.screenshot({
-          path: path.join(
-            reporter.getArtifactsDirectory(),
-            `${name.replace(/[^a-z0-9]+/gi, '-')}.png`
-          ),
-        });
-        reporter.addResult({ name, ...result });
-        await page.close();
+        if (page) {
+          await page.screenshot({ path: reporter.getScreenshotPath(name) });
+          await page.close();
+        }
       }
     }
   } finally {

@@ -4,13 +4,12 @@
  * Runs the manipulations of a test - scripted, or a random sequence of them
  * (the "monkey") - and checks after every single one that:
  * - the page did not throw (an uncaught error takes the whole editor down),
- * - the editor still shows what the edited object contains (as far as the
- *   helper of that editor can tell),
+ * - the editor still shows what it is editing (`helper.check`),
  * - the manipulation did what it was supposed to do.
  *
- * Everything specific to an editor comes from its helper (see
- * `helpers/SpriteEditor.js`): the manipulations, how to describe what is
- * displayed, and how to check it.
+ * Everything specific to an editor comes from its helper (see the table in
+ * README.md, and `helpers/SpriteEditor.js` for a complete example): the
+ * manipulations, how to read what is displayed, and how to check it.
  */
 
 const { closeAnyOverlay } = require('./PageDriver');
@@ -25,134 +24,12 @@ const makeRandom = seed => {
   };
 };
 
-const summarizeAnimation = animation =>
-  JSON.stringify({ name: animation.name, directions: animation.directions });
-
 /**
- * What the edited object contains when the page gives it, or what the editor
- * displays otherwise - so that a manipulation that did nothing can be told
- * apart from one that worked in both cases.
+ * What the manipulations may change, as the helper reads it - so that a
+ * manipulation that did nothing can be told apart from one that worked.
  */
-const takeSnapshot = async (page, helper) => {
-  const editedObject = helper.readEditedObject
-    ? await helper.readEditedObject(page)
-    : null;
-  if (editedObject)
-    return {
-      isFromTheObject: true,
-      animations: editedObject.map(animation => ({
-        name: animation.name,
-        frames: animation.directions[0] ? animation.directions[0].frames : [],
-        directions: animation.directions,
-      })),
-    };
-
-  const described = await helper.describe(page);
-  return {
-    isFromTheObject: false,
-    animations: (described.rows || []).map(row => ({
-      name: row.name,
-      frames: row.frames.map(frame => frame.title),
-      directions: [
-        {
-          frames: row.frames.map(frame => frame.title),
-          timeBetweenFrames: Number(row.timeBetweenFrames),
-          isLooping: row.isLooping,
-        },
-      ],
-    })),
-  };
-};
-
-/** A short description of what a manipulation changed. */
-const describeEffect = (snapshotBefore, snapshotAfter) => {
-  const before = snapshotBefore.animations;
-  const after = snapshotAfter.animations;
-  if (before.length !== after.length)
-    return `${before.length} → ${after.length} animations`;
-
-  const changes = [];
-  before.forEach((animation, position) => {
-    if (summarizeAnimation(animation) === summarizeAnimation(after[position]))
-      return;
-    const framesBefore = animation.frames;
-    const framesAfter = after[position].frames;
-    if (animation.name !== after[position].name)
-      changes.push(`#${position} renamed "${after[position].name}"`);
-    if (framesBefore.length !== framesAfter.length)
-      changes.push(
-        `#${position} ${framesBefore.length} → ${framesAfter.length} frames`
-      );
-    else if (framesBefore.join('|') !== framesAfter.join('|'))
-      changes.push(`#${position} frames reordered`);
-    else changes.push(`#${position} direction settings changed`);
-  });
-  return changes.length ? changes.join(', ') : 'nothing changed';
-};
-
-const framesOf = (snapshot, position) => {
-  const animation = snapshot.animations[position];
-  return animation ? animation.frames : [];
-};
-
-/** Check the precise outcome a manipulation declared. */
-const checkExpectation = (expectation, snapshotAfter) => {
-  const problems = [];
-  const framesAfter = framesOf(snapshotAfter, expectation.row);
-  const expected = expectation.frames;
-  if (expected && framesAfter.join('|') !== expected.join('|'))
-    problems.push(
-      `the frames of the animation #${expectation.row} are [${framesAfter.join(
-        ', '
-      )}] but [${expected.join(', ')}] was expected`
-    );
-
-  const prefix = expectation.framesStartWith;
-  if (
-    prefix &&
-    framesAfter.slice(0, prefix.length).join('|') !== prefix.join('|')
-  )
-    problems.push(
-      `the frames of the animation #${expectation.row} are [${framesAfter.join(
-        ', '
-      )}] but they should start with [${prefix.join(', ')}]`
-    );
-
-  if (
-    expectation.framesCount !== undefined &&
-    framesAfter.length !== expectation.framesCount
-  )
-    problems.push(
-      `the animation #${expectation.row} has ${
-        framesAfter.length
-      } frames but ` + `${expectation.framesCount} were expected`
-    );
-
-  const animationAfter = snapshotAfter.animations[expectation.row];
-  const directionAfter = animationAfter && animationAfter.directions[0];
-  if (
-    directionAfter &&
-    expectation.timeBetweenFrames !== undefined &&
-    Math.abs(directionAfter.timeBetweenFrames - expectation.timeBetweenFrames) >
-      0.0001
-  )
-    problems.push(
-      `the animation #${expectation.row} now has ` +
-        `${directionAfter.timeBetweenFrames}s between frames instead of ` +
-        `${expectation.timeBetweenFrames}s`
-    );
-  if (
-    directionAfter &&
-    expectation.isLooping !== undefined &&
-    expectation.isLooping !== null &&
-    directionAfter.isLooping !== expectation.isLooping
-  )
-    problems.push(
-      `the looping of the animation #${expectation.row} became ` +
-        `${String(directionAfter.isLooping)}`
-    );
-  return problems;
-};
+const takeSnapshot = async (page, helper) =>
+  helper.snapshot ? await helper.snapshot(page) : await helper.describe(page);
 
 /** Run one manipulation and check everything afterwards. */
 const runStep = async ({
@@ -194,42 +71,33 @@ const runStep = async ({
 
   const { problems } = await helper.check(page);
   const snapshotAfter = await takeSnapshot(page, helper);
-  const effect = describeEffect(snapshotBefore, snapshotAfter);
-  const hadNoEffect = effect === 'nothing changed';
+  const hadNoEffect =
+    JSON.stringify(snapshotBefore) === JSON.stringify(snapshotAfter);
+  const effect = hadNoEffect
+    ? 'nothing changed'
+    : helper.describeEffect
+    ? helper.describeEffect(snapshotBefore, snapshotAfter)
+    : 'something changed';
 
   if (action.mustChangeTheObject && hadNoEffect)
     problems.push('the object was not changed');
 
-  if (expectation && snapshotAfter.isFromTheObject)
-    problems.push(...checkExpectation(expectation, snapshotAfter));
+  if (expectation && helper.checkExpectation)
+    problems.push(...helper.checkExpectation(expectation, snapshotAfter));
 
-  // A change of the animations must not leave frames selected: the selection
-  // designates them by their index, which would point at other frames.
-  if (action.clearsTheFrameSelection && !hadNoEffect) {
-    const stateAfter = await helper.describe(page);
-    const stillSelected = (stateAfter.rows || [])
-      .map(row =>
-        row.frames
-          .filter(frame => frame.selected)
-          .map(frame => `#${row.index} ${frame.title}`)
-      )
-      .reduce((all, some) => all.concat(some), []);
-    if (stillSelected.length)
-      problems.push(
-        `${stillSelected.length} frame(s) are still shown as selected after ` +
-          `the animations changed: ${stillSelected.join(', ')}`
-      );
-  }
-
-  if (action.keepsTheFrames) {
-    const allFrames = snapshot =>
-      snapshot.animations
-        .map(animation => animation.frames)
-        .reduce((all, frames) => all.concat(frames), [])
-        .sort()
-        .join('|');
-    if (allFrames(snapshotBefore) !== allFrames(snapshotAfter))
-      problems.push('the frames of the object were not only reordered');
+  // The invariants the helper declares (see `helper.stepChecks` in README.md):
+  // each one is checked after every manipulation flagged with its name.
+  const stepChecks = helper.stepChecks || {};
+  for (const checkName of Object.keys(stepChecks)) {
+    if (!action[checkName]) continue;
+    problems.push(
+      ...(await stepChecks[checkName]({
+        page,
+        snapshotBefore,
+        snapshotAfter,
+        hadNoEffect,
+      }))
+    );
   }
 
   return {

@@ -6,11 +6,6 @@
  * the editor offers can be done, and where the animations of the edited object
  * are exposed so that what the editor displays can be compared with what the
  * object actually contains.
- *
- * These are the tests for "specific stuff": each one exercises a way of
- * changing the animations that used to leave a dangling C++ wrapper behind
- * (`gd::Animation`, `gd::Direction` and `gd::Sprite` are stored in vectors that
- * are reallocated as soon as one is added or removed).
  */
 
 const spriteEditor = require('../helpers/SpriteEditor');

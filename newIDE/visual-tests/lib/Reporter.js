@@ -154,11 +154,14 @@ const makeReporter = ({
     return failed.length === 0;
   };
 
+  const getScreenshotPath = name =>
+    path.join(artifactsDirectory, `${name.replace(/[^a-z0-9]+/gi, '-')}.png`);
+
   return {
     log,
     addResult,
     writeSummary,
-    getArtifactsDirectory: () => artifactsDirectory,
+    getScreenshotPath,
   };
 };
 

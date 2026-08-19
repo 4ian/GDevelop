@@ -41,17 +41,11 @@ const listProposedBehaviors = page =>
   );
 
 /**
- * Search a behavior in the store and add it to the edited object. When it comes
- * from an extension, the extension is downloaded and installed.
- * Returns null, or what went wrong.
+ * In the already opened "add a behavior" dialog: search a behavior in the
+ * store and add it to the edited object. When it comes from an extension, the
+ * extension is downloaded and installed. Returns null, or what went wrong.
  */
-const addBehavior = async (page, { search, behaviorType, name }) => {
-  if (!(await click(page, ADD_BEHAVIOR_BUTTON)))
-    return 'there is no "Add a behavior" button';
-  if (!(await waitFor(page, NEW_BEHAVIOR_DIALOG, 20000)))
-    return 'the dialog to add a behavior did not open';
-  await wait(1500);
-
+const chooseBehaviorInDialog = async (page, { search, behaviorType, name }) => {
   if (!(await typeInInput(page, SEARCH_FIELD, search)))
     return 'there is no search field in the dialog';
 
@@ -86,6 +80,19 @@ const addBehavior = async (page, { search, behaviorType, name }) => {
   return null;
 };
 
+/**
+ * Add a behavior of the store from the "Behaviors" tab of the object editor.
+ * Returns null, or what went wrong.
+ */
+const addBehavior = async (page, behaviorToChoose) => {
+  if (!(await click(page, ADD_BEHAVIOR_BUTTON)))
+    return 'there is no "Add a behavior" button';
+  if (!(await waitFor(page, NEW_BEHAVIOR_DIALOG, 20000)))
+    return 'the dialog to add a behavior did not open';
+  await wait(1500);
+  return await chooseBehaviorInDialog(page, behaviorToChoose);
+};
+
 module.exports = {
   name: 'behaviors-editor',
   paths: [
@@ -96,5 +103,6 @@ module.exports = {
   storeItemOf,
   listBehaviors,
   listProposedBehaviors,
+  chooseBehaviorInDialog,
   addBehavior,
 };

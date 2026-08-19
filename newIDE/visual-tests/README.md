@@ -113,13 +113,16 @@ knowing about it:
 | | |
 | --- | --- |
 | `installPageHelpers` | Runs in the page: finds the controls of the editor and reads what it displays. Registers a resolver so its targets (a row, a frame...) can be used like the generic ones (`{ button: 'Apply' }`, `{ selector: '#id' }`, `{ menuItem: '...' }`, `{ tab: 'Behaviors' }`). |
-| `actions` | The manipulations, with how the monkey may pick them and what must be true afterwards |
+| `actions` | The manipulations, with how the monkey may pick them (`pick`) and what must be true afterwards (`expect`, checked by `checkExpectation`) |
 | `describe` / `check` | What the editor displays, and whether it matches the project |
+| `snapshot` (optional) | What the manipulations may change, to tell a manipulation that did nothing from one that worked (`describe` is used otherwise), with `describeEffect` to log what changed |
+| `stepChecks` (optional) | The invariants of the editor: each one is checked after every manipulation flagged with its name (e.g. `keepsTheFrames` in the Sprite editor) |
+| `summarize` (optional) | One line describing what is displayed, logged when a story is opened |
+| `paths` | The sources its tests watch: they only run when one of these changed |
 
-`helpers/SpriteEditor.js` is the complete example (and the biggest one, as it is
-where the bugs were). `helpers/ObjectsList.js` and `helpers/BehaviorsEditor.js`
-are smaller ones, used by the editor tests to reach and manipulate other parts
-of the app.
+`helpers/SpriteEditor.js` is the complete example. `helpers/ObjectsList.js`,
+`helpers/BehaviorsEditor.js` and `helpers/PropertiesPanel.js` are smaller ones,
+used by the editor tests to reach and manipulate other parts of the app.
 
 ## What is checked after every manipulation
 
@@ -128,6 +131,5 @@ of the app.
 - What it displays matches the project (when the helper can read it).
 - The manipulation actually changed something, so a test cannot pass without
   having exercised anything.
-- Manipulations with a precise outcome get it checked (deleting, duplicating or
-  moving the selected frames must produce exactly the expected frames).
-- Only reordering never creates or loses anything.
+- Manipulations with a precise outcome (`expect`) get it checked, and the
+  invariants declared by the helper (`stepChecks`) hold.

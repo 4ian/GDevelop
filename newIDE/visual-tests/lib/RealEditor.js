@@ -139,7 +139,6 @@ const launchEditor = async ({
   projectPath,
   debuggingPort,
   log,
-  onPageError,
 }) => {
   const userDataDirectory = fs.mkdtempSync(
     path.join(os.tmpdir(), 'gdevelop-visual-tests-')
@@ -200,8 +199,6 @@ const launchEditor = async ({
   }
   if (!page) throw new Error('No page found in the editor.');
   log(`Connected to the editor window (${page.url()}).`);
-
-  page.on('pageerror', error => onPageError(error));
 
   const stop = async () => {
     try {

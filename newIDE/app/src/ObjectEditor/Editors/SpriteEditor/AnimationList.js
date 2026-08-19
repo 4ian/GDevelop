@@ -261,6 +261,7 @@ const AnimationItemRow = React.memo<AnimationItemRowProps>(
                               animations={animations}
                               animationIndex={animationIndex}
                               directionIndex={directionIndex}
+                              animationsChangeTrigger={animationsChangeTrigger}
                               project={project}
                               resourcesLoader={ResourcesLoader}
                               resourceManagementProps={resourceManagementProps}

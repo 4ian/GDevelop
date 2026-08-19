@@ -44,11 +44,33 @@ const findExecutable = root => {
 };
 
 /**
+ * The version built by a branch: the one of its electron-app package.json,
+ * when the branch is known to git - the version of this checkout otherwise.
+ * Downloading the build of another branch (the tests of a branch run against
+ * the latest build of `master`) must use the version of that branch: this
+ * checkout may have bumped it, to a version not uploaded anywhere yet.
+ */
+const getVersionOfBranch = branch => {
+  const result = spawnSync(
+    'git',
+    ['show', `origin/${branch}:newIDE/electron-app/app/package.json`],
+    { cwd: path.resolve(__dirname, '..', '..', '..'), encoding: 'utf8' }
+  );
+  try {
+    return JSON.parse(result.stdout).version;
+  } catch (error) {
+    return electronAppPackageJson.version;
+  }
+};
+
+/**
  * Get the portable Linux build to test: either a local zip (the one a
  * build-linux job just produced) or the latest one uploaded to S3.
  */
 const getPortableBuild = async ({ zipPath, branch, workDirectory, log }) => {
-  const version = electronAppPackageJson.version;
+  const version = zipPath
+    ? electronAppPackageJson.version
+    : getVersionOfBranch(branch);
   fs.mkdirSync(workDirectory, { recursive: true });
 
   let portableZipPath = zipPath;

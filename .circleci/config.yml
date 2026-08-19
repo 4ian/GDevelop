@@ -29,6 +29,30 @@ orbs:
   macos: circleci/macos@2.5.1 # For Rosetta (see below)
   node: circleci/node@7.1.0 # For a recent npm version (see below)
   win: circleci/windows@5.1.0
+commands:
+  # Used by the visual monkey tests jobs on a "changed" scope: stop the job
+  # (before anything expensive) when no test of the suite is related to what
+  # the branch changes. A change to the tests themselves relates every test.
+  halt-unless-a-visual-test-is-related-to-the-changes:
+    parameters:
+      scope:
+        type: enum
+        enum: ['all', 'changed']
+      suite:
+        type: enum
+        enum: ['storybook', 'editor']
+    steps:
+      - run:
+          name: Stop here if no test is related to the changes
+          command: |
+            if [ "<< parameters.scope >>" != "changed" ]; then exit 0; fi
+            git fetch --depth=50 origin master
+            cd newIDE/visual-tests
+            PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-audit --no-fund --silent
+            if [ -z "$(node run.js --suite=<< parameters.suite >> --list-names --only-changed --base-ref=origin/master)" ]; then
+              echo "No visual monkey test of the << parameters.suite >> suite is related to these changes."
+              circleci-agent step halt
+            fi
 jobs:
   # Build the **entire** app for macOS (including the GDevelop.js library).
   build-macos:
@@ -753,17 +777,9 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Stop here if no test is related to the changes
-          command: |
-            if [ "<< parameters.scope >>" != "changed" ]; then exit 0; fi
-            git fetch --depth=50 origin master
-            cd newIDE/visual-tests
-            PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-audit --no-fund --silent
-            if [ -z "$(node run.js --suite=storybook --list-names --only-changed --base-ref=origin/master)" ]; then
-              echo "No visual monkey test is related to these changes."
-              circleci-agent step halt
-            fi
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'storybook'
 
       - restore_cache:
           keys:
@@ -805,17 +821,9 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Stop here if no test is related to the changes
-          command: |
-            if [ "<< parameters.scope >>" != "changed" ]; then exit 0; fi
-            git fetch --depth=50 origin master
-            cd newIDE/visual-tests
-            PUPPETEER_SKIP_DOWNLOAD=1 npm install --no-audit --no-fund --silent
-            if [ -z "$(node run.js --suite=storybook --list-names --only-changed --base-ref=origin/master)" ]; then
-              echo "No visual monkey test is related to these changes."
-              circleci-agent step halt
-            fi
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'storybook'
 
       - attach_workspace:
           at: newIDE/app
@@ -842,7 +850,14 @@ jobs:
 
       - run:
           name: Install the visual tests dependencies (and the Chrome to run them in)
-          command: cd newIDE/visual-tests && npm install --no-audit --no-fund
+          # The install of "Stop here if no test is related to the changes"
+          # skipped the Chrome download, and npm does not re-run the postinstall
+          # of an already installed Puppeteer: run it explicitly (it does
+          # nothing when Chrome is already in the restored cache).
+          command: |
+            cd newIDE/visual-tests
+            npm install --no-audit --no-fund
+            node node_modules/puppeteer/install.mjs
 
       - save_cache:
           paths:
@@ -903,8 +918,20 @@ jobs:
   # Visual monkey tests, "editor" suite: smoke tests using a real, packaged
   # version of the app (like run-cli-html5-export-linux does) opening a real
   # example game.
+  #
+  # Without a local build (so on a branch), the tests run against the latest
+  # portable build of `master` on S3: they then exercise the tests of the
+  # branch, not its changes to the app itself - those are only tested by the
+  # jobs following build-linux, on the branches building the app.
   run-visual-monkey-tests-editor-linux:
     parameters:
+      scope:
+        description: >
+          "all" runs every test. "changed" only runs the tests related to what
+          the branch changes - and nothing at all if it changes nothing related.
+        type: enum
+        enum: ['all', 'changed']
+        default: 'all'
       use-local-build:
         description: When true, attach the workspace produced by build-linux and use its portable zip instead of downloading the latest one from S3.
         type: boolean
@@ -917,6 +944,10 @@ jobs:
 
     steps:
       - checkout
+
+      - halt-unless-a-visual-test-is-related-to-the-changes:
+          scope: << parameters.scope >>
+          suite: 'editor'
 
       - when:
           condition: << parameters.use-local-build >>
@@ -948,8 +979,11 @@ jobs:
       - run:
           name: Run the visual monkey tests on the real editor
           # The editor is a GUI app: it needs a display, even to run headless.
+          # The failure is reported by the last step of the job, so that the
+          # results and the screenshots of a failing run are uploaded first.
           no_output_timeout: 30m
           command: |
+            set +e
             cd newIDE/visual-tests
             if [ "<< parameters.use-local-build >>" = "true" ]; then
               ZIP_PATH=$(ls ~/GDevelop/build-linux-workspace/gdevelop-*.zip | grep -v -- '-arm64' | head -1)
@@ -963,12 +997,24 @@ jobs:
               echo "No local build available; the latest portable zip of master will be downloaded."
               EXTRA_ARGS="--gdevelop-branch=master"
             fi
+            if [ "<< parameters.scope >>" = "changed" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --only-changed --base-ref=origin/master"
+            fi
             xvfb-run -a --server-args="-screen 0 1500x1000x24" \
-              node run.js --suite=editor $EXTRA_ARGS
+              node run.js --suite=editor $EXTRA_ARGS \
+              --artifacts-dir=/tmp/visual-tests-artifacts \
+              --junit-path=/tmp/visual-tests-results/results.xml
+            echo $? > /tmp/visual-tests-exit-code
 
+      - store_test_results:
+          path: /tmp/visual-tests-results
       - store_artifacts:
-          path: newIDE/visual-tests/artifacts
-          destination: visual-tests-artifacts
+          path: /tmp/visual-tests-artifacts
+          destination: visual-tests
+
+      - run:
+          name: Report whether the visual monkey tests passed
+          command: exit "$(cat /tmp/visual-tests-exit-code)"
 
 workflows:
   gdevelop_js-wasm-extra-checks:
@@ -1071,6 +1117,8 @@ workflows:
 
   # On `master`/`stable` (or when explicitly asked for): manipulate the editors
   # in a real browser and check that nothing is broken, with every test.
+  # (`master`, `stable` and the experimental builds also run the editor suite
+  # against the build build-linux just produced, in the main workflow.)
   all-visual-tests:
     when:
       or:
@@ -1087,9 +1135,22 @@ workflows:
           parallelism: << pipeline.parameters.all-visual-tests-parallelism >>
           requires:
             - visual-tests-storybook-build-all
+      # On a branch forced with `run-all-visual-tests`: every test of the
+      # editor suite too, against the latest portable build of `master`.
+      - run-visual-monkey-tests-editor-linux:
+          name: visual-tests-editor-all
+          scope: 'all'
+          filters:
+            branches:
+              ignore:
+                - master
+                - stable
+                - /experimental-build.*/
 
   # On a branch / Pull Request: only run the tests related to what it changes
-  # (nothing at all when it changes nothing related to them).
+  # (nothing at all when it changes nothing related to them). The editor suite
+  # runs against the latest portable build of `master` (a branch builds no
+  # app), so it exercises the tests of the branch, not its changes to the app.
   changed-visual-tests:
     when:
       and:
@@ -1108,3 +1169,10 @@ workflows:
           parallelism: << pipeline.parameters.changed-visual-tests-parallelism >>
           requires:
             - visual-tests-storybook-build-changed
+      - run-visual-monkey-tests-editor-linux:
+          name: visual-tests-editor-changed
+          scope: 'changed'
+          filters:
+            branches:
+              ignore:
+                - /experimental-build.*/

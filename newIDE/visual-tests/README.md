@@ -52,8 +52,14 @@ node run.js --suite=all
 
 On a branch, the CI only runs the tests related to what it changes (and builds
 nothing if there are none): each helper declares the sources its tests watch, in
-its `paths`. Everything runs on `master` - a change anywhere else can break an
-editor too - and `run-all-visual-tests` on a pipeline forces that on a branch.
+its `paths`, and changing the tests themselves relates every test. Everything
+runs on `master` - a change anywhere else can break an editor too - and
+`run-all-visual-tests` on a pipeline forces that on a branch.
+
+Both suites work this way, with one difference: on a branch, the editor suite
+runs against the latest portable build of `master` (a branch builds no app), so
+it exercises the tests of the branch, but not its changes to the app itself -
+those are tested by the same suite on `master`, right after `build-linux`.
 
 A problem these tests find but are not here to guard can be listed in
 `lib/KnownIssues.js`: it is then reported loudly without failing the run, so

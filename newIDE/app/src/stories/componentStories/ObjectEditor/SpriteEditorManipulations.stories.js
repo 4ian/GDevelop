@@ -373,8 +373,10 @@ const SpriteEditorPlayground = ({
           onSessionEnded: changeAnimationsDuringExternalEditorSession
             ? () => {
                 // Simulate another part of the app changing the animations
-                // while the external editor was opened: this reallocates the
-                // animations, and shifts the ones after the removed one.
+                // while the external editor was opened: removing one shifts
+                // all the following ones, and adding enough of them
+                // reallocates the vector holding them - so anything resolved
+                // before the session is now dangling.
                 const gd = global.gd;
                 const animations = gd
                   .asSpriteConfiguration(object.getConfiguration())
@@ -382,11 +384,13 @@ const SpriteEditorPlayground = ({
                 if (animations.getAnimationsCount() > 1) {
                   animations.removeAnimation(0);
                 }
-                const animation = new gd.Animation();
-                animation.setName('AddedDuringSession');
-                animation.setDirectionsCount(1);
-                animations.addAnimation(animation);
-                animation.delete();
+                for (let index = 0; index < 4; index++) {
+                  const animation = new gd.Animation();
+                  animation.setName('AddedDuringSession' + index);
+                  animation.setDirectionsCount(1);
+                  animations.addAnimation(animation);
+                  animation.delete();
+                }
               }
             : undefined,
         }),
@@ -502,6 +506,7 @@ export const ManipulationsWithHostileExternalEditor = (): React.Node => (
     objectName="MyHostileExternalEditorSpriteObject"
     animationsCount={6}
     framesPerAnimation={4}
+    serializeOnChange
     changeAnimationsDuringExternalEditorSession
   />
 );

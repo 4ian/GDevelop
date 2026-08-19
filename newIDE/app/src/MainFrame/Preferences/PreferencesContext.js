@@ -256,6 +256,11 @@ export type PreferencesValues = {|
   disableNpmScriptConfirmation: boolean,
   showJsTypeError: boolean,
   canonicalEventSerialization: boolean,
+  aiCustomEndpointEnabled: boolean,
+  aiCustomBaseUrl: string,
+  aiCustomApiKey: string,
+  aiCustomModel: string,
+  aiCustomTemperature: number,
 |};
 
 /**
@@ -384,6 +389,11 @@ export type Preferences = {|
   setUseBackgroundSerializerForSaving: (enabled: boolean) => void,
   setShowJsTypeError: (enabled: boolean) => void,
   setCanonicalEventSerialization: (enabled: boolean) => void,
+  setAiCustomEndpointEnabled: (enabled: boolean) => void,
+  setAiCustomBaseUrl: (baseUrl: string) => void,
+  setAiCustomApiKey: (apiKey: string) => void,
+  setAiCustomModel: (model: string) => void,
+  setAiCustomTemperature: (temperature: number) => void,
 |};
 
 export const initialPreferences = {
@@ -451,6 +461,11 @@ export const initialPreferences = {
     disableNpmScriptConfirmation: false,
     showJsTypeError: false,
     canonicalEventSerialization: false,
+    aiCustomEndpointEnabled: false,
+    aiCustomBaseUrl: 'http://localhost:11434/v1',
+    aiCustomApiKey: '',
+    aiCustomModel: 'qwen2.5-coder',
+    aiCustomTemperature: 0.7,
   },
   setMultipleValues: () => {},
   setLanguage: () => {},
@@ -542,6 +557,11 @@ export const initialPreferences = {
   setUseBackgroundSerializerForSaving: (enabled: boolean) => {},
   setShowJsTypeError: (enabled: boolean) => {},
   setCanonicalEventSerialization: (enabled: boolean) => {},
+  setAiCustomEndpointEnabled: (enabled: boolean) => {},
+  setAiCustomBaseUrl: (baseUrl: string) => {},
+  setAiCustomApiKey: (apiKey: string) => {},
+  setAiCustomModel: (model: string) => {},
+  setAiCustomTemperature: (temperature: number) => {},
 };
 
 const PreferencesContext: React.Context<Preferences> = React.createContext<Preferences>(

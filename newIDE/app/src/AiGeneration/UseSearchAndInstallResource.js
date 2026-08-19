@@ -14,6 +14,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { createNewResource } from '../ResourcesList/ResourceSource';
 import { applyResourceDefaults } from '../ResourcesList/ResourceUtils';
+import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
 
 import PromisePool from '@supercharge/promise-pool';
 
@@ -36,8 +37,11 @@ export const useSearchAndInstallResource = ({
       async ({
         resources,
       }: ResourceSearchAndInstallOptions): Promise<ResourceSearchAndInstallResult> => {
-        if (!profile) throw new Error('User should be authenticated.');
+        if (!profile && !isCustomEndpointEnabled())
+          throw new Error('User should be authenticated.');
         if (!project) throw new Error('Project should be opened.');
+
+        const activeUserId = profile ? profile.id : 'local-byok-user';
 
         const { results } = await PromisePool.withConcurrency(5)
           .for(resources)
@@ -47,7 +51,7 @@ export const useSearchAndInstallResource = ({
                 { times: 3, backoff: { initialDelay: 300, factor: 2 } },
                 () =>
                   createResourceSearch(getAuthorizationHeader, {
-                    userId: profile.id,
+                    userId: activeUserId,
                     searchTerms: resourceToSearch.resourceName,
                     resourceKind: resourceToSearch.resourceKind,
                   })

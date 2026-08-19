@@ -34,6 +34,7 @@ import {
   CHECK_APP_UPDATES_TIMEOUT,
   PERIODIC_APP_UPDATES_TIMEOUT,
 } from '../../Utils/GlobalFetchTimeouts';
+import { setCustomEndpointConfig } from '../../AI/CustomAIClient';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -417,9 +418,30 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setCanonicalEventSerialization: (this._setCanonicalEventSerialization.bind(
       this
     ): any),
+    // $FlowFixMe[method-unbinding]
+    setAiCustomEndpointEnabled: (this._setAiCustomEndpointEnabled.bind(
+      this
+    ): any),
+    // $FlowFixMe[method-unbinding]
+    setAiCustomBaseUrl: (this._setAiCustomBaseUrl.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAiCustomApiKey: (this._setAiCustomApiKey.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAiCustomModel: (this._setAiCustomModel.bind(this): any),
+    // $FlowFixMe[method-unbinding]
+    setAiCustomTemperature: (this._setAiCustomTemperature.bind(this): any),
   };
 
   componentDidMount() {
+    // Sync custom AI config on mount
+    setCustomEndpointConfig({
+      enabled: this.state.values.aiCustomEndpointEnabled,
+      baseUrl: this.state.values.aiCustomBaseUrl,
+      apiKey: this.state.values.aiCustomApiKey,
+      model: this.state.values.aiCustomModel,
+      temperature: this.state.values.aiCustomTemperature,
+    });
+
     this._periodicUpdateCheckTimeout = setTimeout(
       () => this._checkUpdates(),
       CHECK_APP_UPDATES_TIMEOUT
@@ -1447,6 +1469,81 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAiCustomEndpointEnabled(newValue: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiCustomEndpointEnabled: newValue,
+        },
+      }),
+      () => {
+        this._persistValuesToLocalStorage(this.state);
+        setCustomEndpointConfig({ enabled: newValue });
+      }
+    );
+  }
+
+  _setAiCustomBaseUrl(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiCustomBaseUrl: newValue,
+        },
+      }),
+      () => {
+        this._persistValuesToLocalStorage(this.state);
+        setCustomEndpointConfig({ baseUrl: newValue });
+      }
+    );
+  }
+
+  _setAiCustomApiKey(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiCustomApiKey: newValue,
+        },
+      }),
+      () => {
+        this._persistValuesToLocalStorage(this.state);
+        setCustomEndpointConfig({ apiKey: newValue });
+      }
+    );
+  }
+
+  _setAiCustomModel(newValue: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiCustomModel: newValue,
+        },
+      }),
+      () => {
+        this._persistValuesToLocalStorage(this.state);
+        setCustomEndpointConfig({ model: newValue });
+      }
+    );
+  }
+
+  _setAiCustomTemperature(newValue: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          aiCustomTemperature: newValue,
+        },
+      }),
+      () => {
+        this._persistValuesToLocalStorage(this.state);
+        setCustomEndpointConfig({ temperature: newValue });
+      }
     );
   }
 

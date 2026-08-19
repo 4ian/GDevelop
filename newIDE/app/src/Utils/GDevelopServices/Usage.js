@@ -16,6 +16,7 @@ import {
   ensureIsObjectWithPropertyOfType,
 } from '../DataValidator';
 import { type BundleListingData } from './Shop';
+import { isCustomEndpointEnabled } from '../../AI/CustomAIClient';
 
 export type Usage = {
   id: string,
@@ -583,6 +584,10 @@ export const isSubscriptionComingFromTeam = (
 export const hasValidSubscriptionPlan = (
   subscription: ?Subscription
 ): boolean => {
+  if (isCustomEndpointEnabled()) {
+    return true;
+  }
+
   const hasValidSubscription =
     !!subscription &&
     !!subscription.planId &&
@@ -758,6 +763,10 @@ export const canBenefitFromSocialRole = (
 export const canUpgradeSubscription = (
   subscription: ?Subscription
 ): false | true | boolean => {
+  if (isCustomEndpointEnabled()) {
+    return false;
+  }
+
   return (
     !!subscription &&
     // $FlowFixMe[incompatible-type]

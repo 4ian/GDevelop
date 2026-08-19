@@ -43,6 +43,7 @@ import {
   canUpgradeSubscription,
   hasValidSubscriptionPlan,
 } from '../Utils/GDevelopServices/Usage';
+import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
 import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { type EditorCallbacks } from '../EditorFunctions';
 import {
@@ -462,12 +463,26 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const {
         profile,
-        getAuthorizationHeader,
+        getAuthorizationHeader: rawGetAuthorizationHeader,
         onOpenCreateAccountDialog,
         limits,
         onRefreshLimits,
         subscription,
       } = authenticatedUser;
+
+      const getAuthorizationHeader = React.useCallback(
+        async (): Promise<string> => {
+          try {
+            return await rawGetAuthorizationHeader();
+          } catch (error) {
+            if (isCustomEndpointEnabled()) {
+              return 'Bearer local-byok-token';
+            }
+            throw error;
+          }
+        },
+        [rawGetAuthorizationHeader]
+      );
 
       const { isRefreshingLimits, refreshLimits } = useRefreshLimits(
         onRefreshLimits
@@ -507,11 +522,13 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             if (!newAiRequestOptions) return;
             console.info('Starting a new AI request...');
 
-            if (!profile) {
+            if (!profile && !isCustomEndpointEnabled()) {
               onOpenCreateAccountDialog();
               startNewAiRequest(null);
               return;
             }
+
+            const activeUserId = profile ? profile.id : 'local-byok-user';
 
             // Read the options and reset them (to avoid launching the same request twice).
             const {
@@ -524,7 +541,12 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             // Ensure the user has enough credits to pay for the request, or ask them
             // to buy some more.
             let payWithCredits = false;
-            if (quota && quota.limitReached && aiRequestPriceInCredits) {
+            if (
+              quota &&
+              quota.limitReached &&
+              aiRequestPriceInCredits &&
+              !isCustomEndpointEnabled()
+            ) {
               payWithCredits = true;
               const doesNotHaveEnoughCreditsToContinue =
                 availableCredits < aiRequestPriceInCredits;
@@ -558,7 +580,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
               const preparedAiUserContent = await prepareAiUserContent({
                 getAuthorizationHeader,
-                userId: profile.id,
+                userId: activeUserId,
                 simplifiedProjectJson,
                 projectSpecificExtensionsSummaryJson,
                 eventsJson: null,
@@ -566,7 +588,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
               const aiRequest = await createAiRequest(getAuthorizationHeader, {
                 userRequest: userRequest,
-                userId: profile.id,
+                userId: activeUserId,
                 gameProjectJsonUserRelativeKey:
                   preparedAiUserContent.gameProjectJsonUserRelativeKey,
                 gameProjectJson: preparedAiUserContent.gameProjectJson,
@@ -666,7 +688,9 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
           createdProject?: ?gdProject,
           editorFunctionCallResults: Array<EditorFunctionCallResult>,
         |}) => {
-          if (!profile) return;
+          if (!profile && !isCustomEndpointEnabled()) return;
+
+          const activeUserId = profile ? profile.id : 'local-byok-user';
 
           const aiRequestForMessage = aiRequests[aiRequestId];
           if (!aiRequestForMessage) return;
@@ -717,7 +741,8 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
             userMessage &&
             quota &&
             quota.limitReached &&
-            aiRequestPriceInCredits
+            aiRequestPriceInCredits &&
+            !isCustomEndpointEnabled()
           ) {
             payWithCredits = true;
             const doesNotHaveEnoughCreditsToContinue =
@@ -760,7 +785,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
             const preparedAiUserContent = await prepareAiUserContent({
               getAuthorizationHeader,
-              userId: profile.id,
+              userId: activeUserId,
               simplifiedProjectJson,
               projectSpecificExtensionsSummaryJson,
               eventsJson: null,
@@ -778,7 +803,7 @@ export const AskAiEditor: React.ComponentType<Props> = React.memo<Props>(
 
             const aiRequest: AiRequest = await retryIfFailed({ times: 2 }, () =>
               addMessageToAiRequest(getAuthorizationHeader, {
-                userId: profile.id,
+                userId: activeUserId,
                 aiRequestId,
                 functionCallOutputs,
                 gameProjectJsonUserRelativeKey:

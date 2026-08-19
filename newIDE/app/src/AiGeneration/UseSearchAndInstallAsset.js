@@ -13,6 +13,7 @@ import { retryIfFailed } from '../Utils/RetryIfFailed';
 import { useInstallAsset } from '../AssetStore/NewObjectDialog';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../AssetStore/AssetStoreContext';
+import { isCustomEndpointEnabled } from '../AI/CustomAIClient';
 
 type _FuncReturnType = {
   searchAndInstallAsset: AssetSearchAndInstallOptions => Promise<AssetSearchAndInstallResult>,
@@ -49,7 +50,10 @@ export const useSearchAndInstallAsset = ({
         exactOrPartialAssetId,
         ...assetSearchOptions
       }: AssetSearchAndInstallOptions): Promise<AssetSearchAndInstallResult> => {
-        if (!profile) throw new Error('User should be authenticated.');
+        if (!profile && !isCustomEndpointEnabled())
+          throw new Error('User should be authenticated.');
+
+        const activeUserId = profile ? profile.id : 'local-byok-user';
 
         let assetShortHeader;
         if (exactOrPartialAssetId) {
@@ -90,7 +94,7 @@ export const useSearchAndInstallAsset = ({
             { times: 3, backoff: { initialDelay: 300, factor: 2 } },
             () =>
               createAssetSearch(getAuthorizationHeader, {
-                userId: profile.id,
+                userId: activeUserId,
                 objectType,
                 exactOrPartialAssetId,
                 ...assetSearchOptions,

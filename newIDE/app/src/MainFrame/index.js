@@ -3589,7 +3589,7 @@ const MainFrame = (props: Props): React.MixedElement => {
   };
 
   const openBehaviorEvents = React.useCallback(
-    (extensionName: string, behaviorName: string, functionName?: string) => {
+    (extensionName: string, behaviorName: string) => {
       const { currentProject, editorTabs } = state;
       if (!currentProject) return;
 
@@ -3616,12 +3616,7 @@ const MainFrame = (props: Props): React.MixedElement => {
           }));
         } else {
           // Open a new editor for the extension and the given function
-          openEventsFunctionsExtension(
-            extensionName,
-            functionName || null,
-            behaviorName,
-            null
-          );
+          openEventsFunctionsExtension(extensionName, null, behaviorName, null);
         }
       } else {
         // It's not an events functions extension, we should not be here.
@@ -3657,13 +3652,14 @@ const MainFrame = (props: Props): React.MixedElement => {
           object.hasBehaviorNamed(name)
         )
       );
-      openBehaviorEvents(
+      openEventsFunctionsExtension(
         extensionName,
+        'doStepPreEvents',
         eventsBasedBehavior.getName(),
-        'doStepPreEvents'
+        null
       );
     },
-    [openBehaviorEvents]
+    [openEventsFunctionsExtension]
   );
 
   const onExtractAsExternalLayout = React.useCallback(

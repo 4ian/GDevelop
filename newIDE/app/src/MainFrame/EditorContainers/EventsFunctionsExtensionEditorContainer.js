@@ -34,6 +34,7 @@ const styles = {
 
 export class EventsFunctionsExtensionEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsFunctionsExtensionEditor;
+  _blurTimeOutId: any = null;
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -239,6 +240,23 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
       this.editor.selectEventsBasedBehaviorByName(eventBasedBehaviorName);
   }
 
+  _onBlur = () => {
+    // We forward the event on the next tick by using setTimeout.
+    // This is necessary because we need to first check if
+    // another child of the element has received focus as
+    // the blur event fires prior to the new focus event.
+    this._blurTimeOutId = setTimeout(() => {
+      if (this.editor) {
+        this.editor.onFocusLost();
+      }
+    });
+  };
+
+  _onFocus = () => {
+    // If a child receives focus, do not forward the onBlur.
+    clearTimeout(this._blurTimeOutId);
+  };
+
   render(): any {
     const { project, projectItemName } = this.props;
     const eventsFunctionsExtension = this.getEventsFunctionsExtension();
@@ -255,7 +273,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     } = this.props.extraEditorProps || {};
 
     return (
-      <div style={styles.container}>
+      <div
+        style={styles.container}
+        onBlur={this._onBlur}
+        onFocus={this._onFocus}
+      >
         <EventsFunctionsExtensionEditor
           key={eventsFunctionsExtension.ptr}
           project={project}

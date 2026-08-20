@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
-import { enumerateAllChildrenInFolder } from './EnumerateObjectFolderOrObject';
-import { type ObjectFolderOrObjectWithContext } from './EnumerateObjectFolderOrObject';
+import {
+  enumerateAllChildrenInFolderMatchingSearch,
+  type ObjectFolderOrObjectWithContext,
+} from './EnumerateObjectFolderOrObject';
 
 /**
  * Manages which objects/folders are selected in the Objects panel.
@@ -15,11 +17,13 @@ function useObjectsSelection({
   selectedObjectFolderOrObjectsWithContext,
   globalObjectsRootFolder,
   objectsRootFolder,
+  searchText,
   onObjectFolderOrObjectsWithContextSelected,
 }: {|
   selectedObjectFolderOrObjectsWithContext: Array<ObjectFolderOrObjectWithContext>,
   globalObjectsRootFolder: gdObjectFolderOrObject | null,
   objectsRootFolder: gdObjectFolderOrObject,
+  searchText: string,
   onObjectFolderOrObjectsWithContextSelected: (
     items: Array<ObjectFolderOrObjectWithContext>
   ) => void,
@@ -78,7 +82,10 @@ function useObjectsSelection({
       // global when they actually live in the scene container.
       const global = rootFolder !== objectsRootFolder;
       selectObjectFolderOrObjectsWithContext(
-        enumerateAllChildrenInFolder(rootFolder).map(objectFolderOrObject => ({
+        enumerateAllChildrenInFolderMatchingSearch(
+          rootFolder,
+          searchText
+        ).map(objectFolderOrObject => ({
           objectFolderOrObject,
           global,
         }))
@@ -88,6 +95,7 @@ function useObjectsSelection({
       selectedObjectFolderOrObjectsWithContext,
       globalObjectsRootFolder,
       objectsRootFolder,
+      searchText,
       selectObjectFolderOrObjectsWithContext,
     ]
   );

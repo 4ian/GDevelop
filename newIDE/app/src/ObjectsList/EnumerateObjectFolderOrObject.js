@@ -138,6 +138,30 @@ export const enumerateAllChildrenInFolder = (
   return result;
 };
 
+/**
+ * Same case-insensitive substring match as TreeView's search filter.
+ * Ancestor folders shown only as context for a match are not included.
+ * Matching folders that still contain a non-matching descendant are skipped
+ * so bulk ops cannot act on hidden children.
+ */
+export const enumerateAllChildrenInFolderMatchingSearch = (
+  folder: gdObjectFolderOrObject,
+  searchText: string
+): Array<gdObjectFolderOrObject> => {
+  const children = enumerateAllChildrenInFolder(folder);
+  if (!searchText) return children;
+  const lowercaseSearchText = searchText.toLowerCase();
+  const matchesSearch = (item: gdObjectFolderOrObject) =>
+    getObjectFolderOrObjectUnifiedName(item)
+      .toLowerCase()
+      .includes(lowercaseSearchText);
+  return children.filter(child => {
+    if (!matchesSearch(child)) return false;
+    if (!child.isFolder()) return true;
+    return enumerateAllChildrenInFolder(child).every(matchesSearch);
+  });
+};
+
 const collectObjectsToDelete = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): Array<gdObject> => {

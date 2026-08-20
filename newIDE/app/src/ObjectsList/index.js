@@ -816,6 +816,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       selectedObjectFolderOrObjectsWithContext,
       globalObjectsRootFolder,
       objectsRootFolder,
+      searchText,
       onObjectFolderOrObjectsWithContextSelected,
     });
 

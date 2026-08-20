@@ -5,6 +5,8 @@ import {
   getSelectionTopLevelNodes,
   getObjectsToDeleteFromSelection,
   removeEmptyFoldersFromSelection,
+  enumerateAllChildrenInFolder,
+  enumerateAllChildrenInFolderMatchingSearch,
 } from './EnumerateObjectFolderOrObject';
 import {
   copyObjectFolderOrObjectsToClipboard,
@@ -74,6 +76,60 @@ describe('ObjectFolderOrObjectsClipboard', () => {
       { global: false, objectFolderOrObject: subFolder },
       { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
     ]);
+
+    project.delete();
+  });
+
+  test('enumerateAllChildrenInFolderMatchingSearch follows the list search filter', () => {
+    const { project, objectsContainer, rootFolder } = makeProjectWithObjects();
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'Enemy1',
+      rootFolder,
+      2
+    );
+    const enemiesFolder = rootFolder.insertNewFolder('Enemies', 3);
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'EnemyBoss',
+      enemiesFolder,
+      0
+    );
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'Wall',
+      enemiesFolder,
+      1
+    );
+
+    const allNames = enumerateAllChildrenInFolder(rootFolder).map(item =>
+      item.isFolder() ? item.getFolderName() : item.getObject().getName()
+    );
+    expect(allNames).toEqual([
+      'MySprite',
+      'MyFolder',
+      'MySpriteInFolder',
+      'Enemy1',
+      'Enemies',
+      'EnemyBoss',
+      'Wall',
+    ]);
+
+    expect(
+      enumerateAllChildrenInFolderMatchingSearch(rootFolder, '').map(item =>
+        item.isFolder() ? item.getFolderName() : item.getObject().getName()
+      )
+    ).toEqual(allNames);
+
+    expect(
+      enumerateAllChildrenInFolderMatchingSearch(rootFolder, 'enemy').map(
+        item =>
+          item.isFolder() ? item.getFolderName() : item.getObject().getName()
+      )
+    ).toEqual(['Enemy1', 'EnemyBoss']);
 
     project.delete();
   });

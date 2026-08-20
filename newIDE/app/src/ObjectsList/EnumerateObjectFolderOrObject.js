@@ -104,22 +104,43 @@ export const getFoldersAscendanceWithoutRootFolder = (
 };
 
 /**
- * Filter out items whose ancestor is also part of the given selection, so
- * that a bulk operation (copy, cut, delete, move) is not applied twice to
- * the same object or folder (once directly, once through its ancestor).
+ * Keep items whose ancestors are not also selected. A folder in the selection
+ * already carries its content, so descendants must not be operated on twice.
+ * Uses a Set of selected ptrs and one parent-chain walk per item (O(n · depth)).
  */
+export const getSelectionTopLevelItems = <T>(
+  items: $ReadOnlyArray<T>,
+  getObjectFolderOrObject: (item: T) => gdObjectFolderOrObject | null
+): Array<T> => {
+  const selectedPtrs = new Set();
+  const resolved: Array<{|
+    item: T,
+    objectFolderOrObject: gdObjectFolderOrObject,
+  |}> = [];
+  items.forEach(item => {
+    const objectFolderOrObject = getObjectFolderOrObject(item);
+    if (!objectFolderOrObject) return;
+    selectedPtrs.add(objectFolderOrObject.ptr);
+    resolved.push({ item, objectFolderOrObject });
+  });
+  return resolved
+    .filter(({ objectFolderOrObject }) => {
+      let ancestor = objectFolderOrObject.getParent();
+      while (!ancestor.isRootFolder()) {
+        if (selectedPtrs.has(ancestor.ptr)) return false;
+        ancestor = ancestor.getParent();
+      }
+      return true;
+    })
+    .map(({ item }) => item);
+};
+
 export const getSelectionTopLevelNodes = (
   items: Array<ObjectFolderOrObjectWithContext>
 ): Array<ObjectFolderOrObjectWithContext> =>
-  items.filter(
-    item =>
-      !items.some(
-        otherItem =>
-          otherItem !== item &&
-          item.objectFolderOrObject.isADescendantOf(
-            otherItem.objectFolderOrObject
-          )
-      )
+  getSelectionTopLevelItems(
+    items,
+    item => item.objectFolderOrObject
   );
 
 /**

@@ -66,7 +66,12 @@ describe('ObjectFolderOrObjectsClipboard', () => {
   };
 
   test('getSelectionTopLevelNodes filters out descendants of selected folders', () => {
-    const { project, rootFolder, subFolder } = makeProjectWithObjects();
+    const {
+      project,
+      objectsContainer,
+      rootFolder,
+      subFolder,
+    } = makeProjectWithObjects();
     const objectInFolder = subFolder.getChildAt(0);
 
     const topLevelNodes = getSelectionTopLevelNodes([
@@ -76,6 +81,26 @@ describe('ObjectFolderOrObjectsClipboard', () => {
     ]);
 
     expect(topLevelNodes).toEqual([
+      { global: false, objectFolderOrObject: subFolder },
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+    ]);
+
+    const nestedFolder = subFolder.insertNewFolder('NestedFolder', 1);
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'DeepSprite',
+      nestedFolder,
+      0
+    );
+    const nestedObject = nestedFolder.getChildAt(0);
+    const topLevelWithNesting = getSelectionTopLevelNodes([
+      { global: false, objectFolderOrObject: subFolder },
+      { global: false, objectFolderOrObject: nestedFolder },
+      { global: false, objectFolderOrObject: nestedObject },
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+    ]);
+    expect(topLevelWithNesting).toEqual([
       { global: false, objectFolderOrObject: subFolder },
       { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
     ]);

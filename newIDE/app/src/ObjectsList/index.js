@@ -29,6 +29,7 @@ import Add from '../UI/CustomSvgIcons/Add';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   getFoldersAscendanceWithoutRootFolder,
+  getSelectionTopLevelItems,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import {
@@ -1589,15 +1590,9 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         destinationItem: TreeViewItem,
         where: 'before' | 'inside' | 'after'
       ) => {
-        // Only move the top level items: a folder being moved already
-        // carries its content along with it.
-        const topLevelSelectedItems = selectedItems.filter(
-          selectedItem =>
-            !selectedItems.some(
-              otherItem =>
-                otherItem !== selectedItem &&
-                selectedItem.content.isDescendantOf(otherItem.content)
-            )
+        const topLevelSelectedItems = getSelectionTopLevelItems(
+          selectedItems,
+          item => item.content.getObjectFolderOrObject()
         );
         if (topLevelSelectedItems.length === 0) return;
 

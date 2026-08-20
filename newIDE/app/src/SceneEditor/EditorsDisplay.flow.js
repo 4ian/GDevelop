@@ -91,8 +91,8 @@ export type SceneEditorsDisplayProps = {|
     objectWithContext: ObjectWithContext,
     hasResourceChanged: boolean
   ) => void,
-  onObjectFolderOrObjectWithContextSelected: (
-    ?ObjectFolderOrObjectWithContext
+  onObjectFolderOrObjectsWithContextSelected: (
+    Array<ObjectFolderOrObjectWithContext>
   ) => void,
   onSetAsGlobalObject: (object: gdObject) => void,
   onExportAssets: () => void,

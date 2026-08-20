@@ -12,6 +12,8 @@ import {
 } from './EnumerateObjectFolderOrObject';
 import {
   copyObjectFolderOrObjectsToClipboard,
+  serializeObjectFolderOrObjectsForClipboard,
+  writeObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
   getObjectFolderOrObjectsClipboardSummaryName,
   getObjectFolderOrObjectsClipboardObjectTypes,
@@ -351,7 +353,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     this._delete();
   }
 
-  async _delete(): Promise<void> {
+  async _delete(): Promise<boolean> {
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -368,7 +370,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       selectObjectFolderOrObjectWithContext(null);
       this.objectFolder.getParent().removeFolderChild(this.objectFolder);
       forceUpdateList();
-      return;
+      return true;
     }
 
     let message: MessageDescriptor;
@@ -384,7 +386,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     }
 
     const answer = await showDeleteConfirmation({ message, title });
-    if (!answer) return;
+    if (!answer) return false;
 
     const objectsWithContext = objectsToDelete.map(object => ({
       object,
@@ -418,6 +420,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
 
       onObjectModified(false);
     });
+    return true;
   }
 
   copy(): void {
@@ -427,8 +430,17 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
   }
 
   cut(): void {
-    this.copy();
-    this.delete();
+    this._cut();
+  }
+
+  async _cut(): Promise<void> {
+    const clipboardPayload = serializeObjectFolderOrObjectsForClipboard([
+      { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
+    ]);
+    if (!clipboardPayload) return;
+    const deleted = await this._delete();
+    if (!deleted) return;
+    writeObjectFolderOrObjectsToClipboard(clipboardPayload);
   }
 
   paste(): void {

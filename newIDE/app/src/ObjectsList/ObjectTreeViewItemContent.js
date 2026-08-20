@@ -17,6 +17,8 @@ import {
 } from './EnumerateObjectFolderOrObject';
 import {
   copyObjectFolderOrObjectsToClipboard,
+  serializeObjectFolderOrObjectsForClipboard,
+  writeObjectFolderOrObjectsToClipboard,
   hasObjectFolderOrObjectsInClipboard,
   getObjectFolderOrObjectsClipboardSummaryName,
   getObjectFolderOrObjectsClipboardObjectTypes,
@@ -565,9 +567,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
     this._delete();
   }
 
-  async _delete(): Promise<void> {
+  async _delete(): Promise<boolean> {
     const object = this._getAliveObject();
-    if (!object) return;
+    if (!object) return false;
     const {
       globalObjectsContainer,
       objectsContainer,
@@ -581,7 +583,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       title: t`Remove object`,
       message: t`Are you sure you want to remove this object? This can't be undone.`,
     });
-    if (!answer) return;
+    if (!answer) return false;
 
     const objectsToDelete = [object];
     const objectsWithContext = objectsToDelete.map(object => ({
@@ -611,6 +613,7 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       }
       onObjectModified(false);
     });
+    return true;
   }
 
   copy(): void {
@@ -622,9 +625,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   }
 
   cut(): void {
-    this.copy();
-    // TODO It should probably not show an alert
-    this.delete();
+    this._cut();
+  }
+
+  async _cut(): Promise<void> {
+    const objectFolderOrObject = this._getAliveObjectFolderOrObject();
+    if (!objectFolderOrObject) return;
+    const clipboardPayload = serializeObjectFolderOrObjectsForClipboard([
+      { objectFolderOrObject, global: this._isGlobal },
+    ]);
+    if (!clipboardPayload) return;
+    const deleted = await this._delete();
+    if (!deleted) return;
+    writeObjectFolderOrObjectsToClipboard(clipboardPayload);
   }
 
   paste(): void {

@@ -17,7 +17,10 @@ import {
   OBJECT_FOLDER_OR_OBJECTS_CLIPBOARD_KIND,
   OBJECT_CLIPBOARD_KIND,
 } from './ObjectFolderOrObjectsClipboard';
-import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
+import {
+  duplicateObjectFolderOrObjects,
+  duplicateObjectFolderOrObjectsInPlace,
+} from './ObjectFolderOrObjectsDuplicate';
 
 const gd: libGDevelop = global.gd;
 
@@ -244,6 +247,49 @@ describe('ObjectFolderOrObjectsClipboard', () => {
     expect(getObjectFolderOrObjectsClipboardSummaryName()).toBe(
       clipboardSummaryBefore
     );
+
+    project.delete();
+  });
+
+  test('duplicateObjectFolderOrObjectsInPlace inserts each copy after its original sibling', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const globalObjectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const objectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const rootFolder = objectsContainer.getRootFolder();
+    ['A', 'B', 'C'].forEach((name, index) => {
+      objectsContainer.insertNewObjectInFolder(
+        project,
+        'Sprite',
+        name,
+        rootFolder,
+        index
+      );
+    });
+
+    const result = duplicateObjectFolderOrObjectsInPlace({
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      items: [
+        { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+        { global: false, objectFolderOrObject: rootFolder.getChildAt(1) },
+      ],
+    });
+
+    expect(result).not.toBe(null);
+    if (!result) throw new Error('unreachable');
+    expect(
+      Array.from({ length: rootFolder.getChildrenCount() }, (_, i) => {
+        const child = rootFolder.getChildAt(i);
+        return child.isFolder()
+          ? child.getFolderName()
+          : child.getObject().getName();
+      })
+    ).toEqual(['A', 'A2', 'B', 'B2', 'C']);
 
     project.delete();
   });

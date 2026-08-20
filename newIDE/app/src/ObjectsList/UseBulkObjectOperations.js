@@ -21,7 +21,7 @@ import {
   getPasteMenuLabel,
   getUniqueFolderName,
 } from './ObjectFolderOrObjectsClipboard';
-import { duplicateObjectFolderOrObjects } from './ObjectFolderOrObjectsDuplicate';
+import { duplicateObjectFolderOrObjectsInPlace } from './ObjectFolderOrObjectsDuplicate';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import { type ShowConfirmDeleteDialogOptions } from '../UI/Alert/AlertContext';
 
@@ -123,46 +123,20 @@ function useBulkObjectOperations({
   const bulkDuplicate = React.useCallback(
     () => {
       if (isListLocked) return;
-      if (topLevelSelectedItems.length === 0) return;
 
-      const allCreatedObjects: Array<gdObject> = [];
-      const allNewItems: Array<ObjectFolderOrObjectWithContext> = [];
-      // Track how many items were inserted per parent to adjust positions
-      // correctly when multiple selected siblings share the same folder.
-      const insertionOffsets: Map<gdObjectFolderOrObject, number> = new Map();
-
-      topLevelSelectedItems.forEach(item => {
-        const parent = item.objectFolderOrObject.getParent();
-        const currentOffset = insertionOffsets.get(parent) || 0;
-        const position =
-          parent.getChildPosition(item.objectFolderOrObject) +
-          1 +
-          currentOffset;
-
-        const result = duplicateObjectFolderOrObjects({
-          project,
-          globalObjectsContainer,
-          objectsContainer,
-          items: [item],
-          destinationFolder: parent,
-          positionInFolder: position,
-        });
-        if (!result) return;
-
-        allCreatedObjects.push(...result.createdObjects);
-        result.topLevelObjectFolderOrObjects.forEach(objectFolderOrObject => {
-          allNewItems.push({ objectFolderOrObject, global: item.global });
-        });
-        insertionOffsets.set(parent, currentOffset + 1);
+      const result = duplicateObjectFolderOrObjectsInPlace({
+        project,
+        globalObjectsContainer,
+        objectsContainer,
+        items: topLevelSelectedItems,
       });
-
-      if (allNewItems.length === 0) return;
+      if (!result) return;
 
       // Duplicating existing objects can never introduce a new type to the
       // project — the originals are already present.
-      onObjectCreated(allCreatedObjects, false);
+      onObjectCreated(result.createdObjects, false);
       onObjectModified(true);
-      selectObjectFolderOrObjectsWithContext(allNewItems);
+      selectObjectFolderOrObjectsWithContext(result.duplicatedItems);
     },
     [
       isListLocked,

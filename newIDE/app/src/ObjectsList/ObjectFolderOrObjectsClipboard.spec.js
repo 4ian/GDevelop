@@ -21,6 +21,7 @@ import {
   duplicateObjectFolderOrObjects,
   duplicateObjectFolderOrObjectsInPlace,
 } from './ObjectFolderOrObjectsDuplicate';
+import { makeFakeI18n } from '../EditorFunctions/TestHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -175,7 +176,9 @@ describe('ObjectFolderOrObjectsClipboard', () => {
       { global: false, objectFolderOrObject: subFolder },
     ]);
     expect(hasObjectFolderOrObjectsInClipboard()).toBe(true);
-    expect(getObjectFolderOrObjectsClipboardSummaryName()).toBe('MyFolder');
+    expect(getObjectFolderOrObjectsClipboardSummaryName(makeFakeI18n())).toBe(
+      'MyFolder'
+    );
     expect(getObjectFolderOrObjectsClipboardObjectTypes()).toEqual(['Sprite']);
 
     const pastedContent = pasteObjectFolderOrObjectsFromClipboard({
@@ -253,7 +256,9 @@ describe('ObjectFolderOrObjectsClipboard', () => {
       objectFolderOrObject: rootFolder.getChildAt(0),
     };
 
-    const clipboardSummaryBefore = getObjectFolderOrObjectsClipboardSummaryName();
+    const clipboardSummaryBefore = getObjectFolderOrObjectsClipboardSummaryName(
+      makeFakeI18n()
+    );
 
     const duplicatedContent = duplicateObjectFolderOrObjects({
       project,
@@ -269,7 +274,7 @@ describe('ObjectFolderOrObjectsClipboard', () => {
     expect(duplicatedContent.createdObjects).toHaveLength(1);
     expect(objectsContainer.getObjectsCount()).toBe(3);
     // Duplication must not read from nor write to the OS clipboard.
-    expect(getObjectFolderOrObjectsClipboardSummaryName()).toBe(
+    expect(getObjectFolderOrObjectsClipboardSummaryName(makeFakeI18n())).toBe(
       clipboardSummaryBefore
     );
 

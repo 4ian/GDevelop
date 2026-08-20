@@ -328,7 +328,9 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
   ): any {
     let translation = t`Paste`;
     if (hasObjectFolderOrObjectsInClipboard()) {
-      const clipboardSummaryName = getObjectFolderOrObjectsClipboardSummaryName();
+      const clipboardSummaryName = getObjectFolderOrObjectsClipboardSummaryName(
+        i18n
+      );
       translation = isGlobalObject
         ? t`Paste ${clipboardSummaryName} as a Global Object`
         : t`Paste ${clipboardSummaryName}`;

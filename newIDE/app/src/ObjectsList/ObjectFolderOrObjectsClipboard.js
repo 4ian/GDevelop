@@ -144,11 +144,13 @@ export const getObjectFolderOrObjectsClipboardContent = (): ?{|
  * A short, human readable name of what's in the clipboard, used in
  * "Paste ..." menu labels for single-item context menus.
  */
-export const getObjectFolderOrObjectsClipboardSummaryName = (): string => {
+export const getObjectFolderOrObjectsClipboardSummaryName = (
+  i18n: I18nType
+): string => {
   const content = getObjectFolderOrObjectsClipboardContent();
   if (!content || content.items.length === 0) return '';
   if (content.items.length === 1) return content.items[0].name;
-  return `${content.items.length} items`;
+  return i18n._(t`${content.items.length} items`);
 };
 
 /**

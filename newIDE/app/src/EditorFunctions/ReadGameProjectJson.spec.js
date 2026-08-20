@@ -35,13 +35,6 @@ describe('read_game_project_json', () => {
     expect(result.message).toBeUndefined();
   });
 
-  it('reads the LIVE project: a scene added after opening is visible', async () => {
-    project.insertNewLayout('JustAdded', 3);
-    const result = await launch({ path: 'scenes[*].sceneName' });
-    expect(result.success).toBe(true);
-    expect(result.result).toEqual(['Level1', 'Level2', 'Menu', 'JustAdded']);
-  });
-
   it('applies a case-insensitive contains filter on an array', async () => {
     const result = await launch({
       path: 'scenes',

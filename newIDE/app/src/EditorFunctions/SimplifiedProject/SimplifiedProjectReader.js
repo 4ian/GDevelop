@@ -1,5 +1,6 @@
 // @flow
-// VENDORED from GDevelop-services/generation-api/src/lib/gdevelop-simplified-project-reader.js — keep the semantics and marker strings in sync (update both in the same change).
+// Keep the semantics and marker strings in sync with the backend reader
+// (update both in the same change).
 
 /**
  * Truncate a value to a given depth. Objects beyond the depth are replaced

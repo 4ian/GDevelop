@@ -8784,11 +8784,6 @@ const readGameProjectJson: EditorFunction = {
       text: <Trans>Inspect the game structure.</Trans>,
     };
   },
-  // Reads the LIVE project client-side (v15+): the simplified project is
-  // built on the spot and navigated with the vendored reader (identical
-  // semantics to the backend's `gdevelop-simplified-project-reader.js`).
-  // The backend only computes the result for tools <= v14 (from a stale
-  // uploaded snapshot) and skips it for tools >= v15.
   launchFunction: async ({ project, args }) => {
     const simplifiedProject = makeSimplifiedProjectBuilder(
       gd

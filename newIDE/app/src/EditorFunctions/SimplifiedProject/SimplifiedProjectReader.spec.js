@@ -1,7 +1,6 @@
 // @flow
-// Spec for the VENDORED reader — mirrors the backend spec in
-// GDevelop-services/generation-api/src/lib/__tests__/gdevelop-simplified-project-reader.spec.js
-// (marker strings must stay identical: update both in the same change).
+// Keep in sync with the backend reader spec (marker strings must stay
+// identical: update both in the same change).
 import {
   navigateSimplifiedProjectJson,
   parsePath,

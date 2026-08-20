@@ -112,7 +112,7 @@ export const getSelectionTopLevelItems = <T>(
   items: $ReadOnlyArray<T>,
   getObjectFolderOrObject: (item: T) => gdObjectFolderOrObject | null
 ): Array<T> => {
-  const selectedPtrs = new Set();
+  const selectedPtrs = new Set<number>();
   const resolved: Array<{|
     item: T,
     objectFolderOrObject: gdObjectFolderOrObject,
@@ -138,10 +138,7 @@ export const getSelectionTopLevelItems = <T>(
 export const getSelectionTopLevelNodes = (
   items: Array<ObjectFolderOrObjectWithContext>
 ): Array<ObjectFolderOrObjectWithContext> =>
-  getSelectionTopLevelItems(
-    items,
-    item => item.objectFolderOrObject
-  );
+  getSelectionTopLevelItems(items, item => item.objectFolderOrObject);
 
 /**
  * Enumerate every direct and indirect child of the given folder (both objects
@@ -214,9 +211,7 @@ export const dropDescendantsOfRemovedFolders = (
   previous: Array<ObjectFolderOrObjectWithContext>,
   next: Array<ObjectFolderOrObjectWithContext>
 ): Array<ObjectFolderOrObjectWithContext> => {
-  const nextPtrs = new Set(
-    next.map(item => item.objectFolderOrObject.ptr)
-  );
+  const nextPtrs = new Set(next.map(item => item.objectFolderOrObject.ptr));
   const removedFolders = previous.filter(
     item =>
       item.objectFolderOrObject.isFolder() &&

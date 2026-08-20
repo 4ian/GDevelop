@@ -82,13 +82,12 @@ function useObjectsSelection({
       // global when they actually live in the scene container.
       const global = rootFolder !== objectsRootFolder;
       selectObjectFolderOrObjectsWithContext(
-        enumerateAllChildrenInFolderMatchingSearch(
-          rootFolder,
-          searchText
-        ).map(objectFolderOrObject => ({
-          objectFolderOrObject,
-          global,
-        }))
+        enumerateAllChildrenInFolderMatchingSearch(rootFolder, searchText).map(
+          objectFolderOrObject => ({
+            objectFolderOrObject,
+            global,
+          })
+        )
       );
     },
     [

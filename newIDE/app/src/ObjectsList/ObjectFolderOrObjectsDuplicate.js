@@ -91,8 +91,7 @@ export const duplicateObjectFolderOrObjectsInPlace = ({
       objectsContainer,
       items: [item],
       destinationFolder: parent,
-      positionInFolder:
-        parent.getChildPosition(item.objectFolderOrObject) + 1,
+      positionInFolder: parent.getChildPosition(item.objectFolderOrObject) + 1,
     });
     if (!result) return;
     createdObjects.push(...result.createdObjects);

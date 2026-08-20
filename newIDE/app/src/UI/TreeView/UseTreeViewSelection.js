@@ -7,19 +7,29 @@ import {
   type SelectArgs,
 } from '.';
 
-type ComputeArgs<Item: ItemBaseAttributes> = {|
+// Inexact (+ rest) so tests can pass items with extra fields (e.g. `id`) and
+// TreeView can pass exact FlattenedNode rows without invariance errors.
+type SelectableTreeItem = { +isRoot?: boolean, +isPlaceholder?: boolean, ... };
+type SelectableFlattenedNode<Item> = {
+  +id: string,
+  +selected: boolean,
+  +item: Item,
+  ...
+};
+
+type ComputeArgs<Item: SelectableTreeItem> = {|
   multiSelect: boolean,
   selectedItems: $ReadOnlyArray<Item>,
-  flattenedData: $ReadOnlyArray<FlattenedNode<Item>>,
+  flattenedData: $ReadOnlyArray<SelectableFlattenedNode<Item>>,
   getItemId: (item: Item) => string,
   selectionAnchorId: ?string,
   shiftSelectionBase: $ReadOnlyArray<Item>,
-  node: FlattenedNode<Item>,
+  node: SelectableFlattenedNode<Item>,
   exclusive?: boolean,
   extendFromAnchor?: boolean,
 |};
 
-export type ComputeTreeViewSelectionResult<Item: ItemBaseAttributes> = {|
+export type ComputeTreeViewSelectionResult<Item: SelectableTreeItem> = {|
   newSelection: Array<Item> | null,
   selectionAnchorId: ?string,
   shiftSelectionBase: Array<Item>,
@@ -30,7 +40,7 @@ export type ComputeTreeViewSelectionResult<Item: ItemBaseAttributes> = {|
  * Pure selection transition used by `useTreeViewSelection`. Exported so the
  * VS-Code-style range / toggle rules can be unit-tested without rendering.
  */
-export function computeTreeViewSelection<Item: ItemBaseAttributes>({
+export function computeTreeViewSelection<Item: SelectableTreeItem>({
   multiSelect,
   selectedItems,
   flattenedData,

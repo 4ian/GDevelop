@@ -1,33 +1,28 @@
 // @flow
 import { computeTreeViewSelection } from './UseTreeViewSelection';
 
-type Item = {|
-  id: string,
-  isRoot?: boolean,
-  isPlaceholder?: boolean,
-|};
+type Item = {
+  +id: string,
+  +isRoot?: boolean,
+  +isPlaceholder?: boolean,
+};
 
 const node = (
   id: string,
   selected: boolean = false,
-  extra?: {| isRoot?: boolean, isPlaceholder?: boolean |}
-) => ({
+  extra?: { +isRoot?: boolean, +isPlaceholder?: boolean }
+): {| id: string, selected: boolean, item: Item |} => ({
   id,
-  name: id,
-  rightComponent: null,
-  rightButton: null,
-  shouldHideMenuIcon: null,
-  hasChildren: false,
-  canHaveChildren: false,
-  extraClass: '',
-  depth: 0,
-  collapsed: false,
   selected,
-  disableCollapse: false,
-  item: { id, ...extra },
+  item: {
+    id,
+    isRoot: extra ? extra.isRoot : undefined,
+    isPlaceholder: extra ? extra.isPlaceholder : undefined,
+  },
 });
 
-const getItemId = (item: Item) => item.id;
+const item = (id: string): Item => ({ id });
+const getItemId = (item: Item): string => item.id;
 
 describe('computeTreeViewSelection', () => {
   const flattenedData = [
@@ -59,11 +54,11 @@ describe('computeTreeViewSelection', () => {
   test('ctrl+click appends to the selection and moves the anchor to the clicked item', () => {
     const result = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'a' }],
+      selectedItems: [item('a')],
       flattenedData,
       getItemId,
       selectionAnchorId: 'a',
-      shiftSelectionBase: [{ id: 'a' }],
+      shiftSelectionBase: [item('a')],
       node: node('d'),
     });
     expect(result.newSelection && result.newSelection.map(getItemId)).toEqual([
@@ -77,11 +72,11 @@ describe('computeTreeViewSelection', () => {
   test('ctrl+click on a selected item toggles it off and keeps keyboard focus on it', () => {
     const result = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'a' }, { id: 'd' }],
+      selectedItems: [item('a'), item('d')],
       flattenedData,
       getItemId,
       selectionAnchorId: 'd',
-      shiftSelectionBase: [{ id: 'a' }, { id: 'd' }],
+      shiftSelectionBase: [item('a'), item('d')],
       node: { ...node('d'), selected: true },
     });
     expect(result.newSelection && result.newSelection.map(getItemId)).toEqual([
@@ -93,11 +88,11 @@ describe('computeTreeViewSelection', () => {
   test('shift+click extends from the anchor and keeps items outside the range', () => {
     const result = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'a' }, { id: 'd' }],
+      selectedItems: [item('a'), item('d')],
       flattenedData,
       getItemId,
       selectionAnchorId: 'd',
-      shiftSelectionBase: [{ id: 'a' }, { id: 'd' }],
+      shiftSelectionBase: [item('a'), item('d')],
       node: node('b'),
       extendFromAnchor: true,
     });
@@ -114,11 +109,11 @@ describe('computeTreeViewSelection', () => {
   test('consecutive shift+clicks replace the previous range from the same anchor', () => {
     const firstRange = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'a' }, { id: 'd' }],
+      selectedItems: [item('a'), item('d')],
       flattenedData,
       getItemId,
       selectionAnchorId: 'd',
-      shiftSelectionBase: [{ id: 'a' }, { id: 'd' }],
+      shiftSelectionBase: [item('a'), item('d')],
       node: node('b'),
       extendFromAnchor: true,
     });
@@ -148,11 +143,11 @@ describe('computeTreeViewSelection', () => {
     ];
     const result = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'a' }],
+      selectedItems: [item('a')],
       flattenedData: withPlaceholder,
       getItemId,
       selectionAnchorId: 'a',
-      shiftSelectionBase: [{ id: 'a' }],
+      shiftSelectionBase: [item('a')],
       node: node('b'),
       extendFromAnchor: true,
     });
@@ -165,11 +160,11 @@ describe('computeTreeViewSelection', () => {
   test('exclusive click on the only selected item is a no-op for the selection', () => {
     const result = computeTreeViewSelection({
       multiSelect: true,
-      selectedItems: [{ id: 'b' }],
+      selectedItems: [item('b')],
       flattenedData,
       getItemId,
       selectionAnchorId: 'b',
-      shiftSelectionBase: [{ id: 'b' }],
+      shiftSelectionBase: [item('b')],
       node: { ...node('b'), selected: true },
       exclusive: true,
     });

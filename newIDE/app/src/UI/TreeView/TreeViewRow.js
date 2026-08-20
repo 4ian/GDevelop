@@ -202,7 +202,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
         if (!isSticky) onOpen(node);
         return;
       }
-      onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
+      onSelect({
+        node,
+        exclusive: !(event.metaKey || event.ctrlKey || event.shiftKey),
+        extendFromAnchor: event.shiftKey,
+      });
       onClick(node);
     },
     [onClick, onSelect, node, onOpen, isSticky]
@@ -219,10 +223,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      if (!node.item.isRoot) onClickItem(event);
+      // In multi-select mode, preserve an existing selection when right-clicking
+      // one of its rows. In single-select mode always (re-)select the row so
+      // that the context menu always operates on the correct item.
+      if (!node.item.isRoot && !(data.multiSelect && node.selected))
+        onClickItem(event);
       openContextMenu(event);
     },
-    [node, onClickItem, openContextMenu]
+    [node, data.multiSelect, onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(

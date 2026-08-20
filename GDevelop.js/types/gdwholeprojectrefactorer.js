@@ -5,6 +5,7 @@ declare class gdWholeProjectRefactorer {
   static applyRefactoringForObjectVariablesContainer(project: gdProject, objectVariablesContainer: gdVariablesContainer, initialInstancesContainer: gdInitialInstancesContainer, objectName: string, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
   static applyRefactoringForGroupVariablesContainer(project: gdProject, globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, initialInstancesContainer: gdInitialInstancesContainer, groupVariablesContainer: gdVariablesContainer, objectGroup: gdObjectGroup, changeset: gdVariablesChangeset, originalSerializedVariables: gdSerializerElement): void;
   static renameEventsFunctionsExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
+  static updateExtensionNameInExtension(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, sourceExtensionName: string): void;
   static updateExtensionNameInEventsBasedObject(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedObject: gdEventsBasedObject, sourceExtensionName: string): void;
   static renameEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;

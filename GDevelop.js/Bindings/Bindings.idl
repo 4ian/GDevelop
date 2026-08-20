@@ -2819,6 +2819,10 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_UpdateExtensionNameInExtension(
+      [Ref] Project project,
+      [Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString sourceExtensionName);
     void STATIC_UpdateExtensionNameInEventsBasedBehavior(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,

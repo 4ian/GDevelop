@@ -37,8 +37,8 @@ import {
   pasteObjectFolderOrObjectsFromClipboard,
   getPasteMenuLabel,
 } from './ObjectFolderOrObjectsClipboard';
-import { useObjectsSelection } from './useObjectsSelection';
-import { useBulkObjectOperations } from './useBulkObjectOperations';
+import { useObjectsSelection } from './UseObjectsSelection';
+import { useBulkObjectOperations } from './UseBulkObjectOperations';
 import { mapFor } from '../Utils/MapFor';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';

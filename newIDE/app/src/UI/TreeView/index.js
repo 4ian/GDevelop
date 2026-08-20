@@ -21,7 +21,7 @@ import {
   findSurfaceBackgroundColor,
 } from './StickyRows';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
-import { useTreeViewSelection } from './useTreeViewSelection';
+import { useTreeViewSelection } from './UseTreeViewSelection';
 
 export const navigationKeys = [
   'ArrowDown',

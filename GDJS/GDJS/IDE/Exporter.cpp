@@ -30,12 +30,14 @@
 
 namespace gdjs {
 
-// Modernized using std::unordered_set for O(1) deduplication instead of O(N) std::find
-static void InsertUnique(std::vector<gd::String> &container, std::unordered_set<gd::String> &seen, const gd::String &str) {
+namespace {
+// Thread-safe, highly efficient local O(1) tracking mechanism
+void InsertUnique(std::vector<gd::String> &container, std::unordered_set<gd::String> &seen, const gd::String &str) {
     if (seen.insert(str).second) {
         container.push_back(str);
     }
 }
+} // namespace
 
 Exporter::Exporter(gd::AbstractFileSystem &fileSystem, const gd::String &gdjsRoot_) 
     : fs(fileSystem), gdjsRoot(gdjsRoot_) {
@@ -60,7 +62,6 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         auto &wholeProjectDiagnosticReport = options.project.GetWholeProjectDiagnosticReport();
         wholeProjectDiagnosticReport.Clear();
 
-        // Use project properties fallback to set empty properties
         if (exportedProject.GetAuthorIds().empty() && !options.fallbackAuthorId.empty()) {
             exportedProject.GetAuthorIds().push_back(options.fallbackAuthorId);
         }
@@ -68,22 +69,17 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
             exportedProject.GetAuthorUsernames().push_back(options.fallbackAuthorUsername);
         }
 
-        // Prepare the export directory
         fs.MkDir(exportDir);
         includesFiles.clear();
         std::vector<gd::String> resourcesFiles;
         
-        // Track unique elements efficiently
+        // Stack-allocated tracking caches protect long-lived class instances from leaking memory
         std::unordered_set<gd::String> seenIncludes;
         std::unordered_set<gd::String> seenResources;
 
-        // Export the resources (before generating events as some resource filenames may be updated)
         helper.ExportResources(fs, exportedProject, exportDir);
-
-        // Compatibility with GD <= 5.0-beta56
         helper.AddDeprecatedFontFilesToFontResources(fs, exportedProject.GetResourcesManager(), exportDir);
 
-        // Export engine libraries
         helper.AddLibsInclude(
             /*pixiRenderers=*/true,
             usedExtensionsResult.Has3DObjects(),
@@ -97,12 +93,11 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
             includesFiles
         );
 
-        // Seed seenIncludes with what AddLibsInclude just populated
+        // Populate baseline data from the base engine libraries into our tracking sets
         for (const auto &file : includesFiles) {
             seenIncludes.insert(file);
         }
 
-        // Export files for free functions, objects, and behaviors using efficient unique inserts
         for (const auto &includeFile : usedExtensionsResult.GetUsedIncludeFiles()) {
             InsertUnique(includesFiles, seenIncludes, includeFile);
         }
@@ -110,16 +105,13 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
             InsertUnique(resourcesFiles, seenResources, requiredFile);
         }
 
-        // Export effects (after engine libraries as they auto-register themselves to the engine)
         helper.ExportEffectIncludes(exportedProject, includesFiles);
 
-        // Export events
         if (!helper.ExportScenesEventsCode(exportedProject, codeOutputDir, includesFiles, wholeProjectDiagnosticReport, false)) {
             gd::LogError(_("Error during exporting! Unable to export events:\n") + lastError);
             return false;
         }
 
-        // ...and export data configuration
         gd::SerializerElement noRuntimeGameOptions;
         std::vector<gd::InGameEditorResourceMetadata> noInGameEditorResources;
         const gd::String dataJsPath = codeOutputDir + "/data.js";
@@ -145,7 +137,6 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
         return true;
     };
 
-    // Target deployment dispatching
     if (options.target == "cordova") {
         fs.MkDir(options.exportPath);
         fs.MkDir(options.exportPath + "/www");

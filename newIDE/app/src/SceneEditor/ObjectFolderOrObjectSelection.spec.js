@@ -1,5 +1,8 @@
 // @flow
-import { cleanNonExistingObjectFolderOrObjectWithContexts } from './ObjectFolderOrObjectsSelection';
+import {
+  cleanNonExistingObjectFolderOrObjectWithContexts,
+  getObjectFolderOrObjectWithContextFromObjectName,
+} from './ObjectFolderOrObjectsSelection';
 const gd: libGDevelop = global.gd;
 
 describe('SceneEditor', () => {
@@ -96,6 +99,103 @@ describe('SceneEditor', () => {
         objectFolderOrObject: globalRootFolder.getChildAt(0),
       },
     ]);
+
+    project.delete();
+  });
+
+  test('getObjectFolderOrObjectWithContextFromObjectName finds objects in the right container', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const globalObjectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const objectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+
+    globalObjectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'MyGlobalSprite',
+      globalObjectsContainer.getRootFolder(),
+      0
+    );
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'MySceneSprite',
+      objectsContainer.getRootFolder(),
+      0
+    );
+
+    expect(
+      getObjectFolderOrObjectWithContextFromObjectName(
+        globalObjectsContainer,
+        objectsContainer,
+        'MyGlobalSprite'
+      )
+    ).toEqual({
+      global: true,
+      objectFolderOrObject: globalObjectsContainer
+        .getRootFolder()
+        .getChildAt(0),
+    });
+    expect(
+      getObjectFolderOrObjectWithContextFromObjectName(
+        globalObjectsContainer,
+        objectsContainer,
+        'MySceneSprite'
+      )
+    ).toEqual({
+      global: false,
+      objectFolderOrObject: objectsContainer.getRootFolder().getChildAt(0),
+    });
+    expect(
+      getObjectFolderOrObjectWithContextFromObjectName(
+        globalObjectsContainer,
+        objectsContainer,
+        'DoesNotExist'
+      )
+    ).toBe(null);
+
+    project.delete();
+  });
+
+  test('cleanNonExistingObjectFolderOrObjectWithContexts keeps a multi-selection spanning several objects and folders intact', () => {
+    const project = gd.ProjectHelper.createNewGDJSProject();
+    const objectsContainer = new gd.ObjectsContainer(
+      gd.ObjectsContainer.Unknown
+    );
+    const rootFolder = objectsContainer.getRootFolder();
+
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'ObjectA',
+      rootFolder,
+      0
+    );
+    objectsContainer.insertNewObjectInFolder(
+      project,
+      'Sprite',
+      'ObjectB',
+      rootFolder,
+      1
+    );
+    const folder = rootFolder.insertNewFolder('SomeFolder', 2);
+
+    const selection = [
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(0) },
+      { global: false, objectFolderOrObject: rootFolder.getChildAt(1) },
+      { global: false, objectFolderOrObject: folder },
+    ];
+
+    expect(
+      cleanNonExistingObjectFolderOrObjectWithContexts(
+        null,
+        objectsContainer,
+        selection
+      )
+    ).toEqual(selection);
 
     project.delete();
   });

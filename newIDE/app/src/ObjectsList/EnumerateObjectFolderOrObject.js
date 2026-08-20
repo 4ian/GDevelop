@@ -159,6 +159,35 @@ export const enumerateAllChildrenInFolder = (
   return result;
 };
 
+const itemMatchesSearchText = (
+  item: gdObjectFolderOrObject,
+  lowercaseSearchText: string
+): boolean =>
+  getObjectFolderOrObjectUnifiedName(item)
+    .toLowerCase()
+    .includes(lowercaseSearchText);
+
+/**
+ * Same case-insensitive substring match as TreeView's search filter.
+ * Folders that only appear as ancestors of a match, or that still contain a
+ * non-matching descendant, are not selectable: bulk ops would otherwise act
+ * on hidden children.
+ */
+export const isSelectableWhileSearching = (
+  objectFolderOrObject: gdObjectFolderOrObject,
+  searchText: string
+): boolean => {
+  if (!searchText) return true;
+  const lowercaseSearchText = searchText.toLowerCase();
+  if (!itemMatchesSearchText(objectFolderOrObject, lowercaseSearchText)) {
+    return false;
+  }
+  if (!objectFolderOrObject.isFolder()) return true;
+  return enumerateAllChildrenInFolder(objectFolderOrObject).every(child =>
+    itemMatchesSearchText(child, lowercaseSearchText)
+  );
+};
+
 /**
  * Same case-insensitive substring match as TreeView's search filter.
  * Ancestor folders shown only as context for a match are not included.
@@ -171,16 +200,35 @@ export const enumerateAllChildrenInFolderMatchingSearch = (
 ): Array<gdObjectFolderOrObject> => {
   const children = enumerateAllChildrenInFolder(folder);
   if (!searchText) return children;
-  const lowercaseSearchText = searchText.toLowerCase();
-  const matchesSearch = (item: gdObjectFolderOrObject) =>
-    getObjectFolderOrObjectUnifiedName(item)
-      .toLowerCase()
-      .includes(lowercaseSearchText);
-  return children.filter(child => {
-    if (!matchesSearch(child)) return false;
-    if (!child.isFolder()) return true;
-    return enumerateAllChildrenInFolder(child).every(matchesSearch);
-  });
+  return children.filter(child =>
+    isSelectableWhileSearching(child, searchText)
+  );
+};
+
+/**
+ * After a Ctrl+click that removes a folder from the selection, also drop
+ * descendants that Select All (or a previous range) had added. Otherwise
+ * nested objects stay selected inside a collapsed folder.
+ */
+export const dropDescendantsOfRemovedFolders = (
+  previous: Array<ObjectFolderOrObjectWithContext>,
+  next: Array<ObjectFolderOrObjectWithContext>
+): Array<ObjectFolderOrObjectWithContext> => {
+  const nextPtrs = new Set(
+    next.map(item => item.objectFolderOrObject.ptr)
+  );
+  const removedFolders = previous.filter(
+    item =>
+      item.objectFolderOrObject.isFolder() &&
+      !nextPtrs.has(item.objectFolderOrObject.ptr)
+  );
+  if (removedFolders.length === 0) return next;
+  return next.filter(
+    item =>
+      !removedFolders.some(folder =>
+        item.objectFolderOrObject.isADescendantOf(folder.objectFolderOrObject)
+      )
+  );
 };
 
 const collectObjectsToDelete = (

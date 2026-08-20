@@ -421,7 +421,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     [flattenOpened, items, searchText]
   );
 
-  const onSelect = useTreeViewSelection({
+  const { onSelect, navigationFocusIdRef } = useTreeViewSelection({
     multiSelect,
     selectedItems,
     flattenedData,
@@ -740,13 +740,16 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
     (event: KeyboardEvent) => {
       if (!navigationKeys.includes(event.key)) return;
       let newFocusedItem;
-      const item = selectedItems[0];
-      let itemIndexInFlattenedData = -1;
-      if (item) {
-        itemIndexInFlattenedData = flattenedData.findIndex(
-          node => node.id === getItemId(item)
-        );
-      }
+      const focusedId =
+        navigationFocusIdRef.current ||
+        (selectedItems[0] ? getItemId(selectedItems[0]) : null);
+      let itemIndexInFlattenedData = focusedId
+        ? flattenedData.findIndex(node => node.id === focusedId)
+        : -1;
+      const item =
+        itemIndexInFlattenedData !== -1
+          ? flattenedData[itemIndexInFlattenedData].item
+          : selectedItems[0];
 
       if (itemIndexInFlattenedData === -1) {
         // If no row is selected, start from the first row that is selectable.
@@ -860,6 +863,7 @@ const InnerTreeView = <Item: ItemBaseAttributes>(
       closeItems,
       onClickItem,
       scrollToItem,
+      navigationFocusIdRef,
     ]
   );
 

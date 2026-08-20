@@ -7,6 +7,8 @@ import {
   removeEmptyFoldersFromSelection,
   enumerateAllChildrenInFolder,
   enumerateAllChildrenInFolderMatchingSearch,
+  isSelectableWhileSearching,
+  dropDescendantsOfRemovedFolders,
 } from './EnumerateObjectFolderOrObject';
 import {
   copyObjectFolderOrObjectsToClipboard,
@@ -159,6 +161,33 @@ describe('ObjectFolderOrObjectsClipboard', () => {
           item.isFolder() ? item.getFolderName() : item.getObject().getName()
       )
     ).toEqual(['Enemy1', 'EnemyBoss']);
+
+    expect(isSelectableWhileSearching(enemiesFolder, 'enemy')).toBe(false);
+    expect(
+      isSelectableWhileSearching(enemiesFolder.getChildAt(0), 'enemy')
+    ).toBe(true);
+
+    project.delete();
+  });
+
+  test('dropDescendantsOfRemovedFolders clears children left behind after deselecting a folder', () => {
+    const { project, rootFolder, subFolder } = makeProjectWithObjects();
+    const objectInFolder = subFolder.getChildAt(0);
+    const sibling = rootFolder.getChildAt(0);
+
+    const previous = [
+      { global: false, objectFolderOrObject: subFolder },
+      { global: false, objectFolderOrObject: objectInFolder },
+      { global: false, objectFolderOrObject: sibling },
+    ];
+    const nextAfterDeselectingFolder = [
+      { global: false, objectFolderOrObject: objectInFolder },
+      { global: false, objectFolderOrObject: sibling },
+    ];
+
+    expect(
+      dropDescendantsOfRemovedFolders(previous, nextAfterDeselectingFolder)
+    ).toEqual([{ global: false, objectFolderOrObject: sibling }]);
 
     project.delete();
   });

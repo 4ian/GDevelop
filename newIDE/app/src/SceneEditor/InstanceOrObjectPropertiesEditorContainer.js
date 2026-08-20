@@ -229,15 +229,9 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : objects.length > 1 && lastSelectionType === 'object' ? (
-          <EmptyMessage>
-            <Plural
-              value={objects.length}
-              one="# object selected."
-              other="# objects selected."
-            />
-          </EmptyMessage>
-        ) : !!objects.length && lastSelectionType === 'object' ? (
+        ) : lastSelectionType === 'object' &&
+          objects.length === 1 &&
+          selectedObjectFolderOrObjectsCount === 1 ? (
           <CompactObjectPropertiesEditor
             objects={objects}
             onEditObject={onEditObject}
@@ -274,10 +268,20 @@ export const InstanceOrObjectPropertiesEditorContainer: React.ComponentType<{
             unsavedChanges={unsavedChanges}
             i18n={i18n}
           />
-        ) : selectedObjectFolderOrObjectsCount > 0 &&
-          lastSelectionType === 'object' ? (
+        ) : lastSelectionType === 'object' &&
+          selectedObjectFolderOrObjectsCount > 0 &&
+          objects.length === 0 ? (
           <EmptyMessage>
             <Trans>Folder selected. No properties to display.</Trans>
+          </EmptyMessage>
+        ) : lastSelectionType === 'object' &&
+          selectedObjectFolderOrObjectsCount > 0 ? (
+          <EmptyMessage>
+            <Plural
+              value={objects.length}
+              one="# object selected."
+              other="# objects selected."
+            />
           </EmptyMessage>
         ) : objectGroup && lastSelectionType === 'objectGroup' ? (
           <CompactObjectGroupPropertiesEditor

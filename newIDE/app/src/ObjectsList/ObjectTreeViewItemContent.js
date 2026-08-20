@@ -96,6 +96,9 @@ export type ObjectTreeViewItemProps = {|
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
+  selectObjectFolderOrObjectsWithContext: (
+    items: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   addFolder: (items: Array<ObjectFolderOrObjectWithContext>) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
@@ -670,14 +673,19 @@ export class ObjectTreeViewItemContent implements TreeViewItemContent {
       onObjectPasted,
       onObjectModified,
       onObjectCreated,
-      forceUpdateList,
+      selectObjectFolderOrObjectsWithContext,
     } = this.props;
     onObjectModified(true);
-    forceUpdateList();
     if (createdObjects.length > 0) {
       if (onObjectPasted) onObjectPasted(createdObjects[0]);
       onObjectCreated(createdObjects, isTheFirstOfItsTypeInProject);
     }
+    selectObjectFolderOrObjectsWithContext(
+      topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
+        objectFolderOrObject: pastedObjectFolderOrObject,
+        global: this._isGlobal,
+      }))
+    );
   }
 
   duplicate(): void {

@@ -30,6 +30,8 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import {
   getFoldersAscendanceWithoutRootFolder,
   getSelectionTopLevelItems,
+  isSelectableWhileSearching,
+  dropDescendantsOfRemovedFolders,
   type ObjectFolderOrObjectWithContext,
 } from './EnumerateObjectFolderOrObject';
 import {
@@ -1166,6 +1168,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getThumbnail,
         showDeleteConfirmation,
         selectObjectFolderOrObjectWithContext,
+        selectObjectFolderOrObjectsWithContext,
         addFolder,
         forceUpdateList,
         forceUpdate,
@@ -1195,6 +1198,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         getThumbnail,
         showDeleteConfirmation,
         selectObjectFolderOrObjectWithContext,
+        selectObjectFolderOrObjectsWithContext,
         addFolder,
         forceUpdateList,
         forceUpdate,
@@ -1218,6 +1222,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
+        selectObjectFolderOrObjectsWithContext,
         showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
@@ -1238,6 +1243,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         onRenameObjectFolderOrObjectWithContextFinish,
         onDeleteObjects,
         selectObjectFolderOrObjectWithContext,
+        selectObjectFolderOrObjectsWithContext,
         showDeleteConfirmation,
         forceUpdateList,
         forceUpdate,
@@ -1983,9 +1989,31 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                         // than passing them through to SceneEditor which would
                         // silently shrink them.
                         const { global } = objectFolderOrObjectsToSelect[0];
+                        const sameSectionItems = objectFolderOrObjectsToSelect.filter(
+                          item => item.global === global
+                        );
+                        let searchableItems = sameSectionItems;
+                        if (searchText) {
+                          const matchingItems = sameSectionItems.filter(item =>
+                            isSelectableWhileSearching(
+                              item.objectFolderOrObject,
+                              searchText
+                            )
+                          );
+                          // A click/range that only hit context-only folders
+                          // must not clear the current selection.
+                          if (
+                            matchingItems.length === 0 &&
+                            sameSectionItems.length > 0
+                          ) {
+                            return;
+                          }
+                          searchableItems = matchingItems;
+                        }
                         selectObjectFolderOrObjectsWithContext(
-                          objectFolderOrObjectsToSelect.filter(
-                            item => item.global === global
+                          dropDescendantsOfRemovedFolders(
+                            selectedObjectFolderOrObjectsWithContext,
+                            searchableItems
                           )
                         );
                       }}

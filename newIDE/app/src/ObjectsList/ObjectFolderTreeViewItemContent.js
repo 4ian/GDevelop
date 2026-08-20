@@ -82,6 +82,9 @@ export type ObjectFolderTreeViewItemProps = {|
   selectObjectFolderOrObjectWithContext: (
     objectFolderOrObjectWithContext: ?ObjectFolderOrObjectWithContext
   ) => void,
+  selectObjectFolderOrObjectsWithContext: (
+    items: Array<ObjectFolderOrObjectWithContext>
+  ) => void,
   forceUpdateList: () => void,
   forceUpdate: () => void,
   isListLocked: boolean,
@@ -369,7 +372,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       // Folder is empty or contains only empty folders.
       selectObjectFolderOrObjectWithContext(null);
       this.objectFolder.getParent().removeFolderChild(this.objectFolder);
-      forceUpdateList();
+      onObjectModified(true);
       return true;
     }
 
@@ -452,6 +455,7 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
       expandFolders,
       onObjectModified,
       onObjectCreated,
+      selectObjectFolderOrObjectsWithContext,
     } = this.props;
 
     const isTheFirstOfItsTypeInProject = getObjectFolderOrObjectsClipboardObjectTypes().some(
@@ -479,6 +483,12 @@ export class ObjectFolderTreeViewItemContent implements TreeViewItemContent {
     expandFolders([
       { objectFolderOrObject: this.objectFolder, global: this._isGlobal },
     ]);
+    selectObjectFolderOrObjectsWithContext(
+      topLevelObjectFolderOrObjects.map(pastedObjectFolderOrObject => ({
+        objectFolderOrObject: pastedObjectFolderOrObject,
+        global: this._isGlobal,
+      }))
+    );
   }
 
   duplicate(): void {
